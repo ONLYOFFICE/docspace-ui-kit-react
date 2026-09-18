@@ -231,7 +231,12 @@ describe("<QuantityPicker />", () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     render(
-      <Harness initialValue={10} minValue={10} enableZero onChange={onChange} />,
+      <Harness
+        initialValue={10}
+        minValue={10}
+        enableZero
+        onChange={onChange}
+      />,
     );
 
     const input = getInput();

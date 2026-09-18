@@ -50,7 +50,6 @@ const GracePeriodModal: React.FC<GracePeriodModalProps> = ({
         <Text fontWeight={600}>{t("Reminder")}</Text>
         <Text as="span" dataTestId="grace_period_info">
           <CommonTrans
-           
             i18nKey="GracePeriodActivatedInfo"
             values={{
               fromDate: paymentDate,
@@ -62,9 +61,7 @@ const GracePeriodModal: React.FC<GracePeriodModalProps> = ({
             }}
           />
         </Text>{" "}
-        <Text as="span">
-          {t("GracePeriodActivatedDescription")}
-        </Text>
+        <Text as="span">{t("GracePeriodActivatedDescription")}</Text>
       </ModalDialog.Body>
       <ModalDialog.Footer>
         <Button

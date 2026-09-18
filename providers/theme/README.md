@@ -4,13 +4,13 @@ Resolves the active theme (light, dark, or system) and provides it to child comp
 
 ## Props
 
-| Prop           | Type              | Required | Description                                              |
-| -------------- | ----------------- | -------- | -------------------------------------------------------- |
-| `initialTheme` | `ThemeKeys`       | No       | The initial theme (`BaseStr`, `DarkStr`, `SystemStr`)    |
-| `systemTheme`  | `ThemeKeys`       | No       | Override for the detected system theme                   |
-| `colorTheme`   | `CustomColorThemesSettingsDto` | No | Color theme data; fetched from API if not provided |
-| `locale`       | `string`          | No       | Locale for RTL detection and font family resolution      |
-| `children`     | `React.ReactNode` | Yes      | Child components that receive theming                    |
+| Prop           | Type                           | Required | Description                                           |
+| -------------- | ------------------------------ | -------- | ----------------------------------------------------- |
+| `initialTheme` | `ThemeKeys`                    | No       | The initial theme (`BaseStr`, `DarkStr`, `SystemStr`) |
+| `systemTheme`  | `ThemeKeys`                    | No       | Override for the detected system theme                |
+| `colorTheme`   | `CustomColorThemesSettingsDto` | No       | Color theme data; fetched from API if not provided    |
+| `locale`       | `string`                       | No       | Locale for RTL detection and font family resolution   |
+| `children`     | `React.ReactNode`              | Yes      | Child components that receive theming                 |
 
 ## Usage
 
@@ -20,7 +20,7 @@ import { ThemeKeys } from "@onlyoffice/apps-ui-kit/enums";
 
 <ThemeProvider initialTheme={ThemeKeys.BaseStr} locale="en">
   <App />
-</ThemeProvider>
+</ThemeProvider>;
 ```
 
 ## How it works

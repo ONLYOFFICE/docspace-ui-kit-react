@@ -87,9 +87,7 @@ const CssCustomizationTemplate = () => {
       {container && (
         <Portal
           element={
-            <div className={styles.popup}>
-              Custom styled portal content
-            </div>
+            <div className={styles.popup}>Custom styled portal content</div>
           }
           appendTo={container}
         />
@@ -136,7 +134,9 @@ export const Default: Story = {
     );
   },
   args: {
-    element: <div className={styles.popup}>This content is rendered in a portal</div>,
+    element: (
+      <div className={styles.popup}>This content is rendered in a portal</div>
+    ),
     visible: true,
   },
   parameters: {
@@ -170,8 +170,7 @@ export const Hidden: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Portal with visible set to false. The content is not rendered.",
+        story: "Portal with visible set to false. The content is not rendered.",
       },
       source: {
         code: `<Portal element={<div>Hidden content</div>} visible={false} appendTo={containerElement} />`,
@@ -239,7 +238,9 @@ const MultiplePortalsTemplate = () => {
           />
           <Portal
             element={
-              <div className={`${styles.popup} ${styles.purple} ${styles.top50}`}>
+              <div
+                className={`${styles.popup} ${styles.purple} ${styles.top50}`}
+              >
                 Second Portal
               </div>
             }
@@ -247,7 +248,9 @@ const MultiplePortalsTemplate = () => {
           />
           <Portal
             element={
-              <div className={`${styles.popup} ${styles.green} ${styles.top70}`}>
+              <div
+                className={`${styles.popup} ${styles.green} ${styles.top70}`}
+              >
                 Third Portal
               </div>
             }

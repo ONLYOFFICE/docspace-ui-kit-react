@@ -17,3 +17,11 @@ pnpm-lock.yaml
 # drift that the next sync silently reverts.
 locales/
 css/
+
+# Prettier's Markdown printer escapes `*` inside the `{/* ... */}` expression
+# that opens every component doc with the licence header -- it emits `{/\*`
+# and `\*/}`, which is no longer a JavaScript comment. Storybook's indexer then
+# fails every one of those files with "Could not parse expression with acorn"
+# and refuses to start at all. It broke 18 files the first time `pnpm format`
+# ran here, and nothing before Storybook itself would have caught it.
+*.mdx

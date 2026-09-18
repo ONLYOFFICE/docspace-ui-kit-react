@@ -151,13 +151,34 @@ const AllVariantsTemplate = () => {
   return (
     <>
       <div className={styles.containerInline}>
-        <SelectedItem label="Inline enabled" propKey="1" isInline onClose={noop} />
-        <SelectedItem label="Inline disabled" propKey="2" isInline isDisabled onClose={noop} />
-        <SelectedItem label="Another item" propKey="3" isInline onClose={noop} />
+        <SelectedItem
+          label="Inline enabled"
+          propKey="1"
+          isInline
+          onClose={noop}
+        />
+        <SelectedItem
+          label="Inline disabled"
+          propKey="2"
+          isInline
+          isDisabled
+          onClose={noop}
+        />
+        <SelectedItem
+          label="Another item"
+          propKey="3"
+          isInline
+          onClose={noop}
+        />
       </div>
 
       <div className={styles.container}>
-        <SelectedItem label="Block display item" propKey="4" isInline={false} onClose={noop} />
+        <SelectedItem
+          label="Block display item"
+          propKey="4"
+          isInline={false}
+          onClose={noop}
+        />
       </div>
     </>
   );
@@ -198,9 +219,25 @@ export const CssCustomization: Story = {
         } as CSSProperties
       }
     >
-      <SelectedItem label="Custom item" propKey="1" isInline onClose={() => {}} />
-      <SelectedItem label="Disabled" propKey="2" isInline isDisabled onClose={() => {}} />
-      <SelectedItem label="Another tag" propKey="3" isInline onClose={() => {}} />
+      <SelectedItem
+        label="Custom item"
+        propKey="1"
+        isInline
+        onClose={() => {}}
+      />
+      <SelectedItem
+        label="Disabled"
+        propKey="2"
+        isInline
+        isDisabled
+        onClose={() => {}}
+      />
+      <SelectedItem
+        label="Another tag"
+        propKey="3"
+        isInline
+        onClose={() => {}}
+      />
     </div>
   ),
   parameters: {

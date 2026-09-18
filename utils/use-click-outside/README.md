@@ -34,11 +34,7 @@ function Dropdown() {
 
   if (!isOpen) return null;
 
-  return (
-    <div ref={dropdownRef}>
-      Dropdown Content
-    </div>
-  );
+  return <div ref={dropdownRef}>Dropdown Content</div>;
 }
 ```
 
@@ -50,20 +46,26 @@ You can pass additional dependencies that will cause the effect to re-run:
 import { useRef, useState } from "react";
 import { useClickOutside } from "@onlyoffice/apps-ui-kit/utils/useClickOutside";
 
-function Modal({ onClose, enabled }: { onClose: () => void; enabled: boolean }) {
+function Modal({
+  onClose,
+  enabled,
+}: {
+  onClose: () => void;
+  enabled: boolean;
+}) {
   const modalRef = useRef<HTMLDivElement>(null);
 
-  useClickOutside(modalRef, () => {
-    if (enabled) {
-      onClose();
-    }
-  }, enabled);
-
-  return (
-    <div ref={modalRef}>
-      Modal Content
-    </div>
+  useClickOutside(
+    modalRef,
+    () => {
+      if (enabled) {
+        onClose();
+      }
+    },
+    enabled,
   );
+
+  return <div ref={modalRef}>Modal Content</div>;
 }
 ```
 
@@ -89,11 +91,11 @@ useClickOutside(sectionRef, handleClose);
 
 ### Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `ref` | `RefObject<T \| null>` | Yes | React ref attached to the element to monitor |
-| `handler` | `VoidFunction` | Yes | Callback function called when click outside is detected |
-| `...deps` | `DependencyList` | No | Additional dependencies for the effect |
+| Parameter | Type                   | Required | Description                                             |
+| --------- | ---------------------- | -------- | ------------------------------------------------------- |
+| `ref`     | `RefObject<T \| null>` | Yes      | React ref attached to the element to monitor            |
+| `handler` | `VoidFunction`         | Yes      | Callback function called when click outside is detected |
+| `...deps` | `DependencyList`       | No       | Additional dependencies for the effect                  |
 
 ### Type Signature
 
@@ -121,9 +123,7 @@ function DropdownMenu() {
 
   return (
     <div>
-      <button onClick={() => setIsOpen(!isOpen)}>
-        Toggle Menu
-      </button>
+      <button onClick={() => setIsOpen(!isOpen)}>Toggle Menu</button>
       {isOpen && (
         <div ref={menuRef}>
           <ul>
@@ -178,16 +178,12 @@ function Popover({ canClose = true }) {
         setIsVisible(false);
       }
     },
-    canClose
+    canClose,
   );
 
   if (!isVisible) return null;
 
-  return (
-    <div ref={popoverRef}>
-      Popover Content
-    </div>
-  );
+  return <div ref={popoverRef}>Popover Content</div>;
 }
 ```
 
@@ -198,7 +194,9 @@ import { useRef, useState, useEffect } from "react";
 import { useClickOutside } from "@onlyoffice/apps-ui-kit/utils/useClickOutside";
 
 function ContextMenu() {
-  const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  const [position, setPosition] = useState<{ x: number; y: number } | null>(
+    null,
+  );
   const menuRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(menuRef, () => setPosition(null));

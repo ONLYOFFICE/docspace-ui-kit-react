@@ -41,9 +41,7 @@ export const ChatInfoBlock = ({
 
   const bodyText = match([standalone, isPortalAdmin])
     // standalone admin
-    .with([true, true], () =>
-      t("AIDisabledInfoBlockStandaloneDescription"),
-    )
+    .with([true, true], () => t("AIDisabledInfoBlockStandaloneDescription"))
     // saas admin
     .with([false, true], () => (
       <>
@@ -79,9 +77,7 @@ export const ChatInfoBlock = ({
       </>
     ))
     // standalone/saas user
-    .otherwise(() =>
-      t("AIDisabledInfoBlockContactAdminDescription"),
-    );
+    .otherwise(() => t("AIDisabledInfoBlockContactAdminDescription"));
 
   return (
     <PublicRoomBar
@@ -93,4 +89,3 @@ export const ChatInfoBlock = ({
     />
   );
 };
-

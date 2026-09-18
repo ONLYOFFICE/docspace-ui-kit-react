@@ -42,4 +42,3 @@ const RowView = ({ sectionWidth }: { sectionWidth: number }) => {
 };
 
 export default observer(RowView);
-

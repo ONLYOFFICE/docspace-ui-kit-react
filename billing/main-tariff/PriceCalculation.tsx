@@ -154,4 +154,3 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
 });
 
 export default PriceCalculation;
-

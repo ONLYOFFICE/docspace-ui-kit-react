@@ -9,13 +9,14 @@ if (typeof SVGSVGElement === "undefined") {
 // jsdom doesn't provide ResizeObserver, used by components that observe
 // container-driven size changes (e.g. TableHeader).
 if (typeof ResizeObserver === "undefined") {
-  (globalThis as Record<string, unknown>).ResizeObserver = class ResizeObserver {
-    observe(): void {}
+  (globalThis as Record<string, unknown>).ResizeObserver =
+    class ResizeObserver {
+      observe(): void {}
 
-    unobserve(): void {}
+      unobserve(): void {}
 
-    disconnect(): void {}
-  };
+      disconnect(): void {}
+    };
 }
 
 import enCommon from "../locales/en/Common.json";

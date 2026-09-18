@@ -130,4 +130,3 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
 };
 
 export default observer(TransactionRowView);
-

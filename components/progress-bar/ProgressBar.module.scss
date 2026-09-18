@@ -68,7 +68,10 @@
   overflow: hidden;
   border-radius: var(--progress-bar-border-radius);
   margin-bottom: var(--progress-bar-margin-bottom);
-  background-color: var(--progress-bar-track, var(--progress-bar-background-color));
+  background-color: var(
+    --progress-bar-track,
+    var(--progress-bar-background-color)
+  );
 
   .percent {
     float: inline-start;
@@ -78,14 +81,20 @@
     width: var(--progress-percent, 0%);
     transition: width 0.6s ease;
     border-radius: var(--progress-bar-border-radius);
-    background-color: var(--progress-bar-fill, var(--progress-bar-percent-background));
+    background-color: var(
+      --progress-bar-fill,
+      var(--progress-bar-percent-background)
+    );
   }
 
   .animation {
     width: 20%;
     height: 100%;
     border-radius: var(--progress-bar-border-radius);
-    background-color: var(--progress-bar-fill, var(--progress-bar-percent-background));
+    background-color: var(
+      --progress-bar-fill,
+      var(--progress-bar-percent-background)
+    );
     animation: loadingAnimation 1.5s ease-in-out infinite;
 
     [dir="rtl"] & {

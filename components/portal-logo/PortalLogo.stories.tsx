@@ -145,4 +145,3 @@ export const WithClassName: Story = {
     },
   },
 };
-

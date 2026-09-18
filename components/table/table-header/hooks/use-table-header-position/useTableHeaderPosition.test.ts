@@ -26,8 +26,9 @@ describe("useTableHeaderPosition", () => {
     headerRef = {
       current: document.createElement("div"),
     };
-    
-    global.MutationObserver = MockMutationObserver as unknown as typeof MutationObserver;
+
+    global.MutationObserver =
+      MockMutationObserver as unknown as typeof MutationObserver;
 
     vi.clearAllMocks();
   });
@@ -136,7 +137,7 @@ describe("useTableHeaderPosition", () => {
   it("should update top on mutation", () => {
     setIsSafari(true);
     renderHook(() => useTableHeaderPosition(headerRef));
-    
+
     const filterRow = document.createElement("div");
     filterRow.className = "filter-input_selected-row";
     filterRow.getBoundingClientRect = vi.fn(() => ({
@@ -162,18 +163,21 @@ describe("useTableHeaderPosition", () => {
     setIsSafari(true);
     const removeEventListenerSpy = vi.spyOn(window, "removeEventListener");
     const { unmount } = renderHook(() => useTableHeaderPosition(headerRef));
-    
+
     unmount();
-    
+
     expect(disconnectMock).toHaveBeenCalled();
-    expect(removeEventListenerSpy).toHaveBeenCalledWith("resize", expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith(
+      "resize",
+      expect.any(Function),
+    );
   });
 
   it("should not crash if headerRef.current is null during update", () => {
     setIsSafari(true);
     const nullRef = { current: null };
     renderHook(() => useTableHeaderPosition(nullRef));
-    
+
     expect(() => {
       window.dispatchEvent(new Event("resize"));
       if (mutationCallback) {

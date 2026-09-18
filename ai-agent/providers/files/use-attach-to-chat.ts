@@ -31,7 +31,6 @@ export type ChatAttachableItem = {
   externalDbTableName?: string | null;
 };
 
-
 /**
  * Why each item did not end up on the message. Every reason is counted
  * apart: they read differently to the user, and a caller that lumps them

@@ -1,10 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import {
-  RectangleSkeleton,
-  RectangleSkeletonProps,
-} from "../../../rectangle";
+import { RectangleSkeleton, RectangleSkeletonProps } from "../../../rectangle";
 
 import styles from "./RowLoader.module.scss";
 

@@ -304,7 +304,8 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: "CSS custom property overrides applied to the calendar container.",
+        story:
+          "CSS custom property overrides applied to the calendar container.",
       },
     },
   },

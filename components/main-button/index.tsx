@@ -31,9 +31,8 @@ const MainButton = (props: MainButtonProps) => {
 
   // The element used to position the dropdown. Defaults to the button itself;
   // callers can override (e.g. SearchInput wraps the button in a larger pill).
-  const positionRef = (anchorRef ?? buttonRef) as React.RefObject<
-    HTMLElement | null
-  >;
+  const positionRef = (anchorRef ??
+    buttonRef) as React.RefObject<HTMLElement | null>;
 
   useEffect(() => {
     const updateWidth = () => {
@@ -118,7 +117,9 @@ const MainButton = (props: MainButtonProps) => {
               className={styles.menu}
               model={model}
               ref={menuRef}
-              appendTo={typeof document !== "undefined" ? document.body : undefined}
+              appendTo={
+                typeof document !== "undefined" ? document.body : undefined
+              }
               containerRef={positionRef as React.RefObject<HTMLDivElement>}
               style={{
                 position: "fixed",

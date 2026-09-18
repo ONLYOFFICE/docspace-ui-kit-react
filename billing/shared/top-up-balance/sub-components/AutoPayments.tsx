@@ -328,4 +328,3 @@ const AutoPayments = ({
 };
 
 export default observer(AutoPayments);
-

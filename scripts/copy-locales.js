@@ -168,4 +168,3 @@ if (fs.existsSync(FONTS_DIR_SRC)) {
 } else {
   console.error(`fonts directory not found: ${FONTS_DIR_SRC}`);
 }
-

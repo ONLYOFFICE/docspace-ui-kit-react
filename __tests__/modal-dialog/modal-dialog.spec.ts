@@ -59,6 +59,8 @@ test.describe("ModalDialog — dark", () => {
     await gotoStory(page, "css-customization");
     await page.evaluate(() => document.body.classList.add("dark"));
     await page.getByRole("button", { name: "Show" }).click();
-    await expect(page).toHaveScreenshot("modal-dialog-css-customization-dark.png");
+    await expect(page).toHaveScreenshot(
+      "modal-dialog-css-customization-dark.png",
+    );
   });
 });

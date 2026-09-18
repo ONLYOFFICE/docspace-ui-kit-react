@@ -186,7 +186,8 @@ export const ArchiveState: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Archive icon displayed for archived rooms regardless of room type.",
+        story:
+          "Archive icon displayed for archived rooms regardless of room type.",
       },
       source: {
         code: `<RoomLogo type={RoomsType.CustomRoom} isArchive />`,
@@ -306,11 +307,11 @@ export const CheckboxChecked: Story = {
 
 export const CssCustomization = {
   render: () => (
-    <div
-      style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-    >
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-        <span style={{ fontSize: "12px", color: "#666", width: "80px" }}>Default</span>
+        <span style={{ fontSize: "12px", color: "#666", width: "80px" }}>
+          Default
+        </span>
         <div style={{ display: "flex", gap: "8px" }}>
           <RoomLogoPure type={RoomsType.FormRoom} />
           <RoomLogoPure type={RoomsType.EditingRoom} />
@@ -318,7 +319,9 @@ export const CssCustomization = {
         </div>
       </div>
       <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-        <span style={{ fontSize: "12px", color: "#666", width: "80px" }}>Rounded</span>
+        <span style={{ fontSize: "12px", color: "#666", width: "80px" }}>
+          Rounded
+        </span>
         <div
           style={
             {

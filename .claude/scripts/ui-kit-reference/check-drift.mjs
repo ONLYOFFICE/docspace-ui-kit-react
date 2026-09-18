@@ -49,7 +49,9 @@ if (!fs.existsSync(REFERENCE)) {
   process.exit(2);
 }
 
-const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
+const pkg = JSON.parse(
+  fs.readFileSync(path.join(ROOT, "package.json"), "utf8"),
+);
 const reference = fs.readFileSync(REFERENCE, "utf8");
 const read = (file) =>
   fs.existsSync(file) ? fs.readFileSync(file, "utf8") : undefined;
@@ -97,7 +99,8 @@ const kitTarball = vendored.find((file) => {
   }
 });
 
-if (!kitTarball) note(findings, "vendored tarball", "no kit tarball in vendor/");
+if (!kitTarball)
+  note(findings, "vendored tarball", "no kit tarball in vendor/");
 else {
   const manifest = JSON.parse(
     execFileSync(
@@ -137,7 +140,10 @@ const referenceFiles = fs.existsSync(referencesDir)
   : [];
 
 const STALE_PATHS = [
-  ["dist/cjs", "the build emits dist/esm and dist/types; there is no CJS output"],
+  [
+    "dist/cjs",
+    "the build emits dist/esm and dist/types; there is no CJS output",
+  ],
   [
     ".module.scss.js",
     "a component's CSS is now <Name>.module.scss/index.css, with the class-name map in index.js beside it",
@@ -152,8 +158,7 @@ for (const file of referenceFiles) {
       stalePaths.push(`${path.basename(file)} points at ${needle} -- ${why}`);
 }
 
-if (stalePaths.length)
-  note(findings, "dist layout", stalePaths.join("\n    "));
+if (stalePaths.length) note(findings, "dist layout", stalePaths.join("\n    "));
 else
   note(
     ok,
@@ -164,7 +169,11 @@ else
 for (const claimed of reference.matchAll(/dist\/types\/[\w/<>.-]+/g)) {
   const shape = claimed[0];
   if (!shape.startsWith("dist/types/components/"))
-    note(findings, "types path", `unexpected declaration path claimed: ${shape}`);
+    note(
+      findings,
+      "types path",
+      `unexpected declaration path claimed: ${shape}`,
+    );
 }
 
 // --- D. component names the reference talks about ---------------------------
@@ -315,7 +324,8 @@ const CLAIMS = [
     expect: /labelVisible\s*=\s*false/,
   },
   {
-    claim: "FieldContainer carries its own bottom margin, waived by removeMargin",
+    claim:
+      "FieldContainer carries its own bottom margin, waived by removeMargin",
     file: "components/field-container/FieldContainer.tsx",
     expect: /removeMargin/,
   },
@@ -340,7 +350,7 @@ const CLAIMS = [
     expect: /label === selectedLabel/,
   },
   {
-    claim: "Link maps the literal \"accent\" to var(--accent-main)",
+    claim: 'Link maps the literal "accent" to var(--accent-main)',
     file: "components/link/index.tsx",
     expect: /color === "accent" \? "var\(--accent-main\)"/,
   },
@@ -389,5 +399,6 @@ if (!findings.length) {
 }
 
 console.log(`\n${findings.length} drift finding(s):\n`);
-for (const { label, detail } of findings) console.log(`  DRIFT ${label}: ${detail}`);
+for (const { label, detail } of findings)
+  console.log(`  DRIFT ${label}: ${detail}`);
 process.exit(1);

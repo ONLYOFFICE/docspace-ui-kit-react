@@ -582,4 +582,3 @@ export const CssCustomization: Story = {
     },
   },
 };
-

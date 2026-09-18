@@ -71,50 +71,50 @@ const buttonRef = useRef<HTMLButtonElement>(null);
 
 ## Properties
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `open` | `boolean` | `false` | Controls whether the dropdown is visible |
-| `children` | `ReactNode` | - | Content to render inside the dropdown (typically DropDownItem components) |
-| `forwardedRef` | `RefObject<HTMLElement>` | - | Reference to the parent/trigger element for positioning |
-| `directionX` | `'left' \| 'right'` | `'right'` | Horizontal opening direction relative to parent |
-| `directionY` | `'top' \| 'bottom' \| 'both'` | `'bottom'` | Vertical opening direction relative to parent |
-| `maxHeight` | `number` | - | Maximum height in pixels; enables scrolling when content exceeds |
-| `manualWidth` | `string` | - | Custom width (e.g., "100%", "300px") |
-| `manualX` | `string` | - | Custom horizontal position (non-portal mode only) |
-| `manualY` | `string` | - | Custom vertical position (non-portal mode only) |
-| `offsetX` | `number` | `0` | Horizontal offset from calculated position (portal mode only) |
-| `clickOutsideAction` | `(e: Event, open: boolean) => void` | - | Callback when clicking outside the dropdown |
-| `isDefaultMode` | `boolean` | `true` | Use portal mode (true) or inline mode (false) |
-| `fixedDirection` | `boolean` | `false` | Disable automatic position adjustment |
-| `showDisabledItems` | `boolean` | `false` | Show or hide disabled items |
-| `enableKeyboardEvents` | `boolean` | `false` | Enable keyboard navigation |
-| `zIndex` | `number` | - | Custom z-index value |
-| `className` | `string` | - | Additional CSS classes |
-| `style` | `CSSProperties` | - | Custom inline styles |
-| `dataTestId` | `string` | `'dropdown'` | Test ID for automated testing |
-| `appendTo` | `HTMLElement` | - | Custom container for portal rendering |
-| `eventTypes` | `string \| string[]` | - | Event types to listen for click outside |
-| `topSpace` | `number` | - | Minimum space from top of viewport |
-| `backDrop` | `JSX.Element \| null` | - | Custom backdrop element |
-| `isMobileView` | `boolean` | - | Enable mobile-optimized view |
-| `isNoFixedHeightOptions` | `boolean` | - | Use variable height for items |
+| Prop                     | Type                                | Default      | Description                                                               |
+| ------------------------ | ----------------------------------- | ------------ | ------------------------------------------------------------------------- |
+| `open`                   | `boolean`                           | `false`      | Controls whether the dropdown is visible                                  |
+| `children`               | `ReactNode`                         | -            | Content to render inside the dropdown (typically DropDownItem components) |
+| `forwardedRef`           | `RefObject<HTMLElement>`            | -            | Reference to the parent/trigger element for positioning                   |
+| `directionX`             | `'left' \| 'right'`                 | `'right'`    | Horizontal opening direction relative to parent                           |
+| `directionY`             | `'top' \| 'bottom' \| 'both'`       | `'bottom'`   | Vertical opening direction relative to parent                             |
+| `maxHeight`              | `number`                            | -            | Maximum height in pixels; enables scrolling when content exceeds          |
+| `manualWidth`            | `string`                            | -            | Custom width (e.g., "100%", "300px")                                      |
+| `manualX`                | `string`                            | -            | Custom horizontal position (non-portal mode only)                         |
+| `manualY`                | `string`                            | -            | Custom vertical position (non-portal mode only)                           |
+| `offsetX`                | `number`                            | `0`          | Horizontal offset from calculated position (portal mode only)             |
+| `clickOutsideAction`     | `(e: Event, open: boolean) => void` | -            | Callback when clicking outside the dropdown                               |
+| `isDefaultMode`          | `boolean`                           | `true`       | Use portal mode (true) or inline mode (false)                             |
+| `fixedDirection`         | `boolean`                           | `false`      | Disable automatic position adjustment                                     |
+| `showDisabledItems`      | `boolean`                           | `false`      | Show or hide disabled items                                               |
+| `enableKeyboardEvents`   | `boolean`                           | `false`      | Enable keyboard navigation                                                |
+| `zIndex`                 | `number`                            | -            | Custom z-index value                                                      |
+| `className`              | `string`                            | -            | Additional CSS classes                                                    |
+| `style`                  | `CSSProperties`                     | -            | Custom inline styles                                                      |
+| `dataTestId`             | `string`                            | `'dropdown'` | Test ID for automated testing                                             |
+| `appendTo`               | `HTMLElement`                       | -            | Custom container for portal rendering                                     |
+| `eventTypes`             | `string \| string[]`                | -            | Event types to listen for click outside                                   |
+| `topSpace`               | `number`                            | -            | Minimum space from top of viewport                                        |
+| `backDrop`               | `JSX.Element \| null`               | -            | Custom backdrop element                                                   |
+| `isMobileView`           | `boolean`                           | -            | Enable mobile-optimized view                                              |
+| `isNoFixedHeightOptions` | `boolean`                           | -            | Use variable height for items                                             |
 
 ## Direction Options
 
 ### Horizontal Direction (directionX)
 
-| Value | Description |
-|-------|-------------|
+| Value     | Description                                   |
+| --------- | --------------------------------------------- |
 | `'right'` | Opens aligned to parent's left edge (default) |
-| `'left'` | Opens aligned to parent's right edge |
+| `'left'`  | Opens aligned to parent's right edge          |
 
 ### Vertical Direction (directionY)
 
-| Value | Description |
-|-------|-------------|
-| `'bottom'` | Opens below the parent element (default) |
-| `'top'` | Opens above the parent element |
-| `'both'` | Automatically chooses based on available space |
+| Value      | Description                                    |
+| ---------- | ---------------------------------------------- |
+| `'bottom'` | Opens below the parent element (default)       |
+| `'top'`    | Opens above the parent element                 |
+| `'both'`   | Automatically chooses based on available space |
 
 ## Examples
 
@@ -127,19 +127,33 @@ function MenuButton() {
 
   return (
     <div style={{ position: "relative" }}>
-      <Button
-        ref={buttonRef}
-        label="Actions"
-        onClick={() => setIsOpen(true)}
-      />
+      <Button ref={buttonRef} label="Actions" onClick={() => setIsOpen(true)} />
       <DropDown
         open={isOpen}
         forwardedRef={buttonRef}
         clickOutsideAction={() => setIsOpen(false)}
       >
-        <DropDownItem label="Edit" onClick={() => { handleEdit(); setIsOpen(false); }} />
-        <DropDownItem label="Share" onClick={() => { handleShare(); setIsOpen(false); }} />
-        <DropDownItem label="Delete" onClick={() => { handleDelete(); setIsOpen(false); }} />
+        <DropDownItem
+          label="Edit"
+          onClick={() => {
+            handleEdit();
+            setIsOpen(false);
+          }}
+        />
+        <DropDownItem
+          label="Share"
+          onClick={() => {
+            handleShare();
+            setIsOpen(false);
+          }}
+        />
+        <DropDownItem
+          label="Delete"
+          onClick={() => {
+            handleDelete();
+            setIsOpen(false);
+          }}
+        />
       </DropDown>
     </div>
   );
@@ -184,11 +198,7 @@ function MenuButton() {
 ### Custom Width
 
 ```tsx
-<DropDown
-  open={isOpen}
-  forwardedRef={buttonRef}
-  manualWidth="250px"
->
+<DropDown open={isOpen} forwardedRef={buttonRef} manualWidth="250px">
   <DropDownItem label="Short" />
   <DropDownItem label="This is a longer option that needs more space" />
 </DropDown>
@@ -198,11 +208,7 @@ function MenuButton() {
 
 ```tsx
 // Useful when trigger is near bottom of viewport
-<DropDown
-  open={isOpen}
-  forwardedRef={buttonRef}
-  directionY="top"
->
+<DropDown open={isOpen} forwardedRef={buttonRef} directionY="top">
   <DropDownItem label="Option 1" />
   <DropDownItem label="Option 2" />
 </DropDown>
@@ -252,6 +258,7 @@ The dropdown uses intelligent positioning:
 ### Automatic Repositioning
 
 When `fixedDirection` is `false` (default), the dropdown automatically:
+
 - Flips horizontally if it would overflow the viewport edge
 - Flips vertically if there's more space above/below the trigger
 - Adjusts position on window resize

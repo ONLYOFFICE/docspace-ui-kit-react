@@ -63,8 +63,7 @@ import { TableGroupMenu } from "@onlyoffice/apps-ui-kit/components/table/table-g
     },
     isBlocked: {
       control: "boolean",
-      description:
-        "Block all interactions while an operation is in progress",
+      description: "Block all interactions while an operation is in progress",
       table: {
         defaultValue: { summary: "false" },
       },

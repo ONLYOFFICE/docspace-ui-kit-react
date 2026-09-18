@@ -22,7 +22,10 @@ const MyPopup = ({ anchorRef, onClose }) => {
 ## Advanced Usage with Custom Coverage Check
 
 ```tsx
-import { useCloseOnAnchorCovered, isElementCovered } from "@onlyoffice/apps-ui-kit/hooks/useCloseOnAnchorCovered";
+import {
+  useCloseOnAnchorCovered,
+  isElementCovered,
+} from "@onlyoffice/apps-ui-kit/hooks/useCloseOnAnchorCovered";
 
 const MyPopup = ({ anchorRef, onClose }) => {
   const customCoverageCheck = (element: HTMLElement) => {
@@ -54,6 +57,7 @@ const MyPopup = ({ anchorRef, onClose }) => {
 Default implementation that checks if an element is covered or outside the viewport.
 
 **Checks:**
+
 - Element is outside viewport boundaries
 - Element is covered by another element at its center-top point
 

@@ -340,4 +340,3 @@ export const CssCustomization: Story = {
     },
   },
 };
-

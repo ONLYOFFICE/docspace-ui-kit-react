@@ -287,8 +287,7 @@ const useFilesHelper = ({
               const roomInfoRes = await foldersApi.getFolderInfo({
                 folderId: roomPart.id as number,
               });
-              isInsidePrivateRoom =
-                roomInfoRes.data.response?.private === true;
+              isInsidePrivateRoom = roomInfoRes.data.response?.private === true;
               privateRoomCacheRef.current.set(roomPart.id, isInsidePrivateRoom);
             } catch {
               isInsidePrivateRoom = false;
@@ -430,8 +429,7 @@ const useFilesHelper = ({
 
             if (specialItems.length) {
               itemList.unshift(...specialItems);
-              const base =
-                withCreate && security?.Create ? total + 1 : total;
+              const base = withCreate && security?.Create ? total + 1 : total;
               setTotal(base + specialItems.length);
             }
           }

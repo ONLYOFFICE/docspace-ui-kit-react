@@ -289,7 +289,8 @@ const Section = (props: SectionProps) => {
       secondaryActiveOperations.length === 1 &&
       !secondaryOperationsCompleted);
 
-  const isInfoVisible = canDisplay && (isInfoPanelVisible || isChatPanelVisible);
+  const isInfoVisible =
+    canDisplay && (isInfoPanelVisible || isChatPanelVisible);
 
   if (!isSectionAvailable) return null;
 

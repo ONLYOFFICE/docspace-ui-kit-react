@@ -94,9 +94,7 @@ vi.mock("../../context-menu", () => {
 
     return (
       <div data-testid="context-menu">
-        {header && (
-          <div data-testid="context-menu-header">{header.title}</div>
-        )}
+        {header && <div data-testid="context-menu-header">{header.title}</div>}
         {model?.map((item) => (
           <div key={item.key}>{item.label}</div>
         ))}
@@ -306,7 +304,7 @@ describe("FolderTile", () => {
       cancelable: true,
       button: 2,
     });
-    
+
     // We need to use fireEvent or dispatchEvent
     fireEvent(tile, event);
 
@@ -327,8 +325,10 @@ describe("FolderTile", () => {
 
   it("constructs context menu header correctly from first child item", () => {
     const childItem = { title: "Custom Title", icon: "custom-icon" };
-    const FolderChild = ({ item }: { item: typeof childItem }) => <div data-testid="child" />;
-    
+    const FolderChild = ({ item }: { item: typeof childItem }) => (
+      <div data-testid="child" />
+    );
+
     renderFolderTile({
       children: <FolderChild item={childItem} />,
     });
@@ -347,7 +347,7 @@ describe("FolderTile", () => {
     const button = screen.getByTestId("context-menu-button");
     fireEvent.click(button);
 
-    // tileContextClick is called once in getOptions (getData) 
+    // tileContextClick is called once in getOptions (getData)
     // and once in onContextMenu (onClick)
     expect(tileContextClick).toHaveBeenCalled();
   });
@@ -365,7 +365,7 @@ describe("FolderTile", () => {
     const button = screen.getByTestId("context-menu-button");
     fireEvent.click(button);
 
-    // The button click itself is handled by fireEvent, 
+    // The button click itself is handled by fireEvent,
     // but forwardRef.current.click() is called inside onContextMenu
     expect(clickSpy).toHaveBeenCalled();
     clickSpy.mockRestore();
@@ -381,7 +381,7 @@ describe("FolderTile", () => {
     const button = screen.getByTestId("context-menu-button");
     fireEvent.click(button);
 
-    // If propagation was not stopped, onSelect would be called 
+    // If propagation was not stopped, onSelect would be called
     // because FolderTile has an onClick that calls onSelect
     expect(onSelect).not.toHaveBeenCalled();
   });

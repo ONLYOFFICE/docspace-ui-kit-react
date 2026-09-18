@@ -5,7 +5,7 @@ The main button is located at the top of the main menu. It may consist of 2 butt
 ### Usage
 
 ```js
-import { MainButton } from ".";;
+import { MainButton } from ".";
 ```
 
 ```jsx

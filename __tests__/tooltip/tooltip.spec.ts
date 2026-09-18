@@ -55,6 +55,8 @@ test.describe("Tooltip — dark", () => {
     const tooltip = page.locator(".__react_component_tooltip").first();
     await tooltip.waitFor({ state: "visible" });
     // Compare only the tooltip element to avoid full-page position flakiness
-    await expect(tooltip).toHaveScreenshot("tooltip-css-customization-dark.png");
+    await expect(tooltip).toHaveScreenshot(
+      "tooltip-css-customization-dark.png",
+    );
   });
 });

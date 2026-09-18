@@ -22,7 +22,10 @@
 .mainButton {
   @include mixins.no-user-select();
   :global(.light) & {
-    --main-button-background-color: var(--accent-main, #{colors.$light-blue-main});
+    --main-button-background-color: var(
+      --accent-main,
+      #{colors.$light-blue-main}
+    );
     --main-button-padding: 5px 14px 5px 12px;
     --main-button-border-radius: 3px;
     --main-button-line-height: 22px;
@@ -34,11 +37,13 @@
     --main-button-svg-height: 100%;
     --main-button-svg-fill: #{colors.$white};
     --main-button-arrow-dropdown-border-top-disabled: 5px solid #{colors.$white};
-
   }
 
   :global(.dark) & {
-    --main-button-background-color: var(--accent-main, #{colors.$light-blue-main});
+    --main-button-background-color: var(
+      --accent-main,
+      #{colors.$light-blue-main}
+    );
     --main-button-text-color: #{colors.$white};
     --main-button-text-color-disabled: #{colors.$white};
     --main-button-svg-fill: #{colors.$white};
@@ -52,14 +57,38 @@
     --main-button-svg-height: 100%;
   }
 
-  --main-button-bg-value: var(--main-button-bg, var(--main-button-background-color));
-  --main-button-text-value: var(--main-button-color, var(--main-button-text-color));
-  --main-button-icon-fill-value: var(--main-button-icon-color, var(--main-button-svg-fill));
-  --main-button-radius-value: var(--main-button-radius, var(--main-button-border-radius));
-  --main-button-padding-value: var(--main-button-inner-padding, var(--main-button-padding));
-  --main-button-font-size-value: var(--main-button-text-size, var(--main-button-font-size));
-  --main-button-font-weight-value: var(--main-button-text-weight, var(--main-button-font-weight));
-  --main-button-line-height-value: var(--main-button-text-line-height, var(--main-button-line-height));
+  --main-button-bg-value: var(
+    --main-button-bg,
+    var(--main-button-background-color)
+  );
+  --main-button-text-value: var(
+    --main-button-color,
+    var(--main-button-text-color)
+  );
+  --main-button-icon-fill-value: var(
+    --main-button-icon-color,
+    var(--main-button-svg-fill)
+  );
+  --main-button-radius-value: var(
+    --main-button-radius,
+    var(--main-button-border-radius)
+  );
+  --main-button-padding-value: var(
+    --main-button-inner-padding,
+    var(--main-button-padding)
+  );
+  --main-button-font-size-value: var(
+    --main-button-text-size,
+    var(--main-button-font-size)
+  );
+  --main-button-font-weight-value: var(
+    --main-button-text-weight,
+    var(--main-button-font-weight)
+  );
+  --main-button-line-height-value: var(
+    --main-button-text-line-height,
+    var(--main-button-line-height)
+  );
 
   -webkit-tap-highlight-color: var(--tap-highlight-color);
   position: relative;
@@ -135,13 +164,13 @@
       }
     }
   }
-  
+
   .text {
     display: inline;
     font-size: var(--main-button-font-size-value);
     font-weight: var(--main-button-font-weight-value);
     color: var(--main-button-text-value);
-  
+
     .disabled & {
       color: var(--main-button-text-color-disabled);
     }

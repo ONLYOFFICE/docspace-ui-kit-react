@@ -14,7 +14,6 @@ describe("useCloseOnAnchorCovered", () => {
     anchorElement = document.createElement("div");
     document.body.appendChild(anchorElement);
 
-
     rafIdCounter = 0;
     rafSpy = vi
       .spyOn(window, "requestAnimationFrame")

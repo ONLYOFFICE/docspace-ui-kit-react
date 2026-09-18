@@ -3,12 +3,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { screen, render, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DatePicker } from "./index";
-import {
-  now,
-  createDateTime,
-  addToDate,
-  startOf,
-} from "../../utils/date";
+import { now, createDateTime, addToDate, startOf } from "../../utils/date";
 
 // Mock selector-add-button
 vi.mock("../add-button", () => ({

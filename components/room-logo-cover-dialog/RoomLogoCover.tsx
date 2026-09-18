@@ -87,9 +87,14 @@ const RoomLogoCover = ({
     return globalColors.logoColors[0];
   })();
 
-  const [selectedColor, setSelectedColor] = React.useState<string>(defaultColor);
-  const [selectedCover, setSelectedCover] = React.useState<ICover | null>(defaultCover);
-  const [withoutIcon, setWithoutIcon] = React.useState<boolean>(defaultCover == null);
+  const [selectedColor, setSelectedColor] =
+    React.useState<string>(defaultColor);
+  const [selectedCover, setSelectedCover] = React.useState<ICover | null>(
+    defaultCover,
+  );
+  const [withoutIcon, setWithoutIcon] = React.useState<boolean>(
+    defaultCover == null,
+  );
 
   React.useEffect(() => {
     onInit?.(selectedColor, withoutIcon ? null : selectedCover);

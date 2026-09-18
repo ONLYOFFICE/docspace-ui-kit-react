@@ -136,4 +136,3 @@ const PaymentMethod = (props: PaymentMethodProps) => {
 };
 
 export default observer(PaymentMethod);
-

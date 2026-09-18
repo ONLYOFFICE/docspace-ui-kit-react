@@ -29,9 +29,7 @@ const CodeBlock = ({
 
   const onCopy = () => {
     copy(content);
-    toastr.success(
-      successCopyMessage ?? t("CopiedToClipboard"),
-    );
+    toastr.success(successCopyMessage ?? t("CopiedToClipboard"));
   };
 
   return (

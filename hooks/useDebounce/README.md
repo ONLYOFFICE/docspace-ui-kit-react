@@ -9,8 +9,8 @@ React hook for debouncing callback functions with automatic cleanup.
 ## Usage
 
 ```tsx
-import { useState } from 'react';
-import { useDebounce } from '@onlyoffice/apps-ui-kit/hooks/useDebounce';
+import { useState } from "react";
+import { useDebounce } from "@onlyoffice/apps-ui-kit/hooks/useDebounce";
 
 function SearchComponent() {
   const [searchResults, setSearchResults] = useState([]);
@@ -18,7 +18,7 @@ function SearchComponent() {
   const handleSearch = (query: string) => {
     // This will only execute after user stops typing for 500ms
     fetch(`/api/search?q=${query}`)
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(setSearchResults);
   };
 
@@ -57,7 +57,7 @@ Returns a debounced version of the callback function with the same signature: `(
 
 ```tsx
 function EmailInput() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isValid, setIsValid] = useState<boolean | null>(null);
 
   const validateEmail = (value: string) => {
@@ -92,11 +92,11 @@ function EmailInput() {
 
 ```tsx
 function AutoSaveEditor() {
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
 
   const saveContent = (text: string) => {
-    localStorage.setItem('draft', text);
-    console.log('Content saved!');
+    localStorage.setItem("draft", text);
+    console.log("Content saved!");
   };
 
   const debouncedSave = useDebounce(saveContent, 1000);

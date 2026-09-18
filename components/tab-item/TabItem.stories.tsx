@@ -136,8 +136,7 @@ export const ActiveState: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Tab in its active/selected state with a visual indicator.",
+        story: "Tab in its active/selected state with a visual indicator.",
       },
       source: {
         code: `<TabItem label="Active Tab" isActive />`,
@@ -243,9 +242,7 @@ export const TabGroup: Story = {
 };
 
 const MultiSelectTemplate = () => {
-  const [selected, setSelected] = useState<Set<string>>(
-    new Set(["documents"]),
-  );
+  const [selected, setSelected] = useState<Set<string>>(new Set(["documents"]));
 
   const toggleSelection = (key: string) => {
     setSelected((prev) => {

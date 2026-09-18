@@ -11,10 +11,7 @@ import { Portal } from "@onlyoffice/apps-ui-kit";
 ### Basic Example
 
 ```jsx
-<Portal
-  element={<div className="modal">Modal content</div>}
-  visible={true}
-/>
+<Portal element={<div className="modal">Modal content</div>} visible={true} />
 ```
 
 ### Custom Container
@@ -27,7 +24,7 @@ const [container, setContainer] = useState(null);
     element={<div>Content rendered in custom container</div>}
     appendTo={container}
   />
-</div>
+</div>;
 ```
 
 ### Conditional Rendering
@@ -41,11 +38,11 @@ const [container, setContainer] = useState(null);
 
 ## Properties
 
-| Props      | Type              | Required | Default         | Description                                      |
-| ---------- | :---------------- | :------: | :-------------- | :----------------------------------------------- |
-| `element`  | `React.ReactNode` |    ✓     | -               | The React node to be rendered inside the portal  |
-| `visible`  | `boolean`         |    -     | `true`          | Whether the portal content should be visible     |
-| `appendTo` | `HTMLElement`     |    -     | `document.body` | The DOM element to append the portal to          |
+| Props      | Type              | Required | Default         | Description                                     |
+| ---------- | :---------------- | :------: | :-------------- | :---------------------------------------------- |
+| `element`  | `React.ReactNode` |    ✓     | -               | The React node to be rendered inside the portal |
+| `visible`  | `boolean`         |    -     | `true`          | Whether the portal content should be visible    |
+| `appendTo` | `HTMLElement`     |    -     | `document.body` | The DOM element to append the portal to         |
 
 ## Use Cases
 
@@ -70,7 +67,7 @@ const [container, setContainer] = useState(null);
 ```jsx
 <Portal
   element={
-    <div style={{ position: 'absolute', top: tooltipY, left: tooltipX }}>
+    <div style={{ position: "absolute", top: tooltipY, left: tooltipX }}>
       Tooltip text
     </div>
   }

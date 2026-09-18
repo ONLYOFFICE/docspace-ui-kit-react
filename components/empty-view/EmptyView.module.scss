@@ -40,15 +40,42 @@
     --empty-view-action-secondary-color: #{colors.$gray-dark};
   }
 
-  --empty-view-title-color-value: var(--empty-view-title-color, var(--empty-view-header-color));
-  --empty-view-description-color-value: var(--empty-view-desc-color, var(--empty-view-description-color));
-  --empty-view-link-color-value: var(--empty-view-link-accent, var(--empty-view-link-color));
-  --empty-view-link-bg-value: var(--empty-view-link-background, var(--empty-view-link-bg-color));
-  --empty-view-link-hover-bg-value: var(--empty-view-link-hover-background, var(--empty-view-link-bg-color-hover));
-  --empty-view-separator-color-value: var(--empty-view-divider-color, var(--empty-view-separator-color));
-  --empty-view-item-hover-bg-value: var(--empty-view-item-hover-background, var(--empty-view-items-hover));
-  --empty-view-items-header-value: var(--empty-view-item-title-color, var(--empty-view-items-header));
-  --empty-view-items-subheading-value: var(--empty-view-item-desc-color, var(--empty-view-items-subheading));
+  --empty-view-title-color-value: var(
+    --empty-view-title-color,
+    var(--empty-view-header-color)
+  );
+  --empty-view-description-color-value: var(
+    --empty-view-desc-color,
+    var(--empty-view-description-color)
+  );
+  --empty-view-link-color-value: var(
+    --empty-view-link-accent,
+    var(--empty-view-link-color)
+  );
+  --empty-view-link-bg-value: var(
+    --empty-view-link-background,
+    var(--empty-view-link-bg-color)
+  );
+  --empty-view-link-hover-bg-value: var(
+    --empty-view-link-hover-background,
+    var(--empty-view-link-bg-color-hover)
+  );
+  --empty-view-separator-color-value: var(
+    --empty-view-divider-color,
+    var(--empty-view-separator-color)
+  );
+  --empty-view-item-hover-bg-value: var(
+    --empty-view-item-hover-background,
+    var(--empty-view-items-hover)
+  );
+  --empty-view-items-header-value: var(
+    --empty-view-item-title-color,
+    var(--empty-view-items-header)
+  );
+  --empty-view-items-subheading-value: var(
+    --empty-view-item-desc-color,
+    var(--empty-view-items-subheading)
+  );
   --empty-view-max-width: var(--empty-view-width, 480px);
   --empty-view-top-padding: var(--empty-view-padding-top, 61px);
   --empty-view-items-gap: var(--empty-view-gap, 18px);

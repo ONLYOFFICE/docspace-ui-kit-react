@@ -11,7 +11,10 @@
 .loaderContainer {
   --app-loader-background-color: #{$white};
 
-  --app-loader-bg-value: var(--app-loader-bg, var(--app-loader-background-color));
+  --app-loader-bg-value: var(
+    --app-loader-bg,
+    var(--app-loader-background-color)
+  );
   --app-loader-z-index-value: var(--app-loader-z-index, 5000);
 
   width: 100vw;

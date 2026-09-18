@@ -14,9 +14,18 @@
     --text-disable-color: #{colors.$gray-dark-text};
   }
 
-  --category-item-description-color-value: var(--category-item-description-color, var(--settings-description-color));
-  --category-item-arrow-color-value: var(--category-item-arrow-color, var(--settings-arrow-fill));
-  --category-item-disabled-color-value: var(--category-item-disabled-color, var(--text-disable-color));
+  --category-item-description-color-value: var(
+    --category-item-description-color,
+    var(--settings-description-color)
+  );
+  --category-item-arrow-color-value: var(
+    --category-item-arrow-color,
+    var(--settings-arrow-fill)
+  );
+  --category-item-disabled-color-value: var(
+    --category-item-disabled-color,
+    var(--text-disable-color)
+  );
   --category-item-bottom-margin: var(--category-item-margin, 20px);
 
   margin-bottom: var(--category-item-bottom-margin);
@@ -29,7 +38,10 @@
 }
 
 .categoryItemSubheader {
-  --category-item-subheader-font-size: var(--category-item-subheader-size, 13px);
+  --category-item-subheader-font-size: var(
+    --category-item-subheader-size,
+    13px
+  );
 
   font-size: var(--category-item-subheader-font-size);
   font-weight: 600;

@@ -25,14 +25,15 @@ getTextColor(color: string, brightnessDiff?: number): string
 
 ### Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `color` | `string` | - | Hex color string (e.g., `"#ffffff"`) |
-| `brightnessDiff` | `number` | `128` | Brightness threshold (0-255) |
+| Parameter        | Type     | Default | Description                          |
+| ---------------- | -------- | ------- | ------------------------------------ |
+| `color`          | `string` | -       | Hex color string (e.g., `"#ffffff"`) |
+| `brightnessDiff` | `number` | `128`   | Brightness threshold (0-255)         |
 
 ### Returns
 
 Returns a hex color string:
+
 - `"#333333"` (black) - for light backgrounds
 - `"#ffffff"` (white) - for dark backgrounds
 
@@ -45,6 +46,7 @@ brightness = (R * 299 + G * 587 + B * 114) / 1000
 ```
 
 This formula weights RGB values based on human perception:
+
 - Green contributes most (58.7%)
 - Red contributes second (29.9%)
 - Blue contributes least (11.4%)
@@ -59,11 +61,7 @@ If the calculated brightness exceeds the threshold, black text is returned; othe
 const Badge = ({ backgroundColor, label }) => {
   const textColor = getTextColor(backgroundColor);
 
-  return (
-    <span style={{ backgroundColor, color: textColor }}>
-      {label}
-    </span>
-  );
+  return <span style={{ backgroundColor, color: textColor }}>{label}</span>;
 };
 ```
 

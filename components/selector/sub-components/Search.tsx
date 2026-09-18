@@ -32,8 +32,7 @@ const Search = React.memo(({ isSearch }: SearchProps) => {
     [onClearSearchAction, onSearch, setIsSearch],
   );
 
-  if (isSearchLoading)
-    return searchLoader;
+  if (isSearchLoading) return searchLoader;
 
   if (!withSearch || !isSearch) return null;
 

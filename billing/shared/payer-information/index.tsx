@@ -71,9 +71,7 @@ const PayerInformation = () => {
         : t("UnknownPayerAdminUnpaid");
     }
 
-    return isOwner
-      ? t("UnknownPayerForOwner")
-      : t("UnknownPayerForAdmin");
+    return isOwner ? t("UnknownPayerForOwner") : t("UnknownPayerForAdmin");
   };
 
   const unknownPayerInformation = (
@@ -197,4 +195,3 @@ const PayerInformation = () => {
 };
 
 export default observer(PayerInformation);
-

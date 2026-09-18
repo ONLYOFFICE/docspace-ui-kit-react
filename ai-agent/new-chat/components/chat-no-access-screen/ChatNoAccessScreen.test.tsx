@@ -65,9 +65,7 @@ describe("<ChatNoAccessScreen />", () => {
       "EmptyAIAgentsNotActiveYetTitle",
     );
     const description = screen.getByTestId("empty-view-description");
-    expect(description).toHaveTextContent(
-      "EmptyAIDisabledContactAdminDesc",
-    );
+    expect(description).toHaveTextContent("EmptyAIDisabledContactAdminDesc");
     expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
 
     expect(EmptyView).toHaveBeenCalledWith(
@@ -141,7 +139,9 @@ describe("<ChatNoAccessScreen />", () => {
       "EmptyAIAgentsNotActiveYetTitle",
     );
     const description = screen.getByTestId("empty-view-description");
-    expect(description).toHaveTextContent("EmptyAIAgentsNotActiveYetDescription");
+    expect(description).toHaveTextContent(
+      "EmptyAIAgentsNotActiveYetDescription",
+    );
     expect(description).toHaveTextContent(
       "EmptyAIAgentsNotActiveYetDescriptionLine2",
     );

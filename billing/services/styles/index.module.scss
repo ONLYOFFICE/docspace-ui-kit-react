@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-
 }
 
 .storageInfo {
@@ -57,7 +56,7 @@
   width: 100%;
 }
 
-.warningContainer{
+.warningContainer {
   margin-top: auto;
 }
 
@@ -67,11 +66,11 @@
   width: 100%;
 }
 
-.storageInput{
-  margin:4px 0;
+.storageInput {
+  margin: 4px 0;
 }
 
-.perStorageInfo{
+.perStorageInfo {
   margin-top: 4px;
   color: var(--payment-dialog-text);
 }

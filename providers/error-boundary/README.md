@@ -4,11 +4,11 @@ Catches JavaScript errors anywhere in the child component tree and renders a fal
 
 ## Props
 
-| Prop       | Type                                              | Required | Description                                              |
-| ---------- | ------------------------------------------------- | -------- | -------------------------------------------------------- |
-| `fallback` | `ReactNode \| ((error: Error) => ReactNode)`      | No       | Custom fallback UI; defaults to `ErrorContainer`         |
-| `onError`  | `(error: Error, errorInfo: ErrorInfo) => void`     | No       | Callback invoked when an error is caught                 |
-| `children` | `React.ReactNode`                                  | Yes      | Child components to monitor for errors                   |
+| Prop       | Type                                           | Required | Description                                      |
+| ---------- | ---------------------------------------------- | -------- | ------------------------------------------------ |
+| `fallback` | `ReactNode \| ((error: Error) => ReactNode)`   | No       | Custom fallback UI; defaults to `ErrorContainer` |
+| `onError`  | `(error: Error, errorInfo: ErrorInfo) => void` | No       | Callback invoked when an error is caught         |
+| `children` | `React.ReactNode`                              | Yes      | Child components to monitor for errors           |
 
 ## Usage
 
@@ -21,7 +21,7 @@ import { ErrorBoundary } from "@onlyoffice/apps-ui-kit/providers/error-boundary"
 
 <ErrorBoundary>
   <App />
-</ErrorBoundary>
+</ErrorBoundary>;
 ```
 
 ### Custom fallback (ReactNode)

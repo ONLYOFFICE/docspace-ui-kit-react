@@ -74,7 +74,7 @@ still true, and all still unenforced.
   runs** — `components`, `selectors`, `ai-agent`, `errors`, `ui`, `utils`, `context`,
   `providers`, `hooks`. A test placed under `billing/`, `uploader/`, `document-editor/` or
   `api/` is collected by nothing and passes by never running.
-- 10 components have no test; that is tolerated, an untested *change* to interactive logic is
+- 10 components have no test; that is tolerated, an untested _change_ to interactive logic is
   not. `node .claude/scripts/component-docs/gaps.mjs` lists them, along with the missing
   READMEs and stories.
 - `__tests__/` holds 94 Playwright visual-regression specs that run against a built Storybook

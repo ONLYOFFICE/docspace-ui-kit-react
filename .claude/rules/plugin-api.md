@@ -30,7 +30,7 @@ table at the end of this file has the state per branch.) A second copy inside th
 bundle would read no portal context and fall back to light LTR, so the plugin never bundles
 the kit.
 
-**The consequence: `index.ts` at this repository root *is* the plugin API surface, in full.**
+**The consequence: `index.ts` at this repository root _is_ the plugin API surface, in full.**
 Not a curated subset — whatever `export *` reaches from the root barrel is what every plugin
 author can import, and removing a name from it breaks plugins with no compile error anywhere
 in this repository or in the client. Treat a change to `index.ts` as a public-API change even
@@ -42,14 +42,14 @@ when `docs/public-api.md` calls the module portal-internal.
 
 ## What is in the surface and what is not
 
-| Reachable from a plugin | Not reachable |
-|---|---|
-| `components`, `hooks`, `context`, `enums`, `constants`, `types` | `ai-agent`, `api`, `selectors`, `document-editor` — absent from the root barrel |
-| `utils` (the barrel only) | `utils/socket` — subpath only |
-| `errors`, `uploader`, `billing` | `providers/Providers`, `providers/api` — not in `providers/index.ts` |
-| `providers/theme`, `providers/translation`, `providers/error-boundary` | `assets/**`, `styles/**` — subpath only |
+| Reachable from a plugin                                                | Not reachable                                                                   |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `components`, `hooks`, `context`, `enums`, `constants`, `types`        | `ai-agent`, `api`, `selectors`, `document-editor` — absent from the root barrel |
+| `utils` (the barrel only)                                              | `utils/socket` — subpath only                                                   |
+| `errors`, `uploader`, `billing`                                        | `providers/Providers`, `providers/api` — not in `providers/index.ts`            |
+| `providers/theme`, `providers/translation`, `providers/error-boundary` | `assets/**`, `styles/**` — subpath only                                         |
 
-Everything in the right-hand column is reachable by *subpath* for the client and other npm
+Everything in the right-hand column is reachable by _subpath_ for the client and other npm
 consumers, and unreachable for a plugin, because:
 
 ## Subpath imports throw at plugin load
@@ -99,11 +99,11 @@ nothing checks that the snapshot is fresh —
 The specifier the portal's shim accepts is branch-dependent, and all three repositories now
 carry a matching `feature/ui-kit-separation`:
 
-| Repository | On `develop` / `release/v4.0.0` / `main` | On `feature/ui-kit-separation` |
-|---|---|---|
-| DocSpace-client (`react/uiKit.ts`, `react/shim.ts`) | `@docspace/ui-kit`; `master` has no module-plugin shim at all | `@onlyoffice/apps-ui-kit` |
-| this repository | `@docspace/ui-kit@0.0.1`, everything in `dependencies` | `@onlyoffice/apps-ui-kit@4.0.0`, ESM-only, `exports` map, optional peers |
-| agent-skills (`scripts/contract.mjs`, `vendor/`) | `@docspace/ui-kit`, `vendor/docspace-ui-kit-0.0.1.tgz` | `@onlyoffice/apps-ui-kit`, `vendor/onlyoffice-apps-ui-kit-4.0.0.tgz` |
+| Repository                                          | On `develop` / `release/v4.0.0` / `main`                      | On `feature/ui-kit-separation`                                           |
+| --------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| DocSpace-client (`react/uiKit.ts`, `react/shim.ts`) | `@docspace/ui-kit`; `master` has no module-plugin shim at all | `@onlyoffice/apps-ui-kit`                                                |
+| this repository                                     | `@docspace/ui-kit@0.0.1`, everything in `dependencies`        | `@onlyoffice/apps-ui-kit@4.0.0`, ESM-only, `exports` map, optional peers |
+| agent-skills (`scripts/contract.mjs`, `vendor/`)    | `@docspace/ui-kit`, `vendor/docspace-ui-kit-0.0.1.tgz`        | `@onlyoffice/apps-ui-kit`, `vendor/onlyoffice-apps-ui-kit-4.0.0.tgz`     |
 
 The shim throws on any bare specifier it does not know, so **the three branches have to land
 together**. Merging the client alone stops every existing plugin with an error naming

@@ -28,10 +28,26 @@ const buildItems = (overrides: Partial<QuickActionItem>[] = []) => {
 // scroll.
 const buildFiveItems = (): QuickActionItem[] => [
   { id: "vdr", icon: <svg data-testid="icon-vdr" />, label: "VDR room" },
-  { id: "collab", icon: <svg data-testid="icon-collab" />, label: "Collaboration room" },
-  { id: "public", icon: <svg data-testid="icon-public" />, label: "Public room" },
-  { id: "custom", icon: <svg data-testid="icon-custom" />, label: "Custom room" },
-  { id: "template", icon: <svg data-testid="icon-template" />, label: "Room template" },
+  {
+    id: "collab",
+    icon: <svg data-testid="icon-collab" />,
+    label: "Collaboration room",
+  },
+  {
+    id: "public",
+    icon: <svg data-testid="icon-public" />,
+    label: "Public room",
+  },
+  {
+    id: "custom",
+    icon: <svg data-testid="icon-custom" />,
+    label: "Custom room",
+  },
+  {
+    id: "template",
+    icon: <svg data-testid="icon-template" />,
+    label: "Room template",
+  },
 ];
 
 describe("QuickActions", () => {
@@ -103,7 +119,9 @@ describe("QuickActions", () => {
   });
 
   it("renders a button when no href is provided", () => {
-    const items: QuickActionItem[] = [{ id: "run", icon: <svg />, label: "Run" }];
+    const items: QuickActionItem[] = [
+      { id: "run", icon: <svg />, label: "Run" },
+    ];
 
     render(<QuickActions {...LABELS} items={items} />);
 
@@ -162,7 +180,9 @@ describe("QuickActions", () => {
 
     it("offers only the next arrow at the start of the strip", () => {
       simulateTrack({ scrollLeft: 0 });
-      render(<QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />);
+      render(
+        <QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />,
+      );
 
       expect(screen.queryByTestId(PREV_TESTID)).not.toBeInTheDocument();
       expect(screen.getByTestId(NEXT_TESTID)).toBeInTheDocument();
@@ -170,7 +190,9 @@ describe("QuickActions", () => {
 
     it("offers only the prev arrow at the end of the strip", () => {
       simulateTrack({ scrollLeft: 600 });
-      render(<QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />);
+      render(
+        <QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />,
+      );
 
       expect(screen.getByTestId(PREV_TESTID)).toBeInTheDocument();
       expect(screen.queryByTestId(NEXT_TESTID)).not.toBeInTheDocument();
@@ -178,7 +200,9 @@ describe("QuickActions", () => {
 
     it("offers both arrows midway through the strip", () => {
       simulateTrack({ scrollLeft: 300 });
-      render(<QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />);
+      render(
+        <QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />,
+      );
 
       expect(screen.getByTestId(PREV_TESTID)).toBeInTheDocument();
       expect(screen.getByTestId(NEXT_TESTID)).toBeInTheDocument();
@@ -220,7 +244,9 @@ describe("QuickActions", () => {
       );
       writes.length = 0;
 
-      rerender(<QuickActions {...LABELS} items={buildItems()} dataTestId="qa" />);
+      rerender(
+        <QuickActions {...LABELS} items={buildItems()} dataTestId="qa" />,
+      );
 
       expect(writes).toContain(0);
     });
@@ -236,7 +262,9 @@ describe("QuickActions", () => {
       );
       writes.length = 0;
 
-      rerender(<QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />);
+      rerender(
+        <QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />,
+      );
 
       expect(writes).toHaveLength(0);
     });
@@ -249,12 +277,19 @@ describe("QuickActions", () => {
       // and restored, which remounts it with the tiles already in place.
       simulateTrack({ scrollLeft: 300 });
       const { rerender } = render(
-        <QuickActions {...LABELS} items={buildFiveItems()} isLoading dataTestId="qa" />,
+        <QuickActions
+          {...LABELS}
+          items={buildFiveItems()}
+          isLoading
+          dataTestId="qa"
+        />,
       );
 
       expect(screen.queryByTestId(NEXT_TESTID)).not.toBeInTheDocument();
 
-      rerender(<QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />);
+      rerender(
+        <QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />,
+      );
 
       expect(screen.getByTestId(PREV_TESTID)).toBeInTheDocument();
       expect(screen.getByTestId(NEXT_TESTID)).toBeInTheDocument();
@@ -268,7 +303,9 @@ describe("QuickActions", () => {
         value: scrollBy,
       });
 
-      render(<QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />);
+      render(
+        <QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />,
+      );
 
       fireEvent.click(screen.getByTestId(NEXT_TESTID));
       expect(scrollBy).toHaveBeenCalledWith(
@@ -292,7 +329,9 @@ describe("QuickActions", () => {
         value: scrollBy,
       });
 
-      render(<QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />);
+      render(
+        <QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />,
+      );
       screen.getByTestId("quick-actions-track").style.direction = "rtl";
 
       fireEvent.click(screen.getByTestId(NEXT_TESTID));
@@ -412,7 +451,9 @@ describe("QuickActions", () => {
         </>,
       );
 
-      const ids = screen.getAllByTestId(CLOSE_TESTID).map((button) => button.id);
+      const ids = screen
+        .getAllByTestId(CLOSE_TESTID)
+        .map((button) => button.id);
 
       expect(ids).toHaveLength(2);
       expect(ids[0]).not.toBe(ids[1]);

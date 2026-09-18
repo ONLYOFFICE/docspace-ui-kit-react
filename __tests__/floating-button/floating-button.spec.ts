@@ -20,7 +20,9 @@ test.describe("FloatingButton — light", () => {
 
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
-    await expect(page).toHaveScreenshot("floating-button-css-customization.png");
+    await expect(page).toHaveScreenshot(
+      "floating-button-css-customization.png",
+    );
   });
 });
 

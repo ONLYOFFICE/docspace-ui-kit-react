@@ -231,20 +231,13 @@ const CustomStyledTemplate = () => {
         backgroundColor="transparent"
         color="#333"
       />
-      <Badge
-        label="Large"
-        maxWidth="80px"
-        padding="4px 16px"
-        fontSize="14px"
-      />
+      <Badge label="Large" maxWidth="80px" padding="4px 16px" fontSize="14px" />
     </Wrapper>
   );
 };
 
 const InteractiveTemplate = () => {
-  return (
-    <Badge label="Click me" onClick={() => alert("Badge clicked!")} />
-  );
+  return <Badge label="Click me" onClick={() => alert("Badge clicked!")} />;
 };
 
 export const BadgeTypes: Story = {
@@ -321,8 +314,7 @@ export const InteractiveBadge: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Badge with click handler for interactive behavior.",
+        story: "Badge with click handler for interactive behavior.",
       },
       source: {
         code: `<Badge label="Click me" onClick={() => alert("Badge clicked!")} />`,

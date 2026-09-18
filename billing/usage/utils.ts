@@ -48,4 +48,3 @@ export const getUsageRange = (
       return { from: current.startOf("month"), to: current };
   }
 };
-

@@ -20,4 +20,3 @@ export type RectangleSkeletonProps = {
    */
   uniqueKey?: string;
 };
-

@@ -231,4 +231,3 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
 };
 
 export default observer(AvailableCredits);
-

@@ -50,4 +50,3 @@ const TabsOverride: React.FC<AiChatTabsProps> = (props) => {
 TabsOverride.displayName = "TabsOverride";
 
 export { TabsOverride };
-

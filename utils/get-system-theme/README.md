@@ -23,7 +23,7 @@ const theme = getSystemTheme(); // ThemeKeys.DarkStr | ThemeKeys.BaseStr
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
-| `index.ts` | `getSystemTheme` function |
-| `getSystemTheme.test.ts` | Unit tests (Vitest) |
+| File                     | Description               |
+| ------------------------ | ------------------------- |
+| `index.ts`               | `getSystemTheme` function |
+| `getSystemTheme.test.ts` | Unit tests (Vitest)       |

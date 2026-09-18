@@ -33,6 +33,6 @@ combineUrl(host?: string, ...params: (string | number | undefined)[]): string
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
+| File       | Description           |
+| ---------- | --------------------- |
 | `index.ts` | `combineUrl` function |

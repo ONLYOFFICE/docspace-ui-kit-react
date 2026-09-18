@@ -22,18 +22,14 @@ const groups: NavMenuGroup[] = [
       {
         id: "ai-rooms",
         label: "AI Rooms",
-        children: [
-          { id: "rooms-recent", label: "Recent" },
-        ],
+        children: [{ id: "rooms-recent", label: "Recent" }],
       },
     ],
   },
   {
     id: "available",
     label: "Available Apps",
-    items: [
-      { id: "ai-agents", label: "AI Agents" },
-    ],
+    items: [{ id: "ai-agents", label: "AI Agents" }],
   },
 ];
 
@@ -56,15 +52,25 @@ describe("<NavMenu />", () => {
 
     it("renders all top-level item labels", () => {
       render(<NavMenu groups={groups} />);
-      expect(screen.getByRole("button", { name: "AI Files" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "AI Rooms" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "AI Agents" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "AI Files" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "AI Rooms" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "AI Agents" }),
+      ).toBeInTheDocument();
     });
 
     it("renders sub-items expanded when defaultExpandedId is set", () => {
       render(<NavMenu groups={groups} defaultExpandedId="ai-files" />);
-      expect(screen.getByRole("button", { name: "Shared with me" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Favorites" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Shared with me" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Favorites" }),
+      ).toBeInTheDocument();
     });
 
     it("does not render group label element when label is omitted", () => {
@@ -100,7 +106,9 @@ describe("<NavMenu />", () => {
       await userEvent.click(button);
 
       expect(button).toHaveAttribute("aria-expanded", "true");
-      expect(screen.getByRole("button", { name: "Shared with me" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Shared with me" }),
+      ).toBeInTheDocument();
     });
 
     it("keeps active item expanded on second click", async () => {
@@ -308,7 +316,9 @@ describe("<NavMenu />", () => {
           defaultExpandedId="ai-files"
         />,
       );
-      const activeSubButton = screen.getByRole("button", { name: "Shared with me" });
+      const activeSubButton = screen.getByRole("button", {
+        name: "Shared with me",
+      });
       expect(activeSubButton.className).toMatch(/active/);
     });
   });
@@ -319,7 +329,9 @@ describe("<NavMenu />", () => {
         {
           id: "g",
           label: "Group",
-          items: [{ id: "item-1", label: "Item", showBadge: true, labelBadge: 5 }],
+          items: [
+            { id: "item-1", label: "Item", showBadge: true, labelBadge: 5 },
+          ],
         },
       ];
       render(<NavMenu groups={badgeGroups} />);
@@ -331,7 +343,9 @@ describe("<NavMenu />", () => {
         {
           id: "g",
           label: "Group",
-          items: [{ id: "item-1", label: "Item", showBadge: false, labelBadge: 5 }],
+          items: [
+            { id: "item-1", label: "Item", showBadge: false, labelBadge: 5 },
+          ],
         },
       ];
       render(<NavMenu groups={badgeGroups} />);
@@ -377,7 +391,13 @@ describe("<NavMenu />", () => {
           id: "g",
           label: "Group",
           items: [
-            { id: "item-1", label: "Item", showBadge: true, labelBadge: 3, onClickBadge },
+            {
+              id: "item-1",
+              label: "Item",
+              showBadge: true,
+              labelBadge: 3,
+              onClickBadge,
+            },
           ],
         },
       ];
@@ -394,7 +414,13 @@ describe("<NavMenu />", () => {
           id: "g",
           label: "Group",
           items: [
-            { id: "item-1", label: "Item", showBadge: true, labelBadge: 3, onClick },
+            {
+              id: "item-1",
+              label: "Item",
+              showBadge: true,
+              labelBadge: 3,
+              onClick,
+            },
           ],
         },
       ];
@@ -575,9 +601,7 @@ describe("<NavMenu />", () => {
             {
               id: "parent",
               label: "Parent",
-              children: [
-                { id: "child", label: "Child", onClick: subOnClick },
-              ],
+              children: [{ id: "child", label: "Child", onClick: subOnClick }],
             },
           ],
         },

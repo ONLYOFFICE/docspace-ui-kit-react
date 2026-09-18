@@ -22,7 +22,9 @@ describe("ColumnarInfoBar", () => {
   });
 
   it("renders headerText when provided", () => {
-    render(<ColumnarInfoBar columns={columns} headerText="Your profile details" />);
+    render(
+      <ColumnarInfoBar columns={columns} headerText="Your profile details" />,
+    );
     expect(screen.getByText("Your profile details")).toBeInTheDocument();
   });
 
@@ -58,7 +60,10 @@ describe("ColumnarInfoBar", () => {
 
   it("renders ReactNode values inside columns", () => {
     const columnsWithNode = [
-      { label: "Status", value: <span data-testid="status-badge">200 OK</span> },
+      {
+        label: "Status",
+        value: <span data-testid="status-badge">200 OK</span>,
+      },
     ];
     render(<ColumnarInfoBar columns={columnsWithNode} />);
     expect(screen.getByTestId("status-badge")).toBeInTheDocument();

@@ -35,12 +35,16 @@ test.describe("AvatarEditorDialog -- dark", () => {
   test("default dark", async ({ page }) => {
     await gotoStory(page, "default");
     await page.evaluate(() => document.body.classList.add("dark"));
-    await expect(page).toHaveScreenshot("avatar-editor-dialog-default-dark.png");
+    await expect(page).toHaveScreenshot(
+      "avatar-editor-dialog-default-dark.png",
+    );
   });
 
   test("square-crop dark", async ({ page }) => {
     await gotoStory(page, "square-crop");
     await page.evaluate(() => document.body.classList.add("dark"));
-    await expect(page).toHaveScreenshot("avatar-editor-dialog-square-crop-dark.png");
+    await expect(page).toHaveScreenshot(
+      "avatar-editor-dialog-square-crop-dark.png",
+    );
   });
 });

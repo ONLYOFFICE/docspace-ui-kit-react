@@ -56,7 +56,10 @@ export const getIsPayer = (
   return userEmail.toLowerCase() === walletCustomerEmail.toLowerCase();
 };
 
-export const formatPaymentDate = (date: DateTime, timeType?: "start" | "end"): string => {
+export const formatPaymentDate = (
+  date: DateTime,
+  timeType?: "start" | "end",
+): string => {
   if (!timeType) {
     return formatDateUtil(date, "yyyy-MM-dd'T'HH:mm:ss", { locale: "en" });
   }

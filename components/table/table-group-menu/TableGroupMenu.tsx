@@ -184,4 +184,3 @@ const TableGroupMenu = memo((props: TableGroupMenuProps) => {
 }, equal);
 
 export { TableGroupMenu };
-

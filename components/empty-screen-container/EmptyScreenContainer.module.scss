@@ -21,10 +21,22 @@
     --empty-content-button-color-text: #{colors.$white};
   }
 
-  --empty-content-header-color-value: var(--empty-screen-header-color, var(--empty-content-header-color));
-  --empty-content-description-color-value: var(--empty-screen-description-color, var(--empty-content-description-color));
-  --empty-content-button-link-value: var(--empty-screen-link-color, var(--empty-content-button-color-link));
-  --empty-content-button-text-value: var(--empty-screen-text-color, var(--empty-content-button-color-text));
+  --empty-content-header-color-value: var(
+    --empty-screen-header-color,
+    var(--empty-content-header-color)
+  );
+  --empty-content-description-color-value: var(
+    --empty-screen-description-color,
+    var(--empty-content-description-color)
+  );
+  --empty-content-button-link-value: var(
+    --empty-screen-link-color,
+    var(--empty-content-button-color-link)
+  );
+  --empty-content-button-text-value: var(
+    --empty-screen-text-color,
+    var(--empty-content-button-color-text)
+  );
   --empty-screen-max-width: var(--empty-screen-width, 640px);
 
   width: var(--empty-screen-max-width);

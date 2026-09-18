@@ -24,7 +24,7 @@ deleteCookie("theme");
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
-| `index.ts` | `getCookie`, `setCookie`, `deleteCookie` |
-| `cookie.test.ts` | Unit tests (Vitest) |
+| File             | Description                              |
+| ---------------- | ---------------------------------------- |
+| `index.ts`       | `getCookie`, `setCookie`, `deleteCookie` |
+| `cookie.test.ts` | Unit tests (Vitest)                      |

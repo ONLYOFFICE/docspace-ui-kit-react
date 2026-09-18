@@ -3,11 +3,7 @@
   "//declarationMap": "Off deliberately. `files` ships dist, locales and LICENSE -- no .ts sources -- so every emitted map pointed at a path outside the package (sources: [\"../../index.ts\"]) and resolved to nothing for a consumer. It was 834 dead files and 3.3 MB. Turning it on again requires shipping the sources too, otherwise the maps are worse than absent: tooling follows them and finds nothing.",
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ES2023"
-    ],
+    "lib": ["DOM", "DOM.Iterable", "ES2023"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
@@ -18,10 +14,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
-    "types": [
-      "vite/client",
-      "node"
-    ],
+    "types": ["vite/client", "node"],
     "noEmit": false,
     "declaration": true,
     "emitDeclarationOnly": true,

@@ -11,21 +11,21 @@ const [visible, setVisible] = useState(false);
 
 <Aside visible={visible} onClose={() => setVisible(false)}>
   <div>Panel content</div>
-</Aside>
+</Aside>;
 ```
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `visible` | `boolean` | - | Controls panel visibility |
-| `onClose` | `() => void` | - | Callback when panel closes |
-| `scale` | `boolean` | `false` | Full-width scaling mode |
-| `zIndex` | `number` | `400` | CSS z-index value |
-| `withoutHeader` | `boolean` | `false` | Hide the header section |
-| `withoutBodyScroll` | `boolean` | `false` | Disable body scroll when open |
-| `className` | `string` | - | Additional CSS class |
-| `children` | `ReactNode` | - | Panel content |
+| Prop                | Type         | Default | Description                   |
+| ------------------- | ------------ | ------- | ----------------------------- |
+| `visible`           | `boolean`    | -       | Controls panel visibility     |
+| `onClose`           | `() => void` | -       | Callback when panel closes    |
+| `scale`             | `boolean`    | `false` | Full-width scaling mode       |
+| `zIndex`            | `number`     | `400`   | CSS z-index value             |
+| `withoutHeader`     | `boolean`    | `false` | Hide the header section       |
+| `withoutBodyScroll` | `boolean`    | `false` | Disable body scroll when open |
+| `className`         | `string`     | -       | Additional CSS class          |
+| `children`          | `ReactNode`  | -       | Panel content                 |
 
 Additionally accepts all [AsideHeader](./aside-header/README.md) props when `withoutHeader` is false.
 
@@ -33,8 +33,8 @@ Additionally accepts all [AsideHeader](./aside-header/README.md) props when `wit
 
 The component uses CSS variables for theming, defined locally within the component:
 
-| Variable | Light | Dark | Description |
-|----------|-------|------|-------------|
+| Variable           | Light     | Dark      | Description            |
+| ------------------ | --------- | --------- | ---------------------- |
 | `--aside-bg-color` | `#ffffff` | `#333333` | Panel background color |
 
 ## Examples
@@ -53,9 +53,7 @@ The component uses CSS variables for theming, defined locally within the compone
 <Aside
   visible={true}
   header="Settings"
-  headerIcons={[
-    { key: "help", url: "/icons/help.svg", onClick: showHelp },
-  ]}
+  headerIcons={[{ key: "help", url: "/icons/help.svg", onClick: showHelp }]}
   onClose={() => setVisible(false)}
 >
   <div>Settings content</div>

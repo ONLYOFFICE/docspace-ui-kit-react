@@ -262,18 +262,8 @@ export const Sizes: Story = {
 const DisabledTemplate = () => {
   return (
     <Wrapper>
-      <IconButton
-        size={25}
-        iconName={SearchReactSvgUrl}
-        isFill
-        isDisabled
-      />
-      <IconButton
-        size={25}
-        iconName={SettingsReactSvgUrl}
-        isFill
-        isDisabled
-      />
+      <IconButton size={25} iconName={SearchReactSvgUrl} isFill isDisabled />
+      <IconButton size={25} iconName={SettingsReactSvgUrl} isFill isDisabled />
     </Wrapper>
   );
 };

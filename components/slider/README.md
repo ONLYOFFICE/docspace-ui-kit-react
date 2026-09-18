@@ -28,23 +28,23 @@ const MyComponent = () => {
 
 ## Properties
 
-| Name               | Type                                       | Default   | Description                                      |
-|--------------------|--------------------------------------------|-----------|--------------------------------------------------|
-| id                 | string                                     | -         | Element ID                                       |
-| className          | string                                     | -         | CSS class name                                   |
-| style              | CSSProperties                              | -         | Inline styles                                    |
-| min                | number                                     | required  | Minimum range value                              |
-| max                | number                                     | required  | Maximum range value                              |
-| value              | number                                     | required  | Current slider value                             |
-| step               | number                                     | -         | Increment/decrement step size                    |
-| onChange           | (e: ChangeEvent<HTMLInputElement>) => void | -         | Change event handler                             |
-| isDisabled         | boolean                                    | false     | Disabled state                                   |
-| withPouring        | boolean                                    | -         | Fills the track background up to current value  |
-| thumbWidth         | string                                     | -         | Custom thumb width (e.g., "24px")                |
-| thumbHeight        | string                                     | -         | Custom thumb height (e.g., "24px")               |
-| thumbBorderWidth   | string                                     | -         | Custom thumb border width                        |
-| runnableTrackHeight| string                                     | -         | Custom track height (e.g., "8px")                |
-| dataTestId         | string                                     | "slider"  | Test ID for the component                        |
+| Name                | Type                                       | Default  | Description                                    |
+| ------------------- | ------------------------------------------ | -------- | ---------------------------------------------- |
+| id                  | string                                     | -        | Element ID                                     |
+| className           | string                                     | -        | CSS class name                                 |
+| style               | CSSProperties                              | -        | Inline styles                                  |
+| min                 | number                                     | required | Minimum range value                            |
+| max                 | number                                     | required | Maximum range value                            |
+| value               | number                                     | required | Current slider value                           |
+| step                | number                                     | -        | Increment/decrement step size                  |
+| onChange            | (e: ChangeEvent<HTMLInputElement>) => void | -        | Change event handler                           |
+| isDisabled          | boolean                                    | false    | Disabled state                                 |
+| withPouring         | boolean                                    | -        | Fills the track background up to current value |
+| thumbWidth          | string                                     | -        | Custom thumb width (e.g., "24px")              |
+| thumbHeight         | string                                     | -        | Custom thumb height (e.g., "24px")             |
+| thumbBorderWidth    | string                                     | -        | Custom thumb border width                      |
+| runnableTrackHeight | string                                     | -        | Custom track height (e.g., "8px")              |
+| dataTestId          | string                                     | "slider" | Test ID for the component                      |
 
 ## Styling
 
@@ -61,31 +61,25 @@ The component uses CSS modules with CSS variables for theming. Key variables inc
 ## Examples
 
 ### Basic Usage
+
 ```jsx
 <Slider min={0} max={100} value={50} />
 ```
 
 ### With Track Filling
+
 ```jsx
-<Slider
-  min={0}
-  max={100}
-  value={50}
-  withPouring
-/>
+<Slider min={0} max={100} value={50} withPouring />
 ```
 
 ### Custom Step Size
+
 ```jsx
-<Slider
-  min={0}
-  max={10}
-  step={5}
-  value={5}
-/>
+<Slider min={0} max={10} step={5} value={5} />
 ```
 
 ### Custom Thumb and Track Size
+
 ```jsx
 <Slider
   min={0}
@@ -99,23 +93,15 @@ The component uses CSS modules with CSS variables for theming. Key variables inc
 ```
 
 ### Disabled State
+
 ```jsx
-<Slider
-  min={0}
-  max={100}
-  value={50}
-  isDisabled
-/>
+<Slider min={0} max={100} value={50} isDisabled />
 ```
 
 ### RTL Support
+
 ```jsx
 <div dir="rtl">
-  <Slider
-    min={0}
-    max={100}
-    value={50}
-    withPouring
-  />
+  <Slider min={0} max={100} value={50} withPouring />
 </div>
 ```

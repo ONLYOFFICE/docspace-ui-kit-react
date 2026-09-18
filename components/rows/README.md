@@ -5,7 +5,11 @@ A set of components for rendering items in a row-based list layout. Provides `Ro
 ## Usage
 
 ```tsx
-import { Row, RowContent, RowContainer } from "@onlyoffice/apps-ui-kit/components/rows";
+import {
+  Row,
+  RowContent,
+  RowContainer,
+} from "@onlyoffice/apps-ui-kit/components/rows";
 
 <RowContainer>
   <Row
@@ -19,7 +23,7 @@ import { Row, RowContent, RowContainer } from "@onlyoffice/apps-ui-kit/component
       <span>Additional Info</span>
     </RowContent>
   </Row>
-</RowContainer>
+</RowContainer>;
 ```
 
 ## Exports
@@ -33,22 +37,22 @@ import { Row, RowContent, RowContainer } from "@onlyoffice/apps-ui-kit/component
 
 ## Row Properties
 
-| Prop                     | Type                                  | Default     | Description                                          |
-|--------------------------|---------------------------------------|-------------|------------------------------------------------------|
-| `checked`                | `boolean`                             | —           | Checkbox checked state                               |
-| `children`               | `ReactElement`                        | —           | Row content (typically `RowContent`)                 |
-| `element`                | `ReactElement`                        | —           | Element displayed in the first slot (e.g., avatar)   |
-| `contentElement`         | `ReactNode`                           | —           | Additional content element                           |
-| `contextOptions`         | `ContextMenuModel[]`                  | —           | Context menu items                                   |
-| `onSelect`               | `(checked, data?) => void`            | —           | Selection change callback                            |
-| `onRowClick`             | `(e: MouseEvent) => void`             | —           | Click handler for the row (excluding checkbox/menu)  |
-| `getContextModel`        | `() => ContextMenuModel[]`            | —           | Dynamic context menu model getter                    |
-| `mode`                   | `"modern" \| "default"`               | —           | Row display mode                                     |
-| `withoutBorder`          | `boolean`                             | —           | Removes row borders                                  |
-| `inProgress`             | `boolean`                             | —           | Shows a loading indicator                            |
-| `isIndexEditingMode`     | `boolean`                             | —           | Enables VDR index editing controls                   |
-| `badgesComponent`        | `ReactNode`                           | —           | Badges displayed in the row                          |
-| `isDisabled`             | `boolean`                             | —           | Disables the row checkbox                            |
+| Prop                 | Type                       | Default | Description                                         |
+| -------------------- | -------------------------- | ------- | --------------------------------------------------- |
+| `checked`            | `boolean`                  | —       | Checkbox checked state                              |
+| `children`           | `ReactElement`             | —       | Row content (typically `RowContent`)                |
+| `element`            | `ReactElement`             | —       | Element displayed in the first slot (e.g., avatar)  |
+| `contentElement`     | `ReactNode`                | —       | Additional content element                          |
+| `contextOptions`     | `ContextMenuModel[]`       | —       | Context menu items                                  |
+| `onSelect`           | `(checked, data?) => void` | —       | Selection change callback                           |
+| `onRowClick`         | `(e: MouseEvent) => void`  | —       | Click handler for the row (excluding checkbox/menu) |
+| `getContextModel`    | `() => ContextMenuModel[]` | —       | Dynamic context menu model getter                   |
+| `mode`               | `"modern" \| "default"`    | —       | Row display mode                                    |
+| `withoutBorder`      | `boolean`                  | —       | Removes row borders                                 |
+| `inProgress`         | `boolean`                  | —       | Shows a loading indicator                           |
+| `isIndexEditingMode` | `boolean`                  | —       | Enables VDR index editing controls                  |
+| `badgesComponent`    | `ReactNode`                | —       | Badges displayed in the row                         |
+| `isDisabled`         | `boolean`                  | —       | Disables the row checkbox                           |
 
 ## Examples
 
@@ -57,11 +61,7 @@ import { Row, RowContent, RowContainer } from "@onlyoffice/apps-ui-kit/component
 ```tsx
 <RowContainer>
   {items.map((item) => (
-    <Row
-      key={item.id}
-      element={<Icon />}
-      contextOptions={item.contextOptions}
-    >
+    <Row key={item.id} element={<Icon />} contextOptions={item.contextOptions}>
       <RowContent>
         <span>{item.title}</span>
       </RowContent>
@@ -75,5 +75,5 @@ import { Row, RowContent, RowContainer } from "@onlyoffice/apps-ui-kit/component
 ```tsx
 import { RowsSkeleton } from "@onlyoffice/apps-ui-kit/components/rows";
 
-<RowsSkeleton count={5} />
+<RowsSkeleton count={5} />;
 ```

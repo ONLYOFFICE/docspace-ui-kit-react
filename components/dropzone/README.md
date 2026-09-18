@@ -16,32 +16,32 @@ import Dropzone from "@onlyoffice/apps-ui-kit/components/dropzone";
   exstsText="PNG, JPG"
   fullExstsText="PNG, JPG, GIF, BMP, WEBP."
   formatsPlusBadgeValue={3}
-/>
+/>;
 ```
 
 ## Properties
 
-| Prop                   | Type                        | Default     | Description                                                              |
-|------------------------|-----------------------------|-------------|--------------------------------------------------------------------------|
-| `isLoading`            | `boolean`                   | —           | Shows a loading spinner instead of the drop area                         |
-| `isDisabled`           | `boolean`                   | `false`     | Disables click and keyboard interactions                                 |
-| `isFolderUpload`       | `boolean`                   | `false`     | Enables folder upload mode instead of file upload                        |
-| `isMultipleUpload`     | `boolean`                   | `true`      | Allows multiple files/folders. When `false`, only one item is accepted   |
-| `onSingleUploadError`  | `() => void`                | —           | Called when user tries to upload multiple items in single upload mode    |
-| `accept`               | `string \| string[]`        | —           | Accepted MIME types for file uploads (not applied in folder mode)        |
-| `onDrop`               | `(files: File[]) => void`   | —           | Callback when files are dropped or selected                              |
-| `maxFiles`             | `number`                    | `0`         | Maximum number of files (0 = unlimited)                                  |
-| `linkMainText`         | `string`                    | —           | Primary instructional text (displayed as link)                           |
-| `linkSecondaryText`    | `string`                    | —           | Secondary instructional text                                             |
-| `exstsText`            | `string`                    | —           | Short text describing supported file types                               |
-| `fullExstsText`        | `string`                    | —           | Full list of file types (shown in expandable dropdown)                   |
-| `formatsPlusBadgeValue`| `number`                    | —           | Badge showing count of additional formats (e.g., +5)                     |
-| `icon`                 | `string`                    | —           | Optional icon URL to display                                             |
-| `iconClassName`        | `string`                    | —           | Optional className for the icon                                          |
-| `className`            | `string`                    | —           | Optional className for the dropzone container                            |
-| `loaderClassName`      | `string`                    | —           | Optional className for the loader                                        |
-| `getFilesFromEvent`    | `function`                  | —           | Custom function to get files from drop event                             |
-| `dataTestId`           | `string`                    | `"dropzone"`| Test ID for automated testing                                            |
+| Prop                    | Type                      | Default      | Description                                                            |
+| ----------------------- | ------------------------- | ------------ | ---------------------------------------------------------------------- |
+| `isLoading`             | `boolean`                 | —            | Shows a loading spinner instead of the drop area                       |
+| `isDisabled`            | `boolean`                 | `false`      | Disables click and keyboard interactions                               |
+| `isFolderUpload`        | `boolean`                 | `false`      | Enables folder upload mode instead of file upload                      |
+| `isMultipleUpload`      | `boolean`                 | `true`       | Allows multiple files/folders. When `false`, only one item is accepted |
+| `onSingleUploadError`   | `() => void`              | —            | Called when user tries to upload multiple items in single upload mode  |
+| `accept`                | `string \| string[]`      | —            | Accepted MIME types for file uploads (not applied in folder mode)      |
+| `onDrop`                | `(files: File[]) => void` | —            | Callback when files are dropped or selected                            |
+| `maxFiles`              | `number`                  | `0`          | Maximum number of files (0 = unlimited)                                |
+| `linkMainText`          | `string`                  | —            | Primary instructional text (displayed as link)                         |
+| `linkSecondaryText`     | `string`                  | —            | Secondary instructional text                                           |
+| `exstsText`             | `string`                  | —            | Short text describing supported file types                             |
+| `fullExstsText`         | `string`                  | —            | Full list of file types (shown in expandable dropdown)                 |
+| `formatsPlusBadgeValue` | `number`                  | —            | Badge showing count of additional formats (e.g., +5)                   |
+| `icon`                  | `string`                  | —            | Optional icon URL to display                                           |
+| `iconClassName`         | `string`                  | —            | Optional className for the icon                                        |
+| `className`             | `string`                  | —            | Optional className for the dropzone container                          |
+| `loaderClassName`       | `string`                  | —            | Optional className for the loader                                      |
+| `getFilesFromEvent`     | `function`                | —            | Custom function to get files from drop event                           |
+| `dataTestId`            | `string`                  | `"dropzone"` | Test ID for automated testing                                          |
 
 ## Examples
 

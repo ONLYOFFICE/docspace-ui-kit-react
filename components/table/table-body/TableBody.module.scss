@@ -1,9 +1,8 @@
- .tableBody {
-    display: contents;
-  
-    &.useReactWindow {
-      display: block;
-      height: 100%;
-    }
+.tableBody {
+  display: contents;
+
+  &.useReactWindow {
+    display: block;
+    height: 100%;
   }
-  
+}

@@ -8,7 +8,7 @@ describe("getCalendarYears", () => {
 
   it("should return a range of 16 years (current year - 1 to + 15)", () => {
     const result = getCalendarYears(mockDate);
-    
+
     expect(result).toHaveLength(16);
     expect(result[0]).toBe("2022");
     expect(result[15]).toBe("2037");

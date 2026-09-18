@@ -40,7 +40,7 @@ import { Backdrop } from "@onlyoffice/apps-ui-kit/components/backdrop";
 ## Properties
 
 | Prop                 | Type                            | Default | Description                                              |
-|----------------------|---------------------------------|---------|----------------------------------------------------------|
+| -------------------- | ------------------------------- | ------- | -------------------------------------------------------- |
 | `visible`            | `boolean`                       | `false` | Controls the visibility of the backdrop                  |
 | `zIndex`             | `number`                        | `203`   | Sets the z-index CSS property for stacking context       |
 | `className`          | `string \| string[]`            | -       | Custom CSS class name(s) to apply                        |
@@ -62,6 +62,7 @@ The component uses CSS modules with CSS variables for theming:
 ```
 
 Theme values:
+
 - Light theme: `rgba(6, 22, 38, 0.2)`
 - Dark theme: `rgba(27, 27, 27, 0.6)`
 
@@ -85,11 +86,7 @@ const ModalExample = () => {
         withBackground
         onClick={() => setIsOpen(false)}
       />
-      {isOpen && (
-        <div className="modal">
-          Modal Content
-        </div>
-      )}
+      {isOpen && <div className="modal">Modal Content</div>}
     </>
   );
 };
@@ -175,11 +172,11 @@ The component automatically adjusts its behavior for mobile and tablet devices:
 
 The component intelligently manages multiple backdrops:
 
-| Scenario | Behavior |
-|----------|----------|
-| Default (no `isAside`) | Only one backdrop displayed at a time |
-| With `isAside` | Up to two backdrops can be displayed simultaneously |
-| With `shouldShowBackdrop` | Forces backdrop to display regardless of count |
+| Scenario                  | Behavior                                            |
+| ------------------------- | --------------------------------------------------- |
+| Default (no `isAside`)    | Only one backdrop displayed at a time               |
+| With `isAside`            | Up to two backdrops can be displayed simultaneously |
+| With `shouldShowBackdrop` | Forces backdrop to display regardless of count      |
 
 ## Notes
 

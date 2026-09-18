@@ -20,7 +20,9 @@ test.describe("RadioButtonGroup — light", () => {
 
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
-    await expect(page).toHaveScreenshot("radio-button-group-css-customization.png");
+    await expect(page).toHaveScreenshot(
+      "radio-button-group-css-customization.png",
+    );
   });
 });
 

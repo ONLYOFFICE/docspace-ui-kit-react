@@ -5,13 +5,13 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import ApiProvider from "./ApiProvider";
 
 const meta = {
-	title: "Components/Providers/ApiProvider",
-	tags: ["!autodocs"],
-	component: ApiProvider,
-	parameters: {
-		docs: {
-			description: {
-				component: `Provides API client context to all child components using the DocSpace API SDK.
+  title: "Components/Providers/ApiProvider",
+  tags: ["!autodocs"],
+  component: ApiProvider,
+  parameters: {
+    docs: {
+      description: {
+        component: `Provides API client context to all child components using the DocSpace API SDK.
 
 ### Features
 
@@ -37,24 +37,24 @@ const MyComponent = () => {
   // Use API clients...
 };
 \`\`\``,
-			},
-		},
-	},
-	argTypes: {
-		url: {
-			control: "text",
-			description: "Base URL of the DocSpace API server",
-		},
-		apiKey: {
-			control: "text",
-			description: "API key used for Bearer token authentication",
-		},
-		children: {
-			control: false,
-			description:
-				"Child components that can access API clients via useApi() hook",
-		},
-	},
+      },
+    },
+  },
+  argTypes: {
+    url: {
+      control: "text",
+      description: "Base URL of the DocSpace API server",
+    },
+    apiKey: {
+      control: "text",
+      description: "API key used for Bearer token authentication",
+    },
+    children: {
+      control: false,
+      description:
+        "Child components that can access API clients via useApi() hook",
+    },
+  },
 } satisfies Meta<typeof ApiProvider>;
 
 type Story = StoryObj<ComponentProps<typeof ApiProvider>>;
@@ -62,31 +62,31 @@ type Story = StoryObj<ComponentProps<typeof ApiProvider>>;
 export default meta;
 
 export const Default: Story = {
-	render: (args) => (
-		<ApiProvider {...args}>
-			<div style={{ padding: "16px" }}>
-				<p>
-					Children are rendered with access to API clients via the{" "}
-					<code>useApi()</code> hook.
-				</p>
-			</div>
-		</ApiProvider>
-	),
-	args: {
-		url: "https://docspace.example.com",
-		apiKey: "example-api-key",
-	},
-	parameters: {
-		docs: {
-			description: {
-				story:
-					"Default ApiProvider wrapping child content. Children can access API clients via the useApi() hook.",
-			},
-			source: {
-				code: `<ApiProvider url="https://docspace.example.com" apiKey="your-api-key">
+  render: (args) => (
+    <ApiProvider {...args}>
+      <div style={{ padding: "16px" }}>
+        <p>
+          Children are rendered with access to API clients via the{" "}
+          <code>useApi()</code> hook.
+        </p>
+      </div>
+    </ApiProvider>
+  ),
+  args: {
+    url: "https://docspace.example.com",
+    apiKey: "example-api-key",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default ApiProvider wrapping child content. Children can access API clients via the useApi() hook.",
+      },
+      source: {
+        code: `<ApiProvider url="https://docspace.example.com" apiKey="your-api-key">
   <App />
 </ApiProvider>`,
-			},
-		},
-	},
+      },
+    },
+  },
 };

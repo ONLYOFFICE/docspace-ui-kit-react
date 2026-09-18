@@ -35,7 +35,7 @@ getFilesFromEvent(evt: DragEvent | ClipboardEvent | Event | React.DragEvent | Re
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
-| `index.ts` | `getFilesFromEvent` default export |
-| `getFilesFromEvent.test.ts` | Unit tests (Vitest) |
+| File                        | Description                        |
+| --------------------------- | ---------------------------------- |
+| `index.ts`                  | `getFilesFromEvent` default export |
+| `getFilesFromEvent.test.ts` | Unit tests (Vitest)                |

@@ -16,7 +16,7 @@ import { ImageEditor } from "@onlyoffice/apps-ui-kit/components/image-editor";
   isDisabled={false}
   editorBorderRadius={50}
   onChangeFile={handleFileChange}
-/>
+/>;
 ```
 
 ## Features
@@ -34,20 +34,20 @@ import { ImageEditor } from "@onlyoffice/apps-ui-kit/components/image-editor";
 
 ## Properties
 
-| Prop                           | Type                                           | Default | Description                                      |
-|--------------------------------|------------------------------------------------|---------|--------------------------------------------------|
-| `t`                            | `TTranslation`                                 | —       | Translation function for i18n                    |
-| `image`                        | `TImage`                                       | —       | Current image state (file, zoom, x, y)           |
-| `onChangeImage`                | `(image: TImage) => void`                      | —       | Callback when image state changes                |
-| `Preview`                      | `React.ReactNode`                              | —       | Preview element rendered beside the cropper      |
-| `setPreview`                   | `(preview: string) => void`                    | —       | Callback to update the preview data URL          |
-| `isDisabled`                   | `boolean`                                      | —       | Disables all editing interactions                |
-| `editorBorderRadius`           | `number`                                       | —       | Border radius of the crop area in pixels         |
-| `onChangeFile`                 | `(e: ChangeEvent<HTMLInputElement>) => void`   | —       | Callback when a new file is selected             |
-| `classNameWrapperImageCropper` | `string`                                       | —       | CSS class for the cropper wrapper                |
-| `className`                    | `string`                                       | —       | CSS class for the root element                   |
-| `disableImageRescaling`        | `boolean`                                      | —       | Disables automatic image rescaling               |
-| `maxImageSize`                 | `number`                                       | —       | Maximum allowed image size                       |
+| Prop                           | Type                                         | Default | Description                                 |
+| ------------------------------ | -------------------------------------------- | ------- | ------------------------------------------- |
+| `t`                            | `TTranslation`                               | —       | Translation function for i18n               |
+| `image`                        | `TImage`                                     | —       | Current image state (file, zoom, x, y)      |
+| `onChangeImage`                | `(image: TImage) => void`                    | —       | Callback when image state changes           |
+| `Preview`                      | `React.ReactNode`                            | —       | Preview element rendered beside the cropper |
+| `setPreview`                   | `(preview: string) => void`                  | —       | Callback to update the preview data URL     |
+| `isDisabled`                   | `boolean`                                    | —       | Disables all editing interactions           |
+| `editorBorderRadius`           | `number`                                     | —       | Border radius of the crop area in pixels    |
+| `onChangeFile`                 | `(e: ChangeEvent<HTMLInputElement>) => void` | —       | Callback when a new file is selected        |
+| `classNameWrapperImageCropper` | `string`                                     | —       | CSS class for the cropper wrapper           |
+| `className`                    | `string`                                     | —       | CSS class for the root element              |
+| `disableImageRescaling`        | `boolean`                                    | —       | Disables automatic image rescaling          |
+| `maxImageSize`                 | `number`                                     | —       | Maximum allowed image size                  |
 
 ## TImage Type
 

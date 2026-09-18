@@ -3,7 +3,11 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 import { ThemeKeys } from "../../enums";
-import { DEFAULT_FONT_FAMILY, SYSTEM_FONT_FAMILY, SYSTEM_THEME_KEY } from "./themes/constants";
+import {
+  DEFAULT_FONT_FAMILY,
+  SYSTEM_FONT_FAMILY,
+  SYSTEM_THEME_KEY,
+} from "./themes/constants";
 
 import useTheme from "./useTheme";
 
@@ -21,7 +25,8 @@ vi.mock("../../utils/cookie", () => ({
 
 vi.mock("@onlyoffice/docspace-api-sdk", () => ({
   CommonSettingsApiAxiosParamCreator: () => ({
-    getPortalColorTheme: (...args: unknown[]) => mockGetPortalColorTheme(...args),
+    getPortalColorTheme: (...args: unknown[]) =>
+      mockGetPortalColorTheme(...args),
   }),
 }));
 
@@ -31,16 +36,21 @@ const createMatchMedia = () => {
     matchMedia: vi.fn().mockImplementation(() => ({
       matches: false,
       media: "(prefers-color-scheme: dark)",
-      addEventListener: vi.fn((event: string, cb: (e: MediaQueryListEvent) => void) => {
-        if (event === "change") listeners.push(cb);
-      }),
-      removeEventListener: vi.fn((event: string, cb: (e: MediaQueryListEvent) => void) => {
-        if (event === "change") {
-          const index = listeners.indexOf(cb);
-          if (index > -1) listeners.splice(index, 1);
-        }
-      }),
-      dispatch: (event: MediaQueryListEvent) => listeners.forEach((cb) => cb(event)),
+      addEventListener: vi.fn(
+        (event: string, cb: (e: MediaQueryListEvent) => void) => {
+          if (event === "change") listeners.push(cb);
+        },
+      ),
+      removeEventListener: vi.fn(
+        (event: string, cb: (e: MediaQueryListEvent) => void) => {
+          if (event === "change") {
+            const index = listeners.indexOf(cb);
+            if (index > -1) listeners.splice(index, 1);
+          }
+        },
+      ),
+      dispatch: (event: MediaQueryListEvent) =>
+        listeners.forEach((cb) => cb(event)),
     })),
   };
 };
@@ -52,7 +62,10 @@ describe("useTheme", () => {
     mockGetSystemTheme.mockReset();
     mockSetCookie.mockReset();
 
-    mockGetPortalColorTheme.mockResolvedValue({ selected: undefined, themes: [] });
+    mockGetPortalColorTheme.mockResolvedValue({
+      selected: undefined,
+      themes: [],
+    });
 
     const { matchMedia } = createMatchMedia();
     vi.stubGlobal("matchMedia", matchMedia);
@@ -66,7 +79,9 @@ describe("useTheme", () => {
   it("returns Base theme by default with LTR and default font", () => {
     mockGetSystemTheme.mockReturnValue(ThemeKeys.BaseStr);
 
-    const { result } = renderHook(() => useTheme({ initialTheme: ThemeKeys.BaseStr }));
+    const { result } = renderHook(() =>
+      useTheme({ initialTheme: ThemeKeys.BaseStr }),
+    );
 
     expect(result.current.theme.isBase).toBe(true);
     expect(result.current.theme.interfaceDirection).toBe("ltr");
@@ -76,7 +91,9 @@ describe("useTheme", () => {
   it("returns Dark theme when initialTheme is DarkStr", () => {
     mockGetSystemTheme.mockReturnValue(ThemeKeys.DarkStr);
 
-    const { result } = renderHook(() => useTheme({ initialTheme: ThemeKeys.DarkStr }));
+    const { result } = renderHook(() =>
+      useTheme({ initialTheme: ThemeKeys.DarkStr }),
+    );
 
     expect(result.current.theme.isBase).toBe(false);
   });
@@ -110,9 +127,7 @@ describe("useTheme", () => {
     mockGetSystemTheme.mockReturnValue(ThemeKeys.BaseStr);
     mockGetPortalColorTheme.mockResolvedValue({
       selected: "10",
-      themes: [
-        { id: "10", name: "Fetched" },
-      ],
+      themes: [{ id: "10", name: "Fetched" }],
     });
 
     const { result } = renderHook(() => useTheme({}));
@@ -131,6 +146,9 @@ describe("useTheme", () => {
 
     renderHook(() => useTheme({ initialTheme: ThemeKeys.SystemStr }));
 
-    expect(mockSetCookie).toHaveBeenCalledWith(SYSTEM_THEME_KEY, ThemeKeys.DarkStr);
+    expect(mockSetCookie).toHaveBeenCalledWith(
+      SYSTEM_THEME_KEY,
+      ThemeKeys.DarkStr,
+    );
   });
 });

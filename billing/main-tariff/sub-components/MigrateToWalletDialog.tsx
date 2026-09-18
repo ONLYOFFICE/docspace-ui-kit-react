@@ -374,4 +374,3 @@ const MigrateToWalletDialog = observer(
 );
 
 export default MigrateToWalletDialog;
-

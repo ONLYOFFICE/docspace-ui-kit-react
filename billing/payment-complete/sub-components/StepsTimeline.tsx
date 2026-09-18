@@ -56,11 +56,7 @@ const StepsTimeline = ({
             : "pending";
 
         return (
-          <li
-            key={step.key}
-            className={styles.timelineItem}
-            data-state={state}
-          >
+          <li key={step.key} className={styles.timelineItem} data-state={state}>
             {!isLast ? (
               <Text
                 className={styles.timelineConnector}

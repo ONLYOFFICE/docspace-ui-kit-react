@@ -11,11 +11,11 @@ React hook for declaratively managing event listeners with automatic cleanup and
 ### Window Events
 
 ```tsx
-import { useEventListener } from '@onlyoffice/apps-ui-kit/hooks/useEventListener';
+import { useEventListener } from "@onlyoffice/apps-ui-kit/hooks/useEventListener";
 
 function ScrollTracker() {
-  useEventListener('scroll', (event) => {
-    console.log('Window scrolled:', window.scrollY);
+  useEventListener("scroll", (event) => {
+    console.log("Window scrolled:", window.scrollY);
   });
 
   return <div>Scroll the page...</div>;
@@ -25,18 +25,18 @@ function ScrollTracker() {
 ### Element Events
 
 ```tsx
-import { useEventListener } from '@onlyoffice/apps-ui-kit/hooks/useEventListener';
-import { useRef } from 'react';
+import { useEventListener } from "@onlyoffice/apps-ui-kit/hooks/useEventListener";
+import { useRef } from "react";
 
 function ClickableBox() {
   const boxRef = useRef<HTMLDivElement>(null);
 
   useEventListener(
-    'click',
+    "click",
     (event) => {
-      console.log('Box clicked!', event);
+      console.log("Box clicked!", event);
     },
-    boxRef
+    boxRef,
   );
 
   return <div ref={boxRef}>Click me!</div>;
@@ -46,20 +46,20 @@ function ClickableBox() {
 ### Document Events
 
 ```tsx
-import { useEventListener } from '@onlyoffice/apps-ui-kit/hooks/useEventListener';
-import { useRef } from 'react';
+import { useEventListener } from "@onlyoffice/apps-ui-kit/hooks/useEventListener";
+import { useRef } from "react";
 
 function KeyboardHandler() {
   const documentRef = useRef<Document>(document);
 
   useEventListener(
-    'keydown',
+    "keydown",
     (event) => {
-      if (event.key === 'Escape') {
-        console.log('Escape pressed!');
+      if (event.key === "Escape") {
+        console.log("Escape pressed!");
       }
     },
-    documentRef
+    documentRef,
   );
 
   return <div>Press Escape key...</div>;
@@ -69,50 +69,50 @@ function KeyboardHandler() {
 ### MediaQueryList Events
 
 ```tsx
-import { useEventListener } from '@onlyoffice/apps-ui-kit/hooks/useEventListener';
-import { useRef, useEffect, useState } from 'react';
+import { useEventListener } from "@onlyoffice/apps-ui-kit/hooks/useEventListener";
+import { useRef, useEffect, useState } from "react";
 
 function DarkModeDetector() {
   const [isDark, setIsDark] = useState(false);
   const mediaQueryRef = useRef<MediaQueryList | null>(null);
 
   useEffect(() => {
-    mediaQueryRef.current = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQueryRef.current = window.matchMedia("(prefers-color-scheme: dark)");
     setIsDark(mediaQueryRef.current.matches);
   }, []);
 
   useEventListener(
-    'change',
+    "change",
     (event) => {
       setIsDark(event.matches);
     },
-    mediaQueryRef
+    mediaQueryRef,
   );
 
-  return <div>Dark mode: {isDark ? 'Yes' : 'No'}</div>;
+  return <div>Dark mode: {isDark ? "Yes" : "No"}</div>;
 }
 ```
 
 ### Custom Events
 
 ```tsx
-import { useEventListener } from '@onlyoffice/apps-ui-kit/hooks/useEventListener';
-import { useRef } from 'react';
+import { useEventListener } from "@onlyoffice/apps-ui-kit/hooks/useEventListener";
+import { useRef } from "react";
 
 function CustomEventHandler() {
   const elementRef = useRef<HTMLDivElement>(null);
 
   useEventListener(
-    'myCustomEvent',
+    "myCustomEvent",
     (event: CustomEvent) => {
-      console.log('Custom event received:', event.detail);
+      console.log("Custom event received:", event.detail);
     },
-    elementRef
+    elementRef,
   );
 
   const triggerEvent = () => {
     elementRef.current?.dispatchEvent(
-      new CustomEvent('myCustomEvent', { detail: { data: 'Hello!' } })
+      new CustomEvent("myCustomEvent", { detail: { data: "Hello!" } }),
     );
   };
 
@@ -136,6 +136,7 @@ function CustomEventHandler() {
 ### Type Safety
 
 The hook provides full TypeScript support with overloads for:
+
 - **WindowEventMap**: Window events (e.g., 'resize', 'scroll')
 - **HTMLElementEventMap**: HTML element events (e.g., 'click', 'input')
 - **SVGElementEventMap**: SVG element events
@@ -150,12 +151,12 @@ The hook provides full TypeScript support with overloads for:
 ```tsx
 function PassiveScrollHandler() {
   useEventListener(
-    'scroll',
+    "scroll",
     (event) => {
-      console.log('Scrolling...');
+      console.log("Scrolling...");
     },
     undefined,
-    { passive: true } // Improves scroll performance
+    { passive: true }, // Improves scroll performance
   );
 
   return <div>Scroll with passive listener</div>;
@@ -168,9 +169,9 @@ function PassiveScrollHandler() {
 function MultiEventComponent() {
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  useEventListener('click', () => console.log('Clicked'), buttonRef);
-  useEventListener('mouseenter', () => console.log('Mouse entered'), buttonRef);
-  useEventListener('mouseleave', () => console.log('Mouse left'), buttonRef);
+  useEventListener("click", () => console.log("Clicked"), buttonRef);
+  useEventListener("mouseenter", () => console.log("Mouse entered"), buttonRef);
+  useEventListener("mouseleave", () => console.log("Mouse left"), buttonRef);
 
   return <button ref={buttonRef}>Hover and click me</button>;
 }
@@ -183,13 +184,13 @@ function ConditionalListener({ enabled }: { enabled: boolean }) {
   const elementRef = useRef<HTMLDivElement>(null);
 
   useEventListener(
-    'click',
+    "click",
     (event) => {
       if (enabled) {
-        console.log('Click handled');
+        console.log("Click handled");
       }
     },
-    elementRef
+    elementRef,
   );
 
   return <div ref={elementRef}>Click me (enabled: {String(enabled)})</div>;

@@ -9,8 +9,8 @@
   "folders": [
     {
       "name": "🧩 @onlyoffice/apps-ui-kit",
-      "path": "."
-    }
+      "path": ".",
+    },
   ],
   "settings": {
     "VsCodeTaskButtons.showCounter": false,
@@ -22,19 +22,19 @@
           {
             "label": "Dev server (port 6006)",
             "task": "Storybook | dev server",
-            "tooltip": "🎨 Hot-reloading Storybook. A fresh clone needs `Sync | locales` first: css/fonts.css is gitignored"
+            "tooltip": "🎨 Hot-reloading Storybook. A fresh clone needs `Sync | locales` first: css/fonts.css is gitignored",
           },
           {
             "label": "Build the static site",
             "task": "Storybook | build static",
-            "tooltip": "🎨 What the E2E suite runs against"
+            "tooltip": "🎨 What the E2E suite runs against",
           },
           {
             "label": "Serve the built site",
             "task": "Storybook | serve the built site",
-            "tooltip": "🎨 Serve storybook-static on port 6006"
-          }
-        ]
+            "tooltip": "🎨 Serve storybook-static on port 6006",
+          },
+        ],
       },
       {
         "label": "$(check) Check",
@@ -43,54 +43,54 @@
           {
             "label": "The whole pre-push gate",
             "task": "Check | the whole pre-push gate",
-            "tooltip": "✅ tsc, lint and test -- exactly what lefthook runs on push"
+            "tooltip": "✅ tsc, lint and test -- exactly what lefthook runs on push",
           },
           {
             "label": "Typescript (tsc)",
             "task": "Check | Tsc",
-            "tooltip": "✅ Strict mode, no emit"
+            "tooltip": "✅ Strict mode, no emit",
           },
           {
             "label": "Lint (Biome)",
             "task": "Check | Biome",
-            "tooltip": "✅ Lint only -- Biome's formatter is disabled in this repo"
+            "tooltip": "✅ Lint only -- Biome's formatter is disabled in this repo",
           },
           {
             "label": "Lint:fix (Biome)",
             "task": "Check | Biome:fix",
-            "tooltip": "✅ Apply Biome's safe fixes"
+            "tooltip": "✅ Apply Biome's safe fixes",
           },
           {
             "label": "Test (Vitest)",
             "task": "Check | Vitest",
-            "tooltip": "✅ One pass over the directories vitest.config.ts collects"
+            "tooltip": "✅ One pass over the directories vitest.config.ts collects",
           },
           {
             "label": "Test: watch",
             "task": "Check | Vitest:watch",
-            "tooltip": "✅ Re-run on change"
+            "tooltip": "✅ Re-run on change",
           },
           {
             "label": "Test: UI",
             "task": "Check | Vitest:ui",
-            "tooltip": "✅ Vitest's browser UI"
+            "tooltip": "✅ Vitest's browser UI",
           },
           {
             "label": "Test: coverage",
             "task": "Check | Vitest:coverage",
-            "tooltip": "✅ v8 coverage report"
+            "tooltip": "✅ v8 coverage report",
           },
           {
             "label": "Format check (Prettier)",
             "task": "Check | Prettier",
-            "tooltip": "✅ Not in any gate -- files can be nonconforming with everything green"
+            "tooltip": "✅ Not in any gate -- files can be nonconforming with everything green",
           },
           {
             "label": "Format:fix (Prettier)",
             "task": "Check | Prettier:fix",
-            "tooltip": "✅ Rewrites files; expect a large diff on a repo that has drifted"
-          }
-        ]
+            "tooltip": "✅ Rewrites files; expect a large diff on a repo that has drifted",
+          },
+        ],
       },
       {
         "label": "$(package) Package",
@@ -99,34 +99,34 @@
           {
             "label": "Build and verify",
             "task": "Package | build and verify",
-            "tooltip": "📦 What the blocking CI job runs"
+            "tooltip": "📦 What the blocking CI job runs",
           },
           {
             "label": "Build",
             "task": "Package | build",
-            "tooltip": "📦 rollup, tsc, type normalisation, one stylesheet, then check-dist"
+            "tooltip": "📦 rollup, tsc, type normalisation, one stylesheet, then check-dist",
           },
           {
             "label": "Build: watch",
             "task": "Package | build:watch",
-            "tooltip": "📦 rollup -w, for a client checkout linked at this one"
+            "tooltip": "📦 rollup -w, for a client checkout linked at this one",
           },
           {
             "label": "Verify the tarball (publint + attw)",
             "task": "Package | verify (publint + attw)",
-            "tooltip": "📦 Packs with pnpm so publishConfig applies -- npm pack would report total failure for the wrong reason"
+            "tooltip": "📦 Packs with pnpm so publishConfig applies -- npm pack would report total failure for the wrong reason",
           },
           {
             "label": "What a publish would ship",
             "task": "Package | what a publish would ship",
-            "tooltip": "📦 pnpm pack --dry-run. Read the list: locales are vendored, so this is literally it"
+            "tooltip": "📦 pnpm pack --dry-run. Read the list: locales are vendored, so this is literally it",
           },
           {
             "label": "Clean dist",
             "task": "Package | clean dist",
-            "tooltip": "📦 rm -rf dist"
-          }
-        ]
+            "tooltip": "📦 rm -rf dist",
+          },
+        ],
       },
       {
         "label": "$(search) Audit",
@@ -135,44 +135,44 @@
           {
             "label": "Plugin API surface",
             "task": "Audit | plugin API surface",
-            "tooltip": "🔍 The root barrel is the DocSpace plugin UI API. Fails on a removed or re-kinded export"
+            "tooltip": "🔍 The root barrel is the DocSpace plugin UI API. Fails on a removed or re-kinded export",
           },
           {
             "label": "Accept the current plugin surface",
             "task": "Audit | accept the current plugin surface",
-            "tooltip": "🔍 Rewrites docs/plugin-surface.json. Only when the removals are intended"
+            "tooltip": "🔍 Rewrites docs/plugin-surface.json. Only when the removals are intended",
           },
           {
             "label": "Drift against the plugin skill",
             "task": "Audit | drift against the plugin skill",
-            "tooltip": "🔍 Checks agent-skills/skills/plugin-sdk against this source. Needs that checkout"
+            "tooltip": "🔍 Checks agent-skills/skills/plugin-sdk against this source. Needs that checkout",
           },
           {
             "label": "Tokens, hex and RTL (changed files)",
             "task": "Audit | tokens, hex and RTL (changed files)",
-            "tooltip": "🔍 Undefined var(), hardcoded hex, physical left/right -- in what this change touched"
+            "tooltip": "🔍 Undefined var(), hardcoded hex, physical left/right -- in what this change touched",
           },
           {
             "label": "Tokens, hex and RTL (whole package)",
             "task": "Audit | tokens, hex and RTL (whole package)",
-            "tooltip": "🔍 The standing backlog. Do not report it as if a change caused it"
+            "tooltip": "🔍 The standing backlog. Do not report it as if a change caused it",
           },
           {
             "label": "Manifest invariants",
             "task": "Audit | manifest invariants",
-            "tooltip": "🔍 Unimported dependencies, undeclared imports, unmirrored peers"
+            "tooltip": "🔍 Unimported dependencies, undeclared imports, unmirrored peers",
           },
           {
             "label": "Documentation gaps",
             "task": "Audit | documentation gaps",
-            "tooltip": "🔍 Components with no README, story or test. READMEs ship in the package"
+            "tooltip": "🔍 Components with no README, story or test. READMEs ship in the package",
           },
           {
             "label": "Scaffold a component...",
             "task": "Audit | scaffold a component",
-            "tooltip": "🔍 Writes the folder and registers it in the barrel -- which is the plugin API"
-          }
-        ]
+            "tooltip": "🔍 Writes the folder and registers it in the barrel -- which is the plugin API",
+          },
+        ],
       },
       {
         "label": "$(device-camera) E2E",
@@ -181,34 +181,34 @@
           {
             "label": "Run against a built Storybook",
             "task": "E2E | run against a built Storybook",
-            "tooltip": "📸 Builds Storybook first, then runs the specs"
+            "tooltip": "📸 Builds Storybook first, then runs the specs",
           },
           {
             "label": "Playwright UI",
             "task": "E2E | Playwright UI",
-            "tooltip": "📸 Interactive runner"
+            "tooltip": "📸 Interactive runner",
           },
           {
             "label": "Docker: build the image",
             "task": "E2E | Docker: build the image",
-            "tooltip": "📸 Do this before the first Docker run"
+            "tooltip": "📸 Do this before the first Docker run",
           },
           {
             "label": "Docker: run",
             "task": "E2E | Docker: run",
-            "tooltip": "📸 The only way to get screenshots that match CI's rendering"
+            "tooltip": "📸 The only way to get screenshots that match CI's rendering",
           },
           {
             "label": "Docker: update screenshots",
             "task": "E2E | Docker: update screenshots",
-            "tooltip": "📸 Rewrites the baselines -- review every changed image"
+            "tooltip": "📸 Rewrites the baselines -- review every changed image",
           },
           {
             "label": "Show the last report",
             "task": "E2E | show the last report",
-            "tooltip": "📸 Serves playwright-report/ on port 9330"
-          }
-        ]
+            "tooltip": "📸 Serves playwright-report/ on port 9330",
+          },
+        ],
       },
       {
         "label": "$(sync) Sync",
@@ -217,26 +217,30 @@
           {
             "label": "Install dependencies",
             "task": "Sync | install dependencies",
-            "tooltip": "🔄 pnpm install"
+            "tooltip": "🔄 pnpm install",
           },
           {
             "label": "Locales, fonts and css",
             "task": "Sync | locales, fonts and css from a client checkout",
-            "tooltip": "🔄 Needs DOCSPACE_CLIENT_ROOT (default ../../DocSpace/client) and fails loudly without it. Only locales/en is committed"
+            "tooltip": "🔄 Needs DOCSPACE_CLIENT_ROOT (default ../../DocSpace/client) and fails loudly without it. Only locales/en is committed",
           },
           {
             "label": "Icons",
             "task": "Sync | icons from a client checkout",
-            "tooltip": "🔄 Refreshes assets/icons from the client's public/images/icons"
-          }
-        ]
-      }
+            "tooltip": "🔄 Refreshes assets/icons from the client's public/images/icons",
+          },
+        ],
+      },
     ],
     "editor.formatOnSave": true,
     "[javascript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
-    "[javascriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+    "[javascriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
     "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
-    "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
     "[scss]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
     // JSON goes to Prettier too: `pnpm format` runs Prettier over .json, so
     // VS Code's own formatter here made the two disagree and files flipped
@@ -247,7 +251,7 @@
     // to false, and Prettier owns formatting through `pnpm format`.
     "editor.codeActionsOnSave": {
       "source.organizeImports.biome": "never",
-      "quickfix.biome": "never"
-    }
-  }
+      "quickfix.biome": "never",
+    },
+  },
 }

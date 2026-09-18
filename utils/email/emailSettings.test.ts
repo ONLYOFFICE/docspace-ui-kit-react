@@ -32,7 +32,9 @@ describe("EmailSettings", () => {
     ] as const;
 
     setters.forEach((setter) => {
-      expect(() => Reflect.set(settings as object, setter, invalidValue)).toThrow(TypeError);
+      expect(() =>
+        Reflect.set(settings as object, setter, invalidValue),
+      ).toThrow(TypeError);
     });
   });
 
@@ -47,18 +49,25 @@ describe("EmailSettings", () => {
 
   it("returns same instance when parse receives EmailSettings", () => {
     const instance = new EmailSettings();
-    const result = EmailSettings.parse(instance as unknown as Record<string, boolean>);
+    const result = EmailSettings.parse(
+      instance as unknown as Record<string, boolean>,
+    );
 
     expect(result).toBe(instance);
   });
 
   it("throws on invalid parse argument type", () => {
-    expect(() => EmailSettings.parse(null as unknown as Record<string, boolean>)).toThrow(TypeError);
+    expect(() =>
+      EmailSettings.parse(null as unknown as Record<string, boolean>),
+    ).toThrow(TypeError);
   });
 
   it("compares settings objects with equals", () => {
     const settings1 = { allowSpaces: true, allowName: true };
-    const settings2 = EmailSettings.parse(settings1).toObject() as Record<string, boolean>;
+    const settings2 = EmailSettings.parse(settings1).toObject() as Record<
+      string,
+      boolean
+    >;
 
     expect(EmailSettings.equals(settings1, settings2)).toBe(true);
 
@@ -67,9 +76,14 @@ describe("EmailSettings", () => {
   });
 
   it("ignores unknown properties when parsing", () => {
-    const parsed = EmailSettings.parse({ allowSpaces: true, unknownFlag: true });
+    const parsed = EmailSettings.parse({
+      allowSpaces: true,
+      unknownFlag: true,
+    });
 
     expect(parsed.allowSpaces).toBe(true);
-    expect((parsed as unknown as Record<string, unknown>).unknownFlag).toBeUndefined();
+    expect(
+      (parsed as unknown as Record<string, unknown>).unknownFlag,
+    ).toBeUndefined();
   });
 });

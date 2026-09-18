@@ -4,48 +4,48 @@ import { Scrollbar, type ScrollbarProps } from "../../scrollbar";
 import { ASIDE_PADDING_AFTER_LAST_ITEM } from "../../../constants";
 
 export const VirtualScroll = (props: ScrollbarProps) => {
-	const scrollContentRef = useRef<HTMLDivElement | null>(null);
+  const scrollContentRef = useRef<HTMLDivElement | null>(null);
 
-	useEffect(() => {
-		const isSearchInputFocused = document.activeElement?.closest(
-			".search-input-block",
-		);
+  useEffect(() => {
+    const isSearchInputFocused = document.activeElement?.closest(
+      ".search-input-block",
+    );
 
-		if (!isSearchInputFocused) {
-			scrollContentRef.current?.focus();
-		}
-	}, []);
+    if (!isSearchInputFocused) {
+      scrollContentRef.current?.focus();
+    }
+  }, []);
 
-	useEffect(() => {
-		const onTabClick = (e: KeyboardEvent) => {
-			if (e.key !== "Tab") return;
+  useEffect(() => {
+    const onTabClick = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
 
-			e.preventDefault();
+      e.preventDefault();
 
-			const searchInput = document.querySelector(
-				".selector-search-input input",
-			) as HTMLInputElement;
+      const searchInput = document.querySelector(
+        ".selector-search-input input",
+      ) as HTMLInputElement;
 
-			if (searchInput) {
-				searchInput.focus();
-			}
-		};
+      if (searchInput) {
+        searchInput.focus();
+      }
+    };
 
-		scrollContentRef.current?.addEventListener("keydown", onTabClick);
+    scrollContentRef.current?.addEventListener("keydown", onTabClick);
 
-		return () => {
-			scrollContentRef.current?.removeEventListener("keydown", onTabClick);
-		};
-	}, []);
+    return () => {
+      scrollContentRef.current?.removeEventListener("keydown", onTabClick);
+    };
+  }, []);
 
-	return (
-		<Scrollbar
-			{...props}
-			scrollClass="selector-body-scroll"
-			paddingAfterLastItem={ASIDE_PADDING_AFTER_LAST_ITEM}
-			contentRef={scrollContentRef}
-		/>
-	);
+  return (
+    <Scrollbar
+      {...props}
+      scrollClass="selector-body-scroll"
+      paddingAfterLastItem={ASIDE_PADDING_AFTER_LAST_ITEM}
+      contentRef={scrollContentRef}
+    />
+  );
 };
 
 VirtualScroll.displayName = "VirtualScroll";

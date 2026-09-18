@@ -24,13 +24,13 @@ export const DaysHeader = ({
     setSelectedScene((prevSelectedScene) => prevSelectedScene + 1);
 
   const onLeftClick = () =>
-    setObservedDate(
-      (prevObservedDate) => subtractFromDate(prevObservedDate, 1, "months")!,
+    setObservedDate((prevObservedDate) =>
+      subtractFromDate(prevObservedDate, 1, "months")!,
     );
 
   const onRightClick = () =>
-    setObservedDate(
-      (prevObservedDate) => addToDate(prevObservedDate, 1, "months")!,
+    setObservedDate((prevObservedDate) =>
+      addToDate(prevObservedDate, 1, "months")!,
     );
 
   const isLeftDisabled =

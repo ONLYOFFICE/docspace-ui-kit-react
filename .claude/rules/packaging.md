@@ -56,11 +56,11 @@ wasteful otherwise.
 
 Where a new package goes:
 
-| The importer is | Declare it as |
-|---|---|
-| public core (`components`, `utils`, `hooks`, `context`, `providers/theme|translation|error-boundary`, `errors`) | `dependencies` |
+| The importer is                                                                                                                           | Declare it as                                            |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| public core (`components`, `utils`, `hooks`, `context`, `providers/theme                                                                  | translation                                              | error-boundary`, `errors`) | `dependencies` |
 | a portal-internal module only (`ai-agent`, `billing`, `selectors`, `uploader`, `api`, `providers/api`, `utils/socket`, `document-editor`) | **optional** `peerDependencies` + `peerDependenciesMeta` |
-| React / React-DOM | required peer, never bundled, never a dependency |
+| React / React-DOM                                                                                                                         | required peer, never bundled, never a dependency         |
 
 Every non-required peer is mirrored in `devDependencies` — pnpm does not install peers, so the
 build, tests and Storybook need a concrete copy. `@onlyoffice/ai-chat`'s own optional peers

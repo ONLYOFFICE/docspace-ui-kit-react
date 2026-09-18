@@ -7,7 +7,11 @@
       "type": "shell",
       "command": "cd ${workspaceFolder} ; pnpm run storybook",
       "isBackground": true,
-      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false }
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
     },
     {
       "label": "Storybook | build static",
@@ -20,7 +24,11 @@
       "type": "shell",
       "command": "cd ${workspaceFolder} ; pnpm run storybook-serve",
       "isBackground": true,
-      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false }
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
     },
 
     {
@@ -53,14 +61,22 @@
       "type": "shell",
       "command": "cd ${workspaceFolder} ; pnpm run test:watch",
       "isBackground": true,
-      "presentation": { "reveal": "always", "panel": "dedicated", "focus": true }
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      }
     },
     {
       "label": "Check | Vitest:ui",
       "type": "shell",
       "command": "cd ${workspaceFolder} ; pnpm run test:ui",
       "isBackground": true,
-      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false }
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
     },
     {
       "label": "Check | Vitest:coverage",
@@ -99,7 +115,11 @@
       "type": "shell",
       "command": "cd ${workspaceFolder} ; pnpm run build:watch",
       "isBackground": true,
-      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false }
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
     },
     {
       "label": "Package | verify (publint + attw)",
@@ -186,7 +206,11 @@
       "type": "shell",
       "command": "cd ${workspaceFolder} ; pnpm run test:e2e:ui",
       "isBackground": true,
-      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false }
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
     },
     {
       "label": "E2E | Docker: build the image",
@@ -211,7 +235,11 @@
       "type": "shell",
       "command": "cd ${workspaceFolder} ; pnpm run test:e2e:report",
       "isBackground": true,
-      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false }
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
     },
 
     {

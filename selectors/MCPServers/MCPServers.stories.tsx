@@ -128,7 +128,6 @@ const Template = (props: StoryArgs) => (
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     initedSelectedServers: [],
     onSubmit: (servers) => {
       const names = servers.map((s) => s.label).join(", ");
@@ -163,7 +162,6 @@ export const WithPreselection: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     initedSelectedServers: ["portal"],
     onSubmit: (servers) => {
       const names = servers.map((s) => s.label).join(", ");

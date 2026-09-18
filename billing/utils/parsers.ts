@@ -1,5 +1,9 @@
 import type { TenantQuotaFeatureDto } from "@onlyoffice/docspace-api-sdk";
-import type { TAiToolsPrices, TWalletServiceQuota, TServiceFeatureWithPrice } from "../types";
+import type {
+  TAiToolsPrices,
+  TWalletServiceQuota,
+  TServiceFeatureWithPrice,
+} from "../types";
 
 export const parseAiPrices = (response: unknown): TAiToolsPrices | null =>
   response ? (response as TAiToolsPrices) : null;
@@ -37,10 +41,10 @@ export const parseServicesQuotasMap = (
 ): Map<string, TenantQuotaFeatureDto | TServiceFeatureWithPrice> => {
   const services = response as TWalletServiceQuota[];
 
-  const map: Map<string, TenantQuotaFeatureDto | TServiceFeatureWithPrice> = new Map();
+  const map: Map<string, TenantQuotaFeatureDto | TServiceFeatureWithPrice> =
+    new Map();
 
   services.forEach((service) => applyServiceQuotaToMap(service, map));
 
   return map;
 };
-

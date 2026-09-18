@@ -94,7 +94,9 @@ const PlanUpgradePreview: React.FC<PlanUpgradePreviewProps> = (props) => {
             },
             { signal: controller.signal },
           );
-          const currentWriteOff = calcRes?.data?.response as unknown as { amount: number } | null;
+          const currentWriteOff = calcRes?.data?.response as unknown as {
+            amount: number;
+          } | null;
 
           if (!currentWriteOff) {
             toastr.error(t("UnexpectedError"));

@@ -102,4 +102,3 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
 };
 
 export default observer(TransactionRow);
-

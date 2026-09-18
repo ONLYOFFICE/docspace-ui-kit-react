@@ -50,9 +50,7 @@ describe("CommonTrans", () => {
       />,
     );
 
-    expect(container.textContent).toBe(
-      "Message exported to file: report.docx",
-    );
+    expect(container.textContent).toBe("Message exported to file: report.docx");
   });
 
   it("keeps the raw placeholder only when the value is truly missing", () => {

@@ -1,5 +1,5 @@
 export enum ContextMenuButtonDisplayType {
-	dropdown = "dropdown",
-	toggle = "toggle",
-	auto = "auto",
+  dropdown = "dropdown",
+  toggle = "toggle",
+  auto = "auto",
 }

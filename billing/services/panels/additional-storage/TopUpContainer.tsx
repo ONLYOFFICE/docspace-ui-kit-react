@@ -14,12 +14,8 @@ type TopUpContainerTypes = {
 };
 
 const TopUpContainer = (props: TopUpContainerTypes) => {
-  const {
-    isVisibleContainer,
-    onCloseTopUpModal,
-    amount,
-    initialAmount,
-  } = props;
+  const { isVisibleContainer, onCloseTopUpModal, amount, initialAmount } =
+    props;
 
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();

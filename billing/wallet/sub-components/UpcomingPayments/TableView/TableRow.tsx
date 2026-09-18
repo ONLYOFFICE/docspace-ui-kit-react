@@ -79,4 +79,3 @@ const UpcomingPaymentRow: React.FC<UpcomingPaymentRowProps> = ({
 };
 
 export default UpcomingPaymentRow;
-

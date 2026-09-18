@@ -362,4 +362,3 @@ export const QuickActions = ({
 export type { QuickActionItem, QuickActionsProps };
 
 export * from "./icons";
-

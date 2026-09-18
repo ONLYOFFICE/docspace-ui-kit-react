@@ -75,4 +75,3 @@ export type NavMenuProps = {
   iconOnly?: boolean;
   withExpandControl?: boolean;
 };
-

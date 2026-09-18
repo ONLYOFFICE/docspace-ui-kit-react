@@ -9,7 +9,7 @@ import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-conte
 
 <TileContent>
   <Link>File name or content</Link>
-</TileContent>
+</TileContent>;
 ```
 
 ## Props
@@ -47,9 +47,7 @@ TileContent is typically used inside FileTile or RoomTile components:
 ```tsx
 <FileTile {...props}>
   <TileContent>
-    <Link type={LinkType.page}>
-      Document.docx
-    </Link>
+    <Link type={LinkType.page}>Document.docx</Link>
   </TileContent>
 </FileTile>
 ```
@@ -57,9 +55,7 @@ TileContent is typically used inside FileTile or RoomTile components:
 ```tsx
 <RoomTile {...props}>
   <TileContent>
-    <Link>
-      Room Content
-    </Link>
+    <Link>Room Content</Link>
   </TileContent>
 </RoomTile>
 ```

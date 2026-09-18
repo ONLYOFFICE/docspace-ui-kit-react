@@ -313,4 +313,3 @@ const SpendingBreakdown = ({
 };
 
 export default observer(SpendingBreakdown);
-

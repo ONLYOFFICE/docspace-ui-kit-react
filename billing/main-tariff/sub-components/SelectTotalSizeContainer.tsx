@@ -35,4 +35,3 @@ const SelectTotalSizeContainer = observer(
 );
 
 export default SelectTotalSizeContainer;
-

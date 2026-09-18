@@ -17,32 +17,32 @@ import { Uploader } from "@onlyoffice/apps-ui-kit/uploader";
   secondaryText="or drag and drop files here"
   onUploadSuccess={(files) => console.log("Uploaded:", files)}
   onUploadError={(error) => console.error("Error:", error)}
-/>
+/>;
 ```
 
 ## Properties
 
-| Prop                 | Type                                      | Default | Description                                                    |
-|----------------------|-------------------------------------------|---------|----------------------------------------------------------------|
-| `width`              | `string`                                  | `100%`  | Width of the uploader container                                |
-| `height`             | `string`                                  | `100%`  | Height of the uploader container                               |
-| `targetId`           | `string`                                  | —       | Target folder ID for uploads                                   |
-| `accept`             | `string`                                  | —       | Accepted file types (e.g., `.pdf,.doc,.docx`)                  |
-| `shortText`          | `string`                                  | —       | Short text displaying supported file extensions                |
-| `fullText`           | `string`                                  | —       | Full list of extensions (shown in expandable dropdown)         |
-| `badgeValue`         | `number`                                  | —       | Badge showing count of additional formats (e.g., +5)           |
-| `linkMainText`       | `string`                                  | —       | Main text displayed in the dropzone                            |
-| `secondaryText`      | `string`                                  | —       | Secondary text displayed in the dropzone                       |
-| `extensionsText`     | `string`                                  | —       | Text displaying supported file extensions                      |
-| `isFolderUpload`     | `boolean`                                 | `false` | Enables folder upload mode                                     |
-| `isMultipleUpload`   | `boolean`                                 | `true`  | Allows multiple files/folders upload                           |
-| `maxPerUploadSize`   | `string`                                  | —       | Maximum size per single upload (e.g., `10MB`)                  |
-| `maxTotalUploadSize` | `string`                                  | —       | Maximum total upload size (e.g., `100MB`)                      |
-| `filesSettings`      | `UploaderFilesSettings`                   | —       | Server file settings (chunk size, thread count, etc.)          |
-| `onUploadProgress`   | `(data: UploadProgressData) => void`      | —       | Called on each upload progress update per file                 |
-| `onUploadSuccess`    | `(data: unknown[]) => void`               | —       | Called when all files are uploaded successfully                |
-| `onUploadError`      | `(data: { error: string }) => void`       | —       | Called when upload fails                                       |
-| `getFolderUrl`       | `(folderId: number) => string`            | —       | Callback to generate folder URL for success toast link.        |
+| Prop                 | Type                                 | Default | Description                                             |
+| -------------------- | ------------------------------------ | ------- | ------------------------------------------------------- |
+| `width`              | `string`                             | `100%`  | Width of the uploader container                         |
+| `height`             | `string`                             | `100%`  | Height of the uploader container                        |
+| `targetId`           | `string`                             | —       | Target folder ID for uploads                            |
+| `accept`             | `string`                             | —       | Accepted file types (e.g., `.pdf,.doc,.docx`)           |
+| `shortText`          | `string`                             | —       | Short text displaying supported file extensions         |
+| `fullText`           | `string`                             | —       | Full list of extensions (shown in expandable dropdown)  |
+| `badgeValue`         | `number`                             | —       | Badge showing count of additional formats (e.g., +5)    |
+| `linkMainText`       | `string`                             | —       | Main text displayed in the dropzone                     |
+| `secondaryText`      | `string`                             | —       | Secondary text displayed in the dropzone                |
+| `extensionsText`     | `string`                             | —       | Text displaying supported file extensions               |
+| `isFolderUpload`     | `boolean`                            | `false` | Enables folder upload mode                              |
+| `isMultipleUpload`   | `boolean`                            | `true`  | Allows multiple files/folders upload                    |
+| `maxPerUploadSize`   | `string`                             | —       | Maximum size per single upload (e.g., `10MB`)           |
+| `maxTotalUploadSize` | `string`                             | —       | Maximum total upload size (e.g., `100MB`)               |
+| `filesSettings`      | `UploaderFilesSettings`              | —       | Server file settings (chunk size, thread count, etc.)   |
+| `onUploadProgress`   | `(data: UploadProgressData) => void` | —       | Called on each upload progress update per file          |
+| `onUploadSuccess`    | `(data: unknown[]) => void`          | —       | Called when all files are uploaded successfully         |
+| `onUploadError`      | `(data: { error: string }) => void`  | —       | Called when upload fails                                |
+| `getFolderUrl`       | `(folderId: number) => string`       | —       | Callback to generate folder URL for success toast link. |
 
 ## Examples
 

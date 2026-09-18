@@ -20,4 +20,3 @@ const AgentRoomIdSync = () => {
 };
 
 export default AgentRoomIdSync;
-

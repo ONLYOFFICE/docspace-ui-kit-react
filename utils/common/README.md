@@ -30,7 +30,7 @@ import {
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
-| `index.ts` | All utility functions and constants |
-| `common.test.ts` | Unit tests (Vitest) |
+| File             | Description                         |
+| ---------------- | ----------------------------------- |
+| `index.ts`       | All utility functions and constants |
+| `common.test.ts` | Unit tests (Vitest)                 |

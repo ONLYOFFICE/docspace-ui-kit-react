@@ -63,4 +63,3 @@ const TableView = ({ sectionWidth, serviceName }: TransactionHistoryProps) => {
 };
 
 export default observer(TableView);
-

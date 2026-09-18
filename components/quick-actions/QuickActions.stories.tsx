@@ -21,10 +21,7 @@ import {
 } from "./icons";
 
 import { QuickActions } from "./index";
-import type {
-  QuickActionItem,
-  QuickActionsProps,
-} from "./QuickActions.types";
+import type { QuickActionItem, QuickActionsProps } from "./QuickActions.types";
 
 const meta = {
   title: "UI/Data display/QuickActions",
@@ -408,4 +405,3 @@ Set the variables on any ancestor element — they cascade down to all tiles:
     },
   },
 };
-

@@ -15,13 +15,13 @@ import { LoaderWrapper } from "@onlyoffice/apps-ui-kit/components/loader-wrapper
 
 <LoaderWrapper isLoading>
   <SectionContent />
-</LoaderWrapper>
+</LoaderWrapper>;
 ```
 
 ## Props
 
-| Prop       | Type              | Default             | Description                                   |
-|------------|-------------------|---------------------|-----------------------------------------------|
-| `children` | `React.ReactNode` | —                   | Content rendered inside the wrapper           |
-| `isLoading`| `boolean`         | —                   | Toggles dimming and pointer-event blocking    |
-| `testId`   | `string`          | `"loader-wrapper"` | `data-testid` override for automated testing  |
+| Prop        | Type              | Default            | Description                                  |
+| ----------- | ----------------- | ------------------ | -------------------------------------------- |
+| `children`  | `React.ReactNode` | —                  | Content rendered inside the wrapper          |
+| `isLoading` | `boolean`         | —                  | Toggles dimming and pointer-event blocking   |
+| `testId`    | `string`          | `"loader-wrapper"` | `data-testid` override for automated testing |

@@ -31,6 +31,8 @@ test.describe("TimePicker — dark", () => {
   test("css customization dark", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await page.evaluate(() => document.body.classList.add("dark"));
-    await expect(page).toHaveScreenshot("time-picker-css-customization-dark.png");
+    await expect(page).toHaveScreenshot(
+      "time-picker-css-customization-dark.png",
+    );
   });
 });

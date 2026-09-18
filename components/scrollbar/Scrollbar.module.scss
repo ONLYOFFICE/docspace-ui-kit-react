@@ -27,14 +27,23 @@
   --scrollbar-press-bg-color: #{$light-scroll-active};
 
   --scrollbar-thumb-color: var(--scrollbar-bg, var(--scrollbar-bg-color));
-  --scrollbar-thumb-hover-color: var(--scrollbar-bg-hover, var(--scrollbar-hover-bg-color));
-  --scrollbar-thumb-active-color: var(--scrollbar-bg-active, var(--scrollbar-press-bg-color));
+  --scrollbar-thumb-hover-color: var(
+    --scrollbar-bg-hover,
+    var(--scrollbar-hover-bg-color)
+  );
+  --scrollbar-thumb-active-color: var(
+    --scrollbar-bg-active,
+    var(--scrollbar-press-bg-color)
+  );
   --scrollbar-track-border-radius: var(--scrollbar-radius, 8px);
   --scrollbar-thumb-default-size: var(--scrollbar-thumb-size, 4px);
   --scrollbar-track-inner-padding: var(--scrollbar-track-padding, 4px);
 
   --scrollbar-padding-inline-end: var(--scrollbar-padding-end, 17px);
-  --scrollbar-padding-inline-end-mobile: var(--scrollbar-padding-end-mobile, 8px);
+  --scrollbar-padding-inline-end-mobile: var(
+    --scrollbar-padding-end-mobile,
+    8px
+  );
   --scrollbar-padding-after-last-item: var(--scrollbar-last-padding, unset);
 
   &:global(.trackYVisible.trackXVisible) {

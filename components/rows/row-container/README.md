@@ -37,18 +37,18 @@ import { RowContainer } from "@onlyoffice/apps-ui-kit/components/rows";
 
 ## Props
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `children` | `React.ReactNode[]` | – | Rows rendered inside the container. When `useReactWindow` is `true`, they are passed to the shared `InfiniteLoaderComponent`. |
-| `manualHeight` | `string` | – | Sets a fixed container height via the `--manual-height` CSS variable. |
-| `itemHeight` | `number` | `50` | Height of a single row; required for accurate virtualization when `useReactWindow` is enabled. |
-| `useReactWindow` | `boolean` | `true` | Toggles virtualization. When `false`, children render directly without `react-window`. |
-| `id` | `string` | `"rowContainer"` | DOM id applied to the wrapper. |
-| `className` | `string` | – | Custom class appended to the wrapper. |
-| `style` | `React.CSSProperties` | – | Inline styles for the wrapper. Works together with `manualHeight`. |
-| `onScroll` | `() => void` | – | Callback fired when the virtualized list scrolls. |
-| `filesLength` | `number` | – | Current number of loaded items; forwarded to `InfiniteLoaderComponent`. |
-| `itemCount` | `number` | – | Total item count known to the loader. |
-| `fetchMoreFiles` | `(params: IndexRange) => Promise<void>` | – | Async loader fired by `InfiniteLoaderComponent` when more rows need to be fetched. |
-| `hasMoreFiles` | `boolean` | – | Indicates whether there are more items to request. |
-| `noSelect` | `boolean` | `false` | When `true`, disables text selection inside the container via a helper class. |
+| Prop             | Type                                    | Default          | Description                                                                                                                   |
+| ---------------- | --------------------------------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `children`       | `React.ReactNode[]`                     | –                | Rows rendered inside the container. When `useReactWindow` is `true`, they are passed to the shared `InfiniteLoaderComponent`. |
+| `manualHeight`   | `string`                                | –                | Sets a fixed container height via the `--manual-height` CSS variable.                                                         |
+| `itemHeight`     | `number`                                | `50`             | Height of a single row; required for accurate virtualization when `useReactWindow` is enabled.                                |
+| `useReactWindow` | `boolean`                               | `true`           | Toggles virtualization. When `false`, children render directly without `react-window`.                                        |
+| `id`             | `string`                                | `"rowContainer"` | DOM id applied to the wrapper.                                                                                                |
+| `className`      | `string`                                | –                | Custom class appended to the wrapper.                                                                                         |
+| `style`          | `React.CSSProperties`                   | –                | Inline styles for the wrapper. Works together with `manualHeight`.                                                            |
+| `onScroll`       | `() => void`                            | –                | Callback fired when the virtualized list scrolls.                                                                             |
+| `filesLength`    | `number`                                | –                | Current number of loaded items; forwarded to `InfiniteLoaderComponent`.                                                       |
+| `itemCount`      | `number`                                | –                | Total item count known to the loader.                                                                                         |
+| `fetchMoreFiles` | `(params: IndexRange) => Promise<void>` | –                | Async loader fired by `InfiniteLoaderComponent` when more rows need to be fetched.                                            |
+| `hasMoreFiles`   | `boolean`                               | –                | Indicates whether there are more items to request.                                                                            |
+| `noSelect`       | `boolean`                               | `false`          | When `true`, disables text selection inside the container via a helper class.                                                 |

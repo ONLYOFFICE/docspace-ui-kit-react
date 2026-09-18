@@ -120,15 +120,12 @@ const ImageEditorDemo = ({
     setImage(newImage);
   }, []);
 
-  const onChangeFile = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files?.[0]) {
-        const file = e.target.files[0];
-        setImage((prev) => ({ ...prev, uploadedFile: file }));
-      }
-    },
-    [],
-  );
+  const onChangeFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      const file = e.target.files[0];
+      setImage((prev) => ({ ...prev, uploadedFile: file }));
+    }
+  }, []);
 
   const handleSetPreview = useCallback((value: string) => {
     setPreview(value ? <img src={value} alt="Preview" /> : null);

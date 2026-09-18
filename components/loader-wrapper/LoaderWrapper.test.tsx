@@ -29,7 +29,9 @@ describe("LoaderWrapper", () => {
 
     const wrapper = screen.getByTestId("loader-wrapper");
     // opacity uses a CSS variable for external customization
-    expect(wrapper.style.opacity).toMatch(/var\(--loader-wrapper-loading-opacity/);
+    expect(wrapper.style.opacity).toMatch(
+      /var\(--loader-wrapper-loading-opacity/,
+    );
     expect(wrapper).toHaveStyle({ pointerEvents: "none" });
   });
 });

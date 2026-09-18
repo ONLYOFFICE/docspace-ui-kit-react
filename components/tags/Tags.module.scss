@@ -11,7 +11,10 @@
 
 .dropdownText {
   --tag-dropdown-text-margin: 8px;
-  --tags-overflow-margin: var(--tags-overflow-text-margin, var(--tag-dropdown-text-margin));
+  --tags-overflow-margin: var(
+    --tags-overflow-text-margin,
+    var(--tag-dropdown-text-margin)
+  );
 
   line-height: 30px;
   display: block;

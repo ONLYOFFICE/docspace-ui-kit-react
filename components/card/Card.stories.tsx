@@ -142,12 +142,12 @@ const FullExampleTemplate = () => (
         {"Analyze responses with AI"}
       </span>
     }
-    extra={
-      <span className={styles.connectedStatus}>Connected</span>
-    }
+    extra={<span className={styles.connectedStatus}>Connected</span>}
   >
     <p style={{ margin: 0 }}>
-      {"Ask AI to explore responses from this form, generate insights, and visualize the data."}
+      {
+        "Ask AI to explore responses from this form, generate insights, and visualize the data."
+      }
     </p>
     <div style={{ marginTop: "8px" }}>
       <button type="button">Ask AI</button>

@@ -51,4 +51,3 @@ export type QuickActionsProps = QuickActionsCloseProps &
     className?: string;
     dataTestId?: string;
   };
-

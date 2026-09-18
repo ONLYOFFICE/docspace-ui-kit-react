@@ -7,167 +7,171 @@ import { InputSize } from "../text-input";
 import { SearchInput } from ".";
 
 const baseProps = {
-	value: "",
-	size: InputSize.base,
+  value: "",
+  size: InputSize.base,
 };
 
 describe("<SearchInput />", () => {
-	it("renders without error", () => {
-		render(<SearchInput {...baseProps} />);
-		expect(screen.getByTestId("search-input")).toBeInTheDocument();
-	});
+  it("renders without error", () => {
+    render(<SearchInput {...baseProps} />);
+    expect(screen.getByTestId("search-input")).toBeInTheDocument();
+  });
 
-	it("renders with different sizes", () => {
-		const { rerender } = render(
-			<SearchInput {...baseProps} size={InputSize.base} />,
-		);
-		expect(screen.getByTestId("text-input")).toHaveAttribute(
-			"data-size",
-			InputSize.base,
-		);
+  it("renders with different sizes", () => {
+    const { rerender } = render(
+      <SearchInput {...baseProps} size={InputSize.base} />,
+    );
+    expect(screen.getByTestId("text-input")).toHaveAttribute(
+      "data-size",
+      InputSize.base,
+    );
 
-		rerender(<SearchInput {...baseProps} size={InputSize.middle} />);
-		expect(screen.getByTestId("text-input")).toHaveAttribute(
-			"data-size",
-			InputSize.middle,
-		);
+    rerender(<SearchInput {...baseProps} size={InputSize.middle} />);
+    expect(screen.getByTestId("text-input")).toHaveAttribute(
+      "data-size",
+      InputSize.middle,
+    );
 
-		rerender(<SearchInput {...baseProps} size={InputSize.large} />);
-		expect(screen.getByTestId("text-input")).toHaveAttribute(
-			"data-size",
-			InputSize.large,
-		);
-	});
+    rerender(<SearchInput {...baseProps} size={InputSize.large} />);
+    expect(screen.getByTestId("text-input")).toHaveAttribute(
+      "data-size",
+      InputSize.large,
+    );
+  });
 
-	it("handles input changes", async () => {
-		const onChange = vi.fn();
-		render(<SearchInput {...baseProps} onChange={onChange} />);
+  it("handles input changes", async () => {
+    const onChange = vi.fn();
+    render(<SearchInput {...baseProps} onChange={onChange} />);
 
-		const input = screen.getByTestId("text-input");
-		await userEvent.type(input, "test");
+    const input = screen.getByTestId("text-input");
+    await userEvent.type(input, "test");
 
-		expect(input).toHaveValue("test");
-	});
+    expect(input).toHaveValue("test");
+  });
 
-	it("handles auto refresh with timeout", async () => {
-		const onChange = vi.fn();
-		render(
-			<SearchInput
-				{...baseProps}
-				onChange={onChange}
-				autoRefresh
-				refreshTimeout={500}
-			/>,
-		);
+  it("handles auto refresh with timeout", async () => {
+    const onChange = vi.fn();
+    render(
+      <SearchInput
+        {...baseProps}
+        onChange={onChange}
+        autoRefresh
+        refreshTimeout={500}
+      />,
+    );
 
-		const input = screen.getByTestId("text-input");
-		await userEvent.type(input, "test");
+    const input = screen.getByTestId("text-input");
+    await userEvent.type(input, "test");
 
-		await waitFor(
-			() => {
-				expect(onChange).toHaveBeenCalledWith("test");
-			},
-			{ timeout: 600 },
-		);
-	});
+    await waitFor(
+      () => {
+        expect(onChange).toHaveBeenCalledWith("test");
+      },
+      { timeout: 600 },
+    );
+  });
 
-	it("handles disabled state", () => {
-		render(<SearchInput {...baseProps} isDisabled />);
-		expect(screen.getByTestId("text-input")).toBeDisabled();
-	});
+  it("handles disabled state", () => {
+    render(<SearchInput {...baseProps} isDisabled />);
+    expect(screen.getByTestId("text-input")).toBeDisabled();
+  });
 
-	it("accepts custom className and id", () => {
-		render(
-			<SearchInput {...baseProps} className="custom-class" id="custom-id" />,
-		);
-		const input = screen.getByTestId("search-input");
+  it("accepts custom className and id", () => {
+    render(
+      <SearchInput {...baseProps} className="custom-class" id="custom-id" />,
+    );
+    const input = screen.getByTestId("search-input");
 
-		expect(input).toHaveClass("custom-class");
-		expect(input).toHaveAttribute("id", "custom-id");
-	});
+    expect(input).toHaveClass("custom-class");
+    expect(input).toHaveAttribute("id", "custom-id");
+  });
 
-	it("handles focus events", async () => {
-		const onFocus = vi.fn();
-		render(<SearchInput {...baseProps} onFocus={onFocus} />);
+  it("handles focus events", async () => {
+    const onFocus = vi.fn();
+    render(<SearchInput {...baseProps} onFocus={onFocus} />);
 
-		const input = screen.getByTestId("text-input");
-		await userEvent.click(input);
+    const input = screen.getByTestId("text-input");
+    await userEvent.click(input);
 
-		expect(onFocus).toHaveBeenCalled();
-	});
+    expect(onFocus).toHaveBeenCalled();
+  });
 
-	it("shows clear button when input has value", () => {
-		render(<SearchInput {...baseProps} value="test" />);
-		const { container } = render(<SearchInput {...baseProps} value="test" />);
-		const iconButton = container.getElementsByClassName("search-cross")[0];
-		expect(iconButton).toBeInTheDocument();
-	});
+  it("shows clear button when input has value", () => {
+    render(<SearchInput {...baseProps} value="test" />);
+    const { container } = render(<SearchInput {...baseProps} value="test" />);
+    const iconButton = container.getElementsByClassName("search-cross")[0];
+    expect(iconButton).toBeInTheDocument();
+  });
 
-	it("shows clear button when showClearButton is true", () => {
-		render(<SearchInput {...baseProps} showClearButton />);
-		const { container } = render(
-			<SearchInput {...baseProps} showClearButton />,
-		);
-		const iconButton = container.getElementsByClassName("search-cross")[0];
-		expect(iconButton).toBeInTheDocument();
-	});
+  it("shows clear button when showClearButton is true", () => {
+    render(<SearchInput {...baseProps} showClearButton />);
+    const { container } = render(
+      <SearchInput {...baseProps} showClearButton />,
+    );
+    const iconButton = container.getElementsByClassName("search-cross")[0];
+    expect(iconButton).toBeInTheDocument();
+  });
 
-	it("shows search icon by default", () => {
-		render(<SearchInput {...baseProps} />);
-		const { container } = render(<SearchInput {...baseProps} />);
-		const iconButton = container.getElementsByClassName("search-loupe")[0];
-		expect(iconButton).toBeInTheDocument();
-	});
+  it("shows search icon by default", () => {
+    render(<SearchInput {...baseProps} />);
+    const { container } = render(<SearchInput {...baseProps} />);
+    const iconButton = container.getElementsByClassName("search-loupe")[0];
+    expect(iconButton).toBeInTheDocument();
+  });
 
-	it("updates input value when prop value changes", () => {
-		const { rerender } = render(<SearchInput {...baseProps} value="initial" />);
-		const input = screen.getByTestId("text-input");
-		expect(input).toHaveValue("initial");
+  it("updates input value when prop value changes", () => {
+    const { rerender } = render(<SearchInput {...baseProps} value="initial" />);
+    const input = screen.getByTestId("text-input");
+    expect(input).toHaveValue("initial");
 
-		rerender(<SearchInput {...baseProps} value="updated" />);
-		expect(input).toHaveValue("updated");
-	});
+    rerender(<SearchInput {...baseProps} value="updated" />);
+    expect(input).toHaveValue("updated");
+  });
 
-	it("renders main button when showMainButton and mainButtonProps are provided", () => {
-		render(
-			<SearchInput
-				{...baseProps}
-				showMainButton
-				mainButtonProps={{ text: "New room", model: [] }}
-			/>,
-		);
-		expect(screen.getByText("New room")).toBeInTheDocument();
-	});
+  it("renders main button when showMainButton and mainButtonProps are provided", () => {
+    render(
+      <SearchInput
+        {...baseProps}
+        showMainButton
+        mainButtonProps={{ text: "New room", model: [] }}
+      />,
+    );
+    expect(screen.getByText("New room")).toBeInTheDocument();
+  });
 
-	it("does not render main button when showMainButton is false", () => {
-		render(
-			<SearchInput
-				{...baseProps}
-				showMainButton={false}
-				mainButtonProps={{ text: "New room", model: [] }}
-			/>,
-		);
-		expect(screen.queryByText("New room")).not.toBeInTheDocument();
-	});
+  it("does not render main button when showMainButton is false", () => {
+    render(
+      <SearchInput
+        {...baseProps}
+        showMainButton={false}
+        mainButtonProps={{ text: "New room", model: [] }}
+      />,
+    );
+    expect(screen.queryByText("New room")).not.toBeInTheDocument();
+  });
 
-	it("does not render main button when mainButtonProps is not provided", () => {
-		render(<SearchInput {...baseProps} showMainButton />);
-		expect(screen.queryByTestId("main-button")).not.toBeInTheDocument();
-	});
+  it("does not render main button when mainButtonProps is not provided", () => {
+    render(<SearchInput {...baseProps} showMainButton />);
+    expect(screen.queryByTestId("main-button")).not.toBeInTheDocument();
+  });
 
-	it("clears input and calls onClearSearch when clear button is clicked", async () => {
-		const onClearSearch = vi.fn();
-		const { container } = render(
-			<SearchInput {...baseProps} value="test value" onClearSearch={onClearSearch} />,
-		);
+  it("clears input and calls onClearSearch when clear button is clicked", async () => {
+    const onClearSearch = vi.fn();
+    const { container } = render(
+      <SearchInput
+        {...baseProps}
+        value="test value"
+        onClearSearch={onClearSearch}
+      />,
+    );
 
-		const input = screen.getByTestId("text-input");
-		expect(input).toHaveValue("test value");
+    const input = screen.getByTestId("text-input");
+    expect(input).toHaveValue("test value");
 
-		const clearButton = container.getElementsByClassName("search-cross")[0];
-		await userEvent.click(clearButton);
+    const clearButton = container.getElementsByClassName("search-cross")[0];
+    await userEvent.click(clearButton);
 
-		expect(input).toHaveValue("");
-		expect(onClearSearch).toHaveBeenCalledTimes(1);
-	});
+    expect(input).toHaveValue("");
+    expect(onClearSearch).toHaveBeenCalledTimes(1);
+  });
 });

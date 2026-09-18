@@ -38,4 +38,3 @@ const RowView = ({
 };
 
 export default observer(RowView);
-

@@ -14,11 +14,7 @@ import type {
 } from "@onlyoffice/docspace-api-sdk";
 
 export type TransactionSourceType =
-  | "Agent"
-  | "File"
-  | "Folder"
-  | "Room"
-  | "Form";
+  "Agent" | "File" | "Folder" | "Room" | "Form";
 
 export type WalletOperationDto = Omit<
   OperationDto,
@@ -1751,4 +1747,3 @@ class PaymentStore {
 }
 
 export default PaymentStore;
-

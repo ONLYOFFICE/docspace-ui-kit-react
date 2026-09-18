@@ -11,14 +11,14 @@ import { FormWrapper } from "@onlyoffice/apps-ui-kit/components/form-wrapper";
   <Input placeholder="Email" />
   <Input placeholder="Password" type="password" />
   <Button primary label="Sign In" />
-</FormWrapper>
+</FormWrapper>;
 ```
 
 ## Properties
 
-| Prop        | Type                | Default | Description                          |
-|-------------|---------------------|---------|--------------------------------------|
-| `children`  | `React.ReactNode`   | —       | Content rendered inside the wrapper  |
-| `id`        | `string`            | —       | HTML id attribute                    |
-| `className` | `string`            | —       | Additional CSS class names           |
-| `style`     | `React.CSSProperties` | —    | Custom inline styles                 |
+| Prop        | Type                  | Default | Description                         |
+| ----------- | --------------------- | ------- | ----------------------------------- |
+| `children`  | `React.ReactNode`     | —       | Content rendered inside the wrapper |
+| `id`        | `string`              | —       | HTML id attribute                   |
+| `className` | `string`              | —       | Additional CSS class names          |
+| `style`     | `React.CSSProperties` | —       | Custom inline styles                |

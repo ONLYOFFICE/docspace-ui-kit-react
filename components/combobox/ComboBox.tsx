@@ -98,9 +98,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     (
       option: TOption,
       event:
-        | React.ChangeEvent<HTMLInputElement>
-        | React.MouseEvent
-        | KeyboardEvent,
+        React.ChangeEvent<HTMLInputElement> | React.MouseEvent | KeyboardEvent,
     ) => {
       if (option.isSeparator) return;
       if (option.disabled && option.tooltip) return;

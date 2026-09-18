@@ -22,7 +22,7 @@ import { RoomTile } from "@onlyoffice/apps-ui-kit/components/tiles/room-tile";
   selectOption={(option) => console.log(option)}
   getRoomTypeName={(type, t) => type}
   onSelect={(checked, item) => console.log(checked, item)}
-/>
+/>;
 ```
 
 ## Props
@@ -39,9 +39,9 @@ import { RoomTile } from "@onlyoffice/apps-ui-kit/components/tiles/room-tile";
 | `checked`             |                       `boolean`                        |    -     |   -    | `false` | Indicates if the room is selected                    |
 | `isActive`            |                       `boolean`                        |    -     |   -    | `false` | Indicates if the room is in active state             |
 | `isBlockingOperation` |                       `boolean`                        |    -     |   -    | `false` | Indicates if the room is in blocking operation state |
-| `onSelect`            |     `(checked: boolean, item: RoomItem) => void`       |    -     |   -    |    -    | Callback when room is selected                       |
-| `thumbnailClick`      |           `(e: React.MouseEvent) => void`              |    -     |   -    |    -    | Callback when thumbnail is clicked                   |
-| `getContextModel`     |              `() => ContextMenuModel[]`                |    -     |   -    |    -    | Function to get context menu model                   |
+| `onSelect`            |      `(checked: boolean, item: RoomItem) => void`      |    -     |   -    |    -    | Callback when room is selected                       |
+| `thumbnailClick`      |            `(e: React.MouseEvent) => void`             |    -     |   -    |    -    | Callback when thumbnail is clicked                   |
+| `getContextModel`     |               `() => ContextMenuModel[]`               |    -     |   -    |    -    | Function to get context menu model                   |
 | `children`            |                   `React.ReactNode`                    |    -     |   -    |    -    | Child elements                                       |
 | `indeterminate`       |                       `boolean`                        |    -     |   -    | `false` | Checkbox indeterminate state flag                    |
 | `element`             |                   `React.ReactNode`                    |    -     |   -    |    -    | Additional React element                             |

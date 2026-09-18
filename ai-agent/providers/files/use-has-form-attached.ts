@@ -36,8 +36,7 @@ export const useHasFormAttached = (): boolean => {
   );
 
   return React.useMemo(
-    () =>
-      [...files, ...images].some((ref) => registry.ids.has(ref.id)),
+    () => [...files, ...images].some((ref) => registry.ids.has(ref.id)),
     // `version` is the registry's change signal, not a value read here.
     [files, images, registry, version],
   );

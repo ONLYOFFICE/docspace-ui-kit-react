@@ -136,4 +136,3 @@ const BalanceAmount = (props: BalanceAmountProps) => {
 };
 
 export default BalanceAmount;
-

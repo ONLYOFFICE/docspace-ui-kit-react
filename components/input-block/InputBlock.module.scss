@@ -28,7 +28,10 @@
 }
 
 .childrenBlock {
-  --input-block-children-pad: var(--input-block-children-padding, 2px 0 2px 2px);
+  --input-block-children-pad: var(
+    --input-block-children-padding,
+    2px 0 2px 2px
+  );
 
   display: flex;
   align-items: center;

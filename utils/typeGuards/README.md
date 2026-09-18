@@ -33,6 +33,6 @@ Returns `true` if `item` is a non-null object with a `src` property (matching Ne
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
+| File       | Description                                         |
+| ---------- | --------------------------------------------------- |
 | `index.ts` | `isNextImage` type guard and `StaticImageData` type |

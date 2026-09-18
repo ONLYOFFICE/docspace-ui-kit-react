@@ -39,7 +39,7 @@ import { Text } from "@onlyoffice/apps-ui-kit";
 | `className`       |            `string`             |    -     |    -    | Additional CSS class names                            |
 | `style`           |      `React.CSSProperties`      |    -     |    -    | Additional inline styles                              |
 | `onClick`         | `(e: React.MouseEvent) => void` |    -     |    -    | Click event handler                                   |
-| `ref`             |      `React.Ref<HTMLElement>`   |    -     |    -    | Ref to the underlying DOM element                     |
+| `ref`             |    `React.Ref<HTMLElement>`     |    -     |    -    | Ref to the underlying DOM element                     |
 | `view`            |            `string`             |    -     |    -    | View mode (e.g., `"tile"`)                            |
 | `dataTestId`      |            `string`             |    -     | `text`  | Test ID for testing purposes                          |
 

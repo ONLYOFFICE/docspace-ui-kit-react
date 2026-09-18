@@ -55,8 +55,7 @@ class CurrentQuotasStore {
 
   get isYearTariff() {
     const result = this.currentPortalQuotaFeatures.get(YEAR_KEY) as
-      | TBooleanPaymentFeature
-      | undefined;
+      TBooleanPaymentFeature | undefined;
     return !!result?.value;
   }
 
@@ -76,29 +75,25 @@ class CurrentQuotasStore {
 
   get maxCountManagersByQuota() {
     const result = this.currentPortalQuotaFeatures.get(MANAGER) as
-      | TNumericPaymentFeature
-      | undefined;
+      TNumericPaymentFeature | undefined;
     return result?.value ?? 0;
   }
 
   get addedManagersCount() {
     const result = this.currentPortalQuotaFeatures.get(MANAGER) as
-      | TNumericPaymentFeature
-      | undefined;
+      TNumericPaymentFeature | undefined;
     return result?.used?.value ?? 0;
   }
 
   get usedTotalStorageSizeCount() {
     const result = this.currentPortalQuotaFeatures.get(TOTAL_SIZE) as
-      | TNumericPaymentFeature
-      | undefined;
+      TNumericPaymentFeature | undefined;
     return result?.used?.value ?? 0;
   }
 
   get maxTotalSizeByQuota() {
     const result = this.currentPortalQuotaFeatures.get(TOTAL_SIZE) as
-      | TNumericPaymentFeature
-      | undefined;
+      TNumericPaymentFeature | undefined;
     if (!result?.value) return -1;
     return result.value;
   }
@@ -114,8 +109,7 @@ class CurrentQuotasStore {
 
   get maxFreeBackups() {
     const result = this.currentPortalQuotaFeatures.get(FREE_BACKUP) as
-      | TNumericPaymentFeature
-      | undefined;
+      TNumericPaymentFeature | undefined;
 
     return result?.value ?? 0;
   }

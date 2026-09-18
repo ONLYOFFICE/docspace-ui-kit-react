@@ -77,11 +77,7 @@ const PaymentsSetupWrapper: React.FC<{
     );
   }
 
-  return (
-    <BillingRoot config={config}>
-      {children}
-    </BillingRoot>
-  );
+  return <BillingRoot config={config}>{children}</BillingRoot>;
 };
 
 export const withPaymentsSetup: Decorator = (Story, context) => {

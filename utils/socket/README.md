@@ -28,12 +28,15 @@ SocketHelper?.on(SocketEvents.CreateFile, (file) => {
   console.log("file created", file);
 });
 
-SocketHelper?.emit(SocketCommands.Subscribe, { roomParts: "files", ids: [roomId] });
+SocketHelper?.emit(SocketCommands.Subscribe, {
+  roomParts: "files",
+  ids: [roomId],
+});
 ```
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
-| `index.ts` | `SocketHelper` class, `SocketEvents`/`SocketCommands` enums, and all associated types |
-| `socket.test.ts` | Unit tests (Vitest) |
+| File             | Description                                                                           |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| `index.ts`       | `SocketHelper` class, `SocketEvents`/`SocketCommands` enums, and all associated types |
+| `socket.test.ts` | Unit tests (Vitest)                                                                   |

@@ -234,7 +234,12 @@ const TooltipPositionsTemplate = () => {
       {(["top", "right", "bottom", "left"] as const).map((place) => (
         <div
           key={place}
-          style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "8px",
+          }}
         >
           <HelpButton
             tooltipContent={<div>Tooltip appears at {place}</div>}

@@ -11,7 +11,10 @@
   }
 
   // bridge vars — bind public overrides to internal theme tokens
-  --access-right-select-text-v: var(--access-right-select-text, var(--text-color));
+  --access-right-select-text-v: var(
+    --access-right-select-text,
+    var(--text-color)
+  );
   --access-right-select-disabled-icon-v: var(
     --access-right-select-disabled-icon,
     var(--combobox-children-button-default-disabled-color)
@@ -75,11 +78,20 @@
     --access-right-select-description,
     var(--access-right-select-description-color)
   );
-  --access-right-select-icon-v: var(--access-right-select-icon, var(--drop-down-item-icon-color));
+  --access-right-select-icon-v: var(
+    --access-right-select-icon,
+    var(--drop-down-item-icon-color)
+  );
   // new bridge vars for hardcoded values
   --access-right-select-gap-v: var(--access-right-select-gap, 8px);
-  --access-right-select-padding-v: var(--access-right-select-item-padding, 7px 0);
-  --access-right-select-description-size-v: var(--access-right-select-description-size, 13px);
+  --access-right-select-padding-v: var(
+    --access-right-select-item-padding,
+    7px 0
+  );
+  --access-right-select-description-size-v: var(
+    --access-right-select-description-size,
+    13px
+  );
 
   width: auto;
 

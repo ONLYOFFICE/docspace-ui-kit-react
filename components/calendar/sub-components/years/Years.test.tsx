@@ -135,12 +135,14 @@ describe("Years Component", () => {
 
   it("should disable next button if out of range", () => {
     // Mock nextYearStart > maxDate
-    vi.mocked(dateUtils.createDateTime).mockImplementation((year, month, day) => {
-      if (year === 2033) {
-        return DateTime.fromObject({ year: 2051, month: 1, day: 1 });
-      }
-      return DateTime.fromObject({ year, month, day });
-    });
+    vi.mocked(dateUtils.createDateTime).mockImplementation(
+      (year, month, day) => {
+        if (year === 2033) {
+          return DateTime.fromObject({ year: 2051, month: 1, day: 1 });
+        }
+        return DateTime.fromObject({ year, month, day });
+      },
+    );
 
     render(<Years {...defaultProps} />);
 

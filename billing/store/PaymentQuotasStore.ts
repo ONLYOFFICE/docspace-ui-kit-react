@@ -85,15 +85,13 @@ class PaymentQuotasStore {
 
   get stepAddingQuotaManagers() {
     const result = this.portalPaymentQuotasFeatures.get(MANAGER) as
-      | TNumericPaymentFeature
-      | undefined;
+      TNumericPaymentFeature | undefined;
     return result?.value ?? null;
   }
 
   get stepAddingQuotaTotalSize() {
     const result = this.portalPaymentQuotasFeatures.get(TOTAL_SIZE) as
-      | TNumericPaymentFeature
-      | undefined;
+      TNumericPaymentFeature | undefined;
     return result?.value ?? null;
   }
 
@@ -136,8 +134,7 @@ class PaymentQuotasStore {
       const quotasByYear = new Map<boolean, QuotaWithMap>(
         Array.from(quotasById.values()).map((q) => {
           const yearFeature = q.featuresMap.get(YEAR_KEY) as
-            | TBooleanPaymentFeature
-            | undefined;
+            TBooleanPaymentFeature | undefined;
           return [yearFeature?.value ?? false, q];
         }),
       );
@@ -145,11 +142,11 @@ class PaymentQuotasStore {
       const isFreeTariff = this.currentQuotasStore?.isFreeTariff ?? true;
       const currentQuotaId = this.currentQuotasStore?.currentQuotaId ?? null;
 
-
       if (currentQuotaId !== FUTURE_TARIFF_QUOTA_ID) {
         const futureQuota = quotasById.get(FUTURE_TARIFF_QUOTA_ID);
         this.futurePaymentQuotas = futureQuota ?? null;
-        this.futurePaymentQuotasFeatures = futureQuota?.featuresMap ?? new Map();
+        this.futurePaymentQuotasFeatures =
+          futureQuota?.featuresMap ?? new Map();
       } else {
         this.futurePaymentQuotas = null;
         this.futurePaymentQuotasFeatures = new Map();
@@ -180,4 +177,3 @@ class PaymentQuotasStore {
 }
 
 export default PaymentQuotasStore;
-

@@ -39,9 +39,9 @@
   margin: 4px 0;
   max-width: 660px;
   border-radius: 6px;
-  
+
   box-sizing: border-box;
-  
+
   .warningTitle {
     display: flex;
     gap: 8px;
@@ -55,15 +55,13 @@
     }
   }
 
-  .warningColor{
-    color:var(--payment-warning-color);
+  .warningColor {
+    color: var(--payment-warning-color);
   }
 
   .warningBody {
     color: var(--payment-tariff-text);
   }
-
- 
 }
 
 .cancelChangeLink {

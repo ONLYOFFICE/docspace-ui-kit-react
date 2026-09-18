@@ -105,9 +105,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
       tooltipContent={
         <>
           <Text isBold>{t("Payer")}</Text>
-          <Text>
-            {t("PayerDescription")}
-          </Text>
+          <Text>{t("PayerDescription")}</Text>
         </>
       }
       dataTestId="payer_info_help_button"
@@ -209,4 +207,3 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 };
 
 export default observer(PaymentMethod);
-

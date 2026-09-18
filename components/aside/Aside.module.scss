@@ -36,7 +36,10 @@ $mobile-footer-height: 64px;
   // new bridge vars for hardcoded values
   --aside-width-v: var(--aside-width, 480px);
   --aside-transition-v: var(--aside-transition, transform 0.3s ease-in-out);
-  --aside-mobile-footer-height-v: var(--aside-mobile-footer-height, #{$mobile-footer-height});
+  --aside-mobile-footer-height-v: var(
+    --aside-mobile-footer-height,
+    #{$mobile-footer-height}
+  );
 
   background-color: var(--aside-bg-v);
   height: 100%;

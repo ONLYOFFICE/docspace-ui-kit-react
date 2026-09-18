@@ -70,4 +70,3 @@ const SaaSPage = observer(
 );
 
 export default SaaSPage;
-

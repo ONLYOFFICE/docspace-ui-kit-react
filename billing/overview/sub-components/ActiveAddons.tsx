@@ -145,4 +145,3 @@ const ActiveAddons = ({ onManageAddons }: ActiveAddonsProps) => {
 };
 
 export default observer(ActiveAddons);
-

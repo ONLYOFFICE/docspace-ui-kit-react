@@ -4,13 +4,13 @@ Wraps children with `I18nextProvider` when translations are available. Falls bac
 
 ## Props
 
-| Prop           | Type              | Required | Description                                              |
-| -------------- | ----------------- | -------- | -------------------------------------------------------- |
-| `settings`     | `SettingsDto`     | No       | Portal settings (used for `culture` and `timezone`)      |
-| `user`         | `EmployeeFullDto` | No       | Current user (used for `cultureName`)                    |
-| `locale`       | `string`          | No       | Explicit locale override (takes highest priority)        |
-| `translations` | `TTranslations`   | No       | Translation resources map                                |
-| `children`     | `React.ReactNode` | Yes      | Child components                                         |
+| Prop           | Type              | Required | Description                                         |
+| -------------- | ----------------- | -------- | --------------------------------------------------- |
+| `settings`     | `SettingsDto`     | No       | Portal settings (used for `culture` and `timezone`) |
+| `user`         | `EmployeeFullDto` | No       | Current user (used for `cultureName`)               |
+| `locale`       | `string`          | No       | Explicit locale override (takes highest priority)   |
+| `translations` | `TTranslations`   | No       | Translation resources map                           |
+| `children`     | `React.ReactNode` | Yes      | Child components                                    |
 
 ## `TTranslations` Type
 
@@ -78,7 +78,7 @@ import { TranslationProvider } from "@onlyoffice/apps-ui-kit/providers/translati
 
 <TranslationProvider translations={translations} locale="en">
   <App />
-</TranslationProvider>
+</TranslationProvider>;
 ```
 
 ### Full example

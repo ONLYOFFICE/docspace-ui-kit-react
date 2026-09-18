@@ -30,32 +30,32 @@ import { TemplateTile } from "@onlyoffice/apps-ui-kit/components/tiles/template-
   <TileContent>
     <Link>Template Content</Link>
   </TileContent>
-</TemplateTile>
+</TemplateTile>;
 ```
 
 ## Props
 
-| Props                   |                       Type                        | Required | Values | Default | Description                                              |
-| ----------------------- | :-----------------------------------------------: | :------: | :----: | :-----: | -------------------------------------------------------- |
-| `item`                  |                  `TemplateItem`                   |   Yes    |   -    |    -    | Template data object                                     |
-| `contextOptions`        |              `ContextMenuModel[]`                 |   Yes    |   -    |    -    | Context menu options                                     |
-| `columnCount`           |                     `number`                      |   Yes    |   -    |    -    | Number of columns in the grid                            |
-| `openUser`              |                   `() => void`                    |   Yes    |   -    |    -    | Callback when owner link is clicked                      |
-| `checked`               |                    `boolean`                      |    -     |   -    | `false` | Indicates if the template is selected                    |
-| `isActive`              |                    `boolean`                      |    -     |   -    | `false` | Indicates if the template is in active state             |
-| `isBlockingOperation`   |                    `boolean`                      |    -     |   -    | `false` | Indicates if the template is in blocking operation state |
-| `onSelect`              | `(checked: boolean, item: TemplateItem) => void`  |    -     |   -    |    -    | Callback when template is selected                       |
-| `thumbnailClick`        |         `(e: React.MouseEvent) => void`           |    -     |   -    |    -    | Callback when thumbnail is clicked                       |
-| `getContextModel`       |           `() => ContextMenuModel[]`              |    -     |   -    |    -    | Function to get context menu model                       |
-| `children`              |                `React.ReactNode`                  |    -     |   -    |    -    | Child elements                                           |
-| `indeterminate`         |                    `boolean`                      |    -     |   -    | `false` | Checkbox indeterminate state flag                        |
-| `element`               |                `React.ReactNode`                  |    -     |   -    |    -    | Additional React element (icon)                          |
-| `badges`                |                `React.ReactNode`                  |    -     |   -    |    -    | Template badges                                          |
-| `inProgress`            |                    `boolean`                      |    -     |   -    | `false` | Indicates if template is in progress state               |
-| `showHotkeyBorder`      |                    `boolean`                      |    -     |   -    | `false` | Flag to show hotkey border                               |
-| `isEdit`                |                    `boolean`                      |    -     |   -    | `false` | Flag for edit mode                                       |
-| `showStorageInfo`       |                    `boolean`                      |    -     |   -    | `false` | Flag to show storage information                         |
-| `SpaceQuotaComponent`   |    `React.ComponentType<SpaceQuotaProps>`         |    -     |   -    |    -    | Component to display space quota                         |
+| Props                 |                       Type                       | Required | Values | Default | Description                                              |
+| --------------------- | :----------------------------------------------: | :------: | :----: | :-----: | -------------------------------------------------------- |
+| `item`                |                  `TemplateItem`                  |   Yes    |   -    |    -    | Template data object                                     |
+| `contextOptions`      |               `ContextMenuModel[]`               |   Yes    |   -    |    -    | Context menu options                                     |
+| `columnCount`         |                     `number`                     |   Yes    |   -    |    -    | Number of columns in the grid                            |
+| `openUser`            |                   `() => void`                   |   Yes    |   -    |    -    | Callback when owner link is clicked                      |
+| `checked`             |                    `boolean`                     |    -     |   -    | `false` | Indicates if the template is selected                    |
+| `isActive`            |                    `boolean`                     |    -     |   -    | `false` | Indicates if the template is in active state             |
+| `isBlockingOperation` |                    `boolean`                     |    -     |   -    | `false` | Indicates if the template is in blocking operation state |
+| `onSelect`            | `(checked: boolean, item: TemplateItem) => void` |    -     |   -    |    -    | Callback when template is selected                       |
+| `thumbnailClick`      |         `(e: React.MouseEvent) => void`          |    -     |   -    |    -    | Callback when thumbnail is clicked                       |
+| `getContextModel`     |            `() => ContextMenuModel[]`            |    -     |   -    |    -    | Function to get context menu model                       |
+| `children`            |                `React.ReactNode`                 |    -     |   -    |    -    | Child elements                                           |
+| `indeterminate`       |                    `boolean`                     |    -     |   -    | `false` | Checkbox indeterminate state flag                        |
+| `element`             |                `React.ReactNode`                 |    -     |   -    |    -    | Additional React element (icon)                          |
+| `badges`              |                `React.ReactNode`                 |    -     |   -    |    -    | Template badges                                          |
+| `inProgress`          |                    `boolean`                     |    -     |   -    | `false` | Indicates if template is in progress state               |
+| `showHotkeyBorder`    |                    `boolean`                     |    -     |   -    | `false` | Flag to show hotkey border                               |
+| `isEdit`              |                    `boolean`                     |    -     |   -    | `false` | Flag for edit mode                                       |
+| `showStorageInfo`     |                    `boolean`                     |    -     |   -    | `false` | Flag to show storage information                         |
+| `SpaceQuotaComponent` |      `React.ComponentType<SpaceQuotaProps>`      |    -     |   -    |    -    | Component to display space quota                         |
 
 ## Template Item Structure
 

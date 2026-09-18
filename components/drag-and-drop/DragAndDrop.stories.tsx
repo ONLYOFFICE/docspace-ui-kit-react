@@ -162,7 +162,14 @@ const InteractiveDropZone = (args: ComponentProps<typeof DragAndDrop>) => {
 
 export const CssCustomization: Story = {
   render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "400px" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+        width: "400px",
+      }}
+    >
       {/* Dragging state — shows --dnd-dragging-bg */}
       <div
         style={
@@ -173,7 +180,11 @@ export const CssCustomization: Story = {
           } as CSSProperties
         }
       >
-        <DragAndDrop isDropZone dragging style={{ height: "120px", borderRadius: "8px" }}>
+        <DragAndDrop
+          isDropZone
+          dragging
+          style={{ height: "120px", borderRadius: "8px" }}
+        >
           <div
             style={{
               height: "100%",
@@ -196,7 +207,15 @@ export const CssCustomization: Story = {
           } as CSSProperties
         }
       >
-        <DragAndDrop isDropZone isDragDisabled style={{ height: "80px", borderRadius: "8px", border: "2px dashed #0082c9" }}>
+        <DragAndDrop
+          isDropZone
+          isDragDisabled
+          style={{
+            height: "80px",
+            borderRadius: "8px",
+            border: "2px dashed #0082c9",
+          }}
+        >
           <div
             style={{
               height: "100%",

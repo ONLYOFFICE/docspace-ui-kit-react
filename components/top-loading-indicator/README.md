@@ -28,11 +28,11 @@ TopLoaderService.cancel();
 
 ## API
 
-| Method                    | Description                                              |
-|---------------------------|----------------------------------------------------------|
-| `TopLoaderService.start()`  | Starts or restarts the progress animation from 0%      |
-| `TopLoaderService.end()`    | Triggers the completion animation to 100%              |
-| `TopLoaderService.cancel()` | Immediately resets the bar to 0% and stops the timer   |
+| Method                      | Description                                          |
+| --------------------------- | ---------------------------------------------------- |
+| `TopLoaderService.start()`  | Starts or restarts the progress animation from 0%    |
+| `TopLoaderService.end()`    | Triggers the completion animation to 100%            |
+| `TopLoaderService.cancel()` | Immediately resets the bar to 0% and stops the timer |
 
 ## Prerequisites
 

@@ -20,7 +20,9 @@ test.describe("FieldContainer — light", () => {
 
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
-    await expect(page).toHaveScreenshot("field-container-css-customization.png");
+    await expect(page).toHaveScreenshot(
+      "field-container-css-customization.png",
+    );
   });
 });
 

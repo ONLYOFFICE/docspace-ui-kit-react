@@ -43,19 +43,19 @@ import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
 
 ## Properties
 
-| Prop              | Type            | Required | Default | Description                                          |
-| ----------------- | --------------- | :------: | ------- | ---------------------------------------------------- |
-| `type`            | `RoomsType`     |    -     | -       | Room type determining which icon to display          |
-| `isArchive`       | `boolean`       |    -     | `false` | Display archive room icon                            |
-| `isTemplate`      | `boolean`       |    -     | `false` | Display template icon                                |
-| `isTemplateRoom`  | `boolean`       |    -     | `false` | Display template variant of room type icon           |
-| `withCheckbox`    | `boolean`       |    -     | `false` | Show checkbox overlay for selection                  |
-| `isChecked`       | `boolean`       |    -     | `false` | Checkbox checked state                               |
-| `isIndeterminate` | `boolean`       |    -     | `false` | Checkbox indeterminate state                         |
-| `onChange`        | `() => void`    |    -     | -       | Callback when checkbox state changes                 |
-| `id`              | `string`        |    -     | -       | HTML id attribute                                    |
-| `className`       | `string`        |    -     | -       | Additional CSS class name                            |
-| `style`           | `CSSProperties` |    -     | -       | Custom inline styles                                 |
+| Prop              | Type            | Required | Default | Description                                 |
+| ----------------- | --------------- | :------: | ------- | ------------------------------------------- |
+| `type`            | `RoomsType`     |    -     | -       | Room type determining which icon to display |
+| `isArchive`       | `boolean`       |    -     | `false` | Display archive room icon                   |
+| `isTemplate`      | `boolean`       |    -     | `false` | Display template icon                       |
+| `isTemplateRoom`  | `boolean`       |    -     | `false` | Display template variant of room type icon  |
+| `withCheckbox`    | `boolean`       |    -     | `false` | Show checkbox overlay for selection         |
+| `isChecked`       | `boolean`       |    -     | `false` | Checkbox checked state                      |
+| `isIndeterminate` | `boolean`       |    -     | `false` | Checkbox indeterminate state                |
+| `onChange`        | `() => void`    |    -     | -       | Callback when checkbox state changes        |
+| `id`              | `string`        |    -     | -       | HTML id attribute                           |
+| `className`       | `string`        |    -     | -       | Additional CSS class name                   |
+| `style`           | `CSSProperties` |    -     | -       | Custom inline styles                        |
 
 ## Room Types
 
@@ -64,12 +64,12 @@ The `RoomsType` enum provides the following room types:
 ```tsx
 import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
 
-RoomsType.EditingRoom     // Collaboration/editing room
-RoomsType.CustomRoom      // Custom room
-RoomsType.PublicRoom      // Public room
-RoomsType.VirtualDataRoom // Virtual data room
-RoomsType.FormRoom        // Form room
-RoomsType.AIRoom          // AI room
+RoomsType.EditingRoom; // Collaboration/editing room
+RoomsType.CustomRoom; // Custom room
+RoomsType.PublicRoom; // Public room
+RoomsType.VirtualDataRoom; // Virtual data room
+RoomsType.FormRoom; // Form room
+RoomsType.AIRoom; // AI room
 ```
 
 ## Examples

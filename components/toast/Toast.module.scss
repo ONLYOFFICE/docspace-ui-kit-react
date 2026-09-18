@@ -32,35 +32,35 @@
       --toast-text-color: #{$dark-gray-dark};
       --toast-close-button-color: #{$dark-gray-dark};
       --toast-transform: translate3d(150%, 0, 0);
-      
+
       --toast-success-bg: #{$black};
       --toast-success-border: 2px solid #{$dark-toast-done};
       --toast-success-hover-bg: #{$black};
-      
+
       --toast-error-bg: #{$black};
       --toast-error-border: 2px solid #{$dark-toast-warning};
       --toast-error-hover-bg: #{$black};
-      
+
       --toast-info-bg: #{$black};
       --toast-info-border: 2px solid #{$dark-toast-info};
       --toast-info-hover-bg: #{$black};
-      
+
       --toast-warning-bg: #{$black};
       --toast-warning-border: 2px solid #{$dark-toast-alert};
       --toast-warning-hover-bg: #{$black};
 
       --toastr-text-color: #{$dark-gray-dark};
       --toastr-close-button-color: #{$dark-gray-dark};
-      
+
       --toastr-title-success-color: #{$dark-toast-done};
       --toastr-svg-success-color: #{$dark-toast-done};
-      
+
       --toastr-title-error-color: #{$dark-toast-warning};
       --toastr-svg-error-color: #{$dark-toast-warning};
-      
+
       --toastr-title-warning-color: #{$dark-toast-alert};
       --toastr-svg-warning-color: #{$dark-toast-alert};
-      
+
       --toastr-title-info-color: #{$dark-toast-info};
       --toastr-svg-info-color: #{$dark-toast-info};
     }
@@ -75,35 +75,35 @@
   --toast-text-color: #{$dark-black};
   --toast-close-button-color: #{$white};
   --toast-transform: translate3d(150%, 0, 0);
-  
+
   --toast-success-bg: #{$light-toast-done};
   --toast-success-border: none;
   --toast-success-hover-bg: #{$light-toast-done};
-  
+
   --toast-error-bg: #{$light-toast-warning};
   --toast-error-border: none;
   --toast-error-hover-bg: #{$light-toast-warning};
-  
+
   --toast-info-bg: #{$light-toast-info};
   --toast-info-border: none;
   --toast-info-hover-bg: #{$light-toast-info};
-  
+
   --toast-warning-bg: #{$light-toast-alert};
   --toast-warning-border: none;
   --toast-warning-hover-bg: #{$light-toast-alert};
 
   --toastr-text-color: #{$black};
   --toastr-close-button-color: #{$black};
-  
+
   --toastr-title-success-color: #{$dark-black};
   --toastr-svg-success-color: #{$black};
-  
+
   --toastr-title-error-color: #{$dark-black};
   --toastr-svg-error-color: #{$black};
-  
+
   --toastr-title-warning-color: #{$dark-black};
   --toastr-svg-warning-color: #{$black};
-  
+
   --toastr-title-info-color: #{$dark-black};
   --toastr-svg-info-color: #{$black};
 

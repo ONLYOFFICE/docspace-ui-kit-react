@@ -38,13 +38,13 @@ xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx
 
 ### Structure
 
-| Group | Length | Example |
-|-------|--------|---------|
-| 1 | 8 chars | `550e8400` |
-| 2 | 4 chars | `e29b` |
-| 3 | 4 chars | `41d4` (starts with "4") |
-| 4 | 4 chars | `a716` |
-| 5 | 12 chars | `446655440000` |
+| Group | Length   | Example                  |
+| ----- | -------- | ------------------------ |
+| 1     | 8 chars  | `550e8400`               |
+| 2     | 4 chars  | `e29b`                   |
+| 3     | 4 chars  | `41d4` (starts with "4") |
+| 4     | 4 chars  | `a716`                   |
+| 5     | 12 chars | `446655440000`           |
 
 ## Usage Examples
 

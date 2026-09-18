@@ -3,7 +3,10 @@ import { RectangleSkeleton } from "../../../rectangle";
 import styles from "./Dialog.module.scss";
 import { DialogSkeletonProps } from "./Dialog.types";
 
-export const DialogModalSkeleton = ({ isLarge, withFooterBorder }: DialogSkeletonProps) => {
+export const DialogModalSkeleton = ({
+  isLarge,
+  withFooterBorder,
+}: DialogSkeletonProps) => {
   return (
     <div
       className={styles.dialogLoader}

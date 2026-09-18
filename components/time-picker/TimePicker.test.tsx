@@ -92,8 +92,14 @@ describe("<TimePicker />", () => {
     const hoursInput = screen.getByLabelText("Hours");
     const minutesInput = screen.getByLabelText("Minutes");
 
-    const hoursEvent = new MouseEvent("contextmenu", { bubbles: true, cancelable: true });
-    const minutesEvent = new MouseEvent("contextmenu", { bubbles: true, cancelable: true });
+    const hoursEvent = new MouseEvent("contextmenu", {
+      bubbles: true,
+      cancelable: true,
+    });
+    const minutesEvent = new MouseEvent("contextmenu", {
+      bubbles: true,
+      cancelable: true,
+    });
 
     fireEvent(hoursInput, hoursEvent);
     fireEvent(minutesInput, minutesEvent);

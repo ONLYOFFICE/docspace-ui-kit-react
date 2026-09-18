@@ -150,4 +150,3 @@ const ProgressBar = ({
 };
 
 export { ProgressBar };
-

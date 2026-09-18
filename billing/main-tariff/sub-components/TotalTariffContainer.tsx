@@ -223,4 +223,3 @@ const TotalTariffContainer = observer(
 );
 
 export default TotalTariffContainer;
-

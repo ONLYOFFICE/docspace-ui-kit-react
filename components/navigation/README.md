@@ -26,7 +26,7 @@ import { Navigation } from "@onlyoffice/apps-ui-kit/components/navigation";
   showText={true}
   burgerLogo="/logo.svg"
   // ...other required props
-/>
+/>;
 ```
 
 ## Features
@@ -54,23 +54,23 @@ import { Navigation } from "@onlyoffice/apps-ui-kit/components/navigation";
 
 ## Key Properties
 
-| Prop                       | Type                          | Default | Description                                          |
-|----------------------------|-------------------------------|---------|------------------------------------------------------|
-| `title`                    | `string`                      | —       | Current folder title                                 |
-| `isRootFolder`             | `boolean`                     | —       | Whether the current folder is the root               |
-| `navigationItems`          | `TNavigationItem[]`           | —       | Breadcrumb path items                                |
-| `onClickFolder`            | `TOnNavigationItemClick`      | —       | Callback when a breadcrumb item is clicked           |
-| `onBackToParentFolder`     | `() => void`                  | —       | Callback for the back button                         |
-| `canCreate`                | `boolean`                     | —       | Shows the plus/create button                         |
-| `getContextOptionsFolder`  | `TGetContextMenuModel`        | —       | Returns context menu items for the folder            |
-| `getContextOptionsPlus`    | `TGetContextMenuModel`        | —       | Returns context menu items for the plus button       |
-| `isInfoPanelVisible`       | `boolean`                     | —       | Whether the info panel is currently visible          |
-| `toggleInfoPanel`          | `(e?: MouseEvent) => void`    | —       | Toggles info panel visibility                        |
-| `isDesktop`                | `boolean`                     | —       | Whether the current device is desktop                |
-| `showText`                 | `boolean`                     | —       | Whether to show text labels                          |
-| `burgerLogo`               | `string`                      | —       | Logo URL for the navigation dropdown                 |
-| `titleIcon`                | `string`                      | —       | Icon displayed next to the title                     |
-| `showRootFolderTitle`      | `boolean`                     | —       | Whether to show the root folder title                |
-| `showNavigationButton`     | `boolean`                     | —       | Shows an additional navigation action button         |
-| `navigationButtonLabel`    | `string`                      | —       | Label for the navigation action button               |
-| `onNavigationButtonClick`  | `() => void`                  | —       | Callback for the navigation action button            |
+| Prop                      | Type                       | Default | Description                                    |
+| ------------------------- | -------------------------- | ------- | ---------------------------------------------- |
+| `title`                   | `string`                   | —       | Current folder title                           |
+| `isRootFolder`            | `boolean`                  | —       | Whether the current folder is the root         |
+| `navigationItems`         | `TNavigationItem[]`        | —       | Breadcrumb path items                          |
+| `onClickFolder`           | `TOnNavigationItemClick`   | —       | Callback when a breadcrumb item is clicked     |
+| `onBackToParentFolder`    | `() => void`               | —       | Callback for the back button                   |
+| `canCreate`               | `boolean`                  | —       | Shows the plus/create button                   |
+| `getContextOptionsFolder` | `TGetContextMenuModel`     | —       | Returns context menu items for the folder      |
+| `getContextOptionsPlus`   | `TGetContextMenuModel`     | —       | Returns context menu items for the plus button |
+| `isInfoPanelVisible`      | `boolean`                  | —       | Whether the info panel is currently visible    |
+| `toggleInfoPanel`         | `(e?: MouseEvent) => void` | —       | Toggles info panel visibility                  |
+| `isDesktop`               | `boolean`                  | —       | Whether the current device is desktop          |
+| `showText`                | `boolean`                  | —       | Whether to show text labels                    |
+| `burgerLogo`              | `string`                   | —       | Logo URL for the navigation dropdown           |
+| `titleIcon`               | `string`                   | —       | Icon displayed next to the title               |
+| `showRootFolderTitle`     | `boolean`                  | —       | Whether to show the root folder title          |
+| `showNavigationButton`    | `boolean`                  | —       | Shows an additional navigation action button   |
+| `navigationButtonLabel`   | `string`                   | —       | Label for the navigation action button         |
+| `onNavigationButtonClick` | `() => void`               | —       | Callback for the navigation action button      |

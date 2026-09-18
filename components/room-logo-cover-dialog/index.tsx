@@ -190,4 +190,3 @@ export { RoomLogoCoverDialog };
 export { RoomLogoCover };
 export type { RoomLogoCoverDialogProps, ICover };
 export type { RoomLogoCoverProps } from "./RoomLogoCover";
-

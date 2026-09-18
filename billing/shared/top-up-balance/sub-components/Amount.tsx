@@ -179,4 +179,3 @@ const Amount = (props: AmountProps) => {
 };
 
 export default Amount;
-

@@ -285,5 +285,4 @@ describe("useAnimation", () => {
     // Should keep default value of 90
     expect(result.current.endWidth).toBe(90);
   });
-
 });

@@ -26,22 +26,22 @@ const MyComponent = () => {
 
 ## Properties
 
-| Name        | Type                                    | Default | Description                    |
-|-------------|-----------------------------------------|---------|--------------------------------|
-| id          | string                                  | -       | Element ID                     |
-| className   | string                                  | -       | CSS class name                 |
-| style       | CSSProperties                           | -       | Inline styles                  |
-| name        | string                                  | -       | Input name attribute           |
-| label       | string                                  | -       | Label text                     |
-| isChecked   | boolean                                 | false   | Checked state                  |
-| isDisabled  | boolean                                 | false   | Disabled state                 |
-| isLoading   | boolean                                 | false   | Loading state                  |
-| noAnimation | boolean                                 | false   | Disables animation effects     |
-| onChange    | (e: ChangeEvent<HTMLInputElement>) => void | -    | Change event handler          |
-| fontWeight  | number                                  | -       | Label font weight              |
-| fontSize    | string                                  | -       | Label font size                |
-| dataTestId  | string                                  | -       | Test ID for the component      |
-| dataTooltipId | string                                | -       | Tooltip ID for the component   |
+| Name          | Type                                       | Default | Description                  |
+| ------------- | ------------------------------------------ | ------- | ---------------------------- |
+| id            | string                                     | -       | Element ID                   |
+| className     | string                                     | -       | CSS class name               |
+| style         | CSSProperties                              | -       | Inline styles                |
+| name          | string                                     | -       | Input name attribute         |
+| label         | string                                     | -       | Label text                   |
+| isChecked     | boolean                                    | false   | Checked state                |
+| isDisabled    | boolean                                    | false   | Disabled state               |
+| isLoading     | boolean                                    | false   | Loading state                |
+| noAnimation   | boolean                                    | false   | Disables animation effects   |
+| onChange      | (e: ChangeEvent<HTMLInputElement>) => void | -       | Change event handler         |
+| fontWeight    | number                                     | -       | Label font weight            |
+| fontSize      | string                                     | -       | Label font size              |
+| dataTestId    | string                                     | -       | Test ID for the component    |
+| dataTooltipId | string                                     | -       | Tooltip ID for the component |
 
 ## Styling
 
@@ -60,11 +60,13 @@ The component uses CSS modules with CSS variables for theming. Key variables inc
 ## Examples
 
 ### Basic Usage
+
 ```jsx
 <ToggleButton label="Basic toggle" />
 ```
 
 ### With Custom Styling
+
 ```jsx
 <ToggleButton
   label="Custom styled"
@@ -75,24 +77,19 @@ The component uses CSS modules with CSS variables for theming. Key variables inc
 ```
 
 ### Disabled State
+
 ```jsx
-<ToggleButton
-  label="Disabled toggle"
-  isDisabled={true}
-/>
+<ToggleButton label="Disabled toggle" isDisabled={true} />
 ```
 
 ### Loading State
+
 ```jsx
-<ToggleButton
-  label="Loading"
-  isLoading={true}
-/>
+<ToggleButton label="Loading" isLoading={true} />
 ```
 
 ### Without Animation
+
 ```jsx
-<ToggleButton
-  label="No animation"
-  noAnimation={true}
-/>
+<ToggleButton label="No animation" noAnimation={true} />
+```

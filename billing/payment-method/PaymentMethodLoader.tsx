@@ -49,4 +49,3 @@ const PaymentMethodLoader: React.FC = () => {
 };
 
 export default PaymentMethodLoader;
-

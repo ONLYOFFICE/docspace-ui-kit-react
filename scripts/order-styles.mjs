@@ -45,13 +45,18 @@ import { fileURLToPath } from "node:url";
 import cssnano from "cssnano";
 import postcss from "postcss";
 
-const DIST = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../dist");
+const DIST = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../dist",
+);
 const ESM = path.join(DIST, "esm");
 const STYLESHEET = path.join(DIST, "styles.css");
 
 /** Every .js under a directory, as paths relative to it, sorted. */
 export const collect = (root, dir = root, found = []) => {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+  for (const entry of fs
+    .readdirSync(dir, { withFileTypes: true })
+    .sort((a, b) => a.name.localeCompare(b.name))) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) collect(root, full, found);
     else if (entry.name.endsWith(".js")) found.push(path.relative(root, full));
@@ -63,7 +68,8 @@ export const collect = (root, dir = root, found = []) => {
  * Relative import specifiers of one built module, resolved to module ids.
  * Bare specifiers are externals and carry no CSS, so they are dropped.
  */
-const IMPORT_RE = /(?:^|\n)\s*(?:import|export)[^'"\n]*?from\s*["']([^"']+)["']|(?:^|\n)\s*import\s*["']([^"']+)["']/g;
+const IMPORT_RE =
+  /(?:^|\n)\s*(?:import|export)[^'"\n]*?from\s*["']([^"']+)["']|(?:^|\n)\s*import\s*["']([^"']+)["']/g;
 
 const importsOf = (id) => {
   const code = fs.readFileSync(path.join(ESM, id), "utf8");
@@ -83,7 +89,9 @@ const isStylesheet = (id) => id.includes(".module.scss");
 
 /** Every emitted stylesheet, as `<stylesheet>/index.css` paths relative to dist/esm, sorted. */
 const collectCss = (root, dir = root, found = []) => {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+  for (const entry of fs
+    .readdirSync(dir, { withFileTypes: true })
+    .sort((a, b) => a.name.localeCompare(b.name))) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) collectCss(root, full, found);
     else if (entry.name === "index.css") found.push(path.relative(root, full));
@@ -200,7 +208,8 @@ const attribution = (ids) => {
     byPrefix.get(prefix).push(id);
 
     const code = fs.readFileSync(path.join(ESM, id), "utf8");
-    for (const m of code.matchAll(/"([^"]+)":"(dsui-[^"]+)"/g)) byClass.set(m[2], id);
+    for (const m of code.matchAll(/"([^"]+)":"(dsui-[^"]+)"/g))
+      byClass.set(m[2], id);
   }
 
   return { byPrefix, byClass };
@@ -262,7 +271,8 @@ export const analyseStylesheet = () => {
       const prefix = `${cls.slice(0, cls.indexOf("__") + 2)}`;
       const candidates = byPrefix.get(prefix);
       if (!candidates) continue;
-      owner = candidates.length === 1 ? candidates[0] : (byClass.get(cls) ?? null);
+      owner =
+        candidates.length === 1 ? candidates[0] : (byClass.get(cls) ?? null);
       if (owner) break;
     }
 
@@ -283,7 +293,8 @@ export const analyseStylesheet = () => {
 
   for (const item of items) {
     if (item.owner === null) continue;
-    if (previous !== null && rankOf(item.owner) < rankOf(previous.owner)) inverted += 1;
+    if (previous !== null && rankOf(item.owner) < rankOf(previous.owner))
+      inverted += 1;
     previous = item;
   }
 
@@ -309,7 +320,9 @@ export const orderedStylesheets = () => {
   const files = collectCss(ESM);
   const rankOf = (file) => {
     const chunk = file.replace(/index\.css$/, "index.js");
-    return isStylesheet(chunk) ? rank.get(chunk) ?? Number.MAX_SAFE_INTEGER : -1;
+    return isStylesheet(chunk)
+      ? (rank.get(chunk) ?? Number.MAX_SAFE_INTEGER)
+      : -1;
   };
 
   return files.sort((a, b) => rankOf(a) - rankOf(b) || a.localeCompare(b));
@@ -339,10 +352,13 @@ const main = async () => {
 
   const ordered = (charset ? `${charset}\n` : "") + parts.join("\n");
 
-  const { css } = await postcss([cssnano({ preset: "default" })]).process(ordered, {
-    from: undefined,
-    to: STYLESHEET,
-  });
+  const { css } = await postcss([cssnano({ preset: "default" })]).process(
+    ordered,
+    {
+      from: undefined,
+      to: STYLESHEET,
+    },
+  );
 
   fs.writeFileSync(STYLESHEET, css);
 
@@ -354,4 +370,8 @@ const main = async () => {
   );
 };
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();
+if (
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+)
+  await main();

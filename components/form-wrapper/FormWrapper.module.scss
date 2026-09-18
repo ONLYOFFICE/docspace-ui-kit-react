@@ -12,8 +12,14 @@
     --form-wrapper-box-shadow: 0px 5px 20px #{colors.$badge-shadow};
   }
 
-  --form-wrapper-bg-value: var(--form-wrapper-bg, var(--form-wrapper-background));
-  --form-wrapper-shadow-value: var(--form-wrapper-shadow, var(--form-wrapper-box-shadow));
+  --form-wrapper-bg-value: var(
+    --form-wrapper-bg,
+    var(--form-wrapper-background)
+  );
+  --form-wrapper-shadow-value: var(
+    --form-wrapper-shadow,
+    var(--form-wrapper-box-shadow)
+  );
   --form-wrapper-border-radius: var(--form-wrapper-radius, 12px);
   --form-wrapper-inner-padding: var(--form-wrapper-padding, 32px);
   --form-wrapper-width-max: var(--form-wrapper-max-width, 320px);

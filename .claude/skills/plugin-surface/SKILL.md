@@ -25,12 +25,12 @@ chain, and compares against the baseline. Exit code 1 when something was **remov
 
 The four sections mean different things:
 
-| Section | Severity |
-|---|---|
-| **Removed** | a release blocker. Every plugin importing the name stops compiling, and the failure surfaces in someone else's repository |
-| **Kind changed** | usually a break too -- `enum -> variable` survives, `variable -> type` does not (the value is gone at runtime) |
-| **Moved between modules** | harmless to plugins; it is still exported. Worth a glance: an unintended move usually means a barrel was edited by hand |
-| **Added** | safe, but new names are the ones a plugin author cannot rely on yet -- the portal ships an older build than the author's checkout |
+| Section                   | Severity                                                                                                                          |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **Removed**               | a release blocker. Every plugin importing the name stops compiling, and the failure surfaces in someone else's repository         |
+| **Kind changed**          | usually a break too -- `enum -> variable` survives, `variable -> type` does not (the value is gone at runtime)                    |
+| **Moved between modules** | harmless to plugins; it is still exported. Worth a glance: an unintended move usually means a barrel was edited by hand           |
+| **Added**                 | safe, but new names are the ones a plugin author cannot rely on yet -- the portal ships an older build than the author's checkout |
 
 `--json` for the raw data, `--write` to accept the current surface as the new baseline.
 

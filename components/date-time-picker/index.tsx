@@ -127,8 +127,7 @@ const DateTimePicker = (props: DateTimePickerComponentProps) => {
     // Most locales use 24-hour format except US, AU, PH, etc.
     const twelveHourLocales = ["en-US", "en-AU", "en-PH", "en"];
     const is12Hour =
-      twelveHourLocales.some((l) => locale.startsWith(l)) ||
-      locale === "en-GB";
+      twelveHourLocales.some((l) => locale.startsWith(l)) || locale === "en-GB";
 
     setIsTwelveHourFormat(is12Hour);
   }, [initialDate, locale]);

@@ -61,7 +61,10 @@ const watchForExportedFile = (
   const handler = (opt?: TOptSocket) => {
     if (opt?.cmd !== "create" || opt?.type !== "file" || !opt?.data) return;
     try {
-      const file = JSON.parse(opt.data) as { folderId?: unknown; title?: unknown };
+      const file = JSON.parse(opt.data) as {
+        folderId?: unknown;
+        title?: unknown;
+      };
       if (String(file.folderId) !== String(folderId)) return;
       // The converter dedupes clashing names ("name (1).docx"), so match by
       // the base-name prefix rather than exact equality.

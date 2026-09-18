@@ -24,4 +24,3 @@ export const STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED =
   "storagePreviousSubscriptionRemoved";
 
 export const AI_PAYWALL_START_AMOUNT = 20;
-

@@ -15,7 +15,11 @@ import {
 type FakeWindow = {
   closed: boolean;
   close: () => void;
-  document: { open: () => void; write: (html: string) => void; close: () => void };
+  document: {
+    open: () => void;
+    write: (html: string) => void;
+    close: () => void;
+  };
 };
 
 const makeWindow = (): FakeWindow => {

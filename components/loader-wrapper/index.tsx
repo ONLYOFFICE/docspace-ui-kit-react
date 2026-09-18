@@ -14,7 +14,8 @@ export const LoaderWrapper = ({
           ? "var(--loader-wrapper-loading-opacity, 0.5)"
           : "var(--loader-wrapper-idle-opacity, 1)",
         pointerEvents: isLoading ? "none" : "auto",
-        transition: "var(--loader-wrapper-transition, opacity 0.3s ease-in-out)",
+        transition:
+          "var(--loader-wrapper-transition, opacity 0.3s ease-in-out)",
         display: "flex",
         flexDirection: "column",
         flexGrow: 1,

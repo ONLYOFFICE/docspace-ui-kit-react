@@ -51,14 +51,14 @@ import { RowContent } from "@onlyoffice/apps-ui-kit/components/rows";
 
 ## Props
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `children` | `React.ReactElement[]` | – | Elements to arrange across the main and side containers. Side elements can pass `containerWidth` / `containerMinWidth` props. |
-| `className` | `string` | – | Custom class for the root wrapper. |
-| `disableSideInfo` | `boolean` | `false` | Hides the auto-generated tablet-side summary. |
-| `id` | `string` | – | DOM id for the wrapper. |
-| `onClick` | `() => void` | – | Click handler applied to the root container. |
-| `sideColor` | `string` | – | Overrides the color of the tablet side-info summary. |
-| `style` | `React.CSSProperties` | – | Inline styles for the root wrapper. |
-| `sectionWidth` | `number` | – | Adds a fixed width modifier for the main section. |
-| `convertSideInfo` | `boolean` | `true` | Controls whether `getSideInfo` should convert side elements into the tablet summary. |
+| Prop              | Type                   | Default | Description                                                                                                                   |
+| ----------------- | ---------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `children`        | `React.ReactElement[]` | –       | Elements to arrange across the main and side containers. Side elements can pass `containerWidth` / `containerMinWidth` props. |
+| `className`       | `string`               | –       | Custom class for the root wrapper.                                                                                            |
+| `disableSideInfo` | `boolean`              | `false` | Hides the auto-generated tablet-side summary.                                                                                 |
+| `id`              | `string`               | –       | DOM id for the wrapper.                                                                                                       |
+| `onClick`         | `() => void`           | –       | Click handler applied to the root container.                                                                                  |
+| `sideColor`       | `string`               | –       | Overrides the color of the tablet side-info summary.                                                                          |
+| `style`           | `React.CSSProperties`  | –       | Inline styles for the root wrapper.                                                                                           |
+| `sectionWidth`    | `number`               | –       | Adds a fixed width modifier for the main section.                                                                             |
+| `convertSideInfo` | `boolean`              | `true`  | Controls whether `getSideInfo` should convert side elements into the tablet summary.                                          |

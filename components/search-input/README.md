@@ -39,24 +39,24 @@ The properties are organized into four categories:
 
 ### Base Props
 
-| Props          |          Type           | Required | Description                  |
-| -------------- | :---------------------: | :------: | ---------------------------- |
-| `id`           |        `string`         |    -     | Used as HTML `id` property   |
-| `forwardedRef` | `Ref<HTMLInputElement>` |    -     | Forwarded ref                |
-| `name`         |        `string`         |    -     | Sets the unique element name |
-| `className`    |        `string`         |    -     | Accepts class                |
-| `style`        |     `CSSProperties`     |    -     | Accepts css style            |
-| `children`     |       `ReactNode`       |    -     | Child elements               |
-| `tabIndex`     |        `number`         |    -     | HTML tabindex property       |
+| Props          |          Type           | Required | Description                   |
+| -------------- | :---------------------: | :------: | ----------------------------- |
+| `id`           |        `string`         |    -     | Used as HTML `id` property    |
+| `forwardedRef` | `Ref<HTMLInputElement>` |    -     | Forwarded ref                 |
+| `name`         |        `string`         |    -     | Sets the unique element name  |
+| `className`    |        `string`         |    -     | Accepts class                 |
+| `style`        |     `CSSProperties`     |    -     | Accepts css style             |
+| `children`     |       `ReactNode`       |    -     | Child elements                |
+| `tabIndex`     |        `number`         |    -     | HTML tabindex property        |
 | `dataTestId`   |        `string`         |    -     | Added data-testid for testing |
 
 ### State Props
 
-| Props        |    Type     | Required |             Values              | Default | Description                              |
-| ------------ | :---------: | :------: | :-----------------------------: | :-----: | ---------------------------------------- |
-| `value`      |  `string`   |    ✓     |                -                |    -    | Input value                              |
-| `isDisabled` |  `boolean`  |    -     |                -                | `false` | Indicates that the field cannot be used  |
-| `scale`      |  `boolean`  |    -     |                -                | `false` | Indicates that the input field has scale |
+| Props        |    Type     | Required |          Values           | Default | Description                              |
+| ------------ | :---------: | :------: | :-----------------------: | :-----: | ---------------------------------------- |
+| `value`      |  `string`   |    ✓     |             -             |    -    | Input value                              |
+| `isDisabled` |  `boolean`  |    -     |             -             | `false` | Indicates that the field cannot be used  |
+| `scale`      |  `boolean`  |    -     |             -             | `false` | Indicates that the input field has scale |
 | `size`       | `InputSize` |    ✓     | `base`, `middle`, `large` | `base`  | Supported size of the input fields       |
 
 ### Behavior Props

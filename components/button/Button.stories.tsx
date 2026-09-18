@@ -736,4 +736,3 @@ All color variables support \`-hover\`, \`-active\`, \`-disabled\` suffixes.`,
     },
   },
 };
-

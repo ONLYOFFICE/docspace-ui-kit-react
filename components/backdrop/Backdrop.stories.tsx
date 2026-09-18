@@ -59,8 +59,7 @@ import { Backdrop } from "@onlyoffice/apps-ui-kit/components/backdrop";
     },
     withoutBackground: {
       control: "boolean",
-      description:
-        "Forces no background. Takes precedence over withBackground",
+      description: "Forces no background. Takes precedence over withBackground",
       table: {
         defaultValue: { summary: "false" },
       },

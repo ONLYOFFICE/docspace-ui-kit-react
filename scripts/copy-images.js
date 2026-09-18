@@ -42,7 +42,10 @@ function copyFile(src, dest) {
 for (const size of SIZES) {
   // Copy base icons
   for (const name of baseIcons) {
-    copyFile(path.join(SOURCE, `${size}`, name), path.join(DEST, `${size}`, name));
+    copyFile(
+      path.join(SOURCE, `${size}`, name),
+      path.join(DEST, `${size}`, name),
+    );
   }
 
   // Copy room/ and template/ subfolders if they exist in this size
@@ -50,11 +53,10 @@ for (const size of SIZES) {
     const subSrc = path.join(SOURCE, `${size}`, sub);
     if (!fs.existsSync(subSrc)) continue;
 
-    for (const name of fs.readdirSync(subSrc).filter((f) => f.endsWith(".svg"))) {
-      copyFile(
-        path.join(subSrc, name),
-        path.join(DEST, `${size}`, sub, name),
-      );
+    for (const name of fs
+      .readdirSync(subSrc)
+      .filter((f) => f.endsWith(".svg"))) {
+      copyFile(path.join(subSrc, name), path.join(DEST, `${size}`, sub, name));
     }
   }
 }

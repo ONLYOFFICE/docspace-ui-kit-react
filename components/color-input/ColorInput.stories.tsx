@@ -128,14 +128,8 @@ const CssCustomizationTemplate = () => {
       }
     >
       <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
-        <ColorInput
-          defaultColor="#0082c9"
-          handleChange={() => {}}
-        />
-        <ColorInput
-          defaultColor="#4CAF50"
-          handleChange={() => {}}
-        />
+        <ColorInput defaultColor="#0082c9" handleChange={() => {}} />
+        <ColorInput defaultColor="#4CAF50" handleChange={() => {}} />
       </div>
     </div>
   );
@@ -204,9 +198,7 @@ const SizesTemplate = () => {
           key={size}
           defaultColor={globalColors.lightBlueMain}
           size={size}
-          handleChange={(color) =>
-            console.log(`${size} color changed:`, color)
-          }
+          handleChange={(color) => console.log(`${size} color changed:`, color)}
         />
       ))}
     </Wrapper>

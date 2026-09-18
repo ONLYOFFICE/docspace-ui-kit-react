@@ -6,7 +6,10 @@ Context menu component for displaying contextual actions. Supports submenus, hea
 
 ```tsx
 import { ContextMenu } from "@onlyoffice/apps-ui-kit/components/context-menu";
-import type { ContextMenuModel, ContextMenuRefType } from "@onlyoffice/apps-ui-kit/components/context-menu";
+import type {
+  ContextMenuModel,
+  ContextMenuRefType,
+} from "@onlyoffice/apps-ui-kit/components/context-menu";
 
 const menuRef = useRef<ContextMenuRefType>(null);
 
@@ -17,7 +20,7 @@ const model: ContextMenuModel[] = [
   { key: "delete", label: "Delete", icon: deleteIcon, onClick: handleDelete },
 ];
 
-<ContextMenu ref={menuRef} model={model} />
+<ContextMenu ref={menuRef} model={model} />;
 
 // Show menu programmatically
 const handleRightClick = (e: React.MouseEvent) => {
@@ -27,36 +30,36 @@ const handleRightClick = (e: React.MouseEvent) => {
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `model` | `ContextMenuModel[]` | - | Array of menu items |
-| `header` | `HeaderType` | - | Header with icon, title, and optional avatar |
-| `id` | `string` | `"contextMenu"` | Unique identifier |
-| `className` | `string` | - | Additional CSS class |
-| `style` | `CSSProperties` | - | Inline styles |
-| `global` | `boolean` | - | Attach menu to document |
-| `withBackdrop` | `boolean` | `true` | Show backdrop overlay |
-| `ignoreChangeView` | `boolean` | - | Ignore mobile view restrictions |
-| `autoZIndex` | `boolean` | - | Automatic z-index layering |
-| `baseZIndex` | `number` | - | Base z-index value |
-| `appendTo` | `HTMLElement` | - | DOM element to mount menu |
-| `onShow` | `(e) => void` | - | Callback when menu shows |
-| `onHide` | `(e) => void` | - | Callback when menu hides |
-| `containerRef` | `RefObject<HTMLDivElement>` | - | Reference to container |
-| `scaled` | `boolean` | - | Scale width by container |
-| `fillIcon` | `boolean` | - | Fill icons with default colors |
-| `getContextModel` | `() => ContextMenuModel[]` | - | Dynamic model getter |
-| `leftOffset` | `number` | - | Left position offset |
-| `rightOffset` | `number` | - | Right position offset |
-| `isRoom` | `boolean` | - | Room context styling |
-| `isArchive` | `boolean` | - | Archive context styling |
-| `badgeUrl` | `string` | - | Badge icon URL |
-| `headerOnlyMobile` | `boolean` | - | Show header only on mobile |
-| `maxHeightLowerSubmenu` | `number` | - | Max height for lower submenus |
-| `showDisabledItems` | `boolean` | - | Show disabled items |
-| `withHotkeys` | `boolean` | - | Enable keyboard navigation |
-| `withoutBackHeaderButton` | `boolean` | - | Hide back button in header |
-| `dataTestId` | `string` | - | Test ID |
+| Prop                      | Type                        | Default         | Description                                  |
+| ------------------------- | --------------------------- | --------------- | -------------------------------------------- |
+| `model`                   | `ContextMenuModel[]`        | -               | Array of menu items                          |
+| `header`                  | `HeaderType`                | -               | Header with icon, title, and optional avatar |
+| `id`                      | `string`                    | `"contextMenu"` | Unique identifier                            |
+| `className`               | `string`                    | -               | Additional CSS class                         |
+| `style`                   | `CSSProperties`             | -               | Inline styles                                |
+| `global`                  | `boolean`                   | -               | Attach menu to document                      |
+| `withBackdrop`            | `boolean`                   | `true`          | Show backdrop overlay                        |
+| `ignoreChangeView`        | `boolean`                   | -               | Ignore mobile view restrictions              |
+| `autoZIndex`              | `boolean`                   | -               | Automatic z-index layering                   |
+| `baseZIndex`              | `number`                    | -               | Base z-index value                           |
+| `appendTo`                | `HTMLElement`               | -               | DOM element to mount menu                    |
+| `onShow`                  | `(e) => void`               | -               | Callback when menu shows                     |
+| `onHide`                  | `(e) => void`               | -               | Callback when menu hides                     |
+| `containerRef`            | `RefObject<HTMLDivElement>` | -               | Reference to container                       |
+| `scaled`                  | `boolean`                   | -               | Scale width by container                     |
+| `fillIcon`                | `boolean`                   | -               | Fill icons with default colors               |
+| `getContextModel`         | `() => ContextMenuModel[]`  | -               | Dynamic model getter                         |
+| `leftOffset`              | `number`                    | -               | Left position offset                         |
+| `rightOffset`             | `number`                    | -               | Right position offset                        |
+| `isRoom`                  | `boolean`                   | -               | Room context styling                         |
+| `isArchive`               | `boolean`                   | -               | Archive context styling                      |
+| `badgeUrl`                | `string`                    | -               | Badge icon URL                               |
+| `headerOnlyMobile`        | `boolean`                   | -               | Show header only on mobile                   |
+| `maxHeightLowerSubmenu`   | `number`                    | -               | Max height for lower submenus                |
+| `showDisabledItems`       | `boolean`                   | -               | Show disabled items                          |
+| `withHotkeys`             | `boolean`                   | -               | Enable keyboard navigation                   |
+| `withoutBackHeaderButton` | `boolean`                   | -               | Hide back button in header                   |
+| `dataTestId`              | `string`                    | -               | Test ID                                      |
 
 ## Types
 
@@ -75,16 +78,16 @@ type ContextMenuType = {
   icon?: string;
   disabled?: boolean;
   onClick?: (value, item?) => void;
-  items?: ContextMenuModel[];       // Submenu items
-  url?: string;                      // External link
-  target?: string;                   // Link target
-  isHeader?: boolean;                // Header item
-  isLoader?: boolean;                // Show loader
-  onLoad?: () => Promise<ContextMenuModel[]>;  // Async load
-  withToggle?: boolean;              // Toggle switch
-  checked?: boolean;                 // Toggle state
-  badgeLabel?: string;               // Badge text
-  isPaidBadge?: boolean;             // Paid feature badge
+  items?: ContextMenuModel[]; // Submenu items
+  url?: string; // External link
+  target?: string; // Link target
+  isHeader?: boolean; // Header item
+  isLoader?: boolean; // Show loader
+  onLoad?: () => Promise<ContextMenuModel[]>; // Async load
+  withToggle?: boolean; // Toggle switch
+  checked?: boolean; // Toggle state
+  badgeLabel?: string; // Badge text
+  isPaidBadge?: boolean; // Paid feature badge
   className?: string;
   style?: CSSProperties;
   dataTestId?: string;
@@ -128,22 +131,22 @@ type ContextMenuRefType = {
 
 The component uses CSS variables for theming, defined locally within the component:
 
-| Variable | Light | Dark | Description |
-|----------|-------|------|-------------|
-| `--context-menu-background` | `#ffffff` | `#333333` | Menu background |
-| `--context-menu-border` | `none` | `1px solid #474747` | Menu border |
-| `--context-menu-header-border` | `1px solid #eceef1` | `1px solid #474747` | Header border |
-| `--context-menu-box-shadow` | `0px 8px 16px 0px rgba(...)` | `0px 8px 16px 0px rgba(...)` | Box shadow |
-| `--context-menu-header-text-color` | `#333333` | `#ffffff` | Header text color |
-| `--context-menu-header-text-margin` | `0 0 0 8px` | `0 0 0 8px` | Header text margin |
-| `--context-menu-submenu-list-margin` | `4px` | `4px` | Submenu margin |
-| `--context-menu-button-border` | `#d0d5da` | `#858585` | Button border |
-| `--context-menu-button-hover-border` | `#a3a9ae` | `#858585` | Button hover border |
-| `--sub-menu-item-background-color` | `#ffffff` | `#333333` | Item background |
-| `--sub-menu-item-hover-background-color` | `#f8f9f9` | `#3d3d3d` | Item hover background |
-| `--sub-menu-item-disabled-color` | `#a3a9ae` | `#a3a9ae` | Disabled item color |
-| `--sub-menu-item-disabled-background-color` | `#ffffff` | `#333333` | Disabled item background |
-| `--drop-down-item-hover-color` | `#f8f9f9` | `#3d3d3d` | Dropdown item hover |
+| Variable                                    | Light                        | Dark                         | Description              |
+| ------------------------------------------- | ---------------------------- | ---------------------------- | ------------------------ |
+| `--context-menu-background`                 | `#ffffff`                    | `#333333`                    | Menu background          |
+| `--context-menu-border`                     | `none`                       | `1px solid #474747`          | Menu border              |
+| `--context-menu-header-border`              | `1px solid #eceef1`          | `1px solid #474747`          | Header border            |
+| `--context-menu-box-shadow`                 | `0px 8px 16px 0px rgba(...)` | `0px 8px 16px 0px rgba(...)` | Box shadow               |
+| `--context-menu-header-text-color`          | `#333333`                    | `#ffffff`                    | Header text color        |
+| `--context-menu-header-text-margin`         | `0 0 0 8px`                  | `0 0 0 8px`                  | Header text margin       |
+| `--context-menu-submenu-list-margin`        | `4px`                        | `4px`                        | Submenu margin           |
+| `--context-menu-button-border`              | `#d0d5da`                    | `#858585`                    | Button border            |
+| `--context-menu-button-hover-border`        | `#a3a9ae`                    | `#858585`                    | Button hover border      |
+| `--sub-menu-item-background-color`          | `#ffffff`                    | `#333333`                    | Item background          |
+| `--sub-menu-item-hover-background-color`    | `#f8f9f9`                    | `#3d3d3d`                    | Item hover background    |
+| `--sub-menu-item-disabled-color`            | `#a3a9ae`                    | `#a3a9ae`                    | Disabled item color      |
+| `--sub-menu-item-disabled-background-color` | `#ffffff`                    | `#333333`                    | Disabled item background |
+| `--drop-down-item-hover-color`              | `#f8f9f9`                    | `#3d3d3d`                    | Dropdown item hover      |
 
 ## Examples
 
@@ -156,7 +159,7 @@ const model = [
   { key: "delete", label: "Delete", onClick: () => {} },
 ];
 
-<ContextMenu model={model} />
+<ContextMenu model={model} />;
 ```
 
 ### With Icons
@@ -167,7 +170,7 @@ const model = [
   { key: "copy", label: "Copy", icon: copyIcon, onClick: handleCopy },
 ];
 
-<ContextMenu model={model} fillIcon />
+<ContextMenu model={model} fillIcon />;
 ```
 
 ### With Separators
@@ -180,7 +183,7 @@ const model = [
   { key: "delete", label: "Delete", onClick: handleDelete },
 ];
 
-<ContextMenu model={model} />
+<ContextMenu model={model} />;
 ```
 
 ### With Header
@@ -191,7 +194,7 @@ const header = {
   icon: "/icons/pdf.svg",
 };
 
-<ContextMenu model={model} header={header} />
+<ContextMenu model={model} header={header} />;
 ```
 
 ### With Submenu
@@ -209,7 +212,7 @@ const model = [
   },
 ];
 
-<ContextMenu model={model} />
+<ContextMenu model={model} />;
 ```
 
 ### With Toggle
@@ -225,7 +228,7 @@ const model = [
   },
 ];
 
-<ContextMenu model={model} />
+<ContextMenu model={model} />;
 ```
 
 ### With Badge
@@ -241,7 +244,7 @@ const model = [
   },
 ];
 
-<ContextMenu model={model} />
+<ContextMenu model={model} />;
 ```
 
 ### Programmatic Control
@@ -277,7 +280,7 @@ const model = [
     isLoader: true,
     onLoad: async () => {
       const users = await fetchUsers();
-      return users.map(u => ({
+      return users.map((u) => ({
         key: u.id,
         label: u.name,
         onClick: () => shareWith(u.id),
@@ -286,5 +289,5 @@ const model = [
   },
 ];
 
-<ContextMenu model={model} />
+<ContextMenu model={model} />;
 ```

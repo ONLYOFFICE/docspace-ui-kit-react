@@ -15,7 +15,9 @@ async function gotoStory(page: Page, storyId: string) {
 test.describe("PublicRoomBar — light", () => {
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
-    await expect(page).toHaveScreenshot("public-room-bar-css-customization.png");
+    await expect(page).toHaveScreenshot(
+      "public-room-bar-css-customization.png",
+    );
   });
 });
 
@@ -31,6 +33,8 @@ test.describe("PublicRoomBar — dark", () => {
   test("css customization dark", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await page.evaluate(() => document.body.classList.add("dark"));
-    await expect(page).toHaveScreenshot("public-room-bar-css-customization-dark.png");
+    await expect(page).toHaveScreenshot(
+      "public-room-bar-css-customization-dark.png",
+    );
   });
 });

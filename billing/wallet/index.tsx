@@ -69,4 +69,3 @@ const Wallet = observer((props: WalletProps) => {
 });
 
 export default Wallet;
-

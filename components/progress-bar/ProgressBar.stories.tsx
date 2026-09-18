@@ -224,7 +224,9 @@ export const CssCustomization: Story = {
   },
 };
 
-type PreparationStory = StoryObj<ComponentProps<typeof PreparationPortalProgress>>;
+type PreparationStory = StoryObj<
+  ComponentProps<typeof PreparationPortalProgress>
+>;
 
 export const PreparationPortal: PreparationStory = {
   render: (args) => <PreparationPortalProgress {...args} />,

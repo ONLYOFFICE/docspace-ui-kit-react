@@ -104,4 +104,3 @@ export type ComponentProps = OmitTooltipProps<
     onMouseLeave?: MouseEventHandler;
   }
 >;
-

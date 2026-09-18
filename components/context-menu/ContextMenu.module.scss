@@ -48,16 +48,28 @@
       position: absolute;
 
       --context-menu-border-radius: var(--context-menu-radius, 6px);
-      --context-menu-item-padding: var(--context-menu-menu-item-padding, 0 16px);
+      --context-menu-item-padding: var(
+        --context-menu-menu-item-padding,
+        0 16px
+      );
       --context-menu-header-height: var(--context-menu-header-row-height, 55px);
       --context-menu-header-padding: var(
         --context-menu-header-inner-padding,
         6px 16px
       );
-      --context-menu-separator-margin: var(--context-menu-divider-margin, 6px 16px);
+      --context-menu-separator-margin: var(
+        --context-menu-divider-margin,
+        6px 16px
+      );
       --context-menu-item-font-size: var(--context-menu-item-text-size, 13px);
-      --context-menu-item-font-weight: var(--context-menu-item-text-weight, 600);
-      --context-menu-header-font-size: var(--context-menu-header-text-size, 15px);
+      --context-menu-item-font-weight: var(
+        --context-menu-item-text-weight,
+        600
+      );
+      --context-menu-header-font-size: var(
+        --context-menu-header-text-size,
+        15px
+      );
       --context-menu-item-line-height: var(--context-menu-item-height, 36px);
 
       background: var(--context-menu-bg, var(--context-menu-background));
@@ -66,7 +78,10 @@
       -moz-border-radius: var(--context-menu-border-radius);
       -webkit-border-radius: var(--context-menu-border-radius);
       box-shadow: var(--context-menu-shadow, var(--context-menu-box-shadow));
-      -moz-box-shadow: var(--context-menu-shadow, var(--context-menu-box-shadow));
+      -moz-box-shadow: var(
+        --context-menu-shadow,
+        var(--context-menu-box-shadow)
+      );
       -webkit-box-shadow: var(
         --context-menu-shadow,
         var(--context-menu-box-shadow)
@@ -153,7 +168,10 @@
       -moz-border-radius: var(--context-menu-border-radius);
       -webkit-border-radius: var(--context-menu-border-radius);
       box-shadow: var(--context-menu-shadow, var(--context-menu-box-shadow));
-      -moz-box-shadow: var(--context-menu-shadow, var(--context-menu-box-shadow));
+      -moz-box-shadow: var(
+        --context-menu-shadow,
+        var(--context-menu-box-shadow)
+      );
       -webkit-box-shadow: var(
         --context-menu-shadow,
         var(--context-menu-box-shadow)
@@ -341,7 +359,10 @@
           path[fill],
           circle[fill],
           rect[fill] {
-            fill: var(--context-menu-text, var(--context-menu-header-text-color));
+            fill: var(
+              --context-menu-text,
+              var(--context-menu-header-text-color)
+            );
           }
 
           path[stroke],

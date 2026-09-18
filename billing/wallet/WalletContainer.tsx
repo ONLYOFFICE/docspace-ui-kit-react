@@ -309,4 +309,3 @@ const Wallet = (props: WalletProps) => {
 };
 
 export default observer(Wallet);
-

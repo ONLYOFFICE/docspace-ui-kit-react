@@ -55,20 +55,20 @@ import { EmptyScreenContainer } from "@onlyoffice/apps-ui-kit";
 
 ## Properties
 
-| Prop              | Type              | Required | Default | Description                                              |
-| ----------------- | ----------------- | :------: | ------- | -------------------------------------------------------- |
-| `imageSrc`        | `string`          |    ✓     | -       | URL source for the empty state image                     |
-| `imageAlt`        | `string`          |    ✓     | -       | Alternative text for the image for accessibility         |
-| `headerText`      | `string`          |    ✓     | -       | Main header text displayed below the image               |
-| `subheadingText`  | `string`          |    -     | -       | Optional subheading text displayed below the header      |
-| `descriptionText` | `string \| ReactNode` |  -   | -       | Optional description text or element below the subheading |
-| `buttons`         | `ReactNode`       |    -     | -       | Optional action buttons or interactive elements          |
-| `withoutFilter`   | `boolean`         |    -     | `false` | Whether to display without filter styling                |
-| `imageStyle`      | `CSSProperties`   |    -     | -       | Custom CSS styles for the image (desktop only)           |
-| `buttonStyle`     | `CSSProperties`   |    -     | -       | Custom CSS styles for the buttons container              |
-| `className`       | `string`          |    -     | -       | Additional CSS class name                                |
-| `id`              | `string`          |    -     | -       | HTML id attribute                                        |
-| `style`           | `CSSProperties`   |    -     | -       | Custom CSS styles for the container                      |
+| Prop              | Type                  | Required | Default | Description                                               |
+| ----------------- | --------------------- | :------: | ------- | --------------------------------------------------------- |
+| `imageSrc`        | `string`              |    ✓     | -       | URL source for the empty state image                      |
+| `imageAlt`        | `string`              |    ✓     | -       | Alternative text for the image for accessibility          |
+| `headerText`      | `string`              |    ✓     | -       | Main header text displayed below the image                |
+| `subheadingText`  | `string`              |    -     | -       | Optional subheading text displayed below the header       |
+| `descriptionText` | `string \| ReactNode` |    -     | -       | Optional description text or element below the subheading |
+| `buttons`         | `ReactNode`           |    -     | -       | Optional action buttons or interactive elements           |
+| `withoutFilter`   | `boolean`             |    -     | `false` | Whether to display without filter styling                 |
+| `imageStyle`      | `CSSProperties`       |    -     | -       | Custom CSS styles for the image (desktop only)            |
+| `buttonStyle`     | `CSSProperties`       |    -     | -       | Custom CSS styles for the buttons container               |
+| `className`       | `string`              |    -     | -       | Additional CSS class name                                 |
+| `id`              | `string`              |    -     | -       | HTML id attribute                                         |
+| `style`           | `CSSProperties`       |    -     | -       | Custom CSS styles for the container                       |
 
 ## Examples
 

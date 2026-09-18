@@ -76,4 +76,3 @@ const UpcomingPaymentRow: React.FC<UpcomingPaymentRowProps> = ({
 };
 
 export default observer(UpcomingPaymentRow);
-

@@ -29,7 +29,7 @@ getLogoUrl(WhiteLabelLogoType.LightSmall, true, false, "ru", true);
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
-| `index.ts` | `getLogoUrl` function |
-| `getLogoUrl.test.ts` | Unit tests (Vitest) |
+| File                 | Description           |
+| -------------------- | --------------------- |
+| `index.ts`           | `getLogoUrl` function |
+| `getLogoUrl.test.ts` | Unit tests (Vitest)   |

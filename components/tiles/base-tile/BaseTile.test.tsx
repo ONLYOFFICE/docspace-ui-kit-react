@@ -5,7 +5,10 @@ import { render, fireEvent, screen } from "@testing-library/react";
 import { BaseTile } from ".";
 import { BaseTileProps, TileChildProps } from "./BaseTile.types";
 import { ContextMenuButtonProps } from "../../context-menu-button/ContextMenuButton.types";
-import { ContextMenuProps, ContextMenuRefType } from "../../context-menu/ContextMenu.types";
+import {
+  ContextMenuProps,
+  ContextMenuRefType,
+} from "../../context-menu/ContextMenu.types";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({ t: (key: string) => key }),
@@ -113,14 +116,10 @@ describe("BaseTile", () => {
     element: <div data-testid="tile-icon">Tile Icon</div>,
   };
 
-  const TileTopContent = () => (
-    <div data-testid="top-content">Top Content</div>
-  );
+  const TileTopContent = () => <div data-testid="top-content">Top Content</div>;
 
   it("renders tile correctly", () => {
-    render(
-      <BaseTile {...defaultProps} topContent={<TileTopContent />} />,
-    );
+    render(<BaseTile {...defaultProps} topContent={<TileTopContent />} />);
     expect(screen.getByTestId("tile")).toBeTruthy();
     expect(screen.getByTestId("top-content")).toBeTruthy();
   });
@@ -160,9 +159,7 @@ describe("BaseTile", () => {
   });
 
   it("renders element icon when provided", () => {
-    render(
-      <BaseTile {...defaultProps} topContent={<TileTopContent />} />,
-    );
+    render(<BaseTile {...defaultProps} topContent={<TileTopContent />} />);
     expect(screen.getByTestId("tile-icon")).toBeTruthy();
   });
 

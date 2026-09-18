@@ -12,4 +12,3 @@ export interface CardProps {
   dataTestId?: string;
   footer?: React.ReactNode;
 }
-

@@ -40,9 +40,7 @@ export function useKeyboardAwareSheet(
     const apply = (sheet: HTMLElement) => {
       const keyboardHeight = Math.max(0, window.innerHeight - vv.height);
       sheet.style.bottom =
-        keyboardHeight > KEYBOARD_HEIGHT_THRESHOLD
-          ? `${keyboardHeight}px`
-          : "";
+        keyboardHeight > KEYBOARD_HEIGHT_THRESHOLD ? `${keyboardHeight}px` : "";
     };
 
     const update = () => {

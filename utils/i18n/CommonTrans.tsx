@@ -1,8 +1,13 @@
-import { type ReactNode, type ReactElement, cloneElement, Fragment, createElement } from "react";
+import {
+  type ReactNode,
+  type ReactElement,
+  cloneElement,
+  Fragment,
+  createElement,
+} from "react";
 import { getCommonTranslation } from "./i18n-utils";
 
-export type CommonTransComponent =
-  ReactElement<{ children?: ReactNode }>;
+export type CommonTransComponent = ReactElement<{ children?: ReactNode }>;
 
 function renderCommonTrans(
   template: string,
@@ -43,14 +48,8 @@ function renderCommonTrans(
       const tagName = match[3];
       const content = match[4];
       const children = renderCommonTrans(content, values, components);
-      
-      result.push(
-        createElement(
-          tagName,
-          { key: result.length },
-          ...children,
-        ),
-      );
+
+      result.push(createElement(tagName, { key: result.length }, ...children));
     }
 
     // {{value}}

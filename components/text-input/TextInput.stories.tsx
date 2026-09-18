@@ -186,7 +186,14 @@ export const Default: Story = {
 
 const SizesTemplate = () => {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "16px", alignItems: "flex-start" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+        alignItems: "flex-start",
+      }}
+    >
       {(Object.keys(InputSize) as Array<InputSize>).map((size) => (
         <ControlledInput
           key={size}
@@ -369,11 +376,7 @@ export const WithMask: Story = {
 const ScaledTemplate = () => {
   return (
     <div style={{ display: "grid", gridGap: "16px" }}>
-      <ControlledInput
-        scale
-        initialValue="Scaled base"
-        size={InputSize.base}
-      />
+      <ControlledInput scale initialValue="Scaled base" size={InputSize.base} />
       <ControlledInput
         scale
         initialValue="Scaled middle"
@@ -431,9 +434,23 @@ export const CssCustomization: Story = {
         } as CSSProperties
       }
     >
-      <TextInput type={InputType.text} value="Custom styled input" onChange={() => {}} />
-      <TextInput type={InputType.text} value="" placeholder="Placeholder text" onChange={() => {}} />
-      <TextInput type={InputType.text} value="Disabled" isDisabled onChange={() => {}} />
+      <TextInput
+        type={InputType.text}
+        value="Custom styled input"
+        onChange={() => {}}
+      />
+      <TextInput
+        type={InputType.text}
+        value=""
+        placeholder="Placeholder text"
+        onChange={() => {}}
+      />
+      <TextInput
+        type={InputType.text}
+        value="Disabled"
+        isDisabled
+        onChange={() => {}}
+      />
     </div>
   ),
   parameters: {

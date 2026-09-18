@@ -106,8 +106,10 @@ const MCPServersSelector = ({
         // is relative, so the browser resolves it against the portal origin
         // the app is already served from.
         icon:
-          getServerIcon(isSystem ? ServerType.Portal : ServerType.Custom, isBase) ??
-          "",
+          getServerIcon(
+            isSystem ? ServerType.Portal : ServerType.Custom,
+            isBase,
+          ) ?? "",
         isMCP: true,
         isSelected: initedSelectedServers?.includes(name),
       };

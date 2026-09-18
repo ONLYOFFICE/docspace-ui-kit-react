@@ -56,7 +56,11 @@ const SpendAmount = ({
         place="top-end"
         getContent={() => (
           <Text fontSize="12px" noSelect>
-            {formatterCurrencyWithoutTranction(language, amount, amountCurrency)}
+            {formatterCurrencyWithoutTranction(
+              language,
+              amount,
+              amountCurrency,
+            )}
           </Text>
         )}
         dataTestId={`${tooltipId}_tooltip`}

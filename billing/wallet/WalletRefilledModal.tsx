@@ -133,4 +133,3 @@ const WalletRefilledModal = (props: WalletRefilledModalProps) => {
 };
 
 export default observer(WalletRefilledModal);
-

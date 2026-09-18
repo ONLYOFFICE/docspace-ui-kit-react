@@ -220,10 +220,7 @@ export const Sizes: Story = {
 const StatesTemplate = () => {
   return (
     <Wrapper>
-      <ControlledInputBlock
-        {...defaultProps}
-        placeholder="Normal"
-      />
+      <ControlledInputBlock {...defaultProps} placeholder="Normal" />
       <ControlledInputBlock
         {...defaultProps}
         hasError

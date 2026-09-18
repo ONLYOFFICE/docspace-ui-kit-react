@@ -9,7 +9,10 @@ React hook for managing CSS-based animation states with custom event dispatching
 ## Usage
 
 ```tsx
-import { useAnimation, AnimationEvents } from '@onlyoffice/apps-ui-kit/hooks/useAnimation';
+import {
+  useAnimation,
+  AnimationEvents,
+} from "@onlyoffice/apps-ui-kit/hooks/useAnimation";
 
 function AnimatedComponent({ isActive }: { isActive: boolean }) {
   const {
@@ -33,10 +36,16 @@ function AnimatedComponent({ isActive }: { isActive: boolean }) {
     };
 
     // Dispatch when your CSS animation completes
-    animationElementRef.current?.addEventListener('animationend', handleAnimationEnd);
+    animationElementRef.current?.addEventListener(
+      "animationend",
+      handleAnimationEnd,
+    );
 
     return () => {
-      animationElementRef.current?.removeEventListener('animationend', handleAnimationEnd);
+      animationElementRef.current?.removeEventListener(
+        "animationend",
+        handleAnimationEnd,
+      );
     };
   }, []);
 
@@ -45,11 +54,11 @@ function AnimatedComponent({ isActive }: { isActive: boolean }) {
       <div
         ref={animationElementRef}
         style={{
-          width: animationPhase === 'finish' ? `${endWidth}%` : undefined,
+          width: animationPhase === "finish" ? `${endWidth}%` : undefined,
         }}
         className={`animation-${animationPhase}`}
       >
-        {isAnimationReady && 'Animating...'}
+        {isAnimationReady && "Animating..."}
       </div>
       <button onClick={handleClick}>Start Animation</button>
     </div>
@@ -89,10 +98,10 @@ The hook dispatches and listens to custom window events:
 
 ```typescript
 export const AnimationEvents = {
-  END_ANIMATION: "ANIMATION_END",           // Dispatch this to end the animation
-  ANIMATION_STARTED: "ANIMATION_STARTED",   // Dispatched when animation starts
-  ANIMATION_ENDED: "ANIMATION_ENDED",       // Dispatched when animation fully completes
-  Forced_Animation: "FORCED_ANIMATION",     // Reserved for forced animations
+  END_ANIMATION: "ANIMATION_END", // Dispatch this to end the animation
+  ANIMATION_STARTED: "ANIMATION_STARTED", // Dispatched when animation starts
+  ANIMATION_ENDED: "ANIMATION_ENDED", // Dispatched when animation fully completes
+  Forced_Animation: "FORCED_ANIMATION", // Reserved for forced animations
 };
 ```
 

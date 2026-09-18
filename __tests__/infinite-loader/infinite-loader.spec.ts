@@ -15,7 +15,9 @@ async function gotoStory(page: Page, storyId: string) {
 test.describe("InfiniteLoader — light", () => {
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
-    await expect(page).toHaveScreenshot("infinite-loader-css-customization.png");
+    await expect(page).toHaveScreenshot(
+      "infinite-loader-css-customization.png",
+    );
   });
 });
 

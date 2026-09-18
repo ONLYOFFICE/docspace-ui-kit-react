@@ -50,6 +50,8 @@ test.describe("PortalLogo — dark", () => {
     await page.setViewportSize({ width: 500, height: 600 });
     await gotoStory(page, "css-customization");
     await page.evaluate(() => document.body.classList.add("dark"));
-    await expect(page).toHaveScreenshot("portal-logo-css-customization-dark.png");
+    await expect(page).toHaveScreenshot(
+      "portal-logo-css-customization-dark.png",
+    );
   });
 });

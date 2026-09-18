@@ -9,7 +9,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { analyseStylesheet, collect, orderedStylesheets } from "./order-styles.mjs";
+import {
+  analyseStylesheet,
+  collect,
+  orderedStylesheets,
+} from "./order-styles.mjs";
 
 const DIST = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -72,7 +76,8 @@ console.log("dist/ carries no bundled dependencies.");
 // statement. Searching the whole text for the quoted string counts a mention
 // in a comment or in documentation as a real directive, which fails the build
 // for no reason.
-const DIRECTIVE = /^\s*(?:\/\*[\s\S]*?\*\/\s*|\/\/[^\n]*\n\s*)*["']use client["']\s*;?/;
+const DIRECTIVE =
+  /^\s*(?:\/\*[\s\S]*?\*\/\s*|\/\/[^\n]*\n\s*)*["']use client["']\s*;?/;
 
 /** Module ids (paths relative to `dir`, extension stripped) carrying the directive. */
 const modulesWithDirective = (dir, exts) => {
@@ -118,9 +123,12 @@ const inSource = new Set(
     .readdirSync(SOURCE_ROOT, { withFileTypes: true })
     .filter((e) => e.isDirectory() && !SKIP.includes(e.name))
     .flatMap((e) =>
-      [...modulesWithDirective(path.join(SOURCE_ROOT, e.name), [".ts", ".tsx"])].map(
-        (id) => moduleId(`${e.name}/${id}`),
-      ),
+      [
+        ...modulesWithDirective(path.join(SOURCE_ROOT, e.name), [
+          ".ts",
+          ".tsx",
+        ]),
+      ].map((id) => moduleId(`${e.name}/${id}`)),
     ),
 );
 
@@ -136,7 +144,10 @@ const missing = [...inSource].filter((id) => !inDist.has(id)).sort();
 if (missing.length > 0) {
   console.error(
     `\n  "use client" is missing from ${missing.length} built module(s):\n` +
-      missing.slice(0, 10).map((id) => `    ${id}`).join("\n") +
+      missing
+        .slice(0, 10)
+        .map((id) => `    ${id}`)
+        .join("\n") +
       (missing.length > 10 ? `\n    ... and ${missing.length - 10} more` : "") +
       "\n\n  Rollup strips module-level directives, so Next.js App Router consumers " +
       "will\n  break on the first interactive component. Check preserveUseClient " +
@@ -251,7 +262,9 @@ const CSS_IMPORT_RE = /^import\s+["'](\.[^"']+\.css)["'];?/gm;
 for (const id of collect(path.join(DIST, "esm"))) {
   const code = fs.readFileSync(path.join(DIST, "esm", id), "utf8");
   for (const m of code.matchAll(CSS_IMPORT_RE)) {
-    cssImports.add(path.posix.normalize(path.posix.join(path.posix.dirname(id), m[1])));
+    cssImports.add(
+      path.posix.normalize(path.posix.join(path.posix.dirname(id), m[1])),
+    );
   }
 }
 
@@ -261,20 +274,29 @@ for (const file of stylesheets) {
   const proxy = file.replace(/index\.css$/, "index.js");
   const ownProxy = fs.existsSync(path.join(DIST, "esm", proxy));
   const importedByOwnProxy =
-    ownProxy && fs.readFileSync(path.join(DIST, "esm", proxy), "utf8").startsWith('import "./index.css";');
+    ownProxy &&
+    fs
+      .readFileSync(path.join(DIST, "esm", proxy), "utf8")
+      .startsWith('import "./index.css";');
 
   if ((ownProxy && !importedByOwnProxy) || !cssImports.has(file)) {
     detached += 1;
-    console.error(`  ${file}: ${ownProxy ? "not imported by its proxy" : "imported by no chunk"}`);
+    console.error(
+      `  ${file}: ${ownProxy ? "not imported by its proxy" : "imported by no chunk"}`,
+    );
   }
 }
 
 if (detached > 0) {
-  console.error(`\n  ${detached} stylesheet(s) are detached from the modules that need them.\n`);
+  console.error(
+    `\n  ${detached} stylesheet(s) are detached from the modules that need them.\n`,
+  );
   process.exit(1);
 }
 
-console.log(`Per-module CSS: ${stylesheets.length} stylesheets, every one imported by the modules that use it.`);
+console.log(
+  `Per-module CSS: ${stylesheets.length} stylesheets, every one imported by the modules that use it.`,
+);
 
 // The cascade in the assembled dist/styles.css has to match the order the
 // modules would have injected their styles in: a module's rules after

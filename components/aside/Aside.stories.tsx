@@ -136,10 +136,7 @@ const Template = (args: AsideProps) => {
         <Text fontSize="22px" fontWeight={600}>
           Documents
         </Text>
-        <Text
-          fontSize="13px"
-          style={{ marginTop: "8px", color: "#a3a9ae" }}
-        >
+        <Text fontSize="13px" style={{ marginTop: "8px", color: "#a3a9ae" }}>
           Click the button below to open the side panel.
         </Text>
         <Button
@@ -250,15 +247,16 @@ const UserProfileContent = () => (
         gap: "12px",
       }}
     >
-      <Avatar size={AvatarSize.big} userName="John Smith" role={AvatarRole.owner} />
+      <Avatar
+        size={AvatarSize.big}
+        userName="John Smith"
+        role={AvatarRole.owner}
+      />
       <div style={{ textAlign: "center" }}>
         <Text fontSize="16px" fontWeight={700}>
           John Smith
         </Text>
-        <Text
-          fontSize="13px"
-          style={{ marginTop: "4px", color: "#a3a9ae" }}
-        >
+        <Text fontSize="13px" style={{ marginTop: "4px", color: "#a3a9ae" }}>
           john.smith@company.com
         </Text>
         <div style={{ marginTop: "8px" }}>
@@ -267,7 +265,14 @@ const UserProfileContent = () => (
       </div>
     </div>
 
-    <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "16px" }}>
+    <div
+      style={{
+        padding: "16px 20px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+      }}
+    >
       <div>
         <Label text="First Name" />
         <TextInput
@@ -368,7 +373,11 @@ const FileDetailsContent = () => (
             padding: "8px 0",
           }}
         >
-          <Avatar size={AvatarSize.min} userName={name} role={AvatarRole.user} />
+          <Avatar
+            size={AvatarSize.min}
+            userName={name}
+            role={AvatarRole.user}
+          />
           <Text fontSize="13px">{name}</Text>
         </div>
       ))}
@@ -395,13 +404,11 @@ const CssCustomizationTemplate = () => (
       } as CSSProperties
     }
   >
-    <Aside
-      visible
-      header="Settings"
-      onClose={() => {}}
-    >
+    <Aside visible header="Settings" onClose={() => {}}>
       <div style={{ padding: "20px" }}>
-        <p style={{ margin: "0 0 12px", fontWeight: 600, color: "#004f82" }}>Custom styled panel</p>
+        <p style={{ margin: "0 0 12px", fontWeight: 600, color: "#004f82" }}>
+          Custom styled panel
+        </p>
         <p style={{ margin: 0, fontSize: "13px", color: "#5aa9d0" }}>
           Background, width, header color and border customized via CSS vars.
         </p>

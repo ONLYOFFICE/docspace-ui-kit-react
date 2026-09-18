@@ -1,10 +1,5 @@
 export type TextAlignValue =
-  | "start"
-  | "end"
-  | "left"
-  | "right"
-  | "center"
-  | "justify";
+  "start" | "end" | "left" | "right" | "center" | "justify";
 
 /**
  * Snackbar properties.
@@ -86,7 +81,7 @@ export type SnackbarProps = {
   onClose?: () => void;
 
   skipBlur?: boolean;
-   /**
+  /**
    * Specifies additional information text next to the header.
    */
   additionalHeaderText?: string;

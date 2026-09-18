@@ -1,19 +1,19 @@
-import { renderHook } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import { useIsomorphicLayoutEffect } from './index';
-import { useEffect, useLayoutEffect } from 'react';
+import { renderHook } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { useIsomorphicLayoutEffect } from "./index";
+import { useEffect, useLayoutEffect } from "react";
 
-describe('useIsomorphicLayoutEffect', () => {
-  it('should be defined', () => {
+describe("useIsomorphicLayoutEffect", () => {
+  it("should be defined", () => {
     expect(useIsomorphicLayoutEffect).toBeDefined();
-    expect(typeof useIsomorphicLayoutEffect).toBe('function');
+    expect(typeof useIsomorphicLayoutEffect).toBe("function");
   });
 
-  it('should use useLayoutEffect in browser environment', () => {
+  it("should use useLayoutEffect in browser environment", () => {
     expect(useIsomorphicLayoutEffect).toBe(useLayoutEffect);
   });
 
-  it('should execute effect callback', () => {
+  it("should execute effect callback", () => {
     const effectCallback = vi.fn();
 
     renderHook(() => {
@@ -23,7 +23,7 @@ describe('useIsomorphicLayoutEffect', () => {
     expect(effectCallback).toHaveBeenCalledTimes(1);
   });
 
-  it('should execute effect callback with dependencies', () => {
+  it("should execute effect callback with dependencies", () => {
     const effectCallback = vi.fn();
 
     const { rerender } = renderHook(
@@ -32,7 +32,7 @@ describe('useIsomorphicLayoutEffect', () => {
       },
       {
         initialProps: { dep: 1 },
-      }
+      },
     );
 
     expect(effectCallback).toHaveBeenCalledTimes(1);
@@ -44,7 +44,7 @@ describe('useIsomorphicLayoutEffect', () => {
     expect(effectCallback).toHaveBeenCalledTimes(2);
   });
 
-  it('should call cleanup function on unmount', () => {
+  it("should call cleanup function on unmount", () => {
     const cleanup = vi.fn();
     const effectCallback = vi.fn(() => cleanup);
 
@@ -59,7 +59,7 @@ describe('useIsomorphicLayoutEffect', () => {
     expect(cleanup).toHaveBeenCalledTimes(1);
   });
 
-  it('should call cleanup function when dependencies change', () => {
+  it("should call cleanup function when dependencies change", () => {
     const cleanup = vi.fn();
     const effectCallback = vi.fn(() => cleanup);
 
@@ -69,7 +69,7 @@ describe('useIsomorphicLayoutEffect', () => {
       },
       {
         initialProps: { dep: 1 },
-      }
+      },
     );
 
     expect(cleanup).not.toHaveBeenCalled();
@@ -81,7 +81,7 @@ describe('useIsomorphicLayoutEffect', () => {
     expect(effectCallback).toHaveBeenCalledTimes(2);
   });
 
-  it('should work with empty dependency array', () => {
+  it("should work with empty dependency array", () => {
     const effectCallback = vi.fn();
 
     const { rerender } = renderHook(() => {
@@ -96,7 +96,7 @@ describe('useIsomorphicLayoutEffect', () => {
     expect(effectCallback).toHaveBeenCalledTimes(1);
   });
 
-  it('should work without dependency array', () => {
+  it("should work without dependency array", () => {
     const effectCallback = vi.fn();
 
     const { rerender } = renderHook(() => {
@@ -110,7 +110,7 @@ describe('useIsomorphicLayoutEffect', () => {
     expect(effectCallback).toHaveBeenCalledTimes(2);
   });
 
-  it('should handle multiple dependencies', () => {
+  it("should handle multiple dependencies", () => {
     const effectCallback = vi.fn();
 
     const { rerender } = renderHook(
@@ -118,23 +118,23 @@ describe('useIsomorphicLayoutEffect', () => {
         useIsomorphicLayoutEffect(effectCallback, [dep1, dep2]);
       },
       {
-        initialProps: { dep1: 1, dep2: 'a' },
-      }
+        initialProps: { dep1: 1, dep2: "a" },
+      },
     );
 
     expect(effectCallback).toHaveBeenCalledTimes(1);
 
-    rerender({ dep1: 1, dep2: 'a' });
+    rerender({ dep1: 1, dep2: "a" });
     expect(effectCallback).toHaveBeenCalledTimes(1);
 
-    rerender({ dep1: 2, dep2: 'a' });
+    rerender({ dep1: 2, dep2: "a" });
     expect(effectCallback).toHaveBeenCalledTimes(2);
 
-    rerender({ dep1: 2, dep2: 'b' });
+    rerender({ dep1: 2, dep2: "b" });
     expect(effectCallback).toHaveBeenCalledTimes(3);
   });
 
-  it('should handle object and array dependencies correctly', () => {
+  it("should handle object and array dependencies correctly", () => {
     const effectCallback = vi.fn();
     const obj = { value: 1 };
     const arr = [1, 2, 3];
@@ -145,7 +145,7 @@ describe('useIsomorphicLayoutEffect', () => {
       },
       {
         initialProps: { objDep: obj, arrDep: arr },
-      }
+      },
     );
 
     expect(effectCallback).toHaveBeenCalledTimes(1);
@@ -160,54 +160,54 @@ describe('useIsomorphicLayoutEffect', () => {
     expect(effectCallback).toHaveBeenCalledTimes(3);
   });
 
-  it('should execute synchronously like useLayoutEffect', () => {
+  it("should execute synchronously like useLayoutEffect", () => {
     const executionOrder: string[] = [];
 
     renderHook(() => {
-      executionOrder.push('render');
+      executionOrder.push("render");
 
       useIsomorphicLayoutEffect(() => {
-        executionOrder.push('effect');
+        executionOrder.push("effect");
       });
 
-      executionOrder.push('after-hook');
+      executionOrder.push("after-hook");
     });
 
-    expect(executionOrder).toEqual(['render', 'after-hook', 'effect']);
+    expect(executionOrder).toEqual(["render", "after-hook", "effect"]);
   });
 
-  it('should handle errors in effect callback', () => {
+  it("should handle errors in effect callback", () => {
     const consoleErrorSpy = vi
-      .spyOn(console, 'error')
+      .spyOn(console, "error")
       .mockImplementation(() => {});
 
     expect(() => {
       renderHook(() => {
         useIsomorphicLayoutEffect(() => {
-          throw new Error('Effect error');
+          throw new Error("Effect error");
         });
       });
-    }).toThrow('Effect error');
+    }).toThrow("Effect error");
 
     consoleErrorSpy.mockRestore();
   });
 
-  it('should handle errors in cleanup function', () => {
+  it("should handle errors in cleanup function", () => {
     const consoleErrorSpy = vi
-      .spyOn(console, 'error')
+      .spyOn(console, "error")
       .mockImplementation(() => {});
 
     const { unmount } = renderHook(() => {
       useIsomorphicLayoutEffect(() => {
         return () => {
-          throw new Error('Cleanup error');
+          throw new Error("Cleanup error");
         };
       });
     });
 
     expect(() => {
       unmount();
-    }).toThrow('Cleanup error');
+    }).toThrow("Cleanup error");
 
     consoleErrorSpy.mockRestore();
   });

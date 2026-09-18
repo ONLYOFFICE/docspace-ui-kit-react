@@ -88,7 +88,9 @@ export const getCommonTranslation = (
   namespaces: string[] = DEFAULT_NAMESPACES,
 ): string => {
   if (typeof window === "undefined") {
-    const inst = commonI18nInstance ?? (i18ninstance.isInitialized ? i18ninstance : undefined);
+    const inst =
+      commonI18nInstance ??
+      (i18ninstance.isInitialized ? i18ninstance : undefined);
     if (!inst) return "";
     const result = inst.t(key, {
       ...(interpolation as Record<string, string | number>),

@@ -168,9 +168,8 @@ const names = Object.keys(entries).sort();
 const surface = {
   // Recorded so a diff taken against another branch says which barrel it read.
   entry: "index.ts",
-  package: JSON.parse(
-    fs.readFileSync(path.join(ROOT, "package.json"), "utf8"),
-  ).name,
+  package: JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"))
+    .name,
   total: names.length,
   values: names.filter((n) => !TYPE_ONLY.has(entries[n].kind)).length,
   exports: Object.fromEntries(names.map((n) => [n, entries[n]])),
@@ -251,21 +250,22 @@ const moved = names
 const pad = (n) => n.padEnd(34);
 
 if (removed.length) {
-  console.log(`\nRemoved -- breaks every plugin using them (${removed.length}):`);
+  console.log(
+    `\nRemoved -- breaks every plugin using them (${removed.length}):`,
+  );
   for (const n of removed) console.log(`  - ${pad(n)}was ${before[n].origin}`);
 }
 
 if (changed.length) {
   console.log(`\nKind changed (${changed.length}):`);
   for (const n of changed)
-    console.log(
-      `  ~ ${pad(n)}${before[n].kind} -> ${surface.exports[n].kind}`,
-    );
+    console.log(`  ~ ${pad(n)}${before[n].kind} -> ${surface.exports[n].kind}`);
 }
 
 if (added.length) {
   console.log(`\nAdded (${added.length}):`);
-  for (const n of added) console.log(`  + ${pad(n)}${surface.exports[n].origin}`);
+  for (const n of added)
+    console.log(`  + ${pad(n)}${surface.exports[n].origin}`);
 }
 
 if (moved.length) {

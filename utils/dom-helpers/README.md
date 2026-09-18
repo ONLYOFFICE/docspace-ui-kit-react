@@ -30,6 +30,7 @@ console.log(`Viewport: ${width}x${height}`);
 Gets the absolute offset position of an element relative to the document.
 
 **Parameters:**
+
 - `el?` (HTMLElement | null) - The element to get offset for
 
 **Returns:** `{ top: number | "auto", left: number | "auto" }` - Element offset
@@ -49,6 +50,7 @@ console.log(`Position: top=${offset.top}, left=${offset.left}`);
 Gets the outer width of an element, optionally including margins.
 
 **Parameters:**
+
 - `el` (HTMLElement) - The element to measure
 - `margin?` (string) - If truthy, includes margin in calculation
 
@@ -71,6 +73,7 @@ const widthWithMargin = DomHelpers.getOuterWidth(element, "true");
 Gets the outer width of a hidden element by temporarily making it visible.
 
 **Parameters:**
+
 - `element` (HTMLElement | null) - The hidden element to measure
 
 **Returns:** `number` - Element width in pixels
@@ -90,6 +93,7 @@ console.log(`Hidden element width: ${width}px`);
 Gets the outer height of a hidden element by temporarily making it visible.
 
 **Parameters:**
+
 - `element` (HTMLElement | null) - The hidden element to measure
 
 **Returns:** `number` - Element height in pixels
@@ -107,6 +111,7 @@ console.log(`Hidden element height: ${height}px`);
 Calculates the scrollbar width for a specific element or the browser default.
 
 **Parameters:**
+
 - `el?` (HTMLElement) - Optional element to calculate scrollbar width for
 
 **Returns:** `number` - Scrollbar width in pixels
@@ -119,7 +124,8 @@ const defaultWidth = DomHelpers.calculateScrollbarWidth();
 
 // Get scrollbar width for a specific scrollable element
 const scrollContainer = document.getElementById("scroll-container");
-const containerScrollbarWidth = DomHelpers.calculateScrollbarWidth(scrollContainer);
+const containerScrollbarWidth =
+  DomHelpers.calculateScrollbarWidth(scrollContainer);
 ```
 
 **Note:** When called without an element, the result is cached for subsequent calls.
@@ -255,7 +261,7 @@ function animateHeight(element: HTMLElement, show: boolean) {
       () => {
         element.style.display = "none";
       },
-      { once: true }
+      { once: true },
     );
   }
 }
@@ -263,10 +269,10 @@ function animateHeight(element: HTMLElement, show: boolean) {
 
 ## Static Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
+| Property                   | Type             | Description                    |
+| -------------------------- | ---------------- | ------------------------------ |
 | `calculatedScrollbarWidth` | `number \| null` | Cached browser scrollbar width |
-| `zIndex` | `number` | Current z-index counter value |
+| `zIndex`                   | `number`         | Current z-index counter value  |
 
 ## SSR Considerations
 

@@ -49,9 +49,18 @@
   --slider-thumb-s: var(--slider-handle-size, var(--slider-thumb-size));
   --slider-radius: var(--slider-track-radius, var(--slider-border-radius));
   --slider-thumb-bg: var(--slider-handle-color, var(--slider-thumb-background));
-  --slider-track-color: var(--slider-background-color, var(--slider-background));
-  --slider-filled-color: var(--slider-fill-color, var(--slider-range-track-background));
-  --slider-fill-image: var(--slider-pouring-image, var(--slider-background-image));
+  --slider-track-color: var(
+    --slider-background-color,
+    var(--slider-background)
+  );
+  --slider-filled-color: var(
+    --slider-fill-color,
+    var(--slider-range-track-background)
+  );
+  --slider-fill-image: var(
+    --slider-pouring-image,
+    var(--slider-background-image)
+  );
 
   width: 100%;
   margin: 24px 0;

@@ -144,7 +144,12 @@ export const Resizable: Story = {
   render: (args) => <TableHeaderCell {...args} />,
   args: {
     ...Default.args,
-    column: { ...Default.args?.column, key: "name", title: "Name", resizable: true },
+    column: {
+      ...Default.args?.column,
+      key: "name",
+      title: "Name",
+      resizable: true,
+    },
     resizable: true,
   },
   parameters: {

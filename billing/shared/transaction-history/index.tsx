@@ -625,4 +625,3 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
 };
 
 export default observer(TransactionHistory);
-

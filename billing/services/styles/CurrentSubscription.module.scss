@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin:20px 0;
+  margin: 20px 0;
 }
 
 .subscriptionCard {
@@ -41,14 +41,10 @@
   gap: 2px;
 }
 
-
-
 .priceInfo {
   display: flex;
   align-items: center;
 }
-
-
 
 .renewalInfo {
   color: var(--payment-dialog-text);

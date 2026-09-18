@@ -72,8 +72,9 @@ describe("TileContent", () => {
       </TileContent>,
     );
 
-    const element = screen.getByTestId("child-content").parentElement
-      ?.parentElement?.parentElement;
+    const element =
+      screen.getByTestId("child-content").parentElement?.parentElement
+        ?.parentElement;
     if (element) {
       fireEvent.click(element);
       expect(onClick).toHaveBeenCalled();

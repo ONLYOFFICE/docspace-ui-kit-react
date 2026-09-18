@@ -26,4 +26,3 @@ export function getCorrectDate(
 
   return `${curDate} ${curTime}`;
 }
-

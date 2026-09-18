@@ -138,13 +138,13 @@ export const VariantStory: Story = {
 
 ## Story Naming Conventions
 
-| Pattern | Example |
-|---------|---------|
-| Default interactive | `Default` |
-| Size variants | `Sizes` or `SmallSize`, `LargeSize` |
-| State variants | `DisabledState`, `LoadingState`, `HoveredState` |
-| Type/style variants | `PrimaryButtons`, `SecondaryButtons` |
-| Feature demos | `WithIcon`, `WithTooltip`, `WithCallback` |
+| Pattern             | Example                                         |
+| ------------------- | ----------------------------------------------- |
+| Default interactive | `Default`                                       |
+| Size variants       | `Sizes` or `SmallSize`, `LargeSize`             |
+| State variants      | `DisabledState`, `LoadingState`, `HoveredState` |
+| Type/style variants | `PrimaryButtons`, `SecondaryButtons`            |
+| Feature demos       | `WithIcon`, `WithTooltip`, `WithCallback`       |
 
 ## Categories
 
@@ -172,6 +172,7 @@ Rewrite the story for the badge component following the Button story pattern
 ```
 
 Claude will:
+
 1. Read the component's source to understand its props
 2. Read the existing story
 3. Rewrite the story following this template

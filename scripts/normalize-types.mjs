@@ -49,7 +49,7 @@ const SVG_REEXPORT =
   /export\s*\{\s*default as (\w+)\s*\}\s*from\s*"[^"]+\.svg";?/g;
 
 const SVG_COMPONENT_TYPE =
-  'React.FunctionComponent<React.SVGProps<SVGSVGElement> & { title?: string }>';
+  "React.FunctionComponent<React.SVGProps<SVGSVGElement> & { title?: string }>";
 
 const rewriteSvgReexports = (text) => {
   if (!SVG_REEXPORT.test(text)) return null;
@@ -158,8 +158,7 @@ const moveToIndexShape = () => {
 
   for (const file of walk(TYPES)) {
     // Where this file used to be, so its own `../` still mean what they meant.
-    const wasAt =
-      [...moved].find(([, to]) => to === file)?.[0] ?? file;
+    const wasAt = [...moved].find(([, to]) => to === file)?.[0] ?? file;
 
     const original = fs.readFileSync(file, "utf8");
 

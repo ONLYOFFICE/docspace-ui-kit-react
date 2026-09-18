@@ -399,11 +399,13 @@ const SubMenu = (props: SubMenuProps) => {
 
     const linkClassName = classNames("p-menuitem-link", "not-selectable", {
       "p-disabled": item.disabled || item.disableColor,
-      "p-disabled-styles-toggle": item.disabled && item.disabledStylesType === "toggle",
+      "p-disabled-styles-toggle":
+        item.disabled && item.disabledStylesType === "toggle",
     });
     const iconClassName = classNames("p-menuitem-icon", {
       "p-disabled": item.disabled || item.disableColor,
-      "p-disabled-styles-toggle": item.disabled && item.disabledStylesType === "toggle",
+      "p-disabled-styles-toggle":
+        item.disabled && item.disabledStylesType === "toggle",
     });
     const subMenuIconClassName = "p-submenu-icon";
 
@@ -421,7 +423,7 @@ const SubMenu = (props: SubMenuProps) => {
       }
 
       if (item.iconNode) {
-        return <span className={iconClassName || ""}>{item.iconNode}</span>
+        return <span className={iconClassName || ""}>{item.iconNode}</span>;
       }
 
       if (!item.icon) return null;

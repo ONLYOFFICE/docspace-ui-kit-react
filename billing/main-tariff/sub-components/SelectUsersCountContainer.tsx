@@ -8,7 +8,13 @@ import { usePaymentStore } from "../../store/PaymentStoreProvider";
 
 let formattedSizeTitle: string | null = null;
 const SelectUsersCountContainer = observer(
-  ({ isDisabled, isNeedPlusSign }: { isDisabled: boolean; isNeedPlusSign: boolean }) => {
+  ({
+    isDisabled,
+    isNeedPlusSign,
+  }: {
+    isDisabled: boolean;
+    isNeedPlusSign: boolean;
+  }) => {
     const store = usePaymentStore();
 
     const {
@@ -60,4 +66,3 @@ const SelectUsersCountContainer = observer(
 );
 
 export default SelectUsersCountContainer;
-

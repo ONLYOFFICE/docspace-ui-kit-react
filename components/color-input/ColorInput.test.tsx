@@ -6,13 +6,18 @@ import colorInputStyles from "./ColorInput.module.scss";
 import { InputSize } from "../text-input/TextInput.enums";
 
 vi.mock("../drop-down", async () => {
-  const actual = await vi.importActual<typeof import("../drop-down")>(
-    "../drop-down",
-  );
+  const actual =
+    await vi.importActual<typeof import("../drop-down")>("../drop-down");
 
   return {
     ...actual,
-    DropDown: ({ open, children }: { open?: boolean; children: React.ReactNode }) => (
+    DropDown: ({
+      open,
+      children,
+    }: {
+      open?: boolean;
+      children: React.ReactNode;
+    }) => (
       <div data-testid="dropdown" data-open={open ? "true" : "false"}>
         {children}
       </div>

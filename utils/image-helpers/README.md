@@ -13,7 +13,12 @@ Maps file extensions to icon URLs at various sizes (24, 32, 64, 96px). Provides 
 ## Import
 
 ```ts
-import { iconSize24, iconSize32, iconSize64, iconSize96 } from "../../utils/image-helpers";
+import {
+  iconSize24,
+  iconSize32,
+  iconSize64,
+  iconSize96,
+} from "../../utils/image-helpers";
 ```
 
 ## Usage
@@ -31,15 +36,15 @@ const fallback = iconSize32.get("file.svg");
 
 ## Exported Maps
 
-| Export | Sizes | Includes Room Icons |
-|--------|-------|-------------------|
-| `iconSize24` | 24px | No |
-| `iconSize32` | 32px | Yes |
-| `iconSize64` | 64px | No |
-| `iconSize96` | 96px | No |
+| Export       | Sizes | Includes Room Icons |
+| ------------ | ----- | ------------------- |
+| `iconSize24` | 24px  | No                  |
+| `iconSize32` | 32px  | Yes                 |
+| `iconSize64` | 64px  | No                  |
+| `iconSize96` | 96px  | No                  |
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
+| File       | Description                      |
+| ---------- | -------------------------------- |
 | `index.ts` | Icon maps generation and exports |

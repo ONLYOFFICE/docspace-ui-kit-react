@@ -123,11 +123,14 @@ const preview: Preview = {
       const currentColorScheme = isDark ? darkColorScheme : lightColorScheme;
 
       const translations: TTranslations = new Map([
-        ["en", new Map([
-          ["Common", enCommon],
-          ["Payments", enPayments],
-          ["Settings", enSettings],
-        ])],
+        [
+          "en",
+          new Map([
+            ["Common", enCommon],
+            ["Payments", enPayments],
+            ["Settings", enSettings],
+          ]),
+        ],
       ]);
 
       const isDocs = context.viewMode === "docs";

@@ -65,10 +65,22 @@
 }
 
 .roomType {
-  --room-type-item-bg-value: var(--room-type-item-bg, var(--room-type-list-item-background));
-  --room-type-item-border-value: var(--room-type-item-border, var(--room-type-list-item-border));
-  --room-type-item-hover-bg-value: var(--room-type-item-hover-bg, var(--room-type-list-item-hover-background));
-  --room-type-description-color-value: var(--room-type-description-color, var(--room-type-list-item-description-text));
+  --room-type-item-bg-value: var(
+    --room-type-item-bg,
+    var(--room-type-list-item-background)
+  );
+  --room-type-item-border-value: var(
+    --room-type-item-border,
+    var(--room-type-list-item-border)
+  );
+  --room-type-item-hover-bg-value: var(
+    --room-type-item-hover-bg,
+    var(--room-type-list-item-hover-background)
+  );
+  --room-type-description-color-value: var(
+    --room-type-description-color,
+    var(--room-type-list-item-description-text)
+  );
   --room-type-item-border-radius: var(--room-type-item-radius, 6px);
   --room-type-item-inner-padding: var(--room-type-item-padding, 16px);
   --room-type-item-gap: var(--room-type-gap, 12px);

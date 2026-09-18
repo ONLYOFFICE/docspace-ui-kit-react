@@ -14,21 +14,21 @@ import { CategoryItem } from "@onlyoffice/apps-ui-kit/components/category-item";
   onClickLink={handleClick}
   withPaidBadge={false}
   badgeLabel="Paid"
-/>
+/>;
 ```
 
 ## Properties
 
-| Prop            | Type                                  | Default | Description                                      |
-|-----------------|---------------------------------------|---------|--------------------------------------------------|
-| `title`         | `string`                              | —       | Category heading text displayed as a link        |
-| `subtitle`      | `string`                              | —       | Description text below the title                 |
-| `url`           | `string`                              | —       | Navigation URL for the category link             |
-| `onClickLink`   | `(e: MouseEvent) => void`            | —       | Click handler for the category link              |
-| `isDisabled`    | `boolean`                             | `false` | Disables the link and dims the description       |
-| `withPaidBadge` | `boolean`                             | —       | Shows a "Paid" badge next to the title           |
-| `badgeLabel`    | `string`                              | —       | Text displayed inside the paid badge             |
-| `dataTestId`    | `string`                              | —       | Test ID for automated testing                    |
+| Prop            | Type                      | Default | Description                                |
+| --------------- | ------------------------- | ------- | ------------------------------------------ |
+| `title`         | `string`                  | —       | Category heading text displayed as a link  |
+| `subtitle`      | `string`                  | —       | Description text below the title           |
+| `url`           | `string`                  | —       | Navigation URL for the category link       |
+| `onClickLink`   | `(e: MouseEvent) => void` | —       | Click handler for the category link        |
+| `isDisabled`    | `boolean`                 | `false` | Disables the link and dims the description |
+| `withPaidBadge` | `boolean`                 | —       | Shows a "Paid" badge next to the title     |
+| `badgeLabel`    | `string`                  | —       | Text displayed inside the paid badge       |
+| `dataTestId`    | `string`                  | —       | Test ID for automated testing              |
 
 ## Examples
 

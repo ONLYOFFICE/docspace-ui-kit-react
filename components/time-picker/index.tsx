@@ -2,11 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import classNames from "classnames";
 import type { DateTime } from "luxon";
 
-import {
-  InputSize,
-  InputType,
-  TextInput,
-} from "../text-input";
+import { InputSize, InputType, TextInput } from "../text-input";
 
 import {
   parseToDateTime,
@@ -97,7 +93,7 @@ const TimePicker = ({
   useEffect(() => {
     if (focusOnRender && hoursInputRef.current) hoursInputRef.current.select();
     mountRef.current = true;
-  }, [focusOnRender]); 
+  }, [focusOnRender]);
 
   const changeMinutes = (time: string) => {
     setMinutes(time);

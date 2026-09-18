@@ -114,8 +114,7 @@ import { AccessRightSelect } from "@onlyoffice/apps-ui-kit/components/access-rig
     },
     isMobileView: {
       control: "boolean",
-      description:
-        "Whether to render the dropdown in mobile-optimized layout",
+      description: "Whether to render the dropdown in mobile-optimized layout",
       table: { defaultValue: { summary: "false" } },
     },
     manualY: {
@@ -145,8 +144,7 @@ import { AccessRightSelect } from "@onlyoffice/apps-ui-kit/components/access-rig
     },
     isSelectionDisabled: {
       control: "boolean",
-      description:
-        "Disables selection and shows an error text when clicked",
+      description: "Disables selection and shows an error text when clicked",
       table: { defaultValue: { summary: "false" } },
     },
     topSpace: {
@@ -160,8 +158,7 @@ import { AccessRightSelect } from "@onlyoffice/apps-ui-kit/components/access-rig
     },
     fillIcon: {
       control: "boolean",
-      description:
-        "Whether to use filled icon style in modern view mode",
+      description: "Whether to use filled icon style in modern view mode",
       table: { defaultValue: { summary: "false" } },
     },
     isDefaultMode: {
@@ -182,8 +179,7 @@ import { AccessRightSelect } from "@onlyoffice/apps-ui-kit/components/access-rig
     type: {
       control: { type: "select" },
       options: [undefined, "badge", "onlyIcon", "descriptive"],
-      description:
-        "Display type variant for the selected option rendering",
+      description: "Display type variant for the selected option rendering",
     },
 
     className: { table: { disable: true } },

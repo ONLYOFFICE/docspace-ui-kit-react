@@ -40,7 +40,7 @@ import {
       </TableRow>
     ))}
   </TableBody>
-</TableContainer>
+</TableContainer>;
 ```
 
 ## Features
@@ -67,32 +67,32 @@ import {
 
 ### TableHeader
 
-| Prop                   | Type                | Default | Description                                |
-|------------------------|---------------------|---------|--------------------------------------------|
-| `columns`              | `TTableColumn[]`    | —       | Column definitions                         |
-| `columnStorageName`    | `string`            | —       | Storage key for persisting column sizes    |
-| `sectionWidth`         | `number`            | —       | Available width for the table              |
-| `sortBy`               | `string`            | —       | Currently sorted column key                |
-| `sorted`               | `boolean`           | —       | Whether sorting is active                  |
-| `useReactWindow`       | `boolean`           | —       | Enables virtualized rendering              |
-| `showSettings`         | `boolean`           | —       | Shows the column settings button           |
+| Prop                | Type             | Default | Description                             |
+| ------------------- | ---------------- | ------- | --------------------------------------- |
+| `columns`           | `TTableColumn[]` | —       | Column definitions                      |
+| `columnStorageName` | `string`         | —       | Storage key for persisting column sizes |
+| `sectionWidth`      | `number`         | —       | Available width for the table           |
+| `sortBy`            | `string`         | —       | Currently sorted column key             |
+| `sorted`            | `boolean`        | —       | Whether sorting is active               |
+| `useReactWindow`    | `boolean`        | —       | Enables virtualized rendering           |
+| `showSettings`      | `boolean`        | —       | Shows the column settings button        |
 
 ### TableBody
 
-| Prop                   | Type                                    | Default | Description                                |
-|------------------------|-----------------------------------------|---------|--------------------------------------------|
-| `fetchMoreFiles`       | `(params: IndexRange) => Promise<void>` | —       | Callback to load more rows                 |
-| `filesLength`          | `number`                                | —       | Number of currently loaded rows            |
-| `hasMoreFiles`         | `boolean`                               | —       | Whether more rows are available            |
-| `itemCount`            | `number`                                | —       | Total row count                            |
-| `itemHeight`           | `number`                                | —       | Height of each row in pixels               |
-| `useReactWindow`       | `boolean`                               | —       | Enables virtualized rendering              |
+| Prop             | Type                                    | Default | Description                     |
+| ---------------- | --------------------------------------- | ------- | ------------------------------- |
+| `fetchMoreFiles` | `(params: IndexRange) => Promise<void>` | —       | Callback to load more rows      |
+| `filesLength`    | `number`                                | —       | Number of currently loaded rows |
+| `hasMoreFiles`   | `boolean`                               | —       | Whether more rows are available |
+| `itemCount`      | `number`                                | —       | Total row count                 |
+| `itemHeight`     | `number`                                | —       | Height of each row in pixels    |
+| `useReactWindow` | `boolean`                               | —       | Enables virtualized rendering   |
 
 ### TableRow
 
-| Prop                   | Type                      | Default | Description                                |
-|------------------------|---------------------------|---------|--------------------------------------------|
-| `contextOptions`       | `ContextMenuModel[]`      | —       | Context menu items for the row             |
-| `getContextModel`      | `() => ContextMenuModel[]`| —       | Dynamic context menu model getter          |
-| `checked`              | `boolean`                 | —       | Whether the row is selected                |
-| `dragging`             | `boolean`                 | —       | Whether the row is being dragged           |
+| Prop              | Type                       | Default | Description                       |
+| ----------------- | -------------------------- | ------- | --------------------------------- |
+| `contextOptions`  | `ContextMenuModel[]`       | —       | Context menu items for the row    |
+| `getContextModel` | `() => ContextMenuModel[]` | —       | Dynamic context menu model getter |
+| `checked`         | `boolean`                  | —       | Whether the row is selected       |
+| `dragging`        | `boolean`                  | —       | Whether the row is being dragged  |

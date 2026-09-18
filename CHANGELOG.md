@@ -7,7 +7,7 @@ First release of this package under its own name and from its own repository. It
 root; it is now `@onlyoffice/apps-ui-kit`, built and consumed as a package. The version
 aligns with the DocSpace 4.0 line rather than continuing the old numbering.
 
-Everything under *Changed* is breaking for a consumer that previously resolved the source
+Everything under _Changed_ is breaking for a consumer that previously resolved the source
 tree.
 
 ## Changed

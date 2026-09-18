@@ -128,7 +128,8 @@ export const Oval: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Oval spinner animation, commonly used for inline loading states.",
+        story:
+          "Oval spinner animation, commonly used for inline loading states.",
       },
       source: {
         code: `<Loader type={LoaderTypes.oval} size="40px" color={globalColors.loaderLight} />`,

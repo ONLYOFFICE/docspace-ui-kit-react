@@ -41,7 +41,10 @@ $control-outset: $control-gap + $control-size + $control-inset;
 
 .quickActions {
   --_tile-bg: var(--quick-actions-tile-bg, #{colors.$gray-light});
-  --_tile-bg-hover: var(--quick-actions-tile-bg-hover, #{colors.$gray-light-mid});
+  --_tile-bg-hover: var(
+    --quick-actions-tile-bg-hover,
+    #{colors.$gray-light-mid}
+  );
   --_tile-color: var(--quick-actions-tile-color, #{colors.$black});
   // Cap on a single tile's width. Consumers that want the tiles to fill the
   // whole banner width instead of stopping at the design width set this to
@@ -71,7 +74,10 @@ $control-outset: $control-gap + $control-size + $control-inset;
 
   :global(.dark) & {
     --_tile-bg: var(--quick-actions-tile-bg, #{colors.$dark-gray-light});
-    --_tile-bg-hover: var(--quick-actions-tile-bg-hover, #{colors.$gray-dark-mid});
+    --_tile-bg-hover: var(
+      --quick-actions-tile-bg-hover,
+      #{colors.$gray-dark-mid}
+    );
     --_tile-color: var(--quick-actions-tile-color, #{colors.$white});
     --_control-bg: #{colors.$dark-gray-light};
     --_control-bg-hover: #{colors.$gray-dark-mid};

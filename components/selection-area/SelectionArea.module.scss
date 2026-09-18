@@ -2,7 +2,10 @@
 
 .selectionArea {
   --selection-area-bg-value: var(--selection-area-bg, rgba(68, 170, 255, 0.5));
-  --selection-area-border-value: var(--selection-area-border, 1px solid #{colors.$light-second-main});
+  --selection-area-border-value: var(
+    --selection-area-border,
+    1px solid #{colors.$light-second-main}
+  );
   --selection-area-z-index-value: var(--selection-area-z-index, 1000);
 
   top: 0;

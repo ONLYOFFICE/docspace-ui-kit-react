@@ -9,6 +9,7 @@ React hook that uses `useLayoutEffect` on the client and `useEffect` on the serv
 ## Problem It Solves
 
 Using `useLayoutEffect` directly in SSR environments causes warnings:
+
 ```
 Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer's output format.
 ```
@@ -18,8 +19,8 @@ This hook eliminates that warning by using `useEffect` during SSR and `useLayout
 ## Usage
 
 ```tsx
-import { useIsomorphicLayoutEffect } from '@onlyoffice/apps-ui-kit/hooks/useIsomorphicLayoutEffect';
-import { useRef } from 'react';
+import { useIsomorphicLayoutEffect } from "@onlyoffice/apps-ui-kit/hooks/useIsomorphicLayoutEffect";
+import { useRef } from "react";
 
 function Component() {
   const elementRef = useRef<HTMLDivElement>(null);
@@ -29,7 +30,7 @@ function Component() {
     // and as a regular effect during SSR
     if (elementRef.current) {
       const height = elementRef.current.offsetHeight;
-      console.log('Element height:', height);
+      console.log("Element height:", height);
     }
   }, []);
 
@@ -51,6 +52,7 @@ useIsomorphicLayoutEffect(
 ### Parameters
 
 Same as `useLayoutEffect` and `useEffect`:
+
 - **`effect`** (`EffectCallback`): The effect function to run. Can return a cleanup function.
 - **`deps`** (`DependencyList`, optional): Array of dependencies that trigger the effect when changed.
 
@@ -95,7 +97,7 @@ function ScrollToTop() {
 ### 3. Preventing Visual Flicker
 
 ```tsx
-function ThemeApplier({ theme }: { theme: 'light' | 'dark' }) {
+function ThemeApplier({ theme }: { theme: "light" | "dark" }) {
   useIsomorphicLayoutEffect(() => {
     // Apply theme before paint to prevent flicker
     document.body.className = theme;
@@ -110,7 +112,7 @@ function ThemeApplier({ theme }: { theme: 'light' | 'dark' }) {
 ```tsx
 function RefUpdater() {
   const previousValue = useRef<string>();
-  const [value, setValue] = useState('initial');
+  const [value, setValue] = useState("initial");
 
   useIsomorphicLayoutEffect(() => {
     previousValue.current = value;
@@ -120,7 +122,7 @@ function RefUpdater() {
     <div>
       <p>Current: {value}</p>
       <p>Previous: {previousValue.current}</p>
-      <button onClick={() => setValue('new')}>Update</button>
+      <button onClick={() => setValue("new")}>Update</button>
     </div>
   );
 }
@@ -128,11 +130,11 @@ function RefUpdater() {
 
 ## Comparison
 
-| Hook | Client (Browser) | Server (SSR) | Use Case |
-|------|------------------|--------------|----------|
-| `useEffect` | Runs after paint | Runs after render | Async operations, subscriptions |
-| `useLayoutEffect` | Runs before paint | ⚠️ Warning | DOM measurements, synchronous updates |
-| `useIsomorphicLayoutEffect` | Runs before paint | Runs after render | SSR-safe DOM operations |
+| Hook                        | Client (Browser)  | Server (SSR)      | Use Case                              |
+| --------------------------- | ----------------- | ----------------- | ------------------------------------- |
+| `useEffect`                 | Runs after paint  | Runs after render | Async operations, subscriptions       |
+| `useLayoutEffect`           | Runs before paint | ⚠️ Warning        | DOM measurements, synchronous updates |
+| `useIsomorphicLayoutEffect` | Runs before paint | Runs after render | SSR-safe DOM operations               |
 
 ## Implementation
 
@@ -174,7 +176,7 @@ function Tooltip() {
   return (
     <div
       ref={tooltipRef}
-      style={{ position: 'absolute', left: position.x, top: position.y }}
+      style={{ position: "absolute", left: position.x, top: position.y }}
     >
       Tooltip
     </div>

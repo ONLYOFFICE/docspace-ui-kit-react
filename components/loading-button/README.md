@@ -7,10 +7,7 @@ A circular progress button that displays upload/conversion progress as an animat
 ```tsx
 import { LoadingButton } from "@onlyoffice/apps-ui-kit/components/loading-button";
 
-<LoadingButton
-  percent={45}
-  onClick={handleCancel}
-/>
+<LoadingButton percent={45} onClick={handleCancel} />;
 ```
 
 ## Features
@@ -23,17 +20,17 @@ import { LoadingButton } from "@onlyoffice/apps-ui-kit/components/loading-button
 
 ## Properties
 
-| Prop              | Type                          | Default | Description                                        |
-|-------------------|-------------------------------|---------|----------------------------------------------------|
-| `percent`         | `number`                      | `0`     | Progress value from 0 to 100                       |
-| `onClick`         | `() => void`                  | —       | Click handler (typically used to cancel)           |
-| `inConversion`    | `boolean`                     | `false` | Hides the close icon during file conversion        |
-| `loaderColor`     | `string`                      | —       | Custom color for the progress ring                 |
-| `backgroundColor` | `string`                      | —       | Custom background color for the inner circle       |
-| `isDefaultMode`   | `boolean`                     | —       | Applies default mode styling                       |
-| `id`              | `string`                      | —       | HTML id attribute                                  |
-| `className`       | `string`                      | —       | Additional CSS class name                          |
-| `style`           | `React.CSSProperties`         | —       | Custom inline styles                               |
+| Prop              | Type                  | Default | Description                                  |
+| ----------------- | --------------------- | ------- | -------------------------------------------- |
+| `percent`         | `number`              | `0`     | Progress value from 0 to 100                 |
+| `onClick`         | `() => void`          | —       | Click handler (typically used to cancel)     |
+| `inConversion`    | `boolean`             | `false` | Hides the close icon during file conversion  |
+| `loaderColor`     | `string`              | —       | Custom color for the progress ring           |
+| `backgroundColor` | `string`              | —       | Custom background color for the inner circle |
+| `isDefaultMode`   | `boolean`             | —       | Applies default mode styling                 |
+| `id`              | `string`              | —       | HTML id attribute                            |
+| `className`       | `string`              | —       | Additional CSS class name                    |
+| `style`           | `React.CSSProperties` | —       | Custom inline styles                         |
 
 ## Examples
 

@@ -60,7 +60,7 @@ const useProgressBar = (styles: Partial<CSSStyleDeclaration>) => {
     return () => {
       if (document.body.contains(bar)) document.body.removeChild(bar);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };
 
@@ -84,10 +84,9 @@ const CssCustomizationTemplate = () => {
   return (
     <div style={{ padding: "40px 20px" }}>
       <p style={{ margin: 0, fontSize: "13px", color: "#555" }}>
-        Progress bar at 65% — a static visual demo of the styles you would
-        apply to <code>#ipl-progress-indicator</code> (rendered here under a
-        different id so it doesn't collide with the live bar in the Default
-        story)
+        Progress bar at 65% — a static visual demo of the styles you would apply
+        to <code>#ipl-progress-indicator</code> (rendered here under a different
+        id so it doesn't collide with the live bar in the Default story)
       </p>
       <p style={{ marginTop: "8px", fontSize: "12px", color: "#888" }}>
         Customizable properties: <strong>height</strong>,{" "}

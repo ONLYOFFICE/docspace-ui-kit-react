@@ -27,4 +27,3 @@ const DelayedPaymentMethodBanner = () => {
 };
 
 export default DelayedPaymentMethodBanner;
-

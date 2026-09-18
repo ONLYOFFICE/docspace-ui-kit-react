@@ -18,7 +18,7 @@ import { InfiniteLoaderComponent } from "@onlyoffice/apps-ui-kit/components/infi
   {items.map((item) => (
     <RowItem key={item.id} item={item} />
   ))}
-</InfiniteLoaderComponent>
+</InfiniteLoaderComponent>;
 ```
 
 ## Features
@@ -30,20 +30,20 @@ import { InfiniteLoaderComponent } from "@onlyoffice/apps-ui-kit/components/infi
 
 ## Properties
 
-| Prop                          | Type                                    | Default | Description                                          |
-|-------------------------------|-----------------------------------------|---------|------------------------------------------------------|
-| `viewAs`                      | `TViewAs`                               | —       | View mode: `"row"` or `"tile"`                       |
-| `hasMoreFiles`                | `boolean`                               | —       | Whether more items are available to load              |
-| `filesLength`                 | `number`                                | —       | Current number of loaded items                       |
-| `itemCount`                   | `number`                                | —       | Total number of items (loaded + not yet loaded)      |
-| `loadMoreItems`               | `(params: IndexRange) => Promise<void>` | —       | Callback to load additional items                    |
-| `itemSize`                    | `number`                                | —       | Height of each item in pixels (row view)             |
-| `children`                    | `React.ReactNode[]`                     | —       | Array of child elements to render                    |
-| `onScroll`                    | `() => void`                            | —       | Optional scroll event callback                       |
-| `isLoading`                   | `boolean`                               | —       | When true, renders nothing (initial load)            |
-| `columnStorageName`           | `string`                                | —       | Storage key for column configuration                 |
-| `columnInfoPanelStorageName`  | `string`                                | —       | Storage key for info panel column configuration      |
-| `className`                   | `string`                                | —       | Additional CSS class name                            |
-| `infoPanelVisible`            | `boolean`                               | —       | Whether the info panel is visible                    |
-| `countTilesInRow`             | `number`                                | —       | Number of tiles per row in grid view                 |
-| `currentFolderId`             | `string \| number`                      | —       | Current folder identifier                            |
+| Prop                         | Type                                    | Default | Description                                     |
+| ---------------------------- | --------------------------------------- | ------- | ----------------------------------------------- |
+| `viewAs`                     | `TViewAs`                               | —       | View mode: `"row"` or `"tile"`                  |
+| `hasMoreFiles`               | `boolean`                               | —       | Whether more items are available to load        |
+| `filesLength`                | `number`                                | —       | Current number of loaded items                  |
+| `itemCount`                  | `number`                                | —       | Total number of items (loaded + not yet loaded) |
+| `loadMoreItems`              | `(params: IndexRange) => Promise<void>` | —       | Callback to load additional items               |
+| `itemSize`                   | `number`                                | —       | Height of each item in pixels (row view)        |
+| `children`                   | `React.ReactNode[]`                     | —       | Array of child elements to render               |
+| `onScroll`                   | `() => void`                            | —       | Optional scroll event callback                  |
+| `isLoading`                  | `boolean`                               | —       | When true, renders nothing (initial load)       |
+| `columnStorageName`          | `string`                                | —       | Storage key for column configuration            |
+| `columnInfoPanelStorageName` | `string`                                | —       | Storage key for info panel column configuration |
+| `className`                  | `string`                                | —       | Additional CSS class name                       |
+| `infoPanelVisible`           | `boolean`                               | —       | Whether the info panel is visible               |
+| `countTilesInRow`            | `number`                                | —       | Number of tiles per row in grid view            |
+| `currentFolderId`            | `string \| number`                      | —       | Current folder identifier                       |

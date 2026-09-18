@@ -20,8 +20,14 @@
   // bridge vars — bind public overrides to internal theme tokens
   --time-input-border-v: var(--time-input-border, var(--input-border-color));
   --time-input-bg-v: var(--time-input-bg, var(--input-bg));
-  --time-input-error-border-v: var(--time-input-error-border, var(--input-error-border));
-  --time-input-focus-border-v: var(--time-input-focus-border, var(--input-border-focus));
+  --time-input-error-border-v: var(
+    --time-input-error-border,
+    var(--input-error-border)
+  );
+  --time-input-focus-border-v: var(
+    --time-input-focus-border,
+    var(--input-border-focus)
+  );
   // new bridge vars for hardcoded values
   --time-input-width-v: var(--time-input-width, 60px);
   --time-input-height-v: var(--time-input-height, 32px);

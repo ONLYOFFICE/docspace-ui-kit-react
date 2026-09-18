@@ -86,7 +86,9 @@ describe("<TableGroupMenu />", () => {
 
   it("does not render combobox if withComboBox is false", () => {
     render(<TableGroupMenu {...defaultProps} withComboBox={false} />);
-    expect(screen.queryByTestId("table_group_menu_combobox")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("table_group_menu_combobox"),
+    ).not.toBeInTheDocument();
   });
 
   it("renders close button if isCloseable is true", () => {

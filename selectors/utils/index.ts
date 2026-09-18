@@ -260,7 +260,13 @@ export const buildSpecialFolderItems = ({
     isFolder: true,
     avatar: React.createElement(Icon),
     disableMultiSelect: true,
-    specialFolderScope: { kind, folderId: folder.id!, section, parentId, folderType },
+    specialFolderScope: {
+      kind,
+      folderId: folder.id!,
+      section,
+      parentId,
+      folderType,
+    },
   });
 
   if (withRecent && recentFolder)
@@ -339,4 +345,3 @@ export const buildScopedFolderUrl = ({
 
   return `/api/2.0/files/${folderId}?${params.toString()}`;
 };
-

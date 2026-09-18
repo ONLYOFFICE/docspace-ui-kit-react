@@ -1,6 +1,5 @@
 @use "../../styles/variables" as variables;
 
-
 :global(.dark) {
   :local {
     .label {
@@ -93,7 +92,10 @@
   svg {
     rect {
       fill: var(--checkbox-fill-color-default);
-      stroke: var(--checkbox-border-color, var(--checkbox-border-color-default));
+      stroke: var(
+        --checkbox-border-color,
+        var(--checkbox-border-color-default)
+      );
     }
     path {
       fill: var(--checkbox-arrow-color-default);

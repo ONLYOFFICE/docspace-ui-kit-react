@@ -14,9 +14,9 @@ paths:
 whether DocSpace-client still catches them for you, and that depends on which branch of the
 client is live:
 
-| Client branch | `moduleWorkspaces` in `common/tests/utils/files.js` | These rules |
-|---|---|---|
-| `develop`, `release/v4.0.0` | includes `UI_KIT_PATH`, and `getWorkSpaces({ excludeUiKit })` exists to opt out per suite | **enforced** — the suites scan the ui-kit checkout at `libs/ui-kit` and a push there fails |
+| Client branch               | `moduleWorkspaces` in `common/tests/utils/files.js`                                                                                 | These rules                                                                                              |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `develop`, `release/v4.0.0` | includes `UI_KIT_PATH`, and `getWorkSpaces({ excludeUiKit })` exists to opt out per suite                                           | **enforced** — the suites scan the ui-kit checkout at `libs/ui-kit` and a push there fails               |
 | `feature/ui-kit-separation` | ui-kit removed; the comment reads "ships as a prebuilt tarball from its own repository and is never part of the scanned workspaces" | **not enforced at all** — colors, ascii, indentation, license and dependencies no longer see this source |
 
 So today, working on the separation branch, nothing anywhere checks the rules below. That is a

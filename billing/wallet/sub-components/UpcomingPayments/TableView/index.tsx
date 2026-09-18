@@ -75,4 +75,3 @@ const TableView = ({ sectionWidth }: UpcomingPaymentsTableViewProps) => {
 };
 
 export default observer(TableView);
-

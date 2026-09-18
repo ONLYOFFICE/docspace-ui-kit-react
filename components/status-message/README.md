@@ -16,10 +16,10 @@ import { StatusMessage } from "@onlyoffice/apps-ui-kit";
 
 ## Component Properties
 
-| Props       |             Type              | Required | Default | Description                                    |
-| ----------- | :---------------------------: | :------: | :-----: | ---------------------------------------------- |
-| `message`   | `string \| React.ReactNode`   |    ✓     |    -    | Message content to display                     |
-| `isWarning` |           `boolean`           |    -     | `false` | Whether to display as warning style            |
+| Props       |            Type             | Required | Default | Description                         |
+| ----------- | :-------------------------: | :------: | :-----: | ----------------------------------- |
+| `message`   | `string \| React.ReactNode` |    ✓     |    -    | Message content to display          |
+| `isWarning` |          `boolean`          |    -     | `false` | Whether to display as warning style |
 
 ## Examples
 

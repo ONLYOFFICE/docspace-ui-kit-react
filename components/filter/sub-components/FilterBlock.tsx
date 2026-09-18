@@ -292,9 +292,8 @@ const FilterBlock = ({
             "displaySelectorType" in groupItem &&
             groupItem.displaySelectorType
           ) {
-            groupItem.selectedLabel = groupSelectedItem
-              ?.values()
-              .next().value?.label;
+            groupItem.selectedLabel = groupSelectedItem?.values().next()
+              .value?.label;
             groupItem.selectedKey = groupSelectedItem?.values().next().value
               ?.key as string;
           }

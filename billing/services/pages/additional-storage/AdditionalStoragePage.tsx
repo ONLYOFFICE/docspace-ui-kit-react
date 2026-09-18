@@ -355,9 +355,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
               size={ButtonSize.small}
               primary
               onClick={
-                isDelayedPaymentTopUp
-                  ? openTopUpDialog
-                  : openUpgradeDialog
+                isDelayedPaymentTopUp ? openTopUpDialog : openUpgradeDialog
               }
               isDisabled={isDisabled}
             />
@@ -467,4 +465,3 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
 };
 
 export default observer(AdditionalStoragePage);
-

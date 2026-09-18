@@ -66,7 +66,6 @@
 
   .viewUsageLink {
     color: var(--color-scheme-main-accent);
-
   }
   .autoPaymentInformation {
     margin-bottom: 24px;
@@ -79,10 +78,6 @@
   .autoPaymentEditing {
     display: flex;
   }
-
-
- 
-
 
   .headerContainer {
     display: flex;
@@ -104,7 +99,6 @@
     font-size: 28px;
   }
 }
-
 
 .autoPaymentBanner {
   display: flex;
@@ -153,7 +147,7 @@
 }
 
 .learnMoreLink {
-      color: var(--payment-text-color);
+  color: var(--payment-text-color);
 }
 
 .autoPaymentInformation {

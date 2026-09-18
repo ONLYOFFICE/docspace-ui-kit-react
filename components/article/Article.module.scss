@@ -3,7 +3,6 @@
 
 :global(.light) {
   :local {
-
     .apps,
     .wrapper,
     .hideArticleMenuButton,
@@ -16,12 +15,15 @@
       --files-article-body-download-app-list-text-color: #{colors.$gray};
       --files-article-body-download-app-list-mac-hover-color: #{colors.$dark-black};
       --files-article-body-dev-tools-color: #{colors.$gray-text};
-      --files-article-body-dev-tools-background-color: var(--accent-main,
-        #{colors.$light-blue-main});
+      --files-article-body-dev-tools-background-color: var(
+        --accent-main,
+        #{colors.$light-blue-main}
+      );
       --files-article-body-dev-tools-background-opacity: 0.17;
       --article-catalog-background: #{colors.$gray-light};
       --article-catalog-show-text: #{colors.$light-gray-dark};
-      --article-catalog-header-border-bottom: 1px solid #{colors.$gray-light-mid};
+      --article-catalog-header-border-bottom: 1px solid
+        #{colors.$gray-light-mid};
       --article-client-home-logo-color: #{colors.$black};
       --article-catalog-profile-background: #{colors.$light-gray-hover};
       --article-catalog-profile-border-top: 1px solid #{colors.$gray-light-mid};
@@ -37,7 +39,6 @@
 
 :global(.dark) {
   :local {
-
     .apps,
     .wrapper,
     .hideArticleMenuButton,
@@ -54,10 +55,12 @@
       --files-article-body-dev-tools-background-opacity: 1;
       --article-catalog-background: #{colors.$dark-gray-light};
       --article-catalog-show-text: #{colors.$dark-gray-dark};
-      --article-catalog-header-border-bottom: 1px solid #{colors.$gray-dark-strong};
+      --article-catalog-header-border-bottom: 1px solid
+        #{colors.$gray-dark-strong};
       --article-client-home-logo-color: #{colors.$white};
       --article-catalog-profile-background: #{colors.$light-dark-gray-hover};
-      --article-catalog-profile-border-top: 1px solid #{colors.$gray-dark-strong};
+      --article-catalog-profile-border-top: 1px solid
+        #{colors.$gray-dark-strong};
       --article-catalog-vertical-line: 1px solid #{colors.$gray-dark-strong};
       --article-catalog-background: #{colors.$dark-gray-light};
       --article-desktop-width: 252px;
@@ -114,7 +117,9 @@
   }
 
   .macOsIcon {
-    --icon-button-hover-color: var(--files-article-body-download-app-list-mac-hover-color);
+    --icon-button-hover-color: var(
+      --files-article-body-download-app-list-mac-hover-color
+    );
   }
 
   .linuxIcon {
@@ -126,7 +131,9 @@
   }
 
   .iosIcon {
-    --icon-button-hover-color: var(--files-article-body-download-app-list-mac-hover-color);
+    --icon-button-hover-color: var(
+      --files-article-body-download-app-list-mac-hover-color
+    );
   }
 }
 
@@ -515,18 +522,39 @@
 .article {
   // bridge vars — bind public overrides to internal theme tokens
   --article-catalog-bg-v: var(--article-bg, var(--article-catalog-background));
-  --article-catalog-border-v: var(--article-border, var(--article-catalog-vertical-line));
-  --article-header-border-v: var(--article-header-border, var(--article-catalog-header-border-bottom));
-  --article-profile-bg-v: var(--article-profile-bg, var(--article-catalog-profile-background));
-  --article-profile-border-v: var(--article-profile-border, var(--article-catalog-profile-border-top));
-  --article-logo-color-v: var(--article-logo-color, var(--article-client-home-logo-color));
+  --article-catalog-border-v: var(
+    --article-border,
+    var(--article-catalog-vertical-line)
+  );
+  --article-header-border-v: var(
+    --article-header-border,
+    var(--article-catalog-header-border-bottom)
+  );
+  --article-profile-bg-v: var(
+    --article-profile-bg,
+    var(--article-catalog-profile-background)
+  );
+  --article-profile-border-v: var(
+    --article-profile-border,
+    var(--article-catalog-profile-border-top)
+  );
+  --article-logo-color-v: var(
+    --article-logo-color,
+    var(--article-client-home-logo-color)
+  );
   --article-desktop-width-v: var(--article-width, var(--article-desktop-width));
-  --article-tablet-width-v: var(--article-sidebar-width, var(--article-tablet-width));
+  --article-tablet-width-v: var(
+    --article-sidebar-width,
+    var(--article-tablet-width)
+  );
   --article-tablet-width-collapsed-v: var(
     --article-sidebar-collapsed-width,
     var(--article-tablet-width-collapsed)
   );
-  --back-button-color-v: var(--article-back-color, var(--back-button-text-color));
+  --back-button-color-v: var(
+    --article-back-color,
+    var(--back-button-text-color)
+  );
 
   position: relative;
   overflow: hidden;

@@ -20,40 +20,40 @@ import { TileContent } from "../tile-content";
 const element = <PublicRoomIconReactSvg />;
 
 const badges = (
-	<div className="badges">
-		<IconButton
-			onClick={() => {}}
-			className="badge icons-group is-pinned tablet-badge tablet-pinned"
-			iconNode={<UnpinReactSvg />}
-			size={IconSizeType.medium}
-		/>
-	</div>
+  <div className="badges">
+    <IconButton
+      onClick={() => {}}
+      className="badge icons-group is-pinned tablet-badge tablet-pinned"
+      iconNode={<UnpinReactSvg />}
+      size={IconSizeType.medium}
+    />
+  </div>
 );
 
 const contextOptions = [
-	{
-		id: "option_edit",
-		key: "edit",
-		label: "Edit",
-		onClick: () => {},
-		disabled: false,
-	},
-	{
-		id: "option_delete",
-		key: "delete",
-		label: "Delete",
-		onClick: () => {},
-		disabled: false,
-	},
+  {
+    id: "option_edit",
+    key: "edit",
+    label: "Edit",
+    onClick: () => {},
+    disabled: false,
+  },
+  {
+    id: "option_delete",
+    key: "delete",
+    label: "Delete",
+    onClick: () => {},
+    disabled: false,
+  },
 ];
 
 const meta = {
-	title: "UI/Tiles/RoomTile",
-	component: RoomTile,
-	parameters: {
-		docs: {
-			description: {
-				component: `Room tile component for displaying room information in a tile format.
+  title: "UI/Tiles/RoomTile",
+  component: RoomTile,
+  parameters: {
+    docs: {
+      description: {
+        component: `Room tile component for displaying room information in a tile format.
 
 ### Features
 
@@ -81,41 +81,40 @@ import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-conte
   <TileContent><Link>Room Content</Link></TileContent>
 </RoomTile>
 \`\`\``,
-			},
-		},
-	},
-	argTypes: {
-		checked: {
-			control: "boolean",
-			description: "Whether the tile is selected/checked",
-			table: {
-				defaultValue: { summary: "false" },
-			},
-		},
-		isActive: {
-			control: "boolean",
-			description: "Whether the tile is in active state",
-			table: {
-				defaultValue: { summary: "false" },
-			},
-		},
-		isBlockingOperation: {
-			control: "boolean",
-			description:
-				"Whether a blocking operation is in progress on the room",
-			table: {
-				defaultValue: { summary: "false" },
-			},
-		},
-		indeterminate: {
-			control: "boolean",
-			description:
-				"Whether the checkbox shows an indeterminate state for partial selection",
-			table: {
-				defaultValue: { summary: "false" },
-			},
-		},
-	},
+      },
+    },
+  },
+  argTypes: {
+    checked: {
+      control: "boolean",
+      description: "Whether the tile is selected/checked",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isActive: {
+      control: "boolean",
+      description: "Whether the tile is in active state",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isBlockingOperation: {
+      control: "boolean",
+      description: "Whether a blocking operation is in progress on the room",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    indeterminate: {
+      control: "boolean",
+      description:
+        "Whether the checkbox shows an indeterminate state for partial selection",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+  },
 } satisfies Meta<typeof RoomTile>;
 
 type Story = StoryObj<ComponentProps<typeof RoomTile>>;
@@ -123,55 +122,55 @@ type Story = StoryObj<ComponentProps<typeof RoomTile>>;
 export default meta;
 
 const Template = ({ checked: initialChecked, ...args }: RoomTileProps) => {
-	const [checked, setChecked] = useState(initialChecked);
+  const [checked, setChecked] = useState(initialChecked);
 
-	const onSelect = (isSelected: boolean) => {
-		setChecked(isSelected);
-	};
+  const onSelect = (isSelected: boolean) => {
+    setChecked(isSelected);
+  };
 
-	return (
-		<div style={{ maxWidth: "300px", margin: "30px" }}>
-			<RoomTile {...args} checked={checked} onSelect={onSelect}>
-				<TileContent>
-					<Link>Room Content</Link>
-				</TileContent>
-			</RoomTile>
-		</div>
-	);
+  return (
+    <div style={{ maxWidth: "300px", margin: "30px" }}>
+      <RoomTile {...args} checked={checked} onSelect={onSelect}>
+        <TileContent>
+          <Link>Room Content</Link>
+        </TileContent>
+      </RoomTile>
+    </div>
+  );
 };
 
 export const Default: Story = {
-	render: Template,
-	args: {
-		item: {
-			id: "room-1",
-			title: "Sample Room",
-			roomType: "collaboration",
-			tags: [
-				{
-					label: "Collaboration",
-					roomType: RoomsType.EditingRoom,
-				},
-			],
-			contextOptions,
-		},
-		element,
-		contextOptions,
-		badges,
-		thumbnailClick: () => {},
-		getContextModel: () => contextOptions,
-		selectTag: () => {},
-		selectOption: () => {},
-		getRoomTypeName: (type: string) => type,
-		columnCount: 1,
-	},
-	parameters: {
-		docs: {
-			description: {
-				story: "Basic room tile with selection functionality",
-			},
-			source: {
-				code: `<RoomTile
+  render: Template,
+  args: {
+    item: {
+      id: "room-1",
+      title: "Sample Room",
+      roomType: "collaboration",
+      tags: [
+        {
+          label: "Collaboration",
+          roomType: RoomsType.EditingRoom,
+        },
+      ],
+      contextOptions,
+    },
+    element,
+    contextOptions,
+    badges,
+    thumbnailClick: () => {},
+    getContextModel: () => contextOptions,
+    selectTag: () => {},
+    selectOption: () => {},
+    getRoomTypeName: (type: string) => type,
+    columnCount: 1,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Basic room tile with selection functionality",
+      },
+      source: {
+        code: `<RoomTile
   item={{ id: "room-1", title: "Sample Room", roomType: "collaboration", tags: [...] }}
   element={<PublicRoomIconReactSvg />}
   contextOptions={contextOptions}
@@ -181,24 +180,24 @@ export const Default: Story = {
 >
   <TileContent><Link>Room Content</Link></TileContent>
 </RoomTile>`,
-			},
-		},
-	},
+      },
+    },
+  },
 };
 
 export const Checked: Story = {
-	render: Template,
-	args: {
-		...Default.args,
-		checked: true,
-	},
-	parameters: {
-		docs: {
-			description: {
-				story: "Room tile in checked state",
-			},
-			source: {
-				code: `<RoomTile
+  render: Template,
+  args: {
+    ...Default.args,
+    checked: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Room tile in checked state",
+      },
+      source: {
+        code: `<RoomTile
   item={{ id: "room-1", title: "Sample Room", roomType: "collaboration", tags: [...] }}
   element={<PublicRoomIconReactSvg />}
   contextOptions={contextOptions}
@@ -207,24 +206,24 @@ export const Checked: Story = {
 >
   <TileContent><Link>Room Content</Link></TileContent>
 </RoomTile>`,
-			},
-		},
-	},
+      },
+    },
+  },
 };
 
 export const InProgress: Story = {
-	render: Template,
-	args: {
-		...Default.args,
-		inProgress: true,
-	},
-	parameters: {
-		docs: {
-			description: {
-				story: "Room tile showing progress state",
-			},
-			source: {
-				code: `<RoomTile
+  render: Template,
+  args: {
+    ...Default.args,
+    inProgress: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Room tile showing progress state",
+      },
+      source: {
+        code: `<RoomTile
   item={{ id: "room-1", title: "Sample Room", roomType: "collaboration", tags: [...] }}
   element={<PublicRoomIconReactSvg />}
   contextOptions={contextOptions}
@@ -232,24 +231,24 @@ export const InProgress: Story = {
 >
   <TileContent><Link>Room Content</Link></TileContent>
 </RoomTile>`,
-			},
-		},
-	},
+      },
+    },
+  },
 };
 
 export const BlockingOperation: Story = {
-	render: Template,
-	args: {
-		...Default.args,
-		isBlockingOperation: true,
-	},
-	parameters: {
-		docs: {
-			description: {
-				story: "Room tile showing blocking operation state",
-			},
-			source: {
-				code: `<RoomTile
+  render: Template,
+  args: {
+    ...Default.args,
+    isBlockingOperation: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Room tile showing blocking operation state",
+      },
+      source: {
+        code: `<RoomTile
   item={{ id: "room-1", title: "Sample Room", roomType: "collaboration", tags: [...] }}
   element={<PublicRoomIconReactSvg />}
   contextOptions={contextOptions}
@@ -257,55 +256,55 @@ export const BlockingOperation: Story = {
 >
   <TileContent><Link>Room Content</Link></TileContent>
 </RoomTile>`,
-			},
-		},
-	},
+      },
+    },
+  },
 };
 
 export const CssCustomization: Story = {
-	render: () => (
-		<div
-			style={
-				{
-					"--tile-bg": "#e6f3fb",
-					"--tile-border-style": "1px solid #0082c9",
-					"--tile-radius": "16px",
-					"--tile-hover-bg": "#cce5f6",
-					"--tile-icon-color": "#0082c9",
-					"--tile-tag-hover-bg": "#cce5f6",
-				} as CSSProperties
-			}
-		>
-			<div style={{ maxWidth: "300px", margin: "30px" }}>
-				<RoomTile
-					item={{
-						id: "room-1",
-						title: "Sample Room",
-						roomType: "collaboration",
-						tags: [{ label: "Collaboration", roomType: RoomsType.EditingRoom }],
-						contextOptions,
-					}}
-					element={element}
-					contextOptions={contextOptions}
-					badges={badges}
-					thumbnailClick={() => {}}
-					getContextModel={() => contextOptions}
-					selectTag={() => {}}
-					selectOption={() => {}}
-					getRoomTypeName={(type: string) => type}
-					columnCount={1}
-				>
-					<TileContent>
-						<Link>Sample Room</Link>
-					</TileContent>
-				</RoomTile>
-			</div>
-		</div>
-	),
-	parameters: {
-		docs: {
-			description: {
-				story: `CSS Custom Properties for external customization:
+  render: () => (
+    <div
+      style={
+        {
+          "--tile-bg": "#e6f3fb",
+          "--tile-border-style": "1px solid #0082c9",
+          "--tile-radius": "16px",
+          "--tile-hover-bg": "#cce5f6",
+          "--tile-icon-color": "#0082c9",
+          "--tile-tag-hover-bg": "#cce5f6",
+        } as CSSProperties
+      }
+    >
+      <div style={{ maxWidth: "300px", margin: "30px" }}>
+        <RoomTile
+          item={{
+            id: "room-1",
+            title: "Sample Room",
+            roomType: "collaboration",
+            tags: [{ label: "Collaboration", roomType: RoomsType.EditingRoom }],
+            contextOptions,
+          }}
+          element={element}
+          contextOptions={contextOptions}
+          badges={badges}
+          thumbnailClick={() => {}}
+          getContextModel={() => contextOptions}
+          selectTag={() => {}}
+          selectOption={() => {}}
+          getRoomTypeName={(type: string) => type}
+          columnCount={1}
+        >
+          <TileContent>
+            <Link>Sample Room</Link>
+          </TileContent>
+        </RoomTile>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
@@ -315,7 +314,7 @@ export const CssCustomization: Story = {
 | \`--tile-hover-bg\` | Hover/checked background | theme-based |
 | \`--tile-icon-color\` | Icon button color | theme-based |
 | \`--tile-tag-hover-bg\` | Tag background on hover/checked | theme-based |`,
-			},
-		},
-	},
+      },
+    },
+  },
 };

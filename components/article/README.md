@@ -19,7 +19,7 @@ import { Article } from "@onlyoffice/apps-ui-kit/components/article";
   // ...other required props
 >
   {[<MainMenu />, <BodyContent />]}
-</Article>
+</Article>;
 ```
 
 ## Features
@@ -45,18 +45,18 @@ import { Article } from "@onlyoffice/apps-ui-kit/components/article";
 
 ## Properties
 
-| Prop                    | Type                          | Default | Description                                          |
-|-------------------------|-------------------------------|---------|------------------------------------------------------|
-| `children`              | `JSX.Element[]`               | —       | Child elements rendered inside the article body      |
-| `showText`              | `boolean`                     | —       | Whether to show text labels alongside icons          |
-| `setShowText`           | `(value: boolean) => void`    | —       | Callback to toggle text visibility                   |
-| `articleOpen`           | `boolean`                     | —       | Whether the article panel is open                    |
-| `setArticleOpen`        | `(value: boolean) => void`    | —       | Callback to toggle article open state                |
-| `toggleArticleOpen`     | `() => void`                  | —       | Toggle function for article open/close               |
-| `currentDeviceType`     | `DeviceType`                  | —       | Current device type (desktop, tablet, mobile)        |
-| `showArticleLoader`     | `boolean`                     | —       | Shows skeleton loader instead of content             |
-| `isBurgerLoading`       | `boolean`                     | —       | Shows loading state on the burger menu button        |
-| `hideAppsBlock`         | `boolean`                     | —       | Hides the apps download section                      |
-| `isAdmin`               | `boolean`                     | —       | Whether the current user is an admin                 |
-| `withSendAgain`         | `boolean`                     | —       | Shows "send again" confirmation email option         |
-| `mainBarVisible`        | `boolean`                     | —       | Controls main bar visibility                         |
+| Prop                | Type                       | Default | Description                                     |
+| ------------------- | -------------------------- | ------- | ----------------------------------------------- |
+| `children`          | `JSX.Element[]`            | —       | Child elements rendered inside the article body |
+| `showText`          | `boolean`                  | —       | Whether to show text labels alongside icons     |
+| `setShowText`       | `(value: boolean) => void` | —       | Callback to toggle text visibility              |
+| `articleOpen`       | `boolean`                  | —       | Whether the article panel is open               |
+| `setArticleOpen`    | `(value: boolean) => void` | —       | Callback to toggle article open state           |
+| `toggleArticleOpen` | `() => void`               | —       | Toggle function for article open/close          |
+| `currentDeviceType` | `DeviceType`               | —       | Current device type (desktop, tablet, mobile)   |
+| `showArticleLoader` | `boolean`                  | —       | Shows skeleton loader instead of content        |
+| `isBurgerLoading`   | `boolean`                  | —       | Shows loading state on the burger menu button   |
+| `hideAppsBlock`     | `boolean`                  | —       | Hides the apps download section                 |
+| `isAdmin`           | `boolean`                  | —       | Whether the current user is an admin            |
+| `withSendAgain`     | `boolean`                  | —       | Shows "send again" confirmation email option    |
+| `mainBarVisible`    | `boolean`                  | —       | Controls main bar visibility                    |

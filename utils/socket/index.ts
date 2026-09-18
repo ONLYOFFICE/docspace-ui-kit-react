@@ -246,7 +246,6 @@ export type TEditFileData =
   | string
   | { fileId: number | string; editingBy: Record<string, string> };
 
-
 export type TChangeWebPluginData = {
   webPluginName: string;
   enabled: boolean;

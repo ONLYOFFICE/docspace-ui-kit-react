@@ -2,7 +2,11 @@ import React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
 import { TemplateTile } from ".";
-import { TemplateTileProps, SpaceQuotaProps, TemplateItem } from "./TemplateTile.types";
+import {
+  TemplateTileProps,
+  SpaceQuotaProps,
+  TemplateItem,
+} from "./TemplateTile.types";
 
 // Mock translations
 vi.mock("react-i18next", () => ({

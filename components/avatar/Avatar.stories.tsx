@@ -502,9 +502,21 @@ export const CssCustomization: Story = {
         } as CSSProperties
       }
     >
-      <AvatarPure size={AvatarSize.big} userName="John Doe" role={AvatarRole.admin} />
-      <AvatarPure size={AvatarSize.big} userName="Jane Smith" role={AvatarRole.user} />
-      <AvatarPure size={AvatarSize.medium} userName="AB" role={AvatarRole.guest} />
+      <AvatarPure
+        size={AvatarSize.big}
+        userName="John Doe"
+        role={AvatarRole.admin}
+      />
+      <AvatarPure
+        size={AvatarSize.big}
+        userName="Jane Smith"
+        role={AvatarRole.user}
+      />
+      <AvatarPure
+        size={AvatarSize.medium}
+        userName="AB"
+        role={AvatarRole.guest}
+      />
     </div>
   ),
   parameters: {

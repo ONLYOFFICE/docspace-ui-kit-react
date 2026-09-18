@@ -56,17 +56,17 @@ import { PublicRoomBar } from "@onlyoffice/apps-ui-kit";
 
 ## Properties
 
-| Prop           | Type                       | Required | Default | Description                                    |
-| -------------- | -------------------------- | :------: | ------- | ---------------------------------------------- |
-| `headerText`   | `string \| ReactNode`      |    Yes   | -       | Header text or component                       |
-| `bodyText`     | `string \| ReactNode`      |    Yes   | -       | Body text or component                         |
-| `iconName`     | `string`                   |    -     | -       | Custom icon URL path                           |
-| `onClose`      | `() => void`               |    -     | -       | Callback when close button clicked             |
-| `barIsVisible` | `boolean`                  |    -     | `false` | Controls top margin based on visibility        |
-| `className`    | `string`                   |    -     | -       | Additional CSS class name                      |
-| `style`        | `CSSProperties`            |    -     | -       | Custom inline styles                           |
-| `dataTestId`   | `string`                   |    -     | -       | Test ID for testing                            |
-| `ref`          | `RefObject<HTMLDivElement>`|    -     | -       | Ref to the container element                   |
+| Prop           | Type                        | Required | Default | Description                             |
+| -------------- | --------------------------- | :------: | ------- | --------------------------------------- |
+| `headerText`   | `string \| ReactNode`       |   Yes    | -       | Header text or component                |
+| `bodyText`     | `string \| ReactNode`       |   Yes    | -       | Body text or component                  |
+| `iconName`     | `string`                    |    -     | -       | Custom icon URL path                    |
+| `onClose`      | `() => void`                |    -     | -       | Callback when close button clicked      |
+| `barIsVisible` | `boolean`                   |    -     | `false` | Controls top margin based on visibility |
+| `className`    | `string`                    |    -     | -       | Additional CSS class name               |
+| `style`        | `CSSProperties`             |    -     | -       | Custom inline styles                    |
+| `dataTestId`   | `string`                    |    -     | -       | Test ID for testing                     |
+| `ref`          | `RefObject<HTMLDivElement>` |    -     | -       | Ref to the container element            |
 
 ## Examples
 
@@ -74,11 +74,7 @@ import { PublicRoomBar } from "@onlyoffice/apps-ui-kit";
 
 ```tsx
 const NotificationBar = ({ message, onDismiss }) => (
-  <PublicRoomBar
-    headerText="Notice"
-    bodyText={message}
-    onClose={onDismiss}
-  />
+  <PublicRoomBar headerText="Notice" bodyText={message} onClose={onDismiss} />
 );
 ```
 
@@ -113,16 +109,10 @@ The component defines CSS variables for light and dark themes:
 
 ```scss
 // Light theme
---info-block-background: gray-light
---info-block-header-color: black
---info-block-description-color: gray-text
---icon-button-color: gray
-
-// Dark theme
---info-block-background: dark-gray-light
---info-block-header-color: white
---info-block-description-color: dark-gray-dark
---icon-button-color: gray-dark
+--info-block-background: gray-light --info-block-header-color: black
+  --info-block-description-color: gray-text --icon-button-color: gray // Dark theme
+  --info-block-background: dark-gray-light --info-block-header-color: white
+  --info-block-description-color: dark-gray-dark --icon-button-color: gray-dark;
 ```
 
 ```tsx

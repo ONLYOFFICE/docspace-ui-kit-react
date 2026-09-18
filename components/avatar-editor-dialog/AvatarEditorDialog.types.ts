@@ -1,8 +1,5 @@
 import type { TTranslation } from "../../utils";
-import type {
-  TImage,
-  TChangeImage,
-} from "../image-editor/ImageEditor.types";
+import type { TImage, TChangeImage } from "../image-editor/ImageEditor.types";
 
 export type AvatarEditorDialogProps = {
   t: TTranslation;

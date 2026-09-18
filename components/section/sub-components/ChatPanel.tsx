@@ -26,7 +26,8 @@ const clamp = (value: number, min: number, max: number) =>
 // (the dashboard). Both the drag bounds and the reflow clamp are derived from
 // it, so the panel never has to know the host's row structure.
 const contentWidth = (panel: HTMLElement) => {
-  const content = document.getElementById("section") ?? panel.previousElementSibling;
+  const content =
+    document.getElementById("section") ?? panel.previousElementSibling;
   return content
     ? content.getBoundingClientRect().width
     : Number.POSITIVE_INFINITY;
@@ -121,12 +122,16 @@ const ChatPanel = ({
         if (deficit < 1) return;
 
         const current = panel.getBoundingClientRect().width;
-        const next = Math.max(MIN_CHAT_PANEL_WIDTH, Math.round(current - deficit));
+        const next = Math.max(
+          MIN_CHAT_PANEL_WIDTH,
+          Math.round(current - deficit),
+        );
         if (next < current) onResize(next);
       });
     };
 
-    const content = document.getElementById("section") ?? panel.previousElementSibling;
+    const content =
+      document.getElementById("section") ?? panel.previousElementSibling;
     const observer = new ResizeObserver(clampToRow);
     if (content) observer.observe(content);
     // The observer covers in-page layout changes; the window listener covers a
@@ -180,7 +185,8 @@ const ChatPanel = ({
       let committed = false;
 
       const onMouseMove = (event: MouseEvent) => {
-        const desiredWidth = anchorWidth + direction * (event.clientX - anchorX);
+        const desiredWidth =
+          anchorWidth + direction * (event.clientX - anchorX);
 
         if (fullscreen) {
           // Dragging the edge back inwards is the way out of fullscreen. Until

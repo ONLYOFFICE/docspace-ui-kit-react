@@ -15,7 +15,10 @@
     --icon-button-color: #{colors.$gray-dark};
   }
 
-  --public-room-bar-bg-value: var(--public-room-bar-bg, var(--info-block-background));
+  --public-room-bar-bg-value: var(
+    --public-room-bar-bg,
+    var(--info-block-background)
+  );
   --public-room-bar-header-color-value: var(
     --public-room-bar-header-color,
     var(--info-block-header-color)
@@ -36,10 +39,16 @@
   --public-room-bar-font-size-value: var(--public-room-bar-text-size, 12px);
   --public-room-bar-padding-value: var(--public-room-bar-padding, 12px 16px);
   --public-room-bar-radius-value: var(--public-room-bar-radius, 6px);
-  --public-room-bar-margin-bottom-value: var(--public-room-bar-bottom-margin, 10px);
+  --public-room-bar-margin-bottom-value: var(
+    --public-room-bar-bottom-margin,
+    10px
+  );
   --public-room-bar-margin-top-value: var(--public-room-bar-top-margin, 20px);
   --public-room-bar-header-gap-value: var(--public-room-bar-header-gap, 8px);
-  --public-room-bar-header-weight-value: var(--public-room-bar-header-weight, 600);
+  --public-room-bar-header-weight-value: var(
+    --public-room-bar-header-weight,
+    600
+  );
 
   display: flex;
   background-color: var(--public-room-bar-bg-value);

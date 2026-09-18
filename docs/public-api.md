@@ -5,7 +5,7 @@ DocSpace portal, and what it guarantees about neither.
 
 **Status:** largely landed. The `exports` map, the dependency split and the build that serves
 them are in the tree; what remains open is listed at the end, and one thing this document
-claimed has turned out not to be true — see *Dependency consequences*. Counts verified against
+claimed has turned out not to be true — see _Dependency consequences_. Counts verified against
 `feature/ui-kit-separation` and a DocSpace-client checkout on the same branch.
 
 ## Why this exists
@@ -31,27 +31,27 @@ still be breaking. `docs/plugin-surface.json` records that surface name by name;
 
 ## Tiers
 
-| Tier | Meaning | Guarantee |
-|---|---|---|
-| **Public** | Documented, published, supported for external use | Semver. Breaking changes need a major and a migration note |
-| **Portal-internal** | **Ships in the published package** and resolves, but is not part of the supported contract | None. May change or move in any release, without a major |
-| **Private** | Implementation detail | Not resolvable at all once the `exports` map lands |
+| Tier                | Meaning                                                                                    | Guarantee                                                  |
+| ------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| **Public**          | Documented, published, supported for external use                                          | Semver. Breaking changes need a major and a migration note |
+| **Portal-internal** | **Ships in the published package** and resolves, but is not part of the supported contract | None. May change or move in any release, without a major   |
+| **Private**         | Implementation detail                                                                      | Not resolvable at all once the `exports` map lands         |
 
 ## Public surface
 
-| Module | Contents | Notes |
-|---|---|---|
-| `components` | 98 component folders | The bulk of the value. Includes the generic `selector` component (distinct from `selectors/`) |
-| `utils` | Helpers re-exported from `utils/index.ts` | The barrel only. `utils/socket` is **not** public — see below |
-| `hooks` | 11 hooks | Barrelled in `hooks/index.ts` and exported from the root. `useViewEffect` is a default export, re-exported by name |
-| `context` | `ThemeContext`, `InterfaceDirectionContext` | |
-| `enums`, `constants`, `types` | Shared enums, constants, type definitions | |
-| `errors` | Error page components (401, 403, 404, …) | Self-contained, no portal coupling |
-| `styles` | Global SCSS, mixins, variables | Needed by consumers who extend the design system |
-| `assets` | Icon set as React components | **Subpath-only, deliberately.** Hundreds of SVG modules; a barrel would defeat tree-shaking and force every consumer to parse the whole set. Licensing of the assets themselves is a separate question (D12) |
-| `providers/theme` | `ThemeProvider`, theme objects, `useTheme` | |
-| `providers/translation` | `TranslationProvider`, i18n wiring | |
-| `providers/error-boundary` | `ErrorBoundary` | |
+| Module                        | Contents                                    | Notes                                                                                                                                                                                                        |
+| ----------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `components`                  | 98 component folders                        | The bulk of the value. Includes the generic `selector` component (distinct from `selectors/`)                                                                                                                |
+| `utils`                       | Helpers re-exported from `utils/index.ts`   | The barrel only. `utils/socket` is **not** public — see below                                                                                                                                                |
+| `hooks`                       | 11 hooks                                    | Barrelled in `hooks/index.ts` and exported from the root. `useViewEffect` is a default export, re-exported by name                                                                                           |
+| `context`                     | `ThemeContext`, `InterfaceDirectionContext` |                                                                                                                                                                                                              |
+| `enums`, `constants`, `types` | Shared enums, constants, type definitions   |                                                                                                                                                                                                              |
+| `errors`                      | Error page components (401, 403, 404, …)    | Self-contained, no portal coupling                                                                                                                                                                           |
+| `styles`                      | Global SCSS, mixins, variables              | Needed by consumers who extend the design system                                                                                                                                                             |
+| `assets`                      | Icon set as React components                | **Subpath-only, deliberately.** Hundreds of SVG modules; a barrel would defeat tree-shaking and force every consumer to parse the whole set. Licensing of the assets themselves is a separate question (D12) |
+| `providers/theme`             | `ThemeProvider`, theme objects, `useTheme`  |                                                                                                                                                                                                              |
+| `providers/translation`       | `TranslationProvider`, i18n wiring          |                                                                                                                                                                                                              |
+| `providers/error-boundary`    | `ErrorBoundary`                             |                                                                                                                                                                                                              |
 
 ### Not public, and why — the two that look like they should be
 
@@ -73,7 +73,7 @@ index.js -> uploader/index.js        -> providers/api/ApiProvider/index.js -> ax
 index.js -> billing/wallet/...       -> selectors/People/index.js          -> axios
 ```
 
-Since `axios` is an *optional* peer, `npm i @onlyoffice/apps-ui-kit` does not install it, and a
+Since `axios` is an _optional_ peer, `npm i @onlyoffice/apps-ui-kit` does not install it, and a
 bare `import { Button } from "@onlyoffice/apps-ui-kit"` then fails to resolve for anyone who
 bundles the barrel themselves. Observed, not inferred: the DocSpace plugin preview harness
 reports `Could not resolve "axios" imported by "@onlyoffice/apps-ui-kit"` on a freshly generated
@@ -103,22 +103,22 @@ above, nothing in the root barrel reaches it.
 
 These **ship in the published package** and resolve normally — the monorepo depends on them 227
 times and must be able to consume the built artifact uniformly (WP-12). What they lack is a
-*contract*: no semver promise, no documentation for external use, no support.
+_contract_: no semver promise, no documentation for external use, no support.
 
 The `exports` map therefore declares them, and the build emits them. The distinction is
 editorial, not mechanical — which is why it has to be written down here rather than enforced by
 resolution alone.
 
-| Module | Client imports | Why not public API |
-|---|---|---|
-| `ai-agent` | 80 | Depends on `@onlyoffice/ai-chat`, which cannot currently be published. Ships anyway, via optional peer dependencies — see below |
-| `billing` | 68 | Portal tariff/payment flows; depends on the API layer and MobX stores |
-| `selectors` | 70 | Data-driven pickers (People, Room, Files, Groups, MCPServers, AIAgent) built on the API layer and MobX |
-| `uploader` | 7 | Depends on `selectors/Files` and `providers/api` |
-| `document-editor` | 2 | Wrapper around `@onlyoffice/document-editor-react`; external consumers should use that package directly |
-| `api` | — | Portal REST client |
-| `providers/api` | — | Portal API provider; sole importer of `axios` |
-| `utils/socket` | — | See above |
+| Module            | Client imports | Why not public API                                                                                                              |
+| ----------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `ai-agent`        | 80             | Depends on `@onlyoffice/ai-chat`, which cannot currently be published. Ships anyway, via optional peer dependencies — see below |
+| `billing`         | 68             | Portal tariff/payment flows; depends on the API layer and MobX stores                                                           |
+| `selectors`       | 70             | Data-driven pickers (People, Room, Files, Groups, MCPServers, AIAgent) built on the API layer and MobX                          |
+| `uploader`        | 7              | Depends on `selectors/Files` and `providers/api`                                                                                |
+| `document-editor` | 2              | Wrapper around `@onlyoffice/document-editor-react`; external consumers should use that package directly                         |
+| `api`             | —              | Portal REST client                                                                                                              |
+| `providers/api`   | —              | Portal API provider; sole importer of `axios`                                                                                   |
+| `utils/socket`    | —              | See above                                                                                                                       |
 
 **Two of them are in the root barrel**: `index.ts` exports `uploader` and `billing` alongside
 the public modules, so they are portal-internal by tiering and public by resolution — and, since
@@ -160,7 +160,7 @@ Because every module now ships, the question is no longer "what does the core ne
 must a consumer install to use what they actually import**. The `ai-chat` mechanism generalises
 into the rule:
 
-> The public core's requirements are `dependencies`. Anything needed *only* by portal-internal
+> The public core's requirements are `dependencies`. Anything needed _only_ by portal-internal
 > modules is an **optional peer dependency**.
 
 That way `npm i @onlyoffice/apps-ui-kit` pulls what a component library legitimately needs
@@ -178,11 +178,11 @@ types and enums such as `RoomType`, `FolderType` and `CustomColorThemesSettingsI
 `file:` tarball, which is unpublishable; it is now `^3.7.0` from public npm. The switch is done,
 but it was **not** a swap of identical artifacts, and the reason to record that is below:
 
-| | npm 3.7.0 | vendored 3.7.0 |
-|---|---|---|
-| Files | 2 649 | 2 622 |
-| Differing by content | 83 files, incl. `LICENSE`, `README`, `chat-api`, `settings-api`, `files-settings-api` | |
-| Present only on the other side | 27 model files (`ai-user-settings-*`, `external-sharing-settings-*`, `generated-file-*`, …) | **none** |
+|                                | npm 3.7.0                                                                                   | vendored 3.7.0 |
+| ------------------------------ | ------------------------------------------------------------------------------------------- | -------------- |
+| Files                          | 2 649                                                                                       | 2 622          |
+| Differing by content           | 83 files, incl. `LICENSE`, `README`, `chat-api`, `settings-api`, `files-settings-api`       |                |
+| Present only on the other side | 27 model files (`ai-user-settings-*`, `external-sharing-settings-*`, `generated-file-*`, …) | **none**       |
 
 The npm build is a strict superset by file presence — nothing is lost by switching — and the
 two enums the core actually imports, `room-type.js` and `folder-type.js`, are byte-identical.
@@ -206,15 +206,15 @@ Declared so the portal can satisfy them and external consumers never download th
 and this is the whole list — every one is verified to be imported somewhere under this package
 root:
 
-| Package(s) | Needed by |
-|---|---|
-| `@onlyoffice/ai-chat` | `ai-agent` |
-| `mobx`, `mobx-react` (84 importers, all portal) | `selectors`, `billing` |
-| `axios` | `providers/api` — but see *Dependency consequences*: the barrel reaches it |
-| `socket.io-client`, `@socket.io/component-emitter` | `utils/socket` |
-| `react-router` | portal navigation |
-| `react-markdown`, `react-syntax-highlighter`, `rehype-katex`, `rehype-raw`, `remark-gfm`, `remark-math`, `katex` | `ai-agent` markdown rendering |
-| `@onlyoffice/document-editor-react` | `document-editor` |
+| Package(s)                                                                                                       | Needed by                                                                  |
+| ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `@onlyoffice/ai-chat`                                                                                            | `ai-agent`                                                                 |
+| `mobx`, `mobx-react` (84 importers, all portal)                                                                  | `selectors`, `billing`                                                     |
+| `axios`                                                                                                          | `providers/api` — but see _Dependency consequences_: the barrel reaches it |
+| `socket.io-client`, `@socket.io/component-emitter`                                                               | `utils/socket`                                                             |
+| `react-router`                                                                                                   | portal navigation                                                          |
+| `react-markdown`, `react-syntax-highlighter`, `rehype-katex`, `rehype-raw`, `remark-gfm`, `remark-math`, `katex` | `ai-agent` markdown rendering                                              |
+| `@onlyoffice/document-editor-react`                                                                              | `document-editor`                                                          |
 
 **`ai-chat`'s own optional peers are deliberately not here.** An earlier revision of this
 document said they were, and they were declared for a while: the LLM vendor SDKs, the
@@ -238,7 +238,7 @@ longer mirrors — see the note above.
 The consequence is worth stating plainly rather than leaving as a worry: **an app that renders
 `ai-agent` must satisfy `ai-chat`'s peers itself.** Anything it misses switches an `ai-chat`
 feature off silently, which is what an unsatisfied optional peer does. Two of them
-(`@assistant-ui/react`, `assistant-stream`) are *required* peers of `ai-chat`, so those fail
+(`@assistant-ui/react`, `assistant-stream`) are _required_ peers of `ai-chat`, so those fail
 loudly instead. Nothing here checks either; the `ai-agent` tests do not reach the code paths
 that load them.
 
@@ -247,14 +247,14 @@ that load them.
 Deep imports stay supported — 2 974 of the 4 060 import sites are `components/*`, and breaking
 them is not on the table. The `exports` map is deliberately small:
 
-| Key | Serves |
-|---|---|
-| `.` | the barrel |
-| `./styles.css` | the whole-library stylesheet, for consumers that cannot take the per-module CSS each component imports itself |
-| `./package.json` | required by tooling |
-| `./locales/*` | the vendored translations |
-| `./styles/*` | raw Sass sources, the form every `@use` in the portal writes |
-| `./*` | **one wildcard for every module subpath**, public and portal-internal alike |
+| Key              | Serves                                                                                                        |
+| ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| `.`              | the barrel                                                                                                    |
+| `./styles.css`   | the whole-library stylesheet, for consumers that cannot take the per-module CSS each component imports itself |
+| `./package.json` | required by tooling                                                                                           |
+| `./locales/*`    | the vendored translations                                                                                     |
+| `./styles/*`     | raw Sass sources, the form every `@use` in the portal writes                                                  |
+| `./*`            | **one wildcard for every module subpath**, public and portal-internal alike                                   |
 
 There is no per-module list. The build emits a single shape — `<subpath>/index.js` for the
 JavaScript, `<subpath>/index.d.mts` for the types — so one wildcard serves all of it, which is
@@ -309,7 +309,7 @@ harness in another repository rather than by anything here.
    **Amended:** `ai-chat`'s own peer list was subsequently removed again — nothing here imports
    those packages and pnpm installs neither peers nor optional peers, so declaring them
    satisfied nothing. The fifteen optional peers that remain are listed under
-   *`peerDependencies`, optional*.
+   _`peerDependencies`, optional_.
 2. ~~Should the ONLYOFFICE icons move to MIT with the code?~~ **Answered: no — the package was
    briefly relicensed under MIT and that was reverted; everything here is AGPL-3.0-only.**
    `LICENSE` is the verbatim AGPL-3.0 text and nothing else: the same file the umbrella
@@ -328,6 +328,6 @@ harness in another repository rather than by anything here.
    `ai-agent`. Now a question for the consuming app rather than for this package, since the
    peer list is no longer mirrored here.
 6. **`axios` is not portal-only, and cannot be while `billing` and `uploader` are in the root
-   barrel.** The two ways out are in *Dependency consequences*; they trade the tiering against
+   barrel.** The two ways out are in _Dependency consequences_; they trade the tiering against
    the plugin API, so this is a product decision, not a packaging one. Until it is taken, an
    external consumer who bundles the barrel must install `axios` themselves.

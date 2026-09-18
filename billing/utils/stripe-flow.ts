@@ -132,4 +132,3 @@ export const waitForTopUpCompletion = async (
 
   return { isDelayedPaymentMethod };
 };
-

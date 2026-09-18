@@ -162,4 +162,3 @@ describe("uploadFilesToChat", () => {
     expect(mockToastError).toHaveBeenCalledTimes(1);
   });
 });
-

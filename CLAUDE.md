@@ -22,14 +22,14 @@ for component work and reach for the packed tarball when verifying the package i
 
 Path-scoped detail that does not belong here, loaded when the matching files are touched:
 
-| Rule | Covers |
-|---|---|
-| `plugin-api.md` | the root barrel **is** the DocSpace plugin UI API; the portal shim, subpath imports that throw, and the `agent-skills` skill that documents it |
-| `component-authoring.md` | folder layout, props and JSDoc, `ref` as a prop, stories, what `vitest.config.ts` actually collects |
-| `theming.md` | which layer a `var(--x)` comes from, undefined tokens failing silently, RTL |
-| `packaging.md` | `exports`, `publishConfig`, ESM-only dist, dependency placement, per-module CSS, `"use client"` |
-| `source-checks.md` | the client-side checks that used to cover this source (hex, ASCII, indentation, assets, deps, licence headers), why none of them run here now, and AGPL-3.0-only without per-file headers |
-| `vscode-tasks.md` | the three layers behind the status-bar buttons in `ui-kit.code-workspace` |
+| Rule                     | Covers                                                                                                                                                                                    |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plugin-api.md`          | the root barrel **is** the DocSpace plugin UI API; the portal shim, subpath imports that throw, and the `agent-skills` skill that documents it                                            |
+| `component-authoring.md` | folder layout, props and JSDoc, `ref` as a prop, stories, what `vitest.config.ts` actually collects                                                                                       |
+| `theming.md`             | which layer a `var(--x)` comes from, undefined tokens failing silently, RTL                                                                                                               |
+| `packaging.md`           | `exports`, `publishConfig`, ESM-only dist, dependency placement, per-module CSS, `"use client"`                                                                                           |
+| `source-checks.md`       | the client-side checks that used to cover this source (hex, ASCII, indentation, assets, deps, licence headers), why none of them run here now, and AGPL-3.0-only without per-file headers |
+| `vscode-tasks.md`        | the three layers behind the status-bar buttons in `ui-kit.code-workspace`                                                                                                                 |
 
 ## Tech Stack
 

@@ -1,10 +1,7 @@
 import React from "react";
 import { useCommonTranslation } from "../../../utils/i18n";
 
-import {
-  ModalDialog,
-  ModalDialogType,
-} from "../../../components/modal-dialog";
+import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
 import { Button, ButtonSize } from "../../../components/button";
 import { Text } from "../../../components/text";
 

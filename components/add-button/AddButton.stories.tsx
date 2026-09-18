@@ -336,4 +336,3 @@ export const CustomIconSize: Story = {
     },
   },
 };
-

@@ -28,6 +28,6 @@ addLog(log: string, category: "socket"): void
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
+| File       | Description       |
+| ---------- | ----------------- |
 | `index.ts` | `addLog` function |

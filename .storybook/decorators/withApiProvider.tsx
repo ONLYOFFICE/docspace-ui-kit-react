@@ -25,7 +25,8 @@ const withApiProvider: Decorator = (Story, context) => {
       url={apiUrl}
       apiKey={apiKey}
       initSocket={false}
-      useBearerForRawClient>
+      useBearerForRawClient
+    >
       <Story key={apiConfig} />
     </ApiProvider>
   );

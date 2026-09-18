@@ -7,7 +7,10 @@ import { isMobile, isTablet } from "../../../utils";
 
 import { FileTile } from ".";
 import { FileItemType } from "./FileTile.types";
-import { ContextMenuRefType, HeaderType } from "../../context-menu/ContextMenu.types";
+import {
+  ContextMenuRefType,
+  HeaderType,
+} from "../../context-menu/ContextMenu.types";
 
 // Mock translations
 vi.mock("react-i18next", () => ({
@@ -87,31 +90,36 @@ vi.mock("../../context-menu-button", () => ({
 
 // Mock ContextMenu component
 vi.mock("../../context-menu", () => {
-  const ContextMenuComponent = React.forwardRef(({
-    model,
-    header,
-  }: {
-    model?: Array<{ key: string; label: string }>;
-    header?: HeaderType;
-  }, ref: React.ForwardedRef<ContextMenuRefType>) => {
-    React.useImperativeHandle(ref, () => ({
-      show: vi.fn(),
-      hide: vi.fn(),
-      toggle: vi.fn(),
-      menuRef: { current: null },
-    }));
+  const ContextMenuComponent = React.forwardRef(
+    (
+      {
+        model,
+        header,
+      }: {
+        model?: Array<{ key: string; label: string }>;
+        header?: HeaderType;
+      },
+      ref: React.ForwardedRef<ContextMenuRefType>,
+    ) => {
+      React.useImperativeHandle(ref, () => ({
+        show: vi.fn(),
+        hide: vi.fn(),
+        toggle: vi.fn(),
+        menuRef: { current: null },
+      }));
 
-    return (
-      <div data-testid="context-menu">
-        {header && (
-          <div data-testid="context-menu-header">{header.title}</div>
-        )}
-        {model?.map((item) => (
-          <div key={item.key}>{item.label}</div>
-        ))}
-      </div>
-    );
-  });
+      return (
+        <div data-testid="context-menu">
+          {header && (
+            <div data-testid="context-menu-header">{header.title}</div>
+          )}
+          {model?.map((item) => (
+            <div key={item.key}>{item.label}</div>
+          ))}
+        </div>
+      );
+    },
+  );
   ContextMenuComponent.displayName = "ContextMenu";
   return { ContextMenu: ContextMenuComponent };
 });
@@ -341,7 +349,12 @@ describe("FileTile", () => {
 
   it("handles thumbnail load error", () => {
     render(
-      <FileTile {...defaultProps} thumbnail="invalid.png" thumbSize={96} temporaryIcon={<div data-testid='temp-icon' />}>
+      <FileTile
+        {...defaultProps}
+        thumbnail="invalid.png"
+        thumbSize={96}
+        temporaryIcon={<div data-testid="temp-icon" />}
+      >
         <FileContent />
       </FileTile>,
     );
@@ -363,7 +376,11 @@ describe("FileTile", () => {
   });
 
   it("renders plugin icon when item.isPlugin is true", () => {
-    const pluginItem = { ...mockItem, isPlugin: true, fileTileIcon: "plugin.png" };
+    const pluginItem = {
+      ...mockItem,
+      isPlugin: true,
+      fileTileIcon: "plugin.png",
+    };
     render(
       <FileTile {...defaultProps} item={pluginItem}>
         <FileContent />
@@ -388,7 +405,9 @@ describe("FileTile", () => {
 
   it("constructs context menu header correctly from first child item", () => {
     const childItem = { title: "Custom Title", icon: "custom-icon" };
-    const FileChild = ({ item }: { item: typeof childItem }) => <div data-testid="child" />;
+    const FileChild = ({ item }: { item: typeof childItem }) => (
+      <div data-testid="child" />
+    );
 
     render(
       <FileTile {...defaultProps}>
@@ -425,7 +444,7 @@ describe("FileTile", () => {
     const { container } = render(
       <FileTile {...defaultProps}>
         <FileContent />
-      </FileTile>
+      </FileTile>,
     );
     expect(container.firstChild).toHaveClass("isTouchDevice");
     vi.mocked(isMobile).mockReturnValue(false);
@@ -434,9 +453,14 @@ describe("FileTile", () => {
   it("does not call setSelection when clicking on an image", () => {
     const setSelection = vi.fn();
     render(
-      <FileTile {...defaultProps} setSelection={setSelection} thumbnail="test.png" thumbSize={96}>
+      <FileTile
+        {...defaultProps}
+        setSelection={setSelection}
+        thumbnail="test.png"
+        thumbSize={96}
+      >
         <FileContent />
-      </FileTile>
+      </FileTile>,
     );
 
     const img = screen.getByTestId("file-thumbnail");
@@ -450,7 +474,7 @@ describe("FileTile", () => {
     render(
       <FileTile {...defaultProps} setSelection={setSelection}>
         <FileContent />
-      </FileTile>
+      </FileTile>,
     );
 
     const tile = screen.getByTestId("tile");
@@ -463,7 +487,7 @@ describe("FileTile", () => {
     const { container } = render(
       <FileTile {...defaultProps} isHighlight={true}>
         <FileContent />
-      </FileTile>
+      </FileTile>,
     );
     expect(container.querySelector(".isHighlight")).toBeTruthy();
   });
@@ -471,12 +495,12 @@ describe("FileTile", () => {
   it("applies isImageOrMedia class when ImageView is true", () => {
     const mediaItem = {
       ...mockItem,
-      viewAccessibility: { ImageView: true, MediaView: false }
+      viewAccessibility: { ImageView: true, MediaView: false },
     };
     const { container } = render(
       <FileTile {...defaultProps} item={mediaItem}>
         <FileContent />
-      </FileTile>
+      </FileTile>,
     );
     expect(container.querySelector(".isImageOrMedia")).toBeTruthy();
   });
@@ -486,7 +510,7 @@ describe("FileTile", () => {
     render(
       <FileTile {...defaultProps} onSelect={onSelect}>
         <FileContent />
-      </FileTile>
+      </FileTile>,
     );
 
     const tile = screen.getByTestId("tile");
@@ -495,4 +519,3 @@ describe("FileTile", () => {
     expect(onSelect).not.toHaveBeenCalled();
   });
 });
-

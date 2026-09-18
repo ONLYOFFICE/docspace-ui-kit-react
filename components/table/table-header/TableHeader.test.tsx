@@ -31,10 +31,14 @@ const TableHeaderWithContainerRef = (
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div 
-      id="table-container" 
+    <div
+      id="table-container"
       ref={containerRef}
-      style={{ display: "grid", gridTemplateColumns: "210px 110px 110px 110px 24px", width: "1000px" }}
+      style={{
+        display: "grid",
+        gridTemplateColumns: "210px 110px 110px 110px 24px",
+        width: "1000px",
+      }}
     >
       <TableHeader {...args} containerRef={containerRef} />
     </div>
@@ -99,17 +103,20 @@ describe("<TableHeader />", () => {
     localStorage.clear();
 
     // Mock getBoundingClientRect for elements
-    window.HTMLElement.prototype.getBoundingClientRect = vi.fn(() => ({
-      width: 1000,
-      height: 40,
-      top: 0,
-      left: 0,
-      bottom: 40,
-      right: 1000,
-      x: 0,
-      y: 0,
-      toJSON: () => {},
-    } as DOMRect));
+    window.HTMLElement.prototype.getBoundingClientRect = vi.fn(
+      () =>
+        ({
+          width: 1000,
+          height: 40,
+          top: 0,
+          left: 0,
+          bottom: 40,
+          right: 1000,
+          x: 0,
+          y: 0,
+          toJSON: () => {},
+        }) as DOMRect,
+    );
   });
 
   it("renders without errors", () => {
@@ -173,25 +180,32 @@ describe("<TableHeader />", () => {
 
   it("resets columns when column count changes and no storage", () => {
     const removeItemSpy = vi.spyOn(Storage.prototype, "removeItem");
-    const { rerender } = render(<TableHeaderWithContainerRef {...defaultProps} />);
-    
+    const { rerender } = render(
+      <TableHeaderWithContainerRef {...defaultProps} />,
+    );
+
     // Clear storage created by first render to simulate "no storage"
     localStorage.removeItem(COLUMN_STORAGE_NAME);
     removeItemSpy.mockClear();
-    
-    const moreColumns = [...mockColumns, {
-      key: "NewCol",
-      title: "New Col",
-      enable: true,
-      sortBy: "NewCol",
-      onChange: () => {},
-      onClick: () => {},
-    }];
-    
+
+    const moreColumns = [
+      ...mockColumns,
+      {
+        key: "NewCol",
+        title: "New Col",
+        enable: true,
+        sortBy: "NewCol",
+        onChange: () => {},
+        onClick: () => {},
+      },
+    ];
+
     act(() => {
-      rerender(<TableHeaderWithContainerRef {...defaultProps} columns={moreColumns} />);
+      rerender(
+        <TableHeaderWithContainerRef {...defaultProps} columns={moreColumns} />,
+      );
     });
-    
+
     // resetColumns MUST call removeItem
     expect(removeItemSpy).toHaveBeenCalledWith(COLUMN_STORAGE_NAME);
     expect(localStorage.getItem(COLUMN_STORAGE_NAME)).not.toBeNull();
@@ -200,15 +214,22 @@ describe("<TableHeader />", () => {
 
   it("calls onResize when columns length does not change", () => {
     const removeItemSpy = vi.spyOn(Storage.prototype, "removeItem");
-    const { rerender } = render(<TableHeaderWithContainerRef {...defaultProps} />);
-    
+    const { rerender } = render(
+      <TableHeaderWithContainerRef {...defaultProps} />,
+    );
+
     // Clear calls from initial render
     removeItemSpy.mockClear();
 
     act(() => {
-      rerender(<TableHeaderWithContainerRef {...defaultProps} sortBy={SortByFieldName.Type} />);
+      rerender(
+        <TableHeaderWithContainerRef
+          {...defaultProps}
+          sortBy={SortByFieldName.Type}
+        />,
+      );
     });
-    
+
     // onResize MUST NOT call removeItem(COLUMN_STORAGE_NAME) if infoPanelVisible is false.
     // onResize might call removeItem(COLUMN_INFO_PANEL_STORAGE_NAME) for cleanup.
     // We check that it didn't do a full reset.
@@ -226,20 +247,20 @@ describe("<TableHeader />", () => {
     });
 
     const { rerender } = render(
-      <TableHeaderWithContainerRef 
-        {...defaultProps} 
-        columns={mockColumns} 
-        sortBy={SortByFieldName.Name} 
-      />
+      <TableHeaderWithContainerRef
+        {...defaultProps}
+        columns={mockColumns}
+        sortBy={SortByFieldName.Name}
+      />,
     );
 
     act(() => {
       rerender(
-        <TableHeaderWithContainerRef 
-          {...defaultProps} 
-          columns={columnsWithDisabled} 
-          sortBy={SortByFieldName.Type} 
-        />
+        <TableHeaderWithContainerRef
+          {...defaultProps}
+          columns={columnsWithDisabled}
+          sortBy={SortByFieldName.Type}
+        />,
       );
     });
 

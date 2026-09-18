@@ -225,12 +225,7 @@ export type LinkRouterProps = {
 export type ValueOf<T> = T[keyof T];
 
 export type TViewAs =
-  | "tile"
-  | "table"
-  | "row"
-  | "settings"
-  | "profile"
-  | "tileDynamicHeight";
+  "tile" | "table" | "row" | "settings" | "profile" | "tileDynamicHeight";
 
 declare global {
   interface Window {
@@ -293,10 +288,7 @@ export type TFileViewAccessibility = {
 };
 
 export type TShareRightsType =
-  | "ExternalLink"
-  | "Group"
-  | "PrimaryExternalLink"
-  | "User";
+  "ExternalLink" | "Group" | "PrimaryExternalLink" | "User";
 
 export type TAvailableShareRights = Partial<
   Record<TShareRightsType, ShareRights[]>

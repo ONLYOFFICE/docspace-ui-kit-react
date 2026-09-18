@@ -10,10 +10,7 @@ type WalletLoaderProps = {
   isTablet?: boolean;
 };
 
-const WalletLoader: React.FC<WalletLoaderProps> = ({
-  isMobile,
-  isTablet,
-}) => {
+const WalletLoader: React.FC<WalletLoaderProps> = ({ isMobile, isTablet }) => {
   const loaderClassName = classNames(styles.transactionHistoryLoader, {
     [styles.isTablet]: isTablet,
   });
@@ -21,8 +18,18 @@ const WalletLoader: React.FC<WalletLoaderProps> = ({
   return (
     <div className={loaderClassName}>
       <div className={styles.descriptionRow}>
-        <RectangleSkeleton uniqueKey="wallet-desc-1" height="40px" borderRadius="3px" width="100%" />
-        <RectangleSkeleton uniqueKey="wallet-desc-2" height="20px" borderRadius="3px" width="73px" />
+        <RectangleSkeleton
+          uniqueKey="wallet-desc-1"
+          height="40px"
+          borderRadius="3px"
+          width="100%"
+        />
+        <RectangleSkeleton
+          uniqueKey="wallet-desc-2"
+          height="20px"
+          borderRadius="3px"
+          width="73px"
+        />
       </div>
 
       <RectangleSkeleton

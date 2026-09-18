@@ -476,7 +476,13 @@ export const CssCustomization: Story = {
         } as CSSProperties
       }
     >
-      <RoomIcon title="NC" size="96px" color="0082c9" radius="50%" showDefault />
+      <RoomIcon
+        title="NC"
+        size="96px"
+        color="0082c9"
+        radius="50%"
+        showDefault
+      />
       <div
         style={
           {

@@ -5,7 +5,17 @@ import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import styles from "./SubComponents.module.scss";
 
 const DowngradePlanButtonContainer = observer(
-  ({ isDisabled, onDowngradeTariff, onUpdateTariff, buttonLabel }: { isDisabled?: boolean; onDowngradeTariff?: () => void; onUpdateTariff?: () => void; buttonLabel: string }) => {
+  ({
+    isDisabled,
+    onDowngradeTariff,
+    onUpdateTariff,
+    buttonLabel,
+  }: {
+    isDisabled?: boolean;
+    onDowngradeTariff?: () => void;
+    onUpdateTariff?: () => void;
+    buttonLabel: string;
+  }) => {
     const paymentStore = usePaymentStore();
     const { isLoading, isLessCountThanAcceptable } = paymentStore;
 
@@ -26,4 +36,3 @@ const DowngradePlanButtonContainer = observer(
 );
 
 export default DowngradePlanButtonContainer;
-

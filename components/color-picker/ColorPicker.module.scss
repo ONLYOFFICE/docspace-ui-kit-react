@@ -110,9 +110,15 @@
     --color-picker-color: #{variables.$gray-text};
 
     // bridge vars — bind public overrides to internal theme tokens
-    --color-picker-border-v: var(--color-picker-border-style, var(--color-picker-border));
+    --color-picker-border-v: var(
+      --color-picker-border-style,
+      var(--color-picker-border)
+    );
     --color-picker-bg-v: var(--color-picker-bg, var(--color-picker-background));
-    --color-picker-color-v: var(--color-picker-text-color, var(--color-picker-color));
+    --color-picker-color-v: var(
+      --color-picker-text-color,
+      var(--color-picker-color)
+    );
     // new bridge vars for hardcoded values
     --color-picker-input-height-v: var(--color-picker-input-height, 32px);
     --color-picker-input-padding-v: var(--color-picker-input-padding, 6px 8px);

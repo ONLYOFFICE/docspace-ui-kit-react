@@ -23,19 +23,19 @@ import { MCPIcon, MCPIconSize } from "@onlyoffice/apps-ui-kit/components/mcp-ico
 
 ## Properties
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `title` | `string` | - | Title text for the icon (required). First character is displayed when no image |
-| `size` | `MCPIconSize` | `MCPIconSize.Large` | Size of the icon |
-| `imgSrc` | `string` | - | Image source URL for the icon |
-| `className` | `string` | - | Additional CSS class name |
-| `dataTestId` | `string` | `"mcp-icon"` | Test ID for automated testing |
+| Prop         | Type          | Default             | Description                                                                    |
+| ------------ | ------------- | ------------------- | ------------------------------------------------------------------------------ |
+| `title`      | `string`      | -                   | Title text for the icon (required). First character is displayed when no image |
+| `size`       | `MCPIconSize` | `MCPIconSize.Large` | Size of the icon                                                               |
+| `imgSrc`     | `string`      | -                   | Image source URL for the icon                                                  |
+| `className`  | `string`      | -                   | Additional CSS class name                                                      |
+| `dataTestId` | `string`      | `"mcp-icon"`        | Test ID for automated testing                                                  |
 
 ## MCPIconSize
 
-| Value | Dimensions |
-|-------|------------|
-| `Small` | 16x16px |
-| `Medium` | 24x24px |
-| `Big` | 32x32px |
-| `Large` | 48x48px |
+| Value    | Dimensions |
+| -------- | ---------- |
+| `Small`  | 16x16px    |
+| `Medium` | 24x24px    |
+| `Big`    | 32x32px    |
+| `Large`  | 48x48px    |

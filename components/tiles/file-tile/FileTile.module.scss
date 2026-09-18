@@ -46,7 +46,10 @@
   height: var(--tile-height, 222px);
 
   background: var(--tile-bg, var(--tile-background-color));
-  border: var(--file-tile-border-style, var(--tile-border-style, var(--tile-border)));
+  border: var(
+    --file-tile-border-style,
+    var(--tile-border-style, var(--tile-border))
+  );
   border-radius: var(--tile-radius, var(--tile-border-radius));
 
   @include mixins.mobile {
@@ -377,4 +380,3 @@
     }
   }
 }
-

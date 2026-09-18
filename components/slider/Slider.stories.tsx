@@ -308,4 +308,3 @@ export const CssCustomization: Story = {
     },
   },
 };
-

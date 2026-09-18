@@ -161,7 +161,7 @@ export const Method: StoryObj = {
     docs: {
       description: {
         story:
-          "Payment method page with multiple states. **Card linked**: shows payer details (avatar, name, email), card status with check/warning icon, and a button to the Stripe customer portal. **Payer not found**: if the payer email doesn't match any portal user, a message is shown suggesting to choose a new payer (for owners) or contact the owner (for admins). **No card**: shows an \"Add payment method\" button that redirects to card linking.\n\n**Non-payer admins:** the Stripe customer portal button is hidden. Only the portal owner or the payer themselves can access Stripe to manage payment details or reassign the payer role.",
+          'Payment method page with multiple states. **Card linked**: shows payer details (avatar, name, email), card status with check/warning icon, and a button to the Stripe customer portal. **Payer not found**: if the payer email doesn\'t match any portal user, a message is shown suggesting to choose a new payer (for owners) or contact the owner (for admins). **No card**: shows an "Add payment method" button that redirects to card linking.\n\n**Non-payer admins:** the Stripe customer portal button is hidden. Only the portal owner or the payer themselves can access Stripe to manage payment details or reassign the payer role.',
       },
       source: {
         code: `<BillingRoot config={config}>
@@ -175,7 +175,9 @@ export const Method: StoryObj = {
 // ── Services ──
 
 export const Services: StoryObj = {
-  render: () => <ServicesListPage showPortalSettingsLoader={false} cardDisabled />,
+  render: () => (
+    <ServicesListPage showPortalSettingsLoader={false} cardDisabled />
+  ),
   parameters: {
     docs: {
       description: {
@@ -241,11 +243,19 @@ export const DiskStorage: StoryObj = {
 const loaderTabs = [
   { key: "mainTariff", label: "Main Tariff", component: <PaymentsLoader /> },
   { key: "wallet", label: "Wallet", component: <WalletLoader /> },
-  { key: "method", label: "Payment Method", component: <PaymentMethodLoader /> },
+  {
+    key: "method",
+    label: "Payment Method",
+    component: <PaymentMethodLoader />,
+  },
   { key: "services", label: "Services", component: <ServicesLoader /> },
   { key: "aiTools", label: "AI Tools", component: <AiPageLoader /> },
   { key: "backup", label: "Backup", component: <BackupPageLoader /> },
-  { key: "storage", label: "Disk Storage", component: <AdditionalStoragePageLoader /> },
+  {
+    key: "storage",
+    label: "Disk Storage",
+    component: <AdditionalStoragePageLoader />,
+  },
 ] as const;
 
 const LoadingStatesRender = () => {
@@ -262,7 +272,10 @@ const LoadingStatesRender = () => {
               padding: "6px 16px",
               borderRadius: 6,
               border: "1px solid var(--border-service-color, #eceef1)",
-              background: active === key ? "var(--color-scheme-main-accent, #4781D1)" : "transparent",
+              background:
+                active === key
+                  ? "var(--color-scheme-main-accent, #4781D1)"
+                  : "transparent",
               color: active === key ? "#fff" : "inherit",
               cursor: "pointer",
               fontSize: 13,

@@ -18,7 +18,6 @@ export type ArticleHeaderProps = {
   onBack?: () => void;
 };
 
-
 export type ArticleAppsProps = {
   showText: boolean;
   withDevTools: boolean;

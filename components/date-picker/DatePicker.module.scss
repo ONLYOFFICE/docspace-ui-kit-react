@@ -3,7 +3,10 @@
 @use "../../styles/mixins";
 
 .dropDownStyle {
-  --date-picker-dropdown-padding-v: var(--date-picker-dropdown-padding, 16px 16px 16px 17px);
+  --date-picker-dropdown-padding-v: var(
+    --date-picker-dropdown-padding,
+    16px 16px 16px 17px
+  );
 
   position: relative;
 
@@ -72,7 +75,10 @@
   }
 
   // bridge vars
-  --date-picker-header-border-v: var(--date-picker-header-border, var(--date-picker-border));
+  --date-picker-header-border-v: var(
+    --date-picker-header-border,
+    var(--date-picker-border)
+  );
 
   display: flex;
   align-items: center;

@@ -1,9 +1,4 @@
-import React, {
-  ChangeEvent,
-  KeyboardEvent,
-  MouseEvent,
-  useState,
-} from "react";
+import React, { ChangeEvent, KeyboardEvent, MouseEvent, useState } from "react";
 import classNames from "classnames";
 
 import PlusIcon from "../../assets/payment.plus.react.svg";

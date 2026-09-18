@@ -47,8 +47,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Default unavailable error page with standard messaging.",
+        story: "Default unavailable error page with standard messaging.",
       },
       source: {
         code: `<ErrorUnavailable />`,

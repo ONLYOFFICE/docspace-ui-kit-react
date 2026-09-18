@@ -30,108 +30,107 @@
   min-width: fit-content;
 
   background-color: var(--button-background-base);
- 
-   :global(.combo-button_selected-icon) > div {
-     display: flex;
-     align-items: center;
-   }
- 
-   svg {
-     path[fill] {
-       fill: var(--button-color-base);
-     }
- 
-     path[stroke] {
-       stroke: var(--button-color-base);
-     }
-   }
- 
-   &.isBlocked {
-     svg {
-       path[fill] {
-         fill: var(--button-color-base-disabled);
-       }
- 
-       path[stroke] {
-         stroke: var(--button-color-base-disabled);
-       }
-     }
-   }
- 
-   &:hover,
-   &:active {
-     border: none !important;
-     background-color: unset !important;
-   }
- 
-   &:hover {
-     svg {
-       path[fill] {
-         fill: var(--button-color-base-hover);
-       }
- 
-       path[stroke] {
-         stroke: var(--button-color-base-hover);
-       }
-     }
-   }
- 
-   &:active {
-     svg {
-       path[fill] {
-         fill: var(--button-color-base-active);
-       }
- 
-       path[stroke] {
-         stroke: var(--button-color-base-active);
-       }
-     }
-   }
- 
-   :global(.btnIcon) {
-     padding-inline-end: 8px;
-   }
- 
-   :global(.button-content) {
-     @include mixins.tablet-and-below {
-       flex-direction: column;
-       gap: 4px;
-     }
- 
-     @include mixins.mobile {
-       margin-top: 4px;
-     }
-   }
- 
-   /* TODO: remove if editors core version 85+ */
-   &.oldChrome {
-     :global(.button-content) {
-       > div {
-         margin-right: 8px;
- 
-         @include mixins.tablet-and-below {
-           margin-right: 0;
-         }
-       }
-     }
-   }
- 
-   @include mixins.tablet-and-below {
-     display: flex;
-     justify-content: center;
-     flex-direction: column;
-     padding: 0 12px;
- 
-     :global(.btnIcon) {
-       padding: 0;
-       margin: 0 auto;
-     }
-   }
- 
-   @include mixins.mobile {
-     padding: 0 16px;
-     font-size: 0;
-     line-height: 0;
-   }
- }
- 
+
+  :global(.combo-button_selected-icon) > div {
+    display: flex;
+    align-items: center;
+  }
+
+  svg {
+    path[fill] {
+      fill: var(--button-color-base);
+    }
+
+    path[stroke] {
+      stroke: var(--button-color-base);
+    }
+  }
+
+  &.isBlocked {
+    svg {
+      path[fill] {
+        fill: var(--button-color-base-disabled);
+      }
+
+      path[stroke] {
+        stroke: var(--button-color-base-disabled);
+      }
+    }
+  }
+
+  &:hover,
+  &:active {
+    border: none !important;
+    background-color: unset !important;
+  }
+
+  &:hover {
+    svg {
+      path[fill] {
+        fill: var(--button-color-base-hover);
+      }
+
+      path[stroke] {
+        stroke: var(--button-color-base-hover);
+      }
+    }
+  }
+
+  &:active {
+    svg {
+      path[fill] {
+        fill: var(--button-color-base-active);
+      }
+
+      path[stroke] {
+        stroke: var(--button-color-base-active);
+      }
+    }
+  }
+
+  :global(.btnIcon) {
+    padding-inline-end: 8px;
+  }
+
+  :global(.button-content) {
+    @include mixins.tablet-and-below {
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    @include mixins.mobile {
+      margin-top: 4px;
+    }
+  }
+
+  /* TODO: remove if editors core version 85+ */
+  &.oldChrome {
+    :global(.button-content) {
+      > div {
+        margin-right: 8px;
+
+        @include mixins.tablet-and-below {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+
+  @include mixins.tablet-and-below {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 12px;
+
+    :global(.btnIcon) {
+      padding: 0;
+      margin: 0 auto;
+    }
+  }
+
+  @include mixins.mobile {
+    padding: 0 16px;
+    font-size: 0;
+    line-height: 0;
+  }
+}

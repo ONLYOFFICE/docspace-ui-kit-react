@@ -14,7 +14,7 @@ import { Snackbar } from "@onlyoffice/apps-ui-kit/components/snackbar";
   onAction={handleUpdate}
   countDownTime={10}
   sectionWidth={800}
-/>
+/>;
 ```
 
 ## Features
@@ -30,27 +30,27 @@ import { Snackbar } from "@onlyoffice/apps-ui-kit/components/snackbar";
 
 ## Properties
 
-| Prop                   | Type                              | Default | Description                                          |
-|------------------------|-----------------------------------|---------|------------------------------------------------------|
-| `text`                 | `string \| ReactNode`             | —       | Main snackbar text content                           |
-| `headerText`           | `string`                          | —       | Header text displayed above the main text            |
-| `additionalHeaderText` | `string`                          | —       | Additional info text next to the header              |
-| `btnText`              | `string`                          | —       | Action button label                                  |
-| `onAction`             | `(e?: MouseEvent) => void`        | —       | Callback when the action button is clicked           |
-| `onClose`              | `() => void`                      | —       | Callback when the close button is clicked            |
-| `countDownTime`        | `number`                          | —       | Auto-dismiss countdown in seconds                    |
-| `sectionWidth`         | `number`                          | —       | Width of the parent section in pixels                |
-| `backgroundImg`        | `string`                          | —       | URL for the background image                         |
-| `showIcon`             | `boolean`                         | —       | Whether to display the snackbar icon                 |
-| `fontSize`             | `string`                          | —       | Custom font size                                     |
-| `fontWeight`           | `number`                          | —       | Custom font weight                                   |
-| `textAlign`            | `TextAlignValue`                  | —       | Text alignment                                       |
-| `htmlContent`          | `string`                          | —       | HTML string rendered inside the snackbar             |
-| `style`                | `React.CSSProperties`             | —       | Custom inline styles                                 |
-| `opacity`              | `number`                          | —       | Custom opacity value                                 |
-| `isCampaigns`          | `boolean`                         | —       | Enables campaign banner styling                      |
-| `isMaintenance`        | `boolean`                         | —       | Enables maintenance banner styling                   |
-| `onLoad`               | `() => void`                      | —       | Callback when the snackbar content is fully loaded   |
+| Prop                   | Type                       | Default | Description                                        |
+| ---------------------- | -------------------------- | ------- | -------------------------------------------------- |
+| `text`                 | `string \| ReactNode`      | —       | Main snackbar text content                         |
+| `headerText`           | `string`                   | —       | Header text displayed above the main text          |
+| `additionalHeaderText` | `string`                   | —       | Additional info text next to the header            |
+| `btnText`              | `string`                   | —       | Action button label                                |
+| `onAction`             | `(e?: MouseEvent) => void` | —       | Callback when the action button is clicked         |
+| `onClose`              | `() => void`               | —       | Callback when the close button is clicked          |
+| `countDownTime`        | `number`                   | —       | Auto-dismiss countdown in seconds                  |
+| `sectionWidth`         | `number`                   | —       | Width of the parent section in pixels              |
+| `backgroundImg`        | `string`                   | —       | URL for the background image                       |
+| `showIcon`             | `boolean`                  | —       | Whether to display the snackbar icon               |
+| `fontSize`             | `string`                   | —       | Custom font size                                   |
+| `fontWeight`           | `number`                   | —       | Custom font weight                                 |
+| `textAlign`            | `TextAlignValue`           | —       | Text alignment                                     |
+| `htmlContent`          | `string`                   | —       | HTML string rendered inside the snackbar           |
+| `style`                | `React.CSSProperties`      | —       | Custom inline styles                               |
+| `opacity`              | `number`                   | —       | Custom opacity value                               |
+| `isCampaigns`          | `boolean`                  | —       | Enables campaign banner styling                    |
+| `isMaintenance`        | `boolean`                  | —       | Enables maintenance banner styling                 |
+| `onLoad`               | `() => void`               | —       | Callback when the snackbar content is fully loaded |
 
 ## Examples
 

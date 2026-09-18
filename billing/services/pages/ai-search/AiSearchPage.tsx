@@ -360,4 +360,3 @@ const AiSearchPage = (props: AiSearchPageProps) => {
 };
 
 export default observer(AiSearchPage);
-

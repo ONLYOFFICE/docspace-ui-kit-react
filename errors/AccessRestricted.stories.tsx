@@ -47,8 +47,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Default access restricted error page with standard messaging.",
+        story: "Default access restricted error page with standard messaging.",
       },
       source: {
         code: `<AccessRestricted />`,

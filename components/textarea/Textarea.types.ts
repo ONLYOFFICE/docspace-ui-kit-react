@@ -61,7 +61,7 @@ export type TextareaProps = {
 
   isChatMode?: boolean;
   dataTestId?: string;
-  
+
   /** Callback function for handling copy action */
   onCopy?: (text: string) => void;
 };

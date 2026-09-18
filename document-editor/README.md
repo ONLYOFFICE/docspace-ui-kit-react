@@ -78,15 +78,15 @@ import type { IConfig } from "@onlyoffice/apps-ui-kit/document-editor";
 
 ## Properties
 
-| Prop                    | Type                                                          | Required | Default | Description                                                                 |
-| ----------------------- | ------------------------------------------------------------- | :------: | :-----: | --------------------------------------------------------------------------- |
-| `id`                    | `string`                                                      |    ✅    |    -    | Unique identifier for the editor instance                                   |
-| `documentServerUrl`     | `string`                                                      |    ✅    |    -    | URL of the ONLYOFFICE Document Server                                       |
-| `config`                | `IConfig`                                                     |    ✅    |    -    | Editor configuration object (see [Config API](#config-object))              |
-| `width`                 | `string`                                                      |    -     | `"100%"`| Width of the editor container (CSS value)                                   |
-| `height`                | `string`                                                      |    -     | `"100%"`| Height of the editor container (CSS value)                                  |
-| `shardkey`              | `string`                                                      |    -     |    -    | Shard key for load balancing across multiple document servers              |
-| `onLoadComponentError`  | `(errorCode: number, errorDescription: string) => void`       |    -     |    -    | Callback invoked when the component fails to load                           |
+| Prop                   | Type                                                    | Required | Default  | Description                                                    |
+| ---------------------- | ------------------------------------------------------- | :------: | :------: | -------------------------------------------------------------- |
+| `id`                   | `string`                                                |    ✅    |    -     | Unique identifier for the editor instance                      |
+| `documentServerUrl`    | `string`                                                |    ✅    |    -     | URL of the ONLYOFFICE Document Server                          |
+| `config`               | `IConfig`                                               |    ✅    |    -     | Editor configuration object (see [Config API](#config-object)) |
+| `width`                | `string`                                                |    -     | `"100%"` | Width of the editor container (CSS value)                      |
+| `height`               | `string`                                                |    -     | `"100%"` | Height of the editor container (CSS value)                     |
+| `shardkey`             | `string`                                                |    -     |    -     | Shard key for load balancing across multiple document servers  |
+| `onLoadComponentError` | `(errorCode: number, errorDescription: string) => void` |    -     |    -     | Callback invoked when the component fails to load              |
 
 ## Config Object
 

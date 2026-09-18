@@ -1,5 +1,5 @@
-.modalBody{
-  margin-top:20px;
+.modalBody {
+  margin-top: 20px;
 }
 
 .buttonContainerWrapper {
@@ -27,14 +27,14 @@
   max-width: 660px;
 }
 
- .shortView {
-    max-width: 320px;
-  }
+.shortView {
+  max-width: 320px;
+}
 
-  .withoutBackground {
-    background: transparent;
-    border: 1px solid var(--aside-header-border-color);
-  }
+.withoutBackground {
+  background: transparent;
+  border: 1px solid var(--aside-header-border-color);
+}
 
 .walletInfoIcon {
   width: 40px;
@@ -54,13 +54,11 @@
     svg {
       width: 16px;
       height: 16px;
-        path {
-          fill: var(--payment-icon-color);
-        }
+      path {
+        fill: var(--payment-icon-color);
+      }
     }
   }
-
-  
 }
 
 .walletInfoBody {
@@ -93,5 +91,5 @@
 }
 
 .balanceValue {
-  color: (var(--color-scheme-main-accent))
+  color: (var(--color-scheme-main-accent));
 }

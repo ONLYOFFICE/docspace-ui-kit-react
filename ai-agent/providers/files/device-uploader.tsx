@@ -87,4 +87,3 @@ const DeviceUploader = React.forwardRef<
 DeviceUploader.displayName = "DeviceUploader";
 
 export default DeviceUploader;
-

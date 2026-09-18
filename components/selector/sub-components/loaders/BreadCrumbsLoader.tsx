@@ -1,9 +1,6 @@
 import React from "react";
 
-import {
-  RectangleSkeleton,
-  RectangleSkeletonProps,
-} from "../../../rectangle";
+import { RectangleSkeleton, RectangleSkeletonProps } from "../../../rectangle";
 
 import styles from "./BreadCrumbsLoader.module.scss";
 

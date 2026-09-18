@@ -53,6 +53,8 @@ test.describe("EmailInput — dark", () => {
   test("css customization dark", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await page.evaluate(() => document.body.classList.add("dark"));
-    await expect(page).toHaveScreenshot("email-input-css-customization-dark.png");
+    await expect(page).toHaveScreenshot(
+      "email-input-css-customization-dark.png",
+    );
   });
 });

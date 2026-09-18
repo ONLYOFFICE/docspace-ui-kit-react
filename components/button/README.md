@@ -67,43 +67,43 @@ import { Button, ButtonSize } from "@onlyoffice/apps-ui-kit/components/button";
 
 ## Properties
 
-| Prop           | Type                                      | Default    | Description                                                                                                                        |
-| -------------- | ----------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `label`        | `string`                                  | Required   | Text content displayed inside the button                                                                                           |
-| `primary`      | `boolean`                                 | `false`    | When true, applies primary button styling with brand colors                                                                        |
-| `size`         | `ButtonSize`                              | `normal`   | Controls button dimensions (`extraSmall`, `small`, `normal`, `medium`). Normal size is 36px height on Desktop, 40px on Touchscreen |
-| `scale`        | `boolean`                                 | `false`    | When true, button width expands to fill its container (width: 100%)                                                                |
-| `icon`         | `ReactNode`                               | -          | Optional icon element rendered before the label                                                                                    |
-| `filled`       | `boolean`                                 | `false`    | Applies filled variant styling                                                                                                     |
-| `filledStroke` | `boolean`                                 | `false`    | Applies filled variant with stroke/border styling                                                                                  |
-| `isDisabled`   | `boolean`                                 | `false`    | Disables button interactions and shows disabled state                                                                              |
-| `isLoading`    | `boolean`                                 | `false`    | Shows loading spinner and disables button interactions                                                                             |
-| `isHovered`    | `boolean`                                 | `false`    | Forces hover state display (for demonstration purposes)                                                                            |
-| `isClicked`    | `boolean`                                 | `false`    | Forces active/clicked state display (for demonstration purposes)                                                                   |
-| `onClick`      | `(e: React.MouseEvent) => void`           | -          | Click event handler function                                                                                                       |
-| `tooltipText`  | `string`                                  | -          | Text displayed in tooltip on hover                                                                                                 |
-| `className`    | `string`                                  | -          | Additional CSS classes to apply                                                                                                    |
-| `id`           | `string`                                  | -          | HTML id attribute                                                                                                                  |
-| `style`        | `CSSProperties`                           | -          | Custom inline styles                                                                                                               |
-| `minWidth`     | `string`                                  | -          | Sets minimum button width (CSS value, e.g., "120px")                                                                               |
-| `title`        | `string`                                  | -          | HTML title attribute (prefer `tooltipText` for better tooltip support)                                                             |
-| `tabIndex`     | `number`                                  | -          | Overrides the default tab order                                                                                                    |
-| `type`         | `'button' \| 'submit' \| 'reset'`         | `'button'` | HTML button type attribute                                                                                                         |
-| `testId`       | `string`                                  | `'button'` | Test ID for automated testing                                                                                                      |
-| `ref`          | `React.Ref<HTMLElement>`                  | -          | Ref to access the DOM element                                                                                                      |
-| `aria-label`   | `string`                                  | -          | ARIA label for accessibility                                                                                                       |
-| `aria-disabled`| `'true' \| 'false'`                       | -          | ARIA disabled state                                                                                                                |
-| `aria-busy`    | `'true' \| 'false'`                       | -          | ARIA busy state (automatically set when isLoading)                                                                                 |
+| Prop            | Type                              | Default    | Description                                                                                                                        |
+| --------------- | --------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `label`         | `string`                          | Required   | Text content displayed inside the button                                                                                           |
+| `primary`       | `boolean`                         | `false`    | When true, applies primary button styling with brand colors                                                                        |
+| `size`          | `ButtonSize`                      | `normal`   | Controls button dimensions (`extraSmall`, `small`, `normal`, `medium`). Normal size is 36px height on Desktop, 40px on Touchscreen |
+| `scale`         | `boolean`                         | `false`    | When true, button width expands to fill its container (width: 100%)                                                                |
+| `icon`          | `ReactNode`                       | -          | Optional icon element rendered before the label                                                                                    |
+| `filled`        | `boolean`                         | `false`    | Applies filled variant styling                                                                                                     |
+| `filledStroke`  | `boolean`                         | `false`    | Applies filled variant with stroke/border styling                                                                                  |
+| `isDisabled`    | `boolean`                         | `false`    | Disables button interactions and shows disabled state                                                                              |
+| `isLoading`     | `boolean`                         | `false`    | Shows loading spinner and disables button interactions                                                                             |
+| `isHovered`     | `boolean`                         | `false`    | Forces hover state display (for demonstration purposes)                                                                            |
+| `isClicked`     | `boolean`                         | `false`    | Forces active/clicked state display (for demonstration purposes)                                                                   |
+| `onClick`       | `(e: React.MouseEvent) => void`   | -          | Click event handler function                                                                                                       |
+| `tooltipText`   | `string`                          | -          | Text displayed in tooltip on hover                                                                                                 |
+| `className`     | `string`                          | -          | Additional CSS classes to apply                                                                                                    |
+| `id`            | `string`                          | -          | HTML id attribute                                                                                                                  |
+| `style`         | `CSSProperties`                   | -          | Custom inline styles                                                                                                               |
+| `minWidth`      | `string`                          | -          | Sets minimum button width (CSS value, e.g., "120px")                                                                               |
+| `title`         | `string`                          | -          | HTML title attribute (prefer `tooltipText` for better tooltip support)                                                             |
+| `tabIndex`      | `number`                          | -          | Overrides the default tab order                                                                                                    |
+| `type`          | `'button' \| 'submit' \| 'reset'` | `'button'` | HTML button type attribute                                                                                                         |
+| `testId`        | `string`                          | `'button'` | Test ID for automated testing                                                                                                      |
+| `ref`           | `React.Ref<HTMLElement>`          | -          | Ref to access the DOM element                                                                                                      |
+| `aria-label`    | `string`                          | -          | ARIA label for accessibility                                                                                                       |
+| `aria-disabled` | `'true' \| 'false'`               | -          | ARIA disabled state                                                                                                                |
+| `aria-busy`     | `'true' \| 'false'`               | -          | ARIA busy state (automatically set when isLoading)                                                                                 |
 
 ## Button Sizes
 
 The `ButtonSize` enum provides four size options:
 
 ```tsx
-ButtonSize.extraSmall // Smallest size
-ButtonSize.small      // Small size
-ButtonSize.normal     // Default size (36px height on desktop)
-ButtonSize.medium     // Largest size (40px height on desktop)
+ButtonSize.extraSmall; // Smallest size
+ButtonSize.small; // Small size
+ButtonSize.normal; // Default size (36px height on desktop)
+ButtonSize.medium; // Largest size (40px height on desktop)
 ```
 
 ## Examples
@@ -194,35 +194,20 @@ function SaveButton() {
 
 ```tsx
 // Useful for mobile layouts or modal footers
-<Button
-  primary
-  scale
-  label="Continue"
-  size={ButtonSize.medium}
-/>
+<Button primary scale label="Continue" size={ButtonSize.medium} />
 ```
 
 ### Disabled State
 
 ```tsx
-<Button
-  primary
-  isDisabled
-  label="Submit"
-  onClick={handleSubmit}
-/>
+<Button primary isDisabled label="Submit" onClick={handleSubmit} />
 ```
 
 ### Form Submission
 
 ```tsx
 <form onSubmit={handleSubmit}>
-  <Button
-    primary
-    type="submit"
-    label="Submit Form"
-    size={ButtonSize.normal}
-  />
+  <Button primary type="submit" label="Submit Form" size={ButtonSize.normal} />
 </form>
 ```
 
@@ -265,6 +250,6 @@ The Button component uses CSS modules for styling. You can customize appearance 
   primary
   label="Custom Button"
   className="my-custom-button"
-  style={{ marginTop: '10px' }}
+  style={{ marginTop: "10px" }}
 />
 ```

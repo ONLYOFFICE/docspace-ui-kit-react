@@ -20,4 +20,3 @@ export type {
   TAiToolsPrices,
   TServiceFeatureWithPrice,
 } from "./types";
-

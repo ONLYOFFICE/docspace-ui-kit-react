@@ -77,16 +77,14 @@ import { TableBody } from "@onlyoffice/apps-ui-kit/components/table/table-body";
     },
     hasMoreFiles: {
       control: "boolean",
-      description:
-        "Whether more files are available to fetch",
+      description: "Whether more files are available to fetch",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     infoPanelVisible: {
       control: "boolean",
-      description:
-        "Whether the info panel is visible (affects column layout)",
+      description: "Whether the info panel is visible (affects column layout)",
       table: {
         defaultValue: { summary: "false" },
       },

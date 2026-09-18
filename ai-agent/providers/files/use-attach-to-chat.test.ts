@@ -46,9 +46,7 @@ const leases = (free: number) =>
     return accepted.map((_, i) => `pnd-${i + 1}`);
   });
 
-type AttachItems = Parameters<
-  ReturnType<typeof useAttachHostFilesToChat>
->[0];
+type AttachItems = Parameters<ReturnType<typeof useAttachHostFilesToChat>>[0];
 
 const attach = async (items: AttachItems) => {
   const { result } = renderHook(() => useAttachHostFilesToChat());

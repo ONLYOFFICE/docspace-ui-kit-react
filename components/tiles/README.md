@@ -16,7 +16,7 @@ import {
   <RoomTile item={room} />
   <FolderTile item={folder} />
   <FileTile item={file} />
-</TileContainer>
+</TileContainer>;
 ```
 
 ## Exports

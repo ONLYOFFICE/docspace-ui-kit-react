@@ -19,7 +19,9 @@ test.describe("RoomLogoCoverDialog -- light", () => {
 
   test("with-preselected-cover", async ({ page }) => {
     await gotoStory(page, "with-preselected-cover");
-    await expect(page).toHaveScreenshot("room-logo-cover-dialog-preselected.png");
+    await expect(page).toHaveScreenshot(
+      "room-logo-cover-dialog-preselected.png",
+    );
   });
 });
 
@@ -35,12 +37,16 @@ test.describe("RoomLogoCoverDialog -- dark", () => {
   test("default dark", async ({ page }) => {
     await gotoStory(page, "default");
     await page.evaluate(() => document.body.classList.add("dark"));
-    await expect(page).toHaveScreenshot("room-logo-cover-dialog-default-dark.png");
+    await expect(page).toHaveScreenshot(
+      "room-logo-cover-dialog-default-dark.png",
+    );
   });
 
   test("with-preselected-cover dark", async ({ page }) => {
     await gotoStory(page, "with-preselected-cover");
     await page.evaluate(() => document.body.classList.add("dark"));
-    await expect(page).toHaveScreenshot("room-logo-cover-dialog-preselected-dark.png");
+    await expect(page).toHaveScreenshot(
+      "room-logo-cover-dialog-preselected-dark.png",
+    );
   });
 });

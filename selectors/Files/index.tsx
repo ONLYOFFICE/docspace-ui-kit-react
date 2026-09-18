@@ -31,17 +31,17 @@ import useSelectorBody from "./hooks/useSelectorBody";
 import useSelectorState from "./hooks/useSelectorState";
 
 import { useCommonTranslation } from "../../utils/i18n";
-import type { FilesSelectorProps, TSelectedFileInfo } from "./FilesSelector.types";
+import type {
+  FilesSelectorProps,
+  TSelectedFileInfo,
+} from "./FilesSelector.types";
 import { SettingsContextProvider } from "../utils/contexts/Settings";
 import {
   LoadersContext,
   LoadersContextProvider,
 } from "../utils/contexts/Loaders";
 import { getDefaultBreadCrumb } from "../utils";
-import {
-  FORMS_ROOT_FOLDER_TYPE,
-  FORMS_SECTION_ID,
-} from "../utils/constants";
+import { FORMS_ROOT_FOLDER_TYPE, FORMS_SECTION_ID } from "../utils/constants";
 
 const FilesSelectorComponent = (props: FilesSelectorProps) => {
   const {

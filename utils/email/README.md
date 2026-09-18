@@ -15,7 +15,13 @@ Email address parsing and validation, built on [email-addresses](https://www.npm
 ## Import
 
 ```ts
-import { parseAddress, parseAddresses, isValidDomainName, Email, EmailSettings } from "../../utils/email";
+import {
+  parseAddress,
+  parseAddresses,
+  isValidDomainName,
+  Email,
+  EmailSettings,
+} from "../../utils/email";
 ```
 
 ## Usage
@@ -23,7 +29,7 @@ import { parseAddress, parseAddresses, isValidDomainName, Email, EmailSettings }
 ```ts
 const result = parseAddress("Jane Doe <jane@example.com>");
 result.isValid(); // => true
-result.email;     // => "jane@example.com"
+result.email; // => "jane@example.com"
 
 const settings = new EmailSettings();
 settings.allowLocalDomainName = true;
@@ -34,21 +40,21 @@ parseAddress("user@localhost", settings).isValid(); // => true
 
 All default to `false` except `allowStrictLocalPart` (`true`):
 
-| Option | Description |
-|--------|-------------|
-| `allowDomainPunycode` | Allow `xn--` punycode domains |
-| `allowLocalPartPunycode` | Allow `xn--` punycode in the local part |
-| `allowDomainIp` | Allow `[IP]`-style domains |
-| `allowStrictLocalPart` | Enforce the strict local-part character set |
-| `allowSpaces` | Allow spaces in the local part |
-| `allowName` | Allow a display name (`"Name" <addr>`) |
-| `allowLocalDomainName` | Allow domains without a `.` (e.g. `localhost`) |
+| Option                   | Description                                    |
+| ------------------------ | ---------------------------------------------- |
+| `allowDomainPunycode`    | Allow `xn--` punycode domains                  |
+| `allowLocalPartPunycode` | Allow `xn--` punycode in the local part        |
+| `allowDomainIp`          | Allow `[IP]`-style domains                     |
+| `allowStrictLocalPart`   | Enforce the strict local-part character set    |
+| `allowSpaces`            | Allow spaces in the local part                 |
+| `allowName`              | Allow a display name (`"Name" <addr>`)         |
+| `allowLocalDomainName`   | Allow domains without a `.` (e.g. `localhost`) |
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
-| `index.ts` | Barrel re-exporting `email.ts` and `emailSettings.ts` |
-| `email.ts` | `parseAddress`, `parseAddresses`, `isValidDomainName`, `isEqualEmail`, `Email` |
-| `emailSettings.ts` | `EmailSettings` options class |
-| `email.test.ts`, `emailSettings.test.ts` | Unit tests (Vitest) |
+| File                                     | Description                                                                    |
+| ---------------------------------------- | ------------------------------------------------------------------------------ |
+| `index.ts`                               | Barrel re-exporting `email.ts` and `emailSettings.ts`                          |
+| `email.ts`                               | `parseAddress`, `parseAddresses`, `isValidDomainName`, `isEqualEmail`, `Email` |
+| `emailSettings.ts`                       | `EmailSettings` options class                                                  |
+| `email.test.ts`, `emailSettings.test.ts` | Unit tests (Vitest)                                                            |

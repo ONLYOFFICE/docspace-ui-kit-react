@@ -35,7 +35,7 @@ const ChangePricingPlanDialog = observer(
       <Text as="span" fontSize="13px">
         <CommonTrans
           i18nKey="PlanUsersLimit"
-         
+
           values={{
             usersCount: managersCount,
             productName: getBrandName("ProductName"),
@@ -52,7 +52,7 @@ const ChangePricingPlanDialog = observer(
       <Text as="span" fontSize="13px">
         <CommonTrans
           i18nKey="PlanStorageLimit"
-         
+
           values={{
             storageValue: allowedStorageSpace,
             currentStorageValue: currentStorageSpace,
@@ -102,4 +102,3 @@ const ChangePricingPlanDialog = observer(
 );
 
 export default ChangePricingPlanDialog;
-

@@ -32,12 +32,21 @@
   }
 
   // bridge vars — bind public overrides to internal theme tokens
-  --date-time-picker-cell-bg-v: var(--date-time-picker-cell-bg, var(--date-picker-cell-background));
-  --date-time-picker-icon-v: var(--date-time-picker-icon, var(--date-picker-icon-color));
+  --date-time-picker-cell-bg-v: var(
+    --date-time-picker-cell-bg,
+    var(--date-picker-cell-background)
+  );
+  --date-time-picker-icon-v: var(
+    --date-time-picker-icon,
+    var(--date-picker-icon-color)
+  );
   // new bridge vars for hardcoded values
   --date-time-picker-cell-height-v: var(--date-time-picker-cell-height, 32px);
   --date-time-picker-cell-radius-v: var(--date-time-picker-cell-radius, 3px);
-  --date-time-picker-cell-padding-v: var(--date-time-picker-cell-padding, 6px 8px);
+  --date-time-picker-cell-padding-v: var(
+    --date-time-picker-cell-padding,
+    6px 8px
+  );
 
   display: flex;
   align-items: center;

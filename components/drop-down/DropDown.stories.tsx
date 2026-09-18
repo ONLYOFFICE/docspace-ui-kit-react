@@ -625,4 +625,3 @@ Use \`isDefaultMode={false}\` (inline mode) so CSS vars from the parent cascade 
     },
   },
 };
-

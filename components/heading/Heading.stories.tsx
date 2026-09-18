@@ -192,16 +192,10 @@ const CustomStyledTemplate = () => {
       <Heading level={HeadingLevel.h1} color="blue">
         Blue Heading
       </Heading>
-      <Heading
-        level={HeadingLevel.h1}
-        style={{ fontStyle: "italic" }}
-      >
+      <Heading level={HeadingLevel.h1} style={{ fontStyle: "italic" }}>
         Italic Heading
       </Heading>
-      <Heading
-        level={HeadingLevel.h1}
-        style={{ textDecoration: "underline" }}
-      >
+      <Heading level={HeadingLevel.h1} style={{ textDecoration: "underline" }}>
         Underlined Heading
       </Heading>
     </Wrapper>

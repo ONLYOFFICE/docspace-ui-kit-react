@@ -52,8 +52,7 @@ export interface TableHeaderProps {
   columnInfoPanelStorageName?: string;
   settingsTitle?: string;
   tagRef?:
-    | React.ForwardedRef<HTMLDivElement>
-    | ((node: HTMLDivElement) => void);
+    React.ForwardedRef<HTMLDivElement> | ((node: HTMLDivElement) => void);
   isIndexEditingMode?: boolean;
   withoutWideColumn?: boolean;
   style?: React.CSSProperties;
@@ -69,8 +68,7 @@ export interface TableHeaderCellProps {
   defaultSize?: number;
   sortingVisible: boolean;
   tagRef?:
-    | React.ForwardedRef<HTMLDivElement>
-    | ((node: HTMLDivElement) => void);
+    React.ForwardedRef<HTMLDivElement> | ((node: HTMLDivElement) => void);
   testId?: string;
 }
 

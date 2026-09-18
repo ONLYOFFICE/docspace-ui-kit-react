@@ -32,7 +32,10 @@
 
   &.defaultMode {
     .circleMask .circleFill {
-      background-color: var(--loading-button-idle, var(--loading-button-default-bg));
+      background-color: var(
+        --loading-button-idle,
+        var(--loading-button-default-bg)
+      );
     }
     .loadingButton {
       cursor: pointer;
@@ -45,7 +48,10 @@
     &:hover {
       .loadingButton {
         svg path {
-          fill: var(--loading-button-hover-fill, var(--loading-button-hover-color));
+          fill: var(
+            --loading-button-hover-fill,
+            var(--loading-button-hover-color)
+          );
         }
       }
     }

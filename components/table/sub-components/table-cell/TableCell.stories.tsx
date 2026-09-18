@@ -42,7 +42,8 @@ import { TableCell } from "@onlyoffice/apps-ui-kit/components/table/sub-componen
   argTypes: {
     hasAccess: {
       control: "boolean",
-      description: "Whether the user has access to interact with the cell element",
+      description:
+        "Whether the user has access to interact with the cell element",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -86,8 +87,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Default table cell with simple text content.",
+        story: "Default table cell with simple text content.",
       },
       source: {
         code: `<TableCell className="custom-cell">Cell Content</TableCell>`,

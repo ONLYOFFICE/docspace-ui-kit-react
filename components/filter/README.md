@@ -43,7 +43,7 @@ import { Filter } from "@onlyoffice/apps-ui-kit/components/filter";
   isContactsInsideGroupPage={false}
   isContactsGuestsPage={false}
   currentDeviceType={DeviceType.desktop}
-/>
+/>;
 ```
 
 ## Features

@@ -29,6 +29,6 @@ openingNewTab(url: string, e?: React.MouseEvent): boolean
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
+| File       | Description                                                                    |
+| ---------- | ------------------------------------------------------------------------------ |
 | `index.ts` | `openingNewTab` function; also declares the global `Window.ClientConfig` shape |

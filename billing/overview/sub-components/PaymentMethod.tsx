@@ -135,4 +135,3 @@ const PaymentMethod = ({ onManagePaymentMethod }: PaymentMethodProps) => {
 };
 
 export default observer(PaymentMethod);
-

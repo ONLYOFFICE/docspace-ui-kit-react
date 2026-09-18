@@ -47,8 +47,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Default invalid link error page with standard messaging.",
+        story: "Default invalid link error page with standard messaging.",
       },
       source: {
         code: `<ErrorInvalidLink />`,

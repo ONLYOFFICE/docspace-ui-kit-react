@@ -34,7 +34,10 @@
     -moz-box-shadow: var(--tooltip-box-shadow);
     -webkit-box-shadow: var(--tooltip-box-shadow);
     padding: var(--tooltip-padding);
-    max-width: min(100vw, var(--tooltip-max-width-value, var(--tooltip-max-width)));
+    max-width: min(
+      100vw,
+      var(--tooltip-max-width-value, var(--tooltip-max-width))
+    );
     color: var(--tooltip-color, var(--tooltip-text-color));
     font-size: var(--tooltip-font-size);
     z-index: var(--tooltip-z-index);

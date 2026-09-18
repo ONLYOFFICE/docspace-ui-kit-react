@@ -277,14 +277,13 @@ fs.mkdirSync(dir);
 for (const [name, content] of Object.entries(files))
   fs.writeFileSync(path.join(dir, name), content);
 
-if (!has("--no-register"))
-  fs.appendFileSync(barrel, registration);
+if (!has("--no-register")) fs.appendFileSync(barrel, registration);
 
 console.log(`Created components/${kebab}/`);
 for (const name of Object.keys(files)) console.log(`  ${name}`);
 console.log(
   has("--no-register")
-    ? "\nNot registered. Add `export * from \"./" +
+    ? '\nNot registered. Add `export * from "./' +
         kebab +
         '";` to components/index.ts when ready.'
     : "\nRegistered in components/index.ts -- it is now part of the plugin API surface.",

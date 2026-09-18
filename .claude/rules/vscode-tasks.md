@@ -37,7 +37,7 @@ node -e 'const fs=require("fs");const t=JSON.parse(fs.readFileSync(".vscode/task
   server, `build:watch`, `test:watch`, the Vitest and Playwright UIs. Everything else uses a
   `new` panel so two runs do not overwrite each other's output.
 - **A task that needs an argument uses an `inputs` prompt**, not a hardcoded value. `Audit |
-  scaffold a component` is the only one today.
+scaffold a component` is the only one today.
 - **The button tooltip is where a caveat goes.** Several tasks have one that is not obvious from
   the label: `verify:package` must pack with pnpm, the whole-package token audit reports a
   standing backlog rather than anything the current change caused, and the Docker E2E run is the

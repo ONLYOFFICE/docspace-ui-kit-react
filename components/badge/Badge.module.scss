@@ -37,7 +37,6 @@
   }
 }
 
-
 .inner,
 .themed {
   --badge-background-color: var(--accent-main, #{$light-status-warning});
@@ -49,9 +48,9 @@
   --badge-high-text-font-size: var(--badge-high-font-size, 13px);
 }
 
-:global(.dark){
+:global(.dark) {
   :local {
-    .inner, 
+    .inner,
     .themed {
       --badge-background-color: var(--accent-main, #{$dark-status-warning});
       --badge-disable-background-color: #{$gray-dark-strong};
@@ -68,7 +67,6 @@
   align-items: center;
   justify-content: center;
   line-height: 1.5;
-
 
   &[data-compact="true"] {
     line-height: 0.8;
@@ -135,11 +133,19 @@
       background-color: var(--badge-disable-background-color);
 
       &:hover:not([data-no-hover="true"]) {
-        background-color: color-mix(in srgb, var(--badge-disable-background-color) 85%, transparent);
+        background-color: color-mix(
+          in srgb,
+          var(--badge-disable-background-color) 85%,
+          transparent
+        );
       }
 
       &:active:not([data-no-hover="true"]) {
-        background-color: color-mix(in srgb, var(--badge-disable-background-color) 90%, black);
+        background-color: color-mix(
+          in srgb,
+          var(--badge-disable-background-color) 90%,
+          black
+        );
       }
 
       &:hover:not([data-no-hover="true"]) {

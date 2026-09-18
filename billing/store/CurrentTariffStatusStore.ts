@@ -354,4 +354,3 @@ class CurrentTariffStatusStore {
 }
 
 export default CurrentTariffStatusStore;
-

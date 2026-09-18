@@ -8,7 +8,7 @@ describe("getCalendarDays", () => {
 
   it("should return correct structure provided a date", () => {
     const result = getCalendarDays(mockDate);
-    
+
     expect(result).toHaveProperty("prevMonthDays");
     expect(result).toHaveProperty("currentMonthDays");
     expect(result).toHaveProperty("nextMonthDays");
@@ -43,14 +43,14 @@ describe("getCalendarDays", () => {
   it("should handle a month starting on Monday correctly (e.g. May 2023)", () => {
     // May 1, 2023 is a Monday.
     const mayDate = DateTime.fromObject({ year: 2023, month: 5, day: 15 });
-    
+
     const result = getCalendarDays(mayDate);
-    
+
     // Current month (May) has 31 days.
     // 0 prev days is correct for a Monday start.
     expect(result.prevMonthDays).toHaveLength(0);
     expect(result.currentMonthDays).toHaveLength(31);
-    
+
     // Next month days:
     // 42 - 31 = 11 days from June.
     expect(result.nextMonthDays).toHaveLength(11);

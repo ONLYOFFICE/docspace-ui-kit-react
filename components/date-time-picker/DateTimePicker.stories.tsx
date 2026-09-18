@@ -159,8 +159,7 @@ export const Default: Story = {
     className: "date-time-picker",
     id: "default-date-time-picker",
     hasError: false,
-    onChange: (date: null | DateTime) =>
-      console.log("Date changed:", date),
+    onChange: (date: null | DateTime) => console.log("Date changed:", date),
     translations: { AM: "AM", PM: "PM" },
   },
 };

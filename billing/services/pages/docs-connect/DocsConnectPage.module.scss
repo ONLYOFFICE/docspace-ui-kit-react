@@ -64,11 +64,7 @@
   font-weight: 600;
   line-height: 16px;
   color: var(--payment-error-color);
-  background: color-mix(
-    in srgb,
-    var(--payment-error-color) 12%,
-    transparent
-  );
+  background: color-mix(in srgb, var(--payment-error-color) 12%, transparent);
 }
 
 .tariffHeader {

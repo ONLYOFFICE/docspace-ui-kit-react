@@ -192,13 +192,13 @@ import PeopleSelector from "@onlyoffice/apps-ui-kit/selectors/People";
     },
     roomId: {
       control: "text",
-      description:
-        "Scope the list to users/groups with access to this room ID",
+      description: "Scope the list to users/groups with access to this room ID",
     },
     targetEntityType: {
       control: "select",
       options: ["file", "folder", "room"],
-      description: "Entity type used for shared-access queries when roomId is set",
+      description:
+        "Entity type used for shared-access queries when roomId is set",
       table: { defaultValue: { summary: "room" } },
     },
     onlyRoomMembers: {
@@ -299,7 +299,6 @@ const Template = (props: StoryArgs) => (
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     withHeader: true,
     headerProps: {
       headerLabel: "Select Member",
@@ -337,7 +336,6 @@ export const MultiSelectWithTabs: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     withHeader: true,
     headerProps: {
       headerLabel: "Add Members",
@@ -387,7 +385,6 @@ export const AsideMode: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     useAside: true,
     withoutBackground: false,
     withBlur: false,

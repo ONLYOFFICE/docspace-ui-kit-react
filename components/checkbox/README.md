@@ -34,11 +34,7 @@ With indeterminate state:
 With error state:
 
 ```jsx
-<Checkbox
-  label="Checkbox with Error"
-  hasError
-  onChange={handleChange}
-/>
+<Checkbox label="Checkbox with Error" hasError onChange={handleChange} />
 ```
 
 With help button:
@@ -78,13 +74,13 @@ Disabled states:
 | ----------------- | :----------------------------: | :------: | :-----: | ---------------------------------------------------------- |
 | `id`              |            `string`            |    -     |    -    | HTML id attribute for the label element                    |
 | `className`       |            `string`            |    -     |    -    | Additional CSS class for styling                           |
-| `style`           |       `CSSProperties`          |    -     |    -    | Additional inline styles                                   |
+| `style`           |        `CSSProperties`         |    -     |    -    | Additional inline styles                                   |
 | `name`            |            `string`            |    -     |    -    | HTML name attribute for the input element                  |
 | `value`           | `string \| number \| string[]` |    -     |    -    | Value associated with the checkbox                         |
 | `label`           |            `string`            |    -     |    -    | Text label displayed next to the checkbox                  |
 | `title`           |            `string`            |    -     |    -    | Tooltip text shown on hover                                |
 | `truncate`        |           `boolean`            |    -     | `false` | Whether to truncate the label text if it overflows         |
-| `tabIndex`        |            `number`            |    -     |   `-1`  | Tab order of the checkbox                                  |
+| `tabIndex`        |            `number`            |    -     |  `-1`   | Tab order of the checkbox                                  |
 | `isChecked`       |           `boolean`            |    -     | `false` | Controls the checked state of the checkbox                 |
 | `isIndeterminate` |           `boolean`            |    -     | `false` | Shows a rectangle instead of a checkmark when true         |
 | `isDisabled`      |           `boolean`            |    -     | `false` | Disables the checkbox input                                |

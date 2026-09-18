@@ -186,9 +186,7 @@ const UpdatePlanButtonContainer = ({
     return isDowngradePlan ? (
       <DowngradePlanButtonContainer
         onDowngradeTariff={
-          needsWalletMigration
-            ? openMigrateDialog
-            : onDowngradeTariff
+          needsWalletMigration ? openMigrateDialog : onDowngradeTariff
         }
         isDisabled={isDisabled || hasScheduledTariffAdminsChange}
         buttonLabel={confirmLabel}
@@ -311,4 +309,3 @@ const UpdatePlanButtonContainer = ({
 };
 
 export default observer(UpdatePlanButtonContainer);
-

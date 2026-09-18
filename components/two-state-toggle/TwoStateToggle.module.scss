@@ -33,7 +33,12 @@ $thumb-w: calc(($pill-w - $pill-p * 2) / 2);
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-scheme-main-accent, #{$light-second-main}) 30%, transparent);
+    box-shadow: 0 0 0 3px
+      color-mix(
+        in srgb,
+        var(--color-scheme-main-accent, #{$light-second-main}) 30%,
+        transparent
+      );
   }
 }
 

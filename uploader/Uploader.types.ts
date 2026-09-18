@@ -63,4 +63,3 @@ export type TFileWithOptionalEmptyDir = File & { isEmptyDirectory?: boolean };
 export type TFileWithOptionalLastModifiedDate = File & {
   lastModifiedDate?: unknown;
 };
-

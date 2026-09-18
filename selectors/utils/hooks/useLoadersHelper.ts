@@ -25,9 +25,8 @@ interface SectionLoaderState {
 const useLoadersHelper = ({ withInit }: { withInit?: boolean }) => {
   const [isNextPageLoading, setIsNextPageLoading] =
     React.useState<boolean>(false);
-  const [isFullLoadActive, setIsFullLoadActiveState] = React.useState(
-    !withInit,
-  );
+  const [isFullLoadActive, setIsFullLoadActiveState] =
+    React.useState(!withInit);
 
   const [showBreadCrumbsLoader, setShowBreadCrumbsLoader] =
     React.useState<boolean>(!withInit);

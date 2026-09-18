@@ -8,10 +8,7 @@ import { Button, ButtonSize } from "../../components/button";
 import { TextInput, InputType, InputSize } from "../../components/text-input";
 import { Text } from "../../components/text";
 import { Textarea } from "../../components/textarea";
-import {
-  ModalDialog,
-  ModalDialogType,
-} from "../../components/modal-dialog";
+import { ModalDialog, ModalDialogType } from "../../components/modal-dialog";
 import { EmailInput } from "../../components/email-input";
 import type { TValidate } from "../../components/email-input";
 import { ErrorKeys } from "../../enums";

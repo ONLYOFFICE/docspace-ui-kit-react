@@ -9,17 +9,17 @@
   margin-bottom: 0;
   height: 64px;
   box-sizing: border-box;
-    &.warningColor {
+  &.warningColor {
     color: var(--warning-color);
     border-color: var(--warning-color);
   }
-  
+
   &.scale {
-   max-width: 100%;
+    max-width: 100%;
   }
 
-  &.withoutMargin{
-   margin-bottom: 0px;
+  &.withoutMargin {
+    margin-bottom: 0px;
   }
 }
 
@@ -28,29 +28,24 @@
   min-width: 0;
 }
 
-
- .tickedWrapper {
-    svg {
-      width: 16px;
-      height: 16px;
-      path {
-        fill: var(--payment-credit-color);
-      }
-
-
-      
-      }
-  
-
-       &.warningColor {
-           svg {
-          rect{
-              fill: var(--warning-color);
-          }
-
-          path {
-              fill: var(--warning-color);
-
-            }
-       }}
+.tickedWrapper {
+  svg {
+    width: 16px;
+    height: 16px;
+    path {
+      fill: var(--payment-credit-color);
+    }
   }
+
+  &.warningColor {
+    svg {
+      rect {
+        fill: var(--warning-color);
+      }
+
+      path {
+        fill: var(--warning-color);
+      }
+    }
+  }
+}

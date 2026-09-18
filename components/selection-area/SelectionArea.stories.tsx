@@ -47,8 +47,7 @@ import { SelectionArea } from "@onlyoffice/apps-ui-kit/components/selection-area
     viewAs: {
       control: "select",
       options: ["tile", "row"],
-      description:
-        "Layout mode for items - tile grid or row list",
+      description: "Layout mode for items - tile grid or row list",
     },
     folderHeaderHeight: {
       control: "number",
@@ -66,16 +65,14 @@ import { SelectionArea } from "@onlyoffice/apps-ui-kit/components/selection-area
     },
     countTilesInRow: {
       control: "number",
-      description:
-        "Number of tiles displayed per row in tile view",
+      description: "Number of tiles displayed per row in tile view",
       table: {
         defaultValue: { summary: "4" },
       },
     },
     isRooms: {
       control: "boolean",
-      description:
-        "Whether the selection area is used for rooms",
+      description: "Whether the selection area is used for rooms",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -95,9 +92,7 @@ type Story = StoryObj<ComponentProps<typeof SelectionArea>>;
 export default meta;
 
 const SelectionTemplate = (args: SelectionAreaProps) => {
-  const [selectedItems, setSelectedItems] = useState<string[]>(
-    [],
-  );
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const handleMove = ({
     added,
@@ -113,9 +108,7 @@ const SelectionTemplate = (args: SelectionAreaProps) => {
         const valueElement =
           args.viewAs === "tile"
             ? element
-            : element.getElementsByClassName(
-                args.itemClass || "item-name",
-              )[0];
+            : element.getElementsByClassName(args.itemClass || "item-name")[0];
 
         const value = valueElement?.getAttribute("value");
         if (value && !newItems.includes(value)) {
@@ -127,9 +120,7 @@ const SelectionTemplate = (args: SelectionAreaProps) => {
         const valueElement =
           args.viewAs === "tile"
             ? element
-            : element.getElementsByClassName(
-                args.itemClass || "item-name",
-              )[0];
+            : element.getElementsByClassName(args.itemClass || "item-name")[0];
 
         const value = valueElement?.getAttribute("value");
         if (value) {
@@ -151,10 +142,7 @@ const SelectionTemplate = (args: SelectionAreaProps) => {
           <div
             key={`item_${String(index)}`}
             className={`${styles.item} selectable-item ${selectedItems.includes(`item_${index}`) ? styles.selected : ""}`}
-            {...({ value: `item_${index}` } as Record<
-              string,
-              string
-            >)}
+            {...({ value: `item_${index}` } as Record<string, string>)}
             data-id={`item_${index}`}
           >
             Item {index + 1}

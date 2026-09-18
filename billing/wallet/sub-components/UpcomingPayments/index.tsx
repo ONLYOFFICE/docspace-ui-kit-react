@@ -73,4 +73,3 @@ const UpcomingPayments = () => {
 };
 
 export default observer(UpcomingPayments);
-

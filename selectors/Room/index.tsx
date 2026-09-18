@@ -289,7 +289,8 @@ const RoomSelectorComponent = ({
         onSearch: onSearchAction,
         onClearSearch: onClearSearchAction,
         searchLoader: <SearchLoader />,
-        isSearchLoading: isFullLoadActive && !searchValue && !afterSearch.current,
+        isSearchLoading:
+          isFullLoadActive && !searchValue && !afterSearch.current,
       }
     : {};
 

@@ -41,6 +41,8 @@ test.describe("TwoStateToggle -- dark", () => {
   test("custom-labels dark", async ({ page }) => {
     await gotoStory(page, "custom-labels");
     await page.evaluate(() => document.body.classList.add("dark"));
-    await expect(page).toHaveScreenshot("two-state-toggle-custom-labels-dark.png");
+    await expect(page).toHaveScreenshot(
+      "two-state-toggle-custom-labels-dark.png",
+    );
   });
 });

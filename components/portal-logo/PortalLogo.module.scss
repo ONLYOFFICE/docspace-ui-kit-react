@@ -10,11 +10,23 @@
     --header-background-color: #{colors.$dark-gray-light};
   }
 
-  --portal-logo-mobile-bg-value: var(--portal-logo-mobile-bg, var(--header-background-color));
+  --portal-logo-mobile-bg-value: var(
+    --portal-logo-mobile-bg,
+    var(--header-background-color)
+  );
   --portal-logo-mobile-height-value: var(--portal-logo-mobile-height, 48px);
-  --portal-logo-mobile-img-height-value: var(--portal-logo-mobile-img-height, 24px);
-  --portal-logo-desktop-img-height-value: var(--portal-logo-desktop-img-height, 44px);
-  --portal-logo-desktop-img-width-value: var(--portal-logo-desktop-img-width, 386px);
+  --portal-logo-mobile-img-height-value: var(
+    --portal-logo-mobile-img-height,
+    24px
+  );
+  --portal-logo-desktop-img-height-value: var(
+    --portal-logo-desktop-img-height,
+    44px
+  );
+  --portal-logo-desktop-img-width-value: var(
+    --portal-logo-desktop-img-width,
+    386px
+  );
 
   @include mixins.mobile {
     &:not(.resizable) {

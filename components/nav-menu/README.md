@@ -38,7 +38,7 @@ const groups: NavMenuGroup[] = [
   groups={groups}
   activeItemId="documents"
   defaultExpandedId="documents"
-/>
+/>;
 ```
 
 ## Features
@@ -58,15 +58,15 @@ const groups: NavMenuGroup[] = [
 
 ## Properties
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `groups` | `NavMenuGroup[]` | — | Array of groups containing navigation items |
-| `activeItemId` | `string` | — | `id` of the currently active item or sub-item |
-| `defaultExpandedId` | `string` | — | `id` of the item expanded by default |
-| `withAnimation` | `boolean` | `false` | Enables progress-bar animation on item click |
-| `className` | `string` | — | Additional CSS class on the root element |
-| `LinkRouter` | `React.ComponentType<LinkRouterProps>` | — | Router link component; when provided, items with `linkData` render as links instead of buttons |
-| `iconOnly` | `boolean` | `false` | Collapses the menu to icons only — hides text labels, badges, and group labels; sub-items are not rendered |
+| Prop                | Type                                   | Default | Description                                                                                                |
+| ------------------- | -------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------- |
+| `groups`            | `NavMenuGroup[]`                       | —       | Array of groups containing navigation items                                                                |
+| `activeItemId`      | `string`                               | —       | `id` of the currently active item or sub-item                                                              |
+| `defaultExpandedId` | `string`                               | —       | `id` of the item expanded by default                                                                       |
+| `withAnimation`     | `boolean`                              | `false` | Enables progress-bar animation on item click                                                               |
+| `className`         | `string`                               | —       | Additional CSS class on the root element                                                                   |
+| `LinkRouter`        | `React.ComponentType<LinkRouterProps>` | —       | Router link component; when provided, items with `linkData` render as links instead of buttons             |
+| `iconOnly`          | `boolean`                              | `false` | Collapses the menu to icons only — hides text labels, badges, and group labels; sub-items are not rendered |
 
 ## Types
 
@@ -85,15 +85,15 @@ type NavMenuGroup = {
 type NavMenuItem = {
   id: string;
   label: string;
-  icon?: string;                          // SVG file URL (import with ?url)
+  icon?: string; // SVG file URL (import with ?url)
   iconNode?: React.ReactNode;
   onClick?: (item: NavMenuItem) => void;
   children?: NavSubItem[];
-  showBadge?: boolean;                    // Show a badge on the item
-  labelBadge?: string | number;           // Numeric or text badge label
-  badgeComponent?: React.ReactNode;       // Custom badge component (overrides labelBadge)
-  onClickBadge?: (id: string) => void;   // Called with item id; does not trigger onClick
-  linkData?: NavMenuLinkData;             // When set and LinkRouter provided, renders as a link
+  showBadge?: boolean; // Show a badge on the item
+  labelBadge?: string | number; // Numeric or text badge label
+  badgeComponent?: React.ReactNode; // Custom badge component (overrides labelBadge)
+  onClickBadge?: (id: string) => void; // Called with item id; does not trigger onClick
+  linkData?: NavMenuLinkData; // When set and LinkRouter provided, renders as a link
 };
 
 type NavSubItem = {
@@ -143,11 +143,11 @@ a native hover tooltip. Pair with a toggle button to let users expand and collap
 
 The component can be customized via CSS variables on a parent element:
 
-| Variable | Description |
-|----------|-------------|
-| `--nav-menu-group-label-color` | Group label text color |
-| `--nav-menu-item-text-color` | Item text color |
-| `--nav-menu-item-icon-color` | Icon fill color in default state |
-| `--nav-menu-item-icon-active-color` | Icon fill color for the active item |
-| `--nav-menu-item-bg-hover` | Background color on hover |
-| `--nav-menu-item-bg-active` | Background color for the active item |
+| Variable                            | Description                          |
+| ----------------------------------- | ------------------------------------ |
+| `--nav-menu-group-label-color`      | Group label text color               |
+| `--nav-menu-item-text-color`        | Item text color                      |
+| `--nav-menu-item-icon-color`        | Icon fill color in default state     |
+| `--nav-menu-item-icon-active-color` | Icon fill color for the active item  |
+| `--nav-menu-item-bg-hover`          | Background color on hover            |
+| `--nav-menu-item-bg-active`         | Background color for the active item |

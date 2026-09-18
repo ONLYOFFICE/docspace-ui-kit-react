@@ -28,7 +28,9 @@ const ROOT = path.resolve(
   "../../..",
 );
 
-const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
+const pkg = JSON.parse(
+  fs.readFileSync(path.join(ROOT, "package.json"), "utf8"),
+);
 const deps = pkg.dependencies ?? {};
 const peers = pkg.peerDependencies ?? {};
 const devs = pkg.devDependencies ?? {};
@@ -75,7 +77,9 @@ const packageOf = (specifier) => {
   // came out of a template literal or a sentence, not an import.
   if (!/^[@a-zA-Z0-9._~/-]+$/.test(specifier)) return undefined;
   const parts = specifier.split("/");
-  const name = specifier.startsWith("@") ? parts.slice(0, 2).join("/") : parts[0];
+  const name = specifier.startsWith("@")
+    ? parts.slice(0, 2).join("/")
+    : parts[0];
   // `import path from "path"` -- a builtin written without the node: prefix.
   return BUILTINS.has(name) ? undefined : name;
 };
@@ -237,5 +241,6 @@ if (!findings.length) {
 }
 
 console.log(`\n${findings.length} finding(s):\n`);
-for (const { title, detail } of findings) console.log(`  ${title}:\n    ${detail}\n`);
+for (const { title, detail } of findings)
+  console.log(`  ${title}:\n    ${detail}\n`);
 process.exit(1);

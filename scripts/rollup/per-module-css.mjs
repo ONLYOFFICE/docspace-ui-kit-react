@@ -50,84 +50,105 @@ const MARKER_IMPORT_RE = /^import\s+(["'])per-module-css:([^"']+)\1;?\n?/gm;
 const ROOT = path.resolve(".");
 
 /** Where a stylesheet's CSS is emitted: <path relative to the root>/index.css, mirroring the module layout. */
-const cssFileFor = (id) => `${path.relative(ROOT, id).split(path.sep).join("/")}/index.css`;
+const cssFileFor = (id) =>
+  `${path.relative(ROOT, id).split(path.sep).join("/")}/index.css`;
 
 export const perModuleCss = ({ generateScopedName }) => {
-	/** Compiled CSS by module id, filled in `transform`, written in `generateBundle`. */
-	const cssById = new Map();
+  /** Compiled CSS by module id, filled in `transform`, written in `generateBundle`. */
+  const cssById = new Map();
 
-	return {
-		name: "per-module-css",
+  return {
+    name: "per-module-css",
 
-		resolveId(source) {
-			return source.startsWith(MARKER) ? { id: source, external: true } : null;
-		},
+    resolveId(source) {
+      return source.startsWith(MARKER) ? { id: source, external: true } : null;
+    },
 
-		async transform(code, id) {
-			if (!STYLE_RE.test(id) || id.includes(`${path.sep}node_modules${path.sep}`)) return null;
+    async transform(code, id) {
+      if (
+        !STYLE_RE.test(id) ||
+        id.includes(`${path.sep}node_modules${path.sep}`)
+      )
+        return null;
 
-			let css = code;
+      let css = code;
 
-			if (id.endsWith(".scss")) {
-				const result = sass.compile(id, { style: "expanded" });
-				css = result.css;
-				for (const url of result.loadedUrls) {
-					if (url.protocol === "file:") this.addWatchFile(decodeURIComponent(url.pathname));
-				}
-			}
+      if (id.endsWith(".scss")) {
+        const result = sass.compile(id, { style: "expanded" });
+        css = result.css;
+        for (const url of result.loadedUrls) {
+          if (url.protocol === "file:")
+            this.addWatchFile(decodeURIComponent(url.pathname));
+        }
+      }
 
-			let classes = null;
+      let classes = null;
 
-			if (MODULE_RE.test(id)) {
-				const result = await postcss([
-					postcssModules({
-						generateScopedName,
-						getJSON: (_file, json) => {
-							classes = json;
-						},
-					}),
-				]).process(css, { from: id, map: false });
-				css = result.css;
-			}
+      if (MODULE_RE.test(id)) {
+        const result = await postcss([
+          postcssModules({
+            generateScopedName,
+            getJSON: (_file, json) => {
+              classes = json;
+            },
+          }),
+        ]).process(css, { from: id, map: false });
+        css = result.css;
+      }
 
-			cssById.set(id, css);
+      cssById.set(id, css);
 
-			return {
-				code:
-					`import ${JSON.stringify(MARKER + id)};\n` +
-					(classes === null ? "" : `export default ${JSON.stringify(classes)};\n`),
-				map: { mappings: "" },
-			};
-		},
+      return {
+        code:
+          `import ${JSON.stringify(MARKER + id)};\n` +
+          (classes === null
+            ? ""
+            : `export default ${JSON.stringify(classes)};\n`),
+        map: { mappings: "" },
+      };
+    },
 
-		generateBundle(_options, bundle) {
-			const emitted = new Set();
+    generateBundle(_options, bundle) {
+      const emitted = new Set();
 
-			for (const chunk of Object.values(bundle)) {
-				if (chunk.type !== "chunk") continue;
+      for (const chunk of Object.values(bundle)) {
+        if (chunk.type !== "chunk") continue;
 
-				chunk.code = chunk.code.replace(MARKER_IMPORT_RE, (_match, _quote, id) => {
-					const css = cssById.get(id);
-					if (css === undefined) this.error(`${chunk.fileName} imports a stylesheet that was never compiled: ${id}`);
+        chunk.code = chunk.code.replace(
+          MARKER_IMPORT_RE,
+          (_match, _quote, id) => {
+            const css = cssById.get(id);
+            if (css === undefined)
+              this.error(
+                `${chunk.fileName} imports a stylesheet that was never compiled: ${id}`,
+              );
 
-					const cssFile = cssFileFor(id);
-					if (!emitted.has(cssFile)) {
-						this.emitFile({ type: "asset", fileName: cssFile, source: css });
-						emitted.add(cssFile);
-					}
+            const cssFile = cssFileFor(id);
+            if (!emitted.has(cssFile)) {
+              this.emitFile({ type: "asset", fileName: cssFile, source: css });
+              emitted.add(cssFile);
+            }
 
-					let specifier = path.posix.relative(path.posix.dirname(chunk.fileName), cssFile);
-					if (!specifier.startsWith(".")) specifier = `./${specifier}`;
-					return `import "${specifier}";\n`;
-				});
-			}
+            let specifier = path.posix.relative(
+              path.posix.dirname(chunk.fileName),
+              cssFile,
+            );
+            if (!specifier.startsWith(".")) specifier = `./${specifier}`;
+            return `import "${specifier}";\n`;
+          },
+        );
+      }
 
-			// A compiled stylesheet nobody imports would have been part of the
-			// old bundle and is now silently gone from consumers -- refuse.
-			const orphans = [...cssById.keys()].filter((id) => !emitted.has(cssFileFor(id)));
-			if (orphans.length > 0) {
-				this.error(`${orphans.length} compiled stylesheet(s) are imported by no chunk:\n  ${orphans.map(cssFileFor).join("\n  ")}`);
-			}
-		},
-	};
+      // A compiled stylesheet nobody imports would have been part of the
+      // old bundle and is now silently gone from consumers -- refuse.
+      const orphans = [...cssById.keys()].filter(
+        (id) => !emitted.has(cssFileFor(id)),
+      );
+      if (orphans.length > 0) {
+        this.error(
+          `${orphans.length} compiled stylesheet(s) are imported by no chunk:\n  ${orphans.map(cssFileFor).join("\n  ")}`,
+        );
+      }
+    },
+  };
 };

@@ -28,7 +28,10 @@ const escapeHtml = (value: string): string =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 
-const buildPlaceholderHtml = (isDark: boolean, title: string): string => `<!doctype html>
+const buildPlaceholderHtml = (
+  isDark: boolean,
+  title: string,
+): string => `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">

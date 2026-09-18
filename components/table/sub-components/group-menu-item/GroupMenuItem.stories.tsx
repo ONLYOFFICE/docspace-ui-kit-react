@@ -42,15 +42,15 @@ import { GroupMenuItem } from "@onlyoffice/apps-ui-kit/components/table/sub-comp
   argTypes: {
     isBlocked: {
       control: "boolean",
-      description:
-        "Block the menu item while a bulk operation is in progress",
+      description: "Block the menu item while a bulk operation is in progress",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     item: {
       control: false,
-      description: "Menu item configuration object with label, icon, and click handler",
+      description:
+        "Menu item configuration object with label, icon, and click handler",
     },
   },
 } satisfies Meta<typeof GroupMenuItem>;

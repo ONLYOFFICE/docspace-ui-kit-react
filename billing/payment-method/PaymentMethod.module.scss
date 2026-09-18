@@ -1,8 +1,7 @@
 .container {
   max-width: 660px;
-  width: 100%
+  width: 100%;
 }
-
 
 .header {
   margin-top: 20px;
@@ -13,18 +12,18 @@
 
 .description {
   margin-bottom: 16px;
-  color: var(--payment-text-color)
+  color: var(--payment-text-color);
 }
 
-.payerInfoHeader{
+.payerInfoHeader {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.noPaymentDescription{
-margin-top:4px;
-margin-bottom: 20px;
+.noPaymentDescription {
+  margin-top: 4px;
+  margin-bottom: 20px;
 }
 
 .linkNewCardDescription {
@@ -37,8 +36,7 @@ margin-bottom: 20px;
   max-width: 320px;
 }
 
-.reachOutPayer{
-margin-top: 8px;
-color: var(--warning-color)
+.reachOutPayer {
+  margin-top: 8px;
+  color: var(--warning-color);
 }
-

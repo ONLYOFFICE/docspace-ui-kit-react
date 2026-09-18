@@ -20,22 +20,22 @@ import AIAgentSelector from "@onlyoffice/apps-ui-kit/selectors/AIAgent";
 
 ## Props
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `onSubmit` | `(items: TSelectorItem[]) => void \| Promise<void>` | Yes | Callback when an agent is selected and submitted |
-| `onClose` | `() => void` | Yes | Callback to close the selector |
-| `id` | `string` | No | HTML id attribute |
-| `className` | `string` | No | CSS class name |
-| `style` | `React.CSSProperties` | No | Inline styles |
-| `excludeItems` | `(number \| string \| undefined)[]` | No | IDs of agents to exclude from the list |
-| `setIsDataReady` | `(value: boolean) => void` | No | Callback indicating when data has finished loading |
-| `withPadding` | `boolean` | No | Whether to add padding to the selector |
-| `disableBySecurity` | `string` | No | Security property key to check; disables items that lack the permission |
-| `withInit` | `boolean` | No | Enable SSR mode with pre-fetched data |
-| `initItems` | `FolderDtoInteger[]` | When `withInit=true` | Pre-fetched items for SSR |
-| `initTotal` | `number` | When `withInit=true` | Total count for SSR |
-| `initHasNextPage` | `boolean` | When `withInit=true` | Whether more pages exist for SSR |
-| `initSearchValue` | `string` | No | Initial search value for SSR |
+| Prop                | Type                                                | Required             | Description                                                             |
+| ------------------- | --------------------------------------------------- | -------------------- | ----------------------------------------------------------------------- |
+| `onSubmit`          | `(items: TSelectorItem[]) => void \| Promise<void>` | Yes                  | Callback when an agent is selected and submitted                        |
+| `onClose`           | `() => void`                                        | Yes                  | Callback to close the selector                                          |
+| `id`                | `string`                                            | No                   | HTML id attribute                                                       |
+| `className`         | `string`                                            | No                   | CSS class name                                                          |
+| `style`             | `React.CSSProperties`                               | No                   | Inline styles                                                           |
+| `excludeItems`      | `(number \| string \| undefined)[]`                 | No                   | IDs of agents to exclude from the list                                  |
+| `setIsDataReady`    | `(value: boolean) => void`                          | No                   | Callback indicating when data has finished loading                      |
+| `withPadding`       | `boolean`                                           | No                   | Whether to add padding to the selector                                  |
+| `disableBySecurity` | `string`                                            | No                   | Security property key to check; disables items that lack the permission |
+| `withInit`          | `boolean`                                           | No                   | Enable SSR mode with pre-fetched data                                   |
+| `initItems`         | `FolderDtoInteger[]`                                | When `withInit=true` | Pre-fetched items for SSR                                               |
+| `initTotal`         | `number`                                            | When `withInit=true` | Total count for SSR                                                     |
+| `initHasNextPage`   | `boolean`                                           | When `withInit=true` | Whether more pages exist for SSR                                        |
+| `initSearchValue`   | `string`                                            | No                   | Initial search value for SSR                                            |
 
 ## Usage
 
@@ -60,8 +60,8 @@ const MyComponent = () => {
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
-| `index.tsx` | Main component with selector logic and rendering |
-| `AIAgent.types.ts` | TypeScript type definitions for props |
+| File               | Description                                                                       |
+| ------------------ | --------------------------------------------------------------------------------- |
+| `index.tsx`        | Main component with selector logic and rendering                                  |
+| `AIAgent.types.ts` | TypeScript type definitions for props                                             |
 | `AIAgent.utils.ts` | `convertToItems` utility — transforms `FolderDtoInteger[]` into `TSelectorItem[]` |

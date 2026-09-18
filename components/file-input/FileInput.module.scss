@@ -35,9 +35,18 @@
   --file-input-disabled-placeholder-color: #{$gray-strong};
 
   // bridge vars — bind public overrides to internal theme tokens
-  --file-input-border-v: var(--file-input-border, var(--file-input-border-color));
-  --file-input-border-hover-v: var(--file-input-hover-border, var(--file-input-hover-border-color));
-  --file-input-border-focus-v: var(--file-input-focus-border, var(--file-input-focus-border-color));
+  --file-input-border-v: var(
+    --file-input-border,
+    var(--file-input-border-color)
+  );
+  --file-input-border-hover-v: var(
+    --file-input-hover-border,
+    var(--file-input-hover-border-color)
+  );
+  --file-input-border-focus-v: var(
+    --file-input-focus-border,
+    var(--file-input-focus-border-color)
+  );
   --file-input-border-disabled-v: var(
     --file-input-disabled-border,
     var(--file-input-disabled-border-color)
@@ -46,7 +55,10 @@
     --file-input-warning-border,
     var(--file-input-warning-border-color)
   );
-  --file-input-border-error-v: var(--file-input-error-border, var(--file-input-error-border-color));
+  --file-input-border-error-v: var(
+    --file-input-error-border,
+    var(--file-input-error-border-color)
+  );
   --file-input-placeholder-v: var(
     --file-input-placeholder-color,
     var(--file-input-disabled-placeholder-color)

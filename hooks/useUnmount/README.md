@@ -9,11 +9,11 @@ React hook for executing cleanup functions when a component unmounts.
 ## Usage
 
 ```tsx
-import { useUnmount } from '@onlyoffice/apps-ui-kit/hooks/useUnmount';
+import { useUnmount } from "@onlyoffice/apps-ui-kit/hooks/useUnmount";
 
 function Component() {
   useUnmount(() => {
-    console.log('Component is unmounting');
+    console.log("Component is unmounting");
   });
 
   return <div>Hello World</div>;
@@ -41,10 +41,10 @@ This hook does not return any value.
 
 ```tsx
 function FormComponent() {
-  const [formData, setFormData] = useState({ name: '', email: '' });
+  const [formData, setFormData] = useState({ name: "", email: "" });
 
   useUnmount(() => {
-    localStorage.setItem('formDraft', JSON.stringify(formData));
+    localStorage.setItem("formDraft", JSON.stringify(formData));
   });
 
   return (
@@ -71,7 +71,7 @@ function RealtimeData() {
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    wsRef.current = new WebSocket('wss://api.example.com/data');
+    wsRef.current = new WebSocket("wss://api.example.com/data");
   }, []);
 
   useUnmount(() => {

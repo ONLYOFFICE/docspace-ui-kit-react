@@ -137,18 +137,23 @@ describe("<Avatar />", () => {
 
   describe("default source", () => {
     it("displays default avatar when isDefaultSource is true and no source/userName", () => {
-      render(
-        <Avatar {...baseProps} source="" userName="" isDefaultSource />,
-      );
-      const svg = screen.getByTestId("avatar").querySelector("svg[data-is-default='true']");
+      render(<Avatar {...baseProps} source="" userName="" isDefaultSource />);
+      const svg = screen
+        .getByTestId("avatar")
+        .querySelector("svg[data-is-default='true']");
       expect(svg).toBeInTheDocument();
     });
 
     it("marks image as default when source contains default_user_photo", () => {
       render(
-        <Avatar {...baseProps} source="https://example.com/default_user_photo.png" />,
+        <Avatar
+          {...baseProps}
+          source="https://example.com/default_user_photo.png"
+        />,
       );
-      const svg = screen.getByTestId("avatar").querySelector("svg[data-is-default='true']");
+      const svg = screen
+        .getByTestId("avatar")
+        .querySelector("svg[data-is-default='true']");
       expect(svg).toBeInTheDocument();
     });
   });
@@ -373,9 +378,14 @@ describe("<Avatar />", () => {
           role={AvatarRole.admin}
         />,
       );
-      const roleWrapper = screen.getByTestId("avatar").querySelector("[data-tooltip-id]");
+      const roleWrapper = screen
+        .getByTestId("avatar")
+        .querySelector("[data-tooltip-id]");
       expect(roleWrapper).toBeInTheDocument();
-      expect(roleWrapper).toHaveAttribute("data-tooltip-content", "Test tooltip");
+      expect(roleWrapper).toHaveAttribute(
+        "data-tooltip-content",
+        "Test tooltip",
+      );
     });
   });
 

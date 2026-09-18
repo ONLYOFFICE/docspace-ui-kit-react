@@ -334,7 +334,8 @@
 .subItemWithSeparator {
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid var(--nav-menu-separator-color, var(--quick-buttons-color));
+  border-top: 1px solid
+    var(--nav-menu-separator-color, var(--quick-buttons-color));
 }
 
 .subItemSibling {

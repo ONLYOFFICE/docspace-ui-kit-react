@@ -46,8 +46,7 @@ import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
     },
     isOpen: {
       control: "boolean",
-      description:
-        "Whether the room type item is in open/expanded state",
+      description: "Whether the room type item is in open/expanded state",
       table: {
         defaultValue: { summary: "false" },
       },

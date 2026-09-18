@@ -20,12 +20,12 @@ import MCPServersSelector from "@onlyoffice/apps-ui-kit/selectors/MCPServers";
 
 ## Props
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `onSubmit` | `(servers: TSelectorItem[]) => void` | Yes | Callback with the selected servers when submitted |
-| `onClose` | `VoidFunction` | Yes | Callback to fully close the selector |
-| `onBackClick` | `VoidFunction` | Yes | Callback for the back button (navigates to previous view) |
-| `initedSelectedServers` | `string[]` | No | IDs of servers that should be pre-selected |
+| Prop                    | Type                                 | Required | Description                                               |
+| ----------------------- | ------------------------------------ | -------- | --------------------------------------------------------- |
+| `onSubmit`              | `(servers: TSelectorItem[]) => void` | Yes      | Callback with the selected servers when submitted         |
+| `onClose`               | `VoidFunction`                       | Yes      | Callback to fully close the selector                      |
+| `onBackClick`           | `VoidFunction`                       | Yes      | Callback for the back button (navigates to previous view) |
+| `initedSelectedServers` | `string[]`                           | No       | IDs of servers that should be pre-selected                |
 
 ## Usage
 
@@ -53,15 +53,15 @@ const AIAgentSettings = () => {
 
 ```tsx
 enum ServerType {
-  Custom,   // Custom MCP server
-  Portal,   // DocSpace portal server (uses portal logo)
-  GitHub,   // GitHub integration
-  Box,      // Box integration
+  Custom, // Custom MCP server
+  Portal, // DocSpace portal server (uses portal logo)
+  GitHub, // GitHub integration
+  Box, // Box integration
 }
 ```
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
+| File        | Description                                                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `index.tsx` | Main component with server fetching, multi-select logic, and rendering. Also exports `ServerType` enum and `TServer` type |

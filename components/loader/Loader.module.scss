@@ -1,7 +1,6 @@
 @use "../../styles/variables/colors" as *;
 
-
-.loader, 
+.loader,
 .loaderTrack {
   --loader-color: #{$loader-light};
   --button-loader-track-primary: #{$white};
@@ -10,12 +9,12 @@
 
 :global(.dark) {
   :local {
-    .loader, 
+    .loader,
     .loaderTrack {
       --loader-color: #{$loader-dark};
       --button-loader-track-primary: #{$white};
       --button-loader-track-base: #{$white};
-      }
+    }
   }
 }
 
@@ -26,8 +25,14 @@
 }
 
 .loaderTrack {
-  --loader-track-primary-value: var(--loader-track-primary, var(--button-loader-track-primary));
-  --loader-track-base-value: var(--loader-track-base, var(--button-loader-track-base));
+  --loader-track-primary-value: var(
+    --loader-track-primary,
+    var(--button-loader-track-primary)
+  );
+  --loader-track-base-value: var(
+    --loader-track-base,
+    var(--button-loader-track-base)
+  );
   --loader-disabled-opacity: var(--loader-opacity-disabled, 0.6);
 
   width: var(--loader-size, 20px);

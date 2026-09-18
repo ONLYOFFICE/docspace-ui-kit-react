@@ -6,7 +6,10 @@
     .iconButton {
       --icon-button-color: #{colors.$gray-dark};
       --icon-button-hover-color: #{colors.$white};
-      --accent-main: var(--color-scheme-main-accent, #{colors.$light-blue-main});
+      --accent-main: var(
+        --color-scheme-main-accent,
+        #{colors.$light-blue-main}
+      );
     }
   }
 }

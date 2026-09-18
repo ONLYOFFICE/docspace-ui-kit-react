@@ -59,7 +59,10 @@
     :global {
       .tag,
       .advanced-tag {
-        background: var(--tile-tag-hover-bg, var(--tile-tag-checked-background));
+        background: var(
+          --tile-tag-hover-bg,
+          var(--tile-tag-checked-background)
+        );
       }
     }
   }

@@ -20,7 +20,10 @@
     --ops-progress-dropdown-hover,
     var(--progress-bar-background-hover)
   );
-  --ops-progress-dropdown-margin-value: var(--ops-progress-dropdown-margin, 8px);
+  --ops-progress-dropdown-margin-value: var(
+    --ops-progress-dropdown-margin,
+    8px
+  );
   --ops-progress-list-padding-value: var(--ops-progress-list-padding, 0px 8px);
 
   margin-bottom: var(--ops-progress-dropdown-margin-value);

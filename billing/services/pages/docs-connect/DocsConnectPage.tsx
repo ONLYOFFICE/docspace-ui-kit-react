@@ -407,11 +407,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
                   primary
                   size={ButtonSize.small}
                   label={getRenewLabel()}
-                  onClick={
-                    isDelayedPaymentTopUp
-                      ? openTopUpDialog
-                      : onEditPlan
-                  }
+                  onClick={isDelayedPaymentTopUp ? openTopUpDialog : onEditPlan}
                 />
                 <Button
                   size={ButtonSize.small}

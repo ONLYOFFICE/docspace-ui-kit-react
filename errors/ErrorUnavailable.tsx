@@ -9,9 +9,7 @@ const ErrorUnavailable = () => {
   return (
     ready && (
       <div className={styles.errorUnavailableWrapper}>
-        <ErrorContainer
-          headerText={t("ErrorDeactivatedText")}
-        />
+        <ErrorContainer headerText={t("ErrorDeactivatedText")} />
       </div>
     )
   );

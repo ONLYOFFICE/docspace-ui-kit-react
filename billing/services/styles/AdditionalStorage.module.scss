@@ -102,7 +102,6 @@
   max-width: 660px;
 }
 
-
 .additionalInfo {
   display: grid;
   grid-template-columns: 16px 1fr;
@@ -137,8 +136,8 @@
       }
     }
   }
-  
-   &.errorColor {
+
+  &.errorColor {
     color: var(--payment-error-color);
     svg {
       path {

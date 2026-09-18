@@ -82,6 +82,10 @@ list(
 );
 list("README shorter than five lines", thin);
 list("No story", noStory, "Every component needs one; stories carry the docs.");
-list("No test", noTest, "Tolerated. An untested change to interactive logic is not.");
+list(
+  "No test",
+  noTest,
+  "Tolerated. An untested change to interactive logic is not.",
+);
 
 process.exit(noReadme.length || noStory.length ? 1 : 0);

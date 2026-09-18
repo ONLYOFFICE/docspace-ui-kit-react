@@ -14,8 +14,5 @@ export {
   type AttachToChatResult,
 } from "./use-attach-to-chat";
 export { CHAT_ATTACHMENT_LIMIT } from "./limits";
-export {
-  useFilesIntegration,
-  type FilesIntegration,
-} from "./use-integration";
+export { useFilesIntegration, type FilesIntegration } from "./use-integration";
 export { notifyAlreadyAttached, notifyAttachmentLimit } from "./notices";

@@ -25,11 +25,23 @@
   --toast-warning-border: none;
 
   --status-message-background: var(--status-message-bg, var(--toast-error-bg));
-  --status-message-box-shadow: var(--status-message-shadow, var(--toast-box-shadow));
-  --status-message-border-style: var(--status-message-border, var(--toast-error-border));
+  --status-message-box-shadow: var(
+    --status-message-shadow,
+    var(--toast-box-shadow)
+  );
+  --status-message-border-style: var(
+    --status-message-border,
+    var(--toast-error-border)
+  );
   --status-message-color: var(--status-message-text, var(--toastr-text-color));
-  --status-message-icon-fill: var(--status-message-icon, var(--toastr-svg-error-color));
-  --status-message-icon-warning-fill: var(--status-message-warning-icon, var(--toastr-svg-warning-color));
+  --status-message-icon-fill: var(
+    --status-message-icon,
+    var(--toastr-svg-error-color)
+  );
+  --status-message-icon-warning-fill: var(
+    --status-message-warning-icon,
+    var(--toastr-svg-warning-color)
+  );
   --status-message-border-radius: var(--status-message-radius, 6px);
   --status-message-inner-padding: var(--status-message-padding, 8px 12px);
   --status-message-inner-gap: var(--status-message-gap, 12px);
@@ -67,7 +79,10 @@
 
 .warning {
   background: var(--status-message-warning-bg, var(--toast-warning-bg));
-  border: var(--status-message-warning-border-style, var(--toast-warning-border));
+  border: var(
+    --status-message-warning-border-style,
+    var(--toast-warning-border)
+  );
 
   svg path {
     fill: var(--status-message-icon-warning-fill);

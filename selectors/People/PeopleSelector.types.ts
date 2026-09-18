@@ -82,4 +82,3 @@ export type PeopleSelectorProps = TSelectorHeader &
     "data-test-id"?: string;
   } & ContactsSelectorGroups &
   ContactsSelectorGuests;
-

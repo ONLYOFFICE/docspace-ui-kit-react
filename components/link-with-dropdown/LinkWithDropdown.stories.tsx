@@ -52,7 +52,8 @@ import { LinkWithDropdown } from "@onlyoffice/apps-ui-kit/components/link-with-d
     },
     data: {
       control: "object",
-      description: "Array of dropdown items with key, label, onClick, and optional isSeparator",
+      description:
+        "Array of dropdown items with key, label, onClick, and optional isSeparator",
     },
     fontSize: {
       control: "text",
@@ -290,8 +291,7 @@ export const SemiTransparent: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Link with reduced opacity for a subtle, secondary appearance.",
+        story: "Link with reduced opacity for a subtle, secondary appearance.",
       },
       source: {
         code: `<LinkWithDropdown data={items} isSemitransparent>Semi-transparent Link</LinkWithDropdown>`,

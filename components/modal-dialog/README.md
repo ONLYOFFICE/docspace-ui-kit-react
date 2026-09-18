@@ -20,17 +20,8 @@ import { ModalDialog } from "@onlyoffice/apps-ui-kit/components/modal-dialog";
     </div>
   </ModalDialog.Body>
   <ModalDialog.Footer>
-    <Button
-      label="Send"
-      primary
-      size="normal"
-      onClick={() => {}}
-    />
-    <Button
-      label="Cancel"
-      size="normal"
-      onClick={() => {}}
-    />
+    <Button label="Send" primary size="normal" onClick={() => {}} />
+    <Button label="Cancel" size="normal" onClick={() => {}} />
   </ModalDialog.Footer>
 </ModalDialog>
 ```
@@ -38,80 +29,80 @@ import { ModalDialog } from "@onlyoffice/apps-ui-kit/components/modal-dialog";
 ### Aside Example
 
 ```jsx
-<ModalDialog 
-  visible={true} 
+<ModalDialog
+  visible={true}
   displayType="aside"
   withBodyScroll
   onClose={() => {}}
 >
   <ModalDialog.Header>Side Panel</ModalDialog.Header>
-  <ModalDialog.Body>
-    {/* Long scrollable content */}
-  </ModalDialog.Body>
+  <ModalDialog.Body>{/* Long scrollable content */}</ModalDialog.Body>
 </ModalDialog>
 ```
 
 ## Properties
 
-| Props                | Type                    | Required | Default | Description                                                  |
-| ------------------- | :---------------------- | :------: | :-----: | ------------------------------------------------------------ |
-| `children`          | `ReactElement \| ReactElement[]` |    ✓     |    -    | Modal content components (Header, Body, Footer, Container)   |
-| `visible`           | `boolean`               |    -     | `false` | Controls modal visibility                                    |
-| `displayType`       | `ModalDialogType`       |    -     | `modal` | Display type (`modal` or `aside`)                           |
-| `displayTypeDetailed`| `ModalDialogTypeDetailed`|    -    |    -    | Detailed display type for different screen sizes            |
-| `onClose`           | `(e?: React.MouseEvent) => void` |    -     |    -    | Callback when modal is closed                               |
-| `onBackClick`       | `() => void`            |    -     |    -    | Callback when Backspace key is pressed                      |
-| `id`                | `string`                |    -     |    -    | HTML id attribute                                           |
-| `className`         | `string`                |    -     |    -    | Custom CSS classes                                          |
-| `style`             | `React.CSSProperties`   |    -     |    -    | Inline styles                                               |
-| `zIndex`            | `number`                |    -     |  `310`  | CSS z-index for modal layering                              |
-| `isLoading`         | `boolean`               |    -     | `false` | Shows loader in body                                        |
-| `isCloseable`       | `boolean`               |    -     |  `true` | Controls if modal can be closed                             |
-| `embedded`          | `boolean`               |    -     | `false` | Enables embedded mode (disables closing)                    |
-| `dataTestId`        | `string`                |    -     | `modal` | Test id for testing                                         |
+| Props                 | Type                             | Required | Default | Description                                                |
+| --------------------- | :------------------------------- | :------: | :-----: | ---------------------------------------------------------- |
+| `children`            | `ReactElement \| ReactElement[]` |    ✓     |    -    | Modal content components (Header, Body, Footer, Container) |
+| `visible`             | `boolean`                        |    -     | `false` | Controls modal visibility                                  |
+| `displayType`         | `ModalDialogType`                |    -     | `modal` | Display type (`modal` or `aside`)                          |
+| `displayTypeDetailed` | `ModalDialogTypeDetailed`        |    -     |    -    | Detailed display type for different screen sizes           |
+| `onClose`             | `(e?: React.MouseEvent) => void` |    -     |    -    | Callback when modal is closed                              |
+| `onBackClick`         | `() => void`                     |    -     |    -    | Callback when Backspace key is pressed                     |
+| `id`                  | `string`                         |    -     |    -    | HTML id attribute                                          |
+| `className`           | `string`                         |    -     |    -    | Custom CSS classes                                         |
+| `style`               | `React.CSSProperties`            |    -     |    -    | Inline styles                                              |
+| `zIndex`              | `number`                         |    -     |  `310`  | CSS z-index for modal layering                             |
+| `isLoading`           | `boolean`                        |    -     | `false` | Shows loader in body                                       |
+| `isCloseable`         | `boolean`                        |    -     | `true`  | Controls if modal can be closed                            |
+| `embedded`            | `boolean`                        |    -     | `false` | Enables embedded mode (disables closing)                   |
+| `dataTestId`          | `string`                         |    -     | `modal` | Test id for testing                                        |
 
 ### Modal-only Properties
 
-| Props              | Type      | Required | Default | Description                                           |
-| ----------------- | :-------- | :------: | :-----: | ----------------------------------------------------- |
-| `isLarge`         | `boolean` |    -     | `false` | Sets width: 520px and max-height: 400px               |
-| `isHuge`          | `boolean` |    -     | `false` | Sets predefined huge size                             |
-| `autoMaxWidth`    | `boolean` |    -     | `false` | Sets max-width: auto                                  |
-| `autoMaxHeight`   | `boolean` |    -     | `false` | Sets max-height: auto                                 |
-| `withFooterBorder`| `boolean` |    -     | `false` | Displays border between body and footer               |
+| Props              | Type      | Required | Default | Description                             |
+| ------------------ | :-------- | :------: | :-----: | --------------------------------------- |
+| `isLarge`          | `boolean` |    -     | `false` | Sets width: 520px and max-height: 400px |
+| `isHuge`           | `boolean` |    -     | `false` | Sets predefined huge size               |
+| `autoMaxWidth`     | `boolean` |    -     | `false` | Sets max-width: auto                    |
+| `autoMaxHeight`    | `boolean` |    -     | `false` | Sets max-height: auto                   |
+| `withFooterBorder` | `boolean` |    -     | `false` | Displays border between body and footer |
 
 ### Aside-only Properties
 
-| Props               | Type      | Required | Default | Description                                           |
-| ------------------ | :-------- | :------: | :-----: | ----------------------------------------------------- |
-| `withBodyScroll`   | `boolean` |    -     | `false` | Enables body scroll                                   |
-| `isScrollLocked`   | `boolean` |    -     | `false` | Locks the scroll in body section                      |
-| `containerVisible` | `boolean` |    -     | `false` | Shows Container instead of Header/Body/Footer         |
+| Props              | Type      | Required | Default | Description                                   |
+| ------------------ | :-------- | :------: | :-----: | --------------------------------------------- |
+| `withBodyScroll`   | `boolean` |    -     | `false` | Enables body scroll                           |
+| `isScrollLocked`   | `boolean` |    -     | `false` | Locks the scroll in body section              |
+| `containerVisible` | `boolean` |    -     | `false` | Shows Container instead of Header/Body/Footer |
 
 ### Additional Properties
 
-| Props                  | Type      | Required | Default | Description                                           |
-| --------------------- | :-------- | :------: | :-----: | ----------------------------------------------------- |
-| `withForm`            | `boolean` |    -     | `false` | Wraps content in form element                         |
-| `onSubmit`            | `(e: React.FormEvent) => void` |    -     |    -    | Form submit handler                                   |
-| `withoutPadding`      | `boolean` |    -     | `false` | Removes default padding from body                     |
-| `withoutHeaderMargin` | `boolean` |    -     | `false` | Removes default margin from header                    |
-| `hideContent`         | `boolean` |    -     | `false` | Hides modal content                                   |
-| `isDoubleFooterLine`  | `boolean` |    -     | `false` | Displays double line in footer                        |
-| `backdropVisible`     | `boolean` |    -     |  `true` | Controls the visibility of the backdrop overlay       |
-| `closeOnBackdropClick`| `boolean` |    -     |  `true` | Disables closing the modal when backdrop is clicked   |
-| `blur`                | `number`  |    -     |    -    | Sets backdrop blur value                              |
-| `isInvitePanelLoader` | `boolean` |    -     | `false` | Shows invite panel loader                             |
-| `withBodyScrollForcibly`| `boolean`|    -    | `false` | Forces body scroll regardless of display type         |
-| `scrollbarCreateContext`| `boolean`|    -    | `false` | Creates context for scrollbar                         |
-| `withBorder`          | `boolean` |    -     | `false` | Adds border to modal content                          |
+| Props                    | Type                           | Required | Default | Description                                         |
+| ------------------------ | :----------------------------- | :------: | :-----: | --------------------------------------------------- |
+| `withForm`               | `boolean`                      |    -     | `false` | Wraps content in form element                       |
+| `onSubmit`               | `(e: React.FormEvent) => void` |    -     |    -    | Form submit handler                                 |
+| `withoutPadding`         | `boolean`                      |    -     | `false` | Removes default padding from body                   |
+| `withoutHeaderMargin`    | `boolean`                      |    -     | `false` | Removes default margin from header                  |
+| `hideContent`            | `boolean`                      |    -     | `false` | Hides modal content                                 |
+| `isDoubleFooterLine`     | `boolean`                      |    -     | `false` | Displays double line in footer                      |
+| `backdropVisible`        | `boolean`                      |    -     | `true`  | Controls the visibility of the backdrop overlay     |
+| `closeOnBackdropClick`   | `boolean`                      |    -     | `true`  | Disables closing the modal when backdrop is clicked |
+| `blur`                   | `number`                       |    -     |    -    | Sets backdrop blur value                            |
+| `isInvitePanelLoader`    | `boolean`                      |    -     | `false` | Shows invite panel loader                           |
+| `withBodyScrollForcibly` | `boolean`                      |    -     | `false` | Forces body scroll regardless of display type       |
+| `scrollbarCreateContext` | `boolean`                      |    -     | `false` | Creates context for scrollbar                       |
+| `withBorder`             | `boolean`                      |    -     | `false` | Adds border to modal content                        |
 
 ## Sub-components
 
 ### ModalDialog.Header
+
 Container for modal header content. Supports header icons, back button, and close button.
 
 **Props (inherited from AsideHeader):**
+
 - `header` - Header content (string or ReactNode)
 - `headerIcons` - Array of icons to display
 - `headerComponent` - Additional component to render
@@ -120,12 +111,15 @@ Container for modal header content. Supports header icons, back button, and clos
 - `headerHeight` - Custom header height
 
 ### ModalDialog.Body
+
 Container for modal body content. Supports scrolling in aside mode.
 
 ### ModalDialog.Footer
+
 Container for modal footer content, typically used for action buttons.
 
 ### ModalDialog.Container
+
 Container for aside mode with `containerVisible` prop. Used to display custom content instead of Header/Body/Footer structure.
 
 ## Examples
@@ -133,7 +127,7 @@ Container for aside mode with `containerVisible` prop. Used to display custom co
 ### Modal with Form
 
 ```jsx
-<ModalDialog 
+<ModalDialog
   visible={true}
   withForm
   onSubmit={(e) => {
@@ -143,9 +137,7 @@ Container for aside mode with `containerVisible` prop. Used to display custom co
 >
   <ModalDialog.Header>Form Example</ModalDialog.Header>
   <ModalDialog.Body>
-    <form>
-      {/* Form fields */}
-    </form>
+    <form>{/* Form fields */}</form>
   </ModalDialog.Body>
   <ModalDialog.Footer>
     <Button type="submit" label="Submit" primary />
@@ -156,45 +148,31 @@ Container for aside mode with `containerVisible` prop. Used to display custom co
 ### Large Modal
 
 ```jsx
-<ModalDialog 
-  visible={true}
-  isLarge
-  withFooterBorder
->
+<ModalDialog visible={true} isLarge withFooterBorder>
   <ModalDialog.Header>Large Modal</ModalDialog.Header>
-  <ModalDialog.Body>
-    {/* Content */}
-  </ModalDialog.Body>
-  <ModalDialog.Footer>
-    {/* Actions */}
-  </ModalDialog.Footer>
+  <ModalDialog.Body>{/* Content */}</ModalDialog.Body>
+  <ModalDialog.Footer>{/* Actions */}</ModalDialog.Footer>
 </ModalDialog>
 ```
 
 ### Scrollable Aside Panel
 
 ```jsx
-<ModalDialog 
+<ModalDialog
   visible={true}
   displayType="aside"
   withBodyScroll
   isScrollLocked={false}
 >
   <ModalDialog.Header>Scrollable Panel</ModalDialog.Header>
-  <ModalDialog.Body>
-    {/* Long scrollable content */}
-  </ModalDialog.Body>
+  <ModalDialog.Body>{/* Long scrollable content */}</ModalDialog.Body>
 </ModalDialog>
 ```
 
 ### Embedded Modal
 
 ```jsx
-<ModalDialog 
-  visible={true}
-  embedded
-  onClose={() => {}}
->
+<ModalDialog visible={true} embedded onClose={() => {}}>
   <ModalDialog.Header>Embedded Modal</ModalDialog.Header>
   <ModalDialog.Body>
     This modal cannot be closed by user actions
@@ -205,26 +183,20 @@ Container for aside mode with `containerVisible` prop. Used to display custom co
 ### Modal with Backdrop Control
 
 ```jsx
-<ModalDialog 
+<ModalDialog
   visible={true}
   backdropVisible={false}
   closeOnBackdropClick={false}
 >
   <ModalDialog.Header>No Backdrop</ModalDialog.Header>
-  <ModalDialog.Body>
-    Modal without visible backdrop
-  </ModalDialog.Body>
+  <ModalDialog.Body>Modal without visible backdrop</ModalDialog.Body>
 </ModalDialog>
 ```
 
 ### Aside with Container
 
 ```jsx
-<ModalDialog 
-  visible={true}
-  displayType="aside"
-  containerVisible
->
+<ModalDialog visible={true} displayType="aside" containerVisible>
   <ModalDialog.Container>
     {/* Custom container content */}
   </ModalDialog.Container>

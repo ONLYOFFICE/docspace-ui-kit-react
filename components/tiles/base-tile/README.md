@@ -15,7 +15,7 @@ import { BaseTile } from "@onlyoffice/apps-ui-kit/components/tiles/base-tile";
   element={<IconElement />}
   topContent={<div>Top content</div>}
   bottomContent={<div>Bottom content</div>}
-/>
+/>;
 ```
 
 ## Props
@@ -42,7 +42,7 @@ import { BaseTile } from "@onlyoffice/apps-ui-kit/components/tiles/base-tile";
 | `onHover`             |                 `() => void`                 |    -     |   -    |    -    | Callback on hover                                      |
 | `onLeave`             |                 `() => void`                 |    -     |   -    |    -    | Callback on mouse leave                                |
 | `className`           |                   `string`                   |    -     |   -    |    -    | Additional CSS class name                              |
-| `onRoomClick`         |        `(e: React.MouseEvent) => void`       |    -     |   -    |    -    | Callback when tile is clicked                          |
+| `onRoomClick`         |       `(e: React.MouseEvent) => void`        |    -     |   -    |    -    | Callback when tile is clicked                          |
 | `dataTestId`          |                   `string`                   |    -     |   -    |    -    | Data test id for the tile                              |
 | `badgeUrl`            |                   `string`                   |    -     |   -    |    -    | Badge URL                                              |
 
@@ -58,6 +58,7 @@ import { BaseTile } from "@onlyoffice/apps-ui-kit/components/tiles/base-tile";
 ## Structure
 
 The BaseTile component consists of:
+
 - **Top Content**: Icon/checkbox area and main content
 - **Bottom Content**: Additional content area (e.g., tags, metadata)
 - **Context Menu**: Three-dot menu for actions

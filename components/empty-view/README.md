@@ -90,13 +90,13 @@ import { EmptyView } from "@onlyoffice/apps-ui-kit/components/empty-view";
 
 ## Properties
 
-| Prop          | Type                              | Required | Default | Description                                    |
-| ------------- | --------------------------------- | :------: | ------- | ---------------------------------------------- |
-| `title`       | `string`                          |    ✓     | -       | Main title text displayed below the icon       |
-| `description` | `ReactNode`                       |    ✓     | -       | Description text or content                    |
-| `icon`        | `ReactElement`                    |    ✓     | -       | Icon component to display                      |
-| `options`     | `EmptyViewOptionsType \| null`    |    ✓     | -       | Array of interactive options (can be null)     |
-| `LinkRouter`  | `ComponentType<LinkRouterProps>`  |    -     | -       | Router Link component for navigation links     |
+| Prop          | Type                             | Required | Default | Description                                |
+| ------------- | -------------------------------- | :------: | ------- | ------------------------------------------ |
+| `title`       | `string`                         |    ✓     | -       | Main title text displayed below the icon   |
+| `description` | `ReactNode`                      |    ✓     | -       | Description text or content                |
+| `icon`        | `ReactElement`                   |    ✓     | -       | Icon component to display                  |
+| `options`     | `EmptyViewOptionsType \| null`   |    ✓     | -       | Array of interactive options (can be null) |
+| `LinkRouter`  | `ComponentType<LinkRouterProps>` |    -     | -       | Router Link component for navigation links |
 
 ## Option Types
 
@@ -106,42 +106,42 @@ Options array can contain three types of elements:
 
 Used for navigation links. Requires `LinkRouter` prop to be set.
 
-| Prop          | Type                                    | Required | Default | Description                        |
-| ------------- | --------------------------------------- | :------: | ------- | ---------------------------------- |
-| `key`         | `React.Key`                             |    ✓     | -       | Unique identifier                  |
-| `to`          | `string`                                |    ✓     | -       | Target route or URL                |
-| `icon`        | `ReactElement`                          |    ✓     | -       | Icon to display                    |
-| `description` | `string`                                |    ✓     | -       | Link text                          |
-| `state`       | `unknown`                               |    -     | -       | State to pass to the router        |
-| `onClick`     | `MouseEventHandler<HTMLAnchorElement>`  |    -     | -       | Click handler                      |
-| `className`   | `string`                                |    -     | -       | Additional CSS class               |
-| `isNext`      | `boolean`                               |    -     | -       | Use regular link instead of router |
+| Prop          | Type                                   | Required | Default | Description                        |
+| ------------- | -------------------------------------- | :------: | ------- | ---------------------------------- |
+| `key`         | `React.Key`                            |    ✓     | -       | Unique identifier                  |
+| `to`          | `string`                               |    ✓     | -       | Target route or URL                |
+| `icon`        | `ReactElement`                         |    ✓     | -       | Icon to display                    |
+| `description` | `string`                               |    ✓     | -       | Link text                          |
+| `state`       | `unknown`                              |    -     | -       | State to pass to the router        |
+| `onClick`     | `MouseEventHandler<HTMLAnchorElement>` |    -     | -       | Click handler                      |
+| `className`   | `string`                               |    -     | -       | Additional CSS class               |
+| `isNext`      | `boolean`                              |    -     | -       | Use regular link instead of router |
 
 ### Button Option
 
 Used for action buttons.
 
-| Prop        | Type                            | Required | Default | Description          |
-| ----------- | ------------------------------- | :------: | ------- | -------------------- |
-| `key`       | `React.Key`                     |    ✓     | -       | Unique identifier    |
-| `type`      | `"button"`                      |    ✓     | -       | Must be `"button"`   |
-| `title`     | `string`                        |    ✓     | -       | Button label         |
-| `onClick`   | `MouseEventHandler<HTMLElement>`|    -     | -       | Click handler        |
-| `className` | `string`                        |    -     | -       | Additional CSS class |
+| Prop        | Type                             | Required | Default | Description          |
+| ----------- | -------------------------------- | :------: | ------- | -------------------- |
+| `key`       | `React.Key`                      |    ✓     | -       | Unique identifier    |
+| `type`      | `"button"`                       |    ✓     | -       | Must be `"button"`   |
+| `title`     | `string`                         |    ✓     | -       | Button label         |
+| `onClick`   | `MouseEventHandler<HTMLElement>` |    -     | -       | Click handler        |
+| `className` | `string`                         |    -     | -       | Additional CSS class |
 
 ### Item Option
 
 Used for clickable list items with optional context menu.
 
-| Prop          | Type                            | Required | Default | Description                  |
-| ------------- | ------------------------------- | :------: | ------- | ---------------------------- |
-| `key`         | `React.Key`                     |    ✓     | -       | Unique identifier            |
-| `title`       | `string`                        |    ✓     | -       | Item title                   |
-| `description` | `ReactNode`                     |    ✓     | -       | Item description             |
-| `icon`        | `ReactElement`                  |    ✓     | -       | Icon to display              |
-| `onClick`     | `(event) => void`               |    -     | -       | Click handler                |
-| `disabled`    | `boolean`                       |    -     | `false` | Disable the item             |
-| `model`       | `ContextMenuModel[]`            |    -     | -       | Context menu configuration   |
+| Prop          | Type                 | Required | Default | Description                |
+| ------------- | -------------------- | :------: | ------- | -------------------------- |
+| `key`         | `React.Key`          |    ✓     | -       | Unique identifier          |
+| `title`       | `string`             |    ✓     | -       | Item title                 |
+| `description` | `ReactNode`          |    ✓     | -       | Item description           |
+| `icon`        | `ReactElement`       |    ✓     | -       | Icon to display            |
+| `onClick`     | `(event) => void`    |    -     | -       | Click handler              |
+| `disabled`    | `boolean`            |    -     | `false` | Disable the item           |
+| `model`       | `ContextMenuModel[]` |    -     | -       | Context menu configuration |
 
 ## Examples
 

@@ -101,10 +101,7 @@ export const useFilesIntegration = ({
   const overlay = (
     <>
       {pickerVisible ? (
-        <AttachDialog
-          onClose={closePicker}
-          onFilesAttached={onFilesAttached}
-        />
+        <AttachDialog onClose={closePicker} onFilesAttached={onFilesAttached} />
       ) : null}
       {saveRequest ? (
         <SaveDialog

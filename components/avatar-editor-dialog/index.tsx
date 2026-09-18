@@ -68,7 +68,9 @@ const AvatarEditorDialog = ({
       dataTestId={dataTestId}
       style={
         scrollBodyHeight
-          ? ({ "--modal-body-height": `${scrollBodyHeight}px` } as React.CSSProperties)
+          ? ({
+              "--modal-body-height": `${scrollBodyHeight}px`,
+            } as React.CSSProperties)
           : undefined
       }
     >

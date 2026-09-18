@@ -17,7 +17,7 @@ import { hasOwnProperty } from "../../utils/hasOwnProperty";
 
 ```ts
 hasOwnProperty({ a: 1 }, "a"); // => true
-hasOwnProperty(null, "a");     // => false
+hasOwnProperty(null, "a"); // => false
 hasOwnProperty(undefined, "a"); // => false
 ```
 
@@ -29,7 +29,7 @@ hasOwnProperty(obj: unknown, propertyName: string): boolean
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
-| `index.ts` | `hasOwnProperty` function |
-| `hasOwnProperty.test.ts` | Unit tests (Vitest) |
+| File                     | Description               |
+| ------------------------ | ------------------------- |
+| `index.ts`               | `hasOwnProperty` function |
+| `hasOwnProperty.test.ts` | Unit tests (Vitest)       |

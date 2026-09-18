@@ -154,9 +154,7 @@ export function toISOString(
  * @param dateTime - DateTime to convert
  * @returns JavaScript Date object
  */
-export function toJSDate(
-  dateTime: DateTime | null | undefined,
-): Date | null {
+export function toJSDate(dateTime: DateTime | null | undefined): Date | null {
   if (!dateTime || !dateTime.isValid) return null;
   return dateTime.toJSDate();
 }

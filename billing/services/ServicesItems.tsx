@@ -429,8 +429,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               currentUsers: docsConnectState?.tariffUsers ?? 0,
               scheduledUsers,
               scheduledOnDevPack: docsConnectState?.scheduledOnDevPack ?? false,
-              nextDevPackEnabled:
-                docsConnectState?.nextDevPackEnabled ?? false,
+              nextDevPackEnabled: docsConnectState?.nextDevPackEnabled ?? false,
             });
             const deactivated = docsConnectState?.deactivated ?? false;
             const canceled = docsConnectState?.canceled ?? false;

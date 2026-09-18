@@ -73,7 +73,8 @@ import { ModalDialog } from "@onlyoffice/apps-ui-kit/components/modal-dialog";
     },
     isCloseable: {
       control: "boolean",
-      description: "Whether the modal can be closed via close button or backdrop",
+      description:
+        "Whether the modal can be closed via close button or backdrop",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -94,7 +95,8 @@ import { ModalDialog } from "@onlyoffice/apps-ui-kit/components/modal-dialog";
     },
     isHuge: {
       control: "boolean",
-      description: "Sets predefined huge size (modal only, requires autoMaxWidth)",
+      description:
+        "Sets predefined huge size (modal only, requires autoMaxWidth)",
       table: {
         defaultValue: { summary: "false" },
       },

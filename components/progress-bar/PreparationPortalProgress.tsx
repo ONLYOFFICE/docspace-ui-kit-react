@@ -12,7 +12,11 @@ export const PreparationPortalProgress = ({
   ...rest
 }: PreparationPortalProgressProps) => {
   return (
-    <div data-testid="preparation-portal-progress" className={className} {...rest}>
+    <div
+      data-testid="preparation-portal-progress"
+      className={className}
+      {...rest}
+    >
       <div className={styles.preparationPortalProgress}>
         <div className={styles.preparationPortalProgressBar}>
           <div

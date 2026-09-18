@@ -185,7 +185,8 @@ import { InfiniteLoaderComponent } from "@onlyoffice/apps-ui-kit/components/infi
     },
     itemSize: {
       control: "number",
-      description: "Height of each item in pixels (used for scroll calculations)",
+      description:
+        "Height of each item in pixels (used for scroll calculations)",
     },
     isLoading: {
       control: "boolean",

@@ -284,7 +284,7 @@ export function getWeekdayName(
   const weekdays = Info.weekdays(format, { locale });
   // luxon weekdays are 1-indexed (1 = Monday, 7 = Sunday)
   // Array is 0-indexed, so subtract 1
-  const index = ((weekday - 1) % 7 + 7) % 7;
+  const index = (((weekday - 1) % 7) + 7) % 7;
   return weekdays[index] || "";
 }
 

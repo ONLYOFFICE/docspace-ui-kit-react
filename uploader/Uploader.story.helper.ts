@@ -1,4 +1,7 @@
-export const getFolderUrl = (baseUrl: string, folderId: string | number): string => {
+export const getFolderUrl = (
+  baseUrl: string,
+  folderId: string | number,
+): string => {
   return `${baseUrl}/rooms/personal/filter?folder=${folderId}`;
 };
 

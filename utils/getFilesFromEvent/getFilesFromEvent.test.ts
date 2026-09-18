@@ -65,10 +65,7 @@ const createDirectoryEntry = (
   } as unknown as FileSystemDirectoryEntry;
 };
 
-const createFileEntry = (
-  file: File,
-  fullPath: string,
-): FileSystemFileEntry =>
+const createFileEntry = (file: File, fullPath: string): FileSystemFileEntry =>
   ({
     isDirectory: false,
     isFile: true,

@@ -181,4 +181,3 @@ const AIFeaturesDialog: React.FC<AIFeaturesDialogProps> = ({
 };
 
 export default observer(AIFeaturesDialog);
-

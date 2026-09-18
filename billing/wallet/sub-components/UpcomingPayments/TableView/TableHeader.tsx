@@ -66,4 +66,3 @@ const UpcomingPaymentsTableHeader = (props: TableHeaderProps) => {
 };
 
 export default observer(UpcomingPaymentsTableHeader);
-

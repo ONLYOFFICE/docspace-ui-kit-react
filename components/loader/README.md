@@ -30,15 +30,15 @@ import { Loader, LoaderTypes } from "@onlyoffice/apps-ui-kit/components/loader";
 
 ### Properties
 
-| Props       |         Type          | Required |                    Values                     | Default | Description                         |
-| ----------- | :-------------------: | :------: | :-------------------------------------------: | :-----: | ----------------------------------- |
-| `type`      |     `LoaderTypes`     |    -     | `base`, `oval`, `dualRing`, `rombs`, `track`  | `base`  | Type of loader animation            |
-| `size`      |       `string`        |    -     |            Any valid CSS size unit            | `40px`  | Size of the loader                  |
-| `color`     |       `string`        |    -     |              Any valid CSS color              |    -    | Custom color for the loader         |
-| `label`     |       `string`        |    -     |                       -                       |    -    | Accessible label for screen readers |
-| `className` |       `string`        |    -     |                       -                       |    -    | Custom CSS class                    |
-| `id`        |       `string`        |    -     |                       -                       |    -    | Unique identifier                   |
-| `style`     | `React.CSSProperties` |    -     |                       -                       |    -    | Additional inline styles            |
+| Props       |         Type          | Required |                    Values                    | Default | Description                         |
+| ----------- | :-------------------: | :------: | :------------------------------------------: | :-----: | ----------------------------------- |
+| `type`      |     `LoaderTypes`     |    -     | `base`, `oval`, `dualRing`, `rombs`, `track` | `base`  | Type of loader animation            |
+| `size`      |       `string`        |    -     |           Any valid CSS size unit            | `40px`  | Size of the loader                  |
+| `color`     |       `string`        |    -     |             Any valid CSS color              |    -    | Custom color for the loader         |
+| `label`     |       `string`        |    -     |                      -                       |    -    | Accessible label for screen readers |
+| `className` |       `string`        |    -     |                      -                       |    -    | Custom CSS class                    |
+| `id`        |       `string`        |    -     |                      -                       |    -    | Unique identifier                   |
+| `style`     | `React.CSSProperties` |    -     |                      -                       |    -    | Additional inline styles            |
 
 ### Loader Types
 

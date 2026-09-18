@@ -13,7 +13,12 @@ React Context for managing application theme state and color schemes in DocSpace
 ## Installation
 
 ```tsx
-import { ThemeProvider, useTheme, type TTheme, type TColorScheme } from "@onlyoffice/apps-ui-kit/context";
+import {
+  ThemeProvider,
+  useTheme,
+  type TTheme,
+  type TColorScheme,
+} from "@onlyoffice/apps-ui-kit/context";
 ```
 
 ## Usage
@@ -57,7 +62,10 @@ function MyComponent() {
 Provide a custom color scheme for brand customization:
 
 ```tsx
-import { ThemeProvider, type TColorScheme } from "@onlyoffice/apps-ui-kit/context";
+import {
+  ThemeProvider,
+  type TColorScheme,
+} from "@onlyoffice/apps-ui-kit/context";
 
 const customColorScheme: TColorScheme = {
   id: 1,
@@ -92,6 +100,7 @@ type TTheme = "Base" | "Dark";
 ```
 
 Available theme options:
+
 - `"Base"` - Light theme
 - `"Dark"` - Dark theme
 
@@ -99,15 +108,15 @@ Available theme options:
 
 ```tsx
 type TColorScheme = {
-  id: number;                    // Unique identifier
-  name: string;                  // Color scheme name
+  id: number; // Unique identifier
+  name: string; // Color scheme name
   main: {
-    accent: string;              // Main accent color (hex)
-    buttons: string;             // Primary button color (hex)
+    accent: string; // Main accent color (hex)
+    buttons: string; // Primary button color (hex)
   };
   text: {
-    accent: string;              // Text color for accent elements (hex)
-    buttons: string;             // Text color for buttons (hex)
+    accent: string; // Text color for accent elements (hex)
+    buttons: string; // Text color for buttons (hex)
   };
 };
 ```
@@ -120,11 +129,11 @@ Provider component that makes theme context available to child components.
 
 **Props:**
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `theme` | `TTheme` | Yes | Current theme ("Base" or "Dark") |
-| `currentColorScheme` | `TColorScheme` | No | Custom color scheme configuration |
-| `children` | `ReactNode` | Yes | Child components |
+| Prop                 | Type           | Required | Description                       |
+| -------------------- | -------------- | -------- | --------------------------------- |
+| `theme`              | `TTheme`       | Yes      | Current theme ("Base" or "Dark")  |
+| `currentColorScheme` | `TColorScheme` | No       | Custom color scheme configuration |
+| `children`           | `ReactNode`    | Yes      | Child components                  |
 
 **Example:**
 
@@ -240,7 +249,10 @@ function CustomButton() {
 
 ```tsx
 import { useState } from "react";
-import { ThemeProvider, type TColorScheme } from "@onlyoffice/apps-ui-kit/context";
+import {
+  ThemeProvider,
+  type TColorScheme,
+} from "@onlyoffice/apps-ui-kit/context";
 
 const colorSchemes: TColorScheme[] = [
   {
@@ -268,7 +280,11 @@ function App() {
 
   return (
     <ThemeProvider theme="Base" currentColorScheme={selectedScheme}>
-      <select onChange={(e) => setSelectedScheme(colorSchemes[Number(e.target.value)])}>
+      <select
+        onChange={(e) =>
+          setSelectedScheme(colorSchemes[Number(e.target.value)])
+        }
+      >
         {colorSchemes.map((scheme, index) => (
           <option key={scheme.id} value={index}>
             {scheme.name}

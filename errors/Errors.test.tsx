@@ -25,7 +25,9 @@ const mockTranslations: Record<string, string> = {
 
 const setupI18n = (data: Record<string, string> = {}) => {
   (
-    window as unknown as { i18n: { loaded: Record<string, { data: Record<string, string> }> } }
+    window as unknown as {
+      i18n: { loaded: Record<string, { data: Record<string, string> }> };
+    }
   ).i18n = {
     loaded: {
       "en/Common.json": { data },
@@ -107,9 +109,7 @@ describe("Error Pages", () => {
     it("displays header and body text", () => {
       render(<ErrorInvalidLink />);
       expect(screen.getByText("Invalid link")).toBeInTheDocument();
-      expect(
-        screen.getByText("This link does not exist"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("This link does not exist")).toBeInTheDocument();
     });
 
     it("renders nothing when translations are not ready", () => {

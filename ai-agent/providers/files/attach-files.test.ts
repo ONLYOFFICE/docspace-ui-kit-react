@@ -239,9 +239,9 @@ describe("hasFormResults", () => {
     expect(hasFormResults({ isForm: true, externalDbTableName: "" })).toBe(
       false,
     );
-    expect(
-      hasFormResults({ isForm: true, externalDbTableName: null }),
-    ).toBe(false);
+    expect(hasFormResults({ isForm: true, externalDbTableName: null })).toBe(
+      false,
+    );
   });
 
   it("leaves out an ordinary file", () => {

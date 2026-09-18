@@ -10,7 +10,10 @@ Auto-scrolls the `.section-scroll` container when the mouse nears the top or bot
 ## Import
 
 ```ts
-import { onEdgeScrolling, clearEdgeScrollingTimer } from "../../utils/edge-scrolling";
+import {
+  onEdgeScrolling,
+  clearEdgeScrollingTimer,
+} from "../../utils/edge-scrolling";
 ```
 
 ## Usage
@@ -22,7 +25,7 @@ document.addEventListener("mouseup", clearEdgeScrollingTimer);
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
-| `index.ts` | `onEdgeScrolling`, `clearEdgeScrollingTimer` |
-| `edgeScrolling.test.ts` | Unit tests (Vitest) |
+| File                    | Description                                  |
+| ----------------------- | -------------------------------------------- |
+| `index.ts`              | `onEdgeScrolling`, `clearEdgeScrollingTimer` |
+| `edgeScrolling.test.ts` | Unit tests (Vitest)                          |

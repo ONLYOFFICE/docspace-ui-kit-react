@@ -246,12 +246,14 @@ import { isTouchDevice } from "@onlyoffice/apps-ui-kit/utils/device";
 const Button = styled.button`
   padding: 8px 16px;
 
-  ${isTouchDevice &&
-  `
+  ${
+    isTouchDevice &&
+    `
     min-height: 44px;
     min-width: 44px;
     padding: 12px 20px;
-  `}
+  `
+  }
 `;
 ```
 
@@ -284,7 +286,11 @@ function initializeApp() {
 
 ```typescript
 import { useState, useEffect } from "react";
-import { isMobile, isTablet, isDesktop } from "@onlyoffice/apps-ui-kit/utils/device";
+import {
+  isMobile,
+  isTablet,
+  isDesktop,
+} from "@onlyoffice/apps-ui-kit/utils/device";
 
 export function useBreakpoint() {
   const [breakpoint, setBreakpoint] = useState({
@@ -345,4 +351,3 @@ When using these utilities in a server-side rendering context:
 - [Styled Components Documentation](https://styled-components.com/docs/advanced#media-templates)
 - [MDN: window.matchMedia](https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia)
 - [MDN: Screen Orientation API](https://developer.mozilla.org/en-US/docs/Web/API/Screen/orientation)
-

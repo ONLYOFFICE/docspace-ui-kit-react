@@ -116,9 +116,7 @@ export default meta;
 
 export const CssCustomization: Story = {
   render: () => (
-    <div
-      style={{ display: "flex", flexDirection: "column", gap: "12px" }}
-    >
+    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
       <RectangleSkeleton
         width="280px"
         height="40px"

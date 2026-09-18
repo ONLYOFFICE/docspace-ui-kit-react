@@ -132,8 +132,7 @@ const ref = useRef<HTMLDivElement>(null);
   argTypes: {
     useReactWindow: {
       control: "boolean",
-      description:
-        "Enable react-window mode for virtualized scrolling styles",
+      description: "Enable react-window mode for virtualized scrolling styles",
       table: {
         defaultValue: { summary: "false" },
       },

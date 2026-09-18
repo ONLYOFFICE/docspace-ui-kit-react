@@ -25,7 +25,8 @@
   }
 
   :global(.dark) & {
-    --files-section-tiles-view-tile-border: 1px solid #{colors.$gray-dark-strong};
+    --files-section-tiles-view-tile-border: 1px solid
+      #{colors.$gray-dark-strong};
   }
 
   border-radius: 6px;

@@ -136,10 +136,19 @@
   // without creating circular references on the --input-* theme variables.
   --_input-bg: var(--text-input-bg, var(--input-bg));
   --_input-color: var(--text-input-color, var(--input-color));
-  --_input-border-color: var(--text-input-border-color, var(--input-border-color));
+  --_input-border-color: var(
+    --text-input-border-color,
+    var(--input-border-color)
+  );
   --_input-border-radius: var(--text-input-radius, var(--input-border-radius));
-  --_input-border-hover: var(--text-input-border-hover, var(--input-border-hover));
-  --_input-border-focus: var(--text-input-border-focus, var(--input-border-focus));
+  --_input-border-hover: var(
+    --text-input-border-hover,
+    var(--input-border-hover)
+  );
+  --_input-border-focus: var(
+    --text-input-border-focus,
+    var(--input-border-focus)
+  );
 
   background-color: var(--_input-bg);
   color: var(--_input-color);

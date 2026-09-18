@@ -99,4 +99,3 @@ const PeriodSelect = ({ value, onSelect }: PeriodSelectProps) => {
 };
 
 export default PeriodSelect;
-

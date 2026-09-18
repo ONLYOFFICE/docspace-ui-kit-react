@@ -82,7 +82,9 @@ describe("Days Component", () => {
       DateTime.fromObject({ year: 2023, month: 4, day: 30 }),
     );
 
-    vi.mocked(calendarUtils.getDayElements).mockReturnValue([<div key="mock-days">MockDays</div>]);
+    vi.mocked(calendarUtils.getDayElements).mockReturnValue([
+      <div key="mock-days">MockDays</div>,
+    ]);
     vi.mocked(calendarUtils.getWeekdayElements).mockReturnValue([
       <div key="mock-weekdays">MockWeekdays</div>,
     ]);
@@ -137,7 +139,11 @@ describe("Days Component", () => {
 
   it("should disable previous button if out of range", () => {
     // Mock endOf(subtractFromDate(...)) < minDate
-    const prevMonthEnd = DateTime.fromObject({ year: 2019, month: 12, day: 31 });
+    const prevMonthEnd = DateTime.fromObject({
+      year: 2019,
+      month: 12,
+      day: 31,
+    });
     vi.mocked(dateUtils.endOf).mockReturnValue(prevMonthEnd);
 
     render(<Days {...defaultProps} />);
@@ -148,7 +154,11 @@ describe("Days Component", () => {
 
   it("should disable next button if out of range", () => {
     // Mock startOf(addToDate(...)) > maxDate
-    const nextMonthStart = DateTime.fromObject({ year: 2031, month: 1, day: 1 });
+    const nextMonthStart = DateTime.fromObject({
+      year: 2031,
+      month: 1,
+      day: 1,
+    });
     vi.mocked(dateUtils.startOf).mockReturnValue(nextMonthStart);
 
     render(<Days {...defaultProps} />);

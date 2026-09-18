@@ -40,4 +40,3 @@ const AutoPaymentInfo = () => {
 };
 
 export default observer(AutoPaymentInfo);
-

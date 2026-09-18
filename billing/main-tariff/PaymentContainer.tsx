@@ -110,12 +110,8 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
           <>
             <Text isBold>{t("ManagerTypesDescription")}</Text>
             <br />
-            <Text isBold>
-              {t("PortalAdmin")}
-            </Text>
-            <Text>
-              {t("AdministratorDescription")}
-            </Text>
+            <Text isBold>{t("PortalAdmin")}</Text>
+            <Text>{t("AdministratorDescription")}</Text>
             <br />
             <Text isBold>{t("RoomAdmin")}</Text>
             <Text>{t("RoomManagerDescription")}</Text>
@@ -231,7 +227,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
           lineHeight="16px"
           className={styles.paymentInfoManagersPrice}
         >
-          {hasScheduledTariffAdminsChange && nextTariffAdminsCount? (
+          {hasScheduledTariffAdminsChange && nextTariffAdminsCount ? (
             <CommonTrans
               i18nKey="BusinessRenewalPricingInfo"
               values={{
@@ -353,4 +349,3 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
 });
 
 export default PaymentContainer;
-

@@ -2,7 +2,6 @@ import { RefObject } from "react";
 import { ContextMenuModel } from "../context-menu";
 import { GuidanceRefKey } from "../../enums";
 
-
 export type MainButtonProps = {
   /** Button text */
   text?: string;

@@ -131,9 +131,7 @@ type Story = StoryObj<ComponentProps<typeof MainButton>>;
 export default meta;
 
 const Wrapper = (props: { children: React.ReactNode }) => {
-  return (
-    <div style={{ maxWidth: "210px" }}>{props.children}</div>
-  );
+  return <div style={{ maxWidth: "210px" }}>{props.children}</div>;
 };
 
 export const CssCustomization: Story = {

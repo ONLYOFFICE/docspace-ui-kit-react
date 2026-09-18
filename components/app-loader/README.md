@@ -7,7 +7,7 @@ A full-screen loading indicator displayed while the application is initializing.
 ```tsx
 import AppLoader from "@onlyoffice/apps-ui-kit/components/app-loader";
 
-<AppLoader />
+<AppLoader />;
 ```
 
 ## Features

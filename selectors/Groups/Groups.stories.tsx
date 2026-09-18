@@ -134,7 +134,6 @@ const Template = (props: StoryArgs) => (
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     withHeader: true,
     headerProps: {
       headerLabel: "Select Group",
@@ -173,7 +172,6 @@ export const AsideMode: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     useAside: true,
     withoutBackground: false,
     withBlur: false,

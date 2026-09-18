@@ -116,4 +116,3 @@ const WalletInfo = (props: WalletInfoProps) => {
 };
 
 export default observer(WalletInfo);
-

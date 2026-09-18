@@ -15,19 +15,24 @@ Date utilities built on [luxon](https://moment.github.io/luxon/): parsing, arith
 ## Import
 
 ```ts
-import { parseToDateTime, addToDate, isSameDay, fromNow } from "../../utils/date";
+import {
+  parseToDateTime,
+  addToDate,
+  isSameDay,
+  fromNow,
+} from "../../utils/date";
 ```
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
-| `index.ts` | Barrel re-exporting all of the below |
-| `parse.ts` | Parsing and construction (`DateTime` factories) |
-| `formatDate.ts` | moment.js → luxon format token conversion |
+| File                | Description                                      |
+| ------------------- | ------------------------------------------------ |
+| `index.ts`          | Barrel re-exporting all of the below             |
+| `parse.ts`          | Parsing and construction (`DateTime` factories)  |
+| `formatDate.ts`     | moment.js → luxon format token conversion        |
 | `dateArithmetic.ts` | Adding, subtracting, and reading date components |
-| `dateComparison.ts` | Ordering and equality checks |
-| `duration.ts` | Duration creation and human-readable formatting |
-| `timezone.ts` | Timezone conversion |
-| `getCorrectDate.ts` | Locale-aware date correction |
-| `date.test.ts` | Unit tests (Vitest) |
+| `dateComparison.ts` | Ordering and equality checks                     |
+| `duration.ts`       | Duration creation and human-readable formatting  |
+| `timezone.ts`       | Timezone conversion                              |
+| `getCorrectDate.ts` | Locale-aware date correction                     |
+| `date.test.ts`      | Unit tests (Vitest)                              |

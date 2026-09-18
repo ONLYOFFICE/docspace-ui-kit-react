@@ -14,12 +14,16 @@ async function gotoStory(page: Page, storyId: string) {
 test.describe("ColumnarInfoBar -- light", () => {
   test("profile-details", async ({ page }) => {
     await gotoStory(page, "profile-details");
-    await expect(page).toHaveScreenshot("columnar-info-bar-profile-details.png");
+    await expect(page).toHaveScreenshot(
+      "columnar-info-bar-profile-details.png",
+    );
   });
 
   test("css-customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
-    await expect(page).toHaveScreenshot("columnar-info-bar-css-customization.png");
+    await expect(page).toHaveScreenshot(
+      "columnar-info-bar-css-customization.png",
+    );
   });
 });
 
@@ -35,12 +39,16 @@ test.describe("ColumnarInfoBar -- dark", () => {
   test("profile-details dark", async ({ page }) => {
     await gotoStory(page, "profile-details");
     await page.evaluate(() => document.body.classList.add("dark"));
-    await expect(page).toHaveScreenshot("columnar-info-bar-profile-details-dark.png");
+    await expect(page).toHaveScreenshot(
+      "columnar-info-bar-profile-details-dark.png",
+    );
   });
 
   test("css-customization dark", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await page.evaluate(() => document.body.classList.add("dark"));
-    await expect(page).toHaveScreenshot("columnar-info-bar-css-customization-dark.png");
+    await expect(page).toHaveScreenshot(
+      "columnar-info-bar-css-customization-dark.png",
+    );
   });
 });

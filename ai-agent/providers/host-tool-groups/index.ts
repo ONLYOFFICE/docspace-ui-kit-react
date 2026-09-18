@@ -561,4 +561,3 @@ export const openGeneratedFileWithToolCall = (
   }, GENERATED_FILE_READY_TIMEOUT_MS);
   return true;
 };
-

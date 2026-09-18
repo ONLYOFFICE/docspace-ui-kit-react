@@ -152,4 +152,3 @@ const ProgressList = ({
 };
 
 export default ProgressList;
-

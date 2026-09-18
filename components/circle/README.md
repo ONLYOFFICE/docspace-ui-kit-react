@@ -21,47 +21,35 @@ import { CircleSkeleton } from "@onlyoffice/apps-ui-kit/components/circle";
 
 ## Properties
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `title` | `string` | `""` | Accessible title for screen readers |
-| `x` | `string` | `"3"` | X coordinate of circle center (cx) |
-| `y` | `string` | `"12"` | Y coordinate of circle center (cy) |
-| `radius` | `string` | `"12"` | Circle radius |
-| `width` | `string` | `"100%"` | SVG container width |
-| `height` | `string` | `"100%"` | SVG container height |
-| `backgroundColor` | `string` | `globalColors.darkBlack` | Background color of the skeleton |
-| `foregroundColor` | `string` | `globalColors.darkBlack` | Foreground (animated) color |
-| `backgroundOpacity` | `number` | `0.1` | Opacity of background |
-| `foregroundOpacity` | `number` | `0.15` | Opacity of foreground animation |
-| `speed` | `number` | `2` | Animation speed in seconds |
-| `animate` | `boolean` | `true` | Enable/disable animation |
-| `className` | `string` | - | Additional CSS class |
-| `style` | `CSSProperties` | - | Inline styles |
+| Property            | Type            | Default                  | Description                         |
+| ------------------- | --------------- | ------------------------ | ----------------------------------- |
+| `title`             | `string`        | `""`                     | Accessible title for screen readers |
+| `x`                 | `string`        | `"3"`                    | X coordinate of circle center (cx)  |
+| `y`                 | `string`        | `"12"`                   | Y coordinate of circle center (cy)  |
+| `radius`            | `string`        | `"12"`                   | Circle radius                       |
+| `width`             | `string`        | `"100%"`                 | SVG container width                 |
+| `height`            | `string`        | `"100%"`                 | SVG container height                |
+| `backgroundColor`   | `string`        | `globalColors.darkBlack` | Background color of the skeleton    |
+| `foregroundColor`   | `string`        | `globalColors.darkBlack` | Foreground (animated) color         |
+| `backgroundOpacity` | `number`        | `0.1`                    | Opacity of background               |
+| `foregroundOpacity` | `number`        | `0.15`                   | Opacity of foreground animation     |
+| `speed`             | `number`        | `2`                      | Animation speed in seconds          |
+| `animate`           | `boolean`       | `true`                   | Enable/disable animation            |
+| `className`         | `string`        | -                        | Additional CSS class                |
+| `style`             | `CSSProperties` | -                        | Inline styles                       |
 
 ## Examples
 
 ### Avatar Placeholder
 
 ```tsx
-<CircleSkeleton
-  radius="20"
-  x="20"
-  y="20"
-  width="40px"
-  height="40px"
-/>
+<CircleSkeleton radius="20" x="20" y="20" width="40px" height="40px" />
 ```
 
 ### Large Profile Picture
 
 ```tsx
-<CircleSkeleton
-  radius="48"
-  x="48"
-  y="48"
-  width="96px"
-  height="96px"
-/>
+<CircleSkeleton radius="48" x="48" y="48" width="96px" height="96px" />
 ```
 
 ### Disabled Animation

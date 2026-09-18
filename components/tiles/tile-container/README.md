@@ -7,20 +7,16 @@ Container component for organizing and displaying tiles in a grid layout with au
 ```tsx
 import { TileContainer } from "@onlyoffice/apps-ui-kit/components/tiles/tile-container";
 
-<TileContainer
-  headingFolders="Folders"
-  headingFiles="Files"
-  isDesc={false}
->
+<TileContainer headingFolders="Folders" headingFiles="Files" isDesc={false}>
   <FileTile item={fileItem} {...props} />
   <RoomTile item={roomItem} {...props} />
   <FileTile item={folderItem} {...props} />
-</TileContainer>
+</TileContainer>;
 ```
 
 ## Props
 
-| Props            |         Type          | Required | Values |     Default       | Description                                |
+| Props            |         Type          | Required | Values |      Default      | Description                                |
 | ---------------- | :-------------------: | :------: | :----: | :---------------: | ------------------------------------------ |
 | `children`       |   `React.ReactNode`   |   Yes    |   -    |         -         | Tile components to render                  |
 | `headingFolders` |       `string`        |    -     |   -    |         -         | Heading text for folders section           |
@@ -86,10 +82,7 @@ interface TileItem {
 When `useReactWindow` is enabled and `infiniteGrid` component is provided:
 
 ```tsx
-<TileContainer
-  useReactWindow
-  infiniteGrid={InfiniteGridComponent}
->
+<TileContainer useReactWindow infiniteGrid={InfiniteGridComponent}>
   {tiles}
 </TileContainer>
 ```

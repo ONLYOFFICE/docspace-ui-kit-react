@@ -21,22 +21,22 @@ import { RectangleSkeleton } from "@onlyoffice/apps-ui-kit/components/rectangle"
 
 ## Properties
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `title` | `string` | `""` | Accessible title for screen readers |
-| `x` | `string` | `"0"` | X position of rectangle |
-| `y` | `string` | `"0"` | Y position of rectangle |
-| `width` | `string` | `"100%"` | Rectangle and SVG container width |
-| `height` | `string` | `"32px"` | Rectangle and SVG container height |
-| `borderRadius` | `string` | `"3"` | Corner radius (rx and ry) |
-| `backgroundColor` | `string` | `globalColors.darkBlack` | Background color of the skeleton |
-| `foregroundColor` | `string` | `globalColors.darkBlack` | Foreground (animated) color |
-| `backgroundOpacity` | `number` | `0.1` | Opacity of background |
-| `foregroundOpacity` | `number` | `0.15` | Opacity of foreground animation |
-| `speed` | `number` | `2` | Animation speed in seconds |
-| `animate` | `boolean` | `true` | Enable/disable animation |
-| `className` | `string` | - | Additional CSS class |
-| `style` | `CSSProperties` | - | Inline styles |
+| Property            | Type            | Default                  | Description                         |
+| ------------------- | --------------- | ------------------------ | ----------------------------------- |
+| `title`             | `string`        | `""`                     | Accessible title for screen readers |
+| `x`                 | `string`        | `"0"`                    | X position of rectangle             |
+| `y`                 | `string`        | `"0"`                    | Y position of rectangle             |
+| `width`             | `string`        | `"100%"`                 | Rectangle and SVG container width   |
+| `height`            | `string`        | `"32px"`                 | Rectangle and SVG container height  |
+| `borderRadius`      | `string`        | `"3"`                    | Corner radius (rx and ry)           |
+| `backgroundColor`   | `string`        | `globalColors.darkBlack` | Background color of the skeleton    |
+| `foregroundColor`   | `string`        | `globalColors.darkBlack` | Foreground (animated) color         |
+| `backgroundOpacity` | `number`        | `0.1`                    | Opacity of background               |
+| `foregroundOpacity` | `number`        | `0.15`                   | Opacity of foreground animation     |
+| `speed`             | `number`        | `2`                      | Animation speed in seconds          |
+| `animate`           | `boolean`       | `true`                   | Enable/disable animation            |
+| `className`         | `string`        | -                        | Additional CSS class                |
+| `style`             | `CSSProperties` | -                        | Inline styles                       |
 
 ## Examples
 

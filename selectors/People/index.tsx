@@ -74,8 +74,7 @@ const toListItem = (
     } = item;
 
     const access = (item as Record<string, unknown>).access as
-      | number
-      | undefined;
+      number | undefined;
 
     const role = getUserType(item);
 
@@ -560,8 +559,7 @@ const PeopleSelector = ({
     onSearch,
     onClearSearch,
     searchLoader: <SearchLoader />,
-    isSearchLoading:
-      isFirstLoad && !searchValue && !afterSearch.current,
+    isSearchLoading: isFirstLoad && !searchValue && !afterSearch.current,
   };
 
   const infoProps: TSelectorInfo = withInfo

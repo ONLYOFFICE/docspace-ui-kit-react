@@ -27,13 +27,14 @@ trimSeparator(array: ContextMenuModel[]): ContextMenuModel[]
 
 ### Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `array` | `ContextMenuModel[]` | Array of context menu items |
+| Parameter | Type                 | Description                 |
+| --------- | -------------------- | --------------------------- |
+| `array`   | `ContextMenuModel[]` | Array of context menu items |
 
 ### Returns
 
 Returns a cleaned `ContextMenuModel[]` with:
+
 - No leading separators
 - No trailing separators
 - No consecutive separators
@@ -44,6 +45,7 @@ Returns a cleaned `ContextMenuModel[]` with:
 ### Basic Cleaning
 
 The function performs these operations:
+
 1. Removes disabled items (`disabled: true`)
 2. Removes leading separators
 3. Removes trailing separators

@@ -103,4 +103,3 @@ describe("getCommonTranslation", () => {
     expect(getCommonTranslation("Paid")).toBe("Paid");
   });
 });
-

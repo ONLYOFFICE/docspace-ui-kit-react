@@ -694,11 +694,26 @@
   }
 
   // bridge vars
-  --filter-view-fill-v: var(--filter-view-fill, var(--view-selector-fill-color));
-  --filter-view-checked-v: var(--filter-view-checked, var(--view-selector-checked-fill-color));
-  --filter-view-border-v: var(--filter-view-border, var(--view-selector-border-color));
-  --filter-view-hover-border-v: var(--filter-view-hover-border, var(--view-selector-hover-border-color));
-  --filter-view-hover-icon-v: var(--filter-view-hover-icon, var(--view-selector-icon-button-hover-color));
+  --filter-view-fill-v: var(
+    --filter-view-fill,
+    var(--view-selector-fill-color)
+  );
+  --filter-view-checked-v: var(
+    --filter-view-checked,
+    var(--view-selector-checked-fill-color)
+  );
+  --filter-view-border-v: var(
+    --filter-view-border,
+    var(--view-selector-border-color)
+  );
+  --filter-view-hover-border-v: var(
+    --filter-view-hover-border,
+    var(--view-selector-hover-border-color)
+  );
+  --filter-view-hover-icon-v: var(
+    --filter-view-hover-icon,
+    var(--view-selector-icon-button-hover-color)
+  );
 
   position: relative;
   padding: 7px;

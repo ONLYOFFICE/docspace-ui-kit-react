@@ -14,7 +14,7 @@ import { OperationsProgress } from "@onlyoffice/apps-ui-kit/components/operation
   clearOperationsData={handleClear}
   percent={45}
   mainButtonVisible={false}
-/>
+/>;
 ```
 
 ## Features
@@ -35,19 +35,19 @@ import { OperationsProgress } from "@onlyoffice/apps-ui-kit/components/operation
 
 ## Key Properties
 
-| Prop                       | Type                                          | Default | Description                                          |
-|----------------------------|-----------------------------------------------|---------|------------------------------------------------------|
-| `operations`               | `Operation[]`                                 | —       | Array of current operations                          |
-| `panelOperations`          | `Operation[]`                                 | —       | Array of panel-specific operations                   |
-| `operationsAlert`          | `boolean`                                     | —       | Whether any operation has an error                   |
-| `operationsCompleted`      | `boolean`                                     | —       | Whether all operations are completed                 |
-| `clearOperationsData`      | `(id?, operation?, item?) => void`            | —       | Clears completed/errored operations                  |
-| `clearPanelOperationsData` | `(operation?) => void`                        | —       | Clears panel operations                              |
-| `cancelUpload`             | `(t) => void`                                 | —       | Cancels the current upload                           |
-| `percent`                  | `number`                                      | —       | Overall progress percentage                          |
-| `mainButtonVisible`        | `boolean`                                     | —       | Whether the main action button is visible            |
-| `showCancelButton`         | `boolean`                                     | —       | Shows a cancel button for operations                 |
-| `isInfoPanelVisible`       | `boolean`                                     | —       | Whether the info panel is visible                    |
+| Prop                       | Type                               | Default | Description                               |
+| -------------------------- | ---------------------------------- | ------- | ----------------------------------------- |
+| `operations`               | `Operation[]`                      | —       | Array of current operations               |
+| `panelOperations`          | `Operation[]`                      | —       | Array of panel-specific operations        |
+| `operationsAlert`          | `boolean`                          | —       | Whether any operation has an error        |
+| `operationsCompleted`      | `boolean`                          | —       | Whether all operations are completed      |
+| `clearOperationsData`      | `(id?, operation?, item?) => void` | —       | Clears completed/errored operations       |
+| `clearPanelOperationsData` | `(operation?) => void`             | —       | Clears panel operations                   |
+| `cancelUpload`             | `(t) => void`                      | —       | Cancels the current upload                |
+| `percent`                  | `number`                           | —       | Overall progress percentage               |
+| `mainButtonVisible`        | `boolean`                          | —       | Whether the main action button is visible |
+| `showCancelButton`         | `boolean`                          | —       | Shows a cancel button for operations      |
+| `isInfoPanelVisible`       | `boolean`                          | —       | Whether the info panel is visible         |
 
 ## Operation Type
 

@@ -5,7 +5,10 @@ Utilities for standardizing icon sizing across the UI Kit.
 ## Installation
 
 ```typescript
-import { IconSizeType, isIconSizeType } from "@onlyoffice/apps-ui-kit/utils/common-icons-style";
+import {
+  IconSizeType,
+  isIconSizeType,
+} from "@onlyoffice/apps-ui-kit/utils/common-icons-style";
 ```
 
 ## IconSizeType Enum
@@ -15,22 +18,22 @@ Predefined icon sizes for consistent sizing across the application.
 ```typescript
 enum IconSizeType {
   extraSmall = "extraSmall", // 8px
-  small = "small",           // 12px
-  medium = "medium",         // 16px
-  big = "big",               // 24px
-  scale = "scale",           // 100% of container
+  small = "small", // 12px
+  medium = "medium", // 16px
+  big = "big", // 24px
+  scale = "scale", // 100% of container
 }
 ```
 
 ### Size Mapping
 
-| Size Type | Pixel Value | Use Case |
-|-----------|-------------|----------|
-| `extraSmall` | 8px | Tiny indicators, badges |
-| `small` | 12px | Compact UI, inline icons |
-| `medium` | 16px | Default icon size, most common |
-| `big` | 24px | Large buttons, emphasis |
-| `scale` | 100% | Responsive icons that fill container |
+| Size Type    | Pixel Value | Use Case                             |
+| ------------ | ----------- | ------------------------------------ |
+| `extraSmall` | 8px         | Tiny indicators, badges              |
+| `small`      | 12px        | Compact UI, inline icons             |
+| `medium`     | 16px        | Default icon size, most common       |
+| `big`        | 24px        | Large buttons, emphasis              |
+| `scale`      | 100%        | Responsive icons that fill container |
 
 ## API
 
@@ -39,6 +42,7 @@ enum IconSizeType {
 Type guard function to check if a value is a valid IconSizeType.
 
 **Parameters:**
+
 - `value` (unknown) - Value to check
 
 **Returns:** `boolean` - `true` if value is a valid IconSizeType
@@ -46,7 +50,10 @@ Type guard function to check if a value is a valid IconSizeType.
 **Example:**
 
 ```typescript
-import { isIconSizeType, IconSizeType } from "@onlyoffice/apps-ui-kit/utils/common-icons-style";
+import {
+  isIconSizeType,
+  IconSizeType,
+} from "@onlyoffice/apps-ui-kit/utils/common-icons-style";
 
 const size = "medium";
 if (isIconSizeType(size)) {
@@ -54,9 +61,9 @@ if (isIconSizeType(size)) {
   const iconSize: IconSizeType = size;
 }
 
-isIconSizeType("medium");  // true
-isIconSizeType("large");   // false
-isIconSizeType(16);        // false
+isIconSizeType("medium"); // true
+isIconSizeType("large"); // false
+isIconSizeType(16); // false
 ```
 
 ## Usage Examples
@@ -133,6 +140,7 @@ interface IconProps {
 ## Testing
 
 Run tests:
+
 ```bash
 pnpm test common-icons-style
 ```

@@ -2,7 +2,6 @@
 @use "../../styles/mixins";
 
 .container {
-
   --error-container-background: #{colors.$white};
   --error-container-body-text: #{colors.$gray};
   --error-container-link-color: #{colors.$link};
@@ -13,9 +12,18 @@
     --error-container-link-color: #{colors.$dark-link};
   }
 
-  --error-container-bg-value: var(--error-container-bg, var(--error-container-background));
-  --error-container-text-value: var(--error-container-text, var(--error-container-body-text));
-  --error-container-link-value: var(--error-container-link, var(--error-container-link-color));
+  --error-container-bg-value: var(
+    --error-container-bg,
+    var(--error-container-background)
+  );
+  --error-container-text-value: var(
+    --error-container-text,
+    var(--error-container-body-text)
+  );
+  --error-container-link-value: var(
+    --error-container-link,
+    var(--error-container-link-color)
+  );
 
   background: var(--error-container-bg-value);
   cursor: default;

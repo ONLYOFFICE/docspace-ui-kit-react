@@ -74,7 +74,9 @@ const TransactionBody = ({
   const title = hasAppliedDateFilter
     ? t("NoFindingsFound2")
     : (emptyTitle ??
-      (isDocsConnect ? t("NoDocsConnectTransaction") : t("NoWalletTransaction")));
+      (isDocsConnect
+        ? t("NoDocsConnectTransaction")
+        : t("NoWalletTransaction")));
   const description = hasAppliedDateFilter
     ? t("NoTransactionsFilter")
     : (emptyDescription ??

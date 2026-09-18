@@ -4,10 +4,7 @@ import { observer } from "mobx-react";
 
 import { Button, ButtonSize } from "../../components/button";
 import { Text } from "../../components/text";
-import {
-  ModalDialog,
-  ModalDialogType,
-} from "../../components/modal-dialog";
+import { ModalDialog, ModalDialogType } from "../../components/modal-dialog";
 import { calculateTotalPrice, getConvertedSize } from "../utils/common";
 import { STORAGE_TARIFF_DEACTIVATED } from "../constants";
 
@@ -22,11 +19,7 @@ type StorageTariffDeactivatedProps = {
 };
 
 const StorageTariffDeactivated = observer(
-  ({
-    visible,
-    onClose,
-    onOpenPanel,
-  }: StorageTariffDeactivatedProps) => {
+  ({ visible, onClose, onOpenPanel }: StorageTariffDeactivatedProps) => {
     const navigate = useNavigate();
     const store = usePaymentStore();
     const {
@@ -83,7 +76,7 @@ const StorageTariffDeactivated = observer(
           <Text as="span">
             <CommonTrans
               i18nKey="PreviousPlan"
-             
+
               values={{
                 amount: `${previousStoragePlanSize} ${t("Gigabyte")}`,
                 price: formatWalletCurrency(totalPrice, 2),
@@ -97,7 +90,7 @@ const StorageTariffDeactivated = observer(
           <Text>
             <CommonTrans
               i18nKey="StorageUsed"
-             
+
               values={{
                 amount: getConvertedSize(t, usedTotalStorageSizeCount!),
               }}
@@ -109,7 +102,7 @@ const StorageTariffDeactivated = observer(
           <Text>
             <CommonTrans
               i18nKey="AvailableLimit"
-             
+
               values={{
                 amount: getConvertedSize(t, maxTotalSizeByQuota!),
               }}
@@ -127,9 +120,7 @@ const StorageTariffDeactivated = observer(
         <ModalDialog.Footer>
           <Button
             className="send-button"
-            label={
-              onOpenPanel ? t("BuyStorage") : t("GoToAddon")
-            }
+            label={onOpenPanel ? t("BuyStorage") : t("GoToAddon")}
             size={ButtonSize.normal}
             primary
             onClick={onClick}

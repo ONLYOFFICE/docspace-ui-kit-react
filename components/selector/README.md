@@ -62,14 +62,14 @@ const label = getUserTypeTranslation(EmployeeType.Admin);
 
 The following translation keys are used by the Selector component:
 
-| Key | Description | Example |
-|-----|-------------|---------|
-| `Owner` | Owner user type | "Owner" |
+| Key           | Description                                        | Example                 |
+| ------------- | -------------------------------------------------- | ----------------------- |
+| `Owner`       | Owner user type                                    | "Owner"                 |
 | `PortalAdmin` | Admin user type (supports `{{productName}}` param) | "{{productName}} admin" |
-| `RoomAdmin` | Room admin user type | "Room admin" |
-| `User` | Power user type | "Power user" |
-| `Guest` | Guest user type | "Guest" |
-| `ProductName` | Product name for interpolation | "DocSpace" |
+| `RoomAdmin`   | Room admin user type                               | "Room admin"            |
+| `User`        | Power user type                                    | "Power user"            |
+| `Guest`       | Guest user type                                    | "Guest"                 |
+| `ProductName` | Product name for interpolation                     | "DocSpace"              |
 
 ```jsx
 <Selector

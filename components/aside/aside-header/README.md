@@ -11,26 +11,26 @@ import { AsideHeader } from "@onlyoffice/apps-ui-kit/components/aside";
   header="Settings"
   isCloseable
   onCloseClick={() => console.log("Close")}
-/>
+/>;
 ```
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `header` | `string \| ReactNode` | - | Header content |
-| `headerIcons` | `HeaderIcon[]` | `[]` | Array of icons to display |
-| `headerComponent` | `ReactNode` | - | Additional component to render |
-| `isLoading` | `boolean` | `false` | Show loading skeleton |
-| `withoutBorder` | `boolean` | `false` | Hide bottom border |
-| `headerHeight` | `string` | `"53px"` | Custom header height |
-| `isCloseable` | `boolean` | `false` | Show close button |
-| `onCloseClick` | `() => void` | - | Close button handler |
-| `isBackButton` | `boolean` | `false` | Show back button |
-| `onBackClick` | `() => void` | - | Back button handler |
-| `className` | `string` | - | Additional CSS class |
-| `id` | `string` | - | HTML id attribute |
-| `style` | `CSSProperties` | - | Inline styles |
+| Prop              | Type                  | Default  | Description                    |
+| ----------------- | --------------------- | -------- | ------------------------------ |
+| `header`          | `string \| ReactNode` | -        | Header content                 |
+| `headerIcons`     | `HeaderIcon[]`        | `[]`     | Array of icons to display      |
+| `headerComponent` | `ReactNode`           | -        | Additional component to render |
+| `isLoading`       | `boolean`             | `false`  | Show loading skeleton          |
+| `withoutBorder`   | `boolean`             | `false`  | Hide bottom border             |
+| `headerHeight`    | `string`              | `"53px"` | Custom header height           |
+| `isCloseable`     | `boolean`             | `false`  | Show close button              |
+| `onCloseClick`    | `() => void`          | -        | Close button handler           |
+| `isBackButton`    | `boolean`             | `false`  | Show back button               |
+| `onBackClick`     | `() => void`          | -        | Back button handler            |
+| `className`       | `string`              | -        | Additional CSS class           |
+| `id`              | `string`              | -        | HTML id attribute              |
+| `style`           | `CSSProperties`       | -        | Inline styles                  |
 
 ### HeaderIcon Type
 
@@ -46,11 +46,11 @@ type HeaderIcon = {
 
 The component uses CSS variables for theming, defined locally within the component:
 
-| Variable | Light | Dark | Description |
-|----------|-------|------|-------------|
-| `--aside-header-text-color` | `#333333` | `#ffffff` | Header text color |
-| `--aside-header-border-color` | `#eceef1` | `#474747` | Bottom border color |
-| `--aside-header-custom-height` | `53px` | `53px` | Custom header height |
+| Variable                       | Light     | Dark      | Description          |
+| ------------------------------ | --------- | --------- | -------------------- |
+| `--aside-header-text-color`    | `#333333` | `#ffffff` | Header text color    |
+| `--aside-header-border-color`  | `#eceef1` | `#474747` | Bottom border color  |
+| `--aside-header-custom-height` | `53px`    | `53px`    | Custom header height |
 
 ## Examples
 
@@ -89,5 +89,10 @@ The component uses CSS variables for theming, defined locally within the compone
 ### Custom Height
 
 ```tsx
-<AsideHeader header="Tall Header" headerHeight="70px" isCloseable onCloseClick={handleClose} />
+<AsideHeader
+  header="Tall Header"
+  headerHeight="70px"
+  isCloseable
+  onCloseClick={handleClose}
+/>
 ```

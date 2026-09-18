@@ -34,10 +34,10 @@ return <span>{t("Common:Save")}</span>;
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
-| `index.ts` | Barrel re-exporting the below |
-| `i18n-utils.ts` | `getCommonTranslation`, `getCurrentCommonLanguage`, `getTranslationReady`, `registerCommonI18nInstance` |
-| `useCommonTranslation.ts` | React hook wrapping `getCommonTranslation` |
-| `CommonTrans.tsx` | `<Trans>`-style interpolation component |
-| `*.test.ts`, `*.test.tsx` | Unit tests (Vitest) |
+| File                      | Description                                                                                             |
+| ------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `index.ts`                | Barrel re-exporting the below                                                                           |
+| `i18n-utils.ts`           | `getCommonTranslation`, `getCurrentCommonLanguage`, `getTranslationReady`, `registerCommonI18nInstance` |
+| `useCommonTranslation.ts` | React hook wrapping `getCommonTranslation`                                                              |
+| `CommonTrans.tsx`         | `<Trans>`-style interpolation component                                                                 |
+| `*.test.ts`, `*.test.tsx` | Unit tests (Vitest)                                                                                     |

@@ -111,9 +111,33 @@ const mockNavigationItems = [
 ];
 
 const mockSortData = [
-  { key: "name", label: "Name", isSelected: false, id: "1", className: "", sortDirection: "asc" as const, sortId: "1" },
-  { key: "modified", label: "Modified", isSelected: false, id: "2", className: "", sortDirection: "asc" as const, sortId: "1" },
-  { key: "size", label: "Size", isSelected: false, id: "3", className: "", sortDirection: "asc" as const, sortId: "1" },
+  {
+    key: "name",
+    label: "Name",
+    isSelected: false,
+    id: "1",
+    className: "",
+    sortDirection: "asc" as const,
+    sortId: "1",
+  },
+  {
+    key: "modified",
+    label: "Modified",
+    isSelected: false,
+    id: "2",
+    className: "",
+    sortDirection: "asc" as const,
+    sortId: "1",
+  },
+  {
+    key: "size",
+    label: "Size",
+    isSelected: false,
+    id: "3",
+    className: "",
+    sortDirection: "asc" as const,
+    sortId: "1",
+  },
 ];
 
 const mockViewSettings = [
@@ -122,9 +146,36 @@ const mockViewSettings = [
 ];
 
 const mockColumns = [
-  { key: "name", title: "Name", resizable: true, enable: true, default: true, sortBy: SortByFieldName.Name, minWidth: 210, onChange: noop, onClick: noop },
-  { key: "type", title: "Type", enable: true, resizable: true, sortBy: SortByFieldName.Type, onChange: noop, onClick: noop },
-  { key: "tags", title: "Tags", enable: true, resizable: true, sortBy: SortByFieldName.Tags, withTagRef: true, onChange: noop, onClick: noop },
+  {
+    key: "name",
+    title: "Name",
+    resizable: true,
+    enable: true,
+    default: true,
+    sortBy: SortByFieldName.Name,
+    minWidth: 210,
+    onChange: noop,
+    onClick: noop,
+  },
+  {
+    key: "type",
+    title: "Type",
+    enable: true,
+    resizable: true,
+    sortBy: SortByFieldName.Type,
+    onChange: noop,
+    onClick: noop,
+  },
+  {
+    key: "tags",
+    title: "Tags",
+    enable: true,
+    resizable: true,
+    sortBy: SortByFieldName.Tags,
+    withTagRef: true,
+    onChange: noop,
+    onClick: noop,
+  },
 ];
 
 const mockFiles = [
@@ -215,9 +266,25 @@ const FilterContent = () => (
     getViewSettingsData={() => mockViewSettings}
     getFilterData={() =>
       Promise.resolve([
-        { key: FilterGroups.filterType, group: FilterGroups.filterType, label: "Type", isHeader: true, isLast: true },
-        { id: "filter_type-documents", key: "documents", group: FilterGroups.filterType, label: "Documents" },
-        { id: "filter_type-spreadsheets", key: "spreadsheets", group: FilterGroups.filterType, label: "Spreadsheets" },
+        {
+          key: FilterGroups.filterType,
+          group: FilterGroups.filterType,
+          label: "Type",
+          isHeader: true,
+          isLast: true,
+        },
+        {
+          id: "filter_type-documents",
+          key: "documents",
+          group: FilterGroups.filterType,
+          label: "Documents",
+        },
+        {
+          id: "filter_type-spreadsheets",
+          key: "spreadsheets",
+          group: FilterGroups.filterType,
+          label: "Spreadsheets",
+        },
       ])
     }
     getSelectedFilterData={() => Promise.resolve([])}
@@ -293,7 +360,13 @@ export const Default: Story = {
               zIndex: 202,
             }}
           >
-            <span style={{ ...sectionLabelStyle, color: "#2196F3", backgroundColor: "#E3F2FD" }}>
+            <span
+              style={{
+                ...sectionLabelStyle,
+                color: "#2196F3",
+                backgroundColor: "#E3F2FD",
+              }}
+            >
               Header
             </span>
             <NavigationHeader />
@@ -310,7 +383,13 @@ export const Default: Story = {
               zIndex: 202,
             }}
           >
-            <span style={{ ...sectionLabelStyle, color: "#FF9800", backgroundColor: "#FFF3E0" }}>
+            <span
+              style={{
+                ...sectionLabelStyle,
+                color: "#FF9800",
+                backgroundColor: "#FFF3E0",
+              }}
+            >
               Filter
             </span>
             <FilterContent />
@@ -326,7 +405,13 @@ export const Default: Story = {
               position: "relative",
             }}
           >
-            <span style={{ ...sectionLabelStyle, color: "#4CAF50", backgroundColor: "#E8F5E9" }}>
+            <span
+              style={{
+                ...sectionLabelStyle,
+                color: "#4CAF50",
+                backgroundColor: "#E8F5E9",
+              }}
+            >
               Body
             </span>
             <TableContent />

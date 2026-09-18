@@ -55,4 +55,3 @@ const CardInfoComponent = ({
 };
 
 export const CardInformation = observer(CardInfoComponent);
-

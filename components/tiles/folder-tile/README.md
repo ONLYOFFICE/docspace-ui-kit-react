@@ -24,36 +24,36 @@ import { FolderTile } from "@onlyoffice/apps-ui-kit/components/tiles/folder-tile
   <TileContent>
     <Link>Folder Content</Link>
   </TileContent>
-</FolderTile>
+</FolderTile>;
 ```
 
 ## Props
 
-| Props                |                       Type                        | Required | Values | Default | Description                                            |
-| -------------------- | :-----------------------------------------------: | :------: | :----: | :-----: | ------------------------------------------------------ |
-| `item`               |                   `FolderItem`                    |   Yes    |   -    |    -    | Folder data object                                     |
-| `contextOptions`     |               `ContextMenuModel[]`                |   Yes    |   -    |    -    | Context menu options                                   |
-| `checked`            |                     `boolean`                     |    -     |   -    | `false` | Indicates if the folder is selected                    |
-| `showHotkeyBorder`   |                     `boolean`                     |    -     |   -    | `false` | Flag to show hotkey border                             |
-| `inProgress`         |                     `boolean`                     |    -     |   -    | `false` | Indicates if folder is in progress state               |
-| `onSelect`           |  `(checked: boolean, item: FolderItem) => void`   |    -     |   -    |    -    | Callback when folder is selected                       |
-| `thumbnailClick`     |          `(e: React.MouseEvent) => void`          |    -     |   -    |    -    | Callback when thumbnail is clicked                     |
-| `getContextModel`    |            `() => ContextMenuModel[]`             |    -     |   -    |    -    | Function to get context menu model                     |
-| `setSelection`       |          `(items: FolderItem[]) => void`          |    -     |   -    |    -    | Function to set selected items                         |
-| `withCtrlSelect`     |            `(item: FolderItem) => void`           |    -     |   -    |    -    | Handler for Ctrl + Click selection                     |
-| `withShiftSelect`    |            `(item: FolderItem) => void`           |    -     |   -    |    -    | Handler for Shift + Click selection                    |
-| `element`            |                 `React.ReactNode`                 |    -     |   -    |    -    | Additional React element (icon)                        |
-| `children`           |                 `React.ReactNode`                 |    -     |   -    |    -    | Child elements                                         |
-| `hideContextMenu`    |                   `() => void`                    |    -     |   -    |    -    | Callback to hide context menu                          |
-| `tileContextClick`   |        `(isRightClick?: boolean) => void`         |    -     |   -    |    -    | Callback when context menu is clicked                  |
-| `badges`             |                 `React.ReactNode`                 |    -     |   -    |    -    | Folder badges                                          |
-| `indeterminate`      |                     `boolean`                     |    -     |   -    | `false` | Checkbox indeterminate state flag                      |
-| `isDragging`         |                     `boolean`                     |    -     |   -    | `false` | Indicates if folder is being dragged                   |
-| `isActive`           |                     `boolean`                     |    -     |   -    | `false` | Indicates if folder is in active state                 |
-| `isEdit`             |                     `boolean`                     |    -     |   -    | `false` | Flag for edit mode                                     |
-| `temporaryIcon`      |          `string \| React.ReactElement`           |    -     |   -    |    -    | Temporary icon (SVG path or React element)             |
-| `isBigFolder`        |                     `boolean`                     |    -     |   -    | `false` | Flag for big folder view                               |
-| `dataTestId`         |                     `string`                      |    -     |   -    |    -    | Data test id for the tile                              |
+| Props              |                      Type                      | Required | Values | Default | Description                                |
+| ------------------ | :--------------------------------------------: | :------: | :----: | :-----: | ------------------------------------------ |
+| `item`             |                  `FolderItem`                  |   Yes    |   -    |    -    | Folder data object                         |
+| `contextOptions`   |              `ContextMenuModel[]`              |   Yes    |   -    |    -    | Context menu options                       |
+| `checked`          |                   `boolean`                    |    -     |   -    | `false` | Indicates if the folder is selected        |
+| `showHotkeyBorder` |                   `boolean`                    |    -     |   -    | `false` | Flag to show hotkey border                 |
+| `inProgress`       |                   `boolean`                    |    -     |   -    | `false` | Indicates if folder is in progress state   |
+| `onSelect`         | `(checked: boolean, item: FolderItem) => void` |    -     |   -    |    -    | Callback when folder is selected           |
+| `thumbnailClick`   |        `(e: React.MouseEvent) => void`         |    -     |   -    |    -    | Callback when thumbnail is clicked         |
+| `getContextModel`  |           `() => ContextMenuModel[]`           |    -     |   -    |    -    | Function to get context menu model         |
+| `setSelection`     |        `(items: FolderItem[]) => void`         |    -     |   -    |    -    | Function to set selected items             |
+| `withCtrlSelect`   |          `(item: FolderItem) => void`          |    -     |   -    |    -    | Handler for Ctrl + Click selection         |
+| `withShiftSelect`  |          `(item: FolderItem) => void`          |    -     |   -    |    -    | Handler for Shift + Click selection        |
+| `element`          |               `React.ReactNode`                |    -     |   -    |    -    | Additional React element (icon)            |
+| `children`         |               `React.ReactNode`                |    -     |   -    |    -    | Child elements                             |
+| `hideContextMenu`  |                  `() => void`                  |    -     |   -    |    -    | Callback to hide context menu              |
+| `tileContextClick` |       `(isRightClick?: boolean) => void`       |    -     |   -    |    -    | Callback when context menu is clicked      |
+| `badges`           |               `React.ReactNode`                |    -     |   -    |    -    | Folder badges                              |
+| `indeterminate`    |                   `boolean`                    |    -     |   -    | `false` | Checkbox indeterminate state flag          |
+| `isDragging`       |                   `boolean`                    |    -     |   -    | `false` | Indicates if folder is being dragged       |
+| `isActive`         |                   `boolean`                    |    -     |   -    | `false` | Indicates if folder is in active state     |
+| `isEdit`           |                   `boolean`                    |    -     |   -    | `false` | Flag for edit mode                         |
+| `temporaryIcon`    |         `string \| React.ReactElement`         |    -     |   -    |    -    | Temporary icon (SVG path or React element) |
+| `isBigFolder`      |                   `boolean`                    |    -     |   -    | `false` | Flag for big folder view                   |
+| `dataTestId`       |                    `string`                    |    -     |   -    |    -    | Data test id for the tile                  |
 
 ## Folder Item Structure
 

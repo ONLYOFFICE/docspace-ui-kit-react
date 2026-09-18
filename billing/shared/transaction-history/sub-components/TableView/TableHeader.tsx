@@ -81,4 +81,3 @@ const TransactionHistoryTableHeader = (props: TableHeaderProps) => {
 };
 
 export default TransactionHistoryTableHeader;
-

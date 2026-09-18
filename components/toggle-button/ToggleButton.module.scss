@@ -7,7 +7,10 @@
       rect {
         fill: var(
           --toggle-button-checked-color,
-          var(--color-scheme-main-accent, var(--toggle-button-fill-color-default))
+          var(
+            --color-scheme-main-accent,
+            var(--toggle-button-fill-color-default)
+          )
         ) !important;
       }
       circle {
@@ -40,8 +43,14 @@
 
 .container {
   --toggle-button-fill-color-default: #{$light-blue-main};
-  --toggle-button-fill-color-off: var(--toggle-button-off-color, #{$gray-strong});
-  --toggle-button-hover-fill-color-off: var(--toggle-button-off-hover-color, #{$gray});
+  --toggle-button-fill-color-off: var(
+    --toggle-button-off-color,
+    #{$gray-strong}
+  );
+  --toggle-button-hover-fill-color-off: var(
+    --toggle-button-off-hover-color,
+    #{$gray}
+  );
   --toggle-button-fill-circle-color: #{$white};
   --toggle-button-fill-circle-color-off: #{$white};
 
@@ -99,7 +108,10 @@
       rect {
         fill: var(
           --toggle-button-checked-color,
-          var(--color-scheme-main-accent, var(--toggle-button-fill-color-default))
+          var(
+            --color-scheme-main-accent,
+            var(--toggle-button-fill-color-default)
+          )
         ) !important;
 
         &:hover {
@@ -140,7 +152,10 @@
       rect {
         fill: var(
           --toggle-button-checked-color,
-          var(--color-scheme-main-accent, var(--toggle-button-fill-color-default))
+          var(
+            --color-scheme-main-accent,
+            var(--toggle-button-fill-color-default)
+          )
         ) !important;
       }
 

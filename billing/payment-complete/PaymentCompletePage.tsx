@@ -363,4 +363,3 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
 };
 
 export default PaymentCompletePage;
-

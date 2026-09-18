@@ -7,15 +7,25 @@
     --combobox-button-bg: #{colors.$white};
     --combobox-button-color: #{colors.$black};
     --combobox-button-disabled-color: #{colors.$gray-strong};
-    --combobox-button-border: 1px solid var(--combobox-border-color, #{colors.$gray-strong});
-    --combobox-button-open-border-color: var(--combobox-focus-border-color, var(--accent-main));
+    --combobox-button-border: 1px solid
+      var(--combobox-border-color, #{colors.$gray-strong});
+    --combobox-button-open-border-color: var(
+      --combobox-focus-border-color,
+      var(--accent-main)
+    );
     --combobox-button-disabled-border-color: #{colors.$gray-light-mid};
     --combobox-button-disabled-bg: #{colors.$gray-light};
     --combobox-button-focus-bg-modern-view: #{colors.$light-gray-selected};
     --combobox-button-icon-button-color: #{colors.$gray};
     --combobox-button-icon-button-hover-color: #{colors.$light-gray-dark};
-    --combobox-button-hover-border-color: var(--combobox-hover-border-color, #{colors.$gray});
-    --combobox-button-hover-border-color-open: var(--combobox-focus-border-color, #{colors.$light-second-main});
+    --combobox-button-hover-border-color: var(
+      --combobox-hover-border-color,
+      #{colors.$gray}
+    );
+    --combobox-button-hover-border-color-open: var(
+      --combobox-focus-border-color,
+      #{colors.$light-second-main}
+    );
     --combobox-button-hover-disabled-border-color: #{colors.$gray-light-mid};
     --combobox-button-hover-bg-modern-view: #{colors.$gray-light-mid};
     --combobox-button-focus-open-border-color: var(--accent-main);
@@ -36,15 +46,25 @@
     --combobox-button-bg: #{colors.$black};
     --combobox-button-color: #{colors.$gray-dark};
     --combobox-button-disabled-color: #{colors.$gray-dark};
-    --combobox-button-border: 1px solid var(--combobox-border-color, #{colors.$gray-dark-strong});
-    --combobox-button-open-border-color: var(--combobox-focus-border-color, #{colors.$white});
+    --combobox-button-border: 1px solid
+      var(--combobox-border-color, #{colors.$gray-dark-strong});
+    --combobox-button-open-border-color: var(
+      --combobox-focus-border-color,
+      #{colors.$white}
+    );
     --combobox-button-disabled-border-color: #{colors.$gray-dark-strong};
     --combobox-button-disabled-bg: #{colors.$gray-dark-strong};
     --combobox-button-focus-bg-modern-view: #{colors.$gray-dark-mid};
     --combobox-button-icon-button-color: #{colors.$gray-dark};
     --combobox-button-icon-button-hover-color: #{colors.$white};
-    --combobox-button-hover-border-color: var(--combobox-hover-border-color, #{colors.$gray-dark});
-    --combobox-button-hover-border-color-open: var(--combobox-focus-border-color, #{colors.$white});
+    --combobox-button-hover-border-color: var(
+      --combobox-hover-border-color,
+      #{colors.$gray-dark}
+    );
+    --combobox-button-hover-border-color-open: var(
+      --combobox-focus-border-color,
+      #{colors.$white}
+    );
     --combobox-button-hover-disabled-border-color: #{colors.$gray-dark-strong};
     --combobox-button-hover-bg-modern-view: #{colors.$gray-dark-strong};
     --combobox-button-focus-open-border-color: var(
@@ -182,10 +202,10 @@
     }
 
     &:is(
-        .isDisabled,
-        .isLoading,
-        :not(.containOptions):not(.withAdvancedOptions)
-      ) {
+      .isDisabled,
+      .isLoading,
+      :not(.containOptions):not(.withAdvancedOptions)
+    ) {
       cursor: default;
     }
 
