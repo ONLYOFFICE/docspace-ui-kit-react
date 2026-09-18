@@ -82,7 +82,19 @@ tree.
   instance
 - `pnpm build` no longer needs a DocSpace checkout
 
-### Known issues
+#### Line endings
+
+`.gitattributes` pins the repository to LF (`* text=auto eol=lf`). This matters
+on Windows: with `core.autocrlf=true` a checkout used to get CRLF working
+copies of files that are LF in git, and `pnpm format` — now part of the
+pre-push gate — then failed on all ~1700 of them.
+
+A checkout that predates `.gitattributes` is not converted by pulling it, since
+git only rewrites working copies at checkout. **See "Line endings" in the
+README for the one-time migration**; it discards uncommitted changes, so commit
+or stash first.
+
+## Known issues
 
 - **`axios` is not portal-only.** `docs/public-api.md` says it is; the root barrel reaches
   it through `uploader` and `billing`, both of which are exported from `index.ts`. Since

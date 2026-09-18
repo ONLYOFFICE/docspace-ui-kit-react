@@ -9,6 +9,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { assertPosixIds, walk } from "./lib/fs-ids.mjs";
 import {
   analyseStylesheet,
   collect,
@@ -25,23 +26,10 @@ const DIST = path.resolve(
 // CommonJS interop shims it synthesises.
 const FORBIDDEN_DIRS = ["node_modules", "_virtual"];
 
-const findForbidden = (dir, found = []) => {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-
-    if (!entry.isDirectory()) continue;
-
-    if (FORBIDDEN_DIRS.includes(entry.name)) {
-      const count = fs.readdirSync(full).length;
-      found.push({ path: path.relative(DIST, full), count });
-      continue;
-    }
-
-    findForbidden(full, found);
-  }
-
-  return found;
-};
+const findForbidden = (root) =>
+  [...walk(root, { enterDir: (entry) => !FORBIDDEN_DIRS.includes(entry.name) })]
+    .filter((e) => e.isDir && FORBIDDEN_DIRS.includes(e.name))
+    .map((e) => ({ path: e.id, count: fs.readdirSync(e.full).length }));
 
 if (!fs.existsSync(DIST)) {
   console.error("dist/ not found -- run `pnpm build` first.");
@@ -80,34 +68,20 @@ const DIRECTIVE =
   /^\s*(?:\/\*[\s\S]*?\*\/\s*|\/\/[^\n]*\n\s*)*["']use client["']\s*;?/;
 
 /** Module ids (paths relative to `dir`, extension stripped) carrying the directive. */
-const modulesWithDirective = (dir, exts) => {
-  const found = new Set();
-
-  const walk = (d) => {
-    for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
-      const full = path.join(d, entry.name);
-
-      if (entry.isDirectory()) {
-        walk(full);
-        continue;
-      }
-
-      if (!exts.some((ext) => entry.name.endsWith(ext))) continue;
-      if (!DIRECTIVE.test(fs.readFileSync(full, "utf8"))) continue;
-
-      found.add(
-        path
-          .relative(dir, full)
-          .replace(/\\/g, "/")
-          .replace(/\.(tsx?|jsx?)$/, ""),
-      );
-    }
-  };
-
-  walk(dir);
-
-  return found;
-};
+const modulesWithDirective = (root, exts) =>
+  new Set(
+    assertPosixIds(
+      [...walk(root)]
+        .filter(
+          (e) =>
+            !e.isDir &&
+            exts.some((ext) => e.name.endsWith(ext)) &&
+            DIRECTIVE.test(fs.readFileSync(e.full, "utf8")),
+        )
+        .map((e) => e.id.replace(/\.(tsx?|jsx?)$/, "")),
+      "modulesWithDirective",
+    ),
+  );
 
 const SOURCE_ROOT = path.resolve(DIST, "..");
 const SKIP = ["node_modules", "dist", ".git", "storybook-static", "locales"];
@@ -177,31 +151,17 @@ const collectShapeOffenders = (root, ext) => {
   const stray = [];
   const collided = [];
 
-  const walk = (dir) => {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name);
+  for (const entry of walk(root)) {
+    if (entry.isDir || !entry.name.endsWith(ext)) continue;
 
-      if (entry.isDirectory()) {
-        walk(full);
-        continue;
-      }
+    if (/^index\d+\./.test(entry.name)) collided.push(entry.id);
+    else if (entry.name !== `index${ext}`) stray.push(entry.id);
+  }
 
-      if (!entry.name.endsWith(ext)) continue;
-
-      const rel = path.relative(root, full);
-
-      if (/^index\d+\./.test(entry.name)) {
-        collided.push(rel);
-        continue;
-      }
-
-      if (entry.name !== `index${ext}`) stray.push(rel);
-    }
+  return {
+    stray: assertPosixIds(stray, "collectShapeOffenders"),
+    collided: assertPosixIds(collided, "collectShapeOffenders"),
   };
-
-  walk(root);
-
-  return { stray, collided };
 };
 
 const SHAPE_TREES = [
@@ -262,9 +222,7 @@ const CSS_IMPORT_RE = /^import\s+["'](\.[^"']+\.css)["'];?/gm;
 for (const id of collect(path.join(DIST, "esm"))) {
   const code = fs.readFileSync(path.join(DIST, "esm", id), "utf8");
   for (const m of code.matchAll(CSS_IMPORT_RE)) {
-    cssImports.add(
-      path.posix.normalize(path.posix.join(path.posix.dirname(id), m[1])),
-    );
+    cssImports.add(path.posix.join(path.posix.dirname(id), m[1]));
   }
 }
 
@@ -279,11 +237,16 @@ for (const file of stylesheets) {
       .readFileSync(path.join(DIST, "esm", proxy), "utf8")
       .startsWith('import "./index.css";');
 
-  if ((ownProxy && !importedByOwnProxy) || !cssImports.has(file)) {
+  // Report the condition that actually fired, not whichever one `ownProxy` names.
+  const reason = (() => {
+    if (ownProxy && !importedByOwnProxy) return "not imported by its proxy";
+    if (!cssImports.has(file)) return "imported by no chunk";
+    return null;
+  })();
+
+  if (reason) {
     detached += 1;
-    console.error(
-      `  ${file}: ${ownProxy ? "not imported by its proxy" : "imported by no chunk"}`,
-    );
+    console.error(`  ${file}: ${reason}`);
   }
 }
 

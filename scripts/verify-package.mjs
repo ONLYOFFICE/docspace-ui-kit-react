@@ -16,6 +16,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import zlib from "node:zlib";
 
 const PKG_DIR = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -31,6 +32,40 @@ const run = (cmd, args, opts = {}) =>
     shell: process.platform === "win32",
     ...opts,
   });
+
+// Reads one file out of a .tgz with node's own gzip and a walk over the tar
+// headers, never the `tar` binary. `tar` resolves to bsdtar in PowerShell and
+// to the GNU tar from Git Bash under lefthook, and GNU tar reads `C:\...` as a
+// remote `host:path` spec: "Cannot connect to C: resolve failed". So this
+// passed when run by hand and failed in the pre-push gate, on Windows only.
+const readFromTarball = (file, entry) => {
+  const buf = zlib.gunzipSync(fs.readFileSync(file));
+
+  for (let off = 0; off + 512 <= buf.length;) {
+    const name = buf.toString("utf8", off, off + 100).replace(/\0.*/, "");
+
+    if (!name) {
+      off += 512;
+      continue;
+    }
+
+    const size = Number.parseInt(
+      buf
+        .toString("utf8", off + 124, off + 136)
+        .replace(/\0.*/, "")
+        .trim() || "0",
+      8,
+    );
+
+    if (name === entry) {
+      return buf.toString("utf8", off + 512, off + 512 + size);
+    }
+
+    off += 512 + Math.ceil(size / 512) * 512;
+  }
+
+  throw new Error(`${entry} is not in ${path.basename(file)}`);
+};
 
 // Without dist/ this still packs, and publint then reports six missing entry
 // points -- which reads as a broken `exports`/`publishConfig` rather than as
@@ -60,9 +95,7 @@ try {
 
   // A packed package with no entry points is the failure mode B-8 describes;
   // catch it here rather than discovering it after publishing.
-  const packed = JSON.parse(
-    run("tar", ["xzOf", tarball, "package/package.json"]),
-  );
+  const packed = JSON.parse(readFromTarball(tarball, "package/package.json"));
 
   for (const field of ["main", "exports"]) {
     if (!packed[field]) {

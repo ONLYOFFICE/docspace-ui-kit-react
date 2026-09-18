@@ -14,6 +14,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { toPosix } from "./lib/fs-ids.mjs";
+
 const TYPES = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../dist/types",
@@ -133,8 +135,8 @@ const moveToIndexShape = () => {
 
       if (!isStaleFromPreviousRun) {
         console.error(
-          `Cannot normalise ${path.relative(TYPES, file)}: ` +
-            `${path.relative(TYPES, target)} is a different module. ` +
+          `Cannot normalise ${toPosix(path.relative(TYPES, file))}: ` +
+            `${toPosix(path.relative(TYPES, target))} is a different module. ` +
             "A source tree cannot hold both `x.ts` and `x/index.ts` -- " +
             "rename one.",
         );
