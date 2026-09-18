@@ -953,6 +953,35 @@ everything works out of the box.
 > `DOCSPACE_CLIENT_ROOT` pointing at a DocSpace client checkout) refreshes them along
 > with the non-English locales — run it when the upstream fonts or strings change.
 
+### Line endings (Windows: one-time migration)
+
+The repository is LF everywhere, enforced by `.gitattributes`
+(`* text=auto eol=lf`). Prettier is configured with `endOfLine: "lf"` and
+`pnpm format` is part of the pre-push gate, so a CRLF working copy fails the
+push — with every file in the repository listed, which says nothing about what
+is actually wrong.
+
+`.gitattributes` only decides what git writes **at checkout**. A clone made
+after it landed is already correct and needs nothing. A checkout that predates
+it keeps its CRLF working copies, so convert it once:
+
+```bash
+git status                     # commit or stash anything you care about first
+git add --renormalize .
+git checkout -- .              # rewrites the working tree; discards uncommitted changes
+```
+
+`git checkout -- .` throws away uncommitted work — that is the point of the
+`git status` above. `git add --renormalize .` on its own is not enough: it
+updates the index, never the working tree.
+
+To confirm afterwards, this prints nothing when the tree is clean — `w/none` is
+an empty file, which has no line endings either way:
+
+```bash
+git ls-files --eol | grep -vE 'w/lf|w/none|i/-text'
+```
+
 ### Running any of this from VS Code
 
 Open [`ui-kit.code-workspace`](ui-kit.code-workspace) rather than the folder. It adds six

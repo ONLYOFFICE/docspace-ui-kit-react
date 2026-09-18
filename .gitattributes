@@ -1,0 +1,27 @@
+# Every text file is LF in the index and LF in the working tree, on every
+# platform. Without this, a Windows checkout with the common `core.autocrlf=true`
+# gets CRLF working copies of files that are LF in git, and `prettier --check`
+# (endOfLine: "lf" in .prettierrc.yaml) then reports every file in the
+# repository as misformatted, which blocks the pre-push gate.
+#
+# Adding this file does not convert a checkout that already exists -- git only
+# rewrites working copies on checkout. See "Line endings" in the README for the
+# one-time migration.
+* text=auto eol=lf
+
+# Belt and braces. `text=auto` already detects these by their NUL bytes, but an
+# archive or a font that happens to have none would be mangled as text.
+*.tgz binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+
+# cmd.exe needs CRLF: with LF it mis-seeks on `goto` and labels. There are no
+# such files here today; this keeps the first one that arrives from breaking.
+*.bat text eol=crlf
+*.cmd text eol=crlf
