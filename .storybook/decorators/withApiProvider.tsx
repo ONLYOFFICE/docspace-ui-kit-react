@@ -1,5 +1,5 @@
 import React from "react";
-import type { Decorator } from "@storybook/react";
+import type { Decorator } from "@storybook/react-vite";
 
 import ApiProvider from "../../providers/api/ApiProvider";
 import { DEFAULT_API_URL, DEFAULT_API_KEY } from "../globals";
