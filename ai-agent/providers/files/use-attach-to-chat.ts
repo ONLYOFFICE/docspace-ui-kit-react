@@ -63,7 +63,7 @@ export type ChatAttachableItem = {
   isFolder?: boolean;
   // The row is a DocSpace PDF form, and the table its responses are collected
   // in. Together they decide whether the chat offers the form-specific hints
-  // (see `hasFormResults` / `useHasFormAttached`).
+  // (see `hasFormResults`).
   isForm?: boolean;
   externalDbTableName?: string | null;
   /**
