@@ -37,10 +37,11 @@ Provides API client context to all child components using the ONLYOFFICE Apps AP
 
 ## Features
 
-- **API Client Instances** — Creates and manages multiple API clients (Profiles, Settings, Folders, Rooms, Files, Groups, Search)
+- **API Client Instances** — Creates and manages the SDK clients: Profiles, Settings, Folders, Rooms, Files, File settings, Operations, Group, People search, Group search, AI, Third-party, Payment and Portal quota
 - **Bearer Token Auth** — Configures axios instances with Bearer token authentication
 - **React Context** — Exposes API clients via `useApi()` hook
 - **Memoized Initialization** — API clients are memoized based on URL and API key changes
+- **Socket Connection** — Connects the portal WebSocket on mount unless `initSocket` is `false`
 
 <Story of={ApiProviderStories.Default} />
 

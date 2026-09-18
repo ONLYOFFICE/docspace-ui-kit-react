@@ -45,15 +45,18 @@ Used across all ONLYOFFICE Apps applications: Client, Login, DocEditor, Manageme
 npm install @onlyoffice/apps-ui-kit
 ```
 
+The package is not on the public npm registry yet — until it is published, consumers install
+a packed tarball built from this repository with `pnpm build && pnpm pack`.
+
 ### Requirements
 
-- Node.js >= 24
-- React >= 19
+- Node.js >= 22
+- React >= 19 (React and React-DOM are peer dependencies)
 
 ### Quick start
 
 ```tsx
-import { Providers } from "@onlyoffice/apps-ui-kit/providers";
+import Providers from "@onlyoffice/apps-ui-kit/providers/Providers";
 
 <Providers url="https://your-docspace.com/api" apiKey="your-api-key" locale="en">
   <App />

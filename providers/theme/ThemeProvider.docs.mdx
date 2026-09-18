@@ -33,7 +33,7 @@ import * as ThemeProviderStories from './ThemeProvider.stories';
 
 # ThemeProvider
 
-ThemeProvider resolves the active theme (light/dark/system) and provides it to child components via styled-components context.
+ThemeProvider resolves the active theme (light/dark/system), stamps `data-theme` and `data-dir` on `<html>`, and sets the CSS custom properties that each component's SCSS module reads.
 
 ## Features
 
