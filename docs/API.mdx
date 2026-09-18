@@ -7,6 +7,28 @@ import { Meta } from "@storybook/addon-docs/blocks";
 The UI Kit uses `ApiProvider` to give components access to the ONLYOFFICE Apps REST API.
 It wraps the `@onlyoffice/docspace-api-sdk` and authenticates requests with a Bearer token.
 
+## Reference documentation
+
+This page covers the provider, not the endpoints. The REST API itself is documented at
+[api.onlyoffice.com/docspace](https://api.onlyoffice.com/docspace/), and the same
+documentation is published in a machine-readable form for agents and LLMs:
+
+- [`llms.txt`](https://api.teamlab.info/llms.txt) — index of every section
+- [`docspace/api-backend/llms.txt`](https://api.teamlab.info/docspace/api-backend/llms.txt) —
+  the DocSpace REST API reference the SDK wraps
+- [`docspace/javascript-sdk/llms.txt`](https://api.teamlab.info/docspace/javascript-sdk/llms.txt) —
+  Embed SDK
+- [`docspace/plugins-sdk/llms.txt`](https://api.teamlab.info/docspace/plugins-sdk/llms.txt) —
+  Plugins SDK
+- [`docspace/mcp-server/llms.txt`](https://api.teamlab.info/docspace/mcp-server/llms.txt) —
+  MCP server
+
+Every page there is also available as Markdown: replace the trailing slash of its URL
+with `.md`.
+
+Those links point at `api.teamlab.info` today. The documentation is moving to
+`api.onlyoffice.com` under the same paths, so prefer that host once it serves them.
+
 ## Setting up ApiProvider
 
 ```tsx
@@ -17,10 +39,12 @@ import { ApiProvider } from "@onlyoffice/apps-ui-kit/providers/api";
 </ApiProvider>
 ```
 
-Or use the composite `Providers` component that includes API, translation, and theme providers:
+Or use the composite `Providers` component that includes API, translation, and theme
+providers. It is portal-specific, so it is deliberately **not** re-exported from
+`providers` — import it by its own subpath, as a default export:
 
 ```tsx
-import { Providers } from "@onlyoffice/apps-ui-kit/providers";
+import Providers from "@onlyoffice/apps-ui-kit/providers/Providers";
 
 <Providers url="https://your-docspace.com/api" apiKey="your-api-key" locale="en">
   <App />
@@ -31,6 +55,10 @@ import { Providers } from "@onlyoffice/apps-ui-kit/providers";
 
 - **`url`** (`string`) — base URL of the ONLYOFFICE Apps API
 - **`apiKey`** (`string`) — API key used as Bearer token for authentication
+- **`initSocket`** (`boolean`, default `true`) — connect the portal WebSocket on mount
+- **`socketPath`** (`string`) — socket path; read from portal settings when omitted
+- **`useBearerForRawClient`** (`boolean`) — send `Authorization` with the `Bearer` prefix on
+  `rawApiClient` as well (Storybook needs this)
 
 ## Using the API in components
 
@@ -71,10 +99,17 @@ The `useApi` hook returns the following services:
 - **`roomsApi`** — room management (`createRoom`, `getRoomsFolder`)
 - **`filesApi`** — file operations (`openEditFile`)
 - **`filesSettingsApi`** — file settings (`getDocServiceUrl`)
+- **`operationsApi`** — long-running file operations
 - **`groupApi`** — group management
 - **`peopleSearchApi`** — people search
 - **`groupSearchApi`** — group search
-- **`apiClient`** — raw axios instance for custom requests
+- **`aiApi`** — AI agents and MCP servers
+- **`thirdPartyApi`** — third-party storage connections
+- **`paymentApi`** — tariffs and payments
+- **`portalQuotaApi`** — portal quota
+- **`apiClient`** — raw client for custom requests (`Bearer` prefix on the token)
+- **`rawApiClient`** — the same client without the `Bearer` prefix, unless
+  `useBearerForRawClient` is set
 - **`baseUrl`** — base API URL string
 
 ## Response format
@@ -182,11 +217,13 @@ When using the composite `Providers` component, providers are nested in this ord
 ```
 ErrorBoundary
   └── ApiProvider
-      └── SocketProvider
-          └── TranslationProvider
-              └── ThemeProvider
-                  └── {children}
+      └── TranslationProvider
+          └── ThemeProvider
+              └── {children}
 ```
+
+There is no separate socket provider: `ApiProvider` connects the portal WebSocket itself in
+an effect, unless `initSocket` is `false`.
 
 ## Testing
 

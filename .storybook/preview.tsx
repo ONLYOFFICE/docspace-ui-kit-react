@@ -1,5 +1,5 @@
 import React from "react";
-import type { Preview } from "@storybook/react";
+import type { Preview } from "@storybook/react-vite";
 import { useDarkMode } from "@vueless/storybook-dark-mode";
 
 import { ThemeProviderComponent } from "../components/theme-provider";

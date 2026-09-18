@@ -4,8 +4,10 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 # Themes
 
-The UI Kit ships with Base (light) and Dark themes built on **styled-components**.
-`ThemeProvider` resolves the active theme, sets CSS custom properties, and exposes theme tokens to all child components.
+The UI Kit ships with Base (light) and Dark themes. Styling is **SCSS Modules plus CSS
+custom properties** — there is no runtime CSS-in-JS. `ThemeProvider` resolves the active
+theme, stamps it on the document, and sets the custom properties that every component's
+stylesheet reads.
 
 ## Setting up ThemeProvider
 
@@ -18,10 +20,12 @@ import { ThemeKeys } from "@onlyoffice/apps-ui-kit/enums";
 </ThemeProvider>
 ```
 
-Or use the composite `Providers` component:
+Or use the composite `Providers` component. It is portal-specific — it also mounts
+`ApiProvider` and fetches portal settings on mount — so it is deliberately **not** re-exported
+from `providers`; import it by its own subpath, as a default export:
 
 ```tsx
-import { Providers } from "@onlyoffice/apps-ui-kit/providers";
+import Providers from "@onlyoffice/apps-ui-kit/providers/Providers";
 
 <Providers
   url="https://your-docspace.com/api"
@@ -61,23 +65,39 @@ The hook resolves the active theme in this order:
 
 When `SystemStr` is used, a `matchMedia` listener automatically switches the theme when the OS preference changes.
 
-## Using theme in styled-components
+## Where a component's colours come from
 
-Every styled component receives the full theme object via props:
+Nothing reads the theme object to paint a component. Each component has its own
+`*.module.scss`, and that stylesheet declares its tokens under the theme class and reads
+them back through `var()`:
 
-```tsx
-import styled from "styled-components";
+```scss
+:global(.light) {
+  :local {
+    .card {
+      --card-background: #{colors.$white};
+      --card-text-color: #{colors.$black};
+    }
+  }
+}
 
-const StyledCard = styled.div`
-  background-color: ${(props) => props.theme.backgroundColor};
-  color: ${(props) => props.theme.text.color};
-  font-family: ${(props) => props.theme.fontFamily};
-`;
+.card {
+  background-color: var(--card-background);
+  color: var(--card-text-color);
+}
 ```
 
-### Theme object structure
+`ThemeProvider` only decides *which* theme is active; the values come from the stylesheet
+that ships next to the component. An undefined token fails silently, so add both halves
+together.
 
-The theme object contains 100+ nested categories for component-specific tokens:
+### Theme object
+
+`Base` and `Dark` are still exported from `@onlyoffice/apps-ui-kit/providers/theme`, and
+`useTheme` still resolves one of them. Only three of their fields drive anything today —
+`isBase`, `interfaceDirection` and `fontFamily`, which `ThemeProvider` turns into the DOM
+attributes below. The remaining ~130 per-component categories are a leftover from the
+CSS-in-JS era; no component in the package reads them:
 
 ```ts
 {
@@ -178,11 +198,11 @@ If `colorTheme` is not provided, it is fetched automatically from the ONLYOFFICE
 - `<html data-dir="ltr|rtl">`
 - `<body class="light|dark ltr|rtl">`
 
-CSS custom properties set on `<html>`:
+CSS custom properties:
 
 ```
---interface-direction: "ltr" | "rtl"
---font-family: "Open Sans, sans-serif, Arial"
+<html> --interface-direction: "ltr" | "rtl"
+<body> --font-family: "Open Sans, sans-serif, Arial"
 ```
 
 ## RTL support
@@ -202,7 +222,8 @@ getDirectionByLanguage("en");  // "ltr"
 getDirectionByLanguage("he");  // "rtl"
 ```
 
-Helper functions for styled-components:
+Helper functions, for the cases a value has to be flipped in JavaScript rather than by a
+CSS logical property:
 
 ```ts
 // Flip text-align for RTL

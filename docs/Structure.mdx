@@ -7,29 +7,42 @@ import { Meta } from "@storybook/addon-docs/blocks";
 ## Library layout
 
 ```
-docspace-ui-kit-react/
-├── components/       # 130+ reusable React components
+./
+├── components/       # 98 reusable React components
 ├── hooks/            # Custom React hooks
-├── providers/        # Context providers (theme, translation, API)
-├── selectors/        # Selector components (room, files, people)
-├── document-editor/  # Document editor component
+├── providers/        # Context providers (theme, translation, error boundary)
+├── context/          # React context definitions
 ├── errors/           # Error page components
 ├── constants/        # Shared constants
-├── context/          # React context definitions
 ├── enums/            # TypeScript enums
 ├── types/            # TypeScript type definitions
 ├── utils/            # Utility functions
-├── locales/          # i18n translation files
+├── styles/           # Global SCSS, mixins, variables
+├── locales/          # i18n translation files (English is committed)
 └── assets/           # Static assets (images, icons)
+```
+
+These ship in the package too, but are coupled to a DocSpace portal rather than being
+general-purpose UI — see `docs/public-api.md` for the tiering:
+
+```
+./
+├── ai-agent/         # AI chat panel and settings
+├── api/              # Portal REST client
+├── billing/          # Tariff, payment and services flows
+├── document-editor/  # Document editor wrapper
+├── selectors/        # Data-driven selectors (room, files, people, groups, ...)
+└── uploader/         # Upload UI
 ```
 
 ## Tech stack
 
-- **React 19** — UI framework
+- **React 19** — UI framework (a peer dependency, along with React-DOM)
 - **TypeScript 5.9** — type safety
-- **MobX 6** — state management
-- **Styled Components 5** — component styling
+- **SCSS Modules + CSS custom properties** — component styling; no runtime CSS-in-JS
+- **Rollup** — library build, ESM only
+- **MobX 6** — state management, in the portal-coupled stores
 - **i18next** — internationalization
-- **Biome** — linting and formatting
+- **Biome** — linting only; its formatter is disabled and Prettier formats
 - **Vitest** — unit testing
 - **Storybook** — component documentation
