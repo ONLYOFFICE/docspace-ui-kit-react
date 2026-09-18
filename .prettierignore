@@ -1,0 +1,19 @@
+# Prettier 3 reads .gitignore by default, so dist/, storybook-static/,
+# coverage/, playwright-report/, test-results/ and every locale but en are
+# already out of scope. This file is only for what is committed and must
+# still not be reformatted.
+
+# Machine-generated, and Prettier corrupts it. pnpm writes package keys that
+# exceed YAML's 1024-character implicit-key limit in explicit-key form
+# (`? '<key>'` on one line, `: ` on the next); Prettier rewrites them as
+# ordinary `"<key>":` mappings, which is invalid YAML. pnpm then reports
+# "Ignoring broken lockfile", discards it and re-resolves every dependency --
+# and CI's --frozen-lockfile fails outright.
+pnpm-lock.yaml
+
+# Derived from a DocSpace client checkout by `pnpm sync-locales`
+# (scripts/copy-locales.js). Both are committed so the package builds and runs
+# Storybook standalone, but they are copies: formatting them here only creates
+# drift that the next sync silently reverts.
+locales/
+css/

@@ -45,8 +45,14 @@ node -e 'const fs=require("fs");const t=JSON.parse(fs.readFileSync(".vscode/task
 
 ## Formatting bindings
 
-Both the workspace file and `.vscode/settings.json` bind Prettier as the formatter and set
-Biome's `codeActionsOnSave` entries to `never`. That is deliberate, not a leftover:
-`biome.json` sets `formatter.enabled: false`, so Biome lints here and Prettier formats. Turning
-Biome's formatter on in the editor would reformat files against the repository's own
-configuration — and `pnpm format` is in no gate, so nothing would catch it.
+Both the workspace file and `.vscode/settings.json` bind Prettier as the formatter — for
+`json` and `jsonc` too — and set Biome's `codeActionsOnSave` entries to `never`. That is
+deliberate, not a leftover: `biome.json` sets `formatter.enabled: false`, so Biome lints here
+and Prettier formats. Turning Biome's formatter on in the editor would reformat files against
+the repository's own configuration — and `pnpm format` is in no gate, so nothing would catch
+it.
+
+The JSON bindings pointed at VS Code's built-in formatter until `.prettierrc.yaml` was added.
+That made format-on-save and `pnpm format` disagree on every `.json` file: VS Code keeps a
+short object on one line, Prettier expands it once it passes 80 columns, so `.vscode/tasks.json`
+flipped back and forth depending on which one ran last. Both now point at Prettier.

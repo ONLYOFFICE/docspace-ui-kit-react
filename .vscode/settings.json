@@ -38,8 +38,12 @@
   "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
   "[javascript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
   "[scss]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
-  "[json]": { "editor.defaultFormatter": "vscode.json-language-features" },
-  "[jsonc]": { "editor.defaultFormatter": "vscode.json-language-features" },
+  // JSON goes to Prettier too. `pnpm format` runs Prettier over .json, so
+  // binding these to VS Code's own formatter made the two disagree -- it keeps
+  // a short object on one line, Prettier expands it past 80 columns -- and
+  // files flipped between saving here and running the script.
+  "[json]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[jsonc]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
 
   // Biome lints, it does not format here.
   "editor.codeActionsOnSave": {

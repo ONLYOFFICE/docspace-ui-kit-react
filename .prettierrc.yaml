@@ -1,0 +1,32 @@
+# Prettier owns formatting here: biome.json sets `formatter.enabled: false`,
+# so Biome lints and Prettier formats. Until this file existed there was no
+# configuration at all, and `pnpm format` fell back to whichever defaults the
+# installed Prettier -- or a developer's own global config -- happened to carry.
+#
+# Every value below is Prettier 3's current default. They are spelled out on
+# purpose: the point is that the repository's style stops depending on a
+# default that a future major version may change, and that the editor
+# extension and `pnpm format` produce byte-identical output on every machine.
+# The first four are the conventions CLAUDE.md already documented.
+
+printWidth: 80
+singleQuote: false
+jsxSingleQuote: false
+trailingComma: "all"
+
+tabWidth: 2
+useTabs: false
+semi: true
+quoteProps: "as-needed"
+bracketSpacing: true
+arrowParens: "always"
+
+# The repository is LF throughout -- no tracked file contains a CR. (CLAUDE.md
+# claimed CRLF; that was inherited from the DocSpace client and was never true
+# here.)
+endOfLine: "lf"
+
+# Markdown is a large part of this repository -- component READMEs, docs/,
+# .claude/rules -- and "always" would reflow every paragraph of prose into a
+# diff that hides the real edits.
+proseWrap: "preserve"

@@ -238,8 +238,11 @@
     "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
     "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
     "[scss]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
-    "[json]": { "editor.defaultFormatter": "vscode.json-language-features" },
-    "[jsonc]": { "editor.defaultFormatter": "vscode.json-language-features" },
+    // JSON goes to Prettier too: `pnpm format` runs Prettier over .json, so
+    // VS Code's own formatter here made the two disagree and files flipped
+    // between saving in the editor and running the script.
+    "[json]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+    "[jsonc]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
     // Biome lints here, it does not format: biome.json sets formatter.enabled
     // to false, and Prettier owns formatting through `pnpm format`.
     "editor.codeActionsOnSave": {

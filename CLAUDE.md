@@ -41,7 +41,12 @@ Path-scoped detail that does not belong here, loaded when the matching files are
 - **Vitest** — unit and component tests
 - **Biome** — linting only. Its **formatter is disabled**
   (`biome.json`: `formatter.enabled: false`); formatting is Prettier, via `pnpm format`,
-  which is **not** in any gate. Files can be Prettier-nonconforming with everything green
+  which is **not** in any gate. Files can be Prettier-nonconforming with everything green —
+  and most still are: the repository has never been formatted, so `pnpm format:fix` rewrites
+  ~725 files. Prettier is configured in `.prettierrc.yaml` (Prettier 3's own defaults, pinned
+  so the editor and the script cannot disagree) and `.prettierignore` holds back
+  `pnpm-lock.yaml` — formatting it produces a lockfile pnpm rejects — and the client-derived
+  `locales/` and `css/`
 - **SCSS Modules** — styling (`*.module.scss` per component); theming via CSS
   custom properties
 - **Lefthook** — git hooks (lint + tests on pre-push)
@@ -185,7 +190,8 @@ applies. Three levels, fastest first:
 - **`ref` as a prop**: React 19, so `ref?: React.Ref<HTMLElement>` in the props type. Do not
   add `forwardRef` to new components; the 20 that still use it are legacy
 - **Accessibility**: WCAG 2.1 AA — `aria-*` attributes, keyboard navigation, focus management
-- **Biome**: 80-char line width, double quotes, trailing commas, CRLF line endings
+- **Formatting**: Prettier (`.prettierrc.yaml`) — 80-char line width, double quotes,
+  trailing commas, 2-space indent, LF. Biome's formatter is off and configures none of this
 - **Tests**: Vitest + React Testing Library, setup in `test/setup.ts`
 - **Stories**: every component must have a story. It may live in a subdirectory rather
   than beside `index.ts` — `table`, `rows` and `tiles` all do — so check recursively
