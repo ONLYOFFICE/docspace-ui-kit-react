@@ -39,8 +39,7 @@ node -e 'const fs=require("fs");const t=JSON.parse(fs.readFileSync(".vscode/task
 - **A task that needs an argument uses an `inputs` prompt**, not a hardcoded value. `Audit |
   scaffold a component` is the only one today.
 - **The button tooltip is where a caveat goes.** Several tasks have one that is not obvious from
-  the label: Storybook needs `pnpm sync-locales` once in a fresh clone (`css/fonts.css` is
-  gitignored), `verify:package` must pack with pnpm, the whole-package token audit reports a
+  the label: `verify:package` must pack with pnpm, the whole-package token audit reports a
   standing backlog rather than anything the current change caused, and the Docker E2E run is the
   only one whose screenshots match CI's rendering.
 

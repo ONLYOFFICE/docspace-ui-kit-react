@@ -29,6 +29,9 @@ test.describe("ModalDialog — light", () => {
 
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
+    // The story starts closed behind a trigger; without the click the shot is
+    // of an empty page with a button.
+    await page.getByRole("button", { name: "Show" }).click();
     await expect(page).toHaveScreenshot("modal-dialog-css-customization.png");
   });
 });
@@ -55,6 +58,7 @@ test.describe("ModalDialog — dark", () => {
   test("css customization dark", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await page.evaluate(() => document.body.classList.add("dark"));
+    await page.getByRole("button", { name: "Show" }).click();
     await expect(page).toHaveScreenshot("modal-dialog-css-customization-dark.png");
   });
 });

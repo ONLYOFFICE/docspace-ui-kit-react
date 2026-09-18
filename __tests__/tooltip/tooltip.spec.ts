@@ -24,6 +24,10 @@ test.describe("Tooltip — light", () => {
 
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
+    // The story only renders the anchor -- react-tooltip mounts the bubble on
+    // hover, so without this the locator below waits for something that never
+    // appears.
+    await page.getByText("Hover to see custom tooltip").hover();
     const tooltip = page.locator(".__react_component_tooltip").first();
     await tooltip.waitFor({ state: "visible" });
     // Compare only the tooltip element to avoid full-page position flakiness
@@ -47,6 +51,7 @@ test.describe("Tooltip — dark", () => {
   test("css customization dark", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await page.evaluate(() => document.body.classList.add("dark"));
+    await page.getByText("Hover to see custom tooltip").hover();
     const tooltip = page.locator(".__react_component_tooltip").first();
     await tooltip.waitFor({ state: "visible" });
     // Compare only the tooltip element to avoid full-page position flakiness

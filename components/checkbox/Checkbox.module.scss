@@ -7,6 +7,8 @@
       --checkbox-fill-color-default: #{variables.$dark-gray-light};
       --checkbox-border-color-default: #{variables.$gray-dark-strong};
       --checkbox-arrow-color-default: #{variables.$white};
+      --checkbox-checked-fill-default: #{variables.$dark-gray-light};
+      --checkbox-checked-arrow-default: #{variables.$white};
       --checkbox-indeterminate-color: #{variables.$white};
       --checkbox-disable-arrow-color: #{variables.$gray-dark-strong};
       --checkbox-disable-border-color: #{variables.$gray-dark-mid};
@@ -29,6 +31,8 @@
   --checkbox-fill-color-default: #{variables.$white};
   --checkbox-border-color-default: #{variables.$gray-strong};
   --checkbox-arrow-color-default: #{variables.$black};
+  --checkbox-checked-fill-default: #{variables.$white};
+  --checkbox-checked-arrow-default: #{variables.$black};
   --checkbox-indeterminate-color: #{variables.$black};
   --checkbox-disable-arrow-color: #{variables.$gray-strong};
   --checkbox-disable-border-color: #{variables.$gray-light-mid};
@@ -71,9 +75,19 @@
     margin-top: -2px;
   }
 
+  // `:has()` carries the specificity of its argument, so this rule is (0,3,1)
+  // against the dark block's (0,2,0) -- it wins in either theme. The fallback
+  // therefore has to be the theme's own checked colour, not a light constant,
+  // or a checked box renders white on a dark portal.
   &:has(input[type="checkbox"]:checked) {
-    --checkbox-fill-color-default: var(--checkbox-fill-color, #{variables.$white});
-    --checkbox-arrow-color-default: var(--checkbox-arrow-color, #{variables.$black});
+    --checkbox-fill-color-default: var(
+      --checkbox-fill-color,
+      var(--checkbox-checked-fill-default)
+    );
+    --checkbox-arrow-color-default: var(
+      --checkbox-arrow-color,
+      var(--checkbox-checked-arrow-default)
+    );
   }
 
   svg {

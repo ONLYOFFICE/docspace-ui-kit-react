@@ -69,8 +69,8 @@ rule is a bug in Hebrew and Arabic portals, and no check reports it.
 
 ## Storybook is the only place the full theme resolves
 
-`.storybook/preview.tsx` mounts `ThemeProviderComponent` and imports `../css/fonts.css` —
-which is **gitignored and produced by `pnpm sync-locales`**. A fresh clone therefore fails
-`pnpm storybook-build` until that has run once. The portal's `theme.scss` is still not loaded,
+`.storybook/preview.tsx` mounts `ThemeProviderComponent` and imports `../css/fonts.css`,
+which is committed (refreshed from a client checkout by `pnpm sync-locales`), so a fresh
+clone renders the real fonts. The portal's `theme.scss` is still not loaded,
 so a story can look correct while relying on a token only the client defines; that is exactly
 the case the `grep` above catches.

@@ -1,0 +1,12 @@
+.git
+node_modules
+dist
+coverage
+storybook-static
+playwright-report
+test-results
+onlyoffice-apps-ui-kit-*.tgz
+.env
+.env.local
+.DS_Store
+.idea

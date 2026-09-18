@@ -95,9 +95,12 @@ locales/en/          — COMMITTED, so the package builds standalone. Other lang
                        gitignored and produced on demand by `pnpm sync-locales`
 index.ts             — Main library entry point
 
-Gitignored, absent from a fresh clone: dist/, css/, fonts/, locales/* except locales/en.
-`pnpm sync-locales` produces css/ and fonts/ — Storybook needs them, the library build
-does not.
+css/fonts.css and fonts/ are COMMITTED as well — Storybook imports the stylesheet and the
+Docker E2E image has no DocSpace beside it. `pnpm sync-locales` refreshes them; the library
+build does not use them.
+
+Gitignored, absent from a fresh clone: dist/, locales/* except locales/en, and the
+Playwright output (playwright-report/, test-results/).
 ```
 
 ## Common Commands
@@ -216,7 +219,7 @@ commit messages. Same rule as the DocSpace client repository.
   **It writes a derived subset** of `Common.json`, not a copy — the keys it finds by
   regex-scanning this package, plus a hardcoded list of five the regexes miss (which is
   why `no-dynamic-i18n-key` matters); `Payments.json` and `Settings.json` are copied
-  whole. The same script also copies `css/fonts.css` and `fonts/` from the client —
-  both are gitignored, so **a fresh clone has no fonts stylesheet and `storybook-build`
-  will fail on it** until `pnpm sync-locales` runs. `copy-images.js` skips under CI —
-  harmless, since `assets/icons/` is committed.
+  whole. The same script also copies `css/fonts.css` and `fonts/` from the client — both
+  are **committed**, like `locales/en` and `assets/icons/`, so Storybook and the Docker
+  E2E image work with no DocSpace anywhere near them; the script only refreshes them.
+  `copy-images.js` skips under CI — harmless, since `assets/icons/` is committed.

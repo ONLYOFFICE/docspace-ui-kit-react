@@ -69,5 +69,5 @@ pnpm tsc && pnpm lint && pnpm test
 node .claude/scripts/plugin-surface/surface.mjs
 ```
 
-Storybook (`pnpm storybook`) is the environment for the visual half; it needs `pnpm sync-locales`
-to have run once in a fresh clone, or it fails on the missing `css/fonts.css`.
+Storybook (`pnpm storybook`) is the environment for the visual half; it runs from a fresh clone
+with no DocSpace checkout — `locales/en`, `assets/icons/` and `css/fonts.css` are all committed.

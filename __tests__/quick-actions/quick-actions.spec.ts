@@ -17,9 +17,11 @@ test.describe("QuickActions -- light", () => {
     await expect(page).toHaveScreenshot("quick-actions-default.png");
   });
 
-  test("collapsible", async ({ page }) => {
-    await gotoStory(page, "collapsible");
-    await expect(page).toHaveScreenshot("quick-actions-collapsible.png");
+  // `collapsible` is gone: 0647ad64 turned the tile grid into a carousel with
+  // floating controls, and the story went with it.
+  test("carousel", async ({ page }) => {
+    await gotoStory(page, "carousel");
+    await expect(page).toHaveScreenshot("quick-actions-carousel.png");
   });
 });
 
@@ -38,9 +40,9 @@ test.describe("QuickActions -- dark", () => {
     await expect(page).toHaveScreenshot("quick-actions-default-dark.png");
   });
 
-  test("collapsible dark", async ({ page }) => {
-    await gotoStory(page, "collapsible");
+  test("carousel dark", async ({ page }) => {
+    await gotoStory(page, "carousel");
     await page.evaluate(() => document.body.classList.add("dark"));
-    await expect(page).toHaveScreenshot("quick-actions-collapsible-dark.png");
+    await expect(page).toHaveScreenshot("quick-actions-carousel-dark.png");
   });
 });

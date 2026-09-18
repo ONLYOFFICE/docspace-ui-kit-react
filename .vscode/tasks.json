@@ -206,6 +206,13 @@
       "command": "cd ${workspaceFolder} ; pnpm run test:e2e:docker:update-screenshots",
       "presentation": { "reveal": "always", "panel": "new", "focus": true }
     },
+    {
+      "label": "E2E | show the last report",
+      "type": "shell",
+      "command": "cd ${workspaceFolder} ; pnpm run test:e2e:report",
+      "isBackground": true,
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false }
+    },
 
     {
       "label": "Sync | locales, fonts and css from a client checkout",

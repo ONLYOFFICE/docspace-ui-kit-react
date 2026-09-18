@@ -859,10 +859,10 @@ This package is developed standalone — clone it and run `pnpm install`. No Doc
 checkout is required for development, Storybook or tests; `locales/en` is committed so
 everything works out of the box.
 
-> The one exception: Storybook needs `css/fonts.css`, which is gitignored and copied
-> from a DocSpace client checkout by `pnpm sync-locales`. Run it once (with
-> `DOCSPACE_CLIENT_ROOT` pointing at your checkout) if `pnpm storybook-build` complains
-> about the missing stylesheet. The same command refreshes the non-English locales.
+> `css/fonts.css` and `fonts/` are vendored here too, for the same reason: Storybook
+> imports the stylesheet, so a fresh clone has to have it. `pnpm sync-locales` (with
+> `DOCSPACE_CLIENT_ROOT` pointing at a DocSpace client checkout) refreshes them along
+> with the non-English locales — run it when the upstream fonts or strings change.
 
 ### Running any of this from VS Code
 
@@ -910,6 +910,37 @@ pnpm test:watch     # watch mode
 pnpm test:coverage  # with coverage report
 pnpm test:ui        # Vitest UI dashboard
 ```
+
+### Visual regression (Playwright)
+
+The specs in [`__tests__/`](__tests__/) drive a Storybook on port 6007 and compare full-page
+screenshots against the baselines committed next to them. They are **not** part of the
+pre-push gate and not run in CI, so they only report what you ask them to.
+
+```bash
+pnpm test:e2e                      # locally: build Storybook, then run the specs
+pnpm test:e2e:ui                   # the interactive Playwright runner
+
+pnpm test:e2e:docker:build         # build the image (once, and after a dependency change)
+pnpm test:e2e:docker:start         # run the suite inside it
+pnpm test:e2e:docker:dev           # same, with the sources mounted from the working tree
+pnpm test:e2e:docker:update-screenshots   # rewrite the baselines -- review every image
+pnpm test:e2e:docker:clear         # drop the image
+```
+
+**Compare screenshots in Docker, not on the host.** Font rendering and browser behaviour
+differ between macOS and Linux, so a baseline taken on the host fails everywhere else. The
+image carries the same fonts and the same pinned Chromium for everyone.
+
+Both the report layout and the reporters match the DocSpace client's packages: `dot` for the
+console, an HTML report and `test-results.json`, all under `playwright-report/`.
+
+```bash
+pnpm test:e2e:report   # serve the last HTML report on port 9330
+```
+
+`WORKERS=1 pnpm test:e2e:docker:start` pins the run to one worker, the way CI runs it —
+worth doing when a spec fails only under parallel load.
 
 ### Build
 

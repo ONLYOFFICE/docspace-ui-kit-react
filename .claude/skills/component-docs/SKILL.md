@@ -61,8 +61,8 @@ npx prettier --check components/<name>
 node .claude/scripts/component-docs/gaps.mjs
 ```
 
-Storybook needs `pnpm sync-locales` to have run once in a fresh clone — `css/fonts.css` is
-gitignored and `storybook-build` fails without it.
+Storybook runs from a fresh clone with no DocSpace checkout: `locales/en`, `assets/icons/`
+and `css/fonts.css` are committed.
 
 ## Scope
 

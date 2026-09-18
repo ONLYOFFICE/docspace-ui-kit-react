@@ -5,16 +5,26 @@ const STORYBOOK_PORT = 6007;
 export default defineConfig({
   testDir: "./__tests__",
   fullyParallel: true,
+  // 30s (the default) is not enough for the first specs of a run: `storybook
+  // dev` serves the port before it has compiled anything, so the earliest
+  // navigations wait on an on-demand build while every worker asks at once.
+  timeout: 60_000,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: Number(process.env.WORKERS) || (process.env.CI ? 1 : undefined),
   reporter: [
     ["dot"],
     [
       "html",
       {
-        outputFolder: "../../playwright-report/ui-kit",
+        outputFolder: "playwright-report",
         open: "never",
+      },
+    ],
+    [
+      "json",
+      {
+        outputFile: "playwright-report/test-results.json",
       },
     ],
   ],
@@ -39,7 +49,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `pnpm run copy-assets && storybook dev --port ${STORYBOOK_PORT} --no-open`,
+    command: `storybook dev --port ${STORYBOOK_PORT} --no-open`,
     port: STORYBOOK_PORT,
     timeout: 1000 * 60 * 5,
     reuseExistingServer: !process.env.CI,

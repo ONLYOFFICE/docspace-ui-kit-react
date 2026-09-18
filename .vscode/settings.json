@@ -3,9 +3,9 @@
   // formatter bindings; these are the ones worth having even when the folder
   // is opened directly rather than through ui-kit.code-workspace.
 
-  // dist/ and storybook-static/ are build output, css/ and fonts/ are produced
-  // by `pnpm sync-locales`, and locales holds vendored translations. Searching
-  // them buries every real hit -- dist alone mirrors the whole source tree.
+  // dist/ and storybook-static/ are build output; css/, fonts/ and locales hold
+  // vendored assets refreshed by `pnpm sync-locales`. Searching them buries
+  // every real hit -- dist alone mirrors the whole source tree.
   "search.exclude": {
     "**/dist": true,
     "**/storybook-static": true,

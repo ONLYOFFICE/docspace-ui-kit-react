@@ -25,47 +25,30 @@ WORKDIR /app
 
 RUN pnpm config set store-dir /root/.local/share/pnpm/store
 
-# Copy package manifests for layer caching
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-COPY common/tests/package-lock.json ./common/tests/package-lock.json
-COPY common/tests/package.json ./common/tests/package.json
-COPY packages/client/package.json ./packages/client/package.json
-COPY packages/client/onlyoffice-docspace-plugin-sdk-*.tgz ./packages/client/
-COPY packages/client/onlyoffice-docspace-sdk-js-*.tgz ./packages/client/
-COPY packages/shared/package.json ./packages/shared/package.json
-COPY libs/ui-kit/package.json ./libs/ui-kit/package.json
-COPY libs/ui-kit/*.tgz ./libs/ui-kit/
+# Manifests first, for layer caching. The ai-chat tarball has to come with
+# them: package.json depends on it as `file:onlyoffice-ai-chat-*.tgz`, so the
+# install fails without it.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY onlyoffice-ai-chat-*.tgz ./
 
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 
 # CI=true is scoped to this one command on purpose. It skips the
-# `lefthook install` in the workspace prepare scripts, which cannot work
-# because the image has no .git. A persistent `ENV CI=true` would be wrong
-# here twice over: it flips Playwright's runtime defaults (retries,
-# workers, forbidOnly) and it makes copy-locales emit empty locale stubs
-# and copy-images skip altogether, so the image would build without assets.
+# `lefthook install` in the prepare script, which cannot work because the
+# image has no .git. A persistent `ENV CI=true` would be wrong here: it flips
+# Playwright's runtime defaults (retries, workers, forbidOnly), which the
+# container is meant to take from the invocation, not from the image.
 RUN CI=true pnpm install --frozen-lockfile
 
 # Install Playwright browsers
 RUN npm uninstall -g playwright playwright-core @playwright/test
-# CI=true only silences the prepare scripts of the dependency check pnpm
-# runs before exec; it does not reach Playwright's own config here.
-RUN cd /app/libs/ui-kit && CI=true pnpm exec playwright install chromium --with-deps
+RUN CI=true pnpm exec playwright install chromium --with-deps
 
-# Copy source code
-COPY common/ ./common/
-COPY packages/client/ ./packages/client/
-COPY packages/shared/ ./packages/shared/
-COPY libs/ui-kit/ ./libs/ui-kit/
-COPY public/ ./public/
+# Copy source code. Everything Storybook needs is committed -- locales/en,
+# assets/icons, css/fonts.css and fonts/ -- so the image builds with no
+# DocSpace checkout anywhere near it. `pnpm sync-locales` is a manual refresh
+# against a client checkout and is deliberately not run here.
+COPY . .
 
-# Copy locales needed by Storybook
-# Deliberately no CI=true here: copy-locales writes empty locale stubs and
-# copy-images exits early when CI is set, which would ship the image
-# without any assets.
-RUN pnpm --filter @onlyoffice/apps-ui-kit run copy-assets
-
-WORKDIR /app/libs/ui-kit
-
-# Build Storybook static for test:ci mode (not needed for local dev mode)
-# RUN pnpm run storybook-build
+# Storybook is started by playwright.config.ts' webServer on port 6007, so the
+# image deliberately ships no storybook-static build.

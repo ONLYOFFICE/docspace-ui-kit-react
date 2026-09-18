@@ -9,11 +9,13 @@ storybook-static
 # `pnpm sync-locales` and stays out of git.
 locales/*
 !locales/en
-css
-fonts
 debug-storybook.log
 .env
 .env.local
 # Pack output. The tarball is a build artifact; it is copied into the
 # DocSpace client repository and committed there, never here.
 onlyoffice-apps-ui-kit-*.tgz
+
+# Playwright output (visual-regression run, see __tests__/ and compose.yaml)
+playwright-report
+test-results

@@ -202,6 +202,11 @@
             "label": "Docker: update screenshots",
             "task": "E2E | Docker: update screenshots",
             "tooltip": "📸 Rewrites the baselines -- review every changed image"
+          },
+          {
+            "label": "Show the last report",
+            "task": "E2E | show the last report",
+            "tooltip": "📸 Serves playwright-report/ on port 9330"
           }
         ]
       },

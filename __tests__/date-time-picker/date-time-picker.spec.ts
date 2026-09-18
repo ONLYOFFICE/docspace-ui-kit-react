@@ -5,6 +5,9 @@ import { type Page, expect, test } from "@playwright/test";
 const STORY_BASE = "ui-interactive-elements-datetimepicker";
 
 async function gotoStory(page: Page, storyId: string) {
+  // The css-customization story renders the current time, so without a frozen
+  // clock the shot differs from its baseline as soon as the minute rolls over.
+  await page.clock.install({ time: new Date("2026-01-15T09:20:00") });
   const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
   await page.goto(url);
   await page.waitForSelector("#storybook-root", { state: "visible" });
