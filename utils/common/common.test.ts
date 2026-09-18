@@ -12,8 +12,8 @@ vi.mock("../i18n", () => ({
   getCommonTranslation: vi.fn((key: string) => {
     const mocks: Record<string, string> = {
       Owner: "Owner",
-      PortalAdmin: "Admin of {{productName}}",
-      ProductName: "DocSpace",
+      PortalAdmin: "Full admin",
+      ProductName: "ONLYOFFICE",
       RoomAdmin: "Room Admin",
       User: "User",
       Guest: "Guest",
@@ -29,9 +29,7 @@ describe("Common Utilities", () => {
     });
 
     it("translates Admin with product name", () => {
-      expect(getUserTypeTranslation(EmployeeType.Admin)).toBe(
-        "Admin of DocSpace",
-      );
+      expect(getUserTypeTranslation(EmployeeType.Admin)).toBe("Full admin");
     });
 
     it("translates RoomAdmin", () => {
@@ -68,14 +66,12 @@ describe("Common Utilities", () => {
     it("handles parameters in translation", () => {
       const spy = vi.spyOn(i18n, "getCommonTranslation");
       spy.mockImplementation((key) => {
-        if (key === "PortalAdmin") return "Administrator of {{productName}}";
+        if (key === "PortalAdmin") return "Full admin";
         return key;
       });
 
       // productName comes from getBrandName("ProductName") which returns "DocSpace"
-      expect(getUserTypeTranslation(EmployeeType.Admin)).toBe(
-        "Administrator of DocSpace",
-      );
+      expect(getUserTypeTranslation(EmployeeType.Admin)).toBe("Full admin");
       spy.mockRestore();
     });
   });

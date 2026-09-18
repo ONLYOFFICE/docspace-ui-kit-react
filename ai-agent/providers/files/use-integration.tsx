@@ -81,7 +81,7 @@ export const useFilesIntegration = ({
         id: "add-files-from-product",
         text: t("Common:AddFilesFromProduct", {
           productName: getBrandName("ProductName"),
-          defaultValue: "Add files from {{productName}}",
+          defaultValue: "Add files from ONLYOFFICE",
         }),
         icon: <CatalogDocuments className={styles.composerActionIcon} />,
         onClick: () => setPickerVisible(true),
