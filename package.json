@@ -15,7 +15,7 @@
     "sync-assets": "pnpm run sync-locales && pnpm run sync-images",
     "build": "pnpm run clean && rollup -c && tsc -p tsconfig.build.json && node scripts/normalize-types.mjs && node scripts/finalize-dist.mjs && node scripts/order-styles.mjs && node scripts/check-dist.mjs",
     "build:watch": "rollup -c -w",
-    "clean": "rm -rf dist",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
     "storybook": "storybook dev -p 6006",
     "storybook-build": "storybook build",
     "storybook-serve": "serve storybook-static -p 6006",

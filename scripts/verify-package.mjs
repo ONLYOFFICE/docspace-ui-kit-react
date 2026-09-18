@@ -32,6 +32,19 @@ const run = (cmd, args, opts = {}) =>
     ...opts,
   });
 
+// Without dist/ this still packs, and publint then reports six missing entry
+// points -- which reads as a broken `exports`/`publishConfig` rather than as
+// "the build never ran". Say which it is.
+const DIST_DIR = path.join(PKG_DIR, "dist");
+
+if (!fs.existsSync(DIST_DIR)) {
+  console.error(
+    `${path.relative(PKG_DIR, DIST_DIR) || "dist"} does not exist, so there is ` +
+      "nothing to verify. Run `pnpm build` first.",
+  );
+  process.exit(1);
+}
+
 const outDir = fs.mkdtempSync(path.join(os.tmpdir(), "ui-kit-verify-"));
 
 try {

@@ -798,17 +798,22 @@ type TTranslations = Map<
 
 #### 1. Import locale files
 
-The library ships with locale files for 32 languages under `@onlyoffice/apps-ui-kit/locales/`:
+**The package ships English only** -- `Common.json`, `Payments.json` and
+`Settings.json` under `@onlyoffice/apps-ui-kit/locales/en/`. Only `locales/en`
+is committed (see `.gitignore`), and `pnpm pack` ships what is on disk, so a
+publish from a clean checkout carries English and nothing else:
 
 ```typescript
 import enCommon from "@onlyoffice/apps-ui-kit/locales/en/Common.json";
-import ruCommon from "@onlyoffice/apps-ui-kit/locales/ru/Common.json";
-import deCommon from "@onlyoffice/apps-ui-kit/locales/de/Common.json";
-import frCommon from "@onlyoffice/apps-ui-kit/locales/fr/Common.json";
-// ... add as many languages as you need
 ```
 
-Available locales: `ar-SA`, `az`, `bg`, `cs`, `de`, `el-GR`, `en`, `es`, `fi`, `fr`, `hy-AM`, `it`, `ja-JP`, `ko-KR`, `lo-LA`, `lv`, `nl`, `pl`, `pt`, `pt-BR`, `ro`, `ru`, `si`, `sk`, `sl`, `sq-AL`, `sr-Cyrl-RS`, `sr-Latn-RS`, `tr`, `uk-UA`, `vi`, `zh-CN`.
+Every other language comes from the host application. The portal apps build
+their `translations` map from their own `public/locales`, and any consumer does
+the same with its own resources; the kit's components read whatever
+`TranslationProvider` is given. The 32 languages the portal carries can be
+refreshed into a local checkout with `pnpm sync-locales`, which copies them
+from a DocSpace-client checkout for Storybook and manual checks -- they are not
+committed and not published.
 
 #### 2. Build the translations map
 

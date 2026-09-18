@@ -94,7 +94,10 @@ for (const lang of langs) {
   const all = JSON.parse(fs.readFileSync(src, "utf-8"));
   const filtered = {};
 
-  for (const key of USED_KEYS) {
+  // Sorted, so a second run over an unchanged client produces no diff: the
+  // keys arrive in whatever order the source scan found them, which shifts
+  // whenever a component moves.
+  for (const key of [...USED_KEYS].sort((a, b) => a.localeCompare(b))) {
     if (key in all) {
       filtered[key] = all[key];
     }

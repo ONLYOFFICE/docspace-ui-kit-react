@@ -78,9 +78,9 @@ jobs:
       - name: Verify the package (publint + attw)
         run: pnpm verify:package
 
-      # locales/ is vendored and committed, and `pnpm build` no longer runs
-      # the copy scripts, so what this prints is what a publish would ship --
-      # translations included. `pnpm sync-locales` is a manual refresh from a
-      # DocSpace checkout and never runs here.
+      # What this prints is what a publish would ship. Only `locales/en` is
+      # committed, so that means English: `pnpm sync-locales` is a manual
+      # refresh from a DocSpace-client checkout for local use and never runs
+      # here, and `pnpm build` no longer runs the copy scripts either.
       - name: Show what would be published
         run: pnpm pack --dry-run

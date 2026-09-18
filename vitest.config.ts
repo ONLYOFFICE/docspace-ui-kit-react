@@ -45,6 +45,7 @@ export default defineConfig({
       "context/**/*.test.{ts,tsx}",
       "providers/**/*.test.{ts,tsx}",
       "hooks/**/*.test.{ts,tsx}",
+      "scripts/**/*.test.{ts,mjs}",
     ],
     css: {
       modules: {

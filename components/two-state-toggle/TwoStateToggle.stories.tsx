@@ -49,7 +49,8 @@ import { HomeViewToggle } from "@onlyoffice/apps-ui-kit/components/home-view-tog
     },
     labelOld: {
       control: "text",
-      description: "Label for the classic ONLYOFFICE Apps view (left side of pill)",
+      description:
+        "Label for the classic ONLYOFFICE Apps view (left side of pill)",
       table: { defaultValue: { summary: "OLD" } },
     },
     labelNew: {

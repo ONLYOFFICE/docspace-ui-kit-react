@@ -17,3 +17,21 @@ pre-push:
       run: pnpm test
       skip_empty: true
       follow: true
+    # The gate used to stop at tsc, lint and test, which left the packaging
+    # steps to CI -- and CI is Linux only. Two Windows-only breakages shipped
+    # through that gap at once: `clean` called `rm -rf`, and the per-module-css
+    # plugin keyed its map by a raw module id. Both fail in `build`, so build
+    # here, where the developer's own platform is the one being tested. Adds
+    # about 30 seconds.
+    build:
+      run: pnpm build
+      skip_empty: true
+      follow: true
+    verify-package:
+      run: pnpm verify:package
+      skip_empty: true
+      follow: true
+    format:
+      run: pnpm format
+      skip_empty: true
+      follow: true

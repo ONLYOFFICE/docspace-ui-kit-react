@@ -10,7 +10,7 @@ aligns with the DocSpace 4.0 line rather than continuing the old numbering.
 Everything under _Changed_ is breaking for a consumer that previously resolved the source
 tree.
 
-## Changed
+### Changed
 
 - **Renamed** from `@docspace/ui-kit` to `@onlyoffice/apps-ui-kit`
 - **ESM only.** The published manifest declares `type: module`; the build emits
@@ -42,7 +42,7 @@ tree.
 - Licence declaration moved out of the source files: the package is still AGPL-3.0-only,
   declared in `package.json`, `LICENSE` and the README, with no per-file headers
 
-## Added
+### Added
 
 - `locales/en` is committed, so the package builds, tests and runs Storybook with no
   DocSpace checkout beside it. The other languages are refreshed on demand with
@@ -63,14 +63,14 @@ tree.
 - `ui-kit.code-workspace` and `.vscode/` — tasks for the build, the checks, Storybook, the
   E2E suite and the audit scripts, behind grouped status-bar buttons
 
-## Removed
+### Removed
 
 - `react-virtualized-auto-sizer` and `@babel/runtime` — neither is imported, and the build
   does not miss them
 - The monorepo paths, aliases and submodule wiring the package carried while it lived
   inside the client
 
-## Fixed
+### Fixed
 
 - `ImageEditor` no longer crashes on render
 - Built icons keep their `viewBox`
@@ -82,7 +82,7 @@ tree.
   instance
 - `pnpm build` no longer needs a DocSpace checkout
 
-## Known issues
+### Known issues
 
 - **`axios` is not portal-only.** `docs/public-api.md` says it is; the root barrel reaches
   it through `uploader` and `billing`, both of which are exported from `index.ts`. Since

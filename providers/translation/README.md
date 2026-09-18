@@ -40,12 +40,14 @@ Translation files live in `locales/<lang>/Common.json`. Import the ones you need
 // Single language
 import enCommon from "@onlyoffice/apps-ui-kit/locales/en/Common.json";
 
-// Multiple languages
-import frCommon from "@onlyoffice/apps-ui-kit/locales/fr/Common.json";
-import deCommon from "@onlyoffice/apps-ui-kit/locales/de/Common.json";
+// Other languages come from your own resources
+import frCommon from "./locales/fr/Common.json";
+import deCommon from "./locales/de/Common.json";
 ```
 
-Available locales: `ar-SA`, `az`, `bg`, `cs`, `de`, `el-GR`, `en`, `es`, `fi`, `fr`, `hy-AM`, `it`, `ja-JP`, `ko-KR`, `lo-LA`, `lv`, `nl`, `pl`, `pt`, `pt-BR`, `ro`, `ru`, `si`, `sk`, `sl`, `sq-AL`, `sr-Cyrl-RS`, `sr-Latn-RS`, `tr`, `uk-UA`, `vi`, `zh-CN`.
+The package ships `locales/en` and nothing else. Every other language is the
+host application's to supply -- the provider takes whatever map it is given,
+so the keys are what has to match, not the file's origin.
 
 ### Step 2 — Import the `TTranslations` type
 
@@ -89,7 +91,7 @@ import type { TTranslations } from "@onlyoffice/apps-ui-kit/providers/translatio
 import { useTranslation } from "react-i18next";
 
 import enCommon from "@onlyoffice/apps-ui-kit/locales/en/Common.json";
-import frCommon from "@onlyoffice/apps-ui-kit/locales/fr/Common.json";
+import frCommon from "./locales/fr/Common.json"; // your own resources: the package ships English only
 
 const translations: TTranslations = new Map([
   ["en", new Map([["Common", enCommon]])],

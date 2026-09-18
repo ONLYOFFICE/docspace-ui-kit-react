@@ -164,7 +164,8 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Default story using a live ONLYOFFICE Apps API to load agent rooms.",
+        story:
+          "Default story using a live ONLYOFFICE Apps API to load agent rooms.",
       },
       source: {
         code: `<AIAgentSelector

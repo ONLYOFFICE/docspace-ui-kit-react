@@ -49,11 +49,23 @@ const MARKER_IMPORT_RE = /^import\s+(["'])per-module-css:([^"']+)\1;?\n?/gm;
 
 const ROOT = path.resolve(".");
 
-/** Where a stylesheet's CSS is emitted: <path relative to the root>/index.css, mirroring the module layout. */
-const cssFileFor = (id) =>
-  `${path.relative(ROOT, id).split(path.sep).join("/")}/index.css`;
+// Module ids reach this plugin with the platform's separator, so on Windows
+// they carry backslashes -- and a backslash is the one character that does not
+// survive the round trip through the marker import. `JSON.stringify` doubles
+// it on the way into the chunk, the regexp above reads the doubled form back,
+// and the map lookup misses every time: the build failed with "imports a
+// stylesheet that was never compiled" for the first module it reached. POSIX
+// separators are what rollup emits in `fileName` anyway, so normalising here
+// makes the key, the marker and the emitted path the same string everywhere.
+const posixId = (id) => id.replace(/\\/g, "/");
 
-export const perModuleCss = ({ generateScopedName }) => {
+/** Where a stylesheet's CSS is emitted: <path relative to the root>/index.css, mirroring the module layout. */
+const cssFileForRoot = (root, id) =>
+  `${path.posix.relative(posixId(root), id)}/index.css`;
+
+export const perModuleCss = ({ generateScopedName, root = ROOT }) => {
+  const cssFileFor = (id) => cssFileForRoot(root, id);
+
   /** Compiled CSS by module id, filled in `transform`, written in `generateBundle`. */
   const cssById = new Map();
 
@@ -96,11 +108,11 @@ export const perModuleCss = ({ generateScopedName }) => {
         css = result.css;
       }
 
-      cssById.set(id, css);
+      cssById.set(posixId(id), css);
 
       return {
         code:
-          `import ${JSON.stringify(MARKER + id)};\n` +
+          `import ${JSON.stringify(MARKER + posixId(id))};\n` +
           (classes === null
             ? ""
             : `export default ${JSON.stringify(classes)};\n`),
