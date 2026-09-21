@@ -39,7 +39,9 @@
     "test:e2e": "pnpm run storybook-build && pnpm exec playwright test",
     "test:e2e:ui": "pnpm exec playwright test --ui",
     "test:e2e:report": "pnpm exec playwright show-report --port 9330",
-    "verify:package": "node scripts/verify-package.mjs"
+    "verify:package": "node scripts/verify-package.mjs",
+    "readme:props": "node scripts/readme-props.mjs --write",
+    "readme:props:check": "node scripts/readme-props.mjs --check"
   },
   "//peerDependencies": "Only packages this library imports directly. Transitive dependencies of @onlyoffice/ai-chat (the assistant-ui, radix, codemirror, LLM-vendor SDKs and friends) are declared by ai-chat itself as its own peers -- re-declaring them here duplicated a list nothing kept in sync. Everything below is verified imported somewhere under this package root.",
   "peerDependencies": {
