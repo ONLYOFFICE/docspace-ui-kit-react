@@ -1,13 +1,37 @@
 {
   "entry": "index.ts",
   "package": "@onlyoffice/apps-ui-kit",
-  "total": 449,
-  "values": 311,
+  "total": 663,
+  "values": 454,
   "exports": {
+    "ADMIN": {
+      "kind": "variable",
+      "origin": "billing"
+    },
     "AIChatIcon": {
       "kind": "variable",
       "origin": "components/quick-actions",
       "external": "assets (*.react.svg)"
+    },
+    "AI_ENUM": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "AI_PAYWALL_START_AMOUNT": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "AI_SEARCH": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "AI_SEARCH_ENUM": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "AI_TOOLS": {
+      "kind": "variable",
+      "origin": "billing"
     },
     "ASIDE_PADDING_AFTER_LAST_ITEM": {
       "kind": "variable",
@@ -16,6 +40,14 @@
     "AccessRestricted": {
       "kind": "variable",
       "origin": "errors"
+    },
+    "AccessRightSelect": {
+      "kind": "variable",
+      "origin": "components/access-right-select"
+    },
+    "AccessSelectorProps": {
+      "kind": "type",
+      "origin": "components/selector"
     },
     "ActionButton": {
       "kind": "function",
@@ -41,10 +73,22 @@
       "kind": "variable",
       "origin": "hooks/useAnimation"
     },
+    "AppLoader": {
+      "kind": "variable",
+      "origin": "components/app-loader"
+    },
     "ArticleHideMenuIcon": {
       "kind": "variable",
       "origin": "components/nav-menu",
       "external": "assets (*.react.svg)"
+    },
+    "ArticleProfile": {
+      "kind": "variable",
+      "origin": "components/article/sub-components"
+    },
+    "ArticleProfileProps": {
+      "kind": "type",
+      "origin": "components/article"
     },
     "Aside": {
       "kind": "variable",
@@ -90,6 +134,10 @@
       "kind": "enum",
       "origin": "components/avatar"
     },
+    "BACKUP_SERVICE": {
+      "kind": "variable",
+      "origin": "billing"
+    },
     "Backdrop": {
       "kind": "variable",
       "origin": "components/backdrop"
@@ -127,9 +175,29 @@
       "origin": "components/quick-actions",
       "external": "assets (*.react.svg)"
     },
+    "BodyProps": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "BrandLookup": {
+      "kind": "type",
+      "origin": "constants"
+    },
+    "BreadCrumbsLoader": {
+      "kind": "variable",
+      "origin": "components/selector/sub-components/loaders"
+    },
+    "BreadCrumbsProps": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
     "Button": {
       "kind": "variable",
       "origin": "components/button"
+    },
+    "ButtonDelete": {
+      "kind": "variable",
+      "origin": "components/image-editor/ButtonDelete"
     },
     "ButtonKeys": {
       "kind": "enum",
@@ -142,6 +210,10 @@
     "ButtonSize": {
       "kind": "enum",
       "origin": "components/button"
+    },
+    "CHAT_SUPPORTED_FORMATS": {
+      "kind": "variable",
+      "origin": "constants"
     },
     "Calendar": {
       "kind": "variable",
@@ -163,6 +235,10 @@
       "kind": "variable",
       "origin": "components/nav-menu",
       "external": "assets (*.react.svg)"
+    },
+    "CategoryItem": {
+      "kind": "variable",
+      "origin": "components/category-item"
     },
     "ChatReasoningEffort": {
       "kind": "enum",
@@ -192,6 +268,26 @@
       "kind": "interface",
       "origin": "components/collapsible-card"
     },
+    "ColorInput": {
+      "kind": "variable",
+      "origin": "components/color-input"
+    },
+    "ColorPicker": {
+      "kind": "variable",
+      "origin": "components/color-picker"
+    },
+    "ColumnarInfoBar": {
+      "kind": "variable",
+      "origin": "components/columnar-info-bar"
+    },
+    "ColumnarInfoBarColumn": {
+      "kind": "type",
+      "origin": "components/columnar-info-bar"
+    },
+    "ColumnarInfoBarProps": {
+      "kind": "type",
+      "origin": "components/columnar-info-bar"
+    },
     "ComboBox": {
       "kind": "variable",
       "origin": "components/combobox"
@@ -211,6 +307,10 @@
     "ComponentProps": {
       "kind": "type",
       "origin": "components/tooltip"
+    },
+    "ConstLookup": {
+      "kind": "type",
+      "origin": "constants"
     },
     "Consumer": {
       "kind": "variable",
@@ -321,9 +421,41 @@
       "kind": "variable",
       "origin": "constants"
     },
+    "DISK_STORAGE": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "DOCS_CONNECT": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "DOCS_CONNECT_DEVPACK_PRODUCT": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "DOCS_CONNECT_DEVPACK_SERVICE": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "DOCS_CONNECT_PRODUCT": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "DOCS_CONNECT_ROUTE": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "DOCS_CONNECT_SERVICE": {
+      "kind": "variable",
+      "origin": "billing"
+    },
     "Dark": {
       "kind": "variable",
       "origin": "providers/theme/themes"
+    },
+    "Data": {
+      "kind": "type",
+      "origin": "components/selector"
     },
     "DatePicker": {
       "kind": "variable",
@@ -345,6 +477,10 @@
       "kind": "type",
       "origin": "components/date-time-picker"
     },
+    "DateUnit": {
+      "kind": "type",
+      "origin": "utils/date"
+    },
     "DeviceType": {
       "kind": "enum",
       "origin": "enums"
@@ -361,6 +497,10 @@
       "kind": "variable",
       "origin": "components/modal-dialog/sub-components/skeletons"
     },
+    "DiffUnit": {
+      "kind": "type",
+      "origin": "utils/date"
+    },
     "DistributedTaskStatus": {
       "kind": "enum",
       "origin": "enums"
@@ -368,6 +508,10 @@
     "DomHelpers": {
       "kind": "class",
       "origin": "utils/dom-helpers"
+    },
+    "DragAndDrop": {
+      "kind": "other",
+      "origin": "components/drag-and-drop"
     },
     "DropDown": {
       "kind": "variable",
@@ -380,6 +524,14 @@
     "DropDownItemProps": {
       "kind": "type",
       "origin": "components/drop-down-item"
+    },
+    "Dropzone": {
+      "kind": "variable",
+      "origin": "components/dropzone"
+    },
+    "DurationUnit": {
+      "kind": "type",
+      "origin": "utils/date"
     },
     "EBOOK_EXST": {
       "kind": "variable",
@@ -430,6 +582,14 @@
       "kind": "variable",
       "origin": "components/empty-screen-container"
     },
+    "EmptyScreenFormRoomProps": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "EmptyScreenProps": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
     "EmptyView": {
       "kind": "variable",
       "origin": "components/empty-view"
@@ -478,6 +638,14 @@
       "kind": "class",
       "origin": "providers/error-boundary"
     },
+    "ErrorContainer": {
+      "kind": "variable",
+      "origin": "components/error-container"
+    },
+    "ErrorContainerProps": {
+      "kind": "type",
+      "origin": "components/error-container"
+    },
     "ErrorInvalidLink": {
       "kind": "variable",
       "origin": "errors"
@@ -509,6 +677,10 @@
     "FOLDER_FORM_VALIDATION": {
       "kind": "variable",
       "origin": "constants"
+    },
+    "FREE_BACKUP": {
+      "kind": "variable",
+      "origin": "billing"
     },
     "FUNCTION_EMPTY": {
       "kind": "variable",
@@ -563,6 +735,14 @@
       "kind": "enum",
       "origin": "enums"
     },
+    "FloatingButton": {
+      "kind": "variable",
+      "origin": "components/floating-button"
+    },
+    "FloatingButtonIcons": {
+      "kind": "variable",
+      "origin": "components/floating-button"
+    },
     "FolderTile": {
       "kind": "variable",
       "origin": "components/tiles/folder-tile"
@@ -570,6 +750,14 @@
     "FolderType": {
       "kind": "enum",
       "origin": "enums"
+    },
+    "FooterProps": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "FormWrapper": {
+      "kind": "variable",
+      "origin": "components/form-wrapper"
     },
     "GeneratePdfAiIcon": {
       "kind": "variable",
@@ -593,6 +781,10 @@
     "HTML_EXST": {
       "kind": "variable",
       "origin": "constants"
+    },
+    "HeaderProps": {
+      "kind": "type",
+      "origin": "components/selector"
     },
     "HeaderType": {
       "kind": "type",
@@ -646,9 +838,21 @@
       "kind": "enum",
       "origin": "utils/common-icons-style"
     },
+    "ImageEditor": {
+      "kind": "variable",
+      "origin": "components/image-editor"
+    },
     "IndexIconButtons": {
       "kind": "variable",
       "origin": "components/rows/row/sub-components/index-icon-buttons"
+    },
+    "InfiniteLoaderComponent": {
+      "kind": "variable",
+      "origin": "components/infinite-loader"
+    },
+    "InfoBarProps": {
+      "kind": "type",
+      "origin": "components/selector"
     },
     "InputBlock": {
       "kind": "variable",
@@ -657,6 +861,10 @@
     "InputBlockProps": {
       "kind": "type",
       "origin": "components/input-block"
+    },
+    "InputItemProps": {
+      "kind": "type",
+      "origin": "components/selector"
     },
     "InputSize": {
       "kind": "enum",
@@ -673,6 +881,10 @@
     "InterfaceDirectionProvider": {
       "kind": "variable",
       "origin": "context/InterfaceDirectionContext"
+    },
+    "ItemProps": {
+      "kind": "interface",
+      "origin": "components/selector"
     },
     "LANGUAGE": {
       "kind": "variable",
@@ -714,6 +926,14 @@
       "kind": "variable",
       "origin": "components/link"
     },
+    "LinkWithDropDownProps": {
+      "kind": "type",
+      "origin": "components/link-with-dropdown"
+    },
+    "LinkWithDropdown": {
+      "kind": "variable",
+      "origin": "components/link-with-dropdown"
+    },
     "Loader": {
       "kind": "variable",
       "origin": "components/loader"
@@ -722,6 +942,10 @@
       "kind": "enum",
       "origin": "components/loader"
     },
+    "LoaderWrapper": {
+      "kind": "variable",
+      "origin": "components/loader-wrapper"
+    },
     "LoadingButton": {
       "kind": "variable",
       "origin": "components/loading-button"
@@ -729,6 +953,10 @@
     "LoadingButtonProps": {
       "kind": "interface",
       "origin": "components/loading-button"
+    },
+    "MANAGER": {
+      "kind": "variable",
+      "origin": "billing"
     },
     "MAX_INFINITE_LOADER_SHIFT": {
       "kind": "variable",
@@ -745,6 +973,14 @@
     "MCPIconSize": {
       "kind": "enum",
       "origin": "components/mcp-icon"
+    },
+    "MainButton": {
+      "kind": "variable",
+      "origin": "components/main-button"
+    },
+    "MainButtonMobile": {
+      "kind": "variable",
+      "origin": "components/main-button-mobile"
     },
     "MainTariff": {
       "kind": "variable",
@@ -790,6 +1026,14 @@
       "kind": "type",
       "origin": "components/nav-menu"
     },
+    "NewItemDropDownProps": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "NewItemProps": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
     "Nullable": {
       "kind": "type",
       "origin": "types"
@@ -802,9 +1046,25 @@
       "kind": "type",
       "origin": "components/tooltip"
     },
+    "OperationsProgressButton": {
+      "kind": "variable",
+      "origin": "components/operations-progress-button"
+    },
+    "Paging": {
+      "kind": "variable",
+      "origin": "components/paging"
+    },
     "ParseErrorTypes": {
       "kind": "enum",
       "origin": "enums"
+    },
+    "PasswordInput": {
+      "kind": "variable",
+      "origin": "components/password-input"
+    },
+    "PasswordInputHandle": {
+      "kind": "type",
+      "origin": "components/password-input"
     },
     "PathObject": {
       "kind": "type",
@@ -825,6 +1085,14 @@
     "PortalFeaturesLimitations": {
       "kind": "enum",
       "origin": "enums"
+    },
+    "PortalLogo": {
+      "kind": "variable",
+      "origin": "components/portal-logo"
+    },
+    "PortalLogoProps": {
+      "kind": "type",
+      "origin": "components/portal-logo"
     },
     "PortalProps": {
       "kind": "type",
@@ -853,6 +1121,18 @@
     "ProviderType": {
       "kind": "enum",
       "origin": "enums"
+    },
+    "ProvidersProps": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "PublicRoomBar": {
+      "kind": "variable",
+      "origin": "components/public-room-bar"
+    },
+    "QuantityPicker": {
+      "kind": "variable",
+      "origin": "components/quantity-picker"
     },
     "QuickActionItem": {
       "kind": "type",
@@ -891,6 +1171,10 @@
       "origin": "components/quick-actions",
       "external": "assets (*.react.svg)"
     },
+    "ROOM": {
+      "kind": "variable",
+      "origin": "billing"
+    },
     "ROOM_ACTION_KEYS": {
       "kind": "variable",
       "origin": "constants"
@@ -927,6 +1211,10 @@
       "kind": "type",
       "origin": "components/room-icon"
     },
+    "RoomLogo": {
+      "kind": "variable",
+      "origin": "components/room-logo"
+    },
     "RoomLogoCover": {
       "kind": "variable",
       "origin": "components/room-logo-cover-dialog"
@@ -946,6 +1234,10 @@
     "RoomTile": {
       "kind": "variable",
       "origin": "components/tiles/room-tile"
+    },
+    "RoomType": {
+      "kind": "variable",
+      "origin": "components/room-type"
     },
     "RoomsType": {
       "kind": "enum",
@@ -975,6 +1267,10 @@
       "kind": "variable",
       "origin": "components/rows/row-content"
     },
+    "RowLoader": {
+      "kind": "variable",
+      "origin": "components/selector/sub-components/loaders"
+    },
     "RowSkeleton": {
       "kind": "variable",
       "origin": "components/rows/skeletons"
@@ -982,6 +1278,22 @@
     "RowsSkeleton": {
       "kind": "variable",
       "origin": "components/rows/skeletons"
+    },
+    "STORAGE_DEACTIVATION_VISITED": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "STORAGE_ENUM": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "STORAGE_TARIFF_DEACTIVATED": {
+      "kind": "variable",
+      "origin": "billing"
     },
     "SYSTEM_FONT_FAMILY": {
       "kind": "variable",
@@ -1026,6 +1338,22 @@
       "kind": "variable",
       "origin": "components/search-input"
     },
+    "SearchLoader": {
+      "kind": "variable",
+      "origin": "components/selector/sub-components/loaders"
+    },
+    "SearchProps": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "SectionProps": {
+      "kind": "type",
+      "origin": "components/section"
+    },
+    "SelectAllProps": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
     "SelectedItem": {
       "kind": "variable",
       "origin": "components/selected-item"
@@ -1041,6 +1369,18 @@
     "SelectionArea": {
       "kind": "variable",
       "origin": "components/selection-area"
+    },
+    "Selector": {
+      "kind": "variable",
+      "origin": "components/selector"
+    },
+    "SelectorAccessRightsMode": {
+      "kind": "enum",
+      "origin": "components/selector"
+    },
+    "SelectorProps": {
+      "kind": "type",
+      "origin": "components/selector"
     },
     "SeparatorType": {
       "kind": "type",
@@ -1082,6 +1422,14 @@
       "kind": "enum",
       "origin": "enums"
     },
+    "SpecialFolderScope": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TAccessRight": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
     "TAiToolsPrices": {
       "kind": "type",
       "origin": "billing"
@@ -1097,6 +1445,14 @@
     "TAvatarModel": {
       "kind": "type",
       "origin": "components/avatar"
+    },
+    "TBreadCrumb": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TChangeImage": {
+      "kind": "type",
+      "origin": "components/image-editor"
     },
     "TColorScheme": {
       "kind": "type",
@@ -1129,6 +1485,10 @@
     "TDirectionY": {
       "kind": "type",
       "origin": "types"
+    },
+    "TDisplayedItem": {
+      "kind": "type",
+      "origin": "components/selector"
     },
     "TEMPLATE_GALLERY_FORMATS": {
       "kind": "variable",
@@ -1174,6 +1534,26 @@
       "kind": "type",
       "origin": "components/tooltip"
     },
+    "TGroupMenuItem": {
+      "kind": "type",
+      "origin": "components/table"
+    },
+    "THeaderBackButton": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TImage": {
+      "kind": "type",
+      "origin": "components/image-editor"
+    },
+    "TInfoBar": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TInfoBarData": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
     "TInterfaceDirection": {
       "kind": "type",
       "origin": "context/InterfaceDirectionContext"
@@ -1190,6 +1570,14 @@
       "kind": "type",
       "origin": "components/room-icon"
     },
+    "TNavigationItem": {
+      "kind": "type",
+      "origin": "components/navigation"
+    },
+    "TOTAL_SIZE": {
+      "kind": "variable",
+      "origin": "billing"
+    },
     "TOnMobileItemClick": {
       "kind": "type",
       "origin": "components/context-menu"
@@ -1197,6 +1585,10 @@
     "TOnMove": {
       "kind": "type",
       "origin": "components/selection-area"
+    },
+    "TOnSubmit": {
+      "kind": "type",
+      "origin": "components/selector"
     },
     "TOption": {
       "kind": "type",
@@ -1210,6 +1602,10 @@
       "kind": "type",
       "origin": "billing"
     },
+    "TRenderCustomItem": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
     "TRoomLogoParams": {
       "kind": "type",
       "origin": "utils/calculateRoomLogoParams"
@@ -1218,9 +1614,109 @@
       "kind": "type",
       "origin": "types"
     },
+    "TSelectorAccessRights": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorBreadCrumbs": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorCancelButton": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorCheckbox": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorEmptyScreen": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorFooterCheckbox": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorFooterInput": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorHeader": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorInfo": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorInput": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorItem": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorItemFile": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorItemFolder": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorItemGroup": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorItemInput": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorItemMCP": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorItemNew": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorItemRoom": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorItemUser": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorSearch": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorSelectAll": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorSubmitButton": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorTabs": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorWithAside": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
     "TServiceFeatureWithPrice": {
       "kind": "type",
       "origin": "billing"
+    },
+    "TSetPreview": {
+      "kind": "type",
+      "origin": "components/image-editor"
     },
     "TShareRightsType": {
       "kind": "type",
@@ -1238,9 +1734,17 @@
       "kind": "type",
       "origin": "types"
     },
+    "TSvgComponent": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
     "TTabItem": {
       "kind": "type",
       "origin": "components/tabs"
+    },
+    "TTableColumn": {
+      "kind": "type",
+      "origin": "components/table"
     },
     "TTheme": {
       "kind": "type",
@@ -1249,6 +1753,10 @@
     "TThemeProvider": {
       "kind": "type",
       "origin": "providers/theme"
+    },
+    "TTitles": {
+      "kind": "type",
+      "origin": "components/navigation"
     },
     "TTooltipPlace": {
       "kind": "type",
@@ -1285,6 +1793,30 @@
     "TabItem": {
       "kind": "variable",
       "origin": "components/tab-item"
+    },
+    "TableBody": {
+      "kind": "variable",
+      "origin": "components/table/table-body"
+    },
+    "TableCell": {
+      "kind": "variable",
+      "origin": "components/table/sub-components/table-cell"
+    },
+    "TableContainer": {
+      "kind": "variable",
+      "origin": "components/table/table-container"
+    },
+    "TableGroupMenu": {
+      "kind": "variable",
+      "origin": "components/table/table-group-menu"
+    },
+    "TableHeader": {
+      "kind": "variable",
+      "origin": "components/table/table-header"
+    },
+    "TableRow": {
+      "kind": "variable",
+      "origin": "components/table/table-row"
     },
     "Tabs": {
       "kind": "variable",
@@ -1496,6 +2028,10 @@
       "kind": "enum",
       "origin": "enums"
     },
+    "WEB_SEARCH": {
+      "kind": "variable",
+      "origin": "billing"
+    },
     "Wallet": {
       "kind": "variable",
       "origin": "billing/wallet"
@@ -1516,6 +2052,14 @@
       "kind": "interface",
       "origin": "components/tooltip"
     },
+    "YEAR_KEY": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "addToDate": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
     "beautifyJSON": {
       "kind": "function",
       "origin": "components/textarea"
@@ -1532,13 +2076,49 @@
       "kind": "variable",
       "origin": "utils/edge-scrolling"
     },
+    "combineUrl": {
+      "kind": "variable",
+      "origin": "utils/combineUrl"
+    },
+    "convertDuration": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "convertMomentFormatToLuxon": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
     "createChunks": {
       "kind": "variable",
       "origin": "uploader/utils"
     },
+    "createDateTime": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "createDuration": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "dateDiff": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "dateDiffAbs": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "daysInMonth": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
     "delay": {
       "kind": "variable",
       "origin": "utils/pipe"
+    },
+    "deleteCookie": {
+      "kind": "function",
+      "origin": "utils/cookie"
     },
     "desktop": {
       "kind": "variable",
@@ -1548,17 +2128,81 @@
       "kind": "variable",
       "origin": "components/room-icon"
     },
+    "endOf": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "formatDate": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "formatDateLocalized": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "formatWithTimezone": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "fromMillis": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "fromNow": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "fromNowMinus": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "fromNowPlus": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "fromSeconds": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "fromUnixTimestamp": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "getAiModelName": {
+      "kind": "variable",
+      "origin": "utils/ai"
+    },
+    "getAppTimezone": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "getBrandName": {
+      "kind": "function",
+      "origin": "constants"
+    },
+    "getBrowserTimezone": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
     "getCommonTranslation": {
       "kind": "variable",
       "origin": "utils/i18n"
     },
+    "getConstName": {
+      "kind": "function",
+      "origin": "constants"
+    },
     "getCookie": {
-      "kind": "variable",
-      "origin": "utils/i18n"
+      "kind": "function",
+      "origin": "utils/cookie"
     },
     "getCorrectBorderRadius": {
       "kind": "variable",
       "origin": "providers/theme/rtl-utils"
+    },
+    "getCorrectDate": {
+      "kind": "function",
+      "origin": "utils/date"
     },
     "getCorrectFourValuesStyle": {
       "kind": "variable",
@@ -1572,6 +2216,10 @@
       "kind": "variable",
       "origin": "utils/i18n"
     },
+    "getDateValues": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
     "getDirectionByLanguage": {
       "kind": "variable",
       "origin": "providers/theme/rtl-utils"
@@ -1579,6 +2227,14 @@
     "getErrorMessage": {
       "kind": "variable",
       "origin": "utils/getErrorMessage"
+    },
+    "getFilesFromEvent": {
+      "kind": "function",
+      "origin": "utils/getFilesFromEvent"
+    },
+    "getFirstDayOfWeek": {
+      "kind": "function",
+      "origin": "utils/date"
     },
     "getFontFamilyDependingOnLanguage": {
       "kind": "variable",
@@ -1596,6 +2252,22 @@
       "kind": "variable",
       "origin": "utils/common"
     },
+    "getLogoUrl": {
+      "kind": "variable",
+      "origin": "utils/getLogoUrl"
+    },
+    "getMonths": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "getMonthsShort": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "getOAuthToken": {
+      "kind": "function",
+      "origin": "utils/get-oauth-token"
+    },
     "getParts": {
       "kind": "variable",
       "origin": "utils/email"
@@ -1604,9 +2276,25 @@
       "kind": "variable",
       "origin": "components/room-icon"
     },
+    "getServerIcon": {
+      "kind": "variable",
+      "origin": "utils/ai"
+    },
+    "getSystemTheme": {
+      "kind": "variable",
+      "origin": "utils/get-system-theme"
+    },
     "getTextColor": {
       "kind": "variable",
       "origin": "utils/get-text-color"
+    },
+    "getTimezoneOffset": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "getTitleWithoutExtension": {
+      "kind": "variable",
+      "origin": "utils/getTitleWithoutExtension"
     },
     "getTranslationReady": {
       "kind": "variable",
@@ -1624,6 +2312,14 @@
       "kind": "variable",
       "origin": "utils/common"
     },
+    "getWeekdayName": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "getWeekdays": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
     "globalColors": {
       "kind": "variable",
       "origin": "providers/theme/themes"
@@ -1631,6 +2327,38 @@
     "hasOwnProperty": {
       "kind": "variable",
       "origin": "utils/hasOwnProperty"
+    },
+    "humanizeDuration": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "iconSize24": {
+      "kind": "variable",
+      "origin": "utils/image-helpers"
+    },
+    "iconSize32": {
+      "kind": "variable",
+      "origin": "utils/image-helpers"
+    },
+    "iconSize64": {
+      "kind": "variable",
+      "origin": "utils/image-helpers"
+    },
+    "iconSize96": {
+      "kind": "variable",
+      "origin": "utils/image-helpers"
+    },
+    "isAfter": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "isBefore": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "isBetween": {
+      "kind": "function",
+      "origin": "utils/date"
     },
     "isDesktop": {
       "kind": "variable",
@@ -1643,6 +2371,10 @@
     "isEqualEmail": {
       "kind": "variable",
       "origin": "utils/email"
+    },
+    "isFuture": {
+      "kind": "function",
+      "origin": "utils/date"
     },
     "isIconSizeType": {
       "kind": "variable",
@@ -1668,9 +2400,25 @@
       "kind": "variable",
       "origin": "utils/device"
     },
+    "isNextImage": {
+      "kind": "variable",
+      "origin": "utils/typeGuards"
+    },
+    "isPast": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
     "isReliableAndroidViewport": {
       "kind": "variable",
       "origin": "utils/device"
+    },
+    "isSame": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "isSameDay": {
+      "kind": "function",
+      "origin": "utils/date"
     },
     "isTablet": {
       "kind": "variable",
@@ -1680,13 +2428,29 @@
       "kind": "variable",
       "origin": "utils/device"
     },
+    "isValidDate": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
     "isValidDomainName": {
       "kind": "variable",
       "origin": "utils/email"
     },
+    "isValidTimezone": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
     "jsonify": {
       "kind": "function",
       "origin": "components/textarea"
+    },
+    "maxDate": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "minDate": {
+      "kind": "function",
+      "origin": "utils/date"
     },
     "mobile": {
       "kind": "variable",
@@ -1696,6 +2460,10 @@
       "kind": "variable",
       "origin": "utils/device"
     },
+    "now": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
     "omitTooltipProps": {
       "kind": "function",
       "origin": "components/tooltip"
@@ -1703,6 +2471,10 @@
     "onEdgeScrolling": {
       "kind": "variable",
       "origin": "utils/edge-scrolling"
+    },
+    "openingNewTab": {
+      "kind": "variable",
+      "origin": "utils/openingNewTab"
     },
     "parseAddress": {
       "kind": "variable",
@@ -1712,33 +2484,109 @@
       "kind": "variable",
       "origin": "utils/email"
     },
+    "parseISO": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
     "parseLocaleConstants": {
       "kind": "function",
       "origin": "utils/parse-locale-constants"
+    },
+    "parseToDateTime": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "parseWithFormat": {
+      "kind": "function",
+      "origin": "utils/date"
     },
     "pipe": {
       "kind": "variable",
       "origin": "utils/pipe"
     },
+    "presentInArray": {
+      "kind": "variable",
+      "origin": "utils/presentInArray"
+    },
     "runWithConcurrency": {
       "kind": "variable",
       "origin": "uploader/utils"
+    },
+    "setBrandLookup": {
+      "kind": "function",
+      "origin": "constants"
+    },
+    "setConstLookup": {
+      "kind": "function",
+      "origin": "constants"
+    },
+    "setCookie": {
+      "kind": "function",
+      "origin": "utils/cookie"
+    },
+    "setDateValues": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "setDefaultLocale": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "setDefaultTimezone": {
+      "kind": "function",
+      "origin": "utils/date"
     },
     "size": {
       "kind": "variable",
       "origin": "utils/device"
     },
+    "startOf": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
     "stopWhen": {
       "kind": "variable",
       "origin": "utils/pipe"
+    },
+    "subtractFromDate": {
+      "kind": "function",
+      "origin": "utils/date"
     },
     "tablet": {
       "kind": "variable",
       "origin": "utils/device"
     },
+    "toAppTimezone": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "toISOString": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "toJSDate": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "toRelative": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "toTimezone": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
+    "toUnixTimestamp": {
+      "kind": "function",
+      "origin": "utils/date"
+    },
     "toastr": {
       "kind": "variable",
       "origin": "components/toast/sub-components"
+    },
+    "today": {
+      "kind": "function",
+      "origin": "utils/date"
     },
     "transitionalScreenSize": {
       "kind": "variable",
@@ -1767,6 +2615,10 @@
     "useDebounce": {
       "kind": "variable",
       "origin": "hooks/useDebounce"
+    },
+    "useDropzone": {
+      "kind": "variable",
+      "origin": "utils/react-dropzone-interop"
     },
     "useEventListener": {
       "kind": "function",
@@ -1819,6 +2671,10 @@
     "useVirtualKeyboardInset": {
       "kind": "function",
       "origin": "hooks/useVirtualKeyboardInset"
+    },
+    "utc": {
+      "kind": "function",
+      "origin": "utils/date"
     },
     "uuid": {
       "kind": "variable",

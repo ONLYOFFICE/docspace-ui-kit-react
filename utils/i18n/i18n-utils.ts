@@ -1,18 +1,12 @@
 import { default as i18ninstance } from "i18next";
 
-/**
- * Gets a cookie value by name
- */
-export const getCookie = (name: string): string | undefined => {
-  if (typeof document === "undefined") return undefined;
+import { getCookie } from "../cookie";
 
-  const matches = document.cookie.match(
-    new RegExp(
-      `(?:^|; )${name.replace(/([.$?*|{}()[\]\\/+^])/g, "\\$1")}=([^;]*)`,
-    ),
-  );
-  return matches ? decodeURIComponent(matches[1]) : undefined;
-};
+// One implementation of `getCookie`, in utils/cookie. This module used to carry
+// a second, narrower copy; both reached the root barrel, where `export *` drops
+// a name that resolves to two different declarations -- silently removing it
+// from the plugin API. Re-exported here so `utils/i18n` keeps the name.
+export { getCookie };
 
 export type WindowI18n = {
   t?: (key: string, options?: Record<string, string | number>) => string;

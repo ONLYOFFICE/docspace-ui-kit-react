@@ -113,7 +113,16 @@ const preview: Preview = {
         // "Components" holds the portal-coupled composites.
         order: [
           "Getting started",
-          ["Welcome", "Structure", "Translation", "Themes", "API"],
+          [
+            "Welcome",
+            "Structure",
+            "Utils",
+            "Hooks",
+            "Constants",
+            "Translation",
+            "Themes",
+            "API",
+          ],
           "Components",
           [
             "AI Chat",

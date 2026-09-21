@@ -53,6 +53,34 @@ still be breaking. `docs/plugin-surface.json` records that surface name by name;
 | `providers/translation`       | `TranslationProvider`, i18n wiring          |                                                                                                                                                                                                              |
 | `providers/error-boundary`    | `ErrorBoundary`                             |                                                                                                                                                                                                              |
 
+### The barrel was a subset of the folders, and is not any more
+
+Both barrels under-exported for reasons nobody recorded. `components/index.ts` listed 68 of the
+98 folders, leaving `table`, `selector`, `password-input`, `color-picker`, `image-editor`,
+`navigation`, `section`, `article`, `main-button` and 21 more reachable only by subpath — so
+unreachable from a plugin. `utils/index.ts` listed 18 of 35, missing the whole `date` module,
+`combineUrl`, `cookie`, `getLogoUrl`, `openingNewTab`, `presentInArray`, `getOAuthToken`,
+`getSystemTheme` and the `iconSize*` helpers. `constants/index.ts` re-exported none of its
+neighbours (`CHAT_SUPPORTED_FORMATS`, the brand and const lookups), and `billing/index.ts` left
+out its tariff constants.
+
+None of those had a portal dependency, an optional peer or an import of `api`/`selectors`, so
+the gap was an oversight rather than a tiering decision. They are in the barrel now: 449 → 663
+exports, nothing removed. Three modules stayed out deliberately — `utils/socket` (above),
+`utils/interop-default` (a Node CJS/ESM interop shim) and `utils/add-log` (socket logging
+against `window.ClientConfig`). Adding a name to the barrel is permanent in a way removing one
+is not, so plumbing does not go in.
+
+Two things fell out of closing it:
+
+- **`getCookie` existed twice** — `utils/cookie` and `utils/i18n/i18n-utils` — and `export *`
+  drops a name that resolves to two different declarations. Barrelling both would have _removed_
+  `getCookie` from the plugin API with no error anywhere. `utils/i18n` now re-exports the one in
+  `utils/cookie`, which also means i18n honours `?culture` on `/confirm/LinkInvite`.
+- **`Dropzone` collided**: the kit's own `components/dropzone` against the raw `react-dropzone`
+  component that `utils/react-dropzone-interop` wraps. The component keeps the name; the util
+  exports only `useDropzone`.
+
 ### Not public, and why — the two that look like they should be
 
 **`providers/Providers` (the composed root).** It composes ErrorBoundary, TranslationProvider,
@@ -96,8 +124,15 @@ Unresolved; tracked as open question 6.
 `@socket.io/component-emitter` in the whole library, and meaningful only against a DocSpace
 portal's socket server. Keeping it out of the public surface moves both dependencies to
 optional peers rather than removing them: the module still ships (`dist/esm/utils/socket`), and
-it is reachable by subpath, but an external install downloads neither package. Unlike `axios`
-above, nothing in the root barrel reaches it.
+it is reachable by subpath, but an external install downloads neither package.
+
+**It is not, however, out of the barrel's reach, and this document claimed it was.** Tracing
+`dist/esm/index.js` gives `index.js -> billing/wallet -> utils/socket -> socket.io-client`, so
+`socket.io-client` leaks into the core by exactly the route `axios` does — through `billing`.
+Keeping the *names* out of the barrel is not the same as keeping the *module graph* out of it;
+only the tiering decision in open question 6 settles that. The modules reachable from the
+barrel also pull `mobx`, `mobx-react` (`billing/store`) and `react-router`
+(`billing/services`).
 
 ## Portal-internal
 

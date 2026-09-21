@@ -3,6 +3,7 @@ import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import type { StorybookConfig } from "@storybook/react-vite";
 import svgr from "vite-plugin-svgr";
+import remarkGfm from "remark-gfm";
 
 import { aiChatMock } from "./ai-chat-mock.ts";
 
@@ -55,7 +56,18 @@ const config: StorybookConfig = {
   addons: [
     "@storybook/addon-links",
     "@vueless/storybook-dark-mode",
-    "@storybook/addon-docs",
+    {
+      // MDX ships with CommonMark only, so a Markdown table renders as a line
+      // of literal pipes and dashes -- which is what every table in docs/*.mdx
+      // did until this was added. remark-gfm is already in the tree as one of
+      // ai-agent's optional peers, so this costs no new dependency.
+      name: "@storybook/addon-docs",
+      options: {
+        mdxPluginOptions: {
+          mdxCompileOptions: { remarkPlugins: [remarkGfm] },
+        },
+      },
+    },
   ],
 
   framework: {
