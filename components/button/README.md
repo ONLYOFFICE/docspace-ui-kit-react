@@ -280,6 +280,10 @@ Each state colour also has an override: `--button-root-bg`, `--button-root-color
 `--button-root-border` and their `-hover` / `-active` / `-disabled` forms for the secondary
 variant, and the matching `--button-primary-*` set for the primary one.
 
+**There is no destructive variant.** The stylesheet has nothing red: a delete confirmation is
+an ordinary `primary` button, and making it red means setting `--accent-button` on an ancestor
+of that button — not on the dialog, which would recolour its close button too.
+
 ## Accessibility
 
 - Renders a native `<button>`, so Enter and Space activate it and it takes part in tab order
