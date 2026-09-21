@@ -81,10 +81,15 @@ export type ModalSubComponentsProps = AsideHeaderProps & {
   /** Forces body scroll regardless of display type */
   withBodyScrollForcibly?: boolean;
 
+  /** Draws a one-pixel border on the dialog's inline-start edge, where an aside
+   * meets the page. Set `--modal-dialog-aside-border` to recolour it.
+   * @default false */
   withBorder?: boolean;
   /** Test id */
   dataTestId?: string;
 
+  /** Makes the body's scrollbar publish itself through `ScrollbarContext`, so a
+   * descendant can scroll it. Off unless something inside needs that. */
   scrollbarCreateContext?: boolean;
   /** Controls the visibility of the backdrop overlay */
   backdropVisible?: boolean;
