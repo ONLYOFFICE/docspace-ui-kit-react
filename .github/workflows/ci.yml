@@ -40,6 +40,15 @@ jobs:
       - name: Run Tests
         run: pnpm test
 
+      # The full pass: everything the pre-push gate checks, plus type-checking
+      # every ```tsx block in every README. "Copy this and it works" is the one
+      # promise these files make, and this is the only thing that keeps it.
+      - name: Check the READMEs
+        run: pnpm check:readme:full
+
+      - name: Check the generated README blocks
+        run: pnpm readme:props:check && pnpm readme:catalogue:check
+
   package:
     name: "Build & verify the package"
     runs-on: ubuntu-latest

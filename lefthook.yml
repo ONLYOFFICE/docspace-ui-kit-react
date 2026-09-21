@@ -18,6 +18,13 @@ pre-push:
     tsc:
       run: pnpm tsc
       follow: true
+    # Structure and derived truth only; the `--compile` pass that type-checks
+    # every example in every README takes half a minute and runs in CI. Folders
+    # still on the old README format are listed in
+    # `scripts/readme-allowlist.json` and skipped until they are rewritten.
+    check-readme:
+      run: pnpm check:readme && pnpm readme:props:check && pnpm readme:catalogue:check
+      follow: true
     test:
       run: pnpm test
       follow: true
