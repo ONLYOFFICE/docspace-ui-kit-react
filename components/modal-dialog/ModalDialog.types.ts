@@ -58,9 +58,14 @@ export type ModalSubComponentsProps = AsideHeaderProps & {
   containerVisible?: boolean;
   /** Displays double line in footer */
   isDoubleFooterLine?: boolean;
-  /** Sets the displayed dialog to be closed or open */
+  /** Whether the user may close the dialog at all. Every route to `onClose` —
+   * the header's cross, Escape, a backdrop click — runs through one guard, so
+   * `false` stops all three and leaves closing entirely to the caller.
+   * @default true */
   isCloseable?: boolean;
-  /**  Disables closing the modal when the backdrop is clicked */
+  /** Whether a click on the backdrop closes the dialog. Unlike `isCloseable`,
+   * this stops only that one route; the cross and Escape keep working.
+   * @default true */
   closeOnBackdropClick?: boolean;
   /** Enables embedded mode */
   embedded?: boolean;
