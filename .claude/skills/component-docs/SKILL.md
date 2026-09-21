@@ -20,32 +20,49 @@ is missing from a flat listing.
 
 ## Writing a README
 
-Match the existing ones; `components/badge/README.md` is a good short example. Four parts:
+[`README_TEMPLATE.md`](../../../README_TEMPLATE.md) is the contract and
+[`components/button/README.md`](../../../components/button/README.md) is the worked example.
+Read both before starting; what follows is the procedure, not a second description of the
+shape.
 
-1. `# ComponentName`, then one paragraph on **what it is for and when to reach for it** — not
-   a restatement of the props.
-2. `## Usage` with a JSX block importing by subpath:
-   `import { Badge } from "@onlyoffice/apps-ui-kit/components/badge";`. That is how the client
-   imports; the barrel import is the plugin's form and belongs in the plugin skill, not here.
-3. `## Properties` — a table of name, type, default, description. Generate it from
-   `<Name>.types.ts` rather than by hand, and **fix the JSDoc while you are in there** if a prop
-   has none. The table and the JSDoc have to agree; the JSDoc is what reaches consumers.
-4. Anything the types cannot say: a required wrapper, an own margin, an intrinsic-size quirk.
-   This is the part with real value — it is the same material the plugin skill's trap list is
-   made of.
+1. Read `index.ts(x)`, `<Name>.tsx`, `<Name>.types.ts`, `<Name>.enums.ts`, `<Name>.module.scss`,
+   the tests and `sub-components/**`. If the barrel wraps the component, read the wrapper too.
+2. Complete the JSDoc on every own prop, adding `@default` and `@portal` where the template
+   says. A prop without one is an error, not a blank cell.
+3. Write the metadata block. `state.visibility` names the real prop — this kit calls it
+   `visible`, `isVisible`, `isOpen` and `open` in different folders, and the validator checks
+   it against the resolved props.
+4. `pnpm readme:props --write --only components/<name>`. Never type between the markers.
+5. Write the hand sections, including at least three bullets under "Behaviour the types don't
+   state", each traceable to the stylesheet, the source or a test.
+6. `pnpm check:readme:full --only components/<name>` until clean, then remove the folder from
+   `scripts/readme-allowlist.json`.
+
+The section with the real value is the last one: what the types cannot say. An own outer
+margin, a component with no intrinsic size, a callback that receives a value where every
+sibling receives the event. It is the same material the plugin skill's trap list is made of.
 
 Do not invent behaviour. Read the component and its `.module.scss`; where you cannot tell, say
 nothing rather than guessing, and note what you left out.
 
 ## Writing a story
 
-The story is the documentation surface: `parameters.docs.description.component` carries the
-feature list, the accessibility notes and the table of component-level CSS variables. Copy the
-shape from a neighbouring component in the same Storybook section.
+The story shows the component; the README describes it. `parameters.docs.description.component`
+reads the README rather than repeating it:
 
-For a component-level `var(--x, fallback)`, the story's table is the **only** record that the
-knob exists. Grep the `.module.scss` for `var(--` with a fallback and make sure each one has a
-row.
+```ts
+import readme from "./README.md?raw";
+// parameters: { docs: { description: { component: readme } } }
+```
+
+So the docs page a developer opens and the file a coding agent reads are one text. The metadata
+block and the generator markers are HTML comments and render as nothing.
+
+What the story owns is what prose cannot carry: the scenarios, the controls, the
+visual-regression surface. A component-level `var(--x, fallback)` is recorded in the README's
+`## CSS variables` table — grep the `.module.scss` for `var(--` with a fallback and make sure
+each one has a row there, because stories are not published in the package and a consumer never
+sees them.
 
 `theme-provider` is the outstanding case, and it is not a visual component: a story for it shows
 what it does to its subtree — `data-theme` on `<html>`, the resolved `--color-scheme-*`
@@ -56,10 +73,15 @@ need to point at it.
 ## Verify
 
 ```bash
-pnpm storybook                 # the story renders
+pnpm check:readme:full --only components/<name>   # structure, metadata, table, examples
+pnpm storybook                                    # the story renders
 npx prettier --check components/<name>
 node .claude/scripts/component-docs/gaps.mjs
 ```
+
+`check:readme:full` type-checks every ```tsx block in the README, so an example that does not
+compile fails here rather than in a reader's editor. `gaps.mjs` answers a different question —
+which files are missing at all — and the two do not overlap.
 
 Storybook runs from a fresh clone with no DocSpace checkout: `locales/en`, `assets/icons/`
 and `css/fonts.css` are committed.
