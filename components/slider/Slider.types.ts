@@ -1,36 +1,49 @@
 import type { TColorScheme } from "../../context/ThemeContext";
 
 export type SliderProps = {
-  /** Accepts id */
+  /** Applied to the input. */
   id?: string;
 
-  /** Accepts class */
+  /** Applied to the input. */
   className?: string;
-  /** Sets the width of the input thumb */
+  /** Width of the drag handle, as a CSS length. */
   thumbWidth?: string;
-  /** Sets the height of the input thumb */
+  /** Height of the drag handle, as a CSS length. */
   thumbHeight?: string;
-  /** Sets the border width of the input thumb */
+  /** Border width of the drag handle, as a CSS length. */
   thumbBorderWidth?: string;
-  /** Sets the height of the runnableTrack for the input */
+  /** Height of the track the handle runs along, as a CSS length. */
   runnableTrackHeight?: string;
-  /** The change event is triggered when the elelment's value is modified */
+  /**
+   * Called on every move of the handle, with the range input's change event —
+   * `event.target.value` is a string. Required in practice: the input is
+   * controlled, so without this the handle cannot move.
+   */
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  /** Determines min range value */
+  /** Lowest value of the range. */
   min: number;
-  /** Determines max range value */
+  /** Highest value of the range. */
   max: number;
-  /** Specifies the increment/decrement step size */
+  /** How far one step of the handle moves. */
   step?: number;
-  /** Default input value */
+  /** The current value. This is a controlled input; it does not keep its own. */
   value: number;
-  /** Sets the background color of the runnableTrack */
+  /**
+   * Fills the track to the left of the handle. The fill is computed from
+   * `value`, `min` and `max`, and flipped for a right-to-left interface.
+   */
   withPouring?: boolean;
-  /** Disables the input  */
+  /**
+   * Whether the input is disabled, which also greys the handle.
+   * @default false
+   */
   isDisabled?: boolean;
-  /** Accepts css */
+  /** Applied to the input. */
   style?: React.CSSProperties;
-  /** Accepts dataTestId */
+  /**
+   * `data-testid` of the input.
+   * @default "slider"
+   */
   dataTestId?: string;
 };
 
