@@ -717,10 +717,26 @@ export function createReadmeProgram(folders = componentFolders()) {
     const baseProps = describe(base);
     const known = new Set(baseProps.map((prop) => prop.name));
 
+    // "What does the exported component accept beyond this type?" is only a
+    // question when the component accepts this type at all. A marker naming a
+    // satellite -- `TBreadCrumb`, `TSelectorItem`, `HeaderProps` -- resolves a
+    // type the component never takes, and the diff against it is the component's
+    // entire prop list, printed again under every such table.
+    const componentNames = componentProps
+      ? new Set(
+          checker.getPropertiesOfType(componentProps).map((s) => s.getName()),
+        )
+      : null;
+
+    const describesTheComponent =
+      componentNames !== null &&
+      baseProps.length > 0 &&
+      baseProps.every((prop) => componentNames.has(prop.name));
+
     // What the exported wrapper accepts on top of the declared type. Empty for
     // the 92 folders whose index exports the component itself.
     const wrapperProps =
-      declared && componentProps
+      declared && componentProps && describesTheComponent
         ? describe(componentProps).filter((prop) => !known.has(prop.name))
         : [];
 
