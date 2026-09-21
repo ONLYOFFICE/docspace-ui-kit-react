@@ -135,6 +135,22 @@ const preview: Preview = {
           ],
           "UI",
           "Samples",
+          [
+            // The samples are a ladder -- each one builds on the previous --
+            // so they are ordered by hand rather than alphabetically. The
+            // numbers in the titles keep that visible in the sidebar; this
+            // list keeps it true if a title is ever renamed.
+            "01. Buttons and toasts",
+            "02. Sign-in form",
+            "03. Room settings",
+            "04. Dialogs",
+            "05. Selectable file list",
+            "06. Sortable table",
+            "07. Tiles and the view switch",
+            "08. Loading, empty, broken",
+            "09. People picker",
+            "10. A small Files app",
+          ],
         ],
       },
     },

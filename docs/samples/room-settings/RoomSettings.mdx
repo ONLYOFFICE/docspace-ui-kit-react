@@ -1,0 +1,55 @@
+import { Meta, Source, Story } from "@storybook/addon-docs/blocks";
+
+import * as RoomSettingsStories from "./RoomSettings.stories";
+import source from "./RoomSettings.tsx?raw";
+
+<Meta of={RoomSettingsStories} />
+
+# 03. Room settings
+
+Six controls and a footer with an opinion: **Save** is asleep until there is
+something to save, and says so.
+
+<Story of={RoomSettingsStories.Default} />
+
+Move the slider, then press **Cancel** — the screen goes back to the state it
+opened with. Turn off _Delete files automatically_ and the period disappears
+with it, because a setting nobody can act on is noise.
+
+## How the footer knows
+
+Every control here is controlled: value in, handler out. That is what makes the
+dirty check one line rather than six flags —
+
+```tsx
+const isDirty = JSON.stringify(settings) !== JSON.stringify(savedState);
+```
+
+— and it is why _Cancel_ is `setSettings(savedState)` and nothing else.
+
+## The controls
+
+- **`ToggleButton`** for a switch that takes effect on the spot.
+- **`RadioButtonGroup`** for a choice of three, `orientation="vertical"` when
+  the labels deserve a line each.
+- **`ComboBox`** for a closed list. It wants the whole option object as
+  `selectedOption`, not just a key — find it in your own options array, which
+  keeps the label and the value from drifting apart.
+- **`Slider`** with `withPouring`, so the filled part of the track reads as
+  _how much_ at a glance.
+- **`ColorInput`** hands you a hex string; the room's accent is data, not CSS.
+- **`HelpButton` and `FieldContainer`'s `tooltipContent`** — two ways to attach
+  the same explanation. Inside a labelled field, let the container carry it
+  (`inlineHelpButton`); next to plain text, place the button yourself.
+
+Pass `tooltipContent` a React node rather than a string. A string routes
+through the application's single shared tooltip anchor, which a standalone
+screen like this one has not mounted.
+
+## The code
+
+Imports here are relative to this repository. In your application they come
+from the package — `@onlyoffice/apps-ui-kit/components/toggle-button`,
+`@onlyoffice/apps-ui-kit/components/slider`, and so on.
+
+<Source code={source} language="tsx" />

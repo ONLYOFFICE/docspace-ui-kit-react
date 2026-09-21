@@ -1,0 +1,68 @@
+import { Meta, Source, Story } from "@storybook/addon-docs/blocks";
+
+import * as FileTableStories from "./FileTable.stories";
+import source from "./FileTable.tsx?raw";
+
+<Meta of={FileTableStories} />
+
+# 06. Sortable table
+
+The same eight files, in the view people use to compare rather than browse.
+Click **Size** twice. Drag the border between two columns. Then open the gear at
+the end of the header and hide _Author_.
+
+<Story of={FileTableStories.Default} />
+
+Reload the page afterwards: the column widths you dragged are still there. The
+header persists them under `columnStorageName`, which is why that prop is
+required and why it must be unique per table.
+
+## Three mechanisms, only one of them yours
+
+| What | Who does it | How |
+| --- | --- | --- |
+| Sorting | **you** | the column's `onClick` hands you its `sortBy`; the header only draws the arrow from `sortBy` + `sorted` |
+| Resizing | the header | remembered under `columnStorageName` |
+| Hiding columns | the header | behind `showSettings`; each column's `enable` is the state, `onChange` flips it |
+
+So the table never sorts your data behind your back — which is what you want
+the moment the rows come from a server that sorts them for you.
+
+## The parts
+
+```tsx
+<TableContainer forwardedRef={containerRef} useReactWindow={false}>
+  <TableHeader containerRef={containerRef} columns={columns} … />
+  <TableBody itemCount={rows.length} itemHeight={48} … >
+    {rows}
+  </TableBody>
+</TableContainer>
+```
+
+- **`containerRef`** is shared: the container holds it, the header measures
+  against it. Without it the header cannot lay its columns out.
+- **`TableCell` order follows column order.** A hidden column means one cell
+  fewer in every row — which is why this sample renders its cells
+  conditionally, just as the header enables its columns.
+- **`itemHeight`** is what virtual scrolling measures with. Turn
+  `useReactWindow` on, pass `fetchMoreFiles`, and ten thousand rows cost the
+  same as these eight.
+
+## Outside a Section
+
+Two things a screen gets for free from `Section` (the last sample) and has to
+supply itself here:
+
+- **a scroll container with the id `sectionScroll`** — the header is
+  `position: fixed`, and that container is what it pins itself against;
+- **25px of room above the table** — `TableContainer` carries
+  `margin-top: -25px`, expecting the gap the portal's section leaves. Without
+  the spacer the header climbs over whatever sits above it, which is a
+  five-minute mystery the first time you meet it.
+
+## The code
+
+Imports here are relative to this repository. In your application they come
+from the package — `@onlyoffice/apps-ui-kit/components/table`, and so on.
+
+<Source code={source} language="tsx" />

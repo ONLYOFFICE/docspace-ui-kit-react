@@ -33,6 +33,10 @@ const LinkUi: React.FC<LinkProps> = React.memo(
     ariaLabel,
     dataTestId,
     style,
+    // Same as in Text: RowContent reads these off the element to size its
+    // containers, so they must never reach the anchor as attributes.
+    containerWidth: _containerWidth,
+    containerMinWidth: _containerMinWidth,
     ...rest
   }: LinkProps) => {
     const linkClasses = classNames(

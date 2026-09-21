@@ -1,0 +1,78 @@
+import { Meta, Source, Story } from "@storybook/addon-docs/blocks";
+
+import * as ScreenStatesStories from "./ScreenStates.stories";
+import source from "./ScreenStates.tsx?raw";
+
+<Meta of={ScreenStatesStories} />
+
+# 08. Loading, empty, broken
+
+The three screens nobody designs until the demo breaks. Walk the tabs, then
+flip the theme in the toolbar and walk them again.
+
+<Story of={ScreenStatesStories.Default} />
+
+Each state answers a different question, which is why each has its own
+component:
+
+| State | The user is asking | What to render |
+| --- | --- | --- |
+| Loading | is it coming? | `RowsSkeleton` — a skeleton shaped like the answer, not a spinner in the middle of nowhere |
+| Empty | what now? | `EmptyView`, which is a list of ways out |
+| No results | where is it? | `EmptyScreenContainer`, keeping the filter visible |
+| Failed | is it me? | plain words, what was _not_ changed, and two ways out |
+
+## `EmptyView` is a menu, not a message
+
+Its `options` array is typed, and the type of each entry decides how it is
+drawn — so the primary way out looks like a primary button, the secondary ones
+look like actions, and "or" is a real separator:
+
+```tsx
+options={[
+  { key: "upload", type: "button", title: "Upload files", primary: true, onClick },
+  { key: "or",     type: "separator", text: "or" },
+  { key: "create", type: "action", title: "Create a document", icon: <PlusIcon />, onClick },
+]}
+```
+
+An empty screen with no options is a dead end. If you cannot think of an
+action, the screen is probably a _no results_ screen and belongs in the row
+below it.
+
+## The failed state has no illustration
+
+Deliberately. The sleeping-folder drawing says _this room is empty_, which is
+the wrong news for a request that timed out — and reusing it teaches the user
+to distrust it. A failure gets three things instead: what failed, what was
+**not** changed, and the retry. No picture required.
+
+## Illustrations and the dark theme
+
+This is the one place where the theme is a JavaScript concern. CSS custom
+properties cannot repaint an SVG illustration, so the kit ships light/dark
+pairs and you pick between them:
+
+```tsx
+const { isBase } = useTheme();
+
+<EmptyView icon={isBase ? <EmptyRoomsLightSvg /> : <EmptyRoomsDarkSvg />} … />
+```
+
+Everything else on these screens — text, borders, buttons — follows the theme
+without being asked.
+
+## Full-page errors
+
+A failed request inside a screen is an inline state, like the one here. A
+failed _route_ — no access, no such portal, not signed in — is a whole page,
+and the kit ships those separately under `errors/`: `Error401`, `Error403`,
+`Error404`, `ErrorOfflineContainer`, `ErrorUnavailable`, `AccessRestricted`.
+See **Components → Errors**.
+
+## The code
+
+Imports here are relative to this repository. In your application they come
+from the package — `@onlyoffice/apps-ui-kit/components/empty-view`, and so on.
+
+<Source code={source} language="tsx" />
