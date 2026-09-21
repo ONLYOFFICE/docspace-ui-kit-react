@@ -36,6 +36,22 @@ const config: StorybookConfig = {
 
   staticDirs: [{ from: "../assets", to: "/static" }],
 
+  // Opening the manager without a `path` leaves the selection to Storybook,
+  // which lands on the first leaf of the index -- an autodocs page of whatever
+  // sorts first, not the introduction. Pin the entry point to the Welcome page
+  // instead. Only a bare URL is rewritten, so every deep link still resolves,
+  // and the rewrite keeps the current pathname, which is what makes it work
+  // behind the `/storybook/` proxy as well.
+  managerHead: (head) => `${head}
+    <script>
+      (function () {
+        var url = new URL(window.location.href);
+        if (url.searchParams.has("path")) return;
+        url.searchParams.set("path", "/docs/getting-started-welcome--docs");
+        window.location.replace(url.toString());
+      })();
+    </script>`,
+
   addons: [
     "@storybook/addon-links",
     "@vueless/storybook-dark-mode",
