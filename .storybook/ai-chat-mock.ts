@@ -192,10 +192,7 @@ const streamReply = async (
 // and the chat list perform. Anything not listed keeps 404ing on purpose: a
 // silent `{}` for a route this mock has never seen would hide a real
 // integration gap behind a story that looks fine.
-const GET_ROUTES: Record<
-  string,
-  (params: URLSearchParams) => unknown
-> = {
+const GET_ROUTES: Record<string, (params: URLSearchParams) => unknown> = {
   "profiles/list": () => [MOCK_PROFILE],
   "profiles/get-by-id": () => MOCK_PROFILE,
   "profiles/list-models": () => [MOCK_MODEL],
