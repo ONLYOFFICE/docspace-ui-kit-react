@@ -1,9 +1,9 @@
 import { ChangeEvent, KeyboardEvent } from "react";
 
 export type TextareaProps = {
-  /** Class name */
+  /** Applied to the scrollbar around the textarea, not to the textarea itself. */
   className?: string;
-  /** Wrapper class name */
+  /** Applied to the outer wrapper that carries the height and the copy icon. */
   wrapperClassName?: string;
   /** Used as HTML `id` property  */
   id?: string;
@@ -11,11 +11,15 @@ export type TextareaProps = {
   isDisabled?: boolean;
   /** Indicates that the field is displaying read-only content */
   isReadOnly?: boolean;
-  /** Indicates the input field has an error  */
+  /** Draws the field in the error colour. Ignored when `isJSONField` is set:
+   * that mode computes the error state from whether the value parses.
+   * @default false */
   hasError?: boolean;
-  /** Indicates the input field has scale */
+  /** Makes the field 65vh tall instead of the default 89px.
+   * @default false */
   heightScale?: boolean;
-  /** Max value length */
+  /** Maximum number of characters the field accepts. Unlike `TextInput`, which
+   * caps at 255, there is no limit unless you set one. */
   maxLength?: number;
   /** Used as HTML `name` property  */
   name?: string;
@@ -27,41 +31,66 @@ export type TextareaProps = {
   placeholder?: string;
   /** Accepts css style */
   style?: React.CSSProperties;
-  /** Used as HTML `tabindex` property */
+  /** Used as HTML `tabindex` property. The default of `-1` takes the field
+   * **out of the tab order**; pass `0` for a field the user is meant to reach
+   * with the keyboard.
+   * @default -1 */
   tabIndex?: number;
-  /** Textarea value */
+  /** The text. The field is controlled, so pair it with `onChange`.
+   * @default "" */
   value?: string;
-  /** Font-size value */
+  /** Font size in pixels, applied inline to the textarea and to the line
+   * numbers.
+   * @default 13 */
   fontSize?: number;
-  /** Text-area height value */
+  /** Fixed height, as a number of pixels or a CSS length. It wins over the
+   * default height but not over `heightScale` or `isFullHeight`. */
   heightTextArea?: string | number;
-  /** Specifies the text color */
+  /** Colour of the text, applied inline. */
   color?: string;
   /** Default input property */
   autoFocus?: boolean;
-  /** Allows selecting the textarea */
+  /** Selects the whole text whenever this flips to true — for a field the user
+   * is expected to copy from.
+   * @default false */
   areaSelect?: boolean;
-  /** Prettifies Json and adds lines numeration */
+  /** Treats the value as JSON: pretty-prints it, and puts the field in the
+   * error state whenever it does not parse — which overrides `hasError`.
+   * @default false */
   isJSONField?: boolean;
-  /** Indicates the text of toast/informational alarm */
+  /** Text of the toast shown after a successful copy. Without it the copy is
+   * silent. */
   copyInfoText?: string;
-  /** Shows copy icon */
+  /** Shows a copy button in the corner of the field.
+   * @default false */
   enableCopy?: boolean;
-  /** Inserts numeration */
+  /** Renders line numbers down the left edge and indents the text to make room
+   * for them.
+   * @default false */
   hasNumeration?: boolean;
-  /** Calculating height of content depending on number of lines */
+  /** Sizes the field to its content instead of scrolling inside a fixed
+   * height.
+   * @default false */
   isFullHeight?: boolean;
-  /** Calculated height of content depending on number of lines in pixels */
+  /** Ignored. The component computes the full height itself and never reads
+   * this prop. */
   fullHeight?: number;
-  /** Minimum height of the textarea. */
+  /** Ignored. Nothing in the component or its stylesheet reads this prop. */
   minHeight?: string;
 
+  /** Applied to the copy button, alongside the component's own class. */
   classNameCopyIcon?: string;
+  /** Ignored. The indent for the line numbers is computed from the content. */
   paddingLeftProp?: string;
 
+  /** Moves the scrollbar styling from the inner scroller to the outer wrapper,
+   * which is what a chat composer needs.
+   * @default false */
   isChatMode?: boolean;
+  /** Value of `data-testid` on the textarea.
+   * @default "textarea" */
   dataTestId?: string;
 
-  /** Callback function for handling copy action */
+  /** Called with the copied text after the copy button is used. */
   onCopy?: (text: string) => void;
 };

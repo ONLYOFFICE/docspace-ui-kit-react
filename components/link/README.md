@@ -1,50 +1,219 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "Link",
+  "folder": "components/link",
+  "kind": "component",
+  "category": "Navigation",
+  "status": "public",
+  "summary": "Anchor styled to the kit's conventions, for navigation or for an in-place action.",
+  "import": { "subpath": "components/link", "barrel": true, "default": false },
+  "exports": ["Link", "LinkUi", "LinkProps", "LinkType", "LinkTarget"],
+  "providers": ["ThemeProvider"],
+  "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
+  "related": ["button", "link-with-dropdown", "text"],
+  "subComponents": [],
+  "testIds": ["link"]
+} -->
+
 # Link
 
-A link component with 2 types:
+Anchor styled to the kit's conventions, for navigation or for an in-place action. It renders a
+`Text` as an `<a>`, so everything that shapes text — size, weight, truncation — comes from
+there.
 
-1. `page` - simple link which refers to other pages and parts of the current page
-2. `action` - link which usually doesn't have a hyperlink and performs an action on click (open dropdown, filter data, etc.)
+## Use this when / not when
 
-### Usage
+- Use to navigate, and for a low-emphasis action inside a sentence or a table cell.
+- Not for the primary action of a screen or a dialog — that is
+  [`Button`](../button/README.md), which is sized, focusable and labelled for the job.
+- Not for a link that opens a menu: [`LinkWithDropdown`](../link-with-dropdown/README.md).
+- Not for text that does not act — plain [`Text`](../text/README.md) has the same typography
+  without the cursor and the hover underline.
 
-```js
-import {
-  Link,
-  LinkType,
-  LinkTarget,
-} from "@onlyoffice/apps-ui-kit/components/link";
+## Import
+
+```ts
+import { Link, LinkType } from "@onlyoffice/apps-ui-kit/components/link";
 ```
 
-```jsx
-<Link type={LinkType.page} color="black" href="https://github.com" isBold>
-  Bold page link
-</Link>
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
+
+Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme` above it in the tree. It
+supplies the link colour, which otherwise falls back to plain black.
+
+## Minimal example
+
+```tsx
+import { Link } from "@onlyoffice/apps-ui-kit/components/link";
+
+export function RoomLink({ id, name }: { id: string; name: string }) {
+  return <Link href={`/rooms/${id}`}>{name}</Link>;
+}
 ```
 
-### Properties
+## Props
 
-| Props               |      Type       | Required |                                         Values                                          | Default | Description                                                                         |
-| ------------------- | :-------------: | :------: | :-------------------------------------------------------------------------------------: | :-----: | ----------------------------------------------------------------------------------- |
-| `href`              |    `string`     |    -     |                                            -                                            |    -    | Used as HTML `href` property                                                        |
-| `id`                |    `string`     |    -     |                                            -                                            |    -    | Accepts id                                                                          |
-| `isBold`            |    `boolean`    |    -     |                                            -                                            | `false` | Sets font weight to bold                                                            |
-| `isHovered`         |    `boolean`    |    -     |                                            -                                            | `false` | Sets hovered state and link effects                                                 |
-| `isSemitransparent` |    `boolean`    |    -     |                                            -                                            | `false` | Sets css-property 'opacity' to 0.5. Usually applied for users with "pending" status |
-| `isTextOverflow`    |    `boolean`    |    -     |                                            -                                            | `true`  | Activates or deactivates text-overflow CSS property with ellipsis ('...') value     |
-| `noHover`           |    `boolean`    |    -     |                                            -                                            | `false` | Disables hover effect                                                               |
-| `enableUserSelect`  |    `boolean`    |    -     |                                            -                                            | `false` | Enables user selection                                                              |
-| `type`              |   `LinkType`    |    -     |                                    `page`, `action`                                     | `page`  | Sets the link type                                                                  |
-| `target`            |  `LinkTarget`   |    -     |                          `_blank`, `_self`, `_parent`, `_top`                           |    -    | Sets the target attribute                                                           |
-| `label`             |    `string`     |    -     |                                            -                                            |    -    | Label text                                                                          |
-| `textDecoration`    |    `string`     |    -     | `none`, `underline`, `line-through`, `overline`, `underline dotted`, `underline dashed` |    -    | Sets the text decoration style                                                      |
-| `ariaLabel`         |    `string`     |    -     |                                            -                                            |    -    | Accessibility label for the link                                                    |
-| `dataTestId`        |    `string`     |    -     |                                            -                                            |    -    | Data attribute for testing                                                          |
-| `onClick`           |   `function`    |    -     |                                            -                                            |    -    | Callback function triggered when link is clicked. Only for 'action' type            |
-| `rel`               |    `string`     |    -     |                                            -                                            |    -    | Used as HTML `rel` property                                                         |
-| `tabIndex`          |    `number`     |    -     |                                            -                                            |    -    | Used as HTML `tabindex` property                                                    |
-| `title`             |    `string`     |    -     |                                            -                                            |    -    | Used as HTML `title` property                                                       |
-| `color`             |    `string`     |    -     |                                `accent` or any CSS color                                |    -    | CSS color or accent theme color                                                     |
-| `className`         |    `string`     |    -     |                                            -                                            |    -    | Accepts class                                                                       |
-| `style`             | `CSSProperties` |    -     |                                            -                                            |    -    | Accepts css style                                                                   |
+<!-- props:start -->
 
-The Link component also inherits all props from the Text component.
+_Generated by `pnpm readme:props` from `LinkProps` in `Link.types.ts`. Do not edit; edit the JSDoc._
+
+| Prop                | Type                                                                                                | Required | Default         | Description                                                                                                                                                                                                                  |
+| ------------------- | --------------------------------------------------------------------------------------------------- | -------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ariaLabel`         | `string`                                                                                            | no       | –               | Value of `aria-label`. When it is absent the component passes `children` instead, which is the visible text for a string child and an object for a node.                                                                     |
+| `color`             | `string`                                                                                            | no       | –               | Any CSS colour, or the literal `"accent"`, which resolves to the theme's `--accent-main`.                                                                                                                                    |
+| `dataTestId`        | `string`                                                                                            | no       | `"link"`        | Value of `data-testid` on the anchor.                                                                                                                                                                                        |
+| `enableUserSelect`  | `boolean`                                                                                           | no       | `true`          | Whether the label can be selected with the mouse.                                                                                                                                                                            |
+| `href`              | `string`                                                                                            | no       | –               | Used as HTML `href` property                                                                                                                                                                                                 |
+| `id`                | `string`                                                                                            | no       | –               | Accepts id                                                                                                                                                                                                                   |
+| `isBold`            | `boolean`                                                                                           | no       | `false`         | Renders the label at weight 600.                                                                                                                                                                                             |
+| `isHovered`         | `boolean`                                                                                           | no       | `false`         | Paints the link as if the pointer were over it, for a row that highlights its link on hover of the whole row.                                                                                                                |
+| `isSemitransparent` | `boolean`                                                                                           | no       | `false`         | Halves the opacity, the kit's convention for a pending or inactive entity.                                                                                                                                                   |
+| `isTextOverflow`    | `boolean`                                                                                           | no       | `false`         | Constrains the link to the width of its container (`display: inline-block; max-width: 100%`). It does **not** add the ellipsis by itself — that comes from `truncate`, inherited from `Text`. Set both to clip a long label. |
+| `label`             | `string`                                                                                            | no       | –               | Ignored. The component reads its text from `children`; this prop is spread onto the anchor as an unknown attribute and does nothing.                                                                                         |
+| `noHover`           | `boolean`                                                                                           | no       | `false`         | Removes the underline the link grows on hover.                                                                                                                                                                               |
+| `onClick`           | `((e: React.MouseEvent<Element>) => void) & ((e: React.MouseEvent<Element>) => void)`               | no       | –               | Sets a callback function that is triggered when the link is clicked. Only for 'action' type of link                                                                                                                          |
+| `onKeyDown`         | `(e: React.KeyboardEvent<Element>) => void`                                                         | no       | –               | Sets a callback function that is triggered on a key press. An action link carries no href, so it is not activated by Enter on its own - a link that has to work from the keyboard handles the key here and takes a tabIndex. |
+| `rel`               | `string`                                                                                            | no       | –               | Used as HTML `rel` property                                                                                                                                                                                                  |
+| `role`              | `AriaRole`                                                                                          | no       | –               | ARIA role. An anchor with no href has no implicit role at all, so an action link is invisible to assistive technology until it is named one - "button", since it acts rather than navigates.                                 |
+| `tabIndex`          | `number`                                                                                            | no       | –               | Used as HTML `tabindex` property                                                                                                                                                                                             |
+| `target`            | `LinkTarget`                                                                                        | no       | –               | Sets the target attribute                                                                                                                                                                                                    |
+| `textDecoration`    | `"line-through" \| "none" \| "overline" \| "underline dashed" \| "underline dotted" \| "underline"` | no       | –               | Sets the text decoration style                                                                                                                                                                                               |
+| `title`             | `string`                                                                                            | no       | –               | Tooltip text. Consumed by the `withTooltip` wrapper the folder exports, so it becomes the tooltip's content and never reaches the DOM as a `title` attribute.                                                                |
+| `type`              | `LinkType`                                                                                          | no       | `LinkType.page` | `page` for navigation, `action` for a link that runs code. An action link carries no `href`, which has consequences for the keyboard — see `role` and `onKeyDown`.                                                           |
+
+#### Inherited from `TextProps`
+
+Declared by [`components/text`](../../components/text/README.md) and accepted here too.
+
+| Prop                | Type                                            | Required | Default | Description                                               |
+| ------------------- | ----------------------------------------------- | -------- | ------- | --------------------------------------------------------- |
+| `as`                | `ElementType<any, keyof JSX.IntrinsicElements>` | no       | –       | Sets the tag through which the component is rendered      |
+| `backgroundColor`   | `string`                                        | no       | –       | Sets background color                                     |
+| `children`          | `ReactNode`                                     | no       | –       | Child elements                                            |
+| `className`         | `string`                                        | no       | –       | Sets the class name                                       |
+| `containerMinWidth` | `string`                                        | no       | –       | Used in container component                               |
+| `containerWidth`    | `string`                                        | no       | –       | Used in container component                               |
+| `dir`               | `"auto" \| "ltr" \| "rtl"`                      | no       | –       | Text direction                                            |
+| `display`           | `string`                                        | no       | –       | Sets the 'display' property                               |
+| `fontSize`          | `string`                                        | no       | –       | Sets the font size                                        |
+| `fontWeight`        | `number \| string`                              | no       | –       | Sets the font weight                                      |
+| `htmlFor`           | `string`                                        | no       | –       | For label association                                     |
+| `isInline`          | `boolean`                                       | no       | –       | Sets the 'display: inline-block' property                 |
+| `isItalic`          | `boolean`                                       | no       | –       | Sets the font style to italic                             |
+| `lineHeight`        | `string`                                        | no       | –       | Sets the line height                                      |
+| `noSelect`          | `boolean`                                       | no       | –       | Disables text selection                                   |
+| `ref`               | `RefObject<HTMLDivElement \| null>`             | no       | –       | Ref to access the DOM element or React component instance |
+| `style`             | `CSSProperties`                                 | no       | –       | Additional inline styles                                  |
+| `tag`               | `string`                                        | no       | –       | Accepts the tag id                                        |
+| `textAlign`         | `"center" \| "justify" \| "left" \| "right"`    | no       | –       | Sets the 'text-align' property                            |
+| `truncate`          | `boolean`                                       | no       | –       | Disables word wrapping                                    |
+| `view`              | `string`                                        | no       | –       | Visual style variant                                      |
+
+#### Added by the wrapper the folder exports
+
+The `index` module exports a wrapped component, so these are accepted on top of the props above.
+
+| Prop                  | Type                | Required | Default | Description                                                                                                                                                                                       |
+| --------------------- | ------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onMouseEnter`        | `MouseEventHandler` | no       | –       | Called in addition to the handler that opens the tooltip, after it.                                                                                                                               |
+| `onMouseLeave`        | `MouseEventHandler` | no       | –       | Called in addition to the handler that closes the tooltip, after it.                                                                                                                              |
+| `onMouseMove`         | `MouseEventHandler` | no       | –       | Passed through only while the element has no tooltip. Once one is active the wrapper's own handler replaces it and this is dropped.                                                               |
+| `tooltipContent`      | `ReactNode`         | no       | –       | Tooltip content, used instead of `title` when both are set. Only a string produces a tooltip: the wrapper needs text for the anchor, so any other node leaves the element with no tooltip at all. |
+| `tooltipFitToContent` | `boolean`           | no       | –       | Ignored. Nothing reads this prop.                                                                                                                                                                 |
+| `tooltipPlace`        | `TTooltipPlace`     | no       | –       | Ignored. Nothing reads this prop; the tooltip's placement comes from the `Tooltip` the anchor resolves to.                                                                                        |
+
+<!-- props:end -->
+
+## Recipes
+
+### An action link
+
+An action link has no `href`, and an anchor without one is neither focusable nor announced as
+anything. Give it a role, a tab stop and a key handler, or use a `Button`.
+
+```tsx
+import { Link, LinkType } from "@onlyoffice/apps-ui-kit/components/link";
+
+export function ResendInvite({ resend }: { resend: () => void }) {
+  return (
+    <Link
+      type={LinkType.action}
+      role="button"
+      tabIndex={0}
+      onClick={() => resend()}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") resend();
+      }}
+    >
+      Resend the invitation
+    </Link>
+  );
+}
+```
+
+### A long label in a narrow column
+
+```tsx
+import { Link } from "@onlyoffice/apps-ui-kit/components/link";
+
+export function FileLink({ href, name }: { href: string; name: string }) {
+  return (
+    <div style={{ width: 200 }}>
+      <Link href={href} isTextOverflow truncate title={name}>
+        {name}
+      </Link>
+    </div>
+  );
+}
+```
+
+## Behaviour the types don't state
+
+- **`isTextOverflow` does not produce an ellipsis.** It only sets
+  `display: inline-block; max-width: 100%`, which gives the label a width to be clipped
+  against. The clipping itself comes from `truncate`, inherited from `Text`. One without the
+  other does nothing visible.
+- **`title` never reaches the DOM.** The folder exports `withTooltip(Link)`, and the wrapper
+  consumes `title` as the tooltip's text. Only a string produces a tooltip.
+- **An action link is not keyboard-operable by itself.** With `type={LinkType.action}` there is
+  no `href`, so the anchor has no implicit role, no tab stop and no Enter activation. The
+  recipe above adds all three.
+- `aria-label` falls back to `children` when `ariaLabel` is absent. For a string child that is
+  the visible text; for a node it is an object, which is not a useful label.
+- `label` is accepted and never read. The text is `children`; `label` is spread onto the
+  anchor as an unknown attribute.
+- `enableUserSelect` defaults to **true**, so the label is selectable unless you turn it off —
+  the opposite of most controls in this kit.
+- The component is memoised with a deep comparison rather than React's shallow one, so a new
+  object or handler on every render does not re-render it.
+
+## CSS variables
+
+| Variable            | Default    | Effect              |
+| ------------------- | ---------- | ------------------- |
+| `--link-text-color` | theme text | Colour of the label |
+
+The other `--link-*` names in the stylesheet — the line height, the text decoration, the
+display mode — are assigned on the component's own element, so a value set on an ancestor is
+overridden. Use `color`, `textDecoration` and `isTextOverflow` instead.
+
+## Accessibility
+
+- With `href` it is an ordinary anchor: focusable, activated by Enter, announced as a link.
+- With `type={LinkType.action}` and no `href` it is none of those things until you pass `role`,
+  `tabIndex` and `onKeyDown`. This is the component's sharpest edge.
+- `aria-label` is set from `ariaLabel`, or from `children` as a fallback.
+- The hover state is an underline; nothing distinguishes focus from hover, so a focus ring of
+  your own is worth adding where a link is the only control in a row.
+
+## Test ids
+
+| Element    | `data-testid`                         |
+| ---------- | ------------------------------------- |
+| The anchor | `link`, overridable with `dataTestId` |
+
+## Related
+
+- [`Button`](../button/README.md) — for an action with emphasis, focus and a real button role.
+- [`LinkWithDropdown`](../link-with-dropdown/README.md) — for a link that opens a menu.
+- [`Text`](../text/README.md) — the typography this component is built on.
