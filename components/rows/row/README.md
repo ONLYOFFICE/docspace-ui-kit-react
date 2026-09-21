@@ -1,76 +1,227 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "Row",
+  "folder": "components/rows/row",
+  "kind": "sub-component",
+  "parent": "Rows",
+  "category": "Data display",
+  "status": "public",
+  "summary": "One row of the file list: an optional checkbox, a start element, the content and a context menu.",
+  "import": { "subpath": "components/rows/row", "barrel": false, "default": false },
+  "exports": ["Row"],
+  "providers": ["ThemeProvider", "TranslationProvider"],
+  "state": { "visibility": null, "close": "rowContextClose", "loading": "inProgress", "disabled": "isDisabled" },
+  "related": ["rows", "rows/row-content", "context-menu"],
+  "subComponents": [],
+  "testIds": ["row"]
+} -->
+
 # Row
 
-Displays a single line of structured content with an optional checkbox, leading element, extra content area, context menu and badges.
+One row of the file list: an optional checkbox, a start element, the content and a context
+menu. Which parts appear is decided by which props you pass at all, not by their values.
+
+## Use this when / not when
+
+- Use inside a [`RowContainer`](../row-container/README.md), with a
+  [`RowContent`](../row-content/README.md) as its child — the shape the portal's file list is
+  made of.
+- Not as a generic list row. It reads `item` off its child's props to build its context menu's
+  header, and it renders a right-click menu whether or not you want one.
+- Not for tabular data the user sorts: [`Table`](../../table/README.md).
+- Not for a clickable card or a menu entry —
+  [`DropDownItem`](../../drop-down-item/README.md) or markup of your own is smaller and says
+  what it is.
 
 ## Import
 
 ```ts
-import { Row } from "@onlyoffice/apps-ui-kit/components/rows";
+import { Row } from "@onlyoffice/apps-ui-kit/components/rows/row";
 ```
 
-## Usage
+The folder itself is not listed in `components/index.ts`, but its parent is, so the name also
+arrives through `@onlyoffice/apps-ui-kit/components/rows` and through the package's own entry
+point.
+
+`RowProps` is **not** exported — type a wrapper's props yourself, or import the type from its
+file path.
+
+Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme`, and
+`TranslationProvider` from `@onlyoffice/apps-ui-kit/providers/translation` for the context
+menu's own labels.
+
+## Minimal example
+
+`contextOptions` is what decides whether a context button is rendered; an empty array means no.
 
 ```tsx
-const contextOptions = [
-  { key: "rename", label: "Rename" },
-  { key: "delete", label: "Delete" },
-];
+import { Row } from "@onlyoffice/apps-ui-kit/components/rows/row";
+import { RowContent } from "@onlyoffice/apps-ui-kit/components/rows/row-content";
+import { Text } from "@onlyoffice/apps-ui-kit/components/text";
 
-<Row
-  checked={false}
-  contextOptions={contextOptions}
-  onSelect={(nextChecked) => console.log("checked", nextChecked)}
-  onRowClick={() => console.log("row click")}
->
-  <Text truncate>Document.docx</Text>
-</Row>;
-```
-
-### Modern mode with element
-
-```tsx
-<Row
-  mode="modern"
-  checked
-  element={
-    <Avatar size={AvatarSize.min} role={AvatarRole.user} userName="Alex" />
-  }
-  contextOptions={contextOptions}
->
-  <Text truncate>Workspace</Text>
-</Row>
+export function FileRow({ name }: { name: string }) {
+  return (
+    <Row contextOptions={[]}>
+      <RowContent>
+        <Text fontWeight={600}>{name}</Text>
+        <span />
+      </RowContent>
+    </Row>
+  );
+}
 ```
 
 ## Props
 
-| Prop                       | Type                                         | Default     | Description                                                                                                                  |
-| -------------------------- | -------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `checked`                  | `boolean`                                    | –           | When provided, renders the checkbox (default mode) or the styled checkbox container (modern mode).                           |
-| `children`                 | `React.ReactElement<{ item: RowItemType }>`  | –           | Main content block. If the element exposes an `item` prop, its data is reused inside the context menu header.                |
-| `className`                | `string`                                     | –           | Custom class name added to the root wrapper.                                                                                 |
-| `contentElement`           | `React.ReactNode`                            | –           | Additional element rendered near the context area (e.g., actions, tags).                                                     |
-| `contextButtonSpacerWidth` | `string`                                     | `"26px"`    | Controls the width reserved for the context menu button via a CSS custom property.                                           |
-| `contextOptions`           | `ContextMenuModel[]`                         | –           | Options shown in the contextual menu. When omitted, an empty placeholder replaces the button.                                |
-| `data`                     | `{ contextOptions: ContextMenuModel[] }`     | –           | Alternative place to keep `contextOptions` together with other row metadata.                                                 |
-| `element`                  | `React.ReactElement`                         | –           | Leading element (avatar, icon, combobox, etc.). In modern mode it shares the container with the checkbox.                    |
-| `id`                       | `string`                                     | –           | DOM id for the wrapper.                                                                                                      |
-| `indeterminate`            | `boolean`                                    | –           | Shows the checkbox in an indeterminate state.                                                                                |
-| `onSelect`                 | `(checked: boolean, data?: unknown) => void` | –           | Called when the checkbox (or leading element on mobile) toggles its state. Receives the next `checked` value and row `data`. |
-| `onRowClick`               | `(e: React.MouseEvent) => void`              | –           | Fired when any part of the row except the checkbox and context button is clicked.                                            |
-| `onContextClick`           | `(openedViaRightClick?: boolean) => void`    | –           | Fired when the context button or right click triggers the context menu.                                                      |
-| `style`                    | `React.CSSProperties`                        | –           | Inline styles for the wrapper.                                                                                               |
-| `inProgress`               | `boolean`                                    | –           | Replaces the regular content with a loader when `true`.                                                                      |
-| `getContextModel`          | `() => ContextMenuModel[]`                   | –           | Lazily provides menu items for the floating ContextMenu component.                                                           |
-| `mode`                     | `"default" \| "modern"`                      | `"default"` | Switches layout between the classic checkbox-first row and the modern combined element/checkbox container.                   |
-| `withoutBorder`            | `boolean`                                    | `false`     | Hides the default row borders.                                                                                               |
-| `isIndexEditingMode`       | `boolean`                                    | –           | Displays index control buttons instead of the context menu button.                                                           |
-| `isRoom`                   | `boolean`                                    | –           | Marks the row context as a room (affects ContextMenu styling).                                                               |
-| `contextTitle`             | `string`                                     | –           | Optional title displayed inside the context menu button tooltip.                                                             |
-| `badgesComponent`          | `React.ReactNode`                            | –           | Custom badges displayed near the context button.                                                                             |
-| `isArchive`                | `boolean`                                    | –           | Marks the context menu as originating from an archived entity.                                                               |
-| `rowContextClose`          | `() => void`                                 | –           | Callback fired when the floating context menu hides.                                                                         |
-| `badgeUrl`                 | `string`                                     | –           | Optional badge image URL passed to the context menu.                                                                         |
-| `isDisabled`               | `boolean`                                    | –           | Disables the checkbox interaction.                                                                                           |
-| `onChangeIndex`            | `(action: VDRIndexingAction) => void`        | –           | Handles clicks on index-increase/decrease buttons when `isIndexEditingMode` is enabled.                                      |
-| `item`                     | `RowItemType`                                | –           | Data object forwarded to children to describe avatars/icons/titles.                                                          |
-| `dataTestId`               | `string`                                     | –           | Custom `data-testid` attribute (defaults to `row`).                                                                          |
+<!-- props:start RowProps -->
+
+_Generated by `pnpm readme:props` from `RowProps` in `Row.types.tsx`. Do not edit; edit the JSDoc._
+
+| Prop                       | Type                                                                         | Required | Default     | Description                                                                                                                                                                 |
+| -------------------------- | ---------------------------------------------------------------------------- | -------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `badgesComponent`          | `ReactNode`                                                                  | no       | –           | Element placed before `contentElement`, for badges of your own.                                                                                                             |
+| `badgeUrl`                 | `string`                                                                     | no       | –           | URL of the badge image shown in the context menu's header.                                                                                                                  |
+| `checked`                  | `boolean`                                                                    | no       | –           | Whether the row's checkbox is ticked. Its **presence** is what renders the checkbox at all — passing `checked={false}` gives an unticked box, omitting the prop gives none. |
+| `children`                 | `ReactElement<{ item: RowItemType; }, string \| JSXElementConstructor<any>>` | no       | –           | The row's content, normally a `RowContent`. The row reads `item` off this element's props to build the header of its context menu.                                          |
+| `className`                | `string`                                                                     | no       | –           | Applied to the row element.                                                                                                                                                 |
+| `contentElement`           | `ReactNode`                                                                  | no       | –           | Element placed before the context button, after the badges.                                                                                                                 |
+| `contextButtonSpacerWidth` | `string`                                                                     | no       | `"26px"`    | Width reserved for the context button, as a CSS length.                                                                                                                     |
+| `contextOptions`           | `ContextMenuModel[]`                                                         | no       | –           | Items of the context menu. They may be given here or as `data.contextOptions`, which wins; an empty list renders no button.                                                 |
+| `contextTitle`             | `string`                                                                     | no       | –           | Hover tooltip of the context button.                                                                                                                                        |
+| `data`                     | `TData`                                                                      | no       | –           | Arbitrary payload handed back to `onSelect`. Its `contextOptions`, if it has any, are the ones the menu uses.                                                               |
+| `dataTestId`               | `string`                                                                     | no       | `"row"`     | Value of `data-testid` on the row.                                                                                                                                          |
+| `element`                  | `ReactElement<unknown, string \| JSXElementConstructor<any>>`                | no       | –           | Element at the start of the row — an avatar or a file icon. Like `checked`, its presence is what reserves the space.                                                        |
+| `getContextModel`          | `() => ContextMenuModel[]`                                                   | no       | –           | Builds the context menu's items when it opens, instead of `contextOptions`.                                                                                                 |
+| `id`                       | `string`                                                                     | no       | –           | Ignored. Nothing reads this prop and no `id` reaches the DOM.                                                                                                               |
+| `indeterminate`            | `boolean`                                                                    | no       | –           | Draws the checkbox as partly ticked, for a group that is half-selected.                                                                                                     |
+| `inProgress`               | `boolean`                                                                    | no       | –           | Replaces the checkbox and the start element with a spinner.                                                                                                                 |
+| `isArchive`                | `boolean`                                                                    | no       | –           | Tells the context menu that the room is archived.                                                                                                                           |
+| `isDisabled`               | `boolean`                                                                    | no       | –           | Disables the checkbox, and nothing else about the row.                                                                                                                      |
+| `isIndexEditingMode`       | `boolean`                                                                    | no       | –           | Replaces the context button with the up and down arrows of index editing.                                                                                                   |
+| `isRoom`                   | `boolean`                                                                    | no       | –           | Tells the context menu that this row is a room, which changes its header.                                                                                                   |
+| `item`                     | `RowItemType`                                                                | no       | –           | Ignored. The context menu's header is read from the child's own `item` prop.                                                                                                |
+| `mode`                     | `TMode`                                                                      | no       | `"default"` | `modern` moves the checkbox on top of the start element, so it needs both `checked` and `element` to render either.                                                         |
+| `onChangeIndex`            | `(action: VDRIndexingAction) => void`                                        | no       | –           | Called with the direction when an index arrow is clicked.                                                                                                                   |
+| `onContextClick`           | `(value?: boolean) => void`                                                  | no       | –           | Called when the context menu is asked for, with `true` for a right-click.                                                                                                   |
+| `onRowClick`               | `(e: React.MouseEvent) => void`                                              | no       | –           | Called by a click on the start element and on the content, but not on the checkbox or the context button.                                                                   |
+| `onSelect`                 | `(checked: boolean, data?: unknown) => void`                                 | no       | –           | Called with the new checked state and whatever `data` holds.                                                                                                                |
+| `rowContextClose`          | `() => void`                                                                 | no       | –           | Called when the context menu closes.                                                                                                                                        |
+| `style`                    | `CSSProperties`                                                              | no       | –           | Ignored. Nothing reads this prop and no inline style reaches the DOM.                                                                                                       |
+| `withoutBorder`            | `boolean`                                                                    | no       | `false`     | Removes the row's bottom border.                                                                                                                                            |
+
+<!-- props:end -->
+
+## Recipes
+
+### Selection
+
+```tsx
+import { useState } from "react";
+import { Row } from "@onlyoffice/apps-ui-kit/components/rows/row";
+import { RowContent } from "@onlyoffice/apps-ui-kit/components/rows/row-content";
+import { Text } from "@onlyoffice/apps-ui-kit/components/text";
+
+export function SelectableRow({ name }: { name: string }) {
+  const [checked, setChecked] = useState(false);
+
+  return (
+    <Row
+      checked={checked}
+      contextOptions={[]}
+      onSelect={(next) => setChecked(next)}
+      onRowClick={() => setChecked(!checked)}
+    >
+      <RowContent>
+        <Text fontWeight={600}>{name}</Text>
+        <span />
+      </RowContent>
+    </Row>
+  );
+}
+```
+
+### Loading
+
+`inProgress` replaces the checkbox and the start element with a spinner; the content and the
+context menu stay.
+
+```tsx
+import { Row } from "@onlyoffice/apps-ui-kit/components/rows/row";
+import { RowContent } from "@onlyoffice/apps-ui-kit/components/rows/row-content";
+import { Text } from "@onlyoffice/apps-ui-kit/components/text";
+
+export function UploadingRow({ name, done }: { name: string; done: boolean }) {
+  return (
+    <Row checked={false} inProgress={!done} contextOptions={[]}>
+      <RowContent>
+        <Text fontWeight={600}>{name}</Text>
+        <span />
+      </RowContent>
+    </Row>
+  );
+}
+```
+
+### Disabled
+
+`isDisabled` disables the checkbox alone. The row stays clickable and its context menu still
+opens.
+
+```tsx
+import { Row } from "@onlyoffice/apps-ui-kit/components/rows/row";
+import { RowContent } from "@onlyoffice/apps-ui-kit/components/rows/row-content";
+import { Text } from "@onlyoffice/apps-ui-kit/components/text";
+
+export function LockedRow({ name }: { name: string }) {
+  return (
+    <Row checked={false} isDisabled contextOptions={[]}>
+      <RowContent>
+        <Text fontWeight={600}>{name}</Text>
+        <span />
+      </RowContent>
+    </Row>
+  );
+}
+```
+
+## Behaviour the types don't state
+
+- **A prop being present is what renders a part.** The row asks whether `checked`, `element` and
+  `contentElement` are keys of its props, not whether they hold anything, so
+  `checked={undefined}` still renders a checkbox and omitting the prop is the only way to have
+  none.
+- **The context menu's header comes from the child's `item` prop.** The row reaches into
+  `children.props.item` for the title, icon, avatar and logo — so the header is empty unless the
+  child accepts and carries an `item`. The row's own `item` prop is not read at all.
+- **Options may come from two places.** `data.contextOptions` wins over `contextOptions` when it
+  has any; `getContextModel` is what the menu calls when it opens. With no options the button is
+  replaced by an empty spacer of `contextButtonSpacerWidth`.
+- **The whole row opens the menu on right-click**, and if the menu is not mounted yet the row
+  clicks itself first to mount it — a workaround left in the source.
+- **`onRowClick` is bound to the content and the start element**, not to the row: a click on the
+  checkbox, the badges or the context button does not reach it.
+- On a touch device a click on the start element also selects the row, calling `onSelect(true)`.
+- `mode="modern"` puts the checkbox over the start element and needs **both** `checked` and
+  `element` present, or neither is rendered.
+- `id` and `style` are declared and never read; `className` is the way in.
+- The component is memoised with a deep comparison of all its props.
+
+## Accessibility
+
+- The row is a `<div>` with no role, not focusable, and its click handlers are on inner
+  elements. The [`Checkbox`](../../checkbox/README.md) is the only part a keyboard reaches.
+- The context menu opens on right-click or from a [`ContextMenuButton`](../../context-menu-button/README.md),
+  which is itself a `<div>` — there is no keyboard route to it.
+- Nothing announces selection: the row carries no `aria-selected`, only a class.
+
+## Test ids
+
+| Element | `data-testid`                        |
+| ------- | ------------------------------------ |
+| The row | `row`, overridable with `dataTestId` |
+
+## Related
+
+- [`RowContent`](../row-content/README.md) — the child this expects, and where `item` lives.
+- [`RowContainer`](../row-container/README.md) — the list around it.
+- [`ContextMenu`](../../context-menu/README.md) — the menu it renders for every row.
