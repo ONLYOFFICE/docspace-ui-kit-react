@@ -31,5 +31,7 @@ export type AsideHeaderProps = PickedDivProps & {
   isBackButton?: boolean;
   /** Click handler for the back button */
   onBackClick?: () => void;
+  /** Value of `data-testid` on the header.
+   * @default "aside-header" */
   dataTestId?: string;
 };
