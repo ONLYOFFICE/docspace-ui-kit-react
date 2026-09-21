@@ -2,6 +2,9 @@ import type { PropsWithChildren } from "react";
 import type { ButtonSize } from "./Button.enums";
 
 type BaseButtonProps = PropsWithChildren<{
+  /** Rendered in place of `label` when `label` is empty or unset. A non-empty
+   * `label` wins and the children are dropped. */
+  children?: React.ReactNode;
   /** Ref to access the DOM element or React component instance */
   ref?: React.Ref<HTMLElement>;
   /** Button text */
