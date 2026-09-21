@@ -245,10 +245,19 @@ export function createReadmeProgram(folders = componentFolders()) {
    * import from the root barrel. Derived, never taken from a README.
    */
   const barrelFolders = () => {
-    const source = program.getSourceFile(
-      path.join(ROOT, COMPONENTS_DIR, "index.ts"),
+    // Parsed from disk rather than taken from the program: nothing imports
+    // `components/index.ts`, so it is not reachable from the component index
+    // modules the program is rooted at, and asking the program for it returned
+    // nothing -- which read as "no component is in the barrel".
+    const file = path.join(ROOT, COMPONENTS_DIR, "index.ts");
+    if (!fs.existsSync(file)) return new Set();
+
+    const source = ts.createSourceFile(
+      file,
+      fs.readFileSync(file, "utf8"),
+      ts.ScriptTarget.ESNext,
+      true,
     );
-    if (!source) return new Set();
 
     const found = new Set();
 
