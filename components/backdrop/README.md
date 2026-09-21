@@ -1,186 +1,183 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "Backdrop",
+  "folder": "components/backdrop",
+  "kind": "component",
+  "category": "Overlays",
+  "status": "public",
+  "summary": "Full-screen layer behind an overlay, transparent by default, that catches the click meant to close it.",
+  "import": { "subpath": "components/backdrop", "barrel": true, "default": false },
+  "exports": ["Backdrop"],
+  "providers": ["ThemeProvider"],
+  "state": { "visibility": "visible", "close": "onClick", "loading": null, "disabled": null },
+  "related": ["aside", "modal-dialog", "drop-down"],
+  "subComponents": [],
+  "testIds": ["backdrop"]
+} -->
+
 # Backdrop
 
-A flexible backdrop component that provides a customizable overlay for modals, dialogs, and aside components. The component supports multiple instances, touch events, and responsive behavior for mobile and tablet devices.
+Full-screen layer behind an overlay, transparent by default, that catches the click meant to
+close it. It dims the page only when you ask, or on a phone.
 
-## Features
+## Use this when / not when
 
-- Customizable background and blur effects
-- Responsive design with mobile/tablet support
-- Configurable z-index for proper stacking
-- Multiple backdrop support for aside components
-- Touch event handling for mobile devices
-- Theme-aware with light/dark mode support
+- Use behind an overlay of your own — an [`Aside`](../aside/README.md), a panel, a popover —
+  that has to close when the user clicks away from it.
+- Not behind a [`ModalDialog`](../modal-dialog/README.md) or a
+  [`DropDown`](../drop-down/README.md): both render one themselves, and a second one is
+  suppressed.
+- Not as a loading veil over a region. It is `position: fixed` and covers the whole viewport,
+  never a part of it.
+- Not to block interaction: it stops pointer events under itself but nothing else. Focus still
+  moves into the page behind, and there is no Escape handling.
 
-## Usage
+## Import
 
-```tsx
+```ts
 import { Backdrop } from "@onlyoffice/apps-ui-kit/components/backdrop";
-
-// Basic usage
-<Backdrop visible onClick={handleBackdropClick} />
-
-// With modal dialog
-<Backdrop
-  visible
-  isModalDialog
-  withBackground
-  zIndex={1000}
-  onClick={handleBackdropClick}
-/>
-
-// With aside component
-<Backdrop
-  visible
-  isAside
-  withBackground
-  onClick={handleBackdropClick}
-/>
 ```
 
-## Properties
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
-| Prop                 | Type                            | Default | Description                                              |
-| -------------------- | ------------------------------- | ------- | -------------------------------------------------------- |
-| `visible`            | `boolean`                       | `false` | Controls the visibility of the backdrop                  |
-| `zIndex`             | `number`                        | `203`   | Sets the z-index CSS property for stacking context       |
-| `className`          | `string \| string[]`            | -       | Custom CSS class name(s) to apply                        |
-| `id`                 | `string`                        | -       | HTML id attribute for the backdrop element               |
-| `style`              | `React.CSSProperties`           | -       | Custom inline styles                                     |
-| `withBackground`     | `boolean`                       | `false` | Enables background visibility                            |
-| `isAside`            | `boolean`                       | `false` | Indicates backdrop is used with an Aside component       |
-| `withoutBackground`  | `boolean`                       | `false` | Forces backdrop to render without background             |
-| `isModalDialog`      | `boolean`                       | `false` | Indicates backdrop is used with a modal dialog           |
-| `shouldShowBackdrop` | `boolean`                       | `false` | Forces the backdrop to show regardless of existing count |
-| `onClick`            | `(e: React.MouseEvent) => void` | -       | Click event handler                                      |
+`BackdropProps` is **not** exported — type a wrapper's props yourself, or import the type from
+its file path.
 
-## Styling
+Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme` above it in the tree for
+the dimming colour, which differs between the light and the dark theme.
 
-The component uses CSS modules with CSS variables for theming:
+## Minimal example
 
-```css
---backdrop-background-color
-```
-
-Theme values:
-
-- Light theme: `rgba(6, 22, 38, 0.2)`
-- Dark theme: `rgba(27, 27, 27, 0.6)`
-
-## Examples
-
-### Modal Dialog
+`zIndex` has to be below the thing it sits behind — the default is 203.
 
 ```tsx
 import { useState } from "react";
 import { Backdrop } from "@onlyoffice/apps-ui-kit/components/backdrop";
+import { Button } from "@onlyoffice/apps-ui-kit/components/button";
 
-const ModalExample = () => {
-  const [isOpen, setIsOpen] = useState(false);
+export function Popover() {
+  const [open, setOpen] = useState(false);
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)}>Open Modal</button>
-      <Backdrop
-        visible={isOpen}
-        isModalDialog
-        withBackground
-        onClick={() => setIsOpen(false)}
-      />
-      {isOpen && <div className="modal">Modal Content</div>}
+      <Button label="Open" onClick={() => setOpen(true)} />
+      {open ? (
+        <>
+          <Backdrop visible zIndex={199} onClick={() => setOpen(false)} />
+          <div
+            style={{
+              position: "fixed",
+              inset: "40% auto auto 40%",
+              zIndex: 200,
+            }}
+          >
+            <Button label="Close" onClick={() => setOpen(false)} />
+          </div>
+        </>
+      ) : null}
     </>
   );
-};
+}
 ```
 
-### Multiple Backdrops with Aside
+## Props
+
+<!-- props:start -->
+
+_Generated by `pnpm readme:props` from `BackdropProps` in `Backdrop.types.ts`. Do not edit; edit the JSDoc._
+
+| Prop                 | Type                            | Required | Default | Description                                                                                                                                        |
+| -------------------- | ------------------------------- | -------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `visible`            | `boolean`                       | **yes**  | `false` | Whether the layer is rendered at all. It is not a CSS switch: a backdrop that is not visible renders nothing.                                      |
+| `className`          | `string \| string[]`            | no       | –       | Custom CSS class name(s) to apply to the backdrop Can be a single string or an array of strings                                                    |
+| `id`                 | `string`                        | no       | –       | HTML id attribute for the backdrop element                                                                                                         |
+| `isAside`            | `boolean`                       | no       | `false` | Marks the backdrop as belonging to a side panel: it then dims the page, and it is allowed to render even when two backdrops are already on screen. |
+| `isModalDialog`      | `boolean`                       | no       | `false` | Lets touch scrolling through the backdrop go on as usual. Without it a touch move over the layer has its default action prevented.                 |
+| `onClick`            | `(e: React.MouseEvent) => void` | no       | –       | Called on a click, and on a touch move or touch end, which pass a touch event cast to a mouse event.                                               |
+| `shouldShowBackdrop` | `boolean`                       | no       | `false` | Renders the layer even when another backdrop is already on screen, which would otherwise suppress it.                                              |
+| `style`              | `React.CSSProperties`           | no       | –       | Custom inline styles to apply to the backdrop. `zIndex` is merged in first.                                                                        |
+| `withBackground`     | `boolean`                       | no       | `false` | Dims the page. Without it the layer is transparent and only catches clicks — except on a viewport of 600px or less, where it dims anyway.          |
+| `withoutBackground`  | `boolean`                       | no       | `false` | Forces the backdrop to render without a background Takes precedence over withBackground                                                            |
+| `zIndex`             | `number`                        | no       | `203`   | Stacking order of the layer. The component it covers needs a higher one.                                                                           |
+
+<!-- props:end -->
+
+## Recipes
+
+### Open and close, controlled
+
+`visible` is the whole of it: `false` renders nothing, so the layer needs no conditional
+rendering of its own.
 
 ```tsx
 import { useState } from "react";
+import { Aside } from "@onlyoffice/apps-ui-kit/components/aside";
 import { Backdrop } from "@onlyoffice/apps-ui-kit/components/backdrop";
+import { Button } from "@onlyoffice/apps-ui-kit/components/button";
 
-const AsideExample = () => {
-  const [isFirstOpen, setFirstOpen] = useState(false);
-  const [isSecondOpen, setSecondOpen] = useState(false);
+export function MembersPanel() {
+  const [open, setOpen] = useState(false);
+  const close = () => setOpen(false);
 
   return (
     <>
-      <button onClick={() => setFirstOpen(true)}>Open First Aside</button>
-      <button onClick={() => setSecondOpen(true)}>Open Second Aside</button>
-
-      <Backdrop
-        visible={isFirstOpen}
-        isAside
-        withBackground
-        onClick={() => setFirstOpen(false)}
-      />
-      <Backdrop
-        visible={isSecondOpen}
-        isAside
-        withBackground
-        onClick={() => setSecondOpen(false)}
-      />
-
-      {isFirstOpen && <aside>First Aside Content</aside>}
-      {isSecondOpen && <aside>Second Aside Content</aside>}
+      <Button label="Members" onClick={() => setOpen(true)} />
+      <Backdrop visible={open} isAside zIndex={399} onClick={close} />
+      {open ? (
+        <Aside visible header="Members" onClose={close}>
+          <p style={{ padding: 16 }}>Nobody has joined this room yet.</p>
+        </Aside>
+      ) : null}
     </>
   );
-};
+}
 ```
 
-### Custom Z-Index
+## Behaviour the types don't state
 
-```tsx
-<Backdrop
-  visible={isOpen}
-  withBackground
-  zIndex={500}
-  onClick={() => setIsOpen(false)}
-/>
-```
+- **A second backdrop renders nothing.** On every change the component counts the elements
+  carrying the `backdrop-active` class already in the document and bails out if there is one —
+  unless `isAside` is set, which raises the allowance to two, or `shouldShowBackdrop`, which
+  ignores the count. This is how a dialog opened from a panel avoids stacking two veils, and it
+  is also why your own backdrop may silently fail to appear behind someone else's overlay.
+- **It is transparent unless you ask for the dimming.** `withBackground` turns it on, `isAside`
+  turns it on, and a viewport of 600px or less turns it on whether you asked or not;
+  `withoutBackground` wins over all three.
+- **The viewport is measured during render and never again.** There is no resize listener, so a
+  window resized across 600px keeps whatever the backdrop decided when it opened.
+- **Touch moves over it are cancelled** unless `isModalDialog` is set, which is what stops the
+  page behind a panel scrolling under the user's finger. `onClick` receives those touch events
+  too, cast to a mouse event.
+- It is `position: fixed` at `100vw × 100vh`, so it ignores the scroll position and any
+  transformed ancestor.
+- `className` accepts an array as well as a string, unlike the rest of the kit.
 
-### Without Blur (Context Menu)
+## CSS variables
 
-```tsx
-<Backdrop
-  visible={isContextMenuOpen}
-  withoutBlur
-  onClick={() => setContextMenuOpen(false)}
-/>
-```
+| Variable             | Default            | Effect                         |
+| -------------------- | ------------------ | ------------------------------ |
+| `--backdrop-bg`      | theme dimming blur | Colour of the dimming          |
+| `--backdrop-z-index` | `203`              | Stacking order, if no `zIndex` |
 
-### Force Show Backdrop
+## Accessibility
 
-```tsx
-// Force backdrop to show even if other backdrops exist
-<Backdrop
-  visible={isOpen}
-  shouldShowBackdrop
-  withBackground
-  onClick={() => setIsOpen(false)}
-/>
-```
+- The layer is an empty `<div>` with no role and no name, which is right: it is not an object
+  the user interacts with deliberately.
+- It does not trap focus, does not mark the page behind as inert and does not handle Escape.
+  An overlay that must be modal has to do those itself — or be a
+  [`ModalDialog`](../modal-dialog/README.md).
+- Clicking it is a mouse-only way out, so give the overlay a close button as well.
 
-## Mobile and Tablet Support
+## Test ids
 
-The component automatically adjusts its behavior for mobile and tablet devices:
+| Element   | `data-testid` |
+| --------- | ------------- |
+| The layer | `backdrop`    |
 
-- Automatically shows background on mobile/tablet devices unless `withoutBlur` is set
-- Handles touch events appropriately for modal dialogs
-- Prevents default touch behavior for non-modal backdrops to avoid scrolling issues
+It cannot be overridden by a prop.
 
-## Backdrop Stacking
+## Related
 
-The component intelligently manages multiple backdrops:
-
-| Scenario                  | Behavior                                            |
-| ------------------------- | --------------------------------------------------- |
-| Default (no `isAside`)    | Only one backdrop displayed at a time               |
-| With `isAside`            | Up to two backdrops can be displayed simultaneously |
-| With `shouldShowBackdrop` | Forces backdrop to display regardless of count      |
-
-## Notes
-
-- When using multiple backdrops with `isAside`, up to two backdrops can be displayed simultaneously
-- `withoutBackground` takes precedence over `withBackground`
-- Touch events are prevented by default unless `isModalDialog` is true
-- The backdrop adds `backdrop-active` and `not-selectable` classes for styling hooks
+- [`ModalDialog`](../modal-dialog/README.md) — renders its own, so you do not add one.
+- [`Aside`](../aside/README.md) — renders none, so you do.
+- [`DropDown`](../drop-down/README.md) — renders one unless `withBackdrop` is false.

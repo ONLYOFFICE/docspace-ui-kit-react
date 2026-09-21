@@ -49,144 +49,212 @@ export type TSeparatorOption = TBaseOption & {
 export type TOption = TRegularOption | TSeparatorOption;
 
 export type TComboboxProps = {
-  /** Displays advanced options */
+  /**
+   * Element whose children replace the list entirely, for a menu that is not a
+   * list of options. `options` is then used only for the button.
+   */
   advancedOptions?: React.ReactElement<{ children?: React.ReactNode }>;
-  /** Number of advanced options */
+  /** How many advanced options there are, for deciding the mobile layout. */
   advancedOptionsCount?: number;
-  /** Children elements */
+  /**
+   * Content rendered inside the button, before the label. A click on it is
+   * ignored unless `disableIconClick` is false.
+   */
   children?: React.ReactNode;
-  /** Accepts class */
+  /** Applied to the element that wraps the button and the list. */
   className?: string;
-  /** Class name for dropdown container */
+  /** Applied to the list element. */
   dropDownClassName?: string;
-  /** Icon for the combo button */
+  /** Icon to draw instead of the arrow: a component, an element, or a URL. */
   comboIcon?: string | React.ReactNode;
-  /** Disable icon click */
+  /**
+   * Whether a click on `children` is swallowed instead of opening the list.
+   * @default true
+   */
   disableIconClick?: boolean;
-  /** Disable item click */
+  /** Stops the list opening at all, without the disabled styling. */
   disableItemClick?: boolean;
-  /** Disable first level item click */
+  /** The same, but only for first-level items on a touch device. */
   disableItemClickFirstLevel?: boolean;
-  /** X direction position */
+  /** Preferred horizontal side of the list; it flips to fit the viewport. */
   directionX?: TDirectionX;
-  /** Y direction position */
+  /** Preferred vertical side of the list; it flips to fit the viewport. */
   directionY?: TDirectionY;
-  /** Component Display Type */
+  /**
+   * `toggle` renders the button alone and no list at all, for a control that
+   * only looks like a combo box.
+   * @default ComboBoxDisplayType.default
+   */
   displayType?: ComboBoxDisplayType;
-  /** Display selected option */
+  /**
+   * Keeps the option that is currently selected usable and highlights it.
+   * Without it that option is rendered disabled, so the value cannot be picked
+   * again.
+   */
   displaySelectedOption?: boolean;
-  /** Display arrow */
+  /** Draws the arrow even when there are no options to open. */
   displayArrow?: boolean;
-  /** Height of Dropdown */
+  /**
+   * Height of the list in pixels. It is also what gives the list a scrollbar:
+   * without it a long list is rendered in full.
+   */
   dropDownMaxHeight?: number;
-  /** Test id for dropdown */
+  /** Value of `data-testid` on the list. */
   dropDownTestId?: string;
-  /** Shows disabled items when displayType !== toggle */
+  /** Ignored. The list is always told to keep disabled options. */
   showDisabledItems?: boolean;
-  /** Fill icon */
+  /** Recolours the selected option's icon to the text colour. */
   fillIcon?: boolean;
-  /** Fixed direction */
+  /** Keeps `directionX` and `directionY` as given instead of flipping them. */
   fixedDirection?: boolean;
-  /** Value to display in the plus badge */
+  /** Number shown as `+N` after the label, for a multi-select summary. */
   plusBadgeValue?: number;
-  /** Force close on click outside */
+  /** Stops the outside-click listener being registered. */
   forceCloseClickOutside?: boolean;
-  /** Hide mobile view */
+  /** Keeps the list anchored to the button on a phone instead of turning it into a bottom sheet. */
   hideMobileView?: boolean;
-  /** Accepts id */
+  /** Applied to the element that wraps the button and the list. */
   id?: string;
-  /** Accepts id for dropdown container */
+  /** Applied to the list element. */
   dropDownId?: string;
-  /** Is aside */
+  /** Marks the list's backdrop as belonging to a side panel. */
   isAside?: boolean;
-  /** Is disabled */
+  /** Greys the button out and stops it opening. */
   isDisabled?: boolean;
-  /** Is loading */
+  /** Replaces the arrow with a spinner and stops the button opening. */
   isLoading?: boolean;
-  /** Is default mode */
+  /**
+   * Whether the list is rendered in a portal on `document.body`.
+   * @default true
+   */
   isDefaultMode?: boolean;
-  /** Is mobile view */
+  /** Pins the list to the bottom of the screen, full width, in portrait. */
   isMobileView?: boolean;
-  /** Is no fixed height options */
+  /** Renders the options in a plain scrollbar instead of the virtualised list. */
   isNoFixedHeightOptions?: boolean;
-  /** Manual width */
+  /**
+   * Width of the list as a CSS length. It has nothing to do with the button's
+   * width — use `scaledOptions` for that.
+   * @default "200px"
+   */
   manualWidth?: string;
-  /** Manual X position */
+  /** (Non-portal mode) Exact horizontal offset of the list from the button. */
   manualX?: string;
-  /** Manual Y position */
+  /** (Non-portal mode) Exact vertical offset of the list from the button. */
   manualY?: number | string;
-  /** Modern view */
+  /** Compact button with no background until it is open. */
   modernView?: boolean;
-  /** No border */
+  /** Removes the button's border. */
   noBorder?: boolean;
-  /** Offset left */
+  /** Horizontal offset of the list, in pixels. */
   offsetX?: number;
-  /** Opened state */
+  /**
+   * Opens or closes the list from outside. It seeds the internal state rather
+   * than controlling it: the next click on the button wins until this changes.
+   */
   opened?: boolean;
-  /** List of options */
+  /**
+   * The options. Each needs a unique `key`, and a `label` unless it is a
+   * separator; `disabled`, `icon`, `description`, `isBeta` and `tooltip` are
+   * passed to the row.
+   */
   options: TOption[];
-  /** Option style */
+  /** Inline style applied to every option. */
   optionStyle?: React.CSSProperties;
-  /** Placeholder for search option */
+  /** Ignored. Nothing reads this prop; there is no search field. */
   searchPlaceholder?: string;
-  /** Selected option */
+  /**
+   * The option to show in the button. The component does not choose it: keep it
+   * in your own state and set it from `onSelect`.
+   */
   selectedOption: TOption;
-  /** Scaled */
+  /**
+   * Makes the button take the full width of its parent, which overrides `size`.
+   * @default true
+   */
   scaled?: boolean;
-  /** Scaled options */
+  /** Matches the list's width to the button's instead of `manualWidth`. */
   scaledOptions?: boolean;
-  /** Set is open item access */
+  /** Called with the open state whenever it changes, alongside `onToggle`. */
   setIsOpenItemAccess?: (isOpen: boolean) => void;
-  /** Size */
+  /**
+   * One of the fixed widths — 173, 300, 350 or 500px, or the content's own. It
+   * only applies when `scaled` is false.
+   * @default ComboBoxSize.base
+   */
   size?: `${ComboBoxSize}`;
 
+  /** Ignored. Nothing reads this prop. */
   role?: string;
-  /** Style */
+  /** Applied to the wrapper and, again, to the list. */
   style?: React.CSSProperties;
-  /** Tab index */
+  /**
+   * Position of the button in the tab order. It is -1 by default, which keeps
+   * the combo box off it entirely.
+   */
   tabIndex?: number;
-  /** Text overflow */
+  /** Truncates an option's label with an ellipsis instead of wrapping it. */
   textOverflow?: boolean;
-  /** Title */
+  /** Hover tooltip for the whole control. It needs `RootTooltip` mounted. */
   title?: string;
-  /** Top space */
+  /** Space to leave above the list when it opens upwards, in pixels. */
   topSpace?: number;
-  /** Type */
+  /**
+   * Shape of the button: `badge` draws the label as a coloured badge,
+   * `onlyIcon` drops the label, `descriptive` adds the option's `description`
+   * under it.
+   */
   type?: TCombobox;
-  /** Use portal backdrop */
+  /** Moves the list's backdrop into the portal, above the page. */
   usePortalBackdrop?: boolean;
-  /** With backdrop */
+  /**
+   * Whether the list renders a backdrop to catch the next click.
+   * @default true
+   */
   withBackdrop?: boolean;
-  /** With background */
+  /** Gives that backdrop its dimming background. */
   withBackground?: boolean;
-  /** With blur */
+  /** Ignored. It reaches the list, which does not read it either. */
   withBlur?: boolean;
-  /** With label */
+  /**
+   * Whether the selected option is matched by label rather than by key.
+   * @default true
+   */
   withLabel?: boolean;
-  /** Without background */
+  /** Makes that backdrop transparent. */
   withoutBackground?: boolean;
-  /** Without padding */
+  /** Removes the vertical padding around the button. */
   withoutPadding?: boolean;
-  /** With search */
+  /** Ignored. Nothing reads this prop; there is no search field. */
   withSearch?: boolean;
-  /** On backdrop click */
+  /** Called when a click outside closes the list, if `withBackdrop` is on. */
   onBackdropClick?: (e: Event) => void;
-  /** On click selected item */
+  /** Called when the option already selected is clicked again. */
   onClickSelectedItem?: (option: TOption) => void;
-  /** On select */
+  /**
+   * Called with the option that was clicked. Nothing changes on its own —
+   * `selectedOption` is yours to update.
+   */
   onSelect?: (option: TOption) => void;
-  /** On toggle */
+  /**
+   * Called when the button is clicked, with the state being asked for. Passing
+   * it without `onBackdropClick` also stops a click outside closing the list.
+   */
   onToggle?: (e: React.MouseEvent<HTMLDivElement>, isOpen: boolean) => void;
 
-  /** Indicates if the backdrop should be shown */
+  /** Renders the backdrop even when another one is already on screen. */
   shouldShowBackdrop?: boolean;
-  /** Data test id */
+  /** Value of `data-testid` on the wrapper.
+   * @default "combobox" */
   dataTestId?: string;
-  /** Disables text selection */
+  /**
+   * Whether the button's text cannot be selected.
+   * @default true
+   */
   noSelect?: boolean;
-  /** Optional flag to use an image icon. */
+  /** Draws the kit's placeholder image next to the selected option's icon. */
   useImageIcon?: boolean;
-  /** Hides the arrow completely */
+  /** Hides the arrow, whatever `displayArrow` and the options say. */
   withoutArrow?: boolean;
 };
 
