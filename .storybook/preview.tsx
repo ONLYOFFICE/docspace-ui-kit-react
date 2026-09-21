@@ -18,7 +18,7 @@ import enCommon from "../locales/en/Common.json";
 import enPayments from "../locales/en/Payments.json";
 import enSettings from "../locales/en/Settings.json";
 
-import "./styles.css";
+import "./styles.scss";
 import "../css/fonts.css";
 
 import lightTheme from "./lightTheme";
@@ -116,11 +116,12 @@ const preview: Preview = {
           ["Welcome", "Structure", "Translation", "Themes", "API"],
           "Components",
           [
-            "Selectors",
-            "Uploader",
-            "Document Editor",
+            "AI Chat",
             "Billing",
+            "Document Editor",
+            "Uploader",
             "Providers",
+            "Selectors",
             "Errors",
           ],
           "UI",

@@ -75,7 +75,18 @@
     padding: 6px 8px;
     border-radius: 3px !important;
     border: none;
-    background: var(--chat-input-background-color) !important;
+    // `--chat-input-background-color` comes from the portal
+    // (`packages/shared/styles/theme.scss`), not from this package. An
+    // undefined custom property makes the whole declaration invalid at
+    // computed-value time, and because this one is `!important` it wins over
+    // the widget's own `--chat-composer-background-color` before failing --
+    // so outside a DocSpace portal the composer loses its background
+    // entirely and the input has no visible bounds. Fall back to the token
+    // the widget itself defines (see `ai-agent/providers/themes`).
+    background: var(
+      --chat-input-background-color,
+      var(--chat-composer-background-color)
+    ) !important;
 
     // padding-block-end: 0px;
 
@@ -322,6 +333,16 @@
 }
 
 .splitView {
+  // Local fallback for the portal's `--info-panel-border-color`, which this
+  // package consumes and does not ship. Same values the client's theme.scss
+  // and `Section`'s `.infoPanelWrapper` use, so a portal that does define the
+  // token still wins and nothing shifts.
+  --ai-chat-divider-color: #{colors.$gray-light-mid};
+
+  :global(.dark) & {
+    --ai-chat-divider-color: #{colors.$gray-dark-strong};
+  }
+
   display: grid;
   // minmax(0, 1fr), not bare 1fr: a bare fr track has an auto minimum, so
   // any fixed-width descendant (like the lib's Analyzing row) widens the
@@ -343,7 +364,8 @@
     // The ChatList inside owns the vertical scroll; clip anything else so
     // the column itself never becomes a second scroller.
     overflow: hidden;
-    border-inline-end: 1px solid var(--info-panel-border-color);
+    border-inline-end: 1px solid
+      var(--info-panel-border-color, var(--ai-chat-divider-color));
   }
 }
 

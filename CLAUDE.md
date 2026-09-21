@@ -29,6 +29,7 @@ Path-scoped detail that does not belong here, loaded when the matching files are
 | `theming.md`             | which layer a `var(--x)` comes from, undefined tokens failing silently, RTL                                                                                                               |
 | `packaging.md`           | `exports`, `publishConfig`, ESM-only dist, dependency placement, per-module CSS, `"use client"`                                                                                           |
 | `source-checks.md`       | the client-side checks that used to cover this source (hex, ASCII, indentation, assets, deps, licence headers), why none of them run here now, and AGPL-3.0-only without per-file headers |
+| `cross-platform.md`      | why every command has to run on Windows too, what `package.json` scripts may not contain, and why `path.sep` does not make an id POSIX                                                    |
 | `vscode-tasks.md`        | the three layers behind the status-bar buttons in `ui-kit.code-workspace`                                                                                                                 |
 
 ## Tech Stack
@@ -196,6 +197,30 @@ applies. Three levels, fastest first:
 - **Stories**: every component must have a story. It may live in a subdirectory rather
   than beside `index.ts` — `table`, `rows` and `tiles` all do — so check recursively
   before concluding one is missing. `theme-provider` is the only one currently without
+
+## Paths
+
+Never write an absolute path into anything committed here — not into `CLAUDE.md`, the rules
+under `.claude/`, a script, a comment, a README or a commit message. An absolute path carries
+one machine's home directory into a shared repository, where it is wrong for everyone else and
+silently stays wrong.
+
+Write paths relative to the repository root (`.claude/scripts/…`, `components/button/`). A
+checkout that lives outside this one is named relative to it and made overridable, which is what
+every script here already does:
+
+| Neighbour       | Expected at, from this repository | Override                        |
+| --------------- | --------------------------------- | ------------------------------- |
+| DocSpace client | `../DocSpace/client`              | `DOCSPACE_CLIENT_ROOT`          |
+| `agent-skills`  | `../agent-skills`                 | `AGENT_SKILLS_ROOT`, `--skills` |
+
+Both are siblings of this checkout. The client default is spelled `../../DocSpace/client` in
+`scripts/copy-locales.js` and `scripts/copy-images.js` because those resolve it from `scripts/`,
+one level further down — which is the whole reason to say what a path is relative to whenever it
+is not the repository root.
+
+The exception is a path that is genuinely absolute on every machine — a URL, or a runtime path
+inside a container such as `/app`. A path under `/Users`, `/home` or `C:\Users` never is.
 
 ## Commit messages
 

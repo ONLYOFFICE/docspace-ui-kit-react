@@ -1,6 +1,18 @@
 @use "../../../../styles/mixins";
+@use "../../../../styles/variables/colors";
 
 .header {
+  // Local fallback for the portal's `--info-panel-border-color`: this package
+  // consumes that token and does not ship it, and an undefined custom property
+  // invalidates the whole `border-bottom`, so the divider under the panel title
+  // disappears outside a DocSpace portal. Same values the client's theme.scss
+  // uses, so a portal still wins.
+  --ai-chat-panel-header-border-color: #{colors.$gray-light-mid};
+
+  :global(.dark) & {
+    --ai-chat-panel-header-border-color: #{colors.$gray-dark-strong};
+  }
+
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -11,7 +23,8 @@
   padding-inline: 16px;
   box-sizing: border-box;
 
-  border-bottom: solid 1px var(--info-panel-border-color);
+  border-bottom: solid 1px
+    var(--info-panel-border-color, var(--ai-chat-panel-header-border-color));
   @include mixins.mobile {
     height: var(--section-header-height-mobile, 53px);
   }
