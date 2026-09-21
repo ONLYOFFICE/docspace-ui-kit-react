@@ -71,9 +71,17 @@ export type TooltipHandlers = {
 };
 
 export interface WithTooltipProps {
+  /** Tooltip text. Consumed by the wrapper, so it never reaches the DOM as a
+   * `title` attribute. `tooltipContent` takes precedence over it. */
   title?: string;
+  /** Tooltip content, used instead of `title` when both are set. Only a string
+   * produces a tooltip: the wrapper needs text for the anchor, so any other
+   * node leaves the element with no tooltip at all. */
   tooltipContent?: React.ReactNode;
+  /** Ignored. Nothing reads this prop; the tooltip's placement comes from the
+   * `Tooltip` the anchor resolves to. */
   tooltipPlace?: TTooltipPlace;
+  /** Ignored. Nothing reads this prop. */
   tooltipFitToContent?: boolean;
 }
 
