@@ -82,6 +82,17 @@ Not README material — these need a fix or a decision of their own.
 - **Three `FieldContainer` props are dead**: `icon`, `helpButtonHeaderContent`, `offsetRight`
   are accepted by the type and never read. They are now documented as ignored; removing them
   is a breaking change someone should schedule.
+- **`ModalDialog` cannot be given an accessible name.** `role="dialog"` and `aria-modal` sit on
+  the click-to-close element, and unknown props — an `aria-label` among them — are spread onto
+  the internal `AsideHeader`, and only when a header is rendered. So the advice "label it
+  yourself" cannot be followed from outside the component. Needs a fix in `Modal.tsx`: move the
+  role onto the content element and let it take the caller's `aria-*`.
+- **Two `ModalDialog` prop descriptions were wrong, not merely thin.** `isCloseable` carried
+  `visible`'s description, and `closeOnBackdropClick` said it _disables_ what its name enables.
+  Both are corrected; both had been copied into readers' mental models for as long as they
+  existed.
+- **Two `WithTooltipProps` props are dead**: `tooltipPlace` and `tooltipFitToContent` are
+  declared, stripped from the forwarded props by `omitTooltipProps`, and read nowhere.
 
 ## Found while writing the template, not yet placed
 

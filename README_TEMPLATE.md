@@ -187,6 +187,14 @@ and props are in the table.
 README. This is the section that stops a reader reaching for `Row` when they wanted a
 table, or `LoadingButton` when they wanted `Button isLoading`.
 
+**Say what the component does not have.** A README is read by someone who has a job to do and
+is looking for the thing that does it; when it is not there, silence reads as "keep looking"
+and costs a question or, worse, a hand-rolled substitute. Button has no destructive variant —
+nothing in its stylesheet is red — and a reader building a delete confirmation will hunt for
+one until the README says so and points at `--accent-button`. Write the absence wherever the
+reader will look for the feature: a missing variant in "Use this when / not when", a missing
+knob in "CSS variables", missing behaviour in "Behaviour the types don't state".
+
 **`## Import`.** The subpath form is canonical: it is what the published `exports` map
 guarantees for all 98 components, and it keeps a consumer's bundle to the components they
 use. Add the barrel sentence only when `import.barrel` is true. Never write a path into
@@ -240,6 +248,12 @@ itself. Columns: Variable, Default, Effect.
 interaction it supports, and what the consumer still has to supply. "Renders a plain
 `<div>` and sets no ARIA of its own" is a valid and useful answer.
 
+Whatever you tell the consumer to supply, check that they can. `ModalDialog`'s section used
+to say "add `aria-label` yourself"; the prop type accepts one, but unknown props are spread
+onto the internal header, not onto the element carrying `role="dialog"`, so following the
+advice does nothing. A reader who takes an instruction that cannot work loses more than one
+who is told the component has a gap.
+
 **`## Test ids`.** Table of element → `data-testid`, and the prop that overrides it.
 
 **`## Related`.** Links to the READMEs in `metadata.related`, one line each saying when to
@@ -277,7 +291,11 @@ Rules:
    `<Name>.module.scss`, `<Name>.stories.tsx`, `<Name>.test.tsx` and `sub-components/**`.
    If `index` wraps the component, read the wrapper too.
 2. Complete the JSDoc on every own prop in the types file. Add `@portal` and `@default`
-   where this guide says.
+   where this guide says. **Read the existing sentences against the code rather than past
+   them.** The validator can see that a description exists; only you can see that it is
+   about this prop. On `ModalDialog`, `isCloseable` carried `visible`'s description and
+   `closeOnBackdropClick` said it _disables_ what its name enables and its default turns on —
+   both had been there for as long as the props had, and both survived every check.
 3. Write the metadata block. Take `state.*` from the real props; take `import.barrel` and
    `import.default` from the source, not from memory.
 4. `pnpm readme:props --write --only components/<folder>`, then fix every reported
@@ -299,6 +317,9 @@ Rules:
 - [ ] Import block uses the subpath; barrel sentence present only if it is in the barrel
 - [ ] Minimal example is one complete module and compiles
 - [ ] Every own prop has JSDoc; the table is generated, not typed
+- [ ] Every prop description was read against the code, not merely found to exist
+- [ ] The absences a reader will hunt for are stated where they will hunt
+- [ ] Nothing in Accessibility asks the consumer to do something the component prevents
 - [ ] No Default cell claims a default the code does not apply
 - [ ] Recipes cover the states the metadata declares, and only those
 - [ ] At least three behaviour bullets, each from the source, stylesheet or tests
@@ -330,6 +351,24 @@ Rewrite components/aside/README.md following README_TEMPLATE.md. Read the compon
 types, its stylesheet and its tests first, and tell me what you found that the current
 README gets wrong before you write.
 ```
+
+### Checking that a README actually works
+
+Copy the finished READMEs somewhere outside this repository, give an agent those files and
+nothing else — no checkout, no `node_modules`, no `.d.ts` — and ask it to build something real
+from them. Then ask it for three lists: the questions it would have asked a colleague, the
+assumptions it had to make, and what it had to read twice. Insist on bluntness; a polite answer
+is worthless.
+
+Run the result through `createExampleProgram` in `scripts/lib/readme-program.mjs`, which is
+what type-checks the READMEs' own examples.
+
+Done on `button` and `modal-dialog`, this produced a component that compiled with no
+diagnostics and used only the props the kit already has — and nine questions the two files
+should have answered. Every rule in this guide that mentions a specific defect came from that
+run or from writing the four pilot READMEs. Questions about the _application_ — localisation,
+error handling, which providers are mounted — are not this document's job; they belong in
+`docs/getting-started.md`.
 
 That last sentence is worth keeping: on Button it surfaced a documented size that the
 stylesheet contradicts, a `title` prop consumed by a wrapper, and a `type` value that is
