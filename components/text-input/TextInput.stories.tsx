@@ -7,41 +7,17 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { TextInput } from ".";
 import { InputSize, InputType } from "./TextInput.enums";
 
+// The README is what the package ships and what a coding agent reads; rendering
+// it here keeps the developer looking at Storybook and the agent on one text.
+import readme from "./README.md?raw";
+
 const meta = {
   title: "UI/Interactive elements/TextInput",
   component: TextInput,
   parameters: {
     docs: {
       description: {
-        component: `Single-line text input field with support for various types, sizes, states, and input masking.
-
-### Features
-
-- **Multiple Types**: text, password, email, tel, search, and number
-- **Three Sizes**: base, middle, and large
-- **Input Masking**: Format input with custom masks (e.g., date, phone)
-- **Validation States**: Error and warning visual indicators
-- **Full Width**: Scale to 100% width when needed
-- **Bold Text**: Option for bold font weight
-
-### Usage
-
-\`\`\`tsx
-import { TextInput, InputSize, InputType } from "@onlyoffice/apps-ui-kit/components/text-input";
-
-// Basic text input
-<TextInput value={value} onChange={handleChange} placeholder="Enter text" />
-
-// With input mask
-<TextInput
-  mask={[/\\d/, /\\d/, "/", /\\d/, /\\d/, "/", /\\d/, /\\d/, /\\d/, /\\d/]}
-  placeholder="DD/MM/YYYY"
-  guide
-/>
-
-// Error state
-<TextInput hasError value="Invalid" />
-\`\`\``,
+        component: readme,
       },
     },
     design: {
