@@ -64,24 +64,45 @@ export const indexFileOf = (folder) => {
   return null;
 };
 
+// Directories a component keeps its own machinery in. They have index modules
+// and are not components: `components/calendar/utils/get-calendar-days` is a
+// date helper, not something anyone imports or documents.
+const INTERNAL_DIRS = new Set([
+  "sub-components",
+  "utils",
+  "hooks",
+  "skeletons",
+  "__tests__",
+]);
+
 /**
  * Every documentable folder under `components/`, as POSIX ids relative to the
- * repository root: a directory with an `index` module, nested ones included
- * (`components/rows/row`). `sub-components` is where a folder keeps the parts
- * it does not publish, so it is not walked.
+ * repository root.
+ *
+ * Directly under `components/` an index module is enough -- that is what a
+ * component is here. Deeper than that, a folder counts only once it has a
+ * README of its own: `components/rows/row` and `components/aside/aside-header`
+ * are real sub-components a consumer imports, while the eight index modules
+ * under `components/calendar/utils` are not, and nothing in the file system
+ * tells them apart.
  */
 export function componentFolders() {
   const folders = [];
 
   for (const entry of walk(path.join(ROOT, COMPONENTS_DIR), {
     sort: true,
-    enterDir: (dirent) =>
-      dirent.name !== "sub-components" && dirent.name !== "__tests__",
+    enterDir: (dirent) => !INTERNAL_DIRS.has(dirent.name),
   })) {
-    if (!entry.isDir) continue;
+    if (!entry.isDir || INTERNAL_DIRS.has(entry.name)) continue;
 
     const folder = `${COMPONENTS_DIR}/${entry.id}`;
-    if (indexFileOf(folder)) folders.push(folder);
+    if (!indexFileOf(folder)) continue;
+
+    const nested = entry.id.includes("/");
+
+    if (!nested || fs.existsSync(path.join(ROOT, folder, "README.md"))) {
+      folders.push(folder);
+    }
   }
 
   return folders;
@@ -97,8 +118,39 @@ const readTsConfig = () => {
     );
   }
 
-  return ts.parseJsonConfigFileContent(config, ts.sys, ROOT).options;
+  return ts.parseJsonConfigFileContent(config, ts.sys, ROOT);
 };
+
+/**
+ * A program over the repository plus the given files, with the package's own
+ * specifier resolved to the source tree -- so a README example that imports
+ * `@onlyoffice/apps-ui-kit/components/button` compiles here exactly as it will
+ * for a consumer who installed the package.
+ *
+ * The repository's own file list is kept and the examples are added to it. An
+ * earlier attempt compiled the extracted blocks alone and lost the ambient
+ * environment they rely on (`*.react.svg` module declarations, `process`,
+ * `Buffer`), which produced a wall of errors from `components/avatar`,
+ * `components/context-menu`, `components/room-icon` and `components/tooltip`
+ * that had nothing to do with any README.
+ */
+export function createExampleProgram(files) {
+  const { options, fileNames } = readTsConfig();
+
+  return ts.createProgram([...fileNames, ...files], {
+    ...options,
+    noEmit: true,
+    // An example declares what it needs and uses all of it, but a reader's
+    // eye, not this flag, is what should judge that.
+    noUnusedLocals: false,
+    noUnusedParameters: false,
+    baseUrl: ROOT,
+    paths: {
+      "@onlyoffice/apps-ui-kit": ["./index.ts"],
+      "@onlyoffice/apps-ui-kit/*": ["./*"],
+    },
+  });
+}
 
 /**
  * The name of the interface or type alias a property is declared in. It is the
@@ -193,7 +245,10 @@ const printableType = (text, optional) => {
 
 export function createReadmeProgram(folders = componentFolders()) {
   const roots = folders.map(indexFileOf).filter(Boolean);
-  const program = ts.createProgram(roots, { ...readTsConfig(), noEmit: true });
+  const program = ts.createProgram(roots, {
+    ...readTsConfig().options,
+    noEmit: true,
+  });
   const checker = program.getTypeChecker();
 
   const relative = (fileName) => toPosix(path.relative(ROOT, fileName));

@@ -21,9 +21,12 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import * as ts from "typescript";
+
 import {
   ROOT,
   componentFolders,
+  createExampleProgram,
   createReadmeProgram,
 } from "./lib/readme-program.mjs";
 import { parseMetadata, validateMetadata } from "./lib/readme-meta.mjs";
@@ -37,6 +40,19 @@ import {
 const PACKAGE = "@onlyoffice/apps-ui-kit";
 
 const ALLOWLIST = path.join(ROOT, "scripts", "readme-allowlist.json");
+
+// Outside the repository tree, so nothing has to be added to `.gitignore` and
+// no stale extraction can be mistaken for a source file.
+const CACHE = path.join(ROOT, "node_modules", ".cache", "readme-check");
+
+// A specifier only a consumer's bundler resolves. Without a declaration for it
+// every example that imports an icon fails to compile here for a reason that
+// says nothing about the example.
+const CONSUMER_AMBIENT = `declare module "*.svg?react" {
+  const Component: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
+  export default Component;
+}
+`;
 
 // Text that cannot appear in a README a consumer reads. Each is something that
 // resolves only inside DocSpace-client, or names a package or a technology this
@@ -70,17 +86,18 @@ const FORBIDDEN = [
 
 const usage = () => {
   console.error(
-    "usage: node scripts/check-readme.mjs [--only <folder>...] [--json]",
+    "usage: node scripts/check-readme.mjs [--only <folder>...] [--compile] [--json]",
   );
   process.exit(2);
 };
 
 const parseArgs = (argv) => {
-  const options = { only: [], json: false };
+  const options = { only: [], json: false, compile: false };
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--json") options.json = true;
+    else if (arg === "--compile") options.compile = true;
     else if (arg === "--only") {
       while (argv[i + 1] && !argv[i + 1].startsWith("--")) {
         options.only.push(argv[(i += 1)]);
@@ -120,6 +137,31 @@ const codeBlocks = (readme) =>
     line: lineOf(readme, match.index),
   }));
 
+/**
+ * Writes every ```tsx block to the cache directory, one file per block, with
+ * nothing added above the code so that a diagnostic's line number maps back to
+ * the README by a single addition.
+ *
+ * ```tsx-snippet is deliberately not extracted: that fence is how a README says
+ * "this fragment illustrates, it does not compile", and the template forbids it
+ * where a reader copies code -- the minimal example and the recipes.
+ */
+const extractExamples = (folder, readme) => {
+  const dir = path.join(CACHE, folder.replaceAll("/", "__"));
+  fs.mkdirSync(dir, { recursive: true });
+
+  return codeBlocks(readme)
+    .filter((block) => block.language === "tsx")
+    .map((block, index) => {
+      const file = path.join(dir, `${index}.tsx`);
+      fs.writeFileSync(file, block.body, "utf8");
+
+      // The fence sits on `block.line`, so the first line of code is the next
+      // one, and a diagnostic reported on line 1 belongs to it.
+      return { folder, file, firstLine: block.line + 1 };
+    });
+};
+
 const main = async () => {
   const options = parseArgs(process.argv.slice(2));
   const allowlist = readAllowlist();
@@ -151,6 +193,9 @@ const main = async () => {
   // the README against a different truth than CI does.
   const kit = createReadmeProgram();
   const barrel = kit.barrelFolders();
+  const examples = [];
+
+  if (options.compile) fs.rmSync(CACHE, { recursive: true, force: true });
 
   for (const folder of folders) {
     const file = path.join(ROOT, folder, "README.md");
@@ -334,12 +379,16 @@ const main = async () => {
         }
       }
 
-      const formatted = await formatMarkdown(
-        renderBlocks(readme, blocks),
-        file,
-      );
+      // Both sides are formatted, so that a README which merely needs
+      // `pnpm format` is not reported as a stale table. Prettier formats the
+      // code inside a ```tsx fence too, so comparing a formatted rendering
+      // against an unformatted file blamed the generator for a long line.
+      const [expected, actual] = await Promise.all([
+        formatMarkdown(renderBlocks(readme, blocks), file),
+        formatMarkdown(readme, file),
+      ]);
 
-      if (formatted !== readme) {
+      if (expected !== actual) {
         error(
           "E_PROPS_SYNC",
           folder,
@@ -415,6 +464,43 @@ const main = async () => {
             : "this folder is not in the root barrel, but the README says it is",
         );
       }
+    }
+
+    if (options.compile) examples.push(...extractExamples(folder, readme));
+  }
+
+  // --- the examples compile ---
+
+  if (options.compile && examples.length > 0) {
+    const ambient = path.join(CACHE, "consumer-ambient.d.ts");
+    fs.writeFileSync(ambient, CONSUMER_AMBIENT, "utf8");
+
+    const program = createExampleProgram([
+      ambient,
+      ...examples.map((example) => example.file),
+    ]);
+
+    const byFile = new Map(
+      examples.map((example) => [path.resolve(example.file), example]),
+    );
+
+    for (const diagnostic of program
+      .getSemanticDiagnostics()
+      .concat(program.getSyntacticDiagnostics())) {
+      const source = diagnostic.file && path.resolve(diagnostic.file.fileName);
+      const example = source && byFile.get(source);
+      if (!example) continue;
+
+      const { line } = diagnostic.file.getLineAndCharacterOfPosition(
+        diagnostic.start ?? 0,
+      );
+
+      error(
+        "E_TSX_COMPILE",
+        example.folder,
+        example.firstLine + line,
+        ts.flattenDiagnosticMessageText(diagnostic.messageText, " "),
+      );
     }
   }
 
