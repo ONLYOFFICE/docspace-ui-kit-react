@@ -129,7 +129,7 @@ it is reachable by subpath, but an external install downloads neither package.
 **It is not, however, out of the barrel's reach, and this document claimed it was.** Tracing
 `dist/esm/index.js` gives `index.js -> billing/wallet -> utils/socket -> socket.io-client`, so
 `socket.io-client` leaks into the core by exactly the route `axios` does — through `billing`.
-Keeping the *names* out of the barrel is not the same as keeping the *module graph* out of it;
+Keeping the _names_ out of the barrel is not the same as keeping the _module graph_ out of it;
 only the tiering decision in open question 6 settles that. The modules reachable from the
 barrel also pull `mobx`, `mobx-react` (`billing/store`) and `react-router`
 (`billing/services`).
