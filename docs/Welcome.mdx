@@ -1,65 +1,10 @@
 import { Meta } from "@storybook/addon-docs/blocks";
 
+import { WelcomePage } from "./welcome/WelcomePage";
+
 <Meta title="Getting started/Welcome" />
 
-# ONLYOFFICE Apps UI Kit
-
-A shared React component library for ONLYOFFICE Apps that provides:
-
-- 98 reusable components, 11 hooks and 32 utility modules;
-- theming — light and dark, colour tokens, RTL — and the i18n wiring around it;
-- shared constants, enums and type definitions.
-
-Used across all ONLYOFFICE Apps (Files, Rooms, Forms, Agents) and applications: Client, Login, DocEditor, Management, and SDK.
-
-The package also ships the portal-coupled modules the DocSpace client needs — the REST client,
-the MobX-backed selectors, billing, the uploader, the document-editor wrapper and the AI agent.
-They resolve and they are supported for the portal, but they carry no compatibility promise for
-anyone else; **Structure** lists them and `docs/public-api.md` in the repository has the full
-tiering.
-
-<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "16px", marginTop: "24px", marginBottom: "48px" }}>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/samples-01-buttons-and-toasts--docs" target="_top">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>Samples</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>Ten working screens, from one button to a small app</p>
-	</a>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/getting-started-structure--docs" target="_top">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>Structure</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>How the codebase is organized</p>
-	</a>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/getting-started-utils--docs" target="_top">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>Utils</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>Dates, devices, URLs, cookies and the other helpers</p>
-	</a>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/getting-started-hooks--docs" target="_top">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>Hooks</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>The eleven React hooks the components are built on</p>
-	</a>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/getting-started-constants--docs" target="_top">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>Constants</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>Shared constants, enums and type definitions</p>
-	</a>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/getting-started-translation--docs" target="_top">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>Translation</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>How to use i18n and translations</p>
-	</a>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/getting-started-themes--docs" target="_top">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>Themes</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>Light/dark themes, color tokens, and RTL support</p>
-	</a>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/getting-started-api--docs" target="_top">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>API</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>How to use ApiProvider and REST API services</p>
-	</a>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="https://api.onlyoffice.com/docspace/" target="_blank" rel="noreferrer">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>ONLYOFFICE Apps API</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>Official ONLYOFFICE Apps API documentation</p>
-	</a>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="https://github.com/ONLYOFFICE/docspace-ui-kit-react" target="_blank" rel="noreferrer">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>GitHub</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>Source code repository</p>
-	</a>
-</div>
+<WelcomePage />
 
 ## Installation
 
