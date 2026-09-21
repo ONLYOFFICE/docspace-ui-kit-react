@@ -49,7 +49,7 @@ const REQUIRED_FIELDS = [
   "testIds",
 ];
 
-const OPTIONAL_FIELDS = ["parent"];
+const OPTIONAL_FIELDS = ["parent", "propsType"];
 
 const SUMMARY_LIMIT = 160;
 
@@ -114,6 +114,15 @@ export const validateMetadata = (meta) => {
 
   if (meta.kind !== "sub-component" && "parent" in meta) {
     say("`parent` belongs only to a `sub-component`");
+  }
+
+  // The only permitted value is `null`, which says "this folder has no props of
+  // its own" -- a barrel over other components, or a service with no element.
+  // A *name* would belong in the marker, next to the table it resolves.
+  if ("propsType" in meta && meta.propsType !== null) {
+    say(
+      "`propsType` may only be `null`; name a type in the `props:start` marker",
+    );
   }
 
   if (!CATEGORIES.includes(meta.category)) {

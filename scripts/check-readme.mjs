@@ -136,7 +136,11 @@ const SECTIONS = [
   { title: "Use this when / not when" },
   { title: "Import" },
   { title: "Minimal example" },
-  { title: "Props" },
+  {
+    title: "Props",
+    when: (meta) => meta.propsType !== null,
+    because: "the component has props of its own",
+  },
   { title: "Recipes" },
   { title: "Behaviour the types don't state" },
   {
@@ -467,7 +471,7 @@ const main = async () => {
       } catch (resolveError) {
         error("E_PROPS_TYPE_NOT_FOUND", folder, 1, resolveError.message);
       }
-    } else {
+    } else if (meta.propsType !== null) {
       PROPS_BLOCK.lastIndex = 0;
       error(
         "E_PROPS_MARKER",
@@ -475,6 +479,8 @@ const main = async () => {
         1,
         "no `props:start` / `props:end` block",
       );
+    } else {
+      PROPS_BLOCK.lastIndex = 0;
     }
 
     if (blocks) {
