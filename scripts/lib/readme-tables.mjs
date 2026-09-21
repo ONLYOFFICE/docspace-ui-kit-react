@@ -165,17 +165,29 @@ export const propsMarkdown = (resolved) => {
   return lines.join("\n").trimEnd();
 };
 
-const enumsMarkdown = (resolved) => {
-  if (resolved.enums.length === 0) return null;
+/**
+ * One table for the whole README, however many `props:start` markers it has.
+ * Each marker is resolved on its own and each resolution dedupes only against
+ * itself, so a README with several tables -- Table has seven, Selector six --
+ * used to print `SelectorAccessRightsMode` once per marker.
+ */
+const enumsMarkdown = (blocks) => {
+  const seen = new Set();
+  const rows = [];
 
-  return [
-    "| Enum | Members |",
-    "| --- | --- |",
-    ...resolved.enums.map(
-      (item) =>
+  for (const block of blocks) {
+    for (const item of block.enums) {
+      if (seen.has(item.name)) continue;
+      seen.add(item.name);
+      rows.push(
         `| ${code(item.name)} | ${item.members.map((member) => code(member)).join(", ")} |`,
-    ),
-  ].join("\n");
+      );
+    }
+  }
+
+  if (rows.length === 0) return null;
+
+  return ["| Enum | Members |", "| --- | --- |", ...rows].join("\n");
 };
 
 /** The prop types a README's markers ask for, resolved in marker order. */
@@ -196,7 +208,7 @@ export const renderBlocks = (readme, blocks) => {
     return `<!-- props:start${block.marker ? ` ${block.marker}` : ""} -->\n\n${propsMarkdown(block)}\n\n<!-- props:end -->`;
   });
 
-  const enums = blocks.map(enumsMarkdown).filter(Boolean).join("\n\n");
+  const enums = enumsMarkdown(blocks) ?? "";
 
   return withProps.replace(
     ENUMS_BLOCK,
