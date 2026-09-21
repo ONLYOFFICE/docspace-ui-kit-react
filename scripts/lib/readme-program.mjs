@@ -342,6 +342,36 @@ export function createReadmeProgram(folders = componentFolders()) {
     const defaults = new Map();
     const dir = path.join(ROOT, folder);
 
+    // `title = LOADER_STYLE.title` is true but useless in a table: the reader
+    // wants the value, not the name of the constant holding it. Follow one hop
+    // to the property of a shared constant object and print what it says.
+    const literalOf = (expression) => {
+      if (!ts.isPropertyAccessExpression(expression)) return undefined;
+
+      // `Object.freeze` returns `Readonly<T>`, whose properties are synthesized
+      // by the mapped type and carry no `valueDeclaration` -- but they still
+      // point back at the property assignment they were built from.
+      const symbol = checker.getSymbolAtLocation(expression.name);
+      const declaration = symbol?.valueDeclaration ?? symbol?.declarations?.[0];
+
+      if (!declaration || !ts.isPropertyAssignment(declaration))
+        return undefined;
+
+      const value = declaration.initializer;
+
+      if (
+        ts.isStringLiteral(value) ||
+        ts.isNumericLiteral(value) ||
+        value.kind === ts.SyntaxKind.TrueKeyword ||
+        value.kind === ts.SyntaxKind.FalseKeyword
+      )
+        return value.getText();
+
+      // Two hops happen: the skeletons default to `LOADER_STYLE.backgroundColor`,
+      // which is itself `globalColors.darkBlack`.
+      return literalOf(value);
+    };
+
     const files = fs
       .readdirSync(dir, { withFileTypes: true })
       .filter((e) => e.isFile() && /\.tsx?$/.test(e.name))
@@ -357,7 +387,10 @@ export function createReadmeProgram(folders = componentFolders()) {
 
           const name = (element.propertyName ?? element.name).getText();
           if (!defaults.has(name)) {
-            defaults.set(name, element.initializer.getText());
+            defaults.set(
+              name,
+              literalOf(element.initializer) ?? element.initializer.getText(),
+            );
           }
         }
       };
