@@ -524,11 +524,25 @@ export function createReadmeProgram(folders = componentFolders()) {
     const optional = Boolean(symbol.flags & ts.SymbolFlags.Optional);
     const printed = checker.typeToString(type, declaration, TYPE_FLAGS);
 
-    const tags = new Map(
-      symbol
-        .getJsDocTags(checker)
-        .map((tag) => [tag.name, ts.displayPartsToString(tag.text ?? [])]),
-    );
+    // Tags from the declaration that won, the way `documentationOf` already
+    // prefers its comment. `symbol.getJsDocTags` merges every declaration, so a
+    // folder that re-declares an inherited prop to correct its default --
+    // RadioButtonGroup's `orientation` is horizontal where RadioButton's is
+    // vertical -- would still be handed the inherited `@default`.
+    const declaredTags = (declaration.jsDoc ?? []).length
+      ? ts
+          .getJSDocTags(declaration)
+          .map((tag) => [
+            tag.tagName.getText(),
+            typeof tag.comment === "string"
+              ? tag.comment
+              : ts.displayPartsToString(tag.comment ?? []),
+          ])
+      : symbol
+          .getJsDocTags(checker)
+          .map((tag) => [tag.name, ts.displayPartsToString(tag.text ?? [])]);
+
+    const tags = new Map(declaredTags);
 
     const name = symbol.getName();
     const taggedDefault = tags.get("default")?.trim();
