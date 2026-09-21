@@ -88,6 +88,10 @@ const groupBy = (items, key) => {
 const isPromoted = (prop) =>
   prop.origin !== "external" || PROMOTED_REACT_PROPS.has(prop.name);
 
+// What belongs in the component's own table: what it declares, and what it
+// picked out of a foreign type by name.
+const isOwn = (prop) => prop.origin === "own" || prop.origin === "picked";
+
 export const propsMarkdown = (resolved) => {
   const lines = [];
   const source = resolved.typeFile
@@ -100,8 +104,8 @@ export const propsMarkdown = (resolved) => {
   );
 
   const all = resolved.baseProps;
-  const own = all.filter((prop) => prop.origin === "own" && !prop.portal);
-  const portal = all.filter((prop) => prop.origin === "own" && prop.portal);
+  const own = all.filter((prop) => isOwn(prop) && !prop.portal);
+  const portal = all.filter((prop) => isOwn(prop) && prop.portal);
   const inherited = all.filter((prop) => prop.origin === "kit" && !prop.portal);
   const external = all.filter((prop) => prop.origin === "external");
 

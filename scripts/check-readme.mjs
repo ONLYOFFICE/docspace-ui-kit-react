@@ -13,10 +13,10 @@
 // ignored prop and no error at all, so `state.visibility` is checked against
 // the resolved props rather than believed.
 //
-// Not checked here yet: the order of the `##` sections. `README_TEMPLATE.md`
-// and `.claude/rules/component-authoring.md` currently describe two different
-// README shapes, and encoding either one in a gate settles that question by
-// accident. It lands with the decision, not before.
+// The section list and its order come from `README_TEMPLATE.md`, which is the
+// source of truth for what a component's documentation says; the authoring rule
+// and the `component-docs` skill were rewritten to match rather than the other
+// way round.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -501,7 +501,9 @@ const main = async () => {
             "E_PROP_NO_DOC",
             folder,
             1,
-            `\`${prop.name}\` has no JSDoc in ${prop.declaredFile}; it is a blank cell here and in Storybook`,
+            prop.origin === "picked"
+              ? `\`${prop.name}\` is picked out of a foreign type that does not document it. Declare it in the folder's own props type with a JSDoc line; a picked prop is a blank cell here and in Storybook.`
+              : `\`${prop.name}\` has no JSDoc in ${prop.declaredFile}; it is a blank cell here and in Storybook`,
           );
         }
 

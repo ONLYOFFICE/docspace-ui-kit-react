@@ -419,7 +419,60 @@ export function createReadmeProgram(folders = componentFolders()) {
     );
   };
 
-  const describeProp = (symbol, folder, defaults) => {
+  /**
+   * Prop names the folder picks out of a foreign type by hand, as in
+   * `Pick<React.InputHTMLAttributes<HTMLInputElement>, "name" | "onChange">`.
+   *
+   * They are declared in `@types/react`, so origin alone files them with the
+   * three hundred attributes that collapse into one closing line -- and that
+   * buried `onChange` and `name` on ToggleButton, the two props without which
+   * the component does nothing. Naming a prop in a `Pick` is a deliberate act;
+   * it belongs in the table.
+   */
+  const pickedNames = (folder) => {
+    const names = new Set();
+    const dir = path.join(ROOT, folder);
+
+    const files = fs
+      .readdirSync(dir, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && /\.tsx?$/.test(entry.name))
+      .map((entry) => path.join(dir, entry.name));
+
+    for (const file of files) {
+      const source = program.getSourceFile(file);
+      if (!source) continue;
+
+      const visit = (node) => {
+        if (
+          ts.isTypeReferenceNode(node) &&
+          node.typeName.getText() === "Pick" &&
+          node.typeArguments?.length === 2
+        ) {
+          const selector = node.typeArguments[1];
+          const members = ts.isUnionTypeNode(selector)
+            ? selector.types
+            : [selector];
+
+          for (const member of members) {
+            if (
+              ts.isLiteralTypeNode(member) &&
+              ts.isStringLiteral(member.literal)
+            ) {
+              names.add(member.literal.text);
+            }
+          }
+        }
+
+        ts.forEachChild(node, visit);
+      };
+
+      visit(source);
+    }
+
+    return names;
+  };
+
+  const describeProp = (symbol, folder, defaults, picked) => {
     const declarations = symbol.declarations ?? [];
 
     // The component's own declaration wins over the React attribute it
@@ -463,7 +516,14 @@ export function createReadmeProgram(folders = componentFolders()) {
       deprecated: tags.has("deprecated"),
       deprecatedReason: tags.get("deprecated")?.trim() || null,
       portal: tags.has("portal"),
-      origin: owner === folder ? "own" : owner ? "kit" : "external",
+      origin:
+        owner === folder
+          ? "own"
+          : owner
+            ? "kit"
+            : picked.has(name)
+              ? "picked"
+              : "external",
       ownerFolder: owner,
       declaredFile: relative(declaration.getSourceFile().fileName),
       // The type that declares the prop, which is what a group heading and the
@@ -564,6 +624,7 @@ export function createReadmeProgram(folders = componentFolders()) {
    */
   const resolveProps = (folder, typeName = null) => {
     const defaults = destructuringDefaults(folder);
+    const picked = pickedNames(folder);
     const wanted = typeName ?? `${pascalCase(folder)}Props`;
 
     const declared = exportedType(folder, wanted);
@@ -582,7 +643,7 @@ export function createReadmeProgram(folders = componentFolders()) {
     const describe = (type) =>
       checker
         .getPropertiesOfType(type)
-        .map((symbol) => describeProp(symbol, folder, defaults))
+        .map((symbol) => describeProp(symbol, folder, defaults, picked))
         .filter(Boolean);
 
     const baseProps = describe(base);
