@@ -567,15 +567,50 @@ export function createReadmeProgram(folders = componentFolders()) {
     return found;
   };
 
+  /**
+   * A type declared in the folder's own files, whether or not the index
+   * re-exports it. Several folders declare `<Name>Props` and export only the
+   * component -- Aside, SearchInput, ModalDialog -- and resolving those through
+   * the call signature printed the whole intersection where the alias was
+   * wanted.
+   */
+  const declaredInFolder = (folder, typeName) => {
+    const dir = path.join(ROOT, folder);
+
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (!entry.isFile() || !/\.tsx?$/.test(entry.name)) continue;
+
+      const source = program.getSourceFile(path.join(dir, entry.name));
+      if (!source) continue;
+
+      for (const statement of source.statements) {
+        if (
+          (ts.isTypeAliasDeclaration(statement) ||
+            ts.isInterfaceDeclaration(statement)) &&
+          statement.name.getText() === typeName
+        ) {
+          const symbol = checker.getSymbolAtLocation(statement.name);
+          const type = symbol && checker.getDeclaredTypeOfSymbol(symbol);
+
+          if (type) {
+            return { type, file: relative(source.fileName) };
+          }
+        }
+      }
+    }
+
+    return null;
+  };
+
   /** The declared type of an exported type name, with the file declaring it. */
   const exportedType = (folder, typeName) => {
     const moduleSymbol = moduleSymbolOf(folder);
-    if (!moduleSymbol) return null;
+    if (!moduleSymbol) return declaredInFolder(folder, typeName);
 
     const symbol = checker
       .getExportsOfModule(moduleSymbol)
       .find((exported) => exported.getName() === typeName);
-    if (!symbol) return null;
+    if (!symbol) return declaredInFolder(folder, typeName);
 
     const target =
       symbol.flags & ts.SymbolFlags.Alias
