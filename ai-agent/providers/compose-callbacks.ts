@@ -48,8 +48,9 @@ type Handler = (data: never) => void;
  *
  * Ours runs first, so by the time the host's handler sees the event the
  * provider state it may read (the analyze mode) has already settled. A throw
- * from either side must not swallow the other, hence the try/catch: these are
- * notifications, not a pipeline.
+ * from ours must not cost the host its notification, hence the `finally`:
+ * these are notifications, not a pipeline. The error still propagates once
+ * both have run — swallowing it would hide a broken handler.
  */
 export const composeCallbacks = (
   host: ChatCallbacks | undefined,
