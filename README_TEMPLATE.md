@@ -15,11 +15,24 @@ fails that bar today — a prop table that disagrees with the types, a `visible`
 reader guessed as `isVisible`, a size that the stylesheet contradicts, an import path that
 only resolves inside DocSpace-client.
 
-Three surfaces document a component and none of them agree: this README, the story's
+Three surfaces used to document a component and none of them agreed: this README, the story's
 `parameters.docs.description.component`, and the react-docgen prop table Storybook builds
-from the JSDoc on `*.types.ts`. The template collapses that: **the JSDoc is the single
-source for prop descriptions**, the README's prop table is generated from it, and what is
-left in the README is what the types cannot say.
+from the JSDoc on `*.types.ts`. The template collapses that into one. **The JSDoc is the
+single source for prop descriptions**, the README's prop table is generated from it, and the
+story no longer repeats any of it — it reads this file:
+
+```ts
+import readme from "./README.md?raw";
+// parameters: { docs: { description: { component: readme } } }
+```
+
+So a developer who opens Storybook to look at the component before handing it to an agent
+reads exactly what the agent will read, next to the live thing. The metadata block and the
+generator markers are HTML comments and render as nothing; that is verified, not assumed.
+
+This is also why the CSS-variable table and the accessibility notes live here rather than in
+the story: `package.json` publishes `components/**/README.md` and does not publish stories, so
+anything written only in a story does not exist for someone who installed the package.
 
 ## The skeleton
 

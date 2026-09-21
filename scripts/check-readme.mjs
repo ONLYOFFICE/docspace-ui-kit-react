@@ -129,6 +129,70 @@ const headingAndLead = (readme) => {
   return { heading: match[1], lead: match[2].replace(/\s+/g, " ").trim() };
 };
 
+// The `##` sections, in the order `README_TEMPLATE.md` puts them. `when` is
+// what makes a conditional section required and forbidden otherwise; a section
+// without it is mandatory.
+const SECTIONS = [
+  { title: "Use this when / not when" },
+  { title: "Import" },
+  { title: "Minimal example" },
+  { title: "Props" },
+  { title: "Recipes" },
+  { title: "Behaviour the types don't state" },
+  {
+    title: "Sub-components",
+    when: (meta) => (meta.subComponents ?? []).length > 0,
+    because: "`subComponents` in the metadata is not empty",
+  },
+  { title: "CSS variables", optional: true },
+  { title: "Accessibility" },
+  { title: "Test ids" },
+  { title: "Related" },
+];
+
+// Story titles map to categories rather than defining them: the titles carry
+// thirteen variants today, including two spellings of the same section, and the
+// story is the side that is wrong more often -- hence a warning.
+const CATEGORY_OF_STORY_SECTION = new Map([
+  ["Interactive elements", "Interactive elements"],
+  ["Form controls", "Form controls"],
+  ["Overlays", "Overlays"],
+  ["Data display", "Data display"],
+  ["Table", "Data display"],
+  ["Tiles", "Data display"],
+  ["Rows", "Data display"],
+  ["Layout", "Layout"],
+  ["Layout components", "Layout"],
+  ["Navigation", "Navigation"],
+  ["Feedback", "Feedback"],
+  ["Status components", "Feedback"],
+  ["Skeletons", "Feedback"],
+]);
+
+/** The category a folder's story title maps to, or null when there is none. */
+const categoryFromStory = (folder) => {
+  const dir = path.join(ROOT, folder);
+  if (!fs.existsSync(dir)) return null;
+
+  const story = fs
+    .readdirSync(dir)
+    .find((name) => name.endsWith(".stories.tsx"));
+  if (!story) return null;
+
+  const match = /title:\s*"UI\/([^/"]+)/.exec(
+    fs.readFileSync(path.join(dir, story), "utf8"),
+  );
+
+  return match ? (CATEGORY_OF_STORY_SECTION.get(match[1]) ?? null) : null;
+};
+
+/** The `##` headings of a README, with the line each sits on. */
+const sectionsOf = (readme) =>
+  [...readme.matchAll(/^##\s+(.+?)\s*$/gm)].map((match) => ({
+    title: match[1],
+    line: lineOf(readme, match.index),
+  }));
+
 /** Every fenced code block, with the line it starts on. */
 const codeBlocks = (readme) =>
   [...readme.matchAll(/```(\w[\w-]*)?\r?\n([\s\S]*?)```/g)].map((match) => ({
@@ -249,6 +313,78 @@ const main = async () => {
         folder,
         1,
         "`summary` must be the first sentence under the heading, word for word",
+      );
+    }
+
+    const storyCategory = categoryFromStory(folder);
+
+    if (storyCategory && storyCategory !== meta.category) {
+      warn(
+        "W_CATEGORY_STORY",
+        folder,
+        1,
+        `\`category\` is \`${meta.category}\` and the story's title puts it under \`${storyCategory}\``,
+      );
+    }
+
+    // --- the sections, and their order ---
+
+    const present = sectionsOf(readme);
+    const known = new Set(SECTIONS.map((section) => section.title));
+
+    for (const section of present) {
+      if (!known.has(section.title)) {
+        error(
+          "E_SECTIONS",
+          folder,
+          section.line,
+          `\`## ${section.title}\` is not a section of the template; the free headings go under \`## Recipes\` as \`###\``,
+        );
+      }
+    }
+
+    const expected = SECTIONS.filter(
+      (section) => !section.optional && (!section.when || section.when(meta)),
+    );
+
+    for (const section of expected) {
+      if (!present.some((found) => found.title === section.title)) {
+        error(
+          "E_SECTIONS",
+          folder,
+          1,
+          section.when
+            ? `\`## ${section.title}\` is required because ${section.because}`
+            : `\`## ${section.title}\` is missing`,
+        );
+      }
+    }
+
+    for (const section of SECTIONS) {
+      if (
+        section.when &&
+        !section.when(meta) &&
+        present.some((found) => found.title === section.title)
+      ) {
+        error(
+          "E_SECTIONS",
+          folder,
+          1,
+          `\`## ${section.title}\` is there but the condition for it does not hold`,
+        );
+      }
+    }
+
+    const order = present
+      .filter((found) => known.has(found.title))
+      .map((found) => SECTIONS.findIndex((s) => s.title === found.title));
+
+    if (order.some((index, at) => at > 0 && index < order[at - 1])) {
+      error(
+        "E_SECTIONS",
+        folder,
+        present[0]?.line ?? 1,
+        `the sections are out of order; the template's order is ${SECTIONS.map((s) => s.title).join(" → ")}`,
       );
     }
 
