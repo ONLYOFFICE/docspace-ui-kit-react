@@ -19,3 +19,7 @@ onlyoffice-apps-ui-kit-*.tgz
 # Playwright output (visual-regression run, see __tests__/ and compose.yaml)
 playwright-report
 test-results
+
+# Stories-audit reports (see .claude/skills/audit-stories). Written on demand,
+# kept out of git so a sweep is not committed with the fixes it asks for.
+audits

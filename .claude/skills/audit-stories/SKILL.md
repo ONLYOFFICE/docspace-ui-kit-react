@@ -44,8 +44,14 @@ keeps the fixed shape below with only the `### Template` section.
    - callbacks that are wired in the component but invisible in every
      story (no action, no interaction).
 3. **State coverage.** Conditional renders in the component (disabled,
-   loading, error, empty, RTL-sensitive layout) that no story puts on
-   screen.
+   loading, error, empty) that no story puts on screen. Direction is a
+   state too, but only where it changes the picture: a component whose
+   code or stylesheet reads `interfaceDirection` or `isRTL`, matches
+   `[dir="rtl"]`, checks `document.dir` or the computed `direction`,
+   mirrors with `scaleX(-1)`, or positions with physical `left`/`right`
+   (`margin-left`, `padding-right`, `left:`) — there an RTL story shows
+   a flip or exposes a bug. A symmetric component with none of this
+   gets no RTL finding and no RTL story.
 4. **Staleness.** The reverse direction:
    - story `args` or `argTypes` naming props the component no longer
      has (spreads and loose typing let these survive compilation);
@@ -64,8 +70,9 @@ keeps the fixed shape below with only the `### Template` section.
      full statements — a bare enumeration, a list of prop names, a
      label repeated as its own clause or a trailing period each count;
      `### Accessibility` present when the component sets roles,
-     `aria-*` or handles keys, absent otherwise; `### Usage` with two
-     to four examples;
+     `aria-*` or handles keys, or renders a native interactive element
+     (`input`, `button`, `a`, `select`, `textarea`) as its root; absent
+     otherwise; `### Usage` with two to four examples;
    - every story has `parameters.docs.description.story` saying why,
      and `parameters.docs.source.code`;
    - a story is named for what the reader sees or does, not for the
@@ -81,6 +88,15 @@ keeps the fixed shape below with only the `### Template` section.
 
 ## Report and fixes
 
+- **A report longer than the chat can carry is written to a file**, and
+  never to the session scratchpad: that directory is temporary, hidden
+  from Finder and gone on the next reboot. It goes to `audits/` at the
+  repository root, named `AUDIT-<scope>-<YYYY-MM-DD>.md` — no leading
+  dot, so Finder shows it without the hidden-files toggle. The folder is
+  gitignored, so a sweep is never committed with the fixes it asks for.
+  The chat then carries the summary table, the first-rank findings and
+  the path, nothing more. A single-component run fits in the chat and
+  needs no file.
 - Rank: missing story file, then stale claims and dead args (actively
   misleading), then coverage gaps (merely incomplete), then template
   deviations (form only).
@@ -136,7 +152,9 @@ keeps the fixed shape below with only the `### Template` section.
   own conventions (`CLAUDE.md`, `.claude/rules/component-authoring.md`)
   and land as commits in this repository. Behavior that looks wrong in
   the _component_ is reported as a potential bug, not papered over in
-  the story.
+  the story. A dead export, an unused type or a stray import found on
+  the way is an `Outside the stories` item, removed only on request and
+  in its own commit — a story fix touches story files.
 
 ## Reporting a sweep
 
@@ -211,7 +229,16 @@ follows it:
   announces, the keys it handles, how focus moves — verified with a
   grep for `role=`, `aria-`, `tabIndex` and `.focus(` in the component.
   Styling hooks (`data-*`) and bidi attributes (`dir`) do not belong
-  there; a component that sets none of this gets no section. `### Usage`
+  there. A component whose root is a native interactive element and
+  that adds nothing of its own keeps the section: the intro sentence
+  says the support comes from the platform, the bullets name what the
+  element gives (the keys, the values it exposes, what `disabled` does)
+  and what the consumer must still supply (a name via `<label for>` or
+  `aria-label`) — never an `aria-*` the component does not set, in
+  either direction: a bullet reporting that none is set is still a
+  bullet about attributes that are not there, and says nothing a
+  reader can act on. A component that sets none of this and has no
+  such root gets no section. `### Usage`
   with two to four short examples. Storybook's
   own guidance applies on top: the description says what the component
   is for and when to use it, a story description says _why_ one would
@@ -259,6 +286,17 @@ follows it:
   a story picks a fitting icon per item only when icons are what it
   demonstrates (an `ItemVariants` story), otherwise the dozen extra
   imports document nothing and break on the next icon rename.
+- **An RTL story only where direction changes the picture** — the
+  criterion of check 3 — one per component, named `RightToLeft`. Two
+  mechanisms flip a component and the story sets both:
+  `globals: { direction: "rtl" }` sets the theme's `interfaceDirection`,
+  which is all the Direction toolbar does, because the preview decorator
+  puts no `dir` on the DOM; so the story also wraps its canvas in
+  `<div dir="rtl">` for the `[dir="rtl"]` rules, the computed-direction
+  checks and the `scaleX(-1)` mirrors. One mechanism alone shows a
+  half-flipped component. The description names what the reader should
+  see move — the icon's side, the fill direction, the alignment — and
+  the sample text is a short neutral RTL phrase, not product copy.
 - **Comments in a story are rare and one line long.** They explain only
   what the code cannot show — why a story is framed or hidden on Docs,
   why a type forces unused fields — and never repeat the story's own
@@ -312,12 +350,25 @@ Default |` — defaults taken from the stylesheet's `var(--x, <default>)`
 - **A CSS-variables table is a list of claims — check every row.** For
   each variable a `CssCustomization` story documents, find the rule
   that reads it (`grep var(--name` across the component's stylesheets)
-  and what that rule renders, and when: a variable no rule reads, or
+  and what that rule renders, and when. "Reads it" is judged on the
+  compiled CSS, not the SCSS source: nesting, a missing `&`, `:global`,
+  `@media` and `@supports` change what a rule matches and when, and a
+  compiled selector that cannot reach the element carrying the variable
+  (a descendant combinator before its own pseudo-element, a parent class
+  nothing sets) makes the rule dead. Read the built CSS in `dist/` or
+  compile the module, and trace the final selector to the element. A
+  variable no rule reads, or
   one whose rule changes nothing observable (a `line-height` on text
   inside a fixed-height row), is dropped from the table; one that only
-  works in part gets the caveat in its comment; one that applies only
-  in a mode the story does not show (the mobile-only header, an aside
-  variant) is labelled with that mode. The same goes for any other
+  works in part gets the caveat in its comment — including one read
+  only by a single browser's pseudo-element (`::-moz-*`, `::-webkit-*`),
+  which names the browser and what it really paints there; one that
+  applies only in a mode the story does not show (the mobile-only
+  header, an aside variant) is labelled with that mode. A row is never
+  dropped because the browser it needs is not installed to verify it —
+  the caveat stays and the gap goes in the `Evidence:` sub-bullet. A
+  row whose description is wrong is reworded, not removed. The same
+  goes for any other
   list in the docs — keys, events, sub-components: every entry is
   verified, none is carried over on trust.
 - **Verify in the browser** before reporting a story as fixed: start
