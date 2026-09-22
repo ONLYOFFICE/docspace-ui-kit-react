@@ -511,10 +511,28 @@ export function createReadmeProgram(folders = componentFolders()) {
     // The component's own declaration wins over the React attribute it
     // narrows; a kit declaration wins over a `node_modules` one.
     const scored = declarations.map((declaration) => {
-      const owner = folderOfFile(declaration.getSourceFile().fileName);
-      return { declaration, owner, rank: owner === folder ? 0 : owner ? 1 : 2 };
+      const source = declaration.getSourceFile();
+      const owner = folderOfFile(source.fileName);
+      return {
+        declaration,
+        owner,
+        rank: owner === folder ? 0 : owner ? 1 : 2,
+        file: source.fileName,
+        pos: declaration.pos,
+      };
     });
-    scored.sort((a, b) => a.rank - b.rank);
+
+    // The tiebreak is not cosmetic. PasswordInput inherits `id` from both
+    // input-block's `CommonProps` and text-input's `TextInputProps`, which are
+    // the same rank, and the checker's declaration order for such a symbol
+    // depends on what the program resolved earlier -- so the group heading
+    // flipped between the two depending on whether `--only` had narrowed the
+    // run. Sorting on the file and position as well makes the table identical
+    // however it was produced.
+    scored.sort(
+      (a, b) =>
+        a.rank - b.rank || a.file.localeCompare(b.file) || a.pos - b.pos,
+    );
 
     const home = scored[0];
     if (!home) return null;

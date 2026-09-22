@@ -111,7 +111,16 @@ export const propsMarkdown = (resolved) => {
 
   lines.push(table(ordered([...own, ...external.filter(isPromoted)])), "");
 
-  for (const [folder, props] of groupBy(inherited, (p) => p.ownerFolder)) {
+  // Sorted by folder for the same reason the collapsed line below is sorted:
+  // `groupBy` keeps first-encounter order, and the order the checker hands back
+  // the properties of an intersection depends on what the program resolved
+  // earlier. PasswordInput inherits from both input-block and text-input, and
+  // its two groups swapped places between a `--only` run and a full one.
+  const inheritedGroups = [...groupBy(inherited, (p) => p.ownerFolder)].sort(
+    ([a], [b]) => a.localeCompare(b),
+  );
+
+  for (const [folder, props] of inheritedGroups) {
     const from = props[0].declaredIn ?? path.posix.basename(folder);
     lines.push(
       `#### Inherited from \`${from}\``,
