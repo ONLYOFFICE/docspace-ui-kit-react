@@ -1,6 +1,4 @@
 [
-  "components/action-button",
-  "components/add-button",
   "components/app-loader",
   "components/article",
   "components/avatar-editor-dialog",
@@ -14,11 +12,9 @@
   "components/empty-screen-container",
   "components/error-container",
   "components/filter",
-  "components/floating-button",
   "components/heading",
   "components/image-editor",
   "components/loader-wrapper",
-  "components/loading-button",
   "components/main-button",
   "components/main-button-mobile",
   "components/mcp-icon",
@@ -36,7 +32,6 @@
   "components/room-type",
   "components/section",
   "components/selection-area",
-  "components/snackbar",
   "components/status-message",
   "components/text",
   "components/theme-provider",
@@ -48,6 +43,5 @@
   "components/tiles/template-tile",
   "components/tiles/tile-container",
   "components/tiles/tile-content",
-  "components/toast",
   "components/top-loading-indicator"
 ]

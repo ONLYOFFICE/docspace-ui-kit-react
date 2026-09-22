@@ -6,9 +6,11 @@ type AsProp<C extends ElementType> = {
 };
 
 type ActionButtonOwnProps = {
-  /** Icon node rendered before the label text. */
+  /** Icon node rendered before the label text. It is drawn at 12px and filled with the text colour. */
   icon?: ReactNode;
+  /** Text of the button. Anything else you pass as `children` is dropped. */
   label?: ReactNode;
+  /** Applied to the rendered element, after the component's own class. */
   className?: string;
 };
 
