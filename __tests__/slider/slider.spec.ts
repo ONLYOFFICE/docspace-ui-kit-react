@@ -27,6 +27,32 @@ test.describe("Slider — light", () => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("slider-css-customization.png");
   });
+
+  test("with custom steps", async ({ page }) => {
+    await gotoStory(page, "with-custom-steps");
+    await expect(page).toHaveScreenshot("slider-with-custom-steps.png");
+  });
+
+  test("without pouring", async ({ page }) => {
+    await gotoStory(page, "without-pouring");
+    await expect(page).toHaveScreenshot("slider-without-pouring.png");
+  });
+
+  test("with custom size", async ({ page }) => {
+    await gotoStory(page, "with-custom-size");
+    await expect(page).toHaveScreenshot("slider-with-custom-size.png");
+  });
+
+  test("rtl", async ({ page }) => {
+    await gotoStory(page, "rtl");
+    await expect(page).toHaveScreenshot("slider-rtl.png");
+  });
+
+  test("focus ring", async ({ page }) => {
+    await gotoStory(page, "default");
+    await page.keyboard.press("Tab");
+    await expect(page).toHaveScreenshot("slider-focus-ring.png");
+  });
 });
 
 test.describe("Slider — dark", () => {
@@ -54,5 +80,36 @@ test.describe("Slider — dark", () => {
     await gotoStory(page, "css-customization");
     await page.evaluate(() => document.body.classList.add("dark"));
     await expect(page).toHaveScreenshot("slider-css-customization-dark.png");
+  });
+
+  test("with custom steps dark", async ({ page }) => {
+    await gotoStory(page, "with-custom-steps");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await expect(page).toHaveScreenshot("slider-with-custom-steps-dark.png");
+  });
+
+  test("without pouring dark", async ({ page }) => {
+    await gotoStory(page, "without-pouring");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await expect(page).toHaveScreenshot("slider-without-pouring-dark.png");
+  });
+
+  test("with custom size dark", async ({ page }) => {
+    await gotoStory(page, "with-custom-size");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await expect(page).toHaveScreenshot("slider-with-custom-size-dark.png");
+  });
+
+  test("rtl dark", async ({ page }) => {
+    await gotoStory(page, "rtl");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await expect(page).toHaveScreenshot("slider-rtl-dark.png");
+  });
+
+  test("focus ring dark", async ({ page }) => {
+    await gotoStory(page, "default");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await page.keyboard.press("Tab");
+    await expect(page).toHaveScreenshot("slider-focus-ring-dark.png");
   });
 });
