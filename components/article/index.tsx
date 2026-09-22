@@ -391,4 +391,4 @@ Article.Body = ArticleBody;
 
 export default Article;
 export { ArticleProfile };
-export type { ArticleProfileProps } from "./Article.types";
+export type { ArticleProfileProps, ArticleProps } from "./Article.types";

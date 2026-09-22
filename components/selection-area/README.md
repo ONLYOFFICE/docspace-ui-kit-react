@@ -26,8 +26,9 @@ you give it.
 - Use over a listing whose items you can label with classes and a `value` attribute, when
   dragging across them should select them.
 - **It does nothing without an element whose id is the literal `sectionScroll`.** Every mouse-down
-  outside one is ignored, and nothing in this package renders such an element — it comes from the
-  DocSpace layout. Add it yourself around the listing, or the component is inert.
+  outside one is ignored. [`Section`](../section/README.md) renders that element as its body
+  scroller, so inside one this is already satisfied; anywhere else, give the scrolling element that
+  id yourself or the component is inert.
 - Not for selecting one item — that is the checkbox on
   [`Tiles`](../tiles/README.md) or [`Rows`](../rows/README.md).
 - Not for dragging items somewhere — [`DragAndDrop`](../drag-and-drop/README.md) is the drop
@@ -208,7 +209,9 @@ export function ControlledSelection({ ids }: { ids: string[] }) {
 ## Behaviour the types don't state
 
 - **The literal id `sectionScroll` is a hard requirement.** A mouse-down whose target is not inside
-  an element with that id is ignored outright. Nothing in the package renders one.
+  an element with that id is ignored outright. [`Section`](../section/README.md) puts it on its body
+  scroller, but only while `withBodyScroll` is set and the layout is not the phone one — so a
+  section that does not scroll its own body leaves this component inert as well.
 - **Six more literal class names cancel a selection before it starts**: `not-selectable`,
   `tile-selected`, `table-row-selected`, `row-selected`, `table-container_row-checkbox` and
   `item-file-name`. A mouse-down inside any of them does nothing.
