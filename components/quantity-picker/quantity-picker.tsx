@@ -13,30 +13,71 @@ import { TabItem } from "../tab-item";
 import styles from "./quantity-picker.module.scss";
 
 interface TabItemObject {
+  /** Text of the chip, which is rendered with a `+` in front of it. */
   name: string;
+  /** How much the chip adds to the current value. */
   value: number;
 }
 
 type QuantityPickerProps = {
+  /** The current number. This is a controlled component; it keeps none of its own. */
   value: number;
+  /** Smallest number the minus button and the field will settle on. */
   minValue: number;
+  /**
+   * Largest ordinary number. With `showPlusSign` the value may go one past it,
+   * which is displayed as `<maxValue>+`.
+   */
   maxValue: number;
+  /** How much one press of plus or minus moves the value. */
   step: number;
+  /** Heading above the control. */
   title?: string | null;
+  /** Smaller line under the heading. */
   subtitle?: string;
+  /**
+   * Whether anything above `maxValue` is shown as `<maxValue>+` rather than as
+   * the number. Typing a larger number then reports `maxValue + 1`.
+   */
   showPlusSign?: boolean;
+  /**
+   * Whether the whole control is inert. The field is replaced by plain text, so
+   * nothing can be typed or focused.
+   */
   isDisabled?: boolean;
+  /** Whether a slider is drawn under the control, running from `minValue` to `maxValue + 1`. */
   showSlider?: boolean;
+  /**
+   * Called with the new number whenever it changes — a button, the slider, a
+   * quick-add chip, or the field on blur or Enter.
+   */
   onChange: (value: number) => void;
+  /** Applied to the outermost element. */
   className?: string;
+  /**
+   * Quick-add chips under the control. Each **adds** its number to the current
+   * value rather than setting it; a bare number is labelled `+<number>`.
+   */
   items?: Array<number | TabItemObject>;
+  /** Whether the number is drawn in the larger size. */
   isLarge?: boolean;
+  /** Whether the plus and minus buttons are left out, leaving the field alone. */
   withoutControls?: boolean;
+  /** Text shown in place of the number while `isDisabled`. */
   disableValue?: string;
+  /** Line under the controls. It is rendered even when empty, so it always takes its height. */
   underControlsTitle?: string | React.ReactNode;
+  /** Ignored. Nothing reads this prop; `enableZero` is the one that works. */
   isZeroAllowed?: boolean;
+  /**
+   * Whether the value may fall to 0 instead of stopping at `minValue`. It also
+   * turns on the warning styling for a value between 0 and `minValue`.
+   * @default false
+   */
   enableZero?: boolean;
+  /** `data-tooltip-id` on the minus button, for a `Tooltip` of your own. */
   minusTooltipId?: string;
+  /** Whether only the minus button is inert. */
   minusDisabled?: boolean;
 };
 

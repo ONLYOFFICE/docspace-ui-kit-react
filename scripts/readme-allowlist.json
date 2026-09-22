@@ -5,13 +5,10 @@
   "components/article",
   "components/avatar-editor-dialog",
   "components/badge",
-  "components/calendar",
   "components/card",
   "components/category-item",
   "components/collapsible-card",
   "components/columnar-info-bar",
-  "components/date-picker",
-  "components/date-time-picker",
   "components/drag-and-drop",
   "components/dropzone",
   "components/empty-screen-container",
@@ -33,7 +30,6 @@
   "components/portal-logo",
   "components/progress-bar",
   "components/public-room-bar",
-  "components/quantity-picker",
   "components/quick-actions",
   "components/room-icon",
   "components/room-logo",
@@ -58,8 +54,6 @@
   "components/tiles/template-tile",
   "components/tiles/tile-container",
   "components/tiles/tile-content",
-  "components/time-picker",
   "components/toast",
-  "components/top-loading-indicator",
-  "components/two-state-toggle"
+  "components/top-loading-indicator"
 ]
