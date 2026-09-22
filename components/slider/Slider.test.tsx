@@ -67,6 +67,48 @@ describe("<Slider />", () => {
     );
 
     const slider = screen.getByTestId("slider");
-    expect(slider).toBeInTheDocument();
+
+    expect(slider.style.getPropertyValue("--thumb-width")).toBe("20px");
+    expect(slider.style.getPropertyValue("--thumb-height")).toBe("20px");
+    expect(slider.style.getPropertyValue("--thumb-border-width")).toBe("2px");
+    expect(slider.style.getPropertyValue("--runnable-track-height")).toBe(
+      "4px",
+    );
+  });
+
+  it("sizes the poured fill from the value's place in the range", () => {
+    render(
+      <Slider {...defaultProps} min={100} max={200} value={150} withPouring />,
+    );
+
+    const slider = screen.getByTestId("slider");
+
+    expect(slider.style.getPropertyValue("--size-prop")).toBe("50%");
+    expect(slider.style.backgroundSize).toBe("50% 100%");
+  });
+
+  it("leaves the track unfilled without withPouring", () => {
+    render(<Slider {...defaultProps} />);
+
+    expect(screen.getByTestId("slider").style.backgroundSize).toBe("auto");
+  });
+
+  it("pours from the right in a right-to-left document", () => {
+    document.dir = "rtl";
+    render(<Slider {...defaultProps} withPouring />);
+    document.dir = "";
+
+    expect(screen.getByTestId("slider").style.backgroundPosition).toBe(
+      "right center",
+    );
+  });
+
+  it("marks the poured and disabled states with modifier classes", () => {
+    render(<Slider {...defaultProps} withPouring isDisabled />);
+
+    const slider = screen.getByTestId("slider");
+
+    expect(slider.className).toContain("withPouring");
+    expect(slider.className).toContain("disabled");
   });
 });
