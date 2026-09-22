@@ -53,6 +53,18 @@ export const TableHeader = (props: TableHeaderProps) => {
   const [hideColumns, setHideColumns] = useState(false);
   const [minWidthsIndex, setMinWidthsIndex] = useState<number[]>([]);
 
+  // Column ids repeat across tables; search this header only.
+  // Before the ref is attached, never fall back to another table.
+  const getContainer = () =>
+    containerRef.current ??
+    headerRef.current?.closest<HTMLDivElement>(".table-container") ??
+    document.getElementById("table-container");
+
+  const getColumnNode = (index: Nullable<number> | string) =>
+    headerRef.current
+      ? headerRef.current.querySelector<HTMLElement>(`[id="column_${index}"]`)
+      : document.getElementById(`column_${index}`);
+
   const { isRTL } = useInterfaceDirection();
 
   const getNextColumn = (array: TTableColumn[], index: number) => {
@@ -70,7 +82,9 @@ export const TableHeader = (props: TableHeaderProps) => {
   const updateTableRows = (str: string) => {
     if (!useReactWindow) return;
 
-    const rows = document.querySelectorAll(".table-row, .table-list-item");
+    const rows = (getContainer() ?? document).querySelectorAll(
+      ".table-row, .table-list-item",
+    );
 
     if (rows?.length) {
       for (let i = 0; i < rows.length; i += 1) {
@@ -96,7 +110,7 @@ export const TableHeader = (props: TableHeaderProps) => {
     if (colIndex < 0) return;
 
     while (colIndex >= 0) {
-      leftColumn = document.getElementById(`column_${colIndex}`);
+      leftColumn = getColumnNode(colIndex);
       if (leftColumn) {
         if (leftColumn.dataset.enable === "true") break;
         else colIndex -= 1;
@@ -145,7 +159,7 @@ export const TableHeader = (props: TableHeaderProps) => {
     let colIndex = index || +columnIndex + 1;
 
     while (colIndex !== columns.length) {
-      rightColumn = document.getElementById(`column_${colIndex}`);
+      rightColumn = getColumnNode(colIndex);
       if (rightColumn) {
         if (rightColumn.dataset.enable === "true") break;
         else colIndex += 1;
@@ -155,7 +169,7 @@ export const TableHeader = (props: TableHeaderProps) => {
     const offset = getSubstring(widths[+columnIndex]) - newWidth;
     const column2Width = getSubstring(widths[colIndex]);
 
-    const defaultColumn = document.getElementById(`column_${colIndex}`);
+    const defaultColumn = getColumnNode(colIndex);
     if (!defaultColumn || defaultColumn.dataset.defaultSize) return;
 
     const minSize = rightColumn?.dataset.minWidth
@@ -183,7 +197,7 @@ export const TableHeader = (props: TableHeaderProps) => {
     const columnIndex = columnIndexRef.current;
 
     if (columnIndex === null) return;
-    const column = document.getElementById(`column_${columnIndex}`);
+    const column = getColumnNode(columnIndex);
 
     if (!column) return;
 
@@ -253,13 +267,12 @@ export const TableHeader = (props: TableHeaderProps) => {
   };
 
   function resetColumns(isResized: boolean = false) {
+
     // While the container is collapsed (e.g. the host hides #section behind a
     // fullscreen overlay, giving it width 0), recomputing against a zero width
     // yields garbage column sizes that would get persisted and corrupt the
     // layout once the container is restored — skip until it has a real width.
-    const collapsedContainer = containerRef.current
-      ? containerRef.current
-      : document.getElementById("table-container");
+    const collapsedContainer = getContainer();
     if (
       collapsedContainer &&
       collapsedContainer.getBoundingClientRect().width < 1
@@ -277,9 +290,7 @@ export const TableHeader = (props: TableHeaderProps) => {
       .filter((x) => !x.default)
       .filter((x) => !x.isShort);
 
-    const container = containerRef.current
-      ? containerRef.current
-      : document.getElementById("table-container");
+    const container = getContainer();
 
     if (!container) return;
 
@@ -368,7 +379,7 @@ export const TableHeader = (props: TableHeaderProps) => {
       const unfixedSize = checkingForUnfixedSize(item, defaultColumnSize);
       if (!unfixedSize) return;
 
-      const column = document.getElementById(`column_${index}`);
+      const column = getColumnNode(index);
       const minWidth = column?.dataset?.minWidth;
       const minSize = minWidth ? +minWidth : MIN_SIZE_NAME_COLUMN;
 
@@ -386,7 +397,7 @@ export const TableHeader = (props: TableHeaderProps) => {
       const unfixedSize = checkingForUnfixedSize(item, defaultColumnSize);
       if (!unfixedSize) return;
 
-      const column = document.getElementById(`column_${index}`);
+      const column = getColumnNode(index);
       const minWidth = column?.dataset?.minWidth;
       const minSize = minWidth ? +minWidth : MIN_SIZE_NAME_COLUMN;
 
@@ -475,15 +486,14 @@ export const TableHeader = (props: TableHeaderProps) => {
   }
 
   function onResize(isResized: boolean = false) {
+
     if (!isDesktop() || !columnStorageName || !columnInfoPanelStorageName) {
       return;
     }
 
     let activeColumnIndex = null;
 
-    const container = containerRef.current
-      ? containerRef.current
-      : document.getElementById("table-container");
+    const container = getContainer();
 
     if (!container) return;
 
@@ -576,7 +586,7 @@ export const TableHeader = (props: TableHeaderProps) => {
       let containerMinWidth = containerWidth - defaultSize - SETTINGS_SIZE;
 
       tableInfoPanelContainer.forEach((item, index) => {
-        const column = document.getElementById(`column_${index}`);
+        const column = getColumnNode(index);
 
         const enable =
           index === tableContainer.length - 1 ||
@@ -609,7 +619,7 @@ export const TableHeader = (props: TableHeaderProps) => {
           columns.find((col) => col.isShort && col.enable)?.minWidth || 0;
 
         tableInfoPanelContainer.forEach((item, index) => {
-          const column = document.getElementById(`column_${index}`);
+          const column = getColumnNode(index);
 
           if (shortColumnSize && index === 0) {
             gridTemplateColumns.push(`${shortColumnSize}px`);
@@ -675,7 +685,7 @@ export const TableHeader = (props: TableHeaderProps) => {
             let overWidth = 0;
 
             tableInfoPanelContainer.forEach((item, index) => {
-              const column = document.getElementById(`column_${index}`);
+              const column = getColumnNode(index);
 
               const shortColumSize =
                 column?.dataset?.shortColum && column.dataset.minWidth;
@@ -807,7 +817,7 @@ export const TableHeader = (props: TableHeaderProps) => {
             const oldWidthIndexAndName = indexColumnWidth + nameColumnWidth;
 
             tableInfoPanelContainer.forEach((item, index) => {
-              const column = document.getElementById(`column_${index}`);
+              const column = getColumnNode(index);
 
               const enable =
                 index === tableInfoPanelContainer.length - 1 ||
@@ -952,7 +962,7 @@ export const TableHeader = (props: TableHeaderProps) => {
           for (const index in tableContainer) {
             const item = tableContainer[index];
 
-            const column = document.getElementById(`column_${index}`);
+            const column = getColumnNode(index);
             const enable =
               +index === tableContainer.length - 1 ||
               (column ? column.dataset.enable === "true" : item !== "0px");
