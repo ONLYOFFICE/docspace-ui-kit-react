@@ -1,11 +1,6 @@
 [
-  "components/app-loader",
   "components/article",
   "components/filter",
-  "components/loader-wrapper",
   "components/navigation",
-  "components/progress-bar",
-  "components/section",
-  "components/status-message",
-  "components/top-loading-indicator"
+  "components/section"
 ]
