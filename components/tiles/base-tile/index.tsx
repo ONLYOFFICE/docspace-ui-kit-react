@@ -209,3 +209,8 @@ export const BaseTile = ({
     </div>
   );
 };
+export type {
+  BaseTileProps,
+  ItemProps,
+  TileChildProps,
+} from "./BaseTile.types";

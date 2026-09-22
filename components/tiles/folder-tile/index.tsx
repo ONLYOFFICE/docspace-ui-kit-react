@@ -314,3 +314,8 @@ export const FolderTile = ({
 };
 
 export default FolderTile;
+export type {
+  FolderTileProps,
+  FolderItem,
+  FolderChildProps,
+} from "./FolderTile.types";

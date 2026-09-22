@@ -53,9 +53,9 @@ export type TextProps = {
   rel?: string;
   /** Passed to the element unchanged. The component adds no role, so a focusable text element needs one from you. */
   tabIndex?: number;
-  /** Ignored. Nothing reads this prop, and it reaches the DOM as an unknown attribute. */
+  /** Not read here — it reaches the DOM as an unknown attribute. It is read off this element by `RowContent` and `TileContent`, which use it as the width of the slot they put the child in. */
   containerWidth?: string;
-  /** Ignored. Nothing reads this prop, and it reaches the DOM as an unknown attribute. */
+  /** Not read here — it reaches the DOM as an unknown attribute. It is read off this element by `RowContent`, which uses it as the minimum width of a side slot. */
   containerMinWidth?: string;
   /** Value of `data-testid` on the element.
    * @default "text" */

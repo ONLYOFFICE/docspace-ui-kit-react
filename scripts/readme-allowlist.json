@@ -12,13 +12,5 @@
   "components/selection-area",
   "components/status-message",
   "components/theme-provider",
-  "components/tiles",
-  "components/tiles/base-tile",
-  "components/tiles/file-tile",
-  "components/tiles/folder-tile",
-  "components/tiles/room-tile",
-  "components/tiles/template-tile",
-  "components/tiles/tile-container",
-  "components/tiles/tile-content",
   "components/top-loading-indicator"
 ]

@@ -1,94 +1,289 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "FileTile",
+  "folder": "components/tiles/file-tile",
+  "kind": "sub-component",
+  "parent": "Tiles",
+  "category": "Data display",
+  "status": "public",
+  "summary": "Tile for a document: a thumbnail with badges over it, and a name row with a checkbox and a menu.",
+  "import": { "subpath": "components/tiles/file-tile", "barrel": false, "default": false },
+  "exports": ["FileTile", "FileTileProps", "FileItem", "FileItemType", "FileChildProps"],
+  "providers": ["ThemeProvider", "TranslationProvider"],
+  "state": { "visibility": null, "close": "hideContextMenu", "loading": "inProgress", "disabled": null },
+  "related": ["tiles", "tiles/folder-tile", "tiles/tile-content"],
+  "subComponents": [],
+  "testIds": ["tile", "file-thumbnail"]
+} -->
+
 # FileTile
 
-File tile component for displaying file information in a tile format with thumbnail preview.
+Tile for a document: a thumbnail with badges over it, and a name row with a checkbox and a menu.
+It is the card form of one file in the DocSpace listing, and the only tile in the family with a
+preview image.
 
-## Usage
+## Use this when / not when
+
+- Use for a document in a tile listing, with a thumbnail when you have one and an icon when you
+  do not.
+- Not for a folder — [`FolderTile`](../folder-tile/README.md) has its own two layouts and no
+  thumbnail fallback chain.
+- Not for a room or a template — [`RoomTile`](../room-tile/README.md) and
+  [`TemplateTile`](../template-tile/README.md).
+- Not for a card of your own — [`BaseTile`](../base-tile/README.md) is the shell without the
+  file-specific click handling.
+- **A plain click selects the file; it does not open it.** Opening is up to the link you put in
+  the content, or to `thumbnailClick`. See the note about the class names that make a click
+  harmless.
+
+## Import
+
+```ts
+import { FileTile } from "@onlyoffice/apps-ui-kit/components/tiles/file-tile";
+```
+
+`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+The name is also reachable from `@onlyoffice/apps-ui-kit/components/tiles`, which re-exports the
+whole family.
+
+Needs `ThemeProvider` for its colours and `TranslationProvider` for the three-dot button's
+tooltip, which it asks the kit's own translation hook for under the key `TitleShowActions`.
+
+## Minimal example
 
 ```tsx
+import { Link } from "@onlyoffice/apps-ui-kit/components/link";
 import { FileTile } from "@onlyoffice/apps-ui-kit/components/tiles/file-tile";
+import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
 
-<FileTile
-  item={{
-    id: "file-1",
-    title: "Document.docx",
-    fileExst: ".docx",
-    fileType: FileType.Document,
-  }}
-  contextOptions={contextOptions}
-  element={<FileIcon />}
-  thumbnail="/path/to/thumbnail.jpg"
-  temporaryIcon={<DefaultIcon />}
-  onSelect={(checked, item) => console.log(checked, item)}
-/>;
+const file = {
+  id: "d1",
+  title: "Report.docx",
+  fileExst: ".docx",
+  contextOptions: [],
+};
+
+export function DocumentTile() {
+  return (
+    <FileTile item={file} contextOptions={[]} temporaryIcon="/icons/docx.svg">
+      <TileContent>
+        <Link className="item-file-name">{file.title}</Link>
+      </TileContent>
+    </FileTile>
+  );
+}
 ```
 
 ## Props
 
-| Props                      |                       Type                       | Required | Values | Default | Description                                         |
-| -------------------------- | :----------------------------------------------: | :------: | :----: | :-----: | --------------------------------------------------- |
-| `item`                     |                  `FileItemType`                  |   Yes    |   -    |    -    | File item data                                      |
-| `contextOptions`           |               `ContextMenuModel[]`               |   Yes    |   -    |    -    | Context menu options                                |
-| `checked`                  |                    `boolean`                     |    -     |   -    | `false` | Indicates if the tile is selected                   |
-| `children`                 |         `ReactElement \| ReactElement[]`         |    -     |   -    |    -    | Child components to render                          |
-| `contextButtonSpacerWidth` |                     `number`                     |    -     |   -    |    -    | Width of the spacer for context menu button         |
-| `inProgress`               |                    `boolean`                     |    -     |   -    | `false` | Indicates if the tile is in loading state           |
-| `onSelect`                 | `(checked: boolean, item: FileItemType) => void` |    -     |   -    |    -    | Function called when tile is selected               |
-| `thumbnailClick`           |         `(e: React.MouseEvent) => void`          |    -     |   -    |    -    | Function called when thumbnail is clicked           |
-| `thumbnail`                |                     `string`                     |    -     |   -    |    -    | Thumbnail image URL                                 |
-| `temporaryIcon`            |             `string \| ReactElement`             |    -     |   -    |    -    | Temporary icon when thumbnail is not available      |
-| `withCtrlSelect`           |          `(item: FileItemType) => void`          |    -     |   -    |    -    | Function to handle selection with Ctrl key          |
-| `withShiftSelect`          |          `(item: FileItemType) => void`          |    -     |   -    |    -    | Function to handle selection with Shift key         |
-| `element`                  |                  `ReactElement`                  |    -     |   -    |    -    | Custom element to render                            |
-| `tileContextClick`         |        `(isRightClick?: boolean) => void`        |    -     |   -    |    -    | Function called when context menu button is clicked |
-| `getContextModel`          |            `() => ContextMenuModel[]`            |    -     |   -    |    -    | Function to get context menu model                  |
-| `hideContextMenu`          |                   `() => void`                   |    -     |   -    |    -    | Function to hide context menu                       |
-| `sideColor`                |                     `string`                     |    -     |   -    |    -    | Color for the left border                           |
-| `setSelection`             |          `(items: FileItem[]) => void`           |    -     |   -    |    -    | Function to set selection state                     |
-| `contentElement`           |                  `ReactElement`                  |    -     |   -    |    -    | Custom content element                              |
-| `badges`                   |                  `ReactElement`                  |    -     |   -    |    -    | Custom badges to display                            |
-| `isHighlight`              |                    `boolean`                     |    -     |   -    | `false` | Flag indicating if tile should be highlighted       |
-| `isBlockingOperation`      |                    `boolean`                     |    -     |   -    | `false` | Indicates if file is in blocking operation state    |
-| `showHotkeyBorder`         |                    `boolean`                     |    -     |   -    | `false` | Flag to show hotkey border                          |
-| `isDragging`               |                    `boolean`                     |    -     |   -    | `false` | Indicates if file is being dragged                  |
-| `thumbSize`                |                     `number`                     |    -     |   -    |    -    | Size of the thumbnail in pixels                     |
-| `isActive`                 |                    `boolean`                     |    -     |   -    | `false` | Indicates if file is in active state                |
-| `isEdit`                   |                    `boolean`                     |    -     |   -    | `false` | Flag for edit mode                                  |
-| `dataTestId`               |                     `string`                     |    -     |   -    |    -    | Data test id for the tile                           |
+<!-- props:start -->
 
-## Features
+_Generated by `pnpm readme:props` from `FileTileProps` in `FileTile.types.tsx`. Do not edit; edit the JSDoc._
 
-- **Thumbnail Preview**: Displays file thumbnails with fallback icons
-- **File Type Icons**: Shows appropriate icons for different file types
-- **Plugin Support**: Handles plugin files with custom icons
-- **Multi-Selection**: Supports Ctrl/Cmd and Shift key selection
-- **Drag & Drop**: Visual feedback during drag operations
-- **Context Menu**: Right-click and three-dot menu support
-- **Progress State**: Shows loader during operations
-- **Badges**: Supports custom badges (version, lock, etc.)
-- **Mobile Optimized**: Touch-friendly interface
+| Prop                       | Type                                                                                                                          | Required | Default  | Description                                                                                                                                   |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | -------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `contextOptions`           | `ContextMenuModel[]`                                                                                                          | **yes**  | –        | The menu's entries. Required — but the three-dot button appears only when `item` also carries a `contextOptions` key of its own.              |
+| `item`                     | `FileItemType`                                                                                                                | **yes**  | –        | The file this tile stands for.                                                                                                                |
+| `badges`                   | `ReactElement<unknown, string \| JSXElementConstructor<any>>`                                                                 | no       | –        | Badges drawn over the thumbnail. Give them the class `badges` so a click on them does not select the tile.                                    |
+| `checked`                  | `boolean`                                                                                                                     | no       | –        | Whether the tile is selected.                                                                                                                 |
+| `children`                 | `ReactElement<unknown, string \| JSXElementConstructor<any>> \| ReactElement<unknown, string \| JSXElementConstructor<any>>…` | no       | –        | The tile's content. Only the first element is rendered, in the row beside the icon; the rest are dropped.                                     |
+| `contentElement`           | `ReactElement<unknown, string \| JSXElementConstructor<any>>`                                                                 | no       | –        | Row of quick-action buttons over the thumbnail, above the badges.                                                                             |
+| `contextButtonSpacerWidth` | `number`                                                                                                                      | no       | –        | Ignored. Nothing reads it, and it is spread onto the outer element as an unknown attribute.                                                   |
+| `dataTestId`               | `string`                                                                                                                      | no       | `"tile"` | Value of `data-testid` on the outer element.                                                                                                  |
+| `element`                  | `ReactElement<unknown, string \| JSXElementConstructor<any>>`                                                                 | no       | –        | The icon beside the checkbox. Without it neither the icon nor the checkbox is rendered at all.                                                |
+| `forwardRef`               | `RefObject<HTMLDivElement \| null>`                                                                                           | no       | –        | Attached to the outer element, and clicked by the component itself on a right-click before the menu is mounted.                               |
+| `getContextModel`          | `() => ContextMenuModel[]`                                                                                                    | no       | –        | Builds the menu shown on right-click. Without it the right-click menu never opens.                                                            |
+| `hideContextMenu`          | `() => void`                                                                                                                  | no       | –        | Called when the menu closes.                                                                                                                  |
+| `inProgress`               | `boolean`                                                                                                                     | no       | –        | Replaces the icon and the checkbox with the kit's track loader.                                                                               |
+| `isActive`                 | `boolean`                                                                                                                     | no       | –        | Whether the tile is the one being acted on, which keeps its hover state.                                                                      |
+| `isBlockingOperation`      | `boolean`                                                                                                                     | no       | –        | Dims the tile while an operation is running over it.                                                                                          |
+| `isDragging`               | `boolean`                                                                                                                     | no       | –        | Dims the tile while it is being dragged.                                                                                                      |
+| `isEdit`                   | `boolean`                                                                                                                     | no       | –        | Renaming state: it removes the icon and the checkbox.                                                                                         |
+| `isHighlight`              | `boolean`                                                                                                                     | no       | –        | Tints the lower half, for a file that a search or a filter has just matched.                                                                  |
+| `onSelect`                 | `(checked: boolean, item: FileItemType) => void`                                                                              | no       | –        | Called with the new checked state and the `item` — from the checkbox, from a plain click on the tile, and from a tap on the icon below 600px. |
+| `setSelection`             | `(items: FileItem[]) => void`                                                                                                 | no       | –        | Called with an empty array before a plain click selects the tile, unless the click landed on an image, an input or an SVG shape.              |
+| `showHotkeyBorder`         | `boolean`                                                                                                                     | no       | –        | Draws the accent outline that marks the tile the keyboard is on.                                                                              |
+| `sideColor`                | `string`                                                                                                                      | no       | –        | Ignored. Nothing reads it, and it is spread onto the outer element as an unknown attribute.                                                   |
+| `temporaryIcon`            | `ReactElement<unknown, string \| JSXElementConstructor<any>> \| string`                                                       | no       | –        | Drawn when there is no `thumbnail`: a URL is fetched as an SVG, an element is rendered as given.                                              |
+| `thumbnail`                | `string`                                                                                                                      | no       | –        | Preview image for the file. It falls back to `temporaryIcon` when the image fails to load.                                                    |
+| `thumbnailClick`           | `(e: React.MouseEvent) => void`                                                                                               | no       | –        | Called with the event when the thumbnail area is clicked. The tile's own click handler runs as well.                                          |
+| `thumbSize`                | `number`                                                                                                                      | no       | –        | Ignored. Only its difference from `null` is tested, which a `number \| undefined` always satisfies, so the branch it guards is unreachable.   |
+| `tileContextClick`         | `(isRightClick?: boolean) => void`                                                                                            | no       | –        | Called before the menu opens, with `true` when the trigger was a right-click.                                                                 |
+| `withCtrlSelect`           | `(item: FileItemType) => void`                                                                                                | no       | –        | Called with the `item` on a Ctrl- or Cmd-click, instead of selecting.                                                                         |
+| `withShiftSelect`          | `(item: FileItemType) => void`                                                                                                | no       | –        | Called with the `item` on a Shift-click, instead of selecting.                                                                                |
 
-## File Item Structure
+<!-- props:end -->
+
+## Recipes
+
+### Selection, including Ctrl and Shift
+
+A plain click calls `onSelect` with the opposite of `checked`. Ctrl or Cmd and Shift are diverted
+to their own callbacks and never select on their own — if you do not pass them, those clicks do
+nothing.
 
 ```tsx
-{
-  id: string | number;
-  title: string;
-  fileExst?: string;
-  fileType?: FileType;
-  isPlugin?: boolean;
-  fileTileIcon?: string;
-  logo?: {
-    original?: string;
-    large?: string;
-    medium?: string;
-    small?: string;
-    color?: string;
-    cover?: string;
-  };
-  viewAccessibility?: {
-    ImageView: boolean;
-    MediaView: boolean;
-  };
-  contextOptions?: string[];
+import { useState } from "react";
+
+import { Link } from "@onlyoffice/apps-ui-kit/components/link";
+import { FileTile } from "@onlyoffice/apps-ui-kit/components/tiles/file-tile";
+import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
+
+const file = { id: "d1", title: "Report.docx", contextOptions: [] };
+
+export function SelectableFileTile() {
+  const [checked, setChecked] = useState(false);
+
+  return (
+    <FileTile
+      item={file}
+      checked={checked}
+      contextOptions={[]}
+      element={<span aria-hidden="true">📄</span>}
+      onSelect={(next) => setChecked(next)}
+      withCtrlSelect={() => setChecked((c) => !c)}
+      withShiftSelect={() => setChecked(true)}
+    >
+      <TileContent>
+        <Link className="item-file-name">{file.title}</Link>
+      </TileContent>
+    </FileTile>
+  );
 }
 ```
+
+### Opening the file
+
+The name and the thumbnail need to be exempt from the selecting click. The component checks the
+target for a handful of literal class names — `item-file-name`, `badges`, `tag`,
+`not-selectable`, `expandButton` — so put one of them on anything that should do something else.
+
+```tsx
+import { Link } from "@onlyoffice/apps-ui-kit/components/link";
+import { FileTile } from "@onlyoffice/apps-ui-kit/components/tiles/file-tile";
+import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
+
+const file = { id: "d1", title: "Report.docx", contextOptions: [] };
+
+export function OpenableFileTile({ open }: { open: () => void }) {
+  return (
+    <FileTile
+      item={file}
+      contextOptions={[]}
+      thumbnail="/thumbs/report.png"
+      thumbnailClick={open}
+    >
+      <TileContent>
+        <Link className="item-file-name" onClick={open}>
+          {file.title}
+        </Link>
+      </TileContent>
+    </FileTile>
+  );
+}
+```
+
+### Badges and quick actions
+
+`badges` sits over the thumbnail and `contentElement` sits above it. Give the badges the class
+`badges` so that clicking one does not select the tile.
+
+```tsx
+import { Link } from "@onlyoffice/apps-ui-kit/components/link";
+import { Badge } from "@onlyoffice/apps-ui-kit/components/badge";
+import { FileTile } from "@onlyoffice/apps-ui-kit/components/tiles/file-tile";
+import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
+
+const file = { id: "d1", title: "Report.docx", contextOptions: [] };
+
+export function BadgedFileTile() {
+  return (
+    <FileTile
+      item={file}
+      contextOptions={[]}
+      thumbnail="/thumbs/report.png"
+      badges={
+        <div className="badges">
+          <Badge label="New" />
+        </div>
+      }
+    >
+      <TileContent>
+        <Link className="item-file-name">{file.title}</Link>
+      </TileContent>
+    </FileTile>
+  );
+}
+```
+
+## Behaviour the types don't state
+
+- **Which picture is drawn follows a fixed chain**: a plugin icon when `item.isPlugin` and
+  `item.fileTileIcon` are both set, otherwise the `thumbnail` until it fails to load, otherwise
+  `temporaryIcon`. The failure is sticky for as long as the component stays mounted.
+- **A plain click selects, with exceptions by class name.** The handler walks up from the click
+  target looking for `.badges`, `.item-file-name`, `.tag`, `.not-selectable`, `.expandButton`,
+  `.p-contextmenu` and the internal checkbox class; finding any of them cancels the selection. Those
+  strings are the contract between this tile and your content.
+- **`setSelection([])` runs first**, clearing the rest of the selection, unless the click landed on
+  an `img`, an `input` or an SVG shape.
+- **A double click selects once.** The handler requires `e.detail === 1`, so the second click of a
+  pair is ignored rather than toggling back.
+- **`thumbSize` does nothing.** The only test on it is `thumbSize !== null`, which a
+  `number | undefined` always satisfies, so the branch it guards is unreachable and the value is
+  never used as a size.
+- **`contextButtonSpacerWidth` and `sideColor` are dead and leak.** Neither is read, and because
+  the component spreads its remaining props onto the outer element, both arrive in the DOM as
+  unknown attributes.
+- **Only the first child is rendered.** Everything after it in `children` is dropped without a
+  word.
+- **The three-dot button needs the flag on the item as well as the prop** — see
+  [`BaseTile`](../base-tile/README.md), which has the same gate; and the right-click menu still
+  needs `getContextModel`.
+- **The picture is wrapped in a link with no `href`**, so it is an `<a>` that is not focusable and
+  is not announced as a link.
+- **A tap on the icon selects, but only below 600px.**
+
+## CSS variables
+
+| Variable                  | Default                      | Effect                               |
+| ------------------------- | ---------------------------- | ------------------------------------ |
+| `--tile-bg`               | the theme's tile background  | Background of the tile               |
+| `--tile-hover-bg`         | the checked background       | Background on hover and when checked |
+| `--tile-border-style`     | the theme's border           | Border of the tile                   |
+| `--tile-radius`           | `12px`                       | Corner radius                        |
+| `--tile-height`           | `222px`                      | Height of the whole tile             |
+| `--tile-thumbnail-height` | `100%`                       | Height of the thumbnail area         |
+| `--tile-text-size`        | the theme's font size        | Size of the name row                 |
+| `--tile-text-weight`      | `normal`                     | Weight of the name row               |
+| `--tile-badge-bg`         | the theme's badge background | Background behind the badges         |
+| `--tile-badge-radius`     | `3px`                        | Corner radius of the badge strip     |
+| `--tile-icon-color`       | the theme's icon colour      | Fill of the three-dot button         |
+
+## Accessibility
+
+- The tile is a plain `<div>` with click and context-menu handlers: no role, no `tabindex`, no key
+  handling. The only focusable things are the checkbox and whatever you put in the content.
+- **The thumbnail's `alt` is the fixed English string `Thumbnail-img`**, which is neither
+  descriptive nor translated and cannot be changed.
+- Ctrl-click and Shift-click have no keyboard equivalent, so range and additive selection are
+  pointer-only.
+- The badges and quick actions are your own elements; they are not announced as belonging to the
+  file unless you label them.
+- The name is the one thing that should be a real link — make it one, rather than relying on the
+  tile's click handler, so that the file can be opened from the keyboard.
+
+## Test ids
+
+| Element       | `data-testid`                      |
+| ------------- | ---------------------------------- |
+| Outer element | `tile`, overridden by `dataTestId` |
+| Thumbnail     | `file-thumbnail`                   |
+
+The checkbox, the three-dot button and the menu carry their own components' ids.
+
+## Related
+
+- [`Tiles`](../README.md) — the family this belongs to.
+- [`FolderTile`](../folder-tile/README.md) — the same idea for a folder.
+- [`TileContent`](../tile-content/README.md) — what goes in `children`.

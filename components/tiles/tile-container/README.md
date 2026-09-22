@@ -1,90 +1,231 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "TileContainer",
+  "folder": "components/tiles/tile-container",
+  "kind": "sub-component",
+  "parent": "Tiles",
+  "category": "Data display",
+  "status": "public",
+  "summary": "Grid that sorts the tiles it is given into rooms, templates, folders and files and gives two of them a heading.",
+  "import": { "subpath": "components/tiles/tile-container", "barrel": false, "default": false },
+  "exports": ["TileContainer", "TileContainerProps", "TileItem", "TileItemProps", "CommonTileProps"],
+  "providers": ["ThemeProvider"],
+  "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
+  "related": ["tiles", "tiles/file-tile", "tiles/folder-tile"],
+  "subComponents": [],
+  "testIds": []
+} -->
+
 # TileContainer
 
-Container component for organizing and displaying tiles in a grid layout with automatic categorization.
+Grid that sorts the tiles it is given into rooms, templates, folders and files and gives two of
+them a heading. It does not lay out a list of cards — it reads each child's `item` and decides
+which of four groups it belongs to.
 
-## Usage
+## Use this when / not when
+
+- Use to render a DocSpace-shaped listing: rooms or templates at the top, then folders, then
+  files, each in its own grid.
+- Not as a general card grid — **a child without an `item` prop is dropped without a word**, so
+  your own markup between the tiles never appears. Write a plain CSS grid instead.
+- Not for the list view — that is [`RowContainer`](../../rows/row-container/README.md).
+- **It does not sort within a group.** The order inside each grid is the order you passed the
+  children in; `isDesc` only flips a class on the headings.
+- **It does not virtualise anything by itself.** `useReactWindow` hands the groups to the
+  `infiniteGrid` you supply; on its own it removes the grid wrappers and leaves the tiles
+  unlaid-out.
+
+## Import
+
+```ts
+import { TileContainer } from "@onlyoffice/apps-ui-kit/components/tiles/tile-container";
+```
+
+`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+The name is also reachable from `@onlyoffice/apps-ui-kit/components/tiles`, which re-exports the
+whole family.
+
+Needs `ThemeProvider` above it in the tree: the headings are the kit's `Heading`, which takes its
+colour from the custom properties the provider's `.light` and `.dark` classes declare.
+
+## Minimal example
 
 ```tsx
+import { FolderTile } from "@onlyoffice/apps-ui-kit/components/tiles/folder-tile";
 import { TileContainer } from "@onlyoffice/apps-ui-kit/components/tiles/tile-container";
+import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
+import { Link } from "@onlyoffice/apps-ui-kit/components/link";
 
-<TileContainer headingFolders="Folders" headingFiles="Files" isDesc={false}>
-  <FileTile item={fileItem} {...props} />
-  <RoomTile item={roomItem} {...props} />
-  <FileTile item={folderItem} {...props} />
-</TileContainer>;
+const folders = [
+  { id: 1, title: "Contracts", isFolder: true, contextOptions: [] },
+  { id: 2, title: "Invoices", isFolder: true, contextOptions: [] },
+];
+
+export function Listing() {
+  return (
+    <TileContainer headingFolders="Folders">
+      {folders.map((folder) => (
+        <FolderTile key={folder.id} item={folder} contextOptions={[]}>
+          <TileContent>
+            <Link className="item-file-name">{folder.title}</Link>
+          </TileContent>
+        </FolderTile>
+      ))}
+    </TileContainer>
+  );
+}
 ```
 
 ## Props
 
-| Props            |         Type          | Required | Values |      Default      | Description                                |
-| ---------------- | :-------------------: | :------: | :----: | :---------------: | ------------------------------------------ |
-| `children`       |   `React.ReactNode`   |   Yes    |   -    |         -         | Tile components to render                  |
-| `headingFolders` |       `string`        |    -     |   -    |         -         | Heading text for folders section           |
-| `headingFiles`   |       `string`        |    -     |   -    |         -         | Heading text for files section             |
-| `useReactWindow` |       `boolean`       |    -     |   -    |      `false`      | Enable virtualization with react-window    |
-| `id`             |       `string`        |    -     |   -    | `"tileContainer"` | Container ID                               |
-| `className`      |       `string`        |    -     |   -    |         -         | Additional CSS class name                  |
-| `infiniteGrid`   | `React.ComponentType` |    -     |   -    |         -         | Infinite grid component for virtualization |
-| `isDesc`         |       `boolean`       |    -     |   -    |      `false`      | Descending order flag for styling          |
-| `style`          | `React.CSSProperties` |    -     |   -    |         -         | Inline styles                              |
-| `noSelect`       |       `boolean`       |    -     |   -    |      `false`      | Disable selection styling                  |
+<!-- props:start -->
 
-## Features
+_Generated by `pnpm readme:props` from `TileContainerProps` in `TileContainer.types.tsx`. Do not edit; edit the JSDoc._
 
-- **Automatic Categorization**: Automatically groups items into:
-  - Rooms
-  - Templates
-  - Folders
-  - Files
-- **Section Headings**: Displays headings for folders and files sections
-- **Grid Layout**: Responsive grid layout for tiles
-- **Virtualization Support**: Optional react-window integration for large lists
-- **Flexible Rendering**: Supports both regular and virtualized rendering modes
+| Prop             | Type                                                                                      | Required | Default           | Description                                                                                                                                                         |
+| ---------------- | ----------------------------------------------------------------------------------------- | -------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `children`       | `ReactNode`                                                                               | **yes**  | –                 | The tiles. Each one must carry an `item` prop; a child without it is silently dropped, including plain markup.                                                      |
+| `className`      | `string`                                                                                  | no       | –                 | Added before the component's own class on the outer element.                                                                                                        |
+| `headingFiles`   | `ReactNode`                                                                               | no       | –                 | Heading above the files group. It is rendered only when that group has something in it.                                                                             |
+| `headingFolders` | `ReactNode`                                                                               | no       | –                 | Heading above the folders group. It is rendered only when that group has something in it.                                                                           |
+| `id`             | `string`                                                                                  | no       | `"tileContainer"` | Value of `id` on the outer element.                                                                                                                                 |
+| `infiniteGrid`   | `ComponentType<{ children: React.ReactNode; isRooms?: boolean; isTemplates?: boolean; }>` | no       | –                 | The virtualising grid to render the tiles into. It is told whether the current run is rooms or templates.                                                           |
+| `isDesc`         | `boolean`                                                                                 | no       | –                 | Flips the arrow class on both headings. It sorts nothing.                                                                                                           |
+| `noSelect`       | `boolean`                                                                                 | no       | –                 | Turns off text selection across the whole container.                                                                                                                |
+| `style`          | `CSSProperties`                                                                           | no       | –                 | Inline style of the outer element, and where `--tile-container-gap` goes.                                                                                           |
+| `useReactWindow` | `boolean`                                                                                 | no       | –                 | Hands the four groups to `infiniteGrid` instead of wrapping each in its own grid. Without an `infiniteGrid` alongside it the tiles are emitted with no grid at all. |
 
-## Item Categorization
+<!-- props:end -->
 
-The container automatically categorizes children based on item properties:
+## Recipes
 
-- **Rooms**: Items with `isRoom: true`
-- **Templates**: Items with `isTemplate: true`
-- **Folders**: Items with `isFolder: true` and no `fileExst`
-- **Files**: All other items
+### Folders and files together
 
-## Layout Structure
-
-```
-TileContainer
-├── Rooms (no heading)
-├── Templates (no heading)
-├── Folders
-│   ├── Heading: "Folders"
-│   └── Grid of folder tiles
-└── Files
-    ├── Heading: "Files"
-    └── Grid of file tiles
-```
-
-## Tile Item Interface
+The groups appear in a fixed order — rooms, templates, folders, files — whatever order you hand
+the children in. Only folders and files get a heading, and only when the group is not empty.
 
 ```tsx
-interface TileItem {
-  id: string | number;
-  isFolder?: boolean;
-  isRoom?: boolean;
-  isTemplate?: boolean;
-  fileExst?: string;
-  // ... other properties
+import { FileTile } from "@onlyoffice/apps-ui-kit/components/tiles/file-tile";
+import { FolderTile } from "@onlyoffice/apps-ui-kit/components/tiles/folder-tile";
+import { TileContainer } from "@onlyoffice/apps-ui-kit/components/tiles/tile-container";
+import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
+import { Link } from "@onlyoffice/apps-ui-kit/components/link";
+
+const folder = {
+  id: "f1",
+  title: "Drafts",
+  isFolder: true,
+  contextOptions: [],
+};
+const file = {
+  id: "d1",
+  title: "Report.docx",
+  fileExst: ".docx",
+  contextOptions: [],
+};
+
+export function MixedListing() {
+  return (
+    <TileContainer headingFolders="Folders" headingFiles="Documents">
+      <FileTile item={file} contextOptions={[]}>
+        <TileContent>
+          <Link className="item-file-name">{file.title}</Link>
+        </TileContent>
+      </FileTile>
+      <FolderTile item={folder} contextOptions={[]}>
+        <TileContent>
+          <Link className="item-file-name">{folder.title}</Link>
+        </TileContent>
+      </FolderTile>
+    </TileContainer>
+  );
 }
 ```
 
-## Virtualization
+### Changing the gap
 
-When `useReactWindow` is enabled and `infiniteGrid` component is provided:
+`--tile-container-gap` is the space between tiles in every grid. It is read from the container,
+so `style` is the natural place for it.
 
 ```tsx
-<TileContainer useReactWindow infiniteGrid={InfiniteGridComponent}>
-  {tiles}
-</TileContainer>
+import type { CSSProperties } from "react";
+
+import { FolderTile } from "@onlyoffice/apps-ui-kit/components/tiles/folder-tile";
+import { TileContainer } from "@onlyoffice/apps-ui-kit/components/tiles/tile-container";
+import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
+import { Text } from "@onlyoffice/apps-ui-kit/components/text";
+
+const folder = {
+  id: 1,
+  title: "Contracts",
+  isFolder: true,
+  contextOptions: [],
+};
+
+export function TightListing() {
+  return (
+    <TileContainer style={{ "--tile-container-gap": "8px" } as CSSProperties}>
+      <FolderTile item={folder} contextOptions={[]}>
+        <TileContent>
+          <Text>{folder.title}</Text>
+        </TileContent>
+      </FolderTile>
+    </TileContainer>
+  );
+}
 ```
 
-The container will pass `isRooms` and `isTemplates` flags to the infinite grid component for proper rendering.
+## Behaviour the types don't state
+
+- **A child without `props.item` is dropped silently.** The container walks its children, skips
+  anything that is not a valid element or has no `item`, and renders the rest into one of four
+  buckets. A separator, a heading of your own or a message between the tiles disappears.
+- **The groups render in a fixed order**: rooms, templates, folders, files. The order you pass
+  them in only decides the order inside a group.
+- **The sorting rules are not what the names suggest.** A tile goes to folders when `isFolder` is
+  set _or_ its `id` is the literal `-1`, and in both cases only while `fileExst` is absent and
+  `isRoom` is not set. Templates are checked next, rooms after that, and everything left over is
+  a file — so an item with none of the flags is rendered as a file.
+- **`id` is the React key.** Two items with the same id produce a duplicate-key warning and the
+  usual reconciliation trouble.
+- **`useReactWindow` without `infiniteGrid` removes the layout.** The grid wrappers are only
+  emitted on the non-virtualised path, so the flag on its own leaves the tiles as loose children
+  of the container.
+- **Only folders and files get a heading**, and only when their group is non-empty. Rooms and
+  templates have no heading prop at all.
+- **The folders heading carries the literal element id `folder-tile-heading`**; the files heading
+  has none. Two containers on one page give you two elements with that id.
+- **The outer element's id defaults to the literal `tileContainer`**, so the same applies unless
+  you pass your own.
+- **Each tile is wrapped in a `div`** carrying `tile-item` and one of `room`, `template`,
+  `folder` or `file` — stable hooks for a portal stylesheet, and the elements your own CSS has to
+  target if you want to size a tile.
+
+## CSS variables
+
+| Variable                            | Default | Effect                           |
+| ----------------------------------- | ------- | -------------------------------- |
+| `--tile-container-gap`              | `16px`  | Gap between tiles in every group |
+| `--tile-container-sort-font-size`   | `12px`  | Size of the two group headings   |
+| `--tile-container-sort-font-weight` | `600`   | Weight of the two group headings |
+
+## Accessibility
+
+- The container is a plain `<div>` and the groups are plain `<div>`s: there is no `list` role and
+  no count, so a screen reader hears a run of tiles with nothing tying them together.
+- The two headings are real heading elements from `Heading`, at the kit's smallest size. Rooms and
+  templates have none, so a listing that is only rooms has no heading at all — supply one above
+  the container.
+- Nothing here manages focus or announces that the listing changed. Announce the result count
+  yourself when the content is replaced by a filter.
+
+## Test ids
+
+The component sets none. Select the container by its `id`, which defaults to `tileContainer`, and
+the individual wrappers by the `tile-item` class.
+
+## Related
+
+- [`Tiles`](../README.md) — the family this belongs to.
+- [`FileTile`](../file-tile/README.md) — the tile for a document.
+- [`FolderTile`](../folder-tile/README.md) — the tile for a folder.
