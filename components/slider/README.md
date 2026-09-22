@@ -48,15 +48,21 @@ const MyComponent = () => {
 
 ## Styling
 
-The component uses CSS modules with CSS variables for theming. Key variables include:
+The component is a CSS module themed with CSS custom properties. Set any of these on
+an ancestor element to override the defaults:
 
-```css
---thumb-width
---thumb-height
---thumb-border-width
---runnable-track-height
---size-prop
-```
+| Variable                    | Description                                                        | Default     |
+| --------------------------- | ------------------------------------------------------------------ | ----------- |
+| `--slider-handle-color`     | Thumb background color                                             | theme token |
+| `--slider-pouring-image`    | Fill image for the poured portion, applied only with `withPouring` | theme token |
+| `--slider-background-color` | Track (unfilled) background color                                  | theme token |
+| `--slider-size`             | Track height                                                       | `8px`       |
+| `--slider-handle-size`      | Thumb width and height                                             | `24px`      |
+| `--slider-track-radius`     | Border radius of the track; the thumb keeps a fixed radius         | `5.6px`     |
+
+The `thumbWidth`, `thumbHeight`, `thumbBorderWidth` and `runnableTrackHeight` props write
+`--thumb-width`, `--thumb-height`, `--thumb-border-width` and `--runnable-track-height`
+inline on the input, and take precedence over the variables above.
 
 ## Examples
 
