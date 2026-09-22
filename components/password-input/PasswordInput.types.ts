@@ -82,31 +82,55 @@ export type TPasswordTooltipProps = {
 };
 
 type PasswordInputBaseProps = {
+  /** Handle for generating a password and reading the current value. */
   ref?: React.RefObject<PasswordInputHandle | null>;
-  /** Input value */
+  /**
+   * Value the field starts with. The component owns the value from then on:
+   * changing this later is ignored unless it becomes an empty string, or
+   * `isSimulateType` is set.
+   */
   inputValue?: string;
-  /** Required to associate the password field with the email field */
+  /** Ignored. It only sets an internal flag for a copy button that is not rendered. */
   emailInputName?: string;
-  /** Set of settings for password generator and validator */
+  /**
+   * The rules the generator and the checker use. Left out, only a minimum
+   * length of 8 is required — digits, capitals and symbols are all off.
+   */
   passwordSettings?: TPasswordSettings;
-  /** Callback function triggered on validation */
+  /**
+   * Called after every change with whether every rule passes, and with each
+   * rule's own result. It never fires in `simpleView`, which skips checking.
+   */
   onValidateInput?: (
     progressScore: boolean,
     passwordValidation: TPasswordValidation,
   ) => void;
-  /** Set of special characters for password generator */
+  /**
+   * Characters the generator may pick symbols from.
+   * @default "!@#$%^&*"
+   */
   generatorSpecial?: string;
-  /** Sets the password input view to simple */
+  /**
+   * Strips the component down to the field and the reveal eye: no strength
+   * tooltip, no generate link, and no validation at all.
+   */
   simpleView?: boolean;
-  /** Setting display block for full width */
+  /** Whether the wrapper is a full-width block rather than shrinking to the field. */
   isFullWidth?: boolean;
-  /** Indicating the password type simulation */
+  /**
+   * Renders the value as repeated `simulateSymbol` characters in a **text**
+   * field, keeping the real value in state. It needs the input's `id` to be
+   * `conversion-password`, which is where it reads the caret from.
+   */
   isSimulateType?: boolean;
-  /** Sets simulate input symbol */
+  /**
+   * The character drawn for each real one under `isSimulateType`.
+   * @default "•"
+   */
   simulateSymbol?: string;
-  /** Prompts to copy the email and password data */
+  /** Ignored. It feeds a copy button that is not rendered. */
   clipActionResource?: string;
-  /** Prompts that the data has been copied */
+  /** Ignored. It feeds a copy button that is not rendered. */
   clipCopiedResource?: string;
 };
 
@@ -123,12 +147,26 @@ export type PasswordInputProps = Omit<
 > &
   PasswordInputBaseProps &
   TPasswordTooltipProps & {
-    /** Input type override */
+    /**
+     * Whether the field starts revealed. The eye toggles it from then on, and
+     * `isDisabled` forces it back to hidden.
+     * @default InputType.password
+     */
     inputType?: InputType.text | InputType.password;
+    /**
+     * `name` of the field, and the fallback for the tooltip's anchor id when no
+     * `id` is given — so two fields on one page need distinct ids.
+     * @default "passwordInput"
+     */
     inputName?: string;
+    /** Width of the field's wrapper, as a CSS length. */
     inputWidth?: string;
-    /** Callback function triggered on input change */
+    /**
+     * Called on every change with the DOM event and the value after sanitising.
+     * Read the second argument: under `isSimulateType` the event carries the
+     * masking characters, not the password.
+     */
     onChange?: (e: React.ChangeEvent<HTMLInputElement>, value?: string) => void;
-    /** Optional function to sanitize the input value in real time (e.g. strip spaces) */
+    /** Runs on every change before the value is stored — stripping spaces, say. */
     sanitizeValue?: (value: string) => string;
   };
