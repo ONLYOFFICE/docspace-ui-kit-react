@@ -310,12 +310,13 @@ const Article = ({
               {!isMobile && isLiveChatAvailable ? (
                 <ArticleLiveChat
                   isInfoPanelVisible={isInfoPanelVisible}
-                  withMainButton={
-                    withMainButton || false ? !!articleMainButtonContent : false
+                  withFloatingButton={
+                    !!withMainButton &&
+                    !!articleMainButtonContent &&
+                    isMobileArticle
                   }
                   languageBaseName={languageBaseName}
                   zendeskEmail={zendeskEmail}
-                  isMobileArticle={isMobileArticle}
                   chatDisplayName={chatDisplayName}
                   zendeskKey={zendeskKey}
                   showProgress={showProgress}

@@ -2,7 +2,17 @@ import React, { useCallback, useEffect } from "react";
 
 import { useInterfaceDirection } from "../../../context/InterfaceDirectionContext";
 import { useTheme } from "../../../context/ThemeContext";
-import { LIVE_CHAT_LOCAL_STORAGE_KEY } from "../../../constants";
+import { useIsMobile } from "../../../hooks/use-is-mobile";
+import { INFO_PANEL_WIDTH } from "../../../utils/device";
+import {
+  FLOATING_CORNER_GAP,
+  FLOATING_CORNER_INSET,
+  FLOATING_CORNER_INSET_MOBILE,
+  FLOATING_CORNER_SIZE,
+  LIVE_CHAT_LOCAL_STORAGE_KEY,
+  ZENDESK_LAUNCHER_MARGIN_BLOCK,
+  ZENDESK_LAUNCHER_MARGIN_INLINE,
+} from "../../../constants";
 import { Zendesk } from "../zendesk";
 import { zendeskAPI } from "../zendesk/Zendesk.utils";
 import { ArticleZendeskProps } from "../Article.types";
@@ -22,8 +32,7 @@ const ArticleLiveChat = ({
   languageBaseName,
   zendeskEmail,
   chatDisplayName,
-  withMainButton,
-  isMobileArticle,
+  withFloatingButton,
   zendeskKey,
   showProgress,
   isShowLiveChat,
@@ -33,30 +42,37 @@ const ArticleLiveChat = ({
   const ready = getTranslationReady();
   const { currentColorScheme } = useTheme();
   const { isRTL } = useInterfaceDirection();
-  const infoPanelOffset = isInfoPanelVisible ? 400 : 0;
+  const isMobileWidth = useIsMobile();
+  const infoPanelOffset = isInfoPanelVisible ? INFO_PANEL_WIDTH : 0;
 
   useEffect(() => {
+    // The launcher is the only element of the floating corner stack that CSS
+    // does not place, so it repeats the inset the others get from
+    // styles/variables/_floating-corner.scss - otherwise it lines up with
+    // nothing. It shares that corner with the app's create button and with the
+    // upload progress button, and steps one button width aside whenever either
+    // of them is on screen.
+    const inset = isMobileWidth
+      ? FLOATING_CORNER_INSET_MOBILE
+      : FLOATING_CORNER_INSET;
+    const sharesCorner = withFloatingButton || showProgress;
+    const dodge = sharesCorner ? FLOATING_CORNER_SIZE + FLOATING_CORNER_GAP : 0;
+
+    // Zendesk adds the offset to the margin the launcher frame already has, so
+    // both axes hand it the distance that is still missing. That margin is
+    // also a floor: an offset cannot be negative, so an inset smaller than it
+    // (16px against the 20px inline margin) leaves the launcher at the margin.
+    const horizontal =
+      infoPanelOffset + inset + dodge - ZENDESK_LAUNCHER_MARGIN_INLINE;
+    const vertical = inset - ZENDESK_LAUNCHER_MARGIN_BLOCK;
+
     zendeskAPI.addChanges("webWidget", "updateSettings", {
-      offset:
-        withMainButton && isMobileArticle
-          ? {
-              horizontal: "68px",
-              vertical: "11px",
-            }
-          : {
-              horizontal: showProgress
-                ? `${`${infoPanelOffset + 90}px`}`
-                : `${`${infoPanelOffset + 4}px`}`,
-              vertical: "11px",
-            },
+      offset: {
+        horizontal: `${Math.max(horizontal, 0)}px`,
+        vertical: `${Math.max(vertical, 0)}px`,
+      },
     });
-  }, [
-    withMainButton,
-    isMobileArticle,
-    showProgress,
-    isInfoPanelVisible,
-    infoPanelOffset,
-  ]);
+  }, [withFloatingButton, isMobileWidth, showProgress, infoPanelOffset]);
 
   useEffect(() => {
     zendeskAPI.addChanges("webWidget", "setLocale", languageBaseName);
