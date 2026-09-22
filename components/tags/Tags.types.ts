@@ -2,29 +2,29 @@ import type { RefObject } from "react";
 import type { TagClickEvent, TagProps, TagType } from "../tag/Tag.types";
 
 export type TagsProps = {
-  /** Accepts id */
+  /** Applied to the outermost element. */
   id?: string;
-  /** Accepts the tags */
+  /** Tags to lay out. A bare string is treated as `{ label }`. */
   tags: Array<TagType | string>;
-  /** Accepts class */
+  /** Applied to the outermost element. */
   className?: string;
-  /** Accepts the tag column count */
+  /** How many tags are drawn before the rest collapse into one overflow tag. `-1` draws all of them. */
   columnCount: number;
-  /** Accepts css style */
+  /** Applied to the outermost element as inline style. */
   style?: React.CSSProperties;
-  /** Accepts the function that is called when the tag is selected */
+  /** Called with `{ label, roomType, providerType }` when a tag, or an entry of the overflow drop-down, is clicked. */
   onSelectTag: (tag: TagClickEvent) => void;
-  /** Mouse enter event handler */
+  /** Called when the pointer enters any tag. It is not told which one. */
   onMouseEnter?: VoidFunction;
-  /** Mouse leave event handler */
+  /** Called when the pointer leaves any tag. */
   onMouseLeave?: VoidFunction;
-  /** Reference to the option tag element */
+  /** Ref to the overflow tag, for a menu of your own anchored to it. */
   optionTagRef?: RefObject<HTMLDivElement | null>;
-  /** Callback function that is called when the option tag is clicked */
+  /** Called when the overflow tag or the create tag is clicked. Passing it replaces the built-in drop-down. */
   onOptionTagClick?: VoidFunction;
-  /** Controls visibility of the create tag button */
+  /** Whether a plus tag is drawn for creating a new one. It is dropped as soon as the tags overflow. */
   showCreateTag?: boolean;
-  /** Determines whether to show a remove icon for the tag */
+  /** Passed to the overflow drop-down, where it removes the leading margin of each entry. */
   removeTagIcon?: boolean;
 };
 

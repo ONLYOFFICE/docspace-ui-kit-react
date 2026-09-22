@@ -4,65 +4,65 @@ import { type TDirectionX, TDirectionY } from "../../types";
 export type TDropdownType = "alwaysDashed" | "appearDashedAfterHover";
 
 export type SimpleLinkWithDropdownProps = {
-  /** Sets font weight to bold */
+  /** Whether the text is bold. */
   isBold?: boolean;
-  /** Link font size */
+  /** Font size of the text, as a CSS length. */
   fontSize?: string;
-  /** Link font weight */
+  /** Font weight of the text. */
   fontWeight?: number;
-  /** Activates text-overflow with ellipsis */
+  /** Whether the text is truncated with an ellipsis at 200px instead of wrapping. */
   isTextOverflow?: boolean;
-  /** Indicates if the link is in hover state */
+  /** Ignored. Nothing reads this prop; the hover state comes from CSS. */
   isHovered?: boolean;
-  /** Sets opacity to 0.5 for pending status */
+  /** Whether the link is drawn at half opacity, the portal's "pending" look. */
   isSemitransparent?: boolean;
-  /** Link color */
+  /** CSS colour of the text. */
   color?: string;
-  /** Link title attribute */
+  /** `title` attribute of the text — the browser's own tooltip for a truncated label. */
   title?: string;
-  /** Disables the link */
+  /** Whether the link is inert: it greys out and clicking no longer opens the menu. */
   isDisabled?: boolean;
-  /** Dropdown display type */
+  /** Whether the dashed underline is always drawn or appears on hover. */
   dropdownType?: TDropdownType;
-  /** Dropdown menu items */
+  /** Entries of the menu. Each is a `DropDownItem`'s props; `key` is required, and `onClick` is called with the event. */
   data?: ContextMenuModel[];
-  /** Link content */
+  /** Text of the link. */
   children?: React.ReactNode;
 };
 
 export type LinkWithDropDownProps = SimpleLinkWithDropdownProps & {
-  /** Displays the expander icon */
+  /** Whether a chevron is drawn after the text, which turns over while the menu is open. */
   withExpander?: boolean;
-  /** Controls dropdown visibility */
+  /** Whether the menu starts open. The component then keeps that state itself; changing this prop re-syncs it. */
   isOpen?: boolean;
-  /** Additional CSS class for the link */
+  /** Applied to the outermost element, and to the link inside it. */
   className?: string;
-  /** Additional CSS class for the dropdown */
+  /** Applied to the menu. */
   dropDownClassName?: string;
-  /** HTML id attribute */
+  /** Applied to the outermost element. */
   id?: string;
-  /** Additional inline styles */
+  /** Applied to the outermost element as inline style. */
   style?: React.CSSProperties;
-  /** Sets the dropdown opening horizontal direction */
+  /** Which side of the link the menu is aligned to. Passed straight to `DropDown`, which defaults to `"right"`. */
   directionX?: TDirectionX;
-  /** Sets the dropdown opening vertical direction */
+  /** Whether the menu opens above or below the link. Passed straight to `DropDown`, which defaults to `"bottom"`. */
   directionY?: TDirectionY;
-  /** Enables scrollbar in dropdown */
+  /** Whether the menu is wrapped in a scrollbar of its own. It only takes effect on a phone. */
   hasScroll?: boolean;
-  /** Manual width for the dropdown */
+  /** Exact width of the menu, as a CSS length. Without it the menu is as wide as its widest entry. */
   manualWidth?: string;
-  /** Is aside */
+  /** Passed to the menu's backdrop, which then keeps an aside panel above itself. */
   isAside?: boolean;
-  /** Without blur background */
+  /** Passed to the menu's backdrop: makes it transparent. */
   withoutBackground?: boolean;
-  /** Fix dropdown direction regardless of available space */
+  /** Whether the menu keeps `directionX` and `directionY` even when it does not fit there. */
   fixedDirection?: boolean;
-  /** Use default mode for dropdown positioning */
+  /** Whether the menu is rendered in a portal on `document.body`. Turn it off to render it in place. */
   isDefaultMode?: boolean;
-  /** Minimum space from top of viewport */
+  /** (`withDynamicScrollbar` only) Space to leave above the menu, in pixels. */
   topSpace?: number;
-  /** Minimum space from bottom of viewport */
+  /** (`withDynamicScrollbar` only) Space to leave below the menu, in pixels. */
   bottomSpace?: number;
-  /** Enables dynamic height calculation and project Scrollbar for the dropdown list */
+  /** Whether the menu measures the room around the link on every open and scrolls inside what is left. */
   withDynamicScrollbar?: boolean;
 };

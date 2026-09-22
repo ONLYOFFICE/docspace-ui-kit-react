@@ -1,84 +1,82 @@
-import type { TDirectionY } from "../../types";
-
 export type TagProps = {
-  /** Accepts the ref */
+  /** Ref to the outermost element. */
   ref?: React.RefObject<HTMLDivElement | null>;
-  /** Accepts the tag id */
+  /** Identifier of the tag. It is handed to `onDelete`, and it is the text shown when `label` is left out. */
   tag: string;
-  /** Accepts the tag label */
+  /** Text of the tag. It is also the `title` attribute and the accessible name. */
   label?: string;
-  /** Accepts class */
+  /** Applied to the outermost element. */
   className?: string;
-  /** Accepts id */
+  /** Applied to the outermost element. */
   id?: string;
-  /** Accepts css style */
+  /** Merged into the outermost element's inline style, before `tagMaxWidth` is applied. */
   style?: React.CSSProperties;
-  /** Accepts the tag styles as new and adds the delete button */
+  /** Whether the tag is drawn in its "new" colours. It is also what makes the delete cross appear. */
   isNewTag?: boolean;
-  /** Accepts the tag styles as disabled and disables clicking */
+  /** Whether the tag is inert. Pointer events are dropped in CSS as well, so hover does nothing either. */
   isDisabled?: boolean;
-  /** Accepts the tag styles as deleted and disables clicking */
+  /** Whether the tag counts as removed: `onClick` stops firing and the border greys out. */
   isDeleted?: boolean;
-  /** Accepts the function that is called when the tag is clicked */
+  /** Called on a click anywhere in the tag, with `{ label, roomType, providerType }` — not with the DOM event. */
   onClick?: (tag: TagClickEvent) => void;
-  /** Accepts the function that ist called when the tag delete button is clicked */
+  /** Called with `tag` when the cross is clicked. The cross is only rendered when `isNewTag` is set as well. */
   onDelete?: (tag?: string) => void;
-  /** Accepts the max width of the tag */
+  /** `max-width` of the tag, as a CSS length — `Tags` passes a percentage of its own width. */
   tagMaxWidth?: string;
-  /** Accepts the icon associated with the tag */
+  /** Glyph before the label: an SVG URL, or a component rendered as a 12px icon. */
   icon?: string | React.FC<React.SVGProps<SVGSVGElement>>;
-  /** Accepts the icon class name */
+  /** Applied to that glyph. */
   iconClassName?: string;
-  /** Indicates if the tag is a default tag */
+  /** Ignored. Nothing reads this prop on a single tag; it is `TagType.isDefault` that `Tags` acts on. */
   isDefault?: boolean;
-  /** Indicates if the tag is the last in a series */
+  /** Whether the trailing margin is dropped, for the last tag in a row. */
   isLast?: boolean;
-  /** Determines whether to show a remove icon for the tag */
+  /** Passed straight back through `onClick`. The component itself does nothing with it. */
   roomType?: number;
-  /** Indicates the type of provider associated with the tag */
+  /** Passed straight back through `onClick`. The component itself does nothing with it. */
   providerType?: number;
-  /** Data test id for the tag */
+  /** `data-testid` of the outermost element. */
   dataTestId?: string;
-  /** Mouse enter event handler */
+  /** Called when the pointer enters the tag. */
   onMouseEnter?: () => void;
-  /** Mouse leave event handler */
+  /** Called when the pointer leaves the tag. */
   onMouseLeave?: () => void;
-  /** Accepts the tag label */
+  /** Whether the label is rendered. Turn it off for a tag that is only its icon. */
   withLabel?: boolean;
-  /** Accepts an optional suffix to append after the label */
+  /** Extra text after the label, inside the same line. */
   labelSuffix?: string;
-  /** Accepts the color for the label suffix */
+  /** CSS colour of that suffix. */
   labelSuffixColor?: string;
 };
 
 export type TagType = {
-  /** Accepts a unique key for the tag. */
+  /** React key for the tag. `Tags` falls back to the label when it is absent. */
   key?: string;
-  /** Indicates if the tag is a default tag. */
+  /** Marks the tag as the room's default one. It only takes part in the width arithmetic. */
   isDefault?: boolean;
-  /** Indicates if the tag is associated with a third-party provider. */
+  /** Marks the tag as a third-party provider: it is given a fixed 44px width and its label is hidden. */
   isThirdParty?: boolean;
-  /** Accepts the tag label */
+  /** Text of the tag. `Tags` also uses it as the React key. */
   label: string;
-  /** Accepts the max width of the tag */
+  /** `max-width` of the tag. `Tags` overwrites whatever is passed here with its own calculation. */
   maxWidth?: string;
-  /** Accepts the dropdown options */
+  /** Labels listed in the overflow drop-down. `Tags` fills this in for the overflow tag itself. */
   advancedOptions?: string[];
-  /** Accepts the tag styles as disabled and disables clicking */
+  /** Whether the tag is inert. */
   isDisabled?: boolean;
-  /** Indicates the type of room associated with the tag. */
+  /** Passed back through `onSelectTag`. */
   roomType?: number;
-  /** Accepts the icon associated with the tag. */
+  /** Glyph before the label: an SVG URL, or a component. */
   icon?: string | React.FC<React.SVGProps<SVGSVGElement>>;
-  /** Indicates the type of provider associated with the tag. */
+  /** Passed back through `onSelectTag`. */
   providerType?: number;
-  /** Accepts the function that is called when the tag is clicked */
+  /** Ignored by `Tags`, which wires every tag to `onSelectTag` instead. */
   onClick?: () => void;
-  /** Indicates if the tag is an overflow trigger */
+  /** Marks the tag as the overflow or create trigger. `Tags` sets this itself. */
   isOptionTag?: boolean;
-  /** Accepts an optional suffix to append after the label */
+  /** Extra text after the label. */
   labelSuffix?: string;
-  /** Accepts the color for the label suffix */
+  /** CSS colour of that suffix. */
   labelSuffixColor?: string;
 };
 
