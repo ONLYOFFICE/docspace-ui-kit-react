@@ -88,6 +88,7 @@ export type { SuggestionSet } from "./suggestions";
 
 import { toastr } from "../../components/toast";
 import { Link, LinkType } from "../../components/link";
+import { useIsMobile } from "../../hooks/use-is-mobile";
 
 import { AiChatAvailabilityContext } from "./availability";
 import { ChatIntro } from "../chat-intro";
@@ -566,6 +567,8 @@ const AiAgentProviders = ({
   // refs.
   const [analyzableIds, setAnalyzableIds] = useState<string[]>([]);
 
+  const isMobile = useIsMobile();
+
   const onFilesAttached = useCallback(
     (attached: AttachedFileInfo[]) => {
       // The form's chip is on the draft now. `useAttachHostFilesToChat`
@@ -995,6 +998,7 @@ const AiAgentProviders = ({
       profilePickerReadOnly,
       profilePickerActions,
       onProfilePickerSelect,
+      dropdownNavigation: isMobile ? "drilldown" : "flyout",
       formatChatError,
       // Hide "Always allow" only for generate tools (matched by full name).
       hideToolAllowAlways: GENERATE_TOOL_NAMES,
@@ -1026,6 +1030,7 @@ const AiAgentProviders = ({
       profilePickerReadOnly,
       profilePickerActions,
       onProfilePickerSelect,
+      isMobile,
       formatChatError,
       onToolCallApproveResult,
       onDropFiles,
@@ -1134,3 +1139,4 @@ export {
   useAiChatStore,
 } from "./ai-chat-store";
 export type { AiChatRouterPage } from "./ai-chat-store";
+
