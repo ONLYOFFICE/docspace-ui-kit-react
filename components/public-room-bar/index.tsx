@@ -82,4 +82,5 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
 };
 PublicRoomBar.displayName = "PublicRoomBar";
 
+export type { PublicRoomBarProps };
 export default PublicRoomBar;
