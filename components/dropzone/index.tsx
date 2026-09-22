@@ -319,3 +319,4 @@ const Dropzone = ({
 };
 
 export default Dropzone;
+export type { DropzoneProps, SvgIconComponent } from "./Dropzone.types";

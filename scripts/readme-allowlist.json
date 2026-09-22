@@ -1,16 +1,11 @@
 [
   "components/app-loader",
   "components/article",
-  "components/drag-and-drop",
-  "components/dropzone",
   "components/filter",
   "components/loader-wrapper",
-  "components/nav-menu",
   "components/navigation",
   "components/progress-bar",
   "components/section",
-  "components/selection-area",
   "components/status-message",
-  "components/theme-provider",
   "components/top-loading-indicator"
 ]
