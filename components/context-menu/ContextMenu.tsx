@@ -214,6 +214,10 @@ const ContextMenu = (props: ContextMenuProps) => {
       // never fire and pushed the menu off the screen.
       const viewport = DomHelpers.getLayoutViewport();
 
+      // pointer coordinates are page-based, a container rect is viewport-based
+      const scrollX = rects ? 0 : window.scrollX;
+      const scrollY = rects ? 0 : window.scrollY;
+
       const borderWidth = menuRef.current
         ? +window
             .getComputedStyle(menuRef.current)
@@ -259,24 +263,24 @@ const ContextMenu = (props: ContextMenuProps) => {
       }
 
       // flip
-      if (left + width - document.body.scrollLeft > viewport.width) {
+      if (left - scrollX + width > viewport.width) {
         left -= width;
       }
 
       // flip
-      if (top + height - document.body.scrollTop > viewport.height) {
+      if (top - scrollY + height > viewport.height) {
         top -= height;
       }
 
       // fit
-      if (left < document.body.scrollLeft) {
-        left = document.body.scrollLeft;
+      if (left < scrollX) {
+        left = scrollX;
       }
 
       // fit
-      if (top < document.body.scrollTop) {
-        if (document.body.scrollTop === 0) top = MARGIN_BORDER;
-        else top = document.body.scrollTop;
+      if (top < scrollY) {
+        if (scrollY === 0) top = MARGIN_BORDER;
+        else top = scrollY;
       }
 
       if (borderWidth) width += borderWidth * 2;
@@ -293,12 +297,12 @@ const ContextMenu = (props: ContextMenuProps) => {
       }
       // fit: the flip above falls short when the pointer itself lands outside
       // the layout viewport, so clamp the menu to the visible box as well
-      if (left + width > viewport.width) {
-        left = Math.max(MARGIN_BORDER, viewport.width - width);
+      if (left - scrollX + width > viewport.width) {
+        left = scrollX + Math.max(MARGIN_BORDER, viewport.width - width);
       }
 
-      if (top + height > viewport.height) {
-        top = Math.max(MARGIN_BORDER, viewport.height - height);
+      if (top - scrollY + height > viewport.height) {
+        top = scrollY + Math.max(MARGIN_BORDER, viewport.height - height);
       }
 
       if (menuRef.current) {

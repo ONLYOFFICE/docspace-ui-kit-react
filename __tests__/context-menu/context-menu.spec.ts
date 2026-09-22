@@ -152,3 +152,45 @@ test.describe("ContextMenu — item variants (dark)", () => {
     );
   });
 });
+
+// the Docs page is the only Storybook page where the document itself scrolls
+test.describe("ContextMenu — scrolled document", () => {
+  const PRIMARY_TRIGGER =
+    '#story--ui-overlays-contextmenu--default--primary-inner [data-testid="trigger"]';
+
+  test.use({ viewport: { width: 1440, height: 700 } });
+
+  test("opens next to the pointer and stays inside the viewport", async ({
+    page,
+  }) => {
+    await page.goto(`/iframe.html?id=${STORY_BASE}--docs&viewMode=docs`);
+    const trigger = page.locator(PRIMARY_TRIGGER);
+    await trigger.waitFor({ state: "visible" });
+    await page.waitForLoadState("networkidle");
+
+    await trigger.evaluate((el) => {
+      const rect = el.getBoundingClientRect();
+      document.scrollingElement!.scrollTop +=
+        rect.top - (window.innerHeight - rect.height - 40);
+    });
+    const scrollY = await page.evaluate(() => window.scrollY);
+    expect(scrollY).toBeGreaterThan(0);
+
+    await trigger.click({ button: "right" });
+    const menu = page.locator(".p-contextmenu").first();
+    await menu.waitFor({ state: "visible" });
+
+    const box = (await menu.boundingBox())!;
+    const pointer = (await trigger.boundingBox())!;
+    const pointerY = pointer.y + pointer.height / 2;
+    const viewportHeight = page.viewportSize()!.height;
+
+    expect(box.y).toBeGreaterThanOrEqual(0);
+    expect(box.y + box.height).toBeLessThanOrEqual(viewportHeight);
+    const gap = Math.min(
+      Math.abs(box.y - pointerY),
+      Math.abs(box.y + box.height - pointerY),
+    );
+    expect(gap).toBeLessThan(8);
+  });
+});

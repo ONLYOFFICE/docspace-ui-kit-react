@@ -31,13 +31,17 @@ const mockViewport = (layoutWidth: number, visualWidth: number) => {
   defineSize(document.documentElement, "clientHeight", 800);
 };
 
-const showAt = (ref: React.RefObject<ContextMenuRefType | null>, x: number) => {
+const showAt = (
+  ref: React.RefObject<ContextMenuRefType | null>,
+  x: number,
+  y = 100,
+) => {
   act(() => {
     ref.current?.show({
       clientX: x,
-      clientY: 100,
+      clientY: y,
       pageX: x,
-      pageY: 100,
+      pageY: y,
       stopPropagation: () => {},
       preventDefault: () => {},
     } as unknown as MouseEvent);
@@ -53,6 +57,8 @@ describe("<ContextMenu />", () => {
     defineSize(window, "innerHeight", undefined);
     defineSize(document.documentElement, "clientWidth", undefined);
     defineSize(document.documentElement, "clientHeight", undefined);
+    defineSize(window, "scrollY", undefined);
+    Reflect.deleteProperty(HTMLElement.prototype, "offsetHeight");
   });
 
   it("renders without error", () => {
@@ -119,6 +125,40 @@ describe("<ContextMenu />", () => {
 
     expect(left).toBeLessThanOrEqual(800 - ITEM_WIDTH);
     expect(left).toBeGreaterThanOrEqual(0);
+  });
+
+  it("keeps the menu in the visible part of a scrolled document", () => {
+    const MENU_HEIGHT = 200;
+    const SCROLL_Y = 1000;
+
+    Element.prototype.getBoundingClientRect = () =>
+      ({ width: ITEM_WIDTH, height: 36 }) as DOMRect;
+    Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
+      configurable: true,
+      get: () => MENU_HEIGHT,
+    });
+
+    mockViewport(800, 800);
+    defineSize(window, "scrollY", SCROLL_Y);
+
+    const ref = React.createRef<ContextMenuRefType>();
+
+    render(
+      <ContextMenu
+        ref={ref}
+        model={[{ key: "open", label: "Open" }]}
+        withHotkeys={false}
+      />,
+    );
+
+    showAt(ref, 100, SCROLL_Y + 700);
+
+    const top = Number.parseFloat(
+      ref.current?.menuRef.current?.style.top ?? "",
+    );
+
+    expect(top).toBeGreaterThanOrEqual(SCROLL_Y);
+    expect(top + MENU_HEIGHT).toBeLessThanOrEqual(SCROLL_Y + 800);
   });
 
   /**
