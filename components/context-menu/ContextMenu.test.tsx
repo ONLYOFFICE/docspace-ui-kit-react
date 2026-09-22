@@ -161,6 +161,30 @@ describe("<ContextMenu />", () => {
     expect(top + MENU_HEIGHT).toBeLessThanOrEqual(SCROLL_Y + 800);
   });
 
+  it("prevents the default action of navigation keys only while open", () => {
+    const ref = React.createRef<ContextMenuRefType>();
+
+    render(<ContextMenu ref={ref} model={[{ key: "open", label: "Open" }]} />);
+
+    const pressArrowDown = () => {
+      const event = new KeyboardEvent("keydown", {
+        code: "ArrowDown",
+        key: "ArrowDown",
+        cancelable: true,
+      });
+      act(() => {
+        window.dispatchEvent(event);
+      });
+      return event.defaultPrevented;
+    };
+
+    expect(pressArrowDown()).toBe(false);
+
+    showAt(ref, 100);
+
+    expect(pressArrowDown()).toBe(true);
+  });
+
   /**
    * Bug 83459 - an open menu must survive a re-render of whatever holds it.
    *

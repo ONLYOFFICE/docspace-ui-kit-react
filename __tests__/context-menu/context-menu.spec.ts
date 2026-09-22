@@ -193,4 +193,29 @@ test.describe("ContextMenu — scrolled document", () => {
     );
     expect(gap).toBeLessThan(8);
   });
+
+  test("arrow keys move the highlight without scrolling the page", async ({
+    page,
+  }) => {
+    await page.goto(`/iframe.html?id=${STORY_BASE}--docs&viewMode=docs`);
+    const trigger = page.locator(PRIMARY_TRIGGER);
+    await trigger.waitFor({ state: "visible" });
+    await trigger.click({ button: "right" });
+    await page.locator(".p-contextmenu").first().waitFor({ state: "visible" });
+
+    await page.getByRole("menuitem", { name: "Edit" }).hover();
+    await page.mouse.move(1, 1);
+
+    const before = await page.evaluate(() => window.scrollY);
+    const focused = page.locator('[data-focused="true"]');
+    await expect(focused).toHaveText("Edit");
+
+    // one key per render: the listener reads the highlight from its own render
+    await page.keyboard.press("ArrowDown");
+    await expect(focused).toHaveText("Preview");
+    await page.keyboard.press("ArrowDown");
+    await expect(focused).toHaveText("Sharing settings");
+
+    expect(await page.evaluate(() => window.scrollY)).toBe(before);
+  });
 });

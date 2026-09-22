@@ -7,6 +7,16 @@ import type {
   TContextMenuValueTypeOnClick,
 } from "../ContextMenu.types";
 
+// the browser acts on these on keydown, before the keyup handler runs
+const HANDLED_KEYS = new Set([
+  "ArrowUp",
+  "ArrowDown",
+  "ArrowLeft",
+  "ArrowRight",
+  "Enter",
+  "Escape",
+]);
+
 const useContextMenuHotkeys = ({
   visible,
   withHotkeys,
@@ -203,10 +213,18 @@ const useContextMenuHotkeys = ({
     }
   };
 
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (!visible || !withHotkeys) return;
+
+    if (HANDLED_KEYS.has(e.code)) e.preventDefault();
+  };
+
   useEffect(() => {
+    window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
 
     return () => {
+      window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
     };
   });
