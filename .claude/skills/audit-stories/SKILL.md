@@ -135,31 +135,32 @@ keeps the fixed shape below with only the `### Template` section.
 - Apply fixes when asked: new or corrected stories follow the library's
   own conventions (`CLAUDE.md`, `.claude/rules/component-authoring.md`)
   and land as commits in this repository. Behavior that looks wrong in
-  the *component* is reported as a potential bug, not papered over in
+  the _component_ is reported as a potential bug, not papered over in
   the story.
 
 ## Reporting a sweep
 
 A folder or `all` scope produces dozens of items, and the itemized
 format that reads well for one component turns into a wall of text
-for thirty. The reader's first question is *which components have a
-problem*, so a sweep report answers that before anything else:
+for thirty. The reader's first question is _which components have a
+problem_, so a sweep report answers that before anything else:
 
 - **Summary table first**, and nothing above it but one line naming
   the scope. One row per component with at least one finding, worst
   first, six columns, no prose inside a cell:
 
-  | Component | Story file | Stale | Gaps | Template | Worst finding |
-  | --- | --- | --- | --- | --- | --- |
-  | `theme-provider` | missing | – | – | – | no story at all |
-  | `context-menu` | ok | 3 | 5 | 2 | `args.onHide` names a prop the component dropped |
-  | `toggle-button` | ok | – | 2 | 1 | disabled state never shown |
+  | Component        | Story file | Stale | Gaps | Template | Worst finding                                    |
+  | ---------------- | ---------- | ----- | ---- | -------- | ------------------------------------------------ |
+  | `theme-provider` | missing    | –     | –    | –        | no story at all                                  |
+  | `context-menu`   | ok         | 3     | 5    | 2        | `args.onHide` names a prop the component dropped |
+  | `toggle-button`  | ok         | –     | 2    | 1        | disabled state never shown                       |
 
   `Stale` counts the items from check 4, `Gaps` the items from checks
   2 and 3, `Template` the items from check 6 (the only column a
   `template` run fills), `Worst finding` is the component's top-ranked item in one
   clause of at most ten words. A component whose story file is missing
   has no counts — the other checks cannot run on it.
+
 - **Clean components in one line** right under the table: "No
   findings: `badge`, `button`, `checkbox`, …" — every audited name that
   is not in the table, comma-separated, never one bullet each and never
@@ -189,7 +190,7 @@ follows it:
 
 - **Component description** — one sentence on what the component is
   for (no internals such as ref methods or getter props), then
-  `### Features`: 6–8 *capabilities*, one per bullet, in the form the
+  `### Features`: 6–8 _capabilities_, one per bullet, in the form the
   existing stories use — `**Label**: <clause>` where the clause is a
   full statement a reader understands without the code: verb-led
   ("Displays folder hierarchy with clickable navigation items",
@@ -213,7 +214,7 @@ follows it:
   there; a component that sets none of this gets no section. `### Usage`
   with two to four short examples. Storybook's
   own guidance applies on top: the description says what the component
-  is for and when to use it, a story description says *why* one would
+  is for and when to use it, a story description says _why_ one would
   use what it shows, not what it shows.
 - **An `argTypes` description states the component's contract in the
   types' own terms**, not the product's use of it: `header` takes "a
@@ -227,7 +228,7 @@ follows it:
   and, if it has none, a JSDoc line in the types file.
 - **One story per concept or state**, driven by `args` through a shared
   template so the Controls panel works; every story has
-  `parameters.docs.description.story` (the *why*, not a restatement of
+  `parameters.docs.description.story` (the _why_, not a restatement of
   the props) and `parameters.docs.source.code`.
 - **A story is named for what the reader sees or does**, in the
   template's forms (`WithBackdrop`, `DisabledState`, `AttachedToDocument`),
@@ -303,7 +304,7 @@ follows it:
 - **`CssCustomization` has one form** (94 of the 146 story files): the story text
   opens with "CSS Custom Properties for external customization:" and
   lists the variables as a Markdown table `| Variable | Description |
-  Default |` — defaults taken from the stylesheet's `var(--x, <default>)`
+Default |` — defaults taken from the stylesheet's `var(--x, <default>)`
   fallbacks, "theme-based" when the fallback is a theme token. The
   example sets the variables on a wrapper `<div style={{ "--x": … }}>`;
   a component that portals its DOM (a menu, a dropdown, a tooltip) sets
@@ -330,7 +331,7 @@ follows it:
     `iframe.html?viewMode=story&id=<story id>`.
   - A scripted check is written to the session scratchpad but run with
     `NODE_PATH="$PWD/node_modules" node <scratchpad>/check.cjs` from the
-    repository root. Node resolves `require` from the *script's* own
+    repository root. Node resolves `require` from the _script's_ own
     directory, so a scratchpad script never sees the repository's
     `node_modules` and `cd` into the repository does not change that.
   - Import the browser from `@playwright/test`, not `playwright`: only
