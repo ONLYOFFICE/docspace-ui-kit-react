@@ -1,23 +1,28 @@
 import type React from "react";
 
 export interface CollapsibleCardProps {
-  /** Header title shown next to the chevron. */
+  /** First line of the header, next to the chevron. The whole header is the button, so this is part of its accessible name. */
   title: React.ReactNode;
-  /** Optional secondary line under the title. */
+  /** Second line of the header, under the title. Also inside the button, and so also part of its accessible name. */
   description?: React.ReactNode;
-  /** Body content rendered when expanded. */
+  /** Body, rendered only while the card is open. Without it the card opens to nothing. */
   children?: React.ReactNode;
   /**
-   * Controlled open state. When provided, the parent owns state and must
-   * update it via `onToggle`. When undefined, the component is uncontrolled
-   * and uses `defaultOpen` as the initial value.
+   * Whether the card is open. Passing it — even as `false` — takes control away
+   * from the component for good: it then opens and closes only when you change
+   * this value from `onToggle`.
    */
   isOpen?: boolean;
-  /** Initial open state in uncontrolled mode. Defaults to `false`. */
+  /** Whether the card starts open. Read once, on the first render, and only while `isOpen` is unset.
+   * @default false */
   defaultOpen?: boolean;
-  /** Called with the next open value when the header is activated. */
+  /** Called with the state the card is moving to whenever the header is activated, in both the controlled and the uncontrolled case. */
   onToggle?: (nextOpen: boolean) => void;
+  /** Added after the component's own class, on the outer element. */
   className?: string;
+  /** Inline style of the outer element. */
   style?: React.CSSProperties;
+  /** Value of `data-testid` on the outer element.
+   * @default "collapsible-card" */
   dataTestId?: string;
 }

@@ -1,62 +1,63 @@
 export type TextProps = {
-  /** Ref to access the DOM element or React component instance */
+  /** Attached to the rendered element, whatever `as` made it. Typed for a div whatever that element actually is. */
   ref?: React.RefObject<HTMLDivElement | null>;
-  /** Sets the tag through which the component is rendered */
+  /** Element to render, replacing the component's own default — `p` for `Text` itself. Wins over `tag` when both are set. */
   as?: React.ElementType;
-  /** Accepts the tag id */
+  /** Element to render, used only while `as` is unset. It is a tag name, not an id. */
   tag?: string;
-  /** Sets background color */
+  /** Background colour, as an inline style. Any CSS colour. */
   backgroundColor?: string;
-  /** Specifies the text color */
+  /** Text colour, as an inline style. `Text` declares none of its own and inherits without it. */
   color?: string;
-  /** Sets the 'display' property */
+  /** Ignored. Nothing reads this prop, and it reaches the DOM as an unknown attribute. Use `isInline` or `style`. */
   display?: string;
-  /** Sets the font size */
+  /** Font size, as an inline style. Unset, `Text` is 13px through `--text-size`. */
   fontSize?: string;
-  /** Sets the font weight */
+  /** Font weight, as an inline style. Ignored while `isBold` is set. Unset, `Text` is 400 through `--text-weight`. */
   fontWeight?: number | string;
-  /** Sets font weight value to bold */
+  /** Sets the weight to 700, overriding `fontWeight`. */
   isBold?: boolean;
-  /** Sets the 'display: inline-block' property */
+  /** Renders the text inline instead of as a block — `inline-block` in `Text`, `inline` in `Heading`. */
   isInline?: boolean;
-  /** Sets the font style to italic */
+  /** Renders the text in italics. */
   isItalic?: boolean;
-  /** Sets the line height */
+  /** Line height, as an inline style. */
   lineHeight?: string;
-  /** Disables text selection */
+  /** Stops the text being selected, on every browser the kit supports. */
   noSelect?: boolean;
-  /** Sets the 'text-align' property */
+  /** Text alignment, as an inline style. */
   textAlign?: "left" | "center" | "right" | "justify";
-  /** Title attribute for hover tooltip */
+  /** Tooltip text. On a component the kit wraps in its tooltip HOC it is consumed before the element is built and opens the shared tooltip instead, which needs `RootTooltip` mounted; elsewhere it is the native `title` attribute. */
   title?: string;
-  /** Sets the class name */
+  /** Added after the component's own classes. */
   className?: string;
-  /** Disables word wrapping */
+  /** Holds the text on one line and ends it with an ellipsis. It needs a parent of bounded width; on its own the element grows instead. */
   truncate?: boolean;
-  /** HTML id attribute */
+  /** `id` of the rendered element. */
   id?: string;
-  /** Additional inline styles */
+  /** Inline style of the element. `Text` merges it over the style props above, so a `fontSize` here wins over the `fontSize` prop. */
   style?: React.CSSProperties;
-  /** Text direction */
+  /** Writing direction. `"ltr"` and `"rtl"` set the `dir` attribute; `"auto"` instead wraps the children in a span that takes the pointer events off them. */
   dir?: "ltr" | "rtl" | "auto";
-  /** Child elements */
+  /** Text to render. */
   children?: React.ReactNode;
-  /** Click event handler */
+  /** Called with the event when the element is clicked. */
   onClick?: (e: React.MouseEvent<Element>) => void;
-  /** For label association */
+  /** Passed to the element unchanged, for `as="label"`. */
   htmlFor?: string;
-  /** Visual style variant */
+  /** Only `"tile"` is recognised, and only together with `dir="auto"`: it clamps the text to two lines. */
   view?: string;
-  /** Link href */
+  /** Passed to the element unchanged, for `as="a"`. */
   href?: string;
-  /** Used as HTML `rel` property */
+  /** Passed to the element unchanged, for `as="a"`. */
   rel?: string;
-  /** Used as HTML `tabindex` property */
+  /** Passed to the element unchanged. The component adds no role, so a focusable text element needs one from you. */
   tabIndex?: number;
-  /** Used in container component */
+  /** Ignored. Nothing reads this prop, and it reaches the DOM as an unknown attribute. */
   containerWidth?: string;
-  /** Used in container component */
+  /** Ignored. Nothing reads this prop, and it reaches the DOM as an unknown attribute. */
   containerMinWidth?: string;
-  /** Test id */
+  /** Value of `data-testid` on the element.
+   * @default "text" */
   dataTestId?: string;
 };
