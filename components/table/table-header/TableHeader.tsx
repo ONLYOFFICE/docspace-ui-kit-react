@@ -267,7 +267,6 @@ export const TableHeader = (props: TableHeaderProps) => {
   };
 
   function resetColumns(isResized: boolean = false) {
-
     // While the container is collapsed (e.g. the host hides #section behind a
     // fullscreen overlay, giving it width 0), recomputing against a zero width
     // yields garbage column sizes that would get persisted and corrupt the
@@ -486,7 +485,6 @@ export const TableHeader = (props: TableHeaderProps) => {
   }
 
   function onResize(isResized: boolean = false) {
-
     if (!isDesktop() || !columnStorageName || !columnInfoPanelStorageName) {
       return;
     }
