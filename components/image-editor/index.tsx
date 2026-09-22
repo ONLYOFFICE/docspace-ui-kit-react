@@ -56,4 +56,9 @@ const ImageEditor = ({
 };
 
 export { ImageEditor, ButtonDelete };
-export type { TImage, TChangeImage, TSetPreview } from "./ImageEditor.types";
+export type {
+  ImageEditorProps,
+  TImage,
+  TChangeImage,
+  TSetPreview,
+} from "./ImageEditor.types";
