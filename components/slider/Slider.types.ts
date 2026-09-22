@@ -1,5 +1,3 @@
-import type { TColorScheme } from "../../context/ThemeContext";
-
 export type SliderProps = {
   /** Accepts id */
   id?: string;
@@ -32,9 +30,4 @@ export type SliderProps = {
   style?: React.CSSProperties;
   /** Accepts dataTestId */
   dataTestId?: string;
-};
-
-export type SliderThemeProps = SliderProps & {
-  $currentColorScheme?: TColorScheme;
-  sizeProp?: string;
 };
