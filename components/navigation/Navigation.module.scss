@@ -825,6 +825,12 @@
       gap: 8px;
 
       @include mixins.truncate;
+
+      // `truncate` only clips what already has a width to clip against. As a
+      // grid item this box still has an automatic min-content floor, so without
+      // this it sizes to the untruncated title and the ellipsis never appears -
+      // the overflow is pushed onto the trailing controls instead.
+      min-width: 0;
     }
 
     .navigation-header-separator {
@@ -850,6 +856,11 @@
       @include mixins.truncate;
       min-height: 33px;
       gap: 8px;
+
+      // Same reason as `.badges-container` above: this is the flex item that
+      // actually carries the name, so it needs its own floor released for the
+      // ellipsis to land here rather than the name overflowing its parent.
+      min-width: 0;
 
       @include mixins.mobile {
         min-height: auto;
@@ -877,7 +888,12 @@
   &[data-show-title="true"] {
     :global {
       .title-block {
-        min-width: 43px;
+        // Keeps a sliver of the name visible instead of letting it collapse to
+        // nothing, but capped at the space actually available: as a plain
+        // `min-width` this was a hard floor that outranked the `min-width: 0`
+        // the ellipsis needs, so on a narrow header the name overflowed onto
+        // the trailing controls rather than truncating.
+        min-width: min(43px, 100%);
       }
     }
   }
@@ -898,14 +914,22 @@
     // with 750px of nothing beside it. The floor keeps the controls whole the
     // other way too: a long folder name now truncates instead of squeezing
     // them, which is the order the header is supposed to degrade in.
-    grid-template-columns: 49px auto minmax(186px, 1fr);
+    // `minmax(0, auto)` rather than a bare `auto` on the title: an `auto` track
+    // refuses to go below its own min-content, and the title's min-content is
+    // the whole untruncated room name. On a phone that is wider than the header
+    // itself, so the track kept its full width, the trailing control column was
+    // pushed past the header's edge and the AI chat button ended up underneath
+    // the name. Releasing the floor lets the track shrink, which is what
+    // actually puts the ellipsis in - the controls keep their own `minmax`
+    // floor, so the degradation order is unchanged.
+    grid-template-columns: 49px minmax(0, auto) minmax(186px, 1fr);
 
     &[data-is-root-folder="true"][data-with-logo="true"] {
-      grid-template-columns: 59px auto minmax(186px, 1fr);
+      grid-template-columns: 59px minmax(0, auto) minmax(186px, 1fr);
     }
 
     &[data-is-root-folder="true"][data-with-logo="false"] {
-      grid-template-columns: auto minmax(186px, 1fr);
+      grid-template-columns: minmax(0, auto) minmax(186px, 1fr);
     }
 
     // Same flip as above. This one is the framed/SDK header, which the client
@@ -913,7 +937,7 @@
     // than from a measurement - leaving it inverted would just park the same
     // bug where nothing here can see it.
     &[data-with-logo="true"] {
-      grid-template-columns: 43px 49px auto minmax(186px, 1fr);
+      grid-template-columns: 43px 49px minmax(0, auto) minmax(186px, 1fr);
     }
 
     // &[data-with-chat="true"] {
@@ -921,15 +945,17 @@
     // }
 
     &[data-is-root-folder="false"][data-is-frame="true"][data-is-frame-logo="true"] {
-      grid-template-columns: 49px 49px auto 1fr;
+      grid-template-columns: 49px 49px minmax(0, auto) 1fr;
     }
 
     &[data-is-root-folder="true"][data-is-frame="true"][data-with-logo="true"] {
-      grid-template-columns: 59px auto auto 1fr;
+      grid-template-columns: 59px minmax(0, auto) minmax(0, auto) 1fr;
     }
   }
 
   @include mixins.mobile {
+    // Hiding the logo is the one part of the mobile header that is specific to
+    // the standalone app - a framed host supplies its own.
     &[data-is-frame="false"] {
       :global {
         .navigation-logo,
@@ -937,16 +963,24 @@
           display: none;
         }
       }
+    }
 
-      grid-template-columns: 29px auto 1fr !important;
+    // The grid, by contrast, applies to every mobile header. It used to be
+    // gated on `[data-is-frame="false"]` too, so a framed header (the SDK) fell
+    // through to the tablet rules on a phone and its trailing controls - the AI
+    // chat button among them - were pushed out from under a long folder name.
+    //
+    // `minmax(0, auto)` for the same reason as the tablet block above: a bare
+    // `auto` cannot shrink below the untruncated title, so the name has to be
+    // allowed to give way before anything else does.
+    grid-template-columns: 29px minmax(0, auto) 1fr !important;
 
-      &[data-is-show-back-button="true"][data-with-logo="false"][data-is-root-folder="true"] {
-        grid-template-columns: 34px auto 1fr !important;
-      }
+    &[data-is-show-back-button="true"][data-with-logo="false"][data-is-root-folder="true"] {
+      grid-template-columns: 34px minmax(0, auto) 1fr !important;
+    }
 
-      &[data-is-root-folder="true"] {
-        grid-template-columns: auto 1fr !important;
-      }
+    &[data-is-root-folder="true"] {
+      grid-template-columns: minmax(0, auto) 1fr !important;
     }
   }
 }
