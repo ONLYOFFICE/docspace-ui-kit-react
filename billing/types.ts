@@ -118,6 +118,11 @@ type TAiToolsEmbeddingPrice = {
   prompt: number;
 };
 
+type TAiToolsImagePrice = TAiToolsChatPrice & {
+  /** Per 1M image output tokens. */
+  image: number;
+};
+
 type TAiToolsChatModelPrice = {
   id: string;
   alias: string;
@@ -125,6 +130,10 @@ type TAiToolsChatModelPrice = {
   image: string;
   link?: string;
   price: TAiToolsChatPrice;
+};
+
+type TAiToolsImageModelPrice = Omit<TAiToolsChatModelPrice, "price"> & {
+  price: TAiToolsImagePrice;
 };
 
 type TAiToolsEmbeddingModelPrice = {
@@ -151,7 +160,7 @@ export type TAiToolsPrices = {
     symbol: string;
   };
   chat?: TAiToolsChatModelPrice[];
-  image?: TAiToolsChatModelPrice[];
+  image?: TAiToolsImageModelPrice[];
   embedding?: TAiToolsEmbeddingModelPrice[];
   webSearch?: TAiToolsWebSearchPrice[];
 };
