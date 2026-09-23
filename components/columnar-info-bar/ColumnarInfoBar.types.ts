@@ -8,7 +8,7 @@ export type ColumnarInfoBarColumn = {
 };
 
 export type ColumnarInfoBarProps = {
-  /** Heading rendered above the columns; omitted when empty */
+  /** Heading rendered above the columns as an `<h3>`; omitted when empty */
   headerText?: string;
   /** Label and value pairs, one column each, in order */
   columns: ColumnarInfoBarColumn[];
@@ -20,4 +20,9 @@ export type ColumnarInfoBarProps = {
   style?: React.CSSProperties;
   /** Visual variant: warning bar with an accent border, bordered neutral card, or in-page card with a two-column grid */
   variant?: "default" | "neutral" | "page";
+  /**
+   * Accessible name of the close button (its `aria-label`). Defaults to the
+   * English `"Close"`; pass a translated string. Ignored without `onAction`.
+   */
+  closeLabel?: string;
 };

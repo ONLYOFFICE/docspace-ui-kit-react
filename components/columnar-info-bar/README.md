@@ -28,11 +28,12 @@ The barrel also exports the `ColumnarInfoBarProps` and `ColumnarInfoBarColumn` t
 | Name       | Type                             | Default   | Description                                                                       |
 | ---------- | -------------------------------- | --------- | --------------------------------------------------------------------------------- |
 | columns    | ColumnarInfoBarColumn[]          | -         | Label and value pairs, one column each, in order (required)                       |
-| headerText | string                           | -         | Heading rendered above the columns; omitted when empty                            |
+| headerText | string                           | -         | Heading rendered above the columns as an `<h3>`; omitted when empty               |
 | onAction   | () => void                       | -         | Close button click handler; the close button renders only when this is set        |
 | onLoad     | () => void                       | -         | Called once, after the component mounts                                           |
 | style      | CSSProperties                    | -         | Inline styles on the root element; the way to set the `--cib-*` custom properties |
 | variant    | "default" \| "neutral" \| "page" | "default" | Visual variant; see below                                                         |
+| closeLabel | string                           | "Close"   | Accessible name (`aria-label`) of the close button; pass a translated string      |
 
 `ColumnarInfoBarColumn` is `{ label: ReactNode; value: ReactNode }`.
 
@@ -61,7 +62,11 @@ The `neutral` and `page` variants set `--cib-accent` to transparent and define t
 
 - Below the mobile breakpoint (600px) each column of the `default` and `neutral` variants takes the full width.
 - The layout uses logical properties, so the accent border and the close button move to the other side under RTL.
-- The close button is labelled "Close" in English; the label is not translated.
+
+## Accessibility
+
+- `headerText` renders as an `<h3>`, so the bar's title is reachable by heading navigation. The level is fixed; the bar is meant to sit inside a page or panel that already has its own `h1`/`h2`. The user-agent heading margin is reset, so it looks the same as plain text.
+- The close button is an icon-only `<button type="button">` whose accessible name is `closeLabel`. It defaults to the English "Close" and the component does not translate it, so pass `closeLabel={t("...")}` from a localized screen.
 
 ## Examples
 
