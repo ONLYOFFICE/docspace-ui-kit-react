@@ -1,14 +1,23 @@
 import type { MouseEvent, ReactNode } from "react";
 
 export type QuickActionItem = {
+  /** Unique key of the tile; the set of ids also identifies the section. */
   id: string;
+  /** Tile illustration, rendered `aria-hidden`. */
   icon: ReactNode;
+  /** Visible caption and accessible name of the tile. */
   label: string;
+  /** Click handler of the tile, on the button or the link alike. */
   onClick?: (e: MouseEvent<HTMLElement>) => void;
+  /** Renders the tile as a link instead of a button (ignored while disabled). */
   href?: string;
+  /** Link target; `_blank` adds `rel="noopener noreferrer"`. */
   target?: "_blank" | "_self" | "_parent" | "_top";
+  /** Dims the tile and blocks interaction. */
   disabled?: boolean;
+  /** Tooltip shown below the tile. */
   tooltipContent?: ReactNode;
+  /** `data-testid` of the tile element. */
   dataTestId?: string;
 };
 
@@ -42,12 +51,27 @@ type QuickActionsCloseProps =
  * including a banner whose `isLoading` is a running flag, names its arrows.
  */
 type QuickActionsControlProps =
-  | { isLoading: true; prevLabel?: never; nextLabel?: never }
-  | { isLoading?: boolean; prevLabel: string; nextLabel: string };
+  | {
+      /** Renders skeleton tiles instead of the items. */
+      isLoading: true;
+      prevLabel?: never;
+      nextLabel?: never;
+    }
+  | {
+      /** Renders skeleton tiles instead of the items. */
+      isLoading?: boolean;
+      /** Accessible name of the scroll-back arrow. */
+      prevLabel: string;
+      /** Accessible name of the scroll-forward arrow. */
+      nextLabel: string;
+    };
 
 export type QuickActionsProps = QuickActionsCloseProps &
   QuickActionsControlProps & {
+    /** Tiles to render; an empty array renders nothing unless loading. */
     items: QuickActionItem[];
+    /** Class name of the outer banner element. */
     className?: string;
+    /** `data-testid` of the outer banner element. */
     dataTestId?: string;
   };
