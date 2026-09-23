@@ -31,9 +31,9 @@ The folder barrel has a **default** export only. The package root re-exports it 
 | type               | "listItem" \| "dropdownButton" \| "dropdownItem" | "listItem" | Display variant                                                                |
 | id                 | string                                           | -          | DOM `id` of the root element                                                   |
 | selectedId         | string \| number                                 | -          | Written to the root element as `data-selected-id`; not used for rendering      |
-| onClick            | MouseEventHandler\<HTMLElement\>                 | -          | Click handler on the root element; the arrow button calls it as well           |
-| disabledFormRoom   | boolean                                          | -          | Styles a `FormRoom` item as disabled (`listItem` and `dropdownItem`)           |
-| disabledPublicRoom | boolean                                          | -          | Styles a `PublicRoom` item as disabled (`listItem` and `dropdownItem`)         |
+| onClick            | MouseEventHandler\<HTMLElement\>                 | -          | Click handler on the root element, arrow included; not called while disabled   |
+| disabledFormRoom   | boolean                                          | -          | Disables a `FormRoom` item (`listItem` and `dropdownItem`)                     |
+| disabledPublicRoom | boolean                                          | -          | Disables a `PublicRoom` item (`listItem` and `dropdownItem`)                   |
 | isTemplate         | boolean                                          | -          | Shows the "from template" title and description; also passed to `RoomLogo`     |
 | isTemplateRoom     | boolean                                          | -          | Passed to `RoomLogo` as `isTemplateRoom`                                       |
 | isFormSection      | boolean                                          | -          | Shows the form-set title and description instead of the room type's            |
@@ -46,8 +46,8 @@ The folder barrel has a **default** export only. The package root re-exports it 
 ## Behaviour
 
 - **Title precedence.** `isFormSection` wins over `isTemplate`, which wins over `roomType`.
-- **Disabled.** An item is disabled only when it is a `FormRoom` with `disabledFormRoom` or a `PublicRoom` with `disabledPublicRoom`, and only the `listItem` and `dropdownItem` variants show it. Disabling is visual: `onClick` still fires. A disabled item drops its title tooltip and carries `data-tooltip-id="create-room-tooltip"`, so the host can render a `Tooltip` with that id to explain why.
-- **Arrow.** `listItem` shows a forward arrow; `dropdownButton` rotates it a quarter turn one way, and the other way while `isOpen`; `dropdownItem` hides it.
+- **Disabled.** An item is disabled only when it is a `FormRoom` with `disabledFormRoom` or a `PublicRoom` with `disabledPublicRoom`, and only the `listItem` and `dropdownItem` variants honour it. A disabled item does not call `onClick`, carries `aria-disabled="true"` and loses the pointer cursor. It also drops its title tooltip and carries `data-tooltip-id="create-room-tooltip"`, so the host can render a `Tooltip` with that id to explain why.
+- **Arrow.** The arrow is decoration inside the clickable root and has no handler of its own, so clicking it calls `onClick` once, like any other part of the item. `listItem` shows a forward arrow; `dropdownButton` rotates it a quarter turn one way, and the other way while `isOpen`; `dropdownItem` hides it.
 - **Test ids.** The root carries `room-type-list-item`, `room-type-dropdown-button` or `room-type-dropdown-item`, by variant.
 
 ## Layout
@@ -72,7 +72,7 @@ Component-level CSS variables, set on the item or any ancestor:
 | `--room-type-item-padding`      | `16px`                                        | Inner padding                    |
 | `--room-type-gap`               | `12px`                                        | Gap between logo, text and arrow |
 
-The `--room-type-list-item-*` fallbacks are theme values set under `.light` / `.dark`, and all three variants use them. The pressed and open border colour comes from the portal accent (`--current-color-scheme-main-accent` on `listItem`, `--accent-main` on `dropdownButton`) and has no component-level override; neither has the disabled background.
+The fallbacks are theme values set under `.light` / `.dark`. The table names the `listItem` ones; `dropdownButton` falls back to its own `--room-type-dropdown-button-*` values, and `dropdownItem` to its own hover and description values. The `dropdownItem` background still falls back to the `listItem` value (`none`), not to `--room-type-dropdown-item-background`. The pressed and open border colour is the portal accent, `--accent-main`, and has no component-level override; neither has the disabled background.
 
 ## Examples
 

@@ -144,7 +144,7 @@
   }
 
   &:active {
-    border-color: var(--current-color-scheme-main-accent);
+    border-color: var(--accent-main);
   }
 
   :global {
@@ -168,6 +168,25 @@
 }
 
 .dropDownButton {
+  // Each variant reads its own theme values, as it did before the
+  // component-level overrides were added; the overrides still win.
+  --room-type-item-bg-value: var(
+    --room-type-item-bg,
+    var(--room-type-dropdown-button-background)
+  );
+  --room-type-item-border-value: var(
+    --room-type-item-border,
+    var(--room-type-dropdown-button-border)
+  );
+  --room-type-item-hover-bg-value: var(
+    --room-type-item-hover-bg,
+    var(--room-type-dropdown-button-hover-background)
+  );
+  --room-type-description-color-value: var(
+    --room-type-description-color,
+    var(--room-type-dropdown-button-description-text)
+  );
+
   background-color: var(--room-type-item-bg-value);
   border-radius: var(--room-type-item-border-radius);
   border: 1px solid var(--room-type-item-border-value);
@@ -205,6 +224,18 @@
 }
 
 .dropDownItem {
+  // Background deliberately still falls back to the list-item value (none):
+  // --room-type-dropdown-item-background is white / black, and switching to
+  // it would change what renders today.
+  --room-type-item-hover-bg-value: var(
+    --room-type-item-hover-bg,
+    var(--room-type-dropdown-item-hover-background)
+  );
+  --room-type-description-color-value: var(
+    --room-type-description-color,
+    var(--room-type-dropdown-item-description-text)
+  );
+
   background-color: var(--room-type-item-bg-value);
 
   &:hover {

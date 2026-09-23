@@ -1,3 +1,4 @@
+import type { MouseEventHandler } from "react";
 import { useTranslation } from "react-i18next";
 import classNames from "classnames";
 
@@ -49,6 +50,13 @@ const RoomType = ({
   const disabled =
     (isFormRoom && disabledFormRoom) || (isPublicRoom && disabledPublicRoom);
 
+  // `listItem` and `dropdownItem` render the disabled state, so they also
+  // refuse the click. Styling alone left the handler live.
+  const handleClick: MouseEventHandler<HTMLElement> = (e) => {
+    if (disabled) return;
+    onClick?.(e);
+  };
+
   const arrowClassName =
     type === "dropdownButton"
       ? "choose_room-forward_btn dropdown-button"
@@ -77,7 +85,10 @@ const RoomType = ({
         className={arrowClassName}
         iconNode={<ArrowReactSvg />}
         size={16}
-        onClick={onClick}
+        // No onClick: the arrow sits inside the root, which already handles
+        // the click. Passing the handler here too made one click call it
+        // twice. isClickable keeps the pointer cursor the handler used to set.
+        isClickable={!disabled}
       />
     </>
   );
@@ -91,7 +102,8 @@ const RoomType = ({
       })}
       id={id}
       title={disabled ? "" : room.title}
-      onClick={onClick}
+      onClick={handleClick}
+      aria-disabled={disabled || undefined}
       data-tooltip-id={disabled ? "create-room-tooltip" : undefined}
       data-testid="room-type-list-item"
       data-selected-id={selectedId}
@@ -117,7 +129,8 @@ const RoomType = ({
       as="div"
       id={id}
       title={disabled ? "" : room.title}
-      onClick={onClick}
+      onClick={handleClick}
+      aria-disabled={disabled || undefined}
       data-selected-id={selectedId}
       data-tooltip-id={disabled ? "create-room-tooltip" : undefined}
       className={classNames(styles.roomType, styles.dropDownItem, {

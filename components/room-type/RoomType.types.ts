@@ -14,11 +14,11 @@ export type RoomTypeProps = {
   /** Written to the root element as `data-selected-id`; not used for rendering. */
   selectedId: string | number;
 
-  /** Click handler on the root element; the arrow button calls it as well. */
+  /** Click handler on the root element, arrow included; one click, one call. Not called while the item is disabled. */
   onClick: React.MouseEventHandler<HTMLElement>;
-  /** Styles a `FormRoom` item as disabled (`listItem` and `dropdownItem`). */
+  /** Disables a `FormRoom` item: styled as disabled and `onClick` is not called (`listItem` and `dropdownItem`). */
   disabledFormRoom?: boolean;
-  /** Styles a `PublicRoom` item as disabled (`listItem` and `dropdownItem`). */
+  /** Disables a `PublicRoom` item: styled as disabled and `onClick` is not called (`listItem` and `dropdownItem`). */
   disabledPublicRoom?: boolean;
   /** Shows the "from template" title and description; also passed to `RoomLogo`. */
   isTemplate?: boolean;
