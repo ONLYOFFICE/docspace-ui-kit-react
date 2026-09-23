@@ -119,10 +119,13 @@ class on `<body>`, `ltr` or `rtl` beside it, `data-theme` and `data-dir` on `<ht
   it: the provider listens for changes to that media query for as long as it is mounted.
 - `locale` — a language tag. It decides two things: the writing direction, from a list of
   thirteen right-to-left languages, and the font family.
-- **`colorTheme` — pass it, always.** Without it the provider calls the DocSpace REST API on mount
-  to ask a portal which accent colours to use. Outside a portal that request fails, the rejection
-  is not caught, and the provider never retries. `{ themes: [], selected: 0 }` is the way to say
-  "no portal, no accent override".
+- **`colorTheme` — the portal's accent palette; an application of its own leaves it out.** The
+  provider looks as though it asks a portal for the palette when the prop is absent, but the call
+  it makes is the API SDK's _parameter builder_: it returns `{ url, options }` and sends nothing,
+  the result is read as a response, and the branch quietly ends. No request, no rejection, no
+  retry — the kit's own accent is kept. That dead call is what puts the REST client and `axios`
+  into every application that mounts this provider; see
+  [`known-defects.md`](known-defects.md).
 
 Do not mount `ThemeProviderComponent` from `components/theme-provider` yourself. It is the older
 layer this provider is built on; used directly it takes a full theme object rather than a name, and
