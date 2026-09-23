@@ -69,14 +69,9 @@ describe("ArticleLiveChat", () => {
   });
 
   it("renders nothing without a Zendesk key", () => {
-    const { container } = render(
-      <ArticleLiveChat {...props} zendeskKey="" />,
-    );
+    const { container } = render(<ArticleLiveChat {...props} zendeskKey="" />);
 
     expect(container).toBeEmptyDOMElement();
-    expect(zendeskAPI.addChanges).not.toHaveBeenCalledWith(
-      "webWidget",
-      "hide",
-    );
+    expect(zendeskAPI.addChanges).not.toHaveBeenCalledWith("webWidget", "hide");
   });
 });
