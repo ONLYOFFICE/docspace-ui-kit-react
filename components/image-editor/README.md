@@ -26,6 +26,7 @@ import { ImageEditor } from "@onlyoffice/apps-ui-kit/components/image-editor";
 - **Delete button**: `ButtonDelete` sub-component for removing the uploaded image
 - **Configurable border radius**: Supports circular and rounded-rectangle crops
 - **Rescaling control**: Optional `disableImageRescaling` flag
+- **No size check**: the editor passes the file input's event to `onChangeFile` untouched; `maxImageSize` is deprecated and ignored, so any size limit or compression belongs in that handler
 
 ## Sub-components
 
@@ -34,20 +35,20 @@ import { ImageEditor } from "@onlyoffice/apps-ui-kit/components/image-editor";
 
 ## Properties
 
-| Prop                           | Type                                         | Default | Description                                 |
-| ------------------------------ | -------------------------------------------- | ------- | ------------------------------------------- |
-| `t`                            | `TTranslation`                               | —       | Translation function for i18n               |
-| `image`                        | `TImage`                                     | —       | Current image state (file, zoom, x, y)      |
-| `onChangeImage`                | `(image: TImage) => void`                    | —       | Callback when image state changes           |
-| `Preview`                      | `React.ReactNode`                            | —       | Preview element rendered beside the cropper |
-| `setPreview`                   | `(preview: string) => void`                  | —       | Callback to update the preview data URL     |
-| `isDisabled`                   | `boolean`                                    | —       | Disables all editing interactions           |
-| `editorBorderRadius`           | `number`                                     | —       | Border radius of the crop area in pixels    |
-| `onChangeFile`                 | `(e: ChangeEvent<HTMLInputElement>) => void` | —       | Callback when a new file is selected        |
-| `classNameWrapperImageCropper` | `string`                                     | —       | CSS class for the cropper wrapper           |
-| `className`                    | `string`                                     | —       | CSS class for the root element              |
-| `disableImageRescaling`        | `boolean`                                    | —       | Disables automatic image rescaling          |
-| `maxImageSize`                 | `number`                                     | —       | Maximum allowed image size                  |
+| Prop                           | Type                                         | Default | Description                                                                                    |
+| ------------------------------ | -------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------- |
+| `t`                            | `TTranslation`                               | —       | Translation function for i18n                                                                  |
+| `image`                        | `TImage`                                     | —       | Current image state (file, zoom, x, y)                                                         |
+| `onChangeImage`                | `(image: TImage) => void`                    | —       | Callback when image state changes                                                              |
+| `Preview`                      | `React.ReactNode`                            | —       | Preview element rendered beside the cropper                                                    |
+| `setPreview`                   | `(preview: string) => void`                  | —       | Callback to update the preview data URL                                                        |
+| `isDisabled`                   | `boolean`                                    | —       | Disables all editing interactions                                                              |
+| `editorBorderRadius`           | `number`                                     | —       | Border radius of the crop area in pixels                                                       |
+| `onChangeFile`                 | `(e: ChangeEvent<HTMLInputElement>) => void` | —       | Callback when a new file is selected                                                           |
+| `classNameWrapperImageCropper` | `string`                                     | —       | CSS class for the cropper wrapper                                                              |
+| `className`                    | `string`                                     | —       | CSS class for the root element                                                                 |
+| `disableImageRescaling`        | `boolean`                                    | —       | Disables automatic image rescaling                                                             |
+| `maxImageSize`                 | `number`                                     | —       | **Deprecated, no effect.** Size limits and compression are the caller's job, in `onChangeFile` |
 
 ## TImage Type
 

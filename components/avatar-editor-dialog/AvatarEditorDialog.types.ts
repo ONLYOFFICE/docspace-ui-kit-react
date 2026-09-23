@@ -14,7 +14,7 @@ export type AvatarEditorDialogProps = {
   isLoading?: boolean;
   /** Border radius of the crop mask, in pixels; `0` gives a square crop. */
   editorBorderRadius?: number;
-  /** Maximum allowed image size, forwarded to the image editor (which does not currently use it). */
+  /** @deprecated Has no effect. Size limits and compression are the caller's job, in `onChangeFile`. */
   maxImageSize?: number;
   /** Test id forwarded to the underlying modal dialog. */
   dataTestId?: string;

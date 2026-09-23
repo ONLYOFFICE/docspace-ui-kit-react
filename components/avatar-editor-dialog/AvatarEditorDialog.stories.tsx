@@ -25,7 +25,7 @@ const meta = {
 
 - **Crop and zoom**: hosts \`ImageEditor\`, keeping zoom and offset in the \`image\` value
 - **Circular or square crop**: \`editorBorderRadius\` selects the mask
-- **Size limit**: \`maxImageSize\` rejects oversized uploads
+- **No size check**: \`maxImageSize\` is deprecated and has no effect; limit or compress the file in \`onChangeFile\`
 - **Loading state**: \`isLoading\` disables the save action while the upload is in flight
 
 ### Usage

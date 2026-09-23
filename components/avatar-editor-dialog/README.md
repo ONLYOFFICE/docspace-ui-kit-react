@@ -38,7 +38,7 @@ const MyComponent = () => {
 | image              | TImage                                                      | -       | Current image, zoom and crop position; controlled by the caller                                                  |
 | isLoading          | boolean                                                     | false   | Shows a loader on the save button and disables cancel and the editor                                             |
 | editorBorderRadius | number                                                      | 110     | Border radius of the crop mask, in pixels; `0` gives a square crop                                               |
-| maxImageSize       | number                                                      | -       | Maximum allowed image size, forwarded to the image editor (which does not currently use it)                      |
+| maxImageSize       | number                                                      | -       | **Deprecated, no effect.** Size limits and compression are the caller's job, in `onChangeFile`                   |
 | dataTestId         | string                                                      | -       | Test id forwarded to the underlying modal dialog                                                                 |
 | onClose            | () => void                                                  | -       | Called when the dialog is closed or cancelled, after the image is reset                                          |
 | onSave             | (image: TImage, preview: string) => void \| Promise\<void\> | -       | Called by the save button with the current image and the cropped preview as a data URL                           |
@@ -49,7 +49,8 @@ const MyComponent = () => {
 
 ## Behaviour notes
 
-- **Needs an image to show anything.** The body renders the cropper only when `image.uploadedFile` is set and is not the portal's default avatar (a string containing `default_user_photo`). With no file the dialog opens with an empty body; the only file input lives inside the cropper ("Choose another"), so the first file has to be picked outside the dialog.
+- **Needs an image to show anything.** The body renders the cropper only when `image.uploadedFile` is set and is not the portal's default avatar (a string containing `default_user_photo`). With no file the dialog opens with an empty body; the only file input lives inside the cropper ("Choose another"), so the first file has to be picked outside the dialog. Open the dialog with `image.uploadedFile` already set.
+- **No size check.** `maxImageSize` is deprecated and has no effect; the dialog passes the file input's event to `onChangeFile` untouched. Reject, limit or compress oversized files in that handler (the DocSpace client compresses to under 1 MB there and shows `Common:SizeImageLarge` when it cannot).
 - **Translator is a prop.** The dialog does not use the translation hook; pass a `t` that resolves the `Common:` keys above plus `Common:ChooseAnother` and `Common:Delete` used by the image editor.
 - **Closing resets the image.** Cancel and the modal's close both call `onChangeImage({ x: 0.5, y: 0.5, zoom: 1, uploadedFile: undefined })` before `onClose`. Saving does not close the dialog — do that in `onSave`.
 - **Short viewports.** When the viewport is shorter than 590px (a 448px cropper plus header and footer), the body gets a fixed height and scrolls; the height is recomputed on window resize.

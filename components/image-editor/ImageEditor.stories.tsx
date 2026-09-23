@@ -22,7 +22,7 @@ const meta = {
 - **Image Upload**: Upload images from the local filesystem
 - **Crop & Zoom**: Crop and zoom uploaded images with interactive controls
 - **Customizable Border Radius**: Configure editor border radius for square or circular crops
-- **Max File Size**: Set a maximum allowed image file size
+- **No size check**: \`maxImageSize\` is deprecated and has no effect; limit or compress the file in \`onChangeFile\`
 - **Image Rescaling**: Optionally disable image rescaling
 - **Disabled State**: Disable the editor to prevent user interaction
 
@@ -48,13 +48,12 @@ import { ImageEditor } from "@onlyoffice/apps-ui-kit/components/image-editor";
   editorBorderRadius={400}
 />
 
-// With max image size and rescaling disabled
+// With rescaling disabled
 <ImageEditor
   t={(key) => key}
   image={image}
   onChangeImage={handleChangeImage}
   onChangeFile={handleChangeFile}
-  maxImageSize={2097152}
   disableImageRescaling
 />
 \`\`\``,
@@ -85,9 +84,10 @@ import { ImageEditor } from "@onlyoffice/apps-ui-kit/components/image-editor";
     },
     maxImageSize: {
       control: "number",
-      description: "Maximum image size in bytes (default 1MB)",
+      description:
+        "Deprecated, has no effect. Size limits and compression are the caller's job, in onChangeFile",
       table: {
-        defaultValue: { summary: "1048576" },
+        defaultValue: { summary: "undefined" },
       },
     },
   },

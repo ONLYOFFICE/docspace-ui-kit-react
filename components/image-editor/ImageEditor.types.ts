@@ -19,6 +19,7 @@ export type ImageEditorProps = {
   classNameWrapperImageCropper?: string;
   className?: string;
   disableImageRescaling?: boolean;
+  /** @deprecated Has no effect. Size limits and compression are the caller's job, in `onChangeFile`. */
   maxImageSize?: number;
   editorBorderRadius: number;
   onChangeFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
