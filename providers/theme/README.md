@@ -4,13 +4,13 @@ Resolves the active theme (light, dark, or system) and applies it to the documen
 
 ## Props
 
-| Prop           | Type                           | Required | Description                                           |
-| -------------- | ------------------------------ | -------- | ----------------------------------------------------- |
-| `initialTheme` | `ThemeKeys`                    | No       | The initial theme (`BaseStr`, `DarkStr`, `SystemStr`) |
-| `systemTheme`  | `ThemeKeys`                    | No       | Override for the detected system theme                |
+| Prop           | Type                           | Required | Description                                                                            |
+| -------------- | ------------------------------ | -------- | -------------------------------------------------------------------------------------- |
+| `initialTheme` | `ThemeKeys`                    | No       | The initial theme (`BaseStr`, `DarkStr`, `SystemStr`)                                  |
+| `systemTheme`  | `ThemeKeys`                    | No       | Override for the detected system theme                                                 |
 | `colorTheme`   | `CustomColorThemesSettingsDto` | No       | The portal's custom accent palette. Left out, the kit's own accent is used — see below |
-| `locale`       | `string`                       | No       | Locale for RTL detection and font family resolution   |
-| `children`     | `React.ReactNode`              | Yes      | Child components that receive theming                 |
+| `locale`       | `string`                       | No       | Locale for RTL detection and font family resolution                                    |
+| `children`     | `React.ReactNode`              | Yes      | Child components that receive theming                                                  |
 
 ## Usage
 

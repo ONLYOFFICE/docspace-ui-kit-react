@@ -431,7 +431,9 @@ const main = async () => {
     // judged by the names it does export.
     const defaultOnly =
       exports.hasDefault && !exports.names.includes(meta.name ?? "");
-    const documented = (meta.exports ?? []).filter((name) => name !== "default");
+    const documented = (meta.exports ?? []).filter(
+      (name) => name !== "default",
+    );
     const inBarrel =
       !defaultOnly &&
       documented.length > 0 &&
