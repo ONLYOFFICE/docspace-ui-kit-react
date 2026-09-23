@@ -14,11 +14,15 @@ const meta = {
 
 ### Features
 
-- **Bounded stepping**: increments and decrements by \`step\`, clamped to \`minValue\` and \`maxValue\`
+- **Bounded stepping**: increments and decrements by \`step\`, clamped to \`minValue\` and \`maxValue\` (or the single \`maxValue+\` overflow state with \`showPlusSign\`); plus, presets, typing and the slider share that cap
 - **Direct entry**: the value can be typed; out-of-range input surfaces an error state
 - **Optional slider**: \`showSlider\` adds a slider bound to the same value
 - **Presets**: \`items\` renders selectable tabs for common amounts
-- **Zero handling**: \`isZeroAllowed\` and \`enableZero\` govern whether zero is a valid value below \`minValue\`
+- **Zero handling**: \`enableZero\` (deprecated alias \`isZeroAllowed\`) makes zero a valid value below \`minValue\`
+
+### Accessibility
+
+The minus and plus controls are native buttons, reachable with Tab and operated with Enter or Space. They contain only an icon: pass \`decreaseLabel\` and \`increaseLabel\` to name them. \`isDisabled\` disables them; \`minusDisabled\` uses \`aria-disabled\` so the minus control stays focusable for its tooltip.
 
 ### Usage
 
@@ -44,7 +48,7 @@ Controlled: pass \`value\` and update it from \`onChange\`. The stories below wr
     },
     showPlusSign: {
       control: "boolean",
-      description: "Prefixes the value with a plus sign",
+      description: "Allows one overflow step past maxValue, shown as maxValue+",
     },
   },
 } satisfies Meta<typeof QuantityPicker>;
@@ -76,6 +80,8 @@ export const Default: Story = {
     step: 1,
     title: "Managers",
     subtitle: "Choose how many managers to add",
+    decreaseLabel: "Decrease",
+    increaseLabel: "Increase",
     onChange: () => {},
   },
 };

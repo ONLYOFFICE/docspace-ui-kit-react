@@ -1,16 +1,15 @@
 import { useState } from "react";
+import type { ComponentProps } from "react";
 import { describe, it, expect, vi } from "vitest";
 import { screen, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import QuantityPicker from ".";
 
-type HarnessProps = {
+type HarnessProps = Partial<
+  Omit<ComponentProps<typeof QuantityPicker>, "value" | "onChange">
+> & {
   initialValue?: number;
-  minValue?: number;
-  maxValue?: number;
-  enableZero?: boolean;
-  showPlusSign?: boolean;
   onChange?: (value: number) => void;
 };
 
@@ -18,9 +17,9 @@ const Harness = ({
   initialValue = 10,
   minValue = 10,
   maxValue = 999,
-  enableZero,
-  showPlusSign,
+  step = 1,
   onChange,
+  ...rest
 }: HarnessProps) => {
   const [value, setValue] = useState(initialValue);
 
@@ -29,9 +28,8 @@ const Harness = ({
       value={value}
       minValue={minValue}
       maxValue={maxValue}
-      step={1}
-      enableZero={enableZero}
-      showPlusSign={showPlusSign}
+      step={step}
+      {...rest}
       onChange={(newValue) => {
         setValue(newValue);
         onChange?.(newValue);
@@ -41,6 +39,8 @@ const Harness = ({
 };
 
 const getInput = () => screen.getByTestId("quantity_picker_input");
+const getPlus = () => screen.getByTestId("quantity_picker_plus_icon");
+const getMinus = () => screen.getByTestId("quantity_picker_minus_icon");
 
 describe("<QuantityPicker />", () => {
   it("renders the current value", () => {
@@ -270,5 +270,245 @@ describe("<QuantityPicker />", () => {
     await user.click(screen.getByTestId("quantity_picker_plus_icon"));
 
     expect(input).toHaveValue("11");
+  });
+
+  describe("upper bound", () => {
+    it("does not step past maxValue with plus", async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(
+        <Harness
+          initialValue={100}
+          minValue={1}
+          maxValue={100}
+          onChange={onChange}
+        />,
+      );
+
+      await user.click(getPlus());
+
+      expect(getInput()).toHaveValue("100");
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it("shortens the last step so plus stops at maxValue", async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(
+        <Harness
+          initialValue={98}
+          minValue={1}
+          maxValue={100}
+          step={5}
+          onChange={onChange}
+        />,
+      );
+
+      await user.click(getPlus());
+
+      expect(onChange).toHaveBeenLastCalledWith(100);
+    });
+
+    it("steps once into the overflow state with showPlusSign, and no further", async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(
+        <Harness
+          initialValue={100}
+          minValue={1}
+          maxValue={100}
+          step={10}
+          showPlusSign
+          onChange={onChange}
+        />,
+      );
+
+      await user.click(getPlus());
+      expect(onChange).toHaveBeenLastCalledWith(101);
+      expect(getInput()).toHaveValue("100+");
+
+      await user.click(getPlus());
+      expect(onChange).toHaveBeenCalledTimes(1);
+    });
+
+    it("caps a preset tab at maxValue", async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(
+        <Harness
+          initialValue={95}
+          minValue={1}
+          maxValue={100}
+          items={[10]}
+          onChange={onChange}
+        />,
+      );
+
+      await user.click(screen.getByTestId("add_10_tab_item"));
+
+      expect(onChange).toHaveBeenLastCalledWith(100);
+    });
+
+    it("caps a preset tab at the overflow state with showPlusSign", async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(
+        <Harness
+          initialValue={95}
+          minValue={1}
+          maxValue={100}
+          items={[50]}
+          showPlusSign
+          onChange={onChange}
+        />,
+      );
+
+      await user.click(screen.getByTestId("add_50_tab_item"));
+
+      expect(onChange).toHaveBeenLastCalledWith(101);
+      expect(getInput()).toHaveValue("100+");
+    });
+
+    it("bounds the slider at maxValue without showPlusSign", () => {
+      render(
+        <Harness initialValue={5} minValue={1} maxValue={100} showSlider />,
+      );
+
+      expect(screen.getByRole("slider")).toHaveAttribute("max", "100");
+    });
+
+    it("bounds the slider at the overflow state with showPlusSign", () => {
+      render(
+        <Harness
+          initialValue={5}
+          minValue={1}
+          maxValue={100}
+          showSlider
+          showPlusSign
+        />,
+      );
+
+      expect(screen.getByRole("slider")).toHaveAttribute("max", "101");
+    });
+  });
+
+  describe("controls", () => {
+    it("renders the controls as buttons with the given accessible names", () => {
+      render(<Harness decreaseLabel="Decrease" increaseLabel="Increase" />);
+
+      expect(screen.getByRole("button", { name: "Decrease" })).toBe(getMinus());
+      expect(screen.getByRole("button", { name: "Increase" })).toBe(getPlus());
+      expect(getPlus()).toHaveAttribute("type", "button");
+    });
+
+    it("renders no aria-label when no label is given", () => {
+      render(<Harness />);
+
+      expect(getPlus()).not.toHaveAttribute("aria-label");
+      expect(getMinus()).not.toHaveAttribute("aria-label");
+    });
+
+    it("is operable from the keyboard", async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(<Harness initialValue={10} minValue={1} onChange={onChange} />);
+
+      await user.tab();
+      expect(getMinus()).toHaveFocus();
+      await user.keyboard("{Enter}");
+      expect(onChange).toHaveBeenLastCalledWith(9);
+
+      await user.tab();
+      expect(getInput()).toHaveFocus();
+
+      await user.tab();
+      expect(getPlus()).toHaveFocus();
+      await user.keyboard(" ");
+      expect(onChange).toHaveBeenLastCalledWith(10);
+    });
+
+    it("disables both controls and the preset tabs with isDisabled", async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(<Harness isDisabled items={[10]} onChange={onChange} />);
+
+      expect(getMinus()).toBeDisabled();
+      expect(getPlus()).toBeDisabled();
+
+      await user.click(getPlus());
+      await user.click(screen.getByTestId("add_10_tab_item"));
+
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it("keeps a minusDisabled control focusable but inert", async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(<Harness initialValue={20} minusDisabled onChange={onChange} />);
+
+      const minus = getMinus();
+      expect(minus).not.toBeDisabled();
+      expect(minus).toHaveAttribute("aria-disabled", "true");
+
+      await user.click(minus);
+      minus.focus();
+      await user.keyboard("{Enter}");
+
+      expect(onChange).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("disabled styling", () => {
+    it("marks the subtitle disabled", () => {
+      render(<Harness subtitle="Included" isDisabled />);
+
+      expect(screen.getByText("Included").className).toMatch(/disabled/);
+    });
+
+    it("sizes the field to its content only while disableValue is shown", () => {
+      const { rerender } = render(
+        <QuantityPicker
+          value={5}
+          minValue={1}
+          maxValue={100}
+          step={1}
+          disableValue="Unlimited"
+          onChange={() => {}}
+        />,
+      );
+
+      expect(getInput().className).not.toMatch(/isConstant/);
+
+      rerender(
+        <QuantityPicker
+          value={5}
+          minValue={1}
+          maxValue={100}
+          step={1}
+          disableValue="Unlimited"
+          isDisabled
+          onChange={() => {}}
+        />,
+      );
+
+      expect(screen.getByText("Unlimited").className).toMatch(/isConstant/);
+    });
+  });
+
+  it("treats the deprecated isZeroAllowed as enableZero", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <Harness
+        initialValue={10}
+        minValue={10}
+        isZeroAllowed
+        onChange={onChange}
+      />,
+    );
+
+    await user.click(getMinus());
+
+    expect(onChange).toHaveBeenLastCalledWith(0);
   });
 });

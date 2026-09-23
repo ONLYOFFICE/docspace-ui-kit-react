@@ -24,42 +24,49 @@ type QuantityPickerProps = {
   value: number;
   /** Lower bound for the controls, typed input and slider */
   minValue: number;
-  /** Upper bound; with `showPlusSign`, values above it display as `maxValue+` */
+  /** Upper bound; nothing the component does goes past it, except the one overflow step `showPlusSign` allows */
   maxValue: number;
-  /** Amount the plus and minus controls and the slider move by */
+  /** Amount the plus and minus controls and the slider move by; the last step up is shortened so it stops at the bound */
   step: number;
   /** Heading above the controls; omitted when empty */
   title?: string | null;
   /** Secondary line under the title; omitted when empty */
   subtitle?: string;
-  /** Lets the value go one past `maxValue`, shown as `maxValue+` */
+  /** Lets the value go exactly one past `maxValue` (to `maxValue + 1`), shown as `maxValue+` */
   showPlusSign?: boolean;
   /** Disables every control and replaces the input with static text */
   isDisabled?: boolean;
-  /** Renders a slider bound to the value, from `minValue` to `maxValue + 1` */
+  /** Renders a slider bound to the value, from `minValue` to `maxValue` (`maxValue + 1` with `showPlusSign`) */
   showSlider?: boolean;
   /** Called with the new value */
   onChange: (value: number) => void;
   /** Class name on the root element */
   className?: string;
-  /** Preset tabs; selecting one adds its amount to the current value */
+  /** Preset tabs; selecting one adds its amount to the current value, capped like the plus control */
   items?: Array<number | TabItemObject>;
   /** Widens the value field from 101px to 140px */
   isLarge?: boolean;
   /** Hides the plus and minus controls */
   withoutControls?: boolean;
-  /** Text shown in place of the value while `isDisabled` is set */
+  /** Text shown in place of the value while `isDisabled` is set; the field then sizes to its content */
   disableValue?: string;
   /** Text under the controls; turns to the warning colour while an invalid value is entered with `enableZero` */
   underControlsTitle?: string | React.ReactNode;
-  /** Declared but not read by the component; use `enableZero` */
+  /**
+   * Former name of `enableZero`, kept as an alias; `enableZero` wins when both are set.
+   * @deprecated Use `enableZero`.
+   */
   isZeroAllowed?: boolean;
   /** Allows zero as a value below `minValue`; other values below it are flagged */
   enableZero?: boolean;
   /** Tooltip id set as `data-tooltip-id` on the minus control */
   minusTooltipId?: string;
-  /** Disables only the minus control */
+  /** Disables only the minus control; it stays focusable (`aria-disabled`) so `minusTooltipId` can still explain why */
   minusDisabled?: boolean;
+  /** Accessible name of the minus control, e.g. a translated "Decrease"; no `aria-label` is rendered without it */
+  decreaseLabel?: string;
+  /** Accessible name of the plus control, e.g. a translated "Increase"; no `aria-label` is rendered without it */
+  increaseLabel?: string;
 };
 
 const shouldSetIncrementError = (
@@ -90,17 +97,25 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
   withoutControls,
   disableValue,
   underControlsTitle,
-  enableZero = false,
+  enableZero: enableZeroProp,
+  isZeroAllowed,
   minusTooltipId,
   minusDisabled,
+  decreaseLabel,
+  increaseLabel,
 }) => {
+  const enableZero = enableZeroProp ?? isZeroAllowed ?? false;
+
   const displayValue = showPlusSign
     ? value > maxValue
       ? `${maxValue}+`
       : `${value}`
     : `${value}`;
 
+  // The highest value the component itself ever produces: `maxValue`, or the
+  // single `maxValue+` overflow state when `showPlusSign` is on.
   const overflowValue = showPlusSign ? maxValue + 1 : maxValue;
+  const capToOverflow = (next: number) => Math.min(next, overflowValue);
 
   const [error, setError] = useState(false);
   const [draftValue, setDraftValue] = useState<string | null>(null);
@@ -117,7 +132,7 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
   const inputClass = classNames(styles.countInput, {
     [styles.disabled]: isDisabled,
     [styles.isLarge]: isLarge,
-    [styles.isContant]: disableValue,
+    [styles.isConstant]: isDisabled && disableValue,
   });
   const circleClass = classNames(styles.circle, {
     [styles.disabled]: isDisabled,
@@ -132,20 +147,18 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
     onChange(newValue);
   };
 
-  const handleButtonClick = (e: MouseEvent<HTMLDivElement>) => {
+  const handleButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
     const operation = e.currentTarget.dataset.operation as "plus" | "minus";
     let newValue = +value;
 
     setDraftValue(null);
 
     if (operation === "plus") {
-      if (value <= maxValue) {
-        if (newValue < minValue) {
-          newValue = minValue;
-          setError(false);
-        } else {
-          newValue += step;
-        }
+      if (newValue < minValue) {
+        newValue = minValue;
+        setError(false);
+      } else if (newValue < overflowValue) {
+        newValue = capToOverflow(newValue + step);
       }
     }
 
@@ -207,7 +220,7 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
     if (e.key === "Enter") commitDraftValue();
   };
 
-  const handleButtonMouseDown = (e: MouseEvent<HTMLDivElement>) => {
+  const handleButtonMouseDown = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
   };
 
@@ -215,6 +228,7 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
     ? {}
     : { onClick: handleButtonClick, onMouseDown: handleButtonMouseDown };
   const minusButtonProps = isDisabled || minusDisabled ? {} : buttonProps;
+  const isMinusInactive = !isDisabled && minusDisabled;
   const minusCircleClass = classNames(circleClass, styles.minusIcon, {
     [styles.disabled]: minusDisabled,
   });
@@ -256,7 +270,7 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
     if (itemValue === undefined) return;
 
     setDraftValue(null);
-    onChange(value + itemValue);
+    onChange(capToOverflow(value + itemValue));
     setError(false);
   };
 
@@ -275,7 +289,7 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
           fontWeight={600}
           fontSize="11px"
           className={classNames(styles.subTitle, {
-            [styles.isDisabled]: isDisabled,
+            [styles.disabled]: isDisabled,
           })}
         >
           {subtitle}
@@ -284,15 +298,19 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
 
       <div className={styles.countControls}>
         {withoutControls ? null : (
-          <div
+          <button
+            type="button"
             className={minusCircleClass}
             {...minusButtonProps}
             {...(minusTooltipId ? { "data-tooltip-id": minusTooltipId } : {})}
+            {...(decreaseLabel ? { "aria-label": decreaseLabel } : {})}
+            {...(isMinusInactive ? { "aria-disabled": true } : {})}
+            disabled={isDisabled}
             data-operation="minus"
             data-testid="quantity_picker_minus_icon"
           >
-            <MinusIcon className={controlButtonClass} />
-          </div>
+            <MinusIcon className={controlButtonClass} aria-hidden="true" />
+          </button>
         )}
 
         {isDisabled ? (
@@ -306,19 +324,25 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
             value={draftValue ?? displayValue}
             style={{ boxShadow: "none" }}
             {...inputProps}
+            // TextInput defaults to tabIndex -1; the value field has to be
+            // reachable between the two controls.
+            tabIndex={0}
             testId="quantity_picker_input"
           />
         )}
 
         {withoutControls ? null : (
-          <div
+          <button
+            type="button"
             className={`${circleClass} ${styles.plusIcon}`}
             {...buttonProps}
+            {...(increaseLabel ? { "aria-label": increaseLabel } : {})}
+            disabled={isDisabled}
             data-operation="plus"
             data-testid="quantity_picker_plus_icon"
           >
-            <PlusIcon className={controlButtonClass} />
-          </div>
+            <PlusIcon className={controlButtonClass} aria-hidden="true" />
+          </button>
         )}
       </div>
 
@@ -332,7 +356,7 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
             runnableTrackHeight="12px"
             isDisabled={isDisabled}
             min={minValue}
-            max={maxValue + 1}
+            max={overflowValue}
             step={step}
             withPouring
             value={value}
@@ -342,7 +366,9 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
           />
           <div className={styles.sliderTrack}>
             <Text className={styles.sliderTrackValueMin}>{minValue}</Text>
-            <Text className={styles.sliderTrackValueMax}>{`${maxValue}+`}</Text>
+            <Text
+              className={styles.sliderTrackValueMax}
+            >{`${maxValue}${showPlusSign ? "+" : ""}`}</Text>
           </div>
         </div>
       ) : null}
@@ -356,6 +382,7 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
                 key={item.id}
                 label={item.name}
                 onSelect={onSelectTab}
+                isDisabled={isDisabled}
                 allowNoSelection
                 dataTestId={`add_${item.id}_tab_item`}
               />
