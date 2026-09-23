@@ -6,7 +6,7 @@
   "category": "Interactive elements",
   "status": "public",
   "summary": "Dashed upload area with a picture, a prompt and a format list, which turns into a loader while the upload runs.",
-  "import": { "subpath": "components/dropzone", "barrel": false, "default": true },
+  "import": { "subpath": "components/dropzone", "barrel": true, "default": true },
   "exports": ["default", "DropzoneProps", "SvgIconComponent"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": "isLoading", "disabled": "isDisabled" },
@@ -40,8 +40,8 @@ thing without it.
 import Dropzone from "@onlyoffice/apps-ui-kit/components/dropzone";
 ```
 
-It is a **default** export. `components/index.ts` does not re-export this folder, so the subpath
-above is the only way in.
+It is a **default** export here, so the name is yours to choose. The root barrel
+`@onlyoffice/apps-ui-kit` re-exports it too, under the fixed name `Dropzone`.
 
 Needs `ThemeProvider` above it in the tree: the border, the background and the accent on the
 prompt all come from custom properties the provider's `.light` and `.dark` classes declare.

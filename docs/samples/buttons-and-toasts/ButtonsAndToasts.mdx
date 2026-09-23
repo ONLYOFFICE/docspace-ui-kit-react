@@ -1,0 +1,48 @@
+import { Meta, Source, Story } from "@storybook/addon-docs/blocks";
+
+import * as ButtonsAndToastsStories from "./ButtonsAndToasts.stories";
+import source from "./ButtonsAndToasts.tsx?raw";
+
+<Meta of={ButtonsAndToastsStories} />
+
+# 01. Buttons and toasts
+
+A document header with three buttons. Save it, copy its link, throw it away —
+and get told what happened, with a way back.
+
+<Story of={ButtonsAndToastsStories.Default} />
+
+Press **Save** and watch the button: the spinner, the disabled state and the
+focus ring are already inside it. Press **Move to Trash** and read the toast —
+that _Undo_ is a real `Link` component living inside the notification, because
+`toastr` takes a React node and not just a string:
+
+```tsx
+toastr.success(
+  <span>
+    Moved to Trash • <Link type={LinkType.action} onClick={undo}>Undo</Link>
+  </span>,
+  null,
+  8000,
+  true,
+);
+```
+
+Three things that save time later:
+
+- **`Toast` is mounted once**, near the root of your app. `toastr.*` is
+  imperative and silent without it — the single most common reason a first
+  toast never shows up.
+- **An error that must be read** gets `timeout: 0` and `withCross: true`, so it
+  waits for the user instead of disappearing in five seconds.
+- **No colour is set anywhere in this file.** The accent comes from the theme,
+  which is why the same screen follows a rebranded portal, and the dark theme,
+  without a second implementation.
+
+## The code
+
+Imports here are relative to this repository. In your application they come
+from the package — `@onlyoffice/apps-ui-kit/components/button`,
+`@onlyoffice/apps-ui-kit/components/toast`, and so on.
+
+<Source code={source} language="tsx" />

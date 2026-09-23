@@ -1,0 +1,57 @@
+import { Meta, Source, Story } from "@storybook/addon-docs/blocks";
+
+import * as DialogsStories from "./Dialogs.stories";
+import source from "./Dialogs.tsx?raw";
+
+<Meta of={DialogsStories} />
+
+# 04. Dialogs
+
+One component, two arrivals. **Invite people** slides in from the side;
+**Delete 3 files** lands in the middle and waits for an answer.
+
+<Story of={DialogsStories.Default} />
+
+Tick _Delete permanently_ and watch the confirming button rename itself. A
+button that repeats the verb — _Move to Trash_, _Delete permanently_ — is
+readable on its own; a button that says _OK_ makes the user re-read the
+paragraph above it.
+
+## Modal or aside
+
+`ModalDialog` is the same component both times, and `displayType` picks the
+form:
+
+```tsx
+<ModalDialog visible={visible} displayType={ModalDialogType.aside} onClose={close}>
+  <ModalDialog.Header>Invite people</ModalDialog.Header>
+  <ModalDialog.Body>…</ModalDialog.Body>
+  <ModalDialog.Footer>…</ModalDialog.Footer>
+</ModalDialog>
+```
+
+Use the **modal** for one blocking decision, the **aside** for a form with room
+to breathe. When the right answer depends on the screen size, pass
+`displayTypeDetailed` instead and give a separate answer per breakpoint —
+`{ desktop: aside, tablet: aside, mobile: modal }` is the usual shape.
+
+## Worth copying
+
+- **`withForm` plus `onSubmit`** turns the aside into a real `<form>`, so Enter
+  submits it and the footer button can be `type="submit"`. Without it, keyboard
+  users have to reach for the mouse.
+- **`Header`, `Body`, `Footer` are slots, not wrappers** — they carry no markup
+  of their own. Passing arbitrary children instead of those three is the
+  reliable way to get a dialog that ignores your layout.
+- **Close, then report.** Both dialogs here fire a toast after they close, so
+  the outcome survives the dialog disappearing.
+- **`scale` on footer buttons** makes them share the width evenly, which is
+  what the product's dialogs do on every screen.
+
+## The code
+
+Imports here are relative to this repository. In your application they come
+from the package — `@onlyoffice/apps-ui-kit/components/modal-dialog`, and so
+on.
+
+<Source code={source} language="tsx" />

@@ -1,0 +1,72 @@
+import { Meta, Source, Story } from "@storybook/addon-docs/blocks";
+
+import * as FilesAppStories from "./FilesApp.stories";
+import source from "./FilesApp.tsx?raw";
+
+<Meta of={FilesAppStories} />
+
+# 10. A small Files app
+
+Everything from the previous nine samples on one screen. Search for `budget`.
+Switch to tiles. Select three files and watch the breadcrumb header become a
+toolbar. Create a folder from **Create** — it appears in the count.
+
+<Story of={FilesAppStories.Default} />
+
+## Who owns what
+
+This is the one idea worth taking from the file: **layout and data never
+negotiate.**
+
+- **`Article`** is the sidebar. It owns collapsing, the mobile drawer, the main
+  button slot and the profile block. You give it entries.
+- **`Section`** is everything to the right, as five named slots —
+  `SectionHeader`, `SectionFilter`, `SectionBody`, `SectionFooter`, plus the
+  info panel. It owns the sticky header, the scroll container and the
+  breakpoints.
+- **Your state** owns the rest: `viewAs`, `query`, the sort direction, the
+  selected ids. No component here has an opinion about any of them, which is
+  why the same `Section` carries a table on one screen and a tile grid on the
+  next.
+
+That is also what makes the header trick a two-line change: while something is
+selected, render `TableGroupMenu` in `SectionHeader` instead of `Navigation`.
+The body does not know the difference.
+
+## Portal-shaped props
+
+`Article`, `Section`, `Navigation` and `Filter` were written for the portal, so
+they ask for things the portal knows: `currentDeviceType`, whether the sidebar
+is open, the URLs of the desktop apps, which kind of page this is. A standalone
+application answers with constants — which is exactly what this sample does,
+and why the prop lists look long next to the components in the earlier samples.
+
+If you only need the middle of the screen, take `Navigation`, `Filter` and the
+list components on their own; `Section` is not a prerequisite for any of them.
+
+## The one line that matters for a real portal
+
+```tsx
+const onSearchDebounced = useDebounce((value: string) => setQuery(value), 300);
+```
+
+Filtering eight local files needs no debounce. A folder with eight thousand
+files behind a REST call does, and the place to put it is exactly here — at the
+boundary where the request would be made, not inside the filter component.
+
+## Where to go next
+
+- **Components → Selectors** for the data-driven pickers (people, rooms, files,
+  groups) that talk to the portal.
+- **Components → Uploader** for upload progress, which plugs into
+  `Section`'s own progress area.
+- **Getting started → Themes** for what `data-theme`, `data-dir` and the
+  colour scheme actually set, including the RTL mirror this screen already
+  follows.
+
+## The code
+
+Imports here are relative to this repository. In your application they come
+from the package — `@onlyoffice/apps-ui-kit/components/section`, and so on.
+
+<Source code={source} language="tsx" />

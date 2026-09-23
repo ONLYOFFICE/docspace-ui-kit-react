@@ -6,7 +6,7 @@
   "category": "Navigation",
   "status": "public",
   "summary": "Previous and next buttons with a page selector between them and a page-size selector at the end.",
-  "import": { "subpath": "components/paging", "barrel": false, "default": false },
+  "import": { "subpath": "components/paging", "barrel": true, "default": false },
   "exports": ["Paging", "PagingProps"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
@@ -41,7 +41,7 @@ it the options and the current values, and it tells you what was clicked.
 import { Paging } from "@onlyoffice/apps-ui-kit/components/paging";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 Needs `ThemeProvider` above it in the tree: the buttons and both drop-downs take their colours
 from the custom properties the provider's `.light` and `.dark` classes declare, and without it

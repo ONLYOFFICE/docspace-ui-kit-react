@@ -6,7 +6,7 @@
   "category": "Interactive elements",
   "status": "public",
   "summary": "Floating round button in the corner of the screen that opens a full-width sheet of actions.",
-  "import": { "subpath": "components/main-button-mobile", "barrel": false, "default": false },
+  "import": { "subpath": "components/main-button-mobile", "barrel": true, "default": false },
   "exports": ["MainButtonMobile"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": "opened", "close": "onClose", "loading": null, "disabled": null },
@@ -42,7 +42,7 @@ is open.
 import { MainButtonMobile } from "@onlyoffice/apps-ui-kit/components/main-button-mobile";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme`. Everything this
 component draws — the button's colour, the sheet's background and, under the light theme, the

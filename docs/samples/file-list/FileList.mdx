@@ -1,0 +1,58 @@
+import { Meta, Source, Story } from "@storybook/addon-docs/blocks";
+
+import * as FileListStories from "./FileList.stories";
+import source from "./FileList.tsx?raw";
+
+<Meta of={FileListStories} />
+
+# 05. Selectable file list
+
+Tick a checkbox and the page header becomes a toolbar for the rows you picked.
+Right-click a row — or use the ⋮ button — for the per-file menu.
+
+<Story of={FileListStories.Default} />
+
+This is the shape of every list screen in the product: a row list, a selection,
+and a group menu that replaces the title while a selection exists. Selecting
+some but not all rows leaves the toolbar checkbox indeterminate, which is the
+affordance for _select the rest_.
+
+## The positional children of `RowContent`
+
+`RowContent` is not a flex box you fill freely — the positions mean something,
+and that is what makes a row survive a narrow window:
+
+```tsx
+<RowContent>
+  <Link isTextOverflow>{file.title}</Link>   {/* [0] title, always visible */}
+  <div>{badges}</div>                        {/* [1] next to the title      */}
+  <Text containerMinWidth="120px">{author}</Text>  {/* [2…] side columns    */}
+  <Text containerMinWidth="70px">{size}</Text>
+  <Text containerMinWidth="100px">{date}</Text>
+</RowContent>
+```
+
+Side columns are the first thing dropped when the row runs out of room, so put
+the least important facts last. `containerMinWidth` is how each one claims its
+share.
+
+## `Row` and the group menu
+
+- **`Row`** renders the checkbox only when you pass `checked` — a list without
+  selection simply omits the prop, and the space goes back to the content.
+- **`contextOptions`** drives both the ⋮ button and the right-click menu, and
+  `{ isSeparator: true }` is a legal entry in that array.
+- **`TableGroupMenu`** lives under `components/table` but belongs to any view:
+  rows, tiles or table all share it, which is why the toolbar looks the same
+  whichever view the user is in.
+- **`RowContainer` with `useReactWindow={false}`** renders the rows plainly.
+  Turn it on and pass `itemCount` / `fetchMoreFiles` to virtualize thousands of
+  them without changing a single row.
+
+## The code
+
+Imports here are relative to this repository. In your application they come
+from the package — `@onlyoffice/apps-ui-kit/components/rows`, and so on.
+`FileIcon` and the sample data are shared with the next samples.
+
+<Source code={source} language="tsx" />

@@ -12,7 +12,11 @@ import { hasOwnProperty } from "../../../utils/hasOwnProperty";
 import { HeaderType } from "../../context-menu/ContextMenu.types";
 import { Loader, LoaderTypes } from "../../loader";
 
-import { BaseTileProps, TileChildProps, ItemProps } from "./BaseTile.types";
+import {
+  BaseTileProps,
+  TileChildProps,
+  BaseTileItemProps,
+} from "./BaseTile.types";
 
 import styles from "./BaseTile.module.scss";
 
@@ -57,7 +61,7 @@ export const BaseTile = ({
     ? (firstChild.props as TileChildProps | undefined)?.item
     : undefined;
 
-  const srcItem: ItemProps | undefined = childItem ?? item;
+  const srcItem: BaseTileItemProps | undefined = childItem ?? item;
 
   const contextMenuHeader: HeaderType | undefined = srcItem
     ? {
@@ -211,6 +215,6 @@ export const BaseTile = ({
 };
 export type {
   BaseTileProps,
-  ItemProps,
+  BaseTileItemProps,
   TileChildProps,
 } from "./BaseTile.types";

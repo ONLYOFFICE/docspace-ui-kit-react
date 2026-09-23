@@ -6,7 +6,7 @@
   "category": "Interactive elements",
   "status": "public",
   "summary": "Accent button at the top of a side menu that opens a menu of the things a user can create.",
-  "import": { "subpath": "components/main-button", "barrel": false, "default": false },
+  "import": { "subpath": "components/main-button", "barrel": true, "default": false },
   "exports": ["MainButton"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
@@ -39,7 +39,7 @@ given.
 import { MainButton } from "@onlyoffice/apps-ui-kit/components/main-button";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme`: every value the button
 draws itself with — background, padding, radius, font size and weight — is defined under the

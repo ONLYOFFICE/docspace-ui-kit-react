@@ -6,7 +6,7 @@
   "category": "Overlays",
   "status": "public",
   "summary": "Panel for picking one or many things out of a list too long to render at once.",
-  "import": { "subpath": "components/selector", "barrel": false, "default": false },
+  "import": { "subpath": "components/selector", "barrel": true, "default": false },
   "exports": ["Selector", "SelectorProps", "TSelectorItem", "SelectorAccessRightsMode", "RowLoader", "SearchLoader", "BreadCrumbsLoader"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": "onClose", "loading": "isLoading", "disabled": null },
@@ -39,7 +39,7 @@ breadcrumbs, pagination and footer.
 import { Selector } from "@onlyoffice/apps-ui-kit/components/selector";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 The folder also exports the three skeletons its own props ask for — `RowLoader`,
 `SearchLoader`, `BreadCrumbsLoader` — and every type on this page.

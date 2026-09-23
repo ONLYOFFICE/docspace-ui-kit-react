@@ -30,6 +30,11 @@ const TextUi = ({
   className,
   style,
   dataTestId,
+  // Read by the parent off this element's props -- RowContent and TileContent
+  // size their side containers from them -- and meaningless on the DOM node
+  // itself. Kept out of `rest` so React is not handed an unknown attribute.
+  containerWidth: _containerWidth,
+  containerMinWidth: _containerMinWidth,
   ...rest
 }: TextProps) => {
   const elementType = !as && tag ? tag : as;

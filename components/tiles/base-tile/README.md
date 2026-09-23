@@ -8,7 +8,7 @@
   "status": "public",
   "summary": "The tile shell: an icon that turns into a checkbox, a slot for the content, a three-dot menu and a lower half.",
   "import": { "subpath": "components/tiles/base-tile", "barrel": false, "default": false },
-  "exports": ["BaseTile", "BaseTileProps", "ItemProps", "TileChildProps"],
+  "exports": ["BaseTile", "BaseTileProps", "BaseTileItemProps", "TileChildProps"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": "hideContextMenu", "loading": "inProgress", "disabled": null },
   "related": ["tiles", "tiles/room-tile", "tiles/template-tile"],

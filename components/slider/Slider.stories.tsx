@@ -19,14 +19,20 @@ const meta = {
 - **Min/Max Range**: Configurable minimum and maximum values
 - **Custom Step Size**: Control the increment/decrement granularity
 - **Pouring Effect**: Visual fill indicator showing the selected portion of the track
-- **Disabled State**: Prevents interaction when disabled
+- **Disabled State**: Dims the control, blocks pointer and keyboard input and drops it out of the tab order
 - **Custom Sizing**: Adjustable thumb and track dimensions
-- **RTL Support**: Works correctly in right-to-left layouts
+- **RTL Support**: Pours the track from the right edge when the surrounding direction is right-to-left
+- **Controlled Value**: Renders exactly the \`value\` it is given and reports every move through \`onChange\`
 
 ### Accessibility
 
-- Keyboard navigation with arrow keys
-- \`aria-valuemin\`, \`aria-valuemax\`, \`aria-valuenow\` attributes
+The slider is a native \`<input type="range">\`, so keyboard and screen reader support comes from the platform rather than from attributes the component adds:
+
+- Arrow keys move the thumb one \`step\`, PageUp and PageDown move it in larger jumps, Home and End go to \`min\` and \`max\`
+- The current, minimum and maximum values reach assistive technology through the input's own \`value\`, \`min\` and \`max\`
+- Keyboard focus draws a ring around the thumb (\`:focus-visible\`), so a tabbing user can see which control is live
+- \`isDisabled\` sets the input's \`disabled\` attribute, which also takes the slider out of the tab order
+- The input carries no name of its own — give it an \`id\` and point a \`<label for>\` at it
 
 ### Usage
 
@@ -75,8 +81,40 @@ import { Slider } from "@onlyoffice/apps-ui-kit/components/slider";
       control: "boolean",
       description: "Shows the filled portion of the track",
       table: {
-        defaultValue: { summary: "true" },
+        defaultValue: { summary: "false" },
       },
+    },
+    thumbWidth: {
+      control: "text",
+      description: "Width of the input thumb",
+      table: {
+        defaultValue: { summary: "24px" },
+      },
+    },
+    thumbHeight: {
+      control: "text",
+      description: "Height of the input thumb",
+      table: {
+        defaultValue: { summary: "24px" },
+      },
+    },
+    thumbBorderWidth: {
+      control: "text",
+      description: "Border width of the input thumb",
+      table: {
+        defaultValue: { summary: "6px" },
+      },
+    },
+    runnableTrackHeight: {
+      control: "text",
+      description: "Height of the runnable track the thumb slides along",
+      table: {
+        defaultValue: { summary: "8px" },
+      },
+    },
+    onChange: {
+      action: "onChange",
+      description: "Called when the input's value is modified",
     },
   },
 } satisfies Meta<typeof Slider>;
@@ -207,10 +245,10 @@ export const WithCustomSize: Story = {
     value: 50,
     isDisabled: false,
     withPouring: true,
-    thumbWidth: "24px",
-    thumbHeight: "24px",
-    thumbBorderWidth: "2px",
-    runnableTrackHeight: "8px",
+    thumbWidth: "32px",
+    thumbHeight: "32px",
+    thumbBorderWidth: "8px",
+    runnableTrackHeight: "14px",
   },
   parameters: {
     docs: {
@@ -221,10 +259,10 @@ export const WithCustomSize: Story = {
       source: {
         code: `<Slider
   min={0} max={100} value={50}
-  thumbWidth="24px"
-  thumbHeight="24px"
-  thumbBorderWidth="2px"
-  runnableTrackHeight="8px"
+  thumbWidth="32px"
+  thumbHeight="32px"
+  thumbBorderWidth="8px"
+  runnableTrackHeight="14px"
 />`,
       },
     },
@@ -271,7 +309,6 @@ export const CssCustomization: Story = {
             padding: "20px",
             "--slider-handle-color": "#7c3aed",
             "--slider-pouring-image": "linear-gradient(#7c3aed, #7c3aed)",
-            "--slider-fill-color": "#e9d5ff",
             "--slider-size": "12px",
             "--slider-handle-size": "28px",
             "--slider-track-radius": "6px",
@@ -298,12 +335,24 @@ export const CssCustomization: Story = {
 | Variable | Description | Default |
 |----------|-------------|---------|
 | \`--slider-handle-color\` | Thumb background color | theme token |
-| \`--slider-pouring-image\` | Fill image for the poured portion (must be a \`linear-gradient\` or other \`<image>\`) | theme token |
-| \`--slider-fill-color\` | Filled track color (Firefox / moz range) | theme token |
+| \`--slider-pouring-image\` | Fill image for the poured portion, applied only with \`withPouring\` (must be a \`linear-gradient\` or other \`<image>\`) | theme token |
 | \`--slider-background-color\` | Track (unfilled) background color | theme token |
 | \`--slider-size\` | Track height | \`8px\` |
 | \`--slider-handle-size\` | Thumb width and height | \`24px\` |
-| \`--slider-track-radius\` | Border radius of track and thumb | \`5.6px\` |`,
+| \`--slider-track-radius\` | Border radius of the track; the thumb keeps a fixed radius | \`5.6px\` |`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--slider-handle-color": "#7c3aed",
+    "--slider-pouring-image": "linear-gradient(#7c3aed, #7c3aed)",
+    "--slider-size": "12px",
+    "--slider-handle-size": "28px",
+    "--slider-track-radius": "6px",
+  }}
+>
+  <Slider min={0} max={100} value={value} withPouring onChange={handleChange} />
+</div>`,
       },
     },
   },

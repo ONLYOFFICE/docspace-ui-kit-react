@@ -6,7 +6,7 @@
   "category": "Layout",
   "status": "public",
   "summary": "Full-screen error page: an animated landscape, a heading, an explanation and one action button.",
-  "import": { "subpath": "components/error-container", "barrel": false, "default": false },
+  "import": { "subpath": "components/error-container", "barrel": true, "default": false },
   "exports": ["ErrorContainer", "ErrorContainerProps"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
@@ -41,7 +41,7 @@ a browser it does not support.
 import { ErrorContainer } from "@onlyoffice/apps-ui-kit/components/error-container";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 The component file has a default export, but the folder's `index` re-exports it under a name —
 `import ErrorContainer from …` does not resolve.
 

@@ -1,5 +1,3 @@
-import type { TColorScheme } from "../../context/ThemeContext";
-
 export type SliderProps = {
   /** Applied to the input. */
   id?: string;
@@ -45,9 +43,4 @@ export type SliderProps = {
    * @default "slider"
    */
   dataTestId?: string;
-};
-
-export type SliderThemeProps = SliderProps & {
-  $currentColorScheme?: TColorScheme;
-  sizeProp?: string;
 };

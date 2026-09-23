@@ -1,0 +1,55 @@
+import { Meta, Source, Story } from "@storybook/addon-docs/blocks";
+
+import * as TilesViewStories from "./TilesView.stories";
+import source from "./TilesView.tsx?raw";
+
+<Meta of={TilesViewStories} />
+
+# 07. Tiles and the view switch
+
+Select two tiles, then press the list icon. The selection is still there —
+because the switch changes the renderer, not the data.
+
+<Story of={TilesViewStories.Default} />
+
+That is the whole trick behind the portal's own view switcher, and it is worth
+copying verbatim: `viewAs` and `selectedIds` are separate pieces of state, and
+no component owns either of them.
+
+## `TileContainer` sorts for you
+
+Hand it folders and files in any order. Anything whose `item` has `isFolder`
+lands under `headingFolders`, the rest under `headingFiles`:
+
+```tsx
+<TileContainer
+  headingFolders={<Text isBold>Folders</Text>}
+  headingFiles={<Text isBold>Files</Text>}
+>
+  {folders.map(…)}
+  {files.map(…)}
+</TileContainer>
+```
+
+Leave the headings out and you get one flat grid — which is what a rooms screen
+wants, since it has nothing to separate.
+
+## Tiles in three slots
+
+- **`element`** is the small icon in the tile's header line, next to the
+  checkbox and the ⋮ button.
+- **`temporaryIcon`** is the big picture in the body, shown until a real
+  `thumbnail` arrives. Pass both and the thumbnail wins once it loads, which is
+  how a document preview appears without the tile jumping.
+- **`children`** is a `TileContent` — the caption. `isTextOverflow` on the link
+  inside it is what keeps a long filename from breaking the grid.
+
+`badges` takes any node, so the same `Badge` you used in the list works here
+too; a tile and a row are two presentations of one item, not two data models.
+
+## The code
+
+Imports here are relative to this repository. In your application they come
+from the package — `@onlyoffice/apps-ui-kit/components/tiles`, and so on.
+
+<Source code={source} language="tsx" />

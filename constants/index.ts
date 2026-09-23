@@ -1,5 +1,11 @@
 import { globalColors } from "../providers/theme/themes";
 
+export * from "./ai";
+
+export * from "./brands";
+
+export * from "./consts";
+
 export const LOADER_STYLE = Object.freeze({
   title: "",
   width: "100%",
@@ -44,6 +50,28 @@ export const ROOM_ACTION_KEYS = {
 export const ASIDE_PADDING_AFTER_LAST_ITEM = "12px";
 
 export const LIVE_CHAT_LOCAL_STORAGE_KEY = "live_chat_state";
+
+// Geometry of the floating corner stack, mirroring
+// styles/variables/_floating-corner.scss - keep the two in sync. The Zendesk
+// launcher is placed by script instead of by CSS, so it can only line up with
+// the create button pinned to the same corner by reading the same numbers.
+export const FLOATING_CORNER_INSET = 24;
+
+export const FLOATING_CORNER_INSET_MOBILE = 16;
+
+export const FLOATING_CORNER_SIZE = 48;
+
+export const FLOATING_CORNER_GAP = 16;
+
+// The launcher frame carries a margin of its own and Zendesk adds the offset
+// we ask for on top of it, so an offset of 16px leaves the button 26px up.
+// Taking the margin back out is what makes the offset mean what it says - the
+// legacy offsets this replaced were written the same way (their "4px"
+// horizontal was the 24px inset, their "68px" the 88px the button needs to
+// clear the create button).
+export const ZENDESK_LAUNCHER_MARGIN_BLOCK = 10;
+
+export const ZENDESK_LAUNCHER_MARGIN_INLINE = 20;
 
 export const LANGUAGE = "asc_language";
 

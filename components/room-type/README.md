@@ -6,7 +6,7 @@
   "category": "Data display",
   "status": "portal-internal",
   "summary": "Row offering one kind of room, with its glyph, its translated name and its description.",
-  "import": { "subpath": "components/room-type", "barrel": false, "default": true },
+  "import": { "subpath": "components/room-type", "barrel": true, "default": true },
   "exports": ["default", "RoomTypeProps"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
@@ -40,8 +40,8 @@ on). Without those translations loaded the row renders a glyph and two empty lin
 import RoomType from "@onlyoffice/apps-ui-kit/components/room-type";
 ```
 
-It is a **default** export. `components/index.ts` does not re-export this folder, so the subpath
-above is the only way in.
+It is a **default** export here, so the name is yours to choose. The root barrel
+`@onlyoffice/apps-ui-kit` re-exports it too, under the fixed name `RoomType`.
 
 Needs `TranslationProvider` above it, with the portal's `Common` namespace, or every label is
 empty and i18next logs a missing-key error. Needs `ThemeProvider` for its borders and hover

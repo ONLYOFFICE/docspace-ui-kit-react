@@ -1,0 +1,43 @@
+import { Meta, Source, Story } from "@storybook/addon-docs/blocks";
+
+import * as SignInFormStories from "./SignInForm.stories";
+import source from "./SignInForm.tsx?raw";
+
+<Meta of={SignInFormStories} />
+
+# 02. Sign-in form
+
+A form that refuses you first. Submit it empty, then with `nope@` in the email
+field, then with the wrong password — the errors land in three different places
+and none of them needed layout work.
+
+<Story of={SignInFormStories.Default} />
+
+The password this demo portal accepts is **`Docs2026!`**.
+
+## Where the pieces do the work
+
+- **`FormWrapper`** is the card: padding, border and background that match every
+  other sign-in screen in the product.
+- **`FieldContainer`** owns the label, the required asterisk and the error line
+  under the field. Validation becomes two pieces of state — `hasError` and
+  `errorMessage` — instead of a layout exercise.
+- **`EmailInput`** parses the address itself and reports through
+  `onValidateInput`. The form decides _when_ to listen: on submit, never while
+  the user is still mid-address, which is the difference between helpful and
+  nagging.
+- **`PasswordInput`** with `simpleView` is the sign-in variant — one field with
+  the reveal eye. Drop `simpleView` and it grows the strength tooltip and the
+  generator, which is what a _set a new password_ screen wants.
+
+Two habits worth copying from this file: clearing the error in `onChange`, so a
+correction is rewarded immediately, and `noValidate` on the `<form>`, so the
+browser's own bubbles stay out of the way of the component's error line.
+
+## The code
+
+Imports here are relative to this repository. In your application they come
+from the package — `@onlyoffice/apps-ui-kit/components/field-container`,
+`@onlyoffice/apps-ui-kit/components/email-input`, and so on.
+
+<Source code={source} language="tsx" />

@@ -6,7 +6,7 @@
   "category": "Interactive elements",
   "status": "public",
   "summary": "Dashed link that opens a menu under itself.",
-  "import": { "subpath": "components/link-with-dropdown", "barrel": false, "default": false },
+  "import": { "subpath": "components/link-with-dropdown", "barrel": true, "default": false },
   "exports": ["LinkWithDropdown", "LinkWithDropDownProps"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": "isOpen", "close": null, "loading": null, "disabled": "isDisabled" },
@@ -37,7 +37,7 @@ portal — a value written as text that turns out to be a choice.
 import { LinkWithDropdown } from "@onlyoffice/apps-ui-kit/components/link-with-dropdown";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme`; the link and the menu take
 their colours from it.

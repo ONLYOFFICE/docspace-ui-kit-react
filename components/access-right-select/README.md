@@ -6,7 +6,7 @@
   "category": "Form controls",
   "status": "public",
   "summary": "Drop-down for choosing an access level, with an icon, a description and a paid badge on each row.",
-  "import": { "subpath": "components/access-right-select", "barrel": false, "default": false },
+  "import": { "subpath": "components/access-right-select", "barrel": true, "default": false },
   "exports": ["AccessRightSelect"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": null, "loading": "isLoading", "disabled": "isDisabled" },
@@ -37,7 +37,7 @@ row. It is a [`ComboBox`](../combobox/README.md) whose options are laid out as a
 import { AccessRightSelect } from "@onlyoffice/apps-ui-kit/components/access-right-select";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 `AccessRightSelectProps` is not exported — type a wrapper's props yourself.
 

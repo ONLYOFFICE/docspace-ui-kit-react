@@ -6,7 +6,7 @@
   "category": "Interactive elements",
   "status": "public",
   "summary": "Round corner badge that shows the progress of a background operation and opens its panel.",
-  "import": { "subpath": "components/floating-button", "barrel": false, "default": false },
+  "import": { "subpath": "components/floating-button", "barrel": true, "default": false },
   "exports": ["FloatingButton", "FloatingButtonIcons"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
@@ -36,7 +36,7 @@ the disc that appears in the bottom corner of the portal while files are uploadi
 import { FloatingButton } from "@onlyoffice/apps-ui-kit/components/floating-button";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme`, and specifically its
 colour scheme: the circle's background is the accent colour, and without one it has no

@@ -1,0 +1,72 @@
+import { Meta, Source, Story } from "@storybook/addon-docs/blocks";
+
+import * as PeopleSelectorStories from "./PeopleSelector.stories";
+import source from "./PeopleSelector.tsx?raw";
+
+<Meta of={PeopleSelectorStories} />
+
+# 09. People picker
+
+Search, tick two or three names, choose what they may do, and press **Invite**.
+The answer comes back as data — the picker never changes anything itself.
+
+<Story of={PeopleSelectorStories.Default} />
+
+Type `kim` in the search field, then clear it. Search here is a plain local
+filter over an array; swap it for a request and nothing else in the file has to
+change, because the Selector asks a question (`onSearch`) rather than reaching
+for the data itself.
+
+## The opt-ins come in pairs
+
+`Selector` has a lot of sections and every one is opt-in — but the flags are
+typed as pairs, so you cannot switch a section on and forget to wire it:
+
+| Turn on | And you must pass |
+| --- | --- |
+| `withSearch` | `onSearch`, `onClearSearch`, `searchLoader`, `isSearchLoading` |
+| `withSelectAll` | `selectAllLabel`, `selectAllIcon`, `onSelectAll` |
+| `withAccessRights` | `accessRights`, `selectedAccessRight`, `onAccessRightsChange` |
+| `withBreadCrumbs` | `breadCrumbs`, `onSelectBreadCrumb`, `breadCrumbsLoader`, `isBreadCrumbsLoading` |
+| `withHeader` | `headerProps` — the label and `onCloseClick` |
+
+TypeScript refuses the half-wired version, which is why those prop types look
+the way they do.
+
+## Selection belongs to the Selector
+
+You pass `items` and an initial `selectedItems`; the component tracks the ticks
+and hands you the final answer:
+
+```tsx
+onSubmit={(selected, selectedAccess) => {
+  invite(selected.map((item) => item.id), selectedAccess);
+}}
+```
+
+Two more things this sample relies on:
+
+- **An item is a typed union, not a bag.** A user needs `email`, `status`,
+  `userType` and the `isOwner` / `isAdmin` / `isVisitor` flags, because the row
+  renders a role badge from them. Files, folders, rooms, groups and MCP servers
+  are other members of the same union — which is how one component serves every
+  picker in the product.
+- **The Selector fills its container.** Give it a box with a real width and
+  height; inside a `ModalDialog.Body` that box is the dialog.
+
+Two empty screens are required, not one: `emptyScreen*` for _there is nothing_
+and `searchEmptyScreen*` for _nothing matches_. They are different messages, and
+the second one must not suggest that the room is empty.
+
+## Data-driven pickers
+
+The portal's own pickers — people, rooms, files, groups, agents — live in
+`selectors/` and add the REST calls, paging and MobX stores on top of this
+component. They need a portal to talk to; this one needs nothing.
+
+## The code
+
+Imports here are relative to this repository. In your application they come
+from the package — `@onlyoffice/apps-ui-kit/components/selector`, and so on.
+
+<Source code={source} language="tsx" />

@@ -6,7 +6,7 @@
   "category": "Form controls",
   "status": "public",
   "summary": "Hex field with a swatch that opens a colour picker.",
-  "import": { "subpath": "components/color-input", "barrel": false, "default": false },
+  "import": { "subpath": "components/color-input", "barrel": true, "default": false },
   "exports": ["ColorInput"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
@@ -36,7 +36,7 @@ Hex field with a swatch that opens a colour picker. It is the form-field form of
 import { ColorInput } from "@onlyoffice/apps-ui-kit/components/color-input";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 `ColorInputProps` is not exported — type a wrapper's props yourself.
 

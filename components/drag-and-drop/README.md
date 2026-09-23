@@ -6,7 +6,7 @@
   "category": "Interactive elements",
   "status": "public",
   "summary": "Wrapper that turns whatever is inside it into a drop target for files, with no interface of its own.",
-  "import": { "subpath": "components/drag-and-drop", "barrel": false, "default": false },
+  "import": { "subpath": "components/drag-and-drop", "barrel": true, "default": false },
   "exports": ["DragAndDrop", "DragAndDropProps"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDragDisabled" },
@@ -40,7 +40,7 @@ folder — not a visible upload area.
 import { DragAndDrop } from "@onlyoffice/apps-ui-kit/components/drag-and-drop";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 Needs `ThemeProvider` above it in the tree: the two drag colours are declared only under the
 `.light` and `.dark` classes the provider puts on `<body>`, so without it the highlight resolves to

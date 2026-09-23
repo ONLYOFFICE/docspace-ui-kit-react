@@ -127,7 +127,9 @@ export function LockedQuality({ quality }: { quality: number }) {
   form field with a value and no `onChange`.
 - **The value arrives as a string.** It is a DOM change event, so `event.target.value` needs
   `Number(...)` before it goes back into state.
-- **It is 100% wide.** The input fills its container and has no width prop; constrain the parent.
+- **It is 100% wide and brings its own vertical margin.** The input fills its container, has no
+  width prop, and carries `margin: 24px 0` so that the handle has room to overhang the track —
+  which adds to a column `gap` rather than collapsing into it.
 - **`withPouring` is computed, not native.** The filled part is a background sized from
   `(value - min) / (max - min)`, so a `min` equal to `max` divides by zero and the fill comes out
   as `NaN%` — nothing is drawn.
@@ -142,15 +144,18 @@ export function LockedQuality({ quality }: { quality: number }) {
 
 ## CSS variables
 
-| Variable                | Default    | Effect                         |
-| ----------------------- | ---------- | ------------------------------ |
-| `--slider-size`         | `8px`      | Height of the track            |
-| `--slider-handle-size`  | theme size | Width and height of the handle |
-| `--slider-handle-color` | theme      | Fill of the handle             |
-| `--slider-track-radius` | theme      | Corner radius of the track     |
+| Variable                    | Default | Effect                                                          |
+| --------------------------- | ------- | --------------------------------------------------------------- |
+| `--slider-size`             | `8px`   | Height of the track                                             |
+| `--slider-handle-size`      | `24px`  | Width and height of the handle                                  |
+| `--slider-track-radius`     | `5.6px` | Corner radius of the track; the handle keeps its own            |
+| `--slider-handle-color`     | theme   | Fill of the handle, and the colour the focus ring is mixed from |
+| `--slider-background-color` | theme   | Background of the unfilled track                                |
+| `--slider-pouring-image`    | theme   | Fill of the poured part, used only with `withPouring`           |
 
 `--thumb-width`, `--thumb-height`, `--thumb-border-width`, `--runnable-track-height` and
-`--size-prop` are written by the props; set the props rather than these.
+`--size-prop` are written inline by the props and beat all of the above; set the props rather than
+these.
 
 ## Accessibility
 
@@ -160,7 +165,9 @@ export function LockedQuality({ quality }: { quality: number }) {
   reader announces only "slider".
 - The value is announced as a bare number. Where it means something else — a percentage, a
   duration — add `aria-valuetext`.
-- There is no visible focus ring beyond the browser's own on the input.
+- Keyboard focus is shown as a 3px halo around the handle, drawn on `:focus-visible` only and
+  mixed from the handle's own colour. The browser's outline is turned off, so a browser that does
+  not support `:focus-visible` shows nothing.
 
 ## Test ids
 

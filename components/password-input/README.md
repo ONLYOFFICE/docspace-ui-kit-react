@@ -6,7 +6,7 @@
   "category": "Form controls",
   "status": "public",
   "summary": "Password field with a reveal eye, a strength tooltip and a generator.",
-  "import": { "subpath": "components/password-input", "barrel": false, "default": false },
+  "import": { "subpath": "components/password-input", "barrel": true, "default": false },
   "exports": ["PasswordInput", "PasswordInputHandle"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
@@ -38,7 +38,7 @@ Password field with a reveal eye, a strength tooltip and a generator. It is
 import { PasswordInput } from "@onlyoffice/apps-ui-kit/components/password-input";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 `PasswordInputProps` is not exported; `PasswordInputHandle`, the type of the `ref`, is.
 

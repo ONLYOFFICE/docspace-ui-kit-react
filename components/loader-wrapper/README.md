@@ -6,7 +6,7 @@
   "category": "Feedback",
   "status": "public",
   "summary": "Dims whatever is inside it and stops the mouse reaching it while something is loading.",
-  "import": { "subpath": "components/loader-wrapper", "barrel": false, "default": false },
+  "import": { "subpath": "components/loader-wrapper", "barrel": true, "default": false },
   "exports": ["LoaderWrapper", "LoaderWrapperProps"],
   "providers": [],
   "state": { "visibility": null, "close": null, "loading": "isLoading", "disabled": null },
@@ -38,7 +38,7 @@ way.
 import { LoaderWrapper } from "@onlyoffice/apps-ui-kit/components/loader-wrapper";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 It needs no provider above it: everything it sets is an inline style, and it has no colours.
 

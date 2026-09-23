@@ -56,7 +56,7 @@ export type BaseTileProps = {
 };
 
 /** The subset of an item the context menu's header is built from. */
-export type ItemProps = {
+export type BaseTileItemProps = {
   title?: string;
   icon?: string;
   logo?: {
@@ -72,5 +72,5 @@ export type ItemProps = {
 
 /** What the tile looks for on the first child of `topContent`. */
 export type TileChildProps = {
-  item: ItemProps;
+  item: BaseTileItemProps;
 };

@@ -6,7 +6,7 @@
   "category": "Form controls",
   "status": "public",
   "summary": "White card of a fixed width that the portal's sign-in and wizard forms sit on.",
-  "import": { "subpath": "components/form-wrapper", "barrel": false, "default": false },
+  "import": { "subpath": "components/form-wrapper", "barrel": true, "default": false },
   "exports": ["FormWrapper"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
@@ -36,7 +36,7 @@ rounded box 320px wide that drops all of its decoration on a phone.
 import { FormWrapper } from "@onlyoffice/apps-ui-kit/components/form-wrapper";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 `FormWrapperProps` is not exported — type a wrapper's props yourself.
 

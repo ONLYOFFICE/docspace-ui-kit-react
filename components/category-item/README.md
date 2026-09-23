@@ -6,7 +6,7 @@
   "category": "Data display",
   "status": "public",
   "summary": "Settings-page entry: a linked title, a line of explanation, an arrow, and an optional paid badge.",
-  "import": { "subpath": "components/category-item", "barrel": false, "default": false },
+  "import": { "subpath": "components/category-item", "barrel": true, "default": false },
   "exports": ["CategoryItem", "ICategoryItemProps"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
@@ -38,7 +38,7 @@ Security, Backup and the rest.
 import { CategoryItem } from "@onlyoffice/apps-ui-kit/components/category-item";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 Needs `ThemeProvider` above it in the tree. The description and arrow colours are declared only
 under the `.light` and `.dark` classes the provider puts on `<body>`, and the paid badge picks

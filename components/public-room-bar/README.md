@@ -6,7 +6,7 @@
   "category": "Feedback",
   "status": "public",
   "summary": "Grey note above a screen's content: an icon, a bold line and a paragraph, with an optional close cross.",
-  "import": { "subpath": "components/public-room-bar", "barrel": false, "default": true },
+  "import": { "subpath": "components/public-room-bar", "barrel": true, "default": true },
   "exports": ["default", "PublicRoomBarProps"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": "onClose", "loading": null, "disabled": null },
@@ -40,8 +40,8 @@ so it serves as the kit's standing informational bar.
 import PublicRoomBar from "@onlyoffice/apps-ui-kit/components/public-room-bar";
 ```
 
-It is a **default** export. `components/index.ts` does not re-export this folder, so the subpath
-above is the only way in.
+It is a **default** export here, so the name is yours to choose. The root barrel
+`@onlyoffice/apps-ui-kit` re-exports it too, under the fixed name `PublicRoomBar`.
 
 Needs `ThemeProvider` above it in the tree. The background and the two text colours are declared
 only under the `.light` and `.dark` classes the provider puts on `<body>`; without it the bar

@@ -6,7 +6,7 @@
   "category": "Data display",
   "status": "public",
   "summary": "Fixed 32px glyph saying which kind of room this is, with an optional selection checkbox.",
-  "import": { "subpath": "components/room-logo", "barrel": false, "default": false },
+  "import": { "subpath": "components/room-logo", "barrel": true, "default": false },
   "exports": ["RoomLogo", "RoomLogoPure", "RoomLogoProps"],
   "providers": [],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
@@ -42,7 +42,7 @@ import { RoomLogo } from "@onlyoffice/apps-ui-kit/components/room-logo";
 import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 No provider is required: the glyphs are flat SVGs with their own colours and the box reads only
 its two custom properties, both with fallbacks.

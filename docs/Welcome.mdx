@@ -1,59 +1,97 @@
 import { Meta } from "@storybook/addon-docs/blocks";
 
+import { WelcomePage } from "./welcome/WelcomePage";
+
 <Meta title="Getting started/Welcome" />
 
-# ONLYOFFICE Apps UI Kit
-
-A shared component library for ONLYOFFICE Apps that provides:
-
-- reusable React components, hooks, and utilities;
-- MobX stores for state management;
-- API client and type definitions.
-
-Used across all ONLYOFFICE Apps applications: Client, Login, DocEditor, Management, and SDK.
-
-<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "16px", marginTop: "24px", marginBottom: "48px" }}>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/getting-started-structure--docs" target="_top">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>Structure</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>How the codebase is organized</p>
-	</a>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/getting-started-translation--docs" target="_top">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>Translation</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>How to use i18n and translations</p>
-	</a>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/getting-started-themes--docs" target="_top">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>Themes</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>Light/dark themes, color tokens, and RTL support</p>
-	</a>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/getting-started-api--docs" target="_top">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>API</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>How to use ApiProvider and REST API services</p>
-	</a>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="https://api.onlyoffice.com/docspace/" target="_blank" rel="noreferrer">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>ONLYOFFICE Apps API</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>Official ONLYOFFICE Apps API documentation</p>
-	</a>
-	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="https://github.com/ONLYOFFICE/DocSpace-ui-kit-react" target="_blank" rel="noreferrer">
-		<p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>GitHub</p>
-		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>Source code repository</p>
-	</a>
-</div>
+<WelcomePage />
 
 ## Installation
+
+The package is **not on the public npm registry yet**, so there is nothing to `npm install`
+today. Consumers take a packed tarball built from this repository:
+
+```bash
+pnpm build && pnpm pack   # -> onlyoffice-apps-ui-kit-4.0.0.tgz
+```
+
+and install that file in the consuming application. Pack with **pnpm**, not npm: the `exports`
+map lives under `publishConfig`, which is a pnpm feature, and an npm-packed tarball ends up
+with no `exports` and no `main` at all.
+
+Once the package is published this becomes the usual one-liner:
 
 ```bash
 npm install @onlyoffice/apps-ui-kit
 ```
 
-The package is not on the public npm registry yet — until it is published, consumers install
-a packed tarball built from this repository with `pnpm build && pnpm pack`.
+DocSpace **plugins** install nothing. The portal hands a plugin its own already-mounted copy of
+the kit and refuses every subpath, so for a plugin the root barrel is the entire API — see
+**Utils** for what that means in practice.
 
 ### Requirements
 
-- Node.js >= 22
-- React >= 19 (React and React-DOM are peer dependencies)
+- **Node.js >= 22.**
+- **Four required peer dependencies**: `react` and `react-dom` (`^19.0.0`), plus `i18next` and
+  `react-i18next`. The last two are stateful, so a second copy in your tree breaks translation
+  silently rather than loudly.
+- **`axios`, for now.** It is declared an *optional* peer, because only the portal REST client
+  needs it — but `billing` and `uploader` are exported from the root barrel and reach it from
+  there, so a bare `import { Button } from "@onlyoffice/apps-ui-kit"` fails to resolve `axios`
+  for anyone who bundles the barrel themselves. Import by subpath, or install `axios`
+  alongside. This is open question 6 in `docs/public-api.md`, not a settled design.
+
+The other fourteen optional peers — `mobx`, `mobx-react`, `react-router`, `socket.io-client`,
+`@onlyoffice/ai-chat` and the AI agent's markdown stack — are needed only by the portal-coupled
+modules, and an ordinary install downloads none of them.
+
+### Styles
+
+Every component pulls in its own compiled CSS, so there is no separate styling step: 193 of the
+197 stylesheets in `dist` are imported by the module that uses them. If your bundler cannot take
+per-module CSS, import the whole sheet once instead:
+
+```tsx
+import "@onlyoffice/apps-ui-kit/styles.css";
+```
 
 ### Quick start
+
+Compose the three public providers yourself. `ThemeProvider` stamps `data-theme` and `data-dir`
+on the document, `TranslationProvider` builds a private i18next instance from the bundles you
+give it, and `ErrorBoundary` catches what escapes a component.
+
+```tsx
+import {
+  ErrorBoundary,
+  ThemeProvider,
+  TranslationProvider,
+  type TTranslations,
+} from "@onlyoffice/apps-ui-kit/providers";
+import { ThemeKeys } from "@onlyoffice/apps-ui-kit/enums";
+import enCommon from "@onlyoffice/apps-ui-kit/locales/en/Common.json";
+
+const translations: TTranslations = new Map([
+  ["en", new Map([["Common", enCommon]])],
+]);
+
+<ErrorBoundary>
+  <TranslationProvider locale="en" translations={translations}>
+    <ThemeProvider initialTheme={ThemeKeys.SystemStr}>
+      <App />
+    </ThemeProvider>
+  </TranslationProvider>
+</ErrorBoundary>
+```
+
+`TranslationProvider` renders its children untranslated when `translations` is omitted, so pass
+the bundles you need — `Common.json`, `Payments.json` and `Settings.json` ship for English, and
+`pnpm sync-locales` refreshes the other languages from a DocSpace client checkout.
+
+There is also a composed `Providers` root, and it is **portal-specific**: it adds `ApiProvider`
+and fetches portal settings and the current user on mount, so it needs a DocSpace endpoint to
+talk to. That is why it is deliberately not re-exported from `providers` — import it by its own
+subpath, as a default export:
 
 ```tsx
 import Providers from "@onlyoffice/apps-ui-kit/providers/Providers";
@@ -66,8 +104,17 @@ import Providers from "@onlyoffice/apps-ui-kit/providers/Providers";
 ### Run Storybook locally
 
 ```bash
-git clone https://github.com/ONLYOFFICE/DocSpace-ui-kit-react.git
-cd DocSpace-ui-kit-react
+git clone -b feature/ui-kit-separation \
+  https://github.com/ONLYOFFICE/docspace-ui-kit-react.git
+cd docspace-ui-kit-react
 pnpm install
 pnpm storybook
 ```
+
+The branch matters until the separation lands: `master` still carries the previous package,
+`@docspace/ui-kit@0.0.1`, rather than the `@onlyoffice/apps-ui-kit@4.0.0` this documentation
+describes.
+
+---
+
+`@onlyoffice/apps-ui-kit` 4.0.0 — AGPL-3.0-only.

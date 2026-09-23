@@ -6,7 +6,7 @@
   "category": "Interactive elements",
   "status": "portal-internal",
   "summary": "Crop window with drag, zoom and a replace control, for turning an uploaded picture into an avatar or a logo.",
-  "import": { "subpath": "components/image-editor", "barrel": false, "default": false },
+  "import": { "subpath": "components/image-editor", "barrel": true, "default": false },
   "exports": ["ImageEditor", "ButtonDelete", "ImageEditorProps", "TImage", "TChangeImage", "TSetPreview"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
@@ -49,7 +49,7 @@ import {
 } from "@onlyoffice/apps-ui-kit/components/image-editor";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 Needs `ThemeProvider` above it in the tree: the cropper reads the theme in JavaScript to pick the
 shade of the mask outside the crop window, and that context falls back to light rather than

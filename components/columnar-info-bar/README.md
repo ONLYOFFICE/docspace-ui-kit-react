@@ -6,7 +6,7 @@
   "category": "Feedback",
   "status": "public",
   "summary": "Bar of label-and-value columns for context the reader does not have to act on.",
-  "import": { "subpath": "components/columnar-info-bar", "barrel": false, "default": false },
+  "import": { "subpath": "components/columnar-info-bar", "barrel": true, "default": false },
   "exports": ["ColumnarInfoBar", "ColumnarInfoBarProps", "ColumnarInfoBarColumn"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": "onAction", "loading": null, "disabled": null },
@@ -39,7 +39,7 @@ optional caption and an optional close cross.
 import { ColumnarInfoBar } from "@onlyoffice/apps-ui-kit/components/columnar-info-bar";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 Needs `ThemeProvider` above it in the tree. Every colour it paints comes from custom properties
 declared only under the `.light` and `.dark` classes the provider puts on `<body>`; without it

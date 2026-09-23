@@ -6,7 +6,7 @@
   "category": "Form controls",
   "status": "public",
   "summary": "Saturation square with a hue strip for choosing a colour, with or without a hex field and buttons.",
-  "import": { "subpath": "components/color-picker", "barrel": false, "default": false },
+  "import": { "subpath": "components/color-picker", "barrel": true, "default": false },
   "exports": ["ColorPicker"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": "onClose", "loading": null, "disabled": null },
@@ -36,7 +36,7 @@ buttons. It is the vendored `react-colorful` picker wrapped in the kit's own chr
 import { ColorPicker } from "@onlyoffice/apps-ui-kit/components/color-picker";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 `ColorPickerProps` is not exported — type a wrapper's props yourself.
 

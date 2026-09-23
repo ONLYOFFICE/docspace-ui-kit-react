@@ -6,7 +6,7 @@
   "category": "Data display",
   "status": "public",
   "summary": "Columnar list with resizable, sortable and hideable columns, laid out by a CSS grid the header writes.",
-  "import": { "subpath": "components/table", "barrel": false, "default": false },
+  "import": { "subpath": "components/table", "barrel": true, "default": false },
   "exports": ["TableContainer", "TableHeader", "TableBody", "TableRow", "TableCell", "TableGroupMenu", "TTableColumn", "TGroupMenuItem"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": "onHideContextMenu", "loading": null, "disabled": "isBlocked" },
@@ -43,7 +43,7 @@ import {
 } from "@onlyoffice/apps-ui-kit/components/table";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 None of the props types are exported either — `TTableColumn` and `TGroupMenuItem` are, and they
 are the two you write by hand.

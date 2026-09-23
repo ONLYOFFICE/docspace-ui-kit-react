@@ -6,7 +6,7 @@
   "category": "Data display",
   "status": "portal-internal",
   "summary": "The portal's white-label logo, fetched from the DocSpace server and swapped for the theme.",
-  "import": { "subpath": "components/portal-logo", "barrel": false, "default": false },
+  "import": { "subpath": "components/portal-logo", "barrel": true, "default": false },
   "exports": ["PortalLogo", "PortalLogoProps"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
@@ -40,7 +40,7 @@ endpoint. There is no `src` prop, no base-URL prop and no way to point it elsewh
 import { PortalLogo } from "@onlyoffice/apps-ui-kit/components/portal-logo";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 The component file has a default export, but the folder's `index` re-exports it under a name —
 `import PortalLogo from …` does not resolve.
 

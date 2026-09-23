@@ -70,10 +70,13 @@ export type ArticleZendeskProps = {
   zendeskEmail: string;
   /** Name the Zendesk widget shows for the visitor. */
   chatDisplayName: string;
-  /** Whether a main button belongs above the body. Without it the `Article.MainButton` slot is not rendered on anything but a phone. */
-  withMainButton?: boolean;
-  /** Whether the panel is in its narrow, overlay-capable mode. It is written back through `setIsMobileArticle` on mount and on every device change. */
-  isMobileArticle: boolean;
+  /**
+   * Something the app pins to the bottom inline-end corner - a create button,
+   * an upload progress button - is on screen, so the launcher steps aside to
+   * keep off it. Not read from the panel's own props: it is worked out there
+   * from `withMainButton`, the main button slot and `isMobileArticle`.
+   */
+  withFloatingButton?: boolean;
   /** Key of the Zendesk account. The live chat block loads a third-party script with it. */
   zendeskKey: string;
   /** Whether an upload or other progress indicator is on screen, which moves the live chat bubble up. */
@@ -105,6 +108,10 @@ export type ArticleProps = ArticleProfileProps &
   Omit<ArticleAppsProps, "withDevTools" | "withCustomSlot"> & {
     /** Called on mount and on every device change with the width the component has decided on. Wire it to the state behind `showText` or the panel never changes width. */
     setShowText: (value: boolean) => void;
+    /** Whether a main button belongs above the body. Without it the `Article.MainButton` slot is not rendered on anything but a phone. */
+    withMainButton?: boolean;
+    /** Whether the panel is in its narrow, overlay-capable mode. It is written back through `setIsMobileArticle` on mount and on every device change. */
+    isMobileArticle: boolean;
     /** Called on mount and on every device change. Wire it to the state behind `isMobileArticle`. */
     setIsMobileArticle: (value: boolean) => void;
     /** The three slots, as an array. Each is `Article.Header`, `Article.MainButton` or `Article.Body`; anything else is dropped, and the slots are matched by display name, so a wrapper around one hides it. */

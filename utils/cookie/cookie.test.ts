@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
-vi.mock("../../constants", () => ({
-  LANGUAGE: "language",
-}));
+// The real constant, not a mock: test/setup.ts loads utils/i18n, which imports
+// this module, so utils/cookie is already in the module cache by the time a
+// `vi.mock` here could apply -- it would silently do nothing.
+import { LANGUAGE } from "../../constants";
 
 import { getCookie, setCookie, deleteCookie } from ".";
 
@@ -58,22 +59,22 @@ describe("cookie utils", () => {
     it("returns culture from URL for LANGUAGE on LinkInvite page", () => {
       window.history.replaceState({}, "", "/confirm/LinkInvite?culture=de-DE");
 
-      document.cookie = "language=en-US; path=/";
-      expect(getCookie("language")).toBe("de-DE");
+      document.cookie = `${LANGUAGE}=en-US; path=/`;
+      expect(getCookie(LANGUAGE)).toBe("de-DE");
     });
 
     it("falls back to cookie when culture param is missing", () => {
       window.history.replaceState({}, "", "/confirm/LinkInvite");
 
-      document.cookie = "language=en-US; path=/";
-      expect(getCookie("language")).toBe("en-US");
+      document.cookie = `${LANGUAGE}=en-US; path=/`;
+      expect(getCookie(LANGUAGE)).toBe("en-US");
     });
 
     it("falls back to cookie when pathname does not match", () => {
       window.history.replaceState({}, "", "/other?culture=de-DE");
 
-      document.cookie = "language=en-US; path=/";
-      expect(getCookie("language")).toBe("en-US");
+      document.cookie = `${LANGUAGE}=en-US; path=/`;
+      expect(getCookie(LANGUAGE)).toBe("en-US");
     });
 
     it("does not apply URL logic for non-LANGUAGE cookies", () => {

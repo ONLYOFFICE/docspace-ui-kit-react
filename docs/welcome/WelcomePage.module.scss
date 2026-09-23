@@ -1,0 +1,426 @@
+@use "../../styles/variables/colors";
+
+// Styled after the DocSpace client's Overview screen -- the same type scale,
+// spacing rhythm and card shapes, not a pixel copy of it. Colours come from
+// the kit's own palette and the accent from the theme, so the page follows
+// light, dark and a rebranded portal on its own.
+
+.page {
+  --accent-main: var(--color-scheme-main-accent, #{colors.$light-blue-main});
+
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1440px;
+
+  // The docs container repaints and underlines every link inside it. These
+  // rules sit under `.page`, so they outrank it and the tiles keep the look
+  // they have in the product. Everything else on this page wins the same way:
+  // one extra class in the selector.
+  .quickActions a,
+  .referenceTile,
+  .sublineLink {
+    text-decoration: none;
+  }
+
+  .quickActions a,
+  .referenceTile {
+    color: inherit;
+  }
+
+  // Header: one 23px line and a 13px subline.
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .headerText {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .title {
+    font-size: 23px;
+    font-weight: 700;
+    line-height: 28px;
+    margin: 0;
+  }
+
+  .subline {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 13px;
+    line-height: 20px;
+
+    :global(.light) & {
+      color: colors.$light-gray-dark;
+    }
+
+    :global(.dark) & {
+      color: colors.$dark-gray-dark;
+    }
+  }
+
+  .sublineLink {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  // Facts panel: a tinted panel with a grid of label/value pairs.
+  .factsCard {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 20px;
+    border-radius: 6px;
+    box-sizing: border-box;
+
+    :global(.light) & {
+      background-color: colors.$gray-light;
+    }
+
+    :global(.dark) & {
+      background-color: colors.$dark-gray-light;
+    }
+  }
+
+  .factsTitle {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    margin: 0;
+  }
+
+  .factsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px 24px;
+
+    @media (max-width: 900px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 520px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .factsField {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .factsLabel {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 16px;
+
+    :global(.light) & {
+      color: colors.$light-gray-dark;
+    }
+
+    :global(.dark) & {
+      color: colors.$gray-dark;
+    }
+  }
+
+  .factsValue {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 20px;
+    overflow-wrap: anywhere;
+  }
+
+  // Sections: a heading block plus content, on a 20px rhythm.
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .sectionHeading {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .sectionTitle {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 24px;
+    margin: 0;
+  }
+
+  .sectionSubtitle {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+    margin: 0;
+
+    :global(.light) & {
+      color: colors.$gray-text;
+    }
+
+    :global(.dark) & {
+      color: colors.$dark-gray-dark;
+    }
+  }
+
+  // The carousel caps its tiles by default, which leaves a gap at the end of a
+  // wide row.
+  .quickActions {
+    --quick-actions-tile-max-width: none;
+  }
+
+  // Module cards: four up, bordered, 12px radius.
+  .modulesGrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+
+    @media (max-width: 1100px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 560px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .moduleCard {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 12px;
+    background: transparent;
+    text-align: start;
+    color: inherit;
+    box-sizing: border-box;
+
+    :global(.light) & {
+      border: 1px solid colors.$gray-light-mid;
+    }
+
+    :global(.dark) & {
+      border: 1px solid colors.$light-dark-gray-hover;
+    }
+  }
+
+  .moduleHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .moduleIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+
+    :global(.light) & {
+      background-color: colors.$gray-light-mid;
+    }
+
+    :global(.dark) & {
+      background-color: colors.$gray-dark-mid;
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+
+      path {
+        :global(.light) & {
+          fill: colors.$light-gray-dark;
+        }
+
+        :global(.dark) & {
+          fill: colors.$dark-gray-dark;
+        }
+      }
+    }
+  }
+
+  // An auto flex basis keeps the badge on the title's right while both fit, and
+  // drops it to its own line once they do not.
+  .moduleHeadings {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+  }
+
+  .moduleTitle {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 16px;
+    margin: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .moduleBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 16px;
+    white-space: nowrap;
+
+    :global(.light) & {
+      background-color: colors.$gray-light;
+      color: colors.$light-gray-dark;
+    }
+
+    :global(.dark) & {
+      background-color: colors.$dark-gray-light;
+      color: colors.$dark-gray-dark;
+    }
+
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  .moduleDescription {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    margin: 0;
+    flex: 1;
+
+    :global(.light) & {
+      color: colors.$light-gray-dark;
+    }
+
+    :global(.dark) & {
+      color: colors.$dark-gray-dark;
+    }
+  }
+
+  // Pushed down so the buttons line up across cards with different description
+  // lengths.
+  .moduleFooter {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-block-start: auto;
+  }
+
+  // Reference tiles: 48px icon, name, arrow.
+  .referenceGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+
+    @media (max-width: 1100px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .referenceTile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    box-sizing: border-box;
+    min-height: 82px;
+    padding: 16px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    font-family: inherit;
+    transition: border-color 0.15s ease;
+
+    :global(.light) & {
+      background-color: colors.$white;
+      border: 1px solid colors.$gray-light-mid;
+    }
+
+    :global(.dark) & {
+      background-color: colors.$dark-gray-light;
+      border: 1px solid colors.$light-dark-gray-hover;
+    }
+
+    &:hover {
+      border-color: var(--accent-main);
+    }
+  }
+
+  .referenceIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+
+    :global(.light) & {
+      background-color: colors.$gray-light-mid;
+    }
+
+    :global(.dark) & {
+      background-color: colors.$gray-dark-mid;
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+
+      path {
+        :global(.light) & {
+          fill: colors.$light-gray-dark;
+        }
+
+        :global(.dark) & {
+          fill: colors.$dark-gray-dark;
+        }
+      }
+    }
+  }
+
+  .referenceName {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 16px;
+  }
+
+  .referenceArrow {
+    flex-shrink: 0;
+    width: 8px;
+    height: 9px;
+
+    path {
+      fill: var(--accent-main);
+    }
+  }
+}

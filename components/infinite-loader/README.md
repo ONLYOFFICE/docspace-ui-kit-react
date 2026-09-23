@@ -6,7 +6,7 @@
   "category": "Feedback",
   "status": "public",
   "summary": "Virtualised list or grid that asks for the next page as the user scrolls towards the end.",
-  "import": { "subpath": "components/infinite-loader", "barrel": false, "default": false },
+  "import": { "subpath": "components/infinite-loader", "barrel": true, "default": false },
   "exports": ["InfiniteLoaderComponent"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": "isLoading", "disabled": null },
@@ -38,7 +38,7 @@ built for the DocSpace portal's layout and looks for the portal's own elements b
 import { InfiniteLoaderComponent } from "@onlyoffice/apps-ui-kit/components/infinite-loader";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
 The export is named `InfiniteLoaderComponent`, not `InfiniteLoader`, and `InfiniteLoaderProps`
 is **not** exported — import the type from its file path if you need it.

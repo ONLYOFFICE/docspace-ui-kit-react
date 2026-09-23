@@ -184,10 +184,7 @@ const moveToIndexShape = () => {
       // extensionless specifiers, and `./x` reads better than `./x/index`.
       const dir = path.dirname(finalTarget);
 
-      let rel = path
-        .relative(path.dirname(file), dir)
-        .split(path.sep)
-        .join("/");
+      let rel = toPosix(path.relative(path.dirname(file), dir));
 
       if (rel === "") rel = ".";
       if (!rel.startsWith(".")) rel = `./${rel}`;
@@ -252,10 +249,7 @@ const toEsmSpecifier = (fromFile, specifier) => {
 
   if (!target) return null;
 
-  const rel = path
-    .relative(path.dirname(fromFile), target)
-    .split(path.sep)
-    .join("/");
+  const rel = toPosix(path.relative(path.dirname(fromFile), target));
 
   return rel.startsWith(".") ? rel : `./${rel}`;
 };
