@@ -42,7 +42,7 @@ const MyComponent = () => {
 
 ## Accessibility
 
-The header is a native `<button type="button">` with `aria-expanded` and `aria-controls` pointing at the body's generated id, so it is keyboard-operable with Enter and Space. The chevron is `aria-hidden`. The focus ring is shown only on `:focus-visible` (a 2px outline in the current text colour).
+The header is a native `<button type="button">` with `aria-expanded`, so it is keyboard-operable with Enter and Space. `aria-controls` points at the body's generated id only while the body is rendered — the card is open and `children` is truthy; while collapsed, or with no children, the attribute is omitted rather than left naming an element that is not in the DOM. The chevron is `aria-hidden`. The focus ring is shown only on `:focus-visible` (a 2px outline in the current text colour).
 
 ## Layout
 

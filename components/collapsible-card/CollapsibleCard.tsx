@@ -25,6 +25,9 @@ export const CollapsibleCard = ({
   const open = isControlled ? isOpen : internalOpen;
 
   const bodyId = useUniqueId("body");
+  // The body is unmounted while collapsed and never rendered without
+  // children, so aria-controls may only name it while it is in the DOM.
+  const isBodyRendered = open && Boolean(children);
 
   const handleToggle = () => {
     const next = !open;
@@ -44,7 +47,7 @@ export const CollapsibleCard = ({
         className={styles.header}
         onClick={handleToggle}
         aria-expanded={open}
-        aria-controls={bodyId}
+        aria-controls={isBodyRendered ? bodyId : undefined}
       >
         <span className={styles.heading}>
           <span className={styles.title}>{title}</span>
@@ -56,7 +59,7 @@ export const CollapsibleCard = ({
           <ArrowIcon />
         </span>
       </button>
-      {open && children ? (
+      {isBodyRendered ? (
         <div id={bodyId} className={styles.body}>
           {children}
         </div>

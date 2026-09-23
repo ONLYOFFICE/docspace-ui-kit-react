@@ -5,7 +5,11 @@ export interface CollapsibleCardProps {
   title: React.ReactNode;
   /** Optional secondary line under the title. */
   description?: React.ReactNode;
-  /** Body content rendered when expanded. */
+  /**
+   * Body content rendered when expanded. The body is unmounted while
+   * collapsed and not rendered at all when this is falsy; the header's
+   * `aria-controls` is set only while the body is rendered.
+   */
   children?: React.ReactNode;
   /**
    * Controlled open state. When provided, the parent owns state and must
