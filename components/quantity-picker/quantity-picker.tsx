@@ -13,30 +13,52 @@ import { TabItem } from "../tab-item";
 import styles from "./quantity-picker.module.scss";
 
 interface TabItemObject {
+  /** Tab label; rendered with a leading plus sign */
   name: string;
+  /** Amount added to the current value when the tab is selected */
   value: number;
 }
 
 type QuantityPickerProps = {
+  /** Current value; the component is controlled */
   value: number;
+  /** Lower bound for the controls, typed input and slider */
   minValue: number;
+  /** Upper bound; with `showPlusSign`, values above it display as `maxValue+` */
   maxValue: number;
+  /** Amount the plus and minus controls and the slider move by */
   step: number;
+  /** Heading above the controls; omitted when empty */
   title?: string | null;
+  /** Secondary line under the title; omitted when empty */
   subtitle?: string;
+  /** Lets the value go one past `maxValue`, shown as `maxValue+` */
   showPlusSign?: boolean;
+  /** Disables every control and replaces the input with static text */
   isDisabled?: boolean;
+  /** Renders a slider bound to the value, from `minValue` to `maxValue + 1` */
   showSlider?: boolean;
+  /** Called with the new value */
   onChange: (value: number) => void;
+  /** Class name on the root element */
   className?: string;
+  /** Preset tabs; selecting one adds its amount to the current value */
   items?: Array<number | TabItemObject>;
+  /** Widens the value field from 101px to 140px */
   isLarge?: boolean;
+  /** Hides the plus and minus controls */
   withoutControls?: boolean;
+  /** Text shown in place of the value while `isDisabled` is set */
   disableValue?: string;
+  /** Text under the controls; turns to the warning colour while an invalid value is entered with `enableZero` */
   underControlsTitle?: string | React.ReactNode;
+  /** Declared but not read by the component; use `enableZero` */
   isZeroAllowed?: boolean;
+  /** Allows zero as a value below `minValue`; other values below it are flagged */
   enableZero?: boolean;
+  /** Tooltip id set as `data-tooltip-id` on the minus control */
   minusTooltipId?: string;
+  /** Disables only the minus control */
   minusDisabled?: boolean;
 };
 
