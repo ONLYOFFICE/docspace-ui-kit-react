@@ -155,8 +155,9 @@ The rest of the monorepo stays AGPL-3.0-only and keeps its headers, so never poi
 
 ## What this repository does enforce
 
-`lefthook.yml` here runs `pnpm format`, `pnpm lint`, `pnpm tsc`, `pnpm test`, `pnpm build` and
-`pnpm verify:package` on pre-push, and rewrites the staged files with Prettier on pre-commit.
+`lefthook.yml` here runs `pnpm format:gate`, `pnpm lint`, `pnpm tsc`, `pnpm test`, `pnpm build`
+and `pnpm verify:package` on pre-push -- in that order, stopping at the first failure -- and
+rewrites the staged files with Prettier on pre-commit and pre-merge-commit.
 CI runs the same formatting, lint, type and test checks plus the packaging ones. None of the
 rules above are among any of them.
 

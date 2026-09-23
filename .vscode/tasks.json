@@ -104,7 +104,7 @@
     {
       "label": "Check | the whole pre-push gate",
       "type": "shell",
-      "command": "pnpm run format && pnpm run lint && pnpm run tsc && pnpm run test",
+      "command": "pnpm run format:gate && pnpm run lint && pnpm run tsc && pnpm run test",
       "presentation": { "reveal": "always", "panel": "new", "focus": true }
     },
 

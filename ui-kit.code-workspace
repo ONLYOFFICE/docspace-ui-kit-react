@@ -43,7 +43,7 @@
           {
             "label": "The whole pre-push gate",
             "task": "Check | the whole pre-push gate",
-            "tooltip": "✅ format, lint, tsc and test -- the fast half of what lefthook runs on push",
+            "tooltip": "✅ format:gate, lint, tsc and test -- the fast half of what lefthook runs on push, in the same order",
           },
           {
             "label": "Typescript (tsc)",

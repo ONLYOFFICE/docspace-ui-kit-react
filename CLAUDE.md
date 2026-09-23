@@ -43,8 +43,9 @@ Path-scoped detail that does not belong here, loaded when the matching files are
 - **Biome** — linting only. Its **formatter is disabled**
   (`biome.json`: `formatter.enabled: false`); formatting is Prettier, via `pnpm format`
   (`--check`) and `pnpm format:fix` (`--write`). The repository **has** been formatted:
-  `pnpm format` passes over the whole tree, and it is gated both in `lefthook.yml`
-  (first pre-push command, so it fails before the 40s build) and in CI's lint job.
+  `pnpm format` passes over the whole tree, and it is gated in `lefthook.yml` at three
+  points (pre-commit and pre-merge-commit rewrite staged files; pre-push runs
+  `pnpm format:gate` first) and in CI's lint job, which uses `--check` and never writes.
   Prettier is configured in `.prettierrc.yaml` (Prettier 3's own defaults, pinned
   so the editor and the script cannot disagree) and `.prettierignore` holds back
   `pnpm-lock.yaml` — formatting it produces a lockfile pnpm rejects — the client-derived
@@ -52,8 +53,12 @@ Path-scoped detail that does not belong here, loaded when the matching files are
   something Storybook's indexer cannot parse
 - **SCSS Modules** — styling (`*.module.scss` per component); theming via CSS
   custom properties
-- **Lefthook** — git hooks: `format`, `lint`, `tsc`, `test`, `build` and
-  `verify:package` on pre-push, in that order (cheapest first)
+- **Lefthook** — git hooks. Pre-commit and pre-merge-commit rewrite the staged files
+  with Prettier (`stage_fixed`); pre-push runs `format:gate`, `lint`, `tsc`, `test`,
+  `build` and `verify:package`, in that order and stopping at the first failure
+  (`priority` + `piped` — lefthook otherwise sorts commands alphabetically and runs
+  them all). `format:gate` fixes the files it finds and still fails the push, because
+  a pre-push hook cannot rewrite the commits being pushed
 - **pnpm** — package manager
 
 ## Repository Structure
