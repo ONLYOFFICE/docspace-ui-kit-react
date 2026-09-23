@@ -12,7 +12,7 @@ import { InputSize, InputType } from "./TextInput.enums";
 import readme from "./README.md?raw";
 
 const meta = {
-  title: "UI/Interactive elements/TextInput",
+  title: "UI/Form controls/TextInput",
   component: TextInput,
   parameters: {
     docs: {

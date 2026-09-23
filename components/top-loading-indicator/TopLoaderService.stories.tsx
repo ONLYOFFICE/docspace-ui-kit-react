@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { TopLoaderService } from "./index";
 
 const meta = {
-  title: "UI/Layout components/TopLoader",
+  title: "UI/Feedback/TopLoader",
   parameters: {
     docs: {
       description: {

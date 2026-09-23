@@ -12,7 +12,7 @@ import { InputBlock } from ".";
 import type { InputBlockProps } from "./InputBlock.types";
 
 const meta = {
-  title: "UI/Interactive elements/InputBlock",
+  title: "UI/Form controls/InputBlock",
   component: InputBlock,
   parameters: {
     docs: {

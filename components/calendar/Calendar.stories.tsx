@@ -39,7 +39,7 @@ const locales = [
 ];
 
 const meta = {
-  title: "UI/Interactive elements/Calendar",
+  title: "UI/Form controls/Calendar",
   component: Calendar,
   parameters: {
     docs: {

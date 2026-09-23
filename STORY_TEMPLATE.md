@@ -16,7 +16,7 @@ import { ComponentName } from ".";
 
 const meta = {
   // 1. Title follows: "UI/<category>/<ComponentName>"
-  //    Categories: Interactive elements, Data display, Layout, Navigation, Feedback, etc.
+  //    The category must match the README's metadata block; see Categories below.
   title: "UI/<category>/<ComponentName>",
   component: ComponentName,
   parameters: {
@@ -148,13 +148,20 @@ export const VariantStory: Story = {
 
 ## Categories
 
-- `Interactive elements` - Button, Checkbox, RadioButton, Toggle, TextInput, etc.
-- `Data display` - Badge, Tag, Avatar, Table, Tabs, etc.
-- `Layout` - Section, Article, Portal, etc.
-- `Navigation` - Paging, Navigation, Link, etc.
-- `Feedback` - Toast, Snackbar, Loader, ProgressBar, etc.
-- `Overlays` - ModalDialog, DropDown, ContextMenu, Tooltip, Aside, etc.
-- `Form` - FieldContainer, PasswordInput, EmailInput, SearchInput, etc.
+Seven, and they are the same seven a README's `category` may hold. The two must agree:
+`pnpm check:readme` compares them and reports `W_CATEGORY_STORY` when they do not.
+
+- `Interactive elements` - Button, IconButton, Link, Tag, etc.
+- `Form controls` - FieldContainer, TextInput, Textarea, ComboBox, Checkbox, Slider, etc.
+- `Overlays` - ModalDialog, Aside, DropDown, ContextMenu, Tooltip, etc.
+- `Data display` - Badge, Avatar, Text, Card, Table, Tiles, etc.
+- `Layout` - Section, Article, Portal, Scrollbar, etc.
+- `Navigation` - Navigation, Paging, Tabs, Filter, etc.
+- `Feedback` - Toast, Snackbar, Loader, ProgressBar, skeletons, etc.
+
+A story title may also use one of these grouping sections, which keep a family together in
+the sidebar and count as their category above: `Table` and `Tiles` and `Rows` (Data
+display), `Layout components` (Layout), `Status components` and `Skeletons` (Feedback).
 
 ## How to Use This With Claude Code
 

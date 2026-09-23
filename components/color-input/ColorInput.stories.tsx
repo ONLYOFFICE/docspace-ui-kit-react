@@ -9,7 +9,7 @@ import { globalColors } from "../../providers/theme";
 import { ColorInput } from ".";
 
 const meta = {
-  title: "UI/Interactive elements/ColorInput",
+  title: "UI/Form controls/ColorInput",
   component: ColorInput,
   parameters: {
     docs: {
