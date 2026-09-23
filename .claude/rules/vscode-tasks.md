@@ -52,8 +52,15 @@ Both the workspace file and `.vscode/settings.json` bind Prettier as the formatt
 `json` and `jsonc` too — and set Biome's `codeActionsOnSave` entries to `never`. That is
 deliberate, not a leftover: `biome.json` sets `formatter.enabled: false`, so Biome lints here
 and Prettier formats. Turning Biome's formatter on in the editor would reformat files against
-the repository's own configuration — and `pnpm format` is in no gate, so nothing would catch
-it.
+the repository's own configuration, and `pnpm format` — first in `lefthook.yml`, and a CI step —
+would then fail on push for every file the editor touched.
+
+`.vscode/settings.json` binds Prettier for every language `prettier --check .` covers, not
+just the TypeScript ones: `javascriptreact`, `css`, `html`, `markdown` and `yaml` are bound too.
+A language with no binding falls back to VS Code's own formatter, which is the failure described
+next. The extension reads `.prettierrc.yaml` and `.prettierignore`, so a save and
+`pnpm format:fix` produce the same bytes, and neither touches `pnpm-lock.yaml`, `locales/`,
+`css/` or `*.mdx`.
 
 The JSON bindings pointed at VS Code's built-in formatter until `.prettierrc.yaml` was added.
 That made format-on-save and `pnpm format` disagree on every `.json` file: VS Code keeps a

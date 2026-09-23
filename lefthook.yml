@@ -6,6 +6,27 @@ output:
 # or lint slip, and there is no reason to find it after 2143 tests and a 40s
 # build. `skip_empty` is deliberately absent -- it only has an effect together
 # with a `files`/`glob` filter, and every command here runs over the whole tree.
+# Formats what is being committed, so the tree never drifts between commits and
+# the `format` check below has nothing left to find. `stage_fixed` re-stages the
+# files Prettier rewrote, so the commit carries the formatted bytes rather than
+# leaving a dirty tree behind. Lefthook hides unstaged changes while this runs,
+# so a partially staged file commits only its staged hunks -- verified, not
+# assumed: a file staged with one edit and left with a second, unstaged one
+# commits the first alone and keeps the second in the working tree.
+#
+# `--ignore-unknown` skips what Prettier has no parser for, and Prettier reads
+# .prettierignore itself, so pnpm-lock.yaml, locales/, css/ and *.mdx are left
+# alone here exactly as they are by `pnpm format`. The glob is still worth
+# having: with no matching staged file lefthook skips the command outright
+# rather than starting node to do nothing.
+pre-commit:
+  parallel: false
+  commands:
+    format:
+      glob: "*.{ts,tsx,js,jsx,mjs,cjs,json,jsonc,scss,css,html,md,yml,yaml}"
+      run: pnpm exec prettier --write --ignore-unknown {staged_files}
+      stage_fixed: true
+
 pre-push:
   parallel: false
   commands:

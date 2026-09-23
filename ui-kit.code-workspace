@@ -43,7 +43,7 @@
           {
             "label": "The whole pre-push gate",
             "task": "Check | the whole pre-push gate",
-            "tooltip": "✅ tsc, lint and test -- exactly what lefthook runs on push",
+            "tooltip": "✅ format, lint, tsc and test -- the fast half of what lefthook runs on push",
           },
           {
             "label": "Typescript (tsc)",
@@ -83,12 +83,12 @@
           {
             "label": "Format check (Prettier)",
             "task": "Check | Prettier",
-            "tooltip": "✅ Not in any gate -- files can be nonconforming with everything green",
+            "tooltip": "✅ prettier --check over the tree -- the first thing lefthook runs on push, and a CI step",
           },
           {
             "label": "Format:fix (Prettier)",
             "task": "Check | Prettier:fix",
-            "tooltip": "✅ Rewrites files; expect a large diff on a repo that has drifted",
+            "tooltip": "✅ Rewrites files. Rarely needed: VS Code formats on save with the same config",
           },
         ],
       },

@@ -155,9 +155,12 @@ The rest of the monorepo stays AGPL-3.0-only and keeps its headers, so never poi
 
 ## What this repository does enforce
 
-`lefthook.yml` here runs `pnpm tsc`, `pnpm lint` and `pnpm test` on pre-push. That is the whole
-local gate — none of the rules above are among them. CI adds `pnpm build` and
-`pnpm verify:package`, which cover packaging rather than source style.
+`lefthook.yml` here runs `pnpm format`, `pnpm lint`, `pnpm tsc`, `pnpm test`, `pnpm build` and
+`pnpm verify:package` on pre-push, and rewrites the staged files with Prettier on pre-commit.
+CI runs the same formatting, lint, type and test checks plus the packaging ones. None of the
+rules above are among any of them.
 
-Also not enforced anywhere: `pnpm format` (Prettier). Files can be, and are, Prettier-
-nonconforming while every gate is green.
+Formatting is the one thing on that list which is now enforced end to end -- VS Code formats on
+save, the pre-commit hook rewrites what is staged, and both pre-push and CI check the tree --
+so the older claim that files can be Prettier-nonconforming with every gate green no longer
+holds. Everything else in this file still goes unchecked.

@@ -41,16 +41,19 @@ Path-scoped detail that does not belong here, loaded when the matching files are
 - **Storybook 10** — component documentation and visual development
 - **Vitest** — unit and component tests
 - **Biome** — linting only. Its **formatter is disabled**
-  (`biome.json`: `formatter.enabled: false`); formatting is Prettier, via `pnpm format`,
-  which is **not** in any gate. Files can be Prettier-nonconforming with everything green —
-  and most still are: the repository has never been formatted, so `pnpm format:fix` rewrites
-  ~725 files. Prettier is configured in `.prettierrc.yaml` (Prettier 3's own defaults, pinned
+  (`biome.json`: `formatter.enabled: false`); formatting is Prettier, via `pnpm format`
+  (`--check`) and `pnpm format:fix` (`--write`). The repository **has** been formatted:
+  `pnpm format` passes over the whole tree, and it is gated both in `lefthook.yml`
+  (first pre-push command, so it fails before the 40s build) and in CI's lint job.
+  Prettier is configured in `.prettierrc.yaml` (Prettier 3's own defaults, pinned
   so the editor and the script cannot disagree) and `.prettierignore` holds back
-  `pnpm-lock.yaml` — formatting it produces a lockfile pnpm rejects — and the client-derived
-  `locales/` and `css/`
+  `pnpm-lock.yaml` — formatting it produces a lockfile pnpm rejects — the client-derived
+  `locales/` and `css/`, and `*.mdx`, whose licence-header comment Prettier escapes into
+  something Storybook's indexer cannot parse
 - **SCSS Modules** — styling (`*.module.scss` per component); theming via CSS
   custom properties
-- **Lefthook** — git hooks (lint + tests on pre-push)
+- **Lefthook** — git hooks: `format`, `lint`, `tsc`, `test`, `build` and
+  `verify:package` on pre-push, in that order (cheapest first)
 - **pnpm** — package manager
 
 ## Repository Structure

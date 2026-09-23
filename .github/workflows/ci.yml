@@ -31,6 +31,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      # First, and before lint: a formatting slip is the cheapest failure to
+      # find and the most likely one to reach a pull request. lefthook runs
+      # this on pre-push, but a hook is local and `--no-verify` skips it, so
+      # the branch that made `pnpm format` fail is exactly the branch that
+      # bypassed the hook. This step is the copy that cannot be bypassed.
+      - name: Check formatting
+        run: pnpm format
+
       - name: Run Lint
         run: pnpm lint
 

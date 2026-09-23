@@ -104,7 +104,7 @@
     {
       "label": "Check | the whole pre-push gate",
       "type": "shell",
-      "command": "pnpm run tsc && pnpm run lint && pnpm run test",
+      "command": "pnpm run format && pnpm run lint && pnpm run tsc && pnpm run test",
       "presentation": { "reveal": "always", "panel": "new", "focus": true }
     },
 
@@ -133,7 +133,7 @@
       "presentation": { "reveal": "always", "panel": "new", "focus": true }
     },
     {
-      "label": "Package | what a publish would ship",
+      "label": "Package | what a publish would ship (dry)",
       "type": "shell",
       "command": "pnpm pack --dry-run",
       "presentation": { "reveal": "always", "panel": "new", "focus": true }
