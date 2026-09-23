@@ -66,14 +66,14 @@
 .stepConnectorDashed {
   position: relative;
 
-  padding-left: 18px;
+  padding-inline-start: 18px;
 }
 
 .stepConnectorSolid::before,
 .stepConnectorDashed::before {
   content: "";
   position: absolute;
-  left: 18px;
+  inset-inline-start: 18px;
   top: 0;
   bottom: 0;
   width: 2px;
@@ -84,12 +84,12 @@
 }
 
 .stepConnectorDashed::before {
-  border-left: 2px dashed var(--color-scheme-main-buttons);
+  border-inline-start: 2px dashed var(--color-scheme-main-buttons);
   width: 0;
 }
 
 .stepConnectorContent {
-  padding-left: 32px;
+  padding-inline-start: 32px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -121,7 +121,7 @@
 }
 
 .featureTilesGrid {
-  padding-left: 32px;
+  padding-inline-start: 32px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
@@ -151,7 +151,7 @@
 }
 
 .payForSection {
-  padding-left: 32px;
+  padding-inline-start: 32px;
   display: flex;
   flex-direction: column;
   gap: 12px;

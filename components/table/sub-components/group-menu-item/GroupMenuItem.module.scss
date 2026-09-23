@@ -107,10 +107,10 @@
   &.oldChrome {
     :global(.button-content) {
       > div {
-        margin-right: 8px;
+        margin-inline-end: 8px;
 
         @include mixins.tablet-and-below {
-          margin-right: 0;
+          margin-inline-end: 0;
         }
       }
     }

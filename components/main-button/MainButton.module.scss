@@ -8,7 +8,7 @@
   transform-origin: top left;
   box-sizing: border-box;
 
-  [dir="rtl"] & {
+  [data-dir="rtl"] & {
     transform-origin: top right;
   }
 }

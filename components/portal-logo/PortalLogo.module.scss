@@ -49,7 +49,7 @@
         margin: auto;
       }
 
-      [dir="rtl"] & {
+      [data-dir="rtl"] & {
         right: 0;
       }
     }
