@@ -133,6 +133,12 @@
       "presentation": { "reveal": "always", "panel": "new", "focus": true }
     },
     {
+      "label": "Package | pack the tarball",
+      "type": "shell",
+      "command": "pnpm run build && pnpm pack",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
       "label": "Package | what a publish would ship (dry)",
       "type": "shell",
       "command": "pnpm pack --dry-run",

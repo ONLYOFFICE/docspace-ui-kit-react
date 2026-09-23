@@ -117,8 +117,13 @@
             "tooltip": "📦 Packs with pnpm so publishConfig applies -- npm pack would report total failure for the wrong reason",
           },
           {
-            "label": "What a publish would ship",
-            "task": "Package | what a publish would ship",
+            "label": "Pack the tarball",
+            "task": "Package | pack the tarball",
+            "tooltip": "📦 Builds, then writes the real .tgz -- what you install in a client checkout. pnpm pack alone would not build: there is no prepack script",
+          },
+          {
+            "label": "What a publish would ship (dry)",
+            "task": "Package | what a publish would ship (dry)",
             "tooltip": "📦 pnpm pack --dry-run. Read the list: locales are vendored, so this is literally it",
           },
           {
