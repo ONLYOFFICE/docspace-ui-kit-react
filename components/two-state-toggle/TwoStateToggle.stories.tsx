@@ -9,34 +9,40 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `HomeViewToggle is a pill-shaped toggle that switches between the new Dashboard view and the classic ONLYOFFICE Apps view.
+        component: `TwoStateToggle is a pill-shaped switch that moves the user between the new Dashboard and the classic DocSpace view. It is not a general-purpose on/off control; for an ordinary two-state setting use \`ToggleButton\`.
 
-The current state is persisted in \`localStorage\` under the key \`useDocSpace\` (\`"new"\` | \`"old"\`).
+### Features
 
-### Behavior
+- **State in \`localStorage\`**: the initial position is read once, on mount, from the \`useDocSpace\` key. \`"old"\` means the classic view; anything else, including no value, means the new one. There is no \`value\` / \`onChange\` pair
+- **NEW to OLD**: opens a confirmation modal. Confirming writes \`"old"\` and navigates to \`/\`; cancelling or closing the modal changes nothing
+- **OLD to NEW**: switches immediately, writes \`"new"\` and navigates to \`/dashboard\`
+- **Fixed targets**: \`/dashboard\` and \`/\` are hardcoded. \`onNavigate\` only decides how to navigate; without it the page does a full load through \`window.location.href\`
+- **Blocked storage**: if \`localStorage\` throws, the toggle starts in the new view and still switches and navigates; the choice is just not persisted
+- **Hiding parts**: an empty \`title\` renders only the pill; an empty \`confirmHint\` drops the hint from the modal
 
-- **NEW → OLD**: opens a confirmation modal before switching
-- **OLD → NEW**: switches immediately (no full page reload when \`onNavigate\` is provided)
-- **First visit** (\`null\` in localStorage): \`DefaultPageRedirect\` redirects to \`/dashboard?design=new\` to write the explicit value
+### Accessibility
+
+- \`role="switch"\` on a \`<button>\`, with \`aria-checked\` set while the new view is active
+- \`aria-label\`: taken from \`ariaLabel\`, default "Switch DocSpace design". \`title\`, \`labelOld\` and \`labelNew\` do not change it; the labels are \`aria-hidden\`
 
 ### Usage
 
 \`\`\`tsx
-import { HomeViewToggle } from "@onlyoffice/apps-ui-kit/components/home-view-toggle";
+import { TwoStateToggle } from "@onlyoffice/apps-ui-kit/components/two-state-toggle";
 
-// In a React Router context — pass navigate to avoid a full reload
-<HomeViewToggle onNavigate={(url) => navigate(url)} />
+// In a React Router context: pass navigate to avoid a full reload
+<TwoStateToggle onNavigate={(url) => navigate(url)} />
 
 // Standalone (falls back to window.location.href)
-<HomeViewToggle />
+<TwoStateToggle />
 \`\`\`
 
 ### CSS Custom Properties
 
 | Variable | Description |
 |----------|-------------|
-| \`--color-scheme-main-accent\` | Pill background / active label color |
-| \`--button-root-border-radius\` | Border radius of the pill and thumb |
+| \`--color-scheme-main-accent\` | Pill background, focus ring, label on the thumb |
+| \`--button-root-border-radius\` | Border radius of the pill (thumb is 2px smaller); fallback \`6px\` |
 | \`--text-color\` | Color of the title label |`,
       },
     },
@@ -44,18 +50,20 @@ import { HomeViewToggle } from "@onlyoffice/apps-ui-kit/components/home-view-tog
   argTypes: {
     title: {
       control: "text",
-      description: "Text label shown to the left of the toggle",
-      table: { defaultValue: { summary: "ONLYOFFICE Apps design" } },
+      description:
+        "Text label shown at the inline start of the toggle; an empty string hides it",
+      table: { defaultValue: { summary: "DocSpace design" } },
     },
     labelOld: {
       control: "text",
       description:
-        "Label for the classic ONLYOFFICE Apps view (left side of pill)",
+        "Label for the classic DocSpace view (inline-start half of the pill)",
       table: { defaultValue: { summary: "OLD" } },
     },
     labelNew: {
       control: "text",
-      description: "Label for the new Dashboard view (right side of pill)",
+      description:
+        "Label for the new Dashboard view (inline-end half of the pill)",
       table: { defaultValue: { summary: "NEW" } },
     },
     confirmTitle: {
@@ -66,10 +74,23 @@ import { HomeViewToggle } from "@onlyoffice/apps-ui-kit/components/home-view-tog
     confirmBody: {
       control: "text",
       description: "Confirmation modal main body text",
+      table: {
+        defaultValue: {
+          summary:
+            "You are about to leave the new Dashboard and return to the classic DocSpace view.",
+        },
+      },
     },
     confirmHint: {
       control: "text",
-      description: "Hint shown below the body — e.g. how to return to new view",
+      description:
+        "Hint shown below the body, e.g. how to return to the new view; an empty string hides it",
+      table: {
+        defaultValue: {
+          summary:
+            "You can return to the new Dashboard at any time by navigating to /dashboard.",
+        },
+      },
     },
     confirmOk: {
       control: "text",
@@ -81,10 +102,15 @@ import { HomeViewToggle } from "@onlyoffice/apps-ui-kit/components/home-view-tog
       description: 'Confirmation modal "cancel" button label',
       table: { defaultValue: { summary: "Cancel" } },
     },
+    ariaLabel: {
+      control: "text",
+      description: "Accessible name of the switch button",
+      table: { defaultValue: { summary: "Switch DocSpace design" } },
+    },
     onNavigate: {
       action: "onNavigate",
       description:
-        "Called instead of `window.location.href` when switching to NEW. Pass React Router `navigate` here.",
+        'Called with `"/dashboard"` when switching to NEW and with `"/"` after confirming the switch to OLD; replaces `window.location.href`. Pass React Router `navigate` here.',
     },
     className: {
       control: "text",
@@ -105,7 +131,7 @@ export default meta;
 
 export const Default: Story = {
   args: {
-    title: "ONLYOFFICE Apps design",
+    title: "DocSpace design",
     labelOld: "OLD",
     labelNew: "NEW",
   },
@@ -119,7 +145,7 @@ export const ShowingOldState: Story = {
     },
   ],
   args: {
-    title: "ONLYOFFICE Apps design",
+    title: "DocSpace design",
   },
   parameters: {
     docs: {
@@ -141,7 +167,7 @@ export const WithoutTitle: Story = {
         story: "Toggle without the text label — only the pill is rendered.",
       },
       source: {
-        code: `<HomeViewToggle title="" onNavigate={(url) => navigate(url)} />`,
+        code: `<TwoStateToggle title="" onNavigate={(url) => navigate(url)} />`,
       },
     },
   },

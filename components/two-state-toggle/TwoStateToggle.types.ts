@@ -1,9 +1,9 @@
 export type TwoStateToggleProps = {
-  /** Text label shown to the left of the toggle */
+  /** Text label shown at the inline start of the toggle; an empty string hides it */
   title?: string;
-  /** Label for the classic DocSpace view (left side of pill) */
+  /** Label for the classic DocSpace view (inline-start half of the pill) */
   labelOld?: string;
-  /** Label for the new Dashboard view (right side of pill) */
+  /** Label for the new Dashboard view (inline-end half of the pill) */
   labelNew?: string;
   /** Confirmation modal title (shown when switching NEW → OLD) */
   confirmTitle?: string;
@@ -16,9 +16,15 @@ export type TwoStateToggleProps = {
   /** Confirmation modal "cancel" button label */
   confirmCancel?: string;
   /**
-   * Called when the user navigates to a new URL.
-   * Provide React Router's `navigate` here to avoid a full page reload
-   * when switching to the new Dashboard view.
+   * Accessible name of the switch button. Defaults to the English
+   * "Switch DocSpace design"; pass a translated string in a localised UI
+   */
+  ariaLabel?: string;
+  /**
+   * Called with the target URL after every switch: `"/dashboard"` when
+   * switching to the new view, `"/"` after confirming the switch back to the
+   * old one. The targets are fixed; this only decides how to navigate, so pass
+   * React Router's `navigate` to avoid a full page reload.
    * Falls back to `window.location.href` when omitted.
    */
   onNavigate?: (url: string) => void;

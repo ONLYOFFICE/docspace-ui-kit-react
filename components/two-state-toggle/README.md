@@ -16,28 +16,29 @@ const MyComponent = () => {
 
 ## Properties
 
-| Name          | Type                  | Default                                                                             | Description                                                      |
-| ------------- | --------------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| title         | string                | "DocSpace design"                                                                   | Text label shown to the left of the toggle                       |
-| labelOld      | string                | "OLD"                                                                               | Label for the classic DocSpace view (left side of pill)          |
-| labelNew      | string                | "NEW"                                                                               | Label for the new Dashboard view (right side of pill)            |
-| confirmTitle  | string                | "Switch to Old Design"                                                              | Confirmation modal title (shown when switching NEW to OLD)       |
-| confirmBody   | string                | "You are about to leave the new Dashboard and return to the classic DocSpace view." | Confirmation modal main body text                                |
-| confirmHint   | string                | "You can return to the new Dashboard at any time by navigating to /dashboard."      | Hint shown below the body — e.g. how to return to new view       |
-| confirmOk     | string                | "Switch"                                                                            | Confirmation modal "proceed" button label                        |
-| confirmCancel | string                | "Cancel"                                                                            | Confirmation modal "cancel" button label                         |
-| onNavigate    | (url: string) => void | -                                                                                   | Called with the target URL; falls back to `window.location.href` |
-| className     | string                | -                                                                                   | Additional CSS class applied to the wrapper                      |
+| Name          | Type                  | Default                                                                             | Description                                                    |
+| ------------- | --------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| title         | string                | "DocSpace design"                                                                   | Text label at the inline start of the toggle; empty hides it   |
+| labelOld      | string                | "OLD"                                                                               | Label for the classic DocSpace view (inline-start half)        |
+| labelNew      | string                | "NEW"                                                                               | Label for the new Dashboard view (inline-end half)             |
+| confirmTitle  | string                | "Switch to Old Design"                                                              | Confirmation modal title (shown when switching NEW to OLD)     |
+| confirmBody   | string                | "You are about to leave the new Dashboard and return to the classic DocSpace view." | Confirmation modal main body text                              |
+| confirmHint   | string                | "You can return to the new Dashboard at any time by navigating to /dashboard."      | Hint shown below the body — e.g. how to return to new view     |
+| confirmOk     | string                | "Switch"                                                                            | Confirmation modal "proceed" button label                      |
+| confirmCancel | string                | "Cancel"                                                                            | Confirmation modal "cancel" button label                       |
+| ariaLabel     | string                | "Switch DocSpace design"                                                            | Accessible name of the switch button                           |
+| onNavigate    | (url: string) => void | -                                                                                   | Called with `/dashboard` or `/`; falls back to `location.href` |
+| className     | string                | -                                                                                   | Additional CSS class applied to the wrapper                    |
 
 ## Behaviour
 
-- **State lives in `localStorage`, not in props.** The initial position is read once, on mount, from `localStorage.useDocSpace`: `"old"` means the classic view, anything else (including no value) means the new one. There is no `value` / `onChange` pair, and the component touches `localStorage` during render, so it cannot be rendered on the server.
+- **State lives in `localStorage`, not in props.** The initial position is read once, on mount, from `localStorage.useDocSpace`: `"old"` means the classic view, anything else (including no value) means the new one. There is no `value` / `onChange` pair. Storage access is guarded: if `localStorage` throws (blocked site data, a sandboxed frame), the toggle starts in the new view and still switches and navigates, it just does not persist the choice.
 - **NEW to OLD** opens a confirmation modal. Confirming writes `"old"` and navigates to `/`; cancelling or closing the modal changes nothing.
 - **OLD to NEW** switches immediately: writes `"new"` and navigates to `/dashboard`.
 - **Navigation targets are fixed.** `/dashboard` and `/` are hardcoded; `onNavigate` only decides how the navigation happens. Without it the page does a full load through `window.location.href`.
 - **Hiding parts.** An empty `title` renders only the pill; an empty `confirmHint` drops the hint from the modal.
-- **Accessibility.** The pill is a `<button role="switch">` with `aria-checked` set when the new view is active. Its accessible name is the fixed English string "Switch DocSpace design"; `title`, `labelOld` and `labelNew` do not change it.
-- **All strings are English defaults.** Pass translated strings for every text prop in a localised UI.
+- **Accessibility.** The pill is a `<button role="switch">` with `aria-checked` set when the new view is active. Its accessible name comes from `ariaLabel` (default "Switch DocSpace design"); `title`, `labelOld` and `labelNew` do not change it, and the labels are hidden from assistive technology.
+- **All strings are English defaults.** Pass translated strings for every text prop, `ariaLabel` included, in a localised UI.
 
 ## Size
 
