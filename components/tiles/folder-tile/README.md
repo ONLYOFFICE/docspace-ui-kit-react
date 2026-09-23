@@ -7,7 +7,7 @@
   "category": "Data display",
   "status": "public",
   "summary": "Tile for a folder, as a single name row or, with one flag, a tall card with a picture on top.",
-  "import": { "subpath": "components/tiles/folder-tile", "barrel": false, "default": true },
+  "import": { "subpath": "components/tiles/folder-tile", "barrel": true, "default": true },
   "exports": ["default", "FolderTile", "FolderTileProps", "FolderItem", "FolderChildProps"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": "hideContextMenu", "loading": "inProgress", "disabled": null },
@@ -40,9 +40,9 @@ portal uses for a room's own subfolders.
 import FolderTile from "@onlyoffice/apps-ui-kit/components/tiles/folder-tile";
 ```
 
-It is a **default** export, and the same component is also exported under its name — which is the
-form `@onlyoffice/apps-ui-kit/components/tiles` re-exports, since a star re-export does not carry
-a default. `components/index.ts` does not re-export this folder directly.
+`components/index.ts` does not list this folder, but it lists `tiles`, and `export *`
+is transitive — so the name arrives from `@onlyoffice/apps-ui-kit/components/tiles` and from
+the root barrel `@onlyoffice/apps-ui-kit` as well.
 
 Needs `ThemeProvider` for its colours and `TranslationProvider` for the three-dot button's
 tooltip, which it asks the kit's own translation hook for under the key `TitleShowActions`.

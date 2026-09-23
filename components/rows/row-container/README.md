@@ -7,7 +7,7 @@
   "category": "Data display",
   "status": "public",
   "summary": "Scrolling list the rows go in, virtualised and paged in as the user reaches the end.",
-  "import": { "subpath": "components/rows/row-container", "barrel": false, "default": false },
+  "import": { "subpath": "components/rows/row-container", "barrel": true, "default": false },
   "exports": ["RowContainer"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
@@ -36,9 +36,9 @@ virtualisation is built for the DocSpace portal and needs the portal's own scrol
 import { RowContainer } from "@onlyoffice/apps-ui-kit/components/rows/row-container";
 ```
 
-The folder itself is not listed in `components/index.ts`, but its parent is, so the name also
-arrives through `@onlyoffice/apps-ui-kit/components/rows` and through the package's own entry
-point.
+`components/index.ts` does not list this folder, but it lists `rows`, and `export *`
+is transitive — so the name arrives from `@onlyoffice/apps-ui-kit/components/rows` and from
+the root barrel `@onlyoffice/apps-ui-kit` as well.
 
 `RowContainerProps` is **not** exported — type a wrapper's props yourself, or import the type
 from its file path.

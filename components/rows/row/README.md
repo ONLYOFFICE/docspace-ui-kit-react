@@ -7,7 +7,7 @@
   "category": "Data display",
   "status": "public",
   "summary": "One row of the file list: an optional checkbox, a start element, the content and a context menu.",
-  "import": { "subpath": "components/rows/row", "barrel": false, "default": false },
+  "import": { "subpath": "components/rows/row", "barrel": true, "default": false },
   "exports": ["Row"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": "rowContextClose", "loading": "inProgress", "disabled": "isDisabled" },
@@ -39,9 +39,9 @@ menu. Which parts appear is decided by which props you pass at all, not by their
 import { Row } from "@onlyoffice/apps-ui-kit/components/rows/row";
 ```
 
-The folder itself is not listed in `components/index.ts`, but its parent is, so the name also
-arrives through `@onlyoffice/apps-ui-kit/components/rows` and through the package's own entry
-point.
+`components/index.ts` does not list this folder, but it lists `rows`, and `export *`
+is transitive — so the name arrives from `@onlyoffice/apps-ui-kit/components/rows` and from
+the root barrel `@onlyoffice/apps-ui-kit` as well.
 
 `RowProps` is **not** exported — type a wrapper's props yourself, or import the type from its
 file path.

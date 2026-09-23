@@ -7,7 +7,7 @@
   "category": "Data display",
   "status": "public",
   "summary": "Tile for a room template: the name on top, and an owner and storage pair along the bottom.",
-  "import": { "subpath": "components/tiles/template-tile", "barrel": false, "default": false },
+  "import": { "subpath": "components/tiles/template-tile", "barrel": true, "default": false },
   "exports": ["TemplateTile", "TemplateTileProps", "TemplateItem", "SpaceQuotaProps"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": "hideContextMenu", "loading": "inProgress", "disabled": null },
@@ -41,9 +41,9 @@ tile puts its tags.
 import { TemplateTile } from "@onlyoffice/apps-ui-kit/components/tiles/template-tile";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
-The name is also reachable from `@onlyoffice/apps-ui-kit/components/tiles`, which re-exports the
-whole family.
+`components/index.ts` does not list this folder, but it lists `tiles`, and `export *`
+is transitive — so the name arrives from `@onlyoffice/apps-ui-kit/components/tiles` and from
+the root barrel `@onlyoffice/apps-ui-kit` as well.
 
 Needs `ThemeProvider` for its colours and `TranslationProvider` for the two captions and the
 three-dot button's tooltip, which it asks the kit's own translation hook for; without it the lower

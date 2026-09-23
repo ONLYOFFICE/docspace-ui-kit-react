@@ -7,7 +7,7 @@
   "category": "Data display",
   "status": "public",
   "summary": "The title slot of a tile: three nested wrappers that give the name its width and its truncation.",
-  "import": { "subpath": "components/tiles/tile-content", "barrel": false, "default": false },
+  "import": { "subpath": "components/tiles/tile-content", "barrel": true, "default": false },
   "exports": ["TileContent", "TileContentProps"],
   "providers": [],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
@@ -39,9 +39,9 @@ title out the same way.
 import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
-The name is also reachable from `@onlyoffice/apps-ui-kit/components/tiles`, which re-exports the
-whole family.
+`components/index.ts` does not list this folder, but it lists `tiles`, and `export *`
+is transitive — so the name arrives from `@onlyoffice/apps-ui-kit/components/tiles` and from
+the root barrel `@onlyoffice/apps-ui-kit` as well.
 
 It needs no provider of its own: it sets no colours and reads no context. Whatever you put inside
 it usually does.

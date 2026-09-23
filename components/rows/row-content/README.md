@@ -7,7 +7,7 @@
   "category": "Data display",
   "status": "public",
   "summary": "The text of a row, laid out by the position of its children rather than by named slots.",
-  "import": { "subpath": "components/rows/row-content", "barrel": false, "default": false },
+  "import": { "subpath": "components/rows/row-content", "barrel": true, "default": false },
   "exports": ["RowContent"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
@@ -37,9 +37,9 @@ line of text under them.
 import { RowContent } from "@onlyoffice/apps-ui-kit/components/rows/row-content";
 ```
 
-The folder itself is not listed in `components/index.ts`, but its parent is, so the name also
-arrives through `@onlyoffice/apps-ui-kit/components/rows` and through the package's own entry
-point.
+`components/index.ts` does not list this folder, but it lists `rows`, and `export *`
+is transitive — so the name arrives from `@onlyoffice/apps-ui-kit/components/rows` and from
+the root barrel `@onlyoffice/apps-ui-kit` as well.
 
 `RowContentProps` is **not** exported — type a wrapper's props yourself, or import the type
 from its file path.

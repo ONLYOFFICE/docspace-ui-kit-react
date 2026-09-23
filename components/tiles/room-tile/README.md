@@ -7,7 +7,7 @@
   "category": "Data display",
   "status": "public",
   "summary": "Tile for a room: the logo and name on top, and the room's tags along the bottom.",
-  "import": { "subpath": "components/tiles/room-tile", "barrel": false, "default": false },
+  "import": { "subpath": "components/tiles/room-tile", "barrel": true, "default": false },
   "exports": ["RoomTile", "RoomTileProps", "RoomItem", "SelectOption"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": null, "loading": "inProgress", "disabled": null },
@@ -42,9 +42,9 @@ makes it worth using rather than building your own.
 import { RoomTile } from "@onlyoffice/apps-ui-kit/components/tiles/room-tile";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
-The name is also reachable from `@onlyoffice/apps-ui-kit/components/tiles`, which re-exports the
-whole family.
+`components/index.ts` does not list this folder, but it lists `tiles`, and `export *`
+is transitive — so the name arrives from `@onlyoffice/apps-ui-kit/components/tiles` and from
+the root barrel `@onlyoffice/apps-ui-kit` as well.
 
 Needs `ThemeProvider` for its colours and `TranslationProvider` for two labels it asks the kit's
 own translation hook for: the three-dot button's tooltip, and the `NoTags` line an AI agent gets

@@ -296,8 +296,11 @@ export function createReadmeProgram(folders = componentFolders()) {
   };
 
   /**
-   * The folders `components/index.ts` re-exports -- the 68 a consumer can
-   * import from the root barrel. Derived, never taken from a README.
+   * The folders `components/index.ts` re-exports -- all 98 of them. Whether a
+   * consumer can reach a component from the root barrel is a different
+   * question, answered in `check-readme.mjs` from the names each folder
+   * exports: `export *` carries those and drops defaults. Derived, never taken
+   * from a README.
    */
   const barrelFolders = () => {
     // Parsed from disk rather than taken from the program: nothing imports

@@ -183,22 +183,40 @@ export function Buttons() {
 }
 ```
 
-All 98 component folders are re-exported by the root barrel. Six of them are re-exported under a
-fixed name — `AppLoader`, `Dropzone`, `OperationsProgressButton`, `PublicRoomBar`,
-`QuantityPicker` and `RoomType` — where the subpath gives a default export instead, so the subpath
-lets you name them and the barrel does not.
+All 98 component folders are re-exported by the root barrel, and `export *` is transitive — so a
+nested component such as `Row` or `AsideHeader` arrives from the barrel too, without its own
+folder being listed there.
 
-**Three components are not in the barrel at all**, whatever the folder list suggests: `Article`,
-`Navigation` and `Section` are default exports re-exported with `export *`, which does not carry a
-default. The barrel has their types; the components themselves are reachable only by subpath:
+**What `export *` does not carry is a default.** Nine components are default exports, so the
+barrel has their folder's types and not the component; the subpath is the only way to them, and
+the name is yours to choose:
 
 ```tsx
-import Section from "@onlyoffice/apps-ui-kit/components/section";
+import AppLoader from "@onlyoffice/apps-ui-kit/components/app-loader";
 import Article from "@onlyoffice/apps-ui-kit/components/article";
+import Dropzone from "@onlyoffice/apps-ui-kit/components/dropzone";
 import Navigation from "@onlyoffice/apps-ui-kit/components/navigation";
+import OperationsProgressButton from "@onlyoffice/apps-ui-kit/components/operations-progress-button";
+import PublicRoomBar from "@onlyoffice/apps-ui-kit/components/public-room-bar";
+import QuantityPicker from "@onlyoffice/apps-ui-kit/components/quantity-picker";
+import RoomType from "@onlyoffice/apps-ui-kit/components/room-type";
+import Section from "@onlyoffice/apps-ui-kit/components/section";
 
-export const layout = { Section, Article, Navigation };
+export const defaults = {
+  AppLoader,
+  Article,
+  Dropzone,
+  Navigation,
+  OperationsProgressButton,
+  PublicRoomBar,
+  QuantityPicker,
+  RoomType,
+  Section,
+};
 ```
+
+`FilterInput` and `StatusMessage` are default exports as well, but they are also exported under
+their own names, so for those two the barrel works.
 
 Never reach into the published build directory. The `exports` map is the public surface; a
 specifier that names the build output instead of a subpath is not covered by it, and it breaks the

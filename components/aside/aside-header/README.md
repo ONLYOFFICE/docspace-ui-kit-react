@@ -7,7 +7,7 @@
   "category": "Overlays",
   "status": "public",
   "summary": "Title bar of a side panel or a dialog, with a back arrow, extra icons and the close cross.",
-  "import": { "subpath": "components/aside/aside-header", "barrel": false, "default": false },
+  "import": { "subpath": "components/aside/aside-header", "barrel": true, "default": false },
   "exports": ["AsideHeader", "AsideHeaderProps"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": "onCloseClick", "loading": "isLoading", "disabled": null },
@@ -38,9 +38,9 @@ its props, so this page is where those props are explained.
 import { AsideHeader } from "@onlyoffice/apps-ui-kit/components/aside/aside-header";
 ```
 
-The folder itself is not listed in `components/index.ts`, but its parent is, so the name also
-arrives through `@onlyoffice/apps-ui-kit/components/aside` and through the package's own entry
-point.
+`components/index.ts` does not list this folder, but it lists `aside`, and `export *`
+is transitive — so the name arrives from `@onlyoffice/apps-ui-kit/components/aside` and from
+the root barrel `@onlyoffice/apps-ui-kit` as well.
 
 Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme` above it in the tree for
 the title colour and the border colour.

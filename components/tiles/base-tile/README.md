@@ -7,7 +7,7 @@
   "category": "Data display",
   "status": "public",
   "summary": "The tile shell: an icon that turns into a checkbox, a slot for the content, a three-dot menu and a lower half.",
-  "import": { "subpath": "components/tiles/base-tile", "barrel": false, "default": false },
+  "import": { "subpath": "components/tiles/base-tile", "barrel": true, "default": false },
   "exports": ["BaseTile", "BaseTileProps", "BaseTileItemProps", "TileChildProps"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": "hideContextMenu", "loading": "inProgress", "disabled": null },
@@ -44,9 +44,9 @@ file and folder tiles are not, and repeat the same logic separately.
 import { BaseTile } from "@onlyoffice/apps-ui-kit/components/tiles/base-tile";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
-The name is also reachable from `@onlyoffice/apps-ui-kit/components/tiles`, which re-exports the
-whole family.
+`components/index.ts` does not list this folder, but it lists `tiles`, and `export *`
+is transitive — so the name arrives from `@onlyoffice/apps-ui-kit/components/tiles` and from
+the root barrel `@onlyoffice/apps-ui-kit` as well.
 
 Needs `ThemeProvider` for its colours and `TranslationProvider` for the three-dot button's
 tooltip, which it asks the kit's own translation hook for under the key

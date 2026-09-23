@@ -7,7 +7,7 @@
   "category": "Data display",
   "status": "public",
   "summary": "Grid that sorts the tiles it is given into rooms, templates, folders and files and gives two of them a heading.",
-  "import": { "subpath": "components/tiles/tile-container", "barrel": false, "default": false },
+  "import": { "subpath": "components/tiles/tile-container", "barrel": true, "default": false },
   "exports": ["TileContainer", "TileContainerProps", "TileItem", "TileItemProps", "CommonTileProps"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
@@ -41,9 +41,9 @@ which of four groups it belongs to.
 import { TileContainer } from "@onlyoffice/apps-ui-kit/components/tiles/tile-container";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
-The name is also reachable from `@onlyoffice/apps-ui-kit/components/tiles`, which re-exports the
-whole family.
+`components/index.ts` does not list this folder, but it lists `tiles`, and `export *`
+is transitive — so the name arrives from `@onlyoffice/apps-ui-kit/components/tiles` and from
+the root barrel `@onlyoffice/apps-ui-kit` as well.
 
 Needs `ThemeProvider` above it in the tree: the headings are the kit's `Heading`, which takes its
 colour from the custom properties the provider's `.light` and `.dark` classes declare.

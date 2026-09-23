@@ -7,7 +7,7 @@
   "category": "Data display",
   "status": "public",
   "summary": "Tile for a document: a thumbnail with badges over it, and a name row with a checkbox and a menu.",
-  "import": { "subpath": "components/tiles/file-tile", "barrel": false, "default": false },
+  "import": { "subpath": "components/tiles/file-tile", "barrel": true, "default": false },
   "exports": ["FileTile", "FileTileProps", "FileItem", "FileItemType", "FileChildProps"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": "hideContextMenu", "loading": "inProgress", "disabled": null },
@@ -42,9 +42,9 @@ preview image.
 import { FileTile } from "@onlyoffice/apps-ui-kit/components/tiles/file-tile";
 ```
 
-`components/index.ts` does not re-export this folder, so the subpath above is the only way in.
-The name is also reachable from `@onlyoffice/apps-ui-kit/components/tiles`, which re-exports the
-whole family.
+`components/index.ts` does not list this folder, but it lists `tiles`, and `export *`
+is transitive — so the name arrives from `@onlyoffice/apps-ui-kit/components/tiles` and from
+the root barrel `@onlyoffice/apps-ui-kit` as well.
 
 Needs `ThemeProvider` for its colours and `TranslationProvider` for the three-dot button's
 tooltip, which it asks the kit's own translation hook for under the key `TitleShowActions`.

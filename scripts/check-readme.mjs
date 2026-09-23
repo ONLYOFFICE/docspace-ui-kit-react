@@ -282,6 +282,16 @@ const main = async () => {
   const barrel = kit.barrelFolders();
   const examples = [];
 
+  // Every name `import { X } from "@onlyoffice/apps-ui-kit"` resolves to. The
+  // barrel re-exports its folders with `export *`, which carries their named
+  // exports transitively and drops their defaults -- so a folder being listed
+  // there says nothing about whether its component arrived. `AsideHeader` is in
+  // the barrel through `components/aside`, and `Section` is not in it at all.
+  const barrelNames = new Set();
+  for (const folder of barrel) {
+    for (const name of kit.folderExports(folder).names) barrelNames.add(name);
+  }
+
   if (options.compile) fs.rmSync(CACHE, { recursive: true, force: true });
 
   for (const folder of folders) {
@@ -412,14 +422,27 @@ const main = async () => {
     }
 
     const exports = kit.folderExports(folder);
-    const inBarrel = barrel.has(folder);
+    // Can the component this README documents be imported from the root barrel
+    // by name? A folder being listed in `components/index.ts` does not answer
+    // it: `export *` carries named exports and drops defaults, so a component
+    // that is only a default export is unreachable from the barrel however
+    // plainly its folder is re-exported there. A folder whose own name is not
+    // one of its exports -- `table`, `rows`, `tiles` document a family -- is
+    // judged by the names it does export.
+    const defaultOnly =
+      exports.hasDefault && !exports.names.includes(meta.name ?? "");
+    const documented = (meta.exports ?? []).filter((name) => name !== "default");
+    const inBarrel =
+      !defaultOnly &&
+      documented.length > 0 &&
+      documented.every((name) => barrelNames.has(name));
 
     if (meta.import?.barrel !== inBarrel) {
       error(
         "E_META_BARREL",
         folder,
         1,
-        `\`import.barrel\` says ${meta.import?.barrel}; \`components/index.ts\` ${inBarrel ? "does" : "does not"} re-export this folder`,
+        `\`import.barrel\` says ${meta.import?.barrel}; ${defaultOnly ? `\`${meta.name}\` is a default export, and \`export *\` in \`components/index.ts\` does not carry it` : `the root barrel ${inBarrel ? "exports" : "does not export"} every name this README documents`}`,
       );
     }
 
@@ -615,16 +638,21 @@ const main = async () => {
         }
       }
 
+      // A component the barrel does not carry is the case a reader is most
+      // likely to get wrong, so the denial is spelled the same way everywhere
+      // and checked literally -- prose that merely mentions the barrel while
+      // explaining why it is empty would otherwise read as a promise.
       const saysBarrel = /root barrel/i.test(readme);
+      const saysNotInBarrel = /\*\*not in the root barrel\*\*/i.test(readme);
 
-      if (saysBarrel !== inBarrel) {
+      if (inBarrel ? !saysBarrel || saysNotInBarrel : !saysNotInBarrel) {
         error(
           "E_IMPORT_LINE",
           folder,
           1,
           inBarrel
-            ? "this folder is in the root barrel and the README does not say so"
-            : "this folder is not in the root barrel, but the README says it is",
+            ? `\`${meta.name}\` is exported from the root barrel and the README does not say so`
+            : `\`${meta.name}\` is not exported from the root barrel; the README must say so, in the words "**not in the root barrel**"`,
         );
       }
     }

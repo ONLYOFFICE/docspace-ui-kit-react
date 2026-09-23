@@ -249,7 +249,11 @@
     "components/**/README.md",
     "context/**/README.md",
     "providers/**/README.md",
-    "utils/**/README.md"
+    "utils/**/README.md",
+    "docs/getting-started.md",
+    "docs/components.md",
+    "docs/public-api.md",
+    "docs/known-defects.md"
   ],
   "//sideEffects": "The stylesheets, and the proxy module emitted for each one: dist/esm/**/X.module.scss/index.js exports the class-name map and imports the CSS beside it, so a bundler that tree-shakes an unused map must still keep the import.",
   "sideEffects": [
