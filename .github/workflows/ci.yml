@@ -48,6 +48,35 @@ jobs:
       - name: Run Tests
         run: pnpm test
 
+  storybook:
+    name: "Build Storybook"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # `storybook dev` and `storybook build` do not fail on the same things:
+      # the dev server leaves an unresolved import to fail lazily, the static
+      # build stops on it. The optional peers of @onlyoffice/ai-chat broke the
+      # static build that way, and nothing noticed, because the only thing
+      # that ran it was `test:e2e`, which is not run here. A new optional peer
+      # in an ai-chat upgrade fails this step with MISSING_EXPORT naming the
+      # package -- add a stub for it in .storybook/stubs/.
+      - name: Build Storybook
+        run: pnpm storybook-build
+
   package:
     name: "Build & verify the package"
     runs-on: ubuntu-latest
