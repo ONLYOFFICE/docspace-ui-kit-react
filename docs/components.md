@@ -7,11 +7,56 @@ to change a row, change that README.
 Two things to read before picking one:
 
 - **Import by subpath.** `@onlyoffice/apps-ui-kit/components/<folder>` resolves for every
-  component and keeps your bundle to what you use. Sixty-eight of them are also re-exported
-  from the root barrel; the table says which.
+  component and keeps your bundle to what you use. `components/index.ts` re-exports all 98
+  folders, but three of the components are still subpath-only: `Article`, `Navigation` and
+  `Section` are default exports re-exported with `export *`, which carries a folder's types and
+  not its default. The Import column reads the barrel, so it cannot show that; their READMEs do.
 - **Public versus portal-internal.** A portal-internal component needs DocSpace context — a
-  `t` translation function, a MobX store, a device type — and will not work in a standalone
-  app. [`public-api.md`](public-api.md) is the full account.
+  translation function, a portal store, a device type it is told about — and will not work in a
+  standalone app. [`public-api.md`](public-api.md) is the full account.
+
+New to the package? [`getting-started.md`](getting-started.md) covers the two providers, the CSS
+model and the two layout rules first.
+
+## Which one do I want
+
+### The close calls
+
+| You want                                     | Use                                                 | Not                                                                              |
+| -------------------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------- |
+| A dialog in the middle of the screen         | `ModalDialog`                                       | `Aside`, which is the same dialog docked to the edge                             |
+| A panel sliding in from the side             | `Aside`, or `ModalDialog` with `displayType` aside  | `Section`'s info panel, which is part of the portal layout                       |
+| A menu under a control                       | `DropDown` with `DropDownItem`                      | `ContextMenu`, which is the right-click menu and positions itself at the pointer |
+| A line of text                               | `Text`                                              | `Heading`, which carries the heading sizes and weights                           |
+| A caption above a field                      | `FieldContainer`, which draws one                   | `Label` on its own, unless the field is outside a container                      |
+| A spinner while something loads              | `Loader` with an explicit `type`                    | the default `Loader`, which renders its label as text and no spinner             |
+| Placeholder shapes while a list loads        | `RectangleSkeleton`, `CircleSkeleton`               | `Loader`, which says "busy" rather than "this is the shape of what is coming"    |
+| A measurable percentage                      | `ProgressBar`                                       | `TopLoaderService`, whose numbers are invented by a timer                        |
+| A page-wide wait with no number              | `TopLoaderService`                                  | `AppLoader`, which covers the screen and blocks nothing                          |
+| A table of data with columns                 | `components/table`                                  | `Rows`, which is the portal's file list and reads children by index              |
+| A grid of cards                              | `Tiles`                                             | `Rows` in a wider container                                                      |
+| "Nothing here yet" in a page                 | `EmptyView`                                         | `EmptyScreenContainer`, the older portal one                                     |
+| A message that goes away by itself           | `toastr` plus one mounted `Toast`                   | `StatusMessage`, which stays until you clear it                                  |
+| A message that stays until the state changes | `StatusMessage`                                     | `Toast`, which is transient by design                                            |
+| A banner the reader can close                | `Snackbar`, `ColumnarInfoBar`                       | `StatusMessage`, which has no close control                                      |
+| An upload area with a file dialog            | `Dropzone`                                          | `DragAndDrop`, which has no dialog and no filtering                              |
+| An existing element to accept dropped files  | `DragAndDrop`                                       | `Dropzone`, which draws a bordered area of its own                               |
+| A search field                               | `SearchInput` — its `onChange` receives the string  | `TextInput`, whose `onChange` receives the event                                 |
+| Yes or no                                    | `ToggleButton` in a wrapper with a size, `Checkbox` | `ToggleButton` alone, which has no size of its own                               |
+
+### The prop that shows and hides it
+
+There is no single name. Guessing wrong is silent — the prop is ignored and nothing is logged:
+
+| Prop      | Components                                                                                |
+| --------- | ----------------------------------------------------------------------------------------- |
+| `visible` | `Aside`, `ModalDialog`, `Backdrop`, `Portal`, `AvatarEditorDialog`, `RoomLogoCoverDialog` |
+| `isOpen`  | `HelpButton`, `LinkWithDropdown`, `Tooltip`, `CollapsibleCard`                            |
+| `opened`  | `ComboBox`, `ContextMenuButton`, `MainButtonMobile`                                       |
+| `open`    | `DropDown`                                                                                |
+
+The catalogue below repeats it per component, and `check-readme` verifies each entry against the
+component's real props.
 
 <!-- catalogue:start -->
 

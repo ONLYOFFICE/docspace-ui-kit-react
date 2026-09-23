@@ -214,8 +214,8 @@ const codeBlocks = (readme) =>
  * "this fragment illustrates, it does not compile", and the template forbids it
  * where a reader copies code -- the minimal example and the recipes.
  */
-const extractExamples = (folder, readme) => {
-  const dir = path.join(CACHE, folder.replaceAll("/", "__"));
+const extractExamples = (source, readme, label = `${source}/README.md`) => {
+  const dir = path.join(CACHE, source.replaceAll("/", "__"));
   fs.mkdirSync(dir, { recursive: true });
 
   return codeBlocks(readme)
@@ -226,8 +226,30 @@ const extractExamples = (folder, readme) => {
 
       // The fence sits on `block.line`, so the first line of code is the next
       // one, and a diagnostic reported on line 1 belongs to it.
-      return { folder, file, firstLine: block.line + 1 };
+      return { label, file, firstLine: block.line + 1 };
     });
+};
+
+/**
+ * The pages under `docs/`. They carry no metadata block and no section
+ * contract -- they are prose -- but their code has to compile and their text is
+ * read by the same people, so the forbidden-text rules and the ```tsx pass
+ * apply to them as they do to a README.
+ *
+ * `.mdx` is left out: it is Storybook's, it is not synced downstream, and its
+ * blocks are rendered rather than copied.
+ */
+const DOCS_DIR = "docs";
+
+const docPages = () => {
+  const dir = path.join(ROOT, DOCS_DIR);
+  if (!fs.existsSync(dir)) return [];
+
+  return fs
+    .readdirSync(dir)
+    .filter((name) => name.endsWith(".md"))
+    .sort()
+    .map((name) => `${DOCS_DIR}/${name}`);
 };
 
 const main = async () => {
@@ -244,14 +266,11 @@ const main = async () => {
     : all.filter((folder) => !allowlist.has(folder));
 
   const findings = [];
+  const reportFile = (severity, code, file, line, message) =>
+    findings.push({ severity, code, file, line, message });
+
   const report = (severity, code, folder, line, message) =>
-    findings.push({
-      severity,
-      code,
-      file: `${folder}/README.md`,
-      line,
-      message,
-    });
+    reportFile(severity, code, `${folder}/README.md`, line, message);
 
   const error = (...args) => report("error", ...args);
   const warn = (...args) => report("warning", ...args);
@@ -613,6 +632,33 @@ const main = async () => {
     if (options.compile) examples.push(...extractExamples(folder, readme));
   }
 
+  // --- the pages under docs/ ---
+
+  // Only when the whole set is checked: `--only` names component folders, and
+  // narrowing to one of them should not drag the docs in with it.
+  const pages = named ? [] : docPages();
+
+  for (const page of pages) {
+    const text = fs.readFileSync(path.join(ROOT, page), "utf8");
+
+    for (const { pattern, message } of FORBIDDEN) {
+      const match = pattern.exec(text);
+      if (match) {
+        reportFile(
+          "error",
+          "E_FORBIDDEN_TEXT",
+          page,
+          lineOf(text, match.index),
+          message,
+        );
+      }
+    }
+
+    if (options.compile) {
+      examples.push(...extractExamples(page.replace(/\.md$/, ""), text, page));
+    }
+  }
+
   // --- the examples compile ---
 
   if (options.compile && examples.length > 0) {
@@ -639,9 +685,10 @@ const main = async () => {
         diagnostic.start ?? 0,
       );
 
-      error(
+      reportFile(
+        "error",
         "E_TSX_COMPILE",
-        example.folder,
+        example.label,
         example.firstLine + line,
         ts.flattenDiagnosticMessageText(diagnostic.messageText, " "),
       );
@@ -651,7 +698,13 @@ const main = async () => {
   const errors = findings.filter((finding) => finding.severity === "error");
 
   if (options.json) {
-    console.log(JSON.stringify({ checked: folders.length, findings }, null, 2));
+    console.log(
+      JSON.stringify(
+        { checked: folders.length, pages: pages.length, findings },
+        null,
+        2,
+      ),
+    );
   } else {
     for (const finding of findings) {
       const where = `${finding.file}${finding.line ? `:${finding.line}` : ""}`;
@@ -665,8 +718,10 @@ const main = async () => {
         ? `, ${allowlist.size} on the legacy format skipped`
         : "";
 
+    const docs = pages.length > 0 ? ` and ${pages.length} docs page(s)` : "";
+
     console.log(
-      `\n${folders.length} README(s) checked${skipped}: ` +
+      `\n${folders.length} README(s)${docs} checked${skipped}: ` +
         `${errors.length} error(s), ${findings.length - errors.length} warning(s).`,
     );
   }
