@@ -49,16 +49,8 @@ export type ArticleZendeskProps = {
   languageBaseName: string;
   zendeskEmail: string;
   chatDisplayName: string;
-  /**
-   * Something the app pins to the bottom inline-end corner - a create button,
-   * an upload progress button - is on screen, so the launcher steps aside to
-   * keep off it.
-   */
-  withFloatingButton?: boolean;
   zendeskKey: string;
-  showProgress: boolean;
   isShowLiveChat: boolean;
-  isInfoPanelVisible?: boolean;
 };
 
 export type ArticleProfileProps = {
@@ -80,6 +72,8 @@ export type ArticleProps = ArticleProfileProps &
     setShowText: (value: boolean) => void;
     withMainButton?: boolean;
     isMobileArticle: boolean;
+    showProgress: boolean;
+    isInfoPanelVisible?: boolean;
     setIsMobileArticle: (value: boolean) => void;
     children: React.JSX.Element[];
 
