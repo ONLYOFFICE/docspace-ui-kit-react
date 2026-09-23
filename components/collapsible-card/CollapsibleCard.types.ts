@@ -17,7 +17,13 @@ export interface CollapsibleCardProps {
   defaultOpen?: boolean;
   /** Called with the next open value when the header is activated. */
   onToggle?: (nextOpen: boolean) => void;
+  /** Additional CSS class name applied to the root element. */
   className?: string;
+  /** Inline styles applied to the root element. */
   style?: React.CSSProperties;
+  /**
+   * Value of the root element's `data-testid`. Defaults to
+   * `"collapsible-card"`.
+   */
   dataTestId?: string;
 }
