@@ -281,8 +281,15 @@ Each state colour also has an override: `--button-root-bg`, `--button-root-color
 variant, and the matching `--button-primary-*` set for the primary one.
 
 **There is no destructive variant.** The stylesheet has nothing red: a delete confirmation is
-an ordinary `primary` button, and making it red means setting `--accent-button` on an ancestor
-of that button — not on the dialog, which would recolour its close button too.
+an ordinary `primary` button, and making it red means overriding `--accent-button`. Put it on
+the button itself — `style` is forwarded to the `<button>` element, so
+`style={{ "--accent-button": "#f21c0e" } as CSSProperties}` is enough, and it needs no wrapper
+element. Do not set it on the dialog or the panel around the button: that recolours everything
+accented inside, the close button included.
+
+Reach for a wrapper element only when the variable has to cover several buttons at once, and
+not inside a row that shares its width — a wrapped `scale` button stops being an equal flex
+item and shrinks to its label.
 
 ## Accessibility
 

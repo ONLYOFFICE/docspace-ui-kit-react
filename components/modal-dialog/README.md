@@ -317,6 +317,12 @@ export function RenameDialog({
 - **The dialog renders through a portal into `document.body`**, so it is not affected by a
   parent's `overflow` or stacking context; layering is controlled by `zIndex` on the backdrop,
   310 by default.
+- **The footer is a flex row and its buttons share it.** Give each button `scale` and the two
+  come out the same width, because each asks for the full row and they shrink against one
+  another. Wrapping one of them in an element of your own — to scope a CSS variable, say —
+  takes it out of that arrangement: the wrapper sizes to its content and the other button
+  takes the rest of the row. Put the variable on the button instead; `Button` forwards
+  `style` to its `<button>`. Only `isDoubleFooterLine` expects wrapper elements, one per line.
 - **`withFooterBorder` defaults differently per display type** — `true` for aside, `false`
   for modal — unless you pass it.
 - **Anything the component does not read itself is forwarded last** to the internal modal and

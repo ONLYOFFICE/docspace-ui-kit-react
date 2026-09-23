@@ -21,6 +21,14 @@ Every item below was re-verified on 2026-09-23 against the merged
   `components/field-container/FieldContainer.tsx:72` and `:89`. No label in any form built from it
   is associated with its control, so clicking the label focuses nothing and a screen reader
   announces the field unnamed.
+- **A `Textarea` in a `FieldContainer` cannot be named at all.** The two defects above leave
+  every control unassociated with its label, and a `TextInput` can be patched from outside
+  because `TextInputProps` extends `React.InputHTMLAttributes` — `aria-label` reaches the input.
+  `TextareaProps` (`components/textarea/Textarea.types.ts:3`) is a closed object type: it
+  neither sets an `aria-*` of its own nor accepts one, and it has no `name` or `aria-labelledby`
+  either. So a multi-line field has no way to be named short of writing a second, duplicate
+  `<label>` beside the visible one. Found by the A7 spot test: an agent given the three READMEs
+  named the single-line field and correctly reported the multi-line one as unnameable.
 - **`ModalDialog` cannot be given an accessible name.** `role="dialog"` and `aria-modal` sit on the
   click-to-close element, and unknown props — an `aria-label` among them — are spread onto the
   internal `AsideHeader`, and only when a header is rendered. The advice "label it yourself" cannot
