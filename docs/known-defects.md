@@ -42,6 +42,34 @@ Every item below was re-verified on 2026-09-23 against the merged
   sibling line calls `removeEventListener`. Each re-run leaves another listener behind, and the
   effect depends on `visible`, `onClose`, `onBackClick` and both display-type props.
 
+## Code that only looks as though it runs
+
+- **`ThemeProvider` fetches the colour theme with a function that sends no request.**
+  `providers/theme/useTheme.ts:93` awaits
+  `CommonSettingsApiAxiosParamCreator().getPortalColorTheme()`, whose declared return type is
+  `Promise<RequestArgs>` — the param creator builds a URL and options, it does not call the
+  portal. The result is cast to `CustomColorThemesSettingsDto`, `.themes` on it is `undefined`,
+  and the branch quietly does nothing. So the accent palette is never loaded, in the portal
+  either, unless `colorTheme` is passed in.
+
+  It costs more than a dead branch: the import puts `@onlyoffice/docspace-api-sdk` — and
+  `axios`, which that package depends on — into every application that mounts `ThemeProvider`,
+  which is every application that uses the kit at all. Either call the operation properly
+  (`CommonSettingsApi(...).getPortalColorTheme()`) behind something the portal supplies, or
+  drop the fetch and make `colorTheme` the only way in. Found while writing the `ui-kit`
+  skill's setup page.
+
+## Documentation that outlived its subject
+
+- **The three provider READMEs were never brought to the template.**
+  `providers/theme/README.md` still says the theme reaches children through
+  `ThemeProviderComponent` and the CSS-in-JS library this package dropped. The component it
+  names carries none of it and has not for some time — it writes `data-theme` and `data-dir`
+  on `<html>` and the `light`/`dark` and `ltr`/`rtl` classes on `<body>`. `check-readme` never
+  saw it: its scope is `components/**` and `docs/*.md`. The three pages ship in the package
+  and are copied into the `ui-kit` skill, so they are read. Widen the validator's scope to
+  `providers/**/README.md` and rewrite the three against `README_TEMPLATE.md`.
+
 ## Props that are declared and never read
 
 Each is documented as ignored in its README, so nobody is misled today; removing them is a breaking
