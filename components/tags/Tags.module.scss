@@ -21,11 +21,6 @@
   pointer-events: none;
 
   &:not(.removeTagIcon) {
-    [dir="rtl"] & {
-      margin-right: var(--tags-overflow-margin) !important;
-    }
-    [dir="ltr"] & {
-      margin-left: var(--tags-overflow-margin) !important;
-    }
+    margin-inline-start: var(--tags-overflow-margin) !important;
   }
 }
