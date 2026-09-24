@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { PlatformAdapter } from "@onlyoffice/ai-chat";
+import type { ExportFormat, PlatformAdapter } from "@onlyoffice/ai-chat";
 import { useEffect, useMemo, useRef, useState, useEffectEvent } from "react";
 
 import { PORTAL_BASE_THEME_ID, PORTAL_DARK_THEME_ID } from "../themes";
@@ -45,12 +45,20 @@ const getSystemTheme = (): "light" | "dark" => {
     : "light";
 };
 
+// Shared empty list: a host that declares no formats must not hand the
+// library a fresh array on every render.
+const EMPTY_FORMATS: ExportFormat[] = [];
+
 const themeIdForSystem = (t: "light" | "dark") =>
   t === "dark" ? PORTAL_DARK_THEME_ID : PORTAL_BASE_THEME_ID;
 
 export type SaveAsFileHandler = (
   content: string,
   defaultName: string,
+  // `ExportFormat.id` picked from the chat's export submenu. Absent for the
+  // plain "Save" action (a single message's download button), where the
+  // extension in `defaultName` is the only hint.
+  format?: string,
 ) => Promise<void>;
 
 export type OpenFileHandler = (path: string, name: string) => void;
@@ -60,10 +68,16 @@ type PlatformFileOperations = NonNullable<PlatformAdapter["file"]>;
 const createFileOperations = (
   getSaveHandler: () => SaveAsFileHandler | null | undefined,
   getOpenHandler: () => OpenFileHandler | null | undefined,
+  getExportFormats: () => ExportFormat[],
 ): Partial<PlatformFileOperations> => ({
-  saveAsFile: async (content, defaultName) => {
-    await getSaveHandler()?.(content, defaultName);
+  saveAsFile: async (content, defaultName, format) => {
+    await getSaveHandler()?.(content, defaultName, format);
   },
+  // Declaring more than one format makes the library replace the thread's
+  // single "Download" item with an "Export to…" submenu and pass the chosen
+  // `id` back through `saveAsFile`. Called during render, so it must stay
+  // synchronous and cheap.
+  getExportFormats,
   // Fired by the library when the user clicks a file chip on a sent message.
   openFile: (path, name) => {
     getOpenHandler()?.(path, name);
@@ -77,25 +91,39 @@ type UsePlatformAdapterArgs = {
   theme?: string;
   onSaveAsFile?: SaveAsFileHandler;
   onOpenFile?: OpenFileHandler;
+  // Export formats offered for a chat thread. Their labels are localized by
+  // the host, so they are read through a ref on every call rather than
+  // captured — and the adapter is rebuilt on a locale change anyway, which is
+  // what re-runs the library's own memo over this list.
+  exportFormats?: ExportFormat[];
 };
 
 // Returns the platform adapter the chat library needs. The adapter object is
-// built once and kept stable (its identity never changes), so downstream chat
-// stores aren't rebuilt; host locale/theme and OS theme changes mutate its
-// `env` in place and notify subscribers. The save handler is read through a ref
-// so the latest `onSaveAsFile` is always used without rebuilding the adapter.
+// memoized on the host locale and theme alone, so downstream chat stores are
+// not rebuilt by anything else; `env` is mutated in place and subscribers are
+// notified. The save handler is read through a ref so the latest
+// `onSaveAsFile` is always used without rebuilding the adapter.
 export const usePlatformAdapter = ({
   locale,
   theme,
   onSaveAsFile,
   onOpenFile,
+  exportFormats,
 }: UsePlatformAdapterArgs): PlatformAdapter => {
   const [systemTheme, setSystemTheme] = useState(() => getSystemTheme());
 
   const saveAsFileEvent = useEffectEvent<SaveAsFileHandler>(
-    (content, defaultName) =>
-      onSaveAsFile?.(content, defaultName) ?? Promise.resolve(),
+    (content, defaultName, format) =>
+      onSaveAsFile?.(content, defaultName, format) ?? Promise.resolve(),
   );
+
+  // A ref rather than a `useEffectEvent` like the handlers above: the library
+  // calls `getExportFormats` while rendering the chat list, and an effect
+  // event throws when it is called during render.
+  const exportFormatsRef = useRef<ExportFormat[]>(
+    exportFormats ?? EMPTY_FORMATS,
+  );
+  exportFormatsRef.current = exportFormats ?? EMPTY_FORMATS;
 
   const openFileEvent = useEffectEvent<OpenFileHandler>((path, name) => {
     onOpenFile?.(path, name);
@@ -109,6 +137,7 @@ export const usePlatformAdapter = ({
       file: createFileOperations(
         () => saveAsFileEvent,
         () => openFileEvent,
+        () => exportFormatsRef.current,
       ),
       process: null,
       // Registered MCP servers are executed by the Node AI service (their
