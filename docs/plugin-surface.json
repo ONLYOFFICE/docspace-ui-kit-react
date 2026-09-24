@@ -1,8 +1,8 @@
 {
   "entry": "index.ts",
   "package": "@onlyoffice/apps-ui-kit",
-  "total": 663,
-  "values": 454,
+  "total": 668,
+  "values": 459,
   "exports": {
     "ADMIN": {
       "kind": "variable",
@@ -76,6 +76,10 @@
     "AppLoader": {
       "kind": "variable",
       "origin": "components/app-loader"
+    },
+    "Article": {
+      "kind": "variable",
+      "origin": "components/article"
     },
     "ArticleHideMenuIcon": {
       "kind": "variable",
@@ -727,6 +731,10 @@
       "kind": "enum",
       "origin": "enums"
     },
+    "FilterInput": {
+      "kind": "variable",
+      "origin": "components/filter"
+    },
     "FilterKeys": {
       "kind": "enum",
       "origin": "enums"
@@ -1025,6 +1033,10 @@
     "NavSubItem": {
       "kind": "type",
       "origin": "components/nav-menu"
+    },
+    "Navigation": {
+      "kind": "other",
+      "origin": "components/navigation"
     },
     "NewItemDropDownProps": {
       "kind": "type",
@@ -1346,6 +1358,10 @@
       "kind": "type",
       "origin": "components/selector"
     },
+    "Section": {
+      "kind": "variable",
+      "origin": "components/section"
+    },
     "SectionProps": {
       "kind": "type",
       "origin": "components/section"
@@ -1425,6 +1441,10 @@
     "SpecialFolderScope": {
       "kind": "type",
       "origin": "components/selector"
+    },
+    "StatusMessage": {
+      "kind": "variable",
+      "origin": "components/status-message"
     },
     "TAccessRight": {
       "kind": "type",

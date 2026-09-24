@@ -36,7 +36,7 @@ author can import, and removing a name from it breaks plugins with no compile er
 in this repository or in the client. Treat a change to `index.ts` as a public-API change even
 when `docs/public-api.md` calls the module portal-internal.
 
-`docs/plugin-surface.json` records that surface name by name (663 exports today: 454 values,
+`docs/plugin-surface.json` records that surface name by name (668 exports today: 459 values,
 209 type-only). Diff a change against it with
 `node .claude/scripts/plugin-surface/surface.mjs`, or use the `plugin-surface` skill.
 
