@@ -189,8 +189,9 @@ export type TComboboxProps = {
   /** Applied to the wrapper and, again, to the list. */
   style?: React.CSSProperties;
   /**
-   * Position of the button in the tab order. It is -1 by default, which keeps
-   * the combo box off it entirely.
+   * Position of the button in the tab order. It is `0` by default, so the
+   * control is reachable; pass `-1` to take it off the tab order.
+   * @default 0
    */
   tabIndex?: number;
   /** Truncates an option's label with an ellipsis instead of wrapping it. */

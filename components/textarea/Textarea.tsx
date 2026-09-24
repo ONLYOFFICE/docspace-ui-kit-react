@@ -31,7 +31,10 @@ const Textarea = ({
   onChange,
   placeholder = " ",
   style,
-  tabIndex = -1,
+  // No default: `-1` here took every multi-line field out of the tab order, so
+  // a form could not be filled in from the keyboard unless the caller passed
+  // `0` to each one. Undefined means no attribute, which is the natural order.
+  tabIndex,
   value = "",
   fontSize = 13,
   heightTextArea,
@@ -48,6 +51,9 @@ const Textarea = ({
   onKeyDown,
   onCopy,
   copyInfoText,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
 }: TextareaProps) => {
   const { isRTL } = useInterfaceDirection();
 
@@ -193,6 +199,9 @@ const Textarea = ({
           maxLength={maxLength}
           name={name}
           tabIndex={tabIndex}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={ariaDescribedBy}
           disabled={isDisabled}
           readOnly={isReadOnly}
           value={isJSONField ? modifiedValue : value}

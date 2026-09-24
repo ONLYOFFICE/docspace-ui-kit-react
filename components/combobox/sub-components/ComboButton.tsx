@@ -37,7 +37,10 @@ export const ComboButton: React.FC<TComboButtonProps> = ({
   size = ComboBoxSize.content,
   scaled = false,
   modernView = false,
-  tabIndex = -1,
+  // This div is the control: it carries the button role, `aria-expanded` and
+  // `aria-haspopup`. Defaulting to -1 made every combo box unreachable by
+  // keyboard unless the caller passed a tab index of its own.
+  tabIndex = 0,
   isLoading = false,
   displayArrow: displayArrowProp,
   noSelect,
