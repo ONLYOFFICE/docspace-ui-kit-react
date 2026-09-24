@@ -580,6 +580,53 @@ const BoldTemplate = () => {
   );
 };
 
+export const BoldText: Story = {
+  render: () => <BoldTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Emphasize a value with `isBold` (600) or pass any `fontWeight`; the middle size is already 600, so `isBold` changes nothing there.",
+      },
+      source: {
+        code: `<TextInput value="Normal weight" />
+<TextInput value="Bold weight" isBold />
+<TextInput value="Weight 700" fontWeight={700} />`,
+      },
+    },
+  },
+};
+
+const RightToLeftTemplate = () => {
+  return (
+    <div dir="rtl" style={{ display: "grid", gap: "16px", width: "300px" }}>
+      <ControlledInput placeholder="أدخل النص" />
+      <ControlledInput type={InputType.tel} placeholder="+1 (___) ___-____" />
+    </div>
+  );
+};
+
+// Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
+export const RightToLeft: Story = {
+  render: () => <RightToLeftTemplate />,
+  globals: { direction: "rtl" },
+  parameters: {
+    docs: {
+      story: { inline: false, height: "120px" },
+      description: {
+        story:
+          'The same fields under a right-to-left interface: the placeholder moves to the right edge and typed text starts from the right; the tel field keeps its placeholder left-to-right, so a phone number reads the same as in a left-to-right interface. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+      },
+      source: {
+        code: `<div dir="rtl">
+  <TextInput type={InputType.text} value={value} onChange={handleChange} placeholder="أدخل النص" />
+  <TextInput type={InputType.tel} value={phone} onChange={handlePhone} placeholder="+1 (___) ___-____" />
+</div>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
     <div
@@ -661,53 +708,6 @@ export const CssCustomization: Story = {
     onChange={() => {}}
   />
   <TextInput type={InputType.text} value="Disabled" isDisabled onChange={() => {}} />
-</div>`,
-      },
-    },
-  },
-};
-
-export const BoldText: Story = {
-  render: () => <BoldTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Emphasize a value with `isBold` (600) or pass any `fontWeight`; the middle size is already 600, so `isBold` changes nothing there.",
-      },
-      source: {
-        code: `<TextInput value="Normal weight" />
-<TextInput value="Bold weight" isBold />
-<TextInput value="Weight 700" fontWeight={700} />`,
-      },
-    },
-  },
-};
-
-const RightToLeftTemplate = () => {
-  return (
-    <div dir="rtl" style={{ display: "grid", gap: "16px", width: "300px" }}>
-      <ControlledInput placeholder="أدخل النص" />
-      <ControlledInput type={InputType.tel} placeholder="+1 (___) ___-____" />
-    </div>
-  );
-};
-
-// Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
-export const RightToLeft: Story = {
-  render: () => <RightToLeftTemplate />,
-  globals: { direction: "rtl" },
-  parameters: {
-    docs: {
-      story: { inline: false, height: "120px" },
-      description: {
-        story:
-          'The same fields under a right-to-left interface: the placeholder moves to the right edge and typed text starts from the right; the tel field keeps its placeholder left-to-right, so a phone number reads the same as in a left-to-right interface. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
-      },
-      source: {
-        code: `<div dir="rtl">
-  <TextInput type={InputType.text} value={value} onChange={handleChange} placeholder="أدخل النص" />
-  <TextInput type={InputType.tel} value={phone} onChange={handlePhone} placeholder="+1 (___) ___-____" />
 </div>`,
       },
     },

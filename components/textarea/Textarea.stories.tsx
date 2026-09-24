@@ -474,6 +474,82 @@ const CustomHeightTemplate = () => {
   );
 };
 
+export const CustomHeights: Story = {
+  render: () => <CustomHeightTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Three heights of the same field, to pick the one that fits the surrounding form (`heightTextArea`).",
+      },
+      source: {
+        code: `<Textarea value="Small" heightTextArea="80px" />
+<Textarea value="Medium" heightTextArea="150px" />
+<Textarea value="Large" heightTextArea="250px" />`,
+      },
+    },
+  },
+};
+
+const GrowsWithContentTemplate = () => {
+  return (
+    <div style={{ width: "400px" }}>
+      <ControlledTextarea
+        initialValue={`First line\nSecond line\nThird line\nFourth line\nFifth line\nSixth line`}
+        isFullHeight
+      />
+    </div>
+  );
+};
+
+export const GrowsWithContent: Story = {
+  render: () => <GrowsWithContentTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The frame is as tall as its text: add a line and it grows, delete one and it shrinks, never below the default height (`isFullHeight`).",
+      },
+      source: {
+        code: `<Textarea value={value} onChange={handleChange} isFullHeight />`,
+      },
+    },
+  },
+};
+
+const RightToLeftTemplate = () => {
+  return (
+    <div dir="rtl" style={{ width: "400px" }}>
+      <ControlledTextarea
+        initialValue={`السطر الأول\nالسطر الثاني\nالسطر الثالث`}
+        hasNumeration
+        enableCopy
+        heightTextArea="120px"
+      />
+    </div>
+  );
+};
+
+// Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
+export const RightToLeft: Story = {
+  render: () => <RightToLeftTemplate />,
+  globals: { direction: "rtl" },
+  parameters: {
+    docs: {
+      story: { inline: false, height: "200px" },
+      description: {
+        story:
+          'The same field under a right-to-left interface, mirroring the left-to-right layout: the line numbers move to the right edge, the copy button to the left one, and the text starts from the right. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+      },
+      source: {
+        code: `<div dir="rtl">
+  <Textarea value={value} onChange={handleChange} hasNumeration enableCopy />
+</div>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
     <div
@@ -546,82 +622,6 @@ export const CssCustomization: Story = {
 >
   <Textarea value="Custom styled textarea with CSS variables" onChange={() => {}} />
   <Textarea value={"First line\\nSecond line\\nThird line"} hasNumeration onChange={() => {}} />
-</div>`,
-      },
-    },
-  },
-};
-
-export const CustomHeights: Story = {
-  render: () => <CustomHeightTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Three heights of the same field, to pick the one that fits the surrounding form (`heightTextArea`).",
-      },
-      source: {
-        code: `<Textarea value="Small" heightTextArea="80px" />
-<Textarea value="Medium" heightTextArea="150px" />
-<Textarea value="Large" heightTextArea="250px" />`,
-      },
-    },
-  },
-};
-
-const GrowsWithContentTemplate = () => {
-  return (
-    <div style={{ width: "400px" }}>
-      <ControlledTextarea
-        initialValue={`First line\nSecond line\nThird line\nFourth line\nFifth line\nSixth line`}
-        isFullHeight
-      />
-    </div>
-  );
-};
-
-export const GrowsWithContent: Story = {
-  render: () => <GrowsWithContentTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "The frame is as tall as its text: add a line and it grows, delete one and it shrinks, never below the default height (`isFullHeight`).",
-      },
-      source: {
-        code: `<Textarea value={value} onChange={handleChange} isFullHeight />`,
-      },
-    },
-  },
-};
-
-const RightToLeftTemplate = () => {
-  return (
-    <div dir="rtl" style={{ width: "400px" }}>
-      <ControlledTextarea
-        initialValue={`السطر الأول\nالسطر الثاني\nالسطر الثالث`}
-        hasNumeration
-        enableCopy
-        heightTextArea="120px"
-      />
-    </div>
-  );
-};
-
-// Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
-export const RightToLeft: Story = {
-  render: () => <RightToLeftTemplate />,
-  globals: { direction: "rtl" },
-  parameters: {
-    docs: {
-      story: { inline: false, height: "200px" },
-      description: {
-        story:
-          'The same field under a right-to-left interface, mirroring the left-to-right layout: the line numbers move to the right edge, the copy button to the left one, and the text starts from the right. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
-      },
-      source: {
-        code: `<div dir="rtl">
-  <Textarea value={value} onChange={handleChange} hasNumeration enableCopy />
 </div>`,
       },
     },
