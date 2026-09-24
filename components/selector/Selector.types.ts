@@ -741,8 +741,13 @@ export type SpecialFolderScope = {
   kind: "recent" | "favorites";
   folderId: number | string;
   section: "files" | "rooms" | "forms" | "agents";
-  parentId?: number;
-  folderType?: number;
+  /**
+   * Folder types the Recent/Favorites aggregate is scoped to, so each section
+   * only shows its own content. The server binds this to a `List<FolderType>`
+   * and keeps an entry when any ancestor of its parent has one of these types,
+   * so a section made of several room types passes them all.
+   */
+  folderType?: number | number[];
 };
 
 export type TSelectorItemUser = MergeTypes<
