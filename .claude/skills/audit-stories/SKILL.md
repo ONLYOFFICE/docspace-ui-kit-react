@@ -247,7 +247,15 @@ follows it:
   types' own terms**, not the product's use of it: `header` takes "a
   title with an optional visual — initials on a color, an icon, an
   avatar…", not "the room color" — the kit does not know what a room is,
-  even when the prop next to it is called `isRoom`.
+  even when the prop next to it is called `isRoom`. And it says it in
+  words a reader can picture, naming the concrete result — the size, the
+  side, the moment something happens — rather than the mechanism behind
+  it ("makes the field a fixed share of the window height, so it
+  stretches with the window", not "height follows the viewport"). A CSS
+  variable name belongs in the `CssCustomization` table, not in a prop
+  description. A floor, a cap or a fallback is mentioned only when a
+  reader can actually hit it, and then as the value, not as the variable
+  that holds it.
 - **Props live in `argTypes` and the types file**, not in prose: the
   Docs props table is generated from `<Name>.types.ts` by
   `react-docgen-typescript`, JSDoc comments included. Document a prop
@@ -297,6 +305,16 @@ follows it:
   half-flipped component. The description names what the reader should
   see move — the icon's side, the fill direction, the alignment — and
   the sample text is a short neutral RTL phrase, not product copy.
+  **The story is always framed on Docs**: `ThemeProvider` writes
+  `data-dir` onto `<html>`, the Docs page mounts every story in one
+  document, and the last provider to run wins — so an inline story with
+  `globals.direction: "rtl"` flips the whole Docs page (headings, bullets,
+  the frame of every other story) while every other story keeps the
+  toolbar's direction, so the page and the components on it disagree,
+  whatever the toolbar says. Give it
+  `parameters.docs.story = { inline: false, height }` with a
+  one-line comment saying why, and after adding it open the Docs page and
+  read `document.documentElement.dataset.dir`: it must still say `ltr`.
 - **Comments in a story are rare and one line long.** They explain only
   what the code cannot show — why a story is framed or hidden on Docs,
   why a type forces unused fields — and never repeat the story's own
