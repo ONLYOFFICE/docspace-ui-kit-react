@@ -8,17 +8,55 @@ import { FieldContainer } from "./FieldContainer";
 import type { FieldContainerProps } from "./FieldContainer.types";
 import { globalColors } from "../../providers/theme";
 
-// The README is what the package ships and what a coding agent reads; rendering
-// it here keeps the developer looking at Storybook and the agent on one text.
-import readme from "./README.md?raw";
-
 const meta = {
   title: "UI/Form controls/FieldContainer",
   component: FieldContainer,
   parameters: {
     docs: {
       description: {
-        component: readme,
+        component: `A responsive form field container component that provides consistent layout and styling for form inputs.
+
+### Features
+
+- **Dual Layout**: Horizontal and vertical alignment options
+- **Error Handling**: Built-in error message display with customizable color and width
+- **Required Indicator**: Optional asterisk for required fields
+- **Label Configuration**: Adjustable label width and visibility
+- **Tooltip Support**: Integrated help button with configurable tooltip placement
+- **Inline Help**: Option to render the help button inline within the label
+
+### Accessibility
+
+\`labelFor\` is the \`id\` of the control the label belongs to. Give the control the same \`id\` and the caption becomes clickable and is announced with the field; without the pair the label captions nothing.
+
+### Usage
+
+\`\`\`tsx
+import { FieldContainer } from "@onlyoffice/apps-ui-kit/components/field-container";
+
+// Horizontal layout with tooltip
+<FieldContainer
+  labelText="Name:"
+  labelVisible
+  labelFor="name"
+  tooltipContent="Enter your full name"
+  place="top"
+>
+  <TextInput id="name" type={InputType.text} value={value} onChange={handleChange} />
+</FieldContainer>
+
+// Vertical layout with error
+<FieldContainer
+  isVertical
+  labelText="Email:"
+  labelVisible
+  labelFor="email"
+  hasError
+  errorMessage="Invalid email"
+>
+  <TextInput id="email" type={InputType.email} value={value} hasError onChange={handleChange} />
+</FieldContainer>
+\`\`\``,
       },
     },
   },

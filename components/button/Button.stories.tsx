@@ -7,17 +7,51 @@ import Icon from "../../assets/button.alert.react.svg";
 
 import { Button, ButtonSize } from ".";
 
-// The README is what the package ships and what a coding agent reads; rendering
-// it here keeps the developer looking at Storybook and the agent on one text.
-import readme from "./README.md?raw";
-
 const meta = {
   title: "UI/Interactive elements/Button",
   component: Button,
   parameters: {
     docs: {
       description: {
-        component: readme,
+        component: `Button is used for actions on a page.
+
+### Features
+
+- **Two Variants**: Primary and Secondary styles
+- **Four Sizes**: extraSmall, small, normal, and medium
+- **Icon Support**: Display icons alongside text
+- **Loading State**: Show loading indicator during async operations
+- **Tooltip Support**: Display helpful text on hover
+- **Filled Variants**: Additional styling options with filled and filledStroke
+- **Full Width**: Scale to 100% width when needed
+
+### Accessibility
+
+The Button sets these itself, and they overwrite what you pass:
+
+- \`aria-label\`: always equal to \`label\`, so a custom one alongside a \`label\` is discarded
+- \`aria-disabled\`: set while \`isDisabled\`
+- \`aria-busy\`: set while \`isLoading\`, which also disables the button
+
+An icon-only button therefore has to carry its name in \`label\`; there is no other way in.
+
+### Usage
+
+\`\`\`tsx
+import { Button, ButtonSize } from "@onlyoffice/apps-ui-kit/components/button";
+
+// Primary button
+<Button primary size={ButtonSize.normal} label="Save" onClick={handleSave} />
+
+// Secondary button with icon
+<Button size={ButtonSize.small} icon={<Icon />} label="Cancel" />
+
+// Loading state
+<Button primary isLoading label="Saving..." />
+
+// With tooltip
+<Button label="Help" tooltipText="Click for help" />
+\`\`\``,
       },
     },
     design: {
