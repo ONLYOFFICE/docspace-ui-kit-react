@@ -3,35 +3,36 @@ import { ContextMenuModel } from "../context-menu";
 import { GuidanceRefKey } from "../../enums";
 
 export type MainButtonProps = {
-  /** Button text */
+  /** Text drawn in the button. It is the whole label: the component takes no children. */
   text?: string;
-  /** Sets the button to present a disabled state */
+  /** Whether the button is inert: it dims to 60% opacity and the click is dropped. */
   isDisabled?: boolean;
-  /** Activates a drop-down list for MainButton */
+  /** Whether clicking opens the menu built from `model`. When `false`, the click calls `onAction` instead. */
   isDropdown?: boolean;
-  /** Sets a callback function that is triggered when the button is clicked */
+  /** Called with the event when the button is clicked. Only reached while `isDropdown` is `false`. */
   onAction?: (e: React.MouseEvent) => void;
-  /** Opens DropDown */
+  /** Ignored. Nothing reads this prop, and it reaches the DOM as an unknown attribute. */
   opened?: boolean; // TODO: Make us whole
-  /** Accepts class */
+  /** Applied to the button, after the component's own classes. */
   className?: string;
-  /** Accepts id */
+  /** Applied to the button, not to the wrapper around it. */
   id?: string;
-  /** Accepts css style */
+  /** Applied to the button as inline style. */
   style?: React.CSSProperties;
-  /** Data model menu */
+  /** Items of the menu. Required even with `isDropdown={false}`, when nothing reads it. */
   model: ContextMenuModel[];
-  /** Hide the dropdown arrow while keeping dropdown functionality */
+  /** Whether the arrow beside the text is left out. The menu still opens. */
   hideArrow?: boolean;
-  /** Function to set reference map */
+  /** Registers the button's element in the portal's guidance map, for the onboarding tour.
+   * @portal */
   setRefMap?: (
     key: GuidanceRefKey,
     ref: RefObject<HTMLDivElement | null>,
   ) => void;
   /**
-   * Element used to anchor and size the dropdown. Defaults to the button's
-   * own rect; pass an outer wrapper when the button is visually nested
-   * inside a larger clickable area (e.g. inside SearchInput).
+   * Element the menu is anchored to and sized from. Without it the button's own
+   * box is used; pass an outer wrapper when the button sits inside a larger
+   * clickable area.
    */
   anchorRef?: RefObject<HTMLElement | null>;
 };

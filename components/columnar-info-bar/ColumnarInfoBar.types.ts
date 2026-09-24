@@ -1,24 +1,25 @@
 import type React from "react";
 
 export type ColumnarInfoBarColumn = {
-  /** Caption rendered above the value, at reduced emphasis */
+  /** Caption above the value, at 12px. A node, so an icon or a link works here too. */
   label: React.ReactNode;
-  /** Content of the column; any node, laid out inline with an 8px gap */
+  /** The value itself. It is a flex row with an 8px gap, so an icon placed beside the text lines up with it. */
   value: React.ReactNode;
 };
 
 export type ColumnarInfoBarProps = {
-  /** Heading rendered above the columns as an `<h3>`; omitted when empty */
+  /** Bold caption above the columns, rendered as an `<h3>` and omitted entirely when empty. */
   headerText?: string;
-  /** Label and value pairs, one column each, in order */
+  /** The label and value pairs, in order. An empty array renders the bar with nothing inside it. */
   columns: ColumnarInfoBarColumn[];
-  /** Close button click handler; the close button renders only when this is set */
+  /** Called when the close button is clicked. The button exists only while this is set, and the bar does not hide itself — take it out of the tree yourself. */
   onAction?: () => void;
-  /** Called once, after the component mounts */
+  /** Called once after mount, and never again: the effect that calls it has an empty dependency list, so a new function on a later render is ignored. */
   onLoad?: () => void;
-  /** Inline styles on the root element; the way to set the `--cib-*` custom properties */
+  /** Inline style of the bar. There is no `className` prop, so this is also where the `--cib-*` custom properties go. */
   style?: React.CSSProperties;
-  /** Visual variant: warning bar with an accent border, bordered neutral card, or in-page card with a two-column grid */
+  /** Which of the three looks to render: the warning bar with an accent edge, the bordered `neutral` card that slides open, or the padded `page` block whose columns are a two-column grid.
+   * @default "default" */
   variant?: "default" | "neutral" | "page";
   /**
    * Accessible name of the close button (its `aria-label`). Defaults to the

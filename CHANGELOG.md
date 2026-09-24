@@ -62,6 +62,26 @@ tree.
   visual-regression specs for `Selector` and `Table`
 - `ui-kit.code-workspace` and `.vscode/` — tasks for the build, the checks, Storybook, the
   E2E suite and the audit scripts, behind grouped status-bar buttons
+- A README for every component, against `README_TEMPLATE.md`: 98 folders and 11 nested
+  sub-components, each with a machine-checked metadata block and a prop table generated from
+  the JSDoc. `docs/getting-started.md`, `docs/components.md` and `docs/known-defects.md`
+  alongside them, all four `docs/` pages published in the tarball
+- `pnpm check:readme`, `readme:props:check` and `readme:catalogue:check`, in pre-push and in
+  CI; `pnpm check:readme:full` additionally type-checks every `tsx` example in every README
+- **`FilterInput` and `StatusMessage` are now named exports** as well as default ones. Both
+  were reachable only by subpath, because the root barrel re-exports folders with `export *`,
+  which drops a default. Additive: the default export of each is unchanged
+
+### Changed in the type declarations
+
+Behaviour is untouched; these are types that did not describe the component they belonged to.
+
+- **`DateTimePickerProps` now includes `translations`**, which the component has always
+  required and the exported type omitted. Code that built a `DateTimePickerProps` value
+  without it stops compiling, and was already passing an incomplete object at runtime
+- `Checkbox` and `ToggleButton` declare their input and label props directly instead of
+  `Pick`ing them out of React's attribute interfaces, so each one carries its own
+  description. The types are the same, `Checkbox.value` included
 
 ### Removed
 

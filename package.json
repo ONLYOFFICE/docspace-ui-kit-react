@@ -40,7 +40,13 @@
     "test:e2e": "pnpm run storybook-build && pnpm exec playwright test",
     "test:e2e:ui": "pnpm exec playwright test --ui",
     "test:e2e:report": "pnpm exec playwright show-report --port 9330",
-    "verify:package": "node scripts/verify-package.mjs"
+    "verify:package": "node scripts/verify-package.mjs",
+    "readme:props": "node scripts/readme-props.mjs --write",
+    "readme:props:check": "node scripts/readme-props.mjs --check",
+    "check:readme": "node scripts/check-readme.mjs",
+    "check:readme:full": "node scripts/check-readme.mjs --compile",
+    "readme:catalogue": "node scripts/readme-catalogue.mjs",
+    "readme:catalogue:check": "node scripts/readme-catalogue.mjs --check"
   },
   "//peerDependencies": "Only packages this library imports directly. Transitive dependencies of @onlyoffice/ai-chat (the assistant-ui, radix, codemirror, LLM-vendor SDKs and friends) are declared by ai-chat itself as its own peers -- re-declaring them here duplicated a list nothing kept in sync. Everything below is verified imported somewhere under this package root.",
   "peerDependencies": {
@@ -244,7 +250,11 @@
     "components/**/README.md",
     "context/**/README.md",
     "providers/**/README.md",
-    "utils/**/README.md"
+    "utils/**/README.md",
+    "docs/getting-started.md",
+    "docs/components.md",
+    "docs/public-api.md",
+    "docs/known-defects.md"
   ],
   "//sideEffects": "The stylesheets, and the proxy module emitted for each one: dist/esm/**/X.module.scss/index.js exports the class-name map and imports the CSS beside it, so a bundler that tree-shakes an unused map must still keep the import.",
   "sideEffects": [

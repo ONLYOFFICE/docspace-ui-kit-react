@@ -156,4 +156,6 @@ const RoomType = ({
   );
 };
 
+export type { RoomTypeProps };
+
 export default RoomType;

@@ -1,28 +1,35 @@
 import { ToastType } from "./Toast.enums";
 
 export type ToastProps = {
-  /** Accepts class  */
+  /** Applied to the container the toasts are stacked in. */
   className?: string;
-  /** Accepts id */
+  /** Ignored. Nothing reads this prop; the container carries no `id`. */
   id?: string;
-  /** Accepts css style  */
+  /** Applied to that container as inline style. */
   style?: React.CSSProperties;
-  /** Title inside a toast */
+  /** Ignored. A toast's title is the second argument of `toastr.success` and its siblings. */
   title?: string;
-  /** Sets the color and icon of the toast */
+  /** Ignored. A toast's type is the `toastr` method you call. */
   type?: ToastType;
-  /** Any components or data inside a toast */
+  /** Ignored. A toast's body is the first argument of `toastr.success` and its siblings. */
   data?: React.ReactNode | string;
-  /** If false: toast disappeared after clicking on any area of toast. If true: toast disappeared after clicking on close button */
+  /** Ignored. It is the fourth argument of `toastr.success` and its siblings. */
   withCross?: boolean;
-  /** Time (in milliseconds) for showing your toast. Setting in 0 let you to show toast constantly until clicking on it */
+  /** Ignored. It is the third argument of `toastr.success` and its siblings. */
   timeout?: number;
-
+  /** Whether the container renders nothing until the first client-side effect, for a server-rendered tree. */
   isSSR?: boolean;
 };
 
+/**
+ * Shape `toastr.error` unwraps a message from: an axios-style error, a fetch
+ * response or a plain `Error`. The first field that is set wins.
+ */
 export type TData = {
+  /** Body of a failed API call; `response.data.error.message` is read first. */
   response?: { data: { error: { message: string } } };
+  /** Status text of a response, read when there is no API error message. */
   statusText?: string;
+  /** Message of an `Error`, read last. */
   message?: string;
 };

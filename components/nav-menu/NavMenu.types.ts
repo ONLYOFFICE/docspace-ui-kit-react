@@ -66,12 +66,20 @@ export type NavMenuGroup = {
 };
 
 export type NavMenuProps = {
+  /** The sections of the menu, in order. A group with a `label` renders it as a caption above its items. */
   groups: NavMenuGroup[];
+  /** Id of the item or sub-item that is currently open. It highlights that entry and, through an effect, expands the section it belongs to. */
   activeItemId?: string;
+  /** Section expanded on the first render. After that the expansion is the component's own state. */
   defaultExpandedId?: string;
+  /** Plays the sliding highlight when an entry is clicked. */
   withAnimation?: boolean;
+  /** Added after the component's own classes on the `nav` element. */
   className?: string;
+  /** Your router's link component. Without it `linkData` is ignored and every entry is a `button`. */
   LinkRouter?: React.ComponentType<LinkRouterProps>;
+  /** Collapsed rail: labels become tooltips, sub-menus are not rendered, and the active section's children are flattened into the list instead. */
   iconOnly?: boolean;
+  /** Gives each section its own chevron and leaves the item body to navigation. Several sections may then be open at once. */
   withExpandControl?: boolean;
 };

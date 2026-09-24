@@ -367,3 +367,9 @@ const FileTile = ({
 };
 
 export { FileTile };
+export type {
+  FileTileProps,
+  FileItem,
+  FileItemType,
+  FileChildProps,
+} from "./FileTile.types";

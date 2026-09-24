@@ -58,9 +58,14 @@ export type ModalSubComponentsProps = AsideHeaderProps & {
   containerVisible?: boolean;
   /** Displays double line in footer */
   isDoubleFooterLine?: boolean;
-  /** Sets the displayed dialog to be closed or open */
+  /** Whether the user may close the dialog at all. Every route to `onClose` —
+   * the header's cross, Escape, a backdrop click — runs through one guard, so
+   * `false` stops all three and leaves closing entirely to the caller.
+   * @default true */
   isCloseable?: boolean;
-  /**  Disables closing the modal when the backdrop is clicked */
+  /** Whether a click on the backdrop closes the dialog. Unlike `isCloseable`,
+   * this stops only that one route; the cross and Escape keep working.
+   * @default true */
   closeOnBackdropClick?: boolean;
   /** Enables embedded mode */
   embedded?: boolean;
@@ -81,10 +86,15 @@ export type ModalSubComponentsProps = AsideHeaderProps & {
   /** Forces body scroll regardless of display type */
   withBodyScrollForcibly?: boolean;
 
+  /** Draws a one-pixel border on the dialog's inline-start edge, where an aside
+   * meets the page. Set `--modal-dialog-aside-border` to recolour it.
+   * @default false */
   withBorder?: boolean;
   /** Test id */
   dataTestId?: string;
 
+  /** Makes the body's scrollbar publish itself through `ScrollbarContext`, so a
+   * descendant can scroll it. Off unless something inside needs that. */
   scrollbarCreateContext?: boolean;
   /** Controls the visibility of the backdrop overlay */
   backdropVisible?: boolean;

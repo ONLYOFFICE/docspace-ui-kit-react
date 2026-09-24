@@ -849,4 +849,6 @@ const FilterInput = React.memo(
 
 FilterInput.displayName = "FilterInput";
 
+export { FilterInput };
+export type { FilterProps, TItem, TGroupItem } from "./Filter.types";
 export default FilterInput;

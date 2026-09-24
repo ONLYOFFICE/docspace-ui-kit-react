@@ -10,26 +10,62 @@ type HeaderIcon = {
   onClick: () => void;
 };
 
-export type AsideHeaderProps = PickedDivProps & {
-  /** Header content - can be a string or a ReactNode */
+export type AsideHeaderProps = {
+  /** Applied to the header element. */
+  className?: string;
+  /** Applied to the header element. */
+  id?: string;
+  /** Applied to the header element. */
+  style?: React.CSSProperties;
+  /**
+   * Title of the panel. A string is rendered as bold 21px text; any other node
+   * is rendered inside a `Heading` that truncates with an ellipsis. Nothing is
+   * rendered when it is absent, including no placeholder.
+   */
   header?: string | React.ReactNode;
-  /** Array of icons to display in the header */
+  /**
+   * Extra icon buttons between the title and the close cross. Each needs a
+   * `key`, an `onClick` and either `iconNode` (JSX, preferred) or `url` — a URL
+   * fetched at runtime, not an asset name.
+   */
   headerIcons?: HeaderIcon[];
-  /** Additional component to render in the header */
+  /**
+   * Arbitrary node rendered after the icons and before the close cross, for a
+   * control that is not an icon.
+   */
   headerComponent?: React.ReactNode;
-  /** Whether the header is in a loading state */
+  /**
+   * Replaces the whole header — title, icons and close cross alike — with a
+   * skeleton bar. There is no way out of a header that is loading.
+   */
   isLoading?: boolean;
-  /** Whether to hide the bottom border */
+  /**
+   * Hides the bottom border, which otherwise spans the full width of the panel
+   * regardless of the header's own side margins.
+   */
   withoutBorder?: boolean;
-  /** Custom height for the header */
+  /**
+   * Height of the header as a CSS length, applied through the
+   * `--aside-header-custom-height` custom property. Without it the header is
+   * 53px.
+   */
   headerHeight?: string;
-  /** Whether to show the close button */
+  /**
+   * Whether the close cross is rendered. It is the only control that calls
+   * `onCloseClick`.
+   * @default true
+   */
   isCloseable?: boolean;
-  /** Click handler for the close button */
+  /** Called by the close cross. */
   onCloseClick?: () => void;
-  /** Whether to show the back button */
+  /**
+   * Whether a back arrow is rendered before the title. It is mirrored in RTL.
+   * @default false
+   */
   isBackButton?: boolean;
-  /** Click handler for the back button */
+  /** Called by the back arrow. */
   onBackClick?: () => void;
+  /** Value of `data-testid` on the header.
+   * @default "aside-header" */
   dataTestId?: string;
-};
+} & PickedDivProps;

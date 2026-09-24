@@ -17,6 +17,10 @@ export type ButtonOption = {
   items?: ButtonOption[];
 };
 
+/**
+ * Left over from the progress section this menu used to carry. Nothing accepts
+ * it any more: there is no `progressOptions` prop.
+ */
 export type ProgressOption = {
   /** Controls visibility of the progress item */
   open?: boolean;
@@ -68,49 +72,49 @@ export type ActionOption = {
 };
 
 export type MainButtonMobileProps = {
-  /** Ref to access the DOM element or React component instance */
+  /** Handle exposing `contains` and `getButtonElement`, for deciding whether a click landed on the button. */
   ref?: React.RefObject<MainButtonMobileRef>;
-  /** Accepts css style */
+  /** Merged into the wrapper's inline style, after the z-index the component sets itself. */
   style?: React.CSSProperties;
-  /** Drop down items options */
+  /** Items of the upper group of the menu. An item with `items` becomes a submenu. */
   actionOptions?: ActionOption[];
-  /** Menu that opens by clicking on the button */
+  /** Items of the lower group, drawn on a background of its own. An item with `items` becomes a submenu. */
   buttonOptions?: ButtonOption[];
-  /** The function called after the button is clicked */
+  /** Ignored. Nothing reads this prop; the button's own handler is `onClick`. */
   onUploadClick?: () => void;
-  /** Displays button inside the drop down */
+  /** Ignored. Nothing reads this prop. */
   withButton?: boolean;
-  /** Opens a menu on clicking the button. Used with buttonOptions */
+  /** Whether `onClose` is called at all. It then fires on every toggle, including the one that opens the menu. */
   isOpenButton?: boolean;
-  /** The button name in the drop down */
+  /** Ignored. Nothing reads this prop; the groups have no heading. */
   title?: string;
-  /** Loading indicator */
+  /** Ignored. Nothing reads this prop; the button draws no progress. */
   percent?: number;
-  /** Width section */
+  /** Ignored. Nothing reads this prop. */
   sectionWidth?: number;
-  /** Specifies the exact width of the drop down component */
+  /** Width of the menu, as a CSS length. */
   manualWidth?: string;
-  /** Accepts class */
+  /** Applied to the wrapper that carries the button and the menu. */
   className?: string;
-  /** Sets the dropdown to open */
+  /** Whether the menu is open. It is copied into state, so a click changes it back without telling you. */
   opened?: boolean;
-  /** Closes the drop down */
+  /** Called on every toggle of the menu, and only while `isOpenButton` is set. */
   onClose?: () => void;
-  /** If you need open upload panel when clicking on alert button */
+  /** Called when the alert badge is clicked, and only while `withAlertClick` is set. */
   onAlertClick?: () => void;
-  /** Enables alert click */
+  /** Whether clicking the alert badge calls `onAlertClick`. */
   withAlertClick?: boolean;
-  /** Enables the submenu */
+  /** Whether the button opens the menu. When `false` it calls `onClick` and the menu never opens. */
   withMenu?: boolean;
-  /** If true, hides the main button */
+  /** Whether the lower group takes the plain wrapper background instead of the accent one. */
   withoutButton?: boolean;
-  /** Shows alert indicator on the button */
+  /** Whether the alert badge is drawn over the button. It is hidden while the menu is open. */
   alert?: boolean;
-  /** Click handler for the main button */
+  /** Called with the event when the button is clicked, and only while `withMenu` is `false`. */
   onClick?: (e: React.MouseEvent) => void;
-  /** Custom styles for the dropdown */
+  /** Merged into the menu's inline style. The measured height is applied after it and wins. */
   dropdownStyle?: React.CSSProperties;
-  /** Main button ref, used for guidance */
+  /** Ignored. The component uses an internal ref of the same name; use `ref` for the element. */
   mainButtonRef?: React.RefObject<HTMLDivElement | null>;
 };
 

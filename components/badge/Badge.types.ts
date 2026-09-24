@@ -3,37 +3,38 @@ import type React from "react";
 import type { TextProps } from "../text";
 
 export type BadgeProps = TextProps & {
-  /** Ref to access the DOM element or React component instance */
+  /** Attached to the outer element of the badge. */
   ref?: React.RefObject<HTMLDivElement>;
-  /** Content to be displayed inside the badge. Can be a number (e.g., notification count) or text */
+  /** What the badge says. `0`, `"0"` and an empty string hide the badge entirely — the element stays in the DOM with `display: none`.
+   * @default 0 */
   label?: string | number;
-  /** Custom border radius to adjust badge corners. Accepts CSS size values */
+  /** Corner radius of both the outer element and the pill inside it. The pill ignores it while `type` is `"high"`. */
   borderRadius?: string;
-  /** Custom padding to adjust badge spacing. Accepts CSS padding values */
+  /** Padding of the pill inside the badge. Ignored while `type` is `"high"`. */
   padding?: string;
-  /** Maximum width of the badge. Useful for text truncation. Accepts CSS size values */
+  /** Widest the pill may be. Longer text is clipped without an ellipsis. Not applied at all while `isPaidBadge` is set. */
   maxWidth?: string;
-  /** Mouse leave event handler */
+  /** Called with the event when the pointer leaves the badge. */
   onMouseLeave?: (e: React.MouseEvent) => void;
-  /** Mouse over event handler */
+  /** Called with the event when the pointer enters the badge or moves within it. */
   onMouseOver?: (e: React.MouseEvent) => void;
-  /** Disable hover effect */
+  /** Drops the pointer cursor and the hover and active background shifts, for a badge that is only a marker. */
   noHover?: boolean;
-  /** Sets badge type to high priority. Changes visual appearance */
+  /** Switches to the emphasised preset: a 6px radius, roomier padding and 13px text at weight 400. */
   type?: "high";
-  /** Custom border style for the badge. Accepts CSS border values */
+  /** CSS `border` shorthand for the outer element. The badge draws none of its own. */
   border?: string;
-  /** Custom height for the badge. Accepts CSS size values */
+  /** Height of the outer element. Without it the badge is as tall as its text. */
   height?: string;
-  /** When true, applies version badge specific styling. Used for displaying version numbers */
+  /** Lets the badge grow to its content width at tablet widths and below, where it is otherwise held to the pill's width. */
   isVersionBadge?: boolean;
-  /** When true, applies muted styling for less prominent notifications or inactive states */
+  /** Paints the badge grey, overriding `backgroundColor`, for something inactive. */
   isMutedBadge?: boolean;
-  /** When true, applies special styling for paid/premium features */
+  /** Forces white text, overriding `color`, and removes `maxWidth` so the label is never clipped. */
   isPaidBadge?: boolean;
-  /** Handler for mouse over events. Used for hover state management and interactions */
-  /** When true, applies custom hover styles */
+  /** Draws the hover background without a pointer being there, for a badge inside a row that is itself hovered. */
   isHovered?: boolean;
-  /** Data test id for testing */
+  /** Value of `data-testid` on the outer element.
+   * @default "badge" */
   dataTestId?: string;
 };

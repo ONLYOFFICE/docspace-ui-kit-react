@@ -1,7 +1,7 @@
 {
   "entry": "index.ts",
   "package": "@onlyoffice/apps-ui-kit",
-  "total": 668,
+  "total": 706,
   "values": 459,
   "exports": {
     "ADMIN": {
@@ -94,6 +94,10 @@
       "kind": "type",
       "origin": "components/article"
     },
+    "ArticleProps": {
+      "kind": "type",
+      "origin": "components/article"
+    },
     "Aside": {
       "kind": "variable",
       "origin": "components/aside"
@@ -164,6 +168,14 @@
     },
     "BaseTile": {
       "kind": "variable",
+      "origin": "components/tiles/base-tile"
+    },
+    "BaseTileItemProps": {
+      "kind": "type",
+      "origin": "components/tiles/base-tile"
+    },
+    "BaseTileProps": {
+      "kind": "type",
       "origin": "components/tiles/base-tile"
     },
     "BillingOverview": {
@@ -307,6 +319,10 @@
     "ComboButton": {
       "kind": "variable",
       "origin": "components/combobox/sub-components"
+    },
+    "CommonTileProps": {
+      "kind": "interface",
+      "origin": "components/tiles/tile-container"
     },
     "ComponentProps": {
       "kind": "type",
@@ -517,6 +533,10 @@
       "kind": "other",
       "origin": "components/drag-and-drop"
     },
+    "DragAndDropProps": {
+      "kind": "interface",
+      "origin": "components/drag-and-drop"
+    },
     "DropDown": {
       "kind": "variable",
       "origin": "components/drop-down"
@@ -584,6 +604,10 @@
     },
     "EmptyScreenContainer": {
       "kind": "variable",
+      "origin": "components/empty-screen-container"
+    },
+    "EmptyScreenContainerProps": {
+      "kind": "type",
       "origin": "components/empty-screen-container"
     },
     "EmptyScreenFormRoomProps": {
@@ -698,6 +722,10 @@
       "kind": "type",
       "origin": "components/field-container"
     },
+    "FileChildProps": {
+      "kind": "type",
+      "origin": "components/tiles/file-tile"
+    },
     "FileDtoInteger": {
       "kind": "type",
       "origin": "types",
@@ -711,12 +739,24 @@
       "kind": "variable",
       "origin": "components/file-input"
     },
+    "FileItem": {
+      "kind": "interface",
+      "origin": "components/tiles/file-tile"
+    },
+    "FileItemType": {
+      "kind": "type",
+      "origin": "components/tiles/file-tile"
+    },
     "FileStatus": {
       "kind": "enum",
       "origin": "enums"
     },
     "FileTile": {
       "kind": "variable",
+      "origin": "components/tiles/file-tile"
+    },
+    "FileTileProps": {
+      "kind": "type",
       "origin": "components/tiles/file-tile"
     },
     "FileType": {
@@ -739,6 +779,10 @@
       "kind": "enum",
       "origin": "enums"
     },
+    "FilterProps": {
+      "kind": "type",
+      "origin": "components/filter"
+    },
     "FilterSelectorTypes": {
       "kind": "enum",
       "origin": "enums"
@@ -751,8 +795,20 @@
       "kind": "variable",
       "origin": "components/floating-button"
     },
+    "FolderChildProps": {
+      "kind": "type",
+      "origin": "components/tiles/folder-tile"
+    },
+    "FolderItem": {
+      "kind": "interface",
+      "origin": "components/tiles/folder-tile"
+    },
     "FolderTile": {
       "kind": "variable",
+      "origin": "components/tiles/folder-tile"
+    },
+    "FolderTileProps": {
+      "kind": "type",
       "origin": "components/tiles/folder-tile"
     },
     "FolderType": {
@@ -806,12 +862,20 @@
       "kind": "enum",
       "origin": "components/heading"
     },
+    "HeadingProps": {
+      "kind": "type",
+      "origin": "components/heading"
+    },
     "HeadingPure": {
       "kind": "variable",
       "origin": "components/heading"
     },
     "HeadingSize": {
       "kind": "enum",
+      "origin": "components/heading"
+    },
+    "HeadingType": {
+      "kind": "type",
       "origin": "components/heading"
     },
     "HeadingWithTooltip": {
@@ -825,6 +889,10 @@
     "HelpButtonProps": {
       "kind": "type",
       "origin": "components/help-button"
+    },
+    "ICategoryItemProps": {
+      "kind": "type",
+      "origin": "components/category-item"
     },
     "ICover": {
       "kind": "type",
@@ -848,6 +916,10 @@
     },
     "ImageEditor": {
       "kind": "variable",
+      "origin": "components/image-editor"
+    },
+    "ImageEditorProps": {
+      "kind": "type",
       "origin": "components/image-editor"
     },
     "IndexIconButtons": {
@@ -954,6 +1026,10 @@
       "kind": "variable",
       "origin": "components/loader-wrapper"
     },
+    "LoaderWrapperProps": {
+      "kind": "type",
+      "origin": "components/loader-wrapper"
+    },
     "LoadingButton": {
       "kind": "variable",
       "origin": "components/loading-button"
@@ -976,6 +1052,10 @@
     },
     "MCPIcon": {
       "kind": "variable",
+      "origin": "components/mcp-icon"
+    },
+    "MCPIconProps": {
+      "kind": "type",
       "origin": "components/mcp-icon"
     },
     "MCPIconSize": {
@@ -1064,6 +1144,10 @@
     },
     "Paging": {
       "kind": "variable",
+      "origin": "components/paging"
+    },
+    "PagingProps": {
+      "kind": "interface",
       "origin": "components/paging"
     },
     "ParseErrorTypes": {
@@ -1223,6 +1307,10 @@
       "kind": "type",
       "origin": "components/room-icon"
     },
+    "RoomItem": {
+      "kind": "interface",
+      "origin": "components/tiles/room-tile"
+    },
     "RoomLogo": {
       "kind": "variable",
       "origin": "components/room-logo"
@@ -1243,8 +1331,16 @@
       "kind": "type",
       "origin": "components/room-logo-cover-dialog"
     },
+    "RoomLogoProps": {
+      "kind": "interface",
+      "origin": "components/room-logo"
+    },
     "RoomTile": {
       "kind": "variable",
+      "origin": "components/tiles/room-tile"
+    },
+    "RoomTileProps": {
+      "kind": "type",
       "origin": "components/tiles/room-tile"
     },
     "RoomType": {
@@ -1370,6 +1466,10 @@
       "kind": "type",
       "origin": "components/selector"
     },
+    "SelectOption": {
+      "kind": "interface",
+      "origin": "components/tiles/room-tile"
+    },
     "SelectedItem": {
       "kind": "variable",
       "origin": "components/selected-item"
@@ -1384,6 +1484,10 @@
     },
     "SelectionArea": {
       "kind": "variable",
+      "origin": "components/selection-area"
+    },
+    "SelectionAreaProps": {
+      "kind": "type",
       "origin": "components/selection-area"
     },
     "Selector": {
@@ -1438,12 +1542,20 @@
       "kind": "enum",
       "origin": "enums"
     },
+    "SpaceQuotaProps": {
+      "kind": "type",
+      "origin": "components/tiles/template-tile"
+    },
     "SpecialFolderScope": {
       "kind": "type",
       "origin": "components/selector"
     },
     "StatusMessage": {
       "kind": "variable",
+      "origin": "components/status-message"
+    },
+    "StatusMessageProps": {
+      "kind": "type",
       "origin": "components/status-message"
     },
     "TAccessRight": {
@@ -1554,6 +1666,10 @@
       "kind": "type",
       "origin": "components/tooltip"
     },
+    "TGroupItem": {
+      "kind": "type",
+      "origin": "components/filter"
+    },
     "TGroupMenuItem": {
       "kind": "type",
       "origin": "components/table"
@@ -1578,6 +1694,10 @@
       "kind": "type",
       "origin": "context/InterfaceDirectionContext"
     },
+    "TItem": {
+      "kind": "type",
+      "origin": "components/filter"
+    },
     "TLogo": {
       "kind": "type",
       "origin": "types"
@@ -1591,6 +1711,10 @@
       "origin": "components/room-icon"
     },
     "TNavigationItem": {
+      "kind": "type",
+      "origin": "components/navigation"
+    },
+    "TNavigationProps": {
       "kind": "type",
       "origin": "components/navigation"
     },
@@ -1870,8 +1994,16 @@
       "kind": "variable",
       "origin": "components/tags"
     },
+    "TemplateItem": {
+      "kind": "interface",
+      "origin": "components/tiles/template-tile"
+    },
     "TemplateTile": {
       "kind": "variable",
+      "origin": "components/tiles/template-tile"
+    },
+    "TemplateTileProps": {
+      "kind": "type",
       "origin": "components/tiles/template-tile"
     },
     "Text": {
@@ -1934,13 +2066,33 @@
       "kind": "type",
       "origin": "components/theme-provider"
     },
+    "TileChildProps": {
+      "kind": "type",
+      "origin": "components/tiles/base-tile"
+    },
     "TileContainer": {
       "kind": "variable",
+      "origin": "components/tiles/tile-container"
+    },
+    "TileContainerProps": {
+      "kind": "type",
       "origin": "components/tiles/tile-container"
     },
     "TileContent": {
       "kind": "variable",
       "origin": "components/tiles/tile-content"
+    },
+    "TileContentProps": {
+      "kind": "type",
+      "origin": "components/tiles/tile-content"
+    },
+    "TileItem": {
+      "kind": "type",
+      "origin": "components/tiles/tile-container"
+    },
+    "TileItemProps": {
+      "kind": "type",
+      "origin": "components/tiles/tile-container"
     },
     "TimePicker": {
       "kind": "variable",

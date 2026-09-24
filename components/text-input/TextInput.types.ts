@@ -23,7 +23,8 @@ type HTMLInputProps = Omit<
 export type TextInputProps = HTMLInputProps & {
   /** Used as HTML `id` property */
   id?: string;
-  /** Forwarded ref */
+  /** Forwarded ref. Applied to the plain input only — when `mask` is set the masked input
+   * is rendered instead and the ref is dropped. */
   forwardedRef?: React.Ref<HTMLInputElement>;
   /** Used as HTML `name` property */
   name?: string;
@@ -31,11 +32,16 @@ export type TextInputProps = HTMLInputProps & {
   type: InputType;
   /** Value of the input */
   value: string;
-  /** Default maxLength value of the input */
+  /** Maximum number of characters the field accepts; further typing is silently dropped.
+   * @default 255 */
   maxLength?: number;
-  /** Placeholder text for the input */
+  /** Placeholder text for the input. The default is a single space, not an empty string,
+   * so `:placeholder-shown` matches even when no placeholder was asked for.
+   * @default " " */
   placeholder?: string;
-  /** Used as HTML `tabindex` property */
+  /** Used as HTML `tabindex` property. The default of `-1` takes the input **out of the
+   * tab order**; pass `0` for a field the user is meant to reach with the keyboard.
+   * @default -1 */
   tabIndex?: number;
   /** Input text mask */
   mask?: Mask | ((value: string) => Mask);
@@ -69,7 +75,8 @@ export type TextInputProps = HTMLInputProps & {
   hasError?: boolean;
   /** Indicates the input field has a warning */
   hasWarning?: boolean;
-  /** Used as HTML `autocomplete` property */
+  /** Used as HTML `autocomplete` property.
+   * @default "off" */
   autoComplete?: string;
   /** Used as HTML `spellcheck` property */
   spellCheck?: boolean;
@@ -83,7 +90,8 @@ export type TextInputProps = HTMLInputProps & {
   isBold?: boolean;
   /** Indicates that component contains border */
   withBorder?: boolean;
-  /** Text direction */
+  /** Text direction.
+   * @default "auto" */
   dir?: string;
   /** Input mode for virtual keyboard */
   inputMode?:

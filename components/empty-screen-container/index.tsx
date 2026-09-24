@@ -84,4 +84,5 @@ const EmptyScreenContainer = (props: EmptyScreenContainerProps) => {
   );
 };
 
+export type { EmptyScreenContainerProps };
 export { EmptyScreenContainer };

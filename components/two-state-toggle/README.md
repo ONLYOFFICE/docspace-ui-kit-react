@@ -1,82 +1,156 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "TwoStateToggle",
+  "folder": "components/two-state-toggle",
+  "kind": "component",
+  "category": "Navigation",
+  "status": "portal-internal",
+  "summary": "Pill that switches the portal between its classic view and the new dashboard.",
+  "import": { "subpath": "components/two-state-toggle", "barrel": true, "default": false },
+  "exports": ["TwoStateToggle", "TwoStateToggleProps"],
+  "providers": ["ThemeProvider"],
+  "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
+  "related": ["toggle-button", "modal-dialog", "button"],
+  "subComponents": [],
+  "testIds": []
+} -->
+
 # TwoStateToggle
 
-A pill-shaped switch that moves the user between the new Dashboard and the classic DocSpace view. It is not a general-purpose on/off control: it reads and writes the `useDocSpace` key in `localStorage`, asks for confirmation before leaving the new view, and navigates to a fixed URL after every switch. Reach for it only where that design switch is offered; for an ordinary two-state setting use `ToggleButton`.
+Pill that switches the portal between its classic view and the new dashboard. It is
+portal-internal: the destination URLs and the storage key are written into the component, so it
+does nothing useful outside ONLYOFFICE's own application.
 
-## Usage
+## Use this when / not when
 
-```jsx
+- Use only inside the portal, to offer the switch between the classic DocSpace view and the new
+  dashboard.
+- Not as a general two-way switch. It navigates to `/dashboard` and `/`, writes the
+  `useDocSpace` key in `localStorage`, and cannot be pointed anywhere else.
+- Not for an on/off setting — [`ToggleButton`](../toggle-button/README.md) is that, and it
+  reports through `onChange` instead of navigating.
+- Not for a choice between two views inside one page; it reloads or routes away.
+
+## Import
+
+```ts
+import { TwoStateToggle } from "@onlyoffice/apps-ui-kit/components/two-state-toggle";
+```
+
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
+
+Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme`. Every string it prints is
+an English default you are expected to replace; nothing here is translated for you.
+
+## Minimal example
+
+Pass your router's navigate, or the switch reloads the whole page.
+
+```tsx
 import { TwoStateToggle } from "@onlyoffice/apps-ui-kit/components/two-state-toggle";
 
-const MyComponent = () => {
-  const navigate = useNavigate();
-
-  return <TwoStateToggle onNavigate={(url) => navigate(url)} />;
-};
+export function DesignSwitch({
+  navigate,
+}: {
+  navigate: (url: string) => void;
+}) {
+  return <TwoStateToggle onNavigate={navigate} />;
+}
 ```
 
-## Properties
+## Props
 
-| Name          | Type                  | Default                                                                             | Description                                                    |
-| ------------- | --------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| title         | string                | "DocSpace design"                                                                   | Text label at the inline start of the toggle; empty hides it   |
-| labelOld      | string                | "OLD"                                                                               | Label for the classic DocSpace view (inline-start half)        |
-| labelNew      | string                | "NEW"                                                                               | Label for the new Dashboard view (inline-end half)             |
-| confirmTitle  | string                | "Switch to Old Design"                                                              | Confirmation modal title (shown when switching NEW to OLD)     |
-| confirmBody   | string                | "You are about to leave the new Dashboard and return to the classic DocSpace view." | Confirmation modal main body text                              |
-| confirmHint   | string                | "You can return to the new Dashboard at any time by navigating to /dashboard."      | Hint shown below the body — e.g. how to return to new view     |
-| confirmOk     | string                | "Switch"                                                                            | Confirmation modal "proceed" button label                      |
-| confirmCancel | string                | "Cancel"                                                                            | Confirmation modal "cancel" button label                       |
-| ariaLabel     | string                | "Switch DocSpace design"                                                            | Accessible name of the switch button                           |
-| onNavigate    | (url: string) => void | -                                                                                   | Called with `/dashboard` or `/`; falls back to `location.href` |
-| className     | string                | -                                                                                   | Additional CSS class applied to the wrapper                    |
+<!-- props:start TwoStateToggleProps -->
 
-## Behaviour
+_Generated by `pnpm readme:props` from `TwoStateToggleProps` in `TwoStateToggle.types.ts`. Do not edit; edit the JSDoc._
 
-- **State lives in `localStorage`, not in props.** The initial position is read once, on mount, from `localStorage.useDocSpace`: `"old"` means the classic view, anything else (including no value) means the new one. There is no `value` / `onChange` pair. Storage access is guarded: if `localStorage` throws (blocked site data, a sandboxed frame), the toggle starts in the new view and still switches and navigates, it just does not persist the choice.
-- **NEW to OLD** opens a confirmation modal. Confirming writes `"old"` and navigates to `/`; cancelling or closing the modal changes nothing.
-- **OLD to NEW** switches immediately: writes `"new"` and navigates to `/dashboard`.
-- **Navigation targets are fixed.** `/dashboard` and `/` are hardcoded; `onNavigate` only decides how the navigation happens. Without it the page does a full load through `window.location.href`.
-- **Hiding parts.** An empty `title` renders only the pill; an empty `confirmHint` drops the hint from the modal.
-- **Accessibility.** The pill is a `<button role="switch">` with `aria-checked` set when the new view is active. Its accessible name comes from `ariaLabel` (default "Switch DocSpace design"); `title`, `labelOld` and `labelNew` do not change it, and the labels are hidden from assistive technology.
-- **All strings are English defaults.** Pass translated strings for every text prop, `ariaLabel` included, in a localised UI.
+| Prop            | Type                    | Required | Default                                                                               | Description                                                                                                                                                                          |
+| --------------- | ----------------------- | -------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ariaLabel`     | `string`                | no       | `"Switch DocSpace design"`                                                            | Accessible name of the switch button. The English default is not translated for you.                                                                                                 |
+| `className`     | `string`                | no       | –                                                                                     | Applied to the wrapper around the title and the pill.                                                                                                                                |
+| `confirmBody`   | `string`                | no       | `"You are about to leave the new Dashboard and return to the classic DocSpace view."` | First paragraph of that dialog.                                                                                                                                                      |
+| `confirmCancel` | `string`                | no       | `"Cancel"`                                                                            | Label of its cancel button.                                                                                                                                                          |
+| `confirmHint`   | `string`                | no       | `"You can return to the new Dashboard at any time by navigating to /dashboard."`      | Second paragraph of that dialog. An empty string removes it.                                                                                                                         |
+| `confirmOk`     | `string`                | no       | `"Switch"`                                                                            | Label of that dialog's primary button.                                                                                                                                               |
+| `confirmTitle`  | `string`                | no       | `"Switch to Old Design"`                                                              | Heading of the dialog shown when leaving the new view.                                                                                                                               |
+| `labelNew`      | `string`                | no       | `"NEW"`                                                                               | Label on the right half, the new dashboard.                                                                                                                                          |
+| `labelOld`      | `string`                | no       | `"OLD"`                                                                               | Label on the left half of the pill, the classic view.                                                                                                                                |
+| `onNavigate`    | `(url: string) => void` | no       | –                                                                                     | Called with the URL to go to — `/dashboard` or `/`, both hard-coded. Pass your router's navigate here; without it the component assigns `window.location.href` and the page reloads. |
+| `title`         | `string`                | no       | `"DocSpace design"`                                                                   | Text to the left of the pill. An empty string removes it.                                                                                                                            |
 
-## Size
+<!-- props:end -->
 
-The pill has a fixed size of 152 by 36 pixels and does not shrink; each label gets half of it. Long labels do not widen it; the pill hides whatever overflows. The wrapper is `inline-flex` with no outer margin.
+## Recipes
 
-## RTL
+### Translated
 
-`labelOld` sits at the inline start and `labelNew` at the inline end, so in a right-to-left interface the old view is on the right and the title sits to the right of the pill. The thumb slides in the mirrored direction when the `rtl` class is on `<body>`, which `ThemeProvider` sets.
+Every label is a prop with an English default, including the five strings of the confirmation
+dialog.
 
-## Styling
+```tsx
+import { TwoStateToggle } from "@onlyoffice/apps-ui-kit/components/two-state-toggle";
 
-| Variable                      | Fallback                                   | Used for                                         |
-| ----------------------------- | ------------------------------------------ | ------------------------------------------------ |
-| `--color-scheme-main-accent`  | the kit's `$light-second-main` Sass colour | Pill background, focus ring, label on the thumb  |
-| `--button-root-border-radius` | `6px`                                      | Corner radius of the pill (thumb is 2px smaller) |
-| `--text-color`                | none                                       | Colour of the `title` label                      |
-
-`--color-scheme-main-accent` and `--text-color` are set by `ThemeProvider`; the hint colour in the confirmation modal also depends on the `.light` / `.dark` class it puts on `<body>`.
-
-## Examples
-
-### Without a title
-
-```jsx
-<TwoStateToggle title="" onNavigate={(url) => navigate(url)} />
+export function TranslatedSwitch({
+  t,
+  navigate,
+}: {
+  t: (key: string) => string;
+  navigate: (url: string) => void;
+}) {
+  return (
+    <TwoStateToggle
+      title={t("DesignTitle")}
+      labelOld={t("DesignOld")}
+      labelNew={t("DesignNew")}
+      confirmTitle={t("SwitchTitle")}
+      confirmBody={t("SwitchBody")}
+      confirmHint={t("SwitchHint")}
+      confirmOk={t("Switch")}
+      confirmCancel={t("Cancel")}
+      onNavigate={navigate}
+    />
+  );
+}
 ```
 
-### Custom labels
+## Behaviour the types don't state
 
-```jsx
-<TwoStateToggle
-  title="Interface"
-  labelOld="v1"
-  labelNew="v2"
-  confirmTitle="Switch to v1?"
-  confirmBody="You will be taken back to the classic interface."
-  confirmHint="Return to v2 anytime via /dashboard."
-  confirmOk="Yes, switch"
-  confirmCancel="Stay on v2"
-/>
-```
+- **The destinations are hard-coded.** Switching to the new view goes to `/dashboard`, switching
+  back goes to `/`. Neither is a prop.
+- **The state lives in `localStorage` under `useDocSpace`**, written as `"new"` or `"old"`, and
+  it is read once during the first render. Anything absent or not `"old"` counts as the new view.
+- **A storage failure is swallowed, not reported.** Both the read and the write are wrapped, so
+  disabled site data, a private mode or a sandboxed frame no longer throws — but a failed read
+  silently reports the new view and a failed write is dropped, leaving the toggle correct on
+  screen and forgotten on the next load. The read still happens during the first render, so a
+  server-rendered page and its hydration can disagree about which half is selected.
+- **The two directions are not symmetrical.** Leaving the new view opens a confirmation
+  [`ModalDialog`](../modal-dialog/README.md); returning to it happens immediately, with no
+  dialog.
+- **Without `onNavigate` the page reloads**, because the component assigns
+  `window.location.href`. Pass your router's navigate to keep the application alive.
+- **There is no controlled mode.** No prop sets which side is active, and nothing reports a
+  change other than the navigation itself.
+- `title` and `confirmHint` are each removed by passing an empty string.
+
+## Accessibility
+
+- The pill is a real `<button>` with `role="switch"` and `aria-checked`, so it is focusable and
+  operable from the keyboard.
+- **Its name is the hardcoded English "Switch DocSpace design"** and cannot be overridden, so the
+  announced name will not match a translated interface.
+- The OLD and NEW labels are `aria-hidden`, which is right — but it means the only thing
+  announced is that unchangeable name plus the checked state.
+- The confirmation dialog is [`ModalDialog`](../modal-dialog/README.md) and inherits its focus
+  behaviour.
+
+## Test ids
+
+The component sets no `data-testid` of its own. Query it by its `role="switch"`, or pass a
+`className` and use that.
+
+## Related
+
+- [`ToggleButton`](../toggle-button/README.md) — the general on/off switch.
+- [`ModalDialog`](../modal-dialog/README.md) — the confirmation it opens.
+- [`Button`](../button/README.md) — the two buttons in that dialog.

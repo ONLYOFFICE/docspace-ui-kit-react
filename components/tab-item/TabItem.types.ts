@@ -1,22 +1,22 @@
 import React from "react";
 
 export type TTabItemProps = {
-  /** Tab item text. */
+  /** Text of the pill. */
   label: string | React.ReactNode;
-  /** Callback function when tab is selected. */
+  /** Called with the click event whenever the pill is clicked and not blocked by `isDisabled` or `lockLastSelection`. */
   onSelect?: (event: React.MouseEvent<HTMLDivElement>) => void;
-  /** Determines if the tab is currently active. */
+  /** Whether the pill starts selected. The component then keeps that state itself; changing this prop re-syncs it. */
   isActive?: boolean;
-  /** Determines if the tab is disabled and cannot be interacted with. */
+  /** Whether the pill is inert. Pointer events are dropped in CSS as well, unless it is also active. */
   isDisabled?: boolean;
-  /** Allows the tab to be deselected, resulting in no active tab. */
+  /** Freezes the selected look at whatever it was on mount, so the pill can be driven by something other than its own clicks. */
   allowNoSelection?: boolean;
-  /** Enables multi-select functionality */
+  /** Whether clicking an already selected pill deselects it. Without this a selected pill stays selected. */
   withMultiSelect?: boolean;
-  /** Sets a tab class name */
+  /** Applied to the outermost element. */
   className?: string;
-  /** Sets a tab data-testid */
+  /** `data-testid` of the outermost element. */
   dataTestId?: string;
-  /** Locks the last selected tab */
+  /** Whether a click on an already selected pill is dropped entirely — `onSelect` does not fire either. */
   lockLastSelection?: boolean;
 };

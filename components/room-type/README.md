@@ -1,101 +1,242 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "RoomType",
+  "folder": "components/room-type",
+  "kind": "component",
+  "category": "Data display",
+  "status": "portal-internal",
+  "summary": "Row offering one kind of room, with its glyph, its translated name and its description.",
+  "import": { "subpath": "components/room-type", "barrel": false, "default": true },
+  "exports": ["default", "RoomTypeProps"],
+  "providers": ["ThemeProvider", "TranslationProvider"],
+  "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
+  "related": ["room-logo", "room-icon", "drop-down"],
+  "subComponents": [],
+  "testIds": ["room-type-list-item", "room-type-dropdown-button", "room-type-dropdown-item"]
+} -->
+
 # RoomType
 
-A card describing one kind of DocSpace room — its logo, localized title and description, and a forward arrow. Reach for it when a user chooses what kind of room to create: as a row in a list of room types, as the button that shows the current choice and opens a dropdown, or as an entry inside that dropdown. The title and description come from the `Common` translation namespace, keyed by `roomType`.
+Row offering one kind of room, with its glyph, its translated name and its description. It is
+the "choose a room type" step of the portal's create-room flow, in three layouts: a card in the
+list, the collapsed button at the top of a dropdown, and an entry inside that dropdown.
 
-## Usage
+## Use this when / not when
 
-```jsx
+- Use when you are reproducing the portal's room-creation picker and want its exact wording.
+- Not for the glyph alone — that is [`RoomLogo`](../room-logo/README.md), which this component
+  renders inside itself.
+- Not for a particular existing room — that is [`RoomIcon`](../room-icon/README.md).
+- Not as a generic option row: every string is a `Common` translation key of the DocSpace
+  portal, so a row about anything else comes out blank.
+
+**Portal-internal.** All six titles and all six descriptions come from the portal's `Common`
+namespace (`CollaborationRoomTitle`, `VirtualDataRoomDescription`, `FormFilingRoomInfo` and so
+on). Without those translations loaded the row renders a glyph and two empty lines.
+
+## Import
+
+```ts
+import RoomType from "@onlyoffice/apps-ui-kit/components/room-type";
+```
+
+It is a **default** export, so the name is yours to choose. `components/index.ts`
+re-exports this folder with `export *`, which carries named exports and drops defaults — the
+component is **not in the root barrel**, and the subpath above is the only way to it.
+
+Needs `TranslationProvider` above it, with the portal's `Common` namespace, or every label is
+empty and i18next logs a missing-key error. Needs `ThemeProvider` for its borders and hover
+backgrounds.
+
+## Minimal example
+
+```tsx
 import RoomType from "@onlyoffice/apps-ui-kit/components/room-type";
 import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
 
-const MyComponent = () => {
+export function RoomTypePicker({ onPick }: { onPick: () => void }) {
   return (
     <RoomType
-      roomType={RoomsType.EditingRoom}
+      roomType={RoomsType.FormRoom}
       isOpen={false}
-      selectedId="room-1"
-      onClick={handleClick}
+      selectedId=""
+      onClick={onPick}
     />
   );
-};
+}
 ```
 
-The folder barrel has a **default** export only. The package root re-exports it by name as `RoomType`.
+## Props
 
-## Properties
+<!-- props:start -->
 
-| Name               | Type                                             | Default    | Description                                                                    |
-| ------------------ | ------------------------------------------------ | ---------- | ------------------------------------------------------------------------------ |
-| roomType           | RoomsType                                        | -          | Room type whose logo, title and description are shown                          |
-| isOpen             | boolean                                          | -          | Open state; on `dropdownButton` it adds the open border and reverses the arrow |
-| type               | "listItem" \| "dropdownButton" \| "dropdownItem" | "listItem" | Display variant                                                                |
-| id                 | string                                           | -          | DOM `id` of the root element                                                   |
-| selectedId         | string \| number                                 | -          | Written to the root element as `data-selected-id`; not used for rendering      |
-| onClick            | MouseEventHandler\<HTMLElement\>                 | -          | Click handler on the root element, arrow included; not called while disabled   |
-| disabledFormRoom   | boolean                                          | -          | Disables a `FormRoom` item (`listItem` and `dropdownItem`)                     |
-| disabledPublicRoom | boolean                                          | -          | Disables a `PublicRoom` item (`listItem` and `dropdownItem`)                   |
-| isTemplate         | boolean                                          | -          | Shows the "from template" title and description; also passed to `RoomLogo`     |
-| isTemplateRoom     | boolean                                          | -          | Passed to `RoomLogo` as `isTemplateRoom`                                       |
-| isFormSection      | boolean                                          | -          | Shows the form-set title and description instead of the room type's            |
+_Generated by `pnpm readme:props` from `RoomTypeProps` in `RoomType.types.ts`. Do not edit; edit the JSDoc._
 
-## Requirements
+| Prop                 | Type                                               | Required | Default      | Description                                                                                                                                    |
+| -------------------- | -------------------------------------------------- | -------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `isOpen`             | `boolean`                                          | **yes**  | –            | Whether the row is drawn as opened: an accent border on `dropdownButton`, and its arrow turned the other way.                                  |
+| `onClick`            | `React.MouseEventHandler<HTMLElement>`             | **yes**  | –            | Called with the event when the row is clicked, once per click wherever inside the row it lands. A disabled row does not call it at all.        |
+| `selectedId`         | `number \| string`                                 | **yes**  | –            | Written to `data-selected-id` and read by nothing else. Required all the same.                                                                 |
+| `disabledFormRoom`   | `boolean`                                          | no       | –            | Greys the row out while `roomType` is `FormRoom`, marks it `aria-disabled` and stops it calling `onClick`.                                     |
+| `disabledPublicRoom` | `boolean`                                          | no       | –            | Greys the row out while `roomType` is `PublicRoom`, marks it `aria-disabled` and stops it calling `onClick`.                                   |
+| `id`                 | `string`                                           | no       | –            | `id` of the outer element.                                                                                                                     |
+| `isFormSection`      | `boolean`                                          | no       | –            | Uses the form-set wording for the title and the description instead of the room type's.                                                        |
+| `isTemplate`         | `boolean`                                          | no       | –            | Replaces the title and the description with the "from template" wording, whatever `roomType` says, and switches the glyph to the template one. |
+| `isTemplateRoom`     | `boolean`                                          | no       | –            | Switches the glyph to the template variant of `roomType` without touching the texts.                                                           |
+| `roomType`           | `RoomsType`                                        | no       | –            | Which room type the row describes. It picks the glyph, the title and the description; an unknown value leaves both texts empty.                |
+| `type`               | `"dropdownButton" \| "dropdownItem" \| "listItem"` | no       | `"listItem"` | Which layout to render.                                                                                                                        |
 
-- **Translations.** The component calls `useTranslation(["Common"])` from `react-i18next`, so it needs an i18next instance with the `Common` namespace loaded — `TranslationProvider` or the portal's own. Keys used: `CollaborationRoomTitle`, `VirtualDataRoom`, `CustomRoomTitle`, `AIRoomTitle`, `PublicRoom`, `FormFilingRoomTitle`, `FromTemplate`, `FormSetTitle` and the matching descriptions (`CollaborationRoomDescription`, `VirtualDataRoomDescription`, `CustomRoomDescription`, `AIRoomDescription`, `PublicRoomInfo`, `FormFilingRoomInfo`, `FromTemplateRoomInfo`, `SetTemplateDescription`, `FormSetDescription`). A `roomType` outside that set gets an empty title and description.
-- **Theme class.** The default colours are defined only under a `.light` or `.dark` ancestor class, which `ThemeProvider` puts on `<body>`. Without one, and without the overrides below, the item has no border, background or description colour.
+<!-- props:end -->
 
-## Behaviour
+## Recipes
 
-- **Title precedence.** `isFormSection` wins over `isTemplate`, which wins over `roomType`.
-- **Disabled.** An item is disabled only when it is a `FormRoom` with `disabledFormRoom` or a `PublicRoom` with `disabledPublicRoom`, and only the `listItem` and `dropdownItem` variants honour it. A disabled item does not call `onClick`, carries `aria-disabled="true"` and loses the pointer cursor. It also drops its title tooltip and carries `data-tooltip-id="create-room-tooltip"`, so the host can render a `Tooltip` with that id to explain why.
-- **Arrow.** The arrow is decoration inside the clickable root and has no handler of its own, so clicking it calls `onClick` once, like any other part of the item. `listItem` shows a forward arrow; `dropdownButton` rotates it a quarter turn one way, and the other way while `isOpen`; `dropdownItem` hides it.
-- **Test ids.** The root carries `room-type-list-item`, `room-type-dropdown-button` or `room-type-dropdown-item`, by variant.
+### The list of types
 
-## Layout
+The default layout is `listItem`: a bordered card, full width, with the forward arrow on the
+trailing edge.
 
-The root is `width: 100%` with `16px` padding and a `12px` gap between logo, text and arrow. It has no outer margin.
+```tsx
+import RoomType from "@onlyoffice/apps-ui-kit/components/room-type";
+import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
 
-## RTL
+const TYPES = [
+  RoomsType.FormRoom,
+  RoomsType.EditingRoom,
+  RoomsType.PublicRoom,
+  RoomsType.VirtualDataRoom,
+];
 
-The forward arrow is mirrored under an `.rtl` ancestor class, which `ThemeProvider` puts on `<body>`, not under `[data-dir="rtl"]`. The arrow is pushed to the inline end with a logical margin.
-
-## Styling
-
-Component-level CSS variables, set on the item or any ancestor:
-
-| Variable                        | Fallback                                      | Description                      |
-| ------------------------------- | --------------------------------------------- | -------------------------------- |
-| `--room-type-item-bg`           | `var(--room-type-list-item-background)`       | Item background                  |
-| `--room-type-item-border`       | `var(--room-type-list-item-border)`           | Item border colour               |
-| `--room-type-item-hover-bg`     | `var(--room-type-list-item-hover-background)` | Item background on hover         |
-| `--room-type-description-color` | `var(--room-type-list-item-description-text)` | Description text colour          |
-| `--room-type-item-radius`       | `6px`                                         | Border radius                    |
-| `--room-type-item-padding`      | `16px`                                        | Inner padding                    |
-| `--room-type-gap`               | `12px`                                        | Gap between logo, text and arrow |
-
-The fallbacks are theme values set under `.light` / `.dark`. The table names the `listItem` ones; `dropdownButton` falls back to its own `--room-type-dropdown-button-*` values, and `dropdownItem` to its own hover and description values. The `dropdownItem` background still falls back to the `listItem` value (`none`), not to `--room-type-dropdown-item-background`. The pressed and open border colour is the portal accent, `--accent-main`, and has no component-level override; neither has the disabled background.
-
-## Examples
-
-### Dropdown button
-
-```jsx
-<RoomType
-  roomType={RoomsType.PublicRoom}
-  isOpen={true}
-  type="dropdownButton"
-  selectedId="room-2"
-  onClick={handleClick}
-/>
+export function ChooseRoomType({
+  onPick,
+}: {
+  onPick: (type: RoomsType) => void;
+}) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {TYPES.map((type) => (
+        <RoomType
+          key={type}
+          roomType={type}
+          isOpen={false}
+          selectedId={type}
+          onClick={() => onPick(type)}
+        />
+      ))}
+    </div>
+  );
+}
 ```
 
-### Dropdown item
+### The collapsed picker
 
-```jsx
-<RoomType
-  roomType={RoomsType.CustomRoom}
-  isOpen={false}
-  type="dropdownItem"
-  selectedId="room-3"
-  onClick={handleClick}
-/>
+`type="dropdownButton"` is the chosen row with a chevron that points down, and up while
+`isOpen`. The list under it is yours — a [`DropDown`](../drop-down/README.md) holding rows of
+`type="dropdownItem"`.
+
+```tsx
+import { useState } from "react";
+import RoomType from "@onlyoffice/apps-ui-kit/components/room-type";
+import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
+
+export function RoomTypeSelect() {
+  const [open, setOpen] = useState(false);
+  const [picked, setPicked] = useState(RoomsType.FormRoom);
+
+  return (
+    <div>
+      <RoomType
+        roomType={picked}
+        type="dropdownButton"
+        isOpen={open}
+        selectedId={picked}
+        onClick={() => setOpen((value) => !value)}
+      />
+      {open
+        ? [RoomsType.FormRoom, RoomsType.EditingRoom].map((type) => (
+            <RoomType
+              key={type}
+              roomType={type}
+              type="dropdownItem"
+              isOpen={false}
+              selectedId={type}
+              onClick={() => {
+                setPicked(type);
+                setOpen(false);
+              }}
+            />
+          ))
+        : null}
+    </div>
+  );
+}
 ```
+
+## Behaviour the types don't state
+
+- **The arrow carries no handler of its own.** It sits inside the row, which already handles the
+  click, so one click is one call. It is given `isClickable` only while the row is enabled, which
+  is what keeps the pointer cursor on it.
+- **A disabled row refuses the click.** `disabledFormRoom` and `disabledPublicRoom` add a class,
+  swap the tooltip for the portal-wide `create-room-tooltip` anchor, drop the `title`, mark the
+  row `aria-disabled` and return before `onClick`. It is still in the tab order — `aria-disabled`
+  describes the state rather than removing the element.
+- **`selectedId` is required and does nothing.** It is written to `data-selected-id` and read
+  nowhere in the component.
+- **A fourth layout exists in the stylesheet and cannot be reached.** `displayItem` — a static
+  card with no arrow — is the fallback branch, but `type` defaults to `listItem` and its union
+  has only the three names, so nothing can select it.
+- **Ten of the sixteen theme variables are dead.** Every layout resolves its background, border,
+  hover colour and description colour through the same `--room-type-list-item-*` set, so the
+  `--room-type-dropdown-button-*`, `--room-type-dropdown-item-*` (except the disabled one) and
+  `--room-type-display-item-*` declarations are never read. The visible consequence is that a
+  `dropdownItem` is transparent rather than the solid white or black it was given.
+- **The `:active` border on a list item never appears.** It reads
+  `--current-color-scheme-main-accent`, which nothing in the kit defines — the theme provider
+  writes `--color-scheme-main-accent`.
+- **`isTemplate` overrides the wording entirely**, both lines, whatever `roomType` is, while
+  `isTemplateRoom` changes only the glyph. `isFormSection` takes precedence over both.
+- **The row is `width: 100%` with 16px of padding** and no maximum, so it fills whatever holds
+  it; the gap between rows is the container's.
+- **The title is a tooltip too** — it is passed to the wrapping `TooltipContainer`, so the kit's
+  shared tooltip repeats the type's name on hover, provided `RootTooltip` is mounted. A disabled
+  row passes an empty string instead.
+
+## CSS variables
+
+| Variable                        | Default    | Effect                                        |
+| ------------------------------- | ---------- | --------------------------------------------- |
+| `--room-type-item-bg`           | none       | Background of every layout                    |
+| `--room-type-item-border`       | light grey | Border of the list item and dropdown button   |
+| `--room-type-item-hover-bg`     | light grey | Hover background                              |
+| `--room-type-description-color` | grey       | Colour of the second line                     |
+| `--room-type-item-radius`       | `6px`      | Corner radius                                 |
+| `--room-type-item-padding`      | `16px`     | Inner padding                                 |
+| `--room-type-gap`               | `12px`     | Gap between the glyph, the text and the arrow |
+
+## Accessibility
+
+- The row is a `<div>` with a click handler and no role, no `tabIndex` and no key handler, in
+  every layout. It cannot be reached or activated from the keyboard, and a picker built from
+  these rows is unusable without a pointer — wrap each row in your own button if that matters.
+- The arrow inside is an `IconButton` and is focusable, which makes the only reachable control a
+  decorative one.
+- A greyed-out row carries `aria-disabled`, so its state is announced — but it stays focusable and
+  is not removed from the tab order, which is the usual trade `aria-disabled` makes.
+- The glyph is decorative and unlabelled; the accessible content of the row is its two lines of
+  translated text.
+
+## Test ids
+
+| Layout           | `data-testid`               |
+| ---------------- | --------------------------- |
+| `listItem`       | `room-type-list-item`       |
+| `dropdownButton` | `room-type-dropdown-button` |
+| `dropdownItem`   | `room-type-dropdown-item`   |
+
+Every layout also carries `data-selected-id`. There is no prop to change any of these.
+
+## Related
+
+- [`RoomLogo`](../room-logo/README.md) — the glyph this row draws, on its own.
+- [`RoomIcon`](../room-icon/README.md) — an existing room rather than a kind of room.
+- [`DropDown`](../drop-down/README.md) — the surface the `dropdownItem` rows are meant to sit in.

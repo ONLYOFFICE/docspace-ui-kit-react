@@ -7,20 +7,31 @@ import type { AsideHeaderProps } from "./aside-header";
  */
 export type AsideProps = AsideHeaderProps &
   AriaAttributes & {
-    /** Controls the visibility of the aside panel */
+    /** Whether the panel is slid in. It only switches a CSS transform — the
+     * panel and its children stay mounted and in the tab order either way, so
+     * render the component conditionally to close it properly. */
     visible: boolean;
-    /** Enables scaling animation */
+    /** Makes the panel take the full width of the viewport instead of its
+     * 480px.
+     * @default false */
     scale?: boolean;
-    /** Additional CSS class names */
+    /** Applied to the `<aside>` element. */
     className?: string;
-    /** Sets the z-index of the aside panel */
+    /** Stacking order of the panel. It sits above the page but below nothing
+     * in particular — a `Backdrop` of your own needs a lower value.
+     * @default 400 */
     zIndex?: number;
-    /** Content to be rendered inside the aside panel */
+    /** Content of the panel, below the header. */
     children: React.ReactNode;
-    /** Disables body scroll when aside is open */
+    /** Renders the children directly instead of inside the kit's `Scrollbar`.
+     * It does **not** lock the page's scroll, despite the name.
+     * @default false */
     withoutBodyScroll?: boolean;
-    /** Callback function when the aside is closed */
+    /** Called by the header's close cross. Nothing else closes the panel: there
+     * is no backdrop, no Escape handling and no click-outside. */
     onClose?: () => void;
-    /** Removes the header section if true */
+    /** Renders no header at all — which also removes the only control that
+     * calls `onClose`.
+     * @default false */
     withoutHeader?: boolean;
   };

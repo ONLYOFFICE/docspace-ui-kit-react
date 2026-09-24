@@ -9,7 +9,7 @@ import { TabsTypes } from "./Tabs.enums";
 import type { TabsProps, TTabItem } from "./Tabs.types";
 
 const meta = {
-  title: "UI/Data display/Tabs",
+  title: "UI/Navigation/Tabs",
   component: Tabs,
   parameters: {
     docs: {

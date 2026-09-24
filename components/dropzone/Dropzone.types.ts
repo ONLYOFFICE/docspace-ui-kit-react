@@ -4,53 +4,54 @@ import type { FC, SVGProps } from "react";
 export type SvgIconComponent = FC<SVGProps<SVGSVGElement>>;
 
 type BaseDropzoneProps = {
-  /** Shows loading state of the dropzone */
+  /** Replaces the whole drop area with a loader. While it is set there is nothing to drop on and no file input in the DOM. Required. */
   isLoading: boolean;
-  /** Upload progress percentage (0-100) shown when isLoading is true */
+  /** Percentage for the progress bar shown in place of the plain loader while `isLoading`. Leave it out and the loader is an indeterminate spinner. */
   uploadPercent?: number;
-  /** Disables the dropzone */
+  /** Blocks clicking, the keyboard and dropping, and sets `aria-disabled`. */
   isDisabled?: boolean;
-  /** Enables folder upload mode instead of file upload */
+  /** Switches to picking a directory: it replaces the file input with a `webkitdirectory` one, opens that input on any click in the area, and makes `accept` be ignored. */
   isFolderUpload?: boolean;
-  /** Allows multiple files/folders upload. When false, only one item is accepted (default: true) */
+  /** Whether more than one file — or, in folder mode, more than one root folder — may be dropped at once. When it is `false` an over-large drop is refused whole. */
   isMultipleUpload?: boolean;
-  /** Called when user tries to upload multiple items in single upload mode */
+  /** Called instead of `onDrop` when a single-upload rule refuses the drop. Nothing is uploaded and nothing is said to the user by the component. */
   onSingleUploadError?: () => void;
-  /** Main text displayed in the dropzone */
+  /** The first, accent-coloured line. It is also the click target that opens the file dialog. Not translated for you. */
   linkMainText: string;
-  /** Secondary text displayed in the dropzone */
+  /** The line after it, in the body colour. Not translated for you. */
   linkSecondaryText: string;
-  /** Text displaying supported file types (short version) */
+  /** The short list of supported formats under the two lines. Not translated for you. */
   exstsText: string;
-  /** Full text displaying all supported file types (shown in dropdown) */
+  /** The full list, shown in a drop-down when the short line is clicked. Without it that line is not clickable. */
   fullExstsText?: string;
-  /** Value for plus badge showing additional formats count */
+  /** Drawn as a `+N` pill beside the short format list. `0` and no value both leave it out. */
   formatsPlusBadgeValue?: number;
-  /** Maximum number of files allowed (0 for unlimited) */
+  /** Largest number of files the drop library accepts; `0` means no limit. */
   maxFiles?: number;
-  /** Optional icon URL (string) or SVG component to display */
+  /** Picture above the text: a URL, or an SVG component the dropzone renders itself. */
   icon?: string | SvgIconComponent;
-  /** Optional className for the icon */
+  /** Added after the component's own class on the icon. */
   iconClassName?: string;
-  /** Optional className for the dropzone container */
+  /** Added after the component's own class on the outer element. */
   className?: string;
-  /** Optional className for the loader */
+  /** Added after the component's own classes on the loader or the progress bar. */
   loaderClassName?: string;
 };
 
 type FileDropHandler<T extends File = File> = (acceptedFiles: T[]) => void;
 
 export type DropzoneProps = BaseDropzoneProps & {
-  /** Accepted file types (string[]) */
+  /** Accepted types, in react-dropzone 11's form: a MIME type, an extension such as `.docx`, a comma-separated list of either, or an array of them. Ignored in folder mode. Required. */
   accept: string | string[];
-  /** Custom function to get files from drop event */
+  /** Replaces the component's own reader, which is what walks a dropped directory and attaches each file's path. Override it only if you need both. */
   getFilesFromEvent?: (
     event: DropEvent,
   ) => Promise<(File | DataTransferItem)[]> | (File | DataTransferItem)[];
-  /** Callback when files are dropped */
+  /** Called with the accepted files. An empty result never reaches it, and neither does a drop refused by the single-upload rule. */
   onDrop?: FileDropHandler;
-  /** Callback when files are rejected (e.g., wrong file type) */
+  /** Called with the files the drop library refused — wrong type, or more than `maxFiles`. */
   onDropRejected?: (fileRejections: FileRejection[]) => void;
-  /** Data test id */
+  /** Value of `data-testid` on the outer element.
+   * @default "dropzone" */
   dataTestId?: string;
 };

@@ -1,21 +1,22 @@
-/** Base tile item data structure */
+/** The shape `TileContainer` reads off each child to decide which group it belongs to. */
 export type TileItem = {
-  /** Indicates if the item is a folder */
+  /** Sorts the tile into the folders group, unless `isRoom` is set or `fileExst` is present. */
   isFolder?: boolean;
-  /** Indicates if the item is a room */
+  /** Sorts the tile into the rooms group, which is rendered first and gets no heading. */
   isRoom?: boolean;
-  /** File extension */
+  /** Presence of an extension keeps the tile out of the folders group. */
   fileExst?: string;
-  /** Unique identifier for the item */
+  /** React key of the wrapper the container puts around the tile. The literal `-1` also counts as a folder — it is the portal's "up one level" row. */
   id: number | string;
+  /** Sorts the tile into the templates group, which is rendered after the rooms and gets no heading. */
   isTemplate?: boolean;
-  /** Optional display title */
+  /** Title of the item, used as the context menu's header. */
   title?: string;
-  /** Optional alternative display name */
+  /** Used as the context menu's header when there is no `title`. */
   displayName?: string;
-  /** Optional icon identifier */
+  /** Icon of the item, passed to the context menu's header. */
   icon?: string;
-  /** Optional logo data used by tiles/headers */
+  /** Logo of the item, passed to the context menu's header. */
   logo?: {
     original?: string;
     large?: string;
@@ -26,61 +27,62 @@ export type TileItem = {
   };
 };
 
-/** Common properties for tile items */
+/** The props every tile in the family shares. */
 export interface CommonTileProps {
-  /** Indicates if the tile is selected */
+  /** Whether the tile is selected. */
   checked?: boolean;
-  /** Indicates if the tile is in active state */
+  /** Whether the tile is the one the keyboard or the context menu is acting on. */
   isActive?: boolean;
-  /** Indicates if the tile is in a blocking operation state */
+  /** Whether an operation is blocking the tile, which dims it. */
   isBlockingOperation?: boolean;
-  /** Child elements */
+  /** The tile's own content; the first child is the one the tiles treat as their content element. */
   children?: React.ReactNode;
-  /** Checkbox indeterminate state flag */
+  /** Draws the checkbox in its indeterminate state. */
   indeterminate?: boolean;
-  /** Additional React element */
+  /** The icon beside the checkbox. Without it neither the icon nor the checkbox is rendered. */
   element?: React.ReactNode;
-  /** Badges to display */
+  /** Badges drawn over the tile. */
   badges?: React.ReactNode;
-  /** Click handler for the thumbnail */
+  /** Called when the thumbnail is clicked. */
   thumbnailClick?: (e: React.MouseEvent) => void;
-  /** Selection handler */
+  /** Called with the new checked state when the tile is selected. */
   onSelect?: (checked: boolean) => void;
-  /** Class name for styling */
+  /** Added after the component's own classes. */
   className?: string;
-  /** Style object for inline styling */
+  /** Inline style of the tile. */
   style?: React.CSSProperties;
 }
 
-/** Props for individual tile items */
+/** What `TileContainer` expects to find on a child: anything, as long as it carries `item`. */
 export type TileItemProps = CommonTileProps & {
-  /** The tile item data */
+  /** The item the container sorts by. A child without this prop is dropped. */
   item: TileItem;
 };
 
 export type TileContainerProps = {
-  /** Child elements to be rendered within the container */
+  /** The tiles. Each one must carry an `item` prop; a child without it is silently dropped, including plain markup. */
   children: React.ReactNode;
-  /** Additional CSS class names */
+  /** Added before the component's own class on the outer element. */
   className?: string;
-  /** Container's HTML id attribute */
+  /** Value of `id` on the outer element.
+   * @default "tileContainer" */
   id?: string;
-  /** Inline styles for the container */
+  /** Inline style of the outer element, and where `--tile-container-gap` goes. */
   style?: React.CSSProperties;
-  /** Flag to enable React Window for virtualization */
+  /** Hands the four groups to `infiniteGrid` instead of wrapping each in its own grid. Without an `infiniteGrid` alongside it the tiles are emitted with no grid at all. */
   useReactWindow?: boolean;
-  /** Component for rendering infinite grid layout */
+  /** The virtualising grid to render the tiles into. It is told whether the current run is rooms or templates. */
   infiniteGrid?: React.ComponentType<{
     children: React.ReactNode;
     isRooms?: boolean;
     isTemplates?: boolean;
   }>;
-  /** Custom heading for folders section */
+  /** Heading above the folders group. It is rendered only when that group has something in it. */
   headingFolders?: React.ReactNode;
-  /** Custom heading for files section */
+  /** Heading above the files group. It is rendered only when that group has something in it. */
   headingFiles?: React.ReactNode;
-  /** Flag to indicate descending order */
+  /** Flips the arrow class on both headings. It sorts nothing. */
   isDesc?: boolean;
-  /** Disables text selection */
+  /** Turns off text selection across the whole container. */
   noSelect?: boolean;
 };

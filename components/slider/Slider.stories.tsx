@@ -7,7 +7,7 @@ import { Slider } from ".";
 import type { SliderProps } from "./Slider.types";
 
 const meta = {
-  title: "UI/Interactive elements/Slider",
+  title: "UI/Form controls/Slider",
   component: Slider,
   parameters: {
     docs: {

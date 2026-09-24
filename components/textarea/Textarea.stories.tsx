@@ -7,7 +7,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Textarea } from ".";
 
 const meta = {
-  title: "UI/Interactive elements/Textarea",
+  title: "UI/Form controls/Textarea",
   component: Textarea,
   parameters: {
     docs: {

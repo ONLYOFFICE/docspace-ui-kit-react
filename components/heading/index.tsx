@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 
 import styles from "./Heading.module.scss";
-import { HeadingProps } from "./Heading.types";
+import type { HeadingProps, HeadingType } from "./Heading.types";
 import { HeadingLevel, HeadingSize } from "./Heading.enums";
 import { withTooltip } from "../tooltip";
 
@@ -64,4 +64,5 @@ const Heading = React.memo(HeadingPure);
 
 const HeadingWithTooltip = withTooltip(Heading);
 
+export type { HeadingProps, HeadingType };
 export { Heading, HeadingSize, HeadingLevel, HeadingWithTooltip };

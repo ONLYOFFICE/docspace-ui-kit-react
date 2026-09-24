@@ -1,41 +1,181 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "DateTimePicker",
+  "folder": "components/date-time-picker",
+  "kind": "component",
+  "category": "Form controls",
+  "status": "public",
+  "summary": "A date chip and a time beside it, editable in place.",
+  "import": { "subpath": "components/date-time-picker", "barrel": true, "default": false },
+  "exports": ["DateTimePicker", "DateTimePickerProps", "DateTimePickerTranslations"],
+  "providers": ["ThemeProvider"],
+  "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
+  "related": ["date-picker", "time-picker", "calendar"],
+  "subComponents": [],
+  "testIds": ["date-time-picker"]
+} -->
+
 # DateTimePicker
 
-Date-time input
+A date chip and a time beside it, editable in place. It puts
+[`DatePicker`](../date-picker/README.md) and [`TimePicker`](../time-picker/README.md) together
+and adds the AM/PM control the latter lacks.
 
-### Usage
+## Use this when / not when
 
-```js
-import { DateTimePicker } from "@onlyoffice/apps-ui-kit";
+- Use for a single moment — an expiry, a scheduled send, a reminder — where both halves matter.
+- Not when only the day matters; [`DatePicker`](../date-picker/README.md) is smaller and has no
+  time to leave at midnight.
+- Not when only the time matters — [`TimePicker`](../time-picker/README.md) on its own, though
+  you then own the AM/PM control.
+- Not for a range, and not for a disabled or read-only display: neither is a prop.
+
+## Import
+
+```ts
+import { DateTimePicker } from "@onlyoffice/apps-ui-kit/components/date-time-picker";
 ```
 
-```jsx
-<DateTimePicker
-  onChange={onChange}
-  selectDateText="Select date"
-  className="datePicker"
-  id="datePicker"
-  locale="en"
-  hasError={false}
-  openDate={new Date()}
-  translations={{ AM: "AM", PM: "PM" }}
-/>
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
+
+Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme`.
+
+Dates are Luxon `DateTime` objects. `translations` is required and is not filled in for you:
+without it the AM/PM drop-down has blank options.
+
+## Minimal example
+
+`className`, `id`, `selectDateText`, `hasError`, `locale`, `openDate`, `onChange` and
+`translations` are all required by the type.
+
+```tsx
+import { useState } from "react";
+import { DateTime } from "luxon";
+import { DateTimePicker } from "@onlyoffice/apps-ui-kit/components/date-time-picker";
+
+export function ExpiresAt() {
+  const [at, setAt] = useState<DateTime | null>(null);
+
+  return (
+    <DateTimePicker
+      id="expires-at"
+      className=""
+      locale="en"
+      selectDateText="Set an expiry"
+      hasError={false}
+      openDate={DateTime.now()}
+      onChange={setAt}
+      translations={{ AM: "AM", PM: "PM" }}
+    />
+  );
+}
 ```
 
-#### Properties
+## Props
 
-| Props            |       Type       | Required | Values |          Default          | Description                                      |
-| ---------------- | :--------------: | :------: | :----: | :-----------------------: | ------------------------------------------------ |
-| `className`      |     `string`     |    -     |   -    |            ''             | Allows to set classname                          |
-| `id`             |     `string`     |    -     |   -    |             -             | Allows to set id                                 |
-| `onChange`       |      `func`      |    -     |   -    |             -             | Allow you to handle changing events of component |
-| `initialDate`    | `date`, `string` |    -     |   -    |             -             | Default date                                     |
-| `selectDateText` |     `string`     |    -     |   -    |       "Select date"       | Select date text                                 |
-| `locale`         |     `string`     |    -     |   -    | `User's browser settings` | Browser locale                                   |
-| `maxDate`        | `date`, `string` |    -     |   -    |             -             | Maximum date that the user can select.           |
-| `minDate`        | `date`, `string` |    -     |   -    |             -             | Minimum date that the user can select.           |
-| `hasError`       |    `boolean`     |    -     |   -    |           false           | Indicates the input field has an error           |
-| `openDate`       | `date`, `string` |    -     |   -    |             -             | Allows to set first shown date in calendar       |
-| `translations`   |     `object`     |   Yes    |   -    |             -             | Object with AM/PM translations                   |
-| `dataTestId`     |     `string`     |    -     |   -    |             -             | Allows to set data-testid                        |
-| `hideCross`      |    `boolean`     |    -     |   -    |           false           | Hides cross button                               |
-| `useMaxTime`     |    `boolean`     |    -     |   -    |           false           | Use maximum time when selecting date             |
+<!-- props:start DateTimePickerProps -->
+
+_Generated by `pnpm readme:props` from `DateTimePickerProps` in `DateTimePicker.types.tsx`. Do not edit; edit the JSDoc._
+
+| Prop             | Type                                            | Required | Default              | Description                                                                                                                    |
+| ---------------- | ----------------------------------------------- | -------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `className`      | `string`                                        | **yes**  | –                    | Applied to the outermost element.                                                                                              |
+| `hasError`       | `boolean`                                       | **yes**  | –                    | Whether the control is drawn in its error colours.                                                                             |
+| `id`             | `string`                                        | **yes**  | –                    | Applied to the outermost element.                                                                                              |
+| `locale`         | `string`                                        | **yes**  | –                    | BCP 47 tag the calendar is written in. It also decides whether the time is shown as 12-hour or 24-hour.                        |
+| `onChange`       | `(d: null \| DateTime) => void`                 | **yes**  | –                    | Called whenever either half changes, with the combined date and time, or `null` when the date is cleared.                      |
+| `openDate`       | `Date \| DateTime<boolean>`                     | **yes**  | –                    | Month the calendar opens on.                                                                                                   |
+| `selectDateText` | `string`                                        | **yes**  | –                    | Text of the button shown while no date is chosen.                                                                              |
+| `translations`   | `DateTimePickerTranslations`                    | **yes**  | –                    | Labels of the AM and PM options. Required: the component reads them while rendering, and nothing here translates them for you. |
+| `dataTestId`     | `string`                                        | no       | `"date-time-picker"` | `data-testid` of the outermost element.                                                                                        |
+| `hideCross`      | `boolean`                                       | no       | –                    | Whether the date chip's clearing cross is hidden.                                                                              |
+| `initialDate`    | `Nullable<string \| DateTime<boolean> \| Date>` | no       | –                    | Date and time the component starts on.                                                                                         |
+| `maxDate`        | `Date \| DateTime<boolean>`                     | no       | –                    | Latest selectable day in the calendar.                                                                                         |
+| `minDate`        | `Date \| DateTime<boolean>`                     | no       | –                    | Earliest selectable day in the calendar.                                                                                       |
+| `useMaxTime`     | `boolean`                                       | no       | –                    | Whether a picked day is reported at the end of that day rather than at midnight.                                               |
+
+<!-- props:end -->
+
+## Recipes
+
+### Error
+
+`hasError` is required and recolours both halves. It prints no message.
+
+```tsx
+import { useState } from "react";
+import { DateTime } from "luxon";
+import { DateTimePicker } from "@onlyoffice/apps-ui-kit/components/date-time-picker";
+import { Text } from "@onlyoffice/apps-ui-kit/components/text";
+
+export function ScheduledSend() {
+  const [at, setAt] = useState<DateTime | null>(null);
+  const isPast = Boolean(at && at < DateTime.now());
+
+  return (
+    <div>
+      <DateTimePicker
+        id="send-at"
+        className=""
+        locale="en"
+        selectDateText="Schedule"
+        hasError={isPast}
+        minDate={DateTime.now()}
+        openDate={DateTime.now()}
+        onChange={setAt}
+        translations={{ AM: "AM", PM: "PM" }}
+      />
+      {isPast ? <Text fontSize="12px">Choose a time in the future</Text> : null}
+    </div>
+  );
+}
+```
+
+## Behaviour the types don't state
+
+- **The time only appears once a date is chosen.** Until then the control is just the date
+  button; there is no way to set a time first.
+- **The time is a display until it is clicked.** Clicking the clock swaps it for
+  [`TimePicker`](../time-picker/README.md) plus the meridiem drop-down; an outside click, Enter
+  or Tab swaps it back.
+- **12-hour or 24-hour is decided by `locale`, not by a prop.** The component treats anything
+  starting `en`, plus `en-GB` explicitly, as 12-hour — so a British locale gets AM/PM, and every
+  other locale gets a 24-hour clock with no meridiem control.
+- **Choosing a meridiem shifts the time by twelve hours rather than setting it.** Picking AM
+  subtracts twelve and picking PM adds twelve, whichever half the value was already in.
+- **`translations` is required but was missing from the exported props type** until now; it is
+  read while rendering, so an object with `AM` and `PM` has to be passed.
+- **`className`, `id`, `selectDateText` and `hasError` are required by the type** even though
+  empty values are perfectly ordinary. Pass `""` and `false`.
+- The date half is a [`DatePicker`](../date-picker/README.md) driven through its `outerDate`, so
+  all of that component's behaviour applies — including the fixed `dd MMM yyyy` format and the
+  calendar closing on every pick.
+- Outside clicks and keys are listened for on the document in the capture phase, so they act
+  before anything in your own tree.
+
+## Accessibility
+
+- The time display is a `<span role="button">` with `tabIndex={0}` and an `aria-label` giving
+  the current time, but no key handler — Enter and Space do not open the editor.
+- The date half inherits [`DatePicker`](../date-picker/README.md)'s limits: the calendar cannot
+  be operated from the keyboard.
+- `aria-invalid` is set on the wrapper from `hasError`, but no message is tied to it.
+- `aria-label` on the wrapper is `selectDateText`, which describes the button rather than the
+  whole control.
+- The meridiem drop-down is a [`ComboBox`](../combobox/README.md), with that component's
+  limitations.
+
+## Test ids
+
+| Element          | `data-testid`                       |
+| ---------------- | ----------------------------------- |
+| The wrapper      | `date-time-picker`, or `dataTestId` |
+| The time area    | `date-time-picker-time-wrapper`     |
+| The time display | `date-time-picker-time-display`     |
+| The clock glyph  | `date-time-picker-clock-icon`       |
+
+## Related
+
+- [`DatePicker`](../date-picker/README.md) — the date half.
+- [`TimePicker`](../time-picker/README.md) — the time half.
+- [`Calendar`](../calendar/README.md) — the grid behind the date.

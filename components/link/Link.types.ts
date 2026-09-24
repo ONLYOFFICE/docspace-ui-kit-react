@@ -6,23 +6,37 @@ export type LinkProps = TextProps & {
   href?: string;
   /** Accepts id */
   id?: string;
-  /** Sets font weight */
+  /** Renders the label at weight 600.
+   * @default false */
   isBold?: boolean;
-  /** Sets hovered state and link effects */
+  /** Paints the link as if the pointer were over it, for a row that highlights
+   * its link on hover of the whole row.
+   * @default false */
   isHovered?: boolean;
-  /** Sets the 'opacity' css-property to 0.5. Usually applied for the users with "pending" status */
+  /** Halves the opacity, the kit's convention for a pending or inactive entity.
+   * @default false */
   isSemitransparent?: boolean;
-  /** Activates or deactivates _text-overflow_ CSS property with ellipsis (' ... ') value */
+  /** Constrains the link to the width of its container
+   * (`display: inline-block; max-width: 100%`). It does **not** add the
+   * ellipsis by itself — that comes from `truncate`, inherited from `Text`.
+   * Set both to clip a long label.
+   * @default false */
   isTextOverflow?: boolean;
-  /** Disables hover effect */
+  /** Removes the underline the link grows on hover.
+   * @default false */
   noHover?: boolean;
-  /** Enables user selection */
+  /** Whether the label can be selected with the mouse.
+   * @default true */
   enableUserSelect?: boolean;
-  /** Sets the link type */
+  /** `page` for navigation, `action` for a link that runs code. An action link
+   * carries no `href`, which has consequences for the keyboard — see `role` and
+   * `onKeyDown`.
+   * @default LinkType.page */
   type?: LinkType;
   /** Sets the target attribute */
   target?: LinkTarget;
-  /** Label */
+  /** Ignored. The component reads its text from `children`; this prop is
+   * spread onto the anchor as an unknown attribute and does nothing. */
   label?: string;
   /** Sets the text decoration style */
   textDecoration?:
@@ -32,9 +46,12 @@ export type LinkProps = TextProps & {
     | "overline"
     | "underline dotted"
     | "underline dashed";
-  /** Accessibility label for the link */
+  /** Value of `aria-label`. When it is absent the component passes `children`
+   * instead, which is the visible text for a string child and an object for a
+   * node. */
   ariaLabel?: string;
-  /** Data attribute for testing */
+  /** Value of `data-testid` on the anchor.
+   * @default "link" */
   dataTestId?: string;
   /** Sets a callback function that is triggered when the link is clicked. Only for 'action' type of link */
   onClick?: (e: React.MouseEvent<Element>) => void;
@@ -50,8 +67,11 @@ export type LinkProps = TextProps & {
   rel?: string;
   /** Used as HTML `tabindex` property */
   tabIndex?: number;
-  /** Used as HTML `title` property */
+  /** Tooltip text. Consumed by the `withTooltip` wrapper the folder exports, so
+   * it becomes the tooltip's content and never reaches the DOM as a `title`
+   * attribute. */
   title?: string;
-  /** CSS color or accent theme color */
+  /** Any CSS colour, or the literal `"accent"`, which resolves to the theme's
+   * `--accent-main`. */
   color?: "accent" | (string & {});
 };

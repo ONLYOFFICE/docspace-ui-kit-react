@@ -2,6 +2,17 @@
 
 All-in-one composition of `ErrorBoundary`, `ApiProvider`, `TranslationProvider`, and `ThemeProvider`.
 
+**Portal-internal, and not in this folder's barrel.** `Providers` reaches the DocSpace REST API
+for portal settings, so it only works where that API answers; `providers/index.ts` exports the
+three public providers and not this one. An application of its own composes
+[`ThemeProvider`](./theme/README.md) and [`TranslationProvider`](./translation/README.md)
+itself — see [`docs/getting-started.md`](../docs/getting-started.md). Inside the portal, import
+it by its own subpath:
+
+```tsx
+import { Providers } from "@onlyoffice/apps-ui-kit/providers/Providers";
+```
+
 ## Architecture
 
 ```
@@ -35,7 +46,7 @@ If `settings` or `user` are not provided as props, they are fetched automaticall
 ## Usage
 
 ```tsx
-import { Providers } from "@onlyoffice/apps-ui-kit/providers";
+import { Providers } from "@onlyoffice/apps-ui-kit/providers/Providers";
 import enCommon from "@onlyoffice/apps-ui-kit/locales/en/Common.json";
 import type { TTranslations } from "@onlyoffice/apps-ui-kit/providers/translation";
 

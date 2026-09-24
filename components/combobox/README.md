@@ -1,411 +1,345 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "ComboBox",
+  "folder": "components/combobox",
+  "kind": "component",
+  "category": "Form controls",
+  "status": "public",
+  "summary": "Button showing the current choice, with a list of options under it.",
+  "import": { "subpath": "components/combobox", "barrel": true, "default": false },
+  "exports": ["ComboBox", "ComboButton", "ComboBoxDisplayType", "ComboBoxSize", "TOption", "TComboboxProps"],
+  "providers": ["ThemeProvider", "TranslationProvider"],
+  "state": { "visibility": "opened", "close": "onBackdropClick", "loading": "isLoading", "disabled": "isDisabled" },
+  "related": ["drop-down", "drop-down-item", "field-container"],
+  "subComponents": ["ComboButton"],
+  "testIds": ["combobox"]
+} -->
+
 # ComboBox
 
-A versatile and accessible combo box component that combines a text input with a dropdown list. It allows users to either type a value directly or choose from a predefined list of options. The component supports various display types, search functionality, and customizable styling options.
+Button showing the current choice, with a list of options under it. The choice itself stays in
+your state: the component reports a click and nothing more.
 
-## Usage
+## Use this when / not when
 
-```tsx
+- Use to pick one value from a short, known list: a role, a time zone, a filter, a language.
+- Not for a value the user types or searches. There is no search field here — `withSearch` is
+  declared and does nothing — so a long list wants
+  [`Selector`](../selector/README.md) or an input of your own.
+- Not for a menu of actions. A menu is [`DropDown`](../drop-down/README.md) with
+  [`DropDownItem`](../drop-down-item/README.md)s; this one is about a value.
+- Not on its own in a form: a labelled field is
+  [`FieldContainer`](../field-container/README.md) around it.
+- Not for many values at once. It shows one option and a `+N` badge you maintain yourself.
+
+## Import
+
+```ts
 import {
   ComboBox,
   ComboBoxSize,
-  ComboBoxDisplayType,
 } from "@onlyoffice/apps-ui-kit/components/combobox";
-import type {
-  TOption,
-  TComboboxProps,
+```
+
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
+
+Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme` for the button and list
+colours, and `TranslationProvider` from `@onlyoffice/apps-ui-kit/providers/translation` because
+the options are rendered as `DropDownItem`s, which read a translated label for their paid badge.
+
+## Minimal example
+
+`selectedOption` and `options` are both required, and `onSelect` is what updates the first.
+
+```tsx
+import { useState } from "react";
+import {
+  ComboBox,
+  type TOption,
 } from "@onlyoffice/apps-ui-kit/components/combobox";
 
-const options: TOption[] = [
-  { key: 1, label: "Option 1" },
-  { key: 2, label: "Option 2" },
-  { key: 3, label: "Option 3" },
+const ROLES: TOption[] = [
+  { key: "viewer", label: "Viewer" },
+  { key: "editor", label: "Editor" },
+  { key: "owner", label: "Owner" },
 ];
 
-<ComboBox
-  options={options}
-  selectedOption={options[0]}
-  onSelect={(option) => console.log("Selected:", option)}
-/>;
+export function RolePicker() {
+  const [role, setRole] = useState<TOption>(ROLES[0]);
+
+  return (
+    <div style={{ width: 240 }}>
+      <ComboBox
+        options={ROLES}
+        selectedOption={role}
+        onSelect={setRole}
+        scaled
+        scaledOptions
+      />
+    </div>
+  );
+}
 ```
 
 ## Props
 
-| Prop                         | Type                           | Default     | Description                                               |
-| ---------------------------- | ------------------------------ | ----------- | --------------------------------------------------------- |
-| `options`                    | `TOption[]`                    | -           | **Required.** Array of options to display in the dropdown |
-| `selectedOption`             | `TOption`                      | -           | **Required.** Currently selected option                   |
-| `advancedOptions`            | `ReactElement`                 | -           | Displays advanced options content                         |
-| `advancedOptionsCount`       | `number`                       | -           | Number of advanced options                                |
-| `children`                   | `ReactNode`                    | -           | Children elements                                         |
-| `className`                  | `string`                       | -           | Additional CSS class                                      |
-| `dropDownClassName`          | `string`                       | -           | Class name for dropdown container                         |
-| `comboIcon`                  | `string`                       | -           | Icon for the combo button                                 |
-| `disableIconClick`           | `boolean`                      | -           | Disable icon click                                        |
-| `disableItemClick`           | `boolean`                      | -           | Disable item click                                        |
-| `disableItemClickFirstLevel` | `boolean`                      | -           | Disable first level item click                            |
-| `directionX`                 | `"left" \| "right"`            | -           | Horizontal direction of dropdown                          |
-| `directionY`                 | `"top" \| "bottom"`            | -           | Vertical direction of dropdown                            |
-| `displayType`                | `ComboBoxDisplayType`          | `"default"` | Component display type                                    |
-| `displaySelectedOption`      | `boolean`                      | -           | Display selected option                                   |
-| `displayArrow`               | `boolean`                      | -           | Display arrow                                             |
-| `dropDownMaxHeight`          | `number`                       | `200`       | Maximum height of dropdown in pixels                      |
-| `dropDownTestId`             | `string`                       | -           | Test ID for dropdown                                      |
-| `showDisabledItems`          | `boolean`                      | -           | Shows disabled items when displayType !== toggle          |
-| `fillIcon`                   | `boolean`                      | -           | Fill icon with default colors                             |
-| `fixedDirection`             | `boolean`                      | -           | Fixed direction                                           |
-| `plusBadgeValue`             | `number`                       | -           | Value to display in the plus badge                        |
-| `forceCloseClickOutside`     | `boolean`                      | -           | Force close on click outside                              |
-| `hideMobileView`             | `boolean`                      | -           | Hide mobile view                                          |
-| `id`                         | `string`                       | -           | Unique identifier                                         |
-| `dropDownId`                 | `string`                       | -           | ID for dropdown container                                 |
-| `isAside`                    | `boolean`                      | -           | Is aside mode                                             |
-| `isDisabled`                 | `boolean`                      | `false`     | Disable the combobox                                      |
-| `isLoading`                  | `boolean`                      | `false`     | Show loading state                                        |
-| `isDefaultMode`              | `boolean`                      | -           | Is default mode                                           |
-| `isMobileView`               | `boolean`                      | -           | Is mobile view                                            |
-| `isNoFixedHeightOptions`     | `boolean`                      | -           | Is no fixed height options                                |
-| `manualWidth`                | `string`                       | -           | Manual width                                              |
-| `manualX`                    | `string`                       | -           | Manual X position                                         |
-| `manualY`                    | `number \| string`             | -           | Manual Y position                                         |
-| `modernView`                 | `boolean`                      | -           | Modern view styling                                       |
-| `noBorder`                   | `boolean`                      | `false`     | Remove border from combobox                               |
-| `offsetX`                    | `number`                       | -           | Offset left                                               |
-| `opened`                     | `boolean`                      | -           | Controlled open state                                     |
-| `optionStyle`                | `CSSProperties`                | -           | Option style                                              |
-| `searchPlaceholder`          | `string`                       | -           | Placeholder text for search input                         |
-| `scaled`                     | `boolean`                      | `true`      | Enable scaling based on parent                            |
-| `scaledOptions`              | `boolean`                      | -           | Scaled options                                            |
-| `setIsOpenItemAccess`        | `(isOpen: boolean) => void`    | -           | Set is open item access callback                          |
-| `size`                       | `ComboBoxSize`                 | `"base"`    | Size of the combobox                                      |
-| `role`                       | `string`                       | -           | ARIA role                                                 |
-| `style`                      | `CSSProperties`                | -           | Inline styles                                             |
-| `tabIndex`                   | `number`                       | -           | Tab index                                                 |
-| `textOverflow`               | `boolean`                      | -           | Enable text overflow                                      |
-| `title`                      | `string`                       | -           | Title attribute                                           |
-| `topSpace`                   | `number`                       | -           | Top space                                                 |
-| `type`                       | `TCombobox`                    | -           | Type of the combobox                                      |
-| `usePortalBackdrop`          | `boolean`                      | -           | Use portal backdrop                                       |
-| `withBackdrop`               | `boolean`                      | -           | Show backdrop overlay                                     |
-| `withBackground`             | `boolean`                      | -           | With background                                           |
-| `withBlur`                   | `boolean`                      | -           | With blur effect                                          |
-| `withLabel`                  | `boolean`                      | -           | With label                                                |
-| `withoutBackground`          | `boolean`                      | -           | Without background                                        |
-| `withoutPadding`             | `boolean`                      | -           | Without padding                                           |
-| `withSearch`                 | `boolean`                      | `false`     | Enable search functionality                               |
-| `onBackdropClick`            | `(e: Event) => void`           | -           | Callback on backdrop click                                |
-| `onClickSelectedItem`        | `(option: TOption) => void`    | -           | Callback on selected item click                           |
-| `onSelect`                   | `(option: TOption) => void`    | -           | Callback when an option is selected                       |
-| `onToggle`                   | `(e, isOpen: boolean) => void` | -           | Callback on toggle                                        |
-| `shouldShowBackdrop`         | `boolean`                      | -           | Indicates if backdrop should be shown                     |
-| `dataTestId`                 | `string`                       | -           | Test ID                                                   |
-| `noSelect`                   | `boolean`                      | -           | Disables text selection                                   |
-| `useImageIcon`               | `boolean`                      | -           | Use an image icon                                         |
+<!-- props:start TComboboxProps -->
 
-## Types
+_Generated by `pnpm readme:props` from `TComboboxProps` in `ComboBox.types.ts`. Do not edit; edit the JSDoc._
 
-### TOption
+| Prop                         | Type                                                                                  | Required | Default                       | Description                                                                                                                                                      |
+| ---------------------------- | ------------------------------------------------------------------------------------- | -------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `options`                    | `TOption[]`                                                                           | **yes**  | –                             | The options. Each needs a unique `key`, and a `label` unless it is a separator; `disabled`, `icon`, `description`, `isBeta` and `tooltip` are passed to the row. |
+| `selectedOption`             | `TOption`                                                                             | **yes**  | –                             | The option to show in the button. The component does not choose it: keep it in your own state and set it from `onSelect`.                                        |
+| `advancedOptions`            | `ReactElement<{ children?: React.ReactNode; }, string \| JSXElementConstructor<any>>` | no       | –                             | Element whose children replace the list entirely, for a menu that is not a list of options. `options` is then used only for the button.                          |
+| `advancedOptionsCount`       | `number`                                                                              | no       | –                             | How many advanced options there are, for deciding the mobile layout.                                                                                             |
+| `children`                   | `ReactNode`                                                                           | no       | –                             | Content rendered inside the button, before the label. A click on it is ignored unless `disableIconClick` is false.                                               |
+| `className`                  | `string`                                                                              | no       | –                             | Applied to the element that wraps the button and the list.                                                                                                       |
+| `comboIcon`                  | `ReactNode`                                                                           | no       | –                             | Icon to draw instead of the arrow: a component, an element, or a URL.                                                                                            |
+| `dataTestId`                 | `string`                                                                              | no       | `"combobox"`                  | Value of `data-testid` on the wrapper.                                                                                                                           |
+| `directionX`                 | `TDirectionX`                                                                         | no       | –                             | Preferred horizontal side of the list; it flips to fit the viewport.                                                                                             |
+| `directionY`                 | `TDirectionY`                                                                         | no       | –                             | Preferred vertical side of the list; it flips to fit the viewport.                                                                                               |
+| `disableIconClick`           | `boolean`                                                                             | no       | `true`                        | Whether a click on `children` is swallowed instead of opening the list.                                                                                          |
+| `disableItemClick`           | `boolean`                                                                             | no       | –                             | Stops the list opening at all, without the disabled styling.                                                                                                     |
+| `disableItemClickFirstLevel` | `boolean`                                                                             | no       | –                             | The same, but only for first-level items on a touch device.                                                                                                      |
+| `displayArrow`               | `boolean`                                                                             | no       | –                             | Draws the arrow even when there are no options to open.                                                                                                          |
+| `displaySelectedOption`      | `boolean`                                                                             | no       | –                             | Keeps the option that is currently selected usable and highlights it. Without it that option is rendered disabled, so the value cannot be picked again.          |
+| `displayType`                | `ComboBoxDisplayType`                                                                 | no       | `ComboBoxDisplayType.default` | `toggle` renders the button alone and no list at all, for a control that only looks like a combo box.                                                            |
+| `dropDownClassName`          | `string`                                                                              | no       | –                             | Applied to the list element.                                                                                                                                     |
+| `dropDownId`                 | `string`                                                                              | no       | –                             | Applied to the list element.                                                                                                                                     |
+| `dropDownMaxHeight`          | `number`                                                                              | no       | –                             | Height of the list in pixels. It is also what gives the list a scrollbar: without it a long list is rendered in full.                                            |
+| `dropDownTestId`             | `string`                                                                              | no       | –                             | Value of `data-testid` on the list.                                                                                                                              |
+| `fillIcon`                   | `boolean`                                                                             | no       | –                             | Recolours the selected option's icon to the text colour.                                                                                                         |
+| `fixedDirection`             | `boolean`                                                                             | no       | –                             | Keeps `directionX` and `directionY` as given instead of flipping them.                                                                                           |
+| `forceCloseClickOutside`     | `boolean`                                                                             | no       | –                             | Stops the outside-click listener being registered.                                                                                                               |
+| `hideMobileView`             | `boolean`                                                                             | no       | –                             | Keeps the list anchored to the button on a phone instead of turning it into a bottom sheet.                                                                      |
+| `id`                         | `string`                                                                              | no       | –                             | Applied to the element that wraps the button and the list.                                                                                                       |
+| `isAside`                    | `boolean`                                                                             | no       | –                             | Marks the list's backdrop as belonging to a side panel.                                                                                                          |
+| `isDefaultMode`              | `boolean`                                                                             | no       | `true`                        | Whether the list is rendered in a portal on `document.body`.                                                                                                     |
+| `isDisabled`                 | `boolean`                                                                             | no       | –                             | Greys the button out and stops it opening.                                                                                                                       |
+| `isLoading`                  | `boolean`                                                                             | no       | –                             | Replaces the arrow with a spinner and stops the button opening.                                                                                                  |
+| `isMobileView`               | `boolean`                                                                             | no       | –                             | Pins the list to the bottom of the screen, full width, in portrait.                                                                                              |
+| `isNoFixedHeightOptions`     | `boolean`                                                                             | no       | –                             | Renders the options in a plain scrollbar instead of the virtualised list.                                                                                        |
+| `manualWidth`                | `string`                                                                              | no       | `"200px"`                     | Width of the list as a CSS length. It has nothing to do with the button's width — use `scaledOptions` for that.                                                  |
+| `manualX`                    | `string`                                                                              | no       | –                             | (Non-portal mode) Exact horizontal offset of the list from the button.                                                                                           |
+| `manualY`                    | `number \| string`                                                                    | no       | –                             | (Non-portal mode) Exact vertical offset of the list from the button.                                                                                             |
+| `modernView`                 | `boolean`                                                                             | no       | –                             | Compact button with no background until it is open.                                                                                                              |
+| `noBorder`                   | `boolean`                                                                             | no       | –                             | Removes the button's border.                                                                                                                                     |
+| `noSelect`                   | `boolean`                                                                             | no       | `true`                        | Whether the button's text cannot be selected.                                                                                                                    |
+| `offsetX`                    | `number`                                                                              | no       | –                             | Horizontal offset of the list, in pixels.                                                                                                                        |
+| `onBackdropClick`            | `(e: Event) => void`                                                                  | no       | –                             | Called when a click outside closes the list, if `withBackdrop` is on.                                                                                            |
+| `onClickSelectedItem`        | `(option: TOption) => void`                                                           | no       | –                             | Called when the option already selected is clicked again.                                                                                                        |
+| `onSelect`                   | `(option: TOption) => void`                                                           | no       | –                             | Called with the option that was clicked. Nothing changes on its own — `selectedOption` is yours to update.                                                       |
+| `onToggle`                   | `(e: React.MouseEvent<HTMLDivElement>, isOpen: boolean) => void`                      | no       | –                             | Called when the button is clicked, with the state being asked for. Passing it without `onBackdropClick` also stops a click outside closing the list.             |
+| `opened`                     | `boolean`                                                                             | no       | –                             | Opens or closes the list from outside. It seeds the internal state rather than controlling it: the next click on the button wins until this changes.             |
+| `optionStyle`                | `CSSProperties`                                                                       | no       | –                             | Inline style applied to every option.                                                                                                                            |
+| `plusBadgeValue`             | `number`                                                                              | no       | –                             | Number shown as `+N` after the label, for a multi-select summary.                                                                                                |
+| `role`                       | `string`                                                                              | no       | –                             | Ignored. Nothing reads this prop.                                                                                                                                |
+| `scaled`                     | `boolean`                                                                             | no       | `true`                        | Makes the button take the full width of its parent, which overrides `size`.                                                                                      |
+| `scaledOptions`              | `boolean`                                                                             | no       | –                             | Matches the list's width to the button's instead of `manualWidth`.                                                                                               |
+| `searchPlaceholder`          | `string`                                                                              | no       | –                             | Ignored. Nothing reads this prop; there is no search field.                                                                                                      |
+| `setIsOpenItemAccess`        | `(isOpen: boolean) => void`                                                           | no       | –                             | Called with the open state whenever it changes, alongside `onToggle`.                                                                                            |
+| `shouldShowBackdrop`         | `boolean`                                                                             | no       | –                             | Renders the backdrop even when another one is already on screen.                                                                                                 |
+| `showDisabledItems`          | `boolean`                                                                             | no       | –                             | Ignored. The list is always told to keep disabled options.                                                                                                       |
+| `size`                       | `"base" \| "big" \| "content" \| "huge" \| "middle"`                                  | no       | `ComboBoxSize.base`           | One of the fixed widths — 173, 300, 350 or 500px, or the content's own. It only applies when `scaled` is false.                                                  |
+| `style`                      | `CSSProperties`                                                                       | no       | –                             | Applied to the wrapper and, again, to the list.                                                                                                                  |
+| `tabIndex`                   | `number`                                                                              | no       | –                             | Position of the button in the tab order. It is -1 by default, which keeps the combo box off it entirely.                                                         |
+| `textOverflow`               | `boolean`                                                                             | no       | –                             | Truncates an option's label with an ellipsis instead of wrapping it.                                                                                             |
+| `title`                      | `string`                                                                              | no       | –                             | Hover tooltip for the whole control. It needs `RootTooltip` mounted.                                                                                             |
+| `topSpace`                   | `number`                                                                              | no       | –                             | Space to leave above the list when it opens upwards, in pixels.                                                                                                  |
+| `type`                       | `TCombobox`                                                                           | no       | –                             | Shape of the button: `badge` draws the label as a coloured badge, `onlyIcon` drops the label, `descriptive` adds the option's `description` under it.            |
+| `useImageIcon`               | `boolean`                                                                             | no       | –                             | Draws the kit's placeholder image next to the selected option's icon.                                                                                            |
+| `usePortalBackdrop`          | `boolean`                                                                             | no       | –                             | Moves the list's backdrop into the portal, above the page.                                                                                                       |
+| `withBackdrop`               | `boolean`                                                                             | no       | `true`                        | Whether the list renders a backdrop to catch the next click.                                                                                                     |
+| `withBackground`             | `boolean`                                                                             | no       | –                             | Gives that backdrop its dimming background.                                                                                                                      |
+| `withBlur`                   | `boolean`                                                                             | no       | –                             | Ignored. It reaches the list, which does not read it either.                                                                                                     |
+| `withLabel`                  | `boolean`                                                                             | no       | `true`                        | Whether the selected option is matched by label rather than by key.                                                                                              |
+| `withoutArrow`               | `boolean`                                                                             | no       | –                             | Hides the arrow, whatever `displayArrow` and the options say.                                                                                                    |
+| `withoutBackground`          | `boolean`                                                                             | no       | –                             | Makes that backdrop transparent.                                                                                                                                 |
+| `withoutPadding`             | `boolean`                                                                             | no       | –                             | Removes the vertical padding around the button.                                                                                                                  |
+| `withSearch`                 | `boolean`                                                                             | no       | –                             | Ignored. Nothing reads this prop; there is no search field.                                                                                                      |
 
-```ts
-type TOption = TRegularOption | TSeparatorOption;
+<!-- props:end -->
 
-type TRegularOption = {
-  key: string | number;
-  label: string;
-  icon?: string | React.ElementType | React.ReactElement;
-  color?: string;
-  backgroundColor?: string;
-  border?: string;
-  default?: boolean;
-  disabled?: boolean;
-  type?: string;
-  description?: string;
-  quota?: "free" | "paid";
-  isSelected?: boolean;
-  isBeta?: boolean;
-  internal?: boolean;
-  access?: ShareAccessRights;
-  className?: string;
-  title?: string;
-  dataTestId?: string;
-  action?: unknown;
-  onClick?: (opt: TContextMenuValueTypeOnClick) => void;
-  pageNumber?: number;
-  count?: number;
-  tooltip?: string;
-  isSeparator?: boolean;
-};
+### Enums
 
-type TSeparatorOption = {
-  key: string | number;
-  isSeparator: true;
-  // ... other optional properties
-};
-```
+<!-- enums:start -->
 
-### ComboBoxDisplayType
+| Enum                  | Members             |
+| --------------------- | ------------------- |
+| `ComboBoxDisplayType` | `default`, `toggle` |
 
-```ts
-enum ComboBoxDisplayType {
-  default = "default",
-  toggle = "toggle",
+<!-- enums:end -->
+
+## Recipes
+
+### Open and close, controlled
+
+`opened` seeds the open state rather than owning it, and `onToggle` reports every click on the
+button. Pass `onBackdropClick` as well, or a click outside stops closing the list.
+
+```tsx
+import { useState } from "react";
+import {
+  ComboBox,
+  type TOption,
+} from "@onlyoffice/apps-ui-kit/components/combobox";
+
+const SORTS: TOption[] = [
+  { key: "name", label: "Name" },
+  { key: "date", label: "Last modified" },
+];
+
+export function SortPicker() {
+  const [sort, setSort] = useState<TOption>(SORTS[0]);
+  const [open, setOpen] = useState(false);
+
+  return (
+    <ComboBox
+      options={SORTS}
+      selectedOption={sort}
+      opened={open}
+      onToggle={(_event, next) => setOpen(next)}
+      onBackdropClick={() => setOpen(false)}
+      onSelect={(option) => {
+        setSort(option);
+        setOpen(false);
+      }}
+    />
+  );
 }
 ```
 
-### ComboBoxSize
+### Loading and disabled
 
-```ts
-enum ComboBoxSize {
-  base = "base", // 173px
-  middle = "middle", // 300px
-  big = "big", // 350px
-  huge = "huge", // 500px
-  content = "content", // fit-content
+```tsx
+import {
+  ComboBox,
+  type TOption,
+} from "@onlyoffice/apps-ui-kit/components/combobox";
+
+const PLACEHOLDER: TOption = { key: "none", label: "Loading…" };
+
+export function RoomPicker({
+  rooms,
+  isLoading,
+}: {
+  rooms: TOption[];
+  isLoading: boolean;
+}) {
+  return (
+    <ComboBox
+      options={rooms}
+      selectedOption={rooms[0] ?? PLACEHOLDER}
+      isLoading={isLoading}
+      isDisabled={rooms.length === 0}
+      onSelect={() => {}}
+    />
+  );
 }
 ```
 
-## CSS Variables
+### A long list that scrolls
 
-The component uses CSS variables for theming, defined locally within the component:
-
-| Variable                                            | Light                | Dark                                        | Description                            |
-| --------------------------------------------------- | -------------------- | ------------------------------------------- | -------------------------------------- |
-| `--combobox-button-bg`                              | `#ffffff`            | `#333333`                                   | Button background                      |
-| `--combobox-button-color`                           | `#333333`            | `#858585`                                   | Button text color                      |
-| `--combobox-button-disabled-color`                  | `#a3a9ae`            | `#858585`                                   | Disabled button color                  |
-| `--combobox-button-border`                          | `1px solid #a3a9ae`  | `1px solid #474747`                         | Button border                          |
-| `--combobox-button-open-border-color`               | `var(--accent-main)` | `#ffffff`                                   | Open state border color                |
-| `--combobox-button-disabled-border-color`           | `#d0d5da`            | `#474747`                                   | Disabled border color                  |
-| `--combobox-button-disabled-bg`                     | `#f8f9f9`            | `#474747`                                   | Disabled background                    |
-| `--combobox-button-focus-bg-modern-view`            | `#eceef1`            | `#3d3d3d`                                   | Modern view focus background           |
-| `--combobox-button-icon-button-color`               | `#a3a9ae`            | `#858585`                                   | Icon button color                      |
-| `--combobox-button-icon-button-hover-color`         | `#657077`            | `#ffffff`                                   | Icon button hover color                |
-| `--combobox-button-hover-border-color`              | `#a3a9ae`            | `#858585`                                   | Hover border color                     |
-| `--combobox-button-hover-border-color-open`         | `#4781d1`            | `#ffffff`                                   | Open state hover border color          |
-| `--combobox-button-hover-disabled-border-color`     | `#d0d5da`            | `#474747`                                   | Disabled hover border color            |
-| `--combobox-button-hover-bg-modern-view`            | `#d0d5da`            | `#474747`                                   | Modern view hover background           |
-| `--combobox-button-focus-open-border-color`         | `var(--accent-main)` | `var(--combobox-button-hover-border-color)` | Focus open border color                |
-| `--combobox-label-selected-color`                   | `#333333`            | `#ffffff`                                   | Selected label color                   |
-| `--combobox-label-disabled-color`                   | `#a3a9ae`            | `#858585`                                   | Disabled label color                   |
-| `--combobox-label-alternative-color`                | `#a3a9ae`            | `#858585`                                   | Alternative label color                |
-| `--combobox-plus-badge-bg-color`                    | `#a3a9ae`            | `#858585`                                   | Plus badge background                  |
-| `--combobox-plus-badge-selected-bg-color`           | `#657077`            | `#5c5c5c`                                   | Plus badge selected background         |
-| `--combobox-plus-badge-color`                       | `#ffffff`            | `#333333`                                   | Plus badge text color                  |
-| `--combobox-children-button-color`                  | `#333333`            | `#ffffff`                                   | Children button color                  |
-| `--combobox-children-button-disabled-color`         | `#a3a9ae`            | `#858585`                                   | Children button disabled color         |
-| `--combobox-children-button-default-color`          | `#a3a9ae`            | `#ffffff`                                   | Children button default color          |
-| `--combobox-children-button-default-disabled-color` | `#a3a9ae`            | `#858585`                                   | Children button default disabled color |
-| `--combobox-children-button-selected-color`         | `#333333`            | `#ffffff`                                   | Children button selected color         |
-
-## Examples
-
-### Basic ComboBox
+`dropDownMaxHeight` is what gives the list a scrollbar; without it every option is rendered.
 
 ```tsx
-const options: TOption[] = [
-  { key: 1, label: "Option 1" },
-  { key: 2, label: "Option 2" },
-  { key: 3, label: "Option 3" },
-];
+import { useState } from "react";
+import {
+  ComboBox,
+  type TOption,
+} from "@onlyoffice/apps-ui-kit/components/combobox";
 
-<ComboBox
-  options={options}
-  selectedOption={options[0]}
-  onSelect={(option) => setSelected(option)}
-/>;
+export function TimezonePicker({ zones }: { zones: TOption[] }) {
+  const [zone, setZone] = useState<TOption>(zones[0]);
+
+  return (
+    <ComboBox
+      options={zones}
+      selectedOption={zone}
+      onSelect={setZone}
+      dropDownMaxHeight={320}
+      displaySelectedOption
+      textOverflow
+    />
+  );
+}
 ```
 
-### With Icons
+## Behaviour the types don't state
 
-```tsx
-const options: TOption[] = [
-  { key: "edit", label: "Edit", icon: editIcon },
-  { key: "copy", label: "Copy", icon: copyIcon },
-  { key: "delete", label: "Delete", icon: deleteIcon },
-];
+- **The selected option is matched by its label, not its key.** `withLabel` is true by default,
+  and the comparison is `option.label === selectedOption.label`, so two options that read the
+  same are both treated as selected. Pass `withLabel={false}` to compare keys instead.
+- **The option you are on is rendered disabled.** Unless `displaySelectedOption` is set, the
+  option matching the selection is greyed out and cannot be clicked, which is how the kit shows
+  the current value — and why re-picking it does nothing.
+- **Nothing selects anything.** `onSelect` hands you the option; `selectedOption` is yours to
+  update, and the component mirrors whatever you pass back.
+- **The list is 200px wide whatever the button is.** `manualWidth` defaults to `"200px"`;
+  `scaledOptions` is what matches it to the button, and even then the width is measured from the
+  button on a later render, so the first open can still be 200px.
+- **`scaled` is on by default**, so the control fills its parent and `size` has no effect. Turn
+  it off to get the 173px of `ComboBoxSize.base`.
+- **The keyboard does not work.** The component listens for ArrowDown and Enter on the document
+  and looks for options by the test id `drop-down-item` — which its own options never carry,
+  because it gives each one a test id of its own. The result is that the arrows and Enter do
+  nothing while the list is open, and Enter is swallowed for the rest of the page as well.
+- A list of four or more options becomes a bottom sheet on a phone. `hideMobileView` keeps it
+  anchored to the button.
+- An option's `icon` has to be a component or a URL: an element is ignored by the button, and a
+  URL is fetched at runtime by `react-svg`.
+- `searchPlaceholder`, `withSearch`, `showDisabledItems`, `withBlur` and `role` are declared and
+  never read. Disabled options are always kept in the list.
+- The component is memoised with a deep comparison of all its props, so a new `options` array on
+  every render costs a full walk of it rather than a re-render.
 
-<ComboBox
-  options={options}
-  selectedOption={options[0]}
-  onSelect={handleSelect}
-  fillIcon
-/>;
-```
+## Sub-components
 
-### With Search
+`ComboButton` is the button alone, exported for a control that needs the same shape without a
+list of its own. It takes the `selectedOption`, `size`, `type`, `isOpen` and `isLoading` props
+described above and calls `onClick`; everything else — opening, choosing, closing — is yours.
 
-```tsx
-<ComboBox
-  options={options}
-  selectedOption={selectedOption}
-  onSelect={handleSelect}
-  withSearch
-  searchPlaceholder="Search options..."
-/>
-```
+## CSS variables
 
-### With Separators
+| Variable                   | Default    | Effect                            |
+| -------------------------- | ---------- | --------------------------------- |
+| `--combobox-bg`            | theme grey | Background of the control         |
+| `--combobox-open-bg`       | the same   | Background while the list is open |
+| `--combobox-radius`        | `3px`      | Corner radius                     |
+| `--combobox-inner-padding` | `4px 0`    | Padding around the button         |
+| `--combobox-base-width`    | `173px`    | Width at `ComboBoxSize.base`      |
+| `--combobox-middle-width`  | `300px`    | Width at `ComboBoxSize.middle`    |
+| `--combobox-big-width`     | `350px`    | Width at `ComboBoxSize.big`       |
+| `--combobox-huge-width`    | `500px`    | Width at `ComboBoxSize.huge`      |
 
-```tsx
-const options: TOption[] = [
-  { key: "edit", label: "Edit" },
-  { key: "copy", label: "Copy" },
-  { key: "sep1", isSeparator: true },
-  { key: "delete", label: "Delete" },
-];
-
-<ComboBox
-  options={options}
-  selectedOption={options[0]}
-  onSelect={handleSelect}
-/>;
-```
-
-### Different Sizes
-
-```tsx
-<ComboBox
-  options={options}
-  selectedOption={selectedOption}
-  onSelect={handleSelect}
-  size={ComboBoxSize.base}   // 173px
-/>
-
-<ComboBox
-  options={options}
-  selectedOption={selectedOption}
-  onSelect={handleSelect}
-  size={ComboBoxSize.middle} // 300px
-/>
-
-<ComboBox
-  options={options}
-  selectedOption={selectedOption}
-  onSelect={handleSelect}
-  size={ComboBoxSize.content} // fit-content
-/>
-```
-
-### Modern View
-
-```tsx
-<ComboBox
-  options={options}
-  selectedOption={selectedOption}
-  onSelect={handleSelect}
-  modernView
-/>
-```
-
-### No Border
-
-```tsx
-<ComboBox
-  options={options}
-  selectedOption={selectedOption}
-  onSelect={handleSelect}
-  noBorder
-/>
-```
-
-### With Plus Badge
-
-```tsx
-<ComboBox
-  options={options}
-  selectedOption={selectedOption}
-  onSelect={handleSelect}
-  plusBadgeValue={5}
-/>
-```
-
-### With Advanced Options
-
-```tsx
-<ComboBox
-  options={options}
-  selectedOption={selectedOption}
-  onSelect={handleSelect}
-  advancedOptions={
-    <div>
-      <button>Create new</button>
-      <button>Import</button>
-    </div>
-  }
-/>
-```
-
-### Controlled Open State
-
-```tsx
-const [isOpen, setIsOpen] = useState(false);
-
-<ComboBox
-  options={options}
-  selectedOption={selectedOption}
-  onSelect={handleSelect}
-  opened={isOpen}
-  onToggle={(e, open) => setIsOpen(open)}
-/>;
-```
-
-### Disabled State
-
-```tsx
-<ComboBox
-  options={options}
-  selectedOption={selectedOption}
-  onSelect={handleSelect}
-  isDisabled
-/>
-```
-
-### Loading State
-
-```tsx
-<ComboBox
-  options={options}
-  selectedOption={selectedOption}
-  onSelect={handleSelect}
-  isLoading
-/>
-```
-
-### Toggle Display Type
-
-```tsx
-<ComboBox
-  options={options}
-  selectedOption={selectedOption}
-  onSelect={handleSelect}
-  displayType={ComboBoxDisplayType.toggle}
-/>
-```
-
-### Custom Dropdown Position
-
-```tsx
-<ComboBox
-  options={options}
-  selectedOption={selectedOption}
-  onSelect={handleSelect}
-  directionX="right"
-  directionY="bottom"
-  fixedDirection
-/>
-```
+The list is a [`DropDown`](../drop-down/README.md) and takes that component's variables.
 
 ## Accessibility
 
-The ComboBox component implements ARIA attributes and keyboard navigation for improved accessibility:
+- The button is a `<div role="button">` with `aria-haspopup="listbox"` and `aria-expanded`, but
+  its `tabIndex` is -1 unless you pass one, so the control is not reachable by keyboard at all.
+  Pass `tabIndex={0}` — and note that even then the arrow keys do not work, as above.
+- The options are `role="option"` rows in a `role="listbox"` that is not linked to the button by
+  `aria-controls` or `aria-activedescendant`.
+- The control has no accessible name of its own. Put it in a
+  [`FieldContainer`](../field-container/README.md), or give it an `aria-label` through a wrapper.
+- `title` renders the kit's hover tooltip, which is not an accessible name and needs
+  [`RootTooltip`](../tooltip/README.md) mounted.
 
-- `aria-expanded`: Indicates dropdown state
-- `aria-haspopup`: Indicates popup presence
-- `aria-label`: Provides component description
-- `role="combobox"`: Identifies the component type
+## Test ids
 
-Keyboard support:
+| Element     | `data-testid`                                               |
+| ----------- | ----------------------------------------------------------- |
+| The control | `combobox`, overridable with `dataTestId`                   |
+| The list    | set by `dropDownTestId`, otherwise `dropdown`               |
+| An option   | the option's `dataTestId`, otherwise `drop_down_item_<key>` |
 
-- `Enter/Space`: Open/close dropdown
-- `Arrow Up/Down`: Navigate through options
-- `Escape`: Close dropdown
-- `Tab`: Focus next/previous element
+The button inside carries `data-test-id="combo-button"` — with hyphens, unlike everything else
+in the kit — and so do its icon, badge and arrow.
+
+## Related
+
+- [`DropDown`](../drop-down/README.md) — the list this opens, and its own props.
+- [`DropDownItem`](../drop-down-item/README.md) — what each option becomes.
+- [`FieldContainer`](../field-container/README.md) — the label and error text around it.

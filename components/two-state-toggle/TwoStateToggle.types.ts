@@ -1,33 +1,56 @@
 export type TwoStateToggleProps = {
-  /** Text label shown at the inline start of the toggle; an empty string hides it */
+  /**
+   * Text to the left of the pill. An empty string removes it.
+   * @default "DocSpace design"
+   */
   title?: string;
-  /** Label for the classic DocSpace view (inline-start half of the pill) */
+  /**
+   * Label on the left half of the pill, the classic view.
+   * @default "OLD"
+   */
   labelOld?: string;
-  /** Label for the new Dashboard view (inline-end half of the pill) */
+  /**
+   * Label on the right half, the new dashboard.
+   * @default "NEW"
+   */
   labelNew?: string;
-  /** Confirmation modal title (shown when switching NEW → OLD) */
+  /**
+   * Heading of the dialog shown when leaving the new view.
+   * @default "Switch to Old Design"
+   */
   confirmTitle?: string;
-  /** Confirmation modal main body text */
+  /**
+   * First paragraph of that dialog.
+   * @default "You are about to leave the new Dashboard and return to the classic DocSpace view."
+   */
   confirmBody?: string;
-  /** Hint shown below the body — e.g. how to return to new view */
+  /**
+   * Second paragraph of that dialog. An empty string removes it.
+   * @default "You can return to the new Dashboard at any time by navigating to /dashboard."
+   */
   confirmHint?: string;
-  /** Confirmation modal "proceed" button label */
+  /**
+   * Label of that dialog's primary button.
+   * @default "Switch"
+   */
   confirmOk?: string;
-  /** Confirmation modal "cancel" button label */
+  /**
+   * Label of its cancel button.
+   * @default "Cancel"
+   */
   confirmCancel?: string;
   /**
-   * Accessible name of the switch button. Defaults to the English
-   * "Switch DocSpace design"; pass a translated string in a localised UI
+   * Accessible name of the switch button. The English default is not
+   * translated for you.
+   * @default "Switch DocSpace design"
    */
   ariaLabel?: string;
   /**
-   * Called with the target URL after every switch: `"/dashboard"` when
-   * switching to the new view, `"/"` after confirming the switch back to the
-   * old one. The targets are fixed; this only decides how to navigate, so pass
-   * React Router's `navigate` to avoid a full page reload.
-   * Falls back to `window.location.href` when omitted.
+   * Called with the URL to go to — `/dashboard` or `/`, both hard-coded. Pass
+   * your router's navigate here; without it the component assigns
+   * `window.location.href` and the page reloads.
    */
   onNavigate?: (url: string) => void;
-  /** Additional CSS class applied to the wrapper */
+  /** Applied to the wrapper around the title and the pill. */
   className?: string;
 };

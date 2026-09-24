@@ -79,8 +79,16 @@ pre-push:
       priority: 3
       run: pnpm tsc
       follow: true
-    test:
+    # Structure and derived truth only; the `--compile` pass that type-checks
+    # every example in every README takes half a minute and runs in CI.
+    # `scripts/readme-allowlist.json` is `[]` -- a folder listed there is a folder
+    # this step stops checking.
+    check-readme:
       priority: 4
+      run: pnpm check:readme && pnpm readme:props:check && pnpm readme:catalogue:check
+      follow: true
+    test:
+      priority: 5
       run: pnpm test
       follow: true
     # The gate used to stop at tsc, lint and test, which left the packaging
@@ -90,10 +98,10 @@ pre-push:
     # ones. All three fail in `build`, so build here, where the developer's own
     # platform is the one being tested. Adds about 30 seconds.
     build:
-      priority: 5
+      priority: 6
       run: pnpm build
       follow: true
     verify-package:
-      priority: 6
+      priority: 7
       run: pnpm verify:package
       follow: true

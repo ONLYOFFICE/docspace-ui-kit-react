@@ -9,9 +9,15 @@ export const createTooltipWrapper = <TProps extends object>(
 ) => {
   type PropsWithHandlers = TProps &
     WithTooltipProps & {
+      /** Called in addition to the tooltip's own click handler, never instead
+       * of it. */
       onClick?: MouseEventHandler;
+      /** Called in addition to the handler that opens the tooltip, after it. */
       onMouseEnter?: MouseEventHandler;
+      /** Called in addition to the handler that closes the tooltip, after it. */
       onMouseLeave?: MouseEventHandler;
+      /** Passed through only while the element has no tooltip. Once one is
+       * active the wrapper's own handler replaces it and this is dropped. */
       onMouseMove?: MouseEventHandler;
     };
 

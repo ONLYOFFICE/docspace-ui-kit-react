@@ -1,12 +1,10 @@
+import type { LoaderWrapperProps } from "./LoaderWrapper.types";
+
 export const LoaderWrapper = ({
   children,
   isLoading,
   testId,
-}: {
-  children: React.ReactNode;
-  isLoading: boolean;
-  testId?: string;
-}) => {
+}: LoaderWrapperProps) => {
   return (
     <div
       style={{
@@ -32,3 +30,5 @@ export const LoaderWrapper = ({
     </div>
   );
 };
+
+export type { LoaderWrapperProps };

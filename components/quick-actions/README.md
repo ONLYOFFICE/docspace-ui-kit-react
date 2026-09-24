@@ -1,127 +1,299 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "QuickActions",
+  "folder": "components/quick-actions",
+  "kind": "component",
+  "category": "Data display",
+  "status": "public",
+  "summary": "Horizontal strip of large icon tiles that scrolls when the tiles no longer fit.",
+  "import": { "subpath": "components/quick-actions", "barrel": true, "default": false },
+  "exports": ["QuickActions", "QuickActionItem", "QuickActionsProps"],
+  "providers": ["ThemeProvider"],
+  "state": { "visibility": null, "close": "onClose", "loading": "isLoading", "disabled": null },
+  "related": ["rectangle", "tooltip", "empty-view"],
+  "subComponents": [],
+  "testIds": ["quick-actions-track", "quick-actions-prev", "quick-actions-next", "quick-actions-close"]
+} -->
+
 # QuickActions
 
-A banner of large illustrated tiles offering the first things to do in a section — create a document, a room, a form, an agent. Reach for it at the top of a view where a few one-click entry points matter more than a menu. The tiles sit on one row that scrolls horizontally once they no longer fit, with floating arrows to page through it and an optional control to dismiss the whole banner.
+Horizontal strip of large icon tiles that scrolls when the tiles no longer fit. It is the
+banner of "create a document, create a room, start from a template" at the top of an empty
+section.
 
-## Usage
+## Use this when / not when
 
-```jsx
-import {
-  QuickActions,
-  CreateDocumentIcon,
-  CreateSpreadsheetIcon,
-} from "@onlyoffice/apps-ui-kit/components/quick-actions";
+- Use for a small set of ways to start something, offered side by side and equal in weight.
+- Not for a list of records: the tiles are 184×147 and carry one line of text.
+- Not for a loading placeholder on its own — [`RectangleSkeleton`](../rectangle/README.md) is
+  what this component draws while `isLoading` is set, and you can use it directly.
+- Not for switching between views of the same screen; [`Tabs`](../tabs/README.md) is that.
+- Not for the whole empty state. [`EmptyView`](../empty-view/README.md) is the illustration,
+  the title and the explanation; this strip sits next to one, not instead of it.
+- There is no heading, no "show all" and no wrapping to a second row. The strip is one row
+  that scrolls.
 
-const MyComponent = () => {
+## Import
+
+```ts
+import { QuickActions } from "@onlyoffice/apps-ui-kit/components/quick-actions";
+```
+
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
+
+Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme` for the tile and control
+colours; the dark values are defined on the theme's `.dark` class.
+
+## Minimal example
+
+```tsx
+import { QuickActions } from "@onlyoffice/apps-ui-kit/components/quick-actions";
+
+export function StartHere({ onCreate }: { onCreate: (kind: string) => void }) {
   return (
     <QuickActions
-      prevLabel={t("Common:Previous")}
-      nextLabel={t("Common:Next")}
+      prevLabel="Previous"
+      nextLabel="Next"
       items={[
         {
           id: "document",
-          icon: <CreateDocumentIcon />,
           label: "Document",
-          onClick: handleNewDocument,
+          icon: <svg viewBox="0 0 81 75" aria-hidden="true" />,
+          onClick: () => onCreate("document"),
         },
         {
           id: "spreadsheet",
-          icon: <CreateSpreadsheetIcon />,
           label: "Spreadsheet",
-          href: "/new/xlsx",
+          icon: <svg viewBox="0 0 81 75" aria-hidden="true" />,
+          onClick: () => onCreate("spreadsheet"),
         },
       ]}
     />
   );
-};
+}
 ```
 
-The barrel exports `QuickActions` (named), the `QuickActionItem` and `QuickActionsProps` types, and the tile icons listed below.
+## Props
 
-## Properties
+<!-- props:start QuickActionsProps -->
 
-| Name       | Type              | Default | Description                                                                        |
-| ---------- | ----------------- | ------- | ---------------------------------------------------------------------------------- |
-| items      | QuickActionItem[] | -       | Tiles to render; an empty array renders nothing unless loading                     |
-| prevLabel  | string            | -       | Accessible name of the scroll-back arrow. Required unless `isLoading` is `true`    |
-| nextLabel  | string            | -       | Accessible name of the scroll-forward arrow. Required unless `isLoading` is `true` |
-| isLoading  | boolean           | false   | Renders skeleton tiles instead of the items                                        |
-| onClose    | () => void        | -       | Hides the whole banner. Without it no close control is rendered                    |
-| closeLabel | string            | -       | Tooltip and accessible name of the close control. Required with `onClose`          |
-| className  | string            | -       | Class name of the outer banner element                                             |
-| dataTestId | string            | -       | `data-testid` of the outer banner element                                          |
+_Generated by `pnpm readme:props` from `QuickActionsProps` in `QuickActions.types.ts`. Do not edit; edit the JSDoc._
 
-The types enforce the pairings: `onClose` and `closeLabel` come together or not at all, and `prevLabel` / `nextLabel` may be omitted only when `isLoading` is the literal `true`. There are no built-in English fallbacks for any label.
+| Prop         | Type                | Required | Default | Description                                                                                                                                                                                                      |
+| ------------ | ------------------- | -------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `items`      | `QuickActionItem[]` | **yes**  | –       | The tiles, in the order they are drawn. An empty array renders nothing at all.                                                                                                                                   |
+| `className`  | `string`            | no       | –       | Applied to the banner, after the component's own class.                                                                                                                                                          |
+| `closeLabel` | `string`            | no       | –       | Tooltip and accessible name for the close control.                                                                                                                                                               |
+| `dataTestId` | `string`            | no       | –       | `data-testid` of the banner. The track and the controls carry ids of their own.                                                                                                                                  |
+| `isLoading`  | `boolean`           | no       | `false` | Whether skeleton tiles are drawn instead of the real ones.                                                                                                                                                       |
+| `nextLabel`  | `string`            | no       | –       | Accessible name of the arrow that scrolls on. Required, and localized by you, unless `isLoading` is pinned to `true`.                                                                                            |
+| `onClose`    | `() => void`        | no       | –       | Hides the whole banner. When omitted no close control is rendered, so a consumer that has nowhere to persist the choice keeps a carousel without an affordance that would appear to do nothing on the next load. |
+| `prevLabel`  | `string`            | no       | –       | Accessible name of the arrow that scrolls back. Required, and localized by you, unless `isLoading` is pinned to `true`.                                                                                          |
 
-### QuickActionItem
+<!-- props:end -->
 
-| Name           | Type                                           | Default | Description                                                             |
-| -------------- | ---------------------------------------------- | ------- | ----------------------------------------------------------------------- |
-| id             | string                                         | -       | Unique key of the tile; the set of ids also identifies the section      |
-| icon           | ReactNode                                      | -       | Tile illustration, rendered `aria-hidden`                               |
-| label          | string                                         | -       | Visible caption and accessible name of the tile                         |
-| onClick        | (e: MouseEvent\<HTMLElement\>) => void         | -       | Click handler of the tile, on the button or the link alike              |
-| href           | string                                         | -       | Renders the tile as a link instead of a button (ignored while disabled) |
-| target         | "\_blank" \| "\_self" \| "\_parent" \| "\_top" | -       | Link target; `_blank` adds `rel="noopener noreferrer"`                  |
-| disabled       | boolean                                        | -       | Dims the tile and blocks interaction                                    |
-| tooltipContent | ReactNode                                      | -       | Tooltip shown below the tile                                            |
-| dataTestId     | string                                         | -       | `data-testid` of the tile element                                       |
+`items` takes `QuickActionItem`:
 
-## Behaviour
+| Field            | Type                                         | Effect                                                                          |
+| ---------------- | -------------------------------------------- | ------------------------------------------------------------------------------- |
+| `id`             | `string`                                     | React key of the tile, and what the strip watches to know the section changed.  |
+| `icon`           | `ReactNode`                                  | Drawn in an 81×75 box, fitted with `object-fit: contain`.                       |
+| `label`          | `string`                                     | The text and the accessible name. Clamped to two lines.                         |
+| `onClick`        | `(e: MouseEvent<HTMLElement>) => void`       | Called on activation, for a button and for a link alike.                        |
+| `href`           | `string`                                     | Makes the tile an `<a>`. Ignored while `disabled`.                              |
+| `target`         | `"_blank" \| "_self" \| "_parent" \| "_top"` | `"_blank"` also sets `rel="noopener noreferrer"`.                               |
+| `disabled`       | `boolean`                                    | Half opacity, `pointer-events: none`, and the tile stays a `<button disabled>`. |
+| `tooltipContent` | `ReactNode`                                  | Tooltip under the tile. Without it the tile has none.                           |
+| `dataTestId`     | `string`                                     | `data-testid` of the tile.                                                      |
 
-- **Button or link.** A tile with `href` (and not `disabled`) renders as `<a>`; otherwise as `<button type="button">`. A disabled tile is always a button.
-- **Scrolling.** The arrows appear only at an end the strip can still scroll towards, so at the start only the forward arrow shows and no arrow shows when every tile fits. An arrow scrolls by the visible width minus 64px, smoothly. Wheel, trackpad and touch-swipe scroll the same strip natively; the scrollbar is hidden.
-- **Section changes.** When the set of item `id`s changes the strip jumps back to the start. Rebuilding `items` with the same ids on every render does not move it.
-- **Controls visibility.** On devices with hover and a fine pointer the controls fade in only while the banner is hovered or contains focus; elsewhere they stay visible whenever rendered.
-- **Loading.** With `isLoading` the banner renders `items.length` skeleton tiles (four when `items` is empty) and no controls.
-- **Test ids.** Besides `dataTestId`, the strip carries `quick-actions-track` and the controls `quick-actions-prev`, `quick-actions-next` and `quick-actions-close`.
+The folder also re-exports the portal's tile artwork as React components — `BlankPdfIcon`,
+`CreateAgentIcon`, `CreateDocumentIcon`, `CreateFormIcon`, `CreateFromTemplateIcon`,
+`CreateFromTextIcon`, `CreatePresentationIcon`, `CreateRoomIcon`,
+`CreateCustomRoomIllustrationIcon`, `UseRoomTemplateIllustrationIcon`, `QuickVdrRoomIcon`,
+`QuickCollaborationRoomIcon`, `QuickPublicRoomIcon`, `QuickCustomRoomIcon`,
+`QuickFormRoomIcon`, `CreateSpreadsheetIcon`, `GeneratePdfAiIcon`, `GenerateWithAiIcon`,
+`UseTemplateIcon` and `AIChatIcon` — and because the folder is in the barrel, so does
+`@onlyoffice/apps-ui-kit`. They are authored at the tile's own proportions; your own SVG works
+just as well.
 
-## Layout
-
-The banner takes the full width of its container and centres the tile row inside it. Tiles keep a fixed size and do not shrink: 184px wide by 147px high on desktop, 120px high on tablet and below, and 152px wide on mobile. Labels wrap to at most two lines and are ellipsized after that. The arrows and the close control are absolutely positioned over the strip and take no space in layout.
-
-## RTL
-
-Paging follows the direction resolved on the strip itself, so a subtree with its own `dir` pages correctly. The arrow glyphs and the edge fades are mirrored under `[data-dir="rtl"]`, which `ThemeProvider` sets on `<html>`.
-
-## Styling
-
-Component-level CSS variables, set on the banner or any ancestor:
-
-| Variable                         | Fallback                 | Description                                                                |
-| -------------------------------- | ------------------------ | -------------------------------------------------------------------------- |
-| `--quick-actions-tile-bg`        | `colors.$gray-light`     | Tile background (`colors.$dark-gray-light` in dark theme)                  |
-| `--quick-actions-tile-bg-hover`  | `colors.$gray-light-mid` | Tile background on hover and keyboard focus (`colors.$gray-dark-mid` dark) |
-| `--quick-actions-tile-color`     | `colors.$black`          | Tile text colour (`colors.$white` in dark theme)                           |
-| `--quick-actions-tile-max-width` | `184px`                  | Cap on one tile's width; `none` lets the tiles grow to fill the banner     |
-| `--quick-actions-row-max-width`  | `100%`                   | Cap on the width of the tile row                                           |
-| `--quick-actions-edge-inset`     | `0px`                    | Distance from the banner edge to the first tile, applied as inline padding |
-
-The dark-theme values apply under a `.dark` ancestor class, which `ThemeProvider` puts on `<body>`. The fade, arrow and close-control colours are not configurable.
-
-## Icons
-
-`components/quick-actions/icons.ts` re-exports 20 tile illustrations as React components. They are exported from the component barrel and, through it, from the package root:
-
-`BlankPdfIcon`, `CreateAgentIcon`, `CreateDocumentIcon`, `CreateFormIcon`, `CreateFromTemplateIcon`, `CreateFromTextIcon`, `CreatePresentationIcon`, `CreateRoomIcon`, `CreateCustomRoomIllustrationIcon`, `UseRoomTemplateIllustrationIcon`, `QuickVdrRoomIcon`, `QuickCollaborationRoomIcon`, `QuickPublicRoomIcon`, `QuickCustomRoomIcon`, `QuickFormRoomIcon`, `CreateSpreadsheetIcon`, `GeneratePdfAiIcon`, `GenerateWithAiIcon`, `UseTemplateIcon`, `AIChatIcon`.
-
-## Examples
-
-### Dismissible
-
-```jsx
-<QuickActions
-  onClose={hideQuickActions}
-  closeLabel={t("Common:DisableQuickActionsOnAllPages")}
-  prevLabel={t("Common:Previous")}
-  nextLabel={t("Common:Next")}
-  items={roomItems}
-/>
-```
-
-Persisting and reversing the dismissal is up to the host; the component only calls `onClose`.
+## Recipes
 
 ### Loading
 
-```jsx
-<QuickActions isLoading items={[]} />
+`isLoading` replaces the tiles with skeletons of the same box, so nothing moves when the real
+ones arrive. It draws as many as `items` has, or four when that is empty, and renders no
+controls — which is why `prevLabel` and `nextLabel` may be left out only when `isLoading` is
+the literal `true`.
+
+```tsx
+import { QuickActions } from "@onlyoffice/apps-ui-kit/components/quick-actions";
+
+export function StartHereLoading() {
+  return <QuickActions isLoading items={[]} />;
+}
 ```
+
+A banner that _leaves_ the loading state passes both labels, because it will have arrows:
+
+```tsx
+import { QuickActions } from "@onlyoffice/apps-ui-kit/components/quick-actions";
+import type { QuickActionItem } from "@onlyoffice/apps-ui-kit/components/quick-actions";
+
+export function StartHereAsync({
+  items,
+  pending,
+}: {
+  items: QuickActionItem[];
+  pending: boolean;
+}) {
+  return (
+    <QuickActions
+      items={items}
+      isLoading={pending}
+      prevLabel="Previous"
+      nextLabel="Next"
+    />
+  );
+}
+```
+
+### Dismissable
+
+`onClose` adds the cross in the top corner, and the types require `closeLabel` with it.
+Remembering the choice is yours: the component renders nothing different on the next mount.
+
+```tsx
+import { useState } from "react";
+import { QuickActions } from "@onlyoffice/apps-ui-kit/components/quick-actions";
+import type { QuickActionItem } from "@onlyoffice/apps-ui-kit/components/quick-actions";
+
+export function DismissableBanner({ items }: { items: QuickActionItem[] }) {
+  const [hidden, setHidden] = useState(
+    () => localStorage.getItem("quick-actions-hidden") === "1",
+  );
+
+  if (hidden) return null;
+
+  return (
+    <QuickActions
+      items={items}
+      prevLabel="Previous"
+      nextLabel="Next"
+      closeLabel="Hide these"
+      onClose={() => {
+        localStorage.setItem("quick-actions-hidden", "1");
+        setHidden(true);
+      }}
+    />
+  );
+}
+```
+
+### Links and disabled tiles
+
+A tile with `href` is an `<a>`; one with `disabled` stays a `<button disabled>` whatever
+`href` says.
+
+```tsx
+import { QuickActions } from "@onlyoffice/apps-ui-kit/components/quick-actions";
+
+export function StartHereMixed({ canCreateRoom }: { canCreateRoom: boolean }) {
+  return (
+    <QuickActions
+      prevLabel="Previous"
+      nextLabel="Next"
+      items={[
+        {
+          id: "templates",
+          label: "Browse templates",
+          icon: <svg viewBox="0 0 81 75" aria-hidden="true" />,
+          href: "https://www.onlyoffice.com/templates.aspx",
+          target: "_blank",
+        },
+        {
+          id: "room",
+          label: "Create a room",
+          icon: <svg viewBox="0 0 81 75" aria-hidden="true" />,
+          disabled: !canCreateRoom,
+          tooltipContent: canCreateRoom ? undefined : "Ask an admin for access",
+        },
+      ]}
+    />
+  );
+}
+```
+
+## Behaviour the types don't state
+
+- **An empty `items` renders `null`** — not an empty strip. Only the loading form draws
+  anything without tiles.
+- **The tiles never shrink and never wrap.** They keep 184×147 (120px tall at tablet and
+  below, 152px wide on mobile) and the row overflows into a horizontal scroll port, driven by
+  wheel, trackpad and touch. The scrollbar itself is hidden.
+- **The arrows appear and disappear per end**, each one only while the strip can still move
+  that way. They are absolutely positioned over the strip and take no space, so nothing shifts
+  when they come and go. Where hover exists they fade in with the banner or when focus enters
+  it; on a touch device they are always drawn, because there is no hover to reveal them.
+- **The strip rewinds to the start whenever the set of `id`s changes**, so a new section does
+  not open at the previous one's scroll offset. Rebuilding `items` with the same ids leaves the
+  offset alone.
+- **It is measured with a `ResizeObserver` on the track and on every tile**, so a late layout
+  pass is caught; the measurement is throttled by identity, and a scroll that changes nothing
+  does not re-render the tiles.
+- **Paging keeps 64px of the current view on screen** and asks for a smooth scroll; direction
+  is read from the track's computed `direction`, so RTL pages the other way round.
+- **A tooltipped tile is wrapped in an extra element** that becomes the flex item, and the
+  tooltip is anchored by an id built from React's `useId` with its colons stripped.
+- **`onClose` only hides the banner if you do.** The component renders the cross and calls the
+  handler; it keeps no state of its own.
+- The banner spans its container while the row is capped by
+  `--quick-actions-row-max-width`, which is what leaves the arrows room to stand outside the
+  tiles rather than on top of them.
+
+## CSS variables
+
+Set them on any ancestor.
+
+| Variable                         | Default           | Effect                                                     |
+| -------------------------------- | ----------------- | ---------------------------------------------------------- |
+| `--quick-actions-tile-bg`        | theme grey        | Background of a tile.                                      |
+| `--quick-actions-tile-bg-hover`  | theme grey        | Background of a tile while hovered or focused.             |
+| `--quick-actions-tile-color`     | theme text colour | Colour of the label.                                       |
+| `--quick-actions-tile-max-width` | `184px`           | Cap on one tile's width. `none` lets the tiles fill.       |
+| `--quick-actions-row-max-width`  | `100%`            | Cap on the row of tiles, not on the banner.                |
+| `--quick-actions-edge-inset`     | `0px`             | Space between the banner's edge and where the tiles start. |
+
+## Accessibility
+
+- **Every tile is a real `<button type="button">`**, or an `<a>` when it has `href`: focus,
+  Enter and Space, and `disabled`, all come from the platform. The focus ring is drawn with
+  `:focus-visible`.
+- `aria-label` on each tile is its `label`, and the icon is `aria-hidden`, so it is announced
+  once.
+- **The arrows and the cross are named by you.** `prevLabel`, `nextLabel` and `closeLabel` are
+  required by the types rather than defaulted, so a missing translation is a compile error
+  instead of an English word in a localized interface.
+- The controls stay reachable by keyboard on a hover device: they are revealed by
+  `:focus-within` as well as by hover.
+- The strip itself has no role and no keyboard scrolling of its own; a tile scrolled out of
+  view is still reached by tabbing to it, which scrolls it in.
+
+## Test ids
+
+| Element          | `data-testid`                       |
+| ---------------- | ----------------------------------- |
+| The banner       | `dataTestId`, none by default       |
+| The scroll track | `quick-actions-track`               |
+| The back arrow   | `quick-actions-prev`                |
+| The next arrow   | `quick-actions-next`                |
+| The cross        | `quick-actions-close`               |
+| One tile         | its own `dataTestId`, if it has one |
+
+The loading form renders the banner's id and nothing else.
+
+## Related
+
+- [`RectangleSkeleton`](../rectangle/README.md) — the placeholder this component draws while
+  loading, on its own.
+- [`Tooltip`](../tooltip/README.md) — the tooltip a tile opens, for anchoring one yourself.
+- [`EmptyView`](../empty-view/README.md) — the empty state this banner usually sits above.
