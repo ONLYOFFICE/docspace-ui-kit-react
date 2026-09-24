@@ -1,8 +1,13 @@
 name: CI
 
+# `push` covers only the long-lived branches. A task branch is checked through
+# its pull request: with `feature/*` and `bugfix/*` under both triggers, every
+# push to a branch with an open PR ran each job twice on the same commit. The
+# pull_request run is the one worth keeping -- it checks the merge result, not
+# the branch alone. A task branch with no PR yet is covered by the pre-push gate.
 "on":
   push:
-    branches: [master, develop, release/v*, hotfix/v*, feature/*, bugfix/*]
+    branches: [master, develop, release/v*, hotfix/v*]
   pull_request:
     branches: [master, develop, release/v*, hotfix/v*, feature/*, bugfix/*]
 
