@@ -43,8 +43,8 @@ test.describe("Slider — light", () => {
     await expect(page).toHaveScreenshot("slider-with-custom-size.png");
   });
 
-  test("rtl", async ({ page }) => {
-    await gotoStory(page, "rtl");
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
     await expect(page).toHaveScreenshot("slider-rtl.png");
   });
 
@@ -98,8 +98,8 @@ test.describe("Slider — dark", () => {
     await expect(page).toHaveScreenshot("slider-with-custom-size-dark.png");
   });
 
-  test("rtl dark", async ({ page }) => {
-    await gotoStory(page, "rtl");
+  test("right to left dark", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
     await expect(page).toHaveScreenshot("slider-rtl-dark.png");
   });
 

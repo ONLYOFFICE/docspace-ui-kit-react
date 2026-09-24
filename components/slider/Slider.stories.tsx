@@ -269,7 +269,7 @@ export const WithCustomSize: Story = {
   },
 };
 
-export const RTL: Story = {
+export const RightToLeft: Story = {
   render: (args) => (
     <div dir="rtl" style={{ width: "300px", padding: "20px" }}>
       <SliderWithState {...args} />

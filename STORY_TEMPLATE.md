@@ -145,6 +145,7 @@ export const VariantStory: Story = {
 | State variants      | `DisabledState`, `LoadingState`, `HoveredState` |
 | Type/style variants | `PrimaryButtons`, `SecondaryButtons`            |
 | Feature demos       | `WithIcon`, `WithTooltip`, `WithCallback`       |
+| Direction           | `RightToLeft` (never `RTL`)                     |
 
 ## Categories
 
