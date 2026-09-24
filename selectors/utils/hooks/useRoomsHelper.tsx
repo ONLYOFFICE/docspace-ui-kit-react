@@ -52,7 +52,11 @@ import { toastr, type TData } from "../../../components/toast";
 
 import { LoadersContext } from "../contexts/Loaders";
 
-import { PAGE_COUNT, FORMS_SEARCH_AREA } from "../constants";
+import {
+  PAGE_COUNT,
+  FORMS_SEARCH_AREA,
+  ROOMS_SECTION_FOLDER_TYPES,
+} from "../constants";
 import type { UseRoomsHelperProps } from "../types";
 import { useCommonTranslation } from "../../../utils/i18n";
 import {
@@ -96,7 +100,6 @@ const useRoomsHelper = ({
   favoritesFolder,
   withRecentTreeFolder,
   withFavoritesTreeFolder,
-  roomsFolderId,
 }: UseRoomsHelperProps) => {
   const t = useCommonTranslation();
   const {
@@ -322,12 +325,13 @@ const useRoomsHelper = ({
               favoritesFolder,
               withRecent: withRecentTreeFolder,
               withFavorites: withFavoritesTreeFolder,
-              parentId: formsSection ? undefined : roomsFolderId,
-              // Scope filter for Recent/Favorites: the type of the rooms to
-              // keep, not the root section - so this stays FillingFormsRoom (15).
+              // Scope filter for Recent/Favorites: the types of the rooms to
+              // keep, not the root section - so this stays FillingFormsRoom (15)
+              // for Forms, and the room types making up the Rooms section (not
+              // VirtualRooms, which would leak form-filling and AI rooms back in).
               folderType: formsSection
                 ? FolderType.FillingFormsRoom
-                : undefined,
+                : ROOMS_SECTION_FOLDER_TYPES,
               withSeparator: itemList.length > 0,
               t,
             });
@@ -392,7 +396,6 @@ const useRoomsHelper = ({
       favoritesFolder,
       withRecentTreeFolder,
       withFavoritesTreeFolder,
-      roomsFolderId,
       isRoomDisabled,
       finishFullLoad,
     ],
