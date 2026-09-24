@@ -2,28 +2,27 @@ import type React from "react";
 import type { RoomsType } from "../../enums";
 
 export type RoomTypeProps = {
-  /** Room type whose logo, title and description are shown. */
+  /** Which room type the row describes. It picks the glyph, the title and the description; an unknown value leaves both texts empty. */
   roomType?: RoomsType;
-  /** Open state; on `dropdownButton` it adds the open border and reverses the arrow. */
+  /** Whether the row is drawn as opened: an accent border on `dropdownButton`, and its arrow turned the other way. */
   isOpen: boolean;
-
-  /** Display variant. */
+  /** Which layout to render.
+   * @default "listItem" */
   type?: "listItem" | "dropdownButton" | "dropdownItem";
-  /** DOM `id` of the root element. */
+  /** `id` of the outer element. */
   id?: string;
-  /** Written to the root element as `data-selected-id`; not used for rendering. */
+  /** Written to `data-selected-id` and read by nothing else. Required all the same. */
   selectedId: string | number;
-
-  /** Click handler on the root element, arrow included; one click, one call. Not called while the item is disabled. */
+  /** Called with the event when the row is clicked, once per click wherever inside the row it lands. A disabled row does not call it at all. */
   onClick: React.MouseEventHandler<HTMLElement>;
-  /** Disables a `FormRoom` item: styled as disabled and `onClick` is not called (`listItem` and `dropdownItem`). */
+  /** Greys the row out while `roomType` is `FormRoom`, marks it `aria-disabled` and stops it calling `onClick`. */
   disabledFormRoom?: boolean;
-  /** Disables a `PublicRoom` item: styled as disabled and `onClick` is not called (`listItem` and `dropdownItem`). */
+  /** Greys the row out while `roomType` is `PublicRoom`, marks it `aria-disabled` and stops it calling `onClick`. */
   disabledPublicRoom?: boolean;
-  /** Shows the "from template" title and description; also passed to `RoomLogo`. */
+  /** Replaces the title and the description with the "from template" wording, whatever `roomType` says, and switches the glyph to the template one. */
   isTemplate?: boolean;
-  /** Passed to `RoomLogo` as `isTemplateRoom`. */
+  /** Switches the glyph to the template variant of `roomType` without touching the texts. */
   isTemplateRoom?: boolean;
-  /** Shows the form-set title and description instead of the room type's. */
+  /** Uses the form-set wording for the title and the description instead of the room type's. */
   isFormSection?: boolean;
 };

@@ -1,30 +1,47 @@
 import { IndexRange } from "react-virtualized";
 
 export type RowContainerProps = {
-  /** Height of one Row element. Required for the proper functioning of the scroll */
+  /**
+   * Height of one row in pixels, which the virtualised list uses for every row
+   * alike. A row that is taller is clipped.
+   * @default 50
+   */
   itemHeight?: number;
-  /** Allows setting fixed block height for Row */
+  /**
+   * Height of the container as a CSS length. Without it the container is 100%
+   * of its parent, which has to have a height of its own.
+   */
   manualHeight?: string;
-  /** Child elements */
+  /** The rows. It must be an array, one entry per row. */
   children: React.ReactNode[];
-  /** Enables react-window for efficient rendering of large lists */
+  /**
+   * Whether the rows are virtualised and paged in as the user scrolls. Turn it
+   * off for a short list: the virtual list needs the portal's own scroll
+   * container and measures its width by a literal element id.
+   * @default true
+   */
   useReactWindow?: boolean;
-  /** Accepts class */
+  /** Applied to the container. */
   className?: string;
-  /** Accepts id */
+  /**
+   * Id of the container. The virtual list finds the container by the literal id
+   * `rowContainer` to measure its width, so changing this — or rendering two
+   * containers — leaves the rows with a width of zero.
+   * @default "rowContainer"
+   */
   id?: string;
-  /** Accepts css style */
+  /** Applied to the container. */
   style?: React.CSSProperties;
   /** Sets a callback function that is called when the list scroll positions change */
   onScroll?: () => void;
-  /** The property required for the infinite loader */
+  /** How many rows are loaded so far. Read by the virtual list only. */
   filesLength?: number;
-  /** The property required for the infinite loader */
+  /** How many rows there are in total. Read by the virtual list only. */
   itemCount?: number;
-  /** The property required for the infinite loader */
+  /** Called with the range to load when the user scrolls near the end. */
   fetchMoreFiles?: (params: IndexRange) => Promise<void>;
-  /** The property required for the infinite loader */
+  /** Whether there is another page to ask for. */
   hasMoreFiles?: boolean;
-  /** Disables text selection */
+  /** Disables text selection, which is on by default inside the container. */
   noSelect?: boolean;
 };

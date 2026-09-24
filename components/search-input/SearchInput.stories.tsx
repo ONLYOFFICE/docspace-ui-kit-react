@@ -30,7 +30,7 @@ const itemsModel = [
 ];
 
 const meta = {
-  title: "UI/Interactive elements/SearchInput",
+  title: "UI/Form controls/SearchInput",
   component: SearchInput,
   parameters: {
     docs: {

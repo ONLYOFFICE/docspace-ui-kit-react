@@ -1,32 +1,34 @@
 import type { LoaderTypes } from "./Loader.enums";
 
 export type LoaderProps = {
-  /** Ref to access the DOM element or React component instance */
+  /** Ignored. It is neither destructured nor forwarded to the SVG. */
   ref?: React.RefObject<SVGSVGElement>;
-  /** Custom color for the loader. Can be any valid CSS color value */
+  /** Any CSS colour, applied as the stroke of the animation and the colour of
+   * the `base` type's text. */
   color?: string;
-  /**
-   * Type of loader animation to display. Available types:
-   * - base: Simple circular spinner
-   * - oval: Oval-shaped loading animation
-   * - dual-ring: Two concentric rotating rings
-   * - rombs: Diamond-shaped loading animation
-   * - track: Circular track with rotating segment
-   */
+  /** Which animation to render. There is **no default**, and `base` is not an
+   * animation: both it and an absent `type` fall through to a branch that
+   * renders `label` as plain text and nothing else. Pass `oval`, `dualRing`,
+   * `rombs` or `track` for something that spins. */
   type?: LoaderTypes;
-  /** Size of the loader in valid CSS units (px, rem, em, etc.) */
+  /** Size of the animation as a CSS length, applied to both axes. The
+   * stylesheet falls back to 40px for most types and 20px for `track`. For the
+   * `base` type this is the font size of the text instead. */
   size?: string;
-  /** Optional text to display below the loader */
+  /** Accessible name of the animation, set as its `aria-label`. For the `base`
+   * type it is not a label at all but the entire rendered content. */
   label?: string;
-  /** Additional CSS class name for custom styling */
+  /** Applied to the wrapper around the animation, not to the animation. */
   className?: string;
-  /** Unique identifier for the loader component */
+  /** Applied to the wrapper. */
   id?: string;
-  /** Custom inline CSS styles */
+  /** Applied to the wrapper, and again to the inner span of the `base` type. */
   style?: React.CSSProperties;
-  /** If true, uses primary color from theme */
+  /** Uses the primary button's track colour, for a loader drawn on top of a
+   * primary button. Read by the `track` type only. */
   primary?: boolean;
-  /** If true, loader will appear in a disabled state */
+  /** Dims the animation to the disabled opacity. Read by the `track` type
+   * only. */
   isDisabled?: boolean;
 };
 

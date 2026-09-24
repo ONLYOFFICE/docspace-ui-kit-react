@@ -80,6 +80,14 @@ Two things fell out of closing it:
 - **`Dropzone` collided**: the kit's own `components/dropzone` against the raw `react-dropzone`
   component that `utils/react-dropzone-interop` wraps. The component keeps the name; the util
   exports only `useDropzone`.
+- **Five components were listed and still missing.** `export * from "./x"` carries a module's
+  named exports and silently drops its default, and `section`, `filter`, `navigation`,
+  `status-message` and `article` export their component only by default. The folders were in
+  the barrel, the paragraph above said so, and `Section`, `FilterInput`, `Navigation`,
+  `StatusMessage` and `Article` were still absent from both `dist/esm/index.js` and the types —
+  a plugin author found it, not a check. They are re-exported by name now (663 → 668), and
+  `components/barrel.test.ts` fails when a folder's default export is not reachable from the
+  barrel under some name.
 
 ### Not public, and why — the two that look like they should be
 

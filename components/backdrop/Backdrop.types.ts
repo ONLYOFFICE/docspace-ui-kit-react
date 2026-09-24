@@ -1,11 +1,14 @@
 import type React from "react";
 
 export interface BackdropProps {
-  /** Sets visible or hidden */
+  /**
+   * Whether the layer is rendered at all. It is not a CSS switch: a backdrop
+   * that is not visible renders nothing.
+   */
   visible: boolean;
 
   /**
-   * Sets the z-index CSS property for stacking context
+   * Stacking order of the layer. The component it covers needs a higher one.
    * @default 203
    */
   zIndex?: number;
@@ -19,19 +22,19 @@ export interface BackdropProps {
   /** HTML id attribute for the backdrop element */
   id?: string;
 
-  /** Custom inline styles to apply to the backdrop */
+  /** Custom inline styles to apply to the backdrop. `zIndex` is merged in first. */
   style?: React.CSSProperties;
 
   /**
-   * Enables background visibility for the backdrop
-   * Note: Background is not displayed if viewport width > 1024px
+   * Dims the page. Without it the layer is transparent and only catches
+   * clicks — except on a viewport of 600px or less, where it dims anyway.
    * @default false
    */
   withBackground?: boolean;
 
   /**
-   * Indicates if the backdrop is being used with an Aside component
-   * Affects backdrop stacking and background behavior
+   * Marks the backdrop as belonging to a side panel: it then dims the page, and
+   * it is allowed to render even when two backdrops are already on screen.
    * @default false
    */
   isAside?: boolean;
@@ -44,20 +47,21 @@ export interface BackdropProps {
   withoutBackground?: boolean;
 
   /**
-   * Indicates if the backdrop is being used with a modal dialog
-   * Affects touch event handling
+   * Lets touch scrolling through the backdrop go on as usual. Without it a
+   * touch move over the layer has its default action prevented.
    * @default false
    */
   isModalDialog?: boolean;
 
   /**
-   * Click event handler for the backdrop
-   * @param e - React mouse event
+   * Called on a click, and on a touch move or touch end, which pass a touch
+   * event cast to a mouse event.
    */
   onClick?: (e: React.MouseEvent) => void;
 
   /**
-   * Indicates if the backdrop should be shown
+   * Renders the layer even when another backdrop is already on screen, which
+   * would otherwise suppress it.
    * @default false
    */
   shouldShowBackdrop?: boolean;

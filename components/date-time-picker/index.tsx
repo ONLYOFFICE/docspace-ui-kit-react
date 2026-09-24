@@ -17,21 +17,15 @@ import { TimePicker } from "../time-picker";
 import { DatePicker } from "../date-picker";
 import { ComboBox, TOption } from "../combobox";
 
-import type { DateTimePickerProps } from "./DateTimePicker.types";
+import type {
+  DateTimePickerProps,
+  DateTimePickerTranslations,
+} from "./DateTimePicker.types";
 import styles from "./DateTimePicker.module.scss";
 
-export type { DateTimePickerProps };
+export type { DateTimePickerProps, DateTimePickerTranslations };
 
-export type DateTimePickerTranslations = {
-  AM: string;
-  PM: string;
-};
-
-type DateTimePickerComponentProps = DateTimePickerProps & {
-  translations: DateTimePickerTranslations;
-};
-
-const DateTimePicker = (props: DateTimePickerComponentProps) => {
+const DateTimePicker = (props: DateTimePickerProps) => {
   const {
     initialDate,
     selectDateText,

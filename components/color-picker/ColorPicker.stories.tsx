@@ -8,7 +8,7 @@ import { globalColors } from "../../providers/theme";
 import { ColorPicker } from ".";
 
 const meta = {
-  title: "UI/Interactive elements/ColorPicker",
+  title: "UI/Form controls/ColorPicker",
   component: ColorPicker,
   parameters: {
     docs: {

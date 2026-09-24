@@ -5,10 +5,7 @@ import { IconSizeType } from "../../utils/common-icons-style";
 import styles from "./StatusMessage.module.scss";
 import { Text } from "../text";
 
-interface StatusMessageProps {
-  message: string | React.ReactNode;
-  isWarning?: boolean;
-}
+import type { StatusMessageProps } from "./StatusMessage.types";
 
 const StatusMessage: React.FC<StatusMessageProps> = ({
   message,
@@ -103,4 +100,6 @@ const StatusMessage: React.FC<StatusMessageProps> = ({
   );
 };
 
+export { StatusMessage };
+export type { StatusMessageProps };
 export default StatusMessage;

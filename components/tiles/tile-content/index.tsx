@@ -32,3 +32,4 @@ export const TileContent = ({
     </div>
   );
 };
+export type { TileContentProps } from "./TileContent.types";

@@ -115,6 +115,7 @@ export * from "./tiles";
 export * from "./selection-area";
 
 export * from "./status-message";
+export { default as StatusMessage } from "./status-message";
 
 export * from "./progress-bar";
 
@@ -123,6 +124,7 @@ export * from "./file-input";
 export * from "./rows";
 
 export * from "./filter";
+export { default as FilterInput } from "./filter";
 
 export * from "./quick-actions";
 
@@ -139,6 +141,7 @@ export * from "./access-right-select";
 export { default as AppLoader } from "./app-loader";
 
 export * from "./article";
+export { default as Article } from "./article";
 
 export * from "./category-item";
 
@@ -171,6 +174,7 @@ export * from "./main-button";
 export * from "./main-button-mobile";
 
 export * from "./navigation";
+export { default as Navigation } from "./navigation";
 
 export { default as OperationsProgressButton } from "./operations-progress-button";
 
@@ -189,6 +193,7 @@ export * from "./room-logo";
 export { default as RoomType } from "./room-type";
 
 export * from "./section";
+export { default as Section } from "./section";
 
 export * from "./selector";
 

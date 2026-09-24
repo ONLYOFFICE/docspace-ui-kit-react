@@ -25,35 +25,35 @@ export interface SelectOption {
 }
 
 export type RoomTileProps = {
-  /** Indicates if the room is selected */
+  /** Whether the tile is selected. */
   checked?: boolean;
-  /** Indicates if the room is in active state */
+  /** Whether the tile is the one being acted on, which keeps its hover background. */
   isActive?: boolean;
-  /** Indicates if the room is in a blocking operation state */
+  /** Dims the tile while an operation is running over it. */
   isBlockingOperation?: boolean;
-  /** Room data object */
+  /** The room this tile stands for. Its `tags`, `providerType` and `isAIAgent` decide what the bottom row shows, and its `contextOptions` key decides whether the three-dot button appears. */
   item: RoomItem;
-  /** Callback when room is selected */
+  /** Called with the new checked state and the `item` when the checkbox changes, or when the logo is tapped on a screen narrower than 600px. */
   onSelect?: (checked: boolean, item: RoomItem) => void;
-  /** Callback when thumbnail is clicked */
+  /** Called with the event on a click anywhere on the tile except the checkbox, the tags, the badges, an open dialog, the three-dot button and the menu. It is the tile's open handler, not a thumbnail's. */
   thumbnailClick?: (e: React.MouseEvent) => void;
-  /** Function to get context menu model */
+  /** Builds the menu shown on right-click. Without it the right-click menu never opens. */
   getContextModel?: () => ContextMenuModel[];
-  /** Child elements */
+  /** The tile's content. Only the first element is rendered, above the tags. */
   children?: React.ReactNode;
-  /** Checkbox indeterminate state flag */
+  /** Draws the checkbox in its indeterminate state. */
   indeterminate?: boolean;
-  /** Additional React element */
+  /** The room logo beside the checkbox. Without it neither the logo nor the checkbox is rendered at all. */
   element?: React.ReactNode;
-  /** Context menu options */
+  /** The menu's entries. Required — but see `item`. */
   contextOptions: ContextMenuModel[];
-  /** Column count for tags layout */
+  /** How many columns the tag row is laid out in. Required. */
   columnCount: number;
-  /** Callback for tag selection */
+  /** Called with a clicked tag, but only one that carries both a label and a room type — a plain string tag never reaches it, and neither does any tag on an AI agent that has none of its own. */
   selectTag: (tag: TagClickEvent) => void;
-  /** Callback for option selection */
+  /** Called when the generated third-party or room-type tag is clicked, with which of the two it was. Required. */
   selectOption: (option: SelectOption) => void;
-  /** Function to get room type name */
+  /** Turns a room type into the label of the tag shown when the room has no tags of its own. It is handed the kit's own translation function. Required. */
   getRoomTypeName: (
     type: string,
     t:
@@ -63,17 +63,19 @@ export type RoomTileProps = {
           interpolation?: Record<string, string | number>,
         ) => string),
   ) => string;
-  /** Room badges */
+  /** Badges drawn beside the content, in the upper half. */
   badges?: React.ReactNode;
-  /** Indicates if room is in progress state */
+  /** Replaces the logo and the checkbox with the kit's track loader. */
   inProgress?: boolean;
-  /** Flag to show hotkey border */
+  /** Draws the accent outline that marks the tile the keyboard is on. */
   showHotkeyBorder?: boolean;
-  /** Flag for edit mode */
+  /** Renaming state: it removes the logo and the checkbox. */
   isEdit?: boolean;
-  /** Data test id for the tile */
+  /** Value of `data-testid` on the outer element.
+   * @default "tile" */
   dataTestId?: string;
 
+  /** Replaces the whole tag row. It is called on every render with the hover state and the tags the component worked out. */
   customBottomContent?: (
     isHovered: boolean,
     tags: Array<TagType | string>,

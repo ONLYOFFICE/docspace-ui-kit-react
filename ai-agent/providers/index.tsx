@@ -566,10 +566,11 @@ const AiAgentProviders = ({
   // File-attachment integration: the composer "attach" actions, the message
   // "Save as file" handler, and the supporting dialogs/device-upload input.
   // Device uploads are stored as portal files in the chat's entity scope.
-  const { composerActions, onSaveAsFile, overlay } = useFilesIntegration({
-    entityId,
-    onFilesAttached,
-  });
+  const { composerActions, onSaveAsFile, exportFormats, overlay } =
+    useFilesIntegration({
+      entityId,
+      onFilesAttached,
+    });
 
   // Platform adapter passed downstream. Its `file` adapter is wired to the
   // host's save handler, and it tracks the host locale/theme internally (the
@@ -579,6 +580,7 @@ const AiAgentProviders = ({
     theme,
     onSaveAsFile,
     onOpenFile: openAttachedFile,
+    exportFormats,
   });
 
   // Tools that occupy the "editor" host group. `open_file` swaps this to the

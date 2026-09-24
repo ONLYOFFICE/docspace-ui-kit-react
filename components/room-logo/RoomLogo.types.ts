@@ -1,28 +1,28 @@
 import type { RoomsType } from "../../enums";
 
 export interface RoomLogoProps {
-  /** Accepts room type */
+  /** Which room type's glyph to draw. An unknown value, or none, renders an empty box of the logo's size. */
   type?: RoomsType;
-  /** Adds privacy icon  */
+  /** Ignored. Nothing reads this prop; there is no privacy glyph in the folder. */
   isPrivacy?: boolean;
-  /** Adds archive icon  */
+  /** Draws the archive glyph instead, whatever `type` says. It wins over every other flag. */
   isArchive?: boolean;
-  /** Adds template icon  */
+  /** Draws the generic template glyph, ignoring `type`. Checked after `isArchive`. */
   isTemplate?: boolean;
-  /** Adds template room icon  */
+  /** Draws the template variant of `type`'s glyph. There is no AI template variant — that one falls back to the plain AI glyph. */
   isTemplateRoom?: boolean;
-  /** Adds checkbox when row/tile is hovered or checked  */
+  /** Renders a checkbox next to the glyph. The stylesheet hides it, so it only becomes visible under a rule of yours. */
   withCheckbox?: boolean;
-  /** Sets a checked state of the checkbox  */
+  /** Whether that checkbox is checked. */
   isChecked?: boolean;
-  /** Sets an indeterminate state of the checkbox  */
+  /** Whether that checkbox shows the mixed state instead of a tick. */
   isIndeterminate?: boolean;
-  /** Sets onChange checkbox callback function */
+  /** Called by the checkbox, and by a tap on the glyph itself — but the glyph only calls it on a device `react-device-detect` reports as mobile. */
   onChange?: () => void;
-  /** Accepts id  */
+  /** `id` of the outer element. */
   id?: string;
-  /** Accepts class name  */
+  /** Added before the component's own classes, on the outer element. */
   className?: string;
-  /** Accepts css style  */
+  /** Inline style of the outer element. */
   style?: React.CSSProperties;
 }

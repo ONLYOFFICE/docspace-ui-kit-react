@@ -185,3 +185,9 @@ export const TileContainer = ({
     </div>
   );
 };
+export type {
+  TileContainerProps,
+  TileItem,
+  TileItemProps,
+  CommonTileProps,
+} from "./TileContainer.types";

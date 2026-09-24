@@ -80,7 +80,7 @@ const baseFilterArgs: Partial<FilterProps> = {
 };
 
 const meta = {
-  title: "UI/Layout/Filter",
+  title: "UI/Navigation/Filter",
   component: Filter,
   parameters: {
     docs: {

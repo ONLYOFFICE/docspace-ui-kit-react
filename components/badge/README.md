@@ -1,101 +1,265 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "Badge",
+  "folder": "components/badge",
+  "kind": "component",
+  "category": "Data display",
+  "status": "public",
+  "summary": "Small coloured pill for a count or a short marker, announced as a live status region.",
+  "import": { "subpath": "components/badge", "barrel": true, "default": false },
+  "exports": ["Badge", "BadgeProps"],
+  "providers": ["ThemeProvider"],
+  "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
+  "related": ["tag", "selected-item", "text"],
+  "subComponents": [],
+  "testIds": ["badge", "badge-inner", "badge-text"]
+} -->
+
 # Badge
 
-A versatile badge component used for displaying notifications, status markers, or interactive elements. Supports accessibility features and various display modes.
+Small coloured pill for a count or a short marker, announced as a live status region. It is the
+unread counter next to a room, the "Paid" marker on a plan and the version number on a file —
+one short string on the accent colour, sized by its content.
 
-## Usage
+## Use this when / not when
 
-```jsx
+- Use for a count that changes — unread items, pending invites — where `role="status"` and
+  `aria-live="polite"` mean a screen reader hears the new number without the user going to look.
+- Use for a short fixed marker: a version, "New", "Paid".
+- Not for something the user removes or selects — use [`Tag`](../tag/README.md) or
+  [`SelectedItem`](../selected-item/README.md), which have a close control and a real button
+  underneath.
+- Not for a word or two of coloured text with no pill around it — use
+  [`Text`](../text/README.md) with a `color`.
+
+**There is no status palette.** No `success` / `warning` / `error` variant exists: the badge is
+the portal's accent colour, the muted grey of `isMutedBadge`, or whatever you pass as
+`backgroundColor`. Semantic colours are yours to supply.
+
+## Import
+
+```ts
+import { Badge } from "@onlyoffice/apps-ui-kit/components/badge";
+```
+
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
+
+Needs `ThemeProvider` above it in the tree for the dark theme: the dark background and the
+muted grey are declared under the `dark` class the provider puts on `<body>`. Without a provider
+the badge still renders, in its light colours.
+
+## Minimal example
+
+```tsx
 import { Badge } from "@onlyoffice/apps-ui-kit/components/badge";
 
-const MyComponent = () => {
-  return <Badge label={24} onClick={() => console.log("clicked")} />;
-};
+export function UnreadCount({ count }: { count: number }) {
+  return <Badge label={count} noHover />;
+}
 ```
 
-## Properties
+## Props
 
-| Name            | Type                        | Default | Description                                      |
-| --------------- | --------------------------- | ------- | ------------------------------------------------ |
-| label           | string \| number            | 0       | Content to display in the badge                  |
-| type            | "high"                      | -       | Sets badge type to high priority                 |
-| backgroundColor | string                      | -       | Custom background color                          |
-| color           | string                      | -       | Custom text color                                |
-| fontSize        | string                      | "11px"  | Custom font size                                 |
-| fontWeight      | number                      | 800     | Custom font weight                               |
-| borderRadius    | string                      | "11px"  | Custom border radius                             |
-| padding         | string                      | "0 5px" | Custom padding                                   |
-| maxWidth        | string                      | "50px"  | Maximum width of the badge                       |
-| height          | string                      | -       | Custom height                                    |
-| border          | string                      | -       | Custom border style                              |
-| noHover         | boolean                     | false   | Disables hover effects                           |
-| isHovered       | boolean                     | false   | Applies custom hover styles                      |
-| isVersionBadge  | boolean                     | false   | Applies version badge specific styling           |
-| isPaidBadge     | boolean                     | false   | Applies styling for paid/premium features        |
-| isMutedBadge    | boolean                     | false   | Applies muted styling for less prominent display |
-| onClick         | (e: MouseEvent) => void     | -       | Click event handler                              |
-| onMouseOver     | (e: MouseEvent) => void     | -       | Mouse over event handler                         |
-| onMouseLeave    | (e: MouseEvent) => void     | -       | Mouse leave event handler                        |
-| className       | string                      | -       | CSS class name                                   |
-| ref             | RefObject\<HTMLDivElement\> | -       | Ref to access the DOM element                    |
-| dataTestId      | string                      | "badge" | Test ID for the component                        |
+`BadgeProps` is `TextProps` plus the props below. Of what it inherits the component reads
+`backgroundColor`, `className`, `color`, `fontSize` and `fontWeight`; `title` is consumed by the
+tooltip wrapper the badge is built on, and `style` replaces the badge's own inline style — see
+"Behaviour" below. The rest of `TextProps` is spread onto the element unread.
 
-## Styling
+<!-- props:start -->
 
-The component uses CSS modules with CSS variables for theming. Key variables include:
+_Generated by `pnpm readme:props` from `BadgeProps` in `Badge.types.ts`. Do not edit; edit the JSDoc._
 
-```css
---badge-background-color
---badge-disable-background-color
+| Prop             | Type                                                                        | Required | Default     | Description                                                                                                                      |
+| ---------------- | --------------------------------------------------------------------------- | -------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `border`         | `string`                                                                    | no       | –           | CSS `border` shorthand for the outer element. The badge draws none of its own.                                                   |
+| `borderRadius`   | `string`                                                                    | no       | `"11px"`    | Corner radius of both the outer element and the pill inside it. The pill ignores it while `type` is `"high"`.                    |
+| `dataTestId`     | `string`                                                                    | no       | `"badge"`   | Value of `data-testid` on the outer element.                                                                                     |
+| `height`         | `string`                                                                    | no       | –           | Height of the outer element. Without it the badge is as tall as its text.                                                        |
+| `isHovered`      | `boolean`                                                                   | no       | `false`     | Draws the hover background without a pointer being there, for a badge inside a row that is itself hovered.                       |
+| `isMutedBadge`   | `boolean`                                                                   | no       | –           | Paints the badge grey, overriding `backgroundColor`, for something inactive.                                                     |
+| `isPaidBadge`    | `boolean`                                                                   | no       | –           | Forces white text, overriding `color`, and removes `maxWidth` so the label is never clipped.                                     |
+| `isVersionBadge` | `boolean`                                                                   | no       | –           | Lets the badge grow to its content width at tablet widths and below, where it is otherwise held to the pill's width.             |
+| `label`          | `number \| string`                                                          | no       | `0`         | What the badge says. `0`, `"0"` and an empty string hide the badge entirely — the element stays in the DOM with `display: none`. |
+| `maxWidth`       | `string`                                                                    | no       | `"50px"`    | Widest the pill may be. Longer text is clipped without an ellipsis. Not applied at all while `isPaidBadge` is set.               |
+| `noHover`        | `boolean`                                                                   | no       | `false`     | Drops the pointer cursor and the hover and active background shifts, for a badge that is only a marker.                          |
+| `onMouseLeave`   | `(e: React.MouseEvent) => void`                                             | no       | –           | Called with the event when the pointer leaves the badge.                                                                         |
+| `onMouseOver`    | `(e: React.MouseEvent) => void`                                             | no       | –           | Called with the event when the pointer enters the badge or moves within it.                                                      |
+| `padding`        | `string`                                                                    | no       | `"0px 5px"` | Padding of the pill inside the badge. Ignored while `type` is `"high"`.                                                          |
+| `ref`            | `React.RefObject<HTMLDivElement \| null> & React.RefObject<HTMLDivElement>` | no       | –           | Attached to the outer element of the badge.                                                                                      |
+| `type`           | `"high"`                                                                    | no       | –           | Switches to the emphasised preset: a 6px radius, roomier padding and 13px text at weight 400.                                    |
+
+#### Inherited from `TextProps`
+
+Declared by [`components/text`](../../components/text/README.md) and accepted here too.
+
+| Prop                | Type                                            | Required | Default | Description                                                                                                                                                                                                                     |
+| ------------------- | ----------------------------------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `as`                | `ElementType<any, keyof JSX.IntrinsicElements>` | no       | –       | Element to render, replacing the component's own default — `p` for `Text` itself. Wins over `tag` when both are set.                                                                                                            |
+| `backgroundColor`   | `string`                                        | no       | –       | Background colour, as an inline style. Any CSS colour.                                                                                                                                                                          |
+| `children`          | `ReactNode`                                     | no       | –       | Text to render.                                                                                                                                                                                                                 |
+| `className`         | `string`                                        | no       | –       | Added after the component's own classes.                                                                                                                                                                                        |
+| `color`             | `string`                                        | no       | –       | Text colour, as an inline style. `Text` declares none of its own and inherits without it.                                                                                                                                       |
+| `containerMinWidth` | `string`                                        | no       | –       | Not read here — it reaches the DOM as an unknown attribute. It is read off this element by `RowContent`, which uses it as the minimum width of a side slot.                                                                     |
+| `containerWidth`    | `string`                                        | no       | –       | Not read here — it reaches the DOM as an unknown attribute. It is read off this element by `RowContent` and `TileContent`, which use it as the width of the slot they put the child in.                                         |
+| `dir`               | `"auto" \| "ltr" \| "rtl"`                      | no       | –       | Writing direction. `"ltr"` and `"rtl"` set the `dir` attribute; `"auto"` instead wraps the children in a span that takes the pointer events off them.                                                                           |
+| `display`           | `string`                                        | no       | –       | Ignored. Nothing reads this prop, and it reaches the DOM as an unknown attribute. Use `isInline` or `style`.                                                                                                                    |
+| `fontSize`          | `string`                                        | no       | –       | Font size, as an inline style. Unset, `Text` is 13px through `--text-size`.                                                                                                                                                     |
+| `fontWeight`        | `number \| string`                              | no       | –       | Font weight, as an inline style. Ignored while `isBold` is set. Unset, `Text` is 400 through `--text-weight`.                                                                                                                   |
+| `href`              | `string`                                        | no       | –       | Passed to the element unchanged, for `as="a"`.                                                                                                                                                                                  |
+| `htmlFor`           | `string`                                        | no       | –       | Passed to the element unchanged, for `as="label"`.                                                                                                                                                                              |
+| `id`                | `string`                                        | no       | –       | `id` of the rendered element.                                                                                                                                                                                                   |
+| `isBold`            | `boolean`                                       | no       | –       | Sets the weight to 700, overriding `fontWeight`.                                                                                                                                                                                |
+| `isInline`          | `boolean`                                       | no       | –       | Renders the text inline instead of as a block — `inline-block` in `Text`, `inline` in `Heading`.                                                                                                                                |
+| `isItalic`          | `boolean`                                       | no       | –       | Renders the text in italics.                                                                                                                                                                                                    |
+| `lineHeight`        | `string`                                        | no       | –       | Line height, as an inline style.                                                                                                                                                                                                |
+| `noSelect`          | `boolean`                                       | no       | –       | Stops the text being selected, on every browser the kit supports.                                                                                                                                                               |
+| `onClick`           | `(e: React.MouseEvent<Element>) => void`        | no       | –       | Called with the event when the element is clicked.                                                                                                                                                                              |
+| `rel`               | `string`                                        | no       | –       | Passed to the element unchanged, for `as="a"`.                                                                                                                                                                                  |
+| `style`             | `CSSProperties`                                 | no       | –       | Inline style of the element. `Text` merges it over the style props above, so a `fontSize` here wins over the `fontSize` prop.                                                                                                   |
+| `tabIndex`          | `number`                                        | no       | –       | Passed to the element unchanged. The component adds no role, so a focusable text element needs one from you.                                                                                                                    |
+| `tag`               | `string`                                        | no       | –       | Element to render, used only while `as` is unset. It is a tag name, not an id.                                                                                                                                                  |
+| `textAlign`         | `"center" \| "justify" \| "left" \| "right"`    | no       | –       | Text alignment, as an inline style.                                                                                                                                                                                             |
+| `title`             | `string`                                        | no       | –       | Tooltip text. On a component the kit wraps in its tooltip HOC it is consumed before the element is built and opens the shared tooltip instead, which needs `RootTooltip` mounted; elsewhere it is the native `title` attribute. |
+| `truncate`          | `boolean`                                       | no       | –       | Holds the text on one line and ends it with an ellipsis. It needs a parent of bounded width; on its own the element grows instead.                                                                                              |
+| `view`              | `string`                                        | no       | –       | Only `"tile"` is recognised, and only together with `dir="auto"`: it clamps the text to two lines.                                                                                                                              |
+
+<!-- props:end -->
+
+## Recipes
+
+### A counter that disappears at zero
+
+The badge hides itself: `label` of `0`, `"0"` or `""` sets `data-hidden="true"`, which is
+`display: none`. You do not need to branch on the count.
+
+```tsx
+import { Badge } from "@onlyoffice/apps-ui-kit/components/badge";
+
+export function RoomRow({ name, unread }: { name: string; unread: number }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <span>{name}</span>
+      <Badge label={unread} noHover />
+    </div>
+  );
+}
 ```
 
-## Examples
+### A clickable badge
 
-### Basic Usage
+`onClick` calls `preventDefault()` before your handler, and the badge is a `<div>`: it takes a
+pointer but not the keyboard. When the badge is the only way to reach an action, put it inside
+your own button instead of handling the click here.
 
-```jsx
-<Badge label={3} />
+```tsx
+import { Badge } from "@onlyoffice/apps-ui-kit/components/badge";
+
+export function PendingInvites({
+  count,
+  onOpen,
+}: {
+  count: number;
+  onOpen: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      style={{ background: "none", border: "none", padding: 0 }}
+    >
+      <Badge label={count} noHover />
+    </button>
+  );
+}
 ```
 
-### Text Badge
+### A wide marker
 
-```jsx
-<Badge label="New" />
+The pill is capped at 50px, so anything longer than about four characters is cut off. Widen it
+with `maxWidth`, or let `isPaidBadge` drop the cap entirely.
+
+```tsx
+import { Badge } from "@onlyoffice/apps-ui-kit/components/badge";
+
+export function PlanMarker() {
+  return (
+    <Badge
+      label="Business"
+      maxWidth="none"
+      padding="2px 8px"
+      backgroundColor="#4781d1"
+      noHover
+    />
+  );
+}
 ```
 
-### Interactive Badge
+## Behaviour the types don't state
 
-```jsx
-<Badge label="Click me" onClick={() => alert("clicked")} />
-```
+- **The badge hides itself when the label is falsy or `"0"`.** `<Badge />` alone renders an empty
+  hidden element, because `label` defaults to `0`. Anything else, `"false"` and `" "` included,
+  is shown.
+- **The label is clipped at 50px by default, without an ellipsis.** `maxWidth` caps the pill and
+  the outer element clips the overflow, while the text itself is `white-space: nowrap`, so a long
+  label simply ends mid-character. `isPaidBadge` is the one preset that removes the cap.
+- **`style` replaces the badge's own inline style rather than extending it.** The component
+  writes `height`, `border`, `borderRadius` and the background custom property into the element's
+  `style`, and a `style` of yours arrives later in the spread and overwrites the whole object —
+  including the background colour. Use `className`, or pass `backgroundColor`, `height` and
+  `border` as props.
+- **The pointer cursor is on by default**, hover or not, and so is a background shift on hover and
+  on active. A badge that is not clickable wants `noHover`.
+- **`type="high"` overrides the spacing props.** Its padding and radius are `!important` on the
+  pill, so `padding` and `borderRadius` stop applying there; the outer element keeps the radius
+  you passed. Its 13px / 400 text is a plain rule, so `fontSize` and `fontWeight` still win.
+- **The presets override the colour props too.** `isMutedBadge` paints the grey over
+  `backgroundColor`, and `isPaidBadge` forces white text over `color`.
+- **`isVersionBadge` only does something at tablet widths and below**, where it lets the badge
+  take its content width; above that it changes nothing.
+- **A `title` becomes the kit's tooltip**, not a native one: the badge is built on
+  `TooltipContainer`, which consumes `title` and opens the shared tooltip on hover — and that
+  needs `<RootTooltip />` from [`Tooltip`](../tooltip/README.md) mounted once near the root of
+  the app, or nothing appears.
+- **An ancestor with the class `ai-agents` repaints the badge** grey and cancels its hover. That
+  is the DocSpace portal's own hook and there is no prop for it.
 
-### High Priority Badge
+## CSS variables
 
-```jsx
-<Badge type="high" label="High" backgroundColor="#F21C0D" />
-```
+| Variable                 | Default                        | Effect                                                       |
+| ------------------------ | ------------------------------ | ------------------------------------------------------------ |
+| `--badge-bg`             | the accent colour, else orange | Background of the pill; wins over the `backgroundColor` prop |
+| `--badge-radius`         | `6px`                          | Corner radius of the pill while `type="high"`                |
+| `--badge-high-padding`   | `3px 10px`                     | Padding of the pill while `type="high"`                      |
+| `--badge-high-font-size` | `13px`                         | Font size of the label while `type="high"`                   |
+| `--accent-main`          | orange, per theme              | The default background, shared with the rest of the kit      |
 
-### Custom Styled Badge
+## Accessibility
 
-```jsx
-<Badge
-  label="Custom"
-  backgroundColor="#335EA3"
-  color="#FFFFFF"
-  fontSize="14px"
-  fontWeight={600}
-  borderRadius="8px"
-  padding="4px 12px"
-/>
-```
+- The badge is a `<div>` with `role="status"`, `aria-live="polite"` and `aria-atomic="true"`, so a
+  screen reader reads the whole badge out again whenever the label changes. That is what you want
+  for a counter and wrong for a static marker in a long list — pass `role` and `aria-live`
+  yourself to override them.
+- Its accessible name is built as `` `${label} ${type ?? ""}` ``, which leaves a trailing space
+  and says nothing about what is being counted. A badge that has to stand on its own needs an
+  `aria-label` of yours; it reaches the element through the spread.
+- The pill and the label are `aria-hidden`, so the name above is all that is announced.
+- `onClick` does not make the badge operable: there is no role, no `tabIndex` and no key handler.
+  Put it inside a real button.
 
-### Muted Badge
+## Test ids
 
-```jsx
-<Badge label="Muted" isMutedBadge={true} />
-```
+| Element       | `data-testid`                       |
+| ------------- | ----------------------------------- |
+| Outer element | `badge`, overridden by `dataTestId` |
+| The pill      | `badge-inner`                       |
+| The label     | `badge-text`                        |
 
-### Static Badge (No Hover)
+The outer element also carries `data-hidden`, `data-type`, `data-paid`, `data-muted`,
+`data-version-badge`, `data-no-hover` and `data-is-hovered`, which is what to assert on rather
+than the computed style.
 
-```jsx
-<Badge label="Static" noHover={true} />
-```
+## Related
+
+- [`Tag`](../tag/README.md) — a chip the user can click or remove.
+- [`SelectedItem`](../selected-item/README.md) — a chosen value with a close cross.
+- [`Text`](../text/README.md) — coloured text with no pill around it.

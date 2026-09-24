@@ -2,29 +2,52 @@ import type { DateTime } from "luxon";
 
 import type { Nullable } from "../../types";
 
+export type DateTimePickerTranslations = {
+  /** Label of the morning option in the meridiem drop-down. */
+  AM: string;
+  /** Label of the afternoon option. */
+  PM: string;
+};
+
 export type DateTimePickerProps = {
-  /** Date object */
+  /** Date and time the component starts on. */
   initialDate?: Nullable<DateTime | Date | string>;
-  /** Select date text */
+  /** Text of the button shown while no date is chosen. */
   selectDateText: string;
-  /** Allows to set classname */
+  /** Applied to the outermost element. */
   className: string;
-  /** Allows to set id */
+  /** Applied to the outermost element. */
   id: string;
-  /** Allow you to handle changing events of component */
+  /**
+   * Called whenever either half changes, with the combined date and time, or
+   * `null` when the date is cleared.
+   */
   onChange: (d: null | DateTime) => void;
-  /** Specifies min choosable calendar date */
+  /** Earliest selectable day in the calendar. */
   minDate?: DateTime | Date;
-  /** Specifies max choosable calendar date */
+  /** Latest selectable day in the calendar. */
   maxDate?: DateTime | Date;
-  /** Specifies calendar locale */
+  /**
+   * BCP 47 tag the calendar is written in. It also decides whether the time is
+   * shown as 12-hour or 24-hour.
+   */
   locale: string;
-  /** Indicates the input field has an error  */
+  /** Whether the control is drawn in its error colours. */
   hasError: boolean;
-  /** Allows to set first shown date in calendar */
+  /** Month the calendar opens on. */
   openDate: DateTime | Date;
-  /** Allows to set data-testid */
+  /**
+   * `data-testid` of the outermost element.
+   * @default "date-time-picker"
+   */
   dataTestId?: string;
+  /** Whether the date chip's clearing cross is hidden. */
   hideCross?: boolean;
+  /** Whether a picked day is reported at the end of that day rather than at midnight. */
   useMaxTime?: boolean;
+  /**
+   * Labels of the AM and PM options. Required: the component reads them while
+   * rendering, and nothing here translates them for you.
+   */
+  translations: DateTimePickerTranslations;
 };

@@ -1,31 +1,53 @@
 import type { DateTime } from "luxon";
 
 export interface CalendarProps {
-  /** Class name */
+  /** Applied to the outermost element. */
   className?: string;
-  /** Used as HTML `id` property  */
+  /** Applied to the outermost element. */
   id?: string;
-  /** Specifies the calendar locale */
+  /**
+   * BCP 47 tag the month and weekday names are written in.
+   * @default "en"
+   */
   locale: string;
-  /** Value of selected date (DateTime object) */
+  /**
+   * The highlighted day, as a Luxon `DateTime`. Its **time** is kept when
+   * another day is picked — only the date part is replaced.
+   */
   selectedDate: DateTime;
-  /** Allows handling the changing events of the component */
+  /**
+   * Called with the newly picked day, after `setSelectedDate`. Both receive the
+   * same value; there is no separate "confirm" step.
+   */
   onChange?: (formattedDate: DateTime) => void;
-  /** Changes the selected date state */
+  /** Called with the newly picked day, before `onChange`. */
   setSelectedDate?: (formattedDate: DateTime) => void;
-  /** Specifies the minimum selectable date */
+  /**
+   * Earliest selectable day. Days before it are greyed and the header arrows
+   * stop at its month.
+   */
   minDate?: DateTime | Date;
-  /** Specifies the maximum selectable date */
+  /** Latest selectable day, with the same effect at the other end. */
   maxDate?: DateTime | Date;
-  /** Accepts css style */
+  /** Applied to the outermost element. */
   style?: React.CSSProperties;
-  /** First shown date */
+  /**
+   * Month the calendar opens on. Out-of-range values are moved to the nearer of
+   * `minDate` and `maxDate`, with a warning on the console.
+   */
   initialDate?: DateTime | Date;
+  /** Whether the larger touch layout is used. */
   isMobile?: boolean;
+  /** Ref to the outermost element. */
   forwardedRef?: React.RefObject<HTMLDivElement | null>;
+  /** Whether the grid is wrapped in a `Scrollbar` instead of sizing to its content. */
   isScroll?: boolean;
-  /** Data test id for testing */
+  /**
+   * `data-testid` of the outermost element.
+   * @default "calendar"
+   */
   dataTestId?: string;
+  /** Whether a picked day is reported at 23:59:59.999 rather than keeping the old time. */
   useMaxTime?: boolean;
 }
 

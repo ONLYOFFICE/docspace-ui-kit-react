@@ -1,10 +1,10 @@
 import type { TColorScheme } from "../../context/ThemeContext";
 
 export type ThemeProviderProps = {
-  /** Applies a theme to all children components */
+  /** The theme object. Only three of its keys are read: `isBase` chooses light or dark, `interfaceDirection` sets the writing direction, and `fontFamily` becomes `--font-family` on the body. The type accepts any object, so a missing key is not a compile error. */
   theme: Record<string, unknown>;
-  /** Applies a currentColorScheme to all children components */
+  /** The portal's accent colours. When its `main` is present, eight custom properties are written onto both the document root and the body; otherwise nothing is written and nothing is cleared. */
   currentColorScheme?: TColorScheme;
-  /** Child elements */
+  /** The tree the React context applies to. The classes and attributes this component sets are global and apply to the whole document, not only to these children. */
   children: React.ReactNode;
 };

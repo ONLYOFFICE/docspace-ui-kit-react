@@ -2,28 +2,30 @@ import type { TTranslation } from "../../utils";
 import type { TImage, TChangeImage } from "../image-editor/ImageEditor.types";
 
 export type AvatarEditorDialogProps = {
-  /** Translator for the button labels (`Common:SaveButton`, `Common:CancelButton`) and the image editor's own strings. */
+  /** Translation function. The dialog asks it for `Common:SaveButton`, `Common:CancelButton` and `Common:ChooseAnother`, so a portal translation context is required. */
   t: TTranslation;
-  /** Whether the dialog is open. */
+  /** Whether the dialog is on screen. */
   visible: boolean;
-  /** Heading shown in the dialog header. */
+  /** Text of the dialog's header. It is not translated for you. */
   title: string;
-  /** Current image, zoom and crop position; controlled by the caller. */
+  /** The picture and its crop, held in your state. The body is empty until `uploadedFile` is set. */
   image: TImage;
-  /** Shows a loader on the save button and disables cancel and the editor. */
+  /** Puts the save button in its loading state and blocks the editor and the cancel button. It does not block the header cross, Escape or the backdrop. */
   isLoading?: boolean;
-  /** Border radius of the crop mask, in pixels; `0` gives a square crop. */
+  /** Corner radius of the crop window in pixels, on the editor's 648px canvas.
+   * @default 110 */
   editorBorderRadius?: number;
-  /** @deprecated Has no effect. Size limits and compression are the caller's job, in `onChangeFile`. */
+  /** Ignored. It is handed to the image editor, which does not read it either; check the file's size in `onChangeFile`.
+   * @deprecated */
   maxImageSize?: number;
-  /** Test id forwarded to the underlying modal dialog. */
+  /** Value of `data-testid` on the dialog. */
   dataTestId?: string;
-  /** Called when the dialog is closed or cancelled, after the image is reset. */
+  /** Called after the dialog has reset `image` to an empty, centred, unzoomed one — by the cancel button, the header cross, Escape and the backdrop alike. */
   onClose: () => void;
-  /** Called by the save button with the current image and the cropped preview as a data URL. */
+  /** Called with the cropped `image` and its `data:` URL preview when save is clicked. The dialog neither closes itself nor sets `isLoading`. */
   onSave: (image: TImage, preview: string) => void | Promise<void>;
-  /** Called whenever the image, zoom or crop position changes. */
+  /** Called with a new `image` whenever the crop is dragged or the zoom changes. Apply it to your state or nothing moves. */
   onChangeImage: TChangeImage;
-  /** Change handler for the editor's file input ("Choose another"). */
+  /** Called with the change event of the hidden file input when another picture is chosen. Read the file and put it in `image.uploadedFile` yourself. */
   onChangeFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };

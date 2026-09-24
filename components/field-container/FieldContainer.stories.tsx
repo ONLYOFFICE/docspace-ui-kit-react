@@ -8,49 +8,17 @@ import { FieldContainer } from "./FieldContainer";
 import type { FieldContainerProps } from "./FieldContainer.types";
 import { globalColors } from "../../providers/theme";
 
+// The README is what the package ships and what a coding agent reads; rendering
+// it here keeps the developer looking at Storybook and the agent on one text.
+import readme from "./README.md?raw";
+
 const meta = {
   title: "UI/Form controls/FieldContainer",
   component: FieldContainer,
   parameters: {
     docs: {
       description: {
-        component: `A responsive form field container component that provides consistent layout and styling for form inputs.
-
-### Features
-
-- **Dual Layout**: Horizontal and vertical alignment options
-- **Error Handling**: Built-in error message display with customizable color and width
-- **Required Indicator**: Optional asterisk for required fields
-- **Label Configuration**: Adjustable label width and visibility
-- **Tooltip Support**: Integrated help button with configurable tooltip placement
-- **Inline Help**: Option to render the help button inline within the label
-
-### Usage
-
-\`\`\`tsx
-import { FieldContainer } from "@onlyoffice/apps-ui-kit/components/field-container";
-
-// Horizontal layout with tooltip
-<FieldContainer
-  labelText="Name:"
-  labelVisible
-  tooltipContent="Enter your full name"
-  place="top"
->
-  <TextInput value={value} onChange={handleChange} />
-</FieldContainer>
-
-// Vertical layout with error
-<FieldContainer
-  isVertical
-  labelText="Email:"
-  labelVisible
-  hasError
-  errorMessage="Invalid email"
->
-  <TextInput value={value} hasError onChange={handleChange} />
-</FieldContainer>
-\`\`\``,
+        component: readme,
       },
     },
   },

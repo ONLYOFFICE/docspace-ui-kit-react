@@ -1,42 +1,57 @@
 import type React from "react";
 
 export type LabelProps = {
-  /** Indicates if the field associated with this label is required */
+  /**
+   * Appends a red asterisk to the text and sets `aria-required` on the label.
+   * It does not mark the field itself — put `required` on your input too.
+   * @default false
+   */
   isRequired?: boolean;
 
-  /** Indicates if the field associated with this label has an error state */
+  /**
+   * Turns the text red and sets `aria-invalid` on the label. The error message
+   * is not part of this component.
+   * @default false
+   */
   error?: boolean;
 
-  /** When true, sets the label to display inline */
+  /**
+   * Renders the label inline instead of on its own line.
+   * @default false
+   */
   isInline?: boolean;
 
-  /** Tooltip text shown on hover. Also used for accessibility */
+  /** Native `title`, shown as the browser's own tooltip on hover. */
   title?: string;
 
-  /** When true, truncates text that overflows with an ellipsis */
+  /**
+   * Cuts text that does not fit with an ellipsis. It needs a width to cut
+   * against, so give the label one or a parent that constrains it.
+   * @default false
+   */
   truncate?: boolean;
 
-  /** HTML 'for' attribute that associates the label with a form control */
+  /** `for` attribute, which points at the `id` of the field this labels. */
   htmlFor?: string;
 
-  /** The label's text content. Can be a string or a React node */
+  /** The label's text. */
   text?: string | React.ReactNode;
 
-  /** CSS display property value */
+  /** CSS `display` of the label, passed through to `Text`. */
   display?: string;
 
-  /** Additional CSS class names */
+  /** Applied to the label. */
   className?: string;
 
-  /** HTML id attribute */
+  /** Applied to the label. */
   id?: string;
 
-  /** Custom CSS styles */
+  /** Applied to the label. */
   style?: React.CSSProperties;
 
-  /** Child elements to render inside the label */
+  /** Rendered after the text and the asterisk, inside the same label. */
   children?: React.ReactNode;
 
-  /** Maximum width for the tooltip */
+  /** Ignored. Nothing reads this prop; `title` is a native browser tooltip. */
   tooltipMaxWidth?: string;
 };

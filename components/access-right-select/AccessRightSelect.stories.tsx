@@ -19,7 +19,7 @@ const Wrapper = ({ children }: { children: ReactNode }) => (
 );
 
 const meta = {
-  title: "UI/Interactive elements/AccessRightSelect",
+  title: "UI/Form controls/AccessRightSelect",
   component: AccessRightSelect,
   parameters: {
     docs: {

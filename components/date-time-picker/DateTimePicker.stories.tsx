@@ -38,7 +38,7 @@ const locales = [
 ];
 
 const meta = {
-  title: "UI/Interactive elements/DateTimePicker",
+  title: "UI/Form controls/DateTimePicker",
   component: DateTimePicker,
   parameters: {
     docs: {

@@ -3,69 +3,94 @@ import type { ContextMenuModel } from "../context-menu";
 import type { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
 
 export interface ContextMenuButtonProps {
-  /** Sets the button to present an opened state */
+  /** Opens the menu from outside. Changing it opens or closes the menu. */
   opened?: boolean;
-  /** Array of options for display */
+  /**
+   * Items of the menu, read **once** to seed the internal state. Every later
+   * change is ignored — `getData` is what the open menu is built from.
+   */
   data?: ContextMenuModel[];
-  /** Function for converting to inner data */
+  /**
+   * Builds the items when the button is clicked. It is not optional in
+   * practice: the click handler calls it without checking, so a button without
+   * it throws on the first click.
+   */
   getData?: () => ContextMenuModel[];
-  /** Specifies the icon title */
+  /** Hover tooltip of the icon. It needs `RootTooltip` mounted. */
   title?: string;
-  /** Specifies the icon name */
+  /** URL of the icon, fetched at runtime. Without it the kit's vertical dots are drawn. */
   iconName?: string;
-  /** Specifies the icon size */
+  /** Size of the icon in pixels.
+   * @default 16 */
   size?: number;
-  /** Specifies the icon color */
+  /** Any CSS colour for the icon, or the literal `"accent"`. */
   color?: string;
-  /** Sets the button to present a disabled state */
+  /** Greys the icon out and stops the menu opening. */
   isDisabled?: boolean;
-  /** Specifies the icon hover color */
+  /** Colour of the icon while the pointer is over it. */
   hoverColor?: string;
-  /** Specifies the icon click color */
+  /** Colour of the icon while it is held down. */
   clickColor?: string;
-  /** Specifies the icon hover name */
+  /** URL of the icon shown while the pointer is over the button. */
   iconHoverName?: string;
-  /** Specifies the icon click name */
+  /** URL of the icon shown while the button is held down. */
   iconClickName?: string;
-  /** Specifies the icon open name */
+  /** URL of the icon shown while the menu is open. */
   iconOpenName?: string;
-  /** Triggers a callback function when the mouse enters the button borders */
+  /** Called when the pointer enters the icon. */
   onMouseEnter?: (e: React.MouseEvent) => void;
-  /** Triggers a callback function when the mouse leaves the button borders */
+  /** Called when the pointer leaves the icon. */
   onMouseLeave?: (e: React.MouseEvent) => void;
-  /** Triggers a callback function when the mouse moves over the button borders */
+  /** Called on **mouse down** on the icon, despite the name. */
   onMouseOver?: (e: React.MouseEvent) => void;
-  /** Triggers a callback function when the mouse moves out of the button borders */
+  /** Called on **mouse up** on the icon, despite the name, and only for the middle and right buttons. */
   onMouseOut?: (e: React.MouseEvent) => void;
+  /**
+   * Called on a click — after the menu has opened in `dropdown` mode, and
+   * instead of opening anything in `toggle` mode, where it is how you render a
+   * menu of your own.
+   */
   onClick?: (e: React.MouseEvent) => void;
-  /** Direction X */
+  /** Preferred horizontal side of the menu.
+   * @default "left" */
   directionX?: TDirectionX;
-  /** Direction Y */
+  /** Preferred vertical side of the menu. */
   directionY?: TDirectionY;
-  /** Fixes the direction of the dropdown */
+  /** Keeps those directions as given instead of flipping them to fit. */
   fixedDirection?: boolean;
-  /** Accepts class */
+  /** Applied to the wrapper around the icon and the menu. */
   className?: string;
-  /** Accepts id */
+  /** Applied to that wrapper. */
   id?: string;
-  /** Accepts css style */
+  /** Applied to that wrapper. */
   style?: React.CSSProperties;
-  /** Sets the number of columns */
+  /** Ignored. It reaches the menu, which does not read it either. */
   columnCount?: number;
-  /** Sets the display type */
+  /**
+   * `toggle` renders no menu of its own and leaves `onClick` to open one;
+   * `auto` behaves exactly like `dropdown`.
+   * @default ContextMenuButtonDisplayType.dropdown
+   */
   displayType?: ContextMenuButtonDisplayType;
-  /** Closing event */
+  /** Called when the menu closes by itself, after a click outside. */
   onClose?: () => void;
-  /** Sets the drop down open with the portal */
+  /** Whether the menu is rendered in a portal on `document.body`.
+   * @default true */
   usePortal?: boolean;
-  /** Sets the class of the drop down element */
+  /** Applied to the menu element. */
   dropDownClassName?: string;
-  /** Sets the class of the icon button */
+  /** Applied to the icon. */
   iconClassName?: string;
-  /** Enables displaying the icon borders  */
+  /** Draws a rounded border around the icon, 32px square. */
   displayIconBorder?: boolean;
+  /** Colours the icon by filling its shapes rather than stroking them.
+   * @default true */
   isFill?: boolean;
+  /** Stacking order of the menu. */
   zIndex?: number;
+  /** Ignored. Nothing reads this prop. */
   asideHeader?: React.ReactNode;
+  /** Value of `data-testid` on the wrapper.
+   * @default "context-menu-button" */
   testId?: string;
 }

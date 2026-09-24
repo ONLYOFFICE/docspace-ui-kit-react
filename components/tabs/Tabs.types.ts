@@ -1,54 +1,54 @@
 import { TabsTypes } from "./Tabs.enums";
 
 export type TTabItem = {
-  /** Element id. */
+  /** Identifier of the tab. `selectedItemId` is matched against it, and it prefixes the tab's `data-testid`. */
   id: string;
-  /** Tab text. */
+  /** Text of the tab. */
   name: string | React.ReactNode;
-  /** Content that is shown when you click on the tab. */
+  /** What is rendered under the tab bar while this tab is the selected one. */
   content: React.ReactNode;
-  /** State of tab inclusion. State only works for tabs with a secondary theme. */
+  /** Whether the tab is greyed out and cannot be clicked. */
   isDisabled?: boolean;
-  /** Sets a callback function that is triggered when the tab is selected */
+  /** Called before `onSelect` when this tab is clicked. With `withAnimation` it is awaited and the body shows a loader meanwhile. */
   onClick?: () => void | Promise<void>;
-  /** Badge shown after tab. Only for primary tabs type */
+  /** Rendered after the tab's text. Primary tabs only. */
   badge?: React.ReactNode;
-
+  /** Ignored. Nothing in the component reads this; it is a slot for the caller's own bookkeeping. */
   value?: number;
-  /** Icon name. Only for secondary tabs type */
+  /** URL of an SVG drawn before the text. Secondary tabs only. */
   iconName?: string;
 };
 
 export type TabsProps = {
-  /** Child elements. */
+  /** The tabs, in the order they are drawn. Each carries its own content. */
   items: TTabItem[];
-  /** Selected item of tabs. */
+  /** `id` of the selected tab. This is a controlled component; set it from `onSelect`. An empty value selects the first tab. */
   selectedItemId: number | string;
-  /** Theme for displaying tabs. */
+  /** Which of the two tab bars is drawn: an underlined row, or a segmented control. */
   type?: TabsTypes;
-  /** Tab indentation for sticky positioning. */
+  /** `top` of the sticky tab bar, as a CSS length. Without it the bar sticks to the top of the scrolling ancestor. */
   stickyTop?: string;
-  /** Sets a tab class name */
+  /** Applied to the outermost element. */
   className?: string;
-  /** Sets a callback function that is triggered when the tab is selected. */
+  /** Called with the whole tab object when a different tab is clicked. Clicking the selected one does nothing. */
   onSelect?: (element: TTabItem) => void;
-  /** Disables sticky indent */
+  /** Whether the spacer under the tab bar is left out. */
   withoutStickyIntend?: boolean;
-  /** Accepts css style  */
+  /** Applied to the outermost element as inline style. */
   style?: React.CSSProperties;
-  /** If set, this component will animate changes to its layout. Additionally, when a new element enters the DOM and an element already exists with a matching layoutId, it will animate out from the previous element's size/position. */
+  /** Shared `layoutId` of the sliding background, and the `id` of the tab list. Secondary tabs only. */
   layoutId?: string;
-  /** Is loading */
+  /** Holds off the tab-width measurement until the labels are final. It renders no loader of its own. Secondary tabs only. */
   isLoading?: boolean;
-  /** Scales tabs to container width */
+  /** Whether the tabs share the container's width equally instead of being measured from the longest label. Secondary tabs only. */
   scaled?: boolean;
-  /** Unique identifier for hotkey functionality */
+  /** Suffix of the class the keyboard handler focuses, which turns the arrow-key navigation on. Secondary tabs only. */
   hotkeysId?: string;
-  /** Element id */
+  /** Applied to the tab list on primary tabs, and to the outermost element on secondary ones. */
   id?: string;
-  /** Enables animation for tab transitions */
+  /** Whether selecting a tab animates the underline and awaits the item's `onClick` behind a loader. Primary tabs only. */
   withAnimation?: boolean;
-  /** Content rendered sticky above the tab bar */
+  /** Rendered in its own sticky strip above the tab bar, which the bar then sticks below. Primary tabs only. */
   stickyHeader?: React.ReactNode;
 };
 

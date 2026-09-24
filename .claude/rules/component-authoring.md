@@ -24,6 +24,15 @@ components/<kebab-name>/
   README.md            shipped in the package (`files` in package.json)
 ```
 
+The README follows [`README_TEMPLATE.md`](../../README_TEMPLATE.md), which is the contract:
+a metadata block on line 1, a fixed order of sections, a prop table generated from the JSDoc
+between markers, and at least one compiling example. `pnpm check:readme` enforces it, in
+pre-push and in CI. Every folder is on the template — `scripts/readme-allowlist.json`, which
+held the ones still on the old format during the migration, is now `[]`, and a folder added back
+to it is a folder whose documentation stops being checked. That template is the source of truth
+for what a component's documentation says; where it and an older description of README shape
+disagree, the template wins.
+
 The barrel re-exports the component, its props type and its enums, and is where a wrapper HOC
 is applied — `Button`'s barrel wraps the raw component in `withTooltip`, so `Button.tsx` never
 mentions tooltips. Six components do this. Import the wrapped form from `.`, never the raw
@@ -37,7 +46,15 @@ entries, and the file is **not** alphabetical, so append rather than sort.
 - One JSDoc line per prop in `<Name>.types.ts`. This is not decoration: it is the entire
   documentation a plugin author gets, because they read the emitted
   `dist/types/components/<name>/<Name>.types.d.ts` and nothing else
-  ([plugin-api.md](plugin-api.md)).
+  ([plugin-api.md](plugin-api.md)). It is also the only source of the README's prop table and
+  of Storybook's, both generated from it — a prop with no JSDoc is a blank cell in three
+  places and `pnpm check:readme` fails on it.
+- `@default` only where the default is not a destructuring default in the component itself, for
+  instance when a sub-component applies it (`TextInput`'s `maxLength` of 255). The generator
+  reads the destructuring, including the `const { … } = props` form in the function body, and
+  warns when a `@default` tag contradicts it.
+- `@portal` marks a prop that only does something with DocSpace portal context; those render in
+  a table of their own rather than among the props a standalone app can use.
 - `ref?: React.Ref<HTMLElement>` **as an ordinary prop**. React 19 — `forwardRef` is not
   required and new components should not use it; 20 components still do, which is legacy, not
   a pattern to copy.
@@ -48,7 +65,18 @@ entries, and the file is **not** alphabetical, so append rather than sort.
 
 ## What a change costs elsewhere
 
-A prop default, an outer margin or an intrinsic-size change is a behaviour change for two
+**Start with the component's own README.** The generator rewrites the prop table and the gates
+fail on a table that has drifted, so the derived half looks after itself. The hand-written half
+does not: "Behaviour the types don't state", "Accessibility", "CSS variables" and the recipes are
+prose, and nothing in `check:readme` can tell that a sentence has become false. Change what a
+component _does_ — not its signature — and those sections are where the lie will sit, green gates
+and all. Five of them survived a merge that way: a header described as a `div` after it became an
+`<h3>`, a disabled row described as "a colour, not a state" after it started refusing the click,
+an `aria-controls` gap described as unclosable after it was closed, a prop called dead after it
+became an alias, and storage access described as throwing after it was wrapped. Re-read those four
+sections against what you just changed; it takes a minute and it is the only check there is.
+
+A prop default, an outer margin or an intrinsic-size change is also a behaviour change for two
 audiences that will never see this diff:
 
 - The DocSpace client, which imports by subpath and rebuilds against a packed tarball.
@@ -67,24 +95,33 @@ still true, and all still unenforced.
 - Every component needs a story. `theme-provider` is the only one without; the file may sit in
   a subdirectory (`table`, `rows`, `tiles` do), so search recursively before concluding one is
   missing.
-- Stories carry the docs: `parameters.docs.description.component` holds the feature list, the
-  accessibility notes and the table of component-level CSS variables. That table is the only
-  record of an overridable `var(--x, fallback)`.
+- Stories no longer carry the prose. `parameters.docs.description.component` reads the
+  component's own README — `import readme from "./README.md?raw"` — so the page a developer
+  opens in Storybook and the file a coding agent reads are the same text, and neither can drift
+  from the other. The metadata block and the generator markers are HTML comments and render as
+  nothing; verified on the Button docs page.
+- What stays in the story is what cannot be written down: the scenarios, the controls, the
+  visual-regression surface. Feature lists, accessibility notes and the table of overridable
+  `var(--x, fallback)` belong in the README, which is what `package.json` publishes — stories
+  are not in the tarball, so a consumer never saw them.
 - Tests are Vitest + React Testing Library. **`vitest.config.ts` lists the directories it
   runs** — `components`, `selectors`, `ai-agent`, `errors`, `ui`, `utils`, `context`,
   `providers`, `hooks`. A test placed under `billing/`, `uploader/`, `document-editor/` or
   `api/` is collected by nothing and passes by never running.
-- 10 components have no test; that is tolerated, an untested _change_ to interactive logic is
-  not. `node .claude/scripts/component-docs/gaps.mjs` lists them, along with the missing
-  READMEs and stories.
+- Seven components have no test; that is tolerated, an untested _change_ to interactive logic is
+  not. `node .claude/scripts/component-docs/gaps.mjs` lists them and the one missing story; no
+  README is missing any more, and the gates keep it that way.
 - `__tests__/` holds 94 Playwright visual-regression specs that run against a built Storybook
   and are **not in CI**. Nothing you push will run them.
 
 ## Missing documentation, as of today
 
-Ten components ship with no README: `action-button`, `avatar-editor-dialog`, `card`,
-`collapsible-card`, `columnar-info-bar`, `quantity-picker`, `quick-actions`,
-`room-logo-cover-dialog`, `room-type`, `two-state-toggle`. `package.json` publishes
-`components/**/README.md`, so those are gaps in the shipped package, not just here. The
-`component-docs` skill closes them; `node .claude/scripts/component-docs/gaps.mjs` is the
-current count.
+None. All 109 READMEs — 98 component folders and 11 nested sub-components — are on the template,
+and `check:readme` fails a component folder that has none, so this cannot regress quietly.
+`node .claude/scripts/component-docs/gaps.mjs` is the live count and today reports only a missing
+story (`theme-provider`) and seven components without tests.
+
+What is documented is not the same as what is correct. `docs/known-defects.md` lists 11 faults the
+rewrite found — `TextInput` defaulting `tabIndex` to `-1` is the worst of them — each described in
+its component's README as the behaviour it is. That file is the list of things that have to change
+before those descriptions can.

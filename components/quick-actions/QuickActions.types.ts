@@ -1,23 +1,23 @@
 import type { MouseEvent, ReactNode } from "react";
 
 export type QuickActionItem = {
-  /** Unique key of the tile; the set of ids also identifies the section. */
+  /** Identity of the tile: its React key, and what tells one section's tiles from another's. */
   id: string;
-  /** Tile illustration, rendered `aria-hidden`. */
+  /** Element drawn above the label, fitted into an 81×75 box (48×45 at tablet and below). */
   icon: ReactNode;
-  /** Visible caption and accessible name of the tile. */
+  /** Text under the icon, and the tile's accessible name. Clamped to two lines. */
   label: string;
-  /** Click handler of the tile, on the button or the link alike. */
+  /** Called with the event when the tile is activated, whether it is a button or a link. */
   onClick?: (e: MouseEvent<HTMLElement>) => void;
-  /** Renders the tile as a link instead of a button (ignored while disabled). */
+  /** Makes the tile a link to this address. A disabled tile stays a button whatever this says. */
   href?: string;
-  /** Link target; `_blank` adds `rel="noopener noreferrer"`. */
+  /** Target of that link. `"_blank"` also adds `rel="noopener noreferrer"`. */
   target?: "_blank" | "_self" | "_parent" | "_top";
-  /** Dims the tile and blocks interaction. */
+  /** Whether the tile is inert: it fades to half opacity and stops taking the pointer. */
   disabled?: boolean;
-  /** Tooltip shown below the tile. */
+  /** Content of a tooltip shown under the tile on hover. Without it the tile has no tooltip. */
   tooltipContent?: ReactNode;
-  /** `data-testid` of the tile element. */
+  /** `data-testid` of the tile. Without it the tile carries none. */
   dataTestId?: string;
 };
 
@@ -52,26 +52,28 @@ type QuickActionsCloseProps =
  */
 type QuickActionsControlProps =
   | {
-      /** Renders skeleton tiles instead of the items. */
+      /** Whether skeleton tiles are drawn instead of the real ones. */
       isLoading: true;
+      /** Accessible name of the arrow that scrolls back. Required, and localized by you, unless `isLoading` is pinned to `true`. */
       prevLabel?: never;
+      /** Accessible name of the arrow that scrolls on. Required, and localized by you, unless `isLoading` is pinned to `true`. */
       nextLabel?: never;
     }
   | {
-      /** Renders skeleton tiles instead of the items. */
+      /** Whether skeleton tiles are drawn instead of the real ones. */
       isLoading?: boolean;
-      /** Accessible name of the scroll-back arrow. */
+      /** Accessible name of the arrow that scrolls back. Required, and localized by you, unless `isLoading` is pinned to `true`. */
       prevLabel: string;
-      /** Accessible name of the scroll-forward arrow. */
+      /** Accessible name of the arrow that scrolls on. Required, and localized by you, unless `isLoading` is pinned to `true`. */
       nextLabel: string;
     };
 
 export type QuickActionsProps = QuickActionsCloseProps &
   QuickActionsControlProps & {
-    /** Tiles to render; an empty array renders nothing unless loading. */
+    /** The tiles, in the order they are drawn. An empty array renders nothing at all. */
     items: QuickActionItem[];
-    /** Class name of the outer banner element. */
+    /** Applied to the banner, after the component's own class. */
     className?: string;
-    /** `data-testid` of the outer banner element. */
+    /** `data-testid` of the banner. The track and the controls carry ids of their own. */
     dataTestId?: string;
   };

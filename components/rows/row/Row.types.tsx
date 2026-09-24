@@ -22,65 +22,84 @@ export type TData = {
 export type TMode = "modern" | "default";
 
 export type RowProps = {
-  /** Required for hosting the Checkbox component. Its location is always fixed in the first position.
-   * If there is no value, the occupied space is distributed among the other child elements. */
+  /**
+   * Whether the row's checkbox is ticked. Its **presence** is what renders the
+   * checkbox at all — passing `checked={false}` gives an unticked box, omitting
+   * the prop gives none.
+   */
   checked?: boolean;
-  /** Displays the child elements */
+  /**
+   * The row's content, normally a `RowContent`. The row reads `item` off this
+   * element's props to build the header of its context menu.
+   */
   children?: React.ReactElement<{ item: RowItemType }>;
-  /** Accepts class */
+  /** Applied to the row element. */
   className?: string;
-  /** Required for displaying a certain element in the row */
+  /** Element placed before the context button, after the badges. */
   contentElement?: React.ReactNode;
-  /** Sets the width of the ContextMenuButton component. */
+  /** Width reserved for the context button, as a CSS length.
+   * @default "26px" */
   contextButtonSpacerWidth?: string;
-  /** Required for hosting the ContextMenuButton component. It is always located near the right border of the container,
-   * regardless of the contents of the child elements. If there is no value, the occupied space is distributed among the other child elements. */
+  /**
+   * Items of the context menu. They may be given here or as
+   * `data.contextOptions`, which wins; an empty list renders no button.
+   */
   contextOptions?: ContextMenuModel[];
-  /** Current row item information. */
+  /**
+   * Arbitrary payload handed back to `onSelect`. Its `contextOptions`, if it
+   * has any, are the ones the menu uses.
+   */
   data?: TData;
-  /** In case Checkbox component is specified, it is located in a fixed order,
-   * otherwise it is located in the first position. If there is no value, the occupied space is distributed among the other child elements. */
+  /**
+   * Element at the start of the row — an avatar or a file icon. Like `checked`,
+   * its presence is what reserves the space.
+   */
   element?: React.ReactElement;
-  /** Accepts id  */
+  /** Ignored. Nothing reads this prop and no `id` reaches the DOM. */
   id?: string;
-  /** If true, this state is shown as a rectangle in the checkbox */
+  /** Draws the checkbox as partly ticked, for a group that is half-selected. */
   indeterminate?: boolean;
-  /** Sets a callback function that is triggered when a row element is selected. Returns data value. */
+  /** Called with the new checked state and whatever `data` holds. */
   onSelect?: (checked: boolean, data?: unknown) => void;
-  /** Sets a callback function that is triggered when any element except the checkbox and context menu is clicked. */
+  /** Called by a click on the start element and on the content, but not on the checkbox or the context button. */
   onRowClick?: (e: React.MouseEvent) => void;
-  /** Function that is invoked on clicking the icon button in the context-menu */
+  /** Called when the context menu is asked for, with `true` for a right-click. */
   onContextClick?: (value?: boolean) => void;
-  /** Accepts css style  */
+  /** Ignored. Nothing reads this prop and no inline style reaches the DOM. */
   style?: React.CSSProperties;
-  /** Displays the loader */
+  /** Replaces the checkbox and the start element with a spinner. */
   inProgress?: boolean;
-  /** Function that returns an object containing the elements of the context menu */
+  /** Builds the context menu's items when it opens, instead of `contextOptions`. */
   getContextModel?: () => ContextMenuModel[];
-  /** Changes the row mode */
+  /**
+   * `modern` moves the checkbox on top of the start element, so it needs both
+   * `checked` and `element` to render either.
+   * @default "default"
+   */
   mode?: TMode;
-  /** Removes the borders */
+  /** Removes the row's bottom border. */
   withoutBorder?: boolean;
-  /** Required for index editing mode */
+  /** Replaces the context button with the up and down arrows of index editing. */
   isIndexEditingMode?: boolean;
-  /** Indicates if the row represents a room */
+  /** Tells the context menu that this row is a room, which changes its header. */
   isRoom?: boolean;
-  /** Title for the context menu */
+  /** Hover tooltip of the context button. */
   contextTitle?: string;
-  /** Component for displaying badges */
+  /** Element placed before `contentElement`, for badges of your own. */
   badgesComponent?: React.ReactNode;
-  /** Indicates if the row is archived */
+  /** Tells the context menu that the room is archived. */
   isArchive?: boolean;
-  /** Callback for closing the row context */
+  /** Called when the context menu closes. */
   rowContextClose?: () => void;
-  /** URL for the badge */
+  /** URL of the badge image shown in the context menu's header. */
   badgeUrl?: string;
-  /** Disables checkbox */
+  /** Disables the checkbox, and nothing else about the row. */
   isDisabled?: boolean;
-  /** Callback for changing index */
+  /** Called with the direction when an index arrow is clicked. */
   onChangeIndex?: (action: VDRIndexingAction) => void;
-  /** The item data for the row */
+  /** Ignored. The context menu's header is read from the child's own `item` prop. */
   item?: RowItemType;
-  /** Data test id for the row */
+  /** Value of `data-testid` on the row.
+   * @default "row" */
   dataTestId?: string;
 };

@@ -1,123 +1,219 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "QuantityPicker",
+  "folder": "components/quantity-picker",
+  "kind": "component",
+  "category": "Form controls",
+  "status": "public",
+  "summary": "Minus and plus around a number, with an optional slider and quick-add chips.",
+  "import": { "subpath": "components/quantity-picker", "barrel": false, "default": true },
+  "exports": ["default"],
+  "providers": ["ThemeProvider"],
+  "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
+  "related": ["slider", "text-input", "tab-item"],
+  "subComponents": [],
+  "testIds": ["quantity_picker_input"]
+} -->
+
 # QuantityPicker
 
-A large numeric input flanked by minus and plus controls, with an optional slider and optional preset tabs underneath. Reach for it where the user chooses a countable amount to buy or allocate — seats, managers, gigabytes of storage — and the number itself should be the centre of the screen; for an ordinary form field, use a text input instead.
+Minus and plus around a number, with an optional slider and quick-add chips. It is the portal's
+"how many users" control, and the number can be typed as well as stepped.
 
-## Usage
+## Use this when / not when
 
-The folder exports the component as its **default** export; there is no named export.
+- Use for a count the user adjusts up and down — seats, licences, copies — especially where a
+  slider or preset increments help.
+- Not for an arbitrary number. The control is built around a minimum, a maximum and a step;
+  [`TextInput`](../text-input/README.md) is simpler for a free number.
+- Not for a rough value on a continuous range — [`Slider`](../slider/README.md) alone is that.
+- Not for a value that has no bounds. `minValue`, `maxValue` and `step` are all required.
 
-```jsx
+## Import
+
+```ts
+import QuantityPicker from "@onlyoffice/apps-ui-kit/components/quantity-picker";
+```
+
+It is a **default** export, so the name is yours to choose. `components/index.ts`
+re-exports this folder with `export *`, which carries named exports and drops defaults — the
+component is **not in the root barrel**, and the subpath above is the only way to it.
+
+Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme`.
+
+## Minimal example
+
+The control is fully controlled: hold the number and set it from `onChange`.
+
+```tsx
+import { useState } from "react";
 import QuantityPicker from "@onlyoffice/apps-ui-kit/components/quantity-picker";
 
-const MyComponent = () => {
-  const [value, setValue] = useState(5);
+export function Seats() {
+  const [seats, setSeats] = useState(5);
 
   return (
     <QuantityPicker
-      value={value}
+      title="Users"
+      value={seats}
       minValue={1}
       maxValue={100}
       step={1}
-      title="Managers"
-      subtitle="Choose how many managers to add"
-      decreaseLabel="Decrease"
-      increaseLabel="Increase"
-      onChange={setValue}
+      onChange={setSeats}
     />
   );
-};
+}
 ```
 
-The component is controlled: it shows `value` and reports changes through `onChange`, so the parent has to store the new value.
+## Props
 
-## Properties
+<!-- props:start QuantityPickerProps -->
 
-| Name               | Type                             | Default | Description                                                                                               |
-| ------------------ | -------------------------------- | ------- | --------------------------------------------------------------------------------------------------------- |
-| value              | number                           | -       | Current value (required)                                                                                  |
-| minValue           | number                           | -       | Lower bound for the controls, typed input and slider (required)                                           |
-| maxValue           | number                           | -       | Upper bound; nothing goes past it except the one overflow step `showPlusSign` allows (required)           |
-| step               | number                           | -       | Amount the controls and the slider move by; the last step up is shortened to stop at the bound (required) |
-| onChange           | (value: number) => void          | -       | Called with the new value (required)                                                                      |
-| title              | string \| null                   | -       | Heading above the controls; omitted when empty                                                            |
-| subtitle           | string                           | -       | Secondary line under the title; omitted when empty                                                        |
-| showPlusSign       | boolean                          | -       | Lets the value go exactly one past `maxValue` (to `maxValue + 1`), shown as `maxValue+`                   |
-| isDisabled         | boolean                          | -       | Disables every control and replaces the input with static text                                            |
-| showSlider         | boolean                          | -       | Renders a slider bound to the value, from `minValue` to `maxValue` (`maxValue + 1` with `showPlusSign`)   |
-| className          | string                           | -       | Class name on the root element                                                                            |
-| items              | Array\<number \| TabItemObject\> | -       | Preset tabs; selecting one adds its amount to the current value, capped like the plus control             |
-| isLarge            | boolean                          | -       | Widens the value field from 101px to 140px                                                                |
-| withoutControls    | boolean                          | -       | Hides the plus and minus controls                                                                         |
-| disableValue       | string                           | -       | Text shown in place of the value while `isDisabled` is set; the field then sizes to its content           |
-| underControlsTitle | string \| ReactNode              | -       | Text under the controls; turns to the warning colour while an invalid value is entered with `enableZero`  |
-| isZeroAllowed      | boolean                          | -       | Deprecated former name of `enableZero`, kept as an alias; `enableZero` wins when both are set             |
-| enableZero         | boolean                          | false   | Allows zero as a value below `minValue`; other values below it are flagged                                |
-| minusTooltipId     | string                           | -       | Tooltip id set as `data-tooltip-id` on the minus control                                                  |
-| minusDisabled      | boolean                          | -       | Disables only the minus control; it stays focusable (`aria-disabled`) so the tooltip can explain why      |
-| decreaseLabel      | string                           | -       | Accessible name of the minus control; no `aria-label` is rendered without it                              |
-| increaseLabel      | string                           | -       | Accessible name of the plus control; no `aria-label` is rendered without it                               |
+_Generated by `pnpm readme:props` from `QuantityPickerProps` in `quantity-picker.tsx`. Do not edit; edit the JSDoc._
 
-`TabItemObject` is `{ name: string; value: number }`. It is not exported.
+| Prop                 | Type                          | Required | Default | Description                                                                                                       |
+| -------------------- | ----------------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------- |
+| `maxValue`           | `number`                      | **yes**  | –       | Upper bound; nothing the component does goes past it, except the one overflow step `showPlusSign` allows          |
+| `minValue`           | `number`                      | **yes**  | –       | Lower bound for the controls, typed input and slider                                                              |
+| `onChange`           | `(value: number) => void`     | **yes**  | –       | Called with the new value                                                                                         |
+| `step`               | `number`                      | **yes**  | –       | Amount the plus and minus controls and the slider move by; the last step up is shortened so it stops at the bound |
+| `value`              | `number`                      | **yes**  | –       | Current value; the component is controlled                                                                        |
+| `className`          | `string`                      | no       | –       | Class name on the root element                                                                                    |
+| `decreaseLabel`      | `string`                      | no       | –       | Accessible name of the minus control, e.g. a translated "Decrease"; no `aria-label` is rendered without it        |
+| `disableValue`       | `string`                      | no       | –       | Text shown in place of the value while `isDisabled` is set; the field then sizes to its content                   |
+| `enableZero`         | `boolean`                     | no       | –       | Allows zero as a value below `minValue`; other values below it are flagged                                        |
+| `increaseLabel`      | `string`                      | no       | –       | Accessible name of the plus control, e.g. a translated "Increase"; no `aria-label` is rendered without it         |
+| `isDisabled`         | `boolean`                     | no       | –       | Disables every control and replaces the input with static text                                                    |
+| `isLarge`            | `boolean`                     | no       | –       | Widens the value field from 101px to 140px                                                                        |
+| `isZeroAllowed`      | `boolean`                     | no       | –       | **Deprecated.** Use `enableZero`.                                                                                 |
+| `items`              | `(number \| TabItemObject)[]` | no       | –       | Preset tabs; selecting one adds its amount to the current value, capped like the plus control                     |
+| `minusDisabled`      | `boolean`                     | no       | –       | Disables only the minus control; it stays focusable (`aria-disabled`) so `minusTooltipId` can still explain why   |
+| `minusTooltipId`     | `string`                      | no       | –       | Tooltip id set as `data-tooltip-id` on the minus control                                                          |
+| `showPlusSign`       | `boolean`                     | no       | –       | Lets the value go exactly one past `maxValue` (to `maxValue + 1`), shown as `maxValue+`                           |
+| `showSlider`         | `boolean`                     | no       | –       | Renders a slider bound to the value, from `minValue` to `maxValue` (`maxValue + 1` with `showPlusSign`)           |
+| `subtitle`           | `string`                      | no       | –       | Secondary line under the title; omitted when empty                                                                |
+| `title`              | `null \| string`              | no       | –       | Heading above the controls; omitted when empty                                                                    |
+| `underControlsTitle` | `React.ReactNode`             | no       | –       | Text under the controls; turns to the warning colour while an invalid value is entered with `enableZero`          |
+| `withoutControls`    | `boolean`                     | no       | –       | Hides the plus and minus controls                                                                                 |
 
-## Behaviour
+<!-- props:end -->
 
-- **Typing.** Non-digit characters are dropped. While the field is being edited it may hold an empty or below-minimum draft without calling `onChange`; the draft is committed on blur or Enter, where an empty field or a value below `minValue` is clamped to `minValue` (or kept at zero with `enableZero`). A typed value above `maxValue` is replaced at once by `maxValue`, or by `maxValue + 1` — displayed `maxValue+` — with `showPlusSign`.
-- **Upper bound.** The highest value the component produces is `maxValue`, or `maxValue + 1` with `showPlusSign` — a single overflow state displayed as `maxValue+`, not a range. Plus, the preset tabs, typing and the slider all stop there; a step that would overshoot is shortened to land on it.
-- **Controls.** The minus and plus controls are native buttons, so they are in the tab order (with the value field between them) and respond to Enter and Space. Minus steps down and stops at `minValue` (at zero with `enableZero`); from above `maxValue` it drops back to `maxValue`. Plus from below `minValue` jumps to `minValue`. Using a control discards an uncommitted draft. The controls contain only an icon, so pass translated `decreaseLabel` and `increaseLabel` to give them accessible names.
-- **Presets.** Each tab is labelled with a leading plus sign (`+10`) and **adds** its amount to `value` rather than setting it.
-- **Disabled.** With `isDisabled` the input is replaced by static text (`disableValue`, else the value), the title and subtitle turn to the disabled colour, and the controls (disabled buttons), slider and tabs stop responding. `disableValue` applies only then, and the field sizes to its content. `minusDisabled` makes the minus control inert through `aria-disabled` rather than `disabled`, so it stays hoverable and focusable for the `minusTooltipId` tooltip.
+## Recipes
 
-## Styling
+### Disabled / read-only
 
-The colours come from portal theme tokens — `--quantity-picker-rectangle-color`, `--quantity-picker-disable-color`, `--quantity-picker-additional-title`, `--quantity-picker-track-number`, `--quantity-picker-warning-color`, plus `--text-color` and `--text-disable-color`. None has a fallback, and this package does not define them: they come from the DocSpace portal's theme stylesheet, so outside the portal the host has to supply them.
+`isDisabled` replaces the field with plain text, so nothing can be typed or focused.
+`disableValue` is what that text says when the number itself is not the right thing to show.
 
-The root takes the full width and centres itself with `margin: 0 auto`. The minus and plus controls are 38px circles and the value is set at 44px bold. The slider's end labels use logical positions, so they swap sides under RTL.
+```tsx
+import QuantityPicker from "@onlyoffice/apps-ui-kit/components/quantity-picker";
 
-## Examples
-
-### With a slider
-
-```jsx
-<QuantityPicker
-  value={value}
-  minValue={1}
-  maxValue={100}
-  step={1}
-  showSlider
-  title="Storage"
-  subtitle="GB of additional storage"
-  onChange={setValue}
-/>
+export function FixedSeats({ seats }: { seats: number }) {
+  return (
+    <QuantityPicker
+      title="Users"
+      value={seats}
+      minValue={1}
+      maxValue={100}
+      step={1}
+      isDisabled
+      disableValue="Set by your plan"
+      onChange={() => {}}
+    />
+  );
+}
 ```
 
-### With presets
+### A slider and quick-add chips
 
-```jsx
-<QuantityPicker
-  value={value}
-  minValue={1}
-  maxValue={100}
-  step={1}
-  items={[
-    { name: "10", value: 10 },
-    { name: "50", value: 50 },
-    { name: "100", value: 100 },
-  ]}
-  onChange={setValue}
-/>
+`items` are **increments**, not values: a chip labelled `+10` adds ten to whatever is there.
+
+```tsx
+import { useState } from "react";
+import QuantityPicker from "@onlyoffice/apps-ui-kit/components/quantity-picker";
+
+export function SeatsWithPresets() {
+  const [seats, setSeats] = useState(10);
+
+  return (
+    <QuantityPicker
+      title="Users"
+      subtitle="Billed monthly"
+      value={seats}
+      minValue={1}
+      maxValue={250}
+      step={1}
+      showSlider
+      showPlusSign
+      items={[10, 50, { name: "100", value: 100 }]}
+      underControlsTitle={`${seats} users`}
+      onChange={setSeats}
+    />
+  );
+}
 ```
 
-### Disabled
+## Behaviour the types don't state
 
-```jsx
-<QuantityPicker
-  value={5}
-  minValue={1}
-  maxValue={100}
-  step={1}
-  isDisabled
-  disableValue="Unlimited"
-  title="Managers"
-  onChange={() => {}}
-/>
-```
+- **Typing is held as a draft and committed on blur or Enter.** Until then `onChange` fires for
+  each valid intermediate number, but an empty field is not reported — it settles to 0 or
+  `minValue` when you leave it.
+- **Non-digits are stripped as you type**, so a minus sign or a decimal point cannot be entered
+  at all; the control is whole, non-negative numbers only.
+- **`showPlusSign` changes what the maximum means.** Above `maxValue` the display becomes
+  `<maxValue>+`, typing a larger number reports `maxValue + 1`, and the slider's own maximum is
+  `maxValue + 1` so the handle can reach that overflow step.
+- **`items` add, they do not set.** A chip's number is added to the current value, and the chips
+  never look selected — they are buttons, not a choice.
+- **The minus button stops at `minValue`, or at 0 with `enableZero`.** With `enableZero` a value
+  between 0 and `minValue` also turns the line under the controls into its warning colour.
+- **`underControlsTitle` always renders**, even when empty, so the control reserves that line's
+  height whether or not you use it.
+- **`isDisabled` removes the field from the DOM**, replacing it with text — so refs, focus and
+  test queries against the input stop working while it is disabled.
+- `minusDisabled` disables only the minus button; `minusTooltipId` puts `data-tooltip-id` on it
+  for a [`Tooltip`](../tooltip/README.md) you render yourself.
+- `isZeroAllowed` is the former name of `enableZero` and still works as an alias:
+  `enableZero ?? isZeroAllowed ?? false`, so `enableZero` wins when both are set. It is marked
+  deprecated; write `enableZero` in new code.
+
+## CSS variables
+
+The control is styled from the shared theme tokens rather than custom properties of its own.
+The slider inside follows [`Slider`](../slider/README.md).
+
+## Accessibility
+
+- **The plus and minus controls are real `<button type="button">`s**, so they are in the tab
+  order and answer Enter and Space. They are unnamed until you pass `decreaseLabel` and
+  `increaseLabel` — no `aria-label` is rendered without them, and a screen reader then announces
+  two buttons with only their icons.
+- `minusDisabled` leaves the minus control focusable and marks it `aria-disabled`, so a tooltip
+  attached through `minusTooltipId` can still be read; only `isDisabled` sets the real
+  `disabled`.
+- The number is a [`TextInput`](../text-input/README.md) given `tabIndex={0}` by the component,
+  against the kit's own default of `-1`. It has no label; name it through your own markup, and
+  note it disappears entirely when `isDisabled`.
+- The quick-add chips are [`TabItem`](../tab-item/README.md)s, which present as tabs rather than
+  as buttons that change a number.
+- The slider is a real range input and is the only part fully usable from the keyboard — see
+  [`Slider`](../slider/README.md), which has no visible focus ring of its own.
+- Nothing announces the minimum, the maximum or that a value was clamped.
+
+## Test ids
+
+| Element          | `data-testid`                |
+| ---------------- | ---------------------------- |
+| The field        | `quantity_picker_input`      |
+| The minus button | `quantity_picker_minus_icon` |
+| The plus button  | `quantity_picker_plus_icon`  |
+| The slider       | `quantity_picker_slider`     |
+| A quick-add chip | `add_<value>_tab_item`       |
+
+None of them can be overridden by a prop.
+
+## Related
+
+- [`Slider`](../slider/README.md) — the slider it can show, and the control for a rough value.
+- [`TextInput`](../text-input/README.md) — the field in the middle.
+- [`TabItem`](../tab-item/README.md) — what the quick-add chips are built from.

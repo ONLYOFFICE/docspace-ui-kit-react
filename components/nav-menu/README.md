@@ -1,153 +1,357 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "NavMenu",
+  "folder": "components/nav-menu",
+  "kind": "component",
+  "category": "Navigation",
+  "status": "public",
+  "summary": "Sidebar navigation: groups of items, each with an optional sub-menu, a badge and a collapsed rail form.",
+  "import": { "subpath": "components/nav-menu", "barrel": true, "default": false },
+  "exports": ["NavMenu", "NavMenuProps", "NavMenuGroup", "NavMenuItem", "NavSubItem", "NavMenuLinkData", "ArticleHideMenuIcon", "CatalogSettingsPaymentIcon"],
+  "providers": ["ThemeProvider"],
+  "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
+  "related": ["article", "drop-down", "badge"],
+  "subComponents": [],
+  "testIds": []
+} -->
+
 # NavMenu
 
-Sidebar navigation menu with collapsible groups and sub-items. Supports light/dark themes, RTL layout, and externally controlled active state.
+Sidebar navigation: groups of items, each with an optional sub-menu, a badge and a collapsed rail
+form. It owns which section is expanded and nothing else — what is active, and what a click does,
+come from you.
 
-## Usage
+## Use this when / not when
+
+- Use for the left-hand navigation of an application: a handful of groups, each a short list of
+  destinations, some of them with children.
+- Not for a menu that pops open — [`DropDown`](../drop-down/README.md) and
+  [`ContextMenu`](../context-menu/README.md) are the floating ones.
+- Not for the portal's own sidebar chrome — [`Article`](../article/README.md) is the panel with the
+  header, the resize handle and the mobile behaviour; this is the list that goes inside it.
+- **There is no router.** Give it `LinkRouter` and each entry with `linkData` becomes your link
+  component; without it every entry is a `<button>` and `linkData` is ignored.
+- **A section header is never a link.** An item with `children` is always rendered as a button,
+  whatever `linkData` says.
+
+## Import
+
+```ts
+import { NavMenu } from "@onlyoffice/apps-ui-kit/components/nav-menu";
+```
+
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`, together with two icon components
+this folder re-exports — `ArticleHideMenuIcon` and `CatalogSettingsPaymentIcon`.
+
+Needs `ThemeProvider` above it in the tree for every colour it paints. In the collapsed form the
+labels become tooltips through the kit's shared tooltip, which needs `<RootTooltip />` from
+[`Tooltip`](../tooltip/README.md) mounted once near the root of the application — without it a
+collapsed rail has no labels at all.
+
+## Minimal example
 
 ```tsx
+import { useState } from "react";
+
 import { NavMenu } from "@onlyoffice/apps-ui-kit/components/nav-menu";
-import type { NavMenuGroup } from "@onlyoffice/apps-ui-kit/components/nav-menu";
 
-import FolderIconUrl from "@onlyoffice/apps-ui-kit/assets/icons/16/catalog.folder.react.svg?url";
-import TrashIconUrl from "@onlyoffice/apps-ui-kit/assets/icons/16/catalog.trash.react.svg?url";
-
-const groups: NavMenuGroup[] = [
+const groups = [
   {
     id: "main",
-    label: "My Files",
+    label: "Workspace",
     items: [
+      { id: "overview", label: "Overview" },
       {
         id: "documents",
         label: "Documents",
-        icon: FolderIconUrl,
-        onClick: (item) => console.log("clicked", item.id),
         children: [
-          {
-            id: "trash",
-            label: "Trash",
-            icon: TrashIconUrl,
-            onClick: (sub) => console.log("clicked", sub.id),
-          },
+          { id: "recent", label: "Recent" },
+          { id: "favourites", label: "Favourites" },
+          { id: "trash", label: "Trash", withTopSeparator: true },
         ],
       },
     ],
   },
 ];
 
-<NavMenu
-  groups={groups}
-  activeItemId="documents"
-  defaultExpandedId="documents"
-/>;
-```
+export function Sidebar() {
+  const [active, setActive] = useState("overview");
 
-## Features
-
-- **Groups**: items are organized into named groups with a section label
-- **Collapsible sub-items**: clicking an item with children expands the list with a smooth animation
-- **Single expanded section**: opening a new section automatically collapses the previously expanded one
-- **Collapse behavior**: an expanded item can only be collapsed by clicking it again when it is also the active item; clicking a non-active expanded item re-activates it without collapsing
-- **Open-only animation**: expanding is animated (0.25s ease-in-out), collapsing is instant
-- **Active item**: controlled via `activeItemId`, highlights the icon with the accent color
-- **Icons**: accepted as a URL string (`icon`) or a React node (`iconNode`)
-- **Badge**: numeric, icon, or custom component badge on any item via `showBadge` + `labelBadge` / `badgeComponent`; badge click is isolated from item click via `onClickBadge`
-- **RTL**: uses CSS logical properties (`padding-inline-start/end`)
-- **Themes**: light/dark support via CSS custom properties
-- **Accessibility**: `aria-expanded` on items with children, semantic markup (`nav`, `ul`, `li`, `button`)
-- **forwardRef** on the root `<nav>` element
-
-## Properties
-
-| Prop                | Type                                   | Default | Description                                                                                                |
-| ------------------- | -------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------- |
-| `groups`            | `NavMenuGroup[]`                       | —       | Array of groups containing navigation items                                                                |
-| `activeItemId`      | `string`                               | —       | `id` of the currently active item or sub-item                                                              |
-| `defaultExpandedId` | `string`                               | —       | `id` of the item expanded by default                                                                       |
-| `withAnimation`     | `boolean`                              | `false` | Enables progress-bar animation on item click                                                               |
-| `className`         | `string`                               | —       | Additional CSS class on the root element                                                                   |
-| `LinkRouter`        | `React.ComponentType<LinkRouterProps>` | —       | Router link component; when provided, items with `linkData` render as links instead of buttons             |
-| `iconOnly`          | `boolean`                              | `false` | Collapses the menu to icons only — hides text labels, badges, and group labels; sub-items are not rendered |
-
-## Types
-
-```ts
-type NavMenuLinkData = {
-  path: string;
-  state?: unknown;
-};
-
-type NavMenuGroup = {
-  id: string;
-  label: string;
-  items: NavMenuItem[];
-};
-
-type NavMenuItem = {
-  id: string;
-  label: string;
-  icon?: string; // SVG file URL (import with ?url)
-  iconNode?: React.ReactNode;
-  onClick?: (item: NavMenuItem) => void;
-  children?: NavSubItem[];
-  showBadge?: boolean; // Show a badge on the item
-  labelBadge?: string | number; // Numeric or text badge label
-  badgeComponent?: React.ReactNode; // Custom badge component (overrides labelBadge)
-  onClickBadge?: (id: string) => void; // Called with item id; does not trigger onClick
-  linkData?: NavMenuLinkData; // When set and LinkRouter provided, renders as a link
-};
-
-type NavSubItem = {
-  id: string;
-  label: string;
-  icon?: string;
-  iconNode?: React.ReactNode;
-  onClick?: (item: NavSubItem) => void;
-  linkData?: NavMenuLinkData;
-};
-```
-
-## Badge
-
-Set `showBadge: true` on any `NavMenuItem` to display a badge after the item label.
-
-```tsx
-// Numeric badge
-{ id: "rooms", label: "Rooms", showBadge: true, labelBadge: 5 }
-
-// Custom badge component (e.g. "new" tag)
-{ id: "agents", label: "Agents", showBadge: true, badgeComponent: <Badge label="new" /> }
-
-// With click handler (does not trigger item's onClick)
-{
-  id: "files",
-  label: "Files",
-  showBadge: true,
-  labelBadge: 12,
-  onClickBadge: (id) => console.log("badge clicked on", id),
+  return (
+    <NavMenu
+      groups={groups.map((group) => ({
+        ...group,
+        items: group.items.map((item) => ({
+          ...item,
+          onClick: () => setActive(item.id),
+          children: item.children?.map((sub) => ({
+            ...sub,
+            onClick: () => setActive(sub.id),
+          })),
+        })),
+      }))}
+      activeItemId={active}
+    />
+  );
 }
 ```
 
-## Icon-only mode
+## Props
 
-Set `iconOnly` to collapse the menu to icons. Text labels, badges, and group labels are hidden;
-sub-items are not rendered. Items still fire `onClick`.
+<!-- props:start -->
+
+_Generated by `pnpm readme:props` from `NavMenuProps` in `NavMenu.types.ts`. Do not edit; edit the JSDoc._
+
+| Prop                | Type                                   | Required | Default | Description                                                                                                                                |
+| ------------------- | -------------------------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `groups`            | `NavMenuGroup[]`                       | **yes**  | –       | The sections of the menu, in order. A group with a `label` renders it as a caption above its items.                                        |
+| `activeItemId`      | `string`                               | no       | –       | Id of the item or sub-item that is currently open. It highlights that entry and, through an effect, expands the section it belongs to.     |
+| `className`         | `string`                               | no       | –       | Added after the component's own classes on the `nav` element.                                                                              |
+| `defaultExpandedId` | `string`                               | no       | –       | Section expanded on the first render. After that the expansion is the component's own state.                                               |
+| `iconOnly`          | `boolean`                              | no       | `false` | Collapsed rail: labels become tooltips, sub-menus are not rendered, and the active section's children are flattened into the list instead. |
+| `LinkRouter`        | `React.ComponentType<LinkRouterProps>` | no       | –       | Your router's link component. Without it `linkData` is ignored and every entry is a `button`.                                              |
+| `withAnimation`     | `boolean`                              | no       | `false` | Plays the sliding highlight when an entry is clicked.                                                                                      |
+| `withExpandControl` | `boolean`                              | no       | `false` | Gives each section its own chevron and leaves the item body to navigation. Several sections may then be open at once.                      |
+
+#### Added by the wrapper the folder exports
+
+The `index` module exports a wrapped component, so these are accepted on top of the props above.
+
+| Prop  | Type               | Required | Default | Description                                                                                                                                                                     |
+| ----- | ------------------ | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ref` | `Ref<HTMLElement>` | no       | –       | Allows getting a ref to the component instance. Once the component unmounts, React will set `ref.current` to `null` (or call the ref with `null` if you passed a callback ref). |
+
+<!-- props:end -->
+
+## Recipes
+
+### With a router
+
+`LinkRouter` is your router's link component. Only leaf items use it: an item with children stays
+a button, because clicking it expands its sub-menu.
 
 ```tsx
-<NavMenu groups={groups} activeItemId={activeId} iconOnly />
+import { NavMenu } from "@onlyoffice/apps-ui-kit/components/nav-menu";
+import type { LinkRouterProps } from "@onlyoffice/apps-ui-kit/types";
+
+const groups = [
+  {
+    id: "main",
+    items: [
+      { id: "overview", label: "Overview", linkData: { path: "/" } },
+      {
+        id: "documents",
+        label: "Documents",
+        children: [
+          { id: "recent", label: "Recent", linkData: { path: "/recent" } },
+          { id: "trash", label: "Trash", linkData: { path: "/trash" } },
+        ],
+      },
+    ],
+  },
+];
+
+function RouterLink({ to, children, ...rest }: LinkRouterProps) {
+  return (
+    <a href={String(to)} {...rest}>
+      {children}
+    </a>
+  );
+}
+
+export function RoutedSidebar({ path }: { path: string }) {
+  return (
+    <NavMenu
+      groups={groups}
+      LinkRouter={RouterLink}
+      activeItemId={path === "/" ? "overview" : path.slice(1)}
+    />
+  );
+}
 ```
 
-In icon-only mode each button receives a `title` attribute equal to the item label, providing
-a native hover tooltip. Pair with a toggle button to let users expand and collapse the sidebar.
+### The collapsed rail
 
-## CSS Custom Properties
+`iconOnly` hides the labels and the sub-menus. The active section's children are flattened into
+the top-level list instead, so the current branch stays reachable.
 
-The component can be customized via CSS variables on a parent element:
+```tsx
+import { useState } from "react";
 
-| Variable                            | Description                          |
-| ----------------------------------- | ------------------------------------ |
-| `--nav-menu-group-label-color`      | Group label text color               |
-| `--nav-menu-item-text-color`        | Item text color                      |
-| `--nav-menu-item-icon-color`        | Icon fill color in default state     |
-| `--nav-menu-item-icon-active-color` | Icon fill color for the active item  |
-| `--nav-menu-item-bg-hover`          | Background color on hover            |
-| `--nav-menu-item-bg-active`         | Background color for the active item |
+import { NavMenu } from "@onlyoffice/apps-ui-kit/components/nav-menu";
+import { Button } from "@onlyoffice/apps-ui-kit/components/button";
+import { RootTooltip } from "@onlyoffice/apps-ui-kit/components/tooltip";
+
+const groups = [
+  {
+    id: "main",
+    items: [
+      { id: "overview", label: "Overview", icon: "/icons/home.svg" },
+      {
+        id: "documents",
+        label: "Documents",
+        icon: "/icons/docs.svg",
+        children: [
+          { id: "recent", label: "Recent" },
+          { id: "trash", label: "Trash" },
+        ],
+      },
+    ],
+  },
+];
+
+export function CollapsibleSidebar() {
+  const [collapsed, setCollapsed] = useState(false);
+
+  return (
+    <>
+      <RootTooltip />
+      <Button
+        label={collapsed ? "Expand" : "Collapse"}
+        onClick={() => setCollapsed((value) => !value)}
+      />
+      <NavMenu groups={groups} iconOnly={collapsed} activeItemId="recent" />
+    </>
+  );
+}
+```
+
+### Badges
+
+`showBadge` puts a dot on the icon and the kit's badge beside the label. `badgeComponent` replaces
+that badge, and `collapsedBadgeComponent` is what a section shows while its sub-menu is shut —
+the place for an aggregated count.
+
+```tsx
+import { NavMenu } from "@onlyoffice/apps-ui-kit/components/nav-menu";
+import { Badge } from "@onlyoffice/apps-ui-kit/components/badge";
+
+const groups = [
+  {
+    id: "main",
+    items: [
+      {
+        id: "documents",
+        label: "Documents",
+        collapsedBadgeComponent: <Badge label={12} />,
+        children: [
+          { id: "recent", label: "Recent", showBadge: true, labelBadge: 9 },
+          { id: "shared", label: "Shared", showBadge: true, labelBadge: 3 },
+        ],
+      },
+    ],
+  },
+];
+
+export function BadgedSidebar() {
+  return <NavMenu groups={groups} activeItemId="recent" />;
+}
+```
+
+### A click that opens a dialog
+
+An `onClick` that returns exactly `false` tells the menu the interaction was handled, so the
+section does not expand behind whatever you opened. Any other return value, a promise included,
+keeps the default.
+
+```tsx
+import { useState } from "react";
+
+import { NavMenu } from "@onlyoffice/apps-ui-kit/components/nav-menu";
+import { ModalDialog } from "@onlyoffice/apps-ui-kit/components/modal-dialog";
+
+export function SidebarWithDialog() {
+  const [open, setOpen] = useState(false);
+
+  const groups = [
+    {
+      id: "main",
+      items: [
+        { id: "overview", label: "Overview" },
+        {
+          id: "invite",
+          label: "Invite people",
+          children: [{ id: "invite-link", label: "Copy link" }],
+          onClick: () => {
+            setOpen(true);
+            return false as const;
+          },
+        },
+      ],
+    },
+  ];
+
+  return (
+    <>
+      <NavMenu groups={groups} activeItemId="overview" />
+      <ModalDialog visible={open} onClose={() => setOpen(false)}>
+        <ModalDialog.Header>Invite people</ModalDialog.Header>
+        <ModalDialog.Body>Share the link with your team.</ModalDialog.Body>
+      </ModalDialog>
+    </>
+  );
+}
+```
+
+## Behaviour the types don't state
+
+- **Expansion is the component's own state, and `activeItemId` drives it.** An effect finds the
+  section the active id belongs to and opens it — so navigating from outside the menu opens the
+  right branch by itself. An id that matches nothing leaves the state untouched.
+- **Desktop and mobile expand differently.** By default only one section is open at a time and the
+  active one cannot be collapsed by clicking it again; with `withExpandControl` each section gets
+  its own chevron, the item body no longer toggles anything, and several sections may be open at
+  once.
+- **A childless active item collapses everything** on the default behaviour — that is how an
+  "Overview" entry shuts the open section.
+- **`iconOnly` drops the sub-menus entirely** and rebuilds the active section's children as
+  top-level entries, each with a staggered reveal animation. A sub-item's `onClick` is rewrapped in
+  the process, and `withTopSeparator` is lost.
+- **`endOfActiveSection`, `isFlattenedChild` and `flattenIndex` are internal.** The component sets
+  them while flattening; passing them yourself does nothing outside that mode.
+- **Only a leaf can be a link.** The link branch requires the item to have no children, so a
+  section header is always a `<button>` even when it carries `linkData`.
+- **`linkData` without `LinkRouter` is ignored**, silently.
+- **In the collapsed rail the label is a tooltip**, delivered through the kit's shared tooltip —
+  which renders nothing unless `<RootTooltip />` is mounted somewhere in the application.
+- **`icon` is fetched over the network** as an SVG when the menu renders; `iconNode` is rendered as
+  given and wins over it.
+- **Clicks on a badge do not reach the item.** The badge wrapper stops both click and key events, so
+  `onClickBadge` is the only handler that fires there.
+- **The folder re-exports two icons into the root barrel** — `ArticleHideMenuIcon` and
+  `CatalogSettingsPaymentIcon` — which is how they end up in the package's public surface.
+
+## CSS variables
+
+| Variable                     | Default                  | Effect                                        |
+| ---------------------------- | ------------------------ | --------------------------------------------- |
+| `--nav-menu-separator-color` | the quick-buttons colour | Line above a sub-item with `withTopSeparator` |
+
+The sliding highlight is driven by `--end-width` and `--flatten-index`, which the component sets
+itself on each animated element.
+
+## Accessibility
+
+- The root is a `<nav>`, each group is a `<ul>` and each entry a `<li>`, so the structure is
+  announced.
+- Entries are real `<button>`s, or your `LinkRouter` element, and are reachable and operable from
+  the keyboard.
+- A section that expands on its own body click carries `aria-expanded`; with `withExpandControl`
+  the flag moves to the chevron, which is labelled with the section's name.
+- **The `<nav>` has no `aria-label`.** Give it one through a wrapper when the page has more than
+  one navigation landmark.
+- **In the collapsed rail the accessible name is the tooltip title.** It is set on the button, so
+  it is announced even without the tooltip being mounted — but sighted users see nothing.
+- Group labels are `<span>`s, not headings, and are not tied to their list with
+  `aria-labelledby`.
+
+## Test ids
+
+The component sets none. Every entry carries `data-item-id` with the item's own id; select on that,
+or on the `nav` element.
+
+## Related
+
+- [`Article`](../article/README.md) — the sidebar panel this list normally sits in.
+- [`DropDown`](../drop-down/README.md) — for a menu that floats over the page instead.
+- [`Badge`](../badge/README.md) — the counter the entries draw by default.

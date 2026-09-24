@@ -19,10 +19,17 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
 
+import { toPosix } from "../../../scripts/lib/fs-ids.mjs";
+
 const ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../../..",
 );
+// TypeScript hands back every fileName with `/`, on Windows too, while ROOT
+// there is `C:\...`. Compared raw, no file is ever inside the repository: every
+// name reads as `origin: "unknown"`, `external: "ambient"`, and a baseline
+// written that way reports the whole surface as moved.
+const ROOT_ID = toPosix(ROOT);
 const BASELINE = path.join(ROOT, "docs/plugin-surface.json");
 const ENTRY = path.join(ROOT, "index.ts");
 
@@ -112,7 +119,11 @@ const fileOf = (symbol) => symbol.declarations?.[0]?.getSourceFile().fileName;
 const originOf = (chain) => {
   for (let i = chain.length - 1; i >= 0; i -= 1) {
     const file = fileOf(chain[i]);
-    if (!file || file.includes("node_modules") || !file.startsWith(ROOT))
+    if (
+      !file ||
+      file.includes("node_modules") ||
+      !toPosix(file).startsWith(ROOT_ID)
+    )
       continue;
     const dir = path.dirname(path.relative(ROOT, file)).replaceAll("\\", "/");
     // The root barrel itself says nothing; keep walking outwards.
@@ -146,7 +157,7 @@ const externalOf = (chain) => {
   if (ambient?.endsWith(".svg")) return "assets (*.react.svg)";
 
   if (file.includes("node_modules")) return packageOf(file);
-  if (!file.startsWith(ROOT)) return "ambient";
+  if (!toPosix(file).startsWith(ROOT_ID)) return "ambient";
   return undefined;
 };
 

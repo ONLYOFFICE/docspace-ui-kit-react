@@ -1,178 +1,265 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "RoomIcon",
+  "folder": "components/room-icon",
+  "kind": "component",
+  "category": "Data display",
+  "status": "public",
+  "summary": "Square room tile that shows the room's logo, or its initials on a colour when there is none.",
+  "import": { "subpath": "components/room-icon", "barrel": true, "default": false },
+  "exports": ["RoomIcon", "RoomIconProps", "TModel", "getRoomTitle", "encodeToBase64"],
+  "providers": ["ThemeProvider"],
+  "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
+  "related": ["room-logo", "avatar", "badge"],
+  "subComponents": [],
+  "testIds": ["room-icon", "room-title", "room-icon-cover", "room-icon-image", "empty-icon", "hover-container", "hover-image", "badge-container", "customFileInput"]
+} -->
+
 # RoomIcon
 
-Versatile room icon component for displaying room avatars with support for images, colors, badges, editing capabilities, and various states.
+Square room tile that shows the room's logo, or its initials on a colour when there is none. It
+is the thing at the left of a room row and at the top of a room tile: a logo image, an inlined
+cover glyph, or two letters cut from the room's name, with an optional corner badge and an
+optional pencil that opens the logo menu.
 
-## Usage
+## Use this when / not when
+
+- Use wherever a specific room is shown by name — a row, a tile, a breadcrumb, a dialog header.
+- Not for the icon that says what **kind** of room it is — that is
+  [`RoomLogo`](../room-logo/README.md), which picks a fixed glyph from `RoomsType` and knows
+  nothing about a logo of the room's own.
+- Not for a person — use [`Avatar`](../avatar/README.md), which has the role ring, the status
+  dot and the person-shaped placeholder.
+- Not for a count or a marker on its own — that is [`Badge`](../badge/README.md). The badge
+  here is a decoration on the tile, not a counter.
+
+**It is a square with no built-in spacing and no label.** The room's name is drawn only as two
+initials, and only when there is no logo; the readable name next to the tile is yours.
+
+## Import
+
+```ts
+import { RoomIcon } from "@onlyoffice/apps-ui-kit/components/room-icon";
+```
+
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
+
+Needs `ThemeProvider` above it in the tree, and unusually it reads the theme in JavaScript as
+well as in CSS: the colour of the initials is computed from `isBase`. Without a provider the
+context falls back to the light theme, so the tile keeps light-theme initials on a dark page —
+this is not something a stylesheet override can correct.
+
+## Minimal example
 
 ```tsx
 import { RoomIcon } from "@onlyoffice/apps-ui-kit/components/room-icon";
 
-<RoomIcon title="My Room" color="4781D1" size="48px" showDefault />;
+export function RoomRow({ name }: { name: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <RoomIcon title={name} color="4781D1" showDefault />
+      <span>{name}</span>
+    </div>
+  );
+}
 ```
 
 ## Props
 
-| Prop              | Type                       | Default       | Description                               |
-| ----------------- | -------------------------- | ------------- | ----------------------------------------- |
-| `title`           | `string`                   | -             | Room title (used for generating initials) |
-| `color`           | `string`                   | -             | Background color (hex without #)          |
-| `size`            | `string`                   | `"32px"`      | Icon size                                 |
-| `radius`          | `string`                   | `"6px"`       | Border radius                             |
-| `logo`            | `TLogo \| string`          | -             | Room logo (URL or logo object)            |
-| `showDefault`     | `boolean`                  | -             | Show default state with initials          |
-| `isArchive`       | `boolean`                  | `false`       | Archive state styling                     |
-| `isTemplate`      | `boolean`                  | `false`       | Template room styling                     |
-| `isEmptyIcon`     | `boolean`                  | -             | Show empty icon placeholder               |
-| `withEditing`     | `boolean`                  | -             | Enable edit mode with dropdown            |
-| `hoverSrc`        | `string`                   | -             | Image to show on hover                    |
-| `badgeUrl`        | `string`                   | -             | Badge icon URL                            |
-| `badgeIconNode`   | `ReactNode`                | -             | Badge icon as React node                  |
-| `onBadgeClick`    | `() => void`               | -             | Badge click handler                       |
-| `model`           | `TModel[]`                 | -             | Dropdown menu items for editing           |
-| `onChangeFile`    | `(e: ChangeEvent) => void` | -             | File input change handler                 |
-| `dropDownManualX` | `string`                   | `"-10px"`     | Dropdown X position offset                |
-| `tooltipContent`  | `string`                   | -             | Tooltip text for badge                    |
-| `tooltipId`       | `string`                   | -             | Tooltip ID                                |
-| `className`       | `string`                   | -             | Additional CSS class                      |
-| `imgClassName`    | `string`                   | -             | Image element CSS class                   |
-| `dataTestId`      | `string`                   | `"room-icon"` | Test ID                                   |
+The props type is an intersection of two unions. The first says a tile is either **coloured**
+(`color` required, `imgClassName` refused) or **image-backed** (`imgClassName` allowed, `color`
+optional); the second makes the four badge props all-or-nothing. The table below merges them.
 
-### TModel Type
+<!-- props:start -->
 
-```ts
-type TModel = {
-  label: string;
-  icon: string;
-  key: string;
-  onClick: () => void;
-};
-```
+_Generated by `pnpm readme:props` from `RoomIconProps` in `RoomIcon.types.ts`. Do not edit; edit the JSDoc._
 
-### TLogo Type
+| Prop              | Type                                               | Required | Default       | Description                                                                                                                                                   |
+| ----------------- | -------------------------------------------------- | -------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `title`           | `string`                                           | **yes**  | –             | Room name. Only its initials are drawn — the first letter of the first word and of the last.                                                                  |
+| `badgeIconColor`  | `string`                                           | no       | –             | Keeps the glyph's own colours instead of filling it with the tile's background colour.                                                                        |
+| `badgeIconNode`   | `ReactNode`                                        | no       | –             | Badge glyph as a node, used instead of `badgeUrl`.                                                                                                            |
+| `badgeUrl`        | `string`                                           | no       | –             | URL of the badge glyph, drawn in the corner. Either this or `badgeIconNode` renders the badge; `withEditing` suppresses it.                                   |
+| `className`       | `string`                                           | no       | –             | Added to the outer element, before the component's own classes.                                                                                               |
+| `color`           | `string`                                           | no       | –             | Background of the tile and the source of the initials' colour, as six hex digits **without** a leading `#`. Required unless you pass `imgClassName` instead.  |
+| `dataTestId`      | `string`                                           | no       | `"room-icon"` | Value of `data-testid` on the outer element.                                                                                                                  |
+| `dropDownManualX` | `string`                                           | no       | `"-10px"`     | Horizontal offset of the logo menu.                                                                                                                           |
+| `hoverSrc`        | `string`                                           | no       | –             | Image faded in over the tile while the pointer is on it. Ignored while `isArchive` is set.                                                                    |
+| `imgClassName`    | `string`                                           | no       | –             | Added to the `<img>` the logo renders into. The type refuses it alongside a required `color`: a coloured default or an image, not both.                       |
+| `isArchive`       | `boolean`                                          | no       | `false`       | Paints the tile in the archive grey instead of `color`, and turns off the hover overlay.                                                                      |
+| `isEmptyIcon`     | `boolean`                                          | no       | –             | Draws a dashed empty frame with a camera glyph and a plus button, for a room that has no logo yet. It replaces every other content, including the initials.   |
+| `isTemplate`      | `boolean`                                          | no       | `false`       | Draws the template outline instead of the round tile, with the logo shrunk to 24px inside it.                                                                 |
+| `logo`            | `string \| TLogo`                                  | no       | –             | The room's logo: a URL, or the portal's logo object. An object with a `cover` is inlined as a base64 SVG and recoloured; otherwise `medium` is used as a URL. |
+| `model`           | `TModel[]`                                         | no       | –             | Entries of the logo menu. Without it the menu opens empty.                                                                                                    |
+| `onBadgeClick`    | `() => void`                                       | no       | –             | Called when the badge is clicked. The click also reaches the tile, which toggles the logo menu.                                                               |
+| `onChangeFile`    | `(e: React.ChangeEvent<HTMLInputElement>) => void` | no       | –             | Called with the change event of the hidden file input. Passing it is what renders that input at all.                                                          |
+| `radius`          | `string`                                           | no       | `"6px"`       | Corner radius of the tile and of the image inside it.                                                                                                         |
+| `showDefault`     | `boolean`                                          | no       | –             | Draws the initials instead of the logo, whatever `logo` holds.                                                                                                |
+| `size`            | `string`                                           | no       | `"32px"`      | Side of the square, as a px string. It is also divided to scale the cover glyph, so a value in any other unit gives `NaN`.                                    |
+| `tooltipContent`  | `string`                                           | no       | –             | Text of the badge's tooltip. It also needs `tooltipId`, and it is what makes the badge show a pointer cursor.                                                 |
+| `tooltipId`       | `string`                                           | no       | –             | Id the badge's tooltip is registered under. Without it the tooltip has nothing to attach to.                                                                  |
+| `withEditing`     | `boolean`                                          | no       | –             | Adds the pencil button and the menu it opens. It also makes the tile 64px wide at the least.                                                                  |
 
-```ts
-type TLogo = {
-  medium?: string;
-  cover?: {
-    data: string;
-  };
-  color?: string;
-};
-```
+<!-- props:end -->
 
-## CSS Variables
+## Recipes
 
-The component uses CSS variables for theming, defined locally within the component:
+### A room with a logo, falling back to initials
 
-| Variable                               | Light                | Dark                 | Description           |
-| -------------------------------------- | -------------------- | -------------------- | --------------------- |
-| `--room-icon-fill`                     | `#ffffff`            | `#333333`            | Edit button icon fill |
-| `--room-icon-background-color`         | `#ffffff`            | `#333333`            | Badge background      |
-| `--room-icon-link-icon-path`           | `#35A5D2`            | `#5DC0E8`            | Link icon path fill   |
-| `--room-icon-link-icon-background`     | `#ffffff`            | `#333333`            | Link icon background  |
-| `--room-icon-empty-border`             | `2px dashed #d0d5da` | `2px dashed #474747` | Empty state border    |
-| `--room-icon-background-color-archive` | `#a3a9ae`            | `#ffffff`            | Archive background    |
-| `--room-icon-button-color`             | `#a3a9ae`            | `#858585`            | Button color          |
-| `--room-icon-opacity`                  | `1`                  | `0.1`                | Background opacity    |
-| `--room-icon-edit-icon-background`     | `#eceef1`            | `#242424`            | Edit icon background  |
-
-### Inline CSS Variables (set via style prop)
-
-| Variable                 | Description         |
-| ------------------------ | ------------------- |
-| `--room-icon-size`       | Icon dimensions     |
-| `--room-icon-radius`     | Border radius       |
-| `--room-icon-color`      | Background color    |
-| `--room-icon-text-color` | Text/initials color |
-| `--room-icon-cover-size` | Cover icon scale    |
-
-## Examples
-
-### Basic with Color
+The logo is prefetched into an `Image` on mount, and a load failure switches the tile to the
+initials on its own. You do not need to test the URL first.
 
 ```tsx
-<RoomIcon title="Project Alpha" color="4781D1" size="48px" showDefault />
+import { RoomIcon } from "@onlyoffice/apps-ui-kit/components/room-icon";
+
+export function RoomAvatar({
+  name,
+  logoUrl,
+}: {
+  name: string;
+  logoUrl?: string;
+}) {
+  return <RoomIcon title={name} color="4781D1" logo={logoUrl} size="48px" />;
+}
 ```
 
-### With Logo Image
+### The editable tile
+
+`withEditing` adds the pencil and the menu; `model` fills that menu; `onChangeFile` is what
+renders the hidden file input the upload entry reaches through its ref.
 
 ```tsx
-<RoomIcon title="Design Team" logo="https://example.com/logo.png" size="48px" />
+import { RoomIcon } from "@onlyoffice/apps-ui-kit/components/room-icon";
+import type { TModel } from "@onlyoffice/apps-ui-kit/components/room-icon";
+
+export function LogoPicker({
+  name,
+  onUpload,
+  onRemove,
+}: {
+  name: string;
+  onUpload: (ref?: React.RefObject<HTMLInputElement | null>) => void;
+  onRemove: () => void;
+}) {
+  const model: TModel[] = [
+    { key: "upload", label: "Upload", icon: "", onClick: onUpload },
+    { key: "remove", label: "Remove", icon: "", onClick: onRemove },
+  ];
+
+  return (
+    <RoomIcon
+      title={name}
+      color="F97A0B"
+      size="96px"
+      withEditing
+      model={model}
+      onChangeFile={(e) => console.log(e.target.files)}
+    />
+  );
+}
 ```
 
-### Archive State
+### A tile with a corner badge
+
+The badge renders when `badgeUrl` or `badgeIconNode` is set and `withEditing` is not — the two
+share the corner and editing wins.
 
 ```tsx
-<RoomIcon
-  title="Old Project"
-  color="A3A9AE"
-  size="48px"
-  isArchive
-  showDefault
-/>
+import { RoomIcon } from "@onlyoffice/apps-ui-kit/components/room-icon";
+
+export function PublicRoomIcon({ name }: { name: string }) {
+  return (
+    <RoomIcon
+      title={name}
+      color="2DB482"
+      size="48px"
+      showDefault
+      badgeIconNode={
+        <svg viewBox="0 0 12 12" aria-hidden="true">
+          <circle cx="6" cy="6" r="5" />
+        </svg>
+      }
+      onBadgeClick={() => console.log("badge")}
+    />
+  );
+}
 ```
 
-### With Badge
+## Behaviour the types don't state
 
-```tsx
-<RoomIcon
-  title="Public Room"
-  color="2DB482"
-  size="48px"
-  badgeUrl="/icons/planet.svg"
-  onBadgeClick={() => console.log("Badge clicked")}
-  showDefault
-/>
-```
+- **`color` is six hex digits with no `#`.** The component prepends it. Passing `#4781D1` yields
+  `##4781D1` and no background at all.
+- **`size` must be a px string.** It is parsed with `parseFloat` after stripping `"px"` to scale
+  the cover glyph, so `size="3rem"` gives a `NaN` scale and the glyph disappears; the width and
+  height themselves would still be honoured.
+- **A click anywhere on the tile toggles the logo menu**, not just on the pencil. The handler is
+  on the outer element unconditionally, so a tile inside a clickable row opens the menu on every
+  row click when `withEditing`, `isEmptyIcon` or `hoverSrc` is set — and silently flips an
+  internal boolean the rest of the time. Clicking the badge does the same, because the badge's
+  click bubbles.
+- **The initials are the first letter of the first word and the first letter of the last**, taken
+  after `-_[]{}()*+!?.,&\^$|#@%` are stripped and runs of whitespace collapsed, then uppercased.
+  A one-word name therefore gives one letter, and a name made only of punctuation gives none.
+- **The "wrong image" state can never be reached.** Its condition requires `imgSrc` to be
+  something other than a string, and the only values `imgSrc` ever takes are a string or
+  `undefined` — so the `wrongImage` class is dead and a failed load falls back to the plain
+  initials.
+- **The badge is painted outside the square.** It is absolutely positioned and pushed 24px (80px
+  at `size="96px"`) from the centre, so it overflows the tile's own box; a container with
+  `overflow: hidden` clips it.
+- **The file input carries the literal id `customFileInput`.** Two editable tiles on one page
+  produce two elements with the same id.
+- **`logo` with a `cover`** is turned into a `data:image/svg+xml;base64` URL and rendered through
+  `react-svg`, which means the glyph's `path` fill is recoloured from the theme. A plain string,
+  or an object with only `medium`, is used as an ordinary image URL and is not recoloured.
+- **`isTemplate`, `isEmptyIcon` and `showDefault` are checked in that order** and each replaces
+  everything below it, so a tile that is both a template and empty renders the template.
 
-### With Editing
+## CSS variables
 
-```tsx
-const model = [
-  { label: "Upload", icon: uploadIcon, key: "upload", onClick: handleUpload },
-  { label: "Remove", icon: removeIcon, key: "remove", onClick: handleRemove },
-];
+All are read with a fallback, so setting any of them on an ancestor works.
 
-<RoomIcon
-  title="My Room"
-  color="F97A0B"
-  size="96px"
-  withEditing
-  model={model}
-  onChangeFile={handleFileChange}
-  showDefault
-/>;
-```
+| Variable                        | Default                       | Effect                                            |
+| ------------------------------- | ----------------------------- | ------------------------------------------------- |
+| `--room-icon-bg`                | white, black in dark          | Fill of the badge glyph and of the plus button    |
+| `--room-icon-bg-opacity`        | `1`, `0.1` in dark            | Opacity of the coloured background                |
+| `--room-icon-button-icon-color` | grey                          | Fill of the empty-state camera and template glyph |
+| `--room-icon-edit-bg`           | light grey, dark grey in dark | Background of the pencil button                   |
+| `--room-icon-dashed-border`     | `2px dashed` grey             | Border of the empty state                         |
+| `--room-icon-empty-radius`      | `10px`                        | Corner radius of the empty state                  |
 
-### Empty State
+The tile's own size, radius and colour are written as inline custom properties from the props
+and cannot be overridden from a stylesheet.
 
-```tsx
-<RoomIcon title="" isEmptyIcon model={model} onChangeFile={handleFileChange} />
-```
+## Accessibility
 
-### Template Room
+- The outer element is a `<div>` with no role and no ARIA, and it carries a click handler. It is
+  not reachable by keyboard; the room's name has to be a real link or button next to it.
+- The initials are rendered as text, so a screen reader reads out "TR" rather than the room name.
+  Treat the tile as decorative and label the row.
+- Both images use fixed English `alt` text — `"room icon"` and `"room icon hover"` — which is not
+  translated and cannot be changed through a prop.
+- The pencil, the plus and the badge are `IconButton`s and are focusable, but the menu they open
+  is a `DropDown` that closes on an outside click and offers no roving focus of its own.
 
-```tsx
-<RoomIcon title="Template" color="533ED1" size="48px" isTemplate showDefault />
-```
+## Test ids
 
-### With Hover Effect
+| Element                   | `data-testid`                           |
+| ------------------------- | --------------------------------------- |
+| Outer element             | `room-icon`, overridden by `dataTestId` |
+| Initials                  | `room-title`                            |
+| Inlined cover glyph       | `room-icon-cover`                       |
+| Logo image                | `room-icon-image`                       |
+| Camera glyph, empty state | `empty-icon`                            |
+| Hover overlay             | `hover-container`, `hover-image`        |
+| Badge wrapper             | `badge-container`                       |
+| Hidden file input         | `customFileInput`                       |
 
-```tsx
-<RoomIcon
-  title="Hover Me"
-  color="4781D1"
-  size="48px"
-  hoverSrc="/images/camera-icon.svg"
-  model={model}
-  showDefault
-/>
-```
+The outer element also carries `data-is-archive`, `data-has-editing`, `data-is-template` and
+`data-is-empty`.
 
-### Different Sizes
+## Related
 
-```tsx
-<RoomIcon title="Small" color="4781D1" size="32px" showDefault />
-<RoomIcon title="Medium" color="4781D1" size="48px" showDefault />
-<RoomIcon title="Large" color="4781D1" size="96px" showDefault />
-```
+- [`RoomLogo`](../room-logo/README.md) — the glyph for a room _type_, with no per-room logo.
+- [`Avatar`](../avatar/README.md) — the same job for a person, with the status and role rings.
+- [`Badge`](../badge/README.md) — a standalone counter or marker.

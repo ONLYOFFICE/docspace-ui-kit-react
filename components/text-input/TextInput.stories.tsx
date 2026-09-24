@@ -7,54 +7,17 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { TextInput } from ".";
 import { InputSize, InputType } from "./TextInput.enums";
 
+// The README is what the package ships and what a coding agent reads; rendering
+// it here keeps the developer looking at Storybook and the agent on one text.
+import readme from "./README.md?raw";
+
 const meta = {
-  title: "UI/Interactive elements/TextInput",
+  title: "UI/Form controls/TextInput",
   component: TextInput,
   parameters: {
     docs: {
       description: {
-        component: `Single-line text input field with support for various types, sizes, states, and input masking.
-
-### Features
-
-- **Multiple Types**: Renders as a native text, password, email, tel, search or number field, so the browser supplies the matching keyboard and value rules
-- **Three Sizes**: 173px, 300px or 550px wide; the middle size renders its text semibold, the large one in a 16px font with taller padding
-- **Input Masking**: Format input with custom masks (e.g., date, phone)
-- **Validation States**: Error and warning visual indicators
-- **Full Width**: Scale to 100% width when needed
-- **Text Weight**: \`isBold\` sets 600, \`fontWeight\` any other value; the middle size is 600 by default
-- **Content Direction**: Each value picks its own text direction (\`dir="auto"\`), so mixed-script text reads correctly in either interface direction
-- **Focus Control**: Left out of the Tab order unless \`tabIndex\` is set; \`isAutoFocussed\` focuses the field on mount
-
-### Accessibility
-
-The field is a native \`<input>\`, so typing, selection and screen-reader announcement come from the platform; the component adds:
-
-- \`tabIndex\` defaults to -1, so Tab skips the field; pass \`tabIndex={0}\` to reach it with the keyboard
-- Name the field with \`<label htmlFor>\` pointing at the \`id\` prop, or pass \`aria-label\`
-- \`isDisabled\` sets the native \`disabled\`, \`isReadOnly\` the native \`readonly\`; \`autoComplete\` is \`off\` unless set
-
-### Usage
-
-\`\`\`tsx
-import { TextInput, InputSize, InputType } from "@onlyoffice/apps-ui-kit/components/text-input";
-
-// Basic text input
-<TextInput type={InputType.text} value={value} onChange={handleChange} placeholder="Enter text" />
-
-// With input mask
-<TextInput
-  type={InputType.text}
-  value={value}
-  onChange={handleChange}
-  mask={[/\\d/, /\\d/, "/", /\\d/, /\\d/, "/", /\\d/, /\\d/, /\\d/, /\\d/]}
-  placeholder="DD/MM/YYYY"
-  guide
-/>
-
-// Error state
-<TextInput type={InputType.text} value={value} onChange={handleChange} hasError />
-\`\`\``,
+        component: readme,
       },
     },
     design: {

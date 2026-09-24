@@ -4,6 +4,11 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 # API
 
+> **Portal-internal.** Everything on this page needs a DocSpace portal: a URL, an API key and a
+> signed-in person. An application built on this kit does not mount `ApiProvider` and does not call
+> these endpoints — it talks to its own backend and composes only the theme and translation
+> providers.
+
 The UI Kit uses `ApiProvider` to give components access to the ONLYOFFICE Apps REST API.
 It wraps the `@onlyoffice/docspace-api-sdk` and authenticates requests with a Bearer token.
 
@@ -39,17 +44,11 @@ import { ApiProvider } from "@onlyoffice/apps-ui-kit/providers/api";
 </ApiProvider>
 ```
 
-Or use the composite `Providers` component that includes API, translation, and theme
-providers. It is portal-specific, so it is deliberately **not** re-exported from
-`providers` — import it by its own subpath, as a default export:
-
-```tsx
-import Providers from "@onlyoffice/apps-ui-kit/providers/Providers";
-
-<Providers url="https://your-docspace.com/api" apiKey="your-api-key" locale="en">
-  <App />
-</Providers>
-```
+There is also a composite `Providers` component that bundles the API, translation and theme
+providers together. Everything on this page, that component included, is **portal-internal**: it
+needs a DocSpace URL, an API key and a portal behind them. An application of your own composes
+`ThemeProvider` and `TranslationProvider` and nothing else — see
+[Getting started](?path=/docs/getting-started-welcome--docs).
 
 ### Provider props
 

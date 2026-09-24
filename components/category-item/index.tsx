@@ -16,6 +16,8 @@ import { ICategoryItemProps } from "./CategoryItem.types";
 
 import styles from "./CategoryItem.module.scss";
 
+export type { ICategoryItemProps };
+
 export const CategoryItem = ({
   title,
   url,

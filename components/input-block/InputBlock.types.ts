@@ -2,42 +2,60 @@ import React from "react";
 import type { TextInputProps } from "../text-input";
 
 type CommonProps = {
-  /** Used as HTML `id` property */
+  /** Applied to the `<input>`, not to the group around it. */
   id?: string;
-  /** Children elements */
+  /**
+   * Rendered before the input, inside the same bordered group — a currency
+   * sign, a country code, a fixed prefix.
+   */
   children?: React.ReactNode;
-  /** Component class name */
+  /** Applied to the group. */
   className?: string;
-  /** Component style */
+  /** Applied to the group. */
   style?: React.CSSProperties;
-  /** Data test id for testing */
+  /**
+   * `data-testid` of the group.
+   * @default "input-block"
+   */
   dataTestId?: string;
-  /** Test id for testing */
+  /** `data-testid` of the inner `<input>`, passed through to `TextInput`. */
   testId?: string;
 
-  /** Forwarded ref */
+  /** Ref to the `<input>` element itself. */
   forwardedRef?: React.Ref<HTMLInputElement>;
 };
 
 type InputProps = Omit<TextInputProps, keyof CommonProps>;
 
 type IconProps = {
-  /** Path to icon */
+  /** URL of the icon at the end of the field. */
   iconName?: string;
-  /** Specifies the icon color */
+  /** Colour of that icon. */
   iconColor?: string;
-  /** Icon color on hover action */
+  /** Colour of that icon on hover. */
   hoverColor?: string;
-  /** Size icon */
+  /** Size of that icon in pixels. It falls back to `size`. */
   iconSize?: number;
-  /** Determines if icon fill is needed */
+  /**
+   * Whether the icon's paths are recoloured to `iconColor`. Leave it off for a
+   * multi-coloured icon.
+   * @default false
+   */
   isIconFill?: boolean;
-  /** Icon node */
+  /** The icon as an element, instead of `iconName`. */
   iconNode?: React.ReactNode;
-  /** The callback function that is triggered when the icon is clicked */
+  /**
+   * Called when the icon is clicked. Without it the icon is rendered in the
+   * disabled style and does not respond — it is what makes the icon a button.
+   */
   onIconClick?: (e: React.MouseEvent) => void;
-  /** Icon button class name */
+  /** Applied to the box around the icon. */
   iconButtonClassName?: string;
+  /**
+   * Whether the icon box is left out entirely. Without it an empty box is still
+   * rendered and still takes its padding.
+   * @default false
+   */
   noIcon?: boolean;
 };
 

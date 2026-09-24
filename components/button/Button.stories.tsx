@@ -7,51 +7,17 @@ import Icon from "../../assets/button.alert.react.svg";
 
 import { Button, ButtonSize } from ".";
 
+// The README is what the package ships and what a coding agent reads; rendering
+// it here keeps the developer looking at Storybook and the agent on one text.
+import readme from "./README.md?raw";
+
 const meta = {
   title: "UI/Interactive elements/Button",
   component: Button,
   parameters: {
     docs: {
       description: {
-        component: `Button is used for actions on a page.
-
-### Features
-
-- **Two Variants**: Primary and Secondary styles
-- **Four Sizes**: extraSmall, small, normal, and medium
-- **Icon Support**: Display icons alongside text
-- **Loading State**: Show loading indicator during async operations
-- **Tooltip Support**: Display helpful text on hover
-- **Filled Variants**: Additional styling options with filled and filledStroke
-- **Full Width**: Scale to 100% width when needed
-
-### Accessibility
-
-The Button component includes the following ARIA attributes for improved accessibility:
-
-- \`aria-label\`: Provides a text description of the button's action
-- \`aria-disabled\`: Indicates when the button is disabled
-- \`aria-busy\`: Indicates when the button is in a loading state
-
-These attributes help users of assistive technologies better understand the button's state and purpose.
-
-### Usage
-
-\`\`\`tsx
-import { Button, ButtonSize } from "@onlyoffice/apps-ui-kit/components/button";
-
-// Primary button
-<Button primary size={ButtonSize.normal} label="Save" onClick={handleSave} />
-
-// Secondary button with icon
-<Button size={ButtonSize.small} icon={<Icon />} label="Cancel" />
-
-// Loading state
-<Button primary isLoading label="Saving..." />
-
-// With tooltip
-<Button label="Help" tooltipText="Click for help" />
-\`\`\``,
+        component: readme,
       },
     },
     design: {

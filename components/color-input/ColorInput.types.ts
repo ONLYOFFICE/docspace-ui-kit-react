@@ -1,24 +1,34 @@
 import { InputSize } from "../text-input";
 
 export type ColorInputProps = {
-  /** Class name */
+  /** Applied to the outermost element. */
   className?: string;
-  /** Used as HTML `id` property  */
+  /** Applied to the outermost element. */
   id?: string;
-  /** Default color */
+  /**
+   * Colour the field starts on, as a hex string. It is read once, on mount —
+   * the component owns the value from then on, so this is a starting point and
+   * not a controlled value. The kit's blue is used when it is left out.
+   */
   defaultColor?: string;
-  /** Allows handling the changing values of the component */
+  /**
+   * Called with the new hex colour on every keystroke in the field and on every
+   * move inside the picker. There is no confirm step and no `onApply`.
+   */
   handleChange?: (color: string) => void;
-  /** Supported size of the input fields. */
+  /** Height of the field. */
   size?: InputSize;
-  /** Indicates the input field has scale */
+  /** Whether the field stretches to fill its container. */
   scale?: boolean;
-  /** Indicates that the field cannot be used */
+  /** Whether the field is disabled. The swatch stops opening the picker too. */
   isDisabled?: boolean;
-  /** Indicates the input field has an error */
+  /** Whether the field is drawn in its error colours. */
   hasError?: boolean;
-  /** Indicates the input field has a warning */
+  /** Whether the field is drawn in its warning colours. */
   hasWarning?: boolean;
-  /** Test id for the color input */
+  /**
+   * `data-testid` of the outermost element.
+   * @default "color-input"
+   */
   dataTestId?: string;
 };

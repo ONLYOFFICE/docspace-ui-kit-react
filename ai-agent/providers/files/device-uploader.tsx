@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useStores } from "@onlyoffice/ai-chat";
+import { useStores, ATTACHMENT_ACCEPT } from "@onlyoffice/ai-chat";
 
 import { useApi as useFilesApi } from "../../../providers/api";
 
@@ -81,7 +81,14 @@ const DeviceUploader = React.forwardRef<
   );
 
   return (
-    <input ref={inputRef} type="file" multiple hidden onChange={onChange} />
+    <input
+      ref={inputRef}
+      type="file"
+      multiple
+      hidden
+      onChange={onChange}
+      accept={ATTACHMENT_ACCEPT}
+    />
   );
 });
 DeviceUploader.displayName = "DeviceUploader";

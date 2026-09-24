@@ -1,45 +1,48 @@
-type TLabel = string | React.ReactNode;
-
 export interface SelectedItemProps {
-  /** Selected item text */
-  label: TLabel;
-  /** Sets the 'width: fit-content' property */
+  /** Text of the chip. A falsy label renders nothing at all. */
+  label: React.ReactNode;
+  /** Whether the chip shrinks to its content. Without it the chip fills the width of its container. */
   isInline?: boolean;
-  /** Sets a callback function that is triggered when the cross icon is clicked */
+  /** Called when the cross is clicked, with `propKey`, `label`, `group` (`""` when it was not set) and the event. */
   onClose: (
     propKey: string | number,
-    label: TLabel,
+    label: React.ReactNode,
     group?: string,
     e?: React.MouseEvent,
   ) => void;
-  /** Sets a callback function that is triggered when the selected item is clicked */
+  /** Called when anywhere but the cross is clicked, with `propKey`, `label`, `group` and the event. */
   onClick?: (
     propKey: string | number,
-    label: TLabel,
+    label: React.ReactNode,
     group?: string,
     e?: React.MouseEvent<HTMLElement>,
   ) => void;
-  /** Sets the button to present a disabled state */
+  /** Whether the chip is inert. Both handlers stop firing and the label and the cross grey out. */
   isDisabled?: boolean;
-  /** Accepts class  */
+  /** Applied to the outermost element. */
   className?: string;
-  /** Accepts id */
+  /** Applied to the outermost element. */
   id?: string;
-  /** Accepts css style */
+  /** Ignored. Nothing reads this prop; style the chip through `className` or the custom properties. */
   style?: React.CSSProperties;
-  /** Accepts key to remove item */
+  /** Identifier handed back to `onClose` and `onClick`. It is not used for anything else. */
   propKey: string | number;
-  /** Accepts group key to remove item */
+  /** Second identifier handed back to both handlers, for chips that belong to several filters. */
   group?: string;
-  /** Passes ref to component */
+  /** Ref to the outermost element. */
   forwardedRef?: React.RefObject<HTMLDivElement | null>;
+  /** Applied to the cross button, in addition to the class the component needs there itself. */
   classNameCloseButton?: string;
+  /** Whether the cross is left out. `onClose` then has nothing to fire it. */
   hideCross?: boolean;
+  /** `title` attribute of the outermost element — the browser's own tooltip for a truncated label. */
   title?: string;
+  /** `data-testid` of the outermost element. */
   dataTestId?: string;
-  /** Icon as SVG URL string or React SVG component */
+  /** Glyph before the label: an SVG URL, or a component rendered with no props. */
   icon?: string | React.FC<React.SVGProps<SVGSVGElement>>;
+  /** Ignored. Nothing reads this prop; passing `onClick` is what makes the chip clickable. */
   clickable?: boolean;
-  /** Sets the item as active/selected state */
+  /** Whether the chip is drawn in its selected colours. */
   isActive?: boolean;
 }

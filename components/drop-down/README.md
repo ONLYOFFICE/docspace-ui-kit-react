@@ -1,157 +1,80 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "DropDown",
+  "folder": "components/drop-down",
+  "kind": "component",
+  "category": "Overlays",
+  "status": "public",
+  "summary": "Menu anchored to a control, rendered in a portal and positioned against the element you point it at.",
+  "import": { "subpath": "components/drop-down", "barrel": true, "default": false },
+  "exports": ["DropDown"],
+  "providers": ["ThemeProvider"],
+  "state": { "visibility": "open", "close": "clickOutsideAction", "loading": null, "disabled": null },
+  "related": ["drop-down-item", "context-menu", "backdrop"],
+  "subComponents": [],
+  "testIds": ["dropdown"]
+} -->
+
 # DropDown
 
-A flexible dropdown component for displaying menus, options, and contextual content. Supports automatic positioning, virtual scrolling for large lists, and customizable appearance.
+Menu anchored to a control, rendered in a portal and positioned against the element you point
+it at. Its visibility prop is `open`, and the anchor is `forwardedRef`.
 
-## Features
+## Use this when / not when
 
-- **Smart Positioning**: Automatically adjusts position based on viewport space
-- **Two Modes**: Portal mode (default) and inline mode
-- **Virtual Scrolling**: Efficiently renders large lists with react-window
-- **RTL Support**: Full right-to-left layout support
-- **Keyboard Navigation**: Navigate items with arrow keys
-- **Click Outside**: Configurable click-outside handling
-- **Backdrop Support**: Optional backdrop for modal-like behavior
-- **Responsive**: Adapts to viewport changes and device orientation
+- Use for a menu you open from a control of your own: an actions menu, a list of options, a
+  picker built out of [`DropDownItem`](../drop-down-item/README.md)s.
+- Not for a right-click menu — that is [`ContextMenu`](../context-menu/README.md), which
+  positions itself at the pointer.
+- Not for choosing one value from a list: [`ComboBox`](../combobox/README.md) is this component
+  plus the button, the selection and the matching.
+- Not for a hint: [`Tooltip`](../tooltip/README.md).
+- Not as a dialog. There is no focus trap and no Escape handling; the backdrop is all that
+  catches the next click.
 
-## Installation
+## Import
+
+```ts
+import { DropDown } from "@onlyoffice/apps-ui-kit/components/drop-down";
+```
+
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
+
+`DropDownProps` is **not** exported — type a wrapper's props yourself, or import the type from
+its file path.
+
+Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme` above it in the tree for
+the background, the border and the shadow.
+
+## Minimal example
+
+`forwardedRef` is what the menu is positioned against; without it, the menu in its default
+portal mode has nothing to measure.
 
 ```tsx
+import { useRef, useState } from "react";
+import { Button } from "@onlyoffice/apps-ui-kit/components/button";
 import { DropDown } from "@onlyoffice/apps-ui-kit/components/drop-down";
 import { DropDownItem } from "@onlyoffice/apps-ui-kit/components/drop-down-item";
-```
 
-## Usage
-
-```tsx
-// Basic dropdown with items
-const [isOpen, setIsOpen] = useState(false);
-const buttonRef = useRef<HTMLButtonElement>(null);
-
-<Button ref={buttonRef} label="Open Menu" onClick={() => setIsOpen(true)} />
-<DropDown
-  open={isOpen}
-  forwardedRef={buttonRef}
-  clickOutsideAction={() => setIsOpen(false)}
->
-  <DropDownItem label="Option 1" onClick={handleOption1} />
-  <DropDownItem label="Option 2" onClick={handleOption2} />
-  <DropDownItem label="Option 3" onClick={handleOption3} />
-</DropDown>
-
-// Dropdown with header and separator
-<DropDown open={isOpen} forwardedRef={buttonRef}>
-  <DropDownItem isHeader label="Actions" />
-  <DropDownItem label="Edit" onClick={handleEdit} />
-  <DropDownItem label="Duplicate" onClick={handleDuplicate} />
-  <DropDownItem isSeparator />
-  <DropDownItem label="Delete" onClick={handleDelete} />
-</DropDown>
-
-// Dropdown with max height (scrollable)
-<DropDown
-  open={isOpen}
-  forwardedRef={buttonRef}
-  maxHeight={200}
->
-  {items.map((item) => (
-    <DropDownItem key={item.id} label={item.name} onClick={() => selectItem(item)} />
-  ))}
-</DropDown>
-
-// Dropdown opening upward
-<DropDown
-  open={isOpen}
-  forwardedRef={buttonRef}
-  directionY="top"
->
-  <DropDownItem label="Option 1" />
-  <DropDownItem label="Option 2" />
-</DropDown>
-```
-
-## Properties
-
-| Prop                     | Type                                | Default      | Description                                                               |
-| ------------------------ | ----------------------------------- | ------------ | ------------------------------------------------------------------------- |
-| `open`                   | `boolean`                           | `false`      | Controls whether the dropdown is visible                                  |
-| `children`               | `ReactNode`                         | -            | Content to render inside the dropdown (typically DropDownItem components) |
-| `forwardedRef`           | `RefObject<HTMLElement>`            | -            | Reference to the parent/trigger element for positioning                   |
-| `directionX`             | `'left' \| 'right'`                 | `'right'`    | Horizontal opening direction relative to parent                           |
-| `directionY`             | `'top' \| 'bottom' \| 'both'`       | `'bottom'`   | Vertical opening direction relative to parent                             |
-| `maxHeight`              | `number`                            | -            | Maximum height in pixels; enables scrolling when content exceeds          |
-| `manualWidth`            | `string`                            | -            | Custom width (e.g., "100%", "300px")                                      |
-| `manualX`                | `string`                            | -            | Custom horizontal position (non-portal mode only)                         |
-| `manualY`                | `string`                            | -            | Custom vertical position (non-portal mode only)                           |
-| `offsetX`                | `number`                            | `0`          | Horizontal offset from calculated position (portal mode only)             |
-| `clickOutsideAction`     | `(e: Event, open: boolean) => void` | -            | Callback when clicking outside the dropdown                               |
-| `isDefaultMode`          | `boolean`                           | `true`       | Use portal mode (true) or inline mode (false)                             |
-| `fixedDirection`         | `boolean`                           | `false`      | Disable automatic position adjustment                                     |
-| `showDisabledItems`      | `boolean`                           | `false`      | Show or hide disabled items                                               |
-| `enableKeyboardEvents`   | `boolean`                           | `false`      | Enable keyboard navigation                                                |
-| `zIndex`                 | `number`                            | -            | Custom z-index value                                                      |
-| `className`              | `string`                            | -            | Additional CSS classes                                                    |
-| `style`                  | `CSSProperties`                     | -            | Custom inline styles                                                      |
-| `dataTestId`             | `string`                            | `'dropdown'` | Test ID for automated testing                                             |
-| `appendTo`               | `HTMLElement`                       | -            | Custom container for portal rendering                                     |
-| `eventTypes`             | `string \| string[]`                | -            | Event types to listen for click outside                                   |
-| `topSpace`               | `number`                            | -            | Minimum space from top of viewport                                        |
-| `backDrop`               | `JSX.Element \| null`               | -            | Custom backdrop element                                                   |
-| `isMobileView`           | `boolean`                           | -            | Enable mobile-optimized view                                              |
-| `isNoFixedHeightOptions` | `boolean`                           | -            | Use variable height for items                                             |
-
-## Direction Options
-
-### Horizontal Direction (directionX)
-
-| Value     | Description                                   |
-| --------- | --------------------------------------------- |
-| `'right'` | Opens aligned to parent's left edge (default) |
-| `'left'`  | Opens aligned to parent's right edge          |
-
-### Vertical Direction (directionY)
-
-| Value      | Description                                    |
-| ---------- | ---------------------------------------------- |
-| `'bottom'` | Opens below the parent element (default)       |
-| `'top'`    | Opens above the parent element                 |
-| `'both'`   | Automatically chooses based on available space |
-
-## Examples
-
-### Basic Menu
-
-```tsx
-function MenuButton() {
-  const [isOpen, setIsOpen] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+export function ActionsMenu({ onRename }: { onRename: () => void }) {
+  const [open, setOpen] = useState(false);
+  const anchor = useRef<HTMLDivElement>(null);
 
   return (
-    <div style={{ position: "relative" }}>
-      <Button ref={buttonRef} label="Actions" onClick={() => setIsOpen(true)} />
+    <div ref={anchor} style={{ position: "relative", width: "fit-content" }}>
+      <Button label="Actions" onClick={() => setOpen(!open)} />
       <DropDown
-        open={isOpen}
-        forwardedRef={buttonRef}
-        clickOutsideAction={() => setIsOpen(false)}
+        open={open}
+        forwardedRef={anchor}
+        clickOutsideAction={() => setOpen(false)}
+        manualWidth="200px"
       >
         <DropDownItem
-          label="Edit"
+          label="Rename"
           onClick={() => {
-            handleEdit();
-            setIsOpen(false);
-          }}
-        />
-        <DropDownItem
-          label="Share"
-          onClick={() => {
-            handleShare();
-            setIsOpen(false);
-          }}
-        />
-        <DropDownItem
-          label="Delete"
-          onClick={() => {
-            handleDelete();
-            setIsOpen(false);
+            setOpen(false);
+            onRename();
           }}
         />
       </DropDown>
@@ -160,126 +83,209 @@ function MenuButton() {
 }
 ```
 
-### With Headers and Separators
+## Props
+
+<!-- props:start -->
+
+_Generated by `pnpm readme:props` from `DropDownProps` in `DropDown.types.ts`. Do not edit; edit the JSDoc._
+
+| Prop                      | Type                                | Required | Default      | Description                                                                                                                                                                                           |
+| ------------------------- | ----------------------------------- | -------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `appendTo`                | `HTMLElement`                       | no       | –            | Element the portal renders into, instead of `document.body`.                                                                                                                                          |
+| `backDrop`                | `JSX.Element \| null`               | no       | –            | The backdrop element itself. It is built from `withBackdrop`; passing your own replaces it.                                                                                                           |
+| `bottomSpace`             | `number`                            | no       | –            | (`withDynamicScrollbar` only) Space to leave below the menu, in pixels.                                                                                                                               |
+| `children`                | `ReactNode`                         | no       | –            | Items of the menu, normally `DropDownItem`s. With `maxHeight` set they are virtualised, so each child's height is read from its `height` prop rather than measured.                                   |
+| `className`               | `string`                            | no       | –            | Applied to the dropdown element.                                                                                                                                                                      |
+| `clickOutsideAction`      | `(e: Event, open: boolean) => void` | no       | –            | Called when a click lands outside the dropdown, and by the backdrop. The second argument is the state being asked for — the negation of `open`, not the current value.                                |
+| `columnCount`             | `number`                            | no       | –            | Ignored. Nothing reads this prop.                                                                                                                                                                     |
+| `dataTestId`              | `string`                            | no       | `"dropdown"` | Value of `data-testid` on the dropdown.                                                                                                                                                               |
+| `directionX`              | `TDirectionX`                       | no       | `"right"`    | Sets the opening direction relative to the parent                                                                                                                                                     |
+| `directionY`              | `TDirectionY`                       | no       | `"bottom"`   | Sets the opening direction relative to the parent                                                                                                                                                     |
+| `disableOnClickOutside`   | `boolean`                           | no       | –            | Ignored. Nothing reads this prop.                                                                                                                                                                     |
+| `disableScrollbarPadding` | `boolean`                           | no       | –            | Disables scrollbar inline padding to allow hover styles to extend to edge                                                                                                                             |
+| `enableKeyboardEvents`    | `boolean`                           | no       | `true`       | Whether the arrow keys move through the items and Enter clicks one. It is read only when `maxHeight` is set, and while it is on every key press in the document has its default action prevented.     |
+| `enableOnClickOutside`    | `() => void`                        | no       | –            | Called once each time the dropdown opens.                                                                                                                                                             |
+| `eventTypes`              | `string \| string[]`                | no       | –            | DOM event names listened for on `window` to detect a click outside. Nothing is listened for when it is absent; the backdrop is the usual mechanism.                                                   |
+| `fixedDirection`          | `boolean`                           | no       | `false`      | Keeps `directionX` and `directionY` exactly as given instead of flipping them to fit the viewport.                                                                                                    |
+| `forceCloseClickOutside`  | `boolean`                           | no       | –            | Stops the outside-click listeners being registered at all.                                                                                                                                            |
+| `forwardedRef`            | `RefObject<HTMLElement \| null>`    | no       | –            | Ref of the element the menu belongs to. In the default portal mode it is what the menu is measured and positioned against; without it the menu falls back to the corner of the viewport.              |
+| `id`                      | `string`                            | no       | –            | Ignored. Nothing reads this prop and no `id` reaches the DOM.                                                                                                                                         |
+| `isAside`                 | `boolean`                           | no       | –            | Passed to the backdrop, which then keeps an aside panel above itself.                                                                                                                                 |
+| `isDefaultMode`           | `boolean`                           | no       | `true`       | Whether the menu is rendered in a portal on `document.body`, positioned by measuring `forwardedRef`. Turn it off to render it in place, absolutely positioned inside the nearest positioned ancestor. |
+| `isMobileView`            | `boolean`                           | no       | –            | Pins the menu to the bottom edge of the screen, full width, in portrait.                                                                                                                              |
+| `isNoFixedHeightOptions`  | `boolean`                           | no       | –            | Renders the children in a plain scrollbar instead of the virtualised list, for items whose height is not the 32px the list assumes.                                                                   |
+| `manualWidth`             | `string`                            | no       | –            | Required for specifying the exact width of the component; for example; 100%                                                                                                                           |
+| `manualX`                 | `string`                            | no       | –            | (Non portal only) Required for specifying the exact distance from the parent component                                                                                                                |
+| `manualY`                 | `string`                            | no       | –            | (Non portal only) Required for specifying the exact distance from the parent component                                                                                                                |
+| `maxHeight`               | `number`                            | no       | –            | Height of the list in pixels. It is also the switch that turns on virtualisation, the scrollbar and the arrow keys: without it every child is rendered as given and none of the three happens.        |
+| `offsetX`                 | `number`                            | no       | `0`          | (Portal only) Specifies the horizontal offset                                                                                                                                                         |
+| `open`                    | `boolean`                           | no       | –            | Whether the menu is shown. The element stays in the DOM either way — it is `display: none` until this is true.                                                                                        |
+| `shouldShowBackdrop`      | `boolean`                           | no       | `false`      | Passed to the backdrop: makes it render even when it would stay invisible.                                                                                                                            |
+| `showDisabledItems`       | `boolean`                           | no       | `false`      | Keeps children whose `disabled` prop is true in the list. They are dropped by default, together with a separator that ends up first or last.                                                          |
+| `style`                   | `CSSProperties`                     | no       | –            | Merged into the dropdown element's inline style.                                                                                                                                                      |
+| `topSpace`                | `number`                            | no       | –            | (`withDynamicScrollbar` only) Space to leave above the menu, in pixels.                                                                                                                               |
+| `useFlexibleHeight`       | `boolean`                           | no       | –            | Use flexible maxHeight instead of fixed height for scrollbar (allows shrinking when fewer items)                                                                                                      |
+| `usePortalBackdrop`       | `boolean`                           | no       | `false`      | Moves the backdrop inside the portal, above the page at z-index 400 rather than below the menu at 199.                                                                                                |
+| `withBackdrop`            | `boolean`                           | no       | `true`       | Whether a `Backdrop` is rendered behind the menu to catch the next click.                                                                                                                             |
+| `withBackground`          | `boolean`                           | no       | –            | Passed to the backdrop: gives it the dimming background.                                                                                                                                              |
+| `withBlur`                | `boolean`                           | no       | –            | Ignored. Nothing reads this prop.                                                                                                                                                                     |
+| `withDynamicScrollbar`    | `boolean`                           | no       | –            | Measures the room around the anchor on every open and caps the menu at what is left, scrolling the rest. It replaces the virtualised list with a plain scrollbar.                                     |
+| `withoutBackground`       | `boolean`                           | no       | –            | Passed to the backdrop: makes it transparent.                                                                                                                                                         |
+| `zIndex`                  | `number`                            | no       | –            | Stacking order of the menu, written as `--z-index`. The default is 400.                                                                                                                               |
+
+<!-- props:end -->
+
+## Recipes
+
+### Open and close, controlled
+
+`clickOutsideAction` is the close handler: the backdrop calls it, and so does any event type
+you list in `eventTypes`. Its second argument is the state being asked for.
 
 ```tsx
-<DropDown open={isOpen} forwardedRef={buttonRef}>
-  <DropDownItem isHeader label="File Actions" />
-  <DropDownItem label="Open" onClick={handleOpen} />
-  <DropDownItem label="Download" onClick={handleDownload} />
-  <DropDownItem isSeparator />
-  <DropDownItem isHeader label="Edit Actions" />
-  <DropDownItem label="Rename" onClick={handleRename} />
-  <DropDownItem label="Move" onClick={handleMove} />
-  <DropDownItem isSeparator />
-  <DropDownItem label="Delete" onClick={handleDelete} />
-</DropDown>
+import { useRef, useState } from "react";
+import { DropDown } from "@onlyoffice/apps-ui-kit/components/drop-down";
+import { DropDownItem } from "@onlyoffice/apps-ui-kit/components/drop-down-item";
+import { IconButton } from "@onlyoffice/apps-ui-kit/components/icon-button";
+
+export function RowMenu({ onDelete }: { onDelete: () => void }) {
+  const [open, setOpen] = useState(false);
+  const anchor = useRef<HTMLDivElement>(null);
+
+  return (
+    <div ref={anchor} style={{ position: "relative" }}>
+      <IconButton
+        size={16}
+        title="More"
+        onClick={() => setOpen(true)}
+        iconNode={
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <circle cx="3" cy="8" r="1.5" />
+            <circle cx="8" cy="8" r="1.5" />
+            <circle cx="13" cy="8" r="1.5" />
+          </svg>
+        }
+      />
+      <DropDown
+        open={open}
+        forwardedRef={anchor}
+        directionX="left"
+        clickOutsideAction={(_event, next) => setOpen(next)}
+      >
+        <DropDownItem label="Delete" onClick={onDelete} />
+      </DropDown>
+    </div>
+  );
+}
 ```
 
-### Scrollable List
+### A long list that scrolls
+
+`maxHeight` is what turns on the scrollbar — and with it the virtualised list, which reads each
+item's height from its `height` prop rather than measuring it.
 
 ```tsx
-<DropDown
-  open={isOpen}
-  forwardedRef={buttonRef}
-  maxHeight={300}
-  clickOutsideAction={() => setIsOpen(false)}
->
-  {users.map((user) => (
-    <DropDownItem
-      key={user.id}
-      label={user.name}
-      onClick={() => selectUser(user)}
-    />
-  ))}
-</DropDown>
+import { useRef, useState } from "react";
+import { DropDown } from "@onlyoffice/apps-ui-kit/components/drop-down";
+import { DropDownItem } from "@onlyoffice/apps-ui-kit/components/drop-down-item";
+
+export function TimezoneMenu({ zones }: { zones: string[] }) {
+  const [open, setOpen] = useState(false);
+  const anchor = useRef<HTMLDivElement>(null);
+
+  return (
+    <div ref={anchor} style={{ position: "relative" }}>
+      <button type="button" onClick={() => setOpen(!open)}>
+        Time zone
+      </button>
+      <DropDown
+        open={open}
+        forwardedRef={anchor}
+        maxHeight={320}
+        manualWidth="280px"
+        clickOutsideAction={() => setOpen(false)}
+      >
+        {zones.map((zone) => (
+          <DropDownItem
+            key={zone}
+            label={zone}
+            onClick={() => setOpen(false)}
+          />
+        ))}
+      </DropDown>
+    </div>
+  );
+}
 ```
 
-### Custom Width
+## Behaviour the types don't state
 
-```tsx
-<DropDown open={isOpen} forwardedRef={buttonRef} manualWidth="250px">
-  <DropDownItem label="Short" />
-  <DropDownItem label="This is a longer option that needs more space" />
-</DropDown>
-```
+- **It renders into `document.body` by default** and positions itself by measuring the element
+  behind `forwardedRef` on open, on resize and on scroll. Without that ref it cannot find the
+  anchor and lands wherever the stylesheet leaves it; `appendTo` moves the portal, and
+  `isDefaultMode={false}` renders it in place instead, absolutely positioned against the nearest
+  positioned ancestor.
+- **`maxHeight` changes how the children are rendered, not just how tall the menu is.** Without
+  it every child is rendered as given, with no scrollbar and no keyboard navigation. With it the
+  list is virtualised by `react-window`, which takes each child's height from its `height` prop
+  (32px, or 36 on a tablet, and 12 for an item marked `isSeparator`) — a child that is actually
+  taller overlaps its neighbour. `isNoFixedHeightOptions` swaps the virtual list for a plain
+  scrollbar and measures nothing.
+- **While an open menu has keyboard navigation on, every key press in the document has its
+  default prevented.** The handler is attached to `window` and calls `preventDefault()` before
+  it looks at the key, so a text field elsewhere on the page stops accepting characters. Pass
+  `enableKeyboardEvents={false}` for a menu that opens next to an input.
+- **Disabled children are removed from the list by default.** `showDisabledItems` keeps them; a
+  separator that would end up first or last is dropped either way. Keyboard navigation still
+  counts the original children, so the highlight and the removed items disagree.
+- **`directionX` and `directionY` are preferences.** The component measures the room around the
+  anchor and flips the menu to whichever side fits, ending up at the viewport edge when neither
+  does. `fixedDirection` turns that off.
+- **Nothing closes the menu by itself.** `open` is yours, and `clickOutsideAction` is called by
+  the backdrop and by the DOM events you list in `eventTypes` — there is no Escape handling and
+  no default event list. On a mobile device the component registers a single event type spelled
+  `"click, touchend"`, which no browser ever fires.
+- The element is always in the DOM and `display: none` until `open`. Its width comes from
+  `manualWidth`, not from the anchor.
+- The stylesheet's own `max-height` rule is attached to a class the component never sets, so the
+  height you get is the one computed from the items and the scrollbar of the list.
+- `id`, `columnCount`, `withBlur` and `disableOnClickOutside` are declared and never read.
 
-### Opening Upward
+## CSS variables
 
-```tsx
-// Useful when trigger is near bottom of viewport
-<DropDown open={isOpen} forwardedRef={buttonRef} directionY="top">
-  <DropDownItem label="Option 1" />
-  <DropDownItem label="Option 2" />
-</DropDown>
-```
+| Variable                   | Default                    | Effect                   |
+| -------------------------- | -------------------------- | ------------------------ |
+| `--dropdown-bg`            | theme surface              | Background of the menu   |
+| `--dropdown-border-style`  | none in light, 1px in dark | Border                   |
+| `--dropdown-shadow`        | `0 8px 16px` theme shadow  | Shadow                   |
+| `--dropdown-radius`        | `6px`                      | Corner radius            |
+| `--dropdown-inner-padding` | `8px 0`                    | Padding around the items |
+| `--dropdown-text-size`     | `13px`                     | Font size of the items   |
+| `--dropdown-text-weight`   | `600`                      | Font weight of the items |
 
-### With Keyboard Navigation
-
-```tsx
-<DropDown
-  open={isOpen}
-  forwardedRef={buttonRef}
-  enableKeyboardEvents
-  clickOutsideAction={() => setIsOpen(false)}
->
-  <DropDownItem label="First" onClick={handleFirst} />
-  <DropDownItem label="Second" onClick={handleSecond} />
-  <DropDownItem label="Third" onClick={handleThird} />
-</DropDown>
-```
-
-### Non-Portal Mode
-
-```tsx
-// Renders inline instead of in a portal
-// Parent must have position: relative
-<div style={{ position: "relative" }}>
-  <Button ref={buttonRef} label="Menu" onClick={() => setIsOpen(true)} />
-  <DropDown
-    open={isOpen}
-    forwardedRef={buttonRef}
-    isDefaultMode={false}
-    manualY="40px"
-  >
-    <DropDownItem label="Option 1" />
-    <DropDownItem label="Option 2" />
-  </DropDown>
-</div>
-```
-
-## Positioning
-
-The dropdown uses intelligent positioning:
-
-1. **Portal Mode (default)**: Renders in a portal at the document body level, calculating absolute position based on the trigger element
-2. **Inline Mode**: Renders as a sibling element, using CSS positioning relative to parent
-
-### Automatic Repositioning
-
-When `fixedDirection` is `false` (default), the dropdown automatically:
-
-- Flips horizontally if it would overflow the viewport edge
-- Flips vertically if there's more space above/below the trigger
-- Adjusts position on window resize
+`--z-index`, `--max-height`, `--manual-width`, `--manual-x` and `--manual-y` are written by the
+component from the matching props.
 
 ## Accessibility
 
-- Uses `role="listbox"` for proper ARIA semantics
-- Keyboard navigation support with `enableKeyboardEvents`
-- Focus management for accessible interactions
-- Works with screen readers
+- The menu is a `<div role="listbox">` whose children are not options — a `DropDownItem` is a
+  `<div>` with no role — so the roles do not describe what is there.
+- Nothing links the anchor to the menu: no `aria-expanded`, no `aria-controls`, no
+  `aria-activedescendant` on the anchor. Add them on your own control.
+- Focus is neither moved into the menu nor trapped, and Escape does not close it. The arrow keys
+  work only with `maxHeight`, and they move a highlight rather than focus.
+- Enter activates the highlighted child by calling its `onClick` directly, which does nothing
+  for a child that has none.
 
-## Best Practices
+## Test ids
 
-1. **Always provide a ref**: The `forwardedRef` prop is essential for proper positioning
-2. **Handle click outside**: Use `clickOutsideAction` to close the dropdown when clicking elsewhere
-3. **Use maxHeight for long lists**: Prevents the dropdown from extending beyond the viewport
-4. **Position parent correctly**: When using inline mode, ensure parent has `position: relative`
-5. **Consider mobile**: Use `isMobileView` for touch-optimized layouts
+| Element  | `data-testid`                             |
+| -------- | ----------------------------------------- |
+| The menu | `dropdown`, overridable with `dataTestId` |
 
-## Related Components
+## Related
 
-- [DropDownItem](../drop-down-item/README.md) - Individual items within a dropdown
-- [Button](../button/README.md) - Common trigger element for dropdowns
-- [Portal](../portal/README.md) - Underlying portal implementation
+- [`DropDownItem`](../drop-down-item/README.md) — what goes inside, and where `height` comes
+  from.
+- [`ContextMenu`](../context-menu/README.md) — the menu that opens at the pointer.
+- [`Backdrop`](../backdrop/README.md) — the layer this renders for you unless you say otherwise.

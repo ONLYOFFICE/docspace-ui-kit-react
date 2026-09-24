@@ -26,43 +26,46 @@ export type SpaceQuotaProps = {
 };
 
 export type TemplateTileProps = {
-  /** Indicates if the room is selected */
+  /** Whether the tile is selected. */
   checked?: boolean;
-  /** Indicates if the room is in active state */
+  /** Whether the tile is the one being acted on, which keeps its hover background. */
   isActive?: boolean;
-  /** Indicates if the room is in a blocking operation state */
+  /** Dims the tile while an operation is running over it. */
   isBlockingOperation?: boolean;
-  /** Template data object */
+  /** The template this tile stands for. Its `createdBy` fills the owner line and its `security.EditRoom` decides whether the quota control is read-only. */
   item: TemplateItem;
-  /** Callback when template is selected */
+  /** Called with the new checked state and the `item`. A checked item that has no string `title` is dropped before it reaches you. */
   onSelect?: (checked: boolean, item: TemplateItem) => void;
-  /** Callback when thumbnail is clicked */
+  /** Ignored. It reaches the base tile, which does not read it either. */
   thumbnailClick?: (e: React.MouseEvent) => void;
-  /** Function to get context menu model */
+  /** Builds the menu shown on right-click. Without it the right-click menu never opens. */
   getContextModel?: () => ContextMenuModel[];
-  /** Child elements */
+  /** The tile's content. Only the first element is rendered, above the badges. */
   children?: React.ReactNode;
-  /** Checkbox indeterminate state flag */
+  /** Draws the checkbox in its indeterminate state. */
   indeterminate?: boolean;
-  /** Additional React element */
+  /** The icon beside the checkbox. Without it neither the icon nor the checkbox is rendered at all. */
   element?: React.ReactNode;
-  /** Context menu options */
+  /** The menu's entries. Required — but the three-dot button appears only when `item` also carries a `contextOptions` key of its own. */
   contextOptions: ContextMenuModel[];
-  /** Callback when context menu is clicked */
+  /** Called before the menu opens. */
   tileContextClick?: () => void;
-  /** Callback to hide context menu */
+  /** Called when the menu closes. */
   hideContextMenu?: () => void;
-  /** Number of columns in the grid */
+  /** Ignored. It is required by the type and read by nothing — the lower half is a two-column list, not a grid. */
   columnCount: number;
-  /** Room badges */
+  /** Badges beside the content, in the upper half. */
   badges?: React.ReactNode;
-  /** Indicates if room is in progress state */
+  /** Replaces the icon and the checkbox with the kit's track loader. */
   inProgress?: boolean;
-  /** Flag to show hotkey border */
+  /** Draws the accent outline that marks the tile the keyboard is on. */
   showHotkeyBorder?: boolean;
-  /** Flag for edit mode */
+  /** Renaming state: it removes the icon and the checkbox. */
   isEdit?: boolean;
+  /** Adds the storage line to the lower half. The value beside it appears only when `SpaceQuotaComponent` is given as well. */
   showStorageInfo?: boolean;
+  /** Called when the owner's name is clicked. Required, even when the template has no `createdBy` and the name is never rendered. */
   openUser: () => void;
+  /** Renders the storage figure. It is handed the `item`, the literal type `"room"` and whether editing is allowed. */
   SpaceQuotaComponent?: React.ComponentType<SpaceQuotaProps>;
 };

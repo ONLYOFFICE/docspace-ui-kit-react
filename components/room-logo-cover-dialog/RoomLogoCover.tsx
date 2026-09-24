@@ -17,33 +17,51 @@ import type { ICover } from "./RoomLogoCoverDialog.types";
 import styles from "./RoomLogoCoverDialog.module.scss";
 
 export type RoomLogoCoverProps = {
+  /** Translation function. Besides `Common:Color` the icon picker asks for keys outside the `Common` namespace the kit ships. */
   t: TTranslation;
 
+  /** The cover icons to offer. Each carries raw SVG markup that is injected into the page, so take them only from a source you trust. An empty array leaves the icon picker out. */
   covers: ICover[];
+  /** Room title, reduced to initials for the preview when no icon is chosen.
+   * @default "" */
   title?: string;
 
-  /** Generic initial values — used by RoomLogoCoverDialog */
+  /** Colour chosen on the first render, as `#rrggbb`. Anything but `undefined` wins over `coverColor` and `logoColor`. */
   initialColor?: string;
+  /** Cover chosen on the first render. An explicit `null` selects the initials and still wins over `coverId` and `logoCover`. */
   initialCover?: ICover | null;
 
-  /** Raw room data — UIKit derives initialColor/initialCover from these when provided */
+  /** A room's stored colour, six hex digits **without** a leading `#`. Used only when `initialColor` is absent. */
   logoColor?: string;
+  /** A room's stored cover. Used only when `initialCover` and `coverId` are absent, and only together with `withSelection`. */
   logoCover?: ICover | null;
+  /** A room's stored cover colour, six hex digits **without** a leading `#`. Used only when `initialColor` is absent, and it wins over `logoColor`. */
   coverColor?: string;
+  /** Id of a room's stored cover, looked up in `covers`. Used only when `initialCover` is absent. */
   coverId?: string;
+  /** Lets `logoCover` be taken as the starting cover. Without it that field is ignored. */
   withSelection?: boolean;
 
+  /** Whether the colour picker is open. The component does not own this: hold it in the state of whatever wraps it. */
   openColorPicker: boolean;
 
+  /** Whether the preview is drawn for the light theme. Taken from the theme context when it is not passed. */
   isBaseTheme?: boolean;
+  /** The portal's accent colours, used to tint the hovered and selected icon. Without it those states have no accent. */
   currentColorScheme?: TColorScheme;
 
+  /** Attached to the outer element, for measuring its height. */
   forwardedRef?: React.RefObject<HTMLDivElement | null>;
+  /** Height of the scroll area around the two pickers, as a CSS length. Ignored on mobile and while `generalScroll` is set. */
   scrollHeight?: string;
+  /** Drops the inner scroll area, for when something outside scrolls instead. */
   generalScroll?: boolean;
 
+  /** Called once after mount with the starting colour and cover, so the owner can record what it will get back unchanged. */
   onInit?: (color: string, cover: ICover | null) => void;
+  /** Called with the colour and cover after every change. This is the only way out: the component keeps the selection in its own state. */
   onChange?: (color: string, cover: ICover | null) => void;
+  /** Opens and closes the colour picker. */
   setOpenColorPicker: React.Dispatch<React.SetStateAction<boolean>>;
 };
 

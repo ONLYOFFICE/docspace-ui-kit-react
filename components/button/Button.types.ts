@@ -2,20 +2,27 @@ import type { PropsWithChildren } from "react";
 import type { ButtonSize } from "./Button.enums";
 
 type BaseButtonProps = PropsWithChildren<{
+  /** Rendered in place of `label` when `label` is empty or unset. A non-empty
+   * `label` wins and the children are dropped. */
+  children?: React.ReactNode;
   /** Ref to access the DOM element or React component instance */
   ref?: React.Ref<HTMLElement>;
   /** Button text */
   label?: string;
-  /** Optional title attribute */
+  /** Tooltip text. Consumed by the `withTooltip` wrapper the folder exports, so it
+   * becomes the tooltip's content and never reaches the DOM as a `title` attribute. */
   title?: string;
   /** Sets the button primary */
   primary?: boolean;
+  /** Renders on a neutral grey surface with no border, for toolbar-style actions. */
   filled?: boolean;
+  /** Used together with `filled`: strokes the icon's path instead of filling it, for
+   * outline-style icons. */
   filledStroke?: boolean;
   /** Sets the button accent (tinted accent background with accent border/text) */
   accent?: boolean;
-  /** Size of the button.
-   * The normal size equals 36px and 40px in height on the Desktop and Touchscreen devices. */
+  /** Height of the button: `extraSmall` 24px, `small` 32px, `normal` 40px, `medium` 44px.
+   * Each is a `--button-height-*` custom property the consumer can override. */
   size?: ButtonSize;
   /** Scales the width of the button to 100% */
   scale?: boolean;

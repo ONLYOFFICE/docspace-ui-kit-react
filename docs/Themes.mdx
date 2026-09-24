@@ -20,28 +20,21 @@ import { ThemeKeys } from "@onlyoffice/apps-ui-kit/enums";
 </ThemeProvider>
 ```
 
-Or use the composite `Providers` component. It is portal-specific — it also mounts
-`ApiProvider` and fetches portal settings on mount — so it is deliberately **not** re-exported
-from `providers`; import it by its own subpath, as a default export:
-
-```tsx
-import Providers from "@onlyoffice/apps-ui-kit/providers/Providers";
-
-<Providers
-  url="https://your-docspace.com/api"
-  apiKey="your-api-key"
-  initialTheme={ThemeKeys.DarkStr}
-  locale="en"
->
-  <App />
-</Providers>
-```
+There is also a composite `Providers` component, which mounts `ApiProvider` and fetches portal
+settings on mount. **It is for the portal, not for an application of your own**: it requires a
+DocSpace URL and an API key, and without a portal behind them every request it makes fails. It
+is deliberately not re-exported from `providers`. Compose `ThemeProvider` and
+`TranslationProvider` yourself instead — see
+[Getting started](?path=/docs/getting-started-welcome--docs).
 
 ### Provider props
 
 - **`initialTheme`** (`ThemeKeys`) — starting theme: `BaseStr`, `DarkStr`, or `SystemStr`
 - **`systemTheme`** (`ThemeKeys`) — override detected OS preference
-- **`colorTheme`** (`CustomColorThemesSettingsDto`) — custom color palette; fetched from API if omitted
+- **`colorTheme`** (`CustomColorThemesSettingsDto`) — the portal's accent palette. **Pass it.**
+  Omitted, the provider calls the DocSpace REST API on mount to ask for one; outside a portal that
+  request fails, the rejection is not caught, and it is never retried. `{ themes: [], selected: 0 }`
+  says "no portal, no accent override".
 - **`locale`** (`string`) — language code for RTL detection and font selection
 
 ### ThemeKeys enum

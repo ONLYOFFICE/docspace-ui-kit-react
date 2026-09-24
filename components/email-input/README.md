@@ -1,154 +1,239 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "EmailInput",
+  "folder": "components/email-input",
+  "kind": "component",
+  "category": "Form controls",
+  "status": "public",
+  "summary": "Text field that parses what is typed as an email address and colours itself when it does not parse.",
+  "import": { "subpath": "components/email-input", "barrel": true, "default": false },
+  "exports": ["EmailInput", "EmailInputProps", "TValidate"],
+  "providers": ["ThemeProvider"],
+  "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
+  "related": ["text-input", "field-container", "input-block"],
+  "subComponents": [],
+  "testIds": ["email-input"]
+} -->
+
 # EmailInput
 
-Email validation component with RFC 5322 support and customizable settings.
+Text field that parses what is typed as an email address and colours itself when it does not
+parse. It is [`TextInput`](../text-input/README.md) with the kit's address parser attached.
 
-### Usage
+## Use this when / not when
 
-```js
+- Use for a single email address that should be checked as the user types — an invitation, a
+  contact, a login.
+- Not for a list of addresses. The parser handles one address at a time; split the string
+  yourself and validate each.
+- Not when you only want the field's look. [`TextInput`](../text-input/README.md) with
+  `type={InputType.email}` costs nothing and leaves validation to you.
+- Not to show why an address is wrong. The errors come back as translation keys, not as
+  sentences, and nothing here renders them.
+
+## Import
+
+```ts
 import { EmailInput } from "@onlyoffice/apps-ui-kit/components/email-input";
-import { EmailSettings } from "@onlyoffice/apps-ui-kit/utils/email";
-
-const settings = new EmailSettings();
-
-settings.allowDomainPunycode = true;
 ```
 
-```jsx
-<EmailInput
-  name="email"
-  placeholder="email"
-  emailSettings={settings}
-  onValidateInput={result =>
-    console.log("onValidateInput", result.value, result.isValid, result.errors);
-  }
-/>;
-```
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
-### Properties
+Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme` for the field's colours.
 
-You can apply all properties of the `TextInput` component to the component
+## Minimal example
 
-| Props             |           Type            | Required |             Values              |                                                                                      Default                                                                                       | Description                                                                                                                                                                                                          |
-| ----------------- | :-----------------------: | :------: | :-----------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `className`       |         `string`          |    -     |                -                |                                                                                         -                                                                                          | Accepts class                                                                                                                                                                                                        |
-| `customValidate`  |          `func`           |    -     |                -                |                                                                                         -                                                                                          | Function for your custom validation input value. Function must return object with following parameters: `value`: string value of input, `isValid`: boolean result of validating, `errors`(optional): array of errors |
-| `emailSettings`   | `Object`, `EmailSettings` |    -     |                -                | { allowDomainPunycode: false, allowLocalPartPunycode: false, allowDomainIp: false, allowStrictLocalPart: true, allowSpaces: false, allowName: false, allowLocalDomainName: false } | Settings for validating email                                                                                                                                                                                        |
-| `hasError`        |          `bool`           |    -     |                -                |                                                                                         -                                                                                          | Used in your custom validation                                                                                                                                                                                       |
-| `id`              |         `string`          |    -     |                -                |                                                                                         -                                                                                          | Accepts id                                                                                                                                                                                                           |
-| `onChange`        |          `func`           |    -     |                -                |                                                                                         -                                                                                          | Function for your custom handling changes in input                                                                                                                                                                   |
-| `onValidateInput` |          `func`           |    -     | { isValid: bool, errors: array} |                                                                                         -                                                                                          | Will be validate our value, return object with following parameters: `isValid`: boolean result of validating, `errors`: array of errors                                                                              |
-| `style`           |      `obj`, `array`       |    -     |                -                |                                                                                         -                                                                                          | Accepts css style                                                                                                                                                                                                    |
+Leave `hasError` out and the field decides for itself, from the first character typed.
 
-### Validate email
-
-Our validation algorithm based on [RFC 5322 email address parser](https://www.npmjs.com/package/email-addresses).
-
-For email validating you should use plain Object or EmailSettings with following settings:
-
-| Props                    |  Type  | Required | Default | Description                                                                                                                                                 |
-| ------------------------ | :----: | :------: | :-----: | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `allowDomainIp`          | `bool` |    -     | `false` | Allow email with IP address in domain, e. g. `user@[127.0.0.1]` is a valid email address                                                                    |
-| `allowDomainPunycode`    | `bool` |    -     | `false` | Allow email with punycode symbols in domain, e. g. `example@джpумлатест.bрфa` and `example@mañana.com` are valid email addresses                            |
-| `allowLocalDomainName`   | `bool` |    -     | `false` | Allow local domain address, e. g. `admin@local` is a valid email address                                                                                    |
-| `allowLocalPartPunycode` | `bool` |    -     | `false` | Allow email with punycode symbols in local part, e. g. `джумла@example.com` and `mañana@example.com` are valid email addresses                              |
-| `allowName`              | `bool` |    -     | `false` | Supports all features of RFC 5322, which means that `"Bob Example" <bob@example.com>` is a valid email address                                              |
-| `allowSpaces`            | `bool` |    -     | `false` | Allow spaces in local part and domain, e. g. `" "@example.org` is a valid email address                                                                     |
-| `allowStrictLocalPart`   | `bool` |    -     | `true`  | Allow email, started with latin symbols and digits(`([a-zA-Z0-9]+)`) and also contains `_,-,.,+`. Used RegEx `/^([a-zA-Z0-9]+)([_\-\.\+][a-zA-Z0-9]+)\*\$/` |
-
-### emailSettings prop
-
-Plain object:
-
-```js
-const emailSettings = {
-  allowDomainPunycode: false,
-  allowLocalPartPunycode: false,
-  allowDomainIp: false,
-  allowStrictLocalPart: true,
-  allowSpaces: false,
-  allowName: false,
-  allowLocalDomainName: false,
-};
-```
-
-or instance of `EmailSettings` class:
-
-```js
+```tsx
+import { useState } from "react";
 import { EmailInput } from "@onlyoffice/apps-ui-kit/components/email-input";
-import { EmailSettings } from "@onlyoffice/apps-ui-kit/utils/email";
+import { InputSize } from "@onlyoffice/apps-ui-kit/components/text-input";
 
-const emailSettings = new EmailSettings();
+export function InviteField() {
+  const [email, setEmail] = useState("");
 
-emailSettings.toObject(); /* returned Object with default settings:
-{
-  allowDomainPunycode: false,
-  allowLocalPartPunycode: false,
-  allowDomainIp: false,
-  allowStrictLocalPart: true,
-  allowSpaces: false,
-  allowName: false,
-  allowLocalDomainName: false
+  return (
+    <EmailInput
+      size={InputSize.base}
+      value={email}
+      placeholder="name@example.com"
+      scale
+      onChange={(event) => setEmail(event.target.value)}
+    />
+  );
 }
-*/
-email.allowName = true; // set allowName setting to true
+```
 
-emailSettings.toObject(); /* returned Object with NEW settings:
-{
-  
-  allowDomainPunycode: false,
-  allowLocalPartPunycode: false,
-  allowDomainIp: false,
-  allowStrictLocalPart: true,
-  allowSpaces: false,
-  allowName: true,
-  allowLocalDomainName: false
+## Props
 
+<!-- props:start EmailInputProps -->
+
+_Generated by `pnpm readme:props` from `EmailInputProps` in `EmailInput.types.ts`. Do not edit; edit the JSDoc._
+
+| Prop                   | Type                                                     | Required | Default         | Description                                                                                                                       |
+| ---------------------- | -------------------------------------------------------- | -------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `children`             | `Iterable<ReactI18NextChildren> \| ReactI18NextChildren` | no       | –               |                                                                                                                                   |
+| `customValidate`       | `(value: string) => TValidate`                           | no       | –               | Replaces the built-in parser outright. Return the same shape; the component uses `isValid` to decide whether to colour the field. |
+| `dataTestId`           | `string`                                                 | no       | `"email-input"` | `data-testid` of the field.                                                                                                       |
+| `emailSettings`        | `EmailSettings`                                          | no       | –               | Options for the built-in parser: which forms of address to accept.                                                                |
+| `handleAnimationStart` | `(e: React.AnimationEvent<HTMLInputElement>) => void`    | no       | –               | Native `animationstart` on the field. It exists to catch the browser's autofill animation, which fires no change event.           |
+| `onValidateInput`      | `(data: TValidate) => void`                              | no       | –               | Called after every keystroke with the result of the check, whichever parser ran.                                                  |
+
+#### Inherited from `TextInputProps`
+
+Declared by [`components/text-input`](../../components/text-input/README.md) and accepted here too.
+
+| Prop                | Type                                                                                  | Required | Default  | Description                                                                                                                                                        |
+| ------------------- | ------------------------------------------------------------------------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `value`             | `string`                                                                              | **yes**  | –        | Value of the input                                                                                                                                                 |
+| `autoComplete`      | `string`                                                                              | no       | `"off"`  | Used as HTML `autocomplete` property.                                                                                                                              |
+| `className`         | `string`                                                                              | no       | –        | CSS class name                                                                                                                                                     |
+| `dir`               | `string`                                                                              | no       | `"auto"` | Text direction.                                                                                                                                                    |
+| `fontWeight`        | `number \| string`                                                                    | no       | –        | Sets the font weight                                                                                                                                               |
+| `forwardedRef`      | `Ref<HTMLInputElement>`                                                               | no       | –        | Forwarded ref. Applied to the plain input only — when `mask` is set the masked input is rendered instead and the ref is dropped.                                   |
+| `guide`             | `boolean`                                                                             | no       | –        | When guide is true, Text Mask always shows both placeholder characters and non-placeholder mask characters                                                         |
+| `hasError`          | `boolean`                                                                             | no       | –        | Indicates the input field has an error                                                                                                                             |
+| `hasWarning`        | `boolean`                                                                             | no       | –        | Indicates the input field has a warning                                                                                                                            |
+| `id`                | `string`                                                                              | no       | –        | Used as HTML `id` property                                                                                                                                         |
+| `inputMode`         | `"decimal" \| "email" \| "none" \| "numeric" \| "search" \| "tel" \| "text" \| "url"` | no       | –        | Input mode for virtual keyboard                                                                                                                                    |
+| `isAutoFocussed`    | `boolean`                                                                             | no       | –        | Focus the input field on initial render                                                                                                                            |
+| `isBold`            | `boolean`                                                                             | no       | –        | Sets font weight value to 600                                                                                                                                      |
+| `isDisabled`        | `boolean`                                                                             | no       | –        | Indicates that the field cannot be used                                                                                                                            |
+| `isReadOnly`        | `boolean`                                                                             | no       | –        | Indicates that the field is displaying read-only content                                                                                                           |
+| `keepCharPositions` | `boolean`                                                                             | no       | –        | Allows to add or delete characters without changing the positions of the existing characters                                                                       |
+| `mask`              | `((value: string) => Mask) \| Mask`                                                   | no       | –        | Input text mask                                                                                                                                                    |
+| `maxLength`         | `number`                                                                              | no       | `255`    | Maximum number of characters the field accepts; further typing is silently dropped.                                                                                |
+| `name`              | `string`                                                                              | no       | –        | Used as HTML `name` property                                                                                                                                       |
+| `onBlur`            | `(e: React.FocusEvent<HTMLInputElement>) => void`                                     | no       | –        | Called when field is blurred                                                                                                                                       |
+| `onChange`          | `(e: React.ChangeEvent<HTMLInputElement>) => void`                                    | no       | –        | Called with the new value. Required when input is not read only                                                                                                    |
+| `onClick`           | `(e: React.MouseEvent<HTMLInputElement>) => void`                                     | no       | –        | Called when clicked                                                                                                                                                |
+| `onContextMenu`     | `(e: React.MouseEvent<HTMLInputElement>) => void`                                     | no       | –        | Called when context menu is triggered                                                                                                                              |
+| `onFocus`           | `(e: React.FocusEvent<HTMLInputElement>) => void`                                     | no       | –        | Called when field is focused                                                                                                                                       |
+| `onKeyDown`         | `(e: React.KeyboardEvent<HTMLInputElement>) => void`                                  | no       | –        | Called when a key is pressed                                                                                                                                       |
+| `placeholder`       | `string`                                                                              | no       | `" "`    | Placeholder text for the input. The default is a single space, not an empty string, so `:placeholder-shown` matches even when no placeholder was asked for.        |
+| `scale`             | `boolean`                                                                             | no       | –        | Indicates the input field has scale                                                                                                                                |
+| `size`              | `InputSize`                                                                           | no       | –        | Supported size of the input fields                                                                                                                                 |
+| `spellCheck`        | `boolean`                                                                             | no       | –        | Used as HTML `spellcheck` property                                                                                                                                 |
+| `style`             | `CSSProperties`                                                                       | no       | –        | Inline CSS styles                                                                                                                                                  |
+| `tabIndex`          | `number`                                                                              | no       | `-1`     | Used as HTML `tabindex` property. The default of `-1` takes the input **out of the tab order**; pass `0` for a field the user is meant to reach with the keyboard. |
+| `withBorder`        | `boolean`                                                                             | no       | –        | Indicates that component contains border                                                                                                                           |
+
+Plus 298 more props inherited from `React.AriaAttributes`, `React.DOMAttributes`, `React.HTMLAttributes` and `React.InputHTMLAttributes`, forwarded to the element.
+
+<!-- props:end -->
+
+## Recipes
+
+### Error
+
+`hasError` is the override: pass it and the automatic colouring stops entirely, which is what
+you want when the error should only appear after the field is left.
+
+```tsx
+import { useState } from "react";
+import {
+  EmailInput,
+  type TValidate,
+} from "@onlyoffice/apps-ui-kit/components/email-input";
+import { FieldContainer } from "@onlyoffice/apps-ui-kit/components/field-container";
+import { InputSize } from "@onlyoffice/apps-ui-kit/components/text-input";
+
+export function InviteFieldOnBlur() {
+  const [email, setEmail] = useState("");
+  const [isValid, setIsValid] = useState(true);
+  const [wasVisited, setWasVisited] = useState(false);
+
+  const problem = wasVisited && !isValid ? "That is not an email address" : "";
+
+  return (
+    <FieldContainer
+      isVertical
+      labelVisible
+      labelText="Email"
+      hasError={Boolean(problem)}
+      errorMessage={problem}
+    >
+      <EmailInput
+        size={InputSize.base}
+        value={email}
+        scale
+        hasError={Boolean(problem)}
+        onValidateInput={(result: TValidate) => setIsValid(result.isValid)}
+        onBlur={() => setWasVisited(true)}
+        onChange={(event) => setEmail(event.target.value)}
+      />
+    </FieldContainer>
+  );
 }
-*/
 ```
 
-### Custom validate email
+### Disabled / read-only
 
-You should use custom validation with the `customValidate` prop. This prop contains function for your custom validation input value. Function must return object with following parameters: `value`: string value of input, `isValid`: boolean result of validating, `errors`(optional): array of errors.
+Both come from [`TextInput`](../text-input/README.md) unchanged: `isDisabled` greys the field
+and takes it out of the tab order, `isReadOnly` keeps it reachable but not editable.
 
-Base colors:
-
-| Сomponent actions | isValid |                           border-color                           |
-| ----------------- | :-----: | :--------------------------------------------------------------: |
-| `:focus`          | `false` |     ![#c30](https://placehold.it/15/c30/000000?text=+) #c30      |
-| `:focus`          | `true`  | ![#2DA7DB](https://placehold.it/15/2DA7DB/000000?text=+) #2DA7DB |
-| `:hover`          | `false` |     ![#c30](https://placehold.it/15/c30/000000?text=+) #c30      |
-| `:hover`          | `true`  | ![#D0D5DA](https://placehold.it/15/D0D5DA/000000?text=+) #D0D5DA |
-| `default`         | `false` |     ![#c30](https://placehold.it/15/c30/000000?text=+) #c30      |
-| `default`         | `true`  | ![#D0D5DA](https://placehold.it/15/D0D5DA/000000?text=+) #D0D5DA |
-
-```js
-import React from "react";
+```tsx
 import { EmailInput } from "@onlyoffice/apps-ui-kit/components/email-input";
+import { InputSize } from "@onlyoffice/apps-ui-kit/components/text-input";
 
-const onChange = (e) => {
-  // your event handling
-  customValidate(e.target.value);
-};
-
-const customValidate = (value) => {
-  const isValid = !!(value && value.length > 0);
-  return {
-    value,
-    isValid: isValid,
-    errors: isValid ? [] : ["incorrect email"],
-  };
-};
-
-const onValidateInput = (result) => {
-  console.log("onValidateInput", result);
-};
+export function AccountEmail({ email }: { email: string }) {
+  return (
+    <EmailInput
+      size={InputSize.base}
+      value={email}
+      isReadOnly
+      scale
+      onChange={() => {}}
+    />
+  );
+}
 ```
 
-```jsx
-<EmailInput
-  customValidate={customValidate}
-  onChange={onChange}
-  onValidateInput={onValidateInput}
-/>
-```
+## Behaviour the types don't state
+
+- **The field is `type="text"`, not `type="email"`.** `type` is removed from the props on
+  purpose and forced to text, so the browser does no validation of its own and a phone shows
+  the ordinary keyboard. `autoComplete` defaults to `"email"`, which is the only hint the
+  browser gets.
+- **`hasError` is an override, not a starting value.** Left out, the field colours itself from
+  the parser as soon as anything has been typed — so a half-typed address is red. Passed at
+  all, even as `false`, the automatic colouring is switched off completely.
+- **Validation runs on every keystroke**, and also whenever `value` changes from outside, so
+  `onValidateInput` fires more often than a user would expect a message to change. Gate the
+  message on blur, not on the callback.
+- **`errors` are translation keys**, produced by the parser — `EmailIsIncorrect` and the like.
+  They are not sentences, and this component renders none of them.
+- **`customValidate` replaces the parser entirely**, `emailSettings` and all; return the same
+  `{ value, isValid, errors }` shape.
+- **`isAutoFocussed` is ignored on an iOS phone.** The component forces it off there, because
+  the on-screen keyboard opening on load hides the rest of the form.
+- **`testId` is not a prop here** — it is removed from `TextInput`'s props and replaced by
+  `dataTestId`, which defaults to `email-input`.
+- The value is held in the component's own state and re-synced whenever `value` changes, so it
+  behaves as a controlled field as long as you keep passing `value`.
+
+## Accessibility
+
+- The field has no label of its own — use [`FieldContainer`](../field-container/README.md) or
+  [`Label`](../label/README.md) with `htmlFor`.
+- **Nothing is announced when the address is wrong.** The only signal is the border colour, and
+  the field carries no `aria-invalid`, so set it yourself alongside a message tied with
+  `aria-describedby`.
+- Because the input is `type="text"`, assistive technology is not told the field wants an email
+  address. `autoComplete="email"` is the only machine-readable hint.
+- Colouring the field before the address is finished is noise for everyone; gating the error on
+  blur, as in the recipe above, is kinder.
+
+## Test ids
+
+| Element   | `data-testid`                  |
+| --------- | ------------------------------ |
+| The field | `email-input`, or `dataTestId` |
+
+## Related
+
+- [`TextInput`](../text-input/README.md) — the field underneath, and where the rest of the props
+  are documented.
+- [`FieldContainer`](../field-container/README.md) — the label and error message around it.
+- [`InputBlock`](../input-block/README.md) — for a field that needs an icon at its end.

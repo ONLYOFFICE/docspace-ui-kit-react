@@ -1,49 +1,215 @@
+<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "RadioButton",
+  "folder": "components/radio-button",
+  "kind": "component",
+  "category": "Form controls",
+  "status": "public",
+  "summary": "One option of a single-choice set, drawn as a labelled circle.",
+  "import": { "subpath": "components/radio-button", "barrel": true, "default": false },
+  "exports": ["RadioButton"],
+  "providers": ["ThemeProvider"],
+  "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
+  "related": ["radio-button-group", "checkbox", "toggle-button"],
+  "subComponents": [],
+  "testIds": ["radio-button"]
+} -->
+
 # RadioButton
 
-The `RadioButton` component allows you to create radio buttons with customizable labels, styles, and behaviors.
+One option of a single-choice set, drawn as a labelled circle. It is a `<label>` wrapping a
+visually hidden `<input type="radio">` and the kit's own circle icon.
 
-### Usage
+## Use this when / not when
 
-```js
+- Use for a single option you are placing by hand, usually alongside others that share a `name`.
+- Prefer [`RadioButtonGroup`](../radio-button-group/README.md) for a set: it owns the selected
+  value, wires every button to one handler and keeps them apart. Reach for this component only
+  when the options are not a plain list.
+- Not for an on/off setting — [`Checkbox`](../checkbox/README.md) or
+  [`ToggleButton`](../toggle-button/README.md) is that.
+- Not for more than a handful of options; a [`ComboBox`](../combobox/README.md) is kinder past
+  five or six.
+
+## Import
+
+```ts
 import { RadioButton } from "@onlyoffice/apps-ui-kit/components/radio-button";
 ```
 
-```jsx
-<RadioButton
-  name="fruits"
-  value="apple"
-  label="Sweet apple"
-  isChecked={false}
-  isDisabled={false}
-  orientation="vertical"
-  spacing="15px"
-  fontSize="14px"
-  fontWeight={400}
-  onChange={(e) => console.log(e.target.value)}
-/>
+Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
+
+`RadioButtonProps` is not exported — type a wrapper's props yourself.
+
+Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme` for the circle and text
+colours, which differ between the light and the dark theme.
+
+## Minimal example
+
+A set is several buttons sharing one `name`, each told whether it is the chosen one.
+
+```tsx
+import { useState } from "react";
+import { RadioButton } from "@onlyoffice/apps-ui-kit/components/radio-button";
+
+const ROLES = ["Viewer", "Editor", "Room admin"];
+
+export function RolePicker() {
+  const [role, setRole] = useState("Viewer");
+
+  return (
+    <div>
+      {ROLES.map((option) => (
+        <RadioButton
+          key={option}
+          name="role"
+          value={option}
+          label={option}
+          isChecked={role === option}
+          spacing="12px"
+          onClick={() => setRole(option)}
+        />
+      ))}
+    </div>
+  );
+}
 ```
 
-### Properties
+## Props
 
-| Props            |             Type             | Required |          Values          |  Default   | Description                                                                                                                               |
-| ---------------- | :--------------------------: | :------: | :----------------------: | :--------: | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `className`      |           `string`           |    -     |            -             |     -      | Additional CSS class for the root label element                                                                                           |
-| `id`             |           `string`           |    -     |            -             |     -      | HTML id attribute for the root label element                                                                                              |
-| `isChecked`      |          `boolean`           |    -     |            -             |  `false`   | Used as HTML `checked` property for the `<input>` tag                                                                                     |
-| `isDisabled`     |          `boolean`           |    -     |            -             |  `false`   | Used as HTML `disabled` property for the `<input>` tag                                                                                    |
-| `label`          |      `ReactNode/string`      |    -     |            -             |     -      | Label text or node to display next to the radio button. If not provided, value will be used as label                                      |
-| `fontSize`       |           `string`           |    -     |            -             |     -      | Font size for the label text                                                                                                              |
-| `fontWeight`     |           `number`           |    -     |            -             |     -      | Font weight for the label text                                                                                                            |
-| `name`           |           `string`           |   Yes    |            -             |     -      | Used as HTML `name` property for the `<input>` tag. Required for proper radio button group functionality                                  |
-| `onChange`       |          `function`          |    -     |            -             |     -      | Callback fired when radio button selection state changes                                                                                  |
-| `onClick`        |          `function`          |    -     |            -             |     -      | Callback fired when radio button is clicked                                                                                               |
-| `value`          |           `string`           |   Yes    |            -             |     -      | Used as HTML `value` property for the `<input>` tag. Facilitates identification of each radio button                                      |
-| `spacing`        |           `string`           |    -     |            -             |   `15px`   | Sets margin between radio buttons. For horizontal orientation, sets margin-inline-start. For vertical orientation, sets margin-block-end. |
-| `orientation`    | `"horizontal" \| "vertical"` |    -     | "horizontal", "vertical" | "vertical" | Layout orientation of radio buttons when used in a group                                                                                  |
-| `classNameInput` |           `string`           |    -     |            -             |     -      | Additional CSS class for the input element                                                                                                |
-| `autoFocus`      |          `boolean`           |    -     |            -             |  `false`   | Used as HTML `autoFocus` property for the `<input>` tag                                                                                   |
+<!-- props:start RadioButtonProps -->
 
-### Notes
+_Generated by `pnpm readme:props` from `RadioButtonProps` in `RadioButton.types.tsx`. Do not edit; edit the JSDoc._
 
-- Ensure that the `name` prop is unique within a group of radio buttons to ensure proper functionality.
-- The `orientation` and `spacing` props help in arranging multiple radio buttons in a group layout.
+| Prop             | Type                                                                                     | Required | Default          | Description                                                                                                                                                                                     |
+| ---------------- | ---------------------------------------------------------------------------------------- | -------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `autoFocus`      | `boolean`                                                                                | no       | –                | Whether the input takes focus on mount.                                                                                                                                                         |
+| `className`      | `string`                                                                                 | no       | –                | Applied to the label.                                                                                                                                                                           |
+| `classNameInput` | `string`                                                                                 | no       | –                | Applied to the visually hidden `<input>`.                                                                                                                                                       |
+| `fontSize`       | `string`                                                                                 | no       | –                | Font size of the text beside the button.                                                                                                                                                        |
+| `fontWeight`     | `number \| string`                                                                       | no       | –                | Font weight of that text.                                                                                                                                                                       |
+| `id`             | `string`                                                                                 | no       | –                | Applied to the label, not to the input.                                                                                                                                                         |
+| `isChecked`      | `boolean`                                                                                | no       | –                | Whether the button is filled in. It seeds the component's own state and is re-applied whenever it changes, so it works as a controlled value.                                                   |
+| `isDisabled`     | `boolean`                                                                                | no       | –                | Whether the input is disabled and the label greyed out.                                                                                                                                         |
+| `label`          | `ReactNode`                                                                              | no       | –                | What is written beside the button. `value` is used when this is left out.                                                                                                                       |
+| `name`           | `string`                                                                                 | no       | –                | `name` of the input. Buttons sharing one behave as a single choice.                                                                                                                             |
+| `onChange`       | `ChangeEventHandler<HTMLInputElement, HTMLInputElement>`                                 | no       | –                | Called on every change of the input. Giving it takes the component's own state handling out of the loop, so `isChecked` becomes the only thing that moves the dot — and `onClick` stops firing. |
+| `onClick`        | `(e: React.ChangeEvent<HTMLInputElement> \| React.MouseEvent<HTMLInputElement>) => void` | no       | –                | Called when the button is clicked — but only while `onChange` is not given. Passing `onChange` replaces the internal handler and this never fires.                                              |
+| `orientation`    | `RadioButtonOrientation`                                                                 | no       | `"vertical"`     | Which side the gap is put on. It only moves `spacing`; it does not lay anything out on its own.                                                                                                 |
+| `spacing`        | `string`                                                                                 | no       | –                | Gap to the neighbouring button, as a CSS length: `margin-inline-start` when horizontal, `margin-block-end` when vertical. There is no gap at all without it — the buttons touch.                |
+| `style`          | `CSSProperties`                                                                          | no       | –                | Applied to the label.                                                                                                                                                                           |
+| `testId`         | `string`                                                                                 | no       | `"radio-button"` | `data-testid` of the label.                                                                                                                                                                     |
+| `value`          | `number \| readonly string[] \| string`                                                  | no       | –                | `value` of the input, and the label when `label` is left out. It is what a group's `onClick` reads back off the event.                                                                          |
+
+<!-- props:end -->
+
+## Recipes
+
+### Disabled / read-only
+
+`isDisabled` disables the input and greys the label. There is no read-only state: a radio the
+user may see but not change has to be disabled, or rendered as text.
+
+```tsx
+import { RadioButton } from "@onlyoffice/apps-ui-kit/components/radio-button";
+
+export function LockedChoice({ chosen }: { chosen: string }) {
+  return (
+    <RadioButton
+      name="plan"
+      value={chosen}
+      label={`${chosen} (set by your administrator)`}
+      isChecked
+      isDisabled
+    />
+  );
+}
+```
+
+### Fully controlled, with `onChange`
+
+`onChange` replaces the component's internal toggle, which is what you want when the value
+lives in your state — but it also switches `onClick` off, so move the handler across.
+
+```tsx
+import { useState } from "react";
+import { RadioButton } from "@onlyoffice/apps-ui-kit/components/radio-button";
+
+export function ControlledChoice() {
+  const [plan, setPlan] = useState("monthly");
+
+  return (
+    <div>
+      {["monthly", "yearly"].map((option) => (
+        <RadioButton
+          key={option}
+          name="plan"
+          value={option}
+          label={option}
+          isChecked={plan === option}
+          spacing="8px"
+          onChange={(event) => setPlan(event.target.value)}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+## Behaviour the types don't state
+
+- **`onChange` and `onClick` are alternatives, not companions.** The component installs its own
+  change handler — which flips an internal `isChecked` and then calls `onClick` — only while
+  `onChange` is absent. Pass `onChange` and `onClick` is never called at all.
+- **It keeps its own checked state.** `isChecked` seeds it and re-applies on every change of the
+  prop, so a click moves the dot even if your state never changes. With `onChange` the internal
+  toggle is gone and only the prop moves it.
+- **Without `spacing` the buttons touch.** The gap is a custom property set from the prop, and
+  the rule that uses it is only switched on when the prop is truthy. There is no default gap,
+  whatever older documentation said.
+- **`spacing` skips an edge.** Horizontally it is not applied to the first button, vertically not
+  to the last, so the row or column is not padded at its ends.
+- **`orientation` lays nothing out.** It only decides which side `spacing` is applied to; the
+  buttons follow whatever your container does. Its default here is `vertical`, while
+  [`RadioButtonGroup`](../radio-button-group/README.md) defaults to `horizontal`.
+- **`id` lands on the label, not on the input**, so it cannot be the target of an external
+  `<label for>` — the input is already nested inside this one.
+- **The input is hidden but focusable** (`opacity: 0.0001`, `z-index: -1`), and nothing draws a
+  focus ring. A keyboard user moving through the set gets no visible cue.
+- `label` falls back to `value`, so a button with neither shows nothing beside the circle.
+
+## CSS variables
+
+| Variable                            | Default    | Effect                                |
+| ----------------------------------- | ---------- | ------------------------------------- |
+| `--radio-button-gap`                | `8px`      | Space between the circle and the text |
+| `--radio-button-background`         | theme bg   | Fill behind the circle                |
+| `--radio-button-label-color`        | theme text | Colour of the text                    |
+| `--radio-button-dot-color`          | theme text | The filled dot when checked           |
+| `--radio-button-circle-color`       | theme grey | The circle's outline                  |
+| `--radio-button-circle-hover-color` | theme grey | That outline on hover                 |
+
+`--radio-button-spacing` is written by the `spacing` prop; set the prop rather than the variable.
+
+## Accessibility
+
+- The markup is right — a real `<input type="radio">` inside its `<label>` — so the set is
+  reachable with Tab and traversable with the arrow keys as long as the buttons share a `name`.
+- **There is no focus ring.** The input is hidden with opacity, and no `:focus-visible` style
+  replaces the browser's own outline, so keyboard users cannot see where they are. Add one in
+  your application until the kit does.
+- Nothing groups the set: add a `<fieldset>` and `<legend>`, or a container with `role="radiogroup"`
+  and a label, or the options are announced with no question attached.
+- `isDisabled` disables the input properly, so it drops out of the tab order.
+
+## Test ids
+
+| Element   | `data-testid`               |
+| --------- | --------------------------- |
+| The label | `radio-button`, or `testId` |
+
+## Related
+
+- [`RadioButtonGroup`](../radio-button-group/README.md) — the set, with the selection handled.
+- [`Checkbox`](../checkbox/README.md) — for choices that are not exclusive.
+- [`ToggleButton`](../toggle-button/README.md) — for a single on/off setting.

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import type { ComposerAction } from "@onlyoffice/ai-chat";
+import type { ComposerAction, ExportFormat } from "@onlyoffice/ai-chat";
 
 import { getBrandName } from "../../../constants/brands";
 
@@ -15,6 +15,7 @@ import DeviceUploader, { type DeviceUploaderHandle } from "./device-uploader";
 import type { OnFilesAttached } from "./attach-files";
 import AttachDialog from "./attach-dialog";
 import SaveDialog from "./save-dialog";
+import { EXPORT_FORMAT_IDS, EXTENSION_BY_FORMAT } from "./export-format";
 import styles from "./styles.module.scss";
 
 export type FilesIntegration = {
@@ -22,6 +23,8 @@ export type FilesIntegration = {
   composerActions: ComposerAction[];
   // Message "Save as file" handler, wired into platform.file.saveAsFile.
   onSaveAsFile: SaveAsFileHandler;
+  // Thread export formats, wired into platform.file.getExportFormats.
+  exportFormats: ExportFormat[];
   // Dialogs + hidden device-upload input; render inside <AiAgentProviders> so
   // they resolve the stores/api/icon context.
   overlay: React.ReactNode;
@@ -55,15 +58,44 @@ export const useFilesIntegration = ({
   const [saveRequest, setSaveRequest] = React.useState<{
     content: string;
     defaultName: string;
+    format?: string;
     resolve: () => void;
   } | null>(null);
 
   const onSaveAsFile = React.useCallback<SaveAsFileHandler>(
-    (content, defaultName) =>
+    (content, defaultName, format) =>
       new Promise<void>((resolve) => {
-        setSaveRequest({ content, defaultName, resolve });
+        setSaveRequest({ content, defaultName, format, resolve });
       }),
     [],
+  );
+
+  // Order matters — it is the order of the "Export to…" submenu. Labels are
+  // ours, so the list is rebuilt on a language change. The extensions come
+  // from the same table the save dialog names the file with: the library
+  // builds its default file name from this `extension`, and the two drifting
+  // apart would send the dialog a name it then "corrects".
+  const exportFormats = React.useMemo<ExportFormat[]>(
+    () => [
+      {
+        id: EXPORT_FORMAT_IDS.pdf,
+        label: t("Common:ExportPdfDocument", { defaultValue: ".pdf document" }),
+        extension: EXTENSION_BY_FORMAT[EXPORT_FORMAT_IDS.pdf],
+      },
+      {
+        id: EXPORT_FORMAT_IDS.docx,
+        label: t("Common:ExportDocxDocument", {
+          defaultValue: ".docx document",
+        }),
+        extension: EXTENSION_BY_FORMAT[EXPORT_FORMAT_IDS.docx],
+      },
+      {
+        id: EXPORT_FORMAT_IDS.md,
+        label: t("Common:ExportMdFile", { defaultValue: ".md file" }),
+        extension: EXTENSION_BY_FORMAT[EXPORT_FORMAT_IDS.md],
+      },
+    ],
+    [t, i18n.language],
   );
 
   const finishSave = React.useCallback(() => {
@@ -107,6 +139,7 @@ export const useFilesIntegration = ({
         <SaveDialog
           content={saveRequest.content}
           defaultName={saveRequest.defaultName}
+          format={saveRequest.format}
           onFinish={finishSave}
         />
       ) : null}
@@ -118,5 +151,5 @@ export const useFilesIntegration = ({
     </>
   );
 
-  return { composerActions, onSaveAsFile, overlay };
+  return { composerActions, onSaveAsFile, exportFormats, overlay };
 };

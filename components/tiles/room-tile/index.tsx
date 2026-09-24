@@ -173,3 +173,4 @@ export const RoomTile = ({
     />
   );
 };
+export type { RoomTileProps, RoomItem, SelectOption } from "./RoomTile.types";

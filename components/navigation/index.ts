@@ -1,7 +1,7 @@
 import Navigation from "./Navigation";
 
-import { TTitles, TNavigationItem } from "./Navigation.types";
+import { TTitles, TNavigationItem, TNavigationProps } from "./Navigation.types";
 
-export type { TTitles, TNavigationItem };
+export type { TTitles, TNavigationItem, TNavigationProps };
 
 export default Navigation;

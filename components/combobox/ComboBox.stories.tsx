@@ -13,7 +13,7 @@ import { ComboBox } from "./ComboBox";
 import { ComboBoxDisplayType, ComboBoxSize } from "./ComboBox.enums";
 
 const meta = {
-  title: "UI/Interactive elements/ComboBox",
+  title: "UI/Form controls/ComboBox",
   component: ComboBox,
   parameters: {
     docs: {

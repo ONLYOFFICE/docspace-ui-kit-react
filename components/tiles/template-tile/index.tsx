@@ -95,3 +95,8 @@ export const TemplateTile = ({
     />
   );
 };
+export type {
+  TemplateTileProps,
+  TemplateItem,
+  SpaceQuotaProps,
+} from "./TemplateTile.types";

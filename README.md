@@ -18,6 +18,11 @@
 > built from this repository. See [CHANGELOG.md](CHANGELOG.md) — 4.0.0 renamed the package,
 > made it ESM-only and put an `exports` map in front of every subpath.
 
+> **New here?** [`docs/getting-started.md`](docs/getting-started.md) is the one page to read first:
+> what to install, the two providers to mount, why the stylesheet needs no import, and which
+> import form to use. [`docs/components.md`](docs/components.md) is the catalogue, with a table
+> for choosing between the components that are easy to confuse.
+
 > **Scope:** not every directory in this package is public API. Modules coupled to a DocSpace portal — `api/`, `billing/`, `selectors/`, `uploader/`, `ai-agent/`, `document-editor/` and `providers/api` — ship in the package but are intended for ONLYOFFICE's own products. See [`docs/public-api.md`](docs/public-api.md).
 
 ## Features ✨
@@ -499,7 +504,7 @@ import type { TFile, TFolder, TUser, TFileSecurity, TFolderSecurity, TRoomSecuri
 | [Text](./components/text/README.md)                                   | Typography component with various styling options                                                                               |
 | [TextInput](./components/text-input/README.md)                        | Input field for single-line strings with masking support                                                                        |
 | [Textarea](./components/textarea/README.md)                           | Multi-line text input with JSON formatting, line numbers, and copy functionality                                                |
-| [ThemeProvider](./components/theme-provider/README.md)                | Provider component for theme management with styled-components integration                                                      |
+| [ThemeProviderComponent](./components/theme-provider/README.md)       | The older theme provider; new code uses `ThemeProvider` from `providers/theme`                                                  |
 | [TimePicker](./components/time-picker/README.md)                      | Time input component for selecting time values                                                                                  |
 | [Toast](./components/toast/README.md)                                 | Notification component with success, error, warning, and info variants (see [i18n Setup](#i18n-setup))                          |
 | [ToggleButton](./components/toggle-button/README.md)                  | Customizable toggle button with loading and disabled states                                                                     |

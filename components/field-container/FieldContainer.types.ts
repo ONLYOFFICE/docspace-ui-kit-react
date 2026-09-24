@@ -16,7 +16,8 @@ export type FieldContainerProps = {
   labelVisible?: boolean;
   /** Field label text or element */
   labelText?: string | ReactNode;
-  /** Icon source URL */
+  /** Ignored. The component never reads this prop; pass an icon through `tooltipContent`
+   * or render it yourself inside `children`. */
   icon?: string;
   /** Renders the help button inline instead of in a separate div */
   inlineHelpButton?: boolean;
@@ -26,7 +27,8 @@ export type FieldContainerProps = {
   tooltipContent?: string | ReactNode;
   /** Global position of the tooltip */
   place?: TTooltipPlace;
-  /** Tooltip header content (displayed in aside) */
+  /** Ignored. The component never reads this prop and never passes a header to the help
+   * button. */
   helpButtonHeaderContent?: string;
   /** Maximum label width in horizontal alignment (e.g., "110px") */
   maxLabelWidth?: string;
@@ -40,12 +42,16 @@ export type FieldContainerProps = {
   id?: string;
   /** Inline CSS styles */
   style?: CSSProperties;
-  /** Right offset in pixels */
+  /** Ignored. The component never reads this prop; the inline help button's own offset is
+   * hard-coded to 0. */
   offsetRight?: number;
   /** Maximum width of the tooltip */
   tooltipMaxWidth?: string;
   /** Additional CSS class for tooltip */
   tooltipClass?: string;
 
+  /** `data-testid` of the container. The help button, when there is one, gets
+   * `<dataTestId>_help_button`.
+   * @default "field-container" */
   dataTestId?: string;
 };
