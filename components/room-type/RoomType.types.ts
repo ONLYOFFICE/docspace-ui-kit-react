@@ -13,11 +13,11 @@ export type RoomTypeProps = {
   id?: string;
   /** Written to `data-selected-id` and read by nothing else. Required all the same. */
   selectedId: string | number;
-  /** Called with the event when the row is clicked. On `listItem` and `dropdownButton` the arrow is a button of its own, so a click on it calls this twice. */
+  /** Called with the event when the row is clicked, once per click wherever inside the row it lands. A disabled row does not call it at all. */
   onClick: React.MouseEventHandler<HTMLElement>;
-  /** Greys the row out while `roomType` is `FormRoom`. It is styling only — the row still calls `onClick`. */
+  /** Greys the row out while `roomType` is `FormRoom`, marks it `aria-disabled` and stops it calling `onClick`. */
   disabledFormRoom?: boolean;
-  /** Greys the row out while `roomType` is `PublicRoom`. It is styling only — the row still calls `onClick`. */
+  /** Greys the row out while `roomType` is `PublicRoom`, marks it `aria-disabled` and stops it calling `onClick`. */
   disabledPublicRoom?: boolean;
   /** Replaces the title and the description with the "from template" wording, whatever `roomType` says, and switches the glyph to the template one. */
   isTemplate?: boolean;

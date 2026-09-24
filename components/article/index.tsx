@@ -309,17 +309,10 @@ const Article = ({
               ) : null}
               {!isMobile && isLiveChatAvailable ? (
                 <ArticleLiveChat
-                  isInfoPanelVisible={isInfoPanelVisible}
-                  withFloatingButton={
-                    !!withMainButton &&
-                    !!articleMainButtonContent &&
-                    isMobileArticle
-                  }
                   languageBaseName={languageBaseName}
                   zendeskEmail={zendeskEmail}
                   chatDisplayName={chatDisplayName}
                   zendeskKey={zendeskKey}
-                  showProgress={showProgress}
                   isShowLiveChat={isShowLiveChat}
                 />
               ) : null}

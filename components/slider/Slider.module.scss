@@ -102,7 +102,7 @@
     background-repeat: no-repeat;
     background-position: left center;
 
-    [dir="rtl"] & {
+    [data-dir="rtl"] & {
       background-position: right center;
     }
 

@@ -8,7 +8,7 @@ export type ColumnarInfoBarColumn = {
 };
 
 export type ColumnarInfoBarProps = {
-  /** Bold caption above the columns. It is a `div`, not a heading element, so it is not in the document outline. */
+  /** Bold caption above the columns, rendered as an `<h3>` and omitted entirely when empty. */
   headerText?: string;
   /** The label and value pairs, in order. An empty array renders the bar with nothing inside it. */
   columns: ColumnarInfoBarColumn[];
@@ -21,4 +21,9 @@ export type ColumnarInfoBarProps = {
   /** Which of the three looks to render: the warning bar with an accent edge, the bordered `neutral` card that slides open, or the padded `page` block whose columns are a two-column grid.
    * @default "default" */
   variant?: "default" | "neutral" | "page";
+  /**
+   * Accessible name of the close button (its `aria-label`). Defaults to the
+   * English `"Close"`; pass a translated string. Ignored without `onAction`.
+   */
+  closeLabel?: string;
 };

@@ -53,6 +53,16 @@
     }
 
     .circle {
+      // Native <button>: drop the user-agent box so it renders like the
+      // div it replaced (content-box, so 38px plus the 1px border as before).
+      // The focus ring is left to the browser.
+      appearance: none;
+      display: block;
+      box-sizing: content-box;
+      margin: 0;
+      padding: 0;
+      font: inherit;
+      color: inherit;
       position: relative;
       background: var(--quantity-picker-rectangle-color);
       border: 1px solid var(--quantity-picker-rectangle-color);
@@ -107,7 +117,7 @@
     &.isLarge {
       width: 140px;
     }
-    &.isContant {
+    &.isConstant {
       width: fit-content;
     }
   }

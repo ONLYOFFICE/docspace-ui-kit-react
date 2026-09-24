@@ -2,20 +2,81 @@ output:
   - meta
   - summary
 
-# Ordered cheapest-and-most-likely-to-fail first: a typical miss is a formatting
-# or lint slip, and there is no reason to find it after 2143 tests and a 40s
-# build. `skip_empty` is deliberately absent -- it only has an effect together
-# with a `files`/`glob` filter, and every command here runs over the whole tree.
-pre-push:
+# Ordered cheapest-and-most-likely-to-fail first -- a typical miss is a
+# formatting or lint slip, and there is no reason to find it after 2143 tests
+# and a 40s build.
+#
+# Two keys are what make that true, and both were once missing. `priority` sets
+# the order: lefthook sorts a hook's commands ALPHABETICALLY, so the order they
+# appear in this file counts for nothing, and `build` ran before `format` on
+# every push. `piped` stops at the first failure; without it lefthook runs the
+# rest anyway, so a formatting slip still paid for the build, the tests and the
+# tarball. Together they took a failing push from 78 seconds to 5. Add a command
+# here and give it a priority, or it lands wherever its name falls.
+#
+# `skip_empty` is deliberately absent -- it only has an effect together with a
+# `files`/`glob` filter, and every command here runs over the whole tree.
+# Formats what is being committed, so the tree never drifts between commits and
+# the `format` check below has nothing left to find. `stage_fixed` re-stages the
+# files Prettier rewrote, so the commit carries the formatted bytes rather than
+# leaving a dirty tree behind. Lefthook hides unstaged changes while this runs,
+# so a partially staged file commits only its staged hunks -- verified, not
+# assumed: a file staged with one edit and left with a second, unstaged one
+# commits the first alone and keeps the second in the working tree.
+#
+# `--ignore-unknown` skips what Prettier has no parser for, and Prettier reads
+# .prettierignore itself, so pnpm-lock.yaml, locales/, css/ and *.mdx are left
+# alone here exactly as they are by `pnpm format`. The glob is still worth
+# having: with no matching staged file lefthook skips the command outright
+# rather than starting node to do nothing.
+pre-commit:
   parallel: false
   commands:
     format:
-      run: pnpm format
+      glob: "*.{ts,tsx,js,jsx,mjs,cjs,json,jsonc,scss,css,html,md,yml,yaml}"
+      run: pnpm exec prettier --write --ignore-unknown {staged_files}
+      stage_fixed: true
+
+# A merge that git resolves by itself never runs pre-commit -- git runs
+# `pre-merge-commit` for that hook, and only falls back to `pre-commit` when the
+# merge conflicted and you conclude it with `git commit` by hand. So a merge
+# from a branch that was never formatted walked straight past the hook above and
+# failed the push instead: `release/v4.0.0` brought a stray blank line into
+# selectors/utils/hooks/useAgentsHelper.tsx that way. Same command as
+# pre-commit, for the same reason.
+pre-merge-commit:
+  parallel: false
+  commands:
+    format:
+      glob: "*.{ts,tsx,js,jsx,mjs,cjs,json,jsonc,scss,css,html,md,yml,yaml}"
+      run: pnpm exec prettier --write --ignore-unknown {staged_files}
+      stage_fixed: true
+
+pre-push:
+  parallel: false
+  # `piped` is what makes the ordering below worth anything. Without it lefthook
+  # runs every command even after one fails, so a formatting slip still paid for
+  # the build, the tests and the tarball before the push was refused -- 78
+  # seconds to report something found in 5. With it the hook stops at the first
+  # failure.
+  piped: true
+  commands:
+    # Fixes rather than just reporting: it rewrites the offending files with
+    # Prettier and then still stops the push, because a pre-push hook cannot
+    # rewrite the commits already being pushed. It names the files it changed
+    # and the amend command to fold them in. Passing straight through after
+    # rewriting would push the unformatted commits and leave the fix stranded
+    # in a dirty tree.
+    format:
+      priority: 1
+      run: pnpm format:gate
       follow: true
     lint:
+      priority: 2
       run: pnpm lint
       follow: true
     tsc:
+      priority: 3
       run: pnpm tsc
       follow: true
     # Structure and derived truth only; the `--compile` pass that type-checks
@@ -26,6 +87,7 @@ pre-push:
       run: pnpm check:readme && pnpm readme:props:check && pnpm readme:catalogue:check
       follow: true
     test:
+      priority: 4
       run: pnpm test
       follow: true
     # The gate used to stop at tsc, lint and test, which left the packaging
@@ -35,8 +97,10 @@ pre-push:
     # ones. All three fail in `build`, so build here, where the developer's own
     # platform is the one being tested. Adds about 30 seconds.
     build:
+      priority: 5
       run: pnpm build
       follow: true
     verify-package:
+      priority: 6
       run: pnpm verify:package
       follow: true

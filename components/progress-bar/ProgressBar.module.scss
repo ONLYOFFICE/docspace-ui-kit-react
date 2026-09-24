@@ -97,7 +97,7 @@
     );
     animation: loadingAnimation 1.5s ease-in-out infinite;
 
-    [dir="rtl"] & {
+    [data-dir="rtl"] & {
       animation-name: loadingAnimationRtl;
     }
   }

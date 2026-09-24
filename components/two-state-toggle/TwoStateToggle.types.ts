@@ -40,6 +40,12 @@ export type TwoStateToggleProps = {
    */
   confirmCancel?: string;
   /**
+   * Accessible name of the switch button. The English default is not
+   * translated for you.
+   * @default "Switch DocSpace design"
+   */
+  ariaLabel?: string;
+  /**
    * Called with the URL to go to — `/dashboard` or `/`, both hard-coded. Pass
    * your router's navigate here; without it the component assigns
    * `window.location.href` and the page reloads.

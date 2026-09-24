@@ -33,11 +33,27 @@
   "scss.validate": true,
   "css.lint.unknownProperties": "ignore",
 
+  // Format on save, through Prettier, for every language `pnpm format` covers.
+  // formatOnSave alone is not enough: without a per-language binding VS Code
+  // picks its own built-in formatter, which disagrees with Prettier, and the
+  // file flips back and forth between saving here and running the script. The
+  // extension reads .prettierrc.yaml and .prettierignore, so a save produces
+  // the same bytes as `pnpm format:fix` and skips pnpm-lock.yaml, locales/,
+  // css/ and *.mdx exactly as the script does.
   "editor.formatOnSave": true,
   "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
   "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
   "[javascript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[javascriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
   "[scss]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[css]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[html]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  // Markdown and YAML are a large part of what is committed here -- component
+  // READMEs, docs/, .claude/rules, lefthook.yml, the CI workflow -- and
+  // `prettier --check .` checks all of them, so they need the binding too.
+  // proseWrap is "preserve", so a save does not reflow paragraphs.
+  "[markdown]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[yaml]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
   // JSON goes to Prettier too. `pnpm format` runs Prettier over .json, so
   // binding these to VS Code's own formatter made the two disagree -- it keeps
   // a short object on one line, Prettier expands it past 80 columns -- and

@@ -32,7 +32,8 @@ export type ImageEditorProps = {
   className?: string;
   /** Hides the zoom row and freezes the crop position, leaving the picture as it is. */
   disableImageRescaling?: boolean;
-  /** Ignored. Nothing in this folder reads it; check the file's size in `onChangeFile` instead. */
+  /** Ignored. Nothing in this folder reads it; check the file's size in `onChangeFile` instead.
+   * @deprecated */
   maxImageSize?: number;
   /** Corner radius of the crop window in pixels, measured on the 648px canvas — half of it, 324, is a circle. */
   editorBorderRadius: number;

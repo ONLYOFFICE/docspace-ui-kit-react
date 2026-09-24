@@ -58,8 +58,7 @@
 
 .balanceInfo {
   color: var(--payment-dialog-text);
-  margin-right: 0;
-  margin-left: auto;
+  margin-inline: auto 0;
 
   &.warningColor {
     color: var(--warning-color);

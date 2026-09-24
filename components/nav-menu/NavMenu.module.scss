@@ -491,7 +491,7 @@
     height: 40px;
     border-radius: 6px;
 
-    :global([dir="rtl"]) & {
+    :global([data-dir="rtl"]) & {
       transform: translate(50%, -50%);
     }
   }

@@ -5,8 +5,9 @@
 //
 // Storybook still has to render an assistant answer, and the widget's markdown
 // renderer imports this module unconditionally -- an unresolved import throws
-// inside the message component and takes the whole story down with it. So the
-// Storybook dev server aliases the module to this stub.
+// inside the message component and takes the whole story down with it. So
+// Storybook, dev server and static build alike, aliases the module to this
+// stub.
 //
 // The widget's own `SyntaxHighlighter` already draws a plain, unhighlighted
 // block whenever `useShikiHighlighter` has not produced a highlighter yet (its

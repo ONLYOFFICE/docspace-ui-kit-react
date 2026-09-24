@@ -367,7 +367,7 @@
 
 .progressHeader {
   color: var(--text-primary);
-  margin-right: var(--ops-progress-header-margin, 8px);
+  margin-inline-end: var(--ops-progress-header-margin, 8px);
 
   &.withClick {
     cursor: pointer;

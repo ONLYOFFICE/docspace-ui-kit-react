@@ -31,7 +31,10 @@
   flex: 1;
 }
 
+// Rendered as an <h3>: reset the user-agent heading margin so it looks
+// exactly like the former <div>. font-size and font-weight are set below.
 .header {
+  margin: 0;
   padding: 14px 16px 0;
   font-size: 13px;
   font-weight: 600;

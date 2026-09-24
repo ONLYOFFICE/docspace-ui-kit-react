@@ -10,6 +10,25 @@ import styles from "./TwoStateToggle.module.scss";
 
 const LS_KEY = "useDocSpace";
 
+// Storage can throw (disabled site data, some private modes, sandboxed
+// frames). A failed read falls back to the new view; a failed write is
+// dropped, and the in-memory state and navigation still go ahead.
+const readStoredIsNew = (): boolean => {
+  try {
+    return localStorage.getItem(LS_KEY) !== "old";
+  } catch {
+    return true;
+  }
+};
+
+const writeStoredDesign = (value: "new" | "old") => {
+  try {
+    localStorage.setItem(LS_KEY, value);
+  } catch {
+    // Storage unavailable: nothing to persist to.
+  }
+};
+
 const TwoStateToggle = ({
   title = "DocSpace design",
   labelOld = "OLD",
@@ -19,14 +38,13 @@ const TwoStateToggle = ({
   confirmHint = "You can return to the new Dashboard at any time by navigating to /dashboard.",
   confirmOk = "Switch",
   confirmCancel = "Cancel",
+  ariaLabel = "Switch DocSpace design",
   onNavigate,
   className,
 }: TwoStateToggleProps) => {
   // isNew === true  → new Dashboard  (useDocSpace = "new")
   // isNew === false → classic DocSpace (useDocSpace = "old")
-  const [isNew, setIsNew] = React.useState(
-    () => localStorage.getItem(LS_KEY) !== "old",
-  );
+  const [isNew, setIsNew] = React.useState(readStoredIsNew);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
 
   const go = (url: string) => {
@@ -43,7 +61,7 @@ const TwoStateToggle = ({
       setConfirmOpen(true);
     } else {
       // OLD → NEW: update localStorage and navigate without full reload if possible
-      localStorage.setItem(LS_KEY, "new");
+      writeStoredDesign("new");
       setIsNew(true);
       go("/dashboard");
     }
@@ -51,7 +69,7 @@ const TwoStateToggle = ({
 
   const handleConfirm = () => {
     setConfirmOpen(false);
-    localStorage.setItem(LS_KEY, "old");
+    writeStoredDesign("old");
     setIsNew(false);
     go("/");
   };
@@ -68,7 +86,7 @@ const TwoStateToggle = ({
           type="button"
           role="switch"
           aria-checked={isNew}
-          aria-label="Switch DocSpace design"
+          aria-label={ariaLabel}
           onClick={handleToggleClick}
           className={styles.pill}
         >

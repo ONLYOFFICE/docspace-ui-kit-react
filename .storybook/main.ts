@@ -103,22 +103,40 @@ const config: StorybookConfig = {
       }),
     );
 
-    // `@onlyoffice/ai-chat` imports `react-shiki` from its markdown renderer.
-    // It is an optional peer that this package does not install, so the import
-    // is unresolved and the first assistant answer crashes the story. Point it
-    // at a stub that keeps the widget's own unhighlighted fallback.
+    // `@onlyoffice/ai-chat` declares most of its dependencies as optional
+    // peers, and this package installs only the ones it needs (see the
+    // `//devDependencies` note in package.json). The widget still imports the
+    // rest unconditionally, so every one of them has to resolve to something.
     //
-    // Twice, because the id has to resolve in two places: `resolve.alias` for
-    // the module graph, and the dependency optimizer, which prebundles
-    // `@onlyoffice/ai-chat` with its own rolldown resolver and does not read
-    // `resolve.alias` -- without the second one the prebundle emits a chunk
-    // that throws "Could not resolve react-shiki" the moment it is imported.
-    const reactShikiStub = path.resolve(__dirname, "stubs/react-shiki.mjs");
+    // `storybook dev` tolerated that on its own -- Vite leaves an unresolved
+    // optional peer to fail lazily -- but `storybook build` does not: rolldown
+    // resolves those imports against an empty placeholder module and stops with
+    // MISSING_EXPORT for each name. So each absent peer is aliased to a stub
+    // under `stubs/`, which throws only if something actually reaches it.
+    //
+    // Aliased twice, because the ids have to resolve in two places:
+    // `resolve.alias` for the module graph, and the dependency optimizer, which
+    // prebundles `@onlyoffice/ai-chat` with its own rolldown resolver and does
+    // not read `resolve.alias` -- without the second one the prebundle emits a
+    // chunk that throws "Could not resolve react-shiki" the moment it is
+    // imported.
+    const stub = (file: string) => path.resolve(__dirname, "stubs", file);
+
+    const missingAiChatPeers = {
+      "react-shiki": stub("react-shiki.mjs"),
+      openai: stub("openai.mjs"),
+      "@anthropic-ai/sdk": stub("anthropic-sdk.mjs"),
+      "@google/genai": stub("google-genai.mjs"),
+      "@mistralai/mistralai": stub("mistralai.mjs"),
+      codemirror: stub("codemirror.mjs"),
+      "@codemirror/state": stub("codemirror-state.mjs"),
+      "@codemirror/lang-json": stub("codemirror-lang-json.mjs"),
+    };
 
     config.resolve = config.resolve || {};
     config.resolve.alias = {
       ...config.resolve.alias,
-      "react-shiki": reactShikiStub,
+      ...missingAiChatPeers,
     };
 
     config.optimizeDeps = config.optimizeDeps || {};
@@ -126,7 +144,7 @@ const config: StorybookConfig = {
       ...config.optimizeDeps.rolldownOptions,
       resolve: {
         ...config.optimizeDeps.rolldownOptions?.resolve,
-        alias: { "react-shiki": reactShikiStub },
+        alias: { ...missingAiChatPeers },
       },
     };
 

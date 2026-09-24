@@ -230,6 +230,10 @@
   }
 }
 
+// The chevrons below are drawn, not laid out: two borders of a square form a
+// corner, and `rotate()` points it. `border-left` is geometry here, not
+// direction -- a logical `border-inline-start` would move the corner in RTL and
+// turn the rotated arrow sideways -- so it stays physical, as do the offsets.
 .arrowIcon {
   position: absolute;
   border-left: 2px solid;

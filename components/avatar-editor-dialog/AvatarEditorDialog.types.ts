@@ -15,7 +15,8 @@ export type AvatarEditorDialogProps = {
   /** Corner radius of the crop window in pixels, on the editor's 648px canvas.
    * @default 110 */
   editorBorderRadius?: number;
-  /** Ignored. It is handed to the image editor, which does not read it either; check the file's size in `onChangeFile`. */
+  /** Ignored. It is handed to the image editor, which does not read it either; check the file's size in `onChangeFile`.
+   * @deprecated */
   maxImageSize?: number;
   /** Value of `data-testid` on the dialog. */
   dataTestId?: string;
