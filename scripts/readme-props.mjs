@@ -19,8 +19,8 @@ import path from "node:path";
 
 import {
   ROOT,
-  componentFolders,
   createReadmeProgram,
+  documentedFolders,
 } from "./lib/readme-program.mjs";
 import {
   PROPS_BLOCK,
@@ -54,10 +54,16 @@ const parseArgs = (argv) => {
   return options;
 };
 
-/** `button`, `components/button` and `components\button` all name the folder. */
+/**
+ * `button`, `components/button` and `components\button` all name the folder.
+ * A provider is named with its root -- `providers/theme` -- because a bare name
+ * has always meant a component here.
+ */
 const normaliseFolder = (input) => {
   const posix = input.replaceAll("\\", "/").replace(/\/$/, "");
-  return posix.startsWith("components/") ? posix : `components/${posix}`;
+  return /^(components|providers)\//.test(posix)
+    ? posix
+    : `components/${posix}`;
 };
 
 const main = async () => {
@@ -65,7 +71,7 @@ const main = async () => {
   const folders =
     options.only.length > 0
       ? options.only.map(normaliseFolder)
-      : componentFolders();
+      : documentedFolders();
 
   const withReadme = folders.filter((folder) =>
     fs.existsSync(path.join(ROOT, folder, "README.md")),

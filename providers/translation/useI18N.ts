@@ -11,9 +11,13 @@ import type {
 import { getI18NInstance, type TTranslations } from "./i18n";
 
 export type UseI18NProps = {
+  /** Portal settings. Its `culture` is the fallback language and its `timezone` is published on `window`. Portal-internal. */
   settings?: SettingsDto;
+  /** The signed-in portal user, whose `cultureName` outranks the portal's culture. Portal-internal. */
   user?: EmployeeFullDto;
+  /** Language tag to translate into. It outranks both of the above. */
   locale?: string;
+  /** Language to namespace to a flat table of key and string. Without it no i18n context is installed at all. */
   translations?: TTranslations;
 };
 

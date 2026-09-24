@@ -7,7 +7,9 @@ import { ThemeProviderComponent } from "../../components/theme-provider";
 import useTheme, { type UseThemeProps } from "./useTheme";
 
 export type TThemeProvider = {
+  /** The tree the theme applies to. */
   children: React.ReactNode;
+  /** Language tag deciding the writing direction and the font family. */
   locale?: string;
 } & Pick<UseThemeProps, "initialTheme" | "systemTheme" | "colorTheme">;
 
