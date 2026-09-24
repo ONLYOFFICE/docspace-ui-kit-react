@@ -110,11 +110,6 @@ const meta = {
         defaultValue: { summary: "bottom" },
       },
     },
-    helpButtonHeaderContent: {
-      control: "text",
-      description:
-        "Custom header content for the help tooltip when using inline help button",
-    },
     className: {
       control: "text",
       description: "Additional CSS class names to apply to the container",
@@ -276,7 +271,6 @@ export const WithInlineHelp: Story = {
     ...Default.args,
     inlineHelpButton: true,
     tooltipContent: "This is an inline help message",
-    helpButtonHeaderContent: "Help Information",
     labelText: "Profile URL:",
   },
   parameters: {
@@ -291,7 +285,6 @@ export const WithInlineHelp: Story = {
   labelVisible
   inlineHelpButton
   tooltipContent="This is an inline help message"
-  helpButtonHeaderContent="Help Information"
 >
   <TextInput value={value} onChange={handleChange} />
 </FieldContainer>`,
