@@ -17,21 +17,20 @@ only resolves inside DocSpace-client.
 
 Three surfaces used to document a component and none of them agreed: this README, the story's
 `parameters.docs.description.component`, and the react-docgen prop table Storybook builds
-from the JSDoc on `*.types.ts`. The template collapses that into one. **The JSDoc is the
-single source for prop descriptions**, the README's prop table is generated from it, and the
-story no longer repeats any of it — it reads this file:
+from the JSDoc on `*.types.ts`. Two of the three are now tied together: **the JSDoc is the
+single source for prop descriptions**, and the README's prop table is generated from it, so no
+prop is described twice by hand.
 
-```ts
-import readme from "./README.md?raw";
-// parameters: { docs: { description: { component: readme } } }
-```
+The story's component description stays its own text, in the shape `STORY_TEMPLATE.md` sets —
+a short line, `### Features`, an optional `### Accessibility`, `### Usage`. Rendering this
+whole README there instead was tried on four components and reverted: a 260-line page does not
+fit that shape, and it carried sections a Storybook reader has no use for. What it bought,
+one text instead of two, is real and is now bought by discipline rather than by machinery —
+**when you change what a component does, the story's description is the second place to
+correct**, and nothing will fail if you forget.
 
-So a developer who opens Storybook to look at the component before handing it to an agent
-reads exactly what the agent will read, next to the live thing. The metadata block and the
-generator markers are HTML comments and render as nothing; that is verified, not assumed.
-
-This is also why the CSS-variable table and the accessibility notes live here rather than in
-the story: `package.json` publishes `components/**/README.md` and does not publish stories, so
+The CSS-variable table and the accessibility notes belong here rather than in the story either
+way: `package.json` publishes `components/**/README.md` and does not publish stories, so
 anything written only in a story does not exist for someone who installed the package.
 
 ## The skeleton

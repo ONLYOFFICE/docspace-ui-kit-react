@@ -95,11 +95,18 @@ still true, and all still unenforced.
 - Every component needs a story. `theme-provider` is the only one without; the file may sit in
   a subdirectory (`table`, `rows`, `tiles` do), so search recursively before concluding one is
   missing.
-- Stories no longer carry the prose. `parameters.docs.description.component` reads the
-  component's own README — `import readme from "./README.md?raw"` — so the page a developer
-  opens in Storybook and the file a coding agent reads are the same text, and neither can drift
-  from the other. The metadata block and the generator markers are HTML comments and render as
-  nothing; verified on the Button docs page.
+- **`STORY_TEMPLATE.md` governs stories, and it is the only file that does.**
+  `parameters.docs.description.component` is hand-written in its shape — a short line,
+  `### Features`, an optional `### Accessibility`, `### Usage`. Importing the README into it
+  with `?raw` was tried on four components and reverted in September 2026: a 260-line page does
+  not fit that template, and the four files were an unexplained exception among 146. This rule
+  used to state the opposite as settled fact while it was true of four files, which is how a
+  colleague following the template ended up contradicted by a rule. If the two ever disagree
+  again, `STORY_TEMPLATE.md` wins.
+- The consequence is that a component is described in two places by hand, and no gate compares
+  them. Correct both in the same commit, and expect the story's half to be the stale one: of the
+  two descriptions restored on the revert, one claimed `ModalDialog` traps focus, which it has
+  never done.
 - What stays in the story is what cannot be written down: the scenarios, the controls, the
   visual-regression surface. Feature lists, accessibility notes and the table of overridable
   `var(--x, fallback)` belong in the README, which is what `package.json` publishes — stories
