@@ -1,5 +1,75 @@
 # Change Log
 
+## Unreleased
+
+Every fault `docs/known-defects.md` collected is fixed — the eleven it opened with and the two
+the sweep turned up — and the file is gone. Four of these change what a consumer sees, so read
+_Changed_ before upgrading.
+
+### Changed
+
+- **The section header has its height and background back.** `--section-header-height` and
+  `--section-header-bg` were declared under `.header :global(.light)`, which compiles to
+  `.header .light` — a `.light` element _inside_ the header, which nothing is — so both
+  resolved to an invalid `var()` and were dropped. The header has been sizing to its content
+  and showing no background; it is now 69/61/53px as intended. The same mistake was in
+  `.infoPanelWrapper` and `.infoIcon`. **This changes the portal's layout**, which has been
+  rendering the collapsed version all along
+- **`TextInput`, `Textarea`, `Checkbox` and `ComboBox` no longer default `tabIndex` to `-1`.**
+  Every control built from them was out of the tab order, so a form could not be filled in from
+  the keyboard unless the caller passed `tabIndex={0}` to each one. Those explicit zeroes stay
+  valid and are now redundant; pass `-1` where you mean the keyboard to skip a control.
+  `DropDownItem` keeps its `-1` deliberately: an option inside a listbox belongs off the tab
+  order while the container holds focus, which is the active-descendant pattern it implements
+- **`ModalDialog` carries `role="dialog"` and `aria-modal` on the dialog surface**
+  (`#modal-dialog`) instead of on the click-to-close layer, which spans the whole viewport. A
+  test or stylesheet selecting `[role="dialog"]` now matches a different element
+- **`Aside` is a flex column and its body takes the space the header leaves.** The bottom
+  ~53px of a long body used to sit below the panel's edge, unreachable. If you pass
+  `withoutBodyScroll` and bring your own scroller, give it `flex: 1 1 0` and `min-height: 0`
+
+### Added
+
+- `FieldContainer` takes **`labelFor`**, the `id` of the control it labels. It rendered its
+  label with an empty `htmlFor`, so no caption in any form built from it was associated with
+  its field
+- `Textarea` takes **`aria-label`, `aria-labelledby` and `aria-describedby`**. Its props type
+  is closed — it accepts no arbitrary DOM attributes — so a multi-line field previously could
+  not be given an accessible name at all
+- `ModalDialog` takes the same three, and they reach the element carrying the role. An
+  `aria-label` used to be swept into the rest props and land on the internal header, and only
+  when a header was rendered
+- The three public providers — `theme`, `translation`, `error-boundary` — have READMEs on
+  `README_TEMPLATE.md`, with generated prop tables, and `check:readme` now covers
+  `providers/**` as well as `components/**`. 112 pages, up from 109
+
+### Removed
+
+- **Breaking, types only:** `FieldContainerProps.icon`, `.helpButtonHeaderContent` and
+  `.offsetRight`, and `WithTooltipProps.tooltipPlace` and `.tooltipFitToContent`. All five were
+  declared and read nowhere, so passing one now fails to compile rather than doing nothing;
+  runtime behaviour is unchanged. `omitTooltipProps` still strips the two tooltip names, so a
+  caller that has not caught up does not put them on the DOM
+- **`ThemeProvider` no longer imports the REST SDK as a value.** It awaited
+  `CommonSettingsApiAxiosParamCreator().getPortalColorTheme()`, which is the API SDK's
+  _parameter builder_: it returns `{ url, options }` and sends nothing, so the result was read
+  as a response and the branch ended in silence. The palette was never loaded, in the portal
+  either, unless `colorTheme` was passed. Removing it took `@onlyoffice/docspace-api-sdk` and
+  `axios` out of every application that mounts the provider — verified against `dist`. The
+  palette's type is still imported, as a type, and `colorTheme` is now the only way in
+
+- **`docs/known-defects.md` is no longer published.** It collected faults across components
+  until there were none left to collect. A fault is described in its own component's README,
+  which is where someone reading about that component will meet it, and what a fix means for a
+  consumer belongs here
+
+### Fixed
+
+- `ModalDialog` added a `touchend` listener inside its effect's teardown, where every sibling
+  line removed one; each re-run left another listener behind
+- `ThemeProvider` follows a `colorTheme` that arrives after the first render, instead of only
+  reading it once
+
 ## 4.0.0
 
 First release of this package under its own name and from its own repository. It was

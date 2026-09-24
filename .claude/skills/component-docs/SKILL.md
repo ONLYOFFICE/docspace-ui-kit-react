@@ -63,8 +63,13 @@ defects and surprises, which is what people fix:
 - a prop described as dead, after it became an alias;
 - an access described as throwing, after it was wrapped in `try`.
 
-All five are real, and all five reached a merge with every gate green. If the change makes an
-entry in `docs/known-defects.md` obsolete, remove it there in the same commit.
+All five are real, and all five reached a merge with every gate green.
+
+A component's own README is the only record of a fault in it. There used to be a
+`docs/known-defects.md` collecting them across components as well; it was emptied and removed
+once every entry was fixed, and a second place to say the same thing is a second place to go
+stale. So when a fix lands, correct the sentence in the README that described the fault — and
+put what it means for a consumer in `CHANGELOG.md`, which is where someone upgrading looks.
 
 ## Writing a story
 
