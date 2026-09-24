@@ -43,23 +43,20 @@
   border: 1px solid var(--time-input-border-v);
   border-radius: var(--time-input-radius-v);
 
-  transition: "all 0.2s ease 0s";
+  transition: all 0.2s ease 0s;
 
   display: flex;
   align-items: center;
 
   background-color: var(--time-input-bg-v);
 
-  &.hasError {
-    border-color: var(--time-input-error-border-v);
-  }
-
   &.isFocused {
     border-color: var(--time-input-focus-border-v);
   }
 
-  :focus {
-    border-color: var(--time-input-focus-border-v);
+  // after .isFocused, so the error colour stays while the field is edited
+  &.hasError {
+    border-color: var(--time-input-error-border-v);
   }
 
   & > input {
