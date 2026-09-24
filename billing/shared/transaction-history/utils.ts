@@ -104,7 +104,7 @@ export const TOKEN_USAGE_TOOLTIP_ID = "tokenUsageTooltip";
 export const getCachedTokensPercent = (usage: OperationTokenUsage) => {
   if (usage.promptTokens <= 0 || usage.cachedTokens <= 0) return null;
 
-  const percent = Math.round((usage.cachedTokens / usage.promptTokens) * 100);
+  const percent = Math.floor((usage.cachedTokens / usage.promptTokens) * 100);
 
   return percent > 0 ? percent : null;
 };
