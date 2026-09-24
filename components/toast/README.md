@@ -187,7 +187,10 @@ export async function uploadWithProgressToast(file: File) {
   `withCross` turns off close-on-click and draws a cross instead.
 - **The default title is translated at call time**, through the `Common` namespace — `Done`,
   `Warning`, `Alert`, `Info`. Without `TranslationProvider` the title is an empty string, and
-  the toast is drawn with a gap where it would be. Pass `null` to suppress it deliberately.
+  `sub-components/Toastr.tsx:93` renders the title only when it is truthy — so the toast comes
+  out with no title line at all rather than with a blank one. Passing `null` deliberately
+  reaches the same result, which is why a missing provider is easy to mistake for a design
+  decision.
 - **`toastr.error` accepts more than a string.** A React element or an array is rendered as is;
   an object with `response`, `statusText` or `message` is unwrapped; anything else becomes an
   empty toast.

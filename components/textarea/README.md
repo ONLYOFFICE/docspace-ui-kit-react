@@ -178,8 +178,11 @@ export function WebhookPayload() {
 - **It has a maximum width but no width.** The field caps at `--textarea-width` (1200px) and
   otherwise takes whatever width the layout gives it — which, as a flex or grid item, is the
   width of its content, not of the free space. In a flex row it collapses to a sliver that is
-  still focusable and still accepts text. Give it `width: 100%` or `flex: 1 1 auto` with
-  `min-width: 0` where the parent is a flex container.
+  still focusable and still accepts text. Give it `width: 100%` — or `flex: 1 1 auto` with
+  `min-width: 0` where the parent is a flex container — through `wrapperClassName`, which is
+  the only prop that reaches the element carrying the max-width. `style` does not: it is
+  spread onto the inner `Scrollbar`, whose own rule is already `width: 100% !important`, so a
+  width passed that way reads as though it had worked and changes nothing.
 - **It is out of the tab order by default.** `tabIndex` defaults to `-1`; pass `0` for a field
   the user is meant to reach with the keyboard. Every example above does.
 - **`isJSONField` overrides `hasError`.** In that mode the error state is recomputed from

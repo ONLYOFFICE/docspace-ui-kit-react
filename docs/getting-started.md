@@ -84,11 +84,7 @@ const translations: TTranslations = new Map([
 
 export function App() {
   return (
-    <ThemeProvider
-      initialTheme={ThemeKeys.BaseStr}
-      locale="en"
-      colorTheme={{ themes: [], selected: 0 }}
-    >
+    <ThemeProvider initialTheme={ThemeKeys.BaseStr} locale="en">
       <TranslationProvider locale="en" translations={translations}>
         <Button primary label="Save" onClick={() => {}} />
       </TranslationProvider>
@@ -134,8 +130,11 @@ it is easy to hand it one whose CSS and JavaScript sides disagree.
 ### TranslationProvider
 
 From `@onlyoffice/apps-ui-kit/providers/translation`. Several components have labels that are not
-props — the file-drop prompt, the "clear all" link in the filter bar, the collapse handle in the
-side panel, the operations progress button — and they read them from a shared i18next instance.
+props — the file picker's button label, the "clear all" link in the filter bar, the collapse
+handle in the side panel, the operations progress button — and they read them from a shared
+i18next instance. Eleven components do it: `article`, `color-picker`, `drop-down-item`,
+`file-input`, `filter`, `operations-progress-button`, `room-type`, `selector`, `table`, `tiles`
+and `toast`. `Dropzone` is **not** among them; its prompt is a prop like any other.
 
 **Without this provider those labels are empty strings.** Not missing-key placeholders: empty. A
 button renders at its full size with nothing written on it.
