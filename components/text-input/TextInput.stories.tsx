@@ -17,12 +17,22 @@ const meta = {
 
 ### Features
 
-- **Multiple Types**: text, password, email, tel, search, and number
-- **Three Sizes**: base, middle, and large
+- **Multiple Types**: Renders as a native text, password, email, tel, search or number field, so the browser supplies the matching keyboard and value rules
+- **Three Sizes**: 173px, 300px or 550px wide; the middle size renders its text semibold, the large one in a 16px font with taller padding
 - **Input Masking**: Format input with custom masks (e.g., date, phone)
 - **Validation States**: Error and warning visual indicators
 - **Full Width**: Scale to 100% width when needed
-- **Bold Text**: Option for bold font weight
+- **Text Weight**: \`isBold\` sets 600, \`fontWeight\` any other value; the middle size is 600 by default
+- **Content Direction**: Each value picks its own text direction (\`dir="auto"\`), so mixed-script text reads correctly in either interface direction
+- **Focus Control**: Left out of the Tab order unless \`tabIndex\` is set; \`isAutoFocussed\` focuses the field on mount
+
+### Accessibility
+
+The field is a native \`<input>\`, so typing, selection and screen-reader announcement come from the platform; the component adds:
+
+- \`tabIndex\` defaults to -1, so Tab skips the field; pass \`tabIndex={0}\` to reach it with the keyboard
+- Name the field with \`<label htmlFor>\` pointing at the \`id\` prop, or pass \`aria-label\`
+- \`isDisabled\` sets the native \`disabled\`, \`isReadOnly\` the native \`readonly\`; \`autoComplete\` is \`off\` unless set
 
 ### Usage
 
@@ -30,17 +40,20 @@ const meta = {
 import { TextInput, InputSize, InputType } from "@onlyoffice/apps-ui-kit/components/text-input";
 
 // Basic text input
-<TextInput value={value} onChange={handleChange} placeholder="Enter text" />
+<TextInput type={InputType.text} value={value} onChange={handleChange} placeholder="Enter text" />
 
 // With input mask
 <TextInput
+  type={InputType.text}
+  value={value}
+  onChange={handleChange}
   mask={[/\\d/, /\\d/, "/", /\\d/, /\\d/, "/", /\\d/, /\\d/, /\\d/, /\\d/]}
   placeholder="DD/MM/YYYY"
   guide
 />
 
 // Error state
-<TextInput hasError value="Invalid" />
+<TextInput type={InputType.text} value={value} onChange={handleChange} hasError />
 \`\`\``,
       },
     },
@@ -53,7 +66,8 @@ import { TextInput, InputSize, InputType } from "@onlyoffice/apps-ui-kit/compone
     size: {
       control: "select",
       options: Object.values(InputSize),
-      description: "Size variant of the input",
+      description:
+        "Width of the field: 173px, 300px or 550px; large also uses a 16px font, middle a semibold weight",
       table: {
         defaultValue: { summary: "base" },
       },
@@ -90,14 +104,14 @@ import { TextInput, InputSize, InputType } from "@onlyoffice/apps-ui-kit/compone
     },
     hasError: {
       control: "boolean",
-      description: "Show error state",
+      description: "Colors the border red, also while hovered and focused",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hasWarning: {
       control: "boolean",
-      description: "Show warning state",
+      description: "Colors the border orange, also while hovered and focused",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -126,6 +140,138 @@ import { TextInput, InputSize, InputType } from "@onlyoffice/apps-ui-kit/compone
     maxLength: {
       control: "number",
       description: "Maximum character length",
+      table: {
+        defaultValue: { summary: "255" },
+      },
+    },
+    fontWeight: {
+      control: "number",
+      description:
+        "CSS font weight of the text; `isBold` overrides it with 600",
+    },
+    tabIndex: {
+      control: "number",
+      description:
+        "Tab order of the field; the default -1 keeps it out of the Tab sequence, pass 0 to reach it with the keyboard",
+      table: {
+        defaultValue: { summary: "-1" },
+      },
+    },
+    isAutoFocussed: {
+      control: "boolean",
+      description: "Focuses the field when it mounts",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    dir: {
+      control: "select",
+      options: ["auto", "ltr", "rtl"],
+      description:
+        "Text direction of the value; `auto` lets each value pick its own from its first strong character",
+      table: {
+        defaultValue: { summary: '"auto"' },
+      },
+    },
+    inputMode: {
+      control: "select",
+      options: [
+        "none",
+        "text",
+        "decimal",
+        "numeric",
+        "tel",
+        "search",
+        "email",
+        "url",
+      ],
+      description: "Virtual keyboard layout on touch devices",
+    },
+    mask: {
+      control: false,
+      description:
+        "An array of literal characters and RegExps, or a function of the current value returning one; the value is formatted to it as the user types",
+    },
+    guide: {
+      control: "boolean",
+      description:
+        "Shows the whole mask up front, with underscores where characters are still missing; without it the mask grows as the user types",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    keepCharPositions: {
+      control: "boolean",
+      description:
+        "Typing or deleting a character leaves the others in place instead of shifting them along the mask",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    onChange: {
+      description:
+        "Called with the native change event on every edit; the stories wire it themselves to keep the field controlled",
+    },
+    onBlur: {
+      action: "onBlur",
+      description:
+        "Called with the native focus event when the field loses focus",
+    },
+    onFocus: {
+      action: "onFocus",
+      description:
+        "Called with the native focus event when the field gains focus",
+    },
+    onKeyDown: {
+      action: "onKeyDown",
+      description: "Called with the native keyboard event on every key press",
+    },
+    onClick: {
+      action: "onClick",
+      description: "Called with the native mouse event on click",
+    },
+    onContextMenu: {
+      action: "onContextMenu",
+      description: "Called with the native mouse event on right click",
+    },
+    id: {
+      control: "text",
+      description:
+        "HTML id of the input element, the target for `<label htmlFor>`",
+    },
+    name: {
+      control: "text",
+      description: "HTML name of the input element for form submission",
+    },
+    autoComplete: {
+      control: "text",
+      description: "HTML autocomplete of the input element",
+      table: {
+        defaultValue: { summary: '"off"' },
+      },
+    },
+    spellCheck: {
+      control: "boolean",
+      description: "HTML spellcheck of the input element",
+    },
+    className: {
+      control: "text",
+      description: "Extra class on the input element",
+    },
+    style: {
+      control: "object",
+      description: "Inline styles on the input element",
+    },
+    forwardedRef: {
+      control: false,
+      description: "Ref to the input element; not passed on when `mask` is set",
+    },
+    testId: {
+      control: "text",
+      description: "Value of data-testid on the input element",
+      table: {
+        defaultValue: { summary: '"text-input"' },
+      },
     },
   },
 } satisfies Meta<typeof TextInput>;
@@ -182,6 +328,22 @@ export const Default: Story = {
     withBorder: true,
     value: "",
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "An empty field with a placeholder, the shape most forms start from (`placeholder`); change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<TextInput
+  type={InputType.text}
+  value={value}
+  onChange={(e) => setValue(e.target.value)}
+  placeholder="Enter text here"
+/>`,
+      },
+    },
+  },
 };
 
 const SizesTemplate = () => {
@@ -212,7 +374,7 @@ export const Sizes: Story = {
     docs: {
       description: {
         story:
-          "TextInput supports three sizes: base, middle, and large for different UI contexts.",
+          "Pick the width by the room the form gives the field: 173px for a short value, 300px for most text, 550px for a long one (`size`); the middle size is also semibold, the large one uses a 16px font.",
       },
       source: {
         code: `<TextInput size={InputSize.base} value="Base size" />
@@ -242,7 +404,7 @@ export const Types: Story = {
     docs: {
       description: {
         story:
-          "TextInput supports text, password, email, tel, search, and number types.",
+          "Match `type` to the value so the browser supplies the right keyboard and value rules: password hides the characters, number rejects letters, email and tel bring up their own touch keyboards.",
       },
       source: {
         code: `<TextInput type={InputType.text} placeholder="Text" />
@@ -295,7 +457,7 @@ export const States: Story = {
     docs: {
       description: {
         story:
-          "TextInput supports multiple states: normal, error, warning, disabled, read-only, and borderless.",
+          "Every state the field can be in, side by side: a red border on `hasError`, an orange one on `hasWarning`, a grey box that ignores input on `isDisabled`, a field that blocks typing without changing its look on `isReadOnly`, and the bare text of `withBorder={false}` for inline use.",
       },
       source: {
         code: `<TextInput value="Normal" />
@@ -397,7 +559,7 @@ export const ScaledInputs: Story = {
     docs: {
       description: {
         story:
-          "Scale prop makes inputs expand to 100% of their container width.",
+          "Let the field fill its column instead of its size's fixed width, for form grids and side panels (`scale`); font size and padding still follow `size`.",
       },
       source: {
         code: `<TextInput scale size={InputSize.base} value="Scaled base" />
@@ -413,6 +575,7 @@ const BoldTemplate = () => {
     <Wrapper>
       <ControlledInput initialValue="Normal weight" />
       <ControlledInput initialValue="Bold weight" isBold />
+      <ControlledInput initialValue="Weight 700" fontWeight={700} />
     </Wrapper>
   );
 };
@@ -427,10 +590,13 @@ export const CssCustomization: Story = {
           gap: "12px",
           width: "300px",
           "--text-input-bg": "#f5f3ff",
-          "--text-input-border-color": "#7c3aed",
+          "--text-input-border-color": "#c4b5fd",
+          "--text-input-border-hover": "#7c3aed",
+          "--text-input-border-focus": "#4c1d95",
           "--text-input-font-size": "14px",
           "--text-input-radius": "8px",
           "--text-input-color": "#4c1d95",
+          "--text-input-disabled-bg": "#ddd6fe",
         } as CSSProperties
       }
     >
@@ -443,6 +609,7 @@ export const CssCustomization: Story = {
         type={InputType.text}
         value=""
         placeholder="Placeholder text"
+        style={{ "--text-input-placeholder-color": "#8b5cf6" } as CSSProperties}
         onChange={() => {}}
       />
       <TextInput
@@ -456,16 +623,45 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
+        story: `CSS Custom Properties for external customization. The first field shows the shared \`--text-input-*\` tokens; hover and focus it to see the two border variables. The second carries \`--text-input-placeholder-color\` in its own \`style\`, the only place it works. The third is disabled: the theme takes over its text and border, and only the radius, the font size and \`--text-input-disabled-bg\` still apply:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
 | \`--text-input-bg\` | Background color | theme token |
-| \`--text-input-border-color\` | Border color | theme token |
-| \`--text-input-color\` | Text color | theme token |
-| \`--text-input-font-size\` | Font size (all sizes) | \`13px\` / \`16px\` |
+| \`--text-input-border-color\` | Border color at rest | theme token |
+| \`--text-input-border-hover\` | Border color while hovered | theme token |
+| \`--text-input-border-focus\` | Border color while focused | theme token |
+| \`--text-input-color\` | Text and caret color | theme token |
+| \`--text-input-font-size\` | Font size (all sizes) | \`13px\` (base, middle) / \`16px\` (large) |
 | \`--text-input-radius\` | Border radius | theme token |
-| \`--text-input-placeholder-color\` | Placeholder text color | theme token |`,
+| \`--text-input-disabled-bg\` | Background color while disabled | theme token |
+| \`--text-input-placeholder-color\` | Placeholder text color; works only through the component's \`style\` prop, a value set on an ancestor is shadowed by the theme | theme token |`,
+      },
+      source: {
+        code: `<div
+  style={
+    {
+      "--text-input-bg": "#f5f3ff",
+      "--text-input-border-color": "#c4b5fd",
+      "--text-input-border-hover": "#7c3aed",
+      "--text-input-border-focus": "#4c1d95",
+      "--text-input-font-size": "14px",
+      "--text-input-radius": "8px",
+      "--text-input-color": "#4c1d95",
+      "--text-input-disabled-bg": "#ddd6fe",
+    } as CSSProperties
+  }
+>
+  <TextInput type={InputType.text} value="Custom styled input" onChange={() => {}} />
+  <TextInput
+    type={InputType.text}
+    value=""
+    placeholder="Placeholder text"
+    style={{ "--text-input-placeholder-color": "#8b5cf6" } as CSSProperties}
+    onChange={() => {}}
+  />
+  <TextInput type={InputType.text} value="Disabled" isDisabled onChange={() => {}} />
+</div>`,
       },
     },
   },
@@ -476,11 +672,43 @@ export const BoldText: Story = {
   parameters: {
     docs: {
       description: {
-        story: "The isBold prop sets font-weight to 600 for emphasized text.",
+        story:
+          "Emphasize a value with `isBold` (600) or pass any `fontWeight`; the middle size is already 600, so `isBold` changes nothing there.",
       },
       source: {
         code: `<TextInput value="Normal weight" />
-<TextInput value="Bold weight" isBold />`,
+<TextInput value="Bold weight" isBold />
+<TextInput value="Weight 700" fontWeight={700} />`,
+      },
+    },
+  },
+};
+
+const RightToLeftTemplate = () => {
+  return (
+    <div dir="rtl" style={{ display: "grid", gap: "16px", width: "300px" }}>
+      <ControlledInput placeholder="أدخل النص" />
+      <ControlledInput type={InputType.tel} placeholder="+1 (___) ___-____" />
+    </div>
+  );
+};
+
+// Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
+export const RightToLeft: Story = {
+  render: () => <RightToLeftTemplate />,
+  globals: { direction: "rtl" },
+  parameters: {
+    docs: {
+      story: { inline: false, height: "120px" },
+      description: {
+        story:
+          'The same fields under a right-to-left interface: the placeholder moves to the right edge and typed text starts from the right; the tel field keeps its placeholder left-to-right, so a phone number reads the same as in a left-to-right interface. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+      },
+      source: {
+        code: `<div dir="rtl">
+  <TextInput type={InputType.text} value={value} onChange={handleChange} placeholder="أدخل النص" />
+  <TextInput type={InputType.tel} value={phone} onChange={handlePhone} placeholder="+1 (___) ___-____" />
+</div>`,
       },
     },
   },

@@ -23,7 +23,7 @@ type HTMLInputProps = Omit<
 export type TextInputProps = HTMLInputProps & {
   /** Used as HTML `id` property */
   id?: string;
-  /** Forwarded ref */
+  /** Forwarded ref to the input element; not passed on when `mask` is set */
   forwardedRef?: React.Ref<HTMLInputElement>;
   /** Used as HTML `name` property */
   name?: string;
@@ -35,7 +35,7 @@ export type TextInputProps = HTMLInputProps & {
   maxLength?: number;
   /** Placeholder text for the input */
   placeholder?: string;
-  /** Used as HTML `tabindex` property */
+  /** Used as HTML `tabindex` property; defaults to -1, so Tab skips the field unless it is set */
   tabIndex?: number;
   /** Input text mask */
   mask?: Mask | ((value: string) => Mask);
@@ -83,7 +83,7 @@ export type TextInputProps = HTMLInputProps & {
   isBold?: boolean;
   /** Indicates that component contains border */
   withBorder?: boolean;
-  /** Text direction */
+  /** Text direction; defaults to `auto`, so each value picks its own */
   dir?: string;
   /** Input mode for virtual keyboard */
   inputMode?:
