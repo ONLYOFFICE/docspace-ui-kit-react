@@ -305,9 +305,12 @@ Rules:
 6. Remove anything stale the old README carried: `PUBLIC_DIR`, `@docspace/ui-kit`,
    `libs/ui-kit`, styled-components, sizes or defaults the source contradicts.
 7. `pnpm check:readme:full --only components/<folder>` until it is clean.
-8. Remove the folder from `scripts/readme-allowlist.json`.
-9. Commit as `<Name>: rewrite README`. When the JSDoc pass is large (Selector, Section,
+8. Commit as `<Name>: rewrite README`. When the JSDoc pass is large (Selector, Section,
    Table), split it into `<Name>: document props` first.
+
+`scripts/readme-allowlist.json` held the folders still on the old format while the rewrite was
+running. It is `[]` now, and every folder is checked; adding one back is how documentation stops
+being checked, not how a deadline is met.
 
 ## Checklist for each component
 
@@ -339,8 +342,8 @@ prop in the .types file (adding @portal and @default where the guide says), writ
 metadata block, run `pnpm readme:props --write --only components/<folder>`, write the hand
 sections — including at least three "Behaviour the types don't state" bullets found in the
 .module.scss, the component source and the tests — then run
-`pnpm check:readme:full --only components/<folder>` until clean, remove the folder from
-scripts/readme-allowlist.json, and commit as "<Name>: rewrite README".
+`pnpm check:readme:full --only components/<folder>` until clean, and commit as
+"<Name>: rewrite README".
 Do not edit anything between props:start and props:end by hand.
 ```
 

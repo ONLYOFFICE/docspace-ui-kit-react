@@ -35,8 +35,8 @@ shape.
 4. `pnpm readme:props --write --only components/<name>`. Never type between the markers.
 5. Write the hand sections, including at least three bullets under "Behaviour the types don't
    state", each traceable to the stylesheet, the source or a test.
-6. `pnpm check:readme:full --only components/<name>` until clean, then remove the folder from
-   `scripts/readme-allowlist.json`.
+6. `pnpm check:readme:full --only components/<name>` until clean. `scripts/readme-allowlist.json`
+   is `[]` and stays that way — a folder listed there is a folder nothing checks.
 
 The section with the real value is the last one: what the types cannot say. An own outer
 margin, a component with no intrinsic size, a callback that receives a value where every
@@ -44,6 +44,27 @@ sibling receives the event. It is the same material the plugin skill's trap list
 
 Do not invent behaviour. Read the component and its `.module.scss`; where you cannot tell, say
 nothing rather than guessing, and note what you left out.
+
+## Updating one after a change to the component
+
+Changing a signature is the easy case: `pnpm readme:props --write --only components/<name>`
+rewrites the table, and the gates fail if you forget. Changing what the component **does** is the
+case nothing catches. The prop table is generated; "Behaviour the types don't state",
+"Accessibility", "CSS variables" and the recipes are not, and `check:readme` cannot tell that a
+true sentence has become a false one.
+
+So after a behaviour change, re-read those four sections against the diff and ask of each bullet
+whether it is still true. The ones that go stale are exactly the ones worth having — they describe
+defects and surprises, which is what people fix:
+
+- an element described by its tag, after the tag changed (`div` → `<h3>`);
+- a state described as cosmetic, after it started blocking the handler;
+- a gap described as unclosable, after it was closed;
+- a prop described as dead, after it became an alias;
+- an access described as throwing, after it was wrapped in `try`.
+
+All five are real, and all five reached a merge with every gate green. If the change makes an
+entry in `docs/known-defects.md` obsolete, remove it there in the same commit.
 
 ## Writing a story
 
