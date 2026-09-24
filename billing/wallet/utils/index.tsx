@@ -34,7 +34,10 @@
  */
 
 import type { TTranslation } from "../../../utils/common";
-import { truncateNumberToFraction } from "../../utils/common";
+import {
+  formatNumber,
+  truncateNumberToFraction,
+} from "../../utils/common";
 
 const truncateNumberToFractionNumeric = (
   value: number,
@@ -144,9 +147,13 @@ export const accountingLedgersFormat = (
 
 export const getServiceQuantity = (
   t: TTranslation,
+  language: string,
   quantity: number,
   serviceUnit?: string,
 ) => {
   if (!serviceUnit) return "—";
-  return t("Common:UnitCount", { unit: serviceUnit, count: quantity });
+  return t("Common:UnitCount", {
+    unit: serviceUnit,
+    count: formatNumber(language, quantity),
+  });
 };

@@ -139,6 +139,9 @@ export const formatCurrencyValue = (
 export const formatPercentValue = (language: string, value: number) =>
   new Intl.NumberFormat(language, { maximumFractionDigits: 2 }).format(value);
 
+export const formatNumber = (language: string, value: number) =>
+  new Intl.NumberFormat(language).format(value);
+
 export const formatCompactNumber = (value: number, language = "en"): string =>
   new Intl.NumberFormat(language, {
     notation: value >= 1_000_000 ? "compact" : "standard",

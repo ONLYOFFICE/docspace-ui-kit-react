@@ -65,6 +65,7 @@ export type TooltipProps = Pick<
   | "offset"
   | "children"
   | "isOpen"
+  | "setIsOpen"
   | "clickable"
   | "openOnClick"
   | "float"

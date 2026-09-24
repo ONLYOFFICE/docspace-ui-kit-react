@@ -33,49 +33,53 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { observer } from "mobx-react";
+import type React from "react";
 
-import { RowContainer } from "../../../../../components/rows";
-import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
-import { useCommonTranslation } from "../../../../../utils/i18n";
-import { getServiceQuantity } from "../../../utils";
+import classNames from "classnames";
 
-import UpcomingPaymentRow from "./RowBody";
+import StatisticsIcon from "../../../../../../assets/icons/16/statistics.react.svg";
+import { useCommonTranslation } from "../../../../../../utils/i18n";
 
-const RowView = ({ sectionWidth }: { sectionWidth: number }) => {
-  const store = usePaymentStore();
-  const t = useCommonTranslation();
-  const { upcomingPayments, formatWalletCurrency, language } = store;
+import type { OperationTokenUsage } from "../../../../../store/PaymentStore";
+import {
+  TOKEN_USAGE_TOOLTIP_ID,
+  getCachedTokensPercent,
+  serializeTokenUsage,
+} from "../../../utils";
 
-  return (
-    <RowContainer
-      useReactWindow={false}
-      fetchMoreFiles={() => Promise.resolve()}
-      hasMoreFiles={false}
-      itemCount={upcomingPayments.length}
-      filesLength={upcomingPayments.length}
-      itemHeight={58}
-    >
-      {upcomingPayments.map((payment) => (
-        <UpcomingPaymentRow
-          key={payment.id}
-          sectionWidth={sectionWidth}
-          title={payment.title}
-          renewalDate={payment.renewalDate}
-          details={getServiceQuantity(
-            t,
-            language,
-            payment.quantity,
-            payment.unitOfMeasure,
-          )}
-          amount={formatWalletCurrency(payment.amount, 2)}
-          actionType={payment.actionType}
-          actionRoute={payment.actionRoute}
-        />
-      ))}
-    </RowContainer>
-  );
+import styles from "../TokenUsage.module.scss";
+
+type TokenUsageAnchorProps = {
+  usage?: OperationTokenUsage | null;
+  className?: string;
+  children?: React.ReactNode;
 };
 
-export default observer(RowView);
+export const TokenUsageAnchor = ({
+  usage,
+  className,
+  children,
+}: TokenUsageAnchorProps) => {
+  const t = useCommonTranslation();
 
+  if (!usage) return <>{children}</>;
+
+  const cached = getCachedTokensPercent(usage) !== null;
+
+  return (
+    <div
+      className={classNames(styles.anchor, className)}
+      data-tooltip-id={TOKEN_USAGE_TOOLTIP_ID}
+      data-tooltip-content={serializeTokenUsage(usage)}
+      data-testid="transaction_token_usage"
+      data-cached={cached}
+    >
+      <StatisticsIcon
+        className={classNames(styles.icon, { [styles.iconCached]: cached })}
+        role="img"
+        aria-label={t("TokenUsage")}
+      />
+      {children}
+    </div>
+  );
+};

@@ -58,7 +58,8 @@ const TableView = ({ sectionWidth }: UpcomingPaymentsTableViewProps) => {
   const paymentStore = usePaymentStore();
   const t = useCommonTranslation();
 
-  const { upcomingPayments, formatWalletCurrency, userId } = paymentStore;
+  const { upcomingPayments, formatWalletCurrency, userId, language } =
+    paymentStore;
 
   const columnStorageName = `${COLUMNS_SIZE}=${userId}`;
   const columnInfoPanelStorageName = `${INFO_PANEL_COLUMNS_SIZE}=${userId}`;
@@ -95,6 +96,7 @@ const TableView = ({ sectionWidth }: UpcomingPaymentsTableViewProps) => {
               type={payment.title}
               details={getServiceQuantity(
                 t,
+                language,
                 payment.quantity,
                 payment.unitOfMeasure,
               )}

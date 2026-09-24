@@ -81,6 +81,7 @@ const Tooltip = ({
   clickable,
   openOnClick,
   isOpen,
+  setIsOpen,
   float,
   noArrow = true,
   fallbackAxisSideDirection,
@@ -132,6 +133,7 @@ const Tooltip = ({
           float={float}
           place={place}
           isOpen={isOpen}
+          setIsOpen={setIsOpen}
           noArrow={noArrow}
           render={getContent}
           clickable={clickable}

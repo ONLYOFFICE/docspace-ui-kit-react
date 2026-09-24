@@ -35,13 +35,16 @@
 
 import type { TTranslation } from "../../../utils/common";
 import type {
+  OperationTokenUsage,
   TransactionSourceType,
   WalletOperationDto,
 } from "../../store/PaymentStore";
 import { AI_SEARCH, AI_TOOLS } from "../../constants";
 
-export const hasTransactionSource = (serviceName?: string) =>
+export const isAiServiceName = (serviceName?: string) =>
   serviceName === AI_TOOLS || serviceName === AI_SEARCH;
+
+export const hasTransactionSource = isAiServiceName;
 
 const getSourceTypeLabel = (t: TTranslation, type: TransactionSourceType) => {
   switch (type) {
@@ -95,3 +98,27 @@ export const getTransactionSourceLabel = (
 
   return typeLabel || sourceTitle || null;
 };
+
+export const TOKEN_USAGE_TOOLTIP_ID = "tokenUsageTooltip";
+
+export const getCachedTokensPercent = (usage: OperationTokenUsage) => {
+  if (usage.promptTokens <= 0 || usage.cachedTokens <= 0) return null;
+
+  const percent = Math.round((usage.cachedTokens / usage.promptTokens) * 100);
+
+  return percent > 0 ? percent : null;
+};
+
+export const getTokenUsageSegments = (usage: OperationTokenUsage) => ({
+  fromCache: usage.cachedTokens,
+  notFromCache: Math.max(usage.promptTokens - usage.cachedTokens, 0),
+  received: usage.completionTokens,
+});
+
+export const serializeTokenUsage = (usage: OperationTokenUsage) =>
+  JSON.stringify(usage);
+
+export const parseTokenUsage = (
+  content: string | null,
+): OperationTokenUsage | null =>
+  content ? (JSON.parse(content) as OperationTokenUsage) : null;
