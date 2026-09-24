@@ -948,10 +948,6 @@
       "origin": "unknown",
       "external": "ambient"
     },
-    "FilterInput": {
-      "kind": "variable",
-      "origin": "components/filter"
-    },
     "FilterKeys": {
       "kind": "enum",
       "origin": "unknown",
@@ -1914,10 +1910,6 @@
       "kind": "type",
       "origin": "unknown",
       "external": "ambient"
-    },
-    "StatusMessage": {
-      "kind": "variable",
-      "origin": "components/status-message"
     },
     "TAccessRight": {
       "kind": "type",
