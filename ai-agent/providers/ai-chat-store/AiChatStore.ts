@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, reaction } from "mobx";
 
 export type AiChatRouterPage =
   "chat" | "settings" | "history" | "initial-setup";
@@ -340,5 +340,33 @@ export const endAnalyzeOnChipRemoval = (
 ) => {
   if (!hasAnalyzeChip && store.isAnalyzeOnDraft) store.endAnalyzeMode();
 };
+
+/**
+ * Calls `onClosed` when the panel is closed while the analyzed form still
+ * owns a slot on the draft — on it (`pending`) or on its way there
+ * (`attaching`). After the first message the form is off the draft already,
+ * so a close then has nothing to undo.
+ *
+ * Watches the store instead of hooking `close` and `toggle`: both end the mode
+ * in the same action that hides the panel, so the phase the panel was closed
+ * in survives only as the reaction's previous value. The draft cleanup itself
+ * needs the lib stores and is left to the caller (`AiChatStoresBridge`).
+ *
+ * Returns the disposer.
+ */
+export const watchAnalyzeClose = (
+  store: AiChatStore,
+  onClosed: (phase: AnalyzeMode["phase"]) => void,
+) =>
+  reaction(
+    // The mode object is read later for its phase, which is mutated in place,
+    // so the previous value always carries the phase the panel closed in.
+    (): [boolean, AnalyzeMode | null] => [store.isVisible, store.analyzeMode],
+    ([isVisible], [wasVisible, mode]) => {
+      if (isVisible || !wasVisible || !mode) return;
+      if (mode.phase === "active") return;
+      onClosed(mode.phase);
+    },
+  );
 
 export default AiChatStore;

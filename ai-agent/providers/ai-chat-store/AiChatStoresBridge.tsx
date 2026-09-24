@@ -31,9 +31,10 @@ import { reaction } from "mobx";
 
 import { useStores } from "@onlyoffice/ai-chat";
 
+import { dropAnalyzeAttachment } from "../files/form-attachments";
 import { useAnalyzeLock } from "../files/use-analyze-lock";
 
-import { endAnalyzeOnChipRemoval } from "./AiChatStore";
+import { endAnalyzeOnChipRemoval, watchAnalyzeClose } from "./AiChatStore";
 import { useAiChatStore } from "./AiChatStoreProvider";
 
 // Sole Zustand → MobX sync point. Mirrors upstream router page and
@@ -67,6 +68,18 @@ const AiChatStoresBridge = () => {
   useEffect(() => {
     endAnalyzeOnChipRemoval(store, hasAnalyzeChip);
   }, [store, hasAnalyzeChip]);
+
+  useEffect(
+    () =>
+      // Closing the chat ends the analyze mode, and the form it attached goes
+      // with it — the rest of the draft is left alone.
+      watchAnalyzeClose(store, (phase) =>
+        dropAnalyzeAttachment(stores.useAttachmentsStore, {
+          inFlight: phase === "attaching",
+        }),
+      ),
+    [store, stores],
+  );
 
   useEffect(
     () =>

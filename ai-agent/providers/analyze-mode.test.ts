@@ -28,6 +28,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import AiChatStore, {
   endAnalyzeOnChipRemoval,
+  watchAnalyzeClose,
 } from "./ai-chat-store/AiChatStore";
 import {
   analyzeModeCallbacks,
@@ -150,6 +151,69 @@ describe("analyze mode edges", () => {
       callbacks().onThreadsUpdated?.({ kind: "switched" } as never);
 
       expect(store.isAnalyzeMode).toBe(false);
+    });
+  });
+
+  // The draft outlives the panel, so closing the chat has to take the form
+  // off it — but only while the form is still there, and only for a chat
+  // that was analyzing one.
+  describe("closing the panel", () => {
+    const watch = () => {
+      const phases: string[] = [];
+      const dispose = watchAnalyzeClose(store, (phase) => phases.push(phase));
+      return { phases, dispose };
+    };
+
+    beforeEach(() => {
+      store.open();
+    });
+
+    it("drops the form that is still on the draft", () => {
+      const { phases, dispose } = watch();
+
+      store.close();
+
+      expect(phases).toEqual(["pending"]);
+      dispose();
+    });
+
+    it("drops the form whose attach is still in flight", () => {
+      store.startAnalyzeMode({ entryId: "77", title: "Other.pdf" });
+      const { phases, dispose } = watch();
+
+      store.toggle();
+
+      expect(phases).toEqual(["attaching"]);
+      dispose();
+    });
+
+    it("leaves the draft alone once the message took the form", () => {
+      send();
+      const { phases, dispose } = watch();
+
+      store.close();
+
+      expect(phases).toEqual([]);
+      dispose();
+    });
+
+    it("leaves an ordinary chat's draft alone", () => {
+      store.endAnalyzeMode();
+      const { phases, dispose } = watch();
+
+      store.close();
+
+      expect(phases).toEqual([]);
+      dispose();
+    });
+
+    it("does not fire when the mode ends with the panel open", () => {
+      const { phases, dispose } = watch();
+
+      store.endAnalyzeMode();
+
+      expect(phases).toEqual([]);
+      dispose();
     });
   });
 

@@ -160,3 +160,45 @@ export const findAnalyzeAttachmentId = (
 export const hasAnalyzeAttachment = (
   useAttachmentsStore: AttachmentsStore,
 ): boolean => findAnalyzeAttachmentId(useAttachmentsStore) !== undefined;
+
+/**
+ * Takes the analyzed form off the draft, and nothing else.
+ *
+ * The draft outlives the panel, so without this a form attached by "Analyze
+ * responses" would still sit on the composer after the chat that was about it
+ * is closed — with the mode gone, as an ordinary file the user never picked.
+ * Ordinary attachments stay where they are: closing the panel keeps a plain
+ * draft, and only the analyze attach is undone.
+ *
+ * `attaching` means the form's record has not come back yet, so there is no
+ * ref to delete — only its loading chip. The analyze attach emptied the draft
+ * before reserving that chip and the cap admits nothing beside it, so every
+ * pending file chip is the form's; revoking the lease makes the settle drop
+ * the record (see `addAttachmentFile`), and an attach that settles with
+ * nothing reports nothing — the mode is not started again behind a closed
+ * panel.
+ */
+export const dropAnalyzeAttachment = (
+  useAttachmentsStore: AttachmentsStore,
+  { inFlight }: { inFlight: boolean },
+) => {
+  const state = useAttachmentsStore.getState();
+
+  if (inFlight) {
+    state.failPendingAttachments(
+      state.pendingAttachments
+        .filter((pending) => pending.kind === "file")
+        .map((pending) => pending.id),
+    );
+  }
+
+  const id = findAnalyzeAttachmentId(useAttachmentsStore);
+  if (!id) return;
+
+  // Best-effort, like the draft clear: a failed storage delete keeps the chip
+  // visible, and the user can still take it off by hand.
+  const remove = state.attachmentFiles.some((ref) => ref.id === id)
+    ? state.deleteAttachmentFile
+    : state.deleteAttachmentImage;
+  remove(id).catch(() => undefined);
+};
