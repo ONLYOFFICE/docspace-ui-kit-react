@@ -23,7 +23,6 @@ const InputComponent = ({
   isDisabled = false,
   isReadOnly = false,
   maxLength = 255,
-  tabIndex = -1,
   autoComplete = "off",
   placeholder = " ",
   dir = "auto",
@@ -31,6 +30,12 @@ const InputComponent = ({
   className = "",
 
   // Optional props without defaults
+  //
+  // `tabIndex` belongs here, not above: it used to default to `-1`, which took
+  // every field built from this component out of the tab order, so a form could
+  // not be filled in from the keyboard unless the caller passed `0` to each one.
+  // Undefined means no attribute, which is the natural order.
+  tabIndex,
   mask,
   forwardedRef,
   keepCharPositions,

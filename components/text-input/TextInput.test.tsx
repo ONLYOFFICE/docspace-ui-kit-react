@@ -136,6 +136,15 @@ describe("<TextInput />", () => {
     expect(input).toHaveAttribute("tabindex", "2");
   });
 
+  // It used to default to -1, which took every field built from this component
+  // out of the tab order: a form could not be filled in from the keyboard
+  // unless the caller passed tabIndex={0} to each one, and nothing said so.
+  it("is in the tab order when tabIndex is not given", () => {
+    render(<TextInput {...defaultProps} />);
+
+    expect(screen.getByTestId("text-input")).not.toHaveAttribute("tabindex");
+  });
+
   it("handles autoComplete attribute", () => {
     render(<TextInput {...defaultProps} autoComplete="off" />);
 

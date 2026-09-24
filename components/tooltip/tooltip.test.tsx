@@ -1198,6 +1198,10 @@ describe("<RootTooltip />", () => {
 });
 
 describe("omitTooltipProps", () => {
+  // `tooltipPlace` and `tooltipFitToContent` are no longer props of
+  // `WithTooltipProps` -- they were declared and read nowhere -- but the
+  // function still strips them, so a caller that has not caught up does not put
+  // them on the DOM as unknown attributes.
   it("removes tooltip-related props from object", () => {
     const props = {
       title: "Test title",

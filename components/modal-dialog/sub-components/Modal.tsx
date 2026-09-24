@@ -53,6 +53,9 @@ const Modal = ({
   scrollbarCreateContext,
   backdropVisible = true,
   closeOnBackdropClick = true,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
   ...rest
 }: ModalSubComponentsProps) => {
   const internalContentRef = React.useRef<null | HTMLDivElement>(null);
@@ -187,11 +190,14 @@ const Modal = ({
         })}
         zIndex={zIndex}
       >
+        {/* The click-to-close layer. It used to carry `role="dialog"` and
+            `aria-modal`, which put them on an element spanning the whole
+            viewport and left the dialog itself unnamed: `aria-label` from the
+            caller went into `...rest` and onto the header, and only when a
+            header was rendered at all. The role belongs on the content. */}
         <div
           id="modal-onMouseDown-close"
           className={dialogClassName}
-          role="dialog"
-          aria-modal="true"
           style={style}
           onMouseDown={validateOnMouseDown}
         >
@@ -199,6 +205,11 @@ const Modal = ({
             <div
               id="modal-dialog"
               ref={contentRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label={ariaLabel}
+              aria-labelledby={ariaLabelledBy}
+              aria-describedby={ariaDescribedBy}
               style={{ marginBottom: contentMarginBottom }}
               className={contentClassName}
               data-testid="modal-dialog"

@@ -25,11 +25,15 @@ import * as ts from "typescript";
 
 import {
   ROOT,
-  componentFolders,
   createExampleProgram,
   createReadmeProgram,
+  documentedFolders,
 } from "./lib/readme-program.mjs";
-import { parseMetadata, validateMetadata } from "./lib/readme-meta.mjs";
+import {
+  isProvider,
+  parseMetadata,
+  validateMetadata,
+} from "./lib/readme-meta.mjs";
 import {
   PROPS_BLOCK,
   formatMarkdown,
@@ -110,7 +114,11 @@ const parseArgs = (argv) => {
 
 const normaliseFolder = (input) => {
   const posix = input.replaceAll("\\", "/").replace(/\/$/, "");
-  return posix.startsWith("components/") ? posix : `components/${posix}`;
+  // A bare name is a component, which is what `--only button` has always meant;
+  // a provider has to be named with its root, as `--only providers/theme`.
+  return /^(components|providers)\//.test(posix)
+    ? posix
+    : `components/${posix}`;
 };
 
 const readAllowlist = () => {
@@ -150,7 +158,11 @@ const SECTIONS = [
   },
   { title: "CSS variables", optional: true },
   { title: "Accessibility" },
-  { title: "Test ids" },
+  {
+    title: "Test ids",
+    when: (meta) => !isProvider(meta),
+    because: "a component renders an element that a test has to find",
+  },
   { title: "Related" },
 ];
 
@@ -282,7 +294,7 @@ const shippedMatchers = () => {
  * Relative links in a page that ships, pointing at a file that does not.
  *
  * These read as working links here and are dead in the tarball, which is the
- * copy most people have: `docs/known-defects.md` shipped a link to
+ * copy most people have: a published `docs/` page shipped a link to
  * `README_TEMPLATE.md`, a contributor document `files` does not carry. Only
  * pages that ship are worth checking, and only links that resolve inside the
  * repository -- a link to a file that does not exist at all is a different
@@ -309,7 +321,7 @@ const unshippedLinks = (text, from, shipped) => {
 const main = async () => {
   const options = parseArgs(process.argv.slice(2));
   const allowlist = readAllowlist();
-  const all = componentFolders();
+  const all = documentedFolders();
 
   // A folder named explicitly is checked even while it is on the allowlist:
   // the rewrite procedure is "run this until it is clean, then take the folder
@@ -343,7 +355,7 @@ const main = async () => {
   // there says nothing about whether its component arrived. `AsideHeader` is in
   // the barrel through `components/aside`, and `Section` is not in it at all.
   const barrelNames = new Set();
-  for (const folder of barrel) {
+  for (const folder of [...barrel, ...kit.barrelFolders("providers")]) {
     for (const name of kit.folderExports(folder).names) barrelNames.add(name);
   }
 
@@ -406,7 +418,9 @@ const main = async () => {
 
     const storyCategory = categoryFromStory(folder);
 
-    if (storyCategory && storyCategory !== meta.category) {
+    // A provider has no category to disagree with: it appears in no section of
+    // the catalogue, and its story sits under `Providers/`, which maps to none.
+    if (!isProvider(meta) && storyCategory && storyCategory !== meta.category) {
       warn(
         "W_CATEGORY_STORY",
         folder,
@@ -536,7 +550,16 @@ const main = async () => {
     }
 
     for (const related of meta.related ?? []) {
-      const target = path.join(ROOT, "components", related, "README.md");
+      // Everything is relative to `components/` unless it names another root:
+      // `tiles/room-tile` is a nested component, `providers/theme` is not a
+      // component at all. Only a leading root switches the base.
+      const target = path.join(
+        ROOT,
+        /^providers\//.test(related)
+          ? related
+          : path.join("components", related),
+        "README.md",
+      );
       if (!fs.existsSync(target)) {
         error(
           "E_META_RELATED",

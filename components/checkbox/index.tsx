@@ -58,7 +58,10 @@ const CheckboxPure = ({
   isIndeterminate = false,
   isDisabled,
   name,
-  tabIndex = -1,
+  // The focusable element is the icon, not the hidden input below -- so this
+  // defaulting to -1 took the whole control out of the tab order, and every
+  // caller had to pass 0 to get a checkbox a keyboard could reach.
+  tabIndex = 0,
   helpButton,
   dataTestId,
   ...rest
@@ -120,7 +123,7 @@ const CheckboxPure = ({
         {...rest}
       />
       <RenderCheckboxIcon
-        tabIndex={tabIndex || 0}
+        tabIndex={tabIndex}
         isChecked={checked || false}
         isIndeterminate={isIndeterminate || false}
       />

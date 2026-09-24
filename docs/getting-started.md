@@ -115,13 +115,12 @@ class on `<body>`, `ltr` or `rtl` beside it, `data-theme` and `data-dir` on `<ht
   it: the provider listens for changes to that media query for as long as it is mounted.
 - `locale` — a language tag. It decides two things: the writing direction, from a list of
   thirteen right-to-left languages, and the font family.
-- **`colorTheme` — the portal's accent palette; an application of its own leaves it out.** The
-  provider looks as though it asks a portal for the palette when the prop is absent, but the call
-  it makes is the API SDK's _parameter builder_: it returns `{ url, options }` and sends nothing,
-  the result is read as a response, and the branch quietly ends. No request, no rejection, no
-  retry — the kit's own accent is kept. That dead call is what puts the REST client and `axios`
-  into every application that mounts this provider; see
-  [`known-defects.md`](known-defects.md).
+- **`colorTheme` — the portal's accent palette; an application of its own leaves it out**, and
+  the kit's own accent is used. Nothing is fetched: this prop is the only way a palette gets in.
+  The provider used to look as though it asked a portal when the prop was absent, but the call
+  was the API SDK's _parameter builder_ — it returns `{ url, options }` and sends nothing — and
+  that dead call dragged the REST client and `axios` into every application that mounted the
+  provider. Both are gone.
 
 Do not mount `ThemeProviderComponent` from `components/theme-provider` yourself. It is the older
 layer this provider is built on; used directly it takes a full theme object rather than a name, and
