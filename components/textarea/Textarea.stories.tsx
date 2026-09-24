@@ -479,13 +479,19 @@ export const CssCustomization: Story = {
     <div
       style={
         {
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
           width: "300px",
           "--text-input-bg": "#f5f3ff",
-          "--text-input-border-color": "#7c3aed",
+          "--text-input-border-color": "#c4b5fd",
+          "--text-input-border-hover": "#7c3aed",
+          "--text-input-border-focus": "#4c1d95",
           "--text-input-color": "#4c1d95",
           "--text-input-radius": "8px",
-          "--textarea-padding": "8px 12px 4px",
+          "--textarea-padding": "6px 12px 4px",
           "--textarea-height-custom": "120px",
+          "--textarea-numeration-text-color": "#8b5cf6",
         } as CSSProperties
       }
     >
@@ -493,12 +499,17 @@ export const CssCustomization: Story = {
         value="Custom styled textarea with CSS variables"
         onChange={() => {}}
       />
+      <Textarea
+        value={"First line\nSecond line\nThird line"}
+        hasNumeration
+        onChange={() => {}}
+      />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
+        story: `CSS Custom Properties for external customization. The first field shows the shared \`--text-input-*\` tokens; hover and focus it to see the two border variables. The second adds \`hasNumeration\`, the only state in which \`--textarea-numeration-text-color\` has anything to color:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
@@ -508,7 +519,7 @@ export const CssCustomization: Story = {
 | \`--text-input-border-focus\` | Border color while focused | theme token |
 | \`--text-input-color\` | Text and caret color | theme token |
 | \`--text-input-radius\` | Border radius | theme token |
-| \`--textarea-font-size\` | Font size of the line numbers when \`hasNumeration\` is set and \`fontSize\` is left at 13; the text itself follows the \`fontSize\` prop | \`13px\` |
+| \`--textarea-font-size\` | Font size of the line numbers when \`hasNumeration\` is set and \`fontSize\` is left at 13; the text itself follows the \`fontSize\` prop, so any other value puts the numbers out of step with the lines | \`13px\` |
 | \`--textarea-padding\` | Top, end and bottom padding of the text; the start side stays 8px, or the line-number gutter when \`hasNumeration\` is set | \`5px 8px 2px\` |
 | \`--textarea-numeration-text-color\` | Line number color when \`hasNumeration\` is set | theme token |
 | \`--textarea-width\` | Max width | \`1200px\` |
@@ -522,15 +533,19 @@ export const CssCustomization: Story = {
   style={
     {
       "--text-input-bg": "#f5f3ff",
-      "--text-input-border-color": "#7c3aed",
+      "--text-input-border-color": "#c4b5fd",
+      "--text-input-border-hover": "#7c3aed",
+      "--text-input-border-focus": "#4c1d95",
       "--text-input-color": "#4c1d95",
       "--text-input-radius": "8px",
-      "--textarea-padding": "8px 12px 4px",
+      "--textarea-padding": "6px 12px 4px",
       "--textarea-height-custom": "120px",
+      "--textarea-numeration-text-color": "#8b5cf6",
     } as CSSProperties
   }
 >
   <Textarea value="Custom styled textarea with CSS variables" onChange={() => {}} />
+  <Textarea value={"First line\\nSecond line\\nThird line"} hasNumeration onChange={() => {}} />
 </div>`,
       },
     },

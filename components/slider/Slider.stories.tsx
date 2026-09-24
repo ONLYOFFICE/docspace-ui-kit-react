@@ -309,6 +309,7 @@ export const CssCustomization: Story = {
             padding: "20px",
             "--slider-handle-color": "#7c3aed",
             "--slider-pouring-image": "linear-gradient(#7c3aed, #7c3aed)",
+            "--slider-background-color": "#ede9fe",
             "--slider-size": "12px",
             "--slider-handle-size": "28px",
             "--slider-track-radius": "6px",
@@ -324,18 +325,19 @@ export const CssCustomization: Story = {
             setValue(Number(e.target.value))
           }
         />
+        <Slider min={0} max={100} value={40} withPouring isDisabled />
       </div>
     );
   },
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
+        story: `CSS Custom Properties for external customization. The second slider is disabled: the theme does not swap in its own colors there, it mixes the disabled thumb and fill from \`--slider-handle-color\`, so a custom accent survives as a dimmed version of itself:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--slider-handle-color\` | Thumb background color | theme token |
-| \`--slider-pouring-image\` | Fill image for the poured portion, applied only with \`withPouring\` (must be a \`linear-gradient\` or other \`<image>\`) | theme token |
+| \`--slider-handle-color\` | Thumb background color; the disabled thumb and fill are mixed from it | theme token |
+| \`--slider-pouring-image\` | Fill image for the poured portion, applied only with \`withPouring\` and while enabled (must be a \`linear-gradient\` or other \`<image>\`) | theme token |
 | \`--slider-background-color\` | Track (unfilled) background color | theme token |
 | \`--slider-size\` | Track height | \`8px\` |
 | \`--slider-handle-size\` | Thumb width and height | \`24px\` |
@@ -346,12 +348,14 @@ export const CssCustomization: Story = {
   style={{
     "--slider-handle-color": "#7c3aed",
     "--slider-pouring-image": "linear-gradient(#7c3aed, #7c3aed)",
+    "--slider-background-color": "#ede9fe",
     "--slider-size": "12px",
     "--slider-handle-size": "28px",
     "--slider-track-radius": "6px",
   }}
 >
   <Slider min={0} max={100} value={value} withPouring onChange={handleChange} />
+  <Slider min={0} max={100} value={40} withPouring isDisabled />
 </div>`,
       },
     },
