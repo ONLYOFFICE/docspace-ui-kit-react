@@ -2,10 +2,14 @@
 
 import React from "react";
 import { match, P } from "ts-pattern";
-import {
-  type CustomColorThemesSettingsDto,
-  type CustomColorThemesSettingsItem,
-  CommonSettingsApiAxiosParamCreator,
+// Types only, and deliberately so: this file used to import
+// `CommonSettingsApiAxiosParamCreator` as a value, which put the whole REST SDK
+// -- and `axios`, which it depends on -- into every application that mounted
+// ThemeProvider, for a call that never sent a request. A type import is erased
+// at build time, so the palette's shape stays described and nothing ships.
+import type {
+  CustomColorThemesSettingsDto,
+  CustomColorThemesSettingsItem,
 } from "@onlyoffice/docspace-api-sdk";
 
 import { getSystemTheme } from "../../utils/get-system-theme";
@@ -64,9 +68,13 @@ function resolveTheme(
 }
 
 export type UseThemeProps = {
+  /** Theme to start on. Left out, the system's own preference is followed. */
   initialTheme?: ThemeKeys;
+  /** Theme to treat as the system's, instead of reading `prefers-color-scheme`. */
   systemTheme?: ThemeKeys;
+  /** The portal's accent palette. Outside the portal there is none — leave it out. */
   colorTheme?: CustomColorThemesSettingsDto;
+  /** Language tag deciding the writing direction and the font family. */
   lang?: string;
 };
 
@@ -86,22 +94,15 @@ const useTheme = ({
     resolveTheme(initialTheme, systemTheme, effectiveLang, currentColorTheme),
   );
 
-  const isRequestRunning = React.useRef(false);
-
-  const getCurrentColorTheme = React.useCallback(async () => {
-    if (isRequestRunning.current || colorTheme) return;
-    isRequestRunning.current = true;
-
-    const colorThemes =
-      (await CommonSettingsApiAxiosParamCreator().getPortalColorTheme()) as CustomColorThemesSettingsDto;
-    // const colorThemes = await getAppearanceTheme();
-
-    const curColorTheme = colorThemes.themes?.find(
-      (t) => t.id === colorThemes.selected,
-    );
-
-    isRequestRunning.current = false;
-    if (curColorTheme) setCurrentColorTheme(curColorTheme);
+  // `colorTheme` is the only way a palette gets in. What stood here was an
+  // `await` on the API SDK's *parameter builder*: it returns `{ url, options }`
+  // and sends nothing, the result was read as a response, `.themes` on it was
+  // undefined, and the branch ended without so much as a rejection. Keeping it
+  // cost every consumer the REST client and axios for a call that could not
+  // succeed; a portal that wants its accent applied passes it as a prop, which
+  // is what the portal already does.
+  React.useEffect(() => {
+    setCurrentColorTheme(findColorTheme(colorTheme));
   }, [colorTheme]);
 
   const getUserTheme = React.useCallback(() => {
@@ -111,10 +112,6 @@ const useTheme = ({
 
     setCookie(SYSTEM_THEME_KEY, getSystemTheme());
   }, [effectiveLang, initialTheme, systemTheme, currentColorTheme]);
-
-  React.useEffect(() => {
-    getCurrentColorTheme();
-  }, [getCurrentColorTheme]);
 
   React.useEffect(() => {
     getUserTheme();
