@@ -44,7 +44,7 @@
   },
   "//peerDependencies": "Only packages this library imports directly. Transitive dependencies of @onlyoffice/ai-chat (the assistant-ui, radix, codemirror, LLM-vendor SDKs and friends) are declared by ai-chat itself as its own peers -- re-declaring them here duplicated a list nothing kept in sync. Everything below is verified imported somewhere under this package root.",
   "peerDependencies": {
-    "@onlyoffice/ai-chat": "^0.5.113",
+    "@onlyoffice/ai-chat": "^0.5.121",
     "@onlyoffice/document-editor-react": "2.1.1",
     "@socket.io/component-emitter": "3.1.2",
     "axios": "^1.19.0",
@@ -151,7 +151,7 @@
     "@assistant-ui/react": "^0.11.58",
     "@assistant-ui/react-markdown": "^0.11.10",
     "@biomejs/biome": "2.4.16",
-    "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.5.115.tgz",
+    "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.5.121.tgz",
     "@onlyoffice/document-editor-react": "2.1.1",
     "@playwright/test": "1.58.1",
     "@radix-ui/react-dialog": "^1.1.23",
@@ -184,8 +184,8 @@
     "@types/react-virtualized": "9.21.30",
     "@types/react-window": "1.8.8",
     "@types/react-window-infinite-loader": "1.0.9",
-    "@vitest/coverage-v8": "4.1.8",
-    "@vitest/ui": "4.1.8",
+    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/ui": "4.1.11",
     "@vueless/storybook-dark-mode": "^10.0.8",
     "assistant-stream": "^0.2.47",
     "axios": "^1.19.0",
@@ -221,7 +221,7 @@
     "typescript": "5.9.3",
     "vite": "^8.2.0",
     "vite-plugin-svgr": "^4.5.0",
-    "vitest": "4.1.8",
+    "vitest": "4.1.11",
     "zustand": "^5.0.15"
   },
   "keywords": [
