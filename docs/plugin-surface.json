@@ -94,6 +94,10 @@
       "origin": "unknown",
       "external": "ambient"
     },
+    "Article": {
+      "kind": "variable",
+      "origin": "components/article"
+    },
     "ArticleHideMenuIcon": {
       "kind": "variable",
       "origin": "unknown",
@@ -944,6 +948,10 @@
       "origin": "unknown",
       "external": "ambient"
     },
+    "FilterInput": {
+      "kind": "variable",
+      "origin": "components/filter"
+    },
     "FilterKeys": {
       "kind": "enum",
       "origin": "unknown",
@@ -1364,6 +1372,10 @@
       "origin": "unknown",
       "external": "ambient"
     },
+    "Navigation": {
+      "kind": "other",
+      "origin": "components/navigation"
+    },
     "NewItemDropDownProps": {
       "kind": "type",
       "origin": "unknown",
@@ -1774,6 +1786,10 @@
       "origin": "unknown",
       "external": "ambient"
     },
+    "Section": {
+      "kind": "variable",
+      "origin": "components/section"
+    },
     "SectionProps": {
       "kind": "type",
       "origin": "unknown",
@@ -1898,6 +1914,10 @@
       "kind": "type",
       "origin": "unknown",
       "external": "ambient"
+    },
+    "StatusMessage": {
+      "kind": "variable",
+      "origin": "components/status-message"
     },
     "TAccessRight": {
       "kind": "type",
