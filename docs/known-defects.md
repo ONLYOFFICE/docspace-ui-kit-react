@@ -1,7 +1,7 @@
 # Known defects
 
-Found while rewriting the component READMEs against
-[`README_TEMPLATE.md`](../README_TEMPLATE.md). Each is a fault in the component, not in its
+Found while rewriting the component READMEs against `README_TEMPLATE.md`, which lives in the
+repository rather than in the published package. Each is a fault in the component, not in its
 documentation: the READMEs describe the behaviour as it is, and this list is what should change so
 that the description can change with it.
 

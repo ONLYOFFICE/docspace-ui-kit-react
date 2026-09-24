@@ -9,8 +9,11 @@ type PickedTextProps = Pick<TextProps, "title" | "truncate">;
 type InputProps = {
   /** Name of the underlying checkbox input. */
   name?: string;
-  /** Value of the underlying checkbox input, for a form read by name. */
-  value?: string;
+  /** Value of the underlying checkbox input, for a form read by name. The type is
+   * React's own for `<input value>`, kept wide on purpose: narrowing it to `string`
+   * while rewriting this file would have rejected `value={1}` in code that compiled
+   * before. */
+  value?: string | number | readonly string[];
   /** Applied to the checkbox's **icon**, not to the input, which is always
    * `-1`. The default takes the control out of the tab order; pass `0` for a
    * checkbox the user is meant to reach with the keyboard.

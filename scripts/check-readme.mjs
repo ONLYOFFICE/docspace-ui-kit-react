@@ -252,6 +252,60 @@ const docPages = () => {
     .map((name) => `${DOCS_DIR}/${name}`);
 };
 
+/**
+ * Every path `package.json`'s `files` puts in the tarball, as matchers.
+ *
+ * A bare entry is a directory and covers everything under it; `**` spans
+ * directories and `*` does not, which is how npm reads them.
+ */
+const shippedMatchers = () => {
+  const { files = [] } = JSON.parse(
+    fs.readFileSync(path.join(ROOT, "package.json"), "utf8"),
+  );
+
+  return files.map((entry) => {
+    const body = entry
+      .split("/")
+      .map((part) =>
+        part === "**"
+          ? "(?:.+)"
+          : part.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^/]*"),
+      )
+      .join("/");
+
+    // A directory entry ships its contents, so it also matches anything below it.
+    return new RegExp(`^${body}(?:/.*)?$`);
+  });
+};
+
+/**
+ * Relative links in a page that ships, pointing at a file that does not.
+ *
+ * These read as working links here and are dead in the tarball, which is the
+ * copy most people have: `docs/known-defects.md` shipped a link to
+ * `README_TEMPLATE.md`, a contributor document `files` does not carry. Only
+ * pages that ship are worth checking, and only links that resolve inside the
+ * repository -- a link to a file that does not exist at all is a different
+ * fault, and one the repository's own reader hits first.
+ */
+const unshippedLinks = (text, from, shipped) => {
+  // A page that does not ship cannot carry a link that is dead in the tarball.
+  if (!shipped.some((matcher) => matcher.test(from))) return [];
+
+  const dir = path.posix.dirname(from);
+  const found = [];
+
+  for (const match of text.matchAll(/\]\((\.[^)\s#]*)(?:#[^)\s]*)?\)/g)) {
+    const target = path.posix.normalize(path.posix.join(dir, match[1]));
+    if (target.startsWith("..")) continue;
+    if (!fs.existsSync(path.join(ROOT, target))) continue;
+    if (shipped.some((matcher) => matcher.test(target))) continue;
+    found.push({ target, index: match.index });
+  }
+
+  return found;
+};
+
 const main = async () => {
   const options = parseArgs(process.argv.slice(2));
   const allowlist = readAllowlist();
@@ -281,6 +335,7 @@ const main = async () => {
   const kit = createReadmeProgram();
   const barrel = kit.barrelFolders();
   const examples = [];
+  const shipped = shippedMatchers();
 
   // Every name `import { X } from "@onlyoffice/apps-ui-kit"` resolves to. The
   // barrel re-exports its folders with `export *`, which carries their named
@@ -595,6 +650,15 @@ const main = async () => {
       }
     }
 
+    for (const link of unshippedLinks(readme, `${folder}/README.md`, shipped)) {
+      error(
+        "E_LINK_NOT_SHIPPED",
+        folder,
+        lineOf(readme, link.index),
+        `links to \`${link.target}\`, which \`package.json\`'s \`files\` does not publish — the link is dead in the tarball`,
+      );
+    }
+
     const importBlock = codeBlocks(readme).find((block) =>
       block.body.includes(PACKAGE),
     );
@@ -682,6 +746,16 @@ const main = async () => {
           message,
         );
       }
+    }
+
+    for (const link of unshippedLinks(text, page, shipped)) {
+      reportFile(
+        "error",
+        "E_LINK_NOT_SHIPPED",
+        page,
+        lineOf(text, link.index),
+        `links to \`${link.target}\`, which \`package.json\`'s \`files\` does not publish — the link is dead in the tarball`,
+      );
     }
 
     if (options.compile) {

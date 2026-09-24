@@ -7,7 +7,7 @@
   "status": "public",
   "summary": "Fixed 32px glyph saying which kind of room this is, with an optional selection checkbox.",
   "import": { "subpath": "components/room-logo", "barrel": true, "default": false },
-  "exports": ["RoomLogo", "RoomLogoPure", "RoomLogoProps"],
+  "exports": ["RoomLogo", "RoomLogoProps"],
   "providers": [],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["room-icon", "room-type", "checkbox"],

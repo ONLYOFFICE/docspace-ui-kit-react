@@ -1,2688 +1,3523 @@
 {
   "entry": "index.ts",
   "package": "@onlyoffice/apps-ui-kit",
-  "total": 663,
-  "values": 454,
+  "total": 703,
+  "values": 456,
   "exports": {
     "ADMIN": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AIChatIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "AI_ENUM": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AI_PAYWALL_START_AMOUNT": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AI_SEARCH": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AI_SEARCH_ENUM": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AI_TOOLS": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ASIDE_PADDING_AFTER_LAST_ITEM": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AccessRestricted": {
       "kind": "variable",
-      "origin": "errors"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AccessRightSelect": {
       "kind": "variable",
-      "origin": "components/access-right-select"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AccessSelectorProps": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ActionButton": {
       "kind": "function",
-      "origin": "components/action-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ActionButtonProps": {
       "kind": "type",
-      "origin": "components/action-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AddButton": {
       "kind": "variable",
-      "origin": "components/add-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AddButtonProps": {
       "kind": "type",
-      "origin": "components/add-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AnalyticsEvents": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AnimationEvents": {
       "kind": "variable",
-      "origin": "hooks/useAnimation"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AppLoader": {
       "kind": "variable",
-      "origin": "components/app-loader"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ArticleHideMenuIcon": {
       "kind": "variable",
-      "origin": "components/nav-menu",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "ArticleProfile": {
       "kind": "variable",
-      "origin": "components/article/sub-components"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ArticleProfileProps": {
       "kind": "type",
-      "origin": "components/article"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "ArticleProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Aside": {
       "kind": "variable",
-      "origin": "components/aside"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AsideHeader": {
       "kind": "variable",
-      "origin": "components/aside/aside-header"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AsideHeaderProps": {
       "kind": "type",
-      "origin": "components/aside/aside-header"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Avatar": {
       "kind": "variable",
-      "origin": "components/avatar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AvatarActionKeys": {
       "kind": "enum",
-      "origin": "components/avatar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AvatarEditorDialog": {
       "kind": "variable",
-      "origin": "components/avatar-editor-dialog"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AvatarEditorDialogProps": {
       "kind": "type",
-      "origin": "components/avatar-editor-dialog"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AvatarProps": {
       "kind": "type",
-      "origin": "components/avatar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AvatarPure": {
       "kind": "variable",
-      "origin": "components/avatar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AvatarRole": {
       "kind": "enum",
-      "origin": "components/avatar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "AvatarSize": {
       "kind": "enum",
-      "origin": "components/avatar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "BACKUP_SERVICE": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Backdrop": {
       "kind": "variable",
-      "origin": "components/backdrop"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Badge": {
       "kind": "variable",
-      "origin": "components/badge"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "BadgeProps": {
       "kind": "type",
-      "origin": "components/badge"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "BarConfig": {
       "kind": "type",
-      "origin": "components/snackbar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Base": {
       "kind": "variable",
-      "origin": "providers/theme/themes"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "BaseTile": {
       "kind": "variable",
-      "origin": "components/tiles/base-tile"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "BaseTileItemProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "BaseTileProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "BillingOverview": {
       "kind": "other",
-      "origin": "billing/overview"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "BillingRoot": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "BlankPdfIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "BodyProps": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "BrandLookup": {
       "kind": "type",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "BreadCrumbsLoader": {
       "kind": "variable",
-      "origin": "components/selector/sub-components/loaders"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "BreadCrumbsProps": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Button": {
       "kind": "variable",
-      "origin": "components/button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ButtonDelete": {
       "kind": "variable",
-      "origin": "components/image-editor/ButtonDelete"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ButtonKeys": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ButtonProps": {
       "kind": "type",
-      "origin": "components/button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ButtonSize": {
       "kind": "enum",
-      "origin": "components/button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "CHAT_SUPPORTED_FORMATS": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Calendar": {
       "kind": "variable",
-      "origin": "components/calendar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "CalendarProps": {
       "kind": "interface",
-      "origin": "components/calendar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Card": {
       "kind": "variable",
-      "origin": "components/card"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "CardProps": {
       "kind": "interface",
-      "origin": "components/card"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "CatalogSettingsPaymentIcon": {
       "kind": "variable",
-      "origin": "components/nav-menu",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "CategoryItem": {
       "kind": "variable",
-      "origin": "components/category-item"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ChatReasoningEffort": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Checkbox": {
       "kind": "variable",
-      "origin": "components/checkbox"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "CheckboxProps": {
       "kind": "type",
-      "origin": "components/checkbox"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "CircleSkeleton": {
       "kind": "variable",
-      "origin": "components/circle"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "CircleSkeletonProps": {
       "kind": "type",
-      "origin": "components/circle"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "CollapsibleCard": {
       "kind": "variable",
-      "origin": "components/collapsible-card"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "CollapsibleCardProps": {
       "kind": "interface",
-      "origin": "components/collapsible-card"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ColorInput": {
       "kind": "variable",
-      "origin": "components/color-input"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ColorPicker": {
       "kind": "variable",
-      "origin": "components/color-picker"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ColumnarInfoBar": {
       "kind": "variable",
-      "origin": "components/columnar-info-bar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ColumnarInfoBarColumn": {
       "kind": "type",
-      "origin": "components/columnar-info-bar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ColumnarInfoBarProps": {
       "kind": "type",
-      "origin": "components/columnar-info-bar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ComboBox": {
       "kind": "variable",
-      "origin": "components/combobox"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ComboBoxDisplayType": {
       "kind": "enum",
-      "origin": "components/combobox"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ComboBoxSize": {
       "kind": "enum",
-      "origin": "components/combobox"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ComboButton": {
       "kind": "variable",
-      "origin": "components/combobox/sub-components"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "CommonTileProps": {
+      "kind": "interface",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ComponentProps": {
       "kind": "type",
-      "origin": "components/tooltip"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ConstLookup": {
       "kind": "type",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Consumer": {
       "kind": "variable",
-      "origin": "utils/context"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ContentType": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Context": {
       "kind": "variable",
-      "origin": "utils/context"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ContextMenu": {
       "kind": "variable",
-      "origin": "components/context-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ContextMenuButton": {
       "kind": "variable",
-      "origin": "components/context-menu-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ContextMenuButtonDisplayType": {
       "kind": "enum",
-      "origin": "components/context-menu-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ContextMenuButtonProps": {
       "kind": "interface",
-      "origin": "components/context-menu-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ContextMenuModel": {
       "kind": "type",
-      "origin": "components/context-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ContextMenuProps": {
       "kind": "interface",
-      "origin": "components/context-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ContextMenuRefType": {
       "kind": "type",
-      "origin": "components/context-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ContextMenuType": {
       "kind": "type",
-      "origin": "components/context-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ContextMenuTypeOnClick": {
       "kind": "type",
-      "origin": "components/context-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "CreateAgentIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "CreateCustomRoomIllustrationIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "CreateDocumentIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "CreateFormIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "CreateFromTemplateIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "CreateFromTextIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "CreatePresentationIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "CreateRoomIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "CreateSpreadsheetIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "DEFAULT_CHUNK_UPLOAD_SIZE": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DEFAULT_FONT_FAMILY": {
       "kind": "variable",
-      "origin": "providers/theme/themes"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DEFAULT_MAX_UPLOAD_FILES_COUNT": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DEFAULT_MAX_UPLOAD_THREAD_COUNT": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DISK_STORAGE": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DOCS_CONNECT": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DOCS_CONNECT_DEVPACK_PRODUCT": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DOCS_CONNECT_DEVPACK_SERVICE": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DOCS_CONNECT_PRODUCT": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DOCS_CONNECT_ROUTE": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DOCS_CONNECT_SERVICE": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Dark": {
       "kind": "variable",
-      "origin": "providers/theme/themes"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Data": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DatePicker": {
       "kind": "variable",
-      "origin": "components/date-picker"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DatePickerProps": {
       "kind": "type",
-      "origin": "components/date-picker"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DateTimePicker": {
       "kind": "variable",
-      "origin": "components/date-time-picker"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DateTimePickerProps": {
       "kind": "type",
-      "origin": "components/date-time-picker"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DateTimePickerTranslations": {
       "kind": "type",
-      "origin": "components/date-time-picker"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DateUnit": {
       "kind": "type",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DeviceType": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DialogAsideSkeleton": {
       "kind": "variable",
-      "origin": "components/modal-dialog/sub-components/skeletons"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DialogModalSkeleton": {
       "kind": "variable",
-      "origin": "components/modal-dialog/sub-components/skeletons"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DialogReassignmentSkeleton": {
       "kind": "variable",
-      "origin": "components/modal-dialog/sub-components/skeletons"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DiffUnit": {
       "kind": "type",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DistributedTaskStatus": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DomHelpers": {
       "kind": "class",
-      "origin": "utils/dom-helpers"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DragAndDrop": {
       "kind": "other",
-      "origin": "components/drag-and-drop"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "DragAndDropProps": {
+      "kind": "interface",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DropDown": {
       "kind": "variable",
-      "origin": "components/drop-down"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DropDownItem": {
       "kind": "variable",
-      "origin": "components/drop-down-item"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DropDownItemProps": {
       "kind": "type",
-      "origin": "components/drop-down-item"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Dropzone": {
       "kind": "variable",
-      "origin": "components/dropzone"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "DurationUnit": {
       "kind": "type",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EBOOK_EXST": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EMPTY_ARRAY": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EMPTY_OBJECT": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Email": {
       "kind": "class",
-      "origin": "utils/email"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmailInput": {
       "kind": "variable",
-      "origin": "components/email-input"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmailInputProps": {
       "kind": "type",
-      "origin": "components/email-input"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmailSettings": {
       "kind": "class",
-      "origin": "utils/email"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmployeeActivationStatus": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmployeeFullDto": {
       "kind": "type",
-      "origin": "types",
+      "origin": "unknown",
       "external": "@onlyoffice/docspace-api-sdk"
     },
     "EmployeeStatus": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmployeeType": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmptyScreenContainer": {
       "kind": "variable",
-      "origin": "components/empty-screen-container"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "EmptyScreenContainerProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmptyScreenFormRoomProps": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmptyScreenProps": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmptyView": {
       "kind": "variable",
-      "origin": "components/empty-view"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmptyViewButtonType": {
       "kind": "type",
-      "origin": "components/empty-view"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmptyViewItemType": {
       "kind": "type",
-      "origin": "components/empty-view"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmptyViewLinkType": {
       "kind": "type",
-      "origin": "components/empty-view"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmptyViewOptionsType": {
       "kind": "type",
-      "origin": "components/empty-view"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmptyViewProps": {
       "kind": "type",
-      "origin": "components/empty-view"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EmptyViewSeparatorType": {
       "kind": "type",
-      "origin": "components/empty-view"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Encoder": {
       "kind": "variable",
-      "origin": "utils/encoder"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Error401": {
       "kind": "variable",
-      "origin": "errors"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Error403": {
       "kind": "variable",
-      "origin": "errors"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Error404": {
       "kind": "variable",
-      "origin": "errors"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ErrorBoundary": {
       "kind": "class",
-      "origin": "providers/error-boundary"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ErrorContainer": {
       "kind": "variable",
-      "origin": "components/error-container"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ErrorContainerProps": {
       "kind": "type",
-      "origin": "components/error-container"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ErrorInvalidLink": {
       "kind": "variable",
-      "origin": "errors"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ErrorKeys": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ErrorOfflineContainer": {
       "kind": "variable",
-      "origin": "errors"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ErrorUnavailable": {
       "kind": "variable",
-      "origin": "errors"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ErrorUnavailableProps": {
       "kind": "type",
-      "origin": "errors"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "EventType": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Events": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FOLDER_FORM_VALIDATION": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FREE_BACKUP": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FUNCTION_EMPTY": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FieldContainer": {
       "kind": "variable",
-      "origin": "components/field-container"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FieldContainerProps": {
       "kind": "type",
-      "origin": "components/field-container"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "FileChildProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FileDtoInteger": {
       "kind": "type",
-      "origin": "types",
+      "origin": "unknown",
       "external": "@onlyoffice/docspace-api-sdk"
     },
     "FileFillingFormStatus": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FileInput": {
       "kind": "variable",
-      "origin": "components/file-input"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "FileItem": {
+      "kind": "interface",
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "FileItemType": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FileStatus": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FileTile": {
       "kind": "variable",
-      "origin": "components/tiles/file-tile"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "FileTileProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FileType": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FilesSelectorFilterTypes": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FilterGroups": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "FilterInput": {
+      "kind": "variable",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FilterKeys": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "FilterProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FilterSelectorTypes": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FloatingButton": {
       "kind": "variable",
-      "origin": "components/floating-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FloatingButtonIcons": {
       "kind": "variable",
-      "origin": "components/floating-button"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "FolderChildProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "FolderItem": {
+      "kind": "interface",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FolderTile": {
       "kind": "variable",
-      "origin": "components/tiles/folder-tile"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "FolderTileProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FolderType": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FooterProps": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "FormWrapper": {
       "kind": "variable",
-      "origin": "components/form-wrapper"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "GeneratePdfAiIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "GenerateWithAiIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "GroupDto": {
       "kind": "interface",
-      "origin": "types",
+      "origin": "unknown",
       "external": "@onlyoffice/docspace-api-sdk"
     },
     "GuidanceRefKey": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "HTML_EXST": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "HeaderProps": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "HeaderType": {
       "kind": "type",
-      "origin": "components/context-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Heading": {
       "kind": "variable",
-      "origin": "components/heading"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "HeadingLevel": {
       "kind": "enum",
-      "origin": "components/heading"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "HeadingProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "HeadingPure": {
       "kind": "variable",
-      "origin": "components/heading"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "HeadingSize": {
       "kind": "enum",
-      "origin": "components/heading"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "HeadingType": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "HeadingWithTooltip": {
       "kind": "variable",
-      "origin": "components/heading"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "HelpButton": {
       "kind": "variable",
-      "origin": "components/help-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "HelpButtonProps": {
       "kind": "type",
-      "origin": "components/help-button"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "ICategoryItemProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ICover": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "INFO_PANEL_WIDTH": {
       "kind": "variable",
-      "origin": "utils/device"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "IconButton": {
       "kind": "variable",
-      "origin": "components/icon-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "IconButtonProps": {
       "kind": "type",
-      "origin": "components/icon-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "IconSizeType": {
       "kind": "enum",
-      "origin": "utils/common-icons-style"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ImageEditor": {
       "kind": "variable",
-      "origin": "components/image-editor"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "ImageEditorProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "IndexIconButtons": {
       "kind": "variable",
-      "origin": "components/rows/row/sub-components/index-icon-buttons"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "InfiniteLoaderComponent": {
       "kind": "variable",
-      "origin": "components/infinite-loader"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "InfoBarProps": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "InputBlock": {
       "kind": "variable",
-      "origin": "components/input-block"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "InputBlockProps": {
       "kind": "type",
-      "origin": "components/input-block"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "InputItemProps": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "InputSize": {
       "kind": "enum",
-      "origin": "components/text-input"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "InputType": {
       "kind": "enum",
-      "origin": "components/text-input"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "InterfaceDirectionContext": {
       "kind": "variable",
-      "origin": "context/InterfaceDirectionContext"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "InterfaceDirectionProvider": {
       "kind": "variable",
-      "origin": "context/InterfaceDirectionContext"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ItemProps": {
       "kind": "interface",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "LANGUAGE": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "LIVE_CHAT_LOCAL_STORAGE_KEY": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "LOADER_STYLE": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Label": {
       "kind": "variable",
-      "origin": "components/label"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Link": {
       "kind": "variable",
-      "origin": "components/link"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "LinkProps": {
       "kind": "type",
-      "origin": "components/link"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "LinkRouterProps": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "LinkTarget": {
       "kind": "enum",
-      "origin": "components/link"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "LinkType": {
       "kind": "enum",
-      "origin": "components/link"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "LinkUi": {
       "kind": "variable",
-      "origin": "components/link"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "LinkWithDropDownProps": {
       "kind": "type",
-      "origin": "components/link-with-dropdown"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "LinkWithDropdown": {
       "kind": "variable",
-      "origin": "components/link-with-dropdown"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Loader": {
       "kind": "variable",
-      "origin": "components/loader"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "LoaderTypes": {
       "kind": "enum",
-      "origin": "components/loader"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "LoaderWrapper": {
       "kind": "variable",
-      "origin": "components/loader-wrapper"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "LoaderWrapperProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "LoadingButton": {
       "kind": "variable",
-      "origin": "components/loading-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "LoadingButtonProps": {
       "kind": "interface",
-      "origin": "components/loading-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "MANAGER": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "MAX_INFINITE_LOADER_SHIFT": {
       "kind": "variable",
-      "origin": "utils/device"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "MAX_VISIBLE_EXTENSIONS": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "MCPIcon": {
       "kind": "variable",
-      "origin": "components/mcp-icon"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "MCPIconProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "MCPIconSize": {
       "kind": "enum",
-      "origin": "components/mcp-icon"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "MainButton": {
       "kind": "variable",
-      "origin": "components/main-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "MainButtonMobile": {
       "kind": "variable",
-      "origin": "components/main-button-mobile"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "MainTariff": {
       "kind": "variable",
-      "origin": "billing/main-tariff"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "MergeTypes": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ModalDialog": {
       "kind": "variable",
-      "origin": "components/modal-dialog"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ModalDialogType": {
       "kind": "enum",
-      "origin": "components/modal-dialog"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "MouseEventHandler": {
       "kind": "type",
-      "origin": "components/tooltip"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "NavMenu": {
       "kind": "variable",
-      "origin": "components/nav-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "NavMenuGroup": {
       "kind": "type",
-      "origin": "components/nav-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "NavMenuItem": {
       "kind": "type",
-      "origin": "components/nav-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "NavMenuLinkData": {
       "kind": "type",
-      "origin": "components/nav-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "NavMenuProps": {
       "kind": "type",
-      "origin": "components/nav-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "NavSubItem": {
       "kind": "type",
-      "origin": "components/nav-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "NewItemDropDownProps": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "NewItemProps": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Nullable": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "OPERATIONS_NAME": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "OmitTooltipProps": {
       "kind": "type",
-      "origin": "components/tooltip"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "OperationsProgressButton": {
       "kind": "variable",
-      "origin": "components/operations-progress-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Paging": {
       "kind": "variable",
-      "origin": "components/paging"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "PagingProps": {
+      "kind": "interface",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ParseErrorTypes": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "PasswordInput": {
       "kind": "variable",
-      "origin": "components/password-input"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "PasswordInputHandle": {
       "kind": "type",
-      "origin": "components/password-input"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "PathObject": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "PaymentMethod": {
       "kind": "other",
-      "origin": "billing/payment-method"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "PaymentStoreProvider": {
       "kind": "variable",
-      "origin": "billing/store"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Portal": {
       "kind": "variable",
-      "origin": "components/portal"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "PortalFeaturesLimitations": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "PortalLogo": {
       "kind": "variable",
-      "origin": "components/portal-logo"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "PortalLogoProps": {
       "kind": "type",
-      "origin": "components/portal-logo"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "PortalProps": {
       "kind": "type",
-      "origin": "components/portal"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "PreparationPortalProgress": {
       "kind": "variable",
-      "origin": "components/progress-bar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "PreparationPortalProgressProps": {
       "kind": "type",
-      "origin": "components/progress-bar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ProgressBar": {
       "kind": "variable",
-      "origin": "components/progress-bar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ProgressBarProps": {
       "kind": "type",
-      "origin": "components/progress-bar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Provider": {
       "kind": "variable",
-      "origin": "utils/context"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ProviderType": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ProvidersProps": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "PublicRoomBar": {
       "kind": "variable",
-      "origin": "components/public-room-bar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "QuantityPicker": {
       "kind": "variable",
-      "origin": "components/quantity-picker"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "QuickActionItem": {
       "kind": "type",
-      "origin": "components/quick-actions"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "QuickActions": {
       "kind": "variable",
-      "origin": "components/quick-actions"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "QuickActionsProps": {
       "kind": "type",
-      "origin": "components/quick-actions"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "QuickCollaborationRoomIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "QuickCustomRoomIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "QuickFormRoomIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "QuickPublicRoomIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "QuickVdrRoomIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "ROOM": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ROOM_ACTION_KEYS": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RTL_LANGUAGES": {
       "kind": "variable",
-      "origin": "providers/theme/rtl-utils"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RadioButton": {
       "kind": "variable",
-      "origin": "components/radio-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RadioButtonGroup": {
       "kind": "variable",
-      "origin": "components/radio-button-group"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RectangleSkeleton": {
       "kind": "variable",
-      "origin": "components/rectangle"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RectangleSkeletonProps": {
       "kind": "type",
-      "origin": "components/rectangle"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RoleType": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RoomIcon": {
       "kind": "variable",
-      "origin": "components/room-icon"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RoomIconProps": {
       "kind": "type",
-      "origin": "components/room-icon"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "RoomItem": {
+      "kind": "interface",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RoomLogo": {
       "kind": "variable",
-      "origin": "components/room-logo"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RoomLogoCover": {
       "kind": "variable",
-      "origin": "components/room-logo-cover-dialog"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RoomLogoCoverDialog": {
       "kind": "variable",
-      "origin": "components/room-logo-cover-dialog"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RoomLogoCoverDialogProps": {
       "kind": "type",
-      "origin": "components/room-logo-cover-dialog"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RoomLogoCoverProps": {
       "kind": "type",
-      "origin": "components/room-logo-cover-dialog"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "RoomLogoProps": {
+      "kind": "interface",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RoomTile": {
       "kind": "variable",
-      "origin": "components/tiles/room-tile"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "RoomTileProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RoomType": {
       "kind": "variable",
-      "origin": "components/room-type"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RoomsType": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RoomsTypeValues": {
       "kind": "variable",
-      "origin": "utils/common"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RoomsTypes": {
       "kind": "variable",
-      "origin": "utils/common"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RootTooltip": {
       "kind": "variable",
-      "origin": "components/tooltip"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Row": {
       "kind": "variable",
-      "origin": "components/rows/row"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RowContainer": {
       "kind": "variable",
-      "origin": "components/rows/row-container"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RowContent": {
       "kind": "variable",
-      "origin": "components/rows/row-content"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RowLoader": {
       "kind": "variable",
-      "origin": "components/selector/sub-components/loaders"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RowSkeleton": {
       "kind": "variable",
-      "origin": "components/rows/skeletons"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "RowsSkeleton": {
       "kind": "variable",
-      "origin": "components/rows/skeletons"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "STORAGE_DEACTIVATION_VISITED": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "STORAGE_ENUM": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "STORAGE_TARIFF_DEACTIVATED": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SYSTEM_FONT_FAMILY": {
       "kind": "variable",
-      "origin": "providers/theme/themes"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SYSTEM_THEME_KEY": {
       "kind": "variable",
-      "origin": "providers/theme/themes"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Scrollbar": {
       "kind": "variable",
-      "origin": "components/scrollbar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ScrollbarContext": {
       "kind": "variable",
-      "origin": "components/scrollbar/custom-scrollbar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ScrollbarProps": {
       "kind": "type",
-      "origin": "components/scrollbar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ScrollbarType": {
       "kind": "class",
-      "origin": "components/scrollbar/custom-scrollbar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SdkDateToAutoCleanUp": {
       "kind": "variable",
-      "origin": "enums",
+      "origin": "unknown",
       "external": "@onlyoffice/docspace-api-sdk"
     },
     "SdkFilesSettingsDtoDefaultSharingAccessRightsEnum": {
       "kind": "variable",
-      "origin": "enums",
+      "origin": "unknown",
       "external": "@onlyoffice/docspace-api-sdk"
     },
     "SdkSortedByType": {
       "kind": "variable",
-      "origin": "enums",
+      "origin": "unknown",
       "external": "@onlyoffice/docspace-api-sdk"
     },
     "SearchInput": {
       "kind": "variable",
-      "origin": "components/search-input"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SearchLoader": {
       "kind": "variable",
-      "origin": "components/selector/sub-components/loaders"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SearchProps": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SectionProps": {
       "kind": "type",
-      "origin": "components/section"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SelectAllProps": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "SelectOption": {
+      "kind": "interface",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SelectedItem": {
       "kind": "variable",
-      "origin": "components/selected-item"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SelectedItemProps": {
       "kind": "interface",
-      "origin": "components/selected-item"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SelectedItemPure": {
       "kind": "variable",
-      "origin": "components/selected-item"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SelectionArea": {
       "kind": "variable",
-      "origin": "components/selection-area"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "SelectionAreaProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Selector": {
       "kind": "variable",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SelectorAccessRightsMode": {
       "kind": "enum",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SelectorProps": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SeparatorType": {
       "kind": "type",
-      "origin": "components/context-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ServerType": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ServicesList": {
       "kind": "variable",
-      "origin": "billing/services"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ServicesStoreProvider": {
       "kind": "variable",
-      "origin": "billing/store"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ShareAccessRights": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ShareRights": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Slider": {
       "kind": "variable",
-      "origin": "components/slider"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SnackBar": {
       "kind": "class",
-      "origin": "components/snackbar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SnackbarProps": {
       "kind": "type",
-      "origin": "components/snackbar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SortByFieldName": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "SpaceQuotaProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "SpecialFolderScope": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "StatusMessage": {
+      "kind": "variable",
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "StatusMessageProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TAccessRight": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TAiToolsPrices": {
       "kind": "type",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TArrayTypes": {
       "kind": "type",
-      "origin": "components/selection-area"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TAvailableShareRights": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TAvatarModel": {
       "kind": "type",
-      "origin": "components/avatar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TBreadCrumb": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TChangeImage": {
       "kind": "type",
-      "origin": "components/image-editor"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TColorScheme": {
       "kind": "type",
-      "origin": "context/ThemeContext"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TComboboxProps": {
       "kind": "type",
-      "origin": "components/combobox"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TContextMenuRef": {
       "kind": "type",
-      "origin": "components/context-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TContextMenuValueTypeOnClick": {
       "kind": "type",
-      "origin": "components/context-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TCreatedBy": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TData": {
       "kind": "type",
-      "origin": "components/toast"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TDirectionX": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TDirectionY": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TDisplayedItem": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TEMPLATE_GALLERY_FORMATS": {
       "kind": "variable",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TErrorBoundaryProps": {
       "kind": "type",
-      "origin": "providers/error-boundary"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TFallbackAxisSideDirection": {
       "kind": "type",
-      "origin": "components/tooltip"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TFile": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TFileSecurity": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TFileViewAccessibility": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TFolder": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TFolderSecurity": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TGetContextMenuModel": {
       "kind": "type",
-      "origin": "components/context-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TGetIcon": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TGetTooltipContent": {
       "kind": "type",
-      "origin": "components/tooltip"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "TGroupItem": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TGroupMenuItem": {
       "kind": "type",
-      "origin": "components/table"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "THeaderBackButton": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TImage": {
       "kind": "type",
-      "origin": "components/image-editor"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TInfoBar": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TInfoBarData": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TInterfaceDirection": {
       "kind": "type",
-      "origin": "context/InterfaceDirectionContext"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "TItem": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TLogo": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TMobileMenuStackItem": {
       "kind": "type",
-      "origin": "components/context-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TModel": {
       "kind": "type",
-      "origin": "components/room-icon"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TNavigationItem": {
       "kind": "type",
-      "origin": "components/navigation"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "TNavigationProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TOTAL_SIZE": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TOnMobileItemClick": {
       "kind": "type",
-      "origin": "components/context-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TOnMove": {
       "kind": "type",
-      "origin": "components/selection-area"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TOnSubmit": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TOption": {
       "kind": "type",
-      "origin": "components/combobox"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TPathParts": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TPaymentNavigationEvent": {
       "kind": "type",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TRenderCustomItem": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TRoomLogoParams": {
       "kind": "type",
-      "origin": "utils/calculateRoomLogoParams"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TRoomSecurity": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorAccessRights": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorBreadCrumbs": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorCancelButton": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorCheckbox": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorEmptyScreen": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorFooterCheckbox": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorFooterInput": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorHeader": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorInfo": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorInput": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorItem": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorItemFile": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorItemFolder": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorItemGroup": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorItemInput": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorItemMCP": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorItemNew": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorItemRoom": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorItemUser": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorSearch": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorSelectAll": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorSubmitButton": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorTabs": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSelectorWithAside": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TServiceFeatureWithPrice": {
       "kind": "type",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSetPreview": {
       "kind": "type",
-      "origin": "components/image-editor"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TShareRightsType": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TShareSettings": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSortBy": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSortOrder": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TSvgComponent": {
       "kind": "type",
-      "origin": "components/selector"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TTabItem": {
       "kind": "type",
-      "origin": "components/tabs"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TTableColumn": {
       "kind": "type",
-      "origin": "components/table"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TTheme": {
       "kind": "type",
-      "origin": "providers/theme/themes"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TThemeProvider": {
       "kind": "type",
-      "origin": "providers/theme"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TTitles": {
       "kind": "type",
-      "origin": "components/navigation"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TTooltipPlace": {
       "kind": "type",
-      "origin": "components/tooltip"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TTranslation": {
       "kind": "type",
-      "origin": "utils/common"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TTranslationProvider": {
       "kind": "type",
-      "origin": "providers/translation"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TTranslations": {
       "kind": "type",
-      "origin": "providers/translation"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TUser": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TUserGroup": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TValidate": {
       "kind": "type",
-      "origin": "components/email-input"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TViewAs": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TabItem": {
       "kind": "variable",
-      "origin": "components/tab-item"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TableBody": {
       "kind": "variable",
-      "origin": "components/table/table-body"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TableCell": {
       "kind": "variable",
-      "origin": "components/table/sub-components/table-cell"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TableContainer": {
       "kind": "variable",
-      "origin": "components/table/table-container"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TableGroupMenu": {
       "kind": "variable",
-      "origin": "components/table/table-group-menu"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TableHeader": {
       "kind": "variable",
-      "origin": "components/table/table-header"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TableRow": {
       "kind": "variable",
-      "origin": "components/table/table-row"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Tabs": {
       "kind": "variable",
-      "origin": "components/tabs"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TabsProps": {
       "kind": "type",
-      "origin": "components/tabs"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TabsTypes": {
       "kind": "enum",
-      "origin": "components/tabs"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Tag": {
       "kind": "variable",
-      "origin": "components/tag"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TagClickEvent": {
       "kind": "type",
-      "origin": "components/tag"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TagProps": {
       "kind": "type",
-      "origin": "components/tag"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TagType": {
       "kind": "type",
-      "origin": "components/tag"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Tags": {
       "kind": "variable",
-      "origin": "components/tags"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "TemplateItem": {
+      "kind": "interface",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TemplateTile": {
       "kind": "variable",
-      "origin": "components/tiles/template-tile"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "TemplateTileProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Text": {
       "kind": "variable",
-      "origin": "components/text"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TextAlignValue": {
       "kind": "type",
-      "origin": "components/snackbar"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TextInput": {
       "kind": "variable",
-      "origin": "components/text-input"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TextInputProps": {
       "kind": "type",
-      "origin": "components/text-input"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TextInputPure": {
       "kind": "variable",
-      "origin": "components/text-input"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TextProps": {
       "kind": "type",
-      "origin": "components/text"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TextUi": {
       "kind": "variable",
-      "origin": "components/text"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Textarea": {
       "kind": "variable",
-      "origin": "components/textarea"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TextareaProps": {
       "kind": "type",
-      "origin": "components/textarea"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ThemeContext": {
       "kind": "variable",
-      "origin": "context/ThemeContext"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ThemeContextProvider": {
       "kind": "variable",
-      "origin": "context/ThemeContext"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ThemeKeys": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ThemeProvider": {
       "kind": "variable",
-      "origin": "providers/theme"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ThemeProviderComponent": {
       "kind": "variable",
-      "origin": "components/theme-provider"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ThemeProviderProps": {
       "kind": "type",
-      "origin": "components/theme-provider"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "TileChildProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TileContainer": {
       "kind": "variable",
-      "origin": "components/tiles/tile-container"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "TileContainerProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TileContent": {
       "kind": "variable",
-      "origin": "components/tiles/tile-content"
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "TileContentProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "TileItem": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
+    },
+    "TileItemProps": {
+      "kind": "type",
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TimePicker": {
       "kind": "variable",
-      "origin": "components/time-picker"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TimePickerProps": {
       "kind": "type",
-      "origin": "components/time-picker"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "To": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Toast": {
       "kind": "variable",
-      "origin": "components/toast"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ToastProps": {
       "kind": "type",
-      "origin": "components/toast"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ToastType": {
       "kind": "enum",
-      "origin": "components/toast"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ToggleButton": {
       "kind": "variable",
-      "origin": "components/toggle-button"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ToolsPermission": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Tooltip": {
       "kind": "variable",
-      "origin": "components/tooltip"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TooltipContainer": {
       "kind": "variable",
-      "origin": "components/tooltip/sub-components"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TooltipHandlers": {
       "kind": "type",
-      "origin": "components/tooltip"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TooltipProps": {
       "kind": "type",
-      "origin": "components/tooltip"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TopLoaderService": {
       "kind": "class",
-      "origin": "components/top-loading-indicator"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TranslationProvider": {
       "kind": "variable",
-      "origin": "providers/translation"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TwoStateToggle": {
       "kind": "variable",
-      "origin": "components/two-state-toggle"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "TwoStateToggleProps": {
       "kind": "type",
-      "origin": "components/two-state-toggle"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Uploader": {
       "kind": "variable",
-      "origin": "uploader"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Usage": {
       "kind": "other",
-      "origin": "billing/usage"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "UseAnimationReturn": {
       "kind": "type",
-      "origin": "hooks/useAnimation"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "UseI18NProps": {
       "kind": "type",
-      "origin": "providers/translation"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "UseRoomTemplateIllustrationIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "UseTemplateIcon": {
       "kind": "variable",
-      "origin": "components/quick-actions",
+      "origin": "unknown",
       "external": "assets (*.react.svg)"
     },
     "UseThemeProps": {
       "kind": "type",
-      "origin": "providers/theme"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "VDRIndexingAction": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "ValueOf": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "VectorizationStatus": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "WEB_SEARCH": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "Wallet": {
       "kind": "variable",
-      "origin": "billing/wallet"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "WhiteLabelLogoType": {
       "kind": "enum",
-      "origin": "enums"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "WindowI18n": {
       "kind": "type",
-      "origin": "utils/i18n"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "WithFlag": {
       "kind": "type",
-      "origin": "types"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "WithTooltipProps": {
       "kind": "interface",
-      "origin": "components/tooltip"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "YEAR_KEY": {
       "kind": "variable",
-      "origin": "billing"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "addToDate": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "beautifyJSON": {
       "kind": "function",
-      "origin": "components/textarea"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "calculateRoomLogoParams": {
       "kind": "variable",
-      "origin": "utils/calculateRoomLogoParams"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "checkIsSSR": {
       "kind": "function",
-      "origin": "utils/device"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "clearEdgeScrollingTimer": {
       "kind": "variable",
-      "origin": "utils/edge-scrolling"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "combineUrl": {
       "kind": "variable",
-      "origin": "utils/combineUrl"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "convertDuration": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "convertMomentFormatToLuxon": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "createChunks": {
       "kind": "variable",
-      "origin": "uploader/utils"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "createDateTime": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "createDuration": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "dateDiff": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "dateDiffAbs": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "daysInMonth": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "delay": {
       "kind": "variable",
-      "origin": "utils/pipe"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "deleteCookie": {
       "kind": "function",
-      "origin": "utils/cookie"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "desktop": {
       "kind": "variable",
-      "origin": "utils/device"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "encodeToBase64": {
       "kind": "variable",
-      "origin": "components/room-icon"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "endOf": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "formatDate": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "formatDateLocalized": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "formatWithTimezone": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "fromMillis": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "fromNow": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "fromNowMinus": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "fromNowPlus": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "fromSeconds": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "fromUnixTimestamp": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getAiModelName": {
       "kind": "variable",
-      "origin": "utils/ai"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getAppTimezone": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getBrandName": {
       "kind": "function",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getBrowserTimezone": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getCommonTranslation": {
       "kind": "variable",
-      "origin": "utils/i18n"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getConstName": {
       "kind": "function",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getCookie": {
       "kind": "function",
-      "origin": "utils/cookie"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getCorrectBorderRadius": {
       "kind": "variable",
-      "origin": "providers/theme/rtl-utils"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getCorrectDate": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getCorrectFourValuesStyle": {
       "kind": "variable",
-      "origin": "providers/theme/rtl-utils"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getCorrectTextAlign": {
       "kind": "variable",
-      "origin": "providers/theme/rtl-utils"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getCurrentCommonLanguage": {
       "kind": "variable",
-      "origin": "utils/i18n"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getDateValues": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getDirectionByLanguage": {
       "kind": "variable",
-      "origin": "providers/theme/rtl-utils"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getErrorMessage": {
       "kind": "variable",
-      "origin": "utils/getErrorMessage"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getFilesFromEvent": {
       "kind": "function",
-      "origin": "utils/getFilesFromEvent"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getFirstDayOfWeek": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getFontFamilyDependingOnLanguage": {
       "kind": "variable",
-      "origin": "providers/theme/rtl-utils"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getI18NInstance": {
       "kind": "variable",
-      "origin": "providers/translation"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getIconPathByFolderType": {
       "kind": "variable",
-      "origin": "utils/common"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getLifetimePeriodTranslation": {
       "kind": "variable",
-      "origin": "utils/common"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getLogoUrl": {
       "kind": "variable",
-      "origin": "utils/getLogoUrl"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getMonths": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getMonthsShort": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getOAuthToken": {
       "kind": "function",
-      "origin": "utils/get-oauth-token"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getParts": {
       "kind": "variable",
-      "origin": "utils/email"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getRoomTitle": {
       "kind": "variable",
-      "origin": "components/room-icon"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getServerIcon": {
       "kind": "variable",
-      "origin": "utils/ai"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getSystemTheme": {
       "kind": "variable",
-      "origin": "utils/get-system-theme"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getTextColor": {
       "kind": "variable",
-      "origin": "utils/get-text-color"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getTimezoneOffset": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getTitleWithoutExtension": {
       "kind": "variable",
-      "origin": "utils/getTitleWithoutExtension"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getTranslationReady": {
       "kind": "variable",
-      "origin": "utils/i18n"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getUserAvatarRoleByType": {
       "kind": "variable",
-      "origin": "utils/common"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getUserType": {
       "kind": "variable",
-      "origin": "utils/common"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getUserTypeTranslation": {
       "kind": "variable",
-      "origin": "utils/common"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getWeekdayName": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "getWeekdays": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "globalColors": {
       "kind": "variable",
-      "origin": "providers/theme/themes"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "hasOwnProperty": {
       "kind": "variable",
-      "origin": "utils/hasOwnProperty"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "humanizeDuration": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "iconSize24": {
       "kind": "variable",
-      "origin": "utils/image-helpers"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "iconSize32": {
       "kind": "variable",
-      "origin": "utils/image-helpers"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "iconSize64": {
       "kind": "variable",
-      "origin": "utils/image-helpers"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "iconSize96": {
       "kind": "variable",
-      "origin": "utils/image-helpers"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isAfter": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isBefore": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isBetween": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isDesktop": {
       "kind": "variable",
-      "origin": "utils/device"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isElementCovered": {
       "kind": "function",
-      "origin": "hooks/useCloseOnAnchorCovered"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isEqualEmail": {
       "kind": "variable",
-      "origin": "utils/email"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isFuture": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isIconSizeType": {
       "kind": "variable",
-      "origin": "utils/common-icons-style"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isJSON": {
       "kind": "function",
-      "origin": "components/textarea"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isLanguageRtl": {
       "kind": "variable",
-      "origin": "providers/theme/rtl-utils"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isManagement": {
       "kind": "variable",
-      "origin": "utils/common"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isMobile": {
       "kind": "variable",
-      "origin": "utils/device"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isMobileDevice": {
       "kind": "variable",
-      "origin": "utils/device"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isNextImage": {
       "kind": "variable",
-      "origin": "utils/typeGuards"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isPast": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isReliableAndroidViewport": {
       "kind": "variable",
-      "origin": "utils/device"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isSame": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isSameDay": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isTablet": {
       "kind": "variable",
-      "origin": "utils/device"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isTouchDevice": {
       "kind": "variable",
-      "origin": "utils/device"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isValidDate": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isValidDomainName": {
       "kind": "variable",
-      "origin": "utils/email"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "isValidTimezone": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "jsonify": {
       "kind": "function",
-      "origin": "components/textarea"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "maxDate": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "minDate": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "mobile": {
       "kind": "variable",
-      "origin": "utils/device"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "mobileMore": {
       "kind": "variable",
-      "origin": "utils/device"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "now": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "omitTooltipProps": {
       "kind": "function",
-      "origin": "components/tooltip"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "onEdgeScrolling": {
       "kind": "variable",
-      "origin": "utils/edge-scrolling"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "openingNewTab": {
       "kind": "variable",
-      "origin": "utils/openingNewTab"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "parseAddress": {
       "kind": "variable",
-      "origin": "utils/email"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "parseAddresses": {
       "kind": "variable",
-      "origin": "utils/email"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "parseISO": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "parseLocaleConstants": {
       "kind": "function",
-      "origin": "utils/parse-locale-constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "parseToDateTime": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "parseWithFormat": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "pipe": {
       "kind": "variable",
-      "origin": "utils/pipe"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "presentInArray": {
       "kind": "variable",
-      "origin": "utils/presentInArray"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "runWithConcurrency": {
       "kind": "variable",
-      "origin": "uploader/utils"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "setBrandLookup": {
       "kind": "function",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "setConstLookup": {
       "kind": "function",
-      "origin": "constants"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "setCookie": {
       "kind": "function",
-      "origin": "utils/cookie"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "setDateValues": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "setDefaultLocale": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "setDefaultTimezone": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "size": {
       "kind": "variable",
-      "origin": "utils/device"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "startOf": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "stopWhen": {
       "kind": "variable",
-      "origin": "utils/pipe"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "subtractFromDate": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "tablet": {
       "kind": "variable",
-      "origin": "utils/device"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "toAppTimezone": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "toISOString": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "toJSDate": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "toRelative": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "toTimezone": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "toUnixTimestamp": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "toastr": {
       "kind": "variable",
-      "origin": "components/toast/sub-components"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "today": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "transitionalScreenSize": {
       "kind": "variable",
-      "origin": "utils/device"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "trimSeparator": {
       "kind": "function",
-      "origin": "utils/trim-separator"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useAnimation": {
       "kind": "variable",
-      "origin": "hooks/useAnimation"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useClickOutside": {
       "kind": "variable",
-      "origin": "utils/use-click-outside"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useCloseOnAnchorCovered": {
       "kind": "variable",
-      "origin": "hooks/useCloseOnAnchorCovered"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useCommonTranslation": {
       "kind": "variable",
-      "origin": "utils/i18n"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useDebounce": {
       "kind": "variable",
-      "origin": "hooks/useDebounce"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useDropzone": {
       "kind": "variable",
-      "origin": "utils/react-dropzone-interop"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useEventListener": {
       "kind": "function",
-      "origin": "hooks/useEventListener"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useI18N": {
       "kind": "variable",
-      "origin": "providers/translation"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useInterfaceDirection": {
       "kind": "variable",
-      "origin": "context/InterfaceDirectionContext"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useIsDesktop": {
       "kind": "function",
-      "origin": "hooks/use-is-desktop"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useIsMobile": {
       "kind": "function",
-      "origin": "hooks/use-is-mobile"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useIsomorphicLayoutEffect": {
       "kind": "variable",
-      "origin": "hooks/useIsomorphicLayoutEffect"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useKeyboardAwareSheet": {
       "kind": "function",
-      "origin": "hooks/useKeyboardAwareSheet"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "usePaymentStore": {
       "kind": "variable",
-      "origin": "billing/store"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useServicesStore": {
       "kind": "variable",
-      "origin": "billing/store"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useTheme": {
       "kind": "variable",
-      "origin": "context/ThemeContext"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useUnmount": {
       "kind": "variable",
-      "origin": "hooks/useUnmount"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useViewEffect": {
       "kind": "variable",
-      "origin": "hooks/useViewEffect"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "useVirtualKeyboardInset": {
       "kind": "function",
-      "origin": "hooks/useVirtualKeyboardInset"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "utc": {
       "kind": "function",
-      "origin": "utils/date"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "uuid": {
       "kind": "variable",
-      "origin": "utils/uuid"
+      "origin": "unknown",
+      "external": "ambient"
     },
     "withTooltip": {
       "kind": "function",
-      "origin": "components/tooltip/sub-components"
+      "origin": "unknown",
+      "external": "ambient"
     }
   }
 }
