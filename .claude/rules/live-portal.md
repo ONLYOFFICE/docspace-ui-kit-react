@@ -147,6 +147,14 @@ files:write`;
   with it. `.storybook/public/serve.json` sets `"cleanUrls": false`, which also keeps
   `iframe.html?id=…` deep links alive under `pnpm storybook-serve`. `serve` validates that file
   strictly: an unknown key such as `$comment` makes it refuse to start.
+- **Rooms: what the SDK types say and what arrives differ.** `updated` (and `created`) is typed
+  `ApiDateTime` with `utcTime`, and comes over the wire as a plain ISO string — accept both, as
+  `docs/samples/legal/matter.ts` does. A room's `logo` is either a `cover` with inline SVG
+  `data`, which `RoomIcon` recolours, or a protected `/storage/...` picture for
+  `usePortalImage`; with neither, pass `RoomIcon` `showDefault`, or it draws an empty `<img>`
+  instead of the initials. The SDK's `Logo` is not the kit's `TLogo` (`cover.data` may be
+  `null`), so build one. A room's page is `/rooms/shared/<id>/filter?folder=<id>`, for a guest
+  too.
 - **Never commit a URL or a key.** They belong in `.env`, in the toolbar's `localStorage`, or in
   the reader's own head — a sample that ships a working key ships an open portal.
 - **Anything committed here has to render with no portal at all.** CI, the static build and a
