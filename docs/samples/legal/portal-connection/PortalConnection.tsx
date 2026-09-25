@@ -164,7 +164,7 @@ VITE_PROVIDER_API_KEY=sk-...`}
                   {portal.me.displayName}
                 </Text>
                 <Text as="p" className={styles.factLabel}>
-                  {`${portal.me.role} · ${portal.me.email}`}
+                  {`${portal.me.role} • ${portal.me.email}`}
                 </Text>
               </div>
             </div>
