@@ -275,15 +275,29 @@ export function PhoneField() {
 
 ## CSS variables
 
-| Variable                                               | Default                     | Effect                                                                          |
-| ------------------------------------------------------ | --------------------------- | ------------------------------------------------------------------------------- |
-| `--input-width-base` / `-middle` / `-large`            | `173px` / `300px` / `550px` | Width per `InputSize`                                                           |
-| `--text-input-bg`                                      | `--input-bg`                | Background, applied as a large inset box-shadow so autofill does not repaint it |
-| `--text-input-disabled-bg`                             | `--input-disabled-bg`       | Background while disabled                                                       |
-| `--text-input-font-size`                               | per-size value              | Overrides the font size of all three sizes at once                              |
-| `--text-input-font-size-base` / `-middle` / `-large`   | theme values                | Font size per size                                                              |
-| `--text-input-padding-base` / `-middle` / `-large`     | theme values                | Padding per size                                                                |
-| `--text-input-line-height-base` / `-middle` / `-large` | theme values                | Line height per size                                                            |
+Set these on any ancestor; the stylesheet reads them through a fallback to the theme token.
+
+| Variable                    | Default                 | Effect                                                                          |
+| --------------------------- | ----------------------- | ------------------------------------------------------------------------------- |
+| `--text-input-bg`           | `--input-bg`            | Background, applied as a large inset box-shadow so autofill does not repaint it |
+| `--text-input-color`        | `--input-color`         | Text and caret colour                                                           |
+| `--text-input-border-color` | `--input-border-color`  | Border colour at rest                                                           |
+| `--text-input-border-hover` | `--input-border-hover`  | Border colour while hovered                                                     |
+| `--text-input-border-focus` | `--input-border-focus`  | Border colour while focused                                                     |
+| `--text-input-radius`       | `--input-border-radius` | Border radius                                                                   |
+| `--text-input-font-size`    | per-size value          | Overrides the font size of all three sizes at once                              |
+| `--text-input-disabled-bg`  | `--input-disabled-bg`   | Background while disabled                                                       |
+
+The theme tokens below are declared on the `<input>` element itself, so a value set on an
+ancestor never reaches it. Override them through the `style` prop only.
+
+| Variable                                               | Default                     | Effect                                   |
+| ------------------------------------------------------ | --------------------------- | ---------------------------------------- |
+| `--input-width-base` / `-middle` / `-large`            | `173px` / `300px` / `550px` | Width per `InputSize`                    |
+| `--text-input-font-size-base` / `-middle` / `-large`   | `13px` / `13px` / `16px`    | Font size per size                       |
+| `--text-input-padding-base` / `-middle` / `-large`     | theme values                | Padding per size                         |
+| `--text-input-line-height-base` / `-middle` / `-large` | theme values                | Line height per size                     |
+| `--text-input-placeholder-color`                       | theme value                 | Placeholder colour; disabled has its own |
 
 ## Accessibility
 
