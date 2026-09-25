@@ -42,8 +42,9 @@ toolbar global switches between portals saved in `localStorage` by
 - `useBearerForRawClient` — the raw client sends `Bearer <key>`, which is what an API key needs
   and what the portal's own cookie session does not.
 
-So "point this at my portal" is filling `.env` or adding a provider in the toolbar. Nothing in
-`docs/samples/` should re-implement that.
+So "point this at my portal" is adding a provider in the toolbar — the only way on the published
+static Storybook — or, locally, filling `.env`, which production builds deliberately ignore (see
+the traps below). Nothing in `docs/samples/` should re-implement that.
 
 ## Which modules need the provider
 
@@ -63,8 +64,11 @@ is a demonstration, not an authorisation, and the text next to it must say so.
 
 The two honest alternatives:
 
-- **The portal's session**, when the application is served from the portal's own origin and the
-  browser sends the cookie. Nothing to configure, nothing that works in Storybook.
+- **The portal's session**, when the application is served from the portal's own origin. This
+  is what the DocSpace client itself does: `packages/client/src/App.js` mounts this package's
+  `ApiProvider` with `apiKey={getCookie("asc_auth_key")}` and `url` built from
+  `ClientConfig.api.origin || location.origin` plus `ClientConfig.proxy.url`. The session
+  token is the key. Nothing to configure there, and nothing that works in Storybook.
 - **OAuth.** `utils/get-oauth-token` polls `localStorage.code` while a popup completes the flow;
   it assumes an OAuth client registered on the portal with a redirect URI pointing back at the
   application. The helper is the small half of that work.
@@ -74,6 +78,25 @@ The two honest alternatives:
 - **CORS, not 401.** A portal that does not allow the Storybook origin fails the request at the
   browser, so the error carries no status and reads as a network failure. Check the portal's
   CORS settings before debugging the token.
+- **Pictures from the portal are relative _and_ protected.** Avatars
+  (`/storage/userPhotos/...`), room logos and thumbnails are paths on the portal that answer
+  **403** without a signed-in request. The client renders them raw and gets away with it only
+  because it is same-origin, so the browser sends the session cookie. Elsewhere, resolving the
+  path against `baseUrl` fixes the host and nothing else — an `<img>` cannot carry a header. Fetch
+  it through `useApi().apiClient.instance` with `responseType: "blob"` and hand `<img>` an object
+  URL: `docs/samples/legal/usePortalImage.ts` does exactly that. Send the key only to the
+  portal's own origin, revoke the object URL on change, fall back to `""` so `Avatar` draws
+  initials. Resolve with `new URL(path, baseUrl)`, not `combineUrl`, which prefixes the host even
+  to a URL that already has one.
+- **CORS is permissive, credentials are not.** The portal answers `/api/2.0` and `/storage`
+  with `Access-Control-Allow-Origin: *` and echoes the requested headers (checked against a
+  live portal, preflight and actual response). That is why the key must travel as a header and
+  the request must not set `withCredentials`: a wildcard origin refuses cookies.
+- **A static build inlines `VITE_*`.** `import.meta.env.VITE_PROVIDER_API_KEY` is baked into
+  `assets/iframe-*.js` by `storybook build` — verified with a canary key. `.storybook/main.ts`
+  blanks both provider variables when `configType === "PRODUCTION"`, so the published
+  Storybook starts in demo mode and readers connect from the toolbar. Do not remove that guard,
+  and do not add a new `VITE_*` secret without the same treatment.
 - **Never commit a URL or a key.** They belong in `.env`, in the toolbar's `localStorage`, or in
   the reader's own head — a sample that ships a working key ships an open portal.
 - **Anything committed here has to render with no portal at all.** CI, the static build and a
