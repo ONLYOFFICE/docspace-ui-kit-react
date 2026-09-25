@@ -1,6 +1,6 @@
 ---
 name: release-check
-description: Full pre-merge sweep -- the CI gate, plus the checks nothing runs: manifest invariants, the plugin API surface diff, drift against the plugin skill, and what the tarball would actually ship
+description: Full pre-merge sweep -- the CI gate, plus the checks nothing runs: manifest invariants, the plugin API surface diff, drift against the plugin skill, what the tarball would actually ship, and (before a publish) that every vendored peer is already on npm
 argument-hint: "[--quick]"
 ---
 
@@ -87,6 +87,26 @@ Read it, do not skim it. `locales/` is vendored and committed, and the build no 
 copy scripts, so this list is literally what a publish ships. Check: `locales/en` present,
 `dist/esm`, `dist/types` and `dist/styles.css` present, per-component `README.md` files present,
 and nothing from `css/`, `fonts/` or `storybook-static/`.
+
+## 7 -- publish order (before a publish only)
+
+```bash
+node .claude/scripts/release-check/registry.mjs
+```
+
+A vendored package (a tarball committed beside `package.json`, installed as a `file:`
+devDependency) has to be on npm **before** this one is published: consumers never see the dev
+copy, only the peer range, and a peer range can only be met from a registry. `@onlyoffice/ai-chat`
+is the one this applies to today, and it is not on npm yet. Its peer range is a placeholder until
+then — fixed to the published version at publish time, not during merges.
+
+The script fails on a `file:` spec in `dependencies` or `peerDependencies`, on a vendored peer
+missing from npm, and on a peer range that no published version satisfies (npm resolves the
+range, so a prerelease such as `0.5.130-docs.8` does not meet `^0.5.121`). It needs the network;
+exit 2 means the registry could not be asked, not that the check passed.
+
+Before a merge, a "not on npm" finding here is expected: report it as a standing note, not a
+blocker. Before a publish it blocks.
 
 ## Report
 
