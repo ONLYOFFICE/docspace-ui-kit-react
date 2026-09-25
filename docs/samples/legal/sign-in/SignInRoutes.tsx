@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Avatar, AvatarRole, AvatarSize } from "../../../../components/avatar";
 import { Button, ButtonSize } from "../../../../components/button";
@@ -8,6 +8,7 @@ import {
   HeadingLevel,
   HeadingSize,
 } from "../../../../components/heading";
+import { Link, LinkTarget, LinkType } from "../../../../components/link";
 import { RadioButtonGroup } from "../../../../components/radio-button-group";
 import { Text } from "../../../../components/text";
 import {
@@ -17,6 +18,7 @@ import {
 } from "../../../../components/text-input";
 import { ApiProvider, useApi } from "../../../../providers/api";
 import { type Persona, personaFromRoles, type PersonaInfo } from "../persona";
+import { useOAuthAppSetup } from "../useOAuthAppSetup";
 import { useOAuthSignIn } from "../useOAuthSignIn";
 import { usePortal } from "../usePortal";
 import { usePortalImage } from "../usePortalImage";
@@ -150,7 +152,7 @@ const SignedInAs = ({ onPersona }: { onPersona: (p: PersonaInfo) => void }) => {
     );
   }
 
-  if (!me) return <Text fontSize="13px">Asking the portal who this is…</Text>;
+  if (!me) return <Text fontSize="13px">Asking the portal who this is...</Text>;
 
   return (
     <Identity
@@ -179,6 +181,21 @@ export const SignInRoutes = () => {
     () => new URL("oauth-callback.html", document.baseURI).toString(),
     [],
   );
+
+  const rememberClientId = useCallback((value: string) => {
+    setClientId(value);
+    try {
+      localStorage.setItem(CLIENT_ID_KEY, value);
+    } catch {
+      // A private window: the id simply is not remembered.
+    }
+  }, []);
+
+  const appSetup = useOAuthAppSetup({
+    redirectUri,
+    scopes: CLIENT_SCOPES,
+    onCreated: rememberClientId,
+  });
 
   const oauth = useOAuthSignIn({
     portalUrl: baseUrl,
@@ -235,7 +252,7 @@ export const SignInRoutes = () => {
             {portal.status === "demo"
               ? "No portal is configured — connect one from the toolbar, as in the previous sample."
               : portal.status === "loading"
-                ? "Asking the portal…"
+                ? "Asking the portal..."
                 : (portal.detail ?? "The portal did not answer.")}
           </Text>
         )}
@@ -282,17 +299,69 @@ export const SignInRoutes = () => {
             scale
             value={clientId}
             placeholder="From Developer Tools → OAuth on the portal"
-            onChange={(event) => {
-              const value = event.target.value.trim();
-              setClientId(value);
-              try {
-                localStorage.setItem(CLIENT_ID_KEY, value);
-              } catch {
-                // A private window: the id simply is not remembered.
-              }
-            }}
+            onChange={(event) => rememberClientId(event.target.value.trim())}
           />
         </FieldContainer>
+
+        {clientId && baseUrl ? (
+          <Link
+            type={LinkType.page}
+            href={appSetup.appUrl(clientId)}
+            target={LinkTarget.blank}
+            color="accent"
+            isHovered
+            fontSize="13px"
+          >
+            Open the app in ONLYOFFICE
+          </Link>
+        ) : null}
+
+        {!clientId && keyPersona ? (
+          appSetup.available ? (
+            <div className={styles.statusRow}>
+              <Button
+                size={ButtonSize.small}
+                label="Create the OAuth app"
+                isLoading={appSetup.status === "working"}
+                onClick={appSetup.create}
+              />
+              <Text fontSize="12px" lineHeight="18px">
+                {`Registers it for ${portal.me?.displayName ?? "the key's owner"}: PKCE on, this redirect URI and origin, these scopes.`}
+              </Text>
+            </div>
+          ) : (
+            <Text as="p" fontSize="13px" lineHeight="20px">
+              <Link
+                type={LinkType.page}
+                href={appSetup.createUrl}
+                target={LinkTarget.blank}
+                color="accent"
+                isHovered
+                fontSize="13px"
+              >
+                Create it in ONLYOFFICE
+              </Link>{" "}
+              — tick <b>Allow public client (PKCE)</b>, add the redirect URI and
+              the origin below, choose the scopes, then paste the Client ID
+              here. A static build cannot create it for you: the portal&apos;s
+              app registry answers no request from another origin.
+            </Text>
+          )
+        ) : null}
+
+        {appSetup.status === "done" ? (
+          <Text as="p" fontSize="12px" lineHeight="18px">
+            {appSetup.existed
+              ? "Found the app already registered for this redirect URI — nothing new was created."
+              : "Created on the portal. Its Client ID is in the field above."}
+          </Text>
+        ) : null}
+
+        {appSetup.status === "error" ? (
+          <Text as="p" fontSize="13px" lineHeight="20px">
+            {appSetup.error}
+          </Text>
+        ) : null}
 
         <div className={styles.facts}>
           <div>
@@ -301,6 +370,14 @@ export const SignInRoutes = () => {
             </Text>
             <Text as="p" className={styles.factValue}>
               {redirectUri}
+            </Text>
+          </div>
+          <div>
+            <Text as="p" className={styles.factLabel}>
+              Allowed origin to register
+            </Text>
+            <Text as="p" className={styles.factValue}>
+              {window.location.origin}
             </Text>
           </div>
           <div>
@@ -326,9 +403,9 @@ export const SignInRoutes = () => {
               size={ButtonSize.small}
               label={
                 oauth.status === "waiting"
-                  ? "Waiting for the portal…"
+                  ? "Waiting for the portal..."
                   : oauth.status === "exchanging"
-                    ? "Getting the token…"
+                    ? "Getting the token..."
                     : "Sign in with ONLYOFFICE"
               }
               isLoading={

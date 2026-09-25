@@ -4,6 +4,7 @@ import * as SignInRoutesStories from "./SignInRoutes.stories";
 import oauthSource from "../useOAuthSignIn.ts?raw";
 import pkceSource from "../pkce.ts?raw";
 import personaSource from "../persona.ts?raw";
+import setupSource from "../useOAuthAppSetup.ts?raw";
 import source from "./SignInRoutes.tsx?raw";
 
 <Meta of={SignInRoutesStories} />
@@ -45,18 +46,35 @@ changes on the portal.
 
 ### 1. Register the application on the portal
 
-In the portal, **Developer Tools → OAuth → Create app**:
+**With the portal already connected by its API key, press _Create the OAuth
+app_.** It registers exactly what the sign-in needs — PKCE on, this page's
+redirect URI and origin, the scopes below, one of the kit's icons — fills in the
+Client ID, and links to the app's page in the portal's Developer Tools. Press it
+again and it finds the app it made rather than registering a second one.
+
+The button needs `pnpm storybook`. Registering an app is two portal calls: the
+API key buys a five-minute JWT from `GET /api/2.0/security/oauth2/token`, and
+`POST /api/2.0/oauth2/clients` takes it in an `x-signature` header. The first
+answers any origin. The second is the portal's identity service, which refuses
+every CORS preflight — 403, even for the portal's own origin, which never sends
+one — so no page on another host can reach it. `.storybook/oauth-app-proxy.ts`
+makes both calls from the dev server instead. It answers one path, POST only,
+from this dev server's own pages, and forwards to those two routes and nothing
+else.
+
+**In a static build** — the published Storybook — the button becomes a link to
+the portal's own form, **Developer Tools → OAuth → Create app**:
 
 - tick **Allow public client (PKCE)** — without it the portal asks for a
   client secret, and a secret in a browser bundle is not a secret;
-- add the redirect URI this screen shows — for local Storybook that is
-  `http://localhost:6006/oauth-callback.html`, and the published Storybook needs
-  its own address with the same file name;
+- add the redirect URI and the allowed origin this screen shows;
 - give it the scopes a client needs and nothing more:
   `openid accounts.self:read rooms:read files:read files:write`.
 
-Paste the **Client ID** into the field above. It is not a secret — a public
-client's id never is — so the screen remembers it in `localStorage`.
+Either way the **Client ID** ends up in the field above. It is not a secret — a
+public client's id never is — so the screen remembers it in `localStorage`.
+
+<Source code={setupSource} language="tsx" />
 
 ### 2. What happens on **Sign in with ONLYOFFICE**
 

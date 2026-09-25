@@ -6,6 +6,7 @@ import svgr from "vite-plugin-svgr";
 import remarkGfm from "remark-gfm";
 
 import { aiChatMock } from "./ai-chat-mock.ts";
+import { oauthAppProxy } from "./oauth-app-proxy.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -175,6 +176,10 @@ const config: StorybookConfig = {
     // widget's stores never initialise and the panel renders empty. Inert
     // behind nginx (`STORYBOOK_PROXY`), where those calls reach the portal.
     config.plugins.push(aiChatMock());
+
+    // The legal-practice samples' "Create the OAuth app" button: two portal
+    // calls the browser cannot make cross-origin. Dev server only.
+    config.plugins.push(oauthAppProxy());
 
     return config;
   },
