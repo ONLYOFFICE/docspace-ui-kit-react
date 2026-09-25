@@ -35,7 +35,15 @@ const config: StorybookConfig = {
     "../billing/**/*.stories.@(js|jsx|ts|tsx)",
   ],
 
-  staticDirs: [{ from: "../assets", to: "/static" }],
+  // `public/` is served at the root, next to iframe.html, for pages a story
+  // needs a real URL for -- today the OAuth redirect URI of the legal-practice
+  // samples, `oauth-callback.html`, and the `serve.json` that keeps
+  // `pnpm storybook-serve` from rewriting it. Resolved relative to the
+  // preview, so it works under a path prefix as well.
+  staticDirs: [
+    { from: "../assets", to: "/static" },
+    { from: "./public", to: "/" },
+  ],
 
   // Opening the manager without a `path` leaves the selection to Storybook,
   // which lands on the first leaf of the index -- an autodocs page of whatever
