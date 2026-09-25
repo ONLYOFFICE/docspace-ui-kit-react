@@ -17,6 +17,12 @@ import {
   TextInput,
 } from "../../../../components/text-input";
 import { ApiProvider, useApi } from "../../../../providers/api";
+import {
+  CLIENT_SCOPES,
+  callbackUrl,
+  readClientId,
+  writeClientId,
+} from "../clientApp";
 import { type Persona, personaFromRoles, type PersonaInfo } from "../persona";
 import { useOAuthAppSetup } from "../useOAuthAppSetup";
 import { useOAuthSignIn } from "../useOAuthSignIn";
@@ -42,17 +48,6 @@ import styles from "../legal.module.scss";
  * Whichever route, the persona -- lawyer's workspace or client cabinet -- is
  * read from the portal's own roles by `personaFromRoles`.
  */
-
-/** Not secrets: a public client id and where it is registered to answer. */
-const CLIENT_ID_KEY = "legal-samples-oauth-client-id";
-
-const CLIENT_SCOPES = [
-  "openid",
-  "accounts.self:read",
-  "rooms:read",
-  "files:read",
-  "files:write",
-];
 
 const WORKSPACES: Record<Persona, { title: string; items: string[] }> = {
   lawyer: {
@@ -168,27 +163,12 @@ export const SignInRoutes = () => {
   const portal = usePortal();
   const { baseUrl } = useApi();
 
-  const [clientId, setClientId] = useState(() => {
-    try {
-      return localStorage.getItem(CLIENT_ID_KEY) ?? "";
-    } catch {
-      return "";
-    }
-  });
-
-  // The page next to the preview, so it is right under a path prefix too.
-  const redirectUri = useMemo(
-    () => new URL("oauth-callback.html", document.baseURI).toString(),
-    [],
-  );
+  const [clientId, setClientId] = useState(readClientId);
+  const redirectUri = useMemo(callbackUrl, []);
 
   const rememberClientId = useCallback((value: string) => {
     setClientId(value);
-    try {
-      localStorage.setItem(CLIENT_ID_KEY, value);
-    } catch {
-      // A private window: the id simply is not remembered.
-    }
+    writeClientId(value);
   }, []);
 
   const appSetup = useOAuthAppSetup({
