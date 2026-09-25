@@ -136,8 +136,13 @@ const preview: Preview = {
           "UI",
           "Samples",
           [
-            // The component-level ladder, grouped so the samples section can
-            // hold more than one track.
+            // Two tracks. "Legal practice" is the main one: a client cabinet
+            // and a lawyer's workspace built against a real portal, each rung
+            // a screen that ships rather than a component on its own. "UI
+            // basics" is the earlier ladder, kept as the component-level
+            // reference the first track no longer stops to explain.
+            "Legal practice",
+            ["01. Connect to a portal"],
             "UI basics",
             [
               "01. Buttons and toasts",
