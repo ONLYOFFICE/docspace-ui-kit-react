@@ -21,7 +21,7 @@ const meta = {
 - **12-Hour Format**: Caps the hours field at 12 and folds the required \`meridiem\` into the value reported to \`onChange\`; nothing marks AM or PM on screen
 - **Error State**: Visual error indicator for validation
 - **Auto Focus**: Option to focus the input on render
-- **Tab Navigation**: Skipped by Tab unless \`tabIndex\` is set, then hours and minutes are two Tab stops
+- **Tab Navigation**: Hours and minutes are two Tab stops of their own; \`tabIndex\` moves both in the order
 - **Auto-advance**: Two digits in the hours field, or one digit that cannot start a valid hour, move the caret to minutes; two digits in minutes leave the picker and call \`onBlur\`
 - **Range guard**: Accepts digits only, caps hours at 23 (12 in the 12-hour mode) and minutes at 59, and pads a single digit with a leading zero on blur
 
@@ -31,7 +31,7 @@ The two fields are native \`<input>\`s, so typing and screen-reader announcement
 
 - \`role="group"\` with \`aria-label="Time picker"\` on the box, \`aria-label="Hours"\` and \`"Minutes"\` on the fields
 - \`inputMode="numeric"\` brings up the number keypad on touch devices
-- Tab skips the picker unless \`tabIndex\` is set on it; then hours and minutes are two Tab stops, and two digits typed in hours move on to minutes as well
+- Hours and minutes are two Tab stops of their own, and two digits typed in hours move on to minutes as well; \`tabIndex\` moves both fields in the order
 
 ### Usage
 
@@ -72,10 +72,7 @@ import { TimePicker } from "@onlyoffice/apps-ui-kit/components/time-picker";
     tabIndex: {
       control: "number",
       description:
-        "Tab order of both fields; the default -1 keeps the picker out of the Tab sequence, pass 0 to reach it with the keyboard",
-      table: {
-        defaultValue: { summary: "-1 (not in the Tab order)" },
-      },
+        "Position of both fields in the Tab order; left out, they take their natural place in it",
     },
     focusOnRender: {
       control: "boolean",
@@ -154,7 +151,6 @@ export const Default: Story = {
   args: {
     initialTime: createDateTime(2025, 1, 27, 10, 30, 0),
     hasError: false,
-    tabIndex: 0,
     focusOnRender: false,
   },
   parameters: {

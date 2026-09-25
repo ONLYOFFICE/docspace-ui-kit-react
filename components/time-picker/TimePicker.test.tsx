@@ -222,14 +222,16 @@ describe("<TimePicker />", () => {
     expect(hoursInput.value).toBe("01");
   });
 
-  it("passes tabIndex to both fields and keeps them out of the Tab order by default", () => {
+  // Both fields used to inherit TextInput's -1 and Tab left the picker; the
+  // fields are in the natural tab order now, and tabIndex only moves them.
+  it("passes tabIndex to both fields and leaves them in the Tab order without it", () => {
     const { rerender } = render(<TimePicker {...baseProps} tabIndex={0} />);
     expect(screen.getByLabelText("Hours")).toHaveAttribute("tabindex", "0");
     expect(screen.getByLabelText("Minutes")).toHaveAttribute("tabindex", "0");
 
     rerender(<TimePicker {...baseProps} />);
-    expect(screen.getByLabelText("Hours")).toHaveAttribute("tabindex", "-1");
-    expect(screen.getByLabelText("Minutes")).toHaveAttribute("tabindex", "-1");
+    expect(screen.getByLabelText("Hours")).not.toHaveAttribute("tabindex");
+    expect(screen.getByLabelText("Minutes")).not.toHaveAttribute("tabindex");
   });
 
   it("prefixes the field class names with classNameInput and adds none without it", () => {

@@ -27,7 +27,7 @@ type TimePickerBase = {
    * @default false
    */
   hasError?: boolean;
-  /** Position of both fields in the tab order. Left out, Tab skips the picker. */
+  /** Position of both fields in the tab order. Left out, both take their natural place in it. */
   tabIndex?: number;
   /**
    * Called when typing completes the minutes field — two digits, a single digit
