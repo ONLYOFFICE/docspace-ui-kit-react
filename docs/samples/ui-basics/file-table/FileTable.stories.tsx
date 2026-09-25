@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { Dialogs } from "./Dialogs";
+import { FileTable } from "./FileTable";
 
 const meta = {
-  title: "Samples/04. Dialogs",
-  component: Dialogs,
+  title: "Samples/UI basics/06. Sortable table",
+  component: FileTable,
   tags: ["!autodocs"],
   parameters: {
     controls: { disable: true },
     actions: { disable: true },
   },
-} satisfies Meta<typeof Dialogs>;
+} satisfies Meta<typeof FileTable>;
 
 export default meta;
 

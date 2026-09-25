@@ -1,26 +1,26 @@
 import { useState } from "react";
 
-import { Button, ButtonSize } from "../../../components/button";
-import { ColorInput } from "../../../components/color-input";
+import { Button, ButtonSize } from "../../../../components/button";
+import { ColorInput } from "../../../../components/color-input";
 import {
   ComboBox,
   ComboBoxSize,
   type TOption,
-} from "../../../components/combobox";
-import { FieldContainer } from "../../../components/field-container";
+} from "../../../../components/combobox";
+import { FieldContainer } from "../../../../components/field-container";
 import {
   Heading,
   HeadingLevel,
   HeadingSize,
-} from "../../../components/heading";
-import { HelpButton } from "../../../components/help-button";
-import { RadioButtonGroup } from "../../../components/radio-button-group";
-import { Slider } from "../../../components/slider";
-import { Text } from "../../../components/text";
-import { InputSize } from "../../../components/text-input";
-import { Toast, toastr } from "../../../components/toast";
-import { ToggleButton } from "../../../components/toggle-button";
-import { globalColors } from "../../../providers/theme";
+} from "../../../../components/heading";
+import { HelpButton } from "../../../../components/help-button";
+import { RadioButtonGroup } from "../../../../components/radio-button-group";
+import { Slider } from "../../../../components/slider";
+import { Text } from "../../../../components/text";
+import { InputSize } from "../../../../components/text-input";
+import { Toast, toastr } from "../../../../components/toast";
+import { ToggleButton } from "../../../../components/toggle-button";
+import { globalColors } from "../../../../providers/theme";
 
 type RoomSettingsState = {
   fileLifetimeEnabled: boolean;

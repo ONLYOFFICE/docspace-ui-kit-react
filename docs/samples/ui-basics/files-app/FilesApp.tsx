@@ -1,52 +1,55 @@
 import { useMemo, useState } from "react";
 
-import CatalogFolderReactSvg from "../../../assets/icons/16/catalog.folder.react.svg";
-import CatalogRoomsReactSvg from "../../../assets/icons/16/catalog.rooms.react.svg";
-import CatalogTrashReactSvg from "../../../assets/icons/16/catalog.trash.react.svg";
-import CatalogFavoritesReactSvg from "../../../assets/icons/16/catalog.favorites.react.svg";
-import DownloadReactSvgUrl from "../../../assets/icons/16/download.react.svg?url";
-import MoveReactSvgUrl from "../../../assets/icons/16/move.react.svg?url";
-import TrashReactSvgUrl from "../../../assets/icons/16/trash.react.svg?url";
-import ViewRowsReactSvg from "../../../assets/view-rows.react.svg";
-import ViewTilesReactSvg from "../../../assets/view-tiles.react.svg";
-import Article from "../../../components/article";
-import { ArticleItem } from "../../../components/article/item";
-import { Badge } from "../../../components/badge";
-import { Button, ButtonSize } from "../../../components/button";
-import { FieldContainer } from "../../../components/field-container";
-import Filter from "../../../components/filter";
+import CatalogFolderReactSvg from "../../../../assets/icons/16/catalog.folder.react.svg";
+import CatalogRoomsReactSvg from "../../../../assets/icons/16/catalog.rooms.react.svg";
+import CatalogTrashReactSvg from "../../../../assets/icons/16/catalog.trash.react.svg";
+import CatalogFavoritesReactSvg from "../../../../assets/icons/16/catalog.favorites.react.svg";
+import DownloadReactSvgUrl from "../../../../assets/icons/16/download.react.svg?url";
+import MoveReactSvgUrl from "../../../../assets/icons/16/move.react.svg?url";
+import TrashReactSvgUrl from "../../../../assets/icons/16/trash.react.svg?url";
+import ViewRowsReactSvg from "../../../../assets/view-rows.react.svg";
+import ViewTilesReactSvg from "../../../../assets/view-tiles.react.svg";
+import Article from "../../../../components/article";
+import { ArticleItem } from "../../../../components/article/item";
+import { Badge } from "../../../../components/badge";
+import { Button, ButtonSize } from "../../../../components/button";
+import { FieldContainer } from "../../../../components/field-container";
+import Filter from "../../../../components/filter";
 import {
   Heading,
   HeadingLevel,
   HeadingSize,
-} from "../../../components/heading";
-import { Link, LinkType } from "../../../components/link";
-import { MainButton } from "../../../components/main-button";
-import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
-import Navigation from "../../../components/navigation";
-import { DropDownItem } from "../../../components/drop-down-item";
-import { Row, RowContainer, RowContent } from "../../../components/rows";
-import Section from "../../../components/section";
-import { TableGroupMenu } from "../../../components/table";
-import type { TGroupMenuItem } from "../../../components/table";
-import { Text } from "../../../components/text";
-import { InputType, TextInput } from "../../../components/text-input";
+} from "../../../../components/heading";
+import { Link, LinkType } from "../../../../components/link";
+import { MainButton } from "../../../../components/main-button";
+import {
+  ModalDialog,
+  ModalDialogType,
+} from "../../../../components/modal-dialog";
+import Navigation from "../../../../components/navigation";
+import { DropDownItem } from "../../../../components/drop-down-item";
+import { Row, RowContainer, RowContent } from "../../../../components/rows";
+import Section from "../../../../components/section";
+import { TableGroupMenu } from "../../../../components/table";
+import type { TGroupMenuItem } from "../../../../components/table";
+import { Text } from "../../../../components/text";
+import { InputType, TextInput } from "../../../../components/text-input";
 import {
   FileTile,
   FolderTile,
   TileContainer,
   TileContent,
-} from "../../../components/tiles";
-import { Toast, toastr } from "../../../components/toast";
-import { DeviceType, FileType, FilterGroups } from "../../../enums";
-import { useDebounce } from "../../../hooks";
+} from "../../../../components/tiles";
+import { Toast, toastr } from "../../../../components/toast";
+import { DeviceType, FileType, FilterGroups } from "../../../../enums";
+import { useDebounce } from "../../../../hooks";
 import {
   formatSampleDate,
   sampleFiles,
   sampleFolders,
   type SampleFile,
-} from "../sample-data";
-import { FileIcon } from "../file-icon";
+} from "../../sample-data";
+import { FileIcon } from "../../file-icon";
 import styles from "./FilesApp.module.scss";
 
 const noop = () => {};

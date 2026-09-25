@@ -1,15 +1,15 @@
 import { useState } from "react";
 
-import CopyReactSvg from "../../../assets/icons/16/copy.react.svg";
-import { Button, ButtonSize } from "../../../components/button";
+import CopyReactSvg from "../../../../assets/icons/16/copy.react.svg";
+import { Button, ButtonSize } from "../../../../components/button";
 import {
   Heading,
   HeadingLevel,
   HeadingSize,
-} from "../../../components/heading";
-import { Link, LinkType } from "../../../components/link";
-import { Text } from "../../../components/text";
-import { Toast, toastr } from "../../../components/toast";
+} from "../../../../components/heading";
+import { Link, LinkType } from "../../../../components/link";
+import { Text } from "../../../../components/text";
+import { Toast, toastr } from "../../../../components/toast";
 
 const actions: React.CSSProperties = {
   display: "flex",

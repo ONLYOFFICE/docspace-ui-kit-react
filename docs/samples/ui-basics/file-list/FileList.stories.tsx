@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { FileList } from "./FileList";
 
 const meta = {
-  title: "Samples/05. Selectable file list",
+  title: "Samples/UI basics/05. Selectable file list",
   component: FileList,
   tags: ["!autodocs"],
   parameters: {

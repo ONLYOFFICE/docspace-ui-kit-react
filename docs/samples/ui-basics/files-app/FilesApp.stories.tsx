@@ -1,16 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { PeopleSelector } from "./PeopleSelector";
+import { FilesApp } from "./FilesApp";
 
 const meta = {
-  title: "Samples/09. People picker",
-  component: PeopleSelector,
+  title: "Samples/UI basics/10. A small Files app",
+  component: FilesApp,
   tags: ["!autodocs"],
   parameters: {
     controls: { disable: true },
     actions: { disable: true },
+    noPadding: true,
   },
-} satisfies Meta<typeof PeopleSelector>;
+} satisfies Meta<typeof FilesApp>;
 
 export default meta;
 

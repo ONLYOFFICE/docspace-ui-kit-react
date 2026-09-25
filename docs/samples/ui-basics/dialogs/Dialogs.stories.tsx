@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { ScreenStates } from "./ScreenStates";
+import { Dialogs } from "./Dialogs";
 
 const meta = {
-  title: "Samples/08. Loading, empty, broken",
-  component: ScreenStates,
+  title: "Samples/UI basics/04. Dialogs",
+  component: Dialogs,
   tags: ["!autodocs"],
   parameters: {
     controls: { disable: true },
     actions: { disable: true },
   },
-} satisfies Meta<typeof ScreenStates>;
+} satisfies Meta<typeof Dialogs>;
 
 export default meta;
 

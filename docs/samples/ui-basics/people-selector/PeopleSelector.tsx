@@ -1,19 +1,22 @@
 import { useMemo, useState } from "react";
 import { EmployeeStatus, EmployeeType } from "@onlyoffice/docspace-api-sdk";
 
-import EmptyFilterPeopleDarkUrl from "../../../assets/emptyFilter/empty.filter.people.dark.svg?url";
-import EmptyFilterPeopleLightUrl from "../../../assets/emptyFilter/empty.filter.people.light.svg?url";
-import PeopleReactSvgUrl from "../../../assets/icons/16/people.react.svg?url";
-import { AvatarRole } from "../../../components/avatar";
-import { Button, ButtonSize } from "../../../components/button";
-import { Loader, LoaderTypes } from "../../../components/loader";
-import { Selector } from "../../../components/selector";
-import type { TAccessRight, TSelectorItem } from "../../../components/selector";
-import { Text } from "../../../components/text";
-import { Toast, toastr } from "../../../components/toast";
-import { useTheme } from "../../../context/ThemeContext";
-import { globalColors } from "../../../providers/theme";
-import { sampleUsers } from "../sample-data";
+import EmptyFilterPeopleDarkUrl from "../../../../assets/emptyFilter/empty.filter.people.dark.svg?url";
+import EmptyFilterPeopleLightUrl from "../../../../assets/emptyFilter/empty.filter.people.light.svg?url";
+import PeopleReactSvgUrl from "../../../../assets/icons/16/people.react.svg?url";
+import { AvatarRole } from "../../../../components/avatar";
+import { Button, ButtonSize } from "../../../../components/button";
+import { Loader, LoaderTypes } from "../../../../components/loader";
+import { Selector } from "../../../../components/selector";
+import type {
+  TAccessRight,
+  TSelectorItem,
+} from "../../../../components/selector";
+import { Text } from "../../../../components/text";
+import { Toast, toastr } from "../../../../components/toast";
+import { useTheme } from "../../../../context/ThemeContext";
+import { globalColors } from "../../../../providers/theme";
+import { sampleUsers } from "../../sample-data";
 
 const accessRights: TAccessRight[] = [
   { key: "admin", label: "Room admin", access: 0 },

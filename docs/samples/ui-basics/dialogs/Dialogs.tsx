@@ -1,24 +1,27 @@
 import { useState } from "react";
 
-import { Button, ButtonSize } from "../../../components/button";
-import { Checkbox } from "../../../components/checkbox";
+import { Button, ButtonSize } from "../../../../components/button";
+import { Checkbox } from "../../../../components/checkbox";
 import {
   ComboBox,
   ComboBoxSize,
   type TOption,
-} from "../../../components/combobox";
-import { EmailInput } from "../../../components/email-input";
-import { FieldContainer } from "../../../components/field-container";
+} from "../../../../components/combobox";
+import { EmailInput } from "../../../../components/email-input";
+import { FieldContainer } from "../../../../components/field-container";
 import {
   Heading,
   HeadingLevel,
   HeadingSize,
-} from "../../../components/heading";
-import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
-import { Text } from "../../../components/text";
-import { InputSize } from "../../../components/text-input";
-import { Toast, toastr } from "../../../components/toast";
-import { sampleFiles } from "../sample-data";
+} from "../../../../components/heading";
+import {
+  ModalDialog,
+  ModalDialogType,
+} from "../../../../components/modal-dialog";
+import { Text } from "../../../../components/text";
+import { InputSize } from "../../../../components/text-input";
+import { Toast, toastr } from "../../../../components/toast";
+import { sampleFiles } from "../../sample-data";
 
 const accessOptions: TOption[] = [
   { key: "viewer", label: "Viewer" },

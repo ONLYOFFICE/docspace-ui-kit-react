@@ -1,27 +1,27 @@
 import { useState } from "react";
 
-import ViewRowsReactSvg from "../../../assets/view-rows.react.svg";
-import ViewTilesReactSvg from "../../../assets/view-tiles.react.svg";
-import { Badge } from "../../../components/badge";
+import ViewRowsReactSvg from "../../../../assets/view-rows.react.svg";
+import ViewTilesReactSvg from "../../../../assets/view-tiles.react.svg";
+import { Badge } from "../../../../components/badge";
 import {
   Heading,
   HeadingLevel,
   HeadingSize,
-} from "../../../components/heading";
-import { IconButton } from "../../../components/icon-button";
-import { Link, LinkType } from "../../../components/link";
-import { Row, RowContainer, RowContent } from "../../../components/rows";
-import { Text } from "../../../components/text";
+} from "../../../../components/heading";
+import { IconButton } from "../../../../components/icon-button";
+import { Link, LinkType } from "../../../../components/link";
+import { Row, RowContainer, RowContent } from "../../../../components/rows";
+import { Text } from "../../../../components/text";
 import {
   FileTile,
   FolderTile,
   TileContainer,
   TileContent,
-} from "../../../components/tiles";
-import { Toast, toastr } from "../../../components/toast";
-import { FileType } from "../../../enums";
-import { sampleFiles, sampleFolders } from "../sample-data";
-import { FileIcon } from "../file-icon";
+} from "../../../../components/tiles";
+import { Toast, toastr } from "../../../../components/toast";
+import { FileType } from "../../../../enums";
+import { sampleFiles, sampleFolders } from "../../sample-data";
+import { FileIcon } from "../../file-icon";
 
 const fileTypeByExst: Record<string, FileType> = {
   ".docx": FileType.Document,

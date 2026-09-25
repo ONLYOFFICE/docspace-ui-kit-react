@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { TilesView } from "./TilesView";
+import { SignInForm } from "./SignInForm";
 
 const meta = {
-  title: "Samples/07. Tiles and the view switch",
-  component: TilesView,
+  title: "Samples/UI basics/02. Sign-in form",
+  component: SignInForm,
   tags: ["!autodocs"],
   parameters: {
     controls: { disable: true },
     actions: { disable: true },
   },
-} satisfies Meta<typeof TilesView>;
+} satisfies Meta<typeof SignInForm>;
 
 export default meta;
 

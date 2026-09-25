@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { RoomSettings } from "./RoomSettings";
+import { ButtonsAndToasts } from "./ButtonsAndToasts";
 
 const meta = {
-  title: "Samples/03. Room settings",
-  component: RoomSettings,
+  title: "Samples/UI basics/01. Buttons and toasts",
+  component: ButtonsAndToasts,
   tags: ["!autodocs"],
   parameters: {
     controls: { disable: true },
     actions: { disable: true },
   },
-} satisfies Meta<typeof RoomSettings>;
+} satisfies Meta<typeof ButtonsAndToasts>;
 
 export default meta;
 

@@ -1,20 +1,20 @@
 import { useState } from "react";
 
-import { Button, ButtonSize } from "../../../components/button";
-import { Checkbox } from "../../../components/checkbox";
-import { EmailInput } from "../../../components/email-input";
-import { FieldContainer } from "../../../components/field-container";
-import { FormWrapper } from "../../../components/form-wrapper";
+import { Button, ButtonSize } from "../../../../components/button";
+import { Checkbox } from "../../../../components/checkbox";
+import { EmailInput } from "../../../../components/email-input";
+import { FieldContainer } from "../../../../components/field-container";
+import { FormWrapper } from "../../../../components/form-wrapper";
 import {
   Heading,
   HeadingLevel,
   HeadingSize,
-} from "../../../components/heading";
-import { Link, LinkType } from "../../../components/link";
-import { PasswordInput } from "../../../components/password-input";
-import { Text } from "../../../components/text";
-import { InputSize } from "../../../components/text-input";
-import { Toast, toastr } from "../../../components/toast";
+} from "../../../../components/heading";
+import { Link, LinkType } from "../../../../components/link";
+import { PasswordInput } from "../../../../components/password-input";
+import { Text } from "../../../../components/text";
+import { InputSize } from "../../../../components/text-input";
+import { Toast, toastr } from "../../../../components/toast";
 
 /** The one password this demo portal accepts. */
 const DEMO_PASSWORD = "Docs2026!";

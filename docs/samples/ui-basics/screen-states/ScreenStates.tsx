@@ -1,27 +1,27 @@
 import { useState } from "react";
 
-import EmptyFilterFilesDarkUrl from "../../../assets/emptyFilter/empty.filter.files.dark.svg?url";
-import EmptyFilterFilesLightUrl from "../../../assets/emptyFilter/empty.filter.files.light.svg?url";
-import EmptyRoomsDarkSvg from "../../../assets/emptyview/empty.rooms.root.user.dark.svg";
-import EmptyRoomsLightSvg from "../../../assets/emptyview/empty.rooms.root.user.light.svg";
-import PlusReactSvg from "../../../assets/icons/16/button.plus.react.svg";
-import { Button, ButtonSize } from "../../../components/button";
-import { EmptyScreenContainer } from "../../../components/empty-screen-container";
-import { EmptyView } from "../../../components/empty-view";
+import EmptyFilterFilesDarkUrl from "../../../../assets/emptyFilter/empty.filter.files.dark.svg?url";
+import EmptyFilterFilesLightUrl from "../../../../assets/emptyFilter/empty.filter.files.light.svg?url";
+import EmptyRoomsDarkSvg from "../../../../assets/emptyview/empty.rooms.root.user.dark.svg";
+import EmptyRoomsLightSvg from "../../../../assets/emptyview/empty.rooms.root.user.light.svg";
+import PlusReactSvg from "../../../../assets/icons/16/button.plus.react.svg";
+import { Button, ButtonSize } from "../../../../components/button";
+import { EmptyScreenContainer } from "../../../../components/empty-screen-container";
+import { EmptyView } from "../../../../components/empty-view";
 import {
   Heading,
   HeadingLevel,
   HeadingSize,
-} from "../../../components/heading";
-import { Link, LinkType } from "../../../components/link";
-import { Row, RowContainer, RowContent } from "../../../components/rows";
-import { RowsSkeleton } from "../../../components/rows";
-import { Tabs, TabsTypes } from "../../../components/tabs";
-import { Text } from "../../../components/text";
-import { Toast, toastr } from "../../../components/toast";
-import { useTheme } from "../../../context/ThemeContext";
-import { sampleFiles } from "../sample-data";
-import { FileIcon } from "../file-icon";
+} from "../../../../components/heading";
+import { Link, LinkType } from "../../../../components/link";
+import { Row, RowContainer, RowContent } from "../../../../components/rows";
+import { RowsSkeleton } from "../../../../components/rows";
+import { Tabs, TabsTypes } from "../../../../components/tabs";
+import { Text } from "../../../../components/text";
+import { Toast, toastr } from "../../../../components/toast";
+import { useTheme } from "../../../../context/ThemeContext";
+import { sampleFiles } from "../../sample-data";
+import { FileIcon } from "../../file-icon";
 
 const box: React.CSSProperties = {
   minHeight: "360px",

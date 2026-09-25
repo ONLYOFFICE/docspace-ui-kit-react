@@ -4,9 +4,9 @@ import {
   Heading,
   HeadingLevel,
   HeadingSize,
-} from "../../../components/heading";
-import { Link, LinkType } from "../../../components/link";
-import { Scrollbar } from "../../../components/scrollbar";
+} from "../../../../components/heading";
+import { Link, LinkType } from "../../../../components/link";
+import { Scrollbar } from "../../../../components/scrollbar";
 import {
   TableBody,
   TableCell,
@@ -14,12 +14,12 @@ import {
   TableHeader,
   TableRow,
   type TTableColumn,
-} from "../../../components/table";
-import { Text } from "../../../components/text";
-import { Toast, toastr } from "../../../components/toast";
-import { SortByFieldName } from "../../../enums";
-import { formatSampleDate, sampleFiles } from "../sample-data";
-import { FileIcon } from "../file-icon";
+} from "../../../../components/table";
+import { Text } from "../../../../components/text";
+import { Toast, toastr } from "../../../../components/toast";
+import { SortByFieldName } from "../../../../enums";
+import { formatSampleDate, sampleFiles } from "../../sample-data";
+import { FileIcon } from "../../file-icon";
 
 /**
  * The same eight files as the previous sample, in the view people reach for
