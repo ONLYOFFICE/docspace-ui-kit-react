@@ -132,6 +132,10 @@ any origin, so a static page can do all of this with no server of its own.
 The challenge is base64url without padding, as S256 specifies, and
 `pkce.test.ts` checks it against the worked example in RFC 7636 itself.
 
+The app registered here is the one every later screen signs a client in with:
+[03. My matters](?path=/docs/samples-legal-practice-03-my-matters--docs) uses it
+to show a client the matters shared with them, and nothing else.
+
 ## The code
 
 Imports here are relative to this repository. In your application they come

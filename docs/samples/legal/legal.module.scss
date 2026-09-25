@@ -196,4 +196,84 @@
       color: colors.$dark-gray-dark;
     }
   }
+
+  .badgeStage {
+    :global(.light) & {
+      background-color: colors.$light-blue-main;
+      color: colors.$white;
+    }
+
+    :global(.dark) & {
+      background-color: colors.$light-blue-main;
+      color: colors.$white;
+    }
+  }
+
+  // A list of matters: the room's tile, what the matter is, where it stands.
+  .toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .matterList {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .matter {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 12px;
+    padding-block: 12px;
+  }
+
+  .matter + .matter {
+    :global(.light) & {
+      border-top: 1px solid colors.$gray-light-mid;
+    }
+
+    :global(.dark) & {
+      border-top: 1px solid colors.$light-dark-gray-hover;
+    }
+  }
+
+  .matterBody {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .matterTitle {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    overflow-wrap: anywhere;
+  }
+
+  .matterMeta {
+    margin: 0;
+    font-size: 12px;
+    line-height: 16px;
+
+    :global(.light) & {
+      color: colors.$light-gray-dark;
+    }
+
+    :global(.dark) & {
+      color: colors.$dark-gray-dark;
+    }
+  }
+
+  .tagRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
 }

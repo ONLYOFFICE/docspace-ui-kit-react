@@ -1,0 +1,94 @@
+import { Meta, Source, Story } from "@storybook/addon-docs/blocks";
+
+import * as MyMattersStories from "./MyMatters.stories";
+import matterSource from "../matter.ts?raw";
+import hookSource from "../useMatters.ts?raw";
+import source from "./MyMatters.tsx?raw";
+
+<Meta of={MyMattersStories} />
+
+# 03. My matters
+
+The first screen anyone at the firm opens, and the first one a client opens:
+the matters that are theirs. A lawyer wants to know which ones need attention;
+a client wants to know what is happening and who to ask.
+
+<Story of={MyMattersStories.Default} />
+
+With no portal configured, both lists are demo data. Connect a portal from the
+**API** control in the toolbar and the left list becomes the key owner's real
+matters; register the sample's OAuth app in
+[02. Who is signed in](?path=/docs/samples-legal-practice-02-who-is-signed-in--docs)
+and the right one signs a client in as themselves.
+
+## A matter is a room with two tags
+
+Nothing is stored anywhere but the portal. A matter is a room, and the two
+things a room does not already say are carried by its tags:
+
+| Tag | Example | What it does |
+| --- | --- | --- |
+| `Practice: …` | `Practice: Employment` | names the area of law — and makes the room a matter at all |
+| `Stage: …` | `Stage: Discovery` | says where it stands: Intake, Discovery, Negotiation, Hearing or Closed |
+
+Tags, because they are the one piece of free metadata a room has: the portal
+shows them as chips, filters rooms by them, and lets a lawyer change them
+without this application. The prefix keeps them readable in the portal's own
+list, where every room's tags live together. Any other tag passes through and
+is shown to the lawyer as it is; a stage outside the five is kept as written and
+drawn without the accent, so a firm can add its own.
+
+Everything else comes from the room: its title, who opened it (the lead
+lawyer), when it last changed, how many documents and sections it holds.
+
+To try it on your portal: open a room in ONLYOFFICE, add the tags
+`Practice: Employment` and `Stage: Intake`, and press **Refresh**.
+
+<Source code={matterSource} language="tsx" />
+
+## One list, two readers
+
+`useMatters()` never asks *whose* matters. It lists what the nearest
+`ApiProvider` may see:
+
+- under the provider Storybook mounts, that is the **API key** — the lawyer who
+  owns it, and every matter they were added to;
+- under a nested provider holding a client's **OAuth token**, the very same
+  code gets only the rooms shared with that client.
+
+The portal does the filtering, because the portal is what knows who may see
+what. A client cabinet that fetched every room and filtered by the client's name
+would be one edit away from showing a client someone else's matter.
+
+`getSelfProfile()` says who is asking, and the persona from
+[02](?path=/docs/samples-legal-practice-02-who-is-signed-in--docs) decides only
+the wording. A lawyer gets the practice, the lead, the document count, search and
+a filter by stage. A client gets a sentence about what the stage means for them
+and the name of their lawyer — the same room, told for a different reader.
+
+Rooms are read a hundred at a time, active ones only, up to 500. That is a
+sample's limit, not a portal's: a practice with thousands of matters passes
+`filterValue` to `getRoomsFolder` and searches on the server.
+
+<Source code={hookSource} language="tsx" />
+
+## Details worth copying
+
+- **`updated` arrives as a string.** The SDK types it as an object with
+  `utcTime`; the portal sends an ISO timestamp. `matterFromRoom` takes both.
+- **A room's picture is either a cover or a protected file.** A cover the portal
+  drew comes inline as SVG data, and `RoomIcon` recolours it. An uploaded
+  picture is a `/storage/…` path that answers 403 unsigned, so it goes through
+  `usePortalImage` from
+  [01](?path=/docs/samples-legal-practice-01-connect-to-a-portal--docs), under
+  whichever token the list runs with. With neither, `RoomIcon` draws the
+  initials on the room's colour.
+- **The room's page on the portal** is `/rooms/shared/<id>/filter?folder=<id>`,
+  for a guest as much as for a lawyer.
+- **Demo data has the portal's shape.** The demo rooms are what
+  `getRoomsFolder` returns, and go through the same `matterFromRoom`; the two
+  lists imitate the portal's two answers instead of filtering one list.
+
+## The code
+
+<Source code={source} language="tsx" />

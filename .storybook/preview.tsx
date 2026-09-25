@@ -142,7 +142,11 @@ const preview: Preview = {
             // basics" is the earlier ladder, kept as the component-level
             // reference the first track no longer stops to explain.
             "Legal practice",
-            ["01. Connect to a portal", "02. Who is signed in"],
+            [
+              "01. Connect to a portal",
+              "02. Who is signed in",
+              "03. My matters",
+            ],
             "UI basics",
             [
               "01. Buttons and toasts",
