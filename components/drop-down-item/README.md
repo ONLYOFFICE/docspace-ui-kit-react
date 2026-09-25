@@ -211,8 +211,11 @@ export function NotificationsItem() {
 - The row is a `<div role="option">` — or `role="separator"` — with `aria-selected` and
   `aria-disabled`, but its parent is a `role="listbox"` that is not linked to any control, so
   the pattern is incomplete on its own.
-- `tabIndex` is -1 by default, so the item is not in the tab order; the menu's arrow keys move a
-  visual highlight rather than focus, and they work only when the menu has a `maxHeight`.
+- **`tabIndex` is -1 by default, and that is correct here**, unlike on the kit's inputs: an
+  option inside a listbox is meant to stay off the tab order while the container keeps focus and
+  the arrow keys move a highlight. That is the active-descendant pattern, and the row carries
+  `data-focused` for it. What is incomplete is the container, per the point above — not this.
+  The arrow keys also work only when the menu has a `maxHeight`.
 - Clicks are handled on the row, and there is no key handler: Enter and Space do nothing unless
   the enclosing menu's keyboard navigation is on.
 - The badges are text inside the row, so their meaning is announced; the external-link icon is

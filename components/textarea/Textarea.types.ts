@@ -31,11 +31,21 @@ export type TextareaProps = {
   placeholder?: string;
   /** Accepts css style */
   style?: React.CSSProperties;
-  /** Used as HTML `tabindex` property. The default of `-1` takes the field
-   * **out of the tab order**; pass `0` for a field the user is meant to reach
-   * with the keyboard.
-   * @default -1 */
+  /** Used as HTML `tabindex` property. Left out, the field takes its natural
+   * place in the tab order; pass `-1` only for a field the keyboard is meant to
+   * skip. */
   tabIndex?: number;
+  /** Accessible name of the field, for when no `<label>` points at it. This
+   * type is closed — it accepts no arbitrary DOM attributes — so this prop and
+   * `aria-labelledby` are the only two ways to name the field. */
+  "aria-label"?: string;
+  /** `id` of the element that names this field — the usual choice when the
+   * caption is already on screen, for instance a `FieldContainer` label given
+   * an `id` of its own. */
+  "aria-labelledby"?: string;
+  /** `id` of the element describing the field, such as a hint or an error line
+   * below it. Announced after the name. */
+  "aria-describedby"?: string;
   /** The text. The field is controlled, so pair it with `onChange`.
    * @default "" */
   value?: string;

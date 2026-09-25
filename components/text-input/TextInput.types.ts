@@ -39,9 +39,8 @@ export type TextInputProps = HTMLInputProps & {
    * so `:placeholder-shown` matches even when no placeholder was asked for.
    * @default " " */
   placeholder?: string;
-  /** Used as HTML `tabindex` property. The default of `-1` takes the input **out of the
-   * tab order**; pass `0` for a field the user is meant to reach with the keyboard.
-   * @default -1 */
+  /** Used as HTML `tabindex` property. Left out, the field takes its natural place in the tab
+   * order; pass `-1` only for a field the keyboard is meant to skip. */
   tabIndex?: number;
   /** Input text mask */
   mask?: Mask | ((value: string) => Mask);

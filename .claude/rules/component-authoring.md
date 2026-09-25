@@ -95,11 +95,18 @@ still true, and all still unenforced.
 - Every component needs a story. `theme-provider` is the only one without; the file may sit in
   a subdirectory (`table`, `rows`, `tiles` do), so search recursively before concluding one is
   missing.
-- Stories no longer carry the prose. `parameters.docs.description.component` reads the
-  component's own README — `import readme from "./README.md?raw"` — so the page a developer
-  opens in Storybook and the file a coding agent reads are the same text, and neither can drift
-  from the other. The metadata block and the generator markers are HTML comments and render as
-  nothing; verified on the Button docs page.
+- **`STORY_TEMPLATE.md` governs stories, and it is the only file that does.**
+  `parameters.docs.description.component` is hand-written in its shape — a short line,
+  `### Features`, an optional `### Accessibility`, `### Usage`. Importing the README into it
+  with `?raw` was tried on four components and reverted in September 2026: a 260-line page does
+  not fit that template, and the four files were an unexplained exception among 146. This rule
+  used to state the opposite as settled fact while it was true of four files, which is how a
+  colleague following the template ended up contradicted by a rule. If the two ever disagree
+  again, `STORY_TEMPLATE.md` wins.
+- The consequence is that a component is described in two places by hand, and no gate compares
+  them. Correct both in the same commit, and expect the story's half to be the stale one: of the
+  two descriptions restored on the revert, one claimed `ModalDialog` traps focus, which it has
+  never done.
 - What stays in the story is what cannot be written down: the scenarios, the controls, the
   visual-regression surface. Feature lists, accessibility notes and the table of overridable
   `var(--x, fallback)` belong in the README, which is what `package.json` publishes — stories
@@ -116,12 +123,24 @@ still true, and all still unenforced.
 
 ## Missing documentation, as of today
 
-None. All 109 READMEs — 98 component folders and 11 nested sub-components — are on the template,
-and `check:readme` fails a component folder that has none, so this cannot regress quietly.
-`node .claude/scripts/component-docs/gaps.mjs` is the live count and today reports only a missing
-story (`theme-provider`) and seven components without tests.
+None. All 112 READMEs — 98 component folders, 11 nested sub-components and the three public
+providers — are on the template, and `check:readme` fails a folder that has none, so this cannot
+regress quietly. `node .claude/scripts/component-docs/gaps.mjs` is the live count and today
+reports only a missing story (`theme-provider`) and seven components without tests.
 
-What is documented is not the same as what is correct. `docs/known-defects.md` lists 11 faults the
-rewrite found — `TextInput` defaulting `tabIndex` to `-1` is the worst of them — each described in
-its component's README as the behaviour it is. That file is the list of things that have to change
-before those descriptions can.
+A provider block is the same schema with two fields dropped: no `category`, because a provider
+appears in no section of the catalogue, and no `state`, because it renders no element a prop
+shows or hides. `kind: "provider"` is what selects that variant, and naming either field there is
+an error rather than merely unused — a blank `category` would go straight into the catalogue as
+an empty row. The three folders come from `providers/index.ts` rather than the file system, so
+`providers/api` and the composed `Providers`, both portal-internal, stay undocumented on purpose.
+
+What is documented is not the same as what is correct. The rewrite turned up 13 faults in the
+components themselves, which `docs/known-defects.md` collected until all of them were fixed on
+2026-09-24; that file is gone, and `CHANGELOG.md` carries what each one means for a consumer.
+
+**There is no separate defect list now, and starting one again is the wrong move.** Every fault
+was already described in its own component's README — as the behaviour it was, because that is
+what the README is for — and the second copy in a central list was a second thing to keep in
+step. Describe a fault where the component is described; when it is fixed, correct that sentence
+in the same commit as the code, and say in `CHANGELOG.md` what changed for whoever upgrades.

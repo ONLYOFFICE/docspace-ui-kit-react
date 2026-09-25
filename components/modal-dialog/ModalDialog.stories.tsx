@@ -9,17 +9,52 @@ import { ModalDialog } from ".";
 import { ModalDialogType } from "./ModalDialog.enums";
 import type { ModalDialogProps } from "./ModalDialog.types";
 
-// The README is what the package ships and what a coding agent reads; rendering
-// it here keeps the developer looking at Storybook and the agent on one text.
-import readme from "./README.md?raw";
-
 const meta = {
   title: "UI/Overlays/ModalDialog",
   component: ModalDialog,
   parameters: {
     docs: {
       description: {
-        component: readme,
+        component: `ModalDialog displays content in a layer above the page, requiring user interaction before returning.
+
+### Features
+
+- **Two Display Types**: Modal (centered overlay) and Aside (slide-in panel)
+- **Compound Components**: Uses Header, Body, and Footer sub-components for structured layout
+- **Size Variants**: Support for large, huge, and auto-sized modals
+- **Scroll Control**: Configurable body scroll and scroll locking for aside mode
+- **Loading State**: Built-in loading indicator for async content
+- **Keyboard Support**: Escape key to close, Backspace for back navigation
+- **Form Support**: Optional form wrapper with submit handling
+- **Footer Border**: Optional visual separator between body and footer
+
+### Accessibility
+
+- \`Escape\` closes the dialog, and \`Backspace\` outside a field triggers \`onBackClick\`
+- Backdrop click closes it, unless \`closeOnBackdropClick\` is false
+- \`role="dialog"\` and \`aria-modal\` sit on the dialog surface. Name it with \`aria-labelledby\` pointing at your header's \`id\`, or with \`aria-label\`; a dialog with neither is announced unnamed
+- **Focus is not managed.** The dialog neither moves focus into itself when it opens nor traps it, and its markup stays in the document while \`visible\` is false — so render the dialog conditionally, or its controls stay in the page's tab order behind it
+
+### Usage
+
+\`\`\`tsx
+import { ModalDialog } from "@onlyoffice/apps-ui-kit/components/modal-dialog";
+
+<ModalDialog
+  visible={isVisible}
+  onClose={handleClose}
+  aria-labelledby="dialog-title"
+>
+  <ModalDialog.Header>
+    <span id="dialog-title">Title</span>
+  </ModalDialog.Header>
+  <ModalDialog.Body>Content here</ModalDialog.Body>
+  <ModalDialog.Footer>
+    <Button label="Save" primary onClick={handleSave} />
+    <Button label="Cancel" onClick={handleClose} />
+  </ModalDialog.Footer>
+</ModalDialog>
+\`\`\``,
       },
     },
     design: {

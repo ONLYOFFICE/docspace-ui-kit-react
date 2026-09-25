@@ -63,21 +63,28 @@ defects and surprises, which is what people fix:
 - a prop described as dead, after it became an alias;
 - an access described as throwing, after it was wrapped in `try`.
 
-All five are real, and all five reached a merge with every gate green. If the change makes an
-entry in `docs/known-defects.md` obsolete, remove it there in the same commit.
+All five are real, and all five reached a merge with every gate green.
+
+A component's own README is the only record of a fault in it. There used to be a
+`docs/known-defects.md` collecting them across components as well; it was emptied and removed
+once every entry was fixed, and a second place to say the same thing is a second place to go
+stale. So when a fix lands, correct the sentence in the README that described the fault — and
+put what it means for a consumer in `CHANGELOG.md`, which is where someone upgrading looks.
 
 ## Writing a story
 
 The story shows the component; the README describes it. `parameters.docs.description.component`
-reads the README rather than repeating it:
+is hand-written, in the shape `STORY_TEMPLATE.md` sets: a short line, `### Features`, an
+optional `### Accessibility`, `### Usage`. Follow that file — it is the one that governs
+stories.
 
-```ts
-import readme from "./README.md?raw";
-// parameters: { docs: { description: { component: readme } } }
-```
-
-So the docs page a developer opens and the file a coding agent reads are one text. The metadata
-block and the generator markers are HTML comments and render as nothing.
+Importing the README into it (`import readme from "./README.md?raw"`) was tried on four
+components and reverted: a 260-line page does not fit the template, and it carried sections a
+Storybook reader has no use for. So the description is a **second** piece of prose about the
+same component, and nothing checks that the two agree. Treat it as one more place the truth can
+go stale: when you change what a component does, correct the story's description in the same
+commit as the README's. Both restored descriptions turned out to contain a false sentence by
+then — one claimed `ModalDialog` traps focus, which it has never done.
 
 What the story owns is what prose cannot carry: the scenarios, the controls, the
 visual-regression surface. A component-level `var(--x, fallback)` is recorded in the README's

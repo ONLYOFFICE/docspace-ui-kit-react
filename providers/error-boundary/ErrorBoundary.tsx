@@ -6,7 +6,9 @@ import type { ErrorInfo, PropsWithChildren, ReactNode } from "react";
 import ErrorContainer from "../../components/error-container/ErrorContainer";
 
 export type TErrorBoundaryProps = PropsWithChildren<{
+  /** What to render instead of the subtree after a throw. A function receives the error. Without it the kit's own `ErrorContainer` is shown, with the error's message and an untranslated English heading. */
   fallback?: ReactNode | ((error: Error) => ReactNode);
+  /** Called once with the error and React's component stack. Report it here; the boundary itself logs nothing. */
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }>;
 

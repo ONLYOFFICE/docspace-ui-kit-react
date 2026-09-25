@@ -131,18 +131,14 @@ export interface WithTooltipProps {
    * produces a tooltip: the wrapper needs text for the anchor, so any other
    * node leaves the element with no tooltip at all. */
   tooltipContent?: React.ReactNode;
-  /** Ignored. Nothing reads this prop; the tooltip's placement comes from the
-   * `Tooltip` the anchor resolves to. */
-  tooltipPlace?: TTooltipPlace;
-  /** Ignored. Nothing reads this prop. */
-  tooltipFitToContent?: boolean;
 }
 
-export type OmitTooltipProps<T> = Omit<
-  T,
-  "title" | "tooltipContent" | "tooltipPlace" | "tooltipFitToContent"
->;
+export type OmitTooltipProps<T> = Omit<T, "title" | "tooltipContent">;
 
+// `tooltipPlace` and `tooltipFitToContent` were declared here, stripped by the
+// function below and read nowhere. They are gone from the type; they stay in
+// this set so that a caller still passing one does not have it land on the DOM
+// as an unknown attribute.
 const tooltipPropsToOmit = new Set([
   "title",
   "tooltipContent",

@@ -353,10 +353,28 @@ describe("ModalDialog", () => {
         </ModalDialog>,
       );
 
-      const backdrop = screen.getByRole("dialog");
+      const backdrop = document.getElementById("modal-onMouseDown-close");
+      if (!backdrop) throw new Error("no click-to-close layer");
       await userEvent.click(backdrop);
 
       expect(mockOnClose).toHaveBeenCalled();
+    });
+
+    // The role sits on the content, not on the click-to-close layer that spans
+    // the viewport, and the caller's name reaches it. Before, `aria-label` was
+    // swept into the rest props and landed on the header -- and only when a
+    // header was rendered -- so the dialog could not be named at all.
+    it("names the dialog on the element that carries the role", () => {
+      render(
+        <ModalDialog {...defaultProps} aria-label="Delete room">
+          <ModalDialog.Body>Modal Body Content</ModalDialog.Body>
+        </ModalDialog>,
+      );
+
+      const dialog = screen.getByRole("dialog");
+      expect(dialog).toHaveAttribute("id", "modal-dialog");
+      expect(dialog).toHaveAccessibleName("Delete room");
+      expect(dialog).toHaveAttribute("aria-modal", "true");
     });
 
     it("hides content when hideContent is true", () => {

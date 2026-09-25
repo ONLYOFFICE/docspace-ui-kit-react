@@ -132,7 +132,7 @@ const ModalDialog = ({
       window.removeEventListener("keyup", onKeyPress);
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchmove", onSwipe);
-      window.addEventListener("touchend", onSwipeEnd);
+      window.removeEventListener("touchend", onSwipeEnd);
     };
   }, [
     displayType,

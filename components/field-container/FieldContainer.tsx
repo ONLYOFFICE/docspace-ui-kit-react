@@ -22,6 +22,7 @@ const FieldContainer = ({
   inlineHelpButton,
   isRequired,
   labelText,
+  labelFor,
   tooltipMaxWidth,
   tooltipContent,
   tooltipClass,
@@ -69,7 +70,7 @@ const FieldContainer = ({
               truncate
               className={styles.fieldLabel}
               tooltipMaxWidth={tooltipMaxWidth}
-              htmlFor=""
+              htmlFor={labelFor}
             />
             {tooltipContent ? (
               <HelpButton
@@ -86,7 +87,7 @@ const FieldContainer = ({
           <div className={styles.fieldLabelIcon}>
             <Label
               isRequired={isRequired}
-              htmlFor=""
+              htmlFor={labelFor}
               text={labelText}
               truncate
               className={styles.fieldLabel}

@@ -16,9 +16,10 @@ export type FieldContainerProps = {
   labelVisible?: boolean;
   /** Field label text or element */
   labelText?: string | ReactNode;
-  /** Ignored. The component never reads this prop; pass an icon through `tooltipContent`
-   * or render it yourself inside `children`. */
-  icon?: string;
+  /** `id` of the control this labels, which becomes the label's `for`. Give the control that
+   * same `id` and the caption becomes clickable and is announced with the field; without it
+   * the label captions nothing. */
+  labelFor?: string;
   /** Renders the help button inline instead of in a separate div */
   inlineHelpButton?: boolean;
   /** Child elements */
@@ -27,9 +28,6 @@ export type FieldContainerProps = {
   tooltipContent?: string | ReactNode;
   /** Global position of the tooltip */
   place?: TTooltipPlace;
-  /** Ignored. The component never reads this prop and never passes a header to the help
-   * button. */
-  helpButtonHeaderContent?: string;
   /** Maximum label width in horizontal alignment (e.g., "110px") */
   maxLabelWidth?: string;
   /** Error message to display when hasError is true */
@@ -42,9 +40,6 @@ export type FieldContainerProps = {
   id?: string;
   /** Inline CSS styles */
   style?: CSSProperties;
-  /** Ignored. The component never reads this prop; the inline help button's own offset is
-   * hard-coded to 0. */
-  offsetRight?: number;
   /** Maximum width of the tooltip */
   tooltipMaxWidth?: string;
   /** Additional CSS class for tooltip */

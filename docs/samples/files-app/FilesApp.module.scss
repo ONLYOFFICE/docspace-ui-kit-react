@@ -1,0 +1,17 @@
+// The group menu fills the slot it is given, and inside a Section that slot
+// sits within the section's 20px content padding -- so the bar would read as a
+// card floating in the header rather than a band across it. The portal solves
+// this in its own header stylesheet, by letting the menu out of that padding;
+// same two declarations here.
+.headerSlot {
+  // `height: 100%` is not decoration: the menu sizes itself against this
+  // wrapper, and its actions live in a scroll area that collapses to nothing
+  // when the chain from the section header down to them loses its height.
+  width: 100%;
+  height: 100%;
+
+  :global(.table-container_group-menu) {
+    margin-inline: -20px 0;
+    width: calc(100% + 40px);
+  }
+}

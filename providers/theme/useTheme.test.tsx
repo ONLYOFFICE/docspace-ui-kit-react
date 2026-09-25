@@ -11,7 +11,6 @@ import {
 
 import useTheme from "./useTheme";
 
-const mockGetPortalColorTheme = vi.fn();
 const mockGetSystemTheme = vi.fn();
 const mockSetCookie = vi.fn();
 
@@ -23,12 +22,9 @@ vi.mock("../../utils/cookie", () => ({
   setCookie: (...args: unknown[]) => mockSetCookie(...args),
 }));
 
-vi.mock("@onlyoffice/docspace-api-sdk", () => ({
-  CommonSettingsApiAxiosParamCreator: () => ({
-    getPortalColorTheme: (...args: unknown[]) =>
-      mockGetPortalColorTheme(...args),
-  }),
-}));
+// No mock for `@onlyoffice/docspace-api-sdk`: `useTheme` imports only types
+// from it now, and a type import is erased. A mock here would hide a value
+// import creeping back in, which is what put axios in every consumer's bundle.
 
 const createMatchMedia = () => {
   const listeners: Array<(event: MediaQueryListEvent) => void> = [];
@@ -58,14 +54,8 @@ const createMatchMedia = () => {
 describe("useTheme", () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    mockGetPortalColorTheme.mockReset();
     mockGetSystemTheme.mockReset();
     mockSetCookie.mockReset();
-
-    mockGetPortalColorTheme.mockResolvedValue({
-      selected: undefined,
-      themes: [],
-    });
 
     const { matchMedia } = createMatchMedia();
     vi.stubGlobal("matchMedia", matchMedia);
@@ -122,23 +112,48 @@ describe("useTheme", () => {
     expect(result.current.currentColorTheme?.id).toBe("2");
   });
 
-  it("fetches current color theme when not provided", async () => {
+  // This used to assert that the palette was fetched when no `colorTheme` was
+  // passed, and it passed -- because the mock above stood in for the API SDK
+  // and behaved like a real request. The code never made one: it awaited the
+  // SDK's *parameter builder*, which returns `{ url, options }` and sends
+  // nothing, so `.themes` was undefined and the branch ended in silence. The
+  // fetch is gone, and with it the SDK and axios from every consumer's bundle.
+  it("keeps the kit's own accent when no colour theme is passed", async () => {
     vi.useRealTimers();
     mockGetSystemTheme.mockReturnValue(ThemeKeys.BaseStr);
-    mockGetPortalColorTheme.mockResolvedValue({
-      selected: "10",
-      themes: [{ id: "10", name: "Fetched" }],
-    });
 
     const { result } = renderHook(() => useTheme({}));
 
     await waitFor(() => {
-      expect(result.current.currentColorTheme?.name).toBe("Fetched");
+      expect(result.current.theme).toBeDefined();
     });
 
-    expect(mockGetPortalColorTheme).toHaveBeenCalledTimes(1);
+    expect(result.current.currentColorTheme).toBeUndefined();
 
     vi.useFakeTimers();
+  });
+
+  it("follows a colour theme that arrives after the first render", () => {
+    mockGetSystemTheme.mockReturnValue(ThemeKeys.BaseStr);
+
+    const themes = [
+      { id: "1", name: "One" },
+      { id: "2", name: "Two" },
+    ];
+    type ColorTheme = Parameters<typeof useTheme>[0]["colorTheme"];
+
+    const { result, rerender } = renderHook(
+      ({ colorTheme }: { colorTheme?: ColorTheme }) => useTheme({ colorTheme }),
+      { initialProps: {} as { colorTheme?: ColorTheme } },
+    );
+
+    expect(result.current.currentColorTheme).toBeUndefined();
+
+    rerender({
+      colorTheme: { selected: "2", themes } as unknown as ColorTheme,
+    });
+
+    expect(result.current.currentColorTheme?.id).toBe("2");
   });
 
   it("sets cookie with system theme on initialization", () => {

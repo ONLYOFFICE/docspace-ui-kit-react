@@ -24,7 +24,14 @@ export const CATEGORIES = [
   "Feedback",
 ];
 
-export const KINDS = ["component", "sub-component", "compound"];
+// `provider` is a component in the React sense and nothing like one on a page:
+// it renders no element of its own, so it belongs to no category on the
+// catalogue and has no state a prop shows or hides. Those two fields are
+// therefore forbidden rather than merely unused -- an empty `category` on a
+// provider would go straight into the catalogue as a blank row.
+export const KINDS = ["component", "sub-component", "compound", "provider"];
+
+export const isProvider = (meta) => meta?.kind === "provider";
 
 export const STATUSES = ["public", "portal-internal"];
 
@@ -48,6 +55,12 @@ const REQUIRED_FIELDS = [
   "subComponents",
   "testIds",
 ];
+
+// What a provider block carries instead: `category` and `state` are dropped,
+// everything else is the same, so one schema still describes both.
+const PROVIDER_REQUIRED_FIELDS = REQUIRED_FIELDS.filter(
+  (field) => field !== "category" && field !== "state",
+);
 
 const OPTIONAL_FIELDS = ["parent", "propsType"];
 
@@ -88,13 +101,21 @@ export const validateMetadata = (meta) => {
   const problems = [];
   const say = (message) => problems.push(message);
 
-  for (const field of REQUIRED_FIELDS) {
+  const required = isProvider(meta)
+    ? PROVIDER_REQUIRED_FIELDS
+    : REQUIRED_FIELDS;
+
+  for (const field of required) {
     if (!(field in meta)) say(`\`${field}\` is missing`);
   }
 
   for (const field of Object.keys(meta)) {
-    if (!REQUIRED_FIELDS.includes(field) && !OPTIONAL_FIELDS.includes(field)) {
-      say(`\`${field}\` is not a field of schema 1`);
+    if (!required.includes(field) && !OPTIONAL_FIELDS.includes(field)) {
+      say(
+        isProvider(meta) && REQUIRED_FIELDS.includes(field)
+          ? `\`${field}\` belongs to a component; a provider renders no element and has neither`
+          : `\`${field}\` is not a field of schema 1`,
+      );
     }
   }
 
@@ -125,7 +146,7 @@ export const validateMetadata = (meta) => {
     );
   }
 
-  if (!CATEGORIES.includes(meta.category)) {
+  if (!isProvider(meta) && !CATEGORIES.includes(meta.category)) {
     say(`\`category\` must be one of ${CATEGORIES.join(", ")}`);
   }
 
@@ -171,7 +192,9 @@ export const validateMetadata = (meta) => {
     }
   }
 
-  if (typeof meta.state !== "object" || meta.state === null) {
+  if (isProvider(meta)) {
+    // Nothing to check: `state` is absent by the field rules above.
+  } else if (typeof meta.state !== "object" || meta.state === null) {
     say("`state` must be an object");
   } else {
     for (const key of STATE_KEYS) {

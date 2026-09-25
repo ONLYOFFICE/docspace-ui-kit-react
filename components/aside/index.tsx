@@ -44,7 +44,11 @@ const AsidePure = (props: AsideProps) => {
       {!withoutHeader ? (
         <AsideHeader isCloseable onCloseClick={onClose} {...rest} />
       ) : null}
-      {withoutBodyScroll ? children : <Scrollbar>{children}</Scrollbar>}
+      {withoutBodyScroll ? (
+        children
+      ) : (
+        <Scrollbar className={styles.body}>{children}</Scrollbar>
+      )}
     </aside>
   );
 };

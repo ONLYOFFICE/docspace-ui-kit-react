@@ -13,10 +13,10 @@ type InputProps = {
   // `string` would reject `value={1}` in code that compiled before.
   /** Value of the underlying checkbox input, for a form read by name. */
   value?: string | number | readonly string[];
-  /** Applied to the checkbox's **icon**, not to the input, which is always
-   * `-1`. The default takes the control out of the tab order; pass `0` for a
-   * checkbox the user is meant to reach with the keyboard.
-   * @default -1 */
+  /** Applied to the checkbox's **icon**, which is the focusable element — the
+   * input beneath it is always `-1`. Pass `-1` for a checkbox the keyboard is
+   * meant to skip.
+   * @default 0 */
   tabIndex?: number;
   /** Called with the input's change event; the new state is
    * `event.target.checked`. The event does not bubble further — the component

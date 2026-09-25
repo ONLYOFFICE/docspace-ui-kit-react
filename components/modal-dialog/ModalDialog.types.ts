@@ -98,6 +98,16 @@ export type ModalSubComponentsProps = AsideHeaderProps & {
   scrollbarCreateContext?: boolean;
   /** Controls the visibility of the backdrop overlay */
   backdropVisible?: boolean;
+
+  /** Accessible name of the dialog, landing on the element that carries
+   * `role="dialog"`. Prefer `aria-labelledby` when the heading is already on
+   * screen; a dialog with neither is announced as an unnamed dialog. */
+  "aria-label"?: string;
+  /** `id` of the element naming the dialog — usually the heading passed to
+   * `ModalDialog.Header`, given an `id` of its own. */
+  "aria-labelledby"?: string;
+  /** `id` of the element describing the dialog, announced after the name. */
+  "aria-describedby"?: string;
 };
 
 export type ModalDialogProps = Partial<

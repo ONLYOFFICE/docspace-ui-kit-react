@@ -4,6 +4,7 @@ import DownloadReactSvgUrl from "../../../assets/icons/16/download.react.svg?url
 import MoveReactSvgUrl from "../../../assets/icons/16/move.react.svg?url";
 import TrashReactSvgUrl from "../../../assets/icons/16/trash.react.svg?url";
 import { Badge } from "../../../components/badge";
+import { DropDownItem } from "../../../components/drop-down-item";
 import {
   Heading,
   HeadingLevel,
@@ -103,17 +104,25 @@ export const FileList = () => {
     <div style={{ maxWidth: "820px" }}>
       <Toast />
 
-      <div style={{ minHeight: "52px", marginBottom: "8px" }}>
+      {/*
+        The group menu fills its container (`height: 100%`), so the slot it
+        drops into needs a height of its own -- 69px is what the portal's
+        section header gives it. Without one the actions collapse to nothing
+        and only the checkbox is left.
+      */}
+      <div style={{ height: "69px", marginBottom: "8px" }}>
         {selectedCount > 0 ? (
           <TableGroupMenu
             isChecked={isAllSelected}
-            isIndeterminate={!isAllSelected}
+            isIndeterminate={selectedCount > 0 && !isAllSelected}
             headerMenu={groupMenu}
-            withComboBox={false}
+            checkboxOptions={
+              <>
+                <DropDownItem label="All" onClick={() => toggleAll(true)} />
+                <DropDownItem label="None" onClick={() => toggleAll(false)} />
+              </>
+            }
             withoutInfoPanelToggler
-            headerLabel={`${selectedCount} selected`}
-            isCloseable
-            onCloseClick={() => setSelectedIds([])}
             onChange={toggleAll}
           />
         ) : (

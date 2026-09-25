@@ -44,6 +44,13 @@ $mobile-footer-height: 64px;
   background-color: var(--aside-bg-v);
   height: 100%;
 
+  // A column, so the header keeps its own height and the body gets what is
+  // left. Block-level, the body was given no height at all and the scrolling
+  // holder sized itself to the whole panel, putting its last ~53px below the
+  // bottom edge -- the end of a long list could not be reached.
+  display: flex;
+  flex-direction: column;
+
   position: fixed;
   top: 0;
 
@@ -79,4 +86,18 @@ $mobile-footer-height: 64px;
       height: 100%;
     }
   }
+}
+
+// The body of the panel: whatever is under the header.
+//
+// `flex-basis: 0` rather than `auto` is the whole point. The scrolling holder
+// carries an inline `height: 100%` of the library's own (see
+// `scrollbar/custom-scrollbar/style.ts`), which an inline style makes
+// unbeatable by a class rule -- but a definite `flex-basis` replaces the main
+// size property in a column flex container, so the holder is sized by the space
+// that is left instead. `min-height: 0` then lets it be smaller than its
+// content, which is what makes it scroll rather than overflow.
+.body {
+  flex: 1 1 0;
+  min-height: 0;
 }

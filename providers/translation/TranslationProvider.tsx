@@ -6,6 +6,7 @@ import { I18nextProvider } from "react-i18next";
 import useI18N, { type UseI18NProps } from "./useI18N";
 
 export type TTranslationProvider = {
+  /** The tree the translations apply to. */
   children: React.ReactNode;
 } & UseI18NProps;
 

@@ -39,6 +39,15 @@ export const ROOT = path.resolve(
 
 const COMPONENTS_DIR = "components";
 
+// The second documented root. Only what `providers/index.ts` re-exports counts:
+// `providers/api` is the portal REST client and `providers/Providers` the
+// composed root, both portal-internal, and neither is something an application
+// of its own mounts.
+const PROVIDERS_DIR = "providers";
+
+/** Both roots a README can live under, longest first for prefix matching. */
+const DOC_ROOTS = [COMPONENTS_DIR, PROVIDERS_DIR];
+
 // `NoTruncation` because a truncated type is worse than a long one here;
 // `UseAliasDefinedOutsideCurrentScope` keeps `ButtonSize` from expanding into
 // its four members; `WriteArrowStyleSignature` prints handlers as a reader
@@ -106,6 +115,61 @@ export function componentFolders() {
   }
 
   return folders;
+}
+
+/**
+ * The public provider folders, read from `providers/index.ts` rather than from
+ * the file system.
+ *
+ * The barrel is the definition of "public" here: the directory also holds
+ * `api/` and `Providers.tsx`, which the comment at the top of that file calls
+ * portal-internal, and documenting those to an outside reader would be worse
+ * than documenting nothing.
+ */
+export function providerFolders() {
+  return [...reExportedBy(path.join(ROOT, PROVIDERS_DIR, "index.ts"))]
+    .map((name) => `${PROVIDERS_DIR}/${name}`)
+    .filter((folder) => indexFileOf(folder))
+    .sort();
+}
+
+/** Every folder that owes a README: the components and the public providers. */
+export function documentedFolders() {
+  return [...componentFolders(), ...providerFolders()];
+}
+
+/**
+ * The folder names a barrel file re-exports with a relative specifier.
+ *
+ * Parsed from disk rather than from the program: nothing imports these index
+ * files, so they are not reachable from the roots the program is built on, and
+ * asking the program for `components/index.ts` returned nothing -- which read
+ * as "no component is in the barrel".
+ */
+function reExportedBy(file) {
+  const found = new Set();
+  if (!fs.existsSync(file)) return found;
+
+  const source = ts.createSourceFile(
+    file,
+    fs.readFileSync(file, "utf8"),
+    ts.ScriptTarget.ESNext,
+    true,
+  );
+
+  for (const statement of source.statements) {
+    if (
+      (ts.isExportDeclaration(statement) ||
+        ts.isImportDeclaration(statement)) &&
+      statement.moduleSpecifier &&
+      ts.isStringLiteral(statement.moduleSpecifier)
+    ) {
+      const specifier = statement.moduleSpecifier.text;
+      if (specifier.startsWith("./")) found.add(specifier.slice(2));
+    }
+  }
+
+  return found;
 }
 
 const readTsConfig = () => {
@@ -243,7 +307,7 @@ const printableType = (text, optional) => {
     : parts.join(" | ");
 };
 
-export function createReadmeProgram(folders = componentFolders()) {
+export function createReadmeProgram(folders = documentedFolders()) {
   const roots = folders.map(indexFileOf).filter(Boolean);
   const program = ts.createProgram(roots, {
     ...readTsConfig().options,
@@ -256,15 +320,16 @@ export function createReadmeProgram(folders = componentFolders()) {
   /** The folder a declaration belongs to, or null when it is not in one. */
   const folderOfFile = (fileName) => {
     const rel = relative(fileName);
-    if (!rel.startsWith(`${COMPONENTS_DIR}/`) || rel.startsWith("..")) {
-      return null;
-    }
+    if (rel.startsWith("..")) return null;
+
+    const root = DOC_ROOTS.find((dir) => rel.startsWith(`${dir}/`));
+    if (!root) return null;
 
     // Walk up to the nearest directory with an `index` module: a declaration in
     // `components/tooltip/sub-components/createTooltipWrapper.tsx` belongs to
     // `components/tooltip`.
     let dir = path.posix.dirname(rel);
-    while (dir.startsWith(COMPONENTS_DIR) && dir !== COMPONENTS_DIR) {
+    while (dir.startsWith(root) && dir !== root) {
       if (indexFileOf(dir)) return dir;
       dir = path.posix.dirname(dir);
     }
@@ -296,41 +361,21 @@ export function createReadmeProgram(folders = componentFolders()) {
   };
 
   /**
-   * The folders `components/index.ts` re-exports -- all 98 of them. Whether a
-   * consumer can reach a component from the root barrel is a different
-   * question, answered in `check-readme.mjs` from the names each folder
-   * exports: `export *` carries those and drops defaults. Derived, never taken
-   * from a README.
+   * The folders a barrel re-exports: all 98 of `components/index.ts` by
+   * default, or the three of `providers/index.ts` when asked for that one. The
+   * root `index.ts` re-exports both barrels wholesale, so a name either carries
+   * is reachable from `@onlyoffice/apps-ui-kit`.
+   *
+   * Whether a consumer can reach a *component* from the root barrel is a
+   * different question, answered in `check-readme.mjs` from the names each
+   * folder exports: `export *` carries those and drops defaults. Derived, never
+   * taken from a README.
    */
-  const barrelFolders = () => {
-    // Parsed from disk rather than taken from the program: nothing imports
-    // `components/index.ts`, so it is not reachable from the component index
-    // modules the program is rooted at, and asking the program for it returned
-    // nothing -- which read as "no component is in the barrel".
-    const file = path.join(ROOT, COMPONENTS_DIR, "index.ts");
-    if (!fs.existsSync(file)) return new Set();
-
-    const source = ts.createSourceFile(
-      file,
-      fs.readFileSync(file, "utf8"),
-      ts.ScriptTarget.ESNext,
-      true,
-    );
-
+  const barrelFolders = (dir = COMPONENTS_DIR) => {
     const found = new Set();
 
-    for (const statement of source.statements) {
-      if (
-        (ts.isExportDeclaration(statement) ||
-          ts.isImportDeclaration(statement)) &&
-        statement.moduleSpecifier &&
-        ts.isStringLiteral(statement.moduleSpecifier)
-      ) {
-        const specifier = statement.moduleSpecifier.text;
-        if (specifier.startsWith("./")) {
-          found.add(`${COMPONENTS_DIR}/${specifier.slice(2)}`);
-        }
-      }
+    for (const name of reExportedBy(path.join(ROOT, dir, "index.ts"))) {
+      found.add(`${dir}/${name}`);
     }
 
     return found;
