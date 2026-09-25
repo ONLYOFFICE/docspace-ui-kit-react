@@ -609,6 +609,7 @@ const AiAgentProviders = ({
   const {
     composerActions: attachActions,
     onSaveAsFile,
+    exportFormats,
     overlay,
   } = useFilesIntegration({
     entityId,
@@ -623,6 +624,7 @@ const AiAgentProviders = ({
     theme,
     onSaveAsFile,
     onOpenFile: openAttachedFile,
+    exportFormats,
   });
 
   // Tools that occupy the "editor" host group. `open_file` swaps this to the
