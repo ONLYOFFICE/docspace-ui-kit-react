@@ -36,20 +36,29 @@
 "use client";
 
 import React from "react";
-import { useStores } from "@onlyoffice/ai-chat";
+import type { useStores } from "@onlyoffice/ai-chat";
 
 import { getFormRegistry } from "./form-attachments";
 
-/**
- * Whether the message being composed carries at least one form.
- *
- * Recomputed both when the draft's refs change (the store is a zustand hook)
- * and when a new form lands in the registry — the two arrive separately,
- * because the ref is added by the library and the flag by the attach helper.
- */
-export const useHasFormAttached = (): boolean => {
-  const { useAttachmentsStore } = useStores();
+type AttachmentsStore = ReturnType<typeof useStores>["useAttachmentsStore"];
 
+/**
+ * Whether any ref on the current draft is in one of the form registry's sets.
+ *
+ * The two signals arrive separately — the ref is added by the library's
+ * zustand store, the flag by the attach helper's plain async function — so
+ * both have to be watched: the store through its hook, the registry through
+ * its version counter.
+ *
+ * The store is a parameter rather than read from context, because the chat
+ * providers own the bundle they create and are themselves above that context.
+ * `pick` chooses the set (forms with results, PDF forms, analyze-only) and is
+ * expected to be a stable module-level function.
+ */
+export const useRefsInFormRegistry = (
+  useAttachmentsStore: AttachmentsStore,
+  pick: (registry: ReturnType<typeof getFormRegistry>) => Set<string>,
+): boolean => {
   const files = useAttachmentsStore((s) => s.attachmentFiles);
   const images = useAttachmentsStore((s) => s.attachmentImages);
   const registry = getFormRegistry(useAttachmentsStore);
@@ -70,10 +79,10 @@ export const useHasFormAttached = (): boolean => {
     () => 0,
   );
 
-  return React.useMemo(
-    () =>
-      [...files, ...images].some((ref) => registry.ids.has(ref.id)),
+  return React.useMemo(() => {
+    const ids = pick(registry);
+    if (ids.size === 0) return false;
+    return [...files, ...images].some((ref) => ids.has(ref.id));
     // `version` is the registry's change signal, not a value read here.
-    [files, images, registry, version],
-  );
+  }, [files, images, registry, pick, version]);
 };

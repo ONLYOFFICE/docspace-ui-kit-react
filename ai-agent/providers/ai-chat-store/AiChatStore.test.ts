@@ -86,3 +86,161 @@ describe("AiChatStore fullscreen", () => {
     expect(store.isVisible).toBe(false);
   });
 });
+
+// "Analyze responses" is a state of the chat, not a one-off action: it has to
+// outlive the message that takes the form off the composer, and end only on
+// the edges below.
+describe("AiChatStore analyze mode", () => {
+  let store: AiChatStore;
+
+  beforeEach(() => {
+    store = new AiChatStore();
+  });
+
+  const form = { entryId: "42", title: "Survey.pdf" };
+
+  it("starts with the form, and reports it for the banner and the poll", () => {
+    expect(store.isAnalyzeMode).toBe(false);
+
+    store.startAnalyzeMode(form);
+
+    expect(store.isAnalyzeMode).toBe(true);
+    expect(store.analyzeEntryId).toBe("42");
+    expect(store.analyzeFormTitle).toBe("Survey.pdf");
+    // The form is still on the draft until the first message goes out.
+    expect(store.isAnalyzePending).toBe(true);
+  });
+
+  it("moves to another form instead of stacking a second mode", () => {
+    store.startAnalyzeMode(form);
+    store.markAnalyzeSent();
+
+    store.startAnalyzeMode({ entryId: "77", title: "Other.pdf" });
+
+    expect(store.analyzeEntryId).toBe("77");
+    // A fresh subject starts over: its own form is on the draft again.
+    expect(store.isAnalyzePending).toBe(true);
+  });
+
+  // The starter questions are generated per attachment record, so the id the
+  // attach minted is the key they are asked for — the host file id cannot
+  // stand in for it.
+  it("remembers the attachment id the attach reported", () => {
+    store.startAnalyzeMode(form);
+    expect(store.analyzeAttachmentId).toBeUndefined();
+
+    store.markAnalyzeAttached("42", "att-42");
+
+    expect(store.analyzeAttachmentId).toBe("att-42");
+    expect(store.isAnalyzeOnDraft).toBe(true);
+  });
+
+  it("ignores an attachment id reported for another form", () => {
+    store.startAnalyzeMode(form);
+
+    store.markAnalyzeAttached("77", "att-77");
+
+    expect(store.analyzeAttachmentId).toBeUndefined();
+  });
+
+  it("refuses to start without an entry id", () => {
+    // Nothing to ask the questions endpoint about, nothing to name.
+    store.startAnalyzeMode({ entryId: "", title: "Survey.pdf" });
+
+    expect(store.isAnalyzeMode).toBe(false);
+  });
+
+  it("survives the send that empties the composer", () => {
+    store.startAnalyzeMode(form);
+
+    store.markAnalyzeSent();
+
+    expect(store.isAnalyzeMode).toBe(true);
+    // No longer pending: an empty draft now means "already sent", not
+    // "the user removed the form".
+    expect(store.isAnalyzePending).toBe(false);
+  });
+
+  it("ends when the panel closes", () => {
+    store.open();
+    store.startAnalyzeMode(form);
+
+    store.close();
+
+    expect(store.isAnalyzeMode).toBe(false);
+  });
+
+  it("ends when the panel is toggled shut, but not when toggled open", () => {
+    store.startAnalyzeMode(form);
+    store.toggle();
+    expect(store.isVisible).toBe(true);
+    expect(store.isAnalyzeMode).toBe(true);
+
+    store.toggle();
+
+    expect(store.isVisible).toBe(false);
+    expect(store.isAnalyzeMode).toBe(false);
+  });
+
+  // `open` is the entry point that leaves an ongoing conversation alone, so
+  // it only ends the mode when it switches to another agent — whose chat the
+  // analyzed form has nothing to do with.
+  it("ends when the panel is opened for a different agent", () => {
+    store.open(1);
+    store.startAnalyzeMode(form);
+
+    store.open(2);
+
+    expect(store.isAnalyzeMode).toBe(false);
+  });
+
+  it("keeps the mode when opened for the same agent, or for none", () => {
+    store.open(1);
+    store.startAnalyzeMode(form);
+
+    store.open(1);
+    store.open();
+
+    expect(store.isAnalyzeMode).toBe(true);
+  });
+
+  it("ends when a new chat is opened on a closed panel", () => {
+    store.startAnalyzeMode(form);
+
+    store.openNewChat();
+
+    expect(store.pendingNewChat).toBe(true);
+    expect(store.isAnalyzeMode).toBe(false);
+  });
+
+  // Raising a panel that is already open starts no conversation — it keeps
+  // the thread, and the mode is part of that thread. Every attach entry point
+  // (plain "Ask AI", a repeat of "Analyze responses") comes through here
+  // first, so ending the mode unconditionally would take it away from the
+  // chat the user is looking at, chips and panel title included.
+  it("keeps the mode when the panel is already open", () => {
+    store.open();
+    store.startAnalyzeMode(form);
+
+    store.openNewChat();
+
+    expect(store.pendingNewChat).toBe(false);
+    expect(store.isAnalyzeMode).toBe(true);
+  });
+
+  it("is idempotent to end, and reports nothing when off", () => {
+    store.endAnalyzeMode();
+    store.endAnalyzeMode();
+
+    expect(store.isAnalyzeMode).toBe(false);
+    expect(store.analyzeEntryId).toBeUndefined();
+    expect(store.analyzeFormTitle).toBe("");
+    expect(store.isAnalyzePending).toBe(false);
+  });
+
+  it("ignores the sent marker when no mode is on", () => {
+    store.markAnalyzeSent();
+
+    expect(store.isAnalyzeMode).toBe(false);
+  });
+});
