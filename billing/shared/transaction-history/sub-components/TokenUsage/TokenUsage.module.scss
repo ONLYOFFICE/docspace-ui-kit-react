@@ -72,7 +72,7 @@
 .content {
   --token-cache-color: #{$light-status-positive};
   --token-fresh-color: #{$gray};
-  --token-received-color: var(--accent-main, #{$light-blue-main});
+  --token-received-color: #{$light-blue-main};
   --token-divider-color: #{$gray-light-mid};
   --token-details-color: #{$light-gray-dark};
 
