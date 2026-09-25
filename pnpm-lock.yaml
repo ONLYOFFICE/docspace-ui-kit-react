@@ -279,8 +279,8 @@ importers:
         specifier: 2.4.16
         version: 2.4.16
       '@onlyoffice/ai-chat':
-        specifier: file:onlyoffice-ai-chat-0.5.121.tgz
-        version: file:onlyoffice-ai-chat-0.5.121.tgz(e515904a021dcc2b1bbc4333c9eca73c)
+        specifier: file:onlyoffice-ai-chat-0.5.130-docs.8.tgz
+        version: file:onlyoffice-ai-chat-0.5.130-docs.8.tgz(e515904a021dcc2b1bbc4333c9eca73c)
       '@onlyoffice/document-editor-react':
         specifier: 2.1.1
         version: 2.1.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1453,9 +1453,9 @@ packages:
       '@emnapi/core': ^1.7.1 || ^2.0.0-alpha.4
       '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.4
 
-  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.5.121.tgz':
-    resolution: {integrity: sha512-Bz1Xy0+TVKAz+6V/XmNjnyIUxFEtEtKkjPGbJR0Ahi1RIxwPLoVXe5Oh+m6KOUWOVS//sYiDcT080maM4R1QCQ==, tarball: file:onlyoffice-ai-chat-0.5.121.tgz}
-    version: 0.5.121
+  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.5.130-docs.8.tgz':
+    resolution: {integrity: sha512-mlTwzsH4z99OvScpxDXhluPL/Uc/1fwk/uBppFAXzaMWGUdoNKKB9nUWC/9jm2BPvRdT9YHbHZAU37/mTt8hYQ==, tarball: file:onlyoffice-ai-chat-0.5.130-docs.8.tgz}
+    version: 0.5.130-docs.8
     peerDependencies:
       '@anthropic-ai/sdk': ^0.60.0
       '@assistant-ui/react': ^0.11.0
@@ -1470,6 +1470,7 @@ packages:
       '@radix-ui/react-slot': ^1.2.3
       '@radix-ui/react-switch': ^1.2.6
       '@radix-ui/react-tabs': ^1.1.13
+      '@radix-ui/react-toast': ^1.2.15
       '@radix-ui/react-tooltip': ^1.2.8
       assistant-stream: ^0.2.47
       class-variance-authority: ^0.7.1
@@ -1513,6 +1514,8 @@ packages:
       '@radix-ui/react-switch':
         optional: true
       '@radix-ui/react-tabs':
+        optional: true
+      '@radix-ui/react-toast':
         optional: true
       '@radix-ui/react-tooltip':
         optional: true
@@ -6646,7 +6649,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.4
     optional: true
 
-  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.5.121.tgz(e515904a021dcc2b1bbc4333c9eca73c)':
+  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.5.130-docs.8.tgz(e515904a021dcc2b1bbc4333c9eca73c)':
     dependencies:
       '@assistant-ui/react': 0.11.58(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.7.0(react@19.2.8))
       assistant-stream: 0.2.47

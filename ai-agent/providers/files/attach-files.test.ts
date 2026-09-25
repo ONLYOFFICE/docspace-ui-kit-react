@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { attachFilesToChat } from "./attach-files";
-import { getFormRegistry, hasFormResults } from "./form-attachments";
+import {
+  getFormRegistry,
+  hasAnalyzeAttachment,
+  hasFormResults,
+} from "./form-attachments";
 
 // ---------------------------------------------------------------------------
 // Fake attachments store: the refs the dedupe reads, plus the lease surface.
@@ -49,6 +53,15 @@ const input = (path: string, hasFormResults = false) => ({
   type: 7,
   content: "",
   hasFormResults,
+});
+
+// A DocSpace PDF form: the shape "Analyze responses" attaches.
+const pdfFormInput = (path: string) => ({
+  path,
+  title: `${path}.pdf`,
+  type: 7,
+  content: "",
+  hasFormResults: false,
 });
 
 // The helper is typed against the widget's store; the fake carries only the
@@ -224,6 +237,49 @@ describe("attachFilesToChat form flags", () => {
     const registry = getFormRegistry(asStore(store));
     expect(registry.ids.has("att-2")).toBe(true);
     expect(registry.ids.has("att-1")).toBe(false);
+  });
+});
+
+// "Analyze responses" attaches the form as the subject of the message; the
+// mark is what the composer lock reads (see `useAnalyzeLock`).
+describe("attachFilesToChat analyze subject", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("marks the attached form and locks the draft", async () => {
+    const { store } = makeStore();
+
+    await attachFilesToChat(
+      asStore(store),
+      [{ ...pdfFormInput("11"), analyzeOnly: true }],
+      new Set(),
+    );
+
+    expect(getFormRegistry(asStore(store)).analyzeOnlyIds.has("att-1")).toBe(
+      true,
+    );
+    expect(hasAnalyzeAttachment(asStore(store))).toBe(true);
+  });
+
+  it("lifts the lock once the form is off the draft", async () => {
+    const { store, attachmentFiles } = makeStore();
+
+    await attachFilesToChat(
+      asStore(store),
+      [{ ...pdfFormInput("11"), analyzeOnly: true }],
+      new Set(),
+    );
+    // What sending the message does: the library empties both buckets.
+    attachmentFiles.length = 0;
+
+    expect(hasAnalyzeAttachment(asStore(store))).toBe(false);
+  });
+
+  it("leaves an ordinary form attach unlocked", async () => {
+    const { store } = makeStore();
+
+    await attachFilesToChat(asStore(store), [pdfFormInput("11")], new Set());
+
+    expect(hasAnalyzeAttachment(asStore(store))).toBe(false);
   });
 });
 

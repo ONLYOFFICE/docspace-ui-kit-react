@@ -9,7 +9,6 @@ import { useVirtualKeyboardInset } from "../../hooks/useVirtualKeyboardInset";
 
 import { ChatToolbar } from "../chat-toolbar";
 import { ChatNoAccessScreen } from "./components/chat-no-access-screen";
-import { FormModelNotice } from "./components/form-model-notice";
 import { useAiChatStore } from "../providers/ai-chat-store/AiChatStoreProvider";
 
 import styles from "./NewChat.module.scss";
@@ -56,9 +55,6 @@ const NewChat: React.FC<ChatProps> = observer(
     const chatPanel = (
       <>
         {showToolbar ? <ChatToolbar /> : null}
-        {/* Above the conversation, as the legacy chat had it: the notice
-            reacts to what the composer carries, not to what was sent. */}
-        <FormModelNotice />
         {chatBody}
       </>
     );
