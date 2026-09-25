@@ -33,6 +33,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { FolderType } from "@onlyoffice/docspace-api-sdk";
+
 export const SHOW_LOADER_TIMER = 200;
 
 export const MIN_LOADER_TIMER = 500;
@@ -56,3 +58,19 @@ export const FORMS_SECTION_ID = "forms-section";
 
 /** Search area that lists form filling rooms (SearchArea.Forms). */
 export const FORMS_SEARCH_AREA = "Forms";
+
+/**
+ * Folder types of the rooms that make up the "Rooms" section, for the
+ * folderType scope filter of the Recent/Favorites aggregates.
+ *
+ * Mirrors ROOMS_SECTION_FOLDER_TYPES in the client package: form filling rooms
+ * belong to the "Forms" section and AI rooms to "AI Agents", so both are left
+ * out. VirtualRooms = 14 is the root that holds all of them and would leak
+ * those two sections back in, so it is not a member either.
+ */
+export const ROOMS_SECTION_FOLDER_TYPES = [
+  FolderType.EditingRoom,
+  FolderType.CustomRoom,
+  FolderType.PublicRoom,
+  FolderType.VirtualDataRoom,
+];

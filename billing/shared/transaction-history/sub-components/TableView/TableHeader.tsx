@@ -37,7 +37,7 @@ import React from "react";
 import { useCommonTranslation } from "../../../../../utils/i18n";
 
 import { TableHeader } from "../../../../../components/table";
-import { AI_TOOLS } from "../../../../constants";
+import { hasTransactionSource } from "../../utils";
 
 type TableHeaderProps = {
   containerRef: React.RefObject<HTMLDivElement>;
@@ -52,7 +52,7 @@ const TransactionHistoryTableHeader = (props: TableHeaderProps) => {
   const { serviceName, ...rest } = props;
   const t = useCommonTranslation();
 
-  const isAiTools = serviceName === AI_TOOLS;
+  const withSource = hasTransactionSource(serviceName);
 
   const defaultColumns = [
     {
@@ -64,7 +64,7 @@ const TransactionHistoryTableHeader = (props: TableHeaderProps) => {
       active: true,
       minWidth: 150,
     },
-    ...(isAiTools
+    ...(withSource
       ? [
           {
             key: "Source",

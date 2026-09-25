@@ -50,8 +50,7 @@ import {
   getServiceQuantity,
 } from "../../../../wallet/utils";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
-import { AI_TOOLS } from "../../../../constants";
-import { getTransactionSourceLabel } from "../../utils";
+import { getTransactionSourceLabel, hasTransactionSource } from "../../utils";
 
 interface TransactionRowProps {
   transaction: WalletOperationDto;
@@ -87,7 +86,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
           {correctDate}
         </Text>
       </TableCell>
-      {serviceName === AI_TOOLS ? (
+      {hasTransactionSource(serviceName) ? (
         <TableCell>
           <Text fontWeight={600} fontSize="11px">
             {getTransactionSourceLabel(t, transaction) ?? "—"}

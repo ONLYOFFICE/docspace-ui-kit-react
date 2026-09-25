@@ -259,7 +259,6 @@ export const buildSpecialFolderItems = ({
   favoritesFolder,
   withRecent,
   withFavorites,
-  parentId,
   folderType,
   withSeparator,
   t,
@@ -269,8 +268,7 @@ export const buildSpecialFolderItems = ({
   favoritesFolder?: FolderDtoInteger | null;
   withRecent?: boolean;
   withFavorites?: boolean;
-  parentId?: number;
-  folderType?: number;
+  folderType?: SpecialFolderScope["folderType"];
   withSeparator?: boolean;
   t: (key: string) => string;
 }): TSelectorItem[] => {
@@ -294,7 +292,7 @@ export const buildSpecialFolderItems = ({
     isFolder: true,
     avatar: React.createElement(Icon),
     disableMultiSelect: true,
-    specialFolderScope: { kind, folderId: folder.id!, section, parentId, folderType },
+    specialFolderScope: { kind, folderId: folder.id!, section, folderType },
   });
 
   if (withRecent && recentFolder)
@@ -337,7 +335,6 @@ export const buildScopedFolderUrl = ({
   count,
   search,
   filterParams,
-  parentId,
   folderType,
   withSubFolders,
 }: {
@@ -350,8 +347,7 @@ export const buildScopedFolderUrl = ({
     applyFilterOption?: number | string;
     extension?: string;
   };
-  parentId?: number;
-  folderType?: number;
+  folderType?: SpecialFolderScope["folderType"];
   withSubFolders?: boolean;
 }): string => {
   const params = new URLSearchParams();
@@ -368,8 +364,12 @@ export const buildScopedFolderUrl = ({
     params.set("extension", String(filterParams.extension));
   if (withSubFolders != null)
     params.set("withSubFolders", String(withSubFolders));
-  if (parentId != null) params.set("parentId", String(parentId));
-  if (folderType != null) params.set("folderType", String(folderType));
+  // The server binds folderType to a List<FolderType>, so a section made of
+  // several folder types is sent as repeated keys (folderType=16&folderType=19)
+  // rather than one comma-joined value.
+  if (folderType != null)
+    for (const type of Array.isArray(folderType) ? folderType : [folderType])
+      params.append("folderType", String(type));
 
   return `/api/2.0/files/${folderId}?${params.toString()}`;
 };

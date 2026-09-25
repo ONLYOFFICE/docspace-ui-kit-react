@@ -239,7 +239,6 @@ const useFilesHelper = ({
             count: PAGE_COUNT,
             search: currentSearch,
             filterParams,
-            parentId: activeSpecialScope.parentId,
             folderType: activeSpecialScope.folderType,
             withSubFolders,
           });
@@ -459,6 +458,9 @@ const useFilesHelper = ({
               favoritesFolder,
               withRecent: withRecentTreeFolder,
               withFavorites: withFavoritesTreeFolder,
+              // Scope filter for Recent/Favorites: keep My Documents content
+              // only, so room files do not leak into this section.
+              folderType: FolderType.USER,
               withSeparator: itemList.length > 0,
               t,
             });

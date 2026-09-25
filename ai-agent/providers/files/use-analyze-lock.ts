@@ -33,14 +33,28 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-// Sits between the chat header/toolbar and the conversation, aligned with the
-// centered message column the widget lays out below it.
-.formModelNotice {
-  box-sizing: border-box;
+"use client";
 
-  width: 100%;
-  max-width: var(--chat-content-max-width);
-  margin-inline: auto;
-  padding-inline: 16px;
-  padding-block-start: 8px;
-}
+import type { useStores } from "@onlyoffice/ai-chat";
+
+import type { getFormRegistry } from "./form-attachments";
+import { useRefsInFormRegistry } from "./use-form-registry";
+
+type AttachmentsStore = ReturnType<typeof useStores>["useAttachmentsStore"];
+
+const pickAnalyzeOnly = (registry: ReturnType<typeof getFormRegistry>) =>
+  registry.analyzeOnlyIds;
+
+/**
+ * Whether the draft is locked to a single attachment because that attachment
+ * is the subject of the message — the form a user picked "Analyze responses"
+ * on (see `ChatAttachableItem.analyzeOnly`).
+ *
+ * Derived, never stored: the lock exists exactly while the marked ref is on
+ * the draft. Removing its chip, sending the message (the library empties both
+ * buckets) or switching threads lifts it without anyone resetting a flag —
+ * which is what makes it survive the panel being closed and reopened.
+ */
+export const useAnalyzeLock = (
+  useAttachmentsStore: AttachmentsStore,
+): boolean => useRefsInFormRegistry(useAttachmentsStore, pickAnalyzeOnly);

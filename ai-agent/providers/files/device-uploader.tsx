@@ -28,10 +28,11 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useStores } from "@onlyoffice/ai-chat";
+import { useStores, ATTACHMENT_ACCEPT } from "@onlyoffice/ai-chat";
 
 import { useApi as useFilesApi } from "../../../providers/api";
 
+import { useAttachmentLimit } from "./attachment-limit";
 import { uploadFilesToChat } from "./upload-files";
 import type { OnFilesAttached } from "./attach-files";
 
@@ -62,6 +63,8 @@ const DeviceUploader = React.forwardRef<
   const { t } = useTranslation(["Common"]);
   const { useAttachmentsStore } = useStores();
   const { foldersApi, operationsApi, filesSettingsApi } = useFilesApi();
+  // What the composer accepts here, and why (see `AttachmentCap`).
+  const attachmentCap = useAttachmentLimit();
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const uploadFiles = React.useCallback(
@@ -73,6 +76,7 @@ const DeviceUploader = React.forwardRef<
         filesSettingsApi,
         useAttachmentsStore,
         onFilesAttached,
+        attachmentCap,
         t,
       }),
     [
@@ -82,6 +86,7 @@ const DeviceUploader = React.forwardRef<
       filesSettingsApi,
       entityId,
       onFilesAttached,
+      attachmentCap,
       t,
     ],
   );
@@ -107,7 +112,14 @@ const DeviceUploader = React.forwardRef<
   );
 
   return (
-    <input ref={inputRef} type="file" multiple hidden onChange={onChange} />
+    <input
+      ref={inputRef}
+      type="file"
+      multiple
+      hidden
+      onChange={onChange}
+      accept={ATTACHMENT_ACCEPT}
+    />
   );
 });
 DeviceUploader.displayName = "DeviceUploader";

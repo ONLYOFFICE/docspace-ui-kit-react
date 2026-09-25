@@ -35,9 +35,10 @@
 
 import React, { use } from "react";
 
-import type {
-  FolderDtoInteger,
-  FileEntryDtoIntegerAllOfSecurity,
+import {
+  FolderType,
+  type FolderDtoInteger,
+  type FileEntryDtoIntegerAllOfSecurity,
 } from "@onlyoffice/docspace-api-sdk";
 import type { TSelectorItem, TBreadCrumb } from "../../../components/selector";
 import { toastr, type TData } from "../../../components/toast";
@@ -187,6 +188,7 @@ const useAgentsHelper = ({
               favoritesFolder,
               withRecent: withRecentTreeFolder,
               withFavorites: withFavoritesTreeFolder,
+              folderType: FolderType.AiRoom,
               withSeparator: itemList.length > 0,
               t,
             });
@@ -247,3 +249,4 @@ const useAgentsHelper = ({
 };
 
 export default useAgentsHelper;
+

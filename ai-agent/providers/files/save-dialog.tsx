@@ -41,11 +41,15 @@ import SocketHelper, {
 import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import useGetIcon from "../../hooks/useGetIcon";
 
+import {
+  EXTENSION_BY_FORMAT,
+  extensionOf,
+  resolveFormat,
+  stripExt,
+} from "./export-format";
 import useDeviceType from "./use-device-type";
 
-const stripDocxExt = (name: string) => name.replace(/\.docx$/i, "");
-
-// How long to wait for the AI Worker to deliver the converted .docx before
+// How long to wait for the AI Worker to deliver the exported file before
 // silently dropping the completion watcher (no error toast — the file may
 // still arrive later; the user just won't get the notification).
 const EXPORT_WATCH_TIMEOUT_MS = 2 * 60 * 1000;
@@ -58,6 +62,7 @@ const EXPORT_WATCH_TIMEOUT_MS = 2 * 60 * 1000;
 const watchForExportedFile = (
   folderId: number,
   title: string,
+  extension: string,
   onCreated: (createdTitle: string) => void,
 ) => {
   const roomPart = `DIR-${folderId}`;
@@ -75,7 +80,7 @@ const watchForExportedFile = (
     });
   }
 
-  const expectedBase = stripDocxExt(title);
+  const expectedBase = stripExt(title, extension);
   let timer: ReturnType<typeof setTimeout> | null = null;
 
   const cleanup = () => {
@@ -90,10 +95,14 @@ const watchForExportedFile = (
       const file = JSON.parse(opt.data) as { folderId?: unknown; title?: unknown };
       if (String(file.folderId) !== String(folderId)) return;
       // The converter dedupes clashing names ("name (1).docx"), so match by
-      // the base-name prefix rather than exact equality.
+      // the base-name prefix rather than exact equality. The extension is
+      // matched exactly: exporting the same thread twice in two formats leaves
+      // "chat.docx" and "chat.pdf" in one folder, and a prefix-only match
+      // would let either watcher toast for the other's file.
       if (
         typeof file.title !== "string" ||
-        !stripDocxExt(file.title).startsWith(expectedBase)
+        extensionOf(file.title) !== extension ||
+        !stripExt(file.title, extension).startsWith(expectedBase)
       )
         return;
       cleanup();
@@ -112,6 +121,9 @@ type SaveDialogProps = {
   // (e.g. "<title>.docx").
   content: string;
   defaultName: string;
+  // `ExportFormat.id` chosen in the "Export to…" submenu, absent for the plain
+  // save action. See `resolveFormat`.
+  format?: string;
   // Called once the user has saved or cancelled, to close the dialog and
   // resolve the library's awaiting saveAsFile promise.
   onFinish: () => void;
@@ -121,18 +133,29 @@ type SaveDialogProps = {
 // a folder/filename and the message markdown is written to a file there via the
 // host files API. Rendered inside <AiAgentProviders> so ui-kit
 // useApi()/useGetIcon() resolve their context.
-const SaveDialog = ({ content, defaultName, onFinish }: SaveDialogProps) => {
+const SaveDialog = ({
+  content,
+  defaultName,
+  format,
+  onFinish,
+}: SaveDialogProps) => {
   const { t } = useTranslation(["Common"]);
   const { currentDeviceType } = useDeviceType();
   const { getIcon } = useGetIcon();
   const { filesApi, aiApi } = useFilesApi();
+
+  const exportFormat = resolveFormat(format, defaultName);
+  const extension = EXTENSION_BY_FORMAT[exportFormat];
 
   const onSubmit = React.useCallback<
     React.ComponentProps<typeof FilesSelector>["onSubmit"]
   >(
     async (selectedItemId, _folderTitle, _isPublic, _breadCrumbs, fileName) => {
       if (selectedItemId != null) {
-        const title = /\.docx$/i.test(fileName) ? fileName : `${fileName}.docx`;
+        const title =
+          extensionOf(fileName) === extension
+            ? fileName
+            : `${fileName}.${extension}`;
         const folderId = Number(selectedItemId);
         // Reuse the message-export toast key from the legacy chat (it has
         // translations for every locale); without a `components` entry the
@@ -145,31 +168,42 @@ const SaveDialog = ({ content, defaultName, onFinish }: SaveDialogProps) => {
             />,
           );
         try {
-          // Real md → docx conversion via the AI Worker. The call only
-          // queues the job; the toast fires when the converted file lands
-          // in the folder (files socket create event). Arm the watcher only
-          // after the queueing succeeded so a fallback save can't trigger a
-          // duplicate toast.
-          await aiApi.startTextToDocx(folderId, title, content);
-          watchForExportedFile(folderId, title, exportedToast);
-        } catch {
+          // Real export via the AI Worker: docx and pdf go through
+          // DocumentService, md is stored verbatim. The call only queues the
+          // job; the toast fires when the file lands in the folder (files
+          // socket create event, emitted for every format). Arm the watcher
+          // only after the queueing succeeded so a fallback save can't
+          // trigger a duplicate toast.
+          await aiApi.startTextToDocx(folderId, title, content, exportFormat);
+          watchForExportedFile(folderId, title, extension, exportedToast);
+        } catch (err) {
           // Legacy fallback: write the raw markdown as a text file, exactly
           // as this dialog behaved before the async export existed. The
           // creation is synchronous here, so toast right away.
-          try {
-            await filesApi.createTextFile({
-              folderId,
-              createTextOrHtmlFile: { title, content },
-            });
-            exportedToast(title);
-          } catch (e) {
-            toastr.error(e as TData);
+          //
+          // Docx only, on purpose: `createTextFile` derives the extension
+          // from the content (.txt, or .html when it looks like markup) and
+          // appends it to the title, so a failed pdf export would land as
+          // "chat.pdf.txt" — markdown source wearing a document's name. For
+          // the other formats a failure is reported as a failure.
+          if (exportFormat !== "Docx") {
+            toastr.error(err as TData);
+          } else {
+            try {
+              await filesApi.createTextFile({
+                folderId,
+                createTextOrHtmlFile: { title, content },
+              });
+              exportedToast(title);
+            } catch (e) {
+              toastr.error(e as TData);
+            }
           }
         }
       }
       onFinish();
     },
-    [content, filesApi, aiApi, onFinish],
+    [content, filesApi, aiApi, exportFormat, extension, onFinish],
   );
 
   const getIsDisabled = React.useCallback<
@@ -211,9 +245,11 @@ const SaveDialog = ({ content, defaultName, onFinish }: SaveDialogProps) => {
       // The attach dialog keeps the section — reading forms is legitimate.
       withFormsTreeFolder={false}
       // Form-filling rooms are still reachable through the Rooms section and
-      // pass the security.Create check, but the md → docx export into them
-      // dies silently in the AI Worker. Block entering them with the
-      // selector's own warning toast instead (Bug 83615).
+      // pass the security.Create check, but the export into them dies
+      // silently in the AI Worker. Block entering them with the selector's
+      // own warning toast instead (Bug 83615). Kept for every format: such a
+      // space only accepts PDF forms, and an exported chat is never one —
+      // not even when it is exported as a .pdf.
       formProps={{
         isRoomFormAccessible: false,
         message: t("Common:ChatMessageNotAllowedInFormRoom", {
@@ -242,7 +278,7 @@ const SaveDialog = ({ content, defaultName, onFinish }: SaveDialogProps) => {
       descriptionText=""
       footerCheckboxLabel=""
       footerInputHeader={t("Common:FileName", { defaultValue: "File name" })}
-      currentFooterInputValue={stripDocxExt(defaultName)}
+      currentFooterInputValue={stripExt(defaultName, extension)}
       getFilesArchiveError={() => ""}
       currentDeviceType={currentDeviceType}
     />
