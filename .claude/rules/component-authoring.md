@@ -113,8 +113,9 @@ still true, and all still unenforced.
   are not in the tarball, so a consumer never saw them.
 - Tests are Vitest + React Testing Library. **`vitest.config.ts` lists the directories it
   runs** — `components`, `selectors`, `ai-agent`, `errors`, `ui`, `utils`, `context`,
-  `providers`, `hooks`. A test placed under `billing/`, `uploader/`, `document-editor/` or
-  `api/` is collected by nothing and passes by never running.
+  `providers`, `hooks`, `scripts`, and `docs`, for the logic the samples carry (PKCE, role
+  mapping). A test placed under `billing/`, `uploader/`, `document-editor/` or `api/` is
+  collected by nothing and passes by never running.
 - Seven components have no test; that is tolerated, an untested _change_ to interactive logic is
   not. `node .claude/scripts/component-docs/gaps.mjs` lists them and the one missing story; no
   README is missing any more, and the gates keep it that way.
