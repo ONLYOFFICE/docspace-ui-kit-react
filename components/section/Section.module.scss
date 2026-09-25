@@ -4,48 +4,42 @@
 .header {
   // The theme class lives on `body`, an ancestor, so match it as one. A nested
   // `:global(.light){}` compiles to `.header .light` — a `.light` element inside
-  // the header — and nothing is ever that, so every variable below stayed unset,
-  // `height` and `min-height` resolved to an invalid `var()` and were dropped,
-  // and the header sized to its content instead of 69/61/53px with no background.
+  // the header — and nothing is ever that, so the variables never applied.
+  // Only the kit's default background is declared here; heights, paddings and
+  // `--section-header-bg` fall back inside the bridge vars below, so a value the
+  // host sets on an ancestor is not outranked by one declared on this element.
   :global(.light) & {
-    --section-header-height: 69px;
-    --section-header-height-tablet: 61px;
-    --section-header-height-mobile: 53px;
-    --section-header-bg: #{colors.$white};
-    --section-desktop-padding: -20px;
-    --section-tablet-padding: -24px;
+    --section-header-bg-default: #{colors.$white};
   }
 
   :global(.dark) & {
-    --section-header-height: 69px;
-    --section-header-height-tablet: 61px;
-    --section-header-height-mobile: 53px;
-    --section-header-bg: #{colors.$black};
-    --section-desktop-padding: -20px;
-    --section-tablet-padding: -24px;
+    --section-header-bg-default: #{colors.$black};
   }
 
   // bridge vars — bind public overrides to internal theme tokens
   --section-header-height-v: var(
     --section-header-size,
-    var(--section-header-height)
+    var(--section-header-height, 69px)
   );
   --section-header-height-tablet-v: var(
     --section-header-tablet-size,
-    var(--section-header-height-tablet)
+    var(--section-header-height-tablet, 61px)
   );
   --section-header-height-mobile-v: var(
     --section-header-mobile-size,
-    var(--section-header-height-mobile)
+    var(--section-header-height-mobile, 53px)
   );
-  --section-bg-v: var(--section-bg, var(--section-header-bg));
+  --section-bg-v: var(
+    --section-bg,
+    var(--section-header-bg, var(--section-header-bg-default))
+  );
   --section-desktop-padding-v: var(
     --section-content-padding,
-    var(--section-desktop-padding)
+    var(--section-desktop-padding, -20px)
   );
   --section-tablet-padding-v: var(
     --section-content-tablet-padding,
-    var(--section-tablet-padding)
+    var(--section-tablet-padding, -24px)
   );
 
   position: relative;
@@ -365,14 +359,17 @@
 }
 
 .submenu {
-  --section-bg-v: var(--section-bg, var(--section-header-bg));
+  --section-bg-v: var(
+    --section-bg,
+    var(--section-header-bg, var(--section-header-bg-default))
+  );
   --section-header-height-tablet-v: var(
     --section-header-tablet-size,
-    var(--section-header-height-tablet)
+    var(--section-header-height-tablet, 61px)
   );
   --section-header-height-mobile-v: var(
     --section-header-mobile-size,
-    var(--section-header-height-mobile)
+    var(--section-header-height-mobile, 53px)
   );
 
   background: var(--section-bg-v);
@@ -545,13 +542,13 @@
   &.withScroll {
     margin-inline-start: var(
       --section-desktop-padding-v,
-      var(--section-desktop-padding)
+      var(--section-desktop-padding, -20px)
     );
 
     @include mixins.tablet-and-below {
       margin-inline-start: var(
         --section-tablet-padding-v,
-        var(--section-tablet-padding)
+        var(--section-tablet-padding, -24px)
       );
     }
   }
@@ -563,13 +560,13 @@
   &.withScroll {
     margin-inline-start: var(
       --section-desktop-padding-v,
-      var(--section-desktop-padding)
+      var(--section-desktop-padding, -20px)
     );
 
     @include mixins.tablet-and-below {
       margin-inline-start: var(
         --section-tablet-padding-v,
-        var(--section-tablet-padding)
+        var(--section-tablet-padding, -24px)
       );
     }
   }
@@ -588,7 +585,10 @@
       // whole declaration would be dropped and this would fall back to
       // `top: auto` — not sticking at all — whenever --nav-offset is unset.
       top: var(--nav-offset, 0px);
-      background: var(--section-bg-v, var(--section-header-bg));
+      background: var(
+        --section-bg-v,
+        var(--section-header-bg, var(--section-header-bg-default))
+      );
       padding-inline-end: 0;
       z-index: 201;
 
@@ -611,7 +611,10 @@
 }
 
 .isFixed {
-  --section-bg-v: var(--section-bg, var(--section-header-bg));
+  --section-bg-v: var(
+    --section-bg,
+    var(--section-header-bg, var(--section-header-bg-default))
+  );
 
   position: sticky;
   top: 61px;
@@ -635,7 +638,23 @@
 // }
 
 .sectionContainer {
-  --section-bg-v: var(--section-bg, var(--section-header-bg));
+  // The background the portal theme names, with the kit's own value behind it.
+  // Declared as a separate token rather than as `--section-header-bg` itself:
+  // a default declared on this element would outrank the same token inherited
+  // from an ancestor, and the SDK sets exactly that on a wrapper above the
+  // section. Read last in the chain below, so anything the host sets wins.
+  :global(.light) & {
+    --section-header-bg-default: #{colors.$white};
+  }
+
+  :global(.dark) & {
+    --section-header-bg-default: #{colors.$black};
+  }
+
+  --section-bg-v: var(
+    --section-bg,
+    var(--section-header-bg, var(--section-header-bg-default))
+  );
 
   position: relative;
 
@@ -718,7 +737,10 @@
     .section-sticky-container {
       position: sticky;
       top: 0;
-      background: var(--section-bg-v, var(--section-header-bg));
+      background: var(
+        --section-bg-v,
+        var(--section-header-bg, var(--section-header-bg-default))
+      );
       z-index: 201;
       padding-inline: 20px;
       margin-inline: -20px -17px;
@@ -752,7 +774,10 @@
       display: flex;
       align-items: center;
       min-height: var(--section-filter-height, 0);
-      background: var(--section-bg-v, var(--section-header-bg));
+      background: var(
+        --section-bg-v,
+        var(--section-header-bg, var(--section-header-bg-default))
+      );
       // Bleed to the scroll-body edges so the opaque background fully covers
       // tiles scrolling beneath it (the scroll body has padding-inline-start:20px).
       margin-inline: -20px -17px;

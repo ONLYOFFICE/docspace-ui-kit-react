@@ -24,6 +24,7 @@ import { Link, LinkType } from "../../../components/link";
 import { MainButton } from "../../../components/main-button";
 import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
 import Navigation from "../../../components/navigation";
+import { DropDownItem } from "../../../components/drop-down-item";
 import { Row, RowContainer, RowContent } from "../../../components/rows";
 import Section from "../../../components/section";
 import { TableGroupMenu } from "../../../components/table";
@@ -46,6 +47,7 @@ import {
   type SampleFile,
 } from "../sample-data";
 import { FileIcon } from "../file-icon";
+import styles from "./FilesApp.module.scss";
 
 const noop = () => {};
 
@@ -203,6 +205,22 @@ export const FilesApp = () => {
       },
     },
   ];
+
+  // What the arrow next to the checkbox offers. The portal lists the same
+  // three: everything, only the files, only the folders.
+  const selectAllOptions = (
+    <>
+      <DropDownItem
+        label="All"
+        onClick={() => setSelectedIds(files.map((file) => file.id))}
+      />
+      <DropDownItem
+        label="Files"
+        onClick={() => setSelectedIds(files.map((file) => file.id))}
+      />
+      <DropDownItem label="Folders" onClick={() => setSelectedIds([])} />
+    </>
+  );
 
   const mainButtonModel = [
     {
@@ -433,19 +451,24 @@ export const FilesApp = () => {
         >
           <Section.SectionHeader>
             {selectedCount > 0 ? (
-              <TableGroupMenu
-                isChecked={selectedCount === files.length}
-                isIndeterminate={selectedCount !== files.length}
-                headerMenu={groupMenu}
-                withComboBox={false}
-                withoutInfoPanelToggler
-                headerLabel={`${selectedCount} selected`}
-                isCloseable
-                onCloseClick={() => setSelectedIds([])}
-                onChange={(checked) =>
-                  setSelectedIds(checked ? files.map((file) => file.id) : [])
-                }
-              />
+              // The portal's own group menu, prop for prop: a checkbox with
+              // the select-all drop-down beside it, then the actions. No
+              // label and no close button -- clearing the checkbox empties
+              // the selection, which is what makes the bar disappear.
+              <div className={styles.headerSlot}>
+                <TableGroupMenu
+                  isChecked={selectedCount === files.length}
+                  isIndeterminate={
+                    selectedCount > 0 && selectedCount !== files.length
+                  }
+                  headerMenu={groupMenu}
+                  checkboxOptions={selectAllOptions}
+                  withoutInfoPanelToggler
+                  onChange={(checked) =>
+                    setSelectedIds(checked ? files.map((file) => file.id) : [])
+                  }
+                />
+              </div>
             ) : (
               <Navigation
                 title="Documents"
