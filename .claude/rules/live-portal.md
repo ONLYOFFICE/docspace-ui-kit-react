@@ -69,9 +69,24 @@ The two honest alternatives:
   `ApiProvider` with `apiKey={getCookie("asc_auth_key")}` and `url` built from
   `ClientConfig.api.origin || location.origin` plus `ClientConfig.proxy.url`. The session
   token is the key. Nothing to configure there, and nothing that works in Storybook.
-- **OAuth.** `utils/get-oauth-token` polls `localStorage.code` while a popup completes the flow;
-  it assumes an OAuth client registered on the portal with a redirect URI pointing back at the
-  application. The helper is the small half of that work.
+- **OAuth**, the only route that lets a client use an application hosted elsewhere as
+  themselves. `docs/samples/legal/useOAuthSignIn.ts` is the working form. What it rests on, all
+  checked against a live portal:
+  - the app is created under Developer Tools → OAuth with **Allow public client (PKCE)**.
+    Without it the token endpoint wants `client_secret_post`, and a secret in a browser bundle is
+    not one; with it the exchange sends `code_verifier` instead;
+  - endpoints come from `/.well-known/openid-configuration` (`/oauth2/authorize`,
+    `/oauth2/token`); discovery and the token endpoint both answer any origin, so a static page
+    needs no server;
+  - authorize takes `response_type=code`, `client_id`, `redirect_uri`, space-separated `scope`,
+    `state`, `code_challenge_method=S256`, `code_challenge` — base64url, whatever the portal
+    docs' crypto-js snippet implies; `pkce.test.ts` pins it to RFC 7636's own example;
+  - the scopes a client cabinet needs: `openid accounts.self:read rooms:read files:read
+files:write`;
+  - the token goes to a nested `ApiProvider` as `apiKey`; it stays in memory.
+
+  `utils/get-oauth-token` is the older half of this: it polls `localStorage.code` and checks no
+  `state`, so the sample answers by `postMessage` from its own origin instead.
 
 ## Traps
 
@@ -97,6 +112,15 @@ The two honest alternatives:
   blanks both provider variables when `configType === "PRODUCTION"`, so the published
   Storybook starts in demo mode and readers connect from the toolbar. Do not remove that guard,
   and do not add a new `VITE_*` secret without the same treatment.
+- **A popup must open inside the click.** Any `await` before `window.open` — hashing a PKCE
+  verifier is enough — loses the user gesture and the browser blocks it. Open a blank popup
+  synchronously, navigate it once the challenge is ready.
+- **The OAuth callback is a plain `.html` in `.storybook/public/`**, served at the root by
+  `staticDirs`. Storybook's dev server serves a static file only by its full path — a directory
+  index 404s — and `serve` redirects `*.html` to a clean URL, dropping the query and the `code`
+  with it. `.storybook/public/serve.json` sets `"cleanUrls": false`, which also keeps
+  `iframe.html?id=…` deep links alive under `pnpm storybook-serve`. `serve` validates that file
+  strictly: an unknown key such as `$comment` makes it refuse to start.
 - **Never commit a URL or a key.** They belong in `.env`, in the toolbar's `localStorage`, or in
   the reader's own head — a sample that ships a working key ships an open portal.
 - **Anything committed here has to render with no portal at all.** CI, the static build and a
