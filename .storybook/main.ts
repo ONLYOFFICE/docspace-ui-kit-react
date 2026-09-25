@@ -79,7 +79,21 @@ const config: StorybookConfig = {
     reactDocgen: "react-docgen-typescript",
   },
 
-  async viteFinal(config) {
+  async viteFinal(config, { configType }) {
+    // A static build inlines every `import.meta.env.VITE_*` it reads, so a
+    // portal key sitting in the builder's `.env` would ship in plain text in
+    // `assets/iframe-*.js` -- verified with a canary key, and the published
+    // Storybook is exactly such a build. Blank both out for production: the
+    // published pages start in demo mode, and a reader connects their own
+    // portal from the toolbar, which keeps the key in their browser only.
+    if (configType === "PRODUCTION") {
+      config.define = {
+        ...config.define,
+        "import.meta.env.VITE_PROVIDER_API_URL": JSON.stringify(""),
+        "import.meta.env.VITE_PROVIDER_API_KEY": JSON.stringify(""),
+      };
+    }
+
     // When proxied behind nginx at /storybook/, Vite must transform all
     // JS import paths to include the prefix. Nginx strips the prefix before
     // forwarding to Storybook, and sub_filter handles HTML script tags.
