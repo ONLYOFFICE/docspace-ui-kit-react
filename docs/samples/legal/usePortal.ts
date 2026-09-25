@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { useApi } from "../../../providers/api";
+import type { RoleFlags } from "./persona";
 
 /**
  * The state every screen in this track starts from: is there a portal behind
@@ -33,6 +34,8 @@ export type PortalUser = {
   role: string;
   isAdmin: boolean;
   isVisitor: boolean;
+  /** The portal's own flags, for `personaFromRoles`. */
+  roles: RoleFlags;
 };
 
 export type PortalInfo = {
@@ -169,6 +172,13 @@ export const usePortal = (): PortalState => {
             role: describeRole(me ?? {}),
             isAdmin: Boolean(me?.isAdmin || me?.isOwner),
             isVisitor: Boolean(me?.isVisitor),
+            roles: {
+              isOwner: me?.isOwner,
+              isAdmin: me?.isAdmin,
+              isRoomAdmin: me?.isRoomAdmin,
+              isCollaborator: me?.isCollaborator,
+              isVisitor: me?.isVisitor,
+            },
           },
         });
       } catch (error) {
