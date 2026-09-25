@@ -68,6 +68,26 @@ const call = async (
   return { ok: response.ok, status: response.status, body };
 };
 
+/**
+ * The registry answers a refusal as an RFC 9457 problem: `detail` says what
+ * kind ("Validation failed"), and `errors` names each field with the message
+ * its constraint carries -- the only part that says what to change.
+ */
+type Problem = {
+  detail?: string;
+  errors?: { field?: string; message?: string }[];
+};
+
+const describeRefusal = (body: unknown) => {
+  if (typeof body === "string") return body.slice(0, 300) || "No reason given.";
+  const { detail, errors } = (body ?? {}) as Problem;
+  const fields = (errors ?? [])
+    .map(({ field, message }) => [field, message].filter(Boolean).join(": "))
+    .filter(Boolean);
+  if (fields.length) return fields.join("; ");
+  return detail ?? "No reason given.";
+};
+
 type ClientDto = {
   client_id?: string;
   name?: string;
@@ -165,13 +185,7 @@ export const oauthAppProxy = (): PluginOption => ({
           send(res, created.status || 502, {
             step: "create",
             status: created.status,
-            error:
-              typeof created.body === "string"
-                ? created.body.slice(0, 300)
-                : ((created.body as { message?: string; reason?: string })
-                    ?.message ??
-                  (created.body as { reason?: string })?.reason ??
-                  "The portal refused to create the app."),
+            error: describeRefusal(created.body),
           });
           return;
         }

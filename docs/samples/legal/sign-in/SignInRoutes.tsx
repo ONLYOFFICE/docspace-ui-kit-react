@@ -350,17 +350,27 @@ export const SignInRoutes = () => {
         ) : null}
 
         {appSetup.status === "done" ? (
-          <Text as="p" fontSize="12px" lineHeight="18px">
-            {appSetup.existed
-              ? "Found the app already registered for this redirect URI — nothing new was created."
-              : "Created on the portal. Its Client ID is in the field above."}
-          </Text>
+          <div className={styles.statusRow}>
+            <Text as="span" className={`${styles.badge} ${styles.badgeOk}`}>
+              {appSetup.existed ? "Already registered" : "App created"}
+            </Text>
+            <Text fontSize="13px" lineHeight="20px">
+              {appSetup.existed
+                ? "Found the app for this redirect URI — nothing new was created."
+                : "Its Client ID is in the field above."}
+            </Text>
+          </div>
         ) : null}
 
         {appSetup.status === "error" ? (
-          <Text as="p" fontSize="13px" lineHeight="20px">
-            {appSetup.error}
-          </Text>
+          <div className={styles.statusRow} role="alert">
+            <Text as="span" className={`${styles.badge} ${styles.badgeError}`}>
+              App not created
+            </Text>
+            <Text fontSize="13px" lineHeight="20px">
+              {appSetup.error}
+            </Text>
+          </div>
         ) : null}
 
         <div className={styles.facts}>
@@ -423,9 +433,14 @@ export const SignInRoutes = () => {
         </div>
 
         {oauth.error ? (
-          <Text as="p" fontSize="13px" lineHeight="20px">
-            {oauth.error}
-          </Text>
+          <div className={styles.statusRow} role="alert">
+            <Text as="span" className={`${styles.badge} ${styles.badgeError}`}>
+              Sign-in failed
+            </Text>
+            <Text fontSize="13px" lineHeight="20px">
+              {oauth.error}
+            </Text>
+          </div>
         ) : null}
 
         {oauth.status === "signed-in" ? (

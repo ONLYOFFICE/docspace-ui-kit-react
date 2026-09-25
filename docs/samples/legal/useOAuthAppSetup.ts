@@ -15,7 +15,7 @@ import { useApi } from "../../../providers/api";
  * The app is exactly what the sign-in needs: PKCE on, the redirect URI and
  * origin of this page, the scopes a client cabinet uses. The portal insists on
  * an icon and three URLs; the icon is one of the kit's own, the URLs point at
- * this sample.
+ * this sample where the portal accepts it as a URL.
  */
 export type OAuthAppSetup = {
   available: boolean;
@@ -29,6 +29,19 @@ export type OAuthAppSetup = {
   /** The portal's own form, for a static build. */
   createUrl: string;
 };
+
+/**
+ * Where the app's home page, terms, policy and logout redirect point when this
+ * page cannot be one of them. The registry checks those four against a pattern
+ * that wants a dotted host name or an IPv4 address, so `http://localhost:6006`
+ * is refused with 400 -- while the redirect URI and the origin, checked as
+ * plain URLs, may name localhost. On a dev server the four therefore point at
+ * the package's home page instead.
+ */
+const PUBLIC_FALLBACK = "https://www.onlyoffice.com";
+
+const publicPage = (url: URL) =>
+  url.hostname.includes(".") ? url.toString() : PUBLIC_FALLBACK;
 
 const toDataUrl = async (url: string) => {
   const blob = await (await fetch(url)).blob();
@@ -67,10 +80,13 @@ export const useOAuthAppSetup = ({
       ).Authorization;
 
       const origin = window.location.origin;
-      const samplePage = new URL(
-        "/?path=/docs/samples-legal-practice-02-who-is-signed-in--docs",
-        origin,
-      ).toString();
+      // Storybook's manager page, wherever this Storybook is served from.
+      const samplePage = publicPage(
+        new URL(
+          "./?path=/docs/samples-legal-practice-02-who-is-signed-in--docs",
+          document.baseURI,
+        ),
+      );
 
       const response = await fetch(
         new URL("__samples/oauth-app", document.baseURI),

@@ -62,6 +62,14 @@ makes both calls from the dev server instead. It answers one path, POST only,
 from this dev server's own pages, and forwards to those two routes and nothing
 else.
 
+The portal also wants a home page, terms, a privacy policy and a logout
+redirect, and checks those four against a pattern that needs a dotted host name
+or an IPv4 address: `http://localhost:6006/…` is refused with 400, although the
+redirect URI and the origin may name `localhost`. On a dev server the four
+therefore point at `https://www.onlyoffice.com`; an application of your own
+points them at its real pages. When the portal refuses, the screen shows which
+fields and why — the registry names each one in the `errors` of its answer.
+
 **In a static build** — the published Storybook — the button becomes a link to
 the portal's own form, **Developer Tools → OAuth → Create app**:
 
