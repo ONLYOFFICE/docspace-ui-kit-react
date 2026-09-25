@@ -8,7 +8,7 @@ import { resolvePortalUrl } from "./usePortal";
  *
  * Resolving the path against the portal (`portalUrl`) fixes the host and
  * nothing else: `/storage/userPhotos/...` and the other storage paths answer
- * 403 to a request that is not signed in. The DocSpace client never meets
+ * 403 to a request that is not signed in. The ONLYOFFICE Apps client never meets
  * this, because it is served from the portal's origin and the browser sends
  * the session cookie with every `<img>`. A page on any other origin has no
  * such cookie, and an `<img>` cannot carry a header -- so the only way to show

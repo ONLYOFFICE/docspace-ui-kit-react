@@ -10,7 +10,7 @@ import source from "./PortalConnection.tsx?raw";
 # 01. Connect to a portal
 
 The first screen of a legal practice, and the one the other eight lean on: is
-there a DocSpace behind this page, and who does it think we are?
+there an ONLYOFFICE Apps portal behind this page, and who does it think we are?
 
 <Story of={PortalConnectionStories.Default} />
 
@@ -66,7 +66,7 @@ afternoon goes missing.
 ## Pictures from the portal need the key too
 
 An avatar comes back as `/storage/userPhotos/…` — a path on the portal, and one
-that answers **403** to a request that is not signed in. The DocSpace client
+that answers **403** to a request that is not signed in. The ONLYOFFICE Apps client
 never notices, because it is served from the portal's origin and the browser
 sends the session cookie with every `<img>`. A page anywhere else has no such
 cookie, and an `<img>` cannot carry a header.

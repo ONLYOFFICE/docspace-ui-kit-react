@@ -89,7 +89,7 @@ const describeRole = (user: {
   isVisitor?: boolean;
 }) => {
   if (user.isOwner) return "Owner";
-  if (user.isAdmin) return "DocSpace admin";
+  if (user.isAdmin) return "Full admin";
   if (user.isRoomAdmin) return "Room admin";
   if (user.isCollaborator) return "Power user";
   if (user.isVisitor) return "Guest";

@@ -76,11 +76,11 @@ export const PortalConnection = () => {
               </Text>
             </div>
             <Text as="p" fontSize="13px" lineHeight="20px">
-              To point it at a real DocSpace, add a portal from the <b>API</b>{" "}
-              control in the toolbar — it keeps the URL and the key in this
-              browser only, and it is the only way on the published Storybook.
-              Working locally, the same two values can go in <code>.env</code>{" "}
-              instead:
+              To point it at a real ONLYOFFICE Apps portal, add a portal from
+              the <b>API</b> control in the toolbar — it keeps the URL and the
+              key in this browser only, and it is the only way on the published
+              Storybook. Working locally, the same two values can go in{" "}
+              <code>.env</code> instead:
             </Text>
             <pre className={styles.code}>
               {`VITE_PROVIDER_API_URL=https://your-portal.onlyoffice.com

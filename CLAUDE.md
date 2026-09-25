@@ -207,6 +207,24 @@ applies. Three levels, fastest first:
   than beside `index.ts` — `table`, `rows` and `tiles` all do — so check recursively
   before concluding one is missing. `theme-provider` is the only one currently without
 
+## Product naming
+
+The product formerly called DocSpace is **ONLYOFFICE Apps**. Every piece of user-facing text
+uses that name: UI strings, stories, the samples and other `.mdx` pages, and the READMEs the
+package ships.
+
+- **Where space is tight — buttons, links, badges — `ONLYOFFICE` alone is enough**: "Sign in
+  with ONLYOFFICE", "Open in ONLYOFFICE".
+- **Roles use the product's own words**, which carry no product name: Owner, Full admin, Room
+  admin, Power user, User, Guest.
+- **Names of things are not copy, so they stay**: `@onlyoffice/docspace-api-sdk`, the
+  `DocSpace-client` repository and its paths, API routes, `docspace` in URLs, environment and
+  config keys, CSS classes and test ids. Engineering notes here (`CLAUDE.md`, `.claude/rules/`)
+  keep "DocSpace" where it names that codebase.
+- **Inside a component the name comes from `getBrandName("ProductName")`**, because a
+  white-label portal renames the product again; `t("Common:ProductName")` is refused by the
+  `no-constants-via-i18n` lint plugin. Samples and documentation write the name out.
+
 ## Paths
 
 Never write an absolute path into anything committed here — not into `CLAUDE.md`, the rules
