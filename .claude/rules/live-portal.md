@@ -83,6 +83,12 @@ The two honest alternatives:
     docs' crypto-js snippet implies; `pkce.test.ts` pins it to RFC 7636's own example;
   - the scopes a client cabinet needs: `openid accounts.self:read rooms:read files:read
 files:write`;
+  - **`scope` goes last** in the authorize URL. On a person's first consent the login app's
+    consent page (`packages/login` in DocSpace-client, `getRedirectURL`) re-sends the browser
+    to authorize with a URL rebuilt as everything before `&scope=` plus the scopes, so any
+    parameter after `scope` — `state`, `code_challenge` — is silently dropped. The symptom is a
+    code arriving without `state`, once per person, never on the second try.
+    `authorizeUrl` in `useOAuthSignIn.ts` fixes the order and its test pins it;
   - the token goes to a nested `ApiProvider` as `apiKey`; it stays in memory.
 
   The app itself can be registered with the API key, but not from a browser:
