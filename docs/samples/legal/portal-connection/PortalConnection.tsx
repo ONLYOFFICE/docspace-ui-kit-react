@@ -60,7 +60,7 @@ export const PortalConnection = () => {
         {portal.status === "loading" ? (
           <div className={styles.statusRow}>
             <Loader type={LoaderTypes.track} size="20px" />
-            <Text fontSize="13px">Asking the portal…</Text>
+            <Text fontSize="13px">Asking the portal...</Text>
           </div>
         ) : null}
 
