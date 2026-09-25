@@ -93,7 +93,17 @@ files:write`;
   `.storybook/oauth-app-proxy.ts` does it for `storybook dev`, and a static build links to the
   portal's form (`/developer-tools/oauth/create`; an app's page is `/developer-tools/oauth/:id`)
   instead. The portal's form also demands an icon, a website, terms and privacy URLs and an
-  allowed origin, none of which the API marks required.
+  allowed origin, and so does the API behind it, whatever its reference page implies.
+
+  The registry validates them (`CreateClientRequest` in `server/common/ASC.Identity/registration`
+  of the DocSpace repository). `website_url`,
+  `terms_url`, `policy_url` and `logout_redirect_uri` must match a pattern that wants a dotted
+  host or an IPv4 address, so **`localhost` gets 400** — while `redirect_uris` and
+  `allowed_origins` are checked as plain URLs and accept it. The logo is a base64 `data:` URI
+  (png, jpeg or svg+xml) of at most 256 000 decoded bytes; the name is 3–256 characters, the
+  description at most 255. A refusal is an RFC 9457 problem whose `detail` is only "Validation
+  failed"; what to change is in `errors[]` as `{ field, code, message }`, so surface that, not the
+  status.
 
   `utils/get-oauth-token` is the older half of this: it polls `localStorage.code` and checks no
   `state`, so the sample answers by `postMessage` from its own origin instead.
