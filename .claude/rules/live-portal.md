@@ -85,6 +85,16 @@ The two honest alternatives:
 files:write`;
   - the token goes to a nested `ApiProvider` as `apiKey`; it stays in memory.
 
+  The app itself can be registered with the API key, but not from a browser:
+  `GET /api/2.0/security/oauth2/token` (key) returns a five-minute JWT, and
+  `POST /api/2.0/oauth2/clients` — the path the client uses; the docs' `/api/2.0/clients`
+  answers too — takes it in `x-signature`. The identity service behind the second refuses every
+  CORS preflight, 403 even for the portal's own origin, so it is reachable only server-side:
+  `.storybook/oauth-app-proxy.ts` does it for `storybook dev`, and a static build links to the
+  portal's form (`/developer-tools/oauth/create`; an app's page is `/developer-tools/oauth/:id`)
+  instead. The portal's form also demands an icon, a website, terms and privacy URLs and an
+  allowed origin, none of which the API marks required.
+
   `utils/get-oauth-token` is the older half of this: it polls `localStorage.code` and checks no
   `state`, so the sample answers by `postMessage` from its own origin instead.
 
