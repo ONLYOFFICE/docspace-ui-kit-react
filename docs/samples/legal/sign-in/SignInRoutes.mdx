@@ -108,6 +108,12 @@ any origin, so a static page can do all of this with no server of its own.
   verifier first loses the user's gesture and the browser blocks the window. The
   hook opens a blank popup synchronously and points it at the portal once the
   challenge is ready.
+- **Put `scope` last in the authorize URL.** The first time a person allows
+  an app, the portal's consent page sends the browser round once more and
+  rebuilds the authorize URL as everything before `&scope=` plus the scopes.
+  Anything after `scope` is lost: `state` comes back missing and the exchange
+  has no `code_challenge` to check the verifier against. The second sign-in
+  works either way, which is what makes this one hard to see.
 - **Answer by `postMessage`, checked twice.** Only messages from this origin,
   only with the `state` this request made. The kit's `utils/get-oauth-token`
   polls `localStorage` instead and checks no `state`, which is why this sample

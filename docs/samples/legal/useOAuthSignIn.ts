@@ -21,7 +21,7 @@ import { createPkcePair, createState } from "./pkce";
  * everything below it runs as the client. It stays in memory: storage that
  * survives a reload is storage any script on the page can read.
  *
- * Three details that decide whether it works at all:
+ * Four details that decide whether it works at all:
  *
  *   - the popup is opened synchronously in the click, before any `await`,
  *     and pointed at the portal afterwards. Opening it after hashing the
@@ -30,7 +30,9 @@ import { createPkcePair, createState } from "./pkce";
  *     only with the `state` this request made. The kit's `getOAuthToken`
  *     polls `localStorage` instead and checks no `state`;
  *   - the endpoints come from the portal's discovery document, which, like
- *     the token endpoint, answers any origin.
+ *     the token endpoint, answers any origin;
+ *   - `scope` is the last parameter of the authorize URL, or the portal's
+ *     consent page drops `state` and the challenge -- see `authorizeUrl`.
  */
 export type OAuthStatus =
   "idle" | "waiting" | "exchanging" | "signed-in" | "error";
@@ -46,6 +48,40 @@ export type OAuthSignIn = {
 type Endpoints = { authorize: string; token: string };
 
 const CALLBACK_SOURCE = "docspace-oauth-callback";
+
+/**
+ * The authorize URL, with `scope` deliberately last.
+ *
+ * The order matters on a real portal. Its consent page keeps the authorize URL
+ * in a cookie, and when it has to send the browser round once more -- the
+ * first time a person consents, before their signature cookie exists -- it
+ * rebuilds the URL as everything before `&scope=` plus the scopes it
+ * understood. Whatever came after `scope` is gone: with `state` there, the
+ * code comes back without it; with `code_challenge` there, the exchange has
+ * nothing to check the verifier against.
+ */
+export const authorizeUrl = (
+  endpoint: string,
+  params: {
+    clientId: string;
+    redirectUri: string;
+    state: string;
+    codeChallenge: string;
+    scopes: string[];
+  },
+) => {
+  const url = new URL(endpoint);
+  url.search = new URLSearchParams({
+    response_type: "code",
+    client_id: params.clientId,
+    redirect_uri: params.redirectUri,
+    state: params.state,
+    code_challenge_method: "S256",
+    code_challenge: params.codeChallenge,
+    scope: params.scopes.join(" "),
+  }).toString();
+  return url.toString();
+};
 
 const discover = async (portalUrl: string): Promise<Endpoints> => {
   const fallback = {
@@ -117,9 +153,15 @@ export const useOAuthSignIn = ({
       };
 
       if (denied) return fail(`The portal answered "${denied}".`);
-      if (!code || state !== request.state) {
+      if (!code) return fail("The portal sent no authorization code back.");
+      if (!state) {
         return fail(
-          "The answer did not match this request, so it was ignored.",
+          "The code came back without the state this request sent, so it was ignored.",
+        );
+      }
+      if (state !== request.state) {
+        return fail(
+          "The code came back for a different request, so it was ignored.",
         );
       }
 
@@ -203,18 +245,13 @@ export const useOAuthSignIn = ({
 
       pending.current = { state, verifier: pkce.verifier, endpoints, popup };
 
-      const url = new URL(endpoints.authorize);
-      url.search = new URLSearchParams({
-        response_type: "code",
-        client_id: clientId,
-        redirect_uri: redirectUri,
-        scope: scopes.join(" "),
+      popup.location.href = authorizeUrl(endpoints.authorize, {
+        clientId,
+        redirectUri,
         state,
-        code_challenge_method: "S256",
-        code_challenge: pkce.challenge,
-      }).toString();
-
-      popup.location.href = url.toString();
+        codeChallenge: pkce.challenge,
+        scopes,
+      });
     })().catch((exception) => fail((exception as Error).message));
   }, [portalUrl, clientId, redirectUri, scopes, fail]);
 
