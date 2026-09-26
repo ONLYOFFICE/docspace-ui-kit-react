@@ -146,6 +146,7 @@ const preview: Preview = {
             "Legal practice",
             [
               "Overview",
+              "The cabinet",
               "01. My matters",
               "02. Inside a matter",
               "Setup",

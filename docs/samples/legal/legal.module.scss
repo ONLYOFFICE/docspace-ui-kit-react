@@ -325,4 +325,85 @@
       flex: 1 1 240px;
     }
   }
+
+  // The cabinet: a sidebar and a page, laid out the way an application is.
+  .app {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    min-height: 640px;
+    border-radius: 12px;
+    overflow: hidden;
+
+    :global(.light) & {
+      border: 1px solid colors.$gray-light-mid;
+    }
+
+    :global(.dark) & {
+      border: 1px solid colors.$light-dark-gray-hover;
+    }
+
+    @media (max-width: 720px) {
+      grid-template-columns: 1fr;
+      min-height: 0;
+    }
+  }
+
+  .appCentered {
+    grid-template-columns: 1fr;
+    place-items: center;
+    padding: 24px;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 12px;
+    box-sizing: border-box;
+
+    :global(.light) & {
+      background-color: colors.$gray-light;
+      border-inline-end: 1px solid colors.$gray-light-mid;
+    }
+
+    :global(.dark) & {
+      background-color: colors.$dark-gray-light;
+      border-inline-end: 1px solid colors.$light-dark-gray-hover;
+    }
+
+    @media (max-width: 720px) {
+      border-inline-end: none;
+    }
+  }
+
+  .sidebarHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-inline: 8px;
+  }
+
+  .sidebarFirm {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+  }
+
+  .sidebarProfile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-block-start: auto;
+    padding-inline: 8px;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+    padding: 24px;
+    box-sizing: border-box;
+  }
 }
