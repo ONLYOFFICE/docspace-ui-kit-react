@@ -389,7 +389,7 @@ const ClientView = () => {
         <Link
           type={LinkType.page}
           href={new URL(
-            "./?path=/docs/samples-legal-practice-02-who-is-signed-in--docs",
+            "./?path=/docs/samples-legal-practice-setup-who-is-signed-in--docs",
             document.baseURI,
           ).toString()}
           target={LinkTarget.top}
@@ -397,7 +397,7 @@ const ClientView = () => {
           isHovered
           fontSize="13px"
         >
-          02. Who is signed in
+          Who is signed in
         </Link>
         , then come back here.
       </Text>

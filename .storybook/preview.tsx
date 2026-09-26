@@ -137,15 +137,18 @@ const preview: Preview = {
           "Samples",
           [
             // Two tracks. "Legal practice" is the main one: a client cabinet
-            // and a lawyer's workspace built against a real portal, each rung
-            // a screen that ships rather than a component on its own. "UI
-            // basics" is the earlier ladder, kept as the component-level
-            // reference the first track no longer stops to explain.
+            // for a law firm built against a real portal, one problem held
+            // through the whole track, each screen a question and the
+            // components that answer it. "Setup" holds the two pages that
+            // wire a portal in. "UI basics" is the earlier ladder, kept as
+            // the component-level reference the first track no longer stops
+            // to explain.
             "Legal practice",
             [
-              "01. Connect to a portal",
-              "02. Who is signed in",
-              "03. My matters",
+              "Overview",
+              "01. My matters",
+              "Setup",
+              ["Connect to a portal", "Who is signed in"],
             ],
             "UI basics",
             [

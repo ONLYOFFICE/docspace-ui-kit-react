@@ -1,6 +1,6 @@
 /**
  * The OAuth app the legal-practice samples sign clients in with: registered
- * once, in "02. Who is signed in", and used by every later screen that shows a
+ * once, in "Who is signed in", and used by every later screen that shows a
  * client their own view.
  *
  * None of this is secret. A client id is public by design -- a PKCE app has no

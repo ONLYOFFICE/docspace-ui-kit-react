@@ -83,7 +83,7 @@ export const useOAuthAppSetup = ({
       // Storybook's manager page, wherever this Storybook is served from.
       const samplePage = publicPage(
         new URL(
-          "./?path=/docs/samples-legal-practice-02-who-is-signed-in--docs",
+          "./?path=/docs/samples-legal-practice-setup-who-is-signed-in--docs",
           document.baseURI,
         ),
       );

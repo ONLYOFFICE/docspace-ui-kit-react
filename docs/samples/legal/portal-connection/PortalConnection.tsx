@@ -13,13 +13,13 @@ import { usePortalImage } from "../usePortalImage";
 import styles from "../legal.module.scss";
 
 /**
- * The first rung of the legal-practice track, and the one every later screen
- * leans on: does this page have a portal behind it, and who does that portal
- * think we are?
+ * The setup page of the legal-practice track, and the one every screen leans
+ * on: does this page have a portal behind it, and who does that portal think
+ * we are?
  *
  * Nothing here is specific to a law firm yet. It is the honest answer to the
- * question the rest of the track would otherwise have to ask nine times, and
- * the place to say the three things a reader needs before wiring their own
+ * question the rest of the track would otherwise have to ask on every screen,
+ * and the place to say the three things a reader needs before wiring their own
  * screen: where the credentials come from, whose identity the calls run as,
  * and what the page does when there is no portal at all.
  */
@@ -173,7 +173,7 @@ VITE_PROVIDER_API_KEY=sk-...`}
               Every call on every later screen runs as this identity. An API key
               is one user, so a screen that claims to be a client&apos;s own
               view is a demonstration of the layout, not of the permissions —
-              see the next sample for the ways a client signs in as themselves.
+              see Who is signed in for the ways a client signs in as themselves.
             </Text>
           </>
         ) : null}

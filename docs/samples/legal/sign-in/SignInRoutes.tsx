@@ -230,7 +230,7 @@ export const SignInRoutes = () => {
         ) : (
           <Text as="p" fontSize="13px" lineHeight="20px">
             {portal.status === "demo"
-              ? "No portal is configured — connect one from the toolbar, as in the previous sample."
+              ? "No portal is configured — connect one from the toolbar, as in Connect to a portal."
               : portal.status === "loading"
                 ? "Asking the portal..."
                 : (portal.detail ?? "The portal did not answer.")}

@@ -7,7 +7,7 @@ import source from "./MyMatters.tsx?raw";
 
 <Meta of={MyMattersStories} />
 
-# 03. My matters
+# 01. My matters
 
 The first screen anyone at the firm opens, and the first one a client opens:
 the matters that are theirs. A lawyer wants to know which ones need attention;
@@ -18,7 +18,7 @@ a client wants to know what is happening and who to ask.
 With no portal configured, both lists are demo data. Connect a portal from the
 **API** control in the toolbar and the left list becomes the key owner's real
 matters; register the sample's OAuth app in
-[02. Who is signed in](?path=/docs/samples-legal-practice-02-who-is-signed-in--docs)
+[Who is signed in](?path=/docs/samples-legal-practice-setup-who-is-signed-in--docs)
 and the right one signs a client in as themselves.
 
 ## A matter is a room with two tags
@@ -61,7 +61,8 @@ what. A client cabinet that fetched every room and filtered by the client's name
 would be one edit away from showing a client someone else's matter.
 
 `getSelfProfile()` says who is asking, and the persona from
-[02](?path=/docs/samples-legal-practice-02-who-is-signed-in--docs) decides only
+[Who is signed in](?path=/docs/samples-legal-practice-setup-who-is-signed-in--docs)
+decides only
 the wording. A lawyer gets the practice, the lead, the document count, search and
 a filter by stage. A client gets a sentence about what the stage means for them
 and the name of their lawyer — the same room, told for a different reader.
@@ -80,7 +81,8 @@ sample's limit, not a portal's: a practice with thousands of matters passes
   drew comes inline as SVG data, and `RoomIcon` recolours it. An uploaded
   picture is a `/storage/…` path that answers 403 unsigned, so it goes through
   `usePortalImage` from
-  [01](?path=/docs/samples-legal-practice-01-connect-to-a-portal--docs), under
+  [Connect to a portal](?path=/docs/samples-legal-practice-setup-connect-to-a-portal--docs),
+  under
   whichever token the list runs with. With neither, `RoomIcon` draws the
   initials on the room's colour.
 - **The room's page on the portal** is `/rooms/shared/<id>/filter?folder=<id>`,

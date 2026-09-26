@@ -9,7 +9,7 @@ import source from "./SignInRoutes.tsx?raw";
 
 <Meta of={SignInRoutesStories} />
 
-# 02. Who is signed in
+# Who is signed in
 
 A law firm needs two applications from one portal: a workspace for its lawyers
 and a cabinet for its clients. This screen decides which one a person gets —
@@ -25,7 +25,9 @@ and, more importantly, makes sure a client is really themselves.
 | **Portal session** | whoever is signed in to the portal | an application the portal serves itself, like a plugin |
 | **OAuth** | the person who signed in and allowed the app | a client cabinet hosted anywhere |
 
-The API key from the previous sample is one person. Filtering rooms by a
+The API key from
+[Connect to a portal](?path=/docs/samples-legal-practice-setup-connect-to-a-portal--docs)
+is one person. Filtering rooms by a
 client's name on top of it would look like a cabinet and behave like a data
 leak: every client would be one URL edit away from every other client's
 matters. The portal session is the ONLYOFFICE Apps client's own route — it passes the
@@ -133,7 +135,7 @@ The challenge is base64url without padding, as S256 specifies, and
 `pkce.test.ts` checks it against the worked example in RFC 7636 itself.
 
 The app registered here is the one every later screen signs a client in with:
-[03. My matters](?path=/docs/samples-legal-practice-03-my-matters--docs) uses it
+[01. My matters](?path=/docs/samples-legal-practice-01-my-matters--docs) uses it
 to show a client the matters shared with them, and nothing else.
 
 ## The code
