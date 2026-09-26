@@ -154,7 +154,13 @@ files:write`;
   `usePortalImage`; with neither, pass `RoomIcon` `showDefault`, or it draws an empty `<img>`
   instead of the initials. The SDK's `Logo` is not the kit's `TLogo` (`cover.data` may be
   `null`), so build one. A room's page is `/rooms/shared/<id>/filter?folder=<id>`, for a guest
-  too.
+  too, and the same shape opens a folder inside a room.
+- **A folder's contents come one folder per call.** `foldersApi.getFolderByFolderId({ folderId })`
+  answers `{ folders, files, total }` for that folder only, both arrays typed as
+  `FileEntryBaseDto` though the wire carries full folder and file DTOs (`filesCount`, `created`,
+  `pureContentLength`, `webUrl`, a relative path). Walking a room is therefore one call per level;
+  `docs/samples/legal/matterRoom.ts` does it with the "read one folder" step injected, and skips
+  folders whose `filesCount` is 0. Creating a folder is `createFolder({ folderId, createFolder: { title } })`.
 - **Never commit a URL or a key.** They belong in `.env`, in the toolbar's `localStorage`, or in
   the reader's own head — a sample that ships a working key ships an open portal.
 - **Anything committed here has to render with no portal at all.** CI, the static build and a
