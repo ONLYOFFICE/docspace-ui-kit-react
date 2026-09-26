@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { DEMO_ROOMS } from "./demo-matters";
+import type { FolderContents } from "./matterRoom";
 import {
   CLIENT_ROOM_IDS,
   minimalPdf,
@@ -12,9 +13,17 @@ import {
 
 type Call = [string, ...unknown[]];
 
+type Existing = {
+  id: number;
+  title: string;
+  tags?: string[];
+  /** What listing this room, and folders inside it, answers. */
+  folders?: Record<number, FolderContents>;
+};
+
 /** A portal that remembers what it was asked and hands out ids in order. */
 const recorder = (
-  existing: string[] = [],
+  existing: Existing[] = [],
   failOn?: string,
 ): SeedClient & { calls: Call[] } => {
   let nextId = 1000;
@@ -22,9 +31,18 @@ const recorder = (
   const note = (...call: Call) => {
     calls.push(call);
   };
+  const listings: Record<number, FolderContents> = Object.assign(
+    {},
+    ...existing.map((room) => room.folders ?? {}),
+  );
   return {
     calls,
-    roomTitles: async () => existing,
+    rooms: async () =>
+      existing.map(({ id, title, tags }) => ({ id, title, tags: tags ?? [] })),
+    listFolder: async (folderId) => {
+      note("listFolder", folderId);
+      return listings[folderId] ?? { folders: [], files: [] };
+    },
     createRoom: async (title, color) => {
       note("createRoom", title, color);
       if (title === failOn) throw { response: { status: 403 } };
@@ -46,20 +64,26 @@ const recorder = (
 const named = (calls: Call[], name: string) =>
   calls.filter(([call]) => call === name);
 
+/** Titles created under one parent, in order. */
+const madeUnder = (calls: Call[], parent: number) =>
+  named(calls, "createFolder")
+    .filter(([, where]) => where === parent)
+    .map(([, , title]) => title);
+
+const EMPTY = { done: 0, completed: 0, skipped: 0, failed: 0 };
+
 describe("seedPortal", () => {
   it("creates every demo room, tags the matters and fills their folders", async () => {
     const portal = recorder();
     const steps: SeedStep[] = [];
     const summary = await seedPortal(portal, { onStep: (s) => steps.push(s) });
 
-    expect(summary).toEqual({
-      done: DEMO_ROOMS.lawyer.length,
-      skipped: 0,
-      failed: 0,
-    });
+    expect(summary).toEqual({ ...EMPTY, done: DEMO_ROOMS.lawyer.length });
     expect(named(portal.calls, "createRoom")).toHaveLength(9);
     // Two demo rooms carry no Practice tag; one of them has no tag at all.
     expect(named(portal.calls, "tagRoom")).toHaveLength(8);
+    // A room just made holds nothing, so nothing is listed.
+    expect(named(portal.calls, "listFolder")).toHaveLength(0);
 
     // Harper: three top folders, five requests, three received, two drafts.
     const harper = steps.find((s) => s.label.startsWith("Harper"));
@@ -95,15 +119,103 @@ describe("seedPortal", () => {
     expect(png?.[4]).toBe("image/png");
   });
 
-  it("skips rooms already on the portal, whatever their case", async () => {
-    const portal = recorder(["  harper v. northwind LOGISTICS ", "Marketing"]);
+  it("leaves a room alone when it already holds everything", async () => {
+    // Marketing has nothing inside in the demo, so being there is enough;
+    // Firm templates needs its one tag, and has it, whatever the case.
+    const portal = recorder([
+      { id: 5, title: "  MARKETING " },
+      { id: 6, title: "Firm templates", tags: ["internal"] },
+    ]);
     const summary = await seedPortal(portal);
 
     expect(summary.skipped).toBe(2);
     expect(summary.done).toBe(7);
+    expect(named(portal.calls, "tagRoom").map(([, id]) => id)).not.toContain(6);
     expect(
       named(portal.calls, "createRoom").map(([, title]) => title),
-    ).not.toContain("Harper v. Northwind Logistics");
+    ).not.toContain("Marketing");
+  });
+
+  it("gives a room made by hand the tags it lacks", async () => {
+    const portal = recorder([
+      { id: 6, title: "Firm templates" },
+      { id: 7, title: "Sokolova residence permit", tags: ["Urgent"] },
+    ]);
+    const steps: SeedStep[] = [];
+    const summary = await seedPortal(portal, { onStep: (s) => steps.push(s) });
+
+    expect(summary.completed).toBe(2);
+    expect(named(portal.calls, "tagRoom")).toContainEqual([
+      "tagRoom",
+      6,
+      ["Internal"],
+    ]);
+    expect(named(portal.calls, "tagRoom")).toContainEqual([
+      "tagRoom",
+      7,
+      ["Practice: Immigration", "Stage: Hearing"],
+    ]);
+    expect(steps.find((s) => s.label.startsWith("Sokolova"))?.detail).toBe(
+      "Already there; added 2 tags.",
+    );
+  });
+
+  it("fills in what a half-made room is missing, then shares it", async () => {
+    // Harper stopped after "From the client" and its first request.
+    const portal = recorder([
+      {
+        id: 5,
+        title: "Harper v. Northwind Logistics",
+        folders: {
+          5: {
+            folders: [{ id: 51, title: "From the client", filesCount: 0 }],
+            files: [],
+          },
+          51: {
+            folders: [{ id: 511, title: "passport", filesCount: 1 }],
+            files: [],
+          },
+          511: {
+            folders: [],
+            files: [{ id: 5111, title: "passport-scan.pdf" }],
+          },
+        },
+      },
+    ]);
+    const steps: SeedStep[] = [];
+    const summary = await seedPortal(portal, {
+      clientEmail: "emma@example.com",
+      onStep: (s) => steps.push(s),
+    });
+
+    expect(summary.completed).toBe(1);
+    expect(summary.done).toBe(8);
+    expect(steps.find((s) => s.label.startsWith("Harper"))).toMatchObject({
+      status: "completed",
+      detail:
+        "Already there; added 2 tags, 6 folders, 4 files, shared with emma@example.com.",
+    });
+
+    // The room keeps its checklist folder and gets the two it lacked.
+    expect(madeUnder(portal.calls, 5)).toEqual([
+      "From the firm",
+      "Working files",
+    ]);
+    // The checklist keeps "passport", whatever its case, and gets the rest.
+    expect(madeUnder(portal.calls, 51)).toEqual([
+      "Employment contract",
+      "Payslips, last 3 months",
+      "Dismissal letter",
+      "Correspondence with HR",
+    ]);
+    expect(
+      named(portal.calls, "uploadFile").filter(([, where]) => where === 511),
+    ).toHaveLength(0);
+    expect(named(portal.calls, "invite")).toContainEqual([
+      "invite",
+      5,
+      "emma@example.com",
+    ]);
   });
 
   it("shares only the client's rooms, and only when an email is given", async () => {
@@ -137,7 +249,7 @@ describe("seedPortal", () => {
     expect(steps.find((s) => s.status === "failed")).toMatchObject({
       label: "Estate of Margaret Ellis",
       detail:
-        "The portal answered 403: this identity may not create rooms here.",
+        "The portal answered 403: this identity may not write to this portal.",
     });
   });
 });

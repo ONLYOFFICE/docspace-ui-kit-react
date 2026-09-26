@@ -9,17 +9,20 @@ import type { useApi } from "../../../providers/api";
 import { DEMO_FOLDERS } from "./demo-matter-contents";
 import { DEMO_ROOMS } from "./demo-matters";
 import { explainPortalError } from "./explain";
-import type { FileLike, FolderContents } from "./matterRoom";
+import type { FileLike, FolderContents, FolderLike } from "./matterRoom";
 
 /**
  * Put the demo practice on a real portal: the rooms, tags, folders and files
  * every screen shows with no portal, created for real so the screens can be
  * tried against them with one click instead of an afternoon in ONLYOFFICE.
  *
- * It creates and never deletes. A room whose title is already on the portal
- * is skipped, so running it twice adds nothing; what it made is removed from
- * the portal like any other room. Rooms are opened by whoever owns the API
- * key, so the lead of every matter is that person, not the demo's names.
+ * It creates and never deletes, and it can be pressed again. A room whose
+ * title is already on the portal is opened rather than made, and whatever
+ * the demo says should be inside and is not -- a folder, a file -- is added;
+ * a room that has everything is left alone. So a run that failed halfway,
+ * or a folder someone deleted, is put right by the next press. Rooms are
+ * opened by whoever owns the API key, so the lead of every matter is that
+ * person, not the demo's names.
  *
  * The calls are behind `SeedClient`, in the seeder's own words, so the test
  * stands a recorder in for the portal and `sdkSeedClient` is the only part
@@ -27,15 +30,18 @@ import type { FileLike, FolderContents } from "./matterRoom";
  */
 export type SeedStep = {
   label: string;
-  status: "done" | "skipped" | "failed";
+  /** done: made from nothing; completed: was there, missing pieces added. */
+  status: "done" | "completed" | "skipped" | "failed";
   detail?: string;
 };
 
 export type SeedSummary = Record<SeedStep["status"], number>;
 
 export type SeedClient = {
-  /** Titles of the rooms already on the portal, as far as this key sees. */
-  roomTitles: () => Promise<string[]>;
+  /** The rooms already on the portal, as far as this key sees. */
+  rooms: () => Promise<{ id: number; title: string; tags: string[] }[]>;
+  /** What a folder holds, the same shape the screens read. */
+  listFolder: (folderId: number) => Promise<FolderContents>;
   createRoom: (title: string, color: string) => Promise<number>;
   tagRoom: (id: number, tags: string[]) => Promise<void>;
   createFolder: (parentId: number, title: string) => Promise<number>;
@@ -103,8 +109,7 @@ export const pixelPng = () =>
     (char) => char.charCodeAt(0),
   );
 
-const placeFile = (client: SeedClient, folderId: number, file: FileLike) => {
-  const title = file.title ?? "Untitled";
+const placeFile = (client: SeedClient, folderId: number, title: string) => {
   const ext = extOf(title);
   if (OFFICE.has(ext)) return client.createDocument(folderId, title);
   if (ext === ".pdf") {
@@ -126,82 +131,138 @@ const placeFile = (client: SeedClient, folderId: number, file: FileLike) => {
   );
 };
 
-const placeContents = async (
+type Added = { tags: number; folders: number; files: number };
+
+const NOTHING: Added = { tags: 0, folders: 0, files: 0 };
+
+const titleOf = (entry: FolderLike | FileLike) => entry.title ?? "Untitled";
+
+/**
+ * Make a folder hold what the demo says it holds. A folder or file already
+ * there by title is kept; the rest is created. `fresh` says the folder was
+ * made a moment ago, so there is nothing to list.
+ */
+const ensureContents = async (
   client: SeedClient,
   folderId: number,
   contents: FolderContents,
+  fresh: boolean,
+  added: Added,
 ) => {
+  const present = fresh
+    ? { folders: [], files: [] }
+    : await client.listFolder(folderId);
+  const folderIds = new Map(
+    present.folders.map((folder) => [fold(titleOf(folder)), folder.id]),
+  );
+  const fileTitles = new Set(present.files.map((file) => fold(titleOf(file))));
+
   for (const folder of contents.folders) {
-    const id = await client.createFolder(folderId, folder.title ?? "Untitled");
+    const title = titleOf(folder);
+    let id = folderIds.get(fold(title));
+    let made = false;
+    if (id === undefined) {
+      id = await client.createFolder(folderId, title);
+      added.folders += 1;
+      made = true;
+    }
     const inside =
       folder.id === undefined ? undefined : DEMO_FOLDERS[folder.id];
-    if (inside) await placeContents(client, id, inside);
+    if (inside) await ensureContents(client, id, inside, made, added);
   }
-  for (const file of contents.files) await placeFile(client, folderId, file);
-};
 
-const count = (contents: FolderContents | undefined) => {
-  let folders = 0;
-  let files = 0;
-  const walk = (node: FolderContents) => {
-    files += node.files.length;
-    for (const folder of node.folders) {
-      folders += 1;
-      const inside =
-        folder.id === undefined ? undefined : DEMO_FOLDERS[folder.id];
-      if (inside) walk(inside);
-    }
-  };
-  if (contents) walk(contents);
-  return { folders, files };
+  for (const file of contents.files) {
+    const title = titleOf(file);
+    if (fileTitles.has(fold(title))) continue;
+    await placeFile(client, folderId, title);
+    added.files += 1;
+  }
 };
 
 const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? "" : "s"}`;
+
+const describe = (added: Added) =>
+  [
+    added.tags ? plural(added.tags, "tag") : "",
+    added.folders ? plural(added.folders, "folder") : "",
+    added.files ? plural(added.files, "file") : "",
+  ].filter(Boolean);
+
+const nothingAdded = (added: Added) =>
+  !added.tags && !added.folders && !added.files;
 
 export const seedPortal = async (
   client: SeedClient,
   options: { clientEmail?: string; onStep?: (step: SeedStep) => void } = {},
 ): Promise<SeedSummary> => {
-  const summary: SeedSummary = { done: 0, skipped: 0, failed: 0 };
+  const summary: SeedSummary = { done: 0, completed: 0, skipped: 0, failed: 0 };
   const report = (step: SeedStep) => {
     summary[step.status] += 1;
     options.onStep?.(step);
   };
   const email = options.clientEmail?.trim() ?? "";
-  const existing = new Set((await client.roomTitles()).map(fold));
+  const existing = new Map(
+    (await client.rooms()).map((room) => [fold(room.title), room]),
+  );
 
   for (const room of DEMO_ROOMS.lawyer) {
     const title = room.title ?? "Untitled";
-    if (existing.has(fold(title))) {
-      report({
-        label: title,
-        status: "skipped",
-        detail: "A room with this name is already there.",
-      });
-      continue;
-    }
+    const contents = room.id === undefined ? undefined : DEMO_FOLDERS[room.id];
+    const forClient =
+      Boolean(email) &&
+      room.id !== undefined &&
+      CLIENT_ROOM_IDS.includes(room.id);
+    const tags = (room.tags ?? []).filter(Boolean);
+    const found = existing.get(fold(title));
 
     try {
+      if (found) {
+        const added: Added = { ...NOTHING };
+        // Tags first, as for a new room: without the Practice tag the
+        // screens do not count the room as a matter at all.
+        const has = new Set(found.tags.map(fold));
+        const missing = tags.filter((tag) => !has.has(fold(tag)));
+        if (missing.length) {
+          await client.tagRoom(found.id, missing);
+          added.tags = missing.length;
+        }
+        if (contents) {
+          await ensureContents(client, found.id, contents, false, added);
+        }
+        if (nothingAdded(added)) {
+          report({
+            label: title,
+            status: "skipped",
+            detail: "Already there, with everything the demo puts in it.",
+          });
+          continue;
+        }
+        // A room that was short of something most likely came from a run
+        // that stopped before it got to sharing, so share it now.
+        const parts = describe(added);
+        if (forClient) {
+          await client.invite(found.id, email);
+          parts.push(`shared with ${email}`);
+        }
+        report({
+          label: title,
+          status: "completed",
+          detail: `Already there; added ${parts.join(", ")}.`,
+        });
+        continue;
+      }
+
       const id = await client.createRoom(title, room.logo?.color ?? "");
-      const tags = (room.tags ?? []).filter(Boolean);
       if (tags.length) await client.tagRoom(id, tags);
 
-      const contents =
-        room.id === undefined ? undefined : DEMO_FOLDERS[room.id];
-      if (contents) await placeContents(client, id, contents);
+      const added: Added = { ...NOTHING, tags: tags.length };
+      if (contents) await ensureContents(client, id, contents, true, added);
 
-      const made = count(contents);
-      const parts = [
-        tags.length ? plural(tags.length, "tag") : "",
-        made.folders ? plural(made.folders, "folder") : "",
-        made.files ? plural(made.files, "file") : "",
-      ].filter(Boolean);
-
-      if (email && room.id !== undefined && CLIENT_ROOM_IDS.includes(room.id)) {
+      const parts = describe(added);
+      if (forClient) {
         await client.invite(id, email);
         parts.push(`shared with ${email}`);
       }
-
       report({
         label: title,
         status: "done",
@@ -211,7 +272,7 @@ export const seedPortal = async (
       report({
         label: title,
         status: "failed",
-        detail: explainPortalError(error, "create rooms here"),
+        detail: explainPortalError(error, "write to this portal"),
       });
     }
   }
@@ -222,27 +283,50 @@ export const seedPortal = async (
 const PAGE = 100;
 const MAX_ROOMS = 500;
 
-/** The seeder's calls, made with the SDK clients `useApi()` hands out. */
+/** The seeder's calls, made with the clients `useApi()` hands out. */
 export const sdkSeedClient = (
-  api: Pick<ReturnType<typeof useApi>, "roomsApi" | "foldersApi" | "filesApi">,
+  api: Pick<
+    ReturnType<typeof useApi>,
+    "roomsApi" | "foldersApi" | "filesApi" | "apiClient" | "baseUrl"
+  >,
 ): SeedClient => ({
-  roomTitles: async () => {
-    const titles: string[] = [];
+  rooms: async () => {
+    const rooms: { id: number; title: string; tags: string[] }[] = [];
     let total = Infinity;
-    while (titles.length < Math.min(total, MAX_ROOMS)) {
+    while (rooms.length < Math.min(total, MAX_ROOMS)) {
       const page = (
         await api.roomsApi.getRoomsFolder({
           searchArea: SearchArea.Active,
           count: PAGE,
-          startIndex: titles.length,
+          startIndex: rooms.length,
         })
       ).data.response;
-      const folders = page?.folders ?? [];
-      titles.push(...folders.map((folder) => folder.title ?? ""));
-      total = page?.total ?? titles.length;
+      const folders = (page?.folders ?? []) as (FolderLike & {
+        tags?: string[] | null;
+      })[];
+      for (const folder of folders) {
+        if (folder.id !== undefined) {
+          rooms.push({
+            id: folder.id,
+            title: folder.title ?? "",
+            tags: (folder.tags ?? []).filter(Boolean),
+          });
+        }
+      }
+      total = page?.total ?? rooms.length;
       if (!folders.length) break;
     }
-    return titles;
+    return rooms;
+  },
+
+  listFolder: async (folderId) => {
+    const page = (
+      await api.foldersApi.getFolderByFolderId({ folderId, count: PAGE })
+    ).data.response;
+    return {
+      folders: (page?.folders ?? []) as FolderLike[],
+      files: (page?.files ?? []) as FileLike[],
+    };
   },
 
   createRoom: async (title, color) => {
@@ -298,12 +382,20 @@ export const sdkSeedClient = (
   },
 
   uploadFile: async (folderId, title, bytes, type) => {
-    await api.foldersApi.insertFile({
-      folderId,
-      insertFileFile: new File([bytes as BlobPart], title, { type }),
-      insertFileTitle: title,
-      insertFileCreateNewIfExist: true,
-    });
+    // Not the SDK's insertFile. It sends the form fields as
+    // `InsertFile.Title` and `InsertFile.File`, the names the reference
+    // pages show, and the portal's binder reads `title` with no prefix and
+    // takes the first file part whatever it is called -- so the SDK's call
+    // ends in 400, "Value cannot be null. (Parameter 'title')". The form
+    // the portal binds is three plain fields.
+    const form = new FormData();
+    form.append("file", new File([bytes as BlobPart], title, { type }));
+    form.append("title", title);
+    form.append("createNewIfExist", "true");
+    await api.apiClient.instance.post(
+      new URL(`/api/2.0/files/${folderId}/insert`, api.baseUrl).toString(),
+      form,
+    );
   },
 
   invite: async (roomId, email) => {

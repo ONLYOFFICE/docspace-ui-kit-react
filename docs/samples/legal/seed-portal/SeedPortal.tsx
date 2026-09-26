@@ -37,6 +37,7 @@ import styles from "../legal.module.scss";
 const BADGE: Record<SeedStep["status"], { label: string; className: string }> =
   {
     done: { label: "Created", className: styles.badgeOk },
+    completed: { label: "Completed", className: styles.badgeOk },
     skipped: { label: "Already there", className: "" },
     failed: { label: "Failed", className: styles.badgeError },
   };
@@ -140,8 +141,10 @@ export const SeedPortal = () => {
           <>
             <Text as="p" fontSize="13px" lineHeight="20px">
               This creates rooms on the portal connected in the toolbar, as the
-              owner of its API key. Nothing is deleted, and a room whose name is
-              already there is skipped, so pressing twice adds nothing. Give a
+              owner of its API key. Nothing is deleted. A room whose name is
+              already there is not made again; whatever the demo puts inside it
+              and is missing is added, so a run that failed halfway is put right
+              by the next press, and a complete one is left alone. Give a
               client&apos;s email and the two matters that are theirs are shared
               with it; sign in with that address on the client&apos;s side of
               any screen.
@@ -230,8 +233,8 @@ export const SeedPortal = () => {
 
         {summary ? (
           <Text as="p" fontSize="13px" lineHeight="20px">
-            {`${summary.done} created, ${summary.skipped} already there, ${summary.failed} failed. `}
-            {summary.done ? (
+            {`${summary.done} created, ${summary.completed} completed, ${summary.skipped} already there, ${summary.failed} failed. `}
+            {summary.done || summary.completed ? (
               <>
                 Open{" "}
                 <Link

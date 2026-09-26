@@ -19,12 +19,14 @@ rooms that exist: press the button, then open
 
 For each demo room, in the order the list shows them:
 
-1. **Skips it** if a room with that title is already on the portal, compared
-   without regard to case or spacing. Pressing the button twice creates
-   nothing new.
-2. **Creates a custom room** with the demo's colour, as the owner of the API
-   key. That person becomes the lead of every matter, which is the one thing
-   the demo cannot copy.
+1. **Opens it rather than making it** if a room with that title is already
+   on the portal, compared without regard to case or spacing. Whatever the
+   demo puts inside and is missing — a tag, a folder, a file — is added, and
+   a room that has it all is left alone. So a run that failed halfway is put
+   right by the next press, and pressing twice creates nothing new.
+2. **Creates a custom room** otherwise, with the demo's colour, as the owner
+   of the API key. That person becomes the lead of every matter, which is
+   the one thing the demo cannot copy.
 3. **Tags it.** A tag has to exist on the portal before a room can carry it,
    so each is created first and the refusal for one that already exists is
    ignored; then the room gets them all in one call.
@@ -51,9 +53,15 @@ Three of the calls are worth knowing:
 - **`createRoom`** takes `tags`, but a tag it has never seen is dropped
   without a word. `createRoomTag` first, then `addRoomTags`, is what the
   portal's own client does.
-- **`insertFile`** is a multipart upload in one request, the right size for a
-  file you already hold in memory. The chunked session `Uploader` runs is for
-  files a person chose.
+- **The upload is not the SDK's `insertFile`.** That call sends the multipart
+  fields as `InsertFile.Title` and `InsertFile.File`, the names the reference
+  pages show, and a live portal answers 400, "Value cannot be null.
+  (Parameter 'title')": the portal's binder reads a bare `title` and takes
+  the first file part whatever it is called. So the bytes go as a plain
+  `FormData` of `file`, `title` and `createNewIfExist`, through the same
+  axios instance the SDK uses. It is one request, the right size for a file
+  already in memory; the chunked session `Uploader` runs is for files a
+  person chose.
 - **`setRoomSecurity`** invites by `email`, though the SDK's `RoomInvitation`
   names only `id`. The portal takes both; the cast in the code says so.
 
