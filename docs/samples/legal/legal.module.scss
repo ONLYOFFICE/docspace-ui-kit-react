@@ -230,6 +230,17 @@
     align-items: start;
     gap: 12px;
     padding-block: 12px;
+
+    // On a phone the badge goes under the text rather than beside it, so a
+    // title keeps the width it needs.
+    @media (max-width: 480px) {
+      grid-template-columns: 32px minmax(0, 1fr);
+
+      > :last-child {
+        grid-column: 2;
+        justify-self: start;
+      }
+    }
   }
 
   .matter + .matter {
@@ -275,5 +286,43 @@
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
+  }
+
+  // Inside a matter: the room's header, its facts, and the sections under it.
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .roomHeader {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 12px;
+  }
+
+  .roomTitle {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+    overflow-wrap: anywhere;
+  }
+
+  .picker {
+    max-width: 480px;
+  }
+
+  .askRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding-block-start: 12px;
+
+    > :first-child {
+      flex: 1 1 240px;
+    }
   }
 }

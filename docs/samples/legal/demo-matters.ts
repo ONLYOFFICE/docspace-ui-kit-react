@@ -67,7 +67,7 @@ export const DEMO_ROOMS: Record<"lawyer" | "client", RoomLike[]> = {
       "Priya Nair",
       4,
       3,
-      0,
+      2,
       "8C5AA8",
     ),
     room(

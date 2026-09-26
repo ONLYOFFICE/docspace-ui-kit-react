@@ -147,6 +147,7 @@ const preview: Preview = {
             [
               "Overview",
               "01. My matters",
+              "02. Inside a matter",
               "Setup",
               ["Connect to a portal", "Who is signed in"],
             ],
