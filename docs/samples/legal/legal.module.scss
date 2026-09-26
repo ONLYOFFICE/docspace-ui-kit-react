@@ -310,6 +310,13 @@
     overflow-wrap: anywhere;
   }
 
+  .headerActions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
   .picker {
     max-width: 480px;
   }
@@ -324,6 +331,12 @@
     > :first-child {
       flex: 1 1 240px;
     }
+  }
+
+  // The drop area under a request, sized so the dashed box reads as one.
+  .sendBox {
+    height: 180px;
+    margin-block-start: 8px;
   }
 
   // The cabinet: a sidebar and a page, laid out the way an application is.

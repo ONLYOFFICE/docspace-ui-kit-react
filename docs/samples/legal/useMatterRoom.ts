@@ -141,5 +141,43 @@ export const useMatterRoom = (roomId: number) => {
     [roomId, create, run],
   );
 
-  return { state, reload, ask, setUp, busy, actionError };
+  /**
+   * A request has been answered: files landed in its folder. On a portal
+   * the upload itself is the kit's `Uploader`, so there is only the re-read
+   * to do; with no portal the files go into the demo map first, as the
+   * portal would hold them.
+   */
+  const receive = useCallback(
+    (requestId: number, files: File[]) => {
+      if (!baseUrl) {
+        const slot = (demo.current[requestId] ??= { folders: [], files: [] });
+        const now = new Date().toISOString();
+        // The portal counts a folder's files in its parent's listing, which
+        // is what the checklist reads; the demo map has to do the same.
+        for (const listing of Object.values(demo.current)) {
+          const entry = listing.folders.find((f) => f.id === requestId);
+          if (entry) {
+            entry.filesCount = (entry.filesCount ?? 0) + files.length;
+            entry.updated = now;
+          }
+        }
+        for (const file of files) {
+          slot.files.push({
+            id: Date.now() % 1_000_000_000,
+            title: file.name,
+            fileExst: file.name.slice(file.name.lastIndexOf(".")),
+            pureContentLength: file.size,
+            createdBy: { displayName: "You" },
+            created: now,
+            updated: now,
+            webUrl: "",
+          });
+        }
+      }
+      reload();
+    },
+    [baseUrl, reload],
+  );
+
+  return { state, reload, ask, setUp, receive, busy, actionError };
 };

@@ -118,6 +118,14 @@ describe("requestFrom", () => {
       ).asked,
     ).toBe("2026-09-11T09:00:00Z");
   });
+
+  it("dates a received request by its newest file, not the folder", () => {
+    const stale = folder(3, "Contract", 2, { updated: "2026-08-01T10:00:00Z" });
+    expect(requestFrom(stale, portal[3].files).updated).toBe(
+      "2026-09-21T10:00:00Z",
+    );
+    expect(requestFrom(stale, []).updated).toBe("2026-08-01T10:00:00Z");
+  });
 });
 
 describe("progressOf", () => {

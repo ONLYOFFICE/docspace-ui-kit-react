@@ -14,6 +14,7 @@ import { Loader, LoaderTypes } from "../../../../components/loader";
 import { NavMenu } from "../../../../components/nav-menu";
 import { Tabs, TabsTypes } from "../../../../components/tabs";
 import { Text } from "../../../../components/text";
+import { Toast } from "../../../../components/toast";
 import { ClientSession } from "../ClientSession";
 import { MatterRoomPanel } from "../inside-a-matter/InsideAMatter";
 import type { Matter } from "../matter";
@@ -159,7 +160,11 @@ export const CabinetFrame = ({ demoAs }: { demoAs: Persona }) => {
                 {`← ${listLabel}`}
               </Link>
             </div>
-            <MatterRoomPanel matter={screen.matter} persona={persona} />
+            <MatterRoomPanel
+              matter={screen.matter}
+              persona={persona}
+              sending={persona === "client"}
+            />
           </>
         )}
       </main>
@@ -177,6 +182,8 @@ export const Cabinet = () => {
 
   return (
     <div className={styles.page}>
+      {/* Uploads and the like report through toasts; one container serves the frame. */}
+      <Toast />
       <div className={styles.toolbar}>
         {/* Primary tabs: two views of one page. The secondary kind measures
             its own scaled tabs and, in a box this wide, decides two of them

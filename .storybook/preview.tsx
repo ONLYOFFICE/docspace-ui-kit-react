@@ -149,6 +149,7 @@ const preview: Preview = {
               "The cabinet",
               "01. My matters",
               "02. Inside a matter",
+              "03. Sending a document",
               "Setup",
               [
                 "Connect to a portal",

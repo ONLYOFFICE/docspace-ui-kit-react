@@ -111,7 +111,9 @@ export const requestFrom = (folder: FolderLike, files: FileLike[]): Request => {
     received: documents.length > 0 || (folder.filesCount ?? 0) > 0,
     documents,
     asked: isoOf(folder.created),
-    updated: isoOf(folder.updated),
+    // The newest file says when the request was answered; the folder's own
+    // stamp is the fallback, for a slot whose files were not fetched.
+    updated: documents[0]?.updated || isoOf(folder.updated),
   };
 };
 

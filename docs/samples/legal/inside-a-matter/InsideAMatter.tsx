@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type FormEvent, type ReactNode, useState } from "react";
 
 import EmptyRoomsDarkSvg from "../../../../assets/emptyview/empty.rooms.root.user.dark.svg";
 import EmptyRoomsLightSvg from "../../../../assets/emptyview/empty.rooms.root.user.light.svg";
@@ -21,6 +21,7 @@ import {
   InputType,
   TextInput,
 } from "../../../../components/text-input";
+import { toastr } from "../../../../components/toast";
 import { useTheme } from "../../../../context/ThemeContext";
 import { useApi } from "../../../../providers/api";
 import { FileIcon } from "../../file-icon";
@@ -42,6 +43,7 @@ import {
   type Request,
 } from "../matterRoom";
 import type { Persona } from "../persona";
+import { SendDocument } from "../sending-a-document/SendDocument";
 import { useMatterRoom } from "../useMatterRoom";
 import { useMattersView } from "../useMattersView";
 import styles from "../legal.module.scss";
@@ -103,14 +105,19 @@ const DocumentLine = ({ document }: { document: Document }) => {
 const RequestLine = ({
   request,
   persona,
+  send,
 }: {
   request: Request;
   persona: Persona;
+  /** Given, a request still needed gets a "Send it" that opens this. */
+  send?: (request: Request) => ReactNode;
 }) => {
   const { baseUrl } = useApi();
+  const [sending, setSending] = useState(false);
   const href = baseUrl ? roomUrl(baseUrl, request.id) : "";
   const asked = updatedAgo(request.asked);
   const since = updatedAgo(request.updated);
+  const canSend = Boolean(send) && !request.received;
 
   // One line per thing to say; a lawyer gets one per file received.
   const one = (text: string) => [{ key: "state", text }];
@@ -150,7 +157,19 @@ const RequestLine = ({
             {line.text}
           </Text>
         ))}
-        {href ? (
+        {canSend ? (
+          <>
+            <div>
+              <Button
+                size={ButtonSize.extraSmall}
+                primary={!sending}
+                label={sending ? "Not now" : "Send it"}
+                onClick={() => setSending((open) => !open)}
+              />
+            </div>
+            {sending ? send?.(request) : null}
+          </>
+        ) : href ? (
           <OpenLink
             href={href}
             label={
@@ -227,14 +246,33 @@ const ActionError = ({ message }: { message: string }) =>
 export const MatterRoomPanel = ({
   matter,
   persona,
+  sending = false,
 }: {
   matter: Matter;
   persona: Persona;
+  /** Lets a client answer a request from here, with the next screen's control. */
+  sending?: boolean;
 }) => {
   const { isBase } = useTheme();
-  const { state, reload, ask, setUp, busy, actionError } = useMatterRoom(
-    matter.id,
-  );
+  const { baseUrl } = useApi();
+  const { state, reload, ask, setUp, receive, busy, actionError } =
+    useMatterRoom(matter.id);
+
+  const send =
+    sending && persona === "client" && state.status === "ready"
+      ? (request: Request) => (
+          <SendDocument
+            request={request}
+            demo={state.demo}
+            onSent={(files) => {
+              receive(request.id, files);
+              if (state.demo) {
+                toastr.success("Sent. Your lawyer sees it right away.");
+              }
+            }}
+          />
+        )
+      : undefined;
 
   const facts = [
     { label: "Practice", value: matter.practice },
@@ -339,6 +377,7 @@ export const MatterRoomPanel = ({
                   key={request.id}
                   request={request}
                   persona={persona}
+                  send={send}
                 />
               ))}
             </ul>
@@ -402,7 +441,17 @@ export const MatterRoomPanel = ({
             </Text>
           ) : null}
         </div>
-        <StageBadge matter={matter} />
+        <div className={styles.headerActions}>
+          <StageBadge matter={matter} />
+          {baseUrl ? (
+            <Button
+              size={ButtonSize.extraSmall}
+              label="Refresh"
+              isLoading={state.status === "loading"}
+              onClick={reload}
+            />
+          ) : null}
+        </div>
       </div>
 
       <ColumnarInfoBar variant="page" columns={facts} />
