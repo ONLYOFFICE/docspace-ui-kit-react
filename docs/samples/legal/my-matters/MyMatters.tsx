@@ -266,16 +266,31 @@ export const MattersBody = ({
           </Text>
           <div className={styles.statusRow}>
             {baseUrl ? (
-              <Link
-                type={LinkType.page}
-                href={new URL("/rooms/shared/filter", baseUrl).toString()}
-                target={LinkTarget.blank}
-                color="accent"
-                isHovered
-                fontSize="13px"
-              >
-                Open rooms in ONLYOFFICE
-              </Link>
+              <>
+                <Link
+                  type={LinkType.page}
+                  href={new URL("/rooms/shared/filter", baseUrl).toString()}
+                  target={LinkTarget.blank}
+                  color="accent"
+                  isHovered
+                  fontSize="13px"
+                >
+                  Open rooms in ONLYOFFICE
+                </Link>
+                <Link
+                  type={LinkType.page}
+                  href={new URL(
+                    "./?path=/docs/samples-legal-practice-setup-demo-data-on-your-portal--docs",
+                    document.baseURI,
+                  ).toString()}
+                  target={LinkTarget.top}
+                  color="accent"
+                  isHovered
+                  fontSize="13px"
+                >
+                  Or create the demo matters
+                </Link>
+              </>
             ) : null}
             <Button
               size={ButtonSize.extraSmall}
