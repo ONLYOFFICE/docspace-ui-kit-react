@@ -14,20 +14,17 @@ import { Text } from "../../../../components/text";
 import { InputSize } from "../../../../components/text-input";
 import { useApi } from "../../../../providers/api";
 import { ClientSession } from "../ClientSession";
-import { DEMO_PEOPLE, DEMO_ROOMS } from "../demo-matters";
 import {
-  byAttention,
   type KnownStage,
   type Matter,
-  matterFromRoom,
   roomUrl,
   STAGE_FOR_CLIENT,
   STAGES,
   updatedAgo,
 } from "../matter";
 import { MatterLogo, plural, StageBadge, Who } from "../matter-bits";
-import { personaFromRoles, type Persona } from "../persona";
-import { useMatters } from "../useMatters";
+import type { Persona } from "../persona";
+import { type ReadyMattersView, useMattersView } from "../useMattersView";
 import styles from "../legal.module.scss";
 
 /**
@@ -44,9 +41,12 @@ import styles from "../legal.module.scss";
 const MatterRow = ({
   matter,
   persona,
+  onOpen,
 }: {
   matter: Matter;
   persona: Persona;
+  /** Given, the title opens the matter in the application instead of the portal. */
+  onOpen?: (matter: Matter) => void;
 }) => {
   const { baseUrl } = useApi();
   const when = updatedAgo(matter.updated);
@@ -70,7 +70,18 @@ const MatterRow = ({
 
       <div className={styles.matterBody}>
         <Text as="p" className={styles.matterTitle}>
-          {matter.title}
+          {onOpen ? (
+            <Link
+              type={LinkType.action}
+              onClick={() => onOpen(matter)}
+              isBold
+              fontSize="14px"
+            >
+              {matter.title}
+            </Link>
+          ) : (
+            matter.title
+          )}
         </Text>
 
         {persona === "client" ? (
@@ -120,9 +131,11 @@ const ALL = "all";
 const MatterList = ({
   matters,
   persona,
+  onOpen,
 }: {
   matters: Matter[];
   persona: Persona;
+  onOpen?: (matter: Matter) => void;
 }) => {
   const [query, setQuery] = useState("");
   const [stage, setStage] = useState<string>(ALL);
@@ -154,7 +167,12 @@ const MatterList = ({
     return (
       <ul className={styles.matterList}>
         {matters.map((matter) => (
-          <MatterRow key={matter.id} matter={matter} persona="client" />
+          <MatterRow
+            key={matter.id}
+            matter={matter}
+            persona="client"
+            onOpen={onOpen}
+          />
         ))}
       </ul>
     );
@@ -195,7 +213,12 @@ const MatterList = ({
       {shown.length ? (
         <ul className={styles.matterList}>
           {shown.map((matter) => (
-            <MatterRow key={matter.id} matter={matter} persona="lawyer" />
+            <MatterRow
+              key={matter.id}
+              matter={matter}
+              persona="lawyer"
+              onOpen={onOpen}
+            />
           ))}
         </ul>
       ) : (
@@ -208,64 +231,24 @@ const MatterList = ({
 };
 
 /**
- * Everything one identity sees, whichever provider it runs under. In demo
- * mode the portal's two answers are imitated by `demoAs`.
+ * The list and its empty states, for a view already resolved. The cabinet
+ * renders this straight into its page; the sample below wraps it with the
+ * line that says who is reading.
  */
-const MattersPanel = ({ demoAs }: { demoAs: Persona }) => {
-  const state = useMatters();
+export const MattersBody = ({
+  view,
+  onOpen,
+}: {
+  view: ReadyMattersView;
+  onOpen?: (matter: Matter) => void;
+}) => {
   const { baseUrl } = useApi();
-
-  if (state.status === "demo") {
-    const matters = DEMO_ROOMS[demoAs]
-      .map(matterFromRoom)
-      .filter((matter): matter is Matter => matter !== null)
-      .sort(byAttention);
-    // The roles a lawyer and a client have on a real portal.
-    const label = personaFromRoles(
-      demoAs === "client" ? { isVisitor: true } : { isRoomAdmin: true },
-    ).label;
-
-    return (
-      <>
-        <Who name={`${DEMO_PEOPLE[demoAs]} (demo data)`} label={label} />
-        <MatterList matters={matters} persona={demoAs} />
-      </>
-    );
-  }
-
-  if (state.status === "loading") {
-    return (
-      <div className={styles.statusRow}>
-        <Loader type={LoaderTypes.track} size="20px" />
-        <Text fontSize="13px">Asking the portal for rooms...</Text>
-      </div>
-    );
-  }
-
-  if (state.status === "error") {
-    return (
-      <div className={styles.statusRow} role="alert">
-        <Text as="span" className={`${styles.badge} ${styles.badgeError}`}>
-          No matters
-        </Text>
-        <Text fontSize="13px">{state.message}</Text>
-        <Button
-          size={ButtonSize.extraSmall}
-          label="Try again"
-          onClick={state.reload}
-        />
-      </div>
-    );
-  }
-
-  const { persona } = state.persona;
+  const { persona, matters } = view;
 
   return (
     <>
-      <Who name={state.name} label={state.persona.label} />
-
-      {state.matters.length ? (
-        <MatterList matters={state.matters} persona={persona} />
+      {matters.length ? (
+        <MatterList matters={matters} persona={persona} onOpen={onOpen} />
       ) : persona === "client" ? (
         <Text as="p" fontSize="13px" lineHeight="20px">
           Nothing has been shared with you yet. Your lawyer adds you to a
@@ -274,45 +257,96 @@ const MattersPanel = ({ demoAs }: { demoAs: Persona }) => {
       ) : (
         <>
           <Text as="p" fontSize="13px" lineHeight="20px">
-            {state.otherRooms
-              ? `${plural(state.otherRooms, "room")} on this portal, none tagged as a matter. `
+            {view.otherRooms
+              ? `${plural(view.otherRooms, "room")} on this portal, none tagged as a matter. `
               : "No rooms on this portal yet. "}
             Tag a room <b>Practice: Employment</b> and <b>Stage: Intake</b> in
             ONLYOFFICE — any practice, any of the stages below — and it becomes
             a matter here.
           </Text>
           <div className={styles.statusRow}>
-            <Link
-              type={LinkType.page}
-              href={new URL("/rooms/shared/filter", baseUrl).toString()}
-              target={LinkTarget.blank}
-              color="accent"
-              isHovered
-              fontSize="13px"
-            >
-              Open rooms in ONLYOFFICE
-            </Link>
+            {baseUrl ? (
+              <Link
+                type={LinkType.page}
+                href={new URL("/rooms/shared/filter", baseUrl).toString()}
+                target={LinkTarget.blank}
+                color="accent"
+                isHovered
+                fontSize="13px"
+              >
+                Open rooms in ONLYOFFICE
+              </Link>
+            ) : null}
             <Button
               size={ButtonSize.extraSmall}
               label="Refresh"
-              onClick={state.reload}
+              onClick={view.reload}
             />
           </div>
         </>
       )}
 
-      {state.matters.length && state.otherRooms ? (
+      {matters.length && view.otherRooms ? (
         <Text as="p" className={styles.matterMeta}>
-          {`${plural(state.otherRooms, "other room")} without a Practice tag ${state.otherRooms === 1 ? "is" : "are"} not shown.`}
+          {`${plural(view.otherRooms, "other room")} without a Practice tag ${view.otherRooms === 1 ? "is" : "are"} not shown.`}
         </Text>
       ) : null}
 
-      {state.truncated ? (
+      {view.truncated ? (
         <Text as="p" className={styles.matterMeta}>
           Only the first 500 rooms were read. A practice this size searches on
           the server — see the notes below.
         </Text>
       ) : null}
+    </>
+  );
+};
+
+/**
+ * Everything one identity sees, whichever provider it runs under. In demo
+ * mode the portal's two answers are imitated by `demoAs`.
+ */
+export const MattersPanel = ({
+  demoAs,
+  onOpen,
+}: {
+  demoAs: Persona;
+  onOpen?: (matter: Matter) => void;
+}) => {
+  const view = useMattersView(demoAs);
+
+  if (view.status === "loading") {
+    return (
+      <div className={styles.statusRow}>
+        <Loader type={LoaderTypes.track} size="20px" />
+        <Text fontSize="13px">Asking the portal for rooms...</Text>
+      </div>
+    );
+  }
+
+  if (view.status === "error") {
+    return (
+      <div className={styles.statusRow} role="alert">
+        <Text as="span" className={`${styles.badge} ${styles.badgeError}`}>
+          No matters
+        </Text>
+        <Text fontSize="13px">{view.message}</Text>
+        <Button
+          size={ButtonSize.extraSmall}
+          label="Try again"
+          onClick={view.reload}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Who
+        name={view.demo ? `${view.name} (demo data)` : view.name}
+        label={view.label}
+      />
+      <MattersBody view={view} onOpen={onOpen} />
     </>
   );
 };

@@ -32,6 +32,8 @@ export type MattersState =
       status: "ready";
       name: string;
       persona: PersonaInfo;
+      /** A portal path to the reader's picture, protected like every other. */
+      avatar: string;
       matters: Matter[];
       /** Rooms this identity can see that carry no practice tag. */
       otherRooms: number;
@@ -92,6 +94,7 @@ export const useMatters = (): MattersState & { reload: () => void } => {
           status: "ready",
           name: me?.displayName ?? me?.email ?? "Unknown",
           persona: personaFromRoles(me ?? {}),
+          avatar: me?.hasAvatar ? (me.avatarMedium ?? me.avatar ?? "") : "",
           matters,
           otherRooms: rooms.length - matters.length,
           truncated: total > rooms.length,

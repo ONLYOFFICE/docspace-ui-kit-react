@@ -1,4 +1,4 @@
-import { type FormEvent, useMemo, useState } from "react";
+import { type FormEvent, useState } from "react";
 
 import EmptyRoomsDarkSvg from "../../../../assets/emptyview/empty.rooms.root.user.dark.svg";
 import EmptyRoomsLightSvg from "../../../../assets/emptyview/empty.rooms.root.user.light.svg";
@@ -25,12 +25,9 @@ import { useTheme } from "../../../../context/ThemeContext";
 import { useApi } from "../../../../providers/api";
 import { FileIcon } from "../../file-icon";
 import { ClientSession } from "../ClientSession";
-import { DEMO_PEOPLE, DEMO_ROOMS } from "../demo-matters";
 import {
-  byAttention,
   type KnownStage,
   type Matter,
-  matterFromRoom,
   roomUrl,
   STAGE_FOR_CLIENT,
   updatedAgo,
@@ -44,9 +41,9 @@ import {
   progressOf,
   type Request,
 } from "../matterRoom";
-import { personaFromRoles, type Persona } from "../persona";
+import type { Persona } from "../persona";
 import { useMatterRoom } from "../useMatterRoom";
-import { useMatters } from "../useMatters";
+import { useMattersView } from "../useMattersView";
 import styles from "../legal.module.scss";
 
 /**
@@ -227,7 +224,7 @@ const ActionError = ({ message }: { message: string }) =>
   ) : null;
 
 /** The room itself: its facts, then the checklist and the firm's folder. */
-const MatterRoomPanel = ({
+export const MatterRoomPanel = ({
   matter,
   persona,
 }: {
@@ -420,19 +417,10 @@ const MatterRoomPanel = ({
  * picker, and the room of the chosen matter is opened under the same token.
  */
 const MatterView = ({ demoAs }: { demoAs: Persona }) => {
-  const state = useMatters();
+  const view = useMattersView(demoAs);
   const [pickedId, setPickedId] = useState<number | null>(null);
 
-  const demoMatters = useMemo(
-    () =>
-      DEMO_ROOMS[demoAs]
-        .map(matterFromRoom)
-        .filter((matter): matter is Matter => matter !== null)
-        .sort(byAttention),
-    [demoAs],
-  );
-
-  if (state.status === "loading") {
+  if (view.status === "loading") {
     return (
       <div className={styles.statusRow}>
         <Loader type={LoaderTypes.track} size="20px" />
@@ -441,31 +429,24 @@ const MatterView = ({ demoAs }: { demoAs: Persona }) => {
     );
   }
 
-  if (state.status === "error") {
+  if (view.status === "error") {
     return (
       <div className={styles.statusRow} role="alert">
         <Text as="span" className={`${styles.badge} ${styles.badgeError}`}>
           No matters
         </Text>
-        <Text fontSize="13px">{state.message}</Text>
+        <Text fontSize="13px">{view.message}</Text>
         <Button
           size={ButtonSize.extraSmall}
           label="Try again"
-          onClick={state.reload}
+          onClick={view.reload}
         />
       </div>
     );
   }
 
-  const demo = state.status === "demo";
-  const matters = demo ? demoMatters : state.matters;
-  const persona = demo ? demoAs : state.persona.persona;
-  const name = demo ? `${DEMO_PEOPLE[demoAs]} (demo data)` : state.name;
-  const label = demo
-    ? personaFromRoles(
-        demoAs === "client" ? { isVisitor: true } : { isRoomAdmin: true },
-      ).label
-    : state.persona.label;
+  const { matters, persona, label } = view;
+  const name = view.demo ? `${view.name} (demo data)` : view.name;
 
   const matter = matters.find((item) => item.id === pickedId) ?? matters[0];
   const options: TOption[] = matters.map((item) => ({
