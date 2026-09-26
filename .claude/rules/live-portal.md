@@ -166,10 +166,19 @@ files:write`;
   must exist before a room can carry it, so `createRoomTag({ createTagRequestDto: { name } })`
   first, ignoring the refusal for one already there, then
   `addRoomTags({ id, batchTagsRequestDto: { names } })`; `filesApi.createFile({ folderId,
-createFileJsonElement: { title } })` makes an office document through the document server, and
-  `foldersApi.insertFile({ folderId, insertFileFile: File, insertFileTitle })` is the one-request
-  multipart upload for bytes already in memory. `setRoomSecurity` invites by `email`, though the
-  SDK's `RoomInvitation` names only `id`: build the invitation with `email` and cast it.
+createFileJsonElement: { title } })` makes an office document through the document server.
+  `setRoomSecurity` invites by `email`, though the SDK's `RoomInvitation` names only `id`: build
+  the invitation with `email` and cast it.
+- **Do not upload through the SDK's `insertFile`.** It sends the multipart fields as
+  `InsertFile.Title` and `InsertFile.File`, the names the reference pages show, and a live portal
+  answers 400 "Value cannot be null. (Parameter 'title')": the server's `InsertFileModelBinder`
+  (`products/ASC.Files/Core/ApiModels/Binders.cs` in the DocSpace server) reads a bare `title`,
+  `createNewIfExist` and `keepConvertStatus`, and takes the first file part whatever it is named.
+  Post a `FormData` with `file`, `title` and `createNewIfExist` through `apiClient.instance` to
+  `/api/2.0/files/{folderId}/insert`; `seed.ts` does. The generated docs
+  (`api.teamlab.info/docspace/api-backend/llms.txt`, moving to `api.onlyoffice.com`) repeat the
+  SDK's OpenAPI, so when both agree and the portal still refuses, the server source under
+  `../DocSpace/server` (a sibling of the Gitea checkouts) is what decides.
 - **Never commit a URL or a key.** They belong in `.env`, in the toolbar's `localStorage`, or in
   the reader's own head — a sample that ships a working key ships an open portal.
 - **Anything committed here has to render with no portal at all.** CI, the static build and a
