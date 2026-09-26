@@ -62,17 +62,25 @@ export type Matter = {
 };
 
 /**
- * What a room looks like on the wire, as far as a matter is concerned.
- *
- * `updated` is typed by the SDK as an object with `utcTime`, and arrives from
- * the portal as a plain ISO string; both are accepted.
+ * A timestamp as the portal sends it. The SDK types `created` and `updated`
+ * as an object with `utcTime`; the wire carries a plain ISO string. Both are
+ * accepted everywhere in these samples.
  */
+export type PortalTime = string | { utcTime?: string | null } | null;
+
+export const isoOf = (value: PortalTime | undefined) =>
+  typeof value === "string" ? value : (value?.utcTime ?? "");
+
+/** Whoever the portal says made or changed something. */
+export type PortalAuthor = { displayName?: string | null } | null;
+
+/** What a room looks like on the wire, as far as a matter is concerned. */
 export type RoomLike = Pick<
   FolderDtoInteger,
   "id" | "title" | "tags" | "logo" | "filesCount" | "foldersCount"
 > & {
-  createdBy?: { displayName?: string | null } | null;
-  updated?: string | { utcTime?: string } | null;
+  createdBy?: PortalAuthor;
+  updated?: PortalTime;
 };
 
 const PRACTICE_TAG = /^\s*practice\s*:\s*(.+?)\s*$/i;
@@ -97,10 +105,7 @@ export const matterFromRoom = (room: RoomLike): Matter | null => {
 
   const tagged = matchTag(tags, STAGE_TAG);
   const known = tagged ? canonicalStage(tagged) : undefined;
-  const updated =
-    typeof room.updated === "string"
-      ? room.updated
-      : (room.updated?.utcTime ?? "");
+  const updated = isoOf(room.updated);
 
   return {
     id: room.id,
@@ -145,6 +150,9 @@ export const updatedAgo = (iso: string, now: Date = new Date()) => {
   return format.format(-Math.round(days / 365), "year");
 };
 
-/** The room's page in the portal, where a matter's documents are worked on. */
+/**
+ * A folder's page in the portal, where its documents are worked on. A room is
+ * a folder too, so this opens a matter as much as a section inside it.
+ */
 export const roomUrl = (baseUrl: string, id: number) =>
   new URL(`/rooms/shared/${id}/filter?folder=${id}`, baseUrl).toString();

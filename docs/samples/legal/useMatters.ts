@@ -6,6 +6,7 @@ import {
 } from "@onlyoffice/docspace-api-sdk";
 
 import { useApi } from "../../../providers/api";
+import { explainPortalError } from "./explain";
 import { byAttention, type Matter, matterFromRoom } from "./matter";
 import { personaFromRoles, type PersonaInfo } from "./persona";
 
@@ -42,18 +43,6 @@ export type MattersState =
 const PAGE = 100;
 /** A sample's limit. A practice with more matters searches on the server instead. */
 const MAX_ROOMS = 500;
-
-const explain = (error: unknown) => {
-  const status = (error as { response?: { status?: number } })?.response
-    ?.status;
-  if (status === 401 || status === 403) {
-    return `The portal answered ${status}: this identity may not list rooms.`;
-  }
-  if (status === undefined) {
-    return "No answer from the portal -- usually CORS, sometimes a wrong host.";
-  }
-  return `The portal answered ${status}.`;
-};
 
 export const useMatters = (): MattersState & { reload: () => void } => {
   const { baseUrl, profilesApi, roomsApi } = useApi();
@@ -108,7 +97,12 @@ export const useMatters = (): MattersState & { reload: () => void } => {
           truncated: total > rooms.length,
         });
       } catch (error) {
-        if (!cancelled) setState({ status: "error", message: explain(error) });
+        if (!cancelled) {
+          setState({
+            status: "error",
+            message: explainPortalError(error, "list rooms"),
+          });
+        }
       }
     };
 

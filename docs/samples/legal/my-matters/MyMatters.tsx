@@ -8,13 +8,12 @@ import {
 } from "../../../../components/heading";
 import { Link, LinkTarget, LinkType } from "../../../../components/link";
 import { Loader, LoaderTypes } from "../../../../components/loader";
-import { RoomIcon } from "../../../../components/room-icon";
 import { SearchInput } from "../../../../components/search-input";
 import { Tabs, TabsTypes } from "../../../../components/tabs";
 import { Text } from "../../../../components/text";
 import { InputSize } from "../../../../components/text-input";
-import { ApiProvider, useApi } from "../../../../providers/api";
-import { CLIENT_SCOPES, callbackUrl, readClientId } from "../clientApp";
+import { useApi } from "../../../../providers/api";
+import { ClientSession } from "../ClientSession";
 import { DEMO_PEOPLE, DEMO_ROOMS } from "../demo-matters";
 import {
   byAttention,
@@ -26,10 +25,9 @@ import {
   STAGES,
   updatedAgo,
 } from "../matter";
+import { MatterLogo, plural, StageBadge, Who } from "../matter-bits";
 import { personaFromRoles, type Persona } from "../persona";
 import { useMatters } from "../useMatters";
-import { useOAuthSignIn } from "../useOAuthSignIn";
-import { usePortalImage } from "../usePortalImage";
 import styles from "../legal.module.scss";
 
 /**
@@ -43,44 +41,6 @@ import styles from "../legal.module.scss";
  * lead and the document count, a client gets a sentence about what is
  * happening and who to ask.
  */
-const plural = (count: number, one: string, many = `${one}s`) =>
-  `${count} ${count === 1 ? one : many}`;
-
-const MatterLogo = ({ matter }: { matter: Matter }) => {
-  const { logo } = matter;
-  // A cover the portal drew is inline SVG data, and `RoomIcon` recolours it.
-  // An uploaded picture is a protected path on the portal: fetch it signed.
-  const cover = logo?.cover?.data
-    ? { data: logo.cover.data, id: logo.cover.id ?? "" }
-    : undefined;
-  const picture = usePortalImage(cover ? "" : logo?.medium);
-  const color = logo?.color || "555F6B";
-
-  return (
-    <RoomIcon
-      title={matter.title}
-      color={color}
-      logo={
-        cover
-          ? { cover, color, original: "", large: "", medium: "", small: "" }
-          : picture || undefined
-      }
-      size="32px"
-      // Without a logo it would draw an empty <img>, not the initials.
-      showDefault={!cover && !picture}
-    />
-  );
-};
-
-const StageBadge = ({ matter }: { matter: Matter }) => (
-  <Text
-    as="span"
-    className={`${styles.badge} ${matter.stageKnown && !matter.isClosed ? styles.badgeStage : ""}`}
-  >
-    {matter.stage}
-  </Text>
-);
-
 const MatterRow = ({
   matter,
   persona,
@@ -247,15 +207,6 @@ const MatterList = ({
   );
 };
 
-const Who = ({ name, label }: { name: string; label: string }) => (
-  <div className={styles.statusRow}>
-    <Text as="span" className={styles.badge}>
-      {label}
-    </Text>
-    <Text fontSize="13px">{name}</Text>
-  </div>
-);
-
 /**
  * Everything one identity sees, whichever provider it runs under. In demo
  * mode the portal's two answers are imitated by `demoAs`.
@@ -366,106 +317,6 @@ const MattersPanel = ({ demoAs }: { demoAs: Persona }) => {
   );
 };
 
-/** The client's half: the same panel, under the client's own token. */
-const ClientView = () => {
-  const { baseUrl } = useApi();
-  const [clientId] = useState(readClientId);
-  const redirectUri = useMemo(callbackUrl, []);
-  const oauth = useOAuthSignIn({
-    portalUrl: baseUrl,
-    clientId,
-    redirectUri,
-    scopes: CLIENT_SCOPES,
-  });
-
-  // No portal: imitate the client's answer, like everything else here.
-  if (!baseUrl) return <MattersPanel demoAs="client" />;
-
-  if (!clientId) {
-    return (
-      <Text as="p" fontSize="13px" lineHeight="20px">
-        A client signs in as themselves, with the sample&apos;s OAuth app.
-        Register it once in{" "}
-        <Link
-          type={LinkType.page}
-          href={new URL(
-            "./?path=/docs/samples-legal-practice-setup-who-is-signed-in--docs",
-            document.baseURI,
-          ).toString()}
-          target={LinkTarget.top}
-          color="accent"
-          isHovered
-          fontSize="13px"
-        >
-          Who is signed in
-        </Link>
-        , then come back here.
-      </Text>
-    );
-  }
-
-  if (oauth.status === "signed-in") {
-    return (
-      <>
-        <div className={styles.statusRow}>
-          <Button
-            size={ButtonSize.small}
-            label="Sign out"
-            onClick={oauth.signOut}
-          />
-          <Text fontSize="12px">
-            Everything below runs with the client&apos;s token.
-          </Text>
-        </div>
-        <ApiProvider
-          url={baseUrl}
-          apiKey={oauth.token}
-          initSocket={false}
-          useBearerForRawClient
-        >
-          <MattersPanel demoAs="client" />
-        </ApiProvider>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <div className={styles.statusRow}>
-        <Button
-          primary
-          size={ButtonSize.small}
-          label={
-            oauth.status === "waiting"
-              ? "Waiting for the portal..."
-              : oauth.status === "exchanging"
-                ? "Getting the token..."
-                : "Sign in with ONLYOFFICE"
-          }
-          isLoading={
-            oauth.status === "waiting" || oauth.status === "exchanging"
-          }
-          onClick={oauth.signIn}
-        />
-        <Text fontSize="12px">
-          Sign in as a client — a guest on the portal — to see only what was
-          shared with them.
-        </Text>
-      </div>
-      {oauth.error ? (
-        <div className={styles.statusRow} role="alert">
-          <Text as="span" className={`${styles.badge} ${styles.badgeError}`}>
-            Sign-in failed
-          </Text>
-          <Text fontSize="13px" lineHeight="20px">
-            {oauth.error}
-          </Text>
-        </div>
-      ) : null}
-    </>
-  );
-};
-
 export const MyMatters = () => {
   const { baseUrl } = useApi();
 
@@ -502,7 +353,10 @@ export const MyMatters = () => {
             ? "With the client's own OAuth token: only the rooms shared with them."
             : "Only the rooms shared with the client."}
         </Text>
-        <ClientView />
+        {/* The same panel, under the client's own token. */}
+        <ClientSession demo={<MattersPanel demoAs="client" />}>
+          <MattersPanel demoAs="client" />
+        </ClientSession>
       </div>
 
       <div className={styles.card}>
