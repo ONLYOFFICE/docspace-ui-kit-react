@@ -161,6 +161,15 @@ files:write`;
   `pureContentLength`, `webUrl`, a relative path). Walking a room is therefore one call per level;
   `docs/samples/legal/matterRoom.ts` does it with the "read one folder" step injected, and skips
   folders whose `filesCount` is 0. Creating a folder is `createFolder({ folderId, createFolder: { title } })`.
+- **Writing rooms, tags, files and invitations** (`docs/samples/legal/seed.ts` does all four):
+  `createRoom({ createRoomRequestDto: { title, roomType: RoomType.CustomRoom, color } })`; a tag
+  must exist before a room can carry it, so `createRoomTag({ createTagRequestDto: { name } })`
+  first, ignoring the refusal for one already there, then
+  `addRoomTags({ id, batchTagsRequestDto: { names } })`; `filesApi.createFile({ folderId,
+createFileJsonElement: { title } })` makes an office document through the document server, and
+  `foldersApi.insertFile({ folderId, insertFileFile: File, insertFileTitle })` is the one-request
+  multipart upload for bytes already in memory. `setRoomSecurity` invites by `email`, though the
+  SDK's `RoomInvitation` names only `id`: build the invitation with `email` and cast it.
 - **Never commit a URL or a key.** They belong in `.env`, in the toolbar's `localStorage`, or in
   the reader's own head — a sample that ships a working key ships an open portal.
 - **Anything committed here has to render with no portal at all.** CI, the static build and a
