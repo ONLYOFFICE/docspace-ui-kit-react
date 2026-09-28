@@ -17,6 +17,16 @@ test.describe("MCPIcon — light", () => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("mcp-icon-css-customization.png");
   });
+
+  test("broken image fallback", async ({ page }) => {
+    await gotoStory(page, "broken-image-fallback");
+    await expect(page).toHaveScreenshot("mcp-icon-broken-image-fallback.png");
+  });
+
+  test("with image node", async ({ page }) => {
+    await gotoStory(page, "with-image-node");
+    await expect(page).toHaveScreenshot("mcp-icon-with-image-node.png");
+  });
 });
 
 test.describe("MCPIcon — dark", () => {
