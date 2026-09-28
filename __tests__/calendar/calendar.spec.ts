@@ -1,8 +1,8 @@
 import { type Page, expect, test } from "@playwright/test";
 
-// Title: "UI/Interactive elements/Calendar"
-// → prefix: "ui-interactive-elements-calendar"
-const STORY_BASE = "ui-interactive-elements-calendar";
+// Title: "UI/Form controls/Calendar"
+// → prefix: "ui-form-controls-calendar"
+const STORY_BASE = "ui-form-controls-calendar";
 
 async function gotoStory(page: Page, storyId: string) {
   const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
@@ -21,6 +21,11 @@ test.describe("Calendar — light", () => {
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("calendar-css-customization.png");
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("calendar-right-to-left.png");
   });
 });
 
