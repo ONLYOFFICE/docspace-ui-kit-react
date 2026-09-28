@@ -18,6 +18,18 @@ test.describe("ErrorContainer — light", () => {
     await expect(page).toHaveScreenshot("error-container-default.png");
   });
 
+  test("with secondary button", async ({ page }) => {
+    await gotoStory(page, "with-secondary-button");
+    await expect(page).toHaveScreenshot(
+      "error-container-with-secondary-button.png",
+    );
+  });
+
+  test("without logo", async ({ page }) => {
+    await gotoStory(page, "without-logo");
+    await expect(page).toHaveScreenshot("error-container-without-logo.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot(

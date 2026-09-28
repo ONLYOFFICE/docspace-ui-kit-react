@@ -14,10 +14,13 @@ const meta = {
 ### Features
 
 - **Animated Background**: Decorative SVG elements with CSS animations (birds, clouds, mountains, balloon)
-- **Customizable Content**: Header text, body text, and optional custom HTML body
-- **Action Button**: Optional primary or secondary button for recovery actions
-- **Editor Mode**: Specialized layout for document editor errors
-- **Portal Logo**: Optional portal logo display at the top
+- **Message Lines**: Shows a centred heading, an explanation line and an optional third line in the muted colour, each only when its text is set
+- **Action Button**: Adds one full-width recovery button, filled or outlined, once both its label and its click handler are set
+- **Editor Mode**: Lays the page over its host at full width instead of taking a place in the page flow
+- **Portal Logo**: Shows the portal logo above the illustration unless it is hidden
+- **Extra Content**: Renders any children last, below the button, for a support link or a details block
+- **Full-Screen Page**: Fills the whole viewport height and scrolls within itself when the content is taller
+- **Responsive Layout**: Stretches the button to the full width and tightens the spacing on screens narrower than 1024px
 
 ### Usage
 
@@ -44,42 +47,69 @@ import { ErrorContainer } from "@onlyoffice/apps-ui-kit/components/error-contain
   argTypes: {
     headerText: {
       control: "text",
-      description: "Header text of the error message",
+      description: "The heading, rendered as an `h1` at 23px",
     },
     bodyText: {
       control: "text",
-      description: "Main body text of the error message",
+      description: "The line under the heading, 14px and no wider than 560px",
     },
     buttonText: {
       control: "text",
-      description: "Text label for the action button",
+      description:
+        "Label of the action button. The button appears only when `onClickButton` is set as well",
     },
     customizedBodyText: {
       control: "text",
-      description: "Custom HTML content rendered via dangerouslySetInnerHTML",
+      description:
+        "A third line under `bodyText`, 13px and 600-weight, in the muted colour. It takes plain text: markup in the string is shown as typed",
     },
     isPrimaryButton: {
       control: "boolean",
-      description: "Whether the action button uses primary styling",
+      description:
+        "Whether the action button is the filled accent one rather than the outlined one",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     isEditor: {
       control: "boolean",
-      description: "Enable editor mode with absolute positioning layout",
+      description:
+        "Takes the container out of the page flow and lays it over the whole width of its positioned parent, for a host that mounts it over a layout of its own",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hideLogo: {
       control: "boolean",
-      description: "Hide the portal logo at the top",
+      description: "Hides the portal logo above the illustration",
       table: {
         defaultValue: { summary: "false" },
       },
     },
-    onClickButton: { action: "clicked" },
+    onClickButton: {
+      action: "clicked",
+      description:
+        "Called when the action button is clicked. The button appears only when `buttonText` is set as well",
+    },
+    children: {
+      control: false,
+      description:
+        "Rendered last, below the button: the place for a support link or a details block",
+    },
+    id: {
+      control: "text",
+      description:
+        "Value of `id` on the outer element. It does not rename the fixed ids of the parts inside",
+    },
+    className: {
+      control: "text",
+      description:
+        "Added after the component's own classes on the outer element",
+    },
+    style: {
+      control: "object",
+      description: "Inline style of the outer element",
+    },
   },
 } satisfies Meta<typeof ErrorContainer>;
 
@@ -98,7 +128,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default error container with header, body text, and customized body content.",
+          "The plain error page: the heading says what happened (`headerText`), the line under it says what to do (`bodyText`), and the muted third line carries a detail such as an error code (`customizedBodyText`). Change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<ErrorContainer
@@ -123,7 +153,7 @@ export const WithPrimaryButton: Story = {
     docs: {
       description: {
         story:
-          "Error container with a primary action button for retry or navigation.",
+          "**Retry** — a filled button under the message, for the one action that gets the user out of the error (`buttonText` with `onClickButton`). Without the handler the button is not rendered at all.",
       },
       source: {
         code: `<ErrorContainer
@@ -149,7 +179,7 @@ export const InEditorMode: Story = {
     docs: {
       description: {
         story:
-          "Error container in editor mode with absolute positioning for use within the document editor.",
+          "The same page laid over its host instead of pushing it down (`isEditor`), for a screen such as a document editor that mounts the error on top of a layout of its own.",
       },
       source: {
         code: `<ErrorContainer
@@ -209,7 +239,7 @@ export const WithChildren: Story = {
     docs: {
       description: {
         story:
-          "Error container with custom children content for detailed troubleshooting guidance.",
+          "**Please check the following** — a checklist and an error code under the message (`children`), for guidance that does not fit into one line of text.",
       },
       source: {
         code: `<ErrorContainer
@@ -230,6 +260,57 @@ export const WithChildren: Story = {
   },
 };
 
+export const WithSecondaryButton: Story = {
+  render: (args) => <ErrorContainer {...args} />,
+  args: {
+    headerText: "Some error has happened",
+    bodyText: "The file could not be opened",
+    buttonText: "Go back",
+    isPrimaryButton: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "**Go back** — the same button, outlined (`isPrimaryButton` off), for a page where leaving is the way out rather than an action the user is expected to take.",
+      },
+      source: {
+        code: `<ErrorContainer
+  headerText="Some error has happened"
+  bodyText="The file could not be opened"
+  buttonText="Go back"
+  isPrimaryButton={false}
+  onClickButton={handleBack}
+/>`,
+      },
+    },
+  },
+};
+
+export const WithoutLogo: Story = {
+  render: (args) => <ErrorContainer {...args} />,
+  args: {
+    headerText: "Some error has happened",
+    bodyText: "Try again later",
+    hideLogo: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The page starts with the illustration, with no logo above it (`hideLogo`), for a host that already shows its own brand or has no portal to take the logo from.",
+      },
+      source: {
+        code: `<ErrorContainer
+  headerText="Some error has happened"
+  bodyText="Try again later"
+  hideLogo
+/>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization = {
   render: () => (
     <div
@@ -237,14 +318,13 @@ export const CssCustomization = {
         {
           "--error-container-bg": "#e6f3fb",
           "--error-container-text": "#1d2d44",
-          "--error-container-link": "#0082c9",
         } as CSSProperties
       }
     >
       <ErrorContainer
         headerText="Connection error"
         bodyText="Unable to connect to the server."
-        buttonText="Try again"
+        customizedBodyText="Error code: 503"
       />
     </div>
   ),
@@ -255,9 +335,24 @@ export const CssCustomization = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--error-container-bg\` | Container background | white / black |
-| \`--error-container-text\` | Body text color | theme gray |
-| \`--error-container-link\` | Link color | theme link |`,
+| \`--error-container-bg\` | Background of the page | white; black in the dark theme |
+| \`--error-container-text\` | Colour of the \`customizedBodyText\` line | theme-based |
+
+The heading, \`bodyText\` and the button take their colours from Heading, Text and Button.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--error-container-bg": "#e6f3fb",
+    "--error-container-text": "#1d2d44",
+  }}
+>
+  <ErrorContainer
+    headerText="Connection error"
+    bodyText="Unable to connect to the server."
+    customizedBodyText="Error code: 503"
+  />
+</div>`,
       },
     },
   },

@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["empty-screen-container", "empty-view", "portal-logo"],
   "subComponents": [],
-  "testIds": ["ErrorContainer"]
+  "testIds": ["ErrorContainer"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # ErrorContainer
