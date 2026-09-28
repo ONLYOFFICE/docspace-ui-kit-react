@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": "isLoading", "disabled": null },
   "related": ["rows/row-container", "table", "scrollbar"],
   "subComponents": [],
-  "testIds": ["infinite-loader-container-list"]
+  "testIds": ["infinite-loader-container-list"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # InfiniteLoader
