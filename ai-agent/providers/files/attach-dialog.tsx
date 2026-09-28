@@ -14,6 +14,7 @@ import useGetIcon from "../../hooks/useGetIcon";
 import { getOnlyofficeFileType } from "./file-type";
 import { attachFilesToChat, type OnFilesAttached } from "./attach-files";
 import { splitDuplicateAttachments } from "./duplicate-attachments";
+import { useAttachmentLimit } from "./attachment-limit";
 import { hasFormResults } from "./form-attachments";
 import { notifyAlreadyAttached, notifyAttachmentLimit } from "./notices";
 import { reserveAttachmentChips } from "./limits";
@@ -36,6 +37,9 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
   const { currentDeviceType } = useDeviceType();
   const { getIcon } = useGetIcon();
   const { useAttachmentsStore } = useStores();
+  // What the composer accepts here, and why — the reason picks the wording
+  // of the refusal toast.
+  const cap = useAttachmentLimit();
 
   const selectedFilesRef = React.useRef<TSelectorItem[]>([]);
 
@@ -124,6 +128,7 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
           kind: "file" as const,
           type: input.type,
         })),
+        cap.limit,
       );
       const accepted = inputs.slice(0, pendingIds.length);
 
@@ -133,7 +138,7 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
       // chip would just look like nothing happened. Reported after the
       // dialog closes so the toasts are not covered by it.
       notifyAlreadyAttached(t, duplicates);
-      notifyAttachmentLimit(t, inputs.length - accepted.length);
+      notifyAttachmentLimit(t, inputs.length - accepted.length, cap);
       if (accepted.length === 0) return;
 
       try {
@@ -150,7 +155,7 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
         toastr.error(e as TData);
       }
     },
-    [onClose, onFilesAttached, useAttachmentsStore, t],
+    [onClose, onFilesAttached, useAttachmentsStore, cap, t],
   );
 
   const getIsDisabled = React.useCallback<

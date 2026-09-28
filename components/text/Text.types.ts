@@ -53,6 +53,14 @@ export type TextProps = {
   rel?: string;
   /** Passed to the element unchanged. The component adds no role, so a focusable text element needs one from you. */
   tabIndex?: number;
+  /** ARIA role of the element, passed unchanged: `status` or `alert` for a line that reports an outcome, `button` alongside `tabIndex` and `onClick`. */
+  role?: React.AriaRole;
+  /** Accessible name, passed unchanged, for text whose content is not what should be announced. */
+  "aria-label"?: React.AriaAttributes["aria-label"];
+  /** Live-region politeness, passed unchanged, for a line whose content changes and should be read out. */
+  "aria-live"?: React.AriaAttributes["aria-live"];
+  /** Hides the element from assistive technology, passed unchanged, for decoration that repeats what is already read. */
+  "aria-hidden"?: React.AriaAttributes["aria-hidden"];
   /** Not read here — it reaches the DOM as an unknown attribute. It is read off this element by `RowContent` and `TileContent`, which use it as the width of the slot they put the child in. */
   containerWidth?: string;
   /** Not read here — it reaches the DOM as an unknown attribute. It is read off this element by `RowContent`, which uses it as the minimum width of a side slot. */

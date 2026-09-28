@@ -113,6 +113,23 @@ const SecondaryTabs = (props: TabsProps) => {
 
   useEffect(() => {
     if (isLoading) return;
+
+    if (scaled) {
+      // A scaled tab is stretched to its share of the row, so its own width
+      // says nothing about what it holds. The label keeps its natural width
+      // even when truncated, so measure that, plus the icon beside it.
+      const contents = tabItemsRef.current.map((ref) => {
+        if (!ref) return 0;
+        const label = ref.querySelector<HTMLElement>(`.${styles.tabText}`);
+        const icon = ref.querySelector<HTMLElement>(`.${styles.tabIcon}`);
+        return (
+          (label?.scrollWidth ?? 0) + (icon ? icon.offsetWidth + TABS_GAP : 0)
+        );
+      });
+      setReferenceTabSize(Math.min(Math.max(...contents), MAX_TAB_WIDTH));
+      return;
+    }
+
     const widths = tabItemsRef.current.map((ref) =>
       ref ? ref.offsetWidth : 0,
     );
@@ -122,7 +139,7 @@ const SecondaryTabs = (props: TabsProps) => {
     setReferenceTabSize(
       max > MAX_TAB_WIDTH ? MAX_TAB_WIDTH : max - TAB_PADDING,
     );
-  }, [setReferenceTabSize, isLoading]);
+  }, [setReferenceTabSize, isLoading, scaled]);
 
   useEffect(() => {
     if (tabsIsOverflowing) return;

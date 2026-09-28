@@ -1,0 +1,576 @@
+@use "../../../styles/variables/colors";
+
+// The shared surface of the legal-practice track: the same type scale and card
+// shapes the portal's own screens use, so a sample looks like a page of the
+// product rather than a page of documentation.
+
+// The walkthrough on the Overview page: a recording of the cabinet in demo
+// mode, framed like the screens it shows.
+.demoGif {
+  display: block;
+  width: 100%;
+  max-width: 1000px;
+  height: auto;
+  border-radius: 12px;
+  box-sizing: border-box;
+
+  :global(.light) & {
+    border: 1px solid colors.$gray-light-mid;
+  }
+
+  :global(.dark) & {
+    border: 1px solid colors.$light-dark-gray-hover;
+  }
+}
+
+.page {
+  --accent-main: var(--color-scheme-main-accent, #{colors.$light-blue-main});
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+// A dialog's body is rendered through a portal, outside any `.page`, so the
+// classes below are scoped to both. The selector list keeps one specificity
+// in both places, which is what lets them win over a component's own class.
+.dialogBody {
+  --accent-main: var(--color-scheme-main-accent, #{colors.$light-blue-main});
+}
+
+.page,
+.dialogBody {
+  .sectionHeading {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .sectionTitle {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 24px;
+    margin: 0;
+  }
+
+  .sectionSubtitle {
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 20px;
+    margin: 0;
+
+    :global(.light) & {
+      color: colors.$light-gray-dark;
+    }
+
+    :global(.dark) & {
+      color: colors.$dark-gray-dark;
+    }
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 12px;
+    box-sizing: border-box;
+
+    :global(.light) & {
+      border: 1px solid colors.$gray-light-mid;
+    }
+
+    :global(.dark) & {
+      border: 1px solid colors.$light-dark-gray-hover;
+    }
+  }
+
+  // Status line: a badge, then what the badge is about.
+  .statusRow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 16px;
+    white-space: nowrap;
+
+    :global(.light) & {
+      background-color: colors.$gray-light;
+      color: colors.$light-gray-dark;
+    }
+
+    :global(.dark) & {
+      background-color: colors.$dark-gray-light;
+      color: colors.$dark-gray-dark;
+    }
+  }
+
+  .badgeOk {
+    :global(.light) & {
+      background-color: colors.$light-status-positive;
+      color: colors.$white;
+    }
+
+    :global(.dark) & {
+      background-color: colors.$light-status-positive;
+      color: colors.$white;
+    }
+  }
+
+  .badgeError {
+    :global(.light) & {
+      background-color: colors.$light-status-warning;
+      color: colors.$white;
+    }
+
+    :global(.dark) & {
+      background-color: colors.$light-status-warning;
+      color: colors.$white;
+    }
+  }
+
+  // Label/value pairs: the portal, the identity, the base URL.
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px 24px;
+
+    @media (max-width: 720px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .columns2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+
+    @media (max-width: 720px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .factLabel {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 16px;
+
+    :global(.light) & {
+      color: colors.$light-gray-dark;
+    }
+
+    :global(.dark) & {
+      color: colors.$gray-dark;
+    }
+  }
+
+  .factValue {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 20px;
+    overflow-wrap: anywhere;
+  }
+
+  .identity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .code {
+    margin: 0;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 12px;
+    line-height: 20px;
+    white-space: pre;
+    overflow-x: auto;
+
+    :global(.light) & {
+      background-color: colors.$gray-light;
+      color: colors.$black;
+    }
+
+    :global(.dark) & {
+      background-color: colors.$dark-gray-light;
+      color: colors.$white;
+    }
+  }
+
+  .list {
+    margin: 0;
+    padding-inline-start: 20px;
+    font-size: 13px;
+    line-height: 22px;
+
+    :global(.light) & {
+      color: colors.$light-gray-dark;
+    }
+
+    :global(.dark) & {
+      color: colors.$dark-gray-dark;
+    }
+  }
+
+  .badgeStage {
+    :global(.light) & {
+      background-color: colors.$light-blue-main;
+      color: colors.$white;
+    }
+
+    :global(.dark) & {
+      background-color: colors.$light-blue-main;
+      color: colors.$white;
+    }
+  }
+
+  // A list of matters: the room's tile, what the matter is, where it stands.
+  .toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .matterList {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .matter {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 12px;
+    padding-block: 12px;
+
+    // On a phone the badge goes under the text rather than beside it, so a
+    // title keeps the width it needs.
+    @media (max-width: 480px) {
+      grid-template-columns: 32px minmax(0, 1fr);
+
+      > :last-child {
+        grid-column: 2;
+        justify-self: start;
+      }
+    }
+  }
+
+  .matter + .matter {
+    :global(.light) & {
+      border-top: 1px solid colors.$gray-light-mid;
+    }
+
+    :global(.dark) & {
+      border-top: 1px solid colors.$light-dark-gray-hover;
+    }
+  }
+
+  .matterBody {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .matterTitle {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    overflow-wrap: anywhere;
+  }
+
+  .matterMeta {
+    margin: 0;
+    font-size: 12px;
+    line-height: 16px;
+
+    :global(.light) & {
+      color: colors.$light-gray-dark;
+    }
+
+    :global(.dark) & {
+      color: colors.$dark-gray-dark;
+    }
+  }
+
+  .tagRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  // Inside a matter: the room's header, its facts, and the sections under it.
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .roomHeader {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 12px;
+  }
+
+  .roomTitle {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+    overflow-wrap: anywhere;
+  }
+
+  .headerActions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .picker {
+    max-width: 480px;
+  }
+
+  .askRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding-block-start: 12px;
+
+    > :first-child {
+      flex: 1 1 240px;
+    }
+  }
+
+  // Under the checklist the grid already ends with a margin, so the row
+  // that adds a line to it sits closer than a row on its own.
+  .checkGrid + .askRow {
+    padding-block-start: 4px;
+  }
+
+  // A card's title with an action beside it.
+  .listHeader {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  // The new-matter form: the checklist templates two abreast, a hint on top.
+  .hint {
+    margin: 0 0 16px;
+  }
+
+  .checkGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 16px;
+    margin-block: 4px 12px;
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .stepList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  // A document opened in place: a header line, then the editor or its stand-in.
+  .reader {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-block-start: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    box-sizing: border-box;
+
+    :global(.light) & {
+      border: 1px solid colors.$gray-light-mid;
+    }
+
+    :global(.dark) & {
+      border: 1px solid colors.$light-dark-gray-hover;
+    }
+  }
+
+  .readerHeader {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+
+    @media (max-width: 480px) {
+      grid-template-columns: 32px minmax(0, 1fr);
+
+      > :last-child {
+        grid-column: 2;
+      }
+    }
+  }
+
+  .readerActions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .editorBox {
+    height: 560px;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  // The page that stands in for the editor with no portal.
+  .paper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 32px 40px;
+    border-radius: 4px;
+    min-height: 240px;
+
+    :global(.light) & {
+      background-color: colors.$white;
+      border: 1px solid colors.$gray-light-mid;
+      color: colors.$black;
+    }
+
+    :global(.dark) & {
+      background-color: colors.$dark-gray-light;
+      border: 1px solid colors.$light-dark-gray-hover;
+      color: colors.$white;
+    }
+
+    @media (max-width: 480px) {
+      padding: 20px;
+    }
+  }
+
+  .paperTitle {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 26px;
+  }
+
+  .paperLine {
+    margin: 0;
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  // The drop area under a request, sized so the dashed box reads as one.
+  .sendBox {
+    height: 180px;
+    margin-block-start: 8px;
+  }
+
+  // The cabinet: a sidebar and a page, laid out the way an application is.
+  .app {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    min-height: 640px;
+    border-radius: 12px;
+    overflow: hidden;
+
+    :global(.light) & {
+      border: 1px solid colors.$gray-light-mid;
+    }
+
+    :global(.dark) & {
+      border: 1px solid colors.$light-dark-gray-hover;
+    }
+
+    @media (max-width: 720px) {
+      grid-template-columns: 1fr;
+      min-height: 0;
+    }
+  }
+
+  .appCentered {
+    grid-template-columns: 1fr;
+    place-items: center;
+    padding: 24px;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 12px;
+    box-sizing: border-box;
+
+    :global(.light) & {
+      background-color: colors.$gray-light;
+      border-inline-end: 1px solid colors.$gray-light-mid;
+    }
+
+    :global(.dark) & {
+      background-color: colors.$dark-gray-light;
+      border-inline-end: 1px solid colors.$light-dark-gray-hover;
+    }
+
+    @media (max-width: 720px) {
+      border-inline-end: none;
+    }
+  }
+
+  .sidebarHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-inline: 8px;
+  }
+
+  .sidebarFirm {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+  }
+
+  .sidebarProfile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-block-start: auto;
+    padding-inline: 8px;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+    padding: 24px;
+    box-sizing: border-box;
+  }
+}

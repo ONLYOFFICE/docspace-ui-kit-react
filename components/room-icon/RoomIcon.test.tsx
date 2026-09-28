@@ -49,6 +49,13 @@ describe("<RoomIcon />", () => {
     expect(title).toHaveTextContent("TR");
   });
 
+  it("draws the initials, not an empty image, when there is no logo", () => {
+    render(<RoomIcon title="Harper v. Northwind" color="3B72A7" />);
+    expect(screen.getByTestId("room-title")).toHaveTextContent("HN");
+    expect(screen.queryByTestId("room-icon-image")).toBeNull();
+    expect(screen.queryByTestId("room-icon-cover")).toBeNull();
+  });
+
   it("renders empty icon state correctly", () => {
     render(<RoomIcon {...baseProps} isEmptyIcon />);
     const emptyIcon = screen.getByTestId("empty-icon");

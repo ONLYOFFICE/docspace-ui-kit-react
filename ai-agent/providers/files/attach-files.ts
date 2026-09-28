@@ -23,6 +23,13 @@ export type AttachFileInput = {
    * (see {@link rememberFormAttachments}) for the in-chat form hints.
    */
   hasFormResults?: boolean;
+  /**
+   * This attachment is the subject of the message: while it is on the draft
+   * the composer takes nothing else (see `useAnalyzeLock`). Set by the
+   * "Analyze responses" entry point, which is about this one form's
+   * responses.
+   */
+  analyzeOnly?: boolean;
 };
 
 /**
@@ -34,22 +41,26 @@ export type AttachFileInput = {
  */
 export type AttachedFileInfo = {
   id: string;
+  /**
+   * Host entry id the ref came from (`AttachFileInput.path`). The starter
+   * questions are fetched by it, not by the attachment id — the endpoint
+   * looks the form up in DocSpace.
+   */
+  entryId: string;
+  /** Attached as the subject of the message (see `AttachFileInput`). */
+  analyzeOnly?: boolean;
+  /**
+   * File name as the host sent it. The attachment record carries a title too,
+   * but this is the one the user saw in the file list — it is what the
+   * analyze banner names.
+   */
+  title: string;
   /** The backend can analyze this file's contents (an analyzable form). */
   canAnalyze?: boolean;
 };
 
 /** Reports what was attached, so the caller can keep the extra flags. */
 export type OnFilesAttached = (attached: AttachedFileInfo[]) => void;
-
-// The packaged ai-chat (`onlyoffice-ai-chat-0.5.0-docspace.2.tgz`) predates
-// `canAnalyze` on its `Attachment` type, while the backend already returns it.
-// Read it structurally until a build carrying the field is packed.
-const readCanAnalyze = (record: unknown): boolean | undefined => {
-  if (typeof record !== "object" || record === null) return undefined;
-  if (!("canAnalyze" in record)) return undefined;
-  const value = record.canAnalyze;
-  return typeof value === "boolean" ? value : undefined;
-};
 
 /**
  * Attaches host files to the AI chat composer through the attachments
@@ -132,7 +143,6 @@ export const attachFilesToChat = async (
     useAttachmentsStore,
     inputs.map((input) => input.path),
   );
-
   const records =
     (await useAttachmentsStore
       .getState()
@@ -152,16 +162,27 @@ export const attachFilesToChat = async (
       ),
   );
 
-  rememberFormAttachments(
-    useAttachmentsStore,
-    records
+  rememberFormAttachments(useAttachmentsStore, {
+    withResults: records
       .filter((_record, i) => inputs[i]?.hasFormResults)
       .map((record) => record.id),
-  );
+    analyzeOnly: records
+      .filter((_record, i) => inputs[i]?.analyzeOnly)
+      .map((record) => record.id),
+  });
 
+  // Pair each record with the input it came from before dropping the images,
+  // or the filtered array's positions would no longer line up with `inputs`.
   const attached = records
-    .filter((_, i) => !imageIndices.has(i))
-    .map((record) => ({ id: record.id, canAnalyze: readCanAnalyze(record) }));
+    .map((record, index) => ({ record, input: inputs[index] }))
+    .filter((_, index) => !imageIndices.has(index))
+    .map(({ record, input }) => ({
+      id: record.id,
+      entryId: input?.path ?? "",
+      title: input?.title ?? record.title,
+      analyzeOnly: input?.analyzeOnly,
+      canAnalyze: record.canAnalyze,
+    }));
 
   if (imageIndices.size === 0) return attached;
 

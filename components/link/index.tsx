@@ -75,7 +75,9 @@ const LinkUi: React.FC<LinkProps> = React.memo(
         tabIndex={tabIndex}
         isBold={isBold}
         style={commonStyle}
-        aria-label={ariaLabel || children}
+        aria-label={
+          ariaLabel || (typeof children === "string" ? children : undefined)
+        }
         data-testid={dataTestId ?? "link"}
         {...rest}
       >

@@ -1,0 +1,94 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import walkthrough from "./cabinet.gif";
+import styles from "./legal.module.scss";
+
+<Meta title="Samples/Legal practice/Overview" />
+
+# A client cabinet for a law firm
+
+A firm and its client exchange documents by email. Attachments go missing, a
+draft exists in three versions, the client does not know what they still owe,
+and the lawyer does not know what has already come in. Every matter starts
+with "please send us..." and every week has "did you get...?".
+
+These samples build the cabinet that ends that, on an ONLYOFFICE Apps portal
+and nothing else: no server of its own, no database, no second copy of
+anyone's documents. A matter is a room. What the firm needs from the client is
+a set of folders. The client signs in as themselves, drops files where they
+are asked for, and reads the firm's drafts in the editor without downloading
+them.
+
+<img
+  className={styles.demoGif}
+  src={walkthrough}
+  alt="The cabinet, walked through: the lawyer's list of matters, a matter opened to its checklist, the client sending a document and reading a draft, and a new matter opened from the form"
+/>
+
+Half a minute of the cabinet on demo data: the lawyer's list, a matter and its
+checklist, the client sending a document and reading a draft, and a new matter
+opened from the form. Every screen in it is one of the samples below, and the
+whole of it is
+[The cabinet](?path=/docs/samples-legal-practice-the-cabinet--docs).
+
+## The model
+
+| On the portal                                     | In the cabinet                                                    |
+| ------------------------------------------------- | ----------------------------------------------------------------- |
+| a room with the tag `Practice: Employment`        | a matter                                                          |
+| its tag `Stage: Discovery`                        | where it stands: Intake, Discovery, Negotiation, Hearing, Closed  |
+| the folder `From the client`                      | the checklist                                                     |
+| its subfolder `Passport`, empty                   | still needed                                                      |
+| its subfolder `Employment contract`, with a file  | received, on the day the file was uploaded                        |
+| the folder `From the firm`                        | drafts and letters for the client                                 |
+| the client, invited to the room as a guest        | who sees this matter and nothing else                             |
+
+Everything a screen shows is read from that, and everything a screen changes
+is written back as a room, a folder, a tag or a file. A lawyer can do all of
+it from the portal's own interface too, and the cabinet will agree, because
+there is nothing else to be out of step with.
+
+## The screens
+
+[The cabinet](?path=/docs/samples-legal-practice-the-cabinet--docs) is the
+whole application in one story: the sidebar, the list, a matter opened from
+it, as the lawyer or as the client. The screens below are its parts, taken out
+one at a time. Each answers one question, and its page says which components
+carry the answer and why those. Every screen works with no portal, on demo
+data in the shape the portal answers with.
+
+| Screen                                                                   | The question                                                    | What carries it                                                                              |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| [01. My matters](?path=/docs/samples-legal-practice-01-my-matters--docs) | What is going on with my matters?                               | `RoomIcon`, `Tabs`, `SearchInput`, `Badge`, `Tag`, `Link`                                    |
+| [02. Inside a matter](?path=/docs/samples-legal-practice-02-inside-a-matter--docs) | What does the firm still need from me, and what has arrived? | `ProgressBar`, `CollapsibleCard`, `ColumnarInfoBar`, `ComboBox`, `EmptyView`, `TextInput` |
+| [03. Sending a document](?path=/docs/samples-legal-practice-03-sending-a-document--docs) | How does the client hand over a file? | `Uploader`, `Dropzone`, `Toast`, `Button` |
+| [04. Reading the firm's draft](?path=/docs/samples-legal-practice-04-reading-the-firm-s-draft--docs) | How does the client read a draft without downloading it? | `DocumentEditor`, `Button`, `Loader` |
+| [05. Opening a matter](?path=/docs/samples-legal-practice-05-opening-a-matter--docs) | How does a lawyer set all of this up in one go? | `ModalDialog`, `FieldContainer`, `ComboBox`, `Checkbox`, `EmailInput`, `Button` |
+
+
+## Two readers, one code
+
+A lawyer works under the firm's **API key**, and the application acts for the
+firm. A client signs in with **OAuth** and gets a token that is theirs, so the
+portal itself decides which rooms they see. The same components and the same
+hooks serve both. What differs is the token in the nearest `ApiProvider` and
+the wording, and
+[Who is signed in](?path=/docs/samples-legal-practice-setup-who-is-signed-in--docs)
+is where that is decided.
+
+## Running it on your portal
+
+Two setup pages, once:
+
+- [Connect to a portal](?path=/docs/samples-legal-practice-setup-connect-to-a-portal--docs):
+  the **API** control in the toolbar takes a portal URL and an API key and
+  keeps them in this browser.
+- [Who is signed in](?path=/docs/samples-legal-practice-setup-who-is-signed-in--docs):
+  registers the OAuth app a client signs in with, one button while
+  `pnpm storybook` is running.
+
+Then give any room the tags `Practice: Employment` and `Stage: Intake`, and it
+is a matter. Or press the button on
+[Demo data on your portal](?path=/docs/samples-legal-practice-setup-demo-data-on-your-portal--docs)
+and the whole demo practice is created on your portal, rooms, folders and
+files, ready for every screen.

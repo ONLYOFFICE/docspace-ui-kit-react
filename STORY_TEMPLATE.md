@@ -135,6 +135,7 @@ export const VariantStory: Story = {
 8. [ ] **Source code** - Each story has `parameters.docs.source.code` with clean examples
 9. [ ] **Template functions** - Extract complex renders into named `*Template` components
 10. [ ] **Wrapper** - Use a layout wrapper for stories with multiple items
+11. [ ] **Story order** - `Default` first, `CssCustomization` last; `RightToLeft`, when present, right before it
 
 ## Story Naming Conventions
 
@@ -145,6 +146,7 @@ export const VariantStory: Story = {
 | State variants      | `DisabledState`, `LoadingState`, `HoveredState` |
 | Type/style variants | `PrimaryButtons`, `SecondaryButtons`            |
 | Feature demos       | `WithIcon`, `WithTooltip`, `WithCallback`       |
+| Direction           | `RightToLeft` (never `RTL`)                     |
 
 ## Categories
 

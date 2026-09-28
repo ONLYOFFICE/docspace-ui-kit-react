@@ -214,6 +214,8 @@ export function PublicRoomIcon({ name }: { name: string }) {
   or an object with only `medium`, is used as an ordinary image URL and is not recoloured.
 - **`isTemplate`, `isEmptyIcon` and `showDefault` are checked in that order** and each replaces
   everything below it, so a tile that is both a template and empty renders the template.
+- **No `logo` means the initials**, on `color`. `showDefault` is for forcing them while a logo
+  exists; it is not needed to get them.
 
 ## CSS variables
 

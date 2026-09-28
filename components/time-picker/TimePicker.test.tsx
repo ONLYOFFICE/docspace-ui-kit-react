@@ -1,7 +1,7 @@
 import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
-import { TimePicker } from ".";
+import { TimePicker, type TimePickerProps } from ".";
 
 describe("<TimePicker />", () => {
   const mockOnChange = vi.fn();
@@ -187,5 +187,64 @@ describe("<TimePicker />", () => {
 
     expect(selectSpy).toHaveBeenCalled();
     selectSpy.mockRestore();
+  });
+
+  it("folds the meridiem into the value reported in the 12-hour mode", () => {
+    render(
+      <TimePicker
+        initialTime="2025-01-09T14:30:00"
+        isTwelveHourFormat
+        meridiem="PM"
+        onChange={mockOnChange}
+      />,
+    );
+    const hoursInput = screen.getByLabelText("Hours") as HTMLInputElement;
+    expect(hoursInput.value).toBe("02");
+
+    fireEvent.change(hoursInput, { target: { value: "03" } });
+
+    expect(mockOnChange).toHaveBeenCalled();
+    expect(mockOnChange.mock.lastCall?.[0].toFormat("HH:mm")).toBe("15:30");
+  });
+
+  it("requires meridiem with isTwelveHourFormat (checked by tsc)", () => {
+    // @ts-expect-error meridiem is required in the 12-hour mode
+    const props: TimePickerProps = { isTwelveHourFormat: true };
+    expect(props.isTwelveHourFormat).toBe(true);
+  });
+
+  it("caps hours at 12 in the 12-hour mode", () => {
+    render(<TimePicker {...baseProps} isTwelveHourFormat meridiem="AM" />);
+    const hoursInput = screen.getByLabelText("Hours") as HTMLInputElement;
+
+    fireEvent.change(hoursInput, { target: { value: "13" } });
+
+    expect(hoursInput.value).toBe("01");
+  });
+
+  // Both fields used to inherit TextInput's -1 and Tab left the picker; the
+  // fields are in the natural tab order now, and tabIndex only moves them.
+  it("passes tabIndex to both fields and leaves them in the Tab order without it", () => {
+    const { rerender } = render(<TimePicker {...baseProps} tabIndex={0} />);
+    expect(screen.getByLabelText("Hours")).toHaveAttribute("tabindex", "0");
+    expect(screen.getByLabelText("Minutes")).toHaveAttribute("tabindex", "0");
+
+    rerender(<TimePicker {...baseProps} />);
+    expect(screen.getByLabelText("Hours")).not.toHaveAttribute("tabindex");
+    expect(screen.getByLabelText("Minutes")).not.toHaveAttribute("tabindex");
+  });
+
+  it("prefixes the field class names with classNameInput and adds none without it", () => {
+    const { rerender } = render(
+      <TimePicker {...baseProps} classNameInput="picker" />,
+    );
+    expect(screen.getByLabelText("Hours")).toHaveClass("picker-hours-input");
+    expect(screen.getByLabelText("Minutes")).toHaveClass(
+      "picker-minutes-input",
+    );
+
+    rerender(<TimePicker {...baseProps} />);
+    expect(screen.getByLabelText("Hours").className).not.toMatch(/undefined/);
+    expect(screen.getByLabelText("Minutes").className).not.toMatch(/undefined/);
   });
 });

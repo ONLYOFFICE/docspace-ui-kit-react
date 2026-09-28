@@ -6,6 +6,7 @@ import svgr from "vite-plugin-svgr";
 import remarkGfm from "remark-gfm";
 
 import { aiChatMock } from "./ai-chat-mock.ts";
+import { oauthAppProxy } from "./oauth-app-proxy.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -35,7 +36,15 @@ const config: StorybookConfig = {
     "../billing/**/*.stories.@(js|jsx|ts|tsx)",
   ],
 
-  staticDirs: [{ from: "../assets", to: "/static" }],
+  // `public/` is served at the root, next to iframe.html, for pages a story
+  // needs a real URL for -- today the OAuth redirect URI of the legal-practice
+  // samples, `oauth-callback.html`, and the `serve.json` that keeps
+  // `pnpm storybook-serve` from rewriting it. Resolved relative to the
+  // preview, so it works under a path prefix as well.
+  staticDirs: [
+    { from: "../assets", to: "/static" },
+    { from: "./public", to: "/" },
+  ],
 
   // Opening the manager without a `path` leaves the selection to Storybook,
   // which lands on the first leaf of the index -- an autodocs page of whatever
@@ -79,7 +88,21 @@ const config: StorybookConfig = {
     reactDocgen: "react-docgen-typescript",
   },
 
-  async viteFinal(config) {
+  async viteFinal(config, { configType }) {
+    // A static build inlines every `import.meta.env.VITE_*` it reads, so a
+    // portal key sitting in the builder's `.env` would ship in plain text in
+    // `assets/iframe-*.js` -- verified with a canary key, and the published
+    // Storybook is exactly such a build. Blank both out for production: the
+    // published pages start in demo mode, and a reader connects their own
+    // portal from the toolbar, which keeps the key in their browser only.
+    if (configType === "PRODUCTION") {
+      config.define = {
+        ...config.define,
+        "import.meta.env.VITE_PROVIDER_API_URL": JSON.stringify(""),
+        "import.meta.env.VITE_PROVIDER_API_KEY": JSON.stringify(""),
+      };
+    }
+
     // When proxied behind nginx at /storybook/, Vite must transform all
     // JS import paths to include the prefix. Nginx strips the prefix before
     // forwarding to Storybook, and sub_filter handles HTML script tags.
@@ -153,6 +176,10 @@ const config: StorybookConfig = {
     // widget's stores never initialise and the panel renders empty. Inert
     // behind nginx (`STORYBOOK_PROXY`), where those calls reach the portal.
     config.plugins.push(aiChatMock());
+
+    // The legal-practice samples' "Create the OAuth app" button: two portal
+    // calls the browser cannot make cross-origin. Dev server only.
+    config.plugins.push(oauthAppProxy());
 
     return config;
   },

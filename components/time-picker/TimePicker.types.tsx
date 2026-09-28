@@ -1,6 +1,6 @@
 import type { DateTime } from "luxon";
 
-export type TimePickerProps = {
+type TimePickerBase = {
   /**
    * Time the fields start on. It is read once, on mount; changing it afterwards
    * does nothing. Its **date** part is carried into every value `onChange`
@@ -17,19 +17,21 @@ export type TimePickerProps = {
   className?: string;
   /**
    * Prefix for the two fields' class names: they become
-   * `<classNameInput>-hours-input` and `-minutes-input`.
+   * `<classNameInput>-hours-input` and `-minutes-input`. Left out, the fields
+   * get no extra class.
    */
   classNameInput?: string;
   /**
-   * Whether the group is drawn in its error colours.
+   * Whether the group is drawn in its error colours; they stay while a field is
+   * focused.
    * @default false
    */
   hasError?: boolean;
-  /** Position of the hours field in the tab order. */
+  /** Position of both fields in the tab order. Left out, both take their natural place in it. */
   tabIndex?: number;
   /**
-   * Called when the minutes field is left, and also when a rejected minute is
-   * typed.
+   * Called when typing completes the minutes field — two digits, a single digit
+   * above 5, a third digit or a value above 59 — not when the field loses focus.
    */
   onBlur?: () => void;
   /**
@@ -44,15 +46,28 @@ export type TimePickerProps = {
    * @default "time-picker"
    */
   testId?: string;
-  /**
-   * Whether hours run 1–12 rather than 0–23. It changes the fields only — no
-   * AM/PM control is rendered, and `meridiem` is what decides which half of the
-   * day the value lands in.
-   */
-  isTwelveHourFormat?: boolean;
-  /**
-   * `"AM"` or `"PM"`, used when parsing the typed time in 12-hour mode. You own
-   * this value and the control that changes it.
-   */
-  meridiem?: string;
 };
+
+// The 12-hour mode cannot tell 03:30 from 15:30 on its own, so it takes the
+// half of the day with it.
+type TimePickerHourFormat =
+  | {
+      /**
+       * Whether hours run 1 to 12 rather than 0 to 23. It changes the fields
+       * only — no AM/PM control is rendered — and requires `meridiem`.
+       */
+      isTwelveHourFormat: true;
+      /**
+       * `"AM"` or `"PM"`, used when parsing the typed time in 12-hour mode. You
+       * own this value and the control that changes it.
+       */
+      meridiem: string;
+    }
+  | {
+      /** Whether hours run 1 to 12 rather than 0 to 23; requires `meridiem`. */
+      isTwelveHourFormat?: false;
+      /** Ignored in the 24-hour mode. */
+      meridiem?: string;
+    };
+
+export type TimePickerProps = TimePickerBase & TimePickerHourFormat;

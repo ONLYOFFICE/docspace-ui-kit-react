@@ -82,9 +82,16 @@ keeps the fixed shape below with only the `### Template` section.
    - sample data is neutral: no product roles or policies, real names,
      photos, brand names or network-fetched images; one placeholder
      icon unless icons are the subject;
-   - `CssCustomization` has the standard form, and every row of its
-     table names a variable some rule reads;
-   - comments are one line and explain only what the code cannot show.
+   - `CssCustomization` has the standard form, every row of its table
+     names a variable some rule reads, and the example sets every row
+     a rendered instance can show;
+   - comments are one line and explain only what the code cannot show;
+   - `Default` opens the file and `CssCustomization` is the last
+     story, with `RightToLeft`, when there is one, right before it:
+     the Docs page renders the first story as the component's primary
+     preview, and the variables table is an appendix, not an opener.
+     A `CssCustomization` wedged between another story's template
+     and that story is the same finding.
 
 ## Report and fixes
 
@@ -247,7 +254,15 @@ follows it:
   types' own terms**, not the product's use of it: `header` takes "a
   title with an optional visual — initials on a color, an icon, an
   avatar…", not "the room color" — the kit does not know what a room is,
-  even when the prop next to it is called `isRoom`.
+  even when the prop next to it is called `isRoom`. And it says it in
+  words a reader can picture, naming the concrete result — the size, the
+  side, the moment something happens — rather than the mechanism behind
+  it ("makes the field a fixed share of the window height, so it
+  stretches with the window", not "height follows the viewport"). A CSS
+  variable name belongs in the `CssCustomization` table, not in a prop
+  description. A floor, a cap or a fallback is mentioned only when a
+  reader can actually hit it, and then as the value, not as the variable
+  that holds it.
 - **Props live in `argTypes` and the types file**, not in prose: the
   Docs props table is generated from `<Name>.types.ts` by
   `react-docgen-typescript`, JSDoc comments included. Document a prop
@@ -269,7 +284,10 @@ follows it:
   read why (`getTooltipContent`)". A story that shows several variants
   gets one bullet per visible item, labelled by the item's own text,
   never a bullet per prop with a chain of prop names ("`withToggle` +
-  `checked`: a switch…").
+  `checked`: a switch…"). When it points the reader at the Controls
+  panel, it says what to do there in plain words — "change any other
+  prop live in the Controls panel below" — never in terms of the
+  mechanism ("the Controls panel drives every other prop").
 - **Sample data is neutral.** Labels and texts in a story show the
   component, not the product: realistic for a document hub ("Anyone
   with the link", "Move to archive") but never product roles, access
@@ -297,12 +315,32 @@ follows it:
   half-flipped component. The description names what the reader should
   see move — the icon's side, the fill direction, the alignment — and
   the sample text is a short neutral RTL phrase, not product copy.
+  **The story is always framed on Docs**: `ThemeProvider` writes
+  `data-dir` onto `<html>`, the Docs page mounts every story in one
+  document, and the last provider to run wins — so an inline story with
+  `globals.direction: "rtl"` flips the whole Docs page (headings, bullets,
+  the frame of every other story) while every other story keeps the
+  toolbar's direction, so the page and the components on it disagree,
+  whatever the toolbar says. Give it
+  `parameters.docs.story = { inline: false, height }` with a
+  one-line comment saying why, and after adding it open the Docs page and
+  read `document.documentElement.dataset.dir`: it must still say `ltr`.
+  The frame is a story canvas, so the preview decorator's 20px padding
+  and the canvas body's 13px both apply inside it: give the story
+  `parameters.noPadding: true` and a `height` of the content plus the
+  13px above and below it, then look at the frame on the Docs page —
+  a `height` copied from another story clips the last row, and the
+  decorator padding reads as an unexplained gap above the first.
 - **Comments in a story are rare and one line long.** They explain only
   what the code cannot show — why a story is framed or hidden on Docs,
   why a type forces unused fields — and never repeat the story's own
   description or restate what the JSX plainly does.
 - **Targeted edits only.** Keep the file's existing order, change lines
-  in place, append new stories after the last existing one. The same
+  in place, append new stories after the last existing state or
+  variant story and before `RightToLeft` and `CssCustomization`.
+  Moving a misplaced `CssCustomization` to the end is the one
+  reordering allowed: a story's ID comes from its name, not its
+  position, so the baselines hold. The same
   applies inside the description, and every existing Features bullet,
   argTypes description and `description.story` is judged against the
   deciding code, not kept because it is old ("the backdrop dims the
@@ -313,6 +351,12 @@ follows it:
   host calls `show`), or repeats its own label ("Backdrop: Optional
   backdrop") is reworded in place; a missing capability is appended —
   the block is never written anew.
+- **A component fix re-opens the story text written around the old
+  behaviour.** When a finding from the audit is fixed in the component
+  or its stylesheet, every description, bullet and argTypes entry that
+  was worded around the defect is reworded in the same turn, and two
+  props that differ only in the state they mark end up with parallel
+  descriptions — one never carries a clause the other lacks.
 - **Fold corrections into this skill at once.** When the user catches
   a discrepancy in how a fix is being made, the rule that prevents it
   is added here in the same turn, before the fix continues. Never
@@ -347,6 +391,26 @@ Default |` — defaults taken from the stylesheet's `var(--x, <default>)`
   example sets the variables on a wrapper `<div style={{ "--x": … }}>`;
   a component that portals its DOM (a menu, a dropdown, a tooltip) sets
   them through its own `style` prop instead, and the text says why.
+- **An instance in the example earns its place by a variable, not by a
+  state.** The wrapper sets every variable in the table that a rendered
+  instance can show; a row the example never sets is a claim the reader
+  cannot check on the page. One instance is the default. A second is
+  added only for a variable the first cannot reach — one that a prop
+  switches on (a gutter, a fill, a disabled look mixed from the custom
+  colour) — with that prop on the second instance and the variable in
+  the same wrapper, so the reader sees which variable the prop reveals.
+  A state in which the theme swaps the custom colours for its own is
+  shown only when the text says which variables survive it; otherwise
+  it demonstrates nothing and reads as a defect. Hover and focus
+  variables need no instance of their own: set them in the wrapper and
+  tell the reader to hover and focus. Two instances that show the same
+  variables are one too many. The story text names each instance and
+  the variable it is there for. Two checks on the values: neighbouring
+  shades of one colour do not read apart on a one-pixel border, so the
+  states differ in lightness, not in hue alone; and a variable whose
+  honest demonstration looks broken — the component's own layout puts
+  the part it changes out of line with the rest — is not demonstrated,
+  and the caveat goes in its table row instead.
 - **A CSS-variables table is a list of claims — check every row.** For
   each variable a `CssCustomization` story documents, find the rule
   that reads it (`grep var(--name` across the component's stylesheets)
@@ -356,8 +420,12 @@ Default |` — defaults taken from the stylesheet's `var(--x, <default>)`
   compiled selector that cannot reach the element carrying the variable
   (a descendant combinator before its own pseudo-element, a parent class
   nothing sets) makes the rule dead. Read the built CSS in `dist/` or
-  compile the module, and trace the final selector to the element. A
-  variable no rule reads, or
+  compile the module, and trace the final selector to the element.
+  A variable the component's own stylesheet declares on the element
+  that carries it (a theme mixin's `--x: <value>` on the same selector)
+  is shadowed there: a wrapper's value never arrives, so the row is
+  wrong unless the story sets it through the component's `style` prop
+  and says so. A variable no rule reads, or
   one whose rule changes nothing observable (a `line-height` on text
   inside a fixed-height row), is dropped from the table; one that only
   works in part gets the caveat in its comment — including one read

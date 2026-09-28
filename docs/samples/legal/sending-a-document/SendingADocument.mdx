@@ -1,0 +1,66 @@
+import { Meta, Source, Story } from "@storybook/addon-docs/blocks";
+
+import * as SendingADocumentStories from "./SendingADocument.stories";
+import controlSource from "./SendDocument.tsx?raw";
+import source from "./SendingADocument.tsx?raw";
+
+<Meta of={SendingADocumentStories} />
+
+# 03. Sending a document
+
+The client's one job: hand over what the firm asked for. Press **Send it** on
+a request still needed, drop a file, and the line turns green, because a
+request is a folder and "received" means the folder is not empty.
+
+<Story of={SendingADocumentStories.Default} />
+
+With no portal the drop goes into the demo rooms and the lawyer's view below
+shows it arrive. Connect a portal and sign the client in from
+[Who is signed in](?path=/docs/samples-legal-practice-setup-who-is-signed-in--docs),
+and the file goes up to the request's folder under the client's own token;
+press **Refresh** on the lawyer's side to see it.
+
+## One component does the upload
+
+`Uploader` is the kit's upload, the same one the portal runs: it opens an
+upload session for the file in the target folder, sends the chunks several
+at a time, and finalises the session into a file. It talks to the portal
+through `useApi()`, so under the client's `ApiProvider` it uploads as the
+client. The screen tells it one thing, `targetId`, which is the request's
+folder id, and asks for one thing back, `onUploadSuccess`, on which the
+checklist is read again.
+
+<Source code={controlSource} language="tsx" />
+
+With no portal there is no session to open, so the same control renders
+`Dropzone`, the surface `Uploader` is built on, and hands the dropped files
+to the screen, which puts them where the portal would have. Same look, same
+`accept` list, same texts; only the destination differs.
+
+## What changed on the previous screen
+
+Nothing new was drawn. `MatterRoomPanel` took one prop, `sending`, and a
+request still needed now offers **Send it** instead of a link to the portal.
+The panel's hook gained `receive`, which re-reads the room after an upload,
+and in demo mode first records the files. Everything the lawyer sees, the
+progress bar and the badges, comes from the folder as before.
+
+## Details worth copying
+
+- **The client needs to be a content creator in the room.** A guest added as
+  an editor or a viewer can read the folder and not add to it, and the
+  portal answers 403 to the session. The demo-data page adds the client with
+  that role; a firm doing it by hand picks the same one.
+- **`accept` is the kit's dropzone form**: extensions with the dot, comma
+  separated. The text next to it is yours, and `badgeValue` is the "+N"
+  after the short list.
+- **A finished upload is a toast**, raised by `Uploader` itself, with a link
+  to the folder when `getFolderUrl` is given. `Toast` has to be mounted once
+  on the page for it to show; the cabinet mounts it in its frame.
+- **`onUploadSuccess` is the moment to re-read**, not to update state by
+  hand: the portal has the file, the folder's `filesCount` has moved, and the
+  screen already knows how to read that.
+
+## The code
+
+<Source code={source} language="tsx" />

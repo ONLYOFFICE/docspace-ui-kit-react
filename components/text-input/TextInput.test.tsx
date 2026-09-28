@@ -1,3 +1,4 @@
+import { createRef } from "react";
 import { describe, it, expect, vi } from "vitest";
 import { screen, fireEvent, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -19,6 +20,13 @@ describe("<TextInput />", () => {
     const input = screen.getByTestId("text-input");
     expect(input).toBeInTheDocument();
     expect(input).toHaveValue(defaultProps.value);
+  });
+
+  it("forwards the ref to the input element", () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<TextInput {...defaultProps} forwardedRef={ref} />);
+
+    expect(ref.current).toBe(screen.getByTestId("text-input"));
   });
 
   it("applies custom className and id", () => {

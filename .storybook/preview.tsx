@@ -136,20 +136,42 @@ const preview: Preview = {
           "UI",
           "Samples",
           [
-            // The samples are a ladder -- each one builds on the previous --
-            // so they are ordered by hand rather than alphabetically. The
-            // numbers in the titles keep that visible in the sidebar; this
-            // list keeps it true if a title is ever renamed.
-            "01. Buttons and toasts",
-            "02. Sign-in form",
-            "03. Room settings",
-            "04. Dialogs",
-            "05. Selectable file list",
-            "06. Sortable table",
-            "07. Tiles and the view switch",
-            "08. Loading, empty, broken",
-            "09. People picker",
-            "10. A small Files app",
+            // Two tracks. "Legal practice" is the main one: a client cabinet
+            // for a law firm built against a real portal, one problem held
+            // through the whole track, each screen a question and the
+            // components that answer it. "Setup" holds the two pages that
+            // wire a portal in. "UI basics" is the earlier ladder, kept as
+            // the component-level reference the first track no longer stops
+            // to explain.
+            "Legal practice",
+            [
+              "Overview",
+              "The cabinet",
+              "01. My matters",
+              "02. Inside a matter",
+              "03. Sending a document",
+              "04. Reading the firm's draft",
+              "05. Opening a matter",
+              "Setup",
+              [
+                "Connect to a portal",
+                "Who is signed in",
+                "Demo data on your portal",
+              ],
+            ],
+            "UI basics",
+            [
+              "01. Buttons and toasts",
+              "02. Sign-in form",
+              "03. Room settings",
+              "04. Dialogs",
+              "05. Selectable file list",
+              "06. Sortable table",
+              "07. Tiles and the view switch",
+              "08. Loading, empty, broken",
+              "09. People picker",
+              "10. A small Files app",
+            ],
           ],
         ],
       },

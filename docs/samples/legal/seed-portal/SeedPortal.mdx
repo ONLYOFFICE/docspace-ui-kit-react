@@ -1,0 +1,72 @@
+import { Meta, Source, Story } from "@storybook/addon-docs/blocks";
+
+import * as SeedPortalStories from "./SeedPortal.stories";
+import seedSource from "../seed.ts?raw";
+import source from "./SeedPortal.tsx?raw";
+
+<Meta of={SeedPortalStories} />
+
+# Demo data on your portal
+
+Every screen in this track runs on demo data when there is no portal. This
+page puts that same data on a real one, so the screens can be tried against
+rooms that exist: press the button, then open
+[The cabinet](?path=/docs/samples-legal-practice-the-cabinet--docs).
+
+<Story of={SeedPortalStories.Default} />
+
+## What it does
+
+For each demo room, in the order the list shows them:
+
+1. **Opens it rather than making it** if a room with that title is already
+   on the portal, compared without regard to case or spacing. Whatever the
+   demo puts inside and is missing — a tag, a folder, a file — is added, and
+   a room that has it all is left alone. So a run that failed halfway is put
+   right by the next press, and pressing twice creates nothing new.
+2. **Creates a custom room** otherwise, with the demo's colour, as the owner
+   of the API key. That person becomes the lead of every matter, which is
+   the one thing the demo cannot copy.
+3. **Tags it.** A tag has to exist on the portal before a room can carry it,
+   so each is created first and the refusal for one that already exists is
+   ignored; then the room gets them all in one call.
+4. **Makes the folders**: `From the client` with a subfolder per request,
+   `From the firm`, and whatever else the demo room has.
+5. **Puts files where the demo shows them.** Office documents are made by the
+   document server, so they open in the editor; a PDF is written on the spot,
+   one page that says its own name, with a cross-reference table whose
+   offsets are computed rather than hoped for; a PNG is one grey pixel.
+6. **Shares the client's two matters** with the email given, as a content
+   creator, so that person can upload. Leave the field empty and nothing is
+   shared.
+
+It never deletes. What it made is removed like any other room, from
+ONLYOFFICE.
+
+## The calls, and why they are behind an interface
+
+The seeder speaks in its own words, `SeedClient`: create a room, tag it, make
+a folder, put a document there, invite someone. `sdkSeedClient` is the one
+place those words become SDK calls, and the test stands a recorder in for it.
+Three of the calls are worth knowing:
+
+- **`createRoom`** takes `tags`, but a tag it has never seen is dropped
+  without a word. `createRoomTag` first, then `addRoomTags`, is what the
+  portal's own client does.
+- **The upload is not the SDK's `insertFile`.** That call sends the multipart
+  fields as `InsertFile.Title` and `InsertFile.File`, the names the reference
+  pages show, and a live portal answers 400, "Value cannot be null.
+  (Parameter 'title')": the portal's binder reads a bare `title` and takes
+  the first file part whatever it is called. So the bytes go as a plain
+  `FormData` of `file`, `title` and `createNewIfExist`, through the same
+  axios instance the SDK uses. It is one request, the right size for a file
+  already in memory; the chunked session `Uploader` runs is for files a
+  person chose.
+- **`setRoomSecurity`** invites by `email`, though the SDK's `RoomInvitation`
+  names only `id`. The portal takes both; the cast in the code says so.
+
+<Source code={seedSource} language="tsx" />
+
+## The code
+
+<Source code={source} language="tsx" />

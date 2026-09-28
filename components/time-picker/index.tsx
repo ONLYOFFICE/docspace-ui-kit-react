@@ -62,21 +62,23 @@ const TimePicker = ({
     minutesInputRef.current?.blur();
   };
 
-  const changeHours = (time: string) => {
-    setHours(time);
-    const dateStr = `${formatDate(date, "yyyy-MM-dd")} ${time}:${minutes}`;
-    const newDate = parseWithFormat(dateStr, "yyyy-MM-dd HH:mm");
+  const report = (h: string, m: string) => {
+    const day = formatDate(date, "yyyy-MM-dd");
+    const newDate = parseWithFormat(`${day} ${h}:${m}`, "yyyy-MM-dd HH:mm");
     if (newDate) setDate(newDate);
 
-    const dateFormat = isTwelveHourFormat
-      ? "yyyy-MM-dd hh:mm a"
-      : "yyyy-MM-dd HH:mm";
-
-    const parsedDate = parseWithFormat(
-      `${formatDate(date, "yyyy-MM-dd")} ${time}:${minutes} ${meridiem ?? ""}`.trim(),
-      dateFormat,
-    );
+    const parsedDate = isTwelveHourFormat
+      ? parseWithFormat(
+          `${day} ${h}:${m} ${meridiem ?? ""}`,
+          "yyyy-MM-dd hh:mm a",
+        )
+      : newDate;
     if (parsedDate) onChange(parsedDate);
+  };
+
+  const changeHours = (time: string) => {
+    setHours(time);
+    report(time, minutes);
   };
 
   const onHoursBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -97,19 +99,7 @@ const TimePicker = ({
 
   const changeMinutes = (time: string) => {
     setMinutes(time);
-    const dateStr = `${formatDate(date, "yyyy-MM-dd")} ${hours}:${time}`;
-    const newDate = parseWithFormat(dateStr, "yyyy-MM-dd HH:mm");
-    if (newDate) setDate(newDate);
-
-    const dateFormat = isTwelveHourFormat
-      ? "yyyy-MM-dd hh:mm a"
-      : "yyyy-MM-dd HH:mm";
-
-    const parsedDate = parseWithFormat(
-      `${formatDate(date, "yyyy-MM-dd")} ${hours}:${time} ${meridiem ?? ""}`.trim(),
-      dateFormat,
-    );
-    if (parsedDate) onChange(parsedDate);
+    report(hours, time);
   };
 
   const handleChangeHours = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -194,7 +184,7 @@ const TimePicker = ({
       aria-label="Time picker"
     >
       <TextInput
-        className={`${classNameInput}-hours-input`}
+        className={classNameInput ? `${classNameInput}-hours-input` : undefined}
         withBorder={false}
         forwardedRef={hoursInputRef}
         value={hours}
@@ -212,13 +202,16 @@ const TimePicker = ({
       />
       :
       <TextInput
-        className={`${classNameInput}-minutes-input`}
+        className={
+          classNameInput ? `${classNameInput}-minutes-input` : undefined
+        }
         withBorder={false}
         forwardedRef={minutesInputRef}
         value={minutes}
         onChange={handleChangeMinutes}
         onClick={focusMinutesInput}
         onBlur={onMinutesBlur}
+        tabIndex={tabIndex}
         onFocus={focusInput}
         type={InputType.search}
         onContextMenu={preventDefaultContext}

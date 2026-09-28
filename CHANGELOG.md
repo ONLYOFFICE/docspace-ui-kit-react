@@ -8,6 +8,12 @@ _Changed_ before upgrading.
 
 ### Changed
 
+- **`DocumentEditor`'s props are one of two shapes.** Either `documentServerUrl` with
+  `config`, or `fileId` (with `fileVersion` and `isView` if wanted), in which case the wrapper
+  fetches both from the portal behind the nearest `ApiProvider`, as it always did. The type
+  used to demand all of them at once, so a caller with a file id had to cast past it; and a
+  caller with neither made the wrapper open file `1`, which it now refuses through
+  `onLoadComponentError` instead
 - **The section header has its height and background back.** `--section-header-height` and
   `--section-header-bg` were declared under `.header :global(.light)`, which compiles to
   `.header .light` — a `.light` element _inside_ the header, which nothing is — so both
@@ -30,6 +36,12 @@ _Changed_ before upgrading.
 
 ### Added
 
+- `Text` takes **`role`, `aria-label`, `aria-live` and `aria-hidden`**. It always passed
+  unknown props to the element, but its props type is closed, so a status line could not be
+  declared `role="status"` without a wrapper element; its own README told callers to pass a
+  role the type refused. `Heading` and `Link` share the type and take the same four.
+  Declaring `aria-label` also showed that `Link` set it to `children` whatever they were, an
+  object for a node child; it now falls back to `children` only when that is a string
 - `FieldContainer` takes **`labelFor`**, the `id` of the control it labels. It rendered its
   label with an empty `htmlFor`, so no caption in any form built from it was associated with
   its field
@@ -67,6 +79,14 @@ _Changed_ before upgrading.
 
 ### Fixed
 
+- Secondary `Tabs` with `scaled` judged overflow by the tabs' own widths, which are the
+  container's shares, so two tabs in a 480px row were "overflowing" and shown one at a time
+  behind arrows. The check now measures the labels
+- `RoomIcon` with no `logo` rendered an empty `<img>` unless `showDefault` was passed. It now
+  draws the initials, which is what `showDefault` forces when a logo exists
+- `Uploader`'s `targetId` was typed `string`, and a string id is what sends the upload down the
+  third-party route; a portal folder's numeric id could only be passed through a cast. It is
+  `string | number` now, and the README says which route each takes
 - `ModalDialog` added a `touchend` listener inside its effect's teardown, where every sibling
   line removed one; each re-run left another listener behind
 - `ThemeProvider` follows a `colorTheme` that arrives after the first render, instead of only

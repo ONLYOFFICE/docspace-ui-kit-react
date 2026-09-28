@@ -69,7 +69,21 @@ export enum SocketEvents {
   TopUpWallet = "s:top-up-wallet",
   WalletLowBalance = "s:wallet-low-balance",
   UpdateExternalShareSettings = "s:change-external-sharing-settings",
+  FormSuggestedQuestions = "s:form-suggested-questions",
 }
+
+/**
+ * Room carrying the starter questions generated for one chat attachment of a
+ * PDF form.
+ *
+ * Per attachment rather than per form: the questions are generated from the
+ * record `attachments/save-files-many` minted, and the backend emits into
+ * `{tenantId}-form-analysis-{attachmentId}` — the tenant half is prepended by
+ * the socket server for every room part that is not global, so only the tail
+ * belongs here.
+ */
+export const getFormAnalysisRoomPart = (attachmentId: string) =>
+  `form-analysis-${attachmentId}`;
 
 /**
  * Enum representing the various commands that can be sent over a socket connection.
@@ -266,6 +280,16 @@ export type TWalletLowBalanceData = {
   currency?: string;
 };
 
+/**
+ * Starter questions the backend generated for one attached PDF form. Arrives
+ * once per attachment, when the generation finishes — the request that asks
+ * for them answers `pending` until then.
+ */
+export type TFormSuggestedQuestionsData = {
+  attachmentId: string;
+  questions: { question: string; prompt: string }[];
+};
+
 export type TListenEventCallbackMap = {
   [SocketEvents.LogoutSession]: (data: {
     loginEventId: unknown;
@@ -362,6 +386,9 @@ export type TListenEventCallbackMap = {
   [SocketEvents.ChangeAppEnabled]: (data: TChangeAppEnabledData) => void;
   [SocketEvents.TopUpWallet]: (data: TTopUpWalletData) => void;
   [SocketEvents.WalletLowBalance]: (data: TWalletLowBalanceData) => void;
+  [SocketEvents.FormSuggestedQuestions]: (
+    data: TFormSuggestedQuestionsData,
+  ) => void;
 };
 
 /**

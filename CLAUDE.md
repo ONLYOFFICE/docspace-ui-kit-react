@@ -22,15 +22,16 @@ for component work and reach for the packed tarball when verifying the package i
 
 Path-scoped detail that does not belong here, loaded when the matching files are touched:
 
-| Rule                     | Covers                                                                                                                                                                                    |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plugin-api.md`          | the root barrel **is** the DocSpace plugin UI API; the portal shim, subpath imports that throw, and the `agent-skills` skill that documents it                                            |
-| `component-authoring.md` | folder layout, props and JSDoc, `ref` as a prop, stories, what `vitest.config.ts` actually collects                                                                                       |
-| `theming.md`             | which layer a `var(--x)` comes from, undefined tokens failing silently, RTL                                                                                                               |
-| `packaging.md`           | `exports`, `publishConfig`, ESM-only dist, dependency placement, per-module CSS, `"use client"`                                                                                           |
-| `source-checks.md`       | the client-side checks that used to cover this source (hex, ASCII, indentation, assets, deps, licence headers), why none of them run here now, and AGPL-3.0-only without per-file headers |
-| `cross-platform.md`      | why every command has to run on Windows too, what `package.json` scripts may not contain, and why `path.sep` does not make an id POSIX                                                    |
-| `vscode-tasks.md`        | the three layers behind the status-bar buttons in `ui-kit.code-workspace`                                                                                                                 |
+| Rule                     | Covers                                                                                                                                                                                                                           |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plugin-api.md`          | the root barrel **is** the DocSpace plugin UI API; the portal shim, subpath imports that throw, and the `agent-skills` skill that documents it                                                                                   |
+| `component-authoring.md` | folder layout, props and JSDoc, `ref` as a prop, stories, what `vitest.config.ts` actually collects                                                                                                                              |
+| `theming.md`             | which layer a `var(--x)` comes from, undefined tokens failing silently, RTL                                                                                                                                                      |
+| `packaging.md`           | `exports`, `publishConfig`, ESM-only dist, dependency placement, per-module CSS, `"use client"`                                                                                                                                  |
+| `live-portal.md`         | how anything here talks to a real DocSpace: `useApi()`'s clients, the provider Storybook already mounts, `.env` and the portal switcher, whose identity a key runs as, and why every committed screen must render with no portal |
+| `source-checks.md`       | the client-side checks that used to cover this source (hex, ASCII, indentation, assets, deps, licence headers), why none of them run here now, and AGPL-3.0-only without per-file headers                                        |
+| `cross-platform.md`      | why every command has to run on Windows too, what `package.json` scripts may not contain, and why `path.sep` does not make an id POSIX                                                                                           |
+| `vscode-tasks.md`        | the three layers behind the status-bar buttons in `ui-kit.code-workspace`                                                                                                                                                        |
 
 ## Tech Stack
 
@@ -206,6 +207,24 @@ applies. Three levels, fastest first:
   than beside `index.ts` — `table`, `rows` and `tiles` all do — so check recursively
   before concluding one is missing. `theme-provider` is the only one currently without
 
+## Product naming
+
+The product formerly called DocSpace is **ONLYOFFICE Apps**. Every piece of user-facing text
+uses that name: UI strings, stories, the samples and other `.mdx` pages, and the READMEs the
+package ships.
+
+- **Where space is tight — buttons, links, badges — `ONLYOFFICE` alone is enough**: "Sign in
+  with ONLYOFFICE", "Open in ONLYOFFICE".
+- **Roles use the product's own words**, which carry no product name: Owner, Full admin, Room
+  admin, Power user, User, Guest.
+- **Names of things are not copy, so they stay**: `@onlyoffice/docspace-api-sdk`, the
+  `DocSpace-client` repository and its paths, API routes, `docspace` in URLs, environment and
+  config keys, CSS classes and test ids. Engineering notes here (`CLAUDE.md`, `.claude/rules/`)
+  keep "DocSpace" where it names that codebase.
+- **Inside a component the name comes from `getBrandName("ProductName")`**, because a
+  white-label portal renames the product again; `t("Common:ProductName")` is refused by the
+  `no-constants-via-i18n` lint plugin. Samples and documentation write the name out.
+
 ## Paths
 
 Never write an absolute path into anything committed here — not into `CLAUDE.md`, the rules
@@ -229,6 +248,23 @@ is not the repository root.
 
 The exception is a path that is genuinely absolute on every machine — a URL, or a runtime path
 inside a container such as `/app`. A path under `/Users`, `/home` or `C:\Users` never is.
+
+## Language
+
+Everything committed here is written in English: source and comments, READMEs and `.mdx`
+pages, the rules under `.claude/`, commit messages. The ASCII scan in
+`.claude/rules/source-checks.md` already refuses non-Latin text in `.ts` and `.tsx`; this is
+the same rule for prose and every other file, where nothing checks it. Two things are not
+prose and may hold other languages: locale resources under `locales/`, and an example of
+feeding them, such as the German strings in the root README's translation example.
+
+Working notes in another language do not go into the repository at all. Keep such a file out
+with `.git/info/exclude` — it is local, uncommitted, and `git add -A` skips it — rather than
+translating it or committing it. To look for stray text:
+
+```bash
+git grep -nIP '[\x{0400}-\x{04FF}]' -- . ':!locales'
+```
 
 ## Commit messages
 
