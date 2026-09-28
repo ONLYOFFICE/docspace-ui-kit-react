@@ -31,7 +31,11 @@ const COMPONENTS: { id: string; name: string; stories?: string[] }[] = [
     name: "template-tile",
     stories: ["in-progress", "with-hotkey-border", "renaming-state"],
   },
-  { id: "ui-tiles-tilecontainer", name: "tile-container" },
+  {
+    id: "ui-tiles-tilecontainer",
+    name: "tile-container",
+    stories: ["folders-and-files"],
+  },
   {
     id: "ui-tiles-tilecontent",
     name: "tile-content",
