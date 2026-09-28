@@ -12,7 +12,8 @@
   "state": { "visibility": "opened", "close": "onBackdropClick", "loading": "isLoading", "disabled": "isDisabled" },
   "related": ["drop-down", "drop-down-item", "field-container"],
   "subComponents": ["ComboButton"],
-  "testIds": ["combobox"]
+  "testIds": ["combobox"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # ComboBox
