@@ -13,7 +13,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["app-loader", "progress-bar", "loader"],
   "subComponents": [],
-  "testIds": ["top-loader"]
+  "testIds": ["top-loader"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # TopLoaderService
