@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": "onClose", "loading": null, "disabled": null },
   "related": ["columnar-info-bar", "snackbar", "toast"],
   "subComponents": [],
-  "testIds": ["public_room_bar", "icon-button"]
+  "testIds": ["public_room_bar", "icon-button"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # PublicRoomBar
