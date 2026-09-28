@@ -21,6 +21,11 @@ test.describe("DropDown — light", () => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("drop-down-css-customization.png");
   });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("drop-down-right-to-left.png");
+  });
 });
 
 test.describe("DropDown — dark", () => {
