@@ -79,43 +79,45 @@ const facts = [
   { label: "Peers", value: "react 19, react-dom 19, i18next" },
 ];
 
-/** The rungs of the Samples ladder that are worth opening first. */
+/** The samples worth opening first. */
 const sampleTiles = [
   {
-    id: "sample-buttons",
+    id: "sample-overview",
     icon: <CreateDocumentIcon />,
-    label: "Buttons and toasts",
-    href: docsHref("samples-01-buttons-and-toasts--docs"),
+    label: "Legal practice: the problem",
+    href: docsHref("samples-legal-practice-overview--docs"),
   },
   {
-    id: "sample-form",
-    icon: <UseTemplateIcon />,
-    label: "Sign-in form",
-    href: docsHref("samples-02-sign-in-form--docs"),
-  },
-  {
-    id: "sample-list",
+    id: "sample-cabinet",
     icon: <QuickCollaborationRoomIcon />,
-    label: "File list",
-    href: docsHref("samples-05-selectable-file-list--docs"),
+    label: "The client cabinet",
+    href: docsHref("samples-legal-practice-the-cabinet--docs"),
   },
   {
-    id: "sample-table",
+    id: "sample-sending",
+    icon: <UseTemplateIcon />,
+    label: "Sending a document",
+    href: docsHref("samples-legal-practice-03-sending-a-document--docs"),
+  },
+  {
+    id: "sample-reading",
     icon: <CreateSpreadsheetIcon />,
-    label: "Sortable table",
-    href: docsHref("samples-06-sortable-table--docs"),
+    label: "Reading the firm's draft",
+    href: docsHref("samples-legal-practice-04-reading-the-firm-s-draft--docs"),
   },
   {
-    id: "sample-picker",
+    id: "sample-seed",
     icon: <CreateAgentIcon />,
-    label: "People picker",
-    href: docsHref("samples-09-people-picker--docs"),
+    label: "Demo data on your portal",
+    href: docsHref(
+      "samples-legal-practice-setup-demo-data-on-your-portal--docs",
+    ),
   },
   {
     id: "sample-app",
     icon: <CreateRoomIcon />,
     label: "A small Files app",
-    href: docsHref("samples-10-a-small-files-app--docs"),
+    href: docsHref("samples-a-small-files-app--docs"),
   },
 ];
 
@@ -183,8 +185,8 @@ const references = [
   {
     id: "samples",
     icon: <CatalogDocumentsIcon />,
-    name: "All ten samples",
-    href: docsHref("samples-01-buttons-and-toasts--docs"),
+    name: "All samples",
+    href: docsHref("samples-legal-practice-overview--docs"),
   },
   {
     id: "github",
@@ -262,8 +264,9 @@ export const WelcomePage = () => {
               Start with a sample
             </Text>
             <Text as="p" className={styles.sectionSubtitle}>
-              Ten working screens, from a single button to a small Files app.
-              Each one runs here and carries its own source.
+              Two working applications, screen by screen: a client cabinet for a
+              law firm and a small Files app. Both run here in demo, read a real
+              portal from the toolbar, and carry their own source.
             </Text>
           </div>
           <QuickActions

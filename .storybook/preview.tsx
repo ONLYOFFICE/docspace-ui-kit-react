@@ -136,13 +136,13 @@ const preview: Preview = {
           "UI",
           "Samples",
           [
-            // Two tracks. "Legal practice" is the main one: a client cabinet
+            // Two samples. "Legal practice" is the main one: a client cabinet
             // for a law firm built against a real portal, one problem held
             // through the whole track, each screen a question and the
-            // components that answer it. "Setup" holds the two pages that
-            // wire a portal in. "UI basics" is the earlier ladder, kept as
-            // the component-level reference the first track no longer stops
-            // to explain.
+            // components that answer it. "Setup" holds the pages that wire a
+            // portal in. "A small Files app" is the general-purpose screen:
+            // the same portal read through the layout components, with a
+            // demo tree behind it when no portal is configured.
             "Legal practice",
             [
               "Overview",
@@ -159,19 +159,7 @@ const preview: Preview = {
                 "Demo data on your portal",
               ],
             ],
-            "UI basics",
-            [
-              "01. Buttons and toasts",
-              "02. Sign-in form",
-              "03. Room settings",
-              "04. Dialogs",
-              "05. Selectable file list",
-              "06. Sortable table",
-              "07. Tiles and the view switch",
-              "08. Loading, empty, broken",
-              "09. People picker",
-              "10. A small Files app",
-            ],
+            "A small Files app",
           ],
         ],
       },

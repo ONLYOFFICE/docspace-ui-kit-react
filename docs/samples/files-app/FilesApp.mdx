@@ -1,0 +1,135 @@
+import { Meta, Source, Story } from "@storybook/addon-docs/blocks";
+
+import * as FilesAppStories from "./FilesApp.stories";
+import source from "./FilesApp.tsx?raw";
+import sourceTs from "./source.ts?raw";
+import demoTs from "./demo.ts?raw";
+import useListingTs from "./useListing.ts?raw";
+
+<Meta of={FilesAppStories} />
+
+# A small Files app
+
+A Files application on one screen: the rooms, the personal folder and the
+trash in the sidebar; folders opened in place, with a breadcrumb back;
+search, a type filter and a sort order; rows or tiles; a selection toolbar;
+new folders and documents, renames and deletes; uploads; files opened in
+ONLYOFFICE.
+
+Below it runs on a tree in memory. Add a portal in the **API provider**
+toolbar -- [Connect to a portal](?path=/docs/samples-legal-practice-setup-connect-to-a-portal--docs)
+says how -- and the same screen reads that portal, as the owner of the key.
+Nothing in the component changes; the sidebar heading drops its "(demo)".
+
+<Story of={FilesAppStories.Default} />
+
+Open **Finance department**. Search for `budget`. Switch to tiles. Tick two
+files and watch the breadcrumb header become a toolbar. **Create → New
+folder**; then open the folder's menu and rename it. Move something to Trash
+and find it there.
+
+The filter panel, the dialogs and the context menus are portals into the
+page's own `<body>` -- which is the whole application on a real screen, and
+this whole article here. Open the sample on its own, from **Default** in the
+sidebar, to see them the way an application does.
+
+## Who owns what
+
+This is the one idea worth taking from the file: **layout, data and state
+never negotiate.**
+
+- **`Article`** is the sidebar. It owns collapsing, the mobile drawer, the
+  main button slot and the profile block. You give it entries.
+- **`Section`** is everything to the right, as five named slots --
+  `SectionHeader`, `SectionFilter`, `SectionBody`, `SectionFooter`, plus the
+  info panel. It owns the sticky header, the scroll container and the
+  breakpoints.
+- **`FilesSource`** is the data: one `list(query)` that answers a `Listing`,
+  and four writes. `portalSource` is the SDK behind `useApi()`; `demoSource`
+  is a tree in memory with the same shape. The screen cannot tell them apart,
+  which is what lets one page work both with and without a portal.
+- **The component** owns what is left: where the reader is (`Query`), what
+  they searched for, what they selected, which view is on, which dialog is
+  open. No component here has an opinion about any of it, which is why the
+  same `Section` carries rows on one click and tiles on the next.
+
+That is also what makes the header trick a two-line change: while something
+is selected, render `TableGroupMenu` in `SectionHeader` instead of
+`Navigation`. The body does not know the difference.
+
+## What the portal is asked
+
+Every control on the screen is a call the portal already answers. The kit's
+`ApiProvider` makes the typed clients once; `useApi()` hands them out.
+
+| On screen                         | Call                                                             |
+| --------------------------------- | ---------------------------------------------------------------- |
+| Rooms                             | `roomsApi.getRoomsFolder({ searchArea: Active })`                |
+| A room or a folder                | `foldersApi.getFolderByFolderId({ folderId })`                   |
+| My documents, Trash               | `foldersApi.getMyFolder()`, `foldersApi.getTrashFolder()`        |
+| Search, Type filter, Sort by      | `filterValue`, `filterType`, `sortBy` + `sortOrder` on the same  |
+| Breadcrumb                        | the listing's `pathParts`, without the current folder, reversed  |
+| Create → New folder               | `foldersApi.createFolder({ folderId, createFolder: { title } })` |
+| Create → New document             | `filesApi.createFile({ folderId, createFileJsonElement })`       |
+| Rename                            | `filesApi.updateFile`, `foldersApi.renameFolder`                 |
+| Move to Trash, Delete permanently | `operationsApi.deleteBatchItems`, then `getOperationStatuses`    |
+| Upload files                      | `Uploader` with the folder's numeric id as `targetId`            |
+| Open in ONLYOFFICE, Copy link     | the file's `webUrl`, resolved against the provider's `baseUrl`   |
+
+Three things about those calls that the types do not say:
+
+- **A folder's contents come one folder per call**, and the search, the
+  filter and the sort are parameters of that call. Typing in the search box
+  is therefore a request, so the query is debounced exactly where the request
+  is made -- `useDebounce` in the component -- and never inside `Filter`.
+- **Deletes run in the background.** The batch call answers with an
+  operation, not with the result, so `portalSource.remove` polls
+  `getOperationStatuses` until it is finished before the folder is read
+  again; without that the deleted row would still be there.
+- **The rooms list takes no type filter.** `getRoomsFolder` filters by room
+  type, not by file type, so at the Rooms root the page is narrowed on the
+  client. Everywhere else the portal does it.
+
+## What to expect on a real portal
+
+- **Everything runs as the owner of the key.** Rooms are the rooms that
+  person is in; My documents is theirs. A guest's key has no My documents,
+  and the listing says so instead of showing an empty folder -- the portal
+  answers 403 and the sample repeats it.
+- **Rooms are opened, not selected.** The toolbar's one action is a delete,
+  and the portal archives a room before it lets anyone delete it, so rooms
+  carry no checkbox here.
+- **Uploads need a content creator's rights** in the room; a viewer gets 403
+  on the upload session and the uploader's toast says so.
+- **The first hundred entries are shown.** The count line says when a folder
+  holds more; a real application pages with `startIndex`.
+
+## Where to go next
+
+- **Samples → Legal practice** for an application built around one problem,
+  with OAuth for a second identity and a seeder for demo data.
+- **Components → Uploader** for the upload session this screen opens, and
+  **Components → Document Editor** for opening a file in place instead of in
+  a new tab.
+- **Getting started → API** for the clients `useApi()` hands out.
+
+## The code
+
+Imports here are relative to this repository. In your application they come
+from the package -- `@onlyoffice/apps-ui-kit/components/section`, and so on.
+
+### FilesApp.tsx
+
+<Source code={source} language="tsx" />
+
+### source.ts -- the shape, and the portal behind it
+
+<Source code={sourceTs} language="ts" />
+
+### demo.ts -- the same shape from memory
+
+<Source code={demoTs} language="ts" />
+
+### useListing.ts -- one listing at a time
+
+<Source code={useListingTs} language="ts" />
