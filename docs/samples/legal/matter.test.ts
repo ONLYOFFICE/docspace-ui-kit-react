@@ -106,14 +106,22 @@ describe("byAttention", () => {
 describe("updatedAgo", () => {
   const now = new Date(2026, 8, 25, 15, 0);
 
+  // `updatedAgo` speaks the reader's locale on purpose, so the expected words
+  // come from the same formatter rather than being spelled in English: on a
+  // machine set to Russian "today" is "сегодня", and the day count is what is
+  // under test, not the language.
+  const inLocale = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+
   it("counts calendar days, not 24-hour periods", () => {
-    expect(updatedAgo(new Date(2026, 8, 25, 1, 0).toISOString(), now)).toMatch(
-      /today/i,
+    expect(updatedAgo(new Date(2026, 8, 25, 1, 0).toISOString(), now)).toBe(
+      inLocale.format(0, "day"),
     );
-    expect(updatedAgo(new Date(2026, 8, 24, 23, 0).toISOString(), now)).toMatch(
-      /yesterday/i,
+    expect(updatedAgo(new Date(2026, 8, 24, 23, 0).toISOString(), now)).toBe(
+      inLocale.format(-1, "day"),
     );
-    expect(updatedAgo(new Date(2026, 8, 20).toISOString(), now)).toMatch(/5/);
+    expect(updatedAgo(new Date(2026, 8, 20).toISOString(), now)).toBe(
+      inLocale.format(-5, "day"),
+    );
   });
 
   it("returns nothing for a missing date", () => {
