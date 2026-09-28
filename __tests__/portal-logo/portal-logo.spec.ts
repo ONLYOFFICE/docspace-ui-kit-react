@@ -29,6 +29,24 @@ test.describe("PortalLogo — light", () => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("portal-logo-css-customization.png");
   });
+
+  test("on phone", async ({ page }) => {
+    await page.route(/\/logo\.ashx/, (route) =>
+      route.fulfill({
+        contentType: "image/svg+xml",
+        body: MOBILE_LOGO_SVG,
+      }),
+    );
+    await page.setViewportSize({ width: 414, height: 600 });
+    await gotoStory(page, "on-phone");
+    await expect(page).toHaveScreenshot("portal-logo-on-phone.png");
+  });
+
+  test("fallback logo", async ({ page }) => {
+    await page.route(/\/logo\.ashx/, (route) => route.abort());
+    await gotoStory(page, "fallback-logo");
+    await expect(page).toHaveScreenshot("portal-logo-fallback-logo.png");
+  });
 });
 
 test.describe("PortalLogo — dark", () => {
