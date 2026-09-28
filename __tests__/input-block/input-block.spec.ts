@@ -1,8 +1,8 @@
 import { type Page, expect, test } from "@playwright/test";
 
-// Title: "UI/Interactive elements/InputBlock"
-// → prefix: "ui-interactive-elements-inputblock"
-const STORY_BASE = "ui-interactive-elements-inputblock";
+// Title: "UI/Form controls/InputBlock"
+// → prefix: "ui-form-controls-inputblock"
+const STORY_BASE = "ui-form-controls-inputblock";
 
 async function gotoStory(page: Page, storyId: string) {
   const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
@@ -26,6 +26,16 @@ test.describe("InputBlock — light", () => {
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("input-block-css-customization.png");
+  });
+
+  test("with prefix", async ({ page }) => {
+    await gotoStory(page, "with-prefix");
+    await expect(page).toHaveScreenshot("input-block-with-prefix.png");
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("input-block-right-to-left.png");
   });
 });
 
