@@ -149,142 +149,156 @@ export const OpenMatterDialog = ({
     >
       <ModalDialog.Header>New matter</ModalDialog.Header>
       <ModalDialog.Body>
-        <Text as="p" fontSize="13px" lineHeight="20px" className={styles.hint}>
-          A room on the portal, tagged with the practice and the stage, with the
-          checklist folders ready and the client added to it.
-        </Text>
+        {/* The body lives in a portal, outside the page: scope the classes. */}
+        <div className={styles.dialogBody}>
+          <Text
+            as="p"
+            fontSize="13px"
+            lineHeight="20px"
+            className={styles.hint}
+          >
+            A room on the portal, tagged with the practice and the stage, with
+            the checklist folders ready and the client added to it.
+          </Text>
 
-        <FieldContainer
-          isVertical
-          labelVisible
-          isRequired
-          labelText="Matter"
-          hasError={Boolean(error) && !title.trim()}
-        >
-          <TextInput
-            type={InputType.text}
-            size={InputSize.base}
-            scale
-            value={title}
-            placeholder="Nguyen v. Harbor Freight"
-            isAutoFocussed
-            isDisabled={busy}
-            onChange={(event) => setTitle(event.target.value)}
-          />
-        </FieldContainer>
-
-        <div className={styles.columns2}>
-          <FieldContainer isVertical labelVisible labelText="Practice">
-            <ComboBox
-              scaled
-              size={ComboBoxSize.content}
-              options={PRACTICES.map(option)}
-              selectedOption={option(practice)}
-              onSelect={(picked) => setPractice(String(picked.key))}
-              isDisabled={busy}
-            />
-          </FieldContainer>
-          <FieldContainer isVertical labelVisible labelText="Stage">
-            <ComboBox
-              scaled
-              size={ComboBoxSize.content}
-              options={STAGES.map(option)}
-              selectedOption={option(stage)}
-              onSelect={(picked) => setStage(picked.key as KnownStage)}
-              isDisabled={busy}
-            />
-          </FieldContainer>
-        </div>
-
-        <FieldContainer
-          isVertical
-          labelVisible
-          labelText="Client's email"
-          hasError={Boolean(error) && error.includes("email")}
-          errorMessage={error.includes("email") ? error : undefined}
-        >
-          <EmailInput
-            scale
-            size={InputSize.base}
-            value={email}
-            placeholder="Optional. They are added to the room and can sign in."
-            isDisabled={busy}
-            onChange={(event) => setEmail(event.target.value)}
-          />
-        </FieldContainer>
-
-        <FieldContainer isVertical labelVisible labelText="Ask the client for">
-          <div className={styles.checkGrid}>
-            {REQUEST_TEMPLATES.map((request) => (
-              <Checkbox
-                key={request}
-                label={request}
-                isChecked={requests.includes(request)}
-                isDisabled={busy}
-                onChange={() => toggle(request)}
-              />
-            ))}
-            {requests
-              .filter(
-                (request) =>
-                  !(REQUEST_TEMPLATES as readonly string[]).includes(request),
-              )
-              .map((request) => (
-                <Checkbox
-                  key={request}
-                  label={request}
-                  isChecked
-                  isDisabled={busy}
-                  onChange={() => toggle(request)}
-                />
-              ))}
-          </div>
-          <div className={styles.askRow}>
+          <FieldContainer
+            isVertical
+            labelVisible
+            isRequired
+            labelText="Matter"
+            hasError={Boolean(error) && !title.trim()}
+          >
             <TextInput
               type={InputType.text}
               size={InputSize.base}
               scale
-              value={extra}
-              placeholder="Something else, e.g. Medical records"
+              value={title}
+              placeholder="Nguyen v. Harbor Freight"
+              isAutoFocussed
               isDisabled={busy}
-              onChange={(event) => setExtra(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.preventDefault();
-                  addExtra();
-                }
-              }}
+              onChange={(event) => setTitle(event.target.value)}
             />
-            <Button
-              size={ButtonSize.small}
-              label="Add"
-              isDisabled={busy || !extra.trim()}
-              onClick={addExtra}
-            />
+          </FieldContainer>
+
+          <div className={styles.columns2}>
+            <FieldContainer isVertical labelVisible labelText="Practice">
+              <ComboBox
+                scaled
+                size={ComboBoxSize.content}
+                options={PRACTICES.map(option)}
+                selectedOption={option(practice)}
+                onSelect={(picked) => setPractice(String(picked.key))}
+                isDisabled={busy}
+              />
+            </FieldContainer>
+            <FieldContainer isVertical labelVisible labelText="Stage">
+              <ComboBox
+                scaled
+                size={ComboBoxSize.content}
+                options={STAGES.map(option)}
+                selectedOption={option(stage)}
+                onSelect={(picked) => setStage(picked.key as KnownStage)}
+                isDisabled={busy}
+              />
+            </FieldContainer>
           </div>
-        </FieldContainer>
 
-        {error && !error.includes("email") ? (
-          <Text as="p" fontSize="13px" lineHeight="20px" role="alert">
-            {error}
-          </Text>
-        ) : null}
+          <FieldContainer
+            isVertical
+            labelVisible
+            labelText="Client's email"
+            hasError={Boolean(error) && error.includes("email")}
+            errorMessage={error.includes("email") ? error : undefined}
+          >
+            <EmailInput
+              scale
+              size={InputSize.base}
+              value={email}
+              placeholder="Optional. They are added to the room and can sign in."
+              isDisabled={busy}
+              onChange={(event) => setEmail(event.target.value)}
+            />
+          </FieldContainer>
 
-        {steps.length ? (
-          <ul className={styles.stepList}>
-            {steps.map((step) => (
-              <li key={step.label} className={styles.statusRow}>
-                <Text
-                  as="span"
-                  className={`${styles.badge} ${step.status === "done" ? styles.badgeOk : styles.badgeError}`}
-                >
-                  {step.status === "done" ? step.label : `${step.label} failed`}
-                </Text>
-                <Text fontSize="13px">{step.detail}</Text>
-              </li>
-            ))}
-          </ul>
-        ) : null}
+          <FieldContainer
+            isVertical
+            labelVisible
+            labelText="Ask the client for"
+          >
+            <div className={styles.checkGrid}>
+              {REQUEST_TEMPLATES.map((request) => (
+                <Checkbox
+                  key={request}
+                  label={request}
+                  isChecked={requests.includes(request)}
+                  isDisabled={busy}
+                  onChange={() => toggle(request)}
+                />
+              ))}
+              {requests
+                .filter(
+                  (request) =>
+                    !(REQUEST_TEMPLATES as readonly string[]).includes(request),
+                )
+                .map((request) => (
+                  <Checkbox
+                    key={request}
+                    label={request}
+                    isChecked
+                    isDisabled={busy}
+                    onChange={() => toggle(request)}
+                  />
+                ))}
+            </div>
+            <div className={styles.askRow}>
+              <TextInput
+                type={InputType.text}
+                size={InputSize.base}
+                scale
+                value={extra}
+                placeholder="Something else, e.g. Medical records"
+                isDisabled={busy}
+                onChange={(event) => setExtra(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    addExtra();
+                  }
+                }}
+              />
+              <Button
+                size={ButtonSize.small}
+                label="Add"
+                isDisabled={busy || !extra.trim()}
+                onClick={addExtra}
+              />
+            </div>
+          </FieldContainer>
+
+          {error && !error.includes("email") ? (
+            <Text as="p" fontSize="13px" lineHeight="20px" role="alert">
+              {error}
+            </Text>
+          ) : null}
+
+          {steps.length ? (
+            <ul className={styles.stepList}>
+              {steps.map((step) => (
+                <li key={step.label} className={styles.statusRow}>
+                  <Text
+                    as="span"
+                    className={`${styles.badge} ${step.status === "done" ? styles.badgeOk : styles.badgeError}`}
+                  >
+                    {step.status === "done"
+                      ? step.label
+                      : `${step.label} failed`}
+                  </Text>
+                  <Text fontSize="13px">{step.detail}</Text>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
       </ModalDialog.Body>
       <ModalDialog.Footer>
         <Button

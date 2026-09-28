@@ -31,7 +31,17 @@
   gap: 24px;
   box-sizing: border-box;
   width: 100%;
+}
 
+// A dialog's body is rendered through a portal, outside any `.page`, so the
+// classes below are scoped to both. The selector list keeps one specificity
+// in both places, which is what lets them win over a component's own class.
+.dialogBody {
+  --accent-main: var(--color-scheme-main-accent, #{colors.$light-blue-main});
+}
+
+.page,
+.dialogBody {
   .sectionHeading {
     display: flex;
     flex-direction: column;
@@ -352,6 +362,12 @@
     }
   }
 
+  // Under the checklist the grid already ends with a margin, so the row
+  // that adds a line to it sits closer than a row on its own.
+  .checkGrid + .askRow {
+    padding-block-start: 4px;
+  }
+
   // A card's title with an action beside it.
   .listHeader {
     display: flex;
@@ -369,8 +385,8 @@
   .checkGrid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px 16px;
-    margin-block-end: 8px;
+    gap: 10px 16px;
+    margin-block: 4px 12px;
 
     @media (max-width: 480px) {
       grid-template-columns: 1fr;
