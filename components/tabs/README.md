@@ -226,7 +226,9 @@ export function LazyTabs() {
 - **Primary tabs keep the rendered content in state**, refreshed by an effect, so the body lags
   the selection by one commit while an awaited `onClick` is in flight.
 - **Secondary tabs measure the widest label once and give every tab that width**, capped at
-  218px, unless `scaled` is set — then the tabs divide the container equally.
+  218px, unless `scaled` is set — then the tabs divide the container equally, and the overflow
+  check measures the labels rather than the stretched tabs, so a row with room for every label
+  shows no arrows.
 - **`layoutId` is also the DOM `id` of the tab list**, as well as the shared id
   [framer-motion](https://www.npmjs.com/package/framer-motion) uses to slide the background
   between two bars.

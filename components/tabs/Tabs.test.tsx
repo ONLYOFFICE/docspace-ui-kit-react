@@ -413,6 +413,72 @@ describe("Tabs", () => {
       }
     });
 
+    it("measures the labels, not the stretched tabs, when scaled", () => {
+      // Two scaled tabs share a 480px row, 240px each; their labels are 80px.
+      // Judged by the tabs' own width the row "overflows" and grows arrows;
+      // judged by the labels it does not.
+      const originalOffsetWidth = Object.getOwnPropertyDescriptor(
+        HTMLElement.prototype,
+        "offsetWidth",
+      );
+      const originalScrollWidth = Object.getOwnPropertyDescriptor(
+        HTMLElement.prototype,
+        "scrollWidth",
+      );
+
+      Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+        configurable: true,
+        get: function () {
+          if (this.classList.contains(styles.tabs)) return 480;
+          if (this.classList.contains(styles.tab)) return 240;
+          return 0;
+        },
+      });
+      Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
+        configurable: true,
+        get: function () {
+          return this.classList.contains(styles.tabText) ? 80 : 0;
+        },
+      });
+
+      const items = [
+        { id: "lawyer", name: "As the lawyer", content: "1" },
+        { id: "client", name: "As the client", content: "2" },
+      ];
+
+      const { container, rerender } = render(
+        <Tabs
+          items={items}
+          type={TabsTypes.Secondary}
+          selectedItemId="lawyer"
+          scaled
+        />,
+      );
+      rerender(
+        <Tabs
+          items={items}
+          type={TabsTypes.Secondary}
+          selectedItemId="lawyer"
+          scaled
+        />,
+      );
+
+      expect(container.querySelector(`.${styles.arrowRight}`)).toBeNull();
+      expect(container.querySelectorAll(`.${styles.tab}`)).toHaveLength(2);
+
+      const restore = (name: string, descriptor?: PropertyDescriptor) => {
+        if (descriptor) {
+          Object.defineProperty(HTMLElement.prototype, name, descriptor);
+        } else {
+          delete (HTMLElement.prototype as unknown as Record<string, unknown>)[
+            name
+          ];
+        }
+      };
+      restore("offsetWidth", originalOffsetWidth);
+      restore("scrollWidth", originalScrollWidth);
+    });
+
     it("renders blur effects in secondary tabs when not at start/end", () => {
       vi.mocked(useViewTab).mockReturnValue(false);
 
