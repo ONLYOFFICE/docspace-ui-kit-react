@@ -12,7 +12,8 @@
   "state": { "visibility": "isOpen", "close": "afterHide", "loading": null, "disabled": "isDisabled" },
   "related": ["tooltip", "icon-button", "field-container"],
   "subComponents": [],
-  "testIds": ["help-button"]
+  "testIds": ["help-button"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # HelpButton

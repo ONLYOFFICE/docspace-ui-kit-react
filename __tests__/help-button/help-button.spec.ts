@@ -22,6 +22,21 @@ test.describe("HelpButton — light", () => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("help-button-css-customization.png");
   });
+
+  test("with text content", async ({ page }) => {
+    await gotoStory(page, "with-text-content");
+    await expect(page).toHaveScreenshot("help-button-with-text-content.png");
+  });
+
+  test("with custom anchor", async ({ page }) => {
+    await gotoStory(page, "with-custom-anchor");
+    await expect(page).toHaveScreenshot("help-button-with-custom-anchor.png");
+  });
+
+  test("opens on hover", async ({ page }) => {
+    await gotoStory(page, "opens-on-hover");
+    await expect(page).toHaveScreenshot("help-button-opens-on-hover.png");
+  });
 });
 
 test.describe("HelpButton — dark", () => {
