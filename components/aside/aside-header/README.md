@@ -13,7 +13,8 @@
   "state": { "visibility": null, "close": "onCloseClick", "loading": "isLoading", "disabled": null },
   "related": ["aside", "modal-dialog", "icon-button"],
   "subComponents": [],
-  "testIds": ["aside-header", "aside_header_back_icon_button", "aside_header_close_icon_button", "icons-container"]
+  "testIds": ["aside-header", "aside_header_back_icon_button", "aside_header_close_icon_button", "icons-container"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # AsideHeader
