@@ -1,8 +1,8 @@
 import { type Page, expect, test } from "@playwright/test";
 
-// Title: "UI/Interactive elements/SearchInput"
-// → prefix: "ui-interactive-elements-searchinput"
-const STORY_BASE = "ui-interactive-elements-searchinput";
+// Title: "UI/Form controls/SearchInput"
+// → prefix: "ui-form-controls-searchinput"
+const STORY_BASE = "ui-form-controls-searchinput";
 
 async function gotoStory(page: Page, storyId: string) {
   const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
@@ -21,6 +21,30 @@ test.describe("SearchInput — light", () => {
   test("states", async ({ page }) => {
     await gotoStory(page, "states");
     await expect(page).toHaveScreenshot("search-input-states.png");
+  });
+
+  test("persistent clear button", async ({ page }) => {
+    await gotoStory(page, "persistent-clear-button");
+    await expect(page).toHaveScreenshot(
+      "search-input-persistent-clear-button.png",
+    );
+  });
+
+  test("content before text", async ({ page }) => {
+    await gotoStory(page, "content-before-text");
+    await expect(page).toHaveScreenshot("search-input-content-before-text.png");
+  });
+
+  test("disabled main button", async ({ page }) => {
+    await gotoStory(page, "disabled-main-button");
+    await expect(page).toHaveScreenshot(
+      "search-input-disabled-main-button.png",
+    );
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("search-input-right-to-left.png");
   });
 
   test("css customization", async ({ page }) => {
