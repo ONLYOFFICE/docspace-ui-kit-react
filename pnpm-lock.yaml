@@ -1577,7 +1577,7 @@ packages:
       '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.3
 
   '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.5.133.tgz':
-    resolution: {integrity: sha512-bPg9YTFcY+QbCogOQ11UQlN84LWT2bZ+AxN59XhpH8iqKhlSdFDgQFIuSTJOEDBk6aDVHHjuw1c3zc38AJRyOA==, tarball: file:onlyoffice-ai-chat-0.5.133.tgz}
+    resolution: {integrity: sha512-Bfm4UZzPuWtGOp9OBCySq3cx1PAulqKU2Mp5wxeeXaOrwSLq208qLEjaX474v5IActumUcyW3CT0PPvCfRGrSQ==, tarball: file:onlyoffice-ai-chat-0.5.133.tgz}
     version: 0.5.133
     peerDependencies:
       '@anthropic-ai/sdk': ^0.60.0
