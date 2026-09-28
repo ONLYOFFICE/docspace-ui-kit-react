@@ -1,8 +1,8 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import PeopleIcon from "../../assets/icons/16/people.react.svg";
+import FolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
 
 import { Card } from "./Card";
 import styles from "./Card.module.scss";
@@ -13,29 +13,77 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `A generic layout card with optional header (title + extra) and body slots.
-Inspired by Ant Design Card — all slots accept React nodes, no business logic inside.
+        component: `A tinted panel with an optional header row, a body and a footer, for grouping a block of related information.
 
 ### Features
 
-- **title**: left side of the header (text, icon + text, any ReactNode)
-- **extra**: right side of the header (badge, status, any ReactNode)
-- **children**: body content (text, buttons, links, anything)
-- Header row is hidden when both \`title\` and \`extra\` are undefined
+- **Header Row**: Places the title on the leading side and an extra element against the trailing edge of one row
+- **Hidden Header**: Drops the header row entirely when neither a title nor an extra element is given
+- **Free-Form Slots**: Accepts any React node in every slot, from plain text to an icon with a label, a badge or a button
+- **Long Titles**: Lets a long title wrap while the extra element keeps its natural width on a single line
+- **Footer**: Renders an optional footer below the body, spaced like the other slots and otherwise unstyled
+- **Themed Surface**: Colours the rounded background, the title and the body text from the light or dark theme
+- **Styling Hooks**: Passes a class name, an inline style and a test id to the outer element
 
 ### Usage
 
 \`\`\`tsx
 import { Card } from "@onlyoffice/apps-ui-kit/components/card";
 
+// Title and body
+<Card title="Backup storage">
+  Copies of your documents are saved every night.
+</Card>
+
+// Status in the header, action in the footer
 <Card
-  title="Card title"
-  extra={<span className="card-connected-status">Connected</span>}
+  title="Backup storage"
+  extra={<span>Connected</span>}
+  footer={<button type="button">Open settings</button>}
 >
-  Description text goes here.
+  Copies of your documents are saved every night.
 </Card>
 \`\`\``,
       },
+    },
+  },
+  argTypes: {
+    title: {
+      control: "text",
+      description:
+        "Content on the leading side of the header row, in bold. The header row is left out when both this and `extra` are unset",
+      table: { type: { summary: "React.ReactNode" } },
+    },
+    extra: {
+      control: "text",
+      description:
+        "Content on the trailing side of the header row, kept on one line at its natural width, such as a status or a badge",
+      table: { type: { summary: "React.ReactNode" } },
+    },
+    children: {
+      control: "text",
+      description:
+        "Body of the card, in smaller secondary text. Nothing is rendered for it when it is empty",
+      table: { type: { summary: "React.ReactNode" } },
+    },
+    footer: {
+      control: "text",
+      description:
+        "Content of a footer below the body, with no styling of its own beyond the card's 12px spacing",
+      table: { type: { summary: "React.ReactNode" } },
+    },
+    className: {
+      control: "text",
+      description: "Class added after the component's own on the outer element",
+    },
+    style: {
+      control: "object",
+      description: "Inline style of the outer element",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Value of `data-testid` on the outer element",
+      table: { defaultValue: { summary: '"card"' } },
     },
   },
 } satisfies Meta<typeof Card>;
@@ -51,22 +99,33 @@ export const Default: Story = {
   },
   parameters: {
     docs: {
-      description: { story: "Basic card with title and body text." },
+      description: {
+        story:
+          "The common case: a heading over a short block of text (`title`, `children`). Change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<Card title="Card title">Card body content goes here.</Card>`,
+      },
     },
   },
 };
 
 export const WithExtra: Story = {
   args: {
-    title: "AI analysis is ready",
+    title: "Backup storage",
     extra: <span className={styles.connectedStatus}>Connected</span>,
-    children: "Analyze data with Ask AI, create charts, and uncover insights.",
+    children: "Copies of your documents are saved every night.",
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Card with a status badge in the extra slot — pushed to the right of the title.",
+          'A short status belongs next to the heading: "Connected" sits on the trailing edge of the header row, on one line however long the title is (`extra`).',
+      },
+      source: {
+        code: `<Card title="Backup storage" extra={<span>Connected</span>}>
+  Copies of your documents are saved every night.
+</Card>`,
       },
     },
   },
@@ -78,7 +137,13 @@ export const TitleOnly: Story = {
   },
   parameters: {
     docs: {
-      description: { story: "Card with only a title — body is omitted." },
+      description: {
+        story:
+          "A heading alone labels a block that has no details yet; no empty body is left below it (`title` without `children`).",
+      },
+      source: {
+        code: `<Card title="Title without body" />`,
+      },
     },
   },
 };
@@ -91,7 +156,10 @@ export const BodyOnly: Story = {
     docs: {
       description: {
         story:
-          "Card with only body content — header row is hidden when title and extra are both undefined.",
+          "Text alone, for a note that needs no heading: with neither `title` nor `extra` set, the header row is left out and the text starts at the top of the card.",
+      },
+      source: {
+        code: `<Card>Body content without a header row.</Card>`,
       },
     },
   },
@@ -101,7 +169,7 @@ const WithIconInTitleTemplate = () => (
   <Card
     title={
       <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <PeopleIcon style={{ width: 16, height: 16, flexShrink: 0 }} />
+        <FolderIcon style={{ width: 16, height: 16, flexShrink: 0 }} />
         {"Title with icon"}
       </span>
     }
@@ -116,13 +184,13 @@ export const WithIconInTitle: Story = {
     docs: {
       description: {
         story:
-          "Icon placed inside the title slot using a flex span — the card itself has no opinion about icon placement.",
+          "An icon before the heading marks what the card is about; the card lays out nothing inside the title, so the icon and the text are wrapped in a flex span of the consumer's own (`title`).",
       },
       source: {
         code: `<Card
   title={
     <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-      <PeopleIcon style={{ width: 16, height: 16 }} />
+      <FolderIcon style={{ width: 16, height: 16 }} />
       Title with icon
     </span>
   }
@@ -138,20 +206,16 @@ const FullExampleTemplate = () => (
   <Card
     title={
       <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <PeopleIcon style={{ width: 16, height: 16, flexShrink: 0 }} />
-        {"Analyze responses with AI"}
+        <FolderIcon style={{ width: 16, height: 16, flexShrink: 0 }} />
+        {"Backup storage"}
       </span>
     }
     extra={<span className={styles.connectedStatus}>Connected</span>}
+    footer={<button type="button">Open settings</button>}
   >
     <p style={{ margin: 0 }}>
-      {
-        "Ask AI to explore responses from this form, generate insights, and visualize the data."
-      }
+      {"Copies of your documents are saved every night and kept for 30 days."}
     </p>
-    <div style={{ marginTop: "8px" }}>
-      <button type="button">Ask AI</button>
-    </div>
   </Card>
 );
 
@@ -161,7 +225,69 @@ export const FullExample: Story = {
     docs: {
       description: {
         story:
-          "Full example: icon in title, status badge in extra, description text and action button in body — mirrors the FormRoomInfoBlocks use case.",
+          'Every slot at once, for a block that states something and offers the next step: an icon and a heading (`title`), "Connected" on the trailing edge (`extra`), a paragraph (`children`) and an "Open settings" button below it (`footer`).',
+      },
+      source: {
+        code: `<Card
+  title={
+    <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      <FolderIcon style={{ width: 16, height: 16 }} />
+      Backup storage
+    </span>
+  }
+  extra={<span>Connected</span>}
+  footer={<button type="button">Open settings</button>}
+>
+  <p style={{ margin: 0 }}>
+    Copies of your documents are saved every night and kept for 30 days.
+  </p>
+</Card>`,
+      },
+    },
+  },
+};
+
+const CssCustomizationTemplate = () => (
+  <Card
+    title="Custom colours"
+    style={
+      {
+        "--info-block-background": "#e8f1fb",
+        "--card-title-color": "#0b3d91",
+        "--card-body-color": "#3a5a80",
+      } as CSSProperties
+    }
+  >
+    {"The background, the title and the body text use the values set here."}
+  </Card>
+);
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--info-block-background\` | Card background | theme-based |
+| \`--card-title-color\` | Title text colour | theme-based |
+| \`--card-body-color\` | Body text colour | theme-based |
+
+The card's own stylesheet declares these on the card element for the light and dark theme, so a value set on a wrapper never reaches it; set them through the card's \`style\` prop, as here.`,
+      },
+      source: {
+        code: `<Card
+  title="Custom colours"
+  style={{
+    "--info-block-background": "#e8f1fb",
+    "--card-title-color": "#0b3d91",
+    "--card-body-color": "#3a5a80",
+  }}
+>
+  The background, the title and the body text use the values set here.
+</Card>`,
       },
     },
   },

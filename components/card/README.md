@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["collapsible-card", "heading", "text"],
   "subComponents": [],
-  "testIds": ["card"]
+  "testIds": ["card"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Card
