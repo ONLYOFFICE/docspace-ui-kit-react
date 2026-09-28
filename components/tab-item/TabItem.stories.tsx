@@ -2,6 +2,7 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import { TabItem } from ".";
 
@@ -11,21 +12,24 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `TabItem is a single tab element for building tabbed navigation interfaces.
+        component: `TabItem is a single rounded pill that fills in when it is selected, for building a row of filters or presets the user switches between.
 
 ### Features
 
-- **Active State**: Visual indicator for the currently selected tab
-- **Disabled State**: Prevents interaction when disabled
+- **Active State**: Fills the pill with the accent colour and switches the label to a contrasting colour while it is selected
+- **Disabled State**: Ignores clicks and dims the pill to half opacity, unless it is also selected, then it keeps the full selected look
 - **Custom Labels**: Supports text strings or React nodes as labels
-- **Multi-Select**: Optional multi-selection mode for filter-like behavior
-- **Allow No Selection**: Enables deselecting all tabs
-- **Lock Last Selection**: Prevents deselecting when it's the only selected tab
+- **Multi-Select**: Lets a click on a selected pill deselect it, so the pills of a group can be toggled independently
+- **Fixed Look**: Keeps the selected look the pill had on mount, whatever clicks or later \`isActive\` changes say, when \`allowNoSelection\` is set
+- **Lock Last Selection**: Drops a click on an already selected pill entirely, so \`onSelect\` does not fire for it either
+- **Own Selection State**: Starts from \`isActive\`, keeps the selected state itself after a click and re-syncs whenever \`isActive\` changes
+- **Press Feedback**: Shows the selected look while an enabled pill is being pressed
 
 ### Accessibility
 
-- \`aria-selected\`: Indicates the current selection state
-- \`data-testid\`: Provides test identifiers for automation
+TabItem reports its selection state through one attribute on its outer element:
+
+- \`aria-selected\`: \`true\` while the pill is selected and \`false\` otherwise
 
 ### Usage
 
@@ -50,41 +54,63 @@ import { TabItem } from "@onlyoffice/apps-ui-kit/components/tab-item";
   argTypes: {
     label: {
       control: "text",
-      description: "Tab text or React node to display",
+      description:
+        "Text of the pill: a string or a React node, cut off with an ellipsis when it does not fit",
     },
     isActive: {
       control: "boolean",
-      description: "Whether the tab is currently active",
+      description:
+        "Whether the pill starts selected. The pill then keeps its selected state itself after clicks; a change of this prop re-syncs it",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isDisabled: {
       control: "boolean",
-      description: "Disables the tab from being interacted with",
+      description:
+        "Ignores clicks and dims the pill to half opacity; a pill that is also selected keeps its full selected look",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     allowNoSelection: {
       control: "boolean",
-      description: "Allows deselecting the tab so no tab is active",
+      description:
+        "Keeps the selected look the pill had on mount: neither clicks nor later `isActive` changes alter it",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withMultiSelect: {
       control: "boolean",
-      description: "Enables multi-select mode for filter-like behavior",
+      description:
+        "Lets a click on a selected pill deselect it. Without it a selected pill stays selected",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     lockLastSelection: {
       control: "boolean",
-      description: "Prevents deselecting when it's the last selected tab",
+      description:
+        "Drops a click on an already selected pill entirely, so `onSelect` does not fire for it either",
       table: {
         defaultValue: { summary: "false" },
+      },
+    },
+    onSelect: {
+      action: "onSelect",
+      description:
+        "Called with the click event on every click that neither `isDisabled` nor `lockLastSelection` blocks",
+    },
+    className: {
+      control: "text",
+      description: "Extra class name on the outer element",
+    },
+    dataTestId: {
+      control: "text",
+      description: "`data-testid` of the outer element",
+      table: {
+        defaultValue: { summary: '"tab-item"' },
       },
     },
   },
@@ -114,11 +140,13 @@ export const Default: Story = {
   args: {
     label: "Tab Item",
     isActive: false,
+    onSelect: fn(),
   },
   parameters: {
     docs: {
       description: {
-        story: "Default inactive tab item. Click to select.",
+        story:
+          "An unselected pill: click it to see it fill in, and change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<TabItem label="Tab Item" onSelect={handleSelect} />`,
@@ -136,7 +164,8 @@ export const ActiveState: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Tab in its active/selected state with a visual indicator.",
+        story:
+          "The filled look of a selected pill, for a filter that is already applied when the screen opens (`isActive`).",
       },
       source: {
         code: `<TabItem label="Active Tab" isActive />`,
@@ -156,7 +185,7 @@ export const DisabledState: Story = {
     docs: {
       description: {
         story:
-          "Disabled tab that cannot be interacted with. Appears visually muted.",
+          "A dimmed pill that ignores clicks, for an option that does not apply right now (`isDisabled`).",
       },
       source: {
         code: `<TabItem label="Disabled Tab" isDisabled />`,
@@ -286,7 +315,7 @@ export const MultiSelect: Story = {
     docs: {
       description: {
         story:
-          "Tab group with multi-select enabled, allowing multiple tabs to be active simultaneously. Useful for filter interfaces.",
+          "Three pills that toggle independently, for a filter where several values can apply at once: a click on a selected pill deselects it (`withMultiSelect`).",
       },
       source: {
         code: `<TabItem label="Documents" isActive withMultiSelect onSelect={handleToggle} />
@@ -304,17 +333,18 @@ export const CssCustomization = {
         {
           display: "flex",
           gap: "8px",
-          "--tab-item-active-bg": "#0082c9",
+          "--tab-item-active-bg": "#1f6f43",
           "--tab-item-active-text": "#ffffff",
-          "--tab-item-border": "1px solid #0082c9",
+          "--tab-item-border": "1px dashed #8a8a8a",
           "--tab-item-radius": "6px",
           "--tab-item-padding": "6px 20px",
+          "--tab-item-disabled-opacity": "0.3",
         } as CSSProperties
       }
     >
-      <TabItem label="Files" isActive onSelect={() => {}} />
-      <TabItem label="Photos" isActive={false} onSelect={() => {}} />
-      <TabItem label="Talk" isActive={false} onSelect={() => {}} />
+      <TabItem label="Documents" isActive />
+      <TabItem label="Images" />
+      <TabItem label="Videos" isDisabled />
     </div>
   ),
   parameters: {
@@ -324,12 +354,30 @@ export const CssCustomization = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--tab-item-active-bg\` | Active tab background | accent color |
-| \`--tab-item-active-text\` | Active tab text color | white |
-| \`--tab-item-border\` | Tab border style | theme gray border |
-| \`--tab-item-radius\` | Border radius | \`16px\` |
+| \`--tab-item-active-bg\` | Background and border colour of a selected or pressed pill | theme-based |
+| \`--tab-item-active-text\` | Label colour of a selected or pressed pill | theme-based |
+| \`--tab-item-border\` | Border of an unselected pill, as a \`border\` shorthand | theme-based |
+| \`--tab-item-radius\` | Corner radius | \`16px\` |
 | \`--tab-item-padding\` | Inner padding | \`4px 16px\` |
-| \`--tab-item-disabled-opacity\` | Disabled state opacity | \`0.5\` |`,
+| \`--tab-item-disabled-opacity\` | Opacity of a disabled pill that is not selected | \`0.5\` |
+
+**Documents** is selected, for the two active variables; **Images** is unselected, for the border; **Videos** is disabled, for the opacity. Radius and padding show on all three.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--tab-item-active-bg": "#1f6f43",
+    "--tab-item-active-text": "#ffffff",
+    "--tab-item-border": "1px dashed #8a8a8a",
+    "--tab-item-radius": "6px",
+    "--tab-item-padding": "6px 20px",
+    "--tab-item-disabled-opacity": "0.3",
+  }}
+>
+  <TabItem label="Documents" isActive />
+  <TabItem label="Images" />
+  <TabItem label="Videos" isDisabled />
+</div>`,
       },
     },
   },

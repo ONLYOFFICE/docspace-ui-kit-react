@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
   "related": ["tabs", "checkbox", "quantity-picker"],
   "subComponents": [],
-  "testIds": ["tab-item"]
+  "testIds": ["tab-item"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # TabItem
