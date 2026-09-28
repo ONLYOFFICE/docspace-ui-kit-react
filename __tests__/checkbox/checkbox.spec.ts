@@ -25,6 +25,11 @@ test.describe("Checkbox — light", () => {
     await expect(page).toHaveScreenshot("checkbox-checked-states.png");
   });
 
+  test("with help button", async ({ page }) => {
+    await gotoStory(page, "with-help-button");
+    await expect(page).toHaveScreenshot("checkbox-with-help-button.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("checkbox-css-customization.png");
