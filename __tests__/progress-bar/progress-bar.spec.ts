@@ -35,6 +35,13 @@ test.describe("ProgressBar — light", () => {
     await expect(page).toHaveScreenshot("progress-bar-complete.png");
   });
 
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("progress-bar-right-to-left.png", {
+      animations: "disabled",
+    });
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("progress-bar-css-customization.png");

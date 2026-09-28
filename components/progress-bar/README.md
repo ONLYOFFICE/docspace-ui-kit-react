@@ -22,7 +22,8 @@
     "progress-bar-percent",
     "progress-bar-animation",
     "preparation-portal-progress"
-  ]
+  ],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # ProgressBar
