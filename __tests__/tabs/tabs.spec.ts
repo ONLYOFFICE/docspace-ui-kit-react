@@ -1,7 +1,7 @@
 import { type Page, expect, test } from "@playwright/test";
 
-// Title: "UI/Data display/Tabs" → "ui-data-display-tabs"
-const STORY_BASE = "ui-data-display-tabs";
+// Title: "UI/Navigation/Tabs" → "ui-navigation-tabs"
+const STORY_BASE = "ui-navigation-tabs";
 
 async function gotoStory(page: Page, storyId: string) {
   const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
@@ -30,6 +30,36 @@ test.describe("Tabs — light", () => {
   test("loading", async ({ page }) => {
     await gotoStory(page, "loading");
     await expect(page).toHaveScreenshot("tabs-loading.png");
+  });
+
+  test("with badges", async ({ page }) => {
+    await gotoStory(page, "with-badges");
+    await expect(page).toHaveScreenshot("tabs-with-badges.png");
+  });
+
+  test("with icons", async ({ page }) => {
+    await gotoStory(page, "with-icons");
+    await expect(page).toHaveScreenshot("tabs-with-icons.png");
+  });
+
+  test("animated selection", async ({ page }) => {
+    await gotoStory(page, "animated-selection");
+    await expect(page).toHaveScreenshot("tabs-animated-selection.png");
+  });
+
+  test("with sticky header", async ({ page }) => {
+    await gotoStory(page, "with-sticky-header");
+    await expect(page).toHaveScreenshot("tabs-with-sticky-header.png");
+  });
+
+  test("overflowing tabs", async ({ page }) => {
+    await gotoStory(page, "overflowing-tabs");
+    await expect(page).toHaveScreenshot("tabs-overflowing-tabs.png");
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("tabs-right-to-left.png");
   });
 
   test("css customization", async ({ page }) => {
