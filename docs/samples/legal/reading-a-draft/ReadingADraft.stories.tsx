@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ReadingADraft } from "./ReadingADraft";
 
 const meta = {
-  title: "Samples/Legal practice/04. Reading the firm's draft",
+  title: "Samples/Legal practice/Screens/04. Reading the firm's draft",
   component: ReadingADraft,
   tags: ["!autodocs"],
   parameters: {

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { InsideAMatter } from "./InsideAMatter";
 
 const meta = {
-  title: "Samples/Legal practice/02. Inside a matter",
+  title: "Samples/Legal practice/Screens/02. Inside a matter",
   component: InsideAMatter,
   tags: ["!autodocs"],
   parameters: {
