@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
   "related": ["text-input", "field-container", "input-block"],
   "subComponents": [],
-  "testIds": ["textarea"]
+  "testIds": ["textarea"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Textarea
