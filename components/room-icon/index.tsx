@@ -206,7 +206,7 @@ const RoomIcon = ({
             <div className="template-icon-svg">
               <TemplateRoomIcon />
             </div>
-            {showDefault || !correctImage ? (
+            {showDefault || !correctImage || !imgSrc ? (
               roomTitleText
             ) : isImage ? (
               <img
@@ -244,7 +244,7 @@ const RoomIcon = ({
               {dropdownElement}
             </div>
           </>
-        ) : showDefault || !correctImage ? (
+        ) : showDefault || !correctImage || !imgSrc ? (
           <>
             <div className="room-background hover-class" />
             {roomTitleText}
