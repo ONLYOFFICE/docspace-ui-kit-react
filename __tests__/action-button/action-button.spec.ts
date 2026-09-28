@@ -21,6 +21,11 @@ test.describe("ActionButton -- light", () => {
     await gotoStory(page, "with-icon");
     await expect(page).toHaveScreenshot("action-button-with-icon.png");
   });
+
+  test("disabled-state", async ({ page }) => {
+    await gotoStory(page, "disabled-state");
+    await expect(page).toHaveScreenshot("action-button-disabled-state.png");
+  });
 });
 
 test.describe("ActionButton -- dark", () => {
