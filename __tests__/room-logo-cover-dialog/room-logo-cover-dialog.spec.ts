@@ -23,6 +23,33 @@ test.describe("RoomLogoCoverDialog -- light", () => {
       "room-logo-cover-dialog-preselected.png",
     );
   });
+
+  test("initials-from-title", async ({ page }) => {
+    await gotoStory(page, "initials-from-title");
+    await expect(page).toHaveScreenshot(
+      "room-logo-cover-dialog-initials-from-title.png",
+    );
+  });
+
+  test("with-accent-colors", async ({ page }) => {
+    await gotoStory(page, "with-accent-colors");
+    await expect(page).toHaveScreenshot(
+      "room-logo-cover-dialog-with-accent-colors.png",
+    );
+  });
+
+  test("without-icon-picker", async ({ page }) => {
+    await gotoStory(page, "without-icon-picker");
+    await expect(page).toHaveScreenshot(
+      "room-logo-cover-dialog-without-icon-picker.png",
+    );
+  });
+
+  test("on-phone", async ({ page }) => {
+    await page.setViewportSize({ width: 414, height: 760 });
+    await gotoStory(page, "on-phone");
+    await expect(page).toHaveScreenshot("room-logo-cover-dialog-on-phone.png");
+  });
 });
 
 test.describe("RoomLogoCoverDialog -- dark", () => {
