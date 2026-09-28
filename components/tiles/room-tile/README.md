@@ -13,7 +13,8 @@
   "state": { "visibility": null, "close": null, "loading": "inProgress", "disabled": null },
   "related": ["tiles", "tiles/base-tile", "room-icon"],
   "subComponents": [],
-  "testIds": ["tile"]
+  "testIds": ["tile"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # RoomTile

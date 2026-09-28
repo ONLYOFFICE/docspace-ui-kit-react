@@ -1,16 +1,19 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import type { RoomTileProps } from "./RoomTile.types";
 
 import { useState } from "react";
 import PublicRoomIconReactSvg from "../../../assets/icons/32/room/public.svg";
 import UnpinReactSvg from "../../../assets/unpin.react.svg";
+import CatalogFolderReactSvgUrl from "../../../assets/icons/16/catalog.folder.react.svg?url";
 
 import { RoomsType } from "../../../enums";
 
 import { Link } from "../../link";
+import { Text } from "../../text";
 import { IconButton } from "../../icon-button";
 import { IconSizeType } from "../../../utils";
 
@@ -53,18 +56,18 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `Room tile component for displaying room information in a tile format.
+        component: `The card for one room in a tile listing: the logo and name on top, and a row of the room's tags along the bottom.
 
 ### Features
 
-- **Room Icon**: Displays room type icon with visual identity
-- **Selectable**: Supports checked/selected state with checkbox
-- **Active State**: Visual highlight for the currently active room
-- **Blocking Operation**: Indicates when a room operation is in progress
-- **Indeterminate State**: Partial selection indicator
-- **Tags**: Display room type tags below the room title
-- **Pin Badge**: Shows pinned state with unpin action
-- **Context Menu**: Right-click context menu for room actions
+- **Room Logo**: Shows the room logo beside the name and swaps it for a checkbox on hover
+- **Checkbox Selection**: Selects the tile from the checkbox, while a click anywhere else on the tile goes to the open handler
+- **Active State**: Keeps the hover background on the room being acted on
+- **Blocking Operation**: Stops the tile answering hover, clicks and right-clicks while an operation runs over it
+- **Indeterminate Checkbox**: Draws the checkbox half-filled, for a partly selected room
+- **Tags**: Lists the room's tags along the bottom, led by a tag for the connected storage when there is one, and falls back to a tag naming the room type
+- **Pin Badge**: Shows badges such as a pin beside the name
+- **Actions Menu**: Opens the room's menu from a three-dot button, drawn when the item carries a \`contextOptions\` key, and on right-click when \`getContextModel\` is given
 
 ### Usage
 
@@ -80,6 +83,11 @@ import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-conte
 >
   <TileContent><Link>Room Content</Link></TileContent>
 </RoomTile>
+
+// A tag row of your own instead of the tags
+<RoomTile item={room} element={<RoomLogo />} contextOptions={options} customBottomContent={(isHovered, tags) => <MyTags tags={tags} />}>
+  <TileContent><Link>{room.title}</Link></TileContent>
+</RoomTile>
 \`\`\``,
       },
     },
@@ -87,21 +95,24 @@ import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-conte
   argTypes: {
     checked: {
       control: "boolean",
-      description: "Whether the tile is selected/checked",
+      description:
+        "Ticks the checkbox and keeps it in place of the logo, and tints the tile and its tags",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isActive: {
       control: "boolean",
-      description: "Whether the tile is in active state",
+      description:
+        "Keeps the hover background and the tag tint on the tile being acted on",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isBlockingOperation: {
       control: "boolean",
-      description: "Whether a blocking operation is in progress on the room",
+      description:
+        "Stops the tile answering hover, clicks and right-clicks; it looks the same as an idle tile",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -109,11 +120,107 @@ import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-conte
     indeterminate: {
       control: "boolean",
       description:
-        "Whether the checkbox shows an indeterminate state for partial selection",
+        "Draws the checkbox half-filled; it shows while the checkbox does, that is on hover or when the tile is checked",
       table: {
         defaultValue: { summary: "false" },
       },
     },
+    inProgress: {
+      control: "boolean",
+      description: "Replaces the logo and the checkbox with a small loader",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    showHotkeyBorder: {
+      control: "boolean",
+      description:
+        "Turns the tile's border the accent colour, to mark the one the keyboard is on",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isEdit: {
+      control: "boolean",
+      description:
+        "Removes the logo and the checkbox while the room is renamed, and stops hovering from tinting the tile",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    item: {
+      control: "object",
+      description:
+        "The room the tile stands for, passed back through the callbacks. Its `tags`, `providerType` and `isAIAgent` decide the tag row; a `contextOptions` key on it is what draws the three-dot button",
+    },
+    children: {
+      control: false,
+      description:
+        "The name beside the logo, usually a `TileContent`; only the first element is shown",
+    },
+    element: {
+      control: false,
+      description:
+        "The room logo beside the name; without it the tile has neither the logo nor the checkbox",
+    },
+    badges: {
+      control: false,
+      description:
+        "Badges after the name; give their wrapper the class `badges` so clicking them does not open the room",
+    },
+    columnCount: {
+      control: "number",
+      description:
+        "How many columns the tag row has to fit into; the row shows as many tags as the width allows and folds the rest",
+    },
+    contextOptions: {
+      control: "object",
+      description: "Entries of the menu opened by the three-dot button",
+    },
+    getContextModel: {
+      control: false,
+      description:
+        "Returns the entries of the menu opened by a right-click; without it a right-click opens nothing",
+    },
+    getRoomTypeName: {
+      control: false,
+      description:
+        "Turns the room type into the label of the tag shown when the room has no tags of its own",
+    },
+    customBottomContent: {
+      control: false,
+      description:
+        "Draws the bottom row instead of the tags; called on every render with the hover state and the tags the tile worked out",
+    },
+    onSelect: {
+      description:
+        "Called with the new checked state and the item from the checkbox, and when the logo is tapped on a phone",
+    },
+    thumbnailClick: {
+      description:
+        "Called with the event on a click anywhere on the tile except the checkbox, the tags, the badges and the menu; it is the room's open handler",
+    },
+    selectTag: {
+      description:
+        "Called with a clicked tag that carries a label and a room type; a plain text tag never reaches it",
+    },
+    selectOption: {
+      description:
+        "Called when the type tag or the third-party tag is clicked, with which of the two it was",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Value of `data-testid` on the outer element",
+      table: {
+        defaultValue: { summary: '"tile"' },
+      },
+    },
+  },
+  args: {
+    onSelect: fn(),
+    thumbnailClick: fn(),
+    selectTag: fn(),
+    selectOption: fn(),
   },
 } satisfies Meta<typeof RoomTile>;
 
@@ -121,11 +228,16 @@ type Story = StoryObj<ComponentProps<typeof RoomTile>>;
 
 export default meta;
 
-const Template = ({ checked: initialChecked, ...args }: RoomTileProps) => {
+const Template = ({
+  checked: initialChecked,
+  onSelect: onSelectArg,
+  ...args
+}: RoomTileProps) => {
   const [checked, setChecked] = useState(initialChecked);
 
-  const onSelect = (isSelected: boolean) => {
+  const onSelect: RoomTileProps["onSelect"] = (isSelected, item) => {
     setChecked(isSelected);
+    onSelectArg?.(isSelected, item);
   };
 
   return (
@@ -157,17 +269,15 @@ export const Default: Story = {
     element,
     contextOptions,
     badges,
-    thumbnailClick: () => {},
     getContextModel: () => contextOptions,
-    selectTag: () => {},
-    selectOption: () => {},
     getRoomTypeName: (type: string) => type,
     columnCount: 1,
   },
   parameters: {
     docs: {
       description: {
-        story: "Basic room tile with selection functionality",
+        story:
+          "A room with one tag: the logo, the name with a pin badge, the menu, and the tag row below. Hover the logo and tick the checkbox to select the room, click anywhere else or on the tag to see the callbacks in the Actions panel, and change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<RoomTile
@@ -176,7 +286,10 @@ export const Default: Story = {
   contextOptions={contextOptions}
   badges={badges}
   getContextModel={() => contextOptions}
+  getRoomTypeName={getRoomTypeName}
   columnCount={1}
+  thumbnailClick={openRoom}
+  onSelect={handleSelect}
 >
   <TileContent><Link>Room Content</Link></TileContent>
 </RoomTile>`,
@@ -194,7 +307,8 @@ export const Checked: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Room tile in checked state",
+        story:
+          "A selected room, as it looks among others the reader has picked: the checkbox stays ticked in place of the logo and the tile and its tags are tinted (`checked`).",
       },
       source: {
         code: `<RoomTile
@@ -220,7 +334,8 @@ export const InProgress: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Room tile showing progress state",
+        story:
+          "A room that is busy, being created or copied: a small loader stands where the logo and the checkbox were (`inProgress`).",
       },
       source: {
         code: `<RoomTile
@@ -245,7 +360,8 @@ export const BlockingOperation: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Room tile showing blocking operation state",
+        story:
+          "A room an operation is running over, which must not be picked or opened until it ends: hover it, click it or right-click it and nothing happens (`isBlockingOperation`). It looks the same as an idle room, so show the operation somewhere else.",
       },
       source: {
         code: `<RoomTile
@@ -261,44 +377,174 @@ export const BlockingOperation: Story = {
   },
 };
 
+export const GeneratedTags: Story = {
+  render: Template,
+  args: {
+    ...Default.args,
+    item: {
+      id: "room-2",
+      title: "Shared storage",
+      roomType: String(RoomsType.EditingRoom),
+      providerType: "1",
+      thirdPartyIcon: CatalogFolderReactSvgUrl,
+      contextOptions,
+    },
+    getRoomTypeName: () => "Collaboration",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A room with no tags of its own, kept on a connected storage: the tile makes two tags for it: first the storage, drawn as its icon alone (`providerType`, `thirdPartyIcon`), then the room type (`getRoomTypeName`). Click either to see `selectOption` in the Actions panel.",
+      },
+      source: {
+        code: `<RoomTile
+  item={{ id: "room-2", title: "Shared storage", roomType: "2", providerType: "1", thirdPartyIcon: storageIconUrl, contextOptions }}
+  element={<PublicRoomIconReactSvg />}
+  contextOptions={contextOptions}
+  getRoomTypeName={() => "Collaboration"}
+  selectOption={filterByOption}
+  columnCount={1}
+>
+  <TileContent><Link>Room Content</Link></TileContent>
+</RoomTile>`,
+      },
+    },
+  },
+};
+
+export const WithHotkeyBorder: Story = {
+  render: Template,
+  args: {
+    ...Default.args,
+    showHotkeyBorder: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The tile the keyboard is on while the reader moves through the grid with the arrow keys: its border turns the accent colour (`showHotkeyBorder`). The tile does not handle the keys itself.",
+      },
+      source: {
+        code: `<RoomTile
+  item={{ id: "room-1", title: "Sample Room", roomType: "collaboration", tags: [...] }}
+  element={<PublicRoomIconReactSvg />}
+  contextOptions={contextOptions}
+  showHotkeyBorder
+>
+  <TileContent><Link>Room Content</Link></TileContent>
+</RoomTile>`,
+      },
+    },
+  },
+};
+
+export const RenamingState: Story = {
+  render: Template,
+  args: {
+    ...Default.args,
+    isEdit: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A room whose name is being edited: the logo and the checkbox go, so the name can become a text field, and hovering no longer tints the tile (`isEdit`).",
+      },
+      source: {
+        code: `<RoomTile
+  item={{ id: "room-1", title: "Sample Room", roomType: "collaboration", tags: [...] }}
+  element={<PublicRoomIconReactSvg />}
+  contextOptions={contextOptions}
+  isEdit
+>
+  <TileContent><Link>Room Content</Link></TileContent>
+</RoomTile>`,
+      },
+    },
+  },
+};
+
+export const CustomBottomRow: Story = {
+  render: Template,
+  args: {
+    ...Default.args,
+    customBottomContent: (isHovered, tags) => (
+      <Text fontSize="12px">
+        {isHovered ? "Open room" : `${tags.length} tag`}
+      </Text>
+    ),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A room whose bottom row is the host's own: here a line of text that counts the tags and changes when the pointer is over the tile (`customBottomContent`). The tile no longer draws its tags.",
+      },
+      source: {
+        code: `<RoomTile
+  item={room}
+  element={<PublicRoomIconReactSvg />}
+  contextOptions={contextOptions}
+  customBottomContent={(isHovered, tags) => (
+    <Text fontSize="12px">{isHovered ? "Open room" : \`\${tags.length} tag\`}</Text>
+  )}
+>
+  <TileContent><Link>Room Content</Link></TileContent>
+</RoomTile>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
     <div
       style={
         {
-          "--tile-bg": "#e6f3fb",
+          "--tile-bg": "#f4f9fd",
           "--tile-border-style": "1px solid #0082c9",
           "--tile-radius": "16px",
           "--tile-hover-bg": "#cce5f6",
           "--tile-icon-color": "#0082c9",
-          "--tile-tag-hover-bg": "#cce5f6",
+          "--tile-tag-hover-bg": "#e6f3fb",
+          "--tile-hotkey-color": "#e0662e",
+          "--tile-padding": "12px 0",
+          "--tile-row-gap": "12px",
         } as CSSProperties
       }
     >
-      <div style={{ maxWidth: "300px", margin: "30px" }}>
-        <RoomTile
-          item={{
-            id: "room-1",
-            title: "Sample Room",
-            roomType: "collaboration",
-            tags: [{ label: "Collaboration", roomType: RoomsType.EditingRoom }],
-            contextOptions,
-          }}
-          element={element}
-          contextOptions={contextOptions}
-          badges={badges}
-          thumbnailClick={() => {}}
-          getContextModel={() => contextOptions}
-          selectTag={() => {}}
-          selectOption={() => {}}
-          getRoomTypeName={(type: string) => type}
-          columnCount={1}
-        >
-          <TileContent>
-            <Link>Sample Room</Link>
-          </TileContent>
-        </RoomTile>
-      </div>
+      {[
+        { id: "room-1", title: "Sample Room", showHotkeyBorder: false },
+        { id: "room-2", title: "Team Room", showHotkeyBorder: true },
+      ].map(({ id, title, showHotkeyBorder }) => (
+        <div key={id} style={{ maxWidth: "300px", margin: "30px" }}>
+          <RoomTile
+            item={{
+              id,
+              title,
+              roomType: "collaboration",
+              tags: [
+                { label: "Collaboration", roomType: RoomsType.EditingRoom },
+              ],
+              contextOptions,
+            }}
+            element={element}
+            contextOptions={contextOptions}
+            badges={badges}
+            showHotkeyBorder={showHotkeyBorder}
+            getContextModel={() => contextOptions}
+            selectTag={() => {}}
+            selectOption={() => {}}
+            getRoomTypeName={(type: string) => type}
+            columnCount={1}
+          >
+            <TileContent>
+              <Link>{title}</Link>
+            </TileContent>
+          </RoomTile>
+        </div>
+      ))}
     </div>
   ),
   parameters: {
@@ -308,12 +554,39 @@ export const CssCustomization: Story = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--tile-bg\` | Tile background color | theme-based |
-| \`--tile-border-style\` | Tile border | theme-based |
-| \`--tile-radius\` | Tile border radius | \`12px\` |
-| \`--tile-hover-bg\` | Hover/checked background | theme-based |
-| \`--tile-icon-color\` | Icon button color | theme-based |
-| \`--tile-tag-hover-bg\` | Tag background on hover/checked | theme-based |`,
+| \`--tile-bg\` | Background of the tile and of the box behind the logo | theme-based |
+| \`--tile-border-style\` | Border of the tile | theme-based |
+| \`--tile-radius\` | Corner radius of the tile | \`12px\` |
+| \`--tile-hover-bg\` | Background of the tile on hover, and when checked or active | theme-based |
+| \`--tile-icon-color\` | Colour of the three-dot button and of a pin badge (\`is-pinned\`) | theme-based |
+| \`--tile-tag-hover-bg\` | Background of the tags on hover, and when checked or active | theme-based |
+| \`--tile-hotkey-color\` | Border colour while \`showHotkeyBorder\` is on | theme-based |
+| \`--tile-padding\` | Padding of the tile | \`16px 0\` |
+| \`--tile-row-gap\` | Gap between the name row and the tag row | \`16px\` |
+
+Two instances:
+- **Sample Room** — for every variable but the hotkey colour; hover it for \`--tile-hover-bg\` and \`--tile-tag-hover-bg\`.
+- **Team Room** — \`showHotkeyBorder\`, for \`--tile-hotkey-color\`.`,
+      },
+      source: {
+        code: `<div style={{
+  "--tile-bg": "#f4f9fd",
+  "--tile-border-style": "1px solid #0082c9",
+  "--tile-radius": "16px",
+  "--tile-hover-bg": "#cce5f6",
+  "--tile-icon-color": "#0082c9",
+  "--tile-tag-hover-bg": "#e6f3fb",
+  "--tile-hotkey-color": "#e0662e",
+  "--tile-padding": "12px 0",
+  "--tile-row-gap": "12px",
+}}>
+  <RoomTile item={room} element={<RoomLogo />} contextOptions={options} badges={badges} columnCount={1}>
+    <TileContent><Link>Sample Room</Link></TileContent>
+  </RoomTile>
+  <RoomTile item={teamRoom} element={<RoomLogo />} contextOptions={options} badges={badges} columnCount={1} showHotkeyBorder>
+    <TileContent><Link>Team Room</Link></TileContent>
+  </RoomTile>
+</div>`,
       },
     },
   },

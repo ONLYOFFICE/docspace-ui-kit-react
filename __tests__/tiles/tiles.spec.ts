@@ -16,7 +16,16 @@ const COMPONENTS: { id: string; name: string; stories?: string[] }[] = [
     name: "folder-tile",
     stories: ["with-hotkey-border", "renaming-state", "right-to-left"],
   },
-  { id: "ui-tiles-roomtile", name: "room-tile" },
+  {
+    id: "ui-tiles-roomtile",
+    name: "room-tile",
+    stories: [
+      "generated-tags",
+      "with-hotkey-border",
+      "renaming-state",
+      "custom-bottom-row",
+    ],
+  },
   { id: "ui-tiles-templatetile", name: "template-tile" },
   { id: "ui-tiles-tilecontainer", name: "tile-container" },
   {
