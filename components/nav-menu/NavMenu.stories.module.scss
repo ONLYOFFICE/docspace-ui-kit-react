@@ -1,10 +1,13 @@
-.logo {
-  width: 211px;
-  height: 24px;
-  object-fit: contain;
-}
-
-.storyWrapper {
-  background-color: var(--nav-menu-story-bg);
-  padding: 15px 15px 0 15px;
+// Outranks the theme block that declares the variables on the menu's root
+:global(.light) nav.customNav,
+:global(.dark) nav.customNav {
+  --nav-menu-group-label-color: #7c3aed;
+  --nav-menu-item-text-color: #4c1d95;
+  --nav-menu-item-text-active-color: #ffffff;
+  --nav-menu-item-icon-color: #7c3aed;
+  --nav-menu-item-icon-active-color: #ffffff;
+  --nav-menu-item-bg-hover: #ede9fe;
+  --nav-menu-item-bg-active: #6d28d9;
+  --nav-menu-signal-dot-color: #db2777;
+  --nav-menu-separator-color: #a78bfa;
 }
