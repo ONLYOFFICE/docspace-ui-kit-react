@@ -62,7 +62,7 @@ const PROVIDER_REQUIRED_FIELDS = REQUIRED_FIELDS.filter(
   (field) => field !== "category" && field !== "state",
 );
 
-const OPTIONAL_FIELDS = ["parent", "propsType"];
+const OPTIONAL_FIELDS = ["parent", "propsType", "storiesAudit"];
 
 const SUMMARY_LIMIT = 160;
 
@@ -144,6 +144,26 @@ export const validateMetadata = (meta) => {
     say(
       "`propsType` may only be `null`; name a type in the `props:start` marker",
     );
+  }
+
+  // Stamped by the `audit-stories` skill when a run leaves the component's
+  // stories in order. A calendar date, so a reader can tell at a glance which
+  // components have been through the audit and how long ago.
+  if ("storiesAudit" in meta) {
+    const stamp = meta.storiesAudit;
+    const time =
+      typeof stamp === "string" && /^\d{4}-\d{2}-\d{2}$/.test(stamp)
+        ? Date.parse(`${stamp}T00:00:00Z`)
+        : Number.NaN;
+    // `Date.parse` rolls 2026-02-30 over into March rather than refusing it.
+    const valid =
+      !Number.isNaN(time) && new Date(time).toISOString().startsWith(stamp);
+
+    if (!valid) {
+      say("`storiesAudit` must be a date in the form `YYYY-MM-DD`");
+    } else if (stamp > new Date().toISOString().slice(0, 10)) {
+      say("`storiesAudit` is a date in the future");
+    }
   }
 
   if (!isProvider(meta) && !CATEGORIES.includes(meta.category)) {
