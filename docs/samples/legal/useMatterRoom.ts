@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useApi } from "../../../providers/api";
-import { DEMO_FOLDERS } from "./demo-matter-contents";
+import { demoPortal } from "./demo-portal";
 import { explainPortalError } from "./explain";
 import {
   CLIENT_FOLDER,
@@ -20,8 +20,8 @@ import {
  * a subfolder, and `setUp` gives a plain room its two folders. Nothing else
  * changes on the portal from here -- a client's upload is the next screen.
  *
- * With no portal the same walk runs over the demo folders, kept in a map for
- * the life of the screen so the two writes work there too.
+ * With no portal the same walk runs over the demo portal, which every screen
+ * shares, so the writes made here are there when the next screen looks.
  */
 export type MatterRoomState =
   | { status: "loading" }
@@ -38,16 +38,9 @@ export const useMatterRoom = (roomId: number) => {
   const [actionError, setActionError] = useState("");
   const reload = useCallback(() => setAttempt((value) => value + 1), []);
 
-  // The demo portal: a copy of the demo folders this screen may add to.
-  const demo = useRef<Record<number, FolderContents>>(
-    structuredClone(DEMO_FOLDERS),
-  );
-
   const read = useCallback(
     async (folderId: number): Promise<FolderContents> => {
-      if (!baseUrl) {
-        return demo.current[folderId] ?? { folders: [], files: [] };
-      }
+      if (!baseUrl) return demoPortal.listFolder(folderId);
       const page = (
         await foldersApi.getFolderByFolderId({ folderId, count: PAGE })
       ).data.response;
@@ -62,17 +55,7 @@ export const useMatterRoom = (roomId: number) => {
   const create = useCallback(
     async (parentId: number, title: string) => {
       if (!baseUrl) {
-        const parent = (demo.current[parentId] ??= { folders: [], files: [] });
-        const id = Date.now() % 1_000_000_000;
-        const now = new Date().toISOString();
-        parent.folders.push({
-          id,
-          title,
-          filesCount: 0,
-          foldersCount: 0,
-          created: now,
-          updated: now,
-        });
+        demoPortal.createFolder(parentId, title);
         return;
       }
       await foldersApi.createFolder({
@@ -150,27 +133,11 @@ export const useMatterRoom = (roomId: number) => {
   const receive = useCallback(
     (requestId: number, files: File[]) => {
       if (!baseUrl) {
-        const slot = (demo.current[requestId] ??= { folders: [], files: [] });
-        const now = new Date().toISOString();
-        // The portal counts a folder's files in its parent's listing, which
-        // is what the checklist reads; the demo map has to do the same.
-        for (const listing of Object.values(demo.current)) {
-          const entry = listing.folders.find((f) => f.id === requestId);
-          if (entry) {
-            entry.filesCount = (entry.filesCount ?? 0) + files.length;
-            entry.updated = now;
-          }
-        }
         for (const file of files) {
-          slot.files.push({
-            id: Date.now() % 1_000_000_000,
+          demoPortal.addFile(requestId, {
             title: file.name,
-            fileExst: file.name.slice(file.name.lastIndexOf(".")),
-            pureContentLength: file.size,
-            createdBy: { displayName: "You" },
-            created: now,
-            updated: now,
-            webUrl: "",
+            bytes: file.size,
+            by: "You",
           });
         }
       }

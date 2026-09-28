@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 
-import { DEMO_PEOPLE, DEMO_ROOMS } from "./demo-matters";
+import { DEMO_PEOPLE } from "./demo-matters";
+import { demoPortal } from "./demo-portal";
 import { byAttention, type Matter, matterFromRoom } from "./matter";
 import { type Persona, personaFromRoles } from "./persona";
 import { useMatters } from "./useMatters";
@@ -10,10 +11,10 @@ import { useMatters } from "./useMatters";
  * who is reading, what they may see, and whether that came from a portal.
  *
  * `useMatters` answers for the nearest `ApiProvider`. With no portal there
- * is nothing to answer, so the demo imitates the portal's two answers --
- * `demoAs` says which one -- through the same `matterFromRoom` a real room
- * goes through. Every screen that shows matters starts from this, so the
- * demo is decided in one place.
+ * is nothing to answer, so the demo portal imitates the portal's two answers
+ * -- `demoAs` says which one -- through the same `matterFromRoom` a real
+ * room goes through, and the screen follows its changes. Every screen that
+ * shows matters starts from this, so the demo is decided in one place.
  */
 export type MattersView =
   | { status: "loading" }
@@ -38,14 +39,19 @@ export type ReadyMattersView = Extract<MattersView, { status: "ready" }>;
 
 export const useMattersView = (demoAs: Persona): MattersView => {
   const state = useMatters();
+  const demoSnapshot = useSyncExternalStore(
+    demoPortal.subscribe,
+    demoPortal.get,
+  );
 
   const demoMatters = useMemo(
     () =>
-      DEMO_ROOMS[demoAs]
+      demoPortal
+        .roomsFor(demoAs, demoSnapshot)
         .map(matterFromRoom)
         .filter((matter): matter is Matter => matter !== null)
         .sort(byAttention),
-    [demoAs],
+    [demoAs, demoSnapshot],
   );
 
   if (state.status === "loading") return { status: "loading" };
