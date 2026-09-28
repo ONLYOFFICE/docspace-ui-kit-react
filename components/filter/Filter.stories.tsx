@@ -3,13 +3,14 @@ import React, { useState, useEffect } from "react";
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import ViewRowsReactSvg from "../../assets/view-rows.react.svg";
 import ViewTilesReactSvg from "../../assets/view-tiles.react.svg";
 
 import { DeviceType, FilterGroups, FilterKeys } from "../../enums";
 import Filter from ".";
-import type { FilterProps, TSortDataItem } from "./Filter.types";
+import type { FilterProps, TItem, TSortDataItem } from "./Filter.types";
 import {
   ViewSelector,
   type ViewSelectorProps,
@@ -17,7 +18,7 @@ import {
 
 const mockSortData: TSortDataItem[] = [
   {
-    key: "name",
+    key: "AZ",
     label: "Name",
     isSelected: false,
     id: "1",
@@ -26,7 +27,7 @@ const mockSortData: TSortDataItem[] = [
     sortId: "1",
   },
   {
-    key: "modified",
+    key: "DateAndTime",
     label: "Modified",
     isSelected: false,
     id: "2",
@@ -35,7 +36,7 @@ const mockSortData: TSortDataItem[] = [
     sortId: "1",
   },
   {
-    key: "size",
+    key: "Size",
     label: "Size",
     isSelected: false,
     id: "3",
@@ -46,8 +47,8 @@ const mockSortData: TSortDataItem[] = [
 ];
 
 const mockViewSettings = [
-  { id: "1", label: "Grid", value: "tile", icon: <ViewTilesReactSvg /> },
-  { id: "2", label: "List", value: "row", icon: <ViewRowsReactSvg /> },
+  { id: "1", label: "List", value: "row", icon: <ViewRowsReactSvg /> },
+  { id: "2", label: "Grid", value: "tile", icon: <ViewTilesReactSvg /> },
 ];
 
 const defaultViewSettings = [
@@ -55,19 +56,185 @@ const defaultViewSettings = [
   { id: "tile-view", value: "tile", icon: <ViewTilesReactSvg /> },
 ];
 
-const baseFilterArgs: Partial<FilterProps> = {
+// The getters are module-level so their identity is stable across renders, as the component requires.
+const getSortData = () => mockSortData;
+const getSelectedSortData = () => ({
+  sortDirection: "asc" as const,
+  sortId: "AZ" as const,
+});
+const getViewSettingsData = () => mockViewSettings;
+const getNoSelectedFilterData = () => Promise.resolve([]);
+const getSelectedInputValue = () => "";
+
+const documentTypeItems: TItem[] = [
+  {
+    key: FilterGroups.filterType,
+    group: FilterGroups.filterType,
+    label: "Type",
+    isHeader: true,
+    isLast: true,
+  },
+  {
+    id: "filter_type-documents",
+    key: "documents",
+    group: FilterGroups.filterType,
+    label: "Documents",
+  },
+  {
+    id: "filter_type-spreadsheets",
+    key: "spreadsheets",
+    group: FilterGroups.filterType,
+    label: "Spreadsheets",
+  },
+  {
+    id: "filter_type-presentations",
+    key: "presentations",
+    group: FilterGroups.filterType,
+    label: "Presentations",
+  },
+  {
+    id: "filter_type-images",
+    key: "images",
+    group: FilterGroups.filterType,
+    label: "Images",
+    isLast: true,
+  },
+];
+
+const selectedDocuments: TItem[] = [
+  {
+    id: "filter_type-documents",
+    key: "documents",
+    group: FilterGroups.filterType,
+    label: "Documents",
+    isSelected: true,
+  },
+];
+
+const selectedChips: TItem[] = [
+  {
+    key: "documents",
+    group: FilterGroups.filterType,
+    label: "Documents",
+  },
+  {
+    key: "me",
+    group: FilterGroups.filterAuthor,
+    label: "Me",
+  },
+  {
+    key: FilterKeys.excludeSubfolders,
+    group: FilterGroups.filterFolders,
+    label: "Exclude subfolders",
+  },
+];
+
+const optionKindItems = [
+  {
+    key: FilterGroups.filterType,
+    group: FilterGroups.filterType,
+    label: "Type",
+    isHeader: true,
+  },
+  {
+    id: "filter_type-documents",
+    key: "documents",
+    group: FilterGroups.filterType,
+    label: "Documents",
+  },
+  {
+    id: "filter_type-spreadsheets",
+    key: "spreadsheets",
+    group: FilterGroups.filterType,
+    label: "Spreadsheets",
+  },
+  {
+    key: FilterGroups.filterLocation,
+    group: FilterGroups.filterLocation,
+    label: "Location",
+    isHeader: true,
+  },
+  {
+    id: "filter_location",
+    key: "filter_location",
+    group: FilterGroups.filterLocation,
+    withOptions: true,
+    options: [
+      { key: "anywhere", label: "Anywhere" },
+      { key: "my-documents", label: "My documents" },
+      { key: "shared", label: "Shared with me" },
+    ],
+  },
+  {
+    key: FilterGroups.filterFolders,
+    group: FilterGroups.filterFolders,
+    label: "Search",
+    isHeader: true,
+    withoutHeader: true,
+    isLast: true,
+  },
+  {
+    id: "filter_folders",
+    key: FilterKeys.excludeSubfolders,
+    group: FilterGroups.filterFolders,
+    label: "Exclude subfolders",
+    isCheckbox: true,
+  },
+] as TItem[];
+
+const groupIcon = {
+  id: "folder",
+  data: {
+    small:
+      '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h3.4l1.5 1.5h6.1A1.5 1.5 0 0 1 15 5v7.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 12.5z" fill="#657077"/></svg>',
+    default: "",
+  },
+};
+
+const mockRoomGroups = [
+  "Projects",
+  "Clients",
+  "Contracts",
+  "Invoices",
+  "Reports",
+  "Templates",
+  "Drafts",
+  "Research",
+  "Design",
+  "Legal",
+  "Partners",
+  "Training",
+  "Events",
+  "Archive",
+].map((name, index) => ({
+  id: String(index + 1),
+  name,
+  icon: groupIcon,
+  userId: "1",
+  totalRooms: 3,
+}));
+
+const getAllRoomGroups = () => Promise.resolve(mockRoomGroups);
+
+const baseFilterArgs = {
   viewAs: "row",
-  view: "row",
-  getSortData: () => mockSortData,
-  getSelectedSortData: () => ({ sortDirection: "asc", sortId: "AZ" }),
-  getViewSettingsData: () => mockViewSettings,
-  getSelectedFilterData: () => Promise.resolve([]),
-  onSearch: (value) => console.log("Search:", value),
-  onClearFilter: () => console.log("Clear filter"),
-  onChangeViewAs: () => console.log("View changed"),
-  onSort: (key, direction) => console.log("Sort by:", key, direction),
-  onFilter: (items) => console.log("Filter applied:", items),
-  onSortButtonClick: (value) => console.log("Sort button clicked:", value),
+  view: "View",
+  getSortData,
+  getSelectedSortData,
+  getViewSettingsData,
+  getSelectedFilterData: getNoSelectedFilterData,
+  getSelectedInputValue,
+  getFilterData: () => Promise.resolve(documentTypeItems),
+  onSearch: fn(),
+  onClearFilter: fn(),
+  onChangeViewAs: fn(),
+  onSort: fn(),
+  onFilter: fn(),
+  onSortButtonClick: fn(),
+  removeSelectedItem: fn(),
+  clearAll: fn(),
+  setClearSearch: fn(),
+  clearSearch: false,
   filterTitle: "Filter",
   sortByTitle: "Sort by",
   filterHeader: "Filter",
@@ -77,7 +244,16 @@ const baseFilterArgs: Partial<FilterProps> = {
   userId: "1",
   currentDeviceType: DeviceType.desktop,
   initSelectedFilterData: [],
-};
+  isRooms: false,
+  isContactsPage: false,
+  isContactsPeoplePage: false,
+  isContactsGroupsPage: false,
+  isContactsInsideGroupPage: false,
+  isContactsGuestsPage: false,
+  isIndexing: false,
+  isIndexEditingMode: false,
+  isRecentFolder: false,
+} satisfies Partial<FilterProps>;
 
 const meta = {
   title: "UI/Navigation/Filter",
@@ -85,104 +261,320 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `Filter component for filtering and sorting data in table or grid views.
+        component: `The bar above a file listing that combines a search box, a filter panel, a sort menu and a view switch, and holds no filter state of its own: it reads the selection through getters and reports every change.
 
 ### Features
 
-- **Search Input**: Built-in search with clear functionality
-- **Filter Groups**: Organize filters into categorized groups (type, status, author, etc.)
-- **Sort Options**: Configurable sort fields with direction toggle
-- **View Selector**: Switch between grid and list views
-- **Pre-selected Filters**: Support for initial filter state
-- **Room Filtering**: Specialized room filter mode
-- **Disabled State**: Full disabled state for indexing mode
-- **Responsive**: Adapts to different device types
+- **Search Box**: Reports every keystroke to the host and empties itself when the host asks for it
+- **Filter Panel**: Opens a side panel of grouped options — tags, checkboxes and drop-down lists — and hands the whole selection back only when Apply is pressed
+- **Filter Chips**: Shows each filter in force as a chip under the bar that removes it on click, with a "Clear all" link once more than one is shown
+- **Sort Menu**: Lists the sort fields, marks the current one with an arrow for its direction and reverses the direction when that field is picked again
+- **View Switch**: Offers the other view as one button beside the sort menu on a desktop, and moves both views into the sort menu on smaller screens
+- **Reordering Mode**: Disables the search box and takes the filter, sort and view controls off the bar while the listing is being reordered
+- **Grouping Row**: Adds a row of group chips under the bar, with an "all" chip, a management button and a menu for the groups that do not fit
+- **Action Button**: Optional main button inside the search box, to the left of the field
+
+### Accessibility
+
+The bar gets its keyboard and screen reader support from the controls it is built from:
+
+- The search box is a native text input, reached with Tab; pass a \`placeholder\` that names what it searches
+- The filter panel opens as a dialog (\`role="dialog"\`, \`aria-modal\`) that Escape closes
+- The copy of the grouping row used to measure it is \`aria-hidden\`, so each group chip is announced once
 
 ### Usage
 
 \`\`\`tsx
 import Filter from "@onlyoffice/apps-ui-kit/components/filter";
 
+// Search, filter, sort and view switch on a desktop
 <Filter
   placeholder="Search..."
-  onSearch={(value) => console.log(value)}
-  getSortData={() => sortData}
-  getSelectedSortData={() => selectedSort}
-  getFilterData={() => Promise.resolve(filterItems)}
-  getSelectedFilterData={() => Promise.resolve([])}
-  getViewSettingsData={() => viewSettings}
-  onSort={(key, dir) => console.log(key, dir)}
-  onFilter={(items) => console.log(items)}
+  onSearch={setSearch}
+  getFilterData={getFilterData}
+  getSelectedFilterData={getSelectedFilterData}
+  onFilter={applyFilter}
+  getSortData={getSortData}
+  getSelectedSortData={getSelectedSortData}
+  onSort={applySort}
+  getViewSettingsData={getViewSettingsData}
+  viewAs="row"
+  viewSelectorVisible
+  onChangeViewAs={switchView}
   currentDeviceType={DeviceType.desktop}
+  {...requiredProps}
+/>
+
+// While the listing is being reordered
+<Filter isIndexEditingMode isIndexing {...props} />
+
+// With a row of group chips under the bar
+<Filter
+  withRoomGroups
+  organizeRoomsGrouping
+  roomGroups={groups}
+  onFilterByGroup={filterByGroup}
+  {...props}
 />
 \`\`\``,
       },
     },
   },
+  args: baseFilterArgs as FilterProps,
   argTypes: {
     placeholder: {
       control: "text",
-      description: "Placeholder text for the search input",
-    },
-    viewAs: {
-      control: "select",
-      options: ["row", "tile"],
-      description: "Current view mode",
-      table: {
-        defaultValue: { summary: "row" },
-      },
-    },
-    viewSelectorVisible: {
-      control: "boolean",
-      description: "Whether to show the view selector toggle",
-      table: {
-        defaultValue: { summary: "true" },
-      },
-    },
-    isRooms: {
-      control: "boolean",
-      description: "Enables room-specific filter mode",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    isIndexEditingMode: {
-      control: "boolean",
-      description: "Disables the filter during index editing",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    isIndexing: {
-      control: "boolean",
-      description: "Disables the filter during indexing",
-      table: {
-        defaultValue: { summary: "false" },
-      },
+      description:
+        "Placeholder of the search box; nothing translates it for you",
     },
     onSearch: {
       action: "onSearch",
-      description: "Callback when search value changes",
+      description:
+        "Called with the search string itself on every keystroke, and with an empty string when the cross in the box is clicked",
     },
     onClearFilter: {
       action: "onClearFilter",
-      description: "Callback when filters are cleared",
+      description:
+        "Called when the search box is emptied because `clearSearch` was raised",
     },
-    onChangeViewAs: {
-      action: "onChangeViewAs",
-      description: "Callback when view mode changes",
+    clearSearch: {
+      control: "boolean",
+      description:
+        "Raise it to empty the search box; the component clears the field, calls `onClearFilter` and lowers it again through `setClearSearch(false)`",
     },
-    onSort: {
-      action: "onSort",
-      description: "Callback when sort option changes",
+    setClearSearch: {
+      action: "setClearSearch",
+      description: "Called with `false` once a requested clear is carried out",
+    },
+    getSelectedInputValue: {
+      control: false,
+      description:
+        "Returns the text the search box shows; give it a stable identity, because the component focuses the field each time the function changes",
+    },
+    initSearchValue: {
+      control: "text",
+      description: "Text the search box starts with, read once",
+    },
+    showMainButton: {
+      control: "boolean",
+      description:
+        "Shows a main button inside the search box, to the left of the field; it needs `mainButtonProps` as well",
+    },
+    mainButtonProps: {
+      control: false,
+      description:
+        "Props of the main button, such as its text and the items of its menu",
+    },
+    mainButtonIcon: {
+      control: false,
+      description:
+        "Icon shown at 12 by 12 pixels inside the main button; a plus when omitted",
+    },
+    isIndexEditingMode: {
+      control: "boolean",
+      description:
+        "Disables the search box and removes the filter button while the listing is being reordered",
+    },
+    isIndexing: {
+      control: "boolean",
+      description:
+        "Removes the sort button and the view switch while the listing is being reordered",
+    },
+    getFilterData: {
+      control: false,
+      description:
+        "Loads the groups of the filter panel: each group is a header item followed by its options, awaited every time the panel opens",
     },
     onFilter: {
       action: "onFilter",
-      description: "Callback when filter is applied",
+      description:
+        "Called with the whole new selection when Apply is pressed, and with an empty list when the panel's clear button empties a selection that was in force",
+    },
+    getSelectedFilterData: {
+      control: false,
+      description:
+        "Returns the filters in force, which become the chips under the bar; give it a stable identity, because it is read again whenever the function changes",
+    },
+    initSelectedFilterData: {
+      control: "object",
+      description:
+        "The filters in force at the first render, so the chips are right before `getSelectedFilterData` resolves",
+    },
+    removeSelectedItem: {
+      action: "removeSelectedItem",
+      description:
+        "Called with the key and group of a chip when it is clicked; the chip leaves the bar at once, without waiting for the host",
+    },
+    clearAll: {
+      action: "clearAll",
+      description:
+        'Called by the "Clear all" link, which appears once more than one chip carries a label',
+    },
+    filterHeader: {
+      control: "text",
+      description: "Heading of the filter panel; nothing translates it for you",
+    },
+    filterTitle: {
+      control: "text",
+      description: "Tooltip of the filter button",
+    },
+    selectorLabel: {
+      control: "text",
+      description:
+        "Heading handed to `renderSelector` for the step where a group picks a person or a room",
+    },
+    renderSelector: {
+      control: false,
+      description:
+        "Renders the step the panel opens when a group picks a person or a room; without it that step stays empty",
+    },
+    userId: {
+      control: "text",
+      description: "Id of the signed-in person, handed to `renderSelector`",
+    },
+    disableThirdParty: {
+      control: "boolean",
+      description: "Handed to `renderSelector` as it is",
+    },
+    isRooms: {
+      control: "boolean",
+      description:
+        "Shows a loading skeleton in the filter panel for half a second before its options, and is handed to `renderSelector`",
+    },
+    isContactsPage: {
+      control: "boolean",
+      description:
+        "Shapes the filter panel's loading skeleton for a contacts listing; the skeleton appears only while `isRooms` is set",
+    },
+    isContactsPeoplePage: {
+      control: "boolean",
+      description:
+        "Shapes the filter panel's loading skeleton for a listing of people",
+    },
+    isContactsGroupsPage: {
+      control: "boolean",
+      description:
+        "Shapes the filter panel's loading skeleton for a listing of groups",
+    },
+    isContactsInsideGroupPage: {
+      control: "boolean",
+      description:
+        "Shapes the filter panel's loading skeleton for the members of one group",
+    },
+    isContactsGuestsPage: {
+      control: "boolean",
+      description:
+        "Shapes the filter panel's loading skeleton for a listing of guests",
+    },
+    isFlowsPage: {
+      control: "boolean",
+      description:
+        "Leaves only the search box: removes the filter button, the sort button and the view switch",
+    },
+    isRecentFolder: {
+      control: "boolean",
+      description:
+        "Removes the sort button and keeps the view switch on the bar on every device",
+    },
+    getSortData: {
+      control: false,
+      description:
+        "Returns the sort fields, read on mount and again whenever the listing's columns change",
+    },
+    getSelectedSortData: {
+      control: false,
+      description:
+        "Returns the sort in force as a field key and a direction, `asc` or `desc`",
+    },
+    onSort: {
+      action: "onSort",
+      description:
+        "Called with the chosen field's key and the direction; picking the current field again reverses the direction",
     },
     onSortButtonClick: {
       action: "onSortButtonClick",
-      description: "Callback when sort button is clicked",
+      description:
+        "Called with `false` when the sort menu opens and with `true` when it closes, and once with `true` on mount",
+    },
+    sortByTitle: {
+      control: "text",
+      description: "Tooltip of the sort button",
+    },
+    view: {
+      control: "text",
+      description:
+        "Label of the row that holds the view switch inside the sort menu, shown below the desktop layout",
+    },
+    viewAs: {
+      control: "select",
+      options: ["row", "table", "tile"],
+      description:
+        'The listing\'s current view; `"table"` is shown as `"row"`, and the switch offers the other one',
+    },
+    viewSelectorVisible: {
+      control: "boolean",
+      description:
+        "Whether the view switch is shown at all: beside the sort button on a desktop, inside the sort menu on smaller screens",
+    },
+    getViewSettingsData: {
+      control: false,
+      description:
+        "Returns the views the switch offers, each with a value and an icon; give it a stable identity",
+    },
+    onChangeViewAs: {
+      action: "onChangeViewAs",
+      description:
+        "Called when the view switch is clicked; the component keeps no view of its own, so `viewAs` has to change",
+    },
+    currentDeviceType: {
+      control: "select",
+      options: Object.values(DeviceType),
+      description:
+        "Picks the layout: on a desktop the view switch sits on the bar, on other devices it moves into the sort menu; nothing here measures the window",
+    },
+    withRoomGroups: {
+      control: "boolean",
+      description:
+        "Allows the grouping row under the bar; it shows only together with `organizeRoomsGrouping`",
+    },
+    organizeRoomsGrouping: {
+      control: "boolean",
+      description: "Turns grouping on; without it the grouping row never shows",
+    },
+    roomGroups: {
+      control: "object",
+      description:
+        "The groups shown as chips in the grouping row; a group whose `icon` is not an object is left out",
+    },
+    getAllRoomGroups: {
+      control: false,
+      description:
+        "Awaited once when grouping turns on, and the grouping row waits for it; the chips themselves come from `roomGroups`",
+    },
+    onFilterByGroup: {
+      action: "onFilterByGroup",
+      description:
+        'Called with a group\'s id when its chip is clicked, and with `null` for the "all" chip',
+    },
+    currentGroupId: {
+      control: "text",
+      description:
+        'Id of the group whose chip is highlighted; the "all" chip is highlighted when it is empty',
+    },
+    isFormsSection: {
+      control: "boolean",
+      description:
+        'Words the grouping row for spaces rather than rooms: "All spaces" instead of "All rooms"',
+    },
+    isFilterOrSearchActive: {
+      control: "boolean",
+      description:
+        "Hides the grouping row and, if a group was chosen, calls `onFilterByGroup(null)`",
+    },
+    setEditRoomGroupsDialogVisible: {
+      action: "setEditRoomGroupsDialogVisible",
+      description:
+        "Called by the management button at the end of the grouping row, and by the create chip shown when there are no groups",
     },
   },
 } satisfies Meta<typeof Filter>;
@@ -195,78 +587,81 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   return <div style={{ height: "140px" }}>{props.children}</div>;
 };
 
-const OpenFilterOnMount = (props: { children: React.ReactNode }) => {
+const OpenOnMount = (props: { children: React.ReactNode; testId: string }) => {
+  const ref = React.useRef<HTMLDivElement>(null);
+
   React.useEffect(() => {
     const timer = setTimeout(() => {
-      const filterButton = document.querySelector(
-        '[data-testid="filter_icon_button"]',
-      ) as HTMLElement;
-      if (filterButton) {
-        filterButton.click();
-      }
+      const button = ref.current?.querySelector(
+        `[data-testid="${props.testId}"]`,
+      ) as HTMLElement | null;
+      button?.click();
     }, 100);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [props.testId]);
 
-  return <>{props.children}</>;
+  return <div ref={ref}>{props.children}</div>;
 };
 
-const DocumentTypesTemplate = () => {
-  return (
-    <Wrapper>
-      <OpenFilterOnMount>
-        <Filter
-          {...(baseFilterArgs as FilterProps)}
-          getFilterData={() =>
-            Promise.resolve([
-              {
-                key: FilterGroups.filterType,
-                group: FilterGroups.filterType,
-                label: "Type",
-                isHeader: true,
-                isLast: true,
-              },
-              {
-                id: "filter_type-documents",
-                key: "documents",
-                group: FilterGroups.filterType,
-                label: "Documents",
-              },
-              {
-                id: "filter_type-spreadsheets",
-                key: "spreadsheets",
-                group: FilterGroups.filterType,
-                label: "Spreadsheets",
-              },
-              {
-                id: "filter_type-presentations",
-                key: "presentations",
-                group: FilterGroups.filterType,
-                label: "Presentations",
-              },
-              {
-                id: "filter_type-images",
-                key: "images",
-                group: FilterGroups.filterType,
-                label: "Images",
-                isLast: true,
-              },
-            ])
-          }
-        />
-      </OpenFilterOnMount>
-    </Wrapper>
-  );
-};
+const FilterTemplate = (args: FilterProps) => (
+  <Wrapper>
+    <Filter {...args} />
+  </Wrapper>
+);
 
-export const DocumentTypes: Story = {
-  render: () => <DocumentTypesTemplate />,
+const OpenPanelTemplate = (args: FilterProps) => (
+  <Wrapper>
+    <OpenOnMount testId="filter_icon_button">
+      <Filter {...args} />
+    </OpenOnMount>
+  </Wrapper>
+);
+
+// The filter panel covers the whole window, so on the Docs page it gets a frame of its own.
+const panelDocsStory = { inline: false, height: "480px" };
+
+export const Default: Story = {
+  render: (args) => <FilterTemplate {...args} />,
   parameters: {
     docs: {
       description: {
         story:
-          "Basic filter with document type options. Shows filter items for different document types. The filter dropdown automatically opens when the story loads.",
+          "The bar as a desktop listing shows it: the search box, the filter button, the sort button and the button that switches to the other view. Change any prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<Filter
+  placeholder="Search..."
+  onSearch={setSearch}
+  getFilterData={getFilterData}
+  getSelectedFilterData={getSelectedFilterData}
+  onFilter={applyFilter}
+  getSortData={getSortData}
+  getSelectedSortData={getSelectedSortData}
+  onSort={applySort}
+  getViewSettingsData={getViewSettingsData}
+  viewAs="row"
+  viewSelectorVisible
+  onChangeViewAs={switchView}
+  currentDeviceType={DeviceType.desktop}
+  {...requiredProps}
+/>`,
+      },
+    },
+  },
+};
+
+export const DocumentTypes: Story = {
+  render: (args) => <OpenPanelTemplate {...args} />,
+  args: {
+    getFilterData: () => Promise.resolve(documentTypeItems),
+  },
+  parameters: {
+    docs: {
+      story: panelDocsStory,
+      description: {
+        story:
+          "The filter panel with one group of options, opened for you when the story loads. Pick a type and press Apply to see the selection reach `onFilter` in the Actions panel.",
       },
       source: {
         code: `<Filter
@@ -277,297 +672,202 @@ export const DocumentTypes: Story = {
     { id: "filter_type-presentations", key: "presentations", group: FilterGroups.filterType, label: "Presentations" },
     { id: "filter_type-images", key: "images", group: FilterGroups.filterType, label: "Images", isLast: true },
   ])}
-  ...otherProps
+  {...props}
 />`,
       },
     },
   },
 };
 
-const WithSelectedFiltersTemplate = () => {
-  return (
-    <Wrapper>
-      <OpenFilterOnMount>
-        <Filter
-          {...(baseFilterArgs as FilterProps)}
-          getSelectedFilterData={() =>
-            Promise.resolve([
-              {
-                id: "filter_type-documents",
-                key: "documents",
-                group: FilterGroups.filterType,
-                label: "Documents",
-                isSelected: true,
-              },
-            ])
-          }
-          getFilterData={() =>
-            Promise.resolve([
-              {
-                key: FilterGroups.filterType,
-                group: FilterGroups.filterType,
-                label: "Type",
-                isHeader: true,
-                isLast: true,
-                isSelected: false,
-              },
-              {
-                id: "filter_type-documents",
-                key: "documents",
-                group: FilterGroups.filterType,
-                label: "Documents",
-                isSelected: true,
-              },
-              {
-                id: "filter_type-spreadsheets",
-                key: "spreadsheets",
-                group: FilterGroups.filterType,
-                label: "Spreadsheets",
-                isSelected: false,
-              },
-              {
-                id: "filter_type-presentations",
-                key: "presentations",
-                group: FilterGroups.filterType,
-                label: "Presentations",
-                isSelected: false,
-              },
-              {
-                id: "filter_type-images",
-                key: "images",
-                group: FilterGroups.filterType,
-                label: "Images",
-                isSelected: false,
-              },
-            ])
-          }
-          initSelectedFilterData={[
-            {
-              id: "filter_type-documents",
-              key: "documents",
-              group: FilterGroups.filterType,
-              label: "Documents",
-              isSelected: true,
-            },
-          ]}
-        />
-      </OpenFilterOnMount>
-    </Wrapper>
-  );
-};
-
 export const WithSelectedFilters: Story = {
-  render: () => <WithSelectedFiltersTemplate />,
+  render: (args) => <OpenPanelTemplate {...args} />,
+  args: {
+    getFilterData: () => Promise.resolve(documentTypeItems),
+    initSelectedFilterData: selectedDocuments,
+  },
   parameters: {
     docs: {
+      story: panelDocsStory,
       description: {
         story:
-          "Filter with pre-selected options. Shows how the filter looks with some options already selected. The filter dropdown automatically opens when the story loads.",
+          "A filter already in force when the bar mounts: its chip is under the search box and its option is highlighted in the panel, opened for you when the story loads (`initSelectedFilterData`). Apply stays disabled until the selection changes.",
       },
       source: {
         code: `<Filter
   initSelectedFilterData={[
     { id: "filter_type-documents", key: "documents", group: FilterGroups.filterType, label: "Documents", isSelected: true },
   ]}
-  ...otherProps
+  {...props}
 />`,
       },
     },
   },
 };
 
-const MultipleFilterGroupsTemplate = () => {
-  return (
-    <Wrapper>
-      <OpenFilterOnMount>
-        <Filter
-          {...(baseFilterArgs as FilterProps)}
-          getFilterData={() =>
-            Promise.resolve([
-              {
-                key: FilterGroups.filterType,
-                group: FilterGroups.filterType,
-                label: "Type",
-                isHeader: true,
-              },
-              {
-                id: "filter_type-documents",
-                key: "documents",
-                group: FilterGroups.filterType,
-                label: "Documents",
-              },
-              {
-                id: "filter_type-spreadsheets",
-                key: "spreadsheets",
-                group: FilterGroups.filterType,
-                label: "Spreadsheets",
-              },
-              {
-                key: FilterGroups.filterStatus,
-                group: FilterGroups.filterStatus,
-                label: "Status",
-                isHeader: true,
-              },
-              {
-                id: "filter_status-active",
-                key: "active",
-                group: FilterGroups.filterStatus,
-                label: "Active",
-              },
-              {
-                id: "filter_status-archived",
-                key: "archived",
-                group: FilterGroups.filterStatus,
-                label: "Archived",
-              },
-              {
-                key: FilterGroups.filterAuthor,
-                group: FilterGroups.filterAuthor,
-                label: "Author",
-                isHeader: true,
-                isLast: true,
-              },
-              {
-                id: "filter_author-me",
-                key: "me",
-                group: FilterGroups.filterAuthor,
-                label: "Me",
-              },
-              {
-                id: "filter_author-shared",
-                key: "shared",
-                group: FilterGroups.filterAuthor,
-                label: "Shared with me",
-              },
-            ])
-          }
-        />
-      </OpenFilterOnMount>
-    </Wrapper>
-  );
-};
-
 export const MultipleFilterGroups: Story = {
-  render: () => <MultipleFilterGroupsTemplate />,
+  render: (args) => <OpenPanelTemplate {...args} />,
+  args: {
+    getFilterData: () =>
+      Promise.resolve([
+        {
+          key: FilterGroups.filterType,
+          group: FilterGroups.filterType,
+          label: "Type",
+          isHeader: true,
+        },
+        {
+          id: "filter_type-documents",
+          key: "documents",
+          group: FilterGroups.filterType,
+          label: "Documents",
+        },
+        {
+          id: "filter_type-spreadsheets",
+          key: "spreadsheets",
+          group: FilterGroups.filterType,
+          label: "Spreadsheets",
+        },
+        {
+          key: FilterGroups.filterStatus,
+          group: FilterGroups.filterStatus,
+          label: "Status",
+          isHeader: true,
+        },
+        {
+          id: "filter_status-active",
+          key: "active",
+          group: FilterGroups.filterStatus,
+          label: "Active",
+        },
+        {
+          id: "filter_status-archived",
+          key: "archived",
+          group: FilterGroups.filterStatus,
+          label: "Archived",
+        },
+        {
+          key: FilterGroups.filterAuthor,
+          group: FilterGroups.filterAuthor,
+          label: "Author",
+          isHeader: true,
+          isLast: true,
+        },
+        {
+          id: "filter_author-me",
+          key: "me",
+          group: FilterGroups.filterAuthor,
+          label: "Me",
+        },
+        {
+          id: "filter_author-shared",
+          key: "shared",
+          group: FilterGroups.filterAuthor,
+          label: "Shared with me",
+        },
+      ]),
+  },
   parameters: {
     docs: {
+      story: panelDocsStory,
       description: {
         story:
-          "Filter with multiple filter groups. Shows how the filter displays different categories of filter options (Type, Status, Author). The filter dropdown automatically opens when the story loads.",
+          "Several groups in one panel, each under its heading and divided by a line, so a listing can be narrowed by type, status and author at once. The panel opens for you when the story loads; one option can be picked per group.",
       },
       source: {
         code: `<Filter
   getFilterData={() => Promise.resolve([
-    { key: FilterGroups.filterType, label: "Type", isHeader: true },
-    { key: "documents", label: "Documents", group: FilterGroups.filterType },
-    { key: FilterGroups.filterStatus, label: "Status", isHeader: true },
-    { key: "active", label: "Active", group: FilterGroups.filterStatus },
-    { key: FilterGroups.filterAuthor, label: "Author", isHeader: true, isLast: true },
-    { key: "me", label: "Me", group: FilterGroups.filterAuthor },
+    { key: FilterGroups.filterType, group: FilterGroups.filterType, label: "Type", isHeader: true },
+    { key: "documents", group: FilterGroups.filterType, label: "Documents" },
+    { key: FilterGroups.filterStatus, group: FilterGroups.filterStatus, label: "Status", isHeader: true },
+    { key: "active", group: FilterGroups.filterStatus, label: "Active" },
+    { key: FilterGroups.filterAuthor, group: FilterGroups.filterAuthor, label: "Author", isHeader: true, isLast: true },
+    { key: "me", group: FilterGroups.filterAuthor, label: "Me" },
   ])}
-  ...otherProps
+  {...props}
 />`,
       },
     },
   },
 };
 
-const RoomsFilterTemplate = () => {
-  return (
-    <Wrapper>
-      <OpenFilterOnMount>
-        <Filter
-          {...(baseFilterArgs as FilterProps)}
-          isRooms
-          getFilterData={() =>
-            Promise.resolve([
-              {
-                key: FilterGroups.filterRoom,
-                group: FilterGroups.filterRoom,
-                label: "Room",
-                isHeader: true,
-                isLast: true,
-              },
-              {
-                id: "filter_room-all",
-                key: FilterKeys.withContent,
-                group: FilterGroups.filterRoom,
-                label: "All Rooms",
-              },
-              {
-                id: "filter_room-marketing",
-                key: "room-1",
-                group: FilterGroups.filterRoom,
-                label: "Marketing Room",
-              },
-              {
-                id: "filter_room-development",
-                key: "room-2",
-                group: FilterGroups.filterRoom,
-                label: "Development Room",
-              },
-              {
-                id: "filter_room-sales",
-                key: "room-3",
-                group: FilterGroups.filterRoom,
-                label: "Sales Room",
-                isLast: true,
-              },
-            ])
-          }
-        />
-      </OpenFilterOnMount>
-    </Wrapper>
-  );
-};
-
 export const RoomsFilter: Story = {
-  render: () => <RoomsFilterTemplate />,
+  render: (args) => <OpenPanelTemplate {...args} />,
+  args: {
+    isRooms: true,
+    getFilterData: () =>
+      Promise.resolve([
+        {
+          key: FilterGroups.filterRoom,
+          group: FilterGroups.filterRoom,
+          label: "Room",
+          isHeader: true,
+          isLast: true,
+        },
+        {
+          id: "filter_room-all",
+          key: FilterKeys.withContent,
+          group: FilterGroups.filterRoom,
+          label: "All Rooms",
+        },
+        {
+          id: "filter_room-marketing",
+          key: "room-1",
+          group: FilterGroups.filterRoom,
+          label: "Marketing Room",
+        },
+        {
+          id: "filter_room-development",
+          key: "room-2",
+          group: FilterGroups.filterRoom,
+          label: "Development Room",
+        },
+        {
+          id: "filter_room-sales",
+          key: "room-3",
+          group: FilterGroups.filterRoom,
+          label: "Sales Room",
+          isLast: true,
+        },
+      ]),
+  },
   parameters: {
     docs: {
+      story: panelDocsStory,
       description: {
         story:
-          "Filter with room options. Shows room filter items in room-specific mode. The filter dropdown automatically opens when the story loads.",
+          "The panel of a listing of rooms: it shows a loading skeleton for half a second before the options appear, and passes the rooms flag on to `renderSelector` (`isRooms`). The panel opens for you when the story loads.",
       },
       source: {
         code: `<Filter
   isRooms
   getFilterData={() => Promise.resolve([
-    { key: FilterGroups.filterRoom, label: "Room", isHeader: true, isLast: true },
-    { key: FilterKeys.withContent, label: "All Rooms", group: FilterGroups.filterRoom },
-    { key: "room-1", label: "Marketing Room", group: FilterGroups.filterRoom },
-    { key: "room-2", label: "Development Room", group: FilterGroups.filterRoom },
+    { key: FilterGroups.filterRoom, group: FilterGroups.filterRoom, label: "Room", isHeader: true, isLast: true },
+    { key: FilterKeys.withContent, group: FilterGroups.filterRoom, label: "All Rooms" },
+    { key: "room-1", group: FilterGroups.filterRoom, label: "Marketing Room" },
+    { key: "room-2", group: FilterGroups.filterRoom, label: "Development Room" },
   ])}
-  ...otherProps
+  {...props}
 />`,
       },
     },
   },
 };
 
-const DisabledFilterTemplate = () => {
-  return (
-    <Wrapper>
-      <Filter
-        {...(baseFilterArgs as FilterProps)}
-        isIndexEditingMode
-        isIndexing
-        getFilterData={() => Promise.resolve([])}
-      />
-    </Wrapper>
-  );
-};
-
 export const DisabledFilter: Story = {
-  render: () => <DisabledFilterTemplate />,
+  render: (args) => <FilterTemplate {...args} />,
+  args: {
+    isIndexEditingMode: true,
+    isIndexing: true,
+    getFilterData: () => Promise.resolve([]),
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "Filter in completely disabled state. Shows how the filter appears when disabled during indexing mode.",
+          "The bar while the listing is being reordered, when searching, filtering and sorting would fight the new order: the search box is disabled and the filter button is gone (`isIndexEditingMode`), and so are the sort button and the view switch (`isIndexing`).",
       },
       source: {
-        code: `<Filter isIndexEditingMode isIndexing getFilterData={() => Promise.resolve([])} ...otherProps />`,
+        code: `<Filter isIndexEditingMode isIndexing {...props} />`,
       },
     },
   },
@@ -613,7 +913,7 @@ export const ViewSelectorDefault: Story = {
     docs: {
       description: {
         story:
-          "Default ViewSelector with row and tile view options. Click the icons to toggle between views.",
+          "The view switch the sort menu holds on smaller screens: one button per view, the current one filled. Click the other icon to switch views.",
       },
       source: {
         code: `<ViewSelector
@@ -647,7 +947,7 @@ export const ViewSelectorDisabled: Story = {
     docs: {
       description: {
         story:
-          "ViewSelector in a disabled state. The view toggle icons are not interactive.",
+          "The view switch greyed out while switching views is not possible; clicks on its icons do nothing (`isDisabled`).",
       },
       source: {
         code: `<ViewSelector viewSettings={viewSettings} viewAs="row" isDisabled />`,
@@ -674,7 +974,7 @@ export const ViewSelectorFilterMode: Story = {
     docs: {
       description: {
         story:
-          "ViewSelector in filter mode. Shows the selector with filter-specific styling applied.",
+          "The single button the bar shows on a desktop: it carries the icon of the view you would switch to, not the current one, and turns into the other icon when clicked (`isFilter`).",
       },
       source: {
         code: `<ViewSelector viewSettings={viewSettings} viewAs="row" isFilter />`,
@@ -683,71 +983,256 @@ export const ViewSelectorFilterMode: Story = {
   },
 };
 
-export const CssCustomization: Story = {
-  render: () => (
-    <div
-      style={
-        {
-          height: "140px",
-          // Filter button (funnel icon)
-          "--filter-btn-border": "1px solid #0082c9",
-          "--filter-btn-hover-border": "1px solid #006fa6",
-          "--filter-btn-open-fill": "#ffffff",
-          "--filter-btn-radius": "6px",
-          // Filter block sidebar
-          "--filter-bg": "#e6f3fb",
-          "--filter-width": "420px",
-          // Sort button background
-          "--filter-sort-bg": "#e6f3fb",
-          "--filter-sort-selected-bg": "#cce5f6",
-          "--filter-sort-fill": "#0082c9",
-          "--filter-sort-selected-icon": "#0082c9",
-          "--filter-sort-unselected-icon": "#5ab4e5",
-          // View selector
-          "--filter-view-fill": "#e6f3fb",
-          "--filter-view-checked": "#0082c9",
-          "--filter-view-border": "#0082c9",
-          "--filter-view-hover-border": "#006fa6",
-          "--filter-view-hover-icon": "#006fa6",
-          // Filter tags
-          "--filter-tag-border": "1px solid #0082c9",
-          "--filter-tag-selected": "#0082c9",
-          "--filter-tag-radius": "8px",
-          // Filter separator
-          "--filter-separator": "#cce5f6",
-          // SearchInput sub-component
-          "--search-input-icon-color": "#0082c9",
-          "--search-input-icon-filled-color": "#006fa6",
-          // IconButton sub-component
-          "--icon-button-color": "#0082c9",
-          "--icon-button-hover-color": "#006fa6",
-          // SelectedItem sub-component (selected filter chips)
-          "--selected-item-background": "#cce5f6",
-          "--selected-item-background-hover": "#b3d9f0",
-          "--selected-item-active-background": "#0082c9",
-          "--selected-item-active-color": "#ffffff",
-          // ComboBox sub-component (sort)
-          "--combobox-background": "#e6f3fb",
-          // Button sub-component (apply/clear in filter panel)
-          "--button-hover-background-color": "#006fa6",
-          // TextInput sub-component (search field)
-          "--text-input-border-color": "#0082c9",
-          "--text-input-border-hover-color": "#006fa6",
-          "--text-input-border-focus-color": "#0082c9",
-        } as React.CSSProperties
-      }
-    >
-      <Filter
-        {...(baseFilterArgs as FilterProps)}
-        getFilterData={() => Promise.resolve([])}
-      />
-    </div>
-  ),
+export const WithFilterChips: Story = {
+  render: (args) => <FilterTemplate {...args} />,
+  args: {
+    initSelectedFilterData: selectedChips,
+    getSelectedFilterData: () => selectedChips,
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "CSS custom property overrides for the filter bar and its SearchInput, IconButton, ComboBox, ViewSelector, SelectedItem, and Button sub-components.",
+          'The filters in force as chips under the bar, so the reader sees what narrows the listing and can drop any of it in one click. Click a chip to remove it (`removeSelectedItem`); the "Clear all" link appears once more than one chip is shown (`clearAll`).',
+      },
+      source: {
+        code: `<Filter
+  initSelectedFilterData={selected}
+  getSelectedFilterData={getSelectedFilterData}
+  removeSelectedItem={({ key, group }) => removeFilter(key, group)}
+  clearAll={clearFilters}
+  {...props}
+/>`,
+      },
+    },
+  },
+};
+
+export const PanelOptionKinds: Story = {
+  render: (args) => <OpenPanelTemplate {...args} />,
+  args: {
+    getFilterData: () => Promise.resolve(optionKindItems),
+  },
+  parameters: {
+    docs: {
+      story: panelDocsStory,
+      description: {
+        story: `The kinds of option a group can hold besides tags, for filters that are not a choice among a few words. The panel opens for you when the story loads:
+
+- **Documents**, **Spreadsheets** — tags, one of which can be picked
+- **Anywhere** — a drop-down list of values (\`withOptions\` with \`options\`)
+- **Exclude subfolders** — a checkbox, in a group without a heading (\`isCheckbox\`, \`withoutHeader\`)`,
+      },
+      source: {
+        code: `<Filter
+  getFilterData={() => Promise.resolve([
+    { key: FilterGroups.filterType, group: FilterGroups.filterType, label: "Type", isHeader: true },
+    { key: "documents", group: FilterGroups.filterType, label: "Documents" },
+    { key: FilterGroups.filterLocation, group: FilterGroups.filterLocation, label: "Location", isHeader: true },
+    { key: "filter_location", group: FilterGroups.filterLocation, withOptions: true, options: [
+      { key: "anywhere", label: "Anywhere" },
+      { key: "my-documents", label: "My documents" },
+    ] },
+    { key: FilterGroups.filterFolders, group: FilterGroups.filterFolders, label: "Search", isHeader: true, withoutHeader: true, isLast: true },
+    { key: FilterKeys.excludeSubfolders, group: FilterGroups.filterFolders, label: "Exclude subfolders", isCheckbox: true },
+  ])}
+  {...props}
+/>`,
+      },
+    },
+  },
+};
+
+export const SortMenuOnTablet: Story = {
+  render: (args) => (
+    <div style={{ height: "300px" }}>
+      <OpenOnMount testId="filter_sort_button">
+        <Filter {...args} />
+      </OpenOnMount>
+    </div>
+  ),
+  args: {
+    currentDeviceType: DeviceType.tablet,
+  },
+  parameters: {
+    docs: {
+      story: { inline: false, height: "326px" },
+      description: {
+        story:
+          "The sort menu on a device narrower than a desktop, opened for you when the story loads: the view switch has left the bar and heads the menu, above the sort fields (`currentDeviceType`). The current field carries an arrow for its direction; pick it again to reverse it (`onSort`).",
+      },
+      source: {
+        code: `<Filter currentDeviceType={DeviceType.tablet} viewSelectorVisible {...props} />`,
+      },
+    },
+  },
+};
+
+export const WithGroupingRow: Story = {
+  render: (args) => (
+    <div style={{ height: "180px" }}>
+      <Filter {...args} />
+    </div>
+  ),
+  args: {
+    withRoomGroups: true,
+    organizeRoomsGrouping: true,
+    roomGroups: mockRoomGroups,
+    getAllRoomGroups,
+    currentGroupId: "2",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A row of group chips under the bar, for a listing its host has sorted into groups: "All rooms" first, the chosen group highlighted (`currentGroupId`), and the groups that do not fit behind the "..." button. Click a chip to choose it (`onFilterByGroup`); the button at the end of the row opens the host\'s group management (`setEditRoomGroupsDialogVisible`).',
+      },
+      source: {
+        code: `<Filter
+  withRoomGroups
+  organizeRoomsGrouping
+  roomGroups={groups}
+  getAllRoomGroups={loadGroups}
+  currentGroupId="2"
+  onFilterByGroup={filterByGroup}
+  setEditRoomGroupsDialogVisible={openGroupManagement}
+  {...props}
+/>`,
+      },
+    },
+  },
+};
+
+export const WithMainButton: Story = {
+  render: (args) => <FilterTemplate {...args} />,
+  args: {
+    showMainButton: true,
+    mainButtonProps: { text: "New", model: [] },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A main button inside the search box, for a listing that has no room for one of its own beside the bar (`showMainButton`, `mainButtonProps`).",
+      },
+      source: {
+        code: `<Filter
+  showMainButton
+  mainButtonProps={{ text: "New", model: menuItems }}
+  {...props}
+/>`,
+      },
+    },
+  },
+};
+
+export const RightToLeft: Story = {
+  render: (args) => (
+    <div dir="rtl">
+      <FilterTemplate {...args} />
+    </div>
+  ),
+  globals: { direction: "rtl" },
+  args: {
+    placeholder: "بحث",
+    initSelectedFilterData: selectedChips,
+    getSelectedFilterData: () => selectedChips,
+  },
+  parameters: {
+    noPadding: true,
+    docs: {
+      // Framed so the right-to-left direction does not flip the rest of the Docs page.
+      story: { inline: false, height: "166px" },
+      description: {
+        story:
+          'The bar in a right-to-left interface: the search box starts at the right edge, the filter, sort and view buttons line up at the left, and the chips and the "Clear all" link run from right to left.',
+      },
+      source: {
+        code: `<div dir="rtl">
+  <Filter placeholder="بحث" {...props} />
+</div>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: (args) => (
+    <div
+      style={
+        {
+          height: "140px",
+          "--filter-btn-border": "1px solid #0082c9",
+          "--filter-btn-hover-border": "1px solid #004f7a",
+          "--filter-btn-open-fill": "#0082c9",
+          "--filter-btn-radius": "6px",
+          "--filter-sort-bg": "#e6f3fb",
+          "--filter-sort-selected-bg": "#cce5f6",
+          "--filter-sort-fill": "#0082c9",
+          "--filter-view-fill": "#e6f3fb",
+          "--filter-view-checked": "#0082c9",
+          "--filter-view-border": "#0082c9",
+          "--filter-view-hover-border": "#004f7a",
+          "--filter-view-hover-icon": "#004f7a",
+        } as React.CSSProperties
+      }
+    >
+      <Filter {...args} />
+    </div>
+  ),
+  args: {
+    getFilterData: () => Promise.resolve([]),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--filter-btn-border\` | Border of the filter button, as a \`border\` shorthand | theme-based |
+| \`--filter-btn-hover-border\` | Border of the filter button on hover | theme-based |
+| \`--filter-btn-open-fill\` | Colour of the filter button's icon while the panel is open | theme-based |
+| \`--filter-btn-radius\` | Corner radius of the filter button | \`3px\` |
+| \`--filter-sort-bg\` | Background of the sort button | theme-based |
+| \`--filter-sort-selected-bg\` | Background of the current field in the open sort menu | theme-based |
+| \`--filter-sort-fill\` | Colour of the direction arrow in the open sort menu | theme-based |
+| \`--filter-sort-selected-icon\` | Colour of the current view's icon in the sort menu, below the desktop layout only; it goes by position and assumes the row view comes first | theme-based |
+| \`--filter-sort-unselected-icon\` | Colour of the other view's icon in the sort menu, with the same caveat | theme-based |
+| \`--filter-view-fill\` | Background of the view switch button | theme-based |
+| \`--filter-view-checked\` | Colour of the view switch button's icon | theme-based |
+| \`--filter-view-border\` | Border colour of the view switch button | theme-based |
+| \`--filter-view-hover-border\` | Border colour of the view switch button on hover | theme-based |
+| \`--filter-view-hover-icon\` | Colour of the view switch button's icon on hover | theme-based |
+| \`--filter-tag-border\` | Border of an option tag in the filter panel, as a \`border\` shorthand | theme-based |
+| \`--filter-tag-selected\` | Background and border colour of a picked option tag | theme-based |
+| \`--filter-tag-radius\` | Corner radius of an option tag | \`16px\` |
+| \`--filter-tag-height\` | Height of an option tag | \`28px\` |
+| \`--filter-separator\` | Colour of the line between groups in the filter panel | theme-based |
+| \`--filter-bg\` | Background of the step \`renderSelector\` opens inside the panel | theme-based |
+| \`--filter-width\` | Width of that step | \`480px\` |
+
+The example sets the variables of the bar on one wrapper; hover the filter and view buttons, and open the sort menu, to see the hover and menu values. The sort menu's view icons appear only below the desktop layout, so set those two with \`currentDeviceType\` in the Controls panel.
+
+The filter panel renders in a portal on \`<body>\`, outside any wrapper, so the \`--filter-tag-*\`, \`--filter-separator\`, \`--filter-bg\` and \`--filter-width\` variables take effect only when set on \`:root\` or \`body\`. The search box, the chips and the buttons inside the bar read their own components' variables, documented on the SearchInput, SelectedItem, IconButton and Button stories.`,
+      },
+      source: {
+        code: `<div style={{
+  "--filter-btn-border": "1px solid #0082c9",
+  "--filter-btn-hover-border": "1px solid #004f7a",
+  "--filter-btn-open-fill": "#0082c9",
+  "--filter-btn-radius": "6px",
+  "--filter-sort-bg": "#e6f3fb",
+  "--filter-sort-selected-bg": "#cce5f6",
+  "--filter-sort-fill": "#0082c9",
+  "--filter-view-fill": "#e6f3fb",
+  "--filter-view-checked": "#0082c9",
+  "--filter-view-border": "#0082c9",
+  "--filter-view-hover-border": "#004f7a",
+  "--filter-view-hover-icon": "#004f7a",
+}}>
+  <Filter {...props} />
+</div>`,
       },
     },
   },

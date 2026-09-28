@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["section", "search-input", "selected-item"],
   "subComponents": [],
-  "testIds": ["filter_container", "filter_clear_all_link"]
+  "testIds": ["filter_container", "filter_clear_all_link"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # FilterInput
