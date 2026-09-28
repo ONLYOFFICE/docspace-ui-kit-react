@@ -75,6 +75,11 @@ test.describe("Button — screenshots (light theme)", () => {
     await expect(page).toHaveScreenshot("button-with-icon-all-sizes.png");
   });
 
+  test("accent variants — all sizes", async ({ page }) => {
+    await gotoStory(page, "accent-buttons");
+    await expect(page).toHaveScreenshot("button-accent-all-sizes.png");
+  });
+
   test("hover state via mouse", async ({ page }) => {
     await gotoStory(page, "secondary-buttons");
     const firstButton = page
