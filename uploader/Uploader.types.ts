@@ -38,8 +38,14 @@ export type UploaderProps = {
     error: string;
     rejectedFiles?: RejectedFile[];
   }) => void;
-  /** Target folder ID for uploads */
-  targetId?: string;
+  /**
+   * The folder the files go to. A `number` is a folder on the portal: each
+   * chunk goes to the async session and the session is finalised into the
+   * file. A `string` is a folder in third-party storage: each chunk goes to
+   * the session itself and the last one answers with the file. Portal folder
+   * ids are numbers, so pass them as numbers.
+   */
+  targetId?: string | number;
   /** Main text displayed in the dropzone */
   linkMainText?: string;
   /** Secondary text displayed in the dropzone */

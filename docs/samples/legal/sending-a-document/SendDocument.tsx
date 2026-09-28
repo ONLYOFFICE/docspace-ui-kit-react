@@ -52,7 +52,7 @@ export const SendDocument = ({
         />
       ) : (
         <Uploader
-          targetId={String(request.id)}
+          targetId={request.id}
           accept={ACCEPT}
           shortText={SHORT}
           fullText={FULL}

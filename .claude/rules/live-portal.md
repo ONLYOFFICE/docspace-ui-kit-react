@@ -179,14 +179,14 @@ createFileJsonElement: { title } })` makes an office document through the docume
   (`api.teamlab.info/docspace/api-backend/llms.txt`, moving to `api.onlyoffice.com`) repeat the
   SDK's OpenAPI, so when both agree and the portal still refuses, the server source under
   `../DocSpace/server` (a sibling of the Gitea checkouts) is what decides.
-- **`Uploader` takes two routes, and its prop type picks one.** `targetId` is typed `string`,
-  and a string id takes the classic session route: `POST /api/2.0/files/{folderId}/session`
-  opens it, each chunk goes to `POST .../session/{sessionId}` as a `File` form part, and the
-  last chunk answers with the file. A numeric id (only reachable through a cast) takes the async
-  route, `POST .../session/{sessionId}/upload` per chunk and `PUT .../finalize`. Both need the
-  caller to be a content creator in the room; a guest added as editor or viewer gets 403 on the
-  session. Its toasts need `<Toast />` mounted once on the page, outside the story root.
-  `docs/samples/legal/sending-a-document/SendDocument.tsx` is the working form.
+- **`Uploader` takes two routes, and the type of `targetId` picks one.** A `number`, which is
+  what a portal folder has, takes the async route: `POST /api/2.0/files/{folderId}/session`
+  opens it, each chunk goes to `POST .../session/{sessionId}/upload` as a `File` form part, and
+  `PUT .../finalize` makes the file. A `string`, a third-party storage folder, takes the classic
+  route: chunks go to `POST .../session/{sessionId}` and the last one answers with the file.
+  Both need the caller to be a content creator in the room; a guest added as editor or viewer
+  gets 403 on the session. Its toasts need `<Toast />` mounted once on the page, outside the
+  story root. `docs/samples/legal/sending-a-document/SendDocument.tsx` is the working form.
 - **`DocumentEditor` opens a file as whoever the nearest provider is.** Given `fileId` the
   wrapper calls `filesSettingsApi.getDocServiceUrl()` (`GET /api/2.0/files/docservice`, answer
   `docServiceUrl`) and `filesApi.openEditFile({ fileId, view })`
