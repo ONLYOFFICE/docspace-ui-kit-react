@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
   "related": ["context-menu", "button", "main-button-mobile"],
   "subComponents": [],
-  "testIds": ["main-button"]
+  "testIds": ["main-button"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # MainButton
