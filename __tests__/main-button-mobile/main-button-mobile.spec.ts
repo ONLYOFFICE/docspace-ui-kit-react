@@ -19,6 +19,16 @@ test.describe("MainButtonMobile — light", () => {
       "main-button-mobile-css-customization.png",
     );
   });
+
+  test("with submenu", async ({ page }) => {
+    await gotoStory(page, "with-submenu");
+    await expect(page).toHaveScreenshot("main-button-mobile-with-submenu.png");
+  });
+
+  test("without menu", async ({ page }) => {
+    await gotoStory(page, "without-menu");
+    await expect(page).toHaveScreenshot("main-button-mobile-without-menu.png");
+  });
 });
 
 test.describe("MainButtonMobile — dark", () => {

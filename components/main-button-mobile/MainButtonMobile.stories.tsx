@@ -1,36 +1,16 @@
-import { useEffect, useState } from "react";
-
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
-import DownloadReactSvgUrl from "../../assets/icons/16/download.react.svg?url";
 
 import { MainButtonMobile } from ".";
-import styles from "./MainButtonMobile.stories.module.scss";
 
-import { isDesktop as checkIsDesktop, size } from "../../utils/device";
-
-const useIsDesktop = () => {
-  const [isDesktopView, setIsDesktopView] = useState(checkIsDesktop);
-
-  useEffect(() => {
-    const handleResize = () =>
-      setIsDesktopView(window.innerWidth >= size.desktop);
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  return isDesktopView;
+const cornerStyle: CSSProperties = {
+  position: "fixed",
+  bottom: "24px",
+  insetInlineEnd: "24px",
 };
-
-const DesktopWarning = () => (
-  <div className={styles.desktopWarning}>
-    Need change to tablet or mobile viewport
-  </div>
-);
 
 const actionOptions = [
   {
@@ -55,112 +35,201 @@ const actionOptions = [
   },
 ];
 
+const buttonOptions = [
+  {
+    key: "1",
+    label: "Upload files",
+    icon: CatalogFolderReactSvgUrl,
+  },
+  {
+    key: "2",
+    label: "Upload folder",
+    icon: CatalogFolderReactSvgUrl,
+  },
+];
+
 const meta = {
   title: "UI/Interactive elements/MainButtonMobile",
   component: MainButtonMobile,
   parameters: {
     layout: "fullscreen",
     docs: {
+      // The button and its menu are position: fixed; each story needs a window of its own on Docs.
+      story: { inline: false, height: "500px" },
       description: {
-        component: `A mobile-friendly floating action button with dropdown menu and progress indicators.
+        component: `A round button fixed to the corner of a phone or tablet screen that opens a menu of creating actions.
 
 ### Features
 
-- **Floating Action Button**: Fixed-position button for primary mobile actions
-- **Dropdown Menu**: Expandable menu with action items and icons
-- **Upload Button**: Optional secondary button section for file upload actions
-- **Progress Indicator**: Built-in upload progress percentage display
-- **Alert Badge**: Optional alert indicator on the button
-- **Submenu Support**: Nested menu items within action options
+- **Floating Button**: Shows a round plus button that turns into a minus while its menu is open
+- **Dropdown Menu**: Opens a menu above the button whose items carry an icon, a label and an optional second line
+- **Two Groups**: Draws a second group of items under the first on a background of its own, or on the plain menu background
+- **Submenu Support**: Expands an item's nested items in place under it, optionally open from the start
+- **Alert Badge**: Marks the closed button with a badge whose click can be reported to the host
+- **Single Action Mode**: Calls one click handler instead of opening the menu when the menu is turned off
+- **Dismissal**: Closes the menu on a click outside it, on choosing an item and on the browser's Back button
+
+### Accessibility
+
+The component relies on the roles of the parts it is built from:
+
+- **Button name**: The round button is announced as "plus button" while the menu is closed and "minus button" while it is open, in English whatever the interface language
+- **Menu roles**: The open menu is announced as a listbox and each item in it as an option
 
 ### Usage
 
 \`\`\`tsx
 import { MainButtonMobile } from "@onlyoffice/apps-ui-kit/components/main-button-mobile";
 
-// Basic mobile button with dropdown
+// Menu of creating actions
 <MainButtonMobile
-  title="Upload"
   actionOptions={[
-    { key: "1", label: "New document", icon: FolderIcon },
-    { key: "2", label: "New folder", icon: FolderIcon },
+    { key: "doc", label: "New document", icon: FolderIcon, onClick: ({ action }) => create(action), action: "doc" },
+    { key: "folder", label: "New folder", icon: FolderIcon },
   ]}
 />
 
-// With upload button options
+// A second group under the first
 <MainButtonMobile
-  title="Upload"
   actionOptions={actionOptions}
-  withButton
   buttonOptions={[
-    { key: "1", label: "Import files", icon: DownloadIcon, onClick: handleImport },
+    { key: "upload", label: "Upload files", icon: FolderIcon, onClick: handleUpload },
   ]}
 />
+
+// One action, no menu
+<MainButtonMobile withMenu={false} onClick={handleUpload} />
 \`\`\``,
       },
     },
   },
   argTypes: {
-    title: {
-      control: "text",
-      description: "The button name displayed in the dropdown",
+    actionOptions: {
+      control: "object",
+      description:
+        "Items of the upper group of the menu. An item with `items` becomes a submenu that expands in place; its handler is called with the item's `action`",
     },
-    percent: {
-      control: { type: "range", min: 0, max: 100, step: 1 },
-      description: "Upload progress percentage",
-      table: {
-        defaultValue: { summary: "0" },
-      },
+    buttonOptions: {
+      control: "object",
+      description:
+        "Items of the lower group, drawn on a background of their own. An item with `items` becomes a submenu",
     },
     opened: {
       control: "boolean",
-      description: "Controls whether the dropdown menu is open",
+      description:
+        "Whether the menu is open. The button still toggles it on its own, so it changes back without telling you",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     alert: {
       control: "boolean",
-      description: "Shows an alert indicator on the button",
+      description:
+        "Shows an alert badge on the button while the menu is closed",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    withAlertClick: {
+      control: "boolean",
+      description: "Whether a click on the alert badge calls `onAlertClick`",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withMenu: {
       control: "boolean",
-      description: "Whether to show the dropdown menu",
+      description:
+        "Whether the button opens the menu. When off, a click calls `onClick` and the menu never opens",
       table: {
         defaultValue: { summary: "true" },
       },
     },
-    withButton: {
-      control: "boolean",
-      description: "Displays a secondary button inside the dropdown",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
     withoutButton: {
       control: "boolean",
-      description: "If true, hides the main floating button",
+      description:
+        "Draws the lower group on the plain grey background instead of its own blue one; nothing is hidden",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isOpenButton: {
       control: "boolean",
-      description: "Opens the secondary button menu",
+      description:
+        "Whether `onClose` is called at all. It then fires on every toggle, including the one that opens the menu",
       table: {
         defaultValue: { summary: "false" },
       },
     },
+    manualWidth: {
+      control: "text",
+      description:
+        "Width of the menu as a CSS length, never wider than the window less 48px",
+      table: {
+        defaultValue: { summary: "400px" },
+      },
+    },
+    dropdownStyle: {
+      control: "object",
+      description:
+        "Inline style of the menu. The height is measured from the items and overrides any height given here",
+    },
+    style: {
+      control: "object",
+      description:
+        "Inline style of the wrapper that carries the button and the menu, applied after its own z-index",
+    },
+    className: {
+      control: "text",
+      description: "Class of the wrapper that carries the button and the menu",
+    },
     onClick: {
       action: "onClick",
-      description: "Click handler for the main button",
+      description:
+        "Called with the click event when the button is clicked, and only while `withMenu` is off",
     },
     onClose: {
       action: "onClose",
-      description: "Callback when the dropdown is closed",
+      description:
+        "Called on every toggle of the menu, opening included, and only while `isOpenButton` is set",
+    },
+    onAlertClick: {
+      action: "onAlertClick",
+      description:
+        "Called when the alert badge is clicked, and only while `withAlertClick` is set",
+    },
+    ref: {
+      control: false,
+      description:
+        "Handle exposing `contains(target)` and `getButtonElement()`, for telling whether a click landed on the button",
+    },
+    title: {
+      control: false,
+      description:
+        "Ignored. Nothing reads this prop; the groups have no heading",
+    },
+    percent: {
+      control: false,
+      description:
+        "Ignored. Nothing reads this prop; the button draws no progress",
+    },
+    withButton: {
+      control: false,
+      description: "Ignored. Nothing reads this prop",
+    },
+    onUploadClick: {
+      control: false,
+      description:
+        "Ignored. Nothing reads this prop; the button's own handler is `onClick`",
+    },
+    sectionWidth: {
+      control: false,
+      description: "Ignored. Nothing reads this prop",
+    },
+    mainButtonRef: {
+      control: false,
+      description:
+        "Ignored. The component keeps its own element ref; use `ref` to reach the button",
     },
   },
 } satisfies Meta<typeof MainButtonMobile>;
@@ -169,123 +238,125 @@ type Story = StoryObj<ComponentProps<typeof MainButtonMobile>>;
 
 export default meta;
 
-const InteractiveTemplate = ({ ...args }) => {
-  const isDesktop = useIsDesktop();
-  const [isOpenButton, setIsOpenButton] = useState(false);
-
-  const buttonOptions = [
-    {
-      key: "1",
-      label: "Import files",
-      icon: DownloadReactSvgUrl,
-      onClick: () => setIsOpenButton(false),
-    },
-    {
-      key: "2",
-      label: "Import folder",
-      icon: DownloadReactSvgUrl,
-      onClick: () => setIsOpenButton(false),
-    },
-    {
-      key: "4",
-      label: "Upload from cloud",
-      icon: DownloadReactSvgUrl,
-      onClick: () => setIsOpenButton(false),
-    },
-  ];
-
-  if (isDesktop) return <DesktopWarning />;
-
-  return (
-    <MainButtonMobile
-      {...args}
-      style={{
-        position: "fixed",
-        bottom: "24px",
-        insetInlineEnd: "24px",
-      }}
-      actionOptions={actionOptions}
-      buttonOptions={buttonOptions}
-      isOpenButton={isOpenButton}
-      onClose={() => setIsOpenButton(false)}
-    />
-  );
-};
-
 export const Default: Story = {
-  render: (args) => <InteractiveTemplate {...args} />,
   args: {
-    title: "Upload",
     opened: false,
     alert: false,
     withMenu: true,
+    style: cornerStyle,
     actionOptions,
+    buttonOptions,
   },
-};
-
-const WithAlertTemplate = () => {
-  const isDesktop = useIsDesktop();
-
-  if (isDesktop) return <DesktopWarning />;
-
-  return (
-    <MainButtonMobile
-      title="Upload"
-      alert
-      style={{
-        position: "fixed",
-        bottom: "24px",
-        insetInlineEnd: "24px",
-      }}
-      actionOptions={actionOptions}
-    />
-  );
-};
-
-export const WithAlert: Story = {
-  render: () => <WithAlertTemplate />,
   parameters: {
     docs: {
       description: {
         story:
-          "MainButtonMobile with an alert indicator. Draws attention to notifications or important updates.",
+          "The button in the corner of the screen with both groups of items. Tap it to open the menu, tap outside or pick an item to close it, and change any other prop live in the Controls panel below.",
       },
       source: {
-        code: `<MainButtonMobile title="Upload" alert actionOptions={actionOptions} />`,
+        code: `<MainButtonMobile
+  style={{ position: "fixed", bottom: "24px", insetInlineEnd: "24px" }}
+  actionOptions={actionOptions}
+  buttonOptions={buttonOptions}
+/>`,
       },
     },
   },
 };
 
-const WithProgressTemplate = () => {
-  const isDesktop = useIsDesktop();
-
-  if (isDesktop) return <DesktopWarning />;
-
-  return (
-    <MainButtonMobile
-      title="Upload"
-      percent={65}
-      style={{
-        position: "fixed",
-        bottom: "24px",
-        insetInlineEnd: "24px",
-      }}
-      actionOptions={actionOptions}
-    />
-  );
-};
-
-export const WithProgress: Story = {
-  render: () => <WithProgressTemplate />,
+export const WithAlert: Story = {
+  args: {
+    alert: true,
+    withAlertClick: true,
+    style: cornerStyle,
+    actionOptions,
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "MainButtonMobile showing upload progress at 65%. The progress indicator displays around the button.",
+          "A badge on the closed button draws attention to something waiting for the user (`alert`). Click the badge to see `onAlertClick` in the Actions panel, which is called only while `withAlertClick` is set; the badge is hidden while the menu is open.",
       },
       source: {
-        code: `<MainButtonMobile title="Upload" percent={65} actionOptions={actionOptions} />`,
+        code: `<MainButtonMobile
+  alert
+  withAlertClick
+  onAlertClick={openNotifications}
+  actionOptions={actionOptions}
+/>`,
+      },
+    },
+  },
+};
+
+export const WithSubmenu: Story = {
+  args: {
+    opened: true,
+    style: cornerStyle,
+    actionOptions: [
+      {
+        key: "form",
+        label: "New form",
+        icon: CatalogFolderReactSvgUrl,
+        openByDefault: true,
+        items: [
+          { key: "form-blank", label: "From blank", action: "form-blank" },
+          {
+            key: "form-file",
+            label: "From a text file",
+            action: "form-file",
+          },
+        ],
+      },
+      {
+        key: "folder",
+        label: "New folder",
+        icon: CatalogFolderReactSvgUrl,
+        description: "Keeps related files together",
+      },
+    ],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Groups related actions under one item without opening a second menu. **New form** opens its nested items in place under it, already expanded (`items`, `openByDefault`); **New folder** carries a second line under its label (`description`).",
+      },
+      source: {
+        code: `<MainButtonMobile
+  opened
+  actionOptions={[
+    {
+      key: "form",
+      label: "New form",
+      icon: FolderIcon,
+      openByDefault: true,
+      items: [
+        { key: "form-blank", label: "From blank", action: "form-blank" },
+        { key: "form-file", label: "From a text file", action: "form-file" },
+      ],
+    },
+    { key: "folder", label: "New folder", icon: FolderIcon, description: "Keeps related files together" },
+  ]}
+/>`,
+      },
+    },
+  },
+};
+
+export const WithoutMenu: Story = {
+  args: {
+    withMenu: false,
+    style: cornerStyle,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a screen with only one thing to create, the button runs that action directly (`withMenu`). Click it to see `onClick` in the Actions panel; no menu opens.",
+      },
+      source: {
+        code: `<MainButtonMobile withMenu={false} onClick={handleUpload} />`,
       },
     },
   },
@@ -298,25 +369,18 @@ export const CssCustomization: Story = {
         {
           "--main-button-mobile-button-color": "#7c3aed",
           "--main-button-mobile-icon-fill": "#ffffff",
-          "--main-button-mobile-circle-background": "#7c3aed",
-          "--main-button-mobile-z-index": "100",
           "--main-button-mobile-badge-size": "14px",
           "--main-button-mobile-badge-offset": "8px",
-          "--main-button-mobile-progress-height": "6px",
-          "--main-button-mobile-progress-radius": "6px",
           "--main-button-mobile-dropdown-item-padding": "8px 20px",
+          "--main-button-mobile-button-options-background-color": "#5b21b6",
         } as CSSProperties
       }
     >
       <MainButtonMobile
-        title="New"
+        alert
         actionOptions={actionOptions}
-        percent={65}
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          insetInlineEnd: "24px",
-        }}
+        buttonOptions={buttonOptions}
+        style={cornerStyle}
       />
     </div>
   ),
@@ -327,15 +391,29 @@ export const CssCustomization: Story = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--main-button-mobile-button-color\` | Button background color | accent |
-| \`--main-button-mobile-icon-fill\` | Icon fill color | white |
-| \`--main-button-mobile-circle-background\` | Progress circle fill | accent |
-| \`--main-button-mobile-z-index\` | Stack order | \`1010\` |
+| \`--main-button-mobile-button-color\` | Button background color | theme-based |
+| \`--main-button-mobile-icon-fill\` | Fill of the plus and minus | theme-based |
+| \`--main-button-mobile-z-index\` | Stack order of the button against its open menu; below \`202\` the open menu covers the button, so the example leaves it alone | \`1010\` |
 | \`--main-button-mobile-badge-size\` | Alert badge size | \`12px\` |
-| \`--main-button-mobile-badge-offset\` | Alert badge position offset | \`10px\` |
-| \`--main-button-mobile-progress-height\` | Progress bar height | \`4px\` |
-| \`--main-button-mobile-progress-radius\` | Progress bar border-radius | \`2px\` |
-| \`--main-button-mobile-dropdown-item-padding\` | Dropdown item padding | \`6px 23px\` |`,
+| \`--main-button-mobile-badge-offset\` | Alert badge inset from the button's top trailing corner | \`10px\` |
+| \`--main-button-mobile-dropdown-item-padding\` | Padding of one menu item | \`6px 23px\` |
+| \`--main-button-mobile-button-options-background-color\` | Background of the lower group of items | theme-based |
+
+One instance, with the alert badge on so the badge variables show. Open the menu to see the item padding and the lower group's background.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--main-button-mobile-button-color": "#7c3aed",
+    "--main-button-mobile-icon-fill": "#ffffff",
+    "--main-button-mobile-badge-size": "14px",
+    "--main-button-mobile-badge-offset": "8px",
+    "--main-button-mobile-dropdown-item-padding": "8px 20px",
+    "--main-button-mobile-button-options-background-color": "#5b21b6",
+  }}
+>
+  <MainButtonMobile alert actionOptions={actionOptions} buttonOptions={buttonOptions} />
+</div>`,
       },
     },
   },
