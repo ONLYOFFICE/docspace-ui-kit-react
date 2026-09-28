@@ -1,8 +1,8 @@
 import { type Page, expect, test } from "@playwright/test";
 
-// Title: "UI/Data display/Label"
-// → prefix: "ui-data-display-label"
-const STORY_BASE = "ui-data-display-label";
+// Title: "UI/Form controls/Label"
+// → prefix: "ui-form-controls-label"
+const STORY_BASE = "ui-form-controls-label";
 
 async function gotoStory(page: Page, storyId: string) {
   const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;

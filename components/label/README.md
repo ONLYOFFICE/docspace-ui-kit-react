@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["field-container", "text", "text-input"],
   "subComponents": [],
-  "testIds": ["label", "required-mark"]
+  "testIds": ["label", "required-mark"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Label
