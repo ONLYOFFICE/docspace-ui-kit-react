@@ -46,6 +46,12 @@ const CASES: Case[] = [
     shot: "table-header-without-sorting",
   },
   {
+    name: "header right to left",
+    base: BASE.header,
+    story: "right-to-left",
+    shot: "table-header-right-to-left",
+  },
+  {
     name: "header cell",
     base: BASE.headerCell,
     story: "default",
@@ -91,6 +97,18 @@ const CASES: Case[] = [
     shot: "table-group-menu-indeterminate",
   },
   {
+    name: "group menu info panel open",
+    base: BASE.groupMenu,
+    story: "info-panel-open",
+    shot: "table-group-menu-info-panel-open",
+  },
+  {
+    name: "group menu right to left",
+    base: BASE.groupMenu,
+    story: "right-to-left",
+    shot: "table-group-menu-right-to-left",
+  },
+  {
     name: "group menu css customization",
     base: BASE.groupMenu,
     story: "css-customization",
@@ -107,6 +125,12 @@ const CASES: Case[] = [
     base: BASE.settings,
     story: "disabled",
     shot: "table-settings-disabled",
+  },
+  {
+    name: "settings with locked columns",
+    base: BASE.settings,
+    story: "with-locked-columns",
+    shot: "table-settings-with-locked-columns",
   },
   {
     name: "group menu item",

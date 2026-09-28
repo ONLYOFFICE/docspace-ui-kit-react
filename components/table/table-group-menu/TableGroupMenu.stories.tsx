@@ -15,22 +15,23 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `TableGroupMenu displays a bulk action toolbar when table rows are selected.
+        component: `TableGroupMenu is the toolbar that takes the place of the table header while rows are selected, with a select-all checkbox and the actions that apply to the selection.
 
 ### Features
 
-- **Checkbox with ComboBox**: Select all or filter selection via dropdown options
-- **Action Buttons**: Configurable menu items with icons and optional dropdowns
-- **Indeterminate State**: Visual indicator for partial selection
-- **Header Label**: Optional label displayed next to the checkbox
-- **Info Panel Toggle**: Built-in button to toggle the info panel
-- **Closeable**: Optional close button to dismiss the group menu
-- **Blocked State**: Disables all actions while an operation is in progress
+- **Select All**: Opens with a checkbox that selects or clears every row, calling \`onChange\` with its new state, and draws it partly ticked for a partial selection
+- **Selection Filter**: Follows the checkbox with an arrow that opens \`checkboxOptions\`, such as picking only the folders, unless \`withComboBox\` is off
+- **Header Label**: Shows \`headerLabel\` in place of the checkbox, for a toolbar with nothing to select all
+- **Action Buttons**: Lays the \`headerMenu\` entries out after a separator, scrolls them sideways when they do not fit, and leaves out an entry whose \`disabled\` is set
+- **Blocked State**: With \`isBlocked\`, greys every action out and ignores clicks on them while an operation is running
+- **Info Panel Toggle**: Ends with a button that calls \`toggleInfoPanel\`, drawn on a round background while \`isInfoPanelVisible\`; \`withoutInfoPanelToggler\` leaves it out
+- **Close Button**: With \`isCloseable\`, adds a cross before the toggle that calls \`onCloseClick\`
+- **Right-to-Left**: Runs from right to left in an RTL interface and mirrors the info panel icon
 
 ### Usage
 
 \`\`\`tsx
-import { TableGroupMenu } from "@onlyoffice/apps-ui-kit/components/table/table-group-menu";
+import { TableGroupMenu } from "@onlyoffice/apps-ui-kit/components/table";
 
 <TableGroupMenu
   isChecked={allSelected}
@@ -48,65 +49,95 @@ import { TableGroupMenu } from "@onlyoffice/apps-ui-kit/components/table/table-g
   argTypes: {
     isChecked: {
       control: "boolean",
-      description: "Whether the select-all checkbox is checked",
-      table: {
-        defaultValue: { summary: "false" },
-      },
+      description: "Ticks the select-all checkbox",
     },
     isIndeterminate: {
       control: "boolean",
       description:
-        "Whether the checkbox is in an indeterminate state (partial selection)",
+        "Draws the select-all checkbox partly ticked, for a selection that covers some rows but not all",
+    },
+    headerMenu: {
+      control: false,
+      description:
+        "The action buttons, in order; an entry whose `disabled` is set is left out",
+    },
+    checkboxOptions: {
+      control: false,
+      description:
+        "Element whose children become the options of the menu the arrow after the checkbox opens",
+    },
+    withComboBox: {
+      control: "boolean",
+      description:
+        "Shows the arrow after the checkbox that opens `checkboxOptions`",
       table: {
-        defaultValue: { summary: "false" },
+        defaultValue: { summary: "true" },
+      },
+    },
+    headerLabel: {
+      control: "text",
+      description: "Text shown in place of the select-all checkbox",
+    },
+    checkboxMargin: {
+      control: "text",
+      description:
+        "Space before the checkbox or the label as a CSS length, such as `12px`; tablets and phones always use 24px",
+      table: {
+        defaultValue: { summary: "28px" },
       },
     },
     isBlocked: {
       control: "boolean",
-      description: "Block all interactions while an operation is in progress",
+      description: "Greys every action button out and ignores clicks on them",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isMobileView: {
       control: "boolean",
-      description: "Enable mobile-optimized layout",
+      description:
+        "Opens the selection menu and the action menus in their phone form",
       table: {
         defaultValue: { summary: "false" },
       },
+    },
+    withoutInfoPanelToggler: {
+      control: "boolean",
+      description: "Leaves out the info panel button at the end",
     },
     isInfoPanelVisible: {
       control: "boolean",
-      description: "Whether the info panel is currently visible",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    withComboBox: {
-      control: "boolean",
       description:
-        "Show a dropdown combo box next to the checkbox for selection filtering",
+        "Draws the info panel button in the accent colour on a round background",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isCloseable: {
       control: "boolean",
-      description: "Show a close button to dismiss the group menu",
+      description:
+        "Adds a cross before the info panel button; it comes together with `onCloseClick`",
       table: {
         defaultValue: { summary: "false" },
       },
     },
-    headerLabel: {
-      control: "text",
-      description: "Optional label displayed next to the checkbox",
+    onChange: {
+      action: "onChange",
+      description:
+        "Called with the new state when the select-all checkbox is clicked",
     },
-    onChange: { control: false },
-    onClick: { control: false },
-    toggleInfoPanel: { control: false },
-    onCloseClick: { control: false },
-    headerMenu: { control: false },
-    checkboxOptions: { control: false },
+    onClick: {
+      action: "onClick",
+      description: "Called on a click anywhere in the toolbar",
+    },
+    toggleInfoPanel: {
+      action: "toggleInfoPanel",
+      description: "Called when the info panel button is clicked",
+    },
+    onCloseClick: {
+      action: "onCloseClick",
+      description: "Called when the cross is clicked",
+    },
   },
   decorators: [
     (Story) => {
@@ -195,7 +226,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default group menu with checkbox, combo box, and action buttons. Appears when rows are selected.",
+          "The toolbar a user sees after selecting rows, with the actions that apply to them; change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<TableGroupMenu
@@ -222,7 +253,7 @@ export const Checked: Story = {
     docs: {
       description: {
         story:
-          "Group menu with the select-all checkbox in a checked state, indicating all items are selected.",
+          "Every row is selected, so the checkbox is ticked and a click on it clears the selection (`isChecked`).",
       },
       source: {
         code: `<TableGroupMenu
@@ -248,7 +279,7 @@ export const Indeterminate: Story = {
     docs: {
       description: {
         story:
-          "Group menu with the checkbox in an indeterminate state, indicating partial selection.",
+          "Some rows but not all are selected, so the checkbox is partly ticked and a click on it selects the rest (`isIndeterminate`).",
       },
       source: {
         code: `<TableGroupMenu
@@ -274,7 +305,7 @@ export const WithHeaderLabel: Story = {
     docs: {
       description: {
         story:
-          "Group menu with a custom header label displayed next to the checkbox.",
+          "A text in place of the checkbox, for a toolbar that acts on something other than a list of rows the user can select all of (`headerLabel`).",
       },
       source: {
         code: `<TableGroupMenu
@@ -301,7 +332,7 @@ export const Closeable: Story = {
     docs: {
       description: {
         story:
-          "Group menu with a close button that allows users to dismiss the toolbar.",
+          "A cross before the info panel button, for a toolbar the user can dismiss without clearing the selection by hand (`isCloseable`, `onCloseClick`).",
       },
       source: {
         code: `<TableGroupMenu
@@ -328,7 +359,7 @@ export const Blocked: Story = {
     docs: {
       description: {
         story:
-          "Group menu in a blocked state. All actions are disabled while an operation is in progress.",
+          "Every action greyed out and ignoring clicks while an operation on the selection is still running (`isBlocked`); the checkbox stays usable.",
       },
       source: {
         code: `<TableGroupMenu
@@ -339,6 +370,63 @@ export const Blocked: Story = {
   onClick={handleClick}
   withComboBox
 />`,
+      },
+    },
+  },
+};
+
+export const InfoPanelOpen: Story = {
+  render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
+  args: {
+    ...Default.args,
+    isInfoPanelVisible: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "While the info panel is open, its button at the end is drawn in the accent colour on a round background, so the user sees that a click closes the panel (`isInfoPanelVisible`).",
+      },
+      source: {
+        code: `<TableGroupMenu
+  isInfoPanelVisible
+  toggleInfoPanel={handleToggle}
+  headerMenu={menuItems}
+  checkboxOptions={checkboxDropdown}
+  onChange={handleChange}
+/>`,
+      },
+    },
+  },
+};
+
+export const RightToLeft: Story = {
+  render: (args: TableGroupMenuProps) => (
+    <div dir="rtl" style={{ height: "100%" }}>
+      <TableGroupMenu {...args} />
+    </div>
+  ),
+  args: {
+    ...Default.args,
+    headerMenu: createMenuItems().map((item) => ({
+      ...item,
+      label: item.id === "menu-info" ? "\u05DE\u05D9\u05D3\u05E2" : item.label,
+    })),
+  },
+  globals: { direction: "rtl" },
+  parameters: {
+    noPadding: true,
+    docs: {
+      // Framed, because the RTL provider would flip the whole Docs page
+      story: { inline: false, height: "94px" },
+      description: {
+        story:
+          "In a right-to-left interface the checkbox moves to the right edge, the actions follow it leftwards and the info panel button sits at the left edge with its icon mirrored.",
+      },
+      source: {
+        code: `<div dir="rtl">
+  <TableGroupMenu headerMenu={menuItems} onChange={handleChange} />
+</div>`,
       },
     },
   },
@@ -366,7 +454,14 @@ export const CssCustomization: Story = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--table-group-menu-checkbox-margin\` | \`margin-inline-start\` of the checkbox / label element on desktop | \`28px\` |`,
+| \`--table-group-menu-checkbox-margin\` | \`margin-inline-start\` of the checkbox / label element on desktop | \`28px\` |
+
+The \`checkboxMargin\` prop writes the same variable onto the toolbar and wins over a value set on a wrapper.`,
+      },
+      source: {
+        code: `<div style={{ "--table-group-menu-checkbox-margin": "12px" }}>
+  <TableGroupMenu headerMenu={menuItems} onChange={handleChange} />
+</div>`,
       },
     },
   },

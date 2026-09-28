@@ -10,30 +10,41 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `GroupMenuItem renders an individual action button within the TableGroupMenu toolbar.
+        component: `GroupMenuItem is one action button of a TableGroupMenu, the toolbar that replaces the table header while rows are selected.
 
 ### Features
 
-- **Icon Support**: Displays an icon alongside the action label
-- **Dropdown Options**: Can expand into a dropdown with sub-options
-- **Blocked State**: Disables the item when bulk operations are in progress
-- **Disabled State**: Individual items can be disabled independently
+- **Icon and Label**: Draws the icon fetched from \`iconUrl\` before the label, with \`title\` as the hover tooltip and the label as the tooltip when \`title\` is empty
+- **Action Menu**: With \`withDropDown\`, opens its \`options\` in a menu under the button on click, after calling \`onClick\`
+- **Menu Sizing**: Widens the menu to 354 pixels when its options carry descriptions, or with \`fixedDropdownStyles\` makes it 161 pixels wide and five rows high at most
+- **Left Out When Disabled**: Renders nothing at all while the item's \`disabled\` is set, so an action that does not apply to the selection disappears from the toolbar
+- **Blocked State**: With \`isBlocked\`, greys the button and its icon out and ignores clicks, while an operation on the selection is still running
+- **Narrow Layouts**: Puts the icon above the label on a tablet and hides the label on a phone, leaving the icon alone
+
+### Accessibility
+
+The item renders a native \`<button>\` through Button, which supplies what keyboard and screen-reader users get:
+
+- Focusable with Tab and activated with Enter and Space
+- The label is the button's accessible name, even on a phone where it is not drawn
+- \`isBlocked\` sets the native \`disabled\`, which takes the button out of the tab order
 
 ### Usage
 
 \`\`\`tsx
-import { GroupMenuItem } from "@onlyoffice/apps-ui-kit/components/table/sub-components/group-menu-item";
+// GroupMenuItem is not exported on its own: TableGroupMenu renders one per headerMenu entry
+import { TableGroupMenu } from "@onlyoffice/apps-ui-kit/components/table";
 
-<GroupMenuItem
-  item={{
-    id: "action-1",
-    label: "Move",
-    title: "Move selected items",
-    iconUrl: moveIconUrl,
-    onClick: handleMove,
-    disabled: false,
-  }}
-  isBlocked={false}
+<TableGroupMenu
+  headerMenu={[
+    { id: "move", label: "Move", title: "Move", iconUrl: moveIconUrl, disabled: false, onClick: handleMove },
+    {
+      id: "share", label: "Share", title: "Share", iconUrl: shareIconUrl, disabled: false, onClick: () => {},
+      withDropDown: true,
+      options: [{ key: "link", label: "Copy link", onClick: copyLink }],
+    },
+  ]}
+  {...groupMenuProps}
 />
 \`\`\``,
       },
@@ -42,7 +53,7 @@ import { GroupMenuItem } from "@onlyoffice/apps-ui-kit/components/table/sub-comp
   argTypes: {
     isBlocked: {
       control: "boolean",
-      description: "Block the menu item while a bulk operation is in progress",
+      description: "Greys the button out and ignores clicks on it",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -50,7 +61,14 @@ import { GroupMenuItem } from "@onlyoffice/apps-ui-kit/components/table/sub-comp
     item: {
       control: false,
       description:
-        "Menu item configuration object with label, icon, and click handler",
+        "The action: its label, icon URL, tooltip, click handler, and the options of its menu when it has one",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Value of the item's `data-testid` attribute",
+      table: {
+        defaultValue: { summary: "group-menu-item" },
+      },
     },
   },
 } satisfies Meta<typeof GroupMenuItem>;
@@ -85,7 +103,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default group menu item with a label and click handler. Renders as a simple action button.",
+          "A single action applied to every selected row with one click, the most common entry of a group menu; change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<GroupMenuItem
@@ -128,7 +146,7 @@ export const WithDropdown: Story = {
     docs: {
       description: {
         story:
-          "Group menu item with a dropdown containing sub-options. Click to expand the dropdown list.",
+          "An action with variants: click the button and pick one of its options from the menu under it (`withDropDown`, `options`).",
       },
       source: {
         code: `<GroupMenuItem
@@ -162,7 +180,7 @@ export const Blocked: Story = {
     docs: {
       description: {
         story:
-          "Group menu item in a blocked state. The item is disabled and cannot be interacted with.",
+          "The same button greyed out and ignoring clicks, while an operation on the selection is still running (`isBlocked`).",
       },
       source: {
         code: `<GroupMenuItem

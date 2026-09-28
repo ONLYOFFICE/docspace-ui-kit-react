@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": "onHideContextMenu", "loading": null, "disabled": "isBlocked" },
   "related": ["rows", "context-menu", "checkbox"],
   "subComponents": ["TableContainer", "TableHeader", "TableBody", "TableRow", "TableCell", "TableGroupMenu"],
-  "testIds": ["table-container", "table-header", "table-body", "table-row", "table-cell", "table-group-menu", "table-settings"]
+  "testIds": ["table-container", "table-header", "table-body", "table-row", "table-cell", "table-group-menu", "table-settings"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Table
