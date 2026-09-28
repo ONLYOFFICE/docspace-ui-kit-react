@@ -23,6 +23,11 @@ test.describe("RadioButton — light", () => {
     await expect(page).toHaveScreenshot("radio-button-checked-states.png");
   });
 
+  test("with spacing", async ({ page }) => {
+    await gotoStory(page, "with-spacing");
+    await expect(page).toHaveScreenshot("radio-button-with-spacing.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("radio-button-css-customization.png");
@@ -48,6 +53,12 @@ test.describe("RadioButton — dark", () => {
     await gotoStory(page, "checked-states");
     await page.evaluate(() => document.body.classList.add("dark"));
     await expect(page).toHaveScreenshot("radio-button-checked-states-dark.png");
+  });
+
+  test("with spacing dark", async ({ page }) => {
+    await gotoStory(page, "with-spacing");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await expect(page).toHaveScreenshot("radio-button-with-spacing-dark.png");
   });
 
   test("css customization dark", async ({ page }) => {
