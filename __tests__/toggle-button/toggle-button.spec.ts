@@ -29,6 +29,11 @@ test.describe("ToggleButton — light", () => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("toggle-button-css-customization.png");
   });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("toggle-button-right-to-left.png");
+  });
 });
 
 test.describe("ToggleButton — dark", () => {
