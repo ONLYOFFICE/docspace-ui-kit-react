@@ -12,11 +12,12 @@ export type ColorInputProps = {
    */
   defaultColor?: string;
   /**
-   * Called with the new hex colour on every keystroke in the field and on every
-   * move inside the picker. There is no confirm step and no `onApply`.
+   * Called with the new hex colour each time the field holds a complete 3- or
+   * 6-digit code, and on every move inside the picker. There is no confirm step
+   * and no `onApply`.
    */
   handleChange?: (color: string) => void;
-  /** Height of the field. */
+  /** Width, font size and padding of the field; the height does not change. */
   size?: InputSize;
   /** Whether the field stretches to fill its container. */
   scale?: boolean;
