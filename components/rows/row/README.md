@@ -13,7 +13,8 @@
   "state": { "visibility": null, "close": "rowContextClose", "loading": "inProgress", "disabled": "isDisabled" },
   "related": ["rows", "rows/row-content", "context-menu"],
   "subComponents": [],
-  "testIds": ["row"]
+  "testIds": ["row"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Row
