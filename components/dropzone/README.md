@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": "isLoading", "disabled": "isDisabled" },
   "related": ["drag-and-drop", "progress-bar", "file-input"],
   "subComponents": [],
-  "testIds": ["dropzone", "dropzone-input-area", "dropzone-input", "dropzone-icon", "dropzone-text", "dropzone-main-text", "dropzone-secondary-text", "dropzone-file-types"]
+  "testIds": ["dropzone", "dropzone-input-area", "dropzone-input", "dropzone-icon", "dropzone-text", "dropzone-main-text", "dropzone-secondary-text", "dropzone-file-types"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Dropzone

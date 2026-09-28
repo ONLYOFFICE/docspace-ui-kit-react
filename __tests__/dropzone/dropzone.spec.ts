@@ -17,6 +17,21 @@ test.describe("Dropzone — light", () => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("dropzone-css-customization.png");
   });
+
+  test("upload progress", async ({ page }) => {
+    await gotoStory(page, "upload-progress");
+    await expect(page).toHaveScreenshot("dropzone-upload-progress.png");
+  });
+
+  test("with formats list", async ({ page }) => {
+    await gotoStory(page, "with-formats-list");
+    await expect(page).toHaveScreenshot("dropzone-with-formats-list.png");
+  });
+
+  test("with icon", async ({ page }) => {
+    await gotoStory(page, "with-icon");
+    await expect(page).toHaveScreenshot("dropzone-with-icon.png");
+  });
 });
 
 test.describe("Dropzone — dark", () => {
