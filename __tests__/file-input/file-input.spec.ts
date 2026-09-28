@@ -17,6 +17,21 @@ test.describe("FileInput — light", () => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("file-input-css-customization.png");
   });
+
+  test("with button", async ({ page }) => {
+    await gotoStory(page, "with-button");
+    await expect(page).toHaveScreenshot("file-input-with-button.png");
+  });
+
+  test("document icon", async ({ page }) => {
+    await gotoStory(page, "document-icon");
+    await expect(page).toHaveScreenshot("file-input-document-icon.png");
+  });
+
+  test("with path", async ({ page }) => {
+    await gotoStory(page, "with-path");
+    await expect(page).toHaveScreenshot("file-input-with-path.png");
+  });
 });
 
 test.describe("FileInput — dark", () => {

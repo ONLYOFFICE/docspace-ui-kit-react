@@ -2,6 +2,7 @@ import type React from "react";
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import { InputSize } from "../text-input";
 
@@ -13,22 +14,27 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `File input component for handling file uploads with a button trigger, various states, and multiple size options.
+        component: `Read-only field that lets the user pick files from the device, by clicking it or by dropping files onto it, and shows the names of the chosen files.
 
 ### Features
 
 - **File Selection**: Native file picker with customizable accept filters
+- **Drag and Drop**: Accepts files dropped onto the field as well as files picked in the dialog
 - **Multiple Files**: Support for single or multiple file selection
-- **Three Sizes**: base, middle, and large
-- **Loading State**: Show spinner during upload operations
-- **Validation States**: Error and warning visual indicators
-- **Custom Button Label**: Configurable upload button text
-- **Icon Variants**: Document or folder icon styles
+- **Three Sizes**: Base, middle and large heights, each with its own width, icon box and button size
+- **Loading State**: Replaces the icon with a spinner and stops clicks from opening the picker while the host processes a file
+- **Validation States**: Draws the field and its icon box in error or warning border colours
+- **Trigger Variants**: Ends in a folder icon, a document icon, or a labelled button in place of the icon
+- **Path Display**: Shows a given path instead of chosen file names and hands clicks to the host, for picking from somewhere other than the device
 
 ### Accessibility
 
-- \`aria-label\`: Describes the file input button action
-- \`aria-description\`: Provides additional context for the input
+The root is a focusable element with the button role, whose behaviour comes from \`react-dropzone\`:
+
+- \`role="button"\` and \`tabIndex="0"\` on the root, so it is reached with Tab and announced as a button
+- Enter and Space on the focused root open the file picker
+- \`aria-disabled\`: \`"true"\` while \`isDisabled\`, \`"false"\` otherwise
+- The control has no accessible name of its own: pass \`aria-label\`, and optionally \`aria-description\`, both applied to the root
 
 ### Usage
 
@@ -42,11 +48,20 @@ import { FileInput } from "@onlyoffice/apps-ui-kit/components/file-input";
   accept={[".pdf", ".docx"]}
 />
 
-// Multiple files
+// One file at a time
 <FileInput
-  placeholder="Choose files"
-  isMultiple
-  onInput={(files) => console.log(files)}
+  placeholder="Choose a file"
+  size={InputSize.middle}
+  isMultiple={false}
+  onInput={(file) => console.log(file)}
+/>
+
+// A path chosen elsewhere; clicks go to onClick
+<FileInput
+  size={InputSize.base}
+  fromStorage
+  path="Documents/Report.docx"
+  onClick={openFolderDialog}
 />
 \`\`\``,
       },
@@ -56,66 +71,132 @@ import { FileInput } from "@onlyoffice/apps-ui-kit/components/file-input";
     size: {
       control: "select",
       options: Object.values(InputSize),
-      description: "Size of the input field",
+      description:
+        "Height and width of the field, which also pick the icon box and button sizes",
       table: {
         defaultValue: { summary: "base" },
       },
     },
     placeholder: {
       control: "text",
-      description: "Placeholder text",
+      description: "Text shown in the field until a file is chosen",
     },
     buttonLabel: {
       control: "text",
-      description: "Label for the upload button",
+      description: "Renders a button with this label in place of the icon",
     },
     isDisabled: {
       control: "boolean",
-      description: "Disable the input field",
+      description:
+        "Greys the field out and stops a click from opening the file picker",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isLoading: {
       control: "boolean",
-      description: "Show loading spinner",
+      description:
+        "Replaces the icon with a spinner, greys the field and stops a click from opening the file picker; with a button label the button stays and only the click is stopped",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hasError: {
       control: "boolean",
-      description: "Show error state",
+      description: "Draws the field and its icon box with an error border",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hasWarning: {
       control: "boolean",
-      description: "Show warning state",
+      description: "Draws the field and its icon box with a warning border",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     scale: {
       control: "boolean",
-      description: "Scale input to 100% width",
+      description: "Stretches the field to the full width of its container",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isMultiple: {
       control: "boolean",
-      description: "Allow multiple file selection",
+      description: "Whether several files may be chosen or dropped at once",
       table: {
-        defaultValue: { summary: "false" },
+        defaultValue: { summary: "true" },
       },
     },
     isDocumentIcon: {
       control: "boolean",
-      description: "Use document icon instead of folder icon",
+      description: "Shows a document icon instead of the folder icon",
       table: {
         defaultValue: { summary: "false" },
+      },
+    },
+    accept: {
+      control: "object",
+      description:
+        'File extensions or MIME types the picker offers and a drop accepts, such as `[".pdf", "image/*"]`; a file of any other type is refused with an error toast',
+      table: {
+        defaultValue: { summary: '[""]' },
+      },
+    },
+    onInput: {
+      description:
+        "Called with the chosen files: a single `File` when one was chosen, an array when several were",
+    },
+    fromStorage: {
+      control: "boolean",
+      description:
+        "Stops the field from opening the file picker: it shows `path` instead and passes clicks to `onClick`",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    path: {
+      control: "text",
+      description: "Text shown in the field while `fromStorage` is set",
+    },
+    onClick: {
+      description:
+        "Called when the field or its icon is clicked, only while `fromStorage` is set",
+    },
+    id: {
+      control: "text",
+      description: "Id of the hidden file input, not of the visible field",
+    },
+    idButton: {
+      control: "text",
+      description: "Id of the outermost element",
+    },
+    name: {
+      control: false,
+      description: "Accepted but not used",
+    },
+    className: {
+      control: false,
+      description: "Class added to the outermost element",
+    },
+    style: {
+      control: false,
+      description: "Inline style of the outermost element",
+    },
+    "aria-label": {
+      control: "text",
+      description: "Accessible name of the control, which has none without it",
+    },
+    "aria-description": {
+      control: "text",
+      description: "Accessible description of the control",
+    },
+    "data-test-id": {
+      control: "text",
+      description: "Test id of the outermost element",
+      table: {
+        defaultValue: { summary: "file-input" },
       },
     },
   },
@@ -140,104 +221,6 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   );
 };
 
-const CssCustomizationTemplate = () => {
-  return (
-    <div
-      style={
-        {
-          display: "grid",
-          gridGap: "16px",
-          width: "320px",
-          // === FileInput — border and radius ===
-          "--file-input-border": "#0082c9",
-          "--file-input-hover-border": "#006ba6",
-          "--file-input-focus-border": "#004f82",
-          "--file-input-radius": "8px",
-          // === FileInput — validation states ===
-          "--file-input-warning-border": "#e67e00",
-          "--file-input-error-border": "#c0392b",
-          "--file-input-disabled-border": "#b0cce3",
-          "--file-input-placeholder-color": "#7aa8c7",
-          // === TextInput (inner text field) ===
-          "--text-input-bg": "#f0f8ff",
-          "--text-input-color": "#004f82",
-          "--text-input-radius": "8px 0 0 8px",
-          // === IconButton (trigger icon) ===
-          "--icon-button-color": "#0082c9",
-          "--icon-button-hover-color": "#006ba6",
-        } as CSSProperties
-      }
-    >
-      <FileInput
-        placeholder="Choose file"
-        size={InputSize.base}
-        scale
-        aria-label="Custom styled file input"
-      />
-      <FileInput
-        placeholder="Warning state"
-        size={InputSize.base}
-        scale
-        hasWarning
-        aria-label="Warning file input"
-      />
-      <FileInput
-        placeholder="Error state"
-        size={InputSize.base}
-        scale
-        hasError
-        aria-label="Error file input"
-      />
-      <FileInput
-        placeholder="Disabled"
-        size={InputSize.base}
-        scale
-        isDisabled
-        aria-label="Disabled file input"
-      />
-    </div>
-  );
-};
-
-export const CssCustomization: Story = {
-  render: () => <CssCustomizationTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story: `CSS Custom Properties for external customization:
-
-**FileInput — border**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--file-input-border\` | Default border color | theme-based |
-| \`--file-input-hover-border\` | Hover border color | theme-based |
-| \`--file-input-focus-border\` | Focus/active border color | theme-based |
-| \`--file-input-disabled-border\` | Disabled border color | theme-based |
-| \`--file-input-warning-border\` | Warning state border color | theme-based |
-| \`--file-input-error-border\` | Error state border color | theme-based |
-| \`--file-input-placeholder-color\` | Disabled placeholder text color | theme-based |
-| \`--file-input-radius\` | Icon button border radius | \`3px\` |
-
-**TextInput (inner text field)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--text-input-bg\` | Input background color | theme-based |
-| \`--text-input-color\` | Input text color | theme-based |
-| \`--text-input-radius\` | Input border radius | theme-based |
-
-**IconButton (file picker trigger)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--icon-button-color\` | Icon fill/stroke color | theme-based |
-| \`--icon-button-hover-color\` | Icon hover color | theme-based |`,
-      },
-    },
-  },
-};
-
 export const Default: Story = {
   render: (args) => <FileInput {...args} />,
   args: {
@@ -249,6 +232,23 @@ export const Default: Story = {
     hasError: false,
     hasWarning: false,
     "aria-label": "Choose file",
+    onInput: fn(),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The field as a form shows it before anything is chosen; change any prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<FileInput
+  placeholder="Choose file"
+  size={InputSize.base}
+  aria-label="Choose file"
+  onInput={(file) => console.log(file)}
+/>`,
+      },
+    },
   },
 };
 
@@ -280,7 +280,7 @@ export const Sizes: Story = {
     docs: {
       description: {
         story:
-          "FileInput supports three sizes: base, middle, and large for different UI contexts.",
+          "Pick the size that matches the other fields of the form: each one also sets the field's width and the size of its icon box (`size`).",
       },
       source: {
         code: `<FileInput size={InputSize.base} placeholder="Base size" />
@@ -333,7 +333,7 @@ export const States: Story = {
     docs: {
       description: {
         story:
-          "FileInput supports normal, error, warning, disabled, and loading states.",
+          "Use these to tell the user about the chosen file: **Error state** and **Warning state** recolour the border (`hasError`, `hasWarning`), **Disabled** greys the field and ignores clicks (`isDisabled`), and **Loading** shows a spinner in place of the icon (`isLoading`).",
       },
       source: {
         code: `<FileInput placeholder="Normal" />
@@ -371,7 +371,7 @@ export const WithAcceptFilter: Story = {
     docs: {
       description: {
         story:
-          "The accept prop filters which file types are visible in the file picker dialog.",
+          "Limit the field to the types the host can handle: the picker offers only these extensions, and a dropped file of another type is refused with an error toast (`accept`).",
       },
       source: {
         code: `<FileInput placeholder="Images only" accept={[".png", ".jpg", ".jpeg", ".gif"]} />
@@ -400,10 +400,235 @@ export const ScaledInput: Story = {
     docs: {
       description: {
         story:
-          "Scale prop makes the file input expand to 100% of its container width.",
+          "Use it when the field should line up with a full-width form column: it stretches to the width of its container (`scale`).",
       },
       source: {
         code: `<FileInput placeholder="Scaled file input" scale />`,
+      },
+    },
+  },
+};
+
+const WithButtonTemplate = () => {
+  return (
+    <div style={{ display: "grid", gridGap: "16px", width: "400px" }}>
+      <FileInput
+        size={InputSize.base}
+        placeholder="Base size"
+        buttonLabel="Browse"
+        scale
+        aria-label="Base size file input with a button"
+      />
+      <FileInput
+        size={InputSize.middle}
+        placeholder="Middle size"
+        buttonLabel="Browse"
+        scale
+        aria-label="Middle size file input with a button"
+      />
+      <FileInput
+        size={InputSize.large}
+        placeholder="Large size"
+        buttonLabel="Browse"
+        scale
+        aria-label="Large size file input with a button"
+      />
+    </div>
+  );
+};
+
+export const WithButton: Story = {
+  render: () => <WithButtonTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use a labelled button when an icon alone would not tell the user what the field does: the button takes the place of the icon and grows with the field's size (`buttonLabel`). The field is given the full width of its container here (`scale`), because at a fixed size the button is laid out past the field's own width.",
+      },
+      source: {
+        code: `<FileInput size={InputSize.base} placeholder="Base size" buttonLabel="Browse" scale />
+<FileInput size={InputSize.middle} placeholder="Middle size" buttonLabel="Browse" scale />
+<FileInput size={InputSize.large} placeholder="Large size" buttonLabel="Browse" scale />`,
+      },
+    },
+  },
+};
+
+const DocumentIconTemplate = () => {
+  return (
+    <Wrapper>
+      <FileInput
+        size={InputSize.base}
+        placeholder="Folder icon"
+        aria-label="File input with a folder icon"
+      />
+      <FileInput
+        size={InputSize.base}
+        placeholder="Document icon"
+        isDocumentIcon
+        aria-label="File input with a document icon"
+      />
+    </Wrapper>
+  );
+};
+
+export const DocumentIcon: Story = {
+  render: () => <DocumentIconTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use the document icon when the field takes a single document rather than any file: **Folder icon** is the default, **Document icon** the alternative (`isDocumentIcon`).",
+      },
+      source: {
+        code: `<FileInput size={InputSize.base} placeholder="Folder icon" />
+<FileInput size={InputSize.base} placeholder="Document icon" isDocumentIcon />`,
+      },
+    },
+  },
+};
+
+export const WithPath: Story = {
+  render: (args) => <FileInput {...args} />,
+  args: {
+    size: InputSize.middle,
+    placeholder: "Choose a folder",
+    fromStorage: true,
+    path: "Documents/Reports",
+    "aria-label": "Choose a folder",
+    onClick: fn(),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use this when the file comes from somewhere other than the device, such as a folder picker of the host's own: the field shows the path it is given (`fromStorage`, `path`), and a click on it or its icon calls the host instead of opening the file picker (`onClick`) — click it and watch the Actions panel.",
+      },
+      source: {
+        code: `<FileInput
+  size={InputSize.middle}
+  placeholder="Choose a folder"
+  fromStorage
+  path="Documents/Reports"
+  onClick={openFolderDialog}
+/>`,
+      },
+    },
+  },
+};
+
+const CssCustomizationTemplate = () => {
+  return (
+    <div
+      style={
+        {
+          display: "grid",
+          gridGap: "16px",
+          width: "320px",
+          // === FileInput — border and radius ===
+          "--file-input-border": "#0082c9",
+          "--file-input-hover-border": "#006ba6",
+          "--file-input-focus-border": "#004f82",
+          "--file-input-radius": "8px",
+          // === FileInput — validation states ===
+          "--file-input-warning-border": "#e67e00",
+          "--file-input-error-border": "#c0392b",
+          "--file-input-disabled-border": "#b0cce3",
+          "--file-input-placeholder-color": "#7aa8c7",
+          // === TextInput (inner text field) ===
+          "--text-input-bg": "#f0f8ff",
+          "--text-input-color": "#004f82",
+          "--text-input-radius": "8px 0 0 8px",
+        } as CSSProperties
+      }
+    >
+      <FileInput
+        placeholder="Choose file"
+        size={InputSize.base}
+        scale
+        aria-label="Custom styled file input"
+      />
+      <FileInput
+        placeholder="Warning state"
+        size={InputSize.base}
+        scale
+        hasWarning
+        aria-label="Warning file input"
+      />
+      <FileInput
+        placeholder="Error state"
+        size={InputSize.base}
+        scale
+        hasError
+        aria-label="Error file input"
+      />
+      <FileInput
+        placeholder="Disabled"
+        size={InputSize.base}
+        scale
+        isDisabled
+        aria-label="Disabled file input"
+      />
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+**FileInput — border**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--file-input-border\` | Border colour of the field and its icon box | theme-based |
+| \`--file-input-hover-border\` | Border colour of the icon box while the pointer is over the field | theme-based |
+| \`--file-input-focus-border\` | Border colour of the icon box while the field is pressed | theme-based |
+| \`--file-input-disabled-border\` | Disabled border color | theme-based |
+| \`--file-input-warning-border\` | Warning state border color | theme-based |
+| \`--file-input-error-border\` | Error state border color | theme-based |
+| \`--file-input-placeholder-color\` | Disabled placeholder text color | theme-based |
+| \`--file-input-radius\` | Radius of the icon box's outer corners | \`3px\` |
+
+**TextInput (inner text field)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--text-input-bg\` | Input background color | theme-based |
+| \`--text-input-color\` | Input text color | theme-based |
+| \`--text-input-radius\` | Input border radius | theme-based |
+
+The icon's own colour cannot be changed from outside: the icon sets \`--icon-button-color\` on itself, so a wrapper's value never reaches it.
+
+- **Choose file** — the border, background, text and radius variables; hover it for \`--file-input-hover-border\` and press it for \`--file-input-focus-border\`
+- **Warning state** — \`--file-input-warning-border\` (\`hasWarning\`)
+- **Error state** — \`--file-input-error-border\` (\`hasError\`)
+- **Disabled** — \`--file-input-disabled-border\` and \`--file-input-placeholder-color\` (\`isDisabled\`)`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--file-input-border": "#0082c9",
+    "--file-input-hover-border": "#006ba6",
+    "--file-input-focus-border": "#004f82",
+    "--file-input-radius": "8px",
+    "--file-input-warning-border": "#e67e00",
+    "--file-input-error-border": "#c0392b",
+    "--file-input-disabled-border": "#b0cce3",
+    "--file-input-placeholder-color": "#7aa8c7",
+    "--text-input-bg": "#f0f8ff",
+    "--text-input-color": "#004f82",
+    "--text-input-radius": "8px 0 0 8px",
+  }}
+>
+  <FileInput placeholder="Choose file" size={InputSize.base} scale />
+  <FileInput placeholder="Warning state" size={InputSize.base} scale hasWarning />
+  <FileInput placeholder="Error state" size={InputSize.base} scale hasError />
+  <FileInput placeholder="Disabled" size={InputSize.base} scale isDisabled />
+</div>`,
       },
     },
   },
