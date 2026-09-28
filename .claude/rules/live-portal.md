@@ -187,6 +187,17 @@ createFileJsonElement: { title } })` makes an office document through the docume
   caller to be a content creator in the room; a guest added as editor or viewer gets 403 on the
   session. Its toasts need `<Toast />` mounted once on the page, outside the story root.
   `docs/samples/legal/sending-a-document/SendDocument.tsx` is the working form.
+- **`DocumentEditor` opens a file as whoever the nearest provider is.** Given `fileId` the
+  wrapper calls `filesSettingsApi.getDocServiceUrl()` (`GET /api/2.0/files/docservice`, answer
+  `docServiceUrl`) and `filesApi.openEditFile({ fileId, view })`
+  (`GET /api/2.0/files/file/{id}/openedit?view=true`), then loads
+  `<docServiceUrl>web-apps/apps/api/documents/api.js` and calls `DocsAPI.DocEditor(id, config)`.
+  Under a client's OAuth provider the configuration and its token are minted for the client;
+  `isView` asks for read-only on top of the room role. The wrapper's props type still requires
+  `documentServerUrl` and `config`, so build the props object and cast it, as its story does.
+  It renders nothing until the configuration arrives; `events_onAppReady` is when the editor is
+  up, `onLoadComponentError` when either call or the script failed. Every editor on a page needs
+  its own `id`. `docs/samples/legal/reading-a-draft/DocumentReader.tsx` is the working form.
 - **Never commit a URL or a key.** They belong in `.env`, in the toolbar's `localStorage`, or in
   the reader's own head — a sample that ships a working key ships an open portal.
 - **Anything committed here has to render with no portal at all.** CI, the static build and a
