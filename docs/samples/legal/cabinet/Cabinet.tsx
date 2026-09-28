@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import CatalogPortfolioSvgUrl from "../../../../assets/icons/16/catalog.portfolio.react.svg?url";
 import CatalogRoomsSvgUrl from "../../../../assets/icons/16/catalog.rooms.react.svg?url";
@@ -19,6 +19,7 @@ import { ClientSession } from "../ClientSession";
 import { MatterRoomPanel } from "../inside-a-matter/InsideAMatter";
 import type { Matter } from "../matter";
 import { MattersBody } from "../my-matters/MyMatters";
+import { OpenMatterDialog } from "../opening-a-matter/OpenMatterDialog";
 import type { Persona } from "../persona";
 import { useMattersView } from "../useMattersView";
 import { usePortalImage } from "../usePortalImage";
@@ -44,6 +45,19 @@ type Screen = { kind: "list" } | { kind: "matter"; matter: Matter };
 export const CabinetFrame = ({ demoAs }: { demoAs: Persona }) => {
   const view = useMattersView(demoAs);
   const [screen, setScreen] = useState<Screen>({ kind: "list" });
+  const [opening, setOpening] = useState(false);
+  // A matter just opened is shown as soon as the list knows it.
+  const [pendingOpen, setPendingOpen] = useState<number | null>(null);
+  const pending =
+    pendingOpen !== null && view.status === "ready"
+      ? view.matters.find((matter) => matter.id === pendingOpen)
+      : undefined;
+  useEffect(() => {
+    if (pending) {
+      setScreen({ kind: "matter", matter: pending });
+      setPendingOpen(null);
+    }
+  }, [pending]);
   // The reader's picture is a protected path on the portal, like any other.
   const avatar = usePortalImage(view.status === "ready" ? view.avatar : "");
 
@@ -139,9 +153,28 @@ export const CabinetFrame = ({ demoAs }: { demoAs: Persona }) => {
       <main className={styles.content}>
         {screen.kind === "list" ? (
           <>
-            <Heading level={HeadingLevel.h2} size={HeadingSize.medium}>
-              {listLabel}
-            </Heading>
+            <div className={styles.listHeader}>
+              <Heading level={HeadingLevel.h2} size={HeadingSize.medium}>
+                {listLabel}
+              </Heading>
+              {persona === "lawyer" ? (
+                <Button
+                  primary
+                  size={ButtonSize.small}
+                  label="New matter"
+                  onClick={() => setOpening(true)}
+                />
+              ) : null}
+            </div>
+            <OpenMatterDialog
+              visible={opening}
+              onClose={() => setOpening(false)}
+              onOpened={(roomId) => {
+                setOpening(false);
+                setPendingOpen(roomId);
+                view.reload();
+              }}
+            />
             <MattersBody
               view={view}
               onOpen={(matter) => setScreen({ kind: "matter", matter })}

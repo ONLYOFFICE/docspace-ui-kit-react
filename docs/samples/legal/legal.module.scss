@@ -333,6 +333,40 @@
     }
   }
 
+  // A card's title with an action beside it.
+  .listHeader {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  // The new-matter form: the checklist templates two abreast, a hint on top.
+  .hint {
+    margin: 0 0 16px;
+  }
+
+  .checkGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 16px;
+    margin-block-end: 8px;
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .stepList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
   // The drop area under a request, sized so the dashed box reads as one.
   .sendBox {
     height: 180px;
