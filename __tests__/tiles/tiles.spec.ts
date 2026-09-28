@@ -26,7 +26,11 @@ const COMPONENTS: { id: string; name: string; stories?: string[] }[] = [
       "custom-bottom-row",
     ],
   },
-  { id: "ui-tiles-templatetile", name: "template-tile" },
+  {
+    id: "ui-tiles-templatetile",
+    name: "template-tile",
+    stories: ["in-progress", "with-hotkey-border", "renaming-state"],
+  },
   { id: "ui-tiles-tilecontainer", name: "tile-container" },
   {
     id: "ui-tiles-tilecontent",

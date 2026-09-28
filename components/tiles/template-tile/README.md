@@ -13,7 +13,8 @@
   "state": { "visibility": null, "close": "hideContextMenu", "loading": "inProgress", "disabled": null },
   "related": ["tiles", "tiles/base-tile", "tiles/room-tile"],
   "subComponents": [],
-  "testIds": ["tile"]
+  "testIds": ["tile"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # TemplateTile

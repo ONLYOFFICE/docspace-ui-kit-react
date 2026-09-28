@@ -1,6 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import type { TemplateTileProps, TemplateItem } from "./TemplateTile.types";
 
@@ -149,7 +150,7 @@ const defaultItem: StoryTemplateItem = {
   title: "Sample Template",
   createdBy: {
     id: "user-1",
-    displayName: "John Doe",
+    displayName: "Team member",
   },
   security: {
     EditRoom: true,
@@ -165,18 +166,18 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `Template tile component for displaying template information in a tile format.
+        component: `The card for one room template in a tile listing: the icon and name on top, and the template's owner and storage along the bottom.
 
 ### Features
 
-- **Template Icon**: Displays template type icon
-- **Selectable**: Supports checked/selected state with checkbox
-- **Active State**: Visual highlight for the currently active template
-- **Blocking Operation**: Indicates when a template operation is in progress
-- **Indeterminate State**: Partial selection indicator
-- **Space Quota**: Displays storage usage and quota information
-- **Badges**: Action badges like "Create Room" button
-- **Context Menu**: Right-click context menu for template actions
+- **Template Icon**: Shows the template icon beside the name and swaps it for a checkbox on hover
+- **Checkbox Selection**: Selects the tile from the checkbox, or from a tap on the icon on a phone
+- **Active State**: Keeps the hover background on the template being acted on
+- **Blocking Operation**: Stops the tile answering hover, clicks and right-clicks while an operation runs over it
+- **Indeterminate Checkbox**: Draws the checkbox half-filled, for a partly selected template
+- **Owner and Storage**: Lists the owner as a clickable name and, when asked, a storage line whose figure the host draws
+- **Badges**: Places action buttons, such as one that creates a room from the template, beside the name
+- **Actions Menu**: Opens the template's menu from a three-dot button, drawn when the item carries a \`contextOptions\` key, and on right-click when \`getContextModel\` is given
 
 ### Usage
 
@@ -185,12 +186,19 @@ import { TemplateTile } from "@onlyoffice/apps-ui-kit/components/tiles/template-
 import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
 
 <TemplateTile
-  item={{ id: "1", title: "Sample Template", createdBy: { id: "u1", displayName: "John" } }}
+  item={{ id: "1", title: "Sample Template", createdBy: { id: "u1", displayName: "Team member" } }}
   element={<TemplateIcon />}
   contextOptions={options}
+  columnCount={1}
+  openUser={openOwnerProfile}
   onSelect={handleSelect}
 >
   <TileContent><Link>Template Content</Link></TileContent>
+</TemplateTile>
+
+// With the storage line, drawn by your own quota component
+<TemplateTile item={template} element={<TemplateIcon />} contextOptions={options} columnCount={1} openUser={openOwnerProfile} showStorageInfo SpaceQuotaComponent={SpaceQuota}>
+  <TileContent><Link>{template.title}</Link></TileContent>
 </TemplateTile>
 \`\`\``,
       },
@@ -199,14 +207,15 @@ import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-conte
   argTypes: {
     checked: {
       control: "boolean",
-      description: "Whether the tile is selected/checked",
+      description:
+        "Ticks the checkbox and keeps it in place of the icon, and tints the tile",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isActive: {
       control: "boolean",
-      description: "Whether the tile is in active state",
+      description: "Keeps the hover background on the tile being acted on",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -214,7 +223,7 @@ import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-conte
     isBlockingOperation: {
       control: "boolean",
       description:
-        "Whether a blocking operation is in progress on the template",
+        "Stops the tile answering hover, clicks and right-clicks; it looks the same as an idle tile",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -222,11 +231,103 @@ import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-conte
     indeterminate: {
       control: "boolean",
       description:
-        "Whether the checkbox shows an indeterminate state for partial selection",
+        "Draws the checkbox half-filled; it shows while the checkbox does, that is on hover or when the tile is checked",
       table: {
         defaultValue: { summary: "false" },
       },
     },
+    inProgress: {
+      control: "boolean",
+      description: "Replaces the icon and the checkbox with a small loader",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    showHotkeyBorder: {
+      control: "boolean",
+      description:
+        "Turns the tile's border the accent colour, to mark the one the keyboard is on",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isEdit: {
+      control: "boolean",
+      description:
+        "Removes the icon and the checkbox while the template is renamed, and stops hovering from tinting the tile",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    showStorageInfo: {
+      control: "boolean",
+      description:
+        "Adds a storage line under the owner; its figure appears only when `SpaceQuotaComponent` is given too",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    item: {
+      control: "object",
+      description:
+        "The template the tile stands for, passed back through `onSelect`. Its `createdBy` fills the owner line, `security.EditRoom` decides whether the storage figure can be changed, and a `contextOptions` key on it is what draws the three-dot button",
+    },
+    children: {
+      control: false,
+      description:
+        "The name beside the icon, usually a `TileContent`; only the first element is shown",
+    },
+    element: {
+      control: false,
+      description:
+        "The template icon beside the name; without it the tile has neither the icon nor the checkbox",
+    },
+    badges: {
+      control: false,
+      description: "Action buttons after the name",
+    },
+    SpaceQuotaComponent: {
+      control: false,
+      description:
+        'Draws the storage figure; it is handed the item, the type `"room"` and whether the figure is read-only',
+    },
+    contextOptions: {
+      control: "object",
+      description: "Entries of the menu opened by the three-dot button",
+    },
+    getContextModel: {
+      control: false,
+      description:
+        "Returns the entries of the menu opened by a right-click; without it a right-click opens nothing",
+    },
+    onSelect: {
+      description:
+        "Called with the new checked state and the item from the checkbox, and when the icon is tapped on a phone",
+    },
+    openUser: {
+      description: "Called when the owner's name is clicked",
+    },
+    tileContextClick: {
+      description: "Called just before the menu opens",
+    },
+    hideContextMenu: {
+      description: "Called when the menu closes",
+    },
+    columnCount: {
+      control: false,
+      description:
+        "Ignored: the type requires it, and nothing in the tile reads it",
+    },
+    thumbnailClick: {
+      control: false,
+      description: "Ignored: nothing in the tile calls it",
+    },
+  },
+  args: {
+    onSelect: fn(),
+    openUser: fn(),
+    tileContextClick: fn(),
+    hideContextMenu: fn(),
   },
 } satisfies Meta<typeof TemplateTile>;
 
@@ -234,11 +335,16 @@ type Story = StoryObj<ComponentProps<typeof TemplateTile>>;
 
 export default meta;
 
-const Template = ({ checked: initialChecked, ...args }: TemplateTileProps) => {
+const Template = ({
+  checked: initialChecked,
+  onSelect: onSelectArg,
+  ...args
+}: TemplateTileProps) => {
   const [checked, setChecked] = useState(initialChecked);
 
-  const onSelect = (isSelected: boolean) => {
+  const onSelect: TemplateTileProps["onSelect"] = (isSelected, item) => {
     setChecked(isSelected);
+    onSelectArg?.(isSelected, item);
   };
 
   return (
@@ -260,7 +366,6 @@ export const Default: Story = {
     contextOptions,
     badges,
     showStorageInfo: true,
-    openUser: () => {},
     getContextModel: () => contextOptions,
     columnCount: 1,
     SpaceQuotaComponent: MockSpaceQuota,
@@ -268,17 +373,20 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Basic template tile with selection functionality",
+        story:
+          "A template with its owner and the storage it uses: the icon, the name with a create-room button, the menu, and the two lines below. Hover the icon and tick the checkbox to select it, click the owner to see `openUser` in the Actions panel, and change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<TemplateTile
-  item={{ id: "template-1", title: "Sample Template", createdBy: { id: "user-1", displayName: "John Doe" } }}
+  item={{ id: "template-1", title: "Sample Template", createdBy: { id: "user-1", displayName: "Team member" }, contextOptions }}
   element={<PublicRoomTemplateIconReactSvg />}
   contextOptions={contextOptions}
   badges={badges}
   showStorageInfo={true}
+  SpaceQuotaComponent={SpaceQuota}
   getContextModel={() => contextOptions}
   columnCount={1}
+  openUser={openOwnerProfile}
 >
   <TileContent><Link>Template Content</Link></TileContent>
 </TemplateTile>`,
@@ -296,7 +404,8 @@ export const Checked: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Template tile in checked state",
+        story:
+          "A selected template, as it looks among others the reader has picked: the checkbox stays ticked in place of the icon and the tile is tinted (`checked`).",
       },
       source: {
         code: `<TemplateTile
@@ -328,7 +437,8 @@ export const WithSpaceQuota: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Template tile with space quota information and controls",
+        story:
+          "A template with a storage limit the reader may change: the storage line shows the space used and a drop-down with the limit, both drawn by the host's quota component (`showStorageInfo`, `SpaceQuotaComponent`, `security.EditRoom`).",
       },
       source: {
         code: `<TemplateTile
@@ -362,7 +472,8 @@ export const WithReadOnlyQuota: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Template tile with read-only quota display",
+        story:
+          "The same template for a reader who may not edit it: the tile tells the quota component the figure is read-only, so it shows the used space and the limit as plain text (`security.EditRoom: false`).",
       },
       source: {
         code: `<TemplateTile
@@ -388,7 +499,8 @@ export const BlockingOperation: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Template tile showing blocking operation state",
+        story:
+          "A template an operation is running over, which must not be picked or opened until it ends: hover it, click it or right-click it and nothing happens (`isBlockingOperation`). It looks the same as an idle template, so show the operation somewhere else.",
       },
       source: {
         code: `<TemplateTile
@@ -404,37 +516,124 @@ export const BlockingOperation: Story = {
   },
 };
 
+export const InProgress: Story = {
+  render: Template,
+  args: {
+    ...Default.args,
+    inProgress: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A template that is busy, being saved or copied: a small loader stands where the icon and the checkbox were (`inProgress`).",
+      },
+      source: {
+        code: `<TemplateTile
+  item={item}
+  element={<PublicRoomTemplateIconReactSvg />}
+  contextOptions={contextOptions}
+  inProgress
+>
+  <TileContent><Link>Template Content</Link></TileContent>
+</TemplateTile>`,
+      },
+    },
+  },
+};
+
+export const WithHotkeyBorder: Story = {
+  render: Template,
+  args: {
+    ...Default.args,
+    showHotkeyBorder: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The tile the keyboard is on while the reader moves through the grid with the arrow keys: its border turns the accent colour (`showHotkeyBorder`). The tile does not handle the keys itself.",
+      },
+      source: {
+        code: `<TemplateTile
+  item={item}
+  element={<PublicRoomTemplateIconReactSvg />}
+  contextOptions={contextOptions}
+  showHotkeyBorder
+>
+  <TileContent><Link>Template Content</Link></TileContent>
+</TemplateTile>`,
+      },
+    },
+  },
+};
+
+export const RenamingState: Story = {
+  render: Template,
+  args: {
+    ...Default.args,
+    isEdit: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A template whose name is being edited: the icon and the checkbox go, so the name can become a text field, and hovering no longer tints the tile (`isEdit`).",
+      },
+      source: {
+        code: `<TemplateTile
+  item={item}
+  element={<PublicRoomTemplateIconReactSvg />}
+  contextOptions={contextOptions}
+  isEdit
+>
+  <TileContent><Link>Template Content</Link></TileContent>
+</TemplateTile>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
     <div
       style={
         {
-          "--tile-bg": "#e6f3fb",
+          "--tile-bg": "#f4f9fd",
           "--tile-border-style": "1px solid #0082c9",
           "--tile-radius": "16px",
           "--tile-hover-bg": "#cce5f6",
           "--tile-icon-color": "#0082c9",
           "--tile-sub-color": "#006fa6",
+          "--tile-hotkey-color": "#e0662e",
         } as CSSProperties
       }
     >
-      <div style={{ maxWidth: "300px", margin: "30px" }}>
-        <TemplateTile
-          item={defaultItem}
-          element={element}
-          contextOptions={contextOptions}
-          badges={badges}
-          showStorageInfo={true}
-          openUser={() => {}}
-          getContextModel={() => contextOptions}
-          columnCount={1}
-          SpaceQuotaComponent={MockSpaceQuota}
+      {[false, true].map((showHotkeyBorder) => (
+        <div
+          key={String(showHotkeyBorder)}
+          style={{ maxWidth: "300px", margin: "30px" }}
         >
-          <TileContent>
-            <Link>Sample Template</Link>
-          </TileContent>
-        </TemplateTile>
-      </div>
+          <TemplateTile
+            item={defaultItem}
+            element={element}
+            contextOptions={contextOptions}
+            badges={badges}
+            showStorageInfo={true}
+            showHotkeyBorder={showHotkeyBorder}
+            openUser={() => {}}
+            getContextModel={() => contextOptions}
+            columnCount={1}
+            SpaceQuotaComponent={MockSpaceQuota}
+          >
+            <TileContent>
+              <Link>
+                {showHotkeyBorder ? "Team Template" : "Sample Template"}
+              </Link>
+            </TileContent>
+          </TemplateTile>
+        </div>
+      ))}
     </div>
   ),
   parameters: {
@@ -444,12 +643,37 @@ export const CssCustomization: Story = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--tile-bg\` | Tile background color | theme-based |
-| \`--tile-border-style\` | Tile border | theme-based |
-| \`--tile-radius\` | Tile border radius | \`12px\` |
-| \`--tile-hover-bg\` | Hover/checked background | theme-based |
-| \`--tile-icon-color\` | Icon button color | theme-based |
-| \`--tile-sub-color\` | Sub-text/metadata color | theme-based |`,
+| \`--tile-bg\` | Background of the tile | theme-based |
+| \`--tile-border-style\` | Border of the tile | theme-based |
+| \`--tile-radius\` | Corner radius of the tile | \`12px\` |
+| \`--tile-hover-bg\` | Background of the tile on hover, and when checked or active | theme-based |
+| \`--tile-icon-color\` | Colour of the three-dot button | theme-based |
+| \`--tile-sub-color\` | Colour of the Owner and Storage labels and of the owner's name | theme-based |
+| \`--tile-hotkey-color\` | Border colour while \`showHotkeyBorder\` is on | theme-based |
+
+Two instances:
+- **Sample Template** — for every variable but the hotkey colour; hover it for \`--tile-hover-bg\`.
+- **Team Template** — \`showHotkeyBorder\`, for \`--tile-hotkey-color\`.
+
+The base tile's \`--tile-padding\` and \`--tile-row-gap\` do not reach a template tile: its own stylesheet fixes both at \`12px\`.`,
+      },
+      source: {
+        code: `<div style={{
+  "--tile-bg": "#f4f9fd",
+  "--tile-border-style": "1px solid #0082c9",
+  "--tile-radius": "16px",
+  "--tile-hover-bg": "#cce5f6",
+  "--tile-icon-color": "#0082c9",
+  "--tile-sub-color": "#006fa6",
+  "--tile-hotkey-color": "#e0662e",
+}}>
+  <TemplateTile item={template} element={<TemplateIcon />} contextOptions={options} badges={badges} columnCount={1} openUser={openOwnerProfile} showStorageInfo SpaceQuotaComponent={SpaceQuota}>
+    <TileContent><Link>Sample Template</Link></TileContent>
+  </TemplateTile>
+  <TemplateTile item={template} element={<TemplateIcon />} contextOptions={options} badges={badges} columnCount={1} openUser={openOwnerProfile} showStorageInfo SpaceQuotaComponent={SpaceQuota} showHotkeyBorder>
+    <TileContent><Link>Team Template</Link></TileContent>
+  </TemplateTile>
+</div>`,
       },
     },
   },
