@@ -1,0 +1,101 @@
+@use "../../styles/variables/colors" as *;
+
+// The window a portal would give the section: a fixed height, so the
+// section's own scroll container has something to scroll in, and a framed
+// card, so on a docs page it reads as a screen rather than as more page.
+//
+// Private tokens with light defaults, swapped under the kit's `.dark`; the
+// border prefers the portal's own token where a portal stylesheet is loaded.
+.frame {
+  --section-story-border: var(--border-service-color, #{$gray-light-mid});
+  --section-story-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+  --section-story-pill-bg: #{$gray-light};
+  --section-story-pill-text: var(--text-secondary, #{$gray-text});
+  --section-story-muted: var(--text-secondary, #{$gray-text});
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 640px;
+  overflow: hidden;
+  border: 1px solid var(--section-story-border);
+  border-radius: 12px;
+  background: var(--background-color, #{$white});
+  box-shadow: var(--section-story-shadow);
+  // On a docs page the next heading follows the story directly.
+  margin-block-end: 32px;
+
+  :global(.dark) & {
+    --section-story-border: var(--border-service-color, #{$gray-dark-strong});
+    --section-story-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --section-story-pill-bg: #{$gray-dark-mid};
+    --section-story-pill-text: var(--text-secondary, #{$dark-gray-dark});
+    --section-story-muted: var(--text-secondary, #{$dark-gray-dark});
+  }
+}
+
+// Title, then where the rows come from, then the one action on the right.
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+// The heading at the section, the breadcrumb inside it. It takes all the
+// room there is, so the pill and the button keep one place on the right
+// whether a heading or a `Navigation` of any width stands here.
+.title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.source {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--section-story-pill-bg);
+  color: var(--section-story-pill-text);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  white-space: nowrap;
+
+  // A dot that says which source answered: grey for the demo, green for a
+  // connected portal.
+  &::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: $gray-dark;
+  }
+
+  &[data-connected="true"]::before {
+    background: $main-green;
+  }
+}
+
+.actions {
+  flex-shrink: 0;
+}
+
+.count {
+  padding: 8px 0 4px;
+  color: var(--section-story-muted);
+}
+
+// Loading, empty and failed listings share one quiet block.
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 24px 0;
+  color: var(--section-story-muted);
+}

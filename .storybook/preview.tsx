@@ -125,6 +125,10 @@ const preview: Preview = {
           ],
           "Components",
           [
+            // The portal's three top-level lists, in its sidebar's order.
+            "Files",
+            "Rooms",
+            "Forms",
             "AI Chat",
             "Billing",
             "Document Editor",
