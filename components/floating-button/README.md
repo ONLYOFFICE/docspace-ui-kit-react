@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["loading-button", "progress-bar", "operations-progress-button"],
   "subComponents": [],
-  "testIds": ["floating-button", "floating-button-progress", "floating-button-alert"]
+  "testIds": ["floating-button", "floating-button-progress", "floating-button-alert"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # FloatingButton

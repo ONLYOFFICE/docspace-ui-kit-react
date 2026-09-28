@@ -10,15 +10,23 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `A floating action button (FAB) that appears on top of other UI elements for primary or important actions.
+        component: `A round corner badge that shows the progress of a long background operation, such as an upload or a bulk move; the host opens the operation's panel from its \`onClick\`.
 
 ### Features
 
-- **Multiple Icons**: Supports upload, trash, move, duplicate, download, copy, and more
-- **Progress Indicator**: Shows upload/operation progress with percentage
-- **Alert Badge**: Optional alert indicator for notifications
-- **Completed State**: Visual feedback when an operation is complete
-- **Color Customization**: Configurable background color
+- **Operation Icons**: Draws one of sixteen built-in icons in the middle, one per kind of operation, or an image of your own from a URL
+- **Progress Ring**: Fills a ring around the circle as the operation advances, and spins it while no progress value is known
+- **Warning Badge**: Puts a small red exclamation mark on the circle's upper edge when the operation needs attention
+- **Completed State**: Fades the ring out, pulses the circle once and puts a green tick on it when the operation finishes
+- **Stopped State**: Replaces the tick or the warning with a stop mark when the user aborted the operation
+- **Custom Colour**: Paints the circle and the ring in any CSS colour instead of the accent colour
+
+### Accessibility
+
+The circle is a plain \`<div>\` that sets one attribute itself:
+
+- \`aria-label\`: built from the icon name, for example "upload button", and not replaceable by a prop
+- An image from \`iconUrl\` is announced as "icon"
 
 ### Usage
 
@@ -33,6 +41,9 @@ import { FloatingButton, FloatingButtonIcons } from "@onlyoffice/apps-ui-kit/com
 
 // With alert
 <FloatingButton icon={FloatingButtonIcons.upload} alert />
+
+// Finished
+<FloatingButton icon={FloatingButtonIcons.move} completed />
 \`\`\``,
       },
     },
@@ -45,25 +56,42 @@ import { FloatingButton, FloatingButtonIcons } from "@onlyoffice/apps-ui-kit/com
     icon: {
       control: "select",
       options: Object.values(FloatingButtonIcons),
-      description: "The icon to display in the button",
+      description:
+        "Which of the built-in icons is drawn in the middle of the circle; ignored when `iconUrl` is set",
+      table: {
+        defaultValue: { summary: "other" },
+      },
+    },
+    iconUrl: {
+      control: "text",
+      description:
+        "URL of an image drawn in the middle instead of the built-in icon, 20px wide",
     },
     percent: {
       control: { type: "number", min: 0, max: 100 },
-      description: "Loading progress percentage (0-100)",
+      description:
+        "How much of the ring is filled, from 0 to 100; left unset, the ring spins instead",
+    },
+    withoutProgress: {
+      control: "boolean",
+      description:
+        "Leaves the ring out entirely, so only the bare circle shows",
       table: {
-        defaultValue: { summary: "0" },
+        defaultValue: { summary: "false" },
       },
     },
     alert: {
       control: "boolean",
-      description: "Show alert indicator badge",
+      description:
+        "Puts a red exclamation mark on the circle's upper edge; `stopped` wins over it",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     completed: {
       control: "boolean",
-      description: "Show completed state",
+      description:
+        "Marks the operation finished: the ring fades out, the circle pulses once and a green tick appears",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -71,18 +99,59 @@ import { FloatingButton, FloatingButtonIcons } from "@onlyoffice/apps-ui-kit/com
     stopped: {
       control: "boolean",
       description:
-        "Show the stopped state: the operation was aborted by the user. Takes precedence over `alert` and `completed`",
+        "Puts a stop mark on the circle's upper edge, for an operation the user aborted; wins over `alert` and `completed`",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    withoutStatus: {
+      control: "boolean",
+      description:
+        "Hides the badge on the circle's upper edge whatever `stopped`, `alert` and `completed` say",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     color: {
       control: "color",
-      description: "Custom background color",
+      description:
+        "CSS colour of the circle and the ring; left unset, the accent colour is used",
+    },
+    showCancelButton: {
+      control: "boolean",
+      description:
+        "Adds a cross, shown while the pointer is over the badge, that the host's layout must place beside the circle: on its own it lands under the circle and cannot be seen",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    showCloseIcon: {
+      control: "boolean",
+      description:
+        "Keeps the cross from `showCancelButton` visible without hovering",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     onClick: {
       action: "onClick",
-      description: "Function called when the button is clicked",
+      description: "Called with the click event when the circle is clicked",
+    },
+    clearUploadedFilesHistory: {
+      action: "clearUploadedFilesHistory",
+      description: "Called when the cross beside the circle is clicked",
+    },
+    id: {
+      control: "text",
+      description: "`id` of the circle, not of the wrapper that positions it",
+    },
+    className: {
+      control: "text",
+      description: "Extra class on the circle, after the component's own",
+    },
+    style: {
+      control: "object",
+      description: "Inline style on the circle",
     },
   },
   decorators: [
@@ -111,6 +180,17 @@ export const Default: Story = {
   render: (args) => <FloatingButton {...args} />,
   args: {
     icon: FloatingButtonIcons.upload,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "An upload that has just started, with no progress value yet, so the ring spins; change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<FloatingButton icon={FloatingButtonIcons.upload} onClick={openPanel} />`,
+      },
+    },
   },
 };
 
@@ -143,7 +223,7 @@ export const WithAlert: Story = {
     docs: {
       description: {
         story:
-          "Floating button with an alert indicator badge. Used to draw attention to notifications or important updates.",
+          "A red exclamation mark on the circle's upper edge, for an operation that needs the user's attention, such as one that finished with errors (\`alert\`).",
       },
       source: {
         code: `<FloatingButton icon={FloatingButtonIcons.upload} alert />`,
@@ -164,7 +244,7 @@ export const Completed: Story = {
     docs: {
       description: {
         story:
-          "Floating button in completed state. Shows a checkmark or completion indicator when an operation finishes.",
+          "A finished operation: the ring fades out, the circle pulses once and a green tick stays on its upper edge (\`completed\`).",
       },
       source: {
         code: `<FloatingButton icon={FloatingButtonIcons.upload} completed percent={100} />`,
@@ -174,9 +254,7 @@ export const Completed: Story = {
 };
 
 const StoppedTemplate = () => {
-  return (
-    <FloatingButton icon={FloatingButtonIcons.trash} completed stopped alert />
-  );
+  return <FloatingButton icon={FloatingButtonIcons.trash} completed stopped />;
 };
 
 export const Stopped: Story = {
@@ -202,13 +280,26 @@ const IconVariantsTemplate = () => {
     { icon: FloatingButtonIcons.duplicate, label: "duplicate" },
     { icon: FloatingButtonIcons.download, label: "download" },
     { icon: FloatingButtonIcons.copy, label: "copy" },
+    {
+      icon: FloatingButtonIcons.deletePermanently,
+      label: "deletePermanently",
+    },
+    { icon: FloatingButtonIcons.exportIndex, label: "exportIndex" },
+    { icon: FloatingButtonIcons.markAsRead, label: "markAsRead" },
+    { icon: FloatingButtonIcons.backup, label: "backup" },
+    { icon: FloatingButtonIcons.plus, label: "plus" },
+    { icon: FloatingButtonIcons.minus, label: "minus" },
+    { icon: FloatingButtonIcons.refresh, label: "refresh" },
+    { icon: FloatingButtonIcons.dots, label: "dots" },
+    { icon: FloatingButtonIcons.arrow, label: "arrow" },
+    { icon: FloatingButtonIcons.other, label: "other" },
   ];
 
   return (
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(3, 100px)",
+        gridTemplateColumns: "repeat(4, 100px)",
         rowGap: "8px",
         columnGap: "24px",
       }}
@@ -257,7 +348,92 @@ export const IconVariants: Story = {
 <FloatingButton icon={FloatingButtonIcons.move} />
 <FloatingButton icon={FloatingButtonIcons.duplicate} />
 <FloatingButton icon={FloatingButtonIcons.download} />
-<FloatingButton icon={FloatingButtonIcons.copy} />`,
+<FloatingButton icon={FloatingButtonIcons.copy} />
+<FloatingButton icon={FloatingButtonIcons.deletePermanently} />
+<FloatingButton icon={FloatingButtonIcons.exportIndex} />
+<FloatingButton icon={FloatingButtonIcons.markAsRead} />
+<FloatingButton icon={FloatingButtonIcons.backup} />
+<FloatingButton icon={FloatingButtonIcons.plus} />
+<FloatingButton icon={FloatingButtonIcons.minus} />
+<FloatingButton icon={FloatingButtonIcons.refresh} />
+<FloatingButton icon={FloatingButtonIcons.dots} />
+<FloatingButton icon={FloatingButtonIcons.arrow} />
+<FloatingButton icon={FloatingButtonIcons.other} />`,
+      },
+    },
+  },
+};
+
+export const WithoutProgress: Story = {
+  render: () => (
+    <FloatingButton icon={FloatingButtonIcons.upload} withoutProgress />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The bare circle with no ring, for an operation whose progress is not worth showing, or a badge that only opens a panel (`withoutProgress`).",
+      },
+      source: {
+        code: `<FloatingButton icon={FloatingButtonIcons.upload} withoutProgress />`,
+      },
+    },
+  },
+};
+
+export const WithoutStatusBadge: Story = {
+  render: () => (
+    <FloatingButton icon={FloatingButtonIcons.move} completed withoutStatus />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A finished move with no tick on the circle: the ring still fades out, but the badge on the upper edge is hidden whatever the state props say (`withoutStatus`).",
+      },
+      source: {
+        code: `<FloatingButton icon={FloatingButtonIcons.move} completed withoutStatus />`,
+      },
+    },
+  },
+};
+
+export const CustomColor: Story = {
+  render: () => (
+    <FloatingButton
+      icon={FloatingButtonIcons.upload}
+      percent={45}
+      color="#2e8b57"
+    />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The circle, the ring and the accent parts of the icon in a colour of your own instead of the accent colour, for example one per kind of operation (`color`).",
+      },
+      source: {
+        code: `<FloatingButton icon={FloatingButtonIcons.upload} percent={45} color="#2e8b57" />`,
+      },
+    },
+  },
+};
+
+// An inline picture, so the story makes no network request.
+const sampleIconUrl = `data:image/svg+xml;utf8,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><rect x="3" y="2" width="14" height="16" rx="2" fill="#ffffff"/><rect x="6" y="6" width="8" height="1.5" fill="#8fb3d9"/><rect x="6" y="9.5" width="8" height="1.5" fill="#8fb3d9"/><rect x="6" y="13" width="5" height="1.5" fill="#8fb3d9"/></svg>',
+)}`;
+
+export const CustomIconImage: Story = {
+  render: () => <FloatingButton iconUrl={sampleIconUrl} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "An image of your own in the middle, 20px wide, for an operation none of the built-in icons fits (`iconUrl`).",
+      },
+      source: {
+        code: `<FloatingButton iconUrl="/images/operation.svg" />`,
       },
     },
   },
@@ -268,15 +444,23 @@ export const CssCustomization: Story = {
     <div
       style={
         {
+          display: "flex",
+          gap: "24px",
           "--floating-circle-button-background": "#7c3aed",
           "--floating-button-shadow": "0 4px 20px rgba(124,58,237,0.5)",
-          "--floating-button-icon": "#ffffff",
+          "--floating-button-icon": "#fde68a",
         } as CSSProperties
       }
     >
-      <FloatingButton icon={FloatingButtonIcons.upload} />
+      <div style={{ position: "relative", width: 100, height: 70 }}>
+        <FloatingButton icon={FloatingButtonIcons.upload} />
+      </div>
+      <div style={{ position: "relative", width: 100, height: 70 }}>
+        <FloatingButton icon={FloatingButtonIcons.move} />
+      </div>
     </div>
   ),
+  decorators: [],
   parameters: {
     docs: {
       description: {
@@ -284,10 +468,25 @@ export const CssCustomization: Story = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--floating-circle-button-background\` | Button background color | \`--color-scheme-main-accent\` |
-| \`--floating-button-shadow\` | Box shadow | theme token |
-| \`--floating-button-button-size\` | Button size (width & height) | \`48px\` |
-| \`--floating-button-icon\` | Icon fill color | \`--color-scheme-text-accent\` |`,
+| \`--floating-circle-button-background\` | Colour of the circle, the ring and the shapes of the accent icons; the \`color\` prop overrides it | \`--color-scheme-main-accent\` |
+| \`--floating-button-shadow\` | Shadow under the circle | theme-based |
+| \`--floating-button-button-size\` | Width and height of the clickable circle only: the ring and the icon stay 48px in its top corner, so any other value puts them out of line | \`48px\` |
+| \`--floating-button-icon\` | Fill of the icon, except the accent icons (upload, trash, deletePermanently, other) | \`--color-scheme-text-accent\` |
+
+- **Upload** — the background and the shadow; its icon is one of the accent icons (upload, trash, deletePermanently, other), whose shapes are painted in the background colour, so the icon colour does not reach it
+- **Move** — the icon colour, on an icon that is not an accent one`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--floating-circle-button-background": "#7c3aed",
+    "--floating-button-shadow": "0 4px 20px rgba(124,58,237,0.5)",
+    "--floating-button-icon": "#fde68a",
+  }}
+>
+  <FloatingButton icon={FloatingButtonIcons.upload} />
+  <FloatingButton icon={FloatingButtonIcons.move} />
+</div>`,
       },
     },
   },

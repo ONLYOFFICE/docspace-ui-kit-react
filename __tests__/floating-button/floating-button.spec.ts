@@ -18,6 +18,30 @@ test.describe("FloatingButton — light", () => {
     await expect(page).toHaveScreenshot("floating-button-default.png");
   });
 
+  test("without progress", async ({ page }) => {
+    await gotoStory(page, "without-progress");
+    await expect(page).toHaveScreenshot("floating-button-without-progress.png");
+  });
+
+  test("without status badge", async ({ page }) => {
+    await gotoStory(page, "without-status-badge");
+    await expect(page).toHaveScreenshot(
+      "floating-button-without-status-badge.png",
+    );
+  });
+
+  test("custom color", async ({ page }) => {
+    await gotoStory(page, "custom-color");
+    await expect(page).toHaveScreenshot("floating-button-custom-color.png");
+  });
+
+  test("custom icon image", async ({ page }) => {
+    await gotoStory(page, "custom-icon-image");
+    await expect(page).toHaveScreenshot(
+      "floating-button-custom-icon-image.png",
+    );
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot(
