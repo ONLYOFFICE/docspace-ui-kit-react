@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { TwoStateToggle } from ".";
@@ -9,21 +9,25 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `TwoStateToggle is a pill-shaped switch that moves the user between the new Dashboard and the classic DocSpace view. It is not a general-purpose on/off control; for an ordinary two-state setting use \`ToggleButton\`.
+        component: `TwoStateToggle is a pill-shaped switch that moves the user between the new dashboard and the classic view. It is not a general-purpose on/off control; for an ordinary two-state setting use \`ToggleButton\`.
 
 ### Features
 
-- **State in \`localStorage\`**: the initial position is read once, on mount, from the \`useDocSpace\` key. \`"old"\` means the classic view; anything else, including no value, means the new one. There is no \`value\` / \`onChange\` pair
-- **NEW to OLD**: opens a confirmation modal. Confirming writes \`"old"\` and navigates to \`/\`; cancelling or closing the modal changes nothing
-- **OLD to NEW**: switches immediately, writes \`"new"\` and navigates to \`/dashboard\`
-- **Fixed targets**: \`/dashboard\` and \`/\` are hardcoded. \`onNavigate\` only decides how to navigate; without it the page does a full load through \`window.location.href\`
-- **Blocked storage**: if \`localStorage\` throws, the toggle starts in the new view and still switches and navigates; the choice is just not persisted
-- **Hiding parts**: an empty \`title\` renders only the pill; an empty \`confirmHint\` drops the hint from the modal
+- **Stored position**: Reads its starting position once, on mount, from the \`useDocSpace\` key in \`localStorage\` (\`"old"\` selects the classic view, any other value or none the new one) and takes no \`value\` / \`onChange\` pair
+- **Confirmed switch back**: Moving from NEW to OLD opens a confirmation dialog; confirming writes \`"old"\` and navigates to \`/\`, while cancelling or closing the dialog changes nothing
+- **Immediate switch forward**: Moving from OLD to NEW writes \`"new"\` and navigates to \`/dashboard\` at once, with no dialog
+- **Fixed targets**: Always navigates to \`/dashboard\` or \`/\` and leaves only the way of navigating to \`onNavigate\`; without it the page reloads through \`window.location.href\`
+- **Blocked storage**: Starts in the new view when \`localStorage\` throws, and still switches and navigates without persisting the choice
+- **Optional parts**: Renders only the pill when \`title\` is empty and leaves the hint out of the dialog when \`confirmHint\` is empty
+- **Right-to-left**: Puts the OLD half on the right and slides the thumb leftwards to NEW in a right-to-left layout
 
 ### Accessibility
 
-- \`role="switch"\` on a \`<button>\`, with \`aria-checked\` set while the new view is active
+The toggle is a native \`<button>\` carrying a switch role, so keyboard support comes from the platform:
+
+- \`role="switch"\` with \`aria-checked\`: announced as a switch that is on while the new view is active and off in the classic view
 - \`aria-label\`: taken from \`ariaLabel\`, default "Switch DocSpace design". \`title\`, \`labelOld\` and \`labelNew\` do not change it; the labels are \`aria-hidden\`
+- **Keyboard**: Tab focuses the switch and draws a focus ring around the pill; Enter or Space toggles it as a click does
 
 ### Usage
 
@@ -35,15 +39,7 @@ import { TwoStateToggle } from "@onlyoffice/apps-ui-kit/components/two-state-tog
 
 // Standalone (falls back to window.location.href)
 <TwoStateToggle />
-\`\`\`
-
-### CSS Custom Properties
-
-| Variable | Description |
-|----------|-------------|
-| \`--color-scheme-main-accent\` | Pill background, focus ring, label on the thumb |
-| \`--button-root-border-radius\` | Border radius of the pill (thumb is 2px smaller); fallback \`6px\` |
-| \`--text-color\` | Color of the title label |`,
+\`\`\``,
       },
     },
   },
@@ -57,23 +53,24 @@ import { TwoStateToggle } from "@onlyoffice/apps-ui-kit/components/two-state-tog
     labelOld: {
       control: "text",
       description:
-        "Label for the classic DocSpace view (inline-start half of the pill)",
+        "Label on the inline-start half of the pill, the position of the classic view",
       table: { defaultValue: { summary: "OLD" } },
     },
     labelNew: {
       control: "text",
       description:
-        "Label for the new Dashboard view (inline-end half of the pill)",
+        "Label on the inline-end half of the pill, the position of the new dashboard",
       table: { defaultValue: { summary: "NEW" } },
     },
     confirmTitle: {
       control: "text",
-      description: "Confirmation modal title (shown when switching NEW → OLD)",
+      description:
+        "Heading of the confirmation dialog shown when switching from NEW to OLD",
       table: { defaultValue: { summary: "Switch to Old Design" } },
     },
     confirmBody: {
       control: "text",
-      description: "Confirmation modal main body text",
+      description: "First paragraph of the confirmation dialog",
       table: {
         defaultValue: {
           summary:
@@ -84,7 +81,7 @@ import { TwoStateToggle } from "@onlyoffice/apps-ui-kit/components/two-state-tog
     confirmHint: {
       control: "text",
       description:
-        "Hint shown below the body, e.g. how to return to the new view; an empty string hides it",
+        "Second, smaller paragraph under the first one in the confirmation dialog; an empty string hides it",
       table: {
         defaultValue: {
           summary:
@@ -94,17 +91,20 @@ import { TwoStateToggle } from "@onlyoffice/apps-ui-kit/components/two-state-tog
     },
     confirmOk: {
       control: "text",
-      description: 'Confirmation modal "proceed" button label',
+      description:
+        "Label of the confirmation dialog's primary button, which switches to OLD",
       table: { defaultValue: { summary: "Switch" } },
     },
     confirmCancel: {
       control: "text",
-      description: 'Confirmation modal "cancel" button label',
+      description:
+        "Label of the confirmation dialog's second button, which closes it and keeps NEW",
       table: { defaultValue: { summary: "Cancel" } },
     },
     ariaLabel: {
       control: "text",
-      description: "Accessible name of the switch button",
+      description:
+        "Accessible name a screen reader announces for the switch; the English default is not translated",
       table: { defaultValue: { summary: "Switch DocSpace design" } },
     },
     onNavigate: {
@@ -114,7 +114,8 @@ import { TwoStateToggle } from "@onlyoffice/apps-ui-kit/components/two-state-tog
     },
     className: {
       control: "text",
-      description: "Additional CSS class applied to the wrapper",
+      description:
+        "Additional CSS class applied to the wrapper around the title and the pill",
     },
   },
   decorators: [
@@ -135,6 +136,17 @@ export const Default: Story = {
     labelOld: "OLD",
     labelNew: "NEW",
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The toggle in the NEW position, as a first visit finds it. Click it to open the confirmation dialog that guards the way back to the classic view; change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<TwoStateToggle onNavigate={(url) => navigate(url)} />`,
+      },
+    },
+  },
 };
 
 export const ShowingOldState: Story = {
@@ -152,6 +164,10 @@ export const ShowingOldState: Story = {
       description: {
         story:
           'Toggle in the OLD position. Clicking it switches to NEW immediately (calls `onNavigate("/dashboard")`).',
+      },
+      source: {
+        code: `// localStorage.useDocSpace === "old"
+<TwoStateToggle onNavigate={(url) => navigate(url)} />`,
       },
     },
   },
@@ -188,7 +204,88 @@ export const CustomLabels: Story = {
     docs: {
       description: {
         story:
-          "All text strings are customizable — useful when the toggle is reused in other contexts.",
+          "All text strings are customizable — useful when the toggle is reused in other contexts. Click the toggle to see the dialog texts.",
+      },
+      source: {
+        code: `<TwoStateToggle
+  title="Interface"
+  labelOld="v1"
+  labelNew="v2"
+  confirmTitle="Switch to v1?"
+  confirmBody="You will be taken back to the classic interface."
+  confirmHint="Return to v2 anytime via /dashboard."
+  confirmOk="Yes, switch"
+  confirmCancel="Stay on v2"
+  onNavigate={(url) => navigate(url)}
+/>`,
+      },
+    },
+  },
+};
+
+export const RightToLeft: Story = {
+  render: (args) => (
+    <div dir="rtl">
+      <TwoStateToggle {...args} />
+    </div>
+  ),
+  globals: { direction: "rtl" },
+  args: {
+    title: "Design",
+  },
+  parameters: {
+    noPadding: true,
+    docs: {
+      // Framed: an inline RTL story would flip the whole Docs page.
+      story: { inline: false, height: "62px" },
+      description: {
+        story:
+          "The toggle in a right-to-left layout: the title moves to the right of the pill, OLD takes the right half and NEW the left, and the thumb sits on the left over NEW. The wrapper carries `dir=\"rtl\"` for the layout; the thumb's leftward slide comes from the theme's `interfaceDirection` (the Direction toolbar).",
+      },
+      source: {
+        code: `<div dir="rtl">
+  <TwoStateToggle title="Design" onNavigate={(url) => navigate(url)} />
+</div>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: (args) => (
+    <div
+      style={
+        {
+          "--color-scheme-main-accent": "#2e7d32",
+          "--button-root-border-radius": "18px",
+          "--text-color": "#2e7d32",
+        } as CSSProperties
+      }
+    >
+      <TwoStateToggle {...args} />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--color-scheme-main-accent\` | Pill background, the label on the thumb and the focus ring | theme-based |
+| \`--button-root-border-radius\` | Corner radius of the pill; the thumb's is 2px smaller | \`6px\` |
+| \`--text-color\` | Color of the title | theme-based |
+
+The example sets all three on a wrapper; press Tab to focus the switch and see the ring take the custom accent.`,
+      },
+      source: {
+        code: `<div style={{
+  "--color-scheme-main-accent": "#2e7d32",
+  "--button-root-border-radius": "18px",
+  "--text-color": "#2e7d32",
+}}>
+  <TwoStateToggle onNavigate={(url) => navigate(url)} />
+</div>`,
       },
     },
   },
