@@ -8,6 +8,12 @@ _Changed_ before upgrading.
 
 ### Changed
 
+- **`DocumentEditor`'s props are one of two shapes.** Either `documentServerUrl` with
+  `config`, or `fileId` (with `fileVersion` and `isView` if wanted), in which case the wrapper
+  fetches both from the portal behind the nearest `ApiProvider`, as it always did. The type
+  used to demand all of them at once, so a caller with a file id had to cast past it; and a
+  caller with neither made the wrapper open file `1`, which it now refuses through
+  `onLoadComponentError` instead
 - **The section header has its height and background back.** `--section-header-height` and
   `--section-header-bg` were declared under `.header :global(.light)`, which compiles to
   `.header .light` — a `.light` element _inside_ the header, which nothing is — so both

@@ -86,7 +86,9 @@ const FileSelectorWrapper = ({
   );
 };
 
-type StoryArgs = DocumentEditorProps & {
+// The story always opens a file from the portal, so its args are the
+// by-file-id shape of the props.
+type StoryArgs = Extract<DocumentEditorProps, { fileId: number }> & {
   filterParam?: string | number;
 };
 

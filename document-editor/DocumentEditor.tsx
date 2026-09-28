@@ -11,6 +11,7 @@ export const DocumentEditor = (props: DocumentEditorProps) => {
     height = "100%",
     shardkey,
     onLoadComponentError,
+    fileId,
     fileVersion,
     isView,
     config: configProp,
@@ -21,7 +22,6 @@ export const DocumentEditor = (props: DocumentEditorProps) => {
   const hasConfig = "config" in props && configProp;
   const hasDocumentServerUrl =
     "documentServerUrl" in props && documentServerUrlProp;
-  const hasFileId = "fileId" in props && props.fileId;
 
   const api = useApi();
 
@@ -37,12 +37,19 @@ export const DocumentEditor = (props: DocumentEditorProps) => {
 
     let cancelled = false;
 
+    // Neither a configuration nor a file to fetch one for: nothing to open.
+    // The props type rules this out; a caller that casts past it hears why.
+    if (fileId === undefined) {
+      onLoadComponentError?.(0, "No fileId and no config were given");
+      return;
+    }
+
     (async () => {
       try {
         const [docServiceLocation, result] = await Promise.all([
           api.filesSettingsApi.getDocServiceUrl(),
           api.filesApi.openEditFile({
-            fileId: props.fileId || 1,
+            fileId,
             version: fileVersion,
             view: isView,
           }),
@@ -83,7 +90,7 @@ export const DocumentEditor = (props: DocumentEditorProps) => {
   }, [
     documentServerUrl,
     config,
-    hasFileId,
+    fileId,
     fileVersion,
     isView,
     api.filesApi,
