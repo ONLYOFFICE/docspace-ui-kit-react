@@ -23,6 +23,26 @@ test.describe("QuickActions -- light", () => {
     await gotoStory(page, "carousel");
     await expect(page).toHaveScreenshot("quick-actions-carousel.png");
   });
+
+  test("link tiles", async ({ page }) => {
+    await gotoStory(page, "link-tiles");
+    await expect(page).toHaveScreenshot("quick-actions-link-tiles.png");
+  });
+
+  test("disabled state", async ({ page }) => {
+    await gotoStory(page, "disabled-state");
+    await expect(page).toHaveScreenshot("quick-actions-disabled-state.png");
+  });
+
+  test("loading state", async ({ page }) => {
+    await gotoStory(page, "loading-state");
+    await expect(page).toHaveScreenshot("quick-actions-loading-state.png");
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("quick-actions-right-to-left.png");
+  });
 });
 
 test.describe("QuickActions -- dark", () => {

@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": "onClose", "loading": "isLoading", "disabled": null },
   "related": ["rectangle", "tooltip", "empty-view"],
   "subComponents": [],
-  "testIds": ["quick-actions-track", "quick-actions-prev", "quick-actions-next", "quick-actions-close"]
+  "testIds": ["quick-actions-track", "quick-actions-prev", "quick-actions-next", "quick-actions-close"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # QuickActions
