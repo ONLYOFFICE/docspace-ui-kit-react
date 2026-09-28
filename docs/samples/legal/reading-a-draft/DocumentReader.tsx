@@ -4,7 +4,6 @@ import { Button, ButtonSize } from "../../../../components/button";
 import { Loader, LoaderTypes } from "../../../../components/loader";
 import { Text } from "../../../../components/text";
 import { DocumentEditor } from "../../../../document-editor";
-import type { DocumentEditorProps } from "../../../../document-editor/DocumentEditor.types";
 import { FileIcon } from "../../file-icon";
 import type { Document } from "../matterRoom";
 import styles from "../legal.module.scss";
@@ -35,24 +34,6 @@ export const DocumentReader = ({
     demo ? "ready" : "loading",
   );
   const [problem, setProblem] = useState("");
-
-  // Given a file id the wrapper fetches the document server's address and
-  // the configuration itself, but its props type still lists both as
-  // required; the object is cast the way the kit's own story spreads its args.
-  const editor = {
-    id: `draft-${document.id}`,
-    fileId: document.id,
-    isView: mode === "view",
-    height: "100%",
-    width: "100%",
-    events_onAppReady: () => setStatus("ready"),
-    onLoadComponentError: (code: number, message: string) => {
-      setStatus("failed");
-      setProblem(
-        `${message}${code ? ` (${code})` : ""}. The portal has to know this document server, and the reader has to be a member of the room.`,
-      );
-    },
-  } as unknown as DocumentEditorProps;
 
   return (
     <div className={styles.reader}>
@@ -109,7 +90,20 @@ export const DocumentReader = ({
         </div>
       ) : (
         <div className={styles.editorBox}>
-          <DocumentEditor {...editor} />
+          <DocumentEditor
+            id={`draft-${document.id}`}
+            fileId={document.id}
+            isView={mode === "view"}
+            height="100%"
+            width="100%"
+            events_onAppReady={() => setStatus("ready")}
+            onLoadComponentError={(code, message) => {
+              setStatus("failed");
+              setProblem(
+                `${message}${code ? ` (${code})` : ""}. The portal has to know this document server, and the reader has to be a member of the room.`,
+              );
+            }}
+          />
         </div>
       )}
     </div>

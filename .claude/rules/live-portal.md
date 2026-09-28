@@ -193,8 +193,8 @@ createFileJsonElement: { title } })` makes an office document through the docume
   (`GET /api/2.0/files/file/{id}/openedit?view=true`), then loads
   `<docServiceUrl>web-apps/apps/api/documents/api.js` and calls `DocsAPI.DocEditor(id, config)`.
   Under a client's OAuth provider the configuration and its token are minted for the client;
-  `isView` asks for read-only on top of the room role. The wrapper's props type still requires
-  `documentServerUrl` and `config`, so build the props object and cast it, as its story does.
+  `isView` asks for read-only on top of the room role. Its props are one of two shapes,
+  `documentServerUrl` with `config` or `fileId`; the type refuses neither and both.
   It renders nothing until the configuration arrives; `events_onAppReady` is when the editor is
   up, `onLoadComponentError` when either call or the script failed. Every editor on a page needs
   its own `id`. `docs/samples/legal/reading-a-draft/DocumentReader.tsx` is the working form.
