@@ -13,7 +13,8 @@
   "state": { "visibility": null, "close": "hideContextMenu", "loading": "inProgress", "disabled": null },
   "related": ["tiles", "tiles/folder-tile", "tiles/tile-content"],
   "subComponents": [],
-  "testIds": ["tile", "file-thumbnail"]
+  "testIds": ["tile", "file-thumbnail"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # FileTile
