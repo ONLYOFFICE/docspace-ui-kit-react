@@ -18,6 +18,11 @@ test.describe("Scrollbar — light", () => {
     await expect(page).toHaveScreenshot("scrollbar-default.png");
   });
 
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("scrollbar-right-to-left.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("scrollbar-css-customization.png");
