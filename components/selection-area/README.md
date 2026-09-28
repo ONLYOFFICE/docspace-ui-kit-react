@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["tiles", "rows", "drag-and-drop"],
   "subComponents": [],
-  "testIds": ["selection-area"]
+  "testIds": ["selection-area"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # SelectionArea
