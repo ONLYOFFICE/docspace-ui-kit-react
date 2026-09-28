@@ -731,16 +731,16 @@ window.i18n = {
         NotSupportedFormat: "Sorry, this file format isn't supported",
       },
     },
-    "ru/Common.json": {
+    "de/Common.json": {
       data: {
-        Done: "Готово",
-        Warning: "Предупреждение",
-        Alert: "Внимание",
-        Info: "Информация",
-        BetaLabel: "Бета",
-        Paid: "Платно",
-        ClearFilter: "Очистить фильтр",
-        Back: "Назад",
+        Done: "Fertig",
+        Warning: "Warnung",
+        Alert: "Achtung",
+        Info: "Info",
+        BetaLabel: "Beta",
+        Paid: "Kostenpflichtig",
+        ClearFilter: "Filter zurücksetzen",
+        Back: "Zurück",
         // ... other translations
       },
     },
