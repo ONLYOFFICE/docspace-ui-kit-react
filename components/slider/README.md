@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
   "related": ["text-input", "progress-bar", "radio-button-group"],
   "subComponents": [],
-  "testIds": ["slider"]
+  "testIds": ["slider"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Slider
