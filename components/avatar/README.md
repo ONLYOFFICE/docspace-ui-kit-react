@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "noClick" },
   "related": ["circle", "room-icon", "icon-button"],
   "subComponents": [],
-  "testIds": ["avatar", "edit_avatar_icon_button", "file-input"]
+  "testIds": ["avatar", "edit_avatar_icon_button", "file-input"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Avatar
