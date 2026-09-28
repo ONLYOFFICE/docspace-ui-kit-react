@@ -307,8 +307,10 @@ export type FilterProps = SearchInputProps &
     onFilterByGroup?: (groupId: string | null) => void;
     /** Current group ID from URL filter - used to highlight the correct group tag on page load */
     currentGroupId?: string | null;
-    /** Whether the listing is the rooms folder. It is one of four conditions for the room grouping row. */
-    isRoomsFolder?: boolean;
+    /** Whether the listing is the Rooms or the Forms section. It is one of four conditions for the room grouping row. */
+    withRoomGroups?: boolean;
+    /** Switches the grouping row wording from rooms to form spaces. */
+    isFormsSection?: boolean;
     /** Whether room grouping is turned on for the portal. Without it the grouping row is never rendered. */
     organizeRoomsGrouping?: boolean;
     /** When true, hides the room grouping row because filters/search are active */

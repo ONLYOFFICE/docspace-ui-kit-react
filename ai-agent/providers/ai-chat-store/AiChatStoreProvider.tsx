@@ -7,11 +7,21 @@ import AiChatStore from "./AiChatStore";
 const AiChatStoreContext = React.createContext<AiChatStore | null>(null);
 
 export const AiChatStoreProvider = ({
+  store: hostStore,
   children,
 }: {
+  /**
+   * Use this instance instead of creating one. `AiAgentProviders` passes the
+   * store it built in its own body: the analyze mode lives on this store, and
+   * the provider body — which assembles the widget config, the attachment cap
+   * and the chips off that mode — sits above this provider and could not read
+   * it through the context.
+   */
+  store?: AiChatStore;
   children: React.ReactNode;
 }) => {
-  const store = React.useMemo(() => new AiChatStore(), []);
+  const ownStore = React.useMemo(() => new AiChatStore(), []);
+  const store = hostStore ?? ownStore;
   return (
     <AiChatStoreContext.Provider value={store}>
       {children}

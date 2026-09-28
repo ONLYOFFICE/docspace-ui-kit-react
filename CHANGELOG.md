@@ -34,8 +34,10 @@ _Changed_ before upgrading.
   label with an empty `htmlFor`, so no caption in any form built from it was associated with
   its field
 - `Textarea` takes **`aria-label`, `aria-labelledby` and `aria-describedby`**. Its props type
-  is closed — it accepts no arbitrary DOM attributes — so a multi-line field previously could
-  not be given an accessible name at all
+  is closed — it accepts no arbitrary DOM attributes — so these are declared as props rather
+  than passed through. A captioned field needs none of them: `id` lands on the `<textarea>`
+  itself, so a `FieldContainer` given the same string as `labelFor` names it like any other
+  control
 - `ModalDialog` takes the same three, and they reach the element carrying the role. An
   `aria-label` used to be swept into the rest props and land on the internal header, and only
   when a header was rendered
@@ -69,6 +71,18 @@ _Changed_ before upgrading.
   line removed one; each re-run left another listener behind
 - `ThemeProvider` follows a `colorTheme` that arrives after the first render, instead of only
   reading it once
+
+### Documentation
+
+Two sentences that were false the day they were written, each found by an agent disagreeing
+with the page in front of it. No code changed for either.
+
+- `providers/theme` said `initialTheme` "is read once" and that a new value needs a remount.
+  It is re-resolved by an effect keyed on that prop, so the theme changes in place and nothing
+  below the provider loses its state
+- `components/textarea` said `aria-label` and `aria-labelledby` were "the only two ways" to
+  name the field. A `FieldContainer`'s `labelFor` reaches it as well, since its `id` lands on
+  the `<textarea>` element
 
 ## 4.0.0
 

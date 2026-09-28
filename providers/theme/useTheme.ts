@@ -68,7 +68,7 @@ function resolveTheme(
 }
 
 export type UseThemeProps = {
-  /** Theme to start on. Left out, the system's own preference is followed. */
+  /** Theme to use; a new value is applied in place, without a remount. Left out, the system's own preference is followed. */
   initialTheme?: ThemeKeys;
   /** Theme to treat as the system's, instead of reading `prefers-color-scheme`. */
   systemTheme?: ThemeKeys;

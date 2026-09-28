@@ -35,9 +35,9 @@ export type TextareaProps = {
    * place in the tab order; pass `-1` only for a field the keyboard is meant to
    * skip. */
   tabIndex?: number;
-  /** Accessible name of the field, for when no `<label>` points at it. This
-   * type is closed — it accepts no arbitrary DOM attributes — so this prop and
-   * `aria-labelledby` are the only two ways to name the field. */
+  /** Accessible name of the field, for when no `<label>` points at it. Declared
+   * as a prop because this type is closed and accepts no arbitrary DOM
+   * attributes; `id` with a `<label for>` names the field just as well. */
   "aria-label"?: string;
   /** `id` of the element that names this field — the usual choice when the
    * caption is already on screen, for instance a `FieldContainer` label given

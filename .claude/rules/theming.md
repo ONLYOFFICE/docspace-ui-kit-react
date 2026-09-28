@@ -47,6 +47,18 @@ here is the only place it will ever resolve.
   they render standalone: `--accent-main: var(--color-scheme-main-accent, #{$light-blue-main})`
   in `Tabs`, `AddButton`, `IconButton`. Copy that exact form — the `--color-scheme-*` indirection
   is what lets an admin re-brand the accent.
+  Put the default **inside the `var()` chain**, never as a declaration of the host's token on
+  your own element. A custom property declared on an element beats the same property inherited
+  from an ancestor, so `.sectionContainer { --section-header-height: 69px }` silently swallows
+  the value the SDK sets on a wrapper above the section
+  (`packages/sdk/src/hooks/useFrameHeaderConfig.ts` — its `headerHeight` frame option). The
+  shape that cannot do that is
+  `var(--section-header-size, var(--section-header-height, 69px))`, and where the default has to
+  differ per theme, declare a private token of your own for the last link
+  (`--section-header-bg-default`) rather than the portal's. Every rule that reads the token needs
+  the fallback: putting it only in the bridge variable leaves the readers outside that element
+  resolving to nothing — which is how `Section`'s body lost its negative margin and the file list
+  gained a 20px indent.
 - **A component-level knob**, always with a fallback, and documented in the component's story:
   `var(--article-width, var(--article-desktop-width))`. ~760 of the ~2 560 `var()` uses in
   `components/` carry a fallback, and that is the shape a consumer-overridable token takes.
