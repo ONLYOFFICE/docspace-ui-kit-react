@@ -249,6 +249,23 @@ is not the repository root.
 The exception is a path that is genuinely absolute on every machine — a URL, or a runtime path
 inside a container such as `/app`. A path under `/Users`, `/home` or `C:\Users` never is.
 
+## Language
+
+Everything committed here is written in English: source and comments, READMEs and `.mdx`
+pages, the rules under `.claude/`, commit messages. The ASCII scan in
+`.claude/rules/source-checks.md` already refuses non-Latin text in `.ts` and `.tsx`; this is
+the same rule for prose and every other file, where nothing checks it. Two things are not
+prose and may hold other languages: locale resources under `locales/`, and an example of
+feeding them, such as the Russian strings in the root README's translation example.
+
+Working notes in another language do not go into the repository at all. Keep such a file out
+with `.git/info/exclude` — it is local, uncommitted, and `git add -A` skips it — rather than
+translating it or committing it. To look for stray text:
+
+```bash
+git grep -nIP '[\x{0400}-\x{04FF}]' -- . ':!locales'
+```
+
 ## Commit messages
 
 Do not add `Co-Authored-By` trailers or any other AI-attribution lines to
