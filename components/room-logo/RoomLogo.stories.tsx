@@ -1,5 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import { RoomsType } from "../../enums";
 
@@ -11,14 +12,17 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `Displays the default room logo icon based on room type, with support for archive, template, and checkbox states.
+        component: `Draws the stock glyph for a room type, for rooms that have no logo of their own.
 
 ### Features
 
-- **Room Type Icons**: Different SVG icons for each room type (Editing, Custom, Public, VirtualData, Form, AI)
-- **Archive State**: Dedicated archive icon
-- **Template Support**: Template-specific icons for each room type
-- **Checkbox Integration**: Optional checkbox overlay for selection in row/tile views
+- **Room Type Icons**: Draws a separate glyph for each room type (Editing, Custom, Public, Virtual Data, Form, AI)
+- **Archive State**: Replaces the type's glyph with the archive glyph, whatever the type and the other flags say
+- **Generic Template Glyph**: Draws one template glyph for every type when \`isTemplate\` is set
+- **Template Variants**: Draws a template variant of each type's glyph, falling back to the plain glyph for the AI type, which has no variant
+- **Empty Placeholder**: Keeps a blank box of the logo's size when the type is missing or unknown
+- **Selection Checkbox**: Optional checkbox beside the glyph, hidden by the component's own stylesheet until a rule of yours reveals it
+- **Tap To Select**: A tap on the glyph calls \`onChange\` on mobile devices only, so a row can be selected without reaching the checkbox
 
 ### Usage
 
@@ -32,6 +36,9 @@ import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
 // Archive room
 <RoomLogo type={RoomsType.CustomRoom} isArchive />
 
+// Template variant of a room type
+<RoomLogo type={RoomsType.FormRoom} isTemplateRoom />
+
 // With checkbox
 <RoomLogo type={RoomsType.EditingRoom} withCheckbox isChecked={false} onChange={handleChange} />
 \`\`\``,
@@ -43,49 +50,79 @@ import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
     type: {
       control: "select",
       options: Object.values(RoomsType).filter((v) => typeof v === "number"),
-      description: "Room type determining which icon to display",
+      description:
+        "Which room type's glyph to draw. A missing or unknown value draws nothing and leaves a blank box of the logo's size",
+      table: {
+        defaultValue: { summary: "undefined" },
+      },
     },
     isArchive: {
       control: "boolean",
-      description: "Show archive icon",
+      description:
+        "Draws the archive glyph instead of the type's glyph; wins over every other flag",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isTemplate: {
       control: "boolean",
-      description: "Show template room icon",
+      description:
+        "Draws the generic template glyph, the same for every type; ignored when `isArchive` is set",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isTemplateRoom: {
       control: "boolean",
-      description: "Show template-specific variant of the room type icon",
+      description:
+        "Draws the template variant of the type's glyph; the AI type has none and keeps its plain glyph",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withCheckbox: {
       control: "boolean",
-      description: "Show checkbox overlay for selection",
+      description:
+        "Renders a checkbox beside the glyph. The component's own stylesheet hides it, so it shows only under a rule of yours",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isChecked: {
       control: "boolean",
-      description: "Checkbox checked state",
+      description: "Whether that checkbox is ticked",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isIndeterminate: {
       control: "boolean",
-      description: "Checkbox indeterminate state",
+      description:
+        "Whether that checkbox shows the mixed state (a dash) instead of a tick",
       table: {
         defaultValue: { summary: "false" },
       },
+    },
+    onChange: {
+      action: "changed",
+      description:
+        "Called when the checkbox is clicked, and when the glyph is tapped on a mobile device; a click on the glyph on desktop does nothing",
+    },
+    isPrivacy: {
+      control: false,
+      description: "Accepted but ignored: nothing in the component reads it",
+    },
+    id: {
+      control: "text",
+      description: "`id` of the outer element",
+    },
+    className: {
+      control: "text",
+      description: "Class added to the outer element, before its own classes",
+    },
+    style: {
+      control: "object",
+      description: "Inline style of the outer element",
     },
   },
 } satisfies Meta<typeof RoomLogoPure>;
@@ -133,6 +170,18 @@ export const Default: Story = {
     withCheckbox: false,
     isChecked: false,
     isIndeterminate: false,
+    onChange: fn(),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The glyph of one room type at its standard size; pick another type or turn on a flag in the Controls panel below to see which glyph wins.",
+      },
+      source: {
+        code: `<RoomLogo type={RoomsType.CustomRoom} />`,
+      },
+    },
   },
 };
 
@@ -163,7 +212,7 @@ export const AllRoomTypes: Story = {
     docs: {
       description: {
         story:
-          "All available room type icons: Editing, Custom, Public, Virtual Data, Form, and AI.",
+          "Every room type side by side, labelled by type, to pick the glyph a list or a header needs for each kind of room.",
       },
       source: {
         code: `<RoomLogo type={RoomsType.EditingRoom} />
@@ -187,7 +236,7 @@ export const ArchiveState: Story = {
     docs: {
       description: {
         story:
-          "Archive icon displayed for archived rooms regardless of room type.",
+          "An archived room keeps one glyph whatever its type (`isArchive`), so a reader tells archived rooms apart from active ones at a glance.",
       },
       source: {
         code: `<RoomLogo type={RoomsType.CustomRoom} isArchive />`,
@@ -203,6 +252,7 @@ const TemplateRoomTypesTemplate = () => {
     { type: RoomsType.PublicRoom, label: "Public" },
     { type: RoomsType.VirtualDataRoom, label: "Virtual Data" },
     { type: RoomsType.FormRoom, label: "Form" },
+    { type: RoomsType.AIRoom, label: "AI" },
   ];
 
   return (
@@ -222,14 +272,15 @@ export const TemplateRoomTypes: Story = {
     docs: {
       description: {
         story:
-          "Template-specific icons for each room type, shown when isTemplateRoom is enabled.",
+          "A template made from a room shows the template variant of that room's glyph (`isTemplateRoom`), so it still says which kind of room it creates. **AI** has no variant and keeps its plain glyph.",
       },
       source: {
         code: `<RoomLogo type={RoomsType.EditingRoom} isTemplateRoom />
 <RoomLogo type={RoomsType.CustomRoom} isTemplateRoom />
 <RoomLogo type={RoomsType.PublicRoom} isTemplateRoom />
 <RoomLogo type={RoomsType.VirtualDataRoom} isTemplateRoom />
-<RoomLogo type={RoomsType.FormRoom} isTemplateRoom />`,
+<RoomLogo type={RoomsType.FormRoom} isTemplateRoom />
+<RoomLogo type={RoomsType.AIRoom} isTemplateRoom />`,
       },
     },
   },
@@ -244,7 +295,8 @@ export const TemplateState: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Generic template icon for template rooms.",
+        story:
+          "One template glyph for every type (`isTemplate`), for a place that lists templates without telling their room types apart; the `type` set here is ignored.",
       },
       source: {
         code: `<RoomLogo type={RoomsType.CustomRoom} isTemplate />`,
@@ -253,23 +305,39 @@ export const TemplateState: Story = {
   },
 };
 
+// The stylesheet hides the checkbox; this rule stands in for the one a host adds to reveal it.
+const revealCheckbox = `.room-logo-selectable .room-logo_icon-container { display: none; }
+.room-logo-selectable .room-logo_checkbox { display: flex; margin: 0; }`;
+
+const SelectableTemplate = (args: ComponentProps<typeof RoomLogoPure>) => (
+  <>
+    <style>{revealCheckbox}</style>
+    <RoomLogoPure {...args} className="room-logo-selectable" />
+  </>
+);
+
 export const WithCheckbox: Story = {
-  render: (args) => <RoomLogoPure {...args} />,
+  render: (args) => <SelectableTemplate {...args} />,
   args: {
     type: RoomsType.EditingRoom,
     withCheckbox: true,
     isChecked: false,
     isIndeterminate: false,
-    onChange: () => console.log("Checkbox changed"),
+    onChange: fn(),
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Room logo with an integrated checkbox for row/tile selection in list views.",
+          "A row in selection mode swaps the glyph for a checkbox in the same box (`withCheckbox`). The component renders the checkbox hidden, so the story adds the rule that swaps them, as a host must; tick it, or set the mixed state in the Controls panel below.",
       },
       source: {
-        code: `<RoomLogo
+        code: `/* host stylesheet */
+.selectable .room-logo_icon-container { display: none; }
+.selectable .room-logo_checkbox { display: flex; margin: 0; }
+
+<RoomLogo
+  className="selectable"
   type={RoomsType.EditingRoom}
   withCheckbox
   isChecked={false}
@@ -281,20 +349,22 @@ export const WithCheckbox: Story = {
 };
 
 export const CheckboxChecked: Story = {
-  render: (args) => <RoomLogoPure {...args} />,
+  render: (args) => <SelectableTemplate {...args} />,
   args: {
     type: RoomsType.EditingRoom,
     withCheckbox: true,
     isChecked: true,
-    onChange: () => console.log("Checkbox changed"),
+    onChange: fn(),
   },
   parameters: {
     docs: {
       description: {
-        story: "Room logo with checkbox in checked state.",
+        story:
+          "A selected row keeps its checkbox ticked (`isChecked`), with the same host rule revealing it as in the story above.",
       },
       source: {
         code: `<RoomLogo
+  className="selectable"
   type={RoomsType.EditingRoom}
   withCheckbox
   isChecked
@@ -307,36 +377,15 @@ export const CheckboxChecked: Story = {
 
 export const CssCustomization = {
   render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-        <span style={{ fontSize: "12px", color: "#666", width: "80px" }}>
-          Default
-        </span>
-        <div style={{ display: "flex", gap: "8px" }}>
-          <RoomLogoPure type={RoomsType.FormRoom} />
-          <RoomLogoPure type={RoomsType.EditingRoom} />
-          <RoomLogoPure type={RoomsType.CustomRoom} />
-        </div>
-      </div>
-      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-        <span style={{ fontSize: "12px", color: "#666", width: "80px" }}>
-          Rounded
-        </span>
-        <div
-          style={
-            {
-              display: "flex",
-              gap: "8px",
-              "--room-logo-size": "40px",
-              "--room-logo-radius": "50%",
-            } as CSSProperties
-          }
-        >
-          <RoomLogoPure type={RoomsType.FormRoom} />
-          <RoomLogoPure type={RoomsType.EditingRoom} />
-          <RoomLogoPure type={RoomsType.CustomRoom} />
-        </div>
-      </div>
+    <div
+      style={
+        {
+          "--room-logo-size": "40px",
+          "--room-logo-radius": "50%",
+        } as CSSProperties
+      }
+    >
+      <RoomLogoPure type={RoomsType.FormRoom} />
     </div>
   ),
   parameters: {
@@ -346,8 +395,15 @@ export const CssCustomization = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--room-logo-size\` | Icon container size | \`32px\` |
-| \`--room-logo-radius\` | Icon border radius | \`6px\` |`,
+| \`--room-logo-size\` | Width and height of the box the glyph sits in; the glyph keeps its drawn 32px size, so a larger value adds empty space around it | \`32px\` |
+| \`--room-logo-radius\` | Corner radius of the glyph's rounded square | \`6px\` |
+
+The example sets both on a wrapper: a 40px box with a round glyph.`,
+      },
+      source: {
+        code: `<div style={{ "--room-logo-size": "40px", "--room-logo-radius": "50%" }}>
+  <RoomLogo type={RoomsType.FormRoom} />
+</div>`,
       },
     },
   },
