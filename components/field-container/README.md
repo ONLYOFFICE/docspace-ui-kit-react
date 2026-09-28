@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["label", "help-button", "text-input"],
   "subComponents": [],
-  "testIds": ["field-container"]
+  "testIds": ["field-container"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # FieldContainer
