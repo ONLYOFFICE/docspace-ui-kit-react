@@ -9,7 +9,14 @@ import { Toast } from "../toast";
 
 import { AccessRightSelect } from "./AccessRightSelect";
 
-import { data } from "./data";
+import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
+
+import { data as options } from "./data";
+
+// The icon is attached here: data.ts ships in the package, and Rollup cannot load `?url`.
+const data = options.map((option) =>
+  option.isSeparator ? option : { ...option, icon: CatalogFolderReactSvgUrl },
+);
 
 const Wrapper = ({ children }: { children: ReactNode }) => (
   <div
