@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["section", "nav-menu", "context-menu"],
   "subComponents": [],
-  "testIds": ["navigation_button", "plus-button", "ai-chat-button"]
+  "testIds": ["navigation_button", "plus-button", "ai-chat-button"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Navigation

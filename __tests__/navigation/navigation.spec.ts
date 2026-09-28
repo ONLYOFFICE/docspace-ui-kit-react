@@ -18,6 +18,21 @@ test.describe("Navigation — light", () => {
     await expect(page).toHaveScreenshot("navigation-default.png");
   });
 
+  test("with action buttons", async ({ page }) => {
+    await gotoStory(page, "with-action-buttons");
+    await expect(page).toHaveScreenshot("navigation-with-action-buttons.png");
+  });
+
+  test("with ai chat button", async ({ page }) => {
+    await gotoStory(page, "with-ai-chat-button");
+    await expect(page).toHaveScreenshot("navigation-with-ai-chat-button.png");
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("navigation-right-to-left.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("navigation-css-customization.png");
