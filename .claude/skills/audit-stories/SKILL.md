@@ -325,6 +325,12 @@ follows it:
   `parameters.docs.story = { inline: false, height }` with a
   one-line comment saying why, and after adding it open the Docs page and
   read `document.documentElement.dataset.dir`: it must still say `ltr`.
+  The frame is a story canvas, so the preview decorator's 20px padding
+  and the canvas body's 13px both apply inside it: give the story
+  `parameters.noPadding: true` and a `height` of the content plus the
+  13px above and below it, then look at the frame on the Docs page —
+  a `height` copied from another story clips the last row, and the
+  decorator padding reads as an unexplained gap above the first.
 - **Comments in a story are rare and one line long.** They explain only
   what the code cannot show — why a story is framed or hidden on Docs,
   why a type forces unused fields — and never repeat the story's own
