@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
   "related": ["rectangle", "progress-bar", "button"],
   "subComponents": [],
-  "testIds": ["loader", "oval-loader", "dual-ring-loader", "rombs-loader", "track-loader"]
+  "testIds": ["loader", "oval-loader", "dual-ring-loader", "rombs-loader", "track-loader"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Loader
