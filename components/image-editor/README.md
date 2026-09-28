@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
   "related": ["avatar-editor-dialog", "room-logo-cover-dialog", "avatar"],
   "subComponents": ["ButtonDelete"],
-  "testIds": ["image-cropper", "change_image_button", "zoom_in_icon_button", "zoom_out_icon_button", "cropper_delete_button"]
+  "testIds": ["image-cropper", "change_image_button", "zoom_in_icon_button", "zoom_out_icon_button", "cropper_delete_button"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # ImageEditor
