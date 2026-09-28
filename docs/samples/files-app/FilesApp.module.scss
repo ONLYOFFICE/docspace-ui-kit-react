@@ -1,3 +1,5 @@
+@use "../../../styles/mixins";
+
 // The frame a portal would give the screen: the sidebar and the section side
 // by side, at a fixed height so the section's own scroll container has
 // something to scroll in.
@@ -47,4 +49,26 @@
 
 .uploadBox {
   min-height: 200px;
+}
+
+// What stands in for the heading once the sidebar is folded to its 60px.
+.collapsedMark {
+  width: 16px;
+  height: 16px;
+}
+
+// Where the portal keeps the floating button: pinned to the foot of the
+// screen, out of the sidebar slot it is rendered in. The client's own
+// stylesheet does the same for its MobileView.
+.floating {
+  position: fixed;
+  z-index: 200;
+  inset-inline-end: 24px;
+  bottom: 24px;
+
+  @include mixins.mobile {
+    position: absolute;
+    inset-inline-end: 16px;
+    bottom: 16px;
+  }
 }

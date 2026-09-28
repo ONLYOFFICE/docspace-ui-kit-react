@@ -5,6 +5,7 @@ import source from "./FilesApp.tsx?raw";
 import sourceTs from "./source.ts?raw";
 import demoTs from "./demo.ts?raw";
 import useListingTs from "./useListing.ts?raw";
+import useDeviceTypeTs from "./useDeviceType.ts?raw";
 
 <Meta of={FilesAppStories} />
 
@@ -56,6 +57,26 @@ never negotiate.**
 That is also what makes the header trick a two-line change: while something
 is selected, render `TableGroupMenu` in `SectionHeader` instead of
 `Navigation`. The body does not know the difference.
+
+## The device type is a prop, so it has to come from somewhere
+
+`Article`, `Section`, `Navigation` and `Filter` take `currentDeviceType`
+rather than measuring the window: on the portal it is one store value every
+screen agrees on. Here `useDeviceType` reads it off the viewport with the
+kit's own breakpoints, and everything follows from that one value, the way
+it does in the client:
+
+- **Desktop**: the sidebar is 243px wide and carries the `Create` button.
+- **Tablet**: the sidebar folds to 60px from the arrow at its foot, the
+  heading gives way to a mark, and there is no wide button to clip -- the
+  `Article` reports `isMobileArticle`, and the actions move to
+  `MainButtonMobile`, the floating button at the foot of the screen. It goes
+  away where nothing can be created.
+- **Phone**: the sidebar becomes a drawer, and the floating button stays.
+
+Narrow the window on this page to watch the switch. Passing a constant
+`DeviceType.desktop` instead, as an earlier version of this sample did, left
+the sidebar able to fold and the button unable to follow.
 
 ## What the portal is asked
 
@@ -133,3 +154,7 @@ from the package -- `@onlyoffice/apps-ui-kit/components/section`, and so on.
 ### useListing.ts -- one listing at a time
 
 <Source code={useListingTs} language="ts" />
+
+### useDeviceType.ts -- the viewport as the portal's device type
+
+<Source code={useDeviceTypeTs} language="ts" />

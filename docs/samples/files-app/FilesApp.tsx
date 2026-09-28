@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
+import CatalogDocumentsReactSvg from "../../../assets/icons/16/catalog.documents.react.svg";
 import CatalogFolderReactSvg from "../../../assets/icons/16/catalog.folder.react.svg";
 import CatalogRoomsReactSvg from "../../../assets/icons/16/catalog.rooms.react.svg";
 import CatalogTrashReactSvg from "../../../assets/icons/16/catalog.trash.react.svg";
@@ -21,6 +22,7 @@ import {
 } from "../../../components/heading";
 import { Link, LinkType } from "../../../components/link";
 import { MainButton } from "../../../components/main-button";
+import { MainButtonMobile } from "../../../components/main-button-mobile";
 import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
 import Navigation from "../../../components/navigation";
 import { RoomIcon } from "../../../components/room-icon";
@@ -52,6 +54,7 @@ import {
   type Query,
   type TypeFilter,
 } from "./source";
+import { useDeviceType } from "./useDeviceType";
 import { useListing } from "./useListing";
 import styles from "./FilesApp.module.scss";
 
@@ -180,6 +183,13 @@ export const FilesApp = () => {
   });
   const { listing, loading, error, reload } = useListing(source, query);
 
+  // The device type comes from the viewport, as the portal's does. The
+  // Article folds itself on a tablet and becomes a drawer on a phone from
+  // this one prop, and tells us through `setIsMobileArticle` when the main
+  // button has to leave the sidebar.
+  const currentDeviceType = useDeviceType();
+  const isDesktop = currentDeviceType === DeviceType.desktop;
+  const [isMobileArticle, setIsMobileArticle] = useState(false);
   const [showText, setShowText] = useState(true);
   const [articleOpen, setArticleOpen] = useState(false);
   const [viewAs, setViewAs] = useState<"row" | "tile">("row");
@@ -304,18 +314,19 @@ export const FilesApp = () => {
     setDialog(next);
   };
 
-  const createOptions = [
-    ...NEW_DOCUMENTS.map(({ key, label, title }) => ({
-      key,
-      label,
-      onClick: () =>
-        run(
-          () => source.createDocument(current.id, title),
-          `${title} created`,
-          "create documents here",
-        ),
-    })),
-    { key: "separator", isSeparator: true },
+  const createDocument = (title: string) =>
+    run(
+      () => source.createDocument(current.id, title),
+      `${title} created`,
+      "create documents here",
+    );
+
+  const documentOptions = NEW_DOCUMENTS.map(({ key, label, title }) => ({
+    key,
+    label,
+    onClick: () => createDocument(title),
+  }));
+  const folderOptions = [
     {
       key: "folder",
       label: "New folder",
@@ -326,6 +337,11 @@ export const FilesApp = () => {
       label: "Upload files",
       onClick: () => openDialog({ kind: "upload" }),
     },
+  ];
+  const createOptions = [
+    ...documentOptions,
+    { key: "separator", isSeparator: true },
+    ...folderOptions,
   ];
 
   const contextOptions = (entry: Entry) => {
@@ -586,9 +602,9 @@ export const FilesApp = () => {
         articleOpen={articleOpen}
         setArticleOpen={setArticleOpen}
         toggleArticleOpen={() => setArticleOpen((state) => !state)}
-        setIsMobileArticle={noop}
-        isMobileArticle={false}
-        currentDeviceType={DeviceType.desktop}
+        setIsMobileArticle={setIsMobileArticle}
+        isMobileArticle={isMobileArticle}
+        currentDeviceType={currentDeviceType}
         // Three flags that turn portal chrome off. Without the first one the
         // header renders the portal's white-label logo instead of the children
         // below; the last one hides the Developer Tools entry, which belongs
@@ -618,19 +634,38 @@ export const FilesApp = () => {
         officeforiosUrl=""
       >
         <Article.Header key="header">
-          <Heading level={HeadingLevel.h3} size={HeadingSize.small}>
-            {demo ? "Files (demo)" : "Files"}
-          </Heading>
+          {showText ? (
+            <Heading level={HeadingLevel.h3} size={HeadingSize.small}>
+              {demo ? "Files (demo)" : "Files"}
+            </Heading>
+          ) : (
+            // Folded to 60px the portal shows its small logo; this is ours.
+            <CatalogDocumentsReactSvg className={styles.collapsedMark} />
+          )}
         </Article.Header>
 
         <Article.MainButton key="main-button">
-          <MainButton
-            isDropdown
-            text="Create"
-            model={createOptions}
-            isDisabled={!canCreate || busy}
-            onAction={noop}
-          />
+          {isMobileArticle ? (
+            // A tablet or a phone keeps no wide button in the sidebar: the
+            // portal moves the actions to the floating button at the foot of
+            // the screen, and drops it where nothing can be created.
+            canCreate ? (
+              <MainButtonMobile
+                className={styles.floating}
+                actionOptions={documentOptions}
+                buttonOptions={folderOptions}
+                withMenu
+              />
+            ) : null
+          ) : (
+            <MainButton
+              isDropdown
+              text="Create"
+              model={createOptions}
+              isDisabled={!canCreate || busy}
+              onAction={noop}
+            />
+          )}
         </Article.MainButton>
 
         <Article.Body key="body">
@@ -644,7 +679,7 @@ export const FilesApp = () => {
 
       <div className={styles.main}>
         <Section
-          currentDeviceType={DeviceType.desktop}
+          currentDeviceType={currentDeviceType}
           withBodyScroll
           isHeaderVisible
           viewAs={viewAs}
@@ -684,7 +719,7 @@ export const FilesApp = () => {
                 isRootFolder={atRoot}
                 canCreate={canCreate}
                 showText
-                isDesktop
+                isDesktop={isDesktop}
                 isRoom={current.isRoom}
                 withMenu
                 showTitle
@@ -692,7 +727,7 @@ export const FilesApp = () => {
                 showNavigationButton={false}
                 isInfoPanelVisible={false}
                 isCurrentFolderInfo={false}
-                currentDeviceType={DeviceType.desktop}
+                currentDeviceType={currentDeviceType}
                 // The ancestors, nearest first, the place's root last: the
                 // portal's `pathParts` without the current folder, reversed.
                 navigationItems={crumbs.map((crumb) => ({
@@ -737,7 +772,7 @@ export const FilesApp = () => {
               filterHeader="Filter"
               selectorLabel="Select"
               userId="1"
-              currentDeviceType={DeviceType.desktop}
+              currentDeviceType={currentDeviceType}
               viewSelectorVisible
               isRooms={false}
               isContactsPage={false}
