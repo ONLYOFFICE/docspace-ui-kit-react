@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
   "related": ["input-block", "text-input", "tooltip"],
   "subComponents": [],
-  "testIds": ["password-input"]
+  "testIds": ["password-input"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # PasswordInput
