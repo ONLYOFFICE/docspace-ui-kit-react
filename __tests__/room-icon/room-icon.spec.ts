@@ -18,6 +18,16 @@ test.describe("RoomIcon — light", () => {
     await expect(page).toHaveScreenshot("room-icon-default.png");
   });
 
+  test("with logo", async ({ page }) => {
+    await gotoStory(page, "with-logo");
+    await expect(page).toHaveScreenshot("room-icon-with-logo.png");
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("room-icon-right-to-left.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("room-icon-css-customization.png");

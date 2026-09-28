@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["room-logo", "avatar", "badge"],
   "subComponents": [],
-  "testIds": ["room-icon", "room-title", "room-icon-cover", "room-icon-image", "empty-icon", "hover-container", "hover-image", "badge-container", "customFileInput"]
+  "testIds": ["room-icon", "room-title", "room-icon-cover", "room-icon-image", "empty-icon", "hover-container", "hover-image", "badge-container", "customFileInput"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # RoomIcon
