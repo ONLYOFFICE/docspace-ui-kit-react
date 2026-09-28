@@ -1,8 +1,8 @@
 import { type Page, expect, test } from "@playwright/test";
 
-// Title: "UI/Interactive elements/DateTimePicker"
-// → prefix: "ui-interactive-elements-datetimepicker"
-const STORY_BASE = "ui-interactive-elements-datetimepicker";
+// Title: "UI/Form controls/DateTimePicker"
+// → prefix: "ui-form-controls-datetimepicker"
+const STORY_BASE = "ui-form-controls-datetimepicker";
 
 async function gotoStory(page: Page, storyId: string) {
   // The css-customization story renders the current time, so without a frozen
@@ -19,6 +19,13 @@ test.describe("DateTimePicker — light", () => {
   test("default", async ({ page }) => {
     await gotoStory(page, "default");
     await expect(page).toHaveScreenshot("date-time-picker-default.png");
+  });
+
+  test("twenty four hour clock", async ({ page }) => {
+    await gotoStory(page, "twenty-four-hour-clock");
+    await expect(page).toHaveScreenshot(
+      "date-time-picker-twenty-four-hour-clock.png",
+    );
   });
 
   test("css customization", async ({ page }) => {
