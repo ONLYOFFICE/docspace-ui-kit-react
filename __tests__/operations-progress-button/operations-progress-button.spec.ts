@@ -19,6 +19,34 @@ test.describe("OperationsProgressButton — light", () => {
       "operations-progress-button-css-customization.png",
     );
   });
+
+  test("stopped operation", async ({ page }) => {
+    await gotoStory(page, "stopped-operation");
+    await expect(page).toHaveScreenshot(
+      "operations-progress-button-stopped-operation.png",
+    );
+  });
+
+  test("opens panel on click", async ({ page }) => {
+    await gotoStory(page, "opens-panel-on-click");
+    await expect(page).toHaveScreenshot(
+      "operations-progress-button-opens-panel-on-click.png",
+    );
+  });
+
+  test("drag preview", async ({ page }) => {
+    await gotoStory(page, "drag-preview");
+    await expect(page).toHaveScreenshot(
+      "operations-progress-button-drag-preview.png",
+    );
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot(
+      "operations-progress-button-right-to-left.png",
+    );
+  });
 });
 
 test.describe("OperationsProgressButton — dark", () => {
