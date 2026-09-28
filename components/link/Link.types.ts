@@ -46,9 +46,9 @@ export type LinkProps = TextProps & {
     | "overline"
     | "underline dotted"
     | "underline dashed";
-  /** Value of `aria-label`. When it is absent the component passes `children`
-   * instead, which is the visible text for a string child and an object for a
-   * node. */
+  /** Value of `aria-label`. When it is absent and `children` is a string, that
+   * string is used, so the visible text is the accessible name; a node child
+   * gets no `aria-label`, and the anchor is named by its content. */
   ariaLabel?: string;
   /** Value of `data-testid` on the anchor.
    * @default "link" */

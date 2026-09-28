@@ -265,11 +265,9 @@ export const OpenMatterDialog = ({
         </FieldContainer>
 
         {error && !error.includes("email") ? (
-          <div role="alert">
-            <Text as="p" fontSize="13px" lineHeight="20px">
-              {error}
-            </Text>
-          </div>
+          <Text as="p" fontSize="13px" lineHeight="20px" role="alert">
+            {error}
+          </Text>
         ) : null}
 
         {steps.length ? (
