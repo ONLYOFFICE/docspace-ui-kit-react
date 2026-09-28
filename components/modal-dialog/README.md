@@ -12,7 +12,8 @@
   "state": { "visibility": "visible", "close": "onClose", "loading": "isLoading", "disabled": null },
   "related": ["aside", "backdrop", "portal"],
   "subComponents": ["ModalDialog.Header", "ModalDialog.Body", "ModalDialog.Footer", "ModalDialog.Container"],
-  "testIds": ["modal"]
+  "testIds": ["modal"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # ModalDialog
