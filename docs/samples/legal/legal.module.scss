@@ -367,6 +367,91 @@
     list-style: none;
   }
 
+  // A document opened in place: a header line, then the editor or its stand-in.
+  .reader {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-block-start: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    box-sizing: border-box;
+
+    :global(.light) & {
+      border: 1px solid colors.$gray-light-mid;
+    }
+
+    :global(.dark) & {
+      border: 1px solid colors.$light-dark-gray-hover;
+    }
+  }
+
+  .readerHeader {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+
+    @media (max-width: 480px) {
+      grid-template-columns: 32px minmax(0, 1fr);
+
+      > :last-child {
+        grid-column: 2;
+      }
+    }
+  }
+
+  .readerActions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .editorBox {
+    height: 560px;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  // The page that stands in for the editor with no portal.
+  .paper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 32px 40px;
+    border-radius: 4px;
+    min-height: 240px;
+
+    :global(.light) & {
+      background-color: colors.$white;
+      border: 1px solid colors.$gray-light-mid;
+      color: colors.$black;
+    }
+
+    :global(.dark) & {
+      background-color: colors.$dark-gray-light;
+      border: 1px solid colors.$light-dark-gray-hover;
+      color: colors.$white;
+    }
+
+    @media (max-width: 480px) {
+      padding: 20px;
+    }
+  }
+
+  .paperTitle {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 26px;
+  }
+
+  .paperLine {
+    margin: 0;
+    font-size: 14px;
+    line-height: 22px;
+  }
+
   // The drop area under a request, sized so the dashed box reads as one.
   .sendBox {
     height: 180px;

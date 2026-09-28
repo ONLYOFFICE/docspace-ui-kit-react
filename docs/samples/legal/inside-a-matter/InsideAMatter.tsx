@@ -43,6 +43,7 @@ import {
   type Request,
 } from "../matterRoom";
 import type { Persona } from "../persona";
+import { DocumentReader } from "../reading-a-draft/DocumentReader";
 import { SendDocument } from "../sending-a-document/SendDocument";
 import { useMatterRoom } from "../useMatterRoom";
 import { useMattersView } from "../useMattersView";
@@ -76,7 +77,16 @@ const OpenLink = ({ href, label }: { href: string; label: string }) => (
 );
 
 /** A file the firm sent: what it is, who last touched it, how big. */
-const DocumentLine = ({ document }: { document: Document }) => {
+const DocumentLine = ({
+  document,
+  onOpen,
+  openLabel,
+}: {
+  document: Document;
+  /** Given, the line gets a button that opens the file where the reader is. */
+  onOpen?: (document: Document) => void;
+  openLabel?: string;
+}) => {
   const { baseUrl } = useApi();
   const href =
     document.url && baseUrl ? new URL(document.url, baseUrl).toString() : "";
@@ -95,8 +105,16 @@ const DocumentLine = ({ document }: { document: Document }) => {
             formatSize(document.bytes),
           ])}
         </Text>
+        {href ? <OpenLink href={href} label="Open in ONLYOFFICE" /> : null}
       </div>
-      {href ? <OpenLink href={href} label="Open in ONLYOFFICE" /> : null}
+      {onOpen ? (
+        <Button
+          size={ButtonSize.extraSmall}
+          primary
+          label={openLabel ?? "Open"}
+          onClick={() => onOpen(document)}
+        />
+      ) : null}
     </li>
   );
 };
@@ -247,16 +265,20 @@ export const MatterRoomPanel = ({
   matter,
   persona,
   sending = false,
+  reading = false,
 }: {
   matter: Matter;
   persona: Persona;
   /** Lets a client answer a request from here, with the next screen's control. */
   sending?: boolean;
+  /** Lets the reader open a draft here, in the editor, with screen 04's control. */
+  reading?: boolean;
 }) => {
   const { isBase } = useTheme();
   const { baseUrl } = useApi();
   const { state, reload, ask, setUp, receive, busy, actionError } =
     useMatterRoom(matter.id);
+  const [openDraft, setOpenDraft] = useState<Document | null>(null);
 
   const send =
     sending && persona === "client" && state.status === "ready"
@@ -406,7 +428,12 @@ export const MatterRoomPanel = ({
           {drafts.length ? (
             <ul className={styles.matterList}>
               {drafts.map((document) => (
-                <DocumentLine key={document.id} document={document} />
+                <DocumentLine
+                  key={document.id}
+                  document={document}
+                  onOpen={reading ? setOpenDraft : undefined}
+                  openLabel={persona === "client" ? "Read" : "Open"}
+                />
               ))}
             </ul>
           ) : (
@@ -416,6 +443,15 @@ export const MatterRoomPanel = ({
                 : `Put a draft in "${FIRM_FOLDER}" and the client sees it here.`}
             </Text>
           )}
+          {openDraft ? (
+            <DocumentReader
+              key={openDraft.id}
+              document={openDraft}
+              mode={persona === "client" ? "view" : "edit"}
+              demo={state.demo}
+              onClose={() => setOpenDraft(null)}
+            />
+          ) : null}
         </CollapsibleCard>
 
         {persona === "lawyer" && (otherFolders || otherFiles) ? (

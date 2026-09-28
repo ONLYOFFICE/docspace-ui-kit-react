@@ -197,6 +197,7 @@ export const CabinetFrame = ({ demoAs }: { demoAs: Persona }) => {
               matter={screen.matter}
               persona={persona}
               sending={persona === "client"}
+              reading
             />
           </>
         )}

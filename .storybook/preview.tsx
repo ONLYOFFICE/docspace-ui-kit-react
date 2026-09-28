@@ -150,6 +150,7 @@ const preview: Preview = {
               "01. My matters",
               "02. Inside a matter",
               "03. Sending a document",
+              "04. Reading the firm's draft",
               "05. Opening a matter",
               "Setup",
               [

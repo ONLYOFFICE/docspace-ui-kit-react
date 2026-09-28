@@ -1,0 +1,69 @@
+import { Meta, Source, Story } from "@storybook/addon-docs/blocks";
+
+import * as ReadingADraftStories from "./ReadingADraft.stories";
+import readerSource from "./DocumentReader.tsx?raw";
+import source from "./ReadingADraft.tsx?raw";
+
+<Meta of={ReadingADraftStories} />
+
+# 04. Reading the firm's draft
+
+The other half of the exchange. The firm puts a draft in `From the firm`;
+the client presses **Read** and it opens where they are, in the ONLYOFFICE
+editor, read-only. The lawyer presses **Open** on the same line and edits
+it. Nothing is downloaded, nothing is attached to an email, and there is one
+copy.
+
+<Story of={ReadingADraftStories.Default} />
+
+With no portal a page stands in for the editor, because there is no document
+server to load one from. Connect a portal, sign the client in from
+[Who is signed in](?path=/docs/samples-legal-practice-setup-who-is-signed-in--docs),
+and the editor is the real one, minted for that client.
+
+## One component, two calls and a script
+
+`DocumentEditor` is the kit's wrapper around the ONLYOFFICE editor. Given a
+file id it does three things through `useApi()`:
+
+1. asks the portal where its document server is (`getDocServiceUrl`);
+2. asks the portal for this file's editor configuration
+   (`openEditFile`, with `view` when `isView` is set): the document's signed
+   link, the editor's mode, and a token, all minted for whoever asked;
+3. loads the editor script from that document server and mounts it with
+   that configuration.
+
+Under the client's `ApiProvider` all three happen as the client. So the
+configuration is what the client may do in that room, and `isView` asks for
+less than that: read, and comment. The lawyer, under the API key, gets the
+same file in editing mode from the same control.
+
+<Source code={readerSource} language="tsx" />
+
+## What changed on the earlier screen
+
+`MatterRoomPanel` took one more prop, `reading`. A document line in the
+firm's folder now has a button beside the link to the portal, and the panel
+mounts `DocumentReader` under the list for the one that was pressed. The
+list itself, the checklist and the facts are untouched.
+
+## Details worth copying
+
+- **The document server is the portal's, and the browser has to reach it.**
+  The editor script and the document's link both point at it. A server the
+  portal knows but the reader's network cannot reach fails at load, which
+  is what `onLoadComponentError` reports.
+- **The reader must be a member of the room.** A file the portal will not
+  show the client answers 403 to `openEditFile`, which arrives as the same
+  error; the checklist and the drafts come from the same room, so a client
+  who sees the line can open the file.
+- **Every editor on a page needs its own `id`.** The editor mounts into an
+  element by id; two readers with the same id fight over one element. The
+  reader uses the file's id.
+- **Wait for `events_onAppReady`.** The wrapper renders nothing until the
+  configuration arrives, and the editor draws its own loading state after;
+  the reader shows a loader until the editor says it is ready.
+
+## The code
+
+<Source code={source} language="tsx" />
