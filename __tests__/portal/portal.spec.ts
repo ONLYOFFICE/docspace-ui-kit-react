@@ -34,3 +34,10 @@ test.describe("Portal — dark", () => {
     await expect(page).toHaveScreenshot("portal-css-customization-dark.png");
   });
 });
+
+test.describe("Portal — into document body", () => {
+  test("into document body", async ({ page }) => {
+    await gotoStory(page, "into-document-body");
+    await expect(page).toHaveScreenshot("portal-into-document-body.png");
+  });
+});
