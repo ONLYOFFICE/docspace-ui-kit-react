@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["combobox", "button", "infinite-loader"],
   "subComponents": [],
-  "testIds": ["paging", "paging_previous_button", "paging_next_button", "paging_page_items_combobox", "paging_count_items_combobox"]
+  "testIds": ["paging", "paging_previous_button", "paging_next_button", "paging_page_items_combobox", "paging_count_items_combobox"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Paging
