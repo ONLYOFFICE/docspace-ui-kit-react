@@ -97,13 +97,17 @@ const sampleTiles = [
     id: "sample-sending",
     icon: <UseTemplateIcon />,
     label: "Sending a document",
-    href: docsHref("samples-legal-practice-03-sending-a-document--docs"),
+    href: docsHref(
+      "samples-legal-practice-screens-03-sending-a-document--docs",
+    ),
   },
   {
     id: "sample-reading",
     icon: <CreateSpreadsheetIcon />,
     label: "Reading the firm's draft",
-    href: docsHref("samples-legal-practice-04-reading-the-firm-s-draft--docs"),
+    href: docsHref(
+      "samples-legal-practice-screens-04-reading-the-firm-s-draft--docs",
+    ),
   },
   {
     id: "sample-seed",

@@ -139,19 +139,22 @@ const preview: Preview = {
             // Two samples. "Legal practice" is the main one: a client cabinet
             // for a law firm built against a real portal, one problem held
             // through the whole track, each screen a question and the
-            // components that answer it. "Setup" holds the pages that wire a
-            // portal in. "A small Files app" is the general-purpose screen:
+            // components that answer it, grouped under "Screens". "Setup"
+            // holds the pages that wire a portal in. "A small Files app" is the general-purpose screen:
             // the same portal read through the layout components, with a
             // demo tree behind it when no portal is configured.
             "Legal practice",
             [
               "Overview",
               "The cabinet",
-              "01. My matters",
-              "02. Inside a matter",
-              "03. Sending a document",
-              "04. Reading the firm's draft",
-              "05. Opening a matter",
+              "Screens",
+              [
+                "01. My matters",
+                "02. Inside a matter",
+                "03. Sending a document",
+                "04. Reading the firm's draft",
+                "05. Opening a matter",
+              ],
               "Setup",
               [
                 "Connect to a portal",
