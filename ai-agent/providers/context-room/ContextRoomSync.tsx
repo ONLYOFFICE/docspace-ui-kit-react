@@ -72,14 +72,25 @@ const ContextRoomSync = () => {
       .then((hasAiFolder) => {
         if (cancelled) return;
         const current = useCloudsStore.getState();
-        if (hasAiFolder) {
-          current.selectContextFolder(CONTEXT_ROOM_CLOUD, {
-            id: roomId,
-            name: roomName,
-          });
-        } else {
+        if (!hasAiFolder) {
           current.clearContextFolder();
+          return;
         }
+        const selected = current.selectedContextFolder;
+        if (
+          selected?.cloud === CONTEXT_ROOM_CLOUD &&
+          selected.room.id === roomId
+        ) {
+          // Same room as last time: the store would skip the pick, so
+          // re-read the skills — the chat is opening, and a file added to
+          // the folder since should show up now, not after leaving the room.
+          void current.fetchRoomSkills();
+          return;
+        }
+        current.selectContextFolder(CONTEXT_ROOM_CLOUD, {
+          id: roomId,
+          name: roomName,
+        });
       });
 
     return () => {

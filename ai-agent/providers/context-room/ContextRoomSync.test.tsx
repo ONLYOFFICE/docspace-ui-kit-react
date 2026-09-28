@@ -33,8 +33,13 @@ import { act, render } from "@testing-library/react";
 import { ContextRoomProvider } from "./index";
 
 const clouds = {
+  selectedContextFolder: null as null | {
+    cloud: string;
+    room: { id: string; name: string };
+  },
   selectContextFolder: vi.fn(),
   clearContextFolder: vi.fn(),
+  fetchRoomSkills: vi.fn(),
 };
 const useCloudsStore = { getState: () => clouds };
 
@@ -63,6 +68,21 @@ const renderSync = (room: { id: string; name: string } | null) =>
 describe("ContextRoomSync", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clouds.selectedContextFolder = null;
+  });
+
+  it("re-reads the skills when the chat reopens in the room already connected", async () => {
+    hasRoomAiFolder.mockResolvedValue(true);
+    clouds.selectedContextFolder = {
+      cloud: CONTEXT_ROOM_CLOUD,
+      room: { id: "12", name: "Sales" },
+    };
+    renderSync({ id: "12", name: "Sales" });
+    await flush();
+
+    expect(clouds.selectContextFolder).not.toHaveBeenCalled();
+    expect(clouds.fetchRoomSkills).toHaveBeenCalledTimes(1);
+    expect(clouds.clearContextFolder).not.toHaveBeenCalled();
   });
 
   it("connects the room once its .ai folder is confirmed", async () => {
