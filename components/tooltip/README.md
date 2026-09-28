@@ -12,7 +12,8 @@
   "state": { "visibility": "isOpen", "close": "afterHide", "loading": null, "disabled": null },
   "related": ["portal", "help-button", "icon-button"],
   "subComponents": ["TooltipContainer", "RootTooltip"],
-  "testIds": ["tooltip", "system-tooltip-container", "info-tooltip-container"]
+  "testIds": ["tooltip", "system-tooltip-container", "info-tooltip-container"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Tooltip
