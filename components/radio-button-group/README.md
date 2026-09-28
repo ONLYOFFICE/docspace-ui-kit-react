@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
   "related": ["radio-button", "checkbox", "combobox"],
   "subComponents": [],
-  "testIds": ["radio-button-group", "radio-button-group_text"]
+  "testIds": ["radio-button-group", "radio-button-group_text"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # RadioButtonGroup
