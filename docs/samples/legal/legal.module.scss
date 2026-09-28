@@ -4,6 +4,25 @@
 // shapes the portal's own screens use, so a sample looks like a page of the
 // product rather than a page of documentation.
 
+// The walkthrough on the Overview page: a recording of the cabinet in demo
+// mode, framed like the screens it shows.
+.demoGif {
+  display: block;
+  width: 100%;
+  max-width: 1000px;
+  height: auto;
+  border-radius: 12px;
+  box-sizing: border-box;
+
+  :global(.light) & {
+    border: 1px solid colors.$gray-light-mid;
+  }
+
+  :global(.dark) & {
+    border: 1px solid colors.$light-dark-gray-hover;
+  }
+}
+
 .page {
   --accent-main: var(--color-scheme-main-accent, #{colors.$light-blue-main});
 

@@ -1,5 +1,8 @@
 import { Meta } from "@storybook/addon-docs/blocks";
 
+import walkthrough from "./cabinet.gif";
+import styles from "./legal.module.scss";
+
 <Meta title="Samples/Legal practice/Overview" />
 
 # A client cabinet for a law firm
@@ -15,6 +18,18 @@ anyone's documents. A matter is a room. What the firm needs from the client is
 a set of folders. The client signs in as themselves, drops files where they
 are asked for, and reads the firm's drafts in the editor without downloading
 them.
+
+<img
+  className={styles.demoGif}
+  src={walkthrough}
+  alt="The cabinet, walked through: the lawyer's list of matters, a matter opened to its checklist, the client sending a document and reading a draft, and a new matter opened from the form"
+/>
+
+Half a minute of the cabinet on demo data: the lawyer's list, a matter and its
+checklist, the client sending a document and reading a draft, and a new matter
+opened from the form. Every screen in it is one of the samples below, and the
+whole of it is
+[The cabinet](?path=/docs/samples-legal-practice-the-cabinet--docs).
 
 ## The model
 
