@@ -1,7 +1,10 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
+import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
+import { RootTooltip } from "../tooltip";
 import { SelectedItem } from ".";
 import styles from "./SelectedItem.stories.module.scss";
 
@@ -15,11 +18,21 @@ const meta = {
 
 ### Features
 
-- **Inline & Block Modes**: Display as inline (fit-content width) or block element
-- **Close Button**: Built-in close button with callback for item removal
-- **Disabled State**: Prevents interaction when disabled
+- **Inline & Block Modes**: Shrinks to its content by default, or fills the width of its container when \`isInline\` is off
+- **Close Button**: Built-in cross that hands the item's key, label and group to \`onClose\`, or is left out with \`hideCross\`
+- **Disabled State**: Greys out the label and the cross and stops both handlers from firing
 - **Group Support**: Optional group key for categorized selections
-- **Custom Icons**: Support for SVG icons alongside the label
+- **Custom Icons**: Shows a glyph before the label, from an SVG URL or an SVG component
+- **Active State**: Draws the chip, its label and its icon in the selected colours
+- **Click Handling**: Reports a click anywhere on the chip to \`onClick\`, with the same key, label and group
+- **Label Truncation**: Cuts a long label off with an ellipsis, and can show the full text in the shared tooltip through \`title\`, once \`RootTooltip\` is mounted
+
+### Accessibility
+
+The chip is a plain container; what assistive technology gets comes from its cross.
+
+- The cross carries \`aria-disabled\`, \`true\` while \`isDisabled\` is set
+- Neither the chip nor its cross is in the tab order or answers a key, so both are reached with the pointer only
 
 ### Usage
 
@@ -41,36 +54,102 @@ import { SelectedItem } from "@onlyoffice/apps-ui-kit/components/selected-item";
   argTypes: {
     label: {
       control: "text",
-      description: "Text content for the selected item",
+      description: "Text of the chip. An empty label renders nothing at all",
     },
     isInline: {
       control: "boolean",
-      description: "Display as inline (fit-content) or block element",
+      description:
+        "Shrinks the chip to its content; turned off, the chip fills the width of its container",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     isDisabled: {
       control: "boolean",
-      description: "Disables the item and prevents interaction",
+      description:
+        "Greys out the label and the cross and stops `onClose` and `onClick` from firing",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     propKey: {
       control: "text",
-      description: "Unique identifier for the selected item",
+      description:
+        "Identifier handed back to `onClose` and `onClick`; it is not used for anything else",
     },
     group: {
       control: "text",
-      description: "Optional group key for categorized selections",
+      description:
+        "Second identifier handed back to both handlers (`onClose` receives an empty string when it is not set), for chips that belong to several filters",
     },
     hideCross: {
       control: "boolean",
-      description: "Hides the close/remove button",
+      description:
+        "Leaves the cross out, so nothing on the chip fires `onClose`",
       table: {
         defaultValue: { summary: "false" },
       },
+    },
+    isActive: {
+      control: "boolean",
+      description:
+        "Draws the chip in its selected colours: a tinted background with the label and icon in the accent colour",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    icon: {
+      control: false,
+      description:
+        "Glyph before the label: an SVG URL, or a component rendered with no props",
+    },
+    title: {
+      control: "text",
+      description:
+        "Text of the shared tooltip that opens when the pointer rests on the chip, useful when a long label is cut off; it needs `RootTooltip` mounted",
+    },
+    onClose: {
+      action: "onClose",
+      description:
+        "Called when the cross is clicked, with `propKey`, `label`, `group` and the event",
+    },
+    onClick: {
+      action: "onClick",
+      description:
+        "Called when the chip is clicked, with `propKey`, `label`, `group` and the event",
+    },
+    className: {
+      control: "text",
+      description: "Class added to the outermost element",
+    },
+    id: {
+      control: "text",
+      description: "`id` of the outermost element",
+    },
+    classNameCloseButton: {
+      control: "text",
+      description: "Class added to the cross button",
+    },
+    dataTestId: {
+      control: "text",
+      description: "`data-testid` of the outermost element",
+      table: {
+        defaultValue: { summary: '"selected-item"' },
+      },
+    },
+    forwardedRef: {
+      control: false,
+      description: "Ref to the outermost element",
+    },
+    style: {
+      control: false,
+      description:
+        "Ignored: nothing reads it; style the chip through `className` or the CSS custom properties",
+    },
+    clickable: {
+      control: false,
+      description:
+        "Ignored: nothing reads it; passing `onClick` is what makes the chip clickable",
     },
   },
 } satisfies Meta<typeof SelectedItem>;
@@ -87,14 +166,15 @@ export const Default: Story = {
     label: "Selected item",
     isInline: true,
     isDisabled: false,
-    onClose: noop,
+    onClose: fn(),
+    onClick: fn(),
     propKey: "item-1",
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Default inline selected item with a close button. Click the close button to trigger the onClose callback.",
+          "The chip as a filter shows a picked value: click the cross to see `onClose` in the Actions panel, click the label for `onClick`, and change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<SelectedItem label="Selected item" propKey="item-1" isInline onClose={handleRemove} />`,
@@ -109,17 +189,17 @@ export const DisabledState: Story = {
     label: "Disabled item",
     isInline: true,
     isDisabled: true,
-    onClose: noop,
+    onClose: fn(),
     propKey: "item-disabled",
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Disabled selected item that cannot be interacted with or removed.",
+          "For a value the user may see but not take back: the label and the cross grey out and neither handler fires (`isDisabled`).",
       },
       source: {
-        code: `<SelectedItem label="Disabled item" propKey="item-1" isInline isDisabled onClose={handleRemove} />`,
+        code: `<SelectedItem label="Disabled item" propKey="item-disabled" isInline isDisabled onClose={handleRemove} />`,
       },
     },
   },
@@ -131,17 +211,17 @@ export const BlockDisplay: Story = {
     label: "Block display item",
     isInline: false,
     isDisabled: false,
-    onClose: noop,
+    onClose: fn(),
     propKey: "item-block",
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Selected item in block display mode, taking the full width of its container.",
+          "For a list of picked values stacked one per row: the chip fills the width of its container and pushes the cross to the far end (`isInline={false}`).",
       },
       source: {
-        code: `<SelectedItem label="Block item" propKey="item-1" isInline={false} onClose={handleRemove} />`,
+        code: `<SelectedItem label="Block display item" propKey="item-block" isInline={false} onClose={handleRemove} />`,
       },
     },
   },
@@ -190,12 +270,117 @@ export const AllVariants: Story = {
     docs: {
       description: {
         story:
-          "All selected item variants: multiple inline items (enabled and disabled) and a block display item.",
+          "How the modes sit together in a filter bar:\n\n- **Inline enabled** and **Another item** — inline chips wrapping in a row\n- **Inline disabled** — the same chip with its label and cross greyed out (`isDisabled`)\n- **Block display item** — a chip that fills the row (`isInline={false}`)",
       },
       source: {
         code: `<SelectedItem label="Inline enabled" propKey="1" isInline onClose={handleRemove} />
 <SelectedItem label="Inline disabled" propKey="2" isInline isDisabled onClose={handleRemove} />
-<SelectedItem label="Block item" propKey="3" isInline={false} onClose={handleRemove} />`,
+<SelectedItem label="Another item" propKey="3" isInline onClose={handleRemove} />
+<SelectedItem label="Block display item" propKey="4" isInline={false} onClose={handleRemove} />`,
+      },
+    },
+  },
+};
+
+export const WithIcon: Story = {
+  render: (args) => <SelectedItem {...args} />,
+  args: {
+    label: "Documents",
+    isInline: true,
+    icon: CatalogFolderIcon,
+    onClose: fn(),
+    propKey: "item-icon",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a value that is easier to recognise by its kind: a glyph sits before the label (`icon`, here an SVG component; an SVG URL works too).",
+      },
+      source: {
+        code: `import FolderIcon from "./folder.react.svg";
+
+<SelectedItem label="Documents" propKey="item-icon" icon={FolderIcon} isInline onClose={handleRemove} />`,
+      },
+    },
+  },
+};
+
+export const ActiveState: Story = {
+  render: (args) => <SelectedItem {...args} />,
+  args: {
+    label: "Documents",
+    isInline: true,
+    isActive: true,
+    icon: CatalogFolderIcon,
+    onClose: fn(),
+    propKey: "item-active",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For the chip the user is working with right now: the background tints and the label and icon take the accent colour (`isActive`).",
+      },
+      source: {
+        code: `<SelectedItem label="Documents" propKey="item-active" icon={FolderIcon} isInline isActive onClose={handleRemove} />`,
+      },
+    },
+  },
+};
+
+export const WithoutCross: Story = {
+  render: (args) => <SelectedItem {...args} />,
+  args: {
+    label: "Read only",
+    isInline: true,
+    hideCross: true,
+    onClose: fn(),
+    onClick: fn(),
+    propKey: "item-no-cross",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a value the user can pick but not remove from the chip itself: the cross is left out and only a click on the chip is reported (`hideCross`).",
+      },
+      source: {
+        code: `<SelectedItem label="Read only" propKey="item-no-cross" isInline hideCross onClose={handleRemove} onClick={handleClick} />`,
+      },
+    },
+  },
+};
+
+export const TruncatedLabel: Story = {
+  render: (args) => (
+    <>
+      <SelectedItem {...args} />
+      <RootTooltip />
+    </>
+  ),
+  args: {
+    label: "Quarterly report drafts and shared spreadsheets",
+    title: "Quarterly report drafts and shared spreadsheets",
+    isInline: true,
+    onClose: fn(),
+    propKey: "item-long",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For values longer than a chip can hold: the label is cut off with an ellipsis; rest the pointer on the chip to read the full text in the tooltip (`title`). The tooltip is the kit's shared one, so the app must mount `RootTooltip` once, as this story does.",
+      },
+      source: {
+        code: `<SelectedItem
+  label="Quarterly report drafts and shared spreadsheets"
+  title="Quarterly report drafts and shared spreadsheets"
+  propKey="item-long"
+  isInline
+  onClose={handleRemove}
+/>
+<RootTooltip />`,
       },
     },
   },
@@ -211,11 +396,15 @@ export const CssCustomization: Story = {
           flexWrap: "wrap",
           "--selected-item-bg": "#ede9fe",
           "--selected-item-bg-hover": "#ddd6fe",
-          "--selected-item-text": "#4c1d95",
           "--selected-item-disabled-text": "#a78bfa",
+          "--selected-item-active-bg": "#4c1d95",
+          "--selected-item-active-text": "#ffffff",
           "--selected-item-radius": "16px",
           "--selected-item-padding": "6px 12px",
           "--selected-item-height": "28px",
+          "--selected-item-margin-inline": "12px",
+          "--selected-item-margin-bottom": "8px",
+          "--selected-item-label-margin": "16px",
         } as CSSProperties
       }
     >
@@ -233,9 +422,10 @@ export const CssCustomization: Story = {
         onClose={() => {}}
       />
       <SelectedItem
-        label="Another tag"
+        label="Active"
         propKey="3"
         isInline
+        isActive
         onClose={() => {}}
       />
     </div>
@@ -247,18 +437,40 @@ export const CssCustomization: Story = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--selected-item-bg\` | Background color | theme token |
-| \`--selected-item-bg-hover\` | Hover background | theme token |
-| \`--selected-item-text\` | Label text color | theme token |
-| \`--selected-item-disabled-text\` | Disabled label color | theme token |
-| \`--selected-item-active-bg\` | Active state background | theme token |
-| \`--selected-item-active-text\` | Active state text color | theme token |
+| \`--selected-item-bg\` | Background color | theme-based |
+| \`--selected-item-bg-hover\` | Hover background (not applied while disabled or active) | theme-based |
+| \`--selected-item-disabled-text\` | Label color while disabled | theme-based |
+| \`--selected-item-active-bg\` | Background while \`isActive\` | theme-based |
+| \`--selected-item-active-text\` | Label and icon color while \`isActive\` | theme-based |
 | \`--selected-item-radius\` | Border radius | \`3px\` |
 | \`--selected-item-padding\` | Inner padding | \`6px 8px\` |
 | \`--selected-item-height\` | Item height | \`32px\` |
-| \`--selected-item-margin-inline\` | Inline-end margin | \`4px\` |
-| \`--selected-item-margin-bottom\` | Bottom margin | \`4px\` |
-| \`--selected-item-label-margin\` | Label inline-end margin | \`10px\` |`,
+| \`--selected-item-margin-inline\` | Space after the chip, on its inline-end side | \`4px\` |
+| \`--selected-item-margin-bottom\` | Space below the chip | \`4px\` |
+| \`--selected-item-label-margin\` | Space between the label and the cross | \`10px\` |
+
+The example has three chips: **Custom item** for the colours and sizes (hover it for the hover background), **Disabled** for \`--selected-item-disabled-text\` (\`isDisabled\`), and **Active** for the two active variables (\`isActive\`).`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--selected-item-bg": "#ede9fe",
+    "--selected-item-bg-hover": "#ddd6fe",
+    "--selected-item-disabled-text": "#a78bfa",
+    "--selected-item-active-bg": "#4c1d95",
+    "--selected-item-active-text": "#ffffff",
+    "--selected-item-radius": "16px",
+    "--selected-item-padding": "6px 12px",
+    "--selected-item-height": "28px",
+    "--selected-item-margin-inline": "12px",
+    "--selected-item-margin-bottom": "8px",
+    "--selected-item-label-margin": "16px",
+  }}
+>
+  <SelectedItem label="Custom item" propKey="1" isInline onClose={handleRemove} />
+  <SelectedItem label="Disabled" propKey="2" isInline isDisabled onClose={handleRemove} />
+  <SelectedItem label="Active" propKey="3" isInline isActive onClose={handleRemove} />
+</div>`,
       },
     },
   },

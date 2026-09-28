@@ -23,6 +23,26 @@ test.describe("SelectedItem — light", () => {
     await expect(page).toHaveScreenshot("selected-item-all-variants.png");
   });
 
+  test("with icon", async ({ page }) => {
+    await gotoStory(page, "with-icon");
+    await expect(page).toHaveScreenshot("selected-item-with-icon.png");
+  });
+
+  test("active state", async ({ page }) => {
+    await gotoStory(page, "active-state");
+    await expect(page).toHaveScreenshot("selected-item-active-state.png");
+  });
+
+  test("without cross", async ({ page }) => {
+    await gotoStory(page, "without-cross");
+    await expect(page).toHaveScreenshot("selected-item-without-cross.png");
+  });
+
+  test("truncated label", async ({ page }) => {
+    await gotoStory(page, "truncated-label");
+    await expect(page).toHaveScreenshot("selected-item-truncated-label.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("selected-item-css-customization.png");
