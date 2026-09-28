@@ -8,10 +8,10 @@ import { Button, ButtonSize } from "../button";
 import { TextInput, InputSize, InputType } from "../text-input";
 import { ToggleButton } from "../toggle-button";
 import { Avatar, AvatarSize, AvatarRole } from "../avatar";
-import { Badge } from "../badge";
 import { Text } from "../text";
 import { Label } from "../label";
 import { Backdrop } from "../backdrop";
+import DefaultUserPhotoUrl from "../../assets/default_user_photo_size_82-82.png";
 
 const meta = {
   title: "UI/Overlays/Aside",
@@ -19,15 +19,26 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `Aside is a sliding panel that appears from the right side of the screen for displaying contextual content.
+        component: `Aside is a sliding panel that appears from the side of the screen for displaying contextual content beside the page.
 
 ### Features
 
-- **Slide-in Animation**: Smooth transition from the right edge
+- **Slide-in Animation**: Slides in from the right edge, from the left one under a right-to-left interface, and up from the bottom as a sheet on a phone
 - **Optional Header**: Built-in header with title, close button, and back navigation
 - **Scrollable Body**: Content area with automatic scrollbar support
 - **Scale Mode**: Full-width scaling option for responsive layouts
-- **Body Scroll Control**: Option to disable page scrolling when the panel is open
+- **Unwrapped Body**: Renders the children without the kit's scrollbar, for content that scrolls on its own
+- **Close Control**: Closes only through the header's close cross, which calls \`onClose\`; there is no Escape key, backdrop or click-outside handling
+- **Stays Mounted**: Slides out of view when \`visible\` is off while the panel and its children stay mounted, so render it conditionally to remove it
+- **Stacking Order**: Sits at a z-index of 400 by default, so a backdrop of your own goes below it
+
+### Accessibility
+
+The panel is a native \`<aside>\` element; the rest is up to the consumer.
+
+- **Landmark**: \`<aside>\` is announced as a complementary landmark, and any \`aria-*\` prop, such as \`aria-label\` to name it, lands on that element
+- **Close cross**: Carries \`aria-label="close"\`, but it is a \`<div>\` with no button role and no tab stop, so a keyboard cannot reach it
+- **Focus**: Is neither moved into the panel when it opens nor kept inside it, and a hidden panel stays in the tab order
 
 ### Usage
 
@@ -37,6 +48,23 @@ import { Aside } from "@onlyoffice/apps-ui-kit/components/aside";
 <Aside visible={isVisible} header="Panel Title" onClose={handleClose}>
   <div>Panel content here</div>
 </Aside>
+
+// A second level with a back arrow
+<Aside
+  visible={isVisible}
+  header="Details"
+  isBackButton
+  onBackClick={handleBack}
+  onClose={handleClose}
+>
+  <DetailsContent />
+</Aside>
+
+// Full width, with a dimming layer of your own below it
+<Backdrop visible={isVisible} onClick={handleClose} zIndex={399} isAside />
+<Aside visible={isVisible} scale header="Preview" onClose={handleClose}>
+  <PreviewContent />
+</Aside>
 \`\`\``,
       },
     },
@@ -45,53 +73,107 @@ import { Aside } from "@onlyoffice/apps-ui-kit/components/aside";
   argTypes: {
     visible: {
       control: "boolean",
-      description: "Controls panel visibility",
-      table: {
-        defaultValue: { summary: "false" },
-      },
+      description:
+        "Whether the panel is slid into view; the panel and its children stay mounted either way. Required",
     },
     scale: {
       control: "boolean",
-      description: "Full-width scaling mode",
+      description:
+        "Makes the panel take the full width of the window instead of 480px",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     zIndex: {
       control: "number",
-      description: "CSS z-index value",
+      description:
+        "Stacking order of the panel; a backdrop of your own needs a lower value",
+      table: {
+        defaultValue: { summary: "400" },
+      },
     },
     withoutHeader: {
       control: "boolean",
-      description: "Hides the header section",
+      description:
+        "Renders no header at all, which also removes the close cross, the only control that calls `onClose`",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withoutBodyScroll: {
       control: "boolean",
-      description: "Disables body scroll when panel is open",
+      description:
+        "Renders the children directly instead of inside the kit's scrollbar; it does not lock the page's scroll",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     header: {
       control: "text",
-      description: "Header title content",
+      description:
+        "Title of the panel: a string is shown as bold 21px text, any other node inside a heading that cuts off with an ellipsis",
     },
     isBackButton: {
       control: "boolean",
-      description: "Shows back button in header",
+      description:
+        "Shows a back arrow before the title, which calls `onBackClick`",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isCloseable: {
       control: "boolean",
-      description: "Shows close button in header",
+      description: "Shows the close cross, which calls `onClose`",
       table: {
         defaultValue: { summary: "true" },
       },
+    },
+    isLoading: {
+      control: "boolean",
+      description:
+        "Replaces the whole header, title, icons and close cross alike, with a skeleton bar",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    withoutBorder: {
+      control: "boolean",
+      description: "Hides the line under the header",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    headerHeight: {
+      control: "text",
+      description:
+        "Height of the header as a CSS length, such as `70px`; without it the header is 53px tall",
+    },
+    headerIcons: {
+      control: false,
+      description:
+        "Extra icon buttons between the title and the close cross, each with a `key`, an `onClick` and an `iconNode` or a `url`",
+    },
+    headerComponent: {
+      control: false,
+      description:
+        "Any node shown in the header after the icons and before the close cross",
+    },
+    onClose: {
+      action: "close clicked",
+      description:
+        "Called when the close cross is clicked; nothing else closes the panel",
+    },
+    onBackClick: {
+      action: "back clicked",
+      description: "Called when the back arrow is clicked",
+    },
+    className: {
+      control: "text",
+      description: "Class name added to the `<aside>` element",
+    },
+    children: {
+      control: false,
+      description: "Content of the panel, shown below the header",
     },
   },
 } satisfies Meta<typeof Aside>;
@@ -249,19 +331,16 @@ const UserProfileContent = () => (
     >
       <Avatar
         size={AvatarSize.big}
-        userName="John Smith"
-        role={AvatarRole.owner}
+        source={DefaultUserPhotoUrl}
+        role={AvatarRole.none}
       />
       <div style={{ textAlign: "center" }}>
         <Text fontSize="16px" fontWeight={700}>
-          John Smith
+          Team member
         </Text>
         <Text fontSize="13px" style={{ marginTop: "4px", color: "#a3a9ae" }}>
-          john.smith@company.com
+          member@example.com
         </Text>
-        <div style={{ marginTop: "8px" }}>
-          <Badge label="Admin" backgroundColor="#265A8F" />
-        </div>
       </div>
     </div>
 
@@ -276,7 +355,7 @@ const UserProfileContent = () => (
       <div>
         <Label text="First Name" />
         <TextInput
-          value="John"
+          value="Team"
           type={InputType.text}
           size={InputSize.base}
           scale
@@ -286,7 +365,7 @@ const UserProfileContent = () => (
       <div>
         <Label text="Last Name" />
         <TextInput
-          value="Smith"
+          value="Member"
           type={InputType.text}
           size={InputSize.base}
           scale
@@ -296,7 +375,7 @@ const UserProfileContent = () => (
       <div>
         <Label text="Email" />
         <TextInput
-          value="john.smith@company.com"
+          value="member@example.com"
           type={InputType.email}
           size={InputSize.base}
           scale
@@ -338,7 +417,7 @@ const FileDetailsContent = () => (
       {[
         { label: "Type", value: "Document" },
         { label: "Size", value: "2.4 MB" },
-        { label: "Owner", value: "John Smith" },
+        { label: "Owner", value: "Team member" },
         { label: "Created", value: "Jan 15, 2026" },
         { label: "Location", value: "My Documents" },
       ].map((item) => (
@@ -363,7 +442,7 @@ const FileDetailsContent = () => (
       <Text fontWeight={600} fontSize="14px" style={{ marginBottom: "12px" }}>
         Shared with
       </Text>
-      {["Alice Johnson", "Bob Wilson", "Carol Davis"].map((name) => (
+      {["Member one", "Member two", "Member three"].map((name) => (
         <div
           key={name}
           style={{
@@ -376,7 +455,7 @@ const FileDetailsContent = () => (
           <Avatar
             size={AvatarSize.min}
             userName={name}
-            role={AvatarRole.user}
+            role={AvatarRole.none}
           />
           <Text fontSize="13px">{name}</Text>
         </div>
@@ -384,76 +463,6 @@ const FileDetailsContent = () => (
     </div>
   </div>
 );
-
-const CssCustomizationTemplate = () => (
-  <div
-    style={
-      {
-        // === Aside — panel background and size ===
-        "--aside-bg": "#e6f3fb",
-        "--aside-width": "360px",
-        "--aside-transition": "transform 0.2s ease",
-        // === AsideHeader — title and border ===
-        "--aside-header-color": "#004f82",
-        "--aside-header-border": "#0082c9",
-        "--aside-header-font-size": "18px",
-        "--aside-header-height": "60px",
-        // === IconButton (close/back buttons in header) ===
-        "--icon-button-color": "#0082c9",
-        "--icon-button-hover-color": "#006ba6",
-      } as CSSProperties
-    }
-  >
-    <Aside visible header="Settings" onClose={() => {}}>
-      <div style={{ padding: "20px" }}>
-        <p style={{ margin: "0 0 12px", fontWeight: 600, color: "#004f82" }}>
-          Custom styled panel
-        </p>
-        <p style={{ margin: 0, fontSize: "13px", color: "#5aa9d0" }}>
-          Background, width, header color and border customized via CSS vars.
-        </p>
-      </div>
-    </Aside>
-  </div>
-);
-
-export const CssCustomization: Story = {
-  render: () => <CssCustomizationTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story: `CSS Custom Properties for external customization:
-
-**Aside — panel**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--aside-bg\` | Panel background color | theme-based (white/black) |
-| \`--aside-width\` | Panel width | \`480px\` |
-| \`--aside-transition\` | Slide animation | \`transform 0.3s ease-in-out\` |
-| \`--aside-mobile-footer-height\` | Mobile footer offset | \`64px\` |
-
-**AsideHeader — header bar**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--aside-header-color\` | Header title text color | theme-based |
-| \`--aside-header-border\` | Header bottom border color | theme-based |
-| \`--aside-header-font-size\` | Header title font size | \`21px\` |
-| \`--aside-header-height\` | Header height | \`53px\` |
-| \`--aside-header-margin\` | Header horizontal margins | \`0 16px\` |
-| \`--aside-header-gap\` | Gap between header elements | \`6px\` |
-
-**IconButton (close/back buttons)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--icon-button-color\` | Icon fill color | theme-based |
-| \`--icon-button-hover-color\` | Icon hover color | theme-based |`,
-      },
-    },
-  },
-};
 
 export const Default: Story = {
   render: (args) => <Template {...args} />,
@@ -472,7 +481,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default aside panel with a header and simple text content. Click the button to open.",
+          "The panel with a title and a short text, opened by the button on the page. Close it with the cross or by clicking the dimmed page — that dimming is a `Backdrop` of the story's own, since `Aside` renders none. Change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<Aside visible={isVisible} header="Panel Title" onClose={handleClose}>
@@ -496,7 +505,7 @@ export const Settings: Story = {
     docs: {
       description: {
         story:
-          "Aside panel displaying a settings form with toggle switches and save button.",
+          "A short settings form with switches and a save button — the kind of form a side panel holds beside the page it configures.",
       },
       source: {
         code: `<Aside visible={isVisible} header="Settings" onClose={handleClose}>
@@ -518,7 +527,7 @@ export const UserProfile: Story = {
     docs: {
       description: {
         story:
-          "Aside panel showing a user profile with avatar, badge, and editable form fields.",
+          "An edit form with an avatar, labelled text fields and two buttons, for changing an item without leaving the page.",
       },
       source: {
         code: `<Aside visible={isVisible} header="Profile" onClose={handleClose}>
@@ -540,7 +549,7 @@ export const FileDetails: Story = {
     docs: {
       description: {
         story:
-          "Aside panel displaying file metadata, details, and sharing information.",
+          "The details of a selected file — its properties and the people it is shared with — the most common content of a side panel next to a list.",
       },
       source: {
         code: `<Aside visible={isVisible} header="File Info" onClose={handleClose}>
@@ -563,7 +572,7 @@ export const WithBackButton: Story = {
     docs: {
       description: {
         story:
-          "Aside panel with a back button in the header for multi-level navigation.",
+          "A back arrow before the title, for a panel with several levels: the arrow calls `onBackClick`, logged in the Actions panel, while the cross still closes the panel (`isBackButton`).",
       },
       source: {
         code: `<Aside visible={isVisible} header="Details" isBackButton onBackClick={handleBack} onClose={handleClose}>
@@ -585,7 +594,7 @@ export const WithoutHeader: Story = {
     docs: {
       description: {
         story:
-          "Aside panel without a header section. Useful when custom header content is needed.",
+          "A panel with no header, for content that brings its own title bar. The close cross goes with the header, so the page has to close the panel itself — here a click on the dimmed page does (`withoutHeader`).",
       },
       source: {
         code: `<Aside visible={isVisible} withoutHeader onClose={handleClose}>
@@ -608,12 +617,138 @@ export const Scaled: Story = {
     docs: {
       description: {
         story:
-          "Aside panel scaled to full width of the viewport. Useful for mobile layouts.",
+          "The panel across the full width of the window instead of 480px, for content that needs the room (`scale`).",
       },
       source: {
         code: `<Aside visible={isVisible} scale header="Full Width Panel" onClose={handleClose}>
   <SettingsContent />
 </Aside>`,
+      },
+    },
+  },
+};
+
+const RightToLeftTemplate = (args: AsideProps) => (
+  <div dir="rtl">
+    <Template {...args} />
+  </div>
+);
+
+// Framed on Docs: the theme provider stamps the direction on the page, which would flip the whole Docs page.
+export const RightToLeft: Story = {
+  render: (args) => <RightToLeftTemplate {...args} />,
+  globals: { direction: "rtl" },
+  args: {
+    visible: true,
+    header: "Details",
+    isBackButton: true,
+    children: <FileDetailsContent />,
+  },
+  parameters: {
+    noPadding: true,
+    docs: {
+      story: { inline: false, height: "600px" },
+      description: {
+        story:
+          'The same panel under a right-to-left interface: it is attached to the left edge instead of the right and slides in from there, the back arrow points the other way and the close cross sits on the left of the header. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+      },
+      source: {
+        code: `<div dir="rtl">
+  <Aside visible header="Details" isBackButton onBackClick={handleBack} onClose={handleClose}>
+    <FileDetailsContent />
+  </Aside>
+</div>`,
+      },
+    },
+  },
+};
+
+const CssCustomizationTemplate = () => (
+  <div
+    style={
+      {
+        // === Aside — panel background and size ===
+        "--aside-bg": "#e6f3fb",
+        "--aside-width": "360px",
+        "--aside-transition": "transform 0.2s ease",
+        "--aside-mobile-footer-height": "32px",
+        // === AsideHeader — title and border ===
+        "--aside-header-color": "#004f82",
+        "--aside-header-border": "#0082c9",
+        "--aside-header-font-size": "18px",
+        "--aside-header-height": "60px",
+        "--aside-header-gap": "12px",
+      } as CSSProperties
+    }
+  >
+    {/* A node title, not a string: a string title ignores the color and font-size variables */}
+    <Aside
+      visible
+      header={<span>Settings</span>}
+      isBackButton
+      onClose={() => {}}
+    >
+      <div style={{ padding: "20px" }}>
+        <p style={{ margin: "0 0 12px", fontWeight: 600, color: "#004f82" }}>
+          Custom styled panel
+        </p>
+        <p style={{ margin: 0, fontSize: "13px", color: "#5aa9d0" }}>
+          Background, width, header color and border customized via CSS vars.
+        </p>
+      </div>
+    </Aside>
+  </div>
+);
+
+// Framed on Docs: the panel is fixed to the window and has no height of its own inline.
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      story: { inline: false, height: "500px" },
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+**Aside — panel**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--aside-bg\` | Panel background color | theme-based (white/black) |
+| \`--aside-width\` | Panel width, and how far the closed panel is moved out of view | \`480px\` |
+| \`--aside-transition\` | Slide animation | \`transform 0.3s ease-in-out\` |
+| \`--aside-mobile-footer-height\` | On a phone, where the panel rises from the bottom as a sheet: how much of the window stays uncovered above the sheet | \`64px\` |
+
+**AsideHeader — header bar**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--aside-header-color\` | Header title text color; a node title only, a string title keeps the text color | theme-based |
+| \`--aside-header-border\` | Header bottom border color | theme-based |
+| \`--aside-header-font-size\` | Header title font size; a node title only, a string title stays 21px | \`21px\` |
+| \`--aside-header-height\` | Header height, unless \`headerHeight\` is set | \`53px\` |
+| \`--aside-header-margin\` | Header horizontal margins; the bottom border keeps reaching 16px past each side, so any other value leaves it short of the panel edges or overflowing them | \`0 16px\` |
+| \`--aside-header-gap\` | Gap between header elements | \`6px\` |
+
+The title here is a node rather than a string, so the color and font-size variables reach it. The back arrow is on to show the gap between it and the title; the phone footer offset shows only in a phone-width window. The margin is left alone because the border does not follow it.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--aside-bg": "#e6f3fb",
+    "--aside-width": "360px",
+    "--aside-transition": "transform 0.2s ease",
+    "--aside-mobile-footer-height": "32px",
+    "--aside-header-color": "#004f82",
+    "--aside-header-border": "#0082c9",
+    "--aside-header-font-size": "18px",
+    "--aside-header-height": "60px",
+    "--aside-header-gap": "12px",
+  }}
+>
+  <Aside visible header={<span>Settings</span>} isBackButton onClose={handleClose}>
+    {children}
+  </Aside>
+</div>`,
       },
     },
   },
