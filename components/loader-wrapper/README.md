@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": "isLoading", "disabled": null },
   "related": ["loader", "app-loader", "progress-bar"],
   "subComponents": [],
-  "testIds": ["loader-wrapper"]
+  "testIds": ["loader-wrapper"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # LoaderWrapper
