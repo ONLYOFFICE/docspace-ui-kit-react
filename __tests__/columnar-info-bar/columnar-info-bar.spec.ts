@@ -19,6 +19,28 @@ test.describe("ColumnarInfoBar -- light", () => {
     );
   });
 
+  test("default", async ({ page }) => {
+    await gotoStory(page, "default");
+    await expect(page).toHaveScreenshot("columnar-info-bar-default.png");
+  });
+
+  test("event-details", async ({ page }) => {
+    await gotoStory(page, "event-details");
+    await expect(page).toHaveScreenshot("columnar-info-bar-event-details.png");
+  });
+
+  test("neutral-variant", async ({ page }) => {
+    await gotoStory(page, "neutral-variant");
+    await expect(page).toHaveScreenshot(
+      "columnar-info-bar-neutral-variant.png",
+    );
+  });
+
+  test("page-variant", async ({ page }) => {
+    await gotoStory(page, "page-variant");
+    await expect(page).toHaveScreenshot("columnar-info-bar-page-variant.png");
+  });
+
   test("css-customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot(
@@ -41,6 +63,22 @@ test.describe("ColumnarInfoBar -- dark", () => {
     await page.evaluate(() => document.body.classList.add("dark"));
     await expect(page).toHaveScreenshot(
       "columnar-info-bar-profile-details-dark.png",
+    );
+  });
+
+  test("neutral-variant dark", async ({ page }) => {
+    await gotoStory(page, "neutral-variant");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await expect(page).toHaveScreenshot(
+      "columnar-info-bar-neutral-variant-dark.png",
+    );
+  });
+
+  test("page-variant dark", async ({ page }) => {
+    await gotoStory(page, "page-variant");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await expect(page).toHaveScreenshot(
+      "columnar-info-bar-page-variant-dark.png",
     );
   });
 
