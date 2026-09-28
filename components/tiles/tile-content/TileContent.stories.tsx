@@ -1,6 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import WordSvgUrl from "../../../assets/icons/32/word.svg";
 
@@ -23,14 +24,17 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `Content wrapper component for tile items, handles layout and spacing.
+        component: `The slot a tile puts its name in, so that every tile in the family lays its title out the same way.
 
 ### Features
 
-- **Flexible Layout**: Wraps any content within a tile structure
-- **Text Overflow**: Handles long text with ellipsis truncation
-- **Composable**: Works with Link, Text, Badge, and other components
-- **Consistent Spacing**: Provides uniform padding and alignment within tiles
+- **Title Slot**: Holds the one element a tile shows as its name, in the row beside the icon
+- **Full Width**: Stretches across the space the tile leaves between its icon and its menu button
+- **Fixed Width**: Takes a fixed width from the child's own \`containerWidth\` prop, which the kit's \`Text\` and \`Link\` accept
+- **Single-Line Text On Tablets**: Keeps plain text in the slot on one line, cut off with an ellipsis, between 600px and 1023px; a link inside a tile still wraps to two lines there
+- **Title Font**: Sets 12px semibold text for anything inside that does not choose its own font
+- **Richer Titles**: Takes a wrapper of your own when the name needs something beside it, such as a badge
+- **Click Handler**: Calls \`onClick\` on any click inside the slot, with no argument
 
 ### Usage
 
@@ -43,9 +47,40 @@ import { BaseTile } from "@onlyoffice/apps-ui-kit/components/tiles/base-tile";
     <Link>Document.docx</Link>
   </TileContent>
 } />
+
+// A title with a fixed width, read from the child's containerWidth
+<TileContent>
+  <Text containerWidth="120px" truncate>Quarterly report.docx</Text>
+</TileContent>
 \`\`\``,
       },
     },
+  },
+  argTypes: {
+    children: {
+      control: false,
+      description:
+        "The one element shown as the tile's name; a `containerWidth` prop on it becomes the width of the slot",
+    },
+    onClick: {
+      description:
+        "Called with no argument when anything inside the slot is clicked",
+    },
+    className: {
+      control: "text",
+      description: "Class added after the component's own on the outer element",
+    },
+    id: {
+      control: "text",
+      description: "Value of `id` on the outer element",
+    },
+    style: {
+      control: "object",
+      description: "Inline style of the outer element",
+    },
+  },
+  args: {
+    onClick: fn(),
   },
   decorators: [
     (Story) => (
@@ -72,7 +107,8 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Basic tile content with a link inside BaseTile",
+        story:
+          "A file name as a link, the way a tile usually shows it. Click it to see `onClick` in the Actions panel, and change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<TileContent>
@@ -94,7 +130,8 @@ export const WithText: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Tile content with text component inside BaseTile",
+        story:
+          "A name that should not look clickable, for an item the reader cannot open: plain `Text` in place of a link.",
       },
       source: {
         code: `<TileContent>
@@ -117,7 +154,8 @@ export const WithMultipleElements: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Tile content with multiple child elements",
+        story:
+          "A name with a badge beside it. The slot takes one element, so the name and the badge go inside a wrapper of your own.",
       },
       source: {
         code: `<TileContent>
@@ -131,9 +169,33 @@ export const WithMultipleElements: Story = {
   },
 };
 
+export const FixedTitleWidth: Story = {
+  args: {
+    children: (
+      <Text containerWidth="120px" truncate>
+        Quarterly report with a long name.docx
+      </Text>
+    ),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A name held to a set width whatever room the tile has, so the names in a grid end at the same point: the slot takes its width from the child's own `containerWidth` prop, and `truncate` on the `Text` cuts the rest off.",
+      },
+      source: {
+        code: `<TileContent>
+  <Text containerWidth="120px" truncate>
+    Quarterly report with a long name.docx
+  </Text>
+</TileContent>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
-  // Story-level decorator wraps OUTSIDE the meta decorator (which already
-  // embeds TileContent inside BaseTile), so CSS vars cascade into BaseTile.
+  // This decorator wraps the meta one, so the variables reach the BaseTile around the slot.
   decorators: [
     (Story) => (
       <div
@@ -143,7 +205,6 @@ export const CssCustomization: Story = {
             "--tile-border-style": "1px solid #0082c9",
             "--tile-radius": "16px",
             "--tile-hover-bg": "#cce5f6",
-            "--tile-icon-color": "#0082c9",
           } as CSSProperties
         }
       >
@@ -157,15 +218,16 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `TileContent is a structural wrapper — its appearance is inherited from the parent BaseTile. CSS Custom Properties are set on the BaseTile container:
+        story: `CSS Custom Properties for external customization:
+
+TileContent reads none of its own; the ones below belong to the BaseTile around it, set on a wrapper here. Hover the tile to see the hover background.
 
 | Variable | Description | Default |
 |----------|-------------|---------|
 | \`--tile-bg\` | Tile background color | theme-based |
 | \`--tile-border-style\` | Tile border | theme-based |
 | \`--tile-radius\` | Tile border radius | \`12px\` |
-| \`--tile-hover-bg\` | Hover/checked background | theme-based |
-| \`--tile-icon-color\` | Icon button color | theme-based |
+| \`--tile-hover-bg\` | Background while hovered, checked or active | theme-based |
 
 See **BaseTile**, **FileTile**, **FolderTile**, or **RoomTile** CSS Custom Properties stories for the full list.`,
       },
