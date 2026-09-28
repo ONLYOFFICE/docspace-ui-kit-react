@@ -29,6 +29,11 @@ test.describe("IconButton — light", () => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("icon-button-css-customization.png");
   });
+
+  test("with tooltip", async ({ page }) => {
+    await gotoStory(page, "with-tooltip");
+    await expect(page).toHaveScreenshot("icon-button-with-tooltip.png");
+  });
 });
 
 test.describe("IconButton — dark", () => {

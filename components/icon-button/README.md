@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
   "related": ["button", "context-menu-button", "tooltip"],
   "subComponents": [],
-  "testIds": ["icon-button", "icon-button-svg"]
+  "testIds": ["icon-button", "icon-button-svg"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # IconButton
