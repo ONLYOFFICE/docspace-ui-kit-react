@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["button", "link-with-dropdown", "text"],
   "subComponents": [],
-  "testIds": ["link"]
+  "testIds": ["link"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Link

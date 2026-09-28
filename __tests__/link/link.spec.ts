@@ -29,6 +29,37 @@ test.describe("Link — light", () => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("link-css-customization.png");
   });
+
+  test("with text overflow", async ({ page }) => {
+    await gotoStory(page, "with-text-overflow");
+    await expect(page).toHaveScreenshot("link-with-text-overflow.png");
+  });
+
+  test("keyboard accessible action", async ({ page }) => {
+    await gotoStory(page, "keyboard-accessible-action");
+    await page.keyboard.press("Tab");
+    await expect(
+      page.getByRole("button", { name: "Move to archive" }),
+    ).toBeFocused();
+    await expect(page).toHaveScreenshot("link-keyboard-accessible-action.png");
+  });
+
+  test("with tooltip", async ({ page }) => {
+    await gotoStory(page, "with-tooltip");
+    await page.getByTestId("link").hover();
+    await expect(page.getByText("Opens the shared folder")).toBeVisible();
+    await expect(page).toHaveScreenshot("link-with-tooltip.png");
+  });
+
+  test("custom color", async ({ page }) => {
+    await gotoStory(page, "custom-color");
+    await expect(page).toHaveScreenshot("link-custom-color.png");
+  });
+
+  test("text decorations", async ({ page }) => {
+    await gotoStory(page, "text-decorations");
+    await expect(page).toHaveScreenshot("link-text-decorations.png");
+  });
 });
 
 test.describe("Link — dark", () => {
