@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["room-logo", "room-icon", "drop-down"],
   "subComponents": [],
-  "testIds": ["room-type-list-item", "room-type-dropdown-button", "room-type-dropdown-item"]
+  "testIds": ["room-type-list-item", "room-type-dropdown-button", "room-type-dropdown-item"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # RoomType

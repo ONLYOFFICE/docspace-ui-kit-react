@@ -22,6 +22,41 @@ test.describe("RoomType — light", () => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("room-type-css-customization.png");
   });
+
+  test("dropdown button", async ({ page }) => {
+    await gotoStory(page, "dropdown-button");
+    await expect(page).toHaveScreenshot("room-type-dropdown-button.png");
+  });
+
+  test("dropdown item", async ({ page }) => {
+    await gotoStory(page, "dropdown-item");
+    await expect(page).toHaveScreenshot("room-type-dropdown-item.png");
+  });
+
+  test("room types", async ({ page }) => {
+    await gotoStory(page, "room-types");
+    await expect(page).toHaveScreenshot("room-type-room-types.png");
+  });
+
+  test("disabled state", async ({ page }) => {
+    await gotoStory(page, "disabled-state");
+    await expect(page).toHaveScreenshot("room-type-disabled-state.png");
+  });
+
+  test("from template", async ({ page }) => {
+    await gotoStory(page, "from-template");
+    await expect(page).toHaveScreenshot("room-type-from-template.png");
+  });
+
+  test("form space", async ({ page }) => {
+    await gotoStory(page, "form-space");
+    await expect(page).toHaveScreenshot("room-type-form-space.png");
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("room-type-right-to-left.png");
+  });
 });
 
 test.describe("RoomType — dark", () => {
