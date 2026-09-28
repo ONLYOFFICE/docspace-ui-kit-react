@@ -1,7 +1,11 @@
 import { type Page, expect, test } from "@playwright/test";
 
 const COMPONENTS: { id: string; name: string; stories?: string[] }[] = [
-  { id: "ui-tiles-basetile", name: "base-tile" },
+  {
+    id: "ui-tiles-basetile",
+    name: "base-tile",
+    stories: ["with-menu-button", "renaming-state", "blocking-operation"],
+  },
   { id: "ui-tiles-filetile", name: "file-tile" },
   { id: "ui-tiles-foldertile", name: "folder-tile" },
   { id: "ui-tiles-roomtile", name: "room-tile" },
