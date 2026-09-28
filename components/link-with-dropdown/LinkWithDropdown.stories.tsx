@@ -1,6 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import { LinkWithDropdown } from ".";
 
@@ -14,19 +15,23 @@ const meta = {
 
 ### Features
 
-- **Dashed Underline**: Configurable underline style (always or on hover)
+- **Menu Items**: Renders each entry of \`data\` as a menu item and closes the menu after one is clicked
 - **Custom Text Styles**: Configurable font size, weight, and color
-- **Expander Icon**: Optional arrow icon indicator
-- **Disabled State**: Non-interactive state with dimmed appearance
-- **Semitransparent Mode**: Reduced opacity style variant
-- **Custom Width**: Manual dropdown width control
-- **Direction Control**: Vertical dropdown direction (top/bottom)
+- **Expander Icon**: Optional chevron after the text that turns over while the menu is open
+- **Disabled State**: Clicking no longer opens the menu and the cursor stays an arrow
+- **Semitransparent Mode**: Draws the whole link at half opacity
+- **Custom Width**: Sets an exact menu width instead of fitting the widest entry
+- **Direction Control**: Opens the menu above or below the link and aligns it to either side, optionally keeping that placement when it does not fit
+- **Text Overflow**: Truncates a long label with an ellipsis at 200px instead of wrapping it
 
 ### Accessibility
 
-- \`aria-expanded\`: Indicates dropdown open state
-- \`aria-haspopup\`: Indicates popup menu presence
-- Keyboard navigation support
+The link announces itself as a menu button; it handles no keys of its own.
+
+- \`role="button"\` with \`aria-haspopup="true"\`: announced as a button that opens a menu
+- \`aria-expanded\`: reports whether the menu is open
+- \`aria-disabled\`: reports the disabled state set by \`isDisabled\`
+- The link has no \`href\` or \`tabIndex\`, so it is not in the tab order and keyboard users cannot reach it
 
 ### Usage
 
@@ -48,12 +53,12 @@ import { LinkWithDropdown } from "@onlyoffice/apps-ui-kit/components/link-with-d
   argTypes: {
     children: {
       control: "text",
-      description: "Content displayed as the link text",
+      description: "Text of the link",
     },
     data: {
       control: "object",
       description:
-        "Array of dropdown items with key, label, onClick, and optional isSeparator",
+        "Entries of the menu, each with the props of a `DropDownItem`: a required `key`, a `label`, an `onClick` called with the click event, or `isSeparator` for a divider line",
     },
     fontSize: {
       control: "text",
@@ -63,8 +68,8 @@ import { LinkWithDropdown } from "@onlyoffice/apps-ui-kit/components/link-with-d
       },
     },
     fontWeight: {
-      control: "text",
-      description: "CSS font-weight value (number or string)",
+      control: "number",
+      description: "Font weight of the text, as a number",
     },
     isBold: {
       control: "boolean",
@@ -79,28 +84,31 @@ import { LinkWithDropdown } from "@onlyoffice/apps-ui-kit/components/link-with-d
     },
     isDisabled: {
       control: "boolean",
-      description: "Disables the dropdown functionality",
+      description:
+        "Makes the link inert: clicking no longer opens the menu and the cursor stays an arrow",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withExpander: {
       control: "boolean",
-      description: "Shows/hides the expander arrow icon",
+      description:
+        "Draws a chevron after the text, which turns over while the menu is open",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isSemitransparent: {
       control: "boolean",
-      description: "Makes the link semi-transparent",
+      description: "Draws the link at half opacity",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isTextOverflow: {
       control: "boolean",
-      description: "Truncates long text with ellipsis",
+      description:
+        "Truncates the text with an ellipsis at 200px instead of wrapping it",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -108,29 +116,116 @@ import { LinkWithDropdown } from "@onlyoffice/apps-ui-kit/components/link-with-d
     dropdownType: {
       control: "select",
       options: ["alwaysDashed", "appearDashedAfterHover"],
-      description: "Determines when the dashed underline appears",
+      description:
+        "Whether the dashed underline is always drawn or appears on hover. Currently neither value draws an underline",
       table: {
         defaultValue: { summary: "alwaysDashed" },
       },
     },
     manualWidth: {
       control: "text",
-      description: "Sets a custom width for the dropdown menu",
+      description:
+        "Exact width of the menu, as a CSS length. Without it the menu is as wide as its widest entry",
     },
     directionY: {
       control: "select",
-      options: ["top", "bottom"],
-      description: "Sets the vertical direction of the dropdown",
+      options: ["top", "bottom", "both"],
+      description:
+        "Whether the menu opens above or below the link; `both` opens it below unless it would run off the bottom of the window",
       table: {
         defaultValue: { summary: "bottom" },
       },
     },
     fixedDirection: {
       control: "boolean",
-      description: "Fixes the direction of the dropdown menu",
+      description:
+        "Keeps the menu on the chosen sides even when it does not fit there, instead of flipping it",
       table: {
         defaultValue: { summary: "false" },
       },
+    },
+    directionX: {
+      control: "select",
+      options: ["left", "right"],
+      description: "Which side of the link the menu is aligned to",
+      table: {
+        defaultValue: { summary: "right" },
+      },
+    },
+    isOpen: {
+      control: "boolean",
+      description:
+        "Whether the menu starts open. The link then keeps that state itself; changing this prop re-syncs it",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isDefaultMode: {
+      control: "boolean",
+      description:
+        "Whether the menu is rendered in a portal on `document.body`. Turn it off to render it in place",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    title: {
+      control: "text",
+      description:
+        "Tooltip text for the label. It opens the kit's shared tooltip, which appears only where the page mounts `RootTooltip`; no native `title` attribute is set",
+    },
+    hasScroll: {
+      control: "boolean",
+      description:
+        "Wraps the menu in a scrollbar of its own, 250px tall (100px in landscape). It only takes effect on a phone",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    withDynamicScrollbar: {
+      control: "boolean",
+      description:
+        "Measures the room around the link on every open and scrolls the menu inside what is left",
+    },
+    topSpace: {
+      control: "number",
+      description:
+        "(`withDynamicScrollbar` only) Space to leave above the menu, in pixels",
+    },
+    bottomSpace: {
+      control: "number",
+      description:
+        "(`withDynamicScrollbar` only) Space to leave below the menu, in pixels",
+    },
+    isAside: {
+      control: "boolean",
+      description:
+        "Passed to the menu's backdrop, which then keeps an aside panel above itself",
+    },
+    withoutBackground: {
+      control: "boolean",
+      description: "Passed to the menu's backdrop: makes it transparent",
+    },
+    className: {
+      control: "text",
+      description:
+        "Class added to the outermost element and to the link inside it",
+    },
+    dropDownClassName: {
+      control: "text",
+      description: "Class added to the menu",
+    },
+    id: {
+      control: "text",
+      description: "`id` of the outermost element",
+    },
+    style: {
+      control: "object",
+      description: "Inline style of the outermost element",
+    },
+    isHovered: {
+      control: false,
+      description:
+        "Ignored. Nothing reads this prop; the hover look comes from CSS",
     },
   },
   decorators: [
@@ -150,12 +245,12 @@ const dropdownItems = [
   {
     key: "key1",
     label: "Button 1",
-    onClick: () => console.log("Button 1 clicked"),
+    onClick: fn().mockName("Button 1"),
   },
   {
     key: "key2",
     label: "Button 2",
-    onClick: () => console.log("Button 2 clicked"),
+    onClick: fn().mockName("Button 2"),
   },
   {
     key: "key3",
@@ -164,7 +259,7 @@ const dropdownItems = [
   {
     key: "key4",
     label: "Button 3",
-    onClick: () => console.log("Button 3 clicked"),
+    onClick: fn().mockName("Button 3"),
   },
 ];
 
@@ -181,6 +276,26 @@ export const Default: Story = {
     directionY: "bottom",
     fixedDirection: true,
     isDefaultMode: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The link with a three-item menu; click it to open the menu, pick an entry to see its `onClick` in the Actions panel, and change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<LinkWithDropdown
+  data={[
+    { key: "key1", label: "Button 1", onClick: handleClick },
+    { key: "key2", label: "Button 2", onClick: handleClick },
+    { key: "key3", isSeparator: true },
+    { key: "key4", label: "Button 3", onClick: handleClick },
+  ]}
+>
+  Default Link
+</LinkWithDropdown>`,
+      },
+    },
   },
 };
 
@@ -262,7 +377,7 @@ export const Disabled: Story = {
     docs: {
       description: {
         story:
-          "Disabled link that cannot open the dropdown. Appears dimmed to indicate non-interactive state.",
+          "Use it while the options do not apply yet: clicking no longer opens the menu and the cursor stays an arrow (`isDisabled`). In the light theme the text keeps the default grey, so the state is not visible until the link is clicked.",
       },
       source: {
         code: `<LinkWithDropdown data={items} isDisabled>Disabled Link</LinkWithDropdown>`,
@@ -330,14 +445,88 @@ export const WithCustomWidth: Story = {
   },
 };
 
+const TextOverflowTemplate = () => {
+  return (
+    <LinkWithDropdown
+      data={dropdownItems}
+      fontSize="13px"
+      isTextOverflow
+      withExpander
+      directionY="bottom"
+      fixedDirection
+      isDefaultMode={false}
+    >
+      A long link label that does not fit in the available width
+    </LinkWithDropdown>
+  );
+};
+
+export const TextOverflow: Story = {
+  render: () => <TextOverflowTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use it where a label can be longer than its place: the text stops at 200px with an ellipsis and the chevron stays beside it (`isTextOverflow`).",
+      },
+      source: {
+        code: `<LinkWithDropdown
+  data={items}
+  isTextOverflow
+  withExpander
+>
+  A long link label that does not fit in the available width
+</LinkWithDropdown>`,
+      },
+    },
+  },
+};
+
+const OpenMenuTemplate = () => {
+  return (
+    <LinkWithDropdown
+      data={dropdownItems}
+      fontSize="13px"
+      withExpander
+      isOpen
+      directionY="bottom"
+      fixedDirection
+      isDefaultMode={false}
+    >
+      Open Link
+    </LinkWithDropdown>
+  );
+};
+
+export const OpenMenu: Story = {
+  render: () => <OpenMenuTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The menu shown on first render (`isOpen`): the link keeps its highlighted background and the chevron points up while the menu is open. Clicking outside or picking an entry closes it.",
+      },
+      source: {
+        code: `<LinkWithDropdown data={items} withExpander isOpen>
+  Open Link
+</LinkWithDropdown>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
     <div
       style={
         {
+          display: "flex",
+          gap: "16px",
           "--link-with-dropdown-color": "#7c3aed",
+          "--link-with-dropdown-bg": "#f5f3ff",
           "--link-with-dropdown-hover-color": "#5b21b6",
-          "--link-with-dropdown-hover-bg": "#ede9fe",
+          "--link-with-dropdown-hover-bg": "#ddd6fe",
+          "--link-with-dropdown-disabled-color": "#c4b5fd",
           "--link-with-dropdown-radius": "8px",
           "--link-with-dropdown-padding": "6px 12px",
         } as CSSProperties
@@ -353,6 +542,9 @@ export const CssCustomization: Story = {
       >
         Customized Link
       </LinkWithDropdown>
+      <LinkWithDropdown data={dropdownItems} fontSize="13px" isDisabled>
+        Disabled Link
+      </LinkWithDropdown>
     </div>
   ),
   parameters: {
@@ -362,12 +554,35 @@ export const CssCustomization: Story = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--link-with-dropdown-color\` | Default text color | theme gray |
-| \`--link-with-dropdown-hover-color\` | Hover text color | theme dark gray |
-| \`--link-with-dropdown-hover-bg\` | Hover/open background | theme light mid |
-| \`--link-with-dropdown-disabled-color\` | Disabled text color | theme gray |
-| \`--link-with-dropdown-radius\` | Border radius | \`3px\` |
-| \`--link-with-dropdown-padding\` | Inner padding | \`4px 8px\` |`,
+| \`--link-with-dropdown-color\` | Text and chevron color; the chevron keeps it on hover and while open | theme-based |
+| \`--link-with-dropdown-bg\` | Background of the closed link | \`transparent\` |
+| \`--link-with-dropdown-hover-color\` | Text color on hover and while the menu is open | theme-based |
+| \`--link-with-dropdown-hover-bg\` | Background on hover and while the menu is open | theme-based |
+| \`--link-with-dropdown-disabled-color\` | Text color with \`isDisabled\` | theme-based |
+| \`--link-with-dropdown-radius\` | Corner radius of the link's background | \`3px\` |
+| \`--link-with-dropdown-padding\` | Inner padding around the text | \`4px 8px\` |
+
+The first link shows the text, background, radius and padding variables; hover it or open its menu to see the hover pair. The second, with \`isDisabled\`, is there for \`--link-with-dropdown-disabled-color\`.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--link-with-dropdown-color": "#7c3aed",
+    "--link-with-dropdown-bg": "#f5f3ff",
+    "--link-with-dropdown-hover-color": "#5b21b6",
+    "--link-with-dropdown-hover-bg": "#ddd6fe",
+    "--link-with-dropdown-disabled-color": "#c4b5fd",
+    "--link-with-dropdown-radius": "8px",
+    "--link-with-dropdown-padding": "6px 12px",
+  }}
+>
+  <LinkWithDropdown data={items} withExpander>
+    Customized Link
+  </LinkWithDropdown>
+  <LinkWithDropdown data={items} isDisabled>
+    Disabled Link
+  </LinkWithDropdown>
+</div>`,
       },
     },
   },
