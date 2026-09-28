@@ -1057,10 +1057,7 @@ export class Scrollbar extends React.Component<ScrollbarProps, ScrollbarState> {
         style: styles.trackY,
         elementRef: this.elementRefTrackY,
         onClick: this.handleTrackYClick,
-        ...((disableTracksMousewheelScrolling ||
-          disableTrackYMousewheelScrolling) && {
-          onWheel: this.handleTrackYMouseWheel,
-        }),
+        onWheel: this.handleTrackYMouseWheel,
         axis: AxisDirection.Y,
       } as ScrollbarTrackProps;
 
@@ -1095,10 +1092,7 @@ export class Scrollbar extends React.Component<ScrollbarProps, ScrollbarState> {
         style: styles.trackX,
         elementRef: this.elementRefTrackX,
         onClick: this.handleTrackXClick,
-        ...((disableTracksMousewheelScrolling ||
-          disableTrackXMousewheelScrolling) && {
-          onWheel: this.handleTrackXMouseWheel,
-        }),
+        onWheel: this.handleTrackXMouseWheel,
         axis: AxisDirection.X,
       } as ScrollbarTrackProps;
 
