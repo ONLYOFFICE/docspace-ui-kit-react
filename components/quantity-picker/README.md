@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
   "related": ["slider", "text-input", "tab-item"],
   "subComponents": [],
-  "testIds": ["quantity_picker_input"]
+  "testIds": ["quantity_picker_input"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # QuantityPicker
