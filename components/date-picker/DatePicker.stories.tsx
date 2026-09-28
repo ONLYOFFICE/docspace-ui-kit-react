@@ -30,17 +30,30 @@ const meta = {
 - **Locale Support**: Calendar formatting based on locale
 - **Calendar Icon**: Optional calendar icon in the selected date chip
 - **Selected Date Chip**: Displays the chosen date as a removable chip
-- **Auto-Positioning**: Automatically adjusts calendar position based on available space
+- **Auto-Positioning**: Opt-in flip of the calendar to the right edge when less than 340px of room is left to its right as it opens
+- **Controlled Value**: Shows the date held in \`outerDate\`, so the host feeds each change back to keep the chip on screen
+- **Outside Click**: Closes the open calendar on a press anywhere outside the picker
+
+### Accessibility
+
+The trigger shown while no date is chosen carries its own button semantics:
+
+- **Role**: Exposed as a button named by \`selectDateText\`
+- **Expanded state**: \`aria-expanded\` announces whether the calendar is open
+- **Focus**: The trigger sits in the Tab order
 
 ### Usage
 
 \`\`\`tsx
 import { DatePicker } from "@onlyoffice/apps-ui-kit/components/date-picker";
 
+const [date, setDate] = useState<DateTime | null>(null);
+
 <DatePicker
   locale="en"
   openDate={now()}
-  onChange={(date) => console.log(date)}
+  outerDate={date}
+  onChange={setDate}
   selectDateText="Select date"
 />
 
@@ -50,7 +63,8 @@ import { DatePicker } from "@onlyoffice/apps-ui-kit/components/date-picker";
   openDate={now()}
   minDate={now()}
   maxDate={addToDate(now(), 1, "years")}
-  onChange={handleDateChange}
+  outerDate={date}
+  onChange={setDate}
 />
 \`\`\``,
       },
@@ -59,11 +73,15 @@ import { DatePicker } from "@onlyoffice/apps-ui-kit/components/date-picker";
   argTypes: {
     locale: {
       control: "text",
-      description: "Locale for date formatting (e.g., 'en', 'ru')",
+      description:
+        "Locale the calendar writes its month names and weekdays in (e.g. 'en', 'de'); the chip always shows the date as '15 Sep 2026'",
     },
     selectDateText: {
       control: "text",
-      description: "Placeholder text when no date is selected",
+      description: "Text of the button shown while no date is chosen",
+      table: {
+        defaultValue: { summary: '"Select date"' },
+      },
     },
     showCalendarIcon: {
       control: "boolean",
@@ -82,9 +100,70 @@ import { DatePicker } from "@onlyoffice/apps-ui-kit/components/date-picker";
     autoPosition: {
       control: "boolean",
       description:
-        "Auto-position the calendar based on available viewport space",
+        "Opens the calendar against the right edge of the picker's positioned ancestor when less than 340px of the window is left to the picker's right; measured each time the calendar opens",
       table: {
         defaultValue: { summary: "false" },
+      },
+    },
+    openDate: {
+      control: false,
+      description:
+        "Month the calendar shows each time it opens, even with a date already chosen; a month outside `minDate` to `maxDate` is replaced by the nearest limit",
+    },
+    minDate: {
+      control: false,
+      description:
+        "Earliest selectable day; the days before it are drawn disabled",
+    },
+    maxDate: {
+      control: false,
+      description:
+        "Latest selectable day; the days after it are drawn disabled",
+    },
+    initialDate: {
+      control: false,
+      description:
+        "Date the picker starts with; cleared on the first render unless `outerDate` holds a date too",
+    },
+    outerDate: {
+      control: false,
+      description:
+        "The chosen date, held by the host: the chip shows it, and the picker shows the button again whenever it is empty",
+    },
+    onChange: {
+      action: "onChange",
+      description:
+        "Called with the picked day, and with `null` when the chip's cross clears it",
+    },
+    isMobile: {
+      control: "boolean",
+      description:
+        "Widens the gap between the calendar's previous and next arrows from 8px to 12px; the larger day cells of a phone come from the window width, not from this prop",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    useMaxTime: {
+      control: "boolean",
+      description:
+        "Reports a day picked while no date is chosen at 23:59:59.999 of that day instead of at the current time of day",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    className: {
+      control: "text",
+      description: "Class name added to the outermost element",
+    },
+    id: {
+      control: "text",
+      description: "Id of the outermost element",
+    },
+    testId: {
+      control: "text",
+      description: "`data-testid` of the outermost element",
+      table: {
+        defaultValue: { summary: '"date-picker"' },
       },
     },
   },
@@ -138,6 +217,27 @@ export const Default: Story = {
     selectDateText: "Select date",
     showCalendarIcon: true,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The picker as a form shows it before a date is chosen: click **Select date** to open the calendar, pick a day to turn the button into a chip, and change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `const [date, setDate] = useState<DateTime | null>(null);
+
+<DatePicker
+  locale="en"
+  openDate={now()}
+  minDate={createDateTime(1970, 1, 1)}
+  maxDate={startOf(addToDate(now(), 10, "years"), "year")}
+  outerDate={date}
+  onChange={setDate}
+  selectDateText="Select date"
+/>`,
+      },
+    },
+  },
 };
 
 const WithInitialDateTemplate = () => {
@@ -162,11 +262,15 @@ export const WithInitialDate: Story = {
           "DatePicker initialized with the current date. The selected date appears as a chip that can be removed.",
       },
       source: {
-        code: `<DatePicker
+        code: `const [date, setDate] = useState<DateTime | null>(now());
+
+<DatePicker
   locale="en"
   openDate={now()}
   initialDate={now()}
   selectDateText="Date with initial value"
+  outerDate={date}
+  onChange={setDate}
 />`,
       },
     },
@@ -199,6 +303,8 @@ export const FutureDatesOnly: Story = {
   openDate={now()}
   minDate={startOf(now(), "day")}
   selectDateText="Only future dates"
+  outerDate={date}
+  onChange={setDate}
 />`,
       },
     },
@@ -232,6 +338,8 @@ export const SpecificYearRange: Story = {
   minDate={createDateTime(2023, 1, 1)}
   maxDate={createDateTime(2023, 12, 31)}
   selectDateText="Only dates from 2023"
+  outerDate={date}
+  onChange={setDate}
 />`,
       },
     },
@@ -267,58 +375,217 @@ export const WithoutCalendarIcon: Story = {
   initialDate={now()}
   showCalendarIcon={false}
   selectDateText="No calendar icon"
+  outerDate={date}
+  onChange={setDate}
 />`,
       },
     },
   },
 };
 
-export const CssCustomization: Story = {
-  render: () => (
-    <div
-      style={
-        {
-          height: "350px",
-          padding: "20px",
-          // DatePicker container
-          "--date-picker-bg": "#e6f3fb",
-          "--date-picker-header-border": "1px solid #0082c9",
-          "--date-picker-padding": "0 16px 16px",
-          "--date-picker-body-padding": "12px 0",
-          // Calendar sub-component
-          "--calendar-bg": "#e6f3fb",
-          "--calendar-border": "#0082c9",
-          "--calendar-shadow": "0 4px 16px rgba(0,130,201,0.25)",
-          "--calendar-radius": "12px",
-          "--calendar-title": "#0082c9",
-          "--calendar-outline": "#0082c9",
-          "--calendar-arrow": "#0082c9",
-          "--calendar-weekday": "#0082c9",
-          "--calendar-accent": "#0082c9",
-          "--calendar-selected-text": "#ffffff",
-          "--calendar-hover-bg": "#cce5f6",
-          "--calendar-past": "#5ca8d9",
-          "--calendar-disabled-arrow": "#a0c8e8",
-          // AddButton sub-component
-          "--add-button-background": "#e6f3fb",
-          "--add-button-icon": "#0082c9",
-          // SelectedItem sub-component
-          "--selected-item-background": "#cce5f6",
-          "--selected-item-background-hover": "#b3d9f0",
-          "--selected-item-active-background": "#0082c9",
-          "--selected-item-active-color": "#ffffff",
-          // IconButton (used in SelectedItem close button)
-          "--icon-button-color": "#0082c9",
-          "--icon-button-hover-color": "#006fa6",
-        } as React.CSSProperties
-      }
-    >
+const WithoutClearButtonTemplate = () => {
+  return (
+    <ControlledDatePicker
+      locale="en"
+      openDate={now()}
+      initialDate={now()}
+      maxDate={startOf(addToDate(now(), 10, "years")!, "year")!}
+      minDate={createDateTime(1970, 1, 1)}
+      selectDateText="Select date"
+      hideCross
+    />
+  );
+};
+
+export const WithoutClearButton: Story = {
+  render: () => <WithoutClearButtonTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a date the form requires: the chip has no cross, so a date can be replaced by clicking the chip and picking another day, but not removed (`hideCross`).",
+      },
+      source: {
+        code: `const [date, setDate] = useState<DateTime | null>(now());
+
+<DatePicker
+  locale="en"
+  openDate={now()}
+  initialDate={now()}
+  outerDate={date}
+  onChange={setDate}
+  hideCross
+/>`,
+      },
+    },
+  },
+};
+
+const AlignedToRightEdgeTemplate = () => {
+  return (
+    <div style={{ display: "flex", justifyContent: "flex-end" }}>
       <ControlledDatePicker
         locale="en"
         openDate={now()}
-        initialDate={now()}
         maxDate={startOf(addToDate(now(), 10, "years")!, "year")!}
         minDate={createDateTime(1970, 1, 1)}
+        selectDateText="Select date"
+        autoPosition
+      />
+    </div>
+  );
+};
+
+export const AlignedToRightEdge: Story = {
+  render: () => <AlignedToRightEdgeTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a picker near the right edge of the window, such as the last column of a toolbar: click **Select date** and the calendar opens leftwards from the right edge of the nearest positioned container, here the window, instead of running off the screen (`autoPosition`).",
+      },
+      source: {
+        code: `<div style={{ display: "flex", justifyContent: "flex-end" }}>
+  <DatePicker
+    locale="en"
+    openDate={now()}
+    outerDate={date}
+    onChange={setDate}
+    autoPosition
+  />
+</div>`,
+      },
+    },
+  },
+};
+
+const EndOfDayValueTemplate = () => {
+  const [reported, setReported] = useState<DateTime | null>(null);
+
+  return (
+    <div>
+      <div style={{ padding: "20px 20px 0" }}>
+        Reported value: {reported ? reported.toISO() : "none"}
+      </div>
+      <ControlledDatePicker
+        locale="en"
+        openDate={now()}
+        maxDate={startOf(addToDate(now(), 10, "years")!, "year")!}
+        minDate={createDateTime(1970, 1, 1)}
+        selectDateText="Select date"
+        useMaxTime
+        onChange={setReported}
+      />
+    </div>
+  );
+};
+
+export const EndOfDayValue: Story = {
+  render: () => <EndOfDayValueTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'For an inclusive end of a period, such as a "valid until" date: pick a day and the value above ends in 23:59:59.999, so the whole day is covered (`useMaxTime`). Without the prop the day is reported at the current time of day.',
+      },
+      source: {
+        code: `<DatePicker
+  locale="en"
+  openDate={now()}
+  outerDate={date}
+  onChange={setDate}
+  useMaxTime
+/>`,
+      },
+    },
+  },
+};
+
+// Framed on Docs: the theme provider stamps the direction on the page, which would flip the whole Docs page.
+export const RightToLeft: Story = {
+  render: () => (
+    <div dir="rtl">
+      <ControlledDatePicker
+        locale="en"
+        openDate={now()}
+        initialDate={createDateTime(2026, 3, 15)}
+        maxDate={startOf(addToDate(now(), 10, "years")!, "year")!}
+        minDate={createDateTime(1970, 1, 1)}
+        selectDateText="Select date"
+      />
+    </div>
+  ),
+  globals: { direction: "rtl" },
+  parameters: {
+    noPadding: true,
+    docs: {
+      story: { inline: false, height: "470px" },
+      description: {
+        story:
+          'The picker under a right-to-left interface: the chip starts at the right edge, with the calendar icon on its right and the cross on its left, and the calendar opens under the right end of the picker. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+      },
+      source: {
+        code: `<div dir="rtl">
+  <DatePicker
+    locale="en"
+    openDate={now()}
+    outerDate={date}
+    onChange={setDate}
+  />
+</div>`,
+      },
+    },
+  },
+};
+
+const cssVariables = {
+  "--calendar-bg": "#e6f3fb",
+  "--calendar-border": "#0082c9",
+  "--calendar-shadow": "0 4px 16px rgba(0,130,201,0.25)",
+  "--calendar-radius": "12px",
+  "--calendar-title": "#0082c9",
+  "--calendar-title-size": "16px",
+  "--calendar-outline": "#0082c9",
+  "--calendar-arrow": "#0082c9",
+  "--calendar-disabled-arrow": "#a0c8e8",
+  "--calendar-weekday": "#0082c9",
+  "--calendar-accent": "#0082c9",
+  "--calendar-selected-text": "#ffffff",
+  "--calendar-current-radius": "8px",
+  "--calendar-focused-radius": "8px",
+  "--calendar-focused-bg": "#ffffff",
+  "--calendar-focused-text": "#0082c9",
+  "--calendar-hover-bg": "#cce5f6",
+  "--calendar-hover-radius": "8px",
+  "--calendar-past": "#5ca8d9",
+  "--calendar-disabled": "#a0c8e8",
+  "--add-button-bg": "#cce5f6",
+  "--add-button-bg-hover": "#b3d9f0",
+  "--add-button-bg-active": "#99cceb",
+  "--add-button-icon-color": "#0082c9",
+  "--add-button-icon-color-hover": "#004f82",
+  "--add-button-radius": "8px",
+  "--selected-item-bg": "#cce5f6",
+  "--selected-item-bg-hover": "#b3d9f0",
+  "--selected-item-radius": "8px",
+} as React.CSSProperties;
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div style={{ display: "flex", flexWrap: "wrap", ...cssVariables }}>
+      <ControlledDatePicker
+        locale="en"
+        openDate={startOf(now(), "month") as DateTime}
+        initialDate={startOf(now(), "month") as DateTime}
+        minDate={startOf(now(), "month") as DateTime}
+        maxDate={startOf(addToDate(now(), 10, "years")!, "year")!}
+        selectDateText="Select date"
+      />
+      <ControlledDatePicker
+        locale="en"
+        openDate={now()}
+        minDate={startOf(now(), "month") as DateTime}
+        maxDate={startOf(addToDate(now(), 10, "years")!, "year")!}
         selectDateText="Select date"
       />
     </div>
@@ -326,36 +593,62 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS custom property overrides applied to the date picker and its Calendar, AddButton, and SelectedItem sub-components.
+        story: `CSS Custom Properties for external customization:
 
-**DatePicker variables:**
-- \`--date-picker-bg\` — container background
-- \`--date-picker-padding\` — container padding
-- \`--date-picker-header-border\` — header bottom border
-- \`--date-picker-body-padding\` — body area padding
-- \`--date-picker-dropdown-padding\` — dropdown padding
+| Variable | Description | Default |
+| --- | --- | --- |
+| \`--calendar-bg\` | Background of the calendar | theme-based |
+| \`--calendar-border\` | Colour of the calendar's one-pixel border | theme-based |
+| \`--calendar-shadow\` | Box shadow of the calendar | theme-based |
+| \`--calendar-radius\` | Corner radius of the calendar | \`6px\` |
+| \`--calendar-title\` | Colour of the month and year title | theme-based |
+| \`--calendar-title-size\` | Font size of the title; ignored in the mobile layout | \`18px\` |
+| \`--calendar-outline\` | Ring colour of the arrow buttons | theme-based |
+| \`--calendar-arrow\` | Colour of the arrow chevrons | theme-based |
+| \`--calendar-disabled-arrow\` | Colour of the chevron of an arrow that cannot go further | theme-based |
+| \`--calendar-weekday\` | Colour of the weekday labels | theme-based |
+| \`--calendar-accent\` | Fill of today, ring of the chosen day, arrow ring on hover and the title chevron | theme-based |
+| \`--calendar-selected-text\` | Text colour of today on the accent fill | \`#fff\` |
+| \`--calendar-current-radius\` | Corner radius of today | \`50%\` |
+| \`--calendar-focused-radius\` | Corner radius of the chosen day | \`50%\` |
+| \`--calendar-focused-bg\` | Background of the chosen day | \`transparent\` |
+| \`--calendar-focused-text\` | Text colour of the chosen day | theme-based |
+| \`--calendar-hover-bg\` | Background of a day under the pointer | theme-based |
+| \`--calendar-hover-radius\` | Corner radius of a day under the pointer | \`50%\` |
+| \`--calendar-past\` | Text colour of the days of the previous and next month | theme-based |
+| \`--calendar-disabled\` | Text colour of the days outside \`minDate\` and \`maxDate\` | theme-based |
+| \`--add-button-bg\` | Background of the square before **Select date** | theme-based |
+| \`--add-button-bg-hover\` | Background of that square under the pointer | theme-based |
+| \`--add-button-bg-active\` | Background of that square while pressed | theme-based |
+| \`--add-button-icon-color\` | Colour of the calendar glyph in that square | theme-based |
+| \`--add-button-icon-color-hover\` | Colour of that glyph under the pointer | theme-based |
+| \`--add-button-radius\` | Corner radius of that square | \`3px\` |
+| \`--selected-item-bg\` | Background of the chip that shows the chosen date | theme-based |
+| \`--selected-item-bg-hover\` | Background of the chip under the pointer | theme-based |
+| \`--selected-item-radius\` | Corner radius of the chip | \`3px\` |
 
-**Calendar variables:**
-- \`--calendar-bg\` — calendar background color
-- \`--calendar-border\` — calendar border color
-- \`--calendar-shadow\` — calendar box shadow
-- \`--calendar-radius\` — calendar border radius
-- \`--calendar-title\` — month/year title color
-- \`--calendar-title-size\` — month/year title font size
-- \`--calendar-outline\` — nav button outline color
-- \`--calendar-arrow\` — nav arrow color
-- \`--calendar-disabled-arrow\` — disabled nav arrow color
-- \`--calendar-weekday\` — weekday header color
-- \`--calendar-accent\` — selected date / hover outline accent color
-- \`--calendar-selected-text\` — text color on selected (current) date
-- \`--calendar-hover-bg\` — date hover background
-- \`--calendar-past\` — past / out-of-month dates color
-- \`--calendar-disabled\` — disabled dates color
-- \`--calendar-hover-radius\` — date cell border radius on hover
-- \`--calendar-current-radius\` — selected (current) date cell border radius
-- \`--calendar-focused-radius\` — keyboard-focused date cell border radius
-- \`--calendar-focused-bg\` — keyboard-focused date cell background color
-- \`--calendar-focused-text\` — keyboard-focused date cell text color`,
+The variables are set on one wrapper around two pickers. The first holds the first day of this month, so it shows the chip; the second has no date, so it shows the **Select date** button. Open either calendar to see the calendar variables: both start at the first of this month (\`minDate\`), so the days of the previous month and the left arrow show their disabled colours, and the first picker's chosen day differs from today. Hover the chip, the button and a day to see the hover variables.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--calendar-bg": "#e6f3fb",
+    "--calendar-border": "#0082c9",
+    "--calendar-accent": "#0082c9",
+    "--calendar-hover-bg": "#cce5f6",
+    "--add-button-bg": "#cce5f6",
+    "--add-button-icon-color": "#0082c9",
+    "--selected-item-bg": "#cce5f6",
+    "--selected-item-radius": "8px",
+  }}
+>
+  <DatePicker
+    locale="en"
+    openDate={now()}
+    outerDate={date}
+    onChange={setDate}
+  />
+</div>`,
       },
     },
   },
