@@ -248,7 +248,9 @@
     @include text.no-user-select;
   }
 
-  &:not(:disabled):not(&[data-disabled="true"]):not(&[data-error="true"]) {
+  &:not(:disabled):not(&[data-disabled="true"]):not(&[data-error="true"]):not(
+      &[data-warning="true"]
+    ) {
     &:hover {
       border-color: var(--_input-border-hover);
     }
@@ -256,11 +258,14 @@
     &[data-focus="true"] {
       border-color: var(--_input-border-focus);
     }
-    cursor: text;
   }
 
-  &[readonly] {
-    cursor: default;
+  &:not(:disabled):not(&[data-disabled="true"]) {
+    cursor: text;
+
+    &[readonly] {
+      cursor: default;
+    }
   }
 
   &:placeholder-shown {

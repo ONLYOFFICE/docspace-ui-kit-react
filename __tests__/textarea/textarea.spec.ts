@@ -27,6 +27,16 @@ test.describe("Textarea — light", () => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("textarea-css-customization.png");
   });
+
+  test("grows with content", async ({ page }) => {
+    await gotoStory(page, "grows-with-content");
+    await expect(page).toHaveScreenshot("textarea-grows-with-content.png");
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("textarea-right-to-left.png");
+  });
 });
 
 test.describe("Textarea — dark", () => {
@@ -54,5 +64,17 @@ test.describe("Textarea — dark", () => {
     await gotoStory(page, "css-customization");
     await page.evaluate(() => document.body.classList.add("dark"));
     await expect(page).toHaveScreenshot("textarea-css-customization-dark.png");
+  });
+
+  test("grows with content dark", async ({ page }) => {
+    await gotoStory(page, "grows-with-content");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await expect(page).toHaveScreenshot("textarea-grows-with-content-dark.png");
+  });
+
+  test("right to left dark", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await expect(page).toHaveScreenshot("textarea-right-to-left-dark.png");
   });
 });
