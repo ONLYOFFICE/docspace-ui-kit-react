@@ -23,6 +23,11 @@ test.describe("AddButton — light", () => {
     await expect(page).toHaveScreenshot("add-button-disabled-states.png");
   });
 
+  test("with custom icon", async ({ page }) => {
+    await gotoStory(page, "with-custom-icon");
+    await expect(page).toHaveScreenshot("add-button-with-custom-icon.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("add-button-css-customization.png");
