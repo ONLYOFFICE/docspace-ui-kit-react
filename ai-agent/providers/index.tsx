@@ -119,6 +119,7 @@ import {
 } from "./host-tool-groups/generated-file-window";
 import { addDialogSubmitInterceptor } from "./components-overrides/dialog-footer/submit-interceptors";
 import { useApi as useFilesApi } from "../../providers/api";
+import { ContextRoomProvider, type ContextRoom } from "./context-room";
 import { useFilesIntegration, type AttachedFileInfo } from "./files";
 import { uploadFilesToChat } from "./files/upload-files";
 import { openAttachedFile } from "./files/open-file";
@@ -267,6 +268,14 @@ type AiAgentProvidersProps = {
    * {@link SuggestionSet}. A bare array is treated as `{ default: [...] }`.
    */
   suggestions?: Suggestion[] | SuggestionSet;
+  /**
+   * The room the user is standing in, offered to the chat as context. When
+   * the chat opens, `ContextRoomSync` connects it if it holds a `.ai` folder
+   * and the composer shows it with the folder's skills; `null` (outside a
+   * room, or a room kind that cannot hold the folder) drops any connection.
+   * There is no room picker: the current room is the only candidate.
+   */
+  contextRoom?: ContextRoom | null;
   children: ReactNode;
 };
 
@@ -538,6 +547,7 @@ const AiAgentProviders = ({
   composerHeader,
   composerDisabled,
   suggestions,
+  contextRoom,
   children,
 }: AiAgentProvidersProps) => {
   const { t } = useTranslation("Common");
@@ -936,6 +946,10 @@ const AiAgentProviders = ({
       // the "Upload from device" button) instead of the library's in-memory
       // default, so dropped DOCX/PDF/XLSX are supported too.
       onDropFiles,
+      // The context room is the room the user is in, connected by
+      // ContextRoomSync; there is no picker to reconnect it from, so the
+      // library's "Disconnect room" entry would be a one-way door.
+      hideContextRoomDisconnect: true,
     }),
     [
       composerActions,
@@ -1004,10 +1018,12 @@ const AiAgentProviders = ({
                             />
                             <GenerateToolApprovalBridge />
                             <AiChatStoreProvider>
-                              <AiChatStoresBridge />
-                              {getAgentRoomId ? null : <AgentRoomIdSync />}
-                              {children}
-                              {overlay}
+                              <ContextRoomProvider room={contextRoom}>
+                                <AiChatStoresBridge />
+                                {getAgentRoomId ? null : <AgentRoomIdSync />}
+                                {children}
+                                {overlay}
+                              </ContextRoomProvider>
                             </AiChatStoreProvider>
                           </ToolsProvider>
                         </ImagesProvider>
@@ -1027,6 +1043,7 @@ const AiAgentProviders = ({
 export default AiAgentProviders;
 
 export { useIsAiChatAvailable } from "./availability";
+export { useContextRoom, type ContextRoom } from "./context-room";
 export {
   useFormsRecommendation,
   type FormsRecommendation,

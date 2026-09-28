@@ -37,6 +37,7 @@ import { ChatToolbar } from "../chat-toolbar";
 import { ChatNoAccessScreen } from "./components/chat-no-access-screen";
 import { FormModelNotice } from "./components/form-model-notice";
 import { useAiChatStore } from "../providers/ai-chat-store/AiChatStoreProvider";
+import ContextRoomSync from "../providers/context-room/ContextRoomSync";
 
 import styles from "./NewChat.module.scss";
 import type { ChatProps } from "./chat.types";
@@ -81,6 +82,9 @@ const NewChat: React.FC<ChatProps> = observer(
     // the split-screen history layout, so it lives in one place.
     const chatPanel = (
       <>
+        {/* The chat is open: connect the current room as context if it
+            holds a .ai folder (see ContextRoomSync). */}
+        <ContextRoomSync />
         {showToolbar ? <ChatToolbar /> : null}
         {/* Above the conversation, as the legacy chat had it: the notice
             reacts to what the composer carries, not to what was sent. */}

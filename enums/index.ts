@@ -192,6 +192,8 @@ export const enum FolderType {
   AIAgents = 34,
   DefaultTemplates = 35,
   Forms = 36,
+  /** The `.ai` folder in a room's root: its Markdown files are the room's chat skills. */
+  Ai = 37,
 }
 
 export enum GuidanceRefKey {

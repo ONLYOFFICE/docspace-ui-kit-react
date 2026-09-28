@@ -56,6 +56,27 @@ export class AiApi extends BaseCustomApi {
   // JsonStringEnumConverter also accepts other casings, but there is no
   // reason to rely on that. Omitting it keeps the endpoint's own default
   // (`Docx`).
+  // Whether the room holds a `.ai` folder in its root
+  // (`GET /files/rooms/{id}/ai`, added on the server with the Ai folder
+  // type). The listing itself is not needed here — the AI service reads the
+  // skills — so one entry is asked for and only the status matters: 404 is
+  // "no such folder" (or no such room), which is a plain `false`; a refusal
+  // or a failure propagates.
+  async hasRoomAiFolder(roomId: number | string): Promise<boolean> {
+    try {
+      await this.request(`/files/rooms/${encodeURIComponent(String(roomId))}/ai`, {
+        method: "GET",
+        params: { count: 1 },
+      });
+      return true;
+    } catch (error) {
+      if ((error as { status?: number }).status === 404) {
+        return false;
+      }
+      throw error;
+    }
+  }
+
   startTextToDocx(
     folderId: number | string,
     title: string,
