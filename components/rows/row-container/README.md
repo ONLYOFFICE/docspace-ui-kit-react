@@ -13,7 +13,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["rows", "rows/row", "infinite-loader"],
   "subComponents": [],
-  "testIds": ["row-container"]
+  "testIds": ["row-container"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # RowContainer
