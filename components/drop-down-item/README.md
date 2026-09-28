@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": "setOpen", "loading": null, "disabled": "disabled" },
   "related": ["drop-down", "context-menu", "combobox"],
   "subComponents": [],
-  "testIds": ["drop-down-item"]
+  "testIds": ["drop-down-item"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # DropDownItem

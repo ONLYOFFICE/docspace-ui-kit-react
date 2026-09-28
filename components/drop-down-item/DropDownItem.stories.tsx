@@ -17,14 +17,23 @@ const meta = {
 
 ### Features
 
-- **Multiple Modes**: Regular item, header, separator, and submenu
+- **Multiple Modes**: Renders as a regular item, a section header with an optional back arrow, a separator line or a submenu entry with a trailing arrow
 - **Icon Support**: Display icons alongside text labels
 - **Toggle Switch**: Built-in toggle switch for boolean options
-- **Badges**: Beta and paid/pro badge indicators
-- **Selected State**: Visual indicator for the active selection
-- **Disabled State**: Non-interactive state with optional tooltip
-- **Text Overflow**: Automatic ellipsis for long labels
-- **Keyboard Navigation**: Active descendant highlighting
+- **Trailing Content**: Places a beta or paid badge, an external-link icon or any custom element at the end of the row
+- **Description**: Adds an always-visible second line under the label that explains what choosing the item means
+- **Selected State**: Highlights the item with \`isActive\`, while \`isSelected\` marks it as the current choice for assistive technology and sends a repeat click to \`onClickSelectedItem\`
+- **Disabled State**: Greys the item out and stops \`onClick\`, with an explaining tooltip on touch devices
+- **Text Overflow**: Cuts a long label off with an ellipsis when \`textOverflow\` or \`truncateText\` is set
+
+### Accessibility
+
+The item announces itself as one option of the enclosing list and leaves keyboard handling to that list:
+
+- **Role**: Carries \`role="option"\`, or \`role="separator"\` for a separator, so inside \`DropDown\` (a \`listbox\`) each item is read as one of its choices
+- **Selection**: \`aria-selected\` follows \`isSelected\`, so the current choice is announced as selected
+- **Disabled**: \`aria-disabled\` follows \`disabled\`, so the item is announced as unavailable while it stays in the list
+- **Focus**: A \`tabIndex\` of -1 keeps the item out of the Tab order; the enclosing menu moves the keyboard highlight and shows it on the item through \`isActiveDescendant\`
 
 ### Usage
 
@@ -49,124 +58,268 @@ import { DropDownItem } from "@onlyoffice/apps-ui-kit/components/drop-down-item"
   argTypes: {
     label: {
       control: "text",
-      description: "Primary text content",
+      description:
+        "Text or node shown in the item; a string also becomes the hover title",
     },
     icon: {
       control: "text",
-      description: "URL or path to the icon",
+      description:
+        "Icon before the label: a component or element rendered as given, or a URL — a path with `.svg` or `images/` is inlined, anything else becomes an image",
     },
     disabled: {
       control: "boolean",
-      description: "Disables the item",
+      description:
+        "Greys the item out and stops `onClick`; inside `DropDown` the item is dropped from the list unless `showDisabledItems` is set",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isSeparator: {
       control: "boolean",
-      description: "Renders as a separator line",
+      description:
+        "Renders a one-pixel line between items instead of any content",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isHeader: {
       control: "boolean",
-      description: "Renders as a header item",
+      description:
+        "Renders a taller, non-clickable section title with a line under it",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isSelected: {
       control: "boolean",
-      description: "Shows selected state",
+      description:
+        "Marks the item as the current choice: sets `aria-selected` and calls `onClickSelectedItem` on click; it is highlighted only while also disabled",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isSubMenu: {
       control: "boolean",
-      description: "Shows submenu arrow",
+      description:
+        "Shows an arrow at the end of the row; it points the other way in right-to-left and turns down with `isActive`",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isModern: {
       control: "boolean",
-      description: "Uses modern compact styling",
+      description: "Narrows the side padding of the row to 8px",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     noHover: {
       control: "boolean",
-      description: "Disables hover effect",
+      description: "Keeps the background unchanged under the pointer",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     noActive: {
       control: "boolean",
-      description: "Disables active state",
+      description: "Keeps the background unchanged while the item is pressed",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withToggle: {
       control: "boolean",
-      description: "Shows toggle switch",
+      description:
+        "Shows a switch at the end of the row; changing it calls `onClick`",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     checked: {
       control: "boolean",
-      description: "Toggle checked state (used with withToggle)",
+      description: "Whether the switch shown by `withToggle` is on",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isBeta: {
       control: "boolean",
-      description: "Shows beta badge",
+      description:
+        "Shows a beta badge at the end of the row, labelled by `betaLabel`",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isPaidBadge: {
       control: "boolean",
-      description: "Shows paid badge",
+      description:
+        "Shows a paid badge at the end of the row, labelled by `badgeLabel` or `paidLabel`",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     textOverflow: {
       control: "boolean",
-      description: "Truncates text with ellipsis",
+      description:
+        "Cuts the whole row off with an ellipsis when it is wider than the item",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     fillIcon: {
       control: "boolean",
-      description: "Fills icon with text color",
+      description:
+        "Recolours an icon given as a URL to the item's icon colour; off, the icon keeps its own colours",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     isActiveDescendant: {
       control: "boolean",
-      description: "Keyboard navigation active state",
+      description:
+        "Paints the item with the hover background as the one keyboard navigation is on; ignored while disabled",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     minWidth: {
       control: "text",
-      description: "Minimum width of the item",
+      description: "Minimum width of the item, as a CSS length",
     },
     onClick: {
       action: "clicked",
-      description: "Callback when the item is clicked",
+      description:
+        "Called on a click on the item and on a change of its switch; not called while disabled",
+    },
+    isActive: {
+      control: "boolean",
+      description:
+        "Highlights the item with the selected background; on a submenu entry it also turns the arrow down",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    withoutIcon: {
+      control: "boolean",
+      description: "Hides the icon even when `icon` is set",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    withHeaderArrow: {
+      control: "boolean",
+      description: "Shows a back arrow before the label of a header item",
+    },
+    headerArrowAction: {
+      action: "headerArrowAction",
+      description: "Called when the back arrow of a header item is clicked",
+    },
+    children: {
+      control: false,
+      description:
+        "Content of the item, rendered only when `label` is empty — never next to it",
+    },
+    additionalElement: {
+      control: false,
+      description: "Element placed at the end of the row, after the label",
+    },
+    description: {
+      control: "text",
+      description:
+        "Second line under the label, always visible; the item grows to fit it",
+    },
+    truncateText: {
+      control: "boolean",
+      description:
+        "Cuts the label alone off with an ellipsis, so the elements at the end of the row stay visible",
+    },
+    betaLabel: {
+      control: "text",
+      description:
+        "Text of the beta badge, used instead of the host's own constant",
+    },
+    paidLabel: {
+      control: "text",
+      description:
+        "Text of the paid badge, used instead of the translated default",
+    },
+    badgeLabel: {
+      control: "text",
+      description: "Text of the paid badge; takes precedence over `paidLabel`",
+    },
+    withExternalLink: {
+      control: "boolean",
+      description:
+        "Shows an external-link icon at the end of the row, when `externalLinkPath` is also set",
+    },
+    externalLinkPath: {
+      control: "text",
+      description:
+        "Must be non-empty for the external-link icon to show; the item does not navigate to it itself",
+    },
+    onExternalLinkClick: {
+      action: "onExternalLinkClick",
+      description:
+        "Called when the external-link icon is clicked, without calling `onClick`",
+    },
+    onClickSelectedItem: {
+      action: "onClickSelectedItem",
+      description: "Called when an item with `isSelected` is clicked",
+    },
+    onMouseDown: {
+      action: "onMouseDown",
+      description: "Called when a mouse button is pressed on the item",
+    },
+    stopMouseDownPropagation: {
+      control: "boolean",
+      description:
+        "Keeps a mouse press on the item from reaching the page, so a menu that closes on an outside press stays open until the click",
+    },
+    setOpen: {
+      action: "setOpen",
+      description:
+        "Called with `false` after every click, disabled ones included, so the enclosing menu can close",
+    },
+    tooltip: {
+      control: "text",
+      description:
+        "Hint shown on a touch device when a disabled item is tapped; needs `RootTooltip` mounted",
+    },
+    tabIndex: {
+      control: "number",
+      description:
+        "Position in the Tab order; the default keeps the item off it",
+      table: {
+        defaultValue: { summary: "-1" },
+      },
+    },
+    height: {
+      control: "number",
+      description:
+        "Height in pixels the enclosing `DropDown` reserves for the item in its list; the item's own height does not follow it",
+    },
+    heightTablet: {
+      control: "number",
+      description: "The same as `height`, used on a tablet-width window",
+    },
+    className: {
+      control: "text",
+      description: "Class name added to the item",
+    },
+    style: {
+      control: "object",
+      description: "Inline styles of the item",
+    },
+    id: {
+      control: "text",
+      description: "Id of the item element",
+    },
+    testId: {
+      control: "text",
+      description: "Value of `data-testid` on the item",
+      table: {
+        defaultValue: { summary: '"drop-down-item"' },
+      },
     },
   },
 } satisfies Meta<typeof DropDownItem>;
@@ -195,25 +348,36 @@ export const Default: Story = {
   args: {
     label: "Default Item",
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A plain item with a label, the row a menu is made of; change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<DropDownItem label="Default Item" onClick={handleClick} />`,
+      },
+    },
+  },
 };
 
 const WithDescriptionTemplate = () => {
   return (
     <Wrapper>
       <DropDownItem
-        label="Full admin"
+        label="Editor"
         icon={SettingsReactSvgUrl}
-        description="Manage the workspace: create/archive rooms, invite users, configure AI agents, assign lower roles. Full Files access."
+        description="Can edit the document, leave comments and share it with others."
       />
       <DropDownItem
-        label="Room admin"
+        label="Commenter"
         icon={SettingsReactSvgUrl}
-        description="Manage assigned rooms, invite users, create/manage AI agents, assign lower roles. Full Files access."
+        description="Can read the document and leave comments, but not change its text."
       />
       <DropDownItem
-        label="User"
+        label="Viewer"
         icon={SettingsReactSvgUrl}
-        description="Access only invited rooms, view AI agent results and shared chats. Can't create rooms/AI agents. Full Files access."
+        description="Can only read the document."
       />
     </Wrapper>
   );
@@ -225,7 +389,14 @@ export const WithDescription: Story = {
     docs: {
       description: {
         story:
-          "An item with `description` is laid out as two lines - the label and an always-visible description under it. Used for the user type menus, where picking an item has to be an informed choice.",
+          "Each item reads as two lines: the label, and under it an always-visible explanation of what choosing it means (`description`). Use it where picking an item has consequences the label alone cannot convey.",
+      },
+      source: {
+        code: `<DropDownItem
+  label="Editor"
+  icon={SettingsIcon}
+  description="Can edit the document, leave comments and share it with others."
+/>`,
       },
     },
   },
@@ -238,7 +409,7 @@ const ItemTypesTemplate = () => {
       <DropDownItem label="Regular Item" />
       <DropDownItem label="With Icon" icon={SettingsReactSvgUrl} />
       <DropDownItem isSeparator />
-      <DropDownItem label="Selected Item" isSelected />
+      <DropDownItem label="Selected Item" isSelected isActive />
       <DropDownItem label="Disabled Item" disabled />
     </Wrapper>
   );
@@ -250,14 +421,14 @@ export const ItemTypes: Story = {
     docs: {
       description: {
         story:
-          "All available item types: header, regular, with icon, separator, selected, and disabled.",
+          "The building blocks of a menu, top to bottom: **Header Item** — a section title with a line under it (`isHeader`); **Regular Item** and **With Icon** — plain rows, with and without an icon (`icon`); a separator line (`isSeparator`); **Selected Item** — the current choice, highlighted (`isActive`) and announced as selected (`isSelected`); **Disabled Item** — greyed out and not clickable (`disabled`).",
       },
       source: {
         code: `<DropDownItem isHeader label="Header Item" />
 <DropDownItem label="Regular Item" />
 <DropDownItem label="With Icon" icon={SettingsIcon} />
 <DropDownItem isSeparator />
-<DropDownItem label="Selected Item" isSelected />
+<DropDownItem label="Selected Item" isSelected isActive />
 <DropDownItem label="Disabled Item" disabled />`,
       },
     },
@@ -279,7 +450,7 @@ export const WithToggle: Story = {
     docs: {
       description: {
         story:
-          "Items with built-in toggle switches for boolean options. Shows both unchecked and checked states.",
+          "A menu entry that switches an option on and off in place, without opening a dialog: **Toggle Off** and **Toggle On** show both positions (`withToggle`, `checked`); a change of the switch calls `onClick`.",
       },
       source: {
         code: `<DropDownItem label="Toggle Off" withToggle checked={false} />
@@ -314,7 +485,7 @@ export const WithBadges: Story = {
     docs: {
       description: {
         story:
-          "Items with beta and paid/pro badges to indicate feature availability.",
+          "Badges tell the reader before clicking that an entry is new or needs a paid plan: **New Feature** carries a beta badge (`isBeta`, `betaLabel`), **Premium Feature** a paid one (`isPaidBadge`, `paidLabel`).",
       },
       source: {
         code: `<DropDownItem label="New Feature" icon={SettingsIcon} isBeta betaLabel="Beta" />
@@ -344,7 +515,7 @@ export const Submenu: Story = {
     docs: {
       description: {
         story:
-          "Items with submenu arrows. Shows both default and active submenu states.",
+          "An arrow at the end of the row tells the reader the entry leads to more options: **Open Submenu** shows it pointing sideways (`isSubMenu`), **Active Submenu** — the entry whose submenu is open — highlighted with the arrow turned down (`isActive`).",
       },
       source: {
         code: `<DropDownItem label="Open Submenu" icon={SettingsIcon} isSubMenu />
@@ -377,7 +548,7 @@ export const WithAdditionalElement: Story = {
     docs: {
       description: {
         story:
-          "Items with additional elements such as keyboard shortcuts displayed alongside the label.",
+          "Any element can sit at the end of the row, such as the keyboard shortcut of a command: **Save** and **Copy** show theirs on the right (`additionalElement`).",
       },
       source: {
         code: `<DropDownItem label="Save" icon={SettingsIcon} additionalElement={<span>Ctrl+S</span>} />
@@ -387,10 +558,19 @@ export const WithAdditionalElement: Story = {
   },
 };
 
-const HeaderWithArrowTemplate = () => {
+const HeaderWithArrowTemplate = ({
+  headerArrowAction,
+}: {
+  headerArrowAction?: () => void;
+}) => {
   return (
     <Wrapper>
-      <DropDownItem label="Header with Back" isHeader withHeaderArrow />
+      <DropDownItem
+        label="Header with Back"
+        isHeader
+        withHeaderArrow
+        headerArrowAction={headerArrowAction}
+      />
       <DropDownItem label="Option 1" />
       <DropDownItem label="Option 2" />
     </Wrapper>
@@ -398,14 +578,22 @@ const HeaderWithArrowTemplate = () => {
 };
 
 export const HeaderWithArrow: Story = {
-  render: () => <HeaderWithArrowTemplate />,
+  render: (args) => (
+    <HeaderWithArrowTemplate headerArrowAction={args.headerArrowAction} />
+  ),
   parameters: {
     docs: {
       description: {
-        story: "Header item with a back arrow for navigating submenu levels.",
+        story:
+          "A nested menu level needs a way back: **Header with Back** shows an arrow before the title (`isHeader`, `withHeaderArrow`); click it to see `headerArrowAction` in the Actions panel.",
       },
       source: {
-        code: `<DropDownItem label="Header with Back" isHeader withHeaderArrow />`,
+        code: `<DropDownItem
+  label="Header with Back"
+  isHeader
+  withHeaderArrow
+  headerArrowAction={goBack}
+/>`,
       },
     },
   },
@@ -429,10 +617,89 @@ export const WithTextOverflow: Story = {
     docs: {
       description: {
         story:
-          "Long labels are automatically truncated with ellipsis when `textOverflow` is enabled.",
+          "A label longer than the menu is cut off with an ellipsis instead of wrapping or widening the menu (`textOverflow`).",
       },
       source: {
         code: `<DropDownItem label="Very long text..." textOverflow minWidth="200px" />`,
+      },
+    },
+  },
+};
+
+export const WithExternalLink: Story = {
+  render: (args) => (
+    <Wrapper>
+      <DropDownItem {...args} />
+    </Wrapper>
+  ),
+  args: {
+    label: "Help center",
+    icon: SettingsReactSvgUrl,
+    withExternalLink: true,
+    externalLinkPath: "https://example.com/help",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "An entry can carry a second target at its end: **Help center** shows an external-link icon (`withExternalLink`, `externalLinkPath`); click the icon to see `onExternalLinkClick` in the Actions panel while `onClick` stays silent, and open the link from that callback yourself.",
+      },
+      source: {
+        code: `<DropDownItem
+  label="Help center"
+  icon={SettingsIcon}
+  withExternalLink
+  externalLinkPath="https://example.com/help"
+  onExternalLinkClick={() => window.open(helpUrl, "_blank")}
+/>`,
+      },
+    },
+  },
+};
+
+// Arabic for "Settings", "More options" and "Notifications", escaped to keep the source ASCII.
+const RightToLeftTemplate = () => (
+  <div dir="rtl">
+    <Wrapper>
+      <DropDownItem
+        label={"\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a"}
+        icon={SettingsReactSvgUrl}
+      />
+      <DropDownItem
+        label={
+          "\u0627\u0644\u0645\u0632\u064a\u062f \u0645\u0646 \u0627\u0644\u062e\u064a\u0627\u0631\u0627\u062a"
+        }
+        icon={SettingsReactSvgUrl}
+        isSubMenu
+      />
+      <DropDownItem
+        label={"\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a"}
+        icon={SettingsReactSvgUrl}
+        withToggle
+        checked
+      />
+    </Wrapper>
+  </div>
+);
+
+export const RightToLeft: Story = {
+  render: () => <RightToLeftTemplate />,
+  globals: { direction: "rtl" },
+  parameters: {
+    noPadding: true,
+    docs: {
+      // Framed, so the theme's data-dir="rtl" does not flip the whole Docs page.
+      story: { inline: false, height: "130px" },
+      description: {
+        story:
+          'The same rows under a right-to-left interface: the icons move to the right of the labels, and the submenu arrow and the switch move to the left end, the arrow mirrored to point left. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+      },
+      source: {
+        code: `<div dir="rtl">
+  <DropDownItem label="..." icon={SettingsIcon} />
+  <DropDownItem label="..." icon={SettingsIcon} isSubMenu />
+  <DropDownItem label="..." icon={SettingsIcon} withToggle checked />
+</div>`,
       },
     },
   },
@@ -447,15 +714,27 @@ export const CssCustomization: Story = {
           height: "20px",
           width: "240px",
           "--drop-down-item-color": "#4c1d95",
+          "--drop-down-item-icon-fill": "#7c3aed",
           "--drop-down-item-hover-bg": "#ede9fe",
           "--drop-down-item-divider": "#c4b5fd",
+          "--drop-down-item-disabled-color": "#a78bfa",
           "--drop-down-item-height": "40px",
           "--drop-down-item-font-size": "14px",
+          "--drop-down-item-font-weight": "400",
           "--drop-down-item-padding": "0 20px",
+          "--drop-down-item-header-height": "56px",
+          "--drop-down-item-header-font-size": "18px",
         } as CSSProperties
       }
     >
-      <DropDown open directionY="bottom" fixedDirection isDefaultMode={false}>
+      <DropDown
+        open
+        directionY="bottom"
+        fixedDirection
+        isDefaultMode={false}
+        showDisabledItems
+      >
+        <DropDownItem isHeader label="Header" />
         <DropDownItem label="Custom Item" icon={SettingsReactSvgUrl} />
         <DropDownItem label="Another Item" icon={SettingsReactSvgUrl} />
         <DropDownItem isSeparator />
@@ -470,15 +749,19 @@ export const CssCustomization: Story = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--drop-down-item-color\` | Text and icon color | theme token |
-| \`--drop-down-item-hover-bg\` | Hover background color | theme token |
-| \`--drop-down-item-divider\` | Separator color | theme token |
-| \`--drop-down-item-height\` | Item line height | \`32px\` |
+| \`--drop-down-item-color\` | Label text color | theme-based |
+| \`--drop-down-item-icon-fill\` | Icon color while \`fillIcon\` is on, disabled items included | theme-based |
+| \`--drop-down-item-hover-bg\` | Background under the pointer, while pressed and on the keyboard-highlighted item | theme-based |
+| \`--drop-down-item-divider\` | Separator line and the line under a header | theme-based |
+| \`--drop-down-item-disabled-color\` | Label text color of a disabled item | theme-based |
+| \`--drop-down-item-height\` | Item line height; on a tablet-width window it is \`36px\` regardless | \`32px\` |
 | \`--drop-down-item-font-size\` | Item font size | \`13px\` |
-| \`--drop-down-item-font-weight\` | Item font weight | \`600\` |
-| \`--drop-down-item-padding\` | Item padding | \`0 12px\` |
+| \`--drop-down-item-font-weight\` | Item and header font weight | \`600\` |
+| \`--drop-down-item-padding\` | Item padding; on a tablet-width window it is \`0 16px\` regardless | \`0 12px\` |
 | \`--drop-down-item-header-height\` | Header item height | \`48px\` |
-| \`--drop-down-item-header-font-size\` | Header font size | \`15px\` |`,
+| \`--drop-down-item-header-font-size\` | Header font size | \`15px\` |
+
+The wrapper around the \`DropDown\` sets every variable: **Header** shows the header height, font size and the line under it, **Custom Item** and **Another Item** the text and icon colors, row height, font and padding — hover them for the hover background — the separator its color, and **Disabled Item** the disabled text color (\`showDisabledItems\` keeps it in the list).`,
       },
     },
   },
