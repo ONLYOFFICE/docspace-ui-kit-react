@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["tag", "selected-item", "text"],
   "subComponents": [],
-  "testIds": ["badge", "badge-inner", "badge-text"]
+  "testIds": ["badge", "badge-inner", "badge-text"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Badge
