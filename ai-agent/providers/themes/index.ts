@@ -345,6 +345,13 @@ const buildTokens = (
   "--file-items-background-color": "var(--background-normal)",
   "--file-items-border-color": "var(--border-divider)",
   "--file-items-chat-background-color": "var(--background-normal-element)",
+  // The connected-room chip in the composer takes the portal's own paint
+  // for blocks inside the chat input, so it reads as one of them.
+  "--chat-composer-room-background-color":
+    "var(--chat-input-file-background-color)",
+  "--chat-composer-room-border-color": "var(--chat-input-file-border-color)",
+  "--chat-composer-room-hover-background-color":
+    "var(--chat-input-tools-button-hover-background)",
   "--file-items-chat-hover-background-color": "var(--highlight-button-hover)",
   "--file-items-chat-pressed-background-color":
     "var(--highlight-button-pressed)",
