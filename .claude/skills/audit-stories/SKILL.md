@@ -310,7 +310,12 @@ follows it:
   unbroken string that stretches the Docs props table far past its
   column. Give such a prop `control: false` with a one-line comment
   saying why, and after adding icons to sample data open the Docs page
-  and check that `.docblock-argstable` is no wider than its parent.
+  and check that `.docblock-argstable` is no wider than its parent —
+  with every JSON node expanded, because a collapsed array hides the
+  string until someone opens it, and the table shows only the first
+  story's args while the canvas Controls panel shows each story's. A
+  `text` or `select` control is a fixed-width field and does not
+  stretch.
   Sample data in a non-story file (`data.ts`) ships in the package,
   and Rollup cannot load `?url`: attach the icon in the story file.
 - **An RTL story only where direction changes the picture** — the
