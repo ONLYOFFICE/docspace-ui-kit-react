@@ -123,7 +123,7 @@ export type ArticleProps = ArticleProfileProps &
     /** Whether the live chat bubble may be rendered at all. It is also suppressed on a mobile user agent. */
     isLiveChatAvailable: boolean;
 
-    /** Replaces the body, the apps block and the profile block with skeletons. The header and the slots are still rendered. */
+    /** Replaces the profile block with a skeleton and removes the custom slot, the developer tools entry, the apps block, the live chat and the collapse handle. The header and the slots are still rendered. */
     showArticleLoader?: boolean;
     /** Whether the person is an administrator. With `limitedAccessDevToolsForUsers` it decides whether the developer tools entry is shown. */
     isAdmin: boolean;

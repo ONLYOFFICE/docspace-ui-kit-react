@@ -21,70 +21,8 @@ const meta = {
   title: "UI/Layout/Article",
   component: Article,
   parameters: {
-    docs: {
-      description: {
-        component: `Article is the left side panel of an application layout: a header, an optional main action, a scrolling navigation body and the signed-in person's profile block at its foot.
-
-### Features
-
-- **Compound Components**: Takes its header, main action and body as \`Article.Header\`, \`Article.MainButton\` and \`Article.Body\` slots and places their contents in fixed spots of the panel
-- **User Profile**: Shows the person's avatar and name at the foot of the panel, with a menu of actions behind the dots button
-- **Responsive**: Renders a fixed column on desktop, a sidebar on tablet and a full-width overlay with a backdrop on a phone, as \`currentDeviceType\` says; nothing measures the window
-- **Collapsible**: Narrows to a column of icons while \`showText\` is off; on tablet the handle at the foot calls \`toggleShowText\`, and the host flips the prop
-- **Live Chat**: Loads a Zendesk chat bubble when \`isLiveChatAvailable\` is set, except in mobile browsers
-- **Apps Block**: Lists download links for the desktop and mobile applications above the profile block, removable with \`hideAppsBlock\`
-- **Developer Tools Entry**: Links to the developer tools page, hidden from guests and, with \`limitedAccessDevToolsForUsers\`, from anyone who is not an administrator
-- **Loading State**: Swaps the logo, the body extras and the profile block for skeletons while \`isBurgerLoading\` and \`showArticleLoader\` are set
-
-### Usage
-
-\`\`\`tsx
-import Article from "@onlyoffice/apps-ui-kit/components/article";
-
-// panelProps: the remaining required props — callbacks, the person, the app links
-<Article
-  {...panelProps}
-  currentDeviceType={DeviceType.desktop}
-  withCustomArticleHeader
-  withMainButton
->
-  <Article.Header>
-    <h2>My App</h2>
-  </Article.Header>
-  <Article.MainButton>
-    <button>Create</button>
-  </Article.MainButton>
-  <Article.Body>
-    <nav>Navigation items</nav>
-  </Article.Body>
-</Article>
-\`\`\`
-
-\`\`\`tsx
-const [showText, setShowText] = useState(true);
-
-<Article
-  {...panelProps}
-  showText={showText}
-  setShowText={setShowText}
-  toggleShowText={() => setShowText((value) => !value)}
-  currentDeviceType={DeviceType.tablet}
->
-  <Article.Body>
-    <nav>Navigation items</nav>
-  </Article.Body>
-</Article>
-\`\`\`
-
-\`\`\`tsx
-<Article {...panelProps} isBurgerLoading showArticleLoader>
-  <Article.Body>
-    <nav>Navigation items</nav>
-  </Article.Body>
-</Article>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   decorators: [
     // No portal serves logo.ashx here; swap every logo for a bundled one.
@@ -806,33 +744,8 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-The first panel shows the background, the borders and the profile block; the second adds the back button (\`showBackButton\`) for \`--article-back-color\`.
-
-**Article — sidebar**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--article-bg\` | Sidebar background color, also behind the collapse handle | theme-based |
-| \`--article-border\` | Sidebar trailing border, repeated on the profile block | theme-based |
-| \`--article-header-border\` | Header bottom border — only in a phone-width window while \`currentDeviceType\` is not \`mobile\`, because the phone layout renders a header of its own | theme-based |
-| \`--article-width\` | Sidebar width on desktop; the profile block keeps its own 251px, so a wider value leaves a gap beside it | \`252px\` |
-| \`--article-sidebar-width\` | Sidebar width in a tablet-width window (600–1024px) while \`showText\` is on | \`243px\` |
-| \`--article-sidebar-collapsed-width\` | Sidebar width in a tablet-width window while \`showText\` is off | \`60px\` |
-
-**Article — profile section**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--article-profile-bg\` | Profile block background | theme-based |
-| \`--article-profile-border\` | Profile block top border | theme-based |
-
-**Article — back button**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--article-back-color\` | Back button label color | theme-based |`,
+        story:
+          "Five of the panel's variables set on one wrapper -- the variables are listed under CSS variables on this page. The first panel shows the background, the borders and the profile block; the second adds the back button (`showBackButton`) for `--article-back-color`.",
       },
       source: {
         code: `<div style={{ "--article-bg": "#e6f3fb", "--article-border": "1px solid #0082c9", "--article-back-color": "#0082c9" }}>
