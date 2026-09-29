@@ -83,17 +83,17 @@ export type FileTileProps = {
   sideColor?: string;
   /** Called with an empty array before a plain click selects the tile, unless the click landed on an image, an input or an SVG shape. */
   setSelection?: (items: FileItem[]) => void;
-  /** Row of quick-action buttons over the thumbnail, above the badges. */
+  /** Quick-action buttons, stacked in a column in the thumbnail's top start corner. */
   contentElement?: ReactElement;
-  /** Badges drawn over the thumbnail. Give them the class `badges` so a click on them does not select the tile. */
+  /** Badges drawn in a row in the thumbnail's top end corner. Give them the class `badges` so a click on them does not select the tile. */
   badges?: ReactElement;
-  /** Tints the lower half, for a file that a search or a filter has just matched. */
+  /** Fades `--highlightColor` out of the lower half once, on mount, for a file that a search or a filter has just matched. The kit sets no such colour, so nothing shows until you do. */
   isHighlight?: boolean;
-  /** Dims the tile while an operation is running over it. */
+  /** Meant to turn the pointer off while an operation runs over the tile, but the rule it adds never matches, so it currently changes nothing. */
   isBlockingOperation?: boolean;
   /** Draws the accent outline that marks the tile the keyboard is on. */
   showHotkeyBorder?: boolean;
-  /** Dims the tile while it is being dragged. */
+  /** Marks the tile as being dragged: the checkbox no longer replaces the icon on hover. It does not dim the tile. */
   isDragging?: boolean;
   /** Ignored. Only its difference from `null` is tested, which a `number | undefined` always satisfies, so the branch it guards is unreachable. */
   thumbSize?: number;

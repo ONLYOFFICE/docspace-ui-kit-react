@@ -82,43 +82,8 @@ const meta = {
   title: "UI/Tiles/FileTile",
   component: FileTile,
   parameters: {
-    docs: {
-      description: {
-        component: `The card for one document in a tile listing: a preview over the file's name, with a checkbox, badges and a menu.
-
-### Features
-
-- **Thumbnail Preview**: Shows the file's preview image in the upper part, and a placeholder icon when there is none or it fails to load
-- **Click To Select**: Selects the tile on a plain click, and from the checkbox that takes the icon's place on hover
-- **Multi-Select Clicks**: Hands Ctrl- or Cmd-clicks and Shift-clicks to callbacks of their own instead of selecting
-- **Badges and Quick Actions**: Draws badges in the top end corner of the preview and a column of quick-action buttons in the top start corner
-- **Progress Loader**: Replaces the icon and the checkbox with a small loader while the file is busy
-- **Actions Menu**: Opens the file's menu from a three-dot button, drawn when the item carries a \`contextOptions\` key, and on right-click when \`getContextModel\` is given
-- **Hotkey Outline**: Turns the tile's border the accent colour to mark the tile the keyboard is on
-- **Renaming State**: Drops the icon and the checkbox while the file is renamed
-
-### Usage
-
-\`\`\`tsx
-import { FileTile } from "@onlyoffice/apps-ui-kit/components/tiles/file-tile";
-import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
-
-<FileTile
-  item={{ id: "1", title: "Document.docx", fileExst: ".docx", fileType: FileType.Document }}
-  element={<WordIcon />}
-  contextOptions={options}
-  onSelect={handleSelect}
->
-  <TileContent><Link>Document.docx</Link></TileContent>
-</FileTile>
-
-// With a preview image and a handler for Ctrl-clicks
-<FileTile item={file} element={<WordIcon />} contextOptions={options} thumbnail={file.thumbnailUrl} withCtrlSelect={addToSelection}>
-  <TileContent><Link>{file.title}</Link></TileContent>
-</FileTile>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     checked: {
@@ -579,34 +544,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--tile-bg\` | Background of the tile | theme-based |
-| \`--tile-border-style\` | Border of the tile, shared with the other tiles | theme-based |
-| \`--file-tile-border-style\` | Border of a file tile only; wins over \`--tile-border-style\` | theme-based |
-| \`--tile-radius\` | Corner radius of the tile | \`12px\` |
-| \`--tile-height\` | Height of the whole tile | \`222px\` |
-| \`--tile-hover-bg\` | Background of the name row on hover, and of the whole tile when checked | theme-based |
-| \`--tile-hover-text-decoration\` | Decoration of the name on hover | theme-based |
-| \`--tile-icon-display\` | \`display\` of the icon and checkbox box; \`none\` hides both | \`flex\` |
-| \`--tile-hotkey-color\` | Border colour while \`showHotkeyBorder\` is on | theme-based |
-| \`--tile-badge-bg\` | Background of each badge and quick action over the preview | theme-based |
-| \`--tile-badge-radius\` | Corner radius of each badge and quick action | \`3px\` |
-| \`--tile-badge-box-shadow\` | Shadow of each badge and quick action | theme-based |
-| \`--tile-text-size\` | Font size of the name | \`14px\` |
-| \`--tile-text-weight\` | Font weight of the name | \`normal\` |
-| \`--tile-text-color\` | Colour of the name | inherited |
-| \`--tile-text-line-height\` | Line height of the name | \`16px\` |
-| \`--tile-bottom-padding-inline\` | Side padding of the name row | \`0\` |
-| \`--tile-thumbnail-padding-inline\` | Side inset of the preview image | \`0\` |
-| \`--tile-thumbnail-height\` | Height of the preview image | \`100%\` |
-| \`--tile-thumbnail-image-radius\` | Corner radius of the preview image | the tile's top corners |
-| \`--tile-thumbnail-image-hover-bg\` | Background of the upper part on hover | the tile background |
-| \`--tile-thumbnail-transition\` | Transition of the upper part's background | \`background 0.2s\` |
-| \`--tile-option-button-padding-end\` | End padding of the three-dot button | \`16px\` |
-| \`--highlightColor\` | Colour that fades out of the name row while \`isHighlight\` plays; the kit sets none, so without it nothing shows | none |
+        story: `The variables are listed under CSS variables on this page.
 
 Two instances:
 - **Document.docx** — a preview, a badge and a quick action, for every variable except \`--file-tile-border-style\`, \`--tile-icon-display\`, \`--tile-hotkey-color\` and \`--highlightColor\`; hover it for the hover variables.
