@@ -213,7 +213,8 @@ export function PlanMarker() {
   including the background colour. Use `className`, or pass `backgroundColor`, `height` and
   `border` as props.
 - **The pointer cursor is on by default**, hover or not, and so is a background shift on hover and
-  on active. A badge that is not clickable wants `noHover`.
+  on active: the pill turns 15% transparent under the pointer and takes 10% black while pressed,
+  muted grey included. A badge that is not clickable wants `noHover`.
 - **`type="high"` overrides the spacing props.** Its padding and radius are `!important` on the
   pill, so `padding` and `borderRadius` stop applying there; the outer element keeps the radius
   you passed. Its 13px / 400 text is a plain rule, so `fontSize` and `fontWeight` still win.
@@ -237,6 +238,8 @@ export function PlanMarker() {
 | `--badge-high-padding`   | `3px 10px`                     | Padding of the pill while `type="high"`                      |
 | `--badge-high-font-size` | `13px`                         | Font size of the label while `type="high"`                   |
 | `--accent-main`          | orange, per theme              | The default background, shared with the rest of the kit      |
+
+`isMutedBadge` wins over `--badge-bg`: a muted badge stays grey whatever the variable says.
 
 ## Accessibility
 

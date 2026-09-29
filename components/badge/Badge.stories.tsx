@@ -10,51 +10,8 @@ const meta = {
   title: "UI/Data display/Badge",
   component: Badge,
   parameters: {
-    docs: {
-      description: {
-        component: `A small coloured pill for a count or a short marker that sits next to the thing it describes.
-
-### Features
-
-- **Numeric & Text Labels**: Shows a count or a short text and hides itself when the label is \`0\` or empty
-- **High Priority**: Switches to a preset with squarer corners and roomier padding for a marker that should stand out
-- **Version Badge**: Lets the badge fill the width of its container on tablet-width screens and narrower
-- **Paid Badge**: Keeps the text white and never cuts off the label, for a paid-feature marker
-- **Muted Badge**: Paints the pill grey over any custom background for something inactive
-- **Hover States**: Lightens the pill on hover and darkens it while pressed, unless hover effects are turned off
-- **Custom Styling**: Accepts its own background, text colour, size, weight, border, padding, radius and height
-- **Click Handling**: Calls the click handler after preventing the event's default action
-
-### Accessibility
-
-The badge is a live status region, so a screen reader hears a changed count without the user going to look.
-
-- \`role="status"\`: Identifies the badge as a status region
-- \`aria-label\`: Announces the label followed by the type, so a \`high\` badge reading 5 is heard as "5 high"
-- \`aria-live="polite"\`: Announces a new label once the screen reader has finished what it is saying
-- \`aria-atomic="true"\`: Reads the whole label on every change, not only the characters that changed
-- **Hidden pill**: The visible pill is hidden from assistive technologies, so the label is not read twice
-- **No keyboard focus**: The badge takes no focus; a clickable one needs \`tabIndex\` and a \`role\` from you, or its action offered somewhere else
-
-### Usage
-
-\`\`\`tsx
-import { Badge } from "@onlyoffice/apps-ui-kit/components/badge";
-
-// Notification count
-<Badge label={5} />
-
-// Text badge
-<Badge label="New" />
-
-// High priority
-<Badge type="high" label="Urgent" backgroundColor="#F21C0E" />
-
-// Paid feature indicator
-<Badge label="PRO" isPaidBadge backgroundColor="#EDC409" />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=6057-171831&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -414,15 +371,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--badge-bg\` | Colour of the pill, over \`backgroundColor\`; a muted badge stays grey | theme-based |
-| \`--badge-radius\` | Corner radius of the pill, \`high\` type only | \`6px\` |
-| \`--badge-high-padding\` | Padding around the label, \`high\` type only | \`3px 10px\` |
-
-The example is one \`high\` badge, because two of the three variables apply only to that type.`,
+        story: `The variables are listed under CSS variables on this page. The example is one \`high\` badge, because two of the three variables apply only to that type.`,
       },
       source: {
         code: `<div
