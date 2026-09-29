@@ -304,6 +304,15 @@ follows it:
   a story picks a fitting icon per item only when icons are what it
   demonstrates (an `ItemVariants` story), otherwise the dozen extra
   imports document nothing and break on the next icon rename.
+- **An object control prints its value, so an icon in it breaks the
+  props table.** A small `?url` SVG is inlined as a `data:` URI, and a
+  JSON control holding one (an option with an `icon`) shows it as one
+  unbroken string that stretches the Docs props table far past its
+  column. Give such a prop `control: false` with a one-line comment
+  saying why, and after adding icons to sample data open the Docs page
+  and check that `.docblock-argstable` is no wider than its parent.
+  Sample data in a non-story file (`data.ts`) ships in the package,
+  and Rollup cannot load `?url`: attach the icon in the story file.
 - **An RTL story only where direction changes the picture** — the
   criterion of check 3 — one per component, named `RightToLeft`. Two
   mechanisms flip a component and the story sets both:
