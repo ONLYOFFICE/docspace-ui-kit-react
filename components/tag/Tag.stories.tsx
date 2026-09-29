@@ -11,45 +11,8 @@ const meta = {
   title: "UI/Data display/Tag",
   component: Tag,
   parameters: {
-    docs: {
-      description: {
-        component: `A tag component for displaying categorized labels, filters, or status indicators.
-
-### Features
-
-- **New Tag State**: Draws a newly created tag on a filled background and, when a delete handler is given, adds a cross after the label
-- **Disabled State**: Draws a dashed border and ignores the pointer, so the tag neither reacts to hover nor fires its click handler
-- **Deleted State**: Greys out the border and stops the click handler from firing while the tag stays on screen
-- **Click Handler**: Reports a click anywhere in the tag with its label and pass-through values, and highlights the tag on hover while it is set
-- **Delete Handler**: Receives the tag's identifier when the cross of a new tag is clicked
-- **Max Width**: Configurable maximum width with text truncation
-- **Icon Tags**: Shows a glyph from an SVG URL or a component, as a compact tag of its own once the label is turned off
-- **Label Suffix**: Appends extra text to the label on the same line, in a colour of its own
-
-### Accessibility
-
-The tag is a plain \`div\` with no role of its own; it sets two attributes:
-
-- \`aria-label\`: Set to \`label\`, the name a screen reader gives the tag
-- \`aria-disabled\`: Set while \`isDisabled\` is on, so the tag is announced as unavailable
-- The tag is not focusable and handles no keys, so a clickable tag needs another keyboard route to the same action
-
-### Usage
-
-\`\`\`tsx
-import { Tag } from "@onlyoffice/apps-ui-kit/components/tag";
-
-// Basic tag
-<Tag tag="category" label="Design" />
-
-// New tag with delete
-<Tag tag="new" label="New Tag" isNewTag onDelete={(tag) => console.log(tag)} />
-
-// Clickable tag
-<Tag tag="filter" label="React" onClick={({ label }) => console.log(label)} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=62-2597&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -416,18 +379,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-| --- | --- | --- |
-| \`--tag-bg\` | Background of the tag; a new tag, and any tag on hover or press, takes the theme's colour instead | theme-based |
-| \`--tag-border-style\` | Border shorthand; a disabled tag draws its dashed theme border instead | theme-based |
-| \`--tag-radius\` | Corner radius | \`6px\` |
-| \`--tag-inner-padding\` | Space between the border and the content | \`1px 7px\` |
-| \`--tag-height\` | Maximum height; raise it together with a larger vertical padding | \`22px\` |
-| \`--tag-spacing-end\` | Space after the tag, before the next one in a row | \`4px\` |
-
-Both tags take every variable from the wrapper; the second is there to show the space \`--tag-spacing-end\` leaves after **Custom Tag**. The other \`--tag-*\` colours are declared by the theme on the tag itself, so a wrapper cannot override them.`,
+        story: `Six variables set on one wrapper -- the variables are listed under CSS variables on this page. Both tags take every variable from the wrapper; the second is there to show the space \`--tag-spacing-end\` leaves after **Custom Tag**.`,
       },
       source: {
         code: `<div
