@@ -1,11 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import { withDemoBanner } from "../../.storybook/decorators/PortalGate";
+
 import { SectionList } from "./SectionList";
 
 const meta = {
   title: "Components/Forms",
   component: SectionList,
   tags: ["!autodocs"],
+  // With no portal the list runs on its own in-memory data; say so.
+  decorators: [withDemoBanner],
   parameters: {
     controls: { disable: true },
     actions: { disable: true },
