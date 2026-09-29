@@ -13,49 +13,8 @@ const meta = {
   title: "UI/Data display/Tags",
   component: Tags,
   parameters: {
-    docs: {
-      description: {
-        component: `Tags lays out a row of Tag items in one line and collapses the ones that do not fit into a single overflow tag.
-
-### Features
-
-- **Column Count**: Control how many tags are visible before overflow
-- **Overflow Dropdown**: Automatically groups excess tags into a dropdown
-- **String & Object Tags**: Accept simple string arrays or TagType objects with metadata
-- **Create Tag Button**: Optionally draws a plus tag that calls \`onOptionTagClick\`, dropped once the tags overflow
-- **Flush Overflow Entries**: Optionally removes the leading margin of each entry in the overflow drop-down
-- **Custom Overflow Menu**: Replaces the built-in drop-down with a \`+N\` count tag whose click and ref let you anchor a menu of your own
-- **Width Sharing**: Splits the container's width among the visible tags, measured when the tags or the column count change, so a long label truncates instead of widening the row
-- **Icon-only Tags**: Draws a third-party tag as its icon alone, capped at 44px wide
-
-### Accessibility
-
-Tags adds one attribute of its own; everything else comes from each Tag:
-
-- The container carries \`aria-label="Tags container"\`, a fixed English string on an element with no role, so most screen readers do not announce it
-- Each tag's label is its accessible name (\`aria-label\`), and an inert tag is announced as disabled (\`aria-disabled\`)
-- Tags are not focusable and handle no keys, so a keyboard user needs another way to reach what \`onSelectTag\` does
-
-### Usage
-
-\`\`\`tsx
-import { Tags } from "@onlyoffice/apps-ui-kit/components/tags";
-
-// Simple string tags
-<Tags tags={["Design", "Development"]} columnCount={2} onSelectTag={handleSelect} />
-
-// Object tags with an icon and a suffix
-<Tags
-  tags={[{ label: "Design", icon: FolderIcon }, { label: "Review", labelSuffix: " (3)" }]}
-  columnCount={2}
-  onSelectTag={handleSelect}
-/>
-
-// With overflow dropdown
-<Tags tags={tags} columnCount={3} style={{ width: "250px" }} onSelectTag={handleSelect} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=62-2597&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -330,13 +289,7 @@ export const CssCustomization: Story = {
       // Own document: the variable is set on <html> and would indent every story's drop-down.
       story: { inline: false, height: "180px" },
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--tags-overflow-text-margin\` | Leading margin of each entry text in the overflow drop-down; ignored with \`removeTagIcon\`. The drop-down is portalled to the document body, so set it on \`:root\` or \`body\` — a wrapper or the \`style\` prop never reaches it | \`8px\` |
-
-The example sets it to 24px on the document; click the \`...\` tag to see the entry **Invoice** start further from the menu's edge.`,
+        story: `The variable is listed under CSS variables on this page. The example sets it to 24px on the document; click the \`...\` tag to see the entry **Invoice** start further from the menu's edge.`,
       },
       source: {
         code: `:root {
