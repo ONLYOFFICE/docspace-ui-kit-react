@@ -8,8 +8,10 @@ export type RowContainerProps = {
    */
   itemHeight?: number;
   /**
-   * Height of the container as a CSS length. Without it the container is 100%
-   * of its parent, which has to have a height of its own.
+   * Height of the container as a CSS length, read only while `useReactWindow`
+   * is on. Without it the container is 100% of its parent, which has to have a
+   * height of its own; with virtualisation off the container is as tall as its
+   * rows and this prop does nothing.
    */
   manualHeight?: string;
   /** The rows. It must be an array, one entry per row. */

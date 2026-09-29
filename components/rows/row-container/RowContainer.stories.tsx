@@ -23,49 +23,8 @@ const meta = {
   title: "UI/Rows/RowContainer",
   component: RowContainer,
   parameters: {
-    docs: {
-      description: {
-        component: `The list that holds the rows of a file list, either as plain markup or virtualised and paged in as the user scrolls.
-
-### Features
-
-- **Plain List**: Renders the rows one after another when virtualisation is off, for a short list or a page outside the portal
-- **Virtualised Rows**: Mounts only the rows in view, all of one fixed height, while the page section scrolls
-- **Paging On Scroll**: Asks the host for the next range of rows when the user scrolls near the end of what is loaded
-- **Own Height**: Takes a height of its own as a CSS length in the virtualised mode, or fills its parent's height
-- **Text Selection**: Lets the user select the text of the rows, or turns selection off for the whole list
-- **Scroll Callback**: Reports every scroll of the virtualised list to the host
-
-### Usage
-
-\`\`\`tsx
-import { RowContainer } from "@onlyoffice/apps-ui-kit/components/rows/row-container";
-
-// A short list, rendered as it is
-<RowContainer useReactWindow={false}>
-  {files.map((file) => (
-    <Row key={file.id} checked={false} contextOptions={[]}>
-      <RowContent>
-        <Text fontWeight={600}>{file.title}</Text>
-        <span />
-      </RowContent>
-    </Row>
-  ))}
-</RowContainer>
-
-// A long list inside the page section's scroller, loaded page by page
-<RowContainer
-  itemHeight={56}
-  itemCount={total}
-  filesLength={rows.length}
-  hasMoreFiles={rows.length < total}
-  fetchMoreFiles={loadMore}
->
-  {rows}
-</RowContainer>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     children: {
