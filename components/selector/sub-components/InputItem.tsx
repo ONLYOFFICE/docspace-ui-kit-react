@@ -89,8 +89,9 @@ const InputItem = ({
   };
 
   React.useEffect(() => {
+    // Focused for typing, without scrolling the page to wherever the field is.
     if (inputRef.current) {
-      inputRef.current.focus();
+      inputRef.current.focus({ preventScroll: true });
       inputRef.current.select();
     }
   }, []);

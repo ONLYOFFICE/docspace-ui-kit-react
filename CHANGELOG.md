@@ -83,6 +83,10 @@ _Changed_ before upgrading.
 
 ### Fixed
 
+- `Selector` no longer scrolls the page when it mounts. The list's scroll container takes focus
+  on mount, and so does the new-name field when it appears; both focused with a plain `focus()`,
+  which scrolls the page to the element. They now pass `preventScroll`, so the focus still lands
+  in the selector and the page stays where it was. Every selector built on it follows
 - `RoomLogoCoverDialog` fits the window the first time it opens. Its `Portal` mounts the body
   after the first render, so the height was computed before there was anything to measure and
   stayed at the 648px (desktop) or 854px (tablet) preset, past the bottom of a short window; only

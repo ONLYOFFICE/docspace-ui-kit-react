@@ -707,6 +707,10 @@ the stylesheet reads neither, so setting them changes nothing.
   assistive technology is given no list, no count and no position. In multi-select the row's
   checkbox is focusable with Tab and toggled with Space, and that is the only way through the
   list; outside multi-select a row can be picked only with the pointer.
+- **Focus moves into the selector when it mounts**: to the list's scroll container, unless the
+  search box already has it, and to the new-name field when that field appears, with its text
+  selected. Neither scrolls the page (`preventScroll`), so a selector further down a page takes
+  focus without pulling the page to itself.
 - The search box is given `tabIndex={1}`, a positive tab index, which pulls it ahead of
   everything else on the page in tab order.
 - Escape and Enter are listened for on the window, so they act even when focus is outside the
