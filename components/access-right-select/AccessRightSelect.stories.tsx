@@ -106,12 +106,14 @@ import { AccessRightSelect } from "@onlyoffice/apps-ui-kit/components/access-rig
   },
   argTypes: {
     accessOptions: {
-      control: "object",
+      // The icon is a data URI too long to edit, and it stretches the table.
+      control: false,
       description:
         "The access levels to choose from, each drawn as a row with its icon, label, description and paid badge; an entry marked as a separator becomes a divider",
     },
     selectedOption: {
-      control: "object",
+      // The icon is a data URI too long to edit, and it stretches the table.
+      control: false,
       description:
         "The level shown in the button; keep it in your own state and set it from `onSelect`",
     },
