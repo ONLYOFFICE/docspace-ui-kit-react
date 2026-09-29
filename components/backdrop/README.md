@@ -138,8 +138,8 @@ export function MembersPanel() {
 
 - **A second backdrop renders nothing.** On every change the component counts the elements
   carrying the `backdrop-active` class already in the document and bails out if there is one —
-  unless `isAside` is set, which raises the allowance to two, or `shouldShowBackdrop`, which
-  ignores the count. This is how a dialog opened from a panel avoids stacking two veils, and it
+  unless `shouldShowBackdrop` is set, which ignores the count, or `isAside`, which renders the
+  layer whatever the count. This is how a dialog opened from a panel avoids stacking two veils, and it
   is also why your own backdrop may silently fail to appear behind someone else's overlay.
 - **It is transparent unless you ask for the dimming.** `withBackground` turns it on, `isAside`
   turns it on, and a viewport of 600px or less turns it on whether you asked or not;
@@ -147,18 +147,22 @@ export function MembersPanel() {
 - **The viewport is measured during render and never again.** There is no resize listener, so a
   window resized across 600px keeps whatever the backdrop decided when it opened.
 - **Touch moves over it are cancelled** unless `isModalDialog` is set, which is what stops the
-  page behind a panel scrolling under the user's finger. `onClick` receives those touch events
-  too, cast to a mouse event.
+  page behind a panel scrolling under the user's finger. `onClick` receives those touch moves,
+  and every touch end, too, cast to a mouse event — so a touch that merely passes over the layer
+  closes what it covers.
 - It is `position: fixed` at `100vw × 100vh`, so it ignores the scroll position and any
   transformed ancestor.
 - `className` accepts an array as well as a string, unlike the rest of the kit.
 
 ## CSS variables
 
-| Variable             | Default            | Effect                         |
-| -------------------- | ------------------ | ------------------------------ |
-| `--backdrop-bg`      | theme dimming blur | Colour of the dimming          |
-| `--backdrop-z-index` | `203`              | Stacking order, if no `zIndex` |
+| Variable        | Default                                                 | Effect                                                                                                |
+| --------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `--backdrop-bg` | `rgba(6, 22, 38, 0.2)`; `rgba(27, 27, 27, 0.6)` in dark | Colour of the dimming, shown only when the layer dims: `withBackground`, `isAside` or a narrow screen |
+
+The stacking order is the `zIndex` prop, not a variable. The stylesheet does read
+`--backdrop-z-index`, but the component always writes `zIndex` (203 by default) inline, which
+wins, so setting the variable has no effect; a `zIndex` in `style` overrides the prop.
 
 ## Accessibility
 
