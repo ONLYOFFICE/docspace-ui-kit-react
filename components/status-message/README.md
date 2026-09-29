@@ -165,21 +165,21 @@ export function RichMessage() {
 
 ## CSS variables
 
-| Variable                                | Default               | Effect                              |
-| --------------------------------------- | --------------------- | ----------------------------------- |
-| `--status-message-bg`                   | theme error colour    | Background of the bar               |
-| `--status-message-warning-bg`           | theme warning colour  | Background while `isWarning`        |
-| `--status-message-border`               | none, 2px in the dark | Border of the bar                   |
-| `--status-message-warning-border-style` | none, 2px in the dark | Border while `isWarning`            |
-| `--status-message-text`                 | theme text colour     | Colour of the message               |
-| `--status-message-icon`                 | theme text colour     | Fill of the glyph                   |
-| `--status-message-warning-icon`         | theme text colour     | Fill of the glyph while `isWarning` |
-| `--status-message-shadow`               | theme shadow          | `box-shadow` of the bar             |
-| `--status-message-radius`               | `6px`                 | Corner radius                       |
-| `--status-message-padding`              | `8px 12px`            | Padding inside the bar              |
-| `--status-message-gap`                  | `12px`                | Space between glyph and text        |
-| `--status-message-margin-bottom`        | `16px`                | Space under the bar                 |
-| `--status-message-max-width`            | `1200px`              | Widest the bar gets                 |
+| Variable                                | Default                   | Effect                              |
+| --------------------------------------- | ------------------------- | ----------------------------------- |
+| `--status-message-bg`                   | theme error colour        | Background of the bar               |
+| `--status-message-warning-bg`           | theme warning colour      | Background while `isWarning`        |
+| `--status-message-border`               | none, 2px in the dark     | Border of the bar                   |
+| `--status-message-warning-border-style` | none, 2px in the dark     | Border while `isWarning`            |
+| `--status-message-text`                 | theme text colour         | Colour of the message               |
+| `--status-message-icon`                 | black, orange in the dark | Fill of the glyph                   |
+| `--status-message-warning-icon`         | black, amber in the dark  | Fill of the glyph while `isWarning` |
+| `--status-message-shadow`               | theme shadow              | `box-shadow` of the bar             |
+| `--status-message-radius`               | `6px`                     | Corner radius                       |
+| `--status-message-padding`              | `8px 12px`                | Padding inside the bar              |
+| `--status-message-gap`                  | `12px`                    | Space between glyph and text        |
+| `--status-message-margin-bottom`        | `16px`                    | Space under the bar                 |
+| `--status-message-max-width`            | `1200px`                  | Widest the bar gets                 |
 
 Note the two border names: the ordinary state is `--status-message-border`, the warning state
 `--status-message-warning-border-style`.
