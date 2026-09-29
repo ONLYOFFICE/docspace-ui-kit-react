@@ -259,66 +259,8 @@ const meta = {
   title: "UI/Navigation/Filter",
   component: Filter,
   parameters: {
-    docs: {
-      description: {
-        component: `The bar above a file listing that combines a search box, a filter panel, a sort menu and a view switch, and holds no filter state of its own: it reads the selection through getters and reports every change.
-
-### Features
-
-- **Search Box**: Reports every keystroke to the host and empties itself when the host asks for it
-- **Filter Panel**: Opens a side panel of grouped options — tags, checkboxes and drop-down lists — and hands the whole selection back only when Apply is pressed
-- **Filter Chips**: Shows each filter in force as a chip under the bar that removes it on click, with a "Clear all" link once more than one is shown
-- **Sort Menu**: Lists the sort fields, marks the current one with an arrow for its direction and reverses the direction when that field is picked again
-- **View Switch**: Offers the other view as one button beside the sort menu on a desktop, and moves both views into the sort menu on smaller screens
-- **Reordering Mode**: Disables the search box and takes the filter, sort and view controls off the bar while the listing is being reordered
-- **Grouping Row**: Adds a row of group chips under the bar, with an "all" chip, a management button and a menu for the groups that do not fit
-- **Action Button**: Optional main button inside the search box, to the left of the field
-
-### Accessibility
-
-The bar gets its keyboard and screen reader support from the controls it is built from:
-
-- The search box is a native text input, reached with Tab; pass a \`placeholder\` that names what it searches
-- The filter panel opens as a dialog (\`role="dialog"\`, \`aria-modal\`) that Escape closes
-- The copy of the grouping row used to measure it is \`aria-hidden\`, so each group chip is announced once
-
-### Usage
-
-\`\`\`tsx
-import Filter from "@onlyoffice/apps-ui-kit/components/filter";
-
-// Search, filter, sort and view switch on a desktop
-<Filter
-  placeholder="Search..."
-  onSearch={setSearch}
-  getFilterData={getFilterData}
-  getSelectedFilterData={getSelectedFilterData}
-  onFilter={applyFilter}
-  getSortData={getSortData}
-  getSelectedSortData={getSelectedSortData}
-  onSort={applySort}
-  getViewSettingsData={getViewSettingsData}
-  viewAs="row"
-  viewSelectorVisible
-  onChangeViewAs={switchView}
-  currentDeviceType={DeviceType.desktop}
-  {...requiredProps}
-/>
-
-// While the listing is being reordered
-<Filter isIndexEditingMode isIndexing {...props} />
-
-// With a row of group chips under the bar
-<Filter
-  withRoomGroups
-  organizeRoomsGrouping
-  roomGroups={groups}
-  onFilterByGroup={filterByGroup}
-  {...props}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   args: baseFilterArgs as FilterProps,
   argTypes: {
@@ -1186,35 +1128,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--filter-btn-border\` | Border of the filter button, as a \`border\` shorthand | theme-based |
-| \`--filter-btn-hover-border\` | Border of the filter button on hover | theme-based |
-| \`--filter-btn-open-fill\` | Colour of the filter button's icon while the panel is open | theme-based |
-| \`--filter-btn-radius\` | Corner radius of the filter button | \`3px\` |
-| \`--filter-sort-bg\` | Background of the sort button | theme-based |
-| \`--filter-sort-selected-bg\` | Background of the current field in the open sort menu | theme-based |
-| \`--filter-sort-fill\` | Colour of the direction arrow in the open sort menu | theme-based |
-| \`--filter-sort-selected-icon\` | Colour of the current view's icon in the sort menu, below the desktop layout only; it goes by position and assumes the row view comes first | theme-based |
-| \`--filter-sort-unselected-icon\` | Colour of the other view's icon in the sort menu, with the same caveat | theme-based |
-| \`--filter-view-fill\` | Background of the view switch button | theme-based |
-| \`--filter-view-checked\` | Colour of the view switch button's icon | theme-based |
-| \`--filter-view-border\` | Border colour of the view switch button | theme-based |
-| \`--filter-view-hover-border\` | Border colour of the view switch button on hover | theme-based |
-| \`--filter-view-hover-icon\` | Colour of the view switch button's icon on hover | theme-based |
-| \`--filter-tag-border\` | Border of an option tag in the filter panel, as a \`border\` shorthand | theme-based |
-| \`--filter-tag-selected\` | Background and border colour of a picked option tag | theme-based |
-| \`--filter-tag-radius\` | Corner radius of an option tag | \`16px\` |
-| \`--filter-tag-height\` | Height of an option tag | \`28px\` |
-| \`--filter-separator\` | Colour of the line between groups in the filter panel | theme-based |
-| \`--filter-bg\` | Background of the step \`renderSelector\` opens inside the panel | theme-based |
-| \`--filter-width\` | Width of that step | \`480px\` |
-
-The example sets the variables of the bar on one wrapper; hover the filter and view buttons, and open the sort menu, to see the hover and menu values. The sort menu's view icons appear only below the desktop layout, so set those two with \`currentDeviceType\` in the Controls panel.
-
-The filter panel renders in a portal on \`<body>\`, outside any wrapper, so the \`--filter-tag-*\`, \`--filter-separator\`, \`--filter-bg\` and \`--filter-width\` variables take effect only when set on \`:root\` or \`body\`. The search box, the chips and the buttons inside the bar read their own components' variables, documented on the SearchInput, SelectedItem, IconButton and Button stories.`,
+        story: `The variables of the bar set on one wrapper -- the variables are listed under CSS variables on this page. Hover the filter and view buttons, and open the sort menu, to see the hover and menu values. The sort menu's view icons appear only below the desktop layout, so set those two with \`currentDeviceType\` in the Controls panel; the panel's variables apply only on \`:root\` or \`body\`, because it renders in a portal.`,
       },
       source: {
         code: `<div style={{

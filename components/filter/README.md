@@ -326,10 +326,17 @@ export function FilterWithChips() {
   **focuses the search box** each time it is read. Wrap all of them in `useCallback`.
 - **The search box has no value prop.** What it shows comes from `getSelectedInputValue`, what you
   get back is the string, and clearing it is the `clearSearch` pulse described above.
+- **The filter panel works on a copy.** It opens as a side panel of grouped options — tags,
+  checkboxes, toggles, drop-down lists and selector steps — and the whole selection reaches
+  `onFilter` only when Apply is pressed; closing it discards the changes. The one exception is the
+  clear icon in the panel's header, which calls `onFilter([])` at once when filters were in force.
+- **The sort menu marks the current field with an arrow** pointing in the current direction; picking
+  that field again reverses the direction, and picking another keeps it.
 - **The sort button disappears** whenever `isIndexing`, `isFlowsPage` or `isRecentFolder` is set,
-  and the filter button whenever `isIndexEditingMode` or `isFlowsPage` is.
-- **The view selector is in two places.** On a desktop it is a control of its own beside the sort
-  button; below that breakpoint it is rendered inside the sort menu instead, and
+  and the filter button whenever `isIndexEditingMode` or `isFlowsPage` is; `isIndexEditingMode`
+  also disables the search box.
+- **The view selector is in two places.** On a desktop it is a single button beside the sort
+  button that offers the view you are not in; below that breakpoint it is rendered inside the sort menu instead, and
   `viewSelectorVisible` governs both.
 - **`viewAs="table"` is quietly treated as `"row"`** by the sort menu and the view selector.
 - **The room grouping row needs four things at once**: `withRoomGroups`, `organizeRoomsGrouping`, a
@@ -352,15 +359,39 @@ export function FilterWithChips() {
 
 ## CSS variables
 
-| Variable                    | Default | Effect                                   |
-| --------------------------- | ------- | ---------------------------------------- |
-| `--filter-btn-border`       | theme   | Border of the filter and sort buttons    |
-| `--filter-btn-hover-border` | theme   | The same on hover                        |
-| `--filter-btn-open-fill`    | theme   | Fill of the icon while its menu is open  |
-| `--filter-btn-radius`       | `3px`   | Corner radius of those buttons           |
-| `--filter-bg`               | theme   | Background of the filter panel           |
-| `--filter-width`            | `480px` | Width of the filter panel                |
-| `--filter-tag-radius`       | `16px`  | Corner radius of the panel's tag options |
+| Variable                        | Default | Effect                                                                                                          |
+| ------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------- |
+| `--filter-btn-border`           | theme   | Border of the filter button, as a `border` shorthand                                                            |
+| `--filter-btn-hover-border`     | theme   | The same on hover                                                                                               |
+| `--filter-btn-open-fill`        | theme   | Fill of the filter button's icon while the panel is open                                                        |
+| `--filter-btn-radius`           | `3px`   | Corner radius of the filter button                                                                              |
+| `--filter-sort-bg`              | theme   | Background of the sort button                                                                                   |
+| `--filter-sort-selected-bg`     | theme   | Background of the current field in the open sort menu                                                           |
+| `--filter-sort-fill`            | theme   | Colour of the direction arrow in the open sort menu                                                             |
+| `--filter-sort-selected-icon`   | theme   | Colour of the current view's icon in the sort menu, below the desktop layout only                               |
+| `--filter-sort-unselected-icon` | theme   | Colour of the other view's icon there                                                                           |
+| `--filter-view-fill`            | theme   | Background of the view switch button                                                                            |
+| `--filter-view-checked`         | theme   | Colour of the view switch button's icon                                                                         |
+| `--filter-view-border`          | theme   | Border colour of the view switch button                                                                         |
+| `--filter-view-hover-border`    | theme   | Meant as that border on hover, but it has no effect: the rule reading it has an invalid selector and is dropped |
+| `--filter-view-hover-icon`      | theme   | Colour of the view switch button's icon on hover                                                                |
+| `--filter-tag-border`           | theme   | Border of an option tag in the filter panel, as a `border` shorthand                                            |
+| `--filter-tag-selected`         | theme   | Background and border colour of a picked option tag                                                             |
+| `--filter-tag-radius`           | `16px`  | Corner radius of an option tag                                                                                  |
+| `--filter-tag-height`           | `28px`  | Height of an option tag                                                                                         |
+| `--filter-separator`            | theme   | Colour of the line between groups in the filter panel                                                           |
+| `--filter-bg`                   | theme   | Background of the step `renderSelector` fills inside the panel — not of the panel itself                        |
+| `--filter-width`                | `480px` | Width of that step                                                                                              |
+
+The two sort-menu view icons are coloured by position, not by which view they are: the rules
+assume the row view comes first in `getViewSettingsData`, so a different order swaps the colours.
+
+The filter panel is a [`ModalDialog`](../modal-dialog/README.md) rendered in a portal on
+`<body>`, outside any wrapper you put round the bar, so `--filter-tag-*`, `--filter-separator`,
+`--filter-bg` and `--filter-width` take effect only when set on `:root` or `body`. The search box,
+the chips and the buttons inside the bar read their own components' variables —
+[`SearchInput`](../search-input/README.md), [`SelectedItem`](../selected-item/README.md),
+`IconButton` and `Button`.
 
 ## Accessibility
 
@@ -369,6 +400,8 @@ export function FilterWithChips() {
   of them can be reached or operated from the keyboard.
 - The only labels the controls carry are the native `title` attributes from `filterTitle` and
   `sortByTitle`; the panel's heading comes from `filterHeader`, and nothing translates any of them.
+- The filter panel is a [`ModalDialog`](../modal-dialog/README.md): `role="dialog"` with
+  `aria-modal`, closed by Escape. The bar passes it no `aria-label`, so it is announced unnamed.
 - The hidden measurement copy of the grouping row is `aria-hidden`, so it is not read twice.
 - The search box is the kit's [`SearchInput`](../search-input/README.md) and is the one part of the
   bar a keyboard user can use — but it takes focus by itself whenever the value getter changes.
