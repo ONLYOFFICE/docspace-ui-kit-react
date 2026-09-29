@@ -73,7 +73,8 @@ import { Tabs, TabsTypes } from "@onlyoffice/apps-ui-kit/components/tabs";
   },
   argTypes: {
     items: {
-      control: "object",
+      // The icons are data URIs too long to edit, and they stretch the table.
+      control: false,
       description:
         "The tabs, in the order they are drawn. Each carries its id, its label, the content shown while it is selected, and optionally a disabled flag, a click handler, a badge or an icon",
     },
