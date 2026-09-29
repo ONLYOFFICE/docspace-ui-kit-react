@@ -8,41 +8,8 @@ const meta = {
   title: "UI/Status components/AppLoader",
   component: AppLoader,
   parameters: {
-    docs: {
-      description: {
-        component: `A full-screen loading indicator displayed while the application is initializing. Uses the Rombs animation loader.
-
-### Features
-
-- **Full-Screen Overlay**: Centers the loader in the viewport with fixed positioning
-- **Rombs Animation**: Uses the animated rombs (diamond) loader style
-- **Dark Mode Support**: Turns the sheet dark grey when the theme provider puts the \`dark\` class on \`<body>\`
-- **Zero Configuration**: No props required - renders a consistent loading state
-- **Opaque Sheet**: Hides the page behind it completely instead of dimming it
-- **Adjustable Stacking**: Sits above page content by default, with its stack order and background colour open to CSS custom properties
-
-### Accessibility
-
-The loader inside the sheet marks itself busy for assistive technology:
-
-- **Busy state**: The inner loader carries \`aria-busy="true"\`, so screen readers treat it as content that is still loading
-- **Focus**: The sheet takes no focus and does not trap it, so controls under it stay reachable with Tab
-
-### Usage
-
-\`\`\`tsx
-import AppLoader from "@onlyoffice/apps-ui-kit/components/app-loader";
-
-<AppLoader />
-\`\`\`
-
-\`\`\`tsx
-if (!ready) return <AppLoader />;
-
-return <App />;
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     layout: "fullscreen",
   },
 } satisfies Meta<typeof AppLoader>;
@@ -82,12 +49,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--app-loader-bg\` | Background color of the overlay | \`#ffffff\`, \`#333333\` in the dark theme |
-| \`--app-loader-z-index\` | Stack order of the overlay | \`5000\` |`,
+        story: `Both variables set on one wrapper -- the variables are listed under CSS variables on this page. The sheet takes a light blue background and drops its stacking order to 100.`,
       },
       source: {
         code: `<div
