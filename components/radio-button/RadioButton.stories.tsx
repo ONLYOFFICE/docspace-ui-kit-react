@@ -11,54 +11,8 @@ const meta = {
   title: "UI/Form controls/RadioButton",
   component: RadioButton,
   parameters: {
-    docs: {
-      description: {
-        component: `RadioButton is a form control that allows users to select a single option from a set.
-
-### Features
-
-- **Checked/Unchecked States**: Draws an empty circle or a circle with a filled dot, and returns to \`isChecked\` whenever that prop changes
-- **Disabled State**: Disables the input and greys out the circle and the label, so clicks no longer select it
-- **Custom Label**: Writes text or any React node beside the circle, falls back to \`value\` when no label is given, and takes its own font size and weight
-- **Keyboard Access**: Reached with Tab and selected with Space through the native radio input it wraps
-- **Spacing**: Adds a gap to the neighbouring button only when \`spacing\` is given, below the button in a vertical set and before it in a horizontal one; the set's own layout is left to its container
-- **Two Callback Modes**: Tracks its own checked state and reports clicks through \`onClick\`, or, once \`onChange\` is given, hands over every change and follows \`isChecked\` alone
-- **Theming**: Takes its circle and text colours from the light or dark theme, and lets CSS variables override them
-
-### Accessibility
-
-The RadioButton renders a visually hidden native \`<input type="radio">\` inside a \`<label>\`, so its support comes from the platform:
-
-- Screen readers announce a radio button with its checked state, named by the label text beside the circle
-- Buttons that share a \`name\` form one set: Tab enters it, the arrow keys move the selection between its buttons, and Space selects the focused one
-- \`isDisabled\` sets the native \`disabled\` on the input, which takes it out of the Tab order and is announced as unavailable
-- No focus ring is drawn around the circle, so an application that needs a visible focus cue has to style one
-
-### Usage
-
-\`\`\`tsx
-import { RadioButton } from "@onlyoffice/apps-ui-kit/components/radio-button";
-
-// Basic radio button
-<RadioButton name="group" value="option1" label="Option 1" />
-
-// Checked radio button
-<RadioButton name="group" value="option2" label="Option 2" isChecked />
-
-// Disabled radio button
-<RadioButton name="group" value="option3" label="Option 3" isDisabled />
-
-// Controlled set with a gap between the buttons
-<RadioButton
-  name="size"
-  value="small"
-  isChecked={size === "small"}
-  spacing="12px"
-  onChange={(e) => setSize(e.target.value)}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=556-3247&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -446,18 +400,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--radio-button-dot-color\` | Fill of the dot in a checked button; a disabled button draws its own grey dot | theme-based |
-| \`--radio-button-circle-color\` | Outline of the circle; a disabled button draws its own outline | theme-based |
-| \`--radio-button-circle-hover-color\` | Outline of the circle while the pointer is over the button; not applied to a disabled button | theme-based |
-| \`--radio-button-background\` | Fill inside the circle; a disabled button draws its own grey fill | theme-based |
-| \`--radio-button-label-color\` | Colour of the text beside the circle; a disabled button greys it out with its own colour | theme-based |
-| \`--radio-button-gap\` | Space between the circle and the text | \`8px\` |
-
-The example is one checked button, so it shows every variable at once: the violet dot and outline, the light violet fill, the dark violet text and the wider gap. Hover it to see the darker outline.`,
+        story: `The variables are listed under CSS variables on this page. The example is one checked button, so it shows every variable at once: the violet dot and outline, the light violet fill, the dark violet text and the wider gap. Hover it to see the darker outline.`,
       },
       source: {
         code: `<div
