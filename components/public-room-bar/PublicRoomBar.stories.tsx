@@ -11,42 +11,8 @@ const meta = {
   title: "UI/Feedback/PublicRoomBar",
   component: PublicRoomBar,
   parameters: {
-    docs: {
-      description: {
-        component: `PublicRoomBar is a standing note above a screen's content — an icon beside a bold header, a smaller body line and an optional close cross — for a state the reader should keep in mind while they work.
-
-### Features
-
-- **Header & Body Text**: Supports both strings and React nodes for flexible content
-- **Custom Icon**: Shows the kit's people glyph beside the header by default, or an SVG URL or element passed in its place
-- **Close Button**: Shows a close cross only while \`onClose\` is set; the bar does not hide itself, so the host stops rendering it
-- **Hidden Header**: Drops the icon and header row with \`hideHeader\`, leaving the body line on its own
-- **Top Margin Switch**: Keeps a 20px margin above the bar and drops it when \`barIsVisible\` is set; the prop shows and hides nothing
-- **Theme Colors**: Takes its background and text colours from the light or dark theme, each replaceable through a CSS variable
-
-### Usage
-
-\`\`\`tsx
-import PublicRoomBar from "@onlyoffice/apps-ui-kit/components/public-room-bar";
-
-<PublicRoomBar
-  headerText="Public Room"
-  bodyText="This room is accessible to anyone with the link"
-  onClose={handleClose}
-/>
-
-// With custom icon
-<PublicRoomBar
-  headerText="Public Room"
-  bodyText="Accessible via link"
-  iconName={PlanetIcon}
-/>
-
-// Body line only
-<PublicRoomBar headerText="" bodyText="Accessible via link" hideHeader />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     headerText: {
@@ -290,21 +256,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--public-room-bar-bg\` | Background color | theme-based |
-| \`--public-room-bar-header-color\` | Header text color | theme-based |
-| \`--public-room-bar-body-color\` | Body text color | theme-based |
-| \`--public-room-bar-header-icon\` | Header icon fill | \`#657077\` |
-| \`--public-room-bar-padding\` | Inner padding | \`12px 16px\` |
-| \`--public-room-bar-radius\` | Border radius | \`6px\` |
-| \`--public-room-bar-bottom-margin\` | Bottom margin | \`10px\` |
-| \`--public-room-bar-top-margin\` | Top margin, dropped when \`barIsVisible\` is set | \`20px\` |
-| \`--public-room-bar-header-gap\` | Gap between the header icon and text | \`8px\` |
-
-The example sets every variable on a wrapper. The close cross keeps the icon button's own colour whatever the wrapper sets.`,
+        story: `The colour, spacing and corner variables set on one wrapper -- the variables are listed under CSS variables on this page.`,
       },
       source: {
         code: `<div

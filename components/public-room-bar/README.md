@@ -191,7 +191,7 @@ export function QuotaNote() {
 | `--public-room-bar-bg`            | light grey; dark grey in dark | Background of the bar             |
 | `--public-room-bar-header-color`  | black; white in dark          | Colour of `headerText`            |
 | `--public-room-bar-body-color`    | grey text                     | Colour of `bodyText`              |
-| `--public-room-bar-close-icon`    | grey                          | Fill of the close cross           |
+| `--public-room-bar-close-icon`    | grey                          | None; see the note below          |
 | `--public-room-bar-header-icon`   | light grey                    | Fill of the header icon's paths   |
 | `--public-room-bar-text`          | black                         | Colour the two lines fall back to |
 | `--public-room-bar-text-size`     | `12px`                        | Base font size of the bar         |
@@ -201,6 +201,10 @@ export function QuotaNote() {
 | `--public-room-bar-top-margin`    | `20px`                        | Top margin, unless `barIsVisible` |
 | `--public-room-bar-header-gap`    | `8px`                         | Gap between icon and header       |
 | `--public-room-bar-header-weight` | `600`                         | Weight of the header row          |
+
+`--public-room-bar-close-icon` is read, but by a `path` rule that `IconButton`'s own fill rule
+outranks, and `IconButton` also sets `--icon-button-color` on itself. The close cross therefore
+keeps the icon button's grey whatever a wrapper or `style` sets.
 
 ## Accessibility
 
