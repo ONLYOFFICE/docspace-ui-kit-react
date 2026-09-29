@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
   "related": ["card", "link", "badge"],
   "subComponents": [],
-  "testIds": ["link", "text"]
+  "testIds": ["link", "text"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # CategoryItem

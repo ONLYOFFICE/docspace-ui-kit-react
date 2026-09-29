@@ -27,6 +27,18 @@ test.describe("PasswordInput — light", () => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("password-input-css-customization.png");
   });
+
+  test("with password generator", async ({ page }) => {
+    await gotoStory(page, "with-password-generator");
+    await expect(page).toHaveScreenshot(
+      "password-input-with-password-generator.png",
+    );
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("password-input-right-to-left.png");
+  });
 });
 
 test.describe("PasswordInput — dark", () => {

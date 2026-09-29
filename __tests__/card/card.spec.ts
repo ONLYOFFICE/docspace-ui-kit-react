@@ -21,6 +21,11 @@ test.describe("Card -- light", () => {
     await gotoStory(page, "with-extra");
     await expect(page).toHaveScreenshot("card-with-extra.png");
   });
+
+  test("css-customization", async ({ page }) => {
+    await gotoStory(page, "css-customization");
+    await expect(page).toHaveScreenshot("card-css-customization.png");
+  });
 });
 
 test.describe("Card -- dark", () => {

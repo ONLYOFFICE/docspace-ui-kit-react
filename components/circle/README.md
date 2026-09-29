@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["rectangle", "avatar", "loader"],
   "subComponents": [],
-  "testIds": ["circle-skeleton"]
+  "testIds": ["circle-skeleton"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # CircleSkeleton

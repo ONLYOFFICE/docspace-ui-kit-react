@@ -1,5 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import { globalColors } from "../../providers/theme";
 
@@ -11,24 +12,29 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `A versatile badge component for displaying notification counts, status markers, or interactive labels.
+        component: `A small coloured pill for a count or a short marker that sits next to the thing it describes.
 
 ### Features
 
-- **Numeric & Text Labels**: Display counts or text content
-- **High Priority**: Emphasis styling for urgent notifications
-- **Version Badge**: Specialized styling for version numbers
-- **Paid Badge**: Styling for premium/paid feature indicators
-- **Muted Badge**: Reduced prominence for inactive states
-- **Hover States**: Built-in hover effects with manual override
-- **Custom Styling**: Full control over colors, borders, padding, and radius
+- **Numeric & Text Labels**: Shows a count or a short text and hides itself when the label is \`0\` or empty
+- **High Priority**: Switches to a preset with squarer corners and roomier padding for a marker that should stand out
+- **Version Badge**: Lets the badge fill the width of its container on tablet-width screens and narrower
+- **Paid Badge**: Keeps the text white and never cuts off the label, for a paid-feature marker
+- **Muted Badge**: Paints the pill grey over any custom background for something inactive
+- **Hover States**: Lightens the pill on hover and darkens it while pressed, unless hover effects are turned off
+- **Custom Styling**: Accepts its own background, text colour, size, weight, border, padding, radius and height
+- **Click Handling**: Calls the click handler after preventing the event's default action
 
 ### Accessibility
 
-- \`role="status"\`: Identifies the badge as a live status region
-- \`aria-label\`: Describes the badge content and type
-- \`aria-live="polite"\`: Announces updates to assistive technologies
-- \`aria-atomic="true"\`: Ensures the full content is announced on updates
+The badge is a live status region, so a screen reader hears a changed count without the user going to look.
+
+- \`role="status"\`: Identifies the badge as a status region
+- \`aria-label\`: Announces the label followed by the type, so a \`high\` badge reading 5 is heard as "5 high"
+- \`aria-live="polite"\`: Announces a new label once the screen reader has finished what it is saying
+- \`aria-atomic="true"\`: Reads the whole label on every change, not only the characters that changed
+- **Hidden pill**: The visible pill is hidden from assistive technologies, so the label is not read twice
+- **No keyboard focus**: The badge takes no focus; a clickable one needs \`tabIndex\` and a \`role\` from you, or its action offered somewhere else
 
 ### Usage
 
@@ -57,7 +63,8 @@ import { Badge } from "@onlyoffice/apps-ui-kit/components/badge";
   argTypes: {
     label: {
       control: "text",
-      description: "Content to display: number or text",
+      description:
+        'What the badge says, a number or a short text. `0`, `"0"` and an empty string hide the badge',
       table: {
         defaultValue: { summary: "0" },
       },
@@ -65,92 +72,133 @@ import { Badge } from "@onlyoffice/apps-ui-kit/components/badge";
     type: {
       control: "select",
       options: [undefined, "high"],
-      description: "Badge type. Use 'high' for priority styling",
+      description:
+        "`high` switches to the emphasised preset: 6px corners and 3px 10px padding around the label",
     },
     backgroundColor: {
       control: "color",
-      description: "Custom background color",
+      description: "Colour of the pill. Ignored while `isMutedBadge` is set",
+      table: {
+        defaultValue: { summary: "accent colour" },
+      },
     },
     color: {
       control: "color",
-      description: "Custom text color",
+      description: "Colour of the label. Ignored while `isPaidBadge` is set",
+      table: {
+        defaultValue: { summary: "white" },
+      },
     },
     fontSize: {
       control: "text",
-      description: "Custom font size",
+      description: "Size of the label text, in every type including `high`",
       table: {
         defaultValue: { summary: "11px" },
       },
     },
     fontWeight: {
       control: "number",
-      description: "Custom font weight",
+      description: "Weight of the label text, in every type including `high`",
       table: {
         defaultValue: { summary: "800" },
       },
     },
     borderRadius: {
       control: "text",
-      description: "Custom border radius",
+      description:
+        "Corner radius of the badge and its pill. The pill keeps 6px corners while `type` is `high`",
       table: {
         defaultValue: { summary: "11px" },
       },
     },
     padding: {
       control: "text",
-      description: "Custom padding",
+      description:
+        "Space inside the pill around the label. Replaced by 3px 10px while `type` is `high`",
       table: {
         defaultValue: { summary: "0px 5px" },
       },
     },
     maxWidth: {
       control: "text",
-      description: "Maximum width of the badge",
+      description:
+        "Widest the pill may be; a longer label is cut off without an ellipsis. Not applied while `isPaidBadge` is set",
       table: {
         defaultValue: { summary: "50px" },
       },
     },
     height: {
       control: "text",
-      description: "Custom height",
+      description:
+        "Height of the badge. Without it the badge is as tall as its label",
     },
     border: {
       control: "text",
-      description: "Custom border style",
+      description:
+        "CSS `border` shorthand drawn around the badge. The badge draws no border of its own",
     },
     noHover: {
       control: "boolean",
-      description: "Disable hover effects",
+      description:
+        "Keeps the arrow cursor and a fixed colour on hover and press, for a badge that is only a marker",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isHovered: {
       control: "boolean",
-      description: "Force hover state (for demo purposes)",
+      description:
+        "Shows the pointer cursor and makes a `border` transparent without the pointer being there. It does not draw the hover colour",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isVersionBadge: {
       control: "boolean",
-      description: "Apply version badge styling",
+      description:
+        "On tablet-width screens and narrower, lets the badge fill the width of its container; the pill stays centred at its own width",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isPaidBadge: {
       control: "boolean",
-      description: "Apply paid/premium feature styling",
+      description:
+        "Keeps the label white whatever `color` says and lifts `maxWidth`, so a long label is never cut off",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isMutedBadge: {
       control: "boolean",
-      description: "Apply muted styling for less prominent display",
+      description:
+        "Paints the pill grey over `backgroundColor`, for something inactive",
       table: {
         defaultValue: { summary: "false" },
+      },
+    },
+    onClick: {
+      control: false,
+      description:
+        "Called with the click event. The badge prevents the event's default action first",
+    },
+    onMouseOver: {
+      control: false,
+      description: "Called when the pointer enters the badge or moves over it",
+    },
+    onMouseLeave: {
+      control: false,
+      description: "Called when the pointer leaves the badge",
+    },
+    className: {
+      control: "text",
+      description: "Extra class name on the outer element",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Value of `data-testid` on the outer element",
+      table: {
+        defaultValue: { summary: "badge" },
       },
     },
   },
@@ -179,6 +227,20 @@ export const Default: Story = {
   render: (args) => <Badge {...args} />,
   args: {
     label: 24,
+    onClick: fn(),
+    onMouseOver: fn(),
+    onMouseLeave: fn(),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The badge as it usually appears: a count on the accent colour. Change any prop live in the Controls panel below, and set the label to 0 to see the badge disappear.",
+      },
+      source: {
+        code: `<Badge label={24} />`,
+      },
+    },
   },
 };
 
@@ -236,17 +298,15 @@ const CustomStyledTemplate = () => {
   );
 };
 
-const InteractiveTemplate = () => {
-  return <Badge label="Click me" onClick={() => alert("Badge clicked!")} />;
-};
-
 export const BadgeTypes: Story = {
   render: () => <BadgeTypesTemplate />,
   parameters: {
     docs: {
       description: {
-        story:
-          "Different badge content types: numeric counts, text labels, and high priority badges.",
+        story: `The two looks a badge can take:
+
+- **3**, **New**, **99+** — the usual round pill, as wide as its label, for a count or a short word
+- **High** — the emphasised preset (\`type="high"\`), with squarer corners and more padding, for a marker that should stand out`,
       },
       source: {
         code: `<Badge label={3} />
@@ -263,8 +323,11 @@ export const SpecialBadges: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Specialized badge variants: version badges, paid feature indicators, and muted badges.",
+        story: `Markers with a meaning of their own:
+
+- **v1.2.3** — a version number (\`isVersionBadge\`); on tablet-width screens and narrower it fills the width of its container
+- **PRO** — a paid-feature marker (\`isPaidBadge\`): the text stays white and the label is never cut off
+- **Muted** — a grey pill for something inactive (\`isMutedBadge\`)`,
       },
       source: {
         code: `<Badge label="v1.2.3" isVersionBadge />
@@ -280,8 +343,11 @@ export const HoverStates: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Badge hover behavior: default hover effect, forced hover state, and disabled hover.",
+        story: `Hover and press each badge to compare:
+
+- **Default** — the pill lightens on hover and darkens while pressed
+- **Hovered** — shows the pointer cursor before the pointer arrives (\`isHovered\`); the colour still changes only under the real pointer
+- **No Hover** — keeps the arrow cursor and its colour, for a badge that is only a marker (\`noHover\`)`,
       },
       source: {
         code: `<Badge label="Default" />
@@ -297,8 +363,11 @@ export const CustomStyled: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Badges with custom styling: colors, borders, padding, border-radius, and font properties.",
+        story: `For a place where the theme's pill does not fit:
+
+- **Custom** — its own background, text colour, text size and weight, corners and padding
+- **Bordered** — a transparent pill with a border around it (\`border\`)
+- **Large** — a wider cap (\`maxWidth\`) and more padding for a longer label`,
       },
       source: {
         code: `<Badge label="Custom" backgroundColor="#335EA3" color="#FFFFFF" fontSize="14px" fontWeight={600} borderRadius="8px" padding="4px 12px" />
@@ -310,14 +379,19 @@ export const CustomStyled: Story = {
 };
 
 export const InteractiveBadge: Story = {
-  render: () => <InteractiveTemplate />,
+  render: (args) => <Badge {...args} />,
+  args: {
+    label: "Click me",
+    onClick: fn(),
+  },
   parameters: {
     docs: {
       description: {
-        story: "Badge with click handler for interactive behavior.",
+        story:
+          "A badge that opens something when clicked: click it and watch the Actions panel (`onClick`). It takes no keyboard focus, so offer the same action somewhere a keyboard user can reach it.",
       },
       source: {
-        code: `<Badge label="Click me" onClick={() => alert("Badge clicked!")} />`,
+        code: `<Badge label="Click me" onClick={onOpen} />`,
       },
     },
   },
@@ -331,7 +405,6 @@ export const CssCustomization: Story = {
           "--badge-bg": "#7B4FBF",
           "--badge-radius": "12px",
           "--badge-high-padding": "3px 14px",
-          "--badge-high-font-size": "14px",
         } as CSSProperties
       }
     >
@@ -343,12 +416,13 @@ export const CssCustomization: Story = {
       description: {
         story: `CSS Custom Properties for external customization:
 
-\`\`\`css
---badge-bg              /* background color */
---badge-radius          /* border-radius (default 6px) */
---badge-high-padding    /* padding for high type (default 3px 10px) */
---badge-high-font-size  /* font-size for high type (default 13px) */
-\`\`\``,
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--badge-bg\` | Colour of the pill, over \`backgroundColor\`; a muted badge stays grey | theme-based |
+| \`--badge-radius\` | Corner radius of the pill, \`high\` type only | \`6px\` |
+| \`--badge-high-padding\` | Padding around the label, \`high\` type only | \`3px 10px\` |
+
+The example is one \`high\` badge, because two of the three variables apply only to that type.`,
       },
       source: {
         code: `<div
@@ -356,7 +430,6 @@ export const CssCustomization: Story = {
     "--badge-bg": "#7B4FBF",
     "--badge-radius": "12px",
     "--badge-high-padding": "3px 14px",
-    "--badge-high-font-size": "14px",
   }}
 >
   <Badge type="high" label="Premium" />

@@ -31,8 +31,51 @@ test.describe("ModalDialog — light", () => {
     await gotoStory(page, "css-customization");
     // The story starts closed behind a trigger; without the click the shot is
     // of an empty page with a button.
-    await page.getByRole("button", { name: "Show" }).click();
+    await page.getByRole("button", { name: "Show", exact: true }).click();
     await expect(page).toHaveScreenshot("modal-dialog-css-customization.png");
+  });
+});
+
+test.describe("ModalDialog — new stories", () => {
+  test("with back button", async ({ page }) => {
+    await gotoStory(page, "with-back-button");
+    await page.getByRole("button", { name: "Show Aside" }).click();
+    await expect(page).toHaveScreenshot("modal-dialog-with-back-button.png");
+  });
+
+  test("backdrop click disabled", async ({ page }) => {
+    await gotoStory(page, "backdrop-click-disabled");
+    await page.getByRole("button", { name: "Show", exact: true }).click();
+    await expect(page).toHaveScreenshot(
+      "modal-dialog-backdrop-click-disabled.png",
+    );
+  });
+
+  test("form dialog", async ({ page }) => {
+    await gotoStory(page, "form-dialog");
+    await page.getByRole("button", { name: "Show", exact: true }).click();
+    await expect(page).toHaveScreenshot("modal-dialog-form-dialog.png");
+  });
+
+  test("two footer rows", async ({ page }) => {
+    await gotoStory(page, "two-footer-rows");
+    await page.getByRole("button", { name: "Show", exact: true }).click();
+    await expect(page).toHaveScreenshot("modal-dialog-two-footer-rows.png");
+  });
+
+  test("aside with container", async ({ page }) => {
+    await gotoStory(page, "aside-with-container");
+    await page.getByRole("button", { name: "Show Aside" }).click();
+    await page.getByRole("button", { name: "Open details" }).click();
+    await expect(page).toHaveScreenshot(
+      "modal-dialog-aside-with-container.png",
+    );
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await page.getByRole("button", { name: "Show Aside" }).click();
+    await expect(page).toHaveScreenshot("modal-dialog-right-to-left.png");
   });
 });
 
@@ -58,7 +101,7 @@ test.describe("ModalDialog — dark", () => {
   test("css customization dark", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await page.evaluate(() => document.body.classList.add("dark"));
-    await page.getByRole("button", { name: "Show" }).click();
+    await page.getByRole("button", { name: "Show", exact: true }).click();
     await expect(page).toHaveScreenshot(
       "modal-dialog-css-customization-dark.png",
     );

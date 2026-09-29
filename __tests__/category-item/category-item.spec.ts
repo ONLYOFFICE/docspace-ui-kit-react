@@ -18,6 +18,11 @@ test.describe("CategoryItem — light", () => {
     await expect(page).toHaveScreenshot("category-item-default.png");
   });
 
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("category-item-right-to-left.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("category-item-css-customization.png");

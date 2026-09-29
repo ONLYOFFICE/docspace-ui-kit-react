@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["aside", "drop-down", "infinite-loader"],
   "subComponents": [],
-  "testIds": ["scrollbar", "scroller", "scroll-body"]
+  "testIds": ["scrollbar", "scroller", "scroll-body"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Scrollbar

@@ -12,7 +12,8 @@
   "state": { "visibility": "opened", "close": "onClose", "loading": null, "disabled": "isDisabled" },
   "related": ["drop-down", "context-menu", "icon-button"],
   "subComponents": [],
-  "testIds": ["context-menu-button"]
+  "testIds": ["context-menu-button"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # ContextMenuButton

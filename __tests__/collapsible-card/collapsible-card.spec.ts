@@ -21,6 +21,18 @@ test.describe("CollapsibleCard -- light", () => {
     await gotoStory(page, "expanded");
     await expect(page).toHaveScreenshot("collapsible-card-expanded.png");
   });
+
+  test("title only", async ({ page }) => {
+    await gotoStory(page, "title-only");
+    await expect(page).toHaveScreenshot("collapsible-card-title-only.png");
+  });
+
+  test("controlled state", async ({ page }) => {
+    await gotoStory(page, "controlled-state");
+    await expect(page).toHaveScreenshot(
+      "collapsible-card-controlled-state.png",
+    );
+  });
 });
 
 test.describe("CollapsibleCard -- dark", () => {

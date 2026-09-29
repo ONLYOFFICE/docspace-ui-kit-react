@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": "isLoading", "disabled": "isDisabled" },
   "related": ["combobox", "drop-down-item", "toast"],
   "subComponents": [],
-  "testIds": ["access_right_option_"]
+  "testIds": ["access_right_option_"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # AccessRightSelect

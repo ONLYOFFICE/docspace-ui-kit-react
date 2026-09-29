@@ -12,7 +12,8 @@
   "state": { "visibility": "opened", "close": "onClose", "loading": null, "disabled": null },
   "related": ["main-button", "floating-button", "drop-down"],
   "subComponents": [],
-  "testIds": ["main-button-mobile", "dropdown"]
+  "testIds": ["main-button-mobile", "dropdown"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # MainButtonMobile

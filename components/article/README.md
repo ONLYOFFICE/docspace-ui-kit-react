@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": "showArticleLoader", "disabled": null },
   "related": ["section", "navigation", "nav-menu"],
   "subComponents": ["Article.Header", "Article.MainButton", "Article.Body"],
-  "testIds": ["article"]
+  "testIds": ["article"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Article

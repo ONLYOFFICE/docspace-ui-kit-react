@@ -12,7 +12,8 @@
   "state": { "visibility": "visible", "close": "onClick", "loading": null, "disabled": null },
   "related": ["aside", "modal-dialog", "drop-down"],
   "subComponents": [],
-  "testIds": ["backdrop"]
+  "testIds": ["backdrop"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Backdrop

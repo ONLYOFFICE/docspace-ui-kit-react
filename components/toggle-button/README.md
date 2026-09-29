@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": "isLoading", "disabled": "isDisabled" },
   "related": ["checkbox", "radio-button-group", "field-container"],
   "subComponents": [],
-  "testIds": ["toggle-button", "toggle-button-container", "toggle-button-input", "toggle-button-icon", "toggle-button-label"]
+  "testIds": ["toggle-button", "toggle-button-container", "toggle-button-input", "toggle-button-icon", "toggle-button-label"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # ToggleButton

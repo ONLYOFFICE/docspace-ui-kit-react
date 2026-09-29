@@ -29,21 +29,21 @@ const meta = {
 ### Features
 
 - **Right-Click Trigger**: Opens at the pointer where the host calls \`show\`, usually from its right-click handler
-- **Nested Submenus**: Support for multi-level menu items
+- **Nested Submenus**: Opens an item's submenu to its side on hover, to any depth
 - **Separators**: Visual dividers between action groups
-- **Icons**: Each menu item can have its own icon
 - **Disabled Items**: Dropped from the list unless \`showDisabledItems\` is set, then shown greyed out with an optional explaining tooltip
 - **Backdrop**: Optional overlay behind the mobile sheet; \`ignoreChangeView\` brings it to the desktop menu as well
-- **Rich Items**: A menu item can also carry a description line, a toggle switch, a badge or an external link
+- **Rich Items**: A menu item can carry an icon, a description line, a toggle switch, a badge or an external link
 - **Keyboard Navigation**: Arrow Up/Down move the highlight, Arrow Right/Left enter and leave a submenu, Enter activates the item and Escape closes the menu
-- **Mobile Layout**: Below 600px the menu opens as a bottom sheet with an optional header, and submenus replace the list in place with a back button
+- **Mobile Layout**: Below 600px a menu taller than 210px, or any menu with \`ignoreChangeView\`, opens as a bottom sheet with an optional header, and submenus replace the list in place with a back button
 
 ### Accessibility
 
 The ContextMenu component includes the following for improved accessibility:
 
 - \`role="menuitem"\` on every item and \`role="separator"\` on dividers, so assistive technologies announce them as menu items and separators
-- Keyboard control while the menu is open: arrow keys move the highlight, Enter activates the highlighted item, Escape closes the menu
+- Keyboard control while the menu is open: Arrow Up and Down move the highlight, Arrow Right opens the highlighted item's submenu and Arrow Left returns to the parent list, Enter activates the highlighted item or opens its submenu, Escape closes the menu
+- Focus stays where it was when the menu opened: the keyboard highlight is drawn on the item, so a screen reader does not announce which item is highlighted
 
 ### Usage
 
@@ -61,6 +61,15 @@ const model = [
   Right click here
 </div>
 <ContextMenu ref={menuRef} model={model} />
+
+// Items that depend on the current selection, built on every open
+<ContextMenu ref={menuRef} model={[]} getContextModel={() => buildItems(selection)} />
+
+// Opened by a button, under that button
+<div ref={buttonRef}>
+  <button onClick={(e) => menuRef.current?.show(e)}>Actions</button>
+</div>
+<ContextMenu ref={menuRef} model={model} containerRef={buttonRef} />
 \`\`\``,
       },
     },
@@ -71,8 +80,10 @@ const model = [
   },
   argTypes: {
     model: {
-      control: "object",
-      description: "Menu items model array",
+      // The icons are data URIs too long to edit, and they stretch the table.
+      control: false,
+      description:
+        "The items — actions, separators and submenus — read each time the menu opens; `getContextModel` replaces them when it is given",
     },
     getContextModel: {
       control: false,
@@ -80,7 +91,7 @@ const model = [
     },
     className: {
       control: "text",
-      description: "Additional CSS class for the component",
+      description: "Additional CSS class on the menu element",
     },
     withBackdrop: {
       control: "boolean",
@@ -96,22 +107,22 @@ const model = [
         "Mobile-only header above the items: a title with an optional visual — the title's initials on a color, an icon, an avatar, a logo or a cover image",
     },
     headerOnlyMobile: {
-      control: false,
+      control: "boolean",
       description:
         "Mobile header only: shows the header for an opened submenu (its label and a back button) even when no header is passed",
     },
     withoutBackHeaderButton: {
-      control: false,
+      control: "boolean",
       description:
         "Mobile header only: removes the back button of an opened submenu and the icon block of the root header",
     },
     isRoom: {
-      control: false,
+      control: "boolean",
       description:
         "Mobile header only: a 32px icon block instead of the default size",
     },
     isArchive: {
-      control: false,
+      control: "boolean",
       description:
         "Mobile header only: draws the header icon in its archived state",
     },
@@ -122,6 +133,14 @@ const model = [
     badgeIconColor: {
       control: false,
       description: "Mobile header only: color of that badge icon",
+    },
+    ignoreChangeView: {
+      control: "boolean",
+      description:
+        "Opens the menu as a bottom sheet on a narrow viewport whatever its height, and shows the backdrop on any viewport",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     showDisabledItems: {
       control: "boolean",
@@ -147,6 +166,71 @@ const model = [
     maxHeight: {
       control: "number",
       description: "Maximum height of the root list in px; the rest scrolls",
+    },
+    maxHeightLowerSubmenu: {
+      control: "number",
+      description:
+        "Maximum height of a submenu in px; the rest of its items scroll",
+    },
+    containerRef: {
+      control: false,
+      description:
+        "Element the menu opens under, at its left edge and 4px below it, instead of at the pointer",
+    },
+    scaled: {
+      control: "boolean",
+      description:
+        "Meant to make the menu as wide as the element in `containerRef`; today the menu keeps the width of its longest item",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    leftOffset: {
+      control: "number",
+      description:
+        "Moves a menu opened under `containerRef` this many pixels to the left",
+    },
+    rightOffset: {
+      control: "number",
+      description:
+        "Moves that menu further to the left by this many pixels; both offsets add up",
+    },
+    appendTo: {
+      control: false,
+      description:
+        "Element the menu is rendered into, instead of the end of the page body",
+    },
+    autoZIndex: {
+      control: "boolean",
+      description:
+        "Puts each opened menu above everything opened before it, so it is never hidden behind another overlay",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    baseZIndex: {
+      control: "number",
+      description:
+        "Stacking level the menu and its backdrop start from, for a page whose own overlays sit higher",
+      table: {
+        defaultValue: { summary: "0" },
+      },
+    },
+    style: {
+      control: "object",
+      description: "Inline styles of the menu element",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Value of `data-testid` on the menu wrapper",
+      table: {
+        defaultValue: { summary: "context-menu" },
+      },
+    },
+    ref: {
+      control: false,
+      description:
+        "Handle the menu is opened through: `show(event)`, `hide(event)` and `toggle(event)`; there is no visibility prop",
     },
     global: {
       control: "boolean",
@@ -180,7 +264,7 @@ const fullMenuItems: ContextMenuModel[] = [
   { key: 1, label: "Preview", icon: CatalogFolderReactSvgUrl },
   { key: 2, isSeparator: true, disabled: false },
   { key: 3, label: "Sharing settings", icon: CatalogFolderReactSvgUrl },
-  { key: 4, label: "Link for portal users", icon: CatalogFolderReactSvgUrl },
+  { key: 4, label: "Copy internal link", icon: CatalogFolderReactSvgUrl },
   { key: 5, label: "Copy external link", icon: CatalogFolderReactSvgUrl },
   { key: 6, label: "Send by e-mail", icon: CatalogFolderReactSvgUrl },
   {
@@ -194,7 +278,7 @@ const fullMenuItems: ContextMenuModel[] = [
     ],
   },
   { key: 11, isSeparator: true, disabled: false },
-  { key: 12, label: "Make as favorite", icon: CatalogFolderReactSvgUrl },
+  { key: 12, label: "Add to favorites", icon: CatalogFolderReactSvgUrl },
   { key: 13, label: "Download", icon: CatalogFolderReactSvgUrl },
   { key: 14, label: "Download as", icon: CatalogFolderReactSvgUrl },
   {
@@ -315,7 +399,7 @@ export const SimpleMenu: Story = {
     docs: {
       description: {
         story:
-          "A simple context menu with basic editing actions. Right-click the colored area to open.",
+          "A flat list of actions with one separator and no submenus — the shape most row and card menus need, with nothing but `ref` and `model` set. Right-click the colored area to open.",
       },
       source: {
         code: `<ContextMenu
@@ -374,103 +458,10 @@ export const WithBackdrop: Story = {
     docs: {
       description: {
         story:
-          "Context menu with a backdrop overlay. `withBackdrop` shows the backdrop only while the menu is a bottom sheet (viewports up to 600px), so on a desktop viewport it also needs `ignoreChangeView`, which this story passes. The mobile stories below are a bottom sheet already and show it with `withBackdrop` alone.",
+          "Context menu with a backdrop overlay. `withBackdrop` shows the backdrop only while the menu is a bottom sheet (viewports up to 600px), so on a desktop viewport it also needs `ignoreChangeView`, which this story passes. The mobile stories below set both props too, so the sheet and its backdrop appear however short the menu is.",
       },
       source: {
         code: `<ContextMenu ref={cm} model={items} withBackdrop ignoreChangeView />`,
-      },
-    },
-  },
-};
-
-const CssCustomizationTemplate = () => {
-  const cm = useRef<ContextMenuRefType>(null);
-
-  const items: ContextMenuModel[] = [
-    { key: 0, label: "Cut", icon: CatalogFolderReactSvgUrl },
-    { key: 1, label: "Copy", icon: CatalogFolderReactSvgUrl },
-    { key: 2, label: "Paste", icon: CatalogFolderReactSvgUrl },
-    { key: 3, isSeparator: true, disabled: false },
-    { key: 4, label: "Delete", icon: CatalogFolderReactSvgUrl },
-  ];
-
-  return (
-    <div style={{ height: "260px" }}>
-      <ContextMenu
-        ref={cm}
-        model={items}
-        style={
-          {
-            "--context-menu-radius": "12px",
-            "--context-menu-bg": "#1e1b4b",
-            "--context-menu-border-style": "1px solid #4338ca",
-            "--context-menu-text": "#e0e7ff",
-            "--context-menu-item-hover-bg": "rgba(255,255,255,0.1)",
-            "--context-menu-header-border-style": "1px solid #4338ca",
-            "--context-menu-item-text-size": "14px",
-          } as CSSProperties
-        }
-      />
-      <button
-        type="button"
-        data-testid="trigger"
-        style={{
-          width: "200px",
-          height: "100px",
-          backgroundColor: globalColors.lightSecondMain,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          color: globalColors.white,
-          border: "none",
-          cursor: "context-menu",
-        }}
-        onContextMenu={(e) => cm.current?.show(e)}
-      >
-        Right click to open
-      </button>
-    </div>
-  );
-};
-
-export const CssCustomization: Story = {
-  render: () => <CssCustomizationTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story: `CSS Custom Properties for external customization, passed through the \`style\` prop (the menu renders outside its parent, so a wrapper element's variables do not reach it):
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--context-menu-bg\` | Menu background | theme-based |
-| \`--context-menu-border-style\` | Menu border | none (light), \`1px solid\` (dark) |
-| \`--context-menu-header-border-style\` | Separator border; also the mobile header's bottom border | theme-based |
-| \`--context-menu-shadow\` | Menu box-shadow | theme-based |
-| \`--context-menu-text\` | Item text and icon color | theme-based |
-| \`--context-menu-item-hover-bg\` | Item hover background | theme-based |
-| \`--context-menu-item-disabled-text\` | Disabled item text color | theme-based |
-| \`--context-menu-item-disabled-bg\` | Disabled item hover background | theme-based |
-| \`--context-menu-active-item-bg\` | Keyboard-highlighted item background | theme-based |
-| \`--context-menu-radius\` | Menu border radius | \`6px\` |
-| \`--context-menu-menu-item-padding\` | Item padding | \`0 16px\` |
-| \`--context-menu-divider-margin\` | Separator margin; keep the vertical 6px, the list height is computed for it | \`6px 16px\` |
-| \`--context-menu-item-text-size\` | Item font size | \`13px\` |
-| \`--context-menu-item-text-weight\` | Item font weight | \`600\` |
-| \`--context-menu-header-row-height\` | Mobile header only: height | \`55px\` |
-| \`--context-menu-header-inner-padding\` | Mobile header only: padding | \`6px 16px\` |
-| \`--context-menu-header-text-size\` | Mobile header only: font size | \`15px\` |`,
-      },
-      source: {
-        code: `<ContextMenu
-  ref={cm}
-  model={items}
-  style={{
-    "--context-menu-radius": "12px",
-    "--context-menu-bg": "#1e1b4b",
-    "--context-menu-text": "#e0e7ff",
-    "--context-menu-item-hover-bg": "rgba(255,255,255,0.1)",
-  }}
-/>`,
       },
     },
   },
@@ -953,6 +944,268 @@ export const MobileWithAvatarHeader: Story = {
   header={{ title: user.displayName, avatar: user.avatarSmall, original: "", large: "", medium: "", small: "" }}
   withBackdrop
   ignoreChangeView
+/>`,
+      },
+    },
+  },
+};
+
+const AnchoredToElementTemplate = (props: ContextMenuProps) => {
+  const cm = useRef<ContextMenuRefType>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <div style={{ height: "280px" }}>
+      <div ref={anchorRef} style={{ width: "240px" }}>
+        <button
+          type="button"
+          data-testid="trigger"
+          style={{
+            width: "100%",
+            height: "40px",
+            backgroundColor: globalColors.lightSecondMain,
+            color: globalColors.white,
+            fontSize: "15px",
+            border: "none",
+            cursor: "pointer",
+          }}
+          onClick={(e) => cm.current?.show(e)}
+        >
+          Actions
+        </button>
+      </div>
+      <ContextMenu {...props} ref={cm} containerRef={anchorRef} />
+    </div>
+  );
+};
+
+export const AnchoredToElement: Story = {
+  render: (args) => <AnchoredToElementTemplate {...args} />,
+  args: {
+    model: [
+      { key: 0, label: "Rename", icon: CatalogFolderReactSvgUrl },
+      { key: 1, label: "Duplicate", icon: CatalogFolderReactSvgUrl },
+      { key: 2, label: "Download", icon: CatalogFolderReactSvgUrl },
+      { key: 3, isSeparator: true },
+      { key: 4, label: "Delete", icon: CatalogFolderReactSvgUrl },
+    ],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Click **Actions**: the menu opens under the button, at its left edge, wherever the pointer was (`containerRef`). Use it for a menu that belongs to a toolbar button or a row's action button rather than to a right-click. `leftOffset` and `rightOffset` move it left from that edge; change them live in the Controls panel below.",
+      },
+      source: {
+        code: `const anchorRef = useRef<HTMLDivElement>(null);
+
+<div ref={anchorRef}>
+  <button onClick={(e) => cm.current?.show(e)}>Actions</button>
+</div>
+<ContextMenu ref={cm} model={items} containerRef={anchorRef} />`,
+      },
+    },
+  },
+};
+
+const RightToLeftTemplate = (props: ContextMenuProps) => {
+  const cm = useRef<ContextMenuRefType>(null);
+  const [container, setContainer] = useState<HTMLDivElement | null>(null);
+
+  return (
+    <div dir="rtl" ref={setContainer} style={{ height: "300px" }}>
+      {container ? (
+        <ContextMenu {...props} ref={cm} appendTo={container} />
+      ) : null}
+      <button
+        type="button"
+        data-testid="trigger"
+        style={{
+          width: "200px",
+          height: "200px",
+          marginInlineStart: "260px",
+          backgroundColor: globalColors.lightSecondMain,
+          color: globalColors.white,
+          fontSize: "18px",
+          border: "none",
+          cursor: "context-menu",
+        }}
+        onContextMenu={(e) => cm.current?.show(e)}
+      >
+        انقر بزر الفأرة الأيمن
+      </button>
+    </div>
+  );
+};
+
+export const RightToLeft: Story = {
+  render: (args) => <RightToLeftTemplate {...args} />,
+  globals: { direction: "rtl" },
+  args: {
+    model: [
+      { key: 0, label: "تحرير", icon: CatalogFolderReactSvgUrl },
+      { key: 1, label: "نسخ", icon: CatalogFolderReactSvgUrl },
+      {
+        key: 2,
+        label: "نقل إلى",
+        icon: CatalogFolderReactSvgUrl,
+        items: [
+          { key: 3, label: "المستندات" },
+          { key: 4, label: "الأرشيف" },
+        ],
+      },
+      { key: 5, isSeparator: true },
+      { key: 6, label: "حذف", icon: CatalogFolderReactSvgUrl },
+    ],
+  },
+  parameters: {
+    noPadding: true,
+    docs: {
+      // Framed, because an inline RTL story flips the whole Docs page.
+      story: { inline: false, height: "326px" },
+      description: {
+        story:
+          "The menu in a right-to-left interface: it opens to the left of the pointer, the icons sit on the right of the labels, and the third item's submenu opens to the left with its arrow pointing left. The menu renders into the right-to-left container (`appendTo`), because on its own it goes to the end of the page body, outside any `dir` wrapper.",
+      },
+      source: {
+        code: `<div dir="rtl" ref={setContainer}>
+  <ContextMenu ref={cm} model={items} appendTo={container} />
+  <div onContextMenu={(e) => cm.current?.show(e)}>انقر بزر الفأرة الأيمن</div>
+</div>`,
+      },
+    },
+  },
+};
+
+const CssCustomizationTemplate = () => {
+  const cm = useRef<ContextMenuRefType>(null);
+
+  const items: ContextMenuModel[] = [
+    { key: 0, label: "Cut", icon: CatalogFolderReactSvgUrl },
+    { key: 1, label: "Copy", icon: CatalogFolderReactSvgUrl },
+    { key: 2, label: "Paste", icon: CatalogFolderReactSvgUrl },
+    {
+      key: 3,
+      label: "Rename",
+      icon: CatalogFolderReactSvgUrl,
+      disabled: true,
+    },
+    { key: 4, isSeparator: true, disabled: false },
+    {
+      key: 5,
+      label: "Delete",
+      icon: CatalogFolderReactSvgUrl,
+      description: "Moves the selection to the trash",
+    },
+  ];
+
+  return (
+    <div style={{ height: "320px" }}>
+      <ContextMenu
+        ref={cm}
+        model={items}
+        showDisabledItems
+        style={
+          {
+            "--context-menu-radius": "12px",
+            "--context-menu-bg": "#1e1b4b",
+            "--context-menu-border-style": "1px solid #4338ca",
+            "--context-menu-shadow": "0 12px 24px rgba(30, 27, 75, 0.45)",
+            "--context-menu-text": "#e0e7ff",
+            "--context-menu-item-hover-bg": "rgba(255,255,255,0.1)",
+            "--context-menu-item-disabled-text": "#6366f1",
+            "--context-menu-item-disabled-bg": "#312e81",
+            "--context-menu-active-item-bg": "rgba(255,255,255,0.2)",
+            "--context-menu-header-border-style": "1px solid #4338ca",
+            "--context-menu-menu-item-padding": "0 20px",
+            "--context-menu-divider-margin": "6px 20px",
+            "--context-menu-item-text-size": "14px",
+            "--context-menu-item-text-weight": "400",
+            "--context-menu-item-with-description-padding": "8px 20px",
+            "--context-menu-item-description-width": "220px",
+            "--context-menu-item-description": "#a5b4fc",
+          } as CSSProperties
+        }
+      />
+      <button
+        type="button"
+        data-testid="trigger"
+        style={{
+          width: "200px",
+          height: "100px",
+          backgroundColor: globalColors.lightSecondMain,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          color: globalColors.white,
+          border: "none",
+          cursor: "context-menu",
+        }}
+        onContextMenu={(e) => cm.current?.show(e)}
+      >
+        Right click to open
+      </button>
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--context-menu-bg\` | Menu background | theme-based |
+| \`--context-menu-border-style\` | Menu border | none (light), \`1px solid\` (dark) |
+| \`--context-menu-header-border-style\` | Separator border; also the mobile header's bottom border | theme-based |
+| \`--context-menu-shadow\` | Menu box-shadow | theme-based |
+| \`--context-menu-text\` | Item text and icon color | theme-based |
+| \`--context-menu-item-hover-bg\` | Item hover background | theme-based |
+| \`--context-menu-item-disabled-text\` | Disabled item text color | theme-based |
+| \`--context-menu-item-disabled-bg\` | Disabled item hover background | theme-based |
+| \`--context-menu-active-item-bg\` | Keyboard-highlighted item background | theme-based |
+| \`--context-menu-radius\` | Menu border radius | \`6px\` |
+| \`--context-menu-menu-item-padding\` | Item padding; keep the vertical 0, the list height is computed for it | \`0 16px\` |
+| \`--context-menu-divider-margin\` | Separator margin; keep the vertical 6px, the list height is computed for it | \`6px 16px\` |
+| \`--context-menu-item-text-size\` | Item font size | \`13px\` |
+| \`--context-menu-item-text-weight\` | Item font weight | \`600\` |
+| \`--context-menu-item-height\` | Item row height; the list height is computed for 36px, so another value leaves a gap or a scrollbar in a menu without descriptions | \`36px\` |
+| \`--context-menu-item-with-description-padding\` | Padding of an item that has a description | \`8px 12px\` |
+| \`--context-menu-item-description-width\` | Width of the description line, which sets the menu's width | \`330px\` |
+| \`--context-menu-item-description\` | Description text color | theme-based |
+| \`--context-menu-header-row-height\` | Mobile header only: height | \`55px\` |
+| \`--context-menu-header-inner-padding\` | Mobile header only: padding | \`6px 16px\` |
+| \`--context-menu-header-text-size\` | Mobile header only: font size | \`15px\` |
+
+The menu renders outside its parent, so a wrapper element's variables never reach it: the example passes them through the menu's own \`style\` prop. It sets every variable a desktop menu can show — hover **Delete** for the hover background, hover **Rename** for the disabled one, and press Arrow Down for the keyboard highlight. The mobile header rows only apply to the bottom sheet.`,
+      },
+      source: {
+        code: `<ContextMenu
+  ref={cm}
+  model={items}
+  showDisabledItems
+  style={{
+    "--context-menu-radius": "12px",
+    "--context-menu-bg": "#1e1b4b",
+    "--context-menu-border-style": "1px solid #4338ca",
+    "--context-menu-shadow": "0 12px 24px rgba(30, 27, 75, 0.45)",
+    "--context-menu-text": "#e0e7ff",
+    "--context-menu-item-hover-bg": "rgba(255,255,255,0.1)",
+    "--context-menu-item-disabled-text": "#6366f1",
+    "--context-menu-item-disabled-bg": "#312e81",
+    "--context-menu-active-item-bg": "rgba(255,255,255,0.2)",
+    "--context-menu-header-border-style": "1px solid #4338ca",
+    "--context-menu-menu-item-padding": "0 20px",
+    "--context-menu-divider-margin": "6px 20px",
+    "--context-menu-item-text-size": "14px",
+    "--context-menu-item-text-weight": "400",
+    "--context-menu-item-with-description-padding": "8px 20px",
+    "--context-menu-item-description-width": "220px",
+    "--context-menu-item-description": "#a5b4fc",
+  }}
 />`,
       },
     },

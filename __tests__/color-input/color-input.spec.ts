@@ -1,8 +1,8 @@
 import { type Page, expect, test } from "@playwright/test";
 
-// Title: "UI/Interactive elements/ColorInput"
-// → prefix: "ui-interactive-elements-colorinput"
-const STORY_BASE = "ui-interactive-elements-colorinput";
+// Title: "UI/Form controls/ColorInput"
+// → prefix: "ui-form-controls-colorinput"
+const STORY_BASE = "ui-form-controls-colorinput";
 
 async function gotoStory(page: Page, storyId: string) {
   const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;

@@ -12,7 +12,8 @@
   "state": { "visibility": "visible", "close": "onClose", "loading": "isLoading", "disabled": null },
   "related": ["modal-dialog", "backdrop", "aside/aside-header"],
   "subComponents": [],
-  "testIds": ["aside", "aside-header"]
+  "testIds": ["aside", "aside-header"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Aside

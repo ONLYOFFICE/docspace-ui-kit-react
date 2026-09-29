@@ -103,19 +103,21 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `TableContainer is a wrapper for table elements including header, body, rows, and cells.
+        component: `TableContainer is the outer element of a table, the grid that the header, the group menu and the rows are laid out in.
 
 ### Features
 
-- **Grid Layout**: Applies CSS grid styling for consistent column alignment
-- **React-Window Support**: Configures specific styles for virtualized table content
-- **Scrolling Behavior**: Manages scroll context for child components
-- **Composable**: Works with TableHeader, TableBody, TableRow, and TableCell
+- **Shared Column Grid**: Lays its children out as a CSS grid whose columns the TableHeader writes, so the header, the group menu and every row share one set of widths
+- **Virtualised Mode**: With \`useReactWindow\`, becomes a full-height block instead of a grid, because the virtualised body lays each row out on its own
+- **Text Selection Control**: With \`noSelect\`, stops the user selecting text anywhere in the table, for example while rows are being dragged
+- **Header Separator**: Draws the line under the header and the group menu 20 pixels short of each edge, and in the virtualised mode stretches it to the full width while the pointer is over the first row
+- **Reorder Marker**: Colours an element marked \`indexing-separator\` with a theme colour, to show where a dragged row will land
+- **One Table per Page**: Renders with the fixed id \`table-container\`, which the header and the virtualised body look up
 
 ### Usage
 
 \`\`\`tsx
-import { TableContainer } from "@onlyoffice/apps-ui-kit/components/table/table-container";
+import { TableContainer, TableHeader, TableBody } from "@onlyoffice/apps-ui-kit/components/table";
 
 const ref = useRef<HTMLDivElement>(null);
 
@@ -132,13 +134,29 @@ const ref = useRef<HTMLDivElement>(null);
   argTypes: {
     useReactWindow: {
       control: "boolean",
-      description: "Enable react-window mode for virtualized scrolling styles",
+      description:
+        "Makes the container a full-height block instead of a grid; set it together with the same prop on the header and the body when the rows are virtualised",
+    },
+    noSelect: {
+      control: "boolean",
+      description: "Stops the user selecting text anywhere inside the table",
       table: {
         defaultValue: { summary: "false" },
       },
     },
-    forwardedRef: { control: false },
-    children: { control: false },
+    className: {
+      control: "text",
+      description: "Class applied to the container after the component's own",
+    },
+    forwardedRef: {
+      control: false,
+      description:
+        "Ref of the container element; pass the same ref to the header as `containerRef`",
+    },
+    children: {
+      control: false,
+      description: "The header, the group menu and the body",
+    },
   },
   decorators: [
     (Story) => {
@@ -181,7 +199,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default TableContainer with a header and body. Renders all rows without virtual scrolling.",
+          "A complete table of ten rows under a sortable header, the usual way the parts are put together: the container holds the grid, the header sizes its columns. Turn on `useReactWindow` in the Controls panel below to render the same rows through the virtualised body.",
       },
       source: {
         code: `const ref = useRef<HTMLDivElement>(null);

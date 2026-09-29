@@ -1,6 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import OperationsProgressButton from ".";
 import type { Operation } from "./OperationsProgressButton.types";
@@ -15,13 +16,14 @@ const meta = {
 
 ### Features
 
-- **Operation Tracking**: Monitors multiple concurrent file operations
-- **Progress Display**: Shows percentage completion for active operations
-- **Multiple Operations**: Dropdown list when several operations run simultaneously
-- **Alert State**: Visual indicator for errors during operations
-- **Completed State**: Auto-hides after successful completion
-- **Tooltip Labels**: Contextual tooltips showing operation details
-- **Panel Integration**: Click to open detailed operation panels
+- **Operation Tracking**: Shows the operations the host passes in, as secondary operations and operations that own a panel
+- **Progress Display**: Fills the ring around the button with the progress of the only running operation
+- **Multiple Operations**: Shows three dots when several operations run and opens a list of all of them on click
+- **Status Badges**: Marks a failed operation with a warning badge, a finished one with a tick and an aborted one with a stop sign, which wins over the other two
+- **Completed State**: Slides out of view a few seconds after everything completes, unless the pointer is over it or errors are still being checked
+- **Tooltip Labels**: Names the running operation, its outcome or the number of operations in a tooltip on hover
+- **Panel Integration**: Opens an operation's own panel on click when that operation supplies \`showPanel\`
+- **Drag Preview**: Raises a second button in the middle of the screen while files are dragged, with a tooltip naming the folder under the pointer
 
 ### Usage
 
@@ -51,63 +53,138 @@ import OperationsProgressButton from "@onlyoffice/apps-ui-kit/components/operati
     },
   },
   argTypes: {
+    operations: {
+      control: "object",
+      description:
+        "Secondary operations: copy, move, delete and the rest. In the list each row shows a spinner instead of a progress ring",
+      table: {
+        defaultValue: { summary: "[]" },
+      },
+    },
+    panelOperations: {
+      control: "object",
+      description:
+        "Operations that own a panel, such as an upload. In the list each row shows a progress ring with a cancel cross",
+      table: {
+        defaultValue: { summary: "[]" },
+      },
+    },
     operationsAlert: {
       control: "boolean",
-      description: "Indicates if any operation has an error/alert",
+      description:
+        "Whether any operation failed: the button gets a warning badge and the tooltip names the error",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    operationsCanceled: {
+      control: "boolean",
+      description:
+        "Whether an upload was cancelled: the button gets the stop sign and the tooltip shows the operation's label",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     operationsCompleted: {
       control: "boolean",
-      description: "Indicates if all operations have completed",
+      description:
+        "Whether everything is finished: the button shows a tick, slides out of view 4 seconds later (8 with a panel operation) and then calls the clear callbacks",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    operationsStopped: {
+      control: "boolean",
+      description:
+        "Whether an operation was aborted: the button gets the stop sign, which wins over alert and completed, and the tooltip says the operation was stopped",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     mainButtonVisible: {
       control: "boolean",
-      description: "Whether the main action button is visible alongside",
+      description:
+        "Whether the mobile main button is on screen: on tablet widths the button sits 88px from the bottom (80px on phones) instead of 16px, clear of it",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     needErrorChecking: {
       control: "boolean",
-      description: "Enables error state checking for operations",
+      description:
+        "Whether a completed run may still hold errors: the button then stays on screen instead of hiding itself",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     showCancelButton: {
       control: "boolean",
-      description: "Shows a cancel button on hover for upload operations",
+      description:
+        "Whether a cancel cross appears beside the button on hover. Only while there is exactly one operation",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isInfoPanelVisible: {
       control: "boolean",
-      description: "Adjusts positioning when the info panel is open",
+      description:
+        "Whether the info panel is open: the button moves 424px in from the trailing edge, clear of it",
       table: {
         defaultValue: { summary: "false" },
       },
     },
+    isDragging: {
+      control: "boolean",
+      description:
+        "Whether files are being dragged: a preview button rises in the middle of the screen while a drop folder is named",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    dropTargetFolderName: {
+      control: "text",
+      description:
+        "Name of the folder under the pointer, shown in the drag preview button's tooltip",
+    },
     percent: {
-      control: { type: "number", min: 0, max: 100 },
-      description: "Overall progress percentage",
+      control: false,
+      description:
+        "Ignored. Nothing reads this prop; the ring shows the first operation's `percent`",
     },
     clearOperationsData: {
       action: "clearOperationsData",
-      description: "Callback to clear operations data after completion",
+      description:
+        "Called once the hide animation ends, and when a finished row's clear icon is clicked in the list, to drop the secondary operations",
     },
     clearPanelOperationsData: {
       action: "clearPanelOperationsData",
-      description: "Callback to clear panel operations data",
+      description:
+        "Called once the hide animation ends, and when a finished panel row's clear icon is clicked in the list, to drop the panel operations",
+    },
+    clearDropPreviewLocation: {
+      action: "clearDropPreviewLocation",
+      description:
+        "Called when the drag preview button goes away, to forget the drop folder",
+    },
+    cancelUpload: {
+      action: "cancelUpload",
+      description:
+        "Called with the translation function when the cancel cross beside the button, or on a panel row's ring, is clicked",
+    },
+    cancelSecondaryOperationById: {
+      action: "cancelSecondaryOperationById",
+      description:
+        "Meant to be called with the operation and the id of its first item from a secondary row's cancel; those rows show a spinner with no cancel, so nothing calls it",
     },
     onOpenPanel: {
-      action: "onOpenPanel",
-      description: "Callback when the operation panel is opened",
+      control: false,
+      description:
+        "Ignored. Nothing reads this prop; the panel is opened through `Operation.showPanel`",
+    },
+    onCancelOperation: {
+      control: false,
+      description:
+        "Ignored. Nothing reads this prop; the cancel cross calls `cancelUpload`",
     },
   },
   decorators: [
@@ -132,6 +209,10 @@ type Story = StoryObj<ComponentProps<typeof OperationsProgressButton>>;
 
 export default meta;
 
+const Template = (args: ComponentProps<typeof OperationsProgressButton>) => (
+  <OperationsProgressButton {...args} />
+);
+
 const singleUploadOperation: Operation[] = [
   {
     id: "op-1",
@@ -143,36 +224,347 @@ const singleUploadOperation: Operation[] = [
   },
 ];
 
+export const Default: Story = {
+  render: Template,
+  args: {
+    operations: singleUploadOperation,
+    operationsAlert: false,
+    operationsCompleted: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "One running operation: the ring shows how far it has got and the tooltip names it. Change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<OperationsProgressButton
+  operations={[{ id: "op-1", operation: "upload", label: "Uploading files", alert: false, completed: false, percent: 45 }]}
+/>`,
+      },
+    },
+  },
+};
+
+export const UploadInProgress: Story = {
+  render: Template,
+  args: {
+    operations: [
+      {
+        id: "op-1",
+        operation: "upload",
+        label: "Uploading files",
+        alert: false,
+        completed: false,
+        percent: 65,
+      },
+    ],
+    operationsAlert: false,
+    operationsCompleted: false,
+    showCancelButton: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Lets the user stop a running operation: hover the button to reveal the cancel cross beside it (`showCancelButton`); clicking it calls `cancelUpload`.",
+      },
+      source: {
+        code: `<OperationsProgressButton
+  operations={[{ operation: "upload", label: "Uploading files", alert: false, completed: false, percent: 65 }]}
+  showCancelButton
+  cancelUpload={(t) => cancelAllUploads()}
+/>`,
+      },
+    },
+  },
+};
+
+export const WithAlert: Story = {
+  render: Template,
+  args: {
+    operations: [
+      {
+        id: "op-1",
+        operation: "upload",
+        label: "Uploading files",
+        alert: true,
+        completed: false,
+        percent: 40,
+        errorCount: 3,
+      },
+    ],
+    operationsAlert: true,
+    operationsCompleted: false,
+    needErrorChecking: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Tells the user something went wrong without opening anything: the button gets a warning badge (`operationsAlert`); hover it to read the operation's label and how many files failed (`errorCount`).",
+      },
+      source: {
+        code: `<OperationsProgressButton
+  operations={[{ operation: "upload", label: "Uploading files", alert: true, completed: false, percent: 40, errorCount: 3 }]}
+  operationsAlert
+  needErrorChecking
+/>`,
+      },
+    },
+  },
+};
+
+export const CompletedOperation: Story = {
+  render: Template,
+  args: {
+    operations: [
+      {
+        id: "op-1",
+        operation: "copy",
+        label: "Copying files",
+        alert: false,
+        completed: true,
+        percent: 100,
+      },
+    ],
+    operationsAlert: false,
+    operationsCompleted: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The button clears itself away once the work is done: it shows a tick (`operationsCompleted`) and slides out of view 4 seconds later, then calls `clearOperationsData`. Keep the pointer over it to hold it on screen.",
+      },
+      source: {
+        code: `<OperationsProgressButton
+  operations={[{ operation: "copy", label: "Copying files", alert: false, completed: true, percent: 100 }]}
+  operationsCompleted
+  clearOperationsData={() => setOperations([])}
+/>`,
+      },
+    },
+  },
+};
+
+export const MultipleOperations: Story = {
+  render: Template,
+  args: {
+    operations: [
+      {
+        id: "op-1",
+        operation: "upload",
+        label: "Uploading files",
+        alert: false,
+        completed: false,
+        percent: 60,
+      },
+      {
+        id: "op-2",
+        operation: "copy",
+        label: "Copying documents",
+        alert: false,
+        completed: false,
+        percent: 30,
+      },
+    ],
+    panelOperations: [
+      {
+        id: "op-3",
+        operation: "move",
+        label: "Moving folder",
+        alert: false,
+        completed: false,
+        percent: 80,
+        showPanel: fn(),
+      },
+    ],
+    operationsAlert: false,
+    operationsCompleted: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `Keeps several operations behind one button: it shows three dots and the tooltip counts them. Click it to open the list:
+
+- **Uploading files**, **Copying documents** — secondary operations, each with a spinner (\`operations\`)
+- **Moving folder** — an operation with its own panel, with a progress ring and a cancel cross; click the row to open its panel (\`panelOperations\`, \`showPanel\`)`,
+      },
+      source: {
+        code: `<OperationsProgressButton
+  operations={[
+    { operation: "upload", label: "Uploading files", percent: 60, ... },
+    { operation: "copy", label: "Copying documents", percent: 30, ... },
+  ]}
+  panelOperations={[
+    { operation: "move", label: "Moving folder", percent: 80, showPanel, ... },
+  ]}
+/>`,
+      },
+    },
+  },
+};
+
+export const StoppedOperation: Story = {
+  render: Template,
+  args: {
+    operations: [
+      {
+        id: "op-1",
+        operation: "move",
+        label: "Moving files",
+        alert: true,
+        completed: true,
+        percent: 50,
+      },
+    ],
+    operationsAlert: true,
+    operationsCompleted: false,
+    operationsStopped: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Shows that the user aborted an operation rather than that it failed: the button gets a stop sign even though the operation is also marked as failed (`operationsStopped`), and the tooltip says it was stopped.",
+      },
+      source: {
+        code: `<OperationsProgressButton
+  operations={[{ operation: "move", label: "Moving files", alert: true, completed: true, percent: 50 }]}
+  operationsAlert
+  operationsStopped
+/>`,
+      },
+    },
+  },
+};
+
+export const OpensPanelOnClick: Story = {
+  render: Template,
+  args: {
+    panelOperations: [
+      {
+        id: "op-1",
+        operation: "upload",
+        label: "Uploading files",
+        description: "12 of 30 files",
+        alert: false,
+        completed: false,
+        percent: 40,
+        showPanel: fn(),
+      },
+    ],
+    operationsAlert: false,
+    operationsCompleted: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Leads the user to the details of a single operation: click the button to open the operation's own panel (`showPanel`), and hover it to read a second line under the label (`description`).",
+      },
+      source: {
+        code: `<OperationsProgressButton
+  panelOperations={[{
+    operation: "upload",
+    label: "Uploading files",
+    description: "12 of 30 files",
+    alert: false,
+    completed: false,
+    percent: 40,
+    showPanel: (open) => setUploadPanelVisible(open),
+  }]}
+/>`,
+      },
+    },
+  },
+};
+
+export const DragPreview: Story = {
+  render: Template,
+  args: {
+    operations: [],
+    isDragging: true,
+    dropTargetFolderName: "Reports",
+  },
+  parameters: {
+    docs: {
+      // Framed: inline, the always-open tooltip lands elsewhere on the Docs page.
+      story: { inline: false, height: "200px" },
+      description: {
+        story:
+          "Tells the user where dragged files will land: while a drag is in progress (`isDragging`) a preview button rises in the middle, and its tooltip names the folder under the pointer (`dropTargetFolderName`).",
+      },
+      source: {
+        code: `<OperationsProgressButton
+  isDragging
+  dropTargetFolderName="Reports"
+  clearDropPreviewLocation={() => setDropTarget(null)}
+/>`,
+      },
+    },
+  },
+};
+
+export const RightToLeft: Story = {
+  render: (args) => (
+    <div dir="rtl">
+      <OperationsProgressButton {...args} />
+    </div>
+  ),
+  args: {
+    operations: [
+      {
+        id: "op-1",
+        operation: "copy",
+        label: "\u0646\u0633\u062e \u0627\u0644\u0645\u0644\u0641\u0627\u062a",
+        alert: false,
+        completed: false,
+        percent: 45,
+      },
+    ],
+    operationsAlert: false,
+    operationsCompleted: false,
+  },
+  globals: { direction: "rtl" },
+  parameters: {
+    noPadding: true,
+    docs: {
+      // Framed: an inline RTL story would flip the whole Docs page.
+      story: { inline: false, height: "186px" },
+      description: {
+        story:
+          "In a right-to-left layout the button sits in the bottom-left corner instead of the bottom-right, and its tooltip opens towards the middle of the screen.",
+      },
+      source: {
+        code: `<div dir="rtl">
+  <OperationsProgressButton
+    operations={[{ operation: "copy", label: "\u0646\u0633\u062e \u0627\u0644\u0645\u0644\u0641\u0627\u062a", alert: false, completed: false, percent: 45 }]}
+  />
+</div>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
-    // CSS vars grouped by the internal part they target:
-    //
-    // Group 1 — OperationsProgressButton › dropdown list area
-    //   --ops-progress-dropdown-bg       dropdown background
-    //   --ops-progress-dropdown-hover    item hover background
-    //   --ops-progress-list-padding      each row padding
-    //
-    // Group 2 — OperationsProgressButton › progress-list icon SVGs
-    //   --ops-progress-icon-color        default icon fill
-    //   --ops-progress-icon-hover        icon fill on hover
-    //   --ops-progress-success-icon      success-state badge
-    //   --ops-progress-error-icon        error-state badge
-    //
-    // Group 3 — FloatingButton (inner sub-component)
-    //   --floating-circle-button-background  circle fill
-    //   --floating-button-icon               circle icon fill
-    //   --floating-button-button-size        circle diameter
-    //   --floating-button-shadow             circle box-shadow
     <div
       style={
         {
           "--ops-progress-dropdown-bg": "#e6f3fb",
           "--ops-progress-dropdown-hover": "#cce5f6",
+          "--ops-progress-dropdown-margin": "16px",
           "--ops-progress-list-padding": "0px 12px",
+          "--ops-progress-bar-padding": "10px 16px",
+          "--ops-progress-wrapper-margin": "0px",
+          "--ops-progress-items-gap": "12px",
+          "--ops-progress-label-gap": "4px",
           "--ops-progress-icon-color": "#0082c9",
           "--ops-progress-icon-hover": "#006ba6",
-          "--ops-progress-success-icon": "#0082c9",
-          "--ops-progress-error-icon": "#f03032",
+          "--ops-progress-error-icon": "#0082c9",
+          "--ops-progress-stopped-icon": "#f03032",
           "--floating-circle-button-background": "#0082c9",
           "--floating-button-icon": "#ffffff",
           "--floating-button-shadow": "0 4px 16px rgba(0, 130, 201, 0.4)",
@@ -196,6 +588,24 @@ export const CssCustomization: Story = {
             alert: false,
             completed: false,
             percent: 30,
+            showPanel: () => {},
+          },
+          {
+            id: "op-3",
+            operation: "move",
+            label: "Moving files",
+            alert: true,
+            completed: true,
+            percent: 100,
+          },
+          {
+            id: "op-4",
+            operation: "trash",
+            label: "Moving to trash",
+            alert: false,
+            completed: false,
+            stopped: true,
+            percent: 20,
           },
         ]}
         operationsAlert={false}
@@ -208,221 +618,26 @@ export const CssCustomization: Story = {
       description: {
         story: `CSS Custom Properties for external customization:
 
-**OperationsProgressButton — dropdown list area**
-
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--ops-progress-dropdown-bg\` | Dropdown background | theme-based |
-| \`--ops-progress-dropdown-hover\` | Item hover background | theme-based |
-| \`--ops-progress-list-padding\` | Row padding | \`0px 8px\` |
-| \`--ops-progress-dropdown-margin\` | Bottom margin | \`8px\` |
-
-**OperationsProgressButton — progress list icon SVGs**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--ops-progress-icon-color\` | Icon fill | \`#fff\` |
-| \`--ops-progress-icon-hover\` | Icon hover fill | theme-based |
-| \`--ops-progress-success-icon\` | Success badge color | theme-based |
-| \`--ops-progress-error-icon\` | Error badge color | theme-based |
-| \`--ops-progress-items-gap\` | Container item gap | \`8px\` |
-| \`--ops-progress-label-gap\` | Label items gap | \`8px\` |
-| \`--ops-progress-bar-padding\` | Bar wrapper padding | \`8px 16px\` |
-| \`--ops-progress-header-margin\` | Header right margin | \`8px\` |
-| \`--ops-progress-wrapper-margin\` | Progress wrapper margin | \`4px\` |
-
-**FloatingButton (inner sub-component)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
+| \`--ops-progress-dropdown-bg\` | Background of the open list | theme-based |
+| \`--ops-progress-dropdown-hover\` | Background of a row that opens a panel, on hover | theme-based |
+| \`--ops-progress-dropdown-margin\` | Gap between the open list and the button | \`8px\` |
+| \`--ops-progress-list-padding\` | Side padding of each row | \`0px 8px\` |
+| \`--ops-progress-bar-padding\` | Inner padding of each row | \`8px 16px\` |
+| \`--ops-progress-wrapper-margin\` | Space under each row's content | \`4px\` |
+| \`--ops-progress-items-gap\` | Gap between a row's icon and its label | \`8px\` |
+| \`--ops-progress-label-gap\` | Gap between a row's label and its arrow | \`8px\` |
+| \`--ops-progress-icon-color\` | Clear icon of a finished row and cancel cross of a panel row | theme-based |
+| \`--ops-progress-icon-hover\` | The same icons on hover | theme-based |
+| \`--ops-progress-error-icon\` | Exclamation mark inside a failed row's warning badge; the badge itself keeps the theme colour | theme-based |
+| \`--ops-progress-stopped-icon\` | Stop sign of an aborted row | theme-based |
+| \`--ops-progress-success-icon\` | Nothing visible: the theme colour overrides it on the tick | theme-based |
 | \`--floating-circle-button-background\` | Circle fill | accent color |
 | \`--floating-button-icon\` | Circle icon fill | accent text color |
-| \`--floating-button-shadow\` | Circle box-shadow | theme-based |`,
-      },
-    },
-  },
-};
+| \`--floating-button-shadow\` | Circle box-shadow | theme-based |
 
-export const Default: Story = {
-  render: (args) => <OperationsProgressButton {...args} />,
-  args: {
-    operations: singleUploadOperation,
-    operationsAlert: false,
-    operationsCompleted: false,
-  },
-};
-
-const UploadInProgressTemplate = () => {
-  return (
-    <OperationsProgressButton
-      operations={[
-        {
-          id: "op-1",
-          operation: "upload",
-          label: "Uploading files",
-          alert: false,
-          completed: false,
-          percent: 65,
-        },
-      ]}
-      operationsAlert={false}
-      operationsCompleted={false}
-      showCancelButton
-    />
-  );
-};
-
-export const UploadInProgress: Story = {
-  render: () => <UploadInProgressTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Shows an upload operation in progress at 65%. Hover to see the cancel button.",
-      },
-      source: {
-        code: `<OperationsProgressButton
-  operations={[{ operation: "upload", label: "Uploading files", alert: false, completed: false, percent: 65 }]}
-  showCancelButton
-/>`,
-      },
-    },
-  },
-};
-
-const WithAlertTemplate = () => {
-  return (
-    <OperationsProgressButton
-      operations={[
-        {
-          id: "op-1",
-          operation: "upload",
-          label: "Uploading files",
-          alert: true,
-          completed: false,
-          percent: 40,
-          errorCount: 3,
-        },
-      ]}
-      operationsAlert
-      operationsCompleted={false}
-      needErrorChecking
-    />
-  );
-};
-
-export const WithAlert: Story = {
-  render: () => <WithAlertTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Shows an operation with an error alert. The button displays an alert indicator and the tooltip shows error details.",
-      },
-      source: {
-        code: `<OperationsProgressButton
-  operations={[{ operation: "upload", label: "Uploading files", alert: true, completed: false, percent: 40, errorCount: 3 }]}
-  operationsAlert
-  needErrorChecking
-/>`,
-      },
-    },
-  },
-};
-
-const CompletedOperationTemplate = () => {
-  return (
-    <OperationsProgressButton
-      operations={[
-        {
-          id: "op-1",
-          operation: "copy",
-          label: "Copying files",
-          alert: false,
-          completed: true,
-          percent: 100,
-        },
-      ]}
-      operationsAlert={false}
-      operationsCompleted
-    />
-  );
-};
-
-export const CompletedOperation: Story = {
-  render: () => <CompletedOperationTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Shows a completed operation. The button auto-hides after a brief display of the completion state.",
-      },
-      source: {
-        code: `<OperationsProgressButton
-  operations={[{ operation: "copy", label: "Copying files", alert: false, completed: true, percent: 100 }]}
-  operationsCompleted
-/>`,
-      },
-    },
-  },
-};
-
-const MultipleOperationsTemplate = () => {
-  return (
-    <OperationsProgressButton
-      operations={[
-        {
-          id: "op-1",
-          operation: "upload",
-          label: "Uploading files",
-          alert: false,
-          completed: false,
-          percent: 60,
-        },
-        {
-          id: "op-2",
-          operation: "copy",
-          label: "Copying documents",
-          alert: false,
-          completed: false,
-          percent: 30,
-        },
-      ]}
-      panelOperations={[
-        {
-          id: "op-3",
-          operation: "move",
-          label: "Moving folder",
-          alert: false,
-          completed: false,
-          percent: 80,
-          showPanel: () => console.log("Open move panel"),
-        },
-      ]}
-      operationsAlert={false}
-      operationsCompleted={false}
-    />
-  );
-};
-
-export const MultipleOperations: Story = {
-  render: () => <MultipleOperationsTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Multiple concurrent operations. Click the button to open a dropdown listing all active operations with their individual progress.",
-      },
-      source: {
-        code: `<OperationsProgressButton
-  operations={[
-    { operation: "upload", label: "Uploading files", percent: 60, ... },
-    { operation: "copy", label: "Copying documents", percent: 30, ... },
-  ]}
-  panelOperations={[
-    { operation: "move", label: "Moving folder", percent: 80, ... },
-  ]}
-/>`,
+The button shows the three \`--floating-*\` variables; click it to open the list, which shows the rest: **Moving files** is finished and failed, **Moving to trash** was aborted. Hover **Moving files**' clear icon for \`--ops-progress-icon-hover\`.`,
       },
     },
   },

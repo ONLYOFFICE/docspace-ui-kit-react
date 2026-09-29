@@ -24,14 +24,16 @@ const meta = {
 - **Height Options**: A fixed height from \`heightTextArea\`, 65% of the window height with \`heightScale\`, or a height that follows the number of lines with \`isFullHeight\`
 - **Validation States**: Red border on \`hasError\` or invalid JSON, greyed box on \`isDisabled\`; \`isReadOnly\` blocks typing without changing the look
 - **Content Direction**: Each value picks its own text direction (\`dir="auto"\`), so mixed-script text reads correctly in either interface direction
-- **Focus Control**: Left out of the Tab order unless \`tabIndex\` is set; \`autoFocus\` and \`areaSelect\` focus and select the text on mount
+- **Focus Control**: Takes its natural place in the Tab order; \`autoFocus\` focuses the field on mount and \`areaSelect\` selects the whole text whenever it turns on
 
 ### Accessibility
 
 The text field is a native \`<textarea>\`, so typing, selection and screen-reader announcement come from the platform; the component adds:
 
-- \`tabIndex\` defaults to -1, so Tab skips the field; pass \`tabIndex={0}\` to reach it with the keyboard
-- Name the field with \`<label htmlFor>\` pointing at the \`id\` prop
+- Tab reaches the field in document order; pass \`tabIndex={-1}\` only for a field the keyboard is meant to skip
+- Name the field with \`<label htmlFor>\` pointing at the \`id\` prop, or with \`aria-label\` or \`aria-labelledby\`
+- \`aria-describedby\` points at a hint or an error line, announced after the name
+- \`isDisabled\` sets the native \`disabled\`, which takes the field out of the Tab order; \`isReadOnly\` keeps it focusable and selectable
 - The copy button is a mouse-only control; keyboard users select the text with \`areaSelect\` or a click and copy with the platform shortcut
 
 ### Usage
@@ -42,8 +44,9 @@ import { Textarea } from "@onlyoffice/apps-ui-kit/components/textarea";
 // Basic textarea
 <Textarea value={value} onChange={handleChange} placeholder="Enter text" />
 
-// Reachable with Tab
-<Textarea value={value} onChange={handleChange} tabIndex={0} />
+// Named by a label on screen
+<label htmlFor="comment">Comment</label>
+<Textarea id="comment" value={value} onChange={handleChange} />
 
 // With copy button
 <Textarea value={value} enableCopy copyInfoText="Copied!" />
@@ -161,10 +164,7 @@ import { Textarea } from "@onlyoffice/apps-ui-kit/components/textarea";
     tabIndex: {
       control: "number",
       description:
-        "Tab order of the field; the default -1 keeps it out of the Tab sequence, pass 0 to reach it with the keyboard",
-      table: {
-        defaultValue: { summary: "-1" },
-      },
+        "Tab order of the field; left out, the field takes its natural place in the Tab sequence, and -1 makes the keyboard skip it",
     },
     autoFocus: {
       control: "boolean",
@@ -172,7 +172,8 @@ import { Textarea } from "@onlyoffice/apps-ui-kit/components/textarea";
     },
     areaSelect: {
       control: "boolean",
-      description: "Selects the whole text when the field mounts",
+      description:
+        "Selects the whole text whenever it turns on, for a field the reader is expected to copy from",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -219,6 +220,21 @@ import { Textarea } from "@onlyoffice/apps-ui-kit/components/textarea";
       control: "object",
       description:
         "Inline styles applied to the scroll container that carries the border",
+    },
+    "aria-label": {
+      control: "text",
+      description:
+        "Accessible name of the field, for when no `<label>` points at it",
+    },
+    "aria-labelledby": {
+      control: "text",
+      description:
+        "id of the element on screen that names the field, such as a visible caption",
+    },
+    "aria-describedby": {
+      control: "text",
+      description:
+        "id of the element describing the field, such as a hint or an error line below it; announced after the name",
     },
     dataTestId: {
       control: "text",
@@ -278,7 +294,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "An empty field with a placeholder and a fixed height, the shape most forms start from (`placeholder`, `heightTextArea`); the Controls panel drives every other prop.",
+          "An empty field with a placeholder and a fixed height, the shape most forms start from (`placeholder`, `heightTextArea`); change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<Textarea
@@ -324,8 +340,12 @@ export const States: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Four copies of the same field: plain; with the red border a form shows after failed validation (`hasError`); greyed out and unfocusable (`isDisabled`); read-only, which looks like the plain one but rejects typing (`isReadOnly`).",
+        story: `Four copies of the same field, one per state a form puts it in:
+
+- **Normal textarea** — the plain field
+- **Error state** — the red border a form shows after failed validation (\`hasError\`)
+- **Disabled textarea** — greyed out and unfocusable (\`isDisabled\`)
+- **Read-only textarea** — looks like the plain one but rejects typing (\`isReadOnly\`)`,
       },
       source: {
         code: `<Textarea value="Normal textarea" />
@@ -437,8 +457,10 @@ export const JSONField: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Two JSON fields: the first pretty-prints its value with line numbers (`isJSONField` with `hasNumeration`); the second holds a truncated object and keeps the red border until the text parses as JSON.",
+        story: `Two JSON fields, for values a reader edits as configuration:
+
+- **Left** — a valid object, pretty-printed with line numbers (\`isJSONField\`, \`hasNumeration\`)
+- **Right** — a truncated object, which keeps the red border until the text parses as JSON`,
       },
       source: {
         code: `<Textarea
@@ -479,8 +501,11 @@ export const CustomHeights: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Three heights of the same field, to pick the one that fits the surrounding form (`heightTextArea`).",
+        story: `Three heights of the same field, to pick the one that fits the surrounding form (\`heightTextArea\`):
+
+- **Small textarea** — 80px
+- **Medium textarea** — 150px
+- **Large textarea** — 250px`,
       },
       source: {
         code: `<Textarea value="Small" heightTextArea="80px" />
@@ -535,8 +560,9 @@ export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
   parameters: {
+    noPadding: true,
     docs: {
-      story: { inline: false, height: "200px" },
+      story: { inline: false, height: "146px" },
       description: {
         story:
           'The same field under a right-to-left interface, mirroring the left-to-right layout: the line numbers move to the right edge, the copy button to the left one, and the text starts from the right. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
@@ -585,24 +611,27 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization. The first field shows the shared \`--text-input-*\` tokens; hover and focus it to see the two border variables. The second adds \`hasNumeration\`, the only state in which \`--textarea-numeration-text-color\` has anything to color:
+        story: `CSS Custom Properties for external customization:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--text-input-bg\` | Background color, shared with the other text inputs | theme token |
-| \`--text-input-border-color\` | Border color | theme token |
-| \`--text-input-border-hover\` | Border color while hovered | theme token |
-| \`--text-input-border-focus\` | Border color while focused | theme token |
-| \`--text-input-color\` | Text and caret color | theme token |
-| \`--text-input-radius\` | Border radius | theme token |
+| \`--text-input-bg\` | Background color, shared with the other text inputs | theme-based |
+| \`--text-input-border-color\` | Border color | theme-based |
+| \`--text-input-border-hover\` | Border color while hovered | theme-based |
+| \`--text-input-border-focus\` | Border color while focused | theme-based |
+| \`--text-input-color\` | Text and caret color | theme-based |
+| \`--text-input-radius\` | Border radius | theme-based |
 | \`--textarea-font-size\` | Font size of the line numbers when \`hasNumeration\` is set and \`fontSize\` is left at 13; the text itself follows the \`fontSize\` prop, so any other value puts the numbers out of step with the lines | \`13px\` |
 | \`--textarea-padding\` | Top, end and bottom padding of the text; the start side stays 8px, or the line-number gutter when \`hasNumeration\` is set | \`5px 8px 2px\` |
-| \`--textarea-numeration-text-color\` | Line number color when \`hasNumeration\` is set | theme token |
+| \`--textarea-numeration-text-color\` | Line number color when \`hasNumeration\` is set | theme-based |
 | \`--textarea-width\` | Max width | \`1200px\` |
 | \`--textarea-height\` | Minimum height in the \`heightScale\` and \`isFullHeight\` modes; no effect in the default mode, where the height comes from \`heightTextArea\` | \`89px\` |
-| \`--textarea-height-scale\` | Height when \`heightScale\` is true | \`65vh\` |
+| \`--textarea-height-scale\` | Height of the outer frame when \`heightScale\` is true; the inner scroller keeps its own height from \`--textarea-scrollbar-height-scale\` | \`65vh\` |
+| \`--textarea-scrollbar-height-scale\` | Height of the inner scroller, which carries the border, when \`heightScale\` is true | \`67vh\` |
 | \`--textarea-height-full\` | Height when \`isFullHeight\` is true, never below \`--textarea-height\` | line count times line height |
-| \`--textarea-height-custom\` | Height when \`heightTextArea\` prop is set | prop value |`,
+| \`--textarea-height-custom\` | Height in the default mode (neither \`heightScale\` nor \`isFullHeight\`), whether or not \`heightTextArea\` is set; it wins over the prop | \`heightTextArea\` |
+
+The first field shows the shared \`--text-input-*\` tokens, the padding and the custom height; hover and focus it to see the two border variables. The second adds \`hasNumeration\`, the only state in which \`--textarea-numeration-text-color\` has anything to color.`,
       },
       source: {
         code: `<div

@@ -13,9 +13,29 @@ async function gotoStory(page: Page, storyId: string) {
 }
 
 test.describe("Toast — light", () => {
+  test("default", async ({ page }) => {
+    await gotoStory(page, "default");
+    await expect(page).toHaveScreenshot("toast-default.png");
+  });
+
   test("success", async ({ page }) => {
     await gotoStory(page, "success");
     await expect(page).toHaveScreenshot("toast-success.png");
+  });
+
+  test("custom content", async ({ page }) => {
+    await gotoStory(page, "custom-content");
+    await expect(page).toHaveScreenshot("toast-custom-content.png");
+  });
+
+  test("default titles", async ({ page }) => {
+    await gotoStory(page, "default-titles");
+    await expect(page).toHaveScreenshot("toast-default-titles.png");
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("toast-right-to-left.png");
   });
 
   test("css customization", async ({ page }) => {

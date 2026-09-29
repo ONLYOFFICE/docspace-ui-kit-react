@@ -19,6 +19,18 @@ test.describe("PublicRoomBar — light", () => {
       "public-room-bar-css-customization.png",
     );
   });
+
+  test("with close button", async ({ page }) => {
+    await gotoStory(page, "with-close-button");
+    await expect(page).toHaveScreenshot(
+      "public-room-bar-with-close-button.png",
+    );
+  });
+
+  test("without header", async ({ page }) => {
+    await gotoStory(page, "without-header");
+    await expect(page).toHaveScreenshot("public-room-bar-without-header.png");
+  });
 });
 
 test.describe("PublicRoomBar — dark", () => {

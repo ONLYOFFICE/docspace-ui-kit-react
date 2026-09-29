@@ -2,9 +2,9 @@ import type { CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { createDateTime, formatDate } from "../../utils/date";
+import { createDateTime } from "../../utils/date";
 
-import { TimePicker } from ".";
+import { TimePicker, type TimePickerProps } from ".";
 
 const meta = {
   title: "UI/Form controls/TimePicker",
@@ -12,15 +12,15 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `Time input component that allows users to select or input time values.
+        component: `Two-field hours-and-minutes input for typing a time of day, reported to \`onChange\` as a Luxon \`DateTime\`.
 
 ### Features
 
-- **Keyboard Input**: Users can type time values directly
+- **Keyboard Input**: Takes the time as digits typed into separate hours and minutes fields, with no list or clock face to pick from
 - **HH:mm Format**: Two zero-padded fields separated by a colon, always read left to right, even inside a right-to-left layout
 - **12-Hour Format**: Caps the hours field at 12 and folds the required \`meridiem\` into the value reported to \`onChange\`; nothing marks AM or PM on screen
-- **Error State**: Visual error indicator for validation
-- **Auto Focus**: Option to focus the input on render
+- **Error State**: Draws the border in the error colour for a time the form rejected and keeps it while a field is focused
+- **Auto Focus**: Selects the hours field on mount, so the first digit typed replaces it
 - **Tab Navigation**: Hours and minutes are two Tab stops of their own; \`tabIndex\` moves both in the order
 - **Auto-advance**: Two digits in the hours field, or one digit that cannot start a valid hour, move the caret to minutes; two digits in minutes leave the picker and call \`onBlur\`
 - **Range guard**: Accepts digits only, caps hours at 23 (12 in the 12-hour mode) and minutes at 59, and pads a single digit with a leading zero on blur
@@ -64,7 +64,8 @@ import { TimePicker } from "@onlyoffice/apps-ui-kit/components/time-picker";
     },
     hasError: {
       control: "boolean",
-      description: "Indicates if the picker is in an error state",
+      description:
+        "Whether the border is drawn in the error colour; it stays while a field is focused",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -77,7 +78,7 @@ import { TimePicker } from "@onlyoffice/apps-ui-kit/components/time-picker";
     focusOnRender: {
       control: "boolean",
       description:
-        "Whether to automatically focus the input when the component renders",
+        "Whether the hours field is focused, with its text selected, when the picker mounts",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -106,7 +107,8 @@ import { TimePicker } from "@onlyoffice/apps-ui-kit/components/time-picker";
     },
     onChange: {
       action: "onChange",
-      description: "Callback function called when the time changes",
+      description:
+        "Called on every accepted keystroke with a full `DateTime`: the date from `initialTime` combined with the typed time",
     },
     onBlur: {
       action: "onBlur",
@@ -169,22 +171,18 @@ export const Default: Story = {
   },
 };
 
-const WithErrorTemplate = () => {
-  return (
-    <Wrapper>
-      <TimePicker
-        initialTime={createDateTime(2025, 1, 27, 10, 30, 0)}
-        hasError
-        onChange={(time) =>
-          console.log("Time changed:", formatDate(time, "HH:mm"))
-        }
-      />
-    </Wrapper>
-  );
-};
+const WrappedTemplate = (args: Story["args"]) => (
+  <Wrapper>
+    <TimePicker {...(args as TimePickerProps)} />
+  </Wrapper>
+);
 
 export const WithError: Story = {
-  render: () => <WithErrorTemplate />,
+  render: (args) => <WrappedTemplate {...args} />,
+  args: {
+    initialTime: createDateTime(2025, 1, 27, 10, 30, 0),
+    hasError: true,
+  },
   parameters: {
     docs: {
       description: {
@@ -198,31 +196,29 @@ export const WithError: Story = {
   },
 };
 
-const TwelveHourFormatTemplate = () => {
+const TwelveHourFormatTemplate = ({
+  onChange,
+}: Pick<TimePickerProps, "onChange">) => {
   return (
     <Wrapper>
       <TimePicker
         initialTime={createDateTime(2025, 1, 27, 10, 30, 0)}
         isTwelveHourFormat
         meridiem="AM"
-        onChange={(time) =>
-          console.log("Time changed:", formatDate(time, "hh:mm a"))
-        }
+        onChange={onChange}
       />
       <TimePicker
         initialTime={createDateTime(2025, 1, 27, 14, 30, 0)}
         isTwelveHourFormat
         meridiem="PM"
-        onChange={(time) =>
-          console.log("Time changed:", formatDate(time, "hh:mm a"))
-        }
+        onChange={onChange}
       />
     </Wrapper>
   );
 };
 
 export const TwelveHourFormat: Story = {
-  render: () => <TwelveHourFormatTemplate />,
+  render: (args) => <TwelveHourFormatTemplate onChange={args.onChange} />,
   parameters: {
     docs: {
       description: {
@@ -237,27 +233,17 @@ export const TwelveHourFormat: Story = {
   },
 };
 
-const FocusOnRenderTemplate = () => {
-  return (
-    <Wrapper>
-      <TimePicker
-        initialTime={createDateTime(2025, 1, 27, 10, 30, 0)}
-        focusOnRender
-        onChange={(time) =>
-          console.log("Time changed:", formatDate(time, "HH:mm"))
-        }
-      />
-    </Wrapper>
-  );
-};
-
 export const FocusOnRender: Story = {
-  render: () => <FocusOnRenderTemplate />,
+  render: (args) => <WrappedTemplate {...args} />,
+  args: {
+    initialTime: createDateTime(2025, 1, 27, 10, 30, 0),
+    focusOnRender: true,
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "TimePicker that automatically focuses the input when the component renders. Useful for forms where the time input should receive immediate focus.",
+          "The picker opens with the hours field selected (`focusOnRender`), so a form that asks for a time first takes the digits without a click; type `14` and the caret moves on to minutes.",
       },
       source: {
         code: `<TimePicker initialTime={time} focusOnRender onChange={(time) => console.log(time)} />`,
@@ -306,7 +292,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization. The first box shows the border, background, size and radius variables and the inner fields' text colour; click into it to see \`--time-input-focus-border\`. The second adds \`hasError\`, the only state in which \`--time-input-error-border\` has anything to colour. \`--text-input-bg\` is set to the same value as \`--time-input-bg\` so the fields blend into the box:
+        story: `CSS Custom Properties for external customization:
 
 **TimePicker — input box**
 
@@ -326,7 +312,9 @@ export const CssCustomization: Story = {
 | Variable | Description | Default |
 |----------|-------------|---------|
 | \`--text-input-color\` | Text color | theme-based |
-| \`--text-input-bg\` | Background color | theme-based |`,
+| \`--text-input-bg\` | Background color | theme-based |
+
+The first box shows the border, background, size and radius variables and the inner fields' text colour; click into it to see \`--time-input-focus-border\`. The second adds \`hasError\`, the only state in which \`--time-input-error-border\` has anything to colour. \`--text-input-bg\` is set to the same value as \`--time-input-bg\` so the fields blend into the box.`,
       },
       source: {
         code: `<div

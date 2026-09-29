@@ -23,7 +23,8 @@
     "Section.InfoPanelBody",
     "Section.ChatPanel"
   ],
-  "testIds": []
+  "testIds": [],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Section

@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": "onHide", "loading": null, "disabled": null },
   "related": ["context-menu-button", "drop-down", "rows/row"],
   "subComponents": [],
-  "testIds": ["context-menu"]
+  "testIds": ["context-menu"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # ContextMenu

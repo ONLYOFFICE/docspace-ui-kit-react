@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["room-icon", "avatar", "rectangle"],
   "subComponents": [],
-  "testIds": ["mcp-icon"]
+  "testIds": ["mcp-icon"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # MCPIcon

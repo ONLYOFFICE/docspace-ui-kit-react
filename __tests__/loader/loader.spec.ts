@@ -31,6 +31,28 @@ test.describe("Loader — light", () => {
     await expect(page).toHaveScreenshot("loader-oval.png");
   });
 
+  test("on primary button", async ({ page }) => {
+    await gotoStory(page, "on-primary-button");
+    await page.evaluate(() =>
+      document.querySelectorAll<SVGSVGElement>("svg").forEach((s) => {
+        s.setCurrentTime?.(0);
+        s.pauseAnimations?.();
+      }),
+    );
+    await expect(page).toHaveScreenshot("loader-on-primary-button.png");
+  });
+
+  test("disabled state", async ({ page }) => {
+    await gotoStory(page, "disabled-state");
+    await page.evaluate(() =>
+      document.querySelectorAll<SVGSVGElement>("svg").forEach((s) => {
+        s.setCurrentTime?.(0);
+        s.pauseAnimations?.();
+      }),
+    );
+    await expect(page).toHaveScreenshot("loader-disabled-state.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await page.evaluate(() =>

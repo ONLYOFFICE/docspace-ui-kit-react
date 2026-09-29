@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["floating-button", "loader", "progress-bar"],
   "subComponents": [],
-  "testIds": ["loading-button-container"]
+  "testIds": ["loading-button-container"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # LoadingButton

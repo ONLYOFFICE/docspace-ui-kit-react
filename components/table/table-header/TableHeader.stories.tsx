@@ -30,20 +30,23 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `TableHeader displays column headers with interactive features for data tables.
+        component: `TableHeader is the row of column titles at the top of a table; it also decides the width of every column and writes them onto the table's grid.
 
 ### Features
 
-- **Resizable Columns**: Drag column borders to adjust widths
-- **Sorting**: Click column headers to sort by that field
-- **Column Settings**: Toggle column visibility via a settings dropdown
-- **Info Panel Support**: Adjusts layout when the info panel is visible
-- **Index Editing Mode**: Special mode for reordering items
+- **Column Widths**: Writes the widths of all columns onto the container's grid, and onto each row as well when the body is virtualised, so the header and the cells line up
+- **First Layout**: Gives the column marked \`default\` 40% of the width and shares the rest equally, or shares it all equally with \`withoutWideColumn\`
+- **Resizable Columns**: Lets the user drag the handle between two columns, never below a column's \`minWidth\`, and follows the drag the other way in a right-to-left interface
+- **Remembered Widths**: Saves the widths in \`localStorage\` under \`columnStorageName\`, or under \`columnInfoPanelStorageName\` while \`infoPanelVisible\` is set, and restores them on the next visit
+- **Sorting**: Keeps the arrow of the column matching \`sortBy\` on screen, turns it with \`sorted\`, and calls a column's \`onClick\` when its title is clicked
+- **Column Settings**: Ends with a cog that lists the columns the user may hide, unless \`showSettings\` is off
+- **Running Out of Room**: When the columns no longer fit at their minimum widths, collapses every column but the \`default\` one, greys the cog out and reports it through \`setHideColumns\`
+- **Reorder Mode**: With \`isIndexEditingMode\`, stops columns being resized and greys the cog out while rows are reordered
 
 ### Usage
 
 \`\`\`tsx
-import { TableHeader } from "@onlyoffice/apps-ui-kit/components/table/table-header";
+import { TableHeader } from "@onlyoffice/apps-ui-kit/components/table";
 
 const ref = useRef<HTMLDivElement>(null);
 
@@ -63,10 +66,26 @@ const ref = useRef<HTMLDivElement>(null);
     },
   },
   argTypes: {
-    onClick: { control: false, table: { disable: true } },
-    containerRef: { control: false, table: { disable: true } },
-    setHideColumns: { control: false, table: { disable: true } },
-    tagRef: { control: false, table: { disable: true } },
+    columns: {
+      control: false,
+      description:
+        "The columns in order: title, sort field, callbacks and the flags that shape each one",
+    },
+    containerRef: {
+      control: false,
+      description:
+        "Ref of the TableContainer, whose grid columns the header writes",
+    },
+    columnStorageName: {
+      control: "text",
+      description:
+        "`localStorage` key the column widths are saved under; each table on a site needs its own",
+    },
+    columnInfoPanelStorageName: {
+      control: "text",
+      description:
+        "`localStorage` key used instead while an info panel narrows the table",
+    },
     sortBy: {
       control: "select",
       options: [
@@ -75,42 +94,95 @@ const ref = useRef<HTMLDivElement>(null);
         SortByFieldName.Tags,
         SortByFieldName.Author,
       ],
-      description: "Field name used for the current sort order",
+      description:
+        "Field the table is sorted by; the column with the same `sortBy` keeps its arrow on screen",
     },
     sorted: {
       control: "boolean",
-      description: "Whether the table is currently sorted",
+      description: "Direction of the sort; turning it off turns the arrow over",
+    },
+    sortingVisible: {
+      control: "boolean",
+      description:
+        "Shows the sort arrows and lets a click on a title sort the table",
       table: {
-        defaultValue: { summary: "false" },
+        defaultValue: { summary: "true" },
       },
     },
     showSettings: {
       control: "boolean",
-      description: "Show the column settings dropdown",
+      description: "Shows the cog at the end that lists the columns to hide",
       table: {
-        defaultValue: { summary: "false" },
+        defaultValue: { summary: "true" },
       },
     },
-    sortingVisible: {
-      control: "boolean",
-      description: "Show sorting indicators on column headers",
-      table: {
-        defaultValue: { summary: "false" },
-      },
+    settingsTitle: {
+      control: "text",
+      description: "Hover tooltip of the cog",
     },
     infoPanelVisible: {
       control: "boolean",
-      description: "Whether the info panel is visible",
+      description:
+        "Saves and restores the widths under `columnInfoPanelStorageName`, for the narrower table next to an open info panel",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isIndexEditingMode: {
       control: "boolean",
-      description: "Enable index editing mode for reordering",
+      description:
+        "Stops columns being resized and greys the cog out while rows are reordered",
       table: {
         defaultValue: { summary: "false" },
       },
+    },
+    withoutWideColumn: {
+      control: "boolean",
+      description:
+        "Shares the width equally between the columns instead of giving the `default` column 40%",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    resetColumnsSize: {
+      control: "boolean",
+      description: "Discards the saved widths and lays the columns out afresh",
+    },
+    isLengthenHeader: {
+      control: "boolean",
+      description:
+        "Draws the line under the header across its full width instead of stopping short of the edges",
+    },
+    useReactWindow: {
+      control: "boolean",
+      description:
+        "Set when the body is virtualised, so the header rewrites the widths of the rows it renders",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    sectionWidth: {
+      control: "number",
+      description:
+        "Width of the section around the table in pixels; required, but the header reads its container instead",
+    },
+    setHideColumns: {
+      control: false,
+      description:
+        "Called with `true` when the columns stop fitting and with `false` when they fit again",
+    },
+    tagRef: {
+      control: false,
+      description:
+        "Ref attached to the header cell of the column that asks for it with `withTagRef`",
+    },
+    onClick: {
+      control: false,
+      description: "Accepted, but the header never calls it",
+    },
+    style: {
+      control: false,
+      description: "Accepted, but never applied to the header",
     },
   },
   tags: ["!autodocs"],
@@ -200,7 +272,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default table header with four resizable columns, sorting enabled, and column settings visible.",
+          "The header of a four-column list, sorted by Name: drag the handles between the titles to resize the columns, hover a title to see its arrow, and click the cog to choose columns. Change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<TableHeader
@@ -229,7 +301,7 @@ export const WithoutSettings: Story = {
     docs: {
       description: {
         story:
-          "Table header without the column settings dropdown. Users cannot toggle column visibility.",
+          "The same header without the cog, for a table whose columns are fixed (`showSettings` off).",
       },
       source: {
         code: `<TableHeader
@@ -258,7 +330,7 @@ export const WithoutSorting: Story = {
     docs: {
       description: {
         story:
-          "Table header with sorting indicators hidden. Column headers do not display sort direction arrows.",
+          "The same header for a list in a fixed order: no arrows, and a click on a title does nothing (`sortingVisible` off).",
       },
       source: {
         code: `<TableHeader
@@ -272,6 +344,41 @@ export const WithoutSorting: Story = {
   showSettings
   sortingVisible={false}
 />`,
+      },
+    },
+  },
+};
+
+export const RightToLeft: Story = {
+  render: (args) => (
+    <div dir="rtl">
+      <TableHeaderWrapper {...args} />
+    </div>
+  ),
+  args: {
+    ...Default.args,
+    columnStorageName: "storybook-table-header-rtl-column-storage",
+    columnInfoPanelStorageName: "storybook-table-header-rtl-info-panel-storage",
+  },
+  globals: { direction: "rtl" },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "In a right-to-left interface the first column starts at the right edge and the cog sits at the left; dragging a handle to the left widens the column on its right.",
+      },
+      source: {
+        code: `<div dir="rtl">
+  <TableHeader
+    containerRef={ref}
+    columns={columns}
+    columnStorageName="my-columns"
+    columnInfoPanelStorageName="my-info-panel"
+    sectionWidth={1000}
+    sortBy={SortByFieldName.Name}
+    sorted
+  />
+</div>`,
       },
     },
   },

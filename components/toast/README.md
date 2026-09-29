@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["snackbar", "portal", "icon-button"],
   "subComponents": [],
-  "testIds": ["toast", "toast-content"]
+  "testIds": ["toast", "toast-content"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Toast

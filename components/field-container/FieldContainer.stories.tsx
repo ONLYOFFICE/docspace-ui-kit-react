@@ -18,16 +18,21 @@ const meta = {
 
 ### Features
 
-- **Dual Layout**: Horizontal and vertical alignment options
+- **Dual Layout**: Places the label beside the control or stacks it above
 - **Error Handling**: Built-in error message display with customizable color and width
 - **Required Indicator**: Optional asterisk for required fields
 - **Label Configuration**: Adjustable label width and visibility
 - **Tooltip Support**: Integrated help button with configurable tooltip placement
 - **Inline Help**: Option to render the help button inline within the label
+- **Responsive Layout**: Switches the side-by-side layout to stacked on tablet-width screens and below
+- **Label Association**: Ties the caption to the control by \`id\`, so clicking the caption focuses the control
 
 ### Accessibility
 
-\`labelFor\` is the \`id\` of the control the label belongs to. Give the control the same \`id\` and the caption becomes clickable and is announced with the field; without the pair the label captions nothing.
+The caption is a native \`<label>\`, so the field's name reaches assistive technology only when the consumer pairs it with the control:
+
+- **Label**: \`labelFor\` is the \`id\` of the control the label belongs to. Give the control the same \`id\` and the caption becomes clickable and is announced with the field; without the pair the label captions nothing
+- **Required**: With \`isRequired\` the label carries \`aria-required="true"\` and the asterisk is hidden from screen readers
 
 ### Usage
 
@@ -80,7 +85,7 @@ import { FieldContainer } from "@onlyoffice/apps-ui-kit/components/field-contain
     hasError: {
       control: "boolean",
       description:
-        "When true, displays the field in an error state with error styling",
+        "When true, shows `errorMessage` under the field. The child control is not restyled; give it its own error flag",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -101,7 +106,8 @@ import { FieldContainer } from "@onlyoffice/apps-ui-kit/components/field-contain
     },
     inlineHelpButton: {
       control: "boolean",
-      description: "When true, displays an inline help button with tooltip",
+      description:
+        "When true, the help button is rendered inside the label element, after its text, instead of as a separate element next to the label",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -113,12 +119,12 @@ import { FieldContainer } from "@onlyoffice/apps-ui-kit/components/field-contain
     tooltipContent: {
       control: "text",
       description:
-        "Content to be displayed in the tooltip when hovering over the help icon",
+        "Content of the tooltip that opens when the help icon is clicked. Without it no help icon is rendered",
     },
     maxLabelWidth: {
       control: "text",
       description:
-        "Maximum width of the label element. Can be any valid CSS width value",
+        "Width of the label column in the side-by-side layout: the label takes exactly this width, so the controls of stacked fields line up. Has no effect in the vertical layout",
       table: {
         defaultValue: { summary: "110px" },
       },
@@ -138,7 +144,7 @@ import { FieldContainer } from "@onlyoffice/apps-ui-kit/components/field-contain
     errorColor: {
       control: "color",
       description:
-        "Color used for error messages and indicators. Can be any valid CSS color value.",
+        "Colour of the error message text. The theme's error colour when not given",
     },
     place: {
       control: "select",
@@ -156,6 +162,37 @@ import { FieldContainer } from "@onlyoffice/apps-ui-kit/components/field-contain
       control: "object",
       description: "Custom inline styles to apply to the container",
     },
+    labelFor: {
+      control: "text",
+      description:
+        "`id` of the control this labels, which becomes the label's `for`. Give the control the same `id` and clicking the caption focuses it",
+    },
+    id: {
+      control: "text",
+      description: "HTML `id` of the container",
+    },
+    tooltipClass: {
+      control: "text",
+      description: "Additional CSS class names for the help button",
+    },
+    tooltipMaxWidth: {
+      control: "text",
+      description:
+        "Maximum width of the tooltip. Currently has no effect: the label it is passed to does not read it",
+    },
+    dataTestId: {
+      control: "text",
+      description:
+        "`data-testid` of the container. The help button, when there is one, gets `<dataTestId>_help_button`",
+      table: {
+        defaultValue: { summary: "field-container" },
+      },
+    },
+    children: {
+      control: false,
+      description:
+        "The form control the container lays out, rendered in the field body above the error message",
+    },
   },
 } satisfies Meta<typeof FieldContainer>;
 
@@ -169,6 +206,7 @@ const Template = ({ hasError, ...rest }: FieldContainerProps) => {
   return (
     <FieldContainer hasError={hasError} {...rest}>
       <TextInput
+        id={rest.labelFor}
         value={value}
         hasError={hasError}
         className="field-input"
@@ -187,6 +225,7 @@ export const Default: Story = {
   args: {
     labelText: "Name:",
     labelVisible: true,
+    labelFor: "field-name",
     maxLabelWidth: "110px",
     tooltipContent: "Enter your full name",
     place: "top",
@@ -197,17 +236,19 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Default configuration with horizontal layout and tooltip.",
+        story:
+          "The label sits in a fixed-width column beside the control, with a help icon that opens a tooltip on click. Click the caption to focus the input (`labelFor`); change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<FieldContainer
   labelText="Name:"
   labelVisible
+  labelFor="name"
   maxLabelWidth="110px"
   tooltipContent="Enter your full name"
   place="top"
 >
-  <TextInput value={value} onChange={handleChange} />
+  <TextInput id="name" value={value} onChange={handleChange} />
 </FieldContainer>`,
       },
     },
@@ -220,13 +261,14 @@ export const Required: Story = {
     ...Default.args,
     isRequired: true,
     labelText: "Email:",
+    labelFor: "field-email",
     tooltipContent: "Enter a valid email address",
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Required field with a visual asterisk indicator next to the label.",
+          "Marks a field the form cannot be sent without: an asterisk follows the caption, and the label is announced as required (`isRequired`).",
       },
       source: {
         code: `<FieldContainer
@@ -251,11 +293,13 @@ export const WithError: Story = {
     errorColor: globalColors.lightErrorStatus,
     errorMessageWidth: "293px",
     labelText: "Username:",
+    labelFor: "field-username",
   },
   parameters: {
     docs: {
       description: {
-        story: "Field in error state with custom error message and color.",
+        story:
+          "Tells the user what to correct right under the field: the message appears only while `hasError` is set, in `errorColor`, wrapped at `errorMessageWidth`. The red border belongs to the input, which gets its own `hasError`.",
       },
       source: {
         code: `<FieldContainer
@@ -263,7 +307,7 @@ export const WithError: Story = {
   labelVisible
   hasError
   errorMessage="This field is required"
-  errorColor="#F21C0E"
+  errorColor="#F24724"
   errorMessageWidth="293px"
 >
   <TextInput value={value} hasError onChange={handleChange} />
@@ -280,13 +324,14 @@ export const VerticalLayout: Story = {
     isVertical: true,
     maxLabelWidth: "100%",
     labelText: "Description:",
+    labelFor: "field-description",
     tooltipContent: "Provide a brief description",
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Vertical layout with label displayed above the input field and full-width label.",
+          "For narrow forms and long captions: the label stacks above the control, and both span the full width of the container (`isVertical`). The label column width does not apply here.",
       },
       source: {
         code: `<FieldContainer
@@ -310,12 +355,13 @@ export const WithInlineHelp: Story = {
     inlineHelpButton: true,
     tooltipContent: "This is an inline help message",
     labelText: "Profile URL:",
+    labelFor: "field-profile-url",
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Field with an inline help button rendered within the label instead of as a separate element.",
+          "Makes the help icon part of the caption: it is rendered inside the label, after its text, so it follows the caption's own layout instead of standing as a separate element beside it (`inlineHelpButton`).",
       },
       source: {
         code: `<FieldContainer
@@ -342,12 +388,13 @@ export const CustomStyling: Story = {
       borderRadius: "4px",
     },
     labelText: "Custom Field:",
+    labelFor: "field-custom",
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Field container with custom background, padding, and border-radius applied via inline styles.",
+          "Sets the container apart from the page, here with a background, padding and rounded corners, through `style` and `className`.",
       },
       source: {
         code: `<FieldContainer
@@ -375,7 +422,6 @@ const CssCustomizationTemplate = () => {
           "--field-container-margin": "0 0 32px 0",
           "--field-container-error-top": "8px",
           "--error-color": "#7c3aed",
-          "--error-width": "400px",
         } as CSSProperties
       }
     >
@@ -430,9 +476,12 @@ export const CssCustomization: Story = {
 |----------|-------------|---------|
 | \`--field-container-margin\` | Container margin | \`0 0 16px 0\` |
 | \`--field-container-error-top\` | Error message top padding | \`4px\` |
-| \`--error-color\` | Error message text color | theme token |
-| \`--error-width\` | Error message max width | \`293px\` |
-| \`--label-width\` | Label min/max width in horizontal mode | component prop |`,
+| \`--error-color\` | Error message text color when \`errorColor\` is not given | theme-based |
+
+\`--label-width\` and \`--error-width\` are written inline on the component from \`maxLabelWidth\` and \`errorMessageWidth\`, so a wrapper value never arrives; set those props instead.
+
+- **Full Name** — the error message shows the custom colour and top padding
+- **Email** — the gap between the two fields is the custom container margin`,
       },
     },
   },

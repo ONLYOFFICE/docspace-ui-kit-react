@@ -13,7 +13,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["tiles/tile-container", "tiles/base-tile", "rows"],
   "subComponents": ["TileContainer", "TileContent", "BaseTile", "FileTile", "FolderTile", "RoomTile", "TemplateTile"],
-  "testIds": []
+  "testIds": [],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Tiles

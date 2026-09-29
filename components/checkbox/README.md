@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
   "related": ["toggle-button", "radio-button-group", "field-container"],
   "subComponents": [],
-  "testIds": ["checkbox", "checkbox-help-button"]
+  "testIds": ["checkbox", "checkbox-help-button"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Checkbox

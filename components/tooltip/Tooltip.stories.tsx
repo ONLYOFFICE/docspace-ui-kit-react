@@ -1,8 +1,11 @@
 import type { ComponentProps, CSSProperties } from "react";
+import { useRef, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { TooltipRefProps } from "react-tooltip";
 
 import { globalColors } from "../../providers/theme";
+import { Button, ButtonSize } from "../button";
 import { Link } from "../link";
 import { Text } from "../text";
 import { Tooltip } from ".";
@@ -17,12 +20,23 @@ const meta = {
 
 ### Features
 
-- **12 Placement Options**: top, right, bottom, left with start/end variants
-- **Custom Styling**: Configurable background color, opacity, and max width
+- **Placement**: Sits on the preferred one of twelve sides and corners of the anchor, and flips or shifts to stay inside the viewport
+- **Custom Styling**: Takes its own opacity and maximum width, and its own colours through CSS variables
 - **Click or Hover Trigger**: Choose between hover (default) and click-to-show modes
-- **Dynamic Content**: Generate tooltip content dynamically via \`getContent\` callback
+- **Dynamic Content**: Builds the content for each anchor from that anchor's text and element, so one tooltip serves a whole list
 - **Floating Behavior**: Follow cursor position with the \`float\` prop
-- **Arrow Control**: Show or hide the tooltip arrow pointer
+- **Arrow Control**: Hidden by default, with an optional arrow pointing at the anchor
+- **Controlled and Imperative Opening**: Can be held open or closed by the host, or opened only from code through its ref
+- **Automatic Closing**: Closes on Escape, on scroll, on window resize and on a click outside the anchor
+
+### Accessibility
+
+The tooltip element comes from react-tooltip, which gives it a role; the link to the anchor is left to the consumer.
+
+- **\`role="tooltip"\`**: set on the floating element, so assistive technology announces it as a tooltip once it is shown
+- **No description link**: the anchor gets no \`aria-describedby\`, so a screen reader does not read the tooltip with the anchor; give the anchor an \`aria-label\` or visible text for anything the user must know
+- **Hover and click only**: it never opens on keyboard focus, so a keyboard user does not see it
+- **Escape**: closes the open tooltip
 
 ### Usage
 
@@ -36,7 +50,7 @@ import { Tooltip } from "@onlyoffice/apps-ui-kit/components/tooltip";
 <Tooltip id="my-tooltip" />
 
 // With custom styling
-<Tooltip id="styled" color="green" maxWidth="200px" />
+<Tooltip id="styled" opacity={0.9} maxWidth="200px" />
 
 // Click to show
 <Tooltip id="click" openOnClick />
@@ -71,14 +85,16 @@ import { Tooltip } from "@onlyoffice/apps-ui-kit/components/tooltip";
         "left-start",
         "left-end",
       ],
-      description: "Position of the tooltip relative to the target element",
+      description:
+        "Preferred side of the anchor; the tooltip moves to another side when this one has no room in the viewport",
       table: {
         defaultValue: { summary: "top" },
       },
     },
     color: {
       control: "color",
-      description: "Background color of the tooltip",
+      description:
+        "Background colour of the tooltip, in place of the theme's; removing it later keeps the last colour",
     },
     opacity: {
       control: { type: "range", min: 0, max: 1, step: 0.1 },
@@ -89,27 +105,131 @@ import { Tooltip } from "@onlyoffice/apps-ui-kit/components/tooltip";
     },
     maxWidth: {
       control: "text",
-      description: "Maximum width of the tooltip",
+      description:
+        "Maximum width as a CSS length; longer text wraps onto further lines",
+      table: {
+        defaultValue: { summary: "320px" },
+      },
     },
     noArrow: {
       control: "boolean",
-      description: "Hides the arrow pointer",
+      description:
+        "Hides the arrow that points from the tooltip at its anchor; set it to false to show the arrow",
       table: {
-        defaultValue: { summary: "false" },
+        defaultValue: { summary: "true" },
       },
     },
     openOnClick: {
       control: "boolean",
-      description: "Opens tooltip on click instead of hover",
+      description:
+        "Opens the tooltip on a click instead of on hover, and closes it on the next click",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     float: {
       control: "boolean",
-      description: "Enables floating behavior that follows cursor position",
+      description:
+        "Makes the tooltip follow the pointer instead of sitting at a fixed side of the anchor",
       table: {
         defaultValue: { summary: "false" },
+      },
+    },
+    id: {
+      control: "text",
+      description:
+        "Identifier the anchors point at with data-tooltip-id; without it, or anchorSelect, the tooltip has nothing to attach to",
+    },
+    anchorSelect: {
+      control: "text",
+      description:
+        "CSS selector for the anchors, used instead of data-tooltip-id; it matches elements anywhere in the document",
+    },
+    children: {
+      control: "text",
+      description:
+        "Fixed content, shown for every anchor that has no data-tooltip-content of its own",
+    },
+    getContent: {
+      control: false,
+      description:
+        "Function that receives the anchor's text and element and returns the content to show; it replaces both the anchor's text and children",
+    },
+    offset: {
+      control: "number",
+      description: "Gap between the anchor and the tooltip, in pixels",
+      table: {
+        defaultValue: { summary: "4" },
+      },
+    },
+    fallbackAxisSideDirection: {
+      control: "select",
+      options: ["none", "start", "end"],
+      description:
+        "Whether the tooltip may move to a side on the other axis when the preferred side and its opposite both have no room, and which one it tries first",
+    },
+    delayShow: {
+      control: "number",
+      description:
+        "Time the pointer has to rest on the anchor before the tooltip appears, in milliseconds",
+    },
+    clickable: {
+      control: "boolean",
+      description:
+        "Keeps the tooltip open while the pointer is over it, so a link inside it can be clicked",
+    },
+    isOpen: {
+      control: "boolean",
+      description:
+        "Holds the tooltip open or closed; while it is set, hover and click no longer open or close it",
+    },
+    imperativeModeOnly: {
+      control: "boolean",
+      description:
+        "Stops the anchors opening the tooltip, so it opens only when code calls open() on its ref",
+    },
+    ref: {
+      control: false,
+      description:
+        "Handle with open() and close() methods for opening the tooltip from code",
+    },
+    afterShow: {
+      action: "afterShow",
+      description: "Called after the tooltip has appeared",
+    },
+    afterHide: {
+      action: "afterHide",
+      description: "Called after the tooltip has disappeared",
+    },
+    noUserSelect: {
+      control: "boolean",
+      description:
+        "Stops the text inside the tooltip being selected with the pointer",
+    },
+    zIndex: {
+      control: "number",
+      description:
+        "Stacking order of the wrapper around the tooltip, for placing it above or below other layers",
+    },
+    className: {
+      control: "text",
+      description:
+        "Class added to the wrapper around the tooltip, not to the tooltip itself",
+    },
+    style: {
+      control: "object",
+      description:
+        "Inline style of the wrapper around the tooltip; CSS variables set here reach the tooltip",
+    },
+    tooltipStyle: {
+      control: "object",
+      description: "Inline style of the tooltip itself",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Value of data-testid on the wrapper around the tooltip",
+      table: {
+        defaultValue: { summary: "tooltip" },
       },
     },
   },
@@ -145,7 +265,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default tooltip that appears on hover with floating behavior enabled.",
+          "The basic setup: the anchor names the tooltip with `data-tooltip-id` and carries its text in `data-tooltip-content`. Hover the link to see the tooltip follow the pointer (`float`); change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<Link data-tooltip-id="my-tooltip" data-tooltip-content="Simple tooltip">
@@ -170,7 +290,6 @@ const CustomStylingTemplate = () => {
       </div>
       <Tooltip
         id="styled-tooltip"
-        color="green"
         opacity={0.9}
         maxWidth="200px"
         noArrow={false}
@@ -185,13 +304,18 @@ export const CustomStyling: Story = {
     docs: {
       description: {
         story:
-          "Tooltip with custom background color, opacity, and max width styling.",
+          "For a tooltip that has to stand out from the theme: hover the link to see slight transparency (`opacity`), a narrower width limit (`maxWidth`) and the arrow pointing at the link (`noArrow={false}`).",
       },
       source: {
         code: `<Link data-tooltip-id="styled" data-tooltip-content="Styled tooltip">
   Hover for styled tooltip
 </Link>
-<Tooltip id="styled" color="green" opacity={0.9} maxWidth="200px" />`,
+<Tooltip
+  id="styled"
+  opacity={0.9}
+  maxWidth="200px"
+  noArrow={false}
+/>`,
       },
     },
   },
@@ -219,7 +343,7 @@ export const ClickToShow: Story = {
     docs: {
       description: {
         story:
-          "Tooltip triggered by click instead of hover. Useful for touch devices or explicit actions.",
+          "For touch screens and hints the user asks for: click the link to open the tooltip on its right and click again to close it; hovering does nothing (`openOnClick`).",
       },
       source: {
         code: `<Link data-tooltip-id="click" data-tooltip-content="Click-triggered tooltip">
@@ -235,10 +359,7 @@ const RichContentTemplate = () => {
   return (
     <div style={{ height: "240px" }}>
       <div style={{ ...bodyStyle, position: "absolute" as const }}>
-        <Link
-          data-tooltip-id="rich-tooltip"
-          data-tooltip-content="Bob Johnston"
-        >
+        <Link data-tooltip-id="rich-tooltip" data-tooltip-content="Team member">
           Hover for rich content
         </Link>
       </div>
@@ -253,7 +374,7 @@ const RichContentTemplate = () => {
               {content}
             </Text>
             <Text color={globalColors.gray} fontSize="13px">
-              BobJohnston@gmail.com
+              name@example.com
             </Text>
             <Text fontSize="13px">Developer</Text>
           </div>
@@ -269,10 +390,10 @@ export const RichContent: Story = {
     docs: {
       description: {
         story:
-          "Tooltip with rich content rendered via the getContent callback. Displays structured user information.",
+          "For a hint that needs more than one line of plain text: hover the link to see a bold title taken from the anchor's text, with an address and a title below it (`getContent`).",
       },
       source: {
-        code: `<Link data-tooltip-id="rich" data-tooltip-content="Bob Johnston">
+        code: `<Link data-tooltip-id="rich" data-tooltip-content="Team member">
   Hover for rich content
 </Link>
 <Tooltip
@@ -282,7 +403,7 @@ export const RichContent: Story = {
   getContent={({ content }) => (
     <div>
       <Text isBold>{content}</Text>
-      <Text>BobJohnston@gmail.com</Text>
+      <Text>name@example.com</Text>
       <Text>Developer</Text>
     </div>
   )}
@@ -294,9 +415,9 @@ export const RichContent: Story = {
 
 const DynamicGroupTemplate = () => {
   const users = [
-    { name: "Bob", email: "bob@example.com", position: "Developer" },
-    { name: "Alice", email: "alice@example.com", position: "Designer" },
-    { name: "Charlie", email: "charlie@example.com", position: "Manager" },
+    { name: "Member A", email: "a@example.com", position: "Developer" },
+    { name: "Member B", email: "b@example.com", position: "Designer" },
+    { name: "Member C", email: "c@example.com", position: "Manager" },
   ];
 
   return (
@@ -334,13 +455,292 @@ const DynamicGroupTemplate = () => {
   );
 };
 
+export const SharedByManyAnchors: Story = {
+  render: () => <DynamicGroupTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a list where every row needs its own hint: hover each name to see one tooltip show that member's details, looked up from the index the anchor carries (`getContent`).",
+      },
+      source: {
+        code: `{users.map((user, index) => (
+  <Link data-tooltip-id="group" data-tooltip-content={index}>
+    {user.name}
+  </Link>
+))}
+<Tooltip
+  id="group"
+  getContent={({ content }) => {
+    const user = users[Number(content)];
+    return <div><Text isBold>{user.name}</Text></div>;
+  }}
+/>`,
+      },
+    },
+  },
+};
+
+const FixedContentTemplate = () => {
+  return (
+    <div style={{ height: "240px" }}>
+      <div style={{ ...bodyStyle, position: "absolute" as const }}>
+        <Link data-tooltip-id="fixed-content-tooltip">Hover me</Link>
+      </div>
+      <Tooltip id="fixed-content-tooltip">
+        <Text fontSize="12px">
+          Shown for every anchor without text of its own
+        </Text>
+      </Tooltip>
+    </div>
+  );
+};
+
+export const FixedContent: Story = {
+  render: () => <FixedContentTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For content written once in the markup rather than on each anchor: hover the link, which has no `data-tooltip-content`, to see the tooltip's own children.",
+      },
+      source: {
+        code: `<Link data-tooltip-id="fixed">Hover me</Link>
+<Tooltip id="fixed">
+  <Text>Shown for every anchor without text of its own</Text>
+</Tooltip>`,
+      },
+    },
+  },
+};
+
+const AnchoredBySelectorTemplate = () => {
+  return (
+    <div style={{ padding: "20px", display: "flex", gap: "20px" }}>
+      <Link className="selector-anchor" data-tooltip-content="First file">
+        First
+      </Link>
+      <Link className="selector-anchor" data-tooltip-content="Second file">
+        Second
+      </Link>
+      <Tooltip anchorSelect=".selector-anchor" place="bottom" />
+    </div>
+  );
+};
+
+export const AnchoredBySelector: Story = {
+  render: () => <AnchoredBySelectorTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For anchors that cannot carry a `data-tooltip-id`: hover either link to see the tooltip below it; both are found by their class (`anchorSelect`). The selector is matched across the whole page.",
+      },
+      source: {
+        code: `<Link className="file-link" data-tooltip-content="First file">
+  First
+</Link>
+<Link className="file-link" data-tooltip-content="Second file">
+  Second
+</Link>
+<Tooltip anchorSelect=".file-link" place="bottom" />`,
+      },
+    },
+  },
+};
+
+const ClickableContentTemplate = () => {
+  return (
+    <div style={{ height: "240px" }}>
+      <div style={{ ...bodyStyle, position: "absolute" as const }}>
+        <Link data-tooltip-id="clickable-tooltip">Hover me</Link>
+      </div>
+      <Tooltip id="clickable-tooltip" clickable place="bottom">
+        <Text fontSize="12px">
+          Move the pointer here and <Link href="#">follow the link</Link>
+        </Text>
+      </Tooltip>
+    </div>
+  );
+};
+
+export const ClickableContent: Story = {
+  render: () => <ClickableContentTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a tooltip with a link inside: hover the anchor, then move the pointer into the tooltip; it stays open, so the link can be clicked (`clickable`).",
+      },
+      source: {
+        code: `<Link data-tooltip-id="clickable">Hover me</Link>
+<Tooltip id="clickable" clickable place="bottom">
+  <Text>
+    Move the pointer here and <Link href="#">follow the link</Link>
+  </Text>
+</Tooltip>`,
+      },
+    },
+  },
+};
+
+const DelayedAppearanceTemplate = () => {
+  return (
+    <div style={{ height: "240px" }}>
+      <div style={{ ...bodyStyle, position: "absolute" as const }}>
+        <Link
+          data-tooltip-id="delayed-tooltip"
+          data-tooltip-content="Appears after one second"
+        >
+          Rest the pointer here
+        </Link>
+      </div>
+      <Tooltip id="delayed-tooltip" delayShow={1000} />
+    </div>
+  );
+};
+
+export const DelayedAppearance: Story = {
+  render: () => <DelayedAppearanceTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For anchors the pointer often crosses on its way elsewhere: rest the pointer on the link for a second before the tooltip appears; passing over it shows nothing (`delayShow`).",
+      },
+      source: {
+        code: `<Link data-tooltip-id="delayed" data-tooltip-content="Appears after one second">
+  Rest the pointer here
+</Link>
+<Tooltip id="delayed" delayShow={1000} />`,
+      },
+    },
+  },
+};
+
+const ControlledOpenTemplate = () => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div style={{ height: "240px" }}>
+      <div style={{ ...bodyStyle, position: "absolute" as const }}>
+        <span
+          data-tooltip-id="controlled-tooltip"
+          data-tooltip-content="Opened by the button, not by hover"
+        >
+          <Button
+            label={open ? "Hide tooltip" : "Show tooltip"}
+            size={ButtonSize.small}
+            onClick={() => setOpen(!open)}
+          />
+        </span>
+      </div>
+      <Tooltip id="controlled-tooltip" place="right" isOpen={open} />
+    </div>
+  );
+};
+
+export const ControlledOpen: Story = {
+  render: () => <ControlledOpenTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a tooltip the host decides to show, such as after a failed action: click the button to open the tooltip and again to close it; hovering no longer does either (`isOpen`).",
+      },
+      source: {
+        code: `const [open, setOpen] = useState(false);
+
+<span
+  data-tooltip-id="controlled"
+  data-tooltip-content="Opened by the button, not by hover"
+>
+  <Button
+    label={open ? "Hide tooltip" : "Show tooltip"}
+    onClick={() => setOpen(!open)}
+  />
+</span>
+<Tooltip id="controlled" place="right" isOpen={open} />`,
+      },
+    },
+  },
+};
+
+const OpenedFromCodeTemplate = () => {
+  const tooltipRef = useRef<TooltipRefProps | null>(null);
+
+  return (
+    <div style={{ height: "240px" }}>
+      <div
+        style={{
+          ...bodyStyle,
+          position: "absolute" as const,
+          display: "flex",
+          gap: "12px",
+        }}
+      >
+        <Button
+          id="imperative-anchor"
+          label="Open"
+          size={ButtonSize.small}
+          onClick={() =>
+            tooltipRef.current?.open({
+              anchorSelect: "#imperative-anchor",
+              content: "Opened from code",
+            })
+          }
+        />
+        <Button
+          label="Close"
+          size={ButtonSize.small}
+          onClick={() => tooltipRef.current?.close()}
+        />
+      </div>
+      <Tooltip
+        ref={tooltipRef}
+        id="imperative-tooltip"
+        place="bottom"
+        imperativeModeOnly
+      />
+    </div>
+  );
+};
+
+export const OpenedFromCode: Story = {
+  render: () => <OpenedFromCodeTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a tooltip shown at a moment only the code knows: click **Open** to see the tooltip below it and **Close** to hide it; hovering either button shows nothing (`imperativeModeOnly` with `ref`).",
+      },
+      source: {
+        code: `const tooltipRef = useRef<TooltipRefProps | null>(null);
+
+<Button
+  id="open"
+  label="Open"
+  onClick={() =>
+    tooltipRef.current?.open({
+      anchorSelect: "#open",
+      content: "Opened from code",
+    })
+  }
+/>
+<Button label="Close" onClick={() => tooltipRef.current?.close()} />
+<Tooltip ref={tooltipRef} id="imperative" place="bottom" imperativeModeOnly />`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
     <div style={{ height: "200px", position: "relative" }}>
       <div style={{ position: "absolute", top: 80, left: 100 }}>
         <Link
           data-tooltip-id="css-customization-tooltip"
-          data-tooltip-content="Custom tooltip"
+          data-tooltip-content="Custom tooltip with a narrower width that wraps"
         >
           Hover to see custom tooltip
         </Link>
@@ -355,6 +755,9 @@ export const CssCustomization: Story = {
             "--tooltip-bg": "#1e1b4b",
             "--tooltip-color": "#e0e7ff",
             "--tooltip-shadow": "0 4px 16px rgba(0,0,0,0.4)",
+            "--tooltip-text-size": "14px",
+            "--tooltip-max-width-value": "180px",
+            "--tooltip-layer": "1000",
           } as CSSProperties
         }
       />
@@ -363,52 +766,33 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization. Pass via the \`style\` prop on \`<Tooltip>\`:
+        story: `CSS Custom Properties for external customization:
 
-\`\`\`css
---tooltip-bg           /* background color (replaces theme color) */
---tooltip-color        /* text color (replaces theme color) */
---tooltip-max-width-value /* max-width override */
---tooltip-radius       /* border radius (default: 6px) */
---tooltip-shadow       /* box-shadow (default: 0 2px 4px rgba(0,0,0,0.15)) */
---tooltip-inner-padding /* padding (default: 8px 12px) */
---tooltip-text-size    /* font-size (default: 12px) */
---tooltip-layer        /* z-index (default: 999) */
-\`\`\``,
+| Variable | Description | Default |
+| --- | --- | --- |
+| \`--tooltip-bg\` | Background colour, in place of the theme's | theme-based |
+| \`--tooltip-color\` | Text colour, in place of the theme's | theme-based |
+| \`--tooltip-radius\` | Corner radius | \`6px\` |
+| \`--tooltip-shadow\` | Shadow around the tooltip | \`0 2px 4px rgba(0, 0, 0, 0.15)\` |
+| \`--tooltip-inner-padding\` | Space between the edge and the content | \`8px 12px\` |
+| \`--tooltip-text-size\` | Font size of plain text content | \`12px\` |
+| \`--tooltip-max-width-value\` | Width limit, in place of \`maxWidth\`; never wider than the window | \`320px\` |
+| \`--tooltip-layer\` | Stacking order of the tooltip against other layers | \`999\` |
+
+The tooltip renders in a portal outside the story's markup, so the variables go on its own \`style\` prop, which lands on the wrapper around it. Hover the link to see all of them at once; the stacking order has no visible effect here.`,
       },
       source: {
         code: `<Tooltip
   id="custom"
   style={{
     "--tooltip-radius": "16px",
+    "--tooltip-inner-padding": "12px 20px",
     "--tooltip-bg": "#1e1b4b",
     "--tooltip-color": "#e0e7ff",
-  }}
-/>`,
-      },
-    },
-  },
-};
-
-export const DynamicGroup: Story = {
-  render: () => <DynamicGroupTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "A single tooltip shared by multiple trigger elements. Uses getContent to display different data for each anchor.",
-      },
-      source: {
-        code: `{users.map((user, index) => (
-  <Link data-tooltip-id="group" data-tooltip-content={index}>
-    {user.name}
-  </Link>
-))}
-<Tooltip
-  id="group"
-  getContent={({ content }) => {
-    const user = users[Number(content)];
-    return <div><Text isBold>{user.name}</Text></div>;
+    "--tooltip-shadow": "0 4px 16px rgba(0,0,0,0.4)",
+    "--tooltip-text-size": "14px",
+    "--tooltip-max-width-value": "180px",
+    "--tooltip-layer": "1000",
   }}
 />`,
       },

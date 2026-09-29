@@ -25,6 +25,11 @@ test.describe("Text — light", () => {
     await expect(page).toHaveScreenshot("text-font-sizes.png");
   });
 
+  test("with tooltip", async ({ page }) => {
+    await gotoStory(page, "with-tooltip");
+    await expect(page).toHaveScreenshot("text-with-tooltip.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("text-css-customization.png");

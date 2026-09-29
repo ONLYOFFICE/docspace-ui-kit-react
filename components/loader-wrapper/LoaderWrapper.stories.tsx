@@ -14,10 +14,14 @@ const meta = {
 
 ### Features
 
-- **Soft Overlay**: Reduces opacity to 0.5 instead of hiding content
-- **Interaction Lock**: Automatically disables pointer events to prevent accidental clicks
-- **Smooth Transition**: 0.3s ease-in-out opacity animation
-- **Plug-and-Play**: Works with any child tree and keeps layout intact
+- **Dimmed Content**: Fades the children to half opacity while \`isLoading\` is set, keeping them on screen instead of hiding them
+- **Pointer Lock**: Stops mouse clicks, hovers and wheel scrolling from reaching the children while loading
+- **Keyboard Left Alone**: Keeps keyboard focus and key presses working inside the dimmed content, so controls that must not be used need their own disabled state
+- **Smooth Transition**: Animates the fade in and out over 0.3 seconds
+- **No Indicator Of Its Own**: Draws no spinner, overlay or text, so a loader or a skeleton has to be placed beside it
+- **Mounted Children**: Keeps the children mounted while dimmed, so their state and effects survive the loading phase
+- **Flex Column Layout**: Lays the children out in a column that grows to fill a flex parent and can shrink below its content height
+- **Customizable Look**: Takes the dimmed opacity, the idle opacity and the transition from CSS variables
 
 ### Usage
 
@@ -27,6 +31,17 @@ import { LoaderWrapper } from "@onlyoffice/apps-ui-kit/components/loader-wrapper
 <LoaderWrapper isLoading={isLoading}>
   <SectionContent />
 </LoaderWrapper>
+\`\`\`
+
+\`\`\`tsx
+import { Loader } from "@onlyoffice/apps-ui-kit/components/loader";
+
+<>
+  {isSaving ? <Loader /> : null}
+  <LoaderWrapper isLoading={isSaving}>
+    <SettingsForm />
+  </LoaderWrapper>
+</>
 \`\`\``,
       },
     },
@@ -35,15 +50,17 @@ import { LoaderWrapper } from "@onlyoffice/apps-ui-kit/components/loader-wrapper
   argTypes: {
     children: {
       control: false,
-      description: "Content to render inside the wrapper",
+      description:
+        "The content that is dimmed and made unclickable while loading. It is laid out in a flex column",
     },
     isLoading: {
       control: "boolean",
-      description: "Toggles the loading overlay style and interaction lock",
+      description:
+        "Whether the content is busy: fades the content to half opacity and stops the mouse reaching it. Shows no spinner and does not block the keyboard",
     },
     testId: {
       control: "text",
-      description: "Optional data-testid override for automated testing",
+      description: "Replaces the wrapper's `data-testid`",
       table: {
         defaultValue: { summary: "loader-wrapper" },
       },
@@ -78,7 +95,7 @@ const cardContent = (
   </div>
 );
 
-export const IdleContent: Story = {
+export const Default: Story = {
   render: (args) => <LoaderWrapper {...args} />,
   args: {
     isLoading: false,
@@ -88,40 +105,12 @@ export const IdleContent: Story = {
     docs: {
       description: {
         story:
-          "Content in idle state with full opacity and pointer events enabled.",
+          "The content as it looks when nothing is loading: fully opaque and clickable. Switch `isLoading` in the Controls panel below to watch it fade and back.",
       },
       source: {
         code: `<LoaderWrapper isLoading={false}>
   <CardContent />
 </LoaderWrapper>`,
-      },
-    },
-  },
-};
-
-export const CssCustomization: Story = {
-  render: () => (
-    <div
-      style={
-        {
-          "--loader-wrapper-loading-opacity": "0.3",
-          "--loader-wrapper-transition": "opacity 0.6s ease-in-out",
-        } as CSSProperties
-      }
-    >
-      <LoaderWrapper isLoading>{cardContent}</LoaderWrapper>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--loader-wrapper-loading-opacity\` | Opacity when in loading state | \`0.5\` |
-| \`--loader-wrapper-idle-opacity\` | Opacity when idle | \`1\` |
-| \`--loader-wrapper-transition\` | CSS transition for opacity | \`opacity 0.3s ease-in-out\` |`,
       },
     },
   },
@@ -137,12 +126,63 @@ export const LoadingContent: Story = {
     docs: {
       description: {
         story:
-          "Content in loading state with reduced opacity (0.5) and pointer events disabled.",
+          "The same card while loading: it stays on screen at half opacity so the reader keeps their place, and the button no longer answers the mouse (`isLoading`). Place a loader beside it to say why.",
       },
       source: {
         code: `<LoaderWrapper isLoading>
   <CardContent />
 </LoaderWrapper>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--loader-wrapper-loading-opacity": "0.3",
+          "--loader-wrapper-idle-opacity": "0.8",
+          "--loader-wrapper-transition": "opacity 0.6s ease-in-out",
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+        } as CSSProperties
+      }
+    >
+      <LoaderWrapper isLoading>{cardContent}</LoaderWrapper>
+      <LoaderWrapper isLoading={false}>{cardContent}</LoaderWrapper>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--loader-wrapper-loading-opacity\` | Opacity when in loading state | \`0.5\` |
+| \`--loader-wrapper-idle-opacity\` | Opacity when idle | \`1\` |
+| \`--loader-wrapper-transition\` | CSS transition for opacity | \`opacity 0.3s ease-in-out\` |
+
+The first card is loading and shows \`--loader-wrapper-loading-opacity\`; the second is idle and shows \`--loader-wrapper-idle-opacity\`. \`--loader-wrapper-transition\` takes effect only when \`isLoading\` changes on an instance, which these two cards never do.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--loader-wrapper-loading-opacity": "0.3",
+    "--loader-wrapper-idle-opacity": "0.8",
+    "--loader-wrapper-transition": "opacity 0.6s ease-in-out",
+  }}
+>
+  <LoaderWrapper isLoading>
+    <CardContent />
+  </LoaderWrapper>
+  <LoaderWrapper isLoading={false}>
+    <CardContent />
+  </LoaderWrapper>
+</div>`,
       },
     },
   },

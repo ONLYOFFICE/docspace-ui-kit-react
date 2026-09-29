@@ -13,7 +13,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["loader", "loader-wrapper", "top-loading-indicator"],
   "subComponents": [],
-  "testIds": ["app-loader"]
+  "testIds": ["app-loader"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # AppLoader

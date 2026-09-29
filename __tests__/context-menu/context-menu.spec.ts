@@ -115,6 +115,19 @@ test.describe("ContextMenu — item variants (light)", () => {
       "context-menu-mobile-with-avatar-header.png",
     );
   });
+
+  test("anchored to element", async ({ page }) => {
+    await gotoStory(page, "anchored-to-element");
+    await page.click('[data-testid="trigger"]');
+    await page.locator(".p-contextmenu").first().waitFor({ state: "visible" });
+    await expect(page).toHaveScreenshot("context-menu-anchored-to-element.png");
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await openMenu(page);
+    await expect(page).toHaveScreenshot("context-menu-right-to-left.png");
+  });
 });
 
 test.describe("ContextMenu — item variants (dark)", () => {

@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["date-picker", "date-time-picker", "scrollbar"],
   "subComponents": [],
-  "testIds": ["calendar"]
+  "testIds": ["calendar"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Calendar

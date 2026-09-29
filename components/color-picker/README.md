@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": "onClose", "loading": null, "disabled": null },
   "related": ["color-input", "drop-down", "button"],
   "subComponents": [],
-  "testIds": ["color-picker"]
+  "testIds": ["color-picker"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # ColorPicker

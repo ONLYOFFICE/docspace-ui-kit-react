@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["empty-view", "error-container", "rectangle"],
   "subComponents": [],
-  "testIds": ["empty-screen-container"]
+  "testIds": ["empty-screen-container"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # EmptyScreenContainer

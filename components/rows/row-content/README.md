@@ -13,7 +13,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["rows", "rows/row", "text"],
   "subComponents": [],
-  "testIds": ["row-content", "main-container-wrapper", "side-container", "tablet-side-info"]
+  "testIds": ["row-content", "main-container-wrapper", "side-container", "tablet-side-info"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # RowContent

@@ -12,7 +12,8 @@
   "state": { "visibility": "open", "close": "clickOutsideAction", "loading": null, "disabled": null },
   "related": ["drop-down-item", "context-menu", "backdrop"],
   "subComponents": [],
-  "testIds": ["dropdown"]
+  "testIds": ["dropdown"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # DropDown

@@ -15,16 +15,17 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `Password input with built-in validation, strength indicators, visibility toggle, and password generation.
+        component: `Password field that checks the value against a set of rules and shows which ones it meets, for sign-up and password-change forms.
 
 ### Features
 
-- **Validation Tooltip**: Shows password requirements (length, uppercase, digits, special characters)
-- **Strength Indicator**: Visual progress bar for password strength
-- **Visibility Toggle**: Show/hide password content
-- **Password Generator**: Built-in password generation button
-- **Simple View**: Minimal mode without validation UI for login forms
+- **Validation Tooltip**: Opens next to the field as the user types while the value is shorter than the minimum length or the field has an error or warning, and lists each required rule in green once met and red until then
+- **Rule Checking**: Checks the value on every change and reports whether all rules pass, and each rule's own result, through \`onValidateInput\`
+- **Visibility Toggle**: An eye button at the end of the field shows and hides the characters, and disabling the field hides them again
+- **Password Generator**: An optional link in the tooltip fills the field with a random password that meets the enabled rules and reveals it
+- **Simple View**: Strips the component down to the field and the eye button, with no tooltip and no rule checking, for sign-in forms
 - **Customizable Rules**: Configurable minimum length and character requirements
+- **Value Sanitising**: Runs an optional function on every change before the value is stored, such as one that strips spaces
 
 ### Usage
 
@@ -46,6 +47,31 @@ import { PasswordInput } from "@onlyoffice/apps-ui-kit/components/password-input
   tooltipPasswordCapital="capital letters"
   tooltipPasswordSpecial="special characters"
 />
+\`\`\`
+
+A sign-in field, with no rules and no tooltip:
+
+\`\`\`tsx
+<PasswordInput
+  simpleView
+  inputValue={value}
+  onChange={(e, value) => setValue(value ?? "")}
+  placeholder="Password"
+/>
+\`\`\`
+
+A sign-up field with a generator link in the tooltip:
+
+\`\`\`tsx
+<PasswordInput
+  inputValue={value}
+  onChange={(e, value) => setValue(value ?? "")}
+  passwordSettings={{ minLength: 8, digits: true }}
+  tooltipPasswordLength="minimum length: 8"
+  tooltipPasswordDigits="digits"
+  generatePasswordTitle="Generate password"
+  onValidateInput={(isValid) => setCanSubmit(isValid)}
+/>
 \`\`\``,
       },
     },
@@ -54,46 +80,220 @@ import { PasswordInput } from "@onlyoffice/apps-ui-kit/components/password-input
     size: {
       control: "select",
       options: Object.values(InputSize),
-      description: "Size of the input field",
+      description: "Height and font size of the field",
       table: {
-        defaultValue: { summary: "base" },
+        defaultValue: { summary: "middle" },
       },
     },
     simpleView: {
       control: "boolean",
-      description: "Simple view without validation indicators",
+      description:
+        "Strips the component down to the field and the eye button: no tooltip, no generator link and no rule checking",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isDisabled: {
       control: "boolean",
-      description: "Disable the input field",
+      description:
+        "Greys the field out, blocks typing and generation, drops the tooltip and hides the characters again",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isDisableTooltip: {
       control: "boolean",
-      description: "Disable the validation tooltip",
+      description: "Never shows the rules tooltip",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     maxLength: {
       control: "number",
-      description: "Maximum password length",
+      description: "Maximum number of characters the field accepts",
     },
     inputWidth: {
       control: "text",
-      description: "Custom width of the input field",
+      description:
+        "Width of the field as a CSS length; left out, the field fills its container",
     },
     scale: {
       control: "boolean",
-      description: "Scale input to 100% width",
+      description: "Stretches the field to the full width of its container",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    inputValue: {
+      control: "text",
+      description:
+        "Value the field starts with; the component keeps its own value from then on and only follows a later change to an empty string",
+    },
+    inputName: {
+      control: "text",
+      description:
+        "`name` of the field, also used to find the field for the tooltip when no `id` is given, so two fields on one page need distinct names or ids",
+      table: {
+        defaultValue: { summary: "passwordInput" },
+      },
+    },
+    id: {
+      control: "text",
+      description:
+        "`id` of the field's wrapper, used to find the field for the tooltip",
+    },
+    placeholder: {
+      control: "text",
+      description: "Hint shown in the empty field",
+    },
+    inputType: {
+      control: "radio",
+      options: ["password", "text"],
+      description:
+        "Whether the field starts with its characters shown (`text`) or hidden (`password`); the eye button toggles it from then on",
+      table: {
+        defaultValue: { summary: "password" },
+      },
+    },
+    passwordSettings: {
+      control: "object",
+      description:
+        "The rules the checker and the generator use: minimum length, and whether capitals, digits and special characters are required",
+      table: {
+        defaultValue: { summary: "{ minLength: 8 }" },
+      },
+    },
+    hasError: {
+      control: "boolean",
+      description:
+        "Draws the field with a red error border, and the rules tooltip opens on every change",
       table: {
         defaultValue: { summary: "false" },
       },
+    },
+    hasWarning: {
+      control: "boolean",
+      description:
+        "Draws the field with a warning border, and the rules tooltip opens on every change",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    tooltipPasswordTitle: {
+      control: "text",
+      description: "Heading of the rules tooltip",
+    },
+    tooltipPasswordLength: {
+      control: "text",
+      description:
+        "Tooltip line for the minimum length rule, including the number",
+    },
+    tooltipPasswordDigits: {
+      control: "text",
+      description:
+        "Tooltip line for the digits rule, shown when digits are required",
+    },
+    tooltipPasswordCapital: {
+      control: "text",
+      description:
+        "Tooltip line for the capital letters rule, shown when capitals are required",
+    },
+    tooltipPasswordSpecial: {
+      control: "text",
+      description:
+        "Tooltip line for the special characters rule, shown when they are required",
+    },
+    tooltipAllowedCharacters: {
+      control: "text",
+      description: "Extra text shown in the tooltip after the rules",
+    },
+    generatePasswordTitle: {
+      control: "text",
+      description:
+        "Text of a link at the bottom of the tooltip that fills the field with a random password meeting the rules; left out, no link is shown",
+    },
+    generatorSpecial: {
+      control: "text",
+      description: "Characters the generator may pick special characters from",
+      table: {
+        defaultValue: { summary: "!@#$%^&*" },
+      },
+    },
+    isFullWidth: {
+      control: "boolean",
+      description:
+        "Makes the component a full-width block instead of a row that shrinks to the field",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isSimulateType: {
+      control: false,
+      description:
+        "Draws each character as `simulateSymbol` in a plain text field while keeping the real value; the field's `id` must be `conversion-password`",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    simulateSymbol: {
+      control: "text",
+      description: "Character drawn for each real one under `isSimulateType`",
+      table: {
+        defaultValue: { summary: "•" },
+      },
+    },
+    autoComplete: {
+      control: "text",
+      description: "`autocomplete` attribute of the field",
+      table: {
+        defaultValue: { summary: "new-password" },
+      },
+    },
+    tabIndex: {
+      control: "number",
+      description: "Position of the field in the Tab order",
+    },
+    isAutoFocussed: {
+      control: "boolean",
+      description: "Focuses the field when it mounts",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    onChange: {
+      action: "onChange",
+      description:
+        "Called on every change with the DOM event and the stored value; read the second argument, since a generated password arrives without a real event",
+    },
+    onValidateInput: {
+      action: "onValidateInput",
+      description:
+        "Called after every change with whether all rules pass and with each rule's own result; never called in `simpleView`",
+    },
+    sanitizeValue: {
+      control: false,
+      description:
+        "Function run on every change before the value is stored, such as one that strips spaces",
+    },
+    onBlur: {
+      action: "onBlur",
+      description: "Called when the field loses focus",
+    },
+    onKeyDown: {
+      action: "onKeyDown",
+      description: "Called on every key press in the field",
+    },
+    emailInputName: {
+      control: false,
+      description: "Ignored: it feeds a copy button that is not rendered",
+    },
+    clipActionResource: {
+      control: false,
+      description: "Ignored: it feeds a copy button that is not rendered",
+    },
+    clipCopiedResource: {
+      control: false,
+      description: "Ignored: it feeds a copy button that is not rendered",
     },
   },
 } satisfies Meta<typeof PasswordInput>;
@@ -155,12 +355,15 @@ const PasswordInputTemplate = ({
       <PasswordInput
         size={InputSize.base}
         {...args}
+        scale
         inputValue={value}
-        onChange={(e) => setValue(e.currentTarget?.value)}
-        tooltipPasswordLength={`${args.tooltipPasswordLength} ${passwordSettings?.minLength}`}
+        onChange={(e, v) => {
+          setValue(v ?? "");
+          onChange?.(e, v);
+        }}
+        tooltipPasswordLength={`${args.tooltipPasswordLength}${passwordSettings?.minLength}`}
         passwordSettings={settings}
         onValidateInput={onValidateInput}
-        scale
       />
     </div>
   );
@@ -173,12 +376,40 @@ export const Default: Story = {
     passwordSettings: basePasswordSettings,
     simpleView: false,
     inputName: "demoPasswordInput-default",
-    emailInputName: "demoEmailInput",
     isDisableTooltip: false,
     ...baseTooltipProps,
     placeholder: "password",
     maxLength: 30,
     size: InputSize.base,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The field as a sign-up form uses it: type a character to open the rules tooltip and watch each rule turn green as the value meets it; change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<PasswordInput
+  inputValue={value}
+  onChange={(e, value) => setValue(value ?? "")}
+  onValidateInput={(isValid, rules) => setCanSubmit(isValid)}
+  passwordSettings={{
+    minLength: 6,
+    upperCase: true,
+    digits: true,
+    specSymbols: true,
+  }}
+  tooltipPasswordTitle="Password must contain:"
+  tooltipPasswordLength="minimum length: 6"
+  tooltipPasswordDigits="digits"
+  tooltipPasswordCapital="capital letters"
+  tooltipPasswordSpecial="special characters (!@#$%^&*)"
+  placeholder="password"
+  maxLength={30}
+  size={InputSize.base}
+/>`,
+      },
+    },
   },
 };
 
@@ -206,7 +437,7 @@ export const SimpleView: Story = {
     docs: {
       description: {
         story:
-          "Simple view mode hides validation indicators and the strength bar. Ideal for login forms where validation feedback is not needed.",
+          "A sign-in form only needs the field and the eye button: the simple view drops the rules tooltip and skips rule checking, so the field accepts any value (`simpleView`).",
       },
       source: {
         code: `<PasswordInput
@@ -253,7 +484,7 @@ export const States: Story = {
     docs: {
       description: {
         story:
-          "PasswordInput supports normal, disabled, and error states. Each state provides appropriate visual feedback.",
+          "Three fields a form may need side by side: **Normal**, ready for input; **Disabled**, greyed out with typing blocked and no tooltip (`isDisabled`); **With error**, drawn with a red border to flag a value the form rejected (`hasError`).",
       },
       source: {
         code: `<PasswordInput placeholder="Normal" passwordSettings={settings} />
@@ -295,7 +526,7 @@ export const CustomValidation: Story = {
     docs: {
       description: {
         story:
-          "Customizable validation rules: minimum 8 characters, uppercase and digits required, no special characters needed.",
+          "A policy that asks for less: type into the field and the tooltip lists only a minimum length of 8, capital letters and digits, because special characters are switched off (`passwordSettings`).",
       },
       source: {
         code: `<PasswordInput
@@ -352,12 +583,101 @@ export const Sizes: Story = {
     docs: {
       description: {
         story:
-          "PasswordInput supports base, middle, and large sizes to match different UI contexts.",
+          "Pick the height that matches the other fields of the form: base, middle and large (`size`).",
       },
       source: {
         code: `<PasswordInput size={InputSize.base} placeholder="Base size" simpleView />
 <PasswordInput size={InputSize.middle} placeholder="Middle size" simpleView />
 <PasswordInput size={InputSize.large} placeholder="Large size" simpleView />`,
+      },
+    },
+  },
+};
+
+const GeneratorTemplate = () => {
+  const [value, setValue] = useState("");
+
+  return (
+    <div style={{ height: "110px", width: "320px" }}>
+      <PasswordInput
+        inputValue={value}
+        onChange={(e, v) => setValue(v ?? "")}
+        inputName="generator-demo"
+        placeholder="Type a character"
+        passwordSettings={basePasswordSettings}
+        {...baseTooltipProps}
+        tooltipPasswordLength="minimum length: 6"
+        generatePasswordTitle="Generate password"
+        scale
+      />
+    </div>
+  );
+};
+
+export const WithPasswordGenerator: Story = {
+  render: () => <GeneratorTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Saves the user from inventing a password that meets every rule: type a character to open the tooltip, then click **Generate password** at its bottom; the field fills with a random password that passes all rules and shows its characters (`generatePasswordTitle`, symbols picked from `generatorSpecial`).",
+      },
+      source: {
+        code: `<PasswordInput
+  inputValue={value}
+  onChange={(e, value) => setValue(value ?? "")}
+  passwordSettings={settings}
+  tooltipPasswordTitle="Password must contain:"
+  tooltipPasswordLength="minimum length: 6"
+  tooltipPasswordDigits="digits"
+  tooltipPasswordCapital="capital letters"
+  tooltipPasswordSpecial="special characters (!@#$%^&*)"
+  generatorSpecial="!@#$%^&*"
+  generatePasswordTitle="Generate password"
+/>`,
+      },
+    },
+  },
+};
+
+const RightToLeftTemplate = () => {
+  const [value, setValue] = useState("Passw0rd!");
+
+  return (
+    <div dir="rtl" style={{ width: "320px" }}>
+      <PasswordInput
+        simpleView
+        inputValue={value}
+        onChange={(e, v) => setValue(v ?? "")}
+        inputName="rtl-demo"
+        placeholder="كلمة المرور"
+        scale
+      />
+    </div>
+  );
+};
+
+export const RightToLeft: Story = {
+  render: () => <RightToLeftTemplate />,
+  globals: { direction: "rtl" },
+  parameters: {
+    noPadding: true,
+    docs: {
+      // Framed: an inline RTL story would flip the whole Docs page.
+      story: { inline: false, height: "58px" },
+      description: {
+        story:
+          'The field in a right-to-left layout: the hidden characters line up from the right edge and the eye button moves to the left end. The wrapper carries `dir="rtl"`; the direction also comes from the theme\'s `interfaceDirection` (the Direction toolbar).',
+      },
+      source: {
+        code: `<div dir="rtl">
+  <PasswordInput
+    simpleView
+    inputValue={value}
+    onChange={(e, value) => setValue(value ?? "")}
+    placeholder="كلمة المرور"
+  />
+</div>`,
       },
     },
   },
@@ -373,11 +693,8 @@ export const CssCustomization: Story = {
           "--text-input-border-color": "#7c3aed",
           "--text-input-color": "#4c1d95",
           "--text-input-radius": "8px",
-          "--password-input-icon-hover": "#7c3aed",
-          "--password-input-icon-disabled": "#c4b5fd",
-          "--password-input-tooltip-text": "#4c1d95",
-          "--password-input-tooltip-width": "280px",
-          "--password-input-border-radius": "8px",
+          "--text-input-border-hover": "#a78bfa",
+          "--text-input-border-focus": "#2e1065",
         } as CSSProperties
       }
     >
@@ -400,15 +717,15 @@ export const CssCustomization: Story = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--text-input-bg\` | Background color | theme token |
-| \`--text-input-border-color\` | Border color | theme token |
-| \`--text-input-color\` | Text color | theme token |
-| \`--text-input-radius\` | Input border radius | theme token |
-| \`--password-input-icon-hover\` | Eye icon hover color | theme token |
-| \`--password-input-icon-disabled\` | Eye icon disabled color | theme token |
-| \`--password-input-tooltip-text\` | Tooltip text color | theme token |
-| \`--password-input-tooltip-width\` | Tooltip width | \`294px\` |
-| \`--password-input-border-radius\` | Input container border radius | \`3px\` |`,
+| \`--text-input-bg\` | Background color | theme-based |
+| \`--text-input-border-color\` | Border color at rest | theme-based |
+| \`--text-input-border-hover\` | Border color on hover | theme-based |
+| \`--text-input-border-focus\` | Border color while focused | theme-based |
+| \`--text-input-color\` | Text and caret color | theme-based |
+| \`--text-input-radius\` | Border radius | theme-based |
+| \`--password-input-tooltip-width\` | Width of the rules tooltip on tablet and desktop; the tooltip is rendered at the end of \`<body>\`, so set it on \`:root\` or \`body\`, not on a wrapper | \`294px\` |
+
+The example sets every variable but the tooltip width on a wrapper; hover and focus the field to see the border colors.`,
       },
     },
   },

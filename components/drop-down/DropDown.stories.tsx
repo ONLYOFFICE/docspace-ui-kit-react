@@ -15,16 +15,26 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `A flexible dropdown component for displaying menus, options, and contextual content.
+        component: `A menu anchored to a control of your own, for a list of actions or options opened from a button.
 
 ### Features
 
 - **Smart Positioning**: Automatically adjusts position based on viewport space
-- **Two Modes**: Portal mode (default) and inline mode
-- **Virtual Scrolling**: Efficiently renders large lists with react-window
-- **RTL Support**: Full right-to-left layout support
-- **Keyboard Navigation**: Navigate items with arrow keys
-- **Click Outside**: Configurable click-outside handling
+- **Portal and Inline Modes**: Renders in a portal on the page body and measures the anchor by default, or in place inside the nearest positioned ancestor when \`isDefaultMode\` is off
+- **Virtual Scrolling**: Renders only the visible rows of a long list once \`maxHeight\` is set, reading each item's height from its \`height\` prop
+- **RTL Support**: Mirrors the alignment in a right-to-left interface, lining the menu up with the anchor's right edge
+- **Keyboard Navigation**: Moves the highlight through the items with the Up and Down arrows and clicks the highlighted item on Enter, in a list with \`maxHeight\`
+- **Click Outside**: Closes through \`clickOutsideAction\`, which a transparent backdrop behind the menu calls on the next click, optionally dimming the page (\`withBackground\`)
+- **Disabled Items**: Dropped from the list together with a separator left at either end, unless \`showDisabledItems\` keeps them
+
+### Accessibility
+
+The DropDown gives the menu a listbox role and handles the arrow keys itself:
+
+- \`role="listbox"\` on the menu element; a \`DropDownItem\` inside it is an \`option\`, or a \`separator\`
+- Up and Down move the highlighted row, wrapping at either end, and Enter calls the highlighted item's \`onClick\`; both only while the menu is open and \`maxHeight\` is set
+- Focus stays on the control that opened the menu; the highlight moves only visually
+- Escape does not close the menu; wire it yourself if the menu needs it
 
 ### Usage
 
@@ -35,6 +45,7 @@ import { DropDownItem } from "@onlyoffice/apps-ui-kit/components/drop-down-item"
 const [isOpen, setIsOpen] = useState(false);
 const buttonRef = useRef<HTMLButtonElement>(null);
 
+// A menu opened from a button
 <Button ref={buttonRef} label="Menu" onClick={() => setIsOpen(true)} />
 <DropDown
   open={isOpen}
@@ -43,6 +54,13 @@ const buttonRef = useRef<HTMLButtonElement>(null);
 >
   <DropDownItem label="Option 1" onClick={handleClick} />
   <DropDownItem label="Option 2" onClick={handleClick} />
+</DropDown>
+
+// A long list that scrolls and answers the arrow keys
+<DropDown open={isOpen} forwardedRef={buttonRef} maxHeight={200}>
+  {items.map((item) => (
+    <DropDownItem key={item.id} label={item.label} onClick={handleClick} />
+  ))}
 </DropDown>
 \`\`\`
 
@@ -54,7 +72,8 @@ const buttonRef = useRef<HTMLButtonElement>(null);
   argTypes: {
     open: {
       control: "boolean",
-      description: "Controls dropdown visibility",
+      description:
+        "Whether the menu is shown; while it is off the menu stays in the page, hidden",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -62,7 +81,8 @@ const buttonRef = useRef<HTMLButtonElement>(null);
     directionX: {
       control: "select",
       options: ["left", "right"],
-      description: "Horizontal opening direction",
+      description:
+        "Which edge of the anchor the menu lines up with: `right` opens it towards the right from the anchor's left edge, `left` towards the left from its right edge",
       table: {
         defaultValue: { summary: "right" },
       },
@@ -70,57 +90,219 @@ const buttonRef = useRef<HTMLButtonElement>(null);
     directionY: {
       control: "select",
       options: ["top", "bottom", "both"],
-      description: "Vertical opening direction",
+      description:
+        "Whether the menu opens below the anchor, above it, or (`both`) below unless there is no room left under it",
       table: {
         defaultValue: { summary: "bottom" },
       },
     },
     maxHeight: {
       control: "number",
-      description: "Maximum height in pixels (enables scrolling)",
+      description:
+        "Height of the list in pixels; it also turns on the scrollbar, the virtualised list and the arrow keys, none of which happen without it",
     },
     manualWidth: {
       control: "text",
-      description: "Custom width for the dropdown",
+      description:
+        "Exact width of the menu as a CSS length, for example `300px` or `100%`",
     },
     offsetX: {
       control: "number",
-      description: "Horizontal offset from calculated position",
+      description:
+        "Shifts the menu inwards from the anchor's edge by this many pixels; portal mode only",
       table: {
         defaultValue: { summary: "0" },
       },
     },
     zIndex: {
       control: "number",
-      description: "Custom z-index value",
+      description: "Stacking order of the menu",
+      table: {
+        defaultValue: { summary: "400" },
+      },
     },
     showDisabledItems: {
       control: "boolean",
-      description: "Show or hide disabled items",
+      description:
+        "Keeps items whose `disabled` prop is true in the list, greyed out; by default they are dropped",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isDefaultMode: {
       control: "boolean",
-      description: "Use portal mode (true) or inline mode (false)",
+      description:
+        "Renders the menu in a portal on the page body, positioned against `forwardedRef`; off, it renders in place inside the nearest positioned ancestor",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     fixedDirection: {
       control: "boolean",
-      description: "Disable automatic position adjustment",
+      description:
+        "Keeps `directionX` and `directionY` as given instead of flipping them when the menu would not fit the window",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     enableKeyboardEvents: {
       control: "boolean",
-      description: "Enable keyboard navigation",
+      description:
+        "Whether the Up and Down arrows move the highlight and Enter clicks the highlighted item; read only with `maxHeight`, and while it is on every key press on the page has its default action prevented",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    withBackdrop: {
+      control: "boolean",
+      description:
+        "Puts a transparent layer behind the open menu that catches the next click and calls `clickOutsideAction`",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    withBackground: {
+      control: "boolean",
+      description: "Dims the page behind the open menu",
+    },
+    withoutBackground: {
+      control: "boolean",
+      description:
+        "Keeps the layer behind the menu transparent, even with `withBackground` or `isAside` and on a phone, where it is dimmed otherwise",
+    },
+    usePortalBackdrop: {
+      control: "boolean",
+      description:
+        "Renders the backdrop inside the portal, above the rest of the page, instead of beneath the menu",
       table: {
         defaultValue: { summary: "false" },
       },
+    },
+    shouldShowBackdrop: {
+      control: "boolean",
+      description:
+        "Renders the backdrop even when another one is already open on the page, which it otherwise leaves to catch the click",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isAside: {
+      control: "boolean",
+      description:
+        "Dims the page behind the menu and opens its backdrop over up to two others, for a menu inside a side panel",
+    },
+    backDrop: {
+      control: false,
+      description:
+        "An element rendered in place of the backdrop that `withBackdrop` builds",
+    },
+    isMobileView: {
+      control: "boolean",
+      description:
+        "Pins the menu to the bottom edge of the screen at full width when the window is taller than it is wide",
+    },
+    isNoFixedHeightOptions: {
+      control: "boolean",
+      description:
+        "With `maxHeight`, scrolls the items as they are instead of in the virtualised list, for items taller or shorter than 32px",
+    },
+    useFlexibleHeight: {
+      control: "boolean",
+      description:
+        "With `isNoFixedHeightOptions`, lets the list shrink below `maxHeight` when its items take less room",
+    },
+    disableScrollbarPadding: {
+      control: "boolean",
+      description:
+        "With `isNoFixedHeightOptions`, removes the space kept for the scrollbar, so an item's hover fill reaches the menu's edge",
+    },
+    withDynamicScrollbar: {
+      control: "boolean",
+      description:
+        "Caps the menu at the room left between the anchor and the window edge on every open, and scrolls the rest",
+    },
+    topSpace: {
+      control: "number",
+      description:
+        "With `withDynamicScrollbar`, pixels to keep free between the menu and the top of the window",
+    },
+    bottomSpace: {
+      control: "number",
+      description:
+        "With `withDynamicScrollbar`, pixels to keep free between the menu and the bottom of the window",
+    },
+    manualX: {
+      control: "text",
+      description:
+        "Distance from the anchor's edge as a CSS length; inline mode only",
+    },
+    manualY: {
+      control: "text",
+      description:
+        "Distance from the anchor's top or bottom as a CSS length, instead of the anchor's full height; inline mode only",
+    },
+    forwardedRef: {
+      control: false,
+      description:
+        "Ref of the element the menu belongs to; in portal mode the menu is positioned against it, and without it the menu goes to the corner of the window",
+    },
+    appendTo: {
+      control: false,
+      description:
+        "Element the portal renders the menu into instead of the page body",
+    },
+    clickOutsideAction: {
+      action: "clickOutsideAction",
+      description:
+        "Called when the backdrop or a listed outside event is clicked, with the event and the state being asked for: the opposite of `open`",
+    },
+    enableOnClickOutside: {
+      action: "enableOnClickOutside",
+      description: "Called once each time the menu opens",
+    },
+    eventTypes: {
+      control: "object",
+      description:
+        "DOM event names listened for on the window while the menu is open; one outside the menu calls `clickOutsideAction`",
+    },
+    forceCloseClickOutside: {
+      control: "boolean",
+      description: "Stops the outside-event listeners from being added at all",
+    },
+    children: {
+      control: false,
+      description: "Items of the menu, normally `DropDownItem`s",
+    },
+    className: {
+      control: "text",
+      description: "Class added to the menu element",
+    },
+    style: {
+      control: "object",
+      description: "Inline style merged into the menu element's own",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Value of the menu element's `data-testid`",
+      table: {
+        defaultValue: { summary: "dropdown" },
+      },
+    },
+    id: {
+      control: false,
+      description: "Ignored; no `id` reaches the page",
+    },
+    columnCount: {
+      control: false,
+      description: "Ignored; nothing reads it",
+    },
+    disableOnClickOutside: {
+      control: false,
+      description: "Ignored; nothing reads it",
+    },
+    withBlur: {
+      control: false,
+      description: "Ignored; nothing reads it",
     },
   },
 } satisfies Meta<typeof DropDown>;
@@ -144,7 +326,10 @@ const BasicTemplate = (args: ComponentProps<typeof DropDown>) => {
         {...args}
         open={args.open ?? isOpen}
         forwardedRef={parentRef}
-        clickOutsideAction={() => setIsOpen(false)}
+        clickOutsideAction={(e, next) => {
+          args.clickOutsideAction?.(e, next);
+          setIsOpen(false);
+        }}
       >
         <DropDownItem label="Option 1" onClick={() => setIsOpen(false)} />
         <DropDownItem label="Option 2" onClick={() => setIsOpen(false)} />
@@ -162,6 +347,10 @@ export const Default: Story = {
   },
   parameters: {
     docs: {
+      description: {
+        story:
+          "The everyday case: a short menu opened from a button and closed by the next click anywhere else. Press **Open Dropdown**, then change any other prop live in the Controls panel below and open it again.",
+      },
       source: {
         code: `const [isOpen, setIsOpen] = useState(false);
 const buttonRef = useRef<HTMLButtonElement>(null);
@@ -330,7 +519,7 @@ export const ScrollableList: Story = {
     docs: {
       description: {
         story:
-          "Use `maxHeight` to limit the dropdown height and enable scrolling for long lists.",
+          "For a list longer than the screen can hold: the menu stays 200px tall and scrolls (`maxHeight`). Open it and press the Down and Up arrows to move the highlight, then Enter to pick the highlighted option.",
       },
       source: {
         code: `<DropDown open={isOpen} maxHeight={200}>
@@ -443,7 +632,7 @@ export const DirectionVariants: Story = {
     docs: {
       description: {
         story:
-          "Control dropdown position with `directionX` (left/right) and `directionY` (top/bottom) props.",
+          "To open the menu where there is room for it: each button opens its menu to the side and edge its label names (`directionX`, `directionY`). A menu that would run past the side of the window opens towards the other side instead.",
       },
       source: {
         code: `<DropDown directionX="right" directionY="bottom">...</DropDown>
@@ -504,7 +693,7 @@ export const CustomWidth: Story = {
   },
 };
 
-const ContextMenuTemplate = () => {
+const SeparatorsTemplate = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const parentRef = React.useRef<HTMLButtonElement>(null);
 
@@ -512,7 +701,7 @@ const ContextMenuTemplate = () => {
     <div style={{ padding: "20px" }}>
       <Button
         ref={parentRef}
-        label="Context Menu"
+        label="Edit Menu"
         onClick={() => setIsOpen(true)}
       />
       <DropDown
@@ -533,13 +722,13 @@ const ContextMenuTemplate = () => {
   );
 };
 
-export const ContextMenu: Story = {
-  render: () => <ContextMenuTemplate />,
+export const WithSeparators: Story = {
+  render: () => <SeparatorsTemplate />,
   parameters: {
     docs: {
       description: {
         story:
-          "Example of a context menu style dropdown with common editing actions.",
+          "To group a short menu without titles: thin lines split the editing commands into three groups (`isSeparator` on a `DropDownItem`).",
       },
       source: {
         code: `<DropDown open={isOpen}>
@@ -554,6 +743,66 @@ export const ContextMenu: Story = {
   },
 };
 
+const RightToLeftTemplate = () => {
+  const [isOpen, setIsOpen] = React.useState(true);
+  const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
+  const parentRef = React.useRef<HTMLButtonElement>(null);
+
+  return (
+    <div dir="rtl" ref={setContainer} style={{ padding: "20px" }}>
+      <Button ref={parentRef} label="القائمة" onClick={() => setIsOpen(true)} />
+      {container ? (
+        <DropDown
+          open={isOpen}
+          forwardedRef={parentRef}
+          appendTo={container}
+          manualWidth="200px"
+          clickOutsideAction={() => setIsOpen(false)}
+        >
+          <DropDownItem label="فتح" onClick={() => setIsOpen(false)} />
+          <DropDownItem label="تنزيل" onClick={() => setIsOpen(false)} />
+          <DropDownItem
+            label="إعادة التسمية"
+            onClick={() => setIsOpen(false)}
+          />
+        </DropDown>
+      ) : null}
+    </div>
+  );
+};
+
+export const RightToLeft: Story = {
+  render: () => <RightToLeftTemplate />,
+  globals: { direction: "rtl" },
+  parameters: {
+    layout: "fullscreen",
+    noPadding: true,
+    docs: {
+      // Framed, because an inline RTL story flips the whole Docs page.
+      story: { inline: false, height: "220px" },
+      description: {
+        story:
+          "The menu in a right-to-left interface, open from the start: the button sits at the right, the menu lines up with the button's right edge and extends towards the left, and the labels are aligned to the right. The menu renders into the right-to-left container (`appendTo`), because on its own it goes to the end of the page body, outside any `dir` wrapper.",
+      },
+      source: {
+        code: `<div dir="rtl" ref={setContainer}>
+  <Button ref={buttonRef} label="القائمة" onClick={() => setIsOpen(true)} />
+  <DropDown
+    open={isOpen}
+    forwardedRef={buttonRef}
+    appendTo={container}
+    manualWidth="200px"
+    clickOutsideAction={() => setIsOpen(false)}
+  >
+    <DropDownItem label="فتح" onClick={handleClick} />
+    <DropDownItem label="تنزيل" onClick={handleClick} />
+  </DropDown>
+</div>`,
+      },
+    },
+  },
+};
+
 const CssCustomizationTemplate = () => {
   const parentRef = React.useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = React.useState(false);
@@ -563,8 +812,9 @@ const CssCustomizationTemplate = () => {
         {
           "--dropdown-radius": "12px",
           "--dropdown-bg": "#f5f3ff",
+          "--dropdown-border-style": "1px solid #7c3aed",
           "--dropdown-shadow": "0 4px 20px rgba(124, 58, 237, 0.25)",
-          "--dropdown-text-size": "14px",
+          "--dropdown-inner-padding": "12px 0",
           position: "relative",
         } as CSSProperties
       }
@@ -595,25 +845,27 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization. Set on a parent wrapper element:
+        story: `CSS Custom Properties for external customization:
 
-\`\`\`css
---dropdown-bg            /* background (replaces theme color) */
---dropdown-border-style  /* border (replaces theme border) */
---dropdown-shadow        /* box-shadow (replaces theme shadow) */
---dropdown-radius        /* border radius (default: 6px) */
---dropdown-inner-padding /* padding (default: 8px 0) */
---dropdown-text-size     /* font-size (default: 13px) */
---dropdown-text-weight   /* font-weight (default: 600) */
-\`\`\`
+| Variable | Description | Default |
+| --- | --- | --- |
+| \`--dropdown-bg\` | Background of the menu | theme-based |
+| \`--dropdown-border-style\` | Border of the menu, as a \`border\` shorthand | theme-based |
+| \`--dropdown-shadow\` | Shadow of the menu | theme-based |
+| \`--dropdown-radius\` | Corner radius of the menu | \`6px\` |
+| \`--dropdown-inner-padding\` | Space between the menu's edge and its first and last items | \`8px 0\` |
+| \`--dropdown-text-size\` | Font size of the menu; a \`DropDownItem\` sets its own, so it reaches only children that do not | \`13px\` |
+| \`--dropdown-text-weight\` | Font weight of the menu; a \`DropDownItem\` sets its own, so it reaches only children that do not | \`600\` |
 
-Use \`isDefaultMode={false}\` (inline mode) so CSS vars from the parent cascade to the dropdown.`,
+Press **Dropdown trigger** to open the menu. It renders inline here (\`isDefaultMode={false}\`), inside the wrapper that sets the variables; in the default portal mode the menu is on the page body, outside any wrapper, so set them through the DropDown's own \`style\` prop instead.`,
       },
       source: {
         code: `<div style={{
   "--dropdown-radius": "12px",
   "--dropdown-bg": "#f5f3ff",
+  "--dropdown-border-style": "1px solid #7c3aed",
   "--dropdown-shadow": "0 4px 20px rgba(124,58,237,0.25)",
+  "--dropdown-inner-padding": "12px 0",
   position: "relative",
 }}>
   <DropDown open isDefaultMode={false} forwardedRef={ref}>

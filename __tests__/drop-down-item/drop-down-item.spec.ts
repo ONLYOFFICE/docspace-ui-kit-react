@@ -27,6 +27,18 @@ test.describe("DropDownItem — light", () => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("drop-down-item-css-customization.png");
   });
+
+  test("with external link", async ({ page }) => {
+    await gotoStory(page, "with-external-link");
+    await expect(page).toHaveScreenshot(
+      "drop-down-item-with-external-link.png",
+    );
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("drop-down-item-right-to-left.png");
+  });
 });
 
 test.describe("DropDownItem — dark", () => {

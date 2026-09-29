@@ -12,7 +12,8 @@
   "state": { "visibility": "visible", "close": "onClose", "loading": null, "disabled": null },
   "related": ["room-icon", "color-picker", "modal-dialog"],
   "subComponents": ["RoomLogoCover"],
-  "testIds": ["room_logo_cover_dialog", "room_logo_cover_apply_button", "room_logo_cover_cancel_button", "room_logo_cover_without_icon", "color_item_add_custom"]
+  "testIds": ["room_logo_cover_dialog", "room_logo_cover_apply_button", "room_logo_cover_cancel_button", "room_logo_cover_without_icon", "color_item_add_custom"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # RoomLogoCoverDialog

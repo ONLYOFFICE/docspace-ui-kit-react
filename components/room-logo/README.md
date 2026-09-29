@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["room-icon", "room-type", "checkbox"],
   "subComponents": [],
-  "testIds": ["room-logo"]
+  "testIds": ["room-logo"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # RoomLogo

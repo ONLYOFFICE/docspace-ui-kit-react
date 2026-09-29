@@ -22,6 +22,41 @@ test.describe("Tooltip — light", () => {
     await expect(page).toHaveScreenshot("tooltip-custom-styling.png");
   });
 
+  test("shared by many anchors", async ({ page }) => {
+    await gotoStory(page, "shared-by-many-anchors");
+    await expect(page).toHaveScreenshot("tooltip-shared-by-many-anchors.png");
+  });
+
+  test("fixed content", async ({ page }) => {
+    await gotoStory(page, "fixed-content");
+    await expect(page).toHaveScreenshot("tooltip-fixed-content.png");
+  });
+
+  test("anchored by selector", async ({ page }) => {
+    await gotoStory(page, "anchored-by-selector");
+    await expect(page).toHaveScreenshot("tooltip-anchored-by-selector.png");
+  });
+
+  test("clickable content", async ({ page }) => {
+    await gotoStory(page, "clickable-content");
+    await expect(page).toHaveScreenshot("tooltip-clickable-content.png");
+  });
+
+  test("delayed appearance", async ({ page }) => {
+    await gotoStory(page, "delayed-appearance");
+    await expect(page).toHaveScreenshot("tooltip-delayed-appearance.png");
+  });
+
+  test("controlled open", async ({ page }) => {
+    await gotoStory(page, "controlled-open");
+    await expect(page).toHaveScreenshot("tooltip-controlled-open.png");
+  });
+
+  test("opened from code", async ({ page }) => {
+    await gotoStory(page, "opened-from-code");
+    await expect(page).toHaveScreenshot("tooltip-opened-from-code.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     // The story only renders the anchor -- react-tooltip mounts the bubble on

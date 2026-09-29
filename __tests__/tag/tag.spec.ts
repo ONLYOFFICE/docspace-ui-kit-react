@@ -25,6 +25,16 @@ test.describe("Tag — light", () => {
     await expect(page).toHaveScreenshot("tag-states.png");
   });
 
+  test("icon only", async ({ page }) => {
+    await gotoStory(page, "icon-only");
+    await expect(page).toHaveScreenshot("tag-icon-only.png");
+  });
+
+  test("with label suffix", async ({ page }) => {
+    await gotoStory(page, "with-label-suffix");
+    await expect(page).toHaveScreenshot("tag-with-label-suffix.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("tag-css-customization.png");

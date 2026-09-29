@@ -1,7 +1,9 @@
 import type { ComponentProps } from "react";
 import { useRef } from "react";
 
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
+import { useArgs } from "storybook/preview-api";
+import { fn } from "storybook/test";
 
 import ViewRowsReactSvg from "../../assets/view-rows.react.svg";
 import ViewTilesReactSvg from "../../assets/view-tiles.react.svg";
@@ -15,6 +17,9 @@ import {
   TableHeader,
   TableRow,
 } from "../table";
+import { Tabs } from "../tabs";
+import { Text } from "../text";
+import type { Operation } from "../operations-progress-button/OperationsProgressButton.types";
 
 import Section from "./index";
 
@@ -24,22 +29,33 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `Section is the main content area layout component with header, filter, body, and footer sub-components.
+        component: `Section is the main content area of an application page: a pinned header and filter above a scrolling body, with an info panel and a chat panel that open beside it.
 
 ### Features
 
-- **Compound Components**: Header, Filter, Body, Footer, Warning, and Submenu sub-components
-- **Info Panel**: Optional side panel for displaying additional information
-- **Responsive Layout**: Adapts to desktop, tablet, and mobile device types
-- **Body Scroll**: Configurable scroll behavior for the body content
-- **File Drop**: Built-in drag-and-drop file upload support
+- **Slots**: Takes its header, submenu, filter, banner, warning, body, footer and panel contents as \`Section.*\` marker children and places each in its own spot; with no header, filter or body it renders nothing
+- **Pinned Header**: Keeps the header, the submenu and, on desktop, the filter pinned above the body while the body scrolls under them
+- **Device Layouts**: Moves the filter into the scrolling body below desktop and the header too on a phone, as \`currentDeviceType\` says; nothing measures the window
+- **Info Panel**: Opens a details panel beside the body when \`canDisplay\` and \`isInfoPanelVisible\` are both set, inline on desktop and over the page on tablet and phone
+- **Chat Panel**: Docks a second side panel for a chat, with an optional edge handle that resizes it and, dragged further, asks the host to go fullscreen
+- **Operations Button**: Shows a floating progress button while uploads, background or plugin operations are running
+- **File Drop**: Passes the files dropped anywhere on the body to \`onDrop\`, without filtering or highlighting them
+- **Size Context**: Measures itself and shares its width and height with the components inside it, which \`Navigation\` uses to fit its breadcrumbs
+
+### Accessibility
+
+The section adds little of its own; the names, roles and keys come from what its slots hold.
+
+- \`inert\` makes the whole section unfocusable and hides it from assistive technology, for a section kept mounted behind a fullscreen panel
+- PageUp, PageDown, Home and End pressed inside the info panel scroll only the panel, not the listing behind it
+- The chat panel's resize handle is mouse-only and carries \`role="presentation"\`, so screen readers skip it
 
 ### Usage
 
 \`\`\`tsx
 import Section from "@onlyoffice/apps-ui-kit/components/section";
 
-<Section currentDeviceType={DeviceType.desktop} withBodyScroll>
+<Section currentDeviceType={DeviceType.desktop} withBodyScroll settingsStudio={false}>
   <Section.SectionHeader>
     <Navigation title="Documents" />
   </Section.SectionHeader>
@@ -49,48 +65,376 @@ import Section from "@onlyoffice/apps-ui-kit/components/section";
   <Section.SectionBody>
     <TableContent />
   </Section.SectionBody>
-  <Section.SectionFooter>{null}</Section.SectionFooter>
+</Section>
+\`\`\`
+
+\`\`\`tsx
+const [visible, setVisible] = useState(true);
+
+<Section
+  currentDeviceType={DeviceType.desktop}
+  withBodyScroll
+  settingsStudio={false}
+  canDisplay
+  isInfoPanelVisible={visible}
+  setIsInfoPanelVisible={setVisible}
+>
+  <Section.SectionBody>
+    <TableContent />
+  </Section.SectionBody>
+  <Section.InfoPanelHeader>
+    <Text fontWeight={600}>Details</Text>
+  </Section.InfoPanelHeader>
+  <Section.InfoPanelBody>
+    <Text>Annual Report.docx</Text>
+  </Section.InfoPanelBody>
+</Section>
+\`\`\`
+
+\`\`\`tsx
+<Section currentDeviceType={DeviceType.mobile} withBodyScroll settingsStudio={false}>
+  <Section.SectionHeader>
+    <Navigation title="Documents" />
+  </Section.SectionHeader>
+  <Section.SectionBody>
+    <RowList />
+  </Section.SectionBody>
 </Section>
 \`\`\``,
       },
     },
   },
+  args: {
+    onDrop: fn(),
+    onDragOverEmpty: fn(),
+    onDragLeaveEmpty: fn(),
+    setIsInfoPanelVisible: fn(),
+    setIsChatPanelVisible: fn(),
+    setChatPanelWidth: fn(),
+    onOpenUploadPanel: fn(),
+    cancelUpload: fn(),
+    clearSecondaryProgressData: fn(),
+    clearPrimaryProgressData: fn(),
+    cancelSecondaryOperationById: fn(),
+    clearDropPreviewLocation: fn(),
+  },
   argTypes: {
     currentDeviceType: {
       control: "select",
       options: Object.values(DeviceType),
-      description: "Current device type for responsive layout",
+      description:
+        "Which layout to render: where the header and the filter go, whether the body scrolls itself and whether the info panel sits beside the body or covers the page. Nothing measures the window, so the host passes the value that fits it",
       table: {
-        defaultValue: { summary: "desktop" },
+        defaultValue: { summary: "undefined" },
       },
     },
     withBodyScroll: {
       control: "boolean",
-      description: "Enables scroll within the section body",
+      description:
+        "Gives the body a scroller of its own under the pinned header; off, the page scrolls instead and the section takes a 20px inline-start padding. On a phone the page always scrolls",
       table: {
         defaultValue: { summary: "true" },
       },
     },
-    isHeaderVisible: {
+    settingsStudio: {
       control: "boolean",
-      description: "Controls header section visibility",
+      description: "Applies the settings pages' narrower body padding",
       table: {
-        defaultValue: { summary: "true" },
+        defaultValue: { summary: "false" },
       },
+    },
+    viewAs: {
+      control: "select",
+      options: [
+        "row",
+        "table",
+        "tile",
+        "tileDynamicHeight",
+        "settings",
+        "profile",
+      ],
+      description:
+        "Which listing the body holds. `settings` and `profile` drop the body's top padding",
     },
     isInfoPanelAvailable: {
       control: "boolean",
-      description: "Whether the info panel can be displayed",
+      description:
+        "Whether the info panel region exists at all; off, it is never rendered whatever `isInfoPanelVisible` says",
       table: {
-        defaultValue: { summary: "false" },
+        defaultValue: { summary: "true" },
       },
     },
     isInfoPanelVisible: {
       control: "boolean",
-      description: "Whether the info panel is currently visible",
+      description:
+        "Whether the info panel is open. It shows only while `canDisplay` is set as well",
+    },
+    canDisplay: {
+      control: "boolean",
+      description:
+        "Allows the info panel to be shown. Without it the panel stays hidden even while `isInfoPanelVisible` is set",
+    },
+    setIsInfoPanelVisible: {
+      control: false,
+      description:
+        "Called with `false` when the info panel closes itself on a device below desktop: a click on the dimmed page around it, or the browser going back",
+    },
+    isMobileHidden: {
+      control: "boolean",
+      description: "Hides the info panel on any device below desktop",
+    },
+    anotherDialogOpen: {
+      control: "boolean",
+      description:
+        "Hides the info panel below desktop while another dialog is open, so the two do not stack",
+    },
+    infoPanelWithoutScroll: {
+      control: "boolean",
+      description:
+        "Removes the info panel body's own scroller, for panel content that scrolls its own regions",
+    },
+    isInfoPanelScrollLocked: {
+      control: "boolean",
+      description:
+        "Freezes the info panel's scroller, for a drag or a menu that must not scroll the panel under it",
+    },
+    isChatPanelAvailable: {
+      control: "boolean",
+      description:
+        "Whether the chat panel region exists at all; off, it is never rendered",
       table: {
         defaultValue: { summary: "false" },
       },
+    },
+    isChatPanelVisible: {
+      control: "boolean",
+      description:
+        "Whether the chat panel is open. On tablet and phone it covers the whole page",
+    },
+    setIsChatPanelVisible: {
+      control: false,
+      description:
+        "Called with `false` when the browser goes back while the chat panel is open on a device below desktop",
+    },
+    chatPanelDropTargetLabel: {
+      control: "text",
+      description:
+        'Text of a dashed "drop here" frame drawn over the chat panel; set it while the host drags its own items over the panel and clear it afterwards',
+    },
+    isChatPanelResizable: {
+      control: "boolean",
+      description:
+        "Adds a drag handle on the chat panel's inner edge that changes its width, on desktop only",
+    },
+    chatPanelWidth: {
+      control: "number",
+      description:
+        "Width of the docked chat panel in pixels while the handle is on; without it the panel is 400px wide",
+    },
+    setChatPanelWidth: {
+      control: false,
+      description:
+        "Called once per handle drag, when the mouse is released, with the new width in pixels",
+    },
+    setChatPanelFullscreen: {
+      control: false,
+      description:
+        "Called when the handle is dragged past the widest width the page allows; the host is expected to turn fullscreen on. Without it the drag stops at that width",
+    },
+    unsetChatPanelFullscreen: {
+      control: false,
+      description:
+        "Called when the handle is dragged back inwards in fullscreen; the host turns fullscreen off and the same drag goes on resizing the panel",
+    },
+    isChatPanelFullscreen: {
+      control: "boolean",
+      description:
+        "Whether the host renders the chat panel fullscreen right now; the handle then only listens for the drag back inwards",
+    },
+    scrollableBanner: {
+      control: "boolean",
+      description:
+        "Puts the banner at the top of the scrolling body, so it scrolls away under the header, instead of pinning it above the scroller",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    stickyTableHeader: {
+      control: "boolean",
+      description:
+        "Moves the desktop filter into the scrolling body, where it sticks under the header, and lets a table header stick under the filter instead of being fixed. The host gives the resting offsets in CSS variables",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    inert: {
+      control: "boolean",
+      description:
+        "Makes the whole section unfocusable and unclickable and hides it from assistive technology, for a section kept mounted behind a fullscreen panel",
+    },
+    withTabs: {
+      control: "boolean",
+      description:
+        "Marks the filter below desktop as sitting under tabs. No style reads the mark any more, so it changes nothing on screen",
+    },
+    withoutFooter: {
+      control: "boolean",
+      description: "Drops the footer slot and the empty space under the body",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    fullHeightBody: {
+      control: "boolean",
+      description:
+        "Makes the body fill the height below the header rather than its content's, for a page whose inner regions scroll instead",
+    },
+    getContextModel: {
+      control: false,
+      description:
+        "Returns the items of the menu that opens on a right click anywhere in the body. Without it no menu is mounted",
+    },
+    isIndexEditingMode: {
+      control: "boolean",
+      description:
+        "Turns the body's right-click menu off while the listing is being reordered",
+    },
+    pathname: {
+      control: "text",
+      description:
+        "The current route; changing it asks the body to take the focus again on desktop",
+    },
+    onDrop: {
+      control: false,
+      description:
+        "Called with the files dropped anywhere on the body. Nothing is filtered and nothing is highlighted",
+    },
+    onDragOverEmpty: {
+      control: false,
+      description:
+        "Called on every drag over the body, with a flag saying whether a drag was already active",
+    },
+    onDragLeaveEmpty: {
+      control: false,
+      description: "Called when a drag leaves the body",
+    },
+    secondaryActiveOperations: {
+      control: "object",
+      description:
+        "Background operations (copy, move, delete…) shown in the floating progress button. Any non-empty list makes the button appear",
+      table: {
+        defaultValue: { summary: "[]" },
+      },
+    },
+    primaryOperationsArray: {
+      control: "object",
+      description:
+        "Upload operations shown in the progress button's own panel. Any non-empty list makes the button appear",
+      table: {
+        defaultValue: { summary: "[]" },
+      },
+    },
+    pluginOperations: {
+      control: "object",
+      description:
+        "Operations contributed by plugins, listed with the background ones. Any non-empty list makes the button appear",
+      table: {
+        defaultValue: { summary: "[]" },
+      },
+    },
+    secondaryOperationsCompleted: {
+      control: "boolean",
+      description:
+        "Whether the background operations have finished, for the button's completed look",
+    },
+    primaryOperationsCompleted: {
+      control: "boolean",
+      description: "Whether the uploads have finished",
+    },
+    pluginOperationsCompleted: {
+      control: "boolean",
+      description: "Whether the plugin operations have finished",
+    },
+    secondaryOperationsStopped: {
+      control: "boolean",
+      description:
+        "Whether the background operations were stopped rather than finished",
+    },
+    secondaryOperationsAlert: {
+      control: "boolean",
+      description:
+        "Puts the progress button in its alert look for a failed background operation",
+    },
+    primaryOperationsAlert: {
+      control: "boolean",
+      description:
+        "Puts the progress button in its alert look for a failed upload",
+    },
+    pluginOperationsAlert: {
+      control: "boolean",
+      description:
+        "Puts the progress button in its alert look for a failed plugin operation",
+    },
+    primaryOperationsCanceled: {
+      control: "boolean",
+      description: "Whether the uploads were cancelled",
+    },
+    needErrorChecking: {
+      control: "boolean",
+      description:
+        "Makes the progress button check its operations for errors before showing them as complete",
+    },
+    pluginShowCancelButton: {
+      control: "boolean",
+      description:
+        "Shows the progress button's cancel control whatever the operations say",
+    },
+    mainButtonVisible: {
+      control: "boolean",
+      description:
+        "Whether a main action button is on screen, which moves the progress button clear of it",
+    },
+    onOpenUploadPanel: {
+      control: false,
+      description:
+        "Called when the progress button asks to open the upload panel",
+    },
+    cancelUpload: {
+      control: false,
+      description:
+        "Called by the progress button's cancel control while an upload is running",
+    },
+    clearSecondaryProgressData: {
+      control: false,
+      description: "Called to clear a finished background operation",
+    },
+    clearPrimaryProgressData: {
+      control: false,
+      description: "Called to clear a finished upload",
+    },
+    cancelSecondaryOperationById: {
+      control: false,
+      description:
+        "Called with an operation type and id to cancel one background operation",
+    },
+    dragging: {
+      control: "boolean",
+      description:
+        "Whether the host is dragging its own items, which switches the progress button to a drop preview",
+    },
+    dropTargetPreview: {
+      control: "text",
+      description:
+        "Name of the folder a dragged item would land in, shown by the progress button's drop preview",
+    },
+    clearDropPreviewLocation: {
+      control: false,
+      description: "Called to clear that drop preview",
+    },
+    startDropPreview: {
+      control: false,
+      description:
+        "Passing it at all makes the progress button appear even with no operations, so a drag can show its drop preview",
     },
   },
 } satisfies Meta<typeof Section>;
@@ -191,13 +535,17 @@ const mockFiles = [
   { name: "Architecture Diagram.png", type: "Image", tags: "Engineering" },
 ];
 
-const NavigationHeader = () => (
+const NavigationHeader = ({
+  device = DeviceType.desktop,
+}: {
+  device?: DeviceType;
+}) => (
   <Navigation
     title="My Documents"
     isRootFolder={false}
     canCreate
     showText
-    isDesktop
+    isDesktop={device === DeviceType.desktop}
     isRoom={false}
     withMenu
     showTitle
@@ -205,7 +553,7 @@ const NavigationHeader = () => (
     showNavigationButton={false}
     isInfoPanelVisible={false}
     isCurrentFolderInfo={false}
-    currentDeviceType={DeviceType.desktop}
+    currentDeviceType={device}
     navigationItems={mockNavigationItems}
     onClickFolder={noop}
     onBackToParentFolder={noop}
@@ -229,7 +577,11 @@ const NavigationHeader = () => (
   />
 );
 
-const FilterContent = () => (
+const FilterContent = ({
+  device = DeviceType.desktop,
+}: {
+  device?: DeviceType;
+}) => (
   <Filter
     viewAs="row"
     view="row"
@@ -239,7 +591,7 @@ const FilterContent = () => (
     filterHeader="Filter"
     selectorLabel="Select"
     userId="1"
-    currentDeviceType={DeviceType.desktop}
+    currentDeviceType={device}
     viewSelectorVisible
     isRooms={false}
     isContactsPage={false}
@@ -424,17 +776,17 @@ export const Default: Story = {
   args: {
     currentDeviceType: DeviceType.desktop,
     withBodyScroll: true,
-    isHeaderVisible: true,
+    settingsStudio: false,
     isInfoPanelAvailable: false,
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Complete Section layout with Navigation header, Filter bar, and Table body. Each section is outlined with a dashed border and labeled.",
+          "A whole page: breadcrumbs in the header, a search and filter bar under it and a table in the body, each outlined and labelled so you can see where the section puts its slots. Scroll the table to see the header and the filter stay pinned; change any other prop live in the Controls panel below.",
       },
       source: {
-        code: `<Section currentDeviceType={DeviceType.desktop} withBodyScroll isHeaderVisible>
+        code: `<Section currentDeviceType={DeviceType.desktop} withBodyScroll settingsStudio={false}>
   <Section.SectionHeader>
     <Navigation title="My Documents" />
   </Section.SectionHeader>
@@ -451,38 +803,615 @@ export const Default: Story = {
   },
 };
 
+// The side panels sit beside the section only inside a row, as on a real page.
+const PageFrame = ({
+  children,
+  height = 600,
+}: {
+  children: React.ReactNode;
+  height?: number;
+}) => <div style={{ display: "flex", width: "100%", height }}>{children}</div>;
+
+// Docs ignores the viewport preset; give the story a window of its own there.
+const withFrame =
+  (width: number, height: number): Decorator =>
+  (Story, context) => {
+    if (context.viewMode !== "docs") return <Story />;
+
+    return (
+      <iframe
+        title={context.name}
+        src={`iframe.html?viewMode=story&id=${context.id}`}
+        style={{ width, height, border: 0 }}
+      />
+    );
+  };
+
+// The table switches to its own narrow layout below desktop; a plain list reads better there.
+const ListContent = () => (
+  <div>
+    {mockFiles.map((file) => (
+      <div key={file.name} style={{ padding: "12px 0" }}>
+        <Text fontWeight={600}>{file.name}</Text>
+        <Text fontSize="12px">{file.type}</Text>
+      </div>
+    ))}
+  </div>
+);
+
+const infoPanelSlots = [
+  <Section.InfoPanelHeader key="info-header">
+    <div style={{ padding: "20px" }}>
+      <Text fontSize="16px" fontWeight={700}>
+        Annual Report 2025.docx
+      </Text>
+    </div>
+  </Section.InfoPanelHeader>,
+  <Section.InfoPanelBody key="info-body">
+    <div style={{ padding: "0 20px" }}>
+      <Text>Document · 42 KB · modified yesterday</Text>
+    </div>
+  </Section.InfoPanelBody>,
+];
+
+const runningOperation: Operation[] = [
+  {
+    id: "op-1",
+    operation: "copy",
+    label: "Copying 3 items",
+    alert: false,
+    completed: false,
+    percent: 40,
+  },
+];
+
+export const WithInfoPanel: Story = {
+  render: (args) => (
+    <PageFrame>
+      <Section {...args}>
+        <Section.SectionHeader>
+          <NavigationHeader />
+        </Section.SectionHeader>
+        <Section.SectionBody>
+          <TableContent />
+        </Section.SectionBody>
+        {infoPanelSlots}
+      </Section>
+    </PageFrame>
+  ),
+  args: {
+    currentDeviceType: DeviceType.desktop,
+    withBodyScroll: true,
+    settingsStudio: false,
+    canDisplay: true,
+    isInfoPanelVisible: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A details panel beside the listing, for the properties of the selected item without leaving the page. It shows only while both `canDisplay` and `isInfoPanelVisible` are on; switch either off in the Controls panel below to close it.",
+      },
+      source: {
+        code: `<div style={{ display: "flex", height: 600 }}>
+  <Section
+    currentDeviceType={DeviceType.desktop}
+    withBodyScroll
+    settingsStudio={false}
+    canDisplay
+    isInfoPanelVisible
+  >
+    <Section.SectionHeader>
+      <Navigation title="My Documents" />
+    </Section.SectionHeader>
+    <Section.SectionBody>
+      <TableContent />
+    </Section.SectionBody>
+    <Section.InfoPanelHeader>
+      <Text fontSize="16px" fontWeight={700}>Annual Report 2025.docx</Text>
+    </Section.InfoPanelHeader>
+    <Section.InfoPanelBody>
+      <Text>Document · 42 KB · modified yesterday</Text>
+    </Section.InfoPanelBody>
+  </Section>
+</div>`,
+      },
+    },
+  },
+};
+
+// A resize drag writes its width back into the control.
+const renderChatPanel = (args: ComponentProps<typeof Section>) => {
+  const [, updateArgs] = useArgs();
+
+  return (
+    <PageFrame>
+      <Section
+        {...args}
+        setChatPanelWidth={(value) => {
+          args.setChatPanelWidth?.(value);
+          updateArgs({ chatPanelWidth: value });
+        }}
+      >
+        <Section.SectionHeader>
+          <NavigationHeader />
+        </Section.SectionHeader>
+        <Section.SectionBody>
+          <TableContent />
+        </Section.SectionBody>
+        <Section.ChatPanel>
+          <div style={{ padding: "20px" }}>
+            <Text fontSize="16px" fontWeight={700}>
+              Chat
+            </Text>
+            <Text>Ask a question about the files on the left.</Text>
+          </div>
+        </Section.ChatPanel>
+      </Section>
+    </PageFrame>
+  );
+};
+
+export const WithChatPanel: Story = {
+  render: renderChatPanel,
+  args: {
+    currentDeviceType: DeviceType.desktop,
+    withBodyScroll: true,
+    settingsStudio: false,
+    isChatPanelAvailable: true,
+    isChatPanelVisible: true,
+    isChatPanelResizable: true,
+    chatPanelWidth: 400,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A chat docked beside the listing, so a conversation about the files stays open while you work with them. Drag its inner edge to make it wider or narrower (`isChatPanelResizable`); the new width arrives when you release the mouse (`setChatPanelWidth`).",
+      },
+      source: {
+        code: `const [width, setWidth] = useState(400);
+
+<div style={{ display: "flex", height: 600 }}>
+  <Section
+    currentDeviceType={DeviceType.desktop}
+    withBodyScroll
+    settingsStudio={false}
+    isChatPanelAvailable
+    isChatPanelVisible
+    isChatPanelResizable
+    chatPanelWidth={width}
+    setChatPanelWidth={setWidth}
+  >
+    <Section.SectionHeader>
+      <Navigation title="My Documents" />
+    </Section.SectionHeader>
+    <Section.SectionBody>
+      <TableContent />
+    </Section.SectionBody>
+    <Section.ChatPanel>
+      <ChatContent />
+    </Section.ChatPanel>
+  </Section>
+</div>`,
+      },
+    },
+  },
+};
+
+export const WithBanner: Story = {
+  render: (args) => (
+    <PageFrame>
+      <Section {...args}>
+        <Section.SectionHeader>
+          <NavigationHeader />
+        </Section.SectionHeader>
+        <Section.SectionBanner>
+          <div
+            style={{
+              padding: "12px 16px",
+              borderRadius: "6px",
+              backgroundColor: "rgba(66, 133, 244, 0.12)",
+            }}
+          >
+            <Text>Scheduled maintenance tonight from 22:00 to 23:00.</Text>
+          </div>
+        </Section.SectionBanner>
+        <Section.SectionBody>
+          <TableContent />
+        </Section.SectionBody>
+      </Section>
+    </PageFrame>
+  ),
+  args: {
+    currentDeviceType: DeviceType.desktop,
+    withBodyScroll: true,
+    settingsStudio: false,
+    scrollableBanner: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A notice above the header that stays in view while the table scrolls (`Section.SectionBanner`). Switch `scrollableBanner` on in the Controls panel below to put it at the top of the listing instead, where it scrolls away under the header.",
+      },
+      source: {
+        code: `<Section
+  currentDeviceType={DeviceType.desktop}
+  withBodyScroll
+  settingsStudio={false}
+>
+  <Section.SectionHeader>
+    <Navigation title="My Documents" />
+  </Section.SectionHeader>
+  <Section.SectionBanner>
+    <Text>Scheduled maintenance tonight from 22:00 to 23:00.</Text>
+  </Section.SectionBanner>
+  <Section.SectionBody>
+    <TableContent />
+  </Section.SectionBody>
+</Section>`,
+      },
+    },
+  },
+};
+
+const submenuItems = [
+  { id: "all", name: "All files", content: null },
+  { id: "recent", name: "Recent", content: null },
+  { id: "favorites", name: "Favorites", content: null },
+];
+
+export const WithSubmenu: Story = {
+  render: (args) => (
+    <PageFrame>
+      <Section {...args}>
+        <Section.SectionHeader>
+          <NavigationHeader />
+        </Section.SectionHeader>
+        <Section.SectionSubmenu>
+          <Tabs items={submenuItems} selectedItemId="all" />
+        </Section.SectionSubmenu>
+        <Section.SectionBody>
+          <TableContent />
+        </Section.SectionBody>
+      </Section>
+    </PageFrame>
+  ),
+  args: {
+    currentDeviceType: DeviceType.desktop,
+    withBodyScroll: true,
+    settingsStudio: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Tabs under the header that switch between views of the same page and stay pinned with it while the listing scrolls (`Section.SectionSubmenu`).",
+      },
+      source: {
+        code: `<Section
+  currentDeviceType={DeviceType.desktop}
+  withBodyScroll
+  settingsStudio={false}
+>
+  <Section.SectionHeader>
+    <Navigation title="My Documents" />
+  </Section.SectionHeader>
+  <Section.SectionSubmenu>
+    <Tabs items={tabs} selectedItemId="all" />
+  </Section.SectionSubmenu>
+  <Section.SectionBody>
+    <TableContent />
+  </Section.SectionBody>
+</Section>`,
+      },
+    },
+  },
+};
+
+export const WithOperationsProgress: Story = {
+  render: (args) => (
+    <PageFrame>
+      <Section {...args}>
+        <Section.SectionHeader>
+          <NavigationHeader />
+        </Section.SectionHeader>
+        <Section.SectionBody>
+          <TableContent />
+        </Section.SectionBody>
+      </Section>
+    </PageFrame>
+  ),
+  args: {
+    currentDeviceType: DeviceType.desktop,
+    withBodyScroll: true,
+    settingsStudio: false,
+    secondaryActiveOperations: runningOperation,
+    secondaryOperationsCompleted: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A round progress button in the bottom corner, so a long copy or upload stays visible while the user goes on working (`secondaryActiveOperations`). Hover it to read what is running; an empty list hides it again.",
+      },
+      source: {
+        code: `<Section
+  currentDeviceType={DeviceType.desktop}
+  withBodyScroll
+  settingsStudio={false}
+  secondaryActiveOperations={[
+    { id: "op-1", operation: "copy", label: "Copying 3 items", alert: false, completed: false, percent: 40 },
+  ]}
+  secondaryOperationsCompleted={false}
+>
+  <Section.SectionHeader>
+    <Navigation title="My Documents" />
+  </Section.SectionHeader>
+  <Section.SectionBody>
+    <TableContent />
+  </Section.SectionBody>
+</Section>`,
+      },
+    },
+  },
+};
+
+const getBodyContextModel = () => [
+  { key: "upload", label: "Upload file", onClick: fn() },
+  { key: "create", label: "New folder", onClick: fn() },
+];
+
+export const WithContextMenu: Story = {
+  render: (args) => (
+    <PageFrame>
+      <Section {...args}>
+        <Section.SectionHeader>
+          <NavigationHeader />
+        </Section.SectionHeader>
+        <Section.SectionBody>
+          <ListContent />
+        </Section.SectionBody>
+      </Section>
+    </PageFrame>
+  ),
+  args: {
+    currentDeviceType: DeviceType.desktop,
+    withBodyScroll: true,
+    settingsStudio: false,
+    getContextModel: getBodyContextModel,
+  },
+  parameters: {
+    noPadding: true,
+    docs: {
+      // Framed, because the menu listens for right clicks on the whole document.
+      story: { inline: false, height: "626px" },
+      description: {
+        story:
+          "A menu of page-wide actions on a right click anywhere in the body, for what applies to the folder rather than to one file (`getContextModel`). Right click the list to open it.",
+      },
+      source: {
+        code: `<Section
+  currentDeviceType={DeviceType.desktop}
+  withBodyScroll
+  settingsStudio={false}
+  getContextModel={() => [
+    { key: "upload", label: "Upload file", onClick: onUpload },
+    { key: "create", label: "New folder", onClick: onCreate },
+  ]}
+>
+  <Section.SectionHeader>
+    <Navigation title="My Documents" />
+  </Section.SectionHeader>
+  <Section.SectionBody>
+    <RowList />
+  </Section.SectionBody>
+</Section>`,
+      },
+    },
+  },
+};
+
+export const OnTablet: Story = {
+  render: (args) => (
+    <PageFrame height={640}>
+      <Section {...args}>
+        <Section.SectionHeader>
+          <NavigationHeader device={DeviceType.tablet} />
+        </Section.SectionHeader>
+        <Section.SectionFilter>
+          <FilterContent device={DeviceType.tablet} />
+        </Section.SectionFilter>
+        <Section.SectionBody>
+          <ListContent />
+        </Section.SectionBody>
+      </Section>
+    </PageFrame>
+  ),
+  decorators: [withFrame(834, 680)],
+  globals: { viewport: { value: "tablet", isRotated: false } },
+  args: {
+    currentDeviceType: DeviceType.tablet,
+    withBodyScroll: true,
+    settingsStudio: false,
+  },
+  parameters: {
+    noPadding: true,
+    docs: {
+      description: {
+        story:
+          "The page in a tablet-width window: the header stays pinned, while the filter bar moves into the listing and scrolls with it, leaving more room for the rows (`currentDeviceType`).",
+      },
+      source: {
+        code: `<Section
+  currentDeviceType={DeviceType.tablet}
+  withBodyScroll
+  settingsStudio={false}
+>
+  <Section.SectionHeader>
+    <Navigation title="My Documents" />
+  </Section.SectionHeader>
+  <Section.SectionFilter>
+    <Filter />
+  </Section.SectionFilter>
+  <Section.SectionBody>
+    <RowList />
+  </Section.SectionBody>
+</Section>`,
+      },
+    },
+  },
+};
+
+export const OnPhone: Story = {
+  render: (args) => (
+    <PageFrame height={640}>
+      <Section {...args}>
+        <Section.SectionHeader>
+          <NavigationHeader device={DeviceType.mobile} />
+        </Section.SectionHeader>
+        <Section.SectionFilter>
+          <FilterContent device={DeviceType.mobile} />
+        </Section.SectionFilter>
+        <Section.SectionBody>
+          <ListContent />
+        </Section.SectionBody>
+      </Section>
+    </PageFrame>
+  ),
+  decorators: [withFrame(414, 680)],
+  globals: { viewport: { value: "mobile2", isRotated: false } },
+  args: {
+    currentDeviceType: DeviceType.mobile,
+    withBodyScroll: true,
+    settingsStudio: false,
+  },
+  parameters: {
+    noPadding: true,
+    docs: {
+      description: {
+        story:
+          "The page on a phone: the header and the filter bar both move into the listing and the whole page scrolls, so the rows get the full height of the screen (`currentDeviceType`).",
+      },
+      source: {
+        code: `<Section
+  currentDeviceType={DeviceType.mobile}
+  withBodyScroll
+  settingsStudio={false}
+>
+  <Section.SectionHeader>
+    <Navigation title="My Documents" />
+  </Section.SectionHeader>
+  <Section.SectionFilter>
+    <Filter />
+  </Section.SectionFilter>
+  <Section.SectionBody>
+    <RowList />
+  </Section.SectionBody>
+</Section>`,
+      },
+    },
+  },
+};
+
+export const RightToLeft: Story = {
+  render: (args) => (
+    <div dir="rtl">
+      <PageFrame>
+        <Section {...args}>
+          <Section.SectionHeader>
+            <NavigationHeader />
+          </Section.SectionHeader>
+          <Section.SectionBody>
+            <TableContent />
+          </Section.SectionBody>
+          <Section.InfoPanelHeader>
+            <div style={{ padding: "20px" }}>
+              <Text fontSize="16px" fontWeight={700}>
+                تقرير سنوي
+              </Text>
+            </div>
+          </Section.InfoPanelHeader>
+          <Section.InfoPanelBody>
+            <div style={{ padding: "0 20px" }}>
+              <Text>مستند</Text>
+            </div>
+          </Section.InfoPanelBody>
+        </Section>
+      </PageFrame>
+    </div>
+  ),
+  globals: { direction: "rtl" },
+  args: {
+    currentDeviceType: DeviceType.desktop,
+    withBodyScroll: true,
+    settingsStudio: false,
+    canDisplay: true,
+    isInfoPanelVisible: true,
+  },
+  parameters: {
+    noPadding: true,
+    docs: {
+      // Framed, because an inline RTL story flips the whole Docs page.
+      story: { inline: false, height: "626px" },
+      description: {
+        story:
+          "The page in a right-to-left interface: the info panel opens on the left, its border moves to its right edge, and the table's columns run from the right.",
+      },
+      source: {
+        code: `<div dir="rtl">
+  <div style={{ display: "flex", height: 600 }}>
+    <Section
+      currentDeviceType={DeviceType.desktop}
+      withBodyScroll
+      settingsStudio={false}
+      canDisplay
+      isInfoPanelVisible
+    >
+      <Section.SectionHeader>
+        <Navigation title="My Documents" />
+      </Section.SectionHeader>
+      <Section.SectionBody>
+        <TableContent />
+      </Section.SectionBody>
+      <Section.InfoPanelHeader>
+        <Text fontSize="16px" fontWeight={700}>تقرير سنوي</Text>
+      </Section.InfoPanelHeader>
+      <Section.InfoPanelBody>
+        <Text>مستند</Text>
+      </Section.InfoPanelBody>
+    </Section>
+  </div>
+</div>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: (args) => (
     <div
       style={
         {
+          display: "flex",
           width: "100%",
           height: "600px",
-          // Section header background
+          // === Section — pinned header strip ===
           "--section-bg": "#e6f3fb",
-          // Section header size
           "--section-header-size": "56px",
-          // Section footer
           "--section-footer-margin": "24px",
-          // Info panel customization
-          "--info-panel-background": "#e6f3fb",
+          // === Info panel ===
+          "--info-panel-background": "#f5fbff",
           "--info-panel-border-color": "#0082c9",
-          "--info-panel-backdrop": "rgba(0, 130, 201, 0.08)",
-          "--info-panel-width": "360px",
-          // Navigation sub-component
-          "--navigation-root-folder-title-color": "#0082c9",
-          "--navigation-background": "#e6f3fb",
-          "--navigation-box-shadow": "0 2px 8px rgba(0,130,201,0.15)",
-          // Filter sub-component
-          "--filter-button-border": "1px solid #0082c9",
-          "--filter-button-hover-border": "1px solid #006fa6",
-          "--filter-block-background": "#e6f3fb",
-          "--filter-sort-button-background": "#e6f3fb",
-          // Table sub-component (used in SectionBody)
-          "--table-header-border-bottom": "1px solid #0082c9",
-          // IconButton (used in Navigation and Filter)
-          "--icon-button-color": "#0082c9",
-          "--icon-button-hover-color": "#006fa6",
+          "--info-panel-width": "300px",
+          // === Chat panel ===
+          "--chat-panel-background": "#fff8e6",
+          "--chat-panel-border-color": "#c98a00",
+          "--chat-panel-width": "300px",
+          "--chat-panel-drop-overlay-background": "#fff1cc",
+          "--chat-panel-drop-border-color": "#c98a00",
+          "--chat-panel-drop-inset-top": "72px",
         } as React.CSSProperties
       }
     >
@@ -496,16 +1425,14 @@ export const CssCustomization: Story = {
         <Section.SectionBody>
           <TableContent />
         </Section.SectionBody>
-        <Section.InfoPanelHeader>
-          <div style={{ padding: "8px 0", fontWeight: 600, color: "#0082c9" }}>
-            Info Panel
+        {infoPanelSlots}
+        <Section.ChatPanel>
+          <div style={{ padding: "20px" }}>
+            <Text fontSize="16px" fontWeight={700}>
+              Chat
+            </Text>
           </div>
-        </Section.InfoPanelHeader>
-        <Section.InfoPanelBody>
-          <div style={{ padding: "16px", color: "#0082c9" }}>
-            Info panel content with custom Nextcloud-style blue theme.
-          </div>
-        </Section.InfoPanelBody>
+        </Section.ChatPanel>
         <Section.SectionFooter>{null}</Section.SectionFooter>
       </Section>
     </div>
@@ -513,15 +1440,77 @@ export const CssCustomization: Story = {
   args: {
     currentDeviceType: DeviceType.desktop,
     withBodyScroll: true,
-    isHeaderVisible: true,
+    settingsStudio: false,
     isInfoPanelAvailable: true,
+    canDisplay: true,
     isInfoPanelVisible: true,
+    isChatPanelAvailable: true,
+    isChatPanelVisible: true,
+    chatPanelDropTargetLabel: "Drop here to attach",
   },
   parameters: {
     docs: {
       description: {
-        story:
-          "CSS custom property overrides. Set on any ancestor element. Navigation and Filter sub-components can be customized via their own CSS vars.",
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+| --- | --- | --- |
+| \`--section-bg\` | Background of the pinned strip that holds the header, the submenu and the desktop filter | theme-based |
+| \`--section-header-size\` | Height of the header on desktop | \`69px\` |
+| \`--section-header-tablet-size\` | Height of the header on tablet | \`61px\` |
+| \`--section-header-mobile-size\` | Height of the header on a phone | \`53px\` |
+| \`--section-footer-margin\` | Space above the footer slot | \`40px\` |
+| \`--section-footer-margin-mobile\` | Space above the footer slot on a phone | \`32px\` |
+| \`--section-mobile-footer-height\` | Empty space under the body on tablet and phone, which keeps the last row clear of floating buttons | \`64px\` |
+| \`--info-panel-background\` | Background of the info panel. On tablet and phone the panel is portalled to the page root, so set it on \`:root\` there | theme-based |
+| \`--info-panel-border-color\` | Border on the info panel's inner edge; desktop only, the panel has no border below it | theme-based |
+| \`--info-panel-width\` | Width of the info panel on desktop | \`400px\` |
+| \`--info-panel-tablet-width\` | Width of the info panel on tablet and phone, capped at the window width less 69px; set it on \`:root\` | \`480px\` |
+| \`--info-panel-backdrop\` | Colour of the overlay behind the info panel on tablet and phone; set it on \`:root\` | theme-based |
+| \`--chat-panel-background\` | Background of the chat panel | theme-based |
+| \`--chat-panel-border-color\` | Border on the chat panel's inner edge | theme-based |
+| \`--chat-panel-width\` | Width of the docked chat panel on desktop; the resize handle replaces it with its own width while \`chatPanelWidth\` is set | \`400px\` |
+| \`--chat-panel-drop-overlay-background\` | Fill of the "drop here" frame over the chat panel, drawn at 85% opacity | the chat panel's background |
+| \`--chat-panel-drop-border-color\` | Dashed border of that frame | theme-based |
+| \`--chat-panel-drop-inset-top\` | Space left above that frame for the chat's own header; desktop and tablet only, a phone always leaves 53px | \`69px\` |
+| \`--section-filter-top\` | With \`stickyTableHeader\`: where the filter comes to rest under the header | \`0\` |
+| \`--section-filter-height\` | With \`stickyTableHeader\`: minimum height of the filter row | \`0\` |
+| \`--section-filter-bottom\` | With \`stickyTableHeader\`: where the table header comes to rest under the filter | \`0\` |
+
+The example sets every desktop variable on a wrapper around one section with both panels open: the blue strip is the pinned header, the pale blue column is the info panel and the yellow one is the chat panel, with its drop frame on. Navigation, Filter and the table have variables of their own, documented in their stories and set on the same wrapper.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    display: "flex",
+    height: 600,
+    "--section-bg": "#e6f3fb",
+    "--section-header-size": "56px",
+    "--section-footer-margin": "24px",
+    "--info-panel-background": "#f5fbff",
+    "--info-panel-border-color": "#0082c9",
+    "--info-panel-width": "300px",
+    "--chat-panel-background": "#fff8e6",
+    "--chat-panel-border-color": "#c98a00",
+    "--chat-panel-width": "300px",
+    "--chat-panel-drop-overlay-background": "#fff1cc",
+    "--chat-panel-drop-border-color": "#c98a00",
+    "--chat-panel-drop-inset-top": "72px",
+  }}
+>
+  <Section
+    currentDeviceType={DeviceType.desktop}
+    withBodyScroll
+    settingsStudio={false}
+    canDisplay
+    isInfoPanelVisible
+    isChatPanelAvailable
+    isChatPanelVisible
+    chatPanelDropTargetLabel="Drop here to attach"
+  >
+    {/* header, filter, body, info panel and chat panel slots */}
+  </Section>
+</div>`,
       },
     },
   },

@@ -27,6 +27,18 @@ test.describe("SnackBar — light", () => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("snackbar-css-customization.png");
   });
+
+  test("with additional header text", async ({ page }) => {
+    await gotoStory(page, "with-additional-header-text");
+    await expect(page).toHaveScreenshot(
+      "snackbar-with-additional-header-text.png",
+    );
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("snackbar-right-to-left.png");
+  });
 });
 
 test.describe("SnackBar — dark", () => {

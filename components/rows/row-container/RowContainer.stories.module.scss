@@ -1,9 +1,5 @@
 @use "../../../styles/mixins";
 
-.sendClockIcon {
-  @include mixins.common-icons-style;
-}
-
-.catalogSpamIcon {
+.catalogFolderIcon {
   @include mixins.common-icons-style;
 }

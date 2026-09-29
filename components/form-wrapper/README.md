@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["field-container", "button", "text-input"],
   "subComponents": [],
-  "testIds": ["form-wrapper"]
+  "testIds": ["form-wrapper"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # FormWrapper

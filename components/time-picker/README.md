@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["date-time-picker", "text-input", "combobox"],
   "subComponents": [],
-  "testIds": ["time-picker"]
+  "testIds": ["time-picker"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # TimePicker

@@ -23,6 +23,16 @@ test.describe("Paging — light", () => {
     await expect(page).toHaveScreenshot("paging-disabled-previous.png");
   });
 
+  test("single page", async ({ page }) => {
+    await gotoStory(page, "single-page");
+    await expect(page).toHaveScreenshot("paging-single-page.png");
+  });
+
+  test("buttons only", async ({ page }) => {
+    await gotoStory(page, "buttons-only");
+    await expect(page).toHaveScreenshot("paging-buttons-only.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("paging-css-customization.png");

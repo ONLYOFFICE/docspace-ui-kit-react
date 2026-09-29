@@ -21,6 +21,18 @@ test.describe("TwoStateToggle -- light", () => {
     await gotoStory(page, "custom-labels");
     await expect(page).toHaveScreenshot("two-state-toggle-custom-labels.png");
   });
+
+  test("right-to-left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("two-state-toggle-right-to-left.png");
+  });
+
+  test("css-customization", async ({ page }) => {
+    await gotoStory(page, "css-customization");
+    await expect(page).toHaveScreenshot(
+      "two-state-toggle-css-customization.png",
+    );
+  });
 });
 
 test.describe("TwoStateToggle -- dark", () => {

@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["text", "label", "link"],
   "subComponents": [],
-  "testIds": ["heading"]
+  "testIds": ["heading"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Heading

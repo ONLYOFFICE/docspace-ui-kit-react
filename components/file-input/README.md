@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": "isLoading", "disabled": "isDisabled" },
   "related": ["dropzone", "text-input", "toast"],
   "subComponents": [],
-  "testIds": ["file-input"]
+  "testIds": ["file-input"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # FileInput

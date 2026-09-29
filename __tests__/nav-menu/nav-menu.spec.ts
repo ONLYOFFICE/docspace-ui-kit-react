@@ -21,6 +21,41 @@ test.describe("NavMenu -- light", () => {
     await gotoStory(page, "with-badge");
     await expect(page).toHaveScreenshot("nav-menu-with-badge.png");
   });
+
+  test("collapsed-rail", async ({ page }) => {
+    await gotoStory(page, "collapsed-rail");
+    await expect(page).toHaveScreenshot("nav-menu-collapsed-rail.png");
+  });
+
+  test("with-expand-control", async ({ page }) => {
+    await gotoStory(page, "with-expand-control");
+    await expect(page).toHaveScreenshot("nav-menu-with-expand-control.png");
+  });
+
+  test("section-badges", async ({ page }) => {
+    await gotoStory(page, "section-badges");
+    await expect(page).toHaveScreenshot("nav-menu-section-badges.png");
+  });
+
+  test("with-separator", async ({ page }) => {
+    await gotoStory(page, "with-separator");
+    await expect(page).toHaveScreenshot("nav-menu-with-separator.png");
+  });
+
+  test("click-without-expanding", async ({ page }) => {
+    await gotoStory(page, "click-without-expanding");
+    await expect(page).toHaveScreenshot("nav-menu-click-without-expanding.png");
+  });
+
+  test("right-to-left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("nav-menu-right-to-left.png");
+  });
+
+  test("css-customization", async ({ page }) => {
+    await gotoStory(page, "css-customization");
+    await expect(page).toHaveScreenshot("nav-menu-css-customization.png");
+  });
 });
 
 test.describe("NavMenu -- dark", () => {

@@ -14,15 +14,17 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `Component for displaying animated status messages with error or warning styling.
+        component: `A bar for an error or a warning that stays on screen until the state behind it changes, placed above the form or page it is about.
 
 ### Features
 
-- **Animated Entry/Exit**: Smooth slide-in and fade-out animations
-- **Warning Variant**: Alternative styling for warning messages
+- **Fade In and Out**: Fades in when a message arrives and fades out before it leaves
+- **Warning Variant**: Switches the background, border and icon to the warning colours
 - **Auto-Hide**: Automatically hides when the message is cleared
 - **Message Swap**: Smoothly transitions between different messages
-- **Danger Icon**: Displays a warning icon alongside the message text
+- **Danger Icon**: Shows the same danger glyph before the text in both variants, tinted to match
+- **Rich Content**: Accepts plain text or React nodes as the message
+- **Container Width**: Stretches to the width of its container up to 1200px and keeps a 16px gap below
 
 ### Usage
 
@@ -44,11 +46,13 @@ import StatusMessage from "@onlyoffice/apps-ui-kit/components/status-message";
   argTypes: {
     message: {
       control: "text",
-      description: "Message text to display. Set to empty string to hide.",
+      description:
+        "The text or nodes shown in the bar. An empty value fades the bar out and removes it; a new value appears once the previous one has faded out",
     },
     isWarning: {
       control: "boolean",
-      description: "Display with warning styling instead of error",
+      description:
+        "Paints the bar in the warning colours instead of the error ones. Takes effect together with the next change of `message`",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -64,6 +68,17 @@ export const Default: Story = {
   render: (args) => <StatusMessage {...args} />,
   args: {
     message: "This is a status message",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The error bar as a form shows it after a failed action. Type a new text in the Controls panel below to watch the old one fade out first; the warning switch there takes effect with the next text change (`isWarning`).",
+      },
+      source: {
+        code: `<StatusMessage message="This is a status message" />`,
+      },
+    },
   },
 };
 
@@ -123,7 +138,8 @@ export const WarningMessage: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Status message with warning styling for non-critical alerts.",
+        story:
+          "For a problem that does not block the user: the same bar in the warning colours (`isWarning`).",
       },
       source: {
         code: `<StatusMessage message="This is a warning message" isWarning />`,
@@ -138,7 +154,7 @@ export const ToggleVisibility: Story = {
     docs: {
       description: {
         story:
-          "Demonstrates showing and hiding the status message by setting the message to an empty string.",
+          "Use this to see how the bar leaves and returns: **Hide Message** fades it out and removes it, **Show Message** brings it back (`message` set to an empty string and back).",
       },
       source: {
         code: `const [message, setMessage] = useState("Click the button to dismiss");
@@ -157,7 +173,7 @@ export const MessageSwap: Story = {
     docs: {
       description: {
         story:
-          "Demonstrates smooth transitions when swapping between different messages.",
+          "Use this to see what a user sees when one message replaces another: **Message A** and **Message B** fade the current text out before the new one fades in, **Clear** hides the bar.",
       },
       source: {
         code: `const [message, setMessage] = useState("First message");
@@ -185,10 +201,16 @@ export const CssCustomization: Story = {
           "--status-message-padding": "12px 16px",
           "--status-message-gap": "16px",
           "--status-message-shadow": "0 4px 20px rgba(124,58,237,0.3)",
+          "--status-message-margin-bottom": "24px",
+          "--status-message-max-width": "360px",
+          "--status-message-warning-bg": "#422006",
+          "--status-message-warning-border-style": "2px solid #f59e0b",
+          "--status-message-warning-icon": "#fbbf24",
         } as CSSProperties
       }
     >
       <StatusMessage message="Custom styled status message with CSS variables." />
+      <StatusMessage message="Custom styled warning message." isWarning />
     </div>
   ),
   parameters: {
@@ -198,16 +220,43 @@ export const CssCustomization: Story = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--status-message-bg\` | Background color | theme token |
-| \`--status-message-border\` | Border style | theme token |
+| \`--status-message-bg\` | Background color of the error bar | theme token |
+| \`--status-message-border\` | Border of the error bar | theme token |
 | \`--status-message-text\` | Text color | theme token |
-| \`--status-message-icon\` | Icon fill color | theme token |
+| \`--status-message-icon\` | Icon fill color of the error bar | theme token |
+| \`--status-message-warning-bg\` | Background color of the warning bar | theme token |
+| \`--status-message-warning-border-style\` | Border of the warning bar | theme token |
+| \`--status-message-warning-icon\` | Icon fill color of the warning bar | theme token |
 | \`--status-message-shadow\` | Box shadow | theme token |
 | \`--status-message-radius\` | Border radius | \`6px\` |
 | \`--status-message-padding\` | Inner padding | \`8px 12px\` |
 | \`--status-message-gap\` | Gap between icon and text | \`12px\` |
 | \`--status-message-margin-bottom\` | Bottom margin | \`16px\` |
-| \`--status-message-max-width\` | Max width | \`1200px\` |`,
+| \`--status-message-max-width\` | Max width | \`1200px\` |
+
+The first bar shows the shared variables; the second, with \`isWarning\`, is there for the three warning variables, and the gap between the two is the bottom margin. The max width caps both bars below the 400px wrapper.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--status-message-bg": "#1e1b4b",
+    "--status-message-border": "2px solid #7c3aed",
+    "--status-message-text": "#e0e7ff",
+    "--status-message-icon": "#a78bfa",
+    "--status-message-radius": "12px",
+    "--status-message-padding": "12px 16px",
+    "--status-message-gap": "16px",
+    "--status-message-shadow": "0 4px 20px rgba(124,58,237,0.3)",
+    "--status-message-margin-bottom": "24px",
+    "--status-message-max-width": "360px",
+    "--status-message-warning-bg": "#422006",
+    "--status-message-warning-border-style": "2px solid #f59e0b",
+    "--status-message-warning-icon": "#fbbf24",
+  }}
+>
+  <StatusMessage message="Custom styled status message with CSS variables." />
+  <StatusMessage message="Custom styled warning message." isWarning />
+</div>`,
       },
     },
   },

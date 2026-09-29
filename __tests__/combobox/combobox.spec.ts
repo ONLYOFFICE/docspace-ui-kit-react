@@ -1,8 +1,8 @@
 import { type Page, expect, test } from "@playwright/test";
 
-// Title: "UI/Interactive elements/ComboBox"
-// → prefix: "ui-interactive-elements-combobox"
-const STORY_BASE = "ui-interactive-elements-combobox";
+// Title: "UI/Form controls/ComboBox"
+// → prefix: "ui-form-controls-combobox"
+const STORY_BASE = "ui-form-controls-combobox";
 
 async function gotoStory(page: Page, storyId: string) {
   const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
@@ -21,6 +21,16 @@ test.describe("ComboBox — light", () => {
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("combobox-css-customization.png");
+  });
+
+  test("loading state", async ({ page }) => {
+    await gotoStory(page, "loading-state");
+    await expect(page).toHaveScreenshot("combobox-loading-state.png");
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("combobox-right-to-left.png");
   });
 });
 

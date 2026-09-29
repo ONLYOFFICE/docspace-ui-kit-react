@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
   "related": ["tags", "selected-item", "badge"],
   "subComponents": [],
-  "testIds": ["tag_item"]
+  "testIds": ["tag_item"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Tag

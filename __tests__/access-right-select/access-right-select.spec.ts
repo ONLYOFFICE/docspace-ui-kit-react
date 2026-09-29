@@ -1,8 +1,8 @@
 import { type Page, expect, test } from "@playwright/test";
 
-// Title: "UI/Interactive elements/AccessRightSelect"
-// → prefix: "ui-interactive-elements-accessrightselect"
-const STORY_BASE = "ui-interactive-elements-accessrightselect";
+// Title: "UI/Form controls/AccessRightSelect"
+// → prefix: "ui-form-controls-accessrightselect"
+const STORY_BASE = "ui-form-controls-accessrightselect";
 
 async function gotoStory(page: Page, storyId: string) {
   const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
@@ -13,6 +13,39 @@ async function gotoStory(page: Page, storyId: string) {
 }
 
 test.describe("AccessRightSelect — light", () => {
+  test("default", async ({ page }) => {
+    await gotoStory(page, "default");
+    await expect(page).toHaveScreenshot("access-right-select-default.png");
+  });
+
+  test("display types", async ({ page }) => {
+    await gotoStory(page, "display-types");
+    await expect(page).toHaveScreenshot(
+      "access-right-select-display-types.png",
+    );
+  });
+
+  test("restricted choices", async ({ page }) => {
+    await gotoStory(page, "restricted-choices");
+    await expect(page).toHaveScreenshot(
+      "access-right-select-restricted-choices.png",
+    );
+  });
+
+  test("disabled state", async ({ page }) => {
+    await gotoStory(page, "disabled-state");
+    await expect(page).toHaveScreenshot(
+      "access-right-select-disabled-state.png",
+    );
+  });
+
+  test("loading state", async ({ page }) => {
+    await gotoStory(page, "loading-state");
+    await expect(page).toHaveScreenshot(
+      "access-right-select-loading-state.png",
+    );
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot(

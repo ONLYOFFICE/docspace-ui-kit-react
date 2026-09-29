@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": "isLoading", "disabled": "isDisabled" },
   "related": ["icon-button", "button", "selector"],
   "subComponents": [],
-  "testIds": ["selector-add-button", "selector-add-button-container"]
+  "testIds": ["selector-add-button", "selector-add-button-container"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # AddButton

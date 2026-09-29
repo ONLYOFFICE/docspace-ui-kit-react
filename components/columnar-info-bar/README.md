@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": "onAction", "loading": null, "disabled": null },
   "related": ["public-room-bar", "snackbar", "card"],
   "subComponents": [],
-  "testIds": []
+  "testIds": [],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # ColumnarInfoBar

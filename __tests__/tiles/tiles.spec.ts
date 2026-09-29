@@ -1,13 +1,46 @@
 import { type Page, expect, test } from "@playwright/test";
 
-const COMPONENTS = [
-  { id: "ui-tiles-basetile", name: "base-tile" },
-  { id: "ui-tiles-filetile", name: "file-tile" },
-  { id: "ui-tiles-foldertile", name: "folder-tile" },
-  { id: "ui-tiles-roomtile", name: "room-tile" },
-  { id: "ui-tiles-templatetile", name: "template-tile" },
-  { id: "ui-tiles-tilecontainer", name: "tile-container" },
-  { id: "ui-tiles-tilecontent", name: "tile-content" },
+const COMPONENTS: { id: string; name: string; stories?: string[] }[] = [
+  {
+    id: "ui-tiles-basetile",
+    name: "base-tile",
+    stories: ["with-menu-button", "renaming-state", "blocking-operation"],
+  },
+  {
+    id: "ui-tiles-filetile",
+    name: "file-tile",
+    stories: ["with-thumbnail", "with-hotkey-border", "renaming-state"],
+  },
+  {
+    id: "ui-tiles-foldertile",
+    name: "folder-tile",
+    stories: ["with-hotkey-border", "renaming-state", "right-to-left"],
+  },
+  {
+    id: "ui-tiles-roomtile",
+    name: "room-tile",
+    stories: [
+      "generated-tags",
+      "with-hotkey-border",
+      "renaming-state",
+      "custom-bottom-row",
+    ],
+  },
+  {
+    id: "ui-tiles-templatetile",
+    name: "template-tile",
+    stories: ["in-progress", "with-hotkey-border", "renaming-state"],
+  },
+  {
+    id: "ui-tiles-tilecontainer",
+    name: "tile-container",
+    stories: ["folders-and-files"],
+  },
+  {
+    id: "ui-tiles-tilecontent",
+    name: "tile-content",
+    stories: ["fixed-title-width"],
+  },
 ];
 
 async function gotoStory(page: Page, storyBase: string, storyId: string) {
@@ -18,7 +51,7 @@ async function gotoStory(page: Page, storyBase: string, storyId: string) {
   await page.waitForLoadState("networkidle");
 }
 
-for (const { id, name } of COMPONENTS) {
+for (const { id, name, stories = [] } of COMPONENTS) {
   test.describe(`${name} — light`, () => {
     test("default", async ({ page }) => {
       await gotoStory(page, id, "default");
@@ -29,6 +62,13 @@ for (const { id, name } of COMPONENTS) {
       await gotoStory(page, id, "css-customization");
       await expect(page).toHaveScreenshot(`${name}-css-customization.png`);
     });
+
+    for (const storyId of stories) {
+      test(storyId, async ({ page }) => {
+        await gotoStory(page, id, storyId);
+        await expect(page).toHaveScreenshot(`${name}-${storyId}.png`);
+      });
+    }
   });
 
   test.describe(`${name} — dark`, () => {
@@ -51,5 +91,13 @@ for (const { id, name } of COMPONENTS) {
       await page.evaluate(() => document.body.classList.add("dark"));
       await expect(page).toHaveScreenshot(`${name}-css-customization-dark.png`);
     });
+
+    for (const storyId of stories) {
+      test(`${storyId} dark`, async ({ page }) => {
+        await gotoStory(page, id, storyId);
+        await page.evaluate(() => document.body.classList.add("dark"));
+        await expect(page).toHaveScreenshot(`${name}-${storyId}-dark.png`);
+      });
+    }
   });
 }

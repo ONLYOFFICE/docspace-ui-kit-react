@@ -2,6 +2,9 @@ import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
+import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
+
 import { Tag } from ".";
 
 const meta = {
@@ -14,18 +17,22 @@ const meta = {
 
 ### Features
 
-- **New Tag State**: Visual indicator for newly created tags with a delete button
-- **Disabled State**: Prevents interaction and applies disabled styling
-- **Deleted State**: Strikethrough styling for removed tags
-- **Click Handler**: Callback when the tag body is clicked
-- **Delete Handler**: Callback when the delete button is clicked (new tags only)
+- **New Tag State**: Draws a newly created tag on a filled background and, when a delete handler is given, adds a cross after the label
+- **Disabled State**: Draws a dashed border and ignores the pointer, so the tag neither reacts to hover nor fires its click handler
+- **Deleted State**: Greys out the border and stops the click handler from firing while the tag stays on screen
+- **Click Handler**: Reports a click anywhere in the tag with its label and pass-through values, and highlights the tag on hover while it is set
+- **Delete Handler**: Receives the tag's identifier when the cross of a new tag is clicked
 - **Max Width**: Configurable maximum width with text truncation
-- **Icon Support**: Display SVG icons or third-party provider icons
+- **Icon Tags**: Shows a glyph from an SVG URL or a component, as a compact tag of its own once the label is turned off
+- **Label Suffix**: Appends extra text to the label on the same line, in a colour of its own
 
 ### Accessibility
 
-- \`aria-label\`: Set from the tag label text
-- \`aria-disabled\`: Indicates when the tag is disabled
+The tag is a plain \`div\` with no role of its own; it sets two attributes:
+
+- \`aria-label\`: Set to \`label\`, the name a screen reader gives the tag
+- \`aria-disabled\`: Set while \`isDisabled\` is on, so the tag is announced as unavailable
+- The tag is not focusable and handles no keys, so a clickable tag needs another keyboard route to the same action
 
 ### Usage
 
@@ -51,15 +58,17 @@ import { Tag } from "@onlyoffice/apps-ui-kit/components/tag";
   argTypes: {
     tag: {
       control: "text",
-      description: "Identifier for the tag type or category",
+      description:
+        "Identifier of the tag: handed to `onDelete`, and shown as the text when `label` is left out",
     },
     label: {
       control: "text",
-      description: "Display text for the tag",
+      description: "Text of the tag, also used as its accessible name",
     },
     isNewTag: {
       control: "boolean",
-      description: "Marks the tag as newly created and shows delete button",
+      description:
+        'Draws the tag in its "new" colours; together with `onDelete` it also shows the delete cross',
       table: {
         defaultValue: { summary: "false" },
       },
@@ -73,7 +82,8 @@ import { Tag } from "@onlyoffice/apps-ui-kit/components/tag";
     },
     isDeleted: {
       control: "boolean",
-      description: "Displays the tag with deleted/strikethrough styling",
+      description:
+        "Marks the tag as removed: the border greys out and `onClick` stops firing",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -82,13 +92,93 @@ import { Tag } from "@onlyoffice/apps-ui-kit/components/tag";
       control: "text",
       description: "Maximum width of the tag (CSS value)",
     },
+    icon: {
+      control: false,
+      description:
+        "Glyph before the label: an SVG URL, or a component rendered as a 12px icon",
+    },
+    iconClassName: {
+      control: "text",
+      description: "Class name applied to the glyph",
+    },
+    withLabel: {
+      control: "boolean",
+      description:
+        "Whether the label is rendered; turn it off for a tag that is only its glyph",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    labelSuffix: {
+      control: "text",
+      description: "Extra text after the label, on the same line",
+    },
+    labelSuffixColor: {
+      control: "color",
+      description: "CSS colour of the label suffix",
+    },
+    isLast: {
+      control: "boolean",
+      description: "Drops the space after the tag, for the last tag in a row",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isDefault: {
+      control: false,
+      description: "Ignored: nothing on a single tag reads it",
+    },
+    roomType: {
+      control: "number",
+      description:
+        "Number passed straight back through `onClick`; the tag itself does nothing with it",
+    },
+    providerType: {
+      control: "number",
+      description:
+        "Number passed straight back through `onClick`; the tag itself does nothing with it",
+    },
+    id: {
+      control: "text",
+      description: "Id of the outermost element",
+    },
+    className: {
+      control: "text",
+      description: "Class name of the outermost element",
+    },
+    style: {
+      control: "object",
+      description:
+        "Inline style of the outermost element; `tagMaxWidth` wins over its `maxWidth`",
+    },
+    dataTestId: {
+      control: "text",
+      description: "`data-testid` of the outermost element",
+      table: {
+        defaultValue: { summary: '"tag_item"' },
+      },
+    },
+    ref: {
+      control: false,
+      description: "Ref to the outermost element",
+    },
     onClick: {
       action: "clicked",
-      description: "Callback when the tag is clicked",
+      description:
+        "Called on a click anywhere in the tag with `{ label, roomType, providerType }`, not with the DOM event; silent while the tag is disabled or deleted",
     },
     onDelete: {
       action: "deleted",
-      description: "Callback when the delete button is clicked",
+      description:
+        "Called with `tag` when the cross is clicked; the cross appears only on a new tag",
+    },
+    onMouseEnter: {
+      action: "mouseEntered",
+      description: "Called when the pointer enters the tag",
+    },
+    onMouseLeave: {
+      action: "mouseLeft",
+      description: "Called when the pointer leaves the tag",
     },
   },
 } satisfies Meta<typeof Tag>;
@@ -119,6 +209,17 @@ export const Default: Story = {
     label: "Script",
     tagMaxWidth: "160px",
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A plain tag with a label, the starting point for every other state; change any prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<Tag tag="script" label="Script" tagMaxWidth="160px" />`,
+      },
+    },
+  },
 };
 
 const StatesTemplate = () => {
@@ -132,49 +233,22 @@ const StatesTemplate = () => {
   );
 };
 
-const NewTagTemplate = () => {
+const NewTagTemplate = ({ onDelete }: ComponentProps<typeof Tag>) => {
   return (
     <Wrapper>
-      <Tag
-        tag="react"
-        label="React"
-        isNewTag
-        onDelete={() => alert("Delete: React")}
-      />
-      <Tag
-        tag="typescript"
-        label="TypeScript"
-        isNewTag
-        onDelete={() => alert("Delete: TypeScript")}
-      />
-      <Tag
-        tag="nodejs"
-        label="Node.js"
-        isNewTag
-        onDelete={() => alert("Delete: Node.js")}
-      />
+      <Tag tag="drafts" label="Drafts" isNewTag onDelete={onDelete} />
+      <Tag tag="review" label="Review" isNewTag onDelete={onDelete} />
+      <Tag tag="archive" label="Archive" isNewTag onDelete={onDelete} />
     </Wrapper>
   );
 };
 
-const ClickableTemplate = () => {
+const ClickableTemplate = ({ onClick }: ComponentProps<typeof Tag>) => {
   return (
     <Wrapper>
-      <Tag
-        tag="design"
-        label="Design"
-        onClick={() => alert("Clicked: Design")}
-      />
-      <Tag
-        tag="development"
-        label="Development"
-        onClick={() => alert("Clicked: Development")}
-      />
-      <Tag
-        tag="marketing"
-        label="Marketing"
-        onClick={() => alert("Clicked: Marketing")}
-      />
+      <Tag tag="design" label="Design" onClick={onClick} />
+      <Tag tag="development" label="Development" onClick={onClick} />
+      <Tag tag="marketing" label="Marketing" onClick={onClick} />
     </Wrapper>
   );
 };
@@ -198,8 +272,12 @@ export const States: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "All tag states: default, new (with delete button), disabled, and deleted.",
+        story: `The four looks a tag can take, side by side, to pick the one that matches an item's status:
+
+- **Default** — a bordered tag on the plain background
+- **New Tag** — a filled tag with a delete cross after the label (\`isNewTag\` with \`onDelete\`)
+- **Disabled** — a dashed border; the tag ignores hover and clicks (\`isDisabled\`)
+- **Deleted** — a greyed-out border; clicks no longer reach \`onClick\` (\`isDeleted\`)`,
       },
       source: {
         code: `<Tag tag="default" label="Default" />
@@ -212,32 +290,34 @@ export const States: Story = {
 };
 
 export const NewTags: Story = {
-  render: () => <NewTagTemplate />,
+  render: (args) => <NewTagTemplate {...args} />,
   parameters: {
     docs: {
       description: {
         story:
-          "Tags marked as newly created with a delete button. Click the X to trigger the onDelete callback.",
+          "Tags the user has just added and can still take back: click a cross to remove its tag, and the Actions panel shows the identifier `onDelete` receives.",
       },
       source: {
-        code: `<Tag tag="react" label="React" isNewTag onDelete={(tag) => console.log(tag)} />
-<Tag tag="typescript" label="TypeScript" isNewTag onDelete={(tag) => console.log(tag)} />`,
+        code: `<Tag tag="drafts" label="Drafts" isNewTag onDelete={(tag) => console.log(tag)} />
+<Tag tag="review" label="Review" isNewTag onDelete={(tag) => console.log(tag)} />
+<Tag tag="archive" label="Archive" isNewTag onDelete={(tag) => console.log(tag)} />`,
       },
     },
   },
 };
 
 export const ClickableTags: Story = {
-  render: () => <ClickableTemplate />,
+  render: (args) => <ClickableTemplate {...args} />,
   parameters: {
     docs: {
       description: {
         story:
-          "Tags with click handlers. Clicking the tag triggers the onClick callback with tag event data.",
+          "Tags that act as filters: hover one to see it highlight, click it, and the Actions panel shows the `{ label }` object `onClick` receives instead of the DOM event.",
       },
       source: {
         code: `<Tag tag="design" label="Design" onClick={({ label }) => console.log(label)} />
-<Tag tag="development" label="Development" onClick={({ label }) => console.log(label)} />`,
+<Tag tag="development" label="Development" onClick={({ label }) => console.log(label)} />
+<Tag tag="marketing" label="Marketing" onClick={({ label }) => console.log(label)} />`,
       },
     },
   },
@@ -260,21 +340,77 @@ export const MaxWidthVariants: Story = {
   },
 };
 
+export const IconOnly: Story = {
+  render: () => (
+    <Wrapper>
+      <Tag
+        tag="url"
+        label="Folder from a URL"
+        icon={CatalogFolderReactSvgUrl}
+        withLabel={false}
+      />
+      <Tag
+        tag="component"
+        label="Folder component"
+        icon={CatalogFolderIcon}
+        withLabel={false}
+      />
+    </Wrapper>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `A compact tag that is only a glyph marks where an item comes from without taking the width of a label; the hidden label still names the tag for screen readers (\`withLabel={false}\`):
+
+- **First tag** — the glyph loaded from an SVG file (\`icon\` as a URL)
+- **Second tag** — the same glyph passed as a React component (\`icon\` as a component)`,
+      },
+      source: {
+        code: `<Tag tag="url" label="Folder from a URL" icon={folderIconUrl} withLabel={false} />
+<Tag tag="component" label="Folder component" icon={FolderIcon} withLabel={false} />`,
+      },
+    },
+  },
+};
+
+export const WithLabelSuffix: Story = {
+  render: (args) => <Tag {...args} />,
+  args: {
+    tag: "reports",
+    label: "Reports",
+    labelSuffix: " (12)",
+    labelSuffixColor: "#A3A9AE",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A count after the label, in a quieter colour, tells the reader how many items the tag covers without a second element (`labelSuffix`, `labelSuffixColor`).",
+      },
+      source: {
+        code: `<Tag tag="reports" label="Reports" labelSuffix=" (12)" labelSuffixColor="#A3A9AE" />`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
     <div
       style={
         {
+          display: "flex",
           "--tag-bg": "#EDE7F6",
           "--tag-border-style": "1px solid #9C27B0",
           "--tag-radius": "16px",
           "--tag-inner-padding": "4px 14px",
-          "--tag-text-color": "#6A1B9A",
-          "--tag-size": "13px",
+          "--tag-height": "30px",
+          "--tag-spacing-end": "16px",
         } as CSSProperties
       }
     >
       <Tag tag="custom" label="Custom Tag" />
+      <Tag tag="second" label="Second Tag" />
     </div>
   ),
   parameters: {
@@ -282,27 +418,31 @@ export const CssCustomization: Story = {
       description: {
         story: `CSS Custom Properties for external customization:
 
-\`\`\`css
---tag-bg            /* background color */
---tag-border-style  /* border shorthand */
---tag-radius        /* border-radius */
---tag-inner-padding /* padding */
---tag-text-color    /* text color */
---tag-size          /* font-size */
-\`\`\``,
+| Variable | Description | Default |
+| --- | --- | --- |
+| \`--tag-bg\` | Background of the tag; a new tag, and any tag on hover or press, takes the theme's colour instead | theme-based |
+| \`--tag-border-style\` | Border shorthand; a disabled tag draws its dashed theme border instead | theme-based |
+| \`--tag-radius\` | Corner radius | \`6px\` |
+| \`--tag-inner-padding\` | Space between the border and the content | \`1px 7px\` |
+| \`--tag-height\` | Maximum height; raise it together with a larger vertical padding | \`22px\` |
+| \`--tag-spacing-end\` | Space after the tag, before the next one in a row | \`4px\` |
+
+Both tags take every variable from the wrapper; the second is there to show the space \`--tag-spacing-end\` leaves after **Custom Tag**. The other \`--tag-*\` colours are declared by the theme on the tag itself, so a wrapper cannot override them.`,
       },
       source: {
         code: `<div
   style={{
+    display: "flex",
     "--tag-bg": "#EDE7F6",
     "--tag-border-style": "1px solid #9C27B0",
     "--tag-radius": "16px",
     "--tag-inner-padding": "4px 14px",
-    "--tag-text-color": "#6A1B9A",
-    "--tag-size": "13px",
+    "--tag-height": "30px",
+    "--tag-spacing-end": "16px",
   }}
 >
   <Tag tag="custom" label="Custom Tag" />
+  <Tag tag="second" label="Second Tag" />
 </div>`,
       },
     },

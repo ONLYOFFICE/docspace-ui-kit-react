@@ -18,6 +18,16 @@ test.describe("LinkWithDropdown — light", () => {
     await expect(page).toHaveScreenshot("link-with-dropdown-default.png");
   });
 
+  test("text overflow", async ({ page }) => {
+    await gotoStory(page, "text-overflow");
+    await expect(page).toHaveScreenshot("link-with-dropdown-text-overflow.png");
+  });
+
+  test("open menu", async ({ page }) => {
+    await gotoStory(page, "open-menu");
+    await expect(page).toHaveScreenshot("link-with-dropdown-open-menu.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot(

@@ -12,7 +12,8 @@
   "state": { "visibility": "isOpen", "close": "onToggle", "loading": null, "disabled": null },
   "related": ["card", "tabs", "text"],
   "subComponents": [],
-  "testIds": ["collapsible-card"]
+  "testIds": ["collapsible-card"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # CollapsibleCard

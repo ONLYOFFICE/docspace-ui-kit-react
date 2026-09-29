@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": "onClose", "loading": null, "disabled": "isDisabled" },
   "related": ["tag", "date-picker", "icon-button"],
   "subComponents": [],
-  "testIds": ["selected-item"]
+  "testIds": ["selected-item"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # SelectedItem

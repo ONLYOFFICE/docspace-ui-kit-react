@@ -18,6 +18,16 @@ test.describe("SelectionArea — light", () => {
     await expect(page).toHaveScreenshot("selection-area-default.png");
   });
 
+  test("row view", async ({ page }) => {
+    await gotoStory(page, "row-view");
+    await expect(page).toHaveScreenshot("selection-area-row-view.png");
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("selection-area-right-to-left.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("selection-area-css-customization.png");

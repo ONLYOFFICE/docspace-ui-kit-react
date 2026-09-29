@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
   "related": ["text-input", "input-block", "filter"],
   "subComponents": [],
-  "testIds": ["search-input", "main-button"]
+  "testIds": ["search-input", "main-button"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # SearchInput

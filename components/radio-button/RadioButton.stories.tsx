@@ -17,16 +17,22 @@ const meta = {
 
 ### Features
 
-- **Checked/Unchecked States**: Visual indication of selection
-- **Disabled State**: Prevents user interaction
-- **Custom Label**: Text or ReactNode label with configurable font size and weight
-- **Keyboard Accessibility**: Supports focus and keyboard interaction
-- **Orientation**: Horizontal and vertical layout options
-- **Custom Spacing**: Configurable margin between radio buttons
+- **Checked/Unchecked States**: Draws an empty circle or a circle with a filled dot, and returns to \`isChecked\` whenever that prop changes
+- **Disabled State**: Disables the input and greys out the circle and the label, so clicks no longer select it
+- **Custom Label**: Writes text or any React node beside the circle, falls back to \`value\` when no label is given, and takes its own font size and weight
+- **Keyboard Access**: Reached with Tab and selected with Space through the native radio input it wraps
+- **Spacing**: Adds a gap to the neighbouring button only when \`spacing\` is given, below the button in a vertical set and before it in a horizontal one; the set's own layout is left to its container
+- **Two Callback Modes**: Tracks its own checked state and reports clicks through \`onClick\`, or, once \`onChange\` is given, hands over every change and follows \`isChecked\` alone
+- **Theming**: Takes its circle and text colours from the light or dark theme, and lets CSS variables override them
 
 ### Accessibility
 
-The RadioButton component uses a native \`<input type="radio">\` element for screen reader support and keyboard navigation.
+The RadioButton renders a visually hidden native \`<input type="radio">\` inside a \`<label>\`, so its support comes from the platform:
+
+- Screen readers announce a radio button with its checked state, named by the label text beside the circle
+- Buttons that share a \`name\` form one set: Tab enters it, the arrow keys move the selection between its buttons, and Space selects the focused one
+- \`isDisabled\` sets the native \`disabled\` on the input, which takes it out of the Tab order and is announced as unavailable
+- No focus ring is drawn around the circle, so an application that needs a visible focus cue has to style one
 
 ### Usage
 
@@ -41,6 +47,15 @@ import { RadioButton } from "@onlyoffice/apps-ui-kit/components/radio-button";
 
 // Disabled radio button
 <RadioButton name="group" value="option3" label="Option 3" isDisabled />
+
+// Controlled set with a gap between the buttons
+<RadioButton
+  name="size"
+  value="small"
+  isChecked={size === "small"}
+  spacing="12px"
+  onChange={(e) => setSize(e.target.value)}
+/>
 \`\`\``,
       },
     },
@@ -52,46 +67,103 @@ import { RadioButton } from "@onlyoffice/apps-ui-kit/components/radio-button";
   argTypes: {
     isChecked: {
       control: "boolean",
-      description: "Controls the checked state of the radio button",
+      description:
+        "Whether the circle is filled in; the button starts in this state and returns to it whenever the prop changes",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isDisabled: {
       control: "boolean",
-      description: "Disables the radio button when set to true",
+      description:
+        "Disables the input and greys out the circle and the label, so clicks no longer select it",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     label: {
       control: "text",
-      description: "Text label displayed next to the radio button",
+      description:
+        "Text or any React node written beside the circle; `value` is shown when it is left out",
     },
     name: {
       control: "text",
-      description: "Name attribute for the radio button input",
+      description:
+        "`name` of the input; buttons sharing one form a single choice the arrow keys move through",
     },
     value: {
       control: "text",
-      description: "Value attribute for the radio button input",
+      description:
+        "`value` of the input, read back from the change event, and the text beside the circle when `label` is left out",
     },
     fontSize: {
       control: "text",
-      description: "Font size of the label text",
+      description: "Font size of the text beside the circle, as a CSS length",
       table: {
         defaultValue: { summary: "13px" },
       },
     },
     fontWeight: {
       control: "number",
-      description: "Font weight of the label text",
+      description: "Font weight of the text beside the circle",
       table: {
         defaultValue: { summary: "400" },
       },
     },
     spacing: {
       control: "text",
-      description: "Margin between radio buttons",
+      description:
+        "Gap to the neighbouring button, as a CSS length; without it the buttons touch",
+    },
+    orientation: {
+      control: "select",
+      options: ["vertical", "horizontal"],
+      description:
+        "Which side `spacing` goes on: below the button when vertical, before it when horizontal; it does not arrange the buttons itself",
       table: {
-        defaultValue: { summary: "15px" },
+        defaultValue: { summary: "vertical" },
+      },
+    },
+    onChange: {
+      action: "onChange",
+      description:
+        "Called on every change of the input; once given, the button stops tracking its own state, follows `isChecked` alone and no longer calls `onClick`",
+    },
+    onClick: {
+      action: "onClick",
+      description:
+        "Called when the button is clicked, but only while `onChange` is not given",
+    },
+    autoFocus: {
+      control: "boolean",
+      description:
+        "Whether the input takes keyboard focus as soon as it mounts",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    id: {
+      control: "text",
+      description:
+        "`id` of the label that wraps the button, not of the input inside it",
+    },
+    className: {
+      control: "text",
+      description: "Class added to the label that wraps the button",
+    },
+    style: {
+      control: "object",
+      description: "Inline style of the label that wraps the button",
+    },
+    classNameInput: {
+      control: "text",
+      description: "Class added to the visually hidden input",
+    },
+    testId: {
+      control: "text",
+      description: "`data-testid` of the label that wraps the button",
+      table: {
+        defaultValue: { summary: "radio-button" },
       },
     },
   },
@@ -126,6 +198,7 @@ const Template = ({ isChecked, ...args }: RadioButtonProps) => {
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const target = e.target as HTMLInputElement;
     setIsChecked(target.checked);
+    args.onChange?.(e);
   };
 
   return (
@@ -143,6 +216,23 @@ export const Default: Story = {
     fontWeight: 400,
     isDisabled: false,
     isChecked: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A single labelled button, the starting point for any single-choice option; click it to fill in the circle, and change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<RadioButton
+  name="name"
+  value="value"
+  label="Default radio button"
+  isChecked={checked}
+  onChange={(e) => setChecked(e.target.checked)}
+/>`,
+      },
+    },
   },
 };
 
@@ -170,7 +260,8 @@ export const CheckedStates: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Comparison of checked and unchecked radio button states.",
+        story:
+          "The two looks a button can take side by side, so the filled-in choice is easy to tell from the rest: an empty circle and a circle with a dot (`isChecked`).",
       },
       source: {
         code: `<RadioButton name="group" value="unchecked" label="Unchecked" />
@@ -206,7 +297,7 @@ export const DisabledStates: Story = {
     docs: {
       description: {
         story:
-          "Disabled radio buttons cannot be interacted with and have reduced opacity.",
+          "A disabled button, empty or filled in, shows an option the user can see but not change: the circle and the label turn grey and clicks are ignored (`isDisabled`).",
       },
       source: {
         code: `<RadioButton name="group" value="1" label="Disabled unchecked" isDisabled />
@@ -237,54 +328,121 @@ const CustomStylingTemplate = () => {
   );
 };
 
-const CssCustomizationTemplate = () => {
-  const [selected, setSelected] = useState("1");
+export const CustomStyling: Story = {
+  render: () => <CustomStylingTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Larger or smaller label text for a button placed in a heading or a dense list: **Custom styled** at 16px semibold, **Small text** at 11px light (`fontSize`, `fontWeight`).",
+      },
+      source: {
+        code: `<RadioButton name="group" value="1" label="Custom styled" fontSize="16px" fontWeight={600} />
+<RadioButton name="group" value="2" label="Small text" fontSize="11px" fontWeight={300} />`,
+      },
+    },
+  },
+};
 
-  const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelected(e.target.value);
-  };
+const WithSpacingTemplate = () => {
+  const [vertical, setVertical] = useState("small");
+  const [horizontal, setHorizontal] = useState("small");
+  const options = ["small", "medium", "large"];
 
   return (
-    <div
-      style={
-        {
-          display: "flex",
-          flexDirection: "column",
-          gap: "8px",
-          "--radio-button-dot-color": "#7c3aed",
-          "--radio-button-circle-color": "#7c3aed",
-          "--radio-button-circle-hover-color": "#6d28d9",
-          "--radio-button-gap": "16px",
-        } as CSSProperties
-      }
-    >
-      <RadioButton
-        name="custom"
-        value="1"
-        label="Custom option 1"
-        isChecked={selected === "1"}
-        onChange={onChangeHandler}
-      />
-      <RadioButton
-        name="custom"
-        value="2"
-        label="Custom option 2"
-        isChecked={selected === "2"}
-        onChange={onChangeHandler}
-      />
-      <RadioButton
-        name="custom"
-        value="3"
-        label="Custom option 3"
-        isChecked={selected === "3"}
-        onChange={onChangeHandler}
-      />
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        {options.map((option) => (
+          <RadioButton
+            key={option}
+            name="vertical-size"
+            value={option}
+            label={`Vertical: ${option}`}
+            isChecked={vertical === option}
+            spacing="12px"
+            onChange={(e) => setVertical(e.target.value)}
+          />
+        ))}
+      </div>
+      <div style={{ display: "flex", flexDirection: "row" }}>
+        {options.map((option) => (
+          <RadioButton
+            key={option}
+            name="horizontal-size"
+            value={option}
+            label={`Horizontal: ${option}`}
+            isChecked={horizontal === option}
+            orientation="horizontal"
+            spacing="24px"
+            onChange={(e) => setHorizontal(e.target.value)}
+          />
+        ))}
+      </div>
     </div>
   );
 };
 
+export const WithSpacing: Story = {
+  render: () => <WithSpacingTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `A set of buttons needs room between them, because without a gap they touch:
+
+- **Vertical** — a column with 12px below every button but the last (\`spacing\`, the default \`orientation\`)
+- **Horizontal** — a row with 24px before every button but the first (\`spacing\`, \`orientation="horizontal"\`)
+
+The container still lays the buttons out; \`orientation\` only decides which side the gap goes on. Pick an option in each set with a click or the arrow keys.`,
+      },
+      source: {
+        code: `<div style={{ display: "flex", flexDirection: "column" }}>
+  {options.map((option) => (
+    <RadioButton
+      key={option}
+      name="vertical-size"
+      value={option}
+      isChecked={vertical === option}
+      spacing="12px"
+      onChange={(e) => setVertical(e.target.value)}
+    />
+  ))}
+</div>
+
+<div style={{ display: "flex", flexDirection: "row" }}>
+  {options.map((option) => (
+    <RadioButton
+      key={option}
+      name="horizontal-size"
+      value={option}
+      isChecked={horizontal === option}
+      orientation="horizontal"
+      spacing="24px"
+      onChange={(e) => setHorizontal(e.target.value)}
+    />
+  ))}
+</div>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
-  render: () => <CssCustomizationTemplate />,
+  render: () => (
+    <div
+      style={
+        {
+          "--radio-button-dot-color": "#7c3aed",
+          "--radio-button-circle-color": "#7c3aed",
+          "--radio-button-circle-hover-color": "#3b0764",
+          "--radio-button-background": "#f3e8ff",
+          "--radio-button-label-color": "#4c1d95",
+          "--radio-button-gap": "16px",
+        } as CSSProperties
+      }
+    >
+      <RadioButton name="custom" value="1" label="Custom option" isChecked />
+    </div>
+  ),
   parameters: {
     docs: {
       description: {
@@ -292,28 +450,28 @@ export const CssCustomization: Story = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--radio-button-dot-color\` | Fill color of the selected dot | theme token |
-| \`--radio-button-circle-color\` | Stroke color of the radio circle | theme token |
-| \`--radio-button-circle-hover-color\` | Circle stroke color on hover | theme token |
-| \`--radio-button-background\` | Background fill of the radio circle | theme token |
-| \`--radio-button-label-color\` | Label text color | theme token |
-| \`--radio-button-gap\` | Gap between icon and label | \`8px\` |`,
-      },
-    },
-  },
-};
+| \`--radio-button-dot-color\` | Fill of the dot in a checked button; a disabled button draws its own grey dot | theme-based |
+| \`--radio-button-circle-color\` | Outline of the circle; a disabled button draws its own outline | theme-based |
+| \`--radio-button-circle-hover-color\` | Outline of the circle while the pointer is over the button; not applied to a disabled button | theme-based |
+| \`--radio-button-background\` | Fill inside the circle; a disabled button draws its own grey fill | theme-based |
+| \`--radio-button-label-color\` | Colour of the text beside the circle; a disabled button greys it out with its own colour | theme-based |
+| \`--radio-button-gap\` | Space between the circle and the text | \`8px\` |
 
-export const CustomStyling: Story = {
-  render: () => <CustomStylingTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Radio buttons support custom font size and weight for label styling.",
+The example is one checked button, so it shows every variable at once: the violet dot and outline, the light violet fill, the dark violet text and the wider gap. Hover it to see the darker outline.`,
       },
       source: {
-        code: `<RadioButton name="group" value="1" label="Custom styled" fontSize="16px" fontWeight={600} />
-<RadioButton name="group" value="2" label="Small text" fontSize="11px" fontWeight={300} />`,
+        code: `<div
+  style={{
+    "--radio-button-dot-color": "#7c3aed",
+    "--radio-button-circle-color": "#7c3aed",
+    "--radio-button-circle-hover-color": "#3b0764",
+    "--radio-button-background": "#f3e8ff",
+    "--radio-button-label-color": "#4c1d95",
+    "--radio-button-gap": "16px",
+  }}
+>
+  <RadioButton name="custom" value="1" label="Custom option" isChecked />
+</div>`,
       },
     },
   },

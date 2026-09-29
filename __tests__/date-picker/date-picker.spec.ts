@@ -18,6 +18,28 @@ test.describe("DatePicker — light", () => {
     await expect(page).toHaveScreenshot("date-picker-default.png");
   });
 
+  test("without clear button", async ({ page }) => {
+    await gotoStory(page, "without-clear-button");
+    await expect(page).toHaveScreenshot("date-picker-without-clear-button.png");
+  });
+
+  test("aligned to right edge", async ({ page }) => {
+    await gotoStory(page, "aligned-to-right-edge");
+    await expect(page).toHaveScreenshot(
+      "date-picker-aligned-to-right-edge.png",
+    );
+  });
+
+  test("end of day value", async ({ page }) => {
+    await gotoStory(page, "end-of-day-value");
+    await expect(page).toHaveScreenshot("date-picker-end-of-day-value.png");
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("date-picker-right-to-left.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("date-picker-css-customization.png");

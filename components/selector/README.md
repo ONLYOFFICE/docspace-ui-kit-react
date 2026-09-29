@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": "onClose", "loading": "isLoading", "disabled": null },
   "related": ["aside", "search-input", "table"],
   "subComponents": [],
-  "testIds": ["selector", "selector_search_input", "selector_submit_button", "selector_cancel_button"]
+  "testIds": ["selector", "selector_search_input", "selector_submit_button", "selector_cancel_button"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Selector

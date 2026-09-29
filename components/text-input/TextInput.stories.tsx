@@ -18,8 +18,8 @@ const meta = {
 ### Features
 
 - **Multiple Types**: Renders as text, password, email, tel, search or number, so the browser supplies the matching keyboard and value rules
-- **Three Fixed Widths**: base (173px), middle (300px) and large (550px); \`scale\` makes the field fill its container
-- **Input Masking**: Format input with custom masks (e.g., date, phone)
+- **Three Fixed Widths**: Comes 173px, 300px or 550px wide by \`size\`, or fills its container with \`scale\`
+- **Input Masking**: Formats the value to a fixed pattern such as a date or a phone number as the user types
 - **Validation States**: \`hasError\` and \`hasWarning\` colour the border, also while hovered and focused
 - **Disabled and Read-Only**: \`isDisabled\` greys the field and takes it out of the form, \`isReadOnly\` keeps it selectable but not editable
 - **Borderless**: \`withBorder={false}\` drops the outline for inline use
@@ -28,11 +28,11 @@ const meta = {
 
 ### Accessibility
 
-Keyboard and assistive-technology support comes from the native \`<input>\`; the component sets no roles or \`aria-*\` of its own:
+Keyboard and assistive-technology support comes from the native \`<input>\`:
 
 - Focusable by default, in the natural document order; pass \`tabIndex={-1}\` only to take a field out of it
 - Renders no label and does not associate itself with one, so give the input an \`aria-label\` or wrap it in a \`<label>\`
-- \`hasError\` and \`hasWarning\` are visual only and do not set \`aria-invalid\`; set it yourself
+- \`hasError\` and \`hasWarning\` only colour the border, so pair them with a visible message and mark the field invalid yourself
 - \`isDisabled\` maps to the native \`disabled\` attribute and \`isReadOnly\` to \`readonly\`
 
 ### Usage
@@ -77,6 +77,9 @@ import { TextInput, InputSize, InputType } from "@onlyoffice/apps-ui-kit/compone
       control: "select",
       options: Object.values(InputType),
       description: "HTML input type",
+      table: {
+        defaultValue: { summary: "text" },
+      },
     },
     value: {
       control: "text",
@@ -120,7 +123,8 @@ import { TextInput, InputSize, InputType } from "@onlyoffice/apps-ui-kit/compone
     },
     scale: {
       control: "boolean",
-      description: "Scale input to 100% width",
+      description:
+        "Makes the field fill the width of its container instead of its size's fixed width",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -639,9 +643,10 @@ export const AutoFocused: Story = {
     />
   ),
   parameters: {
+    noPadding: true,
     docs: {
       // Framed on Docs: an inline autofocus would pull the page's focus to this field on load.
-      story: { inline: false, height: "60px" },
+      story: { inline: false, height: "58px" },
       description: {
         story:
           "Put the caret in the field the moment it appears, for a dialog or a panel whose first action is typing (`isAutoFocussed`); the field is focused when the story loads, so start typing without clicking.",
@@ -673,8 +678,9 @@ export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
   parameters: {
+    noPadding: true,
     docs: {
-      story: { inline: false, height: "120px" },
+      story: { inline: false, height: "106px" },
       description: {
         story:
           'The same fields under a right-to-left interface: the placeholder sits at the right edge and the caret of an empty field starts on the right; text typed in a right-to-left script runs right to left, Latin text still runs left to right (`dir="auto"`); the tel field keeps its placeholder left-to-right, so a phone number reads the same as in a left-to-right interface. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
@@ -732,19 +738,19 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization. The first field shows the shared \`--text-input-*\` tokens; hover and focus it to see the two border variables. The second carries \`--text-input-placeholder-color\` in its own \`style\`, the only place it works. The third is disabled: the theme takes over its text and border, and only the radius, the font size and \`--text-input-disabled-bg\` still apply:
+        story: `CSS Custom Properties for external customization: the first field shows the shared \`--text-input-*\` tokens; hover and focus it to see the two border variables. The second carries \`--text-input-placeholder-color\` in its own \`style\`, the only place it works. The third is disabled: the theme takes over its text and border, and only the radius, the font size and \`--text-input-disabled-bg\` still apply:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--text-input-bg\` | Background color | theme token |
-| \`--text-input-border-color\` | Border color at rest | theme token |
-| \`--text-input-border-hover\` | Border color while hovered | theme token |
-| \`--text-input-border-focus\` | Border color while focused | theme token |
-| \`--text-input-color\` | Text and caret color | theme token |
+| \`--text-input-bg\` | Background color | theme-based |
+| \`--text-input-border-color\` | Border color at rest | theme-based |
+| \`--text-input-border-hover\` | Border color while hovered | theme-based |
+| \`--text-input-border-focus\` | Border color while focused | theme-based |
+| \`--text-input-color\` | Text and caret color | theme-based |
 | \`--text-input-font-size\` | Font size (all sizes) | \`13px\` (base, middle) / \`16px\` (large) |
-| \`--text-input-radius\` | Border radius | theme token |
-| \`--text-input-disabled-bg\` | Background color while disabled | theme token |
-| \`--text-input-placeholder-color\` | Placeholder text color; works only through the component's \`style\` prop, a value set on an ancestor is shadowed by the theme | theme token |`,
+| \`--text-input-radius\` | Border radius | theme-based |
+| \`--text-input-disabled-bg\` | Background color while disabled | theme-based |
+| \`--text-input-placeholder-color\` | Placeholder text color; works only through the component's \`style\` prop, a value set on an ancestor is shadowed by the theme | theme-based |`,
       },
       source: {
         code: `<div

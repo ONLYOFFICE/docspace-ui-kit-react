@@ -13,6 +13,11 @@ async function gotoStory(page: Page, storyId: string) {
 }
 
 test.describe("DragAndDrop — light", () => {
+  test("nested targets", async ({ page }) => {
+    await gotoStory(page, "nested-targets");
+    await expect(page).toHaveScreenshot("drag-and-drop-nested-targets.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("drag-and-drop-css-customization.png");

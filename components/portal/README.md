@@ -12,7 +12,8 @@
   "state": { "visibility": "visible", "close": null, "loading": null, "disabled": null },
   "related": ["modal-dialog", "drop-down", "tooltip"],
   "subComponents": [],
-  "testIds": []
+  "testIds": [],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Portal

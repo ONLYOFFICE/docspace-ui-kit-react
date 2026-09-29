@@ -20,10 +20,13 @@ const meta = {
 
 ### Features
 
-- **Image Display**: Configurable empty state illustration with custom sizing
-- **Text Content**: Header, subheading, and description text sections
-- **Action Buttons**: Optional button area for filter reset or navigation actions
-- **Filter Variant**: Styling variant for filter-related empty states via \`withoutFilter\`
+- **Image Display**: Shows the illustration at a fixed 200×140, or 150×105 on windows up to 600px wide, unless \`imageStyle\` resizes it
+- **Header**: Puts a bold 19px line of text under the illustration
+- **Explanation Lines**: Adds an optional semibold subheading and a muted 12px description, which may be any React node
+- **Action Buttons**: Stacks the actions in a centred column with 16px between them, in the theme's link colour
+- **Top Offset**: Starts the content lower with \`withoutFilter\`, for a screen that has no filter bar above it
+- **Responsive Width**: Keeps a 640px width on windows wider than 1424px and below that shrinks to its content, up to 640px, 480px on tablets and 343px on phones
+- **Theme Colours**: Takes the header, description and action colours from the light or dark theme, each replaceable through a CSS variable
 
 ### Usage
 
@@ -78,14 +81,16 @@ import { EmptyScreenContainer } from "@onlyoffice/apps-ui-kit/components/empty-s
     },
     withoutFilter: {
       control: "boolean",
-      description: "Whether to display without filter styling",
+      description:
+        "Adds the height of a filter bar to the space above the image, 91px instead of 52px on desktop, for a screen that has no filter bar above it",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     imageStyle: {
       control: "object",
-      description: "Custom CSS styles for the image (desktop only)",
+      description:
+        "Inline styles for the image and the only way past its fixed size; ignored on windows between 601px and 1023px wide",
     },
     buttonStyle: {
       control: "object",
@@ -94,6 +99,15 @@ import { EmptyScreenContainer } from "@onlyoffice/apps-ui-kit/components/empty-s
     className: {
       control: "text",
       description: "Additional CSS class name",
+    },
+    id: {
+      control: false,
+      description: "Accepted by the type but ignored: it never reaches the DOM",
+    },
+    style: {
+      control: false,
+      description:
+        "Accepted by the type but ignored; style the outer element through `className`",
     },
   },
 } satisfies Meta<typeof EmptyScreenContainer>;
@@ -135,7 +149,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Full-featured empty state with header, subheading, description, and a reset filter button.",
+          "The full layout, for a list a filter has emptied: a header, a subheading and a description explain why nothing is shown, and a reset action under them offers the way back.",
       },
       source: {
         code: `<EmptyScreenContainer
@@ -163,7 +177,7 @@ export const MinimalContent: Story = {
     docs: {
       description: {
         story:
-          "Minimal empty state with only header text and a navigation button.",
+          "The least a screen needs, for a place where there is nothing to explain: the image, one header line and a single way out.",
       },
       source: {
         code: `<EmptyScreenContainer
@@ -192,7 +206,7 @@ export const CustomStyles: Story = {
     docs: {
       description: {
         story:
-          "Empty state with custom image dimensions and button container spacing.",
+          "For artwork of another shape: the image is resized past its fixed 200×140 box (`imageStyle`) and the actions sit further down (`buttonStyle`). On windows between 601px and 1023px wide the image falls back to its fixed size.",
       },
       source: {
         code: `<EmptyScreenContainer
@@ -224,7 +238,7 @@ export const WithoutFilter: Story = {
     docs: {
       description: {
         story:
-          "Welcome screen variant without filter-related styling, suitable for onboarding views.",
+          "For a screen with no filter bar above it, such as a first-run view: the content starts 91px from the top instead of 52px (`withoutFilter`), so it sits as low as it would under a filter bar.",
       },
       source: {
         code: `<EmptyScreenContainer
@@ -248,6 +262,7 @@ export const CssCustomization: Story = {
           "--empty-screen-header-color": "#0082c9",
           "--empty-screen-description-color": "#1d2d44",
           "--empty-screen-link-color": "#0082c9",
+          "--empty-screen-text-color": "#6a6a6a",
           "--empty-screen-width": "480px",
         } as CSSProperties
       }
@@ -257,7 +272,12 @@ export const CssCustomization: Story = {
         imageAlt="Empty"
         headerText="No files found"
         descriptionText="Create your first file to get started."
-        buttons={<HomeButton />}
+        buttons={
+          <>
+            <ResetFilterButton />
+            <span>Filters are kept for this folder</span>
+          </>
+        }
         withoutFilter
       />
     </div>
@@ -269,10 +289,38 @@ export const CssCustomization: Story = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--empty-screen-header-color\` | Header text color | theme black/white |
-| \`--empty-screen-description-color\` | Description text color | theme gray |
-| \`--empty-screen-link-color\` | Button link/icon color | theme link |
-| \`--empty-screen-width\` | Container max width | \`640px\` |`,
+| \`--empty-screen-header-color\` | Header text colour | theme-based |
+| \`--empty-screen-description-color\` | Description text colour | theme-based |
+| \`--empty-screen-link-color\` | Colour of links and icons in the actions area | theme-based |
+| \`--empty-screen-text-color\` | Colour of plain text (\`span\`) in the actions area; a \`Button\` label keeps its own colour | theme-based |
+| \`--empty-screen-width\` | Width on windows wider than 1424px; below that the container shrinks to its content | \`640px\` |
+
+The example sets every variable on one wrapper. The reset action shows the link colour on both its icon and its text, the line under it the plain-text colour; the width applies only on a window wider than 1424px.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--empty-screen-header-color": "#0082c9",
+    "--empty-screen-description-color": "#1d2d44",
+    "--empty-screen-link-color": "#0082c9",
+    "--empty-screen-text-color": "#6a6a6a",
+    "--empty-screen-width": "480px",
+  }}
+>
+  <EmptyScreenContainer
+    imageSrc={emptyImage}
+    imageAlt="Empty"
+    headerText="No files found"
+    descriptionText="Create your first file to get started."
+    buttons={
+      <>
+        <ResetFilterButton />
+        <span>Filters are kept for this folder</span>
+      </>
+    }
+    withoutFilter
+  />
+</div>`,
       },
     },
   },

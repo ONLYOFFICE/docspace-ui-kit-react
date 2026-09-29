@@ -21,6 +21,35 @@ test.describe("QuantityPicker -- light", () => {
     await gotoStory(page, "with-slider");
     await expect(page).toHaveScreenshot("quantity-picker-with-slider.png");
   });
+
+  test("with-plus-sign", async ({ page }) => {
+    await gotoStory(page, "with-plus-sign");
+    await expect(page).toHaveScreenshot("quantity-picker-with-plus-sign.png");
+  });
+
+  test("with-zero-allowed", async ({ page }) => {
+    await gotoStory(page, "with-zero-allowed");
+    await expect(page).toHaveScreenshot(
+      "quantity-picker-with-zero-allowed.png",
+    );
+  });
+
+  test("minus-locked-with-tooltip", async ({ page }) => {
+    await gotoStory(page, "minus-locked-with-tooltip");
+    await expect(page).toHaveScreenshot(
+      "quantity-picker-minus-locked-with-tooltip.png",
+    );
+  });
+
+  test("without-controls", async ({ page }) => {
+    await gotoStory(page, "without-controls");
+    await expect(page).toHaveScreenshot("quantity-picker-without-controls.png");
+  });
+
+  test("right-to-left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("quantity-picker-right-to-left.png");
+  });
 });
 
 test.describe("QuantityPicker -- dark", () => {

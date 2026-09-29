@@ -21,19 +21,21 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `TableBody renders table rows with support for infinite scrolling and virtual scrolling.
+        component: `TableBody holds the rows of a table and, for a long list, renders only the rows in view and asks for the next page as the user scrolls.
 
 ### Features
 
-- **Virtual Scrolling**: Uses react-window for efficient rendering of large datasets
-- **Infinite Scrolling**: Automatically fetches more data when scrolling near the bottom
-- **Configurable Item Height**: Supports custom row heights for different layouts
-- **Info Panel Awareness**: Adjusts column layout when the info panel is visible
+- **Virtualised Rows**: With \`useReactWindow\`, mounts only the rows near the visible part of the page scroll and a few beyond it, so thousands of rows stay fast
+- **Infinite Loading**: While \`hasMoreFiles\` is set, adds two placeholder rows after the loaded ones and calls \`fetchMoreFiles\` with the range to load as they scroll into view
+- **Uniform Row Height**: Gives every virtualised row the same \`itemHeight\`, 41 pixels unless set
+- **Saved Column Widths**: Lays each virtualised row out with the column widths the header saved under \`columnStorageName\`, or under \`columnInfoPanelStorageName\` while \`infoPanelVisible\` is set
+- **Plain Mode**: Without virtualisation, renders every row at once as part of the container's grid, for a short list
+- **Required Storage Keys**: Renders an empty element instead of the rows until both storage keys are given
 
 ### Usage
 
 \`\`\`tsx
-import { TableBody } from "@onlyoffice/apps-ui-kit/components/table/table-body";
+import { TableBody } from "@onlyoffice/apps-ui-kit/components/table";
 
 <TableBody
   columnStorageName="my-table-columns"
@@ -54,50 +56,72 @@ import { TableBody } from "@onlyoffice/apps-ui-kit/components/table/table-body";
   argTypes: {
     useReactWindow: {
       control: "boolean",
-      description: "Enable virtual scrolling with react-window",
+      description:
+        "Mounts only the rows near the visible part of the page and loads more on scroll; when off, every row is rendered at once",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     itemHeight: {
       control: "number",
-      description: "Height of each row in pixels",
+      description:
+        "Height of every row in pixels when the rows are virtualised",
       table: {
-        defaultValue: { summary: "50" },
+        defaultValue: { summary: "41" },
       },
     },
     itemCount: {
       control: "number",
-      description: "Total number of items to render",
+      description: "How many rows there are in total, loaded or not",
     },
     filesLength: {
       control: "number",
       description:
-        "Number of currently loaded files (used for infinite scroll calculation)",
+        "How many rows are loaded; rows past this index are drawn as placeholders while `hasMoreFiles` is set",
     },
     hasMoreFiles: {
       control: "boolean",
-      description: "Whether more files are available to fetch",
+      description:
+        "Adds two placeholder rows after the loaded ones and asks `fetchMoreFiles` for more when they come into view",
+    },
+    infoPanelVisible: {
+      control: "boolean",
+      description:
+        "Lays the virtualised rows out with the column widths saved under `columnInfoPanelStorageName` instead of `columnStorageName`",
       table: {
         defaultValue: { summary: "false" },
       },
     },
-    infoPanelVisible: {
+    columnStorageName: {
+      control: "text",
+      description:
+        "`localStorage` key the header saved the column widths under; without it the body renders nothing",
+    },
+    columnInfoPanelStorageName: {
+      control: "text",
+      description:
+        "`localStorage` key of the column widths used while an info panel is open; without it the body renders nothing",
+    },
+    isIndexEditingMode: {
       control: "boolean",
-      description: "Whether the info panel is visible (affects column layout)",
-      table: {
-        defaultValue: { summary: "false" },
-      },
+      description: "Accepted for the rows being reordered, but has no effect",
     },
     fetchMoreFiles: {
       control: false,
       action: "fetchMoreFiles",
+      description:
+        "Called with the start and stop index of the rows to load when placeholder rows scroll into view",
     },
     onScroll: {
       control: false,
       action: "onScroll",
+      description:
+        "Called as the page scrolls, only while the rows are virtualised",
     },
-    children: { control: false },
+    children: {
+      control: false,
+      description: "The rows, as an array with one element per row",
+    },
   },
   decorators: [
     (Story, context) => {
@@ -193,7 +217,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default TableBody with react-window virtual scrolling enabled and 20 rows.",
+          "Twenty rows through the virtualised body, the mode for a list that can grow long: scroll the frame and only the rows near the view stay mounted, as the counter below it shows.",
       },
       source: {
         code: `<TableBody
@@ -223,7 +247,7 @@ export const WithoutReactWindow: Story = {
     docs: {
       description: {
         story:
-          "TableBody without virtual scrolling. All rows are rendered in the DOM at once. Suitable for small datasets.",
+          "The same twenty rows rendered all at once (`useReactWindow` off), which is simpler and enough for a short list that never pages.",
       },
       source: {
         code: `<TableBody
@@ -256,7 +280,7 @@ export const WithMoreFiles: Story = {
     docs: {
       description: {
         story:
-          "TableBody with hasMoreFiles enabled, indicating more data can be fetched via infinite scroll.",
+          "Five loaded rows followed by two placeholder rows, what the user sees while the next page is on its way (`hasMoreFiles`); `fetchMoreFiles` is called as the placeholders come into view.",
       },
       source: {
         code: `<TableBody

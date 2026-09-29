@@ -2,6 +2,9 @@ import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import { HelpButton } from "../help-button";
+import { RootTooltip } from "../tooltip";
+
 import { Checkbox } from ".";
 
 const meta = {
@@ -14,20 +17,21 @@ const meta = {
 
 ### Features
 
-- **Three States**: Checked, unchecked, and indeterminate (partial selection)
+- **Three States**: Shows an empty box, a tick, or a filled square for a parent whose children are only partly selected
 - **Error State**: Visual indication of validation errors
 - **Disabled State**: Prevents user interaction
 - **Label Support**: Text label with optional truncation
-- **Tooltip**: Title text shown on hover
-- **Help Button**: Optional help button element alongside the checkbox
+- **Tooltip**: Opens the shared tooltip with the \`title\` text when the pointer rests on the control, once \`RootTooltip\` is mounted
+- **Help Button**: Renders a help button after the label whose clicks do not toggle the checkbox
 
 ### Accessibility
 
-The Checkbox component includes the following for improved accessibility:
+The Checkbox renders a visually hidden native \`<input type="checkbox">\` inside a \`<label>\`, so most of its support comes from the platform:
 
-- Hidden native \`<input type="checkbox">\` for screen reader support
-- \`tabIndex\` for keyboard navigation ordering
-- Visual states clearly distinguish checked, unchecked, indeterminate, disabled, and error
+- Screen readers announce a checkbox with its checked state, named by the label text; without \`label\` the control has no accessible name
+- \`isIndeterminate\` sets the input's DOM \`indeterminate\` property, so the mixed state is announced, not only drawn
+- \`isDisabled\` sets the native \`disabled\` on the input, which is announced as unavailable
+- Tab moves focus to the box icon (\`tabIndex\`, 0 by default), never to the input, and the focused box draws its border in the focus colour; Space and Enter on the focused icon do not toggle it
 
 ### Usage
 
@@ -52,7 +56,8 @@ import { Checkbox } from "@onlyoffice/apps-ui-kit/components/checkbox";
   argTypes: {
     isChecked: {
       control: "boolean",
-      description: "Controls the checked state of the checkbox",
+      description:
+        "The state the box starts in, and the one it returns to whenever this prop changes; a click flips it regardless of the parent",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -60,21 +65,23 @@ import { Checkbox } from "@onlyoffice/apps-ui-kit/components/checkbox";
     isIndeterminate: {
       control: "boolean",
       description:
-        "Shows a rectangle instead of a checkmark (partial selection)",
+        "Draws a filled square instead of a tick and marks the input as mixed, for a parent whose children are partly selected",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isDisabled: {
       control: "boolean",
-      description: "Disables the checkbox input",
+      description:
+        "Disables the input, greys out the box and the label, and ignores clicks",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hasError: {
       control: "boolean",
-      description: "Displays the checkbox in an error state",
+      description:
+        "Draws the box border and the label in the error colour; it renders no message",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -85,20 +92,62 @@ import { Checkbox } from "@onlyoffice/apps-ui-kit/components/checkbox";
     },
     title: {
       control: "text",
-      description: "Tooltip text shown on hover",
+      description:
+        "Text of the shared tooltip that opens when the pointer rests on the control; it needs `RootTooltip` mounted",
     },
     truncate: {
       control: "boolean",
-      description: "Whether to truncate the label text if it overflows",
+      description:
+        "Holds the label on one line and ends it with an ellipsis when the parent is narrower than the text",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     tabIndex: {
       control: "number",
-      description: "Tab order of the checkbox",
+      description:
+        "Tab order of the box icon, which is the element that takes focus; -1 takes the checkbox out of the tab order",
       table: {
-        defaultValue: { summary: "-1" },
+        defaultValue: { summary: "0" },
+      },
+    },
+    helpButton: {
+      control: false,
+      description:
+        "Node rendered after the label, usually a `HelpButton`; clicking it does not toggle the checkbox",
+    },
+    onChange: {
+      action: "onChange",
+      description:
+        "Called with the input's change event when the box is clicked; the new state is `event.target.checked`",
+    },
+    name: {
+      control: "text",
+      description: "Name of the underlying checkbox input",
+    },
+    value: {
+      control: "text",
+      description:
+        "Value of the underlying checkbox input, sent with the form under `name`",
+    },
+    id: {
+      control: "text",
+      description: "Id of the `<label>` that wraps the whole control",
+    },
+    className: {
+      control: "text",
+      description:
+        "Class name added to the `<label>` that wraps the whole control",
+    },
+    style: {
+      control: "object",
+      description: "Inline style of the `<label>` that wraps the whole control",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Value of `data-testid` on the `<label>`",
+      table: {
+        defaultValue: { summary: "checkbox" },
       },
     },
   },
@@ -128,6 +177,17 @@ export const Default: Story = {
   args: {
     label: "Checkbox",
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A single checkbox with a label, the starting point for any form choice; click it to tick it, and change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<Checkbox label="Checkbox" onChange={handleChange} />`,
+      },
+    },
+  },
 };
 
 const CheckedTemplate = () => {
@@ -144,7 +204,8 @@ export const CheckedStates: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Comparison of checked and unchecked checkbox states.",
+        story:
+          "The two states a user switches between: **Checked** starts ticked (`isChecked`) and **Unchecked** starts empty; clicking either flips it.",
       },
       source: {
         code: `<Checkbox isChecked label="Checked" />
@@ -169,7 +230,7 @@ export const IndeterminateStates: Story = {
     docs: {
       description: {
         story:
-          "Indeterminate state shows a rectangle instead of a checkmark. Used for partial selection (e.g., when some but not all child items are selected).",
+          "For a select-all whose children are only partly selected: **Indeterminate** shows a filled square instead of a tick (`isIndeterminate`), and **Disabled Indeterminate** is the same square greyed out (`isDisabled`).",
       },
       source: {
         code: `<Checkbox isIndeterminate label="Indeterminate" />
@@ -195,7 +256,7 @@ export const DisabledStates: Story = {
     docs: {
       description: {
         story:
-          "Disabled checkboxes cannot be interacted with and have reduced opacity.",
+          "For a choice the user cannot change right now: each state keeps its mark but the box and the label turn grey and clicks are ignored (`isDisabled`).",
       },
       source: {
         code: `<Checkbox isDisabled label="Disabled Unchecked" />
@@ -221,7 +282,7 @@ export const ErrorStates: Story = {
     docs: {
       description: {
         story:
-          "Error state provides visual indication of validation errors on the checkbox.",
+          "For a required choice the form rejected: the box border and the label turn the error colour, checked or not (`hasError`); the message itself comes from a wrapping `FieldContainer`.",
       },
       source: {
         code: `<Checkbox hasError label="Unchecked with Error" />
@@ -248,7 +309,7 @@ export const WithTruncation: Story = {
     docs: {
       description: {
         story:
-          "Long labels can be truncated when the container width is limited.",
+          "For a label longer than the space it gets: in a 200px container the text stays on one line and ends with an ellipsis (`truncate`) instead of wrapping.",
       },
       source: {
         code: `<Checkbox truncate label="This is a very long label that might need to be truncated" />`,
@@ -258,7 +319,12 @@ export const WithTruncation: Story = {
 };
 
 export const WithTitle: Story = {
-  render: (args) => <Checkbox {...args} />,
+  render: (args) => (
+    <>
+      <Checkbox {...args} />
+      <RootTooltip />
+    </>
+  ),
   args: {
     label: "Hover me",
     title: "This is a tooltip that appears on hover",
@@ -266,10 +332,45 @@ export const WithTitle: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Checkbox with a title attribute that shows a tooltip on hover.",
+        story:
+          "For a short explanation the label has no room for: rest the pointer on the checkbox to open the tooltip (`title`). The tooltip is the kit's shared one, so the app must mount `RootTooltip` once, as this story does.",
       },
       source: {
-        code: `<Checkbox label="Hover me" title="This is a tooltip that appears on hover" />`,
+        code: `<Checkbox label="Hover me" title="This is a tooltip that appears on hover" />
+<RootTooltip />`,
+      },
+    },
+  },
+};
+
+const HelpButtonTemplate = () => {
+  return (
+    <>
+      <Checkbox
+        label="Remember me"
+        helpButton={
+          <HelpButton tooltipContent="Keeps you signed in on this device" />
+        }
+      />
+      <RootTooltip />
+    </>
+  );
+};
+
+export const WithHelpButton: Story = {
+  render: () => <HelpButtonTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a choice that needs more explanation than its label: an info icon follows the label (`helpButton`); click it to read the hint, and the checkbox stays as it was. A `HelpButton` with a text hint uses the shared tooltip, so `RootTooltip` is mounted here too.",
+      },
+      source: {
+        code: `<Checkbox
+  label="Remember me"
+  helpButton={<HelpButton tooltipContent="Keeps you signed in on this device" />}
+/>
+<RootTooltip />`,
       },
     },
   },
@@ -282,6 +383,9 @@ export const CssCustomization: Story = {
         {
           "--checkbox-gap": "20px",
           "--checkbox-lh": "20px",
+          "--checkbox-fill-color": "#E3EEFB",
+          "--checkbox-border-color": "#2D6ECF",
+          "--checkbox-arrow-color": "#2D6ECF",
         } as CSSProperties
       }
     >
@@ -293,19 +397,24 @@ export const CssCustomization: Story = {
       description: {
         story: `CSS Custom Properties for external customization:
 
-\`\`\`css
---checkbox-gap          /* spacing between box and label (default 12px) */
---checkbox-lh           /* line-height (default 16px) */
---checkbox-fill-color   /* fill color of the checked box */
---checkbox-border-color /* border color of the box */
---checkbox-arrow-color  /* checkmark arrow color */
-\`\`\``,
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--checkbox-gap\` | Space between the box and the label | \`12px\` |
+| \`--checkbox-lh\` | Height of the control's line; the label text keeps its own 16px line, so a larger value only makes the row taller | \`16px\` |
+| \`--checkbox-fill-color\` | Fill of the box while it is checked; an indeterminate box uses it too | theme-based |
+| \`--checkbox-border-color\` | Border of the box; hover, focus, error and disabled draw their own border colour over it | theme-based |
+| \`--checkbox-arrow-color\` | Colour of the tick in a checked box | theme-based |
+
+The example is one checked box, so it shows every variable at once: the wider gap, the taller row, the light fill, the blue border and the blue tick.`,
       },
       source: {
         code: `<div
   style={{
     "--checkbox-gap": "20px",
     "--checkbox-lh": "20px",
+    "--checkbox-fill-color": "#E3EEFB",
+    "--checkbox-border-color": "#2D6ECF",
+    "--checkbox-arrow-color": "#2D6ECF",
   }}
 >
   <Checkbox label="Increased spacing" isChecked />

@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": "isLoading", "disabled": "isDisabled" },
   "related": ["icon-button", "loading-button", "main-button"],
   "subComponents": [],
-  "testIds": ["button"]
+  "testIds": ["button"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # Button

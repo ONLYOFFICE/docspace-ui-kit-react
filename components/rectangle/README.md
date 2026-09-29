@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["circle", "loader", "empty-view"],
   "subComponents": [],
-  "testIds": ["rectangle-skeleton"]
+  "testIds": ["rectangle-skeleton"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # RectangleSkeleton

@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": "onAction", "loading": null, "disabled": null },
   "related": ["toast", "text", "heading"],
   "subComponents": [],
-  "testIds": ["snackbar-container", "snackbar-message"]
+  "testIds": ["snackbar-container", "snackbar-message"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # SnackBar

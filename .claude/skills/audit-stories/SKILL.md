@@ -304,6 +304,20 @@ follows it:
   a story picks a fitting icon per item only when icons are what it
   demonstrates (an `ItemVariants` story), otherwise the dozen extra
   imports document nothing and break on the next icon rename.
+- **An object control prints its value, so an icon in it breaks the
+  props table.** A small `?url` SVG is inlined as a `data:` URI, and a
+  JSON control holding one (an option with an `icon`) shows it as one
+  unbroken string that stretches the Docs props table far past its
+  column. Give such a prop `control: false` with a one-line comment
+  saying why, and after adding icons to sample data open the Docs page
+  and check that `.docblock-argstable` is no wider than its parent —
+  with every JSON node expanded, because a collapsed array hides the
+  string until someone opens it, and the table shows only the first
+  story's args while the canvas Controls panel shows each story's. A
+  `text` or `select` control is a fixed-width field and does not
+  stretch.
+  Sample data in a non-story file (`data.ts`) ships in the package,
+  and Rollup cannot load `?url`: attach the icon in the story file.
 - **An RTL story only where direction changes the picture** — the
   criterion of check 3 — one per component, named `RightToLeft`. Two
   mechanisms flip a component and the story sets both:
@@ -477,7 +491,9 @@ story. The message has a fixed shape and nothing else:
    ID, and what they rendered, story IDs and screenshot baselines
    unchanged, touched lines formatted by hand, tests green. A fix
    reported without a story actually opened is not reported as fixed.
-5. `Commit:` — hash and message, or "not committed" when the user
+5. `Stamped:` — the `storiesAudit` date written into each README, or
+   why none was (see "Stamping the README").
+6. `Commit:` — hash and message, or "not committed" when the user
    asked to hold it.
 
 The shape, with placeholders:
@@ -490,5 +506,39 @@ N. <what changed, one clause> — [<Name>.stories.tsx:LN](components/<folder>/<N
 M. <section or story added or renamed, one clause> — [<Name>.stories.tsx:LN-LM](…)
 Skipped: item K — <reason in one clause>.
 Checked: <stories opened and what they rendered>, story IDs and baselines unchanged, touched lines formatted by hand.
+Stamped: storiesAudit <YYYY-MM-DD> in <folder>/README.md
 Commit: <hash> <message> | not committed
 ```
+
+## Stamping the README
+
+The last step of a run records in the component's own README that
+the audit has been through it, so a reader of the folder can tell an
+audited component from one never looked at, and how long ago:
+
+- **The stamp is `storiesAudit`** in the `ui-kit-doc` metadata block
+  on line 1 of `<folder>/README.md`, today's date as `YYYY-MM-DD`
+  (`"storiesAudit": "2026-09-28"`), placed as the last field, after
+  `testIds`. A stamp already there is overwritten, never duplicated.
+  `scripts/lib/readme-meta.mjs` refuses any other form and a date in
+  the future; `README_TEMPLATE.md` lists the field.
+- **Stamp when the stories are in order**: the fixes the user asked
+  for are applied and verified in the browser, or the audit found
+  nothing to fix. A report still waiting for its fixes, a run the user
+  stopped halfway and a `template` run whose findings are open leave
+  the README alone — the stamp says the component was fixed, not that
+  someone looked. Items skipped as needing a component change do not
+  hold the stamp back: they are reported, not story defects.
+- **Every README the scope touched**: a sub-component with its own
+  README (`rows/row`, `tiles/base-tile`) is stamped when its stories
+  were audited; in a folder or `all` sweep each component is stamped
+  on its own condition, not the sweep's.
+- **Only that line changes.** Edit the block by hand in its existing
+  layout; the README's prose is not re-read or rewritten for the
+  stamp. Run `pnpm check:readme` afterwards.
+- **The stamp goes into the fix commit**, not a commit of its own; a
+  clean audit with nothing to fix commits the stamp alone, as
+  "Record the stories audit of `<Name>`". When the user holds the
+  commit, the stamp stays in the working tree with the fixes.
+- The `Reporting fixes` message carries it as the `Stamped:` line; a
+  run that did not stamp says why there ("fixes not applied yet").

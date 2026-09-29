@@ -12,7 +12,8 @@
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["calendar", "date-time-picker", "selected-item"],
   "subComponents": [],
-  "testIds": ["date-picker"]
+  "testIds": ["date-picker"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # DatePicker

@@ -23,6 +23,25 @@ test.describe("EmailInput — light", () => {
     await expect(page).toHaveScreenshot("email-input-states.png");
   });
 
+  test("automatic error state", async ({ page }) => {
+    await gotoStory(page, "automatic-error-state");
+    await expect(page).toHaveScreenshot(
+      "email-input-automatic-error-state.png",
+    );
+  });
+
+  test("accepted address forms", async ({ page }) => {
+    await gotoStory(page, "accepted-address-forms");
+    await expect(page).toHaveScreenshot(
+      "email-input-accepted-address-forms.png",
+    );
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("email-input-right-to-left.png");
+  });
+
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("email-input-css-customization.png");

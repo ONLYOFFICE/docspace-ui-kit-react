@@ -12,7 +12,8 @@
   "state": { "visibility": "visible", "close": "onClose", "loading": "isLoading", "disabled": null },
   "related": ["image-editor", "modal-dialog", "avatar"],
   "subComponents": [],
-  "testIds": ["modal"]
+  "testIds": ["modal"],
+  "storiesAudit": "2026-09-28"
 } -->
 
 # AvatarEditorDialog
