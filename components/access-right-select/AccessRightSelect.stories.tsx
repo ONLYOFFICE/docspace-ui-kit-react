@@ -45,64 +45,8 @@ const meta = {
   title: "UI/Form controls/AccessRightSelect",
   component: AccessRightSelect,
   parameters: {
-    docs: {
-      description: {
-        component: `A drop-down for choosing an access level, where every option is a row with an icon, a second line of description and an optional paid badge.
-
-### Features
-
-- **Access Options**: Displays each access level as a row with its icon, label, description and an optional paid badge in the option's colour
-- **Display Types**: Shows the chosen level in the button as its label, as its label with the description underneath, or as its icon alone
-- **Restricted Choices**: Keeps every level visible but refuses the ones outside an allowed set, reporting the refusal in a toast instead of selecting it
-- **Separators**: Draws a divider in place of any option marked as a separator
-- **Loading and Disabled States**: Shows a spinner in place of the button's label and icon while loading and greys the button out when disabled, and neither state opens the list
-- **Responsive Layout**: Stretches the button to its parent's width, and can pin the list to the bottom of the screen on phones
-- **Directional Control**: Opens the list above or below the button and towards either side, flipping when there is no room unless the direction is fixed
-- **Compact Button**: Offers the combo box's compact button presentation for dense layouts
-
-### Accessibility
-
-The control is a combo box, and its roles come from there:
-
-- The button is a \`div\` with \`role="button"\`, \`aria-haspopup="listbox"\` and \`aria-expanded\`, and it is in the tab order
-- The list is a \`role="listbox"\` of \`role="option"\` rows, each announcing \`aria-selected\` and \`aria-disabled\`; a divider is a \`role="separator"\`
-- A refused choice is announced only by the toast, which is not tied to the control
-- The button opens on click only, and the arrow keys and Enter do not move through these rows
-- Nothing names the control: give it a label through the surrounding markup
-
-### Usage
-
-\`\`\`tsx
-import { AccessRightSelect } from "@onlyoffice/apps-ui-kit/components/access-right-select";
-
-// Pick a level; keep the selection in your own state
-<AccessRightSelect
-  accessOptions={options}
-  selectedOption={access}
-  scaled={false}
-  onSelect={(option) => setAccess(option)}
-/>
-
-// Only some levels may be chosen; the rest raise a toast
-<AccessRightSelect
-  accessOptions={options}
-  selectedOption={access}
-  isSelectionDisabled
-  availableAccess={[2, 3]}
-  selectionErrorText="This level is not available"
-  onSelect={(option) => setAccess(option)}
-/>
-
-// The icon alone, for a tight row
-<AccessRightSelect
-  accessOptions={options}
-  selectedOption={access}
-  type="onlyIcon"
-  onSelect={(option) => setAccess(option)}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     accessOptions: {
@@ -570,36 +514,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-**AccessRightSelect — items**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--access-right-select-text\` | Icon and arrow colour in the button, with \`type="onlyIcon"\` only | theme-based |
-| \`--access-right-select-disabled-icon\` | The same icon and arrow while disabled, with \`type="onlyIcon"\` only | theme-based |
-| \`--access-right-select-icon\` | Row icon colour in the list | theme-based |
-| \`--access-right-select-description\` | Row description text colour | theme-based |
-| \`--access-right-select-description-size\` | Row description font size | \`13px\` |
-| \`--access-right-select-gap\` | Gap between a row's icon and its text | \`8px\` |
-| \`--access-right-select-item-padding\` | Row padding | \`7px 0\` |
-
-**Combobox (trigger button)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--combobox-radius\` | Button corner radius | \`3px\` |
-
-**DropDown (options panel)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--dropdown-bg\` | Panel background | theme-based |
-| \`--dropdown-border-style\` | Panel border | theme-based |
-| \`--dropdown-shadow\` | Panel shadow | theme-based |
-| \`--dropdown-radius\` | Panel border radius | \`6px\` |
-
-Open any of them to see the row and panel variables. The list normally renders in a portal at the end of the page, out of reach of a wrapper's variables, so these instances render it in place (\`isDefaultMode={false}\`); with the portal, set the row and panel variables on \`body\` or \`:root\` instead. The three instances share one wrapper:
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. Open any of the instances to see the row and panel variables; they render the list in place (\`isDefaultMode={false}\`), because a portalled list is out of reach of a wrapper's variables. The three instances share one wrapper:
 
 - **Full access** — the usual button, for the button radius and everything in the list
 - **The first icon** — \`type="onlyIcon"\`, for \`--access-right-select-text\`

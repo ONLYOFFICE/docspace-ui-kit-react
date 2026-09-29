@@ -235,10 +235,39 @@ export function LimitedAccess() {
 - The component is memoised, so a new `accessOptions` array built inline on every render defeats
   the memo without changing anything.
 
+## CSS variables
+
+Set these on an ancestor to retheme the rows and the icon-only button. Everything else the
+stylesheet defines is private to it.
+
+| Variable                                 | Default    | Effect                                                             |
+| ---------------------------------------- | ---------- | ------------------------------------------------------------------ |
+| `--access-right-select-text`             | theme text | Icon and arrow colour in the button, with `type: "onlyIcon"` only  |
+| `--access-right-select-disabled-icon`    | theme grey | The same icon and arrow while `isDisabled`, with `"onlyIcon"` only |
+| `--access-right-select-icon`             | theme text | Colour of a row's icon in the list                                 |
+| `--access-right-select-description`      | theme grey | Colour of a row's second line                                      |
+| `--access-right-select-description-size` | `13px`     | Font size of a row's second line                                   |
+| `--access-right-select-gap`              | `8px`      | Gap between a row's icon and its text                              |
+| `--access-right-select-item-padding`     | `7px 0`    | Padding of a row                                                   |
+
+The button is a [`ComboBox`](../combobox/README.md) and the list a
+[`DropDown`](../drop-down/README.md), and they take those components' variables —
+`--combobox-radius` for the button's corners, `--dropdown-bg`, `--dropdown-border-style`,
+`--dropdown-shadow` and `--dropdown-radius` for the panel.
+
+The list renders in a portal at the end of the page by default, out of reach of a wrapper's
+variables, so the row and panel variables set on a wrapper only apply with
+`isDefaultMode={false}`, which renders it in place. With the portal, set them on `body` or
+`:root`.
+
 ## Accessibility
 
-- Everything here is [`ComboBox`](../combobox/README.md)'s: the button and the list are `div`s
-  with click handlers, and the list is not a `listbox`.
+- The roles are [`ComboBox`](../combobox/README.md)'s. The button is a `div` with
+  `role="button"`, `aria-haspopup="listbox"` and `aria-expanded`, and it is in the tab order;
+  the list is a `role="listbox"` of `role="option"` rows, each carrying `aria-selected` and
+  `aria-disabled`, and a divider is a `role="separator"`.
+- **The button opens on click only.** Enter and Space do nothing on it, and the arrow keys and
+  Enter do not move through these rows, because the rows are not the combo box's own options.
 - **The refusal message is a toast**, which is easy to miss and is not tied to the control.
 - The second line of each row is plain text, not a description associated with the option, so it
   is read as part of the row rather than as help.
