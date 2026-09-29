@@ -10,81 +10,8 @@ const meta = {
   title: "UI/Form controls/QuantityPicker",
   component: QuantityPicker,
   parameters: {
-    docs: {
-      description: {
-        component: `Numeric quantity input with minus and plus controls around a typed number, an optional slider and optional quick-add tabs, for choosing a countable amount between a lower and an upper bound.
-
-### Features
-
-- **Bounded Stepping**: Steps the value by \`step\` with the minus and plus controls and stops at \`minValue\` and \`maxValue\`, or at the single \`maxValue+\` overflow state with \`showPlusSign\`; the presets, typing and the slider stop at the same cap
-- **Direct Entry**: Accepts a typed whole number, drops any other character, jumps to the maximum when the number is above it, and raises a number below \`minValue\` to it when the field is left or Enter is pressed
-- **Optional Slider**: Adds a slider under the controls that moves the same value, with the minimum and the maximum written at its ends
-- **Quick-Add Presets**: Renders tabs under the controls that each add their amount to the current value rather than set it
-- **Zero Handling**: Accepts zero as a value below \`minValue\` with \`enableZero\` (deprecated alias \`isZeroAllowed\`): the minus control steps down to zero and a typed number under the minimum is kept as it is
-- **Note Under the Controls**: Shows a line of text or any node under the number, such as the total the value adds up to
-- **Disabled State**: Disables every control and turns the number into static text, optionally replaced by a label such as "Unlimited"
-- **Minus-Only Lock**: Disables just the minus control while leaving it focusable, so a tooltip attached to it can still say why
-
-### Accessibility
-
-The minus and plus controls are native buttons and the number is a text field, so the keyboard support comes from the platform.
-
-- **Tab order**: Tab reaches the minus control, the number field and the plus control in that order; the component gives the field \`tabIndex={0}\` against the text input's own default of -1
-- **Buttons**: Enter and Space press the minus and plus controls
-- **Enter in the field**: Commits a typed number at once instead of waiting for the field to lose focus
-- **Names**: The controls hold only an icon marked \`aria-hidden\`; \`decreaseLabel\` and \`increaseLabel\` become their \`aria-label\`, and the number field needs a name from the host's own markup
-- **Disabled**: \`isDisabled\` sets \`disabled\` on both controls and removes the field; \`minusDisabled\` sets \`aria-disabled\` on the minus control only, so it stays focusable and its tooltip can still be read
-
-### Usage
-
-\`\`\`tsx
-import QuantityPicker from "@onlyoffice/apps-ui-kit/components/quantity-picker";
-
-const [value, setValue] = useState(5);
-
-<QuantityPicker
-  title="Copies"
-  value={value}
-  minValue={1}
-  maxValue={100}
-  step={1}
-  decreaseLabel="Decrease"
-  increaseLabel="Increase"
-  onChange={setValue}
-/>
-\`\`\`
-
-With a slider, an overflow step and quick-add presets:
-
-\`\`\`tsx
-<QuantityPicker
-  value={value}
-  minValue={1}
-  maxValue={250}
-  step={1}
-  showSlider
-  showPlusSign
-  items={[10, 50, { name: "100", value: 100 }]}
-  underControlsTitle={\`\${value} copies\`}
-  onChange={setValue}
-/>
-\`\`\`
-
-A read-only amount:
-
-\`\`\`tsx
-<QuantityPicker
-  value={0}
-  minValue={0}
-  maxValue={100}
-  step={1}
-  isDisabled
-  disableValue="Unlimited"
-  onChange={() => {}}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     value: {
