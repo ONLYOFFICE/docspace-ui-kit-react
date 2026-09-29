@@ -23,47 +23,8 @@ const meta = {
   title: "UI/Rows/Row",
   component: Row,
   parameters: {
-    docs: {
-      description: {
-        component: `One row of a file list: an optional checkbox, a start element, the row's content, badges and a context menu.
-
-### Features
-
-- **Selection Checkbox**: Renders a checkbox only when \`checked\` is passed at all, and reports each change with the new state and the row's \`data\`
-- **Partial Selection**: Draws the checkbox half-ticked for a group that is only partly selected
-- **Start Element**: Places an avatar, a file icon or any other element between the checkbox and the content
-- **Modern Layout**: Shows the start element in the checkbox's place and swaps it for the checkbox on hover or once the row is checked
-- **Context Menu**: Opens the same menu from the three-dot button and from a right-click anywhere on the row; on a phone-sized screen a tall menu opens from the bottom under a header naming the content's \`item\`
-- **Index Editing**: Replaces the three-dot button with up and down arrows that report which way the row should move
-- **Progress State**: Replaces the checkbox and the start element with a spinner while the row is busy
-- **Badges Slot**: Places badges and one more element of your own between the content and the three-dot button
-
-### Usage
-
-\`\`\`tsx
-import { Row } from "@onlyoffice/apps-ui-kit/components/rows/row";
-
-// Selectable row with a context menu
-<Row
-  checked={isChecked}
-  onSelect={(checked) => setIsChecked(checked)}
-  contextOptions={[{ key: "edit", label: "Edit" }]}
->
-  <Text truncate>Row content</Text>
-</Row>
-
-// Row with an avatar at the start and no checkbox
-<Row element={<Avatar size={AvatarSize.min} userName="Team member" />} contextOptions={[]}>
-  <Text truncate>Team member</Text>
-</Row>
-
-// Row whose position is being edited
-<Row isIndexEditingMode onChangeIndex={(action) => move(action)}>
-  <Text truncate>Row content</Text>
-</Row>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     checked: {

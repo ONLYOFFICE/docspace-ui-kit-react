@@ -202,8 +202,12 @@ export function LockedRow({ name }: { name: string }) {
 - **`onRowClick` is bound to the content and the start element**, not to the row: a click on the
   checkbox, the badges or the context button does not reach it.
 - On a touch device a click on the start element also selects the row, calling `onSelect(true)`.
-- `mode="modern"` puts the checkbox over the start element and needs **both** `checked` and
-  `element` present, or neither is rendered.
+- `mode="modern"` puts the checkbox in the start element's place and needs **both** `checked`
+  and `element` present, or neither is rendered. The start element shows until the row is
+  checked or the pointer is over it; then the checkbox takes its place. The hover swap is off
+  on a touch device and in index-editing mode, where only checking the row shows the checkbox.
+- On a phone-sized screen the context menu opens behind a backdrop, and a menu taller than
+  210px opens as a sheet from the bottom, under the header built from the child's `item`.
 - `id` and `style` are declared and never read; `className` is the way in.
 - The component is memoised with a deep comparison of all its props.
 
