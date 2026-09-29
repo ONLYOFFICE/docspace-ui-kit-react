@@ -9,46 +9,8 @@ const meta = {
   title: "UI/Status components/Loader",
   component: Loader,
   parameters: {
-    docs: {
-      description: {
-        component: `Loader component for displaying loading states and progress indicators with multiple animation types.
-
-### Features
-
-- **Four Animations**: Draws an oval spinner, two counter-rotating rings, three bouncing diamonds or a segmented spinning track, chosen with \`type\`
-- **Text Fallback**: Renders \`label\` as a line of plain text, with no animation, when \`type\` is \`base\` or not set
-- **Customizable Color**: Paints the oval and dual-ring strokes and the text fallback in any CSS colour, while the track and the diamonds keep their own colours
-- **Flexible Sizing**: Sets width and height from one CSS length (px, rem or any other unit), and the font size of the text fallback
-- **Primary Button Track**: Draws the track in the colour meant for a loader placed on a primary button
-- **Disabled Track**: Dims the track to 60% opacity while the action it waits on is unavailable
-- **CSS Customization**: Stroke colour, size, track colours and disabled opacity can be overridden with CSS variables
-
-### Accessibility
-
-The Loader marks the loading region and names the animation, and handles no keys:
-
-- \`aria-busy="true"\` on the wrapper tells assistive technology that the region is still loading
-- \`aria-label\` on the oval, dual-ring and track animations is set from \`label\`, so that is the name a screen reader announces; without \`label\` it reads the animation's built-in title ("oval", "dual ring", "track")
-- The diamonds (\`rombs\`) ignore \`label\`, so give their container an accessible name yourself
-- The text fallback is read as its plain text
-- The wrapper is no live region, so wrap the loader in one (\`role="status"\`) if its appearance should be announced
-
-### Usage
-
-\`\`\`tsx
-import { Loader, LoaderTypes } from "@onlyoffice/apps-ui-kit/components/loader";
-
-// Oval loader
-<Loader type={LoaderTypes.oval} size="40px" color="#333" />
-
-// Rombs loader
-<Loader type={LoaderTypes.rombs} size="65px" />
-
-// Base text loader
-<Loader type={LoaderTypes.base} label="Loading content..." />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=419-1989&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -530,15 +492,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--loader-stroke\` | Stroke colour of the oval and dual-ring animations; a \`color\` passed to the dual ring still wins over it | theme-based |
-| \`--loader-size\` | Width and height of the oval, dual-ring and track animations when \`size\` is not set; the diamonds always set their own | \`40px\` (\`20px\` for the track) |
-| \`--loader-track-base\` | Colour of the track | theme-based |
-| \`--loader-track-primary\` | Colour of the track with \`primary\` set | \`#ffffff\` |
-| \`--loader-opacity-disabled\` | Opacity of the track with \`isDisabled\` set | \`0.6\` |
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
 
 The example shows, from left to right: an oval for \`--loader-stroke\` and \`--loader-size\`, which every instance picks up; a track for \`--loader-track-base\`; a track with \`primary\` for \`--loader-track-primary\`; and a track with \`isDisabled\` for \`--loader-opacity-disabled\`.`,
       },
