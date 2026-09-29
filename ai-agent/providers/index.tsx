@@ -1074,13 +1074,15 @@ const AiAgentProviders = ({
     ],
   );
 
-  useEffect(() => {
-    attachHostToolsRuntime({
-      servers: ctx.servers,
-      useServersStore: stores.useServersStore,
-      eventBus: ctx.eventBus,
-    });
-  }, [ctx.servers, ctx.eventBus, stores.useServersStore]);
+  useEffect(
+    () =>
+      attachHostToolsRuntime({
+        servers: ctx.servers,
+        useServersStore: stores.useServersStore,
+        eventBus: ctx.eventBus,
+      }),
+    [ctx.servers, ctx.eventBus, stores.useServersStore],
+  );
 
   useEffect(() => {
     if (openResultFile) attachOpenResultFile(openResultFile);
