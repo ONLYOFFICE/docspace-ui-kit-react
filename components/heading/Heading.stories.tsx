@@ -8,37 +8,8 @@ const meta = {
   title: "UI/Data display/Heading",
   component: Heading,
   parameters: {
-    docs: {
-      description: {
-        component: `Heading component for rendering semantic heading elements with configurable levels, sizes, and types.
-
-### Features
-
-- **Semantic Levels**: Renders h1-h6 elements for proper document hierarchy
-- **Five Sizes**: Offers five preset sizes from 15px to 27px, chosen independently of the heading level
-- **Type Presets**: Replaces the size with one of three bold presets, from 18px to 28px, that share a 50px line height
-- **Truncation**: Truncate overflowing text with ellipsis
-- **Inline Display**: Render headings inline alongside other content
-- **Inline Overrides**: Sets the colour, font size, weight and line height as inline styles that win over the size and type presets
-- **Custom Element**: Renders any other element or component in place of the heading tag while keeping the heading styles
-- **Tooltip Support**: Available via HeadingWithTooltip wrapper
-
-### Usage
-
-\`\`\`tsx
-import { Heading, HeadingLevel, HeadingSize } from "@onlyoffice/apps-ui-kit/components/heading";
-
-// Basic heading
-<Heading level={HeadingLevel.h1} size={HeadingSize.large}>Page Title</Heading>
-
-// Menu-style heading
-<Heading level={HeadingLevel.h3} type="menu">Menu Section</Heading>
-
-// Truncated heading
-<Heading level={HeadingLevel.h2} truncate>Very long heading text...</Heading>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     level: {
@@ -375,18 +346,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--heading-text-color\` | Text colour; the \`color\` prop wins over it | theme-based |
-| \`--heading-weight\` | Font weight of a heading without \`type\`; every \`type\` sets a weight of its own, and \`fontWeight\` wins over it | \`600\` |
-| \`--heading-size-content\` | Font size under \`type="content"\` | \`18px\` |
-| \`--heading-size-menu\` | Font size under \`type="menu"\` | \`23px\` |
-| \`--heading-size-header\` | Font size under \`type="header"\` | \`28px\` |
-| \`--heading-lh\` | Line height under any \`type\`; a heading without \`type\` ignores it | \`50px\` |
-
-The wrapper sets all six. **Custom Heading** (\`type="content"\`) shows the colour, \`--heading-size-content\` and \`--heading-lh\`; **Plain Heading** has no \`type\` and is there for \`--heading-weight\`; **Menu Heading** and **Header Heading** show \`--heading-size-menu\` and \`--heading-size-header\`.`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. **Custom Heading** (\`type="content"\`) shows the colour, \`--heading-size-content\` and \`--heading-lh\`; **Plain Heading** has no \`type\` and is there for \`--heading-weight\`; **Menu Heading** and **Header Heading** show \`--heading-size-menu\` and \`--heading-size-header\`.`,
       },
       source: {
         code: `<div
