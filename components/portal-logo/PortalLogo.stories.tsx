@@ -53,36 +53,8 @@ const meta = {
   title: "UI/Data display/PortalLogo",
   component: PortalLogo,
   parameters: {
-    docs: {
-      description: {
-        component: `Shows the portal's white-label logo at the top of a sign-in or confirmation page.
-
-### Features
-
-- **White-Label Source**: Loads the logo the portal serves from \`/logo.ashx\`, so the image is whatever the administrator uploaded
-- **Theme Aware**: Requests the dark variant of the logo when the theme is dark
-- **Mobile Header Bar**: With \`isResizable\`, swaps to the small logo in a bar fixed across the top of the window at 600px and narrower
-- **Hidden On Narrow Screens**: Without \`isResizable\`, the logo is not shown at all at 600px and narrower
-- **Live Resize**: With \`isResizable\`, follows the window width as it changes, not only the width it had when mounted
-- **Error Handling**: Falls back to a default SVG logo if the image fails to load
-- **Custom Sizing**: Lets the logo size in both layouts and the bar's height and background be changed through CSS variables
-
-### Usage
-
-\`\`\`tsx
-import { PortalLogo } from "@onlyoffice/apps-ui-kit/components/portal-logo";
-
-// Basic portal logo
-<PortalLogo />
-
-// Resizable logo (adapts to mobile)
-<PortalLogo isResizable />
-
-// With custom class
-<PortalLogo className="custom-logo" isResizable />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     className: {
@@ -220,24 +192,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-The example is one resizable logo. On a wide screen it shows the two desktop variables; narrow the window to 600px or less to see the three bar variables, with the desktop width still applied to the logo inside the bar.
-
-**Mobile header bar** (window 600px or narrower, \`isResizable\` only)
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--portal-logo-mobile-bg\` | Header bar background | theme-based |
-| \`--portal-logo-mobile-height\` | Bar height | \`48px\` |
-| \`--portal-logo-mobile-img-height\` | Logo image height | \`24px\` |
-
-**Desktop logo image** (desktop and tablet browsers)
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--portal-logo-desktop-img-height\` | Logo height; the bar's own image height replaces it at 600px or narrower | \`44px\` |
-| \`--portal-logo-desktop-img-width\` | Logo width, inside the mobile bar as well | \`386px\` |`,
+        story: `One resizable logo with every variable set on its wrapper -- the variables are listed under CSS variables on this page. On a wide screen it shows the two desktop variables; narrow the window to 600px or less to see the three bar variables, with the desktop width still applied to the logo inside the bar.`,
       },
     },
   },
