@@ -22,57 +22,8 @@ const meta = {
   title: "UI/Overlays/ContextMenu",
   component: ContextMenu,
   parameters: {
-    docs: {
-      description: {
-        component: `ContextMenu displays a right-click context menu for page or item-level actions.
-
-### Features
-
-- **Right-Click Trigger**: Opens at the pointer where the host calls \`show\`, usually from its right-click handler
-- **Nested Submenus**: Opens an item's submenu to its side on hover, to any depth
-- **Separators**: Visual dividers between action groups
-- **Disabled Items**: Dropped from the list unless \`showDisabledItems\` is set, then shown greyed out with an optional explaining tooltip
-- **Backdrop**: Optional overlay behind the mobile sheet; \`ignoreChangeView\` brings it to the desktop menu as well
-- **Rich Items**: A menu item can carry an icon, a description line, a toggle switch, a badge or an external link
-- **Keyboard Navigation**: Arrow Up/Down move the highlight, Arrow Right/Left enter and leave a submenu, Enter activates the item and Escape closes the menu
-- **Mobile Layout**: Below 600px a menu taller than 210px, or any menu with \`ignoreChangeView\`, opens as a bottom sheet with an optional header, and submenus replace the list in place with a back button
-
-### Accessibility
-
-The ContextMenu component includes the following for improved accessibility:
-
-- \`role="menuitem"\` on every item and \`role="separator"\` on dividers, so assistive technologies announce them as menu items and separators
-- Keyboard control while the menu is open: Arrow Up and Down move the highlight, Arrow Right opens the highlighted item's submenu and Arrow Left returns to the parent list, Enter activates the highlighted item or opens its submenu, Escape closes the menu
-- Focus stays where it was when the menu opened: the keyboard highlight is drawn on the item, so a screen reader does not announce which item is highlighted
-
-### Usage
-
-\`\`\`tsx
-import { ContextMenu } from "@onlyoffice/apps-ui-kit/components/context-menu";
-
-const menuRef = useRef<ContextMenuRefType>(null);
-
-const model = [
-  { key: 0, label: "Edit", icon: EditIcon },
-  { key: 1, label: "Delete", icon: DeleteIcon },
-];
-
-<div onContextMenu={(e) => menuRef.current?.show(e)}>
-  Right click here
-</div>
-<ContextMenu ref={menuRef} model={model} />
-
-// Items that depend on the current selection, built on every open
-<ContextMenu ref={menuRef} model={[]} getContextModel={() => buildItems(selection)} />
-
-// Opened by a button, under that button
-<div ref={buttonRef}>
-  <button onClick={(e) => menuRef.current?.show(e)}>Actions</button>
-</div>
-<ContextMenu ref={menuRef} model={model} containerRef={buttonRef} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=52-2358&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -1154,33 +1105,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--context-menu-bg\` | Menu background | theme-based |
-| \`--context-menu-border-style\` | Menu border | none (light), \`1px solid\` (dark) |
-| \`--context-menu-header-border-style\` | Separator border; also the mobile header's bottom border | theme-based |
-| \`--context-menu-shadow\` | Menu box-shadow | theme-based |
-| \`--context-menu-text\` | Item text and icon color | theme-based |
-| \`--context-menu-item-hover-bg\` | Item hover background | theme-based |
-| \`--context-menu-item-disabled-text\` | Disabled item text color | theme-based |
-| \`--context-menu-item-disabled-bg\` | Disabled item hover background | theme-based |
-| \`--context-menu-active-item-bg\` | Keyboard-highlighted item background | theme-based |
-| \`--context-menu-radius\` | Menu border radius | \`6px\` |
-| \`--context-menu-menu-item-padding\` | Item padding; keep the vertical 0, the list height is computed for it | \`0 16px\` |
-| \`--context-menu-divider-margin\` | Separator margin; keep the vertical 6px, the list height is computed for it | \`6px 16px\` |
-| \`--context-menu-item-text-size\` | Item font size | \`13px\` |
-| \`--context-menu-item-text-weight\` | Item font weight | \`600\` |
-| \`--context-menu-item-height\` | Item row height; the list height is computed for 36px, so another value leaves a gap or a scrollbar in a menu without descriptions | \`36px\` |
-| \`--context-menu-item-with-description-padding\` | Padding of an item that has a description | \`8px 12px\` |
-| \`--context-menu-item-description-width\` | Width of the description line, which sets the menu's width | \`330px\` |
-| \`--context-menu-item-description\` | Description text color | theme-based |
-| \`--context-menu-header-row-height\` | Mobile header only: height | \`55px\` |
-| \`--context-menu-header-inner-padding\` | Mobile header only: padding | \`6px 16px\` |
-| \`--context-menu-header-text-size\` | Mobile header only: font size | \`15px\` |
-
-The menu renders outside its parent, so a wrapper element's variables never reach it: the example passes them through the menu's own \`style\` prop. It sets every variable a desktop menu can show — hover **Delete** for the hover background, hover **Rename** for the disabled one, and press Arrow Down for the keyboard highlight. The mobile header rows only apply to the bottom sheet.`,
+        story: `Every variable a desktop menu can show, passed through the menu's own \`style\` prop, since the menu is portalled out of any wrapper -- the variables are listed under CSS variables on this page. Hover **Delete** for the hover background, hover **Rename** for the disabled one, and press Arrow Down for the keyboard highlight. The mobile header rows only apply to the bottom sheet.`,
       },
       source: {
         code: `<ContextMenu
