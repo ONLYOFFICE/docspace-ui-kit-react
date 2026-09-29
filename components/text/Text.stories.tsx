@@ -10,40 +10,8 @@ const meta = {
   title: "UI/Data display/Text",
   component: Text,
   parameters: {
-    docs: {
-      description: {
-        component: `Component that displays plain text with various styling options.
-
-### Features
-
-- **Multiple HTML Tags**: Renders as a \`<p>\` by default, or as whatever element \`as\` names, from a \`<span>\` to a heading, a label or a link
-- **Typography Control**: Sets its own size, weight, line height, alignment and colours as inline styles, and falls back to the kit's 13px regular text when none is set
-- **Text Styles**: Turns the text bold or italic with one flag each, bold overriding any weight set beside it
-- **Inline Layout**: Sits on a line beside other text as an inline block instead of starting a block of its own
-- **Truncation**: Keeps long text on one line and ends it with an ellipsis where the width of its parent runs out
-- **Text Direction**: Writes left to right or right to left on request, or lets the browser pick the direction from the text itself
-- **Selection Control**: Stops the reader from selecting the text, for captions that should not be copied by accident
-- **Tooltip Support**: Opens the kit's shared tooltip with the \`title\` text when the pointer rests on it, once \`RootTooltip\` is mounted
-
-### Usage
-
-\`\`\`tsx
-import { Text } from "@onlyoffice/apps-ui-kit/components/text";
-
-// Basic text
-<Text>Hello world</Text>
-
-// Bold heading text
-<Text as="h2" fontSize="24px" isBold>Section Title</Text>
-
-// Truncated text
-<Text truncate>Very long text that will be truncated...</Text>
-
-// RTL text
-<Text dir="rtl">مرحبا بالعالم</Text>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     as: {
@@ -617,14 +585,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--text-size\` | Font size; a \`fontSize\` prop or \`style\` wins over it | \`13px\` |
-| \`--text-weight\` | Font weight; a \`fontWeight\` prop, \`style\` or \`isBold\` wins over it | \`400\` |
-
-The wrapper sets both on a single line of text, which comes out larger and semibold.`,
+        story: `Both variables set on one wrapper -- the variables are listed under CSS variables on this page. The line of text inside comes out larger and semibold.`,
       },
       source: {
         code: `<div

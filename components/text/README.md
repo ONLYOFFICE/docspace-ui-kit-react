@@ -221,10 +221,10 @@ export function Legend() {
 
 Both are read with a fallback, so setting either on any ancestor changes every `Text` below it.
 
-| Variable        | Default | Effect                                             |
-| --------------- | ------- | -------------------------------------------------- |
-| `--text-size`   | `13px`  | Font size, unless the `fontSize` prop overrides it |
-| `--text-weight` | `400`   | Font weight, unless `fontWeight` or `isBold` does  |
+| Variable        | Default | Effect                                                        |
+| --------------- | ------- | ------------------------------------------------------------- |
+| `--text-size`   | `13px`  | Font size, unless the `fontSize` prop or `style` overrides it |
+| `--text-weight` | `400`   | Font weight, unless `fontWeight`, `style` or `isBold` does    |
 
 There is no variable for the colour: `Text` does not declare one and inherits instead.
 
