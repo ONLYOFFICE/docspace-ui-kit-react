@@ -56,51 +56,8 @@ const meta = {
     docs: {
       // The button and its menu are position: fixed; each story needs a window of its own on Docs.
       story: { inline: false, height: "500px" },
-      description: {
-        component: `A round button fixed to the corner of a phone or tablet screen that opens a menu of creating actions.
-
-### Features
-
-- **Floating Button**: Shows a round plus button that turns into a minus while its menu is open
-- **Dropdown Menu**: Opens a menu above the button whose items carry an icon, a label and an optional second line
-- **Two Groups**: Draws a second group of items under the first on a background of its own, or on the plain menu background
-- **Submenu Support**: Expands an item's nested items in place under it, optionally open from the start
-- **Alert Badge**: Marks the closed button with a badge whose click can be reported to the host
-- **Single Action Mode**: Calls one click handler instead of opening the menu when the menu is turned off
-- **Dismissal**: Closes the menu on a click outside it, on choosing an item and on the browser's Back button
-
-### Accessibility
-
-The component relies on the roles of the parts it is built from:
-
-- **Button name**: The round button is announced as "plus button" while the menu is closed and "minus button" while it is open, in English whatever the interface language
-- **Menu roles**: The open menu is announced as a listbox and each item in it as an option
-
-### Usage
-
-\`\`\`tsx
-import { MainButtonMobile } from "@onlyoffice/apps-ui-kit/components/main-button-mobile";
-
-// Menu of creating actions
-<MainButtonMobile
-  actionOptions={[
-    { key: "doc", label: "New document", icon: FolderIcon, onClick: ({ action }) => create(action), action: "doc" },
-    { key: "folder", label: "New folder", icon: FolderIcon },
-  ]}
-/>
-
-// A second group under the first
-<MainButtonMobile
-  actionOptions={actionOptions}
-  buttonOptions={[
-    { key: "upload", label: "Upload files", icon: FolderIcon, onClick: handleUpload },
-  ]}
-/>
-
-// One action, no menu
-<MainButtonMobile withMenu={false} onClick={handleUpload} />
-\`\`\``,
-      },
+      // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+      // there is no second description to keep in step with it.
     },
   },
   argTypes: {
@@ -389,19 +346,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--main-button-mobile-button-color\` | Button background color | theme-based |
-| \`--main-button-mobile-icon-fill\` | Fill of the plus and minus | theme-based |
-| \`--main-button-mobile-z-index\` | Stack order of the button against its open menu; below \`202\` the open menu covers the button, so the example leaves it alone | \`1010\` |
-| \`--main-button-mobile-badge-size\` | Alert badge size | \`12px\` |
-| \`--main-button-mobile-badge-offset\` | Alert badge inset from the button's top trailing corner | \`10px\` |
-| \`--main-button-mobile-dropdown-item-padding\` | Padding of one menu item | \`6px 23px\` |
-| \`--main-button-mobile-button-options-background-color\` | Background of the lower group of items | theme-based |
-
-One instance, with the alert badge on so the badge variables show. Open the menu to see the item padding and the lower group's background.`,
+        story: `The variables are listed under CSS variables on this page. One instance, with the alert badge on so the badge variables show. Open the menu to see the item padding and the lower group's background.`,
       },
       source: {
         code: `<div
