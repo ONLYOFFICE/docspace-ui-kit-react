@@ -305,6 +305,10 @@ export function SidebarWithDialog() {
   once.
 - **A childless active item collapses everything** on the default behaviour — that is how an
   "Overview" entry shuts the open section.
+- **A sub-menu opens with a height and opacity transition**, which `prefers-reduced-motion: reduce`
+  turns off.
+- **`iconOnly` hides the group captions as well as the labels**; groups are then set apart by
+  their spacing alone.
 - **`iconOnly` drops the sub-menus entirely** and rebuilds the active section's children as
   top-level entries, each with a staggered reveal animation. A sub-item's `onClick` is rewrapped in
   the process, and `withTopSeparator` is lost.
@@ -324,9 +328,24 @@ export function SidebarWithDialog() {
 
 ## CSS variables
 
-| Variable                     | Default                  | Effect                                        |
-| ---------------------------- | ------------------------ | --------------------------------------------- |
-| `--nav-menu-separator-color` | the quick-buttons colour | Line above a sub-item with `withTopSeparator` |
+| Variable                            | Default                  | Effect                                                                     |
+| ----------------------------------- | ------------------------ | -------------------------------------------------------------------------- |
+| `--nav-menu-group-label-color`      | theme-based              | Group caption text                                                         |
+| `--nav-menu-item-text-color`        | theme-based              | Item and sub-item labels                                                   |
+| `--nav-menu-item-text-active-color` | theme-based (the accent) | Label of the active entry                                                  |
+| `--nav-menu-item-icon-color`        | theme-based              | Item and sub-item icons, and the chevron of `withExpandControl`            |
+| `--nav-menu-item-icon-active-color` | theme-based (the accent) | Icon of the active entry, and the keyboard focus outline                   |
+| `--nav-menu-item-bg-hover`          | theme-based              | Highlight under the entry the pointer is on                                |
+| `--nav-menu-item-bg-active`         | theme-based              | Highlight under the active entry                                           |
+| `--nav-menu-signal-dot-color`       | theme-based (the accent) | Dot on the icon of an entry with a badge; only the collapsed rail shows it |
+| `--nav-menu-separator-color`        | none — no line is drawn  | Line above a sub-item with `withTopSeparator`                              |
+
+**Every variable but the last is declared on the menu's own `nav` element**, under the theme
+class (`.light .root`, `.dark .root`), so a value set on a wrapper never arrives. Set them in a
+rule that outranks that one and pass its class through `className` — `.light nav.my-nav` does.
+
+`--nav-menu-separator-color` is declared nowhere: the line falls back to `--quick-buttons-color`,
+which the kit does not define either, so without one of the two set there is no line at all.
 
 The sliding highlight is driven by `--end-width` and `--flatten-index`, which the component sets
 itself on each animated element.
@@ -339,6 +358,8 @@ itself on each animated element.
   the keyboard.
 - A section that expands on its own body click carries `aria-expanded`; with `withExpandControl`
   the flag moves to the chevron, which is labelled with the section's name.
+- Keyboard focus is drawn as a 2px outline inside the entry, in
+  `--nav-menu-item-icon-active-color`; the pointer never shows it.
 - **The `<nav>` has no `aria-label`.** Give it one through a wrapper when the page has more than
   one navigation landmark.
 - **In the collapsed rail the accessible name is the tooltip title.** It is set on the button, so
