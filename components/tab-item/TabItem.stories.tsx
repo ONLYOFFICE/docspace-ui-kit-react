@@ -164,10 +164,12 @@ const WithReactNodeTemplate = () => {
   return (
     <TabItem
       label={
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <span
+          style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
+        >
           <span style={{ color: "#2DA7DB" }}>&#9679;</span>
           <span>Tab with Icon</span>
-        </div>
+        </span>
       }
     />
   );
@@ -179,15 +181,15 @@ export const WithReactNodeLabel: Story = {
     docs: {
       description: {
         story:
-          "Tab with a React node as label, allowing custom content like icons alongside text.",
+          "Tab with a React node as label, allowing custom content like icons alongside text. The label renders inside a `<p>`, so the node has to be phrasing content -- a `<span>`, not a `<div>`.",
       },
       source: {
         code: `<TabItem
   label={
-    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
       <span style={{ color: "#2DA7DB" }}>●</span>
       <span>Tab with Icon</span>
-    </div>
+    </span>
   }
 />`,
       },
