@@ -16,7 +16,11 @@ export const DocsContainer = ({
 
   return (
     <BaseContainer context={context} theme={isDark ? darkTheme : lightTheme}>
-      {children}
+      {/* The theme above reaches Storybook's own blocks only. A graphic an
+          MDX page draws itself -- the access matrices, the agent-skills
+          infographics -- is styled like the kit, under `:global(.dark)`,
+          and gets that class from here: nothing else wraps a docs page. */}
+      <div className={isDark ? "dark" : "light"}>{children}</div>
     </BaseContainer>
   );
 };
