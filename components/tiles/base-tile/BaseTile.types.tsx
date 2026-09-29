@@ -6,7 +6,7 @@ export type BaseTileProps = {
   checked?: boolean;
   /** Whether the tile is the one being acted on, which keeps its hover background. */
   isActive?: boolean;
-  /** Dims the tile while an operation is running over it. It blocks nothing by itself. */
+  /** Turns the pointer off while an operation is running over the tile: hover, clicks and right-clicks stop reaching it. It does not change how the tile looks. */
   isBlockingOperation?: boolean;
   /** The item this tile stands for. It is also what `onSelect` is called with, and the fallback source of the context menu's header. */
   item: TileItem;
