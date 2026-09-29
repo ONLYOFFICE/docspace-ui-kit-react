@@ -17,32 +17,7 @@ const meta = {
       description: {
         component: `TableGroupMenu is the toolbar that takes the place of the table header while rows are selected, with a select-all checkbox and the actions that apply to the selection.
 
-### Features
-
-- **Select All**: Opens with a checkbox that selects or clears every row, calling \`onChange\` with its new state, and draws it partly ticked for a partial selection
-- **Selection Filter**: Follows the checkbox with an arrow that opens \`checkboxOptions\`, such as picking only the folders, unless \`withComboBox\` is off
-- **Header Label**: Shows \`headerLabel\` in place of the checkbox, for a toolbar with nothing to select all
-- **Action Buttons**: Lays the \`headerMenu\` entries out after a separator, scrolls them sideways when they do not fit, and leaves out an entry whose \`disabled\` is set
-- **Blocked State**: With \`isBlocked\`, greys every action out and ignores clicks on them while an operation is running
-- **Info Panel Toggle**: Ends with a button that calls \`toggleInfoPanel\`, drawn on a round background while \`isInfoPanelVisible\`; \`withoutInfoPanelToggler\` leaves it out
-- **Close Button**: With \`isCloseable\`, adds a cross before the toggle that calls \`onCloseClick\`
-- **Right-to-Left**: Runs from right to left in an RTL interface and mirrors the info panel icon
-
-### Usage
-
-\`\`\`tsx
-import { TableGroupMenu } from "@onlyoffice/apps-ui-kit/components/table";
-
-<TableGroupMenu
-  isChecked={allSelected}
-  isIndeterminate={someSelected}
-  headerMenu={menuItems}
-  checkboxOptions={checkboxDropdown}
-  onChange={handleCheckboxChange}
-  onClick={handleCheckboxClick}
-  withComboBox
-/>
-\`\`\``,
+The Table README describes it in full.`,
       },
     },
   },
@@ -450,13 +425,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--table-group-menu-checkbox-margin\` | \`margin-inline-start\` of the checkbox / label element on desktop | \`28px\` |
-
-The \`checkboxMargin\` prop writes the same variable onto the toolbar and wins over a value set on a wrapper.`,
+        story: `The variable set on a wrapper -- it is listed under CSS variables in the Table README.`,
       },
       source: {
         code: `<div style={{ "--table-group-menu-checkbox-margin": "12px" }}>

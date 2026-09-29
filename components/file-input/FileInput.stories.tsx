@@ -12,60 +12,8 @@ const meta = {
   title: "UI/Form controls/FileInput",
   component: FileInput,
   parameters: {
-    docs: {
-      description: {
-        component: `Read-only field that lets the user pick files from the device, by clicking it or by dropping files onto it, and shows the names of the chosen files.
-
-### Features
-
-- **File Selection**: Native file picker with customizable accept filters
-- **Drag and Drop**: Accepts files dropped onto the field as well as files picked in the dialog
-- **Multiple Files**: Support for single or multiple file selection
-- **Three Sizes**: Base, middle and large heights, each with its own width, icon box and button size
-- **Loading State**: Replaces the icon with a spinner and stops clicks from opening the picker while the host processes a file
-- **Validation States**: Draws the field and its icon box in error or warning border colours
-- **Trigger Variants**: Ends in a folder icon, a document icon, or a labelled button in place of the icon
-- **Path Display**: Shows a given path instead of chosen file names and hands clicks to the host, for picking from somewhere other than the device
-
-### Accessibility
-
-The root is a focusable element with the button role, whose behaviour comes from \`react-dropzone\`:
-
-- \`role="button"\` and \`tabIndex="0"\` on the root, so it is reached with Tab and announced as a button
-- Enter and Space on the focused root open the file picker
-- \`aria-disabled\`: \`"true"\` while \`isDisabled\`, \`"false"\` otherwise
-- The control has no accessible name of its own: pass \`aria-label\`, and optionally \`aria-description\`, both applied to the root
-
-### Usage
-
-\`\`\`tsx
-import { FileInput } from "@onlyoffice/apps-ui-kit/components/file-input";
-
-<FileInput
-  placeholder="Choose file"
-  size={InputSize.base}
-  onInput={(file) => console.log(file)}
-  accept={[".pdf", ".docx"]}
-/>
-
-// One file at a time
-<FileInput
-  placeholder="Choose a file"
-  size={InputSize.middle}
-  isMultiple={false}
-  onInput={(file) => console.log(file)}
-/>
-
-// A path chosen elsewhere; clicks go to onClick
-<FileInput
-  size={InputSize.base}
-  fromStorage
-  path="Documents/Report.docx"
-  onClick={openFolderDialog}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     size: {
@@ -578,30 +526,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-**FileInput — border**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--file-input-border\` | Border colour of the field and its icon box | theme-based |
-| \`--file-input-hover-border\` | Border colour of the icon box while the pointer is over the field | theme-based |
-| \`--file-input-focus-border\` | Border colour of the icon box while the field is pressed | theme-based |
-| \`--file-input-disabled-border\` | Disabled border color | theme-based |
-| \`--file-input-warning-border\` | Warning state border color | theme-based |
-| \`--file-input-error-border\` | Error state border color | theme-based |
-| \`--file-input-placeholder-color\` | Disabled placeholder text color | theme-based |
-| \`--file-input-radius\` | Radius of the icon box's outer corners | \`3px\` |
-
-**TextInput (inner text field)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--text-input-bg\` | Input background color | theme-based |
-| \`--text-input-color\` | Input text color | theme-based |
-| \`--text-input-radius\` | Input border radius | theme-based |
-
-The icon's own colour cannot be changed from outside: the icon sets \`--icon-button-color\` on itself, so a wrapper's value never reaches it.
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
 
 - **Choose file** — the border, background, text and radius variables; hover it for \`--file-input-hover-border\` and press it for \`--file-input-focus-border\`
 - **Warning state** — \`--file-input-warning-border\` (\`hasWarning\`)

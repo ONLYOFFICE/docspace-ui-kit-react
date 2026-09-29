@@ -255,7 +255,8 @@ the replace control it is a `<div>`, so it is not keyboard-operable.
   handlers: no role, no tab stop, no Enter or Space. A keyboard user cannot replace or delete the
   picture. Add your own controls beside the editor when that matters.
 - The crop area is a canvas dragged with the pointer and there is no keyboard equivalent for
-  positioning. The zoom slider is the kit's `Slider` and is reachable; the two zoom buttons come
+  positioning. The zoom slider is the kit's `Slider`, a native `<input type="range">`: it is
+  reached with Tab and moved with the arrow keys, in its 0.01 steps. The two zoom buttons come
   from `IconButton` and are `<div>`s as well.
 - The cropper sets `aria-disabled` from `isDisabled`, so the state is announced even though the
   controls inside it are not focusable to begin with.

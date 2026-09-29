@@ -15,49 +15,8 @@ const meta = {
   title: "UI/Form controls/InputBlock",
   component: InputBlock,
   parameters: {
-    docs: {
-      description: {
-        component: `Input field with integrated icon support, combining a text input with an action icon button.
-
-### Features
-
-- **Icon Integration**: Attach icons with customizable colors and click handlers
-- **Clickable Icon**: Turns the icon into a button when a click handler is set; without one the icon is drawn greyed out and ignores clicks
-- **Multiple Types**: Passes the input type to the inner field, so a password is masked and an email or phone field brings up the matching mobile keyboard
-- **Three Sizes**: Sets the text size, the padding and the height of the icon box together, in base, middle or large
-- **Validation States**: Recolours the border of the whole group for an error or a warning, without printing a message
-- **Read-Only & Disabled**: Read-only keeps the look and the icon and only stops typing; disabled greys the field out and removes the icon
-- **Prefix**: Renders content before the input inside the same border, such as a currency sign or a country code
-- **Full Width**: Always stretches to the width of its container
-
-### Usage
-
-\`\`\`tsx
-import { InputBlock } from "@onlyoffice/apps-ui-kit/components/input-block";
-import { InputSize, InputType } from "@onlyoffice/apps-ui-kit/components/text-input";
-
-<InputBlock
-  type={InputType.text}
-  size={InputSize.base}
-  iconName={SearchIconUrl}
-  placeholder="Search..."
-  value={value}
-  onChange={handleChange}
-  onIconClick={handleSearch}
-/>
-
-// A fixed prefix before the input, no icon at the end
-<InputBlock
-  type={InputType.text}
-  value={amount}
-  onChange={handleAmount}
-  noIcon
->
-  <span>$</span>
-</InputBlock>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     size: {
@@ -611,21 +570,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--text-input-bg\` | Background color | theme token |
-| \`--text-input-border-color\` | Border color | theme token |
-| \`--text-input-border-hover\` | Border color on hover | theme token |
-| \`--text-input-border-focus\` | Border color while the input has focus | theme token |
-| \`--text-input-color\` | Text color | theme token |
-| \`--text-input-font-size\` | Font size | \`13px\` (\`16px\` large) |
-| \`--text-input-radius\` | Border radius | theme token |
-| \`--input-block-icon-padding\` | Icon end padding (base/middle); one length, not a shorthand | \`8px\` |
-| \`--input-block-icon-padding-lg\` | Icon end padding (large) | \`12px\` |
-| \`--input-block-icon-start\` | Icon start padding | \`1px\` |
-| \`--input-block-children-padding\` | Padding around the prefix | \`2px 0 2px 2px\` |
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
 
 **Amount** carries a prefix, for the prefix padding, and shows every other variable except the large icon padding; **Large size** is there for \`--input-block-icon-padding-lg\`, which only the large size reads. Hover and focus a field to see the hover and focus border colours.`,
       },

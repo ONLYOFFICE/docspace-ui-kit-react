@@ -9,11 +9,14 @@ import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
 import AIAgentSelector from ".";
 import type { AIAgentSelectorProps } from "./AIAgent.types";
 
+import { withPortalGate } from "../../.storybook/decorators/PortalGate";
+
 type StoryArgs = AIAgentSelectorProps;
 
 const meta: Meta<StoryArgs> = {
   title: "Components/Selectors/AIAgentSelector",
   component: AIAgentSelector,
+  decorators: [withPortalGate("AI agent selector")],
   tags: ["!autodocs"],
   parameters: {
     docs: {

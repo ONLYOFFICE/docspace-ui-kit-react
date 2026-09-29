@@ -13,60 +13,8 @@ const meta = {
   title: "UI/Overlays/DropDown",
   component: DropDown,
   parameters: {
-    docs: {
-      description: {
-        component: `A menu anchored to a control of your own, for a list of actions or options opened from a button.
-
-### Features
-
-- **Smart Positioning**: Automatically adjusts position based on viewport space
-- **Portal and Inline Modes**: Renders in a portal on the page body and measures the anchor by default, or in place inside the nearest positioned ancestor when \`isDefaultMode\` is off
-- **Virtual Scrolling**: Renders only the visible rows of a long list once \`maxHeight\` is set, reading each item's height from its \`height\` prop
-- **RTL Support**: Mirrors the alignment in a right-to-left interface, lining the menu up with the anchor's right edge
-- **Keyboard Navigation**: Moves the highlight through the items with the Up and Down arrows and clicks the highlighted item on Enter, in a list with \`maxHeight\`
-- **Click Outside**: Closes through \`clickOutsideAction\`, which a transparent backdrop behind the menu calls on the next click, optionally dimming the page (\`withBackground\`)
-- **Disabled Items**: Dropped from the list together with a separator left at either end, unless \`showDisabledItems\` keeps them
-
-### Accessibility
-
-The DropDown gives the menu a listbox role and handles the arrow keys itself:
-
-- \`role="listbox"\` on the menu element; a \`DropDownItem\` inside it is an \`option\`, or a \`separator\`
-- Up and Down move the highlighted row, wrapping at either end, and Enter calls the highlighted item's \`onClick\`; both only while the menu is open and \`maxHeight\` is set
-- Focus stays on the control that opened the menu; the highlight moves only visually
-- Escape does not close the menu; wire it yourself if the menu needs it
-
-### Usage
-
-\`\`\`tsx
-import { DropDown } from "@onlyoffice/apps-ui-kit/components/drop-down";
-import { DropDownItem } from "@onlyoffice/apps-ui-kit/components/drop-down-item";
-
-const [isOpen, setIsOpen] = useState(false);
-const buttonRef = useRef<HTMLButtonElement>(null);
-
-// A menu opened from a button
-<Button ref={buttonRef} label="Menu" onClick={() => setIsOpen(true)} />
-<DropDown
-  open={isOpen}
-  forwardedRef={buttonRef}
-  clickOutsideAction={() => setIsOpen(false)}
->
-  <DropDownItem label="Option 1" onClick={handleClick} />
-  <DropDownItem label="Option 2" onClick={handleClick} />
-</DropDown>
-
-// A long list that scrolls and answers the arrow keys
-<DropDown open={isOpen} forwardedRef={buttonRef} maxHeight={200}>
-  {items.map((item) => (
-    <DropDownItem key={item.id} label={item.label} onClick={handleClick} />
-  ))}
-</DropDown>
-\`\`\`
-
-**Note:** Parent element must have \`position: relative\` for proper positioning in non-portal mode.`,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     layout: "centered",
   },
   argTypes: {
@@ -845,19 +793,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-| --- | --- | --- |
-| \`--dropdown-bg\` | Background of the menu | theme-based |
-| \`--dropdown-border-style\` | Border of the menu, as a \`border\` shorthand | theme-based |
-| \`--dropdown-shadow\` | Shadow of the menu | theme-based |
-| \`--dropdown-radius\` | Corner radius of the menu | \`6px\` |
-| \`--dropdown-inner-padding\` | Space between the menu's edge and its first and last items | \`8px 0\` |
-| \`--dropdown-text-size\` | Font size of the menu; a \`DropDownItem\` sets its own, so it reaches only children that do not | \`13px\` |
-| \`--dropdown-text-weight\` | Font weight of the menu; a \`DropDownItem\` sets its own, so it reaches only children that do not | \`600\` |
-
-Press **Dropdown trigger** to open the menu. It renders inline here (\`isDefaultMode={false}\`), inside the wrapper that sets the variables; in the default portal mode the menu is on the page body, outside any wrapper, so set them through the DropDown's own \`style\` prop instead.`,
+        story: `The variables are listed under CSS variables on this page. Press **Dropdown trigger** to open the menu. It renders inline here (\`isDefaultMode={false}\`), inside the wrapper that sets the variables; in the default portal mode the menu is on the page body, outside any wrapper, so set them through the DropDown's own \`style\` prop instead.`,
       },
       source: {
         code: `<div style={{

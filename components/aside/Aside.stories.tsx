@@ -17,57 +17,8 @@ const meta = {
   title: "UI/Overlays/Aside",
   component: Aside,
   parameters: {
-    docs: {
-      description: {
-        component: `Aside is a sliding panel that appears from the side of the screen for displaying contextual content beside the page.
-
-### Features
-
-- **Slide-in Animation**: Slides in from the right edge, from the left one under a right-to-left interface, and up from the bottom as a sheet on a phone
-- **Optional Header**: Built-in header with title, close button, and back navigation
-- **Scrollable Body**: Content area with automatic scrollbar support
-- **Scale Mode**: Full-width scaling option for responsive layouts
-- **Unwrapped Body**: Renders the children without the kit's scrollbar, for content that scrolls on its own
-- **Close Control**: Closes only through the header's close cross, which calls \`onClose\`; there is no Escape key, backdrop or click-outside handling
-- **Stays Mounted**: Slides out of view when \`visible\` is off while the panel and its children stay mounted, so render it conditionally to remove it
-- **Stacking Order**: Sits at a z-index of 400 by default, so a backdrop of your own goes below it
-
-### Accessibility
-
-The panel is a native \`<aside>\` element; the rest is up to the consumer.
-
-- **Landmark**: \`<aside>\` is announced as a complementary landmark, and any \`aria-*\` prop, such as \`aria-label\` to name it, lands on that element
-- **Close cross**: Carries \`aria-label="close"\`, but it is a \`<div>\` with no button role and no tab stop, so a keyboard cannot reach it
-- **Focus**: Is neither moved into the panel when it opens nor kept inside it, and a hidden panel stays in the tab order
-
-### Usage
-
-\`\`\`tsx
-import { Aside } from "@onlyoffice/apps-ui-kit/components/aside";
-
-<Aside visible={isVisible} header="Panel Title" onClose={handleClose}>
-  <div>Panel content here</div>
-</Aside>
-
-// A second level with a back arrow
-<Aside
-  visible={isVisible}
-  header="Details"
-  isBackButton
-  onBackClick={handleBack}
-  onClose={handleClose}
->
-  <DetailsContent />
-</Aside>
-
-// Full width, with a dimming layer of your own below it
-<Backdrop visible={isVisible} onClick={handleClose} zIndex={399} isAside />
-<Aside visible={isVisible} scale header="Preview" onClose={handleClose}>
-  <PreviewContent />
-</Aside>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     layout: "fullscreen",
   },
   argTypes: {
@@ -707,27 +658,7 @@ export const CssCustomization: Story = {
     docs: {
       story: { inline: false, height: "500px" },
       description: {
-        story: `CSS Custom Properties for external customization:
-
-**Aside — panel**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--aside-bg\` | Panel background color | theme-based (white/black) |
-| \`--aside-width\` | Panel width, and how far the closed panel is moved out of view | \`480px\` |
-| \`--aside-transition\` | Slide animation | \`transform 0.3s ease-in-out\` |
-| \`--aside-mobile-footer-height\` | On a phone, where the panel rises from the bottom as a sheet: how much of the window stays uncovered above the sheet | \`64px\` |
-
-**AsideHeader — header bar**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--aside-header-color\` | Header title text color; a node title only, a string title keeps the text color | theme-based |
-| \`--aside-header-border\` | Header bottom border color | theme-based |
-| \`--aside-header-font-size\` | Header title font size; a node title only, a string title stays 21px | \`21px\` |
-| \`--aside-header-height\` | Header height, unless \`headerHeight\` is set | \`53px\` |
-| \`--aside-header-margin\` | Header horizontal margins; the bottom border keeps reaching 16px past each side, so any other value leaves it short of the panel edges or overflowing them | \`0 16px\` |
-| \`--aside-header-gap\` | Gap between header elements | \`6px\` |
+        story: `The panel and its header restyled through CSS variables on one wrapper -- the variables are listed under CSS variables on this page, and the header's on the AsideHeader page.
 
 The title here is a node rather than a string, so the color and font-size variables reach it. The back arrow is on to show the gap between it and the title; the phone footer offset shows only in a phone-width window. The margin is left alone because the border does not follow it.`,
       },

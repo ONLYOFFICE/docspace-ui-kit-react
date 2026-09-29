@@ -20,34 +20,11 @@ const meta = {
   title: "UI/<category>/<ComponentName>",
   component: ComponentName,
   parameters: {
-    docs: {
-      description: {
-        // 2. Component description with Features, Accessibility (if applicable), and Usage sections
-        component: `Short description of what the component does.
-
-### Features
-
-- **Feature 1**: Description
-- **Feature 2**: Description
-- **Feature 3**: Description
-
-### Accessibility
-
-(Only if the component has ARIA attributes or accessibility features)
-
-- \`aria-label\`: Description
-- \`aria-disabled\`: Description
-
-### Usage
-
-\`\`\`tsx
-import { ComponentName } from "@onlyoffice/apps-ui-kit/components/component-name";
-
-// Example usage
-<ComponentName prop1="value" prop2={true} />
-\`\`\``,
-      },
-    },
+    // 2. No component description. The Docs page is the component's README.md,
+    //    rendered by .storybook/blocks/DocsPage.tsx; see "Where the description
+    //    lives" below.
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     // 3. Figma design link (if available)
     design: {
       type: "figma",
@@ -127,7 +104,7 @@ export const VariantStory: Story = {
 
 1. [ ] **License header** - Keep the full AGPL license comment
 2. [ ] **Meta title** - `"UI/<category>/<ComponentName>"` format
-3. [ ] **Component description** - Include Features, optional Accessibility, and Usage sections
+3. [ ] **No component description** - The README is the Docs page; a fact the story would state goes into the README
 4. [ ] **argTypes** - Document every significant prop with control type, description, and default
 5. [ ] **Default story** - Interactive story with `render: (args) => ...` and sensible `args`
 6. [ ] **Variant stories** - One per major prop/state (disabled, loading, sizes, types, etc.)
@@ -136,6 +113,32 @@ export const VariantStory: Story = {
 9. [ ] **Template functions** - Extract complex renders into named `*Template` components
 10. [ ] **Wrapper** - Use a layout wrapper for stories with multiple items
 11. [ ] **Story order** - `Default` first, `CssCustomization` last; `RightToLeft`, when present, right before it
+12. [ ] **`CssCustomization` has no table** - It demonstrates the variables; the README's `## CSS variables` lists them
+
+## Where the description lives
+
+The component's `README.md` is its only description. The Docs page renders it
+(`.storybook/blocks/DocsPage.tsx`): the intro — purpose, when to use, import — above the
+primary story, the reference sections below the stories, and the README's generated
+`## Props` left to the Controls table. The README ships in the package and is synced into the
+`ui-kit` agent skill; a story is in neither, so a fact written only in a story reaches nobody
+who installed the kit.
+
+So a story file carries no `parameters.docs.description.component`, and its
+`CssCustomization` text says what the example sets, not which variables exist. A fact you
+would have written as a Features or Accessibility bullet belongs in the README's
+"Behaviour the types don't state" or "Accessibility"; a variable and its caveats in its
+"CSS variables" table. Verify it against the code first — `README_TEMPLATE.md` governs the
+README.
+
+What stays in the story is what a README cannot hold: the canvases, the controls, the
+`argTypes` descriptions, each story's `description.story` saying why it exists, and
+`source.code`.
+
+One exception: a story file whose own folder has no README — the table's parts, the
+skeletons, `ArticleItem` — keeps a one-sentence `description.component`, because its Docs page
+has nothing else to show. It names the parent page that describes the part in full, and the
+facts live in the parent README.
 
 ## Story Naming Conventions
 
@@ -184,4 +187,4 @@ Claude will:
 
 1. Read the component's source to understand its props
 2. Read the existing story
-3. Rewrite the story following this template
+3. Rewrite the story following this template, putting any description into the README

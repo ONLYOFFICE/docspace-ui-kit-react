@@ -16,6 +16,7 @@ import FilesSelector from "../selectors/Files";
 import type { TSelectedFileInfo } from "../selectors/Files/FilesSelector.types";
 
 import { dataSets, getIsDisabled } from "./DocumentEditor.story.helper";
+import { withPortalGate } from "../.storybook/decorators/PortalGate";
 
 type FileSelectorWrapperProps = {
   children: (fileId: number) => React.ReactNode;
@@ -176,6 +177,9 @@ const meta: Meta<StoryArgs> = {
         </FileSelectorWrapper>
       );
     },
+    // The editor itself comes from the portal's Document Server, which no
+    // fixture can stand in for, so with no portal this keeps the card.
+    withPortalGate("Document editor", undefined, { demo: false }),
   ],
   argTypes: {
     id: {

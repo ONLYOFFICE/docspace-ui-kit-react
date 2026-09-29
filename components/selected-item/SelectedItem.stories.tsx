@@ -12,44 +12,8 @@ const meta = {
   title: "UI/Data display/SelectedItem",
   component: SelectedItem,
   parameters: {
-    docs: {
-      description: {
-        component: `SelectedItem displays a selected value with an optional close button for removal.
-
-### Features
-
-- **Inline & Block Modes**: Shrinks to its content by default, or fills the width of its container when \`isInline\` is off
-- **Close Button**: Built-in cross that hands the item's key, label and group to \`onClose\`, or is left out with \`hideCross\`
-- **Disabled State**: Greys out the label and the cross and stops both handlers from firing
-- **Group Support**: Optional group key for categorized selections
-- **Custom Icons**: Shows a glyph before the label, from an SVG URL or an SVG component
-- **Active State**: Draws the chip, its label and its icon in the selected colours
-- **Click Handling**: Reports a click anywhere on the chip to \`onClick\`, with the same key, label and group
-- **Label Truncation**: Cuts a long label off with an ellipsis, and can show the full text in the shared tooltip through \`title\`, once \`RootTooltip\` is mounted
-
-### Accessibility
-
-The chip is a plain container; what assistive technology gets comes from its cross.
-
-- The cross carries \`aria-disabled\`, \`true\` while \`isDisabled\` is set
-- Neither the chip nor its cross is in the tab order or answers a key, so both are reached with the pointer only
-
-### Usage
-
-\`\`\`tsx
-import { SelectedItem } from "@onlyoffice/apps-ui-kit/components/selected-item";
-
-// Inline selected item
-<SelectedItem label="Finance" propKey="finance" isInline onClose={handleRemove} />
-
-// Block selected item
-<SelectedItem label="Full width item" propKey="item-1" isInline={false} onClose={handleRemove} />
-
-// Disabled
-<SelectedItem label="Locked" propKey="locked" isDisabled onClose={handleRemove} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     label: {
@@ -433,23 +397,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--selected-item-bg\` | Background color | theme-based |
-| \`--selected-item-bg-hover\` | Hover background (not applied while disabled or active) | theme-based |
-| \`--selected-item-disabled-text\` | Label color while disabled | theme-based |
-| \`--selected-item-active-bg\` | Background while \`isActive\` | theme-based |
-| \`--selected-item-active-text\` | Label and icon color while \`isActive\` | theme-based |
-| \`--selected-item-radius\` | Border radius | \`3px\` |
-| \`--selected-item-padding\` | Inner padding | \`6px 8px\` |
-| \`--selected-item-height\` | Item height | \`32px\` |
-| \`--selected-item-margin-inline\` | Space after the chip, on its inline-end side | \`4px\` |
-| \`--selected-item-margin-bottom\` | Space below the chip | \`4px\` |
-| \`--selected-item-label-margin\` | Space between the label and the cross | \`10px\` |
-
-The example has three chips: **Custom item** for the colours and sizes (hover it for the hover background), **Disabled** for \`--selected-item-disabled-text\` (\`isDisabled\`), and **Active** for the two active variables (\`isActive\`).`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The example has three chips: **Custom item** for the colours and sizes (hover it for the hover background), **Disabled** for \`--selected-item-disabled-text\` (\`isDisabled\`), and **Active** for the two active variables (\`isActive\`).`,
       },
       source: {
         code: `<div

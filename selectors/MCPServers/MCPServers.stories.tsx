@@ -6,6 +6,8 @@ import { toastr } from "../../components/toast/sub-components/Toastr";
 import MCPServersSelector from ".";
 import type { TSelectorItem } from "../../components/selector";
 
+import { withPortalGate } from "../../.storybook/decorators/PortalGate";
+
 type MCPServersSelectorProps = {
   onSubmit: (servers: TSelectorItem[]) => void;
   onClose: VoidFunction;
@@ -21,6 +23,7 @@ type StoryArgs = MCPServersSelectorProps;
 const meta: Meta<StoryArgs> = {
   title: "Components/Selectors/MCPServersSelector",
   component: MCPServersSelector,
+  decorators: [withPortalGate("MCP servers selector")],
   tags: ["!autodocs"],
   parameters: {
     docs: {

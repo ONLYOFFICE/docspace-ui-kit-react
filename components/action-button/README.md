@@ -142,6 +142,12 @@ the style does not change either.
   not render `children` at all, so a node passed as a child disappears.
 - **The component brings no width and no margin.** It is `inline-flex` with `6px 10px` of
   padding and an `8px` gap, so a row of them needs its own gap.
+- **Hover and press change only the background.** It darkens on hover — on devices that
+  have hover, so not after a tap on a touch screen — and again while pressed; the text colour
+  stays. Under `disabled` the button also shows a not-allowed cursor.
+- **The dark colours come from a `.dark` ancestor**, the class `ThemeProvider` puts on
+  `<body>` for the dark theme. Outside one the button keeps its light colours whatever the page looks like.
+- **`ref` reaches the rendered element**, whichever `as` selects.
 - **The label does not wrap or truncate.** A long label stretches the button until its parent
   clips it.
 - **`as` accepts a component as well as a tag name**, and the props of whatever you pass are

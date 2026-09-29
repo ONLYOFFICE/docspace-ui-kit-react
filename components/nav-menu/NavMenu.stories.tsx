@@ -215,46 +215,8 @@ const meta = {
   title: "UI/Navigation/NavMenu",
   component: NavMenu,
   parameters: {
-    docs: {
-      description: {
-        component: `Sidebar navigation for an application: groups of destinations, each item with an optional sub-menu, a badge and a collapsed icon-only form. The menu keeps track of which section is open; which entry is active and what a click does come from the host.
-
-### Features
-
-- **Grouped Sections**: Lays the entries out in groups, each with an optional caption above its items
-- **Expandable Sub-Menus**: Opens an item's children below it with a height animation and by default keeps one section open at a time, so opening another shuts the previous one
-- **Active Entry**: Highlights the item or sub-item named by \`activeItemId\` and opens the section it belongs to, including when the navigation happened outside the menu
-- **Separate Expand Control**: Optional chevron per section that opens and shuts it, so a click on the item selects it without ever shutting it and several sections can stay open
-- **Collapsed Rail**: Icon-only form that hides the labels and captions, shows each label as a tooltip and lists the active section's children as top-level entries
-- **Badges**: Shows a counter beside the label and a dot on the icon, with a custom badge per entry and a separate one for a section while it is shut
-- **Router Links**: Renders leaf entries that carry \`linkData\` through the host's link component instead of a button
-- **Sliding Highlight**: Optional animation that fills the highlight across the entry when it is clicked
-
-### Accessibility
-
-The menu is built from native elements, so most of its keyboard and screen-reader support comes from the platform:
-
-- The root is a \`nav\` element, announced as a navigation landmark
-- Every entry is a native \`button\` or the host's link, reached with Tab and activated with Enter or Space
-- A section header announces whether its sub-menu is open through \`aria-expanded\`; with \`withExpandControl\` the chevron carries it instead and is named after the section with \`aria-label\`
-- Keyboard focus is shown as a 2px outline in the active colour
-
-### Usage
-
-\`\`\`tsx
-import { NavMenu } from "@onlyoffice/apps-ui-kit/components/nav-menu";
-
-// Static menu, first section open
-<NavMenu groups={groups} activeItemId="documents" defaultExpandedId="documents" />
-
-// Collapsed rail
-<NavMenu groups={groups} activeItemId="recent" iconOnly />
-
-// Leaf entries as router links
-<NavMenu groups={groups} activeItemId={active} LinkRouter={RouterLink} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     groups: {
@@ -1306,21 +1268,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-| --- | --- | --- |
-| \`--nav-menu-group-label-color\` | Group caption text | theme-based |
-| \`--nav-menu-item-text-color\` | Item and sub-item labels | theme-based |
-| \`--nav-menu-item-text-active-color\` | Label of the active entry | theme-based |
-| \`--nav-menu-item-icon-color\` | Item and sub-item icons, and the chevron of \`withExpandControl\` | theme-based |
-| \`--nav-menu-item-icon-active-color\` | Icon of the active entry, and the keyboard focus outline | theme-based |
-| \`--nav-menu-item-bg-hover\` | Highlight under the entry the pointer is on | theme-based |
-| \`--nav-menu-item-bg-active\` | Highlight under the active entry | theme-based |
-| \`--nav-menu-signal-dot-color\` | Dot on the icon of an entry with a badge, collapsed rail only | theme-based |
-| \`--nav-menu-separator-color\` | Line above a sub-item with \`withTopSeparator\` | none (no line) |
-
-The component declares every variable but the last on its own \`nav\` element under the theme class, so a value set on a wrapper never arrives. Set them in a rule that outranks the theme's \`.light .root\` and pass its class through \`className\`, as this story does.
+        story: `Every overridable variable set through \`className\` -- the variables, and why a wrapper cannot set them, are listed under CSS variables on this page.
 
 - **The open menu** — every variable but the dot: the caption, the labels, the icons, the active highlight and the line above Trash; hover an entry for the hover colour, and press Tab for the focus outline
 - **The rail** — the dot on the Rooms icon (\`--nav-menu-signal-dot-color\`), which only the collapsed form shows`,

@@ -94,6 +94,21 @@ type ClientDto = {
   redirect_uris?: string[];
 };
 
+/**
+ * Whether a request's Origin is this dev server. A sandboxed frame or a
+ * `file:` page sends the literal `null`, which `new URL` throws on; thrown
+ * inside the async middleware that would leave the request hanging rather
+ * than refused, so anything unparsable is simply not this server.
+ */
+const isOwnOrigin = (origin: string | undefined, host: string | undefined) => {
+  if (!origin) return false;
+  try {
+    return new URL(origin).host === host;
+  } catch {
+    return false;
+  }
+};
+
 export const oauthAppProxy = (): PluginOption => ({
   name: "apps-ui-kit:oauth-app-proxy",
   apply: "serve",
@@ -110,8 +125,7 @@ export const oauthAppProxy = (): PluginOption => ({
         return;
       }
 
-      const origin = req.headers.origin;
-      if (!origin || new URL(origin).host !== req.headers.host) {
+      if (!isOwnOrigin(req.headers.origin, req.headers.host)) {
         send(res, 403, {
           error: "Only this dev server's own pages may call it.",
         });

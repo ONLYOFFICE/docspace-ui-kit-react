@@ -86,7 +86,6 @@ const defaultProps = {
   chatDisplayName: "Test User",
   isMobileArticle: false,
   zendeskKey: "test-key",
-  showProgress: false,
   children: [],
   logoText: "",
   showBackButton: false,

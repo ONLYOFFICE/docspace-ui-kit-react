@@ -38,40 +38,8 @@ const meta = {
   title: "UI/Tiles/BaseTile",
   component: BaseTile,
   parameters: {
-    docs: {
-      description: {
-        component: `A compact card with an icon, a title row and an optional second row, for building a tile of your own when the file, folder, room and template tiles do not fit.
-
-### Features
-
-- **Selection Checkbox**: Swaps the corner icon for a checkbox on hover, and keeps it ticked and visible while the tile is selected
-- **Active Highlight**: Keeps the hover background on the tile being acted on, as it does on a selected one
-- **Progress Loader**: Replaces the icon and the checkbox with a small loader while the item is busy
-- **Hotkey Outline**: Draws an accent border around the tile the keyboard is on
-- **Renaming State**: Drops the icon and the checkbox and gives the top row to its content while the item is renamed
-- **Actions Menu**: Opens the item's menu from a three-dot button, drawn when the item carries a \`contextOptions\` key of its own, and on right-click when \`getContextModel\` is given
-- **Two Content Rows**: Lays out a title row beside the icon and a second row under it, for tags or details
-- **Blocked Pointer**: Stops reacting to hover, clicks and right-clicks while an operation runs over the tile
-
-### Usage
-
-\`\`\`tsx
-import { BaseTile } from "@onlyoffice/apps-ui-kit/components/tiles/base-tile";
-import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
-
-<BaseTile
-  item={{ id: "1", title: "Document.docx" }}
-  element={<WordIcon />}
-  contextOptions={options}
-  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
-  onSelect={handleSelect}
-/>
-
-// A busy item: the loader takes the place of the icon
-<BaseTile item={item} element={<WordIcon />} contextOptions={options} topContent={title} inProgress />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     checked: {
@@ -545,20 +513,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-The first tile shows every variable but the hotkey colour; hover it for the hover background. The second is there for \`--tile-hotkey-color\`, which only a tile with \`showHotkeyBorder\` draws.
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--tile-bg\` | Tile background color | theme-based |
-| \`--tile-border-style\` | Tile border | theme-based |
-| \`--tile-radius\` | Tile border radius | \`12px\` |
-| \`--tile-hover-bg\` | Background while hovered, checked or active | theme-based |
-| \`--tile-icon-color\` | Color of the three-dot button | theme-based |
-| \`--tile-hotkey-color\` | Border color of a tile with \`showHotkeyBorder\` | theme-based |
-| \`--tile-padding\` | Tile vertical padding | \`16px 0\` |
-| \`--tile-row-gap\` | Gap between top and bottom content | \`16px\` |`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The first tile shows every variable but the hotkey colour; hover it for the hover background. The second is there for \`--tile-hotkey-color\`, which only a tile with \`showHotkeyBorder\` draws.`,
       },
     },
   },

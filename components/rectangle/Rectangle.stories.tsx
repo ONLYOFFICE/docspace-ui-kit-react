@@ -116,43 +116,8 @@ const meta = {
     },
   },
   parameters: {
-    docs: {
-      description: {
-        component: `A rectangular loading placeholder that stands in for a line of text, a button, a card or a table cell until the content arrives, so the page does not jump when it does.
-
-### Features
-
-- **Configurable Dimensions**: The width and height size both the element and the rectangle in it, 100% wide and 32px high by default
-- **Custom Colors**: Draws in black at low opacity in every theme by default, and takes its own resting and highlight colours with separate opacities
-- **Sweeping Highlight**: A lighter band sweeps across the rectangle, once every two seconds by default and at any pace set
-- **Still Mode**: Stops the sweep entirely for a page that must not animate
-- **SVG Based**: Renders as an SVG rectangle for crisp display at any resolution
-- **Border Radius**: Rounds the corners slightly by default, up to pill and circle shapes
-- **Accessible Name**: Takes an optional title that names the placeholder for screen readers
-- **SSR Safe**: Keeps the SVG's internal ids stable between server and client render
-
-### Accessibility
-
-The SVG is exposed to assistive technology as an image:
-
-- **Role**: The element carries \`role="img"\`, so a screen reader treats the placeholder as one picture
-- **Name**: \`title\` renders an SVG \`<title>\` that the element's \`aria-labelledby\` points at; without one the image has no name and nothing is announced
-- **Busy State**: The component sets no \`aria-busy\`; mark the loading region with it yourself
-- **Motion**: Nothing checks \`prefers-reduced-motion\`; pass \`animate={false}\` where motion should stop
-
-### Usage
-
-\`\`\`tsx
-import { RectangleSkeleton } from "@onlyoffice/apps-ui-kit/components/rectangle";
-
-// A line of text
-<RectangleSkeleton width="180px" height="22px" title="Loading the title" />
-
-// A still, rounded button placeholder
-<RectangleSkeleton width="120px" height="32px" borderRadius="16" animate={false} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
 } satisfies Meta<typeof RectangleSkeleton>;
 
@@ -341,15 +306,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The component reads no CSS custom property: its colours are SVG gradient stops filled from props, so a wrapper variable never reaches them. All three pills here set the same five props, at three widths:
-
-| Prop | Description | Default |
-|------|-------------|---------|
-| \`backgroundColor\` | Colour of the rectangle at rest | \`#000\` |
-| \`foregroundColor\` | Colour of the sweeping band | \`#000\` |
-| \`backgroundOpacity\` | Opacity of the resting colour | \`0.1\` |
-| \`foregroundOpacity\` | Opacity of the sweeping band | \`0.15\` |
-| \`borderRadius\` | Corner radius of the rectangle | \`3\` |`,
+        story: `There are no CSS variables to list on this page: the component reads none, as "Behaviour the types don't state" explains, so this example styles three pills of different widths with the same five props: \`backgroundColor\`, \`foregroundColor\`, their opacities and \`borderRadius\`.`,
       },
       source: {
         code: `<RectangleSkeleton

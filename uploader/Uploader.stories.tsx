@@ -7,6 +7,7 @@ import type { UploaderProps } from "./Uploader.types";
 import { Toast } from "../components/toast";
 
 import { useApi } from "../providers/api";
+import { withPortalGate } from "../.storybook/decorators/PortalGate";
 import FilesSelector from "../selectors/Files";
 import type { TBreadCrumb } from "../components/selector/Selector.types";
 import { DeviceType } from "../enums";
@@ -25,7 +26,10 @@ const UploaderWithFolderUrl = (args: StoryArgs) => {
   const { baseUrl } = useApi();
   const { storyId = "default", ...uploaderProps } = args;
 
-  const [targetId, setTargetId] = useState("");
+  // Kept as the selector hands it over: a portal folder's id is a number,
+  // and the Uploader picks its route by that type -- a string would send a
+  // portal folder down the third-party storage route.
+  const [targetId, setTargetId] = useState<string | number>("");
   const [folderPath, setFolderPath] = useState("");
   const [isSelectorVisible, setIsSelectorVisible] = useState(false);
 
@@ -37,9 +41,8 @@ const UploaderWithFolderUrl = (args: StoryArgs) => {
   ) => {
     if (!selectedItemId) return;
 
-    const idStr = String(selectedItemId);
     const path = breadCrumbs.map((crumb) => crumb.label).join(" / ");
-    setTargetId(idStr);
+    setTargetId(selectedItemId);
     setFolderPath(path);
     setIsSelectorVisible(false);
   };
@@ -128,6 +131,7 @@ const meta: Meta<StoryArgs> = {
         <Toast />
       </>
     ),
+    withPortalGate("Uploader"),
   ],
   argTypes: {
     width: {

@@ -162,6 +162,8 @@ export function TopLoaderElement() {
 - **`end()` does not leave a full bar on screen.** It animates from where it stands to 100% over one
   second, and the next tick 50ms later sets the width back to `0px`. Nothing fades it out — add a
   transition or an opacity rule of your own if the finish should be visible.
+- **`cancel()` does not animate.** It stops the timer and sets the width to `0px` and
+  `aria-valuenow` to `0` at once, whether the bar is still growing or already closing.
 - **`end()` before `start()` is ignored**, because there is no timer to end.
 - **A second `start()` does not restart the bar.** The interval is already running, so the width
   keeps being computed from the original start time; only `cancel()` then `start()` begins again.

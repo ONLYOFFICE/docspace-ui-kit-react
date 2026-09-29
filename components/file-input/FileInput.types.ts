@@ -22,7 +22,10 @@ export type FileInputProps = {
   hasWarning?: boolean;
   /** Applied to the hidden `<input type="file">`, not to the wrapper. */
   id?: string;
-  /** Whether choosing and dropping are both switched off and the field greyed. */
+  /**
+   * Whether the field is greyed and a click no longer opens the file dialog.
+   * A drop is still accepted, and Enter or Space still opens the dialog.
+   */
   isDisabled?: boolean;
   /**
    * Whether a spinner replaces the icon. It also disables the field, and it is
@@ -37,9 +40,9 @@ export type FileInputProps = {
    */
   onInput?: (file: File | File[]) => void;
   /**
-   * Which files the browser offers. It is handed straight to `react-dropzone`,
-   * which expects a map of MIME type to extensions — `{ "image/*": [".png"] }`
-   * — despite the array type here.
+   * Extensions and MIME types the dialog offers and a drop accepts, such as
+   * `[".pdf", "image/*"]`. The default `[""]` matches only files with no MIME
+   * type, so pass it whenever the field is used.
    */
   accept?: string[];
   /** Renders a button with this label in place of the icon. */

@@ -12,52 +12,8 @@ const meta = {
   title: "UI/Interactive elements/HelpButton",
   component: HelpButton,
   parameters: {
-    docs: {
-      description: {
-        component: `HelpButton is an info icon that opens a short explanation next to a label or setting whose meaning is not obvious from its own text.
-
-### Features
-
-- **Tooltip Content**: Shows a string in the application's shared tooltip and any other React node in a tooltip the component renders itself
-- **Positioning**: Opens on the preferred side of the icon, top unless set otherwise, and moves to another side when that one has no room
-- **Size and Color**: Draws the info icon at 12px in the theme's grey unless another size, any CSS colour or the theme accent is given
-- **Click Mode**: Opens on click and stays open so a link inside can be reached, or opens on hover when \`openOnClick\` is turned off
-- **Offset Control**: Sets the gap between the icon and the tooltip in pixels
-- **Custom Anchor**: Opens the tooltip from any element passed as children, in place of the info icon
-- **Controlled State**: Can be held open or closed by the parent, with callbacks after the tooltip has been shown and hidden
-- **Width Limit**: Caps the width of the tooltip at a CSS length, so long text wraps
-
-### Accessibility
-
-Keyboard support comes from the tooltip underneath:
-
-- **Escape**: Closes the open tooltip, as do a click outside the icon, scrolling and resizing the window
-- **Focus**: The icon is a \`<div>\` with no tab stop, so the explanation cannot be opened from the keyboard; keep text that keyboard users need on the page itself
-
-### Usage
-
-\`\`\`tsx
-import { HelpButton } from "@onlyoffice/apps-ui-kit/components/help-button";
-
-// Basic help button
-<HelpButton tooltipContent={<div>Help text here</div>} />
-
-// With custom position and offset
-<HelpButton
-  tooltipContent={<div>Help text</div>}
-  place="top"
-  offset={12}
-/>
-
-// With custom size and color
-<HelpButton
-  tooltipContent={<div>Help text</div>}
-  size={24}
-  color="#2DA7DB"
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     tooltipContent: {
@@ -622,15 +578,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-| --- | --- | --- |
-| \`--tooltip-bg\` | Background of the tooltip | theme-based |
-| \`--tooltip-color\` | Text colour of the tooltip | theme-based |
-| \`--tooltip-max-width-value\` | Widest the tooltip may grow before its text wraps | \`320px\` |
-
-The tooltip renders in a portal outside the page's own elements, so the variables are passed through \`tooltipStyle\` rather than set on a wrapper. Click either icon to see the custom colours; the second tooltip's longer text wraps at 180px. The icon's colour is set with the \`color\` prop: its own stylesheet declares \`--icon-button-color\` on the icon, so a value set around it never arrives.`,
+        story: `The tooltip's variables passed through \`tooltipStyle\` -- the variables are listed under CSS variables on this page. Click either icon to see the custom colours; the second tooltip's longer text wraps at 180px.`,
       },
       source: {
         code: `<HelpButton

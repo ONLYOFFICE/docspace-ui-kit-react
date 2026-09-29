@@ -207,6 +207,11 @@ export function AccountEmail({ email }: { email: string }) {
   They are not sentences, and this component renders none of them.
 - **`customValidate` replaces the parser entirely**, `emailSettings` and all; return the same
   `{ value, isValid, errors }` shape.
+- **`emailSettings` must be an `EmailSettings` instance.** The parser throws a `TypeError` on
+  a plain object, so build one with `EmailSettings.parse({ allowName: true })` from
+  `@onlyoffice/apps-ui-kit/utils/email`. Left out, the parser refuses punycode, IP-address
+  domains, display names, spaces and local domain names, and applies the strict local-part
+  rules; each of those is one `allow…` flag.
 - **`isAutoFocussed` is ignored on an iOS phone.** The component forces it off there, because
   the on-screen keyboard opening on load hides the rest of the form.
 - **`testId` is not a prop here** — it is removed from `TextInput`'s props and replaced by
@@ -214,10 +219,29 @@ export function AccountEmail({ email }: { email: string }) {
 - The value is held in the component's own state and re-synced whenever `value` changes, so it
   behaves as a controlled field as long as you keep passing `value`.
 
+## CSS variables
+
+The field is a [`TextInput`](../text-input/README.md), so its variables apply here; set them on
+any ancestor. `--email-input-align` is this component's own.
+
+| Variable                    | Default                 | Effect                                                                                                               |
+| --------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `--email-input-align`       | `left`                  | Alignment of the value and the placeholder. Ignored under a right-to-left interface (`.rtl`), where both align right |
+| `--text-input-bg`           | `--input-bg`            | Background                                                                                                           |
+| `--text-input-color`        | `--input-color`         | Text and caret colour                                                                                                |
+| `--text-input-border-color` | `--input-border-color`  | Border colour at rest                                                                                                |
+| `--text-input-border-hover` | `--input-border-hover`  | Border colour while hovered                                                                                          |
+| `--text-input-border-focus` | `--input-border-focus`  | Border colour while focused                                                                                          |
+| `--text-input-radius`       | `--input-border-radius` | Border radius                                                                                                        |
+| `--text-input-font-size`    | `13px` / `16px`         | Font size of every size at once; unset, `base` and `middle` are 13px and `large` 16px                                |
+
+While the field is in its error state the theme's error colour replaces all three border
+variables; the background, text colour, radius, font size and alignment still apply.
+
 ## Accessibility
 
 - The field has no label of its own — use [`FieldContainer`](../field-container/README.md) or
-  [`Label`](../label/README.md) with `htmlFor`.
+  [`Label`](../label/README.md) with `htmlFor`, or pass `aria-label`.
 - **Nothing is announced when the address is wrong.** The only signal is the border colour, and
   the field carries no `aria-invalid`, so set it yourself alongside a message tied with
   `aria-describedby`.

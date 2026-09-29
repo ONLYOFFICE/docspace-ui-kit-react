@@ -12,46 +12,8 @@ const meta = {
   title: "UI/Layout/ThemeProviderComponent",
   component: ThemeProviderComponent,
   parameters: {
-    docs: {
-      description: {
-        component: `ThemeProviderComponent writes a theme object onto the document and supplies the kit's theme and direction context to the tree below it. Use it at the root of an application that already holds a full theme object; otherwise prefer \`ThemeProvider\` from \`@onlyoffice/apps-ui-kit/providers/theme\`, which renders this component for you.
-
-### Features
-
-- **Light And Dark Themes**: Puts a \`light\` or \`dark\` class on \`<body>\` and a matching \`data-theme\` on \`<html>\`, chosen by the theme's \`isBase\`
-- **Page Background And Text**: The \`light\` and \`dark\` classes set the document background and text colour, which the kit's own stylesheet applies to \`<html>\` and \`<body>\`
-- **Writing Direction**: Writes the theme's \`interfaceDirection\` as \`data-dir\` on \`<html>\` and as the direction of \`<body>\`, and reports it to components that mirror themselves
-- **Accent Colours**: Writes the accent and button colours of \`currentColorScheme\` onto \`<html>\` and \`<body>\`, where accented components such as Slider and Tabs read them
-- **Font Family**: Applies the theme's \`fontFamily\` to every element, falling back to \`Open Sans, sans-serif, Arial\` when the theme has none
-- **Theme Context**: Supplies the \`Base\` or \`Dark\` theme and the colour scheme to components that read the theme in code
-- **Document-Wide Effects**: Changes the whole document rather than its children, and leaves every change in place when it unmounts
-
-### Usage
-
-\`\`\`tsx
-import { ThemeProviderComponent } from "@onlyoffice/apps-ui-kit/components/theme-provider";
-
-<ThemeProviderComponent
-  theme={{ isBase: true, interfaceDirection: "ltr", fontFamily: "Open Sans, sans-serif, Arial" }}
->
-  <App />
-</ThemeProviderComponent>
-
-// Dark theme with your own accent colour
-<ThemeProviderComponent
-  theme={{ isBase: false, interfaceDirection: "ltr" }}
-  currentColorScheme={{
-    id: 1,
-    name: "Custom",
-    main: { accent: "#2DB482", buttons: "#2DB482" },
-    text: { accent: "#FFFFFF", buttons: "#FFFFFF" },
-  }}
->
-  <App />
-</ThemeProviderComponent>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     theme: {

@@ -8,36 +8,8 @@ const meta = {
   title: "UI/Layout/Scrollbar",
   component: Scrollbar,
   parameters: {
-    docs: {
-      description: {
-        component: `Scrollbar provides a custom scrollbar with auto-hide, fixed sizing, and both vertical and horizontal scrolling support.
-
-### Features
-
-- **Auto-Hide**: Keeps the tracks hidden until the content is scrolled or the pointer moves over it, then fades them out three seconds later; on by default
-- **Hover Thickening**: Widens the thumb from 4px to 8px on desktop while the pointer is over its track or the thumb is dragged
-- **Fixed Size Thumb**: Keeps the thumb at its wider 8px thickness on desktop instead of widening it only on hover
-- **Vertical & Horizontal**: Supports both scroll directions independently
-- **Custom Padding**: Configurable padding after the last item and inline-end padding
-- **Content-Sized Box**: Can take the height or width of its content instead of filling its parent
-- **RTL Support**: Moves the vertical track to the left edge in a right-to-left interface
-
-### Usage
-
-\`\`\`tsx
-import { Scrollbar } from "@onlyoffice/apps-ui-kit/components/scrollbar";
-
-<Scrollbar style={{ width: 300, height: 200 }}>
-  <p>Scrollable content here...</p>
-</Scrollbar>
-
-// Tracks always visible
-<Scrollbar autoHide={false} style={{ width: 300, height: 200 }}>
-  <p>Content...</p>
-</Scrollbar>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     autoHide: {
@@ -447,20 +419,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--scrollbar-bg\` | Thumb default color | theme token |
-| \`--scrollbar-bg-hover\` | Thumb hover color | theme token |
-| \`--scrollbar-bg-active\` | Thumb active/pressed color | theme token |
-| \`--scrollbar-thumb-size\` | Thumb width (vertical) / height (horizontal) | \`4px\` |
-| \`--scrollbar-radius\` | Track corner radius; the track itself is transparent, so it shows only where it clips a thumb that reaches the track's corner (with \`--scrollbar-track-padding: 0\`) | \`8px\` |
-| \`--scrollbar-track-padding\` | Gap between the track's edges and the thumb | \`4px\` |
-| \`--scrollbar-padding-end\` | Space between the content and the side the vertical track is on; \`paddingInlineEnd\` overrides it | \`17px\` |
-| \`--scrollbar-padding-end-mobile\` | The same space on screens up to 600px wide | \`8px\` |
-
-The example sets the thumb colours (hover and drag the thumb to see the other two), a 6px thumb, a 2px track padding and 32px of space before the track.`,
+        story: `The variables are listed under CSS variables on this page. The example sets the thumb colours (hover and drag the thumb to see the other two), a 6px thumb, a 2px track padding and 32px of space before the track.`,
       },
     },
   },

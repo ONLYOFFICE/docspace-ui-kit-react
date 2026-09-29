@@ -28,8 +28,8 @@ control for a row action or a toolbar, where a label would not fit.
   focusable and named, and it takes an icon too.
 - Not for an icon that opens a menu of actions: that is
   [`ContextMenuButton`](../context-menu-button/README.md).
-- Not for a decorative icon. This one sets a pointer cursor and hover colours whether or not
-  anything happens.
+- Not for a decorative icon. This one keeps its hover colours whether or not anything
+  happens, and shows a pointer cursor as soon as it has an `onClick` or `isClickable`.
 
 ## Import
 
@@ -178,20 +178,34 @@ export function DeleteButton({ onDelete }: { onDelete: () => void }) {
 - The hover and pressed icon swaps are suppressed on a touch device, which the component
   detects by `ontouchstart`.
 - `isDisabled` blocks every handler including the colour swaps, and sets `aria-disabled`; the
-  element stays in the tab order if you gave it one.
+  element stays in the tab order if you gave it one. The stylesheet changes nothing but the
+  cursor, which becomes the arrow, so a disabled button keeps its default icon and colour and
+  otherwise looks the same as an enabled one.
+- The cursor is the pointer only when the button has an `onClick` or `isClickable`; otherwise
+  it is the arrow.
+- With `tooltipId` and `tooltipContent` the button renders its own `Tooltip` below itself,
+  which follows the pointer on a desktop and stays put elsewhere.
 - `title` never reaches the DOM — the component's tooltip container consumes it.
 
 ## CSS variables
 
-The component sets `--icon-button-size` and `--icon-button-color` on its own element from the
-`size` and `color` props, so those props are the way to change them. `color` also accepts the
-name of a custom property (`color="--accent-main"`), which it wraps in `var()`.
+The component declares these on its own element and writes them into its inline style from the
+`size` and `color` props, so a value set on a wrapper never arrives. The props are the way to
+change them; the `style` prop also works, because it is applied after them. `color` accepts
+the name of a custom property (`color="--accent-main"`), which it wraps in `var()`.
+
+| Variable                    | Default             | Effect                                                                                                                                                                                 |
+| --------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--icon-button-color`       | theme               | Icon colour, as fill, or as stroke under `isStroke`                                                                                                                                    |
+| `--icon-button-hover-color` | theme               | Icon colour while a mouse pointer is over the button; not on touch screens. Once `color` is set, the component writes the same value here, so the hover colour comes from `hoverColor` |
+| `--icon-button-size`        | `20px`, from `size` | Width and height of the button                                                                                                                                                         |
 
 ## Accessibility
 
 - The element is a `<div>` with no role and no accessible name. A screen reader announces
   nothing unless you add `role="button"` and a name, which the component does not do for you.
-- `isDisabled` sets `aria-disabled="true"`.
+- `aria-disabled` is always set: `true` while `isDisabled`, `false` otherwise.
+- `aria-label` is passed through to the element and is the way to give it a name.
 - The tooltip from `title` is not an accessible name either — it is rendered by the kit's
   tooltip, not by the platform.
 - For an icon-only action that has to be usable by everyone, `Button` with `aria-label` is the

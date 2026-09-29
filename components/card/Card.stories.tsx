@@ -11,41 +11,8 @@ const meta = {
   title: "UI/Data display/Card",
   component: Card,
   parameters: {
-    docs: {
-      description: {
-        component: `A tinted panel with an optional header row, a body and a footer, for grouping a block of related information.
-
-### Features
-
-- **Header Row**: Places the title on the leading side and an extra element against the trailing edge of one row
-- **Hidden Header**: Drops the header row entirely when neither a title nor an extra element is given
-- **Free-Form Slots**: Accepts any React node in every slot, from plain text to an icon with a label, a badge or a button
-- **Long Titles**: Lets a long title wrap while the extra element keeps its natural width on a single line
-- **Footer**: Renders an optional footer below the body, spaced like the other slots and otherwise unstyled
-- **Themed Surface**: Colours the rounded background, the title and the body text from the light or dark theme
-- **Styling Hooks**: Passes a class name, an inline style and a test id to the outer element
-
-### Usage
-
-\`\`\`tsx
-import { Card } from "@onlyoffice/apps-ui-kit/components/card";
-
-// Title and body
-<Card title="Backup storage">
-  Copies of your documents are saved every night.
-</Card>
-
-// Status in the header, action in the footer
-<Card
-  title="Backup storage"
-  extra={<span>Connected</span>}
-  footer={<button type="button">Open settings</button>}
->
-  Copies of your documents are saved every night.
-</Card>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     title: {
@@ -267,15 +234,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--info-block-background\` | Card background | theme-based |
-| \`--card-title-color\` | Title text colour | theme-based |
-| \`--card-body-color\` | Body text colour | theme-based |
-
-The card's own stylesheet declares these on the card element for the light and dark theme, so a value set on a wrapper never reaches it; set them through the card's \`style\` prop, as here.`,
+        story: `Every overridable variable set on the card itself -- the variables are listed under CSS variables on this page. They are set through the \`style\` prop, because a value on a wrapper never reaches the card.`,
       },
       source: {
         code: `<Card

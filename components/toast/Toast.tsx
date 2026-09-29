@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useSyncExternalStore } from "react";
 import { cssTransition, ToastContainer } from "react-toastify";
 import classNames from "classnames";
 
@@ -17,9 +17,43 @@ const Slide = cssTransition({
   exit: "SlideOut",
 });
 
+// react-toastify keys its registry by containerId, and every <Toast /> uses
+// the same one. With two mounted, the later takes the earlier's place, and a
+// toast still showing in the earlier throws on its next render ("Cannot set
+// properties of undefined (setting 'toggle')"). Two is not exotic: a Storybook
+// docs page mounts one per story, a plugin can mount one next to the portal's.
+// So only the first mounted instance renders the container; when it unmounts,
+// the next one takes over.
+const instances: symbol[] = [];
+const listeners = new Set<() => void>();
+
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+};
+
+const getOwner = () => instances[0];
+
+const setInstances = (update: () => void) => {
+  update();
+  listeners.forEach((listener) => listener());
+};
+
 const Toast = React.memo(({ className, style, isSSR }: ToastProps) => {
   const isServer = useIsServer();
   const offset = useMobileViewport();
+
+  const [instance] = useState(() => Symbol("Toast"));
+  const owner = useSyncExternalStore(subscribe, getOwner, () => undefined);
+
+  useEffect(() => {
+    setInstances(() => instances.push(instance));
+
+    return () =>
+      setInstances(() => instances.splice(instances.indexOf(instance), 1));
+  }, [instance]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -35,6 +69,7 @@ const Toast = React.memo(({ className, style, isSSR }: ToastProps) => {
   }, []);
 
   if (isServer && isSSR) return null;
+  if (owner !== instance) return null;
 
   const element = (
     <ToastContainer

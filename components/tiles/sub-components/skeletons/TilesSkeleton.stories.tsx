@@ -12,37 +12,7 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `Placeholder in the shape of a tile listing, shown while the tiles themselves are loading.
-
-### Features
-
-- **Tile Placeholders**: Draws the number of folder and file placeholders it is given, two folders and eight files unless told otherwise
-- **Grouped Like The Listing**: Puts the folder placeholders above the file placeholders, each group under a bar standing for its heading
-- **Tile Shapes**: Gives a folder a 64px bar and a file a 220px card, both with rounded corners
-- **Optional Files Heading**: Leaves out the bar above the files when the listing has no heading there
-- **Room Placeholder**: Lets a single \`TileSkeleton\` draw a room card, with a logo, a title bar and two tag bars
-- **Sweeping Band**: Moves a light band across every shape at the speed and in the colours given
-- **Fewer Tiles On Smaller Screens**: Hides the placeholders of each group past the seventh on a tablet and past the second on a phone
-
-### Accessibility
-
-Each shape is an SVG exposed to assistive technology as an image:
-
-- **Role**: Every shape carries \`role="img"\`, so a screen reader meets one image per tile and per heading bar
-- **Name**: \`title\` names every shape through an SVG \`<title>\`; without one the images have no name and nothing is announced
-- **Busy State**: The grid sets no \`aria-busy\`; mark the loading region with it yourself
-
-### Usage
-
-\`\`\`tsx
-import { TilesSkeleton } from "@onlyoffice/apps-ui-kit/components/tiles/sub-components/skeletons";
-
-// While the first page of tiles is loading
-{isLoading ? <TilesSkeleton /> : <TileContainer>{tiles}</TileContainer>}
-
-// A folder with files only, and no heading above them
-<TilesSkeleton foldersCount={0} filesCount={6} withTitle={false} />
-\`\`\``,
+        component: `Placeholder in the shape of a tile listing, shown while the tiles themselves are loading. The Tiles page describes it in full.`,
       },
     },
   },

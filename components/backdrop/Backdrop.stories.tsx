@@ -11,36 +11,8 @@ const meta = {
   title: "UI/Overlays/Backdrop",
   component: Backdrop,
   parameters: {
-    docs: {
-      description: {
-        component: `Backdrop provides a customizable overlay layer behind modals, dialogs, and aside panels.
-
-### Features
-
-- **Background Control**: Dims the page behind it or stays transparent and only catches clicks, the transparent mode winning when both are asked for
-- **Responsive Behavior**: Dims the page on screens 600px wide or narrower even when no background is asked for
-- **Z-Index Stacking**: Sits at a configurable stacking order, 203 by default, so the covered component can be placed above it
-- **Multiple Backdrop Support**: Stays hidden while another backdrop is on screen, unless it belongs to a side panel or is forced to render
-- **Touch Events**: Treats a touch move or touch end on the layer as a click and blocks touch scrolling through it
-- **Context Modes**: Side-panel backdrops dim the page by default, while modal-dialog backdrops let touch scrolling go on
-- **Click Catching**: Reports a click anywhere on the layer, so the host can close what it covers
-
-### Usage
-
-\`\`\`tsx
-import { Backdrop } from "@onlyoffice/apps-ui-kit/components/backdrop";
-
-// Dimmed layer behind a dialog
-<Backdrop visible={isVisible} onClick={handleClose} withBackground />
-
-// Transparent layer that closes a menu on an outside click
-<Backdrop visible={isOpen} onClick={closeMenu} withoutBackground />
-
-// Layer behind a side panel, stacked over another backdrop
-<Backdrop visible={isPanelOpen} onClick={closePanel} isAside />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     visible: {
@@ -460,13 +432,7 @@ export const CssCustomization: Story = {
       // The layer is fixed over the whole window, so inline it would cover the Docs page.
       story: { inline: false, height: "200px" },
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--backdrop-bg\` | Color of the dimmed layer, shown with \`withBackground\` or \`isAside\` and on narrow screens | \`rgba(6, 22, 38, 0.2)\`, \`rgba(27, 27, 27, 0.6)\` in the dark theme |
-
-The stacking order is set by the \`zIndex\` prop, not by a variable.`,
+        story: `The dimming colour overridden on a wrapper -- the variables are listed under CSS variables on this page. The stacking order is the \`zIndex\` prop.`,
       },
       source: {
         code: `<div style={{ "--backdrop-bg": "rgba(0, 130, 201, 0.4)" }}>

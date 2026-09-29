@@ -272,9 +272,14 @@ export function CoverSection({
 - **The dialog's height is computed from fixed constants** — 648px on desktop, 854px on tablet —
   recalculated on every resize, and forced to a scrolling body when the viewport is landscape and
   shorter than 640px.
-- **A custom colour is anything outside the kit's palette.** The extra swatch appears only once
-  `selectedColor` is not one of `globalColors.logoColors`; before that the same slot is the plus
-  button that opens the picker.
+- **A custom colour is anything outside the kit's palette** of nine presets. The extra swatch
+  appears only once `selectedColor` is not one of `globalColors.logoColors`; before that the same
+  slot is the plus button that opens the picker. The extra swatch carries a pencil button that
+  opens the picker again to change it.
+- **Where the colour picker opens depends on the width.** On a phone (600px and below) it is a
+  modal of its own; otherwise it is a drop-down anchored to the plus button or custom swatch.
+- **The initials are the first letters of the title's first and last words**, upper-cased, after
+  special symbols are stripped — "Quarterly reports" gives QR, a one-word title a single letter.
 - On `RoomLogoCover` the raw-room fields **`logoColor` and `coverColor` are six hex digits without
   a leading `#`** — the component prefixes it — while `initialColor` is a full `#rrggbb`.
 

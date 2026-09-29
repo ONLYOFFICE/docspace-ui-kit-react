@@ -6,40 +6,10 @@ import ErrorBoundary from "./ErrorBoundary";
 
 const meta = {
   title: "Components/Providers/ErrorProvider",
-  tags: ["!autodocs"],
   component: ErrorBoundary,
   parameters: {
-    docs: {
-      description: {
-        component: `ErrorBoundary catches JavaScript errors in its child component tree and renders a fallback UI.
-
-### Features
-
-- **Catches Rendering Errors**: Catches rendering errors in child components
-- **Custom Fallback UI**: Supports custom fallback UI via \`fallback\` prop (ReactNode or render function)
-- **Error Callback**: \`onError\` callback for error reporting/logging
-- **Default Fallback**: Default fallback uses ErrorContainer
-
-### Usage
-
-\`\`\`tsx
-import { ErrorBoundary } from "@onlyoffice/apps-ui-kit/providers/error-boundary";
-
-// With default fallback
-<ErrorBoundary>
-  <App />
-</ErrorBoundary>
-
-// With custom fallback
-<ErrorBoundary
-  fallback={(error) => <div>Error: {error.message}</div>}
-  onError={(error, errorInfo) => logError(error, errorInfo)}
->
-  <App />
-</ErrorBoundary>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     children: {

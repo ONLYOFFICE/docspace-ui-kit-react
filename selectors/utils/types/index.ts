@@ -56,7 +56,6 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
   favoritesFolder?: FolderDtoInteger | null;
   withRecentTreeFolder?: boolean;
   withFavoritesTreeFolder?: boolean;
-  roomsFolderId?: number;
 };
 
 export type UseAgentsHelperProps = TUseInputItemHelper & {

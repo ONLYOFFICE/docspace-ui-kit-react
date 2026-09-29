@@ -9,50 +9,8 @@ const meta = {
   title: "UI/Form controls/Label",
   component: Label,
   parameters: {
-    docs: {
-      description: {
-        component: `Label component displays field names in forms with support for required indicators and error states.
-
-### Features
-
-- **Required Indicator**: Show a red asterisk (*) for required fields
-- **Error State**: Highlight the label in red for validation errors
-- **Truncation**: Truncate overflowing text with ellipsis
-- **Inline Block**: Sits on the line beside its field as an inline block that keeps its own width and padding
-- **Form Association**: Associates with form controls via \`htmlFor\`
-- **Children Support**: Render additional content (e.g., "(optional)") inside the label
-- **Hover Tooltip**: Opens the kit's shared tooltip with the \`title\` text when the pointer rests on the label, once \`RootTooltip\` is mounted
-
-### Accessibility
-
-The label is a native \`<label>\`, so the field it names comes from the platform; the states it marks are set on the label itself, not on the field.
-
-- **Field name**: \`htmlFor\` ties the label to the field's \`id\`, so a screen reader announces the text as the field's name and clicking the label focuses the field
-- \`aria-required\`: Set on the label when \`isRequired\` is on; screen readers read "required" from the field, so put \`required\` on the input too
-- \`aria-invalid\`: Set on the label when \`error\` is on; the field needs its own \`aria-invalid\` and an error message tied to it with \`aria-describedby\`
-- **Asterisk**: Hidden from screen readers (\`aria-hidden\`), so it adds no noise to the announced name
-
-### Usage
-
-\`\`\`tsx
-import { Label } from "@onlyoffice/apps-ui-kit/components/label";
-
-// Basic label
-<Label text="First name" htmlFor="firstName" />
-
-// Required field
-<Label text="Email" htmlFor="email" isRequired />
-
-// Error state
-<Label text="Password" htmlFor="password" error />
-
-// With children
-<Label text="Phone" htmlFor="phone">
-  <span>(optional)</span>
-</Label>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     text: {
@@ -397,13 +355,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--label-required-color\` | Color of the required asterisk (*) | \`#F24724\` |
-| \`--label-error-color\` | Label text color in error state | \`#F24724\` |
-| \`--text-size\` | Font size (via Text component) | \`13px\` |
+        story: `Both colours and the font size set on one wrapper -- the variables are listed under CSS variables on this page.
 
 - **Display name** shows the asterisk colour (\`--label-required-color\`) and the font size.
 - **Email address** adds \`error\` to show the text colour in the error state (\`--label-error-color\`).`,

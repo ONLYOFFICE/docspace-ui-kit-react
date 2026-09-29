@@ -12,36 +12,8 @@ const meta = {
   title: "UI/Feedback/StatusMessage",
   component: StatusMessage,
   parameters: {
-    docs: {
-      description: {
-        component: `A bar for an error or a warning that stays on screen until the state behind it changes, placed above the form or page it is about.
-
-### Features
-
-- **Fade In and Out**: Fades in when a message arrives and fades out before it leaves
-- **Warning Variant**: Switches the background, border and icon to the warning colours
-- **Auto-Hide**: Automatically hides when the message is cleared
-- **Message Swap**: Smoothly transitions between different messages
-- **Danger Icon**: Shows the same danger glyph before the text in both variants, tinted to match
-- **Rich Content**: Accepts plain text or React nodes as the message
-- **Container Width**: Stretches to the width of its container up to 1200px and keeps a 16px gap below
-
-### Usage
-
-\`\`\`tsx
-import StatusMessage from "@onlyoffice/apps-ui-kit/components/status-message";
-
-// Error message
-<StatusMessage message="Invalid email address" />
-
-// Warning message
-<StatusMessage message="Password is too weak" isWarning />
-
-// Controlled visibility (clear message to hide)
-<StatusMessage message={error || ""} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     message: {
@@ -216,25 +188,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--status-message-bg\` | Background color of the error bar | theme token |
-| \`--status-message-border\` | Border of the error bar | theme token |
-| \`--status-message-text\` | Text color | theme token |
-| \`--status-message-icon\` | Icon fill color of the error bar | theme token |
-| \`--status-message-warning-bg\` | Background color of the warning bar | theme token |
-| \`--status-message-warning-border-style\` | Border of the warning bar | theme token |
-| \`--status-message-warning-icon\` | Icon fill color of the warning bar | theme token |
-| \`--status-message-shadow\` | Box shadow | theme token |
-| \`--status-message-radius\` | Border radius | \`6px\` |
-| \`--status-message-padding\` | Inner padding | \`8px 12px\` |
-| \`--status-message-gap\` | Gap between icon and text | \`12px\` |
-| \`--status-message-margin-bottom\` | Bottom margin | \`16px\` |
-| \`--status-message-max-width\` | Max width | \`1200px\` |
-
-The first bar shows the shared variables; the second, with \`isWarning\`, is there for the three warning variables, and the gap between the two is the bottom margin. The max width caps both bars below the 400px wrapper.`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The first bar shows the shared variables; the second, with \`isWarning\`, is there for the three warning variables, and the gap between the two is the bottom margin. The max width caps both bars below the 400px wrapper.`,
       },
       source: {
         code: `<div

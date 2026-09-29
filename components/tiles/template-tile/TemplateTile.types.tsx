@@ -30,7 +30,7 @@ export type TemplateTileProps = {
   checked?: boolean;
   /** Whether the tile is the one being acted on, which keeps its hover background. */
   isActive?: boolean;
-  /** Dims the tile while an operation is running over it. */
+  /** Turns the pointer off while an operation is running over the tile: hover, clicks and right-clicks stop reaching it. It does not change how the tile looks. */
   isBlockingOperation?: boolean;
   /** The template this tile stands for. Its `createdBy` fills the owner line and its `security.EditRoom` decides whether the quota control is read-only. */
   item: TemplateItem;

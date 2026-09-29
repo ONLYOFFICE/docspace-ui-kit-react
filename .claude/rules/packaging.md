@@ -64,8 +64,12 @@ Where a new package goes:
 
 Every non-required peer is mirrored in `devDependencies` — pnpm does not install peers, so the
 build, tests and Storybook need a concrete copy. `@onlyoffice/ai-chat`'s own optional peers
-(assistant-ui, radix, codemirror, the LLM vendor SDKs) are deliberately **absent**: nothing
-here imports them, and a copy would only pretend otherwise.
+split in two. The ones its chat UI renders with — assistant-ui, assistant-stream, the radix
+primitives, class-variance-authority, clsx, tailwind-merge, zustand — are mirrored too, so the
+AI agent renders in Storybook, without becoming peers of this package. The rest — codemirror,
+react-shiki, the LLM vendor SDKs — are deliberately **absent**: nothing here reaches the code
+that loads them, and a copy would only pretend otherwise. The `//devDependencies` note in
+`package.json` says the same; keep the two in step.
 
 Adding a dependency that nothing imports — or removing the last import while leaving the entry
 — fails the client's pre-push gate, not anything here. See [source-checks.md](source-checks.md).

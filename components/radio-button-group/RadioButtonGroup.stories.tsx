@@ -10,55 +10,8 @@ const meta = {
   title: "UI/Form controls/RadioButtonGroup",
   component: RadioButtonGroup,
   parameters: {
-    docs: {
-      description: {
-        component: `RadioButtonGroup builds a set of radio buttons from an array of options, for choosing exactly one value from a short fixed list.
-
-### Features
-
-- **Two Orientations**: Runs the options side by side in a row, or stacks them in a column only as wide as its longest label
-- **Disabled State**: Disables the whole group at once, or single options while the rest stay selectable
-- **Text Labels**: Places a caption inside the group, between runs of options, from an entry with \`type: "text"\`
-- **Custom Styling**: Sets one font size and weight for every label, the gap between neighbouring buttons and the width of the group
-- **Own Selection State**: Keeps the chosen option itself, starting from \`selected\` and moving to the new value whenever that prop changes
-- **Change Callback**: Reports every choice through \`onClick\` with the input's change event, the new value as a string in \`event.target.value\`
-- **Value Fallback**: Writes an option's \`value\` beside its button when the option has no \`label\`
-
-### Usage
-
-\`\`\`tsx
-import { RadioButtonGroup } from "@onlyoffice/apps-ui-kit/components/radio-button-group";
-
-const options = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-];
-
-// A row of options, one chosen
-<RadioButtonGroup
-  name="size"
-  options={options}
-  selected="option1"
-  onClick={(e) => setValue(e.target.value)}
-/>
-
-// A column with a caption and one disabled option
-<RadioButtonGroup
-  name="sort"
-  orientation="vertical"
-  spacing="8px"
-  options={[
-    { type: "text", label: "Sort by", value: "" },
-    { value: "name", label: "Name" },
-    { value: "date", label: "Date", disabled: true },
-  ]}
-  selected="name"
-  onClick={handleChange}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=556-3247&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -364,14 +317,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--radio-button-group-subtext-top\` | Space above a caption option (\`type: "text"\`) | \`16px\` |
-| \`--radio-button-group-subtext-bottom\` | Space below a caption option | \`8px\` |
-
-The example sets both on a wrapper around a vertical group that opens with the caption "Choose an option:".`,
+        story: `Both caption spacings set on a wrapper around a vertical group that opens with the caption "Choose an option:" -- the variables are listed under CSS variables on this page.`,
       },
       source: {
         code: `<div style={{

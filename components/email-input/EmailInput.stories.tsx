@@ -14,59 +14,8 @@ const meta = {
   title: "UI/Form controls/EmailInput",
   component: EmailInput,
   parameters: {
-    docs: {
-      description: {
-        component: `Email input field with built-in validation against configurable email format rules.
-
-### Features
-
-- **Email Validation**: Checks what is typed against the kit's address parser on every keystroke and whenever a new \`value\` arrives
-- **Configurable Rules**: Accepts or refuses punycode, IP-address domains, display names, spaces and local domain names according to \`emailSettings\`
-- **Custom Validation**: Replaces the built-in parser outright with a function that returns the same result shape
-- **Validation Feedback**: Reports the result of each keystroke, with the parser's error keys, to \`onValidateInput\`
-- **Automatic Error State**: Turns the border red as soon as a non-empty value fails the check, unless \`hasError\` is passed to decide instead
-- **Email Autofill**: Asks the browser for saved addresses through \`autocomplete="email"\` by default
-- **Three Sizes**: Comes in base, middle and large heights and stretches to the container's width with \`scale\`
-- **Disabled And Read-Only**: Greys the field out and takes it out of use, or keeps it focusable while refusing edits
-
-### Accessibility
-
-The field is a native text \`<input>\`, so its keyboard and screen-reader support comes from the platform.
-
-- **Keyboard**: Tab moves focus into the field and typing edits it; \`isDisabled\` renders it \`disabled\`, which takes it out of the tab order
-- **Read-only**: \`isReadOnly\` renders it \`readonly\`, so it stays focusable and its value is still read out
-- **Purpose hint**: \`autocomplete="email"\` is the only machine-readable sign that the field expects an email address
-- **Name and error**: The consumer supplies the name, through \`<label for>\` (FieldContainer, Label) or \`aria-label\`, and an error message tied with \`aria-describedby\`, since the only built-in signal is the border colour
-
-### Usage
-
-\`\`\`tsx
-import { EmailInput } from "@onlyoffice/apps-ui-kit/components/email-input";
-import { EmailSettings } from "@onlyoffice/apps-ui-kit/utils/email";
-
-const settings = EmailSettings.parse({ allowStrictLocalPart: true });
-
-<EmailInput
-  value={value}
-  emailSettings={settings}
-  onChange={(e) => setValue(e.target.value)}
-  onValidateInput={(result) => setIsValid(result.isValid)}
-  placeholder="Enter email address"
-/>
-\`\`\`
-
-\`\`\`tsx
-// Show the error only after the field is left
-<EmailInput
-  value={value}
-  hasError={wasVisited && !isValid}
-  onBlur={() => setWasVisited(true)}
-  onChange={(e) => setValue(e.target.value)}
-  onValidateInput={(result) => setIsValid(result.isValid)}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     size: {
@@ -551,18 +500,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization: the \`--text-input-*\` ones come from TextInput, \`--email-input-align\` is this component's own. The first field shows every variable; hover and focus it to see the two border variables. The second holds an address with its error border forced on (\`hasError\`): the theme's error colour replaces all three border variables, while the background, text colour, radius, font size and alignment still apply:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--text-input-bg\` | Background color | theme token |
-| \`--text-input-border-color\` | Border color at rest | theme token |
-| \`--text-input-border-hover\` | Border color while hovered | theme token |
-| \`--text-input-border-focus\` | Border color while focused | theme token |
-| \`--text-input-color\` | Text and caret color | theme token |
-| \`--text-input-font-size\` | Font size (all sizes) | \`13px\` (base, middle) / \`16px\` (large) |
-| \`--text-input-radius\` | Border radius | theme token |
-| \`--email-input-align\` | Alignment of the value and the placeholder; ignored under a right-to-left interface, where both align right | \`left\` |`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The first field shows them all; hover and focus it to see the two border variables. The second holds an address with its error border forced on (\`hasError\`), where the theme's error colour replaces the border variables and the rest still apply.`,
       },
       source: {
         code: `<div

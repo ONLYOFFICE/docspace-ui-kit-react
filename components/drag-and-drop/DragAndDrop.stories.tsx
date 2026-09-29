@@ -10,50 +10,8 @@ const meta = {
   title: "UI/Interactive elements/DragAndDrop",
   component: DragAndDrop,
   parameters: {
-    docs: {
-      description: {
-        component: `Wrapper that makes an existing element — a row, a tile, a panel — accept dropped files, with no interface of its own.
-
-### Features
-
-- **Drop Target**: Turns whatever it wraps into a target for dropped files without adding a border, a prompt or a file dialog
-- **Drag Highlight**: Paints the drag background only while you pass \`dragging\`, and a stronger accept colour while files are held over the element
-- **Unfiltered Drops**: Hands every dropped file to \`onDrop\` with no type or size filter, and stays silent when a drop carries no files
-- **Drag Callbacks**: Reports each drag-over with the drag-active flag, and each moment the dragged files leave the element
-- **Nested Targets**: Keeps a drop to itself by default, and with \`isDropZone\` hands it to the target around it, whose \`onDrop\` fires instead
-- **Faded Look**: Fades the element to 40% with \`isDragDisabled\` while the drop still goes through, so the host guards \`onDrop\` itself
-- **Custom Styling**: Accepts a class name and inline style on the outer element, where the drag colours and the faded opacity can be overridden
-
-### Accessibility
-
-The drop library turns the element into a focusable button that has no action of its own.
-
-- **Button role**: The element is announced as a button (\`role="button"\`) and sits in the tab order (\`tabIndex="0"\`)
-- **Space and Enter**: Try to open a file dialog, but there is no file input, so nothing happens
-- **Keyboard upload**: Needs a separate button that opens an \`<input type="file">\`, since dragging is the only way in here
-
-### Usage
-
-\`\`\`tsx
-import { DragAndDrop } from "@onlyoffice/apps-ui-kit/components/drag-and-drop";
-
-// A folder row that takes dropped files and highlights during a drag
-<DragAndDrop
-  dragging={dragging}
-  onDragOver={() => setDragging(true)}
-  onDragLeave={() => setDragging(false)}
-  onDrop={(files) => upload(files)}
->
-  <div>Contracts</div>
-</DragAndDrop>
-
-// A read-only folder: faded, and the drop is ignored by the host
-<DragAndDrop isDragDisabled onDrop={() => {}}>
-  <div>Archive</div>
-</DragAndDrop>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     isDropZone: {
@@ -377,15 +335,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--dnd-dragging-bg\` | Background while \`dragging\` is set | theme-based |
-| \`--dnd-accept-bg\` | Background while \`dragging\` is set and files are held over the element | theme-based |
-| \`--dnd-disabled-opacity\` | Opacity while \`isDragDisabled\` is set | \`0.4\` |
-
-One wrapper sets all three. The first box is held in the dragging state for \`--dnd-dragging-bg\`; drag a file over it to see \`--dnd-accept-bg\`. The second box is there for \`--dnd-disabled-opacity\`, which only \`isDragDisabled\` switches on.`,
+        story: `One wrapper sets all three -- the variables are listed under CSS variables on this page. The first box is held in the dragging state for \`--dnd-dragging-bg\`; drag a file over it to see \`--dnd-accept-bg\`. The second box is there for \`--dnd-disabled-opacity\`, which only \`isDragDisabled\` switches on.`,
       },
       source: {
         code: `<div

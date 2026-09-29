@@ -11,45 +11,8 @@ const meta = {
   title: "UI/Form controls/ToggleButton",
   component: ToggleButton,
   parameters: {
-    docs: {
-      description: {
-        component: `ToggleButton is a switch control for toggling between on and off states.
-
-### Features
-
-- **Animated Toggle**: Slides the knob from one end of the track to the other when the state changes
-- **Loading State**: Pulses the knob while an operation is in progress, without blocking clicks
-- **Disabled State**: Dims the switch and the label and ignores clicks
-- **Optional Label**: Text label with configurable font size and weight
-- **No Animation Mode**: Moves the knob instantly instead of sliding it, while the loading pulse still runs
-- **Custom Colours**: Takes the track colour of each state and the gap before the label from CSS variables
-- **Right-to-Left**: Mirrors the switch in a right-to-left interface, so the off knob sits on the right and the label comes before it
-- **Tooltip Anchor**: Carries the id a \`Tooltip\` elsewhere in the tree uses to open over the control
-
-### Accessibility
-
-The ToggleButton renders a visually hidden native \`<input type="checkbox">\` inside a \`<label>\`, so its support comes from the platform:
-
-- Screen readers announce a checkbox with its checked state, named by the label text; without \`label\` the control has no accessible name, and no prop supplies one
-- Tab moves focus to the hidden input and Space toggles it; the switch draws no focus ring while focused
-- \`isDisabled\` sets the native \`disabled\` on the input, which takes it out of the tab order and is announced as unavailable
-
-### Usage
-
-\`\`\`tsx
-import { ToggleButton } from "@onlyoffice/apps-ui-kit/components/toggle-button";
-
-// Basic toggle
-<ToggleButton label="Enable notifications" isChecked={isEnabled} onChange={handleChange} />
-
-// Loading state
-<ToggleButton label="Auto-save" isChecked={isOn} isLoading={isSaving} onChange={handleChange} />
-
-// Without label
-<ToggleButton isChecked={isOn} onChange={handleChange} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     isChecked: {
@@ -348,14 +311,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--toggle-button-spacing\` | Gap between the switch and the label | \`8px\` |
-| \`--toggle-button-checked-color\` | Track colour when checked, disabled or not | theme-based |
-| \`--toggle-button-off-color\` | Track colour when unchecked; the dark theme ignores it and keeps its own | \`#d0d5da\` |
-| \`--toggle-button-off-hover-color\` | Track colour of an unchecked switch under the pointer; the dark theme ignores it and keeps its own | \`#a3a9ae\` |
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
 
 - **Off** is there for \`--toggle-button-off-color\`; hover it to see \`--toggle-button-off-hover-color\`
 - **On** is there for \`--toggle-button-checked-color\`

@@ -15,61 +15,8 @@ const meta = {
   title: "UI/Navigation/Tabs",
   component: Tabs,
   parameters: {
-    docs: {
-      description: {
-        component: `Tabs organize content into multiple sections, allowing users to switch between views.
-
-### Features
-
-- **Two Types**: Draws either an underlined row of tabs or a segmented control whose selected background slides to the clicked tab
-- **Keyboard Navigation**: Lets the segmented control be operated from the keyboard, with a highlight that moves from tab to tab before one is selected
-- **Sticky Positioning**: Keeps the tab bar stuck to the top of its scrolling container, at an adjustable offset and optionally below a sticky header
-- **Scaled Mode**: Stretches segmented tabs to share the container's width equally
-- **Animation**: Grows the underline of a newly selected tab and dims the content while that tab's click handler is still running
-- **Overflow**: Scrolls a bar too wide for its container sideways behind faded edges, and adds previous and next arrows to the segmented control
-- **Badges and Icons**: Shows a badge after the label of an underlined tab, or an icon before the label of a segmented tab
-- **Disabled State**: Individual tabs can be greyed out and made unclickable on either type
-
-### Accessibility
-
-The segmented control handles keys of its own; the underlined row handles none.
-
-- **Tab**: moves focus to the segmented tab list and switches its arrow-key mode on; pressing it again switches the mode off and leaves focus on the list
-- **Arrow Right / Arrow Left**: move the highlight to the next or previous tab, wrapping around at either end
-- **Home / End**: move the highlight to the first or last tab
-- **Enter / Space**: select the highlighted tab
-
-### Usage
-
-\`\`\`tsx
-import { Tabs, TabsTypes } from "@onlyoffice/apps-ui-kit/components/tabs";
-
-// Primary tabs
-<Tabs
-  items={tabItems}
-  selectedItemId={selectedId}
-  onSelect={(item) => setSelectedId(item.id)}
-/>
-
-// Secondary tabs
-<Tabs
-  items={tabItems}
-  selectedItemId={selectedId}
-  type={TabsTypes.Secondary}
-  onSelect={(item) => setSelectedId(item.id)}
-/>
-
-// Segmented tabs spanning the container
-<Tabs
-  items={tabItems}
-  selectedItemId={selectedId}
-  type={TabsTypes.Secondary}
-  scaled
-  onSelect={(item) => setSelectedId(item.id)}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     items: {
@@ -639,34 +586,7 @@ export const CssCustomization: Story = {
       // Framed: the keyboard handler listens on the window and would take keys from the Docs page.
       story: { inline: false, height: "260px" },
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--tabs-primary-height\` | Height of the underlined row | \`32px\` |
-| \`--tabs-primary-gap\` | Gap between underlined tabs | \`20px\` |
-| \`--tabs-text-weight\` | Font weight of the labels, underlined row only; segmented labels stay at 600 | \`600\` |
-| \`--tabs-underline-thickness\` | Thickness of the selected tab's underline | \`4px\` |
-| \`--tabs-underline-radius\` | Corner radius of the selected tab's underline | \`4px 4px 0 0\` |
-| \`--tabs-underline\` | Colour of the line under the whole underlined row | theme-based |
-| \`--tabs-primary-bg\` | Background behind either tab bar and behind the sticky header | theme-based |
-| \`--tabs-primary-text\` | Label colour, underlined row | theme-based |
-| \`--tabs-primary-active-text\` | Label colour of the selected tab, underlined row | theme-based |
-| \`--tabs-primary-hover-text\` | Label colour of a hovered tab, underlined row | theme-based |
-| \`--tabs-secondary-height\` | Height of the segmented control | \`36px\` |
-| \`--tabs-secondary-gap\` | Gap between segmented tabs | \`4px\` |
-| \`--tabs-secondary-padding\` | Padding between the track and the tabs inside it | \`4px\` |
-| \`--tabs-secondary-radius\` | Corner radius of the track | \`5px\` |
-| \`--tabs-secondary-tab-radius\` | Corner radius of one segmented tab and of the selected background | \`3px\` |
-| \`--tabs-secondary-bg\` | Background of the track and of its arrows | theme-based |
-| \`--tabs-secondary-active-bg\` | Background of the selected segmented tab | theme-based |
-| \`--tabs-secondary-text\` | Label and icon colour, segmented control | theme-based |
-| \`--tabs-secondary-active-text\` | Label and icon colour of the selected, hovered or keyboard-highlighted segmented tab | theme-based |
-| \`--tabs-secondary-hover-bg\` | Background of a hovered or keyboard-highlighted segmented tab, and of a hovered arrow | theme-based |
-| \`--tabs-secondary-hover-icon\` | Colour of a hovered arrow; only while the segmented tabs overflow (see Overflowing Tabs) | theme-based |
-| \`--tabs-fade\` | Colour the scrolled-away edge fades to; only while the tabs overflow (see Overflowing Tabs) | theme-based |
-
-The wrapper sets every variable either bar can show without overflowing. The first instance is the underlined row, for the \`--tabs-primary-*\`, underline and weight variables; the second is the segmented control (\`type={TabsTypes.Secondary}\`), for the \`--tabs-secondary-*\` ones. Hover the tabs to see the hover colours.`,
+        story: `Every variable either bar can show without overflowing, set on one wrapper -- the variables are listed under CSS variables on this page. The first instance is the underlined row, for the \`--tabs-primary-*\`, underline and weight variables; the second is the segmented control (\`type={TabsTypes.Secondary}\`), for the \`--tabs-secondary-*\` ones. Hover the tabs to see the hover colours.`,
       },
       source: {
         code: `<div style={{

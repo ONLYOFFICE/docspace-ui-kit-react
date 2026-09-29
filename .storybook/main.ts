@@ -5,7 +5,6 @@ import type { StorybookConfig } from "@storybook/react-vite";
 import svgr from "vite-plugin-svgr";
 import remarkGfm from "remark-gfm";
 
-import { aiChatMock } from "./ai-chat-mock.ts";
 import { oauthAppProxy } from "./oauth-app-proxy.ts";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -16,8 +15,10 @@ const config: StorybookConfig = {
     // Scoped per directory rather than "../**/*.mdx": the recursive form also
     // matches dist/, storybook-static/ and node_modules/, and every .mdx in
     // this package lives under one of the directories listed below.
+    // components/ has none: a component's Docs page is its README, rendered
+    // by .storybook/blocks/DocsPage.tsx, and a glob matching nothing only
+    // prints "No story files found" on every start.
     "../docs/**/*.mdx",
-    "../components/**/*.mdx",
     "../errors/**/*.mdx",
     "../providers/**/*.mdx",
     "../selectors/**/*.mdx",
@@ -39,8 +40,10 @@ const config: StorybookConfig = {
   // `public/` is served at the root, next to iframe.html, for pages a story
   // needs a real URL for -- today the OAuth redirect URI of the legal-practice
   // samples, `oauth-callback.html`, and the `serve.json` that keeps
-  // `pnpm storybook-serve` from rewriting it. Resolved relative to the
-  // preview, so it works under a path prefix as well.
+  // `pnpm storybook-serve` from rewriting it, serves index.html at `/` and
+  // marks HTML and JSON `no-cache` -- otherwise a browser keeps showing the
+  // previous build after a rebuild. Resolved relative to the preview, so it
+  // works under a path prefix as well.
   staticDirs: [
     { from: "../assets", to: "/static" },
     { from: "./public", to: "/" },
@@ -86,6 +89,12 @@ const config: StorybookConfig = {
 
   typescript: {
     reactDocgen: "react-docgen-typescript",
+    // .storybook/ is outside tsconfig.json and holds no component with props,
+    // so docgen skipped each of its files with a warning on every start.
+    // Setting `exclude` replaces the plugin's default, hence the stories.
+    reactDocgenTypescriptOptions: {
+      exclude: ["**/*.stories.tsx", "**/.storybook/**"],
+    },
   },
 
   async viteFinal(config, { configType }) {
@@ -170,12 +179,6 @@ const config: StorybookConfig = {
         alias: { ...missingAiChatPeers },
       },
     };
-
-    // The AI chat widget talks to `/api/2.0/ai` on the page's own origin;
-    // in local Storybook that is this dev server. Without an answer the
-    // widget's stores never initialise and the panel renders empty. Inert
-    // behind nginx (`STORYBOOK_PROXY`), where those calls reach the portal.
-    config.plugins.push(aiChatMock());
 
     // The legal-practice samples' "Create the OAuth app" button: two portal
     // calls the browser cannot make cross-origin. Dev server only.

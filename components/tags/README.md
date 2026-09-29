@@ -150,6 +150,9 @@ export function RoomTagsWithMenu({ tags }: { tags: string[] }) {
 
 ## Behaviour the types don't state
 
+- **The row's width is shared out among the visible tags.** Each gets an equal percentage
+  `maxWidth` of the measured width, less room for the overflow or create tag, so a long label
+  truncates with an ellipsis instead of widening the row.
 - **The widths are measured once per change of `tags`, `columnCount` or `showCreateTag`.**
   There is no `ResizeObserver`: resizing the container, or the row growing because a sibling
   shrank, leaves every tag at the percentage computed for the old width.
@@ -186,10 +189,17 @@ The row itself has one; the tags inside follow [`Tag`](../tag/README.md#css-vari
 | ----------------------------- | ------- | ------------------------------------------------ |
 | `--tags-overflow-text-margin` | `8px`   | Leading margin of an entry in the overflow menu. |
 
+The overflow menu is portalled to the document body, so this variable reaches it only when it
+is set on `:root` or `body`; a wrapper, or the `style` prop, never does. It is ignored under
+`removeTagIcon`, which drops the margin altogether.
+
 ## Accessibility
 
 - The row is a `<div>` with the hardcoded English `aria-label="Tags container"`, which cannot
-  be overridden and does not change with the interface language.
+  be overridden and does not change with the interface language. The `<div>` has no role, so
+  most screen readers do not announce the label at all.
+- Everything else comes from each [`Tag`](../tag/README.md): its label is its accessible name
+  (`aria-label`), and a disabled tag carries `aria-disabled`.
 - It has no list semantics: the tags are not `<li>`s and the row is not a `<ul>`, so a screen
   reader reads a run of labels with no sense of how many there are.
 - **No tag can be reached from the keyboard** — see [`Tag`](../tag/README.md#accessibility) —

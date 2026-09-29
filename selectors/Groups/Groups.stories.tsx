@@ -6,11 +6,14 @@ import { toastr } from "../../components/toast/sub-components/Toastr";
 import GroupsSelector from ".";
 import type { GroupsSelectorProps } from "./GroupsSelector.types";
 
+import { withPortalGate } from "../../.storybook/decorators/PortalGate";
+
 type StoryArgs = GroupsSelectorProps;
 
 const meta: Meta<StoryArgs> = {
   title: "Components/Selectors/GroupsSelector",
   component: GroupsSelector,
+  decorators: [withPortalGate("Groups selector")],
   tags: ["!autodocs"],
   parameters: {
     docs: {

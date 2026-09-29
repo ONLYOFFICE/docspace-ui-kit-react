@@ -11,8 +11,8 @@ export type TextareaProps = {
   isDisabled?: boolean;
   /** Indicates that the field is displaying read-only content */
   isReadOnly?: boolean;
-  /** Draws the field in the error colour. Ignored when `isJSONField` is set:
-   * that mode computes the error state from whether the value parses.
+  /** Draws the field in the error colour. Under `isJSONField` it adds to that
+   * mode's own error state rather than being replaced by it.
    * @default false */
   hasError?: boolean;
   /** Makes the field 65vh tall instead of the default 89px.
@@ -65,7 +65,8 @@ export type TextareaProps = {
    * @default false */
   areaSelect?: boolean;
   /** Treats the value as JSON: pretty-prints it, and puts the field in the
-   * error state whenever it does not parse — which overrides `hasError`.
+   * error state whenever it is empty or not a JSON object or array, whatever
+   * `hasError` says.
    * @default false */
   isJSONField?: boolean;
   /** Text of the toast shown after a successful copy. Without it the copy is

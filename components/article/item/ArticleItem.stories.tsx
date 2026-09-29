@@ -19,7 +19,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Display catalog item. Can show only icon. If is it end of block - adding margin bottom.",
+          "One catalog entry of the Article panel's body: an icon, a label and an optional badge. The Article page describes it in full.",
       },
     },
     design: {
@@ -185,20 +185,8 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--article-item-border-radius\` | Background pill border radius | \`3px\` |
-| \`--article-item-text\` | Item text color (normal) | theme-based |
-| \`--article-item-text-active\` | Item text color (active/selected) | theme-based |
-| \`--article-item-text-weight\` | Item text font weight | \`600\` |
-| \`--article-item-icon\` | Icon fill color (normal) | theme-based |
-| \`--article-item-icon-active\` | Icon fill color (active/selected) | theme-based |
-| \`--article-item-active-bg\` | Background when item is active | theme-based |
-| \`--article-item-active-hover-bg\` | Background when hovering an active item | theme-based |
-| \`--article-item-hover-bg\` | Background on hover | theme-based |
-| \`--sidebar-item-gap\` | Gap between items (set on parent container) | \`0\` |`,
+        story:
+          "The row's variables set on one wrapper -- they are listed under CSS variables on the Article page.",
       },
       source: {
         code: `// Sidebar with Nextcloud-style active state and gaps

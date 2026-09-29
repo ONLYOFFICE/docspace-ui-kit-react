@@ -10,68 +10,8 @@ const meta = {
   title: "UI/Interactive elements/Dropzone",
   component: Dropzone,
   parameters: {
-    docs: {
-      description: {
-        component: `An upload area that takes files or a whole folder by drag and drop or through the system file dialog.
-
-### Features
-
-- **File Upload**: Opens the file dialog on a click anywhere in the area and takes files dropped onto it
-- **Folder Upload**: Picks a whole directory instead of files and gives each file its path inside it, so the folder structure survives the upload
-- **Multiple / Single Upload**: Takes many files or root folders per drop, or only one, refusing a larger drop whole through a callback
-- **Loading State**: Replaces the drop area with a spinner, or with a progress bar when a percentage is given
-- **Accepted Formats**: Restricts file uploads to the listed MIME types or extensions and reports refused files through a callback
-- **Max Files**: Caps the number of files one drop may carry and refuses a drop that holds more
-- **Expandable Formats List**: Shows a short format line with an optional \`+N\` badge that opens the full list in a drop-down when clicked
-- **Drag Highlight**: Tints the area while a file is dragged anywhere over the page, and more strongly once it is over the area
-
-### Accessibility
-
-The drop area is announced as a button and reports its busy and disabled states:
-
-- **Role and name**: The area has \`role="button"\` and the name "File upload area" or "Folder upload area"; the hidden input is named "File input" or "Folder input"
-- **Keyboard**: In file mode the area takes focus with Tab, and Enter or Space opens the file dialog
-- **States**: \`aria-busy\` on the outer element marks the loading state, and \`aria-disabled\` the disabled one
-- **Live text**: The two text lines sit in a polite live region, so a change to them is read out
-
-### Usage
-
-\`\`\`tsx
-import Dropzone from "@onlyoffice/apps-ui-kit/components/dropzone";
-
-// Basic file upload
-<Dropzone
-  isLoading={false}
-  linkMainText="Click to upload"
-  linkSecondaryText="or drag and drop files here"
-  exstsText="PDF, DOC, DOCX"
-  accept={[".pdf", ".doc", ".docx"]}
-  onDrop={(files) => handleUpload(files)}
-/>
-
-// Folder upload
-<Dropzone
-  isLoading={false}
-  isFolderUpload
-  linkMainText="Click to upload folder"
-  linkSecondaryText="or drag and drop folders here"
-  exstsText=""
-  accept={[]}
-  onDrop={(files) => handleFolderUpload(files)}
-/>
-
-// Upload in progress
-<Dropzone
-  isLoading
-  uploadPercent={45}
-  linkMainText="Click to upload"
-  linkSecondaryText="or drag and drop files here"
-  exstsText="PDF, DOC, DOCX"
-  accept={[".pdf", ".doc", ".docx"]}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     isLoading: {
@@ -559,30 +499,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--dropzone-border-style\` | Border shorthand (width style color) | theme-based dashed |
-| \`--dropzone-radius\` | Border radius | \`6px\` |
-| \`--dropzone-min-height\` | Minimum height | \`150px\` |
-| \`--dropzone-gap\` | Gap between the icon, the text lines and the format line, and between the items inside them | \`4px\` |
-| \`--dropzone-drag-bg\` | Background while a file is dragged over the page but not yet over the area | theme-based |
-| \`--dropzone-hover-bg-override\` | Background while a file is dragged over the area | theme-based |
-| \`--dropzone-text-size\` | Font size of the two text lines and the format line | \`13px\` |
-| \`--dropzone-link-secondary-color\` | Colour of the second text line | theme-based |
-| \`--dropzone-text-color\` | Colour of the format line and its arrow | theme-based |
-| \`--dropzone-text-hover-bg\` | Format line background on hover, when a full list is given | theme-based |
-| \`--dropzone-text-pressed-bg\` | Format line background while pressed, when a full list is given | theme-based |
-| \`--dropzone-text-focus-bg\` | Format line background while the full list is open | theme-based |
-| \`--dropzone-text-focus-color\` | Format text colour while the full list is open | theme-based |
-| \`--dropzone-badge-focus-color\` | \`+N\` pill background while the full list is open | theme-based |
-| \`--dropzone-arrow-focus-color\` | Arrow colour while the full list is open | theme-based |
-| \`--dropzone-exsts-radius\` | Format line corner radius, seen on its hover and open backgrounds | \`3px\` |
-| \`--dropzone-formats-radius\` | Full list drop-down corner radius | \`6px\` |
-| \`--dropzone-formats-shadow\` | Full list drop-down shadow | none |
-
-One instance carries every variable. Hover the format line, press it, and click it to open the full list for the hover, pressed and open variables; drag a file over the page, then over the area, for the two drag backgrounds.`,
+        story: `Every overridable variable set on one instance -- the variables are listed under CSS variables on this page. Hover the format line, press it, and click it to open the full list for the hover, pressed and open variables; drag a file over the page, then over the area, for the two drag backgrounds.`,
       },
       source: {
         code: `<div

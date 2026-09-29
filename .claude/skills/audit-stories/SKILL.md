@@ -6,12 +6,15 @@ argument-hint: "<component | folder> [all] [template]"
 
 # Stories audit
 
-The stories are the only written description of a component a
-Storybook reader gets: `parameters.docs.description.component`
-carries the feature list, the accessibility notes and the table of
-CSS variables (see `.claude/rules/component-authoring.md`). This
-skill compares each component's actual code with its stories and
-reports where they disagree. Fixes land in this repository — the
+A component's Docs page is its `README.md`, rendered by
+`.storybook/blocks/DocsPage.tsx` around the stories: the README carries
+the description, the behaviour notes, the accessibility notes and the
+table of CSS variables, and the stories carry the canvases, the
+`argTypes` and each story's own text (see
+`.claude/rules/component-authoring.md`). This skill compares each
+component's actual code with its stories — and with the README
+sections the Docs page shows around them — and reports where they
+disagree. Fixes land in this repository — the
 client consumes only the packed tarball and holds no story.
 
 Scope: the component or folder from the argument. When neither the
@@ -65,14 +68,12 @@ keeps the fixed shape below with only the `### Template` section.
 6. **Template conformance.** The story file against `STORY_TEMPLATE.md`
    and the rules under "Fixing stories" below, read statically. A
    deviation is a finding even when the text is accurate:
-   - the component description: one purpose sentence, then
-     `### Features` with 6–8 `**Label**: <clause>` bullets that are
-     full statements — a bare enumeration, a list of prop names, a
-     label repeated as its own clause or a trailing period each count;
-     `### Accessibility` present when the component sets roles,
-     `aria-*` or handles keys, or renders a native interactive element
-     (`input`, `button`, `a`, `select`, `textarea`) as its root; absent
-     otherwise; `### Usage` with two to four examples;
+   - no `parameters.docs.description.component` in a story file whose
+     folder has a README — its Features, Accessibility or Usage block
+     is a second copy of the README and a finding by itself, fixed by
+     moving what the README lacks into it (see "Fixing stories"); a
+     story file without a README of its own keeps one purpose sentence
+     naming the parent page;
    - every story has `parameters.docs.description.story` saying why,
      and `parameters.docs.source.code`;
    - a story is named for what the reader sees or does, not for the
@@ -82,14 +83,15 @@ keeps the fixed shape below with only the `### Template` section.
    - sample data is neutral: no product roles or policies, real names,
      photos, brand names or network-fetched images; one placeholder
      icon unless icons are the subject;
-   - `CssCustomization` has the standard form, every row of its table
-     names a variable some rule reads, and the example sets every row
-     a rendered instance can show;
+   - `CssCustomization` has the standard form and no table of its own;
+     every row of the README's `## CSS variables` table names a
+     variable some rule reads, and the example sets every row a
+     rendered instance can show;
    - comments are one line and explain only what the code cannot show;
    - `Default` opens the file and `CssCustomization` is the last
      story, with `RightToLeft`, when there is one, right before it:
      the Docs page renders the first story as the component's primary
-     preview, and the variables table is an appendix, not an opener.
+     preview, and the variables demo is an appendix, not an opener.
      A `CssCustomization` wedged between another story's template
      and that story is the same finding.
 
@@ -213,43 +215,31 @@ The pattern is `STORY_TEMPLATE.md` at the repository root, with
 `components/button/Button.stories.tsx` as the reference. Every fix
 follows it:
 
-- **Component description** — one sentence on what the component is
-  for (no internals such as ref methods or getter props), then
-  `### Features`: 6–8 _capabilities_, one per bullet, in the form the
-  existing stories use — `**Label**: <clause>` where the clause is a
-  full statement a reader understands without the code: verb-led
-  ("Displays folder hierarchy with clickable navigation items",
-  "Automatically adjusts position based on viewport space") or a
-  qualified noun phrase ("Optional form wrapper with submit handling").
-  No trailing period, no bare enumerations ("arrows, Enter and
-  Escape" says nothing — write what each key does), no lists of prop
-  names, and one capability per bullet. Facets of the same capability
-  belong together (the flag that turns it on, how it then looks, the
-  tooltip it may carry — "Disabled Items: Dropped from the list unless
-  `showDisabledItems` is set, then shown greyed out with an optional
-  explaining tooltip" is one idea); an unrelated mode or a niche prop
-  (`global`, `scaled`) is not appended as a second clause — it gets
-  its `argTypes` entry and, if it matters, its own story.
-  `### Accessibility` (Button style: one intro sentence, then bullets)
-  lists only what assistive-technology and keyboard users get — the
-  roles and `aria-*` attributes the component sets and what each
-  announces, the keys it handles, how focus moves — verified with a
-  grep for `role=`, `aria-`, `tabIndex` and `.focus(` in the component.
-  Styling hooks (`data-*`) and bidi attributes (`dir`) do not belong
-  there. A component whose root is a native interactive element and
-  that adds nothing of its own keeps the section: the intro sentence
-  says the support comes from the platform, the bullets name what the
-  element gives (the keys, the values it exposes, what `disabled` does)
-  and what the consumer must still supply (a name via `<label for>` or
-  `aria-label`) — never an `aria-*` the component does not set, in
-  either direction: a bullet reporting that none is set is still a
-  bullet about attributes that are not there, and says nothing a
-  reader can act on. A component that sets none of this and has no
-  such root gets no section. `### Usage`
-  with two to four short examples. Storybook's
-  own guidance applies on top: the description says what the component
-  is for and when to use it, a story description says _why_ one would
-  use what it shows, not what it shows.
+- **No component description in the story; the fact goes into the
+  README.** A story file whose folder has a README carries no
+  `parameters.docs.description.component` — only the one-line comment
+  Button's has — because the Docs page renders the README instead. A
+  fact you would have written there is added to the README section it
+  belongs in, under `README_TEMPLATE.md`, and verified against the code
+  first: a capability or a trap into "Behaviour the types don't state"
+  (or a `###` under "Recipes" when it is a use no example shows), a
+  variable into "CSS variables". The README's `## Accessibility` lists
+  only what assistive-technology and keyboard users get — the roles and
+  `aria-*` attributes the component sets and what each announces, the
+  keys it handles, how focus moves — verified with a grep for `role=`,
+  `aria-`, `tabIndex` and `.focus(` in the component. Styling hooks
+  (`data-*`) and bidi attributes (`dir`) do not belong there. A
+  component whose root is a native interactive element and that adds
+  nothing of its own says the support comes from the platform, names
+  what the element gives (the keys, the values it exposes, what
+  `disabled` does) and what the consumer must still supply (a name via
+  `<label for>` or `aria-label`) — never an `aria-*` the component does
+  not set, in either direction. A story file whose folder has no README
+  (the table's parts, the skeletons, `ArticleItem`) keeps one purpose
+  sentence naming the parent page, and its facts go into the parent
+  README. Storybook's own guidance applies to what stays: a story
+  description says _why_ one would use what it shows, not what it
+  shows.
 - **An `argTypes` description states the component's contract in the
   types' own terms**, not the product's use of it: `header` takes "a
   title with an optional visual — initials on a color, an icon, an
@@ -259,8 +249,8 @@ follows it:
   side, the moment something happens — rather than the mechanism behind
   it ("makes the field a fixed share of the window height, so it
   stretches with the window", not "height follows the viewport"). A CSS
-  variable name belongs in the `CssCustomization` table, not in a prop
-  description. A floor, a cap or a fallback is mentioned only when a
+  variable name belongs in the README's CSS variables table, not in a
+  prop description. A floor, a cap or a fallback is mentioned only when a
   reader can actually hit it, and then as the value, not as the variable
   that holds it.
 - **Props live in `argTypes` and the types file**, not in prose: the
@@ -355,7 +345,7 @@ follows it:
   Moving a misplaced `CssCustomization` to the end is the one
   reordering allowed: a story's ID comes from its name, not its
   position, so the baselines hold. The same
-  applies inside the description, and every existing Features bullet,
+  applies inside a README section, and every existing README sentence,
   argTypes description and `description.story` is judged against the
   deciding code, not kept because it is old ("the backdrop dims the
   background when the menu is open" survived a rewrite while the code
@@ -364,7 +354,7 @@ follows it:
   names the wrong actor (the component "shows on right-click" when the
   host calls `show`), or repeats its own label ("Backdrop: Optional
   backdrop") is reworded in place; a missing capability is appended —
-  the block is never written anew.
+  the section is never written anew.
 - **A component fix re-opens the story text written around the old
   behaviour.** When a finding from the audit is fixed in the component
   or its stylesheet, every description, bullet and argTypes entry that
@@ -374,10 +364,9 @@ follows it:
 - **Fold corrections into this skill at once.** When the user catches
   a discrepancy in how a fix is being made, the rule that prevents it
   is added here in the same turn, before the fix continues. Never
-  rewrite a story file wholesale and never run prettier on the whole
-  file — the existing stories are not prettier-clean, so that alone
-  rewrites hundreds of lines. Format the touched lines by hand in the
-  surrounding style.
+  rewrite a story file wholesale. The tree is Prettier-clean, so
+  `npx prettier --write` on a touched file rewrites only your lines,
+  and the pre-commit hook does it anyway.
 - **Keep existing story IDs and visuals stable**: `__tests__/` holds
   Playwright screenshot baselines per story ID. A converted story must
   render the same closed state it did before; new stories get new spec
@@ -397,16 +386,15 @@ follows it:
   there; give it a document of its own with
   `parameters.docs.story = { inline: false }` and check the Docs page,
   not only the story canvas.
-- **`CssCustomization` has one form** (94 of the 146 story files): the story text
-  opens with "CSS Custom Properties for external customization:" and
-  lists the variables as a Markdown table `| Variable | Description |
-Default |` — defaults taken from the stylesheet's `var(--x, <default>)`
-  fallbacks, "theme-based" when the fallback is a theme token. The
-  example sets the variables on a wrapper `<div style={{ "--x": … }}>`;
-  a component that portals its DOM (a menu, a dropdown, a tooltip) sets
+- **`CssCustomization` has one form**: a demo, not a list. Its text
+  says the variables are listed under CSS variables on this page — the
+  README's table, which the Docs page renders — and then names the
+  instances in the example; it carries no table of its own. The example
+  sets the variables on a wrapper `<div style={{ "--x": … }}>`; a
+  component that portals its DOM (a menu, a dropdown, a tooltip) sets
   them through its own `style` prop instead, and the text says why.
 - **An instance in the example earns its place by a variable, not by a
-  state.** The wrapper sets every variable in the table that a rendered
+  state.** The wrapper sets every variable in the README's table that a rendered
   instance can show; a row the example never sets is a claim the reader
   cannot check on the page. One instance is the default. A second is
   added only for a variable the first cannot reach — one that a prop
@@ -424,9 +412,9 @@ Default |` — defaults taken from the stylesheet's `var(--x, <default>)`
   states differ in lightness, not in hue alone; and a variable whose
   honest demonstration looks broken — the component's own layout puts
   the part it changes out of line with the rest — is not demonstrated,
-  and the caveat goes in its table row instead.
+  and the caveat goes in its README table row instead.
 - **A CSS-variables table is a list of claims — check every row.** For
-  each variable a `CssCustomization` story documents, find the rule
+  each variable the README's `## CSS variables` table documents, find the rule
   that reads it (`grep var(--name` across the component's stylesheets)
   and what that rule renders, and when. "Reads it" is judged on the
   compiled CSS, not the SCSS source: nesting, a missing `&`, `:global`,
@@ -438,8 +426,8 @@ Default |` — defaults taken from the stylesheet's `var(--x, <default>)`
   A variable the component's own stylesheet declares on the element
   that carries it (a theme mixin's `--x: <value>` on the same selector)
   is shadowed there: a wrapper's value never arrives, so the row is
-  wrong unless the story sets it through the component's `style` prop
-  and says so. A variable no rule reads, or
+  wrong unless the README says to set it through the component's
+  `style` prop. A variable no rule reads, or
   one whose rule changes nothing observable (a `line-height` on text
   inside a fixed-height row), is dropped from the table; one that only
   works in part gets the caveat in its comment — including one read
@@ -478,7 +466,7 @@ story. The message has a fixed shape and nothing else:
 
 1. `Fixed:` — the item numbers from the audit report.
 2. One line per fixed item: its number, what changed in one clause,
-   one `[file:line](path#LN)` link. A text change — a Features bullet,
+   one `[file:line](path#LN)` link. A text change — a README sentence,
    a description, an `argTypes` description — adds two indented lines,
    `was:` with the old text and `now:` with the new, so the rewording
    is visible without opening the file. A structural change — a

@@ -30,52 +30,8 @@ const meta = {
   title: "UI/Interactive elements/IconButton",
   component: IconButton,
   parameters: {
-    docs: {
-      description: {
-        component: `IconButton is a square clickable icon for compact actions in toolbars, rows and headers, where a labelled button would not fit.
-
-### Features
-
-- **Icon Variants**: Supports separate icons for default, hover, and click states
-- **Color Customization**: Configurable colors for default, hover, and click states, each a CSS colour, the theme accent or a custom property
-- **Adjustable Size**: Sets width and height together from a pixel number, a CSS length or a named icon size
-- **Fill and Stroke**: Toggle between filled and stroked icon rendering
-- **Disabled State**: Ignores every mouse handler and keeps the default icon and colour, while looking the same as an enabled button apart from the arrow cursor
-- **Custom Node**: Accepts arbitrary React nodes instead of SVG icons
-- **Tooltip**: Renders its own tooltip, which follows the pointer on desktop, when given a tooltip id and text
-- **Pointer Cursor**: Shows the pointer cursor only when the button has a click handler or is marked clickable
-
-### Accessibility
-
-The IconButton renders a plain \`<div>\` with no button role, so what assistive technology and keyboard users get is limited:
-
-- \`aria-disabled\`: set to \`true\` while \`isDisabled\`, \`false\` otherwise
-- Not in the tab order unless you pass \`tabIndex\`
-- Enter and Space do nothing unless your \`onKeyDown\` implements them
-- The icon has no accessible name of its own; pass \`aria-label\` for one
-
-### Usage
-
-\`\`\`tsx
-import { IconButton } from "@onlyoffice/apps-ui-kit/components/icon-button";
-
-// Basic icon button
-<IconButton size={25} iconName={SearchIcon} onClick={handleClick} />
-
-// With hover and click icons
-<IconButton
-  size={25}
-  iconName={SearchIcon}
-  iconHoverName={EyeIcon}
-  hoverColor="#333"
-  onClick={handleClick}
-/>
-
-// Disabled
-<IconButton size={25} iconName={SearchIcon} isDisabled />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     iconName: {
@@ -531,15 +487,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--icon-button-color\` | Icon colour, as fill or as stroke under \`isStroke\` | theme-based |
-| \`--icon-button-hover-color\` | Icon colour while a mouse pointer is over the button; not on touch screens | theme-based |
-| \`--icon-button-size\` | Width and height of the button | 20px |
-
-The component declares these variables on its own element and writes them into its inline style, so a value set on a wrapper never arrives; set them through the \`style\` prop, which is applied last. Hover the button to see the hover colour.`,
+        story: `The variables are listed under CSS variables on this page; here all three are set through the \`style\` prop, because a value set on a wrapper never arrives. Hover the button to see the hover colour.`,
       },
       source: {
         code: `<IconButton

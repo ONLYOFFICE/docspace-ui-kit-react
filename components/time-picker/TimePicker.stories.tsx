@@ -10,48 +10,8 @@ const meta = {
   title: "UI/Form controls/TimePicker",
   component: TimePicker,
   parameters: {
-    docs: {
-      description: {
-        component: `Two-field hours-and-minutes input for typing a time of day, reported to \`onChange\` as a Luxon \`DateTime\`.
-
-### Features
-
-- **Keyboard Input**: Takes the time as digits typed into separate hours and minutes fields, with no list or clock face to pick from
-- **HH:mm Format**: Two zero-padded fields separated by a colon, always read left to right, even inside a right-to-left layout
-- **12-Hour Format**: Caps the hours field at 12 and folds the required \`meridiem\` into the value reported to \`onChange\`; nothing marks AM or PM on screen
-- **Error State**: Draws the border in the error colour for a time the form rejected and keeps it while a field is focused
-- **Auto Focus**: Selects the hours field on mount, so the first digit typed replaces it
-- **Tab Navigation**: Hours and minutes are two Tab stops of their own; \`tabIndex\` moves both in the order
-- **Auto-advance**: Two digits in the hours field, or one digit that cannot start a valid hour, move the caret to minutes; two digits in minutes leave the picker and call \`onBlur\`
-- **Range guard**: Accepts digits only, caps hours at 23 (12 in the 12-hour mode) and minutes at 59, and pads a single digit with a leading zero on blur
-
-### Accessibility
-
-The two fields are native \`<input>\`s, so typing and screen-reader announcement come from the platform; the component adds:
-
-- \`role="group"\` with \`aria-label="Time picker"\` on the box, \`aria-label="Hours"\` and \`"Minutes"\` on the fields
-- \`inputMode="numeric"\` brings up the number keypad on touch devices
-- Hours and minutes are two Tab stops of their own, and two digits typed in hours move on to minutes as well; \`tabIndex\` moves both fields in the order
-
-### Usage
-
-\`\`\`tsx
-import { TimePicker } from "@onlyoffice/apps-ui-kit/components/time-picker";
-
-// Basic usage
-<TimePicker
-  initialTime={new Date()}
-  onChange={(time) => console.log(time)}
-/>
-
-// With error state
-<TimePicker initialTime={new Date()} hasError onChange={(time) => console.log(time)} />
-
-// 12-hour format
-<TimePicker initialTime={new Date()} isTwelveHourFormat meridiem="AM" />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     initialTime: {
@@ -292,29 +252,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-**TimePicker — input box**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--time-input-border\` | Default border color | theme-based |
-| \`--time-input-bg\` | Background color | theme-based |
-| \`--time-input-focus-border\` | Focus/active border color | theme-based |
-| \`--time-input-error-border\` | Border color with \`hasError\`, kept while the field is focused | theme-based |
-| \`--time-input-width\` | Input box width | \`60px\` |
-| \`--time-input-height\` | Input box height | \`32px\` |
-| \`--time-input-radius\` | Border radius | \`3px\` |
-| \`--time-input-padding\` | Padding inside the box, shorthand: top and bottom, then sides | \`0px 6px\` |
-
-**TextInput (inner number inputs)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--text-input-color\` | Text color | theme-based |
-| \`--text-input-bg\` | Background color | theme-based |
-
-The first box shows the border, background, size and radius variables and the inner fields' text colour; click into it to see \`--time-input-focus-border\`. The second adds \`hasError\`, the only state in which \`--time-input-error-border\` has anything to colour. \`--text-input-bg\` is set to the same value as \`--time-input-bg\` so the fields blend into the box.`,
+        story: `The TimePicker and inner TextInput variables set on one wrapper -- the variables are listed under CSS variables on this page. The first box shows the border, background, size and radius variables and the inner fields' text colour; click into it to see \`--time-input-focus-border\`. The second adds \`hasError\`, the only state in which \`--time-input-error-border\` has anything to colour. \`--text-input-bg\` is set to the same value as \`--time-input-bg\` so the fields blend into the box.`,
       },
       source: {
         code: `<div

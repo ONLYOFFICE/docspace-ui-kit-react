@@ -73,18 +73,15 @@ put what it means for a consumer in `CHANGELOG.md`, which is where someone upgra
 
 ## Writing a story
 
-The story shows the component; the README describes it. `parameters.docs.description.component`
-is hand-written, in the shape `STORY_TEMPLATE.md` sets: a short line, `### Features`, an
-optional `### Accessibility`, `### Usage`. Follow that file — it is the one that governs
-stories.
+The story shows the component; the README describes it — and the README is also what the
+story's Docs page renders (`.storybook/blocks/DocsPage.tsx`), so there is no second description.
+A story file carries no `parameters.docs.description.component`; `STORY_TEMPLATE.md` governs
+the rest of it. The one exception is a story file whose own folder has no README (the table's
+parts, the skeletons, `ArticleItem`): it keeps one purpose sentence naming the parent page.
 
-Importing the README into it (`import readme from "./README.md?raw"`) was tried on four
-components and reverted: a 260-line page does not fit the template, and it carried sections a
-Storybook reader has no use for. So the description is a **second** piece of prose about the
-same component, and nothing checks that the two agree. Treat it as one more place the truth can
-go stale: when you change what a component does, correct the story's description in the same
-commit as the README's. Both restored descriptions turned out to contain a false sentence by
-then — one claimed `ModalDialog` traps focus, which it has never done.
+That replaced a hand-written second description, which nothing compared with the README and
+which went stale first — one claimed `ModalDialog` traps focus, which it has never done. When
+you change what a component does, correct the README; the Docs page follows.
 
 What the story owns is what prose cannot carry: the scenarios, the controls, the
 visual-regression surface. A component-level `var(--x, fallback)` is recorded in the README's

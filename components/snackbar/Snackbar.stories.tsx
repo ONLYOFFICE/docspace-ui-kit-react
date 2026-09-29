@@ -10,60 +10,8 @@ const meta = {
   title: "UI/Feedback/SnackBar",
   component: SnackBar,
   parameters: {
-    docs: {
-      description: {
-        component: `SnackBar is a full-width notice bar that stays on the page until the user acts on it or the host removes it.
-
-### Features
-
-- **Header & Body**: Draws a bold header line above the message, with an optional smaller line next to the header
-- **Action Button**: Shows an underlined action label after the message that calls \`onAction\` when clicked, in place of the close cross
-- **Countdown Timer**: Shows a minutes:seconds countdown after the message and calls \`onAction\` when it reaches zero
-- **Icon Display**: Draws a warning icon before the header when \`showIcon\` is set
-- **HTML Content**: Renders an HTML string in place of the header and message, sanitized with the xss library
-- **Campaign Banner**: Loads a page into a full-width iframe with only a close cross drawn over it
-- **Opacity Control**: Sets the opacity of the whole bar; without \`opacity\` the bar stays fully transparent
-- **Close Button**: Shows a close cross at the end of the bar when no action label is set; clicking it calls \`onAction\`, and the host removes the bar
-
-### Usage
-
-\`\`\`tsx
-import { SnackBar } from "@onlyoffice/apps-ui-kit/components/snackbar";
-
-// Basic snackbar
-<SnackBar
-  headerText="Notice"
-  text="Important notification"
-  showIcon
-  opacity={1}
-  countDownTime={-1}
-  sectionWidth={500}
-  onAction={handleClose}
-/>
-
-// With action button
-<SnackBar
-  headerText="Update"
-  text="New version available"
-  btnText="Update Now"
-  opacity={1}
-  onAction={handleUpdate}
-  countDownTime={-1}
-  sectionWidth={500}
-/>
-
-// With countdown auto-dismiss
-<SnackBar
-  headerText="Info"
-  text="Dismissing in 5 seconds"
-  opacity={1}
-  countDownTime={5000}
-  sectionWidth={500}
-  onAction={handleDismiss}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     text: {
@@ -431,17 +379,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--snackbar-background\` | Background color | theme-based |
-| \`--snackbar-text-color\` | Color of the message and the countdown; the header keeps the theme's heading color | theme-based |
-| \`--snackbar-accent-color\` | Color of the accent stripe at the start edge | theme-based |
-| \`--snackbar-accent-width\` | Width of the accent stripe | \`4px\` |
-| \`--snackbar-text-size\` | Font size of the header and the message | \`12px\` |
-| \`--snackbar-content-padding\` | Padding around the content and the close cross | \`12px 20px\` |
-| \`--snackbar-icon-fill\` | Fill of the warning icon | theme-based |`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The message takes the red text colour while the header keeps the heading colour.`,
       },
       source: {
         code: `<div

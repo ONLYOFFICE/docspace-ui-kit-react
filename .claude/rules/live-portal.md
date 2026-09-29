@@ -204,3 +204,18 @@ createFileJsonElement: { title } })` makes an office document through the docume
   reader who has never seen a DocSpace all run these pages. A screen that talks to a portal
   carries demo data behind the same shape and an explicit "not connected" state; a screen that
   throws or hangs on a missing portal is a broken page, not a strict one.
+  A module with no demo data of its own — the selectors, `uploader`, billing, the AI chat and
+  settings — gets it from the **demo portal**: with no portal selected, `withApiProvider` points
+  the clients at `https://demo-portal.invalid`, and a Mock Service Worker (`msw`, started by a
+  global loader in `.storybook/preview.tsx`) answers it from `.storybook/mocks/` — one handler
+  file and one fixture file per area, all data made up. The story takes `withPortalGate(title)`
+  (or `<PortalGate>`) from `.storybook/decorators/PortalGate.tsx`, which then renders it under
+  `DemoBanner`: a loud "Demo data" note with an arrow up at the toolbar, a **Connect a portal**
+  button that opens the API Config form through a channel event
+  (`.storybook/addons/events.ts`), and the registration link. The worker file is
+  `.storybook/public/mockServiceWorker.js`, served from the root by `staticDirs`, so the static
+  build has the demo too. A demo-portal route no handler answers gets a 404 and a
+  `[demo portal] no fixture for …` warning in the console, never a silent `{}`: add the fixture
+  rather than a catch-all. `document-editor` is the one exception — no fixture can stand in for
+  a Document Server — so it passes `{ demo: false }` and keeps the "no portal" card, which has
+  the same button and link.

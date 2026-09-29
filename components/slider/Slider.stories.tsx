@@ -10,45 +10,8 @@ const meta = {
   title: "UI/Form controls/Slider",
   component: Slider,
   parameters: {
-    docs: {
-      description: {
-        component: `Slider is a range input for selecting numeric values within a defined range.
-
-### Features
-
-- **Min/Max Range**: Configurable minimum and maximum values
-- **Custom Step Size**: Control the increment/decrement granularity
-- **Pouring Effect**: Visual fill indicator showing the selected portion of the track
-- **Disabled State**: Dims the control, blocks pointer and keyboard input and drops it out of the tab order
-- **Custom Sizing**: Adjustable thumb and track dimensions
-- **RTL Support**: Pours the track from the right edge when the page or a surrounding element is right-to-left at the moment the slider mounts
-- **Controlled Value**: Renders exactly the \`value\` it is given and reports every move through \`onChange\`
-
-### Accessibility
-
-The slider is a native \`<input type="range">\`, so keyboard and screen reader support comes from the platform rather than from attributes the component adds:
-
-- Arrow keys move the thumb one \`step\`, PageUp and PageDown move it in larger jumps, Home and End go to \`min\` and \`max\`
-- The current, minimum and maximum values reach assistive technology through the input's own \`value\`, \`min\` and \`max\`
-- Keyboard focus draws a ring around the thumb (\`:focus-visible\`), so a tabbing user can see which control is live
-- \`isDisabled\` sets the input's \`disabled\` attribute, which also takes the slider out of the tab order
-- The input carries no name of its own — give it an \`id\` and point a \`<label for>\` at it
-
-### Usage
-
-\`\`\`tsx
-import { Slider } from "@onlyoffice/apps-ui-kit/components/slider";
-
-<Slider min={0} max={100} value={50} onChange={handleChange} />
-
-// With custom step
-<Slider min={0} max={10} step={2} value={4} onChange={handleChange} />
-
-// Disabled
-<Slider min={0} max={100} value={30} isDisabled />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     min: {
@@ -361,16 +324,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--slider-handle-color\` | Thumb background color; the disabled thumb and fill are mixed from it | theme-based |
-| \`--slider-pouring-image\` | Fill image for the poured portion, applied only with \`withPouring\` and while enabled (must be a \`linear-gradient\` or other \`<image>\`) | theme-based |
-| \`--slider-background-color\` | Track (unfilled) background color | theme-based |
-| \`--slider-size\` | Track height | \`8px\` |
-| \`--slider-handle-size\` | Thumb width and height | \`24px\` |
-| \`--slider-track-radius\` | Border radius of the track; the thumb keeps a fixed radius | \`5.6px\` |
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
 
 The first slider shows every variable. The second is disabled, to show that the theme does not swap in its own colors there: it mixes the disabled thumb and fill from \`--slider-handle-color\`, so a custom accent survives as a paler version of itself.`,
       },

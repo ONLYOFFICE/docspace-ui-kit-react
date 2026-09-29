@@ -259,11 +259,18 @@ export const analyseStylesheet = () => {
   const CLASS_RE = /dsui-[A-Za-z0-9_-]+?__[A-Za-z0-9_-]+?--[A-Za-z0-9_-]+/g;
 
   let unattributed = 0;
+  // Rules that carry a module class and still resolve to no module. Unlike a
+  // rule with no module class at all, such a rule does take part in an
+  // override, and the order check below cannot see it. A hashed @keyframes
+  // name has the same shape as a class but is no selector, so it is exempt.
+  const orphaned = [];
+  const KEYFRAMES_RE = /^\s*@(-webkit-)?keyframes\b/;
 
   const items = rules.map((text, index) => {
     let owner = null;
+    const classes = text.match(CLASS_RE) ?? [];
 
-    for (const cls of text.match(CLASS_RE) ?? []) {
+    for (const cls of classes) {
       const prefix = `${cls.slice(0, cls.indexOf("__") + 2)}`;
       const candidates = byPrefix.get(prefix);
       if (!candidates) continue;
@@ -272,7 +279,12 @@ export const analyseStylesheet = () => {
       if (owner) break;
     }
 
-    if (owner === null) unattributed += 1;
+    if (owner === null) {
+      unattributed += 1;
+      if (classes.length > 0 && !KEYFRAMES_RE.test(text)) {
+        orphaned.push(classes[0]);
+      }
+    }
 
     return { text, index, owner };
   });
@@ -299,6 +311,7 @@ export const analyseStylesheet = () => {
     items,
     inverted,
     unattributed,
+    orphaned,
     ruleCount: rules.length,
     moduleCount: new Set(items.map((i) => i.owner)).size,
   };

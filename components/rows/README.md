@@ -66,7 +66,7 @@ import { Text } from "@onlyoffice/apps-ui-kit/components/text";
 
 export function MemberList({ names }: { names: string[] }) {
   return (
-    <RowContainer useReactWindow={false} manualHeight="320px">
+    <RowContainer useReactWindow={false}>
       {names.map((name) => (
         <Row key={name} contextOptions={[]}>
           <RowContent>
@@ -101,7 +101,7 @@ export function SelectableList({ names }: { names: string[] }) {
   const [selected, setSelected] = useState<string[]>([]);
 
   return (
-    <RowContainer useReactWindow={false} manualHeight="320px">
+    <RowContainer useReactWindow={false}>
       {names.map((name) => (
         <Row
           key={name}
@@ -150,6 +150,18 @@ export function SelectableList({ names }: { names: string[] }) {
 | `RowSkeleton`, `RowsSkeleton`               | Placeholders in the shape of a row and of a list of them |
 | `IndexIconButtons`                          | The up and down arrows of the row's index-editing mode   |
 
+`RowsSkeleton` draws `count` placeholder rows, 25 when it is not given, while the real rows
+load. Each row is a 32px square for the start element, a bar for the title and a 16px square
+for the context button; below the desktop breakpoint a shorter second bar appears under the
+title, where a real row shows its line of details. The shapes take the colour, opacity, corner
+radius, `speed` and `animate` props of
+[`RectangleSkeleton`](../rectangle/README.md), and `className` and `style` go to every row;
+`x`, `y`, `width`, `height` and `uniqueKey` are ignored, because the rows place and size their
+shapes themselves. `RowsSkeleton` has no way to round the start element: for a list of
+avatars, render `RowSkeleton isRectangle={false}` once per row, which draws a circle in the
+square's place. Neither checks the system's reduced-motion setting; `animate={false}` keeps
+the shapes still.
+
 ## Accessibility
 
 - Nothing here is a list, a grid or an option as far as assistive technology is concerned: the
@@ -159,6 +171,10 @@ export function SelectableList({ names }: { names: string[] }) {
   is reachable — it is the only part of a row that is.
 - A list a keyboard user must be able to work through needs [`Table`](../table/README.md) or
   markup of your own.
+- Each skeleton shape is an SVG with `role="img"`, so a screen reader meets three images per
+  placeholder row. `title` names every one of them through an SVG `<title>`; without it they
+  have no name and nothing is announced. The skeletons set no `aria-busy` — mark the loading
+  region with it yourself.
 
 ## Test ids
 

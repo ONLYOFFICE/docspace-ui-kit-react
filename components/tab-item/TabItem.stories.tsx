@@ -10,42 +10,8 @@ const meta = {
   title: "UI/Navigation/TabItem",
   component: TabItem,
   parameters: {
-    docs: {
-      description: {
-        component: `TabItem is a single rounded pill that fills in when it is selected, for building a row of filters or presets the user switches between.
-
-### Features
-
-- **Active State**: Fills the pill with the accent colour and switches the label to a contrasting colour while it is selected
-- **Disabled State**: Ignores clicks and dims the pill to half opacity, unless it is also selected, then it keeps the full selected look
-- **Custom Labels**: Supports text strings or React nodes as labels
-- **Multi-Select**: Lets a click on a selected pill deselect it, so the pills of a group can be toggled independently
-- **Fixed Look**: Keeps the selected look the pill had on mount, whatever clicks or later \`isActive\` changes say, when \`allowNoSelection\` is set
-- **Lock Last Selection**: Drops a click on an already selected pill entirely, so \`onSelect\` does not fire for it either
-- **Own Selection State**: Starts from \`isActive\`, keeps the selected state itself after a click and re-syncs whenever \`isActive\` changes
-- **Press Feedback**: Shows the selected look while an enabled pill is being pressed
-
-### Accessibility
-
-TabItem reports its selection state through one attribute on its outer element:
-
-- \`aria-selected\`: \`true\` while the pill is selected and \`false\` otherwise
-
-### Usage
-
-\`\`\`tsx
-import { TabItem } from "@onlyoffice/apps-ui-kit/components/tab-item";
-
-<TabItem label="Documents" isActive onSelect={handleSelect} />
-
-// Tab group
-<div style={{ display: "flex", gap: "16px" }}>
-  <TabItem label="All" isActive={activeTab === "all"} onSelect={() => setActive("all")} />
-  <TabItem label="Shared" isActive={activeTab === "shared"} onSelect={() => setActive("shared")} />
-</div>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0",
@@ -350,18 +316,7 @@ export const CssCustomization = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--tab-item-active-bg\` | Background and border colour of a selected or pressed pill | theme-based |
-| \`--tab-item-active-text\` | Label colour of a selected or pressed pill | theme-based |
-| \`--tab-item-border\` | Border of an unselected pill, as a \`border\` shorthand | theme-based |
-| \`--tab-item-radius\` | Corner radius | \`16px\` |
-| \`--tab-item-padding\` | Inner padding | \`4px 16px\` |
-| \`--tab-item-disabled-opacity\` | Opacity of a disabled pill that is not selected | \`0.5\` |
-
-**Documents** is selected, for the two active variables; **Images** is unselected, for the border; **Videos** is disabled, for the opacity. Radius and padding show on all three.`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. **Documents** is selected, for the two active variables; **Images** is unselected, for the border; **Videos** is disabled, for the opacity. Radius and padding show on all three.`,
       },
       source: {
         code: `<div

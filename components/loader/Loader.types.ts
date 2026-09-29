@@ -1,7 +1,7 @@
 import type { LoaderTypes } from "./Loader.enums";
 
 export type LoaderProps = {
-  /** Ignored. It is neither destructured nor forwarded to the SVG. */
+  /** Reaches the `<svg>` of the `track` type; the other types ignore it. */
   ref?: React.RefObject<SVGSVGElement>;
   /** Any CSS colour, applied as the stroke of the animation and the colour of
    * the `base` type's text. */

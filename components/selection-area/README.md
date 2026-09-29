@@ -226,6 +226,8 @@ export function ControlledSelection({ ids }: { ids: string[] }) {
   pointer's position with itself, which is always zero — the flag in `TOnMove` is unreachable.
 - **The drag starts after 10px.** Below that threshold the rectangle stays hidden and no `onMove`
   fires, so a plain click never reports anything.
+- **Only the left button starts a selection.** A press with any other button is dropped straight
+  after `onMouseDown` has been called.
 - **`onMouseDown` fires for every button and every target**, because it is called before the
   left-button check and before the class-name checks.
 - **In tile view three optional props are treated as required.** `countTilesInRow`,
@@ -239,11 +241,11 @@ export function ControlledSelection({ ids }: { ids: string[] }) {
 
 ## CSS variables
 
-| Variable                   | Default                    | Effect                          |
-| -------------------------- | -------------------------- | ------------------------------- |
-| `--selection-area-bg`      | `rgba(68, 170, 255, 0.5)`  | Fill of the rectangle           |
-| `--selection-area-border`  | `1px solid` the kit's blue | Border of the rectangle         |
-| `--selection-area-z-index` | `1000`                     | Stacking order of the rectangle |
+| Variable                   | Default                   | Effect                          |
+| -------------------------- | ------------------------- | ------------------------------- |
+| `--selection-area-bg`      | `rgba(68, 170, 255, 0.5)` | Fill of the rectangle           |
+| `--selection-area-border`  | `1px solid #5299e0`       | Border of the rectangle         |
+| `--selection-area-z-index` | `1000`                    | Stacking order of the rectangle |
 
 ## Accessibility
 

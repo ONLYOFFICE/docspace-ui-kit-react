@@ -11,38 +11,8 @@ const meta = {
   title: "UI/Layout/Portal",
   component: Portal,
   parameters: {
-    docs: {
-      description: {
-        component: `Portal renders the node passed in \`element\` into another part of the document, such as a container of your choice or \`document.body\`, so it escapes a clipping or stacking ancestor while staying in the React tree.
-
-### Features
-
-- **DOM Escape Hatch**: Renders content outside the parent DOM tree
-- **Custom Target**: Append to any DOM element via \`appendTo\` prop
-- **Visibility Control**: Mounts the content when \`visible\` is on and unmounts it when off, so state inside it is lost
-- **Default to Body**: Renders to \`document.body\` when no target is specified
-- **Client-Only Rendering**: Renders nothing on the server and on the first client render, then shows the content one render later
-- **React Context Kept**: Providers above the portal still apply to the content, and its events bubble through the React tree
-- **No Wrapper Element**: Adds no element or styles of its own, so the passed node positions and stacks itself
-
-### Usage
-
-\`\`\`tsx
-import { Portal } from "@onlyoffice/apps-ui-kit/components/portal";
-
-// Render into document.body
-<Portal element={<div>Portal content</div>} />
-
-// Render into a container held in state, not in a ref
-const [container, setContainer] = useState<HTMLElement | null>(null);
-<div ref={setContainer} />
-<Portal element={<div>Portal content</div>} appendTo={container} />
-
-// Control visibility
-<Portal element={<div>Toggleable content</div>} visible={isVisible} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     element: {
@@ -347,21 +317,8 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for the popup demo element used in Portal stories, set on the container the portal appends to:
-
-**Portal popup (demo element)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--portal-popup-bg\` | Popup background color | \`#ffffff\` |
-| \`--portal-popup-shadow\` | Popup box shadow | \`0 4px 12px rgba(0,0,0,0.15)\` |
-| \`--portal-popup-radius\` | Popup border radius | \`6px\` |
-| \`--portal-popup-padding\` | Popup inner padding | \`20px\` |
-| \`--portal-popup-color\` | Popup text color | \`#000\` |
-
-> The Portal component itself is a DOM escape hatch — it has no visual styling of its own.
-> These CSS vars apply to the \`.popup\` demo element used in stories.
-> Set them on the portal target container or on \`document.body\` to customize portal content.`,
+        story:
+          "Portal has no styles of its own, so the README lists no CSS variables for it: the `--portal-popup-*` variables set here belong to this page's demo popup, and are set on the container the portal appends to so the content picks them up there.",
       },
       source: {
         code: `<div

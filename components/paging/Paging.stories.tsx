@@ -12,56 +12,8 @@ const meta = {
   title: "UI/Navigation/Paging",
   component: Paging,
   parameters: {
-    docs: {
-      description: {
-        component: `Paging is the strip of previous and next buttons, a page selector and a page-size selector that sits under a list fetched one page at a time.
-
-### Features
-
-- **Previous/Next Buttons**: Call \`previousAction\` and \`nextAction\` when clicked, showing labels you pass in already translated
-- **Page Selector**: Lists the pages from \`pageItems\` in a drop-down between the buttons and reports the one picked through \`onSelectPage\`
-- **Count Selector**: Lists the page sizes from \`countItems\` in a drop-down at the end of the strip, reports the one picked through \`onSelectCount\` and is left out under \`showCountItem={false}\`
-- **Disabled States**: Disables the previous and next buttons independently, and the page selector as well once both are disabled
-- **Open Direction**: Opens both drop-downs below or above the strip, or below with a move above when a list does not fit there
-- **Controlled Values**: Holds no page of its own, so it shows \`selectedPageItem\` and \`selectedCountItem\` and changes only when you update them
-- **Long Page Lists**: Caps the page drop-down at 200px with a scroll once it holds more than six pages
-- **Narrow Screens**: Stacks the buttons and the page selector above a full-width page-size selector below 600px
-
-### Usage
-
-\`\`\`tsx
-import { Paging } from "@onlyoffice/apps-ui-kit/components/paging";
-
-<Paging
-  previousLabel="Previous"
-  nextLabel="Next"
-  previousAction={handlePrev}
-  nextAction={handleNext}
-  pageItems={pageItems}
-  countItems={countItems}
-  selectedPageItem={currentPage}
-  selectedCountItem={currentCount}
-  onSelectPage={handlePageSelect}
-  onSelectCount={handleCountSelect}
-/>
-
-// On the first page, without the page-size selector
-<Paging
-  previousLabel="Previous"
-  nextLabel="Next"
-  disablePrevious
-  showCountItem={false}
-  previousAction={handlePrev}
-  nextAction={handleNext}
-  pageItems={pageItems}
-  countItems={[]}
-  selectedPageItem={pageItems[0]}
-  selectedCountItem={{ key: 0, label: "" }}
-  onSelectPage={handlePageSelect}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     previousLabel: {
@@ -483,18 +435,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization. Set them on a wrapper or through the \`style\` prop; the example raises the width cap of both buttons so their larger labels are not cut off, widens the page-size selector, and shows taller controls in a window narrower than 1024px:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--paging-gap\` | Gap between the buttons with the page selector and the page-size selector | \`8px\` |
-| \`--paging-button-gap\` | Gap between the buttons and the page selector | \`8px\` |
-| \`--paging-font-size\` | Label size on the two buttons, from 1024px up; narrower windows use 14px | \`13px\` |
-| \`--paging-button-padding\` | Padding of the two buttons | \`6px 28px\` |
-| \`--paging-prev-width\` | Maximum width of the previous button; a longer label is cut off | \`111px\` |
-| \`--paging-next-width\` | Maximum width of the next button; a longer label is cut off | \`86px\` |
-| \`--paging-nav-height\` | Height of the two buttons and the page-size selector below 1024px | \`40px\` |
-| \`--paging-count-width\` | Width of the page-size selector, from 600px up; narrower windows stretch it to full width | \`125px\` |`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The example raises the width cap of both buttons so their larger labels are not cut off, widens the page-size selector, and shows taller controls in a window narrower than 1024px.`,
       },
       source: {
         code: `<div

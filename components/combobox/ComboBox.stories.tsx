@@ -19,58 +19,8 @@ const meta = {
   title: "UI/Form controls/ComboBox",
   component: ComboBox,
   parameters: {
-    docs: {
-      description: {
-        component: `ComboBox is a button that shows the current choice and opens a list of options under it, for picking one value from a fixed set.
-
-### Features
-
-- **Toggle Display**: Renders the button alone, with no list, for a control that only looks like a combo box
-- **Fixed Widths**: Sets the button to 173, 300, 350 or 500 pixels, or to the width of its content, once it is no longer stretched
-- **Button Shapes**: Shows the choice as plain text, as a badge in the option's own colours, as its icon alone, or with its description under the label
-- **Icon Support**: Options can include icons for visual context
-- **Host-Owned Selection**: Reports the picked option through \`onSelect\` and keeps showing the old one until the host passes the new one back as \`selectedOption\`
-- **Keyboard Navigation**: Moves a highlight through the open list with the Up and Down arrows and picks the highlighted option with Enter, once the list has a \`dropDownMaxHeight\`
-- **Full Width**: Stretches the button to the width of its parent unless \`scaled\` is turned off
-- **Disabled and Loading**: Greys the button out, or hides its content behind a spinner, and in both cases stops the list opening
-
-### Accessibility
-
-The button is a focusable \`div\` that sets these attributes itself:
-
-- \`role="button"\`: announced as a button, named by the selected option's label
-- \`aria-expanded\` and \`aria-pressed\`: both true while the list is open
-- \`aria-haspopup="listbox"\`: announces that the button opens a list
-- \`aria-disabled\`: set while \`isDisabled\`
-- The list is a \`role="listbox"\` of \`role="option"\` rows, not linked to the button by \`aria-controls\`
-- Tab reaches the button, because its \`tabIndex\` is 0 by default; \`-1\` takes it out of the tab order
-- Enter and Space on the button do not open the list and Escape does not close it; only a click does. While the list is open and has a \`dropDownMaxHeight\`, the Up and Down arrows move the highlight and Enter picks the highlighted option; without that height the keys do nothing
-
-### Usage
-
-\`\`\`tsx
-import { ComboBox, ComboBoxSize } from "@onlyoffice/apps-ui-kit/components/combobox";
-
-// The host keeps the choice and passes it back
-const [selected, setSelected] = useState<TOption>({ key: 0, label: "Select..." });
-
-<ComboBox
-  options={[
-    { key: 1, label: "Option 1" },
-    { key: 2, label: "Option 2" },
-  ]}
-  selectedOption={selected}
-  onSelect={setSelected}
-/>
-
-// A fixed width instead of the parent's
-<ComboBox scaled={false} size={ComboBoxSize.middle} options={options} selectedOption={selected} onSelect={setSelected} />
-
-// The choice drawn as a coloured badge
-<ComboBox type="badge" options={statusOptions} selectedOption={status} onSelect={setStatus} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=0%3A1&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -1007,18 +957,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--combobox-radius\` | Corner radius of the button, when it has a border | \`3px\` |
-| \`--combobox-inner-padding\` | Space above and below the button, inside the combo box | \`4px 0\` |
-| \`--combobox-base-width\` | Width of the combo box at \`size="base"\` with \`scaled\` off; the button inside keeps its own 173px, so this widens only the empty area beside it. \`--combobox-middle-width\`, \`--combobox-big-width\` and \`--combobox-huge-width\` behave the same for the other sizes | \`173px\` |
-| \`--combobox-border-color\` | Border colour of the button | theme-based |
-| \`--combobox-hover-border-color\` | Border colour of the button under the pointer | theme-based |
-| \`--combobox-focus-border-color\` | Border colour of the button while its list is open | theme-based |
-
-The example sets every variable but the widths: hover the button to see the hover colour and click it to see the open one.`,
+        story: `The border colours, the radius and the padding set on one wrapper -- the variables are listed under CSS variables on this page. Hover the button to see the hover colour and click it to see the open one.`,
       },
       source: {
         code: `<div style={{

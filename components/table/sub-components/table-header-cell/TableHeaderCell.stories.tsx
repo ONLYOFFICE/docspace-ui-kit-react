@@ -12,32 +12,7 @@ const meta = {
       description: {
         component: `TableHeaderCell is the title of one column in a TableHeader, with its sort arrow and the handle that resizes it.
 
-### Features
-
-- **Sort Arrow**: Shows an arrow after the title while the pointer is over the cell or the column is the one sorted by, for a column that has an \`onClick\`
-- **Sort Direction**: Points the arrow one way while \`sorted\` is set and turns it over while it is not
-- **Click to Sort**: Calls the column's \`onClick\` with its \`sortBy\` on a click on the title, and \`onIconClick\` instead on a click on the arrow when the column has one; while \`sortingVisible\` is off the arrow is gone and clicks do nothing
-- **Resize Handle**: With \`resizable\`, draws a short bar at the end of the cell and reports a press on it through \`onMouseDown\`, which TableHeader turns into a drag
-- **Selection Checkbox**: Shows the column's \`checkbox\` before the title, but only while it is ticked or partly ticked
-- **Short Column**: With the column's \`isShort\`, narrows the space kept before the handle from 22 to 12 pixels, for a narrow column such as a row number
-- **Hidden Title**: Leaves the title out while the column's \`enable\` is off, keeping the cell's place in the grid
-
-### Usage
-
-\`\`\`tsx
-// TableHeaderCell is not exported on its own: TableHeader renders one per column
-import { TableHeader } from "@onlyoffice/apps-ui-kit/components/table";
-
-<TableHeader
-  columns={[
-    { key: "name", title: "Name", enable: true, sortBy: "name", onClick: setSortBy },
-    { key: "size", title: "Size", enable: true, sortBy: "size", resizable: true, onClick: setSortBy },
-  ]}
-  sortBy={sortBy}
-  sorted={isDescending}
-  {...headerProps}
-/>
-\`\`\``,
+The Table README describes it in full.`,
       },
     },
   },

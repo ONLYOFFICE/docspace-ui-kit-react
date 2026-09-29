@@ -8,45 +8,8 @@ const meta = {
   title: "UI/Status components/ProgressBar",
   component: ProgressBar,
   parameters: {
-    docs: {
-      description: {
-        component: `A labelled bar for an operation whose progress you can measure, with a status or error line under it.
-
-### Features
-
-- **Percentage Display**: Fills the track to the given percentage, clamping anything above 100 to a full bar
-- **Label Text**: Customizable label describing the ongoing operation
-- **Status Messages**: Show current processing state below the bar
-- **Error Display**: Replaces the status line with a message in the theme's error colour when an operation fails
-- **Infinite Mode**: Animated loading bar for indeterminate progress
-- **Right-to-Left**: Fills from the right and slides the infinite strip right to left in a right-to-left interface
-- **Preparation Variant**: \`PreparationPortalProgress\` draws a taller bar with the percentage printed on it and a centred caption below
-- **CSS Customization**: Track and fill colours, bar height, corner radius, spacing and text colours set through custom properties
-
-### Accessibility
-
-The bar is exposed to assistive technology as a progress indicator.
-
-- \`role="progressbar"\` with \`aria-valuemin="0"\` and \`aria-valuemax="100"\`, and \`aria-valuenow\` set to \`percent\` after clamping, so a screen reader announces how far along the operation is
-- \`aria-label\` is taken from \`label\`, so a bar without a label has no accessible name
-- \`PreparationPortalProgress\` sets none of this: pass \`role\`, the \`aria-value*\` attributes and \`aria-label\` yourself
-
-### Usage
-
-\`\`\`tsx
-import { ProgressBar } from "@onlyoffice/apps-ui-kit/components/progress-bar";
-
-// Basic progress
-<ProgressBar percent={50} label="Uploading file..." />
-
-// With status
-<ProgressBar percent={75} label="Processing" status="3 of 4 files processed" />
-
-// Infinite loading
-<ProgressBar percent={0} label="Please wait..." isInfiniteProgress />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     percent: {
@@ -283,17 +246,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-| --- | --- | --- |
-| \`--progress-bar-track\` | Background of the track, the unfilled part of the bar | theme-based |
-| \`--progress-bar-fill\` | Colour of the fill and of the strip in infinite mode | theme-based |
-| \`--progress-bar-size\` | Height of the bar | \`4px\` |
-| \`--progress-bar-radius\` | Corner radius of the track and the fill | \`3px\` |
-| \`--progress-bar-bottom-margin\` | Space between the bar and the status line | \`8px\` |
-| \`--progress-bar-text\` | Colour of the status line | theme-based |
-| \`--progress-bar-error-text\` | Colour of the error line | theme-based |
+        story: `The variables are listed under CSS variables on this page; the example sets every one of them on one wrapper.
 
 The first bar shows the track, fill, size, radius, margin and status colour; the second sets \`error\` to show \`--progress-bar-error-text\`, since an error takes the place of the status line.`,
       },

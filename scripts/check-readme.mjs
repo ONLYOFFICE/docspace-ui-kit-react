@@ -202,6 +202,48 @@ const categoryFromStory = (folder) => {
   return match ? (CATEGORY_OF_STORY_SECTION.get(match[1]) ?? null) : null;
 };
 
+// The README is the Docs page of every story file in its own folder
+// (.storybook/blocks/DocsPage.tsx), so a description written in one of those
+// files is a second copy of it -- the one that went stale first, every time
+// the two were compared. These are the two shapes that copy took.
+const STORY_DUPLICATES = [
+  {
+    pattern: /description:\s*\{\s*component:\s*[`"']/,
+    message:
+      "the story sets `parameters.docs.description.component`; the Docs page renders this README instead, so move what it says that the README lacks into the README and delete it",
+  },
+  {
+    pattern: /CSS Custom Properties for external customization/,
+    message:
+      "`CssCustomization` lists the variables again; the README's `## CSS variables` is the table the Docs page shows, so keep the demo and drop the list",
+  },
+];
+
+/** Where a story file beside this README repeats it, as `{ file, line, message }`. */
+const storyDuplicates = (folder) => {
+  const dir = path.join(ROOT, folder);
+  if (!fs.existsSync(dir)) return [];
+
+  return fs
+    .readdirSync(dir)
+    .filter((name) => name.endsWith(".stories.tsx"))
+    .flatMap((name) => {
+      const text = fs.readFileSync(path.join(dir, name), "utf8");
+      return STORY_DUPLICATES.flatMap(({ pattern, message }) => {
+        const match = pattern.exec(text);
+        return match
+          ? [
+              {
+                file: `${folder}/${name}`,
+                line: lineOf(text, match.index),
+                message,
+              },
+            ]
+          : [];
+      });
+    });
+};
+
 /** The `##` headings of a README, with the line each sits on. */
 const sectionsOf = (readme) =>
   [...readme.matchAll(/^##\s+(.+?)\s*$/gm)].map((match) => ({
@@ -403,10 +445,18 @@ const main = async () => {
       error("E_META_FOLDER", folder, 1, `\`folder\` says \`${meta.folder}\``);
     }
 
+    // The summary is the lead's whole first sentence: a prefix of the lead that
+    // ends a sentence and is followed by nothing or by whitespace. A bare
+    // `startsWith` passed half a sentence, or a word cut in the middle.
+    const summary = typeof meta.summary === "string" ? meta.summary : null;
     if (
       lead &&
-      typeof meta.summary === "string" &&
-      !lead.startsWith(meta.summary)
+      summary !== null &&
+      !(
+        lead.startsWith(summary) &&
+        /[.!?]$/.test(summary) &&
+        (lead.length === summary.length || /\s/.test(lead[summary.length]))
+      )
     ) {
       error(
         "E_META_SUMMARY",
@@ -427,6 +477,10 @@ const main = async () => {
         1,
         `\`category\` is \`${meta.category}\` and the story's title puts it under \`${storyCategory}\``,
       );
+    }
+
+    for (const { file: story, line, message } of storyDuplicates(folder)) {
+      reportFile("error", "E_STORY_DUPLICATE", story, line, message);
     }
 
     // --- the sections, and their order ---

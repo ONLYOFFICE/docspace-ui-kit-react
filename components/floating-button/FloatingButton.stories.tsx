@@ -8,45 +8,8 @@ const meta = {
   title: "UI/Interactive elements/FloatingButton",
   component: FloatingButton,
   parameters: {
-    docs: {
-      description: {
-        component: `A round corner badge that shows the progress of a long background operation, such as an upload or a bulk move; the host opens the operation's panel from its \`onClick\`.
-
-### Features
-
-- **Operation Icons**: Draws one of sixteen built-in icons in the middle, one per kind of operation, or an image of your own from a URL
-- **Progress Ring**: Fills a ring around the circle as the operation advances, and spins it while no progress value is known
-- **Warning Badge**: Puts a small red exclamation mark on the circle's upper edge when the operation needs attention
-- **Completed State**: Fades the ring out, pulses the circle once and puts a green tick on it when the operation finishes
-- **Stopped State**: Replaces the tick or the warning with a stop mark when the user aborted the operation
-- **Custom Colour**: Paints the circle and the ring in any CSS colour instead of the accent colour
-
-### Accessibility
-
-The circle is a plain \`<div>\` that sets one attribute itself:
-
-- \`aria-label\`: built from the icon name, for example "upload button", and not replaceable by a prop
-- An image from \`iconUrl\` is announced as "icon"
-
-### Usage
-
-\`\`\`tsx
-import { FloatingButton, FloatingButtonIcons } from "@onlyoffice/apps-ui-kit/components/floating-button";
-
-// Basic floating button
-<FloatingButton icon={FloatingButtonIcons.upload} />
-
-// With progress
-<FloatingButton icon={FloatingButtonIcons.upload} percent={45} />
-
-// With alert
-<FloatingButton icon={FloatingButtonIcons.upload} alert />
-
-// Finished
-<FloatingButton icon={FloatingButtonIcons.move} completed />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=1053-45015&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -464,14 +427,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--floating-circle-button-background\` | Colour of the circle, the ring and the shapes of the accent icons; the \`color\` prop overrides it | \`--color-scheme-main-accent\` |
-| \`--floating-button-shadow\` | Shadow under the circle | theme-based |
-| \`--floating-button-button-size\` | Width and height of the clickable circle only: the ring and the icon stay 48px in its top corner, so any other value puts them out of line | \`48px\` |
-| \`--floating-button-icon\` | Fill of the icon, except the accent icons (upload, trash, deletePermanently, other) | \`--color-scheme-text-accent\` |
+        story: `Two buttons under one wrapper that sets the background, the shadow and the icon colour -- the variables are listed under CSS variables on this page.
 
 - **Upload** — the background and the shadow; its icon is one of the accent icons (upload, trash, deletePermanently, other), whose shapes are painted in the background colour, so the icon colour does not reach it
 - **Move** — the icon colour, on an icon that is not an accent one`,

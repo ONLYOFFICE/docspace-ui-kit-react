@@ -11,47 +11,8 @@ const meta = {
   title: "UI/Form controls/Checkbox",
   component: Checkbox,
   parameters: {
-    docs: {
-      description: {
-        component: `Checkbox is a form control that allows users to select one or more options.
-
-### Features
-
-- **Three States**: Shows an empty box, a tick, or a filled square for a parent whose children are only partly selected
-- **Error State**: Visual indication of validation errors
-- **Disabled State**: Prevents user interaction
-- **Label Support**: Text label with optional truncation
-- **Tooltip**: Opens the shared tooltip with the \`title\` text when the pointer rests on the control, once \`RootTooltip\` is mounted
-- **Help Button**: Renders a help button after the label whose clicks do not toggle the checkbox
-
-### Accessibility
-
-The Checkbox renders a visually hidden native \`<input type="checkbox">\` inside a \`<label>\`, so most of its support comes from the platform:
-
-- Screen readers announce a checkbox with its checked state, named by the label text; without \`label\` the control has no accessible name
-- \`isIndeterminate\` sets the input's DOM \`indeterminate\` property, so the mixed state is announced, not only drawn
-- \`isDisabled\` sets the native \`disabled\` on the input, which is announced as unavailable
-- Tab moves focus to the box icon (\`tabIndex\`, 0 by default), never to the input, and the focused box draws its border in the focus colour; Space and Enter on the focused icon do not toggle it
-
-### Usage
-
-\`\`\`tsx
-import { Checkbox } from "@onlyoffice/apps-ui-kit/components/checkbox";
-
-// Basic checkbox
-<Checkbox label="Accept terms" onChange={handleChange} />
-
-// Checked checkbox
-<Checkbox isChecked label="Notifications enabled" />
-
-// Indeterminate (partial selection)
-<Checkbox isIndeterminate label="Select all" />
-
-// With error state
-<Checkbox hasError label="Required field" />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     isChecked: {
@@ -395,17 +356,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--checkbox-gap\` | Space between the box and the label | \`12px\` |
-| \`--checkbox-lh\` | Height of the control's line; the label text keeps its own 16px line, so a larger value only makes the row taller | \`16px\` |
-| \`--checkbox-fill-color\` | Fill of the box while it is checked; an indeterminate box uses it too | theme-based |
-| \`--checkbox-border-color\` | Border of the box; hover, focus, error and disabled draw their own border colour over it | theme-based |
-| \`--checkbox-arrow-color\` | Colour of the tick in a checked box | theme-based |
-
-The example is one checked box, so it shows every variable at once: the wider gap, the taller row, the light fill, the blue border and the blue tick.`,
+        story: `The variables are listed under CSS variables on this page. The example is one checked box on a wrapper that sets every overridable one, so it shows them all at once: the wider gap, the taller row, the light fill, the blue border and the blue tick.`,
       },
       source: {
         code: `<div

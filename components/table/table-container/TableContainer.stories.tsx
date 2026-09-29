@@ -105,29 +105,7 @@ const meta = {
       description: {
         component: `TableContainer is the outer element of a table, the grid that the header, the group menu and the rows are laid out in.
 
-### Features
-
-- **Shared Column Grid**: Lays its children out as a CSS grid whose columns the TableHeader writes, so the header, the group menu and every row share one set of widths
-- **Virtualised Mode**: With \`useReactWindow\`, becomes a full-height block instead of a grid, because the virtualised body lays each row out on its own
-- **Text Selection Control**: With \`noSelect\`, stops the user selecting text anywhere in the table, for example while rows are being dragged
-- **Header Separator**: Draws the line under the header and the group menu 20 pixels short of each edge, and in the virtualised mode stretches it to the full width while the pointer is over the first row
-- **Reorder Marker**: Colours an element marked \`indexing-separator\` with a theme colour, to show where a dragged row will land
-- **One Table per Page**: Renders with the fixed id \`table-container\`, which the header and the virtualised body look up
-
-### Usage
-
-\`\`\`tsx
-import { TableContainer, TableHeader, TableBody } from "@onlyoffice/apps-ui-kit/components/table";
-
-const ref = useRef<HTMLDivElement>(null);
-
-<TableContainer forwardedRef={ref} useReactWindow={false}>
-  <TableHeader {...headerProps} />
-  <TableBody {...bodyProps}>
-    {rows}
-  </TableBody>
-</TableContainer>
-\`\`\``,
+The Table README describes it in full.`,
       },
     },
   },

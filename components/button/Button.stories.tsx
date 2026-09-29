@@ -13,52 +13,8 @@ const meta = {
   title: "UI/Interactive elements/Button",
   component: Button,
   parameters: {
-    docs: {
-      description: {
-        component: `Button is used for actions on a page.
-
-### Features
-
-- **Primary and Secondary**: A solid accent-coloured button for the main action of a view, and a bordered one on the page background for every other action
-- **Four Sizes**: Sets the height to 24, 32, 40 or 44 pixels, with padding and font size to match
-- **Icon Support**: Display icons alongside text
-- **Loading State**: Show loading indicator during async operations
-- **Tooltip Support**: Display helpful text on hover
-- **Filled Variant**: Draws a borderless button on a neutral grey surface for toolbar actions and paints its icon in the text colour, or outlines it for an outline-style icon
-- **Accent Variant**: Tints the background with the accent colour and draws the text and icon in it, for an emphasised action that is not the main one
-- **Full Width**: Scale to 100% width when needed
-
-### Accessibility
-
-The Button renders a native \`<button>\`, and sets these attributes itself, overwriting what you pass:
-
-- \`aria-label\`: always equal to \`label\`, so a custom one alongside a \`label\` is discarded
-- \`aria-disabled\`: set while \`isDisabled\`
-- \`aria-busy\`: set while \`isLoading\`, which also disables the button
-- Focusable with Tab and activated by Enter and Space, as any native button is
-- \`isDisabled\` and \`isLoading\` set the native \`disabled\`, which takes the button out of the tab order and blocks clicks
-
-A button that shows only an icon therefore has no accessible name, because \`label\` is both its name and its visible text; use \`IconButton\` for that case.
-
-### Usage
-
-\`\`\`tsx
-import { Button, ButtonSize } from "@onlyoffice/apps-ui-kit/components/button";
-
-// Primary button
-<Button primary size={ButtonSize.normal} label="Save" onClick={handleSave} />
-
-// Secondary button with icon
-<Button size={ButtonSize.small} icon={<Icon />} label="Cancel" />
-
-// Loading state
-<Button primary isLoading label="Saving..." />
-
-// With tooltip
-<Button label="Help" tooltipText="Click for help" />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=62-3582&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -808,41 +764,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--button-root-bg\` | Secondary background | theme-based |
-| \`--button-root-color\` | Secondary text colour | theme-based |
-| \`--button-root-border\` | Secondary border, as a \`border\` shorthand | theme-based |
-| \`--button-root-bg-hover\` | Secondary background on hover and under \`isHovered\` | theme-based |
-| \`--button-root-color-hover\` | Secondary text colour on hover and under \`isHovered\` | theme-based |
-| \`--button-root-border-hover\` | Secondary border on hover and under \`isHovered\` | theme-based |
-| \`--button-root-bg-active\` | Secondary background while pressed and under \`isClicked\` | theme-based |
-| \`--button-root-color-active\` | Secondary text colour while pressed and under \`isClicked\` | theme-based |
-| \`--button-root-border-active\` | Secondary border while pressed | theme-based |
-| \`--button-root-bg-disabled\` | Secondary background while disabled or loading | theme-based |
-| \`--button-root-color-disabled\` | Secondary text colour while disabled or loading | theme-based |
-| \`--button-root-border-disabled\` | Secondary border while disabled or loading; under \`isDisabled\` only its width and style apply and the line takes the text colour | theme-based |
-| \`--button-primary-bg\` | Primary background | theme-based |
-| \`--button-primary-color\` | Primary text colour | theme-based |
-| \`--button-primary-border\` | Primary border, as a \`border\` shorthand, also used on hover | theme-based |
-| \`--button-primary-bg-hover\` | Primary background on hover and under \`isHovered\` | theme-based |
-| \`--button-primary-color-hover\` | Primary text colour on hover and under \`isHovered\` | theme-based |
-| \`--button-primary-bg-active\` | Primary background while pressed and under \`isClicked\` | theme-based |
-| \`--button-primary-color-active\` | Primary text colour while pressed and under \`isClicked\` | theme-based |
-| \`--button-primary-border-active\` | Primary border colour while pressed; takes a colour, not a shorthand | theme-based |
-| \`--button-primary-bg-disabled\` | Primary background while disabled or loading | theme-based |
-| \`--button-primary-color-disabled\` | Primary text colour while disabled or loading | theme-based |
-| \`--button-primary-border-disabled\` | Primary border while disabled or loading | theme-based |
-| \`--button-root-border-radius\` | Corner radius of every variant except \`accent\`, which keeps 6px | \`3px\` |
-| \`--button-text-weight\` | Font weight | \`600\` |
-| \`--button-height-xs\` / \`-sm\` / \`-md\` / \`-lg\` | Height of the \`extraSmall\`, \`small\`, \`normal\` and \`medium\` sizes | \`24px\` / \`32px\` / \`40px\` / \`44px\` |
-| \`--button-font-size-xs\` / \`-sm\` / \`-md\` / \`-lg\` | Font size of the same four sizes | \`12px\` / \`13px\` / \`14px\` / \`16px\` |
-
-The \`filled\` and \`accent\` variants read none of these: their colours are set on the button itself, so a wrapper cannot change them.
-
-The example sets every variable on one wrapper; hover and press the buttons to see the hover and pressed values.
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. Hover and press the buttons to see the hover and pressed values.
 
 - **Secondary** — the \`--button-root-*\` colours, the radius, the weight and the \`normal\` size's height and font size
 - **Primary** — the \`--button-primary-*\` colours

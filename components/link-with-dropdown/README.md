@@ -148,7 +148,8 @@ export function RoleLink({ role }: { role: string }) {
 
 ### Disabled / read-only
 
-`isDisabled` greys the text and stops the click, so the menu can no longer be opened.
+`isDisabled` greys the text and stops the click, so the menu can no longer be opened; the
+cursor stays an arrow instead of turning into a pointer.
 
 ```tsx
 import { LinkWithDropdown } from "@onlyoffice/apps-ui-kit/components/link-with-dropdown";
@@ -198,6 +199,11 @@ Set them on any ancestor.
 | `--link-with-dropdown-disabled-color` | theme token | Text colour while disabled.        |
 | `--link-with-dropdown-padding`        | `4px 8px`   | Padding around the link.           |
 | `--link-with-dropdown-radius`         | `3px`       | Corner radius.                     |
+
+`--link-with-dropdown-color` also paints the chevron that `withExpander` draws, and the chevron
+keeps it on hover and while the menu is open, when the text switches to
+`--link-with-dropdown-hover-color`. The background, radius and padding belong to the link's
+outer box, so `--link-with-dropdown-bg` shows only while the link is closed and not hovered.
 
 `color` overrides the first of these as an inline style, so it wins over any of them.
 

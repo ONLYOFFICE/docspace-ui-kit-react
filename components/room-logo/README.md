@@ -184,7 +184,9 @@ export function SelectableRoom({
 | `--room-logo-size`   | `32px`  | Width and height of the box, and its minimums            |
 | `--room-logo-radius` | `6px`   | Corner radius applied to the glyph, not to the outer box |
 
-The glyphs are SVG assets with baked-in colours; neither variable recolours them.
+The glyphs are SVG assets with baked-in colours; neither variable recolours them. Nor does
+`--room-logo-size` scale them: each SVG is drawn at a fixed 32px, so a larger box only adds
+empty space around the glyph, and a smaller one leaves it overflowing the box.
 
 ## Accessibility
 

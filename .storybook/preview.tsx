@@ -14,6 +14,7 @@ import { parseLocaleConstants } from "../utils/parse-locale-constants";
 import brandsData from "../test/fixtures/brands.json";
 import globalTypes from "./globals";
 import withApiProvider from "./decorators/withApiProvider";
+import { startDemoPortal } from "./mocks/worker";
 import enCommon from "../locales/en/Common.json";
 import enPayments from "../locales/en/Payments.json";
 import enSettings from "../locales/en/Settings.json";
@@ -24,6 +25,7 @@ import "../css/fonts.css";
 import lightTheme from "./lightTheme";
 import darkTheme from "./darkTheme";
 import { DocsContainer } from "./DocsContainer";
+import { DocsPage } from "./blocks/DocsPage";
 
 // The library ships an identity brand lookup on purpose: getBrandName("Foo")
 // returns "Foo" until a consuming application calls setBrandLookup(), which is
@@ -34,8 +36,8 @@ import { DocsContainer } from "./DocsContainer";
 //
 // `ProductName` is overridden rather than taken from the fixture: the fixture
 // mirrors the portal's own brands.json, which still says "DocSpace", and
-// test/setup.ts plus the expectations in utils/common, errors/Errors.test.tsx
-// and errors/stories.utils.ts are pinned to that value. Storybook shows the
+// test/setup.ts plus the expectations in errors/Errors.test.tsx are pinned to
+// that value. Storybook shows the
 // product under its current name; everything else still comes from the fixture.
 const { get: getBrand } = parseLocaleConstants({
   ...(brandsData as Record<string, string>),
@@ -101,6 +103,8 @@ const preview: Preview = {
     docs: {
       container: DocsContainer,
       toc: true,
+      // The README is the page; see .storybook/blocks/DocsPage.tsx.
+      page: DocsPage,
     },
     options: {
       storySort: {
@@ -126,15 +130,16 @@ const preview: Preview = {
           "Components",
           [
             // The portal's three top-level lists, in its sidebar's order.
+            "AI Chat",
+            "AI Settings",
             "Files",
             "Rooms",
             "Forms",
-            "AI Chat",
             "Billing",
-            "Document Editor",
             "Uploader",
-            "Providers",
+            "Document Editor",
             "Selectors",
+            "Providers",
             "Errors",
           ],
           "UI",
@@ -220,6 +225,16 @@ const preview: Preview = {
           </ThemeProviderComponent>
         </TranslationProvider>
       );
+    },
+  ],
+
+  // The demo portal has to be answering before the first story asks it
+  // anything; `startDemoPortal` starts the worker once and resolves at once
+  // after that.
+  loaders: [
+    async () => {
+      await startDemoPortal();
+      return {};
     },
   ],
 

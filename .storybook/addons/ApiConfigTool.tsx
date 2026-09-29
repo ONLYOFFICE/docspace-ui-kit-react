@@ -17,6 +17,8 @@ import {
   type SavedApiProvider,
 } from "../utils/apiProviders";
 
+import { CONNECT_PORTAL_EVENT } from "./events";
+
 import "./index.css";
 
 type Value = string | number | null | boolean | undefined;
@@ -98,6 +100,18 @@ const AddCustomModal = ({
     <Modal open={open} onOpenChange={onOpenChange} variant="dialog">
       <div className="modal-body">
         <h3 className="header">API Configuration</h3>
+        <p className="hint">
+          The URL of an ONLYOFFICE Apps portal and a key issued in it under
+          Developer Tools &rarr; API keys. No portal yet?{" "}
+          <a
+            href="https://www.onlyoffice.com/docspace-registration"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Get a free one
+          </a>
+          .
+        </p>
         <Form className="form">
           <div className="form-input">
             <p className="label">Name</p>
@@ -114,7 +128,7 @@ const AddCustomModal = ({
               required
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="http://localhost"
+              placeholder="https://portal.example.com"
             />
           </div>
           <div className="form-input">
@@ -161,6 +175,13 @@ const AddCustomModal = ({
   );
 };
 
+// "Connect a portal" on a demo banner, waiting for the tool to open its form.
+// Kept outside the component because the tool is not always mounted when the
+// request arrives: with the toolbar hidden the manager first has to show the
+// story's canvas, and the form opens once the tool mounts there.
+let connectRequested = false;
+const connectListeners = new Set<() => void>();
+
 const ApiConfigDropdown = () => {
   const [globals, updateGlobals] = useGlobals();
   const api = useStorybookApi();
@@ -169,6 +190,19 @@ const ApiConfigDropdown = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
   const apiConfig: string = globals.apiConfig || "default";
+
+  useEffect(() => {
+    const open = () => {
+      if (!connectRequested) return;
+      connectRequested = false;
+      setModalOpen(true);
+    };
+    open();
+    connectListeners.add(open);
+    return () => {
+      connectListeners.delete(open);
+    };
+  }, []);
 
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
@@ -265,7 +299,14 @@ const ApiConfigDropdown = () => {
   );
 };
 
-addons.register(ADDON_ID, () => {
+addons.register(ADDON_ID, (api) => {
+  api.on(CONNECT_PORTAL_EVENT, ({ storyId }: { storyId?: string }) => {
+    connectRequested = true;
+    connectListeners.forEach((listener) => listener());
+    // Nobody picked it up: the toolbar is hidden, so go where it is shown.
+    if (connectRequested && storyId) api.navigate(`/story/${storyId}`);
+  });
+
   addons.add(TOOL_ID, {
     type: types.TOOL,
     title: "API Config",

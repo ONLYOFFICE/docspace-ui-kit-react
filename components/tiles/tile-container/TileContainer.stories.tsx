@@ -56,39 +56,8 @@ const meta = {
   title: "UI/Tiles/TileContainer",
   component: TileContainer,
   parameters: {
-    docs: {
-      description: {
-        component: `The grid a tile listing sits in: it sorts the tiles it is given into rooms, templates, folders and files, and lays each group out in columns.
-
-### Features
-
-- **Responsive Grid**: Lays the tiles out in as many columns as fit, each at least 216px wide, and rooms and templates at least 275px
-- **Virtualised Grid**: Hands the sorted tiles to a virtualising grid of the host's instead of its own grids
-- **Section Headings**: Puts a heading above the folders and above the files, each only when that group is not empty
-- **Sorting By Kind**: Sorts its children into rooms, templates, folders and files by their \`item\`, in that order, and drops a child without one
-- **Adjustable Gap**: Spaces the tiles 16px apart, or by the gap the host sets
-- **Text Selection**: Lets the reader select the text on the tiles, unless selection is turned off for the whole grid
-
-### Usage
-
-\`\`\`tsx
-import { TileContainer } from "@onlyoffice/apps-ui-kit/components/tiles/tile-container";
-import { FileTile } from "@onlyoffice/apps-ui-kit/components/tiles/file-tile";
-
-<TileContainer useReactWindow={false} headingFiles="Files">
-  <FileTile item={file} element={<WordIcon />} contextOptions={options}>
-    <TileContent><Link>{file.title}</Link></TileContent>
-  </FileTile>
-</TileContainer>
-
-// Folders and files, each group under its own heading
-<TileContainer headingFolders="Folders" headingFiles="Files">
-  {folders.map((folder) => <FolderTile key={folder.id} item={folder} element={<FolderIcon />} contextOptions={options}>…</FolderTile>)}
-  {files.map((file) => <FileTile key={file.id} item={file} element={<WordIcon />} contextOptions={options}>…</FileTile>)}
-</TileContainer>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     children: {
@@ -310,17 +279,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--tile-container-gap\` | Gap between the tiles, across and down | \`16px\` |
-| \`--tile-bg\` | Background of each tile inside (read by the tiles) | theme-based |
-| \`--tile-border-style\` | Border of each tile inside (read by the tiles) | theme-based |
-| \`--tile-radius\` | Corner radius of each tile inside (read by the tiles) | \`12px\` |
-| \`--tile-hover-bg\` | Background of a tile on hover (read by the tiles) | theme-based |
-
-One grid of three files sets every row; hover a tile for \`--tile-hover-bg\`. The container's own variable is the gap; the others are the tiles' and are set here once for the whole grid.`,
+        story: `The variables are listed under CSS variables on this page. One grid of three files sets the gap and four of the tiles' variables; hover a tile for \`--tile-hover-bg\`. The container's own variable is the gap; the others are the tiles' and are set here once for the whole grid.`,
       },
       source: {
         code: `<div style={{

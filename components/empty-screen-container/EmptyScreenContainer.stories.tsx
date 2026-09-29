@@ -14,44 +14,8 @@ const meta = {
   title: "UI/Layout components/EmptyScreenContainer",
   component: EmptyScreenContainer,
   parameters: {
-    docs: {
-      description: {
-        component: `A component for displaying empty states in the application with images, headers, descriptions, and action buttons.
-
-### Features
-
-- **Image Display**: Shows the illustration at a fixed 200×140, or 150×105 on windows up to 600px wide, unless \`imageStyle\` resizes it
-- **Header**: Puts a bold 19px line of text under the illustration
-- **Explanation Lines**: Adds an optional semibold subheading and a muted 12px description, which may be any React node
-- **Action Buttons**: Stacks the actions in a centred column with 16px between them, in the theme's link colour
-- **Top Offset**: Starts the content lower with \`withoutFilter\`, for a screen that has no filter bar above it
-- **Responsive Width**: Keeps a 640px width on windows wider than 1424px and below that shrinks to its content, up to 640px, 480px on tablets and 343px on phones
-- **Theme Colours**: Takes the header, description and action colours from the light or dark theme, each replaceable through a CSS variable
-
-### Usage
-
-\`\`\`tsx
-import { EmptyScreenContainer } from "@onlyoffice/apps-ui-kit/components/empty-screen-container";
-
-// With filter reset button
-<EmptyScreenContainer
-  imageSrc={emptyImage}
-  imageAlt="No results"
-  headerText="No results matching your search"
-  descriptionText="Try adjusting your filters"
-  buttons={<ResetFilterButton />}
-/>
-
-// Welcome screen without filter styling
-<EmptyScreenContainer
-  imageSrc={welcomeImage}
-  imageAlt="Welcome"
-  headerText="Welcome to your workspace"
-  withoutFilter
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     imageSrc: {
@@ -285,17 +249,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--empty-screen-header-color\` | Header text colour | theme-based |
-| \`--empty-screen-description-color\` | Description text colour | theme-based |
-| \`--empty-screen-link-color\` | Colour of links and icons in the actions area | theme-based |
-| \`--empty-screen-text-color\` | Colour of plain text (\`span\`) in the actions area; a \`Button\` label keeps its own colour | theme-based |
-| \`--empty-screen-width\` | Width on windows wider than 1424px; below that the container shrinks to its content | \`640px\` |
-
-The example sets every variable on one wrapper. The reset action shows the link colour on both its icon and its text, the line under it the plain-text colour; the width applies only on a window wider than 1424px.`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The reset action shows the link colour on both its icon and its text, the line under it the plain-text colour; the width applies only on a window wider than 1424px.`,
       },
       source: {
         code: `<div

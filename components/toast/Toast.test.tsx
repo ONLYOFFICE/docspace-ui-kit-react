@@ -174,4 +174,42 @@ describe("<Toast />", () => {
       document.querySelector("[data-testid='toast']"),
     ).not.toBeInTheDocument();
   });
+  it("renders one container however many <Toast /> are mounted", () => {
+    // A Storybook docs page mounts one per story, and a plugin inside the
+    // portal can mount its own next to the portal's. react-toastify keys its
+    // registry by containerId, so the later one used to take the earlier's
+    // place, and a toast still showing in the earlier threw on its next render.
+    const Pair = ({ first }: { first: string }) => (
+      <>
+        <Toast key={first} />
+        <Toast />
+      </>
+    );
+    const { rerender } = render(<Pair first="a" />);
+
+    act(() => {
+      toastr.success("Only once", "Two mounted");
+    });
+
+    expect(screen.getAllByText("Only once")).toHaveLength(1);
+    expect(document.querySelectorAll(".Toastify")).toHaveLength(1);
+
+    rerender(<Pair first="b" />);
+
+    act(() => {
+      toastr.info("After a remount", "Two mounted");
+    });
+
+    const toast = screen
+      .getByText("After a remount")
+      .closest(".Toastify__toast");
+    expect(() =>
+      act(() => {
+        toast?.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+        toast?.dispatchEvent(new MouseEvent("mouseout", { bubbles: true }));
+        vi.advanceTimersByTime(100);
+      }),
+    ).not.toThrow();
+    expect(screen.getAllByText("After a remount")).toHaveLength(1);
+  });
 });

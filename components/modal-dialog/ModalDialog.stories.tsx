@@ -14,69 +14,8 @@ const meta = {
   title: "UI/Overlays/ModalDialog",
   component: ModalDialog,
   parameters: {
-    docs: {
-      description: {
-        component: `ModalDialog displays content in a layer above the page, requiring user interaction before returning.
-
-### Features
-
-- **Two Display Types**: Shows as a centered modal or as a panel sliding in from the side, and can switch between them per screen size with \`displayTypeDetailed\`
-- **Compound Components**: Lays out the dialog from Header, Body, Footer and Container slots passed as direct children
-- **Size Variants**: Widens the modal to a large or huge size, or lets it grow with its content in width and height
-- **Scroll Control**: Scrolls a long body inside the side panel, or keeps it still with scroll locking
-- **Loading State**: Replaces the whole content with a skeleton shaped like the current display type while data loads
-- **Keyboard Support**: Closes on Escape and goes back on Backspace pressed outside a text field
-- **Form Support**: Optional form wrapper that hands the submit event to \`onSubmit\` with the page reload already prevented
-- **Footer Border**: Optional line between body and footer, drawn by default in the side panel only
-
-### Accessibility
-
-The dialog surface carries the dialog role; naming it and moving focus are left to the caller.
-
-- \`Escape\` closes the dialog, and \`Backspace\` outside a field triggers \`onBackClick\`
-- Backdrop click closes it, unless \`closeOnBackdropClick\` is false
-- The header's close cross is announced as "close" (\`aria-label\`); \`isCloseable={false}\` removes it and stops Escape and the backdrop as well
-- \`role="dialog"\` and \`aria-modal\` sit on the dialog surface. Name it with \`aria-labelledby\` pointing at your header's \`id\`, or with \`aria-label\`; a dialog with neither is announced unnamed
-- **Focus is not managed.** The dialog neither moves focus into itself when it opens nor traps it, and its markup stays in the document while \`visible\` is false — so render the dialog conditionally, or its controls stay in the page's tab order behind it
-
-### Usage
-
-\`\`\`tsx
-import {
-  ModalDialog,
-  ModalDialogType,
-} from "@onlyoffice/apps-ui-kit/components/modal-dialog";
-
-<ModalDialog
-  visible={isVisible}
-  onClose={handleClose}
-  aria-labelledby="dialog-title"
->
-  <ModalDialog.Header>
-    <span id="dialog-title">Title</span>
-  </ModalDialog.Header>
-  <ModalDialog.Body>Content here</ModalDialog.Body>
-  <ModalDialog.Footer>
-    <Button label="Save" primary onClick={handleSave} />
-    <Button label="Cancel" onClick={handleClose} />
-  </ModalDialog.Footer>
-</ModalDialog>
-
-// A side panel with a back arrow
-<ModalDialog
-  visible={isVisible}
-  displayType={ModalDialogType.aside}
-  isBackButton
-  onBackClick={handleBack}
-  onClose={handleClose}
-  aria-label="Settings"
->
-  <ModalDialog.Header>Settings</ModalDialog.Header>
-  <ModalDialog.Body>Content here</ModalDialog.Body>
-</ModalDialog>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=62-3582&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -1291,34 +1230,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-| --- | --- | --- |
-| \`--modal-dialog-bg\` | Background of the dialog | theme-based |
-| \`--modal-dialog-color\` | Text color of the dialog | theme-based |
-| \`--modal-dialog-divider\` | Line between the body and the footer, with \`withFooterBorder\` | theme-based |
-| \`--modal-dialog-aside-border\` | Border on the edge where the panel meets the page, with \`withBorder\` | theme-based |
-| \`--modal-dialog-backdrop\` | Background of the dimmed page behind the dialog. Page-level | theme-based |
-| \`--modal-dialog-radius\` | Corner radius of the modal; on a phone, of its top corners only. Page-level | \`6px\` |
-| \`--modal-dialog-horizontal-padding\` | Side padding of the body and the footer. Page-level | \`16px\` |
-| \`--modal-dialog-vertical-padding\` | Top and bottom padding of the footer and bottom padding of the modal's body. Page-level | \`16px\` |
-| \`--modal-dialog-buttons-gap\` | Gap between the footer buttons; at tablet width and below it is always 10px. Page-level | \`8px\` |
-| \`--modal-dialog-header-offset\` | Gap between the modal's header and body. Page-level | \`16px\` |
-| \`--modal-dialog-default-width\` | Width of the modal. Page-level | \`400px\` |
-| \`--modal-dialog-default-max-height\` | Height cap of the modal. Page-level | \`280px\` |
-| \`--modal-dialog-lg-width\` | Width of the modal with \`isLarge\`. Page-level | \`520px\` |
-| \`--modal-dialog-lg-max-height\` | Height cap of the modal with \`isLarge\`. Page-level | \`400px\` |
-| \`--modal-dialog-xl-max-width\` | Width cap of the modal with \`isHuge\` and \`autoMaxWidth\`. Page-level | \`730px\` |
-| \`--modal-dialog-aside-default-width\` | Width of the side panel above phone width. Page-level | \`480px\` |
-| \`--modal-dialog-header-justify\` | How the header's items are spread along it. Page-level | \`space-between\` |
-| \`--modal-dialog-header-border-display\` | \`none\` hides the line under the header. Page-level | \`""\` (shown) |
-| \`--modal-dialog-header-title-position\` | CSS position of the title, \`absolute\` to center it. Page-level | \`static\` |
-| \`--modal-dialog-header-title-inset\` | Distance of an absolute title from the header's start edge. Page-level | \`auto\` |
-| \`--modal-dialog-header-title-transform\` | Transform of the title, such as \`translateX(-50%)\` to center it. Page-level | \`none\` |
-| \`--modal-dialog-header-title-text-align\` | Text alignment of the title. Page-level | \`start\` |
-
-The first four are read inside the dialog and can go on its \`style\` prop. The ones marked page-level are read on the dialog's outer element, above the layer \`style\` and \`className\` reach, and the dialog renders into \`document.body\`, so a wrapper around it cannot carry them either: set them on \`body\` or \`:root\`. This example sets them on \`body\` while a dialog is open.
+        story: `Every overridable variable in use -- the variables are listed under CSS variables on this page, which also says which ones must be set on \`body\` or \`:root\` rather than on the dialog. This example puts the colours on each dialog's \`style\` prop and sets the page-level ones on \`body\` while a dialog is open.
 
 - **Show** — the modal with \`withFooterBorder\`: colors from its \`style\` prop, and radius, width, height cap, paddings, gaps, backdrop and a centered title with no line under it from the page
 - **Show Aside** — the side panel with \`withBorder\`, for \`--modal-dialog-aside-border\` and \`--modal-dialog-aside-default-width\``,

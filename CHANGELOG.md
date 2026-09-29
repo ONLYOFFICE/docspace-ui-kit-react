@@ -24,8 +24,9 @@ _Changed_ before upgrading.
 - **`TextInput`, `Textarea`, `Checkbox` and `ComboBox` no longer default `tabIndex` to `-1`.**
   Every control built from them was out of the tab order, so a form could not be filled in from
   the keyboard unless the caller passed `tabIndex={0}` to each one. Those explicit zeroes stay
-  valid and are now redundant; pass `-1` where you mean the keyboard to skip a control.
-  `DropDownItem` keeps its `-1` deliberately: an option inside a listbox belongs off the tab
+  valid and are now redundant; pass `-1` where you mean the keyboard to skip a control. A
+  disabled `Checkbox` or `ComboBox` is out of the tab order whatever `tabIndex` says, as a
+  disabled native control would be. `DropDownItem` keeps its `-1` deliberately: an option inside a listbox belongs off the tab
   order while the container holds focus, which is the active-descendant pattern it implements
 - **`ModalDialog` carries `role="dialog"` and `aria-modal` on the dialog surface**
   (`#modal-dialog`) instead of on the click-to-close layer, which spans the whole viewport. A
@@ -33,6 +34,9 @@ _Changed_ before upgrading.
 - **`Aside` is a flex column and its body takes the space the header leaves.** The bottom
   ~53px of a long body used to sit below the panel's edge, unreachable. If you pass
   `withoutBodyScroll` and bring your own scroller, give it `flex: 1 1 0` and `min-height: 0`
+- **`Article`'s `showProgress` is optional, and it and `isInfoPanelVisible` are deprecated.**
+  Both only moved the live chat launcher, which the component no longer draws, so neither is
+  read. Passing them still compiles; they go in the next major
 
 ### Added
 
@@ -91,6 +95,16 @@ _Changed_ before upgrading.
   line removed one; each re-run left another listener behind
 - `ThemeProvider` follows a `colorTheme` that arrives after the first render, instead of only
   reading it once
+- The committed `locales/en` lacked six keys the source asks for: `Filter`'s forms variant
+  (`SpaceGroups`, `AllSpaces`, `ManageGroupSpaces`) showed the raw key names, and the AI
+  agent's export labels (`ExportPdfDocument`, `ExportDocxDocument`, `ExportMdFile`) had no
+  entry, so only their inline English default could show
+- Two mounted `Toast`s threw `Cannot set properties of undefined (setting 'toggle')` once one
+  of them remounted while the other still showed a toast: `react-toastify` keys its registry by
+  container id, and every `Toast` uses the same one. That happens on any Storybook docs page
+  with several stories, and to a plugin that mounts its own next to the portal's. Only the
+  first mounted `Toast` renders the container now, and the next takes over when it unmounts;
+  the `className` and `style` of the others are ignored
 
 ### Documentation
 
@@ -218,7 +232,7 @@ git only rewrites working copies at checkout. **See "Line endings" in the
 README for the one-time migration**; it discards uncommitted changes, so commit
 or stash first.
 
-## Known issues
+### Known issues
 
 - **`axios` is not portal-only.** `docs/public-api.md` says it is; the root barrel reaches
   it through `uploader` and `billing`, both of which are exported from `index.ts`. Since

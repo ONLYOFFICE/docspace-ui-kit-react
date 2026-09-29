@@ -10,7 +10,7 @@ export interface SelectedItemProps {
     group?: string,
     e?: React.MouseEvent,
   ) => void;
-  /** Called when anywhere but the cross is clicked, with `propKey`, `label`, `group` and the event. */
+  /** Called when the chip is clicked, with `propKey`, `label`, `group` and the event. A click on the cross reaches it too, after `onClose`. */
   onClick?: (
     propKey: string | number,
     label: React.ReactNode,
@@ -35,7 +35,7 @@ export interface SelectedItemProps {
   classNameCloseButton?: string;
   /** Whether the cross is left out. `onClose` then has nothing to fire it. */
   hideCross?: boolean;
-  /** `title` attribute of the outermost element — the browser's own tooltip for a truncated label. */
+  /** Text of the kit's shared tooltip for a truncated label; it shows only once `RootTooltip` is mounted. */
   title?: string;
   /** `data-testid` of the outermost element. */
   dataTestId?: string;

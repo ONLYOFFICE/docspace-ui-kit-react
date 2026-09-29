@@ -135,7 +135,10 @@ export function FileDetails({
   side element's `containerWidth` and `containerMinWidth` size a wrapper nobody sees. They are
   read off the child's props, which means passing them to a [`Text`](../../text/README.md) that
   does not declare them.
-- In a right-to-left interface the joined line is reversed.
+- The title stays on one line and is cut off with an ellipsis when it does not fit, and so is
+  the joined line under it; neither wraps.
+- In a right-to-left interface the joined line is reversed, and the element
+  `convertSideInfo={false}` keeps comes before it instead of after.
 - `style` lands on the content element and again on the title's wrapper.
 - `sectionWidth` is read as a flag rather than a width: any non-zero number switches the
   layout.

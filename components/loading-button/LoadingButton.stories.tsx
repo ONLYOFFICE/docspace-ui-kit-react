@@ -8,39 +8,8 @@ const meta = {
   title: "UI/Feedback/LoadingButton",
   component: LoadingButton,
   parameters: {
-    docs: {
-      description: {
-        component: `16px progress ring with a cross in the middle, for cancelling the operation it measures.
-
-### Features
-
-- **Progress Indicator**: Fills the ring clockwise in proportion to \`percent\`, from a quarter at 25 to a closed circle at 100
-- **Indeterminate Spin**: Spins a half ring endlessly while \`percent\` is 0, for an operation whose size is not known yet
-- **Cancel Cross**: Draws a cross on a disc in the middle of the ring, in the ring's own colour
-- **Conversion Mode**: Drops the cross under \`inConversion\`, leaving the ring on its own
-- **Default Mode**: Draws the ring and the cross in the theme's grey instead of the accent colour, with the cross changing colour on hover
-- **Color Customization**: Takes the ring and cross colour from \`loaderColor\` and the disc colour from \`backgroundColor\`, overriding the theme
-- **Clickable**: Calls \`onClick\` for a click anywhere in the 16px square, not only on the cross
-
-### Usage
-
-\`\`\`tsx
-import { LoadingButton } from "@onlyoffice/apps-ui-kit/components/loading-button";
-
-// Basic loading button
-<LoadingButton percent={45} />
-
-// In conversion mode
-<LoadingButton percent={60} inConversion />
-
-// With custom colors
-<LoadingButton percent={30} loaderColor="#2DA7DB" backgroundColor="#f5f5f5" />
-
-// With a cancel handler
-<LoadingButton percent={75} onClick={() => cancelUpload()} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     id: {
@@ -283,16 +252,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--loading-button-accent\` | Colour of the ring and the cross | \`--accent-main\` |
-| \`--loading-button-idle\` | Colour of the ring and the cross under \`isDefaultMode\` | theme-based |
-| \`--loading-button-hover-fill\` | Colour of the cross on hover under \`isDefaultMode\` | theme-based |
-| \`--loading-button-custom-bg\` | Colour of the disc behind the cross; \`backgroundColor\` overrides it | theme-based |
-
-The first ring shows the accent and the disc colours; the second sets \`isDefaultMode\` to show the idle colour, and hovering it shows the hover colour.`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The first ring shows the accent and the disc colours; the second sets \`isDefaultMode\` to show the idle colour, and hovering it shows the hover colour.`,
       },
       source: {
         code: `<div

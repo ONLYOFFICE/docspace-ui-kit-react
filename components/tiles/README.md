@@ -215,16 +215,36 @@ export function LoadingListing() {
 `TilesSkeleton` and `TileSkeleton` are in `sub-components/skeletons` and are imported from that
 subpath.
 
+`TilesSkeleton` is the placeholder for a whole listing while the tiles load. It draws
+`foldersCount` folder placeholders (2 by default) above `filesCount` file placeholders (8 by
+default), each group under a bar standing for its heading; a group of zero loses its bar too, and
+`withTitle={false}` drops the bar above the files alone. A folder placeholder is a 64px bar and a
+file placeholder a 220px card, both with 12px corners unless `borderRadius` says otherwise. On a
+tablet each group shows at most seven placeholders, on a phone at most two. `isRooms` is meant to
+widen the columns for room tiles and currently changes nothing: its rule is written for a
+descendant of the grid, not the grid itself.
+
+`TileSkeleton` is one placeholder: a file card by default, a folder bar with `isFolder`, and with
+`isRoom` a room card with a logo, a title bar, a menu square and two tag bars. Both take the
+`RectangleSkeleton` props — `speed`, the two colours and their opacities — for the band that sweeps
+across every shape.
+
+Every shape is an SVG with `role="img"`, so a screen reader meets one image per placeholder and per
+heading bar. `title` names them all through an SVG `<title>`; without it they have no name. Neither
+component sets `aria-busy` — mark the loading region with it yourself.
+
 ## CSS variables
 
-The container's own knobs are below; each tile's geometry is documented on its own page, and they
-share the `--tile-*` prefix.
+The container's own knob is below; each tile's variables are documented on its own page, and they
+share the `--tile-*` prefix. They inherit, so a value set on the container reaches every tile.
 
-| Variable                            | Default | Effect                           |
-| ----------------------------------- | ------- | -------------------------------- |
-| `--tile-container-gap`              | `16px`  | Gap between tiles in every group |
-| `--tile-container-sort-font-size`   | `12px`  | Size of the two group headings   |
-| `--tile-container-sort-font-weight` | `600`   | Weight of the two group headings |
+| Variable               | Default | Effect                           |
+| ---------------------- | ------- | -------------------------------- |
+| `--tile-container-gap` | `16px`  | Gap between tiles in every group |
+
+The group headings have no variable: the container's stylesheet has rules reading
+`--tile-container-sort-font-size` and `--tile-container-sort-font-weight`, but under a selector
+that matches no element, so they have no effect.
 
 ## Accessibility
 

@@ -10,47 +10,8 @@ const meta = {
   title: "UI/Feedback/OperationsProgressButton",
   component: OperationsProgressButton,
   parameters: {
-    docs: {
-      description: {
-        component: `Floating progress button that displays the status of ongoing file operations (upload, copy, move, delete, etc.).
-
-### Features
-
-- **Operation Tracking**: Shows the operations the host passes in, as secondary operations and operations that own a panel
-- **Progress Display**: Fills the ring around the button with the progress of the only running operation
-- **Multiple Operations**: Shows three dots when several operations run and opens a list of all of them on click
-- **Status Badges**: Marks a failed operation with a warning badge, a finished one with a tick and an aborted one with a stop sign, which wins over the other two
-- **Completed State**: Slides out of view a few seconds after everything completes, unless the pointer is over it or errors are still being checked
-- **Tooltip Labels**: Names the running operation, its outcome or the number of operations in a tooltip on hover
-- **Panel Integration**: Opens an operation's own panel on click when that operation supplies \`showPanel\`
-- **Drag Preview**: Raises a second button in the middle of the screen while files are dragged, with a tooltip naming the folder under the pointer
-
-### Usage
-
-\`\`\`tsx
-import OperationsProgressButton from "@onlyoffice/apps-ui-kit/components/operations-progress-button";
-
-// Single upload operation
-<OperationsProgressButton
-  operations={[{
-    operation: "upload",
-    label: "Uploading files",
-    alert: false,
-    completed: false,
-    percent: 45,
-  }]}
-/>
-
-// Multiple operations
-<OperationsProgressButton
-  operations={[
-    { operation: "upload", label: "Uploading", alert: false, completed: false, percent: 60 },
-    { operation: "copy", label: "Copying", alert: false, completed: false, percent: 30 },
-  ]}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     operations: {
@@ -616,28 +577,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--ops-progress-dropdown-bg\` | Background of the open list | theme-based |
-| \`--ops-progress-dropdown-hover\` | Background of a row that opens a panel, on hover | theme-based |
-| \`--ops-progress-dropdown-margin\` | Gap between the open list and the button | \`8px\` |
-| \`--ops-progress-list-padding\` | Side padding of each row | \`0px 8px\` |
-| \`--ops-progress-bar-padding\` | Inner padding of each row | \`8px 16px\` |
-| \`--ops-progress-wrapper-margin\` | Space under each row's content | \`4px\` |
-| \`--ops-progress-items-gap\` | Gap between a row's icon and its label | \`8px\` |
-| \`--ops-progress-label-gap\` | Gap between a row's label and its arrow | \`8px\` |
-| \`--ops-progress-icon-color\` | Clear icon of a finished row and cancel cross of a panel row | theme-based |
-| \`--ops-progress-icon-hover\` | The same icons on hover | theme-based |
-| \`--ops-progress-error-icon\` | Exclamation mark inside a failed row's warning badge; the badge itself keeps the theme colour | theme-based |
-| \`--ops-progress-stopped-icon\` | Stop sign of an aborted row | theme-based |
-| \`--ops-progress-success-icon\` | Nothing visible: the theme colour overrides it on the tick | theme-based |
-| \`--floating-circle-button-background\` | Circle fill | accent color |
-| \`--floating-button-icon\` | Circle icon fill | accent text color |
-| \`--floating-button-shadow\` | Circle box-shadow | theme-based |
-
-The button shows the three \`--floating-*\` variables; click it to open the list, which shows the rest: **Moving files** is finished and failed, **Moving to trash** was aborted. Hover **Moving files**' clear icon for \`--ops-progress-icon-hover\`.`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The button shows the three \`--floating-*\` variables; click it to open the list, which shows the rest: **Moving files** is finished and failed, **Moving to trash** was aborted. Hover **Moving files**' clear icon for \`--ops-progress-icon-hover\`.`,
       },
     },
   },

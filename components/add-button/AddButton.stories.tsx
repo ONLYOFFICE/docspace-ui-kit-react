@@ -11,49 +11,8 @@ const meta = {
   title: "UI/Interactive elements/AddButton",
   component: AddButton,
   parameters: {
-    docs: {
-      description: {
-        component: `AddButton is a compact action button for adding items, typically used in selectors and lists.
-
-### Features
-
-- **Optional Label**: Text displayed next to the icon
-- **Loading State**: Spinner replaces icon during async operations
-- **Accent Style**: Tints the square with the theme's accent colour instead of grey
-- **Disabled State**: Prevents interaction
-- **Custom Icon**: Draws any element in place of the default plus, at an icon size of your choice
-- **Truncation**: Cuts a long label with an ellipsis when the parent limits its width
-- **Keyboard Support**: Responds to the Enter key once the button is made focusable with \`tabIndex\`
-
-### Accessibility
-
-The AddButton sets these on the wrapper around the square and the label:
-
-- \`role="button"\`: announces the square and the label as one button, named by the text of \`label\`
-- **Enter**: calls \`onClick\` while the wrapper has focus, unless the button is disabled or loading; Space does nothing
-- **Focus**: the wrapper takes focus only when \`tabIndex\` is passed, since it has no default
-
-A button without \`label\` has no accessible name; \`title\` does not supply one.
-
-### Usage
-
-\`\`\`tsx
-import { AddButton } from "@onlyoffice/apps-ui-kit/components/add-button";
-
-// Basic add button
-<AddButton title="Add item" onClick={handleAdd} />
-
-// With label
-<AddButton title="Add user" label="Add user" onClick={handleAdd} />
-
-// Accent style
-<AddButton title="Create new" isAction onClick={handleCreate} />
-
-// Loading state
-<AddButton title="Adding..." isLoading />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   args: {
     onClick: fn(),
@@ -458,20 +417,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--add-button-radius\` | Border radius | \`3px\` |
-| \`--add-button-dimension\` | Width and height; the \`size\` prop wins over it | \`32px\` |
-| \`--add-button-bg\` | Background color; replaced by the accent tint under \`isAction\` and by the theme while disabled | theme-based |
-| \`--add-button-bg-hover\` | Hover background color | theme-based |
-| \`--add-button-bg-active\` | Active background color | theme-based |
-| \`--add-button-icon-color\` | Icon fill color; replaced by the accent colour under \`isAction\` and by the theme while disabled | theme-based |
-| \`--add-button-icon-color-hover\` | Icon fill on hover, while the pointer is on the square around the icon; over the icon itself the theme's hover colour wins | theme-based |
-| \`--add-button-icon-color-active\` | Icon fill while pressed, with the same limit as the hover fill | theme-based |
-| \`--add-button-text-disabled\` | Label color when disabled | theme-based |
-| \`--add-button-text-gap\` | Gap between button and label | \`8px\` |
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
 
 **Add item** shows the square, icon and gap variables; hover and press it near its edge to see the hover and active colours. **Disabled** is there for \`--add-button-text-disabled\`, the only variable that survives the disabled state: the theme draws its square and icon in its own greys.`,
       },

@@ -151,21 +151,33 @@ export function AccentColour() {
 - **The picker is positioned 48px below the field** with `manualY`, so a field of a different
   height leaves a gap or an overlap.
 - **The drop-down has a backdrop**, which closes the picker on an outside click — and covers the
-  page while it is open.
+  page while it is open. The picker's own close button closes it too.
 - **The field accepts hex only.** It is `react-colorful`'s own input; named colours and `rgb()`
-  are rejected as you type, and the value always comes back prefixed with `#`.
+  are rejected as you type, and the value always comes back prefixed with `#`. Any character
+  that is not a hex digit is dropped as it is typed, and the field holds six digits at most.
+- **A partial code is not reported.** `handleChange` waits until the field holds a complete 3- or
+  6-digit code; leave the field with anything shorter and it puts back the last valid colour.
 - The value is upper-cased for display but reported to `handleChange` exactly as typed.
 - `hasError` and `hasWarning` are written as data attributes on the field, so they colour the
   border and nothing else.
 
 ## CSS variables
 
-| Variable        | Default   | Effect                                       |
-| --------------- | --------- | -------------------------------------------- |
-| `--block-color` | the value | Fill of the swatch; written by the component |
+| Variable                      | Default   | Effect                                                                                 |
+| ----------------------------- | --------- | -------------------------------------------------------------------------------------- |
+| `--color-input-height`        | `32px`    | Height of the hex field                                                                |
+| `--color-input-padding`       | `6px 8px` | Padding of the hex field; only while `size` is left out, since every size sets its own |
+| `--color-input-swatch-size`   | `20px`    | Width and height of the swatch                                                         |
+| `--color-input-swatch-radius` | `2px`     | Corner radius of the swatch                                                            |
+| `--block-color`               | the value | Fill of the swatch; written by the component                                           |
 
 The field's border, background and sizes come from the shared input styles, so they follow
-[`TextInput`](../text-input/README.md).
+[`TextInput`](../text-input/README.md): `--text-input-color`, `--text-input-border-color`,
+`--text-input-border-hover`, `--text-input-border-focus` and `--text-input-radius` set on a
+wrapper reach it. The popup is a [`DropDown`](../drop-down/README.md) and reads
+`--dropdown-border-style`, `--dropdown-shadow` and `--dropdown-radius` (default `6px`);
+`--dropdown-bg` shows only in the 8px strips above and below the picker, whose own panel stays
+white (black in the dark theme).
 
 ## Accessibility
 

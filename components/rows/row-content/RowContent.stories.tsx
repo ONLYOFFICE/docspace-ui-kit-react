@@ -21,41 +21,8 @@ const meta = {
   title: "UI/Rows/RowContent",
   component: RowContent,
   parameters: {
-    docs: {
-      description: {
-        component: `The text of a list row, laid out by the position of its children: a title, the icons beside it and one line of details under them.
-
-### Features
-
-- **Title**: Shows the first child as the row's title on one line, cut off with an ellipsis when it does not fit
-- **Title Icons**: Places the second child right after the title, for small status icons or a control of your own
-- **Details Line**: Joins the text of every later child into one line under the title, separated by vertical bars
-- **Element At The End**: Keeps the last child as the element it is, at the end of the details line, when \`convertSideInfo\` is off
-- **Title Only**: Drops the details line altogether, leaving the title and its icons
-- **Details Colour**: Colours the details line with any CSS colour
-- **Right-to-Left Order**: Joins the details in reverse order in a right-to-left interface
-
-### Usage
-
-\`\`\`tsx
-import { RowContent } from "@onlyoffice/apps-ui-kit/components/rows/row-content";
-
-// Title, an empty icon slot, and two details joined under the title
-<RowContent>
-  <Text fontWeight={600}>Quarterly report.docx</Text>
-  <span />
-  <Text>Modified today</Text>
-  <Text>24 KB</Text>
-</RowContent>
-
-// Title with a control beside it and no details line
-<RowContent disableSideInfo>
-  <Text fontWeight={600}>Quarterly report.docx</Text>
-  <Checkbox isChecked={false} onChange={onChange} />
-</RowContent>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     children: {

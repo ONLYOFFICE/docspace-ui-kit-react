@@ -10,51 +10,8 @@ const meta = {
   title: "UI/Navigation/Link",
   component: Link,
   parameters: {
-    docs: {
-      description: {
-        component: `Link component with two types: page links for navigation and action links for triggering behavior.
-
-### Features
-
-- **Two Types**: A \`page\` link navigates to its \`href\`, an \`action\` link runs its click handler in place
-- **Bold Text**: Emphasize links with bold font weight
-- **Hover States**: Underlines a page link with a solid line and an action link with a dashed one on hover, or keeps that underline on while \`isHovered\` marks the surrounding row as hovered
-- **Semitransparent**: Halves the opacity to mark a pending or inactive entity
-- **Text Overflow**: Keeps a long label within its container's width, and ends it with an ellipsis once \`truncate\` is set as well
-- **User Selection**: Control whether link text can be selected
-- **Tooltip Support**: Shows the \`title\` text in the shared tooltip on hover, where the app mounts \`RootTooltip\`
-- **Custom Colour**: Paints the label in any CSS colour, or in the portal's accent colour with \`color="accent"\`, which appears only where the portal defines that colour
-
-### Accessibility
-
-The Link renders a native \`<a>\`, so a page link gets its keyboard support from the platform; an action link needs more from you:
-
-- \`aria-label\`: set to the text of a string child, or to \`ariaLabel\` when given; a node child gets none, and the anchor is named by its content
-- A page link with an \`href\` is focusable with Tab and followed with Enter, as any native link is
-- An action link has no \`href\`, so it has no role and is not in the tab order: give it \`role="button"\`, \`tabIndex={0}\` and an \`onKeyDown\` that runs the action on Enter and Space
-
-### Usage
-
-\`\`\`tsx
-import { Link, LinkType, LinkTarget } from "@onlyoffice/apps-ui-kit/components/link";
-
-// Page link
-<Link type={LinkType.page} href="https://example.com" target={LinkTarget.blank}>
-  Visit Example
-</Link>
-
-// Action link
-<Link type={LinkType.action} onClick={handleClick}>
-  Click to filter
-</Link>
-
-// Bold link
-<Link type={LinkType.page} href="/profile" isBold>
-  View Profile
-</Link>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     type: {
@@ -675,16 +632,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--link-text-color\` | Colour of the label; the \`color\` prop wins over it | theme-based |
-| \`--link-hover-page-text-decoration\` | Line a page link shows on hover | underline |
-| \`--link-hover-text-decoration\` | Line an action link shows on hover | underline dashed |
-| \`--link-text-decoration\` | Line the link shows at rest; declared on the link itself, so set it through its \`style\` prop | none |
-| \`--link-line-height\` | Line height of the label; declared on the link itself, so set it through its \`style\` prop | calc(100% + 6px) |
-| \`--link-display\` | Display of the link while \`isTextOverflow\` is set; declared on the link itself, so set it through its \`style\` prop | inline-block |
+        story: `Overridable variables set on a wrapper and on the link itself -- the variables are listed under CSS variables on this page.
 
 **Custom color link** is a page link: it takes the colour from the wrapper, and on hover shows no underline (\`--link-hover-page-text-decoration\`). **Custom action link** is there for the variables an action link reads: hover it for a wavy underline (\`--link-hover-text-decoration\`); at rest it carries a dotted underline and a taller line (\`--link-text-decoration\`, \`--link-line-height\`, through its \`style\` prop). \`--link-display\` is not shown: in a column of links its effect cannot be seen.`,
       },

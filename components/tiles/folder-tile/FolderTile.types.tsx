@@ -48,7 +48,7 @@ export type FolderTileProps = {
   contextOptions: ContextMenuModel[];
   /** Draws the checkbox in its indeterminate state. */
   indeterminate?: boolean;
-  /** Dims the tile while it is being dragged. */
+  /** Marks the tile as being dragged: hovering it no longer tints it, underlines the name or swaps the icon for the checkbox. It does not dim the tile. */
   isDragging?: boolean;
   /** Ignored. `isDragging` is the one that is read. */
   dragging?: boolean;

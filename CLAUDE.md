@@ -205,7 +205,8 @@ applies. Three levels, fastest first:
 - **Tests**: Vitest + React Testing Library, setup in `test/setup.ts`
 - **Stories**: every component must have a story. It may live in a subdirectory rather
   than beside `index.ts` — `table`, `rows` and `tiles` all do — so check recursively
-  before concluding one is missing. `theme-provider` is the only one currently without
+  before concluding one is missing. Every component folder has one now, `theme-provider`
+  included.
 
 ## Product naming
 

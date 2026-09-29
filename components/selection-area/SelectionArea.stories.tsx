@@ -12,67 +12,8 @@ const meta = {
   component: SelectionArea,
   tags: ["!autodocs"],
   parameters: {
-    docs: {
-      description: {
-        component: `SelectionArea enables drag-to-select functionality for lists of items in tile or row views.
-
-### Features
-
-- **Drag-to-select**: Click and drag to select multiple items at once
-- **Drag threshold**: Draws the rectangle only after the pointer has moved 10 pixels from where the left button went down, so a plain click selects nothing
-- **Tile/Row views**: Supports both tile grid and row list layouts
-- **Scroll support**: Selection rectangle follows scroll position
-- **Multi-type item support**: Handle different item types with varying heights
-- **Full-set reporting**: Hands \`onMove\` every covered and every uncovered item on each animation frame of the drag, and keeps no selection of its own
-- **Start area**: Starts a drag only on a left-button press inside the element with the id \`sectionScroll\`, and never on an element inside one with the \`not-selectable\` class
-- **Right-to-left tiles**: Mirrors the column order of the tile grid when the interface direction is right-to-left
-
-### Usage
-
-Tile grid:
-
-\`\`\`tsx
-import { SelectionArea } from "@onlyoffice/apps-ui-kit/components/selection-area";
-
-<SelectionArea
-  viewAs="tile"
-  containerClass="my-container"
-  itemsContainerClass="my-items"
-  selectableClass="selectable-item"
-  scrollClass="my-scroll"
-  itemClass="item-name"
-  onMove={handleMove}
-  countTilesInRow={4}
-  arrayTypes={[{ type: "item", itemHeight: 150, rowGap: 16 }]}
-/>
-\`\`\`
-
-Row list, where each row holds a child with the \`value\` attribute:
-
-\`\`\`tsx
-<div id="sectionScroll" className="my-scroll">
-  <div className="my-items">
-    {rows.map((row, index) => (
-      <div key={row.id} className="selectable-item">
-        <span className="item-name" value={\`row_\${index}\`}>
-          {row.title}
-        </span>
-      </div>
-    ))}
-  </div>
-  <SelectionArea
-    viewAs="row"
-    containerClass="my-scroll"
-    itemsContainerClass="my-items"
-    selectableClass="selectable-item"
-    scrollClass="my-scroll"
-    itemClass="item-name"
-    onMove={handleMove}
-  />
-</div>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     viewAs: {
@@ -395,15 +336,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--selection-area-bg\` | Selection rectangle fill | \`rgba(68, 170, 255, 0.5)\` |
-| \`--selection-area-border\` | Selection rectangle border | \`1px solid #5299e0\` |
-| \`--selection-area-z-index\` | Stack order | \`1000\` |
-
-The example sets all three on a wrapper; drag across the tiles to see the fill and the border.`,
+        story: `All three variables set on one wrapper -- the variables are listed under CSS variables on this page. Drag across the tiles to see the fill and the border.`,
       },
       source: {
         code: `<div

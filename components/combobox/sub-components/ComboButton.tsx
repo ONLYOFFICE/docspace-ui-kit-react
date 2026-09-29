@@ -109,7 +109,9 @@ export const ComboButton: React.FC<TComboButtonProps> = ({
     <div
       className={comboButtonClasses}
       onClick={onClick}
-      tabIndex={tabIndex}
+      // `aria-disabled` alone leaves a div in the tab order; a disabled
+      // control is no tab stop.
+      tabIndex={isDisabled ? -1 : tabIndex}
       aria-disabled={isDisabled}
       aria-expanded={isOpen}
       aria-pressed={isOpen}

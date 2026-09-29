@@ -9,46 +9,8 @@ const meta = {
   title: "UI/Interactive elements/LinkWithDropdown",
   component: LinkWithDropdown,
   parameters: {
-    docs: {
-      description: {
-        component: `A link component that expands to show a dropdown menu of options.
-
-### Features
-
-- **Menu Items**: Renders each entry of \`data\` as a menu item and closes the menu after one is clicked
-- **Custom Text Styles**: Configurable font size, weight, and color
-- **Expander Icon**: Optional chevron after the text that turns over while the menu is open
-- **Disabled State**: Clicking no longer opens the menu and the cursor stays an arrow
-- **Semitransparent Mode**: Draws the whole link at half opacity
-- **Custom Width**: Sets an exact menu width instead of fitting the widest entry
-- **Direction Control**: Opens the menu above or below the link and aligns it to either side, optionally keeping that placement when it does not fit
-- **Text Overflow**: Truncates a long label with an ellipsis at 200px instead of wrapping it
-
-### Accessibility
-
-The link announces itself as a menu button; it handles no keys of its own.
-
-- \`role="button"\` with \`aria-haspopup="true"\`: announced as a button that opens a menu
-- \`aria-expanded\`: reports whether the menu is open
-- \`aria-disabled\`: reports the disabled state set by \`isDisabled\`
-- The link has no \`href\` or \`tabIndex\`, so it is not in the tab order and keyboard users cannot reach it
-
-### Usage
-
-\`\`\`tsx
-import { LinkWithDropdown } from "@onlyoffice/apps-ui-kit/components/link-with-dropdown";
-
-<LinkWithDropdown
-  data={[
-    { key: "1", label: "Option 1", onClick: handleClick },
-    { key: "2", label: "Option 2", onClick: handleClick },
-  ]}
->
-  Click me
-</LinkWithDropdown>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     children: {
@@ -550,19 +512,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--link-with-dropdown-color\` | Text and chevron color; the chevron keeps it on hover and while open | theme-based |
-| \`--link-with-dropdown-bg\` | Background of the closed link | \`transparent\` |
-| \`--link-with-dropdown-hover-color\` | Text color on hover and while the menu is open | theme-based |
-| \`--link-with-dropdown-hover-bg\` | Background on hover and while the menu is open | theme-based |
-| \`--link-with-dropdown-disabled-color\` | Text color with \`isDisabled\` | theme-based |
-| \`--link-with-dropdown-radius\` | Corner radius of the link's background | \`3px\` |
-| \`--link-with-dropdown-padding\` | Inner padding around the text | \`4px 8px\` |
-
-The first link shows the text, background, radius and padding variables; hover it or open its menu to see the hover pair. The second, with \`isDisabled\`, is there for \`--link-with-dropdown-disabled-color\`.`,
+        story: `The variables are listed under CSS variables on this page. The first link shows the text, background, radius and padding variables; hover it or open its menu to see the hover pair. The second, with \`isDisabled\`, is there for \`--link-with-dropdown-disabled-color\`.`,
       },
       source: {
         code: `<div

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import throttle from "lodash/throttle";
 import AvatarEditor, { Position } from "react-avatar-editor";
 import classNames from "classnames";
@@ -77,23 +77,28 @@ const ImageCropper = ({
   const setPreviewImageRef = useRef(setPreviewImage);
   setPreviewImageRef.current = setPreviewImage;
 
-  const handleImageChangeRef = useRef(
-    throttle(() => {
-      try {
-        if (!editorRef.current) return;
-        const newPreviewImage = editorRef.current
-          .getImageScaledToCanvas()
-          ?.toDataURL();
-        setPreviewImageRef.current(newPreviewImage);
-      } catch {
-        // console.error(e);
-      }
-    }, 300),
+  // Built once: a throttle created per render would throttle nothing.
+  const handleImageChange = useMemo(
+    () =>
+      throttle(() => {
+        try {
+          if (!editorRef.current) return;
+          const newPreviewImage = editorRef.current
+            .getImageScaledToCanvas()
+            ?.toDataURL();
+          setPreviewImageRef.current(newPreviewImage);
+        } catch {
+          // console.error(e);
+        }
+      }, 300),
+    [],
   );
 
+  useEffect(() => () => handleImageChange.cancel(), [handleImageChange]);
+
   useEffect(() => {
-    handleImageChangeRef.current();
-  }, [image.zoom, image.x, image.y, uploadedFile]);
+    handleImageChange();
+  }, [handleImageChange, image.zoom, image.x, image.y, uploadedFile]);
 
   return (
     <div
@@ -118,7 +123,7 @@ const ImageCropper = ({
           borderRadius={editorBorderRadius}
           style={{ width: "368px", height: "368px" }}
           onPositionChange={handlePositionChange}
-          onImageReady={() => handleImageChangeRef.current()}
+          onImageReady={() => handleImageChange()}
           disableHiDPIScaling={false}
           crossOrigin="anonymous"
         />

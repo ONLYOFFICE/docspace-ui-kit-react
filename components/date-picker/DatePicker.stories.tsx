@@ -19,56 +19,8 @@ const meta = {
   title: "UI/Form controls/DatePicker",
   component: DatePicker,
   parameters: {
-    docs: {
-      description: {
-        component: `Date picker component that allows users to select dates from a calendar popup with configurable date ranges and locale support.
-
-### Features
-
-- **Calendar Popup**: Visual calendar for date selection
-- **Date Ranges**: Configurable minimum and maximum selectable dates
-- **Locale Support**: Calendar formatting based on locale
-- **Calendar Icon**: Optional calendar icon in the selected date chip
-- **Selected Date Chip**: Displays the chosen date as a removable chip
-- **Auto-Positioning**: Opt-in flip of the calendar to the right edge when less than 340px of room is left to its right as it opens
-- **Controlled Value**: Shows the date held in \`outerDate\`, so the host feeds each change back to keep the chip on screen
-- **Outside Click**: Closes the open calendar on a press anywhere outside the picker
-
-### Accessibility
-
-The trigger shown while no date is chosen carries its own button semantics:
-
-- **Role**: Exposed as a button named by \`selectDateText\`
-- **Expanded state**: \`aria-expanded\` announces whether the calendar is open
-- **Focus**: The trigger sits in the Tab order
-
-### Usage
-
-\`\`\`tsx
-import { DatePicker } from "@onlyoffice/apps-ui-kit/components/date-picker";
-
-const [date, setDate] = useState<DateTime | null>(null);
-
-<DatePicker
-  locale="en"
-  openDate={now()}
-  outerDate={date}
-  onChange={setDate}
-  selectDateText="Select date"
-/>
-
-// With date constraints
-<DatePicker
-  locale="en"
-  openDate={now()}
-  minDate={now()}
-  maxDate={addToDate(now(), 1, "years")}
-  outerDate={date}
-  onChange={setDate}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     locale: {
@@ -593,41 +545,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-| --- | --- | --- |
-| \`--calendar-bg\` | Background of the calendar | theme-based |
-| \`--calendar-border\` | Colour of the calendar's one-pixel border | theme-based |
-| \`--calendar-shadow\` | Box shadow of the calendar | theme-based |
-| \`--calendar-radius\` | Corner radius of the calendar | \`6px\` |
-| \`--calendar-title\` | Colour of the month and year title | theme-based |
-| \`--calendar-title-size\` | Font size of the title; ignored in the mobile layout | \`18px\` |
-| \`--calendar-outline\` | Ring colour of the arrow buttons | theme-based |
-| \`--calendar-arrow\` | Colour of the arrow chevrons | theme-based |
-| \`--calendar-disabled-arrow\` | Colour of the chevron of an arrow that cannot go further | theme-based |
-| \`--calendar-weekday\` | Colour of the weekday labels | theme-based |
-| \`--calendar-accent\` | Fill of today, ring of the chosen day, arrow ring on hover and the title chevron | theme-based |
-| \`--calendar-selected-text\` | Text colour of today on the accent fill | \`#fff\` |
-| \`--calendar-current-radius\` | Corner radius of today | \`50%\` |
-| \`--calendar-focused-radius\` | Corner radius of the chosen day | \`50%\` |
-| \`--calendar-focused-bg\` | Background of the chosen day | \`transparent\` |
-| \`--calendar-focused-text\` | Text colour of the chosen day | theme-based |
-| \`--calendar-hover-bg\` | Background of a day under the pointer | theme-based |
-| \`--calendar-hover-radius\` | Corner radius of a day under the pointer | \`50%\` |
-| \`--calendar-past\` | Text colour of the days of the previous and next month | theme-based |
-| \`--calendar-disabled\` | Text colour of the days outside \`minDate\` and \`maxDate\` | theme-based |
-| \`--add-button-bg\` | Background of the square before **Select date** | theme-based |
-| \`--add-button-bg-hover\` | Background of that square under the pointer | theme-based |
-| \`--add-button-bg-active\` | Background of that square while pressed | theme-based |
-| \`--add-button-icon-color\` | Colour of the calendar glyph in that square | theme-based |
-| \`--add-button-icon-color-hover\` | Colour of that glyph under the pointer | theme-based |
-| \`--add-button-radius\` | Corner radius of that square | \`3px\` |
-| \`--selected-item-bg\` | Background of the chip that shows the chosen date | theme-based |
-| \`--selected-item-bg-hover\` | Background of the chip under the pointer | theme-based |
-| \`--selected-item-radius\` | Corner radius of the chip | \`3px\` |
-
-The variables are set on one wrapper around two pickers. The first holds the first day of this month, so it shows the chip; the second has no date, so it shows the **Select date** button. Open either calendar to see the calendar variables: both start at the first of this month (\`minDate\`), so the days of the previous month and the left arrow show their disabled colours, and the first picker's chosen day differs from today. Hover the chip, the button and a day to see the hover variables.`,
+        story: `The variables are listed under CSS variables on this page. They are set on one wrapper around two pickers. The first holds the first day of this month, so it shows the chip; the second has no date, so it shows the **Select date** button. Open either calendar to see the calendar variables: both start at the first of this month (\`minDate\`), so the days of the previous month and the left arrow show their disabled colours, and the first picker's chosen day differs from today. Hover the chip, the button and a day to see the hover variables.`,
       },
       source: {
         code: `<div

@@ -152,12 +152,12 @@
     "xss": "^1.0.15",
     "zoom-level": "2.5.0"
   },
-  "//devDependencies": "Mirrors every non-required peerDependency: pnpm does not install peers, so the build, tests and Storybook need a concrete copy here. The optional peers of @onlyoffice/ai-chat (assistant-ui, radix, codemirror, the LLM vendor SDKs) are deliberately absent: nothing in this package imports them, and pnpm does not install optional peers either, so a copy here would only pretend otherwise. They are the consumer's to declare -- the DocSpace client carries the list for the apps that render the AI agent (its pnpm-workspace.yaml catalog) -- and the ai-agent tests here do not reach the code paths that load them.",
+  "//devDependencies": "Mirrors every non-required peerDependency: pnpm does not install peers, so the build, tests and Storybook need a concrete copy here. Of the optional peers of @onlyoffice/ai-chat, the ones its chat UI renders with are mirrored as well -- assistant-ui, assistant-stream, the radix primitives, class-variance-authority, clsx, tailwind-merge, zustand -- so that the AI agent renders in Storybook; they are not peers of this package. The rest -- codemirror and @codemirror/*, react-shiki, and the LLM vendor SDKs -- are deliberately absent: nothing here reaches the code paths that load them, so a copy would only pretend otherwise. All of them are the consumer's to declare -- the DocSpace client carries the list for the apps that render the AI agent (its pnpm-workspace.yaml catalog).",
   "devDependencies": {
     "@assistant-ui/react": "^0.11.58",
     "@assistant-ui/react-markdown": "^0.11.10",
     "@biomejs/biome": "2.4.16",
-    "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.5.130-docs.8.tgz",
+    "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.5.130-docs.22.tgz",
     "@onlyoffice/document-editor-react": "2.1.1",
     "@playwright/test": "1.58.1",
     "@radix-ui/react-dialog": "^1.1.23",
@@ -204,6 +204,7 @@
     "lefthook": "^2.1.10",
     "mobx": "6.16.1",
     "mobx-react": "9.2.2",
+    "msw": "3.0.0",
     "postcss": "^8.5.25",
     "postcss-modules": "4.3.1",
     "prettier": "^3.9.6",

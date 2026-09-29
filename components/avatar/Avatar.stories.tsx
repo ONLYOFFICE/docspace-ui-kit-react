@@ -37,50 +37,8 @@ const meta = {
   title: "UI/Data display/Avatar",
   component: AvatarPure,
   parameters: {
-    docs: {
-      description: {
-        component: `A component for displaying user or group avatars with support for images, initials, icons, role indicators, and editing functionality.
-
-### Features
-
-- **Multiple Display Modes**: Shows a picture, an SVG icon, initials built from the name, or a placeholder when none of them is given
-- **Seven Sizes**: Scales from 24px (\`extraSmall\`) to 124px (\`max\`), with the initials and the role badge sized to match
-- **Role Indicators**: Draws an owner or an admin badge at the bottom corner, or a custom badge passed in its place
-- **Group Avatars**: Shows a group's initials in upper case on a background of their own
-- **Editing Support**: Adds an edit button at the largest size that opens the file dialog, or a menu of picture actions once there is a picture
-- **Tooltips**: Shows a text when the role badge is hovered
-- **Right-to-Left**: Moves the role badge and the edit button to the bottom-left corner and opens the tooltip to the left
-
-### Accessibility
-
-The avatar is announced as a button; keyboard support is left to the host:
-
-- \`role="button"\`: set on the avatar, so screen readers announce it as a button
-- A picture given as a URL is an \`<img>\` whose text alternative is "avatar"
-- Neither the avatar nor its edit button is in the tab order and no key is handled, so a host that makes the avatar clickable must offer a keyboard path to the same action
-
-### Usage
-
-\`\`\`tsx
-import { Avatar, AvatarSize, AvatarRole } from "@onlyoffice/apps-ui-kit/components/avatar";
-
-// Avatar with image
-<Avatar
-  size={AvatarSize.max}
-  role={AvatarRole.admin}
-  source="https://example.com/photo.jpg"
-  userName="John Smith"
-/>
-
-// Avatar with initials
-<Avatar
-  size={AvatarSize.medium}
-  role={AvatarRole.user}
-  userName="John Doe"
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=878-37278&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -742,16 +700,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--avatar-radius\` | Corner radius of the avatar and of its picture | \`50%\` |
-| \`--avatar-bg\` | Background of an avatar with no picture and no name | theme-based |
-| \`--avatar-initials-bg\` | Background behind a person's initials; a group keeps its own | theme-based |
-| \`--avatar-initials-weight\` | Font weight of a person's initials; a group's stay bold | \`600\` |
-
-The first avatar, with initials, shows the radius, the initials background and the weight; the second, with neither picture nor name, is there for \`--avatar-bg\`.`,
+        story: `Four variables set on one wrapper -- the variables are listed under CSS variables on this page. The first avatar, with initials, shows the radius, the initials background and the weight; the second, with neither picture nor name, is there for \`--avatar-bg\`.`,
       },
       source: {
         code: `<div

@@ -160,7 +160,7 @@ const ChatPanel = observer(() => {
     aiReady: true,
   },
   // Mounts AiAgentProviders against the portal picked in the API Config
-  // toolbar, or against the dev server's mock when none is configured;
+  // toolbar, or against the demo portal when none is configured;
   // `parameters.aiChat` adds each story's scenario props.
   decorators: [withAiSetup],
 };

@@ -201,6 +201,9 @@ export function TruncatedTitle({ name }: { name: string }) {
 - **`type` wins over `size`.** The three `type` presets come later in the stylesheet at the same
   specificity as the five size classes, so `size={HeadingSize.xsmall} type="header"` renders at
   28px. `type` also fixes the line height at 50px, which the sizes do not touch.
+- **`type` sets its own weight.** `content` and `menu` are `bold` (700); `header` stays at 600,
+  from a private variable rather than `--heading-weight`. `fontWeight` still wins over all three,
+  because it is an inline style.
 - **The five sizes are 15px, 19px, 21px, 23px and 27px** for `xsmall` through `xlarge`, and 600
   weight throughout. They are declared on the element itself rather than read with a fallback, so
   they cannot be retuned from a container — only `fontSize` on the component, or the `type`
@@ -228,15 +231,18 @@ export function TruncatedTitle({ name }: { name: string }) {
 ## CSS variables
 
 Only the `type` presets and the colour and weight are exposed; the five `size` steps are private.
+The inline style props win over every variable here: `color` over `--heading-text-color`,
+`fontWeight` over `--heading-weight`, `fontSize` and `lineHeight` over the `type` sizes and line
+height.
 
-| Variable                 | Default              | Effect                                  |
-| ------------------------ | -------------------- | --------------------------------------- |
-| `--heading-weight`       | `600`                | Font weight of every heading            |
-| `--heading-text-color`   | black, white in dark | Text colour                             |
-| `--heading-size-header`  | `28px`               | Font size of `type="header"`            |
-| `--heading-size-menu`    | `23px`               | Font size of `type="menu"`              |
-| `--heading-size-content` | `18px`               | Font size of `type="content"`           |
-| `--heading-lh`           | `50px`               | Line height of all three `type` presets |
+| Variable                 | Default              | Effect                                                             |
+| ------------------------ | -------------------- | ------------------------------------------------------------------ |
+| `--heading-weight`       | `600`                | Font weight of a heading without `type`; every `type` sets its own |
+| `--heading-text-color`   | black, white in dark | Text colour                                                        |
+| `--heading-size-header`  | `28px`               | Font size of `type="header"`                                       |
+| `--heading-size-menu`    | `23px`               | Font size of `type="menu"`                                         |
+| `--heading-size-content` | `18px`               | Font size of `type="content"`                                      |
+| `--heading-lh`           | `50px`               | Line height of all three `type` presets                            |
 
 ## Accessibility
 

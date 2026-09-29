@@ -275,9 +275,20 @@ private to it.
 | `--button-root-border-radius`                   | `3px`                             | Corner radius (the `accent` variant uses `6px` regardless)    |
 | `--button-text-weight`                          | `600`                             | Label weight                                                  |
 
-Each state colour also has an override: `--button-root-bg`, `--button-root-color`,
-`--button-root-border` and their `-hover` / `-active` / `-disabled` forms for the secondary
-variant, and the matching `--button-primary-*` set for the primary one.
+Each state colour also has an override. The secondary variant reads the `--button-root-*` set,
+the primary one the matching `--button-primary-*` set; the `filled` and `accent` variants read
+none of them, because their colours are set on the button itself and a wrapper cannot change them.
+
+| Variable                                                                   | Default | Effect                                                                                                                                  |
+| -------------------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `--button-root-bg`, `--button-root-color`, `--button-root-border`          | theme   | Secondary background, text colour and border; the border is a `border` shorthand                                                        |
+| `--button-root-bg-hover`, `-color-hover`, `-border-hover`                  | theme   | The same three on hover and under `isHovered`                                                                                           |
+| `--button-root-bg-active`, `-color-active`, `-border-active`               | theme   | The same three while pressed; background and text colour also under `isClicked`                                                         |
+| `--button-root-bg-disabled`, `-color-disabled`, `-border-disabled`         | theme   | The same three while disabled or loading; under `isDisabled` only the border's width and style apply and the line takes the text colour |
+| `--button-primary-bg`, `--button-primary-color`, `--button-primary-border` | theme   | Primary background, text colour and border; the border is a `border` shorthand and is kept on hover                                     |
+| `--button-primary-bg-hover`, `-color-hover`                                | theme   | Primary background and text colour on hover and under `isHovered`                                                                       |
+| `--button-primary-bg-active`, `-color-active`, `-border-active`            | theme   | Primary background and text colour while pressed and under `isClicked`; the border takes a colour, not a shorthand                      |
+| `--button-primary-bg-disabled`, `-color-disabled`, `-border-disabled`      | theme   | The same three while disabled or loading                                                                                                |
 
 **There is no destructive variant.** The stylesheet has nothing red: a delete confirmation is
 an ordinary `primary` button, and making it red means overriding `--accent-button`. Put it on

@@ -160,7 +160,9 @@ export function German({ children }: { children: React.ReactNode }) {
 - **The instance is private, and also global.** It is built with `i18next.createInstance()`
   rather than by configuring the singleton, so it does not collide with an application's own
   i18next — but it is published on `window` as well, because `getCommonTranslation` reads it from
-  there outside React.
+  there outside React: `window.i18n.t` is its bound `t`, `window.i18n.instance` the instance, and
+  `window.i18n.loaded` the resources keyed as `<lang>/<namespace>.json`. Each mount overwrites
+  all three.
 - **The language is resolved from three sources, in order:** `locale`, then the user's
   `cultureName`, then the portal settings' `culture`, then `en`. The last two are portal-internal
   and an application of its own passes neither.

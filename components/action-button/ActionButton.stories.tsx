@@ -18,43 +18,8 @@ const meta = {
   title: "UI/Interactive elements/ActionButton",
   component: ActionButton,
   parameters: {
-    docs: {
-      description: {
-        component: `A lightweight polymorphic action button for a secondary action next to content, such as clearing a filter.
-
-### Features
-
-- **Polymorphic**: Renders as a \`button\` by default, or as an \`a\` or any React component passed in \`as\`, taking that element's props
-- **Icon support**: Draws an optional leading icon at 12px, filled with the button's text colour
-- **Label as content**: Renders the text from \`label\` and drops anything passed as children
-- **Quiet look**: Accent text on a plain background, with no border
-- **Hover and press feedback**: Changes the background on hover and again while pressed
-- **Disabled state**: Fades to half opacity with a not-allowed cursor when a \`button\` gets \`disabled\`
-- **Theme-aware colours**: Switches to dark colours under the dark theme
-- **Forwarded props**: Passes every other prop, \`ref\` included, to the rendered element
-
-### Accessibility
-
-The default root is a native \`<button>\`, so its support comes from the platform:
-
-- Focusable with Tab and activated by Enter and Space
-- \`disabled\` removes it from the tab order and blocks clicks
-- \`label\` is the accessible name; an icon-only button needs an \`aria-label\`
-- With \`as="a"\` it is announced as a link and activated by Enter only
-
-### Usage
-
-\`\`\`tsx
-import { ActionButton } from "@onlyoffice/apps-ui-kit/components/action-button";
-
-<ActionButton label="Clear filter" onClick={handleClick} />
-
-<ActionButton icon={<FilterIcon />} label="Clear filter" onClick={handleClick} />
-
-<ActionButton as="a" href="/about" label="Go to page" />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     label: {

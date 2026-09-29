@@ -23,33 +23,7 @@ const meta = {
       description: {
         component: `TableBody holds the rows of a table and, for a long list, renders only the rows in view and asks for the next page as the user scrolls.
 
-### Features
-
-- **Virtualised Rows**: With \`useReactWindow\`, mounts only the rows near the visible part of the page scroll and a few beyond it, so thousands of rows stay fast
-- **Infinite Loading**: While \`hasMoreFiles\` is set, adds two placeholder rows after the loaded ones and calls \`fetchMoreFiles\` with the range to load as they scroll into view
-- **Uniform Row Height**: Gives every virtualised row the same \`itemHeight\`, 41 pixels unless set
-- **Saved Column Widths**: Lays each virtualised row out with the column widths the header saved under \`columnStorageName\`, or under \`columnInfoPanelStorageName\` while \`infoPanelVisible\` is set
-- **Plain Mode**: Without virtualisation, renders every row at once as part of the container's grid, for a short list
-- **Required Storage Keys**: Renders an empty element instead of the rows until both storage keys are given
-
-### Usage
-
-\`\`\`tsx
-import { TableBody } from "@onlyoffice/apps-ui-kit/components/table";
-
-<TableBody
-  columnStorageName="my-table-columns"
-  columnInfoPanelStorageName="my-table-info-panel"
-  fetchMoreFiles={fetchMore}
-  filesLength={items.length}
-  hasMoreFiles={hasMore}
-  itemCount={items.length}
-  itemHeight={50}
-  useReactWindow
->
-  {rows}
-</TableBody>
-\`\`\``,
+The Table README describes it in full.`,
       },
     },
   },

@@ -8,6 +8,8 @@ import RoomSelector from ".";
 import type { RoomSelectorProps } from "./RoomSelector.types";
 import type { TSelectorItem } from "../../components/selector";
 
+import { withPortalGate } from "../../.storybook/decorators/PortalGate";
+
 type StoryArgs = {
   // Layout
   id?: string;
@@ -64,6 +66,7 @@ type StoryArgs = {
 
 const meta: Meta<StoryArgs> = {
   title: "Components/Selectors/RoomSelector",
+  decorators: [withPortalGate("Room selector")],
   tags: ["!autodocs"],
   parameters: {
     docs: {

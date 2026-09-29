@@ -9,60 +9,8 @@ const meta = {
   title: "UI/Data display/CategoryItem",
   component: CategoryItem,
   parameters: {
-    docs: {
-      description: {
-        component: `CategoryItem is one entry of an index of destinations: a linked title, a line of explanation under it and a trailing arrow, with an optional paid badge beside the title.
-
-### Features
-
-- **Title & Subtitle**: Shows the destination's name as a 16px semibold link and a 12px explanatory line under it, capped at 1024px wide
-- **Link Navigation**: Points the title at \`url\` and calls \`onClickLink\` on a click, without preventing the browser from following the link
-- **Paid Badge**: Places a gold badge with its own label beside the title when \`withPaidBadge\` is set, except on a page whose path contains \`management\`
-- **Disabled State**: Removes the link's \`href\` and click handler and gives the subtitle the disabled colour, which is dimmer only in the dark theme, while the title and arrow stay unchanged
-- **Trailing Arrow**: Always ends the heading row with an arrow pointing onward, mirrored under a right-to-left interface
-- **Theme Colours**: Takes the subtitle, disabled and arrow colours from the light or dark theme, and the badge's gold from the theme context
-- **Built-in Spacing**: Adds a 20px bottom margin to each entry, which adds to a surrounding flex or grid \`gap\`
-
-### Usage
-
-\`\`\`tsx
-import { CategoryItem } from "@onlyoffice/apps-ui-kit/components/category-item";
-
-<CategoryItem
-  title="Security"
-  subtitle="Manage passwords and access settings"
-  url="/settings/security"
-  onClickLink={handleClick}
-  withPaidBadge={false}
-  badgeLabel=""
-/>
-
-// Unavailable entry: the title is not a link
-<CategoryItem
-  title="Single sign-on"
-  subtitle="Upgrade to configure single sign-on"
-  url="/settings/sso"
-  onClickLink={handleClick}
-  isDisabled
-  withPaidBadge
-  badgeLabel="PRO"
-/>
-
-// Client-side routing: stop the browser from following the link
-<CategoryItem
-  title="General"
-  subtitle="Language and time zone"
-  url="/settings/general"
-  onClickLink={(e) => {
-    e.preventDefault();
-    navigate("/settings/general");
-  }}
-  withPaidBadge={false}
-  badgeLabel=""
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     title: {
@@ -348,17 +296,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--category-item-title-color\` | Title link color | inherited from the surrounding text |
-| \`--category-item-description-color\` | Subtitle text color | theme-based |
-| \`--category-item-arrow-color\` | Arrow icon fill color | theme-based |
-| \`--category-item-disabled-color\` | Subtitle text color while \`isDisabled\` is set | theme-based |
-| \`--category-item-margin\` | Bottom margin of each entry | \`20px\` |
-
-**Files** shows the title, subtitle and arrow colours and the margin below it; **Security** is disabled (\`isDisabled\`) to show \`--category-item-disabled-color\` on its subtitle.`,
+        story: `The variables set on one wrapper -- they are listed under CSS variables on this page. **Files** shows the title, subtitle and arrow colours and the margin below it; **Security** is disabled (\`isDisabled\`) to show \`--category-item-disabled-color\` on its subtitle.`,
       },
     },
   },

@@ -164,45 +164,8 @@ const meta = {
   title: "UI/Tiles/TemplateTile",
   component: TemplateTile,
   parameters: {
-    docs: {
-      description: {
-        component: `The card for one room template in a tile listing: the icon and name on top, and the template's owner and storage along the bottom.
-
-### Features
-
-- **Template Icon**: Shows the template icon beside the name and swaps it for a checkbox on hover
-- **Checkbox Selection**: Selects the tile from the checkbox, or from a tap on the icon on a phone
-- **Active State**: Keeps the hover background on the template being acted on
-- **Blocking Operation**: Stops the tile answering hover, clicks and right-clicks while an operation runs over it
-- **Indeterminate Checkbox**: Draws the checkbox half-filled, for a partly selected template
-- **Owner and Storage**: Lists the owner as a clickable name and, when asked, a storage line whose figure the host draws
-- **Badges**: Places action buttons, such as one that creates a room from the template, beside the name
-- **Actions Menu**: Opens the template's menu from a three-dot button, drawn when the item carries a \`contextOptions\` key, and on right-click when \`getContextModel\` is given
-
-### Usage
-
-\`\`\`tsx
-import { TemplateTile } from "@onlyoffice/apps-ui-kit/components/tiles/template-tile";
-import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
-
-<TemplateTile
-  item={{ id: "1", title: "Sample Template", createdBy: { id: "u1", displayName: "Team member" } }}
-  element={<TemplateIcon />}
-  contextOptions={options}
-  columnCount={1}
-  openUser={openOwnerProfile}
-  onSelect={handleSelect}
->
-  <TileContent><Link>Template Content</Link></TileContent>
-</TemplateTile>
-
-// With the storage line, drawn by your own quota component
-<TemplateTile item={template} element={<TemplateIcon />} contextOptions={options} columnCount={1} openUser={openOwnerProfile} showStorageInfo SpaceQuotaComponent={SpaceQuota}>
-  <TileContent><Link>{template.title}</Link></TileContent>
-</TemplateTile>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     checked: {
@@ -639,23 +602,11 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--tile-bg\` | Background of the tile | theme-based |
-| \`--tile-border-style\` | Border of the tile | theme-based |
-| \`--tile-radius\` | Corner radius of the tile | \`12px\` |
-| \`--tile-hover-bg\` | Background of the tile on hover, and when checked or active | theme-based |
-| \`--tile-icon-color\` | Colour of the three-dot button | theme-based |
-| \`--tile-sub-color\` | Colour of the Owner and Storage labels and of the owner's name | theme-based |
-| \`--tile-hotkey-color\` | Border colour while \`showHotkeyBorder\` is on | theme-based |
+        story: `The variables are listed under CSS variables on this page.
 
 Two instances:
 - **Sample Template** — for every variable but the hotkey colour; hover it for \`--tile-hover-bg\`.
-- **Team Template** — \`showHotkeyBorder\`, for \`--tile-hotkey-color\`.
-
-The base tile's \`--tile-padding\` and \`--tile-row-gap\` do not reach a template tile: its own stylesheet fixes both at \`12px\`.`,
+- **Team Template** — \`showHotkeyBorder\`, for \`--tile-hotkey-color\`.`,
       },
       source: {
         code: `<div style={{

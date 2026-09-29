@@ -9,54 +9,8 @@ const meta = {
   title: "UI/Data display/CollapsibleCard",
   component: CollapsibleCard,
   parameters: {
-    docs: {
-      description: {
-        component: `A tinted card whose header opens and closes the body below it, for keeping secondary content out of the way until it is asked for.
-
-### Features
-
-- **Two-Line Header**: Shows a bold title with an optional secondary description under it, next to a chevron
-- **Whole-Header Toggle**: Opens or closes the card on a click anywhere in the header, not only on the chevron
-- **Body On Demand**: Mounts the body only while the card is open, so closed content is off the page and starts afresh each time the card opens
-- **Uncontrolled Mode**: Keeps its own open state, starting closed or open as chosen on the first render
-- **Controlled Mode**: Follows an open state held by the parent, which changes it from the toggle callback
-- **Toggle Callback**: Reports the state the card is moving to on every activation, in both modes
-- **Chevron Indicator**: Points the chevron down while closed and up while open, turning it without animating the body
-- **Themed Surface**: Colours the rounded background, the title, the description and the chevron from the light or dark theme
-
-### Accessibility
-
-The header is a native button, so it is reachable and operable from the keyboard with no extra wiring.
-
-- **Keyboard**: Tab focuses the header and Enter or Space opens or closes the card; a visible outline marks keyboard focus
-- **Expanded state**: \`aria-expanded\` announces whether the card is open
-- **Controlled region**: \`aria-controls\` points at the body while it is on the page, and is left off while the card is closed
-- **Accessible name**: The title and the description together form the button's name, so both are read out on focus
-- **Decorative chevron**: The chevron is hidden from assistive technology with \`aria-hidden\`
-
-### Usage
-
-\`\`\`tsx
-import { CollapsibleCard } from "@onlyoffice/apps-ui-kit/components/collapsible-card";
-
-// Uncontrolled, starting open
-<CollapsibleCard
-  title="Shared with the team"
-  description="Everyone in the team can open and comment on these files."
-  defaultOpen
->
-  {/* any content */}
-</CollapsibleCard>
-
-// Controlled by the parent
-const [open, setOpen] = useState(false);
-
-<CollapsibleCard title="Version history" isOpen={open} onToggle={setOpen}>
-  {/* any content */}
-</CollapsibleCard>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     title: {

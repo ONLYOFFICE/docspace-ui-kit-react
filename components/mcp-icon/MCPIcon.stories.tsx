@@ -10,36 +10,8 @@ const meta = {
   title: "UI/Data display/MCPIcon",
   component: MCPIcon,
   parameters: {
-    docs: {
-      description: {
-        component: `A square mark for an MCP (Model Context Protocol) server: its image, or the first letter of its name on a tile.
-
-### Features
-
-- **Letter Fallback**: Draws the uppercased first character of \`title\` on a grey tile when there is no image to show
-- **Four Fixed Sizes**: Renders a 16, 24, 32 or 48px square, each with its own font size and corner radius
-- **Image From a URL**: Shows the image at \`imgSrc\` in place of the letter, stretched to fill the square
-- **Error Handling**: Falls back to the letter when the image fails to load, and tries the image again when \`imgSrc\` changes
-- **Image As a Node**: Takes an inline SVG or any other element through \`imgNode\`, which wins over \`imgSrc\` and never falls back to the letter
-- **Dark Theme Tile**: Lowers the tile behind the letter to 10% opacity under the dark theme
-- **CSS Customization**: Takes the tile colour, its opacity, the letter colour and weight and the corner radius from CSS variables
-
-### Usage
-
-\`\`\`tsx
-import { MCPIcon, MCPIconSize } from "@onlyoffice/apps-ui-kit/components/mcp-icon";
-
-// With title initial
-<MCPIcon title="Document search" size={MCPIconSize.Large} />
-
-// With image
-<MCPIcon title="Document search" size={MCPIconSize.Medium} imgSrc="/path/to/icon.svg" />
-
-// With an inline SVG
-<MCPIcon title="Document search" imgNode={<FolderIcon />} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     layout: "centered",
   },
   argTypes: {
@@ -293,17 +265,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--mcp-icon-bg\` | Colour of the tile behind the letter; an icon with an image has no tile | \`#a3a9ae\` |
-| \`--mcp-icon-color\` | Colour of the letter | \`#ffffff\` |
-| \`--mcp-icon-opacity\` | Opacity of the tile behind the letter, replacing the theme's own value | \`1\`, \`0.1\` in the dark theme |
-| \`--mcp-icon-weight\` | Font weight of the letter | \`700\` |
-| \`--mcp-icon-radius\` | Corner radius of the tile, the same for every size; an image is not clipped to it | \`3px\` / \`4px\` / \`6px\` / \`6px\` by size |
-
-The four sizes share one wrapper that sets all five variables: a round, semi-transparent blue tile with a regular-weight white letter.`,
+        story: `The variables are listed under CSS variables on this page. The four sizes share one wrapper that sets all five variables: a round, semi-transparent blue tile with a regular-weight white letter.`,
       },
       source: {
         code: `<div

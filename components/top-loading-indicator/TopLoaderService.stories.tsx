@@ -6,48 +6,8 @@ import { TopLoaderService } from "./index";
 const meta = {
   title: "UI/Feedback/TopLoader",
   parameters: {
-    docs: {
-      description: {
-        component: `A thin progress bar at the top of the page for a wait of unknown length, driven by three static calls on an element the page supplies.
-
-### Features
-
-- **Smooth Animation**: Linear progress to 50% in the first second, then 10% increments capped at 90%
-- **Completion Animation**: Smoothly animates from current position to 100% when \`end()\` is called
-- **Cancel Support**: Immediately resets the bar to 0% via \`cancel()\`
-- **No React Dependency**: Pure DOM manipulation service, works anywhere
-- **Page-Supplied Element**: Drives the element with the id \`ipl-progress-indicator\` and does nothing, silently, when the page has none
-- **Style Left To The Page**: Writes only the width, so the height, colour, position and transition come from the element's own style
-- **One Bar Per Page**: Keeps its state in the module, so every caller shares one progression and the first \`end()\` finishes it
-- **Safe On The Server**: Every call before the document exists does nothing instead of throwing
-
-### Accessibility
-
-The first \`start()\` turns the element into a progress bar for assistive technology.
-
-- \`role="progressbar"\` with \`aria-valuemin="0"\` and \`aria-valuemax="100"\` announces the element as a progress bar from 0 to 100
-- \`aria-valuenow\` is updated on every tick, so the announced value follows the bar's width, which comes from a timer, not from the work being done
-
-### Usage
-
-\`\`\`tsx
-import { TopLoaderService } from "@onlyoffice/apps-ui-kit/components/top-loading-indicator";
-
-// Render the element once, high in the tree, and style it yourself
-<div id="ipl-progress-indicator" aria-label="Loading" />
-\`\`\`
-
-\`\`\`tsx
-TopLoaderService.start();
-try {
-  await save();
-  TopLoaderService.end();
-} catch {
-  TopLoaderService.cancel();
-}
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
 } satisfies Meta;
 
@@ -164,20 +124,8 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `\`TopLoaderService\` uses direct DOM manipulation on \`#ipl-progress-indicator\`.
-It defines no CSS custom properties: style the element freely via CSS — the service only sets \`width\`, the ARIA attributes and \`data-test-id\` at runtime.
-This story renders a static demo bar under a different id, purely for visual reference — it is not driven by \`TopLoaderService\`.
-
-**Recommended inline style properties:**
-
-| Property | Description | Example |
-|----------|-------------|---------|
-| \`height\` | Bar thickness | \`4px\` |
-| \`backgroundColor\` | Bar fill color | \`#0082c9\` |
-| \`borderRadius\` | Right-edge rounding | \`0 2px 2px 0\` |
-| \`boxShadow\` | Glow / elevation | \`0 0 8px rgba(0,130,201,0.5)\` |
-| \`transition\` | Smooth width animation | \`width 0.2s ease-in-out\` |
-| \`zIndex\` | Stacking order | \`9999\` |`,
+        story: `\`TopLoaderService\` defines no CSS custom properties -- the element's own style does all of it, as the recipe "The element, and its style" on this page describes.
+This story renders a static demo bar under a different id, purely for visual reference -- it is not driven by \`TopLoaderService\`.`,
       },
       source: {
         code: `<div

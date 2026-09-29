@@ -193,8 +193,12 @@ export function ProviderTag({ iconUrl }: { iconUrl: string }) {
   and 28px tall, so two tags closer than that overlap in their hit areas.
 - **The tag brings its own trailing margin** of 4px, which `isLast` removes. In a flex row with
   a `gap` the two add up.
+- **Hover highlights the tag only when `onClick` is passed.** Without a handler the tag keeps
+  its colours and the default cursor under the pointer; a disabled or deleted tag never
+  highlights.
 - **The tag is `width: fit-content` and capped at 22px tall.** `tagMaxWidth` is written into
-  the inline style, after `style`, so it wins over a `maxWidth` set there.
+  the inline style, after `style`, so it wins over a `maxWidth` set there. A label wider than
+  that cap is cut off with an ellipsis, and the full text stays in the `title` tooltip.
 - **A component passed as `icon` is rendered inside an [`IconButton`](../icon-button/README.md)**
   at 12px and the tag's padding drops to 0; a string is fetched and inlined instead. The two
   forms do not look the same.
@@ -218,6 +222,17 @@ Set them on any ancestor.
 | `--tag-text-color`    | theme token | Label colour.                         |
 | `--tag-size`          | `13px`      | Label font size.                      |
 | `--tag-lh`            | `20px`      | Label line height.                    |
+
+`--tag-bg` is the resting background only: a new tag, and any clickable tag on hover or press,
+takes its theme colour instead. Likewise `--tag-border-style` gives way to the dashed theme
+border on a disabled tag. `--tag-height` is a `max-height`, so raise it together with the
+vertical part of `--tag-inner-padding` for a taller tag.
+
+`--tag-text-color`, `--tag-size` and `--tag-lh` are read by the same label class the
+`isDeleted` and `isDisabled` text rules need, which is never put on the text, so today they
+change nothing. The other `--tag-*` names the stylesheet
+uses (`--tag-background`, `--tag-color` and the rest) are declared by the theme on the tag
+itself, so a wrapper cannot override them.
 
 ## Accessibility
 
