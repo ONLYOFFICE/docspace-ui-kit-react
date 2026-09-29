@@ -176,7 +176,14 @@ export function FileLink({ href, name }: { href: string; name: string }) {
   against. The clipping itself comes from `truncate`, inherited from `Text`. One without the
   other does nothing visible.
 - **`title` never reaches the DOM.** The folder exports `withTooltip(Link)`, and the wrapper
-  consumes `title` as the tooltip's text. Only a string produces a tooltip.
+  consumes `title` as the tooltip's text. Only a string produces a tooltip, and it shows only in
+  an application that mounts `RootTooltip` once — without it the hover does nothing.
+- **`color="accent"` depends on the portal.** It resolves to `var(--accent-main)`, which the
+  portal's theme defines and this component does not; where nothing defines it, the declaration
+  is dropped and the label takes its parent's colour.
+- The hover underline differs by type: a `page` link grows a solid underline, an `action` link
+  a dashed one. `isHovered` holds that underline on without the pointer, and `noHover` removes
+  it in both cases.
 - **An action link is not keyboard-operable by itself.** With `type={LinkType.action}` there is
   no `href`, so the anchor has no implicit role, no tab stop and no Enter activation. The
   recipe above adds all three.
@@ -192,13 +199,17 @@ export function FileLink({ href, name }: { href: string; name: string }) {
 
 ## CSS variables
 
-| Variable            | Default    | Effect              |
-| ------------------- | ---------- | ------------------- |
-| `--link-text-color` | theme text | Colour of the label |
+| Variable                            | Default            | Effect                                                     |
+| ----------------------------------- | ------------------ | ---------------------------------------------------------- |
+| `--link-text-color`                 | theme text         | Colour of the label; the `color` prop wins over it         |
+| `--link-hover-page-text-decoration` | `underline`        | Line a `page` link shows on hover and under `isHovered`    |
+| `--link-hover-text-decoration`      | `underline dashed` | Line an `action` link shows on hover and under `isHovered` |
 
-The other `--link-*` names in the stylesheet — the line height, the text decoration, the
-display mode — are assigned on the component's own element, so a value set on an ancestor is
-overridden. Use `color`, `textDecoration` and `isTextOverflow` instead.
+The other `--link-*` names in the stylesheet — `--link-text-decoration` (the line at rest,
+`none`), `--link-line-height` (`calc(100% + 6px)`) and `--link-display` (`inline-block`, read
+only while `isTextOverflow` is set) — are assigned on the component's own element, so a value
+set on an ancestor is overridden. Set them through the link's own `style` prop, or use
+`textDecoration`, `lineHeight` and `isTextOverflow` instead.
 
 ## Accessibility
 
