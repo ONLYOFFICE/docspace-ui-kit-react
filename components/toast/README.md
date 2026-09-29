@@ -181,6 +181,10 @@ export async function uploadWithProgressToast(file: File) {
 - **Nothing appears until `<Toast/>` is mounted.** A `toastr` call made while the container is
   absent is queued by `react-toastify` against the container id `toast-container` and is shown
   only once it exists.
+- **Only one `<Toast/>` renders at a time.** Mounting more — one per story on a docs page, a
+  plugin's next to the portal's — is safe: the first mounted draws the container and the rest
+  render nothing, so their `className` and `style` are ignored. When the first unmounts, the next
+  takes over, without the toasts the first was showing.
 - **The arguments are positional, and the third one is a trap.** `timeout` is in milliseconds;
   `0` means "never close by itself", but **anything below 750 is silently replaced with 5000**,
   so `toastr.success(msg, null, 300)` stays up for five seconds.
