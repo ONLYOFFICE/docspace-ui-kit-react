@@ -49,51 +49,9 @@ const meta = {
   title: "UI/Overlays/RoomLogoCoverDialog",
   component: RoomLogoCoverDialog,
   parameters: {
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     docs: {
-      description: {
-        component: `Dialog for choosing a room's generated logo: a colour and an optional icon, over a live preview of the tile.
-
-### Features
-
-- **Colour Selection**: Picks one of nine preset colours, or a custom colour chosen in a colour picker that opens from the plus button
-- **Custom Colour Swatch**: Keeps a colour outside the presets as an extra swatch after them, with a pencil button to change it again
-- **Cover Selection**: Draws the chosen icon on the tile; clicking the chosen icon again, or "without icon", goes back to the initials
-- **Live Preview**: Shows the resulting room logo as the selection changes
-- **Initials Fallback**: Draws the first and last initials of the room title on the tile while no icon is chosen
-- **Accent Tint**: Highlights the hovered and the chosen icon in the portal's accent colour when one is passed
-- **Result On Apply**: Hands the chosen colour and icon to the caller when apply is clicked and leaves saving and closing to it
-- **Phone Layout**: Switches to a full-screen panel on a phone, with the colour picker in a modal of its own
-
-### Usage
-
-\`\`\`tsx
-import { RoomLogoCoverDialog } from "@onlyoffice/apps-ui-kit/components/room-logo-cover-dialog";
-
-const [visible, setVisible] = useState(false);
-
-<RoomLogoCoverDialog
-  t={t}
-  visible={visible}
-  covers={covers}
-  title="Quarterly reports"
-  onClose={() => setVisible(false)}
-  onApply={(color, cover) => {
-    saveLogo(color, cover);
-    setVisible(false);
-  }}
-/>
-\`\`\`
-
-\`\`\`tsx
-// Reopen with what the room already has
-<RoomLogoCoverDialog
-  {...dialogProps}
-  initialColor="#4781D1"
-  initialCover={roomCover}
-  currentColorScheme={colorScheme}
-/>
-\`\`\``,
-      },
       // Every story opens a modal over the whole page, so on Docs each gets
       // a document of its own.
       story: { inline: false, height: "760px" },
