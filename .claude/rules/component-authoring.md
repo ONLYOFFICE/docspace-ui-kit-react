@@ -95,22 +95,26 @@ still true, and all still unenforced.
 - Every component needs a story. `theme-provider` is the only one without; the file may sit in
   a subdirectory (`table`, `rows`, `tiles` do), so search recursively before concluding one is
   missing.
-- **`STORY_TEMPLATE.md` governs stories, and it is the only file that does.**
-  `parameters.docs.description.component` is hand-written in its shape — a short line,
-  `### Features`, an optional `### Accessibility`, `### Usage`. Importing the README into it
-  with `?raw` was tried on four components and reverted in September 2026: a 260-line page does
-  not fit that template, and the four files were an unexplained exception among 146. This rule
-  used to state the opposite as settled fact while it was true of four files, which is how a
-  colleague following the template ended up contradicted by a rule. If the two ever disagree
-  again, `STORY_TEMPLATE.md` wins.
-- The consequence is that a component is described in two places by hand, and no gate compares
-  them. Correct both in the same commit, and expect the story's half to be the stale one: of the
-  two descriptions restored on the revert, one claimed `ModalDialog` traps focus, which it has
-  never done.
-- What stays in the story is what cannot be written down: the scenarios, the controls, the
-  visual-regression surface. Feature lists, accessibility notes and the table of overridable
-  `var(--x, fallback)` belong in the README, which is what `package.json` publishes — stories
-  are not in the tarball, so a consumer never saw them.
+- **`STORY_TEMPLATE.md` governs stories, and it is the only file that does.** It no longer
+  asks for a component description: the Docs page is the component's `README.md`, rendered by
+  `.storybook/blocks/DocsPage.tsx` — the intro above the primary story, the reference sections
+  below the stories, the generated `## Props` left to the Controls table. A story file carries
+  no `parameters.docs.description.component`, and `CssCustomization` demonstrates the
+  variables without a table of them.
+- This replaced two hand-written descriptions that no gate compared. The last attempt to
+  join them, importing the README into `description.component` with `?raw` (`243ab4f0`), was
+  reverted in September 2026 (`2865a11c`, `9e7062f4`) because the whole 260-line page landed
+  in the Docs header above the first demo; the template splits it around the demos instead.
+  Of the two story descriptions restored on that revert, one claimed `ModalDialog` traps
+  focus, which it has never done — the story half was the stale one, which is why the README
+  is the half that stayed.
+- The exception is a story file whose own folder has no README (the table's parts, the
+  skeletons, `ArticleItem`): its Docs page falls back to the default template, so it keeps a
+  one-sentence description naming the parent page, and the facts live in the parent README.
+- What stays in the story is what cannot be written down: the scenarios, the controls and
+  their `argTypes`, each story's `description.story`, the visual-regression surface. A fact a
+  story would state goes into the README — which is what `package.json` publishes and what the
+  `ui-kit` agent skill syncs; stories are in neither.
 - Tests are Vitest + React Testing Library. **`vitest.config.ts` lists the directories it
   runs** — `components`, `selectors`, `ai-agent`, `errors`, `ui`, `utils`, `context`,
   `providers`, `hooks`, `scripts`, and `docs`, for the logic the samples carry (PKCE, role

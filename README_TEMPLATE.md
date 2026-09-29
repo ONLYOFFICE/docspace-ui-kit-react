@@ -21,16 +21,17 @@ from the JSDoc on `*.types.ts`. Two of the three are now tied together: **the JS
 single source for prop descriptions**, and the README's prop table is generated from it, so no
 prop is described twice by hand.
 
-The story's component description stays its own text, in the shape `STORY_TEMPLATE.md` sets —
-a short line, `### Features`, an optional `### Accessibility`, `### Usage`. Rendering this
-whole README there instead was tried on four components and reverted: a 260-line page does not
-fit that shape, and it carried sections a Storybook reader has no use for. What it bought,
-one text instead of two, is real and is now bought by discipline rather than by machinery —
-**when you change what a component does, the story's description is the second place to
-correct**, and nothing will fail if you forget.
+The third is gone too: **this README is the story's description**. The Storybook Docs page
+renders it (`.storybook/blocks/DocsPage.tsx`) — the intro above the primary story, the
+reference sections below the stories, `## Props` left to the Controls table — and a story file
+carries no `parameters.docs.description.component` of its own (`STORY_TEMPLATE.md`). An
+earlier attempt put this whole page into the Docs header above the first demo and was
+reverted; splitting it around the demos is what makes it fit. So there is one text: **when you
+change what a component does, this README is the place to correct**, and it is what a
+Storybook reader, a consumer of the package and the `ui-kit` agent skill all read.
 
-The CSS-variable table and the accessibility notes belong here rather than in the story either
-way: `package.json` publishes `components/**/README.md` and does not publish stories, so
+The CSS-variable table and the accessibility notes belong here rather than in the story for a
+second reason too: `package.json` publishes `components/**/README.md` and does not publish stories, so
 anything written only in a story does not exist for someone who installed the package.
 
 ## The skeleton

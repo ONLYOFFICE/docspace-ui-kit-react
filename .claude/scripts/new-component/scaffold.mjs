@@ -64,32 +64,6 @@ if (barrelText.includes(`"./${kebab}"`)) {
 // Prettier is not in any gate here, but a scaffold that it would rewrite is a
 // scaffold that shows up as noise in the author's first `pnpm format`. Column
 // widths depend on the component's own name, so they are computed.
-const renderTable = (header, rows) => {
-  const widths = header.map((_, column) =>
-    Math.max(...[header, ...rows].map((row) => row[column].length)),
-  );
-  const line = (cells, fill = " ") =>
-    `| ${cells.map((cell, i) => cell.padEnd(widths[i], fill)).join(` | `)} |`;
-  return [
-    line(header),
-    line(
-      widths.map((width) => "-".repeat(width)),
-      "-",
-    ),
-    ...rows.map((row) => line(row)),
-  ].join("\n");
-};
-
-const propsTable = renderTable(
-  ["Name", "Type", "Default", "Description"],
-  [
-    ["children", "React.ReactNode", "-", "Content"],
-    ["className", "string", "-", "Custom CSS class"],
-    ["style", "React.CSSProperties", "-", "Custom CSS styles"],
-    ["testId", "string", `"${kebab}"`, "Value of the data-testid attribute"],
-  ],
-);
-
 const files = {
   // `ref` is a plain prop: React 19, and forwardRef is legacy here.
   // One JSDoc line per prop -- it is the only documentation a plugin author
@@ -191,26 +165,8 @@ const meta = {
   title: "UI/TODO section/${Pascal}",
   component: ${Pascal},
   parameters: {
-    docs: {
-      description: {
-        component: \`TODO: what this component is for.
-
-### Features
-
-- TODO
-
-### Accessibility
-
-TODO: aria attributes, keyboard behaviour, focus management.
-
-### CSS variables
-
-| Variable | Purpose | Default |
-|---|---|---|
-| \\\`--${kebab}-gap\\\` | Gap between children | \\\`8px\\\` |
-\`,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
 } satisfies Meta<typeof ${Pascal}>;
 
@@ -241,23 +197,85 @@ describe("${Pascal}", () => {
 
   // Shipped in the published package: `files` in package.json lists
   // components/**/README.md.
-  "README.md": `# ${Pascal}
+  // It is also the Storybook Docs page (.storybook/blocks/DocsPage.tsx), so it
+  // is the only description the component has. README_TEMPLATE.md governs it;
+  // the TODO category fails \`pnpm check:readme\` until a real one is chosen.
+  "README.md": `<!-- ui-kit-doc {
+  "schema": 1,
+  "name": "${Pascal}",
+  "folder": "components/${kebab}",
+  "kind": "component",
+  "category": "TODO",
+  "status": "public",
+  "summary": "TODO: what this component is for, in one sentence.",
+  "import": { "subpath": "components/${kebab}", "barrel": true, "default": false },
+  "exports": ["${Pascal}", "${Pascal}Props"${withEnums ? `, "${Pascal}Size"` : ""}],
+  "providers": ["ThemeProvider"],
+  "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
+  "related": [],
+  "subComponents": [],
+  "testIds": ["${kebab}"]
+} -->
 
-TODO: one paragraph on what this component is for and when to reach for it.
+# ${Pascal}
 
-## Usage
+TODO: what this component is for, in one sentence. Then say when to reach for it.
 
-\`\`\`jsx
+## Use this when / not when
+
+- Use when: TODO
+- Not for TODO.
+
+## Import
+
+\`\`\`ts
 import { ${Pascal} } from "@onlyoffice/apps-ui-kit/components/${kebab}";
-
-const MyComponent = () => {
-  return <${Pascal}>content</${Pascal}>;
-};
 \`\`\`
 
-## Properties
+Also exported from the root barrel \`@onlyoffice/apps-ui-kit\`.
 
-${propsTable}
+Needs \`ThemeProvider\` from \`@onlyoffice/apps-ui-kit/providers/theme\` above it in the tree.
+
+## Minimal example
+
+\`\`\`tsx
+import { ${Pascal} } from "@onlyoffice/apps-ui-kit/components/${kebab}";
+
+export function Example() {
+  return <${Pascal}>content</${Pascal}>;
+}
+\`\`\`
+
+## Props
+
+<!-- props:start ${Pascal}Props -->
+<!-- props:end -->
+
+## Recipes
+
+TODO: one \`###\` per real use the minimal example does not show.
+
+## Behaviour the types don't state
+
+- TODO: what a reader would get wrong from the types alone.
+
+## CSS variables
+
+| Variable | Default | Effect |
+| --- | --- | --- |
+| \`--${kebab}-gap\` | \`8px\` | Gap between children |
+
+## Accessibility
+
+- TODO: the roles and \`aria-*\` attributes it sets, the keys it handles, how focus moves.
+
+## Test ids
+
+| Element | \`data-testid\` |
+| --- | --- |
+| The root | \`${kebab}\`, or \`testId\` |
+
+## Related
 `,
 };
 
@@ -289,7 +307,7 @@ console.log(
     : "\nRegistered in components/index.ts -- it is now part of the plugin API surface.",
 );
 console.log(
-  "\nNext: fill the TODOs in the story and README, then\n" +
-    "  pnpm tsc && pnpm lint && pnpm test\n" +
+  "\nNext: fill the TODOs in the README (it is the Docs page) and the story, then\n" +
+    "  pnpm readme:props && pnpm check:readme && pnpm tsc && pnpm lint && pnpm test\n" +
     "  node .claude/scripts/plugin-surface/surface.mjs   # confirm the new exports",
 );
