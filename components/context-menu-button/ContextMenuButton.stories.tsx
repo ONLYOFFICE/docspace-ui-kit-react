@@ -23,63 +23,8 @@ const meta = {
   title: "UI/Interactive elements/ContextMenuButton",
   component: ContextMenuButton,
   parameters: {
-    docs: {
-      description: {
-        component: `ContextMenuButton displays a button that opens a context menu with action items. Commonly used for item-level actions in lists and tables.
-
-### Features
-
-- **Dropdown Menu**: Opens a menu of action items that \`getData\` builds afresh on every click
-- **Icon Customization**: Swaps the icon or its colour while the pointer is over it, while it is held down and while the menu is open
-- **Direction Control**: Places the menu on a preferred side of the button and flips it to fit the window unless the direction is fixed
-- **Toggle Mode**: Renders no menu of its own and hands every click to \`onClick\`, so the host can open a menu of its own
-- **Disabled State**: Greys the icon out and keeps the menu from opening
-- **Icon Border**: Puts the icon in a rounded 32px box that can carry a border
-- **Portal Support**: Renders the menu in a portal on the document body by default, or inline next to the button
-- **Outside Click**: Closes the menu on a click outside it and reports that close through \`onClose\`
-
-### Accessibility
-
-The wrapper and the icon are plain \`<div>\`s, so the component adds only this for assistive technology:
-
-- \`aria-disabled\`: set on the wrapper and on the icon while \`isDisabled\`, so the button is announced as unavailable
-- The open menu is a \`role="listbox"\` with one \`role="option"\` per item, rendered by DropDown
-- The icon takes no focus and handles no keys, so a keyboard route to the same actions has to come from the host
-
-### Usage
-
-\`\`\`tsx
-import { ContextMenuButton, ContextMenuButtonDisplayType } from "@onlyoffice/apps-ui-kit/components/context-menu-button";
-
-// Basic context menu button
-<ContextMenuButton
-  title="Actions"
-  iconName={VerticalDotsIcon}
-  getData={() => [
-    { key: "edit", label: "Edit" },
-    { key: "delete", label: "Delete" },
-  ]}
-/>
-
-// With fixed direction
-<ContextMenuButton
-  title="Actions"
-  iconName={VerticalDotsIcon}
-  directionX="right"
-  directionY="bottom"
-  fixedDirection
-  getData={() => menuData}
-/>
-
-// Toggle mode: no menu of its own, the click opens one the host renders
-<ContextMenuButton
-  displayType={ContextMenuButtonDisplayType.toggle}
-  getData={() => menuData}
-  onClick={(e) => openOwnMenu(e)}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     title: {
@@ -504,22 +449,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--cmb-border\` | Border of the icon box, as a \`border\` shorthand; shown only with \`displayIconBorder\` | none drawn |
-| \`--cmb-hover-border\` | Border colour of the icon box on hover | theme-based |
-| \`--cmb-size\` | Width and height of the icon box | \`32px\` |
-| \`--cmb-radius\` | Corner radius of the icon box | \`3px\` |
-| \`--cmb-icon-padding\` | Padding between the icon box and the icon | \`6px 7px\` |
-| \`--dropdown-bg\` | Menu background | theme-based |
-| \`--dropdown-border-style\` | Menu border | theme-based |
-| \`--dropdown-shadow\` | Menu shadow | theme-based |
-| \`--dropdown-radius\` | Menu corner radius | \`6px\` |
-| \`--dropdown-inner-padding\` | Space above the first item and below the last | \`8px 0\` |
-
-The example opens the menu in a bordered box (\`displayIconBorder\`), so every variable is on screen at once; hover the dots to see \`--cmb-hover-border\`. The menu is kept inline (\`usePortal={false}\`): in a portal it leaves the wrapper, so set the \`--dropdown-*\` variables on \`document.body\` instead. The icon colour is set inline by the icon itself, so use the \`color\` and \`hoverColor\` props rather than a variable.`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The example opens the menu in a bordered box (\`displayIconBorder\`), so every variable is on screen at once; hover the dots to see \`--cmb-hover-border\`. The menu is kept inline (\`usePortal={false}\`): in a portal it leaves the wrapper, so set the \`--dropdown-*\` variables on \`document.body\` instead.`,
       },
       source: {
         code: `<div

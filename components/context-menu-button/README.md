@@ -194,22 +194,31 @@ export function MaybeActions({ canEdit }: { canEdit: boolean }) {
 
 ## CSS variables
 
-| Variable             | Default    | Effect                                  |
-| -------------------- | ---------- | --------------------------------------- |
-| `--cmb-size`         | `32px`     | Size of the bordered box                |
-| `--cmb-radius`       | `3px`      | Corner radius of that box               |
-| `--cmb-icon-padding` | `6px 7px`  | Padding between the border and the icon |
-| `--cmb-border`       | theme grey | Colour of the border                    |
-| `--cmb-hover-border` | theme grey | Colour of the border on hover           |
+| Variable             | Default               | Effect                                     |
+| -------------------- | --------------------- | ------------------------------------------ |
+| `--cmb-size`         | `32px`                | Width and height of the bordered box       |
+| `--cmb-radius`       | `3px`                 | Corner radius of that box                  |
+| `--cmb-icon-padding` | `6px 7px`             | Padding between the border and the icon    |
+| `--cmb-border`       | a theme grey, no line | Border of the box, as a `border` shorthand |
+| `--cmb-hover-border` | theme grey            | Colour of the border on hover              |
 
-The border is drawn only with `displayIconBorder`.
+All five apply only with `displayIconBorder`. The theme's value for `--cmb-border` is a colour
+with no width or style, so by default the box draws no line at all, and `--cmb-hover-border`
+shows nothing until `--cmb-border` supplies a style, as in `1px solid`.
+
+The menu is a [`DropDown`](../drop-down/README.md) and reads its own `--dropdown-*` variables.
+By default it is portalled to `document.body`, outside the wrapper, so set them there, or pass
+`usePortal={false}` to keep the menu inside the element that sets them. The icon colour is set
+inline by the icon itself; change it with `color`, `hoverColor` and `clickColor`, not with a
+variable.
 
 ## Accessibility
 
 - The icon is an [`IconButton`](../icon-button/README.md): a `<div>` with no role, no tab stop
-  and no Enter or Space activation, so the menu cannot be opened from the keyboard.
-- The wrapper carries `aria-disabled` but no `aria-haspopup` or `aria-expanded`, and the menu
-  is not linked to it.
+  and no Enter or Space activation, so the menu cannot be opened from the keyboard; a keyboard route to the same actions has
+  to come from the host.
+- The wrapper and the icon both carry `aria-disabled` while `isDisabled`, but there is no
+  `aria-haspopup` or `aria-expanded`, and the menu is not linked to the button.
 - The items are `role="option"` rows in a `role="listbox"`, which is not what a menu of actions
   is.
 - `title` renders the kit's hover tooltip, not an accessible name.
