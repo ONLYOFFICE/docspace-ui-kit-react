@@ -128,7 +128,8 @@ import { RoomIcon } from "@onlyoffice/apps-ui-kit/components/room-icon";
       },
     },
     model: {
-      control: "object",
+      // The icons are data URIs too long to edit, and they stretch the table.
+      control: false,
       description:
         "Entries of the logo menu, each with a label, an icon and a click handler; the upload entry is handed the hidden file input",
     },
