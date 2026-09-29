@@ -7,7 +7,7 @@ export type TileContentProps = {
   className?: string;
   /** Value of `id` on the outer element. */
   id?: string;
-  /** Called when the content area is clicked. It receives no argument, although the DOM event is what triggers it. */
+  /** Called on any click inside the content area. The type declares no parameter, but the handler is attached to the element as it is, so it receives the React mouse event. */
   onClick?: () => void;
   /** Inline style of the outer element. */
   style?: CSSProperties;

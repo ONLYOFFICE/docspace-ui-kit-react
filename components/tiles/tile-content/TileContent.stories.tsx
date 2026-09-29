@@ -22,39 +22,8 @@ const meta = {
   title: "UI/Tiles/TileContent",
   component: TileContent,
   parameters: {
-    docs: {
-      description: {
-        component: `The slot a tile puts its name in, so that every tile in the family lays its title out the same way.
-
-### Features
-
-- **Title Slot**: Holds the one element a tile shows as its name, in the row beside the icon
-- **Full Width**: Stretches across the space the tile leaves between its icon and its menu button
-- **Fixed Width**: Takes a fixed width from the child's own \`containerWidth\` prop, which the kit's \`Text\` and \`Link\` accept
-- **Single-Line Text On Tablets**: Keeps plain text in the slot on one line, cut off with an ellipsis, between 600px and 1023px; a link inside a tile still wraps to two lines there
-- **Title Font**: Sets 12px semibold text for anything inside that does not choose its own font
-- **Richer Titles**: Takes a wrapper of your own when the name needs something beside it, such as a badge
-- **Click Handler**: Calls \`onClick\` on any click inside the slot, with no argument
-
-### Usage
-
-\`\`\`tsx
-import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
-import { BaseTile } from "@onlyoffice/apps-ui-kit/components/tiles/base-tile";
-
-<BaseTile item={item} element={icon} topContent={
-  <TileContent>
-    <Link>Document.docx</Link>
-  </TileContent>
-} />
-
-// A title with a fixed width, read from the child's containerWidth
-<TileContent>
-  <Text containerWidth="120px" truncate>Quarterly report.docx</Text>
-</TileContent>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     children: {
@@ -218,18 +187,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-TileContent reads none of its own; the ones below belong to the BaseTile around it, set on a wrapper here. Hover the tile to see the hover background.
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--tile-bg\` | Tile background color | theme-based |
-| \`--tile-border-style\` | Tile border | theme-based |
-| \`--tile-radius\` | Tile border radius | \`12px\` |
-| \`--tile-hover-bg\` | Background while hovered, checked or active | theme-based |
-
-See **BaseTile**, **FileTile**, **FolderTile**, or **RoomTile** CSS Custom Properties stories for the full list.`,
+        story: `TileContent reads no variables of its own -- the tile's variables it sits in are listed under CSS variables on the BaseTile, FileTile, FolderTile and RoomTile pages. This example sets four of the BaseTile ones on a wrapper; hover the tile to see the hover background.`,
       },
     },
   },
