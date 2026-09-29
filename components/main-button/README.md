@@ -188,6 +188,10 @@ export function InviteMenu({ onInvite }: { onInvite: (role: string) => void }) {
   and on every `window` resize. There is no `ResizeObserver`: a button that changes width
   without the window changing keeps the previous menu width until the next resize. One item
   with a `description` switches that width to a `min-width` and lets the menu grow.
+- **`model` goes to the menu unchanged**, so an item takes everything a
+  [`ContextMenu`](../context-menu/README.md) item does: an `icon` of its own, `isSeparator` for
+  a divider between groups, and `items` for a sub-menu that an arrow on the item opens to the
+  side.
 - **The menu is a [`ContextMenu`](../context-menu/README.md) appended to `document.body`** and
   positioned `fixed` at the button's bottom inline-start corner, through a synthetic mouse
   event built from the button's rect. It is not inside the button's DOM subtree, so a parent's

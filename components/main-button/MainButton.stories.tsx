@@ -58,42 +58,8 @@ const meta = {
   title: "UI/Interactive elements/MainButton",
   component: MainButton,
   parameters: {
-    docs: {
-      description: {
-        component: `Main action button with an optional dropdown menu. Typically used as the primary call-to-action in a sidebar or toolbar.
-
-### Features
-
-- **Dropdown Menu**: Built-in dropdown with configurable menu items
-- **Nested Items**: Support for sub-menus within dropdown items
-- **Separators**: Visual dividers between menu item groups
-- **Icon Support**: Each menu item can have its own icon
-- **Disabled State**: Dims the button to 60% opacity and drops the click, so the menu does not open and no callback runs
-- **Action Callback**: Direct click handler when used without dropdown
-- **Item Descriptions**: Lays out items that carry a description on two lines and lets the menu grow wider than the button to fit them
-- **Hidden Arrow**: Leaves out the arrow beside the text while a click still opens the menu
-
-### Usage
-
-\`\`\`tsx
-import { MainButton } from "@onlyoffice/apps-ui-kit/components/main-button";
-
-// With dropdown menu
-<MainButton
-  text="Create new"
-  model={[
-    { key: 0, label: "New document", icon: FolderIcon },
-    { key: 1, label: "New folder", icon: FolderIcon },
-    { key: 2, isSeparator: true },
-    { key: 3, label: "Upload", icon: FolderIcon },
-  ]}
-/>
-
-// As a simple action button
-<MainButton text="Click Me" isDropdown={false} onAction={handleClick} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     text: {
@@ -459,20 +425,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--main-button-bg\` | Button background color | theme-based (accent) |
-| \`--main-button-color\` | Button text color | \`#ffffff\` |
-| \`--main-button-icon-color\` | Arrow fill color | \`#ffffff\` |
-| \`--main-button-radius\` | Border radius | \`3px\` |
-| \`--main-button-inner-padding\` | Button padding | \`5px 14px 5px 12px\` |
-| \`--main-button-text-size\` | Font size | \`16px\` |
-| \`--main-button-text-weight\` | Font weight | \`700\` |
-| \`--main-button-text-line-height\` | Line height | \`22px\` |
-
-The example sets every variable on a wrapper around one button; click it to see the menu keep the button's new width.`,
+        story: `Every overridable variable set on a wrapper around one button -- the variables are listed under CSS variables on this page. Click it to see the menu keep the button's new width.`,
       },
       source: {
         code: `<div
