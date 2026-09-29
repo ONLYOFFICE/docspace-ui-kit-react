@@ -87,3 +87,41 @@
     background: $dark-gray-light;
   }
 }
+
+.arrow {
+  display: block;
+  color: $light-status-warning;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 28px;
+
+  :global(.dark) & {
+    color: $dark-status-warning;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 16px;
+  margin-block-start: 16px;
+  font-size: 14px;
+
+  a {
+    color: var(--accent-main, #{$light-blue-main});
+    font-weight: 600;
+  }
+}
+
+.connect {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 3px;
+  background: var(--accent-main, #{$light-blue-main});
+  color: $white;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}

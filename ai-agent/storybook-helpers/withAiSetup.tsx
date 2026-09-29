@@ -7,6 +7,11 @@ import {
   PortalGateCard,
   usePortalConnection,
 } from "../../.storybook/decorators/PortalGate";
+import { DemoBanner } from "../../.storybook/decorators/DemoBanner";
+import {
+  DEMO_API_KEY,
+  DEMO_PORTAL_URL,
+} from "../../.storybook/mocks/demoPortal";
 
 import AiAgentProviders, { type AiServerApi } from "../providers";
 
@@ -33,23 +38,22 @@ export type AiChatStoryProviderProps = Omit<
 // `apiConfig` toolbar global, the same one `withApiProvider` hands every
 // other module, and the story waits for `getSelfProfile()` before mounting.
 //
-// One difference, on purpose. Billing has nothing to show without a portal;
-// the chat does -- `.storybook/ai-chat-mock.ts` answers `/api/2.0/ai` on the
-// dev server. So with no portal configured the chat mounts with no
-// `serverApi` and talks to its own origin.
-//
-// Only on the dev server, though. The mock is a Vite plugin with
-// `apply: "serve"`, so a static build -- the published Storybook,
-// `pnpm storybook-serve` -- has nothing answering that origin, and every init
-// call would 404. There the story shows the no-portal card instead.
-const HAS_AI_MOCK = import.meta.env.DEV;
+// With no portal selected the chat talks to the demo portal instead, which
+// the mock service worker plays (`.storybook/mocks/handlers/ai.ts`), under
+// the same "Demo data" banner `PortalGate` puts above every other module.
+// The worker runs in the static build too, so the published Storybook shows
+// a working chat rather than a card.
 const AiSetupGate = ({
+  title,
   apiConfig,
   storyId,
   args,
   providerProps,
   children,
 }: {
+  // What the gate card names while no portal is connected: the story's own
+  // sidebar entry, so the settings stories do not read "AI Chat".
+  title: string;
   apiConfig: string;
   storyId: string;
   args: AiSetupArgs;
@@ -66,40 +70,33 @@ const AiSetupGate = ({
 
   // `useMemo` only to keep the identity stable across renders;
   // AiAgentProviders compares the fields, not the object.
-  const serverApi = React.useMemo<AiServerApi | undefined>(
+  const serverApi = React.useMemo<AiServerApi>(
     () =>
       hasPortal
         ? {
             origin: url.replace(/\/+$/, ""),
             headers: { Authorization: `Bearer ${apiKey}` },
           }
-        : undefined,
+        : {
+            origin: DEMO_PORTAL_URL,
+            headers: { Authorization: `Bearer ${DEMO_API_KEY}` },
+          },
     [hasPortal, url, apiKey],
   );
-
-  if (!hasPortal && !HAS_AI_MOCK) {
-    return (
-      <PortalGateCard
-        title="AI Chat"
-        state="none"
-        description="The chat talks to the portal selected in the API Config. Its local mock runs only under pnpm storybook, not in a static build."
-      />
-    );
-  }
 
   if (connection !== "connected") {
     return (
       <PortalGateCard
-        title="AI Chat"
+        title={title}
         state={connection}
-        description="The chat talks to the portal selected in the API Config. Pick Default with an empty .env to use the local mock instead."
+        description={`${title} talks to the portal selected in the API Config. Pick Default with an empty .env to use the demo portal instead.`}
       />
     );
   }
 
   const { locale, canUseAi, isAvailable } = args;
 
-  return (
+  const chat = (
     <AiAgentProviders
       {...providerProps}
       // AiAgentProviders hydrates its stores on mount, so a changed arg, a
@@ -114,6 +111,15 @@ const AiSetupGate = ({
       {children}
     </AiAgentProviders>
   );
+
+  if (hasPortal) return chat;
+
+  return (
+    <>
+      <DemoBanner storyId={storyId} />
+      {chat}
+    </>
+  );
 };
 
 export const withAiSetup: Decorator = (Story, context) => {
@@ -121,6 +127,7 @@ export const withAiSetup: Decorator = (Story, context) => {
 
   return (
     <AiSetupGate
+      title={context.title.split("/").pop() ?? context.title}
       apiConfig={apiConfig}
       storyId={context.id}
       args={context.args as AiSetupArgs}

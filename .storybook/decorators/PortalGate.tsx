@@ -5,15 +5,19 @@ import { useApi } from "../../providers/api";
 import { DEFAULT_API_KEY, DEFAULT_API_URL } from "../globals";
 import { resolveApiConfig } from "../utils/apiProviders";
 
+import { DemoBanner, REGISTER_PORTAL_URL } from "./DemoBanner";
+import { CONNECT_PORTAL_EVENT } from "../addons/events";
+import { addons } from "storybook/preview-api";
+
 import styles from "./PortalGate.module.scss";
 
 export type PortalConnectionState = "checking" | "connected" | "failed";
 
 /**
  * Whether the `apiConfig` toolbar global names a portal at all. With none,
- * `withApiProvider` hands out clients whose base URL is empty, and every call
- * goes to Storybook's own origin and comes back 404 -- so a story that needs
- * a portal should not make a single one.
+ * `withApiProvider` points the clients at the demo portal, which the mock
+ * service worker plays (`.storybook/mocks`), and a story shows made-up data
+ * under a banner that says so.
  */
 export const hasPortalConfigured = (apiConfig: string | undefined): boolean => {
   const { url, apiKey } = resolveApiConfig(apiConfig, {
@@ -66,6 +70,8 @@ type PortalGateCardProps = {
   /** `"none"`: no portal is selected, so nothing was asked. */
   state: Exclude<PortalConnectionState, "connected"> | "none";
   description?: string;
+  /** Lets "Connect a portal" reopen this story on the canvas, where the toolbar is. */
+  storyId?: string;
 };
 
 /**
@@ -76,6 +82,7 @@ export const PortalGateCard = ({
   title,
   state,
   description = "A portal connection is required to load these components.",
+  storyId,
 }: PortalGateCardProps) => (
   <div className={styles.container}>
     <div className={styles.card}>
@@ -86,9 +93,27 @@ export const PortalGateCard = ({
         <>
           <p className={styles.description}>{description}</p>
           <p className={styles.notice}>
-            No portal is selected. Add one in the API Config toolbar to see this
-            story with real data.
+            <span className={styles.arrow} aria-hidden="true">
+              {"↑"}
+            </span>
+            No portal is selected. Add one in the toolbar above, with the API
+            Config menu that reads <b>Default</b>, to see this story with real
+            data.
           </p>
+          <div className={styles.actions}>
+            <button
+              type="button"
+              className={styles.connect}
+              onClick={() =>
+                addons.getChannel().emit(CONNECT_PORTAL_EVENT, { storyId })
+              }
+            >
+              Connect a portal
+            </button>
+            <a href={REGISTER_PORTAL_URL} target="_blank" rel="noreferrer">
+              Get a free portal
+            </a>
+          </div>
         </>
       ) : (
         <>
@@ -106,31 +131,59 @@ export const PortalGateCard = ({
   </div>
 );
 
-type PortalGateProps = {
+export type PortalGateOptions = {
+  /**
+   * Whether the module renders against the demo portal when none is
+   * selected. `false` for one the fixtures cannot stand in for -- the
+   * document editor needs a real Document Server -- which then shows the
+   * card instead.
+   * @default true
+   */
+  demo?: boolean;
+};
+
+type PortalGateProps = PortalGateOptions & {
   apiConfig: string | undefined;
   title: string;
   description?: string;
+  storyId?: string;
   children: React.ReactNode;
 };
 
 /**
- * Renders its children only against a portal that answered. With no portal
- * selected it shows the card straight away and makes no request -- the state
- * every story has to render in on the published Storybook, where no key is
- * baked in.
+ * Renders its children against a portal that answered. With no portal
+ * selected -- the state every story has to render in on the published
+ * Storybook, where no key is baked in -- it renders them against the demo
+ * portal under a banner saying the data is made up, or, with `demo: false`,
+ * shows the card and makes no request at all.
  */
 export const PortalGate = ({
   apiConfig,
   title,
   description,
+  storyId,
+  demo = true,
   children,
 }: PortalGateProps) => {
   const hasPortal = hasPortalConfigured(apiConfig);
   const connection = usePortalConnection(hasPortal);
 
   if (!hasPortal) {
+    if (demo && storyId) {
+      return (
+        <>
+          <DemoBanner storyId={storyId} />
+          {children}
+        </>
+      );
+    }
     return (
-      <PortalGateCard title={title} state="none" description={description} />
+      <PortalGateCard
+        title={title}
+        state="none"
+        description={description}
+        storyId={storyId}
+      />
     );
   }
 
@@ -153,12 +206,18 @@ export const PortalGate = ({
  * when the toolbar picks another portal, so the check runs again then.
  */
 export const withPortalGate =
-  (title: string, description?: string): Decorator =>
+  (
+    title: string,
+    description?: string,
+    options: PortalGateOptions = {},
+  ): Decorator =>
   (Story, context) => (
     <PortalGate
       apiConfig={context.globals.apiConfig}
       title={title}
       description={description}
+      storyId={context.id}
+      demo={options.demo}
     >
       <Story />
     </PortalGate>

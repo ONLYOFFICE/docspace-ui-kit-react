@@ -151,10 +151,11 @@ picked there (or `.env` filled in), every `/api/2.0/ai` request goes to that por
 runs as the key's owner — their threads, their models. The portal's AI service has to accept
 the Storybook origin, which it does once `core:cors` allows it.
 
-With nothing configured, the chat talks to `/api/2.0/ai` on the page's own origin. In local
-Storybook that is the dev server, which answers from `.storybook/ai-chat-mock.ts`: one mock
-model, threads kept in memory, and a streamed reply that echoes the prompt. Nothing reaches a
-model; `STORYBOOK_AI_MOCK=0` turns the mock off.
+With nothing configured, the chat talks to the demo portal instead, under a **Demo data**
+banner: a mock service worker answers it from `.storybook/mocks/`, in `pnpm storybook` and the
+static build alike. It has three made-up models, two past threads, and a streamed reply that
+echoes the prompt; everything is kept in memory until the page reloads, and nothing reaches a
+model. **Connect a portal** on the banner opens the API Config form.
 
 ## Properties
 

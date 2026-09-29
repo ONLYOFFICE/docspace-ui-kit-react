@@ -177,7 +177,9 @@ const meta: Meta<StoryArgs> = {
         </FileSelectorWrapper>
       );
     },
-    withPortalGate("Document editor"),
+    // The editor itself comes from the portal's Document Server, which no
+    // fixture can stand in for, so with no portal this keeps the card.
+    withPortalGate("Document editor", undefined, { demo: false }),
   ],
   argTypes: {
     id: {

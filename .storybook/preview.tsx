@@ -14,6 +14,7 @@ import { parseLocaleConstants } from "../utils/parse-locale-constants";
 import brandsData from "../test/fixtures/brands.json";
 import globalTypes from "./globals";
 import withApiProvider from "./decorators/withApiProvider";
+import { startDemoPortal } from "./mocks/worker";
 import enCommon from "../locales/en/Common.json";
 import enPayments from "../locales/en/Payments.json";
 import enSettings from "../locales/en/Settings.json";
@@ -129,15 +130,16 @@ const preview: Preview = {
           "Components",
           [
             // The portal's three top-level lists, in its sidebar's order.
+            "AI Chat",
+            "AI Settings",
             "Files",
             "Rooms",
             "Forms",
-            "AI Chat",
             "Billing",
-            "Document Editor",
             "Uploader",
-            "Providers",
+            "Document Editor",
             "Selectors",
+            "Providers",
             "Errors",
           ],
           "UI",
@@ -223,6 +225,16 @@ const preview: Preview = {
           </ThemeProviderComponent>
         </TranslationProvider>
       );
+    },
+  ],
+
+  // The demo portal has to be answering before the first story asks it
+  // anything; `startDemoPortal` starts the worker once and resolves at once
+  // after that.
+  loaders: [
+    async () => {
+      await startDemoPortal();
+      return {};
     },
   ],
 

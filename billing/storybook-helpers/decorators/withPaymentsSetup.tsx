@@ -37,6 +37,7 @@ export const withPaymentsSetup: Decorator = (Story, context) => {
                 apiConfig={context.globals.apiConfig}
                 title="Payments"
                 description="A portal connection is required to load payment components."
+                storyId={context.id}
               >
                 <BillingRoot config={config}>
                   <Story />
