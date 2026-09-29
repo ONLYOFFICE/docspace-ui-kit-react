@@ -1,4 +1,4 @@
-import { makeAutoObservable, observable } from "mobx";
+import { makeAutoObservable, observable, runInAction } from "mobx";
 import type { PaymentApi } from "@onlyoffice/docspace-api-sdk";
 import { toastr } from "../../components/toast";
 import type { TBalance } from "../types";
@@ -321,8 +321,10 @@ class ServicesStore {
 
       if (response == null) return;
 
-      this.freeBackupsUsed = response.free ?? 0;
-      this.paidBackupsUsed = response.paid ?? 0;
+      runInAction(() => {
+        this.freeBackupsUsed = response.free ?? 0;
+        this.paidBackupsUsed = response.paid ?? 0;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -507,8 +509,11 @@ class ServicesStore {
       console.error(error);
       toastr.error(t("Common:UnexpectedError"));
     } finally {
-      if (this.pendingServiceName === serviceName)
-        this.loadedServiceName = serviceName;
+      // After the awaits above, so outside this method's action.
+      runInAction(() => {
+        if (this.pendingServiceName === serviceName)
+          this.loadedServiceName = serviceName;
+      });
     }
   };
 

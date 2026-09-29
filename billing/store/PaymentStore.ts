@@ -803,7 +803,9 @@ class PaymentStore {
 
       if (!res?.data?.response) return;
 
-      this.balance = res.data.response as unknown as TBalance;
+      runInAction(() => {
+        this.balance = res.data.response as unknown as TBalance;
+      });
     } catch (e: unknown) {
       if (e instanceof Error && e.name === "CanceledError") return;
       throw e;
@@ -840,7 +842,10 @@ class PaymentStore {
         },
       );
 
-      this.serviceUsage = (data?.response?.collection ?? []) as TServiceUsage[];
+      runInAction(() => {
+        this.serviceUsage = (data?.response?.collection ??
+          []) as TServiceUsage[];
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -1077,9 +1082,11 @@ class PaymentStore {
       };
     });
 
-    this.servicesQuotasFeatures = new Map(
-      quotas.map((feature) => [feature.id ?? "", feature]),
-    ) as Map<string, TenantQuotaFeatureDto | TServiceFeatureWithPrice>;
+    runInAction(() => {
+      this.servicesQuotasFeatures = new Map(
+        quotas.map((feature) => [feature.id ?? "", feature]),
+      ) as Map<string, TenantQuotaFeatureDto | TServiceFeatureWithPrice>;
+    });
 
     return services;
   };
@@ -1716,9 +1723,11 @@ class PaymentStore {
         isOwner: boolean;
       };
 
-      this._currentUserEmail = user.email ?? "";
-      this.userId = user.id ?? "";
-      this.isOwner = user.isOwner ?? false;
+      runInAction(() => {
+        this._currentUserEmail = user.email ?? "";
+        this.userId = user.id ?? "";
+        this.isOwner = user.isOwner ?? false;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
