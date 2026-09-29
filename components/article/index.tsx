@@ -270,9 +270,14 @@ const Article = ({
             />
           ) : null}
           {articleBodyContent
-            ? React.cloneElement(articleBodyContent.props.children, {
-                hasCustomSlot: !!customSlot,
-              })
+            ? // `hasCustomSlot` is for a component child to read; a DOM element
+              // (`<nav>`) would only render it as an unknown attribute, which
+              // React warns about.
+              typeof articleBodyContent.props.children.type === "string"
+              ? articleBodyContent.props.children
+              : React.cloneElement(articleBodyContent.props.children, {
+                  hasCustomSlot: !!customSlot,
+                })
             : null}
           {!showArticleLoader ? (
             <>
