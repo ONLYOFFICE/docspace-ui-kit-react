@@ -26,56 +26,8 @@ const meta = {
   title: "UI/Layout components/EmptyView",
   component: EmptyView,
   parameters: {
-    docs: {
-      description: {
-        component: `Empty state component with customizable icon, title, description, and action options for guiding users when no content is available.
-
-### Features
-
-- **Icon Display**: Customizable SVG icon for the empty state illustration
-- **Action Options**: Lists what the user can do next as links, suggestion cards, buttons or text actions, in the order given
-- **Router Integration**: Renders link options through the application's own router link, or as plain action links that only run their handler when none is given
-- **Context Menu**: A suggestion card with a menu model opens that menu on click instead of running its handler
-- **Suggestion Cards**: Item options show an icon, a title, a description and an arrow, and a disabled one is left out entirely
-- **Separators**: Separator options put a short line of text, such as "or", between two options
-- **Extra Content**: Any custom content can be placed between the header and the options
-- **Self-Positioning**: Centres itself in the region it fills, at most 480px wide, with the gaps between its parts built in
-
-### Accessibility
-
-Only suggestion cards and text actions get roles of their own; buttons and links are native elements.
-
-- **Suggestion cards**: Each is a \`role="button"\` with \`tabIndex={0}\` and an \`aria-label\` of its title, so it is in the Tab order and announced by its title; Enter and Space do not activate it
-- **Text actions**: Each is a \`role="button"\` with \`tabIndex={0}\`, named by its own text; Enter and Space do not activate it either
-- **Buttons**: Button options are native \`<button>\` elements, activated by Enter and Space
-- **Headings**: The title renders as an \`<h3>\`, so screen-reader users can jump to the empty state by heading
-
-### Usage
-
-\`\`\`tsx
-import { EmptyView } from "@onlyoffice/apps-ui-kit/components/empty-view";
-
-// With link options
-<EmptyView
-  icon={<EmptyIcon />}
-  title="Empty Folder"
-  description="This folder is empty. Add files to get started."
-  options={[
-    { key: "upload", icon: <UploadIcon />, to: "/upload", description: "Upload files" },
-  ]}
-  LinkRouter={RouterLink}
-/>
-
-// Without options
-<EmptyView
-  icon={<SearchIcon />}
-  title="No Results"
-  description="No files matching your search criteria."
-  options={null}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     title: {
@@ -540,33 +492,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--empty-view-title-color\` | Title text color | theme-based |
-| \`--empty-view-header-font-size\` | Title font size | \`16px\` |
-| \`--empty-view-desc-color\` | Description text color | theme-based |
-| \`--empty-view-link-accent\` | Link text color, and the icon's where its shapes sit in a \`<g>\`; ignored wherever the host page defines \`--accent-main\`, which then colours the links instead | theme-based |
-| \`--empty-view-link-background\` | Link background | theme-based |
-| \`--empty-view-link-hover-background\` | Link background under the pointer | theme-based |
-| \`--empty-view-link-radius\` | Link corner radius | \`6px\` |
-| \`--empty-view-link-padding\` | Padding inside a link | \`6px 10px\` |
-| \`--empty-view-link-text-size\` | Link font size | \`13px\` |
-| \`--empty-view-link-text-weight\` | Link font weight | \`600\` |
-| \`--empty-view-item-radius\` | Suggestion card corner radius | \`6px\` |
-| \`--empty-view-item-padding\` | Padding inside a suggestion card | \`12px 16px\` |
-| \`--empty-view-item-gap\` | Gap between a card's icon, text and arrow | \`20px\` |
-| \`--empty-view-icon-size\` | Suggestion card icon size | \`36px\` |
-| \`--empty-view-item-hover-background\` | Suggestion card background under the pointer | theme-based |
-| \`--empty-view-item-title-color\` | Suggestion card title color | theme-based |
-| \`--empty-view-item-desc-color\` | Suggestion card description color | theme-based |
-| \`--empty-view-divider-color\` | Separator text color | theme-based |
-| \`--empty-view-width\` | Maximum width of the whole block | \`480px\` |
-| \`--empty-view-gap\` | Gap between the header, the extra content and the options | \`18px\` |
-| \`--empty-view-padding-top\` | Space above the illustration; on mobile it is always 40px | \`61px\` |
-
-One instance shows every variable: two links, a separator and a suggestion card. Hover a link and the card to see the hover backgrounds.`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The instance holds two links, a separator and a suggestion card. Hover a link and the card to see the hover backgrounds.`,
       },
       source: {
         code: `<div
