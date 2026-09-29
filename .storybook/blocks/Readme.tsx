@@ -9,8 +9,10 @@ import { Markdown, useOf } from "@storybook/addon-docs/blocks";
 // The README is cut in two around `## Minimal example`: the intro (purpose,
 // when to use, import) goes above the primary story, the reference sections
 // (examples, recipes, behaviour, CSS variables, accessibility, test ids)
-// below the stories. `## Props` is left out entirely -- the Controls table
-// is the live version of it.
+// below the stories. `## Props` is left out when the Controls table already
+// shows the same JSDoc; react-docgen-typescript finds nothing behind a HOC or
+// a default export (DragAndDrop, NavMenu, Navigation, Section, Tag), and
+// there the README's generated table is the only one the page has.
 
 const readmes = import.meta.glob<string>(
   ["../../components/**/README.md", "../../providers/**/README.md"],
@@ -69,12 +71,13 @@ const prepare = (
   raw: string,
   folder: string,
   ids: Record<string, IndexEntry>,
+  keepProps: boolean,
 ) => {
   let text = raw
     .replace(/^<!-- ui-kit-doc[\s\S]*?-->\s*/, "")
     .replace(/^# .*\n/, "");
 
-  text = stripSection(text, "Props");
+  if (!keepProps) text = stripSection(text, "Props");
 
   // `../slider/README.md` -> the Slider page; a link nothing resolves stays
   // a link, so a reader still sees where it meant to go.
@@ -103,6 +106,13 @@ const useReadme = () => {
     resolved.type === "meta"
       ? (resolved.preparedMeta.parameters?.fileName as string | undefined)
       : undefined;
+  const component =
+    resolved.type === "meta"
+      ? (resolved.preparedMeta.component as
+          { __docgenInfo?: { props?: Record<string, unknown> } } | undefined)
+      : undefined;
+  const hasDocgen =
+    Object.keys(component?.__docgenInfo?.props ?? {}).length > 0;
   const key = useMemo(
     () => (fileName ? readmeKeyFor(fileName) : undefined),
     [fileName],
@@ -120,6 +130,7 @@ const useReadme = () => {
             raw,
             key.replace(/^\.\.\/\.\.\//, "").replace(/\/README\.md$/, ""),
             ids,
+            !hasDocgen,
           ),
         );
     });
@@ -127,7 +138,7 @@ const useReadme = () => {
     return () => {
       live = false;
     };
-  }, [key, fileName]);
+  }, [key, fileName, hasDocgen]);
 
   return { hasReadme: key !== undefined, parts };
 };
