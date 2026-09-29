@@ -92,7 +92,8 @@ still true, and all still unenforced.
 
 ## Stories and tests
 
-- Every component needs a story. `theme-provider` is the only one without; the file may sit in
+- Every component needs a story, and every folder has one — `theme-provider` was the last to
+  get it. The file may sit in
   a subdirectory (`table`, `rows`, `tiles` do), so search recursively before concluding one is
   missing.
 - **`STORY_TEMPLATE.md` governs stories, and it is the only file that does.** It no longer
