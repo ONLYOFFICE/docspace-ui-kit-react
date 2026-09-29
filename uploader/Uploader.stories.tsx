@@ -7,6 +7,7 @@ import type { UploaderProps } from "./Uploader.types";
 import { Toast } from "../components/toast";
 
 import { useApi } from "../providers/api";
+import { withPortalGate } from "../.storybook/decorators/PortalGate";
 import FilesSelector from "../selectors/Files";
 import type { TBreadCrumb } from "../components/selector/Selector.types";
 import { DeviceType } from "../enums";
@@ -128,6 +129,7 @@ const meta: Meta<StoryArgs> = {
         <Toast />
       </>
     ),
+    withPortalGate("Uploader"),
   ],
   argTypes: {
     width: {

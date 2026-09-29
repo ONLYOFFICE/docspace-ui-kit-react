@@ -41,8 +41,10 @@ const config: StorybookConfig = {
   // `public/` is served at the root, next to iframe.html, for pages a story
   // needs a real URL for -- today the OAuth redirect URI of the legal-practice
   // samples, `oauth-callback.html`, and the `serve.json` that keeps
-  // `pnpm storybook-serve` from rewriting it. Resolved relative to the
-  // preview, so it works under a path prefix as well.
+  // `pnpm storybook-serve` from rewriting it, serves index.html at `/` and
+  // marks HTML and JSON `no-cache` -- otherwise a browser keeps showing the
+  // previous build after a rebuild. Resolved relative to the preview, so it
+  // works under a path prefix as well.
   staticDirs: [
     { from: "../assets", to: "/static" },
     { from: "./public", to: "/" },

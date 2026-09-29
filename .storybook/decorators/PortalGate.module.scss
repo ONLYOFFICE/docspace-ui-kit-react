@@ -71,3 +71,19 @@
   font-size: 14px;
   color: var(--text-secondary, #{$gray-text});
 }
+
+.notice {
+  font-size: 14px;
+  color: var(--text-color, #{$black});
+  padding: 12px;
+  background: $gray-light;
+  border-radius: 8px;
+  width: 100%;
+  text-align: center;
+  line-height: 1.5;
+
+  :global(.dark) & {
+    color: var(--text-color, #{$white});
+    background: $dark-gray-light;
+  }
+}

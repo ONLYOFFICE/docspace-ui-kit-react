@@ -36,8 +36,13 @@ export type AiChatStoryProviderProps = Omit<
 // One difference, on purpose. Billing has nothing to show without a portal;
 // the chat does -- `.storybook/ai-chat-mock.ts` answers `/api/2.0/ai` on the
 // dev server. So with no portal configured the chat mounts with no
-// `serverApi` and talks to its own origin, which keeps the stories rendering
-// in CI and on the published Storybook, where no key is ever baked in.
+// `serverApi` and talks to its own origin.
+//
+// Only on the dev server, though. The mock is a Vite plugin with
+// `apply: "serve"`, so a static build -- the published Storybook,
+// `pnpm storybook-serve` -- has nothing answering that origin, and every init
+// call would 404. There the story shows the no-portal card instead.
+const HAS_AI_MOCK = import.meta.env.DEV;
 const AiSetupGate = ({
   apiConfig,
   storyId,
@@ -71,6 +76,16 @@ const AiSetupGate = ({
         : undefined,
     [hasPortal, url, apiKey],
   );
+
+  if (!hasPortal && !HAS_AI_MOCK) {
+    return (
+      <PortalGateCard
+        title="AI Chat"
+        state="none"
+        description="The chat talks to the portal selected in the API Config. Its local mock runs only under pnpm storybook, not in a static build."
+      />
+    );
+  }
 
   if (connection !== "connected") {
     return (

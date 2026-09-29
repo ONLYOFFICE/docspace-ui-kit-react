@@ -7,6 +7,8 @@ import PeopleSelector from ".";
 import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import type { TAccessRight, TSelectorItem } from "../../components/selector";
 
+import { withPortalGate } from "../../.storybook/decorators/PortalGate";
+
 type StoryArgs = {
   // Layout
   id?: string;
@@ -74,6 +76,7 @@ type StoryArgs = {
 
 const meta: Meta<StoryArgs> = {
   title: "Components/Selectors/PeopleSelector",
+  decorators: [withPortalGate("People selector")],
   tags: ["!autodocs"],
   parameters: {
     docs: {

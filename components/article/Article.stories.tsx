@@ -1,11 +1,10 @@
-import React from "react";
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import { useArgs } from "storybook/preview-api";
 import { fn } from "storybook/test";
 
-import LightSmallLogoUrl from "../../assets/logo/lightsmall.svg?url";
+import withBundledLogos from "../../.storybook/decorators/withBundledLogos";
 import {
   DeviceType,
   EmployeeActivationStatus,
@@ -24,27 +23,7 @@ const meta = {
     // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
     // there is no second description to keep in step with it.
   },
-  decorators: [
-    // No portal serves logo.ashx here; swap every logo for a bundled one.
-    (Story) => {
-      React.useEffect(() => {
-        const replaceLogos = () => {
-          const images = document.querySelectorAll('img[src*="logo.ashx"]');
-          images.forEach((img) => {
-            (img as HTMLImageElement).src = LightSmallLogoUrl;
-          });
-        };
-
-        replaceLogos();
-        const observer = new MutationObserver(replaceLogos);
-        observer.observe(document.body, { childList: true, subtree: true });
-
-        return () => observer.disconnect();
-      }, []);
-
-      return <Story />;
-    },
-  ],
+  decorators: [withBundledLogos],
   argTypes: {
     showText: {
       control: "boolean",

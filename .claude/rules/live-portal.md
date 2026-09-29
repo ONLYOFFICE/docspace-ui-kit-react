@@ -204,3 +204,7 @@ createFileJsonElement: { title } })` makes an office document through the docume
   reader who has never seen a DocSpace all run these pages. A screen that talks to a portal
   carries demo data behind the same shape and an explicit "not connected" state; a screen that
   throws or hangs on a missing portal is a broken page, not a strict one.
+  A module with no demo data of its own — the selectors, `uploader`, `document-editor`, billing —
+  takes `withPortalGate(title)` (or `<PortalGate>`) from `.storybook/decorators/PortalGate.tsx`:
+  with no portal selected it shows that state and sends nothing, since `withApiProvider`'s empty
+  base URL would otherwise send every call to Storybook's own origin for a 404 and a toast.

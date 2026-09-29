@@ -17,6 +17,8 @@ import type {
   FileEntryDtoIntegerAllOfSecurity,
 } from "./FilesSelector.types";
 
+import { withPortalGate } from "../../.storybook/decorators/PortalGate";
+
 type StoryArgs = {
   // Panel
   isPanelVisible: boolean;
@@ -72,6 +74,7 @@ type StoryArgs = {
 
 const meta: Meta<StoryArgs> = {
   title: "Components/Selectors/FilesSelector",
+  decorators: [withPortalGate("Files selector")],
   tags: ["!autodocs"],
   argTypes: {
     // Panel
