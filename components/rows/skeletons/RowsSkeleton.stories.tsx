@@ -12,36 +12,8 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `Placeholder in the shape of a list of rows, shown while the rows themselves are loading.
-
-### Features
-
-- **Row Placeholders**: Draws the number of placeholder rows it is given, twenty-five unless told otherwise
-- **Row Shape**: Gives every row a square for the start element, a bar for the title and a small square for the three-dot button
-- **Second Line On Smaller Screens**: Adds a shorter bar under the title below the desktop breakpoint, where a row shows its details line
-- **Round Start Element**: Lets a single \`RowSkeleton\` draw a circle in place of the square, for a list of avatars
-- **Sweeping Band**: Moves a light band across every shape at the speed and in the colours given, or keeps the shapes still
-- **Shared Row Styling**: Hands the same class and inline style to every row it draws
-
-### Accessibility
-
-Each shape is an SVG exposed to assistive technology as an image:
-
-- **Role**: Every shape carries \`role="img"\`, so a screen reader meets three images per row
-- **Name**: \`title\` names every shape through an SVG \`<title>\`; without one the images have no name and nothing is announced
-- **Busy State**: The list sets no \`aria-busy\`; mark the loading region with it yourself
-
-### Usage
-
-\`\`\`tsx
-import { RowsSkeleton } from "@onlyoffice/apps-ui-kit/components/rows";
-
-// While the first page of rows is loading
-{isLoading ? <RowsSkeleton count={10} /> : <RowContainer>{rows}</RowContainer>}
-
-// A still placeholder, for a reader who asked for less motion
-<RowsSkeleton count={5} animate={false} />
-\`\`\``,
+        component:
+          "Placeholder in the shape of a list of rows, shown while the rows themselves are loading. The Rows page describes it in full.",
       },
     },
   },
