@@ -31,46 +31,8 @@ const meta = {
   title: "UI/Overlays/AvatarEditorDialog",
   component: AvatarEditorDialog,
   parameters: {
-    docs: {
-      description: {
-        component: `Modal that frames an uploaded picture: the image editor's crop window between a title and a save and cancel pair.
-
-### Features
-
-- **Crop and zoom**: Lets the user drag the picture inside the crop window and zoom it, reporting every change through \`onChangeImage\` for the caller to store
-- **Crop window shape**: Rounds the corners of the crop window by a radius measured on the editor's 648px canvas, from a hard square at 0 to a circle at 324
-- **Replace picture**: Offers a "Choose another" control that opens the file picker and hands its change event to \`onChangeFile\`
-- **Save with preview**: Passes the cropped image and a \`data:\` URL preview of it to \`onSave\`, and leaves closing the dialog to the caller
-- **Reset on close**: Resets the image to an empty, centred, unzoomed one before calling \`onClose\`, whether the user cancels, clicks the header cross, presses Escape or clicks the backdrop
-- **Loading state**: Shows a spinner on the save button and disables the editor and the cancel button while an upload is in flight
-- **Short screens**: Fixes the body height and turns on its scrollbar when the window is shorter than the dialog
-- **No size check**: \`maxImageSize\` is deprecated and has no effect; limit or compress the file in \`onChangeFile\`
-
-### Usage
-
-\`\`\`tsx
-import { AvatarEditorDialog } from "@onlyoffice/apps-ui-kit/components/avatar-editor-dialog";
-
-// Controlled: the caller owns visible and image, and closes the dialog itself
-<AvatarEditorDialog
-  t={t}
-  visible={visible}
-  title="Change photo"
-  image={image}
-  onChangeImage={setImage}
-  onChangeFile={handleChangeFile}
-  onClose={() => setVisible(false)}
-  onSave={(cropped, preview) => upload(preview).then(() => setVisible(false))}
-/>
-
-// Uploading: spinner on save, editor and cancel disabled
-<AvatarEditorDialog {...props} isLoading />
-
-// Square crop window for a logo
-<AvatarEditorDialog {...props} editorBorderRadius={0} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     t: {
