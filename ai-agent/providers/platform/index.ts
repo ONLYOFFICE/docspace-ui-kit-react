@@ -27,6 +27,8 @@
 import type { ExportFormat, PlatformAdapter } from "@onlyoffice/ai-chat";
 import { useEffect, useMemo, useRef, useState, useEffectEvent } from "react";
 
+import { toastr } from "../../../components/toast";
+
 import { PORTAL_BASE_THEME_ID, PORTAL_DARK_THEME_ID } from "../themes";
 
 type EnvChangeInfo = { theme?: string; lang?: string };
@@ -51,6 +53,10 @@ const EMPTY_FORMATS: ExportFormat[] = [];
 
 const themeIdForSystem = (t: "light" | "dark") =>
   t === "dark" ? PORTAL_DARK_THEME_ID : PORTAL_BASE_THEME_ID;
+
+const showHostToast = (text: string) => {
+  toastr.success(text);
+};
 
 export type SaveAsFileHandler = (
   content: string,
@@ -147,6 +153,7 @@ export const usePlatformAdapter = ({
       customServersExecutedByHost: true,
       hostTools: null,
       clouds: null,
+      showToast: showHostToast,
       env: {
         theme: theme ?? themeIdForSystem(getSystemTheme()),
         systemTheme,
@@ -189,3 +196,4 @@ export const usePlatformAdapter = ({
 
   return adapter;
 };
+

@@ -38,6 +38,7 @@ import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 
 import { Scrollbar } from "./Scrollbar";
+import { Scrollbar as CustomScrollbar } from "./custom-scrollbar";
 import styles from "./Scrollbar.module.scss";
 
 vi.useFakeTimers();
@@ -117,5 +118,57 @@ describe("<Scrollbar />", () => {
     const scrollbar = screen.getByTestId("scrollbar");
 
     expect(scrollbar).toHaveClass(styles.fixedSize);
+  });
+
+  describe("mouse wheel over the track", () => {
+    const makeScrollable = (el: HTMLElement) => {
+      let top = 0;
+      Object.defineProperty(el, "scrollTop", {
+        configurable: true,
+        get: () => top,
+        set: (v: number) => {
+          top = v;
+        },
+      });
+    };
+
+    it("scrolls the content when the wheel is used over the vertical track", () => {
+      const { container } = render(
+        <Scrollbar>
+          <div style={{ height: "2000px" }}>Content</div>
+        </Scrollbar>,
+      );
+
+      const scroller = screen.getByTestId("scroller");
+      makeScrollable(scroller);
+
+      const trackY = container.querySelector(".ScrollbarsCustom-TrackY");
+      fireEvent.wheel(trackY as Element, { deltaY: 120 });
+
+      expect(scroller.scrollTop).toBe(120);
+    });
+
+    it("does not scroll when track wheel scrolling is disabled", () => {
+      const { container } = render(
+        <CustomScrollbar
+          disableTrackYMousewheelScrolling
+          scrollerProps={{
+            renderer: ({ elementRef, ...rest }) => (
+              <div {...rest} ref={elementRef} data-testid="scroller" />
+            ),
+          }}
+        >
+          <div style={{ height: "2000px" }}>Content</div>
+        </CustomScrollbar>,
+      );
+
+      const scroller = screen.getByTestId("scroller");
+      makeScrollable(scroller);
+
+      const trackY = container.querySelector(".ScrollbarsCustom-TrackY");
+      fireEvent.wheel(trackY as Element, { deltaY: 120 });
+
+      expect(scroller.scrollTop).toBe(0);
+    });
   });
 });
