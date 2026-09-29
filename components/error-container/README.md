@@ -154,6 +154,8 @@ export function ExpiredLinkPage() {
   `data-testid` you pass is spread onto the element before that attribute is written.
 - **The illustration has no dark variant.** Every colour in it is a hard-coded hex value — the
   pale blue sky and the white clouds stay as they are on a black page.
+- **The landscape assembles itself on mount.** For the first second the mountains, birds and
+  clouds slide into place from off their positions and fade in, and the balloon drops in.
 - **Two clouds and the balloon animate forever**, on a 1s alternating loop, and nothing wraps
   them in a `prefers-reduced-motion` query. There is no prop to stop it.
 - **The heading is 23px, not the 28px its preset would give.** The component asks `Heading` for
@@ -163,6 +165,10 @@ export function ExpiredLinkPage() {
 - **`--error-container-link` does nothing.** The class that reads the link colour is defined in
   the stylesheet but is never put on any element the component renders, and it reads the internal
   variable rather than the overridable one.
+- **Each text line is rendered only when its string is non-empty.** An empty `headerText`,
+  `bodyText` or `customizedBodyText` leaves no element and no gap behind.
+- **Below 1024px the page tightens:** the top padding drops from 100px to 80px, the margins
+  around the illustration shrink, and the button stretches to the full width.
 - **The element's own margin is `0 auto 8px 0`** — automatic on the trailing side only, so the
   page is not centred by that rule; the centring comes from the column layout inside it.
 

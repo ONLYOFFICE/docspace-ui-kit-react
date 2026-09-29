@@ -7,42 +7,8 @@ const meta = {
   title: "UI/Layout components/ErrorContainer",
   component: ErrorContainer,
   parameters: {
-    docs: {
-      description: {
-        component: `A full-page error display component with animated decorative SVGs, portal logo, and customizable error messaging.
-
-### Features
-
-- **Animated Background**: Decorative SVG elements with CSS animations (birds, clouds, mountains, balloon)
-- **Message Lines**: Shows a centred heading, an explanation line and an optional third line in the muted colour, each only when its text is set
-- **Action Button**: Adds one full-width recovery button, filled or outlined, once both its label and its click handler are set
-- **Editor Mode**: Lays the page over its host at full width instead of taking a place in the page flow
-- **Portal Logo**: Shows the portal logo above the illustration unless it is hidden
-- **Extra Content**: Renders any children last, below the button, for a support link or a details block
-- **Full-Screen Page**: Fills the whole viewport height and scrolls within itself when the content is taller
-- **Responsive Layout**: Stretches the button to the full width and tightens the spacing on screens narrower than 1024px
-
-### Usage
-
-\`\`\`tsx
-import { ErrorContainer } from "@onlyoffice/apps-ui-kit/components/error-container";
-
-// Basic error page
-<ErrorContainer
-  headerText="Something went wrong"
-  bodyText="Please try again later"
-/>
-
-// With retry button
-<ErrorContainer
-  headerText="Server Error"
-  bodyText="An error occurred while processing your request"
-  buttonText="Retry"
-  onClickButton={handleRetry}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     headerText: {
@@ -331,14 +297,7 @@ export const CssCustomization = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--error-container-bg\` | Background of the page | white; black in the dark theme |
-| \`--error-container-text\` | Colour of the \`customizedBodyText\` line | theme-based |
-
-The heading, \`bodyText\` and the button take their colours from Heading, Text and Button.`,
+        story: `Both overridable variables set on one wrapper -- the variables are listed under CSS variables on this page. The example tints the page background and the \`customizedBodyText\` line.`,
       },
       source: {
         code: `<div
