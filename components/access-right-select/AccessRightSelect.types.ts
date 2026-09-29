@@ -57,7 +57,12 @@ export type AccessRightSelectProps = PropsFromCombobox & {
   modernView?: boolean;
   /** Passed straight to `ComboBox`: whether the arrow icon is recoloured. */
   fillIcon?: boolean;
-  /** Passed straight to `ComboBox`: whether the drop-down renders in place rather than in a portal. */
+  /**
+   * Passed straight to `ComboBox`: renders the open list in a portal at the end of the page,
+   * positioned against the button; `false` renders it in place, next to the button, where a
+   * wrapper's CSS variables reach it.
+   * @default true
+   */
   isDefaultMode?: boolean;
   /** Passed straight to `ComboBox`: URL of an icon to show instead of the arrow. */
   comboIcon?: string;
