@@ -57,7 +57,9 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
   <LoadersContextProvider>{children}</LoadersContextProvider>
 );
 
-const setup = () =>
+const setup = (
+  props: Partial<Parameters<typeof useAgentsHelper>[0]> = {},
+) =>
   renderHook(
     () => ({
       loaders: use(LoadersContext),
@@ -70,10 +72,45 @@ const setup = () =>
         setBreadCrumbs: vi.fn(),
         setIsRoot: vi.fn(),
         subscribe: vi.fn(),
+        ...props,
       }),
     }),
     { wrapper },
   );
+
+const agent = (id: number, security: Record<string, boolean>) => ({
+  id,
+  title: `agent${id}`,
+  security,
+});
+
+const loadAgents = async (disableBySecurity: string) => {
+  mocks.request.mockResolvedValueOnce({
+    response: {
+      folders: [
+        agent(1, { Read: true, UseChat: true }),
+        agent(2, { Read: true, UseChat: false }),
+      ],
+      total: 2,
+      count: 2,
+      current: {},
+      pathParts: [],
+    },
+  });
+
+  const setItems = vi.fn();
+  const { result } = setup({ setItems, disableBySecurity });
+
+  await act(async () => {
+    await result.current.agents.getAgentList(0);
+  });
+
+  const items = setItems.mock.calls[0][0] as {
+    id: number;
+    isDisabled?: boolean;
+  }[];
+  return Object.fromEntries(items.map((i) => [i.id, !!i.isDisabled]));
+};
 
 describe("useAgentsHelper", () => {
   beforeEach(() => {
@@ -124,5 +161,14 @@ describe("useAgentsHelper", () => {
     });
 
     expect(mocks.request).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps agents open for a file-only right such as AskAi", async () => {
+    // The chat attach picker gates files by AskAi; folders never carry it.
+    expect(await loadAgents("AskAi")).toEqual({ 1: false, 2: false });
+  });
+
+  it("disables agents that are denied an agent-level right", async () => {
+    expect(await loadAgents("UseChat")).toEqual({ 1: false, 2: true });
   });
 });
