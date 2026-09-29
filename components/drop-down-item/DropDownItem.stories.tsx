@@ -11,49 +11,8 @@ const meta = {
   title: "UI/Overlays/DropDownItem",
   component: DropDownItem,
   parameters: {
-    docs: {
-      description: {
-        component: `A versatile dropdown item component used inside DropDown menus.
-
-### Features
-
-- **Multiple Modes**: Renders as a regular item, a section header with an optional back arrow, a separator line or a submenu entry with a trailing arrow
-- **Icon Support**: Display icons alongside text labels
-- **Toggle Switch**: Built-in toggle switch for boolean options
-- **Trailing Content**: Places a beta or paid badge, an external-link icon or any custom element at the end of the row
-- **Description**: Adds an always-visible second line under the label that explains what choosing the item means
-- **Selected State**: Highlights the item with \`isActive\`, while \`isSelected\` marks it as the current choice for assistive technology and sends a repeat click to \`onClickSelectedItem\`
-- **Disabled State**: Greys the item out and stops \`onClick\`, with an explaining tooltip on touch devices
-- **Text Overflow**: Cuts a long label off with an ellipsis when \`textOverflow\` or \`truncateText\` is set
-
-### Accessibility
-
-The item announces itself as one option of the enclosing list and leaves keyboard handling to that list:
-
-- **Role**: Carries \`role="option"\`, or \`role="separator"\` for a separator, so inside \`DropDown\` (a \`listbox\`) each item is read as one of its choices
-- **Selection**: \`aria-selected\` follows \`isSelected\`, so the current choice is announced as selected
-- **Disabled**: \`aria-disabled\` follows \`disabled\`, so the item is announced as unavailable while it stays in the list
-- **Focus**: A \`tabIndex\` of -1 keeps the item out of the Tab order; the enclosing menu moves the keyboard highlight and shows it on the item through \`isActiveDescendant\`
-
-### Usage
-
-\`\`\`tsx
-import { DropDownItem } from "@onlyoffice/apps-ui-kit/components/drop-down-item";
-
-// Regular item with icon
-<DropDownItem label="Settings" icon={SettingsIcon} onClick={handleClick} />
-
-// Header
-<DropDownItem isHeader label="Section Title" />
-
-// Separator
-<DropDownItem isSeparator />
-
-// With toggle
-<DropDownItem label="Enable Feature" withToggle checked={isEnabled} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     label: {
@@ -745,23 +704,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--drop-down-item-color\` | Label text color | theme-based |
-| \`--drop-down-item-icon-fill\` | Icon color while \`fillIcon\` is on, disabled items included | theme-based |
-| \`--drop-down-item-hover-bg\` | Background under the pointer, while pressed and on the keyboard-highlighted item | theme-based |
-| \`--drop-down-item-divider\` | Separator line and the line under a header | theme-based |
-| \`--drop-down-item-disabled-color\` | Label text color of a disabled item | theme-based |
-| \`--drop-down-item-height\` | Item line height; on a tablet-width window it is \`36px\` regardless | \`32px\` |
-| \`--drop-down-item-font-size\` | Item font size | \`13px\` |
-| \`--drop-down-item-font-weight\` | Item and header font weight | \`600\` |
-| \`--drop-down-item-padding\` | Item padding; on a tablet-width window it is \`0 16px\` regardless | \`0 12px\` |
-| \`--drop-down-item-header-height\` | Header item height | \`48px\` |
-| \`--drop-down-item-header-font-size\` | Header font size | \`15px\` |
-
-The wrapper around the \`DropDown\` sets every variable: **Header** shows the header height, font size and the line under it, **Custom Item** and **Another Item** the text and icon colors, row height, font and padding — hover them for the hover background — the separator its color, and **Disabled Item** the disabled text color (\`showDisabledItems\` keeps it in the list).`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. **Header** shows the header height, font size and the line under it, **Custom Item** and **Another Item** the text and icon colors, row height, font and padding — hover them for the hover background — the separator its color, and **Disabled Item** the disabled text color (\`showDisabledItems\` keeps it in the list).`,
       },
     },
   },
