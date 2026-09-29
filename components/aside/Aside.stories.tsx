@@ -22,6 +22,15 @@ const meta = {
     // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
     // there is no second description to keep in step with it.
     layout: "fullscreen",
+    // Every story framed on Docs. Inline, the scene's `100vh` is the whole
+    // Docs window, and Storybook's zoom wrapper carries a transform, which
+    // makes the panel's `position: fixed` relative to the story block: the
+    // closed panel, moved off to the right, then widens the block and it
+    // scrolls sideways. In its own frame the panel is fixed to that frame.
+    docs: { story: { inline: false, height: "600px" } },
+    // The scene pads itself; the preview's own 20px would push it past the
+    // bottom of the frame.
+    noPadding: true,
   },
   argTypes: {
     visible: {
@@ -136,6 +145,8 @@ type Story = StoryObj<ComponentProps<typeof Aside>>;
 export default meta;
 
 const pageStyles: React.CSSProperties = {
+  // Exactly one window tall, padding included.
+  boxSizing: "border-box",
   height: "100vh",
   padding: "32px",
   display: "flex",
