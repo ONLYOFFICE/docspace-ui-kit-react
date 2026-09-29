@@ -4,15 +4,17 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import VerticalDotsReactSvgUrl from "../../assets/icons/16/vertical-dots.react.svg?url";
 
+import type { ContextMenuModel } from "../context-menu";
+
 import { ContextMenuButton } from ".";
 import { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
 
-const menuData = [
+const menuData: ContextMenuModel[] = [
   { key: "key1", label: "Option 1" },
   { key: "key2", label: "Option 2" },
   { key: "key3", label: "Option 3" },
   { key: "key4", isSeparator: true },
-  { key: "key5", label: "Delete", isDisabled: false },
+  { key: "key5", label: "Delete", disabled: false },
 ];
 
 function getMenuData() {
