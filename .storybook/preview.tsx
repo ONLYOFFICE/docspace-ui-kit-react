@@ -24,6 +24,7 @@ import "../css/fonts.css";
 import lightTheme from "./lightTheme";
 import darkTheme from "./darkTheme";
 import { DocsContainer } from "./DocsContainer";
+import { DocsPage } from "./blocks/DocsPage";
 
 // The library ships an identity brand lookup on purpose: getBrandName("Foo")
 // returns "Foo" until a consuming application calls setBrandLookup(), which is
@@ -101,6 +102,8 @@ const preview: Preview = {
     docs: {
       container: DocsContainer,
       toc: true,
+      // The README is the page; see .storybook/blocks/DocsPage.tsx.
+      page: DocsPage,
     },
     options: {
       storySort: {
