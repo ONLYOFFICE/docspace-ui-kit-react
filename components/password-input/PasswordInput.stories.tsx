@@ -13,68 +13,8 @@ const meta = {
   title: "UI/Form controls/PasswordInput",
   component: PasswordInput,
   parameters: {
-    docs: {
-      description: {
-        component: `Password field that checks the value against a set of rules and shows which ones it meets, for sign-up and password-change forms.
-
-### Features
-
-- **Validation Tooltip**: Opens next to the field as the user types while the value is shorter than the minimum length or the field has an error or warning, and lists each required rule in green once met and red until then
-- **Rule Checking**: Checks the value on every change and reports whether all rules pass, and each rule's own result, through \`onValidateInput\`
-- **Visibility Toggle**: An eye button at the end of the field shows and hides the characters, and disabling the field hides them again
-- **Password Generator**: An optional link in the tooltip fills the field with a random password that meets the enabled rules and reveals it
-- **Simple View**: Strips the component down to the field and the eye button, with no tooltip and no rule checking, for sign-in forms
-- **Customizable Rules**: Configurable minimum length and character requirements
-- **Value Sanitising**: Runs an optional function on every change before the value is stored, such as one that strips spaces
-
-### Usage
-
-\`\`\`tsx
-import { PasswordInput } from "@onlyoffice/apps-ui-kit/components/password-input";
-
-<PasswordInput
-  inputValue={value}
-  onChange={handleChange}
-  passwordSettings={{
-    minLength: 8,
-    upperCase: true,
-    digits: true,
-    specSymbols: true,
-  }}
-  tooltipPasswordTitle="Password must contain:"
-  tooltipPasswordLength="minimum length: "
-  tooltipPasswordDigits="digits"
-  tooltipPasswordCapital="capital letters"
-  tooltipPasswordSpecial="special characters"
-/>
-\`\`\`
-
-A sign-in field, with no rules and no tooltip:
-
-\`\`\`tsx
-<PasswordInput
-  simpleView
-  inputValue={value}
-  onChange={(e, value) => setValue(value ?? "")}
-  placeholder="Password"
-/>
-\`\`\`
-
-A sign-up field with a generator link in the tooltip:
-
-\`\`\`tsx
-<PasswordInput
-  inputValue={value}
-  onChange={(e, value) => setValue(value ?? "")}
-  passwordSettings={{ minLength: 8, digits: true }}
-  tooltipPasswordLength="minimum length: 8"
-  tooltipPasswordDigits="digits"
-  generatePasswordTitle="Generate password"
-  onValidateInput={(isValid) => setCanSubmit(isValid)}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     size: {
@@ -713,19 +653,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--text-input-bg\` | Background color | theme-based |
-| \`--text-input-border-color\` | Border color at rest | theme-based |
-| \`--text-input-border-hover\` | Border color on hover | theme-based |
-| \`--text-input-border-focus\` | Border color while focused | theme-based |
-| \`--text-input-color\` | Text and caret color | theme-based |
-| \`--text-input-radius\` | Border radius | theme-based |
-| \`--password-input-tooltip-width\` | Width of the rules tooltip on tablet and desktop; the tooltip is rendered at the end of \`<body>\`, so set it on \`:root\` or \`body\`, not on a wrapper | \`294px\` |
-
-The example sets every variable but the tooltip width on a wrapper; hover and focus the field to see the border colors.`,
+        story: `The input variables set on one wrapper -- the variables are listed under CSS variables on this page. The example sets every variable but the tooltip width, which a wrapper cannot reach; hover and focus the field to see the border colors.`,
       },
     },
   },
