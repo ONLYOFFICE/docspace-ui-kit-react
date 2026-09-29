@@ -105,12 +105,14 @@ import { MainButtonMobile } from "@onlyoffice/apps-ui-kit/components/main-button
   },
   argTypes: {
     actionOptions: {
-      control: "object",
+      // The icons are data URIs too long to edit, and they stretch the table.
+      control: false,
       description:
         "Items of the upper group of the menu. An item with `items` becomes a submenu that expands in place; its handler is called with the item's `action`",
     },
     buttonOptions: {
-      control: "object",
+      // The icons are data URIs too long to edit, and they stretch the table.
+      control: false,
       description:
         "Items of the lower group, drawn on a background of their own. An item with `items` becomes a submenu",
     },
