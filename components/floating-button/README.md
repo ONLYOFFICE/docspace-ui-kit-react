@@ -198,19 +198,26 @@ export function CancellableUpload({
   recoloured by the theme the way the built-in icons are.
 - **`id`, `className` and `style` go on the circle, not on the wrapper** that carries the
   position — so `className` cannot be used to move the button.
-- The circle is 48px, the ring 38px and the icon box 38px; the size is controlled by
-  `--floating-button-button-size` rather than by a prop.
+- The circle is 48px, the ring 38px and the icon box 38px. There is no size prop, and
+  `--floating-button-button-size` only resizes the clickable disc — see "CSS variables".
 
 ## CSS variables
 
 Set them on any ancestor.
 
-| Variable                              | Default       | Effect                            |
-| ------------------------------------- | ------------- | --------------------------------- |
-| `--floating-circle-button-background` | accent colour | Circle and progress ring colour.  |
-| `--floating-button-button-size`       | `48px`        | Diameter of the circle.           |
-| `--floating-button-icon`              | theme token   | Fill of the icon.                 |
-| `--floating-button-shadow`            | theme shadow  | Whole `box-shadow` of the circle. |
+| Variable                              | Default       | Effect                                                                                        |
+| ------------------------------------- | ------------- | --------------------------------------------------------------------------------------------- |
+| `--floating-circle-button-background` | accent colour | Circle and progress ring colour, and the fill of the accent icons' shapes.                    |
+| `--floating-button-button-size`       | `48px`        | Width and height of the clickable circle only; the ring and the icon stay 48px in its corner. |
+| `--floating-button-icon`              | theme token   | Fill of the icon, except the accent icons.                                                    |
+| `--floating-button-shadow`            | theme shadow  | Whole `box-shadow` of the circle.                                                             |
+
+The accent icons are `upload`, `trash`, `deletePermanently` and `other`: their shapes are painted
+in the circle's colour, so `--floating-button-icon` does not reach them.
+
+`--floating-button-button-size` resizes nothing but the clickable disc — the ring, the icon box
+and the status badge are laid out in a fixed 48px box in its top corner, so any other value puts
+them out of line with it.
 
 `color` writes the first of these inline, so it wins over an ancestor's value.
 
@@ -223,6 +230,7 @@ Set them on any ancestor.
   **English regardless of the interface language**, and cannot be overridden.
 - The progress is conveyed only by the ring: no `role="progressbar"`, no `aria-valuenow`, so
   the percentage is invisible to a screen reader.
+- An `iconUrl` image is announced by its `alt`, which is always `"icon"`.
 - The cancel cross is an SVG with a click handler and no name of its own. Anything cancellable
   needs a real control elsewhere as well.
 
