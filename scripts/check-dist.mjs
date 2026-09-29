@@ -270,7 +270,22 @@ console.log(
 // resolve on order alone -- the override and the rule it overrides have equal
 // specificity -- so an inverted pair silently restyles a component in every
 // consumer, and only a visual test would catch it.
-const { inverted, ruleCount, moduleCount } = analyseStylesheet();
+const { inverted, orphaned, ruleCount, moduleCount } = analyseStylesheet();
+
+// A rule naming a module class that maps to no module escapes the order check
+// below without a word, so it fails here instead.
+if (orphaned.length > 0) {
+  console.error(
+    `\n  dist/styles.css: ${orphaned.length} rule(s) carry a module class that ` +
+      "belongs to no emitted module, so their place in the cascade is unchecked:\n" +
+      orphaned
+        .slice(0, 10)
+        .map((cls) => `    .${cls}`)
+        .join("\n") +
+      "\n",
+  );
+  process.exit(1);
+}
 
 if (inverted > 0) {
   console.error(

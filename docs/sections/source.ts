@@ -10,8 +10,9 @@ import {
   SubjectFilter,
 } from "@onlyoffice/docspace-api-sdk";
 
-import { FileType } from "../../enums";
+import { FileType, FilterGroups } from "../../enums";
 import type { TApiContext } from "../../providers/api";
+import { globalColors } from "../../providers/theme/themes/globalColors";
 
 /**
  * What the three section stories read, and the one shape both of their back
@@ -68,7 +69,7 @@ export type SectionItem = {
   by: string;
   /** A file's size as the portal formats it; a room's or folder's item count. */
   detail: string;
-  /** A room's colour, six hex digits without the hash. */
+  /** A room's colour, six hex digits without the hash; empty for none. */
   color: string;
   /**
    * A folder's own type, as the portal sends it in `type`: it tells a form
@@ -104,6 +105,12 @@ export type SectionSource = {
   list: (query: SectionQuery) => Promise<SectionListing>;
 };
 
+/**
+ * The colour a room with none of its own is drawn in, by the list and by
+ * its folder picker alike. `RoomIcon` takes the hex without the hash.
+ */
+export const DEFAULT_ROOM_COLOR = globalColors.lightBlueMain.slice(1);
+
 export const SECTION_TITLES: Record<SectionKind, string> = {
   // The section's name, as the portal's sidebar has it; the list itself is
   // the caller's My documents folder.
@@ -115,12 +122,18 @@ export const SECTION_TITLES: Record<SectionKind, string> = {
 type FilterOption = { key: TypeKey | "me"; label: string };
 export type FilterGroup = {
   group: SectionFilter["group"];
+  /**
+   * The kit's own filter group this one is drawn as. It lives here, beside
+   * the choice of groups, so the panel and its chips cannot disagree on it.
+   */
+  kitGroup: FilterGroups;
   label: string;
   options: FilterOption[];
 };
 
 const FILE_TYPE_GROUP: FilterGroup = {
   group: "type",
+  kitGroup: FilterGroups.filterType,
   label: "Type",
   options: [
     { key: "folders", label: "Folders" },
@@ -131,8 +144,17 @@ const FILE_TYPE_GROUP: FilterGroup = {
   ],
 };
 
+/**
+ * The owner group is not `roomFilterOwner`, although that is the portal's:
+ * the component special-cases that group as exactly [Me, Other, people
+ * selector] (`FilterBlockItem` reads the second entry unconditionally, and
+ * `FilterBlock` will not deselect in it), and "Other" needs a people selector
+ * the list does not mount. A plain tag group is one chip, selected and
+ * cleared like any other.
+ */
 const OWNER_GROUP: FilterGroup = {
   group: "owner",
+  kitGroup: FilterGroups.filterOther,
   label: "Owner",
   options: [{ key: "me", label: "Me" }],
 };
@@ -148,6 +170,7 @@ export const FILTER_GROUPS: Record<SectionKind, FilterGroup[]> = {
   rooms: [
     {
       group: "type",
+      kitGroup: FilterGroups.roomFilterType,
       label: "Room type",
       options: [
         { key: "collaboration", label: "Collaboration" },

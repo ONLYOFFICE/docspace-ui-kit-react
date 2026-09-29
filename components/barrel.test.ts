@@ -1,9 +1,9 @@
 // `export * from "./x"` carries every named export of `x` and silently drops
-// its default. Ten component folders export their component only by default;
-// six of them were re-exported by name and four -- section, filter, navigation,
-// status-message -- were not, so the component was missing from the root barrel,
-// and therefore from the plugin API, while tsc, the build and every other check
-// passed. This test holds the rule for all folders at once.
+// its default. Eleven component folders export their component only by
+// default; six of them were re-exported by name and five -- section, filter,
+// navigation, status-message, article -- were not, so the component was missing
+// from the root barrel, and therefore from the plugin API, while tsc, the build
+// and every other check passed. This test holds the rule for all folders at once.
 import fs from "node:fs";
 import path from "node:path";
 import ts from "typescript";

@@ -299,7 +299,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     favoritesFolder,
     withRecentTreeFolder,
     withFavoritesTreeFolder,
-    roomsFolderId,
 
     withInit,
   });

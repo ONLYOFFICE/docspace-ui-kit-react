@@ -218,7 +218,7 @@ git only rewrites working copies at checkout. **See "Line endings" in the
 README for the one-time migration**; it discards uncommitted changes, so commit
 or stash first.
 
-## Known issues
+### Known issues
 
 - **`axios` is not portal-only.** `docs/public-api.md` says it is; the root barrel reaches
   it through `uploader` and `billing`, both of which are exported from `index.ts`. Since

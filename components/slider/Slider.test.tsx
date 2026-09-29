@@ -95,8 +95,11 @@ describe("<Slider />", () => {
 
   it("pours from the right in a right-to-left document", () => {
     document.dir = "rtl";
-    render(<Slider {...defaultProps} withPouring />);
-    document.dir = "";
+    try {
+      render(<Slider {...defaultProps} withPouring />);
+    } finally {
+      document.dir = "";
+    }
 
     expect(screen.getByTestId("slider").style.backgroundPosition).toBe(
       "right center",

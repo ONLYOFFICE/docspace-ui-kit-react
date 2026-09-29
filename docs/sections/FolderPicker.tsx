@@ -18,6 +18,7 @@ import {
   type TSelectorItem,
 } from "../../components/selector";
 import {
+  DEFAULT_ROOM_COLOR,
   formFolderOf,
   SECTION_TITLES,
   type SectionItem,
@@ -81,7 +82,7 @@ const toRow = (item: SectionItem): TSelectorItem =>
         filesCount: 0,
         foldersCount: 0,
         security: NO_SECURITY,
-        color: item.color || "4781D1",
+        color: item.color || DEFAULT_ROOM_COLOR,
         disableMultiSelect: true,
       }
     : {
