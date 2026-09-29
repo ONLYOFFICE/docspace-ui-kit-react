@@ -76,7 +76,7 @@ const MCPServersSelector = ({
   withBlur,
 }: MCPServersSelectorProps) => {
   const t = useCommonTranslation();
-  const { apiClient } = useApi();
+  const { apiClient, baseUrl } = useApi();
   const { isBase } = useTheme();
 
   const [servers, setServers] = React.useState<TSelectorItem[]>([]);
@@ -102,19 +102,21 @@ const MCPServersSelector = ({
         label: isSystem
           ? `${getBrandName("OrganizationName")} ${getBrandName("ProductName")}`
           : name,
-        // portalUrl is left empty on purpose: the resulting "/logo.ashx?..."
-        // is relative, so the browser resolves it against the portal origin
-        // the app is already served from.
+        // The portal's own logo comes from the portal the clients talk to.
+        // A relative "/logo.ashx" would resolve against the page's origin,
+        // which is the portal only when the app is served from it -- not in
+        // Storybook, and not in an application hosted anywhere else.
         icon:
           getServerIcon(
             isSystem ? ServerType.Portal : ServerType.Custom,
             isBase,
+            baseUrl.replace(/\/+$/, ""),
           ) ?? "",
         isMCP: true,
         isSelected: initedSelectedServers?.includes(name),
       };
     },
-    [isBase, initedSelectedServers, t],
+    [isBase, initedSelectedServers, t, baseUrl],
   );
 
   const fetchServers = React.useCallback(async () => {

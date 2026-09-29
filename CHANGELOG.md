@@ -83,6 +83,10 @@ _Changed_ before upgrading.
 
 ### Fixed
 
+- `MCPServersSelector` loads the portal's logo from the portal. The system server's icon
+  was a relative `/logo.ashx?logotype=3`, which the browser resolves against the page's own
+  origin — the portal only when the application is served from it. Anywhere else the icon was a
+  broken image. It is now built from the `baseUrl` of the nearest `ApiProvider`
 - Secondary `Tabs` with `scaled` judged overflow by the tabs' own widths, which are the
   container's shares, so two tabs in a 480px row were "overflowing" and shown one at a time
   behind arrows. The check now measures the labels
