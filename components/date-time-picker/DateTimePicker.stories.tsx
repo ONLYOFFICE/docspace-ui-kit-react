@@ -41,56 +41,8 @@ const meta = {
   title: "UI/Form controls/DateTimePicker",
   component: DateTimePicker,
   parameters: {
-    docs: {
-      description: {
-        component: `Combined date and time input component that allows users to select both date and time values.
-
-### Features
-
-- **Calendar Date Selection**: Opens a calendar from the "select date" button, then shows the picked day as a chip that reopens the calendar on click
-- **Time Input**: Shows the time beside the chip once a day is picked, and turns it into an hours-and-minutes editor on click
-- **Locale Support**: Writes the calendar in the given locale and takes the clock from it, 12-hour for English locales and 24-hour for every other
-- **Date Range Constraints**: Limits the days the calendar lets you pick to the range between the earliest and the latest date
-- **Error State**: Draws the shown time in red and marks the whole control as invalid for assistive technology
-- **AM/PM Support**: Adds an AM/PM drop-down to the time editor on a 12-hour clock, labelled from \`translations\`, and moves the time by twelve hours when switched
-- **Clearing**: Clears the day and hides the time through the chip's cross, which can be hidden, and reports \`null\` to \`onChange\`
-
-### Accessibility
-
-The control names its parts for screen readers and moves focus into the time editor.
-
-- The outer element carries \`aria-label\` set to \`selectDateText\`, and \`aria-invalid\` while \`hasError\` is set
-- The "select date" button has \`role="button"\`, is named by \`selectDateText\` and reports \`aria-expanded\` while the calendar is open
-- The shown time is reachable with Tab and announced as a button named "Current time" followed by the time
-- The time editor takes focus as soon as it opens, and Enter or Tab closes it
-
-### Usage
-
-\`\`\`tsx
-import { DateTimePicker } from "@onlyoffice/apps-ui-kit/components/date-time-picker";
-
-// Basic usage
-<DateTimePicker
-  locale="en"
-  openDate={new Date()}
-  selectDateText="Select date"
-  translations={{ AM: "AM", PM: "PM" }}
-  onChange={(date) => console.log(date)}
-/>
-
-// With date constraints
-<DateTimePicker
-  locale="en"
-  openDate={new Date()}
-  minDate={new Date("2024/01/01")}
-  maxDate={new Date("2030/01/01")}
-  selectDateText="Select date"
-  translations={{ AM: "AM", PM: "PM" }}
-  onChange={(date) => console.log(date)}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     locale: {
@@ -442,25 +394,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-| --- | --- | --- |
-| \`--date-time-picker-cell-bg\` | Background of the shown time | theme-based |
-| \`--date-time-picker-icon\` | Colour of the clock icon before the time | theme-based |
-| \`--date-time-picker-cell-height\` | Height of the shown time | \`32px\` |
-| \`--date-time-picker-cell-radius\` | Corner radius of the shown time | \`3px\` |
-| \`--date-time-picker-cell-padding\` | Padding inside the shown time | \`6px 8px\` |
-| \`--time-input-focus-border\` | Border colour of the time editor, which opens focused after a click on the time | theme-based |
-| \`--time-input-bg\` | Background of the time editor | theme-based |
-| \`--time-input-radius\` | Corner radius of the time editor | \`3px\` |
-| \`--calendar-bg\` | Background of the calendar, shown after a click on the day chip | theme-based |
-| \`--calendar-border\` | Colour of the calendar's one-pixel border | theme-based |
-| \`--calendar-title\` | Colour of the month and year title | theme-based |
-| \`--calendar-accent\` | Fill of today, ring of the picked day and the title chevron | theme-based |
-| \`--calendar-hover-bg\` | Background of a day under the pointer | theme-based |
-
-One instance sets every variable on a wrapper. Click the time to see the time editor and the day chip to see the calendar; the day chip, the "select date" button and the AM/PM drop-down keep their own variables, listed in the SelectedItem, AddButton and ComboBox stories.`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. Click the time to see the time editor and the day chip to see the calendar; the day chip, the "select date" button and the AM/PM drop-down keep their own variables, listed in the SelectedItem, AddButton and ComboBox stories.`,
       },
       source: {
         code: `<div
