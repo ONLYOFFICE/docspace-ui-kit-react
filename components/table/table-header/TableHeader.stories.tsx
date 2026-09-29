@@ -32,36 +32,7 @@ const meta = {
       description: {
         component: `TableHeader is the row of column titles at the top of a table; it also decides the width of every column and writes them onto the table's grid.
 
-### Features
-
-- **Column Widths**: Writes the widths of all columns onto the container's grid, and onto each row as well when the body is virtualised, so the header and the cells line up
-- **First Layout**: Gives the column marked \`default\` 40% of the width and shares the rest equally, or shares it all equally with \`withoutWideColumn\`
-- **Resizable Columns**: Lets the user drag the handle between two columns, never below a column's \`minWidth\`, and follows the drag the other way in a right-to-left interface
-- **Remembered Widths**: Saves the widths in \`localStorage\` under \`columnStorageName\`, or under \`columnInfoPanelStorageName\` while \`infoPanelVisible\` is set, and restores them on the next visit
-- **Sorting**: Keeps the arrow of the column matching \`sortBy\` on screen, turns it with \`sorted\`, and calls a column's \`onClick\` when its title is clicked
-- **Column Settings**: Ends with a cog that lists the columns the user may hide, unless \`showSettings\` is off
-- **Running Out of Room**: When the columns no longer fit at their minimum widths, collapses every column but the \`default\` one, greys the cog out and reports it through \`setHideColumns\`
-- **Reorder Mode**: With \`isIndexEditingMode\`, stops columns being resized and greys the cog out while rows are reordered
-
-### Usage
-
-\`\`\`tsx
-import { TableHeader } from "@onlyoffice/apps-ui-kit/components/table";
-
-const ref = useRef<HTMLDivElement>(null);
-
-<TableHeader
-  containerRef={ref}
-  columns={columns}
-  columnStorageName="my-columns"
-  columnInfoPanelStorageName="my-info-panel"
-  sectionWidth={1000}
-  sortBy={SortByFieldName.Name}
-  sorted
-  showSettings
-  sortingVisible
-/>
-\`\`\``,
+The Table README describes it in full.`,
       },
     },
   },

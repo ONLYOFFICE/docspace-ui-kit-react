@@ -13,31 +13,7 @@ const meta = {
       description: {
         component: `TableRow is one row of a table: its cells followed by a last cell with the row's context menu button.
 
-### Features
-
-- **Context Menu**: Opens the row's menu on a right-click anywhere in the row or on a click on the three-dot button in its last cell
-- **Menu Items**: Shows the fixed \`contextOptions\`, or items that \`getContextModel\` builds at the moment the menu opens; the three-dot button appears only for a non-empty \`contextOptions\`, otherwise its place stays blank
-- **Grid Cells**: Renders no box of its own, so each cell becomes a column of the container's grid and lines up under the header
-- **Selection Hooks**: Adds a \`checked\` class while \`checked\` is set and reveals children marked \`create-share-link\` while the row is hovered, checked or active; the highlight itself is left to the consumer's styles
-- **Drop Target**: While \`dragging\` is set, fills children marked \`droppable-hover\` with the drop colour, unless the row is active
-- **Reorder Mode**: With \`isIndexEditingMode\`, drops the context menu cell, so rows being reordered carry no menu
-- **Pointer Callbacks**: Reports clicks, double clicks and the pointer entering or leaving the row
-
-### Usage
-
-\`\`\`tsx
-import { TableRow, TableCell } from "@onlyoffice/apps-ui-kit/components/table";
-
-<TableRow
-  checked={isSelected}
-  contextOptions={menuItems}
-  style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr) 24px" }}
->
-  <TableCell>Name</TableCell>
-  <TableCell>Type</TableCell>
-  <TableCell>Modified</TableCell>
-</TableRow>
-\`\`\``,
+The Table README describes it in full.`,
       },
     },
   },

@@ -13,32 +13,7 @@ const meta = {
       description: {
         component: `TableCell is one cell of a TableRow: a fixed-height box that sits in the column the table's grid gives it.
 
-### Features
-
-- **Grid Placement**: Takes its width from the columns the TableHeader writes onto the container, so every cell lines up under its header
-- **Fixed Height**: Draws a 48-pixel-high box with a bottom border, centres its content vertically and clips whatever does not fit
-- **Checkbox on Hover**: With \`hasAccess\`, replaces a child marked \`table-container_element\` with a child marked \`table-container_row-checkbox\` while the pointer is over the cell
-- **Selected Look**: With \`checked\`, keeps that checkbox in place of the element whether or not the pointer is over the cell
-- **Drag-and-Drop Value**: Writes \`value\` onto the element as an attribute, which drag and drop reads to tell which item was picked up
-- **Document Title**: Writes \`documentTitle\` into a \`data-document-title\` attribute for scripts and tests that find a cell by the document it shows
-- **Memoised Rendering**: Re-renders only when a prop changes by value, so updating one row does not redraw every cell of a long table
-
-### Usage
-
-\`\`\`tsx
-import { TableCell } from "@onlyoffice/apps-ui-kit/components/table";
-
-// Simple text cell
-<TableCell>Cell Content</TableCell>
-
-// Cell that shows a checkbox in place of its avatar on hover
-<TableCell hasAccess>
-  <div className="table-container_element">
-    <Avatar role={AvatarRole.none} size={AvatarSize.min} />
-  </div>
-  <Checkbox className="table-container_row-checkbox" isChecked={false} />
-</TableCell>
-\`\`\``,
+The Table README describes it in full.`,
       },
     },
   },

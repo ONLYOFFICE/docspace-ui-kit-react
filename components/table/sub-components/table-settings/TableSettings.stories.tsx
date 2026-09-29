@@ -13,28 +13,7 @@ const meta = {
       description: {
         component: `TableSettings is the cog at the end of a TableHeader that opens a list of the columns, each with a checkbox that shows or hides it.
 
-### Features
-
-- **Column Checkboxes**: Lists one checkbox per column, ticked while the column's \`enable\` is set, and labelled with its \`title\`
-- **Consumer-Owned State**: Calls the column's \`onChange\` with its key when its checkbox is clicked and changes nothing itself, so the consumer flips \`enable\` and stores the choice
-- **Locked Columns**: Leaves out a column marked \`isDisabled\` or one without an \`onChange\`, so a column that must always show cannot be unticked
-- **Disabled Cog**: With \`disableSettings\`, greys the cog out and stops the list opening; the header sets it while it has hidden columns for lack of room or while rows are reordered
-- **Stays Open While Ticking**: Keeps the list open across clicks on its checkboxes and closes it on a click anywhere else or on the cog again
-
-### Usage
-
-\`\`\`tsx
-// TableSettings is not exported on its own: TableHeader renders it from its columns
-import { TableHeader } from "@onlyoffice/apps-ui-kit/components/table";
-
-<TableHeader showSettings settingsTitle="Columns" columns={columns} {...headerProps} />
-
-// A column the user may hide has an onChange that flips its enable
-const columns = [
-  { key: "name", title: "Name", enable: true, isDisabled: true },
-  { key: "type", title: "Type", enable: showType, onChange: () => setShowType((v) => !v) },
-];
-\`\`\``,
+The Table README describes it in full.`,
       },
     },
   },
