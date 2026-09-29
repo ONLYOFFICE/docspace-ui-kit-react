@@ -12,41 +12,8 @@ const meta = {
   title: "UI/Form controls/ColorInput",
   component: ColorInput,
   parameters: {
-    docs: {
-      description: {
-        component: `Color input component that allows users to enter and select colors using a hex value or integrated color picker.
-
-### Features
-
-- **Hex Input**: Enter color values directly as hex codes
-- **Validation While Typing**: Drops any character that is not a hex digit, reports a new color only once the field holds a complete 3- or 6-digit code, and puts the last valid color back when the field loses focus with an incomplete one
-- **Color Picker**: Built-in color picker for visual selection, opened by clicking the swatch at the end of the field and closed by its own close button or a click outside
-- **Live Updates**: Every accepted edit in the field and every move in the picker recolors the swatch and calls \`handleChange\` at once, with no confirm step
-- **Starting Color**: Starts on \`defaultColor\`, or on the kit's blue when it is left out, and keeps its own value from then on
-- **Three Sizes**: Base, middle and large widen the field and, at large, enlarge its text, while the height stays the same
-- **Validation States**: Error and warning visual indicators
-- **Full Width**: Scale to 100% width when needed
-
-### Usage
-
-\`\`\`tsx
-import { ColorInput } from "@onlyoffice/apps-ui-kit/components/color-input";
-import { InputSize } from "@onlyoffice/apps-ui-kit/components/text-input";
-
-// Starting color and a change handler
-<ColorInput
-  defaultColor="#4781D1"
-  handleChange={(color) => console.log(color)}
-/>
-
-// Wider field that fills its container
-<ColorInput size={InputSize.middle} scale handleChange={setColor} />
-
-// Rejected value
-<ColorInput defaultColor="#4781D1" hasError />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     defaultColor: {
@@ -303,37 +270,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-**ColorInput — input and swatch**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--color-input-height\` | Input field height | \`32px\` |
-| \`--color-input-padding\` | Input field padding; only while \`size\` is left out, since every size sets its own padding | \`6px 8px\` |
-| \`--color-input-swatch-size\` | Color swatch width and height | \`20px\` |
-| \`--color-input-swatch-radius\` | Color swatch border radius | \`2px\` |
-
-**TextInput (hex text field)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--text-input-color\` | Input text color | theme-based |
-| \`--text-input-border-color\` | Input border color | theme-based |
-| \`--text-input-border-hover\` | Input border color on hover | theme-based |
-| \`--text-input-border-focus\` | Input border color while focused | theme-based |
-| \`--text-input-radius\` | Input border radius | theme-based |
-
-**DropDown (color picker popup)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--dropdown-bg\` | Popup background; shows only in the 8px strips above and below the picker, whose own panel stays white (black in the dark theme) | theme-based |
-| \`--dropdown-border-style\` | Popup border | theme-based |
-| \`--dropdown-shadow\` | Popup shadow | theme-based |
-| \`--dropdown-radius\` | Popup border radius | \`6px\` |
-
-The example sets every variable but \`--dropdown-bg\` on one field: hover and focus it to see the border colors, and click its swatch to open the popup.`,
+        story: `Every overridable variable but \`--dropdown-bg\` set on one field -- the variables are listed under CSS variables on this page. Hover and focus it to see the border colors, and click its swatch to open the popup.`,
       },
       source: {
         code: `<div
