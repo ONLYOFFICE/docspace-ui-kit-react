@@ -14,55 +14,8 @@ const meta = {
   title: "UI/Overlays/Tooltip",
   component: Tooltip,
   parameters: {
-    docs: {
-      description: {
-        component: `Tooltip displays contextual information when hovering over or clicking on elements.
-
-### Features
-
-- **Placement**: Sits on the preferred one of twelve sides and corners of the anchor, and flips or shifts to stay inside the viewport
-- **Custom Styling**: Takes its own opacity and maximum width, and its own colours through CSS variables
-- **Click or Hover Trigger**: Choose between hover (default) and click-to-show modes
-- **Dynamic Content**: Builds the content for each anchor from that anchor's text and element, so one tooltip serves a whole list
-- **Floating Behavior**: Follow cursor position with the \`float\` prop
-- **Arrow Control**: Hidden by default, with an optional arrow pointing at the anchor
-- **Controlled and Imperative Opening**: Can be held open or closed by the host, or opened only from code through its ref
-- **Automatic Closing**: Closes on Escape, on scroll, on window resize and on a click outside the anchor
-
-### Accessibility
-
-The tooltip element comes from react-tooltip, which gives it a role; the link to the anchor is left to the consumer.
-
-- **\`role="tooltip"\`**: set on the floating element, so assistive technology announces it as a tooltip once it is shown
-- **No description link**: the anchor gets no \`aria-describedby\`, so a screen reader does not read the tooltip with the anchor; give the anchor an \`aria-label\` or visible text for anything the user must know
-- **Hover and click only**: it never opens on keyboard focus, so a keyboard user does not see it
-- **Escape**: closes the open tooltip
-
-### Usage
-
-\`\`\`tsx
-import { Tooltip } from "@onlyoffice/apps-ui-kit/components/tooltip";
-
-// Basic tooltip
-<Link data-tooltip-id="my-tooltip" data-tooltip-content="Hello!">
-  Hover me
-</Link>
-<Tooltip id="my-tooltip" />
-
-// With custom styling
-<Tooltip id="styled" opacity={0.9} maxWidth="200px" />
-
-// Click to show
-<Tooltip id="click" openOnClick />
-
-// Dynamic content
-<Tooltip
-  id="dynamic"
-  getContent={({ content }) => <div>{content}</div>}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?node-id=649%3A4458&mode=dev",
@@ -766,20 +719,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-| --- | --- | --- |
-| \`--tooltip-bg\` | Background colour, in place of the theme's | theme-based |
-| \`--tooltip-color\` | Text colour, in place of the theme's | theme-based |
-| \`--tooltip-radius\` | Corner radius | \`6px\` |
-| \`--tooltip-shadow\` | Shadow around the tooltip | \`0 2px 4px rgba(0, 0, 0, 0.15)\` |
-| \`--tooltip-inner-padding\` | Space between the edge and the content | \`8px 12px\` |
-| \`--tooltip-text-size\` | Font size of plain text content | \`12px\` |
-| \`--tooltip-max-width-value\` | Width limit, in place of \`maxWidth\`; never wider than the window | \`320px\` |
-| \`--tooltip-layer\` | Stacking order of the tooltip against other layers | \`999\` |
-
-The tooltip renders in a portal outside the story's markup, so the variables go on its own \`style\` prop, which lands on the wrapper around it. Hover the link to see all of them at once; the stacking order has no visible effect here.`,
+        story: `Every overridable variable set on one tooltip -- the variables are listed under CSS variables on this page. The tooltip renders in a portal outside the story's markup, so the variables go on its own \`style\` prop, which lands on the wrapper around it. Hover the link to see all of them at once; the stacking order has no visible effect here.`,
       },
       source: {
         code: `<Tooltip
