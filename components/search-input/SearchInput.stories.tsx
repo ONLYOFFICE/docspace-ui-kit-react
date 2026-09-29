@@ -34,49 +34,8 @@ const meta = {
   title: "UI/Form controls/SearchInput",
   component: SearchInput,
   parameters: {
-    docs: {
-      description: {
-        component: `Search field for the control above a list, a table or a panel whose contents narrow as the user types.
-
-### Features
-
-- **Clear Button**: Swaps the magnifier for a cross as soon as the field holds text, or on an empty field too with \`showClearButton\`; clicking the cross empties the field and calls \`onClearSearch\`
-- **Debounced Search**: Reports the typed string, not the change event, through \`onChange\` once typing pauses for \`refreshTimeout\` milliseconds, one second by default
-- **Silent Mode**: Stops calling \`onChange\` altogether when \`autoRefresh\` is off, so the parent reads the field through \`forwardedRef\` instead
-- **Three Sizes**: Follows the kit's base, middle and large input sizes; large is taller and sets its text at 16px instead of 13px
-- **Disabled State**: Greys the field, blocks typing and hides both the magnifier and the cross
-- **Full Width**: Stretches the field to the width of its container with \`scale\`
-- **Main Button**: Places a button with a plus icon to the left of the field, optionally opening a dropdown menu
-- **Parent Reset**: Keeps its own copy of the text while the user types and takes the new \`value\` whenever the parent changes it
-
-### Usage
-
-\`\`\`tsx
-import { SearchInput } from "@onlyoffice/apps-ui-kit/components/search-input";
-import { InputSize } from "@onlyoffice/apps-ui-kit/components/text-input";
-
-const [term, setTerm] = useState("");
-
-<SearchInput
-  size={InputSize.base}
-  value={term}
-  placeholder="Search"
-  onChange={(value) => setTerm(value)}
-  onClearSearch={() => setTerm("")}
-/>
-
-// Filtering a list already in memory: no one-second wait
-<SearchInput
-  size={InputSize.base}
-  value={term}
-  scale
-  refreshTimeout={0}
-  onChange={(value) => setTerm(value)}
-  onClearSearch={() => setTerm("")}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=58-2238&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -723,19 +682,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--text-input-bg\` | Background color of the field | theme-based |
-| \`--text-input-border-color\` | Border color at rest | theme-based |
-| \`--text-input-border-hover\` | Border color on hover | theme-based |
-| \`--text-input-border-focus\` | Border color while the text field has focus | theme-based |
-| \`--text-input-color\` | Text and caret color | theme-based |
-| \`--text-input-radius\` | Border radius of the field | theme-based |
-| \`--search-input-icon-fill\` | Color of the magnifier on an empty field | theme-based |
-| \`--search-input-icon-filled-fill\` | Color of the cross once the field holds text | theme-based |
-| \`--search-input-gap\` | Space between the main button and the field, shown only with \`showMainButton\` | \`8px\` |
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
 
 **Custom styled search** is empty and shows the magnifier color; **With value** holds text and shows the cross color; **With button** carries the main button, for the gap. Hover a field and click into it to see the two other border colors.`,
       },
