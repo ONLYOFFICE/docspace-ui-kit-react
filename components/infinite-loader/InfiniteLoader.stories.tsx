@@ -140,55 +140,8 @@ const meta = {
   title: "UI/Status components/InfiniteLoader",
   component: InfiniteLoaderComponent,
   parameters: {
-    docs: {
-      description: {
-        component: `Virtualised list or grid for long file lists that asks the host for the next page as the user scrolls towards the end of what is loaded.
-
-### Features
-
-- **Virtualized Rendering**: Efficiently renders large lists by only mounting visible items
-- **Infinite Scrolling**: Asks the host for the range of items still missing as the user scrolls near the end of the loaded ones
-- **Tile, Row & Table Layouts**: Lays each child out as one row of a tile grid, one list row or one table row whose columns come from saved widths
-- **Loading Placeholders**: Shows a skeleton row in place of every row or table row not loaded yet, and skeleton rows or tiles while a long scroll jump settles
-- **Fixed Row Height**: Gives every list and table row the same height in pixels, while a tile row takes its height from the kind of tile it holds
-- **Info Panel Awareness**: Reads the table's column widths from a separate saved entry while the info panel is open
-- **Hidden While Loading**: Renders nothing at all while the whole list is still loading
-- **Page Scroll Container**: Follows the scroll of the page section found by its id, not a scroller of its own, and falls back to the window
-
-### Usage
-
-\`\`\`tsx
-import { InfiniteLoaderComponent } from "@onlyoffice/apps-ui-kit/components/infinite-loader";
-
-<InfiniteLoaderComponent
-  viewAs="tile"
-  itemCount={totalItems}
-  filesLength={loadedItems.length}
-  hasMoreFiles={hasMore}
-  loadMoreItems={handleLoadMore}
-  itemSize={48}
-  countTilesInRow={4}
-  isLoading={false}
->
-  {items}
-</InfiniteLoaderComponent>
-
-// A table: column widths are read from localStorage under these keys
-<InfiniteLoaderComponent
-  viewAs="table"
-  itemCount={totalItems}
-  filesLength={loadedItems.length}
-  hasMoreFiles={hasMore}
-  loadMoreItems={handleLoadMore}
-  itemSize={48}
-  columnStorageName="filesColumns"
-  columnInfoPanelStorageName="filesColumnsInfoPanel"
->
-  {rows}
-</InfiniteLoaderComponent>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   decorators: [
     (Story) => (
@@ -494,17 +447,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--infinite-loader-tile-gap\` | Gap between the skeleton tiles a tile row shows while a scroll jump of more than 800px settles; on tablet and smaller screens the gap is fixed at 14px | \`14px 16px\` |
-| \`--infinite-loader-tile-min-size\` | Smallest width of those skeleton tiles | \`216px\` |
-| \`--infinite-loader-tile-max-size\` | Largest width of those skeleton tiles | \`360px\` |
-| \`--infinite-loader-list-width\` | Width of the list in the \`row\` and \`table\` layouts, in place of the measured container width (row and table layouts only, not shown here) | — |
-| \`--infinite-loader-table-width\` | Set by the list itself to the measured container width in the \`row\` and \`table\` layouts; a value set from outside is overwritten, so use \`--infinite-loader-list-width\` | measured width |
-
-The tile demo below sets the three tile variables. They size only the skeleton tiles, which appear for a moment when the box is scrolled by more than 800px at once — drag the scrollbar quickly to see them.`,
+        story: `The three tile variables set on one wrapper -- the variables are listed under CSS variables on this page. They size only the skeleton tiles, which appear for a moment when the box is scrolled by more than 800px at once — drag the scrollbar quickly to see them.`,
       },
       source: {
         code: `<div
