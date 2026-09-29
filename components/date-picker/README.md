@@ -148,6 +148,35 @@ export function DeliveryDate() {
   an `AddButton`, so the button is nested inside a second button role.
 - There is no disabled state and no error state; neither is a prop.
 
+## CSS variables
+
+DatePicker's own stylesheet exposes nothing that reaches the rendered picker; its look comes from
+the three components inside it, so their variables, set on any ancestor, restyle it. The ones
+that show here:
+
+| Variable                                                                            | Default              | Effect                                                                                                           |
+| ----------------------------------------------------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `--add-button-bg`, `-bg-hover`, `-bg-active`                                        | theme                | Background of the square before the **Select date** text, at rest, hovered and pressed                           |
+| `--add-button-icon-color`, `-icon-color-hover`                                      | theme                | Colour of the calendar glyph in that square, at rest and hovered                                                 |
+| `--add-button-radius`                                                               | `3px`                | Corner radius of that square                                                                                     |
+| `--selected-item-bg`, `--selected-item-bg-hover`                                    | theme                | Background of the chip that shows the chosen date, at rest and hovered                                           |
+| `--selected-item-radius`                                                            | `3px`                | Corner radius of the chip                                                                                        |
+| `--calendar-bg`, `--calendar-border`, `--calendar-shadow`                           | theme                | Background, one-pixel border colour and shadow of the calendar                                                   |
+| `--calendar-radius`                                                                 | `6px`                | Corner radius of the calendar                                                                                    |
+| `--calendar-title`, `--calendar-title-size`                                         | theme, `18px`        | Colour and font size of the month and year title; the size is ignored in the mobile layout                       |
+| `--calendar-outline`, `--calendar-arrow`, `--calendar-disabled-arrow`               | theme                | Ring of the arrow buttons, their chevrons, and the chevron of an arrow that cannot go further                    |
+| `--calendar-weekday`                                                                | theme                | Colour of the weekday labels                                                                                     |
+| `--calendar-accent`, `--calendar-selected-text`                                     | theme, `#ffffff`     | Fill of today (also the chosen day's ring, the arrow ring on hover and the title chevron) and today's text on it |
+| `--calendar-focused-bg`, `--calendar-focused-text`                                  | `transparent`, theme | Background and text colour of the chosen day                                                                     |
+| `--calendar-current-radius`, `--calendar-focused-radius`, `--calendar-hover-radius` | `50%`                | Corner radius of today, of the chosen day and of a day under the pointer                                         |
+| `--calendar-hover-bg`                                                               | theme                | Background of a day under the pointer                                                                            |
+| `--calendar-past`, `--calendar-disabled`                                            | theme                | Text colour of the neighbouring months' days, and of the days outside `minDate` and `maxDate`                    |
+
+The full lists, with the caveats, are in [`AddButton`](../add-button/README.md#css-variables),
+[`SelectedItem`](../selected-item/README.md#css-variables) and
+[`Calendar`](../calendar/README.md#css-variables). The calendar glyph inside the chip is filled
+with a fixed grey that no variable reaches.
+
 ## Accessibility
 
 - The "select date" control is a `<div role="button">` with `tabIndex={0}` and an `aria-label`,
