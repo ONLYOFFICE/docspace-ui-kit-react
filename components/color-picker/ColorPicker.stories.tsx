@@ -11,48 +11,8 @@ const meta = {
   title: "UI/Form controls/ColorPicker",
   component: ColorPicker,
   parameters: {
-    docs: {
-      description: {
-        component: `Visual color picker component for selecting colors using a gradient area, hue slider, or hex code input. Supports both standalone picker mode and a full interface with apply/cancel actions.
-
-### Features
-
-- **Visual Picker**: Picks saturation and brightness by dragging a pointer across a gradient square
-- **Hue Slider**: Changes the base hue by dragging a pointer along a rainbow strip under the square
-- **Hex Input**: Accepts a typed hex code behind a caption and follows every move of either pointer
-- **Action Buttons**: Hands the chosen color to the caller on apply and asks the caller to close on cancel, both with caller-supplied texts
-- **Picker-Only Mode**: Replaces the hex field and both buttons with a "Custom" title and a closing cross, the shape used inside a drop-down
-- **Live Changes**: Reports the color on every pointer move and every valid hex code typed, so the caller can preview it before applying
-- **Initial Color**: Starts on the given hex color, read once on mount, so changing it later does not move the pointers
-- **Phone Width**: Stretches to the window width less 16px on each side on screens up to 600px wide
-
-### Accessibility
-
-The picker gives keyboard and screen-reader users the following:
-
-- **Dialog**: The root has \`role="dialog"\` with the accessible name "Color picker"
-- **Sliders**: The square and the strip are sliders named "Color" and "Hue"; the square announces its saturation and brightness in percent, the strip its hue in degrees
-- **Keyboard**: Arrow keys move the pointer of the focused slider by a twentieth of its range per press
-- **Named Controls**: The hex field is named "Hex color value", the closing cross "Close color picker", and each button by its own label
-
-### Usage
-
-\`\`\`tsx
-import { ColorPicker } from "@onlyoffice/apps-ui-kit/components/color-picker";
-
-// Full picker with buttons
-<ColorPicker
-  appliedColor="#4781D1"
-  onApply={(color) => console.log("Applied:", color)}
-  onClose={() => console.log("Cancelled")}
-  isPickerOnly={false}
-/>
-
-// Picker only: a title and a closing cross, no hex field or buttons
-<ColorPicker appliedColor="#FF0000" isPickerOnly />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     appliedColor: {
@@ -377,45 +337,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization. Hover either button to see its hover background:
-
-**ColorPicker — picker and hue slider**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--color-picker-width\` | Width of the picker; ignored on screens up to 600px wide, where the picker takes the window width less 32px | \`195px\` |
-| \`--color-picker-hue-height\` | Hue slider height | \`12px\` |
-| \`--color-picker-hue-radius\` | Hue slider corner radius | \`6px\` |
-
-**ColorPicker — hex input**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--color-picker-border-style\` | Hex input border, as a full \`border\` value | \`1px solid #d0d5da\` |
-| \`--color-picker-bg\` | Hex input background | \`#ffffff\` |
-| \`--color-picker-text-color\` | Hex input text color | \`#555f65\` |
-| \`--color-picker-input-height\` | Hex input height | \`32px\` |
-| \`--color-picker-input-padding\` | Hex input padding | \`6px 8px\` |
-| \`--color-picker-input-radius\` | Hex input corner radius | \`3px\` |
-
-**Button — apply (primary)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--button-primary-bg\` | Apply button background | theme-based |
-| \`--button-primary-border\` | Apply button border | theme-based |
-| \`--button-primary-color\` | Apply button text color | theme-based |
-| \`--button-primary-bg-hover\` | Apply button background on hover | theme-based |
-
-**Button — cancel (secondary)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--button-root-bg\` | Cancel button background | theme-based |
-| \`--button-root-border\` | Cancel button border | theme-based |
-| \`--button-root-color\` | Cancel button text color | theme-based |
-| \`--button-root-bg-hover\` | Cancel button background on hover | theme-based |
-| \`--button-root-border-radius\` | Corner radius of both buttons | \`3px\` |`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The button variables reach the apply and cancel pair through the same wrapper; hover either button to see its hover background.`,
       },
       source: {
         code: `<div
