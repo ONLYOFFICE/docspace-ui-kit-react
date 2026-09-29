@@ -27,82 +27,8 @@ const meta = {
   title: "UI/Layout/Section",
   component: Section,
   parameters: {
-    docs: {
-      description: {
-        component: `Section is the main content area of an application page: a pinned header and filter above a scrolling body, with an info panel and a chat panel that open beside it.
-
-### Features
-
-- **Slots**: Takes its header, submenu, filter, banner, warning, body, footer and panel contents as \`Section.*\` marker children and places each in its own spot; with no header, filter or body it renders nothing
-- **Pinned Header**: Keeps the header, the submenu and, on desktop, the filter pinned above the body while the body scrolls under them
-- **Device Layouts**: Moves the filter into the scrolling body below desktop and the header too on a phone, as \`currentDeviceType\` says; nothing measures the window
-- **Info Panel**: Opens a details panel beside the body when \`canDisplay\` and \`isInfoPanelVisible\` are both set, inline on desktop and over the page on tablet and phone
-- **Chat Panel**: Docks a second side panel for a chat, with an optional edge handle that resizes it and, dragged further, asks the host to go fullscreen
-- **Operations Button**: Shows a floating progress button while uploads, background or plugin operations are running
-- **File Drop**: Passes the files dropped anywhere on the body to \`onDrop\`, without filtering or highlighting them
-- **Size Context**: Measures itself and shares its width and height with the components inside it, which \`Navigation\` uses to fit its breadcrumbs
-
-### Accessibility
-
-The section adds little of its own; the names, roles and keys come from what its slots hold.
-
-- \`inert\` makes the whole section unfocusable and hides it from assistive technology, for a section kept mounted behind a fullscreen panel
-- PageUp, PageDown, Home and End pressed inside the info panel scroll only the panel, not the listing behind it
-- The chat panel's resize handle is mouse-only and carries \`role="presentation"\`, so screen readers skip it
-
-### Usage
-
-\`\`\`tsx
-import Section from "@onlyoffice/apps-ui-kit/components/section";
-
-<Section currentDeviceType={DeviceType.desktop} withBodyScroll settingsStudio={false}>
-  <Section.SectionHeader>
-    <Navigation title="Documents" />
-  </Section.SectionHeader>
-  <Section.SectionFilter>
-    <Filter />
-  </Section.SectionFilter>
-  <Section.SectionBody>
-    <TableContent />
-  </Section.SectionBody>
-</Section>
-\`\`\`
-
-\`\`\`tsx
-const [visible, setVisible] = useState(true);
-
-<Section
-  currentDeviceType={DeviceType.desktop}
-  withBodyScroll
-  settingsStudio={false}
-  canDisplay
-  isInfoPanelVisible={visible}
-  setIsInfoPanelVisible={setVisible}
->
-  <Section.SectionBody>
-    <TableContent />
-  </Section.SectionBody>
-  <Section.InfoPanelHeader>
-    <Text fontWeight={600}>Details</Text>
-  </Section.InfoPanelHeader>
-  <Section.InfoPanelBody>
-    <Text>Annual Report.docx</Text>
-  </Section.InfoPanelBody>
-</Section>
-\`\`\`
-
-\`\`\`tsx
-<Section currentDeviceType={DeviceType.mobile} withBodyScroll settingsStudio={false}>
-  <Section.SectionHeader>
-    <Navigation title="Documents" />
-  </Section.SectionHeader>
-  <Section.SectionBody>
-    <RowList />
-  </Section.SectionBody>
-</Section>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   args: {
     onDrop: fn(),
@@ -1451,33 +1377,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-| --- | --- | --- |
-| \`--section-bg\` | Background of the pinned strip that holds the header, the submenu and the desktop filter | theme-based |
-| \`--section-header-size\` | Height of the header on desktop | \`69px\` |
-| \`--section-header-tablet-size\` | Height of the header on tablet | \`61px\` |
-| \`--section-header-mobile-size\` | Height of the header on a phone | \`53px\` |
-| \`--section-footer-margin\` | Space above the footer slot | \`40px\` |
-| \`--section-footer-margin-mobile\` | Space above the footer slot on a phone | \`32px\` |
-| \`--section-mobile-footer-height\` | Empty space under the body on tablet and phone, which keeps the last row clear of floating buttons | \`64px\` |
-| \`--info-panel-background\` | Background of the info panel. On tablet and phone the panel is portalled to the page root, so set it on \`:root\` there | theme-based |
-| \`--info-panel-border-color\` | Border on the info panel's inner edge; desktop only, the panel has no border below it | theme-based |
-| \`--info-panel-width\` | Width of the info panel on desktop | \`400px\` |
-| \`--info-panel-tablet-width\` | Width of the info panel on tablet and phone, capped at the window width less 69px; set it on \`:root\` | \`480px\` |
-| \`--info-panel-backdrop\` | Colour of the overlay behind the info panel on tablet and phone; set it on \`:root\` | theme-based |
-| \`--chat-panel-background\` | Background of the chat panel | theme-based |
-| \`--chat-panel-border-color\` | Border on the chat panel's inner edge | theme-based |
-| \`--chat-panel-width\` | Width of the docked chat panel on desktop; the resize handle replaces it with its own width while \`chatPanelWidth\` is set | \`400px\` |
-| \`--chat-panel-drop-overlay-background\` | Fill of the "drop here" frame over the chat panel, drawn at 85% opacity | the chat panel's background |
-| \`--chat-panel-drop-border-color\` | Dashed border of that frame | theme-based |
-| \`--chat-panel-drop-inset-top\` | Space left above that frame for the chat's own header; desktop and tablet only, a phone always leaves 53px | \`69px\` |
-| \`--section-filter-top\` | With \`stickyTableHeader\`: where the filter comes to rest under the header | \`0\` |
-| \`--section-filter-height\` | With \`stickyTableHeader\`: minimum height of the filter row | \`0\` |
-| \`--section-filter-bottom\` | With \`stickyTableHeader\`: where the table header comes to rest under the filter | \`0\` |
-
-The example sets every desktop variable on a wrapper around one section with both panels open: the blue strip is the pinned header, the pale blue column is the info panel and the yellow one is the chat panel, with its drop frame on. Navigation, Filter and the table have variables of their own, documented in their stories and set on the same wrapper.`,
+        story: `The variables are listed under CSS variables on this page. The example sets every desktop one on a wrapper around one section with both panels open: the blue strip is the pinned header, the pale blue column is the info panel and the yellow one is the chat panel, with its drop frame on. Navigation, Filter and the table have variables of their own, documented in their stories and set on the same wrapper.`,
       },
       source: {
         code: `<div
