@@ -86,4 +86,39 @@ describe("Aside Component", () => {
     expect(screen.getByTestId("aside")).toHaveClass(styles.aside);
     expect(screen.getByTestId("scrollbar")).toHaveClass(styles.body);
   });
+
+  it("gives header props to the header and aria-* to the panel, not both", () => {
+    const onBack = vi.fn();
+
+    render(
+      <Aside
+        visible
+        onClose={mockOnClose}
+        zIndex={500}
+        header="Details"
+        isBackButton
+        onBackClick={onBack}
+        id="panel-header"
+        style={{ color: "red" }}
+        aria-label="Room details"
+      >
+        test content
+      </Aside>,
+    );
+
+    const aside = screen.getByTestId("aside");
+    const header = screen.getByTestId("aside-header");
+
+    // Header props stay off the DOM element.
+    expect(aside).not.toHaveAttribute("onbackclick");
+    expect(aside).not.toHaveAttribute("isbackbutton");
+    expect(aside).not.toHaveAttribute("header");
+    // `style` and `id` are the header's; the panel keeps its own z-index.
+    expect(aside).toHaveStyle({ zIndex: 500 });
+    expect(aside).not.toHaveAttribute("id");
+    expect(document.querySelectorAll("#panel-header")).toHaveLength(1);
+    // `aria-*` names the landmark, and only the landmark.
+    expect(aside).toHaveAttribute("aria-label", "Room details");
+    expect(header).not.toHaveAttribute("aria-label", "Room details");
+  });
 });

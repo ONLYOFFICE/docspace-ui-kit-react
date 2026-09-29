@@ -83,6 +83,11 @@ _Changed_ before upgrading.
 
 ### Fixed
 
+- `Aside` no longer copies its header's props onto the `<aside>` element. Whatever it did not
+  read itself went to both, so `onBackClick` and `isBackButton` reached the DOM (React warned
+  "Unknown event handler property `onBackClick`"), a `style` replaced the panel's own `z-index`,
+  and an `id` appeared twice on the page. `aria-*` now go on the `<aside>` alone and everything
+  else to the header alone, as the prop table already said of `id` and `style`
 - `Selector` no longer scrolls the page when it mounts. The list's scroll container takes focus
   on mount, and so does the new-name field when it appears; both focused with a plain `focus()`,
   which scrolls the page to the element. They now pass `preventScroll`, so the focus still lands
