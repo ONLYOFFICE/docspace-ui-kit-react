@@ -142,12 +142,15 @@ export function StillPlaceholder() {
   `title`, or mark the region `aria-busy` as the recipes do.
 - **The colours are fixed, not themed.** `backgroundColor` and `foregroundColor` both default to
   black at 10% and 15% opacity. On a dark surface that is nearly invisible — pass a light colour
-  yourself when you draw the skeleton on one.
+  yourself when you draw the skeleton on one. It reads no CSS custom property either: the colours
+  are SVG gradient stops filled from these props, so a variable set on a wrapper never reaches
+  them.
 - **`width` and `height` size both the element and the rectangle inside it.** The SVG has no
   `viewBox`, so `x`, `y` and `borderRadius` are in the element's own pixels. A skeleton with
-  `height="100%"` needs a parent with a height, or it collapses.
-- The animation is one linear gradient sweeping across the shape for `speed` seconds, forever;
-  nothing stops it, so unmount the skeleton when the content arrives.
+  `height="100%"` needs a parent with a height, or it collapses. A percentage `borderRadius` is
+  taken of the element's width, so `"50%"` on a square draws a circle.
+- The animation is one linear gradient sweeping across the shape for `speed` seconds, forever,
+  until `animate={false}` stops it; unmount the skeleton when the content arrives.
 - `uniqueKey` exists because the library picks a random id per render otherwise, which makes
   server and client markup differ. The component passes a `useId()` value when you leave it out,
   so the default is already SSR-safe — `CircleSkeleton` has no such prop and is not.
