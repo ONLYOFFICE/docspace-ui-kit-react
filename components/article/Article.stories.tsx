@@ -341,7 +341,6 @@ const defaultProps: ArticleProps = {
   chatDisplayName: "Support Chat",
   isMobileArticle: false,
   zendeskKey: "your-zendesk-key",
-  showProgress: false,
   showBackButton: false,
   navigate: fn(),
   onBack: fn(),

@@ -72,7 +72,7 @@ export type ArticleZendeskProps = {
   chatDisplayName: string;
   /** Key of the Zendesk account. The live chat block loads a third-party script with it. */
   zendeskKey: string;
-  /** Whether the live chat bubble is expanded. */
+  /** Whether the Zendesk widget script is loaded. The widget's own launcher stays hidden either way; the app opens the chat from its own Support button. */
   isShowLiveChat: boolean;
 };
 
@@ -101,9 +101,15 @@ export type ArticleProps = ArticleProfileProps &
     withMainButton?: boolean;
     /** Whether the panel is in its narrow, overlay-capable mode. It is written back through `setIsMobileArticle` on mount and on every device change. */
     isMobileArticle: boolean;
-    /** Whether an upload or other progress indicator is on screen, which moves the live chat bubble up. */
-    showProgress: boolean;
-    /** Whether the info panel is open, which moves the live chat bubble clear of it. */
+    /**
+     * Whether an upload or other progress indicator is on screen.
+     * @deprecated Not read: the live chat launcher no longer moves for a progress indicator. Kept so existing callers compile; it goes in the next major.
+     */
+    showProgress?: boolean;
+    /**
+     * Whether the info panel is open.
+     * @deprecated Not read: the live chat launcher no longer moves clear of the info panel. Kept so existing callers compile; it goes in the next major.
+     */
     isInfoPanelVisible?: boolean;
     /** Called on mount and on every device change. Wire it to the state behind `isMobileArticle`. */
     setIsMobileArticle: (value: boolean) => void;
@@ -120,7 +126,7 @@ export type ArticleProps = ArticleProfileProps &
     /** Whether the portal's top bar is on screen. Its height is measured out of the window height on every resize — a measurement the component then does not use. */
     mainBarVisible: boolean;
 
-    /** Whether the live chat bubble may be rendered at all. It is also suppressed on a mobile user agent. */
+    /** Whether the live chat is mounted at all. It is also suppressed on a mobile user agent. */
     isLiveChatAvailable: boolean;
 
     /** Replaces the body, the apps block and the profile block with skeletons. The header and the slots are still rendered. */
