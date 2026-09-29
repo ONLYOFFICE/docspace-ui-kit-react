@@ -50,8 +50,8 @@ export type RoomLogoCoverProps = {
   /** The portal's accent colours, used to tint the hovered and selected icon. Without it those states have no accent. */
   currentColorScheme?: TColorScheme;
 
-  /** Attached to the outer element, for measuring its height. */
-  forwardedRef?: React.RefObject<HTMLDivElement | null>;
+  /** Attached to the outer element, for measuring its height: a ref object, or a callback that is handed the element once it is mounted. */
+  forwardedRef?: React.Ref<HTMLDivElement>;
   /** Height of the scroll area around the two pickers, as a CSS length. Ignored on mobile and while `generalScroll` is set. */
   scrollHeight?: string;
   /** Drops the inner scroll area, for when something outside scrolls instead. */

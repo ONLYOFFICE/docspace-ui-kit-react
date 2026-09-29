@@ -83,6 +83,11 @@ _Changed_ before upgrading.
 
 ### Fixed
 
+- `RoomLogoCoverDialog` fits the window the first time it opens. Its `Portal` mounts the body
+  after the first render, so the height was computed before there was anything to measure and
+  stayed at the 648px (desktop) or 854px (tablet) preset, past the bottom of a short window; only
+  a second opening measured it. The body is now measured once it is mounted. `RoomLogoCover`'s
+  `forwardedRef` accepts a callback ref as well as a ref object
 - `MCPServersSelector` loads the portal's logo from the portal. The system server's icon
   was a relative `/logo.ashx?logotype=3`, which the browser resolves against the page's own
   origin — the portal only when the application is served from it. Anywhere else the icon was a
