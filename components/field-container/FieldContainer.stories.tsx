@@ -12,58 +12,8 @@ const meta = {
   title: "UI/Form controls/FieldContainer",
   component: FieldContainer,
   parameters: {
-    docs: {
-      description: {
-        component: `A responsive form field container component that provides consistent layout and styling for form inputs.
-
-### Features
-
-- **Dual Layout**: Places the label beside the control or stacks it above
-- **Error Handling**: Built-in error message display with customizable color and width
-- **Required Indicator**: Optional asterisk for required fields
-- **Label Configuration**: Adjustable label width and visibility
-- **Tooltip Support**: Integrated help button with configurable tooltip placement
-- **Inline Help**: Option to render the help button inline within the label
-- **Responsive Layout**: Switches the side-by-side layout to stacked on tablet-width screens and below
-- **Label Association**: Ties the caption to the control by \`id\`, so clicking the caption focuses the control
-
-### Accessibility
-
-The caption is a native \`<label>\`, so the field's name reaches assistive technology only when the consumer pairs it with the control:
-
-- **Label**: \`labelFor\` is the \`id\` of the control the label belongs to. Give the control the same \`id\` and the caption becomes clickable and is announced with the field; without the pair the label captions nothing
-- **Required**: With \`isRequired\` the label carries \`aria-required="true"\` and the asterisk is hidden from screen readers
-
-### Usage
-
-\`\`\`tsx
-import { FieldContainer } from "@onlyoffice/apps-ui-kit/components/field-container";
-
-// Horizontal layout with tooltip
-<FieldContainer
-  labelText="Name:"
-  labelVisible
-  labelFor="name"
-  tooltipContent="Enter your full name"
-  place="top"
->
-  <TextInput id="name" type={InputType.text} value={value} onChange={handleChange} />
-</FieldContainer>
-
-// Vertical layout with error
-<FieldContainer
-  isVertical
-  labelText="Email:"
-  labelVisible
-  labelFor="email"
-  hasError
-  errorMessage="Invalid email"
->
-  <TextInput id="email" type={InputType.email} value={value} hasError onChange={handleChange} />
-</FieldContainer>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     isVertical: {
@@ -470,15 +420,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--field-container-margin\` | Container margin | \`0 0 16px 0\` |
-| \`--field-container-error-top\` | Error message top padding | \`4px\` |
-| \`--error-color\` | Error message text color when \`errorColor\` is not given | theme-based |
-
-\`--label-width\` and \`--error-width\` are written inline on the component from \`maxLabelWidth\` and \`errorMessageWidth\`, so a wrapper value never arrives; set those props instead.
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
 
 - **Full Name** — the error message shows the custom colour and top padding
 - **Email** — the gap between the two fields is the custom container margin`,
