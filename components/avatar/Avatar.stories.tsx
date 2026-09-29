@@ -127,7 +127,8 @@ import { Avatar, AvatarSize, AvatarRole } from "@onlyoffice/apps-ui-kit/componen
       },
     },
     model: {
-      control: "object",
+      // The icons are data URIs too long to edit, and they stretch the table.
+      control: false,
       description:
         "Actions of the edit menu, in order; the first one runs directly when there is no picture yet, and the one keyed `AvatarActionKeys.PROFILE_AVATAR_UPLOAD` receives the file input's ref",
     },
