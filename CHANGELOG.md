@@ -99,6 +99,12 @@ _Changed_ before upgrading.
   (`SpaceGroups`, `AllSpaces`, `ManageGroupSpaces`) showed the raw key names, and the AI
   agent's export labels (`ExportPdfDocument`, `ExportDocxDocument`, `ExportMdFile`) had no
   entry, so only their inline English default could show
+- Two mounted `Toast`s threw `Cannot set properties of undefined (setting 'toggle')` once one
+  of them remounted while the other still showed a toast: `react-toastify` keys its registry by
+  container id, and every `Toast` uses the same one. That happens on any Storybook docs page
+  with several stories, and to a plugin that mounts its own next to the portal's. Only the
+  first mounted `Toast` renders the container now, and the next takes over when it unmounts;
+  the `className` and `style` of the others are ignored
 
 ### Documentation
 
