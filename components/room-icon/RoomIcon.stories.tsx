@@ -14,40 +14,8 @@ const meta = {
   title: "UI/Data display/RoomIcon",
   component: RoomIcon,
   parameters: {
-    docs: {
-      description: {
-        component: `Square tile that stands for one room: its logo, or two initials from its name on its colour, with an optional corner badge and a menu for changing the logo.
-
-### Features
-
-- **Color Backgrounds**: Draws the first letters of the name's first and last words on the given colour, in white or black, whichever reads better on it
-- **Logo Image**: Shows a logo from a URL, or inlines a cover glyph and paints it in the initials' colour, and falls back to the initials when the image fails to load
-- **Any Size**: Takes any px size for the square; at 96px the corner badge grows to match
-- **Badge Support**: Draws a glyph from a URL or a node in the bottom corner, with an optional tooltip and click handler
-- **Editing Mode**: Adds a pencil button that opens a menu of logo actions, and a hidden file input the upload entry can open; a room with no logo yet gets a dashed empty frame with a plus button instead
-- **Hover Preview**: Slides the initials away and fades in a second image while the pointer is on the tile
-- **Archive Look**: Greys the tile out whatever its colour and switches the hover preview off
-- **Template Outline**: Draws the tile as an outline in its colour, with the initials or a 24px logo inside
-
-### Usage
-
-\`\`\`tsx
-import { RoomIcon } from "@onlyoffice/apps-ui-kit/components/room-icon";
-
-// Initials on a colour
-<RoomIcon title="Project files" color="4781D1" size="48px" />
-
-// A logo, falling back to the initials if it fails to load
-<RoomIcon title="Project files" color="4781D1" size="48px" logo={logoUrl} />
-
-// With a corner badge
-<RoomIcon title="Project files" color="3B72A7" size="96px" badgeUrl={iconUrl} />
-
-// With the logo menu
-<RoomIcon title="Project files" color="4781D1" size="96px" withEditing model={menuModel} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     title: {
@@ -664,18 +632,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--room-icon-bg\` | Fill of the plus glyph in the empty frame and of a badge glyph without \`badgeIconColor\` | theme-based |
-| \`--room-icon-bg-opacity\` | Opacity of the coloured tile behind the initials | \`1\` / \`0.1\` in dark |
-| \`--room-icon-edit-bg\` | Background of the pencil button | theme-based |
-| \`--room-icon-button-icon-color\` | Fill of the camera glyph in the empty frame, and of a template outline that has no \`color\` | theme-based |
-| \`--room-icon-empty-radius\` | Corner radius of the empty frame | \`10px\` |
-| \`--room-icon-dashed-border\` | Border of the empty frame | theme-based |
-
-The wrapper sets every variable, for two instances:
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. It covers two instances:
 
 - **Design review** — an editable tile, for \`--room-icon-bg-opacity\` on the tile and \`--room-icon-edit-bg\` on the pencil
 - **Empty frame** — for \`--room-icon-bg\` on the plus glyph, \`--room-icon-button-icon-color\` on the camera, and the frame's \`--room-icon-dashed-border\` and \`--room-icon-empty-radius\``,
