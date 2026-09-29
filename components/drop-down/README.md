@@ -241,7 +241,8 @@ export function TimezoneMenu({ zones }: { zones: string[] }) {
   counts the original children, so the highlight and the removed items disagree.
 - **`directionX` and `directionY` are preferences.** The component measures the room around the
   anchor and flips the menu to whichever side fits, ending up at the viewport edge when neither
-  does. `fixedDirection` turns that off.
+  does. `fixedDirection` turns that off. In a right-to-left interface the alignment mirrors:
+  the menu lines up with the anchor's right edge instead of its left.
 - **Nothing closes the menu by itself.** `open` is yours, and `clickOutsideAction` is called by
   the backdrop and by the DOM events you list in `eventTypes` — there is no Escape handling and
   no default event list. On a mobile device the component registers a single event type spelled
@@ -254,27 +255,35 @@ export function TimezoneMenu({ zones }: { zones: string[] }) {
 
 ## CSS variables
 
-| Variable                   | Default                    | Effect                   |
-| -------------------------- | -------------------------- | ------------------------ |
-| `--dropdown-bg`            | theme surface              | Background of the menu   |
-| `--dropdown-border-style`  | none in light, 1px in dark | Border                   |
-| `--dropdown-shadow`        | `0 8px 16px` theme shadow  | Shadow                   |
-| `--dropdown-radius`        | `6px`                      | Corner radius            |
-| `--dropdown-inner-padding` | `8px 0`                    | Padding around the items |
-| `--dropdown-text-size`     | `13px`                     | Font size of the items   |
-| `--dropdown-text-weight`   | `600`                      | Font weight of the items |
+| Variable                   | Default                    | Effect                          |
+| -------------------------- | -------------------------- | ------------------------------- |
+| `--dropdown-bg`            | theme surface              | Background of the menu          |
+| `--dropdown-border-style`  | none in light, 1px in dark | Border, as a `border` shorthand |
+| `--dropdown-shadow`        | `0 8px 16px` theme shadow  | Shadow                          |
+| `--dropdown-radius`        | `6px`                      | Corner radius                   |
+| `--dropdown-inner-padding` | `8px 0`                    | Padding around the items        |
+| `--dropdown-text-size`     | `13px`                     | Font size of the items          |
+| `--dropdown-text-weight`   | `600`                      | Font weight of the items        |
+
+`--dropdown-text-size` and `--dropdown-text-weight` are set on the menu, and a `DropDownItem`
+sets its own font size and weight, so they reach only children that do not.
+
+In the default portal mode the menu is rendered on `document.body`, outside any wrapper of
+yours, so a variable set on a wrapper never reaches it: set it through the DropDown's own
+`style` prop, or render in place with `isDefaultMode={false}`.
 
 `--z-index`, `--max-height`, `--manual-width`, `--manual-x` and `--manual-y` are written by the
 component from the matching props.
 
 ## Accessibility
 
-- The menu is a `<div role="listbox">` whose children are not options — a `DropDownItem` is a
-  `<div>` with no role — so the roles do not describe what is there.
+- The menu is a `<div role="listbox">`. A `DropDownItem` inside it is a `role="option"`, or a
+  `role="separator"` when marked `isSeparator`; children of your own get no role.
 - Nothing links the anchor to the menu: no `aria-expanded`, no `aria-controls`, no
   `aria-activedescendant` on the anchor. Add them on your own control.
 - Focus is neither moved into the menu nor trapped, and Escape does not close it. The arrow keys
-  work only with `maxHeight`, and they move a highlight rather than focus.
+  work only with `maxHeight`, and they move a highlight rather than focus, wrapping from the
+  last item to the first and back.
 - Enter activates the highlighted child by calling its `onClick` directly, which does nothing
   for a child that has none.
 
