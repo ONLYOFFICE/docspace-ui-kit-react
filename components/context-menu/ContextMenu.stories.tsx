@@ -80,7 +80,8 @@ const model = [
   },
   argTypes: {
     model: {
-      control: "object",
+      // The icons are data URIs too long to edit, and they stretch the table.
+      control: false,
       description:
         "The items — actions, separators and submenus — read each time the menu opens; `getContextModel` replaces them when it is given",
     },
