@@ -131,7 +131,8 @@ import { MainButton } from "@onlyoffice/apps-ui-kit/components/main-button";
         "Called with the click event when the button is clicked. Only reached while `isDropdown` is off",
     },
     model: {
-      control: "object",
+      // The icons are data URIs too long to edit, and they stretch the table.
+      control: false,
       description:
         "Items of the menu: a label with an optional icon and description, a separator, or a nested list under `items`. Required even when `isDropdown` is off and nothing reads it",
     },
