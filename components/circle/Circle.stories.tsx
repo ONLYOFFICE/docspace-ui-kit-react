@@ -110,53 +110,8 @@ const meta = {
     },
   },
   parameters: {
-    docs: {
-      description: {
-        component: `A round loading placeholder that stands in for an avatar, a logo or a circular icon until it arrives.
-
-### Features
-
-- **Independent Sizing**: The element's width and height and the circle's radius and centre are set separately, so a circle of radius r needs a centre at r, r in a box of 2r to show whole
-- **Custom Colors**: Draws in black at low opacity in every theme by default, and takes its own resting and highlight colours with separate opacities
-- **Sweeping Highlight**: A lighter band sweeps across the circle, once every two seconds by default and at any pace set
-- **Still Mode**: Stops the sweep entirely for a page that must not animate
-- **SVG Based**: Renders as an SVG circle for crisp display at any resolution
-- **Accessible Name**: Takes an optional title that names the placeholder for screen readers
-- **Styling Hooks**: Passes a class name and an inline style through to the SVG element
-
-### Accessibility
-
-The SVG is exposed to assistive technology as an image:
-
-- **Role**: The element carries \`role="img"\`, so a screen reader treats the placeholder as one picture
-- **Name**: \`title\` renders an SVG \`<title>\` that the element's \`aria-labelledby\` points at; without one the image has no name and nothing is announced
-- **Busy State**: The component sets no \`aria-busy\`; mark the loading region with it yourself
-- **Motion**: Nothing checks \`prefers-reduced-motion\`; pass \`animate={false}\` where motion should stop
-
-### Usage
-
-\`\`\`tsx
-import { CircleSkeleton } from "@onlyoffice/apps-ui-kit/components/circle";
-
-<CircleSkeleton width="50" height="50" radius="20" x="25" y="25" />
-\`\`\`
-
-\`\`\`tsx
-<CircleSkeleton
-  width="32"
-  height="32"
-  radius="16"
-  x="16"
-  y="16"
-  title="Loading the avatar"
-/>
-\`\`\`
-
-\`\`\`tsx
-<CircleSkeleton width="40" height="40" radius="20" x="20" y="20" animate={false} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
 } satisfies Meta<typeof CircleSkeleton>;
 
@@ -380,14 +335,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The component reads no CSS custom property: its colours are SVG gradient stops filled from props, so a wrapper variable never reaches them. All three circles here set the same four props, at three sizes:
-
-| Prop | Description | Default |
-|------|-------------|---------|
-| \`backgroundColor\` | Colour of the circle at rest | \`#000\` |
-| \`foregroundColor\` | Colour of the sweeping band | \`#000\` |
-| \`backgroundOpacity\` | Opacity of the resting colour | \`0.1\` |
-| \`foregroundOpacity\` | Opacity of the sweeping band | \`0.15\` |`,
+        story: `The component reads no CSS custom property -- see the behaviour notes on this page; its colours come from props. All three circles here set the same four props, at three sizes.`,
       },
       source: {
         code: `<CircleSkeleton
