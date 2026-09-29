@@ -80,7 +80,27 @@ describe("ContextRoomSync", () => {
     renderSync({ id: "12", name: "Sales" });
     await flush();
 
-    expect(clouds.selectContextFolder).not.toHaveBeenCalled();
+    expect(clouds.selectContextFolder).toHaveBeenCalledWith(
+      CONTEXT_ROOM_CLOUD,
+      { id: "12", name: "Sales" },
+    );
+    expect(clouds.fetchRoomSkills).toHaveBeenCalledTimes(1);
+    expect(clouds.clearContextFolder).not.toHaveBeenCalled();
+  });
+
+  it("hands the store the new name of the room already connected", async () => {
+    hasRoomAiFolder.mockResolvedValue(true);
+    clouds.selectedContextFolder = {
+      cloud: CONTEXT_ROOM_CLOUD,
+      room: { id: "12", name: "Sales" },
+    };
+    renderSync({ id: "12", name: "Sales EMEA" });
+    await flush();
+
+    expect(clouds.selectContextFolder).toHaveBeenCalledWith(
+      CONTEXT_ROOM_CLOUD,
+      { id: "12", name: "Sales EMEA" },
+    );
     expect(clouds.fetchRoomSkills).toHaveBeenCalledTimes(1);
     expect(clouds.clearContextFolder).not.toHaveBeenCalled();
   });

@@ -77,20 +77,21 @@ const ContextRoomSync = () => {
           return;
         }
         const selected = current.selectedContextFolder;
-        if (
-          selected?.cloud === CONTEXT_ROOM_CLOUD &&
-          selected.room.id === roomId
-        ) {
-          // Same room as last time: the store would skip the pick, so
-          // re-read the skills — the chat is opening, and a file added to
-          // the folder since should show up now, not after leaving the room.
-          void current.fetchRoomSkills();
-          return;
-        }
+        const sameRoom =
+          selected?.cloud === CONTEXT_ROOM_CLOUD && selected.room.id === roomId;
+        // For the room already connected the store keeps its skills and
+        // switches and only takes over a changed name (the room was renamed
+        // while the chat stayed open).
         current.selectContextFolder(CONTEXT_ROOM_CLOUD, {
           id: roomId,
           name: roomName,
         });
+        if (sameRoom) {
+          // The pick did not read the skills again, so do it here — the
+          // chat is opening, and a file added to the folder since should
+          // show up now, not after leaving the room.
+          void current.fetchRoomSkills();
+        }
       });
 
     return () => {
