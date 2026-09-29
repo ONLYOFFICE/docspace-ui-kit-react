@@ -16,17 +16,22 @@ export type LabelProps = {
   error?: boolean;
 
   /**
-   * Renders the label inline instead of on its own line.
+   * Makes the label an inline block, so it keeps its own width and padding on
+   * the line beside the field. Without it the label is a plain inline element.
    * @default false
    */
   isInline?: boolean;
 
-  /** Native `title`, shown as the browser's own tooltip on hover. */
+  /**
+   * Text of the kit's shared tooltip, opened when the pointer rests on the
+   * label. It shows only while `RootTooltip` is mounted.
+   */
   title?: string;
 
   /**
-   * Cuts text that does not fit with an ellipsis. It needs a width to cut
-   * against, so give the label one or a parent that constrains it.
+   * Cuts text that does not fit on one line with an ellipsis. The label is
+   * inline, so it also needs `display: block` (through `style`) and a width to
+   * cut against.
    * @default false
    */
   truncate?: boolean;
@@ -37,7 +42,10 @@ export type LabelProps = {
   /** The label's text. */
   text?: string | React.ReactNode;
 
-  /** CSS `display` of the label, passed through to `Text`. */
+  /**
+   * Written onto the label as an HTML `display` attribute, which changes
+   * nothing about its layout. Set `display` through `style` instead.
+   */
   display?: string;
 
   /** Applied to the label. */
@@ -52,6 +60,6 @@ export type LabelProps = {
   /** Rendered after the text and the asterisk, inside the same label. */
   children?: React.ReactNode;
 
-  /** Ignored. Nothing reads this prop; `title` is a native browser tooltip. */
+  /** Ignored. Nothing reads this prop; the shared tooltip sizes itself. */
   tooltipMaxWidth?: string;
 };
