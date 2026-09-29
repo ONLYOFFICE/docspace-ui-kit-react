@@ -127,6 +127,7 @@ const preview: Preview = {
             "Themes",
             "API",
             "Types and roles",
+            "Agent skills",
           ],
           "Components",
           [
