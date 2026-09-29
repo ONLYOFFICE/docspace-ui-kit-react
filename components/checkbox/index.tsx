@@ -123,7 +123,8 @@ const CheckboxPure = ({
         {...rest}
       />
       <RenderCheckboxIcon
-        tabIndex={tabIndex}
+        // A disabled checkbox is no tab stop, as a disabled input would not be.
+        tabIndex={isDisabled ? -1 : tabIndex}
         isChecked={checked || false}
         isIndeterminate={isIndeterminate || false}
       />

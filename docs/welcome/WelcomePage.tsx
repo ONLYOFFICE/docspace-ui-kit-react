@@ -14,12 +14,12 @@ import { CollapsibleCard } from "../../components/collapsible-card";
 import { Link, LinkType } from "../../components/link";
 import { QuickActions } from "../../components/quick-actions";
 import {
-  CreateAgentIcon,
   CreateDocumentIcon,
+  CreateFromTextIcon,
   CreateRoomIcon,
-  CreateSpreadsheetIcon,
   QuickCollaborationRoomIcon,
-  UseTemplateIcon,
+  QuickCustomRoomIcon,
+  QuickFormRoomIcon,
 } from "../../components/quick-actions/icons";
 import { Text } from "../../components/text";
 import { ThemeProviderComponent } from "../../components/theme-provider";
@@ -95,7 +95,8 @@ const sampleTiles = [
   },
   {
     id: "sample-sending",
-    icon: <UseTemplateIcon />,
+    // The client hands a file in, as to a form room.
+    icon: <QuickFormRoomIcon />,
     label: "Sending a document",
     href: docsHref(
       "samples-legal-practice-screens-03-sending-a-document--docs",
@@ -103,7 +104,7 @@ const sampleTiles = [
   },
   {
     id: "sample-reading",
-    icon: <CreateSpreadsheetIcon />,
+    icon: <CreateFromTextIcon />,
     label: "Reading the firm's draft",
     href: docsHref(
       "samples-legal-practice-screens-04-reading-the-firm-s-draft--docs",
@@ -111,7 +112,8 @@ const sampleTiles = [
   },
   {
     id: "sample-seed",
-    icon: <CreateAgentIcon />,
+    // The seed creates custom rooms.
+    icon: <QuickCustomRoomIcon />,
     label: "Demo data on your portal",
     href: docsHref(
       "samples-legal-practice-setup-demo-data-on-your-portal--docs",

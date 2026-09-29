@@ -54,6 +54,15 @@ if (listed.error) {
   process.exit(1);
 }
 
+// 0 is clean and 1 is "some files differ". Anything else -- 2 for a file
+// Prettier cannot parse -- goes to stderr with nothing on stdout, and would
+// otherwise read as zero offenders and pass the gate.
+if (listed.status !== 0 && listed.status !== 1) {
+  console.error("Prettier failed before it could check the formatting:");
+  console.error(listed.stderr ?? "");
+  process.exit(1);
+}
+
 const offenders = (listed.stdout ?? "")
   .split("\n")
   .map((line) => line.trim())

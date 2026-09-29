@@ -24,6 +24,7 @@ import { explainPortalError } from "../samples/legal/explain";
 import { demoSource } from "./demo";
 import { FolderPicker } from "./FolderPicker";
 import {
+  DEFAULT_ROOM_COLOR,
   filterGroupsFor,
   formFolderOf,
   itemCount,
@@ -42,27 +43,17 @@ import styles from "./SectionList.module.scss";
 const noop = () => {};
 
 /**
- * The kit's own filter group for each group a list offers. The type group is
- * a room type only on a rooms list; inside a folder or a room, and in My
- * documents, it is a file type.
- *
- * The owner group is not `roomFilterOwner`, although that is the portal's:
- * the component special-cases that group as exactly [Me, Other, people
- * selector] (`FilterBlockItem` reads the second entry unconditionally, and
- * `FilterBlock` will not deselect in it), and "Other" needs a people
- * selector this list does not mount. A plain tag group is one chip,
- * selected and cleared like any other.
+ * The kit's own filter group a chip belongs to, read from the groups the list
+ * offers at that place rather than decided again here; undefined for a group
+ * it does not offer.
  */
 const groupOf = (
   group: SectionFilter["group"],
   kind: SectionKind,
   folderId: number | null,
-): FilterGroups => {
-  if (group === "owner") return FilterGroups.filterOther;
-  return kind !== "files" && folderId === null
-    ? FilterGroups.roomFilterType
-    : FilterGroups.filterType;
-};
+): FilterGroups | undefined =>
+  filterGroupsFor(kind, folderId).find((offered) => offered.group === group)
+    ?.kitGroup;
 
 const ROOM_TYPE_LABELS: Partial<Record<RoomType, string>> = {
   [RoomType.EditingRoom]: "Collaboration room",
@@ -248,12 +239,20 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
   // whenever the function changes.
   const selectedFilterData = useCallback(
     (): TItem[] =>
-      query.filters.map((filter) => ({
-        id: `filter_${filter.group}-${filter.key}`,
-        key: filter.key,
-        group: groupOf(filter.group, kind, folderId),
-        label: labelOf(filter),
-      })),
+      // A filter whose group this place does not offer has no chip.
+      query.filters.flatMap((filter) => {
+        const group = groupOf(filter.group, kind, folderId);
+        return group
+          ? [
+              {
+                id: `filter_${filter.group}-${filter.key}`,
+                key: filter.key,
+                group,
+                label: labelOf(filter),
+              },
+            ]
+          : [];
+      }),
     [query.filters, kind, folderId],
   );
 
@@ -272,7 +271,7 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
     groups.flatMap((group) => {
       const hit = picked.find(
         (item) =>
-          item.group === groupOf(group.group, kind, folderId) &&
+          item.group === group.kitGroup &&
           group.options.some((option) => option.key === item.key),
       );
       return hit ? [{ group: group.group, key: hit.key } as SectionFilter] : [];
@@ -289,7 +288,7 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
       return (
         <RoomIcon
           title={item.title}
-          color={item.color || "4781D1"}
+          color={item.color || DEFAULT_ROOM_COLOR}
           showDefault
           size="32px"
           radius="6px"
@@ -550,7 +549,7 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
             getFilterData={() =>
               Promise.resolve(
                 groups.flatMap((group): TItem[] => {
-                  const filterGroup = groupOf(group.group, kind, folderId);
+                  const filterGroup = group.kitGroup;
                   return [
                     {
                       key: filterGroup,

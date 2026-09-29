@@ -445,10 +445,18 @@ const main = async () => {
       error("E_META_FOLDER", folder, 1, `\`folder\` says \`${meta.folder}\``);
     }
 
+    // The summary is the lead's whole first sentence: a prefix of the lead that
+    // ends a sentence and is followed by nothing or by whitespace. A bare
+    // `startsWith` passed half a sentence, or a word cut in the middle.
+    const summary = typeof meta.summary === "string" ? meta.summary : null;
     if (
       lead &&
-      typeof meta.summary === "string" &&
-      !lead.startsWith(meta.summary)
+      summary !== null &&
+      !(
+        lead.startsWith(summary) &&
+        /[.!?]$/.test(summary) &&
+        (lead.length === summary.length || /\s/.test(lead[summary.length]))
+      )
     ) {
       error(
         "E_META_SUMMARY",

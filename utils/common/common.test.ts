@@ -70,7 +70,6 @@ describe("Common Utilities", () => {
         return key;
       });
 
-      // productName comes from getBrandName("ProductName") which returns "DocSpace"
       expect(getUserTypeTranslation(EmployeeType.Admin)).toBe("Full admin");
       spy.mockRestore();
     });
