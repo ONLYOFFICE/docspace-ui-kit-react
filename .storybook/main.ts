@@ -16,8 +16,10 @@ const config: StorybookConfig = {
     // Scoped per directory rather than "../**/*.mdx": the recursive form also
     // matches dist/, storybook-static/ and node_modules/, and every .mdx in
     // this package lives under one of the directories listed below.
+    // components/ has none: a component's Docs page is its README, rendered
+    // by .storybook/blocks/DocsPage.tsx, and a glob matching nothing only
+    // prints "No story files found" on every start.
     "../docs/**/*.mdx",
-    "../components/**/*.mdx",
     "../errors/**/*.mdx",
     "../providers/**/*.mdx",
     "../selectors/**/*.mdx",
@@ -86,6 +88,12 @@ const config: StorybookConfig = {
 
   typescript: {
     reactDocgen: "react-docgen-typescript",
+    // .storybook/ is outside tsconfig.json and holds no component with props,
+    // so docgen skipped each of its files with a warning on every start.
+    // Setting `exclude` replaces the plugin's default, hence the stories.
+    reactDocgenTypescriptOptions: {
+      exclude: ["**/*.stories.tsx", "**/.storybook/**"],
+    },
   },
 
   async viteFinal(config, { configType }) {
