@@ -168,7 +168,9 @@ export function TwelveHourTime({ day }: { day: DateTime }) {
   that cannot start a valid hour — above 2, or above 1 in 12-hour mode — is padded with a zero
   and jumps as well. The same happens between minutes and blur.
 - **Out-of-range input is dropped, not corrected.** Minutes above 59 call `onBlur` and leave the
-  field as it was; letters are ignored entirely.
+  field as it was; letters are ignored entirely. A second hour digit that would pass 23 (12 in
+  12-hour mode) is dropped: the first digit stays, padded to `0x`, and the caret moves to minutes.
+- **Clearing a field sets it to `00`** and reports that time, so neither field can be left empty.
 - **A single digit is zero-padded on blur**, so `9` becomes `09`.
 - **`isTwelveHourFormat` renders no AM/PM control.** It changes the hour format and the maximum
   hour; `meridiem` is a plain string you pass, and the types require it alongside
@@ -179,8 +181,31 @@ export function TwelveHourTime({ day }: { day: DateTime }) {
 - **The error colour survives focus.** With `hasError` the border keeps the error colour while
   a field is being edited, instead of switching to the focus colour.
 - **The right-click menu is suppressed** on both fields.
+- **The group is always laid out left to right**, hours then minutes, even inside a
+  right-to-left interface: the wrapper sets `direction: ltr`.
 - The two fields are separated by a literal `:` text node, and clicking anywhere in the group
   that is not the minutes field selects the hours.
+
+## CSS variables
+
+Set these on any ancestor; the group reads them through a fallback to the theme token or to a
+fixed size.
+
+| Variable                    | Default                | Effect                                                        |
+| --------------------------- | ---------------------- | ------------------------------------------------------------- |
+| `--time-input-border`       | `--input-border-color` | Border colour at rest                                         |
+| `--time-input-bg`           | `--input-bg`           | Background of the group                                       |
+| `--time-input-focus-border` | `--input-border-focus` | Border colour while either field is focused                   |
+| `--time-input-error-border` | `--input-error-border` | Border colour under `hasError`, kept while a field is focused |
+| `--time-input-width`        | `60px`                 | Width of the group                                            |
+| `--time-input-height`       | `32px`                 | Height of the group                                           |
+| `--time-input-radius`       | `3px`                  | Border radius                                                 |
+| `--time-input-padding`      | `0px 6px`              | Padding inside the group, as a `padding` shorthand            |
+
+The two fields inside are [`TextInput`](../text-input/README.md)s drawn without a border, so its
+own variables reach them too: `--text-input-color` sets the digits' colour, and
+`--text-input-bg` their background, which is painted over the group's and should be set to the
+same value as `--time-input-bg` for the fields to blend in.
 
 ## Accessibility
 
