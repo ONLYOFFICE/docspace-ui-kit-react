@@ -42,60 +42,8 @@ const meta = {
   title: "UI/Form controls/Calendar",
   component: Calendar,
   parameters: {
-    docs: {
-      description: {
-        component: `Calendar is an always-visible month grid for picking a single day, with month and year views behind its title.
-
-### Features
-
-- **Date Selection**: Click to select a specific date
-- **Month/Year Navigation**: The arrow buttons step one month, year or decade at a time, and clicking the title switches from days to months and from months to years
-- **Locale Support**: Writes month and weekday names in the language of any locale tag passed to it
-- **Date Range Constraints**: Greys out and disables the days, months and years outside \`minDate\` and \`maxDate\`, and stops the arrows at the boundary
-- **Initial Date**: Set the initially visible month/year
-- **Today and Selection**: Fills today's day with the accent colour and rings the selected day in it
-- **Time Kept on Pick**: Keeps the time of the previous selection when another day is picked, or reports the end of the day when \`useMaxTime\` is set
-
-### Accessibility
-
-Every day, month, year and arrow is a native \`<button>\`, so the keyboard support comes from the platform:
-
-- Tab and Shift+Tab move through the arrows and the grid; Enter and Space pick the focused item
-- Out-of-range items and arrows are \`disabled\`, so Tab skips them and they cannot be picked
-- The arrows are named \`aria-label="Previous"\` and \`aria-label="Next"\`
-- The title that opens the month and year views is a heading with a click handler, reachable by mouse only
-
-### Usage
-
-\`\`\`tsx
-import { Calendar } from "@onlyoffice/apps-ui-kit/components/calendar";
-
-// Basic usage
-<Calendar
-  locale="en"
-  selectedDate={selectedDate}
-  setSelectedDate={setSelectedDate}
-/>
-
-// With date constraints
-<Calendar
-  locale="en"
-  selectedDate={selectedDate}
-  setSelectedDate={setSelectedDate}
-  minDate={new Date("2024/01/01")}
-  maxDate={new Date("2030/01/01")}
-/>
-
-// Report the picked day at 23:59:59.999, for an "until" date
-<Calendar
-  locale="en"
-  selectedDate={selectedDate}
-  onChange={setUntil}
-  useMaxTime
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=651-4406&mode=design&t=RrB9MOQGCnUPghij-0",
@@ -457,35 +405,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-| --- | --- | --- |
-| \`--calendar-bg\` | Background of the calendar | theme-based |
-| \`--calendar-border\` | Colour of the one-pixel border | theme-based |
-| \`--calendar-shadow\` | Box shadow of the calendar | theme-based |
-| \`--calendar-radius\` | Corner radius of the calendar | \`6px\` |
-| \`--calendar-padding\` | Inner padding; ignored with \`isScroll\` and in the mobile layout | \`30px 28px 28px 28px\` |
-| \`--calendar-width\` | Width; ignored in the mobile layout, which takes the full width | \`362px\` |
-| \`--calendar-height\` | Height; ignored in the mobile layout, which is 420px high | \`376px\` |
-| \`--calendar-title\` | Colour of the title and of its dashed underline on hover | theme-based |
-| \`--calendar-title-size\` | Font size of the title; ignored in the mobile layout | \`18px\` |
-| \`--calendar-outline\` | Ring colour of the arrow buttons | theme-based |
-| \`--calendar-arrow\` | Colour of the arrow chevrons | theme-based |
-| \`--calendar-disabled-arrow\` | Colour of the chevron of an arrow that cannot go further | theme-based |
-| \`--calendar-weekday\` | Colour of the weekday labels | theme-based |
-| \`--calendar-accent\` | Fill of today, ring of the selected day, arrow ring on hover and the title chevron | theme-based |
-| \`--calendar-selected-text\` | Text colour of today on the accent fill | \`#fff\` |
-| \`--calendar-current-radius\` | Corner radius of today | \`50%\` |
-| \`--calendar-focused-radius\` | Corner radius of the selected day | \`50%\` |
-| \`--calendar-focused-bg\` | Background of the selected day | \`transparent\` |
-| \`--calendar-focused-text\` | Text colour of the selected day | theme-based |
-| \`--calendar-hover-bg\` | Background of a day under the pointer | theme-based |
-| \`--calendar-hover-radius\` | Corner radius of a day under the pointer | \`50%\` |
-| \`--calendar-past\` | Text colour of the days of the previous and next month | theme-based |
-| \`--calendar-disabled\` | Text colour of the days outside \`minDate\` and \`maxDate\` | theme-based |
-
-One calendar sets every variable on a wrapper. It opens with a selected day other than today, so the today and selected-day variables both show, and with \`minDate\` at the start of this month, so the days of the previous month and the left arrow show their disabled colours. Hover a day and an arrow to see the hover variables.`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The calendar opens with a selected day other than today, so the today and selected-day variables both show, and with \`minDate\` at the start of this month, so the days of the previous month and the left arrow show their disabled colours. Hover a day and an arrow to see the hover variables.`,
       },
       source: {
         code: `<div
