@@ -255,14 +255,19 @@ export function StartHereMixed({ canCreateRoom }: { canCreateRoom: boolean }) {
 
 Set them on any ancestor.
 
-| Variable                         | Default           | Effect                                                     |
-| -------------------------------- | ----------------- | ---------------------------------------------------------- |
-| `--quick-actions-tile-bg`        | theme grey        | Background of a tile.                                      |
-| `--quick-actions-tile-bg-hover`  | theme grey        | Background of a tile while hovered or focused.             |
-| `--quick-actions-tile-color`     | theme text colour | Colour of the label.                                       |
-| `--quick-actions-tile-max-width` | `184px`           | Cap on one tile's width. `none` lets the tiles fill.       |
-| `--quick-actions-row-max-width`  | `100%`            | Cap on the row of tiles, not on the banner.                |
-| `--quick-actions-edge-inset`     | `0px`             | Space between the banner's edge and where the tiles start. |
+| Variable                         | Default           | Effect                                                                                                |
+| -------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------- |
+| `--quick-actions-tile-bg`        | theme grey        | Background of a tile.                                                                                 |
+| `--quick-actions-tile-bg-hover`  | theme grey        | Background of a tile while hovered or keyboard-focused.                                               |
+| `--quick-actions-tile-color`     | theme text colour | Colour of the label and of the keyboard focus outline.                                                |
+| `--quick-actions-tile-max-width` | `184px`           | Cap on one tile's width. `none` lets the tiles grow to fill the banner.                               |
+| `--quick-actions-row-max-width`  | `100%`            | Cap on the row of tiles, which is centred in the banner; not a cap on the banner.                     |
+| `--quick-actions-edge-inset`     | `0px`             | Space between the banner's edge and the first tile at rest. Scrolled tiles still run out to the edge. |
+
+The tile variables do not reach the icon: the bundled illustrations carry their own colours.
+
+`--quick-actions-row-max-width` narrower than the tiles makes the row scroll inside the cap,
+but the edge fades stay at the banner's edge, so the strip is cut off hard where the cap ends.
 
 ## Accessibility
 
@@ -270,12 +275,15 @@ Set them on any ancestor.
   Enter and Space, and `disabled`, all come from the platform. The focus ring is drawn with
   `:focus-visible`.
 - `aria-label` on each tile is its `label`, and the icon is `aria-hidden`, so it is announced
-  once.
+  once. The loading skeleton tiles are `aria-hidden` too.
+- A disabled tile sets the native `disabled`, which takes it out of the tab order.
 - **The arrows and the cross are named by you.** `prevLabel`, `nextLabel` and `closeLabel` are
   required by the types rather than defaulted, so a missing translation is a compile error
   instead of an English word in a localized interface.
-- The controls stay reachable by keyboard on a hover device: they are revealed by
-  `:focus-within` as well as by hover.
+- Tab moves through the tiles and then the controls — back, next, cross — which follow the
+  track in the DOM. The controls stay reachable by keyboard on a hover device: they are
+  revealed by `:focus-within` as well as by hover. The cross's tooltip is its `closeLabel`,
+  the same text as its accessible name.
 - The strip itself has no role and no keyboard scrolling of its own; a tile scrolled out of
   view is still reached by tabbing to it, which scrolls it in.
 

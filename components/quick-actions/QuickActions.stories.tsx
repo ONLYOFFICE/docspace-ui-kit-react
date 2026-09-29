@@ -28,63 +28,8 @@ const meta = {
   title: "UI/Data display/QuickActions",
   component: QuickActions,
   parameters: {
-    docs: {
-      description: {
-        component: `QuickActions is a banner of large icon tiles for offering a few equally weighted ways to start something, scrolling sideways when the tiles do not fit.
-
-### Features
-
-- **Icon and Label**: Each tile shows any icon above its label, fitted into a fixed box without distortion, with the label clamped to two lines
-- **Action or Link**: A tile is a button that calls its \`onClick\`, or a link when it has an \`href\`; a link opening in a new tab gets \`rel="noopener noreferrer"\` automatically
-- **Carousel**: Tiles keep their design width and the strip scrolls sideways once they no longer fit, by wheel, trackpad, touch swipe or the arrows
-- **Floating Controls**: The arrows and the close control are layered over the strip, so nothing shifts when they appear, and each arrow is dropped at its own end of the scroll range
-- **Hover Reveal**: With a mouse the controls fade in while the banner is hovered or holds keyboard focus; on a touch screen they stay visible
-- **Optional Dismissal**: Passing \`onClose\` adds a close control with a tooltip in the top corner; storing and reversing the choice is left to the host
-- **Disabled and Tooltipped Tiles**: A tile can be disabled, fading to half opacity and ignoring clicks, and any tile can carry a tooltip shown under it on hover
-- **Loading Placeholder**: While \`isLoading\` is set, skeleton tiles of the same size stand in for the real ones, so the layout does not jump when they arrive
-
-### Accessibility
-
-Tiles and controls are native \`<button>\` and \`<a>\` elements, so Tab, Enter and Space work as on any button or link; the component adds names and hides decoration:
-
-- \`aria-label\` on each tile equals its \`label\`, so the tile is announced by its visible text
-- \`aria-hidden\` on the tile icons and the loading skeleton keeps a screen reader from announcing them
-- \`aria-label\` on the arrows comes from \`prevLabel\` and \`nextLabel\`, and on the close control from \`closeLabel\`, which is also its tooltip; the types require all three, so an unnamed control does not compile
-- Tab moves through the tiles and then the controls, and focus inside the banner reveals the controls where they otherwise wait for hover
-- A disabled tile sets the native \`disabled\`, which takes it out of the tab order; a disabled tile with an \`href\` stays a button
-
-### Usage
-
-\`\`\`tsx
-import {
-  QuickActions,
-  CreateDocumentIcon,
-  CreateSpreadsheetIcon,
-} from "@onlyoffice/apps-ui-kit/components/quick-actions";
-
-<QuickActions
-  prevLabel={t("Common:Previous")}
-  nextLabel={t("Common:Next")}
-  items={[
-    { id: "document", icon: <CreateDocumentIcon />, label: "Document", onClick: handleNew },
-    { id: "spreadsheet", icon: <CreateSpreadsheetIcon />, label: "Spreadsheet", href: "/new/xlsx" },
-  ]}
-/>
-
-// Dismissible: the host hides the banner and remembers the choice
-<QuickActions
-  items={items}
-  prevLabel={t("Common:Previous")}
-  nextLabel={t("Common:Next")}
-  onClose={hideBanner}
-  closeLabel="Hide quick actions"
-/>
-
-// Skeleton tiles while the items load
-<QuickActions items={[]} isLoading />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     items: {
@@ -581,18 +526,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--quick-actions-tile-bg\` | Tile background | theme-based |
-| \`--quick-actions-tile-bg-hover\` | Tile background on hover and keyboard focus | theme-based |
-| \`--quick-actions-tile-color\` | Tile label colour and the keyboard focus outline; the bundled illustrations keep their own colours | theme-based |
-| \`--quick-actions-tile-max-width\` | Cap on one tile's width; \`none\` lets the tiles grow to fill the banner | \`184px\` |
-| \`--quick-actions-row-max-width\` | Cap on the width of the tile row, which is centred in the banner; below the width of the tiles the strip is cut hard at the cap, since the edge fade stays at the banner's edge, so it is not shown in the example | \`100%\` |
-| \`--quick-actions-edge-inset\` | Space between the banner's edge and the first tile at rest; scrolled tiles still run out to the edge | \`0px\` |
-
-The example narrows the tiles to 176px and holds the first one 24px off the banner's edge, which still leaves the fourth tile scrolling; hover a tile for the hover background and Tab into the strip for the focus outline.
+        story: `Every overridable variable but the row cap set on one wrapper -- the variables are listed under CSS variables on this page. The example narrows the tiles to 176px and holds the first one 24px off the banner's edge, which still leaves the fourth tile scrolling; hover a tile for the hover background and Tab into the strip for the focus outline.
 
 Set the variables on any ancestor element — they cascade down to all tiles:
 
