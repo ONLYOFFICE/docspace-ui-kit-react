@@ -10,48 +10,8 @@ const meta: Meta<typeof AsideHeader> = {
   title: "UI/Overlays/AsideHeader",
   component: AsideHeader,
   parameters: {
-    docs: {
-      description: {
-        component: `Header component for aside panels with optional back/close buttons, custom icons, and loading states. \`Aside\` and \`ModalDialog\` already render one and take its props, so use it directly only in a panel of your own.
-
-### Features
-
-- **Title**: Shows a string as bold 21px text and any other node inside a heading, both cut off with an ellipsis when too long
-- **Back Arrow**: Optional arrow before the title that calls \`onBackClick\`, pointing the other way under a right-to-left interface
-- **Close Cross**: Shown by default and the only control that calls \`onCloseClick\`
-- **Extra Icons**: Icon buttons between the title and the close cross, each with its own click handler
-- **Custom Control**: Any node placed after the icons and before the close cross, for a control that is not an icon
-- **Loading State**: Replaces the whole header, close cross included, with a skeleton bar
-- **Bottom Line**: A border across the full width of the panel, which \`withoutBorder\` removes
-- **Custom Height**: A height of your own in place of the default 53px
-
-### Accessibility
-
-The header adds one label and leaves the rest to the panel around it.
-
-- **Close cross**: Carries \`aria-label="close"\`, but it is a \`<div>\` with no button role and no tab stop, so a keyboard cannot reach it
-- **Back arrow and extra icons**: Are \`<div>\` elements too, with no label, no role and no tab stop
-
-### Usage
-
-\`\`\`tsx
-import { AsideHeader } from "@onlyoffice/apps-ui-kit/components/aside/aside-header";
-
-<AsideHeader header="Members" onCloseClick={handleClose} />
-
-// A second level with a back arrow
-<AsideHeader
-  header="Details"
-  isBackButton
-  onBackClick={handleBack}
-  onCloseClick={handleClose}
-/>
-
-// While the content loads
-<AsideHeader isLoading />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     header: {
@@ -441,22 +401,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--aside-header-color\` | Title text color; a node title only, a string title keeps the text color | theme-based |
-| \`--aside-header-border\` | Bottom border color | theme-based |
-| \`--aside-header-height\` | Header height, unless \`headerHeight\` is set | \`53px\` |
-| \`--aside-header-font-size\` | Title font size; a node title only, a string title stays 21px | \`21px\` |
-| \`--aside-header-margin\` | Header horizontal margins; the bottom border keeps reaching 16px past each side, so any other value leaves it short of the panel edges or overflowing them | \`0 16px\` |
-| \`--aside-header-gap\` | Gap between header elements | \`6px\` |
-| \`--aside-header-justify\` | \`justify-content\` of the header row; no visible effect while the close cross is shown, because its automatic margin takes the free space | \`space-between\` |
-| \`--aside-header-border-display\` | \`content\` of the bottom border pseudo-element: \`none\` removes the line, the default \`""\` draws it | \`""\` |
-| \`--aside-header-title-position\` | \`position\` of the title element | \`static\` |
-| \`--aside-header-title-inset\` | \`inset-inline-start\` of the title | \`auto\` |
-| \`--aside-header-title-transform\` | \`transform\` of the title | \`none\` |
-| \`--aside-header-title-text-align\` | \`text-align\` of the title; visible only on a title wider than its text | \`start\` |
+        story: `Two headers restyled through CSS variables -- the variables are listed under CSS variables on this page.
 
 - **Customized Header** — the wrapper's color, border, font size, height and gap; the back arrow is on to show the gap before the title.
 - **Centered Title** — the title taken out of the row and centered, with the line removed. These variables are set through the header's own \`style\`, because in the wrapper they would also move the first header's title away from its back arrow.`,
