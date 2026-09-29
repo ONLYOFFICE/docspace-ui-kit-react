@@ -86,6 +86,12 @@ vi.mock("./components/form-model-notice", () => ({
   FormModelNotice: () => null,
 }));
 
+// The room sync needs the API provider and the clouds store; its own tests
+// cover the connection logic.
+vi.mock("../providers/context-room/ContextRoomSync", () => ({
+  default: () => null,
+}));
+
 const noAccessProps: ChatNoAccessScreenProps = {
   standalone: false,
   isPortalAdmin: true,
