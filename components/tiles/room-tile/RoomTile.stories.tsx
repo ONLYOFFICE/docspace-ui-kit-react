@@ -149,7 +149,8 @@ import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-conte
       },
     },
     item: {
-      control: "object",
+      // The icons are data URIs too long to edit, and they stretch the table.
+      control: false,
       description:
         "The room the tile stands for, passed back through the callbacks. Its `tags`, `providerType` and `isAIAgent` decide the tag row; a `contextOptions` key on it is what draws the three-dot button",
     },
