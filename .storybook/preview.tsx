@@ -91,10 +91,16 @@ const preview: Preview = {
     backgrounds: { disabled: true },
     controls: {
       expanded: true,
-      matchers: {
-        color: /(background|color)$/i,
-        date: /Date$/i,
-      },
+      // No `matchers`: both name-based guesses did more harm than good.
+      // `color: /(background|color)$/i` runs on every prop with a docgen type,
+      // before a story's own argTypes override it, and warned for each match
+      // not typed `string` -- which was all of them: union types
+      // (`"accent" | (string & {})`) come out as "other", and
+      // `withBackground` / `withoutBackground` are booleans.
+      // `date: /Date$/i` gave the callback `setSelectedDate` a date control,
+      // which fed a function to <input type="date"> ("0NaN-aN-aN"). Every
+      // prop that wants a colour or date picker -- ColorPicker, Calendar,
+      // DateTimePicker -- declares `control: "color"` / `"date"` itself.
     },
     darkMode: {
       light: lightTheme,
