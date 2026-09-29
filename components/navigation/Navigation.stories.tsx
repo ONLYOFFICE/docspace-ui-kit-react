@@ -13,49 +13,8 @@ const meta = {
   title: "UI/Navigation/Navigation",
   component: Navigation,
   parameters: {
-    docs: {
-      description: {
-        component: `Navigation is a file browser's folder header: the current folder's name, a back arrow, a drop-down list of the folder trail and the buttons that act on the folder.
-
-### Features
-
-- **Breadcrumb Trail**: Clicking the folder name opens a drop box listing every folder of the trail, and choosing one calls \`onClickFolder\`
-- **Context Menus**: A plus button and a folder button open their own context menus, each shown only when its visibility flag is set
-- **Info Panel Toggle**: A button that calls \`toggleInfoPanel\` and shows a pressed look while the info panel is open
-- **Folder Notice**: A chip next to the buttons shows the text of \`titles.warningText\` on desktop
-- **Device Layouts**: Picks its desktop, tablet or phone layout from the device type you pass, not from the window width
-- **Parent Title**: Shows a second, clickable title before the current folder's name, the parent folder's or one you pass, that opens that folder
-- **Extra Buttons**: Optional labelled button, AI chat button, tariff notice and custom node at the end of the button row
-
-### Usage
-
-\`\`\`tsx
-import Navigation from "@onlyoffice/apps-ui-kit/components/navigation";
-import { DeviceType } from "@onlyoffice/apps-ui-kit/enums";
-
-<Navigation
-  title="Contracts"
-  navigationItems={trail}
-  currentDeviceType={DeviceType.desktop}
-  onClickFolder={(id) => openFolder(id)}
-  onBackToParentFolder={goBack}
-  getContextOptionsFolder={() => folderOptions}
-  getContextOptionsPlus={() => createOptions}
-  {...requiredProps}
-/>
-\`\`\`
-
-\`\`\`tsx
-// The plus and folder buttons appear only with their visibility flags
-<Navigation
-  {...headerProps}
-  canCreate
-  isPlusButtonVisible
-  isContextButtonVisible
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     title: {
@@ -681,25 +640,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-| --- | --- | --- |
-| \`--navigation-heading-size\` | Font size of the folder's name and of the second title | \`18px\` |
-| \`--navigation-heading-weight\` | Font weight of the folder's name and of the second title | \`700\` |
-| \`--navigation-title-color\` | Colour of the second title before the folder's name, and of a badge next to it | theme-based |
-| \`--navigation-expander-fill\` | Fill of the drop-down arrow after the folder's name | theme-based |
-| \`--navigation-arrow-fill\` | Fill of the arrow after the second title | theme-based |
-| \`--navigation-separator\` | Colour of the line between the back arrow and the title | theme-based |
-| \`--navigation-badge-fill\` | Background of the badge next to the folder's name | theme-based |
-| \`--navigation-dropdown-bg\` | Background of the open drop box | theme-based |
-| \`--navigation-dropdown-shadow\` | Shadow of the open drop box | theme-based |
-| \`--navigation-dropdown-radius\` | Radius of the open drop box's lower corners | \`6px\` |
-| \`--navigation-info-panel-bg\` | Background of the info panel toggle while the panel is open | theme-based |
-| \`--navigation-chat-radius\` | Corner radius of the AI chat button | \`6px\` |
-| \`--navigation-warning-bg\` | Background of the notice chip | theme-based |
-| \`--navigation-warning-text\` | Text colour of the notice chip | theme-based |
-| \`--navigation-warning-radius\` | Corner radius of the notice chip | \`6px\` |
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
 
 - **First header** — the heading, the second title, both arrows, the separator and the notice chip; click the folder's name to see the drop box variables.
 - **Second header** — the variables its props switch on: the badge next to the folder's name (\`badgeLabel\`), the pressed info panel toggle (\`isInfoPanelVisible\`) and the AI chat button (\`toggleChatPanel\`).`,
