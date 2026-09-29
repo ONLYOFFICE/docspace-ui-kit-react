@@ -8,43 +8,8 @@ const meta = {
   title: "UI/Status components/LoaderWrapper",
   component: LoaderWrapper,
   parameters: {
-    docs: {
-      description: {
-        component: `A wrapper component that dims its children and disables pointer events during loading states.
-
-### Features
-
-- **Dimmed Content**: Fades the children to half opacity while \`isLoading\` is set, keeping them on screen instead of hiding them
-- **Pointer Lock**: Stops mouse clicks, hovers and wheel scrolling from reaching the children while loading
-- **Keyboard Left Alone**: Keeps keyboard focus and key presses working inside the dimmed content, so controls that must not be used need their own disabled state
-- **Smooth Transition**: Animates the fade in and out over 0.3 seconds
-- **No Indicator Of Its Own**: Draws no spinner, overlay or text, so a loader or a skeleton has to be placed beside it
-- **Mounted Children**: Keeps the children mounted while dimmed, so their state and effects survive the loading phase
-- **Flex Column Layout**: Lays the children out in a column that grows to fill a flex parent and can shrink below its content height
-- **Customizable Look**: Takes the dimmed opacity, the idle opacity and the transition from CSS variables
-
-### Usage
-
-\`\`\`tsx
-import { LoaderWrapper } from "@onlyoffice/apps-ui-kit/components/loader-wrapper";
-
-<LoaderWrapper isLoading={isLoading}>
-  <SectionContent />
-</LoaderWrapper>
-\`\`\`
-
-\`\`\`tsx
-import { Loader } from "@onlyoffice/apps-ui-kit/components/loader";
-
-<>
-  {isSaving ? <Loader /> : null}
-  <LoaderWrapper isLoading={isSaving}>
-    <SettingsForm />
-  </LoaderWrapper>
-</>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     layout: "centered",
   },
   argTypes: {
@@ -158,15 +123,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--loader-wrapper-loading-opacity\` | Opacity when in loading state | \`0.5\` |
-| \`--loader-wrapper-idle-opacity\` | Opacity when idle | \`1\` |
-| \`--loader-wrapper-transition\` | CSS transition for opacity | \`opacity 0.3s ease-in-out\` |
-
-The first card is loading and shows \`--loader-wrapper-loading-opacity\`; the second is idle and shows \`--loader-wrapper-idle-opacity\`. \`--loader-wrapper-transition\` takes effect only when \`isLoading\` changes on an instance, which these two cards never do.`,
+        story: `Both opacities and the transition set on one wrapper -- the variables are listed under CSS variables on this page. The first card is loading and shows \`--loader-wrapper-loading-opacity\`; the second is idle and shows \`--loader-wrapper-idle-opacity\`. \`--loader-wrapper-transition\` takes effect only when \`isLoading\` changes on an instance, which these two cards never do.`,
       },
       source: {
         code: `<div

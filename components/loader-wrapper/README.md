@@ -159,6 +159,8 @@ export function SubtleDim() {
 
 - **It renders no loading indicator of any kind.** The whole component is one `<div>` with an
   opacity, a `pointer-events` value and a transition; nothing spins, and nothing says "loading".
+- **The pointer lock covers clicks, hovers and wheel scrolling.** Hover styles inside do not
+  react, and the wheel over the dimmed content scrolls whatever is behind it instead.
 - **`pointer-events: none` does not stop the keyboard.** Everything inside stays in the tab order
   and still fires on Enter or Space, so a button that is visibly greyed out can still be pressed by
   a keyboard user. Disable the controls themselves as well.
@@ -184,6 +186,9 @@ export function SubtleDim() {
 
 They are read from inline styles, so they must be declared on this element or on one of its
 ancestors; a rule matching a class of your own will not reach them.
+
+The transition animates the fade both ways, but only when `isLoading` changes on a mounted
+instance; a wrapper that mounts already loading starts at the dimmed opacity with no fade.
 
 ## Accessibility
 
