@@ -7,41 +7,8 @@ const meta = {
   title: "UI/Navigation/TwoStateToggle",
   component: TwoStateToggle,
   parameters: {
-    docs: {
-      description: {
-        component: `TwoStateToggle is a pill-shaped switch that moves the user between the new dashboard and the classic view. It is not a general-purpose on/off control; for an ordinary two-state setting use \`ToggleButton\`.
-
-### Features
-
-- **Stored position**: Reads its starting position once, on mount, from the \`useDocSpace\` key in \`localStorage\` (\`"old"\` selects the classic view, any other value or none the new one) and takes no \`value\` / \`onChange\` pair
-- **Confirmed switch back**: Moving from NEW to OLD opens a confirmation dialog; confirming writes \`"old"\` and navigates to \`/\`, while cancelling or closing the dialog changes nothing
-- **Immediate switch forward**: Moving from OLD to NEW writes \`"new"\` and navigates to \`/dashboard\` at once, with no dialog
-- **Fixed targets**: Always navigates to \`/dashboard\` or \`/\` and leaves only the way of navigating to \`onNavigate\`; without it the page reloads through \`window.location.href\`
-- **Blocked storage**: Starts in the new view when \`localStorage\` throws, and still switches and navigates without persisting the choice
-- **Optional parts**: Renders only the pill when \`title\` is empty and leaves the hint out of the dialog when \`confirmHint\` is empty
-- **Right-to-left**: Puts the OLD half on the right and slides the thumb leftwards to NEW in a right-to-left layout
-
-### Accessibility
-
-The toggle is a native \`<button>\` carrying a switch role, so keyboard support comes from the platform:
-
-- \`role="switch"\` with \`aria-checked\`: announced as a switch that is on while the new view is active and off in the classic view
-- \`aria-label\`: taken from \`ariaLabel\`, default "Switch DocSpace design". \`title\`, \`labelOld\` and \`labelNew\` do not change it; the labels are \`aria-hidden\`
-- **Keyboard**: Tab focuses the switch and draws a focus ring around the pill; Enter or Space toggles it as a click does
-
-### Usage
-
-\`\`\`tsx
-import { TwoStateToggle } from "@onlyoffice/apps-ui-kit/components/two-state-toggle";
-
-// In a React Router context: pass navigate to avoid a full reload
-<TwoStateToggle onNavigate={(url) => navigate(url)} />
-
-// Standalone (falls back to window.location.href)
-<TwoStateToggle />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     title: {
@@ -268,15 +235,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--color-scheme-main-accent\` | Pill background, the label on the thumb and the focus ring | theme-based |
-| \`--button-root-border-radius\` | Corner radius of the pill; the thumb's is 2px smaller | \`6px\` |
-| \`--text-color\` | Color of the title | theme-based |
-
-The example sets all three on a wrapper; press Tab to focus the switch and see the ring take the custom accent.`,
+        story: `All three overridable variables set on one wrapper -- the variables are listed under CSS variables on this page. Press Tab to focus the switch and see the ring take the custom accent.`,
       },
       source: {
         code: `<div style={{
