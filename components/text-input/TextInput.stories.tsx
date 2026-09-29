@@ -11,53 +11,8 @@ const meta = {
   title: "UI/Form controls/TextInput",
   component: TextInput,
   parameters: {
-    docs: {
-      description: {
-        component: `Controlled single-line text field in three fixed widths, with optional masking, error and warning states.
-
-### Features
-
-- **Multiple Types**: Renders as text, password, email, tel, search or number, so the browser supplies the matching keyboard and value rules
-- **Three Fixed Widths**: Comes 173px, 300px or 550px wide by \`size\`, or fills its container with \`scale\`
-- **Input Masking**: Formats the value to a fixed pattern such as a date or a phone number as the user types
-- **Validation States**: \`hasError\` and \`hasWarning\` colour the border, also while hovered and focused
-- **Disabled and Read-Only**: \`isDisabled\` greys the field and takes it out of the form, \`isReadOnly\` keeps it selectable but not editable
-- **Borderless**: \`withBorder={false}\` drops the outline for inline use
-- **Length Cap**: Accepts 255 characters unless \`maxLength\` raises it; typing past the cap is dropped silently
-- **Bold Text**: \`isBold\` sets weight 600 and overrides \`fontWeight\`
-
-### Accessibility
-
-Keyboard and assistive-technology support comes from the native \`<input>\`:
-
-- Focusable by default, in the natural document order; pass \`tabIndex={-1}\` only to take a field out of it
-- Renders no label and does not associate itself with one, so give the input an \`aria-label\` or wrap it in a \`<label>\`
-- \`hasError\` and \`hasWarning\` only colour the border, so pair them with a visible message and mark the field invalid yourself
-- \`isDisabled\` maps to the native \`disabled\` attribute and \`isReadOnly\` to \`readonly\`
-
-### Usage
-
-\`\`\`tsx
-import { TextInput, InputSize, InputType } from "@onlyoffice/apps-ui-kit/components/text-input";
-
-// Basic text input
-<TextInput type={InputType.text} size={InputSize.base} value={value} onChange={handleChange} placeholder="Enter text" />
-
-// With input mask
-<TextInput
-  type={InputType.text}
-  value={value}
-  onChange={handleChange}
-  mask={[/\\d/, /\\d/, "/", /\\d/, /\\d/, "/", /\\d/, /\\d/, /\\d/, /\\d/]}
-  placeholder="DD/MM/YYYY"
-  guide
-/>
-
-// Error state
-<TextInput type={InputType.text} hasError value="Invalid" onChange={handleChange} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=633-3686&mode=dev",
@@ -738,19 +693,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization: the first field shows the shared \`--text-input-*\` tokens; hover and focus it to see the two border variables. The second carries \`--text-input-placeholder-color\` in its own \`style\`, the only place it works. The third is disabled: the theme takes over its text and border, and only the radius, the font size and \`--text-input-disabled-bg\` still apply:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--text-input-bg\` | Background color | theme-based |
-| \`--text-input-border-color\` | Border color at rest | theme-based |
-| \`--text-input-border-hover\` | Border color while hovered | theme-based |
-| \`--text-input-border-focus\` | Border color while focused | theme-based |
-| \`--text-input-color\` | Text and caret color | theme-based |
-| \`--text-input-font-size\` | Font size (all sizes) | \`13px\` (base, middle) / \`16px\` (large) |
-| \`--text-input-radius\` | Border radius | theme-based |
-| \`--text-input-disabled-bg\` | Background color while disabled | theme-based |
-| \`--text-input-placeholder-color\` | Placeholder text color; works only through the component's \`style\` prop, a value set on an ancestor is shadowed by the theme | theme-based |`,
+        story: `The first field sets the shared \`--text-input-*\` tokens on a wrapper -- the variables are listed under CSS variables on this page; hover and focus it to see the two border variables. The second carries \`--text-input-placeholder-color\` in its own \`style\`, the only place it works. The third is disabled: the theme takes over its text and border, and only the radius, the font size and \`--text-input-disabled-bg\` still apply.`,
       },
       source: {
         code: `<div

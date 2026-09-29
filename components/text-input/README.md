@@ -273,6 +273,13 @@ export function PhoneField() {
   `<input>` branch only.
 - **The browser's own clear button for `type="search"` is hidden** by the stylesheet, in
   both WebKit and Firefox.
+- **`hasError` and `hasWarning` hold their colour through hover and focus.** The border
+  takes the error (red) or warning (orange) colour at rest, on hover and while focused, so
+  the state never flickers back to the normal border. When both are set the warning colour
+  wins, because its rules come later in the stylesheet.
+- **`withBorder={false}` removes the border outright**, for a field set inline in text or a
+  table cell. With it go the hover, focus, error and warning colours, which are all border
+  colours, so a borderless field shows no validation state.
 
 ## CSS variables
 
@@ -288,6 +295,12 @@ Set these on any ancestor; the stylesheet reads them through a fallback to the t
 | `--text-input-radius`       | `--input-border-radius` | Border radius                                                                   |
 | `--text-input-font-size`    | per-size value          | Overrides the font size of all three sizes at once                              |
 | `--text-input-disabled-bg`  | `--input-disabled-bg`   | Background while disabled                                                       |
+
+Two states set their colours from the theme directly and ignore these overrides. Under
+`hasError` or `hasWarning` the border comes from the theme's error or warning tokens, so
+`--text-input-border-color`, `-hover` and `-focus` stop applying. A disabled field takes its
+text, caret and border colours from the theme as well; only `--text-input-radius`,
+`--text-input-font-size` and `--text-input-disabled-bg` still reach it.
 
 The theme tokens below are declared on the `<input>` element itself, so a value set on an
 ancestor never reaches it. Override them through the `style` prop only.
