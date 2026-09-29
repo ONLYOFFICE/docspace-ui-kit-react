@@ -10,54 +10,8 @@ const meta = {
   title: "UI/Data display/RoomType",
   component: RoomType,
   parameters: {
-    docs: {
-      description: {
-        component: `Offers one kind of room as a selectable row, with its glyph, its translated name and a short description, for a room-type picker.
-
-### Features
-
-- **Room Types**: Shows the glyph, the translated name and the description of each of the six room types
-- **Three Layouts**: Renders as a bordered card in a list, as the collapsed button of a dropdown, or as a borderless entry inside that dropdown
-- **Open State**: Turns the dropdown button's border to the accent colour and points its arrow up instead of down while open
-- **Disabled Rows**: Greys out the form room or the public room row on request and stops it answering clicks, in the list and dropdown-entry layouts
-- **Template Variants**: Replaces both lines with the "from template" wording and the glyph with its template variant, or swaps only the glyph for a room made from a template
-- **Form Space Wording**: Uses the form-space title and description in place of the room type's own
-- **Single Click Target**: Calls the click handler once per click wherever in the row it lands, the arrow included
-- **Right-To-Left Support**: Moves the forward arrow to the left edge and mirrors it in a right-to-left interface
-
-### Accessibility
-
-The row is a plain \`div\` with a click handler; the component adds one state attribute of its own:
-
-- **\`aria-disabled\`**: Set on a greyed-out list or dropdown-entry row, so screen readers announce it as unavailable
-- **No keyboard access**: The row has no role, no \`tabIndex\` and no key handler, so the consumer must wrap it in a button or give the surrounding list its own keyboard handling
-
-### Usage
-
-\`\`\`tsx
-import RoomType from "@onlyoffice/apps-ui-kit/components/room-type";
-import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
-
-<RoomType
-  roomType={RoomsType.EditingRoom}
-  isOpen={false}
-  selectedId="room-1"
-  onClick={handleClick}
-/>
-\`\`\`
-
-\`\`\`tsx
-// The collapsed button of a picker, opening a list of dropdownItem rows
-<RoomType
-  roomType={picked}
-  type="dropdownButton"
-  isOpen={open}
-  selectedId={picked}
-  onClick={() => setOpen((value) => !value)}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     roomType: {
@@ -485,19 +439,7 @@ export const CssCustomization = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--room-type-item-bg\` | Background of the row in every layout; a disabled row keeps its grey | theme-based |
-| \`--room-type-item-border\` | Border colour of the list card and the dropdown button; the dropdown entry has no border | theme-based |
-| \`--room-type-item-hover-bg\` | Background while the pointer is over the row | theme-based |
-| \`--room-type-item-radius\` | Corner radius of the list card and the dropdown button | \`6px\` |
-| \`--room-type-item-padding\` | Inner padding of the row | \`16px\` |
-| \`--room-type-gap\` | Gap between the glyph, the text and the arrow | \`12px\` |
-| \`--room-type-description-color\` | Colour of the description line | theme-based |
-
-The card sets every variable in the table; hover it to see \`--room-type-item-hover-bg\`.`,
+        story: `Every overridable variable set on one card -- the variables are listed under CSS variables on this page. Hover it to see \`--room-type-item-hover-bg\`.`,
       },
       source: {
         code: `<div
