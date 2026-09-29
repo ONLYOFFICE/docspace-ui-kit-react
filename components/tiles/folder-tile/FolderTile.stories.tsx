@@ -54,43 +54,8 @@ const meta = {
   title: "UI/Tiles/FolderTile",
   component: FolderTile,
   parameters: {
-    docs: {
-      description: {
-        component: `The card for one folder in a tile listing: a single name row with an icon, a checkbox and a menu, or a taller card with a picture above that row.
-
-### Features
-
-- **Folder Icon**: Shows the folder icon beside the name and swaps it for a checkbox on hover
-- **Click To Select**: Selects the tile on a plain click or from the checkbox, and hands Ctrl-, Cmd- and Shift-clicks to callbacks of their own
-- **Indeterminate Checkbox**: Draws the checkbox half-filled, for a folder whose contents are only partly selected
-- **Progress Loader**: Replaces the icon and the checkbox with a small loader while the folder is busy
-- **Badges**: Places badges at the end of the name row, next to the menu, or over the picture in the tall layout
-- **Tall Layout**: Puts a picture above the name row instead of drawing the row alone
-- **Actions Menu**: Opens the folder's menu from a three-dot button, drawn when the item carries a \`contextOptions\` key, and on right-click when \`getContextModel\` is given
-- **Hotkey Outline**: Turns the tile's border the accent colour to mark the tile the keyboard is on
-
-### Usage
-
-\`\`\`tsx
-import { FolderTile } from "@onlyoffice/apps-ui-kit/components/tiles/folder-tile";
-import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
-
-<FolderTile
-  item={{ id: "1", title: "My Folder", isFolder: true }}
-  element={<FolderIcon />}
-  contextOptions={options}
-  onSelect={handleSelect}
->
-  <TileContent><Link>My Folder</Link></TileContent>
-</FolderTile>
-
-// The tall layout, with a picture above the name row
-<FolderTile item={folder} element={<FolderIcon />} contextOptions={options} isBigFolder temporaryIcon={<FolderPicture />}>
-  <TileContent><Link>{folder.title}</Link></TileContent>
-</FolderTile>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     checked: {
@@ -577,32 +542,12 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--tile-bg\` | Background of the tall layout, and of the box behind the icon on hover; the single row has none of its own | theme-based |
-| \`--tile-border-style\` | Border of the tile, shared with the other tiles | theme-based |
-| \`--folder-tile-border-style\` | Border of a folder tile only; wins over \`--tile-border-style\` | theme-based |
-| \`--tile-radius\` | Corner radius of the tile | \`12px\` |
-| \`--tile-hover-bg\` | Background of the tile on hover and when checked | theme-based |
-| \`--tile-hover-text-decoration\` | Decoration of the name on hover | theme-based |
-| \`--tile-hotkey-color\` | Border colour while \`showHotkeyBorder\` is on | theme-based |
-| \`--tile-badge-bg\` | Background of each badge over the picture (tall layout only) | theme-based |
-| \`--tile-badge-radius\` | Corner radius of each badge over the picture (tall layout only) | \`4px\` |
-| \`--tile-badge-box-shadow\` | Shadow of each badge over the picture (tall layout only) | theme-based |
-| \`--tile-text-size\` | Font size of the name | \`14px\` |
-| \`--tile-text-weight\` | Font weight of the name | \`normal\` |
-| \`--tile-text-color\` | Colour of the name | inherited |
-| \`--tile-text-line-height\` | Line height of the name | \`16px\` |
+        story: `The variables are listed under CSS variables on this page.
 
 Three instances:
 - **My Folder** — the single row, for the border, radius and name variables; hover it for \`--tile-hover-bg\`, \`--tile-hover-text-decoration\` and \`--tile-bg\` behind the icon.
 - **Projects** — the tall layout (\`isBigFolder\`), for \`--tile-bg\` and the badge variables.
-- **Archive** — \`showHotkeyBorder\`, for \`--tile-hotkey-color\`, in a wrapper of its own that sets \`--folder-tile-border-style\` to a thicker border.
-
-> **Note:** \`--folder-tile-border-style\` and \`--file-tile-border-style\` allow per-component border control
-> while sharing the \`--tile-border-style\` fallback between both tile types.`,
+- **Archive** — \`showHotkeyBorder\`, for \`--tile-hotkey-color\`, in a wrapper of its own that sets \`--folder-tile-border-style\` to a thicker border.`,
       },
       source: {
         code: `<div style={{
