@@ -10,40 +10,8 @@ const meta = {
   title: "UI/Data display/RoomLogo",
   component: RoomLogoPure,
   parameters: {
-    docs: {
-      description: {
-        component: `Draws the stock glyph for a room type, for rooms that have no logo of their own.
-
-### Features
-
-- **Room Type Icons**: Draws a separate glyph for each room type (Editing, Custom, Public, Virtual Data, Form, AI)
-- **Archive State**: Replaces the type's glyph with the archive glyph, whatever the type and the other flags say
-- **Generic Template Glyph**: Draws one template glyph for every type when \`isTemplate\` is set
-- **Template Variants**: Draws a template variant of each type's glyph, falling back to the plain glyph for the AI type, which has no variant
-- **Empty Placeholder**: Keeps a blank box of the logo's size when the type is missing or unknown
-- **Selection Checkbox**: Optional checkbox beside the glyph, hidden by the component's own stylesheet until a rule of yours reveals it
-- **Tap To Select**: A tap on the glyph calls \`onChange\` on mobile devices only, so a row can be selected without reaching the checkbox
-
-### Usage
-
-\`\`\`tsx
-import { RoomLogo } from "@onlyoffice/apps-ui-kit/components/room-logo";
-import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
-
-// Basic room logo
-<RoomLogo type={RoomsType.CustomRoom} />
-
-// Archive room
-<RoomLogo type={RoomsType.CustomRoom} isArchive />
-
-// Template variant of a room type
-<RoomLogo type={RoomsType.FormRoom} isTemplateRoom />
-
-// With checkbox
-<RoomLogo type={RoomsType.EditingRoom} withCheckbox isChecked={false} onChange={handleChange} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     layout: "centered",
   },
   argTypes: {
@@ -391,14 +359,7 @@ export const CssCustomization = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--room-logo-size\` | Width and height of the box the glyph sits in; the glyph keeps its drawn 32px size, so a larger value adds empty space around it | \`32px\` |
-| \`--room-logo-radius\` | Corner radius of the glyph's rounded square | \`6px\` |
-
-The example sets both on a wrapper: a 40px box with a round glyph.`,
+        story: `Both variables set on one wrapper -- the variables are listed under CSS variables on this page. The example draws a 40px box with a round glyph.`,
       },
       source: {
         code: `<div style={{ "--room-logo-size": "40px", "--room-logo-radius": "50%" }}>
