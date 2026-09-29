@@ -49,6 +49,14 @@ const MyComponent = () => {
       control: "text",
       description: "API key used for Bearer token authentication",
     },
+    initSocket: {
+      control: "boolean",
+      description:
+        "Fetches the portal settings and connects the portal WebSocket on mount",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
     children: {
       control: false,
       description:
@@ -75,6 +83,9 @@ export const Default: Story = {
   args: {
     url: "https://docspace.example.com",
     apiKey: "example-api-key",
+    // Off: with it on, the story fetches the settings of and opens a socket
+    // to a portal that does not exist, from every Storybook that opens it.
+    initSocket: false,
   },
   parameters: {
     docs: {
