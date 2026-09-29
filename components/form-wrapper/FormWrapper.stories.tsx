@@ -14,43 +14,8 @@ const meta = {
   title: "UI/Form controls/FormWrapper",
   component: FormWrapper,
   parameters: {
-    docs: {
-      description: {
-        component: `A fixed-width card for a short standalone form, such as sign in or registration, that is the only content of its page.
-
-### Features
-
-- **Consistent Styling**: Draws a rounded, shadowed card whose background and shadow follow the light or dark theme
-- **Flexible Content**: Accepts any React children as form content
-- **Customizable**: Passes a class, an id, inline styles and any other DOM attribute through to the card
-- **Fixed Width**: Holds the card at 320px on a desktop and 416px on a tablet, whatever the width of its container
-- **Centred Children**: Lays the children out in a column centred horizontally, so a child without a width of its own shrinks to its content
-- **Built-in Padding**: Adds 32px of padding inside the card, on top of any margin the children carry
-- **Flush on Phones**: Drops the padding, corners, shadow and background under the mobile breakpoint, so the form sits directly on the page
-
-### Usage
-
-\`\`\`tsx
-import { Button, ButtonSize } from "@onlyoffice/apps-ui-kit/components/button";
-import { FieldContainer } from "@onlyoffice/apps-ui-kit/components/field-container";
-import { FormWrapper } from "@onlyoffice/apps-ui-kit/components/form-wrapper";
-import { InputSize, InputType, TextInput } from "@onlyoffice/apps-ui-kit/components/text-input";
-
-// A sign-in form; a full-width field row and scale make each control span the card
-<FormWrapper>
-  <FieldContainer isVertical labelVisible labelText="Email" style={{ width: "100%" }}>
-    <TextInput type={InputType.email} size={InputSize.base} value={email} onChange={onEmailChange} scale />
-  </FieldContainer>
-  <Button primary scale size={ButtonSize.normal} label="Sign in" onClick={onSubmit} />
-</FormWrapper>
-
-// A wider card: move the minimum and the maximum together
-<FormWrapper style={{ "--form-wrapper-min-width": "480px", "--form-wrapper-max-width": "480px" } as React.CSSProperties}>
-  {children}
-</FormWrapper>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     children: {
@@ -270,18 +235,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--form-wrapper-bg\` | Background color; ignored on a phone | theme-based |
-| \`--form-wrapper-shadow\` | Box shadow; ignored on a phone | theme-based |
-| \`--form-wrapper-radius\` | Border radius; ignored on a phone | \`12px\` |
-| \`--form-wrapper-padding\` | Inner padding; ignored on a phone | \`32px\` |
-| \`--form-wrapper-max-width\` | Maximum width; ignored on a tablet and a phone, where the width is fixed | \`320px\` |
-| \`--form-wrapper-min-width\` | Minimum width; ignored on a tablet and a phone, where the width is fixed | \`320px\` |
-
-The example sets every variable on a wrapper around one card. Set the minimum and the maximum width together: either one alone is clamped by the other.`,
+        story: `Every overridable variable set on a wrapper around one card -- the variables are listed under CSS variables on this page. Set the minimum and the maximum width together: either one alone is clamped by the other.`,
       },
       source: {
         code: `<div
