@@ -32,6 +32,16 @@ export function useVirtualKeyboardInset(enabled = true): number {
       if (frame) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
+        // iOS Safari scrolls the document to reveal a focused input even when
+        // the host pins it (`overflow: hidden` on `html`), pushing the whole
+        // portal off the top of the screen with no way to scroll back. Undo
+        // that scroll; the inset below then lifts the composer instead.
+        if (
+          window.scrollY !== 0 &&
+          getComputedStyle(document.documentElement).overflowY === "hidden"
+        ) {
+          window.scrollTo(0, 0);
+        }
         // Bottom overlap = layout viewport height minus the visual viewport's
         // bottom edge. `offsetTop` matters on iOS: Safari scrolls the page to
         // reveal a focused input, which shrinks the actually covered area.
@@ -45,12 +55,16 @@ export function useVirtualKeyboardInset(enabled = true): number {
 
     vv.addEventListener("resize", update);
     vv.addEventListener("scroll", update);
+    // A document scroll moves the layout viewport, not the visual one inside
+    // it, so `visualViewport` does not report it.
+    window.addEventListener("scroll", update);
     update();
 
     return () => {
       if (frame) cancelAnimationFrame(frame);
       vv.removeEventListener("resize", update);
       vv.removeEventListener("scroll", update);
+      window.removeEventListener("scroll", update);
       setInset(0);
     };
   }, [enabled]);

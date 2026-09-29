@@ -119,10 +119,14 @@ const useAgentsHelper = ({
           .map((item) => {
             const security = item.security as
               FileEntryDtoIntegerAllOfSecurity | undefined;
+            // The Files selector passes one right for both files and agents.
+            // A file-only right (AskAi in the chat attach picker) is never
+            // on a folder's security, so it must not gate the agent itself —
+            // otherwise every agent is disabled and cannot be opened.
+            const key =
+              disableBySecurity as keyof FileEntryDtoIntegerAllOfSecurity;
             const isDisabledBySecurity = disableBySecurity
-              ? !security?.[
-                  disableBySecurity as keyof FileEntryDtoIntegerAllOfSecurity
-                ]
+              ? !security || (key in security && !security[key])
               : false;
             return {
               ...item,
