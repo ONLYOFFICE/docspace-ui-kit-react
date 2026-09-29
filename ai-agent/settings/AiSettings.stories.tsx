@@ -26,6 +26,11 @@ const meta: Meta<StoryArgs> = {
   title: "Components/AI Settings",
   parameters: {
     docs: {
+      // Each story in an iframe of its own on the docs page, for the reason
+      // given in AiChatPanel.stories.tsx: every story mounts
+      // AiAgentProviders, whose host-tool state is single-mount. The heights
+      // are set per story, from what each page measures plus some room.
+      story: { inline: false },
       description: {
         component: `The portal's AI settings screens, from \`ai-agent/settings\`. Each is a page of \`@onlyoffice/ai-chat\` with the kit's layout applied, and reads and writes the same AI service the chat talks to, so it has to sit inside \`AiAgentProviders\`. Without a portal the stories run against the demo portal the mock service worker plays, under a banner that says so: its models, assignments and MCP servers are made up, and a change is saved in memory only, until the page is reloaded.
 
@@ -72,6 +77,7 @@ export const Models: Story = {
   ),
   parameters: {
     docs: {
+      story: { height: "460px" },
       description: {
         story:
           "The AI models connected to the portal, one row each with its provider and a menu, and **Add Model** to connect another from a provider's API key or a locally hosted model. On the demo portal the list holds three made-up models, and one added or removed there is gone again after a reload.",
@@ -94,6 +100,7 @@ export const ModelAssignmentPage: Story = {
   ),
   parameters: {
     docs: {
+      story: { height: "940px" },
       description: {
         story:
           "Which model answers by default, and which one each task uses instead of it: chat, code, summarization, translation, OCR, vision and the rest. The **Default AI model** heading and its description come from the kit's translations; the field's own caption is turned off because it would repeat the heading.",
@@ -116,6 +123,7 @@ export const McpServersList: Story = {
   ),
   parameters: {
     docs: {
+      story: { height: "500px" },
       description: {
         story:
           "The MCP servers whose tools the chat may call. **Edit configuration** opens an inline editor for the servers' JSON configuration, with **Save** and **Cancel**. On the demo portal the page lists the portal's own server and two made-up custom ones; with no server connected, that button is all the page shows.",
@@ -138,6 +146,7 @@ export const WebSearchSettings: Story = {
   ),
   parameters: {
     docs: {
+      story: { height: "440px" },
       description: {
         story:
           "The search engine the chat uses to look things up on the web, and its API key. The fields are stacked rather than side by side, to fit a settings column. **Save** stays disabled until a key is entered.",
