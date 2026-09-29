@@ -13,73 +13,8 @@ const meta = {
   title: "UI/Interactive elements/ImageEditor",
   component: ImageEditor,
   parameters: {
-    docs: {
-      description: {
-        component: `A crop window for framing a picture that has already been chosen, such as an avatar or a logo, with drag, zoom and a control to choose another file.
-
-### Features
-
-- **Replace Picture**: Opens a PNG or JPEG file picker from the Choose another control and hands the change event to \`onChangeFile\`
-- **Crop & Zoom**: Drags the picture inside a square crop window and, for a picture given as a \`File\`, zooms it from 1x to 5x with a slider and two buttons
-- **Customizable Border Radius**: Rounds the crop window from a square to a circle, measured on the 648px canvas where 324 is a circle
-- **Fixed Framing**: Hides the zoom row and freezes the crop position when rescaling is disabled
-- **Disabled State**: Blocks dragging, zooming and choosing another file while the editor is disabled
-- **Live Preview**: Sends the cropped picture as a \`data:\` URL at most every 300ms, for a preview rendered beside the cropper
-- **Controlled State**: Keeps nothing itself, so the file, the crop position and the zoom live in the caller's state
-
-### Accessibility
-
-The editor sets a few attributes itself and relies on the kit's controls for the rest:
-
-- \`role="region"\` with \`aria-label="Image editor"\`: announces the editor as a landmark, with a fixed English name
-- \`aria-disabled\`: set on the cropper while the editor is disabled
-- The zoom slider is a native range input, reached with Tab and moved with the arrow keys
-- Choose another and the crop area respond to the pointer only, so a keyboard user needs a file control of your own beside the editor
-
-### Usage
-
-\`\`\`tsx
-import { ImageEditor } from "@onlyoffice/apps-ui-kit/components/image-editor";
-
-// Basic usage
-<ImageEditor
-  t={(key) => key}
-  image={image}
-  onChangeImage={handleChangeImage}
-  onChangeFile={handleChangeFile}
-  Preview={preview}
-  setPreview={handleSetPreview}
-  isDisabled={false}
-  editorBorderRadius={8}
-/>
-
-// Circular crop (profile avatar)
-<ImageEditor
-  t={(key) => key}
-  image={image}
-  onChangeImage={handleChangeImage}
-  onChangeFile={handleChangeFile}
-  Preview={preview}
-  setPreview={handleSetPreview}
-  isDisabled={false}
-  editorBorderRadius={324}
-/>
-
-// With rescaling disabled
-<ImageEditor
-  t={(key) => key}
-  image={image}
-  onChangeImage={handleChangeImage}
-  onChangeFile={handleChangeFile}
-  Preview={preview}
-  setPreview={handleSetPreview}
-  isDisabled={false}
-  editorBorderRadius={8}
-  disableImageRescaling
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     t: {
