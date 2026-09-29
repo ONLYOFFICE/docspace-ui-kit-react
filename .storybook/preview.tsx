@@ -126,6 +126,7 @@ const preview: Preview = {
             "Translation",
             "Themes",
             "API",
+            "Types and roles",
           ],
           "Components",
           [
