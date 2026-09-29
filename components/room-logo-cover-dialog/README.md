@@ -264,9 +264,11 @@ export function CoverSection({
 - **That control does nothing until a glyph has been chosen.** Turning "without icon" on is
   refused while no cover is selected, which is the state the dialog opens in when
   `initialCover` is `null`.
-- **Two of the icon picker's labels come from outside `Common`.** It asks for
-  `CreateEditRoomDialog:Icon` and for a bare `WithoutIcon` with no namespace at all; neither is in
-  the `Common` bundle the package ships, so both are empty outside the portal.
+- **Two of the icon picker's labels are asked for outside `Common`.** It asks for
+  `CreateEditRoomDialog:Icon`, which is not in the `Common` bundle the package ships, so a `t` of
+  your own has to supply it outside the portal. It also asks for a bare `WithoutIcon` with no
+  namespace: that key is in `Common`, so it resolves through a `t` whose default namespace is
+  `Common` and shows the key itself through any other.
 - **Cover markup is injected, not parsed.** `dangerouslySetInnerHTML` is used for every glyph in
   the picker and for the chosen one in the preview.
 - **The dialog's height is computed from fixed constants** — 648px on desktop, 854px on tablet —

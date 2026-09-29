@@ -8,24 +8,38 @@ import type { ICover } from "../../types";
 import type { TColorScheme } from "../../providers/theme/themes";
 import { Button, ButtonSize } from "../button";
 
+import enCommon from "../../locales/en/Common.json";
+
 import { RoomLogoCoverDialog } from ".";
 
-// The dialog takes its translator as a prop rather than using the hook, so the
-// stories supply a stub that echoes the key.
-const t = ((key: string) => key.replace("Common:", "")) as TTranslation;
+// The dialog takes its translator as a prop rather than using the hook, so
+// the stories hand it the kit's own English bundle. `Common:` keys and the
+// bare `WithoutIcon` come from there; `CreateEditRoomDialog:Icon` lives in a
+// namespace the kit does not ship, which is what an application outside the
+// portal has to supply too.
+const EXTRA_LABELS: Record<string, string> = {
+  "CreateEditRoomDialog:Icon": "Icon",
+};
+const common = enCommon as Record<string, string>;
+const t = ((key: string) =>
+  EXTRA_LABELS[key] ??
+  common[key.replace(/^Common:/, "")] ??
+  key) as TTranslation;
 
-// `data` is inline SVG markup, which is what the portal serves for covers.
-const cover = (id: string, glyph: string): ICover => ({
-  id,
-  data: `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><text x="16" y="22" font-size="18" text-anchor="middle">${glyph}</text></svg>`,
-});
+// The 56 covers the portal serves from `files/rooms/covers`, copied from the
+// server (products/ASC.Files/Core/Covers/default). `data` is the inline SVG
+// markup, which is what that endpoint returns.
+const coverFiles = import.meta.glob<string>(
+  "../../test/fixtures/room-covers/*.svg",
+  { query: "?raw", import: "default", eager: true },
+);
 
-const covers: ICover[] = [
-  cover("folder", "F"),
-  cover("chart", "C"),
-  cover("book", "B"),
-  cover("star", "S"),
-];
+const covers: ICover[] = Object.entries(coverFiles)
+  .map(([path, data]) => ({
+    id: path.replace(/^.*\//, "").replace(/\.svg$/, ""),
+    data,
+  }))
+  .sort((a, b) => a.id.localeCompare(b.id));
 
 const accentScheme: TColorScheme = {
   main: { accent: "#4781D1", buttons: "#5299E0" },
