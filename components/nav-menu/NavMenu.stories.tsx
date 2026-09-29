@@ -258,7 +258,8 @@ import { NavMenu } from "@onlyoffice/apps-ui-kit/components/nav-menu";
   },
   argTypes: {
     groups: {
-      control: "object",
+      // The icons are data URIs too long to edit, and they stretch the table.
+      control: false,
       description:
         "The sections of the menu, in order. Each group has an id, an optional caption and its items; an item may carry an icon, a badge, a link target and a list of sub-items",
     },
