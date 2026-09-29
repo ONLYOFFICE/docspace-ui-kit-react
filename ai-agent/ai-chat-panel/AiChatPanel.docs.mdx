@@ -33,111 +33,128 @@ import * as AiChatPanelStories from './AiChatPanel.stories';
 
 # AI Chat
 
-The AI chat panel: a header button that opens it, and a docked panel carrying the chat.
-
-There is no `AiChatPanel` component to render. `useAiChatPanel` hands back the pieces and the
-host decides where each one goes — the button belongs in the section's own header, the content
-in a panel beside it.
-
-### Features
-
-- **Host-composed** — `chatButton` and `chatPanelContent`, plus the reactive visibility and fullscreen state
-- **Section-agnostic** — reads only the shared `AiChatStore`, so every product surface mounts the identical panel
-- **Docked or fullscreen** — `chatPanelWidth` is session state that resets on every open; fullscreen is set and unset explicitly, so the edge resizer can reach for either from a known state
-- **Opt-out without a conditional hook** — `useAiChatPanel(false)` returns `undefined` for a section that does not offer AI
-
-### Requirements
-
-The tree has to sit inside `AiAgentProviders`, which mounts the `AiChatStoreProvider` the hook
-needs; without it the hook throws. Consumers must be `observer`s, or the visibility and
-fullscreen flags stop being reactive.
-
-`@onlyoffice/ai-chat` is an **optional peer dependency** — importing anything under `ai-agent/`
-without supplying it fails at build time naming the missing package.
-
-**Whether AI is offered at all is the host's decision, not the trigger's.** `chatButton` only
-hides itself once the panel is open; it does not consult availability. A host gates it on
-`useIsAiChatAvailable()`, which returns `canUseAi && isAvailable` — whether the session may
-reach AI at all (an anonymous or barred user: the providers still mount and descendants may
-call `useStores()`, but hydration is skipped and no `/api/2.0/ai` request fires), and whether
-this particular view offers it. Either one false withholds the trigger; both controls below
-have to be on for it to appear.
-
-The **surface is the host's**, not the panel's. `chatPanelContent` is a header and a chat body,
-with no background and no outer edge of its own; in the DocSpace client it is rendered inside
-`Section`'s info panel, which draws both from `--info-panel-background` and
-`--info-panel-border-color`. A host that mounts the content in a bare container gets a chat
-floating on the page with no boundary — the story below draws the same two so it does not.
-
-### Default
+A conversation with the portal's AI models, about the files and rooms the user is working in.
+Every section of ONLYOFFICE Apps mounts the same chat; what changes between them is a handful
+of props — which chips it suggests, whether the model can be changed, whether the user may
+write at all.
 
 <Story of={AiChatPanelStories.Default} />
+
+### Putting it on a screen
+
+There is no `AiChatPanel` component to render. `useAiChatPanel()` returns the panel content
+and the state to place it by, and the host decides where it goes — in the DocSpace client, the
+info panel beside a section.
 
 ```tsx
 import { observer } from "mobx-react";
 
 import AiAgentProviders from "@onlyoffice/apps-ui-kit/ai-agent/providers";
-import { useAiChatPanel } from "@onlyoffice/apps-ui-kit/ai-agent/ai-chat-panel";
+import {
+  useAiChatPanel,
+  useOpenAiChat,
+} from "@onlyoffice/apps-ui-kit/ai-agent/ai-chat-panel";
 
-const Section = observer(() => {
-  const {
-    chatButton,
-    chatPanelContent,
-    isChatPanelVisible,
-    isChatPanelFullscreen,
-    chatPanelWidth,
-  } = useAiChatPanel();
+const ChatPanel = observer(() => {
+  const { chatPanelContent, isChatPanelVisible, isChatPanelFullscreen, chatPanelWidth } =
+    useAiChatPanel();
 
+  if (!isChatPanelVisible) return null;
   return (
-    <div style={{ display: "flex" }}>
-      {!isChatPanelFullscreen ? <header>{chatButton}</header> : null}
-      {isChatPanelVisible ? (
-        <aside style={{ width: isChatPanelFullscreen ? "100%" : chatPanelWidth }}>
-          {chatPanelContent}
-        </aside>
-      ) : null}
-    </div>
+    <aside style={{ width: isChatPanelFullscreen ? "100%" : chatPanelWidth }}>
+      {chatPanelContent}
+    </aside>
   );
 });
 
-<AiAgentProviders locale="en">
-  <Section />
+// Anywhere below the providers: an "Ask AI" action, a deep link.
+const AskAiButton = () => <button onClick={useOpenAiChat()}>Ask AI</button>;
+
+<AiAgentProviders locale="en" isAvailable>
+  <AskAiButton />
+  <ChatPanel />
 </AiAgentProviders>;
 ```
 
-### Not configured
+Three things a host has to get right:
 
-The portal has no usable AI profile, so the panel opens on the branded not-available screen
-instead of the composer. It takes both halves — `aiReady: false` **and** `noAccessProps`,
-which is the wiring for the buttons on that screen; with only the first the body stays empty.
+- **Everything sits inside `AiAgentProviders`**, which mounts the store the hook reads; without it the hook throws. Consumers are `observer`s, or the visibility flags stop updating.
+- **Offering AI is the host's decision.** `useIsAiChatAvailable()` is `canUseAi && isAvailable`: whether the session may reach AI at all, and whether this view offers it. Check it before showing a way into the chat.
+- **The surface is the host's.** The panel content has no background or edge of its own; the frame on this page draws both from `--info-panel-background` and `--info-panel-border-color`, as the client's info panel does.
 
-That is the point of the pair: a host that can route the user to portal AI settings (the
-DocSpace client) passes `noAccessProps` and gets this screen, and a host that cannot (the
-embedded sdk layouts) omits the chat props altogether and falls back to the chat widget's own
-setup screen, which configures a profile in place.
+`@onlyoffice/ai-chat` is an optional peer dependency: importing anything under `ai-agent/`
+without it fails at build time, naming the missing package.
+
+## Scenarios
+
+### Suggestions for the section
+
+Chips on the empty chat put a ready prompt into the composer. The host passes a
+`SuggestionSet` — `default` for an empty composer, `singleFile` once a file is attached,
+`multipleFiles` for more — and the provider switches between them itself, since only it sees
+what is attached.
+
+<Story of={AiChatPanelStories.WithSuggestions} />
+
+### A fixed model, not shown
+
+`hideProfilePicker` removes the picker and its label altogether, for a chat that always talks
+to one assistant.
+
+<Story of={AiChatPanelStories.WithoutModelPicker} />
+
+### Read-only access
+
+`composerDisabled` locks the composer while the history stays readable, and `composerHeader`
+says why, above it.
+
+<Story of={AiChatPanelStories.ReadOnly} />
+
+### No AI model configured yet
+
+When the portal has no usable model, the chat opens on a screen that says so. It takes both
+`aiReady: false` and `noAccessProps` — who the user is, and the handlers behind the screen's
+buttons; a button is drawn only when its handler is passed.
+
+On a cloud portal an admin can activate AI on the spot — `onActivateAI` with a linked card,
+`onTopUpAndActivateAI` without one:
 
 <Story of={AiChatPanelStories.NotConfigured} />
 
-### Opted out
+On a server installation (`standalone`) an admin is sent to connect a provider, through
+`goToAISettings`:
 
-<Story of={AiChatPanelStories.OptedOut} />
+<Story of={AiChatPanelStories.NotConfiguredOnServer} />
 
-### What renders in Storybook
+Anyone else is told to ask their administrator:
 
-The chat widget talks to `/api/2.0/ai` **on the page's own origin**, not through the `apiConfig`
-portal switcher the selectors use. Served from a portal (`STORYBOOK_PROXY=1` behind nginx) that
-origin is the portal and the chat reaches the real AI service.
+<Story of={AiChatPanelStories.NotConfiguredForUser} />
 
-In local Storybook the origin is the dev server, which has no such API — and an unanswered
-init call is not a degraded chat but no chat at all: the widget's stores never finish
-hydrating and the panel renders an empty `.aui-root`, with no composer and no setup screen.
-So the dev server answers those routes itself, from `.storybook/ai-chat-mock.ts`: one mock
-profile, threads and messages kept in memory for the life of the process, and a streamed reply
-that echoes the prompt back. Nothing reaches a model. Set `STORYBOOK_AI_MOCK=0` to turn it off
-and see the unanswered state.
+A host with no settings page to send the user to — the embedded sdk layouts — leaves both out
+and gets the chat widget's own setup screen, which configures a model in place.
 
-`aiReady`, `canUseAi` and `isAvailable` are controls here, so the not-configured panel and a
-session with no AI at all can both be reached without a portal either.
+### Right to left
+
+`locale` sets the widget's own strings, and the page's direction mirrors the layout. The texts
+the kit passes in — the welcome line, the placeholder — come from the host's translations; this
+Storybook loads English only, so those stay in English.
+
+The example is on [its own page](?path=/story/components-ai-chat--right-to-left) rather than
+here: the kit sets the direction on the whole document, so a right-to-left block on this page
+would turn every other block with it.
+
+## What renders in Storybook
+
+The chat follows the **API Config** toolbar, like billing and the selectors. With a portal
+picked there (or `.env` filled in), every `/api/2.0/ai` request goes to that portal with
+`Authorization: Bearer <key>`, through the `serverApi` prop of `AiAgentProviders`, and the chat
+runs as the key's owner — their threads, their models. The portal's AI service has to accept
+the Storybook origin, which it does once `core:cors` allows it.
+
+With nothing configured, the chat talks to `/api/2.0/ai` on the page's own origin. In local
+Storybook that is the dev server, which answers from `.storybook/ai-chat-mock.ts`: one mock
+model, threads kept in memory, and a streamed reply that echoes the prompt. Nothing reaches a
+model; `STORYBOOK_AI_MOCK=0` turns the mock off.
 
 ## Properties
 

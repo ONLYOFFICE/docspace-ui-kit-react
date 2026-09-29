@@ -38,6 +38,23 @@ export const getProviderById = (id: string): SavedApiProvider | undefined => {
   return getSavedProviders().find((p) => p.id === id);
 };
 
+/**
+ * The portal the `apiConfig` toolbar global points at: `.env` for "default"
+ * (and for a saved provider that has since been deleted), the saved entry
+ * otherwise. Both fields are "" when nothing is configured -- the demo mode
+ * every story has to render in.
+ */
+export const resolveApiConfig = (
+  apiConfig: string | undefined,
+  defaults: { url: string; apiKey: string },
+): { url: string; apiKey: string } => {
+  if (apiConfig && apiConfig !== "default" && apiConfig !== "add-custom") {
+    const provider = getProviderById(apiConfig);
+    if (provider) return { url: provider.url, apiKey: provider.apiKey };
+  }
+  return defaults;
+};
+
 export const generateProviderId = (): string => {
   return `provider-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };

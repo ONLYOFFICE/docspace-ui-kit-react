@@ -267,7 +267,26 @@ type AiAgentProvidersProps = {
    * "Ask AI" row action, drag-and-drop.
    */
   attachmentLimit?: number;
+  /**
+   * Where the AI backend lives and how to authenticate against it. Omit it
+   * and the chat talks to `/api/2.0/ai` on the page's own origin with the
+   * session cookie — what the DocSpace client, served from the portal, wants.
+   * Pass it when the page is served from elsewhere (Storybook pointed at a
+   * portal from the toolbar): every chat request then goes to
+   * `${origin}/api/2.0/ai` carrying `headers`, e.g. an `Authorization:
+   * Bearer <key>`. The requests never send credentials, so a key has to
+   * travel as a header.
+   */
+  serverApi?: AiServerApi;
   children: ReactNode;
+};
+
+/** Target of the chat's HTTP transport — see `AiAgentProvidersProps.serverApi`. */
+export type AiServerApi = {
+  /** Portal origin, without a trailing slash and without `/api/2.0/ai`. */
+  origin: string;
+  /** Sent with every chat request. */
+  headers?: Record<string, string>;
 };
 
 // Server-mode API config: backend is mounted at the same origin as the
@@ -281,9 +300,13 @@ const SERVER_API_BASE_URL = "/api/2.0/ai";
 const getOrigin = () =>
   typeof window === "undefined" ? "" : window.location.origin;
 
-const buildServerApiConfig = (): ServerAPIConfig => ({
-  origin: getOrigin(),
+const buildServerApiConfig = (
+  origin: string,
+  headers?: Record<string, string>,
+): ServerAPIConfig => ({
+  origin,
   baseUrl: SERVER_API_BASE_URL,
+  headers,
   routes: DEFAULT_SERVER_API_ROUTES,
 });
 
@@ -500,6 +523,7 @@ const AiAgentProviders = ({
   composerDisabled,
   suggestions,
   attachmentLimit,
+  serverApi,
   children,
 }: AiAgentProvidersProps) => {
   const { t } = useTranslation("Common");
@@ -713,6 +737,14 @@ const AiAgentProviders = ({
     [t],
   );
 
+  // Reduced to primitives so a host passing a fresh `serverApi` object on
+  // every render does not rebuild the whole chat bundle below: only a real
+  // change of target or credentials does.
+  const serverOrigin = serverApi?.origin || getOrigin();
+  const serverHeadersKey = serverApi?.headers
+    ? JSON.stringify(serverApi.headers)
+    : "";
+
   const { stores, ctx, serverApiConfig } = useMemo(() => {
     const eventBus = new ChatEventBus();
     const callbacksManager = new CallbacksManager();
@@ -732,7 +764,7 @@ const AiAgentProviders = ({
       // the auto-register, hide the built-in "onlyoffice" provider type
       // from Add/Edit model dropdowns, and hide the matching row in
       // Web Search settings.
-      onlyofficeConfig: isStandalone ? undefined : { baseUrl: getOrigin() },
+      onlyofficeConfig: isStandalone ? undefined : { baseUrl: serverOrigin },
       hiddenProviders: isStandalone
         ? (["onlyoffice"] as ProviderType[])
         : undefined,
@@ -741,7 +773,12 @@ const AiAgentProviders = ({
         : undefined,
     };
 
-    const config = buildServerApiConfig();
+    const config = buildServerApiConfig(
+      serverOrigin,
+      serverHeadersKey
+        ? (JSON.parse(serverHeadersKey) as Record<string, string>)
+        : undefined,
+    );
     // No `engines` argument → every method call routes over HTTP to the
     // backend mounted at `${origin}${baseUrl}`.
     const api = createServerAPI(config);
@@ -763,7 +800,7 @@ const AiAgentProviders = ({
     });
 
     return { stores: appStores, ctx: appCtx, serverApiConfig: config };
-  }, [isStandalone, platform, aiChatStore]);
+  }, [isStandalone, platform, aiChatStore, serverOrigin, serverHeadersKey]);
 
   // While "Analyze responses" is on, the chat is about that one form: the cap
   // drops to one and the composer's attach actions go away, so the "+" menu
