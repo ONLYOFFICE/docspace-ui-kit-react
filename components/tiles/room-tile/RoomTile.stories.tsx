@@ -54,43 +54,8 @@ const meta = {
   title: "UI/Tiles/RoomTile",
   component: RoomTile,
   parameters: {
-    docs: {
-      description: {
-        component: `The card for one room in a tile listing: the logo and name on top, and a row of the room's tags along the bottom.
-
-### Features
-
-- **Room Logo**: Shows the room logo beside the name and swaps it for a checkbox on hover
-- **Checkbox Selection**: Selects the tile from the checkbox, while a click anywhere else on the tile goes to the open handler
-- **Active State**: Keeps the hover background on the room being acted on
-- **Blocking Operation**: Stops the tile answering hover, clicks and right-clicks while an operation runs over it
-- **Indeterminate Checkbox**: Draws the checkbox half-filled, for a partly selected room
-- **Tags**: Lists the room's tags along the bottom, led by a tag for the connected storage when there is one, and falls back to a tag naming the room type
-- **Pin Badge**: Shows badges such as a pin beside the name
-- **Actions Menu**: Opens the room's menu from a three-dot button, drawn when the item carries a \`contextOptions\` key, and on right-click when \`getContextModel\` is given
-
-### Usage
-
-\`\`\`tsx
-import { RoomTile } from "@onlyoffice/apps-ui-kit/components/tiles/room-tile";
-import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
-
-<RoomTile
-  item={{ id: "1", title: "Sample Room", roomType: "collaboration", tags: [] }}
-  element={<PublicRoomIcon />}
-  contextOptions={options}
-  onSelect={handleSelect}
->
-  <TileContent><Link>Room Content</Link></TileContent>
-</RoomTile>
-
-// A tag row of your own instead of the tags
-<RoomTile item={room} element={<RoomLogo />} contextOptions={options} customBottomContent={(isHovered, tags) => <MyTags tags={tags} />}>
-  <TileContent><Link>{room.title}</Link></TileContent>
-</RoomTile>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     checked: {
@@ -551,19 +516,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--tile-bg\` | Background of the tile and of the box behind the logo | theme-based |
-| \`--tile-border-style\` | Border of the tile | theme-based |
-| \`--tile-radius\` | Corner radius of the tile | \`12px\` |
-| \`--tile-hover-bg\` | Background of the tile on hover, and when checked or active | theme-based |
-| \`--tile-icon-color\` | Colour of the three-dot button and of a pin badge (\`is-pinned\`) | theme-based |
-| \`--tile-tag-hover-bg\` | Background of the tags on hover, and when checked or active | theme-based |
-| \`--tile-hotkey-color\` | Border colour while \`showHotkeyBorder\` is on | theme-based |
-| \`--tile-padding\` | Padding of the tile | \`16px 0\` |
-| \`--tile-row-gap\` | Gap between the name row and the tag row | \`16px\` |
+        story: `The variables are listed under CSS variables on this page.
 
 Two instances:
 - **Sample Room** — for every variable but the hotkey colour; hover it for \`--tile-hover-bg\` and \`--tile-tag-hover-bg\`.

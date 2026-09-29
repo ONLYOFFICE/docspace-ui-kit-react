@@ -29,7 +29,7 @@ export type RoomTileProps = {
   checked?: boolean;
   /** Whether the tile is the one being acted on, which keeps its hover background. */
   isActive?: boolean;
-  /** Dims the tile while an operation is running over it. */
+  /** Turns the pointer off while an operation is running over the tile: hover, clicks and right-clicks stop reaching it. It does not change how the tile looks. */
   isBlockingOperation?: boolean;
   /** The room this tile stands for. Its `tags`, `providerType` and `isAIAgent` decide what the bottom row shows, and its `contextOptions` key decides whether the three-dot button appears. */
   item: RoomItem;
