@@ -118,16 +118,21 @@ const preview: Preview = {
         order: [
           "Getting started",
           [
+            // In the order a newcomer needs them: what the kit is and where
+            // things live; the two providers every app mounts before anything
+            // renders right; the agent skills, before the first line an agent
+            // writes; working against a portal; then the reference pages,
+            // read when a question comes up.
             "Welcome",
             "Structure",
-            "Utils",
-            "Hooks",
-            "Constants",
-            "Translation",
             "Themes",
+            "Translation",
+            "Agent skills",
             "API",
             "Types and roles",
-            "Agent skills",
+            "Hooks",
+            "Utils",
+            "Constants",
           ],
           "Components",
           [
