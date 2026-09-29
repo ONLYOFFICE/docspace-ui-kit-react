@@ -155,22 +155,30 @@ export function ShortList({ names }: { names: string[] }) {
   effect**, and only when they are truthy: clearing either one leaves the last value in place.
 - `contentRef` is filled in by the ref setter rather than forwarded, so it is available after
   mount, not during render.
-- `rtl` follows the interface direction when you leave it out.
+- `rtl` follows the interface direction when you leave it out; in a right-to-left interface
+  the vertical track moves to the left edge.
+- **The thumb thickens on desktop.** From 1024px up it widens from 4px to 8px while the pointer
+  is over its track or the thumb is pressed. `fixedSize` keeps it at 8px there all the time;
+  below 1024px both stay at `--scrollbar-thumb-size`.
 - The scrollbar is the vendored `react-scrollbars-custom`, configured by the kit; `ref` gives
   you its instance, with `scrollTop`, `scrollTo` and the element handles.
 
 ## CSS variables
 
-| Variable                    | Default    | Effect                                  |
-| --------------------------- | ---------- | --------------------------------------- |
-| `--scrollbar-bg`            | theme grey | Colour of the thumb                     |
-| `--scrollbar-bg-hover`      | theme grey | Colour of the thumb on hover            |
-| `--scrollbar-bg-active`     | theme grey | Colour of the thumb while dragged       |
-| `--scrollbar-thumb-size`    | `4px`      | Thickness of the thumb                  |
-| `--scrollbar-radius`        | `8px`      | Corner radius of the track              |
-| `--scrollbar-track-padding` | `4px`      | Padding inside the track                |
-| `--scrollbar-padding-end`   | `17px`     | Space between the content and the track |
-| `--scrollbar-last-padding`  | unset      | Space after the last item, also a prop  |
+| Variable                         | Default    | Effect                                                                                           |
+| -------------------------------- | ---------- | ------------------------------------------------------------------------------------------------ |
+| `--scrollbar-bg`                 | theme grey | Colour of the thumb                                                                              |
+| `--scrollbar-bg-hover`           | theme grey | Colour of the thumb on hover                                                                     |
+| `--scrollbar-bg-active`          | theme grey | Colour of the thumb while dragged                                                                |
+| `--scrollbar-thumb-size`         | `4px`      | Thickness of the thumb: its width on the vertical track, its height on the horizontal one        |
+| `--scrollbar-radius`             | `8px`      | Corner radius of the track                                                                       |
+| `--scrollbar-track-padding`      | `4px`      | Gap between the track's edges and the thumb                                                      |
+| `--scrollbar-padding-end`        | `17px`     | Space between the content and the side the vertical track is on; `paddingInlineEnd` overrides it |
+| `--scrollbar-padding-end-mobile` | `8px`      | The same space on screens up to 600px wide; `paddingInlineEnd` overrides it too                  |
+| `--scrollbar-last-padding`       | unset      | Space after the last item, also a prop                                                           |
+
+The track itself is transparent, so `--scrollbar-radius` shows only where it clips a thumb that
+reaches the track's corner — with `--scrollbar-track-padding: 0`.
 
 ## Accessibility
 
