@@ -211,80 +211,8 @@ const meta = {
   title: "UI/Overlays/Selector",
   component: Selector,
   parameters: {
-    docs: {
-      description: {
-        component: `Selector is a panel for picking one or many items out of a list that is fetched a page at a time — people, groups, rooms, folders or files.
-
-### Features
-
-- **Virtual scroll**: Renders only the rows near the viewport and asks for the next page through \`loadNextPage\` as the list nears its end
-- **Search**: Offers a search box that hands the trimmed query back to you and shows its own empty screen when the search finds nothing
-- **Multi-select**: Puts a checkbox on every row and appends the count to the submit button, with an optional "select all" row and a cap on how many can be ticked
-- **Breadcrumbs**: Shows the folder trail above the list and reports the clicked crumb, so you can load that folder
-- **Access rights**: Adds a drop-down of access levels to the footer and hands the chosen one to \`onSubmit\`
-- **Empty screens**: Shows a picture, heading and paragraph of your choice for an empty folder, and a second set for a search that found nothing
-- **Footer input**: Optional input field in the footer for file naming, with a checkbox beside it when needed
-- **Side panel**: Wraps itself in a backdrop and a side panel with \`useAside\`; otherwise it fills whatever box it is placed in
-
-### Accessibility
-
-Selector sets few attributes of its own; most of what keyboard and assistive-technology users get comes from the controls inside it:
-
-- Escape calls \`onCancel\` and Enter submits, listened for on the whole window rather than on the panel, and both stand down while the inline name field is open
-- The search box is a native text input with \`tabIndex={1}\`, which moves it ahead of the rest of the page in tab order
-- In multi-select each row's checkbox is focusable with Tab and toggled with Space, which is the only keyboard route through the list
-- Rows are not focusable and carry no role, so outside multi-select a row can be picked only with the pointer
-- The footer's submit and cancel buttons are native buttons, reached with Tab and pressed with Enter or Space
-- The header title is plain text, so give the panel an accessible name yourself
-
-### Usage
-
-\`\`\`tsx
-import { Selector, RowLoader } from "@onlyoffice/apps-ui-kit/components/selector";
-
-// Pick one item from a paged list
-<Selector
-  items={items}
-  onSelect={handleSelect}
-  isMultiSelect={false}
-  submitButtonLabel="Choose"
-  disableSubmitButton={false}
-  onSubmit={handleSubmit}
-  totalItems={totalItems}
-  hasNextPage={hasNextPage}
-  isNextPageLoading={isNextPageLoading}
-  loadNextPage={loadNextPage}
-  isLoading={isLoading}
-  rowLoader={<RowLoader isContainer />}
-  {...emptyScreenProps}
-/>
-
-// Pick many, in a panel with a header and a cancel button
-<Selector
-  withHeader
-  headerProps={{ headerLabel: "Add people", onCloseClick: handleClose }}
-  isMultiSelect
-  withSelectAll
-  selectAllLabel="All people"
-  withCancelButton
-  cancelButtonLabel="Cancel"
-  onCancel={handleClose}
-  {...listProps}
-/>
-
-// "Save as": a folder trail and a file name field in the footer
-<Selector
-  withBreadCrumbs
-  breadCrumbs={breadCrumbs}
-  onSelectBreadCrumb={openFolder}
-  withFooterInput
-  footerInputHeader="File name"
-  currentFooterInputValue="Report.docx"
-  {...listProps}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     id: {
@@ -1531,25 +1459,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--selector-border\` | Line above the footer and under the "select all" row, as a \`border\` shorthand | theme-based |
-| \`--selector-body-description-text\` | Colour of the bold \`descriptionText\` line | theme-based |
-| \`--selector-breadcrumbs-prev-item-color\` | Colour of the folders before the current one in the trail, and of the dots of a collapsed trail | theme-based |
-| \`--selector-breadcrumbs-arrow-right-color\` | Colour of the arrows between folders in the trail | theme-based |
-| \`--selector-info-background-color\` | Background of the \`withInfo\` note | theme-based |
-| \`--selector-info-color\` | Text colour of that note | theme-based |
-| \`--selector-item-hover-background\` | Background of the row under the pointer | theme-based |
-| \`--selector-item-selected-background\` | Background of the picked row outside multi-select | theme-based |
-| \`--selector-item-disabled-text-color\` | Label colour of a disabled row | theme-based |
-| \`--selector-item-input-button-border\` | Border of the tick and cross beside the inline name field, and of the "create new" drop-down, as a \`border\` shorthand | theme-based |
-| \`--selector-item-input-button-border-hover\` | Border and icon colour of that tick and cross on hover | theme-based |
-| \`--selector-empty-screen-description-color\` | Paragraph of the empty screen (empty screen only) | theme-based |
-| \`--selector-empty-screen-pressed-button-color\` | Paragraph of the alternative empty screen drawn when the create row sets \`isRoomsOnly\` with a form-filling or data room type (that empty screen only) | theme-based |
-
-The example sets every variable on one wrapper; hover a row to see the hover background and hover the tick beside the name field to see its hover colour. The two empty-screen variables are set too but show only when the list is empty.`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. Hover a row to see the hover background and hover the tick beside the name field to see its hover colour. The two empty-screen variables are set too but show only when the list is empty.`,
       },
       source: {
         code: `<div
