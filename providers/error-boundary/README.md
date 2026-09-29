@@ -143,8 +143,8 @@ export function Reported({ children }: { children: React.ReactNode }) {
   the worst possible moment. Pass `fallback` if that matters.
 - **The error's `message` is shown to the reader** by that default fallback, verbatim. For a
   failure carrying anything internal, replace it rather than letting it through.
-- **A throw with no error object still renders the fallback**, as `new Error("Unhandled
-exception")` — so `fallback` as a function always receives an `Error`, never `undefined`.
+- **A throw with no error object still renders the fallback**, as
+  `new Error("Unhandled exception")` — so `fallback` as a function always receives an `Error`, never `undefined`.
 - **`onError` receives React's `ErrorInfo`**, whose `componentStack` is the useful half; the
   boundary does not touch it.
 - **Only rendering, lifecycle and constructors are covered.** This is React's rule, not the

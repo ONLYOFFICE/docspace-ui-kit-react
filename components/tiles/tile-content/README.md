@@ -140,8 +140,8 @@ export function TitleWithSize({ name, size }: { name: string; size: string }) {
 - **A link still wraps on a tablet.** The tile around the slot clamps a link to two lines with
   `white-space: normal`, which beats the slot's single-line rule, so only plain text gets the
   ellipsis between 600px and 1023px.
-- **`containerWidth` on the child wins over everything.** Without it the wrapper is `width:
-inherit` all the way down, which means the tile decides; with it the wrapper is exactly that
+- **`containerWidth` on the child wins over everything.** Without it the wrapper is
+  `width: inherit` all the way down, which means the tile decides; with it the wrapper is exactly that
   wide whatever the tile says.
 - **The outer element is `inline-flex` at `width: 100%`**, and the middle wrapper pushes
   everything to the start with an automatic trailing margin.
