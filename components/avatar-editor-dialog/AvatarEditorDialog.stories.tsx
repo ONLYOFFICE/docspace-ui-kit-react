@@ -33,6 +33,11 @@ const meta = {
   parameters: {
     // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
     // there is no second description to keep in step with it.
+    docs: {
+      // The stories open a modal over the whole page, so inline they stack
+      // on top of each other; on Docs each gets a document of its own.
+      story: { inline: false, height: "760px" },
+    },
   },
   argTypes: {
     t: {
