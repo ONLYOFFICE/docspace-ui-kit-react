@@ -11,53 +11,8 @@ const meta = {
   title: "UI/Feedback/Toast",
   component: Toast,
   parameters: {
-    docs: {
-      description: {
-        component: `Toast notification component for displaying temporary messages with different severity levels.
-
-### Features
-
-- **Four Types**: Shows success, error, warning and info toasts, each on its own background colour, with a check, danger or info icon; error and warning share the danger icon
-- **Auto-Dismiss**: Closes each toast after the given number of milliseconds, 5000 by default; a value under 750 falls back to 5000
-- **Persistent Mode**: Keeps a toast open until it is closed by hand when its timeout is 0
-- **Close Button**: Adds a cross that closes the toast when \`withCross\` is passed to \`toastr\`; without it a click anywhere on the toast closes it
-- **Custom Content**: Renders any React node as the message, such as a line of text followed by a link
-- **Stacking**: Lists toasts in the top corner on the inline-end side, newest first; at tablet and phone widths they overlap as a deck, each 8px below the one in front
-- **Imperative API**: Opens toasts from anywhere through \`toastr.success\`, \`error\`, \`warning\` and \`info\`, and closes them with \`toastr.clear\`
-- **Default Titles**: Fills an omitted title with a translated word for the type (Done, Warning, Alert, Info) and shows no title when \`null\` is passed
-
-### Accessibility
-
-Each toast is rendered by react-toastify, which marks it for assistive technology:
-
-- \`role="alert"\` on the body of every toast, so a screen reader announces its title and message as soon as it appears
-- The close cross is a \`<div>\` outside the tab order with no accessible name, so a toast shown with a \`timeout\` of 0 cannot be closed from the keyboard
-
-### Usage
-
-\`\`\`tsx
-import { Toast, toastr } from "@onlyoffice/apps-ui-kit/components/toast";
-
-// Mount the Toast container once
-<Toast />
-
-// Trigger toasts imperatively
-toastr.success("Operation completed", "Success", 5000);
-toastr.error("Something went wrong", "Error", 5000);
-toastr.warning("Please review changes", "Warning", 5000);
-toastr.info("New updates available", "Info", 5000);
-
-// Persistent toast with close button
-toastr.success("Saved", "Success", 0, true);
-
-// A failed request: the message is read from the error object
-toastr.error(error);
-
-// Close every open toast
-toastr.clear();
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?node-id=648%3A4421&mode=dev",
@@ -557,17 +512,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--toast-radius\` | Toast border radius | \`6px\` |
-| \`--toast-padding\` | Toast inner padding | \`12px\` |
-| \`--toast-text-size\` | Font size of custom content that sets none of its own; the title and a string message stay at 12px | \`12px\` |
-| \`--toast-width\` | Container width, above phone width | \`320px\` |
-| \`--toast-inset-end\` | Offset from the inline-end edge of the window, above tablet width | \`24px\` |
-
-The toasts are portalled to the end of the page, outside any wrapper of yours, so the variables are set through the \`style\` prop of \`Toast\`. The example sets every row a string toast can show, all but \`--toast-text-size\`: open a toast to see the rounder corners, the wider padding and the wider container further from the edge.`,
+        story: `The variables are listed under CSS variables on this page; here they are set through the \`style\` prop of \`Toast\`, because the toasts are portalled outside any wrapper of yours. The example sets every one a string toast can show, all but \`--toast-text-size\`: open a toast to see the rounder corners, the wider padding and the wider container further from the edge.`,
       },
       source: {
         code: `<Toast
