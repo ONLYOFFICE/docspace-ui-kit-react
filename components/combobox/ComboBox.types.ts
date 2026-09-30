@@ -278,6 +278,8 @@ export type TComboButtonProps = {
   innerContainerClassName?: string;
   /** Indicates if the dropdown is open */
   isOpen?: boolean;
+  /** Id of the option the keyboard has highlighted, announced while the list is open */
+  activeDescendantId?: string;
   /** Size of the button */
   size?: ComboBoxSize;
   /** Indicates if the button is scaled */

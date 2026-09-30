@@ -101,6 +101,13 @@ _Changed_ before upgrading.
 
 ### Fixed
 
+- `ComboBox` works from the keyboard. The button answered no key, so a list could not be opened
+  without a pointer, and the ArrowDown and Enter handler on the document looked for options by a
+  test id its own options never carry — so it moved nothing, and while a list was open it
+  swallowed Enter for the whole page. The button now answers Enter, Space and the arrows to open
+  the list, the arrows to move a highlight that skips options which cannot be picked, Enter or
+  Space to pick, and Escape or Tab to close; the highlighted option is named by
+  `aria-activedescendant`. Nothing listens on the document any more
 - `Checkbox` toggles from the keyboard. Focus lands on the box icon rather than the hidden
   input, and the icon answered no key, so Tab reached the checkbox and Space did nothing — a
   form could not be filled in without a pointer. Space on the focused icon now clicks the input,

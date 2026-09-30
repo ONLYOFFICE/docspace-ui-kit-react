@@ -282,10 +282,12 @@ export function TimezonePicker({ zones }: { zones: TOption[] }) {
   button on a later render, so the first open can still be 200px.
 - **`scaled` is on by default**, so the control fills its parent and `size` has no effect. Turn
   it off to get the 173px of `ComboBoxSize.base`.
-- **The keyboard does not work.** The component listens for ArrowDown and Enter on the document
-  and looks for options by the test id `drop-down-item` — which its own options never carry,
-  because it gives each one a test id of its own. The result is that the arrows and Enter do
-  nothing while the list is open, and Enter is swallowed for the rest of the page as well.
+- **The keyboard works on the button, and only there.** Enter, Space, ArrowDown and ArrowUp open
+  the list; the arrows then move a highlight through `options`, skipping separators, disabled
+  options and — unless `displaySelectedOption` — the current value; Enter or Space picks the
+  highlighted option; Escape and Tab close the list. Focus never leaves the button. With
+  `advancedOptions` the keys open and close the list but move no highlight, since custom content
+  is not a list of `options`, and keys typed into a field inside it are left to that field.
 - **Loading hides the choice.** `isLoading` draws a spinner in the button and hides its label,
   icon, `children` and arrow while keeping their space, so the button keeps its width but no
   longer shows the current value.
@@ -332,11 +334,12 @@ The list is a [`DropDown`](../drop-down/README.md) and takes that component's va
 - The button is a `<div role="button">` with `aria-haspopup="listbox"`, and `aria-expanded` and
   `aria-pressed` that are both true while the list is open; `aria-disabled` follows
   `isDisabled`. Its `tabIndex` defaults to `0`, so it is reachable. It used to default to `-1`,
-  which left the control off the keyboard entirely. Focus gets there, but only a click opens the
-  list: Enter and Space on the button do nothing, Escape does not close it, and the arrow keys
-  do not move through it, as above.
-- The options are `role="option"` rows in a `role="listbox"` that is not linked to the button by
-  `aria-controls` or `aria-activedescendant`.
+  which left the control off the keyboard entirely. It answers the keys of a listbox button, as
+  described above.
+- The options are `role="option"` rows in a `role="listbox"`. While the list is open the button
+  carries `aria-activedescendant` naming the option the keyboard has highlighted, which is drawn
+  with the list's focus style. The listbox itself is not linked to the button by
+  `aria-controls`.
 - The control's name comes from its content, the selected option's label, which says the value
   but not what is being chosen. Put it in a
   [`FieldContainer`](../field-container/README.md), or give it an `aria-label` through a wrapper.

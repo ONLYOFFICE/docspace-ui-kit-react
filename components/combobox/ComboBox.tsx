@@ -98,7 +98,9 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     (
       option: TOption,
       event:
-        React.ChangeEvent<HTMLInputElement> | React.MouseEvent | KeyboardEvent,
+        | React.ChangeEvent<HTMLInputElement>
+        | React.MouseEvent
+        | React.KeyboardEvent,
     ) => {
       if (option.isSeparator) return;
       if (option.disabled && option.tooltip) return;
@@ -115,59 +117,38 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     [onSelect, setIsOpenItemAccess],
   );
 
-  const handleKeyDown = React.useCallback(
-    (e: KeyboardEvent) => {
-      if (!isOpen) return;
+  // The keyboard's place in the list. Focus stays on the button throughout
+  // (the active-descendant pattern), and the options are virtualised, so the
+  // highlighted option is kept here rather than looked up in the DOM.
+  const listboxId = React.useId();
+  const [activeIndex, setActiveIndex] = React.useState(-1);
 
-      const options = document.querySelectorAll(
-        '[data-testid="drop-down-item"]',
-      );
-      const currentFocusedIndex = Array.from(options).findIndex(
-        (opt) => opt.getAttribute("data-focused") === "true",
-      );
+  // The same rule the rendered options follow: a separator, a disabled option
+  // and -- unless displaySelectedOption -- the current value cannot be picked.
+  const isOptionPickable = React.useCallback(
+    (option: TOption) =>
+      !option.isSeparator &&
+      !option.disabled &&
+      (props.displaySelectedOption || option.label !== selectedOption?.label),
+    [props.displaySelectedOption, selectedOption?.label],
+  );
 
-      switch (e.key) {
-        case "ArrowDown": {
-          e.preventDefault();
-          const nextIndex =
-            currentFocusedIndex === -1
-              ? 0
-              : (currentFocusedIndex + 1) % options.length;
-          options.forEach((opt, i) => {
-            opt.setAttribute(
-              "data-focused",
-              i === nextIndex ? "true" : "false",
-            );
-          });
-          break;
-        }
-        case "Enter": {
-          e.preventDefault();
-          const focusedOption = Array.from(options).find(
-            (opt) => opt.getAttribute("data-focused") === "true",
-          );
-          if (focusedOption) {
-            const optionIndex = Array.from(options).indexOf(focusedOption);
-            const option = props.options?.[optionIndex];
-            if (option && !option.disabled) {
-              optionClick(option, e);
-            }
-          }
-          break;
-        }
-        default:
-          break;
+  const stepActiveIndex = React.useCallback(
+    (from: number, step: 1 | -1) => {
+      const list = props.options ?? [];
+      const start = from === -1 && step === -1 ? list.length : from;
+      for (let i = 1; i <= list.length; i += 1) {
+        const index = (start + step * i + list.length * 2) % list.length;
+        if (isOptionPickable(list[index])) return index;
       }
+      return -1;
     },
-    [isOpen, props.options, optionClick],
+    [props.options, isOptionPickable],
   );
 
   React.useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [handleKeyDown]);
+    if (!isOpen) setActiveIndex(-1);
+  }, [isOpen]);
 
   const {
     dropDownMaxHeight,
@@ -281,6 +262,81 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
         : 6;
   }
 
+  const setOpenFromKeyboard = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    value: boolean,
+  ) => {
+    onToggle?.(e as unknown as React.MouseEvent<HTMLDivElement>, value);
+    setIsOpenItemAccess?.(value);
+    setIsOpen(value);
+  };
+
+  // The keys a listbox button answers: Enter, Space and the arrows open the
+  // list; the arrows then move the highlight, Enter or Space picks it, and
+  // Escape or Tab closes the list. Arrow navigation covers `options` only --
+  // custom `advancedOptions` content is not a list of them.
+  const onComboKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.closest("input, textarea, [contenteditable='true']")) return;
+    if (
+      isDisabled ||
+      isLoading ||
+      props.disableItemClick ||
+      displayType === ComboBoxDisplayType.toggle
+    )
+      return;
+
+    const navigable = !withAdvancedOptions && options.length > 0;
+
+    if (!isOpen) {
+      if (!["Enter", " ", "ArrowDown", "ArrowUp"].includes(e.key)) return;
+      if (!navigable && !withAdvancedOptions) return;
+      e.preventDefault();
+
+      const selectedIndex = options.findIndex((option) =>
+        withLabel
+          ? option.label === selectedOption?.label
+          : option.key === selectedOption?.key,
+      );
+      setActiveIndex(
+        !navigable
+          ? -1
+          : selectedIndex !== -1 && isOptionPickable(options[selectedIndex])
+            ? selectedIndex
+            : stepActiveIndex(-1, e.key === "ArrowUp" ? -1 : 1),
+      );
+      setOpenFromKeyboard(e, true);
+      return;
+    }
+
+    switch (e.key) {
+      case "ArrowDown":
+      case "ArrowUp":
+        e.preventDefault();
+        if (navigable)
+          setActiveIndex((index) =>
+            stepActiveIndex(index, e.key === "ArrowUp" ? -1 : 1),
+          );
+        break;
+      case "Enter":
+      case " ": {
+        e.preventDefault();
+        const option = navigable ? options[activeIndex] : undefined;
+        if (option && isOptionPickable(option)) optionClick(option, e);
+        break;
+      }
+      case "Escape":
+        e.preventDefault();
+        setOpenFromKeyboard(e, false);
+        break;
+      case "Tab":
+        setOpenFromKeyboard(e, false);
+        break;
+      default:
+        break;
+    }
+  };
+
   const disableMobileView = optionsCount < 4 || hideMobileView;
 
   const renderedOptions = React.useMemo(() => {
@@ -289,7 +345,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     const selectedLabel = selectedOption?.label;
     const selectedKey = selectedOption?.key;
 
-    return options.map((option) => {
+    return options.map((option, index) => {
       const {
         key,
         disabled,
@@ -330,7 +386,8 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
           icon={icon}
           description={description}
           isBeta={isBeta}
-          data-focused={isOpen ? isActiveOption : undefined}
+          id={`${listboxId}-${index}`}
+          isActiveDescendant={isOpen && index === activeIndex}
           data-is-separator={option.isSeparator || undefined}
           data-type={option.type || undefined}
           aria-disabled={optionDisabled || undefined}
@@ -365,6 +422,8 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     isOpen,
     onClickSelectedItem,
     optionClick,
+    listboxId,
+    activeIndex,
   ]);
 
   const dropDownProps = React.useMemo(
@@ -476,6 +535,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
       className={comboboxClasses}
       ref={ref}
       onClick={comboBoxClick}
+      onKeyDown={onComboKeyDown}
       data-testid={dataTestId ?? "combobox"}
       title={title}
       data-scaled={scaledOptions || undefined}
@@ -491,6 +551,9 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
         innerContainer={children}
         innerContainerClassName="optionalBlock"
         isOpen={isOpen}
+        activeDescendantId={
+          activeIndex === -1 ? undefined : `${listboxId}-${activeIndex}`
+        }
         size={size as ComboBoxSize}
         scaled={scaled}
         comboIcon={comboIcon}

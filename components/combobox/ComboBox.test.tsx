@@ -188,52 +188,65 @@ describe("ComboBox", () => {
     expect(setIsOpenItemAccess).toHaveBeenCalledWith(true);
   });
 
-  it("moves focus between options with ArrowDown key", () => {
+  it("opens from the keyboard and highlights only options that can be picked", () => {
     render(<ComboBox {...baseProps} />);
+    const button = screen.getByRole("button");
 
-    // Open combobox so keyboard handler is active
-    fireEvent.click(screen.getByRole("button"));
+    // Option 1 is the current value, 3 is disabled and 4 a separator,
+    // so Option 2 is the only one the highlight may land on.
+    fireEvent.keyDown(button, { key: "ArrowDown" });
+    expect(button).toHaveAttribute("aria-expanded", "true");
 
-    const first = document.createElement("div");
-    first.setAttribute("data-testid", "drop-down-item");
-    const second = document.createElement("div");
-    second.setAttribute("data-testid", "drop-down-item");
+    const highlighted = () =>
+      document.getElementById(
+        button.getAttribute("aria-activedescendant") ?? "",
+      );
+    expect(highlighted()).toHaveTextContent("Option 2");
+    expect(highlighted()).toHaveAttribute("data-focused", "true");
 
-    document.body.append(first, second);
-
-    // First ArrowDown focuses first option
-
-    fireEvent.keyDown(document, { key: "ArrowDown" });
-    expect(first.getAttribute("data-focused")).toBe("true");
-    expect(second.getAttribute("data-focused")).toBe("false");
-
-    // Second ArrowDown moves focus to second option
-    fireEvent.keyDown(document, { key: "ArrowDown" });
-    expect(first.getAttribute("data-focused")).toBe("false");
-    expect(second.getAttribute("data-focused")).toBe("true");
-
-    document.body.removeChild(first);
-    document.body.removeChild(second);
+    fireEvent.keyDown(button, { key: "ArrowDown" });
+    expect(highlighted()).toHaveTextContent("Option 2");
+    fireEvent.keyDown(button, { key: "ArrowUp" });
+    expect(highlighted()).toHaveTextContent("Option 2");
   });
 
-  it("calls onSelect when Enter is pressed on focused option", () => {
+  it("picks the highlighted option with Enter and closes on Escape", () => {
     const onSelect = vi.fn();
 
     render(<ComboBox {...baseProps} onSelect={onSelect} />);
+    const button = screen.getByRole("button");
 
-    // Open combobox so keyboard handler is active
+    fireEvent.keyDown(button, { key: "Enter" });
+    fireEvent.keyDown(button, { key: "Enter" });
+    expect(onSelect).toHaveBeenCalledWith(baseProps.options[1]);
+    expect(button).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.keyDown(button, { key: " " });
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    fireEvent.keyDown(button, { key: "Escape" });
+    expect(button).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("leaves Enter elsewhere on the page alone while the list is open", () => {
+    render(<ComboBox {...baseProps} />);
     fireEvent.click(screen.getByRole("button"));
 
-    const focusedOption = document.createElement("div");
-    focusedOption.setAttribute("data-testid", "drop-down-item");
-    focusedOption.setAttribute("data-focused", "true");
-    document.body.appendChild(focusedOption);
+    const event = new KeyboardEvent("keydown", {
+      key: "Enter",
+      bubbles: true,
+      cancelable: true,
+    });
+    document.body.dispatchEvent(event);
 
-    fireEvent.keyDown(document, { key: "Enter" });
+    expect(event.defaultPrevented).toBe(false);
+  });
 
-    expect(onSelect).toHaveBeenCalledWith(baseProps.options[0]);
+  it("does not open from the keyboard while disabled", () => {
+    render(<ComboBox {...baseProps} isDisabled />);
+    const button = screen.getByRole("button");
 
-    document.body.removeChild(focusedOption);
+    fireEvent.keyDown(button, { key: "ArrowDown" });
+    expect(button).toHaveAttribute("aria-expanded", "false");
   });
 
   it("ignores unsupported keys in keyboard handler", () => {

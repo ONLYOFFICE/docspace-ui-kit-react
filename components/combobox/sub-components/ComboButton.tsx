@@ -34,6 +34,7 @@ export const ComboButton: React.FC<TComboButtonProps> = ({
   withAdvancedOptions = false,
   innerContainerClassName = "innerContainer",
   isOpen = false,
+  activeDescendantId,
   size = ComboBoxSize.content,
   scaled = false,
   modernView = false,
@@ -116,6 +117,7 @@ export const ComboButton: React.FC<TComboButtonProps> = ({
       aria-expanded={isOpen}
       aria-pressed={isOpen}
       aria-haspopup="listbox"
+      aria-activedescendant={isOpen ? activeDescendantId : undefined}
       role="button"
       data-test-id="combo-button"
     >
