@@ -205,12 +205,17 @@ createFileJsonElement: { title } })` makes an office document through the docume
   carries demo data behind the same shape and an explicit "not connected" state; a screen that
   throws or hangs on a missing portal is a broken page, not a strict one.
   A module with no demo data of its own — the selectors, `uploader`, billing, the AI chat and
-  settings — gets it from the **demo portal**: with no portal selected, `withApiProvider` points
-  the clients at `https://demo-portal.invalid`, and a Mock Service Worker (`msw`, started by a
-  global loader in `.storybook/preview.tsx`) answers it from `.storybook/mocks/` — one handler
-  file and one fixture file per area, all data made up. The story takes `withPortalGate(title)`
-  (or `<PortalGate>`) from `.storybook/decorators/PortalGate.tsx`, which then renders it under
-  `DemoBanner`: a loud "Demo data" note with an arrow up at the toolbar, a **Connect a portal**
+  settings — gets it from the **demo portal**, `https://demo-portal.invalid`, which a Mock Service
+  Worker (`msw`, started by a global loader in `.storybook/preview.tsx`) answers from
+  `.storybook/mocks/` — one handler file and one fixture file per area, all data made up. The
+  story takes `withPortalGate(title)` (or `<PortalGate>`) from `.storybook/decorators/PortalGate.tsx`;
+  with no portal selected it renders the story inside `DemoPortal`, a nested `ApiProvider`
+  pointed at the demo portal, so **only gated stories reach the fixtures**. `withApiProvider`
+  itself still hands out an empty `baseUrl` with no portal, because that is the signal the
+  samples and the Files, Rooms and Forms sections read to switch to their own in-memory data —
+  point it at the demo portal and they take the fixtures for a real portal. Those screens take
+  `withDemoBanner` for the banner alone. `DemoBanner` is a loud "Demo data" note with an arrow up
+  at the toolbar, a **Connect a portal**
   button that opens the API Config form through a channel event
   (`.storybook/addons/events.ts`), and the registration link. The worker file is
   `.storybook/public/mockServiceWorker.js`, served from the root by `staticDirs`, so the static

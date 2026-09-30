@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import {
   type PaymentApi,
   type PortalQuotaApi,
@@ -240,16 +240,22 @@ class CurrentTariffStatusStore {
       const services = (res?.data?.response ??
         []) as unknown as TWalletServiceQuota[];
 
-      this._storageServiceId =
-        services.find((service) =>
-          (service.features ?? []).some((feature) => feature.id === TOTAL_SIZE),
-        )?.id ?? null;
-      this._docsConnectServiceIds = services
-        .filter((service) => isDocsConnectService(service))
-        .map((service) => service.id);
-      this._walletServicesResolved = true;
+      runInAction(() => {
+        this._storageServiceId =
+          services.find((service) =>
+            (service.features ?? []).some(
+              (feature) => feature.id === TOTAL_SIZE,
+            ),
+          )?.id ?? null;
+        this._docsConnectServiceIds = services
+          .filter((service) => isDocsConnectService(service))
+          .map((service) => service.id);
+        this._walletServicesResolved = true;
+      });
     } catch {
-      this._walletServicesResolved = false;
+      runInAction(() => {
+        this._walletServicesResolved = false;
+      });
     }
   };
 
@@ -271,7 +277,11 @@ class CurrentTariffStatusStore {
 
       const tariff = res.data.response as unknown as Tariff;
 
-      this.portalTariffStatus = tariff;
+      // After an await, so outside the action makeAutoObservable made of this
+      // method; MobX strict mode wants every write wrapped.
+      runInAction(() => {
+        this.portalTariffStatus = tariff;
+      });
 
       type WalletQuota = Quota & { additional?: boolean };
       const walletQuotas: WalletQuota[] =
@@ -290,25 +300,27 @@ class CurrentTariffStatusStore {
           : candidates.find((q) => q.additional !== false);
       const tariffQuota = candidates.find((q) => q.additional === false);
 
-      // QuotaState.Overdue = 1
-      if (storageQuota) {
-        if ((storageQuota.state as unknown as number) === 1) {
-          this._previousWalletQuota = [storageQuota];
-          this._walletQuotas = [];
+      runInAction(() => {
+        // QuotaState.Overdue = 1
+        if (storageQuota) {
+          if ((storageQuota.state as unknown as number) === 1) {
+            this._previousWalletQuota = [storageQuota];
+            this._walletQuotas = [];
+          } else {
+            this._walletQuotas = [storageQuota];
+            this._previousWalletQuota = [];
+          }
         } else {
-          this._walletQuotas = [storageQuota];
+          this._walletQuotas = [];
           this._previousWalletQuota = [];
         }
-      } else {
-        this._walletQuotas = [];
-        this._previousWalletQuota = [];
-      }
 
-      if (tariffQuota && (tariffQuota.state as unknown as number) !== 1) {
-        this._tariffWalletQuota = tariffQuota;
-      } else {
-        this._tariffWalletQuota = null;
-      }
+        if (tariffQuota && (tariffQuota.state as unknown as number) !== 1) {
+          this._tariffWalletQuota = tariffQuota;
+        } else {
+          this._tariffWalletQuota = null;
+        }
+      });
 
       this.setIsLoaded(true);
 
@@ -337,13 +349,15 @@ class CurrentTariffStatusStore {
 
       const info = res.data.response as unknown as TCustomerInfo;
 
-      this.payerInfo = {
-        portalId: null,
-        paymentMethodStatus: info.paymentMethodStatus ?? 0,
-        isDelayedPaymentMethod: info.isDelayedPaymentMethod ?? false,
-        email: info.email ?? null,
-        payer: info.payer,
-      };
+      runInAction(() => {
+        this.payerInfo = {
+          portalId: null,
+          paymentMethodStatus: info.paymentMethodStatus ?? 0,
+          isDelayedPaymentMethod: info.isDelayedPaymentMethod ?? false,
+          email: info.email ?? null,
+          payer: info.payer,
+        };
+      });
 
       return this.payerInfo;
     } catch (error: unknown) {

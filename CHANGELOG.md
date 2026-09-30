@@ -34,6 +34,14 @@ _Changed_ before upgrading.
 - **`Aside` is a flex column and its body takes the space the header leaves.** The bottom
   ~53px of a long body used to sit below the panel's edge, unreachable. If you pass
   `withoutBodyScroll` and bring your own scroller, give it `flex: 1 1 0` and `min-height: 0`
+- **`Aside` puts only `aria-*` on the `<aside>` element; every other prop it does not read goes
+  to the header alone.** It used to copy them onto both, so `onBackClick` and `isBackButton`
+  reached the DOM (React warned "Unknown event handler property `onBackClick`"), a `style`
+  replaced the panel's own `z-index`, and an `id` appeared twice on the page. The split follows
+  the prop table, which already gave `id` and `style` to the header. **What reached the panel
+  before and no longer does:** an `id`, `style` or `data-*` meant for the `<aside>`, and any DOM
+  handler — an `onClick` on the panel is now dropped, since the header does not read one either.
+  Wrap the `Aside` or its children to handle a click on the panel
 - **`Article`'s `showProgress` is optional, and it and `isInfoPanelVisible` are deprecated.**
   Both only moved the live chat launcher, which the component no longer draws, so neither is
   read. Passing them still compiles; they go in the next major
@@ -83,6 +91,19 @@ _Changed_ before upgrading.
 
 ### Fixed
 
+- `Selector` no longer scrolls the page when it mounts. The list's scroll container takes focus
+  on mount, and so does the new-name field when it appears; both focused with a plain `focus()`,
+  which scrolls the page to the element. They now pass `preventScroll`, so the focus still lands
+  in the selector and the page stays where it was. Every selector built on it follows
+- `RoomLogoCoverDialog` fits the window the first time it opens. Its `Portal` mounts the body
+  after the first render, so the height was computed before there was anything to measure and
+  stayed at the 648px (desktop) or 854px (tablet) preset, past the bottom of a short window; only
+  a second opening measured it. The body is now measured once it is mounted. `RoomLogoCover`'s
+  `forwardedRef` accepts a callback ref as well as a ref object
+- `MCPServersSelector` loads the portal's logo from the portal. The system server's icon
+  was a relative `/logo.ashx?logotype=3`, which the browser resolves against the page's own
+  origin — the portal only when the application is served from it. Anywhere else the icon was a
+  broken image. It is now built from the `baseUrl` of the nearest `ApiProvider`
 - Secondary `Tabs` with `scaled` judged overflow by the tabs' own widths, which are the
   container's shares, so two tabs in a 480px row were "overflowing" and shown one at a time
   behind arrows. The check now measures the labels

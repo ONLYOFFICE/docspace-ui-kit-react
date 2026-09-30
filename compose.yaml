@@ -27,6 +27,19 @@ services:
       - ./__tests__:/app/__tests__
       - ./playwright.config.ts:/app/playwright.config.ts
       - ./playwright-report:/app/playwright-report
+  # Opens every story and records its console errors and warnings -- the
+  # story-console skill. The source is the one baked into the image, which
+  # .claude/scripts/story-console/docker.mjs rebuilds before each run, so it is
+  # the working tree as it was a moment ago. Only the report comes back out.
+  # `init` reaps the storybook dev server the scan starts and stops.
+  stories-console:
+    image: ui-kit-tests
+    build:
+      context: .
+      dockerfile: Dockerfile
+    init: true
+    volumes:
+      - ./audits:/app/audits
   # Dev mode: mount source code so you can iterate without rebuilding the image.
   # Usage:
   #   docker-compose run --rm tests-dev pnpm exec playwright test

@@ -11,8 +11,11 @@ export const VirtualScroll = (props: ScrollbarProps) => {
       ".search-input-block",
     );
 
+    // `preventScroll`: the list takes focus for the keyboard, not the page's
+    // scroll position. Without it every selector that mounts scrolls the
+    // page to itself -- on a Docs page with a dozen of them, to the bottom.
     if (!isSearchInputFocused) {
-      scrollContentRef.current?.focus();
+      scrollContentRef.current?.focus({ preventScroll: true });
     }
   }, []);
 

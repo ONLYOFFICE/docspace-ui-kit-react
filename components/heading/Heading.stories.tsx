@@ -4,6 +4,10 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Heading, HeadingLevel, HeadingSize } from ".";
 
+const HEADING_LEVELS = Object.values(HeadingLevel).filter(
+  (value): value is HeadingLevel => typeof value === "number",
+);
+
 const meta = {
   title: "UI/Data display/Heading",
   component: Heading,
@@ -13,11 +17,16 @@ const meta = {
   },
   argTypes: {
     level: {
-      control: "select",
-      options: Object.keys(HeadingLevel).filter((key) =>
-        Number.isNaN(Number(key)),
-      ),
-      mapping: HeadingLevel,
+      // Numeric options labelled h1-h6, not `mapping: HeadingLevel`: a numeric
+      // enum maps both ways (`HeadingLevel[1] === "h1"`), so the mapping
+      // turned the default `level: 1` into "h1" and the element into <hh1>.
+      control: {
+        type: "select",
+        labels: Object.fromEntries(
+          HEADING_LEVELS.map((level) => [level, HeadingLevel[level]]),
+        ),
+      },
+      options: HEADING_LEVELS,
       description:
         "Which heading element is rendered, `h1` through `h6`. It changes only the element, not the size: an `h3` can be the largest text on the page",
       table: {

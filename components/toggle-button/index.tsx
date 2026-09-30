@@ -107,6 +107,10 @@ const ToggleButton = ({
           checked={isChecked}
           disabled={isDisabled}
           onChange={onChange}
+          // Without `onChange` the toggle only shows a state someone else
+          // changes -- ServiceCard handles the click on a wrapper. Saying so
+          // is what React asks of a `checked` input with no handler.
+          readOnly={!onChange}
           data-testid="toggle-button-input"
         />
         <ToggleIcon

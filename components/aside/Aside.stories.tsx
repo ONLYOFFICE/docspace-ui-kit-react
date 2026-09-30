@@ -13,6 +13,8 @@ import { Label } from "../label";
 import { Backdrop } from "../backdrop";
 import DefaultUserPhotoUrl from "../../assets/default_user_photo_size_82-82.png";
 
+import styles from "./Aside.stories.module.scss";
+
 const meta = {
   title: "UI/Overlays/Aside",
   component: Aside,
@@ -20,6 +22,15 @@ const meta = {
     // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
     // there is no second description to keep in step with it.
     layout: "fullscreen",
+    // Every story framed on Docs. Inline, the scene's `100vh` is the whole
+    // Docs window, and Storybook's zoom wrapper carries a transform, which
+    // makes the panel's `position: fixed` relative to the story block: the
+    // closed panel, moved off to the right, then widens the block and it
+    // scrolls sideways. In its own frame the panel is fixed to that frame.
+    docs: { story: { inline: false, height: "600px" } },
+    // The scene pads itself; the preview's own 20px would push it past the
+    // bottom of the frame.
+    noPadding: true,
   },
   argTypes: {
     visible: {
@@ -134,20 +145,22 @@ type Story = StoryObj<ComponentProps<typeof Aside>>;
 export default meta;
 
 const pageStyles: React.CSSProperties = {
+  // Exactly one window tall, padding included.
+  boxSizing: "border-box",
   height: "100vh",
   padding: "32px",
   display: "flex",
   flexDirection: "column",
   gap: "16px",
   fontFamily: "'Open Sans', sans-serif",
-  backgroundColor: "#f8f9f9",
+  backgroundColor: "var(--aside-story-page)",
 };
 
 const cardStyles: React.CSSProperties = {
-  backgroundColor: "#fff",
+  backgroundColor: "var(--aside-story-card)",
   borderRadius: "6px",
   padding: "20px",
-  border: "1px solid #eceef1",
+  border: "1px solid var(--aside-story-border)",
 };
 
 const Template = (args: AsideProps) => {
@@ -164,12 +177,15 @@ const Template = (args: AsideProps) => {
   };
 
   return (
-    <div style={pageStyles}>
+    <div className={styles.scene} style={pageStyles}>
       <div style={cardStyles}>
         <Text fontSize="22px" fontWeight={600}>
           Documents
         </Text>
-        <Text fontSize="13px" style={{ marginTop: "8px", color: "#a3a9ae" }}>
+        <Text
+          fontSize="13px"
+          style={{ marginTop: "8px", color: "var(--aside-story-muted)" }}
+        >
           Click the button below to open the side panel.
         </Text>
         <Button
@@ -188,7 +204,7 @@ const Template = (args: AsideProps) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: "#d0d5da",
+          color: "var(--aside-story-faint)",
           fontSize: "14px",
         }}
       >
@@ -210,7 +226,7 @@ const SettingsContent = () => {
 
   const sectionStyle: React.CSSProperties = {
     padding: "16px 20px",
-    borderBottom: "1px solid #eceef1",
+    borderBottom: "1px solid var(--aside-story-border)",
   };
 
   const rowStyle: React.CSSProperties = {
@@ -276,7 +292,7 @@ const UserProfileContent = () => (
         flexDirection: "column",
         alignItems: "center",
         padding: "24px 20px",
-        borderBottom: "1px solid #eceef1",
+        borderBottom: "1px solid var(--aside-story-border)",
         gap: "12px",
       }}
     >
@@ -289,7 +305,10 @@ const UserProfileContent = () => (
         <Text fontSize="16px" fontWeight={700}>
           Team member
         </Text>
-        <Text fontSize="13px" style={{ marginTop: "4px", color: "#a3a9ae" }}>
+        <Text
+          fontSize="13px"
+          style={{ marginTop: "4px", color: "var(--aside-story-muted)" }}
+        >
           member@example.com
         </Text>
       </div>
@@ -347,7 +366,7 @@ const FileDetailsContent = () => (
     <div
       style={{
         padding: "20px",
-        borderBottom: "1px solid #eceef1",
+        borderBottom: "1px solid var(--aside-story-border)",
         display: "flex",
         flexDirection: "column",
         gap: "4px",
@@ -356,7 +375,7 @@ const FileDetailsContent = () => (
       <Text fontSize="15px" fontWeight={600}>
         Quarterly Report.docx
       </Text>
-      <Text fontSize="12px" style={{ color: "#a3a9ae" }}>
+      <Text fontSize="12px" style={{ color: "var(--aside-story-muted)" }}>
         Last modified: Feb 10, 2026
       </Text>
     </div>
@@ -378,10 +397,10 @@ const FileDetailsContent = () => (
             display: "flex",
             justifyContent: "space-between",
             padding: "8px 0",
-            borderBottom: "1px solid #f3f4f4",
+            borderBottom: "1px solid var(--aside-story-row)",
           }}
         >
-          <Text fontSize="13px" style={{ color: "#a3a9ae" }}>
+          <Text fontSize="13px" style={{ color: "var(--aside-story-muted)" }}>
             {item.label}
           </Text>
           <Text fontSize="13px">{item.value}</Text>

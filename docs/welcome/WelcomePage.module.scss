@@ -184,7 +184,8 @@
   // Module cards: four up, bordered, 12px radius.
   .modulesGrid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    // Six cards: two rows of three.
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
 
     @media (max-width: 1100px) {

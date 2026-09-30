@@ -99,6 +99,7 @@ const candidates = (repo, patterns, current) => {
  */
 const detectBase = (repo, current, cfg) => {
   const scored = [];
+  const tooFar = [];
   for (const { bare, ref } of candidates(repo, cfg.basePatterns, current)) {
     const mergeBase = git(repo, ["merge-base", ref, "HEAD"], {
       allowFail: true,
@@ -107,7 +108,11 @@ const detectBase = (repo, current, cfg) => {
     const ahead = Number(
       git(repo, ["rev-list", "--count", `${mergeBase}..HEAD`]),
     );
-    if (!Number.isFinite(ahead) || ahead > cfg.maxCommitsAhead) continue;
+    if (!Number.isFinite(ahead)) continue;
+    if (ahead > cfg.maxCommitsAhead) {
+      tooFar.push({ ref, ahead });
+      continue;
+    }
     scored.push({
       bare,
       ref,
@@ -116,7 +121,8 @@ const detectBase = (repo, current, cfg) => {
     });
   }
   scored.sort((a, b) => a.ahead - b.ahead || a.rank - b.rank);
-  return scored;
+  tooFar.sort((a, b) => a.ahead - b.ahead);
+  return { scored, tooFar };
 };
 
 const resolveBase = (repo, current, cfg, explicit) => {
@@ -135,8 +141,8 @@ const resolveBase = (repo, current, cfg, explicit) => {
   if (cfg.reviewBase)
     return { base: cfg.reviewBase, source: "config file", ranked: [] };
 
-  const ranked = detectBase(repo, current, cfg);
-  if (!ranked.length) return { base: null, source: "none", ranked };
+  const { scored: ranked, tooFar } = detectBase(repo, current, cfg);
+  if (!ranked.length) return { base: null, source: "none", ranked, tooFar };
   return { base: ranked[0].ref, source: "auto-detected", ranked };
 };
 
@@ -218,8 +224,26 @@ const main = () => {
   if (head === "HEAD")
     throw new Error("detached HEAD -- check out the branch to review");
 
-  const { base, source, ranked } = resolveBase(repo, head, cfg, explicit);
-  if (!base) throw new Error("no base branch found -- pass one explicitly");
+  const {
+    base,
+    source,
+    ranked,
+    tooFar = [],
+  } = resolveBase(repo, head, cfg, explicit);
+  if (!base) {
+    // A long-lived branch can outgrow the limit on every candidate; name them
+    // so the fix is one command instead of a guess.
+    const far = tooFar
+      .slice(0, 3)
+      .map((c) => `${c.ref} (+${c.ahead})`)
+      .join(", ");
+    throw new Error(
+      far
+        ? `no base within ${cfg.maxCommitsAhead} commits of HEAD; closest: ${far}\n` +
+            `  pass one explicitly, and --save to pin it: review-scope.mjs ${tooFar[0].ref} --save`
+        : "no base branch found -- pass one explicitly",
+    );
+  }
 
   console.log(`Branch: ${head}`);
   const alts = ranked

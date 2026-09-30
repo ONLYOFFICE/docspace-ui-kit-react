@@ -37,11 +37,13 @@ type ToolsRuntime = {
 // into `provider.currentProvider.tools` before returning.
 let toolsRuntime: ToolsRuntime | null = null;
 
+// Returns the detach for an effect's cleanup. With it, a remount detaches the
+// old runtime before attaching the new one, so a runtime still attached at
+// the next attach means two providers alive at once.
 export const attachHostToolsRuntime = (runtime: ToolsRuntime) => {
   if (toolsRuntime && toolsRuntime !== runtime) {
-    // A different runtime is already attached — either a remount (expected,
-    // the old instance is gone) or two concurrent providers (unsupported,
-    // see the single-mount note above). Warn so the latter is visible.
+    // A different runtime is still attached: two concurrent providers
+    // (unsupported, see the single-mount note above). Warn so it is visible.
     console.warn(
       "%c[host-tool-groups] attachHostToolsRuntime called while a runtime " +
         "was already attached; overwriting. Concurrent AiAgentProviders " +
@@ -50,6 +52,9 @@ export const attachHostToolsRuntime = (runtime: ToolsRuntime) => {
     );
   }
   toolsRuntime = runtime;
+  return () => {
+    if (toolsRuntime === runtime) toolsRuntime = null;
+  };
 };
 
 // Called by open_file / create_and_open to switch the client to the result

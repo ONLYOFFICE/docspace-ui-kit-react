@@ -8,7 +8,7 @@ import {
 } from "react";
 
 import i18nextSingleton from "i18next";
-import { useObserver } from "mobx-react";
+import { comparer, reaction } from "mobx";
 import {
   I18nextProvider as ReactI18nextProvider,
   useTranslation,
@@ -499,6 +499,28 @@ const chatIntro = <ChatIntro />;
 // Static, so it never invalidates the widget config memo.
 const analyzeIntro = <AnalyzeIntro />;
 
+// The fields `select` reads, kept in state and refreshed whenever one of them
+// changes -- the narrow observation `useObserver(fn)` gave, without that
+// deprecated hook and without making the whole provider an `observer`, which
+// would re-render it for every observable its body happens to read.
+// `fireImmediately` covers a change between the first render and the effect.
+const useObservedFields = <T extends object>(select: () => T): T => {
+  const [fields, setFields] = useState(select);
+  const selectRef = useRef(select);
+  selectRef.current = select;
+  useEffect(
+    () =>
+      reaction(
+        () => selectRef.current(),
+        (next) =>
+          setFields((prev) => (comparer.shallow(prev, next) ? prev : next)),
+        { equals: comparer.shallow, fireImmediately: true },
+      ),
+    [],
+  );
+  return fields;
+};
+
 const AiAgentProviders = ({
   locale,
   theme,
@@ -551,7 +573,7 @@ const AiAgentProviders = ({
     analyzePending,
     analyzeAttachmentId,
     analyzeFileName,
-  } = useObserver(() => ({
+  } = useObservedFields(() => ({
     analyzeActive: aiChatStore.isAnalyzeMode,
     analyzePending: aiChatStore.isAnalyzePending,
     analyzeAttachmentId: aiChatStore.analyzeAttachmentId,
@@ -1052,13 +1074,15 @@ const AiAgentProviders = ({
     ],
   );
 
-  useEffect(() => {
-    attachHostToolsRuntime({
-      servers: ctx.servers,
-      useServersStore: stores.useServersStore,
-      eventBus: ctx.eventBus,
-    });
-  }, [ctx.servers, ctx.eventBus, stores.useServersStore]);
+  useEffect(
+    () =>
+      attachHostToolsRuntime({
+        servers: ctx.servers,
+        useServersStore: stores.useServersStore,
+        eventBus: ctx.eventBus,
+      }),
+    [ctx.servers, ctx.eventBus, stores.useServersStore],
+  );
 
   useEffect(() => {
     if (openResultFile) attachOpenResultFile(openResultFile);

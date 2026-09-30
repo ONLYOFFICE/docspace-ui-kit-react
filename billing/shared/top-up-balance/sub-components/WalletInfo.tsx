@@ -46,10 +46,6 @@ const WalletInfo = (props: WalletInfoProps) => {
   const onOpenWallet = () =>
     window.open(toAbsoluteUrl(walletRoute ?? ""), "_blank");
 
-  const keyProp = isBalanceInsufficient
-    ? { tKey: "AvailableCreditsInsufficient" }
-    : { tKey: "AvailableCreditsAmount" };
-
   return (
     <div
       className={classNames(styles.walletInfoContainer, {
@@ -71,22 +67,33 @@ const WalletInfo = (props: WalletInfoProps) => {
             [styles.warningColor]: isBalanceInsufficient,
           })}
         >
-          <CommonTrans
-            i18nKey={keyProp.tKey}
-            values={{ balance }}
-            components={{
-              1: isBalanceInsufficient ? (
-                <Text key="balance-text" as="span" fontWeight={600} />
-              ) : (
-                <Text
-                  key="balance-text"
-                  fontWeight={600}
-                  isInline
-                  className={styles.balanceValue}
-                />
-              ),
-            }}
-          />
+          {/* Each key written out in `i18nKey="..."`: scripts/copy-locales.js
+              finds the keys to vendor by that literal, and a key chosen
+              through a variable never reached locales/en. */}
+          {isBalanceInsufficient ? (
+            <CommonTrans
+              i18nKey="AvailableCreditsInsufficient"
+              values={{ balance }}
+              components={{
+                1: <Text key="balance-text" as="span" fontWeight={600} />,
+              }}
+            />
+          ) : (
+            <CommonTrans
+              i18nKey="AvailableCreditsAmount"
+              values={{ balance }}
+              components={{
+                1: (
+                  <Text
+                    key="balance-text"
+                    fontWeight={600}
+                    isInline
+                    className={styles.balanceValue}
+                  />
+                ),
+              }}
+            />
+          )}
         </div>
       </div>
       <div className={styles.walletInfoActions}>

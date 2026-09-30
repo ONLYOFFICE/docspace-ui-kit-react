@@ -106,8 +106,8 @@ method.
 
 ### Showing a toast
 
-Every method takes the same five positional arguments — `(data, title?, timeout?, withCross?,
-centerPosition?)`. Only the first is required.
+Every method takes the same five positional arguments —
+`(data, title?, timeout?, withCross?, centerPosition?)`. Only the first is required.
 
 ```tsx
 import { toastr } from "@onlyoffice/apps-ui-kit/components/toast";

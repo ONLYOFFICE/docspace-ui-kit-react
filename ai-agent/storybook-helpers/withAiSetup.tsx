@@ -4,10 +4,10 @@ import type { Decorator } from "@storybook/react-vite";
 import { DEFAULT_API_KEY, DEFAULT_API_URL } from "../../.storybook/globals";
 import { resolveApiConfig } from "../../.storybook/utils/apiProviders";
 import {
+  DemoPortal,
   PortalGateCard,
   usePortalConnection,
 } from "../../.storybook/decorators/PortalGate";
-import { DemoBanner } from "../../.storybook/decorators/DemoBanner";
 import {
   DEMO_API_KEY,
   DEMO_PORTAL_URL,
@@ -114,12 +114,9 @@ const AiSetupGate = ({
 
   if (hasPortal) return chat;
 
-  return (
-    <>
-      <DemoBanner storyId={storyId} />
-      {chat}
-    </>
-  );
+  // `DemoPortal` also points `useApi()` at the demo portal, for the parts of
+  // the chat that reach the portal's own API rather than its AI service.
+  return <DemoPortal storyId={storyId}>{chat}</DemoPortal>;
 };
 
 export const withAiSetup: Decorator = (Story, context) => {

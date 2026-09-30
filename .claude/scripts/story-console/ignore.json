@@ -1,0 +1,8 @@
+[
+  {
+    "pattern": "^Error: Something broke!",
+    "level": "error",
+    "stories": "^components-providers-errorprovider--",
+    "reason": "The ErrorBoundary stories throw on purpose to show the fallback, and React logs every error a boundary catches."
+  }
+]

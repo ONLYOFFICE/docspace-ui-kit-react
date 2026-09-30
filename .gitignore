@@ -20,6 +20,7 @@ onlyoffice-apps-ui-kit-*.tgz
 playwright-report
 test-results
 
-# Stories-audit reports (see .claude/skills/audit-stories). Written on demand,
+# Stories-audit and story-console reports (see .claude/skills/audit-stories and
+# .claude/skills/story-console). Written on demand,
 # kept out of git so a sweep is not committed with the fixes it asks for.
 audits

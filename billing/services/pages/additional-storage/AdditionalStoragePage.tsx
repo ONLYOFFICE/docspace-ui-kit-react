@@ -204,10 +204,6 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     },
   ];
 
-  const keyProp = isScheduled
-    ? { tKey: "SubscriptionAutoCancellation" }
-    : { tKey: "SubscriptionWillBeAutomaticallyRenewed" };
-
   if (shouldShowLoader) return <AdditionalStoragePageLoader />;
 
   const getTotalNextStoragePrice = () => {
@@ -395,15 +391,20 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
                       1: <Text fontWeight="600" as="span" />,
                     }}
                   />
+                ) : isScheduled ? (
+                  // Each key written out in `i18nKey="..."`: scripts/copy-locales.js
+                  // finds the keys to vendor by that literal, and a key chosen
+                  // through a variable never reached locales/en.
+                  <CommonTrans
+                    i18nKey="SubscriptionAutoCancellation"
+                    values={{ finalDate: storageExpiryDate }}
+                    components={{ 1: <Text fontWeight="600" as="span" /> }}
+                  />
                 ) : (
                   <CommonTrans
-                    i18nKey={keyProp.tKey}
-                    values={{
-                      finalDate: storageExpiryDate,
-                    }}
-                    components={{
-                      1: <Text fontWeight="600" as="span" />,
-                    }}
+                    i18nKey="SubscriptionWillBeAutomaticallyRenewed"
+                    values={{ finalDate: storageExpiryDate }}
+                    components={{ 1: <Text fontWeight="600" as="span" /> }}
                   />
                 )}
               </Text>

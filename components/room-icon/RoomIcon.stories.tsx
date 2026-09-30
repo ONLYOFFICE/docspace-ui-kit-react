@@ -531,11 +531,16 @@ const coverLogo = {
   small: "",
 };
 
+// A logo that cannot load. A data URI that does not decode fails the same
+// way a missing file does -- `onError` fires and the tile falls back to the
+// initials -- without a request, so the console shows no 404 for it.
+const BROKEN_LOGO_URL = "data:image/png;base64,bm90LWFuLWltYWdl";
+
 const WithLogoTemplate = (args: RoomIconProps) => (
   <Wrapper>
     <RoomIcon {...args} logo={CatalogFolderReactSvgUrl} />
     <RoomIcon {...args} logo={coverLogo} />
-    <RoomIcon {...args} logo="missing-logo.png" />
+    <RoomIcon {...args} logo={BROKEN_LOGO_URL} />
   </Wrapper>
 );
 
@@ -558,7 +563,7 @@ export const WithLogo: Story = {
       source: {
         code: `<RoomIcon title="Project files" color="2DB482" size="48px" logo={logoUrl} />
 <RoomIcon title="Project files" color="2DB482" size="48px" logo={{ cover: { id: "star", data: svgString }, original: "", large: "", medium: "", small: "" }} />
-<RoomIcon title="Project files" color="2DB482" size="48px" logo="missing-logo.png" />`,
+<RoomIcon title="Project files" color="2DB482" size="48px" logo={urlThatFailsToLoad} />`,
       },
     },
   },

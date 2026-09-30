@@ -9,6 +9,8 @@ import CodeIcon from "../../assets/icons/16/code.react.svg";
 import DeveloperIcon from "../../assets/icons/16/catalog.developer.react.svg";
 import SettingsIcon from "../../assets/icons/16/catalog-settings-common.svg";
 import StatisticsIcon from "../../assets/icons/16/statistics.react.svg";
+import AgentSkillsIcon from "../../assets/icons/16/catalog.ai-agents.react.svg";
+import PeopleIcon from "../../assets/icons/16/people.react.svg";
 import { Button, ButtonSize } from "../../components/button";
 import { CollapsibleCard } from "../../components/collapsible-card";
 import { Link, LinkType } from "../../components/link";
@@ -167,6 +169,30 @@ const modules = [
       "The REST client, MobX-backed selectors, billing, the uploader, the editor wrapper and the AI agent.",
     action: { label: "Open API", docsId: "getting-started-api--docs" },
   },
+  {
+    id: "roles",
+    icon: <PeopleIcon />,
+    title: "Types and roles",
+    badge: "Portal rules",
+    description:
+      "Who may do what: the five user types, the eight room roles, and how to check access in code.",
+    action: {
+      label: "Open Types and roles",
+      docsId: "getting-started-types-and-roles--docs",
+    },
+  },
+  {
+    id: "skills",
+    icon: <AgentSkillsIcon />,
+    title: "Agent skills",
+    badge: "For AI agents",
+    description:
+      "Connect them before an AI agent writes code with the kit: it follows the kit's rules and checks its own work.",
+    action: {
+      label: "Open Agent skills",
+      docsId: "getting-started-agent-skills--docs",
+    },
+  },
 ];
 
 const references = [
@@ -289,8 +315,10 @@ export const WelcomePage = () => {
               What is inside
             </Text>
             <Text as="p" className={styles.sectionSubtitle}>
-              The published surface, and the portal-coupled modules that ship
-              alongside it without the same compatibility promise.
+              The published surface, the portal-coupled modules that ship
+              alongside it without the same compatibility promise, and two
+              guides: who may do what on a portal, and building with an AI
+              agent.
             </Text>
           </div>
           <div className={styles.modulesGrid}>

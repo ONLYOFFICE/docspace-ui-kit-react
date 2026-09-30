@@ -244,8 +244,8 @@ export function DialogFooter({
 - **`isLoading` also disables the button.** The element gets `disabled={isDisabled || isLoading}`,
   and the content is hidden with `visibility: hidden` while the loader is laid over it
   absolutely — so the button keeps its width and the layout does not jump.
-- **The label never wraps.** The root is `white-space: nowrap; overflow: hidden;
-text-overflow: ellipsis`. A label wider than the button is clipped with an ellipsis, and
+- **The label never wraps.** The root is
+  `white-space: nowrap; overflow: hidden; text-overflow: ellipsis`. A label wider than the button is clipped with an ellipsis, and
   neither `scale` nor `minWidth` helps: both size the button against its container, never
   against its text. Give the button a width of its own if the label must fit.
 - **There are two independent tooltips.** `tooltipText` is rendered by the component itself,

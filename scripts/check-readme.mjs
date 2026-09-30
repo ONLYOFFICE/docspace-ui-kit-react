@@ -360,6 +360,52 @@ const unshippedLinks = (text, from, shipped) => {
   return found;
 };
 
+// Inline code that a line break splits in two. Storybook renders a README
+// with markdown-to-jsx, and its code component takes a span holding a newline
+// for a block: the result is a <pre> inside the paragraph's <p>, which React
+// reports as invalid nesting on the component's Docs page. Prettier does not
+// join such lines (`proseWrap: preserve`), so nothing else would catch it.
+// Returns the line each such span opens on, outside fenced blocks and tables.
+const wrappedInlineCode = (readme) => {
+  const lines = readme.split("\n");
+  const found = [];
+  let inFence = false;
+  let paragraph = [];
+  let start = 0;
+
+  const scan = () => {
+    const text = paragraph.join("\n");
+    for (const match of text.matchAll(/(?<!`)`([^`]+)`(?!`)/g)) {
+      if (match[1].includes("\n")) {
+        found.push(start + text.slice(0, match.index).split("\n").length);
+      }
+    }
+    paragraph = [];
+  };
+
+  lines.forEach((line, index) => {
+    if (line.trimStart().startsWith("```")) {
+      if (!inFence) scan();
+      inFence = !inFence;
+      return;
+    }
+    if (inFence) return;
+    if (
+      line.trim() === "" ||
+      line.trimStart().startsWith("|") ||
+      line.startsWith("#")
+    ) {
+      scan();
+      return;
+    }
+    if (paragraph.length === 0) start = index;
+    paragraph.push(line);
+  });
+  scan();
+
+  return found;
+};
+
 const main = async () => {
   const options = parseArgs(process.argv.slice(2));
   const allowlist = readAllowlist();
@@ -426,6 +472,15 @@ const main = async () => {
 
     for (const problem of validateMetadata(meta)) {
       error("E_META_SCHEMA", folder, 1, problem);
+    }
+
+    for (const line of wrappedInlineCode(readme)) {
+      error(
+        "E_INLINE_CODE_WRAPPED",
+        folder,
+        line,
+        "inline code is split across two lines; the Docs page renders it as a code block inside the paragraph. Break the line before the opening backtick instead",
+      );
     }
 
     // --- derived truth: the metadata against the source ---

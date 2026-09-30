@@ -310,8 +310,9 @@ export function CollapsibleSidebar() {
 - **A slot that disappears leaves its content behind.** The lifted content is kept in state and only
   ever written, never cleared: rendering without an `Article.Body` afterwards keeps showing the
   previous body.
-- **`Article.Body` must hold exactly one element.** Its child is cloned to receive a
-  `hasCustomSlot` prop, so a fragment, a list or a string throws.
+- **`Article.Body` must hold exactly one element.** A component child is cloned to receive a
+  `hasCustomSlot` prop, so a fragment, a list or a string throws. A DOM element child (`<nav>`)
+  is rendered as it is, without the prop.
 - **Twelve props are dead.** `withSendAgain`, `isNonProfit`, `isGracePeriod`, `isFreeTariff`,
   `isPaymentPageAvailable`, `isLicenseDateExpired`, `isTrial`, `standalone`,
   `currentTariffPlanTitle`, `trialDaysLeft`, `withCustomSlot` and `path` are declared, several of
@@ -347,7 +348,7 @@ export function CollapsibleSidebar() {
 | -------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `Article.Header`     | Content of the header row, beside the burger and the logo                                                            |
 | `Article.MainButton` | The primary action above the body; rendered only while `withMainButton` is set, and moved below the panel on a phone |
-| `Article.Body`       | The scrolling body. Its single element child is cloned with a `hasCustomSlot` prop                                   |
+| `Article.Body`       | The scrolling body. Its single element child, when a component, is cloned with a `hasCustomSlot` prop                |
 
 They are static properties of `Article`, not separate exports, and they accept nothing but
 `children`.

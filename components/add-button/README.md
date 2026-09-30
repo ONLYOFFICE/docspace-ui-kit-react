@@ -159,8 +159,8 @@ export function AddTag({ onAdd }: { onAdd: () => void }) {
   does nothing in either case.
 - **`isAction` needs a colour scheme, not just a theme.** The accent tint is written as an
   inline custom property from the theme's `currentColorScheme.main.accent`; when the provider
-  has none, that property is never set and the rule `background-color: var(--main-accent-button)
-!important` leaves the square transparent.
+  has none, that property is never set and the rule
+  `background-color: var(--main-accent-button) !important` leaves the square transparent.
 - **`size` shares that fate.** It is only written when the colour scheme exists, so under a
   provider without one the square stays 32×32 whatever you pass.
 - **`title` is the kit's tooltip, `titleText` is the browser's.** The first goes through the

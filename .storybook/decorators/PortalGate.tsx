@@ -1,7 +1,8 @@
 import React from "react";
 import type { Decorator } from "@storybook/react-vite";
 
-import { useApi } from "../../providers/api";
+import ApiProvider, { useApi } from "../../providers/api/ApiProvider";
+import { DEMO_API_KEY, DEMO_PORTAL_URL } from "../mocks/demoPortal";
 import { DEFAULT_API_KEY, DEFAULT_API_URL } from "../globals";
 import { resolveApiConfig } from "../utils/apiProviders";
 
@@ -15,9 +16,9 @@ export type PortalConnectionState = "checking" | "connected" | "failed";
 
 /**
  * Whether the `apiConfig` toolbar global names a portal at all. With none,
- * `withApiProvider` points the clients at the demo portal, which the mock
- * service worker plays (`.storybook/mocks`), and a story shows made-up data
- * under a banner that says so.
+ * `withApiProvider` hands out clients whose base URL is empty -- the signal
+ * the samples and the sections read to switch to their own in-memory data --
+ * and a gated story is moved onto the demo portal instead (`DemoPortal`).
  */
 export const hasPortalConfigured = (apiConfig: string | undefined): boolean => {
   const { url, apiKey } = resolveApiConfig(apiConfig, {
@@ -64,6 +65,47 @@ export const usePortalConnection = (enabled = true): PortalConnectionState => {
 
   return state;
 };
+
+/**
+ * The story under the demo banner, with its own `ApiProvider` pointed at the
+ * demo portal the mock service worker plays (`.storybook/mocks`). Nested
+ * rather than set in `withApiProvider`, so only a gated story reaches the
+ * fixtures: a screen with demo data of its own keeps seeing an empty
+ * `baseUrl` and uses that.
+ */
+export const DemoPortal = ({
+  storyId,
+  children,
+}: {
+  storyId: string;
+  children: React.ReactNode;
+}) => (
+  <>
+    <DemoBanner storyId={storyId} />
+    <ApiProvider
+      url={DEMO_PORTAL_URL}
+      apiKey={DEMO_API_KEY}
+      initSocket={false}
+      useBearerForRawClient
+    >
+      {children}
+    </ApiProvider>
+  </>
+);
+
+/**
+ * The demo banner alone, for a screen that carries its own in-memory data
+ * and switches to it on an empty `baseUrl` -- the Files, Rooms and Forms
+ * sections. Shown only while no portal is selected.
+ */
+export const withDemoBanner: Decorator = (Story, context) => (
+  <>
+    {hasPortalConfigured(context.globals.apiConfig) ? null : (
+      <DemoBanner storyId={context.id} />
+    )}
+    <Story />
+  </>
+);
 
 type PortalGateCardProps = {
   title: string;
@@ -170,12 +212,7 @@ export const PortalGate = ({
 
   if (!hasPortal) {
     if (demo && storyId) {
-      return (
-        <>
-          <DemoBanner storyId={storyId} />
-          {children}
-        </>
-      );
+      return <DemoPortal storyId={storyId}>{children}</DemoPortal>;
     }
     return (
       <PortalGateCard

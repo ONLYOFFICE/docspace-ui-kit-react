@@ -222,7 +222,10 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
 
     if (isPaidPeriod && isPaymentDateValid && !isNonProfit)
       return (
+        // A div, not Text's default <p>: the HelpButton below renders a <div>,
+        // which a <p> may not contain.
         <Text
+          as="div"
           fontSize="14px"
           lineHeight="16px"
           className={styles.paymentInfoManagersPrice}

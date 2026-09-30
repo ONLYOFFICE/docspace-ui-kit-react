@@ -93,6 +93,13 @@ const meta: Meta<StoryArgs> = {
   tags: ["!autodocs"],
   parameters: {
     docs: {
+      // Each story in an iframe of its own on the docs page. Every story
+      // mounts AiAgentProviders, whose host-tool state is module-level and
+      // single-mount (ai-agent/providers/host-tool-groups): rendered inline,
+      // the stories on one page share one module, and each provider takes
+      // over the previous one's runtime. The frame is 640px tall; the rest
+      // is the demo-portal banner and the margins.
+      story: { inline: false, height: "860px" },
       description: {
         component: `The AI chat of ONLYOFFICE Apps: a conversation with the portal's AI models, about the files and rooms the user is working in.
 

@@ -53,7 +53,14 @@ const RoomLogoCoverDialog = ({
     null,
   );
 
-  const contentRef = React.useRef<HTMLDivElement>(null);
+  // Held in state rather than a ref object: the dialog's Portal mounts its
+  // content only after the first render, so on the first opening the body
+  // does not exist yet when the layout effect runs. Setting the node
+  // re-renders and measures it once it is there; with a ref object the first
+  // opening kept the preset height and ran past a short window.
+  const [contentNode, setContentNode] = React.useState<HTMLDivElement | null>(
+    null,
+  );
 
   React.useEffect(() => {
     if (!visible) return;
@@ -75,8 +82,8 @@ const RoomLogoCoverDialog = ({
       setScrollBodyHeight(screenHeight - HEADER - BUTTONS - PADDING_HEIGHT);
     else if (scrollBodyHeight) setScrollBodyHeight(null);
 
-    if (contentRef.current) {
-      const contentHeight = contentRef.current.getBoundingClientRect().height;
+    if (contentNode) {
+      const contentHeight = contentNode.getBoundingClientRect().height;
       const h = contentHeight + HEIGHT_WITHOUT_BODY;
       const maxH = isDesktop() ? DESKTOP_HEIGHT : TABLET_HEIGHT;
 
@@ -98,7 +105,7 @@ const RoomLogoCoverDialog = ({
         setHeight(`${window.innerHeight - PADDING_HEIGHT}px`);
       }
     }
-  }, [view, scrollBodyHeight]);
+  }, [view, scrollBodyHeight, contentNode]);
 
   React.useLayoutEffect(() => {
     recalculateHeight();
@@ -154,7 +161,7 @@ const RoomLogoCoverDialog = ({
           openColorPicker={openColorPicker}
           isBaseTheme={isBaseTheme}
           currentColorScheme={currentColorScheme}
-          forwardedRef={contentRef}
+          forwardedRef={setContentNode}
           scrollHeight={scrollH}
           generalScroll={!!scrollBodyHeight}
           onChange={(color, cover) => {

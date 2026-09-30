@@ -1,4 +1,4 @@
-import { makeAutoObservable, observable } from "mobx";
+import { makeAutoObservable, observable, runInAction } from "mobx";
 import type { PaymentApi } from "@onlyoffice/docspace-api-sdk";
 import { toastr } from "../../components/toast";
 import type { TBalance } from "../types";
@@ -182,7 +182,9 @@ class ServicesStore {
       const prices = parseAiPrices(data?.response);
       if (!prices) return;
 
-      this.aiToolsPrices = prices;
+      runInAction(() => {
+        this.aiToolsPrices = prices;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -216,7 +218,9 @@ class ServicesStore {
         nextMap.set(modelId, false);
       });
 
-      this.aiModelAvailabilityMap = nextMap;
+      runInAction(() => {
+        this.aiModelAvailabilityMap = nextMap;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -257,17 +261,21 @@ class ServicesStore {
         { signal: abortController.signal },
       );
 
-      const nextMap = new Map(this.aiModelAvailabilityMap);
-      if (enabled) nextMap.delete(modelId);
-      else nextMap.set(modelId, false);
-      this.aiModelAvailabilityMap = nextMap;
+      runInAction(() => {
+        const nextMap = new Map(this.aiModelAvailabilityMap);
+        if (enabled) nextMap.delete(modelId);
+        else nextMap.set(modelId, false);
+        this.aiModelAvailabilityMap = nextMap;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
     } finally {
-      const nextSet = new Set(this.aiModelAvailabilityUpdatingSet);
-      nextSet.delete(modelId);
-      this.aiModelAvailabilityUpdatingSet = nextSet;
+      runInAction(() => {
+        const nextSet = new Set(this.aiModelAvailabilityUpdatingSet);
+        nextSet.delete(modelId);
+        this.aiModelAvailabilityUpdatingSet = nextSet;
+      });
     }
   };
 
@@ -291,7 +299,9 @@ class ServicesStore {
 
       if (data?.response == null) return;
 
-      this.usedBackupsCount = data.response as number;
+      runInAction(() => {
+        this.usedBackupsCount = data.response as number;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -321,8 +331,10 @@ class ServicesStore {
 
       if (response == null) return;
 
-      this.freeBackupsUsed = response.free ?? 0;
-      this.paidBackupsUsed = response.paid ?? 0;
+      runInAction(() => {
+        this.freeBackupsUsed = response.free ?? 0;
+        this.paidBackupsUsed = response.paid ?? 0;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -359,9 +371,11 @@ class ServicesStore {
 
       const response = data?.response;
 
-      this.serviceUsageMonthly = (
-        Array.isArray(response) ? response : (response?.collection ?? [])
-      ) as TServiceUsageMonthly[];
+      runInAction(() => {
+        this.serviceUsageMonthly = (
+          Array.isArray(response) ? response : (response?.collection ?? [])
+        ) as TServiceUsageMonthly[];
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -507,8 +521,11 @@ class ServicesStore {
       console.error(error);
       toastr.error(t("Common:UnexpectedError"));
     } finally {
-      if (this.pendingServiceName === serviceName)
-        this.loadedServiceName = serviceName;
+      // After the awaits above, so outside this method's action.
+      runInAction(() => {
+        if (this.pendingServiceName === serviceName)
+          this.loadedServiceName = serviceName;
+      });
     }
   };
 
