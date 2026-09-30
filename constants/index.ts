@@ -49,6 +49,11 @@ export const ROOM_ACTION_KEYS = {
 
 export const ASIDE_PADDING_AFTER_LAST_ITEM = "12px";
 
+/**
+ * @deprecated Nothing reads or writes this key any more: the live chat no
+ * longer restores its state from storage. Kept because the root barrel is the
+ * plugin API, and removing a name from it breaks plugins silently.
+ */
 export const LIVE_CHAT_LOCAL_STORAGE_KEY = "live_chat_state";
 
 export const LANGUAGE = "asc_language";

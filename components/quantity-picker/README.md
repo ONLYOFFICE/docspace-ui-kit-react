@@ -6,7 +6,7 @@
   "category": "Form controls",
   "status": "public",
   "summary": "Minus and plus around a number, with an optional slider and quick-add chips.",
-  "import": { "subpath": "components/quantity-picker", "barrel": false, "default": true },
+  "import": { "subpath": "components/quantity-picker", "barrel": true, "default": true },
   "exports": ["default"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "isDisabled" },
@@ -36,9 +36,10 @@ Minus and plus around a number, with an optional slider and quick-add chips. It 
 import QuantityPicker from "@onlyoffice/apps-ui-kit/components/quantity-picker";
 ```
 
-It is a **default** export, so the name is yours to choose. `components/index.ts`
-re-exports this folder with `export *`, which carries named exports and drops defaults — the
-component is **not in the root barrel**, and the subpath above is the only way to it.
+It is a **default** export, so the name is yours to choose. The root barrel carries it by name
+as well — `components/index.ts` re-exports it as `export { default as QuantityPicker }` — but prefer the
+subpath: the barrel does not build without four optional peers, see
+[Which import form](../../docs/getting-started.md#which-import-form).
 
 Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme`.
 

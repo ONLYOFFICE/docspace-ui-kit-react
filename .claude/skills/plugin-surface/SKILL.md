@@ -32,7 +32,10 @@ The four sections mean different things:
 | **Moved between modules** | harmless to plugins; it is still exported. Worth a glance: an unintended move usually means a barrel was edited by hand           |
 | **Added**                 | safe, but new names are the ones a plugin author cannot rely on yet -- the portal ships an older build than the author's checkout |
 
-`--json` for the raw data, `--write` to accept the current surface as the new baseline.
+`--json` for the raw data, `--write` (`pnpm surface`) to accept the current surface as the new
+baseline. `--check` (`pnpm surface:check`, in pre-push and CI) fails on any of the four, an
+addition included: the baseline ships in the package and agent-skills reads it, so one that lags
+is wrong downstream even when no plugin breaks.
 
 ## Step 2 -- explain each removal, do not just list it
 

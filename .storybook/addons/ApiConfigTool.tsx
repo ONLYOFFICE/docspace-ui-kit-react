@@ -175,10 +175,10 @@ const AddCustomModal = ({
   );
 };
 
-// "Connect a portal" on a demo banner, waiting for the tool to open its form.
+// "" on a demo banner, waiting for the tool to open its form.
 // Kept outside the component because the tool is not always mounted when the
-// request arrives: with the toolbar hidden the manager first has to show the
-// story's canvas, and the form opens once the tool mounts there.
+// request arrives: with the toolbar hidden the manager first has to show it,
+// and the form opens once the tool mounts there.
 let connectRequested = false;
 const connectListeners = new Set<() => void>();
 
@@ -300,11 +300,13 @@ const ApiConfigDropdown = () => {
 };
 
 addons.register(ADDON_ID, (api) => {
-  api.on(CONNECT_PORTAL_EVENT, ({ storyId }: { storyId?: string }) => {
+  api.on(CONNECT_PORTAL_EVENT, () => {
     connectRequested = true;
     connectListeners.forEach((listener) => listener());
-    // Nobody picked it up: the toolbar is hidden, so go where it is shown.
-    if (connectRequested && storyId) api.navigate(`/story/${storyId}`);
+    // Nobody picked it up: the reader has hidden the toolbar (Alt+T, or the
+    // menu). Show it again; the tool mounts and opens the form. The toolbar is
+    // shown on Docs pages too, so the reader stays on the page they were on.
+    if (connectRequested) api.toggleToolbar(true);
   });
 
   addons.add(TOOL_ID, {

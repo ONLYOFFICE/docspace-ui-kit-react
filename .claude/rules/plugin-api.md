@@ -38,7 +38,11 @@ when `docs/public-api.md` calls the module portal-internal.
 
 `docs/plugin-surface.json` records that surface name by name (706 exports today: 459 values,
 247 type-only). Diff a change against it with
-`node .claude/scripts/plugin-surface/surface.mjs`, or use the `plugin-surface` skill.
+`node .claude/scripts/plugin-surface/surface.mjs`, or use the `plugin-surface` skill. Any change
+to the barrel, an addition too, means `pnpm surface` in the same commit: `pnpm surface:check`
+runs in pre-push and CI and fails on every difference, because the file ships in the package and
+agent-skills' `ui-kit` skill reads each name's `origin` to tell a consumer which ones are
+portal-internal.
 
 ## What is in the surface and what is not
 

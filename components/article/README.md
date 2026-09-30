@@ -6,7 +6,7 @@
   "category": "Layout",
   "status": "portal-internal",
   "summary": "DocSpace's left panel: a fixed column with a header slot, a main button, a scrolling body and the profile block.",
-  "import": { "subpath": "components/article", "barrel": false, "default": true },
+  "import": { "subpath": "components/article", "barrel": true, "default": true },
   "exports": ["default", "ArticleProfile", "ArticleProfileProps", "ArticleProps"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": null, "loading": "showArticleLoader", "disabled": null },
@@ -40,9 +40,10 @@ the developer tools, the signed-in person — which is why it takes some thirty 
 import Article from "@onlyoffice/apps-ui-kit/components/article";
 ```
 
-It is a **default** export, so the name is yours to choose. `components/index.ts`
-re-exports this folder with `export *`, which carries named exports and drops defaults — the
-component is **not in the root barrel**, and the subpath above is the only way to it.
+It is a **default** export, so the name is yours to choose. The root barrel carries it by name
+as well — `components/index.ts` re-exports it as `export { default as Article }` — but prefer the
+subpath: the barrel does not build without four optional peers, see
+[Which import form](../../docs/getting-started.md#which-import-form).
 
 Needs `ThemeProvider` above it in the tree — every colour and the panel's three widths are declared
 only under the `light` and `dark` classes it puts on `<body>` — and `TranslationProvider`, because

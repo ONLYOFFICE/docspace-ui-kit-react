@@ -1,6 +1,11 @@
 "use client";
 
-import React, { useEffect, useState, useSyncExternalStore } from "react";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { cssTransition, ToastContainer } from "react-toastify";
 import classNames from "classnames";
 
@@ -48,7 +53,9 @@ const Toast = React.memo(({ className, style, isSSR }: ToastProps) => {
   const [instance] = useState(() => Symbol("Toast"));
   const owner = useSyncExternalStore(subscribe, getOwner, () => undefined);
 
-  useEffect(() => {
+  // A layout effect, so a lone Toast mounts its container before the first
+  // paint rather than one effect pass later.
+  useLayoutEffect(() => {
     setInstances(() => instances.push(instance));
 
     return () =>

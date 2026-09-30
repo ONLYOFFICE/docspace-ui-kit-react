@@ -62,6 +62,12 @@ jobs:
       - name: Check the generated README blocks
         run: pnpm readme:props:check && pnpm readme:catalogue:check
 
+      # docs/plugin-surface.json is every name the root barrel exports, and it
+      # ships in the package: agent-skills reads it to learn which of them come
+      # from portal-internal modules. Fails on any difference, additions too.
+      - name: Check the API-surface snapshot
+        run: pnpm surface:check
+
   storybook:
     name: "Build Storybook"
     runs-on: ubuntu-latest

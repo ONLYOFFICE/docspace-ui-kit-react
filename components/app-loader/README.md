@@ -6,7 +6,7 @@
   "category": "Feedback",
   "status": "public",
   "summary": "The blank first screen: a fixed sheet over the whole viewport with the kit's rombs animation on it.",
-  "import": { "subpath": "components/app-loader", "barrel": false, "default": true },
+  "import": { "subpath": "components/app-loader", "barrel": true, "default": true },
   "exports": ["default"],
   "providers": [],
   "propsType": null,
@@ -41,9 +41,10 @@ ready.
 import AppLoader from "@onlyoffice/apps-ui-kit/components/app-loader";
 ```
 
-It is a **default** export, so the name is yours to choose. `components/index.ts`
-re-exports this folder with `export *`, which carries named exports and drops defaults — the
-component is **not in the root barrel**, and the subpath above is the only way to it.
+It is a **default** export, so the name is yours to choose. The root barrel carries it by name
+as well — `components/index.ts` re-exports it as `export { default as AppLoader }` — but prefer the
+subpath: the barrel does not build without four optional peers, see
+[Which import form](../../docs/getting-started.md#which-import-form).
 
 No provider is required — the sheet is white and the animation dark by default. The dark theme's
 dark grey sheet comes from the `dark` class the kit's theme provider puts on `<body>`, so without a

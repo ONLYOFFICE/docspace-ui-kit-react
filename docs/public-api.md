@@ -327,7 +327,9 @@ Partly machine-checked. What runs:
   declare one.
 - **An API-surface snapshot** — `docs/plugin-surface.json`, written and diffed by
   `.claude/scripts/plugin-surface/surface.mjs`. It fails on a removed or re-kinded export, which
-  is the change no compiler reports.
+  is the change no compiler reports. `pnpm surface:check`, in the pre-push gate and in CI, fails
+  on any difference at all, an added name included: the snapshot ships in the package, and it is
+  what agent-skills' `ui-kit` skill reads to learn which barrel names are portal-internal.
 
 What does not exist yet, though an earlier revision of this section listed it as if it did:
 **clean-install smoke tests against bare Vite and Next.js apps.** Nothing exercises the package

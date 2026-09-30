@@ -6,7 +6,7 @@
   "category": "Layout",
   "status": "portal-internal",
   "summary": "DocSpace's page body: a sticky header and filter, a scrolling body, and the info and chat panels beside it.",
-  "import": { "subpath": "components/section", "barrel": false, "default": true },
+  "import": { "subpath": "components/section", "barrel": true, "default": true },
   "exports": ["default", "SectionProps"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": "inert" },
@@ -54,9 +54,10 @@ and it is also what supplies the kit's layout context to everything inside it.
 import Section from "@onlyoffice/apps-ui-kit/components/section";
 ```
 
-It is a **default** export, so the name is yours to choose. `components/index.ts`
-re-exports this folder with `export *`, which carries named exports and drops defaults — the
-component is **not in the root barrel**, and the subpath above is the only way to it.
+It is a **default** export, so the name is yours to choose. The root barrel carries it by name
+as well — `components/index.ts` re-exports it as `export { default as Section }` — but prefer the
+subpath: the barrel does not build without four optional peers, see
+[Which import form](../../docs/getting-started.md#which-import-form).
 
 Needs `ThemeProvider` above it in the tree for its colours, and `TranslationProvider` once any
 operation is in flight — the progress button it renders reads its labels from the kit's shared

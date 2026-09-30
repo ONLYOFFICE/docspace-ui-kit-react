@@ -107,8 +107,8 @@ describe("updatedAgo", () => {
   const now = new Date(2026, 8, 25, 15, 0);
 
   // `updatedAgo` speaks the reader's locale on purpose, so the expected words
-  // come from the same formatter rather than being spelled in English: on a
-  // machine set to Russian "today" is "сегодня", and the day count is what is
+  // come from the same formatter rather than being spelled in English: the
+  // test must pass on a machine in any locale, and the day count is what is
   // under test, not the language.
   const inLocale = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
 

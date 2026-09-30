@@ -10,9 +10,12 @@
 //   node .claude/scripts/plugin-surface/surface.mjs            # report + diff
 //   node .claude/scripts/plugin-surface/surface.mjs --write     # accept current as baseline
 //   node .claude/scripts/plugin-surface/surface.mjs --json      # machine-readable
+//   node .claude/scripts/plugin-surface/surface.mjs --check     # pre-push and CI: any difference fails
 //
 // Exit code 1 when a name disappeared or changed kind; 0 otherwise, additions
 // included. Added names are safe; removed ones are the release-blocking half.
+// Under --check every difference is 1, because a baseline that lags is read
+// downstream as the truth (see the note at --check below).
 
 import fs from "node:fs";
 import path from "node:path";
@@ -289,6 +292,20 @@ if (moved.length) {
 
 if (!removed.length && !changed.length && !added.length && !moved.length) {
   console.log("\nUnchanged against the baseline.");
+}
+
+// --check is the gate: the baseline is also what agent-skills' `ui-kit` skill reads to learn
+// which barrel names come from portal-internal modules, so a name added without --write is a
+// name that skill never flags. Any difference fails here, additions and moves included.
+if (has("--check")) {
+  const stale = removed.length + changed.length + added.length + moved.length;
+  if (stale) {
+    console.error(
+      `\ndocs/plugin-surface.json is out of date (${stale} name(s)). Run \`pnpm surface\` and commit it.`,
+    );
+    process.exit(1);
+  }
+  process.exit(0);
 }
 
 process.exit(removed.length || changed.length ? 1 : 0);

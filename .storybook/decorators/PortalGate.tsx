@@ -6,9 +6,11 @@ import { DEMO_API_KEY, DEMO_PORTAL_URL } from "../mocks/demoPortal";
 import { DEFAULT_API_KEY, DEFAULT_API_URL } from "../globals";
 import { resolveApiConfig } from "../utils/apiProviders";
 
-import { DemoBanner, REGISTER_PORTAL_URL } from "./DemoBanner";
-import { CONNECT_PORTAL_EVENT } from "../addons/events";
-import { addons } from "storybook/preview-api";
+import {
+  DemoBanner,
+  REGISTER_PORTAL_URL,
+  requestPortalConnection,
+} from "./DemoBanner";
 
 import styles from "./PortalGate.module.scss";
 
@@ -146,9 +148,7 @@ export const PortalGateCard = ({
             <button
               type="button"
               className={styles.connect}
-              onClick={() =>
-                addons.getChannel().emit(CONNECT_PORTAL_EVENT, { storyId })
-              }
+              onClick={() => requestPortalConnection(storyId)}
             >
               Connect a portal
             </button>

@@ -10,6 +10,31 @@ import styles from "./DemoBanner.module.scss";
 export const REGISTER_PORTAL_URL =
   "https://www.onlyoffice.com/docspace-registration";
 
+type ChannelWindow = Window & {
+  __STORYBOOK_ADDONS_CHANNEL__?: ReturnType<typeof addons.getChannel>;
+};
+
+/**
+ * Asks the manager to open the API Config form. A Docs page renders a story
+ * with `docs.story.inline: false` (the AI chat and settings) in an
+ * `iframe.html` of its own, whose channel posts to its parent -- the Docs
+ * preview, not the manager -- so the request would go nowhere. Emit on the
+ * channel of the preview the manager itself embeds instead.
+ */
+export const requestPortalConnection = (storyId?: string) => {
+  let preview: ChannelWindow = window;
+  try {
+    while (preview.parent !== preview && preview.parent !== window.top) {
+      preview = preview.parent as ChannelWindow;
+    }
+  } catch {
+    // A parent on another origin: fall back to this frame's own channel.
+    preview = window;
+  }
+  const channel = preview.__STORYBOOK_ADDONS_CHANNEL__ ?? addons.getChannel();
+  channel.emit(CONNECT_PORTAL_EVENT, { storyId });
+};
+
 type DemoBannerProps = {
   /** The id of the story it sits above; the manager reopens it on the canvas. */
   storyId: string;
@@ -22,9 +47,7 @@ type DemoBannerProps = {
  * "Connect a portal" asks the manager to open that tool's form.
  */
 export const DemoBanner = ({ storyId }: DemoBannerProps) => {
-  const connect = () => {
-    addons.getChannel().emit(CONNECT_PORTAL_EVENT, { storyId });
-  };
+  const connect = () => requestPortalConnection(storyId);
 
   return (
     <div className={styles.banner} role="note" data-testid="demo-banner">

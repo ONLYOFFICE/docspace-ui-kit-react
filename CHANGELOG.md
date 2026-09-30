@@ -68,6 +68,16 @@ _Changed_ before upgrading.
 - The three public providers — `theme`, `translation`, `error-boundary` — have READMEs on
   `README_TEMPLATE.md`, with generated prop tables, and `check:readme` now covers
   `providers/**` as well as `components/**`. 112 pages, up from 109
+- The package ships **`docs/plugin-surface.json`**: every name the root barrel exports, with
+  its kind and the module it comes from, as the TypeScript checker resolves it. Tooling outside
+  this repository can tell a portal-internal name from a public one without parsing the barrels
+  itself — agent-skills' `ui-kit` skill does. `pnpm surface:check` keeps it current in pre-push
+  and CI, and fails on an added name as well as a removed one
+
+### Deprecated
+
+- `LIVE_CHAT_LOCAL_STORAGE_KEY`. The live chat no longer restores its state from storage, so
+  nothing reads or writes this key. It stays exported because the root barrel is the plugin API
 
 ### Removed
 
@@ -126,6 +136,11 @@ _Changed_ before upgrading.
   with several stories, and to a plugin that mounts its own next to the portal's. Only the
   first mounted `Toast` renders the container now, and the next takes over when it unmounts;
   the `className` and `style` of the others are ignored
+- `AIAgentSelector` and the Files selector's agent list no longer disable every agent when
+  `disableBySecurity` names a right that a folder's security never carries, such as the
+  file-only `AskAi` of the chat's attach picker. Only a right set to `false`, or a missing
+  security object, disables an agent now. The initial items (`withInit`) and the pages loaded
+  after them follow the same rule; before, the initial items still disabled every agent
 
 ### Documentation
 
@@ -138,6 +153,17 @@ with the page in front of it. No code changed for either.
 - `components/textarea` said `aria-label` and `aria-labelledby` were "the only two ways" to
   name the field. A `FieldContainer`'s `labelFor` reaches it as well, since its `id` lands on
   the `<textarea>` element
+- **The nine default-only components are in the root barrel**, and nine READMEs plus
+  `docs/getting-started.md` said they were not. `components/index.ts` re-exports them by name —
+  `export { default as Section }` — six of them since before the READMEs were written and the
+  other three since shortly after, but `check-readme` rebuilt the barrel's names from each
+  folder's own exports, assumed `export *` throughout, and so failed any README that told the
+  truth. It now asks the TypeScript checker what the barrels export. `import.barrel` is `true`
+  for all nine
+- `docs/getting-started.md` now gives the real reason to import by subpath: **the root barrel
+  does not build without `mobx`, `mobx-react`, `react-router` and `axios`**, four optional peers
+  the barrel's `billing` and `uploader` re-exports import. Vite stops on
+  `"makeAutoObservable" is not exported by "__vite-optional-peer-dep:mobx"`
 
 ## 4.0.0
 

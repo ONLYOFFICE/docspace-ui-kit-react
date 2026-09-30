@@ -45,8 +45,12 @@ export const convertToItems = (
       : undefined;
     const isTemplate = rootFolderType === FolderType.RoomTemplates;
 
+    // Same rule as getAgentList in useAgentsHelper: a right a folder's security
+    // does not carry at all (a file-only one such as AskAi) must not disable
+    // the agent, or the initial items and the loaded pages disagree.
+    const key = disableBySecurity as keyof FileEntryDtoIntegerAllOfSecurity;
     const isDisabledBySecurity = disableBySecurity
-      ? !security?.[disableBySecurity as keyof FileEntryDtoIntegerAllOfSecurity]
+      ? !security || (key in security && !security[key])
       : false;
 
     return {
