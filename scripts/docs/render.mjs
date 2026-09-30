@@ -1,0 +1,359 @@
+// Turns the collected model into site pages: README and MDX sources rewritten
+// for Docusaurus, a generated page per category and one for the section.
+
+import fs from "node:fs";
+import path from "node:path";
+
+import { REPO_URL, storybookUrl } from "./config.mjs";
+import {
+  cell,
+  escapeForMdx,
+  firstParagraph,
+  firstSentence,
+  frontMatter,
+  headings,
+  rewriteLinks,
+  splitLines,
+  stripHtmlComments,
+} from "./markdown.mjs";
+import {
+  DEFAULT_TABLE_CAPTION,
+  DEFAULT_TABLE_HEADER,
+  ROOT_SECTION,
+  SECTIONS,
+} from "./sections.mjs";
+
+export const API_TABLE_IMPORT =
+  "import APITable from '@site/src/components/APITable/APITable';";
+
+const SECTIONS_FILE = "scripts/docs/sections.mjs";
+
+/**
+ * Where every published page is written, keyed by source, plus the reverse
+ * lookups the link rewriter needs.
+ */
+export const layout = (categories, storyId) => {
+  const bySource = new Map();
+  const byStoryId = new Map();
+
+  for (const category of categories) {
+    const index = `${category.slug}/index.md`;
+    if (category.readme) bySource.set(category.readme.source, index);
+    for (const page of category.pages) {
+      const out = `${category.slug}/${page.slug}.md`;
+      bySource.set(page.source, out);
+      if (page.title) byStoryId.set(storyId(page.title), out);
+    }
+    byStoryId.set(storyId(category.key), index);
+  }
+
+  return { bySource, byStoryId };
+};
+
+const relativeLink = (from, to) => {
+  const link = path.posix.relative(path.posix.dirname(from), to);
+  return link.startsWith(".") ? link : `./${link}`;
+};
+
+/**
+ * The link rewriter for one page. Returns the `resolve` callback of
+ * `rewriteLinks`.
+ */
+export const linkResolver = ({ root, source, out, pages, revision, warn }) => {
+  const blob = (kind, file, hash) =>
+    `${REPO_URL}/${kind}/${revision}/${file}${hash}`;
+
+  return (target, label, isImage) => {
+    if (/^[a-z][a-z0-9+.-]*:/i.test(target) || target.startsWith("//")) {
+      return undefined;
+    }
+    if (target.startsWith("#")) return undefined;
+
+    const storybook = /^\?path=\/(?:docs|story)\/([^&#]+)/.exec(target);
+    if (storybook) {
+      const id = storybook[1].replace(/--[^-].*$/, "");
+      const page = pages.byStoryId.get(id);
+      if (page) return relativeLink(out, page);
+      const base = storybookUrl();
+      if (base) return `${base}/${target}`;
+      warn(
+        `${source}: Storybook link "${target}" has no page here; link removed`,
+      );
+      return null;
+    }
+
+    const hashAt = target.indexOf("#");
+    const file = hashAt === -1 ? target : target.slice(0, hashAt);
+    const hash = hashAt === -1 ? "" : target.slice(hashAt);
+    const resolved = path.posix.normalize(
+      path.posix.join(path.posix.dirname(source), decodeURI(file)),
+    );
+
+    const direct =
+      pages.bySource.get(resolved) ??
+      pages.bySource.get(path.posix.join(resolved, "README.md"));
+    if (direct && !isImage) return relativeLink(out, direct) + hash;
+
+    const full = path.join(root, resolved);
+    if (resolved.startsWith("..") || !fs.existsSync(full)) {
+      warn(
+        `${source}: link "${label}" points at "${target}", which does not exist`,
+      );
+      return undefined;
+    }
+    if (isImage) {
+      return `${REPO_URL}/raw/${revision}/${resolved}`;
+    }
+    return blob(
+      fs.statSync(full).isDirectory() ? "tree" : "blob",
+      resolved,
+      hash,
+    );
+  };
+};
+
+/**
+ * Wraps each Props table -- a table whose first header cell is `Prop` -- in
+ * the site's <APITable>, and names the tables when their row ids collide, the
+ * same scheme docspace-sdk-js uses.
+ */
+export const wrapApiTables = (text) => {
+  const lines = splitLines(text);
+  const tables = [];
+  let heading = "";
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const { text: line, code } = lines[index];
+    if (code) continue;
+    const match = /^#{2,6}\s+(.*)$/.exec(line);
+    if (match) heading = match[1].trim();
+    if (!/^\|\s*Prop\s*\|/.test(line)) continue;
+    if (!/^\|[\s:|-]+\|$/.test(lines[index + 1]?.text ?? "")) continue;
+
+    let end = index + 2;
+    while (end < lines.length && /^\|/.test(lines[end].text)) end += 1;
+    const ids = lines
+      .slice(index + 2, end)
+      .map(({ text: row }) => /^\|\s*`([^`]+)`/.exec(row)?.[1])
+      .filter(Boolean);
+    tables.push({ start: index, end, heading, ids });
+    index = end - 1;
+  }
+
+  if (tables.length === 0) return { text, wrapped: false };
+
+  const all = tables.flatMap((table) => table.ids);
+  const collide = new Set(all).size !== all.length;
+  const out = lines.map(({ text: line }) => line);
+
+  for (const table of [...tables].reverse()) {
+    const name = collide
+      ? ` name="${table.heading.replace(/[^\w-]+/g, "-").replace(/^-|-$/g, "")}"`
+      : "";
+    out.splice(table.end, 0, "", "</APITable>");
+    out.splice(table.start, 0, `<APITable${name}>`, "");
+  }
+
+  return { text: out.join("\n"), wrapped: true };
+};
+
+const addImport = (text, line) => `${line}\n\n${text}`;
+
+const storybookLine = (title) => {
+  const base = storybookUrl();
+  return base && title
+    ? `[Open in Storybook](${base}/?path=/docs/${title})`
+    : null;
+};
+
+/** Inserts `line` after the first paragraph that follows the H1. */
+const afterIntro = (text, line) => {
+  if (!line) return text;
+  const lines = text.split("\n");
+  const h1 = lines.findIndex((l) => /^# /.test(l));
+  let index = h1 + 1;
+  while (index < lines.length && lines[index].trim() === "") index += 1;
+  while (index < lines.length && lines[index].trim() !== "") index += 1;
+  lines.splice(index, 0, "", line);
+  return lines.join("\n");
+};
+
+/** A README, rewritten. */
+export const renderReadme = (raw, context) => {
+  const { page, revision, storyId } = context;
+  let text = stripHtmlComments(raw).trim();
+  text = rewriteLinks(text, linkResolver(context));
+  text = escapeForMdx(text);
+  text = afterIntro(
+    text,
+    storybookLine(page.title ? `${storyId(page.title)}--docs` : null),
+  );
+  const tables = wrapApiTables(text);
+  text = tables.wrapped
+    ? addImport(tables.text, API_TABLE_IMPORT)
+    : tables.text;
+
+  return (
+    frontMatter({
+      description: page.meta?.summary,
+      custom_edit_url: `${REPO_URL}/blob/${revision}/${page.source}`,
+    }) +
+    text +
+    "\n"
+  );
+};
+
+/** A Storybook MDX page, with Storybook's own parts taken out. */
+export const renderMdx = (raw, context) => {
+  const { page, revision, warn } = context;
+  const drop = new Set(page.options?.drop ?? []);
+  const kept = [];
+  let inImport = false;
+
+  for (const { text: line, code } of splitLines(raw)) {
+    if (code) {
+      kept.push(line);
+      continue;
+    }
+    if (inImport) {
+      if (/;\s*$/.test(line) || /\bfrom\s+["']/.test(line)) inImport = false;
+      continue;
+    }
+    if (/^import\s/.test(line)) {
+      inImport = !/;\s*$/.test(line) && !/\bfrom\s+["']/.test(line);
+      continue;
+    }
+    const element = /^<([A-Z][\w.]*)[\s/>]/.exec(line);
+    if (element) {
+      if (element[1] === "Meta" || drop.has(element[1])) continue;
+      warn(
+        `${page.source}: <${element[1]}> is a Storybook component the site cannot render`,
+      );
+    }
+    kept.push(line);
+  }
+
+  let text = kept
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  text = rewriteLinks(text, linkResolver(context));
+  // A page whose heading was part of the dropped component still needs one:
+  // Docusaurus titles the page from its H1.
+  if (!headings(text).some(({ depth }) => depth === 1)) {
+    text = `# ${page.label}\n\n${text}`;
+  }
+
+  return (
+    frontMatter({
+      custom_edit_url: `${REPO_URL}/blob/${revision}/${page.source}`,
+    }) +
+    text +
+    "\n"
+  );
+};
+
+/** A plain Markdown file from `docs/`. */
+export const renderMarkdown = (raw, context) => {
+  const { page, revision } = context;
+  let text = stripHtmlComments(raw).trim();
+  text = rewriteLinks(text, linkResolver(context));
+  text = escapeForMdx(text);
+  return (
+    frontMatter({
+      custom_edit_url: `${REPO_URL}/blob/${revision}/${page.source}`,
+    }) +
+    text +
+    "\n"
+  );
+};
+
+/** What the overview table says about a page. */
+export const summaryOf = (page, raw) =>
+  page.meta?.summary ??
+  page.options?.summary ??
+  firstSentence(
+    firstParagraph(stripHtmlComments(raw).replace(/^import .*$/gm, "")),
+  );
+
+const overviewTable = (caption, header, rows, { code = true } = {}) =>
+  [
+    caption,
+    "",
+    `| ${header} | Description |`,
+    "| --- | --- |",
+    ...rows.map(
+      ({ label, link, summary }) =>
+        `| [${code ? `\`${cell(label)}\`` : cell(label)}](${link}) | ${cell(summary)} |`,
+    ),
+  ].join("\n");
+
+/** The page of a category: its README when it has one, sections.mjs otherwise. */
+export const renderCategory = (category, context) => {
+  const { revision, summaries, warn } = context;
+  const section = SECTIONS[category.key];
+  const rows = category.pages.map((page) => ({
+    label: page.label,
+    link: `./${page.slug}.md`,
+    summary: summaries.get(page.source) ?? "",
+  }));
+  const table = overviewTable(
+    section?.tableCaption ?? DEFAULT_TABLE_CAPTION,
+    section?.tableHeader ?? DEFAULT_TABLE_HEADER,
+    rows,
+    // Component names are code; page titles such as "Welcome" are not.
+    { code: category.pages.every((page) => page.kind === "readme") },
+  );
+
+  if (category.readme) {
+    const body = renderReadme(context.readmeText, {
+      ...context,
+      page: category.readme,
+    });
+    return rows.length > 0
+      ? `${body.trimEnd()}\n\n## In this section\n\n${escapeForMdx(table)}\n`
+      : body;
+  }
+
+  if (!section) {
+    warn(`category "${category.key}" has no entry in ${SECTIONS_FILE}`);
+  }
+
+  return (
+    frontMatter({
+      custom_edit_url: `${REPO_URL}/blob/${revision}/${SECTIONS_FILE}`,
+    }) +
+    `# ${section?.title ?? category.label}\n\n` +
+    (section ? `${section.description}\n\n` : "") +
+    "## Overview\n\n" +
+    escapeForMdx(table) +
+    "\n"
+  );
+};
+
+/** The landing page of the section. */
+export const renderRoot = (categories, { revision }) => {
+  const rows = categories.map((category) => {
+    const section = SECTIONS[category.key];
+    return {
+      label: section?.title ?? category.label,
+      link: `./${category.slug}/index.md`,
+      summary: section
+        ? firstSentence(section.description)
+        : (category.readme?.meta?.summary ?? ""),
+    };
+  });
+
+  return (
+    frontMatter({
+      custom_edit_url: `${REPO_URL}/blob/${revision}/${SECTIONS_FILE}`,
+    }) +
+    `# ${ROOT_SECTION.title}\n\n${ROOT_SECTION.description}\n\n` +
+    escapeForMdx(
+      overviewTable(ROOT_SECTION.tableCaption, ROOT_SECTION.tableHeader, rows, {
+        code: false,
+      }),
+    ) +
+    "\n"
+  );
+};

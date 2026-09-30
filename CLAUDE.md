@@ -114,8 +114,8 @@ css/fonts.css and fonts/ are COMMITTED as well — Storybook imports the stylesh
 Docker E2E image has no DocSpace beside it. `pnpm sync-locales` refreshes them; the library
 build does not use them.
 
-Gitignored, absent from a fresh clone: dist/, locales/* except locales/en, and the
-Playwright output (playwright-report/, test-results/).
+Gitignored, absent from a fresh clone: dist/, locales/* except locales/en, the
+Playwright output (playwright-report/, test-results/) and site-docs/ (`pnpm docs`).
 ```
 
 ## Common Commands
@@ -167,6 +167,15 @@ pnpm tsc
 # checkout. Run by hand, never part of build/test. Needs DOCSPACE_CLIENT_ROOT
 # (default ../../DocSpace/client) and fails loudly without it.
 pnpm sync-locales
+
+# API-site pages for api.onlyoffice.com (site/docspace/ui-kit): the component
+# READMEs and the Getting-started pages, laid out in the Storybook tree, into
+# gitignored site-docs/. docs:check also compiles every page as MDX (CI runs it);
+# docs:sync copies the result into ../api.onlyoffice.com (API_SITE_ROOT).
+# See docs-generation.md.
+pnpm docs
+pnpm docs:check
+pnpm docs:sync
 ```
 
 ## Working with DocSpace

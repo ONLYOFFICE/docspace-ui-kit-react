@@ -24,3 +24,7 @@ test-results
 # .claude/skills/story-console). Written on demand,
 # kept out of git so a sweep is not committed with the fixes it asks for.
 audits
+
+# API-site pages, regenerated from the READMEs by `pnpm docs` and copied into
+# api.onlyoffice.com by `pnpm docs:sync`. Never edited here.
+site-docs
