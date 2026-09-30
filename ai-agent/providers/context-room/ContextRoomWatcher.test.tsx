@@ -44,6 +44,7 @@ const { clouds, useCloudsStore, getRoomAiFolder, subscribers, listeners, socket 
       selectContextFolder: vi.fn(),
       clearContextFolder: vi.fn(),
       fetchRoomSkills: vi.fn(async () => {}),
+      fetchContextFolders: vi.fn(async () => {}),
     };
     const useCloudsStore = Object.assign(
       (selector: (s: typeof clouds) => unknown) => selector(clouds),
@@ -155,6 +156,8 @@ describe("ContextRoomWatcher", () => {
         vi.advanceTimersByTime(300);
       });
       expect(clouds.fetchRoomSkills).toHaveBeenCalledTimes(1);
+      // The picker lists only rooms with a skill file, so it is re-read too.
+      expect(clouds.fetchContextFolders).toHaveBeenCalledTimes(1);
       expect(clouds.clearContextFolder).not.toHaveBeenCalled();
     });
 
@@ -288,6 +291,7 @@ describe("ContextRoomWatcher", () => {
 
       emitEvent({ cmd: "create", type: "file", id: 2, data: { folderId: 500, title: "pdf.md", fileExst: ".md" } });
       expect(clouds.selectContextFolder).toHaveBeenCalledWith(CONTEXT_ROOM_CLOUD, sales);
+      expect(clouds.fetchContextFolders).toHaveBeenCalledTimes(1);
     });
 
     it("does not connect on a .ai folder appearing, only on its first skill", async () => {

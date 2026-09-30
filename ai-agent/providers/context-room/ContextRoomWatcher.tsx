@@ -155,6 +155,9 @@ const ContextRoomWatcher = () => {
       refreshTimer.current = setTimeout(() => {
         refreshTimer.current = null;
         const clouds = useCloudsStore.getState();
+        // The picker offers only rooms with a skill file, so a change to
+        // the skills may move this room in or out of it.
+        void clouds.fetchContextFolders();
         void Promise.resolve(clouds.fetchRoomSkills()).then(() => {
           if (cancelled) return;
           // The last skill went: nothing is left to connect for.
@@ -172,10 +175,13 @@ const ContextRoomWatcher = () => {
 
     const connectCurrent = () => {
       if (!currentRoomId || currentRoomName === undefined) return;
-      useCloudsStore.getState().selectContextFolder(CONTEXT_ROOM_CLOUD, {
+      const clouds = useCloudsStore.getState();
+      clouds.selectContextFolder(CONTEXT_ROOM_CLOUD, {
         id: currentRoomId,
         name: currentRoomName,
       });
+      // The room has its first skill now, so the picker gains it too.
+      void clouds.fetchContextFolders();
     };
 
     const handle = (opt?: TOptSocket) => {
