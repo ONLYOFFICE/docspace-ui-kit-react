@@ -3,7 +3,6 @@
 // Private tokens with light defaults, swapped under the kit's `.dark`. The
 // two series are the kit's accent for "with the skill" and a neutral gray for
 // the baseline: a reference, not a second category.
-.cards,
 .benefits,
 .figure {
   --ig-border: #{$gray-light-mid};
@@ -40,64 +39,6 @@
     --ig-good: #{$dark-status-positive};
     --ig-good-soft: rgba(59, 164, 32, 0.16);
   }
-}
-
-// Skill cards.
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
-  list-style: none;
-}
-
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 0;
-  padding: 16px;
-  border: 1px solid var(--ig-border);
-  border-radius: 12px;
-  background: var(--ig-surface);
-}
-
-.mark {
-  display: grid;
-  width: 36px;
-  height: 36px;
-  place-items: center;
-  border-radius: 8px;
-  background: var(--ig-accent);
-  color: $white;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.cardName {
-  font-family: monospace;
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.where {
-  align-self: flex-start;
-  padding: 2px 8px;
-  border-radius: 10px;
-  background: var(--ig-accent-soft);
-  color: var(--ig-accent);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.does {
-  color: var(--ig-muted);
-}
-
-.prompt {
-  margin-block-start: auto;
-  padding-block-start: 8px;
-  border-block-start: 1px dashed var(--ig-border);
-  font-style: italic;
 }
 
 // What the skill takes care of.
