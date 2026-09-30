@@ -64,6 +64,7 @@ export * from "./sub-components/withTooltip";
 export * from "./sub-components/TooltipContainer";
 export * from "./rootTooltip";
 export * from "./Tooltip.types";
+export * from "./hooks/usePinnedTooltip";
 
 const Tooltip = ({
   ref,

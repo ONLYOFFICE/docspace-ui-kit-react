@@ -33,10 +33,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { useEffect, useRef, useState } from "react";
-import { isMobile } from "react-device-detect";
-
-import { Tooltip } from "../../../../../../components/tooltip";
+import { Tooltip, usePinnedTooltip } from "../../../../../../components/tooltip";
 import type { TGetTooltipContent } from "../../../../../../components/tooltip";
 
 import { TOKEN_USAGE_TOOLTIP_ID, parseTokenUsage } from "../../../utils";
@@ -46,54 +43,7 @@ import { TokenUsageContent } from "./TokenUsageContent";
 const TOOLTIP_TEST_ID = "token_usage_tooltip";
 
 export const TokenUsageTooltip = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const pinned = useRef(false);
-
-  useEffect(() => {
-    if (isMobile) return;
-
-    const close = () => {
-      pinned.current = false;
-      setIsOpen(false);
-    };
-
-    const onClick = (event: MouseEvent) => {
-      const target = event.target as Element | null;
-
-      if (target?.closest(`[data-tooltip-id="${TOKEN_USAGE_TOOLTIP_ID}"]`)) {
-        pinned.current = !pinned.current;
-        setIsOpen(true);
-        return;
-      }
-
-      if (target?.closest(`[data-testid="${TOOLTIP_TEST_ID}"]`)) return;
-
-      close();
-    };
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") close();
-    };
-
-    // Capture phase: the history scrolls inside its own container.
-    document.addEventListener("click", onClick);
-    document.addEventListener("keydown", onKeyDown);
-    document.addEventListener("scroll", close, true);
-    window.addEventListener("resize", close);
-
-    return () => {
-      document.removeEventListener("click", onClick);
-      document.removeEventListener("keydown", onKeyDown);
-      document.removeEventListener("scroll", close, true);
-      window.removeEventListener("resize", close);
-    };
-  }, []);
-
-  const onOpenChange = (value: boolean) => {
-    if (!value && pinned.current) return;
-
-    setIsOpen(value);
-  };
+  const pinnedProps = usePinnedTooltip(TOKEN_USAGE_TOOLTIP_ID, TOOLTIP_TEST_ID);
 
   const getContent = ({ content }: TGetTooltipContent) => {
     const usage = parseTokenUsage(content);
@@ -106,11 +56,8 @@ export const TokenUsageTooltip = () => {
       id={TOKEN_USAGE_TOOLTIP_ID}
       place="bottom"
       maxWidth="320px"
-      clickable
-      openOnClick={isMobile}
-      isOpen={isMobile ? undefined : isOpen}
-      setIsOpen={isMobile ? undefined : onOpenChange}
       getContent={getContent}
+      {...pinnedProps}
       dataTestId={TOOLTIP_TEST_ID}
     />
   );
