@@ -2,6 +2,7 @@ import type React from "react";
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import Icon from "../../assets/button.alert.react.svg";
 import OutlineIcon from "../../assets/article-hide-menu-icon.react.svg";
@@ -210,7 +211,18 @@ const Wrapper = (props: { isScale: boolean; children: React.ReactNode }) => {
 
 export const Default: Story = {
   render: (args) => <Button {...args} />,
-  args: { size: ButtonSize.small, label: "Button" },
+  args: { size: ButtonSize.small, label: "Button", onClick: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    const button = canvas.getByRole("button", { name: "Button" });
+
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+
+    // A native <button>: Enter and Space press it like a click.
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" ");
+    await expect(args.onClick).toHaveBeenCalledTimes(3);
+  },
   parameters: {
     docs: {
       description: {
@@ -530,6 +542,12 @@ export const WithIconButtons: Story = {
 export const IsLoadingButtons: Story = {
   name: "Loading Buttons",
   render: () => <IsLoadingTemplate />,
+  play: async ({ canvas }) => {
+    for (const button of canvas.getAllByRole("button")) {
+      await expect(button).toBeDisabled();
+      await expect(button).toHaveAttribute("aria-busy", "true");
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -566,6 +584,12 @@ export const ScaleButtons: Story = {
 
 export const DisabledButtons: Story = {
   render: () => <DisabledTemplate />,
+  play: async ({ canvas }) => {
+    for (const button of canvas.getAllByRole("button")) {
+      await expect(button).toBeDisabled();
+      await expect(button).toHaveAttribute("aria-disabled", "true");
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -656,6 +680,18 @@ export const FilledStrokeButtons: Story = {
 
 export const WithTooltip: Story = {
   render: () => <TooltipTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.hover(canvas.getByRole("button", { name: "Hover me" }));
+    // The tooltip is portalled out of the story root, so look in the page;
+    // it mounts hidden and fades in, hence the wait.
+    await waitFor(() =>
+      expect(
+        screen.getByText("This is a primary button with a tooltip"),
+      ).toBeVisible(),
+    );
+    // One tooltip, not one per button: each has an id of its own.
+    await expect(screen.getAllByRole("tooltip")).toHaveLength(1);
+  },
   parameters: {
     docs: {
       description: {
