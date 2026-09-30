@@ -3,6 +3,7 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 
 import { TextInput } from ".";
 import { InputSize, InputType } from "./TextInput.enums";
@@ -256,7 +257,7 @@ const Wrapper = (props: { children: React.ReactNode }) => {
 const ControlledInput = (
   props: Partial<ComponentProps<typeof TextInput>> & { initialValue?: string },
 ) => {
-  const { initialValue, type = InputType.text, ...rest } = props;
+  const { initialValue, type = InputType.text, onChange, ...rest } = props;
   const [val, setValue] = useState(initialValue || rest.value || "");
 
   return (
@@ -264,9 +265,10 @@ const ControlledInput = (
       {...rest}
       type={type}
       value={val}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-        setValue(e.target.value)
-      }
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+        setValue(e.target.value);
+        onChange?.(e);
+      }}
     />
   );
 };
@@ -285,6 +287,13 @@ export const Default: Story = {
     scale: false,
     withBorder: true,
     value: "",
+    onChange: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const input = canvas.getByPlaceholderText("Enter text here");
+    await userEvent.type(input, "Hello");
+    await expect(input).toHaveValue("Hello");
+    await expect(args.onChange).toHaveBeenCalledTimes(5);
   },
   parameters: {
     docs: {
@@ -358,6 +367,17 @@ const TypesTemplate = () => {
 
 export const Types: Story = {
   render: () => <TypesTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByPlaceholderText("Password")).toHaveAttribute(
+      "type",
+      "password",
+    );
+
+    // The browser keeps letters out of a number field.
+    const number = canvas.getByPlaceholderText("Number");
+    await userEvent.type(number, "a1b2");
+    await expect(number).toHaveValue(12);
+  },
   parameters: {
     docs: {
       description: {
@@ -411,6 +431,13 @@ const StatesTemplate = () => {
 
 export const States: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByPlaceholderText("Disabled")).toBeDisabled();
+
+    const readOnly = canvas.getByPlaceholderText("Read only");
+    await userEvent.type(readOnly, "!");
+    await expect(readOnly).toHaveValue("Read only");
+  },
   parameters: {
     docs: {
       description: {
@@ -494,6 +521,26 @@ const WithMaskTemplate = () => {
 
 export const WithMask: Story = {
   render: () => <WithMaskTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // The mask inserts the separators itself.
+    const date = canvas.getByPlaceholderText("DD/MM/YYYY");
+    await userEvent.type(date, "25122024");
+    await expect(date).toHaveValue("25/12/2024");
+
+    const phone = canvas.getByPlaceholderText("+1 (___) ___-____");
+    await userEvent.type(phone, "15551234567");
+    await expect(phone).toHaveValue("+1 (555) 123-4567");
+
+    // A mask function picks the pattern from the value as it is typed.
+    const flexible = canvas.getByPlaceholderText(
+      "Extension, or + for a full number",
+    );
+    await userEvent.type(flexible, "12345");
+    await expect(flexible).toHaveValue("1234");
+    await userEvent.clear(flexible);
+    await userEvent.type(flexible, "+15551234567");
+    await expect(flexible).toHaveValue("+1 (555) 123-4567");
+  },
   parameters: {
     docs: {
       description: {
@@ -597,6 +644,11 @@ export const AutoFocused: Story = {
       placeholder="Focused as soon as it mounts"
     />
   ),
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByPlaceholderText("Focused as soon as it mounts"),
+    ).toHaveFocus();
+  },
   parameters: {
     noPadding: true,
     docs: {
