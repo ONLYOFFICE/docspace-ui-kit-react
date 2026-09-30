@@ -40,6 +40,10 @@ const { clouds, useCloudsStore, getRoomAiFolder, subscribers, listeners, socket 
   vi.hoisted(() => {
     const clouds = {
       selectedContextFolder: null as Selected,
+      contextFolders: [] as {
+        cloud: string;
+        rooms: { id: string; name: string }[];
+      }[],
       roomSkills: [] as { id: string }[],
       selectContextFolder: vi.fn(),
       clearContextFolder: vi.fn(),
@@ -117,6 +121,7 @@ describe("ContextRoomWatcher", () => {
     vi.clearAllMocks();
     vi.useFakeTimers();
     clouds.selectedContextFolder = null;
+    clouds.contextFolders = [];
     clouds.roomSkills = [{ id: "s1" }];
     subscribers.clear();
     listeners.clear();
@@ -291,6 +296,10 @@ describe("ContextRoomWatcher", () => {
 
       emitEvent({ cmd: "create", type: "file", id: 2, data: { folderId: 500, title: "pdf.md", fileExst: ".md" } });
       expect(clouds.selectContextFolder).toHaveBeenCalledWith(CONTEXT_ROOM_CLOUD, sales);
+      // The picker gains the room: its list is re-read, debounced.
+      await act(async () => {
+        vi.advanceTimersByTime(300);
+      });
       expect(clouds.fetchContextFolders).toHaveBeenCalledTimes(1);
     });
 
@@ -318,6 +327,89 @@ describe("ContextRoomWatcher", () => {
 
     emitEvent({ cmd: "create", type: "folder", id: 502, data: { id: 502, title: "Reports", parentId: 12 } });
     expect(clouds.selectContextFolder).not.toHaveBeenCalled();
+  });
+
+  describe("with rooms offered by the picker", () => {
+    const legal = { id: "77", name: "Legal" };
+    const hr = { id: "78", name: "HR" };
+
+    beforeEach(() => {
+      clouds.contextFolders = [
+        { cloud: CONTEXT_ROOM_CLOUD, rooms: [legal, hr] },
+        { cloud: "elsewhere", rooms: [{ id: "77", name: "Not ours" }] },
+      ];
+      getRoomAiFolder.mockImplementation(async (roomId: string) =>
+        roomId === "77"
+          ? { id: "770", roomId: "77", roomsRootId: "7", hasSkills: true }
+          : { id: "780", roomId: "78", roomsRootId: "7", hasSkills: true },
+      );
+    });
+
+    const tick = () =>
+      act(async () => {
+        vi.advanceTimersByTime(300);
+      });
+
+    it("listens to each offered room, its .ai folder and the rooms root", async () => {
+      renderWatcher(null);
+      await flush();
+
+      expect(getRoomAiFolder).toHaveBeenCalledWith("77");
+      expect(getRoomAiFolder).toHaveBeenCalledWith("78");
+      expect(subscribers).toEqual(
+        new Set(["DIR-77", "DIR-78", "DIR-7", "DIR-770", "DIR-780"]),
+      );
+    });
+
+    it("re-reads the list when an offered room is renamed or removed", async () => {
+      renderWatcher(null);
+      await flush();
+
+      emitEvent({ cmd: "update", type: "folder", id: 77, data: { id: 77, title: "Legal EMEA" } });
+      emitEvent({ cmd: "delete", type: "folder", id: 78 });
+      expect(clouds.fetchContextFolders).not.toHaveBeenCalled();
+      await tick();
+      // Two events inside the window, one re-read.
+      expect(clouds.fetchContextFolders).toHaveBeenCalledTimes(1);
+    });
+
+    it("re-reads the list when an offered room's .ai folder goes or empties", async () => {
+      renderWatcher(null);
+      await flush();
+
+      emitEvent({ cmd: "delete", type: "folder", id: 770 });
+      await tick();
+      emitEvent({ cmd: "delete", type: "file", id: 5, data: { folderId: 780, title: "skill.md" } });
+      await tick();
+      expect(clouds.fetchContextFolders).toHaveBeenCalledTimes(2);
+    });
+
+    it("ignores events for rooms the picker does not offer", async () => {
+      renderWatcher(null);
+      await flush();
+
+      emitEvent({ cmd: "delete", type: "folder", id: 99 });
+      emitEvent({ cmd: "create", type: "file", id: 6, data: { folderId: 990, title: "x.md" } });
+      emitEvent({ cmd: "create", type: "folder", id: 991, data: { id: 991, title: "Reports", parentId: 77 } });
+      await tick();
+      expect(clouds.fetchContextFolders).not.toHaveBeenCalled();
+    });
+
+    it("lets its parts go when the list changes", async () => {
+      const view = renderWatcher(null);
+      await flush();
+      expect(subscribers.has("DIR-78")).toBe(true);
+
+      clouds.contextFolders = [{ cloud: CONTEXT_ROOM_CLOUD, rooms: [legal] }];
+      view.rerender(
+        <ContextRoomProvider room={null}>
+          <ContextRoomWatcher />
+        </ContextRoomProvider>,
+      );
+      await flush();
+      expect(subscribers.has("DIR-78")).toBe(false);
+      expect(subscribers.has("DIR-77")).toBe(true);
+    });
   });
 
   it("does nothing outside rooms with nothing connected", async () => {
