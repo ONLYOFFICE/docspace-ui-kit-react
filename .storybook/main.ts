@@ -80,6 +80,9 @@ const config: StorybookConfig = {
         },
       },
     },
+    // Runs every story as a browser test through Vitest -- the "storybook"
+    // project in vitest.config.ts -- and adds the testing widget to the UI.
+    "@storybook/addon-vitest",
   ],
 
   framework: {
