@@ -40,9 +40,10 @@ const { clouds, useCloudsStore, getRoomAiFolder, subscribers, listeners, socket 
   vi.hoisted(() => {
     const clouds = {
       selectedContextFolder: null as Selected,
+      roomSkills: [] as { id: string }[],
       selectContextFolder: vi.fn(),
       clearContextFolder: vi.fn(),
-      fetchRoomSkills: vi.fn(),
+      fetchRoomSkills: vi.fn(async () => {}),
     };
     const useCloudsStore = Object.assign(
       (selector: (s: typeof clouds) => unknown) => selector(clouds),
@@ -108,13 +109,14 @@ const renderWatcher = (room: { id: string; name: string } | null) =>
   );
 
 const sales = { id: "12", name: "Sales" };
-const aiFolder = { id: "500", roomId: "12", roomsRootId: "7" };
+const aiFolder = { id: "500", roomId: "12", roomsRootId: "7", hasSkills: true };
 
 describe("ContextRoomWatcher", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
     clouds.selectedContextFolder = null;
+    clouds.roomSkills = [{ id: "s1" }];
     subscribers.clear();
     listeners.clear();
     getRoomAiFolder.mockResolvedValue(aiFolder);
@@ -149,10 +151,25 @@ describe("ContextRoomWatcher", () => {
       emitEvent({ cmd: "update", type: "file", id: 1, data: { folderId: 500, title: "a.md" } });
       emitEvent({ cmd: "delete", type: "file", id: 2, data: { folderId: 500 } });
       expect(clouds.fetchRoomSkills).not.toHaveBeenCalled();
-      act(() => {
+      await act(async () => {
         vi.advanceTimersByTime(300);
       });
       expect(clouds.fetchRoomSkills).toHaveBeenCalledTimes(1);
+      expect(clouds.clearContextFolder).not.toHaveBeenCalled();
+    });
+
+    it("disconnects when the last skill file is gone", async () => {
+      renderWatcher(sales);
+      await flush();
+
+      clouds.fetchRoomSkills.mockImplementationOnce(async () => {
+        clouds.roomSkills = [];
+      });
+      emitEvent({ cmd: "delete", type: "file", id: 1, data: { folderId: 500 } });
+      await act(async () => {
+        vi.advanceTimersByTime(300);
+      });
+      expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
     });
 
     it("ignores files elsewhere in the room", async () => {
@@ -218,6 +235,14 @@ describe("ContextRoomWatcher", () => {
       expect(socket.emit).not.toHaveBeenCalled();
     });
 
+    it("disconnects at once when the .ai folder holds no skill any more", async () => {
+      getRoomAiFolder.mockResolvedValue({ ...aiFolder, hasSkills: false });
+      renderWatcher(sales);
+      await flush();
+
+      expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
+    });
+
     it("leaves the file list's own subscription alone", async () => {
       subscribers.add("DIR-12"); // the file list shows the room
       const view = renderWatcher(sales);
@@ -236,21 +261,54 @@ describe("ContextRoomWatcher", () => {
     });
   });
 
-  it("connects the current room when a .ai folder appears in it", async () => {
-    renderWatcher(sales);
-    await flush();
+  describe("with the current room not connected", () => {
+    it("watches the room and, when it has one, its .ai folder", async () => {
+      getRoomAiFolder.mockResolvedValue({ ...aiFolder, hasSkills: false });
+      renderWatcher(sales);
+      await flush();
 
-    expect(getRoomAiFolder).not.toHaveBeenCalled();
-    expect(socket.emit).toHaveBeenCalledWith("subscribe", {
-      roomParts: ["DIR-12"],
-      individual: true,
+      expect(getRoomAiFolder).toHaveBeenCalledWith("12");
+      expect(socket.emit).toHaveBeenNthCalledWith(1, "subscribe", {
+        roomParts: ["DIR-12"],
+        individual: true,
+      });
+      expect(socket.emit).toHaveBeenNthCalledWith(2, "subscribe", {
+        roomParts: ["DIR-500"],
+        individual: true,
+      });
     });
 
-    emitEvent({ cmd: "create", type: "folder", id: 501, data: { id: 501, title: ".ai", parentId: 12 } });
-    expect(clouds.selectContextFolder).toHaveBeenCalledWith(CONTEXT_ROOM_CLOUD, sales);
+    it("connects the room when its first skill file lands in the empty .ai folder", async () => {
+      getRoomAiFolder.mockResolvedValue({ ...aiFolder, hasSkills: false });
+      renderWatcher(sales);
+      await flush();
+
+      emitEvent({ cmd: "create", type: "file", id: 1, data: { folderId: 500, title: "notes.txt", fileExst: ".txt" } });
+      expect(clouds.selectContextFolder).not.toHaveBeenCalled();
+
+      emitEvent({ cmd: "create", type: "file", id: 2, data: { folderId: 500, title: "pdf.md", fileExst: ".md" } });
+      expect(clouds.selectContextFolder).toHaveBeenCalledWith(CONTEXT_ROOM_CLOUD, sales);
+    });
+
+    it("does not connect on a .ai folder appearing, only on its first skill", async () => {
+      getRoomAiFolder.mockResolvedValue(null);
+      renderWatcher(sales);
+      await flush();
+
+      emitEvent({ cmd: "create", type: "folder", id: 501, data: { id: 501, title: ".ai", parentId: 12 } });
+      expect(clouds.selectContextFolder).not.toHaveBeenCalled();
+      expect(socket.emit).toHaveBeenLastCalledWith("subscribe", {
+        roomParts: ["DIR-501"],
+        individual: true,
+      });
+
+      emitEvent({ cmd: "create", type: "file", id: 3, data: { folderId: 501, title: "skill.md" } });
+      expect(clouds.selectContextFolder).toHaveBeenCalledWith(CONTEXT_ROOM_CLOUD, sales);
+    });
   });
 
   it("ignores other folders appearing in the current room", async () => {
+    getRoomAiFolder.mockResolvedValue(null);
     renderWatcher(sales);
     await flush();
 

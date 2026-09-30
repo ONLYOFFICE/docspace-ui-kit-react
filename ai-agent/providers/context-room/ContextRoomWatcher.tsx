@@ -51,25 +51,38 @@ const roomPart = (id: string) => `DIR-${id}`;
 const sameId = (a: unknown, b: unknown): boolean =>
   a !== undefined && a !== null && String(a) === String(b);
 
-type FolderEventData = {
+type EntryEventData = {
   id?: number | string;
   title?: string;
+  fileExst?: string;
   parentId?: number | string;
   folderId?: number | string;
   type?: number;
 };
 
-const parseData = (opt: TOptSocket): FolderEventData | undefined => {
+const parseData = (opt: TOptSocket): EntryEventData | undefined => {
   if (!opt.data) return undefined;
   try {
     const parsed: unknown = JSON.parse(opt.data);
     return parsed && typeof parsed === "object"
-      ? (parsed as FolderEventData)
+      ? (parsed as EntryEventData)
       : undefined;
   } catch {
     return undefined;
   }
 };
+
+const isMarkdown = (data: EntryEventData | undefined): boolean =>
+  (
+    data?.fileExst ??
+    data?.title?.slice(data.title.lastIndexOf(".")) ??
+    ""
+  ).toLowerCase() === ".md";
+
+const isAiFolder = (data: EntryEventData | undefined, roomId: string) =>
+  !!data &&
+  sameId(data.parentId, roomId) &&
+  (data.title === AI_FOLDER_TITLE || data.type === FolderType.Ai);
 
 /**
  * Follows the connected context room on the socket, and the room the user
@@ -78,14 +91,16 @@ const parseData = (opt: TOptSocket): FolderEventData | undefined => {
  *
  * For the connected room it listens in three places, because the portal
  * announces a change to the folder that holds the entry: the `.ai` folder
- * (files added, changed, removed -> the skills are read again), the room
- * (the `.ai` folder renamed away or removed -> disconnected) and the rooms
- * root (the room renamed -> the button takes the new name; the room removed,
- * or the user's access to it -> disconnected).
+ * (files added, changed, removed -> the skills are read again, and a room
+ * left without one is disconnected), the room (the `.ai` folder renamed
+ * away or removed -> disconnected) and the rooms root (the room renamed ->
+ * the button takes the new name; the room removed, or the user's access to
+ * it -> disconnected).
  *
- * For the current room that is not connected it listens to the room alone:
- * a `.ai` folder appearing there connects the room, as opening the chat
- * would have.
+ * For the current room that is not connected it listens to the room and,
+ * when it has one, to its `.ai` folder: the first skill file appearing there
+ * connects the room, as opening the chat would have. An empty `.ai` folder
+ * connects nothing.
  *
  * Only parts nobody else holds are subscribed here and released here; the
  * file list subscribes to the folder it shows through the same socket, and
@@ -116,21 +131,52 @@ const ContextRoomWatcher = () => {
       const parts = ids
         .filter((id): id is string => !!id)
         .map(roomPart)
-        .filter((part) => !mine.has(part) && !socket?.socketSubscribers.has(part));
+        .filter(
+          (part) => !mine.has(part) && !socket?.socketSubscribers.has(part),
+        );
       if (parts.length === 0) return;
       for (const part of parts) mine.add(part);
-      socket?.emit(SocketCommands.Subscribe, { roomParts: parts, individual: true });
+      socket?.emit(SocketCommands.Subscribe, {
+        roomParts: parts,
+        individual: true,
+      });
     };
+
+    // The connected room's `.ai` folder, once known.
+    let connectedAiFolderId: string | undefined;
+    // The current, not connected room's `.ai` folder, once known: the first
+    // skill file landing there connects the room.
+    let currentAiFolderId: string | undefined;
+    const watchCurrent =
+      !!currentRoomId && currentRoomId !== connectedRoomId;
 
     const scheduleSkillsRefresh = () => {
       if (refreshTimer.current) clearTimeout(refreshTimer.current);
       refreshTimer.current = setTimeout(() => {
         refreshTimer.current = null;
-        void useCloudsStore.getState().fetchRoomSkills();
+        const clouds = useCloudsStore.getState();
+        void Promise.resolve(clouds.fetchRoomSkills()).then(() => {
+          if (cancelled) return;
+          // The last skill went: nothing is left to connect for.
+          const state = useCloudsStore.getState();
+          if (
+            state.selectedContextFolder?.cloud === CONTEXT_ROOM_CLOUD &&
+            state.selectedContextFolder.room.id === connectedRoomId &&
+            state.roomSkills.length === 0
+          ) {
+            state.clearContextFolder();
+          }
+        });
       }, SKILLS_REFRESH_DELAY_MS);
     };
 
-    let aiFolderId: string | undefined;
+    const connectCurrent = () => {
+      if (!currentRoomId || currentRoomName === undefined) return;
+      useCloudsStore.getState().selectContextFolder(CONTEXT_ROOM_CLOUD, {
+        id: currentRoomId,
+        name: currentRoomName,
+      });
+    };
 
     const handle = (opt?: TOptSocket) => {
       if (cancelled || !opt) return;
@@ -139,8 +185,19 @@ const ContextRoomWatcher = () => {
 
       if (opt.type === "file") {
         // A skill file of the connected room came, changed or went.
-        if (aiFolderId && data && sameId(data.folderId, aiFolderId)) {
+        if (connectedAiFolderId && sameId(data?.folderId, connectedAiFolderId)) {
           scheduleSkillsRefresh();
+          return;
+        }
+        // The first skill file of the current room's empty `.ai` folder.
+        if (
+          watchCurrent &&
+          currentAiFolderId &&
+          opt.cmd !== "delete" &&
+          sameId(data?.folderId, currentAiFolderId) &&
+          isMarkdown(data)
+        ) {
+          connectCurrent();
         }
         return;
       }
@@ -148,7 +205,7 @@ const ContextRoomWatcher = () => {
       if (opt.type !== "folder") return;
 
       // The `.ai` folder of the connected room.
-      if (aiFolderId && sameId(opt.id, aiFolderId)) {
+      if (connectedAiFolderId && sameId(opt.id, connectedAiFolderId)) {
         if (opt.cmd === "delete") {
           clouds.clearContextFolder();
           return;
@@ -157,7 +214,8 @@ const ContextRoomWatcher = () => {
           const stillAiFolder =
             (data.title === undefined || data.title === AI_FOLDER_TITLE) &&
             (data.type === undefined || data.type === FolderType.Ai) &&
-            (data.parentId === undefined || sameId(data.parentId, connectedRoomId));
+            (data.parentId === undefined ||
+              sameId(data.parentId, connectedRoomId));
           if (!stillAiFolder) clouds.clearContextFolder();
         }
         return;
@@ -169,7 +227,11 @@ const ContextRoomWatcher = () => {
           clouds.clearContextFolder();
           return;
         }
-        if (opt.cmd === "update" && data?.title && data.title !== connectedRoomName) {
+        if (
+          opt.cmd === "update" &&
+          data?.title &&
+          data.title !== connectedRoomName
+        ) {
           // The pick for the room already connected keeps the skills and
           // only takes over the name.
           clouds.selectContextFolder(CONTEXT_ROOM_CLOUD, {
@@ -180,28 +242,41 @@ const ContextRoomWatcher = () => {
         return;
       }
 
-      // A `.ai` folder appearing in the current room while it is not
-      // connected: connect it, as opening the chat there would have.
-      if (
-        opt.cmd === "create" &&
-        currentRoomId &&
-        currentRoomName !== undefined &&
-        currentRoomId !== connectedRoomId &&
-        data &&
-        sameId(data.parentId, currentRoomId) &&
-        (data.title === AI_FOLDER_TITLE || data.type === FolderType.Ai)
-      ) {
-        clouds.selectContextFolder(CONTEXT_ROOM_CLOUD, {
-          id: currentRoomId,
-          name: currentRoomName,
-        });
+      if (!watchCurrent || !currentRoomId) return;
+
+      // A `.ai` folder appearing in the current room: empty at birth, so
+      // nothing connects yet — its first skill file will.
+      if (opt.cmd === "create" && isAiFolder(data, currentRoomId)) {
+        if (data?.id !== undefined && data.id !== null) {
+          currentAiFolderId = String(data.id);
+          subscribe([currentAiFolderId]);
+        }
+        return;
+      }
+
+      // The current room's `.ai` folder going away: forget it.
+      if (currentAiFolderId && sameId(opt.id, currentAiFolderId)) {
+        if (
+          opt.cmd === "delete" ||
+          (opt.cmd === "update" && data && !isAiFolder(data, currentRoomId))
+        ) {
+          currentAiFolderId = undefined;
+        }
       }
     };
 
     socket?.on(SocketEvents.ModifyFolder, handle);
 
-    if (currentRoomId && currentRoomId !== connectedRoomId) {
+    if (watchCurrent && currentRoomId) {
       subscribe([currentRoomId]);
+      aiApi
+        .getRoomAiFolder(currentRoomId)
+        .catch(() => null)
+        .then((folder) => {
+          if (cancelled || !folder) return;
+          currentAiFolderId = folder.id;
+          subscribe([folder.id]);
+        });
     }
 
     if (connectedRoomId) {
@@ -210,13 +285,13 @@ const ContextRoomWatcher = () => {
         .catch(() => null)
         .then((folder) => {
           if (cancelled) return;
-          if (!folder) {
-            // The folder is gone already (or the room is): the socket would
-            // not tell us any more, so let go now.
+          if (!folder || !folder.hasSkills) {
+            // The folder (or its last skill, or the room) is gone already:
+            // the socket would not tell us any more, so let go now.
             useCloudsStore.getState().clearContextFolder();
             return;
           }
-          aiFolderId = folder.id;
+          connectedAiFolderId = folder.id;
           subscribe([folder.roomsRootId, folder.roomId, folder.id]);
         });
     }
