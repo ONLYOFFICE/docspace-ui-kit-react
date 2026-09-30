@@ -35,11 +35,10 @@
 
 import React, { useState, useEffect } from "react";
 import { useCommonTranslation } from "../../../../utils/i18n";
-import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 
 import { Text } from "../../../../components/text";
-import { Link, LinkTarget } from "../../../../components/link";
+import { Link } from "../../../../components/link";
 import { RectangleSkeleton } from "../../../../components/rectangle";
 
 import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
@@ -81,6 +80,7 @@ type AiSearchPageProps = {
   simpleTopUp?: boolean;
   withBottomMargin?: boolean;
   onViewMore?: () => void;
+  onOpenWebSearch?: () => void;
 };
 
 const AiSearchPage = (props: AiSearchPageProps) => {
@@ -90,6 +90,7 @@ const AiSearchPage = (props: AiSearchPageProps) => {
     withoutWallet,
     withBottomMargin,
     onViewMore,
+    onOpenWebSearch,
   } = props;
 
   const { paymentApi } = useApi();
@@ -345,27 +346,18 @@ const AiSearchPage = (props: AiSearchPageProps) => {
         </div>
       </div>
 
-      {paymentStore.aiSearchFeePercent != null ? (
-        <Text as="span" fontSize="13px" className={styles.pricingRow}>
-          <CommonTrans
-            i18nKey="AIExaPricingNote"
-            values={{ percent: paymentStore.aiSearchFeePercent }}
-            components={{
-              1: (
-                <Link
-                  fontSize="13px"
-                  fontWeight={600}
-                  color="accent"
-                  textDecoration="underline dotted"
-                  href="https://exa.ai/pricing"
-                  dataTestId="ai_search_exa_pricing_link"
-                  target={LinkTarget.blank}
-                />
-              ),
-            }}
-          />
-        </Text>
-      ) : null}
+      <Text as="span" fontSize="13px" className={styles.pricingRow}>
+        <Link
+          fontSize="13px"
+          fontWeight={600}
+          color="accent"
+          textDecoration="underline dotted"
+          onClick={onOpenWebSearch}
+          dataTestId="ai_search_see_pricing_link"
+        >
+          {t("SeePricing")}
+        </Link>
+      </Text>
 
       <div>
         <TransactionHistory
