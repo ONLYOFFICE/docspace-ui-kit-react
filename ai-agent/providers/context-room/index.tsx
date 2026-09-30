@@ -26,7 +26,14 @@
 
 "use client";
 
-import React, { createContext, useContext, useMemo, type ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useRef,
+  type MutableRefObject,
+  type ReactNode,
+} from "react";
 
 /**
  * The room the chat may connect as context: the room the user is standing
@@ -42,6 +49,28 @@ export type ContextRoom = {
 const ContextRoomContext = createContext<ContextRoom | null>(null);
 
 export const useContextRoom = () => useContext(ContextRoomContext);
+
+/**
+ * The room id `ContextRoomSync` last connected (or `null` for "no room"),
+ * `undefined` before its first run. It lives here, above the chat pane, so
+ * a reopen of the chat in the same room can tell itself apart from a move
+ * to another room — and leave the user's own choice alone.
+ */
+export type SyncedContextRoom = MutableRefObject<string | null | undefined>;
+
+const SyncedContextRoomContext = createContext<SyncedContextRoom | null>(
+  null,
+);
+
+export const useSyncedContextRoom = (): SyncedContextRoom => {
+  const ref = useContext(SyncedContextRoomContext);
+  if (!ref) {
+    throw new Error(
+      "useSyncedContextRoom must be used within a ContextRoomProvider",
+    );
+  }
+  return ref;
+};
 
 type ContextRoomProviderProps = {
   room: ContextRoom | null | undefined;
@@ -60,10 +89,13 @@ export const ContextRoomProvider = ({
     () => (id && name !== undefined ? { id, name } : null),
     [id, name],
   );
+  const synced = useRef<string | null | undefined>(undefined);
 
   return (
     <ContextRoomContext.Provider value={value}>
-      {children}
+      <SyncedContextRoomContext.Provider value={synced}>
+        {children}
+      </SyncedContextRoomContext.Provider>
     </ContextRoomContext.Provider>
   );
 };

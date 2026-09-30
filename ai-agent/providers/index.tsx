@@ -1031,9 +1031,10 @@ const AiAgentProviders = ({
       // default, so dropped DOCX/PDF/XLSX are supported too.
       onDropFiles,
       // The context room is the room the user is in, connected by
-      // ContextRoomSync; there is no picker to reconnect it from, so the
-      // library's "Disconnect room" entry would be a one-way door.
-      hideContextRoomDisconnect: true,
+      // ContextRoomSync; the composer's picker lists the other rooms with a
+      // .ai folder. DocSpace is one cloud to the library, so the picker
+      // skips the cloud level and lists the rooms straight away.
+      hideContextClouds: true,
     }),
     [
       composerActions,

@@ -65,6 +65,20 @@ const renderSync = (room: { id: string; name: string } | null) =>
     </ContextRoomProvider>,
   );
 
+// The provider outlives the chat pane; the pane (and the sync inside it)
+// comes and goes with the chat. `open` is that pane.
+const Chat = ({
+  room,
+  open,
+}: {
+  room: { id: string; name: string } | null;
+  open: boolean;
+}) => (
+  <ContextRoomProvider room={room}>
+    {open ? <ContextRoomSync /> : null}
+  </ContextRoomProvider>
+);
+
 describe("ContextRoomSync", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -177,6 +191,98 @@ describe("ContextRoomSync", () => {
     );
     await flush();
     expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
+  });
+
+  describe("reopening the chat in the same room", () => {
+    const sales = { id: "12", name: "Sales" };
+
+    const openConnectAndClose = async () => {
+      hasRoomAiFolder.mockResolvedValue(true);
+      const view = render(<Chat room={sales} open />);
+      await flush();
+      expect(clouds.selectContextFolder).toHaveBeenCalledTimes(1);
+      view.rerender(<Chat room={sales} open={false} />);
+      vi.clearAllMocks();
+      return view;
+    };
+
+    it("leaves a Disconnect alone", async () => {
+      const view = await openConnectAndClose();
+      clouds.selectedContextFolder = null; // the user disconnected
+
+      view.rerender(<Chat room={sales} open />);
+      await flush();
+
+      expect(hasRoomAiFolder).not.toHaveBeenCalled();
+      expect(clouds.selectContextFolder).not.toHaveBeenCalled();
+      expect(clouds.clearContextFolder).not.toHaveBeenCalled();
+    });
+
+    it("leaves another room picked from the list alone", async () => {
+      const view = await openConnectAndClose();
+      clouds.selectedContextFolder = {
+        cloud: CONTEXT_ROOM_CLOUD,
+        room: { id: "77", name: "Legal" },
+      };
+
+      view.rerender(<Chat room={sales} open />);
+      await flush();
+
+      expect(hasRoomAiFolder).not.toHaveBeenCalled();
+      expect(clouds.selectContextFolder).not.toHaveBeenCalled();
+      expect(clouds.clearContextFolder).not.toHaveBeenCalled();
+      expect(clouds.fetchRoomSkills).not.toHaveBeenCalled();
+    });
+
+    it("refreshes the current room when it is still the one connected", async () => {
+      const view = await openConnectAndClose();
+      clouds.selectedContextFolder = { cloud: CONTEXT_ROOM_CLOUD, room: sales };
+
+      view.rerender(<Chat room={{ id: "12", name: "Sales EMEA" }} open />);
+      await flush();
+
+      expect(hasRoomAiFolder).not.toHaveBeenCalled();
+      expect(clouds.selectContextFolder).toHaveBeenCalledWith(
+        CONTEXT_ROOM_CLOUD,
+        { id: "12", name: "Sales EMEA" },
+      );
+      expect(clouds.fetchRoomSkills).toHaveBeenCalledTimes(1);
+    });
+
+    it("a move to another room overrides the pick", async () => {
+      const view = await openConnectAndClose();
+      clouds.selectedContextFolder = {
+        cloud: CONTEXT_ROOM_CLOUD,
+        room: { id: "77", name: "Legal" },
+      };
+      hasRoomAiFolder.mockResolvedValue(true);
+
+      view.rerender(<Chat room={{ id: "13", name: "HR" }} open />);
+      await flush();
+
+      expect(hasRoomAiFolder).toHaveBeenCalledWith("13");
+      expect(clouds.selectContextFolder).toHaveBeenCalledWith(
+        CONTEXT_ROOM_CLOUD,
+        { id: "13", name: "HR" },
+      );
+    });
+
+    it("checks again when the first check never landed", async () => {
+      hasRoomAiFolder.mockReturnValueOnce(new Promise<boolean>(() => {}));
+      const view = render(<Chat room={sales} open />);
+      await flush();
+      view.rerender(<Chat room={sales} open={false} />);
+      hasRoomAiFolder.mockResolvedValue(true);
+
+      view.rerender(<Chat room={sales} open />);
+      await flush();
+
+      expect(hasRoomAiFolder).toHaveBeenCalledTimes(2);
+      expect(clouds.selectContextFolder).toHaveBeenCalledWith(
+        CONTEXT_ROOM_CLOUD,
+        sales,
+      );
+    });
   });
 
   it("ignores a late answer for a room that was left", async () => {
