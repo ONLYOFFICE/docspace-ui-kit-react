@@ -251,6 +251,20 @@ describe("ContextRoomWatcher", () => {
       expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
     });
 
+    it.each([401, 403])(
+      "disconnects when the lookup answers %s: the room is gone for this user",
+      async (status) => {
+        getRoomAiFolder.mockRejectedValue(
+          Object.assign(new Error(String(status)), { status }),
+        );
+        renderWatcher(sales);
+        await flush();
+
+        expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
+        expect(socket.emit).not.toHaveBeenCalled();
+      },
+    );
+
     it("keeps the connection when the .ai folder lookup fails", async () => {
       getRoomAiFolder.mockRejectedValue(Object.assign(new Error("503"), { status: 503 }));
       renderWatcher(sales);

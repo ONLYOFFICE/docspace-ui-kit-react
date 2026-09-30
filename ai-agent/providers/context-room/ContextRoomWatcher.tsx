@@ -349,20 +349,25 @@ const ContextRoomWatcher = () => {
     }
 
     if (connectedRoomId) {
-      // Only a plain `null` means the folder is gone (see getRoomAiFolder);
-      // a failed lookup keeps the connection and just goes unwatched.
+      // A plain `null` means the folder is gone (see getRoomAiFolder), and a
+      // refusal means the room is gone for this user: both disconnect. Any
+      // other failure (the network, the server) keeps the connection, which
+      // just goes unwatched.
       let failed = false;
       aiApi
         .getRoomAiFolder(connectedRoomId)
-        .catch(() => {
+        .catch((error: unknown) => {
+          const status = (error as { status?: number }).status;
+          if (status === 401 || status === 403) return null;
           failed = true;
           return null;
         })
         .then((folder) => {
           if (cancelled || failed) return;
           if (!folder || !folder.hasSkills) {
-            // The folder (or its last skill, or the room) is gone already:
-            // the socket would not tell us any more, so let go now.
+            // The folder (or its last skill, or the room, or the user's
+            // access to it) is gone already: the socket would not tell us
+            // any more, so let go now.
             useCloudsStore.getState().clearContextFolder();
             return;
           }
