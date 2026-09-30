@@ -669,8 +669,10 @@ class PaymentStore {
         { signal: abortController.signal },
       );
 
-      this.upcomingPaymentsData =
-        (data?.response as TUpcomingPaymentResponse[]) ?? [];
+      runInAction(() => {
+        this.upcomingPaymentsData =
+          (data?.response as TUpcomingPaymentResponse[]) ?? [];
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -687,7 +689,9 @@ class PaymentStore {
         { signal: abortController.signal },
       );
 
-      this.activeServices = (data?.response as TActiveService[]) ?? [];
+      runInAction(() => {
+        this.activeServices = (data?.response as TActiveService[]) ?? [];
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -953,19 +957,25 @@ class PaymentStore {
       const data = res.data.response as unknown as {
         collection: WalletOperationDto[];
       };
-      this.transactionHistory = data.collection;
-      this.isTransactionHistoryExist = data.collection.length > 0;
+      runInAction(() => {
+        this.transactionHistory = data.collection;
+        this.isTransactionHistoryExist = data.collection.length > 0;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       toastr.error(error as Error);
-      this.isTransactionLoading = true;
+      runInAction(() => {
+        this.isTransactionLoading = true;
+      });
     } finally {
-      if (this._transactionTimerId) {
-        clearTimeout(this._transactionTimerId);
-        this._transactionTimerId = null;
-      }
+      runInAction(() => {
+        if (this._transactionTimerId) {
+          clearTimeout(this._transactionTimerId);
+          this._transactionTimerId = null;
+        }
 
-      this.isTransactionLoading = false;
+        this.isTransactionLoading = false;
+      });
     }
   };
 
@@ -984,13 +994,15 @@ class PaymentStore {
         ?.response;
 
       if (!data) return;
-      this.autoPayments = data;
-      this.isAutomaticPaymentsEnabled = data.enabled ?? false;
+      runInAction(() => {
+        this.autoPayments = data;
+        this.isAutomaticPaymentsEnabled = data.enabled ?? false;
 
-      if (data.enabled) {
-        this.setMinBalance((data.minBalance ?? 0).toString());
-        this.setUpToBalance((data.upToBalance ?? 0).toString());
-      }
+        if (data.enabled) {
+          this.setMinBalance((data.minBalance ?? 0).toString());
+          this.setUpToBalance((data.upToBalance ?? 0).toString());
+        }
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -1025,7 +1037,10 @@ class PaymentStore {
       // The top-up flow passes persist=false so its checkout URL (built with a
       // top-up successUrl) is only returned, not written to the shared
       // this.cardLinked that UnlinkedCardBanner and other consumers rely on.
-      if (persist) this.cardLinked = linkUrl;
+      if (persist)
+        runInAction(() => {
+          this.cardLinked = linkUrl;
+        });
 
       return linkUrl;
     } catch (error: unknown) {
@@ -1051,11 +1066,14 @@ class PaymentStore {
 
       const data = res?.data as unknown as { response?: TenantWalletSettings };
 
-      if (!data?.response) {
+      const settings = data?.response;
+      if (!settings) {
         throw new Error();
       }
 
-      this.autoPayments = data.response;
+      runInAction(() => {
+        this.autoPayments = settings;
+      });
     } catch (error) {
       toastr.error(error as string);
     }
@@ -1130,7 +1148,9 @@ class PaymentStore {
 
       const link = res.data.response as unknown as string;
       if (link.indexOf("error") === -1) {
-        this.accountLink = link;
+        runInAction(() => {
+          this.accountLink = link;
+        });
       } else {
         console.error(link);
       }
@@ -1404,7 +1424,9 @@ class PaymentStore {
     const requests: Promise<unknown>[] = [];
     try {
       await Promise.all([this.initWalletPayerAndBalance(isRefresh)]);
-      this.previousBalance = this.balance;
+      runInAction(() => {
+        this.previousBalance = this.balance;
+      });
 
       if (this.isCardLinkedToPortal) {
         if (this.isStripePortalAvailable) {
@@ -1514,18 +1536,20 @@ class PaymentStore {
         max,
       } = newSettings;
 
-      this.buyUrl = buyUrl ?? "";
-      this.salesEmail = salesEmail ?? "";
-      this.standaloneMode = standaloneMode;
-      this.maxAvailableManagersCount = max;
+      runInAction(() => {
+        this.buyUrl = buyUrl ?? "";
+        this.salesEmail = salesEmail ?? "";
+        this.standaloneMode = standaloneMode;
+        this.maxAvailableManagersCount = max;
 
-      if (currentLicense) {
-        if (currentLicense.dueDate)
-          this.currentLicense.expiresDate = new Date(currentLicense.dueDate);
+        if (currentLicense) {
+          if (currentLicense.dueDate)
+            this.currentLicense.expiresDate = new Date(currentLicense.dueDate);
 
-        if (currentLicense.trial)
-          this.currentLicense.trialMode = currentLicense.trial;
-      }
+          if (currentLicense.trial)
+            this.currentLicense.trialMode = currentLicense.trial;
+        }
+      });
     } catch (e: unknown) {
       if (e instanceof Error && e.name === "CanceledError") return;
       console.error(e);

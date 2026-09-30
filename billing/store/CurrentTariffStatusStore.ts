@@ -240,16 +240,22 @@ class CurrentTariffStatusStore {
       const services = (res?.data?.response ??
         []) as unknown as TWalletServiceQuota[];
 
-      this._storageServiceId =
-        services.find((service) =>
-          (service.features ?? []).some((feature) => feature.id === TOTAL_SIZE),
-        )?.id ?? null;
-      this._docsConnectServiceIds = services
-        .filter((service) => isDocsConnectService(service))
-        .map((service) => service.id);
-      this._walletServicesResolved = true;
+      runInAction(() => {
+        this._storageServiceId =
+          services.find((service) =>
+            (service.features ?? []).some(
+              (feature) => feature.id === TOTAL_SIZE,
+            ),
+          )?.id ?? null;
+        this._docsConnectServiceIds = services
+          .filter((service) => isDocsConnectService(service))
+          .map((service) => service.id);
+        this._walletServicesResolved = true;
+      });
     } catch {
-      this._walletServicesResolved = false;
+      runInAction(() => {
+        this._walletServicesResolved = false;
+      });
     }
   };
 

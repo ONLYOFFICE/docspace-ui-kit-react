@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import type {
   PaymentApi,
   TenantQuotaFeatureDto,
@@ -142,16 +142,6 @@ class PaymentQuotasStore {
       const isFreeTariff = this.currentQuotasStore?.isFreeTariff ?? true;
       const currentQuotaId = this.currentQuotasStore?.currentQuotaId ?? null;
 
-      if (currentQuotaId !== FUTURE_TARIFF_QUOTA_ID) {
-        const futureQuota = quotasById.get(FUTURE_TARIFF_QUOTA_ID);
-        this.futurePaymentQuotas = futureQuota ?? null;
-        this.futurePaymentQuotasFeatures =
-          futureQuota?.featuresMap ?? new Map();
-      } else {
-        this.futurePaymentQuotas = null;
-        this.futurePaymentQuotasFeatures = new Map();
-      }
-
       let matchedQuota: QuotaWithMap | undefined;
 
       if (isFreeTariff) {
@@ -163,10 +153,27 @@ class PaymentQuotasStore {
         matchedQuota = quotasByYear.get(true);
       }
 
-      if (!matchedQuota) return;
+      // After the await above, so outside the action makeAutoObservable made
+      // of this method; one action also keeps observers from seeing the new
+      // future quota beside the old portal one.
+      runInAction(() => {
+        if (currentQuotaId !== FUTURE_TARIFF_QUOTA_ID) {
+          const futureQuota = quotasById.get(FUTURE_TARIFF_QUOTA_ID);
+          this.futurePaymentQuotas = futureQuota ?? null;
+          this.futurePaymentQuotasFeatures =
+            futureQuota?.featuresMap ?? new Map();
+        } else {
+          this.futurePaymentQuotas = null;
+          this.futurePaymentQuotasFeatures = new Map();
+        }
 
-      this.portalPaymentQuotas = matchedQuota;
-      this.portalPaymentQuotasFeatures = matchedQuota.featuresMap;
+        if (!matchedQuota) return;
+
+        this.portalPaymentQuotas = matchedQuota;
+        this.portalPaymentQuotasFeatures = matchedQuota.featuresMap;
+      });
+
+      if (!matchedQuota) return;
 
       this.setIsLoaded(true);
     } catch (error: unknown) {
