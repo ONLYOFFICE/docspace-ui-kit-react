@@ -659,6 +659,33 @@ const WithIconsTemplate = () => {
 
 export const WithIcons: Story = {
   render: () => <WithIconsTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const button = comboButton(canvas);
+    const highlighted = () =>
+      document.getElementById(
+        button.getAttribute("aria-activedescendant") ?? "",
+      );
+
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+
+    // ArrowDown opens the list on its first option; focus stays on the button.
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+    await expect(highlighted()).toHaveTextContent("Move");
+
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(highlighted()).toHaveTextContent("Copy");
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(button).toHaveTextContent("Copy"));
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+    await expect(button).toHaveFocus();
+
+    await userEvent.keyboard(" ");
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+    await userEvent.keyboard("{Escape}");
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+  },
   parameters: {
     docs: {
       description: {
