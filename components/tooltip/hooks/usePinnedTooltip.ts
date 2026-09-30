@@ -48,21 +48,23 @@ export const usePinnedTooltip = (
   contentTestId: string,
 ): PinnedTooltipProps => {
   const [isOpen, setIsOpen] = useState(false);
-  const pinned = useRef(false);
+  const pinnedAnchor = useRef<Element | null>(null);
 
   useEffect(() => {
     if (isMobile) return;
 
     const close = () => {
-      pinned.current = false;
+      pinnedAnchor.current = null;
       setIsOpen(false);
     };
 
     const onClick = (event: MouseEvent) => {
       const target = event.target as Element | null;
 
-      if (target?.closest(`[data-tooltip-id="${tooltipId}"]`)) {
-        pinned.current = !pinned.current;
+      const anchor = target?.closest(`[data-tooltip-id="${tooltipId}"]`);
+
+      if (anchor) {
+        pinnedAnchor.current = pinnedAnchor.current === anchor ? null : anchor;
         setIsOpen(true);
         return;
       }
@@ -76,9 +78,9 @@ export const usePinnedTooltip = (
       if (event.key === "Escape") close();
     };
 
-    // Capture phase: the anchors may scroll inside a nested container.
     document.addEventListener("click", onClick);
     document.addEventListener("keydown", onKeyDown);
+    // Capture phase: the anchors may scroll inside a nested container.
     document.addEventListener("scroll", close, true);
     window.addEventListener("resize", close);
 
@@ -96,7 +98,7 @@ export const usePinnedTooltip = (
     clickable: true,
     isOpen,
     setIsOpen: (value: boolean) => {
-      if (!value && pinned.current) return;
+      if (!value && pinnedAnchor.current) return;
 
       setIsOpen(value);
     },
