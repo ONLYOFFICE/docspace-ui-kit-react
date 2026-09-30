@@ -58,6 +58,16 @@ export type AiExportFormat = "Docx" | "Pdf" | "Md";
 // removed together with the C# AI service; the AI chat now talks to the
 // Node AI service through the @onlyoffice/ai-chat engines. Only the
 // endpoints that are still served remain here.
+/** The `.ai` folder of a room and the folders around it, as socket-room ids. */
+export type TRoomAiFolder = {
+  /** The `.ai` folder: its files are the room's skills. */
+  id: string;
+  /** The room the folder lies in: its rename or removal is announced here. */
+  roomId: string;
+  /** The room's parent (the rooms root), where the room's own rename and removal are announced. */
+  roomsRootId?: string;
+};
+
 export class AiApi extends BaseCustomApi {
   // Async markdown export via the Node AI service
   // (`POST /ai/text-to-docx` → the .NET text-to-docx start endpoint).
@@ -71,25 +81,49 @@ export class AiApi extends BaseCustomApi {
   // JsonStringEnumConverter also accepts other casings, but there is no
   // reason to rely on that. Omitting it keeps the endpoint's own default
   // (`Docx`).
-  // Whether the room holds a `.ai` folder in its root
-  // (`GET /files/rooms/{id}/ai`, added on the server with the Ai folder
-  // type). The listing itself is not needed here — the AI service reads the
-  // skills — so one entry is asked for and only the status matters: 404 is
-  // "no such folder" (or no such room), which is a plain `false`; a refusal
-  // or a failure propagates.
-  async hasRoomAiFolder(roomId: number | string): Promise<boolean> {
+  // The `.ai` folder of a room (`GET /files/rooms/{id}/ai`, added on the
+  // server with the Ai folder type), as the ids the chat needs to follow it
+  // on the socket: the folder itself, the room, and the room's parent (the
+  // rooms root), where the room's own rename and removal are announced.
+  // The listing is not needed here — the AI service reads the skills — so
+  // one entry is asked for. 404 is "no such folder" (or no such room), a
+  // plain `null`; a refusal or a failure propagates.
+  async getRoomAiFolder(roomId: number | string): Promise<TRoomAiFolder | null> {
     try {
-      await this.request(`/files/rooms/${encodeURIComponent(String(roomId))}/ai`, {
+      const res = await this.request<{
+        current?: { id?: number | string };
+        pathParts?: { id?: number | string }[];
+      }>(`/files/rooms/${encodeURIComponent(String(roomId))}/ai`, {
         method: "GET",
         params: { count: 1 },
       });
-      return true;
+      const id = res?.current?.id;
+      if (id === undefined || id === null) return null;
+      // pathParts runs from the root: [..., rooms root, room, .ai folder].
+      const parts = res.pathParts ?? [];
+      const roomIndex = parts.findIndex(
+        (part) => String(part.id) === String(roomId),
+      );
+      const roomsRoot = roomIndex > 0 ? parts[roomIndex - 1]?.id : undefined;
+      return {
+        id: String(id),
+        roomId: String(roomId),
+        roomsRootId:
+          roomsRoot === undefined || roomsRoot === null
+            ? undefined
+            : String(roomsRoot),
+      };
     } catch (error) {
       if ((error as { status?: number }).status === 404) {
-        return false;
+        return null;
       }
       throw error;
     }
+  }
+
+  // Whether the room holds a `.ai` folder in its root; see getRoomAiFolder.
+  async hasRoomAiFolder(roomId: number | string): Promise<boolean> {
+    return (await this.getRoomAiFolder(roomId)) !== null;
   }
 
   startTextToDocx(

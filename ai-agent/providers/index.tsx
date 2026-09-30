@@ -123,6 +123,7 @@ import {
 import { addDialogSubmitInterceptor } from "./components-overrides/dialog-footer/submit-interceptors";
 import { useApi as useFilesApi } from "../../providers/api";
 import { ContextRoomProvider, type ContextRoom } from "./context-room";
+import ContextRoomWatcher from "./context-room/ContextRoomWatcher";
 import {
   useAnalyzeQuestions,
   useComposerTyping,
@@ -1102,6 +1103,7 @@ const AiAgentProviders = ({
                           <GenerateToolApprovalBridge />
                           <AiChatStoreProvider store={aiChatStore}>
                             <ContextRoomProvider room={contextRoom}>
+                              <ContextRoomWatcher />
                               <AiChatStoresBridge />
                               {getAgentRoomId ? null : <AgentRoomIdSync />}
                               {/* The per-section attachment cap covers the
