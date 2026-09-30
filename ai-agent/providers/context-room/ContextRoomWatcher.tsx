@@ -176,11 +176,13 @@ const ContextRoomWatcher = () => {
 
     // The connected room's `.ai` folder, once known.
     let connectedAiFolderId: string | undefined;
-    // The current, not connected room's `.ai` folder, once known: the first
-    // skill file landing there connects the room.
+    // The current room's `.ai` folder while it is known to be empty, and
+    // nothing is connected: the first skill file landing there connects the
+    // room. With something connected — this room, or another one the user
+    // picked — the user's choice stands, and a skill file changes nothing;
+    // so does a folder that already held skills when the user let it go.
     let currentAiFolderId: string | undefined;
-    const watchCurrent =
-      !!currentRoomId && currentRoomId !== connectedRoomId;
+    const watchCurrent = !!currentRoomId && !connectedRoomId;
 
     const scheduleSkillsRefresh = () => {
       // The picker offers only rooms with a skill file, so a change to the
@@ -325,7 +327,8 @@ const ContextRoomWatcher = () => {
         .getRoomAiFolder(currentRoomId)
         .catch(() => null)
         .then((folder) => {
-          if (cancelled || !folder) return;
+          // A folder with skills stays as the user left it.
+          if (cancelled || !folder || folder.hasSkills) return;
           currentAiFolderId = folder.id;
           subscribe([folder.id]);
         });
@@ -346,11 +349,17 @@ const ContextRoomWatcher = () => {
     }
 
     if (connectedRoomId) {
+      // Only a plain `null` means the folder is gone (see getRoomAiFolder);
+      // a failed lookup keeps the connection and just goes unwatched.
+      let failed = false;
       aiApi
         .getRoomAiFolder(connectedRoomId)
-        .catch(() => null)
+        .catch(() => {
+          failed = true;
+          return null;
+        })
         .then((folder) => {
-          if (cancelled) return;
+          if (cancelled || failed) return;
           if (!folder || !folder.hasSkills) {
             // The folder (or its last skill, or the room) is gone already:
             // the socket would not tell us any more, so let go now.

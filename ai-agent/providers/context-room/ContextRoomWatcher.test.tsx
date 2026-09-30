@@ -251,6 +251,15 @@ describe("ContextRoomWatcher", () => {
       expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
     });
 
+    it("keeps the connection when the .ai folder lookup fails", async () => {
+      getRoomAiFolder.mockRejectedValue(Object.assign(new Error("503"), { status: 503 }));
+      renderWatcher(sales);
+      await flush();
+
+      expect(clouds.clearContextFolder).not.toHaveBeenCalled();
+      expect(socket.emit).not.toHaveBeenCalled();
+    });
+
     it("leaves the file list's own subscription alone", async () => {
       subscribers.add("DIR-12"); // the file list shows the room
       const view = renderWatcher(sales);
@@ -318,6 +327,37 @@ describe("ContextRoomWatcher", () => {
       emitEvent({ cmd: "create", type: "file", id: 3, data: { folderId: 501, title: "skill.md" } });
       expect(clouds.selectContextFolder).toHaveBeenCalledWith(CONTEXT_ROOM_CLOUD, sales);
     });
+  });
+
+  it("leaves a room the user picked alone when the current room gains a skill", async () => {
+    const legal = { id: "30", name: "Legal" };
+    clouds.selectedContextFolder = { cloud: CONTEXT_ROOM_CLOUD, room: legal };
+    getRoomAiFolder.mockImplementation(async (roomId: string) =>
+      roomId === "30"
+        ? { id: "600", roomId: "30", roomsRootId: "7", hasSkills: true }
+        : { ...aiFolder, hasSkills: false },
+    );
+    renderWatcher(sales);
+    await flush();
+
+    expect(getRoomAiFolder).not.toHaveBeenCalledWith("12");
+    emitEvent({ cmd: "create", type: "file", id: 4, data: { folderId: 500, title: "skill.md" } });
+    expect(clouds.selectContextFolder).not.toHaveBeenCalled();
+    expect(clouds.clearContextFolder).not.toHaveBeenCalled();
+  });
+
+  it("leaves a room the user let go alone when another skill lands there", async () => {
+    // Nothing connected, the folder already holds skills: a Disconnect.
+    renderWatcher(sales);
+    await flush();
+
+    expect(socket.emit).toHaveBeenCalledTimes(1);
+    expect(socket.emit).toHaveBeenCalledWith("subscribe", {
+      roomParts: ["DIR-12"],
+      individual: true,
+    });
+    emitEvent({ cmd: "create", type: "file", id: 5, data: { folderId: 500, title: "more.md" } });
+    expect(clouds.selectContextFolder).not.toHaveBeenCalled();
   });
 
   it("ignores other folders appearing in the current room", async () => {
