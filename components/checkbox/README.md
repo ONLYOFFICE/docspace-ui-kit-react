@@ -199,7 +199,9 @@ colours.
   label toggles it and a screen reader announces a checkbox with its state and its label.
 - The input is hidden from the tab order (`tabIndex={-1}`, always). Keyboard focus lands on the
   icon instead (`tabIndex`, `0` by default), and the focused box draws its border in the focus
-  colour. Space and Enter on the focused icon do **not** toggle it — only a click does.
+  colour. Space on the focused icon toggles it, as it would a native checkbox: the icon clicks
+  the input, so `onChange` receives the same event a pointer produces. Enter does nothing,
+  also as on a native checkbox.
 - `isDisabled` sets the native `disabled` on the input, which is announced as unavailable.
 - `isIndeterminate` sets the input's DOM `indeterminate` property, so the mixed state is
   announced, not merely drawn.

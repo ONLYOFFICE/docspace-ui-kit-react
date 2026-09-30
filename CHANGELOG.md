@@ -101,6 +101,11 @@ _Changed_ before upgrading.
 
 ### Fixed
 
+- `Checkbox` toggles from the keyboard. Focus lands on the box icon rather than the hidden
+  input, and the icon answered no key, so Tab reached the checkbox and Space did nothing — a
+  form could not be filled in without a pointer. Space on the focused icon now clicks the input,
+  which fires the same `onChange` a pointer does; Enter still does nothing, as on a native
+  checkbox
 - `Button`'s `tooltipText` opens only its own tooltip. A button with no `id` named its tooltip
   `button-tooltip`, the same as every other such button, and each tooltip opens for any anchor
   carrying its name — so hovering one of three buttons opened three tooltips, and the page held
