@@ -132,7 +132,7 @@ export const TokenUsageContent = ({
           value={format(usage.cacheWriteTokens)}
         />
         <UsageLine
-          label={t("Thinking")}
+          label={t("TokensReasoning")}
           value={format(usage.reasoningTokens)}
         />
         <UsageLine label={t("Images")} value={format(usage.imageTokens)} />
