@@ -2,7 +2,7 @@ import type React from "react";
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import { RadioButtonGroup } from ".";
 
@@ -129,6 +129,26 @@ export const Default: Story = {
     selected: "option1",
     spacing: "15px",
   },
+  play: async ({ args, canvas, userEvent }) => {
+    const option1 = canvas.getByRole("radio", { name: "Option 1" });
+    const option2 = canvas.getByRole("radio", { name: "Option 2" });
+    const option3 = canvas.getByRole("radio", { name: "Option 3" });
+    await expect(option1).toBeChecked();
+
+    await userEvent.click(canvas.getByText("Option 2"));
+    await expect(option2).toBeChecked();
+    await expect(option1).not.toBeChecked();
+    await expect(args.onClick).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        target: expect.objectContaining({ value: "option2" }),
+      }),
+    );
+
+    // One name, one set: the arrow keys move the choice along the row.
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(option3).toBeChecked();
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+  },
   parameters: {
     docs: {
       description: {
@@ -155,6 +175,12 @@ export const VerticalLayout: Story = {
     options: baseOptions,
     selected: "option1",
     orientation: "vertical",
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.tab();
+    await expect(canvas.getByRole("radio", { name: "Option 1" })).toHaveFocus();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(canvas.getByRole("radio", { name: "Option 2" })).toBeChecked();
   },
   parameters: {
     docs: {
@@ -200,6 +226,21 @@ const DisabledTemplate = (args: ComponentProps<typeof RadioButtonGroup>) => {
 
 export const DisabledStates: Story = {
   render: (args) => <DisabledTemplate {...args} />,
+  play: async ({ canvas }) => {
+    const radios = canvas.getAllByRole("radio");
+    const wholeGroup = radios.slice(0, 3);
+    const oneOption = radios.slice(3);
+
+    for (const radio of wholeGroup) {
+      await expect(radio).toBeDisabled();
+    }
+    for (const radio of oneOption.slice(0, 3)) {
+      await expect(radio).toBeEnabled();
+    }
+    await expect(
+      canvas.getByRole("radio", { name: "Disabled Option" }),
+    ).toBeDisabled();
+  },
   parameters: {
     docs: {
       description: {
@@ -233,6 +274,11 @@ export const WithTextLabel: Story = {
     ],
     selected: "option1",
     orientation: "vertical",
+  },
+  play: async ({ canvas }) => {
+    // The caption is text in the group, not a fourth button.
+    await expect(canvas.getByText("Please select an option:")).toBeVisible();
+    await expect(canvas.getAllByRole("radio")).toHaveLength(3);
   },
   parameters: {
     docs: {
