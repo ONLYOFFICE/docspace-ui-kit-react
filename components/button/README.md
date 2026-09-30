@@ -249,7 +249,10 @@ export function DialogFooter({
   neither `scale` nor `minWidth` helps: both size the button against its container, never
   against its text. Give the button a width of its own if the label must fit.
 - **There are two independent tooltips.** `tooltipText` is rendered by the component itself,
-  always below the button (`place="bottom"`, `offset={10}`, floating). `title` and
+  always below the button (`place="bottom"`, `offset={10}`, floating). It is named after
+  `id` when one is given and gets a generated id otherwise, so two buttons without an `id`
+  keep separate tooltips, while two buttons given the same `id` still open each other's.
+  `title` and
   `tooltipContent` are handled by the `withTooltip` wrapper that `index.tsx` exports. Setting
   both shows two tooltips; pick one.
 - **The props type is closed.** `ButtonProps` does not extend `ButtonHTMLAttributes`, so

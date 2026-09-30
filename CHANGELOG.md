@@ -101,6 +101,11 @@ _Changed_ before upgrading.
 
 ### Fixed
 
+- `Button`'s `tooltipText` opens only its own tooltip. A button with no `id` named its tooltip
+  `button-tooltip`, the same as every other such button, and each tooltip opens for any anchor
+  carrying its name — so hovering one of three buttons opened three tooltips, and the page held
+  three elements with one `id`. A button without an `id` now gets a generated one; a button
+  with an `id` is unchanged
 - `Selector` no longer scrolls the page when it mounts. The list's scroll container takes focus
   on mount, and so does the new-name field when it appears; both focused with a plain `focus()`,
   which scrolls the page to the element. They now pass `preventScroll`, so the focus still lands

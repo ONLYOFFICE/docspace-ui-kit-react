@@ -1,4 +1,5 @@
 import type React from "react";
+import { useId } from "react";
 import classNames from "classnames";
 import { Loader, LoaderTypes } from "../loader";
 import { Tooltip } from "../tooltip";
@@ -56,7 +57,11 @@ export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
 
   const buttonStyle = minWidth ? { ...style, minWidth } : style;
 
-  const tooltipId = tooltipText ? (id ?? "button-tooltip") : undefined;
+  // Each button renders its own <Tooltip>, and a tooltip opens for every
+  // anchor carrying its id -- so a shared fallback made hovering one button
+  // open the tooltips of all of them.
+  const autoTooltipId = useId();
+  const tooltipId = tooltipText ? (id ?? autoTooltipId) : undefined;
 
   return (
     <>
