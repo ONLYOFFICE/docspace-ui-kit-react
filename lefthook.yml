@@ -85,7 +85,7 @@ pre-push:
     # this step stops checking.
     check-readme:
       priority: 4
-      run: pnpm check:readme && pnpm readme:props:check && pnpm readme:catalogue:check
+      run: pnpm check:readme && pnpm readme:props:check && pnpm readme:catalogue:check && pnpm surface:check
       follow: true
     test:
       priority: 5

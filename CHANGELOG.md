@@ -68,6 +68,11 @@ _Changed_ before upgrading.
 - The three public providers — `theme`, `translation`, `error-boundary` — have READMEs on
   `README_TEMPLATE.md`, with generated prop tables, and `check:readme` now covers
   `providers/**` as well as `components/**`. 112 pages, up from 109
+- The package ships **`docs/plugin-surface.json`**: every name the root barrel exports, with
+  its kind and the module it comes from, as the TypeScript checker resolves it. Tooling outside
+  this repository can tell a portal-internal name from a public one without parsing the barrels
+  itself — agent-skills' `ui-kit` skill does. `pnpm surface:check` keeps it current in pre-push
+  and CI, and fails on an added name as well as a removed one
 
 ### Deprecated
 
