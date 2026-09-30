@@ -2,6 +2,7 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useEffect, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 
 import { ToggleButton } from ".";
 
@@ -139,6 +140,22 @@ export const Default: Story = {
   args: {
     label: "Toggle me",
     isChecked: false,
+    onChange: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const toggle = canvas.getByRole("checkbox", { name: "Toggle me" });
+
+    // The visually hidden input is the tab stop; Space toggles it natively.
+    await userEvent.tab();
+    await expect(toggle).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await expect(toggle).toBeChecked();
+
+    await userEvent.click(canvas.getByText("Toggle me"));
+    await expect(toggle).not.toBeChecked();
+    await userEvent.click(canvas.getByText("Toggle me"));
+    await expect(toggle).toBeChecked();
+    await expect(args.onChange).toHaveBeenCalledTimes(3);
   },
   parameters: {
     docs: {
@@ -165,6 +182,14 @@ const StatesTemplate = () => {
 
 export const CheckedStates: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("checkbox", { name: "Checked" }),
+    ).toBeChecked();
+    await expect(
+      canvas.getByRole("checkbox", { name: "Unchecked" }),
+    ).not.toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -194,6 +219,19 @@ const DisabledTemplate = () => {
 
 export const DisabledStates: Story = {
   render: () => <DisabledTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const off = canvas.getByRole("checkbox", { name: "Disabled off" });
+    const on = canvas.getByRole("checkbox", { name: "Disabled on" });
+    await expect(off).toBeDisabled();
+    await expect(on).toBeDisabled();
+
+    await expect(off).not.toBeChecked();
+    await expect(on).toBeChecked();
+
+    // A disabled input is no tab stop, so Tab passes both switches.
+    await userEvent.tab();
+    await expect(document.activeElement).toBe(document.body);
+  },
   parameters: {
     docs: {
       description: {
@@ -221,6 +259,13 @@ const LoadingTemplate = () => {
 
 export const LoadingState: Story = {
   render: () => <LoadingTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // Loading only pulses the knob: the switch still takes a click.
+    const toggle = canvas.getByRole("checkbox", { name: "Loading unchecked" });
+    await expect(toggle).toBeEnabled();
+    await userEvent.click(canvas.getByText("Loading unchecked"));
+    await expect(toggle).toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
