@@ -4,6 +4,7 @@ import { useState, type CSSProperties, type ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useArgs } from "storybook/preview-api";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import CopyReactSvgUrl from "../../assets/icons/16/copy.react.svg?url";
 import DownloadReactSvgUrl from "../../assets/icons/16/download.react.svg?url";
@@ -490,6 +491,13 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   );
 };
 
+// The button is a div with the button role, named by the label it shows.
+const comboButton = (canvas: { getByRole: typeof screen.getByRole }) =>
+  canvas.getByRole("button", { expanded: false });
+
+// The list may be portalled out of the story root, so look in the page.
+const option = (name: string) => screen.getByRole("option", { name });
+
 // The combo box never changes its own selection, so the stories keep it here.
 const SelectableComboBox = (props: TComboboxProps) => {
   const [selected, setSelected] = useState<TOption>(props.selectedOption);
@@ -555,6 +563,22 @@ export const Default: Story = {
     directionY: "bottom",
     fixedDirection: true,
     isDefaultMode: false,
+    onSelect: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const button = comboButton(canvas);
+    await expect(button).toHaveTextContent("Select Status");
+
+    await userEvent.click(button);
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+
+    await userEvent.click(option("Done"));
+    await expect(args.onSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ key: 2, label: "Done" }),
+    );
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+    // The label follows through updateArgs, which re-renders only inside
+    // Storybook itself; WithSelectedOption checks the label with local state.
   },
   parameters: {
     docs: {
@@ -697,6 +721,13 @@ const WithOptionDescriptionsTemplate = () => {
 
 export const WithOptionDescriptions: Story = {
   render: () => <WithOptionDescriptionsTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(comboButton(canvas));
+    // displaySelectedOption keeps the current value clickable.
+    const pdf = screen.getByRole("option", { name: /^PDF/ });
+    await expect(pdf).toHaveAttribute("aria-selected", "true");
+    await expect(pdf).not.toHaveAttribute("aria-disabled", "true");
+  },
   parameters: {
     docs: {
       description: {
@@ -742,6 +773,15 @@ const DisabledTemplate = () => {
 
 export const Disabled: Story = {
   render: () => <DisabledTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const button = comboButton(canvas);
+    await expect(button).toHaveAttribute("aria-disabled", "true");
+    await expect(button).toHaveAttribute("tabindex", "-1");
+
+    await userEvent.click(button);
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+    await expect(screen.queryByRole("option")).not.toBeInTheDocument();
+  },
   parameters: {
     docs: {
       description: {
@@ -773,6 +813,17 @@ const WithSelectedOptionTemplate = () => {
 
 export const WithSelectedOption: Story = {
   render: () => <WithSelectedOptionTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const button = comboButton(canvas);
+    await userEvent.click(button);
+
+    // Without displaySelectedOption the current value cannot be picked again.
+    await expect(option("Open")).toHaveAttribute("aria-disabled", "true");
+    await expect(option("Open")).toHaveAttribute("aria-selected", "true");
+
+    await userEvent.click(option("Done"));
+    await waitFor(() => expect(button).toHaveTextContent("Done"));
+  },
   parameters: {
     docs: {
       description: {
@@ -867,6 +918,11 @@ export const LoadingState: Story = {
       />
     </Wrapper>
   ),
+  play: async ({ canvas, userEvent }) => {
+    const button = comboButton(canvas);
+    await userEvent.click(button);
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+  },
   parameters: {
     docs: {
       description: {
