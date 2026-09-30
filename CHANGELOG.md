@@ -69,6 +69,11 @@ _Changed_ before upgrading.
   `README_TEMPLATE.md`, with generated prop tables, and `check:readme` now covers
   `providers/**` as well as `components/**`. 112 pages, up from 109
 
+### Deprecated
+
+- `LIVE_CHAT_LOCAL_STORAGE_KEY`. The live chat no longer restores its state from storage, so
+  nothing reads or writes this key. It stays exported because the root barrel is the plugin API
+
 ### Removed
 
 - **Breaking, types only:** `FieldContainerProps.icon`, `.helpButtonHeaderContent` and
@@ -126,6 +131,11 @@ _Changed_ before upgrading.
   with several stories, and to a plugin that mounts its own next to the portal's. Only the
   first mounted `Toast` renders the container now, and the next takes over when it unmounts;
   the `className` and `style` of the others are ignored
+- `AIAgentSelector` and the Files selector's agent list no longer disable every agent when
+  `disableBySecurity` names a right that a folder's security never carries, such as the
+  file-only `AskAi` of the chat's attach picker. Only a right set to `false`, or a missing
+  security object, disables an agent now. The initial items (`withInit`) and the pages loaded
+  after them follow the same rule; before, the initial items still disabled every agent
 
 ### Documentation
 
