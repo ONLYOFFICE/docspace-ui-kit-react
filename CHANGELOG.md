@@ -34,6 +34,14 @@ _Changed_ before upgrading.
 - **`Aside` is a flex column and its body takes the space the header leaves.** The bottom
   ~53px of a long body used to sit below the panel's edge, unreachable. If you pass
   `withoutBodyScroll` and bring your own scroller, give it `flex: 1 1 0` and `min-height: 0`
+- **`Aside` puts only `aria-*` on the `<aside>` element; every other prop it does not read goes
+  to the header alone.** It used to copy them onto both, so `onBackClick` and `isBackButton`
+  reached the DOM (React warned "Unknown event handler property `onBackClick`"), a `style`
+  replaced the panel's own `z-index`, and an `id` appeared twice on the page. The split follows
+  the prop table, which already gave `id` and `style` to the header. **What reached the panel
+  before and no longer does:** an `id`, `style` or `data-*` meant for the `<aside>`, and any DOM
+  handler — an `onClick` on the panel is now dropped, since the header does not read one either.
+  Wrap the `Aside` or its children to handle a click on the panel
 - **`Article`'s `showProgress` is optional, and it and `isInfoPanelVisible` are deprecated.**
   Both only moved the live chat launcher, which the component no longer draws, so neither is
   read. Passing them still compiles; they go in the next major
@@ -83,11 +91,6 @@ _Changed_ before upgrading.
 
 ### Fixed
 
-- `Aside` no longer copies its header's props onto the `<aside>` element. Whatever it did not
-  read itself went to both, so `onBackClick` and `isBackButton` reached the DOM (React warned
-  "Unknown event handler property `onBackClick`"), a `style` replaced the panel's own `z-index`,
-  and an `id` appeared twice on the page. `aria-*` now go on the `<aside>` alone and everything
-  else to the header alone, as the prop table already said of `id` and `style`
 - `Selector` no longer scrolls the page when it mounts. The list's scroll container takes focus
   on mount, and so does the new-name field when it appears; both focused with a plain `focus()`,
   which scrolls the page to the element. They now pass `preventScroll`, so the focus still lands
