@@ -439,9 +439,12 @@ const buildTokens = (
   "--chat-scroll-to-bottom-background-color": "var(--highlight-button-pressed)",
   "--chat-scroll-to-bottom-border-color": "transparent",
 
-  // Composer action buttons
+  // Composer action buttons. The context-room picker sits in the same row
+  // and would otherwise fall back to the widget's --icon-button-color, a
+  // different grey from its two neighbours.
   "--attachment-button-color": p.attachmentButtonColor,
   "--prompt-button-color": p.promptButtonColor,
+  "--composer-settings-button-color": p.attachmentButtonColor,
 
   // Misc
   "--action-gap": "16px",
