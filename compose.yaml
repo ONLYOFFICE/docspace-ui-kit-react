@@ -5,8 +5,12 @@ services:
     image: ui-kit-tests
     # Lets `WORKERS=1 pnpm test:e2e:docker:start` reach playwright.config.ts;
     # unset it resolves to "", which the config reads as "not set".
+    # CI=true is what makes this the CI run: playwright.config.ts reads it for
+    # forbidOnly, two retries and one worker. Set here, on the run, not as an
+    # ENV in the Dockerfile, which explains why the image must not carry it.
     environment:
       WORKERS: "${WORKERS:-}"
+      CI: "true"
     build:
       context: .
       dockerfile: Dockerfile
