@@ -48,6 +48,13 @@ const PROVIDERS_DIR = "providers";
 /** Both roots a README can live under, longest first for prefix matching. */
 const DOC_ROOTS = [COMPONENTS_DIR, PROVIDERS_DIR];
 
+/**
+ * The barrels the root `index.ts` re-exports wholesale, and so the only two a
+ * component or provider README can be reached through by name. The root also
+ * re-exports `billing`, `uploader` and the rest, but no README documents those.
+ */
+const BARRELS = [COMPONENTS_DIR, PROVIDERS_DIR];
+
 // `NoTruncation` because a truncated type is worse than a long one here;
 // `UseAliasDefinedOutsideCurrentScope` keeps `ButtonSize` from expanding into
 // its four members; `WriteArrowStyleSignature` prints handlers as a reader
@@ -308,7 +315,14 @@ const printableType = (text, optional) => {
 };
 
 export function createReadmeProgram(folders = documentedFolders()) {
-  const roots = folders.map(indexFileOf).filter(Boolean);
+  // The two barrels are roots as well, so the checker can answer what
+  // `import { X } from "@onlyoffice/apps-ui-kit"` resolves to. They only
+  // re-export files the folder roots already load, so adding them leaves every
+  // printed type -- and so every generated table -- exactly as it was.
+  const roots = [
+    ...folders.map(indexFileOf).filter(Boolean),
+    ...BARRELS.map((dir) => path.join(ROOT, dir, "index.ts")),
+  ];
   const program = ts.createProgram(roots, {
     ...readTsConfig().options,
     noEmit: true,
@@ -361,15 +375,41 @@ export function createReadmeProgram(folders = documentedFolders()) {
   };
 
   /**
-   * The folders a barrel re-exports: all 98 of `components/index.ts` by
-   * default, or the three of `providers/index.ts` when asked for that one. The
-   * root `index.ts` re-exports both barrels wholesale, so a name either carries
-   * is reachable from `@onlyoffice/apps-ui-kit`.
+   * Every name `import { X } from "@onlyoffice/apps-ui-kit"` resolves to among
+   * the components and providers, as the checker resolves it.
    *
-   * Whether a consumer can reach a *component* from the root barrel is a
-   * different question, answered in `check-readme.mjs` from the names each
-   * folder exports: `export *` carries those and drops defaults. Derived, never
-   * taken from a README.
+   * This used to be rebuilt by hand from what each folder exports, on the
+   * reasoning that the barrel is `export *` and `export *` drops defaults. The
+   * reasoning ignored explicit `export { default as X }` lines, and
+   * `components/index.ts` already had them for six of the nine default-only
+   * components on the day it was written -- the other three followed. So it was
+   * wrong from the start, in a way no gate could see: it failed every README
+   * that told the truth and required all nine to say "not in the root barrel",
+   * while `components/barrel.test.ts` held the barrel to the opposite rule and
+   * passed too. Asking the checker for the module's exports cannot drift from
+   * the file, whatever form a re-export takes.
+   */
+  const barrelNames = () => {
+    const names = new Set();
+
+    for (const dir of BARRELS) {
+      const source = program.getSourceFile(path.join(ROOT, dir, "index.ts"));
+      const symbol = source && checker.getSymbolAtLocation(source);
+      if (!symbol) continue;
+
+      for (const exported of checker.getExportsOfModule(symbol)) {
+        names.add(exported.getName());
+      }
+    }
+
+    return names;
+  };
+
+  /**
+   * The folders a barrel re-exports: all 98 of `components/index.ts` by
+   * default, or the three of `providers/index.ts` when asked for that one.
+   * Which *names* reach a consumer is `barrelNames()`, not this: a folder being
+   * listed says nothing about whether its default arrived.
    */
   const barrelFolders = (dir = COMPONENTS_DIR) => {
     const found = new Set();
@@ -862,6 +902,7 @@ export function createReadmeProgram(folders = documentedFolders()) {
     folderOfFile,
     folderExports,
     barrelFolders,
+    barrelNames,
     resolveProps,
   };
 }

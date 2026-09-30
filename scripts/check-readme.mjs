@@ -433,19 +433,12 @@ const main = async () => {
   // prints depends on which files are loaded, so a narrowed run would compare
   // the README against a different truth than CI does.
   const kit = createReadmeProgram();
-  const barrel = kit.barrelFolders();
   const examples = [];
   const shipped = shippedMatchers();
 
-  // Every name `import { X } from "@onlyoffice/apps-ui-kit"` resolves to. The
-  // barrel re-exports its folders with `export *`, which carries their named
-  // exports transitively and drops their defaults -- so a folder being listed
-  // there says nothing about whether its component arrived. `AsideHeader` is in
-  // the barrel through `components/aside`, and `Section` is not in it at all.
-  const barrelNames = new Set();
-  for (const folder of [...barrel, ...kit.barrelFolders("providers")]) {
-    for (const name of kit.folderExports(folder).names) barrelNames.add(name);
-  }
+  // Every name `import { X } from "@onlyoffice/apps-ui-kit"` resolves to, from
+  // the checker rather than rebuilt from the folders: see `barrelNames()`.
+  const barrelNames = kit.barrelNames();
 
   if (options.compile) fs.rmSync(CACHE, { recursive: true, force: true });
 
@@ -601,28 +594,26 @@ const main = async () => {
 
     const exports = kit.folderExports(folder);
     // Can the component this README documents be imported from the root barrel
-    // by name? A folder being listed in `components/index.ts` does not answer
-    // it: `export *` carries named exports and drops defaults, so a component
-    // that is only a default export is unreachable from the barrel however
-    // plainly its folder is re-exported there. A folder whose own name is not
-    // one of its exports -- `table`, `rows`, `tiles` document a family -- is
-    // judged by the names it does export.
-    const defaultOnly =
-      exports.hasDefault && !exports.names.includes(meta.name ?? "");
+    // by name? Its own name being among the barrel's exports answers it,
+    // whichever way it got there -- `export *` for a named export, an explicit
+    // `export { default as Section }` for a default one. A folder whose own name
+    // is not an export -- `table`, `rows`, `tiles` document a family -- is
+    // judged by the names it does document.
     const documented = (meta.exports ?? []).filter(
       (name) => name !== "default",
     );
     const inBarrel =
-      !defaultOnly &&
-      documented.length > 0 &&
-      documented.every((name) => barrelNames.has(name));
+      barrelNames.has(meta.name ?? "") ||
+      (!exports.hasDefault &&
+        documented.length > 0 &&
+        documented.every((name) => barrelNames.has(name)));
 
     if (meta.import?.barrel !== inBarrel) {
       error(
         "E_META_BARREL",
         folder,
         1,
-        `\`import.barrel\` says ${meta.import?.barrel}; ${defaultOnly ? `\`${meta.name}\` is a default export, and \`export *\` in \`components/index.ts\` does not carry it` : `the root barrel ${inBarrel ? "exports" : "does not export"} every name this README documents`}`,
+        `\`import.barrel\` says ${meta.import?.barrel}; \`import { ${meta.name} } from "${PACKAGE}"\` ${inBarrel ? "resolves" : "does not resolve"}`,
       );
     }
 

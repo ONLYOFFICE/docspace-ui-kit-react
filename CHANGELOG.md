@@ -148,6 +148,17 @@ with the page in front of it. No code changed for either.
 - `components/textarea` said `aria-label` and `aria-labelledby` were "the only two ways" to
   name the field. A `FieldContainer`'s `labelFor` reaches it as well, since its `id` lands on
   the `<textarea>` element
+- **The nine default-only components are in the root barrel**, and nine READMEs plus
+  `docs/getting-started.md` said they were not. `components/index.ts` re-exports them by name —
+  `export { default as Section }` — six of them since before the READMEs were written and the
+  other three since shortly after, but `check-readme` rebuilt the barrel's names from each
+  folder's own exports, assumed `export *` throughout, and so failed any README that told the
+  truth. It now asks the TypeScript checker what the barrels export. `import.barrel` is `true`
+  for all nine
+- `docs/getting-started.md` now gives the real reason to import by subpath: **the root barrel
+  does not build without `mobx`, `mobx-react`, `react-router` and `axios`**, four optional peers
+  the barrel's `billing` and `uploader` re-exports import. Vite stops on
+  `"makeAutoObservable" is not exported by "__vite-optional-peer-dep:mobx"`
 
 ## 4.0.0
 

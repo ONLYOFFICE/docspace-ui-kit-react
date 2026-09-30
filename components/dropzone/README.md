@@ -6,7 +6,7 @@
   "category": "Interactive elements",
   "status": "public",
   "summary": "Dashed upload area with a picture, a prompt and a format list, which turns into a loader while the upload runs.",
-  "import": { "subpath": "components/dropzone", "barrel": false, "default": true },
+  "import": { "subpath": "components/dropzone", "barrel": true, "default": true },
   "exports": ["default", "DropzoneProps", "SvgIconComponent"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": "isLoading", "disabled": "isDisabled" },
@@ -41,9 +41,10 @@ files on the area does the same thing without it.
 import Dropzone from "@onlyoffice/apps-ui-kit/components/dropzone";
 ```
 
-It is a **default** export, so the name is yours to choose. `components/index.ts`
-re-exports this folder with `export *`, which carries named exports and drops defaults — the
-component is **not in the root barrel**, and the subpath above is the only way to it.
+It is a **default** export, so the name is yours to choose. The root barrel carries it by name
+as well — `components/index.ts` re-exports it as `export { default as Dropzone }` — but prefer the
+subpath: the barrel does not build without four optional peers, see
+[Which import form](../../docs/getting-started.md#which-import-form).
 
 Needs `ThemeProvider` above it in the tree: the border, the background and the accent on the
 prompt all come from custom properties the provider's `.light` and `.dark` classes declare.

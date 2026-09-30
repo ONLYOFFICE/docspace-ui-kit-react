@@ -6,7 +6,7 @@
   "category": "Feedback",
   "status": "portal-internal",
   "summary": "Corner badge that reports every background operation of the portal and lists them when there is more than one.",
-  "import": { "subpath": "components/operations-progress-button", "barrel": false, "default": true },
+  "import": { "subpath": "components/operations-progress-button", "barrel": true, "default": true },
   "exports": ["default"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
@@ -41,9 +41,10 @@ the tooltip that names what is running.
 import OperationsProgressButton from "@onlyoffice/apps-ui-kit/components/operations-progress-button";
 ```
 
-It is a **default** export, so the name is yours to choose. `components/index.ts`
-re-exports this folder with `export *`, which carries named exports and drops defaults — the
-component is **not in the root barrel**, and the subpath above is the only way to it.
+It is a **default** export, so the name is yours to choose. The root barrel carries it by name
+as well — `components/index.ts` re-exports it as `export { default as OperationsProgressButton }` — but prefer the
+subpath: the barrel does not build without four optional peers, see
+[Which import form](../../docs/getting-started.md#which-import-form).
 
 Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme`, and
 `TranslationProvider` from `@onlyoffice/apps-ui-kit/providers/translation` carrying the

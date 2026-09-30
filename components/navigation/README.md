@@ -6,7 +6,7 @@
   "category": "Navigation",
   "status": "portal-internal",
   "summary": "The file manager's header: breadcrumb title, back arrow, and the row of buttons that acts on the current folder.",
-  "import": { "subpath": "components/navigation", "barrel": false, "default": true },
+  "import": { "subpath": "components/navigation", "barrel": true, "default": true },
   "exports": ["default", "TTitles", "TNavigationItem", "TNavigationProps"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
@@ -41,9 +41,10 @@ a folder trail, two context menu getters and a device type you tell it about.
 import Navigation from "@onlyoffice/apps-ui-kit/components/navigation";
 ```
 
-It is a **default** export, so the name is yours to choose. `components/index.ts`
-re-exports this folder with `export *`, which carries named exports and drops defaults — the
-component is **not in the root barrel**, and the subpath above is the only way to it.
+It is a **default** export, so the name is yours to choose. The root barrel carries it by name
+as well — `components/index.ts` re-exports it as `export { default as Navigation }` — but prefer the
+subpath: the barrel does not build without four optional peers, see
+[Which import form](../../docs/getting-started.md#which-import-form).
 
 Needs `ThemeProvider` above it in the tree: every colour it uses is declared only under the `light`
 and `dark` classes that provider puts on `<body>`, and the mirrored arrows come from its `rtl`

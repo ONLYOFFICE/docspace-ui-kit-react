@@ -168,7 +168,7 @@ The kit does not ship a font. Its default family is `Open Sans, sans-serif, Aria
 
 ## Which import form
 
-Two work, and both are supported:
+Two resolve, and **the subpath is the one to use**:
 
 ```tsx
 import { Button } from "@onlyoffice/apps-ui-kit";
@@ -184,13 +184,22 @@ export function Buttons() {
 }
 ```
 
+**The root barrel does not build without four optional peers.** It re-exports `billing` and
+`uploader` alongside the components, and those import `mobx`, `mobx-react`, `react-router` and —
+through the portal's API provider — `axios`. All four are optional peers, because only those
+portal modules need them; but a bundler resolves every module the barrel reaches before it
+drops what is unused, so `import { Button } from "@onlyoffice/apps-ui-kit"` in an application
+that has not installed them fails to build. Vite stops on
+`"makeAutoObservable" is not exported by "__vite-optional-peer-dep:mobx"`. A subpath reaches the
+component's own module and nothing else.
+
 All 98 component folders are re-exported by the root barrel, and `export *` is transitive — so a
 nested component such as `Row` or `AsideHeader` arrives from the barrel too, without its own
 folder being listed there.
 
-**What `export *` does not carry is a default.** Nine components are default exports, so the
-barrel has their folder's types and not the component; the subpath is the only way to them, and
-the name is yours to choose:
+**Nine components are default exports.** On their subpath the name is yours to choose, and the
+barrel carries each of them by name as well — `components/index.ts` re-exports them explicitly,
+`export { default as Section } from "./section"` — so `import { Section }` resolves too:
 
 ```tsx
 import AppLoader from "@onlyoffice/apps-ui-kit/components/app-loader";
@@ -216,8 +225,8 @@ export const defaults = {
 };
 ```
 
-`FilterInput` and `StatusMessage` are default exports as well, but they are also exported under
-their own names, so for those two the barrel works.
+`FilterInput` and `StatusMessage` are default exports as well, and are also exported under their
+own names from their folder.
 
 Never reach into the published build directory. The `exports` map is the public surface; a
 specifier that names the build output instead of a subpath is not covered by it, and it breaks the
