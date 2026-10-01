@@ -228,12 +228,14 @@ describe("wrapApiTables", () => {
       "\n",
     );
 
-  it("wraps a Props table and nothing else", () => {
-    const input = `## Props\n\n${table("id")}\n\n| Variable | Default |\n| --- | --- |\n| \`--x\` | 1 |`;
+  it("wraps every table whose rows can be named, and skips one that cannot", () => {
+    const input = `## Props\n\n${table("id")}\n\n| Variable | Default |\n| --- | --- |\n| \`--x\` | 1 |\n\n| A | B |\n| --- | --- |\n|  | empty first cell |`;
     const { text, wrapped } = wrapApiTables(input);
     expect(wrapped).toBe(true);
-    expect(text.match(/<APITable/g)).toHaveLength(1);
+    expect(text.match(/<APITable/g)).toHaveLength(2);
     expect(text).toContain("<APITable>\n\n| Prop");
+    expect(text).toContain("<APITable>\n\n| Variable");
+    expect(text).toContain("| --- | --- |\n|  | empty first cell |");
   });
 
   it("names the tables when their row ids collide", () => {

@@ -211,9 +211,10 @@ export const linkResolver = ({ root, source, out, pages, revision, warn }) => {
 };
 
 /**
- * Wraps each Props table -- a table whose first header cell is `Property`
- * (`Prop` before `reshapePropsTables`) -- in the site's <APITable>, and names
- * the tables when their row ids collide, the same scheme docspace-sdk-js uses.
+ * Wraps every table of a page in the site's <APITable>, as docspace-sdk-js
+ * does: rows become addressable by the text of their first cell. A table
+ * with an empty first cell somewhere is left alone -- the component throws
+ * on a row it cannot name. Tables are named when their row ids collide.
  */
 export const wrapApiTables = (text) => {
   const lines = splitLines(text);
@@ -225,17 +226,23 @@ export const wrapApiTables = (text) => {
     if (code) continue;
     const match = /^#{2,6}\s+(.*)$/.exec(line);
     if (match) heading = match[1].trim();
-    if (!/^\|\s*Prop(?:erty)?\s*\|/.test(line)) continue;
+    if (!/^\|/.test(line)) continue;
     if (!/^\|[\s:|-]+\|$/.test(lines[index + 1]?.text ?? "")) continue;
 
     let end = index + 2;
     while (end < lines.length && /^\|/.test(lines[end].text)) end += 1;
-    const ids = lines
-      .slice(index + 2, end)
-      .map(({ text: row }) => /^\|\s*`([^`]+)`/.exec(row)?.[1])
-      .filter(Boolean);
-    tables.push({ start: index, end, heading, ids });
+    // The row id the component derives: the first cell's first child's
+    // text -- a code span's content, a link's text, or the plain text.
+    const ids = lines.slice(index + 2, end).map(({ text: row }) => {
+      const cell = /^\|\s*((?:\\\||[^|])*?)\s*\|/.exec(row)?.[1] ?? "";
+      const code = /^`([^`]+)`/.exec(cell)?.[1];
+      const link = /^\[`?([^`\]]+)`?\]/.exec(cell)?.[1];
+      return code ?? link ?? cell.replace(/[`*_]/g, "").trim();
+    });
+    const start = index;
     index = end - 1;
+    if (ids.some((id) => id === "")) continue;
+    tables.push({ start, end, heading, ids });
   }
 
   if (tables.length === 0) return { text, wrapped: false };
