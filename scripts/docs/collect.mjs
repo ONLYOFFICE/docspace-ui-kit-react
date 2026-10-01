@@ -282,7 +282,11 @@ export const collect = (root, { warn }) => {
 
   for (const category of categories.values()) {
     const seen = new Map();
+    const own = category.slug.split("/").at(-1);
     for (const page of category.pages) {
+      // Docusaurus reads `navigation/navigation.md` as the folder's index,
+      // which the category page already is.
+      if (page.slug === own) page.slug = `${page.slug}-component`;
       if (seen.has(page.slug)) {
         warn(
           `${page.source}: slug "${category.slug}/${page.slug}" is taken by ${seen.get(page.slug)}`,
