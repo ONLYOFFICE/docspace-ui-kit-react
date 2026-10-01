@@ -1,5 +1,5 @@
 // `pnpm docs:sync`: replaces the section in an api.onlyoffice.com checkout with
-// the pages `pnpm docs` wrote. A local copy into that repository, not a
+// the pages `pnpm run docs` wrote. A local copy into that repository, not a
 // deploy -- the result is reviewed and committed there.
 //
 // The checkout is expected beside this one; API_SITE_ROOT overrides that.
@@ -21,7 +21,7 @@ const target = path.join(site, "site", ...SITE_SECTION.split("/"));
 
 if (!fs.existsSync(path.join(source, SIDEBAR_FILE))) {
   console.error(
-    `${OUT_DIR}/ is missing or incomplete -- run \`pnpm docs\` first`,
+    `${OUT_DIR}/ is missing or incomplete -- run \`pnpm run docs\` first`,
   );
   process.exit(1);
 }

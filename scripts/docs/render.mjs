@@ -5,6 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { REPO_URL, storybookUrl } from "./config.mjs";
+import { BLOCK_RENDERERS } from "./blocks.mjs";
 import { parseMdx } from "./mdx.mjs";
 import { storyKey } from "./pictures.mjs";
 import { storyNameFromExport } from "./story-tree.mjs";
@@ -402,6 +403,10 @@ export const renderMdx = (raw, context) => {
         }
       }
       kept.push(`<${block.tag} ${attrs.join(" ")} />`);
+      continue;
+    }
+    if (block.tag in BLOCK_RENDERERS) {
+      kept.push(BLOCK_RENDERERS[block.tag](context.root, block));
       continue;
     }
     let picture;

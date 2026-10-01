@@ -1,5 +1,5 @@
 // What a page shows as a picture, named so that `pnpm docs:screenshots`
-// (which takes them) and `pnpm docs` (which places them) agree.
+// (which takes them) and `pnpm run docs` (which places them) agree.
 //
 // A picture is `<category>/<page>--<name>-{light,dark}.png` under SHOTS_DIR.
 // Its name says what it is: `primary` and a story's kebab-case name are
@@ -9,6 +9,7 @@
 
 import path from "node:path";
 
+import { BLOCK_RENDERERS } from "./blocks.mjs";
 import { SHOTS_DIR } from "./config.mjs";
 import { storyId, storyNameFromExport } from "./story-tree.mjs";
 
@@ -43,7 +44,7 @@ export const shotsOf = (page) => {
     let blocks = 0;
     for (const block of page.blocks ?? []) {
       if (block.tag === "import" || block.tag === "Meta") continue;
-      if (/^[a-z]/.test(block.tag)) continue;
+      if (/^[a-z]/.test(block.tag) || block.tag in BLOCK_RENDERERS) continue;
       if (block.tag === "Story" && block.of) {
         const exportName = block.of.split(".").at(-1);
         shots.push({ name: storyKey(exportName), kind: "story", exportName });

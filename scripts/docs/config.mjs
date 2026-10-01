@@ -13,7 +13,7 @@ export const OUT_DIR = "site-docs";
 
 /**
  * Where `pnpm docs:screenshots` keeps its pictures, relative to the root.
- * Gitignored, and outside OUT_DIR because `pnpm docs` wipes that; the pages
+ * Gitignored, and outside OUT_DIR because `pnpm run docs` wipes that; the pages
  * that have a picture here get it copied beside them.
  */
 export const SHOTS_DIR = "site-screenshots";

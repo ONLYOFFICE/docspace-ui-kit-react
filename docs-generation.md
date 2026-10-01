@@ -17,7 +17,7 @@ with what only Storybook can render -- the stories, the args tables, the React b
 pnpm docs:build       # everything: Storybook, Chromium if missing, the pictures, then the pages
 pnpm docs:sync        # docs:build, then copy site-docs/ into ../api.onlyoffice.com/site/docspace/ui-kit
 
-pnpm docs             # the pages alone, in seconds and with no browser; a [warn] fails it
+pnpm run docs             # the pages alone, in seconds and with no browser; a [warn] fails it
 pnpm docs:check       # the same, then every page compiled as MDX the way Docusaurus will
 pnpm docs:screenshots # the pictures alone, from an existing storybook-static
 ```
@@ -125,9 +125,9 @@ everything that paints anywhere in the body, so what a portal renders is in it t
 margin, clamped to the viewport, taken at 2x and shown at 1x. A block is photographed as the
 element Storybook rendered, matched to the MDX by position among the page's non-Markdown blocks.
 
-`pnpm docs` copies the pictures beside the pages and puts a Docusaurus `<ThemedImage>` where
+`pnpm run docs` copies the pictures beside the pages and puts a Docusaurus `<ThemedImage>` where
 each belongs, so the reader sees the theme they are in. A picture not taken leaves no trace on
-the page beyond a count in the run's output: CI runs no browser, and `pnpm docs` stays seconds.
+the page beyond a count in the run's output: CI runs no browser, and `pnpm run docs` stays seconds.
 
 It needs a static Storybook (`pnpm storybook-build`, or `STORYBOOK_URL` for a served one) and
 Playwright's Chromium (`pnpm exec playwright install chromium`). Storybook's `index.json` names

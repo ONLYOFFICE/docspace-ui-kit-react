@@ -115,7 +115,7 @@ Docker E2E image has no DocSpace beside it. `pnpm sync-locales` refreshes them; 
 build does not use them.
 
 Gitignored, absent from a fresh clone: dist/, locales/* except locales/en, the
-Playwright output (playwright-report/, test-results/) and site-docs/ (`pnpm docs`).
+Playwright output (playwright-report/, test-results/) and site-docs/ (`pnpm run docs`).
 ```
 
 ## Common Commands
@@ -175,7 +175,7 @@ pnpm sync-locales
 # See docs-generation.md.
 pnpm docs:build         # Storybook, Chromium if missing, pictures, pages -- the site's one command
 pnpm docs:sync          # docs:build, then copy into the site checkout
-pnpm docs               # pages only, seconds, no browser (what CI checks)
+pnpm run docs               # pages only, seconds, no browser (what CI checks)
 pnpm docs:check
 pnpm docs:screenshots
 ```

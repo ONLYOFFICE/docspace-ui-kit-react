@@ -1,4 +1,4 @@
-// `pnpm docs`: the API-site pages for api.onlyoffice.com, built from the
+// `pnpm run docs`: the API-site pages for api.onlyoffice.com, built from the
 // component READMEs and the Storybook "Getting started" pages and laid out in
 // the Storybook tree. See docs-generation.md.
 //

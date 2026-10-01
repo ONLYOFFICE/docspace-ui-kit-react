@@ -12,7 +12,7 @@
 // Reads the static Storybook (`pnpm storybook-build`, or STORYBOOK_URL for a
 // served one): its index.json names the stories and the docs pages. Writes
 // <category>/<page>--<name>-{light,dark}.png under SHOTS_DIR, which
-// `pnpm docs` copies beside the pages that have them; a picture not taken is
+// `pnpm run docs` copies beside the pages that have them; a picture not taken is
 // reported there, not failed, since CI runs no browser.
 //
 // Needs Playwright's Chromium: `pnpm exec playwright install chromium`.
@@ -56,8 +56,11 @@ const THEMES = {
   light: { colorScheme: "light", current: "light" },
   dark: { colorScheme: "dark", current: "dark" },
 };
-/** About the site's reading column, so a full-width component fits the page. */
-const VIEWPORT = { width: 800, height: 600 };
+/**
+ * About the site's reading column wide, so a full-width component fits the
+ * page, and tall enough for a panel: the AI chat is 860px.
+ */
+const VIEWPORT = { width: 800, height: 1000 };
 /** Wider for a Docs page, whose tables and figures scroll in a narrow one. */
 const DOCS_VIEWPORT = { width: 1100, height: 800 };
 /** Transparent margin kept around the painted area. */
@@ -167,8 +170,11 @@ const newContext = async (browser, theme) => {
   return context;
 };
 
+// The page goes transparent, and the "Demo data" banner Storybook puts above
+// a story that reads no portal goes away: the picture is the component.
 const TRANSPARENT =
-  "html, body, .sb-show-main, #storybook-docs, .sbdocs, .sbdocs-wrapper, .sbdocs-content { background: transparent !important; }";
+  "html, body, .sb-show-main, #storybook-docs, .sbdocs, .sbdocs-wrapper, .sbdocs-content { background: transparent !important; }" +
+  ' [data-testid="demo-banner"] { display: none !important; }';
 
 /** A story in story view, cropped to what it paints. */
 const shootStory = async (page, base, id, recipe, file) => {
