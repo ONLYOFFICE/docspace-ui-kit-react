@@ -53,10 +53,8 @@ const warn = (message) => {
   console.warn(`[warn] ${message}`);
 };
 
-// The links point at the GitHub mirror, which carries `master` and little
-// else -- feature branches live on the internal Gitea -- so the branch name
-// is not a usable default the way it is in docspace-sdk-js. DOCS_REVISION
-// opts into a branch or commit that is known to exist there.
+// The GitHub mirror carries `master` and little else, so the current branch
+// is not a usable default the way it is in docspace-sdk-js.
 const revision = () => process.env.DOCS_REVISION || "master";
 
 const { categories, storyId } = collect(ROOT, {

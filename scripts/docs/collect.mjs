@@ -228,11 +228,8 @@ export const collect = (root, { includeInternal = false, statuses, warn }) => {
     category.pages.splice(after + 1, 0, page);
   }
 
-  // A compound README whose children have no README of their own
-  // (components/table) would be a category with nothing under it: a single
-  // page styled as a leaf between the folders. It is one page, so it goes
-  // where its own metadata files it -- `category` names a Storybook group
-  // under UI/ -- in alphabetical place among that group's pages.
+  // A compound README with no pages under it (components/table) is one page,
+  // filed in the UI/ group its metadata `category` names.
   for (const category of [...ordered]) {
     if (category.pages.length > 0 || !category.readme) continue;
     const homeKey = `UI/${category.readme.meta.category}`;

@@ -22,27 +22,20 @@ export const SHOTS_DIR = "site-screenshots";
 export const SHOT_SCALE = 2;
 
 /**
- * What to do in a story before photographing it, keyed by the component's
- * folder. A dialog, a toast, a drop-down or a tooltip opens from a trigger,
- * and its first story is that trigger; the recipe performs the gesture --
- * `click`, `rightClick` or `hover` on a Playwright selector -- and
- * `hideRoot` then hides everything inside #storybook-root, so a component
- * that renders through a portal is photographed without the button that
- * opened it, and `hide` hides just the elements a selector matches, for one
- * that renders beside its trigger. `wait` is the settle time in ms after the
- * gesture (default 400).
+ * How to open a component whose first story is its trigger, keyed by folder:
+ * `click`, `rightClick` or `hover` a Playwright selector, then `hideRoot`
+ * (everything in #storybook-root, for a portal) or `hide` (a selector) so the
+ * trigger stays out of the picture. `wait` is the settle time in ms (400).
  */
 export const PICTURE_RECIPES = {
-  // The toast container is rendered by the story, next to the button.
-  // The toast container is rendered by the story, next to the button; the
-  // toast slides in, and is photographed once it has arrived.
+  // The container is rendered beside the button, and the toast slides in.
   "components/toast": {
     click: "text=Show Toast",
     hide: "text=Show Toast",
     wait: 1500,
   },
   "components/modal-dialog": { click: "text=Show", hideRoot: true },
-  // Both render inside the root, over the story's own page, so the page stays.
+  // Both render inside the root, over the story's own page.
   "components/aside": { click: "text=Open Panel" },
   "components/backdrop": { click: "text=Toggle Backdrop" },
   "components/top-loading-indicator": {
@@ -110,9 +103,7 @@ export const STORY_ORDER_FILE = ".storybook/preview.tsx";
 
 /**
  * Top-level Storybook sections whose children become top-level categories on
- * the site: "UI/Form controls" is published as "Form controls". A sidebar that
- * opens with one category holding everything else is a click the reader
- * always has to make.
+ * the site: "UI/Form controls" is published as "Form controls".
  */
 export const FLATTEN_ROOTS = ["UI", "Components"];
 

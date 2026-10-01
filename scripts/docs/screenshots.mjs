@@ -6,10 +6,10 @@
 //   node scripts/docs/screenshots.mjs [--only <slug>...] [--storybook <dir|url>]
 //
 // Reads the static Storybook (`pnpm storybook-build`, or STORYBOOK_URL for a
-// served one): its index.json says which story is first and which carries
-// the `picture` tag, so nothing here guesses an id. Writes <category>/<page>-{light,dark}.png under
-// SHOTS_DIR, which `pnpm docs` then copies beside the pages that have one.
-// Pages without a picture are reported, never failed: CI runs no browser.
+// served one): its index.json names the stories. Writes
+// <category>/<page>-{light,dark}.png under SHOTS_DIR, which `pnpm docs`
+// copies beside the pages that have one; a page without one is reported,
+// not failed, since CI runs no browser.
 //
 // Needs Playwright's Chromium: `pnpm exec playwright install chromium`.
 
