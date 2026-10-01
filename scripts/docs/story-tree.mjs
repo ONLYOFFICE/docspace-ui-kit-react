@@ -186,15 +186,18 @@ export const collectStories = (root, dirs, warn) => {
     }
   }
 
-  return entries;
+  // Storybook's index order: the file paths in byte order, which puts
+  // `aside/Aside.stories.tsx` before `aside/aside-header/` and
+  // `rows/row-container/` before `rows/row/`.
+  return entries.sort((a, b) =>
+    a.file < b.file ? -1 : a.file > b.file ? 1 : 0,
+  );
 };
 
 /**
  * Storybook's `storySort.order` semantics for one level: listed names first,
  * in the listed order, a `"*"` marking where unlisted ones go (the end when
- * absent). Unlisted names are sorted alphabetically -- Storybook itself keeps
- * them in file-import order, which follows folder names rather than titles and
- * is not a sequence anyone chose.
+ * absent); unlisted names keep the order they are given in.
  *
  * Returns the ordered names and, per name, the order of its children.
  */
@@ -209,9 +212,7 @@ export const orderLevel = (names, order = []) => {
     if (Array.isArray(order[index + 1])) children.set(item, order[index + 1]);
   }
 
-  const rest = names
-    .filter((name) => !listed.includes(name))
-    .sort((a, b) => a.localeCompare(b));
+  const rest = names.filter((name) => !listed.includes(name));
   const present = listed.filter((name) => name !== "*" && names.includes(name));
   const star = listed.indexOf("*");
   let ordered;

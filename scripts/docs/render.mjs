@@ -115,7 +115,7 @@ export const layout = (categories, storyId) => {
   const bySource = new Map();
   const byStoryId = new Map();
 
-  for (const category of categories) {
+  const visit = (category) => {
     const index = `${category.slug}/index.md`;
     if (category.readme) bySource.set(category.readme.source, index);
     for (const page of category.pages) {
@@ -124,10 +124,25 @@ export const layout = (categories, storyId) => {
       if (page.title) byStoryId.set(storyId(page.title), out);
     }
     byStoryId.set(storyId(category.key), index);
-  }
+    category.children.forEach(visit);
+  };
+  categories.forEach(visit);
 
   return { bySource, byStoryId };
 };
+
+/** The overview rows of a category's children, for its page and the root's. */
+const childRows = (categories, prefix = "./") =>
+  categories.map((category) => {
+    const section = SECTIONS[category.key];
+    return {
+      label: section?.title ?? category.label,
+      link: `${prefix}${category.slug.split("/").at(-1)}/index.md`,
+      summary: section
+        ? firstSentence(section.description)
+        : (category.readme?.meta?.summary ?? ""),
+    };
+  });
 
 const relativeLink = (from, to) => {
   const link = path.posix.relative(path.posix.dirname(from), to);
@@ -379,17 +394,24 @@ const overviewTable = (caption, header, rows, { code = true } = {}) =>
 export const renderCategory = (category, context) => {
   const { revision, summaries, warn } = context;
   const section = SECTIONS[category.key];
-  const rows = category.pages.map((page) => ({
-    label: page.label,
-    link: `./${page.slug}.md`,
-    summary: summaries.get(page.source) ?? "",
-  }));
+  const rows = [
+    ...childRows(category.children),
+    ...category.pages.map((page) => ({
+      label: page.label,
+      link: `./${page.slug}.md`,
+      summary: summaries.get(page.source) ?? "",
+    })),
+  ];
   const table = overviewTable(
     section?.tableCaption ?? DEFAULT_TABLE_CAPTION,
     section?.tableHeader ?? DEFAULT_TABLE_HEADER,
     rows,
-    // Component names are code; page titles such as "Welcome" are not.
-    { code: category.pages.every((page) => page.kind === "readme") },
+    // Component names are code; group and page titles are not.
+    {
+      code:
+        category.children.length === 0 &&
+        category.pages.every((page) => page.kind === "readme"),
+    },
   );
 
   if (category.readme) {
@@ -420,16 +442,7 @@ export const renderCategory = (category, context) => {
 
 /** The landing page of the section. */
 export const renderRoot = (categories, { revision }) => {
-  const rows = categories.map((category) => {
-    const section = SECTIONS[category.key];
-    return {
-      label: section?.title ?? category.label,
-      link: `./${category.slug}/index.md`,
-      summary: section
-        ? firstSentence(section.description)
-        : (category.readme?.meta?.summary ?? ""),
-    };
-  });
+  const rows = childRows(categories);
 
   return (
     frontMatter({

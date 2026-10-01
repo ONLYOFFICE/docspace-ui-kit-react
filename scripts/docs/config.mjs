@@ -101,12 +101,6 @@ export const STORY_DIRS = [
  */
 export const STORY_ORDER_FILE = ".storybook/preview.tsx";
 
-/**
- * Top-level Storybook sections whose children become top-level categories on
- * the site: "UI/Form controls" is published as "Form controls".
- */
-export const FLATTEN_ROOTS = ["UI", "Components"];
-
 /** Top-level Storybook sections that are not published at all. */
 export const SKIPPED_ROOTS = ["Samples"];
 

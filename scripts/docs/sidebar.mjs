@@ -1,6 +1,6 @@
 // The Docusaurus sidebar for the section, in the shape docspace-sdk-js emits:
 // a CommonJS module exporting an items array that the site's `sidebars.ts`
-// spreads into its own category.
+// spreads into its own category. Nested as Storybook's sidebar is.
 
 import { PATH_PREFIX } from "./config.mjs";
 import { SECTIONS } from "./sections.mjs";
@@ -12,20 +12,24 @@ export const sidebarItems = (categories) =>
     const label = SECTIONS[category.key]?.title ?? category.label;
     const link = { type: "doc", id: docId(`${category.slug}/index.md`) };
 
-    // collect() files a README-only group into another category, so this is
-    // the fallback for one it could not place: a page, since an empty
-    // category renders as one anyway, styled as a leaf between the folders.
-    if (category.pages.length === 0) return { ...link, label };
+    // A group whose only page is its README (Table: its parts have no README
+    // of their own) is a page, since an empty category renders as one anyway.
+    if (category.pages.length === 0 && category.children.length === 0) {
+      return { ...link, label };
+    }
 
     return {
       type: "category",
       label,
       link,
-      items: category.pages.map((page) => ({
-        type: "doc",
-        id: docId(`${category.slug}/${page.slug}.md`),
-        label: page.label,
-      })),
+      items: [
+        ...sidebarItems(category.children),
+        ...category.pages.map((page) => ({
+          type: "doc",
+          id: docId(`${category.slug}/${page.slug}.md`),
+          label: page.label,
+        })),
+      ],
     };
   });
 

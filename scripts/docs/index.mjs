@@ -68,8 +68,12 @@ const outDir = path.join(ROOT, OUT_DIR);
 
 const read = (source) => fs.readFileSync(path.join(ROOT, source), "utf8");
 
+/** Every category, parents first. */
+const flat = (list) => list.flatMap((c) => [c, ...flat(c.children)]);
+const everyCategory = flat(categories);
+
 const summaries = new Map();
-for (const category of categories) {
+for (const category of everyCategory) {
   for (const page of category.pages) {
     summaries.set(page.source, summaryOf(page, read(page.source)));
   }
@@ -112,7 +116,7 @@ const RENDER = {
   markdown: renderMarkdown,
 };
 
-for (const category of categories) {
+for (const category of everyCategory) {
   const index = `${category.slug}/index.md`;
   files.set(
     index,

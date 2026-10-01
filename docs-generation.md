@@ -88,15 +88,17 @@ A README's place is the `title` of the story in **its own folder**, the same pai
 `.storybook/blocks/Readme.tsx` uses to render it as the Docs page. `UI/Form controls/TextInput`
 puts `components/text-input/README.md` in the "Form controls" category, labelled `TextInput`.
 
-- **`UI` and `Components` are flattened.** Their children become top-level categories. The
-  sidebar would otherwise open with one category that holds everything.
+- **The tree is Storybook's, nested as it is there:** `Getting started`, `Components` and `UI`
+  at the top, the groups under them. A group of `Components` appears on the site only once a
+  README under it carries a metadata block; today that is Providers.
 - **A README with no story of its own** but with stories below it (`components/rows`,
   `components/tiles`, `components/table`) describes the group those stories sit in. It becomes
   that category's page, followed by the table of its components.
 - **Order is `storySort.order`** in `.storybook/preview.tsx`, read with the TypeScript parser,
   so there is one order and the site cannot drift from the sidebar. It stays inline in the
   preview because Storybook reads it statically and rejects an imported constant ("Unexpected
-  'STORY_ORDER'"). Names the order does not list are sorted alphabetically. Storybook keeps them in file-import order, which follows folder names,
+  'STORY_ORDER'"). Names the order does not list follow Storybook's index: story files in byte
+  order of their path, a group placed where its first story -- published or not -- appears. Storybook keeps them in file-import order, which follows folder names,
   not titles.
 - **Titles are read from source** with the TypeScript parser, so no Storybook build is needed.
   A title that is not a string literal is reported instead of guessed.
@@ -153,10 +155,9 @@ A category without a README of its own gets a page built from `scripts/docs/sect
 title, a paragraph, and a table of its pages with each one's summary. Storybook groups have
 nothing to say about themselves, so that paragraph lives there, keyed by Storybook path
 (`"UI/Form controls"`). **A new Storybook group fails a strict run until it has an entry.**
-`index.md` at the root lists the categories. A compound README with no pages under it
-(`components/table`: its parts have no README of their own) is one page, and is filed in the
-category its metadata `category` names -- "Data display", beside Rows and Tiles -- rather than
-standing alone between the folders as an empty category.
+`index.md` at the root lists the three top-level categories. A group whose only page is its
+README (`components/table`: its parts have no README of their own) is a sidebar doc, since
+Docusaurus renders an empty category as one anyway.
 
 ## Output
 

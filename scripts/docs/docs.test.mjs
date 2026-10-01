@@ -81,20 +81,20 @@ describe("story order", () => {
     ).toThrow(/only strings and arrays/);
   });
 
-  it("puts listed names first and the rest alphabetically", () => {
+  it("puts listed names first and the rest in the order given", () => {
     const { ordered, children } = orderLevel(
       ["UI", "Samples", "Getting started", "Aardvark"],
       ["Getting started", ["Welcome"], "UI"],
     );
-    expect(ordered).toEqual(["Getting started", "UI", "Aardvark", "Samples"]);
+    expect(ordered).toEqual(["Getting started", "UI", "Samples", "Aardvark"]);
     expect(children.get("Getting started")).toEqual(["Welcome"]);
   });
 
   it("places the unlisted at a `*`", () => {
     expect(orderLevel(["c", "a", "z", "b"], ["a", "*", "z"]).ordered).toEqual([
       "a",
-      "b",
       "c",
+      "b",
       "z",
     ]);
   });
@@ -291,22 +291,31 @@ describe("reshapePropsTables", () => {
 
 describe("sidebarItems", () => {
   it("emits a category with no pages as a doc", () => {
+    const rows = {
+      key: "UI/Rows",
+      label: "Rows",
+      slug: "ui/rows",
+      children: [],
+      pages: [{ label: "Row", slug: "row" }],
+    };
     const items = sidebarItems([
-      { key: "UI/Table", label: "Table", slug: "table", pages: [] },
       {
-        key: "UI/Rows",
-        label: "Rows",
-        slug: "rows",
-        pages: [{ label: "Row", slug: "row" }],
+        key: "UI/Table",
+        label: "Table",
+        slug: "ui/table",
+        children: [],
+        pages: [],
       },
+      { key: "UI", label: "UI", slug: "ui", children: [rows], pages: [] },
     ]);
     expect(items[0]).toEqual({
       type: "doc",
-      id: "docspace/ui-kit/table/index",
+      id: "docspace/ui-kit/ui/table/index",
       label: "Table",
     });
     expect(items[1].type).toBe("category");
-    expect(items[1].items).toHaveLength(1);
+    expect(items[1].items[0].type).toBe("category");
+    expect(items[1].items[0].items[0].id).toBe("docspace/ui-kit/ui/rows/row");
   });
 });
 

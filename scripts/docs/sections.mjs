@@ -36,6 +36,22 @@ export const SECTIONS = {
     tableCaption: "The following pages are available:",
     tableHeader: "Page",
   },
+  UI: {
+    title: "UI",
+    description:
+      "The components themselves, grouped by what they do on a page: controls, " +
+      "overlays, data display, navigation, feedback and layout.",
+    tableCaption: "The groups are:",
+    tableHeader: "Group",
+  },
+  Components: {
+    title: "Components",
+    description:
+      "The composites built from the UI components for the portal's screens. " +
+      "Of these, the providers are public; the rest need DocSpace context.",
+    tableCaption: "The groups are:",
+    tableHeader: "Group",
+  },
   "Components/Providers": {
     description:
       "The providers an application mounts above the components. `ThemeProvider` and " +

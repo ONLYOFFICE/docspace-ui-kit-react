@@ -9,7 +9,6 @@ import { toPosix, walk } from "../lib/fs-ids.mjs";
 import { parseMetadata } from "../lib/readme-meta.mjs";
 import {
   EXTRA_PAGES,
-  FLATTEN_ROOTS,
   MDX_PAGES,
   README_DIRS,
   SKIPPED_ROOTS,
@@ -32,16 +31,19 @@ const SKIP_DIRS = new Set(["node_modules", "dist"]);
  * @property {string} source   POSIX path of the source file
  * @property {string} label    sidebar label (the Storybook leaf name)
  * @property {string} slug     file name on the site, without `.md`
+ * @property {string} order    the story file whose position orders the page
  * @property {string} [title]  Storybook title, for the Storybook link
  * @property {Object} [meta]   README metadata block
  * @property {Object} [options] MDX_PAGES entry
  *
  * @typedef {Object} Category
- * @property {string} key      Storybook path: "UI/Form controls", "Getting started"
+ * @property {string} key        Storybook path: "UI/Form controls", "UI"
  * @property {string} label
- * @property {string} slug
+ * @property {string} slug       directory on the site: "ui/form-controls"
+ * @property {string} order      first story file under it
+ * @property {Category[]} children
  * @property {Page[]} pages
- * @property {Page} [readme]   a README that describes the whole group
+ * @property {Page} [readme]     a README that describes the whole group
  */
 
 const readmes = (root) => {
@@ -65,17 +67,6 @@ const readmes = (root) => {
 const parentOf = (title) => title.split("/").slice(0, -1).join("/");
 const leafOf = (title) => title.split("/").at(-1);
 
-/**
- * The site category a Storybook group lands in: its first two segments under
- * a flattened root ("UI/Form controls"), its first segment otherwise.
- */
-const categoryKeyOf = (group) => {
-  const parts = group.split("/");
-  return FLATTEN_ROOTS.includes(parts[0])
-    ? parts.slice(0, 2).join("/")
-    : parts[0];
-};
-
 export const collect = (root, { includeInternal = false, statuses, warn }) => {
   const published = new Set(statuses);
   if (includeInternal) published.add("portal-internal");
@@ -86,17 +77,34 @@ export const collect = (root, { includeInternal = false, statuses, warn }) => {
     STORY_ORDER_FILE,
   );
 
+  // Where each group first appears in Storybook's index -- its first story,
+  // published or not -- which is where the sidebar places it.
+  const firstFile = new Map();
+  for (const story of stories) {
+    for (let key = parentOf(story.title); key; key = parentOf(key)) {
+      if (!firstFile.has(key)) firstFile.set(key, story.file);
+    }
+  }
+
+  // The tree Storybook shows, built from the group of every published page:
+  // "UI/Form controls" makes "UI" and, under it, "Form controls".
   /** @type {Map<string, Category>} */
   const categories = new Map();
-  const categoryFor = (group) => {
-    const key = categoryKeyOf(group);
+  const categoryFor = (key) => {
     if (!categories.has(key)) {
-      categories.set(key, {
+      const parent = parentOf(key);
+      const category = {
         key,
         label: leafOf(key),
-        slug: slugify(leafOf(key)),
+        slug: parent
+          ? `${categoryFor(parent).slug}/${slugify(leafOf(key))}`
+          : slugify(key),
+        order: firstFile.get(key) ?? "",
+        children: [],
         pages: [],
-      });
+      };
+      categories.set(key, category);
+      if (parent) categoryFor(parent).children.push(category);
     }
     return categories.get(key);
   };
@@ -122,6 +130,7 @@ export const collect = (root, { includeInternal = false, statuses, warn }) => {
         source: readme.source,
         label: leafOf(own.title),
         slug: path.posix.basename(readme.folder),
+        order: own.file,
         title: own.title,
         meta: readme.meta,
       });
@@ -131,16 +140,13 @@ export const collect = (root, { includeInternal = false, statuses, warn }) => {
     // No story of its own: a README at the root of a compound folder
     // (components/rows, components/tiles) describes the group its children's
     // stories sit in, and becomes that category's page.
-    const groups = new Set(
-      stories
-        .filter(
-          (story) =>
-            story.kind === "story" &&
-            story.dir.startsWith(`${readme.folder}/`) &&
-            !skippedRoot(story.title),
-        )
-        .map((story) => categoryKeyOf(parentOf(story.title))),
+    const below = stories.filter(
+      (story) =>
+        story.kind === "story" &&
+        story.dir.startsWith(`${readme.folder}/`) &&
+        !skippedRoot(story.title),
     );
+    const groups = new Set(below.map((story) => parentOf(story.title)));
 
     if (groups.size !== 1) {
       warn(
@@ -164,6 +170,7 @@ export const collect = (root, { includeInternal = false, statuses, warn }) => {
       source: readme.source,
       label: category.label,
       slug: "index",
+      order: below[0].file,
       meta: readme.meta,
     };
   }
@@ -181,81 +188,34 @@ export const collect = (root, { includeInternal = false, statuses, warn }) => {
       source: story.file,
       label: leafOf(story.title),
       slug: slugify(leafOf(story.title)),
+      order: story.file,
       title: story.title,
       options,
     });
   }
 
-  // Order: Storybook's, with flattened roots replaced by their children.
-  const rootNames = [
-    ...new Set([...categories.keys()].map((k) => k.split("/")[0])),
-  ];
-  const top = orderLevel(rootNames, order);
-  const ordered = [];
-
-  for (const rootName of top.ordered) {
-    const childOrder = top.children.get(rootName) ?? [];
-    if (FLATTEN_ROOTS.includes(rootName)) {
-      const names = [...categories.keys()]
-        .filter((key) => key.startsWith(`${rootName}/`))
-        .map(leafOf);
-      const level = orderLevel(names, childOrder);
-      for (const name of level.ordered) {
-        const category = categories.get(`${rootName}/${name}`);
-        sortPages(category, level.children.get(name));
-        ordered.push(category);
-      }
-    } else {
-      const category = categories.get(rootName);
-      sortPages(category, childOrder);
-      ordered.push(category);
-    }
-  }
+  const roots = [...categories.values()].filter((c) => !parentOf(c.key));
+  const result = orderTree(roots, order);
 
   for (const extra of EXTRA_PAGES) {
-    const category = ordered.find((c) => c.key === extra.group);
+    const category = categories.get(extra.group);
     if (!category) {
       warn(`${extra.source}: category "${extra.group}" is not published`);
       continue;
     }
-    const page = {
+    const after = category.pages.findIndex((p) => p.label === extra.after);
+    if (after === -1)
+      warn(`${extra.source}: no page "${extra.after}" to follow`);
+    category.pages.splice(after + 1, 0, {
       kind: "markdown",
       source: extra.source,
       label: extra.label,
       slug: slugify(extra.label),
-    };
-    const after = category.pages.findIndex((p) => p.label === extra.after);
-    category.pages.splice(after + 1, 0, page);
+      order: "",
+    });
   }
 
-  // A compound README with no pages under it (components/table) is one page,
-  // filed in the UI/ group its metadata `category` names.
-  for (const category of [...ordered]) {
-    if (category.pages.length > 0 || !category.readme) continue;
-    const homeKey = `UI/${category.readme.meta.category}`;
-    const home = ordered.find((c) => c.key === homeKey);
-    if (!home) {
-      warn(
-        `${category.readme.source}: no pages under "${category.key}" and no published category "${homeKey}" to file it in`,
-      );
-      continue;
-    }
-    const page = {
-      ...category.readme,
-      slug: path.posix.basename(path.posix.dirname(category.readme.source)),
-    };
-    const at = home.pages.findIndex(
-      (p) => p.label.localeCompare(page.label) > 0,
-    );
-    home.pages.splice(at === -1 ? home.pages.length : at, 0, page);
-    ordered.splice(ordered.indexOf(category), 1);
-  }
-
-  const result = ordered.filter(
-    (category) => category.pages.length > 0 || category.readme,
-  );
-
-  for (const category of result) {
+  for (const category of categories.values()) {
     const seen = new Map();
     for (const page of category.pages) {
       if (seen.has(page.slug)) {
@@ -268,25 +228,36 @@ export const collect = (root, { includeInternal = false, statuses, warn }) => {
     }
   }
 
-  const slugs = new Map();
-  for (const category of result) {
-    if (slugs.has(category.slug)) {
-      warn(
-        `category "${category.key}" has the slug of "${slugs.get(category.slug)}"`,
-      );
-    }
-    slugs.set(category.slug, category.key);
-  }
-
   return { categories: result, storyId };
 };
 
-const sortPages = (category, childOrder = []) => {
-  const { ordered } = orderLevel(
-    category.pages.map((page) => page.label),
+/**
+ * Storybook's order, level by level: `storySort.order` where it lists names,
+ * story-file order -- the index's -- where it does not. Children and pages
+ * share one level, as they do in Storybook's sidebar.
+ */
+const orderTree = (siblings, childOrder) => {
+  const byOrder = (a, b) =>
+    a.order < b.order ? -1 : a.order > b.order ? 1 : 0;
+  const sorted = [...siblings].sort(byOrder);
+  const { ordered, children } = orderLevel(
+    sorted.map((c) => c.label),
     childOrder,
   );
-  category.pages.sort(
-    (a, b) => ordered.indexOf(a.label) - ordered.indexOf(b.label),
-  );
+  const result = ordered.map((label) => sorted.find((c) => c.label === label));
+
+  for (const category of result) {
+    const own = children.get(category.label) ?? [];
+    category.children = orderTree(category.children, own);
+    const pages = [...category.pages].sort(byOrder);
+    const level = orderLevel(
+      pages.map((p) => p.label),
+      own,
+    );
+    category.pages = level.ordered.map((label) =>
+      pages.find((p) => p.label === label),
+    );
+  }
+
+  return result;
 };
