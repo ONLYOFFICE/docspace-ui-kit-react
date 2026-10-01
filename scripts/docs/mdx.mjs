@@ -11,6 +11,7 @@ const IMPORT = /^import\s+([\s\S]*?)\s+from\s+["']([^"']+)["'];?\s*$/;
  * @property {string} tag        the element's name
  * @property {string} [of]       the `of={X.Y}` expression's text
  * @property {Record<string,string>} attrs  string attributes
+ * @property {Record<string,string>} expressions  `name={identifier}` attributes
  * @property {number} start      first line (0-based)
  * @property {number} end        last line, inclusive
  */
@@ -65,8 +66,11 @@ export const parseMdx = (text) => {
       continue;
     }
 
-    const open = /^<([A-Z][\w.]*)(\s|\/?>|$)/.exec(line);
+    // A React element, or an HTML element with a JSX expression in it --
+    // `<img src={walkthrough} />` -- which the site cannot evaluate either.
+    const open = /^<([A-Za-z][\w.]*)(\s|\/?>|$)/.exec(line);
     if (!open) continue;
+    if (/^[a-z]/.test(open[1]) && !/=\{/.test(line) && />/.test(line)) continue;
 
     // The element ends where its depth returns to zero: `<X` opens, `/>`
     // and `</X>` close. Attributes do not contain `<` on these pages.
@@ -76,7 +80,7 @@ export const parseMdx = (text) => {
     for (let cursor = index; cursor < lines.length; cursor += 1) {
       const current = lines[cursor].text;
       source += `${cursor === index ? "" : "\n"}${current}`;
-      for (const token of current.matchAll(/<\/?[A-Z][\w.]*|\/>|>/g)) {
+      for (const token of current.matchAll(/<\/?[A-Za-z][\w.]*|\/>|>/g)) {
         if (token[0].startsWith("</")) depth -= 1;
         else if (token[0].startsWith("<")) depth += 1;
         else if (token[0] === "/>") depth -= 1;
@@ -91,12 +95,16 @@ export const parseMdx = (text) => {
       attrs[attr[1]] = attr[2] ?? attr[3];
     }
     const of = /\bof=\{\s*([\w.]+)\s*\}/.exec(source)?.[1];
+    const expressions = {};
+    for (const attr of source.matchAll(/(\w[\w-]*)=\{\s*([\w.]+)\s*\}/g)) {
+      expressions[attr[1]] = attr[2];
+    }
 
     if (tag === "Meta") {
       metaOf = of;
       metaTitle = attrs.title;
     }
-    blocks.push({ tag, of, attrs, start: index, end: last });
+    blocks.push({ tag, of, attrs, expressions, start: index, end: last });
     index = last;
   }
 

@@ -43,6 +43,7 @@ export const shotsOf = (page) => {
     let blocks = 0;
     for (const block of page.blocks ?? []) {
       if (block.tag === "import" || block.tag === "Meta") continue;
+      if (/^[a-z]/.test(block.tag)) continue;
       if (block.tag === "Story" && block.of) {
         const exportName = block.of.split(".").at(-1);
         shots.push({ name: storyKey(exportName), kind: "story", exportName });

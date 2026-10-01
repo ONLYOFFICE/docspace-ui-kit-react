@@ -372,8 +372,8 @@ export const renderAutodocs = (raw, context) => {
  * anything else by the element's as the Docs page renders it.
  */
 export const renderMdx = (raw, context) => {
-  const { page, pictures, revision } = context;
-  const { blocks, lines } = parseMdx(raw);
+  const { page, pictures, revision, assets, warn } = context;
+  const { blocks, lines, imports } = parseMdx(raw);
   const kept = [];
   let blockIndex = 0;
   let cursor = 0;
@@ -382,6 +382,28 @@ export const renderMdx = (raw, context) => {
     for (; cursor < block.start; cursor += 1) kept.push(lines[cursor].text);
     cursor = block.end + 1;
     if (block.tag === "import" || block.tag === "Meta") continue;
+    if (/^[a-z]/.test(block.tag)) {
+      // An HTML element: its string attributes stay; `src={walkthrough}`
+      // becomes the imported file, copied beside the page; anything else
+      // computed is dropped.
+      const attrs = Object.entries(block.attrs).map(([k, v]) => `${k}="${v}"`);
+      const source =
+        block.expressions?.src && imports.get(block.expressions.src);
+      if (source) {
+        const from = path.posix.join(path.posix.dirname(page.source), source);
+        const name = path.posix.basename(from);
+        if (fs.existsSync(path.join(context.root, from))) {
+          assets?.set(name, from);
+          attrs.push(`src={require('./${name}').default}`);
+        } else {
+          warn?.(
+            `${page.source}: <${block.tag} src={${block.expressions.src}}> points at ${from}, which does not exist`,
+          );
+        }
+      }
+      kept.push(`<${block.tag} ${attrs.join(" ")} />`);
+      continue;
+    }
     let picture;
     if (block.tag === "Story" && block.of) {
       const exportName = block.of.split(".").at(-1);

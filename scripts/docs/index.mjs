@@ -134,6 +134,7 @@ for (const category of everyCategory) {
 
   for (const page of category.pages) {
     const out = `${category.slug}/${page.slug}.md`;
+    const assets = new Map();
     files.set(
       out,
       RENDER[page.kind](read(page.source), {
@@ -143,11 +144,15 @@ for (const category of everyCategory) {
         page,
         pages,
         pictures: picturesOf(category, page),
+        assets,
         revision: rev,
         storyId,
         warn,
       }),
     );
+    for (const [name, from] of assets) {
+      copies.set(`${category.slug}/${name}`, path.join(ROOT, from));
+    }
   }
 }
 
