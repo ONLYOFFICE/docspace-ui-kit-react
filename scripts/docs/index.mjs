@@ -9,9 +9,8 @@
 // --include-internal  publish portal-internal components as well
 //
 // DOCS_REVISION sets the branch or commit the edit and source links point at
-// (default: the current branch). STORYBOOK_URL adds "Open in Storybook" links.
+// (default: master). STORYBOOK_URL adds "Open in Storybook" links.
 
-import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -46,25 +45,11 @@ const warn = (message) => {
   console.warn(`[warn] ${message}`);
 };
 
-const git = (...argv) => {
-  try {
-    return execFileSync("git", argv, {
-      cwd: ROOT,
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-      shell: process.platform === "win32",
-    }).trim();
-  } catch {
-    return "";
-  }
-};
-
-const revision = () => {
-  if (process.env.DOCS_REVISION) return process.env.DOCS_REVISION;
-  const branch = git("rev-parse", "--abbrev-ref", "HEAD");
-  if (branch && branch !== "HEAD") return branch;
-  return git("rev-parse", "HEAD") || "master";
-};
+// The links point at the GitHub mirror, which carries `master` and little
+// else -- feature branches live on the internal Gitea -- so the branch name
+// is not a usable default the way it is in docspace-sdk-js. DOCS_REVISION
+// opts into a branch or commit that is known to exist there.
+const revision = () => process.env.DOCS_REVISION || "master";
 
 const { categories, storyId } = collect(ROOT, {
   includeInternal: args.includes("--include-internal"),

@@ -8,16 +8,27 @@ import { SECTIONS } from "./sections.mjs";
 const docId = (file) => `${PATH_PREFIX}/${file.replace(/\.md$/, "")}`;
 
 export const sidebarItems = (categories) =>
-  categories.map((category) => ({
-    type: "category",
-    label: SECTIONS[category.key]?.title ?? category.label,
-    link: { type: "doc", id: docId(`${category.slug}/index.md`) },
-    items: category.pages.map((page) => ({
-      type: "doc",
-      id: docId(`${category.slug}/${page.slug}.md`),
-      label: page.label,
-    })),
-  }));
+  categories.map((category) => {
+    const label = SECTIONS[category.key]?.title ?? category.label;
+    const link = { type: "doc", id: docId(`${category.slug}/index.md`) };
+
+    // A category with nothing under it -- a README whose children have no
+    // README of their own -- is a page. An empty category renders as one
+    // anyway, but styled as a leaf between the folders, and the llms.txt
+    // plugin files it under the section root.
+    if (category.pages.length === 0) return { ...link, label };
+
+    return {
+      type: "category",
+      label,
+      link,
+      items: category.pages.map((page) => ({
+        type: "doc",
+        id: docId(`${category.slug}/${page.slug}.md`),
+        label: page.label,
+      })),
+    };
+  });
 
 export const renderSidebar = (categories) =>
   [

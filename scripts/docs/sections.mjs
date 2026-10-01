@@ -16,7 +16,7 @@
 
 /** The landing page of the whole section. */
 export const ROOT_SECTION = {
-  title: "UI kit",
+  title: "UI Kit",
   description:
     "`@onlyoffice/apps-ui-kit` is the React component library every ONLYOFFICE Apps " +
     "product is built with, and the UI a DocSpace plugin renders its screens in. " +
@@ -61,13 +61,13 @@ export const SECTIONS = {
   },
   "UI/Interactive elements": {
     description:
-      "Buttons in their variants, the main action button, drag and drop and the " +
-      "image editor -- components whose job is to be clicked or dragged.",
+      "Buttons in their variants -- plain, icon, floating, main-menu -- and the " +
+      "drag-and-drop surfaces: components whose job is to be clicked or dragged.",
   },
   "UI/Layout": {
     description:
-      "The page frame and its plumbing: article and section, portals, scroll areas " +
-      "and the theme wrapper.",
+      "The page's plumbing: portals, scroll areas, the selection rectangle and " +
+      "the theme wrapper.",
   },
   "UI/Layout components": {
     description:
@@ -76,8 +76,7 @@ export const SECTIONS = {
   },
   "UI/Navigation": {
     description:
-      "Links, tabs, paging, the navigation header and the filter bar that narrows a " +
-      "list.",
+      "Links, tabs, paging and the side menu that moves the user between views.",
   },
   "UI/Overlays": {
     description:

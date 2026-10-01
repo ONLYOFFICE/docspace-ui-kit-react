@@ -12,7 +12,8 @@ import {
   rewriteLinks,
   stripHtmlComments,
 } from "./markdown.mjs";
-import { linkResolver, wrapApiTables } from "./render.mjs";
+import { linkResolver, reshapePropsTables, wrapApiTables } from "./render.mjs";
+import { sidebarItems } from "./sidebar.mjs";
 import {
   csfTitle,
   mdxTitle,
@@ -234,5 +235,66 @@ describe("summaries", () => {
     expect(firstSentence(firstParagraph(text))).toBe(
       "Eleven hooks in `hooks/index.ts. x` here.",
     );
+  });
+});
+
+describe("reshapePropsTables", () => {
+  const readme = [
+    "## Props",
+    "",
+    "| Prop | Type | Required | Default | Description |",
+    "| --- | --- | --- | --- | --- |",
+    "| `label` | `string` | no | – | Button text |",
+    "| `onClick` | `() => void` | **yes** | – | Called on click. |",
+    '| `size` | `"a" \\| "b"` | no | `"a"` | The size |',
+    "",
+    "| Variable | Default | Effect |",
+    "| --- | --- | --- |",
+    "| `--x` | 1 | y |",
+  ].join("\n");
+
+  it("folds Required and Default into the SDK's three columns", () => {
+    const out = reshapePropsTables(readme);
+    expect(out).toContain("| Property | Type | Description |");
+    expect(out).toContain("| `label`? | `string` | Button text |");
+    expect(out).toContain("| `onClick` | `() => void` | Called on click. |");
+    expect(out).toContain(
+      '| `size`? | `"a" \\| "b"` | The size. Default: `"a"`. |',
+    );
+  });
+
+  it("leaves other tables and code alone", () => {
+    const out = reshapePropsTables(
+      `${readme}\n\n\`\`\`\n| Prop | Type | Required | Default | Description |\n\`\`\``,
+    );
+    expect(out).toContain("| Variable | Default | Effect |");
+    expect(out.match(/\| Prop \| Type \| Required/g)).toHaveLength(1);
+  });
+
+  it("gives APITable rows ids without the optional marker", () => {
+    const { text } = wrapApiTables(reshapePropsTables(readme));
+    expect(text).toContain("<APITable>\n\n| Property");
+    expect(text).not.toContain('name="');
+  });
+});
+
+describe("sidebarItems", () => {
+  it("emits a category with no pages as a doc", () => {
+    const items = sidebarItems([
+      { key: "UI/Table", label: "Table", slug: "table", pages: [] },
+      {
+        key: "UI/Rows",
+        label: "Rows",
+        slug: "rows",
+        pages: [{ label: "Row", slug: "row" }],
+      },
+    ]);
+    expect(items[0]).toEqual({
+      type: "doc",
+      id: "docspace/ui-kit/table/index",
+      label: "Table",
+    });
+    expect(items[1].type).toBe("category");
+    expect(items[1].items).toHaveLength(1);
   });
 });
