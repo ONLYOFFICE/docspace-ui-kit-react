@@ -53,6 +53,8 @@ const SKIP_DIRS = new Set(["node_modules", "dist"]);
  * @property {string} order      first story file under it
  * @property {Category[]} children
  * @property {Page[]} pages
+ * @property {Array<{type: "category" | "page", item: Category | Page}>} sequence
+ *   children and pages in sidebar order
  * @property {Page} [readme]     a README that describes the whole group
  */
 
@@ -303,7 +305,8 @@ export const collect = (root, { warn }) => {
 /**
  * Storybook's order, level by level: `storySort.order` where it lists names,
  * story-file order -- the index's -- where it does not. Children and pages
- * share one level, as they do in Storybook's sidebar.
+ * share one level, as they do in Storybook's sidebar, and `sequence` keeps
+ * them interleaved for the sidebar and the category page.
  */
 const orderTree = (siblings, childOrder) => {
   const byOrder = (a, b) =>
@@ -318,14 +321,20 @@ const orderTree = (siblings, childOrder) => {
   for (const category of result) {
     const own = children.get(category.label) ?? [];
     category.children = orderTree(category.children, own);
-    const pages = [...category.pages].sort(byOrder);
+    const items = [
+      ...category.children.map((child) => ({ type: "category", item: child })),
+      ...category.pages.map((page) => ({ type: "page", item: page })),
+    ].sort((a, b) => byOrder(a.item, b.item));
     const level = orderLevel(
-      pages.map((p) => p.label),
+      items.map(({ item }) => item.label),
       own,
     );
-    category.pages = level.ordered.map((label) =>
-      pages.find((p) => p.label === label),
+    category.sequence = level.ordered.map((label) =>
+      items.find(({ item }) => item.label === label),
     );
+    category.pages = category.sequence
+      .filter(({ type }) => type === "page")
+      .map(({ item }) => item);
   }
 
   return result;

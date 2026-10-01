@@ -488,14 +488,15 @@ const overviewTable = (caption, header, rows, { code = true } = {}) =>
 export const renderCategory = (category, context) => {
   const { revision, summaries, warn } = context;
   const section = SECTIONS[category.key];
-  const rows = [
-    ...childRows(category.children),
-    ...category.pages.map((page) => ({
-      label: page.label,
-      link: `./${page.slug}.md`,
-      summary: summaries.get(page.source) ?? "",
-    })),
-  ];
+  const rows = (category.sequence ?? []).map(({ type, item }) =>
+    type === "category"
+      ? childRows([item])[0]
+      : {
+          label: item.label,
+          link: `./${item.slug}.md`,
+          summary: summaries.get(item.source) ?? "",
+        },
+  );
   const table = overviewTable(
     section?.tableCaption ?? DEFAULT_TABLE_CAPTION,
     section?.tableHeader ?? DEFAULT_TABLE_HEADER,

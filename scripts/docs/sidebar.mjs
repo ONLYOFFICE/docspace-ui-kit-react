@@ -22,14 +22,15 @@ export const sidebarItems = (categories) =>
       type: "category",
       label,
       link,
-      items: [
-        ...sidebarItems(category.children),
-        ...category.pages.map((page) => ({
-          type: "doc",
-          id: docId(`${category.slug}/${page.slug}.md`),
-          label: page.label,
-        })),
-      ],
+      items: (category.sequence ?? []).map(({ type, item }) =>
+        type === "category"
+          ? sidebarItems([item])[0]
+          : {
+              type: "doc",
+              id: docId(`${category.slug}/${item.slug}.md`),
+              label: item.label,
+            },
+      ),
     };
   });
 

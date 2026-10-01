@@ -303,12 +303,14 @@ describe("reshapePropsTables", () => {
 
 describe("sidebarItems", () => {
   it("emits a category with no pages as a doc", () => {
+    const row = { label: "Row", slug: "row" };
     const rows = {
       key: "UI/Rows",
       label: "Rows",
       slug: "ui/rows",
       children: [],
-      pages: [{ label: "Row", slug: "row" }],
+      pages: [row],
+      sequence: [{ type: "page", item: row }],
     };
     const items = sidebarItems([
       {
@@ -317,8 +319,16 @@ describe("sidebarItems", () => {
         slug: "ui/table",
         children: [],
         pages: [],
+        sequence: [],
       },
-      { key: "UI", label: "UI", slug: "ui", children: [rows], pages: [] },
+      {
+        key: "UI",
+        label: "UI",
+        slug: "ui",
+        children: [rows],
+        pages: [],
+        sequence: [{ type: "category", item: rows }],
+      },
     ]);
     expect(items[0]).toEqual({
       type: "doc",
