@@ -13,11 +13,16 @@ It does not generate them.
 ## Commands
 
 ```bash
-pnpm docs             # site-docs/ -- pages, category pages, sidebar; a [warn] fails it
+pnpm docs:build       # everything: Storybook, Chromium if missing, the pictures, then the pages
+pnpm docs:sync        # docs:build, then copy site-docs/ into ../api.onlyoffice.com/site/docspace/ui-kit
+
+pnpm docs             # the pages alone, in seconds and with no browser; a [warn] fails it
 pnpm docs:check       # the same, then every page compiled as MDX the way Docusaurus will
-pnpm docs:screenshots # a picture of every component into site-screenshots/ (needs storybook-static)
-pnpm docs:sync        # pnpm docs, then copy site-docs/ into ../api.onlyoffice.com/site/docspace/ui-kit
+pnpm docs:screenshots # the pictures alone, from an existing storybook-static
 ```
+
+`docs:build` and `docs:sync` take `--reuse-storybook` to keep an existing `storybook-static`
+instead of rebuilding it, which is most of their time.
 
 CI runs `pnpm docs:check` in the lint job.
 
@@ -54,15 +59,12 @@ What the site needs, once:
 
   ```bash
   pnpm install --frozen-lockfile
-  pnpm exec playwright install --with-deps chromium
-  pnpm storybook-build
-  pnpm docs:screenshots
-  DOCS_REVISION=<that ref> pnpm docs
+  DOCS_REVISION=<that ref> pnpm docs:build
   ```
 
-  then replaces `site/docspace/ui-kit/` with `site-docs/` and commits. The Storybook build and the
-  pictures take about ten minutes on a GitHub runner; `pnpm docs` alone is seconds, and a run
-  without the two picture steps publishes the pages without pictures.
+  then replaces `site/docspace/ui-kit/` with `site-docs/` and commits. `docs:build` builds the
+  Storybook, installs Chromium (with its system libraries when `CI` is set) and takes the
+  pictures before the pages; about ten minutes on a GitHub runner.
 
 A new category or page here changes nothing on the site: the sidebar module carries the tree.
 

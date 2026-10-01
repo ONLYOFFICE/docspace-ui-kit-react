@@ -173,10 +173,11 @@ pnpm sync-locales
 # gitignored site-docs/. docs:check also compiles every page as MDX (CI runs it);
 # docs:sync copies the result into ../api.onlyoffice.com (API_SITE_ROOT).
 # See docs-generation.md.
-pnpm docs
+pnpm docs:build         # Storybook, Chromium if missing, pictures, pages -- the site's one command
+pnpm docs:sync          # docs:build, then copy into the site checkout
+pnpm docs               # pages only, seconds, no browser (what CI checks)
 pnpm docs:check
-pnpm docs:screenshots   # needs storybook-static and Playwright's Chromium
-pnpm docs:sync
+pnpm docs:screenshots
 ```
 
 ## Working with DocSpace
