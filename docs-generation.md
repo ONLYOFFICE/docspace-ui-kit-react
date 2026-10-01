@@ -29,6 +29,19 @@ CI runs `pnpm docs:check` in the lint job.
 
 `node scripts/docs/index.mjs --include-internal` publishes the portal-internal components too.
 
+## Publishing
+
+As for the SDK, publishing is the site team's step, not this repository's. `api.onlyoffice.com`
+carries a `ReBuild docspace-ui-kit` workflow (`.github/workflows/rebuild-docspace-ui-kit.yaml`
+there) that checks out this repository at a given ref, builds the static Storybook, takes the
+component pictures, runs `pnpm docs` with `DOCS_REVISION` set to that ref, and commits
+`site-docs/` into `site/docspace/ui-kit/` of the site branch it was run on. The sidebar,
+navbar entry and DocSpace landing card are wired once in the site's `sidebars.ts`,
+`docusaurus.config.ts` and `src/sections.ts`; a new category here needs no change there.
+
+Contributors here only need `pnpm docs:check` to pass, which CI runs. `pnpm docs:sync` is for
+checking the result in a local site checkout before handing it over; it is not a deploy.
+
 ## What is published
 
 - **Every README with a `ui-kit-doc` metadata block** under `components/` and `providers/`
