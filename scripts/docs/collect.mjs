@@ -231,6 +231,15 @@ export const collect = (root, { warn }) => {
   // group those stories sit in, and becomes that category's page.
   for (const [folder, readme] of readmeByFolder) {
     if (usedReadmes.has(readme.source)) continue;
+    const shadowedBy = stories.find(
+      (story) => story.dir === folder && docsFor.has(story.file),
+    );
+    if (shadowedBy) {
+      warn(
+        `${readme.source}: not published, ${docsFor.get(shadowedBy.file).file} is the docs page of ${shadowedBy.file}`,
+      );
+      continue;
+    }
     const below = stories.filter(
       (story) =>
         story.dir.startsWith(`${folder}/`) && !skippedRoot(story.title),
@@ -265,22 +274,30 @@ export const collect = (root, { warn }) => {
   const roots = [...categories.values()].filter((c) => !parentOf(c.key));
   const result = orderTree(roots, order);
 
+  // Extra pages take their place in the ordered level: `sequence` is what
+  // the sidebar and the overview table read, `pages` what gets written.
   for (const extra of EXTRA_PAGES) {
     const category = categories.get(extra.group);
     if (!category) {
       warn(`${extra.source}: category "${extra.group}" is not published`);
       continue;
     }
-    const after = category.pages.findIndex((p) => p.label === extra.after);
+    const after = category.sequence.findIndex(
+      ({ type, item }) => type === "page" && item.label === extra.after,
+    );
     if (after === -1)
       warn(`${extra.source}: no page "${extra.after}" to follow`);
-    category.pages.splice(after + 1, 0, {
+    const page = {
       kind: "markdown",
       source: extra.source,
       label: extra.label,
       slug: slugify(extra.label),
       order: "",
-    });
+    };
+    category.sequence.splice(after + 1, 0, { type: "page", item: page });
+    category.pages = category.sequence
+      .filter(({ type }) => type === "page")
+      .map(({ item }) => item);
   }
 
   for (const category of categories.values()) {

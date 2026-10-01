@@ -1,6 +1,7 @@
-// `pnpm run docs`: the API-site pages for api.onlyoffice.com, built from the
-// component READMEs and the Storybook "Getting started" pages and laid out in
-// the Storybook tree. See docs-generation.md.
+// `pnpm run docs`: the API-site pages for api.onlyoffice.com -- one per
+// Storybook docs entry, in Storybook's tree and order, from the component
+// READMEs, the MDX pages and the CSF files, with the pictures and args tables
+// `pnpm docs:screenshots` took placed where they belong. See docs-generation.md.
 //
 //   node scripts/docs/index.mjs [--strict] [--check]
 //
@@ -79,22 +80,23 @@ for (const category of everyCategory) {
 const files = new Map();
 /** @type {Map<string, string>} output path -> source file, copied as is */
 const copies = new Map();
-let pictured = 0;
-let unpictured = 0;
+let placed = 0;
+let missing = 0;
 
 /**
- * The pictures `pnpm docs:screenshots` took for a page, by shot name, each
- * queued for copying beside the page. Shots not taken are counted.
+ * What `pnpm docs:screenshots` took for a page, by shot name: pictures,
+ * each queued for copying beside the page, and the args table's rows.
+ * Shots not taken are counted.
  */
 const picturesOf = (category, page) => {
   const pictures = new Map();
   for (const shot of shotsOf(page)) {
     const sources = pictureFiles(ROOT, category, page, shot.name);
     if (!sources.every((file) => fs.existsSync(file))) {
-      unpictured += 1;
+      missing += 1;
       continue;
     }
-    pictured += 1;
+    placed += 1;
     if (shot.kind === "controls") {
       pictures.set("args-table", {
         rows: JSON.parse(fs.readFileSync(sources[0], "utf8")),
@@ -174,10 +176,10 @@ for (const [file, content] of files) {
 for (const [file, source] of copies) {
   fs.copyFileSync(source, path.join(outDir, file));
 }
-if (pictured + unpictured > 0) {
+if (placed + missing > 0) {
   console.log(
-    `${pictured} picture(s) placed, ${unpictured} not taken` +
-      (unpictured > 0 ? ` (pnpm docs:screenshots takes them).` : "."),
+    `${placed} shot(s) placed, ${missing} not taken` +
+      (missing > 0 ? ` (pnpm docs:screenshots takes them).` : "."),
   );
 }
 

@@ -327,8 +327,6 @@ const syncDiagram = (root) => {
   const figure = elements(source).find(
     (el) =>
       ts.isJsxElement(el) &&
-      el.parent &&
-      ts.isArrowFunction(el.parent.parent?.parent ?? el.parent) === false &&
       styleOf(el) === "figure" &&
       elements(el).some((child) => styleOf(child) === "sync"),
   );

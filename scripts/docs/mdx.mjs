@@ -100,11 +100,24 @@ export const parseMdx = (text) => {
       expressions[attr[1]] = attr[2];
     }
 
+    // What sits between the tags of an element that is not self-closing:
+    // `<div>text</div>` keeps its text on the page, `<img />` has none.
+    const inner = /^<[^>]*?(?<!\/)>([\s\S]*)<\/[\w.]+>\s*$/.exec(source)?.[1];
+    const children = inner === undefined ? undefined : inner.trim();
+
     if (tag === "Meta") {
       metaOf = of;
       metaTitle = attrs.title;
     }
-    blocks.push({ tag, of, attrs, expressions, start: index, end: last });
+    blocks.push({
+      tag,
+      of,
+      attrs,
+      expressions,
+      children,
+      start: index,
+      end: last,
+    });
     index = last;
   }
 

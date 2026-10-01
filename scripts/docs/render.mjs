@@ -232,9 +232,12 @@ export const wrapApiTables = (text) => {
     let end = index + 2;
     while (end < lines.length && /^\|/.test(lines[end].text)) end += 1;
     // The row id the component derives: the first cell's first child's
-    // text -- a code span's content, a link's text, or the plain text.
+    // text -- a code span's content, a link's text, or the plain text. A
+    // cell that opens with an image or an HTML element has no text there,
+    // and the component throws at site build, so the table stays plain.
     const ids = lines.slice(index + 2, end).map(({ text: row }) => {
       const cell = /^\|\s*((?:\\\||[^|])*?)\s*\|/.exec(row)?.[1] ?? "";
+      if (/^(!\[|<)/.test(cell)) return "";
       const code = /^`([^`]+)`/.exec(cell)?.[1];
       const link = /^\[`?([^`\]]+)`?\]/.exec(cell)?.[1];
       return code ?? link ?? cell.replace(/[`*_]/g, "").trim();
@@ -440,7 +443,12 @@ export const renderMdx = (raw, context) => {
           );
         }
       }
-      kept.push(`<${block.tag} ${attrs.join(" ")} />`);
+      const open = `<${block.tag}${attrs.length ? ` ${attrs.join(" ")}` : ""}`;
+      kept.push(
+        block.children
+          ? `${open}>${block.children}</${block.tag}>`
+          : `${open} />`,
+      );
       continue;
     }
     if (block.tag in BLOCK_RENDERERS) {

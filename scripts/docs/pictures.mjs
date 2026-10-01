@@ -19,15 +19,24 @@ export const THEMES = ["light", "dark"];
 /** A story tagged this in its CSF is listed but not photographed. */
 export const NO_PICTURE_TAG = "no-picture";
 
+/**
+ * Shot names that are not a story's: `primary` is the page's opening story
+ * and `args-table` its args table. A story export that keys to one of them
+ * (`export const Primary`) is named `<key>-story` instead.
+ */
+const RESERVED = new Set(["primary", "args-table"]);
+
 /** `WithIcon` -> `with-icon`, the way Storybook keys the story. */
-export const storyKey = (exportName) =>
-  storyId(storyNameFromExport(exportName));
+export const storyKey = (exportName) => {
+  const key = storyId(storyNameFromExport(exportName));
+  return RESERVED.has(key) ? `${key}-story` : key;
+};
 
 /**
  * The shots a page needs, in page order. `kind` is `story` (with
  * `exportName`, or `primary: true` for the one the page opens with),
  * `block` (with `index` among the page's custom elements) or `controls`
- * (named `args-table`, a name no story export can take).
+ * (named `args-table`, which storyKey keeps no story export from taking).
  */
 export const shotsOf = (page) => {
   const shots = [];

@@ -115,16 +115,25 @@ canvas, into `site-screenshots/<category>/<page>--<name>-{light,dark}.png`:
   (`tags: ["picture"]`), else the file's first. A component that opens from a trigger has a
   recipe in `PICTURE_RECIPES` (`scripts/docs/config.mjs`): the gesture that opens it, and what to
   hide so only the component is in the picture.
-- one per story, named after the story (`with-icon`), for the Stories section;
+- one per story, named after the story (`with-icon`), for the Stories section. A story tagged
+  `no-picture` is listed without one -- for a story that paints a page of its own in both
+  themes, as `FieldContainer`'s `CustomStyling` does. An export whose key would be `primary` or
+  `args-table` is named `<key>-story`.
 - `block<n>` -- the n-th React element of an MDX page, photographed on the Docs page itself:
-  the access matrices, the infographics, the Welcome hero, a `<Controls />`;
-- `controls` -- the args table of an `autodocs` page.
+  the infographics and anything `scripts/docs/blocks.mjs` has no text rendering for;
+- `args-table` -- the args table of an `autodocs` page, or a `<Controls />` block, read off the
+  Docs page as rows into one JSON file rather than photographed, so the site shows a table.
+
+A page listed in `MDX_PAGES` with `pictures: false` gets none of these: the Document Editor
+wrapper and the TranslationProvider photograph as nothing a reader learns from.
 
 Stories are opened with `globals=canvas:transparent`, a global `.storybook/preview.tsx` declares
 to drop the white or black page the decorator otherwise paints; the picture is the union of
 everything that paints anywhere in the body, so what a portal renders is in it too, with an 8px
-margin, clamped to the viewport, taken at 2x and shown at 1x. A block is photographed as the
-element Storybook rendered, matched to the MDX by position among the page's non-Markdown blocks.
+margin, clamped to the viewport, taken at 2x and shown at 1x. The demo-data banner and the
+dashed story frames (`STORY_CHROME`, matched by CSS-module class prefix) are hidden first: they
+are scenery, not the component. A block is photographed as the element Storybook rendered,
+matched to the MDX by position among the page's non-Markdown blocks.
 
 `pnpm run docs` copies the pictures beside the pages and puts a Docusaurus `<ThemedImage>` where
 each belongs, so the reader sees the theme they are in. A picture not taken leaves no trace on

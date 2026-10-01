@@ -35,6 +35,17 @@ const stringOf = (node) =>
     ? node.text
     : undefined;
 
+/** The default export's object literal, followed through `export default meta`. */
+const csfMeta = (source) => {
+  const exported = source.statements.find(
+    (s) => ts.isExportAssignment(s) && !s.isExportEquals,
+  );
+  let meta = exported && unwrap(exported.expression);
+  if (meta && ts.isIdentifier(meta))
+    meta = unwrap(findVariable(source, meta.text));
+  return meta;
+};
+
 const findVariable = (source, name) => {
   let found;
   const visit = (node) => {
@@ -62,13 +73,7 @@ export const csfDescription = (text, fileName = "story.tsx") => {
     false,
     ts.ScriptKind.TSX,
   );
-  const exported = source.statements.find(
-    (s) => ts.isExportAssignment(s) && !s.isExportEquals,
-  );
-  let meta = exported && unwrap(exported.expression);
-  if (meta && ts.isIdentifier(meta))
-    meta = unwrap(findVariable(source, meta.text));
-  return stringProperty(meta, [
+  return stringProperty(csfMeta(source), [
     "parameters",
     "docs",
     "description",
@@ -293,9 +298,10 @@ const stringProperty = (object, keys) => {
 };
 
 /**
- * The stories a CSF file exports, in order: `{ exportName, description }`,
- * the description being `parameters.docs.description.story` when it is a
- * string literal. Storybook's own `excludeStories` is not honoured.
+ * The stories a CSF file exports, in order: `{ exportName, description,
+ * tags }`, the description being `parameters.docs.description.story` when
+ * it is a string literal. An export the meta's `excludeStories` names -- as
+ * a string or a regex literal -- is not a story, as in Storybook.
  */
 export const csfStories = (text, fileName = "story.tsx") => {
   const source = ts.createSourceFile(
@@ -305,6 +311,7 @@ export const csfStories = (text, fileName = "story.tsx") => {
     false,
     ts.ScriptKind.TSX,
   );
+  const excluded = excludeStories(csfMeta(source));
   const stories = [];
   for (const statement of source.statements) {
     if (
@@ -315,6 +322,7 @@ export const csfStories = (text, fileName = "story.tsx") => {
     }
     for (const declaration of statement.declarationList.declarations) {
       if (!ts.isIdentifier(declaration.name)) continue;
+      if (excluded(declaration.name.text)) continue;
       const init = unwrap(declaration.initializer);
       const tags = unwrap(
         init &&
@@ -342,4 +350,33 @@ export const csfStories = (text, fileName = "story.tsx") => {
     }
   }
   return stories;
+};
+
+/** A predicate over export names from the meta's `excludeStories`, if any. */
+const excludeStories = (meta) => {
+  const property =
+    meta &&
+    ts.isObjectLiteralExpression(meta) &&
+    meta.properties.find(
+      (p) =>
+        ts.isPropertyAssignment(p) &&
+        (ts.isIdentifier(p.name) || ts.isStringLiteral(p.name)) &&
+        p.name.text === "excludeStories",
+    );
+  const value = property && unwrap(property.initializer);
+  if (!value) return () => false;
+  const matchers = (
+    ts.isArrayLiteralExpression(value) ? value.elements : [value]
+  ).map((element) => {
+    const node = unwrap(element);
+    if (ts.isRegularExpressionLiteral(node)) {
+      const [, pattern, flags] = /^\/(.*)\/([a-z]*)$/.exec(node.text);
+      return new RegExp(pattern, flags);
+    }
+    return stringOf(node);
+  });
+  return (name) =>
+    matchers.some((m) =>
+      m instanceof RegExp ? m.test(name) : m !== undefined && m === name,
+    );
 };

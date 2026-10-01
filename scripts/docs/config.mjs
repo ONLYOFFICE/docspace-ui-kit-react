@@ -80,7 +80,7 @@ export const storybookUrl = () =>
 
 /**
  * Where the Storybook tree is read from: the directories `.storybook/main.ts`
- * globs, minus the ones that hold nothing but samples.
+ * globs. Whole sections are left out by title, in SKIPPED_ROOTS.
  */
 export const STORY_DIRS = [
   "docs",

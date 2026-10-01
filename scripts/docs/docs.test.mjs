@@ -9,6 +9,7 @@ import { compile } from "@mdx-js/mdx";
 import remarkGfm from "remark-gfm";
 import { describe, expect, it } from "vitest";
 
+import { collect } from "./collect.mjs";
 import {
   escapeForMdx,
   firstParagraph,
@@ -23,6 +24,7 @@ import {
   renderMdx,
   renderReadme,
   reshapePropsTables,
+  THEMED_IMAGE_IMPORT,
   wrapApiTables,
 } from "./render.mjs";
 import { sidebarItems } from "./sidebar.mjs";
@@ -229,13 +231,15 @@ describe("wrapApiTables", () => {
     );
 
   it("wraps every table whose rows can be named, and skips one that cannot", () => {
-    const input = `## Props\n\n${table("id")}\n\n| Variable | Default |\n| --- | --- |\n| \`--x\` | 1 |\n\n| A | B |\n| --- | --- |\n|  | empty first cell |`;
+    const input = `## Props\n\n${table("id")}\n\n| Variable | Default |\n| --- | --- |\n| \`--x\` | 1 |\n\n| A | B |\n| --- | --- |\n|  | empty first cell |\n\n| Icon | Name |\n| --- | --- |\n| ![x](x.png) | image first |\n\n| C | D |\n| --- | --- |\n| <br />text | element first |`;
     const { text, wrapped } = wrapApiTables(input);
     expect(wrapped).toBe(true);
     expect(text.match(/<APITable/g)).toHaveLength(2);
     expect(text).toContain("<APITable>\n\n| Prop");
     expect(text).toContain("<APITable>\n\n| Variable");
     expect(text).toContain("| --- | --- |\n|  | empty first cell |");
+    expect(text).toContain("| --- | --- |\n| ![x](x.png) | image first |");
+    expect(text).toContain("| --- | --- |\n| <br />text | element first |");
   });
 
   it("names the tables when their row ids collide", () => {
@@ -411,7 +415,7 @@ describe("pictures", () => {
       storyId: () => "x",
       warn: () => {},
     });
-    expect(out).toContain("import ThemedImage from '@theme/ThemedImage';");
+    expect(out).toContain(THEMED_IMAGE_IMPORT);
     expect(out).toContain(
       "Intro.\n\n<ThemedImage alt=\"Button\" width={117} sources={{ light: require('./button-light.png').default, dark: require('./button-dark.png').default }} />\n\n## Props",
     );
@@ -436,6 +440,46 @@ export const WithIcon = {
     expect(csfStories(text)).toEqual([
       { exportName: "Default", description: undefined, tags: [] },
       { exportName: "WithIcon", description: "Has an icon.", tags: [] },
+    ]);
+  });
+
+  it("leaves out the exports the meta's excludeStories names", () => {
+    const text = `const meta = {
+  title: "UI/X/Y",
+  excludeStories: ["sampleData", /^Helper/],
+};
+export default meta;
+export const sampleData = [1, 2];
+export const HelperOne = () => null;
+export const Default = { args: {} };`;
+    expect(csfStories(text).map((s) => s.exportName)).toEqual(["Default"]);
+    expect(
+      csfStories(
+        `export default { excludeStories: /Data$/ };
+export const rowData = [];
+export const Default = {};`,
+      ).map((s) => s.exportName),
+    ).toEqual(["Default"]);
+  });
+
+  it("keeps a story's shot name off the reserved ones", () => {
+    expect(storyKey("Primary")).toBe("primary-story");
+    expect(storyKey("ArgsTable")).toBe("args-table-story");
+    expect(
+      shotsOf({
+        kind: "readme",
+        stories: [{ exportName: "Default" }, { exportName: "Primary" }],
+      }).map((s) => s.name),
+    ).toEqual(["primary", "default", "primary-story"]);
+  });
+
+  it("keeps what an HTML element holds between its tags", () => {
+    const page = parseMdx(
+      '<div className={styles.x}>\n  Some <b>text</b>\n</div>\n\n<img src={pic} alt="a" />',
+    );
+    expect(page.blocks.map((b) => b.children)).toEqual([
+      "Some <b>text</b>",
+      undefined,
     ]);
   });
 
@@ -484,5 +528,88 @@ export const WithIcon = {
         (s) => s.name,
       ),
     ).toEqual(["primary", "args-table", "default"]);
+  });
+});
+
+describe("collect", () => {
+  const fixture = () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "ui-kit-collect-"));
+    const write = (file, text) => {
+      fs.mkdirSync(path.join(root, path.dirname(file)), { recursive: true });
+      fs.writeFileSync(path.join(root, file), text);
+    };
+    write(
+      ".storybook/preview.tsx",
+      `export default { parameters: { options: { storySort: { order: [
+        "Getting started", ["Welcome", "Structure"], "UI", ["Form controls"],
+      ] } } } };`,
+    );
+    write("docs/welcome.mdx", '<Meta title="Getting started/Welcome" />\n');
+    write("docs/structure.mdx", '<Meta title="Getting started/Structure" />');
+    write("docs/getting-started.md", "# Installation\n");
+    write(
+      "components/button/Button.stories.tsx",
+      'export default { title: "UI/Form controls/Button" };\nexport const Default = {};',
+    );
+    write(
+      "components/button/README.md",
+      '<!-- ui-kit-doc { "summary": "A button." } -->\n\n# Button\n',
+    );
+    write(
+      "components/button/Button.docs.mdx",
+      'import * as S from "./Button.stories";\n\n<Meta of={S} />\n',
+    );
+    write(
+      "components/navigation/Navigation.stories.tsx",
+      'export default { title: "UI/Navigation/Navigation" };\nexport const Default = {};',
+    );
+    write(
+      "components/text-input/TextInput.stories.tsx",
+      'export default { title: "UI/Form controls/TextInput" };\nexport const Default = {};',
+    );
+    write(
+      "components/text-input/README.md",
+      '<!-- ui-kit-doc { "summary": "An input." } -->\n\n# TextInput\n',
+    );
+    return root;
+  };
+
+  it("orders categories and pages as Storybook does, extra pages included", () => {
+    const warnings = [];
+    const { categories } = collect(fixture(), {
+      warn: (message) => warnings.push(message),
+    });
+    expect(warnings).toEqual([
+      "components/button/README.md: not published, components/button/Button.docs.mdx is the docs page of components/button/Button.stories.tsx",
+    ]);
+    expect(categories.map((c) => c.label)).toEqual(["Getting started", "UI"]);
+
+    const [started, ui] = categories;
+    const labels = (category) =>
+      category.sequence.map(({ type, item }) => `${type}:${item.label}`);
+    expect(labels(started)).toEqual([
+      "page:Welcome",
+      "page:Installation",
+      "page:Structure",
+    ]);
+    expect(started.pages.map((p) => `${p.kind}:${p.slug}`)).toEqual([
+      "mdx:welcome",
+      "markdown:installation",
+      "mdx:structure",
+    ]);
+
+    expect(labels(ui)).toEqual([
+      "category:Form controls",
+      "category:Navigation",
+    ]);
+    const [form, navigation] = ui.children;
+    expect(form.slug).toBe("ui/form-controls");
+    expect(form.pages.map((p) => `${p.kind}:${p.slug}:${p.source}`)).toEqual([
+      "docs:button:components/button/Button.docs.mdx",
+      "readme:text-input:components/text-input/README.md",
+    ]);
+    expect(navigation.pages.map((p) => `${p.kind}:${p.slug}`)).toEqual([
+      "autodocs:navigation-component",
+    ]);
   });
 });
