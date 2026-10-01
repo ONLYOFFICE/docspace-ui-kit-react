@@ -219,6 +219,14 @@ radius). The gap only shows with the main button.
 - Renders a plain text input; it sets no `role`, no `aria-label` and no `type="search"`, so a
   screen reader announces an unnamed text field. Label it yourself through the surrounding
   markup — the component accepts no `aria-*` props.
+- **It is not in the tab order unless you pass `tabIndex`.** The prop goes straight to
+  [`InputBlock`](../input-block/README.md), whose own default is `-1`, so a search box given no
+  `tabIndex` cannot be reached from the keyboard. Pass `tabIndex={0}`. The default was removed
+  from `TextInput`, `Textarea`, `Checkbox` and `ComboBox`; `InputBlock` kept it.
+- **`id` lands on two elements**, the wrapper `<div>` and the `<input>`, so a `FieldContainer`'s
+  `labelFor` resolves to the wrapper — the first match — and captions nothing. Until that is
+  fixed, the field cannot be named by a visible caption at all; with no `aria-*` props either,
+  the only way to name it is to set `aria-label` on the input element yourself.
 - The clear button is an icon button with no text; nothing gives it an accessible name.
 - Keyboard behaviour is the platform's own. Escape does not clear the field.
 
