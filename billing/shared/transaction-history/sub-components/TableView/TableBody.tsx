@@ -50,7 +50,12 @@ import {
   getServiceQuantity,
 } from "../../../../wallet/utils";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
-import { getTransactionSourceLabel, hasTransactionSource } from "../../utils";
+import {
+  getTransactionSourceLabel,
+  hasTransactionSource,
+  isAiServiceName,
+} from "../../utils";
+import { TokenUsageAnchor } from "../TokenUsage";
 
 interface TransactionRowProps {
   transaction: WalletOperationDto;
@@ -113,13 +118,18 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         </Text>
       </TableCell>
       <TableCell>
-        <Text fontWeight={600} fontSize="11px">
-          {getServiceQuantity(
-            t,
-            transaction.quantity ?? 0,
-            transaction.serviceUnit ?? undefined,
-          )}
-        </Text>
+        <TokenUsageAnchor
+          usage={isAiServiceName(serviceName) ? transaction.tokenUsage : null}
+        >
+          <Text fontWeight={600} fontSize="11px">
+            {getServiceQuantity(
+              t,
+              language,
+              transaction.quantity ?? 0,
+              transaction.serviceUnit ?? undefined,
+            )}
+          </Text>
+        </TokenUsageAnchor>
       </TableCell>
       <TableCell>
         <Text

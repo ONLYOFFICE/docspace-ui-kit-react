@@ -33,49 +33,32 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { observer } from "mobx-react";
+import { Tooltip, usePinnedTooltip } from "../../../../../../components/tooltip";
+import type { TGetTooltipContent } from "../../../../../../components/tooltip";
 
-import { RowContainer } from "../../../../../components/rows";
-import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
-import { useCommonTranslation } from "../../../../../utils/i18n";
-import { getServiceQuantity } from "../../../utils";
+import { TOKEN_USAGE_TOOLTIP_ID, parseTokenUsage } from "../../../utils";
 
-import UpcomingPaymentRow from "./RowBody";
+import { TokenUsageContent } from "./TokenUsageContent";
 
-const RowView = ({ sectionWidth }: { sectionWidth: number }) => {
-  const store = usePaymentStore();
-  const t = useCommonTranslation();
-  const { upcomingPayments, formatWalletCurrency, language } = store;
+const TOOLTIP_TEST_ID = "token_usage_tooltip";
+
+export const TokenUsageTooltip = () => {
+  const pinnedProps = usePinnedTooltip(TOKEN_USAGE_TOOLTIP_ID, TOOLTIP_TEST_ID);
+
+  const getContent = ({ content }: TGetTooltipContent) => {
+    const usage = parseTokenUsage(content);
+
+    return usage ? <TokenUsageContent usage={usage} /> : null;
+  };
 
   return (
-    <RowContainer
-      useReactWindow={false}
-      fetchMoreFiles={() => Promise.resolve()}
-      hasMoreFiles={false}
-      itemCount={upcomingPayments.length}
-      filesLength={upcomingPayments.length}
-      itemHeight={58}
-    >
-      {upcomingPayments.map((payment) => (
-        <UpcomingPaymentRow
-          key={payment.id}
-          sectionWidth={sectionWidth}
-          title={payment.title}
-          renewalDate={payment.renewalDate}
-          details={getServiceQuantity(
-            t,
-            language,
-            payment.quantity,
-            payment.unitOfMeasure,
-          )}
-          amount={formatWalletCurrency(payment.amount, 2)}
-          actionType={payment.actionType}
-          actionRoute={payment.actionRoute}
-        />
-      ))}
-    </RowContainer>
+    <Tooltip
+      id={TOKEN_USAGE_TOOLTIP_ID}
+      place="bottom"
+      maxWidth="320px"
+      getContent={getContent}
+      {...pinnedProps}
+      dataTestId={TOOLTIP_TEST_ID}
+    />
   );
 };
-
-export default observer(RowView);
-

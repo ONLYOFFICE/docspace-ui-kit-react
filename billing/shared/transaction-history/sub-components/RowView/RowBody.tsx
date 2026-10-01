@@ -50,7 +50,13 @@ import {
   getServiceQuantity,
 } from "../../../../wallet/utils";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
-import { getTransactionSourceLabel, hasTransactionSource } from "../../utils";
+import {
+  getTransactionSourceLabel,
+  hasTransactionSource,
+  isAiServiceName,
+} from "../../utils";
+import { TokenUsageAnchor } from "../TokenUsage";
+import tokenStyles from "../TokenUsage/TokenUsage.module.scss";
 
 type TransactionRowViewProps = {
   transaction: WalletOperationDto;
@@ -80,10 +86,14 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
   );
 
   const correctDate = getCorrectDate(language, date);
+  const usage = isAiServiceName(serviceName) ? transaction.tokenUsage : null;
 
   const getRowChildren = () => {
     const children = [
       <div key="description">
+        {usage ? (
+          <TokenUsageAnchor usage={usage} className={tokenStyles.rowIcon} />
+        ) : null}
         <Text
           fontWeight={600}
           fontSize="14px"
@@ -134,6 +144,7 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
         <Text key="quantity" fontWeight={600} fontSize="11px">
           {getServiceQuantity(
             t,
+            language,
             transaction.quantity ?? 0,
             transaction.serviceUnit ?? undefined,
           )}
