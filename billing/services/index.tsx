@@ -89,6 +89,7 @@ type TServicesProps = {
   getAIConfig?: () => Promise<void>;
   cardDisabled?: boolean;
   onOpenSupportedModels?: () => void;
+  onOpenWebSearch?: () => void;
   onDocsConnectClick?: () => void;
   onDocsConnectToggle?: () => void;
   docsConnectState?: TDocsConnectCardState;
@@ -101,6 +102,7 @@ const Services = observer(
     getAIConfig,
     cardDisabled,
     onOpenSupportedModels,
+    onOpenWebSearch,
     onDocsConnectClick,
     onDocsConnectToggle,
     docsConnectState,
@@ -399,6 +401,7 @@ const Services = observer(
           onToggle={onToggle}
           cardDisabled={cardDisabled}
           onOpenSupportedModels={onOpenSupportedModels}
+          onOpenWebSearch={onOpenWebSearch}
           docsConnectState={docsConnectState}
           onDocsConnectToggle={onDocsConnectToggle}
         />
