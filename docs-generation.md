@@ -31,16 +31,40 @@ CI runs `pnpm docs:check` in the lint job.
 
 ## Publishing
 
-As for the SDK, publishing is the site team's step, not this repository's. `api.onlyoffice.com`
-carries a `ReBuild docspace-ui-kit` workflow (`.github/workflows/rebuild-docspace-ui-kit.yaml`
-there) that checks out this repository at a given ref, builds the static Storybook, takes the
-component pictures, runs `pnpm docs` with `DOCS_REVISION` set to that ref, and commits
-`site-docs/` into `site/docspace/ui-kit/` of the site branch it was run on. The sidebar,
-navbar entry and DocSpace landing card are wired once in the site's `sidebars.ts`,
-`docusaurus.config.ts` and `src/sections.ts`; a new category here needs no change there.
+As for the SDK, publishing is the site team's step: this repository only has to make
+`pnpm docs:check` pass, which CI runs. `pnpm docs:sync` copies the output into a local checkout of
+the site for a look before handing over; it is not a deploy.
 
-Contributors here only need `pnpm docs:check` to pass, which CI runs. `pnpm docs:sync` is for
-checking the result in a local site checkout before handing it over; it is not a deploy.
+What the site needs, once:
+
+- a `docspaceUiKit` sidebar in `sidebars.ts` -- the root page, then the generated sidebar:
+
+  ```ts
+  docspaceUiKit: [
+    {type: "doc", id: "docspace/ui-kit/index"},
+    ...require('./site/docspace/ui-kit/ui-kit-sidebar.cjs'),
+  ],
+  ```
+
+- a `docSidebar` entry for it in the DocSpace navbar menu in `docusaurus.config.ts`, and a
+  section in `src/sections.ts` (which gives the DocSpace landing its card and `llms.txt` its
+  entry) with an icon in `src/features.tsx`;
+- a `ReBuild docspace-ui-kit` workflow shaped like `rebuild-docspace-js-sdk.yaml`, which checks
+  this repository out at a ref and, in it, runs
+
+  ```bash
+  pnpm install --frozen-lockfile
+  pnpm exec playwright install --with-deps chromium
+  pnpm storybook-build
+  pnpm docs:screenshots
+  DOCS_REVISION=<that ref> pnpm docs
+  ```
+
+  then replaces `site/docspace/ui-kit/` with `site-docs/` and commits. The Storybook build and the
+  pictures take about ten minutes on a GitHub runner; `pnpm docs` alone is seconds, and a run
+  without the two picture steps publishes the pages without pictures.
+
+A new category or page here changes nothing on the site: the sidebar module carries the tree.
 
 ## What is published
 
