@@ -85,8 +85,9 @@ Storybook's index has one docs entry per CSF file and one per MDX page. Each bec
 - **An MDX page of its own** (`<Meta title="…" />`: Getting started) -- the page, kind `mdx`.
 - `docs/getting-started.md`, as "Installation", because nine READMEs link to it (`EXTRA_PAGES`).
 
-Nothing is left out: portal-internal components and the samples are on the site because they
-are in Storybook.
+Portal-internal components are on the site because they are in Storybook. The one section left
+out is `Samples` (`SKIPPED_ROOTS`): the samples are applications run against a portal, and
+without one they photograph as demo screens; the Welcome hero drops its links to them.
 
 ## The tree and the order
 
@@ -174,8 +175,7 @@ site-docs/
 ├── ui-kit-sidebar.cjs        # items array for the site's sidebars.ts, nested as Storybook's
 ├── getting-started/          # index.md + welcome, installation, structure, …
 ├── components/               # index.md + the portal composites; selectors/, providers/, errors/
-├── ui/                       # index.md + form-controls/, overlays/, … one directory per group
-└── samples/                  # index.md + legal-practice/, a-small-files-app
+└── ui/                       # index.md + form-controls/, overlays/, … one directory per group
 ```
 
 Sidebar doc ids carry the `docspace/ui-kit` prefix, and every category links to its

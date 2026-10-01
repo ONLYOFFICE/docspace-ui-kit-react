@@ -63,31 +63,6 @@ export const SECTIONS = {
       "found, offline, unavailable, an expired link.",
     tableHeader: "Page",
   },
-  Samples: {
-    title: "Samples",
-    description:
-      "Applications built from the kit against a portal: a client cabinet for a law firm, " +
-      "held through a whole track of screens, and a small Files app.",
-    tableCaption: "The samples are:",
-    tableHeader: "Sample",
-  },
-  "Samples/Legal practice": {
-    description:
-      "A client cabinet for a law firm: one problem held through the whole track, each " +
-      "screen a question and the components that answer it.",
-    tableCaption: "The pages are:",
-    tableHeader: "Page",
-  },
-  "Samples/Legal practice/Screens": {
-    description: "The cabinet's screens, in the order a client meets them.",
-    tableCaption: "The screens are:",
-    tableHeader: "Screen",
-  },
-  "Samples/Legal practice/Setup": {
-    description: "What wires the cabinet to a portal, and who it signs in as.",
-    tableCaption: "The pages are:",
-    tableHeader: "Page",
-  },
   "Components/Providers": {
     description:
       "The providers an application mounts above the components. `ThemeProvider` and " +

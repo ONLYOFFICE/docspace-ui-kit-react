@@ -10,6 +10,15 @@ import fs from "node:fs";
 import path from "node:path";
 import * as ts from "typescript";
 
+import { SKIPPED_ROOTS } from "./config.mjs";
+import { storyId } from "./story-tree.mjs";
+
+/** A Storybook docs link into a section the site does not publish. */
+const unpublished = (href) =>
+  SKIPPED_ROOTS.some((root) =>
+    String(href ?? "").startsWith(`?path=/docs/${storyId(root)}-`),
+  );
+
 const unwrap = (node) => {
   let current = node;
   while (
@@ -208,11 +217,16 @@ const welcomePage = (root) => {
   const [samplesTitle, insideTitle] = byStyle("sectionTitle");
   const [samplesSubtitle, insideSubtitle] = byStyle("sectionSubtitle");
 
-  lines.push(`## ${samplesTitle}`, "", samplesSubtitle, "");
-  for (const tile of data.get("sampleTiles") ?? []) {
-    lines.push(`- [${tile.label}](${tile.href})`);
+  // The samples section goes with the samples when they are not published.
+  const tiles = (data.get("sampleTiles") ?? []).filter(
+    (tile) => !unpublished(tile.href),
+  );
+  if (tiles.length > 0) {
+    lines.push(`## ${samplesTitle}`, "", samplesSubtitle, "");
+    for (const tile of tiles) lines.push(`- [${tile.label}](${tile.href})`);
+    lines.push("");
   }
-  lines.push("", `## ${insideTitle}`, "", insideSubtitle, "");
+  lines.push(`## ${insideTitle}`, "", insideSubtitle, "");
   for (const mod of data.get("modules") ?? []) {
     lines.push(
       `### ${mod.title}`,
@@ -230,6 +244,7 @@ const welcomePage = (root) => {
     const { title, description } = attributesOf(card);
     lines.push(`## ${title}`, "", description, "");
     for (const ref of data.get("references") ?? []) {
+      if (unpublished(ref.href)) continue;
       lines.push(`- [${ref.name}](${ref.href})`);
     }
   }

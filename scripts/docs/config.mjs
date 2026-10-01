@@ -101,8 +101,12 @@ export const STORY_DIRS = [
  */
 export const STORY_ORDER_FILE = ".storybook/preview.tsx";
 
-/** Top-level Storybook sections not published; none, the site is a copy. */
-export const SKIPPED_ROOTS = [];
+/**
+ * Top-level Storybook sections not published. The samples are applications
+ * run against a portal; without one they photograph as demo screens, and
+ * their pages are the applications' own story, not the kit's reference.
+ */
+export const SKIPPED_ROOTS = ["Samples"];
 
 /** Browser contexts photographing at once. */
 export const SHOT_WORKERS = 4;
