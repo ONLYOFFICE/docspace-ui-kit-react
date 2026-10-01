@@ -5,47 +5,6 @@ import styles from "./Infographics.module.scss";
 // The pictures on the "Agent skills" page. Each one replaces a paragraph, so
 // every figure carries its own words for a screen reader.
 
-const SKILLS = [
-  {
-    name: "ui-kit",
-    mark: "UI",
-    where: "Your own React app",
-    does: "Screens built from this kit: forms, dialogs, lists, theming, review",
-    prompt: "A settings form in the ONLYOFFICE style",
-  },
-  {
-    name: "plugin-sdk",
-    mark: "PL",
-    where: "Inside the portal",
-    does: "Portal plugins: scaffold, scopes, items, a check against the loader",
-    prompt: "Add 'Convert to PDF' to the file context menu",
-  },
-  {
-    name: "embed-sdk",
-    mark: "EM",
-    where: "In your web page",
-    does: "ONLYOFFICE Apps in an iframe: modes, sign-in, events, the editor",
-    prompt: "Embed a room viewer on our intranet",
-  },
-];
-
-/** The three skills, side by side: where each one applies and a prompt that loads it. */
-export const SkillCards = () => (
-  <ul className={`sb-unstyled ${styles.cards}`} aria-label="The three skills">
-    {SKILLS.map((skill) => (
-      <li key={skill.name} className={styles.card}>
-        <span className={styles.mark} aria-hidden="true">
-          {skill.mark}
-        </span>
-        <code className={styles.cardName}>{skill.name}</code>
-        <span className={styles.where}>{skill.where}</span>
-        <span className={styles.does}>{skill.does}</span>
-        <span className={styles.prompt}>"{skill.prompt}"</span>
-      </li>
-    ))}
-  </ul>
-);
-
 const BENEFITS = [
   {
     title: "The right prop, first time",
