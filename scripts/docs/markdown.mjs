@@ -217,7 +217,7 @@ export const firstSentence = (paragraph) => {
   return paragraph;
 };
 
-/** `Form controls` → `form-controls`. */
+/** `Form controls` -> `form-controls`. */
 export const slugify = (text) =>
   text
     .toLowerCase()

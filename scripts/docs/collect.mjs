@@ -101,16 +101,11 @@ export const collect = (root, { includeInternal = false, statuses, warn }) => {
     return categories.get(key);
   };
 
-  /** READMEs that exist but are not published, for the link rewriter. */
-  const unpublished = new Set();
   const skippedRoot = (title) => SKIPPED_ROOTS.includes(title.split("/")[0]);
 
   for (const readme of readmes(root)) {
     if (!readme.meta) continue;
-    if (!published.has(readme.meta.status)) {
-      unpublished.add(readme.source);
-      continue;
-    }
+    if (!published.has(readme.meta.status)) continue;
 
     const own = stories.find(
       (story) => story.kind === "story" && story.dir === readme.folder,
@@ -286,7 +281,7 @@ export const collect = (root, { includeInternal = false, statuses, warn }) => {
     slugs.set(category.slug, category.key);
   }
 
-  return { categories: result, unpublished, storyId };
+  return { categories: result, storyId };
 };
 
 const sortPages = (category, childOrder = []) => {

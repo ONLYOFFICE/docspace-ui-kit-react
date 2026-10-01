@@ -88,7 +88,7 @@ export const csfTitle = (text, fileName = "story.tsx") => {
   return stringOf(title?.initializer) ?? null;
 };
 
-/** The `<Meta title="…">` of an MDX page, or `undefined` for `<Meta of={…}>`. */
+/** The `<Meta title="...">` of an MDX page, or `undefined` for `<Meta of={...}>`. */
 export const mdxTitle = (text) =>
   /<Meta\s+title=(?:"([^"]+)"|'([^']+)'|\{\s*["'`]([^"'`]+)["'`]\s*\})/
     .exec(text)
@@ -226,7 +226,7 @@ export const orderLevel = (names, order = []) => {
   return { ordered, children };
 };
 
-/** Storybook's id for a title: `UI/Form controls/Button` → `ui-form-controls-button`. */
+/** Storybook's id for a title: `UI/Form controls/Button` -> `ui-form-controls-button`. */
 export const storyId = (title) =>
   title
     .split("/")
