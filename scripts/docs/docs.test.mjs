@@ -346,7 +346,7 @@ describe("renderMdx", () => {
     root: process.cwd(),
     source,
     out: "getting-started/welcome.md",
-    page: { label: "Welcome", source, options: { drop: ["WelcomePage"] } },
+    page: { label: "Welcome", source, options: {} },
     pages: { bySource: new Map(), byStoryId: new Map() },
     revision: "master",
     warn: () => {},
@@ -359,7 +359,7 @@ describe("renderMdx", () => {
       "",
       '<Meta title="Getting started/Welcome" />',
       "",
-      "<WelcomePage />",
+      "<Hero />",
       "",
       "## Installation",
       "",
@@ -432,8 +432,8 @@ export const WithIcon = {
   parameters: { docs: { description: { story: "Has an icon." } } },
 };`;
     expect(csfStories(text)).toEqual([
-      { exportName: "Default", description: undefined },
-      { exportName: "WithIcon", description: "Has an icon." },
+      { exportName: "Default", description: undefined, tags: [] },
+      { exportName: "WithIcon", description: "Has an icon.", tags: [] },
     ]);
   });
 
@@ -481,6 +481,6 @@ export const WithIcon = {
       shotsOf({ kind: "autodocs", stories: [{ exportName: "Default" }] }).map(
         (s) => s.name,
       ),
-    ).toEqual(["primary", "controls", "default"]);
+    ).toEqual(["primary", "args-table", "default"]);
   });
 });

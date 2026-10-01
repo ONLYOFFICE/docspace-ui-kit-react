@@ -264,6 +264,33 @@ const storybookLine = (title) => {
     : null;
 };
 
+/**
+ * Storybook's args table as the three-column Props table the README pages
+ * carry: the optional marker outside the code span, the default closing the
+ * description.
+ */
+const controlsTable = (rows) =>
+  rows.length === 0
+    ? ""
+    : [
+        "| Property | Type | Description |",
+        "| --- | --- | --- |",
+        ...rows.map((row) => {
+          // Scraped from the page, so prose: escaped like any other.
+          const text = escapeForMdx(row.description ?? "");
+          const sentence = text && !/[.!?]$/.test(text) ? `${text}.` : text;
+          const description = [
+            sentence,
+            row.default ? `Default: \`${row.default}\`.` : "",
+          ]
+            .filter(Boolean)
+            .join(" ");
+          const type = row.type ? `\`${cell(row.type)}\`` : "";
+          const name = `\`${row.name}\`${row.required ? "" : "?"}`;
+          return `| ${name} | ${type} | ${cell(description)} |`;
+        }),
+      ].join("\n");
+
 /** The picture of a page's `name` shot, or nothing when it was not taken. */
 const pictureOf = (pictures, name, alt) =>
   pictures?.has(name) ? themedImage(alt, pictures.get(name)) : null;
@@ -350,11 +377,15 @@ export const renderAutodocs = (raw, context) => {
   if (page.description) parts.push(escapeForMdx(page.description), "");
   const primary = pictureOf(pictures, "primary", page.label);
   if (primary) parts.push(primary, "");
-  const controls = pictureOf(pictures, "controls", `${page.label} props`);
-  if (controls) parts.push("## Props", "", controls, "");
+  const controls = pictures?.get("args-table")?.rows;
+  if (controls?.length) parts.push("## Props", "", controlsTable(controls), "");
   const stories = storiesSection(page, pictures);
   if (stories) parts.push(stories, "");
   let text = parts.join("\n").trimEnd();
+  const tables = wrapApiTables(text);
+  text = tables.wrapped
+    ? addImport(tables.text, API_TABLE_IMPORT)
+    : tables.text;
   if (text.includes("<ThemedImage"))
     text = addImport(text, THEMED_IMAGE_IMPORT);
   return (
@@ -417,6 +448,10 @@ export const renderMdx = (raw, context) => {
         storyKey(exportName),
         storyNameFromExport(exportName),
       );
+    } else if (block.tag === "Controls") {
+      const rows = pictures?.get("args-table")?.rows;
+      if (rows?.length) kept.push(controlsTable(rows));
+      continue;
     } else {
       picture = pictureOf(pictures, `block${blockIndex}`, block.tag);
       blockIndex += 1;
@@ -433,12 +468,26 @@ export const renderMdx = (raw, context) => {
   // footer -- the package version and licence under Welcome. The site has a
   // footer of its own.
   text = text.replace(/\n---\n+(?:[^\n]+\n?)+$/, "").trimEnd();
+  // The other rules go too: Docusaurus draws them as a line across the
+  // page, between sections that have headings already.
+  text = splitLines(text)
+    .filter(
+      ({ text: line, code }) =>
+        code || !/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(line),
+    )
+    .map(({ text: line }) => line)
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n");
   text = rewriteLinks(text, linkResolver(context));
   // A page whose heading was part of the dropped component still needs one:
   // Docusaurus titles the page from its H1.
   if (!headings(text).some(({ depth }) => depth === 1)) {
     text = `# ${page.label}\n\n${text}`;
   }
+  const tables = wrapApiTables(text);
+  text = tables.wrapped
+    ? addImport(tables.text, API_TABLE_IMPORT)
+    : tables.text;
   if (text.includes("<ThemedImage"))
     text = addImport(text, THEMED_IMAGE_IMPORT);
 

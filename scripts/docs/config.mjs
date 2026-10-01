@@ -115,16 +115,28 @@ export const SHOT_WORKERS = 4;
 export const README_DIRS = ["components", "providers"];
 
 /**
- * Per-page overrides for the `<Meta title>` MDX pages, by Storybook title:
- * `summary` replaces the first sentence in the overview table when that
- * sentence is not one.
+ * Per-page overrides, by Storybook title. `summary` replaces the first
+ * sentence in the overview table when that sentence is not one;
+ * `pictures: false` leaves a page without pictures, for one whose stories
+ * show nothing a reader learns from -- the editor wrapper photographs as an
+ * empty frame.
  */
 export const MDX_PAGES = {
   "Getting started/Welcome": {
     summary:
       "What the kit is, how it is installed and the providers every application mounts.",
   },
+  "Components/Document Editor": { pictures: false },
+  "Components/Providers/TranslationProvider": { pictures: false },
 };
+
+/**
+ * Story wrappers that draw a frame around a story -- a dashed border, a
+ * padding -- which is scenery, not the component. Their CSS-module class
+ * names, matched by prefix in the built class (`_storyWrapper_92y89_1`), lose
+ * the frame in a picture.
+ */
+export const STORY_CHROME = ["storyWrapper"];
 
 /**
  * Plain Markdown pages outside the Storybook tree that README links point at,

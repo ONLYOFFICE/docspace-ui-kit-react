@@ -28,8 +28,14 @@ import {
   SHOTS_DIR,
   SHOT_SCALE,
   SHOT_WORKERS,
+  STORY_CHROME,
 } from "./config.mjs";
-import { pictureFiles, shotsOf, storyKey } from "./pictures.mjs";
+import {
+  NO_PICTURE_TAG,
+  pictureFiles,
+  shotsOf,
+  storyKey,
+} from "./pictures.mjs";
 import { storyId } from "./story-tree.mjs";
 
 const args = process.argv.slice(2);
@@ -60,7 +66,7 @@ const THEMES = {
  * About the site's reading column wide, so a full-width component fits the
  * page, and tall enough for a panel: the AI chat is 860px.
  */
-const VIEWPORT = { width: 800, height: 1000 };
+const VIEWPORT = { width: 1024, height: 1000 };
 /** Wider for a Docs page, whose tables and figures scroll in a narrow one. */
 const DOCS_VIEWPORT = { width: 1100, height: 800 };
 /** Transparent margin kept around the painted area. */
@@ -174,7 +180,11 @@ const newContext = async (browser, theme) => {
 // a story that reads no portal goes away: the picture is the component.
 const TRANSPARENT =
   "html, body, .sb-show-main, #storybook-docs, .sbdocs, .sbdocs-wrapper, .sbdocs-content { background: transparent !important; }" +
-  ' [data-testid="demo-banner"] { display: none !important; }';
+  ' [data-testid="demo-banner"] { display: none !important; }' +
+  STORY_CHROME.map(
+    (name) =>
+      ` [class*="_${name}_"] { border: none !important; padding: 0 !important; }`,
+  ).join("");
 
 /** A story in story view, cropped to what it paints. */
 const shootStory = async (page, base, id, recipe, file) => {
@@ -346,7 +356,8 @@ const shootBlock = async (page, base, docsId, index, file) => {
           (!tags.includes(el.tagName.toLowerCase()) ||
             el.classList.contains("sb-unstyled")) &&
           !el.classList.contains("sb-anchor") &&
-          !el.classList.contains("sb-story");
+          !el.classList.contains("sb-story") &&
+          el.querySelector(".docblock-argstable") === null;
         if (custom) seen += 1;
         if (seen === wanted) return i;
       }
@@ -361,15 +372,37 @@ const shootBlock = async (page, base, docsId, index, file) => {
   await block.screenshot({ path: file, omitBackground: true });
 };
 
-/** The args table of an autodocs page. */
-const shootControls = async (page, base, docsId, file) => {
+/**
+ * The args table of a Docs page, as data: one row per prop with its name,
+ * whether it is required, its description, its type and its default -- what
+ * Storybook derived from the component's types and the stories' argTypes.
+ */
+const readControls = async (page, base, docsId, file) => {
   await openDocs(page, base, docsId);
   const table = page.locator(".docblock-argstable").first();
   if ((await table.count()) === 0) {
     throw new Error("no args table on the Docs page");
   }
-  await table.scrollIntoViewIfNeeded();
-  await table.screenshot({ path: file, omitBackground: true });
+  const rows = await table.evaluate((el) =>
+    [...el.querySelectorAll("tbody tr")]
+      .map((tr) => [...tr.children])
+      .filter((cells) => cells.length >= 3)
+      .map(([name, description, fallback]) => {
+        const text = (node) =>
+          node?.textContent?.replace(/\s+/g, " ").trim() ?? "";
+        const parts = [...description.children];
+        return {
+          name: text(name).replace(/\*$/, ""),
+          required:
+            name.querySelector('[title="Required"]') !== null ||
+            /\*$/.test(text(name)),
+          description: parts.length > 1 ? text(parts[0]) : "",
+          type: text(parts.at(-1)),
+          default: text(fallback) === "-" ? "" : text(fallback),
+        };
+      }),
+  );
+  fs.writeFileSync(file, `${JSON.stringify(rows, null, 2)}\n`);
 };
 
 const { chromium } = await import("@playwright/test");
@@ -421,7 +454,8 @@ const jobsOf = ({ page, category }) => {
     let run;
     if (shot.kind === "story") {
       const entry = shot.primary
-        ? (stories.find((e) => e.tags?.includes(PICTURE_TAG)) ?? stories[0])
+        ? (stories.find((e) => e.tags?.includes(PICTURE_TAG)) ??
+          stories.find((e) => !e.tags?.includes(NO_PICTURE_TAG)))
         : stories.find(
             (e) =>
               e.id === `${storyId(page.title)}--${storyKey(shot.exportName)}`,
@@ -442,7 +476,7 @@ const jobsOf = ({ page, category }) => {
     } else if (shot.kind === "block") {
       run = (p, base, file) => shootBlock(p, base, docs.id, shot.index, file);
     } else {
-      run = (p, base, file) => shootControls(p, base, docs.id, file);
+      run = (p, base, file) => readControls(p, base, docs.id, file);
     }
     jobs.push({ run, page, shot, files });
   }
@@ -478,7 +512,10 @@ const worker = async () => {
     const job = queue.shift();
     fs.mkdirSync(path.dirname(job.files[0]), { recursive: true });
     try {
-      for (const [i, theme] of Object.values(THEMES).entries()) {
+      // The args table is data, read once; a picture is taken per theme.
+      const themes =
+        job.shot.kind === "controls" ? [THEMES.light] : Object.values(THEMES);
+      for (const [i, theme] of themes.entries()) {
         const context = await newContext(browser, theme);
         try {
           await job.run(await context.newPage(), served.url, job.files[i]);

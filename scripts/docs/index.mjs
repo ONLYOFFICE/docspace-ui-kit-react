@@ -94,11 +94,17 @@ const picturesOf = (category, page) => {
       unpictured += 1;
       continue;
     }
+    pictured += 1;
+    if (shot.kind === "controls") {
+      pictures.set("args-table", {
+        rows: JSON.parse(fs.readFileSync(sources[0], "utf8")),
+      });
+      continue;
+    }
     const names = pictureNames(page, shot.name);
     names.forEach((name, i) =>
       copies.set(`${category.slug}/${name}`, sources[i]),
     );
-    pictured += 1;
     pictures.set(shot.name, {
       light: names[0],
       dark: names[1],

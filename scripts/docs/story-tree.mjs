@@ -316,6 +316,16 @@ export const csfStories = (text, fileName = "story.tsx") => {
     for (const declaration of statement.declarationList.declarations) {
       if (!ts.isIdentifier(declaration.name)) continue;
       const init = unwrap(declaration.initializer);
+      const tags = unwrap(
+        init &&
+          ts.isObjectLiteralExpression(init) &&
+          init.properties.find(
+            (p) =>
+              ts.isPropertyAssignment(p) &&
+              ts.isIdentifier(p.name) &&
+              p.name.text === "tags",
+          )?.initializer,
+      );
       stories.push({
         exportName: declaration.name.text,
         description: stringProperty(init, [
@@ -324,6 +334,10 @@ export const csfStories = (text, fileName = "story.tsx") => {
           "description",
           "story",
         ]),
+        tags:
+          tags && ts.isArrayLiteralExpression(tags)
+            ? tags.elements.map((e) => stringOf(unwrap(e))).filter(Boolean)
+            : [],
       });
     }
   }

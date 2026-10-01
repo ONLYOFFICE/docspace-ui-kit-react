@@ -176,6 +176,7 @@ export const collect = (root, { warn }) => {
       title: story.title,
       storiesFile: story.file,
       stories: csfStories(read(story.file), story.file),
+      options: MDX_PAGES[story.title] ?? {},
     };
     let page;
     if (docs) {
