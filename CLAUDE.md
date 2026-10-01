@@ -168,9 +168,9 @@ pnpm tsc
 # (default ../../DocSpace/client) and fails loudly without it.
 pnpm sync-locales
 
-# API-site pages for api.onlyoffice.com (site/docspace/ui-kit): the component
-# READMEs and the Getting-started pages, laid out in the Storybook tree, into
-# gitignored site-docs/. docs:check also compiles every page as MDX (CI runs it);
+# API-site pages for api.onlyoffice.com (site/docspace/ui-kit): a copy of
+# Storybook -- one page per docs entry, in its tree, with stories and React
+# blocks as pictures -- into gitignored site-docs/. docs:check also compiles every page as MDX (CI runs it);
 # docs:sync copies the result into ../api.onlyoffice.com (API_SITE_ROOT).
 # See docs-generation.md.
 pnpm docs:build         # Storybook, Chromium if missing, pictures, pages -- the site's one command

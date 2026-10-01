@@ -5,6 +5,9 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { REPO_URL, storybookUrl } from "./config.mjs";
+import { parseMdx } from "./mdx.mjs";
+import { storyKey } from "./pictures.mjs";
+import { storyNameFromExport } from "./story-tree.mjs";
 import {
   cell,
   escapeForMdx,
@@ -260,6 +263,31 @@ const storybookLine = (title) => {
     : null;
 };
 
+/** The picture of a page's `name` shot, or nothing when it was not taken. */
+const pictureOf = (pictures, name, alt) =>
+  pictures?.has(name) ? themedImage(alt, pictures.get(name)) : null;
+
+/**
+ * Storybook's Stories block: every story of the page's CSF file, with its
+ * name, its `docs.description.story` and its picture.
+ */
+const storiesSection = (page, pictures) => {
+  const stories = page.stories ?? [];
+  if (stories.length === 0) return "";
+  const parts = ["## Stories", ""];
+  for (const story of stories) {
+    const name = storyNameFromExport(story.exportName);
+    parts.push(`### ${name}`, "");
+    if (story.description) parts.push(escapeForMdx(story.description), "");
+    const picture = pictureOf(pictures, storyKey(story.exportName), name);
+    if (picture) parts.push(picture, "");
+  }
+  return parts.join("\n").trimEnd();
+};
+
+/** The README's reference half starts here; Storybook puts the stories before it. */
+const REFERENCE_FROM = "\n## Minimal example";
+
 /** Inserts `line` after the first paragraph that follows the H1. */
 const afterIntro = (text, line) => {
   if (!line) return text;
@@ -274,7 +302,7 @@ const afterIntro = (text, line) => {
 
 /** A README, rewritten. */
 export const renderReadme = (raw, context) => {
-  const { page, picture, revision, storyId } = context;
+  const { page, pictures, revision, storyId } = context;
   let text = stripHtmlComments(raw).replace(GENERATED_NOTE, "").trim();
   text = rewriteLinks(text, linkResolver(context));
   text = escapeForMdx(text);
@@ -284,12 +312,21 @@ export const renderReadme = (raw, context) => {
     storybookLine(page.title ? `${storyId(page.title)}--docs` : null),
   );
   // Inserted after the link, so it lands first: right under the intro.
-  text = afterIntro(text, picture ? themedImage(page.label, picture) : null);
+  text = afterIntro(text, pictureOf(pictures, "primary", page.label));
+  const stories = storiesSection(page, pictures);
+  if (stories) {
+    const at = text.indexOf(REFERENCE_FROM);
+    text =
+      at === -1
+        ? `${text}\n\n${stories}`
+        : `${text.slice(0, at)}\n\n${stories}\n${text.slice(at)}`;
+  }
   const tables = wrapApiTables(text);
   text = tables.wrapped
     ? addImport(tables.text, API_TABLE_IMPORT)
     : tables.text;
-  if (picture) text = addImport(text, THEMED_IMAGE_IMPORT);
+  if (text.includes("<ThemedImage"))
+    text = addImport(text, THEMED_IMAGE_IMPORT);
 
   return (
     frontMatter({
@@ -301,35 +338,65 @@ export const renderReadme = (raw, context) => {
   );
 };
 
-/** A Storybook MDX page, with Storybook's own parts taken out. */
-export const renderMdx = (raw, context) => {
-  const { page, revision, warn } = context;
-  const drop = new Set(page.options?.drop ?? []);
-  const kept = [];
-  let inImport = false;
+/**
+ * The generated page of a CSF file with neither a README nor an MDX docs
+ * page: what Storybook's autodocs shows -- title, description, the primary
+ * story, the args table, the stories.
+ */
+export const renderAutodocs = (raw, context) => {
+  const { page, pictures, revision } = context;
+  const parts = [`# ${page.label}`, ""];
+  if (page.description) parts.push(escapeForMdx(page.description), "");
+  const primary = pictureOf(pictures, "primary", page.label);
+  if (primary) parts.push(primary, "");
+  const controls = pictureOf(pictures, "controls", `${page.label} props`);
+  if (controls) parts.push("## Props", "", controls, "");
+  const stories = storiesSection(page, pictures);
+  if (stories) parts.push(stories, "");
+  let text = parts.join("\n").trimEnd();
+  if (text.includes("<ThemedImage"))
+    text = addImport(text, THEMED_IMAGE_IMPORT);
+  return (
+    frontMatter({
+      description: page.description,
+      custom_edit_url: `${REPO_URL}/blob/${revision}/${page.source}`,
+    }) +
+    text +
+    "\n"
+  );
+};
 
-  for (const { text: line, code } of splitLines(raw)) {
-    if (code) {
-      kept.push(line);
-      continue;
-    }
-    if (inImport) {
-      if (/;\s*$/.test(line) || /\bfrom\s+["']/.test(line)) inImport = false;
-      continue;
-    }
-    if (/^import\s/.test(line)) {
-      inImport = !/;\s*$/.test(line) && !/\bfrom\s+["']/.test(line);
-      continue;
-    }
-    const element = /^<([A-Z][\w.]*)[\s/>]/.exec(line);
-    if (element) {
-      if (element[1] === "Meta" || drop.has(element[1])) continue;
-      warn(
-        `${page.source}: <${element[1]}> is a Storybook component the site cannot render`,
+/**
+ * A Storybook MDX page -- a docs page of a CSF file or a page of its own --
+ * with every React element replaced by its picture: a story by the story's,
+ * anything else by the element's as the Docs page renders it.
+ */
+export const renderMdx = (raw, context) => {
+  const { page, pictures, revision } = context;
+  const { blocks, lines } = parseMdx(raw);
+  const kept = [];
+  let blockIndex = 0;
+  let cursor = 0;
+
+  for (const block of blocks) {
+    for (; cursor < block.start; cursor += 1) kept.push(lines[cursor].text);
+    cursor = block.end + 1;
+    if (block.tag === "import" || block.tag === "Meta") continue;
+    let picture;
+    if (block.tag === "Story" && block.of) {
+      const exportName = block.of.split(".").at(-1);
+      picture = pictureOf(
+        pictures,
+        storyKey(exportName),
+        storyNameFromExport(exportName),
       );
+    } else {
+      picture = pictureOf(pictures, `block${blockIndex}`, block.tag);
+      blockIndex += 1;
     }
-    kept.push(line);
+    if (picture) kept.push(picture);
   }
+  for (; cursor < lines.length; cursor += 1) kept.push(lines[cursor].text);
 
   let text = kept
     .join("\n")
@@ -345,6 +412,8 @@ export const renderMdx = (raw, context) => {
   if (!headings(text).some(({ depth }) => depth === 1)) {
     text = `# ${page.label}\n\n${text}`;
   }
+  if (text.includes("<ThemedImage"))
+    text = addImport(text, THEMED_IMAGE_IMPORT);
 
   return (
     frontMatter({
@@ -374,9 +443,12 @@ export const renderMarkdown = (raw, context) => {
 export const summaryOf = (page, raw) =>
   page.meta?.summary ??
   page.options?.summary ??
-  firstSentence(
-    firstParagraph(stripHtmlComments(raw).replace(/^import .*$/gm, "")),
-  );
+  page.description ??
+  (page.kind === "autodocs"
+    ? ""
+    : firstSentence(
+        firstParagraph(stripHtmlComments(raw).replace(/^import .*$/gm, "")),
+      ));
 
 const overviewTable = (caption, header, rows, { code = true } = {}) =>
   [

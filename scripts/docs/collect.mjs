@@ -1,6 +1,6 @@
-// Decides what is published and where: which README or MDX page becomes a
-// page, which Storybook group it sits in, and in what order. Nothing here
-// reads or writes page content beyond the metadata block and the titles.
+// Decides what is published and where: one page per Storybook docs entry,
+// in Storybook's tree and order. Nothing here reads or writes page content
+// beyond the metadata block, the titles and the story lists.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -16,8 +16,11 @@ import {
   STORY_ORDER_FILE,
 } from "./config.mjs";
 import { slugify } from "./markdown.mjs";
+import { parseMdx } from "./mdx.mjs";
 import {
   collectStories,
+  csfDescription,
+  csfStories,
   orderLevel,
   readStoryOrder,
   storyId,
@@ -27,14 +30,21 @@ const SKIP_DIRS = new Set(["node_modules", "dist"]);
 
 /**
  * @typedef {Object} Page
- * @property {"readme" | "mdx" | "markdown"} kind
- * @property {string} source   POSIX path of the source file
- * @property {string} label    sidebar label (the Storybook leaf name)
- * @property {string} slug     file name on the site, without `.md`
- * @property {string} order    the story file whose position orders the page
- * @property {string} [title]  Storybook title, for the Storybook link
- * @property {Object} [meta]   README metadata block
- * @property {Object} [options] MDX_PAGES entry
+ * @property {"readme" | "docs" | "autodocs" | "mdx" | "markdown"} kind
+ *   readme: a component's README, Storybook's autodocs page for it;
+ *   docs: an MDX page with `<Meta of>`, Storybook's docs page for a CSF file;
+ *   autodocs: a CSF file with neither, Storybook's generated page;
+ *   mdx: an MDX page with `<Meta title>`; markdown: a plain file (EXTRA_PAGES)
+ * @property {string} source       POSIX path of the page's source file
+ * @property {string} label        sidebar label (the Storybook leaf name)
+ * @property {string} slug         file name on the site, without `.md`
+ * @property {string} order        the file whose position orders the page
+ * @property {string} [title]      Storybook title
+ * @property {string} [storiesFile] the CSF file the page's stories come from
+ * @property {Array} [stories]     csfStories() of that file
+ * @property {Array} [blocks]      parseMdx() blocks of an MDX page
+ * @property {Object} [meta]       README metadata block
+ * @property {Object} [options]    MDX_PAGES entry
  *
  * @typedef {Object} Category
  * @property {string} key        Storybook path: "UI/Form controls", "UI"
@@ -47,7 +57,7 @@ const SKIP_DIRS = new Set(["node_modules", "dist"]);
  */
 
 const readmes = (root) => {
-  const found = [];
+  const found = new Map();
   for (const dir of README_DIRS) {
     const base = path.join(root, dir);
     if (!fs.existsSync(base)) continue;
@@ -58,7 +68,7 @@ const readmes = (root) => {
       if (entry.isDir || entry.name !== "README.md") continue;
       const source = toPosix(path.posix.join(dir, entry.id));
       const { meta } = parseMetadata(fs.readFileSync(entry.full, "utf8"));
-      found.push({ source, folder: path.posix.dirname(source), meta });
+      if (meta) found.set(path.posix.dirname(source), { source, meta });
     }
   }
   return found;
@@ -67,15 +77,27 @@ const readmes = (root) => {
 const parentOf = (title) => title.split("/").slice(0, -1).join("/");
 const leafOf = (title) => title.split("/").at(-1);
 
-export const collect = (root, { includeInternal = false, statuses, warn }) => {
-  const published = new Set(statuses);
-  if (includeInternal) published.add("portal-internal");
+/** `./Button.stories` from `components/button/Button.stories.tsx` -> that file. */
+const resolveModule = (root, fromFile, specifier) => {
+  if (!specifier.startsWith(".")) return undefined;
+  const base = path.posix.join(path.posix.dirname(fromFile), specifier);
+  for (const candidate of [
+    base,
+    ...[".tsx", ".ts", ".jsx", ".js", ".mdx"].map((ext) => base + ext),
+    ...[".tsx", ".ts", ".jsx", ".js"].map((ext) => `${base}/index${ext}`),
+  ]) {
+    const full = path.join(root, candidate);
+    if (fs.existsSync(full) && fs.statSync(full).isFile()) return candidate;
+  }
+  return undefined;
+};
 
-  const stories = collectStories(root, STORY_DIRS, warn);
-  const order = readStoryOrder(
-    fs.readFileSync(path.join(root, STORY_ORDER_FILE), "utf8"),
-    STORY_ORDER_FILE,
-  );
+export const collect = (root, { warn }) => {
+  const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+  const entries = collectStories(root, STORY_DIRS, warn);
+  const stories = entries.filter((e) => e.kind === "story");
+  const order = readStoryOrder(read(STORY_ORDER_FILE), STORY_ORDER_FILE);
+  const skippedRoot = (title) => SKIPPED_ROOTS.includes(title.split("/")[0]);
 
   // Where each group first appears in Storybook's index -- its first story,
   // published or not -- which is where the sidebar places it.
@@ -86,8 +108,6 @@ export const collect = (root, { includeInternal = false, statuses, warn }) => {
     }
   }
 
-  // The tree Storybook shows, built from the group of every published page:
-  // "UI/Form controls" makes "UI" and, under it, "Form controls".
   /** @type {Map<string, Category>} */
   const categories = new Map();
   const categoryFor = (key) => {
@@ -109,45 +129,110 @@ export const collect = (root, { includeInternal = false, statuses, warn }) => {
     return categories.get(key);
   };
 
-  const skippedRoot = (title) => SKIPPED_ROOTS.includes(title.split("/")[0]);
-
-  for (const readme of readmes(root)) {
-    if (!readme.meta) continue;
-    if (!published.has(readme.meta.status)) continue;
-
-    const own = stories.find(
-      (story) => story.kind === "story" && story.dir === readme.folder,
-    );
-
-    if (own) {
-      if (skippedRoot(own.title)) continue;
-      if (own.title.split("/").length < 2) {
-        warn(`${readme.source}: story title "${own.title}" has no group`);
+  // MDX pages: `<Meta of={X}>` makes the page the docs of X's CSF file;
+  // `<Meta title>` makes it a page of its own.
+  const docsFor = new Map();
+  const titled = [];
+  for (const entry of entries) {
+    if (entry.kind !== "mdx") continue;
+    const parsed = parseMdx(read(entry.file));
+    if (parsed.metaOf) {
+      const specifier = parsed.imports.get(parsed.metaOf.split(".")[0]);
+      const storiesFile =
+        specifier && resolveModule(root, entry.file, specifier);
+      if (!storiesFile) {
+        warn(`${entry.file}: <Meta of={${parsed.metaOf}}> resolves to no file`);
         continue;
       }
-      categoryFor(parentOf(own.title)).pages.push({
-        kind: "readme",
-        source: readme.source,
-        label: leafOf(own.title),
-        slug: path.posix.basename(readme.folder),
-        order: own.file,
-        title: own.title,
-        meta: readme.meta,
+      docsFor.set(storiesFile, { file: entry.file, blocks: parsed.blocks });
+    } else if (parsed.metaTitle) {
+      titled.push({
+        file: entry.file,
+        title: parsed.metaTitle,
+        blocks: parsed.blocks,
       });
+    }
+  }
+
+  const readmeByFolder = readmes(root);
+  const usedReadmes = new Set();
+
+  // One page per CSF file, as Storybook has one docs entry per CSF file:
+  // its MDX docs page when one points at it, else the README beside it
+  // (Storybook renders it as the autodocs page), else the generated page.
+  for (const story of stories) {
+    if (skippedRoot(story.title)) continue;
+    if (story.title.split("/").length < 2) {
+      warn(`${story.file}: story title "${story.title}" has no group`);
       continue;
     }
+    const docs = docsFor.get(story.file);
+    const readme = docs ? undefined : readmeByFolder.get(story.dir);
+    const common = {
+      label: leafOf(story.title),
+      order: story.file,
+      title: story.title,
+      storiesFile: story.file,
+      stories: csfStories(read(story.file), story.file),
+    };
+    let page;
+    if (docs) {
+      page = {
+        ...common,
+        kind: "docs",
+        source: docs.file,
+        slug: slugify(common.label),
+        blocks: docs.blocks,
+      };
+    } else if (readme && !usedReadmes.has(readme.source)) {
+      usedReadmes.add(readme.source);
+      page = {
+        ...common,
+        kind: "readme",
+        source: readme.source,
+        slug: path.posix.basename(story.dir),
+        meta: readme.meta,
+      };
+    } else {
+      page = {
+        ...common,
+        kind: "autodocs",
+        source: story.file,
+        slug: slugify(common.label),
+        description: csfDescription(read(story.file), story.file),
+      };
+    }
+    categoryFor(parentOf(story.title)).pages.push(page);
+  }
 
-    // No story of its own: a README at the root of a compound folder
-    // (components/rows, components/tiles) describes the group its children's
-    // stories sit in, and becomes that category's page.
+  for (const entry of titled) {
+    if (skippedRoot(entry.title)) continue;
+    if (entry.title.split("/").length < 2) {
+      warn(`${entry.file}: MDX title "${entry.title}" has no group`);
+      continue;
+    }
+    categoryFor(parentOf(entry.title)).pages.push({
+      kind: "mdx",
+      source: entry.file,
+      label: leafOf(entry.title),
+      slug: slugify(leafOf(entry.title)),
+      order: entry.file,
+      title: entry.title,
+      blocks: entry.blocks,
+      options: MDX_PAGES[entry.title] ?? {},
+    });
+  }
+
+  // A README with no story in its folder but stories below it
+  // (components/rows, components/tiles, components/table) describes the
+  // group those stories sit in, and becomes that category's page.
+  for (const [folder, readme] of readmeByFolder) {
+    if (usedReadmes.has(readme.source)) continue;
     const below = stories.filter(
       (story) =>
-        story.kind === "story" &&
-        story.dir.startsWith(`${readme.folder}/`) &&
-        !skippedRoot(story.title),
+        story.dir.startsWith(`${folder}/`) && !skippedRoot(story.title),
     );
     const groups = new Set(below.map((story) => parentOf(story.title)));
-
     if (groups.size !== 1) {
       warn(
         `${readme.source}: no story in its folder` +
@@ -157,7 +242,6 @@ export const collect = (root, { includeInternal = false, statuses, warn }) => {
       );
       continue;
     }
-
     const category = categoryFor([...groups][0]);
     if (category.readme) {
       warn(
@@ -173,25 +257,6 @@ export const collect = (root, { includeInternal = false, statuses, warn }) => {
       order: below[0].file,
       meta: readme.meta,
     };
-  }
-
-  for (const story of stories) {
-    if (story.kind !== "mdx" || skippedRoot(story.title)) continue;
-    const options = MDX_PAGES[story.title] ?? {};
-    if (options.skip) continue;
-    if (story.title.split("/").length < 2) {
-      warn(`${story.file}: MDX title "${story.title}" has no group`);
-      continue;
-    }
-    categoryFor(parentOf(story.title)).pages.push({
-      kind: "mdx",
-      source: story.file,
-      label: leafOf(story.title),
-      slug: slugify(leafOf(story.title)),
-      order: story.file,
-      title: story.title,
-      options,
-    });
   }
 
   const roots = [...categories.values()].filter((c) => !parentOf(c.key));
@@ -222,7 +287,7 @@ export const collect = (root, { includeInternal = false, statuses, warn }) => {
         warn(
           `${page.source}: slug "${category.slug}/${page.slug}" is taken by ${seen.get(page.slug)}`,
         );
-        page.slug = slugify(page.label);
+        page.slug = `${page.slug}-${slugify(page.label)}`;
       }
       seen.set(page.slug, page.source);
     }

@@ -6,9 +6,10 @@ directory, and a second one copies them into a checkout of the site repository, 
 reviewed and committed. Nothing here deploys anything.
 
 The difference is the source. The SDK generates its reference from JSDoc with TypeDoc; this
-package already has the text, one README per component, and the tree to arrange it in, the
-Storybook sidebar. So there is no TypeDoc here, and the pipeline arranges and rewrites pages.
-It does not generate them.
+package already has the text and the tree: **the site is a copy of Storybook**. Every docs entry
+of the Storybook index becomes a page, in Storybook's tree and order, with the same text, and
+with what only Storybook can render -- the stories, the args tables, the React blocks of a page
+-- as pictures.
 
 ## Commands
 
@@ -22,17 +23,17 @@ pnpm docs:screenshots # the pictures alone, from an existing storybook-static
 ```
 
 `docs:build` and `docs:sync` take `--reuse-storybook` to keep an existing `storybook-static`
-instead of rebuilding it, which is most of their time.
+instead of rebuilding it. `docs:screenshots` takes `--only <slug>...` for a few pages and
+`--missing` for the pictures not on disk yet; the full set is about 1 200 pictures and takes
+some fifteen minutes.
 
 CI runs `pnpm docs:check` in the lint job.
 
-| Variable        | Effect                                                                                                                       |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `DOCS_REVISION` | Branch or commit the "Edit this page" and source links point at. Default: `master`, the one branch the GitHub mirror carries |
-| `STORYBOOK_URL` | A published Storybook. Set, every component page gets an "Open in Storybook" link                                            |
-| `API_SITE_ROOT` | The api.onlyoffice.com checkout for `docs:sync`. Default: `../api.onlyoffice.com`                                            |
-
-`node scripts/docs/index.mjs --include-internal` publishes the portal-internal components too.
+| Variable        | Effect                                                                                                                                           |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DOCS_REVISION` | Branch or commit the "Edit this page" and source links point at. Default: `master`, the one branch the GitHub mirror carries                     |
+| `STORYBOOK_URL` | A published Storybook. Set, every component page gets an "Open in Storybook" link, and `docs:screenshots` reads it instead of `storybook-static` |
+| `API_SITE_ROOT` | The api.onlyoffice.com checkout for `docs:sync`. Default: `../api.onlyoffice.com`                                                                |
 
 ## Publishing
 
@@ -64,111 +65,117 @@ What the site needs, once:
 
   then replaces `site/docspace/ui-kit/` with `site-docs/` and commits. `docs:build` builds the
   Storybook, installs Chromium (with its system libraries when `CI` is set) and takes the
-  pictures before the pages; about ten minutes on a GitHub runner.
+  pictures before the pages; half an hour on a GitHub runner.
 
-A new category or page here changes nothing on the site: the sidebar module carries the tree.
+A new story, page or group here changes nothing on the site: the sidebar module carries the tree.
 
-## What is published
+## One page per Storybook docs entry
 
-- **Every README with a `ui-kit-doc` metadata block** under `components/` and `providers/`
-  whose `status` is `public`. The metadata supplies the page's `description` and its row in the
-  category table. A README without the block is not published: nothing says what it is for or
-  whether it is public.
-- **The "Getting started" MDX pages** with Storybook's parts taken out: the imports, `<Meta>`
-  and the decorative components listed under `drop` in `scripts/docs/config.mjs`, and a trailing rule with the paragraph after
-  it, which is the page's footer (the version and licence line under Welcome). A page whose
-  content is a React component is `skip`ped there, with the reason: "Agent skills" (infographics)
-  and "Types and roles" (the access matrices).
-- **`docs/getting-started.md`**, as "Installation", because nine READMEs link to it.
-- **`Samples/*` is not published.** The samples run against a portal, and the site cannot.
+Storybook's index has one docs entry per CSF file and one per MDX page. Each becomes a page:
 
-## Where a page goes: the Storybook tree
+- **A CSF file with an MDX docs page pointing at it** (`<Meta of={Stories} />`: the selectors,
+  the errors, the uploader, the portal composites, the samples) -- the MDX page, kind `docs`.
+- **A CSF file with a README beside it** (every component under `components/` and the three
+  public providers) -- the README, kind `readme`, which is what Storybook renders as the
+  component's Docs page (`.storybook/blocks/DocsPage.tsx`): the README's intro, the primary
+  story, the props, the stories, the README's reference half.
+- **A CSF file with neither** (the table's parts, `ArticleItem`, AI Settings) -- a generated page,
+  kind `autodocs`: title, `docs.description.component`, the primary story, the args table, the
+  stories.
+- **An MDX page of its own** (`<Meta title="…" />`: Getting started) -- the page, kind `mdx`.
+- `docs/getting-started.md`, as "Installation", because nine READMEs link to it (`EXTRA_PAGES`).
 
-A README's place is the `title` of the story in **its own folder**, the same pairing
-`.storybook/blocks/Readme.tsx` uses to render it as the Docs page. `UI/Form controls/TextInput`
-puts `components/text-input/README.md` in the "Form controls" category, labelled `TextInput`.
+Nothing is left out: portal-internal components and the samples are on the site because they
+are in Storybook.
 
-- **The tree is Storybook's, nested as it is there:** `Getting started`, `Components` and `UI`
-  at the top, the groups under them. A group of `Components` appears on the site only once a
-  README under it carries a metadata block; today that is Providers.
+## The tree and the order
+
+A page's place is its Storybook title. `UI/Form controls/TextInput` puts the page in `UI`, under
+it `Form controls`, labelled `TextInput`; the categories nest as Storybook's sidebar does.
+
 - **A README with no story of its own** but with stories below it (`components/rows`,
   `components/tiles`, `components/table`) describes the group those stories sit in. It becomes
-  that category's page, followed by the table of its components.
+  that category's page, followed by the table of its pages.
 - **Order is `storySort.order`** in `.storybook/preview.tsx`, read with the TypeScript parser,
   so there is one order and the site cannot drift from the sidebar. It stays inline in the
   preview because Storybook reads it statically and rejects an imported constant ("Unexpected
   'STORY_ORDER'"). Names the order does not list follow Storybook's index: story files in byte
-  order of their path, a group placed where its first story -- published or not -- appears. Storybook keeps them in file-import order, which follows folder names,
-  not titles.
-- **Titles are read from source** with the TypeScript parser, so no Storybook build is needed.
-  A title that is not a string literal is reported instead of guessed.
+  order of their path, a group placed where its first story appears.
+- **Titles are read from source** with the TypeScript parser, so no Storybook build is needed
+  for the pages. A title that is not a string literal is reported instead of guessed.
+
+## Pictures
+
+`pnpm docs:screenshots` (`scripts/docs/screenshots.mjs`) takes, for every page, what
+`scripts/docs/pictures.mjs` lists for it, in the light and the dark theme, on a transparent
+canvas, into `site-screenshots/<category>/<page>--<name>-{light,dark}.png`:
+
+- `primary` -- the story the page opens with: the one tagged `picture` in its CSF
+  (`tags: ["picture"]`), else the file's first. A component that opens from a trigger has a
+  recipe in `PICTURE_RECIPES` (`scripts/docs/config.mjs`): the gesture that opens it, and what to
+  hide so only the component is in the picture.
+- one per story, named after the story (`with-icon`), for the Stories section;
+- `block<n>` -- the n-th React element of an MDX page, photographed on the Docs page itself:
+  the access matrices, the infographics, the Welcome hero, a `<Controls />`;
+- `controls` -- the args table of an `autodocs` page.
+
+Stories are opened with `globals=canvas:transparent`, a global `.storybook/preview.tsx` declares
+to drop the white or black page the decorator otherwise paints; the picture is the union of
+everything that paints anywhere in the body, so what a portal renders is in it too, with an 8px
+margin, clamped to the viewport, taken at 2x and shown at 1x. A block is photographed as the
+element Storybook rendered, matched to the MDX by position among the page's non-Markdown blocks.
+
+`pnpm docs` copies the pictures beside the pages and puts a Docusaurus `<ThemedImage>` where
+each belongs, so the reader sees the theme they are in. A picture not taken leaves no trace on
+the page beyond a count in the run's output: CI runs no browser, and `pnpm docs` stays seconds.
+
+It needs a static Storybook (`pnpm storybook-build`, or `STORYBOOK_URL` for a served one) and
+Playwright's Chromium (`pnpm exec playwright install chromium`). Storybook's `index.json` names
+every story and docs entry, so nothing is guessed; the export-to-id rule (`WithIcon` ->
+`with-icon`) is Storybook's own `storyNameFromExport`.
 
 ## What a page is changed into
 
-`scripts/docs/render.mjs`, in order:
+`scripts/docs/render.mjs`:
 
-1. HTML comments go: the metadata block and the `props`/`enums` markers. MDX has no HTML
-   comments. So does the "_Generated by `pnpm readme:props`_" note, which is for repository
-   readers.
-2. Links are rewritten. A README or published file becomes a relative link to its page on the
-   site. A Storybook `?path=/docs/…` link becomes a link to the page that story became. Any
-   other repository file becomes a GitHub link at `DOCS_REVISION`, and so does a
-   portal-internal README when internal pages are not published. A link to a file that does
-   not exist is a `[warn]`.
-3. README prose is escaped for MDX: `{`/`}`, a `<` that would open a JSX element,
-   `<https://…>` autolinks, and void tags such as `<br>`. Code blocks and inline code are never
-   touched. The MDX pages are MDX already and skip this step.
-4. Each Props table is reshaped into the SDK's three columns, `Property | Type | Description`:
-   `Required` becomes the optional marker after the code span (`` `label`? ``, outside the span
-   so the row id has no `?`) and `Default` closes the description as `Default: \`x\`.`. Five
-columns do not fit the site's `<APITable>`: on a third of the pages a long type pushed the
-description off the right edge. The table is then wrapped in `<APITable>`and the import is
-added. As in the SDK, the tables get a`name` only when their row ids collide.
-5. Front matter: `description` from the metadata `summary`, and `custom_edit_url` pointing at
-   the source file.
-
-## Component pictures
-
-`pnpm docs:screenshots` (`scripts/docs/screenshots.mjs`) photographs one story per published
-component in the light and the dark theme, on a transparent canvas, into
-`site-screenshots/<category>/<page>-{light,dark}.png`. `pnpm docs` copies the pair beside the
-page and puts a Docusaurus `<ThemedImage>` under the intro paragraph, so the reader sees the
-theme they are in; a page without a pair gets no picture, and the run says how many are
-missing rather than failing -- CI runs no browser.
-
-It needs a static Storybook (`pnpm storybook-build`, or `STORYBOOK_URL` for a served one) and
-Playwright's Chromium (`pnpm exec playwright install chromium`). Storybook's `index.json`
-names the story: the one tagged `picture` in its CSF (`tags: ["picture"]`), else the file's
-first. A component that opens from a trigger -- a dialog, a toast, a drop-down, a tooltip -- has a
-recipe in `PICTURE_RECIPES` (`scripts/docs/config.mjs`): the gesture that opens it, and
-whether to hide the trigger so only what the portal renders is in the picture. The story is opened with `globals=canvas:transparent`, a global `.storybook/preview.tsx`
-declares to drop the white or black page and the margin the decorator otherwise paints; the
-picture is the union of everything that paints -- backgrounds, borders, shadows, images,
-text -- anywhere in the body, so what a portal renders is in it too, with an 8px margin,
-taken at 2x and shown at 1x.
-
-Both directories are gitignored; the pictures are regenerated, never edited.
+1. **README pages.** HTML comments go: the metadata block and the `props`/`enums` markers. So
+   does the "_Generated by `pnpm readme:props`_" note, which is for repository readers. Links
+   are rewritten: a README or published file becomes a relative link to its page on the site, a
+   Storybook `?path=/docs/…` link the page that story became, any other repository file a GitHub
+   link at `DOCS_REVISION`; a link to a file that does not exist is a `[warn]`. Prose is escaped
+   for MDX: `{`/`}`, a `<` that would open a JSX element, autolinks, void tags; code blocks and
+   inline code are never touched. Each Props table is reshaped into the SDK's three columns,
+   `Property | Type | Description`: `Required` becomes the optional marker after the code span
+   (`` `label`? ``, outside the span so the row id has no `?`) and `Default` closes the
+   description as `Default: \`x\`.`. Five columns do not fit the site's `<APITable>`, which the
+tables are then wrapped in; as in the SDK, they get a `name`only when their row ids collide.
+The primary picture goes under the intro and a Stories section -- each story's name,`docs.description.story`and picture -- before`## Minimal example`, where Storybook shows
+   them.
+2. **MDX pages.** Imports and `<Meta>` go; every other React element at the top level is
+   replaced by its picture, a `<Story of>` by the story's. A trailing rule and the paragraph after
+   it -- the version and licence line under Welcome -- is the page's Storybook footer and goes
+   too. A page whose H1 was inside a React element gets one from its title.
+3. **Front matter**: `description` from the metadata `summary` (or the component description),
+   and `custom_edit_url` pointing at the source file.
 
 ## Category pages
 
 A category without a README of its own gets a page built from `scripts/docs/sections.mjs`: a
-title, a paragraph, and a table of its pages with each one's summary. Storybook groups have
-nothing to say about themselves, so that paragraph lives there, keyed by Storybook path
+title, a paragraph, and a table of its groups and pages with each one's summary. Storybook groups
+have nothing to say about themselves, so that paragraph lives there, keyed by Storybook path
 (`"UI/Form controls"`). **A new Storybook group fails a strict run until it has an entry.**
-`index.md` at the root lists the three top-level categories. A group whose only page is its
-README (`components/table`: its parts have no README of their own) is a sidebar doc, since
-Docusaurus renders an empty category as one anyway.
+`index.md` at the root lists the top-level categories.
 
 ## Output
 
 ```
 site-docs/
 ├── index.md                  # section landing
-├── ui-kit-sidebar.cjs        # items array for the site's sidebars.ts
+├── ui-kit-sidebar.cjs        # items array for the site's sidebars.ts, nested as Storybook's
 ├── getting-started/          # index.md + welcome, installation, structure, …
-├── providers/                # index.md + error-boundary, theme, translation
-├── form-controls/            # index.md + one page per component
-└── …                         # one directory per category
+├── components/               # index.md + the portal composites; selectors/, providers/, errors/
+├── ui/                       # index.md + form-controls/, overlays/, … one directory per group
+└── samples/                  # index.md + legal-practice/, a-small-files-app
 ```
 
 Sidebar doc ids carry the `docspace/ui-kit` prefix, and every category links to its
@@ -177,7 +184,7 @@ Sidebar doc ids carry the `docspace/ui-kit` prefix, and every category links to 
 
 ## Fixing a problem
 
-Fix it at the source, in this order: the README (or the MDX page); the config in
+Fix it at the source, in this order: the README, the MDX page or the story; the config in
 `scripts/docs/config.mjs` / `sections.mjs`; a transform in `scripts/docs/`, and then a general
 rule with a test in `scripts/docs/docs.test.mjs`, not a page-specific patch. Never edit
-`site-docs/`, which is wiped on every run.
+`site-docs/` or `site-screenshots/`, which are regenerated.

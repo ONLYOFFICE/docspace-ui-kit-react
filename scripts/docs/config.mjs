@@ -101,15 +101,11 @@ export const STORY_DIRS = [
  */
 export const STORY_ORDER_FILE = ".storybook/preview.tsx";
 
-/** Top-level Storybook sections that are not published at all. */
-export const SKIPPED_ROOTS = ["Samples"];
+/** Top-level Storybook sections not published; none, the site is a copy. */
+export const SKIPPED_ROOTS = [];
 
-/**
- * Which README statuses are published. `portal-internal` components need
- * DocSpace context a site reader does not have (docs/public-api.md); pass
- * `--include-internal` to publish them as well.
- */
-export const PUBLISHED_STATUSES = ["public"];
+/** Browser contexts photographing at once. */
+export const SHOT_WORKERS = 4;
 
 /**
  * Directories whose README.md becomes a page when it carries a `ui-kit-doc`
@@ -119,23 +115,14 @@ export const PUBLISHED_STATUSES = ["public"];
 export const README_DIRS = ["components", "providers"];
 
 /**
- * The "Getting started" pages, by Storybook title. `drop` names the JSX
- * elements that are Storybook-only decoration and may be removed; any other
- * JSX left outside a code block fails a strict run, because the site cannot
- * render it. `skip` holds pages whose content *is* the JSX. `summary` replaces
- * the first sentence in the overview table when that sentence is not one.
+ * Per-page overrides for the `<Meta title>` MDX pages, by Storybook title:
+ * `summary` replaces the first sentence in the overview table when that
+ * sentence is not one.
  */
 export const MDX_PAGES = {
   "Getting started/Welcome": {
-    drop: ["WelcomePage"],
     summary:
       "What the kit is, how it is installed and the providers every application mounts.",
-  },
-  "Getting started/Agent skills": {
-    skip: "the page is its infographics; there is no text to publish without them",
-  },
-  "Getting started/Types and roles": {
-    skip: "the access matrices are React components reading docs/access/matrix.ts",
   },
 };
 

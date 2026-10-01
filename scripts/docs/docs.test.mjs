@@ -25,12 +25,16 @@ import {
   wrapApiTables,
 } from "./render.mjs";
 import { sidebarItems } from "./sidebar.mjs";
+import { parseMdx } from "./mdx.mjs";
+import { shotsOf, storyKey } from "./pictures.mjs";
 import {
+  csfStories,
   csfTitle,
   mdxTitle,
   orderLevel,
   readStoryOrder,
   storyId,
+  storyNameFromExport,
 } from "./story-tree.mjs";
 
 const compiles = (text) => compile(text, { remarkPlugins: [remarkGfm] });
@@ -377,11 +381,12 @@ describe("pictures", () => {
       out: "interactive-elements/button.md",
       page: { label: "Button", source: "components/button/README.md" },
       pages: { bySource: new Map(), byStoryId: new Map() },
-      picture: {
-        light: "button-light.png",
-        dark: "button-dark.png",
-        width: 117,
-      },
+      pictures: new Map([
+        [
+          "primary",
+          { light: "button-light.png", dark: "button-dark.png", width: 117 },
+        ],
+      ]),
       revision: "master",
       storyId: () => "x",
       warn: () => {},
@@ -390,5 +395,74 @@ describe("pictures", () => {
     expect(out).toContain(
       "Intro.\n\n<ThemedImage alt=\"Button\" width={117} sources={{ light: require('./button-light.png').default, dark: require('./button-dark.png').default }} />\n\n## Props",
     );
+  });
+});
+
+describe("stories and MDX", () => {
+  it("names a story as Storybook does", () => {
+    expect(storyNameFromExport("WithIcon")).toBe("With Icon");
+    expect(storyNameFromExport("Size24")).toBe("Size 24");
+    expect(storyNameFromExport("MCPServersList")).toBe("MCP Servers List");
+    expect(storyKey("WithIcon")).toBe("with-icon");
+  });
+
+  it("lists a CSF file's stories with their descriptions", () => {
+    const text = `const meta = { title: "UI/X/Y" };
+export default meta;
+export const Default = { args: {} };
+export const WithIcon = {
+  parameters: { docs: { description: { story: "Has an icon." } } },
+};`;
+    expect(csfStories(text)).toEqual([
+      { exportName: "Default", description: undefined },
+      { exportName: "WithIcon", description: "Has an icon." },
+    ]);
+  });
+
+  it("parses an MDX page's imports, Meta and top-level elements", () => {
+    const text = [
+      'import { Meta, Story } from "@storybook/addon-docs/blocks";',
+      "import * as S from './X.stories';",
+      "",
+      "<Meta of={S} />",
+      "",
+      "# X",
+      "",
+      "<Story of={S.Default} />",
+      "",
+      "<Matrix",
+      '  name="rooms"',
+      "/>",
+      "",
+      "```tsx",
+      "<Inline />",
+      "```",
+    ].join("\n");
+    const page = parseMdx(text);
+    expect(page.metaOf).toBe("S");
+    expect(page.imports.get("S")).toBe("./X.stories");
+    expect(page.blocks.map((b) => `${b.tag}@${b.start}-${b.end}`)).toEqual([
+      "import@0-0",
+      "import@1-1",
+      "Meta@3-3",
+      "Story@7-7",
+      "Matrix@9-11",
+    ]);
+    expect(page.blocks[4].attrs.name).toBe("rooms");
+  });
+
+  it("lists a page's shots in order", () => {
+    const names = shotsOf({
+      kind: "docs",
+      blocks: parseMdx(
+        "<Meta of={S} />\n\n<Story of={S.A} />\n\n<Table />\n\n<Story of={S.A} />",
+      ).blocks,
+    }).map((shot) => shot.name);
+    expect(names).toEqual(["a", "block0"]);
+    expect(
+      shotsOf({ kind: "autodocs", stories: [{ exportName: "Default" }] }).map(
+        (s) => s.name,
+      ),
+    ).toEqual(["primary", "controls", "default"]);
   });
 });

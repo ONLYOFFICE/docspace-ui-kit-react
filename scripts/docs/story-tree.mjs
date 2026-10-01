@@ -53,6 +53,29 @@ const findVariable = (source, name) => {
   return found;
 };
 
+/** `parameters.docs.description.component` of a CSF file's meta, when a literal. */
+export const csfDescription = (text, fileName = "story.tsx") => {
+  const source = ts.createSourceFile(
+    fileName,
+    text,
+    ts.ScriptTarget.Latest,
+    false,
+    ts.ScriptKind.TSX,
+  );
+  const exported = source.statements.find(
+    (s) => ts.isExportAssignment(s) && !s.isExportEquals,
+  );
+  let meta = exported && unwrap(exported.expression);
+  if (meta && ts.isIdentifier(meta))
+    meta = unwrap(findVariable(source, meta.text));
+  return stringProperty(meta, [
+    "parameters",
+    "docs",
+    "description",
+    "component",
+  ]);
+};
+
 /**
  * The `title` of a CSF file's default export, `undefined` when the file has
  * no default export, and `null` when it has one whose title is not a literal.
@@ -169,13 +192,13 @@ export const collectStories = (root, dirs, warn) => {
 
       const file = toPosix(path.posix.join(dir, entry.id));
       const text = fs.readFileSync(entry.full, "utf8");
-      const title = isStory ? csfTitle(text, entry.name) : mdxTitle(text);
+      const title = isStory ? csfTitle(text, entry.name) : undefined;
 
       if (title === null) {
         warn(`${file}: the story title is not a string literal`);
         continue;
       }
-      if (title === undefined) continue;
+      if (isStory && title === undefined) continue;
 
       entries.push({
         title,
@@ -239,3 +262,70 @@ export const storyId = (title) =>
         .replace(/^-+|-+$/g, ""),
     )
     .join("-");
+
+/** Storybook's `storyNameFromExport`: `WithIcon` -> `With Icon`, `Size24` -> `Size 24`. */
+export const storyNameFromExport = (key) =>
+  key
+    .replace(/_/g, " ")
+    .replace(/-/g, " ")
+    .replace(/\./g, " ")
+    .replace(/([^\n])([A-Z])([a-z])/g, (_, a, b, c) => `${a} ${b}${c}`)
+    .replace(/([a-z])([A-Z])/g, (_, a, b) => `${a} ${b}`)
+    .replace(/([a-z])([0-9])/gi, (_, a, b) => `${a} ${b}`)
+    .replace(/([0-9])([a-z])/gi, (_, a, b) => `${a} ${b}`)
+    .replace(/(\s|^)(\w)/g, (_, a, b) => `${a}${b.toUpperCase()}`)
+    .replace(/ +/g, " ")
+    .trim();
+
+const stringProperty = (object, keys) => {
+  let node = object;
+  for (const key of keys) {
+    if (!node || !ts.isObjectLiteralExpression(node)) return undefined;
+    const property = node.properties.find(
+      (p) =>
+        ts.isPropertyAssignment(p) &&
+        (ts.isIdentifier(p.name) || ts.isStringLiteral(p.name)) &&
+        p.name.text === key,
+    );
+    node = property ? unwrap(property.initializer) : undefined;
+  }
+  return stringOf(node);
+};
+
+/**
+ * The stories a CSF file exports, in order: `{ exportName, description }`,
+ * the description being `parameters.docs.description.story` when it is a
+ * string literal. Storybook's own `excludeStories` is not honoured.
+ */
+export const csfStories = (text, fileName = "story.tsx") => {
+  const source = ts.createSourceFile(
+    fileName,
+    text,
+    ts.ScriptTarget.Latest,
+    false,
+    ts.ScriptKind.TSX,
+  );
+  const stories = [];
+  for (const statement of source.statements) {
+    if (
+      !ts.isVariableStatement(statement) ||
+      !statement.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
+    ) {
+      continue;
+    }
+    for (const declaration of statement.declarationList.declarations) {
+      if (!ts.isIdentifier(declaration.name)) continue;
+      const init = unwrap(declaration.initializer);
+      stories.push({
+        exportName: declaration.name.text,
+        description: stringProperty(init, [
+          "parameters",
+          "docs",
+          "description",
+          "story",
+        ]),
+      });
+    }
+  }
+  return stories;
+};

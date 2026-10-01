@@ -2,11 +2,10 @@
 // component READMEs and the Storybook "Getting started" pages and laid out in
 // the Storybook tree. See docs-generation.md.
 //
-//   node scripts/docs/index.mjs [--strict] [--check] [--include-internal]
+//   node scripts/docs/index.mjs [--strict] [--check]
 //
-// --strict            a [warn] line fails the run
-// --check             also compiles every page as MDX, the way Docusaurus will
-// --include-internal  publish portal-internal components as well
+// --strict   a [warn] line fails the run
+// --check    also compiles every page as MDX, the way Docusaurus will
 //
 // DOCS_REVISION sets the branch or commit the edit and source links point at
 // (default: master). STORYBOOK_URL adds "Open in Storybook" links.
@@ -17,7 +16,6 @@ import path from "node:path";
 import { collect } from "./collect.mjs";
 import {
   OUT_DIR,
-  PUBLISHED_STATUSES,
   ROOT,
   SHOTS_DIR,
   SHOT_SCALE,
@@ -26,6 +24,7 @@ import {
 import {
   layout,
   pngWidth,
+  renderAutodocs,
   renderCategory,
   renderMarkdown,
   renderMdx,
@@ -33,10 +32,11 @@ import {
   renderRoot,
   summaryOf,
 } from "./render.mjs";
+import { pictureFiles, pictureNames, shotsOf } from "./pictures.mjs";
 import { renderSidebar } from "./sidebar.mjs";
 
 const args = process.argv.slice(2);
-const known = ["--strict", "--check", "--include-internal"];
+const known = ["--strict", "--check"];
 const unknown = args.filter((arg) => !known.includes(arg));
 if (unknown.length > 0) {
   console.error(
@@ -57,11 +57,7 @@ const warn = (message) => {
 // is not a usable default the way it is in docspace-sdk-js.
 const revision = () => process.env.DOCS_REVISION || "master";
 
-const { categories, storyId } = collect(ROOT, {
-  includeInternal: args.includes("--include-internal"),
-  statuses: PUBLISHED_STATUSES,
-  warn,
-});
+const { categories, storyId } = collect(ROOT, { warn });
 const pages = layout(categories, storyId);
 const rev = revision();
 const outDir = path.join(ROOT, OUT_DIR);
@@ -87,32 +83,35 @@ let pictured = 0;
 let unpictured = 0;
 
 /**
- * The light and dark pictures `pnpm docs:screenshots` took for a component,
- * queued for copying beside its page; `undefined` when it has none.
+ * The pictures `pnpm docs:screenshots` took for a page, by shot name, each
+ * queued for copying beside the page. Shots not taken are counted.
  */
-const pictureOf = (category, page) => {
-  if (page.kind !== "readme" || !page.title) return undefined;
-  const names = ["light", "dark"].map((theme) => `${page.slug}-${theme}.png`);
-  const sources = names.map((name) =>
-    path.join(ROOT, SHOTS_DIR, category.slug, name),
-  );
-  if (!sources.every((file) => fs.existsSync(file))) {
-    unpictured += 1;
-    return undefined;
+const picturesOf = (category, page) => {
+  const pictures = new Map();
+  for (const shot of shotsOf(page)) {
+    const sources = pictureFiles(ROOT, category, page, shot.name);
+    if (!sources.every((file) => fs.existsSync(file))) {
+      unpictured += 1;
+      continue;
+    }
+    const names = pictureNames(page, shot.name);
+    names.forEach((name, i) =>
+      copies.set(`${category.slug}/${name}`, sources[i]),
+    );
+    pictured += 1;
+    pictures.set(shot.name, {
+      light: names[0],
+      dark: names[1],
+      width: Math.round(pngWidth(sources[0]) / SHOT_SCALE),
+    });
   }
-  names.forEach((name, i) =>
-    copies.set(`${category.slug}/${name}`, sources[i]),
-  );
-  pictured += 1;
-  return {
-    light: names[0],
-    dark: names[1],
-    width: Math.round(pngWidth(sources[0]) / SHOT_SCALE),
-  };
+  return pictures;
 };
 const RENDER = {
   readme: renderReadme,
+  docs: renderMdx,
   mdx: renderMdx,
+  autodocs: renderAutodocs,
   markdown: renderMarkdown,
 };
 
@@ -143,7 +142,7 @@ for (const category of everyCategory) {
         out,
         page,
         pages,
-        picture: pictureOf(category, page),
+        pictures: picturesOf(category, page),
         revision: rev,
         storyId,
         warn,
@@ -166,7 +165,7 @@ for (const [file, source] of copies) {
 }
 if (pictured + unpictured > 0) {
   console.log(
-    `${pictured} component page(s) carry a picture, ${unpictured} do not` +
+    `${pictured} picture(s) placed, ${unpictured} not taken` +
       (unpictured > 0 ? ` (pnpm docs:screenshots takes them).` : "."),
   );
 }
