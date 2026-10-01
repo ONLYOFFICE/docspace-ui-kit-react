@@ -298,7 +298,9 @@ const { categories } = collect(ROOT, {
   statuses: PUBLISHED_STATUSES,
   warn: () => {},
 });
-const pages = categories.flatMap((category) =>
+/** Every category of the tree, with its pages. */
+const flat = (list) => list.flatMap((c) => [c, ...flat(c.children)]);
+const pages = flat(categories).flatMap((category) =>
   category.pages
     .filter((page) => page.kind === "readme" && page.title)
     .filter((page) => only.length === 0 || only.includes(page.slug))
