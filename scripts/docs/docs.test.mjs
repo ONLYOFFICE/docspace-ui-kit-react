@@ -14,6 +14,7 @@ import {
   firstParagraph,
   firstSentence,
   rewriteLinks,
+  slugify,
   stripHtmlComments,
 } from "./markdown.mjs";
 import {
@@ -240,6 +241,13 @@ describe("wrapApiTables", () => {
     const { text } = wrapApiTables(input);
     expect(text).toContain('<APITable name="Props">');
     expect(text).toContain('<APITable name="Header">');
+  });
+});
+
+describe("slugify", () => {
+  it("drops the number prefix Docusaurus would drop from the id", () => {
+    expect(slugify("01. My matters")).toBe("my-matters");
+    expect(slugify("Form controls")).toBe("form-controls");
   });
 });
 

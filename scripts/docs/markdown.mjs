@@ -217,12 +217,17 @@ export const firstSentence = (paragraph) => {
   return paragraph;
 };
 
-/** `Form controls` -> `form-controls`. */
+/**
+ * `Form controls` -> `form-controls`, and `01. My matters` -> `my-matters`:
+ * Docusaurus drops a number prefix from a file's id, so the file is named
+ * without it and the sidebar ids match.
+ */
 export const slugify = (text) =>
   text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .replace(/^-+|-+$/g, "")
+    .replace(/^\d+-/, "");
 
 /** A table cell: pipes escaped, newlines flattened. */
 export const cell = (text) =>
