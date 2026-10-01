@@ -188,8 +188,8 @@ importers:
         specifier: 1.15.1
         version: 1.15.1
       '@onlyoffice/ai-chat':
-        specifier: file:onlyoffice-ai-chat-0.5.130-docs.25.tgz
-        version: file:onlyoffice-ai-chat-0.5.130-docs.25.tgz(6c8c34e0baa1d55ce15df8d983d5d2d5)
+        specifier: file:onlyoffice-ai-chat-0.6.11.tgz
+        version: file:onlyoffice-ai-chat-0.6.11.tgz(6c8c34e0baa1d55ce15df8d983d5d2d5)
       '@onlyoffice/docspace-api-sdk':
         specifier: file:onlyoffice-docspace-api-sdk-3.7.0.tgz
         version: file:onlyoffice-docspace-api-sdk-3.7.0.tgz(debug@4.4.3(supports-color@7.2.0))
@@ -205,6 +205,9 @@ importers:
       '@radix-ui/react-tabs':
         specifier: 1.1.13
         version: 1.1.13(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@radix-ui/react-toast':
+        specifier: 1.2.23
+        version: 1.2.23(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@radix-ui/react-tooltip':
         specifier: 1.2.8
         version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1576,9 +1579,9 @@ packages:
       '@emnapi/core': ^1.7.1 || ^2.0.0-alpha.3
       '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.3
 
-  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.5.130-docs.25.tgz':
-    resolution: {integrity: sha512-RGdgGRK3w3o12OxKm98HJsrrRr6esQgK9vJFWIOB+nHaupeIeP1RAmQDDo7zf6hbVS2R8CkyTYbCssgIhfXnIw==, tarball: file:onlyoffice-ai-chat-0.5.130-docs.25.tgz}
-    version: 0.5.118-docs.25
+  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.6.11.tgz':
+    resolution: {integrity: sha512-rYF5yrIFMode4xrIzVyZUyDCMquvLZf8/bs3hXKVW6LMRpKqdbMiynJVBGL2b35BLIwXuFE+FSlGNmU/x09lSQ==, tarball: file:onlyoffice-ai-chat-0.6.11.tgz}
+    version: 0.6.11
     peerDependencies:
       '@anthropic-ai/sdk': ^0.60.0
       '@assistant-ui/react': ^0.11.0
@@ -7557,7 +7560,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
-  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.5.130-docs.25.tgz(6c8c34e0baa1d55ce15df8d983d5d2d5)':
+  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.6.11.tgz(6c8c34e0baa1d55ce15df8d983d5d2d5)':
     dependencies:
       '@assistant-ui/react': 0.11.58(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
       assistant-stream: 0.2.47
@@ -8257,7 +8260,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.10
       '@types/react-dom': 19.2.3(@types/react@19.2.10)
-    optional: true
 
   '@radix-ui/react-tooltip@1.2.8(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
@@ -8396,7 +8398,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.10
       '@types/react-dom': 19.2.3(@types/react@19.2.10)
-    optional: true
 
   '@radix-ui/react-visually-hidden@1.2.3(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:

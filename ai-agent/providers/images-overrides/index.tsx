@@ -45,6 +45,7 @@ import OpenIcon from "../../../assets/external.link.svg";
 import DropdownIcon from "../../../assets/triangle.down.react.svg";
 import ArrowDownIcon from "../../../assets/icons/16/output-tokens.svg";
 import CodeIcon from "../../../assets/icons/16/code.react.svg";
+import RoomsIcon from "../../../assets/icons/16/catalog.rooms.react.svg";
 
 import styles from "./Icon.module.scss";
 
@@ -104,4 +105,8 @@ export const imageOverrides: ImageOverrides = {
   // colored with `--text-tertiary`; DocSpace has the same `</>` mark, so use it
   // and reproduce that color through `.tertiary`.
   code: makeIcon(CodeIcon, styles.tertiary),
+  // The composer's context picker (with `hideContextClouds` the widget
+  // draws it as a room) and the room rows inside it: the rooms glyph of the
+  // DocSpace catalog.
+  "btn-room": makeIcon(RoomsIcon),
 };
