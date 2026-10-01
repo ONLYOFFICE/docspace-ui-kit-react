@@ -11,6 +11,50 @@ export { ROOT };
 /** Output directory, relative to the repository root. Gitignored. */
 export const OUT_DIR = "site-docs";
 
+/**
+ * Where `pnpm docs:screenshots` keeps its pictures, relative to the root.
+ * Gitignored, and outside OUT_DIR because `pnpm docs` wipes that; the pages
+ * that have a picture here get it copied beside them.
+ */
+export const SHOTS_DIR = "site-screenshots";
+
+/** Device scale the pictures are taken at; the page shows them at 1/SHOT_SCALE. */
+export const SHOT_SCALE = 2;
+
+/**
+ * What to do in a story before photographing it, keyed by the component's
+ * folder. A dialog, a toast, a drop-down or a tooltip opens from a trigger,
+ * and its first story is that trigger; the recipe performs the gesture --
+ * `click`, `rightClick` or `hover` on a Playwright selector -- and
+ * `hideRoot` then hides everything inside #storybook-root, so a component
+ * that renders through a portal is photographed without the button that
+ * opened it, and `hide` hides just the elements a selector matches, for one
+ * that renders beside its trigger. `wait` is the settle time in ms after the
+ * gesture (default 400).
+ */
+export const PICTURE_RECIPES = {
+  // The toast container is rendered by the story, next to the button.
+  // The toast container is rendered by the story, next to the button; the
+  // toast slides in, and is photographed once it has arrived.
+  "components/toast": {
+    click: "text=Show Toast",
+    hide: "text=Show Toast",
+    wait: 1500,
+  },
+  "components/modal-dialog": { click: "text=Show", hideRoot: true },
+  // Both render inside the root, over the story's own page, so the page stays.
+  "components/aside": { click: "text=Open Panel" },
+  "components/backdrop": { click: "text=Toggle Backdrop" },
+  "components/top-loading-indicator": {
+    click: "text=Start Loading",
+    hideRoot: true,
+    wait: 800,
+  },
+  "components/drop-down": { click: "text=Open Dropdown" },
+  "components/context-menu": { rightClick: "text=Right click on me" },
+  "components/tooltip": { hover: "text=Hover me" },
+};
+
 /** Where the pages live inside the site repository (`site/` + the doc id prefix). */
 export const SITE_SECTION = "docspace/ui-kit";
 

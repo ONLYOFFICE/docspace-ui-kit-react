@@ -30,6 +30,32 @@ export const API_TABLE_IMPORT = [
   "'@site/src/components/APITable/APITable';",
 ].join(" ");
 
+export const THEMED_IMAGE_IMPORT = [
+  "import ThemedImage from",
+  "'@theme/ThemedImage';",
+].join(" ");
+
+/**
+ * The component's picture, in the reader's colour mode: Docusaurus's
+ * ThemedImage swaps the source with the theme. The files are retina
+ * (SCALE in screenshots.mjs), so `width` is what sizes it on the page.
+ */
+const themedImage = (alt, { light, dark, width }) =>
+  `<ThemedImage alt="${alt.replaceAll('"', "&quot;")}" width={${width}} ` +
+  `sources={{ light: require('./${light}').default, dark: require('./${dark}').default }} />`;
+
+/** A PNG's pixel width, from its IHDR chunk. */
+export const pngWidth = (file) => {
+  const header = Buffer.alloc(24);
+  const fd = fs.openSync(file, "r");
+  try {
+    fs.readSync(fd, header, 0, 24, 0);
+  } finally {
+    fs.closeSync(fd);
+  }
+  return header.readUInt32BE(16);
+};
+
 const SECTIONS_FILE = "scripts/docs/sections.mjs";
 
 /** The note `pnpm readme:props` leaves above each table; for repository readers only. */
@@ -233,7 +259,7 @@ const afterIntro = (text, line) => {
 
 /** A README, rewritten. */
 export const renderReadme = (raw, context) => {
-  const { page, revision, storyId } = context;
+  const { page, picture, revision, storyId } = context;
   let text = stripHtmlComments(raw).replace(GENERATED_NOTE, "").trim();
   text = rewriteLinks(text, linkResolver(context));
   text = escapeForMdx(text);
@@ -242,10 +268,13 @@ export const renderReadme = (raw, context) => {
     text,
     storybookLine(page.title ? `${storyId(page.title)}--docs` : null),
   );
+  // Inserted after the link, so it lands first: right under the intro.
+  text = afterIntro(text, picture ? themedImage(page.label, picture) : null);
   const tables = wrapApiTables(text);
   text = tables.wrapped
     ? addImport(tables.text, API_TABLE_IMPORT)
     : tables.text;
+  if (picture) text = addImport(text, THEMED_IMAGE_IMPORT);
 
   return (
     frontMatter({
@@ -291,6 +320,10 @@ export const renderMdx = (raw, context) => {
     .join("\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+  // A trailing rule and the paragraph after it is the page's Storybook
+  // footer -- the package version and licence under Welcome. The site has a
+  // footer of its own.
+  text = text.replace(/\n---\n+(?:[^\n]+\n?)+$/, "").trimEnd();
   text = rewriteLinks(text, linkResolver(context));
   // A page whose heading was part of the dropped component still needs one:
   // Docusaurus titles the page from its H1.

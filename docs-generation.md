@@ -13,9 +13,10 @@ It does not generate them.
 ## Commands
 
 ```bash
-pnpm docs         # site-docs/ -- pages, category pages, sidebar; a [warn] fails it
-pnpm docs:check   # the same, then every page compiled as MDX the way Docusaurus will
-pnpm docs:sync    # pnpm docs, then copy site-docs/ into ../api.onlyoffice.com/site/docspace/ui-kit
+pnpm docs             # site-docs/ -- pages, category pages, sidebar; a [warn] fails it
+pnpm docs:check       # the same, then every page compiled as MDX the way Docusaurus will
+pnpm docs:screenshots # a picture of every component into site-screenshots/ (needs storybook-static)
+pnpm docs:sync        # pnpm docs, then copy site-docs/ into ../api.onlyoffice.com/site/docspace/ui-kit
 ```
 
 CI runs `pnpm docs:check` in the lint job.
@@ -35,7 +36,8 @@ CI runs `pnpm docs:check` in the lint job.
   category table. A README without the block is not published: nothing says what it is for or
   whether it is public.
 - **The "Getting started" MDX pages** with Storybook's parts taken out: the imports, `<Meta>`
-  and the decorative components listed under `drop` in `scripts/docs/config.mjs`. A page whose
+  and the decorative components listed under `drop` in `scripts/docs/config.mjs`, and a trailing rule with the paragraph after
+  it, which is the page's footer (the version and licence line under Welcome). A page whose
   content is a React component is `skip`ped there, with the reason: "Agent skills" (infographics)
   and "Types and roles" (the access matrices).
 - **`docs/getting-started.md`**, as "Installation", because nine READMEs link to it.
@@ -84,14 +86,38 @@ added. As in the SDK, the tables get a`name` only when their row ids collide.
 5. Front matter: `description` from the metadata `summary`, and `custom_edit_url` pointing at
    the source file.
 
+## Component pictures
+
+`pnpm docs:screenshots` (`scripts/docs/screenshots.mjs`) photographs one story per published
+component in the light and the dark theme, on a transparent canvas, into
+`site-screenshots/<category>/<page>-{light,dark}.png`. `pnpm docs` copies the pair beside the
+page and puts a Docusaurus `<ThemedImage>` under the intro paragraph, so the reader sees the
+theme they are in; a page without a pair gets no picture, and the run says how many are
+missing rather than failing -- CI runs no browser.
+
+It needs a static Storybook (`pnpm storybook-build`, or `STORYBOOK_URL` for a served one) and
+Playwright's Chromium (`pnpm exec playwright install chromium`). Storybook's `index.json`
+names the story: the one tagged `picture` in its CSF (`tags: ["picture"]`), else the file's
+first. A component that opens from a trigger -- a dialog, a toast, a drop-down, a tooltip -- has a
+recipe in `PICTURE_RECIPES` (`scripts/docs/config.mjs`): the gesture that opens it, and
+whether to hide the trigger so only what the portal renders is in the picture. The story is opened with `globals=canvas:transparent`, a global `.storybook/preview.tsx`
+declares to drop the white or black page and the margin the decorator otherwise paints; the
+picture is the union of everything that paints -- backgrounds, borders, shadows, images,
+text -- anywhere in the body, so what a portal renders is in it too, with an 8px margin,
+taken at 2x and shown at 1x.
+
+Both directories are gitignored; the pictures are regenerated, never edited.
+
 ## Category pages
 
 A category without a README of its own gets a page built from `scripts/docs/sections.mjs`: a
 title, a paragraph, and a table of its pages with each one's summary. Storybook groups have
 nothing to say about themselves, so that paragraph lives there, keyed by Storybook path
 (`"UI/Form controls"`). **A new Storybook group fails a strict run until it has an entry.**
-`index.md` at the root lists the categories. A category with a README but no pages under it
-(`components/table`) is emitted as a plain sidebar doc, not an empty category.
+`index.md` at the root lists the categories. A compound README with no pages under it
+(`components/table`: its parts have no README of their own) is one page, and is filed in the
+category its metadata `category` names -- "Data display", beside Rows and Tiles -- rather than
+standing alone between the folders as an empty category.
 
 ## Output
 

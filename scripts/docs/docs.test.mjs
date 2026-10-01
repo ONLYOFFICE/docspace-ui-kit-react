@@ -1,6 +1,10 @@
 // The docs pipeline's transforms on fixtures. Every one of them is a text
 // rewrite that a README shape nobody anticipated can break silently, and the
 // only other thing that would notice is the site build in another repository.
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+
 import { compile } from "@mdx-js/mdx";
 import remarkGfm from "remark-gfm";
 import { describe, expect, it } from "vitest";
@@ -12,7 +16,14 @@ import {
   rewriteLinks,
   stripHtmlComments,
 } from "./markdown.mjs";
-import { linkResolver, reshapePropsTables, wrapApiTables } from "./render.mjs";
+import {
+  linkResolver,
+  pngWidth,
+  renderMdx,
+  renderReadme,
+  reshapePropsTables,
+  wrapApiTables,
+} from "./render.mjs";
 import { sidebarItems } from "./sidebar.mjs";
 import {
   csfTitle,
@@ -296,5 +307,79 @@ describe("sidebarItems", () => {
     });
     expect(items[1].type).toBe("category");
     expect(items[1].items).toHaveLength(1);
+  });
+});
+
+describe("renderMdx", () => {
+  const context = (source) => ({
+    root: process.cwd(),
+    source,
+    out: "getting-started/welcome.md",
+    page: { label: "Welcome", source, options: { drop: ["WelcomePage"] } },
+    pages: { bySource: new Map(), byStoryId: new Map() },
+    revision: "master",
+    warn: () => {},
+  });
+
+  it("drops imports, Meta, dropped components and the trailing footer", () => {
+    const raw = [
+      'import { Meta } from "@storybook/addon-docs/blocks";',
+      'import { WelcomePage } from "./welcome/WelcomePage";',
+      "",
+      '<Meta title="Getting started/Welcome" />',
+      "",
+      "<WelcomePage />",
+      "",
+      "## Installation",
+      "",
+      "Text.",
+      "",
+      "---",
+      "",
+      "`@onlyoffice/apps-ui-kit` 4.0.0 — AGPL-3.0-only.",
+      "",
+    ].join("\n");
+    const out = renderMdx(raw, context("docs/Welcome.mdx"));
+    expect(out).toContain("# Welcome\n\n## Installation\n\nText.\n");
+    expect(out).not.toContain("import ");
+    expect(out).not.toContain("<Meta");
+    expect(out).not.toContain("AGPL");
+    expect(out).not.toMatch(/---\n*$/);
+  });
+});
+
+describe("pictures", () => {
+  it("reads a PNG's width from its header", () => {
+    const header = Buffer.alloc(24);
+    header.writeUInt32BE(1948, 16);
+    const file = path.join(os.tmpdir(), `ui-kit-docs-${process.pid}.png`);
+    fs.writeFileSync(file, header);
+    try {
+      expect(pngWidth(file)).toBe(1948);
+    } finally {
+      fs.rmSync(file);
+    }
+  });
+
+  it("puts a ThemedImage under the intro and imports it", () => {
+    const out = renderReadme("# Button\n\nIntro.\n\n## Props\n", {
+      root: process.cwd(),
+      source: "components/button/README.md",
+      out: "interactive-elements/button.md",
+      page: { label: "Button", source: "components/button/README.md" },
+      pages: { bySource: new Map(), byStoryId: new Map() },
+      picture: {
+        light: "button-light.png",
+        dark: "button-dark.png",
+        width: 117,
+      },
+      revision: "master",
+      storyId: () => "x",
+      warn: () => {},
+    });
+    expect(out).toContain("import ThemedImage from '@theme/ThemedImage';");
+    expect(out).toContain(
+      "Intro.\n\n<ThemedImage alt=\"Button\" width={117} sources={{ light: require('./button-light.png').default, dark: require('./button-dark.png').default }} />\n\n## Props",
+    );
   });
 });

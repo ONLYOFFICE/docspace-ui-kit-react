@@ -51,6 +51,7 @@
     "surface:check": "node .claude/scripts/plugin-surface/surface.mjs --check",
     "docs": "node scripts/docs/index.mjs --strict",
     "docs:check": "node scripts/docs/index.mjs --strict --check",
+    "docs:screenshots": "node scripts/docs/screenshots.mjs",
     "docs:sync": "pnpm run docs && node scripts/docs/sync.mjs"
   },
   "//peerDependencies": "Only packages this library imports directly. Transitive dependencies of @onlyoffice/ai-chat (the assistant-ui, radix, codemirror, LLM-vendor SDKs and friends) are declared by ai-chat itself as its own peers -- re-declaring them here duplicated a list nothing kept in sync. Everything below is verified imported somewhere under this package root.",

@@ -175,6 +175,7 @@ pnpm sync-locales
 # See docs-generation.md.
 pnpm docs
 pnpm docs:check
+pnpm docs:screenshots   # needs storybook-static and Playwright's Chromium
 pnpm docs:sync
 ```
 

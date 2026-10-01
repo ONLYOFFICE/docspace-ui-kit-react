@@ -12,10 +12,9 @@ export const sidebarItems = (categories) =>
     const label = SECTIONS[category.key]?.title ?? category.label;
     const link = { type: "doc", id: docId(`${category.slug}/index.md`) };
 
-    // A category with nothing under it -- a README whose children have no
-    // README of their own -- is a page. An empty category renders as one
-    // anyway, but styled as a leaf between the folders, and the llms.txt
-    // plugin files it under the section root.
+    // collect() files a README-only group into another category, so this is
+    // the fallback for one it could not place: a page, since an empty
+    // category renders as one anyway, styled as a leaf between the folders.
     if (category.pages.length === 0) return { ...link, label };
 
     return {

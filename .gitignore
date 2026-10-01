@@ -26,5 +26,8 @@ test-results
 audits
 
 # API-site pages, regenerated from the READMEs by `pnpm docs` and copied into
-# api.onlyoffice.com by `pnpm docs:sync`. Never edited here.
+# api.onlyoffice.com by `pnpm docs:sync`. Never edited here. The component
+# pictures `pnpm docs:screenshots` takes for them live beside, in
+# site-screenshots, so a docs run does not wipe them.
 site-docs
+site-screenshots

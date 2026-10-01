@@ -233,6 +233,32 @@ export const collect = (root, { includeInternal = false, statuses, warn }) => {
     category.pages.splice(after + 1, 0, page);
   }
 
+  // A compound README whose children have no README of their own
+  // (components/table) would be a category with nothing under it: a single
+  // page styled as a leaf between the folders. It is one page, so it goes
+  // where its own metadata files it -- `category` names a Storybook group
+  // under UI/ -- in alphabetical place among that group's pages.
+  for (const category of [...ordered]) {
+    if (category.pages.length > 0 || !category.readme) continue;
+    const homeKey = `UI/${category.readme.meta.category}`;
+    const home = ordered.find((c) => c.key === homeKey);
+    if (!home) {
+      warn(
+        `${category.readme.source}: no pages under "${category.key}" and no published category "${homeKey}" to file it in`,
+      );
+      continue;
+    }
+    const page = {
+      ...category.readme,
+      slug: path.posix.basename(path.posix.dirname(category.readme.source)),
+    };
+    const at = home.pages.findIndex(
+      (p) => p.label.localeCompare(page.label) > 0,
+    );
+    home.pages.splice(at === -1 ? home.pages.length : at, 0, page);
+    ordered.splice(ordered.indexOf(category), 1);
+  }
+
   const result = ordered.filter(
     (category) => category.pages.length > 0 || category.readme,
   );

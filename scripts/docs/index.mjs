@@ -15,9 +15,17 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { collect } from "./collect.mjs";
-import { OUT_DIR, PUBLISHED_STATUSES, ROOT, SIDEBAR_FILE } from "./config.mjs";
+import {
+  OUT_DIR,
+  PUBLISHED_STATUSES,
+  ROOT,
+  SHOTS_DIR,
+  SHOT_SCALE,
+  SIDEBAR_FILE,
+} from "./config.mjs";
 import {
   layout,
+  pngWidth,
   renderCategory,
   renderMarkdown,
   renderMdx,
@@ -71,6 +79,35 @@ for (const category of categories) {
 
 /** @type {Map<string, string>} output path -> content */
 const files = new Map();
+/** @type {Map<string, string>} output path -> source file, copied as is */
+const copies = new Map();
+let pictured = 0;
+let unpictured = 0;
+
+/**
+ * The light and dark pictures `pnpm docs:screenshots` took for a component,
+ * queued for copying beside its page; `undefined` when it has none.
+ */
+const pictureOf = (category, page) => {
+  if (page.kind !== "readme" || !page.title) return undefined;
+  const names = ["light", "dark"].map((theme) => `${page.slug}-${theme}.png`);
+  const sources = names.map((name) =>
+    path.join(ROOT, SHOTS_DIR, category.slug, name),
+  );
+  if (!sources.every((file) => fs.existsSync(file))) {
+    unpictured += 1;
+    return undefined;
+  }
+  names.forEach((name, i) =>
+    copies.set(`${category.slug}/${name}`, sources[i]),
+  );
+  pictured += 1;
+  return {
+    light: names[0],
+    dark: names[1],
+    width: Math.round(pngWidth(sources[0]) / SHOT_SCALE),
+  };
+};
 const RENDER = {
   readme: renderReadme,
   mdx: renderMdx,
@@ -104,6 +141,7 @@ for (const category of categories) {
         out,
         page,
         pages,
+        picture: pictureOf(category, page),
         revision: rev,
         storyId,
         warn,
@@ -120,6 +158,15 @@ for (const [file, content] of files) {
   const full = path.join(outDir, file);
   fs.mkdirSync(path.dirname(full), { recursive: true });
   fs.writeFileSync(full, content);
+}
+for (const [file, source] of copies) {
+  fs.copyFileSync(source, path.join(outDir, file));
+}
+if (pictured + unpictured > 0) {
+  console.log(
+    `${pictured} component page(s) carry a picture, ${unpictured} do not` +
+      (unpictured > 0 ? ` (pnpm docs:screenshots takes them).` : "."),
+  );
 }
 
 const pageCount = [...files.keys()].filter((f) => f.endsWith(".md")).length;
