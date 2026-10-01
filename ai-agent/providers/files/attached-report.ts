@@ -33,41 +33,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-"use client";
-
 import { createContext, useContext } from "react";
 
+import type { OnFilesAttached } from "./attach-files";
+
 /**
- * Host-supplied wiring for the in-chat "use the tested model for form
- * results" notice. Everything here is optional: without a recommended model
- * the notice never shows, and without the dismissal pair it lasts for the
- * session only.
+ * Carries AiAgentProviders' own attach reporter down the tree, so the attach
+ * entry points a host triggers from outside the chat — the "Ask AI" context
+ * action and the drag-and-drop drop zone, both going through
+ * `useAttachHostFilesToChat` — report what they attached exactly like the
+ * picker dialog and the device upload do (those get the callback as a prop).
+ *
+ * The provider owns the reporter (it remembers the record flags the
+ * attachments store drops, `canAnalyze`), so the callers must not have to know
+ * about it: undefined outside the provider makes the report a no-op.
  */
-export type FormsRecommendation = {
-  /**
-   * Model id the portal recommends for form-related tasks
-   * (`TAIConfig.recommendedModelForForms`). Empty/undefined switches the
-   * notice off.
-   */
-  recommendedModel?: string;
-  /** The current user may change the agent's model — picks the admin copy. */
-  canEditAgent?: boolean;
-  /** Opens the agent's settings, where the model is chosen. */
-  onOpenAgentEdit?: () => void;
-  /**
-   * Host-persisted dismissal (`chatRecommendedModelVisible` on the AI user
-   * config). `false` hides the notice for good; omitted means the host does
-   * not persist it and the close button only lasts the session.
-   */
-  noticeVisible?: boolean;
-  /** Called when the user closes the notice, so the host can persist it. */
-  onCloseNotice?: () => void;
-};
+export const OnFilesAttachedContext = createContext<
+  OnFilesAttached | undefined
+>(undefined);
 
-export const FormsRecommendationContext = createContext<FormsRecommendation>(
-  {},
-);
-
-/** Read the host wiring for the form model notice. */
-export const useFormsRecommendation = (): FormsRecommendation =>
-  useContext(FormsRecommendationContext);
+/** The provider's attach reporter, or undefined when rendered without it. */
+export const useOnFilesAttached = (): OnFilesAttached | undefined =>
+  useContext(OnFilesAttachedContext);

@@ -34,6 +34,7 @@ import {
 } from "react";
 
 import i18nextSingleton from "i18next";
+import { useObserver } from "mobx-react";
 import {
   I18nextProvider as ReactI18nextProvider,
   useTranslation,
@@ -80,17 +81,18 @@ import "@onlyoffice/ai-chat/styles";
 // Re-exported so the host can type the `suggestions` array it builds and
 // passes in (the section→chips logic lives in the host, not here).
 export type { Suggestion } from "@onlyoffice/ai-chat";
+// The per-composer-state chip lists the host fills in, and the switching
+// between them, live in ./suggestions — re-exported so the prop's type stays
+// importable from the provider module the host already imports.
+export type { SuggestionSet } from "./suggestions";
 
 import { toastr } from "../../components/toast";
 import { Link, LinkType } from "../../components/link";
 import { useIsMobile } from "../../hooks/use-is-mobile";
 
 import { AiChatAvailabilityContext } from "./availability";
-import {
-  FormsRecommendationContext,
-  type FormsRecommendation,
-} from "./forms-recommendation";
 import { ChatIntro } from "../chat-intro";
+import { AnalyzeIntro } from "../new-chat/components/analyze-intro";
 import { storageAdapter } from "./storage";
 import { usePlatformAdapter } from "./platform";
 import { componentOverrides } from "./components-overrides";
@@ -100,6 +102,7 @@ import { normalizeAiChatLocale } from "./locale";
 import { portalThemes } from "./themes";
 import {
   AgentRoomIdSync,
+  AiChatStore,
   AiChatStoreProvider,
   AiChatStoresBridge,
 } from "./ai-chat-store";
@@ -119,7 +122,27 @@ import {
 } from "./host-tool-groups/generated-file-window";
 import { addDialogSubmitInterceptor } from "./components-overrides/dialog-footer/submit-interceptors";
 import { useApi as useFilesApi } from "../../providers/api";
-import { useFilesIntegration, type AttachedFileInfo } from "./files";
+import {
+  useAnalyzeQuestions,
+  useComposerTyping,
+  useFilesIntegration,
+  type AttachedFileInfo,
+  type ReadSuggestedQuestions,
+  type SuggestedQuestion,
+} from "./files";
+import { resolveSuggestions, type SuggestionSet } from "./suggestions";
+import { composeCallbacks } from "./compose-callbacks";
+import {
+  analyzeModeCallbacks,
+  analyzeSentMiddleware,
+} from "./analyze-sent-middleware";
+import { OnFilesAttachedContext } from "./files/attached-report";
+import {
+  AttachmentLimitContext,
+  resolveAttachmentCap,
+  type AttachmentCap,
+} from "./files/attachment-limit";
+import { CHAT_ATTACHMENT_LIMIT } from "./files/limits";
 import { uploadFilesToChat } from "./files/upload-files";
 import { openAttachedFile } from "./files/open-file";
 
@@ -174,12 +197,6 @@ type AiAgentProvidersProps = {
    * fire and no chat UI is offered.
    */
   canUseAi?: boolean;
-  /**
-   * Wiring for the in-chat notice that recommends the model tested for form
-   * results. Shown above the chat while the composer carries a DocSpace form;
-   * omit it and the notice never appears.
-   */
-  formsRecommendation?: FormsRecommendation;
   getAgentRoomId?: () => number | null;
   openResultFile?: (fileId: number | string) => void;
   closeEditorPanel?: () => void;
@@ -267,47 +284,16 @@ type AiAgentProvidersProps = {
    * {@link SuggestionSet}. A bare array is treated as `{ default: [...] }`.
    */
   suggestions?: Suggestion[] | SuggestionSet;
+  /**
+   * How many attachments the composer accepts in the section the host is
+   * showing. Defaults to the widget's own `CHAT_ATTACHMENT_LIMIT`; the Forms
+   * section passes 1, because a question there is about a single form and its
+   * responses. Values above the widget's cap are ignored (it enforces its
+   * own), and every attach entry point honors it — picker, device upload,
+   * "Ask AI" row action, drag-and-drop.
+   */
+  attachmentLimit?: number;
   children: ReactNode;
-};
-
-/**
- * Suggestion chips per composer state. The host owns the texts; picking
- * between them belongs here, because only the provider sees the attachments
- * store — files can also arrive by drag-and-drop and be removed chip by chip,
- * neither of which the host observes.
- *
- * Precedence: an analyzable form wins over the plain file lists, and those win
- * over the section default. Files and images both count — an attached image
- * is what the user is asking about just as much as a document.
- */
-export type SuggestionSet = {
-  /** Nothing attached: chips for the current section (room / folder). */
-  default: Suggestion[];
-  /** Exactly one file or image attached. */
-  singleFile?: Suggestion[];
-  /** Two or more files/images attached. */
-  multipleFiles?: Suggestion[];
-  /** At least one attached file the backend flagged as analyzable. */
-  analyzableForm?: Suggestion[];
-};
-
-const resolveSuggestions = (
-  suggestions: Suggestion[] | SuggestionSet | undefined,
-  attachedFileIds: string[],
-  analyzableIds: string[],
-): Suggestion[] | undefined => {
-  if (!suggestions || Array.isArray(suggestions)) return suggestions;
-
-  if (attachedFileIds.some((id) => analyzableIds.includes(id))) {
-    return suggestions.analyzableForm ?? suggestions.default;
-  }
-  if (attachedFileIds.length > 1) {
-    return suggestions.multipleFiles ?? suggestions.default;
-  }
-  if (attachedFileIds.length === 1) {
-    return suggestions.singleFile ?? suggestions.default;
-  }
-  return suggestions.default;
 };
 
 // Server-mode API config: backend is mounted at the same origin as the
@@ -513,6 +499,8 @@ const logRescopeFailure = (step: string, reload: Promise<unknown>): void => {
 // (it reads its own string through window.i18n), so one element is created
 // once and reused instead of being rebuilt per render.
 const chatIntro = <ChatIntro />;
+// Static, so it never invalidates the widget config memo.
+const analyzeIntro = <AnalyzeIntro />;
 
 const AiAgentProviders = ({
   locale,
@@ -521,7 +509,6 @@ const AiAgentProviders = ({
   isStandalone,
   isAvailable = false,
   canUseAi = true,
-  formsRecommendation,
   getAgentRoomId,
   openResultFile,
   closeEditorPanel,
@@ -538,11 +525,12 @@ const AiAgentProviders = ({
   composerHeader,
   composerDisabled,
   suggestions,
+  attachmentLimit,
   children,
 }: AiAgentProvidersProps) => {
   const { t } = useTranslation("Common");
   const aiChatLocale = normalizeAiChatLocale(locale);
-  const { foldersApi, operationsApi, filesSettingsApi } = useFilesApi();
+  const { foldersApi, operationsApi, filesSettingsApi, aiApi } = useFilesApi();
 
   const aiChatTranslations = useMemo(
     () => ({
@@ -554,6 +542,24 @@ const AiAgentProviders = ({
     [isStandalone, t],
   );
 
+  // The panel store is created here rather than by `AiChatStoreProvider`
+  // below, because the analyze mode lives on it and everything this body
+  // assembles — the attachment cap, the composer actions, the chips — is
+  // derived from that mode. Only the flat fields are observed, never the mode
+  // object itself.
+  const aiChatStore = useMemo(() => new AiChatStore(), []);
+  const {
+    analyzeActive,
+    analyzePending,
+    analyzeAttachmentId,
+    analyzeFileName,
+  } = useObserver(() => ({
+    analyzeActive: aiChatStore.isAnalyzeMode,
+    analyzePending: aiChatStore.isAnalyzePending,
+    analyzeAttachmentId: aiChatStore.analyzeAttachmentId,
+    analyzeFileName: aiChatStore.analyzeFormTitle,
+  }));
+
   // Ids of attached files the backend flagged as analyzable. The attachments
   // store keeps only `{id, title, kind, path, type}` per ref, so `canAnalyze`
   // exists in the attach response alone and is remembered here. Ids of removed
@@ -563,40 +569,52 @@ const AiAgentProviders = ({
 
   const isMobile = useIsMobile();
 
-  const onFilesAttached = useCallback((attached: AttachedFileInfo[]) => {
-    const ids = attached.filter((f) => f.canAnalyze).map((f) => f.id);
-    if (ids.length === 0) return;
-    setAnalyzableIds((prev) => [...prev, ...ids]);
-  }, []);
+  const onFilesAttached = useCallback(
+    (attached: AttachedFileInfo[]) => {
+      // The form's chip is on the draft now. `useAttachHostFilesToChat`
+      // entered the mode when the attach started — this is the other half:
+      // from here an empty draft means the user removed the chip, not that
+      // the attach is still in flight. Started again as well, for the entry
+      // routes that report an attach without having gone through the hook.
+      const subject = attached.find((f) => f.analyzeOnly && f.entryId);
+      if (subject) {
+        aiChatStore.startAnalyzeMode({
+          entryId: subject.entryId,
+          title: subject.title,
+        });
+        // `subject.id` is what `attachments/save-files-many` minted for the
+        // form; the starter questions are asked for by that, not by the host
+        // file id, so this report is the first moment the poll can start.
+        aiChatStore.markAnalyzeAttached(subject.entryId, subject.id);
+      }
 
-  // Context value for the in-chat form-model notice. Memoized on the fields so
-  // a host passing a fresh object literal every render does not re-render the
-  // whole chat tree.
-  const formsRecommendationValue = useMemo<FormsRecommendation>(
-    () => ({
-      recommendedModel: formsRecommendation?.recommendedModel,
-      canEditAgent: formsRecommendation?.canEditAgent,
-      onOpenAgentEdit: formsRecommendation?.onOpenAgentEdit,
-      noticeVisible: formsRecommendation?.noticeVisible,
-      onCloseNotice: formsRecommendation?.onCloseNotice,
-    }),
-    [
-      formsRecommendation?.recommendedModel,
-      formsRecommendation?.canEditAgent,
-      formsRecommendation?.onOpenAgentEdit,
-      formsRecommendation?.noticeVisible,
-      formsRecommendation?.onCloseNotice,
-    ],
+      const analyzable = attached.filter((f) => f.canAnalyze);
+      if (analyzable.length === 0) return;
+
+      setAnalyzableIds((prev) => [...prev, ...analyzable.map((f) => f.id)]);
+    },
+    [aiChatStore],
+  );
+
+  // Never above what the widget itself enforces: a host asking for more would
+  // only make the cap toast quote a number the store does not honor.
+  const sectionAttachmentLimit = Math.min(
+    Math.max(1, attachmentLimit ?? CHAT_ATTACHMENT_LIMIT),
+    CHAT_ATTACHMENT_LIMIT,
   );
 
   // File-attachment integration: the composer "attach" actions, the message
   // "Save as file" handler, and the supporting dialogs/device-upload input.
   // Device uploads are stored as portal files in the chat's entity scope.
-  const { composerActions, onSaveAsFile, exportFormats, overlay } =
-    useFilesIntegration({
-      entityId,
-      onFilesAttached,
-    });
+  const {
+    composerActions: attachActions,
+    onSaveAsFile,
+    exportFormats,
+    overlay,
+  } = useFilesIntegration({
+    entityId,
+    onFilesAttached,
+  });
 
   // Platform adapter passed downstream. Its `file` adapter is wired to the
   // host's save handler, and it tracks the host locale/theme internally (the
@@ -724,7 +742,9 @@ const AiAgentProviders = ({
   const { stores, ctx, serverApiConfig } = useMemo(() => {
     const eventBus = new ChatEventBus();
     const callbacksManager = new CallbacksManager();
-    const middlewareRunner = new MiddlewareRunner([]);
+    const middlewareRunner = new MiddlewareRunner([
+      analyzeSentMiddleware(aiChatStore),
+    ]);
     const servers = new Servers(platform, eventBus);
 
     const appCtx = {
@@ -769,7 +789,52 @@ const AiAgentProviders = ({
     });
 
     return { stores: appStores, ctx: appCtx, serverApiConfig: config };
-  }, [isStandalone, platform]);
+  }, [isStandalone, platform, aiChatStore]);
+
+  // While "Analyze responses" is on, the chat is about that one form: the cap
+  // drops to one and the composer's attach actions go away, so the "+" menu
+  // stops offering something the cap would then refuse. The mode is state on
+  // the panel store, not a property of the draft — it outlives the message
+  // that takes the form off the composer (see `AiChatStore.analyzeMode`).
+
+  // The number the composer enforces and the reason the refusal quotes — see
+  // `resolveAttachmentCap` for why the analyze mode ends up with no slots at
+  // all once its first message is out.
+  const attachmentCap = useMemo<AttachmentCap>(
+    () =>
+      resolveAttachmentCap({
+        analyzeActive,
+        analyzePending,
+        analyzeFileName,
+        sectionLimit: sectionAttachmentLimit,
+      }),
+    [analyzeActive, analyzePending, analyzeFileName, sectionAttachmentLimit],
+  );
+
+  const composerActions = useMemo(
+    () => (analyzeActive ? [] : attachActions),
+    [analyzeActive, attachActions],
+  );
+
+  // The starter questions of the form being analyzed: asked for once, then
+  // waited for on the socket. In this mode the message is about this form's
+  // answers, so the static chips are not shown in the meantime — a generic
+  // chip would ask the wrong question.
+  const readSuggestedQuestions = useCallback<ReadSuggestedQuestions>(
+    (attachmentId, signal) => aiApi.getSuggestedQuestions(attachmentId, signal),
+    [aiApi],
+  );
+
+  // Asked for by the attachment the form became, so the wait starts only once
+  // the attach has reported it back.
+  const { questions: analyzeQuestions, onTyping } = useAnalyzeQuestions(
+    readSuggestedQuestions,
+    analyzeAttachmentId,
+  );
+
+  // Writing your own question makes the suggestions moot — stop waiting for
+  // them (and let the wait end for good, the chips are not coming back).
+  useComposerTyping(analyzeActive, onTyping);
 
   // Whether the PREVIOUS scope was an agent room — needed to tell a real
   // thread-scope change from plain folder navigation (see the effect below).
@@ -868,6 +933,7 @@ const AiAgentProviders = ({
         filesSettingsApi,
         useAttachmentsStore: stores.useAttachmentsStore,
         onFilesAttached,
+        attachmentCap,
         t,
       }),
     [
@@ -877,6 +943,7 @@ const AiAgentProviders = ({
       filesSettingsApi,
       stores,
       onFilesAttached,
+      attachmentCap,
       t,
     ],
   );
@@ -896,8 +963,25 @@ const AiAgentProviders = ({
         suggestions,
         attachedFileIds === "" ? [] : attachedFileIds.split(","),
         analyzableIds,
+        { active: analyzeActive, questions: analyzeQuestions },
       ),
-    [suggestions, attachedFileIds, analyzableIds],
+    [
+      suggestions,
+      attachedFileIds,
+      analyzableIds,
+      analyzeActive,
+      analyzeQuestions,
+    ],
+  );
+
+  const ownCallbacks = useMemo<ChatCallbacks>(
+    () => analyzeModeCallbacks(aiChatStore),
+    [aiChatStore],
+  );
+
+  const chatCallbacks = useMemo(
+    () => composeCallbacks(callbacks, ownCallbacks),
+    [callbacks, ownCallbacks],
   );
 
   const widgetConfig = useMemo<WidgetConfig>(
@@ -930,7 +1014,7 @@ const AiAgentProviders = ({
       suggestions: resolvedSuggestions,
       // Rendered by the library above the chips, under the same "empty chat"
       // gate — no chips, no intro.
-      suggestionsHeader: chatIntro,
+      suggestionsHeader: analyzeActive ? analyzeIntro : chatIntro,
 
       // Route drag-and-drop through the portal-upload + attach flow (same as
       // the "Upload from device" button) instead of the library's in-memory
@@ -943,6 +1027,7 @@ const AiAgentProviders = ({
       composerDisabled,
       entityId,
       contextEntityId,
+      analyzeActive,
       hideProfilePicker,
       profilePickerReadOnly,
       profilePickerActions,
@@ -974,52 +1059,65 @@ const AiAgentProviders = ({
 
   return (
     <AiChatAvailabilityContext.Provider value={isAvailable && canUseAi}>
-      <FormsRecommendationContext.Provider value={formsRecommendationValue}>
-        <EventsProvider
-          callbacksManager={ctx.callbacksManager}
-          callbacks={callbacks}
-        >
-          <PlatformProvider platform={platform}>
-            <AiChatI18nIsolator
-              locale={aiChatLocale}
-              translations={aiChatTranslations}
-            >
-              <ComponentsProvider overrides={componentOverrides}>
-                <WidgetConfigProvider config={widgetConfig}>
-                  <ApiProvider config={serverApiConfig}>
-                    <StoresProvider stores={stores}>
-                      <ThemeProvider theme={theme} customThemes={portalThemes}>
-                        <ImagesProvider overrides={imageOverrides}>
-                          <ToolsProvider
-                            hostToolGroups={hostToolGroups}
-                            servers={ctx.servers}
-                            eventBus={ctx.eventBus}
-                          >
-                            <StoresHydrator enabled={canUseAi} />
-                            <ProfilePickerAliasBridge
-                              alias={profilePickerAlias}
-                            />
-                            <ThreadContextBridge
-                              onThreadContextChange={onThreadContextChange}
-                            />
-                            <GenerateToolApprovalBridge />
-                            <AiChatStoreProvider>
-                              <AiChatStoresBridge />
-                              {getAgentRoomId ? null : <AgentRoomIdSync />}
-                              {children}
+      <EventsProvider
+        callbacksManager={ctx.callbacksManager}
+        callbacks={chatCallbacks}
+      >
+        <PlatformProvider platform={platform}>
+          <AiChatI18nIsolator
+            locale={aiChatLocale}
+            translations={aiChatTranslations}
+          >
+            <ComponentsProvider overrides={componentOverrides}>
+              <WidgetConfigProvider config={widgetConfig}>
+                <ApiProvider config={serverApiConfig}>
+                  <StoresProvider stores={stores}>
+                    <ThemeProvider theme={theme} customThemes={portalThemes}>
+                      <ImagesProvider overrides={imageOverrides}>
+                        <ToolsProvider
+                          hostToolGroups={hostToolGroups}
+                          servers={ctx.servers}
+                          eventBus={ctx.eventBus}
+                        >
+                          <StoresHydrator enabled={canUseAi} />
+                          <ProfilePickerAliasBridge alias={profilePickerAlias} />
+                          <ThreadContextBridge
+                            onThreadContextChange={onThreadContextChange}
+                          />
+                          <GenerateToolApprovalBridge />
+                          <AiChatStoreProvider store={aiChatStore}>
+                            <AiChatStoresBridge />
+                            {getAgentRoomId ? null : <AgentRoomIdSync />}
+                            {/* The per-section attachment cap covers the
+                                host subtree and the chat's own dialogs
+                                alike — picker, device upload, "Ask AI" row
+                                action, drop zone. */}
+                            <AttachmentLimitContext.Provider
+                              value={attachmentCap}
+                            >
+                              {/* The host subtree attaches files too (the
+                                  "Ask AI" action, the chat-panel drop
+                                  zone): hand it the same reporter the
+                                  dialogs get as a prop, so `canAnalyze`
+                                  survives every entry point. */}
+                              <OnFilesAttachedContext.Provider
+                                value={onFilesAttached}
+                              >
+                                {children}
+                              </OnFilesAttachedContext.Provider>
                               {overlay}
-                            </AiChatStoreProvider>
-                          </ToolsProvider>
-                        </ImagesProvider>
-                      </ThemeProvider>
-                    </StoresProvider>
-                  </ApiProvider>
-                </WidgetConfigProvider>
-              </ComponentsProvider>
-            </AiChatI18nIsolator>
-          </PlatformProvider>
-        </EventsProvider>
-      </FormsRecommendationContext.Provider>
+                            </AttachmentLimitContext.Provider>
+                          </AiChatStoreProvider>
+                        </ToolsProvider>
+                      </ImagesProvider>
+                    </ThemeProvider>
+                  </StoresProvider>
+                </ApiProvider>
+              </WidgetConfigProvider>
+            </ComponentsProvider>
+          </AiChatI18nIsolator>
+        </PlatformProvider>
+      </EventsProvider>
     </AiChatAvailabilityContext.Provider>
   );
 };
@@ -1027,10 +1125,6 @@ const AiAgentProviders = ({
 export default AiAgentProviders;
 
 export { useIsAiChatAvailable } from "./availability";
-export {
-  useFormsRecommendation,
-  type FormsRecommendation,
-} from "./forms-recommendation";
 export { useApi, useI18n, useStores } from "@onlyoffice/ai-chat";
 export { DEFAULT_SERVER_API_ROUTES } from "@onlyoffice/ai-chat";
 export type {

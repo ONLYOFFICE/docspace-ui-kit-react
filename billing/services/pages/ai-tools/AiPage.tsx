@@ -35,11 +35,10 @@
 
 import React, { useState, useEffect } from "react";
 import { useCommonTranslation } from "../../../../utils/i18n";
-import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 
 import { Text } from "../../../../components/text";
-import { Link, LinkTarget } from "../../../../components/link";
+import { Link } from "../../../../components/link";
 import { RectangleSkeleton } from "../../../../components/rectangle";
 
 import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
@@ -314,37 +313,18 @@ const AiPage = (props: AiPageProps) => {
         </div>
       </div>
 
-      {paymentStore.aiToolsFeePercent != null ? (
-        <Text as="span" fontSize="13px" className={styles.pricingRow}>
-          <CommonTrans
-            i18nKey="AIUsagePricingNote"
-            values={{ percent: paymentStore.aiToolsFeePercent }}
-            components={{
-              1: (
-                <Link
-                  fontSize="13px"
-                  fontWeight={600}
-                  color="accent"
-                  textDecoration="underline dotted"
-                  href="https://openrouter.ai/models"
-                  dataTestId="ai_openrouter_pricing_link"
-                  target={LinkTarget.blank}
-                />
-              ),
-              2: (
-                <Link
-                  fontSize="13px"
-                  fontWeight={600}
-                  color="accent"
-                  textDecoration="underline dotted"
-                  onClick={onOpenSupportedModels}
-                  dataTestId="ai_supported_models_link"
-                />
-              ),
-            }}
-          />
-        </Text>
-      ) : null}
+      <Text as="span" fontSize="13px" className={styles.pricingRow}>
+        <Link
+          fontSize="13px"
+          fontWeight={600}
+          color="accent"
+          textDecoration="underline dotted"
+          onClick={onOpenSupportedModels}
+          dataTestId="ai_see_pricing_link"
+        >
+          {t("SeePricing")}
+        </Link>
+      </Text>
 
       <div>
         <TransactionHistory

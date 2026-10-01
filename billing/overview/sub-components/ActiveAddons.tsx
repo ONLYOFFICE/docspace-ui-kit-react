@@ -42,7 +42,7 @@ import { useCommonTranslation } from "../../../utils/i18n";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../store/ServicesStoreProvider";
 import { formatCompactNumber, getCurrencySymbol } from "../../utils/common";
-import { AI_TOOLS } from "../../constants";
+import { AI_SEARCH, AI_TOOLS, BACKUP_SERVICE } from "../../constants";
 
 import styles from "../Overview.module.scss";
 
@@ -117,12 +117,15 @@ const ActiveAddons = ({ onManageAddons }: ActiveAddonsProps) => {
           <div className={styles.addonsList}>
             {activeServices.map((item) => {
               const usage = usageForService(item.service);
-              const isCurrencyUsage = item.service === AI_TOOLS;
+              const isCurrencyUsage =
+                item.service === AI_TOOLS || item.service === AI_SEARCH;
               const currency = usage?.currency || walletCodeCurrency;
 
-              const unitLabel = isCurrencyUsage
-                ? getCurrencySymbol(currency, language)
-                : item.serviceUnit;
+              let unitLabel = item.serviceUnit;
+              if (isCurrencyUsage)
+                unitLabel = getCurrencySymbol(currency, language);
+              else if (item.service === BACKUP_SERVICE)
+                unitLabel = t("BackupCopiesUnit");
 
               const usedValue = isCurrencyUsage
                 ? (usage?.totalAmount ?? 0)
