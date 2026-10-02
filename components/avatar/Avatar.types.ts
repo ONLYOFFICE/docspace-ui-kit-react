@@ -1,91 +1,102 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type React from "react";
 
 import type { AvatarRole, AvatarSize, AvatarActionKeys } from "./Avatar.enums";
 
 export type TAvatarModel = { label: string; icon: string } & (
-	| {
-			key: string;
-			onClick: () => void;
-	  }
-	| {
-			key: typeof AvatarActionKeys.PROFILE_AVATAR_UPLOAD;
-			onClick: (ref?: React.RefObject<HTMLDivElement | null>) => void;
-	  }
+  | {
+      key: string;
+      onClick: () => void;
+    }
+  | {
+      key: typeof AvatarActionKeys.PROFILE_AVATAR_UPLOAD;
+      onClick: (ref?: React.RefObject<HTMLDivElement | null>) => void;
+    }
 );
 
 export type AvatarProps = {
-	/** Size of avatar */
-	size: AvatarSize;
-	/** Adds a table of user roles */
-	role: AvatarRole;
-	/** Displays as `Picture` in case the url is specified and as `Icon` in case the path to the .svg file is specified */
-	source?: string | React.JSX.Element;
-	/** Allows to display a user name as initials when `source` is set to blank */
-	userName?: string;
-	/** Enables avatar editing */
-	editing?: boolean;
-	/** Allows to display as a default icon when `source` is set to blank */
-	isDefaultSource?: boolean;
-	/** Function called when the avatar change button is pressed */
-	editAction?: () => void;
-	/** Hides user role */
-	hideRoleIcon?: boolean;
-	/** Accepts class */
-	className?: string;
-	/** Accepts id */
-	id?: string;
-	/** Accepts css style  */
-	style?: React.CSSProperties;
-	/** Show tooltip on hover role icon */
-	withTooltip?: boolean;
-	/** Tooltip content */
-	tooltipContent?: string;
-	onClick?: (e: React.MouseEvent) => void;
-	/** Display initials for group when `source` is set to blank */
-	isGroup?: boolean;
-	/** Accepts roleIcon */
-	roleIcon?: React.ReactElement;
-	noClick?: boolean;
-	hasAvatar?: boolean;
-	onChangeFile?: () => void;
+  /**
+   * Diameter of the avatar, from `extraSmall` (24px) to `max` (124px). It also
+   * picks the font size of the initials and the size and offset of the role
+   * icon; `extraSmall` has neither of those, so it fits a picture only.
+   */
+  size: AvatarSize;
+  /**
+   * Which role badge is drawn over the bottom corner. Only `owner` and `admin`
+   * draw anything — every other member, `none` included, renders no badge.
+   */
+  role: AvatarRole;
+  /**
+   * The picture. A React element is rendered as given; a string is a URL, shown
+   * with an `<img>` — except a path containing `.svg`, which is fetched and
+   * inlined as an icon unless `isNotIcon` is set, and one containing
+   * `default_user_photo`, which is replaced by the kit's own illustration.
+   */
+  source?: string | React.JSX.Element;
+  /**
+   * Name to build initials from when there is no `source`: the first letter of
+   * each word, two at most. Lower case is preserved unless `isGroup` is set.
+   */
+  userName?: string;
+  /**
+   * Shows the edit button over the avatar — a pencil when `hasAvatar`, a plus
+   * otherwise. It is read only at `size` `max`; at any other size nothing is
+   * rendered.
+   */
+  editing?: boolean;
+  /** Shows the kit's own illustration when there is no `source` and no `userName`. */
+  isDefaultSource?: boolean;
+  /** Ignored. Nothing reads this prop; the edit button calls `model[0].onClick`. */
+  editAction?: () => void;
+  /** Hides the role badge that `role` would otherwise draw. */
+  hideRoleIcon?: boolean;
+  /** Applied to the avatar element and, again, to the picture inside it. */
+  className?: string;
+  /** Ignored. Nothing reads this prop and no `id` reaches the DOM. */
+  id?: string;
+  /** Ignored. Nothing reads this prop and no inline style reaches the DOM. */
+  style?: React.CSSProperties;
+  /**
+   * Renders a tooltip anchored to the role badge. It needs a badge to attach
+   * to, so it does nothing unless `role` is `owner` or `admin`.
+   */
+  withTooltip?: boolean;
+  /** Text of that tooltip. */
+  tooltipContent?: string;
+  /**
+   * Called on a click on the avatar, and on a middle-button press. Passing it
+   * replaces the editing behaviour entirely: the upload menu no longer opens.
+   */
+  onClick?: (e: React.MouseEvent) => void;
+  /** Uppercases the initials and gives them the group background and colour. */
+  isGroup?: boolean;
+  /** Badge to draw instead of the one `role` would choose. */
+  roleIcon?: React.ReactElement;
+  /** Stops a click from opening the upload menu, leaving the avatar inert. */
+  noClick?: boolean;
+  /**
+   * Whether the user already has a picture. It picks the pencil over the plus,
+   * and decides whether a click opens the menu of `model` or goes straight to
+   * the file dialog.
+   */
+  hasAvatar?: boolean;
+  /**
+   * Called with the change event of the hidden file input, which is rendered
+   * only when this prop is given. Without it the avatar is not editable at all.
+   */
+  onChangeFile?: () => void;
 
-	model?: TAvatarModel[];
-	isNotIcon?: boolean;
-	imgClassName?: string;
-	dataTestId?: string;
+  /**
+   * Actions of the edit menu, in order. The first entry is the upload action:
+   * it is what a click runs when there is no picture yet, and the entry whose
+   * `key` is `AvatarActionKeys.PROFILE_AVATAR_UPLOAD` is handed the file
+   * input's ref.
+   */
+  model?: TAvatarModel[];
+  /** Renders a `.svg` source as a picture rather than fetching it as an icon. */
+  isNotIcon?: boolean;
+  /** Added to the `<img>`, for a source shown as a picture. */
+  imgClassName?: string;
+  /** Value of `data-testid` on the avatar.
+   * @default "avatar" */
+  dataTestId?: string;
 };

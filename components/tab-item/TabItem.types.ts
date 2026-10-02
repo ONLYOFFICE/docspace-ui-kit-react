@@ -1,57 +1,22 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React from "react";
 
 export type TTabItemProps = {
-  /** Tab item text. */
+  /** Text of the pill. */
   label: string | React.ReactNode;
-  /** Callback function when tab is selected. */
+  /** Called with the click event whenever the pill is clicked and not blocked by `isDisabled` or `lockLastSelection`. */
   onSelect?: (event: React.MouseEvent<HTMLDivElement>) => void;
-  /** Determines if the tab is currently active. */
+  /** Whether the pill starts selected. The component then keeps that state itself; changing this prop re-syncs it. */
   isActive?: boolean;
-  /** Determines if the tab is disabled and cannot be interacted with. */
+  /** Whether the pill is inert. Pointer events are dropped in CSS as well, unless it is also active. */
   isDisabled?: boolean;
-  /** Allows the tab to be deselected, resulting in no active tab. */
+  /** Freezes the selected look at whatever it was on mount, so the pill can be driven by something other than its own clicks. */
   allowNoSelection?: boolean;
-  /** Enables multi-select functionality */
+  /** Whether clicking an already selected pill deselects it. Without this a selected pill stays selected. */
   withMultiSelect?: boolean;
-  /** Sets a tab class name */
+  /** Applied to the outermost element. */
   className?: string;
-  /** Sets a tab data-testid */
+  /** `data-testid` of the outermost element. */
   dataTestId?: string;
-  /** Locks the last selected tab */
+  /** Whether a click on an already selected pill is dropped entirely — `onSelect` does not fire either. */
   lockLastSelection?: boolean;
 };

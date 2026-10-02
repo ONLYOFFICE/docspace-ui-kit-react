@@ -1,6 +1,6 @@
 @use "../../styles/variables/colors" as *;
 
-:global(.dark){
+:global(.dark) {
   :local {
     .backdrop {
       --backdrop-background-color: #{$blur-dark};

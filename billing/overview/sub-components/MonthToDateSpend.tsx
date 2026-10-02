@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { Fragment, useMemo } from "react";
 import { observer } from "mobx-react";
 
@@ -191,7 +156,11 @@ const MonthToDateSpend = ({ onViewUsage }: MonthToDateSpendProps) => {
       {serviceUsage.length === 0 ? (
         <div className={styles.emptyState}>
           <div className={styles.emptyContent}>
-            <Text fontSize="12px" fontWeight={600} className={styles.mutedTitle}>
+            <Text
+              fontSize="12px"
+              fontWeight={600}
+              className={styles.mutedTitle}
+            >
               {t("NoSpendingActivity")}
             </Text>
             <Text fontSize="12px" className={styles.mutedTitle}>
@@ -202,47 +171,46 @@ const MonthToDateSpend = ({ onViewUsage }: MonthToDateSpendProps) => {
       ) : (
         <div className={styles.spendBody}>
           <div className={styles.spendBar}>
-              {subscriptionsPct > 0 ? (
-                <div
-                  className={styles.spendBarSubs}
-                  style={{ width: `${subscriptionsPct}%` }}
-                />
-              ) : null}
-              {payAsYouGoPct > 0 ? (
-                <div
-                  className={styles.spendBarPayg}
-                  style={{ width: `${payAsYouGoPct}%` }}
-                />
-              ) : null}
-            </div>
+            {subscriptionsPct > 0 ? (
+              <div
+                className={styles.spendBarSubs}
+                style={{ width: `${subscriptionsPct}%` }}
+              />
+            ) : null}
+            {payAsYouGoPct > 0 ? (
+              <div
+                className={styles.spendBarPayg}
+                style={{ width: `${payAsYouGoPct}%` }}
+              />
+            ) : null}
+          </div>
 
-            <div className={styles.spendList}>
-              {[
-                {
-                  key: "subscriptions",
-                  items: subscriptions,
-                  label: t("Subscriptions"),
-                  sectionTotal: subscriptionsTotal,
-                  dotClass: styles.spendDotSubs,
-                  emptyDescription: t("SubscriptionsEmptyDesc"),
-                },
-                {
-                  key: "payAsYouGo",
-                  items: payAsYouGo,
-                  label: t("PayAsYouGo"),
-                  sectionTotal: payAsYouGoTotal,
-                  dotClass: styles.spendDotPayg,
-                  emptyDescription: t("PayAsYouGoEmptyDesc"),
-                },
-              ]
-                // Empty sections drop to the bottom.
-                .sort(
-                  (a, b) =>
-                    Number(a.items.length === 0) -
-                    Number(b.items.length === 0),
-                )
-                .map(renderSection)}
-            </div>
+          <div className={styles.spendList}>
+            {[
+              {
+                key: "subscriptions",
+                items: subscriptions,
+                label: t("Subscriptions"),
+                sectionTotal: subscriptionsTotal,
+                dotClass: styles.spendDotSubs,
+                emptyDescription: t("SubscriptionsEmptyDesc"),
+              },
+              {
+                key: "payAsYouGo",
+                items: payAsYouGo,
+                label: t("PayAsYouGo"),
+                sectionTotal: payAsYouGoTotal,
+                dotClass: styles.spendDotPayg,
+                emptyDescription: t("PayAsYouGoEmptyDesc"),
+              },
+            ]
+              // Empty sections drop to the bottom.
+              .sort(
+                (a, b) =>
+                  Number(a.items.length === 0) - Number(b.items.length === 0),
+              )
+              .map(renderSection)}
+          </div>
         </div>
       )}
     </div>
@@ -250,4 +218,3 @@ const MonthToDateSpend = ({ onViewUsage }: MonthToDateSpendProps) => {
 };
 
 export default observer(MonthToDateSpend);
-

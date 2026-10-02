@@ -1,58 +1,28 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type React from "react";
 
 export interface CollapsibleCardProps {
-  /** Header title shown next to the chevron. */
+  /** First line of the header, next to the chevron. The whole header is the button, so this is part of its accessible name. */
   title: React.ReactNode;
-  /** Optional secondary line under the title. */
+  /** Second line of the header, under the title. Also inside the button, and so also part of its accessible name. */
   description?: React.ReactNode;
-  /** Body content rendered when expanded. */
+  /** Body, rendered only while the card is open. Without it the card opens to nothing. */
   children?: React.ReactNode;
   /**
-   * Controlled open state. When provided, the parent owns state and must
-   * update it via `onToggle`. When undefined, the component is uncontrolled
-   * and uses `defaultOpen` as the initial value.
+   * Whether the card is open. Passing it — even as `false` — takes control away
+   * from the component for good: it then opens and closes only when you change
+   * this value from `onToggle`.
    */
   isOpen?: boolean;
-  /** Initial open state in uncontrolled mode. Defaults to `false`. */
+  /** Whether the card starts open. Read once, on the first render, and only while `isOpen` is unset.
+   * @default false */
   defaultOpen?: boolean;
-  /** Called with the next open value when the header is activated. */
+  /** Called with the state the card is moving to whenever the header is activated, in both the controlled and the uncontrolled case. */
   onToggle?: (nextOpen: boolean) => void;
+  /** Added after the component's own class, on the outer element. */
   className?: string;
+  /** Inline style of the outer element. */
   style?: React.CSSProperties;
+  /** Value of `data-testid` on the outer element.
+   * @default "collapsible-card" */
   dataTestId?: string;
 }

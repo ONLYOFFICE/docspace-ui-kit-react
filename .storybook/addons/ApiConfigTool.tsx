@@ -1,31 +1,3 @@
-/*
- * (c) Copyright Ascensio System SIA 2009-2026
- *
- * This program is a free software product.
- * You can redistribute it and/or modify it under the terms
- * of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
- * Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
- * to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
- * any third-party rights.
- *
- * This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
- * the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
- *
- * The  interactive user interfaces in modified source and object code versions of the Program must
- * display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
- *
- * Pursuant to Section 7(b) of the License you must retain the original Product logo when
- * distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
- * trademark law for use of our trademarks.
- *
- * All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
- * content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
- * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
- */
-
 import React, { useState, useEffect, useCallback } from "react";
 import { addons, types, useStorybookApi } from "storybook/manager-api";
 import { useGlobals } from "storybook/manager-api";
@@ -44,6 +16,8 @@ import {
   STORAGE_KEY,
   type SavedApiProvider,
 } from "../utils/apiProviders";
+
+import { CONNECT_PORTAL_EVENT } from "./events";
 
 import "./index.css";
 
@@ -126,6 +100,18 @@ const AddCustomModal = ({
     <Modal open={open} onOpenChange={onOpenChange} variant="dialog">
       <div className="modal-body">
         <h3 className="header">API Configuration</h3>
+        <p className="hint">
+          The URL of an ONLYOFFICE Apps portal and a key issued in it under
+          Developer Tools &rarr; API keys. No portal yet?{" "}
+          <a
+            href="https://www.onlyoffice.com/docspace-registration"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Get a free one
+          </a>
+          .
+        </p>
         <Form className="form">
           <div className="form-input">
             <p className="label">Name</p>
@@ -142,7 +128,7 @@ const AddCustomModal = ({
               required
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="http://localhost"
+              placeholder="https://portal.example.com"
             />
           </div>
           <div className="form-input">
@@ -189,6 +175,13 @@ const AddCustomModal = ({
   );
 };
 
+// "" on a demo banner, waiting for the tool to open its form.
+// Kept outside the component because the tool is not always mounted when the
+// request arrives: with the toolbar hidden the manager first has to show it,
+// and the form opens once the tool mounts there.
+let connectRequested = false;
+const connectListeners = new Set<() => void>();
+
 const ApiConfigDropdown = () => {
   const [globals, updateGlobals] = useGlobals();
   const api = useStorybookApi();
@@ -197,6 +190,19 @@ const ApiConfigDropdown = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
   const apiConfig: string = globals.apiConfig || "default";
+
+  useEffect(() => {
+    const open = () => {
+      if (!connectRequested) return;
+      connectRequested = false;
+      setModalOpen(true);
+    };
+    open();
+    connectListeners.add(open);
+    return () => {
+      connectListeners.delete(open);
+    };
+  }, []);
 
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
@@ -293,7 +299,16 @@ const ApiConfigDropdown = () => {
   );
 };
 
-addons.register(ADDON_ID, () => {
+addons.register(ADDON_ID, (api) => {
+  api.on(CONNECT_PORTAL_EVENT, () => {
+    connectRequested = true;
+    connectListeners.forEach((listener) => listener());
+    // Nobody picked it up: the reader has hidden the toolbar (Alt+T, or the
+    // menu). Show it again; the tool mounts and opens the form. The toolbar is
+    // shown on Docs pages too, so the reader stays on the page they were on.
+    if (connectRequested) api.toggleToolbar(true);
+  });
+
   addons.add(TOOL_ID, {
     type: types.TOOL,
     title: "API Config",

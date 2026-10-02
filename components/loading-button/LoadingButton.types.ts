@@ -1,46 +1,20 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 export interface LoadingButtonProps {
+  /** Ignored. Nothing reads this prop; the element carries no `id`. */
   id?: string;
+  /** Ignored. Nothing reads this prop; style the ring through the custom properties. */
   className?: string;
+  /** Ignored. Nothing reads this prop either. */
   style?: React.CSSProperties;
+  /** How much of the ring is filled, 0–100. At `0` the ring spins instead of showing an arc. */
   percent?: number;
+  /** Called when anything inside the 16px square is clicked, including the cross. */
   onClick?: VoidFunction;
+  /** Whether the cross in the middle is dropped, leaving the ring on its own. */
   inConversion?: boolean;
-  loaderColor?: React.CSSProperties["color"];
-  backgroundColor?: React.CSSProperties["color"];
+  /** CSS colour of the ring and of the cross. Overrides the accent colour. */
+  loaderColor?: string;
+  /** CSS colour of the disc behind the cross. */
+  backgroundColor?: string;
+  /** Whether the ring is drawn in the idle grey instead of the accent colour, and lightens on hover. */
   isDefaultMode?: boolean;
 }

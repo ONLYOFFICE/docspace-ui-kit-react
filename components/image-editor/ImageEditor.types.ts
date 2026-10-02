@@ -1,73 +1,65 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { TTranslation } from "../../utils";
 
 export type TImage = {
+  /** The picture being edited: a `File` from the input, or a URL string. Only a `File` gets zoom controls. */
   uploadedFile?: string | File;
+  /** Scale of the picture inside the crop circle, from 1 to 5. */
   zoom: number;
+  /** Horizontal position of the crop window, 0 to 1, where 0.5 is centred. */
   x: number;
+  /** Vertical position of the crop window, 0 to 1, where 0.5 is centred. */
   y: number;
 };
 export type TChangeImage = (image: TImage) => void;
 export type TSetPreview = (preview: string) => void;
 
 export type ImageEditorProps = {
+  /** Translation function. The editor asks it for `Common:ChooseAnother`, so a portal translation context is required. */
   t: TTranslation;
+  /** The picture and its crop, held in your state. The whole editor renders nothing while `uploadedFile` is empty. */
   image: TImage;
+  /** Called with a new `image` whenever the crop is dragged or the zoom changes. Apply it to your state or nothing moves. */
   onChangeImage: TChangeImage;
+  /** Rendered beside the cropper, inside the wrapper that `classNameWrapperImageCropper` names — the place for a preview of the cropped result. */
   Preview: React.ReactNode;
+  /** Called, at most every 300ms, with the cropped picture as a `data:` URL. A canvas tainted by a cross-origin image makes it stop silently. */
   setPreview: TSetPreview;
+  /** Blocks dragging, zooming and choosing another file. It is required, so pass `false` when nothing is in flight. */
   isDisabled: boolean;
+  /** Added to the element that wraps the cropper and `Preview`. It is the hook for laying those two out side by side. */
   classNameWrapperImageCropper?: string;
+  /** Added to the outer element. */
   className?: string;
+  /** Hides the zoom row and freezes the crop position, leaving the picture as it is. */
   disableImageRescaling?: boolean;
+  /** Ignored. Nothing in this folder reads it; check the file's size in `onChangeFile` instead.
+   * @deprecated */
   maxImageSize?: number;
+  /** Corner radius of the crop window in pixels, measured on the 648px canvas — half of it, 324, is a circle. */
   editorBorderRadius: number;
+  /** Called with the change event of the hidden file input when another picture is chosen. Read the file and put it in `image.uploadedFile` yourself. */
   onChangeFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export type ImageCropperProps = {
+  /** Translation function, for the `Common:ChooseAnother` label. */
   t: TTranslation;
+  /** The picture and its crop. */
   image: TImage;
+  /** Called with a new `image` whenever the crop is dragged or the zoom changes. */
   onChangeImage: TChangeImage;
+  /** The picture itself, taken from `image.uploadedFile` by the editor. */
   uploadedFile: File | string;
+  /** Called with `undefined` to drop the picture. The cropper itself never calls it. */
   setUploadedFile: (uploadedFile?: File) => void;
+  /** Called with the cropped picture as a `data:` URL, throttled to every 300ms. */
   setPreviewImage: TSetPreview;
+  /** Blocks dragging, zooming and choosing another file. */
   isDisabled: boolean;
+  /** Hides the zoom row and freezes the crop position. */
   disableImageRescaling?: boolean;
+  /** Corner radius of the crop window in pixels, on the 648px canvas. */
   editorBorderRadius: number;
+  /** Called with the change event of the hidden file input. */
   onChangeFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };

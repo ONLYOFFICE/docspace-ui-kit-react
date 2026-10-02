@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Toast } from "../../components/toast";
@@ -41,6 +6,8 @@ import { toastr } from "../../components/toast/sub-components/Toastr";
 import PeopleSelector from ".";
 import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import type { TAccessRight, TSelectorItem } from "../../components/selector";
+
+import { withPortalGate } from "../../.storybook/decorators/PortalGate";
 
 type StoryArgs = {
   // Layout
@@ -109,15 +76,16 @@ type StoryArgs = {
 
 const meta: Meta<StoryArgs> = {
   title: "Components/Selectors/PeopleSelector",
+  decorators: [withPortalGate("People selector")],
   tags: ["!autodocs"],
   parameters: {
     docs: {
       description: {
-        component: `PeopleSelector is a searchable, paginated selector for choosing users and groups from the DocSpace system.
+        component: `PeopleSelector is a searchable, paginated selector for choosing users and groups from the ONLYOFFICE Apps system.
 
 ### Features
 
-- **Live API mode**: Fetches members, groups, and guests from the DocSpace Search API with infinite scroll
+- **Live API mode**: Fetches members, groups, and guests from the ONLYOFFICE Apps Search API with infinite scroll
 - **Tabs**: Toggle Members, Groups, and Guests tabs via \`withGroups\` and \`withGuests\`
 - **Single / multi-select**: Controlled by \`isMultiSelect\`
 - **Room scope**: Pass \`roomId\` to filter users with access to a specific room
@@ -130,7 +98,7 @@ const meta: Meta<StoryArgs> = {
 ### Usage
 
 \`\`\`tsx
-import PeopleSelector from "@docspace/ui-kit/selectors/People";
+import PeopleSelector from "@onlyoffice/apps-ui-kit/selectors/People";
 
 // Basic single-select
 <PeopleSelector
@@ -227,13 +195,13 @@ import PeopleSelector from "@docspace/ui-kit/selectors/People";
     },
     roomId: {
       control: "text",
-      description:
-        "Scope the list to users/groups with access to this room ID",
+      description: "Scope the list to users/groups with access to this room ID",
     },
     targetEntityType: {
       control: "select",
       options: ["file", "folder", "room"],
-      description: "Entity type used for shared-access queries when roomId is set",
+      description:
+        "Entity type used for shared-access queries when roomId is set",
       table: { defaultValue: { summary: "room" } },
     },
     onlyRoomMembers: {
@@ -334,7 +302,6 @@ const Template = (props: StoryArgs) => (
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     withHeader: true,
     headerProps: {
       headerLabel: "Select Member",
@@ -353,7 +320,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default single-select mode. Fetches all members from the DocSpace API.",
+          "Default single-select mode. Fetches all members from the ONLYOFFICE Apps API.",
       },
       source: {
         code: `<PeopleSelector
@@ -372,7 +339,6 @@ export const MultiSelectWithTabs: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     withHeader: true,
     headerProps: {
       headerLabel: "Add Members",
@@ -422,7 +388,6 @@ export const AsideMode: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     useAside: true,
     withoutBackground: false,
     withBlur: false,

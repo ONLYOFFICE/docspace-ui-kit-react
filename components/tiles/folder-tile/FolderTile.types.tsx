@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { ContextMenuModel } from "../../context-menu/ContextMenu.types";
 import { TileItem } from "../tile-container/TileContainer.types";
 
@@ -47,55 +12,58 @@ export interface FolderItem extends TileItem {
 }
 
 export type FolderTileProps = {
-  /** Folder data object */
+  /** The folder this tile stands for. Its `contextOptions` key — present or absent — is what decides whether the three-dot button appears. */
   item: FolderItem;
-  /** Indicates if the folder is selected */
+  /** Whether the tile is selected. */
   checked?: boolean;
-  /** Flag to show hotkey border */
+  /** Draws the accent outline that marks the tile the keyboard is on. */
   showHotkeyBorder?: boolean;
-  /** Indicates if folder is in progress state */
+  /** Replaces the icon and the checkbox with the kit's track loader. */
   inProgress?: boolean;
-  /** Callback when folder is selected */
+  /** Called with the new checked state and the `item` — from the checkbox, from a plain click on the tile, and from a tap on the icon below 600px. */
   onSelect?: (checked: boolean, item: FolderItem) => void;
-  /** Callback when thumbnail is clicked */
+  /** Ignored. Nothing reads it, and the component forwards no unknown props, so it never reaches the DOM either. */
   thumbnailClick?: (e: React.MouseEvent) => void;
-  /** Function to get context menu model */
+  /** Builds the menu shown on right-click. Without it the right-click menu never opens. */
   getContextModel?: () => ContextMenuModel[];
-  /** Function to set selected items */
+  /** Called with an empty array before a plain click selects the tile, unless the click landed on an image, an input or an SVG shape. */
   setSelection?: (items: FolderItem[]) => void;
-  /** Handler for Ctrl + Click selection */
+  /** Called with the `item` on a Ctrl- or Cmd-click, instead of selecting. */
   withCtrlSelect?: (item: FolderItem) => void;
-  /** Handler for Shift + Click selection */
+  /** Called with the `item` on a Shift-click, instead of selecting. */
   withShiftSelect?: (item: FolderItem) => void;
-  /** Additional React element */
+  /** The icon beside the checkbox. Without it neither the icon nor the checkbox is rendered at all. */
   element?: React.ReactNode;
-  /** Child elements */
+  /** The tile's content. Only the first element is rendered; the rest are dropped. */
   children?: React.ReactNode;
-  /** Callback to hide context menu */
+  /** Called when the menu closes. */
   hideContextMenu?: () => void;
-  /** Custom header for context menu */
+  /** Ignored. The header is built from the first child's `item`; nothing reads this prop. */
   contextMenuHeader?: React.ReactNode;
-  /** Callback when context menu is clicked */
+  /** Called before the menu opens, with `true` when the trigger was a right-click. */
   tileContextClick?: (isRightClick?: boolean) => void;
-  /** Folder badges */
+  /** Badges for the folder. In the tall layout they sit over the thumbnail; in the short one they follow the content. */
   badges?: React.ReactNode;
-  /** Context menu options */
+  /** The menu's entries. Required — but see `item`. */
   contextOptions: ContextMenuModel[];
-  /** Checkbox indeterminate state flag */
+  /** Draws the checkbox in its indeterminate state. */
   indeterminate?: boolean;
-  /** Indicates if folder is being dragged */
+  /** Marks the tile as being dragged: hovering it no longer tints it, underlines the name or swaps the icon for the checkbox. It does not dim the tile. */
   isDragging?: boolean;
-  /** Alternative flag for drag state */
+  /** Ignored. `isDragging` is the one that is read. */
   dragging?: boolean;
-  /** Indicates if folder is in active state */
+  /** Whether the tile is the one being acted on, which keeps its hover state. */
   isActive?: boolean;
-  /** Flag for edit mode */
+  /** Renaming state: it removes the icon and the checkbox. */
   isEdit?: boolean;
+  /** Attached to the outer element, and clicked by the component itself on a right-click before the menu is mounted. */
   forwardRef?: React.RefObject<HTMLDivElement | null>;
-  /** The temporary icon to display when thumbnail is not available */
+  /** The folder's picture, drawn only in the tall layout: a URL is fetched as an SVG, an element is rendered as given. */
   temporaryIcon?: string | React.ReactElement;
+  /** Switches to the tall layout — a picture on top and the row below it — instead of the single row. */
   isBigFolder?: boolean;
-  /** Data test id for the tile */
+  /** Value of `data-testid` on the outer element.
+   * @default "tile" */
   dataTestId?: string;
 };
 

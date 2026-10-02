@@ -1,42 +1,7 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
-import { TimePicker } from ".";
+import { TimePicker, type TimePickerProps } from ".";
 
 describe("<TimePicker />", () => {
   const mockOnChange = vi.fn();
@@ -127,8 +92,14 @@ describe("<TimePicker />", () => {
     const hoursInput = screen.getByLabelText("Hours");
     const minutesInput = screen.getByLabelText("Minutes");
 
-    const hoursEvent = new MouseEvent("contextmenu", { bubbles: true, cancelable: true });
-    const minutesEvent = new MouseEvent("contextmenu", { bubbles: true, cancelable: true });
+    const hoursEvent = new MouseEvent("contextmenu", {
+      bubbles: true,
+      cancelable: true,
+    });
+    const minutesEvent = new MouseEvent("contextmenu", {
+      bubbles: true,
+      cancelable: true,
+    });
 
     fireEvent(hoursInput, hoursEvent);
     fireEvent(minutesInput, minutesEvent);
@@ -216,5 +187,64 @@ describe("<TimePicker />", () => {
 
     expect(selectSpy).toHaveBeenCalled();
     selectSpy.mockRestore();
+  });
+
+  it("folds the meridiem into the value reported in the 12-hour mode", () => {
+    render(
+      <TimePicker
+        initialTime="2025-01-09T14:30:00"
+        isTwelveHourFormat
+        meridiem="PM"
+        onChange={mockOnChange}
+      />,
+    );
+    const hoursInput = screen.getByLabelText("Hours") as HTMLInputElement;
+    expect(hoursInput.value).toBe("02");
+
+    fireEvent.change(hoursInput, { target: { value: "03" } });
+
+    expect(mockOnChange).toHaveBeenCalled();
+    expect(mockOnChange.mock.lastCall?.[0].toFormat("HH:mm")).toBe("15:30");
+  });
+
+  it("requires meridiem with isTwelveHourFormat (checked by tsc)", () => {
+    // @ts-expect-error meridiem is required in the 12-hour mode
+    const props: TimePickerProps = { isTwelveHourFormat: true };
+    expect(props.isTwelveHourFormat).toBe(true);
+  });
+
+  it("caps hours at 12 in the 12-hour mode", () => {
+    render(<TimePicker {...baseProps} isTwelveHourFormat meridiem="AM" />);
+    const hoursInput = screen.getByLabelText("Hours") as HTMLInputElement;
+
+    fireEvent.change(hoursInput, { target: { value: "13" } });
+
+    expect(hoursInput.value).toBe("01");
+  });
+
+  // Both fields used to inherit TextInput's -1 and Tab left the picker; the
+  // fields are in the natural tab order now, and tabIndex only moves them.
+  it("passes tabIndex to both fields and leaves them in the Tab order without it", () => {
+    const { rerender } = render(<TimePicker {...baseProps} tabIndex={0} />);
+    expect(screen.getByLabelText("Hours")).toHaveAttribute("tabindex", "0");
+    expect(screen.getByLabelText("Minutes")).toHaveAttribute("tabindex", "0");
+
+    rerender(<TimePicker {...baseProps} />);
+    expect(screen.getByLabelText("Hours")).not.toHaveAttribute("tabindex");
+    expect(screen.getByLabelText("Minutes")).not.toHaveAttribute("tabindex");
+  });
+
+  it("prefixes the field class names with classNameInput and adds none without it", () => {
+    const { rerender } = render(
+      <TimePicker {...baseProps} classNameInput="picker" />,
+    );
+    expect(screen.getByLabelText("Hours")).toHaveClass("picker-hours-input");
+    expect(screen.getByLabelText("Minutes")).toHaveClass(
+      "picker-minutes-input",
+    );
+
+    rerender(<TimePicker {...baseProps} />);
+    expect(screen.getByLabelText("Hours").className).not.toMatch(/undefined/);
+    expect(screen.getByLabelText("Minutes").className).not.toMatch(/undefined/);
   });
 });

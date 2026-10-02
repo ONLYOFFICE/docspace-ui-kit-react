@@ -1,95 +1,35 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import { Paging } from "./Paging";
 import type { PagingProps } from "./Paging.types";
+import type { TOption } from "../combobox";
 
 const meta = {
   title: "UI/Navigation/Paging",
   component: Paging,
   parameters: {
-    docs: {
-      description: {
-        component: `Paging provides page navigation controls with previous/next buttons and page/count selectors.
-
-### Features
-
-- **Previous/Next Buttons**: Navigate between pages with customizable labels
-- **Page Selector**: Dropdown to jump to a specific page
-- **Count Selector**: Dropdown to change items per page
-- **Disabled States**: Independently disable previous or next buttons
-- **Open Direction**: Control dropdown direction (top, bottom, or both)
-
-### Usage
-
-\`\`\`tsx
-import { Paging } from "@docspace/ui-kit/components/paging";
-
-<Paging
-  previousLabel="Previous"
-  nextLabel="Next"
-  previousAction={handlePrev}
-  nextAction={handleNext}
-  pageItems={pageItems}
-  countItems={countItems}
-  selectedPageItem={currentPage}
-  selectedCountItem={currentCount}
-  onSelectPage={handlePageSelect}
-  onSelectCount={handleCountSelect}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     previousLabel: {
       control: "text",
-      description: "Label for the previous button",
+      description:
+        "Label of the previous-page button; nothing is translated, so pass the string already localised",
     },
     nextLabel: {
       control: "text",
-      description: "Label for the next button",
+      description:
+        "Label of the next-page button; nothing is translated, so pass the string already localised",
     },
     disablePrevious: {
       control: "boolean",
-      description: "Disables the previous button",
+      description:
+        "Disables the previous button; the page selector is disabled too only when `disableNext` is set as well",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -104,18 +44,81 @@ import { Paging } from "@docspace/ui-kit/components/paging";
     openDirection: {
       control: "select",
       options: ["bottom", "top", "both"],
-      description: "Direction the dropdown menus open",
+      description:
+        "Side of the buttons both drop-downs open on: `bottom`, `top`, or `both` to open below and move above when a list does not fit there",
       table: {
         defaultValue: { summary: "bottom" },
       },
     },
     showCountItem: {
       control: "boolean",
-      description: "Shows the items-per-page selector",
+      description: "Whether the page-size selector is rendered at all",
       table: {
         defaultValue: { summary: "true" },
       },
     },
+    pageItems: {
+      control: false,
+      description:
+        "One `{ key, label }` per page, listed in the page selector; passing nothing leaves the page selector out",
+    },
+    countItems: {
+      control: false,
+      description:
+        "One `{ key, label }` per page size, listed in the page-size selector; passing nothing leaves that selector out",
+    },
+    selectedPageItem: {
+      control: false,
+      description:
+        "The option the page selector shows; hold it in your own state and update it from `onSelectPage`",
+    },
+    selectedCountItem: {
+      control: false,
+      description:
+        "The option the page-size selector shows; hold it in your own state and update it from `onSelectCount`",
+    },
+    previousAction: {
+      description:
+        "Called when the previous button is clicked; a returned promise is not awaited",
+    },
+    nextAction: {
+      description:
+        "Called when the next button is clicked; a returned promise is not awaited",
+    },
+    onSelectPage: {
+      description:
+        "Called with the option picked in the page selector; nothing moves until you update `selectedPageItem`",
+    },
+    onSelectCount: {
+      description:
+        "Called with the option picked in the page-size selector; nothing changes until you update `selectedCountItem`",
+    },
+    id: {
+      control: "text",
+      description: "Value of `id` on the outer element",
+    },
+    className: {
+      control: "text",
+      description: "Added after the component's own class on the outer element",
+    },
+    style: {
+      control: false,
+      description:
+        "Inline style of the outer element, and where the `--paging-*` custom properties go",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Value of `data-testid` on the outer element",
+      table: {
+        defaultValue: { summary: "paging" },
+      },
+    },
+  },
+  args: {
+    previousAction: fn(),
+    nextAction: fn(),
+    onSelectPage: fn(),
+    onSelectCount: fn(),
   },
 } satisfies Meta<typeof Paging>;
 
@@ -149,25 +152,15 @@ const Template = ({
   onSelectCount,
   ...args
 }: PagingProps) => {
-  const [selectedPageItem, setSelectedPageItems] = useState(pageItems[0]);
-
-  useEffect(() => {
-    setSelectedPageItems(pageItems[0]);
-  }, []);
-
-  const onSelectPageNextHandler = () => {
-    const currentPage = pageItems.filter(
-      (item) => item.key === selectedPageItem.key + 1,
-    );
-    if (currentPage[0]) setSelectedPageItems(currentPage[0]);
-  };
-
-  const onSelectPagePrevHandler = () => {
-    const currentPage = pageItems.filter(
-      (item) => item.key === selectedPageItem.key - 1,
-    );
-    if (currentPage[0]) setSelectedPageItems(currentPage[0]);
-  };
+  const [selectedPageItem, setSelectedPageItem] = useState<TOption>(
+    pageItems[0],
+  );
+  const [selectedCountItem, setSelectedCountItem] = useState<TOption>(
+    countItems[0],
+  );
+  const index = pageItems.findIndex(
+    (item) => item.key === selectedPageItem.key,
+  );
 
   return (
     <div style={{ height: "100%" }}>
@@ -176,18 +169,24 @@ const Template = ({
         pageItems={pageItems}
         style={{ justifyContent: "center", alignItems: "center" }}
         countItems={countItems}
-        previousAction={async () => {
-          previousAction();
-          onSelectPagePrevHandler();
+        previousAction={(e) => {
+          previousAction(e);
+          if (pageItems[index - 1]) setSelectedPageItem(pageItems[index - 1]);
         }}
-        nextAction={async () => {
-          onSelectPageNextHandler();
-          nextAction();
+        nextAction={(e) => {
+          nextAction(e);
+          if (pageItems[index + 1]) setSelectedPageItem(pageItems[index + 1]);
         }}
-        onSelectPage={(a) => onSelectPage?.(a)}
-        onSelectCount={(a) => onSelectCount?.(a)}
+        onSelectPage={(option) => {
+          onSelectPage?.(option);
+          setSelectedPageItem(option);
+        }}
+        onSelectCount={(option) => {
+          onSelectCount?.(option);
+          setSelectedCountItem(option);
+        }}
         selectedPageItem={selectedPageItem}
-        selectedCountItem={countItems[0]}
+        selectedCountItem={selectedCountItem}
       />
     </div>
   );
@@ -201,14 +200,12 @@ export const Default: Story = {
     disablePrevious: false,
     disableNext: false,
     openDirection: "bottom",
-    selectedCountItem: { key: 25, label: "25 per page" },
-    selectedPageItem: { key: 1, label: "1 of 200" },
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Default paging with previous/next buttons and page/count selectors. Navigate through 200 pages.",
+          "The full strip under a list of 200 pages: step with Previous and Next, jump from the page selector, or change the page size, and watch the calls in the Actions panel. The story holds the current page and size itself, as your code must; change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<Paging
@@ -249,7 +246,7 @@ export const DisabledPrevious: Story = {
     docs: {
       description: {
         story:
-          "Paging with the previous button disabled. Typically used when on the first page.",
+          "On the first page there is nowhere to go back to, so the Previous button is greyed out and ignores clicks (`disablePrevious`); the component does not work this out, you set it.",
       },
       source: {
         code: `<Paging previousLabel="Previous" nextLabel="Next" disablePrevious />`,
@@ -281,7 +278,7 @@ export const DisabledNext: Story = {
     docs: {
       description: {
         story:
-          "Paging with the next button disabled. Typically used when on the last page.",
+          "On the last page the Next button is greyed out and ignores clicks (`disableNext`), while the page selector stays open for jumping back.",
       },
       source: {
         code: `<Paging previousLabel="Previous" nextLabel="Next" disableNext />`,
@@ -307,6 +304,103 @@ const WithoutCountTemplate = () => {
   );
 };
 
+export const WithoutCountSelector: Story = {
+  render: () => <WithoutCountTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a list whose page size is fixed, the page-size selector at the end is left out (`showCountItem={false}`), leaving the two buttons and the page selector.",
+      },
+      source: {
+        code: `<Paging previousLabel="Previous" nextLabel="Next" showCountItem={false} />`,
+      },
+    },
+  },
+};
+
+const SinglePageTemplate = () => {
+  const singlePage = createPageItems(1);
+  return (
+    <Paging
+      previousLabel="Previous"
+      nextLabel="Next"
+      disablePrevious
+      disableNext
+      pageItems={singlePage}
+      countItems={countItems}
+      selectedPageItem={singlePage[0]}
+      selectedCountItem={countItems[0]}
+      previousAction={() => {}}
+      nextAction={() => {}}
+      style={{ justifyContent: "center", alignItems: "center" }}
+    />
+  );
+};
+
+export const SinglePage: Story = {
+  render: () => <SinglePageTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "When the whole list fits on one page, both buttons are greyed out and the page selector is disabled with them (`disablePrevious` and `disableNext` together), while the page size can still be changed.",
+      },
+      source: {
+        code: `<Paging
+  previousLabel="Previous"
+  nextLabel="Next"
+  disablePrevious
+  disableNext
+  pageItems={[{ key: 1, label: "1 of 1" }]}
+  countItems={countItems}
+  selectedPageItem={{ key: 1, label: "1 of 1" }}
+  selectedCountItem={countItems[0]}
+  previousAction={handlePrev}
+  nextAction={handleNext}
+/>`,
+      },
+    },
+  },
+};
+
+const ButtonsOnlyTemplate = () => (
+  <Paging
+    previousLabel="Previous"
+    nextLabel="Next"
+    // The type requires both lists, but the component leaves out a selector whose list is missing.
+    pageItems={undefined as unknown as TOption[]}
+    countItems={undefined as unknown as TOption[]}
+    selectedPageItem={pageItems[0]}
+    selectedCountItem={countItems[0]}
+    previousAction={() => {}}
+    nextAction={() => {}}
+    style={{ justifyContent: "center", alignItems: "center" }}
+  />
+);
+
+export const ButtonsOnly: Story = {
+  render: () => <ButtonsOnlyTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a list whose length is not known, only the Previous and Next buttons remain once neither list of options is passed (`pageItems` and `countItems` left out).",
+      },
+      source: {
+        code: `<Paging
+  previousLabel="Previous"
+  nextLabel="Next"
+  previousAction={handlePrev}
+  nextAction={handleNext}
+  selectedPageItem={currentPage}
+  selectedCountItem={currentCount}
+/>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
     <div
@@ -316,6 +410,10 @@ export const CssCustomization: Story = {
           "--paging-button-gap": "12px",
           "--paging-font-size": "14px",
           "--paging-button-padding": "8px 32px",
+          "--paging-prev-width": "140px",
+          "--paging-next-width": "120px",
+          "--paging-count-width": "160px",
+          "--paging-nav-height": "48px",
         } as CSSProperties
       }
     >
@@ -337,29 +435,23 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--paging-gap\` | Gap between paging elements | \`8px\` |
-| \`--paging-button-gap\` | Gap between prev/next buttons | \`8px\` |
-| \`--paging-font-size\` | Font size of nav buttons | \`13px\` |
-| \`--paging-button-padding\` | Padding of nav buttons | \`6px 28px\` |`,
-      },
-    },
-  },
-};
-
-export const WithoutCountSelector: Story = {
-  render: () => <WithoutCountTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Paging without the items-per-page selector. Only shows previous/next buttons and page selector.",
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The example raises the width cap of both buttons so their larger labels are not cut off, widens the page-size selector, and shows taller controls in a window narrower than 1024px.`,
       },
       source: {
-        code: `<Paging previousLabel="Previous" nextLabel="Next" showCountItem={false} />`,
+        code: `<div
+  style={{
+    "--paging-gap": "16px",
+    "--paging-button-gap": "12px",
+    "--paging-font-size": "14px",
+    "--paging-button-padding": "8px 32px",
+    "--paging-prev-width": "140px",
+    "--paging-next-width": "120px",
+    "--paging-count-width": "160px",
+    "--paging-nav-height": "48px",
+  }}
+>
+  <Paging previousLabel="Previous" nextLabel="Next" {...props} />
+</div>`,
       },
     },
   },

@@ -1,0 +1,532 @@
+---
+name: audit-stories
+description: Audit ui-kit components against their Storybook stories — find components without stories, props and states no story shows, stories that drifted from the component's real API or behavior, and stories that break the writing template (STORY_TEMPLATE.md). Invoked without a named component it always starts by asking which one to audit — a menu of component folders, never a scope picked on its own. Use for a component, a folder, or (deliberately) the whole library; `template` runs the template check alone.
+argument-hint: "<component | folder> [all] [template]"
+---
+
+# Stories audit
+
+A component's Docs page is its `README.md`, rendered by
+`.storybook/blocks/DocsPage.tsx` around the stories: the README carries
+the description, the behaviour notes, the accessibility notes and the
+table of CSS variables, and the stories carry the canvases, the
+`argTypes` and each story's own text (see
+`.claude/rules/component-authoring.md`). This skill compares each
+component's actual code with its stories — and with the README
+sections the Docs page shows around them — and reports where they
+disagree. Fixes land in this repository — the
+client consumes only the packed tarball and holds no story.
+
+Scope: the component or folder from the argument. When neither the
+argument nor the request names one, **the scope question is
+mandatory**: ask it with the interactive option dialog before opening
+a single file. Discovering that only one candidate looks relevant is
+research, not an answer — the dialog still runs, with that candidate
+first, marked "(Recommended)". Options are real component folders
+under `components/` — the dialog holds four, so offer the most recently
+changed ones and let the built-in "Other" cover the rest. Never pick a
+scope yourself. `all` sweeps the whole library — offer it only when
+the user asks for a full audit, and warn that it is a long run and
+prefer batching by folder. A folder or `all` run is reported in the
+shape of "Reporting a sweep" below, never as a stream of items.
+`template` after the scope runs check 6 alone: a static pass over the
+writing conventions, no code comparison and no browser. Its report
+keeps the fixed shape below with only the `### Template` section.
+
+## Checks, per component
+
+1. **A story exists at all.** The convention is one `.stories.tsx`
+   per component; a component without one is a finding by itself. The
+   file may sit in a subdirectory (`table`, `rows` and `tiles` keep
+   theirs there), so search recursively before reporting one missing.
+2. **Props coverage.** Compare the exported props type
+   (`<Name>.types.ts`) with what the stories exercise through `args`,
+   `argTypes` and controls:
+   - a prop no story ever sets — especially enum/variant props, where
+     each variant deserves a story or a control;
+   - callbacks that are wired in the component but invisible in every
+     story (no action, no interaction).
+3. **State coverage.** Conditional renders in the component (disabled,
+   loading, error, empty) that no story puts on screen. Direction is a
+   state too, but only where it changes the picture: a component whose
+   code or stylesheet reads `interfaceDirection` or `isRTL`, matches
+   `[dir="rtl"]`, checks `document.dir` or the computed `direction`,
+   mirrors with `scaleX(-1)`, or positions with physical `left`/`right`
+   (`margin-left`, `padding-right`, `left:`) — there an RTL story shows
+   a flip or exposes a bug. A symmetric component with none of this
+   gets no RTL finding and no RTL story.
+4. **Staleness.** The reverse direction:
+   - story `args` or `argTypes` naming props the component no longer
+     has (spreads and loose typing let these survive compilation);
+   - defaults shown in `argTypes`/docs that differ from the component's
+     real defaults;
+   - prose in the story or `.docs.mdx` claiming behavior the component
+     code does not implement (verify each claim against the deciding
+     code, never against other prose).
+5. **Naming and placement** only when broken: the story must live next
+   to the component and follow `<Name>.stories.tsx`.
+6. **Template conformance.** The story file against `STORY_TEMPLATE.md`
+   and the rules under "Fixing stories" below, read statically. A
+   deviation is a finding even when the text is accurate:
+   - no `parameters.docs.description.component` in a story file whose
+     folder has a README — its Features, Accessibility or Usage block
+     is a second copy of the README and a finding by itself, fixed by
+     moving what the README lacks into it (see "Fixing stories"); a
+     story file without a README of its own keeps one purpose sentence
+     naming the parent page;
+   - every story has `parameters.docs.description.story` saying why,
+     and `parameters.docs.source.code`;
+   - a story is named for what the reader sees or does, not for the
+     mechanism;
+   - every prop has an `argTypes` entry with a description in the
+     types' own terms, a control and the real default;
+   - sample data is neutral: no product roles or policies, real names,
+     photos, brand names or network-fetched images; one placeholder
+     icon unless icons are the subject;
+   - `CssCustomization` has the standard form and no table of its own;
+     every row of the README's `## CSS variables` table names a
+     variable some rule reads, and the example sets every row a
+     rendered instance can show;
+   - comments are one line and explain only what the code cannot show;
+   - `Default` opens the file and `CssCustomization` is the last
+     story, with `RightToLeft`, when there is one, right before it:
+     the Docs page renders the first story as the component's primary
+     preview, and the variables demo is an appendix, not an opener.
+     A `CssCustomization` wedged between another story's template
+     and that story is the same finding.
+
+## Report and fixes
+
+- **A report longer than the chat can carry is written to a file**, and
+  never to the session scratchpad: that directory is temporary, hidden
+  from Finder and gone on the next reboot. It goes to `audits/` at the
+  repository root, named `AUDIT-<scope>-<YYYY-MM-DD>.md` — no leading
+  dot, so Finder shows it without the hidden-files toggle. The folder is
+  gitignored, so a sweep is never committed with the fixes it asks for.
+  The chat then carries the summary table, the first-rank findings and
+  the path, nothing more. A single-component run fits in the chat and
+  needs no file.
+- Rank: missing story file, then stale claims and dead args (actively
+  misleading), then coverage gaps (merely incomplete), then template
+  deviations (form only).
+- **The report has a fixed shape**, top to bottom, and nothing else:
+  1. `Scope:` — one line: the component, its story file, the files
+     compared.
+  2. `Checked:` — one line for everything that passed (placement,
+     naming, descriptions present, baselines, tests green). What is
+     fine never gets a paragraph, and process narration ("Storybook
+     stopped", "writing the report") appears nowhere.
+  3. One tally line: how many stale items, how many gaps, how many
+     template deviations, how many findings outside the stories, and
+     the worst item in one clause.
+  4. `### Stale and misleading` — the full skeleton per item.
+  5. `### Coverage gaps` — one line per item.
+  6. `### Template` — one line per item.
+  7. `### Outside the stories` — README, types and component bugs the
+     audit ran into, one line each, labelled `README:` or `Component:`.
+  8. One closing line: what gets fixed on request, by item number.
+- **Items are numbered continuously** across the four sections, so the
+  closing line and the user can say "items 4 and 5" and be understood;
+  a blank line separates items; each opens with a bold title of at
+  most twelve words naming the prop, story or claim and the defect.
+- **A stale item has three labels**, so the reader never guesses which
+  side is speaking: **"The story shows:"** — what it renders, with
+  clickable `[file:line](path#LN)` links; **"The component actually:"**
+  — the deciding code, with links; **"Fix:"** — the change. Each label
+  is one or two sentences, an item cites at most three locations, and
+  the causal chain has at most three steps ("the story sets `title`,
+  the HOC strips it, no `RootTooltip` is mounted, so hover shows
+  nothing"). The browser check, the test that hides the bug and any
+  further evidence go into one indented `Evidence:` sub-bullet, never
+  into the labels.
+- **A coverage gap is one line**: the prop or state — what the
+  component does with it, one link — `Fix:` the story or `argTypes`
+  entry to add. It never gets the three-label skeleton.
+- **A template item is one line too**: the story, section or bullet —
+  what breaks the template, one link — `Fix:` the change. When the fix
+  is a rewording, the Fix line carries the new text in full, so it can
+  be applied as written.
+- **Fix is one line**: the exact change when it fits, otherwise a
+  phrase. Alternatives only when the choice is the user's, joined with
+  "or". A broader remedy (a global decorator, a HOC change) is its own
+  item under `Outside the stories`, not a tail on the Fix line.
+- Plain statements, written for a reader who has not seen the code: no
+  metaphors, no imagery, no clever headlines ("the baseline PNG is a
+  blank page" — never "the tests guard an empty page"). A causal chain
+  is spelled out step by step in words ("the story never wires the
+  prop the component needs to render, so it shows nothing, so the
+  committed baselines are blank"), never compressed into a list of
+  props the reader must decode.
+- Apply fixes when asked: new or corrected stories follow the library's
+  own conventions (`CLAUDE.md`, `.claude/rules/component-authoring.md`)
+  and land as commits in this repository. Behavior that looks wrong in
+  the _component_ is reported as a potential bug, not papered over in
+  the story. A dead export, an unused type or a stray import found on
+  the way is an `Outside the stories` item, removed only on request and
+  in its own commit — a story fix touches story files.
+
+## Reporting a sweep
+
+A folder or `all` scope produces dozens of items, and the itemized
+format that reads well for one component turns into a wall of text
+for thirty. The reader's first question is _which components have a
+problem_, so a sweep report answers that before anything else:
+
+- **Summary table first**, and nothing above it but one line naming
+  the scope. One row per component with at least one finding, worst
+  first, six columns, no prose inside a cell:
+
+  | Component        | Story file | Stale | Gaps | Template | Worst finding                                    |
+  | ---------------- | ---------- | ----- | ---- | -------- | ------------------------------------------------ |
+  | `theme-provider` | missing    | –     | –    | –        | no story at all                                  |
+  | `context-menu`   | ok         | 3     | 5    | 2        | `args.onHide` names a prop the component dropped |
+  | `toggle-button`  | ok         | –     | 2    | 1        | disabled state never shown                       |
+
+  `Stale` counts the items from check 4, `Gaps` the items from checks
+  2 and 3, `Template` the items from check 6 (the only column a
+  `template` run fills), `Worst finding` is the component's top-ranked item in one
+  clause of at most ten words. A component whose story file is missing
+  has no counts — the other checks cannot run on it.
+
+- **Clean components in one line** right under the table: "No
+  findings: `badge`, `button`, `checkbox`, …" — every audited name that
+  is not in the table, comma-separated, never one bullet each and never
+  left out (a name absent from both places looks unaudited).
+- **Details grouped by component**: a `### <component>` heading per
+  table row, in table order, with the itemized skeleton from above
+  under it, items numbered within the component. In a sweep each stale
+  item is trimmed to its three labeled lines
+  — one clause each for "The story shows:", "The component actually:"
+  and "Fix:" — and the step-by-step causal chain is spelled out only
+  for the top item of each component. Two components never share a
+  bullet, a sentence or a paragraph.
+- **Batches keep the same shape.** When the run is split by folder, as
+  the scope section asks for `all`, every batch reports this way and
+  the closing message carries one summary table merged over all
+  batches, so the reader ends with a single table for the whole
+  library, not one per batch.
+- **No narrative between the sections**: no "moving on to", no
+  restatement of the checks, no totals in prose — the table already
+  carries them.
+
+## Fixing stories
+
+The pattern is `STORY_TEMPLATE.md` at the repository root, with
+`components/button/Button.stories.tsx` as the reference. Every fix
+follows it:
+
+- **No component description in the story; the fact goes into the
+  README.** A story file whose folder has a README carries no
+  `parameters.docs.description.component` — only the one-line comment
+  Button's has — because the Docs page renders the README instead. A
+  fact you would have written there is added to the README section it
+  belongs in, under `README_TEMPLATE.md`, and verified against the code
+  first: a capability or a trap into "Behaviour the types don't state"
+  (or a `###` under "Recipes" when it is a use no example shows), a
+  variable into "CSS variables". The README's `## Accessibility` lists
+  only what assistive-technology and keyboard users get — the roles and
+  `aria-*` attributes the component sets and what each announces, the
+  keys it handles, how focus moves — verified with a grep for `role=`,
+  `aria-`, `tabIndex` and `.focus(` in the component. Styling hooks
+  (`data-*`) and bidi attributes (`dir`) do not belong there. A
+  component whose root is a native interactive element and that adds
+  nothing of its own says the support comes from the platform, names
+  what the element gives (the keys, the values it exposes, what
+  `disabled` does) and what the consumer must still supply (a name via
+  `<label for>` or `aria-label`) — never an `aria-*` the component does
+  not set, in either direction. A story file whose folder has no README
+  (the table's parts, the skeletons, `ArticleItem`) keeps one purpose
+  sentence naming the parent page, and its facts go into the parent
+  README. Storybook's own guidance applies to what stays: a story
+  description says _why_ one would use what it shows, not what it
+  shows.
+- **An `argTypes` description states the component's contract in the
+  types' own terms**, not the product's use of it: `header` takes "a
+  title with an optional visual — initials on a color, an icon, an
+  avatar…", not "the room color" — the kit does not know what a room is,
+  even when the prop next to it is called `isRoom`. And it says it in
+  words a reader can picture, naming the concrete result — the size, the
+  side, the moment something happens — rather than the mechanism behind
+  it ("makes the field a fixed share of the window height, so it
+  stretches with the window", not "height follows the viewport"). A CSS
+  variable name belongs in the README's CSS variables table, not in a
+  prop description. A floor, a cap or a fallback is mentioned only when a
+  reader can actually hit it, and then as the value, not as the variable
+  that holds it.
+- **Props live in `argTypes` and the types file**, not in prose: the
+  Docs props table is generated from `<Name>.types.ts` by
+  `react-docgen-typescript`, JSDoc comments included. Document a prop
+  by giving it an `argTypes` entry (control, description, real default)
+  and, if it has none, a JSDoc line in the types file.
+- **One story per concept or state**, driven by `args` through a shared
+  template so the Controls panel works; every story has
+  `parameters.docs.description.story` (the _why_, not a restatement of
+  the props) and `parameters.docs.source.code`.
+- **A story is named for what the reader sees or does**, in the
+  template's forms (`WithBackdrop`, `DisabledState`, `AttachedToDocument`),
+  never for the mechanism behind it: "Global Right Click" tells a reader
+  nothing until the code is open, "Attached To Document" — the JSDoc of
+  the prop it shows — does. Interactive canvases say what to do in
+  their own text ("No trigger here — right click anywhere").
+- **A story description reads from the screen, not from the types.** It
+  says what the reader sees and then names the prop behind it, in
+  parentheses: "**Auto-save** — the same switch, disabled; hover it to
+  read why (`getTooltipContent`)". A story that shows several variants
+  gets one bullet per visible item, labelled by the item's own text,
+  never a bullet per prop with a chain of prop names ("`withToggle` +
+  `checked`: a switch…"). When it points the reader at the Controls
+  panel, it says what to do there in plain words — "change any other
+  prop live in the Controls panel below" — never in terms of the
+  mechanism ("the Controls panel drives every other prop").
+- **Sample data is neutral.** Labels and texts in a story show the
+  component, not the product: realistic for a document hub ("Anyone
+  with the link", "Move to archive") but never product roles, access
+  policies, feature lists or release-specific wording ("Full admin:
+  manage the workspace, configure AI agents…") — those change with
+  every release and turn the kit's docs into a stale copy of the
+  product's. Brand and product names stay out entirely. People are
+  generic too: no real names and no photos of real faces — a bundled
+  placeholder avatar (`default_user_photo…`) and a role-like title
+  ("Team member"); an image fetched from the network also makes every
+  screenshot of the story depend on that host. Icons are one
+  placeholder (`catalog.folder` in this library) repeated across the
+  items — that is how MainButton, DropDown and the other menus do it;
+  a story picks a fitting icon per item only when icons are what it
+  demonstrates (an `ItemVariants` story), otherwise the dozen extra
+  imports document nothing and break on the next icon rename.
+- **An object control prints its value, so an icon in it breaks the
+  props table.** A small `?url` SVG is inlined as a `data:` URI, and a
+  JSON control holding one (an option with an `icon`) shows it as one
+  unbroken string that stretches the Docs props table far past its
+  column. Give such a prop `control: false` with a one-line comment
+  saying why, and after adding icons to sample data open the Docs page
+  and check that `.docblock-argstable` is no wider than its parent —
+  with every JSON node expanded, because a collapsed array hides the
+  string until someone opens it, and the table shows only the first
+  story's args while the canvas Controls panel shows each story's. A
+  `text` or `select` control is a fixed-width field and does not
+  stretch.
+  Sample data in a non-story file (`data.ts`) ships in the package,
+  and Rollup cannot load `?url`: attach the icon in the story file.
+- **An RTL story only where direction changes the picture** — the
+  criterion of check 3 — one per component, named `RightToLeft`. Two
+  mechanisms flip a component and the story sets both:
+  `globals: { direction: "rtl" }` sets the theme's `interfaceDirection`,
+  which is all the Direction toolbar does, because the preview decorator
+  puts no `dir` on the DOM; so the story also wraps its canvas in
+  `<div dir="rtl">` for the `[dir="rtl"]` rules, the computed-direction
+  checks and the `scaleX(-1)` mirrors. One mechanism alone shows a
+  half-flipped component. The description names what the reader should
+  see move — the icon's side, the fill direction, the alignment — and
+  the sample text is a short neutral RTL phrase, not product copy.
+  **The story is always framed on Docs**: `ThemeProvider` writes
+  `data-dir` onto `<html>`, the Docs page mounts every story in one
+  document, and the last provider to run wins — so an inline story with
+  `globals.direction: "rtl"` flips the whole Docs page (headings, bullets,
+  the frame of every other story) while every other story keeps the
+  toolbar's direction, so the page and the components on it disagree,
+  whatever the toolbar says. Give it
+  `parameters.docs.story = { inline: false, height }` with a
+  one-line comment saying why, and after adding it open the Docs page and
+  read `document.documentElement.dataset.dir`: it must still say `ltr`.
+  The frame is a story canvas, so the preview decorator's 20px padding
+  and the canvas body's 13px both apply inside it: give the story
+  `parameters.noPadding: true` and a `height` of the content plus the
+  13px above and below it, then look at the frame on the Docs page —
+  a `height` copied from another story clips the last row, and the
+  decorator padding reads as an unexplained gap above the first.
+- **Comments in a story are rare and one line long.** They explain only
+  what the code cannot show — why a story is framed or hidden on Docs,
+  why a type forces unused fields — and never repeat the story's own
+  description or restate what the JSX plainly does.
+- **Targeted edits only.** Keep the file's existing order, change lines
+  in place, append new stories after the last existing state or
+  variant story and before `RightToLeft` and `CssCustomization`.
+  Moving a misplaced `CssCustomization` to the end is the one
+  reordering allowed: a story's ID comes from its name, not its
+  position, so the baselines hold. The same
+  applies inside a README section, and every existing README sentence,
+  argTypes description and `description.story` is judged against the
+  deciding code, not kept because it is old ("the backdrop dims the
+  background when the menu is open" survived a rewrite while the code
+  shows it only in the mobile layout): one that is accurate and
+  reads as a full clause stays word for word; one that is wrong,
+  names the wrong actor (the component "shows on right-click" when the
+  host calls `show`), or repeats its own label ("Backdrop: Optional
+  backdrop") is reworded in place; a missing capability is appended —
+  the section is never written anew.
+- **A component fix re-opens the story text written around the old
+  behaviour.** When a finding from the audit is fixed in the component
+  or its stylesheet, every description, bullet and argTypes entry that
+  was worded around the defect is reworded in the same turn, and two
+  props that differ only in the state they mark end up with parallel
+  descriptions — one never carries a clause the other lacks.
+- **Fold corrections into this skill at once.** When the user catches
+  a discrepancy in how a fix is being made, the rule that prevents it
+  is added here in the same turn, before the fix continues. Never
+  rewrite a story file wholesale. The tree is Prettier-clean, so
+  `npx prettier --write` on a touched file rewrites only your lines,
+  and the pre-commit hook does it anyway.
+- **Keep existing story IDs and visuals stable**: `__tests__/` holds
+  Playwright screenshot baselines per story ID. A converted story must
+  render the same closed state it did before; new stories get new spec
+  tests, and their baselines are generated in the Docker image (`compose.yaml`), never from a local macOS run.
+- **A viewport preset works in the canvas only.** A story that sets
+  `globals.viewport` to show a layout the component picks from
+  `window.innerWidth` (a bottom sheet, a collapsed header) renders on
+  the Docs page inline at the column's desktop width, where that layout
+  never switches on. Give it the same narrow window there: a decorator
+  that, when `context.viewMode === "docs"`, renders the story's own
+  canvas (`iframe.html?viewMode=story&id=${context.id}`) in a
+  phone-sized `<iframe>`, and passes `<Story />` through otherwise.
+  Hiding the story from Docs is the fallback, not the first choice.
+- **The Docs page mounts every story at once.** A story whose component
+  listens on `document` or `window` (a `global` context menu, a hotkey
+  hook, a scroll handler) answers events meant for its neighbours
+  there; give it a document of its own with
+  `parameters.docs.story = { inline: false }` and check the Docs page,
+  not only the story canvas.
+- **`CssCustomization` has one form**: a demo, not a list. Its text
+  says the variables are listed under CSS variables on this page — the
+  README's table, which the Docs page renders — and then names the
+  instances in the example; it carries no table of its own. The example
+  sets the variables on a wrapper `<div style={{ "--x": … }}>`; a
+  component that portals its DOM (a menu, a dropdown, a tooltip) sets
+  them through its own `style` prop instead, and the text says why.
+- **An instance in the example earns its place by a variable, not by a
+  state.** The wrapper sets every variable in the README's table that a rendered
+  instance can show; a row the example never sets is a claim the reader
+  cannot check on the page. One instance is the default. A second is
+  added only for a variable the first cannot reach — one that a prop
+  switches on (a gutter, a fill, a disabled look mixed from the custom
+  colour) — with that prop on the second instance and the variable in
+  the same wrapper, so the reader sees which variable the prop reveals.
+  A state in which the theme swaps the custom colours for its own is
+  shown only when the text says which variables survive it; otherwise
+  it demonstrates nothing and reads as a defect. Hover and focus
+  variables need no instance of their own: set them in the wrapper and
+  tell the reader to hover and focus. Two instances that show the same
+  variables are one too many. The story text names each instance and
+  the variable it is there for. Two checks on the values: neighbouring
+  shades of one colour do not read apart on a one-pixel border, so the
+  states differ in lightness, not in hue alone; and a variable whose
+  honest demonstration looks broken — the component's own layout puts
+  the part it changes out of line with the rest — is not demonstrated,
+  and the caveat goes in its README table row instead.
+- **A CSS-variables table is a list of claims — check every row.** For
+  each variable the README's `## CSS variables` table documents, find the rule
+  that reads it (`grep var(--name` across the component's stylesheets)
+  and what that rule renders, and when. "Reads it" is judged on the
+  compiled CSS, not the SCSS source: nesting, a missing `&`, `:global`,
+  `@media` and `@supports` change what a rule matches and when, and a
+  compiled selector that cannot reach the element carrying the variable
+  (a descendant combinator before its own pseudo-element, a parent class
+  nothing sets) makes the rule dead. Read the built CSS in `dist/` or
+  compile the module, and trace the final selector to the element.
+  A variable the component's own stylesheet declares on the element
+  that carries it (a theme mixin's `--x: <value>` on the same selector)
+  is shadowed there: a wrapper's value never arrives, so the row is
+  wrong unless the README says to set it through the component's
+  `style` prop. A variable no rule reads, or
+  one whose rule changes nothing observable (a `line-height` on text
+  inside a fixed-height row), is dropped from the table; one that only
+  works in part gets the caveat in its comment — including one read
+  only by a single browser's pseudo-element (`::-moz-*`, `::-webkit-*`),
+  which names the browser and what it really paints there; one that
+  applies only in a mode the story does not show (the mobile-only
+  header, an aside variant) is labelled with that mode. A row is never
+  dropped because the browser it needs is not installed to verify it —
+  the caveat stays and the gap goes in the `Evidence:` sub-bullet. A
+  row whose description is wrong is reworded, not removed. The same
+  goes for any other
+  list in the docs — keys, events, sub-components: every entry is
+  verified, none is carried over on trust.
+- **Verify in the browser** before reporting a story as fixed: start
+  Storybook (`pnpm storybook`, port 6006), open the story, exercise the
+  state the story claims to show. A claim the code seems to support but
+  the page does not render is corrected or dropped, and the cause is
+  reported as a component finding. The mechanics, all three of which
+  have failed a run before:
+  - Take the story IDs from `http://localhost:6006/index.json`, never
+    from the title — the canvas is
+    `iframe.html?viewMode=story&id=<story id>`.
+  - A scripted check is written to the session scratchpad but run with
+    `NODE_PATH="$PWD/node_modules" node <scratchpad>/check.cjs` from the
+    repository root. Node resolves `require` from the _script's_ own
+    directory, so a scratchpad script never sees the repository's
+    `node_modules` and `cd` into the repository does not change that.
+  - Import the browser from `@playwright/test`, not `playwright`: only
+    the first is a declared dependency, so under pnpm's layout the
+    second is absent from `node_modules` even at the repository root.
+
+## Reporting fixes
+
+A fix is reported by item number, never as a diff or as the rewritten
+story. The message has a fixed shape and nothing else:
+
+1. `Fixed:` — the item numbers from the audit report.
+2. One line per fixed item: its number, what changed in one clause,
+   one `[file:line](path#LN)` link. A text change — a README sentence,
+   a description, an `argTypes` description — adds two indented lines,
+   `was:` with the old text and `now:` with the new, so the rewording
+   is visible without opening the file. A structural change — a
+   section added, a story renamed, a `source.code` block added — gets
+   no `was`/`now`.
+3. `Skipped:` — items left alone, each with the reason in one clause
+   (needs a component change, is the user's choice, did not render as
+   claimed in the browser).
+4. `Checked:` — one line: the stories opened in Storybook, by story
+   ID, and what they rendered, story IDs and screenshot baselines
+   unchanged, touched lines formatted by hand, tests green. A fix
+   reported without a story actually opened is not reported as fixed.
+5. `Stamped:` — the `storiesAudit` date written into each README, or
+   why none was (see "Stamping the README").
+6. `Commit:` — hash and message, or "not committed" when the user
+   asked to hold it.
+
+The shape, with placeholders:
+
+```
+Fixed: items N, M.
+N. <what changed, one clause> — [<Name>.stories.tsx:LN](components/<folder>/<Name>.stories.tsx#LN)
+   was: "<old text>"
+   now: "<new text>"
+M. <section or story added or renamed, one clause> — [<Name>.stories.tsx:LN-LM](…)
+Skipped: item K — <reason in one clause>.
+Checked: <stories opened and what they rendered>, story IDs and baselines unchanged, touched lines formatted by hand.
+Stamped: storiesAudit <YYYY-MM-DD> in <folder>/README.md
+Commit: <hash> <message> | not committed
+```
+
+## Stamping the README
+
+The last step of a run records in the component's own README that
+the audit has been through it, so a reader of the folder can tell an
+audited component from one never looked at, and how long ago:
+
+- **The stamp is `storiesAudit`** in the `ui-kit-doc` metadata block
+  on line 1 of `<folder>/README.md`, today's date as `YYYY-MM-DD`
+  (`"storiesAudit": "2026-09-28"`), placed as the last field, after
+  `testIds`. A stamp already there is overwritten, never duplicated.
+  `scripts/lib/readme-meta.mjs` refuses any other form and a date in
+  the future; `README_TEMPLATE.md` lists the field.
+- **Stamp when the stories are in order**: the fixes the user asked
+  for are applied and verified in the browser, or the audit found
+  nothing to fix. A report still waiting for its fixes, a run the user
+  stopped halfway and a `template` run whose findings are open leave
+  the README alone — the stamp says the component was fixed, not that
+  someone looked. Items skipped as needing a component change do not
+  hold the stamp back: they are reported, not story defects.
+- **Every README the scope touched**: a sub-component with its own
+  README (`rows/row`, `tiles/base-tile`) is stamped when its stories
+  were audited; in a folder or `all` sweep each component is stamped
+  on its own condition, not the sweep's.
+- **Only that line changes.** Edit the block by hand in its existing
+  layout; the README's prose is not re-read or rewritten for the
+  stamp. Run `pnpm check:readme` afterwards.
+- **The stamp goes into the fix commit**, not a commit of its own; a
+  clean audit with nothing to fix commits the stamp alone, as
+  "Record the stories audit of `<Name>`". When the user holds the
+  commit, the stamp stays in the working tree with the fixes.
+- The `Reporting fixes` message carries it as the `Stamped:` line; a
+  run that did not stamp says why there ("fixes not applied yet").

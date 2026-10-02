@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -46,76 +11,133 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `TableRow represents a single row within a table, with context menu and selection support.
+        component: `TableRow is one row of a table: its cells followed by a last cell with the row's context menu button.
 
-### Features
-
-- **Context Menu**: Right-click to show configurable context menu options
-- **Selection State**: Visual feedback for checked and active rows
-- **Drag Support**: Rows can indicate a dragging state
-- **Index Editing Mode**: Special styling for index reordering operations
-- **Column Hiding**: Supports hiding columns dynamically
-
-### Usage
-
-\`\`\`tsx
-import { TableRow } from "@docspace/ui-kit/components/table/table-row";
-import { TableCell } from "@docspace/ui-kit/components/table/sub-components/table-cell";
-
-<TableRow
-  checked={isSelected}
-  contextOptions={menuItems}
-  style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr) 24px" }}
->
-  <TableCell>Name</TableCell>
-  <TableCell>Type</TableCell>
-  <TableCell>Modified</TableCell>
-</TableRow>
-\`\`\``,
+The Table README describes it in full.`,
       },
     },
   },
   argTypes: {
     checked: {
       control: "boolean",
-      description: "Whether the row is selected/checked",
+      description:
+        "Adds a `checked` class to the row for the consumer's highlight and reveals children marked `create-share-link`",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isActive: {
       control: "boolean",
-      description: "Whether the row is in an active/focused state",
+      description:
+        "Marks the row whose context menu is open: reveals children marked `create-share-link` and turns off the drop highlight",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     dragging: {
       control: "boolean",
-      description: "Whether the row is currently being dragged",
+      description:
+        "Fills children marked `droppable-hover` with the drop colour while something is dragged over the table",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isIndexEditingMode: {
       control: "boolean",
-      description: "Enable index editing mode for row reordering",
+      description:
+        "Leaves out the last cell with the context menu button, for rows being reordered",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hideColumns: {
       control: "boolean",
-      description: "Whether to hide optional columns",
+      description:
+        "Adds a class for the narrow layout the header asks for when it runs out of room; the kit styles nothing with it",
       table: {
         defaultValue: { summary: "false" },
       },
     },
-    fileContextClick: { control: false, table: { disable: true } },
-    onHideContextMenu: { control: false, table: { disable: true } },
-    getContextModel: { control: false, table: { disable: true } },
-    forwardedRef: { control: false, table: { disable: true } },
-    onClick: { control: false, table: { disable: true } },
+    contextOptions: {
+      control: false,
+      description:
+        "Items of the context menu; a non-empty list renders the three-dot button, an empty one leaves a blank space instead",
+    },
+    getContextModel: {
+      control: false,
+      description: "Builds the context menu items at the moment the menu opens",
+    },
+    title: {
+      control: "text",
+      description: "Hover tooltip of the three-dot button",
+    },
+    badgeUrl: {
+      control: "text",
+      description: "URL of a badge image shown in the context menu's header",
+    },
+    selectionProp: {
+      control: "object",
+      description:
+        "Class and `value` spread onto the last cell, which holds the context menu button",
+    },
+    contextMenuCellStyle: {
+      control: "object",
+      description: "Inline styles of the last cell",
+    },
+    className: {
+      control: "text",
+      description: "Class applied to the row after the component's own",
+    },
+    style: {
+      control: "object",
+      description:
+        "Inline styles of the row; inside a table the header overwrites its grid columns",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Value of the row's `data-testid` attribute",
+      table: {
+        defaultValue: { summary: "table-row" },
+      },
+    },
+    contextMenuTestId: {
+      control: "text",
+      description: "Value of the context menu's `data-testid` attribute",
+    },
+    fileContextClick: {
+      action: "fileContextClick",
+      description:
+        "Called when the context menu is asked for, with `true` for a right-click",
+    },
+    onHideContextMenu: {
+      action: "onHideContextMenu",
+      description: "Called when the context menu closes",
+    },
+    onClick: {
+      action: "onClick",
+      description: "Called with the mouse event on a click anywhere in the row",
+    },
+    onDoubleClick: {
+      action: "onDoubleClick",
+      description:
+        "Called with the mouse event on a double click anywhere in the row",
+    },
+    onMouseEnter: {
+      action: "onMouseEnter",
+      description: "Called when the pointer enters the row",
+    },
+    onMouseLeave: {
+      action: "onMouseLeave",
+      description: "Called when the pointer leaves the row",
+    },
+    forwardedRef: {
+      control: false,
+      description: "Ref of the row element",
+    },
+    children: {
+      control: false,
+      description: "The row's cells, normally one `TableCell` per column",
+    },
   },
   args: {
     style: {
@@ -169,7 +191,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default table row with context menu support. Right-click to see the context menu.",
+          "A row with a context menu, the way rows in a file list offer their actions: right-click anywhere in the row, or click the three-dot button at its end.",
       },
       source: {
         code: `<TableRow
@@ -197,7 +219,7 @@ export const IndexEditingMode: Story = {
     docs: {
       description: {
         story:
-          "Table row in index editing mode. Applies special styling for reordering operations.",
+          "While rows are being reordered the last cell with the context menu button is left out, so a drag cannot open a menu by accident (`isIndexEditingMode`).",
       },
       source: {
         code: `<TableRow

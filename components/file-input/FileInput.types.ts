@@ -1,83 +1,80 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React from "react";
 
 import { InputSize } from "../text-input";
 
 export type FileInputProps = {
-  /** Accepts css style */
+  /** Applied to the outermost element. */
   style?: React.CSSProperties;
-  /** Placeholder text for the input */
+  /** Placeholder of the read-only field, shown until a file is chosen. */
   placeholder?: string;
-  /** Supported size of the input fields */
+  /**
+   * Height of the field, which also picks the icon and button sizes: base and
+   * middle take a 15px icon, large a 16px one.
+   */
   size: InputSize;
-  /** Indicates that the input field has scale */
+  /** Whether the field stretches to fill its container. */
   scale?: boolean;
-  /** Accepts class */
+  /** Applied to the outermost element. */
   className?: string;
-  /** Indicates that the input field has an error */
+  /** Whether the field is drawn in its error colours. */
   hasError?: boolean;
-  /** Indicates that the input field has a warning */
+  /** Whether the field is drawn in its warning colours. */
   hasWarning?: boolean;
-  /** Used as HTML `id` property */
+  /** Applied to the hidden `<input type="file">`, not to the wrapper. */
   id?: string;
-  /** Indicates that the field cannot be used (e.g not authorised, or changes not saved) */
+  /**
+   * Whether the field is greyed and a click no longer opens the file dialog.
+   * A drop is still accepted, and Enter or Space still opens the dialog.
+   */
   isDisabled?: boolean;
-  /** Tells when the button should show loader icon */
+  /**
+   * Whether a spinner replaces the icon. It also disables the field, and it is
+   * ignored when `buttonLabel` is set, since the button has no loading form.
+   */
   isLoading?: boolean;
-  /** Used as HTML `name` property */
+  /** Ignored. Nothing reads this prop. */
   name?: string;
-  /** Called when a file is selected */
+  /**
+   * Called with the chosen files: a single `File` when one was picked, an array
+   * when several were. Check for an array before reading `.name`.
+   */
   onInput?: (file: File | File[]) => void;
-  /** Specifies the files visible for upload */
+  /**
+   * Extensions and MIME types the dialog offers and a drop accepts, such as
+   * `[".pdf", "image/*"]`. The default `[""]` matches only files with no MIME
+   * type, so pass it whenever the field is used.
+   */
   accept?: string[];
-  /** Specifies the label for the upload button */
+  /** Renders a button with this label in place of the icon. */
   buttonLabel?: string;
-  /** Indicates that icon is document. Otherwise, it is folder icon */
+  /** Whether the icon is a document rather than a folder. */
   isDocumentIcon?: boolean;
+  /**
+   * Called when the field or the icon is clicked — but only while `fromStorage`
+   * is set. Without it the click opens the file dialog and this never fires.
+   */
   onClick?: (e: React.MouseEvent) => void;
+  /** Applied to the outermost element. */
   idButton?: string;
+  /** Text shown in the field instead of the chosen file names, with `fromStorage`. */
   path?: string;
+  /**
+   * Turns the control into a button that picks from somewhere else: the hidden
+   * file input is not rendered, `path` is displayed, and clicks go to `onClick`.
+   */
   fromStorage?: boolean;
-  /** Indicates that the input may contain multiple files. */
+  /**
+   * Whether several files may be chosen at once.
+   * @default true
+   */
   isMultiple?: boolean;
-  /** ARIA label for the file input button */
+  /** Accessible name of the control. There is none without it. */
   "aria-label"?: string;
-  /** ARIA description for the file input */
+  /** Accessible description of the control. */
   "aria-description"?: string;
-  /** Data attributes for testing */
+  /**
+   * `data-testid` of the outermost element.
+   * @default "file-input"
+   */
   "data-test-id"?: string;
 };

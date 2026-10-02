@@ -1,0 +1,23 @@
+@use "../../styles/variables/colors" as *;
+
+// The page the stories open the panel over: a grey page, white cards and the
+// panel's own sections. Private tokens with light defaults, swapped under the
+// kit's `.dark`, so the scene follows the theme toolbar like the panel does.
+// The panel is not portalled, so its content inherits them from here.
+.scene {
+  --aside-story-page: #{$gray-light};
+  --aside-story-card: #{$white};
+  --aside-story-border: #{$gray-light-mid};
+  --aside-story-row: #{$light-gray-hover};
+  --aside-story-muted: #{$gray};
+  --aside-story-faint: #{$gray-strong};
+
+  :global(.dark) & {
+    --aside-story-page: #{$black};
+    --aside-story-card: #{$dark-gray-light};
+    --aside-story-border: #{$gray-dark-strong};
+    --aside-story-row: #{$light-dark-gray-hover};
+    --aside-story-muted: #{$gray-dark};
+    --aside-story-faint: #{$gray-dark-strong};
+  }
+}

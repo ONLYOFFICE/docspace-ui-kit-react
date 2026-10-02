@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import {
   ScrollbarProps as ScrollbarLibraryProps,
   Scrollbar as ScrollbarType,
@@ -52,7 +17,30 @@ type PickedScrollbarLibraryProps = Pick<
   | "rtl"
 >;
 
-export type ScrollbarProps = PickedScrollbarLibraryProps & {
+export type ScrollbarProps = {
+  /** Applied to the outermost element. */
+  id?: ScrollbarLibraryProps["id"];
+  /** Applied to the outermost element. */
+  className?: ScrollbarLibraryProps["className"];
+  /** Applied to the outermost element. */
+  style?: ScrollbarLibraryProps["style"];
+  /** Stops the content scrolling vertically. */
+  noScrollY?: ScrollbarLibraryProps["noScrollY"];
+  /** Stops the content scrolling horizontally. */
+  noScrollX?: ScrollbarLibraryProps["noScrollX"];
+  /** Publishes the scrollbar on a React context for the components inside it. */
+  createContext?: ScrollbarLibraryProps["createContext"];
+  /**
+   * Gives the outer element the content's own height, so the scrollbar grows
+   * with its content instead of filling its parent.
+   */
+  translateContentSizeYToHolder?: ScrollbarLibraryProps["translateContentSizeYToHolder"];
+  /** The same on the horizontal axis. */
+  translateContentSizeXToHolder?: ScrollbarLibraryProps["translateContentSizeXToHolder"];
+  /** Both at once. */
+  translateContentSizesToHolder?: ScrollbarLibraryProps["translateContentSizesToHolder"];
+  /** Which side the vertical track is on. It follows the interface direction unless set. */
+  rtl?: ScrollbarLibraryProps["rtl"];
   /** Ref to access the DOM element or React component instance */
   ref?: React.Ref<ScrollbarType | null>;
   /** Ref to access the DOM element of Scroll content element */
@@ -61,20 +49,29 @@ export type ScrollbarProps = PickedScrollbarLibraryProps & {
   scrollClass?: string;
   /** This class will be placed on scroller body element */
   scrollBodyClassName?: string;
-  /** Enable tracks auto hiding.  */
+  /**
+   * Whether the tracks fade out again three seconds after the last scroll or
+   * pointer move.
+   * @default true
+   */
   autoHide?: boolean;
   /** Fix scrollbar size. */
   fixedSize?: boolean;
   /** Set focus on scroll content element after first render */
   autoFocus?: boolean;
-  /** Set scroll body tabindex */
+  /**
+   * Position of the scrolling element in the tab order. The default of -1 keeps
+   * it off the tab order, so the region cannot be scrolled with the arrow keys;
+   * `null` removes the attribute entirely.
+   * @default -1
+   */
   tabIndex?: number | null;
   /** Add padding bottom to scroll-body */
   paddingAfterLastItem?: string;
   /** Add custom padding-inline-end to scroll-body. */
   paddingInlineEnd?: string;
-  /** Add onScroll handler */
+  /** Called as the content scrolls, with the native event. */
   onScroll?: React.UIEventHandler<HTMLDivElement>;
-  /** Add children */
+  /** The content to scroll. */
   children?: React.ReactNode;
-};
+} & PickedScrollbarLibraryProps;

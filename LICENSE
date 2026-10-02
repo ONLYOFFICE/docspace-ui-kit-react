@@ -727,3 +727,18 @@ applicable to the Program. The full license text is available at:
 You can contact Ascensio System SIA by electronic mail at:
 info@onlyoffice.com and by postal mail at: 20A-6 Ernesta Birznieka-Upisha
 Street, Riga, LV-1050, Latvia, European Union.
+
+
+6. Third-Party Brand Marks.
+
+The following files in this repository are third-party brand marks, reproduced
+to identify the services they represent. They are the property of their
+respective owners, are not licensed under the terms above, and their use is
+governed by the trademark policies of those owners:
+
+    assets/thirdparties/box.svg
+    assets/thirdparties/box.dark.svg
+    assets/thirdparties/github.light.react.svg
+    assets/thirdparties/github.dark.react.svg
+
+No trademark rights are granted by this license.

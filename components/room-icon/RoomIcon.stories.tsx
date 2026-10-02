@@ -1,42 +1,9 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import PlanetIcon from "../../assets/icons/12/planet.react.svg?url";
+import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 import PlusSvgUrl from "../../assets/icons/16/button.plus.react.svg?url";
 import EditPenSvgUrl from "../../assets/pencil.react.svg?url";
 import styles from "./RoomIcon.stories.module.scss";
@@ -47,92 +14,143 @@ const meta = {
   title: "UI/Data display/RoomIcon",
   component: RoomIcon,
   parameters: {
-    docs: {
-      description: {
-        component: `Versatile room icon component for displaying room avatars with support for images, colors, badges, editing capabilities, and various states.
-
-### Features
-
-- **Color Backgrounds**: Display colored initials from room titles
-- **Three Sizes**: 32px, 48px, and 96px
-- **Badge Support**: Optional badge icons with tooltips
-- **Editing Mode**: Built-in edit dropdown with upload/edit actions
-- **States**: Archive, template, empty, and hover states
-
-### Usage
-
-\`\`\`tsx
-import { RoomIcon } from "@docspace/ui-kit/components/room-icon";
-
-// Basic room icon
-<RoomIcon title="My Room" color="4781D1" size="48px" showDefault />
-
-// With badge
-<RoomIcon title="Public" color="3B72A7" size="96px" badgeUrl={iconUrl} showDefault />
-
-// With editing
-<RoomIcon title="Editable" size="96px" color="4781D1" withEditing model={menuModel} showDefault />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     title: {
       control: "text",
-      description: "Room title (used for generating initials)",
+      description:
+        "Name the initials are taken from: the first letter of its first word and of its last",
     },
     color: {
-      control: "color",
-      description: "Background color (hex without #)",
+      control: "text",
+      description:
+        "Colour of the tile, as six hex digits without a leading `#`; the initials turn white or black to stay readable on it",
     },
     size: {
-      control: "select",
-      options: ["32px", "48px", "96px"],
-      description: "Icon size",
+      control: "text",
+      description:
+        "Side of the square, as a px string such as `48px`; at `96px` the corner badge grows to match",
       table: {
         defaultValue: { summary: "32px" },
       },
     },
     radius: {
       control: "text",
-      description: "Border radius",
+      description: "Corner radius of the tile and of the image inside it",
       table: {
         defaultValue: { summary: "6px" },
       },
     },
     showDefault: {
       control: "boolean",
-      description: "Show default state with initials",
+      description: "Draws the initials even when a logo is set",
       table: {
         defaultValue: { summary: "false" },
       },
     },
+    logo: {
+      control: "text",
+      description:
+        "Logo drawn instead of the initials: an image URL, or an object whose `cover` SVG is inlined and painted in the initials' colour, or whose `medium` URL is shown as it is",
+    },
+    imgClassName: {
+      control: "text",
+      description: "Class added to the `<img>` the logo is drawn in",
+    },
+    className: {
+      control: "text",
+      description: "Class added to the outer element",
+    },
     isArchive: {
       control: "boolean",
-      description: "Archive state styling",
+      description:
+        "Greys the tile out whatever `color` holds, and switches the hover image off",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isTemplate: {
       control: "boolean",
-      description: "Template room styling",
+      description:
+        "Draws the tile as an outline in its colour, with the initials or a 24px logo inside",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withEditing: {
       control: "boolean",
-      description: "Enable edit mode with dropdown",
+      description:
+        "Adds a pencil button in the corner that opens the logo menu; the tile becomes at least 64px wide and the badge is not drawn",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isEmptyIcon: {
       control: "boolean",
-      description: "Show empty icon placeholder",
+      description:
+        "Replaces the whole tile with a dashed frame, a camera glyph and a plus button that opens the logo menu",
       table: {
         defaultValue: { summary: "false" },
+      },
+    },
+    model: {
+      // The icons are data URIs too long to edit, and they stretch the table.
+      control: false,
+      description:
+        "Entries of the logo menu, each with a label, an icon and a click handler; the upload entry is handed the hidden file input",
+    },
+    dropDownManualX: {
+      control: "text",
+      description: "Horizontal offset of the logo menu from its button",
+      table: {
+        defaultValue: { summary: "-10px" },
+      },
+    },
+    onChangeFile: {
+      action: "onChangeFile",
+      description:
+        "Called when a file is picked in the hidden file input; the input is rendered only when this is set",
+    },
+    hoverSrc: {
+      control: "text",
+      description:
+        "Image that slides in over the tile while the pointer is on it, replacing the initials",
+    },
+    badgeUrl: {
+      control: "text",
+      description: "URL of the glyph drawn in the bottom corner of the tile",
+    },
+    badgeIconNode: {
+      control: false,
+      description:
+        "Glyph drawn in the bottom corner, as a node instead of a URL",
+    },
+    badgeIconColor: {
+      control: "text",
+      description:
+        "When set, the badge glyph keeps its own colours instead of being filled white (black in the dark theme)",
+    },
+    onBadgeClick: {
+      action: "onBadgeClick",
+      description:
+        "Called when the badge is clicked; the click also reaches the tile and toggles the logo menu",
+    },
+    tooltipContent: {
+      control: "text",
+      description:
+        "Text shown under the badge while the pointer is on it; needs `tooltipId`",
+    },
+    tooltipId: {
+      control: "text",
+      description: "Id that ties the badge to its tooltip",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Value of `data-testid` on the outer element",
+      table: {
+        defaultValue: { summary: "room-icon" },
       },
     },
   },
@@ -163,22 +181,19 @@ const mockModel = [
     label: "Upload",
     icon: PlusSvgUrl,
     key: "upload",
-    onClick: () => console.log("Upload clicked"),
+    onClick: fn(),
   },
   {
     label: "Edit",
     icon: EditPenSvgUrl,
     key: "edit",
-    onClick: () => console.log("Edit clicked"),
+    onClick: fn(),
   },
 ];
 
 export const Default: Story = {
   render: (args: RoomIconProps) => (
-    <RoomIcon
-      {...args}
-      className={`${styles.roomTitle} ${styles.roomBackground}`}
-    />
+    <RoomIcon {...args} className={styles.roomTitle} />
   ),
   args: {
     title: "Test Room",
@@ -186,6 +201,17 @@ export const Default: Story = {
     color: "4781D1",
     radius: "6px",
     showDefault: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A room with no logo is shown by its initials on its colour. Change the name, the colour or the size live in the Controls panel below.",
+      },
+      source: {
+        code: `<RoomIcon title="Test Room" color="4781D1" size="96px" />`,
+      },
+    },
   },
 };
 
@@ -205,7 +231,7 @@ export const Sizes: Story = {
     docs: {
       description: {
         story:
-          "All available icon sizes: 32px (small), 48px (medium), and 96px (large).",
+          "The same tile at 32px, 48px and 96px (`size`). Any px value works; the initials stay 14px at every size, so a large tile needs its own text style for them.",
       },
       source: {
         code: `<RoomIcon title="S" color="4781D1" size="32px" showDefault />
@@ -233,7 +259,8 @@ export const Colors: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Room icons with different background colors.",
+        story:
+          "Each room gets its own colour (`color`, six hex digits without `#`), and the initials turn white or black to stay readable on it.",
       },
       source: {
         code: `<RoomIcon title="Blue" color="4781D1" size="48px" showDefault />
@@ -249,10 +276,7 @@ export const Colors: Story = {
 export const WithEditing: Story = {
   render: (args: RoomIconProps) => (
     <div style={{ height: "200px" }}>
-      <RoomIcon
-        {...args}
-        className={`${styles.roomTitle} ${styles.roomBackground}`}
-      />
+      <RoomIcon {...args} className={styles.roomTitle} />
     </div>
   ),
   args: {
@@ -268,7 +292,7 @@ export const WithEditing: Story = {
     docs: {
       description: {
         story:
-          "Room icon with editing enabled. Hover to see the edit overlay with dropdown menu.",
+          "Lets the reader change the logo: click the pencil in the corner, or anywhere on the tile, to open the logo menu (`withEditing`, `model`); picking an entry shows up in the Actions panel.",
       },
       source: {
         code: `<RoomIcon
@@ -300,7 +324,7 @@ export const EmptyState: Story = {
     docs: {
       description: {
         story:
-          "Empty icon placeholder state, typically used when no room image has been set yet.",
+          "For a room that has no logo yet: a dashed frame with a camera glyph, and a plus button in the bottom-right corner that opens the logo menu (`isEmptyIcon`, `model`). The button takes its background from the host's accent colour, which Storybook does not define, so here only a click on that corner finds it.",
       },
       source: {
         code: `<RoomIcon title="" size="96px" isEmptyIcon model={menuModel} />`,
@@ -316,7 +340,7 @@ export const Archive: Story = {
   args: {
     title: "Archived",
     size: "96px",
-    color: "A3A9AE",
+    color: "4781D1",
     radius: "6px",
     showDefault: true,
     isArchive: true,
@@ -324,10 +348,11 @@ export const Archive: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Archived room with muted styling to indicate inactive state.",
+        story:
+          "An archived room is greyed out whatever its colour: this tile is given the same blue as the others (`isArchive`).",
       },
       source: {
-        code: `<RoomIcon title="Archived" size="96px" color="A3A9AE" isArchive showDefault />`,
+        code: `<RoomIcon title="Archived" size="96px" color="4781D1" isArchive />`,
       },
     },
   },
@@ -345,14 +370,14 @@ export const WithBadge: Story = {
     size: "96px",
     radius: "6px",
     badgeUrl: PlanetIcon,
-    onBadgeClick: () => console.log("Badge clicked"),
+    onBadgeClick: fn(),
     showDefault: true,
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Room icon with a badge indicator, useful for showing public/shared status.",
+          "Marks something about the room with a glyph in the bottom corner (`badgeUrl`); clicking it calls `onBadgeClick`, shown in the Actions panel.",
       },
       source: {
         code: `<RoomIcon
@@ -380,8 +405,8 @@ export const WithTooltip: Story = {
     size: "96px",
     radius: "6px",
     badgeUrl: PlanetIcon,
-    onBadgeClick: () => console.log("Badge clicked"),
-    tooltipContent: "This room is publicly accessible",
+    onBadgeClick: fn(),
+    tooltipContent: "Anyone with the link can view",
     tooltipId: "room-tooltip",
     showDefault: true,
   },
@@ -389,7 +414,7 @@ export const WithTooltip: Story = {
     docs: {
       description: {
         story:
-          "Room icon with a badge that shows a tooltip on hover for additional context.",
+          "Explains the badge in words: hover it to read the text (`tooltipContent`), which the badge finds through `tooltipId`.",
       },
       source: {
         code: `<RoomIcon
@@ -397,7 +422,7 @@ export const WithTooltip: Story = {
   color="2DB482"
   size="96px"
   badgeUrl={planetIconUrl}
-  tooltipContent="This room is publicly accessible"
+  tooltipContent="Anyone with the link can view"
   tooltipId="room-tooltip"
   showDefault
 />`,
@@ -421,10 +446,11 @@ export const Template: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Template room icon with specialized styling.",
+        story:
+          "Tells a template apart from a room: an outline in the tile colour instead of a filled square, with the initials inside (`isTemplate`).",
       },
       source: {
-        code: `<RoomIcon title="Template" color="533ED1" size="96px" isTemplate showDefault />`,
+        code: `<RoomIcon title="Template" color="533ED1" size="96px" isTemplate />`,
       },
     },
   },
@@ -433,10 +459,7 @@ export const Template: Story = {
 export const WithHover: Story = {
   render: (args: RoomIconProps) => (
     <div style={{ height: "200px" }}>
-      <RoomIcon
-        {...args}
-        className={`${styles.roomTitle} ${styles.roomBackground}`}
-      />
+      <RoomIcon {...args} className={styles.roomTitle} />
     </div>
   ),
   args: {
@@ -445,21 +468,21 @@ export const WithHover: Story = {
     color: "4781D1",
     radius: "6px",
     showDefault: true,
-    hoverSrc: "https://picsum.photos/200",
+    hoverSrc: EditPenSvgUrl,
     model: mockModel,
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Room icon with a hover effect that reveals a preview image on mouse over.",
+          "Hints that the tile can be clicked: hover it, and the initials slide away while a second image fades in (`hoverSrc`); a click opens the logo menu (`model`).",
       },
       source: {
         code: `<RoomIcon
   title="Hover"
   size="96px"
   color="4781D1"
-  hoverSrc="https://example.com/preview.jpg"
+  hoverSrc={pencilIconUrl}
   model={menuModel}
   showDefault
 />`,
@@ -470,10 +493,7 @@ export const WithHover: Story = {
 
 export const LongTitle: Story = {
   render: (args: RoomIconProps) => (
-    <RoomIcon
-      {...args}
-      className={`${styles.roomTitle} ${styles.roomBackground}`}
-    />
+    <RoomIcon {...args} className={styles.roomTitle} />
   ),
   args: {
     title: "Very Long Room Name That Should Be Truncated",
@@ -486,7 +506,7 @@ export const LongTitle: Story = {
     docs: {
       description: {
         story:
-          "Room icon with a long title to demonstrate initial truncation behavior.",
+          "However long the name, the tile shows two letters: the first of its first word and the first of its last (`title`).",
       },
       source: {
         code: `<RoomIcon
@@ -500,6 +520,91 @@ export const LongTitle: Story = {
   },
 };
 
+const coverGlyph = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M10 2l2.4 5.2 5.6.6-4.2 3.8 1.2 5.6L10 14.4 5 17.2l1.2-5.6L2 7.8l5.6-.6z"/></svg>`;
+
+// The cover path reads only `cover`; the other size URLs are required by TLogo.
+const coverLogo = {
+  cover: { id: "star", data: coverGlyph },
+  original: "",
+  large: "",
+  medium: "",
+  small: "",
+};
+
+// A logo that cannot load. A data URI that does not decode fails the same
+// way a missing file does -- `onError` fires and the tile falls back to the
+// initials -- without a request, so the console shows no 404 for it.
+const BROKEN_LOGO_URL = "data:image/png;base64,bm90LWFuLWltYWdl";
+
+const WithLogoTemplate = (args: RoomIconProps) => (
+  <Wrapper>
+    <RoomIcon {...args} logo={CatalogFolderReactSvgUrl} />
+    <RoomIcon {...args} logo={coverLogo} />
+    <RoomIcon {...args} logo={BROKEN_LOGO_URL} />
+  </Wrapper>
+);
+
+export const WithLogo: Story = {
+  render: (args: RoomIconProps) => <WithLogoTemplate {...args} />,
+  args: {
+    title: "Project files",
+    color: "2DB482",
+    size: "48px",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `A room with a logo of its own shows it instead of the initials (\`logo\`):
+
+- **Image** — a URL, drawn as it is
+- **Cover** — an object with a \`cover\` SVG, inlined and painted in the initials' colour on the tile
+- **Broken URL** — the image fails to load, so the tile falls back to the initials`,
+      },
+      source: {
+        code: `<RoomIcon title="Project files" color="2DB482" size="48px" logo={logoUrl} />
+<RoomIcon title="Project files" color="2DB482" size="48px" logo={{ cover: { id: "star", data: svgString }, original: "", large: "", medium: "", small: "" }} />
+<RoomIcon title="Project files" color="2DB482" size="48px" logo={urlThatFailsToLoad} />`,
+      },
+    },
+  },
+};
+
+const RightToLeftTemplate = (args: RoomIconProps) => (
+  <div dir="rtl">
+    <Wrapper>
+      <RoomIcon {...args} withEditing model={mockModel} />
+      <RoomIcon {...args} badgeUrl={PlanetIcon} />
+    </Wrapper>
+  </div>
+);
+
+// Framed on Docs: the theme provider stamps the direction on the page, which would flip the whole Docs page.
+export const RightToLeft: Story = {
+  render: (args: RoomIconProps) => <RightToLeftTemplate {...args} />,
+  globals: { direction: "rtl" },
+  args: {
+    title: "ملفات المشروع",
+    color: "4781D1",
+    size: "48px",
+  },
+  parameters: {
+    noPadding: true,
+    docs: {
+      story: { inline: false, height: "90px" },
+      description: {
+        story:
+          'The tile under a right-to-left interface: the pencil button and the badge move to the bottom-left corner. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+      },
+      source: {
+        code: `<div dir="rtl">
+  <RoomIcon title="ملفات المشروع" color="4781D1" size="48px" withEditing model={menuModel} />
+  <RoomIcon title="ملفات المشروع" color="4781D1" size="48px" badgeUrl={iconUrl} />
+</div>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
     <div
@@ -508,35 +613,49 @@ export const CssCustomization: Story = {
           display: "flex",
           gap: "24px",
           alignItems: "center",
+          "--room-icon-bg": "#b45309",
+          "--room-icon-bg-opacity": "0.6",
+          "--room-icon-edit-bg": "#fde68a",
+          "--room-icon-button-icon-color": "#7c3aed",
+          "--room-icon-empty-radius": "50%",
+          "--room-icon-dashed-border": "2px dashed #7c3aed",
         } as CSSProperties
       }
     >
-      <RoomIcon title="NC" size="96px" color="0082c9" radius="50%" showDefault />
-      <div
-        style={
-          {
-            "--room-icon-empty-radius": "50%",
-            "--room-icon-dashed-border": "2px dashed #0082c9",
-          } as CSSProperties
-        }
-      >
-        <RoomIcon title="" size="96px" isEmptyIcon model={mockModel} />
-      </div>
+      <RoomIcon
+        title="Design review"
+        size="96px"
+        color="7c3aed"
+        radius="50%"
+        withEditing
+        model={mockModel}
+        className={styles.roomTitle}
+      />
+      <RoomIcon title="" size="96px" isEmptyIcon model={mockModel} />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. It covers two instances:
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--room-icon-bg\` | Icon fill/background overlay color | theme white/black |
-| \`--room-icon-button-icon-color\` | Button icon color | theme gray |
-| \`--room-icon-bg-opacity\` | Background overlay opacity | \`1\` / \`0.1\` |
-| \`--room-icon-edit-bg\` | Edit icon background | theme gray-light-mid |
-| \`--room-icon-empty-radius\` | Empty placeholder border radius | \`10px\` |
-| \`--room-icon-dashed-border\` | Empty placeholder border | theme dashed gray |`,
+- **Design review** — an editable tile, for \`--room-icon-bg-opacity\` on the tile and \`--room-icon-edit-bg\` on the pencil
+- **Empty frame** — for \`--room-icon-bg\` on the plus glyph, \`--room-icon-button-icon-color\` on the camera, and the frame's \`--room-icon-dashed-border\` and \`--room-icon-empty-radius\``,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--room-icon-bg": "#b45309",
+    "--room-icon-bg-opacity": "0.6",
+    "--room-icon-edit-bg": "#fde68a",
+    "--room-icon-button-icon-color": "#7c3aed",
+    "--room-icon-empty-radius": "50%",
+    "--room-icon-dashed-border": "2px dashed #7c3aed",
+  }}
+>
+  <RoomIcon title="Design review" size="96px" color="7c3aed" radius="50%" withEditing model={menuModel} />
+  <RoomIcon title="" size="96px" isEmptyIcon model={menuModel} />
+</div>`,
       },
     },
   },

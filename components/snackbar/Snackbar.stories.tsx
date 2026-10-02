@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -45,74 +10,32 @@ const meta = {
   title: "UI/Feedback/SnackBar",
   component: SnackBar,
   parameters: {
-    docs: {
-      description: {
-        component: `SnackBar component for displaying persistent notification banners with optional actions and countdowns.
-
-### Features
-
-- **Header & Body**: Display a header text with a message body
-- **Action Button**: Optional action button with text label
-- **Countdown Timer**: Auto-dismiss with visible countdown
-- **Icon Display**: Show an info/warning icon alongside content
-- **HTML Content**: Render sanitized HTML content (via xss library)
-- **Maintenance Mode**: Special styling for maintenance notices
-- **Opacity Control**: Adjustable opacity for background styling
-- **Close Button**: Dismiss the snackbar via close button
-
-### Usage
-
-\`\`\`tsx
-import { SnackBar } from "@docspace/ui-kit/components/snackbar";
-
-// Basic snackbar
-<SnackBar
-  headerText="Notice"
-  text="Important notification"
-  showIcon
-  countDownTime={0}
-  sectionWidth={500}
-  onClose={handleClose}
-/>
-
-// With action button
-<SnackBar
-  headerText="Update"
-  text="New version available"
-  btnText="Update Now"
-  onAction={handleUpdate}
-  countDownTime={0}
-  sectionWidth={500}
-/>
-
-// With countdown auto-dismiss
-<SnackBar
-  headerText="Info"
-  text="Dismissing in 5 seconds"
-  countDownTime={5000}
-  sectionWidth={500}
-  onAction={handleDismiss}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     text: {
       control: "text",
-      description: "Main message text",
+      description:
+        "Message of the bar, drawn under the header. Not shown when `htmlContent` is set",
     },
     headerText: {
       control: "text",
-      description: "Header text displayed above the main message",
+      description:
+        "Bold line above the message. Without it the header line is hidden",
+    },
+    additionalHeaderText: {
+      control: "text",
+      description: "Smaller line drawn next to the header",
     },
     btnText: {
       control: "text",
-      description: "Text for the action button",
+      description:
+        "Label of the action, drawn as underlined text after the message. Setting it removes the close cross",
     },
     showIcon: {
       control: "boolean",
-      description: "Show the info/warning icon",
+      description: "Whether the warning icon is drawn before the header",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -120,41 +43,92 @@ import { SnackBar } from "@docspace/ui-kit/components/snackbar";
     countDownTime: {
       control: "number",
       description:
-        "Time in milliseconds before auto-dismissal (0 = no countdown)",
+        "Milliseconds until the countdown after the message reaches zero and calls `onAction`. `-1` shows no countdown; `0` calls `onAction` as soon as the bar mounts",
     },
     opacity: {
       control: { type: "range", min: 0, max: 1, step: 0.1 },
-      description: "Opacity of the snackbar background",
+      description:
+        "Opacity of the whole bar. Without it the bar is fully transparent",
       table: {
-        defaultValue: { summary: "1" },
+        defaultValue: { summary: "0" },
       },
     },
+    backgroundImg: {
+      control: "text",
+      description:
+        "CSS `background-image` value of the bar, a whole value such as `url(/banner.png)` rather than a bare path",
+    },
     isMaintenance: {
+      control: false,
+      description: "Ignored: the bar looks the same with or without it",
+    },
+    fontSize: {
+      control: "text",
+      description:
+        "Font size of the countdown, as a CSS length. The header and message keep their own size",
+    },
+    fontWeight: {
+      control: "number",
+      description:
+        "Font weight of the countdown. The header and message keep their own weight",
+    },
+    textAlign: {
+      control: "select",
+      options: [
+        "start",
+        "end",
+        "left",
+        "right",
+        "center",
+        "justify",
+        "match-parent",
+      ],
+      description: "Text alignment of the header and the message",
+    },
+    htmlContent: {
+      control: "text",
+      description:
+        "HTML drawn in place of the header and message, sanitized with xss, which drops `style` attributes. With `isCampaigns` it is the URL of the page loaded into the iframe",
+    },
+    isCampaigns: {
       control: "boolean",
-      description: "Apply maintenance banner styling",
+      description:
+        "Whether the bar is a campaign banner: `htmlContent` is loaded as a page into an iframe, and the only thing drawn over it is a close cross",
       table: {
         defaultValue: { summary: "false" },
       },
     },
-    fontSize: {
-      control: "text",
-      description: "Font size for the message text",
-    },
-    fontWeight: {
+    sectionWidth: {
       control: "number",
-      description: "Font weight for the message text",
+      description:
+        "Minimum width of the HTML content on a tablet, in pixels. Has no effect without `htmlContent`",
     },
-    textAlign: {
-      control: "select",
-      options: ["left", "center", "right", "justify"],
-      description: "Text alignment for the message",
+    skipBlur: {
+      control: "boolean",
+      description:
+        "Whether a click inside an iframe on the page is left alone. Without it such a click calls `onAction` half a second later",
       table: {
-        defaultValue: { summary: "left" },
+        defaultValue: { summary: "false" },
       },
     },
-    onAction: { action: "onAction" },
-    onClose: { action: "onClose" },
-    onLoad: { action: "onLoad" },
+    style: {
+      control: "object",
+      description:
+        "Inline style of the bar, applied after `opacity` and `backgroundImg`, so it can override both",
+    },
+    onAction: {
+      action: "onAction",
+      description:
+        "Called when the action label or the close cross is clicked, when the countdown reaches zero, and after a click inside an iframe",
+    },
+    onClose: {
+      control: false,
+      description: "Ignored: the close cross calls `onAction`",
+    },
+    onLoad: {
+      action: "onLoad",
+      description: "Called once the bar is mounted",
+    },
   },
 } satisfies Meta<typeof SnackBar>;
 
@@ -172,9 +146,8 @@ const baseArgs: SnackbarProps = {
   fontWeight: 400,
   textAlign: "left" as TextAlignValue,
   htmlContent: "",
-  countDownTime: 0,
+  countDownTime: -1,
   sectionWidth: 500,
-  onClose: fn(),
   onLoad: fn(),
   onAction: fn(),
 };
@@ -188,56 +161,35 @@ const SnackBarWrapper = (args: SnackbarProps) => (
 export const Default: Story = {
   render: (args) => <SnackBarWrapper {...args} />,
   args: baseArgs,
-};
-
-const WithActionTemplate = () => {
-  return (
-    <SnackBarWrapper
-      {...baseArgs}
-      btnText="Take Action"
-      onAction={() => alert("Action taken!")}
-    />
-  );
-};
-
-const WithCountdownTemplate = () => {
-  return (
-    <SnackBarWrapper
-      {...baseArgs}
-      countDownTime={5000}
-      text="This message will disappear in 5 seconds"
-    />
-  );
-};
-
-const WithHtmlContentTemplate = () => {
-  return (
-    <SnackBarWrapper
-      {...baseArgs}
-      htmlContent="<p style='margin: 0; font-size: 13px;'>Your storage is <b>almost full</b>. Please free up space or <a href='#' style='color: #4781d1;'>upgrade your plan</a> to continue working without interruptions.</p>"
-      text=""
-    />
-  );
-};
-
-const MaintenanceTemplate = () => {
-  return (
-    <SnackBarWrapper
-      {...baseArgs}
-      isMaintenance
-      headerText="Maintenance Notice"
-      text="System maintenance is scheduled for tonight at 10 PM"
-    />
-  );
-};
-
-export const WithAction: Story = {
-  render: () => <WithActionTemplate />,
   parameters: {
     docs: {
       description: {
         story:
-          "Snackbar with an action button. Clicking the button triggers the onAction callback.",
+          "The bar as most pages show it: a warning icon, a header and a message, with a close cross at the end that calls `onAction`. Change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<SnackBar
+  headerText="Attention"
+  text="Important notification message"
+  showIcon
+  opacity={1}
+  countDownTime={-1}
+  sectionWidth={500}
+  onAction={handleClose}
+/>`,
+      },
+    },
+  },
+};
+
+export const WithAction: Story = {
+  render: (args) => <SnackBarWrapper {...args} />,
+  args: { ...baseArgs, btnText: "Take Action" },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "When the notice asks for one step, the bar offers it in place of the close cross: the underlined **Take Action** label after the message calls `onAction` (`btnText`).",
       },
       source: {
         code: `<SnackBar
@@ -245,7 +197,8 @@ export const WithAction: Story = {
   text="Important notification"
   btnText="Take Action"
   showIcon
-  countDownTime={0}
+  opacity={1}
+  countDownTime={-1}
   sectionWidth={500}
   onAction={handleAction}
 />`,
@@ -255,18 +208,24 @@ export const WithAction: Story = {
 };
 
 export const WithCountdown: Story = {
-  render: () => <WithCountdownTemplate />,
+  render: (args) => <SnackBarWrapper {...args} />,
+  args: {
+    ...baseArgs,
+    countDownTime: 5000,
+    text: "This message will disappear in 5 seconds",
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "Snackbar with a countdown timer that auto-dismisses after the specified duration.",
+          "For a notice that should not outstay its moment: the countdown after the message ticks down from 00:05 and calls `onAction` at zero, where the host removes the bar (`countDownTime`). Here nothing removes it, so only the timer disappears.",
       },
       source: {
         code: `<SnackBar
   headerText="Attention"
   text="This message will disappear in 5 seconds"
   showIcon
+  opacity={1}
   countDownTime={5000}
   sectionWidth={500}
   onAction={handleDismiss}
@@ -277,19 +236,114 @@ export const WithCountdown: Story = {
 };
 
 export const WithHtmlContent: Story = {
-  render: () => <WithHtmlContentTemplate />,
+  render: (args) => <SnackBarWrapper {...args} />,
+  args: {
+    ...baseArgs,
+    htmlContent:
+      "<p>Your storage is <b>almost full</b>. Please free up space or <a href='#'>upgrade your plan</a> to continue working without interruptions.</p>",
+    text: "",
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "Snackbar displaying sanitized HTML content instead of plain text.",
+          "When the notice needs bold text or a link, pass it as HTML: it replaces the header and the message, and the markup is sanitized first, which also drops any `style` attribute (`htmlContent`).",
       },
       source: {
         code: `<SnackBar
   htmlContent="<p>Your storage is <b>almost full</b>. <a href='#'>Upgrade</a></p>"
-  countDownTime={0}
+  opacity={1}
+  countDownTime={-1}
   sectionWidth={500}
 />`,
+      },
+    },
+  },
+};
+
+export const Maintenance: Story = {
+  render: (args) => <SnackBarWrapper {...args} />,
+  args: {
+    ...baseArgs,
+    headerText: "Maintenance Notice",
+    text: "System maintenance is scheduled for tonight at 10 PM",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A scheduled-maintenance notice is an ordinary bar with its own header and message; there is no separate maintenance look, and `isMaintenance` changes nothing.",
+      },
+      source: {
+        code: `<SnackBar
+  headerText="Maintenance Notice"
+  text="System maintenance is scheduled for tonight at 10 PM"
+  showIcon
+  opacity={1}
+  countDownTime={-1}
+  sectionWidth={500}
+/>`,
+      },
+    },
+  },
+};
+
+export const WithAdditionalHeaderText: Story = {
+  render: (args) => <SnackBarWrapper {...args} />,
+  args: { ...baseArgs, additionalHeaderText: "Today, 10:00" },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "When the header needs a detail such as a time, the smaller **Today, 10:00** line sits right after it (`additionalHeaderText`).",
+      },
+      source: {
+        code: `<SnackBar
+  headerText="Attention"
+  additionalHeaderText="Today, 10:00"
+  text="Important notification message"
+  showIcon
+  opacity={1}
+  countDownTime={-1}
+  sectionWidth={500}
+/>`,
+      },
+    },
+  },
+};
+
+export const RightToLeft: Story = {
+  render: (args) => (
+    <div dir="rtl">
+      <SnackBarWrapper {...args} />
+    </div>
+  ),
+  globals: { direction: "rtl" },
+  args: {
+    ...baseArgs,
+    headerText: "\u062a\u0646\u0628\u064a\u0647",
+    text: "\u0631\u0633\u0627\u0644\u0629 \u0625\u0634\u0639\u0627\u0631 \u0645\u0647\u0645\u0629",
+  },
+  parameters: {
+    noPadding: true,
+    docs: {
+      // Framed: an inline RTL story would flip the direction of the whole Docs page
+      story: { inline: false, height: "90px" },
+      description: {
+        story:
+          "The same bar under a right-to-left interface: the accent stripe moves to the right edge, the icon and header start from the right, and the close cross moves to the left end. The wrapper sets the direction to right-to-left, and the bar's logical properties follow it.",
+      },
+      source: {
+        code: `<div dir="rtl">
+  <SnackBar
+    headerText="..."
+    text="..."
+    showIcon
+    opacity={1}
+    countDownTime={-1}
+    sectionWidth={500}
+  />
+</div>`,
       },
     },
   },
@@ -301,13 +355,13 @@ export const CssCustomization: Story = {
       style={
         {
           width: "400px",
-          "--snackbar-bg": "#1e1b4b",
-          "--snackbar-text-color": "#ef4444",
-          "--snackbar-accent-color": "#818cf8",
+          "--snackbar-background": "#eef2ff",
+          "--snackbar-text-color": "#b91c1c",
+          "--snackbar-accent-color": "#4f46e5",
           "--snackbar-accent-width": "6px",
           "--snackbar-text-size": "13px",
           "--snackbar-content-padding": "16px 24px",
-          "--snackbar-icon-fill": "#818cf8",
+          "--snackbar-icon-fill": "#4f46e5",
         } as CSSProperties
       }
     >
@@ -316,7 +370,7 @@ export const CssCustomization: Story = {
         headerText="Custom Theme"
         showIcon
         opacity={1}
-        countDownTime={0}
+        countDownTime={-1}
         sectionWidth={400}
         onAction={() => {}}
       />
@@ -325,41 +379,30 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--snackbar-bg\` | Background color | theme token |
-| \`--snackbar-text-color\` | Text color | theme token |
-| \`--snackbar-accent-color\` | Accent border color | theme token |
-| \`--snackbar-accent-width\` | Accent border width | \`4px\` |
-| \`--snackbar-text-size\` | Font size | \`12px\` |
-| \`--snackbar-content-padding\` | Content padding | \`12px 20px\` |
-| \`--snackbar-icon-fill\` | Icon fill color | theme token |`,
-      },
-    },
-  },
-};
-
-export const Maintenance: Story = {
-  render: () => <MaintenanceTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Snackbar with maintenance banner styling for system-wide notices.",
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The message takes the red text colour while the header keeps the heading colour.`,
       },
       source: {
-        code: `<SnackBar
-  isMaintenance
-  headerText="Maintenance Notice"
-  text="System maintenance is scheduled for tonight at 10 PM"
-  showIcon
-  countDownTime={0}
-  sectionWidth={500}
-/>`,
+        code: `<div
+  style={{
+    "--snackbar-background": "#eef2ff",
+    "--snackbar-text-color": "#b91c1c",
+    "--snackbar-accent-color": "#4f46e5",
+    "--snackbar-accent-width": "6px",
+    "--snackbar-text-size": "13px",
+    "--snackbar-content-padding": "16px 24px",
+    "--snackbar-icon-fill": "#4f46e5",
+  }}
+>
+  <SnackBar
+    headerText="Custom Theme"
+    text="Custom styled notification with CSS variables"
+    showIcon
+    opacity={1}
+    countDownTime={-1}
+    sectionWidth={400}
+  />
+</div>`,
       },
     },
   },
 };
-

@@ -1,39 +1,4 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import throttle from "lodash/throttle";
 import AvatarEditor, { Position } from "react-avatar-editor";
 import classNames from "classnames";
@@ -109,24 +74,31 @@ const ImageCropper = ({
     }
   };
 
-  const handleImageChange = throttle(() => {
-    try {
-      if (!editorRef.current) return;
-      const newPreviewImage = editorRef.current
-        .getImageScaledToCanvas()
-        ?.toDataURL();
-      setPreviewImage(newPreviewImage);
-    } catch {
-      // console.error(e);
-    }
-  }, 300);
+  const setPreviewImageRef = useRef(setPreviewImage);
+  setPreviewImageRef.current = setPreviewImage;
+
+  // Built once: a throttle created per render would throttle nothing.
+  const handleImageChange = useMemo(
+    () =>
+      throttle(() => {
+        try {
+          if (!editorRef.current) return;
+          const newPreviewImage = editorRef.current
+            .getImageScaledToCanvas()
+            ?.toDataURL();
+          setPreviewImageRef.current(newPreviewImage);
+        } catch {
+          // console.error(e);
+        }
+      }, 300),
+    [],
+  );
+
+  useEffect(() => () => handleImageChange.cancel(), [handleImageChange]);
 
   useEffect(() => {
     handleImageChange();
-    return () => {
-      // setPreviewImage("");
-    };
-  }, [handleImageChange, image, setPreviewImage]);
+  }, [handleImageChange, image.zoom, image.x, image.y, uploadedFile]);
 
   return (
     <div
@@ -151,7 +123,7 @@ const ImageCropper = ({
           borderRadius={editorBorderRadius}
           style={{ width: "368px", height: "368px" }}
           onPositionChange={handlePositionChange}
-          onImageReady={handleImageChange}
+          onImageReady={() => handleImageChange()}
           disableHiDPIScaling={false}
           crossOrigin="anonymous"
         />

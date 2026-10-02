@@ -1,53 +1,20 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import VerticalDotsReactSvgUrl from "../../assets/icons/16/vertical-dots.react.svg?url";
 
+import type { ContextMenuModel } from "../context-menu";
+
 import { ContextMenuButton } from ".";
 import { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
 
-const menuData = [
+const menuData: ContextMenuModel[] = [
   { key: "key1", label: "Option 1" },
   { key: "key2", label: "Option 2" },
   { key: "key3", label: "Option 3" },
   { key: "key4", isSeparator: true },
-  { key: "key5", label: "Delete", isDisabled: false },
+  { key: "key5", label: "Delete", disabled: false },
 ];
 
 function getMenuData() {
@@ -58,52 +25,17 @@ const meta = {
   title: "UI/Interactive elements/ContextMenuButton",
   component: ContextMenuButton,
   parameters: {
-    docs: {
-      description: {
-        component: `ContextMenuButton displays a button that opens a context menu with action items. Commonly used for item-level actions in lists and tables.
-
-### Features
-
-- **Dropdown Menu**: Opens a context menu with configurable items
-- **Icon Customization**: Configurable icon with hover and click states
-- **Direction Control**: Dropdown direction can be set to any corner
-- **Display Types**: Supports dropdown, toggle, and auto display modes
-- **Disabled State**: Full disabled state for the button
-- **Icon Border**: Optional visible border around the icon
-- **Portal Support**: Can render dropdown in a portal for z-index management
-
-### Usage
-
-\`\`\`tsx
-import { ContextMenuButton, ContextMenuButtonDisplayType } from "@docspace/ui-kit/components/context-menu-button";
-
-// Basic context menu button
-<ContextMenuButton
-  title="Actions"
-  iconName={VerticalDotsIcon}
-  getData={() => [
-    { key: "edit", label: "Edit" },
-    { key: "delete", label: "Delete" },
-  ]}
-/>
-
-// With fixed direction
-<ContextMenuButton
-  title="Actions"
-  iconName={VerticalDotsIcon}
-  directionX="right"
-  directionY="bottom"
-  fixedDirection
-  getData={() => menuData}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     title: {
       control: "text",
-      description: "Specifies the icon title / tooltip text",
+      description:
+        "Tooltip text shown on hover over the icon; it appears only where the app mounts `RootTooltip`",
+      table: {
+        defaultValue: { summary: '""' },
+      },
     },
     size: {
       control: { type: "number", min: 12, max: 32 },
@@ -122,7 +54,8 @@ import { ContextMenuButton, ContextMenuButtonDisplayType } from "@docspace/ui-ki
     displayType: {
       control: "select",
       options: Object.values(ContextMenuButtonDisplayType),
-      description: "Sets the display type (dropdown, toggle, auto)",
+      description:
+        "`dropdown` opens the menu under the button; `toggle` renders no menu and passes every click to `onClick`; `auto` behaves exactly like `dropdown`",
       table: {
         defaultValue: { summary: "dropdown" },
       },
@@ -132,16 +65,13 @@ import { ContextMenuButton, ContextMenuButtonDisplayType } from "@docspace/ui-ki
       options: ["left", "right"],
       description: "Horizontal direction for the dropdown",
       table: {
-        defaultValue: { summary: "right" },
+        defaultValue: { summary: "left" },
       },
     },
     directionY: {
       control: "select",
       options: ["top", "bottom", "both"],
       description: "Vertical direction for the dropdown",
-      table: {
-        defaultValue: { summary: "bottom" },
-      },
     },
     fixedDirection: {
       control: "boolean",
@@ -152,7 +82,8 @@ import { ContextMenuButton, ContextMenuButtonDisplayType } from "@docspace/ui-ki
     },
     displayIconBorder: {
       control: "boolean",
-      description: "Enables displaying a visible border around the icon",
+      description:
+        "Puts the icon in a rounded 32px box that can carry a border",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -161,35 +92,134 @@ import { ContextMenuButton, ContextMenuButtonDisplayType } from "@docspace/ui-ki
       control: "boolean",
       description: "Whether to fill the icon",
       table: {
-        defaultValue: { summary: "false" },
+        defaultValue: { summary: "true" },
       },
     },
     usePortal: {
       control: "boolean",
       description: "Renders the dropdown in a portal",
       table: {
-        defaultValue: { summary: "false" },
+        defaultValue: { summary: "true" },
       },
     },
     color: {
       control: "color",
-      description: "Icon color",
+      description: 'Any CSS colour for the icon, or the literal `"accent"`',
     },
     hoverColor: {
       control: "color",
-      description: "Icon hover color",
+      description: "Colour of the icon while the pointer is over it",
     },
     clickColor: {
       control: "color",
-      description: "Icon click color",
+      description:
+        "Colour of the icon while the mouse button is held down on it",
     },
     onClick: {
       action: "onClick",
-      description: "Callback when the button is clicked",
+      description:
+        "Called on a click on the icon: in `dropdown` mode on the click that closes an open menu, in `toggle` mode on every click instead of opening a menu",
     },
     onClose: {
       action: "onClose",
-      description: "Callback when the dropdown closes",
+      description:
+        "Called when the menu closes by itself after a click outside it",
+    },
+    opened: {
+      control: "boolean",
+      description:
+        "Opens the menu from outside; changing it opens or closes the menu",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    data: {
+      control: false,
+      description:
+        "Items shown before the first click; read once, after which `getData` decides what the menu holds",
+      table: {
+        defaultValue: { summary: "[]" },
+      },
+    },
+    getData: {
+      control: false,
+      description:
+        "Returns the menu items; called on every click, and required in practice, since a click without it throws",
+    },
+    iconName: {
+      control: "text",
+      description:
+        "URL of the icon, fetched when the button renders; without it the kit's vertical dots are drawn",
+    },
+    iconHoverName: {
+      control: "text",
+      description: "URL of the icon shown while the pointer is over the button",
+    },
+    iconClickName: {
+      control: "text",
+      description:
+        "URL of the icon shown while the mouse button is held down on it",
+    },
+    iconOpenName: {
+      control: "text",
+      description: "URL of the icon shown while the menu is open",
+    },
+    onMouseEnter: {
+      action: "onMouseEnter",
+      description: "Called when the pointer enters the icon",
+    },
+    onMouseLeave: {
+      action: "onMouseLeave",
+      description: "Called when the pointer leaves the icon",
+    },
+    onMouseOver: {
+      action: "onMouseOver",
+      description:
+        "Called when a mouse button is pressed on the icon, despite the name",
+    },
+    onMouseOut: {
+      action: "onMouseOut",
+      description:
+        "Called when the middle or right mouse button is released on the icon, despite the name",
+    },
+    zIndex: {
+      control: "number",
+      description: "Stacking order of the menu",
+    },
+    className: {
+      control: "text",
+      description: "Class added to the wrapper around the icon and the menu",
+    },
+    id: {
+      control: "text",
+      description: "`id` of the wrapper around the icon and the menu",
+    },
+    style: {
+      control: "object",
+      description: "Inline style of the wrapper around the icon and the menu",
+    },
+    dropDownClassName: {
+      control: "text",
+      description: "Class added to the menu",
+    },
+    iconClassName: {
+      control: "text",
+      description: "Class added to the icon",
+    },
+    columnCount: {
+      control: false,
+      description: "Ignored; nothing in the menu reads it",
+    },
+    asideHeader: {
+      control: false,
+      description: "Ignored; nothing reads it",
+    },
+    testId: {
+      control: "text",
+      description: "Value of `data-testid` on the wrapper",
+      table: {
+        defaultValue: { summary: "context-menu-button" },
+      },
     },
   },
 } satisfies Meta<typeof ContextMenuButton>;
@@ -202,91 +232,11 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   return <div style={{ height: "200px" }}>{props.children}</div>;
 };
 
-// DropDown is portaled to body — inject its vars there so they're inherited
-const CssCustomizationTemplate = () => {
-  return (
-    <div
-      style={
-        {
-          "--dropdown-bg": "#e6f3fb",
-          "--dropdown-border-style": "1px solid #0082c9",
-          "--dropdown-shadow": "0 4px 16px rgba(0, 130, 201, 0.25)",
-          "--dropdown-radius": "12px",
-          "--dropdown-text-size": "13px",
-          "--dropdown-text-weight": "600",
-          // === ContextMenuButton own vars ===
-          "--cmb-border": "1px solid #0082c9",
-          "--cmb-hover-border": "#006ba6",
-          "--cmb-size": "36px",
-          "--cmb-radius": "8px",
-          "--cmb-icon-padding": "8px 9px",
-          // === IconButton (trigger icon) ===
-          "--icon-button-color": "#0082c9",
-          "--icon-button-hover-color": "#006ba6",
-        } as CSSProperties
-      }
-    >
-      <Wrapper>
-        {/* opened + data pre-loaded so the dropdown panel is visible */}
-        <ContextMenuButton
-          title="Actions"
-          iconName={VerticalDotsReactSvgUrl}
-          getData={getMenuData}
-          data={menuData}
-          opened
-          displayIconBorder
-          usePortal={false}
-        />
-      </Wrapper>
-    </div>
-  );
-};
-
-export const CssCustomization: Story = {
-  render: () => <CssCustomizationTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story: `CSS vars grouped by the internal part they target:
-
-**ContextMenuButton — button border wrapper**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--cmb-border\` | Border shorthand | theme-based |
-| \`--cmb-hover-border\` | Hover border color | theme-based |
-| \`--cmb-size\` | Button width and height | \`32px\` |
-| \`--cmb-radius\` | Border radius | \`3px\` |
-| \`--cmb-icon-padding\` | SVG icon padding | \`6px 7px\` |
-
-**IconButton (trigger icon)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--icon-button-color\` | Icon fill/stroke color | theme-based |
-| \`--icon-button-hover-color\` | Icon hover color | theme-based |
-| \`--icon-button-size\` | Icon element size | \`20px\` |
-
-**DropDown (dropdown panel) — set on a parent or \`document.body\` since it renders via portal**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--dropdown-bg\` | Panel background | theme-based |
-| \`--dropdown-border-style\` | Panel border | theme-based |
-| \`--dropdown-shadow\` | Panel shadow | theme-based |
-| \`--dropdown-radius\` | Panel border radius | \`6px\` |
-| \`--dropdown-text-size\` | Item font size | \`13px\` |
-| \`--dropdown-text-weight\` | Item font weight | \`600\` |
-| \`--dropdown-inner-padding\` | Panel inner padding | \`8px 0\` |`,
-      },
-    },
-  },
-};
-
 export const Default: Story = {
+  // A fresh getData on every render lets the memoised component pick up control changes
   render: (args) => (
     <Wrapper>
-      <ContextMenuButton {...args} />
+      <ContextMenuButton {...args} getData={() => args.getData?.() ?? []} />
     </Wrapper>
   ),
   args: {
@@ -301,6 +251,24 @@ export const Default: Story = {
     data: menuData,
     usePortal: false,
     getData: getMenuData,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'The row-level "more" button: click the dots to open the menu and click again or outside it to close it. Change any other prop live in the Controls panel below.',
+      },
+      source: {
+        code: `<ContextMenuButton
+  title="Actions"
+  iconName={VerticalDotsIcon}
+  directionX="right"
+  directionY="bottom"
+  fixedDirection
+  getData={() => menuData}
+/>`,
+      },
+    },
   },
 };
 
@@ -326,7 +294,7 @@ export const Disabled: Story = {
     docs: {
       description: {
         story:
-          "ContextMenuButton in a disabled state. The button cannot be clicked and the dropdown will not open.",
+          "Use it when the actions do not apply to the current item: the icon greys out and a click opens nothing (`isDisabled`).",
       },
       source: {
         code: `<ContextMenuButton
@@ -365,7 +333,7 @@ export const WithIconBorder: Story = {
     docs: {
       description: {
         story:
-          "ContextMenuButton with a visible border around the icon. Provides a clearer visual target for clicking.",
+          "Gives the icon a larger, boxed click target (`displayIconBorder`): the dots sit in a rounded 32px square. The default theme draws no line around it; set `--cmb-border` to add one, as the CSS customization story does.",
       },
       source: {
         code: `<ContextMenuButton
@@ -433,12 +401,82 @@ export const CustomColors: Story = {
     docs: {
       description: {
         story:
-          "ContextMenuButtons with custom icon and hover colors. Click any to open the dropdown menu.",
+          "Matches the icon to the surface it sits on: each button has its own colour, and hovering it shows its hover colour (`color`, `hoverColor`). Click any to open its menu.",
       },
       source: {
         code: `<ContextMenuButton title="Blue" iconName={Icon} color="#2DA7DB" hoverColor="#1a8abf" getData={() => menuData} />
 <ContextMenuButton title="Green" iconName={Icon} color="#4CAF50" hoverColor="#388E3C" getData={() => menuData} />
 <ContextMenuButton title="Red" iconName={Icon} color="#FF5722" hoverColor="#D84315" getData={() => menuData} />`,
+      },
+    },
+  },
+};
+
+// usePortal={false} keeps the menu inside the wrapper, so it inherits the variables
+const CssCustomizationTemplate = () => {
+  return (
+    <div
+      style={
+        {
+          "--dropdown-bg": "#e6f3fb",
+          "--dropdown-border-style": "1px solid #0082c9",
+          "--dropdown-shadow": "0 4px 16px rgba(0, 130, 201, 0.25)",
+          "--dropdown-radius": "12px",
+          "--dropdown-inner-padding": "4px 0",
+          "--cmb-border": "1px solid #0082c9",
+          "--cmb-hover-border": "#003f63",
+          "--cmb-size": "36px",
+          "--cmb-radius": "8px",
+          "--cmb-icon-padding": "8px 9px",
+        } as CSSProperties
+      }
+    >
+      <Wrapper>
+        <ContextMenuButton
+          title="Actions"
+          iconName={VerticalDotsReactSvgUrl}
+          getData={getMenuData}
+          data={menuData}
+          opened
+          displayIconBorder
+          usePortal={false}
+        />
+      </Wrapper>
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The example opens the menu in a bordered box (\`displayIconBorder\`), so every variable is on screen at once; hover the dots to see \`--cmb-hover-border\`. The menu is kept inline (\`usePortal={false}\`): in a portal it leaves the wrapper, so set the \`--dropdown-*\` variables on \`document.body\` instead.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--dropdown-bg": "#e6f3fb",
+    "--dropdown-border-style": "1px solid #0082c9",
+    "--dropdown-shadow": "0 4px 16px rgba(0, 130, 201, 0.25)",
+    "--dropdown-radius": "12px",
+    "--dropdown-inner-padding": "4px 0",
+    "--cmb-border": "1px solid #0082c9",
+    "--cmb-hover-border": "#003f63",
+    "--cmb-size": "36px",
+    "--cmb-radius": "8px",
+    "--cmb-icon-padding": "8px 9px",
+  }}
+>
+  <ContextMenuButton
+    title="Actions"
+    iconName={VerticalDotsIcon}
+    getData={() => menuData}
+    opened
+    displayIconBorder
+    usePortal={false}
+  />
+</div>`,
       },
     },
   },

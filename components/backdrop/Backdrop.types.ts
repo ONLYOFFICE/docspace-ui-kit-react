@@ -1,46 +1,14 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type React from "react";
 
 export interface BackdropProps {
-  /** Sets visible or hidden */
+  /**
+   * Whether the layer is rendered at all. It is not a CSS switch: a backdrop
+   * that is not visible renders nothing.
+   */
   visible: boolean;
 
   /**
-   * Sets the z-index CSS property for stacking context
+   * Stacking order of the layer. The component it covers needs a higher one.
    * @default 203
    */
   zIndex?: number;
@@ -54,19 +22,19 @@ export interface BackdropProps {
   /** HTML id attribute for the backdrop element */
   id?: string;
 
-  /** Custom inline styles to apply to the backdrop */
+  /** Custom inline styles to apply to the backdrop. `zIndex` is merged in first. */
   style?: React.CSSProperties;
 
   /**
-   * Enables background visibility for the backdrop
-   * Note: Background is not displayed if viewport width > 1024px
+   * Dims the page. Without it the layer is transparent and only catches
+   * clicks — except on a viewport of 600px or less, where it dims anyway.
    * @default false
    */
   withBackground?: boolean;
 
   /**
-   * Indicates if the backdrop is being used with an Aside component
-   * Affects backdrop stacking and background behavior
+   * Marks the backdrop as belonging to a side panel: it then dims the page, and
+   * it is allowed to render even when two backdrops are already on screen.
    * @default false
    */
   isAside?: boolean;
@@ -79,20 +47,21 @@ export interface BackdropProps {
   withoutBackground?: boolean;
 
   /**
-   * Indicates if the backdrop is being used with a modal dialog
-   * Affects touch event handling
+   * Lets touch scrolling through the backdrop go on as usual. Without it a
+   * touch move over the layer has its default action prevented.
    * @default false
    */
   isModalDialog?: boolean;
 
   /**
-   * Click event handler for the backdrop
-   * @param e - React mouse event
+   * Called on a click, and on a touch move or touch end, which pass a touch
+   * event cast to a mouse event.
    */
   onClick?: (e: React.MouseEvent) => void;
 
   /**
-   * Indicates if the backdrop should be shown
+   * Renders the layer even when another backdrop is already on screen, which
+   * would otherwise suppress it.
    * @default false
    */
   shouldShowBackdrop?: boolean;

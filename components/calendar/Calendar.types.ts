@@ -1,66 +1,53 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { DateTime } from "luxon";
 
 export interface CalendarProps {
-  /** Class name */
+  /** Applied to the outermost element. */
   className?: string;
-  /** Used as HTML `id` property  */
+  /** Applied to the outermost element. */
   id?: string;
-  /** Specifies the calendar locale */
+  /**
+   * BCP 47 tag the month and weekday names are written in.
+   * @default "en"
+   */
   locale: string;
-  /** Value of selected date (DateTime object) */
+  /**
+   * The highlighted day, as a Luxon `DateTime`. Its **time** is kept when
+   * another day is picked — only the date part is replaced.
+   */
   selectedDate: DateTime;
-  /** Allows handling the changing events of the component */
+  /**
+   * Called with the newly picked day, after `setSelectedDate`. Both receive the
+   * same value; there is no separate "confirm" step.
+   */
   onChange?: (formattedDate: DateTime) => void;
-  /** Changes the selected date state */
+  /** Called with the newly picked day, before `onChange`. */
   setSelectedDate?: (formattedDate: DateTime) => void;
-  /** Specifies the minimum selectable date */
+  /**
+   * Earliest selectable day. Days before it are greyed and the header arrows
+   * stop at its month.
+   */
   minDate?: DateTime | Date;
-  /** Specifies the maximum selectable date */
+  /** Latest selectable day, with the same effect at the other end. */
   maxDate?: DateTime | Date;
-  /** Accepts css style */
+  /** Applied to the outermost element. */
   style?: React.CSSProperties;
-  /** First shown date */
+  /**
+   * Month the calendar opens on. Out-of-range values are moved to the nearer of
+   * `minDate` and `maxDate`, with a warning on the console.
+   */
   initialDate?: DateTime | Date;
+  /** Whether the larger touch layout is used. */
   isMobile?: boolean;
+  /** Ref to the outermost element. */
   forwardedRef?: React.RefObject<HTMLDivElement | null>;
+  /** Whether the grid is wrapped in a `Scrollbar` instead of sizing to its content. */
   isScroll?: boolean;
-  /** Data test id for testing */
+  /**
+   * `data-testid` of the outermost element.
+   * @default "calendar"
+   */
   dataTestId?: string;
+  /** Whether a picked day is reported at 23:59:59.999 rather than keeping the old time. */
   useMaxTime?: boolean;
 }
 

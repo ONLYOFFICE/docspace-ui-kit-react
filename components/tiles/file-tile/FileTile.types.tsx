@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { ReactElement } from "react";
 
 import { ContextMenuModel } from "../../context-menu/ContextMenu.types";
@@ -51,102 +16,95 @@ export interface FileItem extends TileItem {
 }
 
 export type FileItemType = {
-  /** Unique identifier for the file */
+  /** Unique identifier for the file, used as the React key by `TileContainer`. */
   id: string | number;
-  /** Title/name of the file */
+  /** Name of the file. */
   title: string;
-  /** File extension (e.g., ".docx") */
+  /** Extension, with the dot. `TileContainer` reads it to keep the tile out of the folders group. */
   fileExst?: string;
-  /** File type (e.g., "docx", "pdf") */
+  /** Kind of file. Nothing in the tile reads it; it is here for the caller's own logic. */
   fileType?: FileType;
-  /** Whether this item is a plugin */
+  /** Marks the file as coming from a plugin, which makes `fileTileIcon` win over the thumbnail. */
   isPlugin?: boolean;
-  /** Icon URL for plugin files */
+  /** Icon to draw instead of the thumbnail, for a plugin file. */
   fileTileIcon?: string;
-  /** Logo configuration for the file */
+  /** Logo of the file, passed to the context menu's header. */
   logo?: {
-    /** Original size logo URL */
     original?: string;
-    /** Large size logo URL */
     large?: string;
-    /** Medium size logo URL */
     medium?: string;
-    /** Small size logo URL */
     small?: string;
-    /** Logo color */
     color?: string;
-    /** Logo cover image URL */
     cover?: string;
   };
-  /** View accessibility settings for the file */
+  /** Whether the file can be previewed. Only the fact that either flag is on is read, to widen the thumbnail area. */
   viewAccessibility?: {
-    /** Whether image view is enabled */
     ImageView: boolean;
-    /** Whether media view is enabled */
     MediaView: boolean;
   };
-  /** Context menu options for this file */
+  /** Its presence — not its contents — is what makes the three-dot button appear. */
   contextOptions?: string[];
 };
 
-/** Props for the FileTile component */
 export type FileTileProps = {
-  /** Indicates if the tile is in checked/selected state */
+  /** Whether the tile is selected. */
   checked?: boolean;
-  /** Child components to render within the tile. Can be a single element or an array of elements */
+  /** The tile's content. Only the first element is rendered, in the row beside the icon; the rest are dropped. */
   children?: ReactElement | ReactElement[];
-  /** Width of the spacer for the context menu button */
+  /** Ignored. Nothing reads it, and it is spread onto the outer element as an unknown attribute. */
   contextButtonSpacerWidth?: number;
-  /** Array of context menu options to display when the context menu is opened */
+  /** The menu's entries. Required — but the three-dot button appears only when `item` also carries a `contextOptions` key of its own. */
   contextOptions: ContextMenuModel[];
-  /** Indicates if the tile is in a loading/progress state */
+  /** Replaces the icon and the checkbox with the kit's track loader. */
   inProgress?: boolean;
-  /** The file item data associated with this tile */
+  /** The file this tile stands for. */
   item: FileItemType;
-  /** Function called when the tile is selected */
+  /** Called with the new checked state and the `item` — from the checkbox, from a plain click on the tile, and from a tap on the icon below 600px. */
   onSelect?: (checked: boolean, item: FileItemType) => void;
-  /** Function called when the thumbnail is clicked */
+  /** Called with the event when the thumbnail area is clicked. The tile's own click handler runs as well. */
   thumbnailClick?: (e: React.MouseEvent) => void;
-  /** The thumbnail image URL to display */
+  /** Preview image for the file. It falls back to `temporaryIcon` when the image fails to load. */
   thumbnail?: string;
-  /** The temporary icon to display when thumbnail is not available */
+  /** Drawn when there is no `thumbnail`: a URL is fetched as an SVG, an element is rendered as given. */
   temporaryIcon?: string | ReactElement;
-  /** Function to handle selection with Ctrl key */
+  /** Called with the `item` on a Ctrl- or Cmd-click, instead of selecting. */
   withCtrlSelect?: (item: FileItemType) => void;
-  /** Function to handle selection with Shift key */
+  /** Called with the `item` on a Shift-click, instead of selecting. */
   withShiftSelect?: (item: FileItemType) => void;
-  /** Custom element to render within the tile */
+  /** The icon beside the checkbox. Without it neither the icon nor the checkbox is rendered at all. */
   element?: ReactElement;
-  /** Function called when the context menu button is clicked */
+  /** Called before the menu opens, with `true` when the trigger was a right-click. */
   tileContextClick?: (isRightClick?: boolean) => void;
-  /** Function to get the context menu model */
+  /** Builds the menu shown on right-click. Without it the right-click menu never opens. */
   getContextModel?: () => ContextMenuModel[];
-  /** Function to hide the context menu */
+  /** Called when the menu closes. */
   hideContextMenu?: () => void;
-  /** Color for the left border of the tile */
+  /** Ignored. Nothing reads it, and it is spread onto the outer element as an unknown attribute. */
   sideColor?: string;
-  /** Function to set the selection state of the tile */
+  /** Called with an empty array before a plain click selects the tile, unless the click landed on an image, an input or an SVG shape. */
   setSelection?: (items: FileItem[]) => void;
-  /** Custom content element to be rendered in the tile */
+  /** Quick-action buttons, stacked in a column in the thumbnail's top start corner. */
   contentElement?: ReactElement;
-  /** Custom badges to be displayed on the tile */
+  /** Badges drawn in a row in the thumbnail's top end corner. Give them the class `badges` so a click on them does not select the tile. */
   badges?: ReactElement;
-  /** Flag indicating if the tile should be highlighted */
+  /** Fades `--highlightColor` out of the lower half once, on mount, for a file that a search or a filter has just matched. The kit sets no such colour, so nothing shows until you do. */
   isHighlight?: boolean;
-  /** Indicates if the file is in a blocking operation state */
+  /** Meant to turn the pointer off while an operation runs over the tile, but the rule it adds never matches, so it currently changes nothing. */
   isBlockingOperation?: boolean;
-  /** Flag to show hotkey border around the tile */
+  /** Draws the accent outline that marks the tile the keyboard is on. */
   showHotkeyBorder?: boolean;
-  /** Indicates if the file is currently being dragged */
+  /** Marks the tile as being dragged: the checkbox no longer replaces the icon on hover. It does not dim the tile. */
   isDragging?: boolean;
-  /** Size of the thumbnail in pixels */
+  /** Ignored. Only its difference from `null` is tested, which a `number | undefined` always satisfies, so the branch it guards is unreachable. */
   thumbSize?: number;
-  /** Indicates if the file is in active state */
+  /** Whether the tile is the one being acted on, which keeps its hover state. */
   isActive?: boolean;
-  /** Flag for edit mode */
+  /** Renaming state: it removes the icon and the checkbox. */
   isEdit?: boolean;
+  /** Attached to the outer element, and clicked by the component itself on a right-click before the menu is mounted. */
   forwardRef?: React.RefObject<HTMLDivElement | null>;
-  /** Data test id for the tile */
+  /** Value of `data-testid` on the outer element.
+   * @default "tile" */
   dataTestId?: string;
 };
 

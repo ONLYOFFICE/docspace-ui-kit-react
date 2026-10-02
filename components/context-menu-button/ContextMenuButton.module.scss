@@ -17,7 +17,10 @@
   }
 
   --cmb-border-value: var(--cmb-border, var(--context-menu-button-border));
-  --cmb-hover-border-value: var(--cmb-hover-border, var(--context-menu-button-hover-border));
+  --cmb-hover-border-value: var(
+    --cmb-hover-border,
+    var(--context-menu-button-hover-border)
+  );
   --cmb-size-value: var(--cmb-size, 32px);
   --cmb-radius-value: var(--cmb-radius, 3px);
   --cmb-icon-padding-value: var(--cmb-icon-padding, 6px 7px);

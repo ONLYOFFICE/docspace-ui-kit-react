@@ -1,0 +1,118 @@
+import { Meta, Story } from "@storybook/addon-docs/blocks";
+
+import { Source } from "../../../../.storybook/blocks/Source";
+
+import * as InsideAMatterStories from "./InsideAMatter.stories";
+import roomSource from "../matterRoom.ts?raw";
+import hookSource from "../useMatterRoom.ts?raw";
+import source from "./InsideAMatter.tsx?raw";
+
+<Meta of={InsideAMatterStories} />
+
+# 02. Inside a matter
+
+The screen the whole track exists for. A client opens a matter and sees what
+the firm still needs from them and what has arrived; a lawyer sees who sent
+what, when, and asks for one more thing without leaving the page.
+
+<Story of={InsideAMatterStories.Default} />
+
+With no portal, both views read the demo rooms. Connect a portal from the
+**API** control in the toolbar and the lawyer's view opens the key owner's
+real matters; sign a client in with the app from
+[Who is signed in](?path=/docs/samples-legal-practice-setup-who-is-signed-in--docs)
+and the client's view opens theirs. The picker lists the matters from
+[01. My matters](?path=/docs/samples-legal-practice-screens-01-my-matters--docs).
+
+## The checklist is a folder
+
+A matter's room holds two folders with fixed names:
+
+| Folder            | What it is                                                                                           |
+| ----------------- | ---------------------------------------------------------------------------------------------------- |
+| `From the client` | the checklist. One subfolder per document asked for: empty means still needed, a file inside means received |
+| `From the firm`   | drafts and letters for the client to read                                                             |
+
+Nothing else is recorded anywhere. A request is a folder, so the portal
+already says what this application needs to know: how many files it holds
+(`filesCount`), when it was made (`created`, which is when the firm asked) and
+when it last changed (`updated`, which for a received one is the upload).
+Who uploaded is on the file. A lawyer can add a request from ONLYOFFICE by
+making a folder, or from here, and the two agree because they are the same
+thing.
+
+The names are matched without regard to case or spacing, so a folder renamed
+by hand still counts. Everything else in the room — working files, drafts not
+meant for the client — is left alone and, for the lawyer, counted at the
+bottom.
+
+To try it on your portal: open a matter's room in ONLYOFFICE, make a folder
+`From the client` with a subfolder per document you want, and press
+**Try again** or reopen the matter. Or press **Create the two folders** in a
+room that has none.
+
+<Source code={roomSource} language="tsx" />
+
+## Reading a room one folder at a time
+
+The portal answers for one folder per call: `getFolderByFolderId` returns
+that folder's subfolders and files. So the screen reads the room's top level
+to find the two sections, the checklist folder for its requests, every request
+that holds something for its files, and the firm's folder for its drafts. An
+empty request costs no call, because `filesCount` already says it is empty.
+
+`readMatterRoom` is that walk with the "read one folder" step passed in, so
+the same function runs against the SDK, against the demo folders, and in the
+test with a map. That is also why the demo is interactive: **Ask for it** and
+**Create the two folders** write into the same map the walk reads.
+
+<Source code={hookSource} language="tsx" />
+
+## The components, and why these
+
+- **`CollapsibleCard`** for the two sections. Each has a title, a one-line
+  summary that is useful when the body is closed ("3 of 5 received"), and a
+  body the reader may not need — a client who has sent everything wants the
+  firm's drafts, not the checklist.
+- **`ProgressBar`** above the checklist, because "3 of 5" is a shape before
+  it is a number. `label` is its accessible name; without it the bar is
+  silent to a screen reader.
+- **`ColumnarInfoBar`** with `variant="page"` for the matter's facts. The
+  bar is label-and-value columns for context the reader does not act on,
+  which is exactly what practice, stage and lead are here.
+- **`EmptyView`** for a room that has no checklist folder yet. Its shape is
+  a picture, a title, a sentence and a list of ways out — for a lawyer, the
+  button that creates the two folders; for a client, no way out, because
+  there is nothing for them to do.
+- **`ComboBox`** to choose a matter. It keeps nothing: `selectedOption` is
+  the screen's state and `onSelect` reports a click, so the same list can be
+  driven from a URL later. `scaledOptions` matches the list's width to the
+  button's.
+- **`TextInput`** with `scale` and a `Button` of `type="submit"` in a form,
+  so Enter asks for the document as well as the button does.
+- The rows themselves are a list of the screen's own: a folder or file icon,
+  a title, a line of detail and a badge. The kit's `Rows` is shaped around
+  the portal's virtualised file list and says so in its README; a handful of
+  lines is a flex column, not a component.
+
+## Details worth copying
+
+- **`filesCount` is the state.** A request is received when its folder is
+  not empty; there is no flag to keep in step with the files.
+- **The folder's `created` is when the firm asked**, and its `updated` is
+  when the client answered. Both arrive as ISO strings, whatever the SDK's
+  types say, and `isoOf` in `matter.ts` accepts either form.
+- **Same URL shape for a folder as for a room.**
+  `/rooms/shared/<folderId>/filter?folder=<folderId>` opens a subfolder on
+  the portal, which is where "Upload it in ONLYOFFICE" sends a client until
+  the next screen lets them do it here.
+- **A file's `webUrl` is relative**, resolved against the portal's base URL
+  the same way pictures are in
+  [Connect to a portal](?path=/docs/samples-legal-practice-setup-connect-to-a-portal--docs).
+- **The client sees the whole room in ONLYOFFICE.** Room membership is the
+  portal's unit of access; the two folders are what the cabinet shows, not a
+  wall. A working file the client must not see belongs in another room.
+
+## The code
+
+<Source code={source} language="tsx" />

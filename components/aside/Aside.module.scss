@@ -1,37 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
 @use "../../styles/variables";
 @use "../../styles/variables/colors";
 @use "../../styles/mixins";
@@ -70,10 +36,20 @@ $mobile-footer-height: 64px;
   // new bridge vars for hardcoded values
   --aside-width-v: var(--aside-width, 480px);
   --aside-transition-v: var(--aside-transition, transform 0.3s ease-in-out);
-  --aside-mobile-footer-height-v: var(--aside-mobile-footer-height, #{$mobile-footer-height});
+  --aside-mobile-footer-height-v: var(
+    --aside-mobile-footer-height,
+    #{$mobile-footer-height}
+  );
 
   background-color: var(--aside-bg-v);
   height: 100%;
+
+  // A column, so the header keeps its own height and the body gets what is
+  // left. Block-level, the body was given no height at all and the scrolling
+  // holder sized itself to the whole panel, putting its last ~53px below the
+  // bottom edge -- the end of a long list could not be reached.
+  display: flex;
+  flex-direction: column;
 
   position: fixed;
   top: 0;
@@ -110,4 +86,18 @@ $mobile-footer-height: 64px;
       height: 100%;
     }
   }
+}
+
+// The body of the panel: whatever is under the header.
+//
+// `flex-basis: 0` rather than `auto` is the whole point. The scrolling holder
+// carries an inline `height: 100%` of the library's own (see
+// `scrollbar/custom-scrollbar/style.ts`), which an inline style makes
+// unbeatable by a class rule -- but a definite `flex-basis` replaces the main
+// size property in a column flex container, so the holder is sized by the space
+// that is left instead. `min-height: 0` then lets it be smaller than its
+// content, which is what makes it scroll rather than overflow.
+.body {
+  flex: 1 1 0;
+  min-height: 0;
 }

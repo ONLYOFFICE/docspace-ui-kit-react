@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { useState } from "react";
 
 import type { CSSProperties, ComponentProps } from "react";
@@ -47,43 +12,19 @@ const meta = {
   title: "UI/Feedback/StatusMessage",
   component: StatusMessage,
   parameters: {
-    docs: {
-      description: {
-        component: `Component for displaying animated status messages with error or warning styling.
-
-### Features
-
-- **Animated Entry/Exit**: Smooth slide-in and fade-out animations
-- **Warning Variant**: Alternative styling for warning messages
-- **Auto-Hide**: Automatically hides when the message is cleared
-- **Message Swap**: Smoothly transitions between different messages
-- **Danger Icon**: Displays a warning icon alongside the message text
-
-### Usage
-
-\`\`\`tsx
-import StatusMessage from "@docspace/ui-kit/components/status-message";
-
-// Error message
-<StatusMessage message="Invalid email address" />
-
-// Warning message
-<StatusMessage message="Password is too weak" isWarning />
-
-// Controlled visibility (clear message to hide)
-<StatusMessage message={error || ""} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     message: {
       control: "text",
-      description: "Message text to display. Set to empty string to hide.",
+      description:
+        "The text or nodes shown in the bar. An empty value fades the bar out and removes it; a new value appears once the previous one has faded out",
     },
     isWarning: {
       control: "boolean",
-      description: "Display with warning styling instead of error",
+      description:
+        "Paints the bar in the warning colours instead of the error ones. Takes effect together with the next change of `message`",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -99,6 +40,17 @@ export const Default: Story = {
   render: (args) => <StatusMessage {...args} />,
   args: {
     message: "This is a status message",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The error bar as a form shows it after a failed action. Type a new text in the Controls panel below to watch the old one fade out first; the warning switch there takes effect with the next text change (`isWarning`).",
+      },
+      source: {
+        code: `<StatusMessage message="This is a status message" />`,
+      },
+    },
   },
 };
 
@@ -158,7 +110,8 @@ export const WarningMessage: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Status message with warning styling for non-critical alerts.",
+        story:
+          "For a problem that does not block the user: the same bar in the warning colours (`isWarning`).",
       },
       source: {
         code: `<StatusMessage message="This is a warning message" isWarning />`,
@@ -173,7 +126,7 @@ export const ToggleVisibility: Story = {
     docs: {
       description: {
         story:
-          "Demonstrates showing and hiding the status message by setting the message to an empty string.",
+          "Use this to see how the bar leaves and returns: **Hide Message** fades it out and removes it, **Show Message** brings it back (`message` set to an empty string and back).",
       },
       source: {
         code: `const [message, setMessage] = useState("Click the button to dismiss");
@@ -192,7 +145,7 @@ export const MessageSwap: Story = {
     docs: {
       description: {
         story:
-          "Demonstrates smooth transitions when swapping between different messages.",
+          "Use this to see what a user sees when one message replaces another: **Message A** and **Message B** fade the current text out before the new one fades in, **Clear** hides the bar.",
       },
       source: {
         code: `const [message, setMessage] = useState("First message");
@@ -220,29 +173,44 @@ export const CssCustomization: Story = {
           "--status-message-padding": "12px 16px",
           "--status-message-gap": "16px",
           "--status-message-shadow": "0 4px 20px rgba(124,58,237,0.3)",
+          "--status-message-margin-bottom": "24px",
+          "--status-message-max-width": "360px",
+          "--status-message-warning-bg": "#422006",
+          "--status-message-warning-border-style": "2px solid #f59e0b",
+          "--status-message-warning-icon": "#fbbf24",
         } as CSSProperties
       }
     >
       <StatusMessage message="Custom styled status message with CSS variables." />
+      <StatusMessage message="Custom styled warning message." isWarning />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--status-message-bg\` | Background color | theme token |
-| \`--status-message-border\` | Border style | theme token |
-| \`--status-message-text\` | Text color | theme token |
-| \`--status-message-icon\` | Icon fill color | theme token |
-| \`--status-message-shadow\` | Box shadow | theme token |
-| \`--status-message-radius\` | Border radius | \`6px\` |
-| \`--status-message-padding\` | Inner padding | \`8px 12px\` |
-| \`--status-message-gap\` | Gap between icon and text | \`12px\` |
-| \`--status-message-margin-bottom\` | Bottom margin | \`16px\` |
-| \`--status-message-max-width\` | Max width | \`1200px\` |`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The first bar shows the shared variables; the second, with \`isWarning\`, is there for the three warning variables, and the gap between the two is the bottom margin. The max width caps both bars below the 400px wrapper.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--status-message-bg": "#1e1b4b",
+    "--status-message-border": "2px solid #7c3aed",
+    "--status-message-text": "#e0e7ff",
+    "--status-message-icon": "#a78bfa",
+    "--status-message-radius": "12px",
+    "--status-message-padding": "12px 16px",
+    "--status-message-gap": "16px",
+    "--status-message-shadow": "0 4px 20px rgba(124,58,237,0.3)",
+    "--status-message-margin-bottom": "24px",
+    "--status-message-max-width": "360px",
+    "--status-message-warning-bg": "#422006",
+    "--status-message-warning-border-style": "2px solid #f59e0b",
+    "--status-message-warning-icon": "#fbbf24",
+  }}
+>
+  <StatusMessage message="Custom styled status message with CSS variables." />
+  <StatusMessage message="Custom styled warning message." isWarning />
+</div>`,
       },
     },
   },

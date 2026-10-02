@@ -1,41 +1,11 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 "use client";
 
-import React, { useEffect } from "react";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { cssTransition, ToastContainer } from "react-toastify";
 import classNames from "classnames";
 
@@ -52,9 +22,45 @@ const Slide = cssTransition({
   exit: "SlideOut",
 });
 
+// react-toastify keys its registry by containerId, and every <Toast /> uses
+// the same one. With two mounted, the later takes the earlier's place, and a
+// toast still showing in the earlier throws on its next render ("Cannot set
+// properties of undefined (setting 'toggle')"). Two is not exotic: a Storybook
+// docs page mounts one per story, a plugin can mount one next to the portal's.
+// So only the first mounted instance renders the container; when it unmounts,
+// the next one takes over.
+const instances: symbol[] = [];
+const listeners = new Set<() => void>();
+
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+};
+
+const getOwner = () => instances[0];
+
+const setInstances = (update: () => void) => {
+  update();
+  listeners.forEach((listener) => listener());
+};
+
 const Toast = React.memo(({ className, style, isSSR }: ToastProps) => {
   const isServer = useIsServer();
   const offset = useMobileViewport();
+
+  const [instance] = useState(() => Symbol("Toast"));
+  const owner = useSyncExternalStore(subscribe, getOwner, () => undefined);
+
+  // A layout effect, so a lone Toast mounts its container before the first
+  // paint rather than one effect pass later.
+  useLayoutEffect(() => {
+    setInstances(() => instances.push(instance));
+
+    return () =>
+      setInstances(() => instances.splice(instances.indexOf(instance), 1));
+  }, [instance]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -70,6 +76,7 @@ const Toast = React.memo(({ className, style, isSSR }: ToastProps) => {
   }, []);
 
   if (isServer && isSSR) return null;
+  if (owner !== instance) return null;
 
   const element = (
     <ToastContainer

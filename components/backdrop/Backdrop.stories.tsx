@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
@@ -46,40 +11,22 @@ const meta = {
   title: "UI/Overlays/Backdrop",
   component: Backdrop,
   parameters: {
-    docs: {
-      description: {
-        component: `Backdrop provides a customizable overlay layer behind modals, dialogs, and aside panels.
-
-### Features
-
-- **Background Control**: Toggle background visibility with \`withBackground\` and \`withoutBackground\` props
-- **Responsive Behavior**: Adapts to mobile and tablet viewports automatically
-- **Z-Index Stacking**: Configurable z-index for proper layer ordering
-- **Multiple Backdrop Support**: Supports stacking multiple backdrops for aside components
-- **Touch Events**: Built-in touch event handling for mobile devices
-- **Context Modes**: Different behavior for modal dialogs vs aside panels
-
-### Usage
-
-\`\`\`tsx
-import { Backdrop } from "@docspace/ui-kit/components/backdrop";
-
-<Backdrop visible={isVisible} onClick={handleClose} withBackground />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     visible: {
-      control: "boolean",
-      description: "Controls backdrop visibility",
+      control: false,
+      description:
+        "Whether the layer is rendered at all; a backdrop that is not visible renders nothing. The stories switch it with their button",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     zIndex: {
       control: "number",
-      description: "CSS z-index for stacking context",
+      description:
+        "Stacking order of the layer; the component it covers needs a higher one",
       table: {
         defaultValue: { summary: "203" },
       },
@@ -87,7 +34,7 @@ import { Backdrop } from "@docspace/ui-kit/components/backdrop";
     withBackground: {
       control: "boolean",
       description:
-        "Enables background overlay. Not displayed if viewport width > 1024px",
+        "Dims the page. Without it the layer is transparent and only catches clicks, except on a screen 600px wide or narrower, where it dims anyway",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -95,7 +42,7 @@ import { Backdrop } from "@docspace/ui-kit/components/backdrop";
     withoutBackground: {
       control: "boolean",
       description:
-        "Forces no background. Takes precedence over withBackground",
+        "Keeps the layer transparent on every screen size, even when withBackground or isAside is set",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -103,7 +50,7 @@ import { Backdrop } from "@docspace/ui-kit/components/backdrop";
     isAside: {
       control: "boolean",
       description:
-        "Indicates usage with an Aside component. Affects stacking behavior",
+        "Marks the layer as belonging to a side panel: it dims the page and renders even when other backdrops are already on screen",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -111,10 +58,36 @@ import { Backdrop } from "@docspace/ui-kit/components/backdrop";
     isModalDialog: {
       control: "boolean",
       description:
-        "Indicates usage with a modal dialog. Affects touch event handling",
+        "Lets touch scrolling over the layer go on; without it a touch move over the layer is blocked",
       table: {
         defaultValue: { summary: "false" },
       },
+    },
+    shouldShowBackdrop: {
+      control: "boolean",
+      description:
+        "Renders the layer even when another backdrop is already on screen, which would otherwise keep it hidden",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    onClick: {
+      control: false,
+      description:
+        "Called on a click on the layer, and on a touch move or touch end over it. The stories use it to close the backdrop",
+    },
+    className: {
+      control: "text",
+      description: "Extra class name, or an array of them, for the layer",
+    },
+    id: {
+      control: "text",
+      description: "HTML id of the layer",
+    },
+    style: {
+      control: "object",
+      description:
+        "Inline styles for the layer, applied over the stacking order set by zIndex",
     },
   },
 } satisfies Meta<typeof Backdrop>;
@@ -170,19 +143,15 @@ const MultipleBackdropsTemplate = (args: BackdropProps) => {
   const [isFirstVisible, setFirstVisible] = useState(false);
   const [isSecondVisible, setSecondVisible] = useState(false);
 
+  const isDarkTheme = document.body.classList.contains("dark");
+
   return (
-    <div style={{ display: "flex", gap: "1rem" }}>
+    <div style={{ height: "200px" }}>
       <Button
         label="First Backdrop"
         primary
         size={ButtonSize.medium}
-        onClick={() => setFirstVisible(!isFirstVisible)}
-      />
-      <Button
-        label="Second Backdrop"
-        primary
-        size={ButtonSize.medium}
-        onClick={() => setSecondVisible(!isSecondVisible)}
+        onClick={() => setFirstVisible(true)}
       />
       <Backdrop
         {...args}
@@ -190,12 +159,55 @@ const MultipleBackdropsTemplate = (args: BackdropProps) => {
         isAside
         onClick={() => setFirstVisible(false)}
       />
+      {isFirstVisible && !isSecondVisible ? (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 204,
+          }}
+        >
+          <Button
+            label="Second Backdrop"
+            primary
+            size={ButtonSize.medium}
+            onClick={() => setSecondVisible(true)}
+          />
+        </div>
+      ) : null}
       <Backdrop
         {...args}
         visible={isSecondVisible}
         isAside
+        zIndex={205}
         onClick={() => setSecondVisible(false)}
       />
+      {isSecondVisible ? (
+        <button
+          type="button"
+          onClick={() => setSecondVisible(false)}
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            color: isDarkTheme ? "#fff" : "#333",
+            backgroundColor: isDarkTheme
+              ? "rgba(32, 32, 32, 0.8)"
+              : "rgba(255, 255, 255, 0.8)",
+            padding: "10px 16px",
+            borderRadius: "6px",
+            border: "none",
+            fontSize: "16px",
+            cursor: "pointer",
+            zIndex: 206,
+          }}
+        >
+          Click anywhere to close the second backdrop
+        </button>
+      ) : null}
     </div>
   );
 };
@@ -263,7 +275,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Basic backdrop with a background overlay. Click the button to toggle visibility.",
+          "The common case: a dimmed layer behind a dialog that closes it on a click (`withBackground`). Press the button to open it, then click anywhere to close it; change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<Backdrop visible={isVisible} withBackground onClick={handleClose} />`,
@@ -281,7 +293,7 @@ export const WithoutBackground: Story = {
     docs: {
       description: {
         story:
-          "Invisible backdrop that captures clicks without showing a background overlay.",
+          "For a menu or dropdown that must close on an outside click without darkening the page: the layer stays transparent and still catches the click (`withoutBackground`).",
       },
       source: {
         code: `<Backdrop visible={isVisible} withoutBackground onClick={handleClose} />`,
@@ -299,11 +311,11 @@ export const MultipleBackdrops: Story = {
     docs: {
       description: {
         story:
-          "Multiple stacked backdrops using the isAside prop. Up to two backdrops can be displayed simultaneously.",
+          "For a side panel opened over another one: each panel's layer renders even though a backdrop is already on screen, and the second darkens the page further (`isAside`). Open the first backdrop, then the second from the button above it; a click closes the top layer first.",
       },
       source: {
         code: `<Backdrop visible={isFirstVisible} isAside withBackground onClick={() => setFirstVisible(false)} />
-<Backdrop visible={isSecondVisible} isAside withBackground onClick={() => setSecondVisible(false)} />`,
+<Backdrop visible={isSecondVisible} isAside withBackground zIndex={205} onClick={() => setSecondVisible(false)} />`,
       },
     },
   },
@@ -319,7 +331,7 @@ export const ModalDialogBackdrop: Story = {
     docs: {
       description: {
         story:
-          "Backdrop used with a modal dialog. The isModalDialog prop modifies touch event handling for mobile.",
+          "For a modal dialog on a touch screen: the layer keeps catching taps that close the dialog, but no longer blocks touch scrolling (`isModalDialog`).",
       },
       source: {
         code: `<Backdrop visible={isVisible} isModalDialog withBackground onClick={handleClose} />`,
@@ -383,7 +395,7 @@ export const WithCustomZIndex: Story = {
     docs: {
       description: {
         story:
-          "Backdrop with custom z-index (500) instead of the default 203. Content above uses z-index 501.",
+          "When the covered content has to sit above other high layers of the page, raise the backdrop's stacking order and place the content one step above it — here 500 and 501 instead of the default 203 (`zIndex`).",
       },
       source: {
         code: `<Backdrop visible={isVisible} withBackground zIndex={500} onClick={handleClose} />`,
@@ -398,7 +410,6 @@ export const CssCustomization: Story = {
       style={
         {
           "--backdrop-bg": "rgba(0, 130, 201, 0.4)",
-          "--backdrop-z-index": "10",
         } as CSSProperties
       }
     >
@@ -418,13 +429,15 @@ export const CssCustomization: Story = {
   ),
   parameters: {
     docs: {
+      // The layer is fixed over the whole window, so inline it would cover the Docs page.
+      story: { inline: false, height: "200px" },
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--backdrop-bg\` | Background overlay color | theme blur color |
-| \`--backdrop-z-index\` | Stack order | \`203\` |`,
+        story: `The dimming colour overridden on a wrapper -- the variables are listed under CSS variables on this page. The stacking order is the \`zIndex\` prop.`,
+      },
+      source: {
+        code: `<div style={{ "--backdrop-bg": "rgba(0, 130, 201, 0.4)" }}>
+  <Backdrop visible withBackground onClick={handleClose} />
+</div>`,
       },
     },
   },

@@ -1,87 +1,35 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type React from "react";
 import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import { Toast } from "../toast";
+
 import { Textarea } from ".";
 
 const meta = {
-  title: "UI/Interactive elements/Textarea",
+  title: "UI/Form controls/Textarea",
   component: Textarea,
   parameters: {
-    docs: {
-      description: {
-        component: `Multi-line text input field with support for copy functionality, line numeration, JSON formatting, and various sizing options.
-
-### Features
-
-- **Copy Support**: Built-in copy button with customizable toast text
-- **Line Numeration**: Optional line numbers alongside content
-- **JSON Mode**: Auto-format and prettify JSON content
-- **Height Options**: Fixed height, full height, or height-scale modes
-- **Validation States**: Error and read-only visual indicators
-
-### Usage
-
-\`\`\`tsx
-import { Textarea } from "@docspace/ui-kit/components/textarea";
-
-// Basic textarea
-<Textarea value={value} onChange={handleChange} placeholder="Enter text" />
-
-// With copy button
-<Textarea value={value} enableCopy copyInfoText="Copied!" />
-
-// JSON mode with numeration
-<Textarea value={jsonString} isJSONField hasNumeration />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     value: {
       control: "text",
       description: "Textarea value",
+      table: {
+        defaultValue: { summary: '""' },
+      },
     },
     placeholder: {
       control: "text",
-      description: "Placeholder text",
+      description:
+        "Placeholder text. Defaults to a single space so an empty field still counts as showing a placeholder, which the Firefox minimum-height rules rely on",
+      table: {
+        defaultValue: { summary: '" "' },
+      },
     },
     isDisabled: {
       control: "boolean",
@@ -115,6 +63,9 @@ import { Textarea } from "@docspace/ui-kit/components/textarea";
     fontSize: {
       control: "number",
       description: "Font size in pixels",
+      table: {
+        defaultValue: { summary: "13" },
+      },
     },
     color: {
       control: "color",
@@ -136,16 +87,118 @@ import { Textarea } from "@docspace/ui-kit/components/textarea";
     },
     isJSONField: {
       control: "boolean",
-      description: "Prettify JSON and add line numeration",
+      description:
+        "Pretty-prints the value as JSON and shows the error border while it is empty or not valid JSON; pair with hasNumeration for line numbers",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     heightScale: {
       control: "boolean",
-      description: "Scale height to container",
+      description:
+        "Makes the field 65% of the browser window height instead of a fixed height, so it stretches and shrinks with the window",
       table: {
         defaultValue: { summary: "false" },
+      },
+    },
+    isFullHeight: {
+      control: "boolean",
+      description:
+        "Makes the field exactly as tall as its text: every new line makes it taller and every removed line shorter, down to the 89px default height",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    copyInfoText: {
+      control: "text",
+      description:
+        "Text of the success toast shown after the copy button is clicked; without it no toast appears",
+    },
+    onCopy: {
+      action: "onCopy",
+      description:
+        "Called with the copied text after the copy button is clicked",
+    },
+    tabIndex: {
+      control: "number",
+      description:
+        "Tab order of the field; left out, the field takes its natural place in the Tab sequence, and -1 makes the keyboard skip it",
+    },
+    autoFocus: {
+      control: "boolean",
+      description: "Focuses the field when it mounts",
+    },
+    areaSelect: {
+      control: "boolean",
+      description:
+        "Selects the whole text whenever it turns on, for a field the reader is expected to copy from",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    onChange: {
+      description:
+        "Called with the native change event on every edit; the stories wire it themselves to keep the field controlled",
+    },
+    onKeyDown: {
+      action: "onKeyDown",
+      description: "Called with the native keyboard event on every key press",
+    },
+    isChatMode: {
+      control: "boolean",
+      description:
+        "Moves the border, background and state colors from the scroll container to the outer frame",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    id: {
+      control: "text",
+      description:
+        "HTML id of the textarea element, the target for `<label htmlFor>`",
+    },
+    name: {
+      control: "text",
+      description: "HTML name of the textarea element for form submission",
+    },
+    className: {
+      control: "text",
+      description:
+        "Class added to the scroll container that carries the border",
+    },
+    wrapperClassName: {
+      control: "text",
+      description: "Class added to the outer frame",
+    },
+    classNameCopyIcon: {
+      control: "text",
+      description: "Class added to the copy button",
+    },
+    style: {
+      control: "object",
+      description:
+        "Inline styles applied to the scroll container that carries the border",
+    },
+    "aria-label": {
+      control: "text",
+      description:
+        "Accessible name of the field, for when no `<label>` points at it",
+    },
+    "aria-labelledby": {
+      control: "text",
+      description:
+        "id of the element on screen that names the field, such as a visible caption",
+    },
+    "aria-describedby": {
+      control: "text",
+      description:
+        "id of the element describing the field, such as a hint or an error line below it; announced after the name",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Value of data-testid on the textarea element",
+      table: {
+        defaultValue: { summary: '"textarea"' },
       },
     },
   },
@@ -195,6 +248,22 @@ export const Default: Story = {
     heightTextArea: "150px",
     value: "",
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "An empty field with a placeholder and a fixed height, the shape most forms start from (`placeholder`, `heightTextArea`); change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<Textarea
+  value={value}
+  onChange={(e) => setValue(e.target.value)}
+  placeholder="Enter text here"
+  heightTextArea="150px"
+/>`,
+      },
+    },
+  },
 };
 
 const StatesTemplate = () => {
@@ -229,8 +298,12 @@ export const States: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Textarea supports normal, error, disabled, and read-only states.",
+        story: `Four copies of the same field, one per state a form puts it in:
+
+- **Normal textarea** — the plain field
+- **Error state** — the red border a form shows after failed validation (\`hasError\`)
+- **Disabled textarea** — greyed out and unfocusable (\`isDisabled\`)
+- **Read-only textarea** — looks like the plain one but rejects typing (\`isReadOnly\`)`,
       },
       source: {
         code: `<Textarea value="Normal textarea" />
@@ -251,6 +324,7 @@ const WithCopyTemplate = () => {
         copyInfoText="Text copied to clipboard!"
         heightTextArea="100px"
       />
+      <Toast />
     </div>
   );
 };
@@ -261,14 +335,15 @@ export const WithCopy: Story = {
     docs: {
       description: {
         story:
-          "Enable a copy button that copies textarea content to the clipboard with a customizable toast message.",
+          "The copy button in the corner puts the whole text on the clipboard and confirms it with a toast (`enableCopy`, `copyInfoText`); clicking the frame or the button also selects all the text. The toast renders only where a `Toast` container is mounted, so the story mounts one.",
       },
       source: {
         code: `<Textarea
   value="This text can be copied"
   enableCopy
   copyInfoText="Text copied to clipboard!"
-/>`,
+/>
+<Toast />`,
       },
     },
   },
@@ -291,7 +366,8 @@ export const WithNumeration: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Display line numbers alongside the textarea content.",
+        story:
+          "Line numbers beside the text for values read as code or configuration, so a reader can point to a line (`hasNumeration`).",
       },
       source: {
         code: `<Textarea
@@ -305,24 +381,32 @@ export const WithNumeration: Story = {
 
 const sampleJSON = JSON.stringify(
   {
-    name: "DocSpace",
-    version: "1.0.0",
-    features: ["collaboration", "sharing", "editing"],
+    title: "Quarterly report",
+    pages: 12,
+    tags: ["draft", "shared"],
   },
   null,
   2,
 );
 
+const brokenJSON = '{"title": "Quarterly report", "pages": 12,';
+
 const JSONFieldTemplate = () => {
   return (
-    <div style={{ width: "400px" }}>
+    <Wrapper>
       <ControlledTextarea
         initialValue={sampleJSON}
         isJSONField
         hasNumeration
         heightTextArea="200px"
       />
-    </div>
+      <ControlledTextarea
+        initialValue={brokenJSON}
+        isJSONField
+        hasNumeration
+        heightTextArea="200px"
+      />
+    </Wrapper>
   );
 };
 
@@ -331,15 +415,18 @@ export const JSONField: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "JSON mode auto-formats and prettifies JSON content with line numeration.",
+        story: `Two JSON fields, for values a reader edits as configuration:
+
+- **Left** — a valid object, pretty-printed with line numbers (\`isJSONField\`, \`hasNumeration\`)
+- **Right** — a truncated object, which keeps the red border until the text parses as JSON`,
       },
       source: {
         code: `<Textarea
-  value='{"name": "DocSpace", "version": "1.0.0"}'
+  value='{"title": "Quarterly report", "pages": 12}'
   isJSONField
   hasNumeration
-/>`,
+/>
+<Textarea value='{"title": "Quarterly report",' isJSONField hasNumeration />`,
       },
     },
   },
@@ -367,20 +454,104 @@ const CustomHeightTemplate = () => {
   );
 };
 
+export const CustomHeights: Story = {
+  render: () => <CustomHeightTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `Three heights of the same field, to pick the one that fits the surrounding form (\`heightTextArea\`):
+
+- **Small textarea** — 80px
+- **Medium textarea** — 150px
+- **Large textarea** — 250px`,
+      },
+      source: {
+        code: `<Textarea value="Small" heightTextArea="80px" />
+<Textarea value="Medium" heightTextArea="150px" />
+<Textarea value="Large" heightTextArea="250px" />`,
+      },
+    },
+  },
+};
+
+const GrowsWithContentTemplate = () => {
+  return (
+    <div style={{ width: "400px" }}>
+      <ControlledTextarea
+        initialValue={`First line\nSecond line\nThird line\nFourth line\nFifth line\nSixth line`}
+        isFullHeight
+      />
+    </div>
+  );
+};
+
+export const GrowsWithContent: Story = {
+  render: () => <GrowsWithContentTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The frame is as tall as its text: add a line and it grows, delete one and it shrinks, never below the default height (`isFullHeight`).",
+      },
+      source: {
+        code: `<Textarea value={value} onChange={handleChange} isFullHeight />`,
+      },
+    },
+  },
+};
+
+const RightToLeftTemplate = () => {
+  return (
+    <div dir="rtl" style={{ width: "400px" }}>
+      <ControlledTextarea
+        initialValue={`السطر الأول\nالسطر الثاني\nالسطر الثالث`}
+        hasNumeration
+        enableCopy
+        heightTextArea="120px"
+      />
+    </div>
+  );
+};
+
+// Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
+export const RightToLeft: Story = {
+  render: () => <RightToLeftTemplate />,
+  globals: { direction: "rtl" },
+  parameters: {
+    noPadding: true,
+    docs: {
+      story: { inline: false, height: "146px" },
+      description: {
+        story:
+          'The same field under a right-to-left interface, mirroring the left-to-right layout: the line numbers move to the right edge, the copy button to the left one, and the text starts from the right. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+      },
+      source: {
+        code: `<div dir="rtl">
+  <Textarea value={value} onChange={handleChange} hasNumeration enableCopy />
+</div>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
     <div
       style={
         {
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
           width: "300px",
-          "--textarea-bg": "#f5f3ff",
-          "--textarea-border-color": "#7c3aed",
-          "--textarea-text-color": "#4c1d95",
-          "--textarea-font-size": "14px",
-          "--textarea-radius": "8px",
-          "--textarea-numeration-text-color": "#a78bfa",
-          "--textarea-padding": "8px 12px 4px",
+          "--text-input-bg": "#f5f3ff",
+          "--text-input-border-color": "#c4b5fd",
+          "--text-input-border-hover": "#7c3aed",
+          "--text-input-border-focus": "#4c1d95",
+          "--text-input-color": "#4c1d95",
+          "--text-input-radius": "8px",
+          "--textarea-padding": "6px 12px 4px",
           "--textarea-height-custom": "120px",
+          "--textarea-numeration-text-color": "#8b5cf6",
         } as CSSProperties
       }
     >
@@ -388,44 +559,37 @@ export const CssCustomization: Story = {
         value="Custom styled textarea with CSS variables"
         onChange={() => {}}
       />
+      <Textarea
+        value={"First line\nSecond line\nThird line"}
+        hasNumeration
+        onChange={() => {}}
+      />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--textarea-bg\` | Background color | theme token |
-| \`--textarea-border-color\` | Border color | theme token |
-| \`--textarea-text-color\` | Text color | theme token |
-| \`--textarea-font-size\` | Font size | \`13px\` |
-| \`--textarea-radius\` | Border radius | theme token |
-| \`--textarea-padding\` | Textarea padding | \`5px 8px 2px\` |
-| \`--textarea-numeration-text-color\` | Line number color | theme token |
-| \`--textarea-width\` | Max width | \`1200px\` |
-| \`--textarea-height\` | Fixed height | \`89px\` |
-| \`--textarea-height-scale\` | Height when heightScale is true | \`65vh\` |
-| \`--textarea-height-full\` | Height when isFullHeight is true | \`--full-height\` |
-| \`--textarea-height-custom\` | Height when heightTextArea prop is set | prop value |`,
-      },
-    },
-  },
-};
-
-export const CustomHeights: Story = {
-  render: () => <CustomHeightTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "The heightTextArea prop allows setting a custom height for the textarea.",
+        story: `Nine of the variables set on one wrapper -- every one is listed under CSS variables on this page. The first field shows the shared \`--text-input-*\` tokens, the padding and the custom height; hover and focus it to see the two border variables. The second adds \`hasNumeration\`, the only state in which \`--textarea-numeration-text-color\` has anything to color.`,
       },
       source: {
-        code: `<Textarea value="Small" heightTextArea="80px" />
-<Textarea value="Medium" heightTextArea="150px" />
-<Textarea value="Large" heightTextArea="250px" />`,
+        code: `<div
+  style={
+    {
+      "--text-input-bg": "#f5f3ff",
+      "--text-input-border-color": "#c4b5fd",
+      "--text-input-border-hover": "#7c3aed",
+      "--text-input-border-focus": "#4c1d95",
+      "--text-input-color": "#4c1d95",
+      "--text-input-radius": "8px",
+      "--textarea-padding": "6px 12px 4px",
+      "--textarea-height-custom": "120px",
+      "--textarea-numeration-text-color": "#8b5cf6",
+    } as CSSProperties
+  }
+>
+  <Textarea value="Custom styled textarea with CSS variables" onChange={() => {}} />
+  <Textarea value={"First line\\nSecond line\\nThird line"} hasNumeration onChange={() => {}} />
+</div>`,
       },
     },
   },

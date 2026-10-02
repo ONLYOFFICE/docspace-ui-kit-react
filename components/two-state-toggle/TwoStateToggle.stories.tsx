@@ -1,39 +1,4 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { TwoStateToggle } from ".";
@@ -42,87 +7,82 @@ const meta = {
   title: "UI/Navigation/TwoStateToggle",
   component: TwoStateToggle,
   parameters: {
-    docs: {
-      description: {
-        component: `HomeViewToggle is a pill-shaped toggle that switches between the new Dashboard view and the classic DocSpace view.
-
-The current state is persisted in \`localStorage\` under the key \`useDocSpace\` (\`"new"\` | \`"old"\`).
-
-### Behavior
-
-- **NEW → OLD**: opens a confirmation modal before switching
-- **OLD → NEW**: switches immediately (no full page reload when \`onNavigate\` is provided)
-- **First visit** (\`null\` in localStorage): \`DefaultPageRedirect\` redirects to \`/dashboard?design=new\` to write the explicit value
-
-### Usage
-
-\`\`\`tsx
-import { HomeViewToggle } from "@docspace/ui-kit/components/home-view-toggle";
-
-// In a React Router context — pass navigate to avoid a full reload
-<HomeViewToggle onNavigate={(url) => navigate(url)} />
-
-// Standalone (falls back to window.location.href)
-<HomeViewToggle />
-\`\`\`
-
-### CSS Custom Properties
-
-| Variable | Description |
-|----------|-------------|
-| \`--color-scheme-main-accent\` | Pill background / active label color |
-| \`--button-root-border-radius\` | Border radius of the pill and thumb |
-| \`--text-color\` | Color of the title label |`,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     title: {
       control: "text",
-      description: "Text label shown to the left of the toggle",
+      description:
+        "Text label shown at the inline start of the toggle; an empty string hides it",
       table: { defaultValue: { summary: "DocSpace design" } },
     },
     labelOld: {
       control: "text",
-      description: "Label for the classic DocSpace view (left side of pill)",
+      description:
+        "Label on the inline-start half of the pill, the position of the classic view",
       table: { defaultValue: { summary: "OLD" } },
     },
     labelNew: {
       control: "text",
-      description: "Label for the new Dashboard view (right side of pill)",
+      description:
+        "Label on the inline-end half of the pill, the position of the new dashboard",
       table: { defaultValue: { summary: "NEW" } },
     },
     confirmTitle: {
       control: "text",
-      description: "Confirmation modal title (shown when switching NEW → OLD)",
+      description:
+        "Heading of the confirmation dialog shown when switching from NEW to OLD",
       table: { defaultValue: { summary: "Switch to Old Design" } },
     },
     confirmBody: {
       control: "text",
-      description: "Confirmation modal main body text",
+      description: "First paragraph of the confirmation dialog",
+      table: {
+        defaultValue: {
+          summary:
+            "You are about to leave the new Dashboard and return to the classic DocSpace view.",
+        },
+      },
     },
     confirmHint: {
       control: "text",
-      description: "Hint shown below the body — e.g. how to return to new view",
+      description:
+        "Second, smaller paragraph under the first one in the confirmation dialog; an empty string hides it",
+      table: {
+        defaultValue: {
+          summary:
+            "You can return to the new Dashboard at any time by navigating to /dashboard.",
+        },
+      },
     },
     confirmOk: {
       control: "text",
-      description: 'Confirmation modal "proceed" button label',
+      description:
+        "Label of the confirmation dialog's primary button, which switches to OLD",
       table: { defaultValue: { summary: "Switch" } },
     },
     confirmCancel: {
       control: "text",
-      description: 'Confirmation modal "cancel" button label',
+      description:
+        "Label of the confirmation dialog's second button, which closes it and keeps NEW",
       table: { defaultValue: { summary: "Cancel" } },
+    },
+    ariaLabel: {
+      control: "text",
+      description:
+        "Accessible name a screen reader announces for the switch; the English default is not translated",
+      table: { defaultValue: { summary: "Switch DocSpace design" } },
     },
     onNavigate: {
       action: "onNavigate",
       description:
-        "Called instead of `window.location.href` when switching to NEW. Pass React Router `navigate` here.",
+        'Called with `"/dashboard"` when switching to NEW and with `"/"` after confirming the switch to OLD; replaces `window.location.href`. Pass React Router `navigate` here.',
     },
     className: {
       control: "text",
-      description: "Additional CSS class applied to the wrapper",
+      description:
+        "Additional CSS class applied to the wrapper around the title and the pill",
     },
   },
   decorators: [
@@ -143,6 +103,17 @@ export const Default: Story = {
     labelOld: "OLD",
     labelNew: "NEW",
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The toggle in the NEW position, as a first visit finds it. Click it to open the confirmation dialog that guards the way back to the classic view; change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<TwoStateToggle onNavigate={(url) => navigate(url)} />`,
+      },
+    },
+  },
 };
 
 export const ShowingOldState: Story = {
@@ -161,6 +132,10 @@ export const ShowingOldState: Story = {
         story:
           'Toggle in the OLD position. Clicking it switches to NEW immediately (calls `onNavigate("/dashboard")`).',
       },
+      source: {
+        code: `// localStorage.useDocSpace === "old"
+<TwoStateToggle onNavigate={(url) => navigate(url)} />`,
+      },
     },
   },
 };
@@ -175,7 +150,7 @@ export const WithoutTitle: Story = {
         story: "Toggle without the text label — only the pill is rendered.",
       },
       source: {
-        code: `<HomeViewToggle title="" onNavigate={(url) => navigate(url)} />`,
+        code: `<TwoStateToggle title="" onNavigate={(url) => navigate(url)} />`,
       },
     },
   },
@@ -196,7 +171,80 @@ export const CustomLabels: Story = {
     docs: {
       description: {
         story:
-          "All text strings are customizable — useful when the toggle is reused in other contexts.",
+          "All text strings are customizable — useful when the toggle is reused in other contexts. Click the toggle to see the dialog texts.",
+      },
+      source: {
+        code: `<TwoStateToggle
+  title="Interface"
+  labelOld="v1"
+  labelNew="v2"
+  confirmTitle="Switch to v1?"
+  confirmBody="You will be taken back to the classic interface."
+  confirmHint="Return to v2 anytime via /dashboard."
+  confirmOk="Yes, switch"
+  confirmCancel="Stay on v2"
+  onNavigate={(url) => navigate(url)}
+/>`,
+      },
+    },
+  },
+};
+
+export const RightToLeft: Story = {
+  render: (args) => (
+    <div dir="rtl">
+      <TwoStateToggle {...args} />
+    </div>
+  ),
+  globals: { direction: "rtl" },
+  args: {
+    title: "Design",
+  },
+  parameters: {
+    noPadding: true,
+    docs: {
+      // Framed: an inline RTL story would flip the whole Docs page.
+      story: { inline: false, height: "62px" },
+      description: {
+        story:
+          "The toggle in a right-to-left layout: the title moves to the right of the pill, OLD takes the right half and NEW the left, and the thumb sits on the left over NEW. The wrapper carries `dir=\"rtl\"` for the layout; the thumb's leftward slide comes from the theme's `interfaceDirection` (the Direction toolbar).",
+      },
+      source: {
+        code: `<div dir="rtl">
+  <TwoStateToggle title="Design" onNavigate={(url) => navigate(url)} />
+</div>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: (args) => (
+    <div
+      style={
+        {
+          "--color-scheme-main-accent": "#2e7d32",
+          "--button-root-border-radius": "18px",
+          "--text-color": "#2e7d32",
+        } as CSSProperties
+      }
+    >
+      <TwoStateToggle {...args} />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `All three overridable variables set on one wrapper -- the variables are listed under CSS variables on this page. Press Tab to focus the switch and see the ring take the custom accent.`,
+      },
+      source: {
+        code: `<div style={{
+  "--color-scheme-main-accent": "#2e7d32",
+  "--button-root-border-radius": "18px",
+  "--text-color": "#2e7d32",
+}}>
+  <TwoStateToggle onNavigate={(url) => navigate(url)} />
+</div>`,
       },
     },
   },

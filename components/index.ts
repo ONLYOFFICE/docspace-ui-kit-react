@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 export * from "./action-button";
 
 export * from "./avatar";
@@ -150,6 +115,7 @@ export * from "./tiles";
 export * from "./selection-area";
 
 export * from "./status-message";
+export { default as StatusMessage } from "./status-message";
 
 export * from "./progress-bar";
 
@@ -158,6 +124,7 @@ export * from "./file-input";
 export * from "./rows";
 
 export * from "./filter";
+export { default as FilterInput } from "./filter";
 
 export * from "./quick-actions";
 
@@ -168,3 +135,66 @@ export * from "./card";
 export * from "./collapsible-card";
 
 export * from "./two-state-toggle";
+
+export * from "./access-right-select";
+
+export { default as AppLoader } from "./app-loader";
+
+export * from "./article";
+export { default as Article } from "./article";
+
+export * from "./category-item";
+
+export * from "./color-input";
+
+export * from "./color-picker";
+
+export * from "./columnar-info-bar";
+
+export * from "./drag-and-drop";
+
+export { default as Dropzone } from "./dropzone";
+
+export * from "./error-container";
+
+export * from "./floating-button";
+
+export * from "./form-wrapper";
+
+export * from "./image-editor";
+
+export * from "./infinite-loader";
+
+export * from "./link-with-dropdown";
+
+export * from "./loader-wrapper";
+
+export * from "./main-button";
+
+export * from "./main-button-mobile";
+
+export * from "./navigation";
+export { default as Navigation } from "./navigation";
+
+export { default as OperationsProgressButton } from "./operations-progress-button";
+
+export * from "./paging";
+
+export * from "./password-input";
+
+export * from "./portal-logo";
+
+export { default as PublicRoomBar } from "./public-room-bar";
+
+export { default as QuantityPicker } from "./quantity-picker";
+
+export * from "./room-logo";
+
+export { default as RoomType } from "./room-type";
+
+export * from "./section";
+export { default as Section } from "./section";
+
+export * from "./selector";
+
+export * from "./table";

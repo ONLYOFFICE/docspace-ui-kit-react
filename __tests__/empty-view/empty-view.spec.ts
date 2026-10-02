@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { type Page, expect, test } from "@playwright/test";
 
 // Title: "UI/Layout components/EmptyView"
@@ -51,6 +16,43 @@ test.describe("EmptyView — light", () => {
   test("default", async ({ page }) => {
     await gotoStory(page, "default");
     await expect(page).toHaveScreenshot("empty-view-default.png");
+  });
+
+  test("no options", async ({ page }) => {
+    await gotoStory(page, "no-options");
+    await expect(page).toHaveScreenshot("empty-view-no-options.png");
+  });
+
+  test("with multiple options", async ({ page }) => {
+    await gotoStory(page, "with-multiple-options");
+    await expect(page).toHaveScreenshot("empty-view-with-multiple-options.png");
+  });
+
+  test("suggestion cards", async ({ page }) => {
+    await gotoStory(page, "suggestion-cards");
+    await expect(page).toHaveScreenshot("empty-view-suggestion-cards.png");
+  });
+
+  test("with buttons", async ({ page }) => {
+    await gotoStory(page, "with-buttons");
+    await expect(page).toHaveScreenshot("empty-view-with-buttons.png");
+  });
+
+  test("text actions with separator", async ({ page }) => {
+    await gotoStory(page, "text-actions-with-separator");
+    await expect(page).toHaveScreenshot(
+      "empty-view-text-actions-with-separator.png",
+    );
+  });
+
+  test("with extra content", async ({ page }) => {
+    await gotoStory(page, "with-extra-content");
+    await expect(page).toHaveScreenshot("empty-view-with-extra-content.png");
+  });
+
+  test("right to left", async ({ page }) => {
+    await gotoStory(page, "right-to-left");
+    await expect(page).toHaveScreenshot("empty-view-right-to-left.png");
   });
 
   test("css customization", async ({ page }) => {
@@ -77,6 +79,8 @@ test.describe("EmptyView — dark", () => {
   test("css customization dark", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await page.evaluate(() => document.body.classList.add("dark"));
-    await expect(page).toHaveScreenshot("empty-view-css-customization-dark.png");
+    await expect(page).toHaveScreenshot(
+      "empty-view-css-customization-dark.png",
+    );
   });
 });

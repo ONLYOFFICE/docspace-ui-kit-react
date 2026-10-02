@@ -1,0 +1,53 @@
+@use "../../styles/variables/colors" as *;
+
+// The surface the chat sits on. In the DocSpace client the panel content is
+// rendered inside `Section`'s info panel, which draws the background and the
+// edge; the panel itself has neither. The frame draws them from the same two
+// tokens, so a host can compare like with like, and falls back to the kit's
+// colours where no portal theme is loaded -- which is Storybook.
+.frame {
+  --ai-story-surface: var(--info-panel-background, #{$white});
+  --ai-story-border: var(--info-panel-border-color, #{$gray-light-mid});
+  --ai-story-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+  --ai-story-muted: var(--text-secondary, #{$gray-text});
+
+  display: flex;
+  flex-direction: column;
+  // The docked width a host gives the panel by default; fullscreen takes the
+  // whole row instead.
+  width: min(100%, 440px);
+  height: 640px;
+  margin-inline: auto;
+  margin-block-end: 32px;
+  overflow: hidden;
+  border: 1px solid var(--ai-story-border);
+  border-radius: 12px;
+  background: var(--ai-story-surface);
+  box-shadow: var(--ai-story-shadow);
+
+  &[data-fullscreen="true"] {
+    width: 100%;
+  }
+
+  :global(.dark) & {
+    --ai-story-surface: var(--info-panel-background, #{$black});
+    --ai-story-border: var(--info-panel-border-color, #{$gray-dark-strong});
+    --ai-story-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --ai-story-muted: var(--text-secondary, #{$dark-gray-dark});
+  }
+}
+
+// What stands in once the panel's own close button has been pressed: the
+// chat is gone, and one button brings it back.
+.closed {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  color: var(--ai-story-muted);
+  text-align: center;
+}

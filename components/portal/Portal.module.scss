@@ -4,7 +4,10 @@
 .popup {
   // bridge vars for hardcoded values
   --portal-popup-bg-v: var(--portal-popup-bg, #{variables.$white});
-  --portal-popup-shadow-v: var(--portal-popup-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
+  --portal-popup-shadow-v: var(
+    --portal-popup-shadow,
+    0 4px 12px rgba(0, 0, 0, 0.15)
+  );
   --portal-popup-radius-v: var(--portal-popup-radius, 6px);
   --portal-popup-padding-v: var(--portal-popup-padding, 20px);
   --portal-popup-color-v: var(--portal-popup-color, #{variables.$dark-black});
@@ -26,7 +29,10 @@
   }
 
   &.purple {
-    background-color: var(--portal-popup-bg-purple, #{variables.$portal-purple});
+    background-color: var(
+      --portal-popup-bg-purple,
+      #{variables.$portal-purple}
+    );
   }
 
   &.green {

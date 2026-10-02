@@ -1,75 +1,41 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { TOption } from "../combobox";
 
 export interface PagingProps {
-  /** Label for the previous button */
+  /** Label of the previous-page button. Nothing here is translated, so pass the string already localised. */
   previousLabel: string;
-  /** Label for the next button */
+  /** Label of the next-page button. Nothing here is translated, so pass the string already localised. */
   nextLabel: string;
-  /** Action for the previous button */
+  /** Called when the previous button is clicked. A promise it returns is not awaited: the component has no loading state of its own. */
   previousAction: (e?: React.MouseEvent) => Promise<void> | void;
-  /** Action for the next button */
+  /** Called when the next button is clicked. A promise it returns is not awaited: the component has no loading state of its own. */
   nextAction: (e?: React.MouseEvent) => Promise<void> | void;
-  /** Sets previous button disabled */
+  /** Disables the previous button. The page selector is disabled only when `disableNext` is set as well. */
   disablePrevious?: boolean;
-  /** Sets the next button disabled */
+  /** Disables the next button. */
   disableNext?: boolean;
-  /** Initial value for pageItems */
+  /** The option the page selector displays. It is read on every render, so hold it in your own state and update it from `onSelectPage`. */
   selectedPageItem: TOption;
-  /** Initial value for countItems */
+  /** The option the per-page selector displays. It is read on every render, so hold it in your own state and update it from `onSelectCount`. */
   selectedCountItem: TOption;
-  /** Sets a callback function that is triggered when the page is selected */
+  /** Called with the option that was picked in the page selector. Nothing moves until you update `selectedPageItem` yourself. */
   onSelectPage?: (option: TOption) => Promise<void> | void;
-  /** Sets a callback function that is triggered when the page items are selected */
+  /** Called with the option that was picked in the per-page selector. Nothing changes until you update `selectedCountItem` yourself. */
   onSelectCount?: (option: TOption) => Promise<void> | void;
-  /** Paging combo box items */
+  /** One `{ key, label }` per page. Typed as required, but passing nothing simply leaves the page selector out. */
   pageItems: TOption[];
-  /** Items per page combo box items */
+  /** One `{ key, label }` per page size. Typed as required, but passing nothing simply leaves the per-page selector out. */
   countItems: TOption[];
-  /** Indicates opening direction of combo box */
+  /** Which way both drop-downs open; `both` lets each one choose by the room under it. */
   openDirection?: "bottom" | "top" | "both";
-  /** Accepts class */
+  /** Added after the component's own class on the outer element. */
   className?: string;
-  /** Accepts id */
+  /** Value of `id` on the outer element. */
   id?: string;
-  /** Accepts css style */
+  /** Inline style of the outer element, and where the `--paging-*` custom properties go. */
   style?: React.CSSProperties;
-  /** Displays a combobox with the number of items per page */
+  /** Whether the per-page selector is rendered at all. */
   showCountItem?: boolean;
-  /** Unique test id */
+  /** Value of `data-testid` on the outer element.
+   * @default "paging" */
   dataTestId?: string;
 }

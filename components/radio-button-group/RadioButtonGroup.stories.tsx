@@ -1,42 +1,8 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type React from "react";
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import { RadioButtonGroup } from ".";
 
@@ -44,76 +10,87 @@ const meta = {
   title: "UI/Form controls/RadioButtonGroup",
   component: RadioButtonGroup,
   parameters: {
-    docs: {
-      description: {
-        component: `RadioButtonGroup renders a group of radio buttons with shared state management.
-
-### Features
-
-- **Two Orientations**: Horizontal and vertical layouts
-- **Disabled State**: Disable all or individual radio buttons
-- **Text Labels**: Insert text items between radio buttons
-- **Custom Styling**: Configurable font size, weight, spacing, and width
-- **Controlled Selection**: Managed selected state with callback
-
-### Usage
-
-\`\`\`tsx
-import { RadioButtonGroup } from "@docspace/ui-kit/components/radio-button-group";
-
-const options = [
-  { value: "option1", label: "Option 1" },
-  { value: "option2", label: "Option 2" },
-  { value: "option3", label: "Option 3" },
-];
-
-<RadioButtonGroup
-  options={options}
-  selected="option1"
-  onClick={(e) => console.log(e.target.value)}
-  orientation="horizontal"
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=556-3247&mode=design&t=TBNCKMQKQMxr44IZ-0",
     },
   },
+  args: {
+    onClick: fn(),
+  },
   argTypes: {
+    options: {
+      control: "object",
+      description:
+        'The options, in order: each has a `value` and an optional `label`, `disabled`, `autoFocus`, `id` and `dataTestId`; an entry with `type: "text"` is a caption, not a button',
+    },
+    selected: {
+      control: "text",
+      description:
+        "Value of the chosen option, compared as a string; the group starts from it and moves to it again whenever it changes",
+    },
+    onClick: {
+      description:
+        "Called when the choice changes, with the input's change event; the new value is `event.target.value`, always a string",
+    },
+    name: {
+      control: "text",
+      description:
+        "The `name` shared by every input of the group; without one the arrow keys move focus between the inputs but do not change the choice",
+    },
     orientation: {
       control: "select",
       options: ["horizontal", "vertical"],
-      description: "Layout orientation of the radio buttons",
+      description:
+        "Which way the options run: side by side in a row, or stacked in a column only as wide as its longest label",
       table: {
         defaultValue: { summary: "horizontal" },
       },
     },
     isDisabled: {
       control: "boolean",
-      description: "Disable all radio buttons in the group",
+      description:
+        "Disables every button in the group; a single option is disabled through its own `disabled` field",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     width: {
       control: "text",
-      description: "Width of the radio button group container",
+      description: "Width of the group, as a CSS length",
     },
     fontSize: {
       control: "text",
-      description: "Font size for radio button labels",
+      description: "Font size of every option's label",
     },
     fontWeight: {
       control: "text",
-      description: "Font weight for radio button labels",
+      description: "Font weight of every option's label",
     },
     spacing: {
       control: "text",
-      description: "Spacing between radio buttons",
+      description:
+        "Gap between neighbouring buttons, as a CSS length: before each button after the first in a row, below each button but the last in a column; without it the buttons touch",
+    },
+    id: {
+      control: "text",
+      description: "Applied to the group's outer element",
+    },
+    className: {
+      control: "text",
+      description: "Applied to the group's outer element",
+    },
+    style: {
+      control: "object",
+      description: "Applied to the group's outer element",
+    },
+    dataTestId: {
+      control: "text",
+      description: "`data-testid` of the group's outer element",
       table: {
-        defaultValue: { summary: "15px" },
+        defaultValue: { summary: "radio-button-group" },
       },
     },
   },
@@ -146,24 +123,25 @@ const baseOptions = [
 
 export const Default: Story = {
   args: {
+    name: "default",
     options: baseOptions,
     orientation: "horizontal",
     selected: "option1",
-    onClick: (e: React.ChangeEvent<HTMLInputElement>) =>
-      console.log("Selected:", e.target.value),
     spacing: "15px",
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Default horizontal radio button group. Click any option to select it.",
+          "The group as most forms use it: a row of options with one chosen. Click another option to move the choice and watch the Actions panel for the value `onClick` receives; change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<RadioButtonGroup
+  name="default"
   options={options}
   selected="option1"
   orientation="horizontal"
+  spacing="15px"
   onClick={handleClick}
 />`,
       },
@@ -171,27 +149,22 @@ export const Default: Story = {
   },
 };
 
-const VerticalTemplate = () => {
-  return (
-    <RadioButtonGroup
-      options={baseOptions}
-      selected="option1"
-      orientation="vertical"
-      onClick={() => {}}
-    />
-  );
-};
-
 export const VerticalLayout: Story = {
-  render: () => <VerticalTemplate />,
+  args: {
+    name: "vertical",
+    options: baseOptions,
+    selected: "option1",
+    orientation: "vertical",
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "Vertical layout stacks radio buttons on top of each other. Useful for longer option lists or forms.",
+          "The options stacked in a column only as wide as its longest label (`orientation`). Suits longer lists and labels too long to sit side by side; without `spacing` the buttons sit directly under one another.",
       },
       source: {
         code: `<RadioButtonGroup
+  name="vertical"
   options={options}
   selected="option1"
   orientation="vertical"
@@ -202,42 +175,47 @@ export const VerticalLayout: Story = {
   },
 };
 
-const DisabledTemplate = () => {
+const DisabledTemplate = (args: ComponentProps<typeof RadioButtonGroup>) => {
   return (
     <Wrapper>
       <RadioButtonGroup
+        name="disabled-group"
         options={baseOptions}
         selected="option1"
         isDisabled
-        onClick={() => {}}
+        onClick={args.onClick}
       />
       <RadioButtonGroup
+        name="disabled-option"
         options={[
           ...baseOptions,
           { value: "option4", label: "Disabled Option", disabled: true },
         ]}
         selected="option1"
-        onClick={() => {}}
+        onClick={args.onClick}
       />
     </Wrapper>
   );
 };
 
 export const DisabledStates: Story = {
-  render: () => <DisabledTemplate />,
+  render: (args) => <DisabledTemplate {...args} />,
   parameters: {
     docs: {
       description: {
-        story:
-          "Left: entire group disabled. Right: individual option disabled while others remain interactive.",
+        story: `Shows the two ways to take options out of play:
+
+- **Left** — the whole group greyed out and unclickable at once (\`isDisabled\`), for a setting that does not apply right now
+- **Right** — only "Disabled Option" is greyed out (\`disabled\` on the option), while the other three stay selectable`,
       },
       source: {
         code: `// All disabled
-<RadioButtonGroup options={options} selected="option1" isDisabled onClick={handleClick} />
+<RadioButtonGroup name="size" options={options} selected="option1" isDisabled onClick={handleClick} />
 
 // Individual option disabled
 <RadioButtonGroup
-  options={[...options, { value: "opt4", label: "Disabled", disabled: true }]}
+  name="size"
+  options={[...options, { value: "option4", label: "Disabled Option", disabled: true }]}
   selected="option1"
   onClick={handleClick}
 />`,
@@ -246,34 +224,30 @@ export const DisabledStates: Story = {
   },
 };
 
-const WithTextLabelTemplate = () => {
-  return (
-    <RadioButtonGroup
-      options={[
-        { type: "text", label: "Please select an option:", value: "" },
-        ...baseOptions,
-      ]}
-      selected="option1"
-      orientation="vertical"
-      onClick={() => {}}
-    />
-  );
-};
-
 export const WithTextLabel: Story = {
-  render: () => <WithTextLabelTemplate />,
+  args: {
+    name: "with-text",
+    options: [
+      { type: "text", label: "Please select an option:", value: "" },
+      ...baseOptions,
+    ],
+    selected: "option1",
+    orientation: "vertical",
+  },
   parameters: {
     docs: {
       description: {
         story:
-          'Options with `type: "text"` render as plain text labels instead of radio buttons. Useful for adding headings or instructions within the group.',
+          '"Please select an option:" is a caption placed inside the group, not a button (an option with `type: "text"`). Use it for a heading or an instruction above the options, or between two runs of them.',
       },
       source: {
         code: `<RadioButtonGroup
+  name="with-text"
   options={[
     { type: "text", label: "Please select an option:", value: "" },
     { value: "option1", label: "Option 1" },
     { value: "option2", label: "Option 2" },
+    { value: "option3", label: "Option 3" },
   ]}
   selected="option1"
   orientation="vertical"
@@ -284,30 +258,25 @@ export const WithTextLabel: Story = {
   },
 };
 
-const CustomStylingTemplate = () => {
-  return (
-    <RadioButtonGroup
-      options={baseOptions}
-      selected="option1"
-      fontSize="16px"
-      fontWeight="600"
-      spacing="20px"
-      width="300px"
-      onClick={() => {}}
-    />
-  );
-};
-
 export const CustomStyling: Story = {
-  render: () => <CustomStylingTemplate />,
+  args: {
+    name: "custom-styling",
+    options: baseOptions,
+    selected: "option1",
+    fontSize: "16px",
+    fontWeight: "600",
+    spacing: "20px",
+    width: "300px",
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "Custom font size, weight, spacing, and container width for radio button labels.",
+          "Larger, bolder labels (`fontSize`, `fontWeight`), 20px between the buttons (`spacing`) and a group 300px wide (`width`), to match the group to the text and layout around it.",
       },
       source: {
         code: `<RadioButtonGroup
+  name="custom-styling"
   options={options}
   selected="option1"
   fontSize="16px"
@@ -322,7 +291,7 @@ export const CustomStyling: Story = {
 };
 
 export const CssCustomization: Story = {
-  render: () => (
+  render: (args) => (
     <div
       style={
         {
@@ -332,6 +301,7 @@ export const CssCustomization: Story = {
       }
     >
       <RadioButtonGroup
+        name="css-customization"
         options={[
           { type: "text", label: "Choose an option:", value: "" },
           { value: "option1", label: "Option 1" },
@@ -340,19 +310,31 @@ export const CssCustomization: Story = {
         ]}
         selected="option1"
         orientation="vertical"
-        onClick={() => {}}
+        onClick={args.onClick}
       />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--radio-button-group-subtext-top\` | Subtext top margin | \`16px\` |
-| \`--radio-button-group-subtext-bottom\` | Subtext bottom margin | \`8px\` |`,
+        story: `Both caption spacings set on a wrapper around a vertical group that opens with the caption "Choose an option:" -- the variables are listed under CSS variables on this page.`,
+      },
+      source: {
+        code: `<div style={{
+  "--radio-button-group-subtext-top": "24px",
+  "--radio-button-group-subtext-bottom": "12px",
+}}>
+  <RadioButtonGroup
+    name="css-customization"
+    options={[
+      { type: "text", label: "Choose an option:", value: "" },
+      ...options,
+    ]}
+    selected="option1"
+    orientation="vertical"
+    onClick={handleClick}
+  />
+</div>`,
       },
     },
   },

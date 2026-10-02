@@ -7,7 +7,7 @@ export default create({
   appBg: globalColors.black,
   appContentBg: globalColors.black,
 
-  brandTitle: "DocSpace UI Kit",
+  brandTitle: "ONLYOFFICE Apps UI Kit",
   brandUrl: "https://www.onlyoffice.com/docspace.aspx",
   brandTarget: "_self",
 });

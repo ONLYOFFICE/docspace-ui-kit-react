@@ -21,7 +21,10 @@ import { getTitleWithoutExtension } from "../../utils/getTitleWithoutExtension";
 getTitleWithoutExtension({ title: "report.docx", fileExst: ".docx" }, false);
 // => "report"
 
-getTitleWithoutExtension({ title: "my.file.name.pdf", fileExst: ".pdf" }, false);
+getTitleWithoutExtension(
+  { title: "my.file.name.pdf", fileExst: ".pdf" },
+  false,
+);
 // => "my.file.name"
 
 getTitleWithoutExtension({ title: "template.docx", fileExst: ".docx" }, true);
@@ -33,6 +36,6 @@ getTitleWithoutExtension({ title: "untitled", fileExst: "" }, false);
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
+| File       | Description                         |
+| ---------- | ----------------------------------- |
 | `index.ts` | `getTitleWithoutExtension` function |

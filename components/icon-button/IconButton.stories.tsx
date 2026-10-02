@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -65,101 +30,163 @@ const meta = {
   title: "UI/Interactive elements/IconButton",
   component: IconButton,
   parameters: {
-    docs: {
-      description: {
-        component: `IconButton is a button component that displays an icon and handles various interaction states.
-
-### Features
-
-- **Icon Variants**: Supports separate icons for default, hover, and click states
-- **Color Customization**: Configurable colors for default, hover, and click states
-- **Adjustable Size**: Pixel-based size control
-- **Fill and Stroke**: Toggle between filled and stroked icon rendering
-- **Disabled State**: Visually indicates non-interactive state
-- **Custom Node**: Accepts arbitrary React nodes instead of SVG icons
-
-### Usage
-
-\`\`\`tsx
-import { IconButton } from "@docspace/ui-kit/components/icon-button";
-
-// Basic icon button
-<IconButton size={25} iconName={SearchIcon} onClick={handleClick} />
-
-// With hover and click icons
-<IconButton
-  size={25}
-  iconName={SearchIcon}
-  iconHoverName={EyeIcon}
-  hoverColor="#333"
-  onClick={handleClick}
-/>
-
-// Disabled
-<IconButton size={25} iconName={SearchIcon} isDisabled />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     iconName: {
       control: "select",
       options: iconOptions,
-      description: "The main icon to display",
+      description:
+        "URL of the icon, fetched at runtime and inlined as SVG. Ignored when `iconNode` is set",
     },
     iconHoverName: {
       control: "select",
       options: iconOptions,
-      description: "The icon to display on hover",
+      description:
+        "URL of the icon shown while the pointer is over the button; ignored on touch devices",
     },
     iconClickName: {
       control: "select",
       options: iconOptions,
-      description: "The icon to display when clicked",
+      description:
+        "URL of the icon shown from the moment the button is pressed until the pointer leaves it; ignored on touch devices",
     },
     size: {
       control: { type: "number", min: 12, max: 50 },
-      description: "Size of the icon button in pixels",
+      description:
+        "Width and height of the button. A number is pixels; `extraSmall`, `small`, `medium` and `big` are 8, 12, 16 and 24px; `base`, `middle` and `large` are 15px; any other string is used as a CSS length",
       table: {
-        defaultValue: { summary: "25" },
+        defaultValue: { summary: "20" },
       },
     },
     color: {
       control: "color",
-      description: "The default color of the icon",
+      description:
+        "Colour of the icon: any CSS colour, `accent` for the theme accent, or a custom property name starting with `--`",
     },
     hoverColor: {
       control: "color",
-      description: "The color of the icon when hovered",
+      description:
+        "Colour of the icon while the pointer is over the button; same forms as `color`",
     },
     clickColor: {
       control: "color",
-      description: "The color of the icon when clicked",
+      description:
+        "Colour of the icon from the moment the button is pressed until the pointer leaves it; same forms as `color`",
     },
     isFill: {
       control: "boolean",
-      description: "Whether to fill the icon",
+      description:
+        "Colours the icon by filling its shapes; ignored when `isStroke` is on",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     isStroke: {
       control: "boolean",
-      description: "Whether to apply stroke to the icon",
+      description:
+        "Colours the outlines of the icon's shapes and leaves their own fill as drawn",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isDisabled: {
       control: "boolean",
-      description: "Whether the button is disabled",
+      description:
+        "Ignores every mouse handler and the icon and colour swaps, sets `aria-disabled` and shows the arrow cursor",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     onClick: {
       action: "onClick",
-      description: "Function called when the button is clicked",
+      description: "Called when the button is clicked, unless it is disabled",
+    },
+    isClickable: {
+      control: "boolean",
+      description:
+        "Shows the pointer cursor without an `onClick`, for a button whose click is handled by an ancestor",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    iconNode: {
+      control: false,
+      description:
+        "The icon as JSX, rendered inline in place of the icon at `iconName`",
+    },
+    title: {
+      control: "text",
+      description:
+        "Tooltip text, shown by the application's shared tooltip; it never becomes a native `title` attribute",
+    },
+    tooltipId: {
+      control: "text",
+      description:
+        "Id of a tooltip the button renders itself, next to the pointer on desktop; needs `tooltipContent`",
+    },
+    tooltipContent: {
+      control: "text",
+      description: "Text of that tooltip; does nothing without `tooltipId`",
+    },
+    dataTip: {
+      control: "text",
+      description:
+        "Value of the legacy `data-tip` attribute; use `tooltipId` with `tooltipContent`, or `title`",
+      table: {
+        defaultValue: { summary: '""' },
+      },
+    },
+    onMouseEnter: {
+      action: "onMouseEnter",
+      description:
+        "Called when the pointer enters the button, unless it is disabled",
+    },
+    onMouseLeave: {
+      action: "onMouseLeave",
+      description:
+        "Called when the pointer leaves the button, unless it is disabled",
+    },
+    onMouseDown: {
+      action: "onMouseDown",
+      description:
+        "Called when a mouse button is pressed, unless it is disabled",
+    },
+    onMouseUp: {
+      action: "onMouseUp",
+      description:
+        "Called when the middle or right mouse button is released, never the left one; use `onClick` for that",
+    },
+    tabIndex: {
+      control: "number",
+      description:
+        "Puts the button in the tab order; without it the keyboard cannot reach it",
+    },
+    onKeyDown: {
+      action: "onKeyDown",
+      description:
+        "Called on a key press while the button has focus; Enter and Space do nothing unless it implements them",
+    },
+    id: {
+      control: "text",
+      description: "Id of the button element",
+    },
+    className: {
+      control: "text",
+      description: "Class added to the button element",
+    },
+    style: {
+      control: "object",
+      description:
+        "Inline style of the button element, applied after the size and colour the component sets, so it overrides them",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Value of `data-testid` on the button",
+      table: {
+        defaultValue: { summary: '"icon-button"' },
+      },
     },
   },
 } satisfies Meta<typeof IconButton>;
@@ -220,7 +247,7 @@ export const WithHoverState: Story = {
     docs: {
       description: {
         story:
-          "Icon buttons with a different icon displayed on hover. Hover over the buttons to see the alternate icon.",
+          "Hover over the buttons to see the alternate icon and colour, a cue that the button reacts before it is clicked (`iconHoverName`, `hoverColor`).",
       },
       source: {
         code: `<IconButton size={25} iconName={SearchIcon} iconHoverName={EyeIcon} hoverColor="#333" isFill />
@@ -250,7 +277,7 @@ export const WithClickState: Story = {
     docs: {
       description: {
         story:
-          "Icon button with a different icon displayed when clicked. Click the button to see the alternate icon and color.",
+          "Press and hold the button to see the alternate icon and colour that confirm the press (`iconClickName`, `clickColor`); they stay until the pointer leaves the button.",
       },
       source: {
         code: `<IconButton size={25} iconName={SearchIcon} iconClickName={InfoIcon} clickColor="green" isFill />`,
@@ -281,7 +308,7 @@ export const Sizes: Story = {
     docs: {
       description: {
         story:
-          "Icon buttons at various sizes. The size prop controls both width and height in pixels.",
+          "Icon buttons at 16, 20, 25, 32 and 40px, so a size can be picked to match the surrounding text or row height (`size`).",
       },
       source: {
         code: `<IconButton size={16} iconName={SearchIcon} isFill />
@@ -297,18 +324,8 @@ export const Sizes: Story = {
 const DisabledTemplate = () => {
   return (
     <Wrapper>
-      <IconButton
-        size={25}
-        iconName={SearchReactSvgUrl}
-        isFill
-        isDisabled
-      />
-      <IconButton
-        size={25}
-        iconName={SettingsReactSvgUrl}
-        isFill
-        isDisabled
-      />
+      <IconButton size={25} iconName={SearchReactSvgUrl} isFill isDisabled />
+      <IconButton size={25} iconName={SettingsReactSvgUrl} isFill isDisabled />
     </Wrapper>
   );
 };
@@ -319,7 +336,7 @@ export const Disabled: Story = {
     docs: {
       description: {
         story:
-          "Disabled icon buttons. They cannot be interacted with and have reduced opacity.",
+          "Disabled icon buttons ignore clicks and hover and keep their default icon and colour (`isDisabled`). They look the same as enabled ones apart from the arrow cursor, so pair them with a visible reason when the difference matters.",
       },
       source: {
         code: `<IconButton size={25} iconName={SearchIcon} isFill isDisabled />
@@ -354,7 +371,7 @@ export const WithStroke: Story = {
     docs: {
       description: {
         story:
-          "Icon buttons rendered with stroke instead of fill. Uses outline-style icons.",
+          "Stroke mode colours the outlines of the icon's shapes and leaves their own fill as drawn, which suits outline icons (`isStroke`). The two filled icons here show that: each keeps its fill and gains a grey outline.",
       },
       source: {
         code: `<IconButton size={25} iconName={SearchIcon} isStroke isFill={false} />
@@ -403,7 +420,7 @@ export const WithCustomNode: Story = {
     docs: {
       description: {
         story:
-          "Demonstrates using the `iconNode` prop to pass any custom React node (e.g., avatar/initials) instead of an SVG icon.",
+          "A square of initials in place of an SVG icon: any React node can be the icon, rendered inline with no network request (`iconNode`).",
       },
       source: {
         code: `<IconButton
@@ -417,41 +434,72 @@ export const WithCustomNode: Story = {
   },
 };
 
+const WithTooltipTemplate = () => {
+  return (
+    <Wrapper>
+      <IconButton
+        size={25}
+        iconName={SearchReactSvgUrl}
+        tooltipId="icon-button-tooltip"
+        tooltipContent="Search"
+        onClick={() => {}}
+      />
+    </Wrapper>
+  );
+};
+
+export const WithTooltip: Story = {
+  render: () => <WithTooltipTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Hover over the button to read what it does: an icon alone rarely says so, and the button renders this tooltip itself, next to the pointer (`tooltipId`, `tooltipContent`).",
+      },
+      source: {
+        code: `<IconButton
+  size={25}
+  iconName={SearchIcon}
+  tooltipId="icon-button-tooltip"
+  tooltipContent="Search"
+  onClick={handleClick}
+/>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
-    <div
+    <IconButton
+      iconName={SearchReactSvgUrl}
+      isFill
+      onClick={() => {}}
       style={
         {
           "--icon-button-color": "#9C27B0",
-          "--icon-button-hover-color": "#6A1B9A",
+          "--icon-button-hover-color": "#4A148C",
           "--icon-button-size": "32px",
         } as CSSProperties
       }
-    >
-      <IconButton iconName={SearchReactSvgUrl} isFill />
-    </div>
+    />
   ),
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-\`\`\`css
---icon-button-color        /* default icon color */
---icon-button-hover-color  /* icon color on hover */
---icon-button-size         /* icon button size */
-\`\`\``,
+        story: `The variables are listed under CSS variables on this page; here all three are set through the \`style\` prop, because a value set on a wrapper never arrives. Hover the button to see the hover colour.`,
       },
       source: {
-        code: `<div
+        code: `<IconButton
+  iconName={SearchIcon}
+  isFill
+  onClick={handleClick}
   style={{
     "--icon-button-color": "#9C27B0",
-    "--icon-button-hover-color": "#6A1B9A",
+    "--icon-button-hover-color": "#4A148C",
     "--icon-button-size": "32px",
   }}
->
-  <IconButton iconName={SearchReactSvgUrl} isFill />
-</div>`,
+/>`,
       },
     },
   },

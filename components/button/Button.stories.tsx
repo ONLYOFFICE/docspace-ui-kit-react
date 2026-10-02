@@ -1,44 +1,11 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type React from "react";
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import Icon from "../../assets/button.alert.react.svg";
+import OutlineIcon from "../../assets/article-hide-menu-icon.react.svg";
+import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
 
 import { Button, ButtonSize } from ".";
 
@@ -46,49 +13,8 @@ const meta = {
   title: "UI/Interactive elements/Button",
   component: Button,
   parameters: {
-    docs: {
-      description: {
-        component: `Button is used for actions on a page.
-
-### Features
-
-- **Two Variants**: Primary and Secondary styles
-- **Four Sizes**: extraSmall, small, normal, and medium
-- **Icon Support**: Display icons alongside text
-- **Loading State**: Show loading indicator during async operations
-- **Tooltip Support**: Display helpful text on hover
-- **Filled Variants**: Additional styling options with filled and filledStroke
-- **Full Width**: Scale to 100% width when needed
-
-### Accessibility
-
-The Button component includes the following ARIA attributes for improved accessibility:
-
-- \`aria-label\`: Provides a text description of the button's action
-- \`aria-disabled\`: Indicates when the button is disabled
-- \`aria-busy\`: Indicates when the button is in a loading state
-
-These attributes help users of assistive technologies better understand the button's state and purpose.
-
-### Usage
-
-\`\`\`tsx
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
-
-// Primary button
-<Button primary size={ButtonSize.normal} label="Save" onClick={handleSave} />
-
-// Secondary button with icon
-<Button size={ButtonSize.small} icon={<Icon />} label="Cancel" />
-
-// Loading state
-<Button primary isLoading label="Saving..." />
-
-// With tooltip
-<Button label="Help" tooltipText="Click for help" />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=62-3582&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -98,74 +24,164 @@ import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
     size: {
       control: "select",
       options: Object.values(ButtonSize),
-      description: "Button size",
+      description:
+        "Height of the button: 24px for `extraSmall`, 32px for `small`, 40px for `normal`, 44px for `medium`",
       table: {
         defaultValue: { summary: "normal" },
       },
     },
     primary: {
       control: "boolean",
-      description: "Primary button style",
+      description:
+        "Draws the button in the accent colour, for the main action of a view",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    accent: {
+      control: "boolean",
+      description:
+        "Draws the button on a light tint of the accent colour, with the text and icon in the accent colour",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     scale: {
       control: "boolean",
-      description: "Scale button to 100% width",
+      description: "Stretches the button to the full width of its container",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     filled: {
       control: "boolean",
-      description: "Filled button variant",
+      description:
+        "Draws the button on a neutral grey surface with no border and paints its icon in the text colour",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     filledStroke: {
       control: "boolean",
-      description: "Filled button with stroke variant",
+      description:
+        "Used together with `filled`: outlines the icon's shapes instead of filling them, for outline-style icons; does nothing on its own",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isDisabled: {
       control: "boolean",
-      description: "Disable the button",
+      description:
+        "Greys the button out, takes it out of the tab order and blocks clicks",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isLoading: {
       control: "boolean",
-      description: "Show loading state",
+      description:
+        "Hides the content behind a spinner, keeping the button's width, and disables it",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isHovered: {
       control: "boolean",
-      description: "Force hover state (for demo purposes)",
+      description:
+        "Draws the hover look while the pointer is not over the button",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isClicked: {
       control: "boolean",
-      description: "Force clicked state (for demo purposes)",
+      description: "Draws the pressed look while nothing presses the button",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     label: {
       control: "text",
-      description: "Button text label",
+      description:
+        "Text of the button, which is also its accessible name; when empty, the children are shown instead",
+    },
+    children: {
+      control: false,
+      description: "Content shown in place of `label` when `label` is empty",
+    },
+    icon: {
+      control: false,
+      description: "Icon node shown before the label",
+    },
+    minWidth: {
+      control: "text",
+      description:
+        "Smallest width of the button as a CSS length, such as `120px`",
     },
     tooltipText: {
       control: "text",
-      description: "Tooltip text shown on hover",
+      description: "Text of a tooltip shown below the button on hover",
+    },
+    title: {
+      control: "text",
+      description:
+        "Text of a tooltip shown on hover; it never becomes a native `title` attribute",
+    },
+    type: {
+      control: "select",
+      options: ["button", "submit"],
+      description:
+        "Native button type: `submit` submits the surrounding form, any other value renders `button`",
+      table: {
+        defaultValue: { summary: "button" },
+      },
+    },
+    onClick: {
+      action: "onClick",
+      description: "Called with the mouse event when the button is clicked",
+    },
+    tabIndex: {
+      control: "number",
+      description: "Position of the button in the keyboard tab order",
+    },
+    id: {
+      control: "text",
+      description:
+        "HTML id of the button; also names its `tooltipText` tooltip",
+    },
+    className: {
+      control: "text",
+      description: "Class applied to the button after the component's own",
+    },
+    style: {
+      control: "object",
+      description: "Inline styles of the button",
+    },
+    testId: {
+      control: "text",
+      description: "Value of the button's `data-testid` attribute",
+      table: {
+        defaultValue: { summary: "button" },
+      },
+    },
+    ref: {
+      control: false,
+      description: "Ref to the rendered `<button>` element",
+    },
+    "aria-label": {
+      control: false,
+      description:
+        "Replaced by `label` on every render, so a value passed here never reaches the button",
+    },
+    "aria-disabled": {
+      control: false,
+      description:
+        "Replaced on every render: set to `true` while `isDisabled`, removed otherwise",
+    },
+    "aria-busy": {
+      control: false,
+      description:
+        "Replaced on every render: set to `true` while `isLoading`, removed otherwise",
     },
   },
 } satisfies Meta<typeof Button>;
@@ -193,10 +209,19 @@ const Wrapper = (props: { isScale: boolean; children: React.ReactNode }) => {
 };
 
 export const Default: Story = {
-  render: (args) => (
-    <Button {...args} onClick={() => alert("Button clicked")} />
-  ),
+  render: (args) => <Button {...args} />,
   args: { size: ButtonSize.small, label: "Button" },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The secondary button, for any action that is not the main one of a view; click it to see `onClick` in the Actions panel, and change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<Button size={ButtonSize.small} label="Button" onClick={handleClick} />`,
+      },
+    },
+  },
 };
 
 const PrimaryTemplate = () => {
@@ -378,10 +403,10 @@ const FilledTemplate = () => {
     <Wrapper isScale={false}>
       {(Object.keys(ButtonSize) as Array<ButtonSize>).map((size) => (
         <Button
-          key={`all-filled-prim-${size}`}
-          primary
+          key={`all-filled-icon-${size}`}
           size={size}
           filled
+          icon={<CatalogFolderIcon />}
           label={`Filled ${size[0].toUpperCase()}${size.slice(1)}`}
         />
       ))}
@@ -402,18 +427,20 @@ const FilledStrokeTemplate = () => {
     <Wrapper isScale={false}>
       {(Object.keys(ButtonSize) as Array<ButtonSize>).map((size) => (
         <Button
-          key={`all-filled-stroke-prim-${size}`}
-          primary
+          key={`all-filled-outline-${size}`}
           size={size}
-          filledStroke
-          label={`FilledStroke ${size[0].toUpperCase()}${size.slice(1)}`}
+          filled
+          icon={<OutlineIcon />}
+          label={`Filled ${size[0].toUpperCase()}${size.slice(1)}`}
         />
       ))}
       {(Object.keys(ButtonSize) as Array<ButtonSize>).map((size) => (
         <Button
           key={`all-filled-stroke-sec-${size}`}
           size={size}
+          filled
           filledStroke
+          icon={<OutlineIcon />}
           label={`FilledStroke ${size[0].toUpperCase()}${size.slice(1)}`}
         />
       ))}
@@ -470,7 +497,7 @@ export const SecondaryButtons: Story = {
     docs: {
       description: {
         story:
-          "Secondary buttons are used for secondary actions. They have a transparent background with a border.",
+          "Secondary buttons are used for secondary actions. They sit on the page background with a grey border that changes colour on hover.",
       },
       source: {
         code: `<Button size={ButtonSize.extraSmall} label="Secondary ExtraSmall" />
@@ -501,6 +528,7 @@ export const WithIconButtons: Story = {
 };
 
 export const IsLoadingButtons: Story = {
+  name: "Loading Buttons",
   render: () => <IsLoadingTemplate />,
   parameters: {
     docs: {
@@ -542,7 +570,7 @@ export const DisabledButtons: Story = {
     docs: {
       description: {
         story:
-          "Disabled buttons cannot be interacted with and have reduced opacity.",
+          "Disabled buttons cannot be clicked or focused: the secondary one turns grey, the primary one fades to 60% opacity (`isDisabled`).",
       },
       source: {
         code: `<Button primary size={ButtonSize.small} isDisabled label="Disabled Small" />
@@ -560,7 +588,7 @@ export const ClickedButtons: Story = {
     docs: {
       description: {
         story:
-          "Shows the visual state when a button is clicked/pressed. For demonstration purposes.",
+          "The pressed look drawn while nothing presses the button (`isClicked`), for a button whose action is already under way, such as the one that opened the menu now on screen.",
       },
       source: {
         code: `<Button primary size={ButtonSize.small} isClicked label="Clicked Small" />
@@ -578,7 +606,7 @@ export const HoveredButtons: Story = {
     docs: {
       description: {
         story:
-          "Shows the visual state when a button is hovered. For demonstration purposes.",
+          "The hover look drawn while the pointer is elsewhere (`isHovered`), for a button that should light up together with the element it belongs to, such as a hovered row.",
       },
       source: {
         code: `<Button primary size={ButtonSize.small} isHovered label="Hovered Small" />
@@ -596,13 +624,13 @@ export const FilledButtons: Story = {
     docs: {
       description: {
         story:
-          "Filled variant provides an alternative solid background style for buttons.",
+          "A quiet grey button with no border, for toolbar actions that should not compete with the content (`filled`). The first row shows that an icon is repainted in the text colour, whatever colour it was drawn in.",
       },
       source: {
-        code: `<Button primary size={ButtonSize.small} filled label="Filled Small" />
-<Button primary size={ButtonSize.normal} filled label="Filled Normal" />
-<Button size={ButtonSize.small} filled label="Filled Small" />
-<Button size={ButtonSize.normal} filled label="Filled Normal" />`,
+        code: `<Button size={ButtonSize.small} filled label="Filled Small" />
+<Button size={ButtonSize.normal} filled label="Filled Normal" />
+<Button size={ButtonSize.small} filled icon={<CatalogFolderIcon />} label="Filled Small" />
+<Button size={ButtonSize.normal} filled icon={<CatalogFolderIcon />} label="Filled Normal" />`,
       },
     },
   },
@@ -614,13 +642,13 @@ export const FilledStrokeButtons: Story = {
     docs: {
       description: {
         story:
-          "FilledStroke variant combines filled background with a stroke/border for emphasis.",
+          "An outline-style icon on a filled button: in the first row the filled button paints the icon's shapes solid, in the second it keeps the outline (`filled` with `filledStroke`). `filledStroke` changes nothing without `filled`.",
       },
       source: {
-        code: `<Button primary size={ButtonSize.small} filledStroke label="FilledStroke Small" />
-<Button primary size={ButtonSize.normal} filledStroke label="FilledStroke Normal" />
-<Button size={ButtonSize.small} filledStroke label="FilledStroke Small" />
-<Button size={ButtonSize.normal} filledStroke label="FilledStroke Normal" />`,
+        code: `<Button size={ButtonSize.small} filled icon={<OutlineIcon />} label="Filled Small" />
+<Button size={ButtonSize.normal} filled icon={<OutlineIcon />} label="Filled Normal" />
+<Button size={ButtonSize.small} filled filledStroke icon={<OutlineIcon />} label="FilledStroke Small" />
+<Button size={ButtonSize.normal} filled filledStroke icon={<OutlineIcon />} label="FilledStroke Normal" />`,
       },
     },
   },
@@ -643,87 +671,90 @@ export const WithTooltip: Story = {
   },
 };
 
+const AccentTemplate = () => {
+  return (
+    <Wrapper isScale={false}>
+      {(Object.keys(ButtonSize) as Array<ButtonSize>).map((size) => (
+        <Button
+          key={`all-accent-${size}`}
+          size={size}
+          accent
+          label={`Accent ${size[0].toUpperCase()}${size.slice(1)}`}
+        />
+      ))}
+      {(Object.keys(ButtonSize) as Array<ButtonSize>).map((size) => (
+        <Button
+          key={`all-accent-icon-${size}`}
+          size={size}
+          accent
+          icon={<CatalogFolderIcon />}
+          label={`Accent ${size[0].toUpperCase()}${size.slice(1)}`}
+        />
+      ))}
+    </Wrapper>
+  );
+};
+
+export const AccentButtons: Story = {
+  render: () => <AccentTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "An emphasised action that should stand out without taking the place of the primary one: a light accent tint with accent text, and an icon repainted in the same colour (`accent`).",
+      },
+      source: {
+        code: `<Button size={ButtonSize.small} accent label="Accent Small" />
+<Button size={ButtonSize.normal} accent label="Accent Normal" />
+<Button size={ButtonSize.small} accent icon={<CatalogFolderIcon />} label="Accent Small" />
+<Button size={ButtonSize.normal} accent icon={<CatalogFolderIcon />} label="Accent Normal" />`,
+      },
+    },
+  },
+};
+
 const CustomizationTemplate = () => {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      <div>
-        <h4 style={{ margin: "0 0 8px" }}>Default theme (no overrides)</h4>
-        <div style={{ display: "flex", gap: "8px" }}>
-          <Button size={ButtonSize.normal} label="Secondary" />
-          <Button size={ButtonSize.normal} label="Primary" primary />
-        </div>
-      </div>
-
-      <div
-        style={
-          {
-            "--button-root-bg": "#e91e63",
-            "--button-root-color": "#fff",
-            "--button-root-border": "1px solid #e91e63",
-            "--button-root-border-radius": "24px",
-            "--button-root-bg-hover": "#c2185b",
-            "--button-root-color-hover": "#fff",
-            "--button-root-border-hover": "1px solid #c2185b",
-          } as React.CSSProperties
-        }
-      >
-        <h4 style={{ margin: "0 0 8px" }}>Custom secondary (pink, rounded)</h4>
-        <div style={{ display: "flex", gap: "8px" }}>
-          <Button size={ButtonSize.normal} label="Custom" />
-          <Button size={ButtonSize.small} label="Small" />
-          <Button size={ButtonSize.normal} label="Disabled" isDisabled />
-        </div>
-      </div>
-
-      <div
-        style={
-          {
-            "--button-primary-bg": "#7c3aed",
-            "--button-primary-color": "#fff",
-            "--button-primary-border": "1px solid #7c3aed",
-            "--button-primary-bg-hover": "#6d28d9",
-            "--button-primary-bg-active": "#5b21b6",
-            "--button-primary-border-active": "1px solid #5b21b6",
-            "--button-root-border-radius": "8px",
-          } as React.CSSProperties
-        }
-      >
-        <h4 style={{ margin: "0 0 8px" }}>Custom primary (purple)</h4>
-        <div style={{ display: "flex", gap: "8px" }}>
-          <Button size={ButtonSize.normal} label="Save" primary />
-          <Button size={ButtonSize.small} label="Submit" primary />
-          <Button size={ButtonSize.normal} label="Cancel" />
-        </div>
-      </div>
-
-      <div
-        style={
-          {
-            "--button-root-bg": "#065f46",
-            "--button-root-color": "#d1fae5",
-            "--button-root-border": "1px solid #065f46",
-            "--button-root-bg-hover": "#047857",
-            "--button-root-color-hover": "#fff",
-            "--button-root-border-hover": "1px solid #047857",
-            "--button-primary-bg": "#f59e0b",
-            "--button-primary-color": "#000",
-            "--button-primary-border": "1px solid #f59e0b",
-            "--button-primary-bg-hover": "#d97706",
-            "--button-primary-bg-active": "#b45309",
-            "--button-primary-border-active": "1px solid #b45309",
-            "--button-root-border-radius": "0",
-          } as React.CSSProperties
-        }
-      >
-        <h4 style={{ margin: "0 0 8px" }}>
-          Full rebrand (green + amber, no radius)
-        </h4>
-        <div style={{ display: "flex", gap: "8px" }}>
-          <Button size={ButtonSize.normal} label="Secondary" />
-          <Button size={ButtonSize.normal} label="Primary" primary />
-          <Button size={ButtonSize.normal} label="Disabled" isDisabled />
-        </div>
-      </div>
+    <div
+      style={
+        {
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "8px",
+          "--button-root-bg": "#fdf2f8",
+          "--button-root-color": "#9d174d",
+          "--button-root-border": "1px solid #f9a8d4",
+          "--button-root-bg-hover": "#fbcfe8",
+          "--button-root-color-hover": "#831843",
+          "--button-root-border-hover": "1px solid #db2777",
+          "--button-root-bg-active": "#f472b6",
+          "--button-root-color-active": "#500724",
+          "--button-root-border-active": "1px solid #9d174d",
+          "--button-root-bg-disabled": "#f5f5f5",
+          "--button-root-color-disabled": "#a3a3a3",
+          "--button-root-border-disabled": "1px dashed #d4d4d4",
+          "--button-primary-bg": "#7c3aed",
+          "--button-primary-color": "#fff",
+          "--button-primary-border": "1px solid #7c3aed",
+          "--button-primary-bg-hover": "#a78bfa",
+          "--button-primary-color-hover": "#fff",
+          "--button-primary-bg-active": "#4c1d95",
+          "--button-primary-color-active": "#ede9fe",
+          "--button-primary-border-active": "#2e1065",
+          "--button-primary-bg-disabled": "#ddd6fe",
+          "--button-primary-color-disabled": "#7c3aed",
+          "--button-primary-border-disabled": "1px solid #ddd6fe",
+          "--button-root-border-radius": "16px",
+          "--button-text-weight": "700",
+          "--button-height-md": "48px",
+          "--button-font-size-md": "15px",
+        } as React.CSSProperties
+      }
+    >
+      <Button size={ButtonSize.normal} label="Secondary" />
+      <Button size={ButtonSize.normal} label="Primary" primary />
+      <Button size={ButtonSize.normal} label="Disabled" isDisabled />
+      <Button size={ButtonSize.normal} label="Disabled" primary isDisabled />
     </div>
   );
 };
@@ -733,42 +764,49 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Buttons can be customized via CSS Custom Properties on a parent element.
-No JavaScript needed — just set variables on any wrapper.
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. Hover and press the buttons to see the hover and pressed values.
 
-**Available variables:**
-
-| Variable | Description |
-|----------|-------------|
-| \`--button-root-bg\` | Secondary background |
-| \`--button-root-color\` | Secondary text color |
-| \`--button-root-border\` | Secondary border |
-| \`--button-root-border-radius\` | Border radius (all variants) |
-| \`--button-root-bg-hover\` | Secondary hover background |
-| \`--button-root-bg-disabled\` | Secondary disabled background |
-| \`--button-primary-bg\` | Primary background |
-| \`--button-primary-color\` | Primary text color |
-| \`--button-primary-border\` | Primary border |
-| \`--button-primary-bg-hover\` | Primary hover background |
-| \`--button-text-weight\` | Font weight (default: 600) |
-| \`--button-height-xs/sm/md/lg\` | Height per size variant |
-| \`--button-font-size-xs/sm/md/lg\` | Font size per size variant |
-
-All color variables support \`-hover\`, \`-active\`, \`-disabled\` suffixes.`,
+- **Secondary** — the \`--button-root-*\` colours, the radius, the weight and the \`normal\` size's height and font size
+- **Primary** — the \`--button-primary-*\` colours
+- **Disabled** — the \`--button-root-*-disabled\` values (\`isDisabled\`)
+- **Disabled primary** — the \`--button-primary-*-disabled\` values, faded to 60% opacity by the component (\`primary\` with \`isDisabled\`)`,
       },
       source: {
-        code: `// Wrap buttons in a div with CSS variables
-<div style={{
-  "--button-root-bg": "#e91e63",
-  "--button-root-color": "#fff",
-  "--button-root-border": "1px solid #e91e63",
-  "--button-root-border-radius": "24px",
+        code: `<div style={{
+  "--button-root-bg": "#fdf2f8",
+  "--button-root-color": "#9d174d",
+  "--button-root-border": "1px solid #f9a8d4",
+  "--button-root-bg-hover": "#fbcfe8",
+  "--button-root-color-hover": "#831843",
+  "--button-root-border-hover": "1px solid #db2777",
+  "--button-root-bg-active": "#f472b6",
+  "--button-root-color-active": "#500724",
+  "--button-root-border-active": "1px solid #9d174d",
+  "--button-root-bg-disabled": "#f5f5f5",
+  "--button-root-color-disabled": "#a3a3a3",
+  "--button-root-border-disabled": "1px dashed #d4d4d4",
+  "--button-primary-bg": "#7c3aed",
+  "--button-primary-color": "#fff",
+  "--button-primary-border": "1px solid #7c3aed",
+  "--button-primary-bg-hover": "#a78bfa",
+  "--button-primary-color-hover": "#fff",
+  "--button-primary-bg-active": "#4c1d95",
+  "--button-primary-color-active": "#ede9fe",
+  "--button-primary-border-active": "#2e1065",
+  "--button-primary-bg-disabled": "#ddd6fe",
+  "--button-primary-color-disabled": "#7c3aed",
+  "--button-primary-border-disabled": "1px solid #ddd6fe",
+  "--button-root-border-radius": "16px",
+  "--button-text-weight": "700",
+  "--button-height-md": "48px",
+  "--button-font-size-md": "15px",
 }}>
-  <Button label="Custom" />
+  <Button label="Secondary" />
   <Button label="Primary" primary />
+  <Button label="Disabled" isDisabled />
+  <Button label="Disabled" primary isDisabled />
 </div>`,
       },
     },
   },
 };
-

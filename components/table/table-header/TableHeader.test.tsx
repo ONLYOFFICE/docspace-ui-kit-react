@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { useRef } from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, act } from "@testing-library/react";
@@ -66,10 +31,14 @@ const TableHeaderWithContainerRef = (
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div 
-      id="table-container" 
+    <div
+      id="table-container"
       ref={containerRef}
-      style={{ display: "grid", gridTemplateColumns: "210px 110px 110px 110px 24px", width: "1000px" }}
+      style={{
+        display: "grid",
+        gridTemplateColumns: "210px 110px 110px 110px 24px",
+        width: "1000px",
+      }}
     >
       <TableHeader {...args} containerRef={containerRef} />
     </div>
@@ -134,17 +103,20 @@ describe("<TableHeader />", () => {
     localStorage.clear();
 
     // Mock getBoundingClientRect for elements
-    window.HTMLElement.prototype.getBoundingClientRect = vi.fn(() => ({
-      width: 1000,
-      height: 40,
-      top: 0,
-      left: 0,
-      bottom: 40,
-      right: 1000,
-      x: 0,
-      y: 0,
-      toJSON: () => {},
-    } as DOMRect));
+    window.HTMLElement.prototype.getBoundingClientRect = vi.fn(
+      () =>
+        ({
+          width: 1000,
+          height: 40,
+          top: 0,
+          left: 0,
+          bottom: 40,
+          right: 1000,
+          x: 0,
+          y: 0,
+          toJSON: () => {},
+        }) as DOMRect,
+    );
   });
 
   it("renders without errors", () => {
@@ -208,25 +180,32 @@ describe("<TableHeader />", () => {
 
   it("resets columns when column count changes and no storage", () => {
     const removeItemSpy = vi.spyOn(Storage.prototype, "removeItem");
-    const { rerender } = render(<TableHeaderWithContainerRef {...defaultProps} />);
-    
+    const { rerender } = render(
+      <TableHeaderWithContainerRef {...defaultProps} />,
+    );
+
     // Clear storage created by first render to simulate "no storage"
     localStorage.removeItem(COLUMN_STORAGE_NAME);
     removeItemSpy.mockClear();
-    
-    const moreColumns = [...mockColumns, {
-      key: "NewCol",
-      title: "New Col",
-      enable: true,
-      sortBy: "NewCol",
-      onChange: () => {},
-      onClick: () => {},
-    }];
-    
+
+    const moreColumns = [
+      ...mockColumns,
+      {
+        key: "NewCol",
+        title: "New Col",
+        enable: true,
+        sortBy: "NewCol",
+        onChange: () => {},
+        onClick: () => {},
+      },
+    ];
+
     act(() => {
-      rerender(<TableHeaderWithContainerRef {...defaultProps} columns={moreColumns} />);
+      rerender(
+        <TableHeaderWithContainerRef {...defaultProps} columns={moreColumns} />,
+      );
     });
-    
+
     // resetColumns MUST call removeItem
     expect(removeItemSpy).toHaveBeenCalledWith(COLUMN_STORAGE_NAME);
     expect(localStorage.getItem(COLUMN_STORAGE_NAME)).not.toBeNull();
@@ -235,15 +214,22 @@ describe("<TableHeader />", () => {
 
   it("calls onResize when columns length does not change", () => {
     const removeItemSpy = vi.spyOn(Storage.prototype, "removeItem");
-    const { rerender } = render(<TableHeaderWithContainerRef {...defaultProps} />);
-    
+    const { rerender } = render(
+      <TableHeaderWithContainerRef {...defaultProps} />,
+    );
+
     // Clear calls from initial render
     removeItemSpy.mockClear();
 
     act(() => {
-      rerender(<TableHeaderWithContainerRef {...defaultProps} sortBy={SortByFieldName.Type} />);
+      rerender(
+        <TableHeaderWithContainerRef
+          {...defaultProps}
+          sortBy={SortByFieldName.Type}
+        />,
+      );
     });
-    
+
     // onResize MUST NOT call removeItem(COLUMN_STORAGE_NAME) if infoPanelVisible is false.
     // onResize might call removeItem(COLUMN_INFO_PANEL_STORAGE_NAME) for cleanup.
     // We check that it didn't do a full reset.
@@ -261,20 +247,20 @@ describe("<TableHeader />", () => {
     });
 
     const { rerender } = render(
-      <TableHeaderWithContainerRef 
-        {...defaultProps} 
-        columns={mockColumns} 
-        sortBy={SortByFieldName.Name} 
-      />
+      <TableHeaderWithContainerRef
+        {...defaultProps}
+        columns={mockColumns}
+        sortBy={SortByFieldName.Name}
+      />,
     );
 
     act(() => {
       rerender(
-        <TableHeaderWithContainerRef 
-          {...defaultProps} 
-          columns={columnsWithDisabled} 
-          sortBy={SortByFieldName.Type} 
-        />
+        <TableHeaderWithContainerRef
+          {...defaultProps}
+          columns={columnsWithDisabled}
+          sortBy={SortByFieldName.Type}
+        />,
       );
     });
 

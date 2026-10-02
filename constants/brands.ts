@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 // Pluggable brand-name lookup for the ui-kit library.
 //
 // The library ships with an identity lookup (returns the key as-is) so
@@ -42,15 +7,32 @@
 // DocSpace apps register their lookup by importing
 // @docspace/shared/constants/brands, which calls setBrandLookup() as a
 // side effect at module load.
+//
+// The lookup lives on globalThis under a `Symbol.for` key rather than in a
+// module-scope `let`, because a module-scope variable is only shared by code
+// that loaded the *same copy* of this package. pnpm's isolated layout installs
+// one copy per distinct peer-resolution set, and those sets diverge easily: an
+// optional peer with a stale range (`openai` asks for `zod: ^3.23.8`) resolved
+// one way for the app depending on openai directly and another way for the app
+// reaching it through @onlyoffice/ai-chat. That made two openai copies, hence
+// two ai-chat copies, hence two copies of this package -- and setBrandLookup
+// ran against one while the selectors read the other, so every file-selector
+// breadcrumb in the sdk app rendered the literal key "ProductName". A
+// realm-global slot survives that: duplication still costs bundle size, but it
+// can no longer silently change what the UI renders.
 
 export type BrandLookup = (key: string, locale?: string) => string;
 
-let lookup: BrandLookup = (key) => key;
+const SLOT = Symbol.for("@onlyoffice/apps-ui-kit#brandLookup");
+
+type Holder = { [SLOT]?: BrandLookup };
+
+const identity: BrandLookup = (key) => key;
 
 export function setBrandLookup(fn: BrandLookup): void {
-  lookup = fn;
+  (globalThis as Holder)[SLOT] = fn;
 }
 
 export function getBrandName(key: string, locale?: string): string {
-  return lookup(key, locale);
+  return ((globalThis as Holder)[SLOT] ?? identity)(key, locale);
 }

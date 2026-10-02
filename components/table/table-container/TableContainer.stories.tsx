@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { TableContainerProps } from "../Table.types";
@@ -138,29 +103,9 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `TableContainer is a wrapper for table elements including header, body, rows, and cells.
+        component: `TableContainer is the outer element of a table, the grid that the header, the group menu and the rows are laid out in.
 
-### Features
-
-- **Grid Layout**: Applies CSS grid styling for consistent column alignment
-- **React-Window Support**: Configures specific styles for virtualized table content
-- **Scrolling Behavior**: Manages scroll context for child components
-- **Composable**: Works with TableHeader, TableBody, TableRow, and TableCell
-
-### Usage
-
-\`\`\`tsx
-import { TableContainer } from "@docspace/ui-kit/components/table/table-container";
-
-const ref = useRef<HTMLDivElement>(null);
-
-<TableContainer forwardedRef={ref} useReactWindow={false}>
-  <TableHeader {...headerProps} />
-  <TableBody {...bodyProps}>
-    {rows}
-  </TableBody>
-</TableContainer>
-\`\`\``,
+The Table README describes it in full.`,
       },
     },
   },
@@ -168,13 +113,28 @@ const ref = useRef<HTMLDivElement>(null);
     useReactWindow: {
       control: "boolean",
       description:
-        "Enable react-window mode for virtualized scrolling styles",
+        "Makes the container a full-height block instead of a grid; set it together with the same prop on the header and the body when the rows are virtualised",
+    },
+    noSelect: {
+      control: "boolean",
+      description: "Stops the user selecting text anywhere inside the table",
       table: {
         defaultValue: { summary: "false" },
       },
     },
-    forwardedRef: { control: false },
-    children: { control: false },
+    className: {
+      control: "text",
+      description: "Class applied to the container after the component's own",
+    },
+    forwardedRef: {
+      control: false,
+      description:
+        "Ref of the container element; pass the same ref to the header as `containerRef`",
+    },
+    children: {
+      control: false,
+      description: "The header, the group menu and the body",
+    },
   },
   decorators: [
     (Story) => {
@@ -187,15 +147,17 @@ const ref = useRef<HTMLDivElement>(null);
               it sets specific styles to properly contain virtualized content.
             </p>
           </div>
-          <Scrollbar
-            id="sectionScroll"
-            style={{ height: "400px" }}
-            autoHide={false}
-          >
-            <div style={{ marginTop: "25px" }}>
-              <Story />
-            </div>
-          </Scrollbar>
+          <div style={{ position: "relative" }}>
+            <Scrollbar
+              id="sectionScroll"
+              style={{ height: "400px" }}
+              autoHide={false}
+            >
+              <div style={{ marginTop: "25px" }}>
+                <Story />
+              </div>
+            </Scrollbar>
+          </div>
         </div>
       );
     },
@@ -215,7 +177,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default TableContainer with a header and body. Renders all rows without virtual scrolling.",
+          "A complete table of ten rows under a sortable header, the usual way the parts are put together: the container holds the grid, the header sizes its columns. Turn on `useReactWindow` in the Controls panel below to render the same rows through the virtualised body.",
       },
       source: {
         code: `const ref = useRef<HTMLDivElement>(null);

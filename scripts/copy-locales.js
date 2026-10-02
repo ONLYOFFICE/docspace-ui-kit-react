@@ -1,18 +1,19 @@
+// Refreshes locales/ from a DocSpace client checkout. Run by hand via
+// `pnpm sync-locales`, never as part of build, test or lint -- this package has
+// to build standalone, and locales/en is committed for exactly that reason.
+//
+// It used to short-circuit under CI and write four empty {} stubs, exiting 0.
+// That made every CI build silently produce a package with no translations
+// while reporting success. Now the script simply is not in CI's path, and when
+// it is run without a DocSpace checkout it fails loudly instead.
 const fs = require("node:fs");
 const path = require("node:path");
 
-if (process.env.CI) {
-  const dest = path.resolve(__dirname, "../locales/en");
-  fs.mkdirSync(dest, { recursive: true });
-  fs.writeFileSync(path.join(dest, "Common.json"), "{}\n");
-  fs.writeFileSync(path.join(dest, "Payments.json"), "{}\n");
-  fs.writeFileSync(path.join(dest, "Services.json"), "{}\n");
-  fs.writeFileSync(path.join(dest, "Settings.json"), "{}\n");
-  console.log("CI detected - created stub locale files");
-  process.exit(0);
-}
-
-const SOURCE = path.resolve(__dirname, "../../../public/locales");
+const DOCSPACE_CLIENT_ROOT = path.resolve(
+  __dirname,
+  process.env.DOCSPACE_CLIENT_ROOT || "../../DocSpace/client",
+);
+const SOURCE = path.join(DOCSPACE_CLIENT_ROOT, "public/locales");
 const DEST = path.resolve(__dirname, "../locales");
 const UI_KIT_ROOT = path.resolve(__dirname, "..");
 
@@ -93,7 +94,10 @@ for (const lang of langs) {
   const all = JSON.parse(fs.readFileSync(src, "utf-8"));
   const filtered = {};
 
-  for (const key of USED_KEYS) {
+  // Sorted, so a second run over an unchanged client produces no diff: the
+  // keys arrive in whatever order the source scan found them, which shifts
+  // whenever a component moves.
+  for (const key of [...USED_KEYS].sort((a, b) => a.localeCompare(b))) {
     if (key in all) {
       filtered[key] = all[key];
     }
@@ -111,12 +115,16 @@ console.log(
   `Copied Common.json (${USED_KEYS.size} keys) for ${langs.length} locales into locales/`,
 );
 
-// --- Copy Payments.json, Services.json, Settings.json (full files, no key filtering) ---
-const CLIENT_LOCALES = path.resolve(
-  __dirname,
-  "../../../packages/client/public/locales",
+// --- Copy Payments.json and Settings.json (full files, no key filtering) ---
+// `Services` used to be listed here and never existed: no DocSpace locale ships
+// a Services.json, and no `t("Services:...")` call exists in this package. The
+// only thing keeping it alive was the CI stub writer above, which fabricated an
+// empty one -- so outside CI the Storybook build failed on the missing import.
+const CLIENT_LOCALES = path.join(
+  DOCSPACE_CLIENT_ROOT,
+  "packages/client/public/locales",
 );
-const EXTRA_NS = ["Payments", "Services", "Settings"];
+const EXTRA_NS = ["Payments", "Settings"];
 for (const ns of EXTRA_NS) {
   let copiedCount = 0;
   for (const lang of langs) {
@@ -131,9 +139,9 @@ for (const ns of EXTRA_NS) {
   console.log(`Copied ${ns}.json for ${copiedCount} locales into locales/`);
 }
 // --- Copy fonts ---
-const FONTS_CSS_SRC = path.resolve(__dirname, "../../../public/css/fonts.css");
+const FONTS_CSS_SRC = path.join(DOCSPACE_CLIENT_ROOT, "public/css/fonts.css");
 const FONTS_CSS_DEST = path.resolve(__dirname, "../css");
-const FONTS_DIR_SRC = path.resolve(__dirname, "../../../public/fonts");
+const FONTS_DIR_SRC = path.join(DOCSPACE_CLIENT_ROOT, "public/fonts");
 const FONTS_DIR_DEST = path.resolve(__dirname, "../fonts");
 
 function copyDirSync(src, dest) {
@@ -163,4 +171,3 @@ if (fs.existsSync(FONTS_DIR_SRC)) {
 } else {
   console.error(`fonts directory not found: ${FONTS_DIR_SRC}`);
 }
-

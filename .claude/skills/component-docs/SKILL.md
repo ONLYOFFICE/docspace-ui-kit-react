@@ -1,0 +1,118 @@
+---
+name: component-docs
+description: Find and close the documentation gaps that ship in the published package -- components with no README, no story, or a README that is only a heading
+argument-hint: "[<component-name>]"
+---
+
+# Close a documentation gap
+
+`package.json` publishes `components/**/README.md`, so a component without one ships with no
+documentation at all — and the JSDoc on its props is the only thing a plugin author can read
+instead ([plugin-api.md](../../rules/plugin-api.md)).
+
+```bash
+node .claude/scripts/component-docs/gaps.mjs
+```
+
+Ten components have no README, one (`theme-provider`) has no story. Stories are searched
+recursively — `table`, `rows` and `tiles` keep theirs in subdirectories, so do not conclude one
+is missing from a flat listing.
+
+## Writing a README
+
+[`README_TEMPLATE.md`](../../../README_TEMPLATE.md) is the contract and
+[`components/button/README.md`](../../../components/button/README.md) is the worked example.
+Read both before starting; what follows is the procedure, not a second description of the
+shape.
+
+1. Read `index.ts(x)`, `<Name>.tsx`, `<Name>.types.ts`, `<Name>.enums.ts`, `<Name>.module.scss`,
+   the tests and `sub-components/**`. If the barrel wraps the component, read the wrapper too.
+2. Complete the JSDoc on every own prop, adding `@default` and `@portal` where the template
+   says. A prop without one is an error, not a blank cell.
+3. Write the metadata block. `state.visibility` names the real prop — this kit calls it
+   `visible`, `isVisible`, `isOpen` and `open` in different folders, and the validator checks
+   it against the resolved props.
+4. `pnpm readme:props --write --only components/<name>`. Never type between the markers.
+5. Write the hand sections, including at least three bullets under "Behaviour the types don't
+   state", each traceable to the stylesheet, the source or a test.
+6. `pnpm check:readme:full --only components/<name>` until clean. `scripts/readme-allowlist.json`
+   is `[]` and stays that way — a folder listed there is a folder nothing checks.
+
+The section with the real value is the last one: what the types cannot say. An own outer
+margin, a component with no intrinsic size, a callback that receives a value where every
+sibling receives the event. It is the same material the plugin skill's trap list is made of.
+
+Do not invent behaviour. Read the component and its `.module.scss`; where you cannot tell, say
+nothing rather than guessing, and note what you left out.
+
+## Updating one after a change to the component
+
+Changing a signature is the easy case: `pnpm readme:props --write --only components/<name>`
+rewrites the table, and the gates fail if you forget. Changing what the component **does** is the
+case nothing catches. The prop table is generated; "Behaviour the types don't state",
+"Accessibility", "CSS variables" and the recipes are not, and `check:readme` cannot tell that a
+true sentence has become a false one.
+
+So after a behaviour change, re-read those four sections against the diff and ask of each bullet
+whether it is still true. The ones that go stale are exactly the ones worth having — they describe
+defects and surprises, which is what people fix:
+
+- an element described by its tag, after the tag changed (`div` → `<h3>`);
+- a state described as cosmetic, after it started blocking the handler;
+- a gap described as unclosable, after it was closed;
+- a prop described as dead, after it became an alias;
+- an access described as throwing, after it was wrapped in `try`.
+
+All five are real, and all five reached a merge with every gate green.
+
+A component's own README is the only record of a fault in it. There used to be a
+`docs/known-defects.md` collecting them across components as well; it was emptied and removed
+once every entry was fixed, and a second place to say the same thing is a second place to go
+stale. So when a fix lands, correct the sentence in the README that described the fault — and
+put what it means for a consumer in `CHANGELOG.md`, which is where someone upgrading looks.
+
+## Writing a story
+
+The story shows the component; the README describes it — and the README is also what the
+story's Docs page renders (`.storybook/blocks/DocsPage.tsx`), so there is no second description.
+A story file carries no `parameters.docs.description.component`; `STORY_TEMPLATE.md` governs
+the rest of it. The one exception is a story file whose own folder has no README (the table's
+parts, the skeletons, `ArticleItem`): it keeps one purpose sentence naming the parent page.
+
+That replaced a hand-written second description, which nothing compared with the README and
+which went stale first — one claimed `ModalDialog` traps focus, which it has never done. When
+you change what a component does, correct the README; the Docs page follows.
+
+What the story owns is what prose cannot carry: the scenarios, the controls, the
+visual-regression surface. A component-level `var(--x, fallback)` is recorded in the README's
+`## CSS variables` table — grep the `.module.scss` for `var(--` with a fallback and make sure
+each one has a row there, because stories are not published in the package and a consumer never
+sees them.
+
+`theme-provider` is the outstanding case, and it is not a visual component: a story for it shows
+what it does to its subtree — `data-theme` on `<html>`, the resolved `--color-scheme-*`
+properties, children rendering in both themes. Look at `ThemeProvider.stories.tsx` under
+`providers/theme/` first; the provider already has one there, and the component wrapper may only
+need to point at it.
+
+## Verify
+
+```bash
+pnpm check:readme:full --only components/<name>   # structure, metadata, table, examples
+pnpm storybook                                    # the story renders
+npx prettier --check components/<name>
+node .claude/scripts/component-docs/gaps.mjs
+```
+
+`check:readme:full` type-checks every ```tsx block in the README, so an example that does not
+compile fails here rather than in a reader's editor. `gaps.mjs` answers a different question —
+which files are missing at all — and the two do not overlap.
+
+Storybook runs from a fresh clone with no DocSpace checkout: `locales/en`, `assets/icons/`
+and `css/fonts.css` are committed.
+
+## Scope
+
+One component per commit unless asked otherwise. Ten READMEs in one diff is ten judgement calls
+nobody can review, and a README written without reading the component is worse than none — it
+looks authoritative.
