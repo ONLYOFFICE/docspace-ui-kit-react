@@ -153,4 +153,16 @@ export const EXTRA_PAGES = [
     label: "Installation",
     after: "Welcome",
   },
+  {
+    source: "docs/components.md",
+    group: "Getting started",
+    label: "Catalogue",
+    after: "Installation",
+  },
+  {
+    source: "docs/public-api.md",
+    group: "Getting started",
+    label: "Public API",
+    after: "Structure",
+  },
 ];

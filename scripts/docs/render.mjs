@@ -508,6 +508,7 @@ export const renderMdx = (raw, context) => {
 
   return (
     frontMatter({
+      description: summaryOf(page, raw),
       custom_edit_url: `${REPO_URL}/blob/${revision}/${page.source}`,
     }) +
     text +
@@ -523,6 +524,7 @@ export const renderMarkdown = (raw, context) => {
   text = escapeForMdx(text);
   return (
     frontMatter({
+      description: summaryOf(page, raw),
       custom_edit_url: `${REPO_URL}/blob/${revision}/${page.source}`,
     }) +
     text +
@@ -538,7 +540,11 @@ export const summaryOf = (page, raw) =>
   (page.kind === "autodocs"
     ? ""
     : firstSentence(
-        firstParagraph(stripHtmlComments(raw).replace(/^import .*$/gm, "")),
+        firstParagraph(
+          stripHtmlComments(raw)
+            .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
+            .replace(/^import .*$/gm, ""),
+        ),
       ));
 
 const overviewTable = (caption, header, rows, { code = true } = {}) =>

@@ -277,6 +277,10 @@ export const collect = (root, { warn }) => {
   // Extra pages take their place in the ordered level: `sequence` is what
   // the sidebar and the overview table read, `pages` what gets written.
   for (const extra of EXTRA_PAGES) {
+    if (!fs.existsSync(path.join(root, extra.source))) {
+      warn(`${extra.source}: no such file`);
+      continue;
+    }
     const category = categories.get(extra.group);
     if (!category) {
       warn(`${extra.source}: category "${extra.group}" is not published`);

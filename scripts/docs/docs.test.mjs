@@ -24,6 +24,7 @@ import {
   renderMdx,
   renderReadme,
   reshapePropsTables,
+  summaryOf,
   THEMED_IMAGE_IMPORT,
   wrapApiTables,
 } from "./render.mjs";
@@ -263,6 +264,14 @@ describe("summaries", () => {
       "# Hooks\n\nEleven hooks in `hooks/index.ts. x` here. Second one.";
     expect(firstSentence(firstParagraph(text))).toBe(
       "Eleven hooks in `hooks/index.ts. x` here.",
+    );
+  });
+
+  it("skips an MDX comment and the imports before the first paragraph", () => {
+    const raw =
+      "import { Meta } from '@storybook/addon-docs/blocks';\n\n{/*\n(c) Copyright\n*/}\n\n<Meta of={Stories} />\n\n# Files\n\nThe Files section as the portal draws it. More here.";
+    expect(summaryOf({ kind: "docs" }, raw)).toBe(
+      "The Files section as the portal draws it.",
     );
   });
 });
@@ -547,6 +556,8 @@ describe("collect", () => {
     write("docs/welcome.mdx", '<Meta title="Getting started/Welcome" />\n');
     write("docs/structure.mdx", '<Meta title="Getting started/Structure" />');
     write("docs/getting-started.md", "# Installation\n");
+    write("docs/components.md", "# Components\n");
+    write("docs/public-api.md", "# Public API\n");
     write(
       "components/button/Button.stories.tsx",
       'export default { title: "UI/Form controls/Button" };\nexport const Default = {};',
@@ -590,12 +601,16 @@ describe("collect", () => {
     expect(labels(started)).toEqual([
       "page:Welcome",
       "page:Installation",
+      "page:Catalogue",
       "page:Structure",
+      "page:Public API",
     ]);
     expect(started.pages.map((p) => `${p.kind}:${p.slug}`)).toEqual([
       "mdx:welcome",
       "markdown:installation",
+      "markdown:catalogue",
       "mdx:structure",
+      "markdown:public-api",
     ]);
 
     expect(labels(ui)).toEqual([
