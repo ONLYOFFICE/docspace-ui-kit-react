@@ -15,6 +15,7 @@ import brandsData from "../test/fixtures/brands.json";
 import globalTypes from "./globals";
 import withApiProvider from "./decorators/withApiProvider";
 import { startDemoPortal } from "./mocks/worker";
+import { syncNestedPreviewGlobals } from "./utils/nestedPreviewGlobals";
 import enCommon from "../locales/en/Common.json";
 import enPayments from "../locales/en/Payments.json";
 import enSettings from "../locales/en/Settings.json";
@@ -44,6 +45,11 @@ const { get: getBrand } = parseLocaleConstants({
   ProductName: "ONLYOFFICE",
 });
 setBrandLookup(getBrand);
+
+// The API Config and direction toolbars reach the stories a Docs page renders
+// in iframes of their own (`docs.story.inline: false`) -- the AI chat and
+// settings among them.
+syncNestedPreviewGlobals();
 
 const lightColorScheme: TColorScheme = {
   id: 1,
