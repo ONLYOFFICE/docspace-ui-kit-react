@@ -26,7 +26,7 @@ import { useServicesActions } from "./hooks/useServicesActions";
 import ServiceCard from "./sub-components/ServiceCard";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
-import { Link, LinkTarget } from "../../components/link";
+import { Link } from "../../components/link";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
 
 type ServicesItemsProps = {
@@ -37,6 +37,7 @@ type ServicesItemsProps = {
   isTablet?: boolean;
   cardDisabled?: boolean;
   onOpenSupportedModels?: () => void;
+  onOpenWebSearch?: () => void;
   docsConnectState?: TDocsConnectCardState;
   onDocsConnectToggle?: () => void;
 };
@@ -47,6 +48,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   isMobile,
   isTablet,
   onOpenSupportedModels,
+  onOpenWebSearch,
   docsConnectState,
   onDocsConnectToggle,
 }) => {
@@ -64,8 +66,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     isShowPreviousStoragePlan,
     isLowWalletBalance,
     language,
-    aiToolsFeePercent,
-    aiSearchFeePercent,
   } = paymentStore;
 
   const { isFreeTariff } = paymentStore.quotas;
@@ -128,8 +128,11 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     onOpenSupportedModels?.();
   };
 
-  const onPricingLinkClick = (e: React.MouseEvent) => {
+  const onWebSearchClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
+
+    onOpenWebSearch?.();
   };
 
   const textTooltip = (
@@ -205,7 +208,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
         if (isLowWalletBalance) {
           return (
             <CommonTrans
-              i18nKey="AIPricingLowBalanceWithModels"
+              i18nKey="AIPricingLowBalanceWithPricing"
               values={{ price: formatWalletCurrency() }}
               components={{
                 1: (
@@ -215,7 +218,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                     color="accent"
                     textDecoration="underline dotted"
                     onClick={onSupportedModelsClick}
-                    dataTestId="ai_supported_models_link"
+                    dataTestId="ai_see_pricing_link"
                   />
                 ),
               }}
@@ -223,60 +226,30 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
           );
         }
 
-        if (aiToolsFeePercent == null) return "";
-
         return (
-          <CommonTrans
-            i18nKey="AIUsagePricingNote"
-            values={{ percent: aiToolsFeePercent }}
-            components={{
-              1: (
-                <Link
-                  fontSize="13px"
-                  fontWeight={600}
-                  color="accent"
-                  textDecoration="underline dotted"
-                  href="https://openrouter.ai/models"
-                  target={LinkTarget.blank}
-                  onClick={onPricingLinkClick}
-                  dataTestId="ai_openrouter_pricing_link"
-                />
-              ),
-              2: (
-                <Link
-                  fontSize="13px"
-                  fontWeight={600}
-                  color="accent"
-                  textDecoration="underline dotted"
-                  onClick={onSupportedModelsClick}
-                  dataTestId="ai_supported_models_link"
-                />
-              ),
-            }}
-          />
+          <Link
+            fontSize="13px"
+            fontWeight={600}
+            color="accent"
+            textDecoration="underline dotted"
+            onClick={onSupportedModelsClick}
+            dataTestId="ai_see_pricing_link"
+          >
+            {t("SeePricing")}
+          </Link>
         );
       case AI_SEARCH_ENUM:
-        if (aiSearchFeePercent == null) return "";
-
         return (
-          <CommonTrans
-            i18nKey="AIExaPricingNote"
-            values={{ percent: aiSearchFeePercent }}
-            components={{
-              1: (
-                <Link
-                  fontSize="13px"
-                  fontWeight={600}
-                  color="accent"
-                  textDecoration="underline dotted"
-                  href="https://exa.ai/pricing"
-                  target={LinkTarget.blank}
-                  onClick={onPricingLinkClick}
-                  dataTestId="ai_search_exa_pricing_link"
-                />
-              ),
-            }}
-          />
+          <Link
+            fontSize="13px"
+            fontWeight={600}
+            color="accent"
+            textDecoration="underline dotted"
+            onClick={onWebSearchClick}
+            dataTestId="ai_search_see_pricing_link"
+          >
+            {t("SeePricing")}
+          </Link>
         );
       default:
         return "";

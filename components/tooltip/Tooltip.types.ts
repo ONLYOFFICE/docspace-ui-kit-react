@@ -52,6 +52,11 @@ export type TooltipProps = {
    * their own.
    */
   isOpen?: ITooltip["isOpen"];
+  /**
+   * Called when the tooltip wants to open or close itself. Pair it with
+   * `isOpen` to keep a controlled tooltip in sync with hover and click.
+   */
+  setIsOpen?: ITooltip["setIsOpen"];
   /** Keeps the tooltip open while the pointer is over it, so links inside it can be reached. */
   clickable?: ITooltip["clickable"];
   /**

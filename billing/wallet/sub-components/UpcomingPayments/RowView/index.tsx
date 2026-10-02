@@ -10,7 +10,7 @@ import UpcomingPaymentRow from "./RowBody";
 const RowView = ({ sectionWidth }: { sectionWidth: number }) => {
   const store = usePaymentStore();
   const t = useCommonTranslation();
-  const { upcomingPayments, formatWalletCurrency } = store;
+  const { upcomingPayments, formatWalletCurrency, language } = store;
 
   return (
     <RowContainer
@@ -29,6 +29,7 @@ const RowView = ({ sectionWidth }: { sectionWidth: number }) => {
           renewalDate={payment.renewalDate}
           details={getServiceQuantity(
             t,
+            language,
             payment.quantity,
             payment.unitOfMeasure,
           )}

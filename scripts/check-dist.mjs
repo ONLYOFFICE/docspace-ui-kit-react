@@ -92,17 +92,20 @@ const SKIP = ["node_modules", "dist", ".git", "storybook-static", "locales"];
 // them comparable, and also collapses `context/index.ts` onto `context`.
 const moduleId = (id) => id.replace(/(^|\/)index$/, "");
 
+// Tests and story support are never built (NON_SOURCE in rollup.config.mjs), so
+// a directive in one of them has nothing in dist to match. The ids here have
+// their extension stripped already, hence `$` where rollup's pattern has `\.`.
+const NON_SOURCE =
+  /(\.(test|spec|stories)$|story\.helper|stories\.utils|storybook-helpers)/;
+
 const inSource = new Set(
   fs
     .readdirSync(SOURCE_ROOT, { withFileTypes: true })
     .filter((e) => e.isDirectory() && !SKIP.includes(e.name))
     .flatMap((e) =>
-      [
-        ...modulesWithDirective(path.join(SOURCE_ROOT, e.name), [
-          ".ts",
-          ".tsx",
-        ]),
-      ].map((id) => moduleId(`${e.name}/${id}`)),
+      [...modulesWithDirective(path.join(SOURCE_ROOT, e.name), [".ts", ".tsx"])]
+        .filter((id) => !NON_SOURCE.test(id))
+        .map((id) => moduleId(`${e.name}/${id}`)),
     ),
 );
 

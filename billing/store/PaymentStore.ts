@@ -16,6 +16,16 @@ import type {
 export type TransactionSourceType =
   "Agent" | "File" | "Folder" | "Room" | "Form";
 
+export type OperationTokenUsage = {
+  totalTokens: number;
+  promptTokens: number;
+  completionTokens: number;
+  cachedTokens: number;
+  cacheWriteTokens: number;
+  reasoningTokens: number;
+  imageTokens: number;
+};
+
 export type WalletOperationDto = Omit<
   OperationDto,
   "date" | "agentId" | "agentTitle"
@@ -24,6 +34,7 @@ export type WalletOperationDto = Omit<
   sourceId?: string | null;
   sourceTitle?: string | null;
   sourceType?: TransactionSourceType | null;
+  tokenUsage?: OperationTokenUsage | null;
 };
 
 import { toastr } from "../../components/toast";

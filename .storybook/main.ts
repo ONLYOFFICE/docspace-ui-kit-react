@@ -25,7 +25,9 @@ const config: StorybookConfig = {
     "../document-editor/**/*.mdx",
     "../uploader/**/*.mdx",
     "../ai-agent/**/*.mdx",
-    "../billing/**/*.mdx",
+    // billing/ is hidden for now: its page and stories are kept there as
+    // Payments.docs.mdx.bak and Payments.stories.tsx.bak. To bring them back,
+    // drop the .bak and restore the two billing globs.
     "../docs/**/*.stories.@(js|jsx|ts|tsx)",
     "../components/**/*.stories.@(js|jsx|ts|tsx)",
     "../errors/**/*.stories.@(js|jsx|ts|tsx)",
@@ -34,7 +36,6 @@ const config: StorybookConfig = {
     "../document-editor/**/*.stories.@(js|jsx|ts|tsx)",
     "../uploader/**/*.stories.@(js|jsx|ts|tsx)",
     "../ai-agent/**/*.stories.@(js|jsx|ts|tsx)",
-    "../billing/**/*.stories.@(js|jsx|ts|tsx)",
   ],
 
   // `public/` is served at the root, next to iframe.html, for pages a story

@@ -59,10 +59,15 @@ export class BaseCustomApi {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.error?.message ||
-          errorData.message ||
-          `Request error: ${response.status}`,
+      // The HTTP status rides along so a caller can tell "not found" from
+      // a failure without parsing the (localized) message.
+      throw Object.assign(
+        new Error(
+          errorData.error?.message ||
+            errorData.message ||
+            `Request error: ${response.status}`,
+        ),
+        { status: response.status },
       );
     }
 
