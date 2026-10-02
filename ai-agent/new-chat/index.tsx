@@ -10,6 +10,7 @@ import { useVirtualKeyboardInset } from "../../hooks/useVirtualKeyboardInset";
 import { ChatToolbar } from "../chat-toolbar";
 import { ChatNoAccessScreen } from "./components/chat-no-access-screen";
 import { useAiChatStore } from "../providers/ai-chat-store/AiChatStoreProvider";
+import ContextRoomSync from "../providers/context-room/ContextRoomSync";
 
 import styles from "./NewChat.module.scss";
 import type { ChatProps } from "./chat.types";
@@ -54,6 +55,9 @@ const NewChat: React.FC<ChatProps> = observer(
     // the split-screen history layout, so it lives in one place.
     const chatPanel = (
       <>
+        {/* The chat is open: connect the current room as context if it
+            holds a .ai folder (see ContextRoomSync). */}
+        <ContextRoomSync />
         {showToolbar ? <ChatToolbar /> : null}
         {chatBody}
       </>

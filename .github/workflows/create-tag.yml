@@ -4,10 +4,10 @@ on:
   push:
     branches: [master]
     paths-ignore:
-      - '**/*.md'
-      - 'LICENSE'
-      - '.gitignore'
-      - '.github/**'
+      - "**/*.md"
+      - "LICENSE"
+      - ".gitignore"
+      - ".github/**"
 
 jobs:
   create-tag:

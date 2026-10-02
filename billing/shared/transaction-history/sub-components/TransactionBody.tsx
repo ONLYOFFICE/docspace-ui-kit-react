@@ -16,11 +16,13 @@ import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import useViewEffect from "../../../../hooks/useViewEffect";
 import useDeviceType from "../../../hooks/useDeviceType";
 import { isDocsConnectServiceName } from "../../../utils/docs-connect";
+import { isAiServiceName } from "../utils";
 
 import styles from "../styles/TransactionHistory.module.scss";
 
 import TableView from "./TableView";
 import RowView from "./RowView";
+import { TokenUsageTooltip } from "./TokenUsage";
 
 type TransactionHistoryProps = {
   isTransactionHistoryExist: boolean;
@@ -122,6 +124,7 @@ const TransactionBody = ({
   return (
     <div className={styles.transactionBodyWrapper} style={wrapperStyle}>
       {isTransactionHistoryExist ? renderContent : emptyView}
+      {isAiServiceName(serviceName) ? <TokenUsageTooltip /> : null}
     </div>
   );
 };

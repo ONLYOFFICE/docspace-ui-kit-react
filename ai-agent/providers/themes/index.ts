@@ -319,6 +319,13 @@ const buildTokens = (
   "--file-items-background-color": "var(--background-normal)",
   "--file-items-border-color": "var(--border-divider)",
   "--file-items-chat-background-color": "var(--background-normal-element)",
+  // The connected-room chip in the composer takes the portal's own paint
+  // for blocks inside the chat input, so it reads as one of them.
+  "--chat-composer-room-background-color":
+    "var(--chat-input-file-background-color)",
+  "--chat-composer-room-border-color": "var(--chat-input-file-border-color)",
+  "--chat-composer-room-hover-background-color":
+    "var(--chat-input-tools-button-hover-background)",
   "--file-items-chat-hover-background-color": "var(--highlight-button-hover)",
   "--file-items-chat-pressed-background-color":
     "var(--highlight-button-pressed)",
@@ -406,9 +413,12 @@ const buildTokens = (
   "--chat-scroll-to-bottom-background-color": "var(--highlight-button-pressed)",
   "--chat-scroll-to-bottom-border-color": "transparent",
 
-  // Composer action buttons
+  // Composer action buttons. The context-room picker sits in the same row
+  // and would otherwise fall back to the widget's --icon-button-color, a
+  // different grey from its two neighbours.
   "--attachment-button-color": p.attachmentButtonColor,
   "--prompt-button-color": p.promptButtonColor,
+  "--composer-settings-button-color": p.attachmentButtonColor,
 
   // Misc
   "--action-gap": "16px",

@@ -1,8 +1,8 @@
 {
   "entry": "index.ts",
   "package": "@onlyoffice/apps-ui-kit",
-  "total": 706,
-  "values": 459,
+  "total": 707,
+  "values": 460,
   "exports": {
     "ADMIN": {
       "kind": "variable",
@@ -2823,6 +2823,10 @@
     "usePaymentStore": {
       "kind": "variable",
       "origin": "billing/store"
+    },
+    "usePinnedTooltip": {
+      "kind": "variable",
+      "origin": "components/tooltip/hooks"
     },
     "useServicesStore": {
       "kind": "variable",

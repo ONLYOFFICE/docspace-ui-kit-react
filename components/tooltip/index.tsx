@@ -29,6 +29,7 @@ export * from "./sub-components/withTooltip";
 export * from "./sub-components/TooltipContainer";
 export * from "./rootTooltip";
 export * from "./Tooltip.types";
+export * from "./hooks/usePinnedTooltip";
 
 const Tooltip = ({
   ref,
@@ -46,6 +47,7 @@ const Tooltip = ({
   clickable,
   openOnClick,
   isOpen,
+  setIsOpen,
   float,
   noArrow = true,
   fallbackAxisSideDirection,
@@ -97,6 +99,7 @@ const Tooltip = ({
           float={float}
           place={place}
           isOpen={isOpen}
+          setIsOpen={setIsOpen}
           noArrow={noArrow}
           render={getContent}
           clickable={clickable}
