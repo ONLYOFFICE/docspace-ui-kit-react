@@ -23,6 +23,31 @@ export type AiExportFormat = "Docx" | "Pdf" | "Md";
 // removed together with the C# AI service; the AI chat now talks to the
 // Node AI service through the @onlyoffice/ai-chat engines. Only the
 // endpoints that are still served remain here.
+/** The `.ai` folder of a room and the folders around it, as socket-room ids. */
+export type TRoomAiFolder = {
+  /** The `.ai` folder: its Markdown files are the room's skills. */
+  id: string;
+  /** The room the folder lies in: its rename or removal is announced here. */
+  roomId: string;
+  /** The room's parent (the rooms root), where the room's own rename and removal are announced. */
+  roomsRootId?: string;
+  /** Whether the folder holds at least one Markdown file — a room without one has nothing to connect. */
+  hasSkills: boolean;
+};
+
+/** `FilterType.FilesOnly` on the server: the listing skips subfolders. */
+const FILTER_FILES_ONLY = 1;
+
+/** Files of the `.ai` folder looked at for a skill; a real skills folder holds a handful. */
+const AI_FOLDER_SAMPLE = 100;
+
+const isMarkdown = (file: { title?: string; fileExst?: string }): boolean =>
+  (
+    file.fileExst ??
+    file.title?.slice(file.title.lastIndexOf(".")) ??
+    ""
+  ).toLowerCase() === ".md";
+
 export class AiApi extends BaseCustomApi {
   // Async markdown export via the Node AI service
   // (`POST /ai/text-to-docx` → the .NET text-to-docx start endpoint).
@@ -36,6 +61,58 @@ export class AiApi extends BaseCustomApi {
   // JsonStringEnumConverter also accepts other casings, but there is no
   // reason to rely on that. Omitting it keeps the endpoint's own default
   // (`Docx`).
+  // The `.ai` folder of a room (`GET /files/rooms/{id}/ai`, added on the
+  // server with the Ai folder type), as the ids the chat needs to follow it
+  // on the socket — the folder itself, the room, and the room's parent (the
+  // rooms root), where the room's own rename and removal are announced —
+  // and whether it holds a skill at all. The skills themselves are read by
+  // the AI service; here the files are only looked at for a Markdown one.
+  // 404 is "no such folder" (or no such room), a plain `null`; a refusal or
+  // a failure propagates.
+  async getRoomAiFolder(
+    roomId: number | string,
+  ): Promise<TRoomAiFolder | null> {
+    try {
+      const res = await this.request<{
+        current?: { id?: number | string };
+        pathParts?: { id?: number | string }[];
+        files?: { title?: string; fileExst?: string }[];
+      }>(`/files/rooms/${encodeURIComponent(String(roomId))}/ai`, {
+        method: "GET",
+        params: { filterType: FILTER_FILES_ONLY, count: AI_FOLDER_SAMPLE },
+      });
+      const id = res?.current?.id;
+      if (id === undefined || id === null) return null;
+      // pathParts runs from the root: [..., rooms root, room, .ai folder].
+      const parts = res.pathParts ?? [];
+      const roomIndex = parts.findIndex(
+        (part) => String(part.id) === String(roomId),
+      );
+      const roomsRoot = roomIndex > 0 ? parts[roomIndex - 1]?.id : undefined;
+      return {
+        id: String(id),
+        roomId: String(roomId),
+        roomsRootId:
+          roomsRoot === undefined || roomsRoot === null
+            ? undefined
+            : String(roomsRoot),
+        hasSkills: (res.files ?? []).some(isMarkdown),
+      };
+    } catch (error) {
+      if ((error as { status?: number }).status === 404) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  // Whether the room holds a `.ai` folder with at least one skill in it —
+  // what the chat connects; see getRoomAiFolder.
+  async hasRoomAiFolder(roomId: number | string): Promise<boolean> {
+    const folder = await this.getRoomAiFolder(roomId);
+    return folder !== null && folder.hasSkills;
+  }
+
   startTextToDocx(
     folderId: number | string,
     title: string,

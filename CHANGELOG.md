@@ -153,6 +153,16 @@ with the page in front of it. No code changed for either.
 - `components/textarea` said `aria-label` and `aria-labelledby` were "the only two ways" to
   name the field. A `FieldContainer`'s `labelFor` reaches it as well, since its `id` lands on
   the `<textarea>` element
+- **`InputBlock` still defaults `tabIndex` to `-1`**, and its prop table said the opposite: it
+  showed `TextInput`'s description, which stopped being true of `InputBlock` when the default was
+  removed from `TextInput` alone. The table now says `-1`, and so do `SearchInput` and
+  `PasswordInput`, which pass their `tabIndex` through and are out of the tab order unless the
+  caller passes `0`. `SearchInput` also puts one `id` on its wrapper and its input, so a
+  `labelFor` captions the wrapper. Both are recorded on the components' pages; neither is fixed
+- `components/rectangle` and `components/circle` said a CSS variable "never reaches" the
+  skeleton's colours. Passed as `backgroundColor="var(--x)"`, it does — the props become the
+  gradient stops' `stop-color` attribute, where `var()` resolves — so a pair declared under
+  `.light` / `.dark` makes a skeleton follow the theme
 - **The nine default-only components are in the root barrel**, and nine READMEs plus
   `docs/getting-started.md` said they were not. `components/index.ts` re-exports them by name —
   `export { default as Section }` — six of them since before the READMEs were written and the

@@ -96,6 +96,8 @@ import {
 } from "./host-tool-groups/generated-file-window";
 import { addDialogSubmitInterceptor } from "./components-overrides/dialog-footer/submit-interceptors";
 import { useApi as useFilesApi } from "../../providers/api";
+import { ContextRoomProvider, type ContextRoom } from "./context-room";
+import ContextRoomWatcher from "./context-room/ContextRoomWatcher";
 import {
   useAnalyzeQuestions,
   useComposerTyping,
@@ -258,6 +260,14 @@ type AiAgentProvidersProps = {
    * {@link SuggestionSet}. A bare array is treated as `{ default: [...] }`.
    */
   suggestions?: Suggestion[] | SuggestionSet;
+  /**
+   * The room the user is standing in, offered to the chat as context. When
+   * the chat opens, `ContextRoomSync` connects it if it holds a `.ai` folder
+   * and the composer shows it with the folder's skills; `null` (outside a
+   * room, or a room kind that cannot hold the folder) drops any connection.
+   * There is no room picker: the current room is the only candidate.
+   */
+  contextRoom?: ContextRoom | null;
   /**
    * How many attachments the composer accepts in the section the host is
    * showing. Defaults to the widget's own `CHAT_ATTACHMENT_LIMIT`; the Forms
@@ -544,6 +554,7 @@ const AiAgentProviders = ({
   composerHeader,
   composerDisabled,
   suggestions,
+  contextRoom,
   attachmentLimit,
   serverApi,
   children,
@@ -1053,6 +1064,11 @@ const AiAgentProviders = ({
       // the "Upload from device" button) instead of the library's in-memory
       // default, so dropped DOCX/PDF/XLSX are supported too.
       onDropFiles,
+      // The context room is the room the user is in, connected by
+      // ContextRoomSync; the composer's picker lists the other rooms with a
+      // .ai folder. DocSpace is one cloud to the library, so the picker
+      // skips the cloud level and lists the rooms straight away.
+      hideContextClouds: true,
     }),
     [
       composerActions,
@@ -1123,27 +1139,30 @@ const AiAgentProviders = ({
                           />
                           <GenerateToolApprovalBridge />
                           <AiChatStoreProvider store={aiChatStore}>
-                            <AiChatStoresBridge />
-                            {getAgentRoomId ? null : <AgentRoomIdSync />}
-                            {/* The per-section attachment cap covers the
-                                host subtree and the chat's own dialogs
-                                alike — picker, device upload, "Ask AI" row
-                                action, drop zone. */}
-                            <AttachmentLimitContext.Provider
-                              value={attachmentCap}
-                            >
-                              {/* The host subtree attaches files too (the
-                                  "Ask AI" action, the chat-panel drop
-                                  zone): hand it the same reporter the
-                                  dialogs get as a prop, so `canAnalyze`
-                                  survives every entry point. */}
-                              <OnFilesAttachedContext.Provider
-                                value={onFilesAttached}
+                            <ContextRoomProvider room={contextRoom}>
+                              <ContextRoomWatcher />
+                              <AiChatStoresBridge />
+                              {getAgentRoomId ? null : <AgentRoomIdSync />}
+                              {/* The per-section attachment cap covers the
+                                  host subtree and the chat's own dialogs
+                                  alike — picker, device upload, "Ask AI" row
+                                  action, drop zone. */}
+                              <AttachmentLimitContext.Provider
+                                value={attachmentCap}
                               >
-                                {children}
-                              </OnFilesAttachedContext.Provider>
-                              {overlay}
-                            </AttachmentLimitContext.Provider>
+                                {/* The host subtree attaches files too (the
+                                    "Ask AI" action, the chat-panel drop
+                                    zone): hand it the same reporter the
+                                    dialogs get as a prop, so `canAnalyze`
+                                    survives every entry point. */}
+                                <OnFilesAttachedContext.Provider
+                                  value={onFilesAttached}
+                                >
+                                  {children}
+                                </OnFilesAttachedContext.Provider>
+                                {overlay}
+                              </AttachmentLimitContext.Provider>
+                            </ContextRoomProvider>
                           </AiChatStoreProvider>
                         </ToolsProvider>
                       </ImagesProvider>
@@ -1162,6 +1181,7 @@ const AiAgentProviders = ({
 export default AiAgentProviders;
 
 export { useIsAiChatAvailable } from "./availability";
+export { useContextRoom, type ContextRoom } from "./context-room";
 export { useApi, useI18n, useStores } from "@onlyoffice/ai-chat";
 export { DEFAULT_SERVER_API_ROUTES } from "@onlyoffice/ai-chat";
 export type {

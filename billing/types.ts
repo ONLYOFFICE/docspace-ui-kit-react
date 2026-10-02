@@ -77,6 +77,8 @@ export type TDocsConnectPageState = {
 type TAiToolsChatPrice = {
   prompt: number;
   completion: number;
+  promptCacheRead?: number;
+  promptCacheWrite?: number;
 };
 
 type TAiToolsEmbeddingPrice = {
