@@ -1,13 +1,28 @@
 {
   "name": "@onlyoffice/apps-ui-kit",
   "version": "4.0.0",
-  "type": "commonjs",
   "description": "DocSpace UI Component Library",
   "license": "AGPL-3.0-only",
-  "private": false,
-  "engines": {
-    "node": ">=22"
+  "homepage": "https://www.onlyoffice.com",
+  "author": "Ascensio System SIA <integration@onlyoffice.com> (https://www.onlyoffice.com)",
+  "maintainers": [
+    "Ascensio System SIA <integration@onlyoffice.com> (https://www.onlyoffice.com)"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ONLYOFFICE/docspace-ui-kit-react.git"
   },
+  "bugs": {
+    "url": "https://github.com/ONLYOFFICE/docspace-ui-kit-react/issues",
+    "email": "support@onlyoffice.com"
+  },
+  "keywords": [
+    "onlyoffice",
+    "docspace",
+    "react",
+    "components",
+    "ui-kit"
+  ],
   "//sync": "Refresh the vendored assets from a DocSpace client checkout. Run by hand when the upstream strings or icons change, then commit the result -- never wired into build, test or lint, because this package has to work with no DocSpace next to it. Point DOCSPACE_CLIENT_ROOT at the checkout if it is not ../../DocSpace/client. `sync-locales` overwrites every language it finds; only locales/en is committed.",
   "scripts": {
     "sync-locales": "node scripts/copy-locales.js",
@@ -50,6 +65,9 @@
     "readme:catalogue:check": "node scripts/readme-catalogue.mjs --check",
     "surface": "node .claude/scripts/plugin-surface/surface.mjs --write",
     "surface:check": "node .claude/scripts/plugin-surface/surface.mjs --check"
+  },
+  "engines": {
+    "node": ">=22"
   },
   "//peerDependencies": "Only packages this library imports directly. Transitive dependencies of @onlyoffice/ai-chat (the assistant-ui, radix, codemirror, LLM-vendor SDKs and friends) are declared by ai-chat itself as its own peers -- re-declaring them here duplicated a list nothing kept in sync. Everything below is verified imported somewhere under this package root.",
   "peerDependencies": {
@@ -241,16 +259,6 @@
     "vitest": "4.1.11",
     "zustand": "^5.0.15"
   },
-  "keywords": [
-    "react",
-    "components",
-    "ui-kit",
-    "docspace"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ONLYOFFICE/docspace-ui-kit-react.git"
-  },
   "files": [
     "dist",
     "locales",
@@ -296,13 +304,6 @@
       }
     }
   },
-  "bugs": {
-    "url": "https://github.com/ONLYOFFICE/docspace-ui-kit-react/issues",
-    "email": "support@onlyoffice.com"
-  },
-  "homepage": "https://www.onlyoffice.com",
-  "author": "Ascensio System SIA <integration@onlyoffice.com> (https://www.onlyoffice.com)",
-  "maintainers": [
-    "Ascensio System SIA <integration@onlyoffice.com>"
-  ]
+  "private": false,
+  "type": "commonjs"
 }
