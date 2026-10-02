@@ -274,7 +274,7 @@ importers:
         version: 2.4.16
       '@onlyoffice/ai-chat':
         specifier: file:onlyoffice-ai-chat-0.6.11.tgz
-        version: file:onlyoffice-ai-chat-0.6.11.tgz(f467c2c326589592ddafc42124b36002)
+        version: file:onlyoffice-ai-chat-0.6.11.tgz(7a7b4ec48006fe1b5aa7472a03ec4507)
       '@onlyoffice/document-editor-react':
         specifier: 2.1.1
         version: 2.1.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -405,8 +405,8 @@ importers:
         specifier: ^27.4.0
         version: 27.4.0(supports-color@7.2.0)
       katex:
-        specifier: ^0.16.47
-        version: 0.16.47
+        specifier: ^0.17.0
+        version: 0.17.0
       lefthook:
         specifier: ^2.1.10
         version: 2.1.14
@@ -3992,6 +3992,10 @@ packages:
     resolution: {integrity: sha512-Eeo8Ys1doU1z+x8AZsPpQu+p/QcZBI5PeOo7QGQdy2x2m0MU/hYagBbGOmXwr5KVbEfVuWv9LpnQWeehogurjg==}
     hasBin: true
 
+  katex@0.17.0:
+    resolution: {integrity: sha512-Vdw0ATsQ9V+LuegM/BTwQqV/6cTl5lbGcIrU+BCgLxyf6bo38ybOr372tuSIxir3CN720flu1meYR6XzNMwQnw==}
+    hasBin: true
+
   lefthook-darwin-arm64@2.1.14:
     resolution: {integrity: sha512-VMUAqY81+8ph7Mc0iROd3JWqj2sOuK7SYDyd8ZgzYVKChCt+Nnz8ehd4gUwprJy7QI28IFSUh1M3wnIRiYh+fA==}
     cpu: [arm64]
@@ -6862,7 +6866,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.4
     optional: true
 
-  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.6.11.tgz(f467c2c326589592ddafc42124b36002)':
+  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.6.11.tgz(7a7b4ec48006fe1b5aa7472a03ec4507)':
     dependencies:
       '@assistant-ui/react': 0.11.58(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.7.0(react@19.2.8))
       assistant-stream: 0.2.47
@@ -6882,7 +6886,7 @@ snapshots:
       clsx: 2.1.1
       framer-motion: 12.43.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       i18next: 25.10.10(typescript@5.9.3)
-      katex: 0.16.47
+      katex: 0.17.0
       react-i18next: 15.7.4(i18next@25.10.10(typescript@5.9.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3)
       react-svg: 16.4.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       rehype-katex: 7.0.1
@@ -9160,6 +9164,10 @@ snapshots:
   jsonc-parser@3.3.1: {}
 
   katex@0.16.47:
+    dependencies:
+      commander: 8.3.0
+
+  katex@0.17.0:
     dependencies:
       commander: 8.3.0
 
