@@ -42,16 +42,25 @@ if (args.includes("--reuse-storybook") && fs.existsSync(STORYBOOK_INDEX)) {
   run("Storybook", "pnpm", ["storybook-build", "--quiet"]);
 }
 
-// Idempotent: a present browser is a no-op. --with-deps installs the system
+// A browser already on disk -- Playwright's own image, a cached
+// ~/.cache/ms-playwright, a developer's machine -- means no install at all:
+// `playwright install` would still take the registry lock and go to the
+// network to find nothing to do. Otherwise, --with-deps installs the system
 // libraries a bare CI image lacks; it needs root, which a developer's
 // machine does not give it.
-run("Chromium", "pnpm", [
-  "exec",
-  "playwright",
-  "install",
-  ...(process.env.CI ? ["--with-deps"] : []),
-  "chromium",
-]);
+const { chromium } = await import("@playwright/test");
+if (fs.existsSync(chromium.executablePath())) {
+  console.log(`
+== Chromium: using ${chromium.executablePath()}`);
+} else {
+  run("Chromium", "pnpm", [
+    "exec",
+    "playwright",
+    "install",
+    ...(process.env.CI ? ["--with-deps"] : []),
+    "chromium",
+  ]);
+}
 
 run("Pictures", "node", ["scripts/docs/screenshots.mjs"]);
 run("Pages", "node", ["scripts/docs/index.mjs", "--strict"]);

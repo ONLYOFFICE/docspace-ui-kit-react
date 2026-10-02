@@ -71,6 +71,8 @@ const VIEWPORT = { width: 1024, height: 1000 };
 const DOCS_VIEWPORT = { width: 1100, height: 800 };
 /** Transparent margin kept around the painted area. */
 const MARGIN = 8;
+/** How often a run reports where it is, whatever its progress. */
+const HEARTBEAT_MS = 60_000;
 /** The dark-mode addon's store; `current` is what `useDarkMode()` boots from. */
 const DARK_MODE_STORE_KEY = "sb-addon-themes-3";
 /** A story tagged this is the page's primary picture, over the file's first. */
@@ -506,10 +508,29 @@ const failed = [];
 let done = 0;
 const started = Date.now();
 const total = queue.length;
+/** The jobs in flight, so a stalled run says which page it is on. */
+const inFlight = new Set();
+
+const progress = () => {
+  const seconds = Math.round((Date.now() - started) / 1000);
+  const on = [...inFlight]
+    .map((job) => `${job.page.slug} (${job.shot.name})`)
+    .join(", ");
+  return (
+    `${done + failed.length}/${total} after ${seconds}s` +
+    (on ? `, on ${on}` : "")
+  );
+};
+
+console.log(`Taking ${total} picture(s) with ${SHOT_WORKERS} workers...`);
+// A line every minute regardless of progress: on a slow runner the first
+// fifty pictures can take longer than that, and a quiet log reads as a hang.
+const heartbeat = setInterval(() => console.log(progress()), HEARTBEAT_MS);
 
 const worker = async () => {
   while (queue.length > 0) {
     const job = queue.shift();
+    inFlight.add(job);
     fs.mkdirSync(path.dirname(job.files[0]), { recursive: true });
     try {
       // The args table is data, read once; a picture is taken per theme.
@@ -528,14 +549,15 @@ const worker = async () => {
       failed.push(
         `${job.page.source} (${job.shot.name}): ${error.message.split("\n")[0]}`,
       );
+    } finally {
+      inFlight.delete(job);
     }
-    if ((done + failed.length) % 50 === 0) {
-      process.stdout.write(`${done + failed.length}/${total}\n`);
-    }
+    if ((done + failed.length) % 50 === 0) console.log(progress());
   }
 };
 
 await Promise.all(Array.from({ length: SHOT_WORKERS }, worker));
+clearInterval(heartbeat);
 await browser.close();
 served.close();
 

@@ -64,8 +64,23 @@ What the site needs, once:
   ```
 
   then replaces `site/docspace/ui-kit/` with `site-docs/` and commits. `docs:build` builds the
-  Storybook, installs Chromium (with its system libraries when `CI` is set) and takes the
-  pictures before the pages; half an hour on a GitHub runner.
+  Storybook, takes the pictures and writes the pages; half an hour on a GitHub runner, so give
+  the job `timeout-minutes: 90`.
+
+  **Run the job in Playwright's image**, the one matching `@playwright/test` in
+  `package.json`:
+
+  ```yaml
+  container: mcr.microsoft.com/playwright:v1.58.1-noble
+  ```
+
+  Chromium and its system libraries are already in it, and `docs:build` sees the browser on
+  disk and skips the install. Without the image, `docs:build` runs
+  `playwright install --with-deps chromium` itself: an `apt-get` as root, a 170 MB download
+  and its extraction into the runner's filesystem. That is where a Docker-based runner once
+  stalled for the whole hour, with nothing in the log after the download's progress bar. If
+  the image cannot be used, run that install as a step of its own with `timeout-minutes: 10`
+  and `DEBUG: pw:install`, so a stall is bounded and the extraction shows in the log.
 
 A new story, page or group here changes nothing on the site: the sidebar module carries the tree.
 
