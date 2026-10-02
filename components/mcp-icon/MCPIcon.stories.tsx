@@ -1,42 +1,8 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { ComponentProps, CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import LogoUrl from "../../assets/logo/dark_leftmenu.svg?url";
+import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
+import CatalogFolderIconUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 
 import { MCPIcon, MCPIconSize } from ".";
 
@@ -44,55 +10,42 @@ const meta = {
   title: "UI/Data display/MCPIcon",
   component: MCPIcon,
   parameters: {
-    docs: {
-      description: {
-        component: `An icon component for MCP (Model Context Protocol) with configurable size options and image fallback.
-
-### Features
-
-- **Four Sizes**: Small, Medium, Big, and Large
-- **Image Support**: Display a custom image or fall back to the first character of the title
-- **Error Handling**: Gracefully falls back to title initial if image fails to load
-
-### Usage
-
-\`\`\`tsx
-import { MCPIcon, MCPIconSize } from "@docspace/ui-kit/components/mcp-icon";
-
-// With title initial
-<MCPIcon title="DocSpace MCP" size={MCPIconSize.Large} />
-
-// With image
-<MCPIcon title="My Server" size={MCPIconSize.Medium} imgSrc="/path/to/icon.svg" />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     layout: "centered",
   },
   argTypes: {
     title: {
       control: "text",
-      description: "Title text (first character used as fallback icon)",
+      description:
+        "Name of the server. Only its first character is drawn, uppercased, and only while there is no image",
     },
     size: {
       control: "select",
       options: Object.values(MCPIconSize),
-      description: "Size of the icon",
+      description:
+        "One of four squares: 16, 24, 32 or 48px, each with its own font size and corner radius",
       table: {
         defaultValue: { summary: "large" },
       },
     },
     imgSrc: {
       control: "text",
-      description: "Image source URL for the icon",
+      description:
+        "URL of an image drawn instead of the letter; if it fails to load, the letter is shown",
+    },
+    imgNode: {
+      control: false,
+      description:
+        "Image as a node, drawn instead of `imgSrc` when both are set; it never falls back to the letter",
     },
     className: {
       control: "text",
-      description: "Additional CSS class name",
+      description: "Class added to the outer element",
     },
     dataTestId: {
       control: "text",
-      description: "Test ID for testing purposes",
+      description: "Value of `data-testid` on the outer element",
       table: {
         defaultValue: { summary: "mcp-icon" },
       },
@@ -135,92 +88,40 @@ const LabeledItem = (props: { label: string; children: React.ReactNode }) => {
   );
 };
 
-export const CssCustomization: Story = {
-  render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      {/* Group 1 — icon background, text color, border radius */}
-      <div
-        style={
-          {
-            "--mcp-icon-bg": "#0082c9",
-            "--mcp-icon-color": "#ffffff",
-            "--mcp-icon-radius": "50%",
-          } as CSSProperties
-        }
-      >
-        <Wrapper>
-          {(Object.keys(MCPIconSize) as Array<keyof typeof MCPIconSize>).map(
-            (key) => (
-              <LabeledItem key={key} label={key}>
-                <MCPIcon title="D" size={MCPIconSize[key]} />
-              </LabeledItem>
-            ),
-          )}
-        </Wrapper>
-      </div>
-
-      {/* Group 2 — bg opacity override (useful in dark mode where default is 0.1) */}
-      <div
-        style={
-          {
-            "--mcp-icon-bg": "#0082c9",
-            "--mcp-icon-opacity": "0.6",
-            "--mcp-icon-radius": "8px",
-          } as CSSProperties
-        }
-      >
-        <Wrapper>
-          {(Object.keys(MCPIconSize) as Array<keyof typeof MCPIconSize>).map(
-            (key) => (
-              <LabeledItem key={key} label={key}>
-                <MCPIcon title="D" size={MCPIconSize[key]} />
-              </LabeledItem>
-            ),
-          )}
-        </Wrapper>
-      </div>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--mcp-icon-bg\` | Background color of the icon tile | \`#a3a9ae\` |
-| \`--mcp-icon-color\` | Text (initial) color | \`#fff\` |
-| \`--mcp-icon-opacity\` | Background opacity (bridges dark-mode \`--mcp-icon-bg-opacity\`) | \`1\` / \`0.1\` dark |
-| \`--mcp-icon-weight\` | Font weight of the initial | \`700\` |
-| \`--mcp-icon-radius\` | Border radius (applied to all sizes) | size-specific |`,
-      },
-    },
-  },
-};
-
 export const Default: Story = {
   render: (args) => <MCPIcon {...args} />,
   args: {
-    title: "DocSpace MCP",
+    title: "Document search",
     size: MCPIconSize.Large,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A server with no image of its own: the first letter of its name on a grey tile. Change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<MCPIcon title="Document search" size={MCPIconSize.Large} />`,
+      },
+    },
   },
 };
 
 export const WithImage: Story = {
   render: (args) => <MCPIcon {...args} />,
   args: {
-    title: "Any",
+    title: "Document search",
     size: MCPIconSize.Large,
-    imgSrc: LogoUrl,
+    imgSrc: CatalogFolderIconUrl,
   },
   parameters: {
     docs: {
       description: {
         story:
-          "MCP icon displaying a custom image. Falls back to title initial if the image fails to load.",
+          "Use when the server has a logo: the image replaces the letter and fills the whole square (`imgSrc`).",
       },
       source: {
-        code: `<MCPIcon title="My Server" size={MCPIconSize.Large} imgSrc="/path/to/icon.svg" />`,
+        code: `<MCPIcon title="Document search" size={MCPIconSize.Large} imgSrc="/path/to/icon.svg" />`,
       },
     },
   },
@@ -232,7 +133,7 @@ const AllSizesTemplate = () => {
       {(Object.keys(MCPIconSize) as Array<keyof typeof MCPIconSize>).map(
         (key) => (
           <LabeledItem key={key} label={key}>
-            <MCPIcon title="DocSpace" size={MCPIconSize[key]} />
+            <MCPIcon title="Document search" size={MCPIconSize[key]} />
           </LabeledItem>
         ),
       )}
@@ -245,13 +146,14 @@ export const AllSizes: Story = {
   parameters: {
     docs: {
       description: {
-        story: "All available MCP icon sizes: Small, Medium, Big, and Large.",
+        story:
+          "Pick the size that matches the row it sits in: 16px (Small), 24px (Medium), 32px (Big) and 48px (Large), the letter and the corner radius growing with it (`size`).",
       },
       source: {
-        code: `<MCPIcon title="DocSpace" size={MCPIconSize.Small} />
-<MCPIcon title="DocSpace" size={MCPIconSize.Medium} />
-<MCPIcon title="DocSpace" size={MCPIconSize.Big} />
-<MCPIcon title="DocSpace" size={MCPIconSize.Large} />`,
+        code: `<MCPIcon title="Document search" size={MCPIconSize.Small} />
+<MCPIcon title="Document search" size={MCPIconSize.Medium} />
+<MCPIcon title="Document search" size={MCPIconSize.Big} />
+<MCPIcon title="Document search" size={MCPIconSize.Large} />`,
       },
     },
   },
@@ -264,9 +166,9 @@ const AllSizesWithImageTemplate = () => {
         (key) => (
           <LabeledItem key={key} label={key}>
             <MCPIcon
-              title="DocSpace"
+              title="Document search"
               size={MCPIconSize[key]}
-              imgSrc={LogoUrl}
+              imgSrc={CatalogFolderIconUrl}
             />
           </LabeledItem>
         ),
@@ -280,13 +182,103 @@ export const AllSizesWithImage: Story = {
   parameters: {
     docs: {
       description: {
-        story: "All sizes with a custom image instead of the title initial.",
+        story:
+          "The same four sizes with an image: it is scaled to the square, and no tile is drawn behind it (`imgSrc`).",
       },
       source: {
-        code: `<MCPIcon title="DocSpace" size={MCPIconSize.Small} imgSrc={logoUrl} />
-<MCPIcon title="DocSpace" size={MCPIconSize.Medium} imgSrc={logoUrl} />
-<MCPIcon title="DocSpace" size={MCPIconSize.Big} imgSrc={logoUrl} />
-<MCPIcon title="DocSpace" size={MCPIconSize.Large} imgSrc={logoUrl} />`,
+        code: `<MCPIcon title="Document search" size={MCPIconSize.Small} imgSrc={iconUrl} />
+<MCPIcon title="Document search" size={MCPIconSize.Medium} imgSrc={iconUrl} />
+<MCPIcon title="Document search" size={MCPIconSize.Big} imgSrc={iconUrl} />
+<MCPIcon title="Document search" size={MCPIconSize.Large} imgSrc={iconUrl} />`,
+      },
+    },
+  },
+};
+
+export const BrokenImageFallback: Story = {
+  render: (args) => <MCPIcon {...args} />,
+  args: {
+    title: "Document search",
+    size: MCPIconSize.Large,
+    // An unparsable data URL fails to load without a network request.
+    imgSrc: "data:image/png;base64,invalid",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Pass a server's image URL without checking it first: when it fails to load, the letter on its tile takes its place (`imgSrc`).",
+      },
+      source: {
+        code: `<MCPIcon title="Document search" size={MCPIconSize.Large} imgSrc="/missing/icon.svg" />`,
+      },
+    },
+  },
+};
+
+export const WithImageNode: Story = {
+  render: (args) => <MCPIcon {...args} />,
+  args: {
+    title: "Document search",
+    size: MCPIconSize.Large,
+    imgNode: <CatalogFolderIcon />,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use for an icon your bundler has already inlined as a component: the element is drawn in place of the letter, and nothing replaces it if it is empty (`imgNode`).",
+      },
+      source: {
+        code: `import FolderIcon from "./folder.react.svg";
+
+<MCPIcon title="Document search" size={MCPIconSize.Large} imgNode={<FolderIcon />} />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--mcp-icon-bg": "#0082c9",
+          "--mcp-icon-color": "#ffffff",
+          "--mcp-icon-opacity": "0.6",
+          "--mcp-icon-weight": "400",
+          "--mcp-icon-radius": "50%",
+        } as CSSProperties
+      }
+    >
+      <Wrapper>
+        {(Object.keys(MCPIconSize) as Array<keyof typeof MCPIconSize>).map(
+          (key) => (
+            <LabeledItem key={key} label={key}>
+              <MCPIcon title="D" size={MCPIconSize[key]} />
+            </LabeledItem>
+          ),
+        )}
+      </Wrapper>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `The variables are listed under CSS variables on this page. The four sizes share one wrapper that sets all five variables: a round, semi-transparent blue tile with a regular-weight white letter.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--mcp-icon-bg": "#0082c9",
+    "--mcp-icon-color": "#ffffff",
+    "--mcp-icon-opacity": "0.6",
+    "--mcp-icon-weight": "400",
+    "--mcp-icon-radius": "50%",
+  }}
+>
+  <MCPIcon title="D" size={MCPIconSize.Large} />
+</div>`,
       },
     },
   },

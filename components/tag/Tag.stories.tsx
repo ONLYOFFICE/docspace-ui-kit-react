@@ -1,41 +1,9 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
+import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 
 import { Tag } from ".";
 
@@ -43,41 +11,8 @@ const meta = {
   title: "UI/Data display/Tag",
   component: Tag,
   parameters: {
-    docs: {
-      description: {
-        component: `A tag component for displaying categorized labels, filters, or status indicators.
-
-### Features
-
-- **New Tag State**: Visual indicator for newly created tags with a delete button
-- **Disabled State**: Prevents interaction and applies disabled styling
-- **Deleted State**: Strikethrough styling for removed tags
-- **Click Handler**: Callback when the tag body is clicked
-- **Delete Handler**: Callback when the delete button is clicked (new tags only)
-- **Max Width**: Configurable maximum width with text truncation
-- **Icon Support**: Display SVG icons or third-party provider icons
-
-### Accessibility
-
-- \`aria-label\`: Set from the tag label text
-- \`aria-disabled\`: Indicates when the tag is disabled
-
-### Usage
-
-\`\`\`tsx
-import { Tag } from "@docspace/ui-kit/components/tag";
-
-// Basic tag
-<Tag tag="category" label="Design" />
-
-// New tag with delete
-<Tag tag="new" label="New Tag" isNewTag onDelete={(tag) => console.log(tag)} />
-
-// Clickable tag
-<Tag tag="filter" label="React" onClick={({ label }) => console.log(label)} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=62-2597&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -86,15 +21,17 @@ import { Tag } from "@docspace/ui-kit/components/tag";
   argTypes: {
     tag: {
       control: "text",
-      description: "Identifier for the tag type or category",
+      description:
+        "Identifier of the tag: handed to `onDelete`, and shown as the text when `label` is left out",
     },
     label: {
       control: "text",
-      description: "Display text for the tag",
+      description: "Text of the tag, also used as its accessible name",
     },
     isNewTag: {
       control: "boolean",
-      description: "Marks the tag as newly created and shows delete button",
+      description:
+        'Draws the tag in its "new" colours; together with `onDelete` it also shows the delete cross',
       table: {
         defaultValue: { summary: "false" },
       },
@@ -108,7 +45,8 @@ import { Tag } from "@docspace/ui-kit/components/tag";
     },
     isDeleted: {
       control: "boolean",
-      description: "Displays the tag with deleted/strikethrough styling",
+      description:
+        "Marks the tag as removed: the border greys out and `onClick` stops firing",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -117,13 +55,93 @@ import { Tag } from "@docspace/ui-kit/components/tag";
       control: "text",
       description: "Maximum width of the tag (CSS value)",
     },
+    icon: {
+      control: false,
+      description:
+        "Glyph before the label: an SVG URL, or a component rendered as a 12px icon",
+    },
+    iconClassName: {
+      control: "text",
+      description: "Class name applied to the glyph",
+    },
+    withLabel: {
+      control: "boolean",
+      description:
+        "Whether the label is rendered; turn it off for a tag that is only its glyph",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    labelSuffix: {
+      control: "text",
+      description: "Extra text after the label, on the same line",
+    },
+    labelSuffixColor: {
+      control: "color",
+      description: "CSS colour of the label suffix",
+    },
+    isLast: {
+      control: "boolean",
+      description: "Drops the space after the tag, for the last tag in a row",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isDefault: {
+      control: false,
+      description: "Ignored: nothing on a single tag reads it",
+    },
+    roomType: {
+      control: "number",
+      description:
+        "Number passed straight back through `onClick`; the tag itself does nothing with it",
+    },
+    providerType: {
+      control: "number",
+      description:
+        "Number passed straight back through `onClick`; the tag itself does nothing with it",
+    },
+    id: {
+      control: "text",
+      description: "Id of the outermost element",
+    },
+    className: {
+      control: "text",
+      description: "Class name of the outermost element",
+    },
+    style: {
+      control: "object",
+      description:
+        "Inline style of the outermost element; `tagMaxWidth` wins over its `maxWidth`",
+    },
+    dataTestId: {
+      control: "text",
+      description: "`data-testid` of the outermost element",
+      table: {
+        defaultValue: { summary: '"tag_item"' },
+      },
+    },
+    ref: {
+      control: false,
+      description: "Ref to the outermost element",
+    },
     onClick: {
       action: "clicked",
-      description: "Callback when the tag is clicked",
+      description:
+        "Called on a click anywhere in the tag with `{ label, roomType, providerType }`, not with the DOM event; silent while the tag is disabled or deleted",
     },
     onDelete: {
       action: "deleted",
-      description: "Callback when the delete button is clicked",
+      description:
+        "Called with `tag` when the cross is clicked; the cross appears only on a new tag",
+    },
+    onMouseEnter: {
+      action: "mouseEntered",
+      description: "Called when the pointer enters the tag",
+    },
+    onMouseLeave: {
+      action: "mouseLeft",
+      description: "Called when the pointer leaves the tag",
     },
   },
 } satisfies Meta<typeof Tag>;
@@ -154,6 +172,17 @@ export const Default: Story = {
     label: "Script",
     tagMaxWidth: "160px",
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A plain tag with a label, the starting point for every other state; change any prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<Tag tag="script" label="Script" tagMaxWidth="160px" />`,
+      },
+    },
+  },
 };
 
 const StatesTemplate = () => {
@@ -167,49 +196,22 @@ const StatesTemplate = () => {
   );
 };
 
-const NewTagTemplate = () => {
+const NewTagTemplate = ({ onDelete }: ComponentProps<typeof Tag>) => {
   return (
     <Wrapper>
-      <Tag
-        tag="react"
-        label="React"
-        isNewTag
-        onDelete={() => alert("Delete: React")}
-      />
-      <Tag
-        tag="typescript"
-        label="TypeScript"
-        isNewTag
-        onDelete={() => alert("Delete: TypeScript")}
-      />
-      <Tag
-        tag="nodejs"
-        label="Node.js"
-        isNewTag
-        onDelete={() => alert("Delete: Node.js")}
-      />
+      <Tag tag="drafts" label="Drafts" isNewTag onDelete={onDelete} />
+      <Tag tag="review" label="Review" isNewTag onDelete={onDelete} />
+      <Tag tag="archive" label="Archive" isNewTag onDelete={onDelete} />
     </Wrapper>
   );
 };
 
-const ClickableTemplate = () => {
+const ClickableTemplate = ({ onClick }: ComponentProps<typeof Tag>) => {
   return (
     <Wrapper>
-      <Tag
-        tag="design"
-        label="Design"
-        onClick={() => alert("Clicked: Design")}
-      />
-      <Tag
-        tag="development"
-        label="Development"
-        onClick={() => alert("Clicked: Development")}
-      />
-      <Tag
-        tag="marketing"
-        label="Marketing"
-        onClick={() => alert("Clicked: Marketing")}
-      />
+      <Tag tag="design" label="Design" onClick={onClick} />
+      <Tag tag="development" label="Development" onClick={onClick} />
+      <Tag tag="marketing" label="Marketing" onClick={onClick} />
     </Wrapper>
   );
 };
@@ -233,8 +235,12 @@ export const States: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "All tag states: default, new (with delete button), disabled, and deleted.",
+        story: `The four looks a tag can take, side by side, to pick the one that matches an item's status:
+
+- **Default** — a bordered tag on the plain background
+- **New Tag** — a filled tag with a delete cross after the label (\`isNewTag\` with \`onDelete\`)
+- **Disabled** — a dashed border; the tag ignores hover and clicks (\`isDisabled\`)
+- **Deleted** — a greyed-out border; clicks no longer reach \`onClick\` (\`isDeleted\`)`,
       },
       source: {
         code: `<Tag tag="default" label="Default" />
@@ -247,32 +253,34 @@ export const States: Story = {
 };
 
 export const NewTags: Story = {
-  render: () => <NewTagTemplate />,
+  render: (args) => <NewTagTemplate {...args} />,
   parameters: {
     docs: {
       description: {
         story:
-          "Tags marked as newly created with a delete button. Click the X to trigger the onDelete callback.",
+          "Tags the user has just added and can still take back: click a cross to remove its tag, and the Actions panel shows the identifier `onDelete` receives.",
       },
       source: {
-        code: `<Tag tag="react" label="React" isNewTag onDelete={(tag) => console.log(tag)} />
-<Tag tag="typescript" label="TypeScript" isNewTag onDelete={(tag) => console.log(tag)} />`,
+        code: `<Tag tag="drafts" label="Drafts" isNewTag onDelete={(tag) => console.log(tag)} />
+<Tag tag="review" label="Review" isNewTag onDelete={(tag) => console.log(tag)} />
+<Tag tag="archive" label="Archive" isNewTag onDelete={(tag) => console.log(tag)} />`,
       },
     },
   },
 };
 
 export const ClickableTags: Story = {
-  render: () => <ClickableTemplate />,
+  render: (args) => <ClickableTemplate {...args} />,
   parameters: {
     docs: {
       description: {
         story:
-          "Tags with click handlers. Clicking the tag triggers the onClick callback with tag event data.",
+          "Tags that act as filters: hover one to see it highlight, click it, and the Actions panel shows the `{ label }` object `onClick` receives instead of the DOM event.",
       },
       source: {
         code: `<Tag tag="design" label="Design" onClick={({ label }) => console.log(label)} />
-<Tag tag="development" label="Development" onClick={({ label }) => console.log(label)} />`,
+<Tag tag="development" label="Development" onClick={({ label }) => console.log(label)} />
+<Tag tag="marketing" label="Marketing" onClick={({ label }) => console.log(label)} />`,
       },
     },
   },
@@ -295,49 +303,98 @@ export const MaxWidthVariants: Story = {
   },
 };
 
+export const IconOnly: Story = {
+  render: () => (
+    <Wrapper>
+      <Tag
+        tag="url"
+        label="Folder from a URL"
+        icon={CatalogFolderReactSvgUrl}
+        withLabel={false}
+      />
+      <Tag
+        tag="component"
+        label="Folder component"
+        icon={CatalogFolderIcon}
+        withLabel={false}
+      />
+    </Wrapper>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `A compact tag that is only a glyph marks where an item comes from without taking the width of a label; the hidden label still names the tag for screen readers (\`withLabel={false}\`):
+
+- **First tag** — the glyph loaded from an SVG file (\`icon\` as a URL)
+- **Second tag** — the same glyph passed as a React component (\`icon\` as a component)`,
+      },
+      source: {
+        code: `<Tag tag="url" label="Folder from a URL" icon={folderIconUrl} withLabel={false} />
+<Tag tag="component" label="Folder component" icon={FolderIcon} withLabel={false} />`,
+      },
+    },
+  },
+};
+
+export const WithLabelSuffix: Story = {
+  render: (args) => <Tag {...args} />,
+  args: {
+    tag: "reports",
+    label: "Reports",
+    labelSuffix: " (12)",
+    labelSuffixColor: "#A3A9AE",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A count after the label, in a quieter colour, tells the reader how many items the tag covers without a second element (`labelSuffix`, `labelSuffixColor`).",
+      },
+      source: {
+        code: `<Tag tag="reports" label="Reports" labelSuffix=" (12)" labelSuffixColor="#A3A9AE" />`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
     <div
       style={
         {
+          display: "flex",
           "--tag-bg": "#EDE7F6",
           "--tag-border-style": "1px solid #9C27B0",
           "--tag-radius": "16px",
           "--tag-inner-padding": "4px 14px",
-          "--tag-text-color": "#6A1B9A",
-          "--tag-size": "13px",
+          "--tag-height": "30px",
+          "--tag-spacing-end": "16px",
         } as CSSProperties
       }
     >
       <Tag tag="custom" label="Custom Tag" />
+      <Tag tag="second" label="Second Tag" />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-\`\`\`css
---tag-bg            /* background color */
---tag-border-style  /* border shorthand */
---tag-radius        /* border-radius */
---tag-inner-padding /* padding */
---tag-text-color    /* text color */
---tag-size          /* font-size */
-\`\`\``,
+        story: `Six variables set on one wrapper -- the variables are listed under CSS variables on this page. Both tags take every variable from the wrapper; the second is there to show the space \`--tag-spacing-end\` leaves after **Custom Tag**.`,
       },
       source: {
         code: `<div
   style={{
+    display: "flex",
     "--tag-bg": "#EDE7F6",
     "--tag-border-style": "1px solid #9C27B0",
     "--tag-radius": "16px",
     "--tag-inner-padding": "4px 14px",
-    "--tag-text-color": "#6A1B9A",
-    "--tag-size": "13px",
+    "--tag-height": "30px",
+    "--tag-spacing-end": "16px",
   }}
 >
   <Tag tag="custom" label="Custom Tag" />
+  <Tag tag="second" label="Second Tag" />
 </div>`,
       },
     },

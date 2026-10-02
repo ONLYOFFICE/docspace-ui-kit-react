@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { useRef, useState } from "react";
 import { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -44,26 +9,19 @@ import CatalogTrashSvgUrl from "../../assets/icons/16/catalog.trash.react.svg?ur
 import CatalogRoomsSvgUrl from "../../assets/icons/16/catalog.rooms.react.svg?url";
 import CatalogDocumentsSvgUrl from "../../assets/icons/16/catalog.documents.react.svg?url";
 import CatalogAiAgentsSvgUrl from "../../assets/icons/16/catalog.ai-agents.react.svg?url";
-import CatalogPortfolioSvgUrl from "../../assets/icons/16/catalog.portfolio.react.svg?url";
-import CatalogDeveloperSvgUrl from "../../assets/icons/16/catalog.developer.react.svg?url";
-import CatalogSettingsSvgUrl from "../../assets/icons/16/catalog-settings-common.svg?url";
-import PeopleReactSvgUrl from "../../assets/icons/16/people.react.svg?url";
 import VerticalDotsSvgUrl from "../../assets/icons/16/vertical-dots.react.svg?url";
-import PaymentReactSvgUrl from "../../assets/icons/16/catalog-settings-payment.svg?url";
 import { ArticleHideMenuIcon as ArticleHideMenuIconReactSvg } from "./icons";
-import DarkLeftMenuLogo from "../../assets/logo/dark_leftmenu.svg";
 
 import { Avatar, AvatarRole, AvatarSize } from "../avatar";
 import { Badge } from "../badge";
 import { ContextMenu } from "../context-menu";
 import type { ContextMenuRefType } from "../context-menu";
 import { IconButton } from "../icon-button";
+import { RootTooltip } from "../tooltip";
 
 import { NavMenu } from "./NavMenu";
 import { NavMenuGroup, NavMenuLinkData, NavMenuProps } from "./NavMenu.types";
-import styles from "./NavMenu.module.scss";
 import storyStyles from "./NavMenu.stories.module.scss";
-import PortalLogo from "../portal-logo/PortalLogo";
 
 const twoGroupsData: NavMenuGroup[] = [
   {
@@ -128,88 +86,108 @@ const noChildrenData: NavMenuGroup[] = [
     label: "Apps",
     items: [
       { id: "files", label: "Files", icon: CatalogFolderReactSvgUrl },
-      { id: "rooms", label: "Rooms", icon: CatalogRoomsSvgUrl },
-      { id: "agents", label: "Agents", icon: CatalogAiAgentsSvgUrl },
+      { id: "rooms", label: "Rooms", icon: CatalogFolderReactSvgUrl },
+      { id: "agents", label: "Agents", icon: CatalogFolderReactSvgUrl },
     ],
   },
 ];
 
-const fullEnabledAppsData: NavMenuGroup[] = [
+const fullSectionsData: NavMenuGroup[] = [
   {
-    id: "enabled",
-    label: "Enabled Apps",
+    id: "workspace",
+    label: "Workspace",
     items: [
       {
-        id: "ai-files",
-        label: "AI Files",
+        id: "documents",
+        label: "Documents",
         icon: CatalogFolderReactSvgUrl,
         children: [
           {
-            id: "files-shared",
+            id: "documents-shared",
             label: "Shared with me",
-            icon: CatalogSharedSvgUrl,
+            icon: CatalogFolderReactSvgUrl,
           },
           {
-            id: "files-favorites",
+            id: "documents-favorites",
             label: "Favorites",
-            icon: CatalogFavoritesSvgUrl,
+            icon: CatalogFolderReactSvgUrl,
           },
-          { id: "files-recent", label: "Recent", icon: CatalogArchiveSvgUrl },
-          { id: "files-trash", label: "Trash", icon: CatalogTrashSvgUrl },
+          {
+            id: "documents-recent",
+            label: "Recent",
+            icon: CatalogFolderReactSvgUrl,
+          },
+          {
+            id: "documents-trash",
+            label: "Trash",
+            icon: CatalogFolderReactSvgUrl,
+          },
         ],
       },
       {
-        id: "ai-rooms",
-        label: "AI Rooms",
-        icon: CatalogRoomsSvgUrl,
+        id: "rooms",
+        label: "Rooms",
+        icon: CatalogFolderReactSvgUrl,
         children: [
           {
             id: "rooms-favorites",
             label: "Favorites",
-            icon: CatalogFavoritesSvgUrl,
+            icon: CatalogFolderReactSvgUrl,
           },
-          { id: "rooms-recent", label: "Recent", icon: CatalogArchiveSvgUrl },
+          {
+            id: "rooms-recent",
+            label: "Recent",
+            icon: CatalogFolderReactSvgUrl,
+          },
           {
             id: "rooms-templates",
             label: "Templates",
-            icon: CatalogPortfolioSvgUrl,
+            icon: CatalogFolderReactSvgUrl,
           },
           {
             id: "rooms-archive",
             label: "Archive",
-            icon: CatalogDocumentsSvgUrl,
+            icon: CatalogFolderReactSvgUrl,
           },
         ],
       },
       {
-        id: "ai-forms",
-        label: "AI Forms",
-        icon: CatalogDocumentsSvgUrl,
+        id: "forms",
+        label: "Forms",
+        icon: CatalogFolderReactSvgUrl,
         children: [
           {
             id: "forms-in-progress",
-            label: "In Progress",
-            icon: CatalogDeveloperSvgUrl,
+            label: "In progress",
+            icon: CatalogFolderReactSvgUrl,
           },
           {
             id: "forms-complete",
             label: "Complete",
-            icon: CatalogFavoritesSvgUrl,
+            icon: CatalogFolderReactSvgUrl,
           },
         ],
       },
       {
-        id: "ai-agents",
-        label: "AI Agents",
-        icon: CatalogAiAgentsSvgUrl,
+        id: "agents",
+        label: "Agents",
+        icon: CatalogFolderReactSvgUrl,
         children: [
           {
             id: "agents-favorites",
             label: "Favorites",
-            icon: CatalogFavoritesSvgUrl,
+            icon: CatalogFolderReactSvgUrl,
           },
-          { id: "agents-recent", label: "Recent", icon: CatalogArchiveSvgUrl },
-          { id: "agents-trash", label: "Trash", icon: CatalogTrashSvgUrl },
+          {
+            id: "agents-recent",
+            label: "Recent",
+            icon: CatalogFolderReactSvgUrl,
+          },
+          {
+            id: "agents-trash",
+            label: "Trash",
+            icon: CatalogFolderReactSvgUrl,
+          },
         ],
       },
     ],
@@ -237,19 +215,57 @@ const meta = {
   title: "UI/Navigation/NavMenu",
   component: NavMenu,
   parameters: {
-    docs: {
-      description: {
-        component:
-          "Sidebar navigation menu with collapsible groups and sub-items. " +
-          "Clicking an item with children expands it; clicking another collapses the previous one. " +
-          "Supports light/dark themes via CSS custom properties.",
-      },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
+  },
+  argTypes: {
+    groups: {
+      // The icons are data URIs too long to edit, and they stretch the table.
+      control: false,
+      description:
+        "The sections of the menu, in order. Each group has an id, an optional caption and its items; an item may carry an icon, a badge, a link target and a list of sub-items",
+    },
+    activeItemId: {
+      control: "text",
+      description:
+        "Id of the item or sub-item that is currently open. It is highlighted, and the section it belongs to opens",
+    },
+    defaultExpandedId: {
+      control: "text",
+      description:
+        "Id of the section that is open on the first render. After that the menu opens and shuts sections itself",
+    },
+    withAnimation: {
+      control: "boolean",
+      description:
+        "Fills the highlight across an entry from its start to its end when the entry is clicked",
+      table: { defaultValue: { summary: "false" } },
+    },
+    className: {
+      control: "text",
+      description: "Extra class added to the `nav` element",
+    },
+    LinkRouter: {
+      control: false,
+      description:
+        "The host's link component. With it, leaf entries that carry `linkData` render as links; without it every entry is a button and `linkData` is ignored",
+    },
+    iconOnly: {
+      control: "boolean",
+      description:
+        "Collapses the menu to a narrow rail of icons: labels, captions and sub-menus are hidden, each label becomes a tooltip, and the active section's sub-items are listed as entries of their own",
+      table: { defaultValue: { summary: "false" } },
+    },
+    withExpandControl: {
+      control: "boolean",
+      description:
+        "Adds a chevron at the end of every section that opens and shuts it; clicking the item itself then selects it and never shuts it, and several sections can be open at once",
+      table: { defaultValue: { summary: "false" } },
     },
   },
   decorators: [
     (Story) => (
       <div
-        className={styles.storyWrapper}
         style={{
           width: "250px",
           padding: 15,
@@ -270,7 +286,23 @@ type Story = StoryObj<typeof NavMenu>;
 
 export default meta;
 
-export const Default: Story = {};
+export const Default: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The starting point: two captioned groups, the first section open and active. Change the active entry, collapse the menu to a rail or try any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<NavMenu
+  groups={groups}
+  activeItemId="ai-files"
+  defaultExpandedId="ai-files"
+/>`,
+      },
+    },
+  },
+};
 
 export const NoSubItems: Story = {
   args: {
@@ -278,32 +310,73 @@ export const NoSubItems: Story = {
     activeItemId: "files",
     defaultExpandedId: undefined,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a short menu of plain destinations: one group whose items have no sub-menus, so each entry is a single row with its icon and label.",
+      },
+      source: {
+        code: `<NavMenu
+  groups={[
+    {
+      id: "apps",
+      label: "Apps",
+      items: [
+        { id: "files", label: "Files", icon: folderIcon },
+        { id: "rooms", label: "Rooms", icon: folderIcon },
+        { id: "agents", label: "Agents", icon: folderIcon },
+      ],
+    },
+  ]}
+  activeItemId="files"
+/>`,
+      },
+    },
+  },
 };
 
 export const ControlledActive: Story = {
   render: (args) => {
     const [activeId, setActiveId] = useState("ai-files");
 
-    const groupsWithHandlers: NavMenuGroup[] = twoGroupsData.map((group) => ({
-      ...group,
-      items: group.items.map((item) => ({
-        ...item,
-        onClick: () => setActiveId(item.id),
-        children: item.children?.map((sub) => ({
-          ...sub,
-          onClick: () => setActiveId(sub.id),
-        })),
-      })),
-    }));
-
     return (
       <NavMenu
         {...args}
-        groups={groupsWithHandlers}
+        groups={withHandlers(twoGroupsData, setActiveId)}
         activeItemId={activeId}
         defaultExpandedId="ai-files"
       />
     );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "How a host wires selection: every entry's `onClick` stores its id, and the stored id goes back as `activeItemId`. Click the entries — the highlight follows, and clicking a section without a sub-menu shuts the open one.",
+      },
+      source: {
+        code: `const [activeId, setActiveId] = useState("ai-files");
+
+const groupsWithHandlers = groups.map((group) => ({
+  ...group,
+  items: group.items.map((item) => ({
+    ...item,
+    onClick: () => setActiveId(item.id),
+    children: item.children?.map((sub) => ({
+      ...sub,
+      onClick: () => setActiveId(sub.id),
+    })),
+  })),
+}));
+
+<NavMenu
+  groups={groupsWithHandlers}
+  activeItemId={activeId}
+  defaultExpandedId="ai-files"
+/>`,
+      },
+    },
   },
 };
 
@@ -318,6 +391,23 @@ export const DarkTheme: Story = {
       </div>
     ),
   ],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The same menu on a dark surface: inside an element with the `dark` class the captions, labels, icons and highlights switch to the dark palette.",
+      },
+      source: {
+        code: `<div className="dark">
+  <NavMenu
+    groups={groups}
+    activeItemId="ai-files"
+    defaultExpandedId="ai-files"
+  />
+</div>`,
+      },
+    },
+  },
 };
 
 export const WithBadge: Story = {
@@ -369,20 +459,71 @@ export const WithBadge: Story = {
       </div>
     );
   },
+  parameters: {
+    docs: {
+      description: {
+        story: `To draw attention to an entry with new content:
+
+- **Rooms** — the kit's counter badge with the number 5 (\`showBadge\`, \`labelBadge\`)
+- **Agents** — a badge of the host's own in place of the counter (\`badgeComponent\`)
+
+Press the button below the menu to collapse it to a rail: the badges give way to a dot on each icon.`,
+      },
+      source: {
+        code: `<NavMenu
+  groups={[
+    {
+      id: "apps",
+      label: "Apps",
+      items: [
+        { id: "files", label: "Files", icon: folderIcon },
+        { id: "rooms", label: "Rooms", icon: roomsIcon, showBadge: true, labelBadge: 5 },
+        {
+          id: "agents",
+          label: "Agents",
+          icon: agentsIcon,
+          showBadge: true,
+          badgeComponent: <Badge label="new" />,
+        },
+      ],
+    },
+  ]}
+  activeItemId={activeId}
+  iconOnly={iconOnly}
+/>`,
+      },
+    },
+  },
 };
 
-export const FullEnabledApps: Story = {
+export const WithAnimation: Story = {
   render: () => {
-    const [activeId, setActiveId] = useState("files-shared");
+    const [activeId, setActiveId] = useState("documents-shared");
 
     return (
       <NavMenu
-        groups={withHandlers(fullEnabledAppsData, setActiveId)}
+        groups={withHandlers(fullSectionsData, setActiveId)}
         activeItemId={activeId}
-        defaultExpandedId="ai-files"
+        defaultExpandedId="documents"
         withAnimation
       />
     );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "To give a click visible feedback while the next page loads: click any entry and its highlight fills from the start of the row to the end (`withAnimation`). Opening another section also shuts the one that was open.",
+      },
+      source: {
+        code: `<NavMenu
+  groups={groupsWithHandlers}
+  activeItemId={activeId}
+  defaultExpandedId="documents"
+  withAnimation
+/>`,
+      },
+    },
   },
 };
 
@@ -496,15 +637,51 @@ export const WithLinkData: Story = {
       </div>
     );
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For an application with a client-side router: Files, Agents and the two Rooms sub-items render as the router's links to their paths (`LinkRouter`, `linkData`), while Rooms itself stays a button because it opens a sub-menu. Click a link — the path it leads to appears below the menu.",
+      },
+      source: {
+        code: `const RouterLink = ({ to, state, className, onClick, children }) => (
+  <Link to={to} state={state} className={className} onClick={onClick}>
+    {children}
+  </Link>
+);
+
+<NavMenu
+  groups={[
+    {
+      id: "apps",
+      items: [
+        { id: "files", label: "Files", linkData: { path: "/files" } },
+        {
+          id: "rooms",
+          label: "Rooms",
+          children: [
+            { id: "rooms-favorites", label: "Favorites", linkData: { path: "/rooms/favorites" } },
+            { id: "rooms-archive", label: "Archive", linkData: { path: "/rooms/archive" } },
+          ],
+        },
+      ],
+    },
+  ]}
+  activeItemId={activeId}
+  LinkRouter={RouterLink}
+/>`,
+      },
+    },
+  },
 };
 
 const bottomGroups: NavMenuGroup[] = [
   {
     id: "bottom",
     items: [
-      { id: "contacts", label: "Contacts", icon: PeopleReactSvgUrl },
-      { id: "billing", label: "Billing", icon: PaymentReactSvgUrl },
-      { id: "settings", label: "Settings", icon: CatalogSettingsSvgUrl },
+      { id: "contacts", label: "Contacts", icon: CatalogFolderReactSvgUrl },
+      { id: "billing", label: "Billing", icon: CatalogFolderReactSvgUrl },
+      { id: "settings", label: "Settings", icon: CatalogFolderReactSvgUrl },
     ],
   },
 ];
@@ -521,7 +698,7 @@ const SidebarDemo = () => {
   const [iconOnly, setIconOnly] = useState(false);
   const menuRef = useRef<ContextMenuRefType>(null);
 
-  const mainGroups = withHandlers(fullEnabledAppsData, setActiveId);
+  const mainGroups = withHandlers(fullSectionsData, setActiveId);
   const bottomGroupsWithHandlers = withHandlers(bottomGroups, setActiveId);
 
   return (
@@ -532,33 +709,16 @@ const SidebarDemo = () => {
         width: iconOnly ? "60px" : "252px",
         overflow: "hidden",
         height: "100vh",
-        backgroundColor: "var(--nav-menu-story-bg)",
         borderInlineEnd: "1px solid var(--border-color, rgba(0, 0, 0, 0.08))",
         padding: iconOnly ? 0 : "0 16px",
       }}
     >
-      <div
-        style={{
-          height: 24,
-          marginBottom: 15,
-          padding: "0 12px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: iconOnly ? "center" : "flex-start",
-        }}
-      >
-        {iconOnly ? (
-          <DarkLeftMenuLogo width={24} height={24} />
-        ) : (
-          <PortalLogo className={storyStyles.logo} />
-        )}
-      </div>
-
+      <RootTooltip />
       <div style={{ flex: 1, overflowY: "auto" }}>
         <NavMenu
           groups={mainGroups}
           activeItemId={activeId}
-          defaultExpandedId="ai-agents"
+          defaultExpandedId="agents"
           withAnimation
           iconOnly={iconOnly}
         />
@@ -597,7 +757,6 @@ const SidebarDemo = () => {
           justifyContent: iconOnly ? "center" : "flex-start",
           borderBlockStart:
             "1px solid var(--border-color, rgba(0, 0, 0, 0.08))",
-          background: "#F3F4F4",
           height: 48,
           margin: "0 -16px",
           fontSize: "13px",
@@ -607,11 +766,11 @@ const SidebarDemo = () => {
         <Avatar
           size={AvatarSize.min}
           role={AvatarRole.user}
-          userName="Paula Miller"
+          userName="Team member"
           onClick={(e: React.MouseEvent) => menuRef.current?.show(e)}
         />
         {!iconOnly && (
-          <span style={{ flex: 1, fontSize: "14px" }}>Paula Miller</span>
+          <span style={{ flex: 1, fontSize: "14px" }}>Team member</span>
         )}
         {!iconOnly && (
           <IconButton
@@ -635,4 +794,503 @@ export const FullSidebar: Story = {
     ),
   ],
   render: () => <SidebarDemo />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Two menus assembled into a whole sidebar: the sections at the top scroll, a second menu of settings entries sits at the bottom, followed by a collapse button and the signed-in user. Press the collapse button — both menus switch to the rail together (`iconOnly`), and hovering an icon shows its label.",
+      },
+      source: {
+        code: `<aside style={{ display: "flex", flexDirection: "column", width: iconOnly ? 60 : 252 }}>
+  <RootTooltip />
+  <div style={{ flex: 1, overflowY: "auto" }}>
+    <NavMenu groups={mainGroups} activeItemId={activeId} withAnimation iconOnly={iconOnly} />
+  </div>
+  <NavMenu groups={bottomGroups} activeItemId={activeId} withAnimation iconOnly={iconOnly} />
+  <IconButton iconNode={<ArticleHideMenuIcon />} onClick={() => setIconOnly((v) => !v)} />
+</aside>`,
+      },
+    },
+  },
+};
+
+const railGroups: NavMenuGroup[] = [
+  {
+    id: "workspace",
+    label: "Workspace",
+    items: [
+      { id: "overview", label: "Overview", icon: CatalogFolderReactSvgUrl },
+      {
+        id: "documents",
+        label: "Documents",
+        icon: CatalogFolderReactSvgUrl,
+        children: [
+          { id: "recent", label: "Recent", icon: CatalogFolderReactSvgUrl },
+          {
+            id: "favorites",
+            label: "Favorites",
+            icon: CatalogFolderReactSvgUrl,
+          },
+        ],
+      },
+      {
+        id: "rooms",
+        label: "Rooms",
+        icon: CatalogFolderReactSvgUrl,
+        collapsedBadgeComponent: <Badge label={3} />,
+        children: [
+          {
+            id: "rooms-shared",
+            label: "Shared",
+            icon: CatalogFolderReactSvgUrl,
+          },
+        ],
+      },
+    ],
+  },
+];
+
+export const CollapsedRail: Story = {
+  render: () => {
+    const [activeId, setActiveId] = useState("recent");
+
+    return (
+      <div style={{ width: 56 }}>
+        <RootTooltip />
+        <NavMenu
+          groups={withHandlers(railGroups, setActiveId)}
+          activeItemId={activeId}
+          iconOnly
+        />
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `For a sidebar the user has collapsed to save room (\`iconOnly\`):
+
+- **Recent** and **Favorites** — the sub-items of Documents, the active section, listed as entries of their own under it, with a gap after the last one
+- **Rooms** — a shut section with a badge, shown as a dot on its icon
+- Hover any icon to read its label; the tooltip is the kit's shared one, so the app mounts \`RootTooltip\` once, as this story does`,
+      },
+      source: {
+        code: `<RootTooltip />
+<NavMenu groups={groups} activeItemId="recent" iconOnly />`,
+      },
+    },
+  },
+};
+
+const expandControlGroups: NavMenuGroup[] = [
+  {
+    id: "workspace",
+    label: "Workspace",
+    items: [
+      {
+        id: "documents",
+        label: "Documents",
+        icon: CatalogFolderReactSvgUrl,
+        children: [
+          { id: "recent", label: "Recent", icon: CatalogFolderReactSvgUrl },
+          {
+            id: "favorites",
+            label: "Favorites",
+            icon: CatalogFolderReactSvgUrl,
+          },
+        ],
+      },
+      {
+        id: "rooms",
+        label: "Rooms",
+        icon: CatalogFolderReactSvgUrl,
+        children: [
+          {
+            id: "rooms-shared",
+            label: "Shared",
+            icon: CatalogFolderReactSvgUrl,
+          },
+          {
+            id: "rooms-archive",
+            label: "Archive",
+            icon: CatalogFolderReactSvgUrl,
+          },
+        ],
+      },
+    ],
+  },
+];
+
+export const WithExpandControl: Story = {
+  render: () => {
+    const [activeId, setActiveId] = useState("documents");
+
+    return (
+      <NavMenu
+        groups={withHandlers(expandControlGroups, setActiveId)}
+        activeItemId={activeId}
+        withExpandControl
+      />
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a touch layout where a section is itself a page: each section gets a chevron at its end (`withExpandControl`). Press the chevron of Rooms — Rooms opens and Documents stays open next to it; press it again to shut Rooms. Clicking a label selects the entry and never shuts a section.",
+      },
+      source: {
+        code: `<NavMenu
+  groups={groups}
+  activeItemId={activeId}
+  withExpandControl
+/>`,
+      },
+    },
+  },
+};
+
+export const SectionBadges: Story = {
+  render: () => {
+    const [activeId, setActiveId] = useState("overview");
+    const [clickedBadge, setClickedBadge] = useState<string | null>(null);
+
+    const groups: NavMenuGroup[] = [
+      {
+        id: "workspace",
+        label: "Workspace",
+        items: [
+          {
+            id: "overview",
+            label: "Overview",
+            icon: CatalogFolderReactSvgUrl,
+          },
+          {
+            id: "documents",
+            label: "Documents",
+            icon: CatalogFolderReactSvgUrl,
+            collapsedBadgeComponent: <Badge label={12} />,
+            children: [
+              {
+                id: "recent",
+                label: "Recent",
+                icon: CatalogFolderReactSvgUrl,
+                showBadge: true,
+                labelBadge: 9,
+                onClickBadge: setClickedBadge,
+              },
+              {
+                id: "shared",
+                label: "Shared",
+                icon: CatalogFolderReactSvgUrl,
+                showBadge: true,
+                labelBadge: 3,
+                onClickBadge: setClickedBadge,
+              },
+            ],
+          },
+        ],
+      },
+    ];
+
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <NavMenu
+          groups={withHandlers(groups, setActiveId)}
+          activeItemId={activeId}
+        />
+        {clickedBadge && (
+          <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
+            Badge clicked: <code>{clickedBadge}</code>
+          </div>
+        )}
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `For counts that live on sub-items:
+
+- **Documents** — while the section is shut it shows the total, 12, in a badge of its own (\`collapsedBadgeComponent\`); click it to open the section and the total gives way to the counts inside
+- **Recent** and **Shared** — a counter on each sub-item (\`showBadge\`, \`labelBadge\`); click a counter and the sub-item it belongs to is reported below the menu, without selecting it (\`onClickBadge\`)`,
+      },
+      source: {
+        code: `<NavMenu
+  groups={[
+    {
+      id: "workspace",
+      items: [
+        { id: "overview", label: "Overview" },
+        {
+          id: "documents",
+          label: "Documents",
+          collapsedBadgeComponent: <Badge label={12} />,
+          children: [
+            { id: "recent", label: "Recent", showBadge: true, labelBadge: 9, onClickBadge },
+            { id: "shared", label: "Shared", showBadge: true, labelBadge: 3, onClickBadge },
+          ],
+        },
+      ],
+    },
+  ]}
+  activeItemId={activeId}
+/>`,
+      },
+    },
+  },
+};
+
+const separatorGroups: NavMenuGroup[] = [
+  {
+    id: "workspace",
+    items: [
+      {
+        id: "documents",
+        label: "Documents",
+        icon: CatalogFolderReactSvgUrl,
+        children: [
+          { id: "recent", label: "Recent", icon: CatalogFolderReactSvgUrl },
+          {
+            id: "favorites",
+            label: "Favorites",
+            icon: CatalogFolderReactSvgUrl,
+          },
+          {
+            id: "trash",
+            label: "Trash",
+            icon: CatalogFolderReactSvgUrl,
+            withTopSeparator: true,
+          },
+        ],
+      },
+    ],
+  },
+];
+
+export const WithSeparator: Story = {
+  args: {
+    groups: separatorGroups,
+    activeItemId: "recent",
+    defaultExpandedId: "documents",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "To set one sub-item apart from the rest without a second section: Trash sits below a gap (`withTopSeparator`). A line is drawn in that gap only once `--nav-menu-separator-color` gives it a colour — the theme sets none, as the CSS Customization story shows.",
+      },
+      source: {
+        code: `<NavMenu
+  groups={[
+    {
+      id: "workspace",
+      items: [
+        {
+          id: "documents",
+          label: "Documents",
+          children: [
+            { id: "recent", label: "Recent" },
+            { id: "favorites", label: "Favorites" },
+            { id: "trash", label: "Trash", withTopSeparator: true },
+          ],
+        },
+      ],
+    },
+  ]}
+  activeItemId="recent"
+  defaultExpandedId="documents"
+/>`,
+      },
+    },
+  },
+};
+
+export const ClickWithoutExpanding: Story = {
+  render: () => {
+    const [activeId, setActiveId] = useState("overview");
+    const [message, setMessage] = useState<string | null>(null);
+
+    const groups: NavMenuGroup[] = [
+      {
+        id: "workspace",
+        items: [
+          {
+            id: "overview",
+            label: "Overview",
+            icon: CatalogFolderReactSvgUrl,
+            onClick: (item) => setActiveId(item.id),
+          },
+          {
+            id: "invite",
+            label: "Invite people",
+            icon: CatalogFolderReactSvgUrl,
+            onClick: () => {
+              setMessage("A dialog would open here");
+              return false;
+            },
+            children: [
+              {
+                id: "invite-link",
+                label: "Copy link",
+                icon: CatalogFolderReactSvgUrl,
+              },
+            ],
+          },
+        ],
+      },
+    ];
+
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <NavMenu groups={groups} activeItemId={activeId} />
+        {message && (
+          <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
+            {message}
+          </div>
+        )}
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a section whose click opens a dialog rather than a page: click Invite people — its sub-menu stays shut, because its `onClick` returns `false`, and the message below the menu stands in for the dialog.",
+      },
+      source: {
+        code: `{
+  id: "invite",
+  label: "Invite people",
+  onClick: () => {
+    openDialog();
+    return false;
+  },
+  children: [{ id: "invite-link", label: "Copy link" }],
+}`,
+      },
+    },
+  },
+};
+
+const rtlGroups: NavMenuGroup[] = [
+  {
+    id: "workspace",
+    label: "\u0645\u0633\u0627\u062d\u0629 \u0627\u0644\u0639\u0645\u0644",
+    items: [
+      {
+        id: "documents",
+        label: "\u0645\u0644\u0641\u0627\u062a",
+        icon: CatalogFolderReactSvgUrl,
+        children: [
+          {
+            id: "recent",
+            label: "\u0627\u0644\u0623\u062e\u064a\u0631\u0629",
+            icon: CatalogFolderReactSvgUrl,
+            showBadge: true,
+            labelBadge: 4,
+          },
+          {
+            id: "favorites",
+            label: "\u0627\u0644\u0645\u0641\u0636\u0644\u0629",
+            icon: CatalogFolderReactSvgUrl,
+          },
+        ],
+      },
+      {
+        id: "rooms",
+        label: "\u0627\u0644\u063a\u0631\u0641",
+        icon: CatalogFolderReactSvgUrl,
+      },
+    ],
+  },
+];
+
+export const RightToLeft: Story = {
+  globals: { direction: "rtl" },
+  render: () => (
+    <div
+      dir="rtl"
+      style={{ display: "flex", flexDirection: "column", gap: 16 }}
+    >
+      <RootTooltip />
+      <NavMenu
+        groups={rtlGroups}
+        activeItemId="recent"
+        defaultExpandedId="documents"
+      />
+      <div style={{ width: 56 }}>
+        <NavMenu groups={rtlGroups} activeItemId="recent" iconOnly />
+      </div>
+    </div>
+  ),
+  parameters: {
+    noPadding: true,
+    docs: {
+      description: {
+        story:
+          "The menu in a right-to-left interface: icons and captions start at the right edge, sub-items are indented from the right, and the counter sits at the left end of its row. Below it, the collapsed rail keeps its highlight tile centred on the active icon.",
+      },
+      source: {
+        code: `<div dir="rtl">
+  <NavMenu groups={groups} activeItemId="recent" defaultExpandedId="documents" />
+  <NavMenu groups={groups} activeItemId="recent" iconOnly />
+</div>`,
+      },
+      // Framed so the RTL direction it stamps on <html> stays out of the Docs page
+      story: { inline: false, height: "476px" },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <NavMenu
+        className={storyStyles.customNav}
+        groups={separatorGroups.map((group) => ({
+          ...group,
+          label: "Workspace",
+        }))}
+        activeItemId="recent"
+        defaultExpandedId="documents"
+      />
+      <div style={{ width: 56 }}>
+        <NavMenu
+          className={storyStyles.customNav}
+          groups={railGroups}
+          activeItemId="overview"
+          iconOnly
+        />
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `Every overridable variable set through \`className\` -- the variables, and why a wrapper cannot set them, are listed under CSS variables on this page.
+
+- **The open menu** — every variable but the dot: the caption, the labels, the icons, the active highlight and the line above Trash; hover an entry for the hover colour, and press Tab for the focus outline
+- **The rail** — the dot on the Rooms icon (\`--nav-menu-signal-dot-color\`), which only the collapsed form shows`,
+      },
+      source: {
+        code: `/* A rule more specific than the theme's own .light .root */
+.light nav.custom-nav,
+.dark nav.custom-nav {
+  --nav-menu-group-label-color: #7c3aed;
+  --nav-menu-item-text-color: #4c1d95;
+  --nav-menu-item-text-active-color: #ffffff;
+  --nav-menu-item-icon-color: #7c3aed;
+  --nav-menu-item-icon-active-color: #ffffff;
+  --nav-menu-item-bg-hover: #ede9fe;
+  --nav-menu-item-bg-active: #6d28d9;
+  --nav-menu-signal-dot-color: #db2777;
+  --nav-menu-separator-color: #a78bfa;
+}
+
+<NavMenu className="custom-nav" groups={groups} activeItemId="recent" defaultExpandedId="documents" />
+<NavMenu className="custom-nav" groups={groups} activeItemId="overview" iconOnly />`,
+      },
+    },
+  },
 };

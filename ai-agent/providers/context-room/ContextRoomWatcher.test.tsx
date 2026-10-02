@@ -1,29 +1,3 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-
 "use client";
 
 import React from "react";
@@ -36,44 +10,57 @@ type Selected = null | { cloud: string; room: { id: string; name: string } };
 
 // vi.mock factories are hoisted above every import, so the state they close
 // over has to be hoisted with them.
-const { clouds, useCloudsStore, getRoomAiFolder, subscribers, listeners, socket } =
-  vi.hoisted(() => {
-    const clouds = {
-      selectedContextFolder: null as Selected,
-      contextFolders: [] as {
-        cloud: string;
-        rooms: { id: string; name: string }[];
-      }[],
-      roomSkills: [] as { id: string }[],
-      selectContextFolder: vi.fn(),
-      clearContextFolder: vi.fn(),
-      fetchRoomSkills: vi.fn(async () => {}),
-      fetchContextFolders: vi.fn(async () => {}),
-    };
-    const useCloudsStore = Object.assign(
-      (selector: (s: typeof clouds) => unknown) => selector(clouds),
-      { getState: () => clouds },
-    );
-    const getRoomAiFolder = vi.fn();
-    const subscribers = new Set<string>();
-    const listeners = new Set<(opt?: unknown) => void>();
-    const socket = {
-      socketSubscribers: subscribers,
-      emit: vi.fn((command: string, data: { roomParts: string[] }) => {
-        for (const part of data.roomParts) {
-          if (command === "subscribe") subscribers.add(part);
-          else subscribers.delete(part);
-        }
-      }),
-      on: vi.fn((_event: string, cb: (opt?: unknown) => void) => {
-        listeners.add(cb);
-      }),
-      off: vi.fn((_event: string, cb: (opt?: unknown) => void) => {
-        listeners.delete(cb);
-      }),
-    };
-    return { clouds, useCloudsStore, getRoomAiFolder, subscribers, listeners, socket };
-  });
+const {
+  clouds,
+  useCloudsStore,
+  getRoomAiFolder,
+  subscribers,
+  listeners,
+  socket,
+} = vi.hoisted(() => {
+  const clouds = {
+    selectedContextFolder: null as Selected,
+    contextFolders: [] as {
+      cloud: string;
+      rooms: { id: string; name: string }[];
+    }[],
+    roomSkills: [] as { id: string }[],
+    selectContextFolder: vi.fn(),
+    clearContextFolder: vi.fn(),
+    fetchRoomSkills: vi.fn(async () => {}),
+    fetchContextFolders: vi.fn(async () => {}),
+  };
+  const useCloudsStore = Object.assign(
+    (selector: (s: typeof clouds) => unknown) => selector(clouds),
+    { getState: () => clouds },
+  );
+  const getRoomAiFolder = vi.fn();
+  const subscribers = new Set<string>();
+  const listeners = new Set<(opt?: unknown) => void>();
+  const socket = {
+    socketSubscribers: subscribers,
+    emit: vi.fn((command: string, data: { roomParts: string[] }) => {
+      for (const part of data.roomParts) {
+        if (command === "subscribe") subscribers.add(part);
+        else subscribers.delete(part);
+      }
+    }),
+    on: vi.fn((_event: string, cb: (opt?: unknown) => void) => {
+      listeners.add(cb);
+    }),
+    off: vi.fn((_event: string, cb: (opt?: unknown) => void) => {
+      listeners.delete(cb);
+    }),
+  };
+  return {
+    clouds,
+    useCloudsStore,
+    getRoomAiFolder,
+    subscribers,
+    listeners,
+    socket,
+  };
+});
 
 vi.mock("@onlyoffice/ai-chat", () => ({
   useStores: () => ({ useCloudsStore }),
@@ -84,8 +71,7 @@ vi.mock("../../../providers/api", () => ({
 }));
 
 vi.mock("../../../utils/socket", async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import("../../../utils/socket")>();
+  const actual = await importOriginal<typeof import("../../../utils/socket")>();
   return { ...actual, default: socket };
 });
 
@@ -153,9 +139,24 @@ describe("ContextRoomWatcher", () => {
       renderWatcher(sales);
       await flush();
 
-      emitEvent({ cmd: "create", type: "file", id: 1, data: { folderId: 500, title: "a.md" } });
-      emitEvent({ cmd: "update", type: "file", id: 1, data: { folderId: 500, title: "a.md" } });
-      emitEvent({ cmd: "delete", type: "file", id: 2, data: { folderId: 500 } });
+      emitEvent({
+        cmd: "create",
+        type: "file",
+        id: 1,
+        data: { folderId: 500, title: "a.md" },
+      });
+      emitEvent({
+        cmd: "update",
+        type: "file",
+        id: 1,
+        data: { folderId: 500, title: "a.md" },
+      });
+      emitEvent({
+        cmd: "delete",
+        type: "file",
+        id: 2,
+        data: { folderId: 500 },
+      });
       expect(clouds.fetchRoomSkills).not.toHaveBeenCalled();
       await act(async () => {
         vi.advanceTimersByTime(300);
@@ -173,7 +174,12 @@ describe("ContextRoomWatcher", () => {
       clouds.fetchRoomSkills.mockImplementationOnce(async () => {
         clouds.roomSkills = [];
       });
-      emitEvent({ cmd: "delete", type: "file", id: 1, data: { folderId: 500 } });
+      emitEvent({
+        cmd: "delete",
+        type: "file",
+        id: 1,
+        data: { folderId: 500 },
+      });
       await act(async () => {
         vi.advanceTimersByTime(300);
       });
@@ -184,7 +190,12 @@ describe("ContextRoomWatcher", () => {
       renderWatcher(sales);
       await flush();
 
-      emitEvent({ cmd: "create", type: "file", id: 3, data: { folderId: 12, title: "plan.docx" } });
+      emitEvent({
+        cmd: "create",
+        type: "file",
+        id: 3,
+        data: { folderId: 12, title: "plan.docx" },
+      });
       act(() => {
         vi.advanceTimersByTime(300);
       });
@@ -203,7 +214,12 @@ describe("ContextRoomWatcher", () => {
       renderWatcher(sales);
       await flush();
 
-      emitEvent({ cmd: "update", type: "folder", id: 500, data: { id: 500, title: "old-ai", parentId: 12, type: 0 } });
+      emitEvent({
+        cmd: "update",
+        type: "folder",
+        id: 500,
+        data: { id: 500, title: "old-ai", parentId: 12, type: 0 },
+      });
       expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
     });
 
@@ -211,7 +227,12 @@ describe("ContextRoomWatcher", () => {
       renderWatcher(sales);
       await flush();
 
-      emitEvent({ cmd: "update", type: "folder", id: 500, data: { id: 500, title: ".ai", parentId: 12, type: 37 } });
+      emitEvent({
+        cmd: "update",
+        type: "folder",
+        id: 500,
+        data: { id: 500, title: ".ai", parentId: 12, type: 37 },
+      });
       expect(clouds.clearContextFolder).not.toHaveBeenCalled();
     });
 
@@ -219,11 +240,19 @@ describe("ContextRoomWatcher", () => {
       renderWatcher(sales);
       await flush();
 
-      emitEvent({ cmd: "update", type: "folder", id: 12, data: { id: 12, title: "Sales EMEA" } });
-      expect(clouds.selectContextFolder).toHaveBeenCalledWith(CONTEXT_ROOM_CLOUD, {
-        id: "12",
-        name: "Sales EMEA",
+      emitEvent({
+        cmd: "update",
+        type: "folder",
+        id: 12,
+        data: { id: 12, title: "Sales EMEA" },
       });
+      expect(clouds.selectContextFolder).toHaveBeenCalledWith(
+        CONTEXT_ROOM_CLOUD,
+        {
+          id: "12",
+          name: "Sales EMEA",
+        },
+      );
     });
 
     it("disconnects when the room is removed or leaves the user", async () => {
@@ -266,7 +295,9 @@ describe("ContextRoomWatcher", () => {
     );
 
     it("keeps the connection when the .ai folder lookup fails", async () => {
-      getRoomAiFolder.mockRejectedValue(Object.assign(new Error("503"), { status: 503 }));
+      getRoomAiFolder.mockRejectedValue(
+        Object.assign(new Error("503"), { status: 503 }),
+      );
       renderWatcher(sales);
       await flush();
 
@@ -314,11 +345,24 @@ describe("ContextRoomWatcher", () => {
       renderWatcher(sales);
       await flush();
 
-      emitEvent({ cmd: "create", type: "file", id: 1, data: { folderId: 500, title: "notes.txt", fileExst: ".txt" } });
+      emitEvent({
+        cmd: "create",
+        type: "file",
+        id: 1,
+        data: { folderId: 500, title: "notes.txt", fileExst: ".txt" },
+      });
       expect(clouds.selectContextFolder).not.toHaveBeenCalled();
 
-      emitEvent({ cmd: "create", type: "file", id: 2, data: { folderId: 500, title: "pdf.md", fileExst: ".md" } });
-      expect(clouds.selectContextFolder).toHaveBeenCalledWith(CONTEXT_ROOM_CLOUD, sales);
+      emitEvent({
+        cmd: "create",
+        type: "file",
+        id: 2,
+        data: { folderId: 500, title: "pdf.md", fileExst: ".md" },
+      });
+      expect(clouds.selectContextFolder).toHaveBeenCalledWith(
+        CONTEXT_ROOM_CLOUD,
+        sales,
+      );
       // The picker gains the room: its list is re-read, debounced.
       await act(async () => {
         vi.advanceTimersByTime(300);
@@ -331,15 +375,28 @@ describe("ContextRoomWatcher", () => {
       renderWatcher(sales);
       await flush();
 
-      emitEvent({ cmd: "create", type: "folder", id: 501, data: { id: 501, title: ".ai", parentId: 12 } });
+      emitEvent({
+        cmd: "create",
+        type: "folder",
+        id: 501,
+        data: { id: 501, title: ".ai", parentId: 12 },
+      });
       expect(clouds.selectContextFolder).not.toHaveBeenCalled();
       expect(socket.emit).toHaveBeenLastCalledWith("subscribe", {
         roomParts: ["DIR-501"],
         individual: true,
       });
 
-      emitEvent({ cmd: "create", type: "file", id: 3, data: { folderId: 501, title: "skill.md" } });
-      expect(clouds.selectContextFolder).toHaveBeenCalledWith(CONTEXT_ROOM_CLOUD, sales);
+      emitEvent({
+        cmd: "create",
+        type: "file",
+        id: 3,
+        data: { folderId: 501, title: "skill.md" },
+      });
+      expect(clouds.selectContextFolder).toHaveBeenCalledWith(
+        CONTEXT_ROOM_CLOUD,
+        sales,
+      );
     });
   });
 
@@ -355,7 +412,12 @@ describe("ContextRoomWatcher", () => {
     await flush();
 
     expect(getRoomAiFolder).not.toHaveBeenCalledWith("12");
-    emitEvent({ cmd: "create", type: "file", id: 4, data: { folderId: 500, title: "skill.md" } });
+    emitEvent({
+      cmd: "create",
+      type: "file",
+      id: 4,
+      data: { folderId: 500, title: "skill.md" },
+    });
     expect(clouds.selectContextFolder).not.toHaveBeenCalled();
     expect(clouds.clearContextFolder).not.toHaveBeenCalled();
   });
@@ -370,7 +432,12 @@ describe("ContextRoomWatcher", () => {
       roomParts: ["DIR-12"],
       individual: true,
     });
-    emitEvent({ cmd: "create", type: "file", id: 5, data: { folderId: 500, title: "more.md" } });
+    emitEvent({
+      cmd: "create",
+      type: "file",
+      id: 5,
+      data: { folderId: 500, title: "more.md" },
+    });
     expect(clouds.selectContextFolder).not.toHaveBeenCalled();
   });
 
@@ -379,7 +446,12 @@ describe("ContextRoomWatcher", () => {
     renderWatcher(sales);
     await flush();
 
-    emitEvent({ cmd: "create", type: "folder", id: 502, data: { id: 502, title: "Reports", parentId: 12 } });
+    emitEvent({
+      cmd: "create",
+      type: "folder",
+      id: 502,
+      data: { id: 502, title: "Reports", parentId: 12 },
+    });
     expect(clouds.selectContextFolder).not.toHaveBeenCalled();
   });
 
@@ -419,7 +491,12 @@ describe("ContextRoomWatcher", () => {
       renderWatcher(null);
       await flush();
 
-      emitEvent({ cmd: "update", type: "folder", id: 77, data: { id: 77, title: "Legal EMEA" } });
+      emitEvent({
+        cmd: "update",
+        type: "folder",
+        id: 77,
+        data: { id: 77, title: "Legal EMEA" },
+      });
       emitEvent({ cmd: "delete", type: "folder", id: 78 });
       expect(clouds.fetchContextFolders).not.toHaveBeenCalled();
       await tick();
@@ -433,7 +510,12 @@ describe("ContextRoomWatcher", () => {
 
       emitEvent({ cmd: "delete", type: "folder", id: 770 });
       await tick();
-      emitEvent({ cmd: "delete", type: "file", id: 5, data: { folderId: 780, title: "skill.md" } });
+      emitEvent({
+        cmd: "delete",
+        type: "file",
+        id: 5,
+        data: { folderId: 780, title: "skill.md" },
+      });
       await tick();
       expect(clouds.fetchContextFolders).toHaveBeenCalledTimes(2);
     });
@@ -443,8 +525,18 @@ describe("ContextRoomWatcher", () => {
       await flush();
 
       emitEvent({ cmd: "delete", type: "folder", id: 99 });
-      emitEvent({ cmd: "create", type: "file", id: 6, data: { folderId: 990, title: "x.md" } });
-      emitEvent({ cmd: "create", type: "folder", id: 991, data: { id: 991, title: "Reports", parentId: 77 } });
+      emitEvent({
+        cmd: "create",
+        type: "file",
+        id: 6,
+        data: { folderId: 990, title: "x.md" },
+      });
+      emitEvent({
+        cmd: "create",
+        type: "folder",
+        id: 991,
+        data: { id: 991, title: "Reports", parentId: 77 },
+      });
       await tick();
       expect(clouds.fetchContextFolders).not.toHaveBeenCalled();
     });

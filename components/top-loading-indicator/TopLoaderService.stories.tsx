@@ -1,157 +1,19 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { useEffect } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { TopLoaderService } from "./index";
 
 const meta = {
-  title: "UI/Layout components/TopLoader",
+  title: "UI/Feedback/TopLoader",
   parameters: {
-    docs: {
-      description: {
-        component: `A lightweight top-of-page progress bar service for indicating page loading state. Uses direct DOM manipulation for performance.
-
-### Features
-
-- **Smooth Animation**: Linear progress to 50% in the first second, then 10% increments capped at 90%
-- **Completion Animation**: Smoothly animates from current position to 100% when \`end()\` is called
-- **Cancel Support**: Immediately resets the bar to 0% via \`cancel()\`
-- **No React Dependency**: Pure DOM manipulation service, works anywhere
-
-### Accessibility
-
-- \`role="progressbar"\` with \`aria-valuemin\`, \`aria-valuemax\`, \`aria-valuenow\`
-
-### Usage
-
-\`\`\`tsx
-import { TopLoaderService } from "@docspace/ui-kit/components/top-loading-indicator";
-
-// Prerequisite: add <div id="ipl-progress-indicator" /> to your HTML
-
-// Start loading
-TopLoaderService.start();
-
-// Complete loading
-TopLoaderService.end();
-
-// Cancel loading
-TopLoaderService.cancel();
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
 } satisfies Meta;
 
 type Story = StoryObj;
 
 export default meta;
-
-// Helper that mounts a styled #ipl-progress-indicator and cleans up on unmount
-const useProgressBar = (styles: Partial<CSSStyleDeclaration>) => {
-  useEffect(() => {
-    const bar = document.createElement("div");
-    bar.id = "ipl-progress-indicator";
-    Object.assign(bar.style, styles);
-    document.body.appendChild(bar);
-    return () => {
-      if (document.body.contains(bar)) document.body.removeChild(bar);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-};
-
-// ─── CSS Customization ───────────────────────────────────────────────────────
-
-const CssCustomizationTemplate = () => {
-  // Progress bar 1 — Nextcloud blue, 4 px height, glow shadow (65% progress)
-  useProgressBar({
-    position: "fixed",
-    top: "0",
-    left: "0",
-    width: "65%",
-    height: "4px",
-    backgroundColor: "#0082c9",
-    borderRadius: "0 2px 2px 0",
-    boxShadow: "0 0 8px rgba(0, 130, 201, 0.5)",
-    zIndex: "9999",
-    transition: "width 0.2s ease-in-out",
-  });
-
-  return (
-    <div style={{ padding: "40px 20px" }}>
-      <p style={{ margin: 0, fontSize: "13px", color: "#555" }}>
-        Progress bar at 65% — styled via inline CSS on{" "}
-        <code>#ipl-progress-indicator</code>
-      </p>
-      <p style={{ marginTop: "8px", fontSize: "12px", color: "#888" }}>
-        Customizable properties: <strong>height</strong>,{" "}
-        <strong>backgroundColor</strong>, <strong>borderRadius</strong>,{" "}
-        <strong>boxShadow</strong>, <strong>transition</strong>,{" "}
-        <strong>zIndex</strong>
-      </p>
-    </div>
-  );
-};
-
-export const CssCustomization: Story = {
-  render: () => <CssCustomizationTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story: `\`TopLoaderService\` uses direct DOM manipulation on \`#ipl-progress-indicator\`.
-Style the element freely via CSS — the service only sets \`width\` and ARIA attributes at runtime.
-
-**Recommended inline style properties:**
-
-| Property | Description | Example |
-|----------|-------------|---------|
-| \`height\` | Bar thickness | \`4px\` (default \`2px\`) |
-| \`backgroundColor\` | Bar fill color | \`#0082c9\` |
-| \`borderRadius\` | Right-edge rounding | \`0 2px 2px 0\` |
-| \`boxShadow\` | Glow / elevation | \`0 0 8px rgba(0,130,201,0.5)\` |
-| \`transition\` | Smooth width animation | \`width 0.2s ease-in-out\` |
-| \`zIndex\` | Stacking order | \`9999\` |`,
-      },
-    },
-  },
-};
-
-// ─── Default ─────────────────────────────────────────────────────────────────
 
 const DefaultTemplate = () => {
   useEffect(() => {
@@ -194,7 +56,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Interactive demo with Start, End, and Cancel buttons. A thin blue progress bar appears at the top of the viewport.",
+          "Press **Start Loading** and a thin bar grows along the top of the viewport and stops at 90%; **End Loading** runs it to the full width and clears it, **Cancel** clears it at once (\`start\`, \`end\`, \`cancel\`). Use it to see how long a wait looks before the work finishes.",
       },
       source: {
         code: `// Add to HTML: <div id="ipl-progress-indicator" />
@@ -207,6 +69,80 @@ TopLoaderService.end();
 
 // Cancel loading
 TopLoaderService.cancel();`,
+      },
+    },
+  },
+};
+
+// A different id from the service's, so the Docs page does not drive this bar from Default.
+const useProgressBar = (styles: Partial<CSSStyleDeclaration>) => {
+  useEffect(() => {
+    const bar = document.createElement("div");
+    bar.id = "top-loader-css-customization-demo";
+    Object.assign(bar.style, styles);
+    document.body.appendChild(bar);
+    return () => {
+      if (document.body.contains(bar)) document.body.removeChild(bar);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+};
+
+const CssCustomizationTemplate = () => {
+  useProgressBar({
+    position: "fixed",
+    top: "0",
+    left: "0",
+    width: "65%",
+    height: "4px",
+    backgroundColor: "#0082c9",
+    borderRadius: "0 2px 2px 0",
+    boxShadow: "0 0 8px rgba(0, 130, 201, 0.5)",
+    zIndex: "9999",
+    transition: "width 0.2s ease-in-out",
+  });
+
+  return (
+    <div style={{ padding: "40px 20px" }}>
+      <p style={{ margin: 0, fontSize: "13px", color: "#555" }}>
+        Progress bar at 65% — a static visual demo of the styles you would apply
+        to <code>#ipl-progress-indicator</code> (rendered here under a different
+        id so it doesn't collide with the live bar in the Default story)
+      </p>
+      <p style={{ marginTop: "8px", fontSize: "12px", color: "#888" }}>
+        Customizable properties: <strong>height</strong>,{" "}
+        <strong>backgroundColor</strong>, <strong>borderRadius</strong>,{" "}
+        <strong>boxShadow</strong>, <strong>transition</strong>,{" "}
+        <strong>zIndex</strong>
+      </p>
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `\`TopLoaderService\` defines no CSS custom properties -- the element's own style does all of it, as the recipe "The element, and its style" on this page describes.
+This story renders a static demo bar under a different id, purely for visual reference -- it is not driven by \`TopLoaderService\`.`,
+      },
+      source: {
+        code: `<div
+  id="ipl-progress-indicator"
+  style={{
+    position: "fixed",
+    top: 0,
+    insetInlineStart: 0,
+    width: 0,
+    height: 4,
+    backgroundColor: "#0082c9",
+    borderRadius: "0 2px 2px 0",
+    boxShadow: "0 0 8px rgba(0, 130, 201, 0.5)",
+    transition: "width 0.2s ease-in-out",
+    zIndex: 9999,
+  }}
+/>`,
       },
     },
   },

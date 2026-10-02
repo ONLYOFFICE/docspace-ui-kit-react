@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { makeAutoObservable, runInAction } from "mobx";
 import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 import type {
@@ -49,11 +14,7 @@ import type {
 } from "@onlyoffice/docspace-api-sdk";
 
 export type TransactionSourceType =
-  | "Agent"
-  | "File"
-  | "Folder"
-  | "Room"
-  | "Form";
+  "Agent" | "File" | "Folder" | "Room" | "Form";
 
 export type OperationTokenUsage = {
   totalTokens: number;
@@ -719,8 +680,10 @@ class PaymentStore {
         { signal: abortController.signal },
       );
 
-      this.upcomingPaymentsData =
-        (data?.response as TUpcomingPaymentResponse[]) ?? [];
+      runInAction(() => {
+        this.upcomingPaymentsData =
+          (data?.response as TUpcomingPaymentResponse[]) ?? [];
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -737,7 +700,9 @@ class PaymentStore {
         { signal: abortController.signal },
       );
 
-      this.activeServices = (data?.response as TActiveService[]) ?? [];
+      runInAction(() => {
+        this.activeServices = (data?.response as TActiveService[]) ?? [];
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -853,7 +818,9 @@ class PaymentStore {
 
       if (!res?.data?.response) return;
 
-      this.balance = res.data.response as unknown as TBalance;
+      runInAction(() => {
+        this.balance = res.data.response as unknown as TBalance;
+      });
     } catch (e: unknown) {
       if (e instanceof Error && e.name === "CanceledError") return;
       throw e;
@@ -890,7 +857,10 @@ class PaymentStore {
         },
       );
 
-      this.serviceUsage = (data?.response?.collection ?? []) as TServiceUsage[];
+      runInAction(() => {
+        this.serviceUsage = (data?.response?.collection ??
+          []) as TServiceUsage[];
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -998,19 +968,25 @@ class PaymentStore {
       const data = res.data.response as unknown as {
         collection: WalletOperationDto[];
       };
-      this.transactionHistory = data.collection;
-      this.isTransactionHistoryExist = data.collection.length > 0;
+      runInAction(() => {
+        this.transactionHistory = data.collection;
+        this.isTransactionHistoryExist = data.collection.length > 0;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       toastr.error(error as Error);
-      this.isTransactionLoading = true;
+      runInAction(() => {
+        this.isTransactionLoading = true;
+      });
     } finally {
-      if (this._transactionTimerId) {
-        clearTimeout(this._transactionTimerId);
-        this._transactionTimerId = null;
-      }
+      runInAction(() => {
+        if (this._transactionTimerId) {
+          clearTimeout(this._transactionTimerId);
+          this._transactionTimerId = null;
+        }
 
-      this.isTransactionLoading = false;
+        this.isTransactionLoading = false;
+      });
     }
   };
 
@@ -1029,13 +1005,15 @@ class PaymentStore {
         ?.response;
 
       if (!data) return;
-      this.autoPayments = data;
-      this.isAutomaticPaymentsEnabled = data.enabled ?? false;
+      runInAction(() => {
+        this.autoPayments = data;
+        this.isAutomaticPaymentsEnabled = data.enabled ?? false;
 
-      if (data.enabled) {
-        this.setMinBalance((data.minBalance ?? 0).toString());
-        this.setUpToBalance((data.upToBalance ?? 0).toString());
-      }
+        if (data.enabled) {
+          this.setMinBalance((data.minBalance ?? 0).toString());
+          this.setUpToBalance((data.upToBalance ?? 0).toString());
+        }
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -1059,13 +1037,8 @@ class PaymentStore {
       );
     try {
       const res = await this.paymentApi.getCheckoutSetupUrl(
-        { backUrl },
-        {
-          signal: abortController.signal,
-          // TEMP: SDK schema lacks `successUrl`; passing it via axios `params`
-          // until the SDK is regenerated to include it in the request type.
-          params: { successUrl: resolvedSuccessUrl },
-        },
+        { backUrl, successUrl: resolvedSuccessUrl },
+        { signal: abortController.signal },
       );
 
       if (!res?.data?.response) return "";
@@ -1075,7 +1048,10 @@ class PaymentStore {
       // The top-up flow passes persist=false so its checkout URL (built with a
       // top-up successUrl) is only returned, not written to the shared
       // this.cardLinked that UnlinkedCardBanner and other consumers rely on.
-      if (persist) this.cardLinked = linkUrl;
+      if (persist)
+        runInAction(() => {
+          this.cardLinked = linkUrl;
+        });
 
       return linkUrl;
     } catch (error: unknown) {
@@ -1101,11 +1077,14 @@ class PaymentStore {
 
       const data = res?.data as unknown as { response?: TenantWalletSettings };
 
-      if (!data?.response) {
+      const settings = data?.response;
+      if (!settings) {
         throw new Error();
       }
 
-      this.autoPayments = data.response;
+      runInAction(() => {
+        this.autoPayments = settings;
+      });
     } catch (error) {
       toastr.error(error as string);
     }
@@ -1132,9 +1111,11 @@ class PaymentStore {
       };
     });
 
-    this.servicesQuotasFeatures = new Map(
-      quotas.map((feature) => [feature.id ?? "", feature]),
-    ) as Map<string, TenantQuotaFeatureDto | TServiceFeatureWithPrice>;
+    runInAction(() => {
+      this.servicesQuotasFeatures = new Map(
+        quotas.map((feature) => [feature.id ?? "", feature]),
+      ) as Map<string, TenantQuotaFeatureDto | TServiceFeatureWithPrice>;
+    });
 
     return services;
   };
@@ -1178,7 +1159,9 @@ class PaymentStore {
 
       const link = res.data.response as unknown as string;
       if (link.indexOf("error") === -1) {
-        this.accountLink = link;
+        runInAction(() => {
+          this.accountLink = link;
+        });
       } else {
         console.error(link);
       }
@@ -1452,7 +1435,9 @@ class PaymentStore {
     const requests: Promise<unknown>[] = [];
     try {
       await Promise.all([this.initWalletPayerAndBalance(isRefresh)]);
-      this.previousBalance = this.balance;
+      runInAction(() => {
+        this.previousBalance = this.balance;
+      });
 
       if (this.isCardLinkedToPortal) {
         if (this.isStripePortalAvailable) {
@@ -1562,18 +1547,20 @@ class PaymentStore {
         max,
       } = newSettings;
 
-      this.buyUrl = buyUrl ?? "";
-      this.salesEmail = salesEmail ?? "";
-      this.standaloneMode = standaloneMode;
-      this.maxAvailableManagersCount = max;
+      runInAction(() => {
+        this.buyUrl = buyUrl ?? "";
+        this.salesEmail = salesEmail ?? "";
+        this.standaloneMode = standaloneMode;
+        this.maxAvailableManagersCount = max;
 
-      if (currentLicense) {
-        if (currentLicense.dueDate)
-          this.currentLicense.expiresDate = new Date(currentLicense.dueDate);
+        if (currentLicense) {
+          if (currentLicense.dueDate)
+            this.currentLicense.expiresDate = new Date(currentLicense.dueDate);
 
-        if (currentLicense.trial)
-          this.currentLicense.trialMode = currentLicense.trial;
-      }
+          if (currentLicense.trial)
+            this.currentLicense.trialMode = currentLicense.trial;
+        }
+      });
     } catch (e: unknown) {
       if (e instanceof Error && e.name === "CanceledError") return;
       console.error(e);
@@ -1771,9 +1758,11 @@ class PaymentStore {
         isOwner: boolean;
       };
 
-      this._currentUserEmail = user.email ?? "";
-      this.userId = user.id ?? "";
-      this.isOwner = user.isOwner ?? false;
+      runInAction(() => {
+        this._currentUserEmail = user.email ?? "";
+        this.userId = user.id ?? "";
+        this.isOwner = user.isOwner ?? false;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -1802,4 +1791,3 @@ class PaymentStore {
 }
 
 export default PaymentStore;
-

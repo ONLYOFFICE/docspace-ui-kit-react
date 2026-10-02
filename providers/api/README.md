@@ -4,27 +4,27 @@ Provides API client instances (`profilesApi`, `commonSettingsApi`) to the compon
 
 ## Props
 
-| Prop       | Type              | Required | Description                          |
-| ---------- | ----------------- | -------- | ------------------------------------ |
-| `url`      | `string`          | Yes      | Base URL of the DocSpace API         |
-| `apiKey`   | `string`          | Yes      | API key for authentication           |
+| Prop       | Type              | Required | Description                           |
+| ---------- | ----------------- | -------- | ------------------------------------- |
+| `url`      | `string`          | Yes      | Base URL of the DocSpace API          |
+| `apiKey`   | `string`          | Yes      | API key for authentication            |
 | `children` | `React.ReactNode` | Yes      | Child components that consume the API |
 
 ## `useApi()` Hook
 
 Returns an object with:
 
-| Property             | Type                | Description                     |
-| -------------------- | ------------------- | ------------------------------- |
-| `profilesApi`        | `ProfilesApi`       | API client for user profiles    |
-| `commonSettingsApi`  | `CommonSettingsApi` | API client for common settings  |
+| Property            | Type                | Description                    |
+| ------------------- | ------------------- | ------------------------------ |
+| `profilesApi`       | `ProfilesApi`       | API client for user profiles   |
+| `commonSettingsApi` | `CommonSettingsApi` | API client for common settings |
 
 Throws an error if used outside of `ApiProvider`.
 
 ## Usage
 
 ```tsx
-import { ApiProvider, useApi } from "@docspace/ui-kit/providers/api";
+import { ApiProvider, useApi } from "@onlyoffice/apps-ui-kit/providers/api";
 
 function App() {
   return (

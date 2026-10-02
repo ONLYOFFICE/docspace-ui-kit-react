@@ -1,73 +1,38 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { RefObject } from "react";
 import { ContextMenuModel } from "../context-menu";
 import { GuidanceRefKey } from "../../enums";
 
-
 export type MainButtonProps = {
-  /** Button text */
+  /** Text drawn in the button. It is the whole label: the component takes no children. */
   text?: string;
-  /** Sets the button to present a disabled state */
+  /** Whether the button is inert: it dims to 60% opacity and the click is dropped. */
   isDisabled?: boolean;
-  /** Activates a drop-down list for MainButton */
+  /** Whether clicking opens the menu built from `model`. When `false`, the click calls `onAction` instead. */
   isDropdown?: boolean;
-  /** Sets a callback function that is triggered when the button is clicked */
+  /** Called with the event when the button is clicked. Only reached while `isDropdown` is `false`. */
   onAction?: (e: React.MouseEvent) => void;
-  /** Opens DropDown */
+  /** Ignored. Nothing reads this prop, and it reaches the DOM as an unknown attribute. */
   opened?: boolean; // TODO: Make us whole
-  /** Accepts class */
+  /** Applied to the button, after the component's own classes. */
   className?: string;
-  /** Accepts id */
+  /** Applied to the button, not to the wrapper around it. */
   id?: string;
-  /** Accepts css style */
+  /** Applied to the button as inline style. */
   style?: React.CSSProperties;
-  /** Data model menu */
+  /** Items of the menu. Required even with `isDropdown={false}`, when nothing reads it. */
   model: ContextMenuModel[];
-  /** Hide the dropdown arrow while keeping dropdown functionality */
+  /** Whether the arrow beside the text is left out. The menu still opens. */
   hideArrow?: boolean;
-  /** Function to set reference map */
+  /** Registers the button's element in the portal's guidance map, for the onboarding tour.
+   * @portal */
   setRefMap?: (
     key: GuidanceRefKey,
     ref: RefObject<HTMLDivElement | null>,
   ) => void;
   /**
-   * Element used to anchor and size the dropdown. Defaults to the button's
-   * own rect; pass an outer wrapper when the button is visually nested
-   * inside a larger clickable area (e.g. inside SearchInput).
+   * Element the menu is anchored to and sized from. Without it the button's own
+   * box is used; pass an outer wrapper when the button sits inside a larger
+   * clickable area.
    */
   anchorRef?: RefObject<HTMLElement | null>;
 };

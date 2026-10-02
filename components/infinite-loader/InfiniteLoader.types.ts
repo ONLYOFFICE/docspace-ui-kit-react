@@ -1,62 +1,50 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { IndexRange } from "react-virtualized";
 import { TViewAs } from "../../types";
 
 export type InfiniteLoaderProps = {
+  /**
+   * Which layout to render: `tile` lays the children out in a grid, anything
+   * else in a list. It also picks the skeleton shown while a page loads —
+   * `table` and `row` have one, the rest show nothing.
+   */
   viewAs: TViewAs;
+  /** Whether there is another page to ask for. */
   hasMoreFiles: boolean;
+  /** How many items are loaded so far. */
   filesLength: number;
+  /** How many items there are in total, loaded or not. */
   itemCount: number;
+  /** Called with the range to load when the user scrolls near the end. */
   loadMoreItems: (params: IndexRange) => Promise<void>;
+  /** Height of one row, or of one tile, in pixels. It is the same for all of them. */
   itemSize: number;
+  /** The items. It must be an array, one entry per row or tile. */
   children: React.ReactNode[];
+  /** Called as the list scrolls. */
   onScroll?: () => void;
+  /** Renders nothing at all while it is true. */
   isLoading?: boolean;
+  /** `localStorage` key of the table's column widths, for the table skeleton. */
   columnStorageName?: string;
+  /** The info-panel variant of that key. */
   columnInfoPanelStorageName?: string;
+  /** Applied to the list element. */
   className?: string;
+  /** Narrows the layout for an open info panel. */
   infoPanelVisible?: boolean;
+  /** How many tiles fit on a row, in the `tile` layout. */
   countTilesInRow?: number;
+  /** Ignored by the list; the loader sets it itself after a long jump. */
   showSkeleton?: boolean;
+  /** Identifier of the folder being shown, which resets the grid when it changes. */
   currentFolderId?: string | number;
+  /** Renders the tiles in their small form. */
   smallPreview?: boolean;
+  /** Lays a single tile out on its own row. */
   isOneTile?: boolean;
 };
 
 export type ListComponentProps = InfiniteLoaderProps & {
+  /** The element the list watches for scrolling, resolved by the loader. */
   scroll: Element | (Window & typeof globalThis);
 };

@@ -1,0 +1,149 @@
+import { Meta, Story } from "@storybook/addon-docs/blocks";
+
+import { Source } from "../../../../.storybook/blocks/Source";
+
+import * as SignInRoutesStories from "./SignInRoutes.stories";
+import oauthSource from "../useOAuthSignIn.ts?raw";
+import pkceSource from "../pkce.ts?raw";
+import personaSource from "../persona.ts?raw";
+import setupSource from "../useOAuthAppSetup.ts?raw";
+import source from "./SignInRoutes.tsx?raw";
+
+<Meta of={SignInRoutesStories} />
+
+# Who is signed in
+
+A law firm needs two applications from one portal: a workspace for its lawyers
+and a cabinet for its clients. This screen decides which one a person gets —
+and, more importantly, makes sure a client is really themselves.
+
+<Story of={SignInRoutesStories.Default} />
+
+## Three routes, and they are not interchangeable
+
+| Route | Whose identity | Good for |
+| --- | --- | --- |
+| **API key** | the key's owner, always | the lawyer's workspace — the application acts for the firm |
+| **Portal session** | whoever is signed in to the portal | an application the portal serves itself, like a plugin |
+| **OAuth** | the person who signed in and allowed the app | a client cabinet hosted anywhere |
+
+The API key from
+[Connect to a portal](?path=/docs/samples-legal-practice-setup-connect-to-a-portal--docs)
+is one person. Filtering rooms by a
+client's name on top of it would look like a cabinet and behave like a data
+leak: every client would be one URL edit away from every other client's
+matters. The portal session is the ONLYOFFICE Apps client's own route — it passes the
+`asc_auth_key` cookie to `ApiProvider` as `apiKey` — and works only for a page
+the portal serves. That leaves OAuth for a client cabinet on its own domain.
+
+## The persona comes from the portal
+
+`personaFromRoles` reads the portal's own flags. A client is invited as a
+**guest**, who sees only the rooms shared with them; a room admin is a lawyer,
+because room admins open matters and decide who joins them. Keeping a second
+list of roles in the application would drift the first time someone's type
+changes on the portal.
+
+<Source code={personaSource} language="tsx" />
+
+## Signing a client in with OAuth
+
+### 1. Register the application on the portal
+
+**With the portal already connected by its API key, press _Create the OAuth
+app_.** It registers exactly what the sign-in needs — PKCE on, this page's
+redirect URI and origin, the scopes below, one of the kit's icons — fills in the
+Client ID, and links to the app's page in the portal's Developer Tools. Press it
+again and it finds the app it made rather than registering a second one.
+
+The button needs `pnpm storybook`. Registering an app is two portal calls: the
+API key buys a five-minute JWT from `GET /api/2.0/security/oauth2/token`, and
+`POST /api/2.0/oauth2/clients` takes it in an `x-signature` header. The first
+answers any origin. The second is the portal's identity service, which refuses
+every CORS preflight — 403, even for the portal's own origin, which never sends
+one — so no page on another host can reach it. `.storybook/oauth-app-proxy.ts`
+makes both calls from the dev server instead. It answers one path, POST only,
+from this dev server's own pages, and forwards to those two routes and nothing
+else.
+
+The portal also wants a home page, terms, a privacy policy and a logout
+redirect, and checks those four against a pattern that needs a dotted host name
+or an IPv4 address: `http://localhost:6006/…` is refused with 400, although the
+redirect URI and the origin may name `localhost`. On a dev server the four
+therefore point at `https://www.onlyoffice.com`; an application of your own
+points them at its real pages. When the portal refuses, the screen shows which
+fields and why — the registry names each one in the `errors` of its answer.
+
+**In a static build** — the published Storybook — the button becomes a link to
+the portal's own form, **Developer Tools → OAuth → Create app**:
+
+- tick **Allow public client (PKCE)** — without it the portal asks for a
+  client secret, and a secret in a browser bundle is not a secret;
+- add the redirect URI and the allowed origin this screen shows;
+- give it the scopes a client needs and nothing more:
+  `openid accounts.self:read rooms:read files:read files:write`.
+
+Either way the **Client ID** ends up in the field above. It is not a secret — a
+public client's id never is — so the screen remembers it in `localStorage`.
+
+<Source code={setupSource} language="tsx" />
+
+### 2. What happens on **Sign in with ONLYOFFICE**
+
+1. A popup opens at the portal's `authorize` endpoint with the client id, the
+   redirect URI, the scopes, a `state` nonce and an S256 `code_challenge`.
+2. The client signs in on the portal and presses **Allow**.
+3. The portal sends the popup to `oauth-callback.html?code=…&state=…`. That page
+   posts both to this window and closes.
+4. This window checks `state` and exchanges the code, together with the
+   `code_verifier` that never left it, for an access token.
+5. A nested `ApiProvider` gets the token as `apiKey`. Everything below it — here
+   one `getSelfProfile()` — runs as the client.
+
+The endpoints come from the portal's own
+`/.well-known/openid-configuration`, and both it and the token endpoint answer
+any origin, so a static page can do all of this with no server of its own.
+
+<Source code={oauthSource} language="tsx" />
+
+### Details that decide whether it works
+
+- **Open the popup inside the click, before any `await`.** Hashing the
+  verifier first loses the user's gesture and the browser blocks the window. The
+  hook opens a blank popup synchronously and points it at the portal once the
+  challenge is ready.
+- **Put `scope` last in the authorize URL.** The first time a person allows
+  an app, the portal's consent page sends the browser round once more and
+  rebuilds the authorize URL as everything before `&scope=` plus the scopes.
+  Anything after `scope` is lost: `state` comes back missing and the exchange
+  has no `code_challenge` to check the verifier against. The second sign-in
+  works either way, which is what makes this one hard to see.
+- **Answer by `postMessage`, checked twice.** Only messages from this origin,
+  only with the `state` this request made. The kit's `utils/get-oauth-token`
+  polls `localStorage` instead and checks no `state`, which is why this sample
+  does not use it.
+- **Keep the token in memory.** Anything that survives a reload can be read by
+  any script on the page. A real cabinet adds refresh with the `refresh_token`
+  the portal returns; this sample signs out on reload.
+- **The callback is a plain `.html` file** in `.storybook/public/`. Storybook's
+  dev server serves a static file only by its full path, and `serve` — behind
+  `pnpm storybook-serve` — would redirect `*.html` to a clean URL and drop the
+  query with the code in it, until the `serve.json` next to the page told it not
+  to.
+
+<Source code={pkceSource} language="tsx" />
+
+The challenge is base64url without padding, as S256 specifies, and
+`pkce.test.ts` checks it against the worked example in RFC 7636 itself.
+
+The app registered here is the one every later screen signs a client in with:
+[01. My matters](?path=/docs/samples-legal-practice-screens-01-my-matters--docs) uses it
+to show a client the matters shared with them, and nothing else.
+
+## The code
+
+Imports here are relative to this repository. In your application they come
+from the package — `@onlyoffice/apps-ui-kit/providers/api` and the component
+subpaths.
+
+<Source code={source} language="tsx" />

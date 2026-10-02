@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -43,57 +8,35 @@ const meta = {
   title: "UI/Layout/Scrollbar",
   component: Scrollbar,
   parameters: {
-    docs: {
-      description: {
-        component: `Scrollbar provides a custom scrollbar with auto-hide, fixed sizing, and both vertical and horizontal scrolling support.
-
-### Features
-
-- **Auto-Hide**: Scrollbar fades when not actively scrolling
-- **Fixed Size Thumb**: Keep the scrollbar thumb at a fixed size regardless of content length
-- **Vertical & Horizontal**: Supports both scroll directions independently
-- **Custom Padding**: Configurable padding after the last item and inline-end padding
-- **RTL Support**: Works correctly in right-to-left layouts
-
-### Usage
-
-\`\`\`tsx
-import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
-
-<Scrollbar style={{ width: 300, height: 200 }}>
-  <p>Scrollable content here...</p>
-</Scrollbar>
-
-// With auto-hide
-<Scrollbar autoHide style={{ width: 300, height: 200 }}>
-  <p>Content...</p>
-</Scrollbar>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     autoHide: {
       control: "boolean",
-      description: "Automatically hide scrollbar when not in use",
+      description:
+        "Hides the tracks until the content is scrolled or the pointer moves over it, and fades them out again three seconds later",
       table: {
-        defaultValue: { summary: "false" },
+        defaultValue: { summary: "true" },
       },
     },
     fixedSize: {
       control: "boolean",
-      description: "Keep scrollbar thumb size fixed regardless of content",
+      description:
+        "Keeps the thumb at its wider 8px thickness on desktop instead of widening it only while the pointer is over the track",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     paddingAfterLastItem: {
       control: "text",
-      description: "Padding added after the last scrollable item",
+      description:
+        "Space below the last item inside the scrolling area, as a CSS length",
     },
     paddingInlineEnd: {
       control: "text",
-      description: "Padding added to the inline end of the scroll body",
+      description:
+        "Space between the content and the side the vertical track is on, as a CSS length; replaces the default 17px (8px on screens up to 600px wide)",
     },
     noScrollY: {
       control: "boolean",
@@ -108,6 +51,95 @@ import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
       table: {
         defaultValue: { summary: "false" },
       },
+    },
+    rtl: {
+      control: "boolean",
+      description:
+        "Puts the vertical track on the left edge when true and on the right when false; follows the interface direction when not set",
+    },
+    tabIndex: {
+      control: "number",
+      description:
+        "Position of the scrolling area in the tab order; -1 keeps it out of the tab order, `null` removes the attribute",
+      table: {
+        defaultValue: { summary: "-1" },
+      },
+    },
+    autoFocus: {
+      control: "boolean",
+      description: "Moves focus to the scrolling area after the first render",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    translateContentSizeYToHolder: {
+      control: "boolean",
+      description:
+        "Gives the box the height of its content, so it grows with the content instead of filling its parent",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    translateContentSizeXToHolder: {
+      control: "boolean",
+      description:
+        "Gives the box the width of its content, so it grows with the content instead of filling its parent",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    translateContentSizesToHolder: {
+      control: "boolean",
+      description: "Gives the box both the height and the width of its content",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    createContext: {
+      control: "boolean",
+      description:
+        "Publishes the scrollbar instance on a React context for the components rendered inside it",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    onScroll: {
+      action: "onScroll",
+      description: "Called with the native scroll event as the content scrolls",
+    },
+    id: {
+      control: "text",
+      description: "Id of the outer element",
+    },
+    className: {
+      control: "text",
+      description: "Class added to the outer element",
+    },
+    style: {
+      control: "object",
+      description:
+        "Inline styles of the outer element, usually its width and height",
+    },
+    scrollClass: {
+      control: "text",
+      description: "Class added to the element that scrolls",
+    },
+    scrollBodyClassName: {
+      control: "text",
+      description: "Class added to the element that holds the content",
+    },
+    ref: {
+      control: false,
+      description:
+        "Receives the scrollbar instance, with its scroll methods and elements",
+    },
+    contentRef: {
+      control: false,
+      description: "Receives the element that holds the content",
+    },
+    children: {
+      control: false,
+      description: "The content to scroll",
     },
   },
 } satisfies Meta<typeof Scrollbar>;
@@ -156,10 +188,10 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default scrollbar with vertical scrolling enabled and always-visible track.",
+          "Tall content in a fixed-size box, with auto-hide turned off so the vertical track stays on screen (`autoHide={false}`); change any other prop live in the Controls panel below.",
       },
       source: {
-        code: `<Scrollbar style={{ width: 300, height: 200 }}>
+        code: `<Scrollbar autoHide={false} style={{ width: 300, height: 200 }}>
   <p>Scrollable content...</p>
 </Scrollbar>`,
       },
@@ -181,7 +213,7 @@ export const WithAutoHide: Story = {
     docs: {
       description: {
         story:
-          "Scrollbar that automatically hides when not actively scrolling. Hover or scroll to reveal.",
+          "The default behaviour, for content where a permanent track would distract: the track stays hidden until you scroll or move the pointer over the content, then fades out three seconds later (`autoHide`).",
       },
       source: {
         code: `<Scrollbar autoHide style={{ width: 300, height: 200 }}>
@@ -207,10 +239,10 @@ export const WithFixedSize: Story = {
     docs: {
       description: {
         story:
-          "Scrollbar with a fixed-size thumb that doesn't change size based on content length.",
+          "The thumb stays at its wider 8px thickness on desktop instead of widening only while the pointer is over the track, so it is easier to find and grab (`fixedSize`).",
       },
       source: {
-        code: `<Scrollbar fixedSize style={{ width: 300, height: 200 }}>
+        code: `<Scrollbar fixedSize autoHide={false} style={{ width: 300, height: 200 }}>
   <p>Content...</p>
 </Scrollbar>`,
       },
@@ -241,10 +273,10 @@ export const WithHorizontalScroll: Story = {
     docs: {
       description: {
         story:
-          "Scrollbar with horizontal scrolling for wide content that overflows the container.",
+          "Content that overflows sideways gets a horizontal track along the bottom edge, drawn the same way as the vertical one.",
       },
       source: {
-        code: `<Scrollbar style={{ width: 300, height: 100 }}>
+        code: `<Scrollbar autoHide={false} style={{ width: 300, height: 100 }}>
   <div style={{ whiteSpace: "nowrap" }}>Wide content...</div>
 </Scrollbar>`,
       },
@@ -268,10 +300,10 @@ export const WithBothScrollbars: Story = {
     docs: {
       description: {
         story:
-          "Scrollbar with both vertical and horizontal scrolling when content exceeds both dimensions.",
+          "Content taller and wider than the box shows both tracks, each shortened by 16px so they do not overlap in the corner.",
       },
       source: {
-        code: `<Scrollbar style={{ width: 300, height: 200 }}>
+        code: `<Scrollbar autoHide={false} style={{ width: 300, height: 200 }}>
   <div style={{ width: "500px" }}>Tall and wide content...</div>
 </Scrollbar>`,
       },
@@ -297,7 +329,7 @@ export const WithPaddingAfterLastItem: Story = {
           "Scrollbar with additional padding after the last item, providing extra space at the bottom of scrollable content.",
       },
       source: {
-        code: `<Scrollbar paddingAfterLastItem="50px" style={{ width: 300, height: 200 }}>
+        code: `<Scrollbar paddingAfterLastItem="50px" autoHide={false} style={{ width: 300, height: 200 }}>
   <p>Content with padding at bottom...</p>
 </Scrollbar>`,
       },
@@ -323,9 +355,42 @@ export const WithPaddingInlineEnd: Story = {
           "Scrollbar with inline-end padding, adding space on the right (or left in RTL) side of the scroll body.",
       },
       source: {
-        code: `<Scrollbar paddingInlineEnd="100px" style={{ width: 300, height: 200 }}>
+        code: `<Scrollbar paddingInlineEnd="100px" autoHide={false} style={{ width: 300, height: 200 }}>
   <p>Content with inline-end padding...</p>
 </Scrollbar>`,
+      },
+    },
+  },
+};
+
+export const RightToLeft: Story = {
+  render: (args) => (
+    <div dir="rtl">
+      <Scrollbar {...args}>
+        <LongContent />
+      </Scrollbar>
+    </div>
+  ),
+  globals: { direction: "rtl" },
+  args: {
+    style: { width: 300, height: 200 },
+    autoHide: false,
+  },
+  parameters: {
+    noPadding: true,
+    docs: {
+      // Framed: an inline RTL story would flip the direction of the whole Docs page
+      story: { inline: false, height: "226px" },
+      description: {
+        story:
+          "The same box under a right-to-left interface: the vertical track moves to the left edge, the text aligns to the right and the content's inline-end padding moves to the left with the track. The direction comes from the theme's `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir=\"rtl\"` for the text itself.",
+      },
+      source: {
+        code: `<div dir="rtl">
+  <Scrollbar autoHide={false} style={{ width: 300, height: 200 }}>
+    <p>Scrollable content...</p>
+  </Scrollbar>
+</div>`,
       },
     },
   },
@@ -341,6 +406,8 @@ export const CssCustomization: Story = {
           "--scrollbar-bg-active": "#4c1d95",
           "--scrollbar-thumb-size": "6px",
           "--scrollbar-radius": "4px",
+          "--scrollbar-track-padding": "2px",
+          "--scrollbar-padding-end": "32px",
         } as CSSProperties
       }
     >
@@ -352,19 +419,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--scrollbar-bg\` | Thumb default color | theme token |
-| \`--scrollbar-bg-hover\` | Thumb hover color | theme token |
-| \`--scrollbar-bg-active\` | Thumb active/pressed color | theme token |
-| \`--scrollbar-thumb-size\` | Thumb width (vertical) / height (horizontal) | \`4px\` |
-| \`--scrollbar-radius\` | Track border radius | \`8px\` |
-| \`--scrollbar-track-padding\` | Track inner padding | \`4px\` |
-| \`--scrollbar-padding-end\` | Scroll body inline-end padding | \`17px\` |
-| \`--scrollbar-padding-end-mobile\` | Scroll body inline-end padding (mobile) | \`8px\` |
-| \`--scrollbar-last-padding\` | Padding after last item | \`unset\` |`,
+        story: `The variables are listed under CSS variables on this page. The example sets the thumb colours (hover and drag the thumb to see the other two), a 6px thumb, a 2px track padding and 32px of space before the track.`,
       },
     },
   },

@@ -5,7 +5,7 @@ Utility function for generating UUID v4 (Universally Unique Identifier) strings.
 ## Installation
 
 ```typescript
-import { uuid } from "@docspace/ui-kit/utils/uuid";
+import { uuid } from "@onlyoffice/apps-ui-kit/utils/uuid";
 ```
 
 ## Function
@@ -38,20 +38,20 @@ xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx
 
 ### Structure
 
-| Group | Length | Example |
-|-------|--------|---------|
-| 1 | 8 chars | `550e8400` |
-| 2 | 4 chars | `e29b` |
-| 3 | 4 chars | `41d4` (starts with "4") |
-| 4 | 4 chars | `a716` |
-| 5 | 12 chars | `446655440000` |
+| Group | Length   | Example                  |
+| ----- | -------- | ------------------------ |
+| 1     | 8 chars  | `550e8400`               |
+| 2     | 4 chars  | `e29b`                   |
+| 3     | 4 chars  | `41d4` (starts with "4") |
+| 4     | 4 chars  | `a716`                   |
+| 5     | 12 chars | `446655440000`           |
 
 ## Usage Examples
 
 ### Generate Unique Component Keys
 
 ```typescript
-import { uuid } from "@docspace/ui-kit/utils/uuid";
+import { uuid } from "@onlyoffice/apps-ui-kit/utils/uuid";
 
 function TodoList({ items }) {
   const [todos, setTodos] = useState(
@@ -71,7 +71,7 @@ function TodoList({ items }) {
 ### Create Unique Identifiers for DOM Elements
 
 ```typescript
-import { uuid } from "@docspace/ui-kit/utils/uuid";
+import { uuid } from "@onlyoffice/apps-ui-kit/utils/uuid";
 
 function FormField({ label, children }) {
   const id = useMemo(() => uuid(), []);
@@ -88,7 +88,7 @@ function FormField({ label, children }) {
 ### Generate Session or Request IDs
 
 ```typescript
-import { uuid } from "@docspace/ui-kit/utils/uuid";
+import { uuid } from "@onlyoffice/apps-ui-kit/utils/uuid";
 
 function createSession() {
   return {
@@ -111,7 +111,7 @@ async function fetchWithRequestId(url: string) {
 ### Track Items in State
 
 ```typescript
-import { uuid } from "@docspace/ui-kit/utils/uuid";
+import { uuid } from "@onlyoffice/apps-ui-kit/utils/uuid";
 
 interface Notification {
   id: string;
@@ -137,7 +137,7 @@ function useNotifications() {
 ### Generate Temporary File Names
 
 ```typescript
-import { uuid } from "@docspace/ui-kit/utils/uuid";
+import { uuid } from "@onlyoffice/apps-ui-kit/utils/uuid";
 
 function generateTempFileName(extension: string) {
   return `temp_${uuid()}.${extension}`;

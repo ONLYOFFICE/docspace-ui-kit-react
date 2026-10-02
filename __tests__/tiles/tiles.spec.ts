@@ -1,48 +1,46 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { type Page, expect, test } from "@playwright/test";
 
-const COMPONENTS = [
-  { id: "ui-tiles-basetile", name: "base-tile" },
-  { id: "ui-tiles-filetile", name: "file-tile" },
-  { id: "ui-tiles-foldertile", name: "folder-tile" },
-  { id: "ui-tiles-roomtile", name: "room-tile" },
-  { id: "ui-tiles-templatetile", name: "template-tile" },
-  { id: "ui-tiles-tilecontainer", name: "tile-container" },
-  { id: "ui-tiles-tilecontent", name: "tile-content" },
+const COMPONENTS: { id: string; name: string; stories?: string[] }[] = [
+  {
+    id: "ui-tiles-basetile",
+    name: "base-tile",
+    stories: ["with-menu-button", "renaming-state", "blocking-operation"],
+  },
+  {
+    id: "ui-tiles-filetile",
+    name: "file-tile",
+    stories: ["with-thumbnail", "with-hotkey-border", "renaming-state"],
+  },
+  {
+    id: "ui-tiles-foldertile",
+    name: "folder-tile",
+    stories: ["with-hotkey-border", "renaming-state", "right-to-left"],
+  },
+  {
+    id: "ui-tiles-roomtile",
+    name: "room-tile",
+    stories: [
+      "generated-tags",
+      "with-hotkey-border",
+      "renaming-state",
+      "custom-bottom-row",
+    ],
+  },
+  {
+    id: "ui-tiles-templatetile",
+    name: "template-tile",
+    stories: ["in-progress", "with-hotkey-border", "renaming-state"],
+  },
+  {
+    id: "ui-tiles-tilecontainer",
+    name: "tile-container",
+    stories: ["folders-and-files"],
+  },
+  {
+    id: "ui-tiles-tilecontent",
+    name: "tile-content",
+    stories: ["fixed-title-width"],
+  },
 ];
 
 async function gotoStory(page: Page, storyBase: string, storyId: string) {
@@ -53,7 +51,7 @@ async function gotoStory(page: Page, storyBase: string, storyId: string) {
   await page.waitForLoadState("networkidle");
 }
 
-for (const { id, name } of COMPONENTS) {
+for (const { id, name, stories = [] } of COMPONENTS) {
   test.describe(`${name} — light`, () => {
     test("default", async ({ page }) => {
       await gotoStory(page, id, "default");
@@ -64,6 +62,13 @@ for (const { id, name } of COMPONENTS) {
       await gotoStory(page, id, "css-customization");
       await expect(page).toHaveScreenshot(`${name}-css-customization.png`);
     });
+
+    for (const storyId of stories) {
+      test(storyId, async ({ page }) => {
+        await gotoStory(page, id, storyId);
+        await expect(page).toHaveScreenshot(`${name}-${storyId}.png`);
+      });
+    }
   });
 
   test.describe(`${name} — dark`, () => {
@@ -86,5 +91,13 @@ for (const { id, name } of COMPONENTS) {
       await page.evaluate(() => document.body.classList.add("dark"));
       await expect(page).toHaveScreenshot(`${name}-css-customization-dark.png`);
     });
+
+    for (const storyId of stories) {
+      test(`${storyId} dark`, async ({ page }) => {
+        await gotoStory(page, id, storyId);
+        await page.evaluate(() => document.body.classList.add("dark"));
+        await expect(page).toHaveScreenshot(`${name}-${storyId}-dark.png`);
+      });
+    }
   });
 }

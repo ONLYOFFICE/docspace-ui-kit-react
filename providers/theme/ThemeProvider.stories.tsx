@@ -8,33 +8,9 @@ import ThemeProvider from "./ThemeProvider";
 
 const meta: Meta<typeof ThemeProvider> = {
   title: "Components/Providers/ThemeProvider",
-  tags: ["!autodocs"],
   component: ThemeProvider,
-  parameters: {
-    docs: {
-      description: {
-        component: `ThemeProvider resolves the active theme (light/dark/system) and provides it to child components via the \`ThemeProviderComponent\`.
-
-### Features
-
-- Resolves theme based on \`initialTheme\`, \`systemTheme\`, and system preference
-- Fetches color theme from API if not provided
-- Monitors system theme preference changes
-- Supports RTL via the \`locale\` prop
-
-### Usage
-
-\`\`\`tsx
-import { ThemeProvider } from "@docspace/ui-kit/providers/theme";
-import { ThemeKeys } from "@docspace/ui-kit/enums";
-
-<ThemeProvider initialTheme={ThemeKeys.BaseStr}>
-  <App />
-</ThemeProvider>
-\`\`\``,
-      },
-    },
-  },
+  // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+  // there is no second description to keep in step with it.
 };
 
 export default meta;

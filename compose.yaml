@@ -1,40 +1,80 @@
 services:
+  # What CI would run: build the image, run the suite, leave the report behind.
+  # No port mapping -- nothing outside the container talks to Storybook.
+  tests-ci:
+    image: ui-kit-tests
+    # Lets `WORKERS=1 pnpm test:e2e:docker:start` reach playwright.config.ts;
+    # unset it resolves to "", which the config reads as "not set".
+    # CI=true is what makes this the CI run: playwright.config.ts reads it for
+    # forbidOnly, two retries and one worker. Set here, on the run, not as an
+    # ENV in the Dockerfile, which explains why the image must not carry it.
+    environment:
+      WORKERS: "${WORKERS:-}"
+      CI: "true"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./playwright-report:/app/playwright-report
+  # Tests against the source baked into the image. Only the specs, the
+  # Playwright config and the report directory come from the host, so a run
+  # here exercises the committed sources, not the working tree.
   tests-local:
     image: ui-kit-tests
-    build:
-      context: ../..
-      dockerfile: libs/ui-kit/Dockerfile
+    # Lets `WORKERS=1 pnpm test:e2e:docker:start` reach playwright.config.ts;
+    # unset it resolves to "", which the config reads as "not set".
+    environment:
+      WORKERS: "${WORKERS:-}"
     ports:
       - "6007:6007"
     volumes:
-      - ./__tests__:/app/libs/ui-kit/__tests__
-      - ./playwright.config.ts:/app/libs/ui-kit/playwright.config.ts
-      - ../../playwright-report/ui-kit:/app/playwright-report/ui-kit
+      - ./__tests__:/app/__tests__
+      - ./playwright.config.ts:/app/playwright.config.ts
+      - ./playwright-report:/app/playwright-report
+  # Opens every story and records its console errors and warnings -- the
+  # story-console skill. The source is the one baked into the image, which
+  # .claude/scripts/story-console/docker.mjs rebuilds before each run, so it is
+  # the working tree as it was a moment ago. Only the report comes back out.
+  # `init` reaps the storybook dev server the scan starts and stops.
+  stories-console:
+    image: ui-kit-tests
+    build:
+      context: .
+      dockerfile: Dockerfile
+    init: true
+    volumes:
+      - ./audits:/app/audits
   # Dev mode: mount source code so you can iterate without rebuilding the image.
   # Usage:
   #   docker-compose run --rm tests-dev pnpm exec playwright test
   #   docker-compose run --rm tests-dev pnpm exec playwright test __tests__/button/button.spec.ts
-  #   docker-compose run --rm tests-dev pnpm exec playwright test --update-snapshots
+  #   docker-compose run --rm tests-dev pnpm exec playwright test --update-snapshots=changed
   tests-dev:
     image: ui-kit-tests
+    # Lets `WORKERS=1 pnpm test:e2e:docker:start` reach playwright.config.ts;
+    # unset it resolves to "", which the config reads as "not set".
+    environment:
+      WORKERS: "${WORKERS:-}"
     ports:
       - "6007:6007"
     volumes:
       # Source code — edit on host, rebuilt inside container
-      - ./components:/app/libs/ui-kit/components
-      - ./assets:/app/libs/ui-kit/assets
-      - ./constants:/app/libs/ui-kit/constants
-      - ./context:/app/libs/ui-kit/context
-      - ./enums:/app/libs/ui-kit/enums
-      - ./hooks:/app/libs/ui-kit/hooks
-      - ./styles:/app/libs/ui-kit/styles
-      - ./types:/app/libs/ui-kit/types
-      - ./utils:/app/libs/ui-kit/utils
-      - ./providers:/app/libs/ui-kit/providers
-      - ./.storybook:/app/libs/ui-kit/.storybook
+      - ./components:/app/components
+      - ./assets:/app/assets
+      - ./constants:/app/constants
+      - ./context:/app/context
+      - ./enums:/app/enums
+      - ./hooks:/app/hooks
+      - ./styles:/app/styles
+      - ./types:/app/types
+      - ./utils:/app/utils
+      - ./providers:/app/providers
+      - ./css:/app/css
+      - ./fonts:/app/fonts
+      - ./locales:/app/locales
+      - ./.storybook:/app/.storybook
       # Tests and config
-      - ./__tests__:/app/libs/ui-kit/__tests__
-      - ./playwright.config.ts:/app/libs/ui-kit/playwright.config.ts
+      - ./__tests__:/app/__tests__
+      - ./playwright.config.ts:/app/playwright.config.ts
       # Reports output
-      - ../../playwright-report/ui-kit:/app/playwright-report/ui-kit
-
+      - ./playwright-report:/app/playwright-report

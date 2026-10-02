@@ -1,79 +1,44 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 export type AddButtonProps = {
-  /** Title text */
+  /** Tooltip shown on hover, through the kit's own tooltip rather than the browser's. */
   title?: string;
-  /** Sets a callback function that is triggered when the button is clicked */
+  /** Called with the event when the square or the label is clicked, and on Enter when the wrapper has focus. */
   onClick?: (e: React.MouseEvent) => void;
-  /** Sets the button to present a disabled state */
+  /** Whether the button is inert: the icon greys out, the label dims and clicks are dropped. */
   isDisabled?: boolean;
-  /** Attribute className  */
+  /** Applied to the wrapper that holds the square and the label. */
   className?: string;
-  /** Accepts id */
+  /** Applied to the square, not to the wrapper. */
   id?: string;
-  /** Accepts css style */
+  /** Applied to the square as inline style. */
   style?: React.CSSProperties;
-  /** Specifies the icon name */
+  /** URL of the icon, fetched at runtime. Ignored when `iconNode` is set; without either, a plus is drawn. */
   iconName?: string;
-  /** Specifies a custom icon node */
+  /** Icon element to draw instead of the plus. */
   iconNode?: React.ReactNode;
-  /** Change colors to accent */
+  /** Whether the square is tinted with the accent colour instead of grey. It needs a colour scheme from the theme. */
   isAction?: boolean;
-  /** Specifies the icon size */
+  /** Size of the icon inside the square, in pixels. */
   iconSize?: number;
-  /** Label attribute for text */
+  /** Text drawn after the square. Without it the button is the square alone. */
   label?: string;
-  /** Font size property */
+  /** Font size of the label, as a CSS length. */
   fontSize?: string;
-  /** Title attribute for text */
+  /** `title` attribute of the label — the browser's own tooltip, unlike `title`. */
   titleText?: string;
-  /** Disables text selection */
+  /** Whether the label cannot be selected with the pointer. */
   noSelect?: boolean;
-  /** Text direction */
+  /** Writing direction of the label. */
   dir?: "ltr" | "rtl" | "auto";
-  /** Sets the line height */
+  /** Line height of the label, as a CSS length. */
   lineHeight?: string;
-  /** Disables word wrapping */
+  /** Whether the label is truncated with an ellipsis instead of wrapping. */
   truncate?: boolean;
-  /** Size  the icon container */
+  /** Side of the square, as a CSS length. It only takes effect when the theme supplies a colour scheme. */
   size?: string;
-  /** Test id */
+  /** `data-testid` of the square. */
   testId?: string;
-  /** Shows loading state with spinner */
+  /** Whether a spinner replaces the icon and clicks are dropped. */
   isLoading?: boolean;
-  /** Tab index for keyboard navigation */
+  /** `tabIndex` of the wrapper. Without it the button cannot be focused, and the Enter handler never runs. */
   tabIndex?: number;
 };

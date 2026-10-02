@@ -1,46 +1,15 @@
 "use client";
 
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React from "react";
 import { match, P } from "ts-pattern";
-import {
-  type CustomColorThemesSettingsDto,
-  type CustomColorThemesSettingsItem,
-  CommonSettingsApiAxiosParamCreator,
+// Types only, and deliberately so: this file used to import
+// `CommonSettingsApiAxiosParamCreator` as a value, which put the whole REST SDK
+// -- and `axios`, which it depends on -- into every application that mounted
+// ThemeProvider, for a call that never sent a request. A type import is erased
+// at build time, so the palette's shape stays described and nothing ships.
+import type {
+  CustomColorThemesSettingsDto,
+  CustomColorThemesSettingsItem,
 } from "@onlyoffice/docspace-api-sdk";
 
 import { getSystemTheme } from "../../utils/get-system-theme";
@@ -99,9 +68,13 @@ function resolveTheme(
 }
 
 export type UseThemeProps = {
+  /** Theme to use; a new value is applied in place, without a remount. Left out, the system's own preference is followed. */
   initialTheme?: ThemeKeys;
+  /** Theme to treat as the system's, instead of reading `prefers-color-scheme`. */
   systemTheme?: ThemeKeys;
+  /** The portal's accent palette. Outside the portal there is none — leave it out. */
   colorTheme?: CustomColorThemesSettingsDto;
+  /** Language tag deciding the writing direction and the font family. */
   lang?: string;
 };
 
@@ -121,22 +94,15 @@ const useTheme = ({
     resolveTheme(initialTheme, systemTheme, effectiveLang, currentColorTheme),
   );
 
-  const isRequestRunning = React.useRef(false);
-
-  const getCurrentColorTheme = React.useCallback(async () => {
-    if (isRequestRunning.current || colorTheme) return;
-    isRequestRunning.current = true;
-
-    const colorThemes =
-      (await CommonSettingsApiAxiosParamCreator().getPortalColorTheme()) as CustomColorThemesSettingsDto;
-    // const colorThemes = await getAppearanceTheme();
-
-    const curColorTheme = colorThemes.themes?.find(
-      (t) => t.id === colorThemes.selected,
-    );
-
-    isRequestRunning.current = false;
-    if (curColorTheme) setCurrentColorTheme(curColorTheme);
+  // `colorTheme` is the only way a palette gets in. What stood here was an
+  // `await` on the API SDK's *parameter builder*: it returns `{ url, options }`
+  // and sends nothing, the result was read as a response, `.themes` on it was
+  // undefined, and the branch ended without so much as a rejection. Keeping it
+  // cost every consumer the REST client and axios for a call that could not
+  // succeed; a portal that wants its accent applied passes it as a prop, which
+  // is what the portal already does.
+  React.useEffect(() => {
+    setCurrentColorTheme(findColorTheme(colorTheme));
   }, [colorTheme]);
 
   const getUserTheme = React.useCallback(() => {
@@ -146,10 +112,6 @@ const useTheme = ({
 
     setCookie(SYSTEM_THEME_KEY, getSystemTheme());
   }, [effectiveLang, initialTheme, systemTheme, currentColorTheme]);
-
-  React.useEffect(() => {
-    getCurrentColorTheme();
-  }, [getCurrentColorTheme]);
 
   React.useEffect(() => {
     getUserTheme();
@@ -169,4 +131,3 @@ const useTheme = ({
 };
 
 export default useTheme;
-

@@ -1,29 +1,3 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-
 import React from "react";
 import classNames from "classnames";
 
@@ -43,33 +17,51 @@ import type { ICover } from "./RoomLogoCoverDialog.types";
 import styles from "./RoomLogoCoverDialog.module.scss";
 
 export type RoomLogoCoverProps = {
+  /** Translation function. Besides `Common:Color` the icon picker asks for keys outside the `Common` namespace the kit ships. */
   t: TTranslation;
 
+  /** The cover icons to offer. Each carries raw SVG markup that is injected into the page, so take them only from a source you trust. An empty array leaves the icon picker out. */
   covers: ICover[];
+  /** Room title, reduced to initials for the preview when no icon is chosen.
+   * @default "" */
   title?: string;
 
-  /** Generic initial values — used by RoomLogoCoverDialog */
+  /** Colour chosen on the first render, as `#rrggbb`. Anything but `undefined` wins over `coverColor` and `logoColor`. */
   initialColor?: string;
+  /** Cover chosen on the first render. An explicit `null` selects the initials and still wins over `coverId` and `logoCover`. */
   initialCover?: ICover | null;
 
-  /** Raw room data — UIKit derives initialColor/initialCover from these when provided */
+  /** A room's stored colour, six hex digits **without** a leading `#`. Used only when `initialColor` is absent. */
   logoColor?: string;
+  /** A room's stored cover. Used only when `initialCover` and `coverId` are absent, and only together with `withSelection`. */
   logoCover?: ICover | null;
+  /** A room's stored cover colour, six hex digits **without** a leading `#`. Used only when `initialColor` is absent, and it wins over `logoColor`. */
   coverColor?: string;
+  /** Id of a room's stored cover, looked up in `covers`. Used only when `initialCover` is absent. */
   coverId?: string;
+  /** Lets `logoCover` be taken as the starting cover. Without it that field is ignored. */
   withSelection?: boolean;
 
+  /** Whether the colour picker is open. The component does not own this: hold it in the state of whatever wraps it. */
   openColorPicker: boolean;
 
+  /** Whether the preview is drawn for the light theme. Taken from the theme context when it is not passed. */
   isBaseTheme?: boolean;
+  /** The portal's accent colours, used to tint the hovered and selected icon. Without it those states have no accent. */
   currentColorScheme?: TColorScheme;
 
-  forwardedRef?: React.RefObject<HTMLDivElement | null>;
+  /** Attached to the outer element, for measuring its height: a ref object, or a callback that is handed the element once it is mounted. */
+  forwardedRef?: React.Ref<HTMLDivElement>;
+  /** Height of the scroll area around the two pickers, as a CSS length. Ignored on mobile and while `generalScroll` is set. */
   scrollHeight?: string;
+  /** Drops the inner scroll area, for when something outside scrolls instead. */
   generalScroll?: boolean;
 
+  /** Called once after mount with the starting colour and cover, so the owner can record what it will get back unchanged. */
   onInit?: (color: string, cover: ICover | null) => void;
+  /** Called with the colour and cover after every change. This is the only way out: the component keeps the selection in its own state. */
   onChange?: (color: string, cover: ICover | null) => void;
+  /** Opens and closes the colour picker. */
   setOpenColorPicker: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -113,9 +105,14 @@ const RoomLogoCover = ({
     return globalColors.logoColors[0];
   })();
 
-  const [selectedColor, setSelectedColor] = React.useState<string>(defaultColor);
-  const [selectedCover, setSelectedCover] = React.useState<ICover | null>(defaultCover);
-  const [withoutIcon, setWithoutIcon] = React.useState<boolean>(defaultCover == null);
+  const [selectedColor, setSelectedColor] =
+    React.useState<string>(defaultColor);
+  const [selectedCover, setSelectedCover] = React.useState<ICover | null>(
+    defaultCover,
+  );
+  const [withoutIcon, setWithoutIcon] = React.useState<boolean>(
+    defaultCover == null,
+  );
 
   React.useEffect(() => {
     onInit?.(selectedColor, withoutIcon ? null : selectedCover);

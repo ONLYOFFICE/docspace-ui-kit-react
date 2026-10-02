@@ -1,29 +1,3 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-
 import {
   useCallback,
   useEffect,
@@ -34,7 +8,7 @@ import {
 } from "react";
 
 import i18nextSingleton from "i18next";
-import { useObserver } from "mobx-react";
+import { comparer, reaction } from "mobx";
 import {
   I18nextProvider as ReactI18nextProvider,
   useTranslation,
@@ -303,7 +277,26 @@ type AiAgentProvidersProps = {
    * "Ask AI" row action, drag-and-drop.
    */
   attachmentLimit?: number;
+  /**
+   * Where the AI backend lives and how to authenticate against it. Omit it
+   * and the chat talks to `/api/2.0/ai` on the page's own origin with the
+   * session cookie — what the DocSpace client, served from the portal, wants.
+   * Pass it when the page is served from elsewhere (Storybook pointed at a
+   * portal from the toolbar): every chat request then goes to
+   * `${origin}/api/2.0/ai` carrying `headers`, e.g. an `Authorization:
+   * Bearer <key>`. The requests never send credentials, so a key has to
+   * travel as a header.
+   */
+  serverApi?: AiServerApi;
   children: ReactNode;
+};
+
+/** Target of the chat's HTTP transport — see `AiAgentProvidersProps.serverApi`. */
+export type AiServerApi = {
+  /** Portal origin, without a trailing slash and without `/api/2.0/ai`. */
+  origin: string;
+  /** Sent with every chat request. */
+  headers?: Record<string, string>;
 };
 
 // Server-mode API config: backend is mounted at the same origin as the
@@ -317,9 +310,13 @@ const SERVER_API_BASE_URL = "/api/2.0/ai";
 const getOrigin = () =>
   typeof window === "undefined" ? "" : window.location.origin;
 
-const buildServerApiConfig = (): ServerAPIConfig => ({
-  origin: getOrigin(),
+const buildServerApiConfig = (
+  origin: string,
+  headers?: Record<string, string>,
+): ServerAPIConfig => ({
+  origin,
   baseUrl: SERVER_API_BASE_URL,
+  headers,
   routes: DEFAULT_SERVER_API_ROUTES,
 });
 
@@ -512,6 +509,28 @@ const chatIntro = <ChatIntro />;
 // Static, so it never invalidates the widget config memo.
 const analyzeIntro = <AnalyzeIntro />;
 
+// The fields `select` reads, kept in state and refreshed whenever one of them
+// changes -- the narrow observation `useObserver(fn)` gave, without that
+// deprecated hook and without making the whole provider an `observer`, which
+// would re-render it for every observable its body happens to read.
+// `fireImmediately` covers a change between the first render and the effect.
+const useObservedFields = <T extends object>(select: () => T): T => {
+  const [fields, setFields] = useState(select);
+  const selectRef = useRef(select);
+  selectRef.current = select;
+  useEffect(
+    () =>
+      reaction(
+        () => selectRef.current(),
+        (next) =>
+          setFields((prev) => (comparer.shallow(prev, next) ? prev : next)),
+        { equals: comparer.shallow, fireImmediately: true },
+      ),
+    [],
+  );
+  return fields;
+};
+
 const AiAgentProviders = ({
   locale,
   theme,
@@ -537,6 +556,7 @@ const AiAgentProviders = ({
   suggestions,
   contextRoom,
   attachmentLimit,
+  serverApi,
   children,
 }: AiAgentProvidersProps) => {
   const { t } = useTranslation("Common");
@@ -564,7 +584,7 @@ const AiAgentProviders = ({
     analyzePending,
     analyzeAttachmentId,
     analyzeFileName,
-  } = useObserver(() => ({
+  } = useObservedFields(() => ({
     analyzeActive: aiChatStore.isAnalyzeMode,
     analyzePending: aiChatStore.isAnalyzePending,
     analyzeAttachmentId: aiChatStore.analyzeAttachmentId,
@@ -750,6 +770,14 @@ const AiAgentProviders = ({
     [t],
   );
 
+  // Reduced to primitives so a host passing a fresh `serverApi` object on
+  // every render does not rebuild the whole chat bundle below: only a real
+  // change of target or credentials does.
+  const serverOrigin = serverApi?.origin || getOrigin();
+  const serverHeadersKey = serverApi?.headers
+    ? JSON.stringify(serverApi.headers)
+    : "";
+
   const { stores, ctx, serverApiConfig } = useMemo(() => {
     const eventBus = new ChatEventBus();
     const callbacksManager = new CallbacksManager();
@@ -769,7 +797,7 @@ const AiAgentProviders = ({
       // the auto-register, hide the built-in "onlyoffice" provider type
       // from Add/Edit model dropdowns, and hide the matching row in
       // Web Search settings.
-      onlyofficeConfig: isStandalone ? undefined : { baseUrl: getOrigin() },
+      onlyofficeConfig: isStandalone ? undefined : { baseUrl: serverOrigin },
       hiddenProviders: isStandalone
         ? (["onlyoffice"] as ProviderType[])
         : undefined,
@@ -778,7 +806,12 @@ const AiAgentProviders = ({
         : undefined,
     };
 
-    const config = buildServerApiConfig();
+    const config = buildServerApiConfig(
+      serverOrigin,
+      serverHeadersKey
+        ? (JSON.parse(serverHeadersKey) as Record<string, string>)
+        : undefined,
+    );
     // No `engines` argument → every method call routes over HTTP to the
     // backend mounted at `${origin}${baseUrl}`.
     const api = createServerAPI(config);
@@ -800,7 +833,7 @@ const AiAgentProviders = ({
     });
 
     return { stores: appStores, ctx: appCtx, serverApiConfig: config };
-  }, [isStandalone, platform, aiChatStore]);
+  }, [isStandalone, platform, aiChatStore, serverOrigin, serverHeadersKey]);
 
   // While "Analyze responses" is on, the chat is about that one form: the cap
   // drops to one and the composer's attach actions go away, so the "+" menu
@@ -1057,13 +1090,15 @@ const AiAgentProviders = ({
     ],
   );
 
-  useEffect(() => {
-    attachHostToolsRuntime({
-      servers: ctx.servers,
-      useServersStore: stores.useServersStore,
-      eventBus: ctx.eventBus,
-    });
-  }, [ctx.servers, ctx.eventBus, stores.useServersStore]);
+  useEffect(
+    () =>
+      attachHostToolsRuntime({
+        servers: ctx.servers,
+        useServersStore: stores.useServersStore,
+        eventBus: ctx.eventBus,
+      }),
+    [ctx.servers, ctx.eventBus, stores.useServersStore],
+  );
 
   useEffect(() => {
     if (openResultFile) attachOpenResultFile(openResultFile);
@@ -1096,7 +1131,9 @@ const AiAgentProviders = ({
                           eventBus={ctx.eventBus}
                         >
                           <StoresHydrator enabled={canUseAi} />
-                          <ProfilePickerAliasBridge alias={profilePickerAlias} />
+                          <ProfilePickerAliasBridge
+                            alias={profilePickerAlias}
+                          />
                           <ThreadContextBridge
                             onThreadContextChange={onThreadContextChange}
                           />
@@ -1161,4 +1198,3 @@ export {
   useAiChatStore,
 } from "./ai-chat-store";
 export type { AiChatRouterPage } from "./ai-chat-store";
-

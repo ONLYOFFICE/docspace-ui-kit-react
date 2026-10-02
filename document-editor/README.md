@@ -13,8 +13,8 @@ A React wrapper component for integrating ONLYOFFICE Document Editor into your a
 ## Installation
 
 ```tsx
-import { DocumentEditor } from "@docspace/ui-kit/document-editor";
-import type { IConfig } from "@docspace/ui-kit/document-editor";
+import { DocumentEditor } from "@onlyoffice/apps-ui-kit/document-editor";
+import type { IConfig } from "@onlyoffice/apps-ui-kit/document-editor";
 ```
 
 ## Usage
@@ -78,15 +78,42 @@ import type { IConfig } from "@docspace/ui-kit/document-editor";
 
 ## Properties
 
-| Prop                    | Type                                                          | Required | Default | Description                                                                 |
-| ----------------------- | ------------------------------------------------------------- | :------: | :-----: | --------------------------------------------------------------------------- |
-| `id`                    | `string`                                                      |    ✅    |    -    | Unique identifier for the editor instance                                   |
-| `documentServerUrl`     | `string`                                                      |    ✅    |    -    | URL of the ONLYOFFICE Document Server                                       |
-| `config`                | `IConfig`                                                     |    ✅    |    -    | Editor configuration object (see [Config API](#config-object))              |
-| `width`                 | `string`                                                      |    -     | `"100%"`| Width of the editor container (CSS value)                                   |
-| `height`                | `string`                                                      |    -     | `"100%"`| Height of the editor container (CSS value)                                  |
-| `shardkey`              | `string`                                                      |    -     |    -    | Shard key for load balancing across multiple document servers              |
-| `onLoadComponentError`  | `(errorCode: number, errorDescription: string) => void`       |    -     |    -    | Callback invoked when the component fails to load                           |
+| Prop                   | Type                                                    | Required | Default  | Description                                                     |
+| ---------------------- | ------------------------------------------------------- | :------: | :------: | --------------------------------------------------------------- |
+| `id`                   | `string`                                                |    ✅    |    -     | Unique identifier for the editor instance                       |
+| `documentServerUrl`    | `string`                                                |   ✅\*   |    -     | URL of the ONLYOFFICE Document Server                           |
+| `config`               | `IConfig`                                               |   ✅\*   |    -     | Editor configuration object (see [Config API](#config-object))  |
+| `fileId`               | `number`                                                |   ✅\*   |    -     | A file on the portal to open; the wrapper fetches the two above |
+| `fileVersion`          | `number`                                                |    -     |    -     | Version of that file to open                                    |
+| `isView`               | `boolean`                                               |    -     |    -     | Ask the portal for a read-only configuration of that file       |
+| `width`                | `string`                                                |    -     | `"100%"` | Width of the editor container (CSS value)                       |
+| `height`               | `string`                                                |    -     | `"100%"` | Height of the editor container (CSS value)                      |
+| `shardkey`             | `string`                                                |    -     |    -     | Shard key for load balancing across multiple document servers   |
+| `onLoadComponentError` | `(errorCode: number, errorDescription: string) => void` |    -     |    -     | Callback invoked when the component fails to load               |
+
+\* One of two shapes: `documentServerUrl` with `config`, or `fileId` (with `fileVersion` and
+`isView` if wanted). The props type is that union, so a caller passing `fileId` does not name
+the other two, and a caller passing neither is refused at compile time.
+
+### By file id, through the portal
+
+Under an `ApiProvider` the wrapper can be told only which file to open. It asks the portal for
+its document server (`filesSettingsApi.getDocServiceUrl`) and for the file's editor
+configuration (`filesApi.openEditFile`, with `view` when `isView` is set), then mounts the
+editor with both. Everything is requested as whoever the provider speaks for, so under a
+client's OAuth token the configuration is the client's. It renders nothing until the
+configuration arrives; `events_onAppReady` is when the editor is up.
+
+```tsx
+<DocumentEditor
+  id="draft"
+  fileId={1024}
+  isView
+  height="560px"
+  events_onAppReady={() => setReady(true)}
+  onLoadComponentError={(code, message) => setProblem(message)}
+/>
+```
 
 ## Config Object
 

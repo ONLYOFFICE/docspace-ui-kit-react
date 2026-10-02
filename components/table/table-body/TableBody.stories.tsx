@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -56,85 +21,81 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `TableBody renders table rows with support for infinite scrolling and virtual scrolling.
+        component: `TableBody holds the rows of a table and, for a long list, renders only the rows in view and asks for the next page as the user scrolls.
 
-### Features
-
-- **Virtual Scrolling**: Uses react-window for efficient rendering of large datasets
-- **Infinite Scrolling**: Automatically fetches more data when scrolling near the bottom
-- **Configurable Item Height**: Supports custom row heights for different layouts
-- **Info Panel Awareness**: Adjusts column layout when the info panel is visible
-
-### Usage
-
-\`\`\`tsx
-import { TableBody } from "@docspace/ui-kit/components/table/table-body";
-
-<TableBody
-  columnStorageName="my-table-columns"
-  columnInfoPanelStorageName="my-table-info-panel"
-  fetchMoreFiles={fetchMore}
-  filesLength={items.length}
-  hasMoreFiles={hasMore}
-  itemCount={items.length}
-  itemHeight={50}
-  useReactWindow
->
-  {rows}
-</TableBody>
-\`\`\``,
+The Table README describes it in full.`,
       },
     },
   },
   argTypes: {
     useReactWindow: {
       control: "boolean",
-      description: "Enable virtual scrolling with react-window",
+      description:
+        "Mounts only the rows near the visible part of the page and loads more on scroll; when off, every row is rendered at once",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     itemHeight: {
       control: "number",
-      description: "Height of each row in pixels",
+      description:
+        "Height of every row in pixels when the rows are virtualised",
       table: {
-        defaultValue: { summary: "50" },
+        defaultValue: { summary: "41" },
       },
     },
     itemCount: {
       control: "number",
-      description: "Total number of items to render",
+      description: "How many rows there are in total, loaded or not",
     },
     filesLength: {
       control: "number",
       description:
-        "Number of currently loaded files (used for infinite scroll calculation)",
+        "How many rows are loaded; rows past this index are drawn as placeholders while `hasMoreFiles` is set",
     },
     hasMoreFiles: {
       control: "boolean",
       description:
-        "Whether more files are available to fetch",
-      table: {
-        defaultValue: { summary: "false" },
-      },
+        "Adds two placeholder rows after the loaded ones and asks `fetchMoreFiles` for more when they come into view",
     },
     infoPanelVisible: {
       control: "boolean",
       description:
-        "Whether the info panel is visible (affects column layout)",
+        "Lays the virtualised rows out with the column widths saved under `columnInfoPanelStorageName` instead of `columnStorageName`",
       table: {
         defaultValue: { summary: "false" },
       },
     },
+    columnStorageName: {
+      control: "text",
+      description:
+        "`localStorage` key the header saved the column widths under; without it the body renders nothing",
+    },
+    columnInfoPanelStorageName: {
+      control: "text",
+      description:
+        "`localStorage` key of the column widths used while an info panel is open; without it the body renders nothing",
+    },
+    isIndexEditingMode: {
+      control: "boolean",
+      description: "Accepted for the rows being reordered, but has no effect",
+    },
     fetchMoreFiles: {
       control: false,
       action: "fetchMoreFiles",
+      description:
+        "Called with the start and stop index of the rows to load when placeholder rows scroll into view",
     },
     onScroll: {
       control: false,
       action: "onScroll",
+      description:
+        "Called as the page scrolls, only while the rows are virtualised",
     },
-    children: { control: false },
+    children: {
+      control: false,
+      description: "The rows, as an array with one element per row",
+    },
   },
   decorators: [
     (Story, context) => {
@@ -230,7 +191,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default TableBody with react-window virtual scrolling enabled and 20 rows.",
+          "Twenty rows through the virtualised body, the mode for a list that can grow long: scroll the frame and only the rows near the view stay mounted, as the counter below it shows.",
       },
       source: {
         code: `<TableBody
@@ -260,7 +221,7 @@ export const WithoutReactWindow: Story = {
     docs: {
       description: {
         story:
-          "TableBody without virtual scrolling. All rows are rendered in the DOM at once. Suitable for small datasets.",
+          "The same twenty rows rendered all at once (`useReactWindow` off), which is simpler and enough for a short list that never pages.",
       },
       source: {
         code: `<TableBody
@@ -293,7 +254,7 @@ export const WithMoreFiles: Story = {
     docs: {
       description: {
         story:
-          "TableBody with hasMoreFiles enabled, indicating more data can be fetched via infinite scroll.",
+          "Five loaded rows followed by two placeholder rows, what the user sees while the next page is on its way (`hasMoreFiles`); `fetchMoreFiles` is called as the placeholders come into view.",
       },
       source: {
         code: `<TableBody

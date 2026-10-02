@@ -34,7 +34,10 @@
 
 .numeration {
   --textarea-numeration-color: #{$gray};
-  --textarea-numeration-text: var(--textarea-numeration-text-color, var(--textarea-numeration-color));
+  --textarea-numeration-text: var(
+    --textarea-numeration-text-color,
+    var(--textarea-numeration-color)
+  );
   --textarea-numeration-fs: var(--textarea-font-size, 13px);
 
   display: block;
@@ -157,7 +160,10 @@
   --textarea-scrollbar-h: var(--textarea-height, 93px);
   --textarea-scrollbar-scale-h: var(--textarea-scrollbar-height-scale, 67vh);
   --textarea-scrollbar-full-h: var(--textarea-height-full, var(--full-height));
-  --textarea-scrollbar-prop-h: var(--textarea-height-custom, var(--height-textarea));
+  --textarea-scrollbar-prop-h: var(
+    --textarea-height-custom,
+    var(--height-textarea)
+  );
 
   width: 100% !important;
   height: var(--textarea-scrollbar-h);

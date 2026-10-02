@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { ActionButton } from ".";
@@ -53,33 +18,44 @@ const meta = {
   title: "UI/Interactive elements/ActionButton",
   component: ActionButton,
   parameters: {
-    docs: {
-      description: {
-        component: `A lightweight polymorphic action button.
-
-### Features
-
-- **Polymorphic**: render as \`button\`, \`a\`, or any React component via \`as\`
-- **Icon support**: optional leading icon via \`icon\` prop
-- **React 19**: accepts \`ref\` as a regular prop
-
-### Usage
-
-\`\`\`tsx
-import { ActionButton } from "@docspace/ui-kit/components/action-button";
-
-<ActionButton onClick={handleClick}>Clear filter</ActionButton>
-
-<ActionButton icon={<FilterIcon />} onClick={handleClick}>Clear filter</ActionButton>
-
-<ActionButton as="a" href="/about">Go to page</ActionButton>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
-    icon: { control: false },
-    as: { control: false },
+    label: {
+      control: "text",
+      description: "Text of the button; anything passed as children is dropped",
+    },
+    icon: {
+      control: false,
+      description:
+        "Icon node drawn at 12px before the label and filled with the text colour",
+    },
+    as: {
+      control: false,
+      description:
+        "Element or component to render instead of a button; its props are then accepted",
+      table: {
+        defaultValue: { summary: "button" },
+      },
+    },
+    className: {
+      control: "text",
+      description:
+        "Class applied to the rendered element after the component's own",
+    },
+    disabled: {
+      control: "boolean",
+      description:
+        "Native button attribute: fades the button to half opacity and blocks clicks",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    onClick: { action: "onClick" },
+  },
+  args: {
+    label: "Clear filter",
   },
 } satisfies Meta<typeof ActionButton>;
 
@@ -87,21 +63,34 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: {
-    children: "Clear filter",
+  render: (args) => <ActionButton {...args} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The plain text button for a secondary action; click it to see \`onClick\` in the Actions panel, and change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<ActionButton label="Clear filter" onClick={handleClick} />`,
+      },
+    },
   },
 };
 
 export const WithIcon: Story = {
   args: {
-    children: "Clear filter",
     icon: <FilterIcon />,
   },
-};
-
-export const TextOnly: Story = {
-  args: {
-    children: "Text",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "An icon before the label makes the action easier to spot in a busy toolbar; the icon takes the text colour (\`icon\`).",
+      },
+      source: {
+        code: `<ActionButton icon={<FilterIcon />} label="Clear filter" />`,
+      },
+    },
   },
 };
 
@@ -109,6 +98,35 @@ export const AsLink: Story = {
   args: {
     as: "a",
     href: "#",
-    children: "Go to page",
+    label: "Go to page",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The same look for an action that navigates: the button becomes a link and takes \`href\` (\`as\`).",
+      },
+      source: {
+        code: `<ActionButton as="a" href="/about" label="Go to page" />`,
+      },
+    },
+  },
+};
+
+export const DisabledState: Story = {
+  args: {
+    icon: <FilterIcon />,
+    disabled: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "An action that is not available yet stays in place but fades and ignores clicks (\`disabled\`); it works only on the default \`button\`.",
+      },
+      source: {
+        code: `<ActionButton icon={<FilterIcon />} label="Clear filter" disabled />`,
+      },
+    },
   },
 };

@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React from "react";
 import type { ComponentProps } from "react";
 
@@ -73,100 +38,86 @@ const locales = [
 ];
 
 const meta = {
-  title: "UI/Interactive elements/DateTimePicker",
+  title: "UI/Form controls/DateTimePicker",
   component: DateTimePicker,
   parameters: {
-    docs: {
-      description: {
-        component: `Combined date and time input component that allows users to select both date and time values.
-
-### Features
-
-- **Calendar Date Selection**: Integrated calendar for picking dates
-- **Time Input**: Built-in time picker with validation
-- **Locale Support**: Supports 25+ locales for date/time formatting
-- **Date Range Constraints**: Configurable min/max date boundaries
-- **Error State**: Visual error indicator for validation
-- **AM/PM Support**: Configurable 12-hour time format translations
-
-### Usage
-
-\`\`\`tsx
-import { DateTimePicker } from "@docspace/ui-kit/components/date-time-picker";
-
-// Basic usage
-<DateTimePicker
-  locale="en"
-  openDate={new Date()}
-  selectDateText="Select date"
-  onChange={(date) => console.log(date)}
-/>
-
-// With date constraints
-<DateTimePicker
-  locale="en"
-  openDate={new Date()}
-  minDate={new Date("2024/01/01")}
-  maxDate={new Date("2030/01/01")}
-  selectDateText="Select date"
-  onChange={(date) => console.log(date)}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     locale: {
       control: "select",
       options: locales,
       description:
-        "Locale for date and time formatting (affects calendar and time display)",
-      table: {
-        defaultValue: { summary: "en" },
-      },
+        "BCP 47 tag the calendar is written in; it also picks the clock: 12-hour with an AM/PM drop-down for English locales, 24-hour for every other",
     },
     hasError: {
       control: "boolean",
-      description: "Indicates if the picker is in an error state",
-      table: {
-        defaultValue: { summary: "false" },
-      },
+      description:
+        "Draws the shown time in red and marks the control as invalid",
     },
     minDate: {
       control: "date",
-      description: "Minimum selectable date and time",
+      description: "Earliest day the calendar lets you pick",
     },
     maxDate: {
       control: "date",
-      description: "Maximum selectable date and time",
+      description: "Latest day the calendar lets you pick",
     },
     initialDate: {
       control: "date",
-      description: "Initial selected date and time value",
+      description:
+        "Date and time the component starts on; read once, when it mounts",
     },
     openDate: {
       control: "date",
-      description: "Date to display when the calendar initially opens",
+      description: "Month the calendar opens on",
     },
     selectDateText: {
       control: "text",
-      description: "Placeholder text shown before a date is selected",
+      description:
+        "Text of the button shown while no date is chosen, also the control's accessible name",
     },
     className: {
       control: "text",
-      description: "Additional CSS class for the date-time picker container",
+      description: "Class added to the outermost element",
+    },
+    id: {
+      control: "text",
+      description: "`id` of the outermost element",
+    },
+    dataTestId: {
+      control: "text",
+      description: "`data-testid` of the outermost element",
+      table: {
+        defaultValue: { summary: "date-time-picker" },
+      },
     },
     hideCross: {
       control: "boolean",
-      description: "Hides the clear (cross) button",
+      description:
+        "Hides the cross on the date chip, so the picked day cannot be cleared",
       table: {
         defaultValue: { summary: "false" },
       },
+    },
+    useMaxTime: {
+      control: "boolean",
+      description:
+        "Reports the first day picked at the end of that day rather than at the current time of day",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    translations: {
+      control: "object",
+      description:
+        "Labels of the AM and PM options in the drop-down; required, as nothing translates them for you",
     },
     onChange: {
       action: "onChange",
       description:
-        "Callback function called when the selected date/time changes",
+        "Called whenever the day or the time changes, with the combined date and time, or `null` when the day is cleared",
     },
   },
 } satisfies Meta<typeof DateTimePicker>;
@@ -179,10 +130,22 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   return <div style={{ height: "500px" }}>{props.children}</div>;
 };
 
+// The date control hands over a timestamp, which the component does not parse.
+const fromControl = <T,>(value: T): T =>
+  (typeof value === "number" ? new Date(value) : value) as T;
+
 export const Default: Story = {
   render: (args) => (
     <Wrapper>
-      <DateTimePicker {...args} />
+      <DateTimePicker
+        {...args}
+        // initialDate is read once on mount, so a new value remounts the picker.
+        key={String(args.initialDate)}
+        initialDate={fromControl(args.initialDate)}
+        minDate={fromControl(args.minDate)}
+        maxDate={fromControl(args.maxDate)}
+        openDate={fromControl(args.openDate)}
+      />
     </Wrapper>
   ),
   args: {
@@ -194,9 +157,26 @@ export const Default: Story = {
     className: "date-time-picker",
     id: "default-date-time-picker",
     hasError: false,
-    onChange: (date: null | DateTime) =>
-      console.log("Date changed:", date),
     translations: { AM: "AM", PM: "PM" },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'The picker as a form shows it before anything is chosen: only the "Select date" button. Pick a day to see the time appear beside it, click the time to edit it, and change any other prop live in the Controls panel below.',
+      },
+      source: {
+        code: `<DateTimePicker
+  locale="en"
+  openDate={new Date()}
+  minDate={new Date("1970/01/01")}
+  maxDate={new Date("2036/01/01")}
+  selectDateText="Select date"
+  translations={{ AM: "AM", PM: "PM" }}
+  onChange={(date) => console.log(date)}
+/>`,
+      },
+    },
   },
 };
 
@@ -208,6 +188,7 @@ const WithErrorTemplate = () => {
         maxDate={new Date(`${new Date().getFullYear() + 10}/01/01`)}
         minDate={new Date("1970/01/01")}
         openDate={now()}
+        initialDate={now()}
         selectDateText="Select date"
         className="date-time-picker"
         id="error-date-time-picker"
@@ -225,13 +206,15 @@ export const WithError: Story = {
     docs: {
       description: {
         story:
-          "DateTimePicker in an error state. The input field displays a visual error indicator.",
+          "Use it when the chosen moment fails validation: the time turns red and the control is marked invalid for screen readers (`hasError`). A day is picked here because the time, the only part drawn in the error colour, shows only once there is one.",
       },
       source: {
         code: `<DateTimePicker
   locale="en"
   openDate={now()}
+  initialDate={now()}
   selectDateText="Select date"
+  translations={{ AM: "AM", PM: "PM" }}
   hasError
   onChange={(date) => console.log(date)}
 />`,
@@ -266,7 +249,7 @@ export const WithInitialDate: Story = {
     docs: {
       description: {
         story:
-          "DateTimePicker with an initial date pre-selected. The picker opens with the date already filled in.",
+          "Use it to edit a moment that already exists, such as a saved deadline: the day chip and the time show it from the first render (`initialDate`). The English locale gives a 12-hour clock; click the time to see the AM/PM drop-down beside the editor.",
       },
       source: {
         code: `<DateTimePicker
@@ -274,6 +257,7 @@ export const WithInitialDate: Story = {
   openDate={now()}
   initialDate={now()}
   selectDateText="Select date"
+  translations={{ AM: "AM", PM: "PM" }}
   onChange={(date) => console.log(date)}
 />`,
       },
@@ -308,7 +292,7 @@ export const HiddenCross: Story = {
     docs: {
       description: {
         story:
-          "DateTimePicker with the clear (cross) button hidden. Users cannot clear the selected date.",
+          "Use it for a field that must always hold a moment: the day chip has no cross, so the day can be changed in the calendar but never cleared (`hideCross`).",
       },
       source: {
         code: `<DateTimePicker
@@ -316,7 +300,50 @@ export const HiddenCross: Story = {
   openDate={now()}
   initialDate={now()}
   selectDateText="Select date"
+  translations={{ AM: "AM", PM: "PM" }}
   hideCross
+  onChange={(date) => console.log(date)}
+/>`,
+      },
+    },
+  },
+};
+
+const TwentyFourHourClockTemplate = () => {
+  return (
+    <Wrapper>
+      <DateTimePicker
+        locale="de"
+        maxDate={new Date(`${new Date().getFullYear() + 10}/01/01`)}
+        minDate={new Date("1970/01/01")}
+        openDate={now()}
+        initialDate={now()}
+        selectDateText="Select date"
+        className="date-time-picker"
+        id="twenty-four-hour-date-time-picker"
+        hasError={false}
+        onChange={(date) => console.log("Date changed:", date)}
+        translations={{ AM: "AM", PM: "PM" }}
+      />
+    </Wrapper>
+  );
+};
+
+export const TwentyFourHourClock: Story = {
+  render: () => <TwentyFourHourClockTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Any locale that is not English switches the clock to 24 hours (`locale`): the time reads "14:30" rather than "02:30 PM", and the editor opened by a click on it has no AM/PM drop-down. The calendar is written in the same locale.',
+      },
+      source: {
+        code: `<DateTimePicker
+  locale="de"
+  openDate={now()}
+  initialDate={now()}
+  selectDateText="Select date"
+  translations={{ AM: "AM", PM: "PM" }}
   onChange={(date) => console.log(date)}
 />`,
       },
@@ -333,21 +360,11 @@ export const CssCustomization: Story = {
           // DateTimePicker time cell
           "--date-time-picker-cell-bg": "#cce5f6",
           "--date-time-picker-icon": "#0082c9",
+          "--date-time-picker-cell-height": "28px",
           "--date-time-picker-cell-radius": "6px",
           "--date-time-picker-cell-padding": "6px 12px",
-          // DatePicker sub-component
-          "--date-picker-bg": "#e6f3fb",
-          "--date-picker-header-border": "1px solid #0082c9",
-          // AddButton sub-component
-          "--add-button-background": "#e6f3fb",
-          "--add-button-icon": "#0082c9",
-          // SelectedItem sub-component
-          "--selected-item-background": "#cce5f6",
-          "--selected-item-background-hover": "#b3d9f0",
-          "--selected-item-active-background": "#0082c9",
-          "--selected-item-active-color": "#ffffff",
           // TimePicker sub-component
-          "--time-input-border": "1px solid #0082c9",
+          "--time-input-focus-border": "#0082c9",
           "--time-input-bg": "#e6f3fb",
           "--time-input-radius": "6px",
           // Calendar sub-component
@@ -356,11 +373,6 @@ export const CssCustomization: Story = {
           "--calendar-title": "#0082c9",
           "--calendar-accent": "#0082c9",
           "--calendar-hover-bg": "#cce5f6",
-          // ComboBox sub-component (AM/PM selector)
-          "--combobox-background": "#e6f3fb",
-          // IconButton (in SelectedItem close button)
-          "--icon-button-color": "#0082c9",
-          "--icon-button-hover-color": "#006fa6",
         } as React.CSSProperties
       }
     >
@@ -382,8 +394,35 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "CSS custom property overrides for the date-time picker and its DatePicker, TimePicker, Calendar, AddButton, SelectedItem, and ComboBox sub-components.",
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. Click the time to see the time editor and the day chip to see the calendar; the day chip, the "select date" button and the AM/PM drop-down keep their own variables, listed in the SelectedItem, AddButton and ComboBox stories.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--date-time-picker-cell-bg": "#cce5f6",
+    "--date-time-picker-icon": "#0082c9",
+    "--date-time-picker-cell-height": "28px",
+    "--date-time-picker-cell-radius": "6px",
+    "--date-time-picker-cell-padding": "6px 12px",
+    "--time-input-focus-border": "#0082c9",
+    "--time-input-bg": "#e6f3fb",
+    "--time-input-radius": "6px",
+    "--calendar-bg": "#e6f3fb",
+    "--calendar-border": "#0082c9",
+    "--calendar-title": "#0082c9",
+    "--calendar-accent": "#0082c9",
+    "--calendar-hover-bg": "#cce5f6",
+  }}
+>
+  <DateTimePicker
+    locale="en"
+    openDate={now()}
+    initialDate={now()}
+    selectDateText="Select date"
+    translations={{ AM: "AM", PM: "PM" }}
+    onChange={(date) => console.log(date)}
+  />
+</div>`,
       },
     },
   },

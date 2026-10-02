@@ -1,0 +1,10 @@
+// Geometry of the floating corner stack - everything an app pins to the bottom
+// inline-end corner of the viewport: the create button, the Support button
+// that opens live chat. They have to keep one height and one baseline and step
+// aside for each other, so all of them derive their placement from these
+// instead of each carrying its own pixel total that goes stale when a
+// neighbour moves.
+$inset: 24px;
+$inset-mobile: 16px;
+$size: 48px;
+$gap: 16px;

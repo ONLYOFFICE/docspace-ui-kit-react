@@ -1,42 +1,8 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import { TabItem } from ".";
 
@@ -44,39 +10,8 @@ const meta = {
   title: "UI/Navigation/TabItem",
   component: TabItem,
   parameters: {
-    docs: {
-      description: {
-        component: `TabItem is a single tab element for building tabbed navigation interfaces.
-
-### Features
-
-- **Active State**: Visual indicator for the currently selected tab
-- **Disabled State**: Prevents interaction when disabled
-- **Custom Labels**: Supports text strings or React nodes as labels
-- **Multi-Select**: Optional multi-selection mode for filter-like behavior
-- **Allow No Selection**: Enables deselecting all tabs
-- **Lock Last Selection**: Prevents deselecting when it's the only selected tab
-
-### Accessibility
-
-- \`aria-selected\`: Indicates the current selection state
-- \`data-testid\`: Provides test identifiers for automation
-
-### Usage
-
-\`\`\`tsx
-import { TabItem } from "@docspace/ui-kit/components/tab-item";
-
-<TabItem label="Documents" isActive onSelect={handleSelect} />
-
-// Tab group
-<div style={{ display: "flex", gap: "16px" }}>
-  <TabItem label="All" isActive={activeTab === "all"} onSelect={() => setActive("all")} />
-  <TabItem label="Shared" isActive={activeTab === "shared"} onSelect={() => setActive("shared")} />
-</div>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0",
@@ -85,41 +20,63 @@ import { TabItem } from "@docspace/ui-kit/components/tab-item";
   argTypes: {
     label: {
       control: "text",
-      description: "Tab text or React node to display",
+      description:
+        "Text of the pill: a string or a React node, cut off with an ellipsis when it does not fit",
     },
     isActive: {
       control: "boolean",
-      description: "Whether the tab is currently active",
+      description:
+        "Whether the pill starts selected. The pill then keeps its selected state itself after clicks; a change of this prop re-syncs it",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isDisabled: {
       control: "boolean",
-      description: "Disables the tab from being interacted with",
+      description:
+        "Ignores clicks and dims the pill to half opacity; a pill that is also selected keeps its full selected look",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     allowNoSelection: {
       control: "boolean",
-      description: "Allows deselecting the tab so no tab is active",
+      description:
+        "Keeps the selected look the pill had on mount: neither clicks nor later `isActive` changes alter it",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withMultiSelect: {
       control: "boolean",
-      description: "Enables multi-select mode for filter-like behavior",
+      description:
+        "Lets a click on a selected pill deselect it. Without it a selected pill stays selected",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     lockLastSelection: {
       control: "boolean",
-      description: "Prevents deselecting when it's the last selected tab",
+      description:
+        "Drops a click on an already selected pill entirely, so `onSelect` does not fire for it either",
       table: {
         defaultValue: { summary: "false" },
+      },
+    },
+    onSelect: {
+      action: "onSelect",
+      description:
+        "Called with the click event on every click that neither `isDisabled` nor `lockLastSelection` blocks",
+    },
+    className: {
+      control: "text",
+      description: "Extra class name on the outer element",
+    },
+    dataTestId: {
+      control: "text",
+      description: "`data-testid` of the outer element",
+      table: {
+        defaultValue: { summary: '"tab-item"' },
       },
     },
   },
@@ -149,11 +106,13 @@ export const Default: Story = {
   args: {
     label: "Tab Item",
     isActive: false,
+    onSelect: fn(),
   },
   parameters: {
     docs: {
       description: {
-        story: "Default inactive tab item. Click to select.",
+        story:
+          "An unselected pill: click it to see it fill in, and change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<TabItem label="Tab Item" onSelect={handleSelect} />`,
@@ -172,7 +131,7 @@ export const ActiveState: Story = {
     docs: {
       description: {
         story:
-          "Tab in its active/selected state with a visual indicator.",
+          "The filled look of a selected pill, for a filter that is already applied when the screen opens (`isActive`).",
       },
       source: {
         code: `<TabItem label="Active Tab" isActive />`,
@@ -192,7 +151,7 @@ export const DisabledState: Story = {
     docs: {
       description: {
         story:
-          "Disabled tab that cannot be interacted with. Appears visually muted.",
+          "A dimmed pill that ignores clicks, for an option that does not apply right now (`isDisabled`).",
       },
       source: {
         code: `<TabItem label="Disabled Tab" isDisabled />`,
@@ -205,10 +164,12 @@ const WithReactNodeTemplate = () => {
   return (
     <TabItem
       label={
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <span
+          style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
+        >
           <span style={{ color: "#2DA7DB" }}>&#9679;</span>
           <span>Tab with Icon</span>
-        </div>
+        </span>
       }
     />
   );
@@ -220,15 +181,15 @@ export const WithReactNodeLabel: Story = {
     docs: {
       description: {
         story:
-          "Tab with a React node as label, allowing custom content like icons alongside text.",
+          "Tab with a React node as label, allowing custom content like icons alongside text. The label renders inside a `<p>`, so the node has to be phrasing content -- a `<span>`, not a `<div>`.",
       },
       source: {
         code: `<TabItem
   label={
-    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
       <span style={{ color: "#2DA7DB" }}>●</span>
       <span>Tab with Icon</span>
-    </div>
+    </span>
   }
 />`,
       },
@@ -278,9 +239,7 @@ export const TabGroup: Story = {
 };
 
 const MultiSelectTemplate = () => {
-  const [selected, setSelected] = useState<Set<string>>(
-    new Set(["documents"]),
-  );
+  const [selected, setSelected] = useState<Set<string>>(new Set(["documents"]));
 
   const toggleSelection = (key: string) => {
     setSelected((prev) => {
@@ -324,7 +283,7 @@ export const MultiSelect: Story = {
     docs: {
       description: {
         story:
-          "Tab group with multi-select enabled, allowing multiple tabs to be active simultaneously. Useful for filter interfaces.",
+          "Three pills that toggle independently, for a filter where several values can apply at once: a click on a selected pill deselects it (`withMultiSelect`).",
       },
       source: {
         code: `<TabItem label="Documents" isActive withMultiSelect onSelect={handleToggle} />
@@ -342,32 +301,40 @@ export const CssCustomization = {
         {
           display: "flex",
           gap: "8px",
-          "--tab-item-active-bg": "#0082c9",
+          "--tab-item-active-bg": "#1f6f43",
           "--tab-item-active-text": "#ffffff",
-          "--tab-item-border": "1px solid #0082c9",
+          "--tab-item-border": "1px dashed #8a8a8a",
           "--tab-item-radius": "6px",
           "--tab-item-padding": "6px 20px",
+          "--tab-item-disabled-opacity": "0.3",
         } as CSSProperties
       }
     >
-      <TabItem label="Files" isActive onSelect={() => {}} />
-      <TabItem label="Photos" isActive={false} onSelect={() => {}} />
-      <TabItem label="Talk" isActive={false} onSelect={() => {}} />
+      <TabItem label="Documents" isActive />
+      <TabItem label="Images" />
+      <TabItem label="Videos" isDisabled />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--tab-item-active-bg\` | Active tab background | accent color |
-| \`--tab-item-active-text\` | Active tab text color | white |
-| \`--tab-item-border\` | Tab border style | theme gray border |
-| \`--tab-item-radius\` | Border radius | \`16px\` |
-| \`--tab-item-padding\` | Inner padding | \`4px 16px\` |
-| \`--tab-item-disabled-opacity\` | Disabled state opacity | \`0.5\` |`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. **Documents** is selected, for the two active variables; **Images** is unselected, for the border; **Videos** is disabled, for the opacity. Radius and padding show on all three.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--tab-item-active-bg": "#1f6f43",
+    "--tab-item-active-text": "#ffffff",
+    "--tab-item-border": "1px dashed #8a8a8a",
+    "--tab-item-radius": "6px",
+    "--tab-item-padding": "6px 20px",
+    "--tab-item-disabled-opacity": "0.3",
+  }}
+>
+  <TabItem label="Documents" isActive />
+  <TabItem label="Images" />
+  <TabItem label="Videos" isDisabled />
+</div>`,
       },
     },
   },

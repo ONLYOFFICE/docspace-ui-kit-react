@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Toast } from "../../components/toast";
@@ -41,11 +6,14 @@ import { toastr } from "../../components/toast/sub-components/Toastr";
 import GroupsSelector from ".";
 import type { GroupsSelectorProps } from "./GroupsSelector.types";
 
+import { withPortalGate } from "../../.storybook/decorators/PortalGate";
+
 type StoryArgs = GroupsSelectorProps;
 
 const meta: Meta<StoryArgs> = {
   title: "Components/Selectors/GroupsSelector",
   component: GroupsSelector,
+  decorators: [withPortalGate("Groups selector")],
   tags: ["!autodocs"],
   parameters: {
     docs: {
@@ -54,7 +22,7 @@ const meta: Meta<StoryArgs> = {
 
 ### Features
 
-- **Live API mode**: Fetches groups from the DocSpace Groups API in batches of 100 with infinite scroll
+- **Live API mode**: Fetches groups from the ONLYOFFICE Apps Groups API in batches of 100 with infinite scroll
 - **Single-select**: The user can pick exactly one group at a time
 - **Search**: Filters groups by name; resets and re-fetches the list automatically
 - **Header**: Optional configurable header with a close button via \`withHeader\` / \`headerProps\`
@@ -64,7 +32,7 @@ const meta: Meta<StoryArgs> = {
 ### Usage
 
 \`\`\`tsx
-import GroupsSelector from "@docspace/ui-kit/selectors/Groups";
+import GroupsSelector from "@onlyoffice/apps-ui-kit/selectors/Groups";
 
 // Inline mode
 <GroupsSelector
@@ -169,7 +137,6 @@ const Template = (props: StoryArgs) => (
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     withHeader: true,
     headerProps: {
       headerLabel: "Select Group",
@@ -187,7 +154,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default story using a live DocSpace API. Groups are fetched and filtered via the search field.",
+          "Default story using a live ONLYOFFICE Apps API. Groups are fetched and filtered via the search field.",
       },
       source: {
         code: `<GroupsSelector
@@ -208,7 +175,6 @@ export const AsideMode: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     useAside: true,
     withoutBackground: false,
     withBlur: false,

@@ -10,7 +10,10 @@
     --disabled-selected-item-color: #{colors.$gray-dark-text};
   }
 
-  --label-disabled-color: var(--selected-item-disabled-text, var(--disabled-selected-item-color));
+  --label-disabled-color: var(
+    --selected-item-disabled-text,
+    var(--disabled-selected-item-color)
+  );
   --label-margin: var(--selected-item-label-margin, 10px);
 
   line-height: 20px;
@@ -30,7 +33,7 @@
     --filter-input-selected-items-hover-background: #{colors.$light-gray-hover};
 
     --filter-block-item-tag-active-background: #{colors.$light-blue-main-active};
-    --filter-block-item-tag-active-color:  #{colors.$light-blue-main};
+    --filter-block-item-tag-active-color: #{colors.$light-blue-main};
   }
 
   :global(.dark) & {
@@ -41,10 +44,22 @@
     --filter-block-item-tag-active-color: #{colors.$light-blue-main};
   }
 
-  --selected-item-background: var(--selected-item-bg, var(--filter-input-selected-items-background));
-  --selected-item-background-hover: var(--selected-item-bg-hover, var(--filter-input-selected-items-hover-background));
-  --selected-item-active-background: var(--selected-item-active-bg, var(--filter-block-item-tag-active-background));
-  --selected-item-active-color: var(--selected-item-active-text, var(--filter-block-item-tag-active-color));
+  --selected-item-background: var(
+    --selected-item-bg,
+    var(--filter-input-selected-items-background)
+  );
+  --selected-item-background-hover: var(
+    --selected-item-bg-hover,
+    var(--filter-input-selected-items-hover-background)
+  );
+  --selected-item-active-background: var(
+    --selected-item-active-bg,
+    var(--filter-block-item-tag-active-background)
+  );
+  --selected-item-active-color: var(
+    --selected-item-active-text,
+    var(--filter-block-item-tag-active-color)
+  );
   --selected-item-border-radius: var(--selected-item-radius, 3px);
   --selected-item-inner-padding: var(--selected-item-padding, 6px 8px);
   --selected-item-h: var(--selected-item-height, 32px);

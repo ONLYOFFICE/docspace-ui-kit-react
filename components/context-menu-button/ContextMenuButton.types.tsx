@@ -1,106 +1,96 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { TDirectionX, TDirectionY } from "../../types";
 import type { ContextMenuModel } from "../context-menu";
 import type { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
 
 export interface ContextMenuButtonProps {
-	/** Sets the button to present an opened state */
-	opened?: boolean;
-	/** Array of options for display */
-	data?: ContextMenuModel[];
-	/** Function for converting to inner data */
-	getData?: () => ContextMenuModel[];
-	/** Specifies the icon title */
-	title?: string;
-	/** Specifies the icon name */
-	iconName?: string;
-	/** Specifies the icon size */
-	size?: number;
-	/** Specifies the icon color */
-	color?: string;
-	/** Sets the button to present a disabled state */
-	isDisabled?: boolean;
-	/** Specifies the icon hover color */
-	hoverColor?: string;
-	/** Specifies the icon click color */
-	clickColor?: string;
-	/** Specifies the icon hover name */
-	iconHoverName?: string;
-	/** Specifies the icon click name */
-	iconClickName?: string;
-	/** Specifies the icon open name */
-	iconOpenName?: string;
-	/** Triggers a callback function when the mouse enters the button borders */
-	onMouseEnter?: (e: React.MouseEvent) => void;
-	/** Triggers a callback function when the mouse leaves the button borders */
-	onMouseLeave?: (e: React.MouseEvent) => void;
-	/** Triggers a callback function when the mouse moves over the button borders */
-	onMouseOver?: (e: React.MouseEvent) => void;
-	/** Triggers a callback function when the mouse moves out of the button borders */
-	onMouseOut?: (e: React.MouseEvent) => void;
-	onClick?: (e: React.MouseEvent) => void;
-	/** Direction X */
-	directionX?: TDirectionX;
-	/** Direction Y */
-	directionY?: TDirectionY;
-	/** Fixes the direction of the dropdown */
-	fixedDirection?: boolean;
-	/** Accepts class */
-	className?: string;
-	/** Accepts id */
-	id?: string;
-	/** Accepts css style */
-	style?: React.CSSProperties;
-	/** Sets the number of columns */
-	columnCount?: number;
-	/** Sets the display type */
-	displayType?: ContextMenuButtonDisplayType;
-	/** Closing event */
-	onClose?: () => void;
-	/** Sets the drop down open with the portal */
-	usePortal?: boolean;
-	/** Sets the class of the drop down element */
-	dropDownClassName?: string;
-	/** Sets the class of the icon button */
-	iconClassName?: string;
-	/** Enables displaying the icon borders  */
-	displayIconBorder?: boolean;
-	isFill?: boolean;
-	zIndex?: number;
-	asideHeader?: React.ReactNode;
-	testId?: string;
+  /** Opens the menu from outside. Changing it opens or closes the menu. */
+  opened?: boolean;
+  /**
+   * Items of the menu, read **once** to seed the internal state. Every later
+   * change is ignored — `getData` is what the open menu is built from.
+   */
+  data?: ContextMenuModel[];
+  /**
+   * Builds the items when the button is clicked. It is not optional in
+   * practice: the click handler calls it without checking, so a button without
+   * it throws on the first click.
+   */
+  getData?: () => ContextMenuModel[];
+  /** Hover tooltip of the icon. It needs `RootTooltip` mounted. */
+  title?: string;
+  /** URL of the icon, fetched at runtime. Without it the kit's vertical dots are drawn. */
+  iconName?: string;
+  /** Size of the icon in pixels.
+   * @default 16 */
+  size?: number;
+  /** Any CSS colour for the icon, or the literal `"accent"`. */
+  color?: string;
+  /** Greys the icon out and stops the menu opening. */
+  isDisabled?: boolean;
+  /** Colour of the icon while the pointer is over it. */
+  hoverColor?: string;
+  /** Colour of the icon while it is held down. */
+  clickColor?: string;
+  /** URL of the icon shown while the pointer is over the button. */
+  iconHoverName?: string;
+  /** URL of the icon shown while the button is held down. */
+  iconClickName?: string;
+  /** URL of the icon shown while the menu is open. */
+  iconOpenName?: string;
+  /** Called when the pointer enters the icon. */
+  onMouseEnter?: (e: React.MouseEvent) => void;
+  /** Called when the pointer leaves the icon. */
+  onMouseLeave?: (e: React.MouseEvent) => void;
+  /** Called on **mouse down** on the icon, despite the name. */
+  onMouseOver?: (e: React.MouseEvent) => void;
+  /** Called on **mouse up** on the icon, despite the name, and only for the middle and right buttons. */
+  onMouseOut?: (e: React.MouseEvent) => void;
+  /**
+   * Called on a click — after the menu has opened in `dropdown` mode, and
+   * instead of opening anything in `toggle` mode, where it is how you render a
+   * menu of your own.
+   */
+  onClick?: (e: React.MouseEvent) => void;
+  /** Preferred horizontal side of the menu.
+   * @default "left" */
+  directionX?: TDirectionX;
+  /** Preferred vertical side of the menu. */
+  directionY?: TDirectionY;
+  /** Keeps those directions as given instead of flipping them to fit. */
+  fixedDirection?: boolean;
+  /** Applied to the wrapper around the icon and the menu. */
+  className?: string;
+  /** Applied to that wrapper. */
+  id?: string;
+  /** Applied to that wrapper. */
+  style?: React.CSSProperties;
+  /** Ignored. It reaches the menu, which does not read it either. */
+  columnCount?: number;
+  /**
+   * `toggle` renders no menu of its own and leaves `onClick` to open one;
+   * `auto` behaves exactly like `dropdown`.
+   * @default ContextMenuButtonDisplayType.dropdown
+   */
+  displayType?: ContextMenuButtonDisplayType;
+  /** Called when the menu closes by itself, after a click outside. */
+  onClose?: () => void;
+  /** Whether the menu is rendered in a portal on `document.body`.
+   * @default true */
+  usePortal?: boolean;
+  /** Applied to the menu element. */
+  dropDownClassName?: string;
+  /** Applied to the icon. */
+  iconClassName?: string;
+  /** Draws a rounded border around the icon, 32px square. */
+  displayIconBorder?: boolean;
+  /** Colours the icon by filling its shapes rather than stroking them.
+   * @default true */
+  isFill?: boolean;
+  /** Stacking order of the menu. */
+  zIndex?: number;
+  /** Ignored. Nothing reads this prop. */
+  asideHeader?: React.ReactNode;
+  /** Value of `data-testid` on the wrapper.
+   * @default "context-menu-button" */
+  testId?: string;
 }

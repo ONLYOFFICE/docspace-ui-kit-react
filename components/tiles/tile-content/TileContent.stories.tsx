@@ -1,40 +1,7 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import WordSvgUrl from "../../../assets/icons/32/word.svg";
 
@@ -47,52 +14,55 @@ import { Badge } from "../../badge";
 const element = <WordSvgUrl />;
 
 const mockContextOptions = [
-	{ key: "edit", label: "Edit" },
-	{ key: "delete", label: "Delete" },
+  { key: "edit", label: "Edit" },
+  { key: "delete", label: "Delete" },
 ];
 
 const meta = {
-	title: "UI/Tiles/TileContent",
-	component: TileContent,
-	parameters: {
-		docs: {
-			description: {
-				component: `Content wrapper component for tile items, handles layout and spacing.
-
-### Features
-
-- **Flexible Layout**: Wraps any content within a tile structure
-- **Text Overflow**: Handles long text with ellipsis truncation
-- **Composable**: Works with Link, Text, Badge, and other components
-- **Consistent Spacing**: Provides uniform padding and alignment within tiles
-
-### Usage
-
-\`\`\`tsx
-import { TileContent } from "@docspace/ui-kit/components/tiles/tile-content";
-import { BaseTile } from "@docspace/ui-kit/components/tiles/base-tile";
-
-<BaseTile item={item} element={icon} topContent={
-  <TileContent>
-    <Link>Document.docx</Link>
-  </TileContent>
-} />
-\`\`\``,
-			},
-		},
-	},
-	decorators: [
-		(Story) => (
-			<div style={{ maxWidth: "300px", margin: "20px" }}>
-				<BaseTile
-					item={{ id: "1", title: "Document.docx" }}
-					contextOptions={mockContextOptions}
-					element={element}
-					topContent={<Story />}
-				/>
-			</div>
-		),
-	],
+  title: "UI/Tiles/TileContent",
+  component: TileContent,
+  parameters: {
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
+  },
+  argTypes: {
+    children: {
+      control: false,
+      description:
+        "The one element shown as the tile's name; a `containerWidth` prop on it becomes the width of the slot",
+    },
+    onClick: {
+      description:
+        "Called with no argument when anything inside the slot is clicked",
+    },
+    className: {
+      control: "text",
+      description: "Class added after the component's own on the outer element",
+    },
+    id: {
+      control: "text",
+      description: "Value of `id` on the outer element",
+    },
+    style: {
+      control: "object",
+      description: "Inline style of the outer element",
+    },
+  },
+  args: {
+    onClick: fn(),
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ maxWidth: "300px", margin: "20px" }}>
+        <BaseTile
+          item={{ id: "1", title: "Document.docx" }}
+          contextOptions={mockContextOptions}
+          element={element}
+          topContent={<Story />}
+        />
+      </div>
+    ),
+  ],
 } satisfies Meta<typeof TileContent>;
 
 type Story = StoryObj<ComponentProps<typeof TileContent>>;
@@ -100,109 +70,125 @@ type Story = StoryObj<ComponentProps<typeof TileContent>>;
 export default meta;
 
 export const Default: Story = {
-	args: {
-		children: <Link>Document.docx</Link>,
-	},
-	parameters: {
-		docs: {
-			description: {
-				story: "Basic tile content with a link inside BaseTile",
-			},
-			source: {
-				code: `<TileContent>
+  args: {
+    children: <Link>Document.docx</Link>,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A file name as a link, the way a tile usually shows it. Click it to see `onClick` in the Actions panel, and change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<TileContent>
   <Link>Document.docx</Link>
 </TileContent>`,
-			},
-		},
-	},
+      },
+    },
+  },
 };
 
 export const WithText: Story = {
-	args: {
-		children: (
-			<Text fontSize="14px" fontWeight={600}>
-				My Document
-			</Text>
-		),
-	},
-	parameters: {
-		docs: {
-			description: {
-				story: "Tile content with text component inside BaseTile",
-			},
-			source: {
-				code: `<TileContent>
+  args: {
+    children: (
+      <Text fontSize="14px" fontWeight={600}>
+        My Document
+      </Text>
+    ),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A name that should not look clickable, for an item the reader cannot open: plain `Text` in place of a link.",
+      },
+      source: {
+        code: `<TileContent>
   <Text fontSize="14px" fontWeight={600}>My Document</Text>
 </TileContent>`,
-			},
-		},
-	},
+      },
+    },
+  },
 };
 
 export const WithMultipleElements: Story = {
-	args: {
-		children: (
-			<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-				<Link>Document.docx</Link>
-				<Badge label="New" backgroundColor="#4781D1" color="#fff" />
-			</div>
-		),
-	},
-	parameters: {
-		docs: {
-			description: {
-				story: "Tile content with multiple child elements",
-			},
-			source: {
-				code: `<TileContent>
+  args: {
+    children: (
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <Link>Document.docx</Link>
+        <Badge label="New" backgroundColor="#4781D1" color="#fff" />
+      </div>
+    ),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A name with a badge beside it. The slot takes one element, so the name and the badge go inside a wrapper of your own.",
+      },
+      source: {
+        code: `<TileContent>
   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
     <Link>Document.docx</Link>
     <Badge label="New" backgroundColor="#4781D1" color="#fff" />
   </div>
 </TileContent>`,
-			},
-		},
-	},
+      },
+    },
+  },
+};
+
+export const FixedTitleWidth: Story = {
+  args: {
+    children: (
+      <Text containerWidth="120px" truncate>
+        Quarterly report with a long name.docx
+      </Text>
+    ),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A name held to a set width whatever room the tile has, so the names in a grid end at the same point: the slot takes its width from the child's own `containerWidth` prop, and `truncate` on the `Text` cuts the rest off.",
+      },
+      source: {
+        code: `<TileContent>
+  <Text containerWidth="120px" truncate>
+    Quarterly report with a long name.docx
+  </Text>
+</TileContent>`,
+      },
+    },
+  },
 };
 
 export const CssCustomization: Story = {
-	// Story-level decorator wraps OUTSIDE the meta decorator (which already
-	// embeds TileContent inside BaseTile), so CSS vars cascade into BaseTile.
-	decorators: [
-		(Story) => (
-			<div
-				style={
-					{
-						"--tile-bg": "#e6f3fb",
-						"--tile-border-style": "1px solid #0082c9",
-						"--tile-radius": "16px",
-						"--tile-hover-bg": "#cce5f6",
-						"--tile-icon-color": "#0082c9",
-					} as CSSProperties
-				}
-			>
-				<Story />
-			</div>
-		),
-	],
-	args: {
-		children: <Link>Document.docx</Link>,
-	},
-	parameters: {
-		docs: {
-			description: {
-				story: `TileContent is a structural wrapper — its appearance is inherited from the parent BaseTile. CSS Custom Properties are set on the BaseTile container:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--tile-bg\` | Tile background color | theme-based |
-| \`--tile-border-style\` | Tile border | theme-based |
-| \`--tile-radius\` | Tile border radius | \`12px\` |
-| \`--tile-hover-bg\` | Hover/checked background | theme-based |
-| \`--tile-icon-color\` | Icon button color | theme-based |
-
-See **BaseTile**, **FileTile**, **FolderTile**, or **RoomTile** CSS Custom Properties stories for the full list.`,
-			},
-		},
-	},
+  // This decorator wraps the meta one, so the variables reach the BaseTile around the slot.
+  decorators: [
+    (Story) => (
+      <div
+        style={
+          {
+            "--tile-bg": "#e6f3fb",
+            "--tile-border-style": "1px solid #0082c9",
+            "--tile-radius": "16px",
+            "--tile-hover-bg": "#cce5f6",
+          } as CSSProperties
+        }
+      >
+        <Story />
+      </div>
+    ),
+  ],
+  args: {
+    children: <Link>Document.docx</Link>,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `TileContent reads no variables of its own -- the tile's variables it sits in are listed under CSS variables on the BaseTile, FileTile, FolderTile and RoomTile pages. This example sets four of the BaseTile ones on a wrapper; hover the tile to see the hover background.`,
+      },
+    },
+  },
 };

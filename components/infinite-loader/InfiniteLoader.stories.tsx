@@ -1,41 +1,8 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps, ReactNode } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import { fn } from "storybook/test";
 
 import { useEffect, useState } from "react";
 
@@ -69,16 +36,51 @@ const generateItems = (
 const ScrollStructureWrapper = ({ children }: { children: ReactNode }) => (
   <div style={{ height: "300px", position: "relative" }} id="sectionScroll">
     <Scrollbar>
+      {/* The loader measures its width from these portal container ids */}
       <div id="tileContainer" style={{ width: "100%" }}>
-        {children}
+        <div id="rowContainer">
+          <div id="table-container">{children}</div>
+        </div>
       </div>
     </Scrollbar>
   </div>
 );
 
-const InfiniteLoaderDemo = () => {
-  const [items, setItems] = useState<React.ReactNode[]>(generateItems(20, 0));
-  const [itemCount] = useState(100);
+type InfiniteLoaderDemoProps = {
+  viewAs?: TViewAs;
+  itemCount?: number;
+  itemSize?: number;
+  countTilesInRow?: number;
+  isLoading?: boolean;
+  infoPanelVisible?: boolean;
+  hasMoreFiles?: boolean;
+  columnStorageName?: string;
+  columnInfoPanelStorageName?: string;
+  loadMoreItems?: (range: IndexRange) => Promise<void>;
+  onScroll?: () => void;
+  renderItem?: (index: number) => ReactNode;
+};
+
+const InfiniteLoaderDemo = ({
+  viewAs = "tile" as TViewAs,
+  itemCount: itemCountProp = 100,
+  itemSize = 20,
+  countTilesInRow = 4,
+  isLoading = false,
+  infoPanelVisible,
+  hasMoreFiles: hasMoreFilesProp,
+  columnStorageName,
+  columnInfoPanelStorageName,
+  loadMoreItems: onLoadMore,
+  onScroll,
+  renderItem,
+}: InfiniteLoaderDemoProps = {}) => {
+  const makeItems = (count: number, startIndex: number) =>
+    renderItem
+      ? Array.from({ length: count }, (_, i) => renderItem(startIndex + i))
+      : generateItems(count, startIndex);
+  const [items, setItems] = useState<React.ReactNode[]>(makeItems(20, 0));
+  const [itemCount] = useState(itemCountProp);
   const [loadedCount, setLoadedCount] = useState(20);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -86,14 +88,14 @@ const InfiniteLoaderDemo = () => {
     startIndex,
     stopIndex,
   }: IndexRange): Promise<void> => {
-    console.log("loadMoreItems", { startIndex, stopIndex });
+    onLoadMore?.({ startIndex, stopIndex });
 
     await new Promise((resolve) => {
       setTimeout(resolve, 500);
     });
 
     const newItemsCount = stopIndex - startIndex + 1;
-    const newItems = generateItems(newItemsCount, loadedCount);
+    const newItems = makeItems(newItemsCount, loadedCount);
 
     setItems((prev) => [...prev, ...newItems]);
     setLoadedCount((prev) => prev + newItemsCount);
@@ -116,14 +118,18 @@ const InfiniteLoaderDemo = () => {
 
   return (
     <InfiniteLoaderComponent
-      viewAs={"tile" as TViewAs}
+      viewAs={viewAs}
       itemCount={itemCount}
       filesLength={loadedCount}
-      hasMoreFiles={loadedCount < itemCount}
+      hasMoreFiles={hasMoreFilesProp ?? loadedCount < itemCount}
       loadMoreItems={loadMoreItems}
-      itemSize={20}
-      countTilesInRow={4}
-      isLoading={false}
+      itemSize={itemSize}
+      countTilesInRow={countTilesInRow}
+      isLoading={isLoading}
+      infoPanelVisible={infoPanelVisible}
+      columnStorageName={columnStorageName}
+      columnInfoPanelStorageName={columnInfoPanelStorageName}
+      onScroll={onScroll}
     >
       {items}
     </InfiniteLoaderComponent>
@@ -134,39 +140,8 @@ const meta = {
   title: "UI/Status components/InfiniteLoader",
   component: InfiniteLoaderComponent,
   parameters: {
-    docs: {
-      description: {
-        component: `InfiniteLoader component for handling large lists of items with virtualization support.
-
-### Features
-
-- **Virtualized Rendering**: Efficiently renders large lists by only mounting visible items
-- **Infinite Scrolling**: Automatically loads more items as the user scrolls
-- **Tile & Row Views**: Supports both tile and row layout modes via the \`viewAs\` prop
-- **Loading State**: Displays skeleton placeholders while content is loading
-- **Configurable Item Size**: Customize item height for precise scroll calculations
-- **Info Panel Awareness**: Adjusts layout when the info panel is visible
-
-### Usage
-
-\`\`\`tsx
-import { InfiniteLoaderComponent } from "@docspace/ui-kit/components/infinite-loader";
-
-<InfiniteLoaderComponent
-  viewAs="tile"
-  itemCount={totalItems}
-  filesLength={loadedItems.length}
-  hasMoreFiles={hasMore}
-  loadMoreItems={handleLoadMore}
-  itemSize={48}
-  countTilesInRow={4}
-  isLoading={false}
->
-  {items}
-</InfiniteLoaderComponent>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   decorators: [
     (Story) => (
@@ -179,47 +154,95 @@ import { InfiniteLoaderComponent } from "@docspace/ui-kit/components/infinite-lo
     viewAs: {
       control: "select",
       options: ["row", "tile", "table"],
-      description: "Layout mode for rendering items",
-      table: {
-        defaultValue: { summary: "row" },
-      },
+      description:
+        "Which layout to render: `tile` lays the children out as rows of a grid, `row` and `table` as a list; it also picks the placeholder shown for rows not loaded yet",
     },
     hasMoreFiles: {
       control: "boolean",
-      description: "Whether there are more items to load",
-      table: {
-        defaultValue: { summary: "false" },
-      },
+      description:
+        "Whether there is another page to ask for; while false, every row counts as loaded and no placeholder is shown",
     },
     filesLength: {
       control: "number",
-      description: "Number of currently loaded files/items",
+      description: "How many items are loaded so far",
     },
     itemCount: {
       control: "number",
-      description: "Total number of items available",
+      description: "How many items there are in total, loaded or not",
+    },
+    loadMoreItems: {
+      control: false,
+      description:
+        "Called with the start and stop index of the items to load when the user scrolls near the end of the loaded ones; it returns a promise",
     },
     itemSize: {
       control: "number",
-      description: "Height of each item in pixels (used for scroll calculations)",
+      description:
+        "Height of every row in pixels in the `row` and `table` layouts; the `tile` layout ignores it and sizes each row from the tile it holds",
+    },
+    children: {
+      control: false,
+      description:
+        "The items, as an array with one entry per list row, table row or row of tiles",
+    },
+    onScroll: {
+      control: false,
+      description: "Called as the list scrolls",
     },
     isLoading: {
       control: "boolean",
-      description: "Whether content is currently loading",
+      description: "Renders nothing at all while true",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     countTilesInRow: {
       control: "number",
-      description: "Number of tiles per row in tile view mode",
+      description:
+        "How many tiles one row of the `tile` layout holds; it decides which rows count as loaded and how many skeleton tiles a row shows during a long scroll jump",
+      table: {
+        defaultValue: { summary: "1" },
+      },
+    },
+    columnStorageName: {
+      control: "text",
+      description:
+        "`localStorage` key holding the table's column widths; required in the `table` layout, which throws without it",
+    },
+    columnInfoPanelStorageName: {
+      control: "text",
+      description:
+        "`localStorage` key holding the table's column widths while the info panel is open; required in the `table` layout",
     },
     infoPanelVisible: {
       control: "boolean",
-      description: "Whether the info panel is currently visible",
+      description:
+        "Reads the table's column widths from the info-panel key instead of the regular one",
       table: {
         defaultValue: { summary: "false" },
       },
+    },
+    className: {
+      control: "text",
+      description: "Class added to the list element",
+    },
+    currentFolderId: {
+      control: "text",
+      description:
+        "Identifier of the folder being shown; when it changes, the `tile` layout measures its row heights again",
+    },
+    showSkeleton: {
+      control: false,
+      description:
+        "Ignored; the loader sets it itself after a scroll jump of more than 800px",
+    },
+    smallPreview: {
+      control: false,
+      description: "Declared, but no layout reads it",
+    },
+    isOneTile: {
+      control: false,
+      description: "Declared, but no layout reads it",
     },
   },
 } satisfies Meta<typeof InfiniteLoaderComponent>;
@@ -227,6 +250,185 @@ import { InfiniteLoaderComponent } from "@docspace/ui-kit/components/infinite-lo
 type Story = StoryObj<ComponentProps<typeof InfiniteLoaderComponent>>;
 
 export default meta;
+
+export const Default: Story = {
+  args: {
+    viewAs: "tile" as TViewAs,
+    itemCount: 100,
+    itemSize: 20,
+    countTilesInRow: 4,
+    isLoading: false,
+    infoPanelVisible: false,
+    hasMoreFiles: true,
+    loadMoreItems: fn(),
+    onScroll: fn(),
+  },
+  render: (args) => <InfiniteLoaderDemo {...args} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Scroll the box: when the end of the loaded items comes near, the loader asks for the next range, and the new items arrive half a second later (`loadMoreItems`, logged in the Actions panel). In the `tile` layout each child is one row of the grid; here a plain box stands in for a row of tiles. Change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<InfiniteLoaderComponent
+  viewAs="tile"
+  itemCount={100}
+  filesLength={20}
+  hasMoreFiles={true}
+  loadMoreItems={handleLoadMore}
+  itemSize={20}
+  countTilesInRow={4}
+  isLoading={false}
+>
+  {items}
+</InfiniteLoaderComponent>`,
+      },
+    },
+  },
+};
+
+const renderTableRow = (index: number) => (
+  <>
+    <div style={{ padding: "12px 8px" }}>Document {index + 1}</div>
+    <div style={{ padding: "12px 8px" }}>Today</div>
+    <div style={{ padding: "12px 8px" }}>{(index % 9) + 1} KB</div>
+  </>
+);
+
+const TABLE_COLUMNS_KEY = "storybook-infinite-loader-columns";
+
+const saveTableColumns = () => {
+  try {
+    localStorage.setItem(TABLE_COLUMNS_KEY, "2fr 1fr 1fr");
+  } catch {
+    // Without storage the rows fall back to a single column
+  }
+};
+
+export const RowLayout: Story = {
+  args: {
+    viewAs: "row" as TViewAs,
+    itemCount: 100,
+    itemSize: 48,
+    hasMoreFiles: true,
+    loadMoreItems: fn(),
+  },
+  render: (args) => <InfiniteLoaderDemo {...args} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A list of rows of one height (`viewAs="row"`, `itemSize`). Scroll to the end: the rows after the last loaded item are skeleton rows until the next page arrives, and a jump of more than 800px, such as dragging the scrollbar, turns every row in view into a skeleton while the scrolling lasts.',
+      },
+      source: {
+        code: `<InfiniteLoaderComponent
+  viewAs="row"
+  itemCount={100}
+  filesLength={loadedItems.length}
+  hasMoreFiles={hasMore}
+  loadMoreItems={handleLoadMore}
+  itemSize={48}
+>
+  {items}
+</InfiniteLoaderComponent>`,
+      },
+    },
+  },
+};
+
+export const TableLayout: Story = {
+  args: {
+    viewAs: "table" as TViewAs,
+    itemCount: 100,
+    itemSize: 48,
+    hasMoreFiles: true,
+    columnStorageName: TABLE_COLUMNS_KEY,
+    columnInfoPanelStorageName: TABLE_COLUMNS_KEY,
+    loadMoreItems: fn(),
+  },
+  render: (args) => {
+    saveTableColumns();
+    return <InfiniteLoaderDemo {...args} renderItem={renderTableRow} />;
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A table whose rows share one column layout (`viewAs="table"`). The layout is not passed as a prop: the loader reads it from `localStorage` under the key it is given (`columnStorageName`, or `columnInfoPanelStorageName` while `infoPanelVisible` is set), which lets the table header that saves the widths and the rows below stay in step. The rows not loaded yet show the table skeleton.',
+      },
+      source: {
+        code: `localStorage.setItem("filesColumns", "2fr 1fr 1fr");
+
+<InfiniteLoaderComponent
+  viewAs="table"
+  itemCount={100}
+  filesLength={loadedItems.length}
+  hasMoreFiles={hasMore}
+  loadMoreItems={handleLoadMore}
+  itemSize={48}
+  columnStorageName="filesColumns"
+  columnInfoPanelStorageName="filesColumnsInfoPanel"
+>
+  {rows.map((file) => (
+    <>
+      <div>{file.title}</div>
+      <div>{file.modified}</div>
+      <div>{file.size}</div>
+    </>
+  ))}
+</InfiniteLoaderComponent>`,
+      },
+    },
+  },
+};
+
+const renderRtlItem = (index: number) => (
+  <div
+    style={{
+      padding: "8px",
+      border: "1px solid #eee",
+      margin: "4px",
+      borderRadius: "4px",
+    }}
+  >
+    {`\u0645\u0644\u0641 ${index + 1}`}
+  </div>
+);
+
+export const RightToLeft: Story = {
+  args: {
+    viewAs: "row" as TViewAs,
+    itemCount: 100,
+    itemSize: 48,
+    hasMoreFiles: true,
+    loadMoreItems: fn(),
+  },
+  globals: { direction: "rtl" },
+  render: (args) => (
+    <div dir="rtl">
+      <InfiniteLoaderDemo {...args} renderItem={renderRtlItem} />
+    </div>
+  ),
+  parameters: {
+    noPadding: true,
+    docs: {
+      description: {
+        story:
+          "The row layout in a right-to-left interface: the text of each row starts at the right edge of the row instead of the left.",
+      },
+      source: {
+        code: `<div dir="rtl">
+  <InfiniteLoaderComponent viewAs="row" itemSize={48} {...props}>
+    {items}
+  </InfiniteLoaderComponent>
+</div>`,
+      },
+      // Framed so the RTL direction it stamps on <html> stays out of the Docs page
+      story: { inline: false, height: "326px" },
+    },
+  },
+};
 
 export const CssCustomization: Story = {
   render: () => (
@@ -245,42 +447,20 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--infinite-loader-tile-gap\` | Gap between tiles in tile view | \`14px 16px\` |
-| \`--infinite-loader-tile-min-size\` | Minimum tile width in grid | \`216px\` |
-| \`--infinite-loader-tile-max-size\` | Maximum tile width in grid | \`360px\` |
-| \`--infinite-loader-list-width\` | Override row/table layout width (dev override) | — |
-| \`--infinite-loader-table-width\` | Width basis for row/table layouts (set by parent) | \`100%\` |`,
-      },
-    },
-  },
-};
-
-export const Default: Story = {
-  args: {},
-  render: () => <InfiniteLoaderDemo />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Default infinite loader displaying a virtualized list of tile items that loads more content on scroll.",
+        story: `The three tile variables set on one wrapper -- the variables are listed under CSS variables on this page. They size only the skeleton tiles, which appear for a moment when the box is scrolled by more than 800px at once — drag the scrollbar quickly to see them.`,
       },
       source: {
-        code: `<InfiniteLoaderComponent
-  viewAs="tile"
-  itemCount={100}
-  filesLength={20}
-  hasMoreFiles={true}
-  loadMoreItems={handleLoadMore}
-  itemSize={20}
-  countTilesInRow={4}
-  isLoading={false}
+        code: `<div
+  style={{
+    "--infinite-loader-tile-gap": "20px 24px",
+    "--infinite-loader-tile-min-size": "180px",
+    "--infinite-loader-tile-max-size": "280px",
+  }}
 >
-  {items}
-</InfiniteLoaderComponent>`,
+  <InfiniteLoaderComponent viewAs="tile" countTilesInRow={4} {...props}>
+    {items}
+  </InfiniteLoaderComponent>
+</div>`,
       },
     },
   },

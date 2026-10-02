@@ -1,41 +1,8 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import { RootTooltip } from "../tooltip";
 
 import { Text } from ".";
 
@@ -43,123 +10,210 @@ const meta = {
   title: "UI/Data display/Text",
   component: Text,
   parameters: {
-    docs: {
-      description: {
-        component: `Component that displays plain text with various styling options.
-
-### Features
-
-- **Multiple HTML Tags**: Render as p, span, div, or heading elements via the \`as\` prop
-- **Typography Control**: Customize fontSize, fontWeight, lineHeight, and color
-- **Text Styles**: Support for bold, italic, inline, and truncated text
-- **Text Direction**: LTR, RTL, and auto direction support
-- **Alignment**: Left, center, right, and justify alignment
-- **Selection Control**: Disable text selection with \`noSelect\`
-- **Tooltip Support**: Built-in tooltip via the \`withTooltip\` HOC
-
-### Usage
-
-\`\`\`tsx
-import { Text } from "@docspace/ui-kit/components/text";
-
-// Basic text
-<Text>Hello world</Text>
-
-// Bold heading text
-<Text as="h2" fontSize="24px" isBold>Section Title</Text>
-
-// Truncated text
-<Text truncate>Very long text that will be truncated...</Text>
-
-// RTL text
-<Text dir="rtl">مرحبا بالعالم</Text>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     as: {
       control: "select",
-      options: ["p", "span", "div", "h1", "h2", "h3", "h4", "h5", "h6"],
-      description: "HTML element to render",
+      options: [
+        "p",
+        "span",
+        "div",
+        "label",
+        "a",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+      ],
+      description:
+        "Element to render the text as; wins over `tag` when both are set",
       table: {
         defaultValue: { summary: "p" },
       },
     },
+    tag: {
+      control: "text",
+      description:
+        "Tag name of the element to render, used only while `as` is unset",
+    },
+    children: {
+      control: "text",
+      description: "Text to render",
+    },
     fontSize: {
       control: "text",
-      description: "Sets the font size",
+      description:
+        "Font size, set as an inline style; a `fontSize` in `style` wins over it",
+      table: {
+        defaultValue: { summary: "13px" },
+      },
     },
     fontWeight: {
       control: "text",
-      description: "Sets the font weight",
+      description:
+        "Font weight, set as an inline style; ignored while `isBold` is on",
+      table: {
+        defaultValue: { summary: "400" },
+      },
     },
     color: {
       control: "color",
-      description: "Text color",
+      description:
+        "Text colour, set as an inline style; without it the text takes the colour of its parent",
     },
     backgroundColor: {
       control: "color",
-      description: "Background color",
+      description: "Background colour behind the text, set as an inline style",
     },
     textAlign: {
       control: "select",
       options: ["left", "center", "right", "justify"],
-      description: "Text alignment",
-      table: {
-        defaultValue: { summary: "left" },
-      },
+      description:
+        "Aligns the lines to the left, the centre or the right, or stretches them to both edges; without it the text follows its parent's alignment",
     },
     lineHeight: {
       control: "text",
-      description: "Line height",
+      description: "Height of each line, set as an inline style",
     },
     dir: {
       control: "select",
       options: ["ltr", "rtl", "auto"],
-      description: "Text direction",
-      table: {
-        defaultValue: { summary: "ltr" },
-      },
+      description:
+        "Writing direction: `ltr` and `rtl` set it on the element; `auto` lets the browser pick it from the text and wraps the text in a span that clicks pass through",
+    },
+    view: {
+      control: "select",
+      options: [undefined, "tile"],
+      description:
+        "`tile` cuts the text to two lines with an ellipsis, and only while `dir` is `auto`; any other value does nothing",
     },
     isBold: {
       control: "boolean",
-      description: "Sets font weight to bold (700)",
+      description: "Sets the weight to 700, overriding `fontWeight`",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isItalic: {
       control: "boolean",
-      description: "Sets font style to italic",
+      description: "Renders the text in italics",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isInline: {
       control: "boolean",
-      description: "Sets display to inline-block",
+      description:
+        "Makes the element an inline block, so it sits on a line beside other text",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     truncate: {
       control: "boolean",
-      description: "Truncates overflowing text with ellipsis",
+      description:
+        "Keeps the text on one line and ends it with an ellipsis; it needs a parent of bounded width, otherwise the element grows instead",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     noSelect: {
       control: "boolean",
-      description: "Disables text selection",
+      description: "Stops the reader from selecting the text",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     title: {
       control: "text",
-      description: "Title attribute for native hover tooltip",
+      description:
+        "Text of the kit's shared tooltip that opens when the pointer rests on the text; it needs `RootTooltip` mounted",
+    },
+    onClick: {
+      action: "onClick",
+      description: "Called with the event when the text is clicked",
+    },
+    htmlFor: {
+      control: "text",
+      description:
+        'Passed to the element unchanged, for `as="label"`: the `id` of the field the text names',
+    },
+    href: {
+      control: "text",
+      description: 'Passed to the element unchanged, for `as="a"`',
+    },
+    rel: {
+      control: "text",
+      description: 'Passed to the element unchanged, for `as="a"`',
+    },
+    tabIndex: {
+      control: "number",
+      description:
+        "Passed to the element unchanged; a focusable text element also needs a `role` from you",
+    },
+    role: {
+      control: "text",
+      description:
+        "ARIA role of the element, passed unchanged: `status` or `alert` for a line that reports an outcome, `button` alongside `tabIndex` and `onClick`",
+    },
+    "aria-label": {
+      control: "text",
+      description:
+        "Accessible name, passed unchanged, for text whose content is not what should be announced",
+    },
+    "aria-live": {
+      control: "select",
+      options: [undefined, "off", "polite", "assertive"],
+      description:
+        "Passed unchanged, so a screen reader reads the text out when it changes",
+    },
+    "aria-hidden": {
+      control: "boolean",
+      description:
+        "Passed unchanged, hiding decorative text that repeats what is already read",
+    },
+    id: {
+      control: "text",
+      description: "The element's own `id`",
+    },
+    className: {
+      control: false,
+      description: "Class name added after the component's own classes",
+    },
+    style: {
+      control: false,
+      description:
+        "Inline styles of the element, merged over the style props, so its values win",
+    },
+    display: {
+      control: false,
+      description:
+        "Ignored: written onto the element as an unknown attribute and does not change the layout; use `isInline` or `style`",
+    },
+    containerWidth: {
+      control: false,
+      description:
+        "Not read by the text itself: `RowContent` and `TileContent` read it off the child as the width of the slot they put it in",
+    },
+    containerMinWidth: {
+      control: false,
+      description:
+        "Not read by the text itself: `RowContent` reads it off the child as the minimum width of a side slot",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Value of `data-testid` on the element",
+      table: {
+        defaultValue: { summary: "text" },
+      },
+    },
+    ref: {
+      control: false,
+      description: "Attached to the rendered element, whatever `as` made it",
     },
   },
 } satisfies Meta<typeof Text>;
@@ -188,6 +242,19 @@ export const Default: Story = {
     children: "Sample text content",
     as: "p",
     fontSize: "13px",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A paragraph at the kit's body size and regular weight, the starting point for any line of text; change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<Text as="p" fontSize="13px">
+  Sample text content
+</Text>`,
+      },
+    },
   },
 };
 
@@ -319,7 +386,8 @@ export const FontSizes: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Text rendered at various font sizes from 10px to 24px.",
+        story:
+          "Seven lines from 10px to 24px, to pick a size against the 13px body text (`fontSize`).",
       },
       source: {
         code: `<Text fontSize="10px">10px - Extra small text</Text>
@@ -340,7 +408,7 @@ export const FontWeights: Story = {
     docs: {
       description: {
         story:
-          "Text rendered at various font weights from light (300) to bold (700).",
+          "Five lines from light (300) to bold (700), to compare weights at the same size (`fontWeight`); a weight shows only if the font carries it.",
       },
       source: {
         code: `<Text fontWeight="300">Light (300)</Text>
@@ -359,7 +427,7 @@ export const TextStyles: Story = {
     docs: {
       description: {
         story:
-          "Text with bold, italic, and combined bold+italic styling via boolean props.",
+          "Emphasis without choosing a weight: **Bold text** sets 700 (`isBold`), **Italic text** slants it (`isItalic`), and the last line combines both.",
       },
       source: {
         code: `<Text>Regular text</Text>
@@ -377,7 +445,7 @@ export const TextAlignment: Story = {
     docs: {
       description: {
         story:
-          "Text with different alignment options: left, center, right, and justify.",
+          "The four alignments in one column (`textAlign`); the justified paragraph stretches every line but the last to both edges.",
       },
       source: {
         code: `<Text textAlign="left">Left aligned text</Text>
@@ -395,7 +463,7 @@ export const InlineText: Story = {
     docs: {
       description: {
         story:
-          "Inline text elements rendered side by side using the isInline prop.",
+          "Three pieces of text on one line, for mixing styles inside a sentence without a wrapper (`isInline`).",
       },
       source: {
         code: `<Text isInline>First inline text</Text>
@@ -412,7 +480,7 @@ export const TruncatedText: Story = {
     docs: {
       description: {
         story:
-          "Text that truncates with an ellipsis when it exceeds the container width.",
+          "A sentence longer than its 200px box stays on one line and ends with an ellipsis (`truncate`); without a box of bounded width it would grow instead.",
       },
       source: {
         code: `<div style={{ width: 200 }}>
@@ -429,7 +497,7 @@ export const HeadingElements: Story = {
     docs: {
       description: {
         story:
-          "Text rendered as heading elements (h1-h6) using the as prop with appropriate sizes.",
+          "Real `h1`-`h6` elements for a document outline, each given its size and weight by hand (`as`, `fontSize`, `fontWeight`); `Heading` carries these sizes already.",
       },
       source: {
         code: `<Text as="h1" fontSize="32px" fontWeight="700">Heading 1</Text>
@@ -449,7 +517,7 @@ export const Direction: Story = {
     docs: {
       description: {
         story:
-          "Text direction support for LTR, RTL, and auto-detected direction.",
+          'For text whose language is not known in advance: the first line is set left to right and the second right to left (`dir`); the last two leave the direction to the browser, which reads it from the text itself (`dir="auto"`).',
       },
       source: {
         code: `<Text dir="ltr">English text (LTR)</Text>
@@ -466,11 +534,36 @@ export const NoSelectText: Story = {
     docs: {
       description: {
         story:
-          "Text with selection disabled via the noSelect prop. Try selecting the second line.",
+          "For captions that should not be copied by accident: drag across both lines, and only the first one is selected (`noSelect`).",
       },
       source: {
         code: `<Text>This text can be selected</Text>
 <Text noSelect>This text cannot be selected</Text>`,
+      },
+    },
+  },
+};
+
+export const WithTooltip: Story = {
+  render: () => (
+    <>
+      <Text isInline title="Last edited on 12 March">
+        Updated recently
+      </Text>
+      <RootTooltip />
+    </>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For text that needs a word of explanation without taking space on the page: rest the pointer on the line to read the tooltip (`title`). It opens the kit's shared tooltip, which needs `RootTooltip` mounted, as this story does.",
+      },
+      source: {
+        code: `<Text isInline title="Last edited on 12 March">
+  Updated recently
+</Text>
+<RootTooltip />`,
       },
     },
   },
@@ -492,12 +585,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-\`\`\`css
---text-size    /* font-size (default 13px) */
---text-weight  /* font-weight (default 400) */
-\`\`\``,
+        story: `Both variables set on one wrapper -- the variables are listed under CSS variables on this page. The line of text inside comes out larger and semibold.`,
       },
       source: {
         code: `<div

@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Toast } from "../../components/toast";
@@ -44,11 +9,14 @@ import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
 import AIAgentSelector from ".";
 import type { AIAgentSelectorProps } from "./AIAgent.types";
 
+import { withPortalGate } from "../../.storybook/decorators/PortalGate";
+
 type StoryArgs = AIAgentSelectorProps;
 
 const meta: Meta<StoryArgs> = {
   title: "Components/Selectors/AIAgentSelector",
   component: AIAgentSelector,
+  decorators: [withPortalGate("AI agent selector")],
   tags: ["!autodocs"],
   parameters: {
     docs: {
@@ -57,7 +25,7 @@ const meta: Meta<StoryArgs> = {
 
 ### Features
 
-- **Live API mode**: Fetches AI agent rooms from the DocSpace API with infinite scroll
+- **Live API mode**: Fetches AI agent rooms from the ONLYOFFICE Apps API with infinite scroll
 - **Init data mode**: Accepts pre-loaded items for SSR or offline scenarios via \`withInit\`
 - **Security filtering**: Disable items that lack the \`UseChat\` permission via \`disableBySecurity\`
 - **Exclusion list**: Skip already-selected agents via \`excludeItems\`
@@ -67,7 +35,7 @@ const meta: Meta<StoryArgs> = {
 ### Usage
 
 \`\`\`tsx
-import AIAgentSelector from "@docspace/ui-kit/selectors/AIAgent";
+import AIAgentSelector from "@onlyoffice/apps-ui-kit/selectors/AIAgent";
 
 // Live API mode
 <AIAgentSelector
@@ -167,7 +135,15 @@ export default meta;
 type Story = StoryObj<StoryArgs>;
 
 const Template = (props: StoryArgs) => (
-  <div style={{ width: "700px", height: "600px", border: "4px dashed #d0d5dd", overflow: "hidden", transform: "translateZ(0)" }}>
+  <div
+    style={{
+      width: "700px",
+      height: "600px",
+      border: "4px dashed #d0d5dd",
+      overflow: "hidden",
+      transform: "translateZ(0)",
+    }}
+  >
     <Toast />
     <AIAgentSelector {...props} />
   </div>
@@ -176,7 +152,6 @@ const Template = (props: StoryArgs) => (
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     withPadding: true,
     disableBySecurity: undefined,
     excludeItems: [],
@@ -193,7 +168,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default story using a live DocSpace API to load agent rooms.",
+          "Default story using a live ONLYOFFICE Apps API to load agent rooms.",
       },
       source: {
         code: `<AIAgentSelector
@@ -247,7 +222,6 @@ export const WithInit: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     withPadding: true,
     withInit: true,
     initItems,

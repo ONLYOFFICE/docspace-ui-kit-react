@@ -1,72 +1,39 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { LoaderTypes } from "./Loader.enums";
 
 export type LoaderProps = {
-	/** Ref to access the DOM element or React component instance */
-	ref?: React.RefObject<SVGSVGElement>;
-	/** Custom color for the loader. Can be any valid CSS color value */
-	color?: string;
-	/**
-	 * Type of loader animation to display. Available types:
-	 * - base: Simple circular spinner
-	 * - oval: Oval-shaped loading animation
-	 * - dual-ring: Two concentric rotating rings
-	 * - rombs: Diamond-shaped loading animation
-	 * - track: Circular track with rotating segment
-	 */
-	type?: LoaderTypes;
-	/** Size of the loader in valid CSS units (px, rem, em, etc.) */
-	size?: string;
-	/** Optional text to display below the loader */
-	label?: string;
-	/** Additional CSS class name for custom styling */
-	className?: string;
-	/** Unique identifier for the loader component */
-	id?: string;
-	/** Custom inline CSS styles */
-	style?: React.CSSProperties;
-	/** If true, uses primary color from theme */
-	primary?: boolean;
-	/** If true, loader will appear in a disabled state */
-	isDisabled?: boolean;
+  /** Reaches the `<svg>` of the `track` type; the other types ignore it. */
+  ref?: React.RefObject<SVGSVGElement>;
+  /** Any CSS colour, applied as the stroke of the animation and the colour of
+   * the `base` type's text. */
+  color?: string;
+  /** Which animation to render. There is **no default**, and `base` is not an
+   * animation: both it and an absent `type` fall through to a branch that
+   * renders `label` as plain text and nothing else. Pass `oval`, `dualRing`,
+   * `rombs` or `track` for something that spins. */
+  type?: LoaderTypes;
+  /** Size of the animation as a CSS length, applied to both axes. The
+   * stylesheet falls back to 40px for most types and 20px for `track`. For the
+   * `base` type this is the font size of the text instead. */
+  size?: string;
+  /** Accessible name of the animation, set as its `aria-label`. For the `base`
+   * type it is not a label at all but the entire rendered content. */
+  label?: string;
+  /** Applied to the wrapper around the animation, not to the animation. */
+  className?: string;
+  /** Applied to the wrapper. */
+  id?: string;
+  /** Applied to the wrapper, and again to the inner span of the `base` type. */
+  style?: React.CSSProperties;
+  /** Uses the primary button's track colour, for a loader drawn on top of a
+   * primary button. Read by the `track` type only. */
+  primary?: boolean;
+  /** Dims the animation to the disabled opacity. Read by the `track` type
+   * only. */
+  isDisabled?: boolean;
 };
 
 export type LoaderThemeProps = LoaderProps & {
-	ref: SVGSVGElement;
-	viewBox?: string;
-	xmlns?: string;
+  ref: SVGSVGElement;
+  viewBox?: string;
+  xmlns?: string;
 };

@@ -1,42 +1,8 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { describe, expect, it, afterEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 import { Aside } from ".";
+import styles from "./Aside.module.scss";
 
 describe("Aside Component", () => {
   const mockOnClose = vi.fn();
@@ -104,5 +70,55 @@ describe("Aside Component", () => {
 
     const aside = screen.getByTestId("aside");
     expect(aside).toBeInTheDocument();
+  });
+
+  // The panel is a flex column and the scrolling body is the item that takes
+  // what the header leaves. Drop either half and the body's last ~53px fall
+  // below the bottom edge again, which jsdom cannot measure -- so guard the two
+  // class names that carry the layout instead.
+  it("lays the panel out as a column with the scrolling body as its flexible item", () => {
+    render(
+      <Aside visible onClose={mockOnClose}>
+        test content
+      </Aside>,
+    );
+
+    expect(screen.getByTestId("aside")).toHaveClass(styles.aside);
+    expect(screen.getByTestId("scrollbar")).toHaveClass(styles.body);
+  });
+
+  it("gives header props to the header and aria-* to the panel, not both", () => {
+    const onBack = vi.fn();
+
+    render(
+      <Aside
+        visible
+        onClose={mockOnClose}
+        zIndex={500}
+        header="Details"
+        isBackButton
+        onBackClick={onBack}
+        id="panel-header"
+        style={{ color: "red" }}
+        aria-label="Room details"
+      >
+        test content
+      </Aside>,
+    );
+
+    const aside = screen.getByTestId("aside");
+    const header = screen.getByTestId("aside-header");
+
+    // Header props stay off the DOM element.
+    expect(aside).not.toHaveAttribute("onbackclick");
+    expect(aside).not.toHaveAttribute("isbackbutton");
+    expect(aside).not.toHaveAttribute("header");
+    // `style` and `id` are the header's; the panel keeps its own z-index.
+    expect(aside).toHaveStyle({ zIndex: 500 });
+    expect(aside).not.toHaveAttribute("id");
+    expect(document.querySelectorAll("#panel-header")).toHaveLength(1);
+    // `aria-*` names the landmark, and only the landmark.
+    expect(aside).toHaveAttribute("aria-label", "Room details");
+    expect(header).not.toHaveAttribute("aria-label", "Room details");
   });
 });

@@ -1,69 +1,64 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type React from "react";
 
 import type { TextProps } from "../text";
 
 type PickedTextProps = Pick<TextProps, "title" | "truncate">;
 
-type PickedInputProps = Pick<
-	React.ComponentPropsWithoutRef<"input">,
-	"name" | "value" | "tabIndex" | "onChange"
->;
+// Declared here rather than picked out of React's attribute interfaces, which
+// document none of them and would leave the table's most important rows blank.
+type InputProps = {
+  /** Name of the underlying checkbox input. */
+  name?: string;
+  // React's own type for `<input value>`, kept wide on purpose: narrowing it to
+  // `string` would reject `value={1}` in code that compiled before.
+  /** Value of the underlying checkbox input, for a form read by name. */
+  value?: string | number | readonly string[];
+  /** Applied to the checkbox's **icon**, which is the focusable element — the
+   * input beneath it is always `-1`. Pass `-1` for a checkbox the keyboard is
+   * meant to skip.
+   * @default 0 */
+  tabIndex?: number;
+  /** Called with the input's change event; the new state is
+   * `event.target.checked`. The event does not bubble further — the component
+   * stops its propagation. */
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+};
 
-type PickedLabelProps = Pick<
-	React.LabelHTMLAttributes<HTMLLabelElement>,
-	"id" | "style" | "className"
->;
+type LabelProps = {
+  /** Applied to the `<label>` that wraps the whole control. */
+  id?: string;
+  /** Applied to the `<label>` that wraps the whole control. */
+  style?: React.CSSProperties;
+  /** Applied to the `<label>` that wraps the whole control. */
+  className?: string;
+};
 
 export type CheckboxProps = PickedTextProps &
-	PickedInputProps &
-	PickedLabelProps & {
-		/** Label of the input */
-		label?: string;
-		/** Sets the checked state of the checkbox */
-		isChecked?: boolean;
-		/** The state is displayed as a rectangle in the checkbox when set to true */
-		isIndeterminate?: boolean;
-		/** Disables the Checkbox input */
-		isDisabled?: boolean;
-		/** Renders the help button */
-		helpButton?: React.ReactNode;
-		/** Notifies if the error occurs */
-		hasError?: boolean;
-		/** Test id for the checkbox */
-		dataTestId?: string;
-	};
+  InputProps &
+  LabelProps & {
+    /** Text beside the box. It sits in the flow beside the icon, so a long one
+     * wraps unless `truncate` is set. */
+    label?: string;
+    /** The state the checkbox starts in, and the one it is reset to whenever
+     * this prop changes. It is **not** a controlled value: a click flips the
+     * component's own state whether or not the parent agrees.
+     * @default false */
+    isChecked?: boolean;
+    /** Draws a dash instead of a tick and sets the input's DOM `indeterminate`
+     * property, for a parent whose children are partly selected.
+     * @default false */
+    isIndeterminate?: boolean;
+    /** Disables the input, dims the box and the label, and stops the control
+     * responding to a click. */
+    isDisabled?: boolean;
+    /** Node rendered after the label, usually a `HelpButton`. Clicking it does
+     * not toggle the checkbox. */
+    helpButton?: React.ReactNode;
+    /** Draws the box and the label in the error colour. It renders no message —
+     * pair it with `FieldContainer` for that.
+     * @default false */
+    hasError?: boolean;
+    /** Value of `data-testid` on the `<label>`.
+     * @default "checkbox" */
+    dataTestId?: string;
+  };

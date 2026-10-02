@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -46,28 +11,9 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `TableSettings provides a dropdown for managing column visibility in tables.
+        component: `TableSettings is the cog at the end of a TableHeader that opens a list of the columns, each with a checkbox that shows or hides it.
 
-### Features
-
-- **Column Toggles**: Enable or disable individual columns via checkboxes
-- **Disabled State**: Entire settings panel can be disabled during operations
-- **Persistent Configuration**: Works with column storage for saving user preferences
-
-### Usage
-
-\`\`\`tsx
-import { TableSettings } from "@docspace/ui-kit/components/table/sub-components/table-settings";
-
-<TableSettings
-  columns={[
-    { key: "name", title: "Name", enable: true, sortBy: SortByFieldName.Name, onChange: handleToggle },
-    { key: "type", title: "Type", enable: true, sortBy: SortByFieldName.Type, onChange: handleToggle },
-    { key: "modified", title: "Modified", enable: false, sortBy: SortByFieldName.ModifiedDate, onChange: handleToggle },
-  ]}
-  disableSettings={false}
-/>
-\`\`\``,
+The Table README describes it in full.`,
       },
     },
   },
@@ -75,11 +21,11 @@ import { TableSettings } from "@docspace/ui-kit/components/table/sub-components/
     columns: {
       control: false,
       description:
-        "Array of column configuration objects with visibility toggles",
+        "The table's columns; only those with an `onChange` and without `isDisabled` get a checkbox",
     },
     disableSettings: {
       control: "boolean",
-      description: "Disable the entire settings panel",
+      description: "Greys the cog out and stops the list of columns opening",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -130,7 +76,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default table settings dropdown with four columns. The Modified column is disabled by default.",
+          "The cog that lets a user choose which columns to see; click it to open the list, where Modified is unticked because that column is hidden.",
       },
       source: {
         code: `<TableSettings
@@ -157,12 +103,67 @@ export const Disabled: Story = {
     docs: {
       description: {
         story:
-          "Table settings in a disabled state. The settings dropdown cannot be opened or interacted with.",
+          "A greyed-out cog that does not open, for the moments the column set must not change, such as while rows are reordered (`disableSettings`).",
       },
       source: {
         code: `<TableSettings
   columns={columns}
   disableSettings
+/>`,
+      },
+    },
+  },
+};
+
+export const WithLockedColumns: Story = {
+  render: (args) => <TableSettings {...args} />,
+  args: {
+    columns: [
+      {
+        key: "name",
+        title: "Name",
+        enable: true,
+        sortBy: SortByFieldName.Name,
+        isDisabled: true,
+        onChange: () => {},
+      },
+      {
+        key: "type",
+        title: "Type",
+        enable: true,
+        sortBy: SortByFieldName.Type,
+        onChange: () => {},
+      },
+      {
+        key: "size",
+        title: "Size",
+        enable: true,
+        sortBy: SortByFieldName.Size,
+      },
+      {
+        key: "modified",
+        title: "Modified",
+        enable: false,
+        sortBy: SortByFieldName.ModifiedDate,
+        onChange: () => {},
+      },
+    ],
+    disableSettings: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Click the cog: only Type and Modified are listed. Name is marked `isDisabled` and Size has no `onChange`, so neither can be hidden, which keeps the column that identifies a row always on screen.",
+      },
+      source: {
+        code: `<TableSettings
+  columns={[
+    { key: "name", title: "Name", enable: true, isDisabled: true, onChange: handleToggle },
+    { key: "type", title: "Type", enable: true, onChange: handleToggle },
+    { key: "size", title: "Size", enable: true },
+    { key: "modified", title: "Modified", enable: false, onChange: handleToggle },
+  ]}
 />`,
       },
     },

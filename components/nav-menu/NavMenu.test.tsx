@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { createRef } from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
@@ -57,18 +22,14 @@ const groups: NavMenuGroup[] = [
       {
         id: "ai-rooms",
         label: "AI Rooms",
-        children: [
-          { id: "rooms-recent", label: "Recent" },
-        ],
+        children: [{ id: "rooms-recent", label: "Recent" }],
       },
     ],
   },
   {
     id: "available",
     label: "Available Apps",
-    items: [
-      { id: "ai-agents", label: "AI Agents" },
-    ],
+    items: [{ id: "ai-agents", label: "AI Agents" }],
   },
 ];
 
@@ -91,15 +52,25 @@ describe("<NavMenu />", () => {
 
     it("renders all top-level item labels", () => {
       render(<NavMenu groups={groups} />);
-      expect(screen.getByRole("button", { name: "AI Files" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "AI Rooms" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "AI Agents" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "AI Files" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "AI Rooms" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "AI Agents" }),
+      ).toBeInTheDocument();
     });
 
     it("renders sub-items expanded when defaultExpandedId is set", () => {
       render(<NavMenu groups={groups} defaultExpandedId="ai-files" />);
-      expect(screen.getByRole("button", { name: "Shared with me" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Favorites" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Shared with me" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Favorites" }),
+      ).toBeInTheDocument();
     });
 
     it("does not render group label element when label is omitted", () => {
@@ -135,7 +106,9 @@ describe("<NavMenu />", () => {
       await userEvent.click(button);
 
       expect(button).toHaveAttribute("aria-expanded", "true");
-      expect(screen.getByRole("button", { name: "Shared with me" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Shared with me" }),
+      ).toBeInTheDocument();
     });
 
     it("keeps active item expanded on second click", async () => {
@@ -343,7 +316,9 @@ describe("<NavMenu />", () => {
           defaultExpandedId="ai-files"
         />,
       );
-      const activeSubButton = screen.getByRole("button", { name: "Shared with me" });
+      const activeSubButton = screen.getByRole("button", {
+        name: "Shared with me",
+      });
       expect(activeSubButton.className).toMatch(/active/);
     });
   });
@@ -354,7 +329,9 @@ describe("<NavMenu />", () => {
         {
           id: "g",
           label: "Group",
-          items: [{ id: "item-1", label: "Item", showBadge: true, labelBadge: 5 }],
+          items: [
+            { id: "item-1", label: "Item", showBadge: true, labelBadge: 5 },
+          ],
         },
       ];
       render(<NavMenu groups={badgeGroups} />);
@@ -366,7 +343,9 @@ describe("<NavMenu />", () => {
         {
           id: "g",
           label: "Group",
-          items: [{ id: "item-1", label: "Item", showBadge: false, labelBadge: 5 }],
+          items: [
+            { id: "item-1", label: "Item", showBadge: false, labelBadge: 5 },
+          ],
         },
       ];
       render(<NavMenu groups={badgeGroups} />);
@@ -412,7 +391,13 @@ describe("<NavMenu />", () => {
           id: "g",
           label: "Group",
           items: [
-            { id: "item-1", label: "Item", showBadge: true, labelBadge: 3, onClickBadge },
+            {
+              id: "item-1",
+              label: "Item",
+              showBadge: true,
+              labelBadge: 3,
+              onClickBadge,
+            },
           ],
         },
       ];
@@ -429,7 +414,13 @@ describe("<NavMenu />", () => {
           id: "g",
           label: "Group",
           items: [
-            { id: "item-1", label: "Item", showBadge: true, labelBadge: 3, onClick },
+            {
+              id: "item-1",
+              label: "Item",
+              showBadge: true,
+              labelBadge: 3,
+              onClick,
+            },
           ],
         },
       ];
@@ -610,9 +601,7 @@ describe("<NavMenu />", () => {
             {
               id: "parent",
               label: "Parent",
-              children: [
-                { id: "child", label: "Child", onClick: subOnClick },
-              ],
+              children: [{ id: "child", label: "Child", onClick: subOnClick }],
             },
           ],
         },

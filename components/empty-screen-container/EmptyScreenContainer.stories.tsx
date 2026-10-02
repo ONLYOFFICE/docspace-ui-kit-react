@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -49,41 +14,8 @@ const meta = {
   title: "UI/Layout components/EmptyScreenContainer",
   component: EmptyScreenContainer,
   parameters: {
-    docs: {
-      description: {
-        component: `A component for displaying empty states in the application with images, headers, descriptions, and action buttons.
-
-### Features
-
-- **Image Display**: Configurable empty state illustration with custom sizing
-- **Text Content**: Header, subheading, and description text sections
-- **Action Buttons**: Optional button area for filter reset or navigation actions
-- **Filter Variant**: Styling variant for filter-related empty states via \`withoutFilter\`
-
-### Usage
-
-\`\`\`tsx
-import { EmptyScreenContainer } from "@docspace/ui-kit/components/empty-screen-container";
-
-// With filter reset button
-<EmptyScreenContainer
-  imageSrc={emptyImage}
-  imageAlt="No results"
-  headerText="No results matching your search"
-  descriptionText="Try adjusting your filters"
-  buttons={<ResetFilterButton />}
-/>
-
-// Welcome screen without filter styling
-<EmptyScreenContainer
-  imageSrc={welcomeImage}
-  imageAlt="Welcome"
-  headerText="Welcome to your workspace"
-  withoutFilter
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     imageSrc: {
@@ -113,14 +45,16 @@ import { EmptyScreenContainer } from "@docspace/ui-kit/components/empty-screen-c
     },
     withoutFilter: {
       control: "boolean",
-      description: "Whether to display without filter styling",
+      description:
+        "Adds the height of a filter bar to the space above the image, 91px instead of 52px on desktop, for a screen that has no filter bar above it",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     imageStyle: {
       control: "object",
-      description: "Custom CSS styles for the image (desktop only)",
+      description:
+        "Inline styles for the image and the only way past its fixed size; ignored on windows between 601px and 1023px wide",
     },
     buttonStyle: {
       control: "object",
@@ -129,6 +63,15 @@ import { EmptyScreenContainer } from "@docspace/ui-kit/components/empty-screen-c
     className: {
       control: "text",
       description: "Additional CSS class name",
+    },
+    id: {
+      control: false,
+      description: "Accepted by the type but ignored: it never reaches the DOM",
+    },
+    style: {
+      control: false,
+      description:
+        "Accepted by the type but ignored; style the outer element through `className`",
     },
   },
 } satisfies Meta<typeof EmptyScreenContainer>;
@@ -170,7 +113,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Full-featured empty state with header, subheading, description, and a reset filter button.",
+          "The full layout, for a list a filter has emptied: a header, a subheading and a description explain why nothing is shown, and a reset action under them offers the way back.",
       },
       source: {
         code: `<EmptyScreenContainer
@@ -198,7 +141,7 @@ export const MinimalContent: Story = {
     docs: {
       description: {
         story:
-          "Minimal empty state with only header text and a navigation button.",
+          "The least a screen needs, for a place where there is nothing to explain: the image, one header line and a single way out.",
       },
       source: {
         code: `<EmptyScreenContainer
@@ -227,7 +170,7 @@ export const CustomStyles: Story = {
     docs: {
       description: {
         story:
-          "Empty state with custom image dimensions and button container spacing.",
+          "For artwork of another shape: the image is resized past its fixed 200×140 box (`imageStyle`) and the actions sit further down (`buttonStyle`). On windows between 601px and 1023px wide the image falls back to its fixed size.",
       },
       source: {
         code: `<EmptyScreenContainer
@@ -259,7 +202,7 @@ export const WithoutFilter: Story = {
     docs: {
       description: {
         story:
-          "Welcome screen variant without filter-related styling, suitable for onboarding views.",
+          "For a screen with no filter bar above it, such as a first-run view: the content starts 91px from the top instead of 52px (`withoutFilter`), so it sits as low as it would under a filter bar.",
       },
       source: {
         code: `<EmptyScreenContainer
@@ -283,6 +226,7 @@ export const CssCustomization: Story = {
           "--empty-screen-header-color": "#0082c9",
           "--empty-screen-description-color": "#1d2d44",
           "--empty-screen-link-color": "#0082c9",
+          "--empty-screen-text-color": "#6a6a6a",
           "--empty-screen-width": "480px",
         } as CSSProperties
       }
@@ -292,7 +236,12 @@ export const CssCustomization: Story = {
         imageAlt="Empty"
         headerText="No files found"
         descriptionText="Create your first file to get started."
-        buttons={<HomeButton />}
+        buttons={
+          <>
+            <ResetFilterButton />
+            <span>Filters are kept for this folder</span>
+          </>
+        }
         withoutFilter
       />
     </div>
@@ -300,14 +249,32 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--empty-screen-header-color\` | Header text color | theme black/white |
-| \`--empty-screen-description-color\` | Description text color | theme gray |
-| \`--empty-screen-link-color\` | Button link/icon color | theme link |
-| \`--empty-screen-width\` | Container max width | \`640px\` |`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The reset action shows the link colour on both its icon and its text, the line under it the plain-text colour; the width applies only on a window wider than 1424px.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--empty-screen-header-color": "#0082c9",
+    "--empty-screen-description-color": "#1d2d44",
+    "--empty-screen-link-color": "#0082c9",
+    "--empty-screen-text-color": "#6a6a6a",
+    "--empty-screen-width": "480px",
+  }}
+>
+  <EmptyScreenContainer
+    imageSrc={emptyImage}
+    imageAlt="Empty"
+    headerText="No files found"
+    descriptionText="Create your first file to get started."
+    buttons={
+      <>
+        <ResetFilterButton />
+        <span>Filters are kept for this folder</span>
+      </>
+    }
+    withoutFilter
+  />
+</div>`,
       },
     },
   },

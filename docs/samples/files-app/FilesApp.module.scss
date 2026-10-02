@@ -1,0 +1,74 @@
+@use "../../../styles/mixins";
+
+// The frame a portal would give the screen: the sidebar and the section side
+// by side, at a fixed height so the section's own scroll container has
+// something to scroll in.
+.frame {
+  position: relative;
+  display: flex;
+  height: 640px;
+  overflow: hidden;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+// The group menu fills the slot it is given, and inside a Section that slot
+// sits within the section's 20px content padding -- so the bar would read as a
+// card floating in the header rather than a band across it. The portal solves
+// this in its own header stylesheet, by letting the menu out of that padding;
+// same two declarations here.
+.headerSlot {
+  // `height: 100%` is not decoration: the menu sizes itself against this
+  // wrapper, and its actions live in a scroll area that collapses to nothing
+  // when the chain from the section header down to them loses its height.
+  width: 100%;
+  height: 100%;
+
+  :global(.table-container_group-menu) {
+    margin-inline: -20px 0;
+    width: calc(100% + 40px);
+  }
+}
+
+.count {
+  padding: 8px 0 4px;
+}
+
+// Loading, empty and failed listings share one quiet block.
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 24px 0;
+}
+
+.uploadBox {
+  min-height: 200px;
+}
+
+// What stands in for the heading once the sidebar is folded to its 60px.
+.collapsedMark {
+  width: 16px;
+  height: 16px;
+}
+
+// Where the portal keeps the floating button: pinned to the foot of the
+// screen, out of the sidebar slot it is rendered in. The client's own
+// stylesheet does the same for its MobileView.
+.floating {
+  position: fixed;
+  z-index: 200;
+  inset-inline-end: 24px;
+  bottom: 24px;
+
+  @include mixins.mobile {
+    position: absolute;
+    inset-inline-end: 16px;
+    bottom: 16px;
+  }
+}

@@ -1,44 +1,9 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { ChangeEvent, KeyboardEvent } from "react";
 
 export type TextareaProps = {
-  /** Class name */
+  /** Applied to the scrollbar around the textarea, not to the textarea itself. */
   className?: string;
-  /** Wrapper class name */
+  /** Applied to the outer wrapper that carries the height and the copy icon. */
   wrapperClassName?: string;
   /** Used as HTML `id` property  */
   id?: string;
@@ -46,11 +11,15 @@ export type TextareaProps = {
   isDisabled?: boolean;
   /** Indicates that the field is displaying read-only content */
   isReadOnly?: boolean;
-  /** Indicates the input field has an error  */
+  /** Draws the field in the error colour. Under `isJSONField` it adds to that
+   * mode's own error state rather than being replaced by it.
+   * @default false */
   hasError?: boolean;
-  /** Indicates the input field has scale */
+  /** Makes the field 65vh tall instead of the default 89px.
+   * @default false */
   heightScale?: boolean;
-  /** Max value length */
+  /** Maximum number of characters the field accepts. Unlike `TextInput`, which
+   * caps at 255, there is no limit unless you set one. */
   maxLength?: number;
   /** Used as HTML `name` property  */
   name?: string;
@@ -62,41 +31,77 @@ export type TextareaProps = {
   placeholder?: string;
   /** Accepts css style */
   style?: React.CSSProperties;
-  /** Used as HTML `tabindex` property */
+  /** Used as HTML `tabindex` property. Left out, the field takes its natural
+   * place in the tab order; pass `-1` only for a field the keyboard is meant to
+   * skip. */
   tabIndex?: number;
-  /** Textarea value */
+  /** Accessible name of the field, for when no `<label>` points at it. Declared
+   * as a prop because this type is closed and accepts no arbitrary DOM
+   * attributes; `id` with a `<label for>` names the field just as well. */
+  "aria-label"?: string;
+  /** `id` of the element that names this field — the usual choice when the
+   * caption is already on screen, for instance a `FieldContainer` label given
+   * an `id` of its own. */
+  "aria-labelledby"?: string;
+  /** `id` of the element describing the field, such as a hint or an error line
+   * below it. Announced after the name. */
+  "aria-describedby"?: string;
+  /** The text. The field is controlled, so pair it with `onChange`.
+   * @default "" */
   value?: string;
-  /** Font-size value */
+  /** Font size in pixels, applied inline to the textarea and to the line
+   * numbers.
+   * @default 13 */
   fontSize?: number;
-  /** Text-area height value */
+  /** Fixed height, as a number of pixels or a CSS length. It wins over the
+   * default height but not over `heightScale` or `isFullHeight`. */
   heightTextArea?: string | number;
-  /** Specifies the text color */
+  /** Colour of the text, applied inline. */
   color?: string;
   /** Default input property */
   autoFocus?: boolean;
-  /** Allows selecting the textarea */
+  /** Selects the whole text whenever this flips to true — for a field the user
+   * is expected to copy from.
+   * @default false */
   areaSelect?: boolean;
-  /** Prettifies Json and adds lines numeration */
+  /** Treats the value as JSON: pretty-prints it, and puts the field in the
+   * error state whenever it is empty or not a JSON object or array, whatever
+   * `hasError` says.
+   * @default false */
   isJSONField?: boolean;
-  /** Indicates the text of toast/informational alarm */
+  /** Text of the toast shown after a successful copy. Without it the copy is
+   * silent. */
   copyInfoText?: string;
-  /** Shows copy icon */
+  /** Shows a copy button in the corner of the field.
+   * @default false */
   enableCopy?: boolean;
-  /** Inserts numeration */
+  /** Renders line numbers down the left edge and indents the text to make room
+   * for them.
+   * @default false */
   hasNumeration?: boolean;
-  /** Calculating height of content depending on number of lines */
+  /** Sizes the field to its content instead of scrolling inside a fixed
+   * height.
+   * @default false */
   isFullHeight?: boolean;
-  /** Calculated height of content depending on number of lines in pixels */
+  /** Ignored. The component computes the full height itself and never reads
+   * this prop. */
   fullHeight?: number;
-  /** Minimum height of the textarea. */
+  /** Ignored. Nothing in the component or its stylesheet reads this prop. */
   minHeight?: string;
 
+  /** Applied to the copy button, alongside the component's own class. */
   classNameCopyIcon?: string;
+  /** Ignored. The indent for the line numbers is computed from the content. */
   paddingLeftProp?: string;
 
+  /** Moves the scrollbar styling from the inner scroller to the outer wrapper,
+   * which is what a chat composer needs.
+   * @default false */
   isChatMode?: boolean;
+  /** Value of `data-testid` on the textarea.
+   * @default "textarea" */
   dataTestId?: string;
-  
-  /** Callback function for handling copy action */
+
+  /** Called with the copied text after the copy button is used. */
   onCopy?: (text: string) => void;
 };

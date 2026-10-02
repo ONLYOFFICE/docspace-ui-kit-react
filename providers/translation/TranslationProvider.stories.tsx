@@ -13,7 +13,6 @@ const translations: TTranslations = new Map([
 
 const meta: Meta<typeof TranslationProvider> = {
   title: "Components/Providers/TranslationProvider",
-  tags: ["!autodocs"],
   component: TranslationProvider,
   decorators: [
     (Story) => (
@@ -23,34 +22,8 @@ const meta: Meta<typeof TranslationProvider> = {
     ),
   ],
   parameters: {
-    docs: {
-      description: {
-        component: `TranslationProvider wraps children with \`I18nextProvider\` when translations are available.
-
-### Features
-
-- Initializes i18next with the provided translations map
-- Falls back to rendering children directly when no translations exist
-- Sets \`window.i18n.t\` for global access
-- Determines language from \`locale\`, \`user.cultureName\`, or \`settings.culture\`
-
-### Usage
-
-\`\`\`tsx
-import { TranslationProvider } from "@docspace/ui-kit/providers/translation";
-import type { TTranslations } from "@docspace/ui-kit/providers/translation";
-import enCommon from "@docspace/ui-kit/locales/en/Common.json";
-
-const translations: TTranslations = new Map([
-  ["en", new Map([["Common", enCommon]])],
-]);
-
-<TranslationProvider translations={translations} locale="en">
-  <App />
-</TranslationProvider>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
 };
 

@@ -72,7 +72,10 @@
 
   --avatar-border-radius: var(--avatar-radius, 50%);
   --avatar-bg-color: var(--avatar-bg, var(--avatar-image-container-background));
-  --avatar-initials-bg-color: var(--avatar-initials-bg, var(--avatar-image-container-background-image));
+  --avatar-initials-bg-color: var(
+    --avatar-initials-bg,
+    var(--avatar-image-container-background-image)
+  );
 
   :global(.dark) & {
     --avatar-image-container-background: #{$gray-dark-strong};

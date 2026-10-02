@@ -57,7 +57,11 @@ describe("ChatPanel resizer", () => {
   it("applies the width the host owns", () => {
     renderPanel({ width: 520 });
 
-    expect(document.getElementById("ChatPanelWrapper")?.style.getPropertyValue("--chat-panel-width")).toBe("520px");
+    expect(
+      document
+        .getElementById("ChatPanelWrapper")
+        ?.style.getPropertyValue("--chat-panel-width"),
+    ).toBe("520px");
   });
 
   it("widens the panel as the pointer moves toward the section", () => {
@@ -259,7 +263,9 @@ describe("ChatPanel resizer", () => {
     );
     expect(screen.queryByTestId("chat-panel-resizer")).toBeNull();
     expect(
-      document.getElementById("ChatPanelWrapper")?.style.getPropertyValue("--chat-panel-width"),
+      document
+        .getElementById("ChatPanelWrapper")
+        ?.style.getPropertyValue("--chat-panel-width"),
     ).toBe("");
   });
 });

@@ -1,37 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
 import { TextProps } from "../text/Text.types";
 
 export type RadioButtonOrientation = "horizontal" | "vertical";
@@ -47,35 +13,81 @@ type PickedLabelProps = Pick<
 >;
 
 export type RadioButtonProps = {
-  /** Used as HTML `checked` property for the `<input>` tag */
+  /** `name` of the input. Buttons sharing one behave as a single choice. */
+  name?: React.ComponentProps<"input">["name"];
+
+  /**
+   * `value` of the input, and the label when `label` is left out. It is what a
+   * group's `onClick` reads back off the event.
+   */
+  value?: React.ComponentProps<"input">["value"];
+
+  /** Whether the input takes focus on mount. */
+  autoFocus?: React.ComponentProps<"input">["autoFocus"];
+
+  /**
+   * Called on every change of the input. Giving it takes the component's own
+   * state handling out of the loop, so `isChecked` becomes the only thing that
+   * moves the dot — and `onClick` stops firing.
+   */
+  onChange?: React.ComponentProps<"input">["onChange"];
+
+  /** Applied to the label, not to the input. */
+  id?: React.ComponentProps<"label">["id"];
+
+  /** Applied to the label. */
+  className?: React.ComponentProps<"label">["className"];
+
+  /** Applied to the label. */
+  style?: React.ComponentProps<"label">["style"];
+
+  /** Font size of the text beside the button. */
+  fontSize?: TextProps["fontSize"];
+
+  /** Font weight of that text. */
+  fontWeight?: TextProps["fontWeight"];
+
+  /**
+   * Whether the button is filled in. It seeds the component's own state and is
+   * re-applied whenever it changes, so it works as a controlled value.
+   */
   isChecked?: boolean;
 
-  /** Used as HTML `disabled` property for the `<input>` tag */
+  /** Whether the input is disabled and the label greyed out. */
   isDisabled?: boolean;
 
-  /** Label text or node to display next to the radio button.
-   * If not provided, value will be used as label */
+  /** What is written beside the button. `value` is used when this is left out. */
   label?: React.ReactNode | string;
 
-  /** Callback fired when radio button is clicked */
+  /**
+   * Called when the button is clicked — but only while `onChange` is not given.
+   * Passing `onChange` replaces the internal handler and this never fires.
+   */
   onClick?: (
     e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLInputElement>,
   ) => void;
 
-  /** Sets margin between radio buttons.
-   * For horizontal orientation, sets margin-inline-start.
-   * For vertical orientation, sets margin-block-end.
-   * @default "15px" */
+  /**
+   * Gap to the neighbouring button, as a CSS length: `margin-inline-start` when
+   * horizontal, `margin-block-end` when vertical. There is no gap at all
+   * without it — the buttons touch.
+   */
   spacing?: string;
 
-  /** Layout orientation of radio buttons when used in a group
-   * @default "vertical" */
+  /**
+   * Which side the gap is put on. It only moves `spacing`; it does not lay
+   * anything out on its own.
+   * @default "vertical"
+   */
   orientation?: RadioButtonOrientation;
 
-  /** Additional CSS class for the input element */
+  /** Applied to the visually hidden `<input>`. */
   classNameInput?: string;
 
-  /** Test ID for the radio button component */
+  /**
+   * `data-testid` of the label.
+   * @default "radio-button"
+   */
   testId?: string;
 } & PickedTextProps &
   PickedInputProps &

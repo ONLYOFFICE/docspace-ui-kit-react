@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { useState, useRef, useEffect } from "react";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
@@ -60,7 +25,7 @@ import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo
 import UnlinkedCardBanner from "../../../shared/unlinked-card-banner";
 import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import { calculateTotalPrice, getConvertedSize } from "../../../utils/common";
-import { useApi } from "../../../../providers";
+import { useApi } from "../../../../providers/api";
 import { toastr } from "../../../../components/toast";
 import StoragePlanUpgrade from "../../panels/additional-storage/StoragePlanUpgrade";
 import StoragePlanCancel from "../../panels/additional-storage/StoragePlanCancel";
@@ -239,10 +204,6 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     },
   ];
 
-  const keyProp = isScheduled
-    ? { tKey: "SubscriptionAutoCancellation" }
-    : { tKey: "SubscriptionWillBeAutomaticallyRenewed" };
-
   if (shouldShowLoader) return <AdditionalStoragePageLoader />;
 
   const getTotalNextStoragePrice = () => {
@@ -390,9 +351,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
               size={ButtonSize.small}
               primary
               onClick={
-                isDelayedPaymentTopUp
-                  ? openTopUpDialog
-                  : openUpgradeDialog
+                isDelayedPaymentTopUp ? openTopUpDialog : openUpgradeDialog
               }
               isDisabled={isDisabled}
             />
@@ -432,15 +391,20 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
                       1: <Text fontWeight="600" as="span" />,
                     }}
                   />
+                ) : isScheduled ? (
+                  // Each key written out in `i18nKey="..."`: scripts/copy-locales.js
+                  // finds the keys to vendor by that literal, and a key chosen
+                  // through a variable never reached locales/en.
+                  <CommonTrans
+                    i18nKey="SubscriptionAutoCancellation"
+                    values={{ finalDate: storageExpiryDate }}
+                    components={{ 1: <Text fontWeight="600" as="span" /> }}
+                  />
                 ) : (
                   <CommonTrans
-                    i18nKey={keyProp.tKey}
-                    values={{
-                      finalDate: storageExpiryDate,
-                    }}
-                    components={{
-                      1: <Text fontWeight="600" as="span" />,
-                    }}
+                    i18nKey="SubscriptionWillBeAutomaticallyRenewed"
+                    values={{ finalDate: storageExpiryDate }}
+                    components={{ 1: <Text fontWeight="600" as="span" /> }}
                   />
                 )}
               </Text>
@@ -502,4 +466,3 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
 };
 
 export default observer(AdditionalStoragePage);
-

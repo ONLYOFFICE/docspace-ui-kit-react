@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { screen, render, fireEvent } from "@testing-library/react";
 
@@ -446,6 +411,72 @@ describe("Tabs", () => {
       } else {
         delete (HTMLElement.prototype as { offsetWidth?: number }).offsetWidth;
       }
+    });
+
+    it("measures the labels, not the stretched tabs, when scaled", () => {
+      // Two scaled tabs share a 480px row, 240px each; their labels are 80px.
+      // Judged by the tabs' own width the row "overflows" and grows arrows;
+      // judged by the labels it does not.
+      const originalOffsetWidth = Object.getOwnPropertyDescriptor(
+        HTMLElement.prototype,
+        "offsetWidth",
+      );
+      const originalScrollWidth = Object.getOwnPropertyDescriptor(
+        HTMLElement.prototype,
+        "scrollWidth",
+      );
+
+      Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+        configurable: true,
+        get: function () {
+          if (this.classList.contains(styles.tabs)) return 480;
+          if (this.classList.contains(styles.tab)) return 240;
+          return 0;
+        },
+      });
+      Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
+        configurable: true,
+        get: function () {
+          return this.classList.contains(styles.tabText) ? 80 : 0;
+        },
+      });
+
+      const items = [
+        { id: "lawyer", name: "As the lawyer", content: "1" },
+        { id: "client", name: "As the client", content: "2" },
+      ];
+
+      const { container, rerender } = render(
+        <Tabs
+          items={items}
+          type={TabsTypes.Secondary}
+          selectedItemId="lawyer"
+          scaled
+        />,
+      );
+      rerender(
+        <Tabs
+          items={items}
+          type={TabsTypes.Secondary}
+          selectedItemId="lawyer"
+          scaled
+        />,
+      );
+
+      expect(container.querySelector(`.${styles.arrowRight}`)).toBeNull();
+      expect(container.querySelectorAll(`.${styles.tab}`)).toHaveLength(2);
+
+      const restore = (name: string, descriptor?: PropertyDescriptor) => {
+        if (descriptor) {
+          Object.defineProperty(HTMLElement.prototype, name, descriptor);
+        } else {
+          delete (HTMLElement.prototype as unknown as Record<string, unknown>)[
+            name
+          ];
+        }
+      };
+      restore("offsetWidth", originalOffsetWidth);
+      restore("scrollWidth", originalScrollWidth);
     });
 
     it("renders blur effects in secondary tabs when not at start/end", () => {

@@ -1,39 +1,4 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
-import { makeAutoObservable, observable } from "mobx";
+import { makeAutoObservable, observable, runInAction } from "mobx";
 import type { PaymentApi } from "@onlyoffice/docspace-api-sdk";
 import { toastr } from "../../components/toast";
 import type { TBalance } from "../types";
@@ -217,7 +182,9 @@ class ServicesStore {
       const prices = parseAiPrices(data?.response);
       if (!prices) return;
 
-      this.aiToolsPrices = prices;
+      runInAction(() => {
+        this.aiToolsPrices = prices;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -251,7 +218,9 @@ class ServicesStore {
         nextMap.set(modelId, false);
       });
 
-      this.aiModelAvailabilityMap = nextMap;
+      runInAction(() => {
+        this.aiModelAvailabilityMap = nextMap;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -292,17 +261,21 @@ class ServicesStore {
         { signal: abortController.signal },
       );
 
-      const nextMap = new Map(this.aiModelAvailabilityMap);
-      if (enabled) nextMap.delete(modelId);
-      else nextMap.set(modelId, false);
-      this.aiModelAvailabilityMap = nextMap;
+      runInAction(() => {
+        const nextMap = new Map(this.aiModelAvailabilityMap);
+        if (enabled) nextMap.delete(modelId);
+        else nextMap.set(modelId, false);
+        this.aiModelAvailabilityMap = nextMap;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
     } finally {
-      const nextSet = new Set(this.aiModelAvailabilityUpdatingSet);
-      nextSet.delete(modelId);
-      this.aiModelAvailabilityUpdatingSet = nextSet;
+      runInAction(() => {
+        const nextSet = new Set(this.aiModelAvailabilityUpdatingSet);
+        nextSet.delete(modelId);
+        this.aiModelAvailabilityUpdatingSet = nextSet;
+      });
     }
   };
 
@@ -326,7 +299,9 @@ class ServicesStore {
 
       if (data?.response == null) return;
 
-      this.usedBackupsCount = data.response as number;
+      runInAction(() => {
+        this.usedBackupsCount = data.response as number;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -356,8 +331,10 @@ class ServicesStore {
 
       if (response == null) return;
 
-      this.freeBackupsUsed = response.free ?? 0;
-      this.paidBackupsUsed = response.paid ?? 0;
+      runInAction(() => {
+        this.freeBackupsUsed = response.free ?? 0;
+        this.paidBackupsUsed = response.paid ?? 0;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -394,9 +371,11 @@ class ServicesStore {
 
       const response = data?.response;
 
-      this.serviceUsageMonthly = (
-        Array.isArray(response) ? response : (response?.collection ?? [])
-      ) as TServiceUsageMonthly[];
+      runInAction(() => {
+        this.serviceUsageMonthly = (
+          Array.isArray(response) ? response : (response?.collection ?? [])
+        ) as TServiceUsageMonthly[];
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -542,8 +521,11 @@ class ServicesStore {
       console.error(error);
       toastr.error(t("Common:UnexpectedError"));
     } finally {
-      if (this.pendingServiceName === serviceName)
-        this.loadedServiceName = serviceName;
+      // After the awaits above, so outside this method's action.
+      runInAction(() => {
+        if (this.pendingServiceName === serviceName)
+          this.loadedServiceName = serviceName;
+      });
     }
   };
 
@@ -679,4 +661,3 @@ class ServicesStore {
 }
 
 export default ServicesStore;
-

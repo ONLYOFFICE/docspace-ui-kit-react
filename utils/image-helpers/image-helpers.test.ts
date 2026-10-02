@@ -1,23 +1,51 @@
 import { describe, expect, it, vi } from "vitest";
 
-// The module calls require(`PUBLIC_DIR/...`) at the top level which only
-// resolves under Webpack.  We fully mock the module, reproducing its Map-
-// building logic but replacing require() with a path-returning stub.
+// Reproduces the module's Map-building logic with a path-returning stub
+// instead of the real icon components, so this test stays independent of
+// the SVGR-imported assets in icons-map.ts.
 vi.mock(".", () => {
   const iconsMap: Record<string, string[]> = {
     "word.svg": [".docx", ".dotx", ".docm", ".dotm"],
     "wordCommon.svg": [
-      ".fodt", ".doc", ".ott", ".odt", ".rtf",
-      ".stw", ".sxw", ".wps", ".wpt", ".pages", ".hwp", ".hwpx",
+      ".fodt",
+      ".doc",
+      ".ott",
+      ".odt",
+      ".rtf",
+      ".stw",
+      ".sxw",
+      ".wps",
+      ".wpt",
+      ".pages",
+      ".hwp",
+      ".hwpx",
     ],
     "cell.svg": [".xlsx", ".xltx", ".xlsb", ".xltm", ".xlsm"],
     "cellCommon.svg": [
-      ".xls", ".ods", ".csv", ".fods", ".et", ".ett", ".ots", ".sxc", ".numbers",
+      ".xls",
+      ".ods",
+      ".csv",
+      ".fods",
+      ".et",
+      ".ett",
+      ".ots",
+      ".sxc",
+      ".numbers",
     ],
     "diagram.svg": [".vsdx", ".vssx", ".vstx", ".vsdm", ".vssm", ".vstm"],
     "slide.svg": [".pptx", ".potx", ".ppsx", ".pptm", ".ppsm", ".potm"],
     "slideCommon.svg": [
-      ".ppt", ".odp", ".otp", ".pps", ".fodp", ".dps", ".dpt", ".sxi", ".pot", ".key", ".odg",
+      ".ppt",
+      ".odp",
+      ".otp",
+      ".pps",
+      ".fodp",
+      ".dps",
+      ".dpt",
+      ".sxi",
+      ".pot",
+      ".key",
+      ".odg",
     ],
     "pdf.svg": [".pdf"],
     "form.svg": [".docxf", ".oform"],
@@ -28,9 +56,25 @@ vi.mock(".", () => {
     "letter.svg": [".iaf"],
     "text.svg": [".txt"],
     "video.svg": [
-      ".3gp", ".asf", ".avi", ".f4v", ".fla", ".flv", ".m2ts", ".m4v",
-      ".mkv", ".mov", ".mp4", ".mpeg", ".mpg", ".mts", ".ogv", ".svi",
-      ".vob", ".webm", ".wmv",
+      ".3gp",
+      ".asf",
+      ".avi",
+      ".f4v",
+      ".fla",
+      ".flv",
+      ".m2ts",
+      ".m4v",
+      ".mkv",
+      ".mov",
+      ".mp4",
+      ".mpeg",
+      ".mpg",
+      ".mts",
+      ".ogv",
+      ".svi",
+      ".vob",
+      ".webm",
+      ".wmv",
     ],
     "image.svg": ["image"],
     "sound.svg": ["sound"],
@@ -59,7 +103,7 @@ vi.mock(".", () => {
     new Map(
       entries.map(([format, iconName]) => {
         const svg = `${format.replace(/^\./, "")}.svg`;
-        const url = `PUBLIC_DIR/images/icons/${size}/${iconName}?url`;
+        const url = `assets/icons/${size}/${iconName}?url`;
         return [svg, url];
       }),
     );

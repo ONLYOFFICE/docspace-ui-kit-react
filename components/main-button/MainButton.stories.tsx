@@ -1,41 +1,7 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 
@@ -92,71 +58,80 @@ const meta = {
   title: "UI/Interactive elements/MainButton",
   component: MainButton,
   parameters: {
-    docs: {
-      description: {
-        component: `Main action button with an optional dropdown menu. Typically used as the primary call-to-action in a sidebar or toolbar.
-
-### Features
-
-- **Dropdown Menu**: Built-in dropdown with configurable menu items
-- **Nested Items**: Support for sub-menus within dropdown items
-- **Separators**: Visual dividers between menu item groups
-- **Icon Support**: Each menu item can have its own icon
-- **Disabled State**: Full disabled state for button and dropdown
-- **Action Callback**: Direct click handler when used without dropdown
-
-### Usage
-
-\`\`\`tsx
-import { MainButton } from "@docspace/ui-kit/components/main-button";
-
-// With dropdown menu
-<MainButton
-  text="Create new"
-  model={[
-    { key: 0, label: "New document", icon: FolderIcon },
-    { key: 1, label: "New folder", icon: FolderIcon },
-    { key: 2, isSeparator: true },
-    { key: 3, label: "Upload", icon: FolderIcon },
-  ]}
-/>
-
-// As a simple action button
-<MainButton text="Click Me" isDropdown={false} onAction={handleClick} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     text: {
       control: "text",
-      description: "Button text label",
+      description:
+        "Text drawn in the button. It is the whole label: the component takes no children",
+      table: {
+        defaultValue: { summary: '"Button"' },
+      },
     },
     isDisabled: {
       control: "boolean",
-      description: "Sets the button to present a disabled state",
+      description:
+        "Whether the button is inert: it dims to 60% opacity and a click neither opens the menu nor calls `onAction`",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isDropdown: {
       control: "boolean",
-      description: "Activates a drop-down list for MainButton",
+      description:
+        "Whether a click opens the menu built from `model`, with an arrow beside the text. When off, the click calls `onAction` instead",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     opened: {
-      control: "boolean",
-      description: "Controls whether the dropdown is open",
-      table: {
-        defaultValue: { summary: "false" },
-      },
+      control: false,
+      description:
+        "Ignored. Nothing reads this prop, and it reaches the button's element as an unknown attribute",
     },
     onAction: {
       action: "onAction",
       description:
-        "Callback function triggered when the button is clicked (non-dropdown mode)",
+        "Called with the click event when the button is clicked. Only reached while `isDropdown` is off",
+    },
+    model: {
+      // The icons are data URIs too long to edit, and they stretch the table.
+      control: false,
+      description:
+        "Items of the menu: a label with an optional icon and description, a separator, or a nested list under `items`. Required even when `isDropdown` is off and nothing reads it",
+    },
+    hideArrow: {
+      control: "boolean",
+      description:
+        "Whether the arrow beside the text is left out. A click still opens the menu",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    className: {
+      control: "text",
+      description:
+        "Class added to the button, after the component's own classes",
+    },
+    id: {
+      control: "text",
+      description: "Id of the button, not of the wrapper around it",
+    },
+    style: {
+      control: "object",
+      description: "Inline style of the button",
+    },
+    setRefMap: {
+      control: false,
+      description:
+        "Called on mount and on every window resize with a key and the button's element, so a host can find the button, for example to point a guided tour at it",
+    },
+    anchorRef: {
+      control: false,
+      description:
+        "Element the menu opens under and takes its width from. Without it the button's own box is used; pass an outer wrapper when the button sits inside a larger clickable area",
     },
   },
 } satisfies Meta<typeof MainButton>;
@@ -166,48 +141,7 @@ type Story = StoryObj<ComponentProps<typeof MainButton>>;
 export default meta;
 
 const Wrapper = (props: { children: React.ReactNode }) => {
-  return (
-    <div style={{ maxWidth: "210px" }}>{props.children}</div>
-  );
-};
-
-export const CssCustomization: Story = {
-  render: () => (
-    <div
-      style={
-        {
-          "--main-button-bg": "#0082c9",
-          "--main-button-color": "#ffffff",
-          "--main-button-icon-color": "#ffffff",
-          "--main-button-radius": "50px",
-          "--main-button-text-size": "14px",
-          "--main-button-inner-padding": "6px 20px",
-        } as CSSProperties
-      }
-    >
-      <Wrapper>
-        <MainButton text="New" model={itemsModel} />
-      </Wrapper>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--main-button-bg\` | Button background color | accent |
-| \`--main-button-color\` | Button text color | white |
-| \`--main-button-icon-color\` | Icon fill color | white |
-| \`--main-button-radius\` | Border radius | \`3px\` |
-| \`--main-button-inner-padding\` | Button padding | \`5px 14px 5px 12px\` |
-| \`--main-button-text-size\` | Font size | \`16px\` |
-| \`--main-button-text-weight\` | Font weight | \`700\` |
-| \`--main-button-text-line-height\` | Line height | \`22px\` |`,
-      },
-    },
-  },
+  return <div style={{ maxWidth: "210px" }}>{props.children}</div>;
 };
 
 export const Default: Story = {
@@ -219,6 +153,17 @@ export const Default: Story = {
   args: {
     text: "Main Button",
     model: itemsModel,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The button with its menu: click it to open the list of things to create, then change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<MainButton text="Main Button" model={itemsModel} />`,
+      },
+    },
   },
 };
 
@@ -278,62 +223,57 @@ export const DisabledWithDropdown: Story = {
   },
 };
 
-const WithActionTemplate = () => {
-  return (
-    <Wrapper>
-      <MainButton
-        text="Click Me"
-        isDropdown={false}
-        model={[]}
-        onAction={() => alert("Button clicked")}
-      />
-    </Wrapper>
-  );
-};
-
 export const WithAction: Story = {
-  render: () => <WithActionTemplate />,
+  render: (args) => (
+    <Wrapper>
+      <MainButton {...args} />
+    </Wrapper>
+  ),
+  args: {
+    text: "Click Me",
+    isDropdown: false,
+    model: [],
+    onAction: fn(),
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "MainButton as a simple action button without dropdown. Clicking triggers the onAction callback.",
+          "For a single action that needs no menu: the button has no arrow, and a click is reported in the Actions panel instead of opening a list (`isDropdown={false}`, `onAction`).",
       },
       source: {
-        code: `<MainButton text="Click Me" isDropdown={false} onAction={() => alert("Button clicked")} />`,
+        code: `<MainButton text="Click Me" isDropdown={false} model={[]} onAction={handleClick} />`,
       },
     },
   },
 };
 
-const userTypesModel = [
+const describedItemsModel = [
   {
     key: 0,
-    label: "Full admin",
+    label: "Blank document",
     icon: CatalogFolderReactSvgUrl,
-    description:
-      "Manage the workspace: create/archive rooms, invite users, configure AI agents, assign lower roles. Full Files access.",
+    description: "Start from an empty page and add the content yourself.",
   },
   {
     key: 1,
-    label: "Room admin",
+    label: "From template",
     icon: CatalogFolderReactSvgUrl,
     description:
-      "Manage assigned rooms, invite users, create/manage AI agents, assign lower roles. Full Files access.",
+      "Pick a ready-made layout from the gallery and fill in its fields.",
   },
   {
     key: 2,
-    label: "User",
+    label: "Upload file",
     icon: CatalogFolderReactSvgUrl,
-    description:
-      "Access only invited rooms, view AI agent results and shared chats. Can't create rooms/AI agents. Full Files access.",
+    description: "Add a file from your device to the current folder.",
   },
 ];
 
 const WithItemDescriptionsTemplate = () => {
   return (
     <Wrapper>
-      <MainButton text="Invite" model={userTypesModel} />
+      <MainButton text="Create" model={describedItemsModel} />
     </Wrapper>
   );
 };
@@ -344,23 +284,23 @@ export const WithItemDescriptions: Story = {
     docs: {
       description: {
         story:
-          "Dropdown items carrying `description` are laid out as two lines - the label row and an always-visible description under it. The menu is sized by its content instead of the button width.",
+          "For choices that need a word of explanation: click the button and each item shows its label with a description under it, while the menu grows wider than the button to fit the text (`description` on the items of `model`).",
       },
       source: {
         code: `<MainButton
-  text="Invite"
+  text="Create"
   model={[
     {
       key: 0,
-      label: "Full admin",
+      label: "Blank document",
       icon: FolderIcon,
-      description: "Manage the workspace: create/archive rooms, invite users...",
+      description: "Start from an empty page and add the content yourself.",
     },
     {
       key: 1,
-      label: "Room admin",
+      label: "From template",
       icon: FolderIcon,
-      description: "Manage assigned rooms, invite users, create/manage AI agents...",
+      description: "Pick a ready-made layout from the gallery and fill in its fields.",
     },
   ]}
 />`,
@@ -401,6 +341,107 @@ export const WithDropdown: Story = {
     { key: 8, label: "Upload", icon: FolderIcon },
   ]}
 />`,
+      },
+    },
+  },
+};
+
+export const WithoutArrow: Story = {
+  render: (args) => (
+    <Wrapper>
+      <MainButton {...args} />
+    </Wrapper>
+  ),
+  args: {
+    text: "Create new",
+    model: itemsModel,
+    hideArrow: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "For a button whose label alone says it opens a list: the arrow beside the text is gone, yet a click still opens the same menu (`hideArrow`).",
+      },
+      source: {
+        code: `<MainButton text="Create new" model={itemsModel} hideArrow />`,
+      },
+    },
+  },
+};
+
+// Framed on Docs, tall enough for the open menu: the theme provider stamps data-dir on <html>, which would flip the whole page.
+export const RightToLeft: Story = {
+  render: (args) => (
+    <div dir="rtl">
+      <Wrapper>
+        <MainButton {...args} />
+      </Wrapper>
+    </div>
+  ),
+  args: {
+    text: "\u062c\u062f\u064a\u062f",
+    model: itemsModel,
+  },
+  globals: { direction: "rtl" },
+  parameters: {
+    noPadding: true,
+    docs: {
+      story: { inline: false, height: "304px" },
+      description: {
+        story:
+          'The button in a right-to-left layout: the text moves to the right edge and the arrow to the left; click it and the menu opens with its icons on the right and the sub-menu chevron on the left. The wrapper carries `dir="rtl"`; the direction also comes from the theme\'s `interfaceDirection` (the Direction toolbar).',
+      },
+      source: {
+        code: `<div dir="rtl">
+  <MainButton text="\u062c\u062f\u064a\u062f" model={itemsModel} />
+</div>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--main-button-bg": "#0082c9",
+          "--main-button-color": "#ffffff",
+          "--main-button-icon-color": "#ffffff",
+          "--main-button-radius": "50px",
+          "--main-button-text-size": "14px",
+          "--main-button-text-weight": "600",
+          "--main-button-text-line-height": "24px",
+          "--main-button-inner-padding": "6px 20px",
+        } as CSSProperties
+      }
+    >
+      <Wrapper>
+        <MainButton text="New" model={itemsModel} />
+      </Wrapper>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `Every overridable variable set on a wrapper around one button -- the variables are listed under CSS variables on this page. Click it to see the menu keep the button's new width.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--main-button-bg": "#0082c9",
+    "--main-button-color": "#ffffff",
+    "--main-button-icon-color": "#ffffff",
+    "--main-button-radius": "50px",
+    "--main-button-text-size": "14px",
+    "--main-button-text-weight": "600",
+    "--main-button-text-line-height": "24px",
+    "--main-button-inner-padding": "6px 20px",
+  }}
+>
+  <MainButton text="New" model={itemsModel} />
+</div>`,
       },
     },
   },

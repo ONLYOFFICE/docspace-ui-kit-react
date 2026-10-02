@@ -1,82 +1,18 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Toast, ToastType, toastr } from ".";
 import { Button, ButtonSize } from "../button";
+import { Link, LinkType } from "../link";
+import { Text } from "../text";
 
 const meta = {
   title: "UI/Feedback/Toast",
   component: Toast,
   parameters: {
-    docs: {
-      description: {
-        component: `Toast notification component for displaying temporary messages with different severity levels.
-
-### Features
-
-- **Four Types**: Success, error, warning, and info with distinct colors and icons
-- **Auto-Dismiss**: Configurable timeout for automatic dismissal
-- **Persistent Mode**: Set timeout to 0 for toasts that stay until manually dismissed
-- **Close Button**: Optional close button via \`withCross\` prop
-- **Custom Content**: Support for React nodes including links and formatted text
-- **Stacking**: Multiple toasts stack vertically
-- **Imperative API**: Trigger toasts via \`toastr.success()\`, \`toastr.error()\`, etc.
-
-### Usage
-
-\`\`\`tsx
-import { Toast, toastr } from "@docspace/ui-kit/components/toast";
-
-// Mount the Toast container once
-<Toast />
-
-// Trigger toasts imperatively
-toastr.success("Operation completed", "Success", 5000);
-toastr.error("Something went wrong", "Error", 5000);
-toastr.warning("Please review changes", "Warning", 5000);
-toastr.info("New updates available", "Info", 5000);
-
-// Persistent toast with close button
-toastr.success("Saved", "Success", 0, true);
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?node-id=648%3A4421&mode=dev",
@@ -86,20 +22,23 @@ toastr.success("Saved", "Success", 0, true);
     type: {
       control: "select",
       options: Object.values(ToastType),
-      description: "Toast type: success, error, warning, or info",
+      description:
+        "Which `toastr` method the story calls, and so the colour and icon of the toast: `success`, `error`, `warning` or `info`. The `Toast` container itself ignores this prop",
     },
     title: {
       control: "text",
-      description: "Title of the toast notification",
+      description:
+        "Bold first line of the toast, the second argument of `toastr`. Left out, a translated default for the type is shown; `null` shows no title",
     },
     data: {
       control: "text",
-      description: "Content to display inside the toast",
+      description:
+        "Message under the title, the first argument of `toastr`: a string or any React node",
     },
     withCross: {
       control: "boolean",
       description:
-        "Show close button. If false, toast dismisses on click anywhere",
+        "Fourth argument of `toastr`: shows a cross that closes the toast, and stops a click on the toast from closing it",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -107,9 +46,31 @@ toastr.success("Saved", "Success", 0, true);
     timeout: {
       control: "number",
       description:
-        "Duration in milliseconds before auto-dismiss. Set to 0 for persistent",
+        "Third argument of `toastr`: milliseconds before the toast closes, or 0 to keep it open until it is closed by hand. A value under 750 falls back to 5000",
       table: {
         defaultValue: { summary: "5000" },
+      },
+    },
+    id: {
+      control: "text",
+      description:
+        "Ignored: nothing reads it, and the container carries no `id`",
+    },
+    className: {
+      control: "text",
+      description: "Class added to the container the toasts are stacked in",
+    },
+    style: {
+      control: "object",
+      description:
+        "Inline style of the container the toasts are stacked in; the place to set the CSS variables, since the container is not rendered inside your markup",
+    },
+    isSSR: {
+      control: "boolean",
+      description:
+        "Renders nothing until the page has mounted in the browser, so a server-rendered tree and its first client render match",
+      table: {
+        defaultValue: { summary: "false" },
       },
     },
   },
@@ -125,6 +86,9 @@ interface ToastTemplateProps {
   title?: string;
   timeout?: number;
   withCross?: boolean;
+  className?: string;
+  style?: CSSProperties;
+  isSSR?: boolean;
 }
 
 const ToastTemplate = ({
@@ -133,6 +97,9 @@ const ToastTemplate = ({
   title,
   timeout = 5000,
   withCross = false,
+  className,
+  style,
+  isSSR,
 }: ToastTemplateProps) => {
   const showToast = () => {
     switch (type) {
@@ -152,7 +119,7 @@ const ToastTemplate = ({
 
   return (
     <>
-      <Toast />
+      <Toast className={className} style={style} isSSR={isSSR} />
       <Button
         label="Show Toast"
         primary
@@ -184,6 +151,37 @@ const AllTypesTemplate = () => {
   );
 };
 
+export const Default: Story = {
+  render: (args) => (
+    <ToastTemplate
+      type={args.type ?? ToastType.success}
+      data={typeof args.data === "string" ? args.data : "Toast message"}
+      title={args.title}
+      timeout={args.timeout}
+      withCross={args.withCross}
+      className={args.className}
+      style={args.style}
+      isSSR={args.isSSR}
+    />
+  ),
+  args: {
+    data: "Your changes were saved",
+    timeout: 5000,
+    type: ToastType.success,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The call most screens make: a short message after an action, with the title left to the type. Click **Show Toast** to open it, and pick another type or change the message, title or timeout live in the Controls panel below.",
+      },
+      source: {
+        code: `toastr.success("Your changes were saved");`,
+      },
+    },
+  },
+};
+
 export const Success: Story = {
   render: (args) => (
     <ToastTemplate
@@ -192,6 +190,9 @@ export const Success: Story = {
       title={args.title}
       timeout={args.timeout}
       withCross={args.withCross}
+      className={args.className}
+      style={args.style}
+      isSSR={args.isSSR}
     />
   ),
   args: {
@@ -204,7 +205,7 @@ export const Success: Story = {
     docs: {
       description: {
         story:
-          "Success toast for confirming completed operations. Click the button to trigger.",
+          "Confirms that an action the user started has finished, such as a save or a move. Click **Show Toast** to open it, and change the message, title or timeout live in the Controls panel below.",
       },
       source: {
         code: `toastr.success("Operation completed successfully", "Success", 5000);`,
@@ -221,6 +222,9 @@ export const ErrorToast: Story = {
       title={args.title}
       timeout={args.timeout}
       withCross={args.withCross}
+      className={args.className}
+      style={args.style}
+      isSSR={args.isSSR}
     />
   ),
   args: {
@@ -233,7 +237,7 @@ export const ErrorToast: Story = {
     docs: {
       description: {
         story:
-          "Error toast for displaying failure messages. Click the button to trigger.",
+          "Tells the user that an action failed. Click **Show Toast** to open it; in code, pass the caught error itself and the message is read from it.",
       },
       source: {
         code: `toastr.error("An error occurred while processing your request", "Error", 5000);`,
@@ -250,6 +254,9 @@ export const Warning: Story = {
       title={args.title}
       timeout={args.timeout}
       withCross={args.withCross}
+      className={args.className}
+      style={args.style}
+      isSSR={args.isSSR}
     />
   ),
   args: {
@@ -262,7 +269,7 @@ export const Warning: Story = {
     docs: {
       description: {
         story:
-          "Warning toast for cautionary messages. Click the button to trigger.",
+          "Asks the user to look at something before going on, without reporting a failure. Click **Show Toast** to open it.",
       },
       source: {
         code: `toastr.warning("Please review the changes before proceeding", "Warning", 5000);`,
@@ -279,6 +286,9 @@ export const Info: Story = {
       title={args.title}
       timeout={args.timeout}
       withCross={args.withCross}
+      className={args.className}
+      style={args.style}
+      isSSR={args.isSSR}
     />
   ),
   args: {
@@ -291,7 +301,7 @@ export const Info: Story = {
     docs: {
       description: {
         story:
-          "Info toast for general informational messages. Click the button to trigger.",
+          "Reports something neutral the user may want to know, such as a finished background task. Click **Show Toast** to open it.",
       },
       source: {
         code: `toastr.info("New updates are available", "Information", 5000);`,
@@ -308,6 +318,9 @@ export const WithCloseButton: Story = {
       title={args.title}
       timeout={args.timeout}
       withCross={args.withCross}
+      className={args.className}
+      style={args.style}
+      isSSR={args.isSSR}
     />
   ),
   args: {
@@ -321,7 +334,7 @@ export const WithCloseButton: Story = {
     docs: {
       description: {
         story:
-          "Persistent toast with a close button. Set timeout to 0 and withCross to true for manual dismissal only.",
+          "For a message the user must read before it goes: the toast stays until its cross is clicked (`timeout` 0, `withCross`), and a click on the toast itself no longer closes it.",
       },
       source: {
         code: `toastr.success("Click the close button to dismiss", "Dismissible Toast", 0, true);`,
@@ -336,7 +349,7 @@ export const AllTypes: Story = {
     docs: {
       description: {
         story:
-          "Displays all four toast types simultaneously. Each toast is persistent with a close button.",
+          "Compares the four types side by side: **Info** on top, as the newest, then **Warning**, **Error** and **Success**, each on its own background. All four stay open until closed with their cross.",
       },
       source: {
         code: `toastr.success("Success message", "Success", 0, true);
@@ -348,31 +361,149 @@ toastr.info("Info message", "Info", 0, true);`,
   },
 };
 
+const TriggerTemplate = ({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) => (
+  <>
+    <Toast />
+    <Button label={label} primary size={ButtonSize.small} onClick={onClick} />
+  </>
+);
+
+export const CustomContent: Story = {
+  render: () => (
+    <TriggerTemplate
+      label="Show Toast"
+      onClick={() =>
+        toastr.success(
+          <>
+            <Text fontSize="12px">Report.docx was moved to Archive.</Text>
+            <Link type={LinkType.action} fontSize="12px" isBold>
+              Open folder
+            </Link>
+          </>,
+          "File moved",
+          0,
+          true,
+        )
+      }
+    />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A message that needs more than a line of text, such as a link to what the action produced: any React node passed as the first argument is rendered as it is, under the title.",
+      },
+      source: {
+        code: `toastr.success(
+  <>
+    <Text fontSize="12px">Report.docx was moved to Archive.</Text>
+    <Link type={LinkType.action} fontSize="12px" isBold>
+      Open folder
+    </Link>
+  </>,
+  "File moved",
+  0,
+  true,
+);`,
+      },
+    },
+  },
+};
+
+export const DefaultTitles: Story = {
+  render: () => (
+    <TriggerTemplate
+      label="Show Toasts"
+      onClick={() => {
+        toastr.success(
+          "The title is filled in for the type",
+          undefined,
+          0,
+          true,
+        );
+        toastr.info("No title at all", null, 0, true);
+      }}
+    />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Most calls need no title of their own. **No title at all** — the info toast, given `null` as its title, shows the message alone. **Done** — the success toast below it left the title out, so the translated word for its type is shown.",
+      },
+      source: {
+        code: `toastr.success("The title is filled in for the type", undefined, 0, true);
+toastr.info("No title at all", null, 0, true);`,
+      },
+    },
+  },
+};
+
+export const RightToLeft: Story = {
+  render: (args) => (
+    <ToastTemplate
+      type={args.type ?? ToastType.success}
+      data={typeof args.data === "string" ? args.data : "Toast message"}
+      title={args.title}
+      timeout={args.timeout}
+      withCross={args.withCross}
+    />
+  ),
+  globals: { direction: "rtl" },
+  args: {
+    data: "The file was saved",
+    title: "Saved",
+    withCross: true,
+    timeout: 0,
+    type: ToastType.success,
+  },
+  parameters: {
+    noPadding: true,
+    docs: {
+      // Framed: an inline RTL story would flip the whole Docs page.
+      story: { inline: false, height: "112px" },
+      description: {
+        story:
+          "Toasts in a right-to-left layout: they open in the top-left corner and slide in from the left, the icon moves to the right of the text and the cross to the left. The toasts are portalled outside the story, so the direction comes from the document, set here by the Direction toolbar, and a `dir` on a wrapper of yours would not reach them.",
+      },
+      source: {
+        code: `// The page runs right to left, e.g. <ThemeProvider locale="ar">
+toastr.success("The file was saved", "Saved", 0, true);`,
+      },
+    },
+  },
+};
+
 const CssCustomizationTemplate = () => {
   const showToasts = () => {
     toastr.success("Custom success notification", "Styled Toast", 0, true);
   };
 
   return (
-    <div
-      style={
-        {
-          "--toast-radius": "12px",
-          "--toast-padding": "16px",
-          "--toast-text-size": "13px",
-          "--toast-width": "360px",
-          "--toast-inset-end": "32px",
-        } as CSSProperties
-      }
-    >
-      <Toast />
+    <>
+      <Toast
+        style={
+          {
+            "--toast-radius": "12px",
+            "--toast-padding": "16px",
+            "--toast-width": "360px",
+            "--toast-inset-end": "32px",
+          } as CSSProperties
+        }
+      />
       <Button
         label="Show Custom Toasts"
         primary
         size={ButtonSize.small}
         onClick={showToasts}
       />
-    </div>
+    </>
   );
 };
 
@@ -381,17 +512,18 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--toast-radius\` | Toast border radius | \`6px\` |
-| \`--toast-padding\` | Toast inner padding | \`12px\` |
-| \`--toast-text-size\` | Toast font size | \`12px\` |
-| \`--toast-width\` | Container width | \`320px\` |
-| \`--toast-inset-end\` | Offset from inline-end edge | \`24px\` |`,
+        story: `The variables are listed under CSS variables on this page; here they are set through the \`style\` prop of \`Toast\`, because the toasts are portalled outside any wrapper of yours. The example sets every one a string toast can show, all but \`--toast-text-size\`: open a toast to see the rounder corners, the wider padding and the wider container further from the edge.`,
+      },
+      source: {
+        code: `<Toast
+  style={{
+    "--toast-radius": "12px",
+    "--toast-padding": "16px",
+    "--toast-width": "360px",
+    "--toast-inset-end": "32px",
+  }}
+/>`,
       },
     },
   },
 };
-

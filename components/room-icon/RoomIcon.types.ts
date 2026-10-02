@@ -1,102 +1,105 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { Nullable, TLogo } from "../../types";
 import type { ROOM_ACTION_KEYS } from "../../constants";
 
 type RoomIconDefault = {
-	title: string;
-	isArchive?: boolean;
-	size?: string;
-	radius?: string;
-	showDefault?: boolean;
-	imgClassName?: string;
-	className?: string;
-	dataTestId?: string;
+  /** Room name. Only its initials are drawn — the first letter of the first word and of the last. */
+  title: string;
+  /** Paints the tile in the archive grey instead of `color`, and turns off the hover overlay. */
+  isArchive?: boolean;
+  /** Side of the square, as a px string. It is also divided to scale the cover glyph, so a value in any other unit gives `NaN`.
+   * @default "32px" */
+  size?: string;
+  /** Corner radius of the tile and of the image inside it.
+   * @default "6px" */
+  radius?: string;
+  /** Draws the initials instead of the logo, whatever `logo` holds. */
+  showDefault?: boolean;
+  /** Added to the `<img>` the logo renders into. The type refuses it alongside a required `color`: a coloured default or an image, not both. */
+  imgClassName?: string;
+  /** Added to the outer element, before the component's own classes. */
+  className?: string;
+  /** Value of `data-testid` on the outer element.
+   * @default "room-icon" */
+  dataTestId?: string;
 };
 
+/** One entry of the logo menu. The upload entry is told apart by its key and is handed the file input's ref instead of nothing. */
 export type TModel = { label: string; icon: string } & (
-	| {
-			key: string;
-			onClick: () => void;
-	  }
-	| {
-			key: typeof ROOM_ACTION_KEYS.CREATE_EDIT_ROOM_UPLOAD;
-			onClick: (ref?: React.RefObject<Nullable<HTMLInputElement>>) => void;
-	  }
+  | {
+      key: string;
+      onClick: () => void;
+    }
+  | {
+      key: typeof ROOM_ACTION_KEYS.CREATE_EDIT_ROOM_UPLOAD;
+      onClick: (ref?: React.RefObject<Nullable<HTMLInputElement>>) => void;
+    }
 );
 
 type RoomIconExpansion = {
-	hoverSrc?: string;
-	withEditing?: boolean;
-	onChangeFile?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-	isEmptyIcon?: boolean;
-	dropDownManualX?: string;
-	model?: TModel[];
-	logo?: TLogo | string;
-	tooltipContent?: string;
-	tooltipId?: string;
-	isTemplate?: boolean;
-	dataTestId?: string;
+  /** Image faded in over the tile while the pointer is on it. Ignored while `isArchive` is set. */
+  hoverSrc?: string;
+  /** Adds the pencil button and the menu it opens. It also makes the tile 64px wide at the least. */
+  withEditing?: boolean;
+  /** Called with the change event of the hidden file input. Passing it is what renders that input at all. */
+  onChangeFile?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  /** Draws a dashed empty frame with a camera glyph and a plus button, for a room that has no logo yet.
+   * It replaces every other content, including the initials. */
+  isEmptyIcon?: boolean;
+  /** Horizontal offset of the logo menu.
+   * @default "-10px" */
+  dropDownManualX?: string;
+  /** Entries of the logo menu. Without it the menu opens empty. */
+  model?: TModel[];
+  /** The room's logo: a URL, or the portal's logo object. An object with a `cover` is inlined as a base64 SVG and recoloured; otherwise `medium` is used as a URL. */
+  logo?: TLogo | string;
+  /** Text of the badge's tooltip. It also needs `tooltipId`, and it is what makes the badge show a pointer cursor. */
+  tooltipContent?: string;
+  /** Id the badge's tooltip is registered under. Without it the tooltip has nothing to attach to. */
+  tooltipId?: string;
+  /** Draws the template outline instead of the round tile, with the logo shrunk to 24px inside it. */
+  isTemplate?: boolean;
+  /** Value of `data-testid` on the outer element.
+   * @default "room-icon" */
+  dataTestId?: string;
 };
 
 type RoomIconColor = {
-	color: string;
-	imgClassName?: undefined;
+  /** Background of the tile and the source of the initials' colour, as six hex digits **without** a leading `#`. Required unless you pass `imgClassName` instead. */
+  color: string;
+  /** Added to the `<img>` the logo renders into. The type refuses it alongside a required `color`: a coloured default or an image, not both. */
+  imgClassName?: undefined;
 };
 
 type RoomIconImage = {
-	color?: string | undefined;
-	imgClassName?: string;
+  /** Background of the tile and the source of the initials' colour, as six hex digits **without** a leading `#`. Required unless you pass `imgClassName` instead. */
+  color?: string | undefined;
+  /** Added to the `<img>` the logo renders into. The type refuses it alongside a required `color`: a coloured default or an image, not both. */
+  imgClassName?: string;
 };
 
 type RoomIconBadge = {
-	badgeUrl?: string;
-	badgeIconNode?: React.ReactNode;
-	badgeIconColor?: string;
-	onBadgeClick?: () => void;
+  /** URL of the badge glyph, drawn in the corner. Either this or `badgeIconNode` renders the badge; `withEditing` suppresses it. */
+  badgeUrl?: string;
+  /** Badge glyph as a node, used instead of `badgeUrl`. */
+  badgeIconNode?: React.ReactNode;
+  /** Keeps the glyph's own colours instead of filling it with the tile's background colour. */
+  badgeIconColor?: string;
+  /** Called when the badge is clicked. The click also reaches the tile, which toggles the logo menu. */
+  onBadgeClick?: () => void;
 };
 
 type RoomIconNonBadge = {
-	badgeUrl?: undefined;
-	badgeIconNode?: undefined;
-	badgeIconColor?: undefined;
-	onBadgeClick?: undefined;
+  /** URL of the badge glyph, drawn in the corner. Either this or `badgeIconNode` renders the badge; `withEditing` suppresses it. */
+  badgeUrl?: undefined;
+  /** Badge glyph as a node, used instead of `badgeUrl`. */
+  badgeIconNode?: undefined;
+  /** Keeps the glyph's own colours instead of filling it with the tile's background colour. */
+  badgeIconColor?: undefined;
+  /** Called when the badge is clicked. The click also reaches the tile, which toggles the logo menu. */
+  onBadgeClick?: undefined;
 };
 
 export type RoomIconProps = RoomIconDefault &
-	RoomIconExpansion &
-	(RoomIconColor | RoomIconImage) &
-	(RoomIconBadge | RoomIconNonBadge);
+  RoomIconExpansion &
+  (RoomIconColor | RoomIconImage) &
+  (RoomIconBadge | RoomIconNonBadge);

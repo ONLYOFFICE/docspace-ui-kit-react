@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { useState } from "react";
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -47,47 +12,8 @@ const meta = {
   title: "UI/Form controls/FieldContainer",
   component: FieldContainer,
   parameters: {
-    docs: {
-      description: {
-        component: `A responsive form field container component that provides consistent layout and styling for form inputs.
-
-### Features
-
-- **Dual Layout**: Horizontal and vertical alignment options
-- **Error Handling**: Built-in error message display with customizable color and width
-- **Required Indicator**: Optional asterisk for required fields
-- **Label Configuration**: Adjustable label width and visibility
-- **Tooltip Support**: Integrated help button with configurable tooltip placement
-- **Inline Help**: Option to render the help button inline within the label
-
-### Usage
-
-\`\`\`tsx
-import { FieldContainer } from "@docspace/ui-kit/components/field-container";
-
-// Horizontal layout with tooltip
-<FieldContainer
-  labelText="Name:"
-  labelVisible
-  tooltipContent="Enter your full name"
-  place="top"
->
-  <TextInput value={value} onChange={handleChange} />
-</FieldContainer>
-
-// Vertical layout with error
-<FieldContainer
-  isVertical
-  labelText="Email:"
-  labelVisible
-  hasError
-  errorMessage="Invalid email"
->
-  <TextInput value={value} hasError onChange={handleChange} />
-</FieldContainer>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     isVertical: {
@@ -109,7 +35,7 @@ import { FieldContainer } from "@docspace/ui-kit/components/field-container";
     hasError: {
       control: "boolean",
       description:
-        "When true, displays the field in an error state with error styling",
+        "When true, shows `errorMessage` under the field. The child control is not restyled; give it its own error flag",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -130,7 +56,8 @@ import { FieldContainer } from "@docspace/ui-kit/components/field-container";
     },
     inlineHelpButton: {
       control: "boolean",
-      description: "When true, displays an inline help button with tooltip",
+      description:
+        "When true, the help button is rendered inside the label element, after its text, instead of as a separate element next to the label",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -142,12 +69,12 @@ import { FieldContainer } from "@docspace/ui-kit/components/field-container";
     tooltipContent: {
       control: "text",
       description:
-        "Content to be displayed in the tooltip when hovering over the help icon",
+        "Content of the tooltip that opens when the help icon is clicked. Without it no help icon is rendered",
     },
     maxLabelWidth: {
       control: "text",
       description:
-        "Maximum width of the label element. Can be any valid CSS width value",
+        "Width of the label column in the side-by-side layout: the label takes exactly this width, so the controls of stacked fields line up. Has no effect in the vertical layout",
       table: {
         defaultValue: { summary: "110px" },
       },
@@ -167,7 +94,7 @@ import { FieldContainer } from "@docspace/ui-kit/components/field-container";
     errorColor: {
       control: "color",
       description:
-        "Color used for error messages and indicators. Can be any valid CSS color value.",
+        "Colour of the error message text. The theme's error colour when not given",
     },
     place: {
       control: "select",
@@ -177,11 +104,6 @@ import { FieldContainer } from "@docspace/ui-kit/components/field-container";
         defaultValue: { summary: "bottom" },
       },
     },
-    helpButtonHeaderContent: {
-      control: "text",
-      description:
-        "Custom header content for the help tooltip when using inline help button",
-    },
     className: {
       control: "text",
       description: "Additional CSS class names to apply to the container",
@@ -189,6 +111,37 @@ import { FieldContainer } from "@docspace/ui-kit/components/field-container";
     style: {
       control: "object",
       description: "Custom inline styles to apply to the container",
+    },
+    labelFor: {
+      control: "text",
+      description:
+        "`id` of the control this labels, which becomes the label's `for`. Give the control the same `id` and clicking the caption focuses it",
+    },
+    id: {
+      control: "text",
+      description: "HTML `id` of the container",
+    },
+    tooltipClass: {
+      control: "text",
+      description: "Additional CSS class names for the help button",
+    },
+    tooltipMaxWidth: {
+      control: "text",
+      description:
+        "Maximum width of the tooltip. Currently has no effect: the label it is passed to does not read it",
+    },
+    dataTestId: {
+      control: "text",
+      description:
+        "`data-testid` of the container. The help button, when there is one, gets `<dataTestId>_help_button`",
+      table: {
+        defaultValue: { summary: "field-container" },
+      },
+    },
+    children: {
+      control: false,
+      description:
+        "The form control the container lays out, rendered in the field body above the error message",
     },
   },
 } satisfies Meta<typeof FieldContainer>;
@@ -203,6 +156,7 @@ const Template = ({ hasError, ...rest }: FieldContainerProps) => {
   return (
     <FieldContainer hasError={hasError} {...rest}>
       <TextInput
+        id={rest.labelFor}
         value={value}
         hasError={hasError}
         className="field-input"
@@ -221,6 +175,7 @@ export const Default: Story = {
   args: {
     labelText: "Name:",
     labelVisible: true,
+    labelFor: "field-name",
     maxLabelWidth: "110px",
     tooltipContent: "Enter your full name",
     place: "top",
@@ -231,17 +186,19 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Default configuration with horizontal layout and tooltip.",
+        story:
+          "The label sits in a fixed-width column beside the control, with a help icon that opens a tooltip on click. Click the caption to focus the input (`labelFor`); change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<FieldContainer
   labelText="Name:"
   labelVisible
+  labelFor="name"
   maxLabelWidth="110px"
   tooltipContent="Enter your full name"
   place="top"
 >
-  <TextInput value={value} onChange={handleChange} />
+  <TextInput id="name" value={value} onChange={handleChange} />
 </FieldContainer>`,
       },
     },
@@ -254,13 +211,14 @@ export const Required: Story = {
     ...Default.args,
     isRequired: true,
     labelText: "Email:",
+    labelFor: "field-email",
     tooltipContent: "Enter a valid email address",
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Required field with a visual asterisk indicator next to the label.",
+          "Marks a field the form cannot be sent without: an asterisk follows the caption, and the label is announced as required (`isRequired`).",
       },
       source: {
         code: `<FieldContainer
@@ -285,11 +243,13 @@ export const WithError: Story = {
     errorColor: globalColors.lightErrorStatus,
     errorMessageWidth: "293px",
     labelText: "Username:",
+    labelFor: "field-username",
   },
   parameters: {
     docs: {
       description: {
-        story: "Field in error state with custom error message and color.",
+        story:
+          "Tells the user what to correct right under the field: the message appears only while `hasError` is set, in `errorColor`, wrapped at `errorMessageWidth`. The red border belongs to the input, which gets its own `hasError`.",
       },
       source: {
         code: `<FieldContainer
@@ -297,7 +257,7 @@ export const WithError: Story = {
   labelVisible
   hasError
   errorMessage="This field is required"
-  errorColor="#F21C0E"
+  errorColor="#F24724"
   errorMessageWidth="293px"
 >
   <TextInput value={value} hasError onChange={handleChange} />
@@ -314,13 +274,14 @@ export const VerticalLayout: Story = {
     isVertical: true,
     maxLabelWidth: "100%",
     labelText: "Description:",
+    labelFor: "field-description",
     tooltipContent: "Provide a brief description",
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Vertical layout with label displayed above the input field and full-width label.",
+          "For narrow forms and long captions: the label stacks above the control, and both span the full width of the container (`isVertical`). The label column width does not apply here.",
       },
       source: {
         code: `<FieldContainer
@@ -343,14 +304,14 @@ export const WithInlineHelp: Story = {
     ...Default.args,
     inlineHelpButton: true,
     tooltipContent: "This is an inline help message",
-    helpButtonHeaderContent: "Help Information",
     labelText: "Profile URL:",
+    labelFor: "field-profile-url",
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Field with an inline help button rendered within the label instead of as a separate element.",
+          "Makes the help icon part of the caption: it is rendered inside the label, after its text, so it follows the caption's own layout instead of standing as a separate element beside it (`inlineHelpButton`).",
       },
       source: {
         code: `<FieldContainer
@@ -358,7 +319,6 @@ export const WithInlineHelp: Story = {
   labelVisible
   inlineHelpButton
   tooltipContent="This is an inline help message"
-  helpButtonHeaderContent="Help Information"
 >
   <TextInput value={value} onChange={handleChange} />
 </FieldContainer>`,
@@ -378,12 +338,13 @@ export const CustomStyling: Story = {
       borderRadius: "4px",
     },
     labelText: "Custom Field:",
+    labelFor: "field-custom",
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Field container with custom background, padding, and border-radius applied via inline styles.",
+          "Sets the container apart from the page, here with a background, padding and rounded corners, through `style` and `className`.",
       },
       source: {
         code: `<FieldContainer
@@ -411,7 +372,6 @@ const CssCustomizationTemplate = () => {
           "--field-container-margin": "0 0 32px 0",
           "--field-container-error-top": "8px",
           "--error-color": "#7c3aed",
-          "--error-width": "400px",
         } as CSSProperties
       }
     >
@@ -460,15 +420,10 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--field-container-margin\` | Container margin | \`0 0 16px 0\` |
-| \`--field-container-error-top\` | Error message top padding | \`4px\` |
-| \`--error-color\` | Error message text color | theme token |
-| \`--error-width\` | Error message max width | \`293px\` |
-| \`--label-width\` | Label min/max width in horizontal mode | component prop |`,
+- **Full Name** — the error message shows the custom colour and top padding
+- **Email** — the gap between the two fields is the custom container margin`,
       },
     },
   },

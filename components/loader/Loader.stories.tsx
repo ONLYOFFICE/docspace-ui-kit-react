@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -44,33 +9,8 @@ const meta = {
   title: "UI/Status components/Loader",
   component: Loader,
   parameters: {
-    docs: {
-      description: {
-        component: `Loader component for displaying loading states and progress indicators with multiple animation types.
-
-### Features
-
-- **Five Animation Types**: Base (text), Oval, DualRing, Rombs, and Track
-- **Customizable Color**: Apply any CSS color to the loader
-- **Flexible Sizing**: Set size using px, rem, or other CSS units
-- **Accessibility**: Supports label text for screen readers
-
-### Usage
-
-\`\`\`tsx
-import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
-
-// Oval loader
-<Loader type={LoaderTypes.oval} size="40px" color="#333" />
-
-// Rombs loader
-<Loader type={LoaderTypes.rombs} size="65px" />
-
-// Base text loader
-<Loader type={LoaderTypes.base} label="Loading content..." />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=419-1989&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -80,28 +20,66 @@ import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
     type: {
       control: "select",
       options: Object.values(LoaderTypes),
-      description: "Type of the loader animation",
+      description:
+        "Which animation to draw: `oval`, `dual-ring`, `rombs` or `track`; `base` or no value renders `label` as plain text instead",
       table: {
-        defaultValue: { summary: "base" },
+        defaultValue: { summary: "undefined" },
       },
     },
     color: {
       control: "color",
-      description: "Color of the loader",
+      description:
+        "Any CSS colour for the oval and dual-ring strokes and for the text of `base`; the track and the diamonds ignore it",
     },
     size: {
       control: "text",
-      description: "Size of the loader (in px, rem, or other CSS units)",
+      description:
+        "Width and height of the animation as one CSS length (px, rem or any other unit); for `base`, the font size of the text",
       table: {
-        defaultValue: { summary: "40px" },
+        defaultValue: { summary: "40px (20px for track)" },
       },
     },
     label: {
       control: "text",
-      description: "Accessibility label for screen readers",
+      description:
+        "Name a screen reader announces for the oval, dual-ring and track animations; for `base`, the text that is shown",
       table: {
-        defaultValue: { summary: "Loading content, please wait." },
+        defaultValue: { summary: "undefined" },
       },
+    },
+    primary: {
+      control: "boolean",
+      description:
+        "Draws the track in the colour meant for a loader on a primary button, white by default; read by `track` only",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isDisabled: {
+      control: "boolean",
+      description: "Dims the track to 60% opacity; read by `track` only",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    className: {
+      control: "text",
+      description: "Class name of the wrapper around the animation",
+    },
+    id: {
+      control: "text",
+      description:
+        "Id of the wrapper; the track also builds its gradient ids from it, so two tracks on one page need different ids",
+    },
+    style: {
+      control: "object",
+      description:
+        "Inline styles of the wrapper, applied again to the text of `base`",
+    },
+    ref: {
+      control: false,
+      description:
+        "Reference to the track's SVG element; the other types ignore it",
     },
   },
 } satisfies Meta<typeof Loader>;
@@ -150,6 +128,17 @@ export const Default: Story = {
     size: "18px",
     label: "Loading content, please wait...",
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A line of plain text instead of an animation, for a place where a moving spinner would distract: this is what you get with `type` set to `base` or left out, so pick an animation explicitly when you want one. Change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<Loader type={LoaderTypes.base} size="18px" label="Loading content, please wait..." />`,
+      },
+    },
+  },
 };
 
 export const Oval: Story = {
@@ -163,7 +152,8 @@ export const Oval: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Oval spinner animation, commonly used for inline loading states.",
+        story:
+          "Oval spinner animation, commonly used for inline loading states.",
       },
       source: {
         code: `<Loader type={LoaderTypes.oval} size="40px" color={globalColors.loaderLight} />`,
@@ -193,7 +183,7 @@ export const DualRing: Story = {
 };
 
 export const Rombs: Story = {
-  render: () => (
+  render: (args) => (
     <div
       style={{
         display: "flex",
@@ -204,9 +194,14 @@ export const Rombs: Story = {
         padding: "20px",
       }}
     >
-      <Loader type={LoaderTypes.rombs} size="65px" label="Loading..." />
+      <Loader {...args} />
     </div>
   ),
+  args: {
+    type: LoaderTypes.rombs,
+    size: "65px",
+    label: "Loading...",
+  },
   parameters: {
     docs: {
       description: {
@@ -261,7 +256,10 @@ const AllTypesTemplate = () => {
         />
       </LabeledItem>
       <LabeledItem label="Rombs">
-        <Loader type={LoaderTypes.rombs} size="65px" label="Rombs loader" />
+        {/* The diamonds are positioned absolutely and bounce by 120px */}
+        <div style={{ position: "relative", width: "130px", height: "190px" }}>
+          <Loader type={LoaderTypes.rombs} size="65px" label="Rombs loader" />
+        </div>
       </LabeledItem>
       <LabeledItem label="Track">
         <Loader type={LoaderTypes.track} size="30px" label="Track loader" />
@@ -276,7 +274,7 @@ export const AllTypes: Story = {
     docs: {
       description: {
         story:
-          "Side-by-side comparison of all five loader animation types: Base, Oval, DualRing, Rombs, and Track.",
+          "Side-by-side comparison of the text fallback (Base) and the four animations (Oval, DualRing, Rombs and Track), to choose the one that fits the space it waits in.",
       },
       source: {
         code: `<Loader type={LoaderTypes.base} size="18px" />
@@ -386,38 +384,130 @@ export const DifferentSizes: Story = {
   },
 };
 
+export const OnPrimaryButton: Story = {
+  render: (args) => (
+    <div
+      style={{
+        display: "inline-flex",
+        padding: "10px 24px",
+        borderRadius: "3px",
+        background: "var(--color-scheme-main-buttons)",
+      }}
+    >
+      <Loader {...args} />
+    </div>
+  ),
+  args: {
+    type: LoaderTypes.track,
+    size: "20px",
+    primary: true,
+    id: "primary-track",
+    label: "Saving",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A white track on the accent background of a primary button, where the default accent-coloured track would disappear (`primary`).",
+      },
+      source: {
+        code: `<Loader type={LoaderTypes.track} size="20px" primary id="primary-track" label="Saving" />`,
+      },
+    },
+  },
+};
+
+const DisabledStateTemplate = () => {
+  return (
+    <Wrapper>
+      <LabeledItem label="Enabled">
+        <Loader
+          type={LoaderTypes.track}
+          size="30px"
+          id="enabled-track"
+          label="Loading"
+        />
+      </LabeledItem>
+      <LabeledItem label="Disabled">
+        <Loader
+          type={LoaderTypes.track}
+          size="30px"
+          id="disabled-track"
+          isDisabled
+          label="Loading"
+        />
+      </LabeledItem>
+    </Wrapper>
+  );
+};
+
+export const DisabledState: Story = {
+  render: () => <DisabledStateTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The track dimmed beside a normal one, for a loader inside a control that is currently unavailable (`isDisabled`, read by the track only).",
+      },
+      source: {
+        code: `<Loader type={LoaderTypes.track} size="30px" id="enabled-track" />
+<Loader type={LoaderTypes.track} size="30px" id="disabled-track" isDisabled />`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
     <div
       style={
         {
+          display: "flex",
+          gap: "40px",
+          alignItems: "center",
           "--loader-stroke": "#7c3aed",
           "--loader-size": "50px",
+          "--loader-track-base": "#0f766e",
+          "--loader-track-primary": "#b45309",
+          "--loader-opacity-disabled": "0.25",
         } as CSSProperties
       }
     >
       <Loader type={LoaderTypes.oval} label="Custom loader" />
+      <Loader type={LoaderTypes.track} id="css-track" label="Custom track" />
+      <Loader
+        type={LoaderTypes.track}
+        id="css-track-primary"
+        primary
+        label="Custom primary track"
+      />
+      <Loader
+        type={LoaderTypes.track}
+        id="css-track-disabled"
+        isDisabled
+        label="Custom disabled track"
+      />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--loader-stroke\` | Stroke color of the oval/dualRing loader | theme loader color |
-| \`--loader-size\` | Width and height of the loader | \`40px\` |
-| \`--loader-track-primary\` | Track loader spinning arc color | white |
-| \`--loader-track-base\` | Track loader track (background ring) color | accent |`,
+The example shows, from left to right: an oval for \`--loader-stroke\` and \`--loader-size\`, which every instance picks up; a track for \`--loader-track-base\`; a track with \`primary\` for \`--loader-track-primary\`; and a track with \`isDisabled\` for \`--loader-opacity-disabled\`.`,
       },
       source: {
-        code: `// Customize track loader colors via CSS variables
-<div style={{
-  "--loader-track-primary": "#cccccc",
-  "--loader-track-base": "#444444",
+        code: `<div style={{
+  "--loader-stroke": "#7c3aed",
+  "--loader-size": "50px",
+  "--loader-track-base": "#0f766e",
+  "--loader-track-primary": "#b45309",
+  "--loader-opacity-disabled": "0.25",
 }}>
-  <Loader type={LoaderTypes.track} size="30px" />
+  <Loader type={LoaderTypes.oval} />
+  <Loader type={LoaderTypes.track} id="css-track" />
+  <Loader type={LoaderTypes.track} id="css-track-primary" primary />
+  <Loader type={LoaderTypes.track} id="css-track-disabled" isDisabled />
 </div>`,
       },
     },

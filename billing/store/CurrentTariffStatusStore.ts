@@ -1,39 +1,4 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import {
   type PaymentApi,
   type PortalQuotaApi,
@@ -275,16 +240,22 @@ class CurrentTariffStatusStore {
       const services = (res?.data?.response ??
         []) as unknown as TWalletServiceQuota[];
 
-      this._storageServiceId =
-        services.find((service) =>
-          (service.features ?? []).some((feature) => feature.id === TOTAL_SIZE),
-        )?.id ?? null;
-      this._docsConnectServiceIds = services
-        .filter((service) => isDocsConnectService(service))
-        .map((service) => service.id);
-      this._walletServicesResolved = true;
+      runInAction(() => {
+        this._storageServiceId =
+          services.find((service) =>
+            (service.features ?? []).some(
+              (feature) => feature.id === TOTAL_SIZE,
+            ),
+          )?.id ?? null;
+        this._docsConnectServiceIds = services
+          .filter((service) => isDocsConnectService(service))
+          .map((service) => service.id);
+        this._walletServicesResolved = true;
+      });
     } catch {
-      this._walletServicesResolved = false;
+      runInAction(() => {
+        this._walletServicesResolved = false;
+      });
     }
   };
 
@@ -306,7 +277,11 @@ class CurrentTariffStatusStore {
 
       const tariff = res.data.response as unknown as Tariff;
 
-      this.portalTariffStatus = tariff;
+      // After an await, so outside the action makeAutoObservable made of this
+      // method; MobX strict mode wants every write wrapped.
+      runInAction(() => {
+        this.portalTariffStatus = tariff;
+      });
 
       type WalletQuota = Quota & { additional?: boolean };
       const walletQuotas: WalletQuota[] =
@@ -325,25 +300,27 @@ class CurrentTariffStatusStore {
           : candidates.find((q) => q.additional !== false);
       const tariffQuota = candidates.find((q) => q.additional === false);
 
-      // QuotaState.Overdue = 1
-      if (storageQuota) {
-        if ((storageQuota.state as unknown as number) === 1) {
-          this._previousWalletQuota = [storageQuota];
-          this._walletQuotas = [];
+      runInAction(() => {
+        // QuotaState.Overdue = 1
+        if (storageQuota) {
+          if ((storageQuota.state as unknown as number) === 1) {
+            this._previousWalletQuota = [storageQuota];
+            this._walletQuotas = [];
+          } else {
+            this._walletQuotas = [storageQuota];
+            this._previousWalletQuota = [];
+          }
         } else {
-          this._walletQuotas = [storageQuota];
+          this._walletQuotas = [];
           this._previousWalletQuota = [];
         }
-      } else {
-        this._walletQuotas = [];
-        this._previousWalletQuota = [];
-      }
 
-      if (tariffQuota && (tariffQuota.state as unknown as number) !== 1) {
-        this._tariffWalletQuota = tariffQuota;
-      } else {
-        this._tariffWalletQuota = null;
-      }
+        if (tariffQuota && (tariffQuota.state as unknown as number) !== 1) {
+          this._tariffWalletQuota = tariffQuota;
+        } else {
+          this._tariffWalletQuota = null;
+        }
+      });
 
       this.setIsLoaded(true);
 
@@ -372,13 +349,15 @@ class CurrentTariffStatusStore {
 
       const info = res.data.response as unknown as TCustomerInfo;
 
-      this.payerInfo = {
-        portalId: null,
-        paymentMethodStatus: info.paymentMethodStatus ?? 0,
-        isDelayedPaymentMethod: info.isDelayedPaymentMethod ?? false,
-        email: info.email ?? null,
-        payer: info.payer,
-      };
+      runInAction(() => {
+        this.payerInfo = {
+          portalId: null,
+          paymentMethodStatus: info.paymentMethodStatus ?? 0,
+          isDelayedPaymentMethod: info.isDelayedPaymentMethod ?? false,
+          email: info.email ?? null,
+          payer: info.payer,
+        };
+      });
 
       return this.payerInfo;
     } catch (error: unknown) {
@@ -389,4 +368,3 @@ class CurrentTariffStatusStore {
 }
 
 export default CurrentTariffStatusStore;
-
