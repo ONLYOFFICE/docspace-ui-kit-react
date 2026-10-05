@@ -2,6 +2,7 @@ import React from "react";
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, screen, waitFor } from "storybook/test";
 
 import { Text } from "../text";
 import { RootTooltip } from "../tooltip";
@@ -261,7 +262,20 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   );
 };
 
+type Canvas = { getByTestId: (id: string) => HTMLElement };
+
+// The info glyph the tooltip anchors to; the tooltip renders in a portal.
+const icon = (canvas: Canvas) =>
+  canvas.getByTestId("help-button").querySelector("svg") as SVGElement;
+
+const tooltipShows = (text: string) =>
+  waitFor(() => expect(screen.getByText(text)).toBeVisible());
+
 export const Default: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(icon(canvas));
+    await tooltipShows("This is a help tooltip");
+  },
   render: (args) => (
     <div style={{ padding: "40px 20px" }}>
       <HelpButton {...args} />
@@ -450,6 +464,20 @@ const TextContentTemplate = () => {
 
 export const WithTextContent: Story = {
   render: () => <TextContentTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // A string goes to the shared tooltip RootTooltip renders, anchored to
+    // the button element that carries data-tooltip-id.
+    const anchor = canvas
+      .getByTestId("help-button")
+      .querySelector("[data-tooltip-id='info-tooltip']") as HTMLElement;
+    await expect(anchor).toHaveAttribute(
+      "data-tooltip-content",
+      "Plain text opens in the shared tooltip",
+    );
+    // RootTooltip's info tooltip opens on a click, not on hover.
+    await userEvent.click(anchor);
+    await tooltipShows("Plain text opens in the shared tooltip");
+  },
   parameters: {
     docs: {
       description: {
@@ -489,6 +517,11 @@ const CustomAnchorTemplate = () => {
 
 export const WithCustomAnchor: Story = {
   render: () => <CustomAnchorTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // The children are the anchor in place of the glyph.
+    await userEvent.click(canvas.getByText("Storage"));
+    await tooltipShows("Storage is counted across all your rooms.");
+  },
   parameters: {
     docs: {
       description: {
@@ -524,6 +557,10 @@ const OpensOnHoverTemplate = () => {
 
 export const OpensOnHover: Story = {
   render: () => <OpensOnHoverTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.hover(icon(canvas));
+    await tooltipShows("Opens while the pointer is over the icon");
+  },
   parameters: {
     docs: {
       description: {
