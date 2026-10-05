@@ -49,6 +49,29 @@ type AiPageProps = {
 
 const TRANSACTIONS_TAB = "transactions";
 const LIMITS_TAB = "limits";
+const DETAILS_TAB_IDS = [TRANSACTIONS_TAB, LIMITS_TAB];
+const TAB_PARAM = "tab";
+
+const getInitialTabId = () => {
+  const requested = new URLSearchParams(window.location.search).get(TAB_PARAM);
+  return requested && DETAILS_TAB_IDS.includes(requested)
+    ? requested
+    : TRANSACTIONS_TAB;
+};
+
+const writeTabToUrl = (tabId: string) => {
+  const params = new URLSearchParams(window.location.search);
+
+  if (tabId === TRANSACTIONS_TAB) params.delete(TAB_PARAM);
+  else params.set(TAB_PARAM, tabId);
+
+  const query = params.toString();
+  window.history.replaceState(
+    window.history.state,
+    "",
+    `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`,
+  );
+};
 
 const AiPage = (props: AiPageProps) => {
   const {
@@ -65,7 +88,12 @@ const AiPage = (props: AiPageProps) => {
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
 
-  const [selectedTab, setSelectedTab] = useState(TRANSACTIONS_TAB);
+  const [selectedTab, setSelectedTab] = useState(getInitialTabId);
+
+  const onSelectTab = (tabId: string) => {
+    setSelectedTab(tabId);
+    writeTabToUrl(tabId);
+  };
 
   const {
     changeServiceState,
@@ -330,7 +358,7 @@ const AiPage = (props: AiPageProps) => {
         className={styles.detailsTabs}
         items={detailsTabs}
         selectedItemId={selectedTab}
-        onSelect={(item) => setSelectedTab(item.id)}
+        onSelect={(item) => onSelectTab(item.id)}
         withoutStickyIntend
       />
 
