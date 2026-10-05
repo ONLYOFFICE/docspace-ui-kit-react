@@ -1,6 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, within } from "storybook/test";
 
 import SettingsReactSvgUrl from "../../assets/settings.react.svg?url";
 
@@ -306,6 +307,11 @@ export const Default: Story = {
   render: (args) => <DropDownItem {...args} />,
   args: {
     label: "Default Item",
+    onClick: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("option", { name: "Default Item" }));
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -376,6 +382,15 @@ const ItemTypesTemplate = () => {
 
 export const ItemTypes: Story = {
   render: () => <ItemTypesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("separator")).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("option", { name: "Selected Item" }),
+    ).toHaveAttribute("aria-selected", "true");
+    await expect(
+      canvas.getByRole("option", { name: "Disabled Item" }),
+    ).toHaveAttribute("aria-disabled", "true");
+  },
   parameters: {
     docs: {
       description: {
@@ -405,6 +420,12 @@ const WithToggleTemplate = () => {
 
 export const WithToggle: Story = {
   render: () => <WithToggleTemplate />,
+  play: async ({ canvas }) => {
+    const toggleOf = (name: string) =>
+      within(canvas.getByRole("option", { name })).getByRole("checkbox");
+    await expect(toggleOf("Toggle On")).toBeChecked();
+    await expect(toggleOf("Toggle Off")).not.toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -596,6 +617,16 @@ export const WithExternalLink: Story = {
     icon: SettingsReactSvgUrl,
     withExternalLink: true,
     externalLinkPath: "https://example.com/help",
+    onClick: fn(),
+    onExternalLinkClick: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // The icon is the only link inside the row's option.
+    const option = canvas.getByRole("option", { name: "Help center" });
+    const external = option.querySelector("a") as HTMLElement;
+    await userEvent.click(external);
+    await expect(args.onExternalLinkClick).toHaveBeenCalledTimes(1);
+    await expect(args.onClick).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
