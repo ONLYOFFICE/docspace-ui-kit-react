@@ -626,8 +626,6 @@ export const FilesApp = () => {
         showProgress={false}
         logoText="Apps UI Kit"
         languageBaseName="en"
-        zendeskEmail=""
-        chatDisplayName=""
         zendeskKey=""
         downloaddesktopUrl=""
         officeforandroidUrl=""

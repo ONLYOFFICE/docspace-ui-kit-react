@@ -1,89 +1,86 @@
 import React, { useCallback, useEffect } from "react";
 
 import { useInterfaceDirection } from "../../../context/InterfaceDirectionContext";
-import { useTheme } from "../../../context/ThemeContext";
+import { useIsMobile } from "../../../hooks/use-is-mobile";
+import { INFO_PANEL_WIDTH } from "../../../utils/device";
+import {
+  FLOATING_CORNER_GAP,
+  FLOATING_CORNER_INSET,
+  FLOATING_CORNER_INSET_MOBILE,
+  FLOATING_CORNER_SIZE,
+} from "../../../constants";
 import { Zendesk } from "../zendesk";
 import { zendeskAPI } from "../zendesk/Zendesk.utils";
-import { ArticleZendeskProps } from "../Article.types";
+import { ArticleLiveChatProps } from "../Article.types";
 
-import { useCommonTranslation, getTranslationReady } from "../../../utils";
-
-const baseConfig = {
-  webWidget: {
-    zIndex: 201,
-    chat: {
-      menuOptions: { emailTranscript: false },
-    },
-  },
-};
+import "./LiveChat.module.scss";
 
 /**
- * Loads the Zendesk widget and keeps its settings in step with the app. The
- * widget's own launcher stays hidden throughout: the app draws the Support
- * button itself, so that it can be sized and placed with the rest of the
- * floating corner stack, and opens the chat through this component's API.
+ * Where the widget's iframes stand in the stacking order: over the page,
+ * under the app's dialogs and panels. The widget's own default is 999999.
+ */
+const Z_INDEX = 201;
+
+/**
+ * Loads the Zendesk widget and keeps its settings in step with the app: the
+ * locale, the side it opens on, the corner its launcher stands in. The
+ * launcher is the vendor's own and the only way into the chat; the app only
+ * moves it clear of whatever else it pins to that corner, and scales its
+ * iframe down to the corner's button size (LiveChat.module.scss).
+ *
+ * The account serves the messaging Web Widget, so every command goes through
+ * the `messenger` namespace. The Web Widget (Classic) `webWidget` commands are
+ * not ignored there, they throw ("Method webWidget.hide does not exist"), and
+ * the messaging widget has no API for the launcher label, the colour or a
+ * visitor prefill: those are Admin Center settings.
  */
 const ArticleLiveChat = ({
   languageBaseName,
-  zendeskEmail,
-  chatDisplayName,
   zendeskKey,
   isShowLiveChat,
-}: ArticleZendeskProps) => {
-  const t = useCommonTranslation();
-  const ready = getTranslationReady();
-  const { currentColorScheme } = useTheme();
+  withFloatingButton = false,
+  isInfoPanelVisible = false,
+}: ArticleLiveChatProps) => {
   const { isRTL } = useInterfaceDirection();
+  const isMobileWidth = useIsMobile();
 
   useEffect(() => {
-    zendeskAPI.addChanges("webWidget", "setLocale", languageBaseName);
-
-    if (ready)
-      zendeskAPI.addChanges("webWidget", "updateSettings", {
-        launcher: {
-          label: {
-            "*": t("Support"),
-          },
-          chatLabel: {
-            "*": t("Support"),
-          },
-        },
-      });
-  }, [languageBaseName, ready, t]);
+    zendeskAPI.addChanges("messenger:set", "locale", languageBaseName);
+  }, [languageBaseName]);
 
   useEffect(() => {
-    zendeskAPI.addChanges("webWidget", "updateSettings", {
-      color: {
-        theme: currentColorScheme?.main?.accent,
+    // The launcher is the only element of the floating corner stack that CSS
+    // does not place, so it repeats the inset the others get from
+    // styles/variables/_floating-corner.scss - otherwise it lines up with
+    // nothing. It shares that corner with the app's create button and with the
+    // upload progress button, and steps one button width aside whenever either
+    // of them is on screen. Above mobile the info panel is a docked column the
+    // corner moves clear of; on a phone the panel takes the whole screen and
+    // there is nothing to step around. The offsets are pixels from the
+    // viewport edge, on both axes.
+    const inset = isMobileWidth
+      ? FLOATING_CORNER_INSET_MOBILE
+      : FLOATING_CORNER_INSET;
+    const dodge = withFloatingButton
+      ? FLOATING_CORNER_SIZE + FLOATING_CORNER_GAP
+      : 0;
+    const infoPanel =
+      isInfoPanelVisible && !isMobileWidth ? INFO_PANEL_WIDTH : 0;
+    const offset = { horizontal: inset + dodge + infoPanel, vertical: inset };
+
+    // The widget keeps a second offset for what it takes to be a phone. It
+    // gets the same one, so the breakpoint stays ours - useIsMobile, which is
+    // what the create button's stylesheet keys off too.
+    zendeskAPI.addChanges("messenger:set", "customization", {
+      position: {
+        side: isRTL ? "left" : "right",
+        offset: { web: offset, mobile: offset },
       },
     });
-  }, [currentColorScheme?.main?.accent]);
-
-  useEffect(() => {
-    zendeskAPI.addChanges("webWidget", "prefill", {
-      email: {
-        value: zendeskEmail,
-      },
-      name: {
-        value: chatDisplayName ? chatDisplayName.trim() : "",
-      },
-    });
-  }, [zendeskEmail, chatDisplayName]);
-
-  useEffect(() => {
-    zendeskAPI.addChanges("webWidget", "updateSettings", {
-      position: { horizontal: isRTL ? "left" : "right" },
-    });
-  }, [isRTL]);
+  }, [withFloatingButton, isInfoPanelVisible, isMobileWidth, isRTL]);
 
   const onZendeskLoaded = useCallback(() => {
-    // The widget arrives with its own launcher showing. Hiding it leaves the
-    // app's Support button as the only way in, and closing the chat puts it
-    // back out of sight rather than leaving the vendor's launcher behind.
-    zendeskAPI.addChanges("webWidget", "hide");
-    zendeskAPI.addChanges("webWidget:on", "close", () => {
-      zendeskAPI.addChanges("webWidget", "hide");
-    });
+    zendeskAPI.addChanges("messenger:set", "zIndex", Z_INDEX);
   }, []);
 
   return zendeskKey ? (
@@ -91,7 +88,6 @@ const ArticleLiveChat = ({
       defer
       zendeskKey={zendeskKey}
       onLoaded={onZendeskLoaded}
-      config={baseConfig}
       isShowLiveChat={isShowLiveChat}
     />
   ) : null;

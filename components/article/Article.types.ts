@@ -66,14 +66,22 @@ export type ArticleDevToolsBarProps = {
 export type ArticleZendeskProps = {
   /** Locale handed to the Zendesk widget. */
   languageBaseName: string;
-  /** Address the Zendesk widget pre-fills. */
-  zendeskEmail: string;
-  /** Name the Zendesk widget shows for the visitor. */
-  chatDisplayName: string;
   /** Key of the Zendesk account. The live chat block loads a third-party script with it. */
   zendeskKey: string;
-  /** Whether the Zendesk widget script is loaded. The widget's own launcher stays hidden either way; the app opens the chat from its own Support button. */
+  /** Whether the Zendesk widget is on the page. The script loads the first time this is true; from then on the "Live chat" switch shows and hides the widget through its API. */
   isShowLiveChat: boolean;
+};
+
+/** What `ArticleLiveChat` takes: the widget settings, plus the corner its launcher shares. */
+export type ArticleLiveChatProps = ArticleZendeskProps & {
+  /**
+   * Something the app pins to the bottom inline-end corner - a create button,
+   * an upload progress button - is on screen, so the launcher steps aside to
+   * keep off it.
+   */
+  withFloatingButton?: boolean;
+  /** The info panel is docked at the inline end, so the launcher moves clear of it. */
+  isInfoPanelVisible?: boolean;
 };
 
 export type ArticleProfileProps = {
