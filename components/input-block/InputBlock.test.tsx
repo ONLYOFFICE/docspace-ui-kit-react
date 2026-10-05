@@ -158,6 +158,16 @@ describe("<InputBlock />", () => {
     expect(input).toHaveAttribute("maxLength", maxLength.toString());
   });
 
+  it("passes the input props it does not name on to the input", () => {
+    render(
+      <InputBlock {...defaultProps} inputMode="decimal" aria-label="Amount" />,
+    );
+
+    const input = screen.getByRole("textbox", { name: "Amount" });
+    expect(input).toHaveAttribute("inputmode", "decimal");
+    expect(screen.getByTestId("input-block")).not.toHaveAttribute("aria-label");
+  });
+
   it("handles custom className correctly", () => {
     const customClass = "custom-input-block";
     render(<InputBlock {...defaultProps} className={customClass} />);

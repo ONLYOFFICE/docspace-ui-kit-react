@@ -286,6 +286,9 @@ export function Subdomain() {
   `tel` bring up the matching keyboard on a phone.
 - `id` goes on the inner `<input>` while `className` and `style` go on the group, so a `htmlFor`
   pointing at `id` reaches the real field.
+- **Every other `TextInput` prop goes to the inner `<input>` too** — `inputMode`, `aria-label`
+  and the rest of `aria-*` among them — so an accessible name passed here names the field, not
+  the group.
 - `children` are wrapped in two nested boxes of their own, both inheriting the group's
   background, so a prefix sits flush inside the border.
 

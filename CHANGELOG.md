@@ -101,6 +101,11 @@ _Changed_ before upgrading.
 
 ### Fixed
 
+- `InputBlock` passes the `TextInput` props it does not name itself on to the inner `<input>`.
+  Its type has always accepted every `TextInput` prop, but the component forwarded only a fixed
+  list, so `inputMode`, `aria-label` and any other `aria-*` were dropped without a warning: the
+  field had no accessible name and a phone showed the full keyboard. They now reach the
+  `<input>`; the props it names keep going where they went
 - `Selector` no longer scrolls the page when it mounts. The list's scroll container takes focus
   on mount, and so does the new-name field when it appears; both focused with a plain `focus()`,
   which scrolls the page to the element. They now pass `preventScroll`, so the focus still lands
