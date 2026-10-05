@@ -2,7 +2,7 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, within } from "storybook/test";
 
 import { Paging } from "./Paging";
 import type { PagingProps } from "./Paging.types";
@@ -192,7 +192,46 @@ const Template = ({
   );
 };
 
+type Canvas = {
+  getByTestId: (id: string) => HTMLElement;
+  queryByTestId: (id: string) => HTMLElement | null;
+};
+
+// The two buttons, and the button of each selector.
+const previous = (canvas: Canvas) =>
+  canvas.getByTestId("paging_previous_button");
+const next = (canvas: Canvas) => canvas.getByTestId("paging_next_button");
+const pageSelector = (canvas: Canvas) =>
+  within(canvas.getByTestId("paging_page_items_combobox")).getByRole("button");
+const countSelector = (canvas: Canvas) =>
+  within(canvas.getByTestId("paging_count_items_combobox")).getByRole("button");
+
 export const Default: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(pageSelector(canvas)).toHaveTextContent("1 of 200");
+
+    await userEvent.click(next(canvas));
+    await expect(args.nextAction).toHaveBeenCalledTimes(1);
+    await expect(pageSelector(canvas)).toHaveTextContent("2 of 200");
+    await userEvent.click(previous(canvas));
+    await expect(pageSelector(canvas)).toHaveTextContent("1 of 200");
+
+    // A page picked from the list.
+    await userEvent.click(pageSelector(canvas));
+    await userEvent.click(screen.getByRole("option", { name: "3 of 200" }));
+    await expect(args.onSelectPage).toHaveBeenCalledWith(
+      expect.objectContaining({ key: 3 }),
+    );
+    await expect(pageSelector(canvas)).toHaveTextContent("3 of 200");
+
+    // A page size picked from the other list.
+    await userEvent.click(countSelector(canvas));
+    await userEvent.click(screen.getByRole("option", { name: "50 per page" }));
+    await expect(args.onSelectCount).toHaveBeenCalledWith(
+      expect.objectContaining({ key: 50 }),
+    );
+    await expect(countSelector(canvas)).toHaveTextContent("50 per page");
+  },
   render: (args) => <Template {...args} />,
   args: {
     previousLabel: "Previous",
@@ -242,6 +281,15 @@ const DisabledPreviousTemplate = () => {
 
 export const DisabledPrevious: Story = {
   render: () => <DisabledPreviousTemplate />,
+  play: async ({ canvas }) => {
+    await expect(previous(canvas)).toBeDisabled();
+    await expect(next(canvas)).toBeEnabled();
+    // The page selector is disabled only when both buttons are.
+    await expect(pageSelector(canvas)).toHaveAttribute(
+      "aria-disabled",
+      "false",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -274,6 +322,10 @@ const DisabledNextTemplate = () => {
 
 export const DisabledNext: Story = {
   render: () => <DisabledNextTemplate />,
+  play: async ({ canvas }) => {
+    await expect(next(canvas)).toBeDisabled();
+    await expect(previous(canvas)).toBeEnabled();
+  },
   parameters: {
     docs: {
       description: {
@@ -306,6 +358,14 @@ const WithoutCountTemplate = () => {
 
 export const WithoutCountSelector: Story = {
   render: () => <WithoutCountTemplate />,
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.queryByTestId("paging_count_items_combobox"),
+    ).toBeNull();
+    await expect(
+      canvas.getByTestId("paging_page_items_combobox"),
+    ).toBeInTheDocument();
+  },
   parameters: {
     docs: {
       description: {
@@ -340,6 +400,16 @@ const SinglePageTemplate = () => {
 
 export const SinglePage: Story = {
   render: () => <SinglePageTemplate />,
+  play: async ({ canvas }) => {
+    await expect(previous(canvas)).toBeDisabled();
+    await expect(next(canvas)).toBeDisabled();
+    await expect(pageSelector(canvas)).toHaveAttribute("aria-disabled", "true");
+    // The page size can still be changed.
+    await expect(countSelector(canvas)).toHaveAttribute(
+      "aria-disabled",
+      "false",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -381,6 +451,14 @@ const ButtonsOnlyTemplate = () => (
 
 export const ButtonsOnly: Story = {
   render: () => <ButtonsOnlyTemplate />,
+  play: async ({ canvas }) => {
+    await expect(previous(canvas)).toBeInTheDocument();
+    await expect(next(canvas)).toBeInTheDocument();
+    await expect(canvas.queryByTestId("paging_page_items_combobox")).toBeNull();
+    await expect(
+      canvas.queryByTestId("paging_count_items_combobox"),
+    ).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
