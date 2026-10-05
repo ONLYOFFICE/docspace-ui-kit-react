@@ -1,7 +1,7 @@
 import { type ComponentProps, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import { CollapsibleCard } from "./CollapsibleCard";
 
@@ -67,7 +67,36 @@ type Story = StoryObj<ComponentProps<typeof CollapsibleCard>>;
 
 export default meta;
 
+type Canvas = {
+  getByRole: (role: string, options: { name: RegExp }) => HTMLElement;
+};
+
+// The header is the card's button, named by its title and description.
+const header = (canvas: Canvas) =>
+  canvas.getByRole("button", { name: /^Lorem ipsum dolor sit amet\?/ });
+
+const BODY = /Ut enim ad minim veniam/;
+
 export const Collapsed: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(header(canvas)).toHaveAttribute("aria-expanded", "false");
+    await expect(canvas.queryByText(BODY)).toBeNull();
+
+    await userEvent.click(header(canvas));
+    await expect(header(canvas)).toHaveAttribute("aria-expanded", "true");
+    await expect(args.onToggle).toHaveBeenLastCalledWith(true);
+    // aria-controls names the body only once the body is in the DOM.
+    const bodyId = header(canvas).getAttribute("aria-controls");
+    await expect(canvas.getByText(BODY).closest("[id]")).toHaveAttribute(
+      "id",
+      bodyId,
+    );
+
+    // A real button: Enter closes it again.
+    await userEvent.keyboard("{Enter}");
+    await expect(header(canvas)).toHaveAttribute("aria-expanded", "false");
+    await expect(args.onToggle).toHaveBeenLastCalledWith(false);
+  },
   args: {
     title: "Lorem ipsum dolor sit amet?",
     description:
@@ -105,6 +134,12 @@ export const Expanded: Story = {
     ...Collapsed.args,
     defaultOpen: true,
   },
+  play: async ({ canvas, userEvent }) => {
+    await expect(header(canvas)).toHaveAttribute("aria-expanded", "true");
+    await expect(canvas.getByText(BODY)).toBeVisible();
+    await userEvent.click(header(canvas));
+    await expect(canvas.queryByText(BODY)).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -129,6 +164,15 @@ export const TitleOnly: Story = {
     title: "Lorem ipsum dolor sit amet?",
     children: Collapsed.args?.children,
     onToggle: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // With no description the button is named by the title alone.
+    const button = canvas.getByRole("button", {
+      name: "Lorem ipsum dolor sit amet?",
+    });
+    await userEvent.click(button);
+    await expect(args.onToggle).toHaveBeenCalledWith(true);
+    await expect(canvas.getByText(BODY)).toBeVisible();
   },
   parameters: {
     docs: {
@@ -171,6 +215,19 @@ export const ControlledState: Story = {
   render: (args) => <ControlledTemplate {...args} />,
   args: {
     ...Collapsed.args,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // The parent opens it...
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Open from outside" }),
+    );
+    await expect(header(canvas)).toHaveAttribute("aria-expanded", "true");
+    await expect(args.onToggle).not.toHaveBeenCalled();
+
+    // ...and the header only asks the parent to close it.
+    await userEvent.click(header(canvas));
+    await expect(args.onToggle).toHaveBeenCalledWith(false);
+    await expect(header(canvas)).toHaveAttribute("aria-expanded", "false");
   },
   parameters: {
     docs: {
