@@ -1,5 +1,6 @@
 import type { ComponentProps, CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, within } from "storybook/test";
 
 import { ProgressBar, PreparationPortalProgress } from ".";
 import type { ProgressBarProps } from "./ProgressBar.types";
@@ -63,6 +64,14 @@ export const Default: Story = {
     percent: 50,
     label: "Uploading file...",
   },
+  play: async ({ canvas }) => {
+    // The label names the bar, and percent is its reported value and fill.
+    const bar = canvas.getByRole("progressbar", { name: "Uploading file..." });
+    await expect(bar).toHaveAttribute("aria-valuenow", "50");
+    await expect(
+      within(bar).getByTestId("progress-bar-percent").style.width,
+    ).toBe("50%");
+  },
   parameters: {
     docs: {
       description: {
@@ -82,6 +91,9 @@ export const WithStatus: Story = {
     percent: 75,
     label: "Processing document",
     status: "3 of 4 files processed",
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("3 of 4 files processed")).toBeVisible();
   },
   parameters: {
     docs: {
@@ -103,6 +115,14 @@ export const WithError: Story = {
     label: "Upload failed",
     error: "Network connection error",
   },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("Network connection error")).toBeVisible();
+    // The bar stays where the operation stopped.
+    await expect(canvas.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "30",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -123,6 +143,11 @@ export const InfiniteProgress: Story = {
     label: "Please wait...",
     isInfiniteProgress: true,
   },
+  play: async ({ canvas }) => {
+    // The sliding strip replaces the fill.
+    await expect(canvas.getByTestId("progress-bar-animation")).toBeVisible();
+    await expect(canvas.queryByTestId("progress-bar-percent")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -142,6 +167,16 @@ export const Complete: Story = {
     percent: 100,
     label: "Upload complete",
     status: "All files processed successfully",
+  },
+  play: async ({ canvas }) => {
+    const bar = canvas.getByRole("progressbar");
+    await expect(bar).toHaveAttribute("aria-valuenow", "100");
+    // The fill covers the whole track.
+    const fill = canvas.getByTestId("progress-bar-percent");
+    await expect(fill.getBoundingClientRect().width).toBeCloseTo(
+      bar.getBoundingClientRect().width,
+      0,
+    );
   },
   parameters: {
     docs: {
@@ -165,6 +200,10 @@ export const PreparationPortal: PreparationStory = {
   args: {
     percent: 75,
     text: "Setting things up...",
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("75 %")).toBeVisible();
+    await expect(canvas.getByText("Setting things up...")).toBeVisible();
   },
   parameters: {
     controls: { include: ["percent", "text", "className"] },
@@ -200,6 +239,15 @@ export const RightToLeft: Story = {
     percent: 40,
     label: "جارٍ التحميل",
     status: "٢ من ٥",
+  },
+  play: async ({ canvas }) => {
+    // Under RTL the fill grows from the right edge of the track.
+    const [bar] = canvas.getAllByRole("progressbar");
+    const fill = within(bar).getByTestId("progress-bar-percent");
+    await expect(fill.getBoundingClientRect().right).toBeCloseTo(
+      bar.getBoundingClientRect().right,
+      0,
+    );
   },
   parameters: {
     noPadding: true,
@@ -242,6 +290,17 @@ export const CssCustomization: Story = {
     percent: 65,
     label: "Customized progress bar",
     status: "Violet theme, 8px height",
+  },
+  play: async ({ canvas }) => {
+    const [fill] = canvas.getAllByTestId("progress-bar-percent");
+    await expect(getComputedStyle(fill).backgroundColor).toBe(
+      "rgb(124, 58, 237)",
+    );
+    // The second bar's error takes the place of its status line.
+    await expect(canvas.getByText("Connection lost")).toBeVisible();
+    await expect(canvas.getAllByText("Violet theme, 8px height")).toHaveLength(
+      1,
+    );
   },
   parameters: {
     docs: {
