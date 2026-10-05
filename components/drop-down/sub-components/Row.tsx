@@ -20,7 +20,11 @@ const Row = memo(({ data, index, style }: RowProps) => {
       onMouseMove={() => {
         handleMouseMove?.(index);
       }}
-      isActiveDescendant={activedescendant === index}
+      // An owner that tracks the highlight itself, such as ComboBox, sets the
+      // flag on its options; the list's own index serves everyone else.
+      isActiveDescendant={
+        option?.props?.isActiveDescendant ?? activedescendant === index
+      }
     />
   );
 });

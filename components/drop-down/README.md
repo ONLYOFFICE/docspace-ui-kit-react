@@ -236,6 +236,11 @@ export function TimezoneMenu({ zones }: { zones: string[] }) {
   default prevented.** The handler is attached to `window` and calls `preventDefault()` before
   it looks at the key, so a text field elsewhere on the page stops accepting characters. Pass
   `enableKeyboardEvents={false}` for a menu that opens next to an input.
+- **An item's own `isActiveDescendant` wins over the list's highlight.** In the virtual list
+  the highlighted row follows the arrow keys and the pointer, unless a child sets
+  `isActiveDescendant` itself — a component that tracks the highlight on its own, as
+  [`ComboBox`](../combobox/README.md) does, passes it on every option. The list scrolls such
+  an item into view.
 - **Disabled children are removed from the list by default.** `showDisabledItems` keeps them; a
   separator that would end up first or last is dropped either way. Keyboard navigation still
   counts the original children, so the highlight and the removed items disagree.

@@ -41,6 +41,26 @@ const VirtualList = ({
     return foundIndex;
   }, [cleanChildren]);
 
+  // The option an owner has highlighted (isActiveDescendant on the option),
+  // which this list scrolls into view since only it holds the list ref.
+  const ownerHighlight = useMemo(() => {
+    let foundIndex = -1;
+    React.Children.forEach(cleanChildren, (child, index) => {
+      if (
+        React.isValidElement(child) &&
+        (child.props as { isActiveDescendant?: boolean })?.isActiveDescendant
+      ) {
+        foundIndex = index;
+      }
+    });
+    return foundIndex;
+  }, [cleanChildren]);
+
+  useEffect(() => {
+    if (isOpen && ownerHighlight !== -1)
+      listRef.current?.scrollToItem(ownerHighlight, "smart");
+  }, [isOpen, ownerHighlight]);
+
   const [currentIndex, setCurrentIndex] = useState(activeIndex);
   const currentIndexRef = useRef<number>(activeIndex);
 
