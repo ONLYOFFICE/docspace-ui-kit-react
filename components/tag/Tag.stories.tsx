@@ -1,6 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, within } from "storybook/test";
 
 import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
@@ -232,6 +233,21 @@ const MaxWidthTemplate = () => {
 
 export const States: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByLabelText("Disabled")).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    // Only the new tag, which has onDelete, draws a delete cross.
+    for (const label of ["Default", "Disabled", "Deleted"]) {
+      await expect(
+        within(canvas.getByLabelText(label)).queryByTestId("icon-button"),
+      ).not.toBeInTheDocument();
+    }
+    await expect(
+      within(canvas.getByLabelText("New Tag")).getByTestId("icon-button"),
+    ).toBeInTheDocument();
+  },
   parameters: {
     docs: {
       description: {
@@ -254,6 +270,14 @@ export const States: Story = {
 
 export const NewTags: Story = {
   render: (args) => <NewTagTemplate {...args} />,
+  args: { onDelete: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    // The cross is the tag's only button; onDelete gets the identifier,
+    // not the label.
+    const review = canvas.getByLabelText("Review");
+    await userEvent.click(within(review).getByTestId("icon-button"));
+    await expect(args.onDelete).toHaveBeenCalledWith("review");
+  },
   parameters: {
     docs: {
       description: {
@@ -271,6 +295,14 @@ export const NewTags: Story = {
 
 export const ClickableTags: Story = {
   render: (args) => <ClickableTemplate {...args} />,
+  args: { onClick: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByLabelText("Design"));
+    // An object naming the tag, not the DOM event.
+    await expect(args.onClick).toHaveBeenCalledWith(
+      expect.objectContaining({ label: "Design" }),
+    );
+  },
   parameters: {
     docs: {
       description: {
