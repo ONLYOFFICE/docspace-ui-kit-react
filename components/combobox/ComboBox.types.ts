@@ -238,10 +238,15 @@ export type TComboboxProps = {
    */
   onSelect?: (option: TOption) => void;
   /**
-   * Called when the button is clicked, with the state being asked for. Passing
-   * it without `onBackdropClick` also stops a click outside closing the list.
+   * Called when the button is clicked or a key opens or closes the list, with
+   * the state being asked for — so the event is a mouse or a keyboard one.
+   * Passing it without `onBackdropClick` also stops a click outside closing
+   * the list.
    */
-  onToggle?: (e: React.MouseEvent<HTMLDivElement>, isOpen: boolean) => void;
+  onToggle?: (
+    e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>,
+    isOpen: boolean,
+  ) => void;
 
   /** Renders the backdrop even when another one is already on screen. */
   shouldShowBackdrop?: boolean;

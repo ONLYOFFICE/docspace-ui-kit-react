@@ -241,6 +241,77 @@ describe("ComboBox", () => {
     expect(event.defaultPrevented).toBe(false);
   });
 
+  it("highlights the option Enter picks in a list with dropDownMaxHeight", () => {
+    const options = [
+      { key: "a", label: "A" },
+      { key: "b", label: "B" },
+      { key: "c", label: "C" },
+      { key: "d", label: "D" },
+    ];
+    const onSelect = vi.fn();
+
+    render(
+      <ComboBox
+        options={options}
+        selectedOption={options[0]}
+        onSelect={onSelect}
+        dropDownMaxHeight={200}
+        isDefaultMode={false}
+      />,
+    );
+    const button = screen.getByRole("button");
+
+    // The virtual list renders these rows, and used to overwrite the
+    // combo box's highlight with its own index.
+    fireEvent.keyDown(button, { key: "ArrowDown", code: "ArrowDown" });
+    fireEvent.keyDown(button, { key: "ArrowDown", code: "ArrowDown" });
+    const highlighted = [
+      ...document.querySelectorAll('[data-focused="true"]'),
+    ].map((node) => node.textContent);
+    expect(highlighted).toEqual(["C"]);
+
+    // Its window listener used to prevent every key, Tab included.
+    const tab = new KeyboardEvent("keydown", {
+      key: "Tab",
+      code: "Tab",
+      bubbles: true,
+      cancelable: true,
+    });
+    window.dispatchEvent(tab);
+    expect(tab.defaultPrevented).toBe(false);
+
+    fireEvent.keyDown(button, { key: "ArrowUp", code: "ArrowUp" });
+    fireEvent.keyDown(button, { key: "ArrowDown", code: "ArrowDown" });
+    fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(onSelect).toHaveBeenCalledWith(options[2]);
+  });
+
+  it("leaves Enter to custom content in an open list with advancedOptions", () => {
+    render(
+      <ComboBox
+        {...baseProps}
+        options={[]}
+        advancedOptions={
+          <>
+            <button type="button">Inside</button>
+            <span>Note</span>
+          </>
+        }
+      />,
+    );
+    const combo = screen.getAllByRole("button")[0];
+    fireEvent.click(combo);
+
+    const enter = new KeyboardEvent("keydown", {
+      key: "Enter",
+      bubbles: true,
+      cancelable: true,
+    });
+    combo.dispatchEvent(enter);
+    expect(enter.defaultPrevented).toBe(false);
+  });
+
   it("does not open from the keyboard while disabled", () => {
     render(<ComboBox {...baseProps} isDisabled />);
     const button = screen.getByRole("button");

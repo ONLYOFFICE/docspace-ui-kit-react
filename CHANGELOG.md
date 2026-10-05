@@ -8,6 +8,11 @@ _Changed_ before upgrading.
 
 ### Changed
 
+- **`ComboBox`'s `onToggle` may receive a keyboard event.** The keys that open and close the
+  list call it too, so its first argument is typed
+  `React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>`. A handler declared
+  to take only a mouse event no longer compiles, and one that reads `clientX` or `button` has
+  to check which event it got
 - **`DocumentEditor`'s props are one of two shapes.** Either `documentServerUrl` with
   `config`, or `fileId` (with `fileVersion` and `isView` if wanted), in which case the wrapper
   fetches both from the portal behind the nearest `ApiProvider`, as it always did. The type
@@ -106,8 +111,12 @@ _Changed_ before upgrading.
   test id its own options never carry — so it moved nothing, and while a list was open it
   swallowed Enter for the whole page. The button now answers Enter, Space and the arrows to open
   the list, the arrows to move a highlight that skips options which cannot be picked, Enter or
-  Space to pick, and Escape or Tab to close; the highlighted option is named by
-  `aria-activedescendant`. Nothing listens on the document any more
+  Space to pick, and Escape or Tab to close. This holds with `dropDownMaxHeight` too, where the
+  virtual list used to draw its own highlight over the combo box's and to prevent every key on
+  the page, Tab included; the combo box now turns that listener off and scrolls the highlighted
+  row into view. Nothing listens on the document any more. The button carries
+  `aria-activedescendant`, but on `role="button"` screen readers ignore it, so the highlight is
+  visible and not yet announced
 - `Checkbox` toggles from the keyboard. Focus lands on the box icon rather than the hidden
   input, and the icon answered no key, so Tab reached the checkbox and Space did nothing — a
   form could not be filled in without a pointer. Space on the focused icon now clicks the input,

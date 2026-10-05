@@ -266,7 +266,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     e: React.KeyboardEvent<HTMLDivElement>,
     value: boolean,
   ) => {
-    onToggle?.(e as unknown as React.MouseEvent<HTMLDivElement>, value);
+    onToggle?.(e, value);
     setIsOpenItemAccess?.(value);
     setIsOpen(value);
   };
@@ -320,8 +320,10 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
         break;
       case "Enter":
       case " ": {
+        // Custom content may hold a button of its own; leave the key to it.
+        if (!navigable) break;
         e.preventDefault();
-        const option = navigable ? options[activeIndex] : undefined;
+        const option = options[activeIndex];
         if (option && isOptionPickable(option)) optionClick(option, e);
         break;
       }
@@ -449,6 +451,10 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
       withoutBackground,
       dropDownId,
       eventTypes: ["mousedown"],
+      // The combo box handles the keys itself, on its own element; the virtual
+      // list's window listener would move a second highlight and swallow every
+      // key, Tab included.
+      enableKeyboardEvents: false,
       topSpace,
       usePortalBackdrop,
       style,
