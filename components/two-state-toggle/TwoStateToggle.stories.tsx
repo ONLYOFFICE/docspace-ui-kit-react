@@ -1,5 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import { TwoStateToggle } from ".";
 
@@ -85,6 +86,9 @@ const meta = {
         "Additional CSS class applied to the wrapper around the title and the pill",
     },
   },
+  // Without onNavigate a switch sets window.location.href and takes the
+  // story's frame away to /dashboard or /.
+  args: { onNavigate: fn() },
   decorators: [
     (Story) => {
       localStorage.setItem("useDocSpace", "new");
@@ -102,6 +106,28 @@ export const Default: Story = {
     title: "DocSpace design",
     labelOld: "OLD",
     labelNew: "NEW",
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const toggle = canvas.getByRole("switch");
+    await expect(toggle).toHaveAttribute("aria-checked", "true");
+
+    // Leaving NEW asks first; Cancel keeps NEW and goes nowhere.
+    await userEvent.click(toggle);
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Cancel" }),
+    );
+    await expect(toggle).toHaveAttribute("aria-checked", "true");
+    await expect(args.onNavigate).not.toHaveBeenCalled();
+
+    await userEvent.click(toggle);
+    await userEvent.click(
+      await screen.findByRole("button", { name: "Switch" }),
+    );
+    await waitFor(() =>
+      expect(toggle).toHaveAttribute("aria-checked", "false"),
+    );
+    await expect(args.onNavigate).toHaveBeenCalledWith("/");
+    await expect(localStorage.getItem("useDocSpace")).toBe("old");
   },
   parameters: {
     docs: {
@@ -125,6 +151,17 @@ export const ShowingOldState: Story = {
   ],
   args: {
     title: "DocSpace design",
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const toggle = canvas.getByRole("switch");
+    await expect(toggle).toHaveAttribute("aria-checked", "false");
+
+    // Back to NEW needs no confirmation.
+    await userEvent.click(toggle);
+    await expect(toggle).toHaveAttribute("aria-checked", "true");
+    // ModalDialog keeps its markup while closed, so check it is not shown.
+    await expect(screen.queryByText("Switch to Old Design")).not.toBeVisible();
+    await expect(args.onNavigate).toHaveBeenCalledWith("/dashboard");
   },
   parameters: {
     docs: {
