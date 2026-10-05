@@ -2,7 +2,7 @@ import type React from "react";
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fireEvent, fn, waitFor, within } from "storybook/test";
 
 import { InputSize } from "../text-input";
 
@@ -171,8 +171,33 @@ const Wrapper = (props: { children: React.ReactNode }) => {
 
 export const Default: Story = {
   render: (args) => <FileInput {...args} />,
+  play: async ({ args, canvas, userEvent }) => {
+    const input = canvas.getByTestId("upload-click-input");
+    await userEvent.upload(
+      input,
+      new File(["hello"], "notes.txt", { type: "text/plain" }),
+    );
+    await waitFor(() => expect(args.onInput).toHaveBeenCalledTimes(1));
+    await expect(args.onInput).toHaveBeenCalledWith(expect.any(File));
+    await expect(canvas.getByRole("textbox")).toHaveValue("notes.txt");
+
+    // Several files reach onInput as an array, their names joined.
+    await userEvent.upload(input, [
+      new File(["a"], "a.pdf", { type: "application/pdf" }),
+      new File(["b"], "b.txt", { type: "text/plain" }),
+    ]);
+    await waitFor(() => expect(args.onInput).toHaveBeenCalledTimes(2));
+    await expect(args.onInput).toHaveBeenLastCalledWith([
+      expect.any(File),
+      expect.any(File),
+    ]);
+    await expect(canvas.getByRole("textbox")).toHaveValue("a.pdf, b.txt");
+  },
   args: {
     placeholder: "Choose file",
+    // Without accept the default [""] admits only files with no MIME type,
+    // so the field would refuse every ordinary file.
+    accept: [".pdf", ".docx", ".xlsx", ".txt"],
     size: InputSize.base,
     scale: false,
     isDisabled: false,
@@ -192,6 +217,7 @@ export const Default: Story = {
         code: `<FileInput
   placeholder="Choose file"
   size={InputSize.base}
+  accept={[".pdf", ".docx", ".xlsx", ".txt"]}
   aria-label="Choose file"
   onInput={(file) => console.log(file)}
 />`,
@@ -313,8 +339,38 @@ const WithAcceptFilterTemplate = () => {
   );
 };
 
+// userEvent.upload drops a file the input's accept refuses before the
+// component sees it, so the refused file is set on the input directly.
+const chooseUnchecked = (input: HTMLInputElement, file: File) => {
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+  input.files = dataTransfer.files;
+  fireEvent.change(input);
+};
+
 export const WithAcceptFilter: Story = {
   render: () => <WithAcceptFilterTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const images = canvas.getByLabelText("Image file input");
+    const field = within(images).getByRole("textbox");
+    const input = within(images).getByTestId(
+      "upload-click-input",
+    ) as HTMLInputElement;
+
+    // A file of another type is refused and leaves the field empty.
+    chooseUnchecked(
+      input,
+      new File(["x"], "notes.txt", { type: "text/plain" }),
+    );
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    await expect(field).toHaveValue("");
+
+    await userEvent.upload(
+      input,
+      new File(["x"], "photo.png", { type: "image/png" }),
+    );
+    await waitFor(() => expect(field).toHaveValue("photo.png"));
+  },
   parameters: {
     docs: {
       description: {
@@ -438,6 +494,17 @@ export const DocumentIcon: Story = {
 
 export const WithPath: Story = {
   render: (args) => <FileInput {...args} />,
+  play: async ({ args, canvas, userEvent }) => {
+    // fromStorage shows the path and has no file input to open.
+    const field = canvas.getByRole("textbox");
+    await expect(field).toHaveValue("Documents/Reports");
+    await expect(canvas.queryByTestId("upload-click-input")).toBeNull();
+
+    await userEvent.click(field);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    await userEvent.click(canvas.getByTestId("icon-button"));
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+  },
   args: {
     size: InputSize.middle,
     placeholder: "Choose a folder",
