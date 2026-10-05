@@ -3,6 +3,7 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen } from "storybook/test";
 
 import { Toast } from "../toast";
 
@@ -226,17 +227,24 @@ const Wrapper = (props: { children: React.ReactNode }) => {
 const ControlledTextarea = (
   props: Partial<ComponentProps<typeof Textarea>> & { initialValue?: string },
 ) => {
-  const { initialValue, ...rest } = props;
+  const { initialValue, onChange, ...rest } = props;
   const [val, setValue] = useState(initialValue || rest.value || "");
 
   return (
     <Textarea
       {...rest}
       value={val}
-      onChange={(e) => setValue(e.target.value)}
+      onChange={(e) => {
+        setValue(e.target.value);
+        onChange?.(e);
+      }}
     />
   );
 };
+
+// The scrollbar frame around the field carries its error state.
+const frameOf = (field: HTMLElement) =>
+  field.closest("[data-error]") as HTMLElement;
 
 export const Default: Story = {
   render: (args) => <ControlledTextarea {...args} />,
@@ -247,6 +255,13 @@ export const Default: Story = {
     hasError: false,
     heightTextArea: "150px",
     value: "",
+    onChange: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const field = canvas.getByPlaceholderText("Enter text here");
+    await userEvent.type(field, "Hello");
+    await expect(field).toHaveValue("Hello");
+    await expect(args.onChange).toHaveBeenCalledTimes(5);
   },
   parameters: {
     docs: {
@@ -295,6 +310,20 @@ const StatesTemplate = () => {
 
 export const States: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByDisplayValue("Disabled textarea")).toBeDisabled();
+
+    const readOnly = canvas.getByDisplayValue("Read-only textarea");
+    await userEvent.type(readOnly, "!");
+    await expect(readOnly).toHaveValue("Read-only textarea");
+
+    await expect(
+      frameOf(canvas.getByDisplayValue("Error state")),
+    ).toHaveAttribute("data-error", "true");
+    await expect(
+      frameOf(canvas.getByDisplayValue("Normal textarea")),
+    ).toHaveAttribute("data-error", "false");
+  },
   parameters: {
     docs: {
       description: {
@@ -331,6 +360,19 @@ const WithCopyTemplate = () => {
 
 export const WithCopy: Story = {
   render: () => <WithCopyTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const text = "This text can be copied using the copy button.";
+    const field = canvas.getByDisplayValue(text) as HTMLTextAreaElement;
+
+    await userEvent.click(canvas.getByTestId("icon-button"));
+    // The toast container renders outside the field.
+    await expect(
+      await screen.findByText("Text copied to clipboard!"),
+    ).toBeVisible();
+    // The click reaches the frame too, which selects the whole text.
+    await expect(field.selectionStart).toBe(0);
+    await expect(field.selectionEnd).toBe(text.length);
+  },
   parameters: {
     docs: {
       description: {
@@ -412,6 +454,12 @@ const JSONFieldTemplate = () => {
 
 export const JSONField: Story = {
   render: () => <JSONFieldTemplate />,
+  play: async ({ canvas }) => {
+    // The field re-formats the JSON it shows, so take them in order.
+    const [valid, broken] = canvas.getAllByRole("textbox");
+    await expect(frameOf(valid)).toHaveAttribute("data-error", "false");
+    await expect(frameOf(broken)).toHaveAttribute("data-error", "true");
+  },
   parameters: {
     docs: {
       description: {
