@@ -2,7 +2,7 @@ import type { ComponentProps, CSSProperties } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 import { Badge } from "../badge";
@@ -146,6 +146,21 @@ export const Default: Story = {
     selectedItemId: data[0].id,
     onSelect: fn(),
   },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByText("Selected tab: Overview")).toBeVisible();
+
+    await userEvent.click(canvas.getByTestId("Documents_tab"));
+    await expect(args.onSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "Documents" }),
+    );
+    await expect(canvas.getByText("Selected tab: Documents")).toBeVisible();
+
+    // The disabled tab is kept from the pointer by its stylesheet; the click
+    // handler itself does not check isDisabled.
+    await expect(
+      getComputedStyle(canvas.getByTestId("Contacts_tab")).pointerEvents,
+    ).toBe("none");
+  },
   parameters: {
     docs: {
       description: {
@@ -163,6 +178,22 @@ export const Default: Story = {
   },
 };
 
+// The secondary tabs pick a tab through react-hotkeys-hook 3, whose
+// hotkeys-js matches named keys by the legacy keyCode. A keyboard sets it;
+// userEvent does not, so Enter is dispatched here with it.
+const pressEnterWithKeyCode = () => {
+  document.activeElement?.dispatchEvent(
+    new KeyboardEvent("keydown", {
+      key: "Enter",
+      code: "Enter",
+      keyCode: 13,
+      which: 13,
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
+};
+
 export const Secondary: Story = {
   render: (args) => <Template {...args} />,
   args: {
@@ -170,6 +201,22 @@ export const Secondary: Story = {
     type: TabsTypes.Secondary,
     selectedItemId: data[0].id,
     onSelect: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // The keys the description promises: Tab onto the row, an arrow moves
+    // the focus from Overview, Enter picks the focused tab.
+    await userEvent.tab();
+    await userEvent.keyboard("{ArrowRight}");
+    pressEnterWithKeyCode();
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: "Documents" }),
+    );
+
+    await userEvent.click(canvas.getByTestId("Milestones_subtab"));
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: "Milestones" }),
+    );
+    await expect(canvas.getByText("Selected tab: Milestones")).toBeVisible();
   },
   parameters: {
     docs: {
