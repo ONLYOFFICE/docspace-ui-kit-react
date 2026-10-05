@@ -55,7 +55,7 @@ const LimitAmountField = ({
           [styles.symbolAfter]: isSymbolAfter,
         })}
         type={InputType.text}
-        inputMode="numeric"
+        inputMode="decimal"
         size={InputSize.base}
         scale
         value={value}

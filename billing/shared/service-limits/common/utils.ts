@@ -36,23 +36,28 @@ export const getPeriodLabel = (
 export const MIN_LIMIT_AMOUNT = 1;
 export const MAX_LIMIT_AMOUNT = 10000;
 
-const AMOUNT_PATTERN = /^\d*$/;
+export const AMOUNT_FRACTION_DIGITS = 2;
+
+/** Digits with an optional decimal part of up to two digits, after a dot or a comma. */
+const AMOUNT_PATTERN = /^\d*([.,]\d{0,2})?$/;
 
 export const isAmountInputValid = (value: string): boolean =>
   AMOUNT_PATTERN.test(value);
 
 export const parseAmount = (value: string): number | null => {
-  const trimmed = value.trim();
-  if (trimmed === "") return null;
+  const trimmed = value.trim().replace(",", ".");
+  if (trimmed === "" || !AMOUNT_PATTERN.test(trimmed)) return null;
   const amount = Number(trimmed);
-  return Number.isInteger(amount) && amount >= 0 ? amount : null;
+  return Number.isFinite(amount) && amount >= 0 ? amount : null;
 };
 
 export const isAmountOutOfRange = (amount: number | null): boolean =>
   amount !== null && (amount < MIN_LIMIT_AMOUNT || amount > MAX_LIMIT_AMOUNT);
 
 export const formatAmountInput = (amount: number | null | undefined): string =>
-  amount === null || amount === undefined ? "" : String(Math.round(amount));
+  amount === null || amount === undefined
+    ? ""
+    : String(Number(amount.toFixed(AMOUNT_FRACTION_DIGITS)));
 
 export const getCurrencySymbol = (
   language: string,
