@@ -5,12 +5,14 @@ import { observer } from "mobx-react";
 import { Text } from "../../../../components/text";
 import { Link } from "../../../../components/link";
 import { RectangleSkeleton } from "../../../../components/rectangle";
+import { Tabs, type TTabItem } from "../../../../components/tabs";
 
 import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
 import { AI_ENUM, AI_TOOLS } from "../../../constants";
 import { formatCompactNumber } from "../../../utils/common";
 
 import TransactionHistory from "../../../shared/transaction-history";
+import ServiceLimits from "../../../shared/service-limits";
 
 import ServiceToggleSection from "../../sub-components/ServiceToggleSection";
 import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
@@ -42,7 +44,11 @@ type AiPageProps = {
   withBottomMargin?: boolean;
   onViewMore?: () => void;
   onOpenSupportedModels?: () => void;
+  limitsHelpUrl?: string;
 };
+
+const TRANSACTIONS_TAB = "transactions";
+const LIMITS_TAB = "limits";
 
 const AiPage = (props: AiPageProps) => {
   const {
@@ -52,11 +58,14 @@ const AiPage = (props: AiPageProps) => {
     withBottomMargin,
     onViewMore,
     onOpenSupportedModels,
+    limitsHelpUrl,
   } = props;
 
   const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
+
+  const [selectedTab, setSelectedTab] = useState(TRANSACTIONS_TAB);
 
   const {
     changeServiceState,
@@ -143,11 +152,6 @@ const AiPage = (props: AiPageProps) => {
   };
 
   const onOpenTopUp = () => {
-    // if (!isAiToolsServiceOn && !simpleTopUp) {
-    //   setIsTopUpConfirmVisible(true);
-    //   return;
-    // }
-
     setIsTopUpVisible(true);
   };
 
@@ -175,6 +179,37 @@ const AiPage = (props: AiPageProps) => {
     locale: language,
     timezone: getAppTimezone(),
   });
+
+  const detailsTabs: TTabItem[] = [
+    {
+      id: TRANSACTIONS_TAB,
+      name: t("TransactionHistory"),
+      content: (
+        <div className={styles.tabContent}>
+          <TransactionHistory
+            serviceName={AI_TOOLS}
+            withoutHeader
+            withoutRoleFilter
+            hideTypeFilter
+          />
+        </div>
+      ),
+    },
+    {
+      id: LIMITS_TAB,
+      name: t("Limits"),
+      content: (
+        <div className={styles.tabContent}>
+          <ServiceLimits
+            serviceName={AI_TOOLS}
+            portalLimitDescription={t("PortalLimitDescription")}
+            helpUrl={limitsHelpUrl}
+            isDisabled={isDisabled}
+          />
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div className={styles.container}>
@@ -291,13 +326,13 @@ const AiPage = (props: AiPageProps) => {
         </Link>
       </Text>
 
-      <div>
-        <TransactionHistory
-          serviceName={AI_TOOLS}
-          withoutRoleFilter
-          hideTypeFilter
-        />
-      </div>
+      <Tabs
+        className={styles.detailsTabs}
+        items={detailsTabs}
+        selectedItemId={selectedTab}
+        onSelect={(item) => setSelectedTab(item.id)}
+        withoutStickyIntend
+      />
 
       {isTopUpConfirmVisible ? (
         <ConfirmationDialog

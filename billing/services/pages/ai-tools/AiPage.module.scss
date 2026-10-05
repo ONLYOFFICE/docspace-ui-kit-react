@@ -51,7 +51,6 @@
   font-weight: 700;
   line-height: 24px;
   color: var(--text-color);
-  // hug the value so a tooltip anchored to it does not drift to the card edge
   width: fit-content;
 }
 
@@ -79,4 +78,13 @@
 
 .unlinkedBanner {
   margin-top: 10px;
+}
+
+.detailsTabs {
+  margin-top: 24px;
+}
+
+.tabContent {
+  width: 100%;
+  min-width: 0;
 }
