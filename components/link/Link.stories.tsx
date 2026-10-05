@@ -1,6 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import { RootTooltip } from "../tooltip";
 
@@ -193,6 +193,16 @@ export const Default: Story = {
     target: LinkTarget.blank,
     onClick: fn(),
   },
+  // No click: it would open example.com in a new tab.
+  play: async ({ canvas, userEvent }) => {
+    const link = canvas.getByRole("link", { name: "Simple link" });
+    await expect(link).toHaveAttribute("href", "https://example.com");
+    await expect(link).toHaveAttribute("target", "_blank");
+
+    // A page link has an href, so it is a tab stop of its own.
+    await userEvent.tab();
+    await expect(link).toHaveFocus();
+  },
   parameters: {
     docs: {
       description: {
@@ -336,6 +346,13 @@ const NoHoverTemplate = () => {
 };
 
 export const PageLinks: Story = {
+  play: async ({ canvas }) => {
+    const links = canvas.getAllByRole("link");
+    await expect(links).toHaveLength(4);
+    for (const link of links) {
+      await expect(link).toHaveAttribute("href", "https://example.com");
+    }
+  },
   render: () => <PageLinksTemplate />,
   parameters: {
     docs: {
@@ -478,6 +495,13 @@ const WithTooltipTemplate = () => {
 
 export const WithTooltip: Story = {
   render: () => <WithTooltipTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.hover(canvas.getByRole("link", { name: "Shared folder" }));
+    // RootTooltip renders outside the story root.
+    await waitFor(() =>
+      expect(screen.getByText("Opens the shared folder")).toBeVisible(),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -494,14 +518,22 @@ export const WithTooltip: Story = {
   },
 };
 
-const KeyboardActionTemplate = () => {
+// The recipe the source below shows: Enter and Space run the same action a
+// click does.
+const KeyboardActionTemplate = ({ onAction }: { onAction?: () => void }) => {
   return (
     <Link
       type={LinkType.action}
       role="button"
       tabIndex={0}
-      onClick={() => {}}
-      onKeyDown={() => {}}
+      onClick={() => onAction?.()}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          // Space would otherwise scroll the page.
+          e.preventDefault();
+          onAction?.();
+        }
+      }}
     >
       Move to archive
     </Link>
@@ -509,7 +541,22 @@ const KeyboardActionTemplate = () => {
 };
 
 export const KeyboardAccessibleAction: Story = {
-  render: () => <KeyboardActionTemplate />,
+  // args.onClick is the fn() spy below; the template calls it with no event.
+  render: (args) => (
+    <KeyboardActionTemplate onAction={args.onClick as () => void} />
+  ),
+  args: { onClick: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    const link = canvas.getByRole("button", { name: "Move to archive" });
+
+    await userEvent.tab();
+    await expect(link).toHaveFocus();
+
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" ");
+    await userEvent.click(link);
+    await expect(args.onClick).toHaveBeenCalledTimes(3);
+  },
   parameters: {
     docs: {
       description: {
