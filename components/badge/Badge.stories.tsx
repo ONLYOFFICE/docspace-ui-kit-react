@@ -1,6 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import { globalColors } from "../../providers/theme";
 
@@ -188,6 +188,17 @@ export const Default: Story = {
     onMouseOver: fn(),
     onMouseLeave: fn(),
   },
+  play: async ({ args, canvas, userEvent }) => {
+    const badge = canvas.getByRole("status", { name: "24" });
+    await expect(badge).toHaveAttribute("data-hidden", "false");
+
+    await userEvent.hover(badge);
+    await expect(args.onMouseOver).toHaveBeenCalled();
+    await userEvent.click(badge);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    await userEvent.unhover(badge);
+    await expect(args.onMouseLeave).toHaveBeenCalled();
+  },
   parameters: {
     docs: {
       description: {
@@ -257,6 +268,12 @@ const CustomStyledTemplate = () => {
 
 export const BadgeTypes: Story = {
   render: () => <BadgeTypesTemplate />,
+  play: async ({ canvas }) => {
+    // The name is the label followed by the type, when there is one.
+    for (const name of ["3", "New", "99+", "High high"]) {
+      await expect(canvas.getByRole("status", { name })).toBeInTheDocument();
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -297,6 +314,14 @@ export const SpecialBadges: Story = {
 
 export const HoverStates: Story = {
   render: () => <HoverStatesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("status", { name: "Hovered" }),
+    ).toHaveAttribute("data-is-hovered", "true");
+    await expect(
+      canvas.getByRole("status", { name: "No Hover" }),
+    ).toHaveAttribute("data-no-hover", "true");
+  },
   parameters: {
     docs: {
       description: {
