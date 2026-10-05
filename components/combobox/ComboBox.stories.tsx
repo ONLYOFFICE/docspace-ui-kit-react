@@ -1,6 +1,11 @@
 import type React from "react";
 
-import { useState, type CSSProperties, type ComponentProps } from "react";
+import {
+  useEffect,
+  useState,
+  type CSSProperties,
+  type ComponentProps,
+} from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useArgs } from "storybook/preview-api";
@@ -536,19 +541,39 @@ const defaultOptions = [
   },
 ];
 
-// Picking an option writes it back into the args, as a host would.
+// Holds the pick as a host would, and also writes it back into the args so the
+// Controls panel follows. The local state is what the button shows: an args
+// update re-renders the story inside Storybook but not under Vitest.
+const DefaultComboBox = ({
+  updateArgs,
+  ...args
+}: TComboboxProps & {
+  updateArgs: (update: Partial<TComboboxProps>) => void;
+}) => {
+  const [selected, setSelected] = useState<TOption>(args.selectedOption);
+
+  // A change made in the Controls panel reaches the button too.
+  useEffect(() => setSelected(args.selectedOption), [args.selectedOption]);
+
+  return (
+    <ComboBox
+      {...args}
+      selectedOption={selected}
+      onSelect={(option) => {
+        args.onSelect?.(option);
+        setSelected(option);
+        updateArgs({ selectedOption: option });
+      }}
+    />
+  );
+};
+
 const renderDefault = (args: TComboboxProps) => {
   const [, updateArgs] = useArgs<TComboboxProps>();
 
   return (
     <Wrapper>
-      <ComboBox
-        {...args}
-        onSelect={(option) => {
-          args.onSelect?.(option);
-          updateArgs({ selectedOption: option });
-        }}
-      />
+      <DefaultComboBox {...args} updateArgs={updateArgs} />
     </Wrapper>
   );
 };
@@ -566,19 +591,28 @@ export const Default: Story = {
     onSelect: fn(),
   },
   play: async ({ args, canvas, userEvent }) => {
+    // The pick is written back into the args, and Storybook keeps changed
+    // args in the URL, so a reload starts from the last pick rather than the
+    // placeholder. Start from whatever is selected and pick something else:
+    // the current value is disabled in the list.
+    const current = args.selectedOption?.label;
+    const target = defaultOptions.find((o) => o.label !== current);
+    if (!target) return;
+
     const button = comboButton(canvas);
-    await expect(button).toHaveTextContent("Select Status");
+    await expect(button).toHaveTextContent(String(current));
 
     await userEvent.click(button);
     await expect(button).toHaveAttribute("aria-expanded", "true");
 
-    await userEvent.click(option("Done"));
-    await expect(args.onSelect).toHaveBeenCalledWith(
-      expect.objectContaining({ key: 2, label: "Done" }),
+    // Checked by what the button shows, not by the onSelect spy: inside
+    // Storybook the args update re-renders the story, which resets fn() spies,
+    // so the spy reads no calls there while it does under Vitest.
+    await userEvent.click(option(target.label));
+    await waitFor(() =>
+      expect(comboButton(canvas)).toHaveTextContent(target.label),
     );
-    await expect(button).toHaveAttribute("aria-expanded", "false");
-    // The label follows through updateArgs, which re-renders only inside
-    // Storybook itself; WithSelectedOption checks the label with local state.
+    await expect(comboButton(canvas)).toHaveAttribute("aria-expanded", "false");
   },
   parameters: {
     docs: {
