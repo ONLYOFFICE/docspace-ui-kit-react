@@ -40,7 +40,8 @@ Path-scoped detail that does not belong here, loaded when the matching files are
 - **Rollup** — library build (`rollup.config.mjs`), **ESM only** (`dist/esm`, `dist/types`);
   there is no CJS output
 - **Storybook 10** — component documentation and visual development
-- **Vitest** — unit and component tests
+- **Vitest** — unit and component tests in jsdom (`unit` project), plus every story
+  rendered in Chromium through `@storybook/addon-vitest` (`storybook` project)
 - **Biome** — linting only. Its **formatter is disabled**
   (`biome.json`: `formatter.enabled: false`); formatting is Prettier, via `pnpm format`
   (`--check`) and `pnpm format:fix` (`--write`). The repository **has** been formatted:
@@ -143,8 +144,12 @@ pnpm storybook
 # Build Storybook static
 pnpm storybook-build
 
-# Run tests
+# Run tests (the jsdom `unit` project; what pre-push runs)
 pnpm test
+
+# Render every story in Chromium and run its play function (the `storybook`
+# project; CI's "Story tests" job runs it)
+pnpm test:stories
 
 # Tests with UI
 pnpm test:ui

@@ -116,11 +116,18 @@ still true, and all still unenforced.
   their `argTypes`, each story's `description.story`, the visual-regression surface. A fact a
   story would state goes into the README — which is what `package.json` publishes and what the
   `ui-kit` agent skill syncs; stories are in neither.
-- Tests are Vitest + React Testing Library. **`vitest.config.ts` lists the directories it
-  runs** — `components`, `selectors`, `ai-agent`, `errors`, `ui`, `utils`, `context`,
-  `providers`, `hooks`, `scripts`, and `docs`, for the logic the samples carry (PKCE, role
-  mapping). A test placed under `billing/`, `uploader/`, `document-editor/` or `api/` is
-  collected by nothing and passes by never running.
+- **`vitest.config.ts` holds two projects.** `unit` is Vitest + React Testing Library in
+  jsdom, and it **lists the directories it runs** — `components`, `selectors`, `ai-agent`,
+  `errors`, `ui`, `utils`, `context`, `providers`, `hooks`, `scripts`, and `docs`, for the
+  logic the samples carry (PKCE, role mapping). A test placed under `billing/`, `uploader/`,
+  `document-editor/` or `api/` is collected by nothing and passes by never running.
+  `storybook` renders every story in Chromium through `@storybook/addon-vitest` — a smoke test
+  that it renders, plus its `play` function — with the demo portal's service worker served and
+  `VITE_PROVIDER_*` blanked, so no story reaches a live portal.
+- `pnpm test` runs `unit` only, and so does pre-push. `pnpm test:stories` runs `storybook`, and
+  CI's "Story tests" job runs it on every pull request. A `play` function that clicks or types
+  is a test like any other: give the story `fn()` spies for the handlers it checks, and look for
+  a portalled list or tooltip through `screen`, not the story's `canvas`.
 - Seven components have no test; that is tolerated, an untested _change_ to interactive logic is
   not. `node .claude/scripts/component-docs/gaps.mjs` lists them and the one missing story; no
   README is missing any more, and the gates keep it that way.

@@ -97,6 +97,37 @@ jobs:
       - name: Build Storybook
         run: pnpm storybook-build
 
+  story-tests:
+    name: "Story tests"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # The browser the `storybook` Vitest project drives, at the version the
+      # lockfile's playwright expects; --with-deps adds the system libraries
+      # a bare runner lacks.
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      # Every story rendered in Chromium, and its play function run. `pnpm
+      # test` pins the jsdom project, so this is the only place the play
+      # functions are checked for anyone who does not run them by hand.
+      - name: Run the stories as tests
+        run: pnpm test:stories
+
   package:
     name: "Build & verify the package"
     runs-on: ubuntu-latest
