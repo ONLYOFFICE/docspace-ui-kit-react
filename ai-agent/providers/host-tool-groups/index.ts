@@ -128,6 +128,17 @@ const CALL_TOOL_MESSAGE = "callEditorTool";
 const TOOL_RESULT_MESSAGE = "editorToolResult";
 const READY_MESSAGE = "editorDocumentReady";
 
+// Both editors -- the panel's iframe and the generated-file tab -- load the
+// portal's own /doceditor, so their origin is this page's. Tool calls carry
+// what the model writes into the document; addressed to this origin rather
+// than "*", one whose window has meanwhile navigated elsewhere (a sign-in
+// redirect, a link followed in the tab) is dropped by the browser instead of
+// being delivered to that other page.
+const editorOrigin = () => window.location.origin;
+
+const editorUrl = (fileId: number | string) =>
+  `${editorOrigin()}/doceditor?fileId=${encodeURIComponent(String(fileId))}`;
+
 // Reference to the currently-open editor iframe's content window.
 let editorPanelWindow: Window | null = null;
 
@@ -208,15 +219,9 @@ const callEditorTool = async (
         }),
       );
     }, EDITOR_TOOL_TIMEOUT_MS);
-    // SECURITY: targetOrigin is "*", which broadcasts the tool-call payload
-    // (callId + arguments) to any frame loaded in the editor panel window,
-    // including cross-origin iframes (violates postMessage same-origin guidance,
-    // flagged by MDN). The editor iframe src is built from window.location.origin,
-    // so it is same-origin in practice — capture that origin when the iframe
-    // loads and pass it here instead of "*" to scope the message to the editor.
     target.postMessage(
       { type: CALL_TOOL_MESSAGE, callId, name, arguments: args },
-      "*",
+      editorOrigin(),
     );
   });
 };
@@ -374,7 +379,7 @@ export const openEditorPanel = (fileId: number | string): void => {
   });
 
   const iframe = document.createElement("iframe");
-  iframe.src = `${window.location.origin}/doceditor?fileId=${encodeURIComponent(fileId)}`;
+  iframe.src = editorUrl(fileId);
   iframe.title = "Document editor";
   iframe.setAttribute("allowfullscreen", "");
   Object.assign(iframe.style, {
@@ -497,9 +502,7 @@ export const openGeneratedFileWithToolCall = (
     `[host-tool-groups] openGeneratedFileWithToolCall: file ${fileId}, tool "${toolName}"`,
   );
 
-  const url = `${window.location.origin}/doceditor?fileId=${encodeURIComponent(
-    String(fileId),
-  )}`;
+  const url = editorUrl(fileId);
   const reservedWindow = takeReservedGeneratedFileWindow();
   let editorWindow: Window | null;
   if (reservedWindow) {
@@ -547,7 +550,7 @@ export const openGeneratedFileWithToolCall = (
         name: toolName,
         arguments: toolArgs,
       },
-      "*",
+      editorOrigin(),
     );
   };
 

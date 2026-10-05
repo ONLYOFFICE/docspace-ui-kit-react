@@ -106,6 +106,12 @@ _Changed_ before upgrading.
 
 ### Fixed
 
+- The AI agent's editor tool calls go to the portal's own origin only. They carry what the
+  model writes into a document, and were posted to the editor panel's iframe and to the
+  generated-file tab with the target origin `"*"`, so a window that had meanwhile navigated
+  elsewhere — a sign-in redirect, a link followed in the tab — would have received them. Both
+  windows open the portal's `/doceditor`, so the calls are now addressed to
+  `window.location.origin` and the browser drops one whose window holds any other page
 - `ComboBox` works from the keyboard. The button answered no key, so a list could not be opened
   without a pointer, and the ArrowDown and Enter handler on the document looked for options by a
   test id its own options never carry — so it moved nothing, and while a list was open it
