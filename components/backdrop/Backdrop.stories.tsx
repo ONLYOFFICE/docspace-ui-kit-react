@@ -2,6 +2,7 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 
 import { Backdrop } from ".";
 import type { BackdropProps } from "./Backdrop.types";
@@ -266,8 +267,26 @@ const ModalTemplate = (args: BackdropProps) => {
   );
 };
 
+const TRANSPARENT = "rgba(0, 0, 0, 0)";
+
 export const Default: Story = {
   render: (args) => <Template {...args} />,
+  play: async ({ canvas, userEvent }) => {
+    // Not visible means not rendered at all.
+    await expect(canvas.queryByTestId("backdrop")).toBeNull();
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Toggle Backdrop" }),
+    );
+    const backdrop = canvas.getByTestId("backdrop");
+    await expect(backdrop).toBeVisible();
+    await expect(getComputedStyle(backdrop).backgroundColor).not.toBe(
+      TRANSPARENT,
+    );
+
+    await userEvent.click(backdrop);
+    await expect(canvas.queryByTestId("backdrop")).toBeNull();
+  },
   args: {
     withBackground: true,
   },
@@ -289,6 +308,16 @@ export const WithoutBackground: Story = {
   args: {
     withoutBackground: true,
   },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Toggle Backdrop" }),
+    );
+    // Transparent, but it still catches the click that closes it.
+    const backdrop = canvas.getByTestId("backdrop");
+    await expect(getComputedStyle(backdrop).backgroundColor).toBe(TRANSPARENT);
+    await userEvent.click(backdrop);
+    await expect(canvas.queryByTestId("backdrop")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -306,6 +335,23 @@ export const MultipleBackdrops: Story = {
   render: (args) => <MultipleBackdropsTemplate {...args} />,
   args: {
     withBackground: true,
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      canvas.getByRole("button", { name: "First Backdrop" }),
+    );
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Second Backdrop" }),
+    );
+    // isAside lets the second layer render over the first.
+    const layers = canvas.getAllByTestId("backdrop");
+    await expect(layers).toHaveLength(2);
+
+    // A click closes the top layer first.
+    await userEvent.click(layers[1]);
+    await expect(canvas.getAllByTestId("backdrop")).toHaveLength(1);
+    await userEvent.click(canvas.getByTestId("backdrop"));
+    await expect(canvas.queryByTestId("backdrop")).toBeNull();
   },
   parameters: {
     docs: {
@@ -391,6 +437,14 @@ export const WithCustomZIndex: Story = {
     withBackground: true,
     zIndex: 500,
   },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Show Backdrop (z-index: 500)" }),
+    );
+    await expect(getComputedStyle(canvas.getByTestId("backdrop")).zIndex).toBe(
+      "500",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -413,7 +467,7 @@ export const CssCustomization: Story = {
         } as CSSProperties
       }
     >
-      <Backdrop visible withBackground onClick={() => {}} />
+      <Backdrop visible withBackground onClick={fn()} />
       <div
         style={{
           position: "relative",
@@ -427,6 +481,11 @@ export const CssCustomization: Story = {
       </div>
     </div>
   ),
+  play: async ({ canvas }) => {
+    await expect(
+      getComputedStyle(canvas.getByTestId("backdrop")).backgroundColor,
+    ).toBe("rgba(0, 130, 201, 0.4)");
+  },
   parameters: {
     docs: {
       // The layer is fixed over the whole window, so inline it would cover the Docs page.
