@@ -2,7 +2,7 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import { TabItem } from ".";
 
@@ -101,7 +101,33 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   );
 };
 
+type Canvas = { getByText: (text: string) => HTMLElement };
+
+// The pill around a label; it carries aria-selected.
+const pill = (canvas: Canvas, label: string) =>
+  canvas.getByText(label).closest("[data-testid='tab-item']") as HTMLElement;
+
 export const Default: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(pill(canvas, "Tab Item")).toHaveAttribute(
+      "aria-selected",
+      "false",
+    );
+    await userEvent.click(pill(canvas, "Tab Item"));
+    await expect(pill(canvas, "Tab Item")).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(args.onSelect).toHaveBeenCalledTimes(1);
+
+    // Without withMultiSelect a second click keeps it selected.
+    await userEvent.click(pill(canvas, "Tab Item"));
+    await expect(pill(canvas, "Tab Item")).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(args.onSelect).toHaveBeenCalledTimes(2);
+  },
   render: (args) => <TabItem {...args} />,
   args: {
     label: "Tab Item",
@@ -142,10 +168,18 @@ export const ActiveState: Story = {
 
 export const DisabledState: Story = {
   render: (args) => <TabItem {...args} />,
+  play: async ({ canvas }) => {
+    // The stylesheet keeps the pointer off it; the click handler also
+    // returns early on isDisabled.
+    const disabled = pill(canvas, "Disabled Tab");
+    await expect(getComputedStyle(disabled).pointerEvents).toBe("none");
+    await expect(disabled).toHaveAttribute("aria-selected", "false");
+  },
   args: {
     label: "Disabled Tab",
     isActive: false,
     isDisabled: true,
+    onSelect: fn(),
   },
   parameters: {
     docs: {
@@ -223,6 +257,17 @@ const TabGroupTemplate = () => {
 
 export const TabGroup: Story = {
   render: () => <TabGroupTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(pill(canvas, "Second Tab"));
+    await expect(pill(canvas, "Second Tab")).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(pill(canvas, "First Tab")).toHaveAttribute(
+      "aria-selected",
+      "false",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -279,6 +324,19 @@ const MultiSelectTemplate = () => {
 
 export const MultiSelect: Story = {
   render: () => <MultiSelectTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // Each pill toggles on its own.
+    await userEvent.click(pill(canvas, "Documents"));
+    await expect(pill(canvas, "Documents")).toHaveAttribute(
+      "aria-selected",
+      "false",
+    );
+    await userEvent.click(pill(canvas, "Images"));
+    await expect(pill(canvas, "Images")).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+  },
   parameters: {
     docs: {
       description: {
