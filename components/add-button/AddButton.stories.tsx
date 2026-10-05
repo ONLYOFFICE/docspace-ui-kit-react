@@ -1,7 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
 
@@ -168,6 +168,16 @@ export const Default: Story = {
     title: "Add item",
     tabIndex: 0,
   },
+  play: async ({ args, canvas, userEvent }) => {
+    // With tabIndex the wrapper is a tab stop, and Enter adds.
+    await userEvent.tab();
+    await expect(canvas.getByRole("button")).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+
+    await userEvent.click(canvas.getByTestId("selector-add-button"));
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+  },
   parameters: {
     docs: {
       description: {
@@ -181,22 +191,29 @@ export const Default: Story = {
   },
 };
 
-const WithLabelTemplate = () => {
+type ClickProps = Pick<ComponentProps<typeof AddButton>, "onClick">;
+
+const WithLabelTemplate = ({ onClick }: ClickProps) => {
   return (
     <Wrapper>
-      <AddButton title="Add item" label="Add user" onClick={() => {}} />
+      <AddButton title="Add item" label="Add user" onClick={onClick} />
       <AddButton
         title="Add item"
         label="Add group"
         isAction
-        onClick={() => {}}
+        onClick={onClick}
       />
     </Wrapper>
   );
 };
 
 export const WithLabel: Story = {
-  render: () => <WithLabelTemplate />,
+  render: (args) => <WithLabelTemplate onClick={args.onClick} />,
+  play: async ({ args, canvas, userEvent }) => {
+    // The words add too, not only the square.
+    await userEvent.click(canvas.getByText("Add user"));
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -211,22 +228,31 @@ export const WithLabel: Story = {
   },
 };
 
-const DisabledTemplate = () => {
+const DisabledTemplate = ({ onClick }: ClickProps) => {
   return (
     <Wrapper>
-      <AddButton title="Add item" isDisabled onClick={() => {}} />
+      <AddButton title="Add item" isDisabled tabIndex={0} onClick={onClick} />
       <AddButton
         title="Add item"
         label="Disabled with label"
         isDisabled
-        onClick={() => {}}
+        onClick={onClick}
       />
     </Wrapper>
   );
 };
 
 export const DisabledStates: Story = {
-  render: () => <DisabledTemplate />,
+  render: (args) => <DisabledTemplate onClick={args.onClick} />,
+  play: async ({ args, canvas, userEvent }) => {
+    const [square] = canvas.getAllByTestId("selector-add-button");
+    await userEvent.click(square);
+    await userEvent.click(canvas.getByText("Disabled with label"));
+
+    await userEvent.tab();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onClick).not.toHaveBeenCalled();
+  },
   parameters: {
     docs: {
       description: {
