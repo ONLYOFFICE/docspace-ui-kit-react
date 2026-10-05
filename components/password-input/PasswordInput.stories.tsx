@@ -3,6 +3,7 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useState, useEffect } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import { InputSize } from "../text-input";
 
@@ -276,6 +277,18 @@ const baseTooltipProps = {
   generatorSpecial: "!@#$%^&*",
 };
 
+// The eye's block is marked password_eye--close while the value is hidden and
+// password_eye--open while it shows.
+const toggleEye = async (
+  field: HTMLElement,
+  userEvent: { click: (element: Element) => Promise<void> },
+) => {
+  const block = field
+    .closest("[data-testid='input-block']")
+    ?.querySelector("[class*='password_eye--']") as HTMLElement;
+  await userEvent.click(within(block).getByTestId("icon-button"));
+};
+
 const PasswordInputTemplate = ({
   passwordSettings,
   onChange,
@@ -321,6 +334,37 @@ export const Default: Story = {
     placeholder: "password",
     maxLength: 30,
     size: InputSize.base,
+    onChange: fn(),
+    onValidateInput: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const field = canvas.getByPlaceholderText("password");
+    await expect(field).toHaveAttribute("type", "password");
+
+    // Each change reports whether every rule passes, and each rule's result.
+    await userEvent.type(field, "abc");
+    await expect(args.onValidateInput).toHaveBeenLastCalledWith(
+      false,
+      expect.objectContaining({ length: false }),
+    );
+    await userEvent.clear(field);
+    await userEvent.type(field, "Abc12!");
+    await expect(args.onValidateInput).toHaveBeenLastCalledWith(
+      true,
+      expect.objectContaining({
+        length: true,
+        digits: true,
+        capital: true,
+        special: true,
+      }),
+    );
+    await expect(field).toHaveValue("Abc12!");
+
+    // The eye shows the value and hides it again.
+    await toggleEye(field, userEvent);
+    await expect(field).toHaveAttribute("type", "text");
+    await toggleEye(field, userEvent);
+    await expect(field).toHaveAttribute("type", "password");
   },
   parameters: {
     docs: {
@@ -373,6 +417,12 @@ const SimpleViewTemplate = () => {
 
 export const SimpleView: Story = {
   render: () => <SimpleViewTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const field = canvas.getByPlaceholderText("Enter password");
+    await userEvent.type(field, "x");
+    await toggleEye(field, userEvent);
+    await expect(field).toHaveAttribute("type", "text");
+  },
   parameters: {
     docs: {
       description: {
@@ -420,6 +470,10 @@ const StatesTemplate = () => {
 
 export const States: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByPlaceholderText("Disabled")).toBeDisabled();
+    await expect(canvas.getByPlaceholderText("Normal")).toBeEnabled();
+  },
   parameters: {
     docs: {
       description: {
@@ -556,6 +610,21 @@ const GeneratorTemplate = () => {
 
 export const WithPasswordGenerator: Story = {
   render: () => <GeneratorTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const field = canvas.getByPlaceholderText("Type a character");
+    // A character opens the rules tooltip, where the generator link sits.
+    await userEvent.type(field, "a");
+    const generate = await screen.findByTestId("generate_password_link");
+    await userEvent.click(generate);
+
+    // A password that passes every rule, shown rather than masked.
+    await waitFor(() => expect(field).toHaveAttribute("type", "text"));
+    const value = (field as HTMLInputElement).value;
+    await expect(value.length).toBeGreaterThanOrEqual(6);
+    await expect(value).toMatch(/[A-Z]/);
+    await expect(value).toMatch(/\d/);
+    await expect(value).toMatch(/[!@#$%^&*]/);
+  },
   parameters: {
     docs: {
       description: {
