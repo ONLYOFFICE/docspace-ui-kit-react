@@ -2,6 +2,7 @@ import type { CSSProperties, ChangeEvent, ComponentProps } from "react";
 import { useEffect, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fireEvent, fn } from "storybook/test";
 
 import { Slider } from ".";
 import type { SliderProps } from "./Slider.types";
@@ -124,6 +125,12 @@ const SliderWithState = (props: SliderProps) => {
   return <Slider {...props} value={value} onChange={handleChange} />;
 };
 
+// A range input moves on its own default action, which the browser does not
+// run for synthetic key events -- so the play functions set the value through
+// a change event and check that the handle and onChange follow it.
+const moveTo = (slider: HTMLElement, value: string) =>
+  fireEvent.change(slider, { target: { value } });
+
 export const Default: Story = {
   render: (args) => <SliderWithState {...args} />,
   args: {
@@ -133,6 +140,18 @@ export const Default: Story = {
     value: 50,
     isDisabled: false,
     withPouring: true,
+    onChange: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const slider = canvas.getByRole("slider");
+    await expect(slider).toHaveValue("50");
+
+    await userEvent.tab();
+    await expect(slider).toHaveFocus();
+
+    moveTo(slider, "75");
+    await expect(slider).toHaveValue("75");
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -149,6 +168,11 @@ export const Default: Story = {
 
 export const DisabledState: Story = {
   render: (args) => <SliderWithState {...args} />,
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByRole("slider")).toBeDisabled();
+    await userEvent.tab();
+    await expect(document.activeElement).toBe(document.body);
+  },
   args: {
     min: 0,
     max: 100,
@@ -172,6 +196,15 @@ export const DisabledState: Story = {
 
 export const WithCustomSteps: Story = {
   render: (args) => <SliderWithState {...args} />,
+  play: async ({ canvas }) => {
+    const slider = canvas.getByRole("slider");
+    await expect(slider).toHaveAttribute("step", "5");
+    // The input snaps a value between steps to the nearest one.
+    moveTo(slider, "7");
+    await expect(slider).toHaveValue("5");
+    moveTo(slider, "8");
+    await expect(slider).toHaveValue("10");
+  },
   args: {
     min: 0,
     max: 10,
