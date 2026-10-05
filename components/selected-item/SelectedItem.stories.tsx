@@ -1,7 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, within } from "storybook/test";
 
 import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
 import { RootTooltip } from "../tooltip";
@@ -134,6 +134,31 @@ export const Default: Story = {
     onClick: fn(),
     propKey: "item-1",
   },
+  play: async ({ args, canvas, userEvent }) => {
+    const chip = canvas.getByTestId("selected-item");
+
+    await userEvent.click(canvas.getByText("Selected item"));
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    await expect(args.onClick).toHaveBeenCalledWith(
+      "item-1",
+      "Selected item",
+      undefined,
+      expect.anything(),
+    );
+
+    // The cross removes the value. Clicked on the icon drawn inside it, where
+    // a pointer lands, the click reaches the chip's onClick too, after
+    // onClose -- as the README records.
+    const cross = within(chip).getByTestId("icon-button");
+    await userEvent.click(cross.querySelector("svg") as SVGElement);
+    await expect(args.onClose).toHaveBeenCalledWith(
+      "item-1",
+      "Selected item",
+      "",
+      expect.anything(),
+    );
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+  },
   parameters: {
     docs: {
       description: {
@@ -154,7 +179,16 @@ export const DisabledState: Story = {
     isInline: true,
     isDisabled: true,
     onClose: fn(),
+    onClick: fn(),
     propKey: "item-disabled",
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const chip = canvas.getByTestId("selected-item");
+    await userEvent.click(canvas.getByText("Disabled item"));
+    const cross = within(chip).getByTestId("icon-button");
+    await userEvent.click(cross.querySelector("svg") as SVGElement);
+    await expect(args.onClick).not.toHaveBeenCalled();
+    await expect(args.onClose).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -302,6 +336,13 @@ export const WithoutCross: Story = {
     onClose: fn(),
     onClick: fn(),
     propKey: "item-no-cross",
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const chip = canvas.getByTestId("selected-item");
+    await expect(within(chip).queryByTestId("icon-button")).toBeNull();
+    await userEvent.click(chip);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    await expect(args.onClose).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
