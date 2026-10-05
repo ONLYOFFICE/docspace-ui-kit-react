@@ -1,7 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen } from "storybook/test";
 
 import { LinkWithDropdown } from ".";
 
@@ -227,6 +227,16 @@ const dropdownItems = [
 
 export const Default: Story = {
   render: (args) => <LinkWithDropdown {...args} />,
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Default Link" });
+    await userEvent.click(trigger);
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+
+    // Picking an entry runs its own onClick and closes the menu.
+    await userEvent.click(screen.getByRole("option", { name: "Button 2" }));
+    await expect(dropdownItems[1].onClick).toHaveBeenCalledTimes(1);
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  },
   args: {
     children: "Default Link",
     data: dropdownItems,
@@ -335,6 +345,12 @@ const DisabledTemplate = () => {
 
 export const Disabled: Story = {
   render: () => <DisabledTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button");
+    await expect(trigger).toHaveAttribute("aria-disabled", "true");
+    await userEvent.click(trigger);
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  },
   parameters: {
     docs: {
       description: {
