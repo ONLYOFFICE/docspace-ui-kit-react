@@ -1,6 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import CrossReactSvgUrl from "../../assets/icons/12/cross.react.svg?url";
 import EyeReactSvgUrl from "../../assets/eye.react.svg?url";
@@ -210,6 +211,12 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   );
 };
 
+// Every icon button carries the same test id; the icon it shows right now is
+// in data-iconname.
+const iconButtons = (canvas: {
+  getAllByTestId: typeof screen.getAllByTestId;
+}) => canvas.getAllByTestId("icon-button");
+
 export const Default: Story = {
   render: (args) => <IconButton {...args} />,
   args: {
@@ -217,6 +224,13 @@ export const Default: Story = {
     iconName: SearchReactSvgUrl,
     isFill: true,
     isDisabled: false,
+    onClick: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const [button] = iconButtons(canvas);
+    await expect(button).toHaveAttribute("aria-disabled", "false");
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
   },
 };
 
@@ -243,6 +257,15 @@ const WithHoverStateTemplate = () => {
 
 export const WithHoverState: Story = {
   render: () => <WithHoverStateTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const [search] = iconButtons(canvas);
+    await expect(search).toHaveAttribute("data-iconname", SearchReactSvgUrl);
+
+    await userEvent.hover(search);
+    await expect(search).toHaveAttribute("data-iconname", EyeReactSvgUrl);
+    await userEvent.unhover(search);
+    await expect(search).toHaveAttribute("data-iconname", SearchReactSvgUrl);
+  },
   parameters: {
     docs: {
       description: {
@@ -273,6 +296,18 @@ const WithClickStateTemplate = () => {
 
 export const WithClickState: Story = {
   render: () => <WithClickStateTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const [button] = iconButtons(canvas);
+
+    // Press without releasing: the pressed icon shows while the button is down.
+    await userEvent.pointer({ keys: "[MouseLeft>]", target: button });
+    await expect(button).toHaveAttribute("data-iconname", InfoReactSvgUrl);
+    await userEvent.pointer({ keys: "[/MouseLeft]", target: button });
+
+    // It stays until the pointer leaves, as the description says.
+    await userEvent.unhover(button);
+    await expect(button).toHaveAttribute("data-iconname", SearchReactSvgUrl);
+  },
   parameters: {
     docs: {
       description: {
@@ -332,6 +367,16 @@ const DisabledTemplate = () => {
 
 export const Disabled: Story = {
   render: () => <DisabledTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const [search] = iconButtons(canvas);
+    for (const button of iconButtons(canvas)) {
+      await expect(button).toHaveAttribute("aria-disabled", "true");
+    }
+    // Hover and press leave a disabled button's icon alone.
+    await userEvent.hover(search);
+    await userEvent.click(search);
+    await expect(search).toHaveAttribute("data-iconname", SearchReactSvgUrl);
+  },
   parameters: {
     docs: {
       description: {
@@ -450,6 +495,13 @@ const WithTooltipTemplate = () => {
 
 export const WithTooltip: Story = {
   render: () => <WithTooltipTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.hover(iconButtons(canvas)[0]);
+    // The tooltip renders outside the story root.
+    await waitFor(() =>
+      expect(screen.getByRole("tooltip")).toHaveTextContent("Search"),
+    );
+  },
   parameters: {
     docs: {
       description: {
