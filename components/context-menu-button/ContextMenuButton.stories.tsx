@@ -1,6 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import VerticalDotsReactSvgUrl from "../../assets/icons/16/vertical-dots.react.svg?url";
 
@@ -9,12 +10,19 @@ import type { ContextMenuModel } from "../context-menu";
 import { ContextMenuButton } from ".";
 import { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
 
+const onOption2 = fn().mockName("Option 2");
+
 const menuData: ContextMenuModel[] = [
-  { key: "key1", label: "Option 1" },
-  { key: "key2", label: "Option 2" },
-  { key: "key3", label: "Option 3" },
+  { key: "key1", label: "Option 1", onClick: fn().mockName("Option 1") },
+  { key: "key2", label: "Option 2", onClick: onOption2 },
+  { key: "key3", label: "Option 3", onClick: fn().mockName("Option 3") },
   { key: "key4", isSeparator: true },
-  { key: "key5", label: "Delete", disabled: false },
+  {
+    key: "key5",
+    label: "Delete",
+    disabled: false,
+    onClick: fn().mockName("Delete"),
+  },
 ];
 
 function getMenuData() {
@@ -239,6 +247,37 @@ export const Default: Story = {
       <ContextMenuButton {...args} getData={() => args.getData?.() ?? []} />
     </Wrapper>
   ),
+  play: async ({ args, canvas, userEvent }) => {
+    const icon = canvas.getByTestId("icon-button");
+    await userEvent.click(icon);
+    await expect(
+      screen.getByRole("option", { name: "Option 1" }),
+    ).toBeVisible();
+    // onClick fires on the click that closes the menu, not the one opening it.
+    await expect(args.onClick).not.toHaveBeenCalled();
+
+    // An item runs its own onClick and closes the menu.
+    await userEvent.click(screen.getByRole("option", { name: "Option 2" }));
+    await expect(onOption2).toHaveBeenCalledTimes(1);
+    await waitFor(() =>
+      expect(screen.queryByRole("option", { name: "Option 1" })).toBeNull(),
+    );
+
+    // Clicking the dots again closes an open menu and calls onClick.
+    await userEvent.click(icon);
+    await userEvent.click(icon);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    await expect(screen.queryByRole("option", { name: "Option 1" })).toBeNull();
+
+    // A click outside closes it and reports onClose.
+    await userEvent.click(icon);
+    await expect(
+      screen.getByRole("option", { name: "Option 1" }),
+    ).toBeVisible();
+    await userEvent.click(document.body);
+    await waitFor(() => expect(args.onClose).toHaveBeenCalledTimes(1));
+    await expect(screen.queryByRole("option", { name: "Option 1" })).toBeNull();
+  },
   args: {
     title: "Actions",
     displayType: ContextMenuButtonDisplayType.dropdown,
@@ -251,6 +290,8 @@ export const Default: Story = {
     data: menuData,
     usePortal: false,
     getData: getMenuData,
+    onClick: fn(),
+    onClose: fn(),
   },
   parameters: {
     docs: {
@@ -290,6 +331,12 @@ const DisabledTemplate = () => {
 
 export const Disabled: Story = {
   render: () => <DisabledTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const icon = canvas.getByTestId("icon-button");
+    await expect(icon).toHaveAttribute("aria-disabled", "true");
+    await userEvent.click(icon);
+    await expect(screen.queryByRole("option")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -448,6 +495,12 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    // opened shows the menu without a click, inline because usePortal is off.
+    await expect(
+      canvas.getByRole("option", { name: "Option 1" }),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
