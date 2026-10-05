@@ -1,5 +1,6 @@
 import React from "react";
 import type { Decorator } from "@storybook/react-vite";
+import { useDarkMode } from "@vueless/storybook-dark-mode";
 
 import { DEFAULT_API_KEY, DEFAULT_API_URL } from "../../.storybook/globals";
 import { resolveApiConfig } from "../../.storybook/utils/apiProviders";
@@ -14,6 +15,10 @@ import {
 } from "../../.storybook/mocks/demoPortal";
 
 import AiAgentProviders, { type AiServerApi } from "../providers";
+import {
+  PORTAL_BASE_THEME_ID,
+  PORTAL_DARK_THEME_ID,
+} from "../providers/themes";
 
 type AiSetupArgs = {
   locale: string;
@@ -48,6 +53,7 @@ const AiSetupGate = ({
   apiConfig,
   storyId,
   args,
+  theme,
   providerProps,
   children,
 }: {
@@ -57,6 +63,8 @@ const AiSetupGate = ({
   apiConfig: string;
   storyId: string;
   args: AiSetupArgs;
+  // The chat library's theme id, following the Storybook theme toggle.
+  theme: string;
   providerProps?: AiChatStoryProviderProps;
   children: React.ReactNode;
 }) => {
@@ -104,6 +112,7 @@ const AiSetupGate = ({
       // than be re-rendered into it.
       key={`${apiConfig}-${storyId}-${locale}-${canUseAi}-${isAvailable}`}
       locale={locale}
+      theme={providerProps?.theme ?? theme}
       canUseAi={canUseAi}
       isAvailable={isAvailable}
       serverApi={serverApi}
@@ -121,6 +130,10 @@ const AiSetupGate = ({
 
 export const withAiSetup: Decorator = (Story, context) => {
   const apiConfig: string = context.globals.apiConfig || "default";
+  // The host passes the theme, as the DocSpace client does from `isBase`.
+  // Left out, the chat library falls back to the OS colour scheme, so a dark
+  // OS drew a dark chat inside a light Storybook.
+  const isDark = useDarkMode();
 
   return (
     <AiSetupGate
@@ -128,6 +141,7 @@ export const withAiSetup: Decorator = (Story, context) => {
       apiConfig={apiConfig}
       storyId={context.id}
       args={context.args as AiSetupArgs}
+      theme={isDark ? PORTAL_DARK_THEME_ID : PORTAL_BASE_THEME_ID}
       providerProps={context.parameters.aiChat as AiChatStoryProviderProps}
     >
       <Story />
