@@ -850,6 +850,32 @@ export const WithSelectedOption: Story = {
 
     await userEvent.click(option("Done"));
     await waitFor(() => expect(button).toHaveTextContent("Done"));
+
+    // The keyboard in a list with dropDownMaxHeight, which renders through
+    // the virtual list: the row drawn as highlighted is the one the button
+    // names and the one Enter picks.
+    const drawn = () =>
+      [
+        ...document.querySelectorAll('[role="option"][data-focused="true"]'),
+      ].map((node) => node.textContent);
+    const named = () =>
+      document.getElementById(
+        button.getAttribute("aria-activedescendant") ?? "",
+      )?.textContent;
+
+    button.focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+    await expect(drawn()).toEqual(["Open"]);
+    await expect(named()).toBe("Open");
+
+    // Done is the current value and is skipped.
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(drawn()).toEqual(["In Progress"]);
+    await expect(named()).toBe("In Progress");
+
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(button).toHaveTextContent("In Progress"));
   },
   parameters: {
     docs: {
