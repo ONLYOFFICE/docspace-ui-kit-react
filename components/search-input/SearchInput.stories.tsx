@@ -4,7 +4,7 @@ import type { ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, waitFor, within } from "storybook/test";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 
@@ -246,7 +246,33 @@ const ControlledSearch = (props: {
   );
 };
 
+// The icon block names the icon it shows: a cross that clears the field, or
+// the magnifier.
+const iconBlock = (field: HTMLElement) =>
+  field
+    .closest("[data-testid='input-block']")
+    ?.querySelector(".search-cross, .search-loupe") as HTMLElement;
+
 export const Default: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    const field = canvas.getByPlaceholderText("Search");
+    await expect(iconBlock(field)).toHaveClass("search-loupe");
+
+    // onChange gets the string, once typing has paused for refreshTimeout.
+    await userEvent.type(field, "report");
+    await expect(args.onChange).not.toHaveBeenCalled();
+    await waitFor(() => expect(args.onChange).toHaveBeenCalledWith("report"), {
+      timeout: 3000,
+    });
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+
+    // The cross clears the field and reports through onClearSearch only.
+    await expect(iconBlock(field)).toHaveClass("search-cross");
+    await userEvent.click(within(iconBlock(field)).getByTestId("icon-button"));
+    await expect(field).toHaveValue("");
+    await expect(args.onClearSearch).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+  },
   render: (args) => {
     const [value, setValue] = useState(args.value || "");
 
@@ -336,6 +362,9 @@ const StatesTemplate = () => {
 
 export const States: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByDisplayValue("Disabled")).toBeDisabled();
+  },
   parameters: {
     docs: {
       description: {
@@ -372,6 +401,23 @@ const AutoRefreshTemplate = () => {
 
 export const AutoRefreshMode: Story = {
   render: () => <AutoRefreshTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const [auto, manual] = canvas.getAllByText(/Reported to the parent/);
+
+    await userEvent.type(
+      canvas.getByPlaceholderText("Type to auto-refresh (1s)"),
+      "abc",
+    );
+    await waitFor(
+      () => expect(auto).toHaveTextContent('Reported to the parent: "abc"'),
+      { timeout: 3000 },
+    );
+
+    // With autoRefresh off nothing reaches the parent, however long it waits.
+    await userEvent.type(canvas.getByPlaceholderText("No auto-refresh"), "xyz");
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await expect(manual).toHaveTextContent('Reported to the parent: ""');
+  },
   parameters: {
     docs: {
       description: {
@@ -520,6 +566,14 @@ export const PersistentClearButton: Story = {
       <ControlledSearch placeholder="Magnifier on an empty field" />
     </Wrapper>
   ),
+  play: async ({ canvas }) => {
+    await expect(
+      iconBlock(canvas.getByPlaceholderText("Cross on an empty field")),
+    ).toHaveClass("search-cross");
+    await expect(
+      iconBlock(canvas.getByPlaceholderText("Magnifier on an empty field")),
+    ).toHaveClass("search-loupe");
+  },
   parameters: {
     docs: {
       description: {
