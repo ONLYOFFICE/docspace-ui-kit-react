@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { observer } from "mobx-react";
-import classNames from "classnames";
 
 import { Button, ButtonSize } from "../../../components/button";
 import { Text } from "../../../components/text";
@@ -88,6 +87,12 @@ const PortalLimitSection = ({
     !isPortalSaving &&
     !isDisabled;
 
+  const isBelowSpent =
+    amount !== null &&
+    !isOutOfRange &&
+    portalUsage !== null &&
+    amount < portalUsage.amountConsumed;
+
   const getAmountError = () => {
     if (amount === null) return undefined;
 
@@ -136,6 +141,23 @@ const PortalLimitSection = ({
     setIsDraft(false);
   };
 
+  const renderBelowSpent = () => {
+    if (!portalUsage || amount === null) return null;
+
+    const spent = formatWalletCurrency(portalUsage.amountConsumed, 2, currency);
+    const newLimit = formatWalletCurrency(amount, 2, currency);
+    const date = formatPeriodEnd(portalUsage.periodEnd, language);
+
+    return (
+      <Text className={styles.status} dataTestId="portal_limit_status">
+        <Text as="span" fontWeight={600} className={styles.statusWarning}>
+          {t("LimitSpentThisPeriod", { spent })}
+        </Text>{" "}
+        {t("LimitBelowSpent", { amount: newLimit, date })}
+      </Text>
+    );
+  };
+
   const renderStatus = () => {
     if (!portalLimit?.enabled || !portalUsage) return null;
 
@@ -149,26 +171,14 @@ const PortalLimitSection = ({
 
     if (isLimitReached(portalUsage.amountConsumed, limitValue)) {
       return (
-        <Text
-          className={classNames(styles.status, styles.statusColumn)}
-          dataTestId="portal_limit_status"
-        >
-          <Text
-            as="span"
-            fontSize="11px"
-            fontWeight={600}
-            className={classNames(styles.statusBadge, styles.statusBadgeError)}
-          >
+        <Text className={styles.status} dataTestId="portal_limit_status">
+          <Text as="span" fontWeight={600} className={styles.statusReached}>
             {t("LimitReached")}
-          </Text>
-          <Text as="span" fontSize="12px">
-            {t("LimitResumes", { date })}
-          </Text>
+          </Text>{" "}
+          {t("LimitResumes", { date })}
         </Text>
       );
     }
-
-    const spentOf = `${t("LimitSpentOf", { spent, limit })} ${t("LimitResets", { date })}`;
 
     if (isLimitApproaching(portalUsage.amountConsumed, limitValue)) {
       const percent = getLimitUsagePercent(
@@ -177,33 +187,26 @@ const PortalLimitSection = ({
       );
 
       return (
-        <Text
-          className={classNames(styles.status, styles.statusRow)}
-          dataTestId="portal_limit_status"
-        >
-          <Text
-            as="span"
-            fontSize="11px"
-            fontWeight={600}
-            className={classNames(
-              styles.statusBadge,
-              styles.statusBadgeWarning,
-            )}
-          >
-            {t("LimitPercentUsed", { percent })}
-          </Text>
-          <Text as="span" fontSize="12px">
-            {spentOf}
-          </Text>
+        <Text className={styles.status} dataTestId="portal_limit_status">
+          <Text as="span" fontWeight={600} className={styles.statusWarning}>
+            {t("LimitSpentOfPercent", { spent, limit, percent })}
+          </Text>{" "}
+          {t("LimitResets", { date })}
         </Text>
       );
     }
 
     return (
       <Text className={styles.status} dataTestId="portal_limit_status">
-        {spentOf}
+        {t("LimitSpentOf", { spent, limit })} {t("LimitResets", { date })}
       </Text>
     );
+  };
+
+  const renderFormStatus = () => {
+    if (isOutOfRange) return null;
+    if (isBelowSpent) return renderBelowSpent();
+    return renderStatus();
   };
 
   return (
@@ -245,7 +248,7 @@ const PortalLimitSection = ({
               />
             </div>
 
-            {isOutOfRange ? null : renderStatus()}
+            {renderFormStatus()}
 
             <div className={styles.actions}>
               <Button
