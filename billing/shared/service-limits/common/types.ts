@@ -39,5 +39,6 @@ export type TCreateServiceLimitRequest = {
 export type TUpdateServiceLimitRequest = {
   id: number;
   amountValue?: number;
+  period?: TServiceLimitPeriod;
   enabled?: boolean;
 };

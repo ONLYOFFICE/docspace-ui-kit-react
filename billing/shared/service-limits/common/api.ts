@@ -128,7 +128,12 @@ export const updateServiceLimit = async (
   api: AxiosInstance,
   request: TUpdateServiceLimitRequest,
 ): Promise<TServiceLimit> => {
-  const { data } = await api.put(BASE_PATH, request);
+  const { data } = await api.put(BASE_PATH, {
+    id: request.id,
+    amountValue: request.amountValue,
+    enabled: request.enabled,
+    ...(request.period ? { period: periodToCode(request.period) } : {}),
+  });
   const raw = unwrap<Record<string, unknown>>(data);
   if (!raw) throw new Error("Service limit was not updated");
   return normalizeLimit(raw);

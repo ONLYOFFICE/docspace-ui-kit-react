@@ -95,18 +95,15 @@ class ServiceLimitStore {
 
     const current = this.portalLimit;
 
-    if (current && current.period === period) {
+    if (current) {
       await updateServiceLimit(this.#api, {
         id: current.id,
         amountValue: amount,
+        period,
         enabled: true,
       });
 
       return;
-    }
-
-    if (current) {
-      await updateServiceLimit(this.#api, { id: current.id, enabled: false });
     }
 
     await createServiceLimit(this.#api, {
