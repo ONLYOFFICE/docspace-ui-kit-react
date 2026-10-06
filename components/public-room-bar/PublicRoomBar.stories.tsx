@@ -1,7 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
 
 import PlanetIcon from "../../assets/icons/12/planet.react.svg?url";
 
@@ -83,6 +83,16 @@ export const Default: Story = {
     bodyText: "This room is accessible to anyone with the link",
     barIsVisible: false,
   },
+  play: async ({ canvas }) => {
+    const bar = canvas.getByTestId("public_room_bar");
+    await expect(canvas.getByText("Public Room")).toBeVisible();
+    await expect(
+      canvas.getByText("This room is accessible to anyone with the link"),
+    ).toBeVisible();
+    // The default people glyph, and no cross without onClose.
+    await expect(bar.querySelector("svg")).not.toBeNull();
+    await expect(canvas.queryByTestId("icon-button")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -106,6 +116,11 @@ export const WithCustomIcon: Story = {
     bodyText: "This room is accessible to anyone with the link",
     barIsVisible: false,
     iconName: PlanetIcon,
+  },
+  play: async ({ canvas }) => {
+    // A URL is fetched and inlined as an SVG.
+    const bar = canvas.getByTestId("public_room_bar");
+    await waitFor(() => expect(bar.querySelector("svg")).not.toBeNull());
   },
   parameters: {
     docs: {
@@ -131,6 +146,9 @@ export const WithoutCloseButton: Story = {
     bodyText: "This room is accessible to anyone with the link",
     barIsVisible: false,
     onClose: undefined,
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.queryByTestId("icon-button")).toBeNull();
   },
   parameters: {
     docs: {
@@ -158,6 +176,18 @@ const WithCustomComponentsTemplate = () => (
 
 export const WithCustomComponents: Story = {
   render: () => <WithCustomComponentsTemplate />,
+  play: async ({ canvas }) => {
+    // A node is wrapped in a div rather than a paragraph.
+    const header = canvas.getByText("Custom Header Component");
+    await expect(header.closest("p")).toBeNull();
+    await expect(
+      canvas.getByText("Custom Body Component").closest("p"),
+    ).toBeNull();
+    // barIsVisible only drops the top margin.
+    await expect(
+      getComputedStyle(canvas.getByTestId("public_room_bar")).marginTop,
+    ).toBe("0px");
+  },
   parameters: {
     docs: {
       description: {
@@ -182,6 +212,12 @@ export const WithCloseButton: Story = {
     bodyText: "This room is accessible to anyone with the link",
     barIsVisible: false,
     onClose: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // The cross only reports the click; the bar stays on screen.
+    await userEvent.click(canvas.getByTestId("icon-button"));
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
+    await expect(canvas.getByTestId("public_room_bar")).toBeVisible();
   },
   parameters: {
     docs: {
@@ -211,6 +247,16 @@ export const WithoutHeader: Story = {
     bodyText: "This room is accessible to anyone with the link",
     barIsVisible: false,
     hideHeader: true,
+  },
+  play: async ({ canvas }) => {
+    // The icon and the header go together; the body line stays.
+    await expect(canvas.queryByText("Public Room")).toBeNull();
+    await expect(
+      canvas.getByTestId("public_room_bar").querySelector("svg"),
+    ).toBeNull();
+    await expect(
+      canvas.getByText("This room is accessible to anyone with the link"),
+    ).toBeVisible();
   },
   parameters: {
     docs: {
@@ -253,6 +299,11 @@ export const CssCustomization: Story = {
       />
     </div>
   ),
+  play: async ({ canvas }) => {
+    const style = getComputedStyle(canvas.getByTestId("public_room_bar"));
+    await expect(style.backgroundColor).toBe("rgb(230, 243, 251)");
+    await expect(style.borderRadius).toBe("12px");
+  },
   parameters: {
     docs: {
       description: {
