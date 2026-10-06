@@ -1,5 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 
 import CrossReactSvg from "../../assets/icons/12/cross.react.svg";
 import EmptyImageReactSvg from "../../assets/emptyview/empty.rooms.root.light.svg?url";
@@ -80,23 +81,30 @@ type Story = StoryObj<ComponentProps<typeof EmptyScreenContainer>>;
 
 export default meta;
 
+const onResetFilter = fn().mockName("Reset filter");
+const onGoHome = fn().mockName("Go to home");
+
 const ResetFilterButton = () => (
   <div className={styles.resetFilterButton}>
     <CrossReactSvg
       className={styles.crossIcon}
       data-size={IconSizeType.small}
     />
-    <Link type={LinkType.action} isHovered>
+    <Link type={LinkType.action} isHovered onClick={onResetFilter}>
       Reset filter
     </Link>
   </div>
 );
 
 const HomeButton = () => (
-  <Link type={LinkType.action} isHovered>
+  <Link type={LinkType.action} isHovered onClick={onGoHome}>
     Go to home
   </Link>
 );
+
+// Padding above the image with withoutFilter, per breakpoint:
+// desktop, tablet, mobile.
+const WITHOUT_FILTER_PADDING = ["91px", "109px", "69px"];
 
 export const Default: Story = {
   render: (args) => <EmptyScreenContainer {...args} />,
@@ -108,6 +116,20 @@ export const Default: Story = {
     descriptionText:
       "No people matching your filter can be displayed in this section. Please select other filter options or clear filter to view all the people in this section.",
     buttons: <ResetFilterButton />,
+  },
+  play: async ({ canvas, userEvent }) => {
+    await expect(
+      canvas.getByRole("img", { name: "Empty Screen Filter image" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText("No results matching your search could be found"),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText("No files to be displayed in this section"),
+    ).toBeVisible();
+
+    await userEvent.click(canvas.getByText("Reset filter"));
+    await expect(onResetFilter).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -137,6 +159,15 @@ export const MinimalContent: Story = {
     headerText: "No results found",
     buttons: <HomeButton />,
   },
+  play: async ({ canvas, userEvent }) => {
+    // Lines that are not given are not rendered.
+    const container = canvas.getByTestId("empty-screen-container");
+    await expect(container.querySelector(".ec-subheading")).toBeNull();
+    await expect(container.querySelector(".ec-desc")).toBeNull();
+
+    await userEvent.click(canvas.getByText("Go to home"));
+    await expect(onGoHome).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -165,6 +196,18 @@ export const CustomStyles: Story = {
     buttons: <HomeButton />,
     imageStyle: { width: "150px", height: "150px" },
     buttonStyle: { marginTop: "32px" },
+  },
+  play: async ({ canvas }) => {
+    const container = canvas.getByTestId("empty-screen-container");
+    // imageStyle is dropped on tablet widths, so only the button style is
+    // checked unconditionally.
+    const buttons = container.querySelector(".ec-buttons") as HTMLElement;
+    await expect(getComputedStyle(buttons).marginTop).toBe("32px");
+    if (window.innerWidth <= 600 || window.innerWidth >= 1024) {
+      await expect(getComputedStyle(canvas.getByRole("img")).width).toBe(
+        "150px",
+      );
+    }
   },
   parameters: {
     docs: {
@@ -197,6 +240,13 @@ export const WithoutFilter: Story = {
       "Get started by creating your first document or uploading files to this folder.",
     buttons: <HomeButton />,
     withoutFilter: true,
+  },
+  play: async ({ canvas }) => {
+    // withoutFilter adds the filter bar's height above the image.
+    const { paddingTop } = getComputedStyle(
+      canvas.getByTestId("empty-screen-container"),
+    );
+    await expect(WITHOUT_FILTER_PADDING).toContain(paddingTop);
   },
   parameters: {
     docs: {
