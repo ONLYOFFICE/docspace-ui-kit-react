@@ -1,5 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 
 import { Button, Heading, HeadingSize, Text } from "../";
 import { LoaderWrapper } from ".";
@@ -37,6 +38,8 @@ type Story = StoryObj<ComponentProps<typeof LoaderWrapper>>;
 
 export default meta;
 
+const onCardButton = fn().mockName("Lorem ipsum");
+
 const cardContent = (
   <div
     style={{
@@ -56,15 +59,30 @@ const cardContent = (
       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
       tempor incididunt ut labore et dolore magna aliqua.
     </Text>
-    <Button primary label="Lorem ipsum" />
+    <Button primary label="Lorem ipsum" onClick={onCardButton} />
   </div>
 );
+
+const wrapperStyle = (canvasElement: HTMLElement, index = 0) =>
+  getComputedStyle(
+    canvasElement.querySelectorAll<HTMLElement>(
+      "[data-testid='loader-wrapper']",
+    )[index],
+  );
 
 export const Default: Story = {
   render: (args) => <LoaderWrapper {...args} />,
   args: {
     isLoading: false,
     children: cardContent,
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // Idle: fully opaque, and the content answers the mouse.
+    const style = wrapperStyle(canvasElement);
+    await expect(style.opacity).toBe("1");
+    await expect(style.pointerEvents).toBe("auto");
+    await userEvent.click(canvas.getByRole("button", { name: "Lorem ipsum" }));
+    await expect(onCardButton).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -86,6 +104,12 @@ export const LoadingContent: Story = {
   args: {
     isLoading: true,
     children: cardContent,
+  },
+  play: async ({ canvasElement }) => {
+    // Loading: half opacity, and the mouse no longer reaches the content.
+    const style = wrapperStyle(canvasElement);
+    await expect(style.opacity).toBe("0.5");
+    await expect(style.pointerEvents).toBe("none");
   },
   parameters: {
     docs: {
@@ -120,6 +144,10 @@ export const CssCustomization: Story = {
       <LoaderWrapper isLoading={false}>{cardContent}</LoaderWrapper>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    await expect(wrapperStyle(canvasElement, 0).opacity).toBe("0.3");
+    await expect(wrapperStyle(canvasElement, 1).opacity).toBe("0.8");
+  },
   parameters: {
     docs: {
       description: {
