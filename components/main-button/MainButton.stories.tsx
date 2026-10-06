@@ -1,17 +1,20 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 
 import { MainButton } from ".";
+
+const onNewDocument = fn().mockName("New document");
 
 const itemsModel = [
   {
     key: 0,
     label: "New document",
     icon: CatalogFolderReactSvgUrl,
+    onClick: onNewDocument,
   },
   {
     key: 1,
@@ -144,6 +147,28 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   return <div style={{ maxWidth: "210px" }}>{props.children}</div>;
 };
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// The button is a div with no role, so it is found by its text.
+const clickButton = async (
+  { canvas, userEvent }: PlayContext,
+  text: string,
+) => {
+  const button = canvas.getByText(text).parentElement as HTMLElement;
+  await userEvent.click(button);
+  return button;
+};
+
+// The menu fades in, so an item is found first and seen a moment later.
+const findVisibleItem = async (name: string | RegExp) => {
+  const item = await screen.findByRole("menuitem", { name });
+  await waitFor(() => expect(item).toBeVisible());
+  return item;
+};
+
+const isMenuOpen = () =>
+  screen.queryAllByRole("menuitem").some((item) => item.checkVisibility());
+
 export const Default: Story = {
   render: (args) => (
     <Wrapper>
@@ -153,6 +178,21 @@ export const Default: Story = {
   args: {
     text: "Main Button",
     model: itemsModel,
+  },
+  play: async (context) => {
+    const button = await clickButton(context, "Main Button");
+    const item = await findVisibleItem("New document");
+
+    // Without descriptions the menu takes the button's width.
+    const menu = item.closest(".p-contextmenu") as HTMLElement;
+    await expect(menu.getBoundingClientRect().width).toBeCloseTo(
+      button.getBoundingClientRect().width,
+      0,
+    );
+
+    await context.userEvent.click(item);
+    await expect(onNewDocument).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(isMenuOpen()).toBe(false));
   },
   parameters: {
     docs: {
@@ -182,6 +222,11 @@ const DisabledTemplate = () => {
 
 export const Disabled: Story = {
   render: () => <DisabledTemplate />,
+  play: async (context) => {
+    // A disabled button drops the click: no menu opens.
+    await clickButton(context, "Disabled Button");
+    await expect(isMenuOpen()).toBe(false);
+  },
   parameters: {
     docs: {
       description: {
@@ -210,6 +255,11 @@ const DisabledWithDropdownTemplate = () => {
 
 export const DisabledWithDropdown: Story = {
   render: () => <DisabledWithDropdownTemplate />,
+  play: async (context) => {
+    await clickButton(context, "Disabled with Dropdown");
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    await expect(isMenuOpen()).toBe(false);
+  },
   parameters: {
     docs: {
       description: {
@@ -234,6 +284,12 @@ export const WithAction: Story = {
     isDropdown: false,
     model: [],
     onAction: fn(),
+  },
+  play: async (context) => {
+    // isDropdown off: no arrow, and the click calls onAction.
+    const button = await clickButton(context, "Click Me");
+    await expect(context.args.onAction).toHaveBeenCalledTimes(1);
+    await expect(button.querySelector("svg")).toBeNull();
   },
   parameters: {
     docs: {
@@ -280,6 +336,18 @@ const WithItemDescriptionsTemplate = () => {
 
 export const WithItemDescriptions: Story = {
   render: () => <WithItemDescriptionsTemplate />,
+  play: async (context) => {
+    const button = await clickButton(context, "Create");
+    const item = await findVisibleItem(/Blank document/);
+    await expect(item).toHaveTextContent(
+      "Start from an empty page and add the content yourself.",
+    );
+    // With descriptions the menu grows past the button's width.
+    const menu = item.closest(".p-contextmenu") as HTMLElement;
+    await expect(menu.getBoundingClientRect().width).toBeGreaterThan(
+      button.getBoundingClientRect().width,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -319,6 +387,14 @@ const WithDropdownTemplate = () => {
 
 export const WithDropdown: Story = {
   render: () => <WithDropdownTemplate />,
+  play: async (context) => {
+    await clickButton(context, "Create new");
+    // A nested list opens from its parent item.
+    // On a desktop width a nested list opens when its parent is hovered.
+    await context.userEvent.hover(await findVisibleItem("Master form"));
+    await findVisibleItem("From blank");
+    await expect(screen.getAllByRole("separator").length).toBeGreaterThan(0);
+  },
   parameters: {
     docs: {
       description: {
@@ -356,6 +432,12 @@ export const WithoutArrow: Story = {
     text: "Create new",
     model: itemsModel,
     hideArrow: true,
+  },
+  play: async (context) => {
+    // No arrow, yet a click still opens the menu.
+    const button = await clickButton(context, "Create new");
+    await expect(button.querySelector("svg")).toBeNull();
+    await findVisibleItem("New document");
   },
   parameters: {
     docs: {
