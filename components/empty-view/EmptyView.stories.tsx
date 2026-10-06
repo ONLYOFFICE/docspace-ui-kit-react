@@ -1,6 +1,7 @@
 import React from "react";
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen } from "storybook/test";
 
 import EmptyRoomsLightSvg from "../../assets/emptyview/empty.rooms.root.light.svg";
 import CrossSvg from "../../assets/icons/12/cross.react.svg";
@@ -92,6 +93,20 @@ export const Default: Story = {
       },
     ],
   },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", { level: 3, name: "Empty Folder" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText(
+        "This folder is empty. Add files or folders to get started.",
+      ),
+    ).toBeVisible();
+    // With a LinkRouter the option is a real link to its `to`.
+    await expect(
+      canvas.getByRole("link", { name: "Clear Filter" }),
+    ).toHaveAttribute("href", "#");
+  },
   parameters: {
     docs: {
       description: {
@@ -120,6 +135,13 @@ export const NoOptions: Story = {
     title: "No Files Found",
     description: "There are no files matching your search criteria.",
     options: null,
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", { name: "No Files Found" }),
+    ).toBeVisible();
+    // null options: the header alone, no options block.
+    await expect(canvas.queryByTestId("empty-view-body")).toBeNull();
   },
   parameters: {
     docs: {
@@ -166,6 +188,13 @@ export const WithMultipleOptions: Story = {
       },
     ],
   },
+  play: async ({ canvas }) => {
+    // The links stack in the order given.
+    const hrefs = canvas
+      .getAllByRole("link")
+      .map((link) => link.getAttribute("href"));
+    await expect(hrefs).toEqual(["/create", "/upload", "/import"]);
+  },
   parameters: {
     docs: {
       description: {
@@ -189,12 +218,15 @@ export const WithMultipleOptions: Story = {
   },
 };
 
+const onCreateFolder = fn().mockName("Create a folder");
+
 const cardOptions: EmptyViewProps["options"] = [
   {
     key: "create",
     icon: <FolderSvg />,
     title: "Create a folder",
     description: "Keep related files together in one place.",
+    onClick: onCreateFolder,
   },
   {
     key: "upload",
@@ -222,6 +254,20 @@ export const SuggestionCards: Story = {
     title: "Nothing here yet",
     description: "Pick one of the suggestions below to get started.",
     options: cardOptions,
+  },
+  play: async ({ canvas, userEvent }) => {
+    // A plain card runs its onClick; the card is named by its title.
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Create a folder" }),
+    );
+    await expect(onCreateFolder).toHaveBeenCalledTimes(1);
+
+    // A card with a model opens a menu of choices instead.
+    await userEvent.click(canvas.getByRole("button", { name: "Upload files" }));
+    await expect(await screen.findByText("From this device")).toBeVisible();
+
+    // A disabled card is not rendered at all.
+    await expect(canvas.queryByText("Browse templates")).toBeNull();
   },
   parameters: {
     docs: {
@@ -264,8 +310,19 @@ export const WithButtons: Story = {
     title: "No documents",
     description: "Create the first document or bring one in.",
     options: [
-      { key: "create", type: "button", title: "Create document" },
-      { key: "import", type: "button", title: "Import", primary: false },
+      {
+        key: "create",
+        type: "button",
+        title: "Create document",
+        onClick: fn().mockName("Create document"),
+      },
+      {
+        key: "import",
+        type: "button",
+        title: "Import",
+        primary: false,
+        onClick: fn().mockName("Import"),
+      },
       {
         key: "sync",
         type: "button",
@@ -274,6 +331,20 @@ export const WithButtons: Story = {
         isLoading: true,
       },
     ],
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const [create, importOption] = (args.options ?? []) as {
+      onClick: () => void;
+    }[];
+    // Button options are native buttons: Enter works as well as a click.
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Create document" }),
+    );
+    await expect(create.onClick).toHaveBeenCalledTimes(1);
+
+    canvas.getByRole("button", { name: "Import" }).focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(importOption.onClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -312,6 +383,7 @@ export const TextActionsWithSeparator: Story = {
         type: "action",
         icon: <FolderSvg />,
         title: "Upload a file",
+        onClick: fn().mockName("Upload a file"),
       },
       { key: "or", type: "separator", text: "or" },
       {
@@ -320,8 +392,23 @@ export const TextActionsWithSeparator: Story = {
         icon: <FolderSvg />,
         title: "Create a document",
         className: "secondary",
+        onClick: fn().mockName("Create a document"),
       },
     ],
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const [upload, , create] = (args.options ?? []) as {
+      onClick: () => void;
+    }[];
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Upload a file" }),
+    );
+    await expect(upload.onClick).toHaveBeenCalledTimes(1);
+    await expect(canvas.getByText("or")).toBeVisible();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Create a document" }),
+    );
+    await expect(create.onClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -367,6 +454,14 @@ export const WithExtraContent: Story = {
         description: "Clear Filter",
       },
     ],
+  },
+  play: async ({ canvas }) => {
+    // extraContent sits between the description and the options.
+    const extra = canvas.getByText("Ask a teammate to share a file with you.");
+    const body = canvas.getByTestId("empty-view-body");
+    await expect(
+      extra.compareDocumentPosition(body) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   },
   parameters: {
     docs: {
