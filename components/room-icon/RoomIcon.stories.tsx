@@ -1,6 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import PlanetIcon from "../../assets/icons/12/planet.react.svg?url";
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
@@ -176,6 +176,16 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   );
 };
 
+// The stories' typed render leaves play without a contextual type.
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// The menu stays mounted when closed, so it is open while an entry shows.
+const isMenuOpen = () =>
+  screen.queryAllByText("Upload").some((item) => item.checkVisibility());
+
+const initialsOf = (icon: HTMLElement) =>
+  icon.querySelector("[data-testid='room-title']")?.textContent;
+
 const mockModel = [
   {
     label: "Upload",
@@ -202,6 +212,12 @@ export const Default: Story = {
     radius: "6px",
     showDefault: true,
   },
+  play: async ({ canvas }: PlayContext) => {
+    const icon = canvas.getByTestId("room-icon");
+    // The first letters of the first and last words, on a 96px tile.
+    await expect(initialsOf(icon)).toBe("TR");
+    await expect(icon.getBoundingClientRect().width).toBe(96);
+  },
   parameters: {
     docs: {
       description: {
@@ -227,6 +243,12 @@ const SizesTemplate = () => {
 
 export const Sizes: Story = {
   render: () => <SizesTemplate />,
+  play: async ({ canvas }: PlayContext) => {
+    const widths = canvas
+      .getAllByTestId("room-icon")
+      .map((icon) => icon.getBoundingClientRect().width);
+    await expect(widths).toEqual([32, 48, 96]);
+  },
   parameters: {
     docs: {
       description: {
@@ -256,6 +278,19 @@ const ColorsTemplate = () => {
 
 export const Colors: Story = {
   render: () => <ColorsTemplate />,
+  play: async ({ canvas }: PlayContext) => {
+    // Each tile carries its colour as a custom property.
+    const colors = canvas
+      .getAllByTestId("room-icon")
+      .map((icon) => icon.style.getPropertyValue("--room-icon-color"));
+    await expect(colors).toEqual([
+      "#4781D1",
+      "#2DB482",
+      "#F97A0B",
+      "#533ED1",
+      "#F2675A",
+    ]);
+  },
   parameters: {
     docs: {
       description: {
@@ -287,6 +322,18 @@ export const WithEditing: Story = {
     showDefault: true,
     withEditing: true,
     model: mockModel,
+  },
+  play: async ({ canvas, userEvent }: PlayContext) => {
+    const icon = canvas.getByTestId("room-icon");
+    await expect(icon).toHaveAttribute("data-has-editing", "true");
+    // The pencil opens the logo menu; picking an entry runs it and closes.
+    await userEvent.click(
+      icon.querySelector(".open-edit-logo-icon") as HTMLElement,
+    );
+    await waitFor(() => expect(screen.getByText("Upload")).toBeVisible());
+    await userEvent.click(screen.getByText("Edit"));
+    await expect(mockModel[1].onClick).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(isMenuOpen()).toBe(false));
   },
   parameters: {
     docs: {
@@ -320,6 +367,15 @@ export const EmptyState: Story = {
     isEmptyIcon: true,
     model: mockModel,
   },
+  play: async ({ canvas, userEvent }: PlayContext) => {
+    const icon = canvas.getByTestId("room-icon");
+    await expect(canvas.getByTestId("empty-icon")).toBeInTheDocument();
+    // The plus button opens the same logo menu.
+    await userEvent.click(
+      icon.querySelector(".open-plus-logo-icon") as HTMLElement,
+    );
+    await waitFor(() => expect(isMenuOpen()).toBe(true));
+  },
   parameters: {
     docs: {
       description: {
@@ -344,6 +400,11 @@ export const Archive: Story = {
     radius: "6px",
     showDefault: true,
     isArchive: true,
+  },
+  play: async ({ canvas }: PlayContext) => {
+    const icon = canvas.getByTestId("room-icon");
+    await expect(icon).toHaveAttribute("data-is-archive", "true");
+    await expect(icon.className).toMatch(/isArchive/);
   },
   parameters: {
     docs: {
@@ -372,6 +433,13 @@ export const WithBadge: Story = {
     badgeUrl: PlanetIcon,
     onBadgeClick: fn(),
     showDefault: true,
+  },
+  play: async ({ args, canvas, userEvent }: PlayContext) => {
+    const badge = canvas.getByTestId("badge-container");
+    await userEvent.click(
+      badge.querySelector("[data-testid='icon-button']") as HTMLElement,
+    );
+    await expect(args.onBadgeClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -410,6 +478,15 @@ export const WithTooltip: Story = {
     tooltipId: "room-tooltip",
     showDefault: true,
   },
+  play: async ({ canvas, userEvent }: PlayContext) => {
+    const badge = canvas
+      .getByTestId("badge-container")
+      .querySelector("[data-tooltip-id='room-tooltip']") as HTMLElement;
+    await userEvent.hover(badge);
+    await waitFor(() =>
+      expect(screen.getByText("Anyone with the link can view")).toBeVisible(),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -443,6 +520,12 @@ export const Template: Story = {
     isTemplate: true,
     showDefault: true,
   },
+  play: async ({ canvas }: PlayContext) => {
+    const icon = canvas.getByTestId("room-icon");
+    await expect(icon).toHaveAttribute("data-is-template", "true");
+    await expect(icon.querySelector(".template-icon-svg svg")).not.toBeNull();
+    await expect(initialsOf(icon)).toBe("T");
+  },
   parameters: {
     docs: {
       description: {
@@ -470,6 +553,12 @@ export const WithHover: Story = {
     showDefault: true,
     hoverSrc: EditPenSvgUrl,
     model: mockModel,
+  },
+  play: async ({ canvas, userEvent }: PlayContext) => {
+    await expect(canvas.getByTestId("hover-image")).toBeInTheDocument();
+    // A click on the tile opens the logo menu.
+    await userEvent.click(canvas.getByTestId("hover-container"));
+    await waitFor(() => expect(isMenuOpen()).toBe(true));
   },
   parameters: {
     docs: {
@@ -501,6 +590,10 @@ export const LongTitle: Story = {
     color: "F97A0B",
     radius: "6px",
     showDefault: true,
+  },
+  play: async ({ canvas }: PlayContext) => {
+    // Two letters: the first of the first word and of the last.
+    await expect(initialsOf(canvas.getByTestId("room-icon"))).toBe("VT");
   },
   parameters: {
     docs: {
@@ -551,6 +644,19 @@ export const WithLogo: Story = {
     color: "2DB482",
     size: "48px",
   },
+  play: async ({ canvas }: PlayContext) => {
+    const [image, cover, broken] = canvas.getAllByTestId("room-icon");
+    // An image URL is drawn as it is.
+    await expect(
+      image.querySelector("[data-testid='room-icon-image']"),
+    ).not.toBeNull();
+    // A cover SVG is inlined.
+    await expect(
+      cover.querySelector("[data-testid='room-icon-cover']"),
+    ).not.toBeNull();
+    // A logo that fails to load falls back to the initials.
+    await waitFor(() => expect(initialsOf(broken)).toBe("PF"));
+  },
   parameters: {
     docs: {
       description: {
@@ -586,6 +692,16 @@ export const RightToLeft: Story = {
     title: "ملفات المشروع",
     color: "4781D1",
     size: "48px",
+  },
+  play: async ({ canvas }: PlayContext) => {
+    // Under RTL the pencil sits in the bottom-left corner.
+    const [editable] = canvas.getAllByTestId("room-icon");
+    const pencil = editable.querySelector(
+      ".open-edit-logo-icon",
+    ) as HTMLElement;
+    const tile = editable.getBoundingClientRect();
+    const box = pencil.getBoundingClientRect();
+    await expect(box.left - tile.left).toBeLessThan(tile.right - box.right);
   },
   parameters: {
     noPadding: true,
@@ -634,6 +750,14 @@ export const CssCustomization: Story = {
       <RoomIcon title="" size="96px" isEmptyIcon model={mockModel} />
     </div>
   ),
+  play: async ({ canvas }: PlayContext) => {
+    // The dashed frame and its radius belong to the empty tile itself.
+    const [, empty] = canvas.getAllByTestId("room-icon");
+    const frame = getComputedStyle(empty);
+    await expect(frame.borderTopStyle).toBe("dashed");
+    await expect(frame.borderTopColor).toBe("rgb(124, 58, 237)");
+    await expect(frame.borderTopLeftRadius).toBe("50%");
+  },
   parameters: {
     docs: {
       description: {
