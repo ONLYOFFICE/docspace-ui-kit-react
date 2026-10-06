@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import { SortByFieldName } from "../../../../enums";
 
@@ -37,6 +38,14 @@ type Story = StoryObj<ComponentProps<typeof TableSettings>>;
 
 export default meta;
 
+const onColumnToggle = fn();
+
+// The list is portalled; a column's row carries its key in the test id.
+const columnRow = (key: string) =>
+  screen.queryByTestId(`table_settings_${key}`);
+
+const listOpen = () => waitFor(() => expect(columnRow("type")).toBeVisible());
+
 export const Default: Story = {
   render: (args) => <TableSettings {...args} />,
   args: {
@@ -46,31 +55,52 @@ export const Default: Story = {
         title: "Name",
         enable: true,
         sortBy: SortByFieldName.Name,
-        onChange: () => {},
+        onChange: onColumnToggle,
       },
       {
         key: "type",
         title: "Type",
         enable: true,
         sortBy: SortByFieldName.Type,
-        onChange: () => {},
+        onChange: onColumnToggle,
       },
       {
         key: "modified",
         title: "Modified",
         enable: false,
         sortBy: SortByFieldName.ModifiedDate,
-        onChange: () => {},
+        onChange: onColumnToggle,
       },
       {
         key: "owner",
         title: "Owner",
         enable: true,
         sortBy: SortByFieldName.Author,
-        onChange: () => {},
+        onChange: onColumnToggle,
       },
     ],
     disableSettings: false,
+  },
+  beforeEach: () => {
+    onColumnToggle.mockClear();
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByTestId("table-settings-button"));
+    await listOpen();
+    const checkbox = (key: string) =>
+      within(columnRow(key) as HTMLElement).getByRole("checkbox");
+    await expect(checkbox("name")).toBeChecked();
+    // The hidden column is unticked.
+    await expect(checkbox("modified")).not.toBeChecked();
+
+    await userEvent.click(
+      within(columnRow("modified") as HTMLElement).getByText("Modified"),
+    );
+    await expect(onColumnToggle).toHaveBeenCalledWith("modified");
+
+    // A click elsewhere closes the list.
+    await userEvent.click(document.body);
+    await waitFor(() => expect(columnRow("type")).not.toBeVisible());
   },
   parameters: {
     docs: {
@@ -99,6 +129,11 @@ export const Disabled: Story = {
     ...Default.args,
     disableSettings: true,
   },
+  play: async ({ canvas }) => {
+    const cog = canvas.getByTestId("table-settings-button");
+    await expect(cog).toHaveAttribute("aria-disabled", "true");
+    await expect(columnRow("type")).not.toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -125,14 +160,14 @@ export const WithLockedColumns: Story = {
         enable: true,
         sortBy: SortByFieldName.Name,
         isDisabled: true,
-        onChange: () => {},
+        onChange: onColumnToggle,
       },
       {
         key: "type",
         title: "Type",
         enable: true,
         sortBy: SortByFieldName.Type,
-        onChange: () => {},
+        onChange: onColumnToggle,
       },
       {
         key: "size",
@@ -145,10 +180,18 @@ export const WithLockedColumns: Story = {
         title: "Modified",
         enable: false,
         sortBy: SortByFieldName.ModifiedDate,
-        onChange: () => {},
+        onChange: onColumnToggle,
       },
     ],
     disableSettings: false,
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByTestId("table-settings-button"));
+    await listOpen();
+    await expect(columnRow("modified")).toBeVisible();
+    // A locked column and one without onChange are not listed.
+    await expect(columnRow("name")).toBeNull();
+    await expect(columnRow("size")).toBeNull();
   },
   parameters: {
     docs: {
