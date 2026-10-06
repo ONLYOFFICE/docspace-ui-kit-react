@@ -1,5 +1,6 @@
 import React from "react";
 import { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 
 import CatalogFolderReactSvgUrl from "../../../assets/icons/16/catalog.folder.react.svg?url";
 import CatalogTrashReactSvgUrl from "../../../assets/icons/16/catalog.trash.react.svg?url";
@@ -39,6 +40,9 @@ const meta = {
     text: "Documents",
     showText: true,
     linkData: defaultLinkData,
+    id: "documents",
+    onClick: fn(),
+    onClickBadge: fn(),
   },
   argTypes: {
     showText: { control: "boolean" },
@@ -61,12 +65,27 @@ export default meta;
 
 export const Default: Story = {
   args: {},
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByText("Documents")).toBeVisible();
+    // The click lands on the overlay behind the label, which takes no
+    // pointer events of its own; onClick gets the row's id.
+    await userEvent.click(canvas.getByTestId("article-item-sibling"));
+    await expect(args.onClick).toHaveBeenCalledWith(
+      expect.anything(),
+      "documents",
+    );
+  },
 };
 
 export const IconOnly: Story = {
   args: {
     showText: false,
     showBadge: false,
+  },
+  play: async ({ canvas }) => {
+    // Icon only: no label is rendered.
+    await expect(canvas.queryByText("Documents")).toBeNull();
+    await expect(canvas.getByTestId("article-item")).toBeVisible();
   },
   decorators: [
     (Story) => (
@@ -82,6 +101,12 @@ export const WithBadge: Story = {
     showBadge: true,
     labelBadge: "42",
   },
+  play: async ({ args, canvas, userEvent }) => {
+    // A badge click reports the badge, not the row.
+    await userEvent.click(canvas.getByText("42"));
+    await expect(args.onClickBadge).toHaveBeenCalledWith("documents");
+    await expect(args.onClick).not.toHaveBeenCalled();
+  },
 };
 
 export const WithCustomBadge: Story = {
@@ -96,6 +121,12 @@ export const Active: Story = {
     isActive: true,
     showBadge: true,
     labelBadge: "New",
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("article-item").className).toMatch(
+      /active/,
+    );
+    await expect(canvas.getByText("New")).toBeVisible();
   },
 };
 
@@ -116,6 +147,13 @@ export const Header: Story = {
     text: "RECENT",
     isHeader: true,
     showText: true,
+  },
+  play: async ({ canvas }) => {
+    // A header is a plain caption, not a clickable row.
+    await expect(canvas.getByTestId("article-item-header")).toHaveTextContent(
+      "RECENT",
+    );
+    await expect(canvas.queryByTestId("article-item-sibling")).toBeNull();
   },
 };
 
@@ -141,6 +179,13 @@ export const EndOfBlock: Story = {
       />
     </>
   ),
+  play: async ({ canvas }) => {
+    // isEndOfBlock closes a group with a bottom margin.
+    const [first, second] = canvas.getAllByTestId("article-item");
+    await expect(
+      parseFloat(getComputedStyle(first).marginBottom),
+    ).toBeGreaterThan(parseFloat(getComputedStyle(second).marginBottom));
+  },
 };
 
 export const CssCustomization: Story = {
