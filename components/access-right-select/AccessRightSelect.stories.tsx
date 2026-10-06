@@ -1,11 +1,11 @@
 import type { ComponentProps, CSSProperties, ReactNode } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import { ShareAccessRights } from "../../enums";
 import { ComboBoxSize } from "../combobox";
-import { Toast } from "../toast";
+import { Toast, toastr } from "../toast";
 
 import { AccessRightSelect } from "./AccessRightSelect";
 
@@ -269,6 +269,19 @@ type Story = StoryObj<ComponentProps<typeof AccessRightSelect>>;
 
 export default meta;
 
+// A row of the list, which may be portalled out of the story root.
+const accessOption = (key: string) =>
+  screen.getByTestId(`access_right_option_${key}`);
+
+const listShown = () =>
+  waitFor(() => expect(accessOption("key1")).toBeVisible());
+
+const listHidden = () =>
+  waitFor(() => {
+    const row = screen.queryByTestId("access_right_option_key1");
+    expect(!row || !row.checkVisibility()).toBe(true);
+  });
+
 export const Default: Story = {
   args: {
     accessOptions: data,
@@ -284,6 +297,26 @@ export const Default: Story = {
       <AccessRightSelect {...args} />
     </Wrapper>
   ),
+  play: async ({ args, canvas, userEvent }) => {
+    const combobox = canvas.getByTestId("combobox");
+    await expect(combobox).toHaveTextContent("Full access");
+
+    await userEvent.click(canvas.getByRole("button", { expanded: false }));
+    await listShown();
+    // Each level with its description; the paid one with its badge.
+    await expect(accessOption("key1")).toHaveTextContent("paid");
+    await expect(accessOption("key2")).toHaveTextContent(
+      "Can edit and share files",
+    );
+    await expect(accessOption("key1")).toHaveAttribute("aria-selected", "true");
+
+    await userEvent.click(accessOption("key5"));
+    await expect(args.onSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ key: "key5", label: "Viewer" }),
+    );
+    await listHidden();
+    await expect(combobox).toHaveTextContent("Viewer");
+  },
   parameters: {
     docs: {
       description: {
@@ -338,6 +371,15 @@ const DisplayTypesTemplate = () => (
 
 export const DisplayTypes: Story = {
   render: () => <DisplayTypesTemplate />,
+  play: async ({ canvas }) => {
+    const [plain, descriptive, onlyIcon] = canvas.getAllByTestId("combobox");
+    await expect(plain).toHaveTextContent("Editor");
+    await expect(plain).not.toHaveTextContent("Can edit and share files");
+    await expect(descriptive).toHaveTextContent("Can edit and share files");
+    // The icon alone: no label at all.
+    await expect(onlyIcon).not.toHaveTextContent("Editor");
+    await expect(onlyIcon.querySelector("svg")).not.toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -374,6 +416,26 @@ const RestrictedChoicesTemplate = () => (
 
 export const RestrictedChoices: Story = {
   render: () => <RestrictedChoicesTemplate />,
+  beforeEach: () => {
+    toastr.clear();
+  },
+  play: async ({ canvas, userEvent }) => {
+    const combobox = canvas.getByTestId("combobox");
+    await userEvent.click(canvas.getByRole("button", { expanded: false }));
+    await listShown();
+    // A level outside availableAccess is refused with a toast.
+    await userEvent.click(accessOption("key1"));
+    await expect(
+      await screen.findByText("This access level is not available"),
+    ).toBeVisible();
+    await expect(combobox).toHaveTextContent("Viewer");
+
+    // One inside it is picked as usual.
+    await userEvent.click(canvas.getByRole("button", { expanded: false }));
+    await listShown();
+    await userEvent.click(accessOption("key4"));
+    await waitFor(() => expect(combobox).toHaveTextContent("Commenter"));
+  },
   parameters: {
     docs: {
       description: {
@@ -399,6 +461,13 @@ export const DisabledState: Story = {
   args: {
     ...Default.args,
     isDisabled: true,
+  },
+  play: async ({ canvas, userEvent }) => {
+    const button = within(canvas.getByTestId("combobox")).getByRole("button");
+    await expect(button).toHaveAttribute("aria-disabled", "true");
+    await userEvent.click(button);
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    await listHidden();
   },
   render: (args) => (
     <Wrapper>
@@ -426,6 +495,15 @@ export const LoadingState: Story = {
   args: {
     ...Default.args,
     isLoading: true,
+  },
+  play: async ({ canvas, userEvent }) => {
+    // A spinner instead of the label; the list does not open.
+    const combobox = canvas.getByTestId("combobox");
+    await expect(within(combobox).getByTestId("loader")).toBeVisible();
+    await expect(within(combobox).getByText("Full access")).not.toBeVisible();
+    await userEvent.click(within(combobox).getByRole("button"));
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    await listHidden();
   },
   render: (args) => (
     <Wrapper>
@@ -511,6 +589,23 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // Each instance renders its list in place.
+    const [first] = canvas.getAllByTestId("combobox");
+    await userEvent.click(
+      within(first).getByRole("button", { expanded: false }),
+    );
+    const editor = within(first).getByTestId("access_right_option_key2");
+    await waitFor(() => expect(editor).toBeVisible());
+    const description = within(editor).getByText("Can edit and share files");
+    await expect(getComputedStyle(description).color).toBe("rgb(90, 169, 208)");
+    await expect(getComputedStyle(description).fontSize).toBe("12px");
+    const panel = editor.closest('[data-testid="dropdown"]') as HTMLElement;
+    await expect(getComputedStyle(panel).backgroundColor).toBe(
+      "rgb(230, 243, 251)",
+    );
+    await expect(getComputedStyle(panel).borderTopLeftRadius).toBe("12px");
+  },
   parameters: {
     docs: {
       description: {
