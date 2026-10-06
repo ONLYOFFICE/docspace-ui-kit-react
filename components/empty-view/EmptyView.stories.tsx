@@ -1,7 +1,7 @@
 import React from "react";
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn, screen } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import EmptyRoomsLightSvg from "../../assets/emptyview/empty.rooms.root.light.svg";
 import CrossSvg from "../../assets/icons/12/cross.react.svg";
@@ -264,7 +264,9 @@ export const SuggestionCards: Story = {
 
     // A card with a model opens a menu of choices instead.
     await userEvent.click(canvas.getByRole("button", { name: "Upload files" }));
-    await expect(await screen.findByText("From this device")).toBeVisible();
+    // The menu fades in, so the item is found first and seen a moment later.
+    const device = await screen.findByText("From this device");
+    await waitFor(() => expect(device).toBeVisible());
 
     // A disabled card is not rendered at all.
     await expect(canvas.queryByText("Browse templates")).toBeNull();
