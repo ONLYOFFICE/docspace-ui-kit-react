@@ -3,6 +3,7 @@ import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { DateTime } from "luxon";
+import { expect, fn, waitFor, within } from "storybook/test";
 
 import { now } from "../../utils/date";
 
@@ -130,6 +131,20 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   return <div style={{ height: "500px" }}>{props.children}</div>;
 };
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// The time shown beside a picked day: hh:mm AM/PM on a 12-hour clock.
+const TWELVE_HOUR = /^\d{2}:\d{2} (AM|PM)$/;
+const TWENTY_FOUR_HOUR = /^\d{2}:\d{2}$/;
+
+// Opens the time editor from the time display.
+const openTimeEditor = async ({ canvas, userEvent }: PlayContext) => {
+  await userEvent.click(canvas.getByTestId("date-time-picker-time-display"));
+  await waitFor(() =>
+    expect(canvas.getByLabelText("Time picker")).toBeInTheDocument(),
+  );
+};
+
 // The date control hands over a timestamp, which the component does not parse.
 const fromControl = <T,>(value: T): T =>
   (typeof value === "number" ? new Date(value) : value) as T;
@@ -158,6 +173,39 @@ export const Default: Story = {
     id: "default-date-time-picker",
     hasError: false,
     translations: { AM: "AM", PM: "PM" },
+    onChange: fn(),
+  },
+  play: async (context) => {
+    const { args, canvas, userEvent } = context;
+    // Nothing chosen: only the "Select date" button, and no time.
+    // Two nested elements both have role="button" and the name
+    // "Select date"; the outer one owns the click and aria-expanded.
+    const select = canvas.getByTestId("date-selector");
+    await expect(
+      canvas.getAllByRole("button", { name: "Select date" }),
+    ).toHaveLength(2);
+    await expect(select).toHaveAttribute("aria-expanded", "false");
+    await expect(
+      canvas.queryByTestId("date-time-picker-time-display"),
+    ).toBeNull();
+
+    await userEvent.click(select);
+    await expect(select).toHaveAttribute("aria-expanded", "true");
+    const calendar = await canvas.findByTestId("calendar");
+    await userEvent.click(within(calendar).getByRole("button", { name: "15" }));
+
+    // The day is reported with a time, and the time appears beside it.
+    await waitFor(() => expect(args.onChange).toHaveBeenCalled());
+    const picked = (args.onChange as ReturnType<typeof fn>).mock
+      .lastCall?.[0] as DateTime;
+    await expect(picked.day).toBe(15);
+    await expect(
+      canvas.getByTestId("date-time-picker-time-display"),
+    ).toHaveTextContent(TWELVE_HOUR);
+
+    // The English clock has an AM/PM drop-down in the editor.
+    await openTimeEditor(context);
+    await expect(canvas.getByRole("button", { name: /AM|PM/ })).toBeVisible();
   },
   parameters: {
     docs: {
@@ -202,6 +250,15 @@ const WithErrorTemplate = () => {
 
 export const WithError: Story = {
   render: () => <WithErrorTemplate />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("date-time-picker")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    await expect(
+      canvas.getByTestId("date-time-picker-time-display"),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -245,6 +302,20 @@ const WithInitialDateTemplate = () => {
 
 export const WithInitialDate: Story = {
   render: () => <WithInitialDateTemplate />,
+  play: async (context) => {
+    const { canvas } = context;
+    // initialDate shows the day chip and the time from the first render.
+    await expect(canvas.getByTestId("selected-item")).toBeVisible();
+    const time = canvas.getByTestId("date-time-picker-time-display");
+    await expect(time).toHaveTextContent(TWELVE_HOUR);
+    // The spoken time is always on a 24-hour clock.
+    await expect(time.getAttribute("aria-label")).toMatch(
+      /^Current time: \d{2}:\d{2}$/,
+    );
+
+    await openTimeEditor(context);
+    await expect(canvas.getByRole("button", { name: /AM|PM/ })).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -288,6 +359,11 @@ const HiddenCrossTemplate = () => {
 
 export const HiddenCross: Story = {
   render: () => <HiddenCrossTemplate />,
+  play: async ({ canvas }) => {
+    // The day chip has no cross, so the day cannot be cleared.
+    const chip = canvas.getByTestId("selected-item");
+    await expect(within(chip).queryByTestId("icon-button")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -331,6 +407,15 @@ const TwentyFourHourClockTemplate = () => {
 
 export const TwentyFourHourClock: Story = {
   render: () => <TwentyFourHourClockTemplate />,
+  play: async (context) => {
+    const { canvas } = context;
+    // A non-English locale gives a 24-hour clock with no AM/PM control.
+    await expect(
+      canvas.getByTestId("date-time-picker-time-display"),
+    ).toHaveTextContent(TWENTY_FOUR_HOUR);
+    await openTimeEditor(context);
+    await expect(canvas.queryByRole("button", { name: /AM|PM/ })).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -386,11 +471,17 @@ export const CssCustomization: Story = {
         className="date-time-picker"
         id="css-customization-date-time-picker"
         hasError={false}
-        onChange={() => {}}
+        onChange={fn()}
         translations={{ AM: "AM", PM: "PM" }}
       />
     </div>
   ),
+  play: async ({ canvas }) => {
+    const time = canvas.getByTestId("date-time-picker-time-display");
+    await expect(getComputedStyle(time).backgroundColor).toBe(
+      "rgb(204, 229, 246)",
+    );
+  },
   parameters: {
     docs: {
       description: {
