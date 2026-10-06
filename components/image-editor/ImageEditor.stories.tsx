@@ -1,6 +1,7 @@
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 
 import { useCallback, useEffect, useState } from "react";
 
@@ -89,6 +90,12 @@ type Story = StoryObj<ComponentProps<typeof ImageEditor>>;
 
 export default meta;
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// The zoom row appears once the picture has been loaded as a File.
+const zoomSlider = ({ canvas }: PlayContext) =>
+  waitFor(() => canvas.getByRole("slider"));
+
 const ImageEditorDemo = ({
   editorBorderRadius,
   isDisabled,
@@ -164,6 +171,29 @@ export const Default: Story = {
     disableImageRescaling: false,
     editorBorderRadius: 8,
   },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await expect(
+      canvas.getByRole("region", { name: "Image editor" }),
+    ).toBeVisible();
+    await expect(canvas.getByTestId("change_image_button")).toHaveTextContent(
+      "choose another image",
+    );
+    // A URL source has no zoom row; the crop is reported as a preview.
+    await expect(canvas.queryByRole("slider")).toBeNull();
+    await waitFor(() =>
+      expect(canvas.getByRole("img", { name: "Preview" })).toBeVisible(),
+    );
+
+    // Choosing another image loads it as a File, which brings the zoom row.
+    const input = canvasElement.querySelector(
+      "#customFileInput",
+    ) as HTMLInputElement;
+    await userEvent.upload(
+      input,
+      new File(["png"], "photo.png", { type: "image/png" }),
+    );
+    await waitFor(() => expect(canvas.getByRole("slider")).toBeVisible());
+  },
   parameters: {
     docs: {
       description: {
@@ -198,6 +228,13 @@ export const ProfileAvatar: Story = {
     isDisabled: false,
     disableImageRescaling: false,
     editorBorderRadius: 400,
+  },
+  play: async ({ canvas }) => {
+    const cropper = canvas.getByTestId("image-cropper");
+    await expect(cropper.querySelector("canvas")).not.toBeNull();
+    await waitFor(() =>
+      expect(canvas.getByRole("img", { name: "Preview" })).toBeVisible(),
+    );
   },
   parameters: {
     docs: {
@@ -246,6 +283,16 @@ export const WithZoomControls: Story = {
     disableImageRescaling: false,
     editorBorderRadius: 8,
   },
+  play: async (context) => {
+    const { canvas, userEvent } = context;
+    const slider = await zoomSlider(context);
+    await expect(slider).toHaveValue("1");
+    // The buttons step the zoom by half.
+    await userEvent.click(canvas.getByTestId("zoom_in_icon_button"));
+    await waitFor(() => expect(slider).toHaveValue("1.5"));
+    await userEvent.click(canvas.getByTestId("zoom_out_icon_button"));
+    await waitFor(() => expect(slider).toHaveValue("1"));
+  },
   parameters: {
     docs: {
       description: {
@@ -273,6 +320,20 @@ export const DisabledState: Story = {
     disableImageRescaling: false,
     editorBorderRadius: 8,
   },
+  play: async (context) => {
+    const { canvas } = context;
+    const slider = await zoomSlider(context);
+    await expect(canvas.getByTestId("image-cropper")).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    await expect(slider).toBeDisabled();
+    await expect(canvas.getByTestId("zoom_in_icon_button")).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    await expect(slider).toHaveValue("1");
+  },
   parameters: {
     docs: {
       description: {
@@ -299,6 +360,13 @@ export const FixedFraming: Story = {
     isDisabled: false,
     disableImageRescaling: true,
     editorBorderRadius: 8,
+  },
+  play: async ({ canvas }) => {
+    // Even a File gets no zoom row: the framing is fixed.
+    await waitFor(() =>
+      expect(canvas.getByRole("img", { name: "Preview" })).toBeVisible(),
+    );
+    await expect(canvas.queryByRole("slider")).toBeNull();
   },
   parameters: {
     docs: {
