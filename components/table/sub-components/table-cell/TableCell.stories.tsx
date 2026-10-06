@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 
 import { TableCell } from "./TableCell";
 import { Avatar, AvatarRole, AvatarSize } from "../../../avatar";
@@ -73,6 +74,13 @@ type Story = StoryObj<ComponentProps<typeof TableCell>>;
 
 export default meta;
 
+// The swap on hover is CSS :hover, which a synthetic pointer does not set;
+// the plays check the cell at rest and with `checked`.
+const parts = (cell: HTMLElement) => ({
+  element: cell.querySelector(".table-container_element") as HTMLElement,
+  checkbox: cell.querySelector(".table-container_row-checkbox") as HTMLElement,
+});
+
 export const Default: Story = {
   render: (args) => <TableCell {...args} />,
   args: {
@@ -80,6 +88,11 @@ export const Default: Story = {
     children: "Cell Content",
     hasAccess: false,
     checked: false,
+  },
+  play: async ({ canvas }) => {
+    const cell = canvas.getByTestId("table-cell");
+    await expect(cell).toHaveTextContent("Cell Content");
+    await expect(cell).toHaveClass("custom-cell", "table-container_cell");
   },
   parameters: {
     docs: {
@@ -115,6 +128,11 @@ export const WithElement: Story = {
     className: "custom-cell",
     hasAccess: true,
     checked: false,
+  },
+  play: async ({ canvas }) => {
+    const { element, checkbox } = parts(canvas.getByTestId("table-cell"));
+    await expect(element).toBeVisible();
+    await expect(checkbox).not.toBeVisible();
   },
   parameters: {
     docs: {
@@ -156,6 +174,12 @@ export const WithElementChecked: Story = {
     hasAccess: true,
     checked: true,
   },
+  play: async ({ canvas }) => {
+    // Selected: the checkbox stays in place of the avatar.
+    const { element, checkbox } = parts(canvas.getByTestId("table-cell"));
+    await expect(checkbox).toBeVisible();
+    await expect(element).not.toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -195,6 +219,11 @@ export const WithElementNoAccess: Story = {
     className: "custom-cell",
     hasAccess: false,
     checked: false,
+  },
+  play: async ({ canvas }) => {
+    const { element, checkbox } = parts(canvas.getByTestId("table-cell"));
+    await expect(element).toBeVisible();
+    await expect(checkbox).not.toBeVisible();
   },
   parameters: {
     docs: {
