@@ -1,6 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 
 import { FloatingButton, FloatingButtonIcons } from ".";
 
@@ -139,10 +140,37 @@ type Story = StoryObj<ComponentProps<typeof FloatingButton>>;
 
 export default meta;
 
+// The ring, when drawn, is the first child of the circle.
+const ringOf = (button: HTMLElement) => {
+  const circle = button.querySelector(
+    "[data-testid='floating-button-progress']",
+  ) as HTMLElement;
+  return circle.children.length > 1
+    ? (circle.firstElementChild as HTMLElement)
+    : null;
+};
+
+// Every element under `root` whose background is the given colour.
+const paintedWith = (root: HTMLElement, color: string) =>
+  [root, ...root.querySelectorAll<HTMLElement>("*")].filter(
+    (el) => getComputedStyle(el).backgroundColor === color,
+  );
+
 export const Default: Story = {
   render: (args) => <FloatingButton {...args} />,
   args: {
     icon: FloatingButtonIcons.upload,
+    onClick: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const button = canvas.getByTestId("floating-button");
+    await expect(button).toHaveAttribute("aria-label", "upload button");
+    await expect(canvas.getByTestId("icon-upload")).toBeInTheDocument();
+    // No percent: the ring spins, with no progress value of its own.
+    const ring = ringOf(button);
+    await expect(ring?.style.getPropertyValue("--percent-percentage")).toBe("");
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -163,6 +191,12 @@ const WithProgressTemplate = () => {
 
 export const WithProgress: Story = {
   render: () => <WithProgressTemplate />,
+  play: async ({ canvas }) => {
+    const ring = ringOf(canvas.getByTestId("floating-button"));
+    await expect(ring?.style.getPropertyValue("--percent-percentage")).toBe(
+      "45%",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -182,6 +216,11 @@ const WithAlertTemplate = () => {
 
 export const WithAlert: Story = {
   render: () => <WithAlertTemplate />,
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByTestId("floating-button-alert-icon"),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -203,6 +242,12 @@ const CompletedTemplate = () => {
 
 export const Completed: Story = {
   render: () => <CompletedTemplate />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("floating-button").className).toMatch(
+      /completed/,
+    );
+    await expect(canvas.getByTestId("floating-button-tick-icon")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -222,6 +267,13 @@ const StoppedTemplate = () => {
 
 export const Stopped: Story = {
   render: () => <StoppedTemplate />,
+  play: async ({ canvas }) => {
+    // stopped wins over completed: a stop mark, no tick.
+    await expect(
+      canvas.getByTestId("floating-button-stopped-icon"),
+    ).toBeVisible();
+    await expect(canvas.queryByTestId("floating-button-tick-icon")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -299,6 +351,13 @@ const IconVariantsTemplate = () => {
 export const IconVariants: Story = {
   render: () => <IconVariantsTemplate />,
   decorators: [],
+  play: async ({ canvas }) => {
+    const buttons = canvas.getAllByTestId("floating-button");
+    await expect(buttons).toHaveLength(16);
+    await expect(buttons[0]).toHaveAttribute("aria-label", "upload button");
+    await expect(canvas.getByTestId("icon-trash")).toBeInTheDocument();
+    await expect(canvas.getByTestId("icon-arrow")).toBeInTheDocument();
+  },
   parameters: {
     docs: {
       description: {
@@ -331,6 +390,9 @@ export const WithoutProgress: Story = {
   render: () => (
     <FloatingButton icon={FloatingButtonIcons.upload} withoutProgress />
   ),
+  play: async ({ canvas }) => {
+    await expect(ringOf(canvas.getByTestId("floating-button"))).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -348,6 +410,13 @@ export const WithoutStatusBadge: Story = {
   render: () => (
     <FloatingButton icon={FloatingButtonIcons.move} completed withoutStatus />
   ),
+  play: async ({ canvas }) => {
+    // Finished, but no badge on the upper edge.
+    await expect(canvas.getByTestId("floating-button").className).toMatch(
+      /completed/,
+    );
+    await expect(canvas.queryByTestId("floating-button-alert")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -369,6 +438,12 @@ export const CustomColor: Story = {
       color="#2e8b57"
     />
   ),
+  play: async ({ canvas }) => {
+    const button = canvas.getByTestId("floating-button");
+    await expect(
+      paintedWith(button, "rgb(46, 139, 87)").length,
+    ).toBeGreaterThan(0);
+  },
   parameters: {
     docs: {
       description: {
@@ -389,6 +464,12 @@ const sampleIconUrl = `data:image/svg+xml;utf8,${encodeURIComponent(
 
 export const CustomIconImage: Story = {
   render: () => <FloatingButton iconUrl={sampleIconUrl} />,
+  play: async ({ canvas }) => {
+    // iconUrl replaces the built-in icon with a 20px image.
+    const img = canvas.getByRole("img", { name: "icon" });
+    await expect(img).toHaveAttribute("width", "20");
+    await expect(canvas.queryByTestId("icon-other")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -424,6 +505,12 @@ export const CssCustomization: Story = {
     </div>
   ),
   decorators: [],
+  play: async ({ canvas }) => {
+    const [upload] = canvas.getAllByTestId("floating-button");
+    await expect(
+      paintedWith(upload, "rgb(124, 58, 237)").length,
+    ).toBeGreaterThan(0);
+  },
   parameters: {
     docs: {
       description: {
