@@ -1,7 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fireEvent, fn, screen, waitFor, within } from "storybook/test";
 
 import type { FolderTileProps } from "./FolderTile.types";
 
@@ -17,19 +17,29 @@ import { TileContent } from "../tile-content";
 
 const element = <Folder32ReactSvg />;
 
+const onCopyOption = fn();
+const onBadgeClick = fn();
+
+// The menu is portalled and fades in.
+const menuItem = async (name: string) => {
+  const item = await screen.findByRole("menuitem", { name });
+  await waitFor(() => expect(item).toBeVisible());
+  return item;
+};
+
 const contextOptions = [
   {
     id: "option_copy-to",
     key: "copy-to",
     label: "Copy",
-    onClick: () => {},
+    onClick: onCopyOption,
     disabled: false,
   },
   {
     id: "option_move-to",
     key: "move-to",
     label: "Move to",
-    onClick: () => {},
+    onClick: fn(),
     disabled: false,
   },
 ];
@@ -45,7 +55,7 @@ const badges = (
       style={{
         width: "max-content",
       }}
-      onClick={() => {}}
+      onClick={onBadgeClick}
     />
   </div>
 );
@@ -255,6 +265,38 @@ export const Default: Story = {
     badges,
     getContextModel: () => contextOptions,
   },
+  beforeEach: () => {
+    onCopyOption.mockClear();
+    onBadgeClick.mockClear();
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const tile = canvas.getByTestId("tile");
+    const content = within(tile).getByText("Folder Content");
+
+    // A click selects the folder alone; Ctrl and Shift add to the selection.
+    await userEvent.click(content);
+    await expect(args.setSelection).toHaveBeenCalledWith([]);
+    await expect(args.onSelect).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ id: "folder-1" }),
+    );
+    fireEvent.click(content, { ctrlKey: true, detail: 1 });
+    await expect(args.withCtrlSelect).toHaveBeenCalledTimes(1);
+    fireEvent.click(content, { shiftKey: true, detail: 1 });
+    await expect(args.withShiftSelect).toHaveBeenCalledTimes(1);
+
+    // A badge is not a selection click.
+    const selections = (args.onSelect as ReturnType<typeof fn>).mock.calls
+      .length;
+    await userEvent.click(within(tile).getByText("1"));
+    await expect(onBadgeClick).toHaveBeenCalledTimes(1);
+    await expect(args.onSelect).toHaveBeenCalledTimes(selections);
+
+    fireEvent.contextMenu(tile, { button: 2 });
+    await expect(args.tileContextClick).toHaveBeenCalledWith(true);
+    await userEvent.click(await menuItem("Copy"));
+    await expect(onCopyOption).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -292,6 +334,14 @@ export const Big: Story = {
     temporaryIcon: <ImageReactSvg />,
     getContextModel: () => contextOptions,
   },
+  play: async ({ canvas }) => {
+    // A big folder gets a picture above its row.
+    const tile = canvas.getByTestId("tile");
+    const picture = within(tile).getByTestId("file-thumbnail");
+    await expect(picture.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+      within(tile).getByText("Folder Content").getBoundingClientRect().top,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -321,6 +371,13 @@ export const Checked: Story = {
     ...Default.args,
     checked: true,
   },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(tile.className).toMatch(/checked/);
+    await expect(
+      within(tile).getByRole("checkbox", { hidden: true }),
+    ).toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -348,6 +405,13 @@ export const InProgress: Story = {
     ...Default.args,
     inProgress: true,
   },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(
+      within(tile).queryByRole("checkbox", { hidden: true }),
+    ).toBeNull();
+    await expect(tile.querySelector('[class*="loader"]')).not.toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -373,6 +437,11 @@ export const WithHotkeyBorder: Story = {
   args: {
     ...Default.args,
     showHotkeyBorder: true,
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("tile").className).toMatch(
+      /showHotkeyBorder/,
+    );
   },
   parameters: {
     docs: {
@@ -400,6 +469,13 @@ export const RenamingState: Story = {
   args: {
     ...Default.args,
     isEdit: true,
+  },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(tile.className).toMatch(/isEdit/);
+    await expect(
+      within(tile).queryByRole("checkbox", { hidden: true }),
+    ).toBeNull();
   },
   parameters: {
     docs: {
@@ -429,6 +505,17 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The icon at the right-hand end, the name to its left.
+    const tile = canvas.getByTestId("tile");
+    const icon = (
+      tile.querySelector('[class*="iconContainer"]') as HTMLElement
+    ).getBoundingClientRect();
+    const name = within(tile)
+      .getByText("Folder Content")
+      .getBoundingClientRect();
+    await expect(icon.left).toBeGreaterThanOrEqual(name.right);
+  },
   args: {
     ...Default.args,
   },
@@ -453,6 +540,17 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const [folder, big] = canvas.getAllByTestId("tile");
+    await expect(getComputedStyle(folder).borderTopLeftRadius).toBe("16px");
+    // At rest the background shows on the big folder's picture block.
+    const top = big.querySelector('[class*="fileTileTop"]') as HTMLElement;
+    await expect(getComputedStyle(top).backgroundColor).toBe(
+      "rgb(244, 249, 253)",
+    );
+    const name = within(folder).getAllByText("My Folder")[0];
+    await expect(getComputedStyle(name).fontSize).toBe("13px");
+  },
   render: () => (
     <div
       style={
