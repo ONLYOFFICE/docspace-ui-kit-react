@@ -2,6 +2,7 @@ import type { ComponentProps, CSSProperties } from "react";
 import { useEffect, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import { Button, ButtonSize } from "../button";
 import { InputType, TextInput } from "../text-input";
@@ -318,11 +319,37 @@ const meta = {
         "The ModalDialog.Header, Body, Footer and Container slots; any other child is dropped",
     },
   },
+  args: {
+    onClose: fn(),
+    onBackClick: fn(),
+    onSubmit: fn(),
+  },
 } satisfies Meta<typeof ModalDialog>;
 
 type Story = StoryObj<ComponentProps<typeof ModalDialog>>;
 
 export default meta;
+
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// The dialog is always mounted, in a portal; closed, it is hidden.
+const dialog = () => screen.getByTestId("modal-dialog");
+
+const shown = () => waitFor(() => expect(dialog()).toBeVisible());
+const hidden = () => waitFor(() => expect(dialog()).not.toBeVisible());
+
+const open = async ({ canvas, userEvent }: PlayContext, label = "Show") => {
+  await userEvent.click(canvas.getByRole("button", { name: label }));
+  await shown();
+  return dialog();
+};
+
+const closeCross = (root: HTMLElement) =>
+  within(root).queryByTestId("aside_header_close_icon_button");
+
+// The layer around the dialog that a click on the dimmed page lands on.
+const backdropLayer = () =>
+  document.getElementById("modal-onMouseDown-close") as HTMLElement;
 
 const Template = ({ ...args }: ModalDialogProps) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -401,6 +428,36 @@ export const Default: Story = {
   args: {
     displayType: ModalDialogType.modal,
     children: <>test</>,
+  },
+  play: async (context) => {
+    const { args, userEvent } = context;
+    await expect(dialog()).not.toBeVisible();
+
+    const modal = await open(context);
+    await expect(modal).toHaveAttribute("aria-modal", "true");
+    await expect(within(modal).getByText("Change password")).toBeVisible();
+    await expect(within(modal).getAllByText(/^Section \d+$/)).toHaveLength(1);
+
+    // The cross, Escape and the dimmed page all close it through onClose.
+    await userEvent.click(closeCross(modal) as HTMLElement);
+    await hidden();
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
+
+    await open(context);
+    await userEvent.keyboard("{Escape}");
+    await hidden();
+    await expect(args.onClose).toHaveBeenCalledTimes(2);
+
+    await open(context);
+    await userEvent.click(backdropLayer());
+    await hidden();
+    await expect(args.onClose).toHaveBeenCalledTimes(3);
+
+    // A footer button closes it without onClose.
+    await open(context);
+    await userEvent.click(within(modal).getByRole("button", { name: "Send" }));
+    await hidden();
+    await expect(args.onClose).toHaveBeenCalledTimes(3);
   },
   parameters: {
     docs: {
@@ -496,6 +553,21 @@ export const AsideDisplay: Story = {
     displayType: ModalDialogType.aside,
     children: <>test</>,
   },
+  play: async (context) => {
+    const panel = await open(context, "Show Aside");
+    // Against the right edge of the window, 480px wide.
+    await waitFor(() =>
+      expect(
+        Math.abs(panel.getBoundingClientRect().right - window.innerWidth),
+      ).toBeLessThanOrEqual(1),
+    );
+    await expect(panel.getBoundingClientRect().width).toBe(480);
+    await expect(within(panel).getAllByText(/^Section \d+$/)).toHaveLength(20);
+    await context.userEvent.click(
+      within(panel).getByRole("button", { name: "Save" }),
+    );
+    await hidden();
+  },
   parameters: {
     docs: {
       description: {
@@ -522,6 +594,14 @@ export const LoadingState: Story = {
     isLoading: true,
     children: <>test</>,
   },
+  play: async (context) => {
+    const modal = await open(context);
+    // A skeleton in place of the header, body and footer.
+    await expect(within(modal).queryByText("Change password")).toBeNull();
+    await expect(
+      within(modal).getAllByTestId("rectangle-skeleton").length,
+    ).toBeGreaterThan(0);
+  },
   parameters: {
     docs: {
       description: {
@@ -545,6 +625,13 @@ export const AsideLoadingState: Story = {
     isLoading: true,
     children: <>test</>,
   },
+  play: async (context) => {
+    const panel = await open(context, "Show Aside");
+    await expect(within(panel).queryByText("Settings")).toBeNull();
+    await expect(
+      within(panel).getAllByTestId("rectangle-skeleton").length,
+    ).toBeGreaterThan(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -567,6 +654,10 @@ export const LargeModal: Story = {
     displayType: ModalDialogType.modal,
     isLarge: true,
     children: <>test</>,
+  },
+  play: async (context) => {
+    const modal = await open(context);
+    await expect(modal.getBoundingClientRect().width).toBe(520);
   },
   parameters: {
     docs: {
@@ -596,6 +687,13 @@ export const HugeModal: Story = {
     autoMaxHeight: true,
     children: <>test</>,
   },
+  play: async (context) => {
+    const modal = await open(context);
+    // Sized by its content, up to 730px.
+    const { width } = modal.getBoundingClientRect();
+    await expect(width).toBeGreaterThan(400);
+    await expect(width).toBeLessThanOrEqual(730);
+  },
   parameters: {
     docs: {
       description: {
@@ -623,6 +721,11 @@ export const AutoSizeModal: Story = {
     autoMaxHeight: true,
     children: <>test</>,
   },
+  play: async (context) => {
+    const modal = await open(context);
+    // The fixed 400px gives way to the width of the content.
+    await expect(modal.getBoundingClientRect().width).toBeGreaterThan(400);
+  },
   parameters: {
     docs: {
       description: {
@@ -645,6 +748,11 @@ export const WithFooterBorder: Story = {
     displayType: ModalDialogType.modal,
     withFooterBorder: true,
     children: <>test</>,
+  },
+  play: async (context) => {
+    const modal = await open(context);
+    const footer = modal.querySelector(".modal-footer") as HTMLElement;
+    await expect(getComputedStyle(footer).borderTopWidth).toBe("1px");
   },
   parameters: {
     docs: {
@@ -671,6 +779,21 @@ export const NonCloseable: Story = {
     displayType: ModalDialogType.modal,
     isCloseable: false,
     children: <>test</>,
+  },
+  play: async (context) => {
+    const { args, userEvent } = context;
+    const modal = await open(context);
+    await expect(closeCross(modal)).toBeNull();
+    // Neither Escape nor the dimmed page close it.
+    await userEvent.keyboard("{Escape}");
+    await userEvent.click(backdropLayer());
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await expect(modal).toBeVisible();
+    await expect(args.onClose).not.toHaveBeenCalled();
+    await userEvent.click(
+      within(modal).getByRole("button", { name: "Cancel" }),
+    );
+    await hidden();
   },
   parameters: {
     docs: {
@@ -699,6 +822,12 @@ export const AsideScrollLocked: Story = {
     isScrollLocked: true,
     children: <>test</>,
   },
+  play: async (context) => {
+    const panel = await open(context, "Show Aside");
+    const scroller = within(panel).getByTestId("scroller");
+    await expect(scroller.scrollHeight).toBeGreaterThan(scroller.clientHeight);
+    await expect(getComputedStyle(scroller).overflowY).toBe("hidden");
+  },
   parameters: {
     docs: {
       description: {
@@ -722,6 +851,17 @@ export const AsideWithBodyScroll: Story = {
     withBodyScroll: true,
     children: <>test</>,
   },
+  play: async (context) => {
+    const panel = await open(context, "Show Aside");
+    // The body scrolls inside the panel; header and footer stay.
+    const scroller = within(panel).getByTestId("scroller");
+    await expect(scroller.scrollHeight).toBeGreaterThan(scroller.clientHeight);
+    await expect(getComputedStyle(scroller).overflowY).not.toBe("hidden");
+    const footer = (
+      panel.querySelector(".modal-footer") as HTMLElement
+    ).getBoundingClientRect();
+    await expect(footer.bottom).toBeLessThanOrEqual(window.innerHeight + 1);
+  },
   parameters: {
     docs: {
       description: {
@@ -744,6 +884,15 @@ export const AsideNonCloseable: Story = {
     displayType: ModalDialogType.aside,
     isCloseable: false,
     children: <>test</>,
+  },
+  play: async (context) => {
+    const { args, userEvent } = context;
+    const panel = await open(context, "Show Aside");
+    await expect(closeCross(panel)).toBeNull();
+    await userEvent.keyboard("{Escape}");
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await expect(panel).toBeVisible();
+    await expect(args.onClose).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -770,6 +919,19 @@ export const WithBackButton: Story = {
     displayType: ModalDialogType.aside,
     isBackButton: true,
     children: <>test</>,
+  },
+  play: async (context) => {
+    const { args, userEvent } = context;
+    const panel = await open(context, "Show Aside");
+    await userEvent.click(
+      within(panel).getByTestId("aside_header_back_icon_button"),
+    );
+    await expect(args.onBackClick).toHaveBeenCalledTimes(1);
+    // Backspace outside a text field goes back too.
+    await userEvent.keyboard("{Backspace}");
+    await expect(args.onBackClick).toHaveBeenCalledTimes(2);
+    await expect(panel).toBeVisible();
+    await expect(args.onClose).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -799,6 +961,18 @@ export const BackdropClickDisabled: Story = {
     displayType: ModalDialogType.modal,
     closeOnBackdropClick: false,
     children: <>test</>,
+  },
+  play: async (context) => {
+    const { args, userEvent } = context;
+    const modal = await open(context);
+    await userEvent.click(backdropLayer());
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await expect(modal).toBeVisible();
+    await expect(args.onClose).not.toHaveBeenCalled();
+    // Escape still closes it.
+    await userEvent.keyboard("{Escape}");
+    await hidden();
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -878,6 +1052,22 @@ export const FormDialog: Story = {
     displayType: ModalDialogType.modal,
     withForm: true,
     children: <>test</>,
+  },
+  play: async (context) => {
+    const { args, userEvent } = context;
+    const modal = await open(context);
+    // Enter in the field submits.
+    await userEvent.type(
+      within(modal).getByPlaceholderText("Folder name"),
+      "Reports{Enter}",
+    );
+    await expect(args.onSubmit).toHaveBeenCalledTimes(1);
+    await hidden();
+    // So does the Save button.
+    await open(context);
+    await userEvent.click(within(modal).getByRole("button", { name: "Save" }));
+    await expect(args.onSubmit).toHaveBeenCalledTimes(2);
+    await hidden();
   },
   parameters: {
     docs: {
@@ -962,6 +1152,21 @@ export const TwoFooterRows: Story = {
     displayType: ModalDialogType.modal,
     isDoubleFooterLine: true,
     children: <>test</>,
+  },
+  play: async (context) => {
+    const modal = await open(context);
+    const main = within(modal)
+      .getByRole("button", { name: "Save and leave" })
+      .getBoundingClientRect();
+    const leave = within(modal)
+      .getByRole("button", { name: "Leave" })
+      .getBoundingClientRect();
+    const cancel = within(modal)
+      .getByRole("button", { name: "Cancel" })
+      .getBoundingClientRect();
+    // The main action on a row above the other two, which share one.
+    await expect(main.bottom).toBeLessThanOrEqual(leave.top);
+    await expect(leave.top).toBe(cancel.top);
   },
   parameters: {
     docs: {
@@ -1048,6 +1253,20 @@ export const AsideWithContainer: Story = {
     displayType: ModalDialogType.aside,
     children: <>test</>,
   },
+  play: async (context) => {
+    const { userEvent } = context;
+    const panel = await open(context, "Show Aside");
+    await userEvent.click(
+      within(panel).getByRole("button", { name: "Open details" }),
+    );
+    // The container replaces the header, body and footer.
+    await expect(
+      within(panel).getByText("Details replace the whole panel."),
+    ).toBeVisible();
+    await expect(within(panel).queryByText("Settings")).toBeNull();
+    await userEvent.click(within(panel).getByRole("button", { name: "Back" }));
+    await expect(within(panel).getByText("Settings")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -1083,6 +1302,21 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async (context) => {
+    const panel = await open(context, "Show Aside");
+    // Against the left edge; the close cross left of the back arrow.
+    await waitFor(() =>
+      expect(Math.abs(panel.getBoundingClientRect().left)).toBeLessThanOrEqual(
+        1,
+      ),
+    );
+    const back = within(panel)
+      .getByTestId("aside_header_back_icon_button")
+      .getBoundingClientRect();
+    await expect(
+      (closeCross(panel) as HTMLElement).getBoundingClientRect().right,
+    ).toBeLessThan(back.left);
+  },
   args: {
     displayType: ModalDialogType.aside,
     isBackButton: true,
@@ -1227,6 +1461,27 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const [modal, aside] = screen.getAllByTestId("modal-dialog");
+
+    await userEvent.click(canvas.getByRole("button", { name: "Show" }));
+    await waitFor(() => expect(modal).toBeVisible());
+    const box = getComputedStyle(modal);
+    await expect(box.backgroundColor).toBe("rgb(30, 27, 75)");
+    await expect(box.width).toBe("460px");
+    await expect(box.borderTopLeftRadius).toBe("16px");
+    await userEvent.click(
+      within(modal).getByRole("button", { name: "Cancel" }),
+    );
+    await waitFor(() => expect(modal).not.toBeVisible());
+
+    await userEvent.click(canvas.getByRole("button", { name: "Show Aside" }));
+    await waitFor(() => expect(aside).toBeVisible());
+    await expect(getComputedStyle(aside).width).toBe("360px");
+    await expect(getComputedStyle(aside).borderLeftColor).toBe(
+      "rgb(245, 158, 11)",
+    );
+  },
   parameters: {
     docs: {
       description: {
