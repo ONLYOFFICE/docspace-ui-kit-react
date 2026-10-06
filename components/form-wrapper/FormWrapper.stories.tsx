@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, within } from "storybook/test";
 
 import { Button, ButtonSize } from "../button";
 import { FieldContainer } from "../field-container";
@@ -52,6 +53,12 @@ export const Default: Story = {
       </div>
     ),
   },
+  play: async ({ canvas }) => {
+    const card = canvas.getByTestId("form-wrapper");
+    await expect(
+      within(card).getByRole("heading", { name: "Welcome" }),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -81,9 +88,11 @@ const SignInFormTemplate = (args: ComponentProps<typeof FormWrapper>) => {
         isVertical
         labelVisible
         labelText="Email"
+        labelFor="sign-in-email"
         style={fullWidth}
       >
         <TextInput
+          id="sign-in-email"
           type={InputType.email}
           size={InputSize.base}
           value={email}
@@ -95,9 +104,11 @@ const SignInFormTemplate = (args: ComponentProps<typeof FormWrapper>) => {
         isVertical
         labelVisible
         labelText="Password"
+        labelFor="sign-in-password"
         style={fullWidth}
       >
         <TextInput
+          id="sign-in-password"
           type={InputType.password}
           size={InputSize.base}
           value={password}
@@ -114,6 +125,26 @@ export const WithLoginForm: Story = {
   render: (args) => <SignInFormTemplate {...args} />,
   args: {
     children: null,
+  },
+  play: async ({ canvas, userEvent }) => {
+    // Each caption names its field.
+    const email = canvas.getByLabelText("Email");
+    await userEvent.type(email, "user@example.com");
+    await expect(email).toHaveValue("user@example.com");
+
+    const password = canvas.getByLabelText("Password");
+    await userEvent.type(password, "secret");
+    await expect(password).toHaveValue("secret");
+    await expect(password).toHaveAttribute("type", "password");
+
+    // scale stretches the controls across the card.
+    const card = canvas.getByTestId("form-wrapper");
+    const button = canvas.getByRole("button", { name: "Sign in" });
+    await expect(button.getBoundingClientRect().width).toBeCloseTo(
+      email.getBoundingClientRect().width,
+      0,
+    );
+    await expect(card).toContainElement(button);
   },
   parameters: {
     docs: {
@@ -158,9 +189,11 @@ const RegistrationFormTemplate = (args: ComponentProps<typeof FormWrapper>) => {
           isVertical
           labelVisible
           labelText={field.label}
+          labelFor={`register-${field.key}`}
           style={fullWidth}
         >
           <TextInput
+            id={`register-${field.key}`}
             type={field.type}
             size={InputSize.base}
             value={values[field.key]}
@@ -180,6 +213,19 @@ export const WithRegistrationForm: Story = {
   render: (args) => <RegistrationFormTemplate {...args} />,
   args: {
     children: null,
+  },
+  play: async ({ canvas }) => {
+    for (const label of [
+      "Full name",
+      "Email",
+      "Password",
+      "Confirm password",
+    ]) {
+      await expect(canvas.getByLabelText(label)).toBeVisible();
+    }
+    await expect(
+      canvas.getByRole("button", { name: "Create account" }),
+    ).toBeVisible();
   },
   parameters: {
     docs: {
@@ -232,6 +278,14 @@ export const CssCustomization: Story = {
       </FormWrapper>
     </div>
   ),
+  play: async ({ canvas }) => {
+    const card = canvas.getByTestId("form-wrapper");
+    const style = getComputedStyle(card);
+    await expect(style.backgroundColor).toBe("rgb(30, 27, 75)");
+    // The width variables size the content box; the padding is added on top.
+    await expect(style.width).toBe("400px");
+    await expect(style.paddingLeft).toBe("40px");
+  },
   parameters: {
     docs: {
       description: {
