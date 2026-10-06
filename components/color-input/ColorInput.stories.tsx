@@ -2,6 +2,7 @@ import type React from "react";
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import { InputSize } from "../text-input";
 import { globalColors } from "../../providers/theme";
@@ -89,6 +90,20 @@ type Story = StoryObj<ComponentProps<typeof ColorInput>>;
 
 export default meta;
 
+const statesChange = fn();
+
+const swatchOf = (field: HTMLElement) =>
+  field.querySelector<HTMLElement>('[class*="colorBlock"]') as HTMLElement;
+
+// The picker stays mounted while the drop-down is closed, so "open" means
+// the dialog is actually on screen.
+const shownPicker = () =>
+  screen
+    .queryAllByTestId("color-picker")
+    .find((picker) => picker.checkVisibility());
+
+const pickerShown = () => shownPicker() !== undefined;
+
 const Wrapper = (props: { children: React.ReactNode }) => {
   return (
     <div
@@ -118,6 +133,44 @@ export const Default: Story = {
     isDisabled: false,
     hasError: false,
     hasWarning: false,
+    handleChange: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const field = canvas.getByTestId("color-input");
+    const input = within(field).getByRole("textbox");
+    await expect(input).toHaveValue("#4781D1");
+
+    // A 3-digit prefix is already a complete code, so it is reported on
+    // the way to the 6-digit one.
+    await userEvent.clear(input);
+    await userEvent.type(input, "ff0000");
+    await expect(args.handleChange).toHaveBeenCalledWith("#ff0");
+    await expect(args.handleChange).toHaveBeenLastCalledWith("#FF0000");
+    await expect(input).toHaveValue("#FF0000");
+    await expect(swatchOf(field).style.getPropertyValue("--block-color")).toBe(
+      "#FF0000",
+    );
+
+    // The swatch opens the picker; its cross closes it.
+    await userEvent.click(swatchOf(field));
+    await waitFor(() => expect(pickerShown()).toBe(true));
+    const picker = shownPicker() as HTMLElement;
+    await expect(picker).toHaveAttribute("role", "dialog");
+
+    // A move in the picker reports a colour and repaints the field.
+    const hue = within(picker).getByRole("slider", { name: "Hue" });
+    const calls = (args.handleChange as ReturnType<typeof fn>).mock.calls;
+    const before = calls.length;
+    await userEvent.click(hue);
+    await expect(calls.length).toBeGreaterThan(before);
+    const picked = calls[calls.length - 1][0] as string;
+    await expect(picked).not.toBe("#FF0000");
+    await expect(input).toHaveValue(picked.toUpperCase());
+
+    await userEvent.click(
+      within(shownPicker() as HTMLElement).getByLabelText("Close color picker"),
+    );
+    await waitFor(() => expect(pickerShown()).toBe(false));
   },
   parameters: {
     docs: {
@@ -144,7 +197,7 @@ const SizesTemplate = () => {
           key={size}
           defaultColor={globalColors.lightBlueMain}
           size={size}
-          handleChange={(color) => console.log(`${size} color changed:`, color)}
+          handleChange={fn()}
         />
       ))}
     </Wrapper>
@@ -153,6 +206,20 @@ const SizesTemplate = () => {
 
 export const Sizes: Story = {
   render: () => <SizesTemplate />,
+  play: async ({ canvas }) => {
+    const widths = canvas
+      .getAllByRole("textbox")
+      .map((input) => input.getBoundingClientRect().width);
+    const heights = canvas
+      .getAllByRole("textbox")
+      .map((input) => input.getBoundingClientRect().height);
+    await expect(widths).toHaveLength(Object.values(InputSize).length);
+    // Each size is wider than the one before it; the height never changes.
+    for (let i = 1; i < widths.length; i += 1) {
+      await expect(widths[i]).toBeGreaterThan(widths[i - 1]);
+      await expect(heights[i]).toBe(heights[0]);
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -173,22 +240,22 @@ const StatesTemplate = () => {
     <Wrapper>
       <ColorInput
         defaultColor={globalColors.lightBlueMain}
-        handleChange={() => {}}
+        handleChange={statesChange}
       />
       <ColorInput
         defaultColor={globalColors.lightBlueMain}
         hasError
-        handleChange={() => {}}
+        handleChange={statesChange}
       />
       <ColorInput
         defaultColor={globalColors.lightBlueMain}
         hasWarning
-        handleChange={() => {}}
+        handleChange={statesChange}
       />
       <ColorInput
         defaultColor={globalColors.lightBlueMain}
         isDisabled
-        handleChange={() => {}}
+        handleChange={statesChange}
       />
     </Wrapper>
   );
@@ -196,6 +263,29 @@ const StatesTemplate = () => {
 
 export const States: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const [normal, error, warning, disabled] =
+      canvas.getAllByTestId("color-input");
+    const input = (field: HTMLElement) => within(field).getByRole("textbox");
+    await expect(input(normal)).not.toHaveAttribute("data-error");
+    await expect(input(error)).toHaveAttribute("data-error", "true");
+    await expect(input(warning)).toHaveAttribute("data-warning", "true");
+
+    // The disabled field takes no typing and its swatch no clicks.
+    await expect(input(disabled)).toBeDisabled();
+    await expect(getComputedStyle(swatchOf(disabled)).pointerEvents).toBe(
+      "none",
+    );
+    await expect(pickerShown()).toBe(false);
+
+    // The error state is only a border: the field still opens the picker.
+    await userEvent.click(swatchOf(error));
+    await waitFor(() => expect(pickerShown()).toBe(true));
+    await userEvent.click(
+      within(shownPicker() as HTMLElement).getByLabelText("Close color picker"),
+    );
+    await waitFor(() => expect(pickerShown()).toBe(false));
+  },
   parameters: {
     docs: {
       description: {
@@ -218,7 +308,7 @@ const ScaledTemplate = () => {
       <ColorInput
         defaultColor={globalColors.lightBlueMain}
         scale
-        handleChange={(color) => console.log("Color changed:", color)}
+        handleChange={fn()}
       />
     </div>
   );
@@ -226,6 +316,16 @@ const ScaledTemplate = () => {
 
 export const ScaledInput: Story = {
   render: () => <ScaledTemplate />,
+  play: async ({ canvas }) => {
+    const field = canvas.getByTestId("color-input");
+    const input = within(field).getByRole("textbox");
+    await expect(input).toHaveAttribute("data-scale", "true");
+    // The swatch stays at the end of the stretched field.
+    const swatch = swatchOf(field).getBoundingClientRect();
+    const box = input.getBoundingClientRect();
+    await expect(box.width).toBeGreaterThan(400);
+    await expect(swatch.right).toBeGreaterThan(box.right - 40);
+  },
   parameters: {
     docs: {
       description: {
@@ -260,13 +360,22 @@ const CssCustomizationTemplate = () => {
         } as CSSProperties
       }
     >
-      <ColorInput defaultColor="#0082c9" handleChange={() => {}} />
+      <ColorInput defaultColor="#0082c9" handleChange={fn()} />
     </div>
   );
 };
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    const field = canvas.getByTestId("color-input");
+    const swatch = getComputedStyle(swatchOf(field));
+    await expect(swatch.width).toBe("24px");
+    await expect(swatch.borderTopLeftRadius).toBe("6px");
+    const input = getComputedStyle(within(field).getByRole("textbox"));
+    await expect(input.height).toBe("36px");
+    await expect(input.borderTopColor).toBe("rgb(0, 130, 201)");
+  },
   parameters: {
     docs: {
       description: {
