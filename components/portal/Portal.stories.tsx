@@ -2,6 +2,7 @@ import type { ComponentProps, CSSProperties } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, screen } from "storybook/test";
 
 import { Button, ButtonSize } from "../button";
 import { Portal } from "./Portal";
@@ -59,6 +60,15 @@ export const Default: Story = {
     ),
     visible: true,
   },
+  play: async ({ canvas }) => {
+    // The content lands in the container named by appendTo.
+    const content = await canvas.findByText(
+      "This content is rendered in a portal",
+    );
+    await expect(content.parentElement).toHaveTextContent(
+      "Content outside portal",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -86,6 +96,10 @@ export const Hidden: Story = {
   args: {
     element: <div className={styles.popup}>You should not see this</div>,
     visible: false,
+  },
+  play: async () => {
+    // Not hidden but not mounted: nothing reaches the DOM anywhere.
+    await expect(screen.queryByText("You should not see this")).toBeNull();
   },
   parameters: {
     docs: {
@@ -125,6 +139,15 @@ const CustomContainerTemplate = () => {
 
 export const CustomContainer: Story = {
   render: () => <CustomContainerTemplate />,
+  play: async ({ canvas }) => {
+    const content = await canvas.findByText(
+      "Content rendered inside custom container",
+    );
+    await expect(content.parentElement).toHaveTextContent(
+      "Custom container (portal target)",
+    );
+    await expect(content.parentElement).not.toHaveTextContent("Main content");
+  },
   parameters: {
     docs: {
       description: {
@@ -185,6 +208,18 @@ const MultiplePortalsTemplate = () => {
 
 export const MultiplePortals: Story = {
   render: () => <MultiplePortalsTemplate />,
+  play: async ({ canvas }) => {
+    // Each portal is appended after the last.
+    const first = await canvas.findByText("First Portal");
+    const container = first.parentElement as HTMLElement;
+    const texts = Array.from(container.children).map((el) => el.textContent);
+    await expect(texts).toEqual([
+      "Multiple portals example",
+      "First Portal",
+      "Second Portal",
+      "Third Portal",
+    ]);
+  },
   parameters: {
     docs: {
       description: {
@@ -234,6 +269,21 @@ const ToggleVisibilityTemplate = () => {
 
 export const ToggleVisibility: Story = {
   render: () => <ToggleVisibilityTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.queryByText("Portal content")).toBeNull();
+
+    // Opened from outside, closed from inside.
+    await userEvent.click(canvas.getByRole("button", { name: "Show Portal" }));
+    await expect(await canvas.findByText("Portal content")).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Close" }));
+    await expect(canvas.queryByText("Portal content")).toBeNull();
+
+    // And closed from outside too.
+    await userEvent.click(canvas.getByRole("button", { name: "Show Portal" }));
+    await canvas.findByText("Portal content");
+    await userEvent.click(canvas.getByRole("button", { name: "Hide Portal" }));
+    await expect(canvas.queryByText("Portal content")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -266,6 +316,14 @@ const IntoDocumentBodyTemplate = () => (
 
 export const IntoDocumentBody: Story = {
   render: () => <IntoDocumentBodyTemplate />,
+  play: async ({ canvasElement }) => {
+    // Without appendTo the content leaves the story for document.body.
+    const content = await screen.findByText(
+      "Rendered at the end of the page body",
+    );
+    await expect(content.parentElement).toBe(document.body);
+    await expect(canvasElement).not.toContainElement(content);
+  },
   parameters: {
     docs: {
       // The fixed popup would cover the Docs page, so the story gets a frame.
@@ -314,6 +372,13 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    // The content picks up the variables set on the container it lands in.
+    const content = await canvas.findByText("Custom styled portal content");
+    await expect(getComputedStyle(content).backgroundColor).toBe(
+      "rgb(230, 243, 251)",
+    );
+  },
   parameters: {
     docs: {
       description: {
