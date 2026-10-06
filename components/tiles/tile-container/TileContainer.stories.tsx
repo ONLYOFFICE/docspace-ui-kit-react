@@ -1,6 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, within } from "storybook/test";
 
 import type { TileContainerProps } from "./TileContainer.types";
 
@@ -125,6 +126,10 @@ type Story = StoryObj<ComponentProps<typeof TileContainer>>;
 
 export default meta;
 
+// The container sorts its children into groups, each item in a wrapper.
+const items = (root: HTMLElement, kind: "file" | "folder") =>
+  Array.from(root.querySelectorAll<HTMLElement>(`.tile-item.${kind}`));
+
 const ContainerTemplate = (args: TileContainerProps) => {
   return (
     <TileContainer {...args}>
@@ -156,6 +161,11 @@ export const Default: Story = {
   args: {
     useReactWindow: false,
     headingFiles: "Files",
+  },
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvas.getByRole("heading", { name: "Files" })).toBeVisible();
+    await expect(items(canvasElement, "file")).toHaveLength(3);
+    await expect(items(canvasElement, "folder")).toHaveLength(0);
   },
   parameters: {
     docs: {
@@ -214,6 +224,19 @@ export const FoldersAndFiles: Story = {
     headingFolders: "Folders",
     headingFiles: "Files",
   },
+  play: async ({ canvas, canvasElement }) => {
+    await expect(items(canvasElement, "folder")).toHaveLength(2);
+    await expect(items(canvasElement, "file")).toHaveLength(2);
+    // Folders come first, whatever the order of the children.
+    const folders = canvas.getByRole("heading", { name: "Folders" });
+    const files = canvas.getByRole("heading", { name: "Files" });
+    await expect(folders.getBoundingClientRect().top).toBeLessThan(
+      files.getBoundingClientRect().top,
+    );
+    await expect(
+      within(items(canvasElement, "folder")[0]).getByText("Projects"),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -241,6 +264,15 @@ export const FoldersAndFiles: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas, canvasElement }) => {
+    const [first] = items(canvasElement, "file");
+    const grid = first.parentElement as HTMLElement;
+    await expect(getComputedStyle(grid).columnGap).toBe("32px");
+    const tile = getComputedStyle(within(first).getByTestId("tile"));
+    await expect(tile.backgroundColor).toBe("rgb(244, 249, 253)");
+    await expect(tile.borderTopLeftRadius).toBe("16px");
+    await expect(canvas.getAllByTestId("tile")).toHaveLength(3);
+  },
   render: () => (
     <div
       style={
