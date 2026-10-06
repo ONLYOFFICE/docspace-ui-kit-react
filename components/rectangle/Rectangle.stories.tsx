@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ComponentProps } from "react";
+import { expect } from "storybook/test";
 
 import { RectangleSkeleton } from ".";
 
@@ -125,11 +126,26 @@ type Story = StoryObj<ComponentProps<typeof RectangleSkeleton>>;
 
 export default meta;
 
+const boxOf = (svg: Element) => {
+  const { width, height } = svg.getBoundingClientRect();
+  return [Math.round(width), Math.round(height)];
+};
+
 export const Default: Story = {
   render: (args) => <RectangleSkeleton {...args} />,
   args: {
     width: "200px",
     height: "100px",
+  },
+  play: async ({ canvas }) => {
+    const svg = canvas.getByTestId("rectangle-skeleton");
+    await expect(boxOf(svg)).toEqual([200, 100]);
+    // Slightly rounded corners, on the shape inside the clip path (the
+    // first rect is the loader's own background), and the band sweeps.
+    await expect(svg.querySelector("clipPath rect")?.getAttribute("rx")).toBe(
+      "3",
+    );
+    await expect(svg.querySelector("animateTransform")).not.toBeNull();
   },
   parameters: {
     docs: {
@@ -150,6 +166,13 @@ export const SmallCircle: Story = {
     width: "40px",
     height: "40px",
     borderRadius: "50%",
+  },
+  play: async ({ canvas }) => {
+    const svg = canvas.getByTestId("rectangle-skeleton");
+    await expect(boxOf(svg)).toEqual([40, 40]);
+    await expect(svg.querySelector("clipPath rect")?.getAttribute("rx")).toBe(
+      "50%",
+    );
   },
   parameters: {
     docs: {
@@ -173,6 +196,13 @@ export const CustomColors: Story = {
     foregroundColor: "#f5f5f5",
     backgroundOpacity: 0.8,
     foregroundOpacity: 0.4,
+  },
+  play: async ({ canvas }) => {
+    const colors = Array.from(
+      canvas.getByTestId("rectangle-skeleton").querySelectorAll("stop"),
+    ).map((stop) => stop.getAttribute("stop-color"));
+    await expect(colors).toContain("#e0e0e0");
+    await expect(colors).toContain("#f5f5f5");
   },
   parameters: {
     docs: {
@@ -201,6 +231,13 @@ export const NoAnimation: Story = {
     height: "100px",
     animate: false,
   },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas
+        .getByTestId("rectangle-skeleton")
+        .querySelector("animateTransform"),
+    ).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -220,6 +257,14 @@ export const SlowAnimation: Story = {
     width: "200px",
     height: "100px",
     speed: 2.5,
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas
+        .getByTestId("rectangle-skeleton")
+        .querySelector("animateTransform")
+        ?.getAttribute("dur"),
+    ).toBe("2.5s");
   },
   parameters: {
     docs: {
@@ -251,6 +296,18 @@ export const Grid: Story = {
       <RectangleSkeleton width="100%" height="100px" />
     </div>
   ),
+  play: async ({ canvas }) => {
+    // Six cells in rows of three, each filling its cell.
+    const cells = canvas.getAllByTestId("rectangle-skeleton");
+    await expect(cells).toHaveLength(6);
+    const tops = new Set(cells.map((cell) => cell.getBoundingClientRect().top));
+    await expect(tops.size).toBe(2);
+    // Each placeholder keeps its own gradient id.
+    const ids = new Set(
+      cells.map((cell) => cell.querySelector("linearGradient")?.id),
+    );
+    await expect(ids.size).toBe(6);
+  },
   parameters: {
     docs: {
       description: {
@@ -303,6 +360,12 @@ export const CssCustomization: Story = {
       />
     </div>
   ),
+  play: async ({ canvas }) => {
+    const widths = canvas
+      .getAllByTestId("rectangle-skeleton")
+      .map((pill) => boxOf(pill)[0]);
+    await expect(widths).toEqual([280, 200, 160]);
+  },
   parameters: {
     docs: {
       description: {
