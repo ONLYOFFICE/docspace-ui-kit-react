@@ -3,6 +3,7 @@ import React from "react";
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import { Button } from "../button";
 import { DropDownItem } from "../drop-down-item";
@@ -259,6 +260,26 @@ type Story = StoryObj<ComponentProps<typeof DropDown>>;
 
 export default meta;
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// The menu stays mounted, in a portal; closed, it is hidden.
+const shownMenu = () =>
+  screen.getAllByTestId("dropdown").find((menu) => menu.checkVisibility());
+
+const openMenu = async ({ canvas, userEvent }: PlayContext, label: string) => {
+  const button = canvas.getByRole("button", { name: label });
+  await userEvent.click(button);
+  await waitFor(() => expect(shownMenu()).toBeDefined());
+  return { button, menu: shownMenu() as HTMLElement };
+};
+
+const menuClosed = () => waitFor(() => expect(shownMenu()).toBeUndefined());
+
+// An open menu in portal mode renders two backdrops; the click lands on the
+// one painted last.
+const clickOutside = (userEvent: PlayContext["userEvent"]) =>
+  userEvent.click(screen.getAllByTestId("backdrop").at(-1) as HTMLElement);
+
 const BasicTemplate = (args: ComponentProps<typeof DropDown>) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const parentRef = React.useRef<HTMLButtonElement>(null);
@@ -292,6 +313,26 @@ export const Default: Story = {
   args: {
     directionX: "right",
     directionY: "bottom",
+    clickOutsideAction: fn(),
+  },
+  play: async (context) => {
+    const { args, userEvent } = context;
+    await expect(shownMenu()).toBeUndefined();
+
+    const { button, menu } = await openMenu(context, "Open Dropdown");
+    await expect(within(menu).getAllByRole("option")).toHaveLength(3);
+    // Below the button, from its left edge.
+    await expect(menu.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+      button.getBoundingClientRect().bottom - 1,
+    );
+    await userEvent.click(within(menu).getByText("Option 2"));
+    await menuClosed();
+
+    // A click anywhere else closes it through clickOutsideAction.
+    await openMenu(context, "Open Dropdown");
+    await clickOutside(userEvent);
+    await menuClosed();
+    await expect(args.clickOutsideAction).toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -350,6 +391,15 @@ const WithHeadersTemplate = () => {
 
 export const WithHeadersAndSeparators: Story = {
   render: () => <WithHeadersTemplate />,
+  play: async (context) => {
+    const { menu } = await openMenu(context, "File Actions");
+    await expect(within(menu).getAllByRole("separator")).toHaveLength(2);
+    // A header is a caption: clicking it keeps the menu open.
+    await context.userEvent.click(within(menu).getByText("Edit"));
+    await expect(menu).toBeVisible();
+    await context.userEvent.click(within(menu).getByText("Rename"));
+    await menuClosed();
+  },
   parameters: {
     docs: {
       description: {
@@ -370,6 +420,9 @@ export const WithHeadersAndSeparators: Story = {
     },
   },
 };
+
+const onDisabledMove = fn();
+const onDisabledDelete = fn();
 
 const WithDisabledItemsTemplate = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -393,13 +446,13 @@ const WithDisabledItemsTemplate = () => {
         <DropDownItem label="Share" onClick={() => setIsOpen(false)} />
         <DropDownItem
           label="Move (no permission)"
-          onClick={() => {}}
+          onClick={onDisabledMove}
           disabled
         />
         <DropDownItem isSeparator />
         <DropDownItem
           label="Delete (no permission)"
-          onClick={() => {}}
+          onClick={onDisabledDelete}
           disabled
         />
       </DropDown>
@@ -409,6 +462,23 @@ const WithDisabledItemsTemplate = () => {
 
 export const WithDisabledItems: Story = {
   render: () => <WithDisabledItemsTemplate />,
+  beforeEach: () => {
+    onDisabledMove.mockClear();
+    onDisabledDelete.mockClear();
+  },
+  play: async (context) => {
+    const { menu } = await openMenu(context, "Actions Menu");
+    // Shown, but refusing the click.
+    const move = within(menu)
+      .getByText("Move (no permission)")
+      .closest('[role="option"]') as HTMLElement;
+    await expect(move).toHaveAttribute("aria-disabled", "true");
+    await context.userEvent.click(move);
+    await expect(onDisabledMove).not.toHaveBeenCalled();
+    await expect(menu).toBeVisible();
+    await context.userEvent.click(within(menu).getByText("Edit"));
+    await menuClosed();
+  },
   parameters: {
     docs: {
       description: {
@@ -463,6 +533,22 @@ const ScrollableTemplate = () => {
 
 export const ScrollableList: Story = {
   render: () => <ScrollableTemplate />,
+  play: async (context) => {
+    const { userEvent } = context;
+    const { menu } = await openMenu(context, "Long List");
+    await expect(getComputedStyle(menu).height).toBe("200px");
+    // Nothing is highlighted at first; the arrows move the highlight from
+    // the top, and Enter picks the highlighted option.
+    await expect(menu.querySelector('[class*="activeDescendant"]')).toBeNull();
+    await userEvent.keyboard("{ArrowDown}{ArrowDown}");
+    await waitFor(() =>
+      expect(
+        menu.querySelector('[class*="activeDescendant"]'),
+      ).toHaveTextContent("Option 2"),
+    );
+    await userEvent.keyboard("{Enter}");
+    await menuClosed();
+  },
   parameters: {
     docs: {
       description: {
@@ -576,6 +662,36 @@ const DirectionsTemplate = () => {
 
 export const DirectionVariants: Story = {
   render: () => <DirectionsTemplate />,
+  play: async (context) => {
+    const { userEvent } = context;
+    const placed = async (label: string) => {
+      const { button, menu } = await openMenu(context, label);
+      const at = {
+        button: button.getBoundingClientRect(),
+        menu: menu.getBoundingClientRect(),
+      };
+      await clickOutside(userEvent);
+      await menuClosed();
+      return at;
+    };
+
+    const bottomRight = await placed("Bottom Right");
+    await expect(bottomRight.menu.top).toBeGreaterThanOrEqual(
+      bottomRight.button.bottom - 1,
+    );
+    await expect(
+      Math.abs(bottomRight.menu.left - bottomRight.button.left),
+    ).toBeLessThanOrEqual(1);
+
+    const bottomLeft = await placed("Bottom Left");
+    await expect(
+      Math.abs(bottomLeft.menu.right - bottomLeft.button.right),
+    ).toBeLessThanOrEqual(1);
+
+    const topRight = await placed("Top Right");
+    await expect(topRight.menu.top).toBeLessThan(topRight.button.top);
+    await expect(topRight.menu.bottom).toBeLessThan(topRight.button.bottom);
+  },
   parameters: {
     docs: {
       description: {
@@ -625,6 +741,10 @@ const CustomWidthTemplate = () => {
 
 export const CustomWidth: Story = {
   render: () => <CustomWidthTemplate />,
+  play: async (context) => {
+    const { menu } = await openMenu(context, "Wide Dropdown");
+    await expect(menu.getBoundingClientRect().width).toBe(300);
+  },
   parameters: {
     docs: {
       description: {
@@ -672,6 +792,11 @@ const SeparatorsTemplate = () => {
 
 export const WithSeparators: Story = {
   render: () => <SeparatorsTemplate />,
+  play: async (context) => {
+    const { menu } = await openMenu(context, "Edit Menu");
+    await expect(within(menu).getAllByRole("separator")).toHaveLength(2);
+    await expect(within(menu).getAllByRole("option")).toHaveLength(6);
+  },
   parameters: {
     docs: {
       description: {
@@ -721,6 +846,14 @@ const RightToLeftTemplate = () => {
 
 export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
+  play: async ({ canvas }) => {
+    // Open from the start, lined up with the button's right edge.
+    await waitFor(() => expect(shownMenu()).toBeDefined());
+    const menu = (shownMenu() as HTMLElement).getBoundingClientRect();
+    const button = canvas.getByRole("button").getBoundingClientRect();
+    await expect(Math.abs(menu.right - button.right)).toBeLessThanOrEqual(1);
+    await expect(menu.width).toBe(200);
+  },
   globals: { direction: "rtl" },
   parameters: {
     layout: "fullscreen",
@@ -790,6 +923,14 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async (context) => {
+    const { menu } = await openMenu(context, "Dropdown trigger");
+    const box = getComputedStyle(menu);
+    await expect(box.backgroundColor).toBe("rgb(245, 243, 255)");
+    await expect(box.borderTopLeftRadius).toBe("12px");
+    await expect(box.borderTopColor).toBe("rgb(124, 58, 237)");
+    await expect(box.paddingTop).toBe("12px");
+  },
   parameters: {
     docs: {
       description: {
