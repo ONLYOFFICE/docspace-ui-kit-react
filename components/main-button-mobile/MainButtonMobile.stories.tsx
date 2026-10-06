@@ -1,6 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 
@@ -22,6 +23,7 @@ const actionOptions = [
     key: "2",
     label: "New presentation",
     icon: CatalogFolderReactSvgUrl,
+    onClick: fn().mockName("New presentation"),
   },
   {
     key: "3",
@@ -191,11 +193,30 @@ const meta = {
         "Ignored. The component keeps its own element ref; use `ref` to reach the button",
     },
   },
+  args: {
+    onClick: fn(),
+    onAlertClick: fn(),
+  },
 } satisfies Meta<typeof MainButtonMobile>;
 
 type Story = StoryObj<ComponentProps<typeof MainButtonMobile>>;
 
 export default meta;
+
+// The plus icon turns into a minus while the menu is open.
+const expectOpen = async (open: boolean) =>
+  waitFor(() =>
+    expect(
+      screen.getByTestId(open ? "icon-minus" : "icon-plus"),
+    ).toBeInTheDocument(),
+  );
+
+// The badge is an SVG with no name and no test id, found by its wrapper's
+// module class.
+const getAlertBadge = () =>
+  screen
+    .getByTestId("main-button-mobile")
+    .querySelector<SVGElement>('[class*="wrapperAlertIcon"] svg');
 
 export const Default: Story = {
   args: {
@@ -205,6 +226,27 @@ export const Default: Story = {
     style: cornerStyle,
     actionOptions,
     buttonOptions,
+  },
+  play: async ({ canvas, userEvent }) => {
+    const button = canvas.getByTestId("floating-button");
+    await expectOpen(false);
+
+    await userEvent.click(button);
+    await expectOpen(true);
+    // Both groups are listed.
+    await expect(await screen.findByText("New document")).toBeVisible();
+    await expect(screen.getByText("Upload files")).toBeVisible();
+
+    // Picking an item runs its handler and closes the menu.
+    await userEvent.click(screen.getByText("New presentation"));
+    await expect(actionOptions[1].onClick).toHaveBeenCalledTimes(1);
+    await expectOpen(false);
+
+    // A click on the backdrop closes it too.
+    await userEvent.click(button);
+    await expectOpen(true);
+    await userEvent.click(screen.getByTestId("backdrop"));
+    await expectOpen(false);
   },
   parameters: {
     docs: {
@@ -229,6 +271,17 @@ export const WithAlert: Story = {
     withAlertClick: true,
     style: cornerStyle,
     actionOptions,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const badge = getAlertBadge();
+    await expect(badge).toBeTruthy();
+    await userEvent.click(badge as SVGElement);
+    await expect(args.onAlertClick).toHaveBeenCalledTimes(1);
+
+    // The badge is hidden while the menu is open.
+    await userEvent.click(canvas.getByTestId("floating-button"));
+    await expectOpen(true);
+    await expect(getAlertBadge()).toBeFalsy();
   },
   parameters: {
     docs: {
@@ -275,6 +328,17 @@ export const WithSubmenu: Story = {
       },
     ],
   },
+  play: async ({ userEvent }) => {
+    // openByDefault expands the nested items in place.
+    await expect(await screen.findByText("From blank")).toBeVisible();
+    await expect(
+      screen.getByText("Keeps related files together"),
+    ).toBeVisible();
+
+    // The parent item folds them away again.
+    await userEvent.click(screen.getByText("New form"));
+    await waitFor(() => expect(screen.queryByText("From blank")).toBeNull());
+  },
   parameters: {
     docs: {
       description: {
@@ -307,6 +371,12 @@ export const WithoutMenu: Story = {
   args: {
     withMenu: false,
     style: cornerStyle,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // withMenu off: the click calls onClick and no menu opens.
+    await userEvent.click(canvas.getByTestId("floating-button"));
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    await expectOpen(false);
   },
   parameters: {
     docs: {
@@ -343,6 +413,13 @@ export const CssCustomization: Story = {
       />
     </div>
   ),
+  play: async () => {
+    // The size variable sizes the badge's box; the icon inside keeps the
+    // kit's small icon size.
+    const box = getAlertBadge()?.parentElement as HTMLElement;
+    await expect(getComputedStyle(box).width).toBe("14px");
+    await expect(getComputedStyle(box).top).toBe("8px");
+  },
   parameters: {
     docs: {
       description: {
