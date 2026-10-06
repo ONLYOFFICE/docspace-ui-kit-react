@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import type { ComponentProps, ReactElement } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import FolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
 
@@ -84,6 +84,9 @@ const meta = {
         "Inline style of the outermost element; its width is the width the tags share",
     },
   },
+  args: {
+    onSelectTag: fn(),
+  },
 } satisfies Meta<typeof Tags>;
 
 type Story = StoryObj<ComponentProps<typeof Tags>>;
@@ -95,6 +98,13 @@ export const Default: Story = {
   args: {
     tags: ["Design", "Development"],
     columnCount: 2,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByTestId("tag_item_Design"));
+    await expect(args.onSelectTag).toHaveBeenCalledWith(
+      expect.objectContaining({ label: "Design" }),
+    );
+    await expect(canvas.getByTestId("tag_item_Development")).toBeVisible();
   },
 };
 
@@ -114,6 +124,11 @@ export const MultipleTags: Story = {
   args: {
     tags: ["Draft", "Review", "Contract", "Invoice", "Archive"],
     columnCount: 5,
+  },
+  play: async ({ canvas }) => {
+    // Every tag fits, so there is no overflow tag.
+    await expect(canvas.getByTestId("tags").children).toHaveLength(5);
+    await expect(canvas.queryByTestId("tag_item_...")).toBeNull();
   },
   parameters: {
     docs: {
@@ -139,6 +154,32 @@ export const WithOverflow: Story = {
     tags: ["Tag1", "Tag2", "Tag3", "Tag4", "Tag5", "Tag6"],
     style: { width: "250px" },
     columnCount: 3,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // Three tags, then "..." for the rest.
+    await expect(canvas.getByTestId("tag_item_Tag3")).toBeVisible();
+    await expect(canvas.queryByTestId("tag_item_Tag4")).toBeNull();
+
+    await userEvent.click(canvas.getByLabelText("..."));
+    const entries = await screen.findAllByTestId("tag_dropdown_item");
+    await expect(entries.map((entry) => entry.textContent)).toEqual([
+      "Tag4",
+      "Tag5",
+      "Tag6",
+    ]);
+
+    // The entry's text takes no pointer events, so a click lands on the
+    // entry itself, which carries the label; the menu then closes.
+    await userEvent.click(entries[1]);
+    await expect(args.onSelectTag).toHaveBeenCalledWith(
+      expect.objectContaining({ label: "Tag5" }),
+    );
+    await waitFor(() => {
+      const open = screen
+        .queryAllByTestId("tag_dropdown_item")
+        .filter((entry) => entry.checkVisibility());
+      expect(open).toHaveLength(0);
+    });
   },
   parameters: {
     docs: {
@@ -168,6 +209,15 @@ export const WithTagObjects: Story = {
     ],
     columnCount: 3,
   },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("tag_item_Review")).toHaveTextContent(
+      "Review (3)",
+    );
+    // isThirdParty draws the icon alone; the label stays its name.
+    const storage = canvas.getByLabelText("Storage");
+    await expect(storage).not.toHaveTextContent("Storage");
+    await expect(storage.querySelector("svg")).not.toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -195,6 +245,11 @@ export const ShowAll: Story = {
     tags: ["Tag1", "Tag2", "Tag3", "Tag4", "Tag5"],
     columnCount: -1,
   },
+  play: async ({ canvas }) => {
+    // -1 draws every tag and no overflow tag.
+    await expect(canvas.getByTestId("tags").children).toHaveLength(5);
+    await expect(canvas.queryByLabelText("...")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -215,6 +270,16 @@ export const WithCreateTag: Story = {
     columnCount: 3,
     showCreateTag: true,
     onOptionTagClick: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // The plus tag comes last. Its label is empty, so it is found by
+    // its test id; it has no accessible name.
+    const row = canvas.getByTestId("tags");
+    const plus = row.lastElementChild as HTMLElement;
+    await expect(plus).toHaveAttribute("data-testid", "tag_item_");
+    await userEvent.click(plus);
+    await expect(args.onOptionTagClick).toHaveBeenCalledTimes(1);
+    await expect(args.onSelectTag).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -243,6 +308,12 @@ export const WithCustomOptionTag: Story = {
     columnCount: 2,
     onOptionTagClick: fn(),
     style: { width: "150px" },
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // With onOptionTagClick the overflow tag is a +N count with no menu.
+    await userEvent.click(canvas.getByLabelText("+1"));
+    await expect(args.onOptionTagClick).toHaveBeenCalledTimes(1);
+    await expect(screen.queryByTestId("tag_dropdown_item")).toBeNull();
   },
   parameters: {
     docs: {
@@ -283,6 +354,12 @@ export const CssCustomization: Story = {
     tags: ["Draft", "Review", "Contract", "Invoice"],
     columnCount: 3,
     style: { width: "200px" },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByLabelText("..."));
+    const [entry] = await screen.findAllByTestId("tag_dropdown_item");
+    const text = entry.firstElementChild as HTMLElement;
+    await expect(getComputedStyle(text).marginInlineStart).toBe("24px");
   },
   parameters: {
     docs: {
