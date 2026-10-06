@@ -1,6 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, waitFor } from "storybook/test";
 
 import { Scrollbar } from ".";
 
@@ -148,6 +149,18 @@ type Story = StoryObj<ComponentProps<typeof Scrollbar>>;
 
 export default meta;
 
+const part = (root: HTMLElement, className: string) =>
+  root.querySelector<HTMLElement>(`.${className}`) as HTMLElement;
+
+// A track is drawn only when its axis overflows.
+const isShown = (track: HTMLElement | null) =>
+  !!track && track.checkVisibility() && track.getBoundingClientRect().width > 0;
+
+const scrollTo = (scroller: HTMLElement, top: number) => {
+  scroller.scrollTop = top;
+  scroller.dispatchEvent(new Event("scroll"));
+};
+
 const LongContent = () => (
   <>
     <p>
@@ -183,6 +196,32 @@ export const Default: Story = {
   args: {
     style: { width: 300, height: 200 },
     autoHide: false,
+    onScroll: fn(),
+  },
+  play: async ({ args, canvas, canvasElement }) => {
+    const scroller = canvas.getByTestId("scroller");
+    const trackY = part(canvasElement, "track-vertical");
+    const thumbY = part(canvasElement, "thumb-vertical");
+    await expect(isShown(trackY)).toBe(true);
+    await expect(getComputedStyle(trackY).opacity).toBe("1");
+    await expect(isShown(part(canvasElement, "track-horizontal"))).toBe(false);
+    // The thumb is 4px until the pointer is over the track.
+    await expect(getComputedStyle(thumbY).width).toBe("4px");
+
+    // Scrolling the content moves the thumb and reports the native event.
+    const before = thumbY.getBoundingClientRect().top;
+    scrollTo(scroller, scroller.scrollHeight);
+    await waitFor(() =>
+      expect(thumbY.getBoundingClientRect().top).toBeGreaterThan(before),
+    );
+    await expect(args.onScroll).toHaveBeenCalled();
+    // The thumb reaches the bottom of the track.
+    await waitFor(() =>
+      expect(
+        trackY.getBoundingClientRect().bottom -
+          thumbY.getBoundingClientRect().bottom,
+      ).toBeLessThanOrEqual(5),
+    );
   },
   parameters: {
     docs: {
@@ -209,6 +248,16 @@ export const WithAutoHide: Story = {
     style: { width: 300, height: 200 },
     autoHide: true,
   },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const trackY = part(canvasElement, "track-vertical");
+    await expect(getComputedStyle(trackY).opacity).toBe("0");
+    // Moving the pointer over the content marks the tracks for showing;
+    // the CSS shows them under a real :hover, which a synthetic pointer
+    // does not set.
+    await userEvent.hover(canvas.getByTestId("scroll-body"));
+    const root = canvas.getByTestId("scrollbar");
+    await waitFor(() => expect(root.className).toMatch(/scrollVisible/));
+  },
   parameters: {
     docs: {
       description: {
@@ -234,6 +283,11 @@ export const WithFixedSize: Story = {
     style: { width: 300, height: 200 },
     autoHide: false,
     fixedSize: true,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(
+      getComputedStyle(part(canvasElement, "thumb-vertical")).width,
+    ).toBe("8px");
   },
   parameters: {
     docs: {
@@ -269,6 +323,17 @@ export const WithHorizontalScroll: Story = {
     style: { width: 300, height: 100 },
     autoHide: false,
   },
+  play: async ({ canvas, canvasElement }) => {
+    const scroller = canvas.getByTestId("scroller");
+    await expect(scroller.scrollWidth).toBeGreaterThan(scroller.clientWidth);
+    const trackX = part(canvasElement, "track-horizontal");
+    await expect(isShown(trackX)).toBe(true);
+    // Along the bottom edge.
+    await expect(
+      canvas.getByTestId("scrollbar").getBoundingClientRect().bottom -
+        trackX.getBoundingClientRect().bottom,
+    ).toBeLessThanOrEqual(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -296,6 +361,15 @@ export const WithBothScrollbars: Story = {
     style: { width: 300, height: 200 },
     autoHide: false,
   },
+  play: async ({ canvasElement }) => {
+    const trackY = part(canvasElement, "track-vertical");
+    const trackX = part(canvasElement, "track-horizontal");
+    await expect(isShown(trackY)).toBe(true);
+    await expect(isShown(trackX)).toBe(true);
+    // Each is 16px short, leaving the corner free.
+    await expect(trackY.getBoundingClientRect().height).toBe(184);
+    await expect(trackX.getBoundingClientRect().width).toBe(284);
+  },
   parameters: {
     docs: {
       description: {
@@ -321,6 +395,11 @@ export const WithPaddingAfterLastItem: Story = {
     style: { width: 300, height: 200 },
     autoHide: false,
     paddingAfterLastItem: "50px",
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      getComputedStyle(canvas.getByTestId("scroll-body")).paddingBottom,
+    ).toBe("50px");
   },
   parameters: {
     docs: {
@@ -348,6 +427,11 @@ export const WithPaddingInlineEnd: Story = {
     autoHide: false,
     paddingInlineEnd: "100px",
   },
+  play: async ({ canvas }) => {
+    await expect(
+      getComputedStyle(canvas.getByTestId("scroll-body")).paddingRight,
+    ).toBe("100px");
+  },
   parameters: {
     docs: {
       description: {
@@ -372,6 +456,18 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas, canvasElement }) => {
+    const box = canvas.getByTestId("scrollbar").getBoundingClientRect();
+    const trackY = part(
+      canvasElement,
+      "track-vertical",
+    ).getBoundingClientRect();
+    // The track is on the left edge, and the padding moves with it.
+    await expect(trackY.left - box.left).toBeLessThanOrEqual(1);
+    await expect(
+      getComputedStyle(canvas.getByTestId("scroll-body")).paddingLeft,
+    ).toBe("17px");
+  },
   args: {
     style: { width: 300, height: 200 },
     autoHide: false,
@@ -416,6 +512,17 @@ export const CssCustomization: Story = {
       </Scrollbar>
     </div>
   ),
+  play: async ({ canvas, canvasElement }) => {
+    const thumb = getComputedStyle(part(canvasElement, "thumb-vertical"));
+    await expect(thumb.backgroundColor).toBe("rgb(124, 58, 237)");
+    await expect(thumb.width).toBe("6px");
+    const track = getComputedStyle(part(canvasElement, "track-vertical"));
+    await expect(track.paddingTop).toBe("2px");
+    await expect(track.borderTopLeftRadius).toBe("4px");
+    await expect(
+      getComputedStyle(canvas.getByTestId("scroll-body")).paddingRight,
+    ).toBe("32px");
+  },
   parameters: {
     docs: {
       description: {
