@@ -1,7 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fireEvent, fn, screen, waitFor, within } from "storybook/test";
 
 import type { BaseTileProps } from "./BaseTile.types";
 
@@ -17,19 +17,29 @@ import { TileContent } from "../tile-content";
 
 const wordElement = <WordSvgUrl />;
 
+const onEditOption = fn();
+const onDeleteOption = fn();
+
+// The menu is portalled and fades in.
+const menuItem = async (name: string) => {
+  const item = await screen.findByRole("menuitem", { name });
+  await waitFor(() => expect(item).toBeVisible());
+  return item;
+};
+
 const contextOptions = [
   {
     id: "option_edit",
     key: "edit",
     label: "Edit",
-    onClick: () => {},
+    onClick: onEditOption,
     disabled: false,
   },
   {
     id: "option_delete",
     key: "delete",
     label: "Delete",
-    onClick: () => {},
+    onClick: onDeleteOption,
     disabled: false,
   },
 ];
@@ -223,6 +233,34 @@ export const Default: Story = {
     ),
     getContextModel: () => contextOptions,
   },
+  beforeEach: () => {
+    onDeleteOption.mockClear();
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const tile = canvas.getByTestId("tile");
+    await userEvent.hover(tile);
+    await expect(args.onHover).toHaveBeenCalled();
+
+    // The checkbox, shown in place of the icon on a CSS hover, reports the
+    // new state with the item.
+    const checkbox = within(tile).getByRole("checkbox", { hidden: true });
+    await userEvent.click(checkbox);
+    await expect(args.onSelect).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ id: "tile-1" }),
+    );
+    await expect(checkbox).toBeChecked();
+
+    await userEvent.click(within(tile).getByText("Document.docx"));
+    await expect(args.onRoomClick).toHaveBeenCalled();
+
+    // A right click opens the menu.
+    fireEvent.contextMenu(tile, { button: 2 });
+    await expect(args.tileContextClick).toHaveBeenCalledWith(true);
+    await userEvent.click(await menuItem("Delete"));
+    await expect(onDeleteOption).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(args.hideContextMenu).toHaveBeenCalled());
+  },
   parameters: {
     docs: {
       description: {
@@ -248,6 +286,13 @@ export const Checked: Story = {
   args: {
     ...Default.args,
     checked: true,
+  },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(tile.className).toMatch(/checked/);
+    await expect(
+      within(tile).getByRole("checkbox", { hidden: true }),
+    ).toBeChecked();
   },
   parameters: {
     docs: {
@@ -275,6 +320,9 @@ export const Active: Story = {
     ...Default.args,
     isActive: true,
   },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("tile").className).toMatch(/isActive/);
+  },
   parameters: {
     docs: {
       description: {
@@ -300,6 +348,14 @@ export const InProgress: Story = {
     ...Default.args,
     inProgress: true,
   },
+  play: async ({ canvas }) => {
+    // A loader in place of the icon and the checkbox.
+    const tile = canvas.getByTestId("tile");
+    await expect(
+      within(tile).queryByRole("checkbox", { hidden: true }),
+    ).toBeNull();
+    await expect(tile.querySelector('[class*="loader"]')).not.toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -324,6 +380,11 @@ export const WithHotkeyBorder: Story = {
   args: {
     ...Default.args,
     showHotkeyBorder: true,
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("tile").className).toMatch(
+      /showHotkeyBorder/,
+    );
   },
   parameters: {
     docs: {
@@ -359,6 +420,12 @@ export const WithBottomContent: Story = {
       </div>
     ),
   },
+  play: async ({ canvas }) => {
+    const details = canvas.getByText("Additional information");
+    await expect(details.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+      canvas.getByText("Document.docx").getBoundingClientRect().bottom,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -389,6 +456,15 @@ export const WithMenuButton: Story = {
       contextOptions: [],
     } as BaseTileProps["item"],
   },
+  play: async ({ args, canvas, userEvent }) => {
+    // The three-dot button opens the same menu.
+    const button = within(canvas.getByTestId("tile")).getByTestId(
+      "context-menu-button",
+    );
+    await userEvent.click(button);
+    await expect(await menuItem("Edit")).toBeVisible();
+    await expect(args.tileContextClick).toHaveBeenCalled();
+  },
   parameters: {
     docs: {
       description: {
@@ -414,6 +490,13 @@ export const RenamingState: Story = {
     ...Default.args,
     isEdit: true,
   },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(tile.className).toMatch(/isEdit/);
+    await expect(
+      within(tile).queryByRole("checkbox", { hidden: true }),
+    ).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -438,6 +521,12 @@ export const BlockingOperation: Story = {
   args: {
     ...Default.args,
     isBlockingOperation: true,
+  },
+  play: async ({ canvas }) => {
+    // The tile ignores the pointer altogether.
+    await expect(
+      getComputedStyle(canvas.getByTestId("tile")).pointerEvents,
+    ).toBe("none");
   },
   parameters: {
     docs: {
@@ -491,7 +580,7 @@ export const CssCustomization: Story = {
               <Link>Document.docx</Link>
             </TileContent>
           }
-          onSelect={() => {}}
+          onSelect={fn()}
           getContextModel={() => contextOptions}
         />
       </div>
@@ -510,6 +599,16 @@ export const CssCustomization: Story = {
       </div>
     </div>
   ),
+  play: async ({ canvas }) => {
+    const [first, second] = canvas.getAllByTestId("tile");
+    const tile = getComputedStyle(first);
+    await expect(tile.backgroundColor).toBe("rgb(230, 243, 251)");
+    await expect(tile.borderTopLeftRadius).toBe("16px");
+    await expect(tile.rowGap).toBe("12px");
+    await expect(getComputedStyle(second).borderTopColor).toBe(
+      "rgb(0, 48, 77)",
+    );
+  },
   parameters: {
     docs: {
       description: {
