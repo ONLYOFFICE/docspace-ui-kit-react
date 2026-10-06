@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { SelectionAreaProps } from "./SelectionArea.types";
 
 import { useState } from "react";
+import { expect, fireEvent, screen, waitFor } from "storybook/test";
 
 import { SelectionArea } from "./SelectionArea";
 import styles from "./SelectionArea.stories.module.scss";
@@ -113,6 +114,24 @@ const meta = {
 type Story = StoryObj<ComponentProps<typeof SelectionArea>>;
 
 export default meta;
+
+const centre = (el: Element) => {
+  const { left, top, width, height } = el.getBoundingClientRect();
+  return { x: left + width / 2, y: top + height / 2 };
+};
+
+// Presses on `from` and drags to `to`, the way the rectangle listens:
+// mouse-down on the element, mouse-moves on the document. Returns the
+// release, so a test can look at the rectangle while it is drawn.
+const drag = async (from: Element, to: { x: number; y: number }) => {
+  const start = centre(from);
+  fireEvent.mouseDown(from, { button: 0, clientX: start.x, clientY: start.y });
+  fireEvent.mouseMove(document, { clientX: to.x, clientY: to.y });
+  fireEvent.mouseMove(document, { clientX: to.x + 1, clientY: to.y + 1 });
+  return () => fireEvent.mouseUp(document);
+};
+
+const isSelected = (el: Element) => /selected/.test(el.className);
 
 const SelectionTemplate = ({
   gridClassName = styles.itemsContainer,
@@ -225,6 +244,30 @@ export const Default: Story = {
     ],
     isRooms: false,
   },
+  play: async () => {
+    const tile = (n: number) => screen.getByText(`Item ${n}`);
+    // A drag from tile 1 into tile 2 covers both, and nothing below.
+    const release = await drag(tile(1), centre(tile(2)));
+    await waitFor(() => expect(isSelected(tile(2))).toBe(true));
+    await expect(isSelected(tile(1))).toBe(true);
+    await expect(isSelected(tile(5))).toBe(false);
+    release();
+    await expect(screen.getByTestId("selection-area")).not.toBeVisible();
+
+    // A small drag inside one tile of the third column covers that tile
+    // only: the column arithmetic lands on the right one.
+    const releaseInside = await drag(tile(3), {
+      x: centre(tile(3)).x + 20,
+      y: centre(tile(3)).y + 20,
+    });
+    await waitFor(() => expect(isSelected(tile(3))).toBe(true));
+    await expect([1, 2, 4].map((n) => isSelected(tile(n)))).toEqual([
+      false,
+      false,
+      false,
+    ]);
+    releaseInside();
+  },
   parameters: {
     docs: {
       description: {
@@ -252,6 +295,17 @@ export const RowView: Story = {
   render: (args) => <SelectionTemplate {...args} />,
   args: {
     viewAs: "row",
+  },
+  play: async () => {
+    const row = (n: number) => screen.getByText(`Row ${n}`).parentElement!;
+    // Only the vertical extent counts: a drag from row 1 down to row 3,
+    // far to the side, covers rows 1 to 3.
+    const end = centre(row(3));
+    const release = await drag(row(1), { x: end.x + 300, y: end.y });
+    await waitFor(() => expect(isSelected(row(3))).toBe(true));
+    await expect([1, 2].map((n) => isSelected(row(n)))).toEqual([true, true]);
+    await expect(isSelected(row(5))).toBe(false);
+    release();
   },
   parameters: {
     docs: {
@@ -283,6 +337,18 @@ export const RightToLeft: Story = {
   globals: { direction: "rtl" },
   args: {
     ...Default.args,
+  },
+  play: async () => {
+    const tile = (n: number) => screen.getByText(`Item ${n}`);
+    // Under RTL the first tile is the rightmost; the mirrored column
+    // order still lands on it.
+    const release = await drag(tile(1), {
+      x: centre(tile(1)).x - 20,
+      y: centre(tile(1)).y + 20,
+    });
+    await waitFor(() => expect(isSelected(tile(1))).toBe(true));
+    await expect(isSelected(tile(4))).toBe(false);
+    release();
   },
   parameters: {
     docs: {
@@ -332,6 +398,21 @@ export const CssCustomization: Story = {
     countTilesInRow: 4,
     arrayTypes: [{ type: "item", itemHeight: 150, rowGap: 16 }],
     isRooms: false,
+  },
+  play: async () => {
+    // The rectangle shows only while a drag is under way.
+    const area = screen.getByTestId("selection-area");
+    await expect(area).not.toBeVisible();
+    const release = await drag(
+      screen.getByText("Item 1"),
+      centre(screen.getByText("Item 6")),
+    );
+    await waitFor(() => expect(area).toBeVisible());
+    await expect(getComputedStyle(area).backgroundColor).toBe(
+      "rgba(0, 130, 201, 0.25)",
+    );
+    release();
+    await expect(area).not.toBeVisible();
   },
   parameters: {
     docs: {
