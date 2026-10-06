@@ -1,7 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import { CategoryItem } from "./index";
 
@@ -74,6 +74,19 @@ export const Default: Story = {
     badgeLabel: "PRO",
     onClickLink: fn(),
   },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const link = canvas.getByRole("link", { name: "Category Title" });
+    await expect(link).toHaveAttribute("href", "#");
+    // Keep the test page where it is: the handler still runs, but the
+    // browser does not follow the link.
+    canvasElement.addEventListener("click", (e) => e.preventDefault(), {
+      once: true,
+    });
+    await userEvent.click(link);
+    await expect(args.onClickLink).toHaveBeenCalledTimes(1);
+    // No badge unless asked for.
+    await expect(canvas.queryByText("PRO")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -105,6 +118,9 @@ export const WithPaidBadge: Story = {
     badgeLabel: "PRO",
     onClickLink: fn(),
   },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("PRO")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -135,6 +151,12 @@ export const DisabledState: Story = {
     withPaidBadge: false,
     badgeLabel: "PRO",
     onClickLink: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // The title is no longer a link: no href, no handler.
+    await expect(canvas.queryByRole("link")).toBeNull();
+    await userEvent.click(canvas.getByText("Disabled Category"));
+    await expect(args.onClickLink).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -178,7 +200,7 @@ const AllVariantsTemplate = () => (
       url="#"
       withPaidBadge={false}
       badgeLabel=""
-      onClickLink={() => {}}
+      onClickLink={fn()}
     />
     <CategoryItem
       title="Security"
@@ -186,7 +208,7 @@ const AllVariantsTemplate = () => (
       url="#"
       withPaidBadge
       badgeLabel="PRO"
-      onClickLink={() => {}}
+      onClickLink={fn()}
     />
     <CategoryItem
       title="Backup"
@@ -195,13 +217,18 @@ const AllVariantsTemplate = () => (
       isDisabled
       withPaidBadge={false}
       badgeLabel=""
-      onClickLink={() => {}}
+      onClickLink={fn()}
     />
   </Wrapper>
 );
 
 export const AllVariants: Story = {
   render: () => <AllVariantsTemplate />,
+  play: async ({ canvas }) => {
+    const links = canvas.getAllByRole("link").map((link) => link.textContent);
+    await expect(links).toEqual(["General Settings", "Security"]);
+    await expect(canvas.getByText("Backup")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -236,6 +263,14 @@ export const RightToLeft: Story = {
     withPaidBadge: true,
     badgeLabel: "PRO",
     onClickLink: fn(),
+  },
+  play: async ({ canvas }) => {
+    // Under RTL the badge follows the title leftwards.
+    const title = canvas.getByRole("link");
+    const badge = canvas.getByText("PRO");
+    await expect(badge.getBoundingClientRect().right).toBeLessThanOrEqual(
+      title.getBoundingClientRect().left,
+    );
   },
   parameters: {
     noPadding: true,
@@ -278,7 +313,7 @@ export const CssCustomization: Story = {
         title="Files"
         subtitle="Manage files and storage settings"
         url="/settings/files"
-        onClickLink={() => {}}
+        onClickLink={fn()}
         withPaidBadge={false}
         badgeLabel=""
       />
@@ -286,13 +321,23 @@ export const CssCustomization: Story = {
         title="Security"
         subtitle="Configure passwords and two-factor authentication"
         url="/settings/security"
-        onClickLink={() => {}}
+        onClickLink={fn()}
         isDisabled
         withPaidBadge={false}
         badgeLabel=""
       />
     </div>
   ),
+  play: async ({ canvas }) => {
+    await expect(
+      getComputedStyle(canvas.getByRole("link", { name: "Files" })).color,
+    ).toBe("rgb(0, 130, 201)");
+    await expect(
+      getComputedStyle(
+        canvas.getByText("Configure passwords and two-factor authentication"),
+      ).color,
+    ).toBe("rgb(196, 196, 196)");
+  },
   parameters: {
     docs: {
       description: {
