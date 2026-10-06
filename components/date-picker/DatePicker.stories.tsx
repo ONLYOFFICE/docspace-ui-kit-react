@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { DateTime } from "luxon";
+import { expect, fn, within } from "storybook/test";
 
 import {
   addToDate,
@@ -125,6 +126,16 @@ type Story = StoryObj<ComponentProps<typeof DatePicker>>;
 
 export default meta;
 
+// A day of the shown month, not one of the greyed neighbours.
+const dayButton = (calendar: HTMLElement, day: number) =>
+  Array.from(calendar.querySelectorAll<HTMLButtonElement>("button.day")).find(
+    (button) =>
+      !/isSecondary/.test(button.className) &&
+      button.textContent === String(day),
+  ) as HTMLButtonElement;
+
+const chipText = (date: DateTime) => date.toFormat("dd MMM yyyy");
+
 const DatePickerWrapper = (props: { children: React.ReactNode }) => {
   return (
     <div style={{ height: "350px", padding: "20px" }}>{props.children}</div>
@@ -168,6 +179,45 @@ export const Default: Story = {
     minDate: createDateTime(1970, 1, 1),
     selectDateText: "Select date",
     showCalendarIcon: true,
+    onChange: fn(),
+  },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const today = now();
+    const selector = canvas.getByTestId("date-selector");
+    await expect(selector).toHaveAttribute("aria-expanded", "false");
+    await expect(canvas.queryByTestId("calendar")).toBeNull();
+
+    await userEvent.click(selector);
+    await expect(selector).toHaveAttribute("aria-expanded", "true");
+    const calendar = canvas.getByTestId("calendar");
+
+    // The days are buttons, so the keyboard picks one too.
+    const target = today.day === 15 ? 16 : 15;
+    dayButton(calendar, target).focus();
+    await userEvent.keyboard("{Enter}");
+    const picked = today.set({ day: target });
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(
+      (
+        (args.onChange as ReturnType<typeof fn>).mock.calls[0][0] as DateTime
+      ).toISODate(),
+    ).toBe(picked.toISODate());
+    await expect(canvas.queryByTestId("calendar")).toBeNull();
+    const chip = canvas.getByTestId("selected-item");
+    await expect(chip).toHaveTextContent(chipText(picked));
+    await expect(within(chip).getByTestId("calendar-icon")).toBeVisible();
+
+    // The chip reopens the calendar; a click elsewhere closes it.
+    await userEvent.click(canvas.getByTestId("selected-label"));
+    await expect(canvas.getByTestId("calendar")).toBeVisible();
+    await userEvent.click(canvasElement.ownerDocument.body);
+    await expect(canvas.queryByTestId("calendar")).toBeNull();
+
+    // The cross clears the date and brings the button back.
+    await userEvent.click(within(chip).getByTestId("icon-button"));
+    await expect(args.onChange).toHaveBeenLastCalledWith(null);
+    await expect(canvas.getByTestId("date-selector")).toBeVisible();
+    await expect(canvas.queryByTestId("calendar")).toBeNull();
   },
   parameters: {
     docs: {
@@ -207,6 +257,13 @@ const WithInitialDateTemplate = () => {
 
 export const WithInitialDate: Story = {
   render: () => <WithInitialDateTemplate />,
+  play: async ({ canvas }) => {
+    const chip = canvas.getByTestId("selected-item");
+    await expect(chip).toHaveTextContent(chipText(now()));
+    await expect(within(chip).getByTestId("calendar-icon")).toBeVisible();
+    await expect(within(chip).getByTestId("icon-button")).toBeVisible();
+    await expect(canvas.queryByTestId("date-selector")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -243,6 +300,20 @@ const FutureDatesOnlyTemplate = () => {
 
 export const FutureDatesOnly: Story = {
   render: () => <FutureDatesOnlyTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const today = now();
+    await userEvent.click(canvas.getByTestId("date-selector"));
+    const calendar = canvas.getByTestId("calendar");
+    await expect(dayButton(calendar, today.day)).toBeEnabled();
+    // Yesterday is out of range, or the way back is, on the first.
+    if (today.day > 1) {
+      await expect(dayButton(calendar, today.day - 1)).toBeDisabled();
+    } else {
+      await expect(
+        within(calendar).getByRole("button", { name: "Previous" }),
+      ).toBeDisabled();
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -277,6 +348,16 @@ const SpecificYearTemplate = () => {
 
 export const SpecificYearRange: Story = {
   render: () => <SpecificYearTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByTestId("date-selector"));
+    const calendar = canvas.getByTestId("calendar");
+    // openDate decides the month shown, not today.
+    await expect(calendar.querySelector("h2")).toHaveTextContent("June 2023");
+    await userEvent.click(dayButton(calendar, 20));
+    await expect(canvas.getByTestId("selected-item")).toHaveTextContent(
+      "20 Jun 2023",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -314,6 +395,11 @@ const WithoutCalendarIconTemplate = () => {
 
 export const WithoutCalendarIcon: Story = {
   render: () => <WithoutCalendarIconTemplate />,
+  play: async ({ canvas }) => {
+    const chip = canvas.getByTestId("selected-item");
+    await expect(chip).toHaveTextContent(chipText(now()));
+    await expect(within(chip).queryByTestId("calendar-icon")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -351,6 +437,19 @@ const WithoutClearButtonTemplate = () => {
 
 export const WithoutClearButton: Story = {
   render: () => <WithoutClearButtonTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const today = now();
+    const chip = canvas.getByTestId("selected-item");
+    await expect(within(chip).queryByTestId("icon-button")).toBeNull();
+
+    // The date can be replaced, though not removed.
+    await userEvent.click(canvas.getByTestId("selected-label"));
+    const target = today.day === 15 ? 16 : 15;
+    await userEvent.click(dayButton(canvas.getByTestId("calendar"), target));
+    await expect(canvas.getByTestId("selected-item")).toHaveTextContent(
+      chipText(today.set({ day: target })),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -390,6 +489,15 @@ const AlignedToRightEdgeTemplate = () => {
 
 export const AlignedToRightEdge: Story = {
   render: () => <AlignedToRightEdgeTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByTestId("date-selector"));
+    const calendar = canvas.getByTestId("calendar");
+    await expect(calendar.className).toMatch(/rightAligned/);
+    // The calendar stays inside the window.
+    await expect(calendar.getBoundingClientRect().right).toBeLessThanOrEqual(
+      window.innerWidth,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -434,6 +542,15 @@ const EndOfDayValueTemplate = () => {
 
 export const EndOfDayValue: Story = {
   render: () => <EndOfDayValueTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByText("Reported value: none")).toBeVisible();
+    await userEvent.click(canvas.getByTestId("date-selector"));
+    const target = now().day === 15 ? 16 : 15;
+    await userEvent.click(dayButton(canvas.getByTestId("calendar"), target));
+    await expect(canvas.getByText(/^Reported value:/)).toHaveTextContent(
+      /T23:59:59\.999/,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -468,6 +585,24 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    const picker = canvas.getByTestId("date-picker");
+    const chip = canvas.getByTestId("selected-item");
+    await expect(chip).toHaveTextContent("15 Mar 2026");
+    await expect(getComputedStyle(picker).direction).toBe("rtl");
+    // The chip starts at the right edge; the icon is on its right.
+    const box = picker.getBoundingClientRect();
+    await expect(box.right - chip.getBoundingClientRect().right).toBeLessThan(
+      2,
+    );
+    const icon = within(chip)
+      .getByTestId("calendar-icon")
+      .getBoundingClientRect();
+    const cross = within(chip)
+      .getByTestId("icon-button")
+      .getBoundingClientRect();
+    await expect(cross.right).toBeLessThan(icon.left);
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -542,6 +677,22 @@ export const CssCustomization: Story = {
       />
     </div>
   ),
+  play: async ({ canvas, userEvent }) => {
+    const chip = canvas.getByTestId("selected-item");
+    await expect(getComputedStyle(chip).backgroundColor).toBe(
+      "rgb(204, 229, 246)",
+    );
+    await expect(getComputedStyle(chip).borderTopLeftRadius).toBe("8px");
+
+    await userEvent.click(canvas.getByTestId("date-selector"));
+    const calendar = canvas.getByTestId("calendar");
+    await expect(getComputedStyle(calendar).backgroundColor).toBe(
+      "rgb(230, 243, 251)",
+    );
+    await expect(
+      within(calendar).getByRole("button", { name: "Previous" }),
+    ).toBeDisabled();
+  },
   parameters: {
     docs: {
       description: {
