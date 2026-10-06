@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { DateTime } from "luxon";
+import { expect, fn, within } from "storybook/test";
 
 import { now } from "../../utils/date";
 
@@ -151,6 +152,20 @@ type Story = StoryObj<ComponentProps<typeof Calendar>>;
 
 export default meta;
 
+const title = (calendar: HTMLElement) =>
+  calendar.querySelector("h2") as HTMLElement;
+
+// A day of the shown month, not one of the greyed neighbours.
+const dayButton = (calendar: HTMLElement, day: number) =>
+  Array.from(calendar.querySelectorAll<HTMLButtonElement>("button.day")).find(
+    (button) =>
+      !/isSecondary/.test(button.className) &&
+      button.textContent === String(day),
+  ) as HTMLButtonElement;
+
+const monthTitle = (date: DateTime, locale = "en") =>
+  date.setLocale(locale).toFormat("MMMM yyyy").toLowerCase();
+
 // The date control hands back a timestamp, which the component does not parse.
 const toDate = (value?: DateTime | Date | number) =>
   typeof value === "number" ? new Date(value) : value;
@@ -201,6 +216,67 @@ export const Default: Story = {
     maxDate: new Date(`${new Date().getFullYear() + 10}/01/01`),
     minDate: new Date("1970/01/01"),
     initialDate: new Date(),
+    onChange: fn(),
+    setSelectedDate: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const calendar = canvas.getByTestId("calendar");
+    const today = now();
+    await expect(title(calendar).textContent?.toLowerCase()).toBe(
+      monthTitle(today),
+    );
+    await expect(
+      calendar.querySelector('[class*="isCurrent"]'),
+    ).toHaveTextContent(String(today.day));
+
+    // Picking a day reports it to both callbacks and rings it.
+    const target = today.day === 15 ? 16 : 15;
+    await userEvent.click(dayButton(calendar, target));
+    await expect(args.setSelectedDate).toHaveBeenCalledTimes(1);
+    const picked = (args.setSelectedDate as ReturnType<typeof fn>).mock
+      .calls[0][0] as DateTime;
+    await expect(picked.toISODate()).toBe(
+      today.set({ day: target }).toISODate(),
+    );
+    await expect(args.onChange).toHaveBeenCalledWith(picked);
+    await expect(dayButton(calendar, target).className).toMatch(/focused/);
+
+    // The arrows page through months.
+    await userEvent.click(
+      within(calendar).getByRole("button", { name: "Next" }),
+    );
+    await expect(title(calendar).textContent?.toLowerCase()).toBe(
+      monthTitle(today.plus({ months: 1 })),
+    );
+    await userEvent.click(
+      within(calendar).getByRole("button", { name: "Previous" }),
+    );
+    await expect(title(calendar).textContent?.toLowerCase()).toBe(
+      monthTitle(today),
+    );
+
+    // The title opens the months, then the years; a year leads back to
+    // its months, and a month back to its days.
+    await userEvent.click(title(calendar));
+    await expect(title(calendar)).toHaveClass("months-header");
+    await userEvent.click(title(calendar));
+    await expect(title(calendar)).toHaveClass("years-header");
+    const nextYear = String(today.year + 1);
+    const year = Array.from(
+      calendar.querySelectorAll<HTMLButtonElement>("button.year"),
+    ).find((button) => button.textContent === nextYear) as HTMLElement;
+    await userEvent.click(year);
+    await expect(title(calendar)).toHaveClass("months-header");
+    await expect(title(calendar)).toHaveTextContent(nextYear);
+    const [january] =
+      calendar.querySelectorAll<HTMLButtonElement>("button.month");
+    await userEvent.click(january);
+    await expect(title(calendar)).toHaveClass("days-header");
+    await expect(title(calendar).textContent?.toLowerCase()).toBe(
+      monthTitle(today.set({ year: today.year + 1, month: 1 })),
+    );
+    // Browsing selects nothing.
+    await expect(args.setSelectedDate).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -238,6 +314,35 @@ const WithDateConstraintsTemplate = () => {
 
 export const WithDateConstraints: Story = {
   render: () => <WithDateConstraintsTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const calendar = canvas.getByTestId("calendar");
+    const today = now();
+    const previous = within(calendar).getByRole("button", { name: "Previous" });
+    const next = within(calendar).getByRole("button", { name: "Next" });
+
+    // The arrows stop at January and December of this year.
+    for (let month = today.month; month > 1; month -= 1) {
+      await userEvent.click(previous);
+    }
+    await expect(previous).toBeDisabled();
+    await expect(title(calendar).textContent?.toLowerCase()).toBe(
+      monthTitle(today.set({ month: 1 })),
+    );
+    for (let month = 1; month < 12; month += 1) {
+      await userEvent.click(next);
+    }
+    await expect(next).toBeDisabled();
+
+    // Only this year is enabled in the years view.
+    await userEvent.click(title(calendar));
+    await userEvent.click(title(calendar));
+    const enabled = Array.from(
+      calendar.querySelectorAll<HTMLButtonElement>("button.year"),
+    )
+      .filter((button) => !button.disabled)
+      .map((button) => button.textContent);
+    await expect(enabled).toEqual([String(today.year)]);
+  },
   parameters: {
     docs: {
       description: {
@@ -298,6 +403,17 @@ const LocaleExamplesTemplate = () => {
 
 export const LocaleExamples: Story = {
   render: () => <LocaleExamplesTemplate />,
+  play: async ({ canvas }) => {
+    const today = now();
+    const calendars = canvas.getAllByTestId("calendar");
+    await expect(calendars).toHaveLength(4);
+    // Each title is the month written in its own locale.
+    for (const [index, locale] of ["en", "ru", "de", "ja"].entries()) {
+      await expect(title(calendars[index]).textContent?.toLowerCase()).toBe(
+        monthTitle(today, locale),
+      );
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -331,6 +447,16 @@ const RightToLeftTemplate = () => {
 export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    const calendar = canvas.getByTestId("calendar");
+    await expect(getComputedStyle(calendar).direction).toBe("rtl");
+    // The title sits at the right edge, the arrows at the left.
+    const heading = title(calendar).getBoundingClientRect();
+    const next = within(calendar)
+      .getByRole("button", { name: "Next" })
+      .getBoundingClientRect();
+    await expect(next.right).toBeLessThan(heading.left);
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -401,6 +527,21 @@ export const CssCustomization: Story = {
         />
       </div>
     );
+  },
+  play: async ({ canvas }) => {
+    const calendar = canvas.getByTestId("calendar");
+    const box = getComputedStyle(calendar);
+    await expect(box.width).toBe("340px");
+    await expect(box.backgroundColor).toBe("rgb(230, 243, 251)");
+    await expect(box.borderTopLeftRadius).toBe("12px");
+    const current = calendar.querySelector('[class*="isCurrent"]') as Element;
+    await expect(getComputedStyle(current).backgroundColor).toBe(
+      "rgb(0, 130, 201)",
+    );
+    // minDate at the start of this month disables the way back.
+    await expect(
+      within(calendar).getByRole("button", { name: "Previous" }),
+    ).toBeDisabled();
   },
   parameters: {
     docs: {
