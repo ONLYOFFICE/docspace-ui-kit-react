@@ -566,7 +566,6 @@
   "SubscriptionWillBeAutomaticallyRenewed": "Subscription will be automatically renewed <1>on {{finalDate}}</1>",
   "SuccessfullySentMessage": "Your message was successfully sent. You will be contacted by the Sales Department.",
   "SuccessOperation": "{{operationName}}: Done",
-  "Support": "Support",
   "SwitchPlan": "You’re about to switch to the <1>{{planName}} plan</1>.",
   "SwitchToThumbnails": "Switch to thumbnails view",
   "SwitchViewToCompact": "Switch to compact view",

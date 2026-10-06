@@ -13,6 +13,19 @@ _Changed_ before upgrading.
   `React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>`. A handler declared
   to take only a mouse event no longer compiles, and one that reads `clientX` or `button` has
   to check which event it got
+- **`Article` and `ArticleLiveChat` drive the Zendesk widget through the messaging API, and
+  `zendeskEmail` and `chatDisplayName` are gone.** The portal's Zendesk account serves the
+  messaging Web Widget, which does not answer the Web Widget (Classic) `webWidget` commands the
+  live chat was sending - it throws "Method webWidget.hide does not exist" - so none of the
+  settings reached the widget. Every command now goes through `messenger`: the locale follows
+  `languageBaseName`, the widget opens on the left in RTL, its iframes sit at z-index 201
+  instead of its 999999, and the launcher is placed through `messenger:set customization` from
+  the same `FLOATING_CORNER_*` numbers as the create button, one button aside while a floating
+  button is on screen and clear of the docked info panel, and its iframe is scaled down to the
+  corner's 48px button size (Zendesk draws it 64px and has no setting for it). The launcher label, the colour and
+  the visitor prefill have no messaging API (they are Admin Center settings), so those calls
+  are gone, and with the prefill the two props that fed it; a caller still passing them gets a
+  type error. `Zendesk` no longer takes `config`: `window.zESettings` is read by Classic only
 - **`DocumentEditor`'s props are one of two shapes.** Either `documentServerUrl` with
   `config`, or `fileId` (with `fileVersion` and `isView` if wanted), in which case the wrapper
   fetches both from the portal behind the nearest `ApiProvider`, as it always did. The type

@@ -1,8 +1,8 @@
 {
   "entry": "index.ts",
   "package": "@onlyoffice/apps-ui-kit",
-  "total": 707,
-  "values": 460,
+  "total": 711,
+  "values": 464,
   "exports": {
     "ADMIN": {
       "kind": "variable",
@@ -701,6 +701,22 @@
     "Events": {
       "kind": "enum",
       "origin": "enums"
+    },
+    "FLOATING_CORNER_GAP": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "FLOATING_CORNER_INSET": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "FLOATING_CORNER_INSET_MOBILE": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "FLOATING_CORNER_SIZE": {
+      "kind": "variable",
+      "origin": "constants"
     },
     "FOLDER_FORM_VALIDATION": {
       "kind": "variable",
