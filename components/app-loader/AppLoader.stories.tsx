@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 
 import AppLoader from "./index";
 
@@ -20,6 +21,15 @@ export default meta;
 
 export const Default: Story = {
   render: () => <AppLoader />,
+  play: async ({ canvas }) => {
+    // The sheet is fixed to the viewport and covers the whole window.
+    const sheet = canvas.getByTestId("app-loader");
+    await expect(getComputedStyle(sheet).position).toBe("fixed");
+    const box = sheet.getBoundingClientRect();
+    await expect(box.width).toBe(window.innerWidth);
+    await expect(box.height).toBe(window.innerHeight);
+    await expect(sheet.firstElementChild).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -46,6 +56,11 @@ export const CssCustomization: Story = {
       <AppLoader />
     </div>
   ),
+  play: async ({ canvas }) => {
+    const style = getComputedStyle(canvas.getByTestId("app-loader"));
+    await expect(style.backgroundColor).toBe("rgb(230, 243, 251)");
+    await expect(style.zIndex).toBe("100");
+  },
   parameters: {
     docs: {
       description: {
