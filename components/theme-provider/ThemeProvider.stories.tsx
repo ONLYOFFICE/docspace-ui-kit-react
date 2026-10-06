@@ -2,6 +2,7 @@ import type { ComponentProps, ReactNode } from "react";
 import { useEffect, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, waitFor } from "storybook/test";
 
 import { Slider } from "../slider";
 import { Text } from "../text";
@@ -106,7 +107,7 @@ const DocumentState = () => {
       <Text>data-dir: {state.dir}</Text>
       <Text>body class: {state.bodyClass}</Text>
       <Text>accent: {state.accent}</Text>
-      <Slider min={0} max={100} value={60} withPouring onChange={() => {}} />
+      <Slider min={0} max={100} value={60} withPouring onChange={fn()} />
     </div>
   );
 };
@@ -119,6 +120,12 @@ const Template = (args: ComponentProps<typeof ThemeProviderComponent>) => (
   </AfterPreviewProvider>
 );
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// The panel reads back what the provider wrote onto the page.
+const readsBack = ({ canvas }: PlayContext, line: string | RegExp) =>
+  waitFor(() => expect(canvas.getByText(line)).toBeVisible());
+
 // Framed on Docs: the component writes to the whole document, so inline stories would overwrite each other.
 const framed = { inline: false, height: "250px" };
 
@@ -127,6 +134,14 @@ export const Default: Story = {
   args: {
     theme: defaultTheme,
     children: null,
+  },
+  play: async (context) => {
+    await readsBack(context, "data-theme: light");
+    await readsBack(context, "data-dir: ltr");
+    await readsBack(context, /^body class: .*\blight\b/);
+    await expect(getComputedStyle(document.body).fontFamily).toMatch(
+      /Open Sans/,
+    );
   },
   parameters: {
     noPadding: true,
@@ -153,6 +168,10 @@ export const DarkTheme: Story = {
     theme: { ...defaultTheme, isBase: false },
     children: null,
   },
+  play: async (context) => {
+    await readsBack(context, "data-theme: dark");
+    await readsBack(context, /^body class: .*\bdark\b/);
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -176,6 +195,9 @@ export const WithAccentColors: Story = {
     theme: defaultTheme,
     currentColorScheme: greenScheme,
     children: null,
+  },
+  play: async (context) => {
+    await readsBack(context, /^accent: #2DB482$/i);
   },
   parameters: {
     noPadding: true,
@@ -211,6 +233,10 @@ export const RightToLeft: Story = {
   args: {
     theme: { ...defaultTheme, interfaceDirection: "rtl" },
     children: null,
+  },
+  play: async (context) => {
+    await readsBack(context, "data-dir: rtl");
+    await readsBack(context, /^body class: .*\brtl\b/);
   },
   globals: { direction: "rtl" },
   parameters: {
