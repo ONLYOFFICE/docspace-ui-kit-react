@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import React, { useState } from "react";
-import { fn } from "storybook/test";
+import { expect, fn, within } from "storybook/test";
 
 import CatalogFolderReactSvg from "../../../assets/icons/16/catalog.folder.react.svg";
 
@@ -107,6 +107,21 @@ export const Default: Story = {
     convertSideInfo: true,
     onClick: fn(),
   },
+  play: async ({ args, canvas }) => {
+    // The later children are joined into one line; they are not shown.
+    await expect(canvas.getByTestId("tablet-side-info")).toHaveTextContent(
+      "Modified today | 24 KB | Version 2",
+    );
+    for (const side of canvas.getAllByTestId("side-container")) {
+      await expect(side).not.toBeVisible();
+    }
+    await expect(
+      within(canvas.getByTestId("tablet-side-info")).queryByRole("link"),
+    ).toBeNull();
+
+    canvas.getByText("Quarterly report.docx").click();
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -131,6 +146,13 @@ export const ElementAtTheEnd: Story = {
   args: {
     convertSideInfo: false,
   },
+  play: async ({ canvas }) => {
+    // The last child stays an element at the end of the joined text.
+    const line = canvas.getByTestId("tablet-side-info");
+    await expect(line).toHaveTextContent("Modified today | 24 KBVersion 2");
+    const version = within(line).getByText("Version 2");
+    await expect(version.closest("a")).not.toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -154,6 +176,11 @@ export const DetailsColour: Story = {
   render: (args) => <Template {...args} />,
   args: {
     sideColor: globalColors.gray,
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      getComputedStyle(canvas.getByTestId("tablet-side-info")).color,
+    ).toBe("rgb(163, 169, 174)");
   },
   parameters: {
     docs: {
@@ -194,6 +221,12 @@ const TitleOnlyTemplate = () => {
 
 export const TitleOnly: Story = {
   render: () => <TitleOnlyTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.queryByTestId("tablet-side-info")).toBeNull();
+    const checkbox = canvas.getByRole("checkbox");
+    await userEvent.click(checkbox);
+    await expect(checkbox).toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -224,6 +257,12 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // Joined in reverse, so the last detail comes first.
+    await expect(
+      canvas.getByTestId("tablet-side-info").textContent?.startsWith("24 KB"),
+    ).toBe(true);
+  },
   parameters: {
     noPadding: true,
     docs: {
