@@ -1,5 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, within } from "storybook/test";
 
 import { Loader } from ".";
 import { LoaderTypes } from "./Loader.enums";
@@ -88,6 +89,8 @@ type Story = StoryObj<ComponentProps<typeof Loader>>;
 
 export default meta;
 
+const widthOf = (el: Element) => Math.round(el.getBoundingClientRect().width);
+
 const Wrapper = (props: { children: React.ReactNode }) => {
   return (
     <div
@@ -128,6 +131,15 @@ export const Default: Story = {
     size: "18px",
     label: "Loading content, please wait...",
   },
+  play: async ({ canvas }) => {
+    // base renders the label as text at `size`, inside a busy wrapper.
+    await expect(canvas.getByTestId("loader")).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+    const text = canvas.getByText("Loading content, please wait...");
+    await expect(getComputedStyle(text).fontSize).toBe("18px");
+  },
   parameters: {
     docs: {
       description: {
@@ -149,6 +161,11 @@ export const Oval: Story = {
     color: globalColors.loaderLight,
     label: "Loading...",
   },
+  play: async ({ canvas }) => {
+    const oval = canvas.getByTestId("oval-loader");
+    await expect(oval).toHaveAttribute("aria-label", "Loading...");
+    await expect(widthOf(oval)).toBe(40);
+  },
   parameters: {
     docs: {
       description: {
@@ -169,6 +186,11 @@ export const DualRing: Story = {
     size: "40px",
     color: "#333333",
     label: "Loading...",
+  },
+  play: async ({ canvas }) => {
+    const ring = canvas.getByTestId("dual-ring-loader");
+    await expect(ring).toHaveAttribute("aria-label", "Loading...");
+    await expect(widthOf(ring)).toBe(40);
   },
   parameters: {
     docs: {
@@ -202,6 +224,12 @@ export const Rombs: Story = {
     size: "65px",
     label: "Loading...",
   },
+  play: async ({ canvas }) => {
+    // Three diamonds; rombs ignores label.
+    const rombs = canvas.getByTestId("rombs-loader");
+    await expect(rombs).toBeInTheDocument();
+    await expect(rombs).not.toHaveAttribute("aria-label");
+  },
   parameters: {
     docs: {
       description: {
@@ -221,6 +249,11 @@ export const Track: Story = {
     type: LoaderTypes.track,
     size: "30px",
     label: "Loading...",
+  },
+  play: async ({ canvas }) => {
+    const track = canvas.getByTestId("track-loader");
+    await expect(track).toHaveAttribute("aria-label", "Loading...");
+    await expect(widthOf(track)).toBe(30);
   },
   parameters: {
     docs: {
@@ -270,6 +303,18 @@ const AllTypesTemplate = () => {
 
 export const AllTypes: Story = {
   render: () => <AllTypesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getAllByTestId("loader")).toHaveLength(5);
+    for (const id of [
+      "oval-loader",
+      "dual-ring-loader",
+      "rombs-loader",
+      "track-loader",
+    ]) {
+      await expect(canvas.getByTestId(id)).toBeInTheDocument();
+    }
+    await expect(canvas.getByText("Base loader")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -320,6 +365,12 @@ const CustomColorsTemplate = () => {
 
 export const CustomColors: Story = {
   render: () => <CustomColorsTemplate />,
+  play: async ({ canvas }) => {
+    // color reaches the ring strokes.
+    const [orange] = canvas.getAllByTestId("dual-ring-loader");
+    const stroked = orange.querySelector("[stroke]") as Element;
+    await expect(getComputedStyle(stroked).stroke).toBe("rgb(255, 87, 34)");
+  },
   parameters: {
     docs: {
       description: {
@@ -369,6 +420,10 @@ const DifferentSizesTemplate = () => {
 
 export const DifferentSizes: Story = {
   render: () => <DifferentSizesTemplate />,
+  play: async ({ canvas }) => {
+    const widths = canvas.getAllByTestId("oval-loader").map(widthOf);
+    await expect(widths).toEqual([24, 40, 60]);
+  },
   parameters: {
     docs: {
       description: {
@@ -403,6 +458,16 @@ export const OnPrimaryButton: Story = {
     primary: true,
     id: "primary-track",
     label: "Saving",
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("track-loader")).toHaveAttribute(
+      "aria-label",
+      "Saving",
+    );
+    await expect(canvas.getByTestId("loader")).toHaveAttribute(
+      "id",
+      "primary-track",
+    );
   },
   parameters: {
     docs: {
@@ -443,6 +508,12 @@ const DisabledStateTemplate = () => {
 
 export const DisabledState: Story = {
   render: () => <DisabledStateTemplate />,
+  play: async ({ canvas }) => {
+    // The disabled track is dimmed to 60%.
+    const [enabled, disabled] = canvas.getAllByTestId("track-loader");
+    await expect(getComputedStyle(enabled).opacity).toBe("1");
+    await expect(getComputedStyle(disabled).opacity).toBe("0.6");
+  },
   parameters: {
     docs: {
       description: {
@@ -489,6 +560,14 @@ export const CssCustomization: Story = {
       />
     </div>
   ),
+  play: async ({ canvas }) => {
+    // --loader-size reaches every instance without a size of its own.
+    await expect(widthOf(canvas.getByTestId("oval-loader"))).toBe(50);
+    const disabled = within(canvas.getAllByTestId("loader")[3]).getByTestId(
+      "track-loader",
+    );
+    await expect(getComputedStyle(disabled).opacity).toBe("0.25");
+  },
   parameters: {
     docs: {
       description: {
