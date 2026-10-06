@@ -1,6 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 
 import { LoadingButton } from ".";
 
@@ -71,6 +72,23 @@ type Story = StoryObj<ComponentProps<typeof LoadingButton>>;
 
 export default meta;
 
+const ringsOf = (canvasElement: HTMLElement) =>
+  Array.from(
+    canvasElement.querySelectorAll<HTMLElement>(
+      "[data-testid='loading-button-container']",
+    ),
+  );
+
+// The progress is handed to the stylesheet as a custom property.
+const percentOf = (container: HTMLElement) =>
+  (container.firstElementChild as HTMLElement).style.getPropertyValue(
+    "--loading-button-percent",
+  );
+
+// The cross is the only SVG inside a ring.
+const hasCross = (container: HTMLElement) =>
+  container.querySelector("svg") !== null;
+
 const Wrapper = (props: { children: React.ReactNode }) => {
   return (
     <div
@@ -92,6 +110,15 @@ export const Default: Story = {
     percent: 0,
     inConversion: false,
     isDefaultMode: false,
+    onClick: fn(),
+  },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const [ring] = ringsOf(canvasElement);
+    await expect(percentOf(ring)).toBe("0");
+    await expect(hasCross(ring)).toBe(true);
+    // A click anywhere in the square, the cross included, cancels.
+    await userEvent.click(canvas.getByTestId("loading-button-container"));
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -130,6 +157,15 @@ const ProgressStagesTemplate = () => {
 
 export const ProgressStages: Story = {
   render: () => <ProgressStagesTemplate />,
+  play: async ({ canvasElement }) => {
+    await expect(ringsOf(canvasElement).map(percentOf)).toEqual([
+      "0",
+      "25",
+      "50",
+      "75",
+      "100",
+    ]);
+  },
   parameters: {
     docs: {
       description: {
@@ -159,6 +195,12 @@ const InConversionTemplate = () => {
 
 export const InConversion: Story = {
   render: () => <InConversionTemplate />,
+  play: async ({ canvasElement }) => {
+    // inConversion drops the cross from every ring.
+    const rings = ringsOf(canvasElement);
+    await expect(rings).toHaveLength(3);
+    await expect(rings.some(hasCross)).toBe(false);
+  },
   parameters: {
     docs: {
       description: {
@@ -184,6 +226,11 @@ const DefaultModeTemplate = () => {
 
 export const DefaultMode: Story = {
   render: () => <DefaultModeTemplate />,
+  play: async ({ canvasElement }) => {
+    const [ring] = ringsOf(canvasElement);
+    await expect(ring.className).toMatch(/defaultMode/);
+    await expect(percentOf(ring)).toBe("45");
+  },
   parameters: {
     docs: {
       description: {
@@ -214,6 +261,20 @@ const CustomColorsTemplate = () => {
 
 export const CustomColors: Story = {
   render: () => <CustomColorsTemplate />,
+  play: async ({ canvasElement }) => {
+    // loaderColor is handed to the ring as --circle-fill-color.
+    const colors = ringsOf(canvasElement).map((ring) =>
+      ring.style.getPropertyValue("--circle-fill-color"),
+    );
+    await expect(colors).toEqual(["#2DA7DB", "#4CAF50", "#FF5722", "#FF5722"]);
+    // backgroundColor tints the disc behind the cross.
+    const disc = ringsOf(canvasElement)[3].querySelector(
+      ".loading-button",
+    ) as HTMLElement;
+    await expect(getComputedStyle(disc).backgroundColor).toBe(
+      "rgb(255, 224, 214)",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -249,6 +310,14 @@ export const CssCustomization: Story = {
       <LoadingButton percent={30} isDefaultMode />
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const disc = ringsOf(canvasElement)[0].querySelector(
+      ".loading-button",
+    ) as HTMLElement;
+    await expect(getComputedStyle(disc).backgroundColor).toBe(
+      "rgb(237, 233, 254)",
+    );
+  },
   parameters: {
     docs: {
       description: {
