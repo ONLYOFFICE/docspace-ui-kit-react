@@ -1,6 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import AtReactSvgUrl from "../../assets/@.react.svg?url";
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
@@ -195,6 +195,11 @@ type Story = StoryObj<ComponentProps<typeof AvatarPure>>;
 
 export default meta;
 
+const widthOf = (el: Element) => Math.round(el.getBoundingClientRect().width);
+
+const badgeOf = (avatar: HTMLElement) =>
+  avatar.querySelector<HTMLElement>(".avatar_role-wrapper");
+
 const Wrapper = (props: { children: React.ReactNode }) => {
   return (
     <div
@@ -238,6 +243,14 @@ export const Default: Story = {
     tooltipContent: "",
     withTooltip: false,
   },
+  play: async ({ canvas }) => {
+    // Neither picture nor name: the camera icon, at the 124px max size.
+    const avatar = canvas.getByTestId("avatar");
+    await expect(widthOf(avatar)).toBe(124);
+    await expect(avatar.querySelector("img")).toBeNull();
+    await expect(avatar.querySelector("svg")).not.toBeNull();
+    await expect(badgeOf(avatar)).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -262,6 +275,16 @@ export const WithImage: Story = {
     hideRoleIcon: false,
     tooltipContent: "John Smith - Administrator",
     withTooltip: true,
+  },
+  play: async ({ canvas, userEvent }) => {
+    const avatar = canvas.getByTestId("avatar");
+    await expect(canvas.getByRole("img", { name: "avatar" })).toBeVisible();
+    // The admin badge opens its tooltip on hover.
+    const badge = badgeOf(avatar) as HTMLElement;
+    await userEvent.hover(badge);
+    await waitFor(() =>
+      expect(screen.getByText("John Smith - Administrator")).toBeVisible(),
+    );
   },
   parameters: {
     docs: {
@@ -293,6 +316,12 @@ export const WithInitials: Story = {
     editing: false,
     hideRoleIcon: false,
   },
+  play: async ({ canvas }) => {
+    // The first letters of the first two words; a guest has no badge.
+    const avatar = canvas.getByTestId("avatar");
+    await expect(avatar).toHaveTextContent(/^JD$/);
+    await expect(badgeOf(avatar)).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -315,10 +344,19 @@ export const WithIcon: Story = {
   args: {
     size: AvatarSize.max,
     role: AvatarRole.user,
-    source: AtReactSvgUrl,
+    // The avatar treats a source as an icon when the string contains
+    // ".svg"; Vite inlines this small file as a data URL, which does not, so
+    // the fragment gives it one without changing the image.
+    source: `${AtReactSvgUrl}#icon.svg`,
     userName: "",
     editing: false,
     hideRoleIcon: false,
+  },
+  play: async ({ canvas }) => {
+    // A .svg source is drawn as an icon, not as an <img>.
+    const avatar = canvas.getByTestId("avatar");
+    await expect(avatar.querySelector(".icon")).not.toBeNull();
+    await expect(avatar.querySelector("img")).toBeNull();
   },
   parameters: {
     docs: {
@@ -357,6 +395,12 @@ const AllSizesTemplate = () => {
 
 export const AllSizes: Story = {
   render: () => <AllSizesTemplate />,
+  play: async ({ canvas }) => {
+    const widths = canvas.getAllByTestId("avatar").map(widthOf);
+    await expect([...widths].sort((a, b) => a - b)).toEqual([
+      24, 32, 36, 40, 48, 80, 124,
+    ]);
+  },
   parameters: {
     docs: {
       description: {
@@ -400,6 +444,21 @@ const AllRolesTemplate = () => {
 
 export const AllRoles: Story = {
   render: () => <AllRolesTemplate />,
+  play: async ({ canvas }) => {
+    // Only Owner and Admin draw a badge.
+    const withBadge = canvas
+      .getAllByTestId("avatar")
+      .map((avatar) => badgeOf(avatar) !== null);
+    await expect(withBadge).toEqual([
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+    ]);
+  },
   parameters: {
     docs: {
       description: {
@@ -428,6 +487,11 @@ export const GroupAvatar: Story = {
     userName: "Project Team",
     isGroup: true,
     hideRoleIcon: true,
+  },
+  play: async ({ canvas }) => {
+    const avatar = canvas.getByTestId("avatar");
+    await expect(avatar).toHaveTextContent(/^PT$/);
+    await expect(avatar.querySelector("[data-is-group='true']")).not.toBeNull();
   },
   parameters: {
     docs: {
@@ -461,6 +525,18 @@ export const EditingMode: Story = {
     model: editModel,
     // Set so no onClick action is injected: one would replace the edit behaviour.
     onClick: undefined,
+    onChangeFile: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // No picture yet: a plus button, and a picked file reaches onChangeFile.
+    await expect(
+      canvas.getByTestId("edit_avatar_icon_button"),
+    ).toBeInTheDocument();
+    await userEvent.upload(
+      canvas.getByTestId("file-input"),
+      new File(["x"], "me.png", { type: "image/png" }),
+    );
+    await expect(args.onChangeFile).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -504,6 +580,16 @@ export const EditingWithAvatar: Story = {
     model: editModel,
     // Set so no onClick action is injected: one would replace the edit behaviour.
     onClick: undefined,
+    onChangeFile: fn(),
+  },
+  play: async ({ canvas, userEvent }) => {
+    // With a picture, the pencil opens the menu of model actions.
+    await userEvent.click(canvas.getByTestId("edit_avatar_icon_button"));
+    await waitFor(() =>
+      expect(screen.getByText("Upload picture")).toBeVisible(),
+    );
+    await userEvent.click(screen.getByText("Delete picture"));
+    await expect(editModel[1].onClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -568,6 +654,10 @@ export const WithCustomRoleIcon: Story = {
     ),
     hideRoleIcon: false,
   },
+  play: async ({ canvas }) => {
+    const badge = badgeOf(canvas.getByTestId("avatar"));
+    await expect(badge).toHaveTextContent("VIP");
+  },
   parameters: {
     docs: {
       description: {
@@ -595,6 +685,11 @@ export const DefaultSource: Story = {
     userName: "",
     isDefaultSource: true,
     hideRoleIcon: false,
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByTestId("avatar").querySelector("[data-is-default='true']"),
+    ).not.toBeNull();
   },
   parameters: {
     docs: {
@@ -642,6 +737,13 @@ const RightToLeftTemplate = () => {
 export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // Under RTL the badge sits in the bottom-left corner.
+    const [admin] = canvas.getAllByTestId("avatar");
+    const badge = (badgeOf(admin) as HTMLElement).getBoundingClientRect();
+    const box = admin.getBoundingClientRect();
+    await expect(badge.left - box.left).toBeLessThan(box.right - badge.right);
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -697,6 +799,16 @@ export const CssCustomization: Story = {
       <AvatarPure size={AvatarSize.big} role={AvatarRole.user} />
     </div>
   ),
+  play: async ({ canvas }) => {
+    const [initials] = canvas.getAllByTestId("avatar");
+    const painted = [initials, ...initials.querySelectorAll("*")].find(
+      (el) => getComputedStyle(el).backgroundColor === "rgb(124, 58, 237)",
+    ) as HTMLElement | undefined;
+    await expect(painted).toBeDefined();
+    await expect(getComputedStyle(painted as HTMLElement).borderRadius).toBe(
+      "8px",
+    );
+  },
   parameters: {
     docs: {
       description: {
