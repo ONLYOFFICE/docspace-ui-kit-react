@@ -1,6 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fireEvent, fn, screen, waitFor } from "storybook/test";
 
 import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
 
@@ -148,10 +149,52 @@ const defaultArgs: ComponentProps<typeof Dropzone> = {
   exstsText: "Supported file types: PDF, DOC, DOCX",
   accept: [".pdf", ".doc", ".docx"],
   maxFiles: 0,
+  onDrop: fn(),
+  onDropRejected: fn(),
+  onSingleUploadError: fn(),
 };
+
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+const pdf = (name: string) =>
+  new File(["%PDF"], name, { type: "application/pdf" });
+
+// userEvent.upload drops a file the input's accept refuses before the
+// component sees it, so files are set on the input directly instead.
+// Defined rather than assigned: after an upload, userEvent leaves `files`
+// as a getter-only property on the element.
+const chooseUnchecked = (input: HTMLInputElement, files: File[]) => {
+  const dataTransfer = new DataTransfer();
+  for (const file of files) dataTransfer.items.add(file);
+  Object.defineProperty(input, "files", {
+    value: dataTransfer.files,
+    configurable: true,
+  });
+  fireEvent.change(input);
+};
+
+const getInput = ({ canvas }: PlayContext) =>
+  canvas.getByTestId("dropzone-input") as HTMLInputElement;
 
 export const Default: Story = {
   args: defaultArgs,
+  play: async (context) => {
+    const { args, canvas, userEvent } = context;
+    // The area is a focusable button named for its purpose.
+    const area = canvas.getByRole("button", { name: "File upload area" });
+    await expect(area).toHaveAttribute("tabindex", "0");
+
+    await userEvent.upload(getInput(context), pdf("report.pdf"));
+    await waitFor(() => expect(args.onDrop).toHaveBeenCalledTimes(1));
+    await expect(args.onDrop).toHaveBeenCalledWith([expect.any(File)]);
+
+    // A file of another type is refused and reported.
+    chooseUnchecked(getInput(context), [
+      new File(["x"], "notes.txt", { type: "text/plain" }),
+    ]);
+    await waitFor(() => expect(args.onDropRejected).toHaveBeenCalledTimes(1));
+    await expect(args.onDrop).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -177,6 +220,14 @@ export const Loading: Story = {
     ...defaultArgs,
     isLoading: true,
   },
+  play: async ({ canvas }) => {
+    // A loader replaces the whole area: nothing to click or drop on.
+    await expect(canvas.getByTestId("dropzone")).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+    await expect(canvas.queryByTestId("dropzone-input-area")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -200,6 +251,19 @@ export const Disabled: Story = {
   args: {
     ...defaultArgs,
     isDisabled: true,
+  },
+  play: async (context) => {
+    const { canvas } = context;
+    await expect(canvas.getByTestId("dropzone")).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    // The input is disabled and the area leaves the tab order.
+    await expect(getInput(context)).toBeDisabled();
+    await expect(canvas.getByTestId("dropzone-input-area")).not.toHaveAttribute(
+      "tabindex",
+      "0",
+    );
   },
   parameters: {
     docs: {
@@ -227,6 +291,13 @@ export const SingleFileUpload: Story = {
     maxFiles: 1,
     linkMainText: "Upload single file",
     linkSecondaryText: "or drag it here",
+  },
+  play: async (context) => {
+    const { args } = context;
+    // Two files against maxFiles 1: the drop is refused whole.
+    chooseUnchecked(getInput(context), [pdf("a.pdf"), pdf("b.pdf")]);
+    await waitFor(() => expect(args.onDropRejected).toHaveBeenCalledTimes(1));
+    await expect(args.onDrop).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -258,6 +329,17 @@ export const ImageUpload: Story = {
     linkSecondaryText: "or drag them here",
     exstsText: "Supported file types: PNG, JPG, JPEG, GIF",
   },
+  play: async (context) => {
+    const { args, userEvent } = context;
+    await userEvent.upload(
+      getInput(context),
+      new File(["x"], "photo.png", { type: "image/png" }),
+    );
+    await waitFor(() => expect(args.onDrop).toHaveBeenCalledTimes(1));
+
+    chooseUnchecked(getInput(context), [pdf("report.pdf")]);
+    await waitFor(() => expect(args.onDropRejected).toHaveBeenCalledTimes(1));
+  },
   parameters: {
     docs: {
       description: {
@@ -286,6 +368,15 @@ export const FolderUpload: Story = {
     linkMainText: "Click to upload folder",
     linkSecondaryText: "or drag and drop folders here",
     exstsText: "Upload entire folders with their structure",
+  },
+  play: async (context) => {
+    const { canvas } = context;
+    // Folder mode: a directory picker, no format line.
+    await expect(
+      canvas.getByRole("button", { name: "Folder upload area" }),
+    ).toBeVisible();
+    await expect(getInput(context)).toHaveAttribute("webkitdirectory");
+    await expect(canvas.queryByTestId("dropzone-file-types")).toBeNull();
   },
   parameters: {
     docs: {
@@ -348,6 +439,18 @@ export const SingleFileOnly: Story = {
     linkSecondaryText: "or drag file here",
     exstsText: "Only one file can be uploaded at a time",
   },
+  play: async (context) => {
+    const { args, userEvent } = context;
+    // Two files with isMultipleUpload off: onSingleUploadError, not onDrop.
+    await userEvent.upload(getInput(context), [pdf("a.pdf"), pdf("b.pdf")]);
+    await waitFor(() =>
+      expect(args.onSingleUploadError).toHaveBeenCalledTimes(1),
+    );
+    await expect(args.onDrop).not.toHaveBeenCalled();
+
+    await userEvent.upload(getInput(context), pdf("one.pdf"));
+    await waitFor(() => expect(args.onDrop).toHaveBeenCalledTimes(1));
+  },
   parameters: {
     docs: {
       description: {
@@ -376,6 +479,10 @@ export const UploadProgress: Story = {
     isLoading: true,
     uploadPercent: 45,
   },
+  play: async ({ canvas }) => {
+    // uploadPercent swaps the spinner for a progress bar.
+    await expect(canvas.getByText("45 %")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -403,6 +510,20 @@ export const WithFormatsList: Story = {
     formatsPlusBadgeValue: 4,
     fullExstsText: "PDF, DOC, DOCX, ODT, RTF, TXT, EPUB",
   },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByText("+4")).toBeVisible();
+
+    // The format line opens the full list instead of the file dialog.
+    await userEvent.click(canvas.getByTestId("dropzone-file-types"));
+    const full = await screen.findByText("PDF, DOC, DOCX, ODT, RTF, TXT, EPUB");
+    await waitFor(() => expect(full).toBeVisible());
+    await expect(args.onDrop).not.toHaveBeenCalled();
+
+    // Clicking the line again closes it. An outside click does not: the
+    // drop-down has no backdrop and listens for no outside events.
+    await userEvent.click(canvas.getByTestId("dropzone-file-types"));
+    await waitFor(() => expect(full).not.toBeVisible());
+  },
   parameters: {
     docs: {
       description: {
@@ -429,6 +550,10 @@ export const WithIcon: Story = {
   args: {
     ...defaultArgs,
     icon: CatalogFolderIcon,
+  },
+  play: async ({ canvas }) => {
+    const icon = canvas.getByTestId("dropzone-icon");
+    await expect(icon.getBoundingClientRect().width).toBe(50);
   },
   parameters: {
     docs: {
@@ -486,8 +611,8 @@ const CssCustomizationTemplate = () => {
         formatsPlusBadgeValue={5}
         fullExstsText="PDF, DOC, DOCX, ODT, RTF, TXT, EPUB, HTML"
         accept={[".pdf", ".doc", ".docx"]}
-        onDrop={() => {}}
-        onSingleUploadError={() => {}}
+        onDrop={fn()}
+        onSingleUploadError={fn()}
         isLoading={false}
       />
     </div>
@@ -496,6 +621,13 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    // The border and radius belong to the outer wrapper.
+    const style = getComputedStyle(canvas.getByTestId("dropzone"));
+    await expect(style.borderTopStyle).toBe("dashed");
+    await expect(style.borderTopColor).toBe("rgb(0, 130, 201)");
+    await expect(style.borderTopLeftRadius).toBe("12px");
+  },
   parameters: {
     docs: {
       description: {
