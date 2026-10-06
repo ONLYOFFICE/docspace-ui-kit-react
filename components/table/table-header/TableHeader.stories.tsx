@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fireEvent, fn, screen, waitFor, within } from "storybook/test";
 import type { TableHeaderProps } from "../Table.types";
 
 import { useRef } from "react";
@@ -9,6 +10,13 @@ import { SortByFieldName } from "../../../enums";
 const COLUMN_STORAGE_NAME = "storybook-table-header-column-storage";
 const COLUMN_INFO_PANEL_STORAGE_NAME =
   "storybook-table-header-info-panel-storage";
+
+const onColumnSort = fn();
+const onColumnToggle = fn();
+
+// Each cell is tagged with its column's key.
+const headerCells = (root: HTMLElement) =>
+  within(root).getAllByTestId(/^column-/);
 
 const TableHeaderWrapper = (args: Omit<TableHeaderProps, "containerRef">) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -192,8 +200,8 @@ export const Default: Story = {
         default: true,
         sortBy: SortByFieldName.Name,
         minWidth: 210,
-        onChange: () => {},
-        onClick: () => {},
+        onChange: onColumnToggle,
+        onClick: onColumnSort,
       },
       {
         key: "Type",
@@ -201,8 +209,8 @@ export const Default: Story = {
         enable: true,
         resizable: true,
         sortBy: SortByFieldName.Type,
-        onChange: () => {},
-        onClick: () => {},
+        onChange: onColumnToggle,
+        onClick: onColumnSort,
       },
       {
         key: "Tags",
@@ -211,8 +219,8 @@ export const Default: Story = {
         resizable: true,
         sortBy: SortByFieldName.Tags,
         withTagRef: true,
-        onChange: () => {},
-        onClick: () => {},
+        onChange: onColumnToggle,
+        onClick: onColumnSort,
       },
       {
         key: "Owner",
@@ -220,8 +228,8 @@ export const Default: Story = {
         enable: true,
         resizable: true,
         sortBy: SortByFieldName.Author,
-        onChange: () => {},
-        onClick: () => {},
+        onChange: onColumnToggle,
+        onClick: onColumnSort,
       },
     ],
     columnStorageName: COLUMN_STORAGE_NAME,
@@ -238,6 +246,52 @@ export const Default: Story = {
     settingsTitle: "Column Settings",
     isIndexEditingMode: false,
     withoutWideColumn: false,
+  },
+  beforeEach: () => {
+    onColumnSort.mockClear();
+    onColumnToggle.mockClear();
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const cells = headerCells(canvasElement);
+    await expect(cells).toHaveLength(4);
+    // The column sorted by is highlighted.
+    await expect(cells[0].className).toMatch(/isActive/);
+    await expect(cells[1].className).not.toMatch(/isActive/);
+
+    // The header writes the column widths onto the table's grid.
+    const container = canvasElement.querySelector(
+      "#table-container",
+    ) as HTMLElement;
+    await waitFor(() =>
+      expect(container.style.gridTemplateColumns).not.toBe(""),
+    );
+
+    await userEvent.click(within(cells[1]).getByText("Type"));
+    await expect(onColumnSort).toHaveBeenCalledWith(
+      SortByFieldName.Type,
+      expect.anything(),
+    );
+
+    // Dragging a column's edge resizes it.
+    const before = container.style.gridTemplateColumns;
+    const handle = within(cells[0]).getByTestId("resize-handle");
+    const x = handle.getBoundingClientRect().left;
+    fireEvent.mouseDown(handle, { clientX: x });
+    fireEvent.mouseMove(window, { clientX: x + 60 });
+    fireEvent.mouseUp(window, { clientX: x + 60 });
+    await waitFor(() =>
+      expect(container.style.gridTemplateColumns).not.toBe(before),
+    );
+
+    // The cog lists the columns that can be hidden.
+    await userEvent.click(canvas.getByTestId("table-settings-button"));
+    const owner = await waitFor(() => {
+      const row = screen.getByTestId("table_settings_Owner");
+      expect(row).toBeVisible();
+      return row;
+    });
+    await userEvent.click(within(owner).getByText("Owner"));
+    await expect(onColumnToggle).toHaveBeenCalledWith("Owner");
   },
   parameters: {
     docs: {
@@ -268,6 +322,9 @@ export const WithoutSettings: Story = {
     ...Default.args,
     showSettings: false,
   },
+  play: async ({ canvas }) => {
+    await expect(canvas.queryByTestId("table-settings-button")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -296,6 +353,15 @@ export const WithoutSorting: Story = {
   args: {
     ...Default.args,
     sortingVisible: false,
+  },
+  beforeEach: () => {
+    onColumnSort.mockClear();
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    const [name] = headerCells(canvasElement);
+    await expect(within(name).queryByTestId("sort-icon")).toBeNull();
+    await userEvent.click(within(name).getByText("Name"));
+    await expect(onColumnSort).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -332,6 +398,15 @@ export const RightToLeft: Story = {
     columnInfoPanelStorageName: "storybook-table-header-rtl-info-panel-storage",
   },
   globals: { direction: "rtl" },
+  play: async ({ canvasElement }) => {
+    // The first column starts at the right edge.
+    const [name, type] = headerCells(canvasElement);
+    await waitFor(() =>
+      expect(name.getBoundingClientRect().left).toBeGreaterThan(
+        type.getBoundingClientRect().left,
+      ),
+    );
+  },
   parameters: {
     docs: {
       description: {
