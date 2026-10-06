@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, within } from "storybook/test";
 import type { TableContainerProps } from "../Table.types";
 
 import { useRef } from "react";
@@ -17,6 +18,9 @@ const COLUMN_STORAGE_NAME = "storybook-table-container-column-storage";
 const COLUMN_INFO_PANEL_STORAGE_NAME =
   "storybook-table-container-info-panel-storage";
 
+const onColumnSort = fn();
+const onColumnToggle = fn();
+
 const mockColumns = [
   {
     key: "Column 1",
@@ -26,8 +30,8 @@ const mockColumns = [
     default: true,
     sortBy: SortByFieldName.Name,
     minWidth: 210,
-    onChange: () => {},
-    onClick: () => {},
+    onChange: onColumnToggle,
+    onClick: onColumnSort,
   },
   {
     key: "Column 2",
@@ -35,8 +39,8 @@ const mockColumns = [
     enable: true,
     resizable: true,
     sortBy: SortByFieldName.Type,
-    onChange: () => {},
-    onClick: () => {},
+    onChange: onColumnToggle,
+    onClick: onColumnSort,
   },
   {
     key: "Column 3",
@@ -45,8 +49,8 @@ const mockColumns = [
     resizable: true,
     sortBy: SortByFieldName.Tags,
     withTagRef: true,
-    onChange: () => {},
-    onClick: () => {},
+    onChange: onColumnToggle,
+    onClick: onColumnSort,
   },
 ];
 
@@ -172,6 +176,27 @@ export const Default: Story = {
   render: (args) => <TableContainerWrapper {...args} />,
   args: {
     useReactWindow: false,
+  },
+  beforeEach: () => {
+    onColumnSort.mockClear();
+  },
+  play: async ({ canvas, userEvent }) => {
+    const container = canvas.getByTestId("table-container");
+    await expect(getComputedStyle(container).display).toBe("grid");
+    // The header sizes the grid's columns.
+    await expect(container.style.gridTemplateColumns).not.toBe("");
+    const header = canvas.getByTestId("table-header");
+    await expect(within(header).getByText("Column 3")).toBeVisible();
+    await expect(
+      within(canvas.getByTestId("table-body")).getAllByTestId("table-row"),
+    ).toHaveLength(10);
+
+    // A column title sorts by its field.
+    await userEvent.click(within(header).getByText("Column 2"));
+    await expect(onColumnSort).toHaveBeenCalledWith(
+      SortByFieldName.Type,
+      expect.anything(),
+    );
   },
   parameters: {
     docs: {
