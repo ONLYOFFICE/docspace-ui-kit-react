@@ -1,6 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import { RootTooltip } from "../tooltip";
 
@@ -222,6 +223,8 @@ type Story = StoryObj<ComponentProps<typeof Text>>;
 
 export default meta;
 
+const styleOf = (el: HTMLElement) => getComputedStyle(el);
+
 const Wrapper = (props: { children: React.ReactNode }) => {
   return (
     <div
@@ -242,6 +245,15 @@ export const Default: Story = {
     children: "Sample text content",
     as: "p",
     fontSize: "13px",
+    onClick: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const text = canvas.getByText("Sample text content");
+    await expect(text.tagName).toBe("P");
+    await expect(styleOf(text).fontSize).toBe("13px");
+    await expect(styleOf(text).fontWeight).toBe("400");
+    await userEvent.click(text);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -383,6 +395,10 @@ const NoSelectTemplate = () => {
 
 export const FontSizes: Story = {
   render: () => <FontSizesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(styleOf(canvas.getByText(/^10px/)).fontSize).toBe("10px");
+    await expect(styleOf(canvas.getByText(/^24px/)).fontSize).toBe("24px");
+  },
   parameters: {
     docs: {
       description: {
@@ -404,6 +420,14 @@ export const FontSizes: Story = {
 
 export const FontWeights: Story = {
   render: () => <FontWeightsTemplate />,
+  play: async ({ canvas }) => {
+    await expect(styleOf(canvas.getByText("Light (300)")).fontWeight).toBe(
+      "300",
+    );
+    await expect(styleOf(canvas.getByText("Bold (700)")).fontWeight).toBe(
+      "700",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -423,6 +447,14 @@ export const FontWeights: Story = {
 
 export const TextStyles: Story = {
   render: () => <TextStylesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(styleOf(canvas.getByText("Bold text")).fontWeight).toBe("700");
+    await expect(styleOf(canvas.getByText("Italic text")).fontStyle).toBe(
+      "italic",
+    );
+    const both = styleOf(canvas.getByText("Bold and italic text"));
+    await expect([both.fontWeight, both.fontStyle]).toEqual(["700", "italic"]);
+  },
   parameters: {
     docs: {
       description: {
@@ -441,6 +473,14 @@ export const TextStyles: Story = {
 
 export const TextAlignment: Story = {
   render: () => <TextAlignmentTemplate />,
+  play: async ({ canvas }) => {
+    await expect(
+      styleOf(canvas.getByText("Center aligned text")).textAlign,
+    ).toBe("center");
+    await expect(
+      styleOf(canvas.getByText("Right aligned text")).textAlign,
+    ).toBe("right");
+  },
   parameters: {
     docs: {
       description: {
@@ -459,6 +499,16 @@ export const TextAlignment: Story = {
 
 export const InlineText: Story = {
   render: () => <InlineTemplate />,
+  play: async ({ canvas }) => {
+    // All three sit on one line.
+    const tops = ["First inline text", "Second inline text"].map(
+      (t) => canvas.getByText(t).getBoundingClientRect().top,
+    );
+    await expect(tops[0]).toBe(tops[1]);
+    await expect(styleOf(canvas.getByText("First inline text")).display).toBe(
+      "inline-block",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -476,6 +526,11 @@ export const InlineText: Story = {
 
 export const TruncatedText: Story = {
   render: () => <TruncatedTemplate />,
+  play: async ({ canvas }) => {
+    const text = canvas.getByText(/This is a very long text/);
+    await expect(styleOf(text).textOverflow).toBe("ellipsis");
+    await expect(text.scrollWidth).toBeGreaterThan(text.clientWidth);
+  },
   parameters: {
     docs: {
       description: {
@@ -493,6 +548,14 @@ export const TruncatedText: Story = {
 
 export const HeadingElements: Story = {
   render: () => <HeadingElementsTemplate />,
+  play: async ({ canvas }) => {
+    // `as` renders real heading elements.
+    for (const level of [1, 2, 3, 4, 5, 6]) {
+      await expect(
+        canvas.getByRole("heading", { level, name: `Heading ${level}` }),
+      ).toBeVisible();
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -513,6 +576,17 @@ export const HeadingElements: Story = {
 
 export const Direction: Story = {
   render: () => <DirectionTemplate />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("English text (LTR)")).toHaveAttribute(
+      "dir",
+      "ltr",
+    );
+    // dir="auto" leaves the direction to the browser, read from the text.
+    const arabic = canvas.getByText("نص عربي مع اتجاه تلقائي");
+    await expect(styleOf(arabic).direction).toBe("rtl");
+    const english = canvas.getByText("English text with auto direction");
+    await expect(styleOf(english).direction).toBe("ltr");
+  },
   parameters: {
     docs: {
       description: {
@@ -530,6 +604,14 @@ export const Direction: Story = {
 
 export const NoSelectText: Story = {
   render: () => <NoSelectTemplate />,
+  play: async ({ canvas }) => {
+    await expect(
+      styleOf(canvas.getByText("This text cannot be selected")).userSelect,
+    ).toBe("none");
+    await expect(
+      styleOf(canvas.getByText("This text can be selected")).userSelect,
+    ).not.toBe("none");
+  },
   parameters: {
     docs: {
       description: {
@@ -553,6 +635,12 @@ export const WithTooltip: Story = {
       <RootTooltip />
     </>
   ),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.hover(canvas.getByText("Updated recently"));
+    await waitFor(() =>
+      expect(screen.getByText("Last edited on 12 March")).toBeVisible(),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -582,6 +670,13 @@ export const CssCustomization: Story = {
       <Text>Semi-bold larger text via CSS vars</Text>
     </div>
   ),
+  play: async ({ canvas }) => {
+    const text = styleOf(
+      canvas.getByText("Semi-bold larger text via CSS vars"),
+    );
+    await expect(text.fontSize).toBe("18px");
+    await expect(text.fontWeight).toBe("600");
+  },
   parameters: {
     docs: {
       description: {
