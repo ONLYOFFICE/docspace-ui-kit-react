@@ -10,7 +10,7 @@ export interface SelectedItemProps {
     group?: string,
     e?: React.MouseEvent,
   ) => void;
-  /** Called when the chip is clicked, with `propKey`, `label`, `group` and the event. A click on the cross reaches it too, after `onClose`. */
+  /** Called when the chip is clicked, with `propKey`, `label`, `group` and the event. A click on the cross does not reach it. */
   onClick?: (
     propKey: string | number,
     label: React.ReactNode,

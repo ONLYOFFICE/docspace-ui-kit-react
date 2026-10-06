@@ -147,8 +147,8 @@ export const Default: Story = {
     );
 
     // The cross removes the value. Clicked on the icon drawn inside it, where
-    // a pointer lands, the click reaches the chip's onClick too, after
-    // onClose -- as the README records.
+    // a pointer lands, the click stops at the cross: onClose fires and the
+    // chip's onClick does not.
     const cross = within(chip).getByTestId("icon-button");
     await userEvent.click(cross.querySelector("svg") as SVGElement);
     await expect(args.onClose).toHaveBeenCalledWith(
@@ -157,7 +157,7 @@ export const Default: Story = {
       "",
       expect.anything(),
     );
-    await expect(args.onClick).toHaveBeenCalledTimes(2);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
