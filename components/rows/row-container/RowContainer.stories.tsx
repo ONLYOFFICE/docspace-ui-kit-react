@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, waitFor, within } from "storybook/test";
 
 import type { IndexRange } from "react-virtualized";
 
@@ -148,6 +148,12 @@ export const Default: Story = {
     useReactWindow: false,
     children: [],
   },
+  play: async ({ canvas }) => {
+    // Every row at once, without the virtual list.
+    const container = canvas.getByTestId("row-container");
+    await expect(within(container).getAllByTestId("row")).toHaveLength(20);
+    await expect(getComputedStyle(container).userSelect).not.toBe("none");
+  },
   parameters: {
     docs: {
       description: {
@@ -178,6 +184,11 @@ export const NoTextSelection: Story = {
     useReactWindow: false,
     noSelect: true,
     children: [],
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      getComputedStyle(canvas.getByTestId("row-container")).userSelect,
+    ).toBe("none");
   },
   parameters: {
     docs: {
@@ -253,6 +264,32 @@ export const Virtualised: Story = {
     fetchMoreFiles: fn(),
     onScroll: fn(),
     children: [],
+  },
+  play: async ({ args, canvas }) => {
+    await waitFor(() =>
+      expect(canvas.getByText("Document 1.docx")).toBeVisible(),
+    );
+    // Only the rows near the view are mounted.
+    await expect(canvas.getAllByTestId("row").length).toBeLessThan(20);
+
+    // Scrolling to the end of the loaded rows asks for the next page.
+    const scroller = document.querySelector(
+      "#sectionScroll .scroll-wrapper > .scroller",
+    ) as HTMLElement;
+    await waitFor(() => {
+      scroller.scrollTop = scroller.scrollHeight;
+      scroller.dispatchEvent(new Event("scroll"));
+      expect(args.fetchMoreFiles).toHaveBeenCalled();
+    });
+    await expect(args.onScroll).toHaveBeenCalled();
+    await waitFor(
+      () => {
+        scroller.scrollTop = scroller.scrollHeight;
+        scroller.dispatchEvent(new Event("scroll"));
+        expect(canvas.getByText("Document 21.docx")).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
   },
   parameters: {
     noPadding: true,
