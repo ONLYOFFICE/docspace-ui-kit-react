@@ -1,5 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, screen, waitFor } from "storybook/test";
 
 import { RootTooltip } from "../tooltip";
 
@@ -118,6 +119,16 @@ export const Default: Story = {
     title: "Enter your first name",
     htmlFor: "firstName",
   },
+  play: async ({ canvas, userEvent }) => {
+    const label = canvas.getByTestId("label");
+    await expect(label.tagName).toBe("LABEL");
+    await expect(label).toHaveAttribute("for", "firstName");
+    // title opens in the shared tooltip.
+    await userEvent.hover(label);
+    await waitFor(() =>
+      expect(screen.getByText("Enter your first name")).toBeVisible(),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -224,6 +235,13 @@ const FormExampleTemplate = () => {
 
 export const RequiredLabels: Story = {
   render: () => <RequiredTemplate />,
+  play: async ({ canvas }) => {
+    // Each caption ends with an asterisk hidden from screen readers.
+    const marks = canvas.getAllByTestId("required-mark");
+    await expect(marks).toHaveLength(3);
+    await expect(marks[0]).toHaveTextContent("*");
+    await expect(marks[0]).toHaveAttribute("aria-hidden", "true");
+  },
   parameters: {
     docs: {
       description: {
@@ -241,6 +259,17 @@ export const RequiredLabels: Story = {
 
 export const ErrorState: Story = {
   render: () => <ErrorTemplate />,
+  play: async ({ canvas }) => {
+    // error turns the caption the error colour, with or without the mark.
+    const [password, email] = canvas.getAllByTestId("label");
+    await expect(getComputedStyle(password).color).toBe(
+      getComputedStyle(email).color,
+    );
+    await expect(password).toHaveAttribute("data-error", "true");
+    await expect(
+      email.querySelector("[data-testid='required-mark']"),
+    ).not.toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -257,6 +286,12 @@ export const ErrorState: Story = {
 
 export const TruncatedLabel: Story = {
   render: () => <TruncatedTemplate />,
+  play: async ({ canvas }) => {
+    // One line, cut with an ellipsis inside the 150px box.
+    const label = canvas.getByTestId("label");
+    await expect(getComputedStyle(label).textOverflow).toBe("ellipsis");
+    await expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
+  },
   parameters: {
     docs: {
       description: {
@@ -280,6 +315,19 @@ export const TruncatedLabel: Story = {
 
 export const InlineLabel: Story = {
   render: () => <InlineTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // A flex item is blockified whatever its own display, so the inline
+    // flag is checked, and that the caption shares the line with the field.
+    const label = canvas.getByTestId("label");
+    await expect(label).toHaveAttribute("data-inline", "true");
+    const input = canvas.getByRole("textbox");
+    await expect(label.getBoundingClientRect().right).toBeLessThanOrEqual(
+      input.getBoundingClientRect().left,
+    );
+    // htmlFor ties the caption to the input beside it.
+    await userEvent.click(label);
+    await expect(canvas.getByRole("textbox")).toHaveFocus();
+  },
   parameters: {
     docs: {
       description: {
@@ -296,6 +344,11 @@ export const InlineLabel: Story = {
 
 export const WithChildren: Story = {
   render: () => <WithChildrenTemplate />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("label")).toHaveTextContent(
+      "Phone number (optional)",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -313,6 +366,13 @@ export const WithChildren: Story = {
 
 export const FormExample: Story = {
   render: () => <FormExampleTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // Every caption names its field and focuses it on click.
+    await userEvent.click(canvas.getByText("Email"));
+    await expect(canvas.getByLabelText(/Email/)).toHaveFocus();
+    await userEvent.click(canvas.getByText("Bio"));
+    await expect(canvas.getByLabelText(/Bio/)).toHaveFocus();
+  },
   parameters: {
     docs: {
       description: {
@@ -352,6 +412,12 @@ export const CssCustomization: Story = {
       </Wrapper>
     </div>
   ),
+  play: async ({ canvas }) => {
+    const [mark] = canvas.getAllByTestId("required-mark");
+    await expect(getComputedStyle(mark).color).toBe("rgb(0, 130, 201)");
+    const [, email] = canvas.getAllByTestId("label");
+    await expect(getComputedStyle(email).color).toBe("rgb(208, 2, 27)");
+  },
   parameters: {
     docs: {
       description: {
