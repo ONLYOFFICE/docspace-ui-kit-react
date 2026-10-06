@@ -3,7 +3,7 @@ import { useRef } from "react";
 
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import { useArgs } from "storybook/preview-api";
-import { fn } from "storybook/test";
+import { expect, fireEvent, fn, screen, waitFor, within } from "storybook/test";
 
 import ViewRowsReactSvg from "../../assets/view-rows.react.svg";
 import ViewTilesReactSvg from "../../assets/view-tiles.react.svg";
@@ -374,6 +374,12 @@ const COLUMN_INFO_PANEL_STORAGE_NAME = "section-story-columns-info";
 
 const noop = () => {};
 
+const part = (root: HTMLElement, selector: string) =>
+  root.querySelector<HTMLElement>(selector);
+
+const rect = (root: HTMLElement, selector: string) =>
+  (part(root, selector) as HTMLElement).getBoundingClientRect();
+
 const mockNavigationItems = [
   { id: "1", title: "Documents", isRootRoom: false },
   { id: "2", title: "Shared with me", isRootRoom: false },
@@ -705,6 +711,25 @@ export const Default: Story = {
     settingsStudio: false,
     isInfoPanelAvailable: false,
   },
+  play: async ({ canvasElement }) => {
+    const sticky = part(
+      canvasElement,
+      ".section-sticky-container",
+    ) as HTMLElement;
+    // Header and filter are pinned above the scrolling body.
+    const header = part(sticky, ".section-header_header") as HTMLElement;
+    await expect(within(header).getByText("My Documents")).toBeVisible();
+    const filter = part(sticky, ".section-header_filter") as HTMLElement;
+    await expect(
+      within(filter).getByPlaceholderText("Search..."),
+    ).toBeVisible();
+    await expect(getComputedStyle(sticky).position).toBe("sticky");
+    const scroll = part(canvasElement, ".section-scroll") as HTMLElement;
+    await expect(
+      within(scroll).getByText("Annual Report 2025.docx"),
+    ).toBeVisible();
+    await expect(part(canvasElement, "#InfoPanelWrapper")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -812,6 +837,17 @@ export const WithInfoPanel: Story = {
     canDisplay: true,
     isInfoPanelVisible: true,
   },
+  play: async ({ canvasElement }) => {
+    const panel = part(canvasElement, "#InfoPanelWrapper") as HTMLElement;
+    await expect(panel).toBeVisible();
+    await expect(
+      within(panel).getByText("Document · 42 KB · modified yesterday"),
+    ).toBeVisible();
+    // Beside the section, on its right.
+    await expect(panel.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+      rect(canvasElement, "#section").right - 1,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -889,6 +925,27 @@ export const WithChatPanel: Story = {
     isChatPanelResizable: true,
     chatPanelWidth: 400,
   },
+  play: async ({ args, canvasElement }) => {
+    const panel = part(canvasElement, "#ChatPanelWrapper") as HTMLElement;
+    await expect(within(panel).getByText("Chat")).toBeVisible();
+    await expect(getComputedStyle(panel).width).toBe("400px");
+
+    // Dragging the inner edge to the left widens the panel; the width is
+    // reported once, on release. The drag measures the panel with its 1px
+    // border, so the result may be a pixel wider than 440.
+    const resizer = within(panel).getByTestId("chat-panel-resizer");
+    const x = resizer.getBoundingClientRect().left + 2;
+    fireEvent.mouseDown(resizer, { button: 0, clientX: x });
+    fireEvent.mouseMove(window, { clientX: x - 40 });
+    const dragged = Number.parseFloat(getComputedStyle(panel).width);
+    await expect(Math.abs(dragged - 440)).toBeLessThanOrEqual(1);
+    await expect(args.setChatPanelWidth).not.toHaveBeenCalled();
+    fireEvent.mouseUp(window);
+    await expect(args.setChatPanelWidth).toHaveBeenCalledTimes(1);
+    const reported = (args.setChatPanelWidth as ReturnType<typeof fn>).mock
+      .calls[0][0] as number;
+    await expect(Math.abs(reported - 440)).toBeLessThanOrEqual(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -955,6 +1012,21 @@ export const WithBanner: Story = {
     settingsStudio: false,
     scrollableBanner: false,
   },
+  play: async ({ canvasElement }) => {
+    const banner = part(canvasElement, ".section-banner") as HTMLElement;
+    await expect(
+      within(banner).getByText(
+        "Scheduled maintenance tonight from 22:00 to 23:00.",
+      ),
+    ).toBeVisible();
+    // Above the header and outside the scrolling body.
+    await expect(banner.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+      rect(canvasElement, ".section-header_header").top + 1,
+    );
+    await expect(
+      (part(canvasElement, ".section-scroll") as HTMLElement).contains(banner),
+    ).toBe(false);
+  },
   parameters: {
     docs: {
       description: {
@@ -1009,6 +1081,18 @@ export const WithSubmenu: Story = {
     withBodyScroll: true,
     settingsStudio: false,
   },
+  play: async ({ canvasElement }) => {
+    // Pinned with the header, under it.
+    const sticky = part(
+      canvasElement,
+      ".section-sticky-container",
+    ) as HTMLElement;
+    const tabs = part(sticky, ".section-tabs") as HTMLElement;
+    await expect(within(tabs).getByText("Recent")).toBeVisible();
+    await expect(tabs.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+      rect(sticky, ".section-header_header").bottom - 1,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -1056,6 +1140,15 @@ export const WithOperationsProgress: Story = {
     secondaryActiveOperations: runningOperation,
     secondaryOperationsCompleted: false,
   },
+  play: async ({ canvasElement, userEvent }) => {
+    const button = part(canvasElement, ".layout-progress-bar") as HTMLElement;
+    await expect(button).toBeVisible();
+    // Hovering it lists what is running.
+    await userEvent.hover(button);
+    await waitFor(() =>
+      expect(screen.getByText("Copying 3 items")).toBeVisible(),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -1084,9 +1177,12 @@ export const WithOperationsProgress: Story = {
   },
 };
 
+const onBodyUpload = fn();
+const onBodyCreate = fn();
+
 const getBodyContextModel = () => [
-  { key: "upload", label: "Upload file", onClick: fn() },
-  { key: "create", label: "New folder", onClick: fn() },
+  { key: "upload", label: "Upload file", onClick: onBodyUpload },
+  { key: "create", label: "New folder", onClick: onBodyCreate },
 ];
 
 export const WithContextMenu: Story = {
@@ -1107,6 +1203,27 @@ export const WithContextMenu: Story = {
     withBodyScroll: true,
     settingsStudio: false,
     getContextModel: getBodyContextModel,
+  },
+  beforeEach: () => {
+    onBodyUpload.mockClear();
+    onBodyCreate.mockClear();
+  },
+  play: async ({ canvas, userEvent }) => {
+    // A right click outside the body opens nothing.
+    fireEvent.contextMenu(canvas.getByText("My Documents"));
+    await expect(
+      screen.queryByRole("menuitem", { name: "Upload file" }),
+    ).toBeNull();
+
+    fireEvent.contextMenu(canvas.getByText("Meeting Notes.docx"));
+    const upload = await screen.findByRole("menuitem", { name: "Upload file" });
+    await waitFor(() => expect(upload).toBeVisible());
+    await expect(
+      screen.getByRole("menuitem", { name: "New folder" }),
+    ).toBeVisible();
+    await userEvent.click(upload);
+    await expect(onBodyUpload).toHaveBeenCalledTimes(1);
+    await expect(onBodyCreate).not.toHaveBeenCalled();
   },
   parameters: {
     noPadding: true,
@@ -1162,6 +1279,19 @@ export const OnTablet: Story = {
     withBodyScroll: true,
     settingsStudio: false,
   },
+  play: async ({ canvasElement }) => {
+    // The header stays pinned; the filter moves into the scrolling body.
+    const sticky = part(
+      canvasElement,
+      ".section-sticky-container",
+    ) as HTMLElement;
+    await expect(part(sticky, ".section-header_header")).not.toBeNull();
+    await expect(part(sticky, ".section-header_filter")).toBeNull();
+    const filter = part(canvasElement, ".section-body_filter") as HTMLElement;
+    await expect(
+      (part(canvasElement, ".section-body") as HTMLElement).contains(filter),
+    ).toBe(true);
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -1212,6 +1342,14 @@ export const OnPhone: Story = {
     currentDeviceType: DeviceType.mobile,
     withBodyScroll: true,
     settingsStudio: false,
+  },
+  play: async ({ canvasElement }) => {
+    // Nothing is pinned: header and filter both scroll with the body.
+    await expect(part(canvasElement, ".section-sticky-container")).toBeNull();
+    const body = part(canvasElement, ".section-body") as HTMLElement;
+    const header = part(body, ".section-body_header") as HTMLElement;
+    await expect(within(header).getByText("My Documents")).toBeVisible();
+    await expect(part(body, ".section-body_filter")).not.toBeNull();
   },
   parameters: {
     noPadding: true,
@@ -1269,6 +1407,13 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvasElement }) => {
+    // The info panel opens on the left of the section.
+    const panel = rect(canvasElement, "#InfoPanelWrapper");
+    await expect(panel.right).toBeLessThanOrEqual(
+      rect(canvasElement, "#section").left + 1,
+    );
+  },
   args: {
     currentDeviceType: DeviceType.desktop,
     withBodyScroll: true,
@@ -1373,6 +1518,21 @@ export const CssCustomization: Story = {
     isChatPanelAvailable: true,
     isChatPanelVisible: true,
     chatPanelDropTargetLabel: "Drop here to attach",
+  },
+  play: async ({ canvasElement }) => {
+    const info = part(canvasElement, "#InfoPanelWrapper") as HTMLElement;
+    // The width goes to the panel inside the wrapper.
+    const infoPanel = info.firstElementChild as HTMLElement;
+    await expect(getComputedStyle(infoPanel).width).toBe("300px");
+    await expect(getComputedStyle(infoPanel).backgroundColor).toBe(
+      "rgb(245, 251, 255)",
+    );
+    const chat = part(canvasElement, "#ChatPanelWrapper") as HTMLElement;
+    await expect(getComputedStyle(chat).width).toBe("300px");
+    await expect(getComputedStyle(chat).backgroundColor).toBe(
+      "rgb(255, 248, 230)",
+    );
+    await expect(within(chat).getByText("Drop here to attach")).toBeVisible();
   },
   parameters: {
     docs: {
