@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, screen, waitFor, within } from "storybook/test";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 import CatalogSharedSvgUrl from "../../assets/icons/16/catalog.shared.outline.svg?url";
@@ -286,7 +287,39 @@ type Story = StoryObj<typeof NavMenu>;
 
 export default meta;
 
+// An entry, a button or a link, by the id it was given.
+const entry = (root: HTMLElement, id: string) =>
+  root.querySelector<HTMLElement>(`[data-item-id="${id}"]`) as HTMLElement;
+
+const isActive = (root: HTMLElement, id: string) =>
+  /active/.test(entry(root, id).className);
+
+// A section's sub-menu is open when its wrapper carries `expanded`.
+const isExpanded = (root: HTMLElement, id: string) => {
+  const subItems = (entry(root, id).closest("li") as HTMLElement).querySelector(
+    ':scope > [class*="subItems"]',
+  );
+  return !!subItems && /expanded/.test(subItems.className);
+};
+
+const nav = (root: HTMLElement) => root.querySelector("nav") as HTMLElement;
+
 export const Default: Story = {
+  play: async ({ canvasElement, userEvent }) => {
+    await expect(within(canvasElement).getByText("Enabled Apps")).toBeVisible();
+    await expect(
+      within(canvasElement).getByText("Available Apps"),
+    ).toBeVisible();
+    await expect(isActive(canvasElement, "ai-files")).toBe(true);
+    await expect(entry(canvasElement, "ai-files")).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+    await expect(entry(canvasElement, "shared")).toBeVisible();
+    // A click on the active section does not shut it.
+    await userEvent.click(entry(canvasElement, "ai-files"));
+    await expect(isExpanded(canvasElement, "ai-files")).toBe(true);
+  },
   parameters: {
     docs: {
       description: {
@@ -309,6 +342,15 @@ export const NoSubItems: Story = {
     groups: noChildrenData,
     activeItemId: "files",
     defaultExpandedId: undefined,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(isActive(canvasElement, "files")).toBe(true);
+    await expect(isActive(canvasElement, "rooms")).toBe(false);
+    // Plain destinations: buttons with nothing to expand.
+    await expect(entry(canvasElement, "rooms").tagName).toBe("BUTTON");
+    await expect(entry(canvasElement, "rooms")).not.toHaveAttribute(
+      "aria-expanded",
+    );
   },
   parameters: {
     docs: {
@@ -347,6 +389,24 @@ export const ControlledActive: Story = {
         activeItemId={activeId}
         defaultExpandedId="ai-files"
       />
+    );
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    // The highlight follows the click.
+    await userEvent.click(entry(canvasElement, "favorites"));
+    await expect(isActive(canvasElement, "favorites")).toBe(true);
+    await expect(isActive(canvasElement, "ai-files")).toBe(false);
+    await expect(isExpanded(canvasElement, "ai-files")).toBe(true);
+
+    // A section without a sub-menu shuts the open one.
+    await userEvent.click(entry(canvasElement, "ai-rooms"));
+    await expect(isActive(canvasElement, "ai-rooms")).toBe(true);
+    await waitFor(() =>
+      expect(isExpanded(canvasElement, "ai-files")).toBe(false),
+    );
+    await expect(entry(canvasElement, "ai-files")).toHaveAttribute(
+      "aria-expanded",
+      "false",
     );
   },
   parameters: {
@@ -391,6 +451,14 @@ export const DarkTheme: Story = {
       </div>
     ),
   ],
+  play: async ({ canvasElement }) => {
+    // The labels switch to a light colour on the dark surface.
+    const label = within(canvasElement).getByText("AI Rooms");
+    const [r, g, b] = (getComputedStyle(label).color.match(/\d+/g) ?? []).map(
+      Number,
+    );
+    await expect(Math.min(r, g, b)).toBeGreaterThan(150);
+  },
   parameters: {
     docs: {
       description: {
@@ -459,6 +527,20 @@ export const WithBadge: Story = {
       </div>
     );
   },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await expect(canvas.getByText("5")).toBeVisible();
+    await expect(canvas.getByText("new")).toBeVisible();
+    // On the rail the badges give way to a dot on each icon.
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Toggle iconOnly (signal dot)" }),
+    );
+    await expect(nav(canvasElement).className).toMatch(/iconOnly/);
+    await expect(canvas.getByText("5")).not.toBeVisible();
+    const dots = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>('[class*="itemSignalDot"]'),
+    ).filter((dot) => dot.checkVisibility());
+    await expect(dots).toHaveLength(2);
+  },
   parameters: {
     docs: {
       description: {
@@ -507,6 +589,20 @@ export const WithAnimation: Story = {
         defaultExpandedId="documents"
         withAnimation
       />
+    );
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    // Opening another section shuts the one that was open.
+    await userEvent.click(entry(canvasElement, "rooms"));
+    await expect(isActive(canvasElement, "rooms")).toBe(true);
+    await expect(isExpanded(canvasElement, "rooms")).toBe(true);
+    await expect(isExpanded(canvasElement, "documents")).toBe(false);
+    // The highlight of the clicked entry fills across it.
+    const highlight = (
+      entry(canvasElement, "rooms").parentElement as HTMLElement
+    ).firstElementChild as HTMLElement;
+    await waitFor(() =>
+      expect(highlight.className).toMatch(/animatedProgress|animatedFinish/),
     );
   },
   parameters: {
@@ -636,6 +732,19 @@ export const WithLinkData: Story = {
         )}
       </div>
     );
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // Leaf entries become the router's links; Rooms stays a button.
+    await expect(canvas.getByRole("link", { name: "Files" })).toHaveAttribute(
+      "href",
+      "/files",
+    );
+    await expect(entry(canvasElement, "rooms").tagName).toBe("BUTTON");
+    const archive = canvas.getByRole("link", { name: "Archive" });
+    await expect(archive).toHaveAttribute("href", "/rooms/archive");
+    await userEvent.click(archive);
+    await expect(canvas.getByText("/rooms/archive")).toBeVisible();
+    await expect(archive.className).toMatch(/active/);
   },
   parameters: {
     docs: {
@@ -794,6 +903,16 @@ export const FullSidebar: Story = {
     ),
   ],
   render: () => <SidebarDemo />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const [main, bottom] = Array.from(canvasElement.querySelectorAll("nav"));
+    await expect(within(main).getByText("Workspace")).toBeVisible();
+    // The collapse button switches both menus to the rail.
+    await userEvent.click(canvas.getAllByTestId("icon-button")[0]);
+    await expect(main.className).toMatch(/iconOnly/);
+    await expect(bottom.className).toMatch(/iconOnly/);
+    await expect(within(main).getByText("Workspace")).not.toBeVisible();
+    await expect(within(bottom).getByText("Settings")).not.toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -865,6 +984,33 @@ export const CollapsedRail: Story = {
       </div>
     );
   },
+  play: async ({ canvasElement, userEvent }) => {
+    // The active section's sub-items are entries of their own; they are
+    // revealed with an animation.
+    await waitFor(() => expect(entry(canvasElement, "recent")).toBeVisible());
+    await waitFor(() =>
+      expect(entry(canvasElement, "favorites")).toBeVisible(),
+    );
+    await expect(entry(canvasElement, "rooms-shared")).toBeNull();
+    // The shut Rooms section shows its badge as a dot.
+    const dot = entry(canvasElement, "rooms").querySelector(
+      '[class*="itemSignalDot"]',
+    ) as HTMLElement;
+    await expect(dot).toBeVisible();
+
+    // Hovering an icon shows its label.
+    await userEvent.hover(entry(canvasElement, "overview"));
+    await waitFor(() =>
+      expect(screen.getByRole("tooltip")).toHaveTextContent("Overview"),
+    );
+
+    // Selecting Rooms lists its sub-items instead.
+    await userEvent.click(entry(canvasElement, "rooms"));
+    await waitFor(() =>
+      expect(entry(canvasElement, "rooms-shared")).toBeVisible(),
+    );
+    await expect(entry(canvasElement, "recent")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -932,6 +1078,25 @@ export const WithExpandControl: Story = {
         withExpandControl
       />
     );
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    const chevron = (id: string) =>
+      (entry(canvasElement, id).parentElement as HTMLElement).querySelector(
+        '[class*="expandButton"]',
+      ) as HTMLElement;
+    await expect(isExpanded(canvasElement, "documents")).toBe(true);
+    await expect(chevron("rooms")).toHaveAttribute("aria-expanded", "false");
+
+    // Several sections may be open at once.
+    await userEvent.click(chevron("rooms"));
+    await expect(isExpanded(canvasElement, "rooms")).toBe(true);
+    await expect(isExpanded(canvasElement, "documents")).toBe(true);
+    await userEvent.click(chevron("rooms"));
+    await expect(isExpanded(canvasElement, "rooms")).toBe(false);
+
+    // The label selects and never shuts a section.
+    await userEvent.click(entry(canvasElement, "documents"));
+    await expect(isExpanded(canvasElement, "documents")).toBe(true);
   },
   parameters: {
     docs: {
@@ -1007,6 +1172,18 @@ export const SectionBadges: Story = {
       </div>
     );
   },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // The shut section shows its total; open, the counts inside.
+    await expect(canvas.getByText("12")).toBeVisible();
+    await userEvent.click(entry(canvasElement, "documents"));
+    await waitFor(() => expect(canvas.getByText("9")).toBeVisible());
+    await expect(canvas.queryByText("12")).toBeNull();
+
+    // A counter reports its sub-item without selecting it.
+    await userEvent.click(canvas.getByText("9"));
+    await expect(canvas.getByText("recent")).toBeVisible();
+    await expect(isActive(canvasElement, "recent")).toBe(false);
+  },
   parameters: {
     docs: {
       description: {
@@ -1073,6 +1250,17 @@ export const WithSeparator: Story = {
     groups: separatorGroups,
     activeItemId: "recent",
     defaultExpandedId: "documents",
+  },
+  play: async ({ canvasElement }) => {
+    // A gap above Trash; the theme draws no line in it.
+    const trash = entry(canvasElement, "trash").closest("li") as HTMLElement;
+    await expect(getComputedStyle(trash).marginTop).toBe("8px");
+    await expect(getComputedStyle(trash).paddingTop).toBe("8px");
+    await expect(getComputedStyle(trash).borderTopWidth).toBe("0px");
+    const favorites = entry(canvasElement, "favorites").closest(
+      "li",
+    ) as HTMLElement;
+    await expect(getComputedStyle(favorites).marginTop).toBe("0px");
   },
   parameters: {
     docs: {
@@ -1152,6 +1340,16 @@ export const ClickWithoutExpanding: Story = {
       </div>
     );
   },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // onClick returning false keeps the sub-menu shut.
+    await userEvent.click(entry(canvasElement, "invite"));
+    await expect(canvas.getByText("A dialog would open here")).toBeVisible();
+    await expect(isExpanded(canvasElement, "invite")).toBe(false);
+    await expect(entry(canvasElement, "invite")).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -1208,6 +1406,22 @@ const rtlGroups: NavMenuGroup[] = [
 
 export const RightToLeft: Story = {
   globals: { direction: "rtl" },
+  play: async ({ canvasElement }) => {
+    const [menu] = Array.from(canvasElement.querySelectorAll("nav"));
+    // The icon starts at the right edge, before the label.
+    const rooms = entry(menu, "rooms");
+    const icon = (
+      rooms.querySelector('[class*="itemIconWrapper"]') as HTMLElement
+    ).getBoundingClientRect();
+    const label = (
+      rooms.querySelector('[class*="itemText"]') as HTMLElement
+    ).getBoundingClientRect();
+    await expect(icon.left).toBeGreaterThanOrEqual(label.right);
+    // The counter sits at the left end of its row.
+    const recent = entry(menu, "recent").getBoundingClientRect();
+    const counter = within(menu).getByText("4").getBoundingClientRect();
+    await expect(counter.right).toBeLessThanOrEqual(recent.left + 1);
+  },
   render: () => (
     <div
       dir="rtl"
@@ -1265,6 +1479,28 @@ export const CssCustomization: Story = {
       </div>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const [menu, rail] = Array.from(canvasElement.querySelectorAll("nav"));
+    await expect(
+      getComputedStyle(within(menu).getByText("Workspace")).color,
+    ).toBe("rgb(124, 58, 237)");
+    // The active sub-item's highlight.
+    const highlight = (entry(menu, "recent").parentElement as HTMLElement)
+      .firstElementChild as HTMLElement;
+    await expect(getComputedStyle(highlight).backgroundColor).toBe(
+      "rgb(109, 40, 217)",
+    );
+    const trash = entry(menu, "trash").closest("li") as HTMLElement;
+    await expect(getComputedStyle(trash).borderTopColor).toBe(
+      "rgb(167, 139, 250)",
+    );
+    const dot = entry(rail, "rooms").querySelector(
+      '[class*="itemSignalDot"]',
+    ) as HTMLElement;
+    await expect(getComputedStyle(dot).backgroundColor).toBe(
+      "rgb(219, 39, 119)",
+    );
+  },
   parameters: {
     docs: {
       description: {
