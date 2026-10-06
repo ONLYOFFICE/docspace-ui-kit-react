@@ -1,5 +1,6 @@
 import type { ComponentProps, CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 
 import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
 import CatalogFolderIconUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
@@ -57,6 +58,8 @@ type Story = StoryObj<ComponentProps<typeof MCPIcon>>;
 
 export default meta;
 
+const sizeOf = (el: Element) => Math.round(el.getBoundingClientRect().width);
+
 const Wrapper = (props: { children: React.ReactNode }) => {
   return (
     <div
@@ -94,6 +97,12 @@ export const Default: Story = {
     title: "Document search",
     size: MCPIconSize.Large,
   },
+  play: async ({ canvas }) => {
+    // No image: the first letter, uppercased, on a 48px tile.
+    const icon = canvas.getByTestId("mcp-icon");
+    await expect(icon).toHaveTextContent(/^D$/);
+    await expect(sizeOf(icon)).toBe(48);
+  },
   parameters: {
     docs: {
       description: {
@@ -113,6 +122,11 @@ export const WithImage: Story = {
     title: "Document search",
     size: MCPIconSize.Large,
     imgSrc: CatalogFolderIconUrl,
+  },
+  play: async ({ canvas }) => {
+    // The image replaces the letter.
+    await expect(canvas.getByRole("img", { name: "mcp icon" })).toBeVisible();
+    await expect(canvas.getByTestId("mcp-icon")).not.toHaveTextContent("D");
   },
   parameters: {
     docs: {
@@ -143,6 +157,10 @@ const AllSizesTemplate = () => {
 
 export const AllSizes: Story = {
   render: () => <AllSizesTemplate />,
+  play: async ({ canvas }) => {
+    const sizes = canvas.getAllByTestId("mcp-icon").map(sizeOf);
+    await expect([...sizes].sort((a, b) => a - b)).toEqual([16, 24, 32, 48]);
+  },
   parameters: {
     docs: {
       description: {
@@ -179,6 +197,14 @@ const AllSizesWithImageTemplate = () => {
 
 export const AllSizesWithImage: Story = {
   render: () => <AllSizesWithImageTemplate />,
+  play: async ({ canvas }) => {
+    const images = canvas.getAllByRole("img", { name: "mcp icon" });
+    await expect(images).toHaveLength(4);
+    // Each image fills its own square.
+    for (const img of images) {
+      await expect(sizeOf(img)).toBe(sizeOf(img.parentElement as Element));
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -203,6 +229,13 @@ export const BrokenImageFallback: Story = {
     // An unparsable data URL fails to load without a network request.
     imgSrc: "data:image/png;base64,invalid",
   },
+  play: async ({ canvas }) => {
+    // The failed image gives way to the letter.
+    await waitFor(() =>
+      expect(canvas.getByTestId("mcp-icon")).toHaveTextContent(/^D$/),
+    );
+    await expect(canvas.queryByRole("img")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -222,6 +255,11 @@ export const WithImageNode: Story = {
     title: "Document search",
     size: MCPIconSize.Large,
     imgNode: <CatalogFolderIcon />,
+  },
+  play: async ({ canvas }) => {
+    const icon = canvas.getByTestId("mcp-icon");
+    await expect(icon.querySelector("svg")).not.toBeNull();
+    await expect(icon).not.toHaveTextContent("D");
   },
   parameters: {
     docs: {
@@ -262,6 +300,14 @@ export const CssCustomization: Story = {
       </Wrapper>
     </div>
   ),
+  play: async ({ canvas }) => {
+    // The tile is painted by a ::before layer under the letter.
+    const [first] = canvas.getAllByTestId("mcp-icon");
+    const tile = getComputedStyle(first, "::before");
+    await expect(tile.backgroundColor).toBe("rgb(0, 130, 201)");
+    await expect(tile.opacity).toBe("0.6");
+    await expect(getComputedStyle(first).borderRadius).toBe("50%");
+  },
   parameters: {
     docs: {
       description: {
