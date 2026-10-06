@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ComponentProps, CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, waitFor, within } from "storybook/test";
 
 import { Aside } from ".";
 import type { AsideProps } from "./Aside.types";
@@ -138,11 +139,41 @@ const meta = {
       description: "Content of the panel, shown below the header",
     },
   },
+  args: {
+    onClose: fn(),
+    onBackClick: fn(),
+  },
 } satisfies Meta<typeof Aside>;
 
 type Story = StoryObj<ComponentProps<typeof Aside>>;
 
 export default meta;
+
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// The panel is always mounted; closed, it sits just outside the window.
+const slidIn = (aside: HTMLElement) =>
+  waitFor(() => {
+    const { left, right } = aside.getBoundingClientRect();
+    expect(left).toBeGreaterThanOrEqual(-1);
+    expect(right).toBeLessThanOrEqual(window.innerWidth + 1);
+  });
+
+const slidOut = (aside: HTMLElement) =>
+  waitFor(() => {
+    const { left, right } = aside.getBoundingClientRect();
+    expect(left >= window.innerWidth - 1 || right <= 1).toBe(true);
+  });
+
+const openPanel = async ({ canvas, userEvent }: PlayContext) => {
+  const aside = canvas.getByTestId("aside");
+  await userEvent.click(canvas.getByRole("button", { name: "Open Panel" }));
+  await slidIn(aside);
+  return aside;
+};
+
+const closeButton = (aside: HTMLElement) =>
+  within(aside).getByTestId("aside_header_close_icon_button");
 
 const pageStyles: React.CSSProperties = {
   // Exactly one window tall, padding included.
@@ -447,6 +478,32 @@ export const Default: Story = {
       </div>
     ),
   },
+  play: async (context) => {
+    const { args, canvas, userEvent } = context;
+    const aside = canvas.getByTestId("aside");
+    await expect(aside.tagName).toBe("ASIDE");
+    await slidOut(aside);
+
+    await openPanel(context);
+    await expect(aside.getBoundingClientRect().width).toBe(480);
+    await expect(within(aside).getByText("Panel Title")).toBeVisible();
+    await expect(
+      within(aside).getByText(
+        "This is example content inside the Aside panel.",
+      ),
+    ).toBeVisible();
+
+    // The cross closes it.
+    await userEvent.click(closeButton(aside));
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
+    await slidOut(aside);
+
+    // So does the story's backdrop.
+    await openPanel(context);
+    await userEvent.click(canvas.getByTestId("backdrop"));
+    await expect(args.onClose).toHaveBeenCalledTimes(2);
+    await slidOut(aside);
+  },
   parameters: {
     docs: {
       description: {
@@ -471,6 +528,17 @@ export const Settings: Story = {
     header: "Settings",
     children: <SettingsContent />,
   },
+  play: async (context) => {
+    const aside = await openPanel(context);
+    const toggles = within(aside).getAllByRole("checkbox");
+    await expect(toggles).toHaveLength(3);
+    await expect(toggles[0]).toBeChecked();
+    await context.userEvent.click(toggles[0]);
+    await expect(toggles[0]).not.toBeChecked();
+    await expect(
+      within(aside).getByRole("button", { name: "Save Changes" }),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -493,6 +561,12 @@ export const UserProfile: Story = {
     header: "Profile",
     children: <UserProfileContent />,
   },
+  play: async (context) => {
+    const aside = await openPanel(context);
+    await expect(within(aside).getByText("Team member")).toBeVisible();
+    await expect(within(aside).getByDisplayValue("Team")).toBeVisible();
+    await expect(within(aside).getByDisplayValue("Member")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -514,6 +588,14 @@ export const FileDetails: Story = {
     visible: false,
     header: "File Info",
     children: <FileDetailsContent />,
+  },
+  play: async (context) => {
+    const aside = await openPanel(context);
+    await expect(
+      within(aside).getByText("Quarterly Report.docx"),
+    ).toBeVisible();
+    await expect(within(aside).getByText("2.4 MB")).toBeVisible();
+    await expect(within(aside).getByText("Member three")).toBeInTheDocument();
   },
   parameters: {
     docs: {
@@ -538,6 +620,19 @@ export const WithBackButton: Story = {
     isBackButton: true,
     children: <FileDetailsContent />,
   },
+  play: async (context) => {
+    const { args, userEvent } = context;
+    const aside = await openPanel(context);
+    // The arrow calls its own handler and leaves the panel open.
+    await userEvent.click(
+      within(aside).getByTestId("aside_header_back_icon_button"),
+    );
+    await expect(args.onBackClick).toHaveBeenCalledTimes(1);
+    await expect(args.onClose).not.toHaveBeenCalled();
+    await slidIn(aside);
+    await userEvent.click(closeButton(aside));
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -559,6 +654,15 @@ export const WithoutHeader: Story = {
     visible: false,
     withoutHeader: true,
     children: <UserProfileContent />,
+  },
+  play: async (context) => {
+    const { args, canvas, userEvent } = context;
+    const aside = await openPanel(context);
+    // No header and no cross: only the page can close it.
+    await expect(within(aside).queryByTestId("aside-header")).toBeNull();
+    await userEvent.click(canvas.getByTestId("backdrop"));
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
+    await slidOut(aside);
   },
   parameters: {
     docs: {
@@ -582,6 +686,10 @@ export const Scaled: Story = {
     scale: true,
     header: "Full Width Panel",
     children: <SettingsContent />,
+  },
+  play: async (context) => {
+    const aside = await openPanel(context);
+    await expect(aside.getBoundingClientRect().width).toBe(window.innerWidth);
   },
   parameters: {
     docs: {
@@ -608,6 +716,21 @@ const RightToLeftTemplate = (args: AsideProps) => (
 export const RightToLeft: Story = {
   render: (args) => <RightToLeftTemplate {...args} />,
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    const aside = canvas.getByTestId("aside");
+    // Opened against the left edge.
+    await waitFor(() =>
+      expect(Math.abs(aside.getBoundingClientRect().left)).toBeLessThanOrEqual(
+        1,
+      ),
+    );
+    const back = within(aside)
+      .getByTestId("aside_header_back_icon_button")
+      .getBoundingClientRect();
+    await expect(closeButton(aside).getBoundingClientRect().right).toBeLessThan(
+      back.left,
+    );
+  },
   args: {
     visible: true,
     header: "Details",
@@ -652,12 +775,7 @@ const CssCustomizationTemplate = () => (
     }
   >
     {/* A node title, not a string: a string title ignores the color and font-size variables */}
-    <Aside
-      visible
-      header={<span>Settings</span>}
-      isBackButton
-      onClose={() => {}}
-    >
+    <Aside visible header={<span>Settings</span>} isBackButton onClose={fn()}>
       <div style={{ padding: "20px" }}>
         <p style={{ margin: "0 0 12px", fontWeight: 600, color: "#004f82" }}>
           Custom styled panel
@@ -673,6 +791,17 @@ const CssCustomizationTemplate = () => (
 // Framed on Docs: the panel is fixed to the window and has no height of its own inline.
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    const aside = canvas.getByTestId("aside");
+    await slidIn(aside);
+    await expect(aside.getBoundingClientRect().width).toBe(360);
+    await expect(getComputedStyle(aside).backgroundColor).toBe(
+      "rgb(230, 243, 251)",
+    );
+    await expect(
+      getComputedStyle(within(aside).getByTestId("aside-header")).height,
+    ).toBe("60px");
+  },
   parameters: {
     docs: {
       story: { inline: false, height: "500px" },
