@@ -2,7 +2,7 @@ import type { ComponentProps, CSSProperties } from "react";
 
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import { useArgs } from "storybook/preview-api";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import withBundledLogos from "../../.storybook/decorators/withBundledLogos";
 import {
@@ -293,12 +293,19 @@ const mockUser = {
   isAnonim: false,
 };
 
+const onProfileAction = fn();
+const onHelpAction = fn();
+const onLogoutAction = fn();
+
 const getActions = () =>
   [
-    { key: "profile", label: "Profile", onClick: fn() },
-    { key: "help", label: "Help", onClick: fn() },
-    { key: "logout", label: "Logout", onClick: fn() },
+    { key: "profile", label: "Profile", onClick: onProfileAction },
+    { key: "help", label: "Help", onClick: onHelpAction },
+    { key: "logout", label: "Logout", onClick: onLogoutAction },
   ] as ContextMenuModel[];
+
+const article = (root: HTMLElement) =>
+  within(root).getByTestId("article") as HTMLElement;
 
 const bodySlot = (
   <Article.Body key="body">
@@ -354,6 +361,28 @@ export const Default: Story = {
     getActions,
     children: [bodySlot],
   },
+  beforeEach: () => {
+    onHelpAction.mockClear();
+  },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const panel = article(canvasElement);
+    await expect(panel).toHaveAttribute("data-show-text", "true");
+    await expect(within(panel).getByText("Navigation items")).toBeVisible();
+    await expect(canvas.getByTestId("profile_username")).toHaveTextContent(
+      "Team member",
+    );
+
+    // The developer tools entry navigates to its page.
+    await userEvent.click(canvas.getByTestId("dev-tools-bar"));
+    await expect(args.navigate).toHaveBeenCalledWith("/developer-tools");
+
+    // The dots open the profile actions.
+    await userEvent.click(canvas.getByTestId("profile_user_icon_button"));
+    const help = await screen.findByRole("menuitem", { name: "Help" });
+    await waitFor(() => expect(help).toBeVisible());
+    await userEvent.click(help);
+    await expect(onHelpAction).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -385,6 +414,13 @@ export const WithMainButton: Story = {
     getActions,
     withMainButton: true,
     children: [mainButtonSlot, bodySlot],
+  },
+  play: async ({ canvas }) => {
+    // Above the navigation.
+    const button = canvas.getByRole("button", { name: "New document" });
+    await expect(button.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+      canvas.getByText("Navigation items").getBoundingClientRect().top,
+    );
   },
   parameters: {
     docs: {
@@ -420,6 +456,11 @@ export const CustomHeader: Story = {
       bodySlot,
     ],
   },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", { name: "Documents" }),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -449,6 +490,11 @@ export const WithBackButton: Story = {
     showBackButton: true,
     children: [bodySlot],
   },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByText("Back"));
+    await expect(args.onBack).toHaveBeenCalledTimes(1);
+    await expect(args.navigate).not.toHaveBeenCalled();
+  },
   parameters: {
     docs: {
       description: {
@@ -476,6 +522,14 @@ export const LoadingState: Story = {
     showArticleLoader: true,
     children: [bodySlot],
   },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("article-header-loader")).toBeVisible();
+    await expect(canvas.getByTestId("article-profile-loader")).toBeVisible();
+    await expect(canvas.queryByTestId("profile_username")).toBeNull();
+    await expect(canvas.queryByTestId("dev-tools-bar")).toBeNull();
+    // The body is still rendered.
+    await expect(canvas.getByText("Navigation items")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -502,6 +556,18 @@ export const WithCustomSlot: Story = {
     customSlot: <div>Storage: 2 GB of 10 GB</div>,
     children: [bodySlot],
   },
+  play: async ({ canvas }) => {
+    // Between the body and the developer tools entry.
+    const slot = canvas
+      .getByText("Storage: 2 GB of 10 GB")
+      .getBoundingClientRect();
+    await expect(slot.top).toBeGreaterThanOrEqual(
+      canvas.getByText("Navigation items").getBoundingClientRect().bottom,
+    );
+    await expect(slot.bottom).toBeLessThanOrEqual(
+      canvas.getByTestId("dev-tools-bar").getBoundingClientRect().top,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -527,6 +593,11 @@ export const WithoutFooterBlocks: Story = {
     hideAppsBlock: true,
     limitedAccessDevToolsForUsers: true,
     children: [bodySlot],
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("Navigation items")).toBeVisible();
+    await expect(canvas.queryByTestId("profile_username")).toBeNull();
+    await expect(canvas.queryByTestId("dev-tools-bar")).toBeNull();
   },
   parameters: {
     docs: {
@@ -573,6 +644,18 @@ export const CollapsedOnTablet: Story = {
     isMobileArticle: true,
     children: [bodySlot],
   },
+  play: async ({ canvas, canvasElement }) => {
+    // Collapsed: no text, the developer tools entry as an icon only.
+    await expect(article(canvasElement)).toHaveAttribute(
+      "data-show-text",
+      "false",
+    );
+    await expect(canvas.queryByText("Navigation items")).toBeNull();
+    await expect(canvas.getByTestId("dev-tools-bar")).toHaveAttribute(
+      "data-icon-only",
+      "true",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -609,6 +692,20 @@ export const OnPhone: Story = {
     isMobileArticle: true,
     children: [bodySlot],
   },
+  play: async ({ canvas, canvasElement }) => {
+    // Portalled over a backdrop, without the profile block.
+    await expect(
+      canvasElement.querySelector('[data-testid="article"]'),
+    ).toBeNull();
+    await expect(screen.getByTestId("article")).toHaveAttribute(
+      "data-open",
+      "true",
+    );
+    await expect(
+      screen.getAllByTestId("backdrop").some((b) => b.checkVisibility()),
+    ).toBe(true);
+    await expect(canvas.queryByTestId("profile_username")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -641,6 +738,17 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas, canvasElement }) => {
+    // The border is on the left edge; the dots left of the name.
+    const panel = getComputedStyle(article(canvasElement));
+    await expect(panel.borderLeftWidth).toBe("1px");
+    await expect(panel.borderRightWidth).toBe("0px");
+    const name = canvas.getByTestId("profile_username").getBoundingClientRect();
+    const dots = canvas
+      .getByTestId("profile_user_icon_button")
+      .getBoundingClientRect();
+    await expect(dots.right).toBeLessThanOrEqual(name.left + 1);
+  },
   args: {
     ...defaultProps,
     user: mockUser,
@@ -707,6 +815,12 @@ const CssCustomizationTemplate = () => (
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvasElement }) => {
+    const [first] = within(canvasElement).getAllByTestId("article");
+    const panel = getComputedStyle(first);
+    await expect(panel.backgroundColor).toBe("rgb(230, 243, 251)");
+    await expect(panel.borderRightColor).toBe("rgb(0, 130, 201)");
+  },
   parameters: {
     docs: {
       description: {
