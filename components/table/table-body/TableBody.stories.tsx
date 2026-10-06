@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, waitFor, within } from "storybook/test";
 
 import { useEffect, useRef, useState } from "react";
 import { uuid as uuidv4 } from "../../../utils/";
@@ -158,6 +159,10 @@ type Story = StoryObj<ComponentProps<typeof TableBody>>;
 
 export default meta;
 
+// The mounted rows of the body; virtualised, only those near the view.
+const mountedRows = (root: HTMLElement) =>
+  within(root).queryAllByTestId("table-row");
+
 const createMockRows = (count: number) => {
   return Array(count)
     .fill(null)
@@ -178,7 +183,7 @@ export const Default: Story = {
   args: {
     columnStorageName: COLUMN_STORAGE_NAME,
     columnInfoPanelStorageName: COLUMN_INFO_PANEL_STORAGE_NAME,
-    fetchMoreFiles: async () => {},
+    fetchMoreFiles: fn(async () => {}),
     filesLength: 20,
     hasMoreFiles: false,
     itemCount: 20,
@@ -186,6 +191,14 @@ export const Default: Story = {
     useReactWindow: true,
     infoPanelVisible: false,
     children: createMockRows(20),
+  },
+  play: async ({ canvas }) => {
+    const body = await waitFor(() => canvas.getByTestId("table-body"));
+    await waitFor(() => expect(mountedRows(body).length).toBeGreaterThan(0));
+    // Only the rows near the 400px view are mounted.
+    await expect(mountedRows(body).length).toBeLessThan(20);
+    await expect(canvas.getByText("Cell 1-1")).toBeVisible();
+    await expect(canvas.queryByText("Cell 20-1")).toBeNull();
   },
   parameters: {
     docs: {
@@ -217,6 +230,12 @@ export const WithoutReactWindow: Story = {
     ...Default.args,
     useReactWindow: false,
   },
+  play: async ({ canvas }) => {
+    // Every row at once.
+    const body = await waitFor(() => canvas.getByTestId("table-body"));
+    await expect(mountedRows(body)).toHaveLength(20);
+    await expect(canvas.getByText("Cell 20-1")).toBeInTheDocument();
+  },
   parameters: {
     docs: {
       description: {
@@ -247,8 +266,22 @@ export const WithMoreFiles: Story = {
     ...Default.args,
     children: createMockRows(5),
     filesLength: 5,
-    itemCount: 5,
+    // The total: five rows are loaded out of twenty.
+    itemCount: 20,
     hasMoreFiles: true,
+  },
+  play: async ({ args, canvas }) => {
+    await waitFor(() => expect(canvas.getByText("Cell 5-1")).toBeVisible());
+    // The loader acts on a scroll of the section; with the placeholders in
+    // view, the next page is asked for.
+    const scroller = document.querySelector(
+      "#sectionScroll .scroll-wrapper > .scroller",
+    ) as HTMLElement;
+    await waitFor(() => {
+      scroller.scrollTop = scroller.scrollHeight;
+      scroller.dispatchEvent(new Event("scroll"));
+      expect(args.fetchMoreFiles).toHaveBeenCalled();
+    });
   },
   parameters: {
     docs: {
@@ -263,7 +296,7 @@ export const WithMoreFiles: Story = {
   fetchMoreFiles={fetchMore}
   filesLength={5}
   hasMoreFiles
-  itemCount={5}
+  itemCount={20}
   itemHeight={50}
   useReactWindow
 >
