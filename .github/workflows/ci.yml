@@ -101,6 +101,14 @@ jobs:
     name: "Story tests"
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Chromium and its system libraries come baked into Playwright's image.
+    # `playwright install --with-deps chromium` on the bare runner spent the
+    # whole 15-minute budget in apt and the 167 MiB download, and the job was
+    # killed before a single story ran. The tag MUST match the `playwright`
+    # version in package.json: bump both together, or the browser the image
+    # ships is not the one playwright looks for ("Executable doesn't exist").
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.1-noble
     steps:
       - uses: actions/checkout@v4
 
@@ -115,12 +123,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-
-      # The browser the `storybook` Vitest project drives, at the version the
-      # lockfile's playwright expects; --with-deps adds the system libraries
-      # a bare runner lacks.
-      - name: Install Chromium
-        run: pnpm exec playwright install --with-deps chromium
 
       # Every story rendered in Chromium, and its play function run. `pnpm
       # test` pins the jsdom project, so this is the only place the play
