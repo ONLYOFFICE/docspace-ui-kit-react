@@ -1,7 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import OperationsProgressButton from ".";
 import type { Operation } from "./OperationsProgressButton.types";
@@ -148,6 +148,12 @@ const meta = {
         "Ignored. Nothing reads this prop; the cancel cross calls `cancelUpload`",
     },
   },
+  args: {
+    clearOperationsData: fn(),
+    clearPanelOperationsData: fn(),
+    clearDropPreviewLocation: fn(),
+    cancelUpload: fn(),
+  },
   decorators: [
     (Story) => (
       <div
@@ -174,6 +180,29 @@ const Template = (args: ComponentProps<typeof OperationsProgressButton>) => (
   <OperationsProgressButton {...args} />
 );
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// Hovering the button shows what is running, in a portalled tooltip.
+const hoverTooltip = async ({ canvasElement, userEvent }: PlayContext) => {
+  await userEvent.hover(
+    canvasElement.querySelector(".layout-progress-bar") as HTMLElement,
+  );
+  const tooltip = await screen.findByRole("tooltip");
+  await waitFor(() => expect(tooltip).toBeVisible());
+  return tooltip;
+};
+
+// The list of operations opens in a drop-down above the button.
+const openList = async ({ canvas, userEvent }: PlayContext) => {
+  await userEvent.click(canvas.getByTestId("floating-button"));
+  const list = await waitFor(() => {
+    const element = document.querySelector<HTMLElement>(".progress-container");
+    expect(element).not.toBeNull();
+    return element as HTMLElement;
+  });
+  return list;
+};
+
 const singleUploadOperation: Operation[] = [
   {
     id: "op-1",
@@ -191,6 +220,22 @@ export const Default: Story = {
     operations: singleUploadOperation,
     operationsAlert: false,
     operationsCompleted: false,
+  },
+  play: async (context) => {
+    const { canvas } = context;
+    const button = canvas.getByTestId("floating-button");
+    await expect(within(button).getByTestId("icon-upload")).toBeVisible();
+    // The ring shows the first operation's percent.
+    const loader = within(button)
+      .getByTestId("floating-button-progress")
+      .querySelector('[class*="loader"]') as HTMLElement;
+    await expect(loader.style.getPropertyValue("--percent-percentage")).toBe(
+      "45%",
+    );
+    await expect(canvas.queryByTestId("floating-button-close-icon")).toBeNull();
+    await expect(await hoverTooltip(context)).toHaveTextContent(
+      "Uploading files",
+    );
   },
   parameters: {
     docs: {
@@ -223,6 +268,10 @@ export const UploadInProgress: Story = {
     operationsAlert: false,
     operationsCompleted: false,
     showCancelButton: true,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByTestId("floating-button-close-icon"));
+    await expect(args.cancelUpload).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -259,6 +308,14 @@ export const WithAlert: Story = {
     operationsCompleted: false,
     needErrorChecking: true,
   },
+  play: async (context) => {
+    await expect(
+      context.canvas.getByTestId("floating-button-alert-icon"),
+    ).toBeVisible();
+    const tooltip = await hoverTooltip(context);
+    await expect(tooltip).toHaveTextContent("Uploading files");
+    await expect(tooltip).toHaveTextContent("3");
+  },
   parameters: {
     docs: {
       description: {
@@ -291,6 +348,14 @@ export const CompletedOperation: Story = {
     ],
     operationsAlert: false,
     operationsCompleted: true,
+  },
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvas.getByTestId("floating-button-tick-icon")).toBeVisible();
+    // Marked to slide out on its own.
+    const container = (
+      canvasElement.querySelector(".layout-progress-bar") as HTMLElement
+    ).closest('[class*="progressBarContainer"]') as HTMLElement;
+    await expect(container.className).toMatch(/autoHide/);
   },
   parameters: {
     docs: {
@@ -344,6 +409,22 @@ export const MultipleOperations: Story = {
     operationsAlert: false,
     operationsCompleted: false,
   },
+  play: async (context) => {
+    const { args, userEvent } = context;
+    const showPanel = (args.panelOperations as Operation[])[0]
+      .showPanel as ReturnType<typeof fn>;
+    showPanel.mockClear();
+
+    const list = await openList(context);
+    await expect(within(list).getByText("Uploading files")).toBeVisible();
+    await expect(within(list).getByText("Copying documents")).toBeVisible();
+    // The panel operation's row opens its panel and closes the list.
+    await userEvent.click(within(list).getByText("Moving folder"));
+    await expect(showPanel).toHaveBeenCalledWith(true);
+    await waitFor(() =>
+      expect(document.querySelector(".progress-container")).toBeNull(),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -384,6 +465,16 @@ export const StoppedOperation: Story = {
     operationsCompleted: false,
     operationsStopped: true,
   },
+  play: async (context) => {
+    // The stop sign wins over the alert.
+    await expect(
+      context.canvas.getByTestId("floating-button-stopped-icon"),
+    ).toBeVisible();
+    await expect(
+      context.canvas.queryByTestId("floating-button-alert-icon"),
+    ).toBeNull();
+    await expect(await hoverTooltip(context)).toHaveTextContent("Moving files");
+  },
   parameters: {
     docs: {
       description: {
@@ -419,6 +510,17 @@ export const OpensPanelOnClick: Story = {
     operationsAlert: false,
     operationsCompleted: false,
   },
+  play: async (context) => {
+    const { args, canvas, userEvent } = context;
+    const showPanel = (args.panelOperations as Operation[])[0]
+      .showPanel as ReturnType<typeof fn>;
+    showPanel.mockClear();
+    const tooltip = await hoverTooltip(context);
+    await expect(tooltip).toHaveTextContent("Uploading files");
+    await expect(tooltip).toHaveTextContent("12 of 30 files");
+    await userEvent.click(canvas.getByTestId("floating-button"));
+    await expect(showPanel).toHaveBeenCalledWith(true);
+  },
   parameters: {
     docs: {
       description: {
@@ -448,6 +550,10 @@ export const DragPreview: Story = {
     operations: [],
     isDragging: true,
     dropTargetFolderName: "Reports",
+  },
+  play: async () => {
+    // The preview's tooltip names the folder under the pointer.
+    await waitFor(() => expect(screen.getByText(/Reports/)).toBeVisible());
   },
   parameters: {
     docs: {
@@ -489,6 +595,13 @@ export const RightToLeft: Story = {
     operationsCompleted: false,
   },
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // In the bottom-left corner.
+    const button = canvas
+      .getByTestId("floating-button")
+      .getBoundingClientRect();
+    await expect(button.left).toBeLessThan(window.innerWidth / 2);
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -549,7 +662,7 @@ export const CssCustomization: Story = {
             alert: false,
             completed: false,
             percent: 30,
-            showPanel: () => {},
+            showPanel: fn(),
           },
           {
             id: "op-3",
@@ -574,6 +687,18 @@ export const CssCustomization: Story = {
       />
     </div>
   ),
+  play: async (context) => {
+    const button = context.canvas.getByTestId("floating-button");
+    await expect(getComputedStyle(button).backgroundColor).toBe(
+      "rgb(0, 130, 201)",
+    );
+    const list = await openList(context);
+    await expect(within(list).getByText("Moving to trash")).toBeVisible();
+    const dropDown = list.closest('[data-testid="dropdown"]') as HTMLElement;
+    await expect(getComputedStyle(dropDown).backgroundColor).toBe(
+      "rgb(230, 243, 251)",
+    );
+  },
   parameters: {
     docs: {
       description: {
