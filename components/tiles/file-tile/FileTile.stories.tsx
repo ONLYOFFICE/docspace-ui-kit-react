@@ -1,7 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fireEvent, fn, screen, waitFor, within } from "storybook/test";
 
 import type { FileTileProps } from "./FileTile.types";
 
@@ -27,19 +27,30 @@ const thumbnail = `data:image/svg+xml,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="160"><rect width="320" height="160" fill="#f3f4f4"/><rect x="40" y="24" width="240" height="136" fill="#ffffff"/><rect x="64" y="48" width="120" height="8" fill="#a3a9ae"/><rect x="64" y="68" width="192" height="6" fill="#d0d5da"/><rect x="64" y="84" width="176" height="6" fill="#d0d5da"/><rect x="64" y="100" width="184" height="6" fill="#d0d5da"/></svg>',
 )}`;
 
+const onCopyOption = fn();
+const onBadgeClick = fn();
+const onLockClick = fn();
+
+// The menu is portalled and fades in.
+const menuItem = async (name: string) => {
+  const item = await screen.findByRole("menuitem", { name });
+  await waitFor(() => expect(item).toBeVisible());
+  return item;
+};
+
 const contextOptions = [
   {
     id: "option_copy-to",
     key: "copy-to",
     label: "Copy",
-    onClick: () => {},
+    onClick: onCopyOption,
     disabled: false,
   },
   {
     id: "option_move-to",
     key: "move-to",
     label: "Move to",
-    onClick: () => {},
+    onClick: fn(),
     disabled: false,
   },
 ];
@@ -56,7 +67,7 @@ const badges = (
       style={{
         width: "max-content",
       }}
-      onClick={() => {}}
+      onClick={onBadgeClick}
     />
   </div>
 );
@@ -69,7 +80,7 @@ const contentElement = (
       size={IconSizeType.medium}
       data-id="file-lock"
       data-locked={false}
-      onClick={() => {}}
+      onClick={onLockClick}
       color="#A3A9AE"
       isDisabled={false}
       hoverColor="accent"
@@ -302,6 +313,45 @@ export const Default: Story = {
     temporaryIcon: <ImageReactSvg />,
     getContextModel: () => contextOptions,
   },
+  beforeEach: () => {
+    onCopyOption.mockClear();
+    onBadgeClick.mockClear();
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const tile = canvas.getByTestId("tile");
+    const content = within(tile).getByText("File Content");
+
+    // A click on the tile selects it, alone.
+    await userEvent.click(content);
+    await expect(args.setSelection).toHaveBeenCalledWith([]);
+    await expect(args.onSelect).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ id: "file-1" }),
+    );
+
+    // Ctrl and Shift add to the selection instead.
+    fireEvent.click(content, { ctrlKey: true, detail: 1 });
+    await expect(args.withCtrlSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "file-1" }),
+    );
+    fireEvent.click(content, { shiftKey: true, detail: 1 });
+    await expect(args.withShiftSelect).toHaveBeenCalledTimes(1);
+
+    // A badge is not a selection click.
+    const selections = (args.onSelect as ReturnType<typeof fn>).mock.calls
+      .length;
+    await userEvent.click(within(tile).getByText("New"));
+    await expect(onBadgeClick).toHaveBeenCalledTimes(1);
+    await expect(args.onSelect).toHaveBeenCalledTimes(selections);
+
+    await userEvent.click(within(tile).getByTestId("file-thumbnail"));
+    await expect(args.thumbnailClick).toHaveBeenCalled();
+
+    fireEvent.contextMenu(tile, { button: 2 });
+    await expect(args.tileContextClick).toHaveBeenCalledWith(true);
+    await userEvent.click(await menuItem("Copy"));
+    await expect(onCopyOption).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -331,6 +381,13 @@ export const Checked: Story = {
     ...Default.args,
     checked: true,
   },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(tile.className).toMatch(/checked/);
+    await expect(
+      within(tile).getByRole("checkbox", { hidden: true }),
+    ).toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -358,6 +415,13 @@ export const InProgress: Story = {
     ...Default.args,
     inProgress: true,
   },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(
+      within(tile).queryByRole("checkbox", { hidden: true }),
+    ).toBeNull();
+    await expect(tile.querySelector('[class*="loader"]')).not.toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -383,6 +447,13 @@ export const WithThumbnail: Story = {
   args: {
     ...Default.args,
     thumbnail,
+  },
+  play: async ({ canvas }) => {
+    const preview = within(canvas.getByTestId("tile")).getByTestId(
+      "file-thumbnail",
+    );
+    await expect(preview.tagName).toBe("IMG");
+    await expect(preview).toHaveAttribute("src", thumbnail);
   },
   parameters: {
     docs: {
@@ -412,6 +483,11 @@ export const WithHotkeyBorder: Story = {
     ...Default.args,
     showHotkeyBorder: true,
   },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("tile").className).toMatch(
+      /showHotkeyBorder/,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -438,6 +514,13 @@ export const RenamingState: Story = {
   args: {
     ...Default.args,
     isEdit: true,
+  },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(tile.className).toMatch(/isEdit/);
+    await expect(
+      within(tile).queryByRole("checkbox", { hidden: true }),
+    ).toBeNull();
   },
   parameters: {
     docs: {
@@ -541,6 +624,20 @@ export const CssCustomization: Story = {
       </div>
     </div>
   ),
+  play: async ({ canvas }) => {
+    const [document, report] = canvas.getAllByTestId("tile");
+    const tile = getComputedStyle(document);
+    await expect(tile.backgroundColor).toBe("rgb(244, 249, 253)");
+    await expect(tile.borderTopLeftRadius).toBe("16px");
+    await expect(tile.height).toBe("240px");
+    await expect(
+      getComputedStyle(within(document).getByTestId("file-thumbnail"))
+        .borderTopLeftRadius,
+    ).toBe("8px");
+    const hotkey = getComputedStyle(report);
+    await expect(hotkey.borderTopWidth).toBe("2px");
+    await expect(hotkey.borderTopColor).toBe("rgb(224, 102, 46)");
+  },
   parameters: {
     docs: {
       description: {
