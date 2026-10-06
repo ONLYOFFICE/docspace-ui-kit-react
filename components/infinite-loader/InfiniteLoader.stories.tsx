@@ -2,7 +2,7 @@ import type { CSSProperties, ComponentProps, ReactNode } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
 
 import { useEffect, useState } from "react";
 
@@ -251,6 +251,28 @@ type Story = StoryObj<ComponentProps<typeof InfiniteLoaderComponent>>;
 
 export default meta;
 
+// The loader listens to this element, found by the portal's own ids.
+const getScroller = () =>
+  document.querySelector(
+    "#sectionScroll .scroll-wrapper > .scroller",
+  ) as HTMLElement;
+
+// Scrolls to the end of what is loaded and waits for the next page to be
+// asked for, then for its first item to arrive.
+const expectLoadsMore = async (
+  loadMoreItems: unknown,
+  findText: (text: string) => Promise<HTMLElement>,
+  nextItem: string,
+) => {
+  const scroller = getScroller();
+  await waitFor(() => {
+    scroller.scrollTop = scroller.scrollHeight;
+    scroller.dispatchEvent(new Event("scroll"));
+    expect(loadMoreItems).toHaveBeenCalled();
+  });
+  await expect(await findText(nextItem)).toBeInTheDocument();
+};
+
 export const Default: Story = {
   args: {
     viewAs: "tile" as TViewAs,
@@ -264,6 +286,15 @@ export const Default: Story = {
     onScroll: fn(),
   },
   render: (args) => <InfiniteLoaderDemo {...args} />,
+  play: async ({ args, canvas }) => {
+    await expect(await canvas.findByText("Item 1")).toBeVisible();
+    // Near the end of the loaded rows the next range is asked for.
+    await expectLoadsMore(
+      args.loadMoreItems,
+      (text) => canvas.findByText(text, {}, { timeout: 3000 }),
+      "Item 21",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -315,6 +346,18 @@ export const RowLayout: Story = {
     loadMoreItems: fn(),
   },
   render: (args) => <InfiniteLoaderDemo {...args} />,
+  play: async ({ args, canvas }) => {
+    // Every row has the height given by itemSize.
+    const first = await canvas.findByText("Item 1");
+    const row = first.closest('[style*="height: 48px"]');
+    await expect(row).not.toBeNull();
+
+    await expectLoadsMore(
+      args.loadMoreItems,
+      (text) => canvas.findByText(text, {}, { timeout: 3000 }),
+      "Item 21",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -350,6 +393,14 @@ export const TableLayout: Story = {
   render: (args) => {
     saveTableColumns();
     return <InfiniteLoaderDemo {...args} renderItem={renderTableRow} />;
+  },
+  play: async ({ canvas }) => {
+    // The rows take their column layout from localStorage.
+    const cell = await canvas.findByText("Document 1");
+    const row = cell.parentElement as HTMLElement;
+    await expect(
+      getComputedStyle(row).gridTemplateColumns.split(" "),
+    ).toHaveLength(3);
   },
   parameters: {
     docs: {
@@ -410,6 +461,10 @@ export const RightToLeft: Story = {
       <InfiniteLoaderDemo {...args} renderItem={renderRtlItem} />
     </div>
   ),
+  play: async ({ canvas }) => {
+    const item = await canvas.findByText("ملف 1");
+    await expect(getComputedStyle(item).direction).toBe("rtl");
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -444,6 +499,9 @@ export const CssCustomization: Story = {
       <InfiniteLoaderDemo />
     </div>
   ),
+  play: async ({ canvas }) => {
+    await expect(await canvas.findByText("Item 1")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
