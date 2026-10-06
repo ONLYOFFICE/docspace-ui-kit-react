@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { CSSProperties, ComponentProps } from "react";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import { RoomsType } from "../../enums";
 
@@ -105,6 +105,12 @@ type Story = StoryObj<ComponentProps<typeof RoomType>>;
 
 export default meta;
 
+const titleOf = (row: HTMLElement) =>
+  row.querySelector(".choose_room-title-text")?.textContent ?? "";
+
+const arrowOf = (row: HTMLElement) =>
+  row.querySelector(".choose_room-forward_btn") as HTMLElement;
+
 export const Default: Story = {
   render: (args) => <RoomType {...args} />,
   args: {
@@ -113,6 +119,17 @@ export const Default: Story = {
     type: "listItem",
     selectedId: "room-1",
     onClick: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const row = canvas.getByTestId("room-type-list-item");
+    await expect(titleOf(row)).not.toBe("");
+    await expect(row).toHaveAttribute("data-selected-id", "room-1");
+    // One call per click, on the arrow as anywhere else in the row.
+    await userEvent.click(arrowOf(row));
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    // Neither the row nor the arrow is a tab stop.
+    await expect(row).not.toHaveAttribute("tabindex");
+    await expect(row.querySelector("[tabindex]")).toBeNull();
   },
   parameters: {
     docs: {
@@ -142,6 +159,12 @@ export const DropdownButton: Story = {
     selectedId: "room-2",
     onClick: fn(),
   },
+  play: async ({ args, canvas, userEvent }) => {
+    const button = canvas.getByTestId("room-type-dropdown-button");
+    await expect(button.className).toMatch(/isOpen/);
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -169,6 +192,10 @@ export const DropdownItem: Story = {
     type: "dropdownItem",
     selectedId: "room-3",
     onClick: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByTestId("room-type-dropdown-item"));
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -216,6 +243,13 @@ export const RoomTypes: Story = {
     type: "listItem",
     selectedId: "",
     onClick: fn(),
+  },
+  play: async ({ canvas }) => {
+    // Six types, each with a name of its own.
+    const titles = canvas.getAllByTestId("room-type-list-item").map(titleOf);
+    await expect(titles).toHaveLength(6);
+    await expect(new Set(titles).size).toBe(6);
+    await expect(titles.every(Boolean)).toBe(true);
   },
   parameters: {
     docs: {
@@ -271,6 +305,17 @@ export const DisabledState: Story = {
     selectedId: "",
     onClick: fn(),
   },
+  play: async ({ args, canvas, userEvent }) => {
+    const card = canvas.getByTestId("room-type-list-item");
+    const entry = canvas.getByTestId("room-type-dropdown-item");
+    for (const row of [card, entry]) {
+      await expect(row).toHaveAttribute("aria-disabled", "true");
+    }
+    // Shown, but neither calls onClick.
+    await userEvent.click(card);
+    await userEvent.click(entry);
+    await expect(args.onClick).not.toHaveBeenCalled();
+  },
   parameters: {
     docs: {
       description: {
@@ -317,6 +362,13 @@ export const FromTemplate: Story = {
     selectedId: "room-1",
     onClick: fn(),
   },
+  play: async ({ canvas }) => {
+    // isTemplate rewords the row; isTemplateRoom keeps the room's name.
+    const [fromTemplate, templateRoom] = canvas
+      .getAllByTestId("room-type-list-item")
+      .map(titleOf);
+    await expect(fromTemplate).not.toBe(templateRoom);
+  },
   parameters: {
     docs: {
       description: {
@@ -355,6 +407,11 @@ export const FormSpace: Story = {
     isFormSection: true,
     onClick: fn(),
   },
+  play: async ({ canvas }) => {
+    await expect(titleOf(canvas.getByTestId("room-type-list-item"))).not.toBe(
+      "",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -387,6 +444,14 @@ export const RightToLeft: Story = {
     type: "listItem",
     selectedId: "room-1",
     onClick: fn(),
+  },
+  play: async ({ canvas }) => {
+    // Under RTL the forward arrow sits on the left of the text.
+    const row = canvas.getByTestId("room-type-list-item");
+    const text = row.querySelector(".choose_room-info_wrapper") as HTMLElement;
+    await expect(
+      arrowOf(row).getBoundingClientRect().right,
+    ).toBeLessThanOrEqual(text.getBoundingClientRect().left);
   },
   parameters: {
     noPadding: true,
@@ -436,6 +501,11 @@ export const CssCustomization = {
       />
     </div>
   ),
+  play: async ({ canvas }: Parameters<NonNullable<Story["play"]>>[0]) => {
+    const row = getComputedStyle(canvas.getByTestId("room-type-list-item"));
+    await expect(row.backgroundColor).toBe("rgb(230, 243, 251)");
+    await expect(row.borderTopLeftRadius).toBe("12px");
+  },
   parameters: {
     docs: {
       description: {
