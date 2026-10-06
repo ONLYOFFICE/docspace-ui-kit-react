@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fireEvent, fn, screen, waitFor } from "storybook/test";
 
 import { ContextMenuModel } from "../../context-menu";
 import { TableCell } from "../sub-components/table-cell";
@@ -144,6 +145,12 @@ The Table README describes it in full.`,
       display: "grid",
       gridTemplateColumns: "repeat(3, 1fr) 24px",
     },
+    fileContextClick: fn(),
+    onHideContextMenu: fn(),
+    onClick: fn(),
+    onDoubleClick: fn(),
+    onMouseEnter: fn(),
+    onMouseLeave: fn(),
   },
 } satisfies Meta<typeof TableRow>;
 
@@ -151,18 +158,28 @@ type Story = StoryObj<ComponentProps<typeof TableRow>>;
 
 export default meta;
 
+const onEditOption = fn();
+const onDeleteOption = fn();
+
 const contextOptions: ContextMenuModel[] = [
   {
     key: "edit",
     label: "Edit",
-    onClick: () => console.log("Edit clicked"),
+    onClick: onEditOption,
   },
   {
     key: "delete",
     label: "Delete",
-    onClick: () => console.log("Delete clicked"),
+    onClick: onDeleteOption,
   },
 ];
+
+// The menu is portalled and fades in.
+const menuItem = async (name: string) => {
+  const item = await screen.findByRole("menuitem", { name });
+  await waitFor(() => expect(item).toBeVisible());
+  return item;
+};
 
 const RowContent = (
   <>
@@ -186,6 +203,25 @@ export const Default: Story = {
     selectionProp: { className: "selection-class" },
     title: "Context menu",
     contextOptions,
+  },
+  beforeEach: () => {
+    onDeleteOption.mockClear();
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const row = canvas.getByTestId("table-row");
+    await expect(row).toHaveClass("custom-row-class", "table-container_row");
+
+    await userEvent.click(canvas.getByText("Cell 1"));
+    await expect(args.onClick).toHaveBeenCalled();
+    await userEvent.dblClick(canvas.getByText("Cell 2"));
+    await expect(args.onDoubleClick).toHaveBeenCalled();
+
+    // A right click anywhere in the row opens its menu.
+    fireEvent.contextMenu(canvas.getByText("Cell 3"), { button: 2 });
+    await expect(args.fileContextClick).toHaveBeenCalledWith(true);
+    await userEvent.click(await menuItem("Delete"));
+    await expect(onDeleteOption).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(args.onHideContextMenu).toHaveBeenCalled());
   },
   parameters: {
     docs: {
@@ -214,6 +250,13 @@ export const IndexEditingMode: Story = {
     className: "custom-row-class",
     selectionProp: { className: "selection-class" },
     isIndexEditingMode: true,
+  },
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvas.getByText("Cell 3")).toBeVisible();
+    // No last cell with a menu while the index is edited.
+    await expect(
+      canvasElement.querySelector(".context-menu-container"),
+    ).toBeNull();
   },
   parameters: {
     docs: {
