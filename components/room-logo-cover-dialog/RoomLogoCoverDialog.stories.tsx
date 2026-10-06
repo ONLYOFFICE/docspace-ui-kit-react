@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 import { useEffect, useState } from "react";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import type { TTranslation } from "../../utils";
 import type { ICover } from "../../types";
@@ -137,6 +137,23 @@ type Story = StoryObj<ComponentProps<typeof RoomLogoCoverDialog>>;
 
 export default meta;
 
+// The dialog is portalled and stays mounted while closed.
+const dialog = async () => {
+  const element = screen.getByTestId("room_logo_cover_dialog");
+  const content = within(element).getByTestId("modal-dialog");
+  await waitFor(() => expect(content).toBeVisible());
+  return within(content);
+};
+
+const dialogClosed = () =>
+  waitFor(() =>
+    expect(
+      within(screen.getByTestId("room_logo_cover_dialog")).getByTestId(
+        "modal-dialog",
+      ),
+    ).not.toBeVisible(),
+  );
+
 type DemoProps = Pick<
   ComponentProps<typeof RoomLogoCoverDialog>,
   | "visible"
@@ -193,6 +210,22 @@ export const Default: Story = {
     visible: true,
     isBaseTheme: true,
   },
+  play: async ({ args, userEvent }) => {
+    const modal = await dialog();
+    await expect(modal.getByText("Room cover")).toBeVisible();
+    // The first colour is chosen to begin with.
+    await expect(modal.getByTestId("color_item_selected_0")).toBeVisible();
+
+    await userEvent.click(modal.getByTestId("color_item_3"));
+    await expect(modal.getByTestId("color_item_selected_3")).toBeVisible();
+    await userEvent.click(modal.getByTestId("room_logo_cover_icon_2"));
+    await userEvent.click(modal.getByRole("button", { name: "Apply" }));
+    await expect(args.onApply).toHaveBeenCalledWith(
+      "#61C059",
+      expect.objectContaining({ id: covers[2].id }),
+    );
+    await dialogClosed();
+  },
   parameters: {
     docs: {
       description: {
@@ -219,6 +252,20 @@ export const WithPreselectedCover: Story = {
     initialCover: covers[1],
     initialColor: "#4781D1",
   },
+  play: async ({ args, userEvent }) => {
+    const modal = await dialog();
+    // A colour outside the palette shows as the custom one.
+    await expect(modal.getByTestId("color_item_custom_selected")).toBeVisible();
+    await expect(modal.getByTestId("room_logo_cover_icon_1").className).toMatch(
+      /isSelected/,
+    );
+    // Applying unchanged returns the preset.
+    await userEvent.click(modal.getByRole("button", { name: "Apply" }));
+    await expect(args.onApply).toHaveBeenCalledWith(
+      "#4781D1",
+      expect.objectContaining({ id: covers[1].id }),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -242,6 +289,18 @@ export const InitialsFromTitle: Story = {
     ...Default.args,
     title: "Quarterly reports",
   },
+  play: async ({ userEvent }) => {
+    const modal = await dialog();
+    const preview = (
+      await waitFor(() => modal.getByText("Room cover"))
+    ).closest('[data-testid="modal-dialog"]') as HTMLElement;
+    const logo = preview.querySelector(".room-logo-container") as HTMLElement;
+    // Without an icon the preview shows the title's initials.
+    await expect(logo).toHaveTextContent("QR");
+    // An icon replaces them.
+    await userEvent.click(modal.getByTestId("room_logo_cover_icon_0"));
+    await waitFor(() => expect(logo).not.toHaveTextContent("QR"));
+  },
   parameters: {
     docs: {
       description: {
@@ -261,6 +320,14 @@ export const WithAccentColors: Story = {
     ...Default.args,
     initialCover: covers[1],
     currentColorScheme: accentScheme,
+  },
+  play: async () => {
+    const modal = await dialog();
+    // The selected icon is tinted with the accent.
+    const selected = modal.getByTestId("room_logo_cover_icon_1");
+    await expect(selected.style.getPropertyValue("--icon-selected-bg")).toBe(
+      "rgb(71 129 209 / 20%)",
+    );
   },
   parameters: {
     docs: {
@@ -285,6 +352,16 @@ export const WithoutIconPicker: Story = {
     ...Default.args,
     title: "Quarterly reports",
   },
+  play: async ({ args, userEvent }) => {
+    const modal = await dialog();
+    await expect(
+      modal.queryByTestId("room_logo_cover_without_icon"),
+    ).toBeNull();
+    await expect(modal.queryByTestId("room_logo_cover_icon_0")).toBeNull();
+    await userEvent.click(modal.getByRole("button", { name: "Cancel" }));
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
+    await dialogClosed();
+  },
   parameters: {
     docs: {
       description: {
@@ -305,6 +382,12 @@ export const OnPhone: Story = {
   args: {
     ...Default.args,
     title: "Quarterly reports",
+  },
+  play: async ({ args, userEvent }) => {
+    const modal = await dialog();
+    await userEvent.click(modal.getByTestId("color_item_1"));
+    await userEvent.click(modal.getByRole("button", { name: "Apply" }));
+    await expect(args.onApply).toHaveBeenCalledWith("#FF8F40", null);
   },
   parameters: {
     docs: {
