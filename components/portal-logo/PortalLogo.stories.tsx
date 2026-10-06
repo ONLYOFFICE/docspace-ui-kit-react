@@ -1,5 +1,6 @@
 import React, { type ComponentProps, type CSSProperties } from "react";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 
 import PortalLogo from "./PortalLogo";
 
@@ -78,10 +79,33 @@ type Story = StoryObj<ComponentProps<typeof PortalLogo>>;
 
 export default meta;
 
+// The layout follows the window: 600px and narrower counts as a phone.
+const isPhoneWidth = () => window.innerWidth <= 600;
+
+// The image once the placeholder has replaced the failed portal request.
+const findLogo = async (canvasElement: HTMLElement) => {
+  let img: HTMLImageElement | null = null;
+  await waitFor(() => {
+    img = canvasElement.querySelector<HTMLImageElement>("img.logo-wrapper");
+    expect(img?.src).toMatch(/^data:image\/svg\+xml/);
+  });
+  return img as unknown as HTMLImageElement;
+};
+
 export const Default: Story = {
   render: (args) => <PortalLogo {...args} />,
   args: {
     isResizable: false,
+  },
+  play: async ({ canvasElement }) => {
+    const img = await findLogo(canvasElement);
+    await expect(img).toHaveAttribute("alt", "portal logo");
+    // Without isResizable the logo is hidden, not shrunk, on a phone.
+    if (isPhoneWidth()) {
+      await expect(img).not.toBeVisible();
+    } else {
+      await expect(img).toBeVisible();
+    }
   },
   parameters: {
     docs: {
@@ -101,6 +125,17 @@ export const Resizable: Story = {
   args: {
     isResizable: true,
   },
+  play: async ({ canvasElement }) => {
+    const img = await findLogo(canvasElement);
+    // Resizable: visible at any width, in the fixed bar on a phone.
+    await expect(img).toBeVisible();
+    const wrapper = img.parentElement as HTMLElement;
+    await expect(wrapper.className).toMatch(/resizable/);
+    // On a phone width it becomes a bar fixed across the top.
+    await expect(getComputedStyle(wrapper).position === "fixed").toBe(
+      isPhoneWidth(),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -119,6 +154,12 @@ export const WithClassName: Story = {
   args: {
     className: "custom-logo-class",
     isResizable: false,
+  },
+  play: async ({ canvasElement }) => {
+    // The class lands on the image, not on the wrapper around it.
+    const img = await findLogo(canvasElement);
+    await expect(img).toHaveClass("custom-logo-class");
+    await expect(img.parentElement).not.toHaveClass("custom-logo-class");
   },
   parameters: {
     docs: {
@@ -158,6 +199,13 @@ export const FallbackLogo: Story = {
   args: {
     isResizable: false,
   },
+  play: async ({ canvasElement }) => {
+    // The failed request swaps the whole component for the bundled logo.
+    await waitFor(() =>
+      expect(canvasElement.querySelector("svg.logo-wrapper")).not.toBeNull(),
+    );
+    await expect(canvasElement.querySelector("img")).toBeNull();
+  },
   parameters: {
     keepFallback: true,
     docs: {
@@ -189,6 +237,16 @@ export const CssCustomization: Story = {
       <PortalLogo isResizable />
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const img = await findLogo(canvasElement);
+    if (isPhoneWidth()) {
+      await expect(
+        getComputedStyle(img.parentElement as HTMLElement).height,
+      ).toBe("56px");
+    } else {
+      await expect(getComputedStyle(img).height).toBe("36px");
+    }
+  },
   parameters: {
     docs: {
       description: {
