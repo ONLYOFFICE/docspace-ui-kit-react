@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 
 import { Button, ButtonSize } from "../button";
 
@@ -36,10 +37,19 @@ type Story = StoryObj<ComponentProps<typeof StatusMessage>>;
 
 export default meta;
 
+// The bar around a message's text.
+const barOf = (text: HTMLElement) =>
+  text.closest("div[class*='body']") as HTMLElement;
+
 export const Default: Story = {
   render: (args) => <StatusMessage {...args} />,
   args: {
     message: "This is a status message",
+  },
+  play: async ({ canvas }) => {
+    const text = await canvas.findByText("This is a status message");
+    await waitFor(() => expect(text).toBeVisible());
+    await expect(barOf(text).className).not.toMatch(/warning/);
   },
   parameters: {
     docs: {
@@ -107,6 +117,10 @@ const MessageSwapTemplate = () => {
 
 export const WarningMessage: Story = {
   render: () => <WarningTemplate />,
+  play: async ({ canvas }) => {
+    const text = await canvas.findByText("This is a warning message");
+    await expect(barOf(text).className).toMatch(/warning/);
+  },
   parameters: {
     docs: {
       description: {
@@ -122,6 +136,27 @@ export const WarningMessage: Story = {
 
 export const ToggleVisibility: Story = {
   render: () => <ToggleTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await canvas.findByText("Click the button to dismiss");
+
+    // An empty message fades the bar out and removes it.
+    await userEvent.click(canvas.getByRole("button", { name: "Hide Message" }));
+    await waitFor(
+      () =>
+        expect(canvas.queryByText("Click the button to dismiss")).toBeNull(),
+      { timeout: 3000 },
+    );
+
+    // A new one brings it back.
+    await userEvent.click(canvas.getByRole("button", { name: "Show Message" }));
+    await expect(
+      await canvas.findByText(
+        "Status message is visible",
+        {},
+        { timeout: 3000 },
+      ),
+    ).toBeInTheDocument();
+  },
   parameters: {
     docs: {
       description: {
@@ -141,6 +176,29 @@ export const ToggleVisibility: Story = {
 
 export const MessageSwap: Story = {
   render: () => <MessageSwapTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await canvas.findByText("First message");
+
+    // The old text fades out before the new one appears.
+    await userEvent.click(canvas.getByRole("button", { name: "Message B" }));
+    const second = await canvas.findByText(
+      "Second message",
+      {},
+      { timeout: 3000 },
+    );
+    await expect(canvas.queryByText("First message")).toBeNull();
+    // Let the new text finish fading in: the bar is removed on the end of
+    // its fade-out, which never comes if the fade-in had not started.
+    await waitFor(() =>
+      expect(getComputedStyle(barOf(second)).opacity).toBe("1"),
+    );
+
+    await userEvent.click(canvas.getByRole("button", { name: "Clear" }));
+    await waitFor(
+      () => expect(canvas.queryByText("Second message")).toBeNull(),
+      { timeout: 3000 },
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -185,6 +243,21 @@ export const CssCustomization: Story = {
       <StatusMessage message="Custom styled warning message." isWarning />
     </div>
   ),
+  play: async ({ canvas }) => {
+    const plain = barOf(
+      await canvas.findByText(
+        "Custom styled status message with CSS variables.",
+      ),
+    );
+    await expect(getComputedStyle(plain).backgroundColor).toBe(
+      "rgb(30, 27, 75)",
+    );
+    await expect(plain.getBoundingClientRect().width).toBeLessThanOrEqual(360);
+    const warning = barOf(canvas.getByText("Custom styled warning message."));
+    await expect(getComputedStyle(warning).backgroundColor).toBe(
+      "rgb(66, 32, 6)",
+    );
+  },
   parameters: {
     docs: {
       description: {
