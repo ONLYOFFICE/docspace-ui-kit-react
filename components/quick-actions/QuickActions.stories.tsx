@@ -1,6 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import {
   BlankPdfIcon,
@@ -83,6 +83,19 @@ export default meta;
 const Wrapper = (props: { children: React.ReactNode }) => (
   <div style={{ maxWidth: 752 }}>{props.children}</div>
 );
+
+// The stories' typed `render` leaves `play` without a contextual type.
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// The arrows follow the track: shown only where there is somewhere to go.
+const expectArrowsMatchTrack = async (track: HTMLElement) => {
+  const scrollable = track.scrollWidth - track.clientWidth > 1;
+  await waitFor(() =>
+    expect(!!screen.queryByTestId("quick-actions-next")).toBe(scrollable),
+  );
+  // At the start there is never a way back.
+  await expect(screen.queryByTestId("quick-actions-prev")).toBeNull();
+};
 
 const documentItems: QuickActionItem[] = [
   {
@@ -204,6 +217,18 @@ export const Default: Story = {
     prevLabel: "Previous",
     nextLabel: "Next",
   },
+  play: async ({ canvas, userEvent }: PlayContext) => {
+    // Every tile is a native button named by its label.
+    await userEvent.click(canvas.getByRole("button", { name: "Document" }));
+    await expect(documentItems[0].onClick).toHaveBeenCalledTimes(1);
+
+    const spreadsheet = canvas.getByRole("button", { name: "Spreadsheet" });
+    spreadsheet.focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(documentItems[1].onClick).toHaveBeenCalledTimes(1);
+
+    await expectArrowsMatchTrack(canvas.getByTestId("quick-actions-track"));
+  },
   parameters: {
     docs: {
       description: {
@@ -236,6 +261,18 @@ export const InAIForms: Story = {
     items: aiFormsItems,
     prevLabel: "Previous",
     nextLabel: "Next",
+  },
+  play: async ({ canvas }: PlayContext) => {
+    const names = canvas
+      .getAllByRole("button")
+      .filter((button) => !button.dataset.testid?.startsWith("quick-actions"))
+      .map((button) => button.getAttribute("aria-label"));
+    await expect(names).toEqual([
+      "Blank PDF form",
+      "Generate with AI",
+      "From text file",
+      "Use template",
+    ]);
   },
   parameters: {
     docs: {
@@ -270,6 +307,11 @@ export const InAIChat: Story = {
     prevLabel: "Previous",
     nextLabel: "Next",
   },
+  play: async ({ canvas, userEvent }: PlayContext) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Create agent" }));
+    await expect(aiChatItems[0].onClick).toHaveBeenCalledTimes(1);
+    await expectArrowsMatchTrack(canvas.getByTestId("quick-actions-track"));
+  },
   parameters: {
     docs: {
       description: {
@@ -301,6 +343,18 @@ export const Carousel: Story = {
     items: roomItems,
     prevLabel: "Previous",
     nextLabel: "Next",
+  },
+  play: async ({ canvas, userEvent }: PlayContext) => {
+    const track = canvas.getByTestId("quick-actions-track");
+    // Five tiles overflow: only the forward arrow at the start.
+    await expectArrowsMatchTrack(track);
+
+    await userEvent.click(canvas.getByRole("button", { name: "Next" }));
+    await waitFor(() => expect(track.scrollLeft).toBeGreaterThan(0));
+    // Once moved, the back arrow appears.
+    await expect(
+      await canvas.findByRole("button", { name: "Previous" }),
+    ).toBeInTheDocument();
   },
   parameters: {
     docs: {
@@ -338,6 +392,14 @@ export const Dismissible: Story = {
     nextLabel: "Next",
     closeLabel: "Hide quick actions on all pages",
     onClose: fn(),
+  },
+  play: async ({ args, canvas, userEvent }: PlayContext) => {
+    // closeLabel names the cross; a click only reports it.
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Hide quick actions on all pages" }),
+    );
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
+    await expect(canvas.getByTestId("quick-actions-track")).toBeVisible();
   },
   parameters: {
     docs: {
@@ -386,6 +448,17 @@ export const LinkTiles: Story = {
     prevLabel: "Previous",
     nextLabel: "Next",
   },
+  play: async ({ canvas }: PlayContext) => {
+    // href makes a tile a real link.
+    const templates = canvas.getByRole("link", { name: "Browse templates" });
+    await expect(templates).toHaveAttribute("href", "#templates");
+    await expect(templates).not.toHaveAttribute("rel");
+
+    // target="_blank" adds rel="noopener noreferrer" by itself.
+    const guide = canvas.getByRole("link", { name: "Open the guide" });
+    await expect(guide).toHaveAttribute("target", "_blank");
+    await expect(guide).toHaveAttribute("rel", "noopener noreferrer");
+  },
   parameters: {
     docs: {
       description: {
@@ -427,6 +500,17 @@ export const DisabledState: Story = {
     prevLabel: "Previous",
     nextLabel: "Next",
   },
+  play: async ({ canvas, userEvent }: PlayContext) => {
+    const presentation = canvas.getByRole("button", { name: "Presentation" });
+    await expect(presentation).toBeDisabled();
+
+    // The tooltip opens from the wrapper, since a disabled button takes no
+    // pointer events of its own.
+    await userEvent.hover(presentation.parentElement as HTMLElement);
+    await waitFor(() =>
+      expect(screen.getByText("Not available in this folder")).toBeVisible(),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -460,6 +544,11 @@ export const LoadingState: Story = {
       <QuickActions items={documentItems} isLoading />
     </Wrapper>
   ),
+  play: async ({ canvas }: PlayContext) => {
+    // Skeletons only: no tiles, no controls.
+    await expect(canvas.queryAllByRole("button")).toHaveLength(0);
+    await expect(canvas.queryByTestId("quick-actions-track")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -479,6 +568,12 @@ export const RightToLeft: Story = {
       <QuickActions items={roomItems} prevLabel="Previous" nextLabel="Next" />
     </div>
   ),
+  play: async ({ canvas, userEvent }: PlayContext) => {
+    // Under RTL the strip scrolls toward negative offsets.
+    const track = canvas.getByTestId("quick-actions-track");
+    await userEvent.click(await canvas.findByRole("button", { name: "Next" }));
+    await waitFor(() => expect(track.scrollLeft).toBeLessThan(0));
+  },
   globals: { direction: "rtl" },
   parameters: {
     noPadding: true,
@@ -523,6 +618,13 @@ export const CssCustomization: Story = {
       />
     </div>
   ),
+  play: async ({ canvas }: PlayContext) => {
+    const tile = canvas.getByRole("button", { name: "Document" });
+    await expect(getComputedStyle(tile).backgroundColor).toBe(
+      "rgb(30, 27, 75)",
+    );
+    await expect(tile.getBoundingClientRect().width).toBeLessThanOrEqual(176);
+  },
   parameters: {
     docs: {
       description: {
