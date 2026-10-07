@@ -175,10 +175,11 @@ every story and docs entry, so nothing is guessed; the export-to-id rule (`WithI
    inline code are never touched. Each Props table is reshaped into the SDK's three columns,
    `Property | Type | Description`: `Required` becomes the optional marker after the code span
    (`` `label`? ``, outside the span so the row id has no `?`) and `Default` closes the
-   description as `Default: \`x\`.`. Five columns do not fit the site's `<APITable>`, which the
-tables are then wrapped in; as in the SDK, they get a `name`only when their row ids collide.
-The primary picture goes under the intro, and a Stories section -- each story's name, its`docs.description.story`and its picture -- before`## Minimal example`, where Storybook
-   shows them.
+   description as ``Default: `x`.``. Five columns do not fit the site's `<APITable>`, which the
+   tables are then wrapped in; as in the SDK, they get a `name` only when their row ids collide.
+   The primary picture goes under the intro. A Stories section, listing each story's name,
+   description (`docs.description.story`) and picture, is placed before the Minimal example
+   heading, where Storybook shows them.
 2. **MDX pages.** Imports and `<Meta>` go; every other React element at the top level is
    replaced by its picture, a `<Story of>` by the story's. A trailing rule and the paragraph after
    it -- the version and licence line under Welcome -- is the page's Storybook footer and goes
