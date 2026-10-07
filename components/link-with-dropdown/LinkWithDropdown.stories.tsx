@@ -1,7 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn, screen } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import { LinkWithDropdown } from ".";
 
@@ -225,6 +225,22 @@ const dropdownItems = [
   },
 ];
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// The styled root: padding, radius and colours sit on it.
+const root = (trigger: HTMLElement) =>
+  trigger.closest('[data-test-id="link-dropdown"]') as HTMLElement;
+
+const opens = async ({ canvas, userEvent }: PlayContext, name: string) => {
+  const trigger = canvas.getByRole("button", { name });
+  await userEvent.click(trigger);
+  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  await waitFor(() =>
+    expect(screen.getByRole("option", { name: "Button 1" })).toBeVisible(),
+  );
+  return trigger;
+};
+
 export const Default: Story = {
   render: (args) => <LinkWithDropdown {...args} />,
   play: async ({ canvas, userEvent }) => {
@@ -288,6 +304,13 @@ const WithExpanderTemplate = () => {
 
 export const WithExpander: Story = {
   render: () => <WithExpanderTemplate />,
+  play: async (context) => {
+    const trigger = context.canvas.getByRole("button", {
+      name: "Link with Expander",
+    });
+    await expect(trigger.querySelector("svg")).not.toBeNull();
+    await opens(context, "Link with Expander");
+  },
   parameters: {
     docs: {
       description: {
@@ -320,6 +343,16 @@ const CustomStylingTemplate = () => {
 
 export const CustomStyling: Story = {
   render: () => <CustomStylingTemplate />,
+  play: async ({ canvas }) => {
+    const label = canvas.getByText("Custom Styled Link");
+    await expect(label).toHaveStyle({
+      color: "rgb(71, 129, 209)",
+      fontSize: "16px",
+    });
+    await expect(
+      Number(getComputedStyle(label).fontWeight),
+    ).toBeGreaterThanOrEqual(600);
+  },
   parameters: {
     docs: {
       description: {
@@ -381,6 +414,11 @@ const SemiTransparentTemplate = () => {
 
 export const SemiTransparent: Story = {
   render: () => <SemiTransparentTemplate />,
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("button", { name: "Semi-transparent Link" }),
+    ).toHaveStyle({ opacity: "0.5" });
+  },
   parameters: {
     docs: {
       description: {
@@ -410,6 +448,13 @@ const WithCustomWidthTemplate = () => {
 
 export const WithCustomWidth: Story = {
   render: () => <WithCustomWidthTemplate />,
+  play: async (context) => {
+    await opens(context, "Custom Width Link");
+    // The width reaches the menu as its --manual-width.
+    await expect(
+      screen.getByRole("listbox").style.getPropertyValue("--manual-width"),
+    ).toBe("300px");
+  },
   parameters: {
     docs: {
       description: {
@@ -441,6 +486,14 @@ const TextOverflowTemplate = () => {
 
 export const TextOverflow: Story = {
   render: () => <TextOverflowTemplate />,
+  play: async ({ canvas }) => {
+    const label = canvas.getByText(/^A long link label/);
+    // Cut at 200px with an ellipsis, the chevron still beside it.
+    await expect(label.getBoundingClientRect().width).toBeLessThanOrEqual(200);
+    await expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
+    await expect(label).toHaveStyle({ textOverflow: "ellipsis" });
+    await expect(canvas.getByRole("button").querySelector("svg")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -478,6 +531,23 @@ const OpenMenuTemplate = () => {
 
 export const OpenMenu: Story = {
   render: () => <OpenMenuTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // Open from the first render; a click outside, which lands on the
+    // backdrop, closes it.
+    const trigger = canvas.getByRole("button", { name: "Open Link" });
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await waitFor(() =>
+      expect(screen.getByRole("option", { name: "Button 1" })).toBeVisible(),
+    );
+    const backdrop = screen
+      .getAllByTestId("backdrop")
+      .find((element) => element.checkVisibility());
+    if (!backdrop) throw new Error("No visible backdrop");
+    await userEvent.click(backdrop);
+    await waitFor(() =>
+      expect(trigger).toHaveAttribute("aria-expanded", "false"),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -494,6 +564,20 @@ export const OpenMenu: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const customized = root(
+      canvas.getByRole("button", { name: "Customized Link" }),
+    );
+    await expect(customized).toHaveStyle({
+      color: "rgb(124, 58, 237)",
+      backgroundColor: "rgb(245, 243, 255)",
+      borderRadius: "8px",
+      padding: "6px 12px",
+    });
+    await expect(
+      canvas.getByRole("button", { name: "Disabled Link" }),
+    ).toHaveStyle({ color: "rgb(196, 181, 253)" });
+  },
   render: () => (
     <div
       style={
