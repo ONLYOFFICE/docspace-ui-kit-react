@@ -18,7 +18,7 @@ import type { TUsagePeriodKey } from "../types";
 
 import PeriodSelect from "./sub-components/PeriodSelect";
 import SpendingBreakdown from "./sub-components/SpendingBreakdown";
-import SpendAmount from "../shared/spend-amount";
+import BalanceAmount from "../shared/balance-amount";
 
 import { getUsageRange } from "./utils";
 import { toastr } from "../../components/toast";
@@ -52,6 +52,7 @@ const Usage = ({
     formatDate,
     openOnNewPage,
     isCardLinkedToPortal,
+    walletCodeCurrency,
     setFilterStartDate,
     setFilterEndDate,
     savedUsagePeriod,
@@ -124,15 +125,23 @@ const Usage = ({
 
   const { from, to } = getUsageRange(period);
 
-  const openWithPeriod = (openServicePage?: () => void) => {
-    if (!openServicePage) return undefined;
+  const openKeepingPeriod = (openPage?: () => void) => {
+    if (!openPage) return;
 
     return () => {
+      setSavedUsagePeriod(period);
+      openPage();
+    };
+  };
+
+  const openWithPeriod = (openServicePage?: () => void) => {
+    if (!openServicePage) return;
+
+    return openKeepingPeriod(() => {
       setFilterStartDate(from);
       setFilterEndDate(to);
-      setSavedUsagePeriod(period);
       openServicePage();
-    };
+    });
   };
 
   const monthText = from.setLocale(language || "en").toFormat("LLLL yyyy");
@@ -304,9 +313,14 @@ const Usage = ({
         {isLoading ? (
           <RectangleSkeleton width="120px" height="24px" borderRadius="3px" />
         ) : (
-          <SpendAmount
+          <BalanceAmount
+            showRefresh={false}
             amount={totalSpend}
-            className={styles.totalValue}
+            currency={walletCodeCurrency}
+            language={language}
+            mainFontSize="18px"
+            fractionFontSize="12px"
+            withoutMargin
             tooltipId="usage-total-spend"
           />
         )}
@@ -316,7 +330,7 @@ const Usage = ({
       <SpendingBreakdown
         period={period}
         isLoading={isLoading}
-        onTariffPlanClick={onTariffPlanClick}
+        onTariffPlanClick={openKeepingPeriod(onTariffPlanClick)}
         onDiskStorageClick={openWithPeriod(onDiskStorageClick)}
         onBackupClick={openWithPeriod(onBackupClick)}
         onAIServicesClick={openWithPeriod(onAIServicesClick)}
