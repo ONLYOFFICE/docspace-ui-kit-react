@@ -553,6 +553,16 @@ export const RightToLeft: Story = {
     />
   ),
   globals: { direction: "rtl" },
+  play: async (context) => {
+    // The toast reads right to left: the cross moves to the left end.
+    const toast = await openToast(context, "The file was saved");
+    const card = toast.closest(".Toastify__toast") as HTMLElement;
+    await expect(getComputedStyle(card).direction).toBe("rtl");
+    const cross = card.querySelector(".closeButton") as HTMLElement;
+    await expect(cross.getBoundingClientRect().left).toBeLessThan(
+      screen.getByText("The file was saved").getBoundingClientRect().left,
+    );
+  },
   args: {
     data: "The file was saved",
     title: "Saved",
@@ -606,6 +616,20 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async (context) => {
+    const toast = await openToast(
+      context,
+      "Custom success notification",
+      "Show Custom Toasts",
+    );
+    const card = toast.closest(".Toastify__toast") as HTMLElement;
+    await expect(card).toHaveStyle({ borderRadius: "12px", padding: "16px" });
+    const container = card.closest(".Toastify__toast-container") as HTMLElement;
+    await expect(Math.round(container.getBoundingClientRect().width)).toBe(360);
+    await expect(
+      Math.round(window.innerWidth - container.getBoundingClientRect().right),
+    ).toBe(32);
+  },
   parameters: {
     docs: {
       description: {
