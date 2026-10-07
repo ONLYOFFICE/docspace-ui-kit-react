@@ -1,6 +1,7 @@
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 
 import { ErrorOfflineContainer } from "./ErrorOffline";
 import { setupErrorI18n } from "./stories.utils";
@@ -44,6 +45,14 @@ type Story = StoryObj<ComponentProps<typeof ErrorOfflineContainer>>;
 export default meta;
 
 export const Default: Story = {
+  play: async ({ canvas }) => {
+    const page = canvas.getByTestId("ErrorContainer");
+    // The heading and text come from the English locale.
+    await expect(
+      canvas.getByRole("heading", { name: "No internet connection" }),
+    ).toBeVisible();
+    await expect(page.querySelector("#text")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {

@@ -1,6 +1,7 @@
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 
 import { ErrorInvalidLink } from "./ErrorInvalidLink";
 import { setupErrorI18n } from "./stories.utils";
@@ -44,6 +45,16 @@ type Story = StoryObj<ComponentProps<typeof ErrorInvalidLink>>;
 export default meta;
 
 export const Default: Story = {
+  play: async ({ canvas }) => {
+    const page = canvas.getByTestId("ErrorContainer");
+    // The heading and text come from the English locale.
+    await expect(
+      canvas.getByRole("heading", { name: "Invalid link" }),
+    ).toBeVisible();
+    await expect(page.querySelector("#text")).toHaveTextContent(
+      "The link you are trying to open does not exist.",
+    );
+  },
   parameters: {
     docs: {
       description: {

@@ -1,6 +1,7 @@
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 
 import { AccessRestricted } from "./AccessRestricted";
 import { setupErrorI18n } from "./stories.utils";
@@ -44,6 +45,16 @@ type Story = StoryObj<ComponentProps<typeof AccessRestricted>>;
 export default meta;
 
 export const Default: Story = {
+  play: async ({ canvas }) => {
+    const page = canvas.getByTestId("ErrorContainer");
+    // The heading and text come from the English locale.
+    await expect(
+      canvas.getByRole("heading", { name: "Access denied" }),
+    ).toBeVisible();
+    await expect(page.querySelector("#text")).toHaveTextContent(
+      "Your IP address is not included in the list of allowed IP addresses",
+    );
+  },
   parameters: {
     docs: {
       description: {
