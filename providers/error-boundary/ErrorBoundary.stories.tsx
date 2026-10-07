@@ -1,6 +1,7 @@
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 
 import ErrorBoundary from "./ErrorBoundary";
 
@@ -27,6 +28,9 @@ const meta = {
         "Callback fired when an error is caught `(error: Error, errorInfo: ErrorInfo) => void`",
     },
   },
+  args: {
+    onError: fn(),
+  },
 } satisfies Meta<typeof ErrorBoundary>;
 
 type Story = StoryObj<ComponentProps<typeof ErrorBoundary>>;
@@ -40,6 +44,12 @@ export const Default: Story = {
         <p>Children are rendered normally when no error occurs.</p>
       </div>
     ),
+  },
+  play: async ({ args, canvas }) => {
+    await expect(
+      canvas.getByText("Children are rendered normally when no error occurs."),
+    ).toBeVisible();
+    await expect(args.onError).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -65,6 +75,19 @@ const ThrowingComponent = () => {
 export const WithError: Story = {
   args: {
     children: <ThrowingComponent />,
+  },
+  play: async ({ args, canvas }) => {
+    // The kit's own error page, with the message under its heading.
+    await expect(
+      canvas.getByRole("heading", { name: "Something went wrong" }),
+    ).toBeVisible();
+    await expect(canvas.getByText("Something broke!")).toBeVisible();
+    // Called with the error and React's error info.
+    await expect(args.onError).toHaveBeenCalledTimes(1);
+    const [error, errorInfo] = (args.onError as ReturnType<typeof fn>).mock
+      .calls[0] as [Error, unknown];
+    await expect(error.message).toBe("Something broke!");
+    await expect(errorInfo).toBeDefined();
   },
   parameters: {
     docs: {
@@ -94,6 +117,13 @@ export const WithCustomFallback: Story = {
       </div>
     ),
     children: <ThrowingComponent />,
+  },
+  play: async ({ args, canvas }) => {
+    await expect(
+      canvas.getByRole("heading", { name: "Custom Error UI" }),
+    ).toBeVisible();
+    await expect(canvas.queryByText("Something broke!")).toBeNull();
+    await expect(args.onError).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -126,6 +156,13 @@ export const WithRenderFunctionFallback: Story = {
       </div>
     ),
     children: <ThrowingComponent />,
+  },
+  play: async ({ canvas }) => {
+    // The function receives the caught error.
+    await expect(
+      canvas.getByRole("heading", { name: "Error Details" }),
+    ).toBeVisible();
+    await expect(canvas.getByText("Something broke!")).toBeVisible();
   },
   parameters: {
     docs: {
