@@ -1,7 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn, within } from "storybook/test";
+import { expect, fn, screen, within } from "storybook/test";
 
 import SettingsReactSvgUrl from "../../assets/settings.react.svg?url";
 
@@ -288,6 +288,8 @@ type Story = StoryObj<ComponentProps<typeof DropDownItem>>;
 
 export default meta;
 
+const left = (element: Element) => element.getBoundingClientRect().left;
+
 const Wrapper = (props: { children: React.ReactNode }) => {
   return (
     <div
@@ -350,6 +352,16 @@ const WithDescriptionTemplate = () => {
 
 export const WithDescription: Story = {
   render: () => <WithDescriptionTemplate />,
+  play: async ({ canvas }) => {
+    // The explanation sits on a line of its own under the label.
+    const editor = canvas.getByRole("option", { name: /^Editor/ });
+    const label = within(editor).getByText("Editor");
+    const description = within(editor).getByText(/^Can edit the document/);
+    await expect(description).toBeVisible();
+    await expect(
+      description.getBoundingClientRect().top,
+    ).toBeGreaterThanOrEqual(label.getBoundingClientRect().bottom);
+  },
   parameters: {
     docs: {
       description: {
@@ -461,6 +473,18 @@ const WithBadgesTemplate = () => {
 
 export const WithBadges: Story = {
   render: () => <WithBadgesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(
+      within(canvas.getByRole("option", { name: /New Feature/ })).getByText(
+        "Beta",
+      ),
+    ).toBeVisible();
+    await expect(
+      within(canvas.getByRole("option", { name: /Premium Feature/ })).getByText(
+        "Pro",
+      ),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -491,6 +515,18 @@ const SubmenuTemplate = () => {
 
 export const Submenu: Story = {
   render: () => <SubmenuTemplate />,
+  play: async ({ canvas }) => {
+    const arrow = (name: string) =>
+      canvas
+        .getByRole("option", { name })
+        .querySelector('[class*="submenuArrow"]') as HTMLElement;
+    await expect(arrow("Open Submenu")).toBeVisible();
+    await expect(arrow("Open Submenu")).toHaveStyle({ transform: "none" });
+    // The open entry's arrow is turned down.
+    await expect(arrow("Active Submenu")).toHaveStyle({
+      transform: "matrix(0, 1, -1, 0, 0, 0)",
+    });
+  },
   parameters: {
     docs: {
       description: {
@@ -524,6 +560,16 @@ const WithAdditionalElementTemplate = () => {
 
 export const WithAdditionalElement: Story = {
   render: () => <WithAdditionalElementTemplate />,
+  play: async ({ canvas }) => {
+    const save = canvas.getByRole("option", { name: /^Save/ });
+    const shortcut = within(save).getByText("Ctrl+S");
+    await expect(left(shortcut)).toBeGreaterThan(
+      left(within(save).getByText("Save")),
+    );
+    await expect(
+      within(canvas.getByRole("option", { name: /^Copy/ })).getByText("Ctrl+C"),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -561,6 +607,12 @@ export const HeaderWithArrow: Story = {
   render: (args) => (
     <HeaderWithArrowTemplate headerArrowAction={args.headerArrowAction} />
   ),
+  args: { headerArrowAction: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    const header = canvas.getByRole("option", { name: "Header with Back" });
+    await userEvent.click(header.querySelector("svg") as SVGElement);
+    await expect(args.headerArrowAction).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -593,6 +645,15 @@ const TextOverflowTemplate = () => {
 
 export const WithTextOverflow: Story = {
   render: () => <TextOverflowTemplate />,
+  play: async ({ canvas }) => {
+    // The row itself cuts the label.
+    const row = canvas.getByRole("option");
+    await expect(row.scrollWidth).toBeGreaterThan(row.clientWidth);
+    await expect(row).toHaveStyle({
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    });
+  },
   parameters: {
     docs: {
       description: {
@@ -675,6 +736,19 @@ const RightToLeftTemplate = () => (
 export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    const [settings, more, notifications] = canvas.getAllByRole("option");
+    // The icon on the right of the label, the arrow and the switch at the
+    // left end.
+    const iconOf = (option: HTMLElement) =>
+      option.querySelector('[class*="iconWrapper"]') as Element;
+    const label = settings.querySelector('[dir="auto"]') as Element;
+    await expect(left(iconOf(settings))).toBeGreaterThan(left(label));
+    const arrow = more.querySelector('[class*="submenuArrow"]') as Element;
+    await expect(left(arrow)).toBeLessThan(left(iconOf(more)));
+    const toggle = within(notifications).getByRole("checkbox");
+    await expect(left(toggle)).toBeLessThan(left(iconOf(notifications)));
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -696,6 +770,20 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async () => {
+    const custom = screen.getByRole("option", { name: "Custom Item" });
+    await expect(custom).toHaveStyle({
+      height: "40px",
+      color: "rgb(76, 29, 149)",
+      fontSize: "14px",
+    });
+    await expect(screen.getByRole("option", { name: "Header" })).toHaveStyle({
+      height: "56px",
+    });
+    await expect(
+      screen.getByRole("option", { name: "Disabled Item" }),
+    ).toHaveStyle({ color: "rgb(167, 139, 250)" });
+  },
   render: () => (
     <div
       style={
