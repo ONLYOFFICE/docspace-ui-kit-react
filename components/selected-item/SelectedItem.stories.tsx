@@ -1,7 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn, within } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
 import { RootTooltip } from "../tooltip";
@@ -172,6 +172,17 @@ export const Default: Story = {
   },
 };
 
+const rect = (element: Element) => element.getBoundingClientRect();
+
+// The chip around a label.
+const chipOf = (
+  canvas: { getByText: (text: string) => HTMLElement },
+  label: string,
+) =>
+  canvas
+    .getByText(label)
+    .closest("[data-testid='selected-item']") as HTMLElement;
+
 export const DisabledState: Story = {
   render: (args) => <SelectedItem {...args} />,
   args: {
@@ -205,6 +216,27 @@ export const DisabledState: Story = {
 
 export const BlockDisplay: Story = {
   render: (args) => <SelectedItem {...args} />,
+  play: async ({ args, canvas, userEvent }) => {
+    // The chip fills its container's content box and the cross sits at the
+    // far end.
+    const chip = canvas.getByTestId("selected-item");
+    const container = chip.parentElement as HTMLElement;
+    const { paddingLeft, paddingRight } = getComputedStyle(container);
+    await expect(Math.round(rect(chip).width)).toBe(
+      Math.round(
+        container.clientWidth -
+          parseFloat(paddingLeft) -
+          parseFloat(paddingRight),
+      ),
+    );
+    const cross = within(chip).getByTestId("icon-button");
+    await expect(rect(cross).left).toBeGreaterThan(
+      rect(canvas.getByText("Block display item")).right,
+    );
+    await expect(rect(chip).right - rect(cross).right).toBeLessThan(20);
+    await userEvent.click(cross.querySelector("svg") as SVGElement);
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
+  },
   args: {
     label: "Block display item",
     isInline: false,
@@ -264,6 +296,15 @@ const AllVariantsTemplate = () => {
 
 export const AllVariants: Story = {
   render: () => <AllVariantsTemplate />,
+  play: async ({ canvas }) => {
+    const enabled = chipOf(canvas, "Inline enabled");
+    const block = chipOf(canvas, "Block display item");
+    await expect(rect(block).width).toBeGreaterThan(rect(enabled).width * 2);
+    // The disabled chip greys its label.
+    await expect(
+      getComputedStyle(canvas.getByText("Inline disabled")).color,
+    ).not.toBe(getComputedStyle(canvas.getByText("Inline enabled")).color);
+  },
   parameters: {
     docs: {
       description: {
@@ -289,6 +330,14 @@ export const WithIcon: Story = {
     onClose: fn(),
     propKey: "item-icon",
   },
+  play: async ({ canvas }) => {
+    const chip = canvas.getByTestId("selected-item");
+    const glyph = chip.querySelector("svg, img") as Element;
+    await expect(glyph).not.toBeNull();
+    await expect(rect(glyph).right).toBeLessThanOrEqual(
+      rect(canvas.getByText("Documents")).left,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -313,6 +362,14 @@ export const ActiveState: Story = {
     icon: CatalogFolderIcon,
     onClose: fn(),
     propKey: "item-active",
+  },
+  play: async ({ canvas }) => {
+    // A tinted background, and the label in the accent colour.
+    const chip = canvas.getByTestId("selected-item");
+    await expect(getComputedStyle(chip).backgroundColor).not.toBe(
+      "rgba(0, 0, 0, 0)",
+    );
+    await expect(chip.className).toMatch(/isActive|active/);
   },
   parameters: {
     docs: {
@@ -371,6 +428,18 @@ export const TruncatedLabel: Story = {
     onClose: fn(),
     propKey: "item-long",
   },
+  play: async ({ canvas, userEvent }) => {
+    const label = canvas.getByText(
+      "Quarterly report drafts and shared spreadsheets",
+    );
+    await expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
+    await userEvent.hover(canvas.getByTestId("selected-item"));
+    await waitFor(() =>
+      expect(screen.getByRole("tooltip")).toHaveTextContent(
+        "Quarterly report drafts and shared spreadsheets",
+      ),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -392,6 +461,22 @@ export const TruncatedLabel: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    await expect(chipOf(canvas, "Custom item")).toHaveStyle({
+      backgroundColor: "rgb(237, 233, 254)",
+      borderRadius: "16px",
+      height: "28px",
+    });
+    await expect(canvas.getByText("Disabled")).toHaveStyle({
+      color: "rgb(167, 139, 250)",
+    });
+    await expect(chipOf(canvas, "Active")).toHaveStyle({
+      backgroundColor: "rgb(76, 29, 149)",
+    });
+    await expect(canvas.getByText("Active")).toHaveStyle({
+      color: "rgb(255, 255, 255)",
+    });
+  },
   render: () => (
     <div
       style={
