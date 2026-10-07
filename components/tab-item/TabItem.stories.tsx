@@ -153,6 +153,13 @@ export const ActiveState: Story = {
     label: "Active Tab",
     isActive: true,
   },
+  play: async ({ canvas }) => {
+    const active = pill(canvas, "Active Tab");
+    await expect(active).toHaveAttribute("aria-selected", "true");
+    await expect(getComputedStyle(active).backgroundColor).not.toBe(
+      "rgba(0, 0, 0, 0)",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -211,6 +218,12 @@ const WithReactNodeTemplate = () => {
 
 export const WithReactNodeLabel: Story = {
   render: () => <WithReactNodeTemplate />,
+  play: async ({ canvas }) => {
+    // The node is rendered as given, dot and text inside one pill.
+    const tab = pill(canvas, "Tab with Icon");
+    await expect(tab).toHaveTextContent("\u25CFTab with Icon");
+    await expect(tab.querySelector("span[style]")).not.toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -352,7 +365,22 @@ export const MultiSelect: Story = {
   },
 };
 
-export const CssCustomization = {
+export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    await expect(pill(canvas, "Documents")).toHaveStyle({
+      backgroundColor: "rgb(31, 111, 67)",
+      borderRadius: "6px",
+      padding: "6px 20px",
+    });
+    // The text colour is set on the label inside the pill.
+    await expect(canvas.getByText("Documents")).toHaveStyle({
+      color: "rgb(255, 255, 255)",
+    });
+    await expect(pill(canvas, "Images")).toHaveStyle({
+      borderTopStyle: "dashed",
+    });
+    await expect(pill(canvas, "Videos")).toHaveStyle({ opacity: "0.3" });
+  },
   render: () => (
     <div
       style={
