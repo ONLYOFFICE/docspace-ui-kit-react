@@ -466,6 +466,15 @@ export const RightToLeft: Story = {
     model: itemsModel,
   },
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The arrow moves to the left of the label.
+    const button = canvas.getByTestId("main-button");
+    const label = canvas.getByText("\u062c\u062f\u064a\u062f");
+    const arrow = button.querySelector("svg") as SVGElement;
+    await expect(arrow.getBoundingClientRect().right).toBeLessThanOrEqual(
+      label.getBoundingClientRect().left + 1,
+    );
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -484,6 +493,20 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    // The styled button sits inside the group element.
+    await expect(
+      canvas.getByTestId("main-button").firstElementChild as HTMLElement,
+    ).toHaveStyle({
+      backgroundColor: "rgb(0, 130, 201)",
+      borderRadius: "50px",
+    });
+    await expect(canvas.getByText("New")).toHaveStyle({
+      color: "rgb(255, 255, 255)",
+      fontSize: "14px",
+      fontWeight: "600",
+    });
+  },
   render: () => (
     <div
       style={
