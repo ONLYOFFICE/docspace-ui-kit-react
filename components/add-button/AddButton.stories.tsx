@@ -162,6 +162,14 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   );
 };
 
+const rect = (element: Element) => element.getBoundingClientRect();
+
+const squares = (canvas: { getAllByTestId: (id: string) => HTMLElement[] }) =>
+  canvas.getAllByTestId("selector-add-button");
+
+const iconOf = (square: HTMLElement) =>
+  square.querySelector("svg") as SVGElement;
+
 export const Default: Story = {
   render: (args) => <AddButton {...args} />,
   args: {
@@ -278,6 +286,12 @@ const AccentTemplate = () => {
 
 export const AccentStyle: Story = {
   render: () => <AccentTemplate />,
+  play: async ({ canvas }) => {
+    const [plain, accent] = squares(canvas);
+    await expect(getComputedStyle(accent).backgroundColor).not.toBe(
+      getComputedStyle(plain).backgroundColor,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -297,6 +311,16 @@ export const LoadingState: Story = {
   args: {
     title: "Adding...",
     isLoading: true,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const [square] = squares(canvas);
+    // A spinner in place of the plus, in a square of the same size.
+    await expect(Math.round(rect(square).width)).toBe(32);
+    await expect(
+      square.querySelector("[class*='loader' i], [data-testid*='loader' i]"),
+    ).not.toBeNull();
+    await userEvent.click(square);
+    await expect(args.onClick).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -326,6 +350,15 @@ const TruncatedTemplate = () => {
 
 export const TruncatedLabel: Story = {
   render: () => <TruncatedTemplate />,
+  play: async ({ canvas }) => {
+    const label = canvas.getByText(
+      "This is a very long label that should be truncated",
+    );
+    await expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
+    await expect(rect(label).right).toBeLessThanOrEqual(
+      rect(label.closest("div[style]") as Element).right,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -355,6 +388,13 @@ const CustomSizeTemplate = () => {
 
 export const CustomIconSize: Story = {
   render: () => <CustomSizeTemplate />,
+  play: async ({ canvas }) => {
+    const [plain, large] = squares(canvas);
+    await expect(Math.round(rect(plain).width)).toBe(32);
+    await expect(Math.round(rect(large).width)).toBe(36);
+    await expect(Math.round(rect(iconOf(plain)).width)).toBe(12);
+    await expect(Math.round(rect(iconOf(large)).width)).toBe(16);
+  },
   parameters: {
     docs: {
       description: {
@@ -385,6 +425,10 @@ const CustomIconTemplate = () => {
 
 export const WithCustomIcon: Story = {
   render: () => <CustomIconTemplate />,
+  play: async ({ canvas }) => {
+    const [square] = squares(canvas);
+    await expect(Math.round(rect(iconOf(square)).width)).toBe(16);
+  },
   parameters: {
     docs: {
       description: {
@@ -405,6 +449,22 @@ export const WithCustomIcon: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const [square] = squares(canvas);
+    await expect(square).toHaveStyle({
+      width: "40px",
+      height: "40px",
+      borderRadius: "50%",
+      backgroundColor: "rgb(124, 58, 237)",
+    });
+    // The gap is the label's own leading padding.
+    await expect(canvas.getByText("Add item")).toHaveStyle({
+      paddingInlineStart: "16px",
+    });
+    await expect(canvas.getByText("Disabled")).toHaveStyle({
+      color: "rgb(196, 181, 253)",
+    });
+  },
   render: () => (
     <div
       style={
