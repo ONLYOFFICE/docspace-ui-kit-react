@@ -275,6 +275,19 @@ const SizesTemplate = () => {
 
 export const Sizes: Story = {
   render: () => <SizesTemplate />,
+  play: async ({ canvas }) => {
+    const [base, middle, large] = [
+      "Base size",
+      "Middle size",
+      "Large size",
+    ].map((placeholder) => canvas.getByPlaceholderText(placeholder));
+    await expect(
+      [base, middle, large].map((input) =>
+        Math.round(input.getBoundingClientRect().width),
+      ),
+    ).toEqual([173, 300, 550]);
+    await expect(large).toHaveStyle({ fontSize: "16px" });
+  },
   parameters: {
     docs: {
       description: {
@@ -510,6 +523,15 @@ const RightToLeftTemplate = () => {
 export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // Both fields align right; the address itself still reads left to right.
+    const empty = canvas.getByPlaceholderText("name@example.com");
+    const filled = canvas.getByDisplayValue("name@example.com");
+    await expect(empty).toHaveStyle({ textAlign: "right" });
+    await expect(filled).toHaveStyle({ textAlign: "right" });
+    await expect(filled).toHaveAttribute("dir", "auto");
+    await expect(getComputedStyle(filled).direction).toBe("ltr");
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -529,6 +551,22 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const empty = canvas.getByPlaceholderText("Custom styled email");
+    await expect(empty).toHaveStyle({
+      backgroundColor: "rgb(245, 243, 255)",
+      borderTopColor: "rgb(196, 181, 253)",
+      borderRadius: "8px",
+      fontSize: "14px",
+      textAlign: "center",
+    });
+    // hasError takes the theme's red over the custom border.
+    const withValue = canvas.getByDisplayValue("user@example.com");
+    await expect(withValue).toHaveStyle({ color: "rgb(76, 29, 149)" });
+    await expect(getComputedStyle(withValue).borderTopColor).not.toBe(
+      "rgb(196, 181, 253)",
+    );
+  },
   render: () => (
     <div
       style={
