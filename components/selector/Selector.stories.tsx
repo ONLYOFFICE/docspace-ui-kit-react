@@ -2,6 +2,7 @@
 
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 import type { SelectorProps, TSelectorItem } from "./Selector.types";
 
 import React from "react";
@@ -33,6 +34,11 @@ function makeName(seed: number) {
   return result;
 }
 
+// The rows are built once at module level, so their handlers are too.
+const onCreateNewItem = fn();
+const onAcceptNewName = fn();
+const onCancelNewName = fn();
+
 const getItems = (count: number) => {
   const items: TSelectorItem[] = [];
 
@@ -41,8 +47,8 @@ const getItems = (count: number) => {
     id: "create_new_item",
     label: "New folder",
     isCreateNewItem: true,
-    onCreateClick: () => {},
-    onBackClick: () => {},
+    onCreateClick: onCreateNewItem,
+    onBackClick: fn(),
   });
 
   items.push({
@@ -52,8 +58,8 @@ const getItems = (count: number) => {
     isInputItem: true,
     icon: FolderSvgUrl,
     defaultInputValue: "New folder",
-    onAcceptInput: () => {},
-    onCancelInput: () => {},
+    onAcceptInput: onAcceptNewName,
+    onCancelInput: onCancelNewName,
   });
 
   for (let i = 0; i < count; i += 1) {
@@ -201,6 +207,18 @@ const Template = ({
 };
 
 // Renders `items` exactly as given, for stories whose list never pages.
+// A row of the list, by its label.
+const row = (root: HTMLElement, label: string) => {
+  const found = Array.from(
+    root.querySelectorAll<HTMLElement>('[data-testid^="selector-item-"]'),
+  ).find((item) => item.textContent?.includes(label));
+  if (!found) throw new Error(`No row labelled ${label}`);
+  return found;
+};
+
+const selector = (canvas: { getByTestId: (id: string) => HTMLElement }) =>
+  canvas.getByTestId("selector");
+
 const StaticTemplate = (args: SelectorProps) => (
   <div style={frameStyle}>
     <Selector {...args} />
@@ -658,22 +676,22 @@ export const Default: Story = {
     searchPlaceholder: "Search",
     searchValue: "",
     items: renderedItems,
-    onSelect: () => {},
+    onSelect: fn(),
     isMultiSelect: false,
     selectedItems,
     submitButtonLabel: "Add",
-    onSubmit: () => {},
+    onSubmit: fn(),
     withSelectAll: false,
     selectAllLabel: "All items",
     selectAllIcon: "",
-    onSelectAll: () => {},
+    onSelectAll: fn(),
     withAccessRights: false,
     accessRights,
     selectedAccessRight,
-    onAccessRightsChange: () => {},
+    onAccessRightsChange: fn(),
     withCancelButton: false,
     cancelButtonLabel: "Cancel",
-    onCancel: () => {},
+    onCancel: fn(),
     emptyScreenImage: EmptyScreenFilter,
     emptyScreenHeader: "This folder is empty",
     emptyScreenDescription: "Items you add to this folder will appear here.",
@@ -688,13 +706,38 @@ export const Default: Story = {
     disableFirstFetch: true,
     withBreadCrumbs: false,
     breadCrumbs: [],
-    onSelectBreadCrumb: () => {},
+    onSelectBreadCrumb: fn(),
     breadCrumbsLoader: <div />,
     withSearch: false,
     isBreadCrumbsLoading: false,
     alwaysShowFooter: false,
     disableSubmitButton: false,
     descriptionText: "",
+  },
+  beforeEach: () => {
+    onAcceptNewName.mockClear();
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const root = selector(canvas);
+    // The inline name row accepts its value.
+    const name = await waitFor(() =>
+      within(root).getByTestId("selector_input_item"),
+    );
+    await expect(name).toHaveValue("New folder");
+    await userEvent.click(within(root).getByTestId("selector_new_item_accept"));
+    await expect(onAcceptNewName).toHaveBeenCalledWith("New folder");
+
+    // Picking a row reports it and brings the footer.
+    await userEvent.click(row(root, people[0].label));
+    const [picked, isDoubleClick] = (args.onSelect as ReturnType<typeof fn>)
+      .mock.calls[0] as [TSelectorItem, boolean];
+    await expect(picked.id).toBe(people[0].id);
+    await expect(isDoubleClick).toBe(false);
+    const submit = await waitFor(() =>
+      within(root).getByTestId("selector_submit_button"),
+    );
+    await userEvent.click(submit);
+    await expect(args.onSubmit).toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -723,6 +766,18 @@ export const ContentLoading: Story = {
   args: {
     ...Default.args,
     isContentLoading: true,
+  },
+  play: async ({ args, canvas }) => {
+    // The list stays, dimmed, and takes no clicks.
+    const root = selector(canvas);
+    const first = await waitFor(() => row(root, people[0].label));
+    await expect(first).toBeVisible();
+    await expect(
+      getComputedStyle(
+        first.closest('[class*="bodyContentDimmed"]') as HTMLElement,
+      ).pointerEvents,
+    ).toBe("none");
+    await expect(args.onSelect).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -757,6 +812,16 @@ export const BreadCrumbs: Story = {
       { id: 4, label: "Quarterly summaries for the whole year" },
       { id: 5, label: "Drafts" },
     ],
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const root = selector(canvas);
+    await expect(within(root).getByText("Drafts")).toBeVisible();
+    // The middle folders collapse behind the dots.
+    await expect(within(root).queryByText("Projects")).toBeNull();
+    await userEvent.click(within(root).getByText("My documents"));
+    await expect(args.onSelectBreadCrumb).toHaveBeenCalledWith(
+      expect.objectContaining({ label: "My documents" }),
+    );
   },
   parameters: {
     docs: {
@@ -800,6 +865,19 @@ export const NewName: Story = {
     footerCheckboxLabel: "Open saved document in new tab",
     isChecked: false,
   },
+  play: async ({ canvas, userEvent }) => {
+    const root = selector(canvas);
+    const input = within(root).getByTestId("selector_footer_input");
+    await expect(input).toHaveValue("Report.docx");
+    await expect(
+      within(root).getByText("Open saved document in new tab"),
+    ).toBeVisible();
+    // An empty name disables the button.
+    await userEvent.clear(input);
+    await expect(
+      within(root).getByTestId("selector_submit_button"),
+    ).toBeDisabled();
+  },
   parameters: {
     docs: {
       description: {
@@ -832,13 +910,27 @@ export const WithHeader: Story = {
     withHeader: true,
     headerProps: {
       headerLabel: "Choose a folder",
-      onCloseClick: () => {},
-      onBackClick: () => {},
+      onCloseClick: fn(),
+      onBackClick: fn(),
       withoutBackButton: false,
       withoutBorder: false,
     },
     withCancelButton: true,
     cancelButtonLabel: "Cancel",
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const root = selector(canvas);
+    await expect(within(root).getByText("Choose a folder")).toBeVisible();
+    await userEvent.click(
+      within(root).getByTestId("aside_header_close_icon_button"),
+    );
+    await expect(args.headerProps?.onCloseClick).toHaveBeenCalled();
+    await userEvent.click(
+      within(root).getByTestId("aside_header_back_icon_button"),
+    );
+    await expect(args.headerProps?.onBackClick).toHaveBeenCalled();
+    await userEvent.click(within(root).getByTestId("selector_cancel_button"));
+    await expect(args.onCancel).toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -912,6 +1004,24 @@ export const WithSearch: Story = {
     hasNextPage: false,
     loadNextPage: noop,
   },
+  play: async ({ canvas, userEvent }) => {
+    const root = selector(canvas);
+    const search = within(root)
+      .getByTestId("selector_search_input")
+      .querySelector("input") as HTMLInputElement;
+    // Nothing matches, then the whole list comes back.
+    // The search box hands the query over after a pause.
+    await userEvent.type(search, "zzz");
+    await waitFor(
+      () => expect(within(root).getByText("Nothing found")).toBeVisible(),
+      { timeout: 3000 },
+    );
+    await userEvent.clear(search);
+    await waitFor(
+      () => expect(within(root).getByText(searchable[0].label)).toBeVisible(),
+      { timeout: 3000 },
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -953,6 +1063,22 @@ export const MultiSelect: Story = {
     selectAllLabel: "All items",
     selectedItems: [people[1], people[3]],
   },
+  play: async ({ args, canvas, userEvent }) => {
+    const root = selector(canvas);
+    // The footer appears with the first change; its button counts the
+    // ticked rows, the two given ones included.
+    await expect(
+      within(root).queryByTestId("selector_submit_button"),
+    ).toBeNull();
+    await userEvent.click(row(root, people[0].label));
+    await waitFor(() =>
+      expect(
+        within(root).getByTestId("selector_submit_button"),
+      ).toHaveTextContent("Add (3)"),
+    );
+    await userEvent.click(within(root).getByText("All items"));
+    await expect(args.onSelectAll).toHaveBeenCalled();
+  },
   parameters: {
     docs: {
       description: {
@@ -992,6 +1118,14 @@ export const SelectionLimit: Story = {
     maxSelectedItems: 2,
     selectedItems: [limitItems[0], limitItems[2]],
     alwaysShowFooter: true,
+  },
+  play: async ({ args, canvas }) => {
+    const root = selector(canvas);
+    // At the limit, an unticked row is greyed out and ignores clicks.
+    const other = row(root, limitItems[1].label);
+    await expect(other.className).toMatch(/disabled/);
+    other.click();
+    await expect(args.onSelect).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -1034,6 +1168,13 @@ export const DisabledItems: Story = {
     isMultiSelect: true,
     selectedItems: [],
   },
+  play: async ({ args, canvas }) => {
+    const root = selector(canvas);
+    const disabled = row(root, disabledItems[1].label);
+    await expect(within(disabled).getByText("Added")).toBeVisible();
+    disabled.click();
+    await expect(args.onSelect).not.toHaveBeenCalled();
+  },
   parameters: {
     docs: {
       description: {
@@ -1069,6 +1210,24 @@ export const WithAccessRights: Story = {
     accessRights,
     selectedAccessRight,
     accessRightsMode: SelectorAccessRightsMode.Compact,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const root = selector(canvas);
+    // The access drop-down beside the button.
+    const access = within(root).getByTestId("combobox");
+    await expect(access).toHaveTextContent("Editor");
+    await userEvent.click(within(access).getByRole("button"));
+    const viewer = await waitFor(() => {
+      const option = screen
+        .getAllByText("Viewer")
+        .find((element) => element.checkVisibility());
+      expect(option).toBeDefined();
+      return option as HTMLElement;
+    });
+    await userEvent.click(viewer);
+    await expect(args.onAccessRightsChange).toHaveBeenCalledWith(
+      expect.objectContaining({ key: "viewer" }),
+    );
   },
   parameters: {
     docs: {
@@ -1106,6 +1265,16 @@ export const EmptyFolder: Story = {
     hasNextPage: false,
     loadNextPage: noop,
     selectedItems: [],
+  },
+  beforeEach: () => {
+    onCreateNewItem.mockClear();
+  },
+  play: async ({ canvas, userEvent }) => {
+    const root = selector(canvas);
+    await expect(within(root).getByText("This folder is empty")).toBeVisible();
+    // The create row becomes a link.
+    await userEvent.click(within(root).getByText("New folder"));
+    await expect(onCreateNewItem).toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -1146,6 +1315,12 @@ export const LoadingState: Story = {
     isBreadCrumbsLoading: true,
     breadCrumbsLoader: <BreadCrumbsLoader />,
     breadCrumbs: [{ id: 1, label: "My documents" }],
+  },
+  play: async ({ canvas }) => {
+    const root = selector(canvas);
+    await expect(within(root).getByTestId("bread-crumbs-loader")).toBeVisible();
+    await expect(within(root).getByTestId("row-loader")).toBeVisible();
+    await expect(within(root).queryByPlaceholderText("Search")).toBeNull();
   },
   parameters: {
     docs: {
@@ -1221,6 +1396,21 @@ export const WithTabs: Story = {
     isMultiSelect: true,
     selectedItems: [],
   },
+  play: async ({ canvas, userEvent }) => {
+    const root = selector(canvas);
+    // A selection on each tab, counted together.
+    await userEvent.click(row(root, tabLists.files[0].label));
+    await userEvent.click(within(root).getByText("Shared with me"));
+    await waitFor(() =>
+      expect(within(root).getByText(tabLists.shared[0].label)).toBeVisible(),
+    );
+    await userEvent.click(row(root, tabLists.shared[0].label));
+    await waitFor(() =>
+      expect(
+        within(root).getByTestId("selector_submit_button"),
+      ).toHaveTextContent("Add (2)"),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -1254,6 +1444,13 @@ export const WithInfo: Story = {
     withInfo: true,
     infoText: "Only items you can edit are listed here.",
     withInfoBadge: true,
+  },
+  play: async ({ canvas }) => {
+    const root = selector(canvas);
+    await expect(
+      within(root).getByText("Only items you can edit are listed here."),
+    ).toBeVisible();
+    await expect(within(root).getByText("Recent items")).toBeVisible();
   },
   parameters: {
     docs: {
@@ -1297,6 +1494,20 @@ export const WithInfoBar: Story = {
         "Links to the original file keep working after it is copied.",
     },
   },
+  play: async ({ canvas, userEvent }) => {
+    const root = selector(canvas);
+    const title = within(root).getByText("Copies keep their links");
+    await expect(title).toBeVisible();
+    // The cross closes the bar.
+    let bar = title.parentElement as HTMLElement;
+    while (!within(bar).queryByTestId("icon-button")) {
+      bar = bar.parentElement as HTMLElement;
+    }
+    await userEvent.click(within(bar).getByTestId("icon-button"));
+    await waitFor(() =>
+      expect(within(root).queryByText("Copies keep their links")).toBeNull(),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -1331,14 +1542,25 @@ export const InSidePanel: Story = {
     hasNextPage: false,
     loadNextPage: noop,
     useAside: true,
-    onClose: () => {},
+    onClose: fn(),
     withHeader: true,
     headerProps: {
       headerLabel: "Choose a folder",
-      onCloseClick: () => {},
+      onCloseClick: fn(),
     },
     withCancelButton: true,
     cancelButtonLabel: "Cancel",
+  },
+  play: async ({ args, userEvent }) => {
+    // A side panel over a backdrop that closes it.
+    await waitFor(() =>
+      expect(screen.getByText("Choose a folder")).toBeVisible(),
+    );
+    const backdrop = screen
+      .getAllByTestId("backdrop")
+      .find((element) => element.checkVisibility()) as HTMLElement;
+    await userEvent.click(backdrop);
+    await expect(args.onClose).toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -1371,6 +1593,13 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The trail starts at the right edge.
+    const root = selector(canvas);
+    const first = within(root).getByText("المستندات").getBoundingClientRect();
+    const last = within(root).getByText("التقارير").getBoundingClientRect();
+    await expect(first.left).toBeGreaterThan(last.right);
+  },
   args: {
     ...Default.args,
     withBreadCrumbs: true,
@@ -1455,6 +1684,25 @@ export const CssCustomization: Story = {
     descriptionText: "Recent items",
     withInfo: true,
     infoText: "Only items you can edit are listed here.",
+  },
+  play: async ({ canvas }) => {
+    const root = selector(canvas);
+    // The border runs along the top of the footer.
+    let footer = within(root).getByTestId("selector_submit_button")
+      .parentElement as HTMLElement;
+    while (getComputedStyle(footer).borderTopWidth !== "2px") {
+      footer = footer.parentElement as HTMLElement;
+    }
+    await expect(getComputedStyle(footer).borderTopColor).toBe(
+      "rgb(37, 99, 235)",
+    );
+    await expect(
+      getComputedStyle(within(root).getByText("Recent items")).color,
+    ).toBe("rgb(22, 101, 52)");
+    const info = within(root).getByText(
+      "Only items you can edit are listed here.",
+    );
+    await expect(getComputedStyle(info).color).toBe("rgb(146, 64, 14)");
   },
   parameters: {
     docs: {
