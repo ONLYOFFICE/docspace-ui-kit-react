@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, userEvent, waitFor, within } from "storybook/test";
 
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
@@ -113,6 +114,42 @@ export default meta;
 
 type Story = StoryObj<StoryArgs>;
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+const row = (label: string) => {
+  const found = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-testid^="selector-item-"]'),
+  ).find((item) => item.textContent?.includes(label));
+  if (!found) throw new Error(`No row labelled ${label}`);
+  return found;
+};
+
+const ticked = (label: string) =>
+  (
+    within(row(label)).getByRole("checkbox", {
+      hidden: true,
+    }) as HTMLInputElement
+  ).checked;
+
+// The demo portal lists the portal's own server and two custom ones.
+const listed = () =>
+  waitFor(() => expect(row("Demo knowledge base")).toBeVisible());
+
+const submitted = (args: StoryArgs) =>
+  (
+    (args.onSubmit as ReturnType<typeof fn>).mock.calls[0][0] as TSelectorItem[]
+  ).map((server) => server.id);
+
+// Ticking servers and pressing Add hands them over, then goes back.
+const addsServers = async (args: StoryArgs) => {
+  await userEvent.click(row("Demo CRM"));
+  await userEvent.click(row("Demo knowledge base"));
+  await userEvent.click(screen.getByTestId("selector_submit_button"));
+  await expect(args.onSubmit).toHaveBeenCalledTimes(1);
+  await expect(submitted(args)).toEqual(["Demo CRM", "Demo knowledge base"]);
+  await expect(args.onBackClick).toHaveBeenCalledTimes(1);
+};
+
 const Template = (props: StoryArgs) => (
   <div
     style={{
@@ -130,18 +167,29 @@ const Template = (props: StoryArgs) => (
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async ({ args }: PlayContext) => {
+    await listed();
+    await expect(screen.getByText("Available MCP servers")).toBeVisible();
+    // Nothing is ticked, so there is nothing to submit yet.
+    await expect(screen.queryByTestId("selector_submit_button")).toBeNull();
+    await addsServers(args);
+
+    // The header's back arrow is the other way out.
+    await userEvent.click(screen.getByTestId("aside_header_back_icon_button"));
+    await expect(args.onBackClick).toHaveBeenCalledTimes(2);
+  },
   args: {
     initedSelectedServers: [],
-    onSubmit: (servers) => {
+    onSubmit: fn((servers: TSelectorItem[]) => {
       const names = servers.map((s) => s.label).join(", ");
       toastr.success(`Selected: ${names || "none"}`);
-    },
-    onClose: () => {
+    }),
+    onClose: fn(() => {
       toastr.info("Selector closed");
-    },
-    onBackClick: () => {
+    }),
+    onBackClick: fn(() => {
       toastr.info("Back clicked");
-    },
+    }),
   },
   parameters: {
     docs: {
@@ -164,18 +212,28 @@ export const Default: Story = {
 export const WithPreselection: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async ({ args }: PlayContext) => {
+    await listed();
+    await expect(ticked("ONLYOFFICE")).toBe(true);
+    await expect(ticked("Demo CRM")).toBe(false);
+
+    // Adding one more keeps the preselected server.
+    await userEvent.click(row("Demo CRM"));
+    await userEvent.click(screen.getByTestId("selector_submit_button"));
+    await expect(submitted(args)).toEqual(["portal", "Demo CRM"]);
+  },
   args: {
     initedSelectedServers: ["portal"],
-    onSubmit: (servers) => {
+    onSubmit: fn((servers: TSelectorItem[]) => {
       const names = servers.map((s) => s.label).join(", ");
       toastr.success(`Selected: ${names || "none"}`);
-    },
-    onClose: () => {
+    }),
+    onClose: fn(() => {
       toastr.info("Selector closed");
-    },
-    onBackClick: () => {
+    }),
+    onBackClick: fn(() => {
       toastr.info("Back clicked");
-    },
+    }),
   },
   parameters: {
     docs: {
@@ -199,21 +257,29 @@ export const WithPreselection: Story = {
 export const AsideMode: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async ({ args }: PlayContext) => {
+    await listed();
+    // Cancel goes back without submitting.
+    await userEvent.click(row("Demo CRM"));
+    await userEvent.click(screen.getByTestId("selector_cancel_button"));
+    await expect(args.onBackClick).toHaveBeenCalledTimes(1);
+    await expect(args.onSubmit).not.toHaveBeenCalled();
+  },
   args: {
     useAside: true,
     withoutBackground: false,
     withBlur: false,
     initedSelectedServers: [],
-    onSubmit: (servers) => {
+    onSubmit: fn((servers: TSelectorItem[]) => {
       const names = servers.map((s) => s.label).join(", ");
       toastr.success(`Selected: ${names || "none"}`);
-    },
-    onClose: () => {
+    }),
+    onClose: fn(() => {
       toastr.info("Selector closed");
-    },
-    onBackClick: () => {
+    }),
+    onBackClick: fn(() => {
       toastr.info("Back clicked");
-    },
+    }),
   },
   parameters: {
     docs: {
