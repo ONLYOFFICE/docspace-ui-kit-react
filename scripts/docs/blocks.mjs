@@ -117,6 +117,13 @@ const textOf = (element) => {
     .trim();
 };
 
+const need = (value, what) => {
+  if (value === undefined) {
+    throw new Error(`docs/welcome/WelcomePage.tsx: no ${what}`);
+  }
+  return value;
+};
+
 const openingOf = (node) =>
   ts.isJsxElement(node) ? node.openingElement : node;
 
@@ -187,7 +194,7 @@ const welcomePage = (root) => {
   const byTag = (tag) =>
     all.filter((el) => openingOf(el).tagName.getText() === tag);
 
-  const lines = [`# ${byStyle("title")[0]}`, ""];
+  const lines = [`# ${need(byStyle("title")[0], "styles.title")}`, ""];
   const subline = byTag("Text").find(
     (el) => attributesOf(el).fontSize === "13px",
   );
@@ -204,7 +211,7 @@ const welcomePage = (root) => {
   const facts = data.get("facts") ?? [];
   if (facts.length > 0) {
     lines.push(
-      `**${byStyle("factsTitle")[0]}**`,
+      `**${need(byStyle("factsTitle")[0], "styles.factsTitle")}**`,
       "",
       table(
         facts.map((f) => f.label),
@@ -216,6 +223,8 @@ const welcomePage = (root) => {
 
   const [samplesTitle, insideTitle] = byStyle("sectionTitle");
   const [samplesSubtitle, insideSubtitle] = byStyle("sectionSubtitle");
+  need(insideTitle, "second styles.sectionTitle");
+  need(insideSubtitle, "second styles.sectionSubtitle");
 
   // The samples section goes with the samples when they are not published.
   const tiles = (data.get("sampleTiles") ?? []).filter(
@@ -239,14 +248,12 @@ const welcomePage = (root) => {
     }
   }
 
-  const card = byTag("CollapsibleCard")[0];
-  if (card) {
-    const { title, description } = attributesOf(card);
-    lines.push(`## ${title}`, "", description, "");
-    for (const ref of data.get("references") ?? []) {
-      if (unpublished(ref.href)) continue;
-      lines.push(`- [${ref.name}](${ref.href})`);
-    }
+  const card = need(byTag("CollapsibleCard")[0], "CollapsibleCard");
+  const { title, description } = attributesOf(card);
+  lines.push(`## ${title}`, "", description, "");
+  for (const ref of data.get("references") ?? []) {
+    if (unpublished(ref.href)) continue;
+    lines.push(`- [${ref.name}](${ref.href})`);
   }
 
   return lines.join("\n").trim();

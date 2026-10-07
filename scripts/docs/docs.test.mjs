@@ -9,6 +9,7 @@ import { compile } from "@mdx-js/mdx";
 import remarkGfm from "remark-gfm";
 import { describe, expect, it } from "vitest";
 
+import { BLOCK_RENDERERS } from "./blocks.mjs";
 import { collect } from "./collect.mjs";
 import {
   escapeForMdx,
@@ -574,6 +575,18 @@ export const Default = {};`,
         (s) => s.name,
       ),
     ).toEqual(["primary", "args-table", "default"]);
+  });
+});
+
+describe("blocks", () => {
+  it("refuses a Welcome hero whose source lost a class it reads", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "ui-kit-blocks-"));
+    fs.mkdirSync(path.join(root, "docs", "welcome"), { recursive: true });
+    fs.writeFileSync(
+      path.join(root, "docs", "welcome", "WelcomePage.tsx"),
+      "export const WelcomePage = () => <h1 className={styles.heading}>Kit</h1>;",
+    );
+    expect(() => BLOCK_RENDERERS.WelcomePage(root)).toThrow("styles.title");
   });
 });
 
