@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, userEvent, waitFor } from "storybook/test";
 import { RoomType, SearchArea } from "@onlyoffice/docspace-api-sdk";
 
 import { Toast } from "../../components/toast";
@@ -290,6 +291,31 @@ export default meta;
 
 type Story = StoryObj<StoryArgs>;
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+const row = (label: string) => {
+  const found = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-testid^="selector-item-"]'),
+  ).find((item) => item.textContent?.includes(label));
+  if (!found) throw new Error(`No row labelled ${label}`);
+  return found;
+};
+
+const shown = (label: string) =>
+  waitFor(() => expect(row(label)).toBeVisible(), { timeout: 3000 });
+
+const submitted = (args: StoryArgs) =>
+  (
+    (args.onSubmit as ReturnType<typeof fn>).mock.calls[0][0] as TSelectorItem[]
+  ).map((item) => item.label);
+
+// Picking a room and confirming hands it to onSubmit.
+const picks = async (args: StoryArgs, label: string) => {
+  await userEvent.click(row(label));
+  await userEvent.click(screen.getByTestId("selector_submit_button"));
+  await expect(submitted(args)).toEqual([label]);
+};
+
 const Template = (props: StoryArgs) => (
   <div
     style={{
@@ -307,21 +333,41 @@ const Template = (props: StoryArgs) => (
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async ({ args }: PlayContext) => {
+    await shown("Contracts 2026");
+
+    // The demo portal filters the rooms by the search.
+    const search = screen
+      .getByTestId("selector_search_input")
+      .querySelector("input") as HTMLInputElement;
+    await userEvent.type(search, "press");
+    await waitFor(
+      () => expect(screen.queryByText("Contracts 2026")).toBeNull(),
+      { timeout: 3000 },
+    );
+    await expect(row("Press kit")).toBeVisible();
+    await userEvent.clear(search);
+    await shown("Contracts 2026");
+
+    await picks(args, "Press kit");
+    await userEvent.click(screen.getByTestId("aside_header_close_icon_button"));
+    await expect(args.headerProps?.onCloseClick).toHaveBeenCalledTimes(1);
+  },
   args: {
     withHeader: true,
     headerProps: {
       headerLabel: "Select Room",
-      onCloseClick: () => {},
+      onCloseClick: fn(),
     },
     withSearch: true,
     isMultiSelect: false,
-    onSubmit: (items) => {
+    onSubmit: fn((items: TSelectorItem[]) => {
       const label = items[0]?.label;
       toastr.success(`Selected: ${label}`);
-    },
-    onClose: () => {
+    }),
+    onClose: fn(() => {
       toastr.info("Selector closed");
-    },
+    }),
   },
   parameters: {
     docs: {
@@ -346,26 +392,36 @@ export const Default: Story = {
 export const MultiSelect: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async ({ args }: PlayContext) => {
+    await shown("Contracts 2026");
+    await userEvent.click(row("Contracts 2026"));
+    await userEvent.click(row("Press kit"));
+    await userEvent.click(screen.getByTestId("selector_submit_button"));
+    await expect(submitted(args)).toEqual(["Contracts 2026", "Press kit"]);
+
+    await userEvent.click(screen.getByTestId("selector_cancel_button"));
+    await expect(args.onCancel).toHaveBeenCalledTimes(1);
+  },
   args: {
     withHeader: true,
     headerProps: {
       headerLabel: "Add to Rooms",
-      onCloseClick: () => {},
+      onCloseClick: fn(),
     },
     withSearch: true,
     isMultiSelect: true,
     withCancelButton: true,
     cancelButtonLabel: "Cancel",
     forceIsMultiSelect: true,
-    onSubmit: (items) => {
+    onSubmit: fn((items: TSelectorItem[]) => {
       toastr.success(`Selected ${items.length} room(s)`);
-    },
-    onCancel: () => {
+    }),
+    onCancel: fn(() => {
       toastr.info("Cancelled");
-    },
-    onClose: () => {
+    }),
+    onClose: fn(() => {
       toastr.info("Selector closed");
-    },
+    }),
   },
   parameters: {
     docs: {
@@ -394,22 +450,30 @@ export const MultiSelect: Story = {
 export const FilteredByRoomType: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async ({ args }: PlayContext) => {
+    // Only the custom rooms are asked for.
+    await shown("Contracts 2026");
+    await expect(row("Sales proposals")).toBeVisible();
+    await expect(row("Board meetings")).toBeVisible();
+    await expect(screen.queryByText("Press kit")).toBeNull();
+    await picks(args, "Board meetings");
+  },
   args: {
     withHeader: true,
     headerProps: {
       headerLabel: "Select Custom Room",
-      onCloseClick: () => {},
+      onCloseClick: fn(),
     },
     withSearch: true,
     isMultiSelect: false,
     roomType: RoomType.CustomRoom,
-    onSubmit: (items) => {
+    onSubmit: fn((items: TSelectorItem[]) => {
       const label = items[0]?.label;
       toastr.success(`Selected: ${label}`);
-    },
-    onClose: () => {
+    }),
+    onClose: fn(() => {
       toastr.info("Selector closed");
-    },
+    }),
   },
   parameters: {
     docs: {
@@ -436,6 +500,10 @@ export const FilteredByRoomType: Story = {
 export const AsideMode: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async ({ args }: PlayContext) => {
+    await shown("Contracts 2026");
+    await picks(args, "Sales proposals");
+  },
   args: {
     useAside: true,
     withoutBackground: false,
@@ -443,17 +511,17 @@ export const AsideMode: Story = {
     withHeader: true,
     headerProps: {
       headerLabel: "Select Room",
-      onCloseClick: () => {},
+      onCloseClick: fn(),
     },
     withSearch: true,
     isMultiSelect: false,
-    onSubmit: (items) => {
+    onSubmit: fn((items: TSelectorItem[]) => {
       const label = items[0]?.label;
       toastr.success(`Selected: ${label}`);
-    },
-    onClose: () => {
+    }),
+    onClose: fn(() => {
       toastr.info("Selector closed");
-    },
+    }),
   },
   parameters: {
     docs: {
