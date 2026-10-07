@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, userEvent, waitFor } from "storybook/test";
 
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
@@ -119,6 +120,28 @@ export default meta;
 
 type Story = StoryObj<StoryArgs>;
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// The demo portal answers with five groups; picking one and confirming hands
+// it to onSubmit.
+const row = (label: string) => {
+  const found = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-testid^="selector-item-"]'),
+  ).find((item) => item.textContent?.includes(label));
+  if (!found) throw new Error(`No row labelled ${label}`);
+  return found;
+};
+
+const picksAGroup = async (args: StoryArgs) => {
+  await userEvent.click(await waitFor(() => row("Marketing")));
+  await userEvent.click(screen.getByTestId("selector_submit_button"));
+  await expect(args.onSubmit).toHaveBeenCalledTimes(1);
+  const [items] = (args.onSubmit as ReturnType<typeof fn>).mock.calls[0] as [
+    { label: string }[],
+  ];
+  await expect(items[0].label).toBe("Marketing");
+};
+
 const Template = (props: StoryArgs) => (
   <div
     style={{
@@ -136,19 +159,24 @@ const Template = (props: StoryArgs) => (
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async ({ args }: PlayContext) => {
+    await waitFor(() => expect(screen.getByText("Legal")).toBeVisible());
+    await expect(screen.getByText("Select Group")).toBeVisible();
+    await picksAGroup(args);
+  },
   args: {
     withHeader: true,
     headerProps: {
       headerLabel: "Select Group",
-      onCloseClick: () => {},
+      onCloseClick: fn(),
     },
-    onSubmit: (items) => {
+    onSubmit: fn((items) => {
       const label = items[0]?.label;
       toastr.success(`Selected: ${label}`);
-    },
-    onClose: () => {
+    }),
+    onClose: fn(() => {
       toastr.info("Selector closed");
-    },
+    }),
   },
   parameters: {
     docs: {
@@ -174,6 +202,10 @@ export const Default: Story = {
 export const AsideMode: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async ({ args }: PlayContext) => {
+    await waitFor(() => expect(screen.getByText("Legal")).toBeVisible());
+    await picksAGroup(args);
+  },
   args: {
     useAside: true,
     withoutBackground: false,
@@ -181,15 +213,15 @@ export const AsideMode: Story = {
     withHeader: true,
     headerProps: {
       headerLabel: "Select Group",
-      onCloseClick: () => {},
+      onCloseClick: fn(),
     },
-    onSubmit: (items) => {
+    onSubmit: fn((items) => {
       const label = items[0]?.label;
       toastr.success(`Selected: ${label}`);
-    },
-    onClose: () => {
+    }),
+    onClose: fn(() => {
       toastr.info("Selector closed");
-    },
+    }),
   },
   parameters: {
     docs: {
