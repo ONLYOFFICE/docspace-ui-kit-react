@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Meta, StoryContext, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 import { FilterType } from "@onlyoffice/docspace-api-sdk";
 
 import { DocumentEditor } from "./DocumentEditor";
@@ -213,10 +214,36 @@ const meta: Meta<StoryArgs> = {
 
 type Story = StoryObj<StoryArgs>;
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// No fixture stands in for a Document Server, so with no portal every story
+// is the gate's card and the editor is never mounted. With a portal selected
+// the real editor loads and there is nothing here to check.
+const showsTheCard = async ({ canvas, args }: PlayContext) => {
+  await waitFor(() =>
+    expect(canvas.queryByText("Checking portal connection...")).toBeNull(),
+  );
+  const card = canvas.queryByText(
+    "A portal connection is required to load these components.",
+  );
+  if (!card) return;
+  await expect(
+    canvas.getByRole("heading", { name: "Document editor" }),
+  ).toBeVisible();
+  await expect(
+    canvas.getByRole("button", { name: "Connect a portal" }),
+  ).toBeVisible();
+  await expect(
+    canvas.getByRole("link", { name: "Get a free portal" }),
+  ).toHaveAttribute("target", "_blank");
+  await expect(document.getElementById(args.id)).toBeNull();
+};
+
 export default meta;
 
 export const Default: Story = {
   render: (args: StoryArgs) => <DocumentEditor {...args} />,
+  play: showsTheCard,
   args: {
     id: "editor",
     width: "100%",
@@ -226,6 +253,7 @@ export const Default: Story = {
 
 export const ViewMode: Story = {
   render: (args: StoryArgs) => <DocumentEditor {...args} />,
+  play: showsTheCard,
   args: {
     id: "viewer",
     width: "100%",
@@ -245,6 +273,7 @@ export const WithCustomEvent: Story = {
       <DocumentEditor events_onDocumentReady={onDocumentReady} {...args} />
     );
   },
+  play: showsTheCard,
   args: {
     id: "custom-event",
     width: "100%",
@@ -353,6 +382,7 @@ export const FillSpreadsheetWithData: Story = {
       </div>
     );
   },
+  play: showsTheCard,
   args: {
     id: "fill-spreadsheet",
     width: "100%",
