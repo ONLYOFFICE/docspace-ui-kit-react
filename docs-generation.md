@@ -129,7 +129,8 @@ canvas, into `site-screenshots/<category>/<page>--<name>-{light,dark}.png`:
 - `primary` -- the story the page opens with: the one tagged `picture` in its CSF
   (`tags: ["picture"]`), else the file's first. A component that opens from a trigger has a
   recipe in `PICTURE_RECIPES` (`scripts/docs/config.mjs`): the gesture that opens it, and what to
-  hide so only the component is in the picture.
+  hide so only the component is in the picture. The recipe applies to every story of the
+  folder; a story that does not render the trigger is photographed as it is.
 - one per story, named after the story (`with-icon`), for the Stories section. A story tagged
   `no-picture` is listed without one -- for a story that paints a page of its own in both
   themes, as `FieldContainer`'s `CustomStyling` does. An export whose key would be `primary` or

@@ -213,17 +213,25 @@ const shootStory = async (page, base, id, recipe, file) => {
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(300);
 
-  if (recipe) {
-    const [gesture, target] =
-      Object.entries(recipe).find(([key]) =>
-        ["click", "rightClick", "hover"].includes(key),
-      ) ?? [];
-    if (gesture) {
-      const element = page.locator(target).first();
-      if (gesture === "click") await element.click();
-      if (gesture === "rightClick") await element.click({ button: "right" });
-      if (gesture === "hover") await element.hover();
+  const [gesture, target] =
+    Object.entries(recipe ?? {}).find(([key]) =>
+      ["click", "rightClick", "hover"].includes(key),
+    ) ?? [];
+  const trigger = gesture ? page.locator(target).first() : null;
+  let opened = false;
+  if (trigger && (await trigger.isVisible())) {
+    try {
+      if (gesture === "click") await trigger.click({ timeout: 5_000 });
+      if (gesture === "rightClick") {
+        await trigger.click({ button: "right", timeout: 5_000 });
+      }
+      if (gesture === "hover") await trigger.hover({ timeout: 5_000 });
+      opened = true;
+    } catch {
+      opened = false;
     }
+  }
+  if (opened) {
     await page.waitForTimeout(recipe.wait ?? 400);
     if (recipe.hideRoot) {
       await page.addStyleTag({
@@ -468,8 +476,7 @@ const jobsOf = ({ page, category }) => {
         );
         continue;
       }
-      run = (p, base, file) =>
-        shootStory(p, base, entry.id, shot.primary ? recipe : undefined, file);
+      run = (p, base, file) => shootStory(p, base, entry.id, recipe, file);
     } else if (!docs) {
       skipped.push(
         `${page.source}: no docs entry in index.json for "${shot.name}"`,

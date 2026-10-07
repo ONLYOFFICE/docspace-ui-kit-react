@@ -22,10 +22,12 @@ export const SHOTS_DIR = "site-screenshots";
 export const SHOT_SCALE = 2;
 
 /**
- * How to open a component whose first story is its trigger, keyed by folder:
+ * How to open a component whose stories render its trigger, keyed by folder:
  * `click`, `rightClick` or `hover` a Playwright selector, then `hideRoot`
  * (everything in #storybook-root, for a portal) or `hide` (a selector) so the
  * trigger stays out of the picture. `wait` is the settle time in ms (400).
+ * Applied to every story of the folder; one without the trigger is
+ * photographed as it is.
  */
 export const PICTURE_RECIPES = {
   // The container is rendered beside the button, and the toast slides in.
