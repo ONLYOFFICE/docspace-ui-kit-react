@@ -21,8 +21,8 @@ read it.
 
 ## What the skill takes care of
 
-It knows this kit the way its authors do, with a page for every component copied from the
-kit's own READMEs:
+It knows this kit the way its authors do: it reads each component's own page, in the
+installed package or on the API site, and adds the rules those pages cannot state:
 
 <SkillBenefits />
 
@@ -61,6 +61,8 @@ cp -r agent-skills/skills/* .agents/skills/
 Just describe the task. To force a skill, name it: `/onlyoffice:ui-kit`. A good answer names
 the kit version it read and what `check-usage.mjs` found. If yours doesn't, ask for both.
 
+{/* site: skip */}
 ## For people changing this kit
 
 <SyncDiagram />
+{/* site: end */}

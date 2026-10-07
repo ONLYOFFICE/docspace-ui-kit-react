@@ -14,9 +14,8 @@
   </a>
 </p>
 
-> **Note:** version `4.0.0`, **not yet published to npm**. DocSpace consumes a packed tarball
-> built from this repository. See [CHANGELOG.md](CHANGELOG.md) — 4.0.0 renamed the package,
-> made it ESM-only and put an `exports` map in front of every subpath.
+> **Note:** version `4.0.0` renamed the package, made it ESM-only and put an `exports` map in
+> front of every subpath. See [CHANGELOG.md](CHANGELOG.md).
 
 > **New here?** [`docs/getting-started.md`](docs/getting-started.md) is the one page to read first:
 > what to install, the two providers to mount, why the stylesheet needs no import, and which
@@ -41,8 +40,6 @@
 
 ## Installation
 
-Once published:
-
 ```bash
 # pnpm
 pnpm add @onlyoffice/apps-ui-kit
@@ -54,7 +51,7 @@ npm install @onlyoffice/apps-ui-kit
 yarn add @onlyoffice/apps-ui-kit
 ```
 
-Until then, install a packed tarball built from this repository:
+To try a build of this repository instead, pack it and install the file:
 
 ```bash
 pnpm build && pnpm pack

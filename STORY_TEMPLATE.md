@@ -151,6 +151,14 @@ facts live in the parent README.
 | Feature demos       | `WithIcon`, `WithTooltip`, `WithCallback`       |
 | Direction           | `RightToLeft` (never `RTL`)                     |
 
+## Pictures for the API site
+
+The site's pages (`docs-generation.md`) photograph every story. Two tags steer that:
+`tags: ["picture"]` on the story the page should open with, when it is not the first one;
+`tags: ["no-picture"]` on a story that is listed but not photographed -- one that paints a
+page of its own in both themes, as `FieldContainer`'s `CustomStyling` does. Do not name a
+story `Primary` or `ArgsTable`: those shot names belong to the page.
+
 ## Categories
 
 Seven, and they are the same seven a README's `category` may hold. The two must agree:

@@ -199,6 +199,11 @@ const preview: Preview = {
 
   initialGlobals: {
     apiConfig: "default",
+    // "page" paints the story on a white or black page with a 20px margin.
+    // "transparent" drops both, for scripts/docs/screenshots.mjs, which
+    // photographs stories for the API site and needs the component alone.
+    // Set from the URL: iframe.html?id=...&globals=canvas:transparent.
+    canvas: "page",
   },
 
   decorators: [
@@ -222,7 +227,8 @@ const preview: Preview = {
       ]);
 
       const isDocs = context.viewMode === "docs";
-      const noPadding = context.parameters?.noPadding;
+      const transparent = context.globals.canvas === "transparent";
+      const noPadding = context.parameters?.noPadding || transparent;
 
       return (
         <TranslationProvider locale="en" translations={translations}>
@@ -232,9 +238,11 @@ const preview: Preview = {
           >
             <div
               style={{
-                backgroundColor: isDark
-                  ? globalColors.black
-                  : globalColors.white,
+                backgroundColor: transparent
+                  ? "transparent"
+                  : isDark
+                    ? globalColors.black
+                    : globalColors.white,
                 color: isDark ? globalColors.white : globalColors.black,
                 padding: isDocs || noPadding ? "0" : "20px",
               }}

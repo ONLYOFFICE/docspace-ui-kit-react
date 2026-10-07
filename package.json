@@ -63,7 +63,12 @@
     "readme:catalogue": "node scripts/readme-catalogue.mjs",
     "readme:catalogue:check": "node scripts/readme-catalogue.mjs --check",
     "surface": "node .claude/scripts/plugin-surface/surface.mjs --write",
-    "surface:check": "node .claude/scripts/plugin-surface/surface.mjs --check"
+    "surface:check": "node .claude/scripts/plugin-surface/surface.mjs --check",
+    "docs": "node scripts/docs/index.mjs --strict",
+    "docs:check": "node scripts/docs/index.mjs --strict --check",
+    "docs:screenshots": "node scripts/docs/screenshots.mjs",
+    "docs:build": "node scripts/docs/build.mjs",
+    "docs:sync": "node scripts/docs/build.mjs --sync"
   },
   "engines": {
     "node": ">=22"
@@ -177,6 +182,7 @@
     "@assistant-ui/react": "^0.11.58",
     "@assistant-ui/react-markdown": "^0.11.10",
     "@biomejs/biome": "2.4.16",
+    "@mdx-js/mdx": "3.1.1",
     "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.6.39.tgz",
     "@onlyoffice/document-editor-react": "2.1.1",
     "@playwright/test": "1.58.1",

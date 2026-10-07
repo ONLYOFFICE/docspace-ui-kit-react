@@ -1,16 +1,21 @@
-# Getting started
+# Installation and setup
 
 Everything a React application needs to do once, before any component of this kit renders
 correctly: install it, mount two providers, and know which import forms exist. It is written for an
 application of your own — a DocSpace **plugin** installs nothing and composes no providers, because
 the portal has already done both.
 
-Every `tsx` block below is a complete module and is compiled by `pnpm check:readme --compile`.
+<!-- Every tsx block below is a complete module and is compiled by `pnpm check:readme --compile`. -->
 
 ## Install
 
-The package is not on the public npm registry yet, so there is nothing to install by name. Build a
-tarball from this repository and install the file:
+Install the package from npm:
+
+```bash
+npm install @onlyoffice/apps-ui-kit
+```
+
+To try a build of this repository instead, pack it and install the file:
 
 ```bash
 pnpm build && pnpm pack   # -> onlyoffice-apps-ui-kit-4.0.0.tgz
@@ -19,12 +24,6 @@ pnpm build && pnpm pack   # -> onlyoffice-apps-ui-kit-4.0.0.tgz
 Pack with **pnpm, not npm**: the `exports` map lives under `publishConfig`, which npm does not
 apply, and an npm-packed tarball arrives with no `exports` and no `main` at all — every import from
 it fails to resolve.
-
-Once it is published this becomes the usual line:
-
-```bash
-npm install @onlyoffice/apps-ui-kit
-```
 
 The package is **ESM only**. There is no CommonJS build, so a bundler or a Node version that cannot
 load ESM cannot load this kit.
@@ -266,4 +265,9 @@ width when the arrangement matters.
   and the prop that shows and hides it, with a table for choosing between the close calls.
 - Each component's own README, next to its source under `components/<name>/README.md`, and shipped
   in the package at the same path.
+
+<!-- site: skip -->
+
 - [`public-api.md`](public-api.md) — the full public and portal-internal boundary.
+
+<!-- site: end -->
