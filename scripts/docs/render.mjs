@@ -386,7 +386,7 @@ export const renderReadme = (raw, context) => {
     text =
       at === -1
         ? `${text}\n\n${stories}`
-        : `${text.slice(0, at)}\n\n${stories}\n${text.slice(at)}`;
+        : `${text.slice(0, at).trimEnd()}\n\n${stories}\n${text.slice(at)}`;
   }
   const tables = wrapApiTables(text);
   text = tables.wrapped

@@ -19,7 +19,7 @@ export const ROOT_SECTION = {
   title: "UI Kit",
   description:
     "`@onlyoffice/apps-ui-kit` is the React component library every ONLYOFFICE Apps " +
-    "product is built with, and the UI a DocSpace plugin renders its screens in. " +
+    "product is built with, and the UI a plugin for ONLYOFFICE Apps renders its screens in. " +
     "Start with **Getting started** for the two providers and the import forms, then " +
     "pick a component by what it does.",
   tableCaption: "The reference is organised into these sections:",
@@ -48,7 +48,7 @@ export const SECTIONS = {
     title: "Components",
     description:
       "The composites built from the UI components for the portal's screens. " +
-      "Of these, the providers are public; the rest need DocSpace context.",
+      "Of these, the providers are public; the rest need a portal.",
     tableCaption: "The groups are:",
     tableHeader: "Group",
   },
