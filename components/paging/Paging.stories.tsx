@@ -480,6 +480,21 @@ export const ButtonsOnly: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    await expect(previous(canvas)).toHaveStyle({
+      maxWidth: "140px",
+      fontSize: "14px",
+      padding: "8px 32px",
+    });
+    await expect(next(canvas)).toHaveStyle({ maxWidth: "120px" });
+    await expect(
+      Math.round(
+        canvas
+          .getByTestId("paging_count_items_combobox")
+          .getBoundingClientRect().width,
+      ),
+    ).toBe(160);
+  },
   render: () => (
     <div
       style={
