@@ -226,6 +226,21 @@ export const Default: Story = {
   },
 };
 
+type Queries = {
+  getByPlaceholderText: (text: string) => HTMLElement;
+};
+
+const rect = (element: Element) => element.getBoundingClientRect();
+
+// The text field carries the border; the root is the whole control.
+const field = (canvas: Queries, placeholder: string) =>
+  canvas.getByPlaceholderText(placeholder) as HTMLInputElement;
+
+const rootOf = (input: HTMLElement) =>
+  input.closest("[data-testid='file-input']") as HTMLElement;
+
+const borderOf = (input: HTMLElement) => getComputedStyle(input).borderTopColor;
+
 const SizesTemplate = () => {
   return (
     <Wrapper>
@@ -250,6 +265,21 @@ const SizesTemplate = () => {
 
 export const Sizes: Story = {
   render: () => <SizesTemplate />,
+  play: async ({ canvas }) => {
+    const [base, middle, large] = [
+      "Base size",
+      "Middle size",
+      "Large size",
+    ].map((placeholder) => field(canvas, placeholder));
+    // Each size has its fixed width; base and middle share a height.
+    const widths = [base, middle, large].map((input) =>
+      Math.round(rect(rootOf(input)).width),
+    );
+    await expect(widths).toEqual([173, 300, 550]);
+    await expect(rect(middle).height).toBe(rect(base).height);
+    await expect(rect(large).height).toBeGreaterThan(rect(base).height);
+    await expect(large).toHaveStyle({ fontSize: "16px" });
+  },
   parameters: {
     docs: {
       description: {
@@ -303,6 +333,16 @@ const StatesTemplate = () => {
 
 export const States: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas }) => {
+    const normal = borderOf(field(canvas, "Normal"));
+    const error = borderOf(field(canvas, "Error state"));
+    const warning = borderOf(field(canvas, "Warning state"));
+    await expect(new Set([normal, error, warning]).size).toBe(3);
+    await expect(field(canvas, "Disabled")).toBeDisabled();
+    // Loading swaps the folder icon for a loader.
+    const loading = rootOf(field(canvas, "Loading"));
+    await expect(loading.querySelector("[class*='loader' i]")).not.toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -400,6 +440,12 @@ const ScaledTemplate = () => {
 
 export const ScaledInput: Story = {
   render: () => <ScaledTemplate />,
+  play: async ({ canvas }) => {
+    const root = rootOf(field(canvas, "Scaled file input"));
+    await expect(Math.round(rect(root).width)).toBe(
+      Math.round(rect(root.parentElement as HTMLElement).width),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -443,6 +489,18 @@ const WithButtonTemplate = () => {
 
 export const WithButton: Story = {
   render: () => <WithButtonTemplate />,
+  play: async ({ canvas }) => {
+    // A Browse button after the field, sized with it.
+    for (const placeholder of ["Base size", "Middle size", "Large size"]) {
+      const input = field(canvas, placeholder);
+      const browse = within(rootOf(input)).getByRole("button", {
+        name: "Browse",
+      });
+      await expect(rect(browse).left).toBeGreaterThanOrEqual(
+        rect(input).right - 1,
+      );
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -478,6 +536,12 @@ const DocumentIconTemplate = () => {
 
 export const DocumentIcon: Story = {
   render: () => <DocumentIconTemplate />,
+  play: async ({ canvas }) => {
+    const icon = (placeholder: string) =>
+      rootOf(field(canvas, placeholder)).querySelector("svg")?.innerHTML;
+    await expect(icon("Folder icon")).toBeTruthy();
+    await expect(icon("Document icon")).not.toBe(icon("Folder icon"));
+  },
   parameters: {
     docs: {
       description: {
@@ -590,6 +654,22 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    const choose = field(canvas, "Choose file");
+    await expect(choose).toHaveStyle({
+      borderTopColor: "rgb(0, 130, 201)",
+      backgroundColor: "rgb(240, 248, 255)",
+    });
+    await expect(borderOf(field(canvas, "Warning state"))).toBe(
+      "rgb(230, 126, 0)",
+    );
+    await expect(borderOf(field(canvas, "Error state"))).toBe(
+      "rgb(192, 57, 43)",
+    );
+    await expect(borderOf(field(canvas, "Disabled"))).toBe(
+      "rgb(176, 204, 227)",
+    );
+  },
   parameters: {
     docs: {
       description: {
