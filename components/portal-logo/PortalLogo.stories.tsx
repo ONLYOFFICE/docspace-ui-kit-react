@@ -181,6 +181,18 @@ export const OnPhone: Story = {
   args: {
     isResizable: true,
   },
+  play: async ({ canvasElement }) => {
+    // Resizable keeps the logo on screen at a phone width; in a frame wider
+    // than a phone it stays an ordinary logo.
+    const img = await findLogo(canvasElement);
+    await expect(img).toBeVisible();
+    const wrapper = img.parentElement as HTMLElement;
+    await expect(wrapper.className).toMatch(/resizable/);
+    if (isPhoneWidth()) {
+      await expect(getComputedStyle(wrapper).position).toBe("fixed");
+      await expect(Math.round(wrapper.getBoundingClientRect().height)).toBe(48);
+    }
+  },
   parameters: {
     docs: {
       description: {
