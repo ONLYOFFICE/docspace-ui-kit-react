@@ -313,6 +313,8 @@ export const Default: Story = {
   },
 };
 
+const rect = (element: Element) => element.getBoundingClientRect();
+
 const SizesTemplate = () => {
   return (
     <div
@@ -337,6 +339,19 @@ const SizesTemplate = () => {
 
 export const Sizes: Story = {
   render: () => <SizesTemplate />,
+  play: async ({ canvas }) => {
+    // Each size has its own fixed width; large also has the bigger text.
+    const [base, middle, large] = [
+      "Base size",
+      "Middle size",
+      "Large size",
+    ].map((value) => canvas.getByDisplayValue(value));
+    await expect(
+      [base, middle, large].map((input) => Math.round(rect(input).width)),
+    ).toEqual([173, 300, 550]);
+    await expect(base).toHaveStyle({ fontSize: "13px" });
+    await expect(large).toHaveStyle({ fontSize: "16px" });
+  },
   parameters: {
     docs: {
       description: {
@@ -595,6 +610,15 @@ const ScaledTemplate = () => {
 
 export const ScaledInputs: Story = {
   render: () => <ScaledTemplate />,
+  play: async ({ canvas }) => {
+    for (const value of ["Scaled base", "Scaled middle", "Scaled large"]) {
+      const input = canvas.getByDisplayValue(value);
+      const column = input.closest("div[style]") as HTMLElement;
+      await expect(Math.round(rect(input).width)).toBe(
+        Math.round(rect(column).width),
+      );
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -622,6 +646,14 @@ const BoldTemplate = () => {
 
 export const BoldText: Story = {
   render: () => <BoldTemplate />,
+  play: async ({ canvas }) => {
+    const weight = (value: string) =>
+      Number(getComputedStyle(canvas.getByDisplayValue(value)).fontWeight);
+    await expect(weight("Bold weight")).toBeGreaterThan(
+      weight("Normal weight"),
+    );
+    await expect(weight("Weight 700")).toBe(700);
+  },
   parameters: {
     docs: {
       description: {
@@ -684,6 +716,15 @@ const RightToLeftTemplate = () => {
 export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The text field follows its content; the phone field stays
+    // left-to-right so a number reads the same.
+    const [text, tel] = canvas.getAllByRole("textbox");
+    await expect(text).toHaveAttribute("dir", "auto");
+    await expect(getComputedStyle(text).direction).toBe("rtl");
+    await expect(tel).toHaveAttribute("type", "tel");
+    await expect(getComputedStyle(tel, "::placeholder").direction).toBe("ltr");
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -703,6 +744,25 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    await expect(canvas.getByDisplayValue("Custom styled input")).toHaveStyle({
+      backgroundColor: "rgb(245, 243, 255)",
+      borderTopColor: "rgb(196, 181, 253)",
+      borderRadius: "8px",
+      fontSize: "14px",
+      color: "rgb(76, 29, 149)",
+    });
+    await expect(
+      getComputedStyle(
+        canvas.getByPlaceholderText("Placeholder text"),
+        "::placeholder",
+      ).color,
+    ).toBe("rgb(139, 92, 246)");
+    // The disabled fill is an inset shadow, not the background.
+    await expect(
+      getComputedStyle(canvas.getByDisplayValue("Disabled")).boxShadow,
+    ).toContain("rgb(221, 214, 254)");
+  },
   render: () => (
     <div
       style={
