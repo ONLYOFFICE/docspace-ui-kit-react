@@ -181,6 +181,14 @@ export const WithoutTitle: Story = {
   args: {
     title: "",
   },
+  play: async ({ canvas }) => {
+    // Only the pill: its two labels are the whole text.
+    const toggle = canvas.getByRole("switch");
+    await expect(toggle).toBeVisible();
+    await expect(
+      (toggle.parentElement as HTMLElement).textContent?.replace(/\s/g, ""),
+    ).toBe("OLDNEW");
+  },
   parameters: {
     docs: {
       description: {
@@ -203,6 +211,28 @@ export const CustomLabels: Story = {
     confirmHint: "Return to v2 anytime via /dashboard.",
     confirmOk: "Yes, switch",
     confirmCancel: "Stay on v2",
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByText("Interface")).toBeVisible();
+    await expect(canvas.getByText("v1")).toBeVisible();
+    await expect(canvas.getByText("v2")).toBeVisible();
+
+    // The confirmation speaks with the story's own words.
+    await userEvent.click(canvas.getByRole("switch"));
+    await waitFor(() =>
+      expect(screen.getByText("Switch to v1?")).toBeVisible(),
+    );
+    await expect(
+      screen.getByText("You will be taken back to the classic interface."),
+    ).toBeVisible();
+    await expect(
+      screen.getByText("Return to v2 anytime via /dashboard."),
+    ).toBeVisible();
+    await expect(
+      screen.getByRole("button", { name: "Yes, switch" }),
+    ).toBeVisible();
+    await userEvent.click(screen.getByRole("button", { name: "Stay on v2" }));
+    await expect(args.onNavigate).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -237,6 +267,12 @@ export const RightToLeft: Story = {
   args: {
     title: "Design",
   },
+  play: async ({ canvas }) => {
+    // The title moves to the right of the pill.
+    await expect(
+      canvas.getByText("Design").getBoundingClientRect().left,
+    ).toBeGreaterThan(canvas.getByRole("switch").getBoundingClientRect().left);
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -256,6 +292,22 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas, userEvent }) => {
+    const toggle = canvas.getByRole("switch");
+    await expect(toggle).toHaveStyle({
+      borderRadius: "18px",
+      backgroundColor: "rgb(46, 125, 50)",
+    });
+    await expect(canvas.getByText("DocSpace design")).toHaveStyle({
+      color: "rgb(46, 125, 50)",
+    });
+    // The focus ring mixes the custom accent (46, 125, 50 in 0-1 sRGB).
+    await userEvent.tab();
+    await expect(toggle).toHaveFocus();
+    await expect(getComputedStyle(toggle).boxShadow).toContain(
+      "0.180392 0.490196 0.196078",
+    );
+  },
   render: (args) => (
     <div
       style={
