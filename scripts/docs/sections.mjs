@@ -14,18 +14,6 @@
  * @property {string} [tableHeader]
  */
 
-/** The landing page of the whole section. */
-export const ROOT_SECTION = {
-  title: "UI Kit",
-  description:
-    "`@onlyoffice/apps-ui-kit` is the React component library every ONLYOFFICE Apps " +
-    "product is built with, and the UI a plugin for ONLYOFFICE Apps renders its screens in. " +
-    "Start with **Getting started** for the two providers and the import forms, then " +
-    "pick a component by what it does.",
-  tableCaption: "The reference is organised into these sections:",
-  tableHeader: "Section",
-};
-
 /** @type {Record<string, Section>} */
 export const SECTIONS = {
   "Getting started": {

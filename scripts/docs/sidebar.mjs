@@ -7,7 +7,7 @@ import { SECTIONS } from "./sections.mjs";
 
 const docId = (file) => `${PATH_PREFIX}/${file.replace(/\.md$/, "")}`;
 
-export const sidebarItems = (categories) =>
+export const sidebarItems = (categories, depth = 0) =>
   categories.map((category) => {
     const label = SECTIONS[category.key]?.title ?? category.label;
     const link = { type: "doc", id: docId(`${category.slug}/index.md`) };
@@ -22,9 +22,10 @@ export const sidebarItems = (categories) =>
       type: "category",
       label,
       link,
+      ...(depth === 0 ? { collapsed: false } : {}),
       items: (category.sequence ?? []).map(({ type, item }) =>
         type === "category"
-          ? sidebarItems([item])[0]
+          ? sidebarItems([item], depth + 1)[0]
           : {
               type: "doc",
               id: docId(`${category.slug}/${item.slug}.md`),

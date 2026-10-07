@@ -30,7 +30,6 @@ import {
   renderMarkdown,
   renderMdx,
   renderReadme,
-  renderRoot,
   summaryOf,
 } from "./render.mjs";
 import { pictureFiles, pictureNames, shotsOf } from "./pictures.mjs";
@@ -164,7 +163,6 @@ for (const category of everyCategory) {
   }
 }
 
-files.set("index.md", renderRoot(categories, { revision: rev }));
 files.set(SIDEBAR_FILE, renderSidebar(categories));
 
 fs.rmSync(outDir, { recursive: true, force: true });

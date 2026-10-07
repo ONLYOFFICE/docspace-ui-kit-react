@@ -23,7 +23,6 @@ import {
 import {
   DEFAULT_TABLE_CAPTION,
   DEFAULT_TABLE_HEADER,
-  ROOT_SECTION,
   SECTIONS,
 } from "./sections.mjs";
 
@@ -136,7 +135,7 @@ export const layout = (categories, storyId) => {
   return { bySource, byStoryId };
 };
 
-/** The overview rows of a category's children, for its page and the root's. */
+/** The overview rows of a category's children, for its page. */
 const childRows = (categories, prefix = "./") =>
   categories.map((category) => {
     const section = SECTIONS[category.key];
@@ -640,24 +639,6 @@ export const renderCategory = (category, context) => {
     (section ? `${section.description}\n\n` : "") +
     "## Overview\n\n" +
     escapeForMdx(table) +
-    "\n"
-  );
-};
-
-/** The landing page of the section. */
-export const renderRoot = (categories, { revision }) => {
-  const rows = childRows(categories);
-
-  return (
-    frontMatter({
-      custom_edit_url: `${REPO_URL}/blob/${revision}/${SECTIONS_FILE}`,
-    }) +
-    `# ${ROOT_SECTION.title}\n\n${ROOT_SECTION.description}\n\n` +
-    escapeForMdx(
-      overviewTable(ROOT_SECTION.tableCaption, ROOT_SECTION.tableHeader, rows, {
-        code: false,
-      }),
-    ) +
     "\n"
   );
 };

@@ -45,13 +45,11 @@ the site for a look before handing over; it is not a deploy.
 
 What the site needs, once:
 
-- a `docspaceUiKit` sidebar in `sidebars.ts` -- the root page, then the generated sidebar:
+- a `docspaceUiKit` sidebar in `sidebars.ts` -- the generated sidebar alone, as the SDK's; the
+  section opens on its first page, like every other section of the site:
 
   ```ts
-  docspaceUiKit: [
-    {type: "doc", id: "docspace/ui-kit/index"},
-    ...require('./site/docspace/ui-kit/ui-kit-sidebar.cjs'),
-  ],
+  docspaceUiKit: [...require('./site/docspace/ui-kit/ui-kit-sidebar.cjs')],
   ```
 
 - a `docSidebar` entry for it in the DocSpace navbar menu in `docusaurus.config.ts`, and a
@@ -105,7 +103,7 @@ Storybook's index has one docs entry per CSF file and one per MDX page. Each bec
 
 Portal-internal components are on the site because they are in Storybook. The one section left
 out is `Samples` (`SKIPPED_ROOTS`): the samples are applications run against a portal, and
-without one they photograph as demo screens; the Welcome hero drops its links to them.
+without one they photograph as demo screens.
 
 ## The tree and the order
 
@@ -204,22 +202,20 @@ A category without a README of its own gets a page built from `scripts/docs/sect
 title, a paragraph, and a table of its groups and pages with each one's summary. Storybook groups
 have nothing to say about themselves, so that paragraph lives there, keyed by Storybook path
 (`"UI/Form controls"`). **A new Storybook group fails a strict run until it has an entry.**
-`index.md` at the root lists the top-level categories.
 
 ## Output
 
 ```
 site-docs/
-├── index.md                  # section landing
 ├── ui-kit-sidebar.cjs        # items array for the site's sidebars.ts, nested as Storybook's
 ├── getting-started/          # index.md + welcome, installation, structure, …
 ├── components/               # index.md + the portal composites; selectors/, providers/, errors/
 └── ui/                       # index.md + form-controls/, overlays/, … one directory per group
 ```
 
-Sidebar doc ids carry the `docspace/ui-kit` prefix, and every category links to its
-`index.md`. The site spreads `ui-kit-sidebar.cjs` into its own category, as it does
-`typedoc-sidebar.cjs` for the SDK.
+Sidebar doc ids carry the `docspace/ui-kit` prefix, every category links to its `index.md`,
+and the three top-level categories are expanded, as the SDK's are. The site spreads
+`ui-kit-sidebar.cjs` into its own category, as it does `typedoc-sidebar.cjs` for the SDK.
 
 ## Fixing a problem
 
