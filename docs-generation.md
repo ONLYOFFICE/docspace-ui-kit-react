@@ -185,6 +185,9 @@ The primary picture goes under the intro and a Stories section -- each story's n
    too. A page whose H1 was inside a React element gets one from its title.
 3. **Front matter**: `description` from the metadata `summary` (or the component description),
    and `custom_edit_url` pointing at the source file.
+4. **Portal-only pages.** A README whose `status` is `portal-internal`, or a page whose source
+   is under a directory in `PORTAL_DIRS` (`scripts/docs/config.mjs`), opens with a warning
+   admonition that says so and links to the Public API page.
 
 ## Category pages
 

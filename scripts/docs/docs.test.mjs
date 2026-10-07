@@ -433,8 +433,37 @@ describe("pictures", () => {
       warn: () => {},
     });
     expect(out).toContain(THEMED_IMAGE_IMPORT);
+    expect(out).not.toContain(":::warning");
     expect(out).toContain(
       "Intro.\n\n<ThemedImage alt=\"Button\" width={117} sources={{ light: require('./button-light.png').default, dark: require('./button-dark.png').default }} />\n\n## Props",
+    );
+  });
+
+  it("opens a portal-only page with a warning that links to Public API", () => {
+    const out = renderReadme("# Filter\n\nIntro.\n", {
+      root: process.cwd(),
+      source: "components/filter/README.md",
+      out: "ui/form-controls/filter.md",
+      page: {
+        label: "Filter",
+        source: "components/filter/README.md",
+        portalOnly: true,
+      },
+      pages: {
+        bySource: new Map([
+          ["docs/public-api.md", "getting-started/public-api.md"],
+        ]),
+        byStoryId: new Map(),
+      },
+      revision: "master",
+      storyId: () => "x",
+      warn: () => {},
+    });
+    expect(out).toContain(
+      "# Filter\n\n:::warning[Portal only]\n\nWorks only inside an ONLYOFFICE Apps portal",
+    );
+    expect(out).toContain(
+      "[public API](../../getting-started/public-api.md).\n\n:::\n\nIntro.",
     );
   });
 });

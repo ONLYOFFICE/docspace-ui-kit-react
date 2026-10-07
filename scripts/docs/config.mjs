@@ -114,6 +114,22 @@ export const SKIPPED_ROOTS = ["Samples"];
 export const SHOT_WORKERS = 4;
 
 /**
+ * Directories whose pages need a portal and are outside the public API; each
+ * opens with a warning saying so. A README says the same with its
+ * `"status": "portal-internal"`.
+ */
+export const PORTAL_DIRS = [
+  "ai-agent",
+  "api",
+  "billing",
+  "docs/sections",
+  "document-editor",
+  "providers/api",
+  "selectors",
+  "uploader",
+];
+
+/**
  * Directories whose README.md becomes a page when it carries a `ui-kit-doc`
  * metadata block. A README without one is not published: it has no summary
  * for the overview tables and no status to filter on.

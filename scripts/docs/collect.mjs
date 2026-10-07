@@ -10,6 +10,7 @@ import { parseMetadata } from "../lib/readme-meta.mjs";
 import {
   EXTRA_PAGES,
   MDX_PAGES,
+  PORTAL_DIRS,
   README_DIRS,
   SKIPPED_ROOTS,
   STORY_DIRS,
@@ -82,6 +83,12 @@ const leafOf = (title) => title.split("/").at(-1);
 
 /** `PeopleSelector` -> `people-selector`, `Error404` -> `error-404`. */
 const pageSlug = (label) => slugify(storyNameFromExport(label));
+
+const portalOnly = (page) =>
+  page.meta?.status === "portal-internal" ||
+  PORTAL_DIRS.some((dir) =>
+    (page.storiesFile ?? page.source).startsWith(`${dir}/`),
+  );
 
 /** `./Button.stories` from `components/button/Button.stories.tsx` -> that file. */
 const resolveModule = (root, fromFile, specifier) => {
@@ -209,6 +216,7 @@ export const collect = (root, { warn }) => {
         description: csfDescription(read(story.file), story.file),
       };
     }
+    page.portalOnly = portalOnly(page);
     categoryFor(parentOf(story.title)).pages.push(page);
   }
 
@@ -218,7 +226,7 @@ export const collect = (root, { warn }) => {
       warn(`${entry.file}: MDX title "${entry.title}" has no group`);
       continue;
     }
-    categoryFor(parentOf(entry.title)).pages.push({
+    const page = {
       kind: "mdx",
       source: entry.file,
       label: leafOf(entry.title),
@@ -227,7 +235,9 @@ export const collect = (root, { warn }) => {
       title: entry.title,
       blocks: entry.blocks,
       options: MDX_PAGES[entry.title] ?? {},
-    });
+    };
+    page.portalOnly = portalOnly(page);
+    categoryFor(parentOf(entry.title)).pages.push(page);
   }
 
   // A README with no story in its folder but stories below it
@@ -272,6 +282,7 @@ export const collect = (root, { warn }) => {
       slug: "index",
       order: below[0].file,
       meta: readme.meta,
+      portalOnly: readme.meta.status === "portal-internal",
     };
   }
 
