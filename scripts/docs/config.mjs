@@ -168,14 +168,14 @@ export const EXTRA_PAGES = [
   {
     source: "docs/getting-started.md",
     group: "Getting started",
-    label: "Installation",
+    label: "Installation and setup",
     after: "Welcome",
   },
   {
     source: "docs/components.md",
     group: "Getting started",
     label: "Catalogue",
-    after: "Installation",
+    after: "Installation and setup",
   },
   {
     source: "docs/public-api.md",

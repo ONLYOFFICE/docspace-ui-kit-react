@@ -1,11 +1,11 @@
-# Getting started
+# Installation and setup
 
 Everything a React application needs to do once, before any component of this kit renders
 correctly: install it, mount two providers, and know which import forms exist. It is written for an
 application of your own — a DocSpace **plugin** installs nothing and composes no providers, because
 the portal has already done both.
 
-Every `tsx` block below is a complete module and is compiled by `pnpm check:readme --compile`.
+<!-- Every tsx block below is a complete module and is compiled by `pnpm check:readme --compile`. -->
 
 ## Install
 

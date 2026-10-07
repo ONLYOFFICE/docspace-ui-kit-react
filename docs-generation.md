@@ -98,7 +98,8 @@ Storybook's index has one docs entry per CSF file and one per MDX page. Each bec
   kind `autodocs`: title, `docs.description.component`, the primary story, the args table, the
   stories.
 - **An MDX page of its own** (`<Meta title="…" />`: Getting started) -- the page, kind `mdx`.
-- `docs/getting-started.md`, as "Installation", because nine READMEs link to it (`EXTRA_PAGES`).
+- `docs/getting-started.md`, as "Installation and setup", because nine READMEs link to it
+  (`EXTRA_PAGES`).
 
 Portal-internal components are on the site because they are in Storybook. The one section left
 out is `Samples` (`SKIPPED_ROOTS`): the samples are applications run against a portal, and

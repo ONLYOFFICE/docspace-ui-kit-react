@@ -605,7 +605,7 @@ describe("collect", () => {
     );
     write("docs/welcome.mdx", '<Meta title="Getting started/Welcome" />\n');
     write("docs/structure.mdx", '<Meta title="Getting started/Structure" />');
-    write("docs/getting-started.md", "# Installation\n");
+    write("docs/getting-started.md", "# Installation and setup\n");
     write("docs/components.md", "# Components\n");
     write("docs/public-api.md", "# Public API\n");
     write(
@@ -654,14 +654,14 @@ describe("collect", () => {
       category.sequence.map(({ type, item }) => `${type}:${item.label}`);
     expect(labels(started)).toEqual([
       "page:Welcome",
-      "page:Installation",
+      "page:Installation and setup",
       "page:Catalogue",
       "page:Structure",
       "page:Public API",
     ]);
     expect(started.pages.map((p) => `${p.kind}:${p.slug}`)).toEqual([
       "mdx:welcome",
-      "markdown:installation",
+      "markdown:installation-and-setup",
       "markdown:catalogue",
       "mdx:structure",
       "markdown:public-api",
