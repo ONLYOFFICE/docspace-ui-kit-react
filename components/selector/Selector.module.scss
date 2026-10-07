@@ -481,7 +481,8 @@
     height: 32px;
   }
 
-  .selectorItemName {
+  .selectorItemName,
+  .selectorItemNameMultiSelect {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -489,6 +490,7 @@
 
     .selectorItemLabel {
       width: unset;
+      min-width: 0;
 
       .itemFileExst {
         color: var(--files-section-table-view-exst-color);
@@ -503,6 +505,8 @@
   }
 
   .titleIcon {
+    display: flex;
+    flex-shrink: 0;
     cursor: pointer;
   }
 
