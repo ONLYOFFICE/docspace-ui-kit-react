@@ -1,5 +1,6 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 import { useTranslation } from "react-i18next";
 
 import enCommon from "../../locales/en/Common.json";
@@ -49,6 +50,17 @@ const TranslatedDemo = () => {
 
 export const Default: Story = {
   render: () => <TranslatedDemo />,
+  play: async ({ canvas }) => {
+    // Keys resolve to the English bundle.
+    for (const line of [
+      "SaveButton: Save",
+      "CancelButton: Cancel",
+      "Delete: Delete",
+      "Settings: Settings",
+    ]) {
+      await expect(canvas.getByText(line)).toBeVisible();
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -71,6 +83,11 @@ export const WithoutTranslations: Story = {
       <p>No translations provided — children render as-is.</p>
     </div>
   ),
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByText("No translations provided — children render as-is."),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
