@@ -212,6 +212,20 @@ export const Default: Story = {
   },
 };
 
+// A badge is three layers: the status element (border), the pill (fill,
+// padding, radius) and the text.
+const badge = (
+  canvas: { getByRole: (role: string, options: object) => HTMLElement },
+  label: string,
+) => {
+  const root = canvas.getByRole("status", { name: new RegExp(`^${label}`) });
+  return {
+    root,
+    pill: root.firstElementChild as HTMLElement,
+    text: root.querySelector("p") as HTMLElement,
+  };
+};
+
 const BadgeTypesTemplate = () => {
   return (
     <Wrapper>
@@ -294,6 +308,15 @@ export const BadgeTypes: Story = {
 
 export const SpecialBadges: Story = {
   render: () => <SpecialBadgesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(badge(canvas, "v1.2.3").text).toHaveTextContent("v1.2.3");
+    await expect(badge(canvas, "PRO").pill).toHaveStyle({
+      backgroundColor: "rgb(237, 196, 9)",
+    });
+    await expect(badge(canvas, "Muted").pill).toHaveStyle({
+      backgroundColor: "rgb(163, 169, 174)",
+    });
+  },
   parameters: {
     docs: {
       description: {
@@ -342,6 +365,27 @@ export const HoverStates: Story = {
 
 export const CustomStyled: Story = {
   render: () => <CustomStyledTemplate />,
+  play: async ({ canvas }) => {
+    const custom = badge(canvas, "Custom");
+    await expect(custom.pill).toHaveStyle({
+      backgroundColor: "rgb(51, 94, 163)",
+      borderRadius: "8px",
+      padding: "4px 12px",
+    });
+    await expect(custom.text).toHaveStyle({
+      color: "rgb(255, 255, 255)",
+      fontSize: "14px",
+      fontWeight: "600",
+    });
+    const bordered = badge(canvas, "Bordered");
+    await expect(bordered.root).toHaveStyle({ borderTopWidth: "2px" });
+    await expect(bordered.pill).toHaveStyle({
+      backgroundColor: "rgba(0, 0, 0, 0)",
+    });
+    await expect(
+      badge(canvas, "Large").root.getBoundingClientRect().width,
+    ).toBeLessThanOrEqual(80);
+  },
   parameters: {
     docs: {
       description: {
@@ -366,6 +410,10 @@ export const InteractiveBadge: Story = {
     label: "Click me",
     onClick: fn(),
   },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByText("Click me"));
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -380,6 +428,13 @@ export const InteractiveBadge: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    await expect(badge(canvas, "Premium").pill).toHaveStyle({
+      backgroundColor: "rgb(123, 79, 191)",
+      borderRadius: "12px",
+      padding: "3px 14px",
+    });
+  },
   render: () => (
     <div
       style={
