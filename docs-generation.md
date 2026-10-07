@@ -98,8 +98,8 @@ Storybook's index has one docs entry per CSF file and one per MDX page. Each bec
   kind `autodocs`: title, `docs.description.component`, the primary story, the args table, the
   stories.
 - **An MDX page of its own** (`<Meta title="…" />`: Getting started) -- the page, kind `mdx`.
-- `docs/getting-started.md`, as "Installation and setup", because nine READMEs link to it
-  (`EXTRA_PAGES`).
+- `docs/getting-started.md`, as "Installation and setup", because nine READMEs link to it, and
+  `docs/components.md`, as "Catalogue" (`EXTRA_PAGES`).
 
 Portal-internal components are on the site because they are in Storybook. The one section left
 out is `Samples` (`SKIPPED_ROOTS`): the samples are applications run against a portal, and
@@ -214,7 +214,7 @@ have nothing to say about themselves, so that paragraph lives there, keyed by St
 ```
 site-docs/
 ├── ui-kit-sidebar.cjs        # items array for the site's sidebars.ts, nested as Storybook's
-├── getting-started/          # index.md + welcome, installation, structure, …
+├── getting-started/          # index.md + welcome, installation-and-setup, structure, …
 ├── components/               # index.md + the portal composites; selectors/, providers/, errors/
 └── ui/                       # index.md + form-controls/, overlays/, … one directory per group
 ```

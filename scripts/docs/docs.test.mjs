@@ -646,7 +646,6 @@ describe("collect", () => {
     write("docs/structure.mdx", '<Meta title="Getting started/Structure" />');
     write("docs/getting-started.md", "# Installation and setup\n");
     write("docs/components.md", "# Components\n");
-    write("docs/public-api.md", "# Public API\n");
     write(
       "components/button/Button.stories.tsx",
       'export default { title: "UI/Form controls/Button" };\nexport const Default = {};',
