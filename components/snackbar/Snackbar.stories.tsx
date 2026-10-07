@@ -303,6 +303,16 @@ export const Maintenance: Story = {
     headerText: "Maintenance Notice",
     text: "System maintenance is scheduled for tonight at 10 PM",
   },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByTestId("snackbar-header")).toHaveTextContent(
+      "Maintenance Notice",
+    );
+    await expect(canvas.getByTestId("snackbar-message")).toHaveTextContent(
+      "System maintenance is scheduled for tonight at 10 PM",
+    );
+    await userEvent.click(canvas.getByRole("button"));
+    await expect(args.onAction).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -359,6 +369,14 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The text starts at the right; the cross sits at the left end.
+    const header = canvas.getByTestId("snackbar-header");
+    await expect(getComputedStyle(header).direction).toBe("rtl");
+    await expect(
+      canvas.getByRole("button").getBoundingClientRect().left,
+    ).toBeLessThan(header.getBoundingClientRect().left);
+  },
   args: {
     ...baseArgs,
     headerText: "\u062a\u0646\u0628\u064a\u0647",
