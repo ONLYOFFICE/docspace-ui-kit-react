@@ -408,6 +408,28 @@ export const SingleFolderUpload: Story = {
     linkSecondaryText: "or drag folder here",
     exstsText: "Only one folder can be uploaded at a time",
   },
+  play: async (context) => {
+    const { args } = context;
+    const input = getInput(context);
+    await expect(input).toHaveAttribute("webkitdirectory");
+    // Files from two root folders: the drop is refused whole.
+    const inFolder = (folder: string, name: string) => {
+      const file = pdf(name);
+      Object.defineProperty(file, "webkitRelativePath", {
+        value: `${folder}/${name}`,
+      });
+      return file;
+    };
+    Object.defineProperty(input, "files", {
+      value: [inFolder("Reports", "a.pdf"), inFolder("Invoices", "b.pdf")],
+      configurable: true,
+    });
+    fireEvent.change(input);
+    await waitFor(() =>
+      expect(args.onSingleUploadError).toHaveBeenCalledTimes(1),
+    );
+    await expect(args.onDrop).not.toHaveBeenCalled();
+  },
   parameters: {
     docs: {
       description: {
