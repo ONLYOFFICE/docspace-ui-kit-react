@@ -246,6 +246,11 @@ const ControlledTextarea = (
 const frameOf = (field: HTMLElement) =>
   field.closest("[data-error]") as HTMLElement;
 
+const rect = (element: Element) => element.getBoundingClientRect();
+
+const numbersIn = (frame: HTMLElement) =>
+  (frame.querySelector("pre") as HTMLElement).textContent;
+
 export const Default: Story = {
   render: (args) => <ControlledTextarea {...args} />,
   args: {
@@ -405,6 +410,15 @@ const WithNumerationTemplate = () => {
 
 export const WithNumeration: Story = {
   render: () => <WithNumerationTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const field = canvas.getByRole("textbox");
+    const frame = frameOf(field);
+    await expect(numbersIn(frame)).toBe("1\n2\n3\n4\n5");
+    await expect(Math.round(rect(frame).height)).toBe(150);
+    // A new line gets its number.
+    await userEvent.type(field, "{Enter}Line 6");
+    await expect(numbersIn(frame)).toBe("1\n2\n3\n4\n5\n6");
+  },
   parameters: {
     docs: {
       description: {
@@ -504,6 +518,15 @@ const CustomHeightTemplate = () => {
 
 export const CustomHeights: Story = {
   render: () => <CustomHeightTemplate />,
+  play: async ({ canvas }) => {
+    const heights = ["80px height", "150px height", "250px height"].map(
+      (placeholder) =>
+        Math.round(
+          rect(frameOf(canvas.getByPlaceholderText(placeholder))).height,
+        ),
+    );
+    await expect(heights).toEqual([80, 150, 250]);
+  },
   parameters: {
     docs: {
       description: {
@@ -535,6 +558,17 @@ const GrowsWithContentTemplate = () => {
 
 export const GrowsWithContent: Story = {
   render: () => <GrowsWithContentTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // The frame is as tall as its lines, and grows with each new one.
+    const field = canvas.getByRole("textbox");
+    const frame = frameOf(field);
+    const before = rect(frame).height;
+    await userEvent.type(field, "{Enter}Seventh line{Enter}Eighth line");
+    await expect(rect(frame).height).toBeGreaterThan(before);
+    await expect(field.scrollHeight).toBeLessThanOrEqual(
+      field.clientHeight + 1,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -565,6 +599,16 @@ const RightToLeftTemplate = () => {
 export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The line numbers move to the right edge.
+    const field = canvas.getByRole("textbox");
+    const frame = frameOf(field);
+    const numbers = frame.querySelector("pre") as HTMLElement;
+    await expect(numbersIn(frame)).toBe("1\n2\n3");
+    await expect(rect(numbers).left).toBeGreaterThan(
+      rect(frame).left + rect(frame).width / 2,
+    );
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -583,6 +627,14 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const [plain, numbered] = canvas.getAllByRole("textbox");
+    await expect(plain).toHaveStyle({ color: "rgb(76, 29, 149)" });
+    await expect(numbered.parentElement?.querySelector("pre")).toHaveStyle({
+      color: "rgb(139, 92, 246)",
+    });
+    await expect(frameOf(plain)).toHaveStyle({ borderRadius: "8px" });
+  },
   render: () => (
     <div
       style={
