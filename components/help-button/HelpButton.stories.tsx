@@ -271,6 +271,16 @@ const icon = (canvas: Canvas) =>
 const tooltipShows = (text: string) =>
   waitFor(() => expect(screen.getByText(text)).toBeVisible());
 
+const icons = (canvas: { getAllByTestId: (id: string) => HTMLElement[] }) =>
+  canvas
+    .getAllByTestId("help-button")
+    .map((button) => button.querySelector("svg") as SVGElement);
+
+const tooltipOf = (text: string) =>
+  screen.getByText(text).closest("[role='tooltip']") as HTMLElement;
+
+const rect = (element: Element) => element.getBoundingClientRect();
+
 export const Default: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(icon(canvas));
@@ -331,6 +341,16 @@ const CustomStyleTemplate = () => {
 
 export const CustomStyle: Story = {
   render: () => <CustomStyleTemplate />,
+  play: async ({ canvas }) => {
+    const [plain, blue, green] = icons(canvas);
+    await expect(Math.round(rect(blue).width)).toBe(24);
+    await expect(Math.round(rect(green).width)).toBe(20);
+    await expect(rect(plain).width).toBeLessThan(rect(green).width);
+    const fill = (svg: SVGElement) =>
+      getComputedStyle(svg.querySelector("path") as Element).fill;
+    await expect(fill(blue)).toBe("rgb(45, 167, 219)");
+    await expect(fill(green)).toBe("rgb(76, 175, 80)");
+  },
   parameters: {
     docs: {
       description: {
@@ -374,6 +394,17 @@ const WithCustomContentTemplate = () => {
 
 export const WithCustomContent: Story = {
   render: () => <WithCustomContentTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(icon(canvas));
+    await tooltipShows("Help Information");
+    for (const item of [
+      "First instruction",
+      "Second instruction",
+      "Third instruction",
+    ]) {
+      await expect(screen.getByText(item)).toBeVisible();
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -433,6 +464,26 @@ const TooltipPositionsTemplate = () => {
 
 export const TooltipPositions: Story = {
   render: () => <TooltipPositionsTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // Each tooltip opens on its own side of the icon.
+    const places = ["top", "right", "bottom", "left"] as const;
+    const svgs = icons(canvas);
+    for (const [index, place] of places.entries()) {
+      await userEvent.click(svgs[index]);
+      const text = `Tooltip appears at ${place}`;
+      await tooltipShows(text);
+      const tip = rect(tooltipOf(text));
+      const anchor = rect(svgs[index]);
+      if (place === "top")
+        await expect(tip.bottom).toBeLessThanOrEqual(anchor.top);
+      if (place === "bottom")
+        await expect(tip.top).toBeGreaterThanOrEqual(anchor.bottom);
+      if (place === "left")
+        await expect(tip.right).toBeLessThanOrEqual(anchor.left);
+      if (place === "right")
+        await expect(tip.left).toBeGreaterThanOrEqual(anchor.right);
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -586,6 +637,19 @@ const cssTooltipStyle = {
 } as React.CSSProperties;
 
 export const CssCustomization: Story = {
+  play: async ({ canvas, userEvent }) => {
+    const [first, second] = icons(canvas);
+    await userEvent.click(first);
+    await tooltipShows("Customized tooltip");
+    await expect(tooltipOf("Customized tooltip")).toHaveStyle({
+      backgroundColor: "rgb(30, 58, 95)",
+      color: "rgb(230, 243, 251)",
+    });
+    await userEvent.click(second);
+    const text = "Another tooltip, wrapped at the custom maximum width";
+    await tooltipShows(text);
+    await expect(rect(tooltipOf(text)).width).toBeLessThanOrEqual(180);
+  },
   render: () => (
     <div
       style={{
