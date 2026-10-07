@@ -8,22 +8,20 @@ import { WelcomePage } from "./welcome/WelcomePage";
 
 ## Installation
 
-The package is **not on the public npm registry yet**, so there is nothing to `npm install`
-today. Consumers take a packed tarball built from this repository:
+Install the package from npm:
+
+```bash
+npm install @onlyoffice/apps-ui-kit
+```
+
+To try a build of this repository instead, pack it and install the file:
 
 ```bash
 pnpm build && pnpm pack   # -> onlyoffice-apps-ui-kit-4.0.0.tgz
 ```
 
-and install that file in the consuming application. Pack with **pnpm**, not npm: the `exports`
-map lives under `publishConfig`, which is a pnpm feature, and an npm-packed tarball ends up
-with no `exports` and no `main` at all.
-
-Once the package is published this becomes the usual one-liner:
-
-```bash
-npm install @onlyoffice/apps-ui-kit
-```
+Pack with **pnpm**, not npm: the `exports` map lives under `publishConfig`, which is a pnpm
+feature, and an npm-packed tarball ends up with no `exports` and no `main` at all.
 
 DocSpace **plugins** install nothing. The portal hands a plugin its own already-mounted copy of
 the kit and refuses every subpath, so for a plugin the root barrel is the entire API — see

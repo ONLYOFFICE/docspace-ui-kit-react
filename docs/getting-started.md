@@ -9,8 +9,13 @@ the portal has already done both.
 
 ## Install
 
-The package is not on the public npm registry yet, so there is nothing to install by name. Build a
-tarball from this repository and install the file:
+Install the package from npm:
+
+```bash
+npm install @onlyoffice/apps-ui-kit
+```
+
+To try a build of this repository instead, pack it and install the file:
 
 ```bash
 pnpm build && pnpm pack   # -> onlyoffice-apps-ui-kit-4.0.0.tgz
@@ -19,12 +24,6 @@ pnpm build && pnpm pack   # -> onlyoffice-apps-ui-kit-4.0.0.tgz
 Pack with **pnpm, not npm**: the `exports` map lives under `publishConfig`, which npm does not
 apply, and an npm-packed tarball arrives with no `exports` and no `main` at all — every import from
 it fails to resolve.
-
-Once it is published this becomes the usual line:
-
-```bash
-npm install @onlyoffice/apps-ui-kit
-```
 
 The package is **ESM only**. There is no CommonJS build, so a bundler or a Node version that cannot
 load ESM cannot load this kit.
