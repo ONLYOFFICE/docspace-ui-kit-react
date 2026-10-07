@@ -23,9 +23,9 @@ pnpm docs:screenshots # the pictures alone, from an existing storybook-static
 ```
 
 `docs:build` and `docs:sync` take `--reuse-storybook` to keep an existing `storybook-static`
-instead of rebuilding it. `docs:screenshots` takes `--only <slug>...` for a few pages and
-`--missing` for the pictures not on disk yet; the full set is about 1 200 pictures and takes
-some fifteen minutes.
+instead of rebuilding it. `docs:screenshots` takes `--only <slug>...` for a few pages,
+`--missing` for the pictures not on disk yet and `--storybook <dir|url>` for a Storybook other
+than `storybook-static`; the full set is about 1 100 pictures and takes some fifteen minutes.
 
 CI runs `pnpm docs:check` in the lint job.
 
@@ -177,8 +177,8 @@ every story and docs entry, so nothing is guessed; the export-to-id rule (`WithI
    (`` `label`? ``, outside the span so the row id has no `?`) and `Default` closes the
    description as `Default: \`x\`.`. Five columns do not fit the site's `<APITable>`, which the
 tables are then wrapped in; as in the SDK, they get a `name`only when their row ids collide.
-The primary picture goes under the intro and a Stories section -- each story's name,`docs.description.story`and picture -- before`## Minimal example`, where Storybook shows
-   them.
+The primary picture goes under the intro, and a Stories section -- each story's name, its`docs.description.story`and its picture -- before`## Minimal example`, where Storybook
+   shows them.
 2. **MDX pages.** Imports and `<Meta>` go; every other React element at the top level is
    replaced by its picture, a `<Story of>` by the story's. A trailing rule and the paragraph after
    it -- the version and licence line under Welcome -- is the page's Storybook footer and goes

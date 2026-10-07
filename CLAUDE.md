@@ -115,7 +115,8 @@ Docker E2E image has no DocSpace beside it. `pnpm sync-locales` refreshes them; 
 build does not use them.
 
 Gitignored, absent from a fresh clone: dist/, locales/* except locales/en, the
-Playwright output (playwright-report/, test-results/) and site-docs/ (`pnpm run docs`).
+Playwright output (playwright-report/, test-results/), and the API-site output: site-docs/
+(`pnpm run docs`) and site-screenshots/ (`pnpm docs:screenshots`).
 ```
 
 ## Common Commands
@@ -170,9 +171,9 @@ pnpm sync-locales
 
 # API-site pages for api.onlyoffice.com (site/docspace/ui-kit): a copy of
 # Storybook -- one page per docs entry, in its tree, with stories and React
-# blocks as pictures -- into gitignored site-docs/. docs:check also compiles every page as MDX (CI runs it);
-# docs:sync copies the result into ../api.onlyoffice.com (API_SITE_ROOT).
-# See docs-generation.md.
+# blocks as pictures -- into gitignored site-docs/. docs:check also compiles
+# every page as MDX (CI runs it); docs:sync copies the result into
+# ../api.onlyoffice.com (API_SITE_ROOT). See docs-generation.md.
 pnpm docs:build         # Storybook, Chromium if missing, pictures, pages -- the site's one command
 pnpm docs:sync          # docs:build, then copy into the site checkout
 pnpm run docs               # pages only, seconds, no browser (what CI checks)
