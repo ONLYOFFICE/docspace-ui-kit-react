@@ -320,7 +320,24 @@ export const WithoutLogo: Story = {
   },
 };
 
-export const CssCustomization = {
+export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const header = canvas.getByText("Connection error");
+    // The text variable colours customizedBodyText only.
+    await expect(canvas.getByText("Error code: 503")).toHaveStyle({
+      color: "rgb(29, 45, 68)",
+    });
+    // The background variable paints the page behind the illustration.
+    const painted = (() => {
+      for (let el: HTMLElement | null = header; el; el = el.parentElement) {
+        if (getComputedStyle(el).backgroundColor === "rgb(230, 243, 251)") {
+          return true;
+        }
+      }
+      return false;
+    })();
+    await expect(painted).toBe(true);
+  },
   render: () => (
     <div
       style={
