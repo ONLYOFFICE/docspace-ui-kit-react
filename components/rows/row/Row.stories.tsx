@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 
 import React from "react";
-import { fn } from "storybook/test";
+import { expect, fireEvent, fn, screen, waitFor, within } from "storybook/test";
 import { useArgs } from "storybook/preview-api";
 
 import CatalogFolderReactSvg from "../../../assets/icons/16/catalog.folder.react.svg";
@@ -222,6 +222,13 @@ const renderElementComboBox = (onSelect?: (option?: TOption) => void) => (
   />
 );
 
+// The menu is portalled and fades in.
+const menuItem = async (name: string) => {
+  const item = await screen.findByRole("menuitem", { name });
+  await waitFor(() => expect(item).toBeVisible());
+  return item;
+};
+
 const defaultContextOptions = [
   {
     key: "key1",
@@ -299,6 +306,27 @@ export const Default: Story = {
     onContextClick: fn(),
     rowContextClose: fn(),
   },
+  play: async ({ args, canvas, userEvent }) => {
+    const row = canvas.getByTestId("row");
+    await expect(row).toHaveClass("checked");
+    await expect(within(row).getByTestId("avatar")).toBeVisible();
+
+    // The checkbox asks for the opposite of its state.
+    const checkbox = within(row).getByRole("checkbox");
+    await expect(checkbox).toBeChecked();
+    await userEvent.click(checkbox);
+    await expect(args.onSelect).toHaveBeenCalledWith(false, undefined);
+
+    await userEvent.click(within(row).getByText("Sample text"));
+    await expect(args.onRowClick).toHaveBeenCalled();
+
+    // A right click anywhere on the row opens the menu.
+    fireEvent.contextMenu(within(row).getByText("Sample text"), { button: 2 });
+    await expect(args.onContextClick).toHaveBeenCalledWith(true);
+    await expect(await menuItem("Edit")).toBeVisible();
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(args.rowContextClose).toHaveBeenCalled());
+  },
   parameters: {
     docs: {
       description: {
@@ -333,6 +361,15 @@ export const ModernLayout: Story = {
     element: "Icon" as unknown as RowProps["element"],
     onSelect: fn(),
   },
+  play: async ({ args, canvas, userEvent }) => {
+    const row = canvas.getByTestId("row");
+    // The icon holds the place; the checkbox shows on a CSS hover.
+    const icon = row.querySelector(".styled-element") as HTMLElement;
+    await expect(icon).toBeVisible();
+    const checkbox = within(row).getByRole("checkbox", { hidden: true });
+    await userEvent.click(checkbox);
+    await expect(args.onSelect).toHaveBeenCalledWith(true, undefined);
+  },
   parameters: {
     docs: {
       description: {
@@ -361,6 +398,11 @@ export const IndeterminateState: Story = {
     indeterminate: true,
     element: "Icon" as unknown as RowProps["element"],
   },
+  play: async ({ canvas }) => {
+    await expect(
+      within(canvas.getByTestId("row")).getByRole("checkbox"),
+    ).toBePartiallyChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -384,6 +426,13 @@ export const DisabledState: Story = {
     element: "Icon" as unknown as RowProps["element"],
     onRowClick: fn(),
   },
+  play: async ({ args, canvas, userEvent }) => {
+    const row = canvas.getByTestId("row");
+    await expect(within(row).getByRole("checkbox")).toBeDisabled();
+    // The text still reaches onRowClick.
+    await userEvent.click(within(row).getByText("Sample text"));
+    await expect(args.onRowClick).toHaveBeenCalled();
+  },
   parameters: {
     docs: {
       description: {
@@ -405,6 +454,14 @@ export const LoadingState: Story = {
     checked: false,
     inProgress: true,
     element: "Icon" as unknown as RowProps["element"],
+  },
+  play: async ({ canvas }) => {
+    const row = canvas.getByTestId("row");
+    await expect(row.querySelector(".row-progress-loader")).not.toBeNull();
+    await expect(
+      within(row).queryByRole("checkbox", { hidden: true }),
+    ).toBeNull();
+    await expect(within(row).getByText("Sample text")).toBeVisible();
   },
   parameters: {
     docs: {
@@ -428,6 +485,16 @@ export const IndexEditing: Story = {
     isIndexEditingMode: true,
     element: "Icon" as unknown as RowProps["element"],
     onChangeIndex: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const row = canvas.getByTestId("row");
+    // The arrows replace the three-dot button.
+    await expect(within(row).queryByTestId("context-menu-button")).toBeNull();
+    await userEvent.click(within(row).getByTestId("index-up-icon"));
+    await userEvent.click(within(row).getByTestId("index-down-icon"));
+    const calls = (args.onChangeIndex as ReturnType<typeof fn>).mock.calls;
+    await expect(calls).toHaveLength(2);
+    await expect(calls[0][0]).not.toBe(calls[1][0]);
   },
   parameters: {
     docs: {
@@ -456,6 +523,17 @@ export const WithBadges: Story = {
     element: "Icon" as unknown as RowProps["element"],
     badgesComponent: <Badge label="New" />,
     contentElement: <Text fontSize="12px">2 versions</Text>,
+  },
+  play: async ({ canvas }) => {
+    const row = canvas.getByTestId("row");
+    const badge = within(row).getByText("New").getBoundingClientRect();
+    const note = within(row).getByText("2 versions").getBoundingClientRect();
+    const menu = within(row)
+      .getByTestId("context-menu-button")
+      .getBoundingClientRect();
+    // Both before the three-dot button, the badge first.
+    await expect(badge.right).toBeLessThanOrEqual(note.left);
+    await expect(note.right).toBeLessThanOrEqual(menu.left);
   },
   parameters: {
     docs: {
@@ -500,6 +578,14 @@ const WithoutBorderTemplate = () => (
 
 export const WithoutBorder: Story = {
   render: () => <WithoutBorderTemplate />,
+  play: async ({ canvas }) => {
+    // The divider is drawn by ::after.
+    const [withDivider, withoutDivider] = canvas.getAllByTestId("row");
+    await expect(getComputedStyle(withDivider, "::after").content).toBe('""');
+    await expect(getComputedStyle(withoutDivider, "::after").content).toBe(
+      "none",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -561,6 +647,13 @@ export const ContextMenuHeader: Story = {
   globals: { viewport: { value: "mobile1", isRotated: false } },
   decorators: [withPhoneFrame],
   render: () => <ContextMenuHeaderTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      within(canvas.getByTestId("row")).getByTestId("context-menu-button"),
+    );
+    await expect(await menuItem("Delete")).toBeVisible();
+    await expect(screen.getAllByRole("menuitem")).toHaveLength(7);
+  },
   parameters: {
     docs: {
       description: {
@@ -597,6 +690,15 @@ export const RightToLeft: Story = {
     checked: true,
   },
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The checkbox at the right edge, the menu at the left.
+    const row = canvas.getByTestId("row");
+    const checkbox = within(row).getByRole("checkbox").getBoundingClientRect();
+    const menu = within(row)
+      .getByTestId("context-menu-button")
+      .getBoundingClientRect();
+    await expect(checkbox.left).toBeGreaterThan(menu.right);
+  },
   parameters: {
     noPadding: true,
     docs: {
