@@ -62,8 +62,19 @@ if (fs.existsSync(chromium.executablePath())) {
   ]);
 }
 
-run("Pictures", "node", ["scripts/docs/screenshots.mjs"]);
+let picturesFailed = false;
+try {
+  run("Pictures", "node", ["scripts/docs/screenshots.mjs"]);
+} catch {
+  picturesFailed = true;
+}
 run("Pages", "node", ["scripts/docs/index.mjs", "--strict"]);
 if (args.includes("--sync")) run("Sync", "node", ["scripts/docs/sync.mjs"]);
 
 console.log(`\nDone in ${Math.round((Date.now() - started) / 1000)}s.`);
+if (picturesFailed) {
+  console.error(
+    "Some pictures were not taken (see [fail] above); the pages are complete without them.",
+  );
+  process.exit(1);
+}

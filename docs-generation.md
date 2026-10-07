@@ -26,7 +26,8 @@ pnpm docs:screenshots # the pictures alone, from an existing storybook-static
 instead of rebuilding it. `docs:screenshots` takes `--only <slug>...` for a few pages,
 `--missing` for the pictures not on disk yet, `--changed` for the pages whose sources changed
 since the last run, and `--storybook <dir|url>` for a Storybook other than `storybook-static`.
-The full set is about 1 100 pictures.
+The full set is about 1 100 pictures. A picture that fails does not stop the pages: they are
+written without it, and `docs:build` exits non-zero at the end so the failure is seen.
 
 CI runs `pnpm docs:check` in the lint job.
 
