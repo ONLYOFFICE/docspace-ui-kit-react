@@ -1,7 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn, within } from "storybook/test";
+import { expect, fn, waitFor, within } from "storybook/test";
 
 import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
@@ -166,12 +166,21 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   );
 };
 
+const rect = (element: Element) => element.getBoundingClientRect();
+
 export const Default: Story = {
   render: (args) => <Tag {...args} />,
   args: {
     tag: "script",
     label: "Script",
     tagMaxWidth: "160px",
+  },
+  play: async ({ canvas }) => {
+    const tag = canvas.getByLabelText("Script");
+    await expect(tag).toHaveTextContent("Script");
+    await expect(rect(tag).width).toBeLessThanOrEqual(160);
+    // A plain tag carries no delete cross.
+    await expect(within(tag).queryByTestId("icon-button")).toBeNull();
   },
   parameters: {
     docs: {
@@ -320,6 +329,23 @@ export const ClickableTags: Story = {
 
 export const MaxWidthVariants: Story = {
   render: () => <MaxWidthTemplate />,
+  play: async ({ canvas }) => {
+    const widths: Record<string, number> = {
+      Short: 80,
+      "This is a very long tag label that will be truncated": 160,
+      "Wide tag with more space": 250,
+    };
+    for (const [label, max] of Object.entries(widths)) {
+      await expect(
+        rect(canvas.getByLabelText(label)).width,
+      ).toBeLessThanOrEqual(max);
+    }
+    // The long label is cut with an ellipsis.
+    const long = canvas.getByText(
+      "This is a very long tag label that will be truncated",
+    );
+    await expect(long.scrollWidth).toBeGreaterThan(long.clientWidth);
+  },
   parameters: {
     docs: {
       description: {
@@ -352,6 +378,15 @@ export const IconOnly: Story = {
       />
     </Wrapper>
   ),
+  play: async ({ canvas }) => {
+    // Only the glyph shows; the hidden label still names the tag.
+    for (const label of ["Folder from a URL", "Folder component"]) {
+      const tag = canvas.getByLabelText(label);
+      // The URL glyph is fetched and inlined after mounting.
+      await waitFor(() => expect(tag.querySelector("svg, img")).not.toBeNull());
+      await expect(tag).not.toHaveTextContent(label);
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -376,6 +411,13 @@ export const WithLabelSuffix: Story = {
     labelSuffix: " (12)",
     labelSuffixColor: "#A3A9AE",
   },
+  play: async ({ canvas }) => {
+    const tag = canvas.getByLabelText(/Reports/);
+    await expect(tag).toHaveTextContent("Reports (12)");
+    await expect(within(tag).getByText("(12)")).toHaveStyle({
+      color: "rgb(163, 169, 174)",
+    });
+  },
   parameters: {
     docs: {
       description: {
@@ -390,6 +432,21 @@ export const WithLabelSuffix: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const custom = canvas.getByLabelText("Custom Tag");
+    await expect(custom).toHaveStyle({
+      backgroundColor: "rgb(237, 231, 246)",
+      borderRadius: "16px",
+      // --tag-height is a max-height; the content stays 28px tall.
+      maxHeight: "30px",
+    });
+    // --tag-spacing-end: the room left before the next tag.
+    await expect(
+      Math.round(
+        rect(canvas.getByLabelText("Second Tag")).left - rect(custom).right,
+      ),
+    ).toBe(16);
+  },
   render: () => (
     <div
       style={
