@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 import { useEffect, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect, fireEvent, fn } from "storybook/test";
 
 import { Tooltip } from "../tooltip";
 
@@ -245,6 +245,16 @@ export const WithSlider: Story = {
     showSlider: true,
     title: "Storage",
     subtitle: "GB of additional storage",
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // The slider and the field stay in step both ways.
+    const slider = canvas.getByRole("slider");
+    await expect(slider).toHaveValue("40");
+    fireEvent.change(slider, { target: { value: "70" } });
+    await expect(field(canvas)).toHaveValue("70");
+    await expect(args.onChange).toHaveBeenLastCalledWith(70);
+    await userEvent.click(plus(canvas));
+    await expect(slider).toHaveValue("71");
   },
   parameters: {
     docs: {
@@ -494,6 +504,15 @@ export const WithoutControls: Story = {
     title: "Copies",
     subtitle: "Drag the slider or type a number",
   },
+  play: async ({ args, canvas, userEvent }) => {
+    // No minus or plus; the slider and the field remain.
+    await expect(canvas.queryByRole("button", { name: "Decrease" })).toBeNull();
+    await expect(canvas.queryByRole("button", { name: "Increase" })).toBeNull();
+    await userEvent.clear(field(canvas));
+    await userEvent.type(field(canvas), "12{Enter}");
+    await expect(canvas.getByRole("slider")).toHaveValue("12");
+    await expect(args.onChange).toHaveBeenLastCalledWith(12);
+  },
   parameters: {
     docs: {
       description: {
@@ -523,6 +542,12 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // Minus and plus swap sides: plus at the left end.
+    await expect(plus(canvas).getBoundingClientRect().left).toBeLessThan(
+      minus(canvas).getBoundingClientRect().left,
+    );
+  },
   args: {
     ...Default.args,
     value: 40,
