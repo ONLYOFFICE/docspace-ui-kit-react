@@ -381,6 +381,18 @@ export const CustomStyling: Story = {
     labelText: "Custom Field:",
     labelFor: "field-custom",
   },
+  play: async ({ canvasElement, canvas }) => {
+    // The class and the inline style reach the container.
+    const container = canvasElement.querySelector(
+      ".custom-field",
+    ) as HTMLElement;
+    await expect(container).toHaveStyle({
+      backgroundColor: "rgb(245, 245, 245)",
+      padding: "16px",
+      borderRadius: "4px",
+    });
+    await expect(container).toContainElement(canvas.getByText("Custom Field:"));
+  },
   parameters: {
     docs: {
       description: {
@@ -458,6 +470,19 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    const error = canvas.getByText("Name must be at least 3 characters");
+    // --field-container-error-top is the message's top padding.
+    await expect(error).toHaveStyle({
+      color: "rgb(124, 58, 237)",
+      paddingTop: "8px",
+    });
+    const container = (label: string) =>
+      canvas
+        .getByText(label)
+        .closest("[data-testid='field-container']") as HTMLElement;
+    await expect(container("Full Name:")).toHaveStyle({ marginBottom: "32px" });
+  },
   parameters: {
     docs: {
       description: {
