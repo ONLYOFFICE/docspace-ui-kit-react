@@ -656,6 +656,14 @@ const DifferentSizesTemplate = () => {
 
 export const DifferentSizes: Story = {
   render: () => <DifferentSizesTemplate />,
+  play: async ({ canvas }) => {
+    // Fixed widths per size; content fits the label.
+    const widths = canvas
+      .getAllByRole("button")
+      .map((button) => Math.round(button.getBoundingClientRect().width));
+    await expect(widths.slice(0, 4)).toEqual([173, 300, 350, 500]);
+    await expect(widths[4]).toBeLessThan(173);
+  },
   parameters: {
     docs: {
       description: {
@@ -970,6 +978,20 @@ const CustomStylingTemplate = () => {
 
 export const CustomStyling: Story = {
   render: () => <CustomStylingTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // The selection shows as a badge in the option's own colours.
+    const badge = () => canvas.getByTestId("badge");
+    await expect(badge()).toHaveAccessibleName(/Critical/);
+    await expect(
+      badge().style.getPropertyValue("--badge-background-color"),
+    ).toBe("#FF4444");
+    await userEvent.click(comboButton(canvas));
+    await userEvent.click(await waitFor(() => option("Low")));
+    await waitFor(() => expect(badge()).toHaveAccessibleName(/Low/));
+    await expect(
+      badge().style.getPropertyValue("--badge-background-color"),
+    ).toBe("#90EE90");
+  },
   parameters: {
     docs: {
       description: {
@@ -1048,6 +1070,24 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas, userEvent }) => {
+    const button = comboButton(canvas);
+    // The arrow sits at the left end; picking an option still works.
+    const arrow = button.querySelector(
+      "[data-test-id='combo-button-arrow']",
+    ) as Element;
+    await expect(arrow.getBoundingClientRect().left).toBeLessThan(
+      button.getBoundingClientRect().left +
+        button.getBoundingClientRect().width / 2,
+    );
+    await userEvent.click(button);
+    await userEvent.click(await waitFor(() => option("\u0646\u0633\u062e")));
+    await waitFor(() =>
+      expect(canvas.getByRole("button")).toHaveTextContent(
+        "\u0646\u0633\u062e",
+      ),
+    );
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -1077,6 +1117,12 @@ const baseOptions = [
 ];
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    await expect(comboButton(canvas)).toHaveStyle({
+      borderTopColor: "rgb(0, 130, 201)",
+      borderRadius: "12px",
+    });
+  },
   render: () => (
     <div
       style={
