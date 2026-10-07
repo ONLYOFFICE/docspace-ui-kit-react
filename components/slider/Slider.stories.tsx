@@ -131,6 +131,11 @@ const SliderWithState = (props: SliderProps) => {
 const moveTo = (slider: HTMLElement, value: string) =>
   fireEvent.change(slider, { target: { value } });
 
+// The handle is a pseudo-element whose computed style the browser does not
+// report, so it is checked through the variables its rule reads.
+const variable = (slider: HTMLElement, name: string) =>
+  getComputedStyle(slider).getPropertyValue(name).trim();
+
 export const Default: Story = {
   render: (args) => <SliderWithState {...args} />,
   args: {
@@ -236,6 +241,13 @@ export const WithoutPouring: Story = {
     isDisabled: false,
     withPouring: false,
   },
+  play: async ({ canvas }) => {
+    // No fill: the track keeps one colour whatever the value.
+    const slider = canvas.getByRole("slider");
+    await expect(slider.style.backgroundSize).toBe("auto");
+    moveTo(slider, "80");
+    await expect(slider.style.backgroundSize).toBe("auto");
+  },
   parameters: {
     docs: {
       description: {
@@ -270,6 +282,14 @@ export const WithCustomSize: Story = {
     thumbHeight: "32px",
     thumbBorderWidth: "8px",
     runnableTrackHeight: "14px",
+  },
+  play: async ({ canvas }) => {
+    const slider = canvas.getByRole("slider");
+    await expect(variable(slider, "--thumb-width")).toBe("32px");
+    await expect(variable(slider, "--thumb-height")).toBe("32px");
+    await expect(variable(slider, "--thumb-border-width")).toBe("8px");
+    // The track height is the input's own height too.
+    await expect(slider).toHaveStyle({ height: "14px" });
   },
   parameters: {
     docs: {
@@ -306,6 +326,17 @@ export const RightToLeft: Story = {
     withPouring: true,
   },
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The fill grows from the right edge and follows the value.
+    const slider = canvas.getByRole("slider");
+    await expect(getComputedStyle(slider).direction).toBe("rtl");
+    await expect(slider.style.backgroundSize).toMatch(/^50%/);
+    moveTo(slider, "20");
+    await expect(slider.style.backgroundSize).toMatch(/^20%/);
+    await expect(getComputedStyle(slider).backgroundPositionX).toMatch(
+      /100%|right/,
+    );
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -324,6 +355,16 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const [active] = canvas.getAllByRole("slider");
+    await expect(active).toHaveStyle({
+      backgroundColor: "rgb(237, 233, 254)",
+      height: "12px",
+      borderRadius: "6px",
+    });
+    await expect(variable(active, "--slider-thumb-s")).toBe("28px");
+    await expect(variable(active, "--slider-thumb-bg")).toBe("#7c3aed");
+  },
   render: () => {
     const [value, setValue] = useState(60);
     return (
