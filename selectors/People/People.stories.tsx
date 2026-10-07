@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, userEvent, waitFor } from "storybook/test";
 
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
@@ -284,6 +285,37 @@ export default meta;
 
 type Story = StoryObj<StoryArgs>;
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+const row = (label: string) => {
+  const found = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-testid^="selector-item-"]'),
+  ).find((item) => item.textContent?.includes(label));
+  if (!found) throw new Error(`No row labelled ${label}`);
+  return found;
+};
+
+const shown = (label: string) =>
+  waitFor(() => expect(row(label)).toBeVisible(), { timeout: 3000 });
+
+// Rows arrive a few at a time; wait for the one to click.
+const pick = async (label: string) =>
+  userEvent.click(await waitFor(() => row(label), { timeout: 3000 }));
+
+const submitted = (args: StoryArgs) =>
+  (
+    (args.onSubmit as ReturnType<typeof fn>).mock.calls[0][0] as TSelectorItem[]
+  ).map((item) => item.label);
+
+// The demo portal's members; its guests are listed only on their own tab.
+const picksAMember = async (args: StoryArgs) => {
+  await shown("Alex Morgan");
+  await expect(screen.queryByText("Daniel Kim")).toBeNull();
+  await pick("Kenji Sato");
+  await userEvent.click(screen.getByTestId("selector_submit_button"));
+  await expect(submitted(args)).toEqual(["Kenji Sato"]);
+};
+
 const Template = (props: StoryArgs) => (
   <div
     style={{
@@ -301,20 +333,25 @@ const Template = (props: StoryArgs) => (
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async ({ args }: PlayContext) => {
+    await picksAMember(args);
+    await userEvent.click(screen.getByTestId("aside_header_close_icon_button"));
+    await expect(args.headerProps?.onCloseClick).toHaveBeenCalledTimes(1);
+  },
   args: {
     withHeader: true,
     headerProps: {
       headerLabel: "Select Member",
-      onCloseClick: () => {},
+      onCloseClick: fn(),
     },
     isMultiSelect: false,
-    onSubmit: (items) => {
+    onSubmit: fn((items: TSelectorItem[]) => {
       const label = items[0]?.label;
       toastr.success(`Selected: ${label}`);
-    },
-    onClose: () => {
+    }),
+    onClose: fn(() => {
       toastr.info("Selector closed");
-    },
+    }),
   },
   parameters: {
     docs: {
@@ -338,26 +375,43 @@ export const Default: Story = {
 export const MultiSelectWithTabs: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async ({ args }: PlayContext) => {
+    await shown("Alex Morgan");
+    await pick("Kenji Sato");
+
+    // The guests have a tab of their own; the selection carries across.
+    // (Without a roomId the Groups tab asks for people, not groups, so it is
+    // not checked here.)
+    await userEvent.click(screen.getByText("Guests"));
+    await shown("Daniel Kim");
+    await expect(screen.queryByText("Alex Morgan")).toBeNull();
+    await pick("Daniel Kim");
+
+    await userEvent.click(screen.getByTestId("selector_submit_button"));
+    await expect(submitted(args)).toEqual(["Kenji Sato", "Daniel Kim"]);
+    await userEvent.click(screen.getByTestId("selector_cancel_button"));
+    await expect(args.onCancel).toHaveBeenCalledTimes(1);
+  },
   args: {
     withHeader: true,
     headerProps: {
       headerLabel: "Add Members",
-      onCloseClick: () => {},
+      onCloseClick: fn(),
     },
     isMultiSelect: true,
     withGroups: true,
     withGuests: true,
     withCancelButton: true,
     cancelButtonLabel: "Cancel",
-    onSubmit: (items) => {
+    onSubmit: fn((items: TSelectorItem[]) => {
       toastr.success(`Selected ${items.length} item(s)`);
-    },
-    onCancel: () => {
+    }),
+    onCancel: fn(() => {
       toastr.info("Cancelled");
-    },
-    onClose: () => {
+    }),
+    onClose: fn(() => {
       toastr.info("Selector closed");
-    },
+    }),
   },
   parameters: {
     docs: {
@@ -387,6 +441,9 @@ export const MultiSelectWithTabs: Story = {
 export const AsideMode: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async ({ args }: PlayContext) => {
+    await picksAMember(args);
+  },
   args: {
     useAside: true,
     withoutBackground: false,
@@ -394,16 +451,16 @@ export const AsideMode: Story = {
     withHeader: true,
     headerProps: {
       headerLabel: "Select Member",
-      onCloseClick: () => {},
+      onCloseClick: fn(),
     },
     isMultiSelect: false,
-    onSubmit: (items) => {
+    onSubmit: fn((items: TSelectorItem[]) => {
       const label = items[0]?.label;
       toastr.success(`Selected: ${label}`);
-    },
-    onClose: () => {
+    }),
+    onClose: fn(() => {
       toastr.info("Selector closed");
-    },
+    }),
   },
   parameters: {
     docs: {
