@@ -1,7 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import { HelpButton } from "../help-button";
 import { RootTooltip } from "../tooltip";
@@ -274,6 +274,15 @@ export const DisabledStates: Story = {
   },
 };
 
+// The box is drawn by an SVG inside the label.
+const boxOf = (
+  canvas: { getByText: (text: string) => HTMLElement },
+  label: string,
+) =>
+  canvas.getByText(label).closest("label")?.querySelector("svg") as SVGElement;
+
+const style = (element: Element) => getComputedStyle(element);
+
 const ErrorTemplate = () => {
   return (
     <Wrapper>
@@ -285,6 +294,19 @@ const ErrorTemplate = () => {
 
 export const ErrorStates: Story = {
   render: () => <ErrorTemplate />,
+  play: async ({ canvas }) => {
+    // The frame turns red, checked or not.
+    for (const label of ["Unchecked with Error", "Checked with Error"]) {
+      const rect = boxOf(canvas, label).querySelector("rect") as Element;
+      await expect(style(rect).stroke).toBe("rgb(242, 71, 36)");
+    }
+    await expect(
+      canvas.getByRole("checkbox", {
+        name: "Checked with Error",
+        hidden: true,
+      }),
+    ).toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -312,6 +334,12 @@ const TruncatedTemplate = () => {
 
 export const WithTruncation: Story = {
   render: () => <TruncatedTemplate />,
+  play: async ({ canvas }) => {
+    // The label is held on one line.
+    const text = canvas.getByText(/^This is a very long label/);
+    await expect(text).toHaveStyle({ whiteSpace: "nowrap" });
+    await expect(text.getClientRects()).toHaveLength(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -335,6 +363,14 @@ export const WithTitle: Story = {
   args: {
     label: "Hover me",
     title: "This is a tooltip that appears on hover",
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.hover(canvas.getByText("Hover me"));
+    await waitFor(() =>
+      expect(screen.getByRole("tooltip")).toHaveTextContent(
+        "This is a tooltip that appears on hover",
+      ),
+    );
   },
   parameters: {
     docs: {
@@ -390,6 +426,22 @@ export const WithHelpButton: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const box = boxOf(canvas, "Increased spacing");
+    const rect = box.querySelector("rect") as Element;
+    await expect(style(rect).fill).toBe("rgb(227, 238, 251)");
+    await expect(style(rect).stroke).toBe("rgb(45, 110, 207)");
+    await expect(style(box.querySelector("path") as Element).fill).toBe(
+      "rgb(45, 110, 207)",
+    );
+    // --checkbox-gap: the room between the box and the label.
+    await expect(
+      Math.round(
+        canvas.getByText("Increased spacing").getBoundingClientRect().left -
+          box.getBoundingClientRect().right,
+      ),
+    ).toBe(20);
+  },
   render: () => (
     <div
       style={
