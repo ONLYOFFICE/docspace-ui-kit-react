@@ -433,6 +433,22 @@ The container still lays the buttons out; \`orientation\` only decides which sid
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const radio = canvas.getByRole("radio", { name: "Custom option" });
+    await expect(radio).toBeChecked();
+    const label = canvas.getByText("Custom option");
+    await expect(label).toHaveStyle({ color: "rgb(76, 29, 149)" });
+    // --radio-button-gap: the room between the circle and the label.
+    const circle = (label.closest("label") as HTMLElement).querySelector(
+      "svg",
+    ) as SVGElement;
+    await expect(
+      Math.round(
+        label.getBoundingClientRect().left -
+          circle.getBoundingClientRect().right,
+      ),
+    ).toBe(16);
+  },
   render: () => (
     <div
       style={
