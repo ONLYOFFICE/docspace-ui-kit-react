@@ -15,7 +15,7 @@ import PlusIcon from "../../../assets/icons/16/plus.svg";
 import PromptIcon from "../../../assets/icons/16/prompt.svg";
 import ArrowUpIcon from "../../../assets/icons/16/upgrade.react.svg";
 import ClearIcon from "../../../assets/icons/16/clear.react.svg";
-import OpenIcon from "../../../assets/external.link.svg";
+import ChatIcon from "../../../assets/icons/16/chat.react.svg";
 import DropdownIcon from "../../../assets/triangle.down.react.svg";
 import ArrowDownIcon from "../../../assets/icons/16/output-tokens.svg";
 import CodeIcon from "../../../assets/icons/16/code.react.svg";
@@ -74,7 +74,7 @@ export const imageOverrides: ImageOverrides = {
   "btn-prompt": makeIcon(PromptIcon),
   send: makeIcon(ArrowUpIcon),
   "btn-clear": makeIcon(ClearIcon),
-  "btn-open": makeIcon(OpenIcon),
+  "btn-open": makeIcon(ChatIcon),
   arrow: makeIcon(DropdownIcon),
   "dropdown-toggle": makeIcon(ArrowDownIcon),
   // Tool-call header in the thread. The widget draws its own stroked glyph
