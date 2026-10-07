@@ -492,6 +492,15 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // In the option row the icon sits to the right of its text.
+    const title = canvas.getByText("Create a folder");
+    const option = title.closest("[role='button']") as HTMLElement;
+    const icon = option.querySelector("svg") as SVGElement;
+    await expect(icon.getBoundingClientRect().left).toBeGreaterThan(
+      title.getBoundingClientRect().left,
+    );
+  },
   args: {
     icon: <EmptyRoomsLightSvg />,
     title: "This folder is empty",
@@ -529,6 +538,25 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("No Files Found")).toHaveStyle({
+      color: "rgb(0, 130, 201)",
+      fontSize: "18px",
+    });
+    await expect(
+      canvas.getByText("Upload or create files to get started."),
+    ).toHaveStyle({ color: "rgb(91, 107, 122)" });
+    const folder = canvas
+      .getByText("Create a folder")
+      .closest("[role='button']") as HTMLElement;
+    await expect(folder).toHaveStyle({
+      borderRadius: "12px",
+      padding: "16px 20px",
+    });
+    await expect(canvas.getByText("Create a folder")).toHaveStyle({
+      color: "rgb(0, 79, 130)",
+    });
+  },
   render: () => (
     <div
       style={
