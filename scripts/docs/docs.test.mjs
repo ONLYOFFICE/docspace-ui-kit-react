@@ -274,6 +274,14 @@ describe("summaries", () => {
       "The Files section as the portal draws it.",
     );
   });
+
+  it("keeps one sentence of a CSF description, not its code block", () => {
+    const description =
+      'The portal\'s AI settings screens, from `ai-agent/settings`. Each is a page.\n\n```tsx\nimport { AiModels } from "@onlyoffice/apps-ui-kit/ai-agent/settings";\n```';
+    expect(summaryOf({ kind: "autodocs", description }, "")).toBe(
+      "The portal's AI settings screens, from `ai-agent/settings`.",
+    );
+  });
 });
 
 describe("reshapePropsTables", () => {

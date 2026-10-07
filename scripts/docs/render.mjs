@@ -400,7 +400,7 @@ export const renderAutodocs = (raw, context) => {
     text = addImport(text, THEMED_IMAGE_IMPORT);
   return (
     frontMatter({
-      description: page.description,
+      description: summaryOf(page, raw),
       custom_edit_url: `${REPO_URL}/blob/${revision}/${page.source}`,
     }) +
     text +
@@ -536,7 +536,9 @@ export const renderMarkdown = (raw, context) => {
 export const summaryOf = (page, raw) =>
   page.meta?.summary ??
   page.options?.summary ??
-  page.description ??
+  (page.description
+    ? firstSentence(firstParagraph(page.description))
+    : undefined) ??
   (page.kind === "autodocs"
     ? ""
     : firstSentence(
