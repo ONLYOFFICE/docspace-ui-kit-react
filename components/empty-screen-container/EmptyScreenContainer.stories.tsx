@@ -269,6 +269,17 @@ export const WithoutFilter: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("No files found")).toHaveStyle({
+      color: "rgb(0, 130, 201)",
+    });
+    await expect(
+      canvas.getByText("Create your first file to get started."),
+    ).toHaveStyle({ color: "rgb(29, 45, 68)" });
+    await expect(
+      canvas.getByText("Filters are kept for this folder"),
+    ).toBeVisible();
+  },
   render: () => (
     <div
       style={
