@@ -194,7 +194,13 @@ every story and docs entry, so nothing is guessed; the export-to-id rule (`WithI
    and `custom_edit_url` pointing at the source file.
 4. **Portal-only pages.** A README whose `status` is `portal-internal`, or a page whose source
    is under a directory in `PORTAL_DIRS` (`scripts/docs/config.mjs`), opens with a warning
-   admonition that says so and links to the Public API page.
+   admonition that says so and links to the tiers section of the Installation page.
+5. **What the source keeps off the site.** A passage for people changing the kit -- how to run
+   Storybook, the repository layout, the tooling -- is useful in Storybook and noise on the
+   site. The source wraps it in `<!-- site: skip -->` ... `<!-- site: end -->` (in MDX,
+   `{/* site: skip */}` ... `{/* site: end */}`), each marker on a line of its own, and the
+   generator drops the lines between, markers included; Storybook shows them as before.
+   `docs/public-api.md` is a design document and is not published at all.
 
 ## Category pages
 

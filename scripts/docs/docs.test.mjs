@@ -18,6 +18,7 @@ import {
   rewriteLinks,
   slugify,
   stripHtmlComments,
+  stripSiteSkips,
 } from "./markdown.mjs";
 import {
   linkResolver,
@@ -167,6 +168,18 @@ describe("stripHtmlComments", () => {
     expect(stripHtmlComments(input)).toBe(
       ["# Title", "text  more", "```html", "<!-- kept -->", "```"].join("\n"),
     );
+  });
+});
+
+describe("stripSiteSkips", () => {
+  it("drops a marked passage in Markdown and in MDX, never in code", () => {
+    const md =
+      "# A\n\nKeep.\n\n<!-- site: skip -->\n\n## Dev\n\nGone.\n\n<!-- site: end -->\n\n## B\n";
+    expect(stripSiteSkips(md)).toBe("# A\n\nKeep.\n\n## B\n");
+    const mdx = "Keep.\n{/* site: skip */}\nGone.\n{/* site: end */}\nAnd.\n";
+    expect(stripSiteSkips(mdx)).toBe("Keep.\nAnd.\n");
+    const code = "```md\n<!-- site: skip -->\n```\nKept.\n";
+    expect(stripSiteSkips(code)).toBe(code);
   });
 });
 
@@ -452,7 +465,7 @@ describe("pictures", () => {
       },
       pages: {
         bySource: new Map([
-          ["docs/public-api.md", "getting-started/public-api.md"],
+          ["docs/getting-started.md", "getting-started/installation.md"],
         ]),
         byStoryId: new Map(),
       },
@@ -464,7 +477,7 @@ describe("pictures", () => {
       "# Filter\n\n:::warning[Portal only]\n\nWorks only inside an ONLYOFFICE Apps portal",
     );
     expect(out).toContain(
-      "[public API](../../getting-started/public-api.md).\n\n:::\n\nIntro.",
+      "[public API](../../getting-started/installation.md#public-and-portal-internal).\n\n:::\n\nIntro.",
     );
   });
 });
@@ -683,14 +696,12 @@ describe("collect", () => {
       "page:Installation and setup",
       "page:Catalogue",
       "page:Structure",
-      "page:Public API",
     ]);
     expect(started.pages.map((p) => `${p.kind}:${p.slug}`)).toEqual([
       "mdx:welcome",
       "markdown:installation-and-setup",
       "markdown:catalogue",
       "mdx:structure",
-      "markdown:public-api",
     ]);
 
     expect(labels(ui)).toEqual([

@@ -2,7 +2,7 @@
 // and every JSX element at the top level, which is what the site cannot
 // render and photographs instead.
 
-import { splitLines } from "./markdown.mjs";
+import { splitLines, stripSiteSkips } from "./markdown.mjs";
 
 const IMPORT = /^import\s+([\s\S]*?)\s+from\s+["']([^"']+)["'];?\s*$/;
 
@@ -23,7 +23,7 @@ const IMPORT = /^import\s+([\s\S]*?)\s+from\s+["']([^"']+)["'];?\s*$/;
  * top-level JSX element in order, fenced code left alone.
  */
 export const parseMdx = (text) => {
-  const lines = splitLines(text);
+  const lines = splitLines(stripSiteSkips(text));
   const imports = new Map();
   const blocks = [];
   let metaOf;

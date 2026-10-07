@@ -1,8 +1,13 @@
 # Components
 
-Every component this package ships, what it is for, and how it is imported. The tables below
-are generated from the metadata block of each component's README by `pnpm readme:catalogue` —
-to change a row, change that README.
+Every component this package ships, what it is for, and how it is imported.
+
+<!-- site: skip -->
+
+The tables below are generated from the metadata block of each component's README by
+`pnpm readme:catalogue` — to change a row, change that README.
+
+<!-- site: end -->
 
 Two things to read before picking one:
 
@@ -16,7 +21,8 @@ Two things to read before picking one:
   through their parent.
 - **Public versus portal-internal.** A portal-internal component needs DocSpace context — a
   translation function, a portal store, a device type it is told about — and will not work in a
-  standalone app. [`public-api.md`](public-api.md) is the full account.
+  standalone app. [Public and portal-internal](getting-started.md#public-and-portal-internal)
+  says which is which.
 
 New to the package? [`getting-started.md`](getting-started.md) covers the two providers, the CSS
 model and the two layout rules first.

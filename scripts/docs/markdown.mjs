@@ -68,6 +68,27 @@ export const mapProse = (text, fn) =>
     })
     .join("\n");
 
+const SITE_MARKER =
+  /^\s*(?:<!--|\{\/\*)\s*site:\s*(skip|end)\s*(?:-->|\*\/\})\s*$/;
+
+/**
+ * Removes what the source keeps off the site: the lines between a
+ * `<!-- site: skip -->` and the next `<!-- site: end -->` (an MDX comment
+ * carrying the same words in MDX), markers included. A skip with no end
+ * runs to the end of the file.
+ */
+export const stripSiteSkips = (text) => {
+  const out = [];
+  let skipping = false;
+  for (const { text: line, code } of splitLines(text)) {
+    const marker = code ? null : SITE_MARKER.exec(line)?.[1];
+    if (marker === "skip") skipping = true;
+    else if (marker === "end") skipping = false;
+    else if (!skipping) out.push(line);
+  }
+  return out.join("\n").replace(/\n{3,}/g, "\n\n");
+};
+
 /** Removes HTML comments outside code, multi-line ones included. */
 export const stripHtmlComments = (text) => {
   const out = [];

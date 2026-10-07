@@ -265,4 +265,9 @@ width when the arrangement matters.
   and the prop that shows and hides it, with a table for choosing between the close calls.
 - Each component's own README, next to its source under `components/<name>/README.md`, and shipped
   in the package at the same path.
+
+<!-- site: skip -->
+
 - [`public-api.md`](public-api.md) — the full public and portal-internal boundary.
+
+<!-- site: end -->

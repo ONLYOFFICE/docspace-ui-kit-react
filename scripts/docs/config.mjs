@@ -177,10 +177,4 @@ export const EXTRA_PAGES = [
     label: "Catalogue",
     after: "Installation and setup",
   },
-  {
-    source: "docs/public-api.md",
-    group: "Getting started",
-    label: "Public API",
-    after: "Structure",
-  },
 ];
