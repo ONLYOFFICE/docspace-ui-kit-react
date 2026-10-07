@@ -125,15 +125,23 @@ const Usage = ({
 
   const { from, to } = getUsageRange(period);
 
-  const openWithPeriod = (openServicePage?: () => void) => {
-    if (!openServicePage) return undefined;
+  const openKeepingPeriod = (openPage?: () => void) => {
+    if (!openPage) return;
 
     return () => {
+      setSavedUsagePeriod(period);
+      openPage();
+    };
+  };
+
+  const openWithPeriod = (openServicePage?: () => void) => {
+    if (!openServicePage) return;
+
+    return openKeepingPeriod(() => {
       setFilterStartDate(from);
       setFilterEndDate(to);
-      setSavedUsagePeriod(period);
       openServicePage();
-    };
+    });
   };
 
   const monthText = from.setLocale(language || "en").toFormat("LLLL yyyy");
@@ -322,7 +330,7 @@ const Usage = ({
       <SpendingBreakdown
         period={period}
         isLoading={isLoading}
-        onTariffPlanClick={onTariffPlanClick}
+        onTariffPlanClick={openKeepingPeriod(onTariffPlanClick)}
         onDiskStorageClick={openWithPeriod(onDiskStorageClick)}
         onBackupClick={openWithPeriod(onBackupClick)}
         onAIServicesClick={openWithPeriod(onAIServicesClick)}
