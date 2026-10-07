@@ -1,5 +1,6 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 import { useTheme } from "../../context/ThemeContext";
 
 import { ThemeKeys } from "../../enums";
@@ -16,6 +17,10 @@ const meta: Meta<typeof ThemeProvider> = {
 export default meta;
 
 type Story = StoryObj<typeof ThemeProvider>;
+
+// The content reads the theme back from ThemeContext.
+const currentTheme = (canvas: { getByText: (text: string) => HTMLElement }) =>
+  (canvas.getByText("Current theme:").parentElement as HTMLElement).textContent;
 
 const ThemedContent = () => {
   const { isBase } = useTheme();
@@ -57,6 +62,9 @@ export const LightTheme: Story = {
     initialTheme: ThemeKeys.BaseStr,
     children: <ThemedContent />,
   },
+  play: async ({ canvas }) => {
+    await expect(currentTheme(canvas)).toBe("Current theme: Light");
+  },
   parameters: {
     docs: {
       description: {
@@ -71,6 +79,9 @@ export const DarkTheme: Story = {
     initialTheme: ThemeKeys.DarkStr,
     children: <ThemedContent />,
   },
+  play: async ({ canvas }) => {
+    await expect(currentTheme(canvas)).toBe("Current theme: Dark");
+  },
   parameters: {
     docs: {
       description: {
@@ -84,6 +95,15 @@ export const SystemTheme: Story = {
   args: {
     initialTheme: ThemeKeys.SystemStr,
     children: <ThemedContent />,
+  },
+  play: async ({ canvas }) => {
+    // Whatever the browser reports as the system preference.
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)",
+    ).matches;
+    await expect(currentTheme(canvas)).toBe(
+      `Current theme: ${prefersDark ? "Dark" : "Light"}`,
+    );
   },
   parameters: {
     docs: {
