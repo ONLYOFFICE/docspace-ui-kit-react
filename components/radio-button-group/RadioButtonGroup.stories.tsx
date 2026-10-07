@@ -314,6 +314,24 @@ export const CustomStyling: Story = {
     spacing: "20px",
     width: "300px",
   },
+  play: async ({ canvas }) => {
+    const radios = canvas.getAllByRole("radio");
+    const label = (radio: HTMLElement) => radio.closest("label") as HTMLElement;
+    const group = label(radios[0]).parentElement as HTMLElement;
+    await expect(Math.round(group.getBoundingClientRect().width)).toBe(300);
+    const text = canvas.getByText(String(baseOptions[0].label));
+    await expect(text).toHaveStyle({ fontSize: "16px", fontWeight: "600" });
+    // --spacing: the room between neighbouring options.
+    const [first, second] = radios.map((radio) =>
+      label(radio).getBoundingClientRect(),
+    );
+    const gap = Math.round(
+      second.top > first.top
+        ? second.top - first.bottom
+        : second.left - first.right,
+    );
+    await expect(gap).toBe(20);
+  },
   parameters: {
     docs: {
       description: {
@@ -360,6 +378,12 @@ export const CssCustomization: Story = {
       />
     </div>
   ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("Choose an option:")).toHaveStyle({
+      marginTop: "24px",
+      marginBottom: "12px",
+    });
+  },
   parameters: {
     docs: {
       description: {
