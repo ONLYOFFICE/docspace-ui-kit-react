@@ -369,6 +369,15 @@ export const MultipleBackdrops: Story = {
 
 export const ModalDialogBackdrop: Story = {
   render: (args) => <ModalTemplate {...args} />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Show Modal" }));
+    await expect(canvas.getByText("Modal Content")).toBeVisible();
+    const backdrop = canvas.getByTestId("backdrop");
+    await expect(backdrop).toBeVisible();
+    // A click on the backdrop closes the modal.
+    await userEvent.click(backdrop);
+    await expect(canvas.queryByText("Modal Content")).toBeNull();
+  },
   args: {
     withBackground: true,
     isModalDialog: true,
