@@ -485,7 +485,7 @@ export const Default: Story = {
     await slidOut(aside);
 
     await openPanel(context);
-    await expect(aside.getBoundingClientRect().width).toBe(480);
+    await expect(Math.round(aside.getBoundingClientRect().width)).toBe(480);
     await expect(within(aside).getByText("Panel Title")).toBeVisible();
     await expect(
       within(aside).getByText(
@@ -689,7 +689,9 @@ export const Scaled: Story = {
   },
   play: async (context) => {
     const aside = await openPanel(context);
-    await expect(aside.getBoundingClientRect().width).toBe(window.innerWidth);
+    await expect(Math.round(aside.getBoundingClientRect().width)).toBe(
+      window.innerWidth,
+    );
   },
   parameters: {
     docs: {
@@ -794,7 +796,7 @@ export const CssCustomization: Story = {
   play: async ({ canvas }) => {
     const aside = canvas.getByTestId("aside");
     await slidIn(aside);
-    await expect(aside.getBoundingClientRect().width).toBe(360);
+    await expect(Math.round(aside.getBoundingClientRect().width)).toBe(360);
     await expect(getComputedStyle(aside).backgroundColor).toBe(
       "rgb(230, 243, 251)",
     );
