@@ -217,6 +217,14 @@ const iconButtons = (canvas: {
   getAllByTestId: typeof screen.getAllByTestId;
 }) => canvas.getAllByTestId("icon-button");
 
+// An icon given by URL is fetched and inlined after mounting.
+const loadedPath = (button: HTMLElement) =>
+  waitFor(() => {
+    const path = button.querySelector("svg path");
+    if (!path) throw new Error("The icon has not loaded yet");
+    return path as SVGElement;
+  });
+
 export const Default: Story = {
   render: (args) => <IconButton {...args} />,
   args: {
@@ -339,6 +347,12 @@ const SizesTemplate = () => {
 
 export const Sizes: Story = {
   render: () => <SizesTemplate />,
+  play: async ({ canvas }) => {
+    const widths = iconButtons(canvas).map((button) =>
+      Math.round(button.getBoundingClientRect().width),
+    );
+    await expect(widths).toEqual([16, 20, 25, 32, 40]);
+  },
   parameters: {
     docs: {
       description: {
@@ -412,6 +426,15 @@ const WithStrokeTemplate = () => {
 
 export const WithStroke: Story = {
   render: () => <WithStrokeTemplate />,
+  play: async ({ canvas }) => {
+    // The outline takes the icon colour.
+    for (const button of iconButtons(canvas)) {
+      const path = await loadedPath(button);
+      await expect(getComputedStyle(path).stroke).toBe(
+        getComputedStyle(button).color,
+      );
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -461,6 +484,12 @@ const WithCustomNodeTemplate = () => {
 
 export const WithCustomNode: Story = {
   render: () => <WithCustomNodeTemplate />,
+  play: async ({ canvas }) => {
+    // The node wins over iconName: no SVG is fetched.
+    const [button] = iconButtons(canvas);
+    await expect(canvas.getByTitle("Custom node")).toHaveTextContent("IC");
+    await expect(button.querySelector("svg")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -522,6 +551,12 @@ export const WithTooltip: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const [button] = iconButtons(canvas);
+    await expect(button).toHaveStyle({ color: "rgb(156, 39, 176)" });
+    const path = await loadedPath(button);
+    await expect(getComputedStyle(path).fill).toBe("rgb(156, 39, 176)");
+  },
   render: () => (
     <IconButton
       iconName={SearchReactSvgUrl}
