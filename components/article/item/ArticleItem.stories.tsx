@@ -1,6 +1,6 @@
 import React from "react";
 import { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
 
 import CatalogFolderReactSvgUrl from "../../../assets/icons/16/catalog.folder.react.svg?url";
 import CatalogTrashReactSvgUrl from "../../../assets/icons/16/catalog.trash.react.svg?url";
@@ -61,6 +61,10 @@ const meta = {
 
 type Story = StoryObj<typeof ArticleItemPure>;
 
+// The empty layer over the row that takes the click and the drag states.
+const sibling = (canvas: { getByTestId: (id: string) => HTMLElement }) =>
+  canvas.getByTestId("article-item-sibling");
+
 export default meta;
 
 export const Default: Story = {
@@ -114,6 +118,18 @@ export const WithCustomBadge: Story = {
     showBadge: true,
     iconBadge: CatalogTrashReactSvgUrl,
   },
+  play: async ({ args, canvas, userEvent }) => {
+    // The icon stands in for the count, and a click on it stays on the badge.
+    const item = canvas.getByTestId("article-item");
+    const badgeIcon = await waitFor(() => {
+      const svgs = item.querySelectorAll("svg");
+      if (svgs.length < 2) throw new Error("The badge icon has not loaded");
+      return svgs[svgs.length - 1];
+    });
+    await userEvent.click(badgeIcon);
+    await expect(args.onClickBadge).toHaveBeenCalledWith("documents");
+    await expect(args.onClick).not.toHaveBeenCalled();
+  },
 };
 
 export const Active: Story = {
@@ -134,11 +150,17 @@ export const Dragging: Story = {
   args: {
     isDragging: true,
   },
+  play: async ({ canvas }) => {
+    await expect(sibling(canvas).className).toMatch(/dragging/);
+  },
 };
 
 export const DragTarget: Story = {
   args: {
     isDragActive: true,
+  },
+  play: async ({ canvas }) => {
+    await expect(sibling(canvas).className).toMatch(/dragActive/);
   },
 };
 
@@ -189,6 +211,23 @@ export const EndOfBlock: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("Documents")).toHaveStyle({
+      color: "rgb(34, 34, 34)",
+      fontWeight: "400",
+    });
+    await expect(canvas.getByText("Active Item")).toHaveStyle({
+      color: "rgb(255, 255, 255)",
+    });
+    const active = canvas
+      .getByText("Active Item")
+      .closest("[data-testid='article-item']")
+      ?.querySelector("[data-testid='article-item-sibling']") as HTMLElement;
+    await expect(active).toHaveStyle({
+      backgroundColor: "rgb(0, 103, 158)",
+      borderRadius: "8px",
+    });
+  },
   render: () => (
     <div
       style={
