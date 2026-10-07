@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, screen, waitFor } from "storybook/test";
 
 import { withDemoBanner } from "../../.storybook/decorators/PortalGate";
 
@@ -48,10 +49,53 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// The list loads its in-memory demo data after mounting.
+const listed = (context: PlayContext, title: string) =>
+  waitFor(() => expect(context.canvas.getByText(title)).toBeVisible(), {
+    timeout: 3000,
+  });
+
+const opensPicker = async (context: PlayContext) => {
+  await context.userEvent.click(
+    await waitFor(() =>
+      context.canvas.getByRole("button", { name: "Select folder" }),
+    ),
+  );
+  await waitFor(() => expect(screen.getByTestId("selector")).toBeVisible());
+};
+
+export const Default: Story = {
+  play: async (context) => {
+    const { canvas, userEvent } = context;
+    await listed(context, "Job applications");
+
+    // Search narrows the list.
+    await userEvent.type(canvas.getByPlaceholderText(/^Search in /), "survey");
+    await waitFor(
+      () => expect(canvas.queryByText("Expense reports")).toBeNull(),
+      { timeout: 3000 },
+    );
+    await expect(canvas.getByText("Customer survey")).toBeVisible();
+    // The filter pushes the applied query back into the field; an edit made
+    // before that lands is overwritten, so let the search settle first.
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await userEvent.clear(canvas.getByPlaceholderText(/^Search in /));
+    await listed(context, "Expense reports");
+
+    // A folder opens in place.
+    await userEvent.click(canvas.getByText("Job applications"));
+    await listed(context, "In process");
+  },
+};
 
 export const WithFolderPicker: Story = {
   args: { withFolderPicker: true },
+  play: async (context) => {
+    await listed(context, "Job applications");
+    await opensPicker(context);
+  },
   parameters: {
     docs: {
       description: {
