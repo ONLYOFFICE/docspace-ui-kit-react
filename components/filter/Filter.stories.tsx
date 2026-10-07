@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import ViewRowsReactSvg from "../../assets/view-rows.react.svg";
 import ViewTilesReactSvg from "../../assets/view-tiles.react.svg";
@@ -525,6 +525,31 @@ type Story = StoryObj<ComponentProps<typeof Filter>>;
 
 export default meta;
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// The filter panel is an aside dialog in a portal.
+const filterPanel = async () => {
+  const panel = await waitFor(() => {
+    const element = screen.getByTestId("modal-dialog");
+    expect(element).toBeVisible();
+    return element;
+  });
+  return within(panel);
+};
+
+// Closed, the panel unmounts.
+const panelClosed = () =>
+  waitFor(() => expect(screen.queryByTestId("modal-dialog")).toBeNull());
+
+const tag = (key: string) => screen.getByTestId(`filter_tag_${key}`);
+
+const applyButton = () => screen.getByTestId("filter_apply_button");
+
+const openPanel = async ({ canvas, userEvent }: PlayContext) => {
+  await userEvent.click(canvas.getByTestId("filter_icon_button"));
+  return filterPanel();
+};
+
 const Wrapper = (props: { children: React.ReactNode }) => {
   return <div style={{ height: "140px" }}>{props.children}</div>;
 };
@@ -565,6 +590,34 @@ const panelDocsStory = { inline: false, height: "480px" };
 
 export const Default: Story = {
   render: (args) => <FilterTemplate {...args} />,
+  play: async (context) => {
+    const { args, canvas, userEvent } = context;
+    // Typing searches.
+    await userEvent.type(canvas.getByPlaceholderText("Search..."), "report");
+    // The search is debounced.
+    await waitFor(() => expect(args.onSearch).toHaveBeenCalledWith("report"), {
+      timeout: 3000,
+    });
+
+    // The filter button opens the panel; Cancel closes it.
+    const panel = await openPanel(context);
+    await expect(panel.getByTestId("filter_block_header")).toHaveTextContent(
+      "Filter",
+    );
+    await userEvent.click(panel.getByTestId("filter_cancel_button"));
+    await panelClosed();
+
+    // The sort menu reports the field picked.
+    await userEvent.click(canvas.getByTestId("filter_sort_button"));
+    await userEvent.click(
+      await waitFor(() => screen.getByTestId("filter_sort_option_Size")),
+    );
+    await expect(args.onSort).toHaveBeenCalledWith("Size", "asc");
+
+    // On a desktop the single view button switches to the other view.
+    await userEvent.click(canvas.getByTestId("view-selector-icon"));
+    await expect(args.onChangeViewAs).toHaveBeenCalledWith("tile");
+  },
   parameters: {
     docs: {
       description: {
@@ -598,6 +651,21 @@ export const DocumentTypes: Story = {
   args: {
     getFilterData: () => Promise.resolve(documentTypeItems),
   },
+  play: async ({ args, userEvent }) => {
+    await filterPanel();
+    // Apply waits for a change.
+    await expect(applyButton()).toBeDisabled();
+    await userEvent.click(await waitFor(() => tag("spreadsheets")));
+    await expect(tag("spreadsheets")).toHaveAttribute("data-selected", "true");
+    await userEvent.click(applyButton());
+    await expect(args.onFilter).toHaveBeenCalledWith([
+      expect.objectContaining({
+        key: "spreadsheets",
+        group: FilterGroups.filterType,
+      }),
+    ]);
+    await panelClosed();
+  },
   parameters: {
     docs: {
       story: panelDocsStory,
@@ -626,6 +694,16 @@ export const WithSelectedFilters: Story = {
   args: {
     getFilterData: () => Promise.resolve(documentTypeItems),
     initSelectedFilterData: selectedDocuments,
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByTestId("filter_selected_item_documents"),
+    ).toHaveTextContent("Documents");
+    await filterPanel();
+    await waitFor(() =>
+      expect(tag("documents")).toHaveAttribute("data-selected", "true"),
+    );
+    await expect(applyButton()).toBeDisabled();
   },
   parameters: {
     docs: {
@@ -708,6 +786,28 @@ export const MultipleFilterGroups: Story = {
         },
       ]),
   },
+  play: async ({ args, userEvent }) => {
+    const panel = await filterPanel();
+    for (const group of [
+      FilterGroups.filterType,
+      FilterGroups.filterStatus,
+      FilterGroups.filterAuthor,
+    ]) {
+      await waitFor(() =>
+        expect(panel.getByTestId(`filter_block_item_${group}`)).toBeVisible(),
+      );
+    }
+    // One pick per group, applied together.
+    await userEvent.click(tag("active"));
+    await userEvent.click(tag("me"));
+    await userEvent.click(applyButton());
+    await expect(args.onFilter).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ key: "active" }),
+        expect.objectContaining({ key: "me" }),
+      ]),
+    );
+  },
   parameters: {
     docs: {
       story: panelDocsStory,
@@ -772,6 +872,15 @@ export const RoomsFilter: Story = {
         },
       ]),
   },
+  play: async () => {
+    const panel = await filterPanel();
+    // A skeleton first, then the rooms.
+    await expect(panel.getByTestId("filter-block-loader")).toBeVisible();
+    await waitFor(() => expect(tag("room-1")).toBeVisible(), {
+      timeout: 2000,
+    });
+    await expect(panel.queryByTestId("filter-block-loader")).toBeNull();
+  },
   parameters: {
     docs: {
       story: panelDocsStory,
@@ -801,6 +910,12 @@ export const DisabledFilter: Story = {
     isIndexEditingMode: true,
     isIndexing: true,
     getFilterData: () => Promise.resolve([]),
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByPlaceholderText("Search...")).toBeDisabled();
+    await expect(canvas.queryByTestId("filter_icon_button")).toBeNull();
+    await expect(canvas.queryByTestId("filter_sort_button")).toBeNull();
+    await expect(canvas.queryByTestId("view-selector-icon")).toBeNull();
   },
   parameters: {
     docs: {
@@ -851,6 +966,13 @@ const ViewSelectorDefaultTemplate = () => {
 
 export const ViewSelectorDefault: Story = {
   render: () => <ViewSelectorDefaultTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const [row, tile] = canvas.getAllByTestId("view-selector-icon");
+    await expect(row.className).toMatch(/checked/);
+    await userEvent.click(tile);
+    await expect(tile.className).toMatch(/checked/);
+    await expect(row.className).not.toMatch(/checked/);
+  },
   parameters: {
     docs: {
       description: {
@@ -885,6 +1007,12 @@ const ViewSelectorDisabledTemplate = () => {
 
 export const ViewSelectorDisabled: Story = {
   render: () => <ViewSelectorDisabledTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const [row, tile] = canvas.getAllByTestId("view-selector-icon");
+    await userEvent.click(tile);
+    await expect(row.className).toMatch(/checked/);
+    await expect(tile.className).not.toMatch(/checked/);
+  },
   parameters: {
     docs: {
       description: {
@@ -912,6 +1040,16 @@ const ViewSelectorFilterModeTemplate = () => {
 
 export const ViewSelectorFilterMode: Story = {
   render: () => <ViewSelectorFilterModeTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // One button, carrying the view it switches to.
+    const button = canvas.getByTestId("view-selector-icon");
+    await expect(button).toHaveAttribute("data-view", "tile");
+    await userEvent.click(button);
+    await expect(canvas.getByTestId("view-selector-icon")).toHaveAttribute(
+      "data-view",
+      "row",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -930,6 +1068,17 @@ export const WithFilterChips: Story = {
   args: {
     initSelectedFilterData: selectedChips,
     getSelectedFilterData: () => selectedChips,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByTestId("filter_selected_item_me")).toBeVisible();
+    await userEvent.click(
+      within(canvas.getByTestId("filter_selected_item_me")).getByText("Me"),
+    );
+    await expect(args.removeSelectedItem).toHaveBeenCalledWith(
+      expect.objectContaining({ key: "me", group: FilterGroups.filterAuthor }),
+    );
+    await userEvent.click(canvas.getByTestId("filter_clear_all_link"));
+    await expect(args.clearAll).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -954,6 +1103,26 @@ export const PanelOptionKinds: Story = {
   render: (args) => <OpenPanelTemplate {...args} />,
   args: {
     getFilterData: () => Promise.resolve(optionKindItems),
+  },
+  play: async ({ args, userEvent }) => {
+    const panel = await filterPanel();
+    // A drop-down of values and a checkbox, besides the tags.
+    await waitFor(() =>
+      expect(panel.getAllByText("Anywhere")[0]).toBeVisible(),
+    );
+    const checkbox = within(
+      panel.getByTestId(
+        `filter_checkbox_container_${FilterKeys.excludeSubfolders}`,
+      ),
+    ).getByRole("checkbox");
+    await userEvent.click(checkbox);
+    await expect(checkbox).toBeChecked();
+    await userEvent.click(applyButton());
+    await expect(args.onFilter).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ key: FilterKeys.excludeSubfolders }),
+      ]),
+    );
   },
   parameters: {
     docs: {
@@ -996,6 +1165,16 @@ export const SortMenuOnTablet: Story = {
   args: {
     currentDeviceType: DeviceType.tablet,
   },
+  play: async ({ args, userEvent }) => {
+    // The view switch heads the open menu, above the sort fields.
+    await waitFor(() =>
+      expect(
+        screen.getByTestId("filter_sort_view_selector_item"),
+      ).toBeVisible(),
+    );
+    await userEvent.click(screen.getByTestId("filter_sort_option_DateAndTime"));
+    await expect(args.onSort).toHaveBeenCalledWith("DateAndTime", "asc");
+  },
   parameters: {
     docs: {
       story: { inline: false, height: "326px" },
@@ -1022,6 +1201,17 @@ export const WithGroupingRow: Story = {
     roomGroups: mockRoomGroups,
     getAllRoomGroups,
     currentGroupId: "2",
+    onFilterByGroup: fn(),
+    setEditRoomGroupsDialogVisible: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // The chosen group is highlighted; another chip chooses its group.
+    const current = await waitFor(() => canvas.getByTestId("room_group_tag_2"));
+    await expect(current).toHaveTextContent("Clients");
+    await userEvent.click(canvas.getByTestId("room_group_tag_1"));
+    await expect(args.onFilterByGroup).toHaveBeenCalled();
+    await userEvent.click(canvas.getByTestId("create_group_icon_button"));
+    await expect(args.setEditRoomGroupsDialogVisible).toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -1051,6 +1241,11 @@ export const WithMainButton: Story = {
     showMainButton: true,
     mainButtonProps: { text: "New", model: [] },
   },
+  play: async ({ canvas }) => {
+    await expect(
+      within(canvas.getByTestId("filter_container")).getByText("New"),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -1075,6 +1270,14 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The search box at the right, the buttons at the left.
+    const search = canvas.getByPlaceholderText("بحث").getBoundingClientRect();
+    const filterButton = canvas
+      .getByTestId("filter_icon_button")
+      .getBoundingClientRect();
+    await expect(search.left).toBeGreaterThan(filterButton.right);
+  },
   args: {
     placeholder: "بحث",
     initSelectedFilterData: selectedChips,
@@ -1124,6 +1327,11 @@ export const CssCustomization: Story = {
   ),
   args: {
     getFilterData: () => Promise.resolve([]),
+  },
+  play: async ({ canvas }) => {
+    const button = getComputedStyle(canvas.getByTestId("filter_icon_button"));
+    await expect(button.borderTopColor).toBe("rgb(0, 130, 201)");
+    await expect(button.borderTopLeftRadius).toBe("6px");
   },
   parameters: {
     docs: {
