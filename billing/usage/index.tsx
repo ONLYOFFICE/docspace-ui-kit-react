@@ -18,7 +18,7 @@ import type { TUsagePeriodKey } from "../types";
 
 import PeriodSelect from "./sub-components/PeriodSelect";
 import SpendingBreakdown from "./sub-components/SpendingBreakdown";
-import SpendAmount from "../shared/spend-amount";
+import BalanceAmount from "../shared/balance-amount";
 
 import { getUsageRange } from "./utils";
 import { toastr } from "../../components/toast";
@@ -52,6 +52,7 @@ const Usage = ({
     formatDate,
     openOnNewPage,
     isCardLinkedToPortal,
+    walletCodeCurrency,
     setFilterStartDate,
     setFilterEndDate,
     savedUsagePeriod,
@@ -304,9 +305,14 @@ const Usage = ({
         {isLoading ? (
           <RectangleSkeleton width="120px" height="24px" borderRadius="3px" />
         ) : (
-          <SpendAmount
+          <BalanceAmount
+            showRefresh={false}
             amount={totalSpend}
-            className={styles.totalValue}
+            currency={walletCodeCurrency}
+            language={language}
+            mainFontSize="18px"
+            fractionFontSize="12px"
+            withoutMargin
             tooltipId="usage-total-spend"
           />
         )}

@@ -1,0 +1,22 @@
+@use "sass:math";
+@use "../../../styles/variables/floating-corner" as corner;
+
+// Zendesk draws its launcher 64px square, in an iframe of its own, and offers
+// no size setting (`contentScale` scales the window's content, not the
+// launcher). The iframe element lives in the host document, so it is scaled
+// down to the corner's button size from the corner it is pinned to, which
+// keeps its bottom and inline-end edges on the create button's lines. A
+// transform rather than a width and height: the launcher lays itself out at
+// 64px, and a smaller frame would clip it. `!important` outranks the vendor's
+// load animation, which would otherwise show the full size for its first
+// frames. `#launcher` is the id Zendesk gives the frame.
+:global(iframe#launcher) {
+  transform: scale(
+    math.div(corner.$size, corner.$zendesk-launcher-size)
+  ) !important;
+  transform-origin: bottom right !important;
+}
+
+:global([data-dir="rtl"] iframe#launcher) {
+  transform-origin: bottom left !important;
+}

@@ -28,8 +28,13 @@ const EMPTY_FORMATS: ExportFormat[] = [];
 const themeIdForSystem = (t: "light" | "dark") =>
   t === "dark" ? PORTAL_DARK_THEME_ID : PORTAL_BASE_THEME_ID;
 
-const showHostToast = (text: string) => {
-  toastr.success(text);
+// The library's `heading` is the bold line above `text`, which is exactly
+// what `toastr` renders as the toast's title.
+const showHostToast: NonNullable<PlatformAdapter["showToast"]> = (
+  text,
+  meta,
+) => {
+  toastr.success(text, meta?.heading);
 };
 
 export type SaveAsFileHandler = (

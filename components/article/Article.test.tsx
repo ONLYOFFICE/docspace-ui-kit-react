@@ -82,8 +82,6 @@ const defaultProps = {
   withCustomSlot: false,
   isBurgerLoading: false,
   languageBaseName: "en",
-  zendeskEmail: "test@test.com",
-  chatDisplayName: "Test User",
   isMobileArticle: false,
   zendeskKey: "test-key",
   children: [],
