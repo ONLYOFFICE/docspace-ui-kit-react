@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, userEvent, waitFor } from "storybook/test";
 
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
@@ -8,6 +9,7 @@ import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
 
 import AIAgentSelector from ".";
 import type { AIAgentSelectorProps } from "./AIAgent.types";
+import type { TSelectorItem } from "../../components/selector";
 
 import { withPortalGate } from "../../.storybook/decorators/PortalGate";
 
@@ -134,6 +136,21 @@ export default meta;
 
 type Story = StoryObj<StoryArgs>;
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+const rows = () =>
+  Array.from(
+    document.querySelectorAll<HTMLElement>('[data-testid^="selector-item-"]'),
+  );
+
+const row = (label: string) => {
+  const found = rows().find((item) => item.textContent?.includes(label));
+  if (!found) throw new Error(`No row labelled ${label}`);
+  return found;
+};
+
+const submit = () => screen.getByTestId("selector_submit_button");
+
 const Template = (props: StoryArgs) => (
   <div
     style={{
@@ -151,18 +168,45 @@ const Template = (props: StoryArgs) => (
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async ({ args }: PlayContext) => {
+    // The demo portal's agents, with nothing picked yet.
+    await waitFor(() => expect(row("Contract reviewer")).toBeVisible());
+    await expect(screen.getByText("Choose an AI agent")).toBeVisible();
+    await expect(submit()).toBeDisabled();
+    await waitFor(() => expect(args.setIsDataReady).toHaveBeenCalledWith(true));
+
+    // An agent without the chat right cannot be picked.
+    await userEvent.click(row("Board minutes (restricted)"));
+    await expect(submit()).toBeDisabled();
+
+    // Picking one and pressing Select hands it over.
+    await userEvent.click(row("Sales assistant"));
+    await expect(submit()).toBeEnabled();
+    await userEvent.click(submit());
+    await expect(args.onSubmit).toHaveBeenCalledTimes(1);
+    const [items] = (args.onSubmit as ReturnType<typeof fn>).mock.calls[0] as [
+      TSelectorItem[],
+    ];
+    await expect(items[0].label).toBe("Sales assistant");
+
+    // Cancel and the header's close both dismiss it.
+    await userEvent.click(screen.getByTestId("selector_cancel_button"));
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
+    await userEvent.click(screen.getByTestId("aside_header_close_icon_button"));
+    await expect(args.onClose).toHaveBeenCalledTimes(2);
+  },
   args: {
     withPadding: true,
     disableBySecurity: undefined,
     excludeItems: [],
-    onSubmit: (items) => {
+    onSubmit: fn((items: TSelectorItem[]) => {
       const id = items[0]?.id;
       toastr.success(`Submit with ${id}`);
-    },
-    onClose: () => {
+    }),
+    onClose: fn(() => {
       toastr.info("Selector closed");
-    },
-    setIsDataReady: () => {},
+    }),
+    setIsDataReady: fn(),
   },
   parameters: {
     docs: {
@@ -221,6 +265,14 @@ const initItems: FolderDtoInteger[] = [
 export const WithInit: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async ({ args }: PlayContext) => {
+    // The selector still fetches its first page on mount, so the list that
+    // settles is whatever the portal answers; only the picking is checked.
+    await waitFor(() => expect(rows().length).toBeGreaterThan(0));
+    await userEvent.click(rows()[0]);
+    await userEvent.click(submit());
+    await expect(args.onSubmit).toHaveBeenCalledTimes(1);
+  },
   args: {
     withPadding: true,
     withInit: true,
@@ -229,14 +281,14 @@ export const WithInit: Story = {
     initHasNextPage: false,
     initSearchValue: "",
     excludeItems: [],
-    onSubmit: (items) => {
+    onSubmit: fn((items: TSelectorItem[]) => {
       const id = items[0]?.id;
       toastr.success(`Submit with ${id}`);
-    },
-    onClose: () => {
+    }),
+    onClose: fn(() => {
       toastr.info("Selector closed");
-    },
-    setIsDataReady: () => {},
+    }),
+    setIsDataReady: fn(),
   },
   parameters: {
     docs: {
