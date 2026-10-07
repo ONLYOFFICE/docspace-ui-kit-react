@@ -189,16 +189,17 @@ const NOTE = "AI Chat can make mistakes. Check important info.";
 export const Default: Story = {
   play: async ({ userEvent }) => {
     await userEvent.type(await composer(), "Hello there{Enter}");
-    // The demo portal streams a fixed reply that quotes the message.
+    // The demo portal streams a fixed reply that quotes the message, one
+    // word at a time: the quote arrives after the first paragraph does.
     await waitFor(
       () =>
         expect(
-          screen.getByText(/^This is a demo reply from the Storybook demo/),
+          screen.getByText("Hello there", { selector: "strong" }),
         ).toBeVisible(),
       { timeout: 10000 },
     );
     await expect(
-      screen.getByText("Hello there", { selector: "strong" }),
+      screen.getByText(/^This is a demo reply from the Storybook demo/),
     ).toBeVisible();
   },
   parameters: {
