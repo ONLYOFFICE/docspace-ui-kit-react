@@ -107,7 +107,9 @@ without one they photograph as demo screens; the Welcome hero drops its links to
 ## The tree and the order
 
 A page's place is its Storybook title. `UI/Form controls/TextInput` puts the page in `UI`, under
-it `Form controls`, labelled `TextInput`; the categories nest as Storybook's sidebar does.
+it `Form controls`, labelled `TextInput`; the categories nest as Storybook's sidebar does. The
+file is the label in kebab-case, split at its capitals (`PeopleSelector` -> `people-selector`,
+`Error404` -> `error-404`); a README page is named after its folder, which already is.
 
 - **A README with no story of its own** but with stories below it (`components/rows`,
   `components/tiles`, `components/table`) describes the group those stories sit in. It becomes

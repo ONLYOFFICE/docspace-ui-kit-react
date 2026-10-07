@@ -24,6 +24,7 @@ import {
   orderLevel,
   readStoryOrder,
   storyId,
+  storyNameFromExport,
 } from "./story-tree.mjs";
 
 const SKIP_DIRS = new Set(["node_modules", "dist"]);
@@ -78,6 +79,9 @@ const readmes = (root) => {
 
 const parentOf = (title) => title.split("/").slice(0, -1).join("/");
 const leafOf = (title) => title.split("/").at(-1);
+
+/** `PeopleSelector` -> `people-selector`, `Error404` -> `error-404`. */
+const pageSlug = (label) => slugify(storyNameFromExport(label));
 
 /** `./Button.stories` from `components/button/Button.stories.tsx` -> that file. */
 const resolveModule = (root, fromFile, specifier) => {
@@ -184,7 +188,7 @@ export const collect = (root, { warn }) => {
         ...common,
         kind: "docs",
         source: docs.file,
-        slug: slugify(common.label),
+        slug: pageSlug(common.label),
         blocks: docs.blocks,
       };
     } else if (readme && !usedReadmes.has(readme.source)) {
@@ -201,7 +205,7 @@ export const collect = (root, { warn }) => {
         ...common,
         kind: "autodocs",
         source: story.file,
-        slug: slugify(common.label),
+        slug: pageSlug(common.label),
         description: csfDescription(read(story.file), story.file),
       };
     }
@@ -218,7 +222,7 @@ export const collect = (root, { warn }) => {
       kind: "mdx",
       source: entry.file,
       label: leafOf(entry.title),
-      slug: slugify(leafOf(entry.title)),
+      slug: pageSlug(leafOf(entry.title)),
       order: entry.file,
       title: entry.title,
       blocks: entry.blocks,
@@ -295,7 +299,7 @@ export const collect = (root, { warn }) => {
       kind: "markdown",
       source: extra.source,
       label: extra.label,
-      slug: slugify(extra.label),
+      slug: pageSlug(extra.label),
       order: "",
     };
     category.sequence.splice(after + 1, 0, { type: "page", item: page });

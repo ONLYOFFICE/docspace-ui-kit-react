@@ -583,6 +583,10 @@ describe("collect", () => {
       'export default { title: "UI/Navigation/Navigation" };\nexport const Default = {};',
     );
     write(
+      "components/people/People.stories.tsx",
+      'export default { title: "UI/Form controls/PeopleSelector" };\nexport const Default = {};',
+    );
+    write(
       "components/text-input/TextInput.stories.tsx",
       'export default { title: "UI/Form controls/TextInput" };\nexport const Default = {};',
     );
@@ -629,6 +633,7 @@ describe("collect", () => {
     expect(form.slug).toBe("ui/form-controls");
     expect(form.pages.map((p) => `${p.kind}:${p.slug}:${p.source}`)).toEqual([
       "docs:button:components/button/Button.docs.mdx",
+      "autodocs:people-selector:components/people/People.stories.tsx",
       "readme:text-input:components/text-input/README.md",
     ]);
     expect(navigation.pages.map((p) => `${p.kind}:${p.slug}`)).toEqual([
