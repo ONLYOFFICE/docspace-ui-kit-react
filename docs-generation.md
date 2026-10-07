@@ -24,8 +24,9 @@ pnpm docs:screenshots # the pictures alone, from an existing storybook-static
 
 `docs:build` and `docs:sync` take `--reuse-storybook` to keep an existing `storybook-static`
 instead of rebuilding it. `docs:screenshots` takes `--only <slug>...` for a few pages,
-`--missing` for the pictures not on disk yet and `--storybook <dir|url>` for a Storybook other
-than `storybook-static`; the full set is about 1 100 pictures and takes some fifteen minutes.
+`--missing` for the pictures not on disk yet, `--changed` for the pages whose sources changed
+since the last run, and `--storybook <dir|url>` for a Storybook other than `storybook-static`.
+The full set is about 1 100 pictures.
 
 CI runs `pnpm docs:check` in the lint job.
 
@@ -157,6 +158,11 @@ matched to the MDX by position among the page's non-Markdown blocks.
 `pnpm run docs` copies the pictures beside the pages and puts a Docusaurus `<ThemedImage>` where
 each belongs, so the reader sees the theme they are in. A picture not taken leaves no trace on
 the page beyond a count in the run's output: CI runs no browser, and `pnpm run docs` stays seconds.
+
+`--changed` reads `site-screenshots/manifest.json`, which every run writes: a fingerprint per
+page of its source, the files beside its stories and the camera's own inputs (the preview, the
+recipes, the script). A component another page composes is not in a page's fingerprint, so
+`--changed` is for iterating on one component; the site is built from a full run.
 
 It needs a static Storybook (`pnpm storybook-build`, or `STORYBOOK_URL` for a served one) and
 Playwright's Chromium (`pnpm exec playwright install chromium`). Storybook's `index.json` names

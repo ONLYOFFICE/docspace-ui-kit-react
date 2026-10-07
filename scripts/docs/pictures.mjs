@@ -8,8 +8,11 @@
 // table Storybook builds for the page, read off the Docs page as data into
 // one JSON file rather than photographed, so the site shows a table.
 
+import crypto from "node:crypto";
+import fs from "node:fs";
 import path from "node:path";
 
+import { toPosix, walk } from "../lib/fs-ids.mjs";
 import { BLOCK_RENDERERS } from "./blocks.mjs";
 import { SHOTS_DIR } from "./config.mjs";
 import { storyId, storyNameFromExport } from "./story-tree.mjs";
@@ -101,3 +104,63 @@ export const pictureFiles = (root, category, page, name) =>
 /** The two file names of a picture, as the page references them. */
 export const pictureNames = (page, name) =>
   THEMES.map((theme) => `${page.slug}--${name}-${theme}.png`);
+
+/**
+ * What `pnpm docs:screenshots` photographed each page from, by
+ * `<category>/<page>`: a fingerprint of the sources, so `--changed` can
+ * skip a page whose sources are as they were.
+ */
+export const MANIFEST = "manifest.json";
+
+/** Files that shape every picture: the canvas, the recipes, the camera. */
+const SHOT_INPUTS = [
+  ".storybook/preview.tsx",
+  "scripts/docs/config.mjs",
+  "scripts/docs/screenshots.mjs",
+];
+
+const TEST_FILE = /\.test\.[^.]+$/;
+
+/**
+ * A hash of the page's source, every file beside its stories (tests apart)
+ * and SHOT_INPUTS. A component another page composes is not in it: a change
+ * to Button alone does not re-photograph the dialogs that use it, so a full
+ * run is still what the site is built from.
+ */
+export const pageFingerprint = (root, page) => {
+  const dir = path.posix.dirname(page.storiesFile ?? page.source);
+  const files = new Set([page.source, ...SHOT_INPUTS]);
+  for (const entry of walk(path.join(root, dir), { sort: true })) {
+    if (entry.isDir || TEST_FILE.test(entry.name)) continue;
+    files.add(toPosix(path.posix.join(dir, entry.id)));
+  }
+  const hash = crypto.createHash("sha1");
+  for (const file of [...files].sort()) {
+    hash.update(file);
+    hash.update(fs.readFileSync(path.join(root, file)));
+  }
+  return hash.digest("hex");
+};
+
+export const readManifest = (root) => {
+  try {
+    return JSON.parse(
+      fs.readFileSync(path.join(root, SHOTS_DIR, MANIFEST), "utf8"),
+    );
+  } catch {
+    return {};
+  }
+};
+
+export const writeManifest = (root, manifest) => {
+  const sorted = Object.fromEntries(
+    Object.keys(manifest)
+      .sort()
+      .map((key) => [key, manifest[key]]),
+  );
+  fs.mkdirSync(path.join(root, SHOTS_DIR), { recursive: true });
+  fs.writeFileSync(
+    path.join(root, SHOTS_DIR, MANIFEST),
+    `${JSON.stringify(sorted, null, 2)}\n`,
+  );
+};

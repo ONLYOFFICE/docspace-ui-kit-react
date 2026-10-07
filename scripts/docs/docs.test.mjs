@@ -31,7 +31,7 @@ import {
 } from "./render.mjs";
 import { sidebarItems } from "./sidebar.mjs";
 import { parseMdx } from "./mdx.mjs";
-import { shotsOf, storyKey } from "./pictures.mjs";
+import { pageFingerprint, shotsOf, storyKey } from "./pictures.mjs";
 import {
   csfStories,
   csfTitle,
@@ -575,6 +575,32 @@ export const Default = {};`,
         (s) => s.name,
       ),
     ).toEqual(["primary", "args-table", "default"]);
+  });
+});
+
+describe("pageFingerprint", () => {
+  it("changes with a story file, not with a test beside it", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "ui-kit-shots-"));
+    const write = (file, text) => {
+      fs.mkdirSync(path.join(root, path.dirname(file)), { recursive: true });
+      fs.writeFileSync(path.join(root, file), text);
+    };
+    write(".storybook/preview.tsx", "");
+    write("scripts/docs/config.mjs", "");
+    write("scripts/docs/screenshots.mjs", "");
+    write("components/button/Button.stories.tsx", "export const A = {};");
+    write("components/button/Button.test.tsx", "");
+    write("components/button/README.md", "# Button");
+    const page = {
+      kind: "readme",
+      source: "components/button/README.md",
+      storiesFile: "components/button/Button.stories.tsx",
+    };
+    const before = pageFingerprint(root, page);
+    write("components/button/Button.test.tsx", "it()");
+    expect(pageFingerprint(root, page)).toBe(before);
+    write("components/button/Button.stories.tsx", "export const B = {};");
+    expect(pageFingerprint(root, page)).not.toBe(before);
   });
 });
 

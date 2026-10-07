@@ -4,10 +4,12 @@
 // theme on a transparent canvas, so the site shows the one that matches the
 // reader's theme.
 //
-//   node scripts/docs/screenshots.mjs [--only <slug>...] [--missing] [--storybook <dir|url>]
+//   node scripts/docs/screenshots.mjs [--only <slug>...] [--missing] [--changed] [--storybook <dir|url>]
 //
 // --only     only these pages (by slug)
 // --missing  only the pictures that are not on disk yet
+// --changed  only the pages whose sources changed since the last run (the
+//            manifest in SHOTS_DIR); a page that failed is retried
 //
 // Reads the static Storybook (`pnpm storybook-build`, or STORYBOOK_URL for a
 // served one): its index.json names the stories and the docs pages. Writes
@@ -32,9 +34,12 @@ import {
 } from "./config.mjs";
 import {
   NO_PICTURE_TAG,
+  pageFingerprint,
   pictureFiles,
+  readManifest,
   shotsOf,
   storyKey,
+  writeManifest,
 } from "./pictures.mjs";
 import { storyId } from "./story-tree.mjs";
 
@@ -42,6 +47,7 @@ const args = process.argv.slice(2);
 const only = [];
 let storybook = process.env.STORYBOOK_URL || "storybook-static";
 let missingOnly = false;
+let changedOnly = false;
 for (let index = 0; index < args.length; index += 1) {
   if (args[index] === "--only") {
     while (args[index + 1] && !args[index + 1].startsWith("--")) {
@@ -51,6 +57,8 @@ for (let index = 0; index < args.length; index += 1) {
     storybook = args[(index += 1)];
   } else if (args[index] === "--missing") {
     missingOnly = true;
+  } else if (args[index] === "--changed") {
+    changedOnly = true;
   } else {
     console.error(`unknown option ${args[index]}`);
     process.exit(2);
@@ -132,7 +140,7 @@ const serveStatic = (dir) =>
       }
       response.writeHead(200, {
         "Content-Type": MIME[path.extname(file)] ?? "application/octet-stream",
-        "Cache-Control": "no-store",
+        "Cache-Control": "max-age=3600",
       });
       fs.createReadStream(file).pipe(response);
     });
@@ -190,6 +198,7 @@ const TRANSPARENT =
 
 /** A story in story view, cropped to what it paints. */
 const shootStory = async (page, base, id, recipe, file) => {
+  await page.setViewportSize(VIEWPORT);
   await page.goto(
     `${base}/iframe.html?id=${id}&viewMode=story&globals=canvas:transparent`,
     { waitUntil: "networkidle" },
@@ -492,11 +501,27 @@ const jobsOf = ({ page, category }) => {
   return { jobs, skipped };
 };
 
+const manifest = readManifest(ROOT);
+const fingerprints = new Map();
 const queue = [];
 const skipped = [];
+let unchanged = 0;
 for (const item of pages) {
+  const key = `${item.category.slug}/${item.page.slug}`;
+  const fingerprint = pageFingerprint(ROOT, item.page);
+  fingerprints.set(key, fingerprint);
+  const onDisk = () =>
+    shotsOf(item.page).every((shot) =>
+      pictureFiles(ROOT, item.category, item.page, shot.name).every((file) =>
+        fs.existsSync(file),
+      ),
+    );
+  if (changedOnly && manifest[key] === fingerprint && onDisk()) {
+    unchanged += 1;
+    continue;
+  }
   const resolved = jobsOf(item);
-  queue.push(...resolved.jobs);
+  queue.push(...resolved.jobs.map((job) => ({ ...job, key })));
   skipped.push(...resolved.skipped);
 }
 
@@ -534,7 +559,16 @@ console.log(`Taking ${total} picture(s) with ${SHOT_WORKERS} workers...`);
 // fifty pictures can take longer than that, and a quiet log reads as a hang.
 const heartbeat = setInterval(() => console.log(progress()), HEARTBEAT_MS);
 
+// One context per theme for the worker's whole run: the preview bundle is
+// fetched and parsed once per context, then served from its cache. A page
+// is replaced after a failure, whatever state the failure left it in.
 const worker = async () => {
+  const contexts = {};
+  const pages = {};
+  for (const [name, theme] of Object.entries(THEMES)) {
+    contexts[name] = await newContext(browser, theme);
+    pages[name] = await contexts[name].newPage();
+  }
   while (queue.length > 0) {
     const job = queue.shift();
     inFlight.add(job);
@@ -542,25 +576,28 @@ const worker = async () => {
     try {
       // The args table is data, read once; a picture is taken per theme.
       const themes =
-        job.shot.kind === "controls" ? [THEMES.light] : Object.values(THEMES);
-      for (const [i, theme] of themes.entries()) {
-        const context = await newContext(browser, theme);
+        job.shot.kind === "controls" ? ["light"] : Object.keys(THEMES);
+      for (const [i, name] of themes.entries()) {
         try {
-          await job.run(await context.newPage(), served.url, job.files[i]);
-        } finally {
-          await context.close();
+          await job.run(pages[name], served.url, job.files[i]);
+        } catch (error) {
+          await pages[name].close().catch(() => {});
+          pages[name] = await contexts[name].newPage();
+          throw error;
         }
       }
       done += 1;
     } catch (error) {
-      failed.push(
-        `${job.page.source} (${job.shot.name}): ${error.message.split("\n")[0]}`,
-      );
+      failed.push({
+        key: job.key,
+        line: `${job.page.source} (${job.shot.name}): ${error.message.split("\n")[0]}`,
+      });
     } finally {
       inFlight.delete(job);
     }
     if ((done + failed.length) % 50 === 0) console.log(progress());
   }
+  for (const context of Object.values(contexts)) await context.close();
 };
 
 await Promise.all(Array.from({ length: SHOT_WORKERS }, worker));
@@ -568,9 +605,22 @@ clearInterval(heartbeat);
 await browser.close();
 served.close();
 
+// A page whose every shot was taken is recorded as current; one with a
+// failure is forgotten, so the next --changed run retries it. --missing takes
+// a subset of a page's shots and says nothing about the rest.
+if (!missingOnly) {
+  const failedPages = new Set(failed.map(({ key }) => key));
+  for (const [key, fingerprint] of fingerprints) {
+    if (failedPages.has(key)) delete manifest[key];
+    else manifest[key] = fingerprint;
+  }
+  writeManifest(ROOT, manifest);
+}
+
 console.log(
-  `\n${done} picture(s) taken in ${Math.round((Date.now() - started) / 1000)}s -> ${SHOTS_DIR}/`,
+  `\n${done} picture(s) taken in ${Math.round((Date.now() - started) / 1000)}s -> ${SHOTS_DIR}/` +
+    (changedOnly ? `, ${unchanged} page(s) unchanged since the last run` : ""),
 );
 for (const line of skipped) console.log(`[skip] ${line}`);
-for (const line of failed) console.error(`[fail] ${line}`);
+for (const { line } of failed) console.error(`[fail] ${line}`);
 if (failed.length > 0) process.exit(1);
