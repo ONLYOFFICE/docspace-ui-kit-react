@@ -3,7 +3,9 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
+
+import { WhenVisible } from "../../.storybook/utils/WhenVisible";
 
 import { TextInput } from ".";
 import { InputSize, InputType } from "./TextInput.enums";
@@ -671,15 +673,19 @@ export const BoldText: Story = {
 
 export const AutoFocused: Story = {
   render: () => (
-    <ControlledInput
-      isAutoFocussed
-      placeholder="Focused as soon as it mounts"
-    />
+    <WhenVisible>
+      <ControlledInput
+        isAutoFocussed
+        placeholder="Focused as soon as it mounts"
+      />
+    </WhenVisible>
   ),
   play: async ({ canvas }) => {
-    await expect(
-      canvas.getByPlaceholderText("Focused as soon as it mounts"),
-    ).toHaveFocus();
+    await waitFor(() =>
+      expect(
+        canvas.getByPlaceholderText("Focused as soon as it mounts"),
+      ).toHaveFocus(),
+    );
   },
   parameters: {
     noPadding: true,

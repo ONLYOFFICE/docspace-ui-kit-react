@@ -2,8 +2,9 @@ import type { CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { DateTime } from "luxon";
-import { expect, fn, within } from "storybook/test";
+import { expect, fn, waitFor, within } from "storybook/test";
 
+import { WhenVisible } from "../../.storybook/utils/WhenVisible";
 import { createDateTime } from "../../utils/date";
 
 import { TimePicker, type TimePickerProps } from ".";
@@ -257,15 +258,20 @@ export const TwelveHourFormat: Story = {
 };
 
 export const FocusOnRender: Story = {
-  render: (args) => <WrappedTemplate {...args} />,
+  // Mounted once on screen: a hidden field cannot take the focus.
+  render: (args) => (
+    <WhenVisible>
+      <WrappedTemplate {...args} />
+    </WhenVisible>
+  ),
   args: {
     initialTime: createDateTime(2025, 1, 27, 10, 30, 0),
     focusOnRender: true,
   },
   play: async ({ canvas, userEvent }) => {
     // The hours field takes the digits without a click.
-    const hours = canvas.getByLabelText("Hours");
-    await expect(hours).toHaveFocus();
+    const hours = await canvas.findByLabelText("Hours");
+    await waitFor(() => expect(hours).toHaveFocus());
     await userEvent.keyboard("14");
     await expect(hours).toHaveValue("14");
     await expect(canvas.getByLabelText("Minutes")).toHaveFocus();
