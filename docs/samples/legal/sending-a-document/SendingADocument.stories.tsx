@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 
 import { withDemoBanner } from "../../../../.storybook/decorators/PortalGate";
 
@@ -20,4 +21,15 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  play: async ({ canvas, userEvent }) => {
+    // Send it opens a drop zone for that request, and closes it again.
+    const send = await waitFor(
+      () => canvas.getAllByRole("button", { name: "Send it" })[0],
+    );
+    await userEvent.click(send);
+    await expect(canvas.getByText("Choose a file")).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Not now" }));
+    await expect(canvas.queryByText("Choose a file")).toBeNull();
+  },
+};
