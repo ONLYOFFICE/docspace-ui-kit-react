@@ -376,6 +376,17 @@ const WithIconBorderTemplate = () => {
 
 export const WithIconBorder: Story = {
   render: () => <WithIconBorderTemplate />,
+  play: async ({ canvas }) => {
+    // A rounded 32px box around the dots; the default theme draws no line.
+    const button = canvas.getByTestId("context-menu-button");
+    const rect = button.getBoundingClientRect();
+    await expect([Math.round(rect.width), Math.round(rect.height)]).toEqual([
+      32, 32,
+    ]);
+    await expect(
+      parseFloat(getComputedStyle(button).borderRadius),
+    ).toBeGreaterThan(0);
+  },
   parameters: {
     docs: {
       description: {
@@ -444,6 +455,24 @@ const CustomColorsTemplate = () => {
 
 export const CustomColors: Story = {
   render: () => <CustomColorsTemplate />,
+  play: async ({ canvas }) => {
+    // Blue, green and red, in the order they are drawn.
+    const colours = [
+      "rgb(45, 167, 219)",
+      "rgb(76, 175, 80)",
+      "rgb(255, 87, 34)",
+    ];
+    const buttons = canvas.getAllByTestId("context-menu-button");
+    for (const [index, colour] of colours.entries()) {
+      // The dots are fetched and inlined after mounting.
+      const path = await waitFor(() => {
+        const found = buttons[index].querySelector("svg path");
+        if (!found) throw new Error("The icon has not loaded yet");
+        return found;
+      });
+      await expect(getComputedStyle(path).fill).toBe(colour);
+    }
+  },
   parameters: {
     docs: {
       description: {
