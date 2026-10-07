@@ -327,9 +327,22 @@ const shown = (label: string) =>
 
 const submit = () => screen.getByTestId("selector_submit_button");
 
+// While a folder loads, its list stays on screen dimmed and takes no clicks.
+const pick = async (label: string) => {
+  const target = await waitFor(
+    () => {
+      const found = row(label);
+      expect(getComputedStyle(found).pointerEvents).not.toBe("none");
+      return found;
+    },
+    { timeout: 3000 },
+  );
+  await userEvent.click(target);
+};
+
 // Opens a room or folder and waits for something inside it.
 const opens = async (label: string, inside: string) => {
-  await userEvent.click(row(label));
+  await pick(label);
   await shown(inside);
 };
 
@@ -498,7 +511,7 @@ export const WithFileTypeFilter: Story = {
     await opens("Contracts 2026", "Signed");
     // File rows drop the extension.
     await opens("Signed", "Contoso supply agreement");
-    await userEvent.click(row("Contoso supply agreement"));
+    await pick("Contoso supply agreement");
     await expect(submit()).toBeEnabled();
   },
   args: {

@@ -268,8 +268,17 @@ export const WithInit: Story = {
   play: async ({ args }: PlayContext) => {
     // The selector still fetches its first page on mount, so the list that
     // settles is whatever the portal answers; only the picking is checked.
-    await waitFor(() => expect(rows().length).toBeGreaterThan(0));
-    await userEvent.click(rows()[0]);
+    // A click that lands while that page loads is ignored, so pick again
+    // until Select comes on; the pause keeps a second click from unpicking.
+    await waitFor(
+      async () => {
+        if (submit().hasAttribute("disabled")) {
+          await userEvent.click(rows()[0]);
+        }
+        expect(submit()).toBeEnabled();
+      },
+      { interval: 500, timeout: 8000 },
+    );
     await userEvent.click(submit());
     await expect(args.onSubmit).toHaveBeenCalledTimes(1);
   },
