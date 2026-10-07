@@ -2,7 +2,7 @@ import type { ComponentProps, CSSProperties } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 import { Badge } from "../badge";
@@ -115,6 +115,19 @@ const meta = {
 type Story = StoryObj<ComponentProps<typeof Tabs>>;
 
 export default meta;
+
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+const tab = (canvas: PlayContext["canvas"], id: string) =>
+  canvas.getAllByTestId(`${id}_subtab`)[0];
+
+const width = (element: Element) => element.getBoundingClientRect().width;
+
+// The segmented control's arrows, in the order they appear on screen.
+const arrowsOnScreen = (root: HTMLElement) =>
+  Array.from(root.querySelectorAll<HTMLElement>('[class*="arrowIcon"]')).sort(
+    (a, b) => a.getBoundingClientRect().x - b.getBoundingClientRect().x,
+  );
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
   <div style={{ height: "170px" }}>{children}</div>
@@ -240,6 +253,17 @@ export const Secondary: Story = {
 
 export const Scaled: Story = {
   render: (args) => <Template {...args} />,
+  play: async ({ args, canvas, userEvent }) => {
+    // Every tab an equal share of the row.
+    const widths = ["Overview", "Documents", "Milestones", "Time"].map((id) =>
+      Math.round(width(tab(canvas, id))),
+    );
+    await expect(new Set(widths).size).toBe(1);
+    await userEvent.click(tab(canvas, "Time"));
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: "Time" }),
+    );
+  },
   args: {
     items: data,
     type: TabsTypes.Secondary,
@@ -270,6 +294,11 @@ export const Scaled: Story = {
 
 export const Loading: Story = {
   render: (args) => <Template {...args} />,
+  play: async ({ canvas }) => {
+    // The bar waits for its labels; the selected content shows meanwhile.
+    await expect(tab(canvas, "Overview")).not.toBeVisible();
+    await expect(canvas.getByText("Overview content")).toBeVisible();
+  },
   args: {
     items: data,
     type: TabsTypes.Secondary,
@@ -304,6 +333,15 @@ const badgeItems: TTabItem[] = data.map((item, index) =>
 
 export const WithBadges: Story = {
   render: (args) => <Template {...args} />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("Overview_tab")).toHaveTextContent(
+      "Overview3",
+    );
+    await expect(canvas.getByTestId("Documents_tab")).toHaveTextContent(
+      "Documents4",
+    );
+    await expect(canvas.getByTestId("Time_tab")).toHaveTextContent(/^Time$/);
+  },
   args: {
     items: badgeItems,
     selectedItemId: badgeItems[0].id,
@@ -339,6 +377,18 @@ const iconItems: TTabItem[] = data.map((item) => ({
 
 export const WithIcons: Story = {
   render: (args) => <Template {...args} />,
+  play: async ({ args, canvas, userEvent }) => {
+    // The icons are fetched and inlined after mounting.
+    for (const id of ["Overview", "Documents", "Time"]) {
+      await waitFor(() =>
+        expect(tab(canvas, id).querySelector("svg")).not.toBeNull(),
+      );
+    }
+    await userEvent.click(tab(canvas, "Milestones"));
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: "Milestones" }),
+    );
+  },
   args: {
     items: iconItems,
     type: TabsTypes.Secondary,
@@ -379,6 +429,17 @@ const animatedItems: TTabItem[] = data.map((item) => ({
 
 export const AnimatedSelection: Story = {
   render: (args) => <Template {...args} />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByTestId("Documents_tab"));
+    // The old content stays while the tab's onClick promise runs.
+    await expect(canvas.getByText("Overview content")).toBeVisible();
+    await waitFor(
+      () =>
+        expect(canvas.getByText("Documents", { selector: "p" })).toBeVisible(),
+      { timeout: 4000 },
+    );
+    await expect(canvas.queryByText("Overview content")).toBeNull();
+  },
   args: {
     items: animatedItems,
     withAnimation: true,
@@ -438,6 +499,23 @@ export const WithStickyHeader: Story = {
         />
       </div>
     );
+  },
+  play: async ({ canvas }) => {
+    const heading = canvas.getByText("Project files");
+    const box = heading.closest<HTMLElement>('[style*="overflow"]');
+    if (!box) throw new Error("No scrolling box");
+    const before = heading.getBoundingClientRect().top;
+    // Scrolled, the heading and the bar stay at the top of the box.
+    box.scrollTop = 200;
+    await waitFor(() =>
+      expect(
+        canvas.getByText("Overview entry 1").getBoundingClientRect().top,
+      ).toBeLessThan(box.getBoundingClientRect().top),
+    );
+    await expect(Math.round(heading.getBoundingClientRect().top)).toBe(
+      Math.round(before),
+    );
+    await expect(canvas.getByTestId("Overview_tab")).toBeVisible();
   },
   args: {
     items: longItems,
@@ -509,6 +587,21 @@ const OverflowTemplate = (args: TabsProps) => {
 
 export const OverflowingTabs: Story = {
   render: (args) => <OverflowTemplate {...args} />,
+  play: async ({ args, canvasElement }) => {
+    // The underlined row scrolls sideways.
+    const row = canvasElement.querySelector<HTMLElement>(
+      '[data-testid="Templates_tab"]',
+    )?.parentElement;
+    if (!row) throw new Error("No primary row");
+    await expect(row.scrollWidth).toBeGreaterThan(row.clientWidth);
+
+    // The segmented control's right arrow selects the next tab.
+    const [, right] = arrowsOnScreen(canvasElement);
+    right.click();
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: "Documents" }),
+    );
+  },
   args: {
     items: manyItems,
     selectedItemId: manyItems[0].id,
@@ -546,6 +639,17 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ args, canvasElement }) => {
+    // The arrows swap sides: on screen the left one selects the next tab,
+    // and the right one, with the first tab selected, selects nothing.
+    const [left, right] = arrowsOnScreen(canvasElement);
+    right.click();
+    await expect(args.onSelect).not.toHaveBeenCalled();
+    left.click();
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: "Documents" }),
+    );
+  },
   args: {
     items: manyItems,
     selectedItemId: manyItems[0].id,
@@ -628,6 +732,21 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    const bar = canvas
+      .getAllByTestId("Overview_tab")[0]
+      .closest("[data-sticky]") as HTMLElement;
+    // The bar's own height; its bottom border comes on top.
+    await expect(bar).toHaveStyle({ height: "36px" });
+    // The selected segment takes the active text colour; its background is
+    // the sliding marker behind it.
+    await expect(canvas.getAllByText("Overview")[1]).toHaveStyle({
+      color: "rgb(255, 255, 255)",
+    });
+    await expect(canvas.getAllByText("Documents")[1]).toHaveStyle({
+      color: "rgb(109, 40, 217)",
+    });
+  },
   parameters: {
     docs: {
       // Framed: the keyboard handler listens on the window and would take keys from the Docs page.
