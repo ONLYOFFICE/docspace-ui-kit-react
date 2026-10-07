@@ -1,6 +1,7 @@
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 
 import ApiProvider from "./ApiProvider";
 
@@ -86,6 +87,12 @@ export const Default: Story = {
     // Off: with it on, the story fetches the settings of and opens a socket
     // to a portal that does not exist, from every Storybook that opens it.
     initSocket: false,
+  },
+  play: async ({ canvas }) => {
+    // The children render; with initSocket off nothing reaches the network.
+    await expect(
+      canvas.getByText(/Children are rendered with access to API clients/),
+    ).toBeVisible();
   },
   parameters: {
     docs: {
