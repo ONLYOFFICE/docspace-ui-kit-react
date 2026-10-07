@@ -510,17 +510,14 @@ for (const item of pages) {
   const key = `${item.category.slug}/${item.page.slug}`;
   const fingerprint = pageFingerprint(ROOT, item.page);
   fingerprints.set(key, fingerprint);
-  const onDisk = () =>
-    shotsOf(item.page).every((shot) =>
-      pictureFiles(ROOT, item.category, item.page, shot.name).every((file) =>
-        fs.existsSync(file),
-      ),
-    );
-  if (changedOnly && manifest[key] === fingerprint && onDisk()) {
+  const resolved = jobsOf(item);
+  const onDisk = resolved.jobs.every((job) =>
+    job.files.every((file) => fs.existsSync(file)),
+  );
+  if (changedOnly && manifest[key] === fingerprint && onDisk) {
     unchanged += 1;
     continue;
   }
-  const resolved = jobsOf(item);
   queue.push(...resolved.jobs.map((job) => ({ ...job, key })));
   skipped.push(...resolved.skipped);
 }
