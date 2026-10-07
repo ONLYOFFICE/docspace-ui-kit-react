@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, screen, userEvent, waitFor } from "storybook/test";
 import {
   FolderType,
   RoomType,
@@ -311,6 +312,32 @@ const getIsDisabled = (
   return false;
 };
 
+// The story's own handlers answer with a toast, so a submit is read back
+// from it. The demo portal holds the rooms and folders.
+const row = (label: string) => {
+  const found = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-testid^="selector-item-"]'),
+  ).find((item) => item.textContent?.includes(label));
+  if (!found) throw new Error(`No row labelled ${label}`);
+  return found;
+};
+
+const shown = (label: string) =>
+  waitFor(() => expect(row(label)).toBeVisible(), { timeout: 3000 });
+
+const submit = () => screen.getByTestId("selector_submit_button");
+
+// Opens a room or folder and waits for something inside it.
+const opens = async (label: string, inside: string) => {
+  await userEvent.click(row(label));
+  await shown(inside);
+};
+
+const toast = (text: string) =>
+  waitFor(() => expect(screen.getByText(text)).toBeVisible(), {
+    timeout: 3000,
+  });
+
 const getFilesArchiveError = (name: string) =>
   `"${name}" is in the archive and cannot be used as a destination.`;
 
@@ -352,6 +379,20 @@ const Template = (props: StoryArgs) => (
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async () => {
+    await shown("Contracts 2026");
+    // The rooms list itself is not a destination.
+    await expect(submit()).toBeDisabled();
+
+    // Inside a room the room itself is the destination.
+    await opens("Contracts 2026", "Signed");
+    await expect(submit()).toBeEnabled();
+    await userEvent.click(submit());
+    await toast('Saved to "Contracts 2026"');
+
+    await userEvent.click(screen.getByTestId("selector_cancel_button"));
+    await toast("Cancelled");
+  },
   args: {
     isPanelVisible: true,
     embedded: true,
@@ -379,6 +420,11 @@ export const Default: Story = {
 
 export const RoomsOnly: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async () => {
+    await shown("Contracts 2026");
+    await expect(submit()).toHaveTextContent("Move here");
+    await expect(submit()).toBeDisabled();
+  },
   args: {
     isPanelVisible: true,
     embedded: true,
@@ -406,6 +452,17 @@ export const RoomsOnly: Story = {
 
 export const WithFooterInput: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async () => {
+    await shown("Contracts 2026");
+    const name = screen.getByDisplayValue("My Document");
+    await expect(screen.getByText("File name")).toBeVisible();
+
+    await opens("Contracts 2026", "Signed");
+    await userEvent.clear(name);
+    await userEvent.type(name, "Signed copy");
+    await userEvent.click(submit());
+    await toast('Saved to "Contracts 2026" as "Signed copy"');
+  },
   args: {
     isPanelVisible: true,
     embedded: true,
@@ -433,6 +490,17 @@ export const WithFooterInput: Story = {
 
 export const WithFileTypeFilter: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async () => {
+    await shown("Contracts 2026");
+    await expect(screen.getByText("Select a PDF file")).toBeVisible();
+
+    // Only PDFs are offered inside a folder.
+    await opens("Contracts 2026", "Signed");
+    // File rows drop the extension.
+    await opens("Signed", "Contoso supply agreement");
+    await userEvent.click(row("Contoso supply agreement"));
+    await expect(submit()).toBeEnabled();
+  },
   args: {
     isPanelVisible: true,
     embedded: true,
@@ -462,6 +530,10 @@ export const WithFileTypeFilter: Story = {
 
 export const WithRoomCreation: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async () => {
+    await shown("Contracts 2026");
+    await expect(screen.getByText("Create new room")).toBeVisible();
+  },
   args: {
     isPanelVisible: true,
     embedded: true,
@@ -490,6 +562,12 @@ export const WithRoomCreation: Story = {
 };
 
 export const AsidePanel: Story = {
+  play: async () => {
+    await shown("Contracts 2026");
+    await opens("Contracts 2026", "Signed");
+    await userEvent.click(submit());
+    await toast('Saved to "Contracts 2026"');
+  },
   render: (props: StoryArgs) => (
     <div
       style={{
@@ -540,6 +618,13 @@ export const AsidePanel: Story = {
 
 export const WithHeader: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
+  play: async () => {
+    await shown("Contracts 2026");
+    await expect(screen.getByText("Select destination")).toBeVisible();
+    // The header's close is wired to onCancel.
+    await userEvent.click(screen.getByTestId("aside_header_close_icon_button"));
+    await toast("Cancelled");
+  },
   args: {
     isPanelVisible: true,
     embedded: true,
