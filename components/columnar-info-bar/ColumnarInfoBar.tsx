@@ -26,6 +26,18 @@ const ColumnarInfoBar = ({
         : "";
   const className = [styles.bar, variantClass].filter(Boolean).join(" ");
 
+  // A description list, so each label is announced as the term for its value.
+  const list = (
+    <dl className={styles.columns}>
+      {columns.map(({ label, value }, i) => (
+        <div key={i} className={styles.column}>
+          <dt className={styles.label}>{label}</dt>
+          <dd className={styles.value}>{value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+
   if (variant === "page") {
     return (
       <div className={className} style={style}>
@@ -42,30 +54,18 @@ const ColumnarInfoBar = ({
             </button>
           ) : null}
         </div>
-        <div className={styles.columns}>
-          {columns.map(({ label, value }, i) => (
-            <div key={i} className={styles.column}>
-              <div className={styles.label}>{label}</div>
-              <div className={styles.value}>{value}</div>
-            </div>
-          ))}
-        </div>
+        {list}
       </div>
     );
   }
 
+  // The default and neutral bars appear in response to something, so they
+  // are a polite live region; the page block is static content.
   return (
-    <div className={className} style={style}>
+    <div className={className} style={style} role="status">
       <div className={styles.content}>
         {headerText ? <h3 className={styles.header}>{headerText}</h3> : null}
-        <div className={styles.columns}>
-          {columns.map(({ label, value }, i) => (
-            <div key={i} className={styles.column}>
-              <div className={styles.label}>{label}</div>
-              <div className={styles.value}>{value}</div>
-            </div>
-          ))}
-        </div>
+        {list}
       </div>
       {onAction ? (
         <button

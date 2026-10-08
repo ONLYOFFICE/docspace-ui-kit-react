@@ -77,9 +77,14 @@ export const Default: Story = {
     await expect(
       canvas.getByRole("heading", { level: 3, name: "Document details" }),
     ).toBeVisible();
-    // Each label sits above its value.
+    // Each label sits above its value, as a term and its description.
     const owner = canvas.getByText("Owner");
+    await expect(owner.tagName).toBe("DT");
     await expect(owner.nextElementSibling).toHaveTextContent("Team member");
+    await expect(owner.nextElementSibling?.tagName).toBe("DD");
+    await expect(canvas.getAllByRole("term")).toHaveLength(4);
+    // The bar is a polite live region.
+    await expect(canvas.getByRole("status")).toContainElement(owner);
     // No onAction, no close button.
     await expect(canvas.queryByRole("button")).toBeNull();
   },
@@ -202,6 +207,9 @@ export const NeutralVariant: Story = {
         canvas.getByRole("heading", { name: "Before you start" }),
       ).toBeVisible(),
     );
+    // Once the reveal ends the 150px cap no longer applies.
+    const card = canvas.getByRole("status");
+    await waitFor(() => expect(getComputedStyle(card).maxHeight).toBe("none"));
     await userEvent.click(canvas.getByRole("button", { name: "Close" }));
     await expect(args.onAction).toHaveBeenCalledTimes(1);
   },

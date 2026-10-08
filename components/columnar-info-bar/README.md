@@ -184,11 +184,10 @@ export function ErrorFacts() {
   column the full width, so the pairs stack one under another.
 - **`variant="neutral"` is a card, not a bar**: no accent edge, 8px corners, a 2px light-blue
   border and a blue heading, in both themes.
-- **`variant="neutral"` caps its own height at 150px, permanently.** It opens with a 0.4s
-  animation from `max-height: 0` to `max-height: 150px`, declared `both`, so the end frame keeps
-  applying after the animation finishes. Content taller than that spills out of the bar and over
-  whatever follows it. The same variant also adds `margin: 4px` and sets its width to
-  `calc(100% - 8px)`.
+- **`variant="neutral"` slides open.** It reveals itself over 0.4s, from `max-height: 0` to
+  `max-height: 150px`; once the animation ends the cap is gone and the card takes the height of
+  its content, so a taller card grows to its full height at the end of the reveal. The same
+  variant also adds `margin: 4px` and sets its width to `calc(100% - 8px)`.
 - **`variant="page"` stays two columns at every width.** The grid is a fixed
   `repeat(2, 1fr)`; only the default and `neutral` variants give each column the full width
   below 600px.
@@ -224,17 +223,22 @@ element under both the light and the dark theme — and `neutral` and `page` add
 
 ## Accessibility
 
-- The bar is a plain `<div>` with no role, and so are the columns — a screen reader reads each
-  label and value as consecutive text with nothing tying the pair together. Put the association
-  in the wording (`"Status: 200 OK"`) when it matters.
+- The columns are a description list: a `<dl>` whose pairs are `<dt>` (the label) and `<dd>`
+  (the value), each pair grouped in a `<div>`. A screen reader announces the list and reads each
+  value as the description of its label. Keep `label` to phrasing content — a heading inside a
+  `<dt>` is not allowed.
 - The close button is a real `<button>`, reached with Tab and pressed with Enter or Space, whose
   `aria-label` is `closeLabel`. It defaults to the English `"Close"`, so pass a translated
   string in a localised interface; without `onAction` there is no button and the prop is
   ignored.
 - `headerText` renders as an `<h3>`. Check that level against the page around it — the component
   does not adapt it, so a bar placed under an `<h1>` skips `<h2>`.
-- Nothing here traps focus or moves it, and the bar does not announce itself when it appears —
-  wrap it in a live region if it arrives in response to something the user did.
+- The default and `neutral` bars carry `role="status"`, a polite live region, because they
+  appear in response to something. A screen reader announces changes to a live region already on
+  the page; a bar that mounts already filled may be read only when the user reaches it, so keep
+  it mounted and change its content when the announcement matters. The `page` variant is static
+  content and has no role.
+- Nothing here traps focus or moves it.
 
 ## Test ids
 

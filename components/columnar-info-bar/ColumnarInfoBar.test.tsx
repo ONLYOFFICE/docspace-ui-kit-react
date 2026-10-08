@@ -22,6 +22,38 @@ describe("ColumnarInfoBar", () => {
   });
 
   it.each(["default", "neutral", "page"] as const)(
+    "renders the pairs as a description list (%s variant)",
+    (variant) => {
+      const { container } = render(
+        <ColumnarInfoBar columns={columns} variant={variant} />,
+      );
+
+      expect(container.querySelector("dl")).not.toBeNull();
+      const terms = screen.getAllByRole("term");
+      expect(terms.map((t) => t.textContent)).toEqual([
+        "Name",
+        "Email",
+        "Status",
+      ]);
+      expect(terms[0].nextElementSibling?.tagName).toBe("DD");
+      expect(terms[0].nextElementSibling).toHaveTextContent("John Smith");
+    },
+  );
+
+  it.each(["default", "neutral"] as const)(
+    "is a status live region (%s variant)",
+    (variant) => {
+      render(<ColumnarInfoBar columns={columns} variant={variant} />);
+      expect(screen.getByRole("status")).toHaveTextContent("John Smith");
+    },
+  );
+
+  it("is not a live region in the page variant", () => {
+    render(<ColumnarInfoBar columns={columns} variant="page" />);
+    expect(screen.queryByRole("status")).toBeNull();
+  });
+
+  it.each(["default", "neutral", "page"] as const)(
     "renders headerText as a level-3 heading (%s variant)",
     (variant) => {
       render(

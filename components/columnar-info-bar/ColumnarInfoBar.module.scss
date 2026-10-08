@@ -41,9 +41,11 @@
   color: var(--cib-header-color, var(--cib-accent));
 }
 
+// A <dl>: reset the user-agent list margins.
 .columns {
   display: flex;
   flex-wrap: wrap;
+  margin: 0;
   padding: 4px 0;
 }
 
@@ -65,7 +67,9 @@
   margin-bottom: 10px;
 }
 
+// A <dd>: reset the user-agent indent.
 .value {
+  margin: 0;
   font-weight: 600;
   font-size: 13px;
   display: flex;
@@ -192,7 +196,10 @@
   border-radius: 8px;
   margin: 4px;
   width: calc(100% - 8px);
-  animation: barReveal 0.4s ease-out both;
+  // `backwards`, not `both`: the start frame applies during the delay, and
+  // once the reveal ends the bar drops the 150px cap and takes the height of
+  // its content.
+  animation: barReveal 0.4s ease-out backwards;
 
   :global(.light) & {
     --cib-bg: #{colors.$gray-light};
