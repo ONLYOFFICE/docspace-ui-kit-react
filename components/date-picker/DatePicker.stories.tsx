@@ -186,6 +186,19 @@ export const Default: Story = {
     const selector = canvas.getByTestId("date-selector");
     await expect(selector).toHaveAttribute("aria-expanded", "false");
     await expect(canvas.queryByTestId("calendar")).toBeNull();
+    // One button, not the selector with AddButton's own button inside it.
+    await expect(
+      canvas.getAllByRole("button", { name: "Select date" }),
+    ).toEqual([selector]);
+
+    // The selector opens and closes from the keyboard.
+    selector.focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(selector).toHaveAttribute("aria-expanded", "true");
+    await expect(canvas.getByTestId("calendar")).toBeVisible();
+    await userEvent.keyboard(" ");
+    await expect(selector).toHaveAttribute("aria-expanded", "false");
+    await expect(canvas.queryByTestId("calendar")).toBeNull();
 
     await userEvent.click(selector);
     await expect(selector).toHaveAttribute("aria-expanded", "true");
@@ -223,7 +236,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The picker as a form shows it before a date is chosen: click **Select date** to open the calendar, pick a day to turn the button into a chip, and change any other prop live in the Controls panel below.",
+          "The picker as a form shows it before a date is chosen: click **Select date**, or focus it and press Enter or Space, to open the calendar, pick a day to turn the button into a chip, and change any other prop live in the Controls panel below.",
       },
       source: {
         code: `const [date, setDate] = useState<DateTime | null>(null);

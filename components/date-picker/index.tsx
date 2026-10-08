@@ -67,6 +67,13 @@ const DatePicker = (props: DatePickerProps) => {
     setIsCalendarOpen(false);
   };
 
+  const onSelectorKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggleCalendar();
+    }
+  };
+
   const handleChange = (d: null | DateTime) => {
     onChange?.(d);
     setDate(d);
@@ -140,14 +147,19 @@ const DatePicker = (props: DatePickerProps) => {
           aria-label={selectDateText}
           aria-expanded={isCalendarOpen}
           tabIndex={0}
+          onKeyDown={onSelectorKeyDown}
         >
-          <AddButton
-            title={selectDateText}
-            className="add-delivery-date-button"
-            iconNode={<CalendarIcon />}
-            label={selectDateText}
-            noSelect
-          />
+          {/* AddButton draws itself as a role="button" of its own; hidden from
+              assistive technology so the selector is the one button announced. */}
+          <span aria-hidden="true" className={styles.addButton}>
+            <AddButton
+              title={selectDateText}
+              className="add-delivery-date-button"
+              iconNode={<CalendarIcon />}
+              label={selectDateText}
+              noSelect
+            />
+          </span>
         </div>
       ) : null}
 
