@@ -634,9 +634,10 @@ export const WithHeader: Story = {
   play: async () => {
     await shown("Contracts 2026");
     await expect(screen.getByText("Select destination")).toBeVisible();
-    // The header's close is wired to onCancel.
+    // The header's close calls headerProps.onCloseClick, not onCancel.
     await userEvent.click(screen.getByTestId("aside_header_close_icon_button"));
-    await toast("Cancelled");
+    await toast("Closed from the header");
+    await expect(screen.queryByText("Cancelled")).toBeNull();
   },
   args: {
     isPanelVisible: true,
@@ -649,7 +650,9 @@ export const WithHeader: Story = {
     withHeader: true,
     headerProps: {
       headerLabel: "Select destination",
-      onCloseClick: () => {},
+      onCloseClick: () => {
+        toastr.info("Closed from the header");
+      },
     },
     withSearch: true,
     withBreadCrumbs: true,

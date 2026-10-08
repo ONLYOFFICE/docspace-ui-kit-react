@@ -136,7 +136,8 @@ const useSelectorBody = ({
         headerProps: {
           ...headerProps,
           headerLabel: headerProps?.headerLabel || t("SelectAction"),
-          onCloseClick: onCancel,
+          // The caller's own close handler wins; onCancel is the fallback.
+          onCloseClick: headerProps?.onCloseClick ?? onCancel,
         },
       }
     : {};

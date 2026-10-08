@@ -11,6 +11,7 @@ A comprehensive file and folder browser selector for navigating the DocSpace fil
 - Supports room creation via `withCreate` + `createDefineRoomLabel`/`createDefineRoomType`
 - Real-time updates via WebSocket subscriptions
 - Renders in a Portal on mobile/tablet devices
+- With `withHeader`, the header's close cross calls `headerProps.onCloseClick`; `onCancel` is called there only when `headerProps` has no `onCloseClick`. The footer's Cancel button always calls `onCancel`
 - Supports SSR initialization with pre-fetched data
 - Validates folder write access via `checkCreating` (creates and deletes a test file)
 - Handles third-party storage providers
