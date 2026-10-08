@@ -250,8 +250,11 @@ export function TimezoneMenu({ zones }: { zones: string[] }) {
   the menu lines up with the anchor's right edge instead of its left.
 - **Nothing closes the menu by itself.** `open` is yours, and `clickOutsideAction` is called by
   the backdrop and by the DOM events you list in `eventTypes` — there is no Escape handling and
-  no default event list. On a mobile device the component registers a single event type spelled
-  `"click, touchend"`, which no browser ever fires.
+  no default event list on a desktop. On a mobile device the component listens for `click` and
+  `touchend` on `window` unless you pass `eventTypes` yourself or set `forceCloseClickOutside`.
+- **One backdrop.** With `withBackdrop` the menu renders a single `Backdrop`: beside the menu at
+  z-index 199, or inside the portal at 400 with `usePortalBackdrop`. A `backDrop` you pass
+  replaces it in either position.
 - The element is always in the DOM and `display: none` until `open`. Its width comes from
   `manualWidth`, not from the anchor.
 - The stylesheet's own `max-height` rule is attached to a class the component never sets, so the

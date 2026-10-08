@@ -351,7 +351,7 @@ const DropDown = ({
 
     return (
       <>
-        {isDefaultMode ? backDrop : null}
+        {backDrop}
 
         <div
           ref={setDropDownRef}
@@ -462,8 +462,9 @@ const DropDown = ({
   ]);
 
   React.useEffect(() => {
-    if (!dropDownRef.current) return;
-
+    // No early return on a missing ref: in portal mode the menu element only
+    // appears after the portal mounts, so a menu rendered open would
+    // otherwise never get its listeners.
     const listener = (evt: Event) => {
       const target = evt.target as HTMLElement;
 

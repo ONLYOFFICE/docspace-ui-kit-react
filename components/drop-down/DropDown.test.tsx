@@ -1,5 +1,17 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { screen, fireEvent, render } from "@testing-library/react";
+
+const device = vi.hoisted(() => ({ isMobile: false }));
+
+vi.mock("react-device-detect", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("react-device-detect")>();
+  return {
+    ...actual,
+    get isMobile() {
+      return device.isMobile;
+    },
+  };
+});
 import styles from "./DropDown.module.scss";
 import { DropDown } from ".";
 
@@ -222,6 +234,58 @@ describe("<DropDown />", () => {
 
       expect(document.querySelector(styles.backdrop)).not.toBeInTheDocument();
     });
+
+    it("renders a single backdrop for an open menu", () => {
+      render(
+        <DropDown {...baseProps} open>
+          <div>Content</div>
+        </DropDown>,
+      );
+
+      expect(screen.getAllByTestId("backdrop")).toHaveLength(1);
+    });
+
+    it("renders a single backdrop with usePortalBackdrop", () => {
+      render(
+        <DropDown {...baseProps} open usePortalBackdrop>
+          <div>Content</div>
+        </DropDown>,
+      );
+
+      expect(screen.getAllByTestId("backdrop")).toHaveLength(1);
+    });
+  });
+
+  describe("click outside on a mobile device", () => {
+    afterEach(() => {
+      device.isMobile = false;
+    });
+
+    it.each(["click", "touchend"])(
+      "calls clickOutsideAction on a %s outside the menu",
+      (type) => {
+        device.isMobile = true;
+        const clickOutsideAction = vi.fn();
+
+        render(
+          <DropDown
+            {...baseProps}
+            open
+            withBackdrop={false}
+            clickOutsideAction={clickOutsideAction}
+          >
+            <div>Content</div>
+          </DropDown>,
+        );
+
+        fireEvent(document.body, new Event(type, { bubbles: true }));
+
+        expect(clickOutsideAction).toHaveBeenCalledWith(
+          expect.any(Event),
+          false,
+        );
+      },
+    );
   });
 
   describe("position calculation", () => {

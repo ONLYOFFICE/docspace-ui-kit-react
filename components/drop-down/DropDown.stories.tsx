@@ -275,10 +275,12 @@ const openMenu = async ({ canvas, userEvent }: PlayContext, label: string) => {
 
 const menuClosed = () => waitFor(() => expect(shownMenu()).toBeUndefined());
 
-// An open menu in portal mode renders two backdrops; the click lands on the
-// one painted last.
-const clickOutside = (userEvent: PlayContext["userEvent"]) =>
-  userEvent.click(screen.getAllByTestId("backdrop").at(-1) as HTMLElement);
+// An open menu renders exactly one backdrop; the click outside lands on it.
+const clickOutside = async (userEvent: PlayContext["userEvent"]) => {
+  const backdrops = screen.getAllByTestId("backdrop");
+  await expect(backdrops).toHaveLength(1);
+  await userEvent.click(backdrops[0]);
+};
 
 const BasicTemplate = (args: ComponentProps<typeof DropDown>) => {
   const [isOpen, setIsOpen] = React.useState(false);
