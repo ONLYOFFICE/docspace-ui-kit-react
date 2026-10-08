@@ -234,7 +234,12 @@ const meta = {
     showSkeleton: {
       control: false,
       description:
-        "Ignored; the loader sets it itself after a scroll jump of more than 800px",
+        "Ignored; the loader sets it itself after a scroll jump of more than 800px, and a value passed here never reaches the list",
+    },
+    scrollElement: {
+      control: false,
+      description:
+        "The element that scrolls the list; without it the loader looks for the portal's `#sectionScroll` scroller (`#customScrollBar` on mobile) and falls back to the window",
     },
     smallPreview: {
       control: false,

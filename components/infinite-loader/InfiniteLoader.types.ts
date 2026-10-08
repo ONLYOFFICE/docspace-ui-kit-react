@@ -34,8 +34,10 @@ export type InfiniteLoaderProps = {
   infoPanelVisible?: boolean;
   /** How many tiles fit on a row, in the `tile` layout. */
   countTilesInRow?: number;
-  /** Ignored by the list; the loader sets it itself after a long jump. */
+  /** Ignored: the loader sets it itself after a scroll jump of more than 800px, and a value passed here never reaches the list. */
   showSkeleton?: boolean;
+  /** The element that scrolls the list. Without it the loader looks for the portal's `#sectionScroll` scroller (`#customScrollBar` on mobile) and falls back to the window. */
+  scrollElement?: Element | null;
   /** Identifier of the folder being shown, which resets the grid when it changes. */
   currentFolderId?: string | number;
   /** Renders the tiles in their small form. */
