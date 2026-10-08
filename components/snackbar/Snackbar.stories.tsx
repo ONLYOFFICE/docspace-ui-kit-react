@@ -171,10 +171,20 @@ export const Default: Story = {
     );
     await expect(canvas.getByTestId("snackbar-icon")).toBeInTheDocument();
 
-    // The close cross is the only button; it calls onAction. It has no
-    // accessible name, so it is found by role alone.
-    await userEvent.click(canvas.getByRole("button"));
+    // The bar is a polite live region, so its appearance is announced.
+    await expect(canvas.getByRole("status")).toHaveTextContent(
+      "Important notification message",
+    );
+
+    // The close cross is a named, non-submitting button that calls onAction,
+    // from the keyboard as well as the mouse.
+    const close = canvas.getByRole("button", { name: "Close" });
+    await expect(close).toHaveAttribute("type", "button");
+    await userEvent.click(close);
     await expect(args.onAction).toHaveBeenCalledTimes(1);
+    close.focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onAction).toHaveBeenCalledTimes(2);
   },
   parameters: {
     docs: {
@@ -202,15 +212,23 @@ export const WithAction: Story = {
   args: { ...baseArgs, btnText: "Take Action" },
   play: async ({ args, canvas, userEvent }) => {
     // The action label replaces the close cross.
-    await expect(canvas.queryByRole("button")).toBeNull();
-    await userEvent.click(canvas.getByText("Take Action"));
+    await expect(canvas.queryByRole("button", { name: "Close" })).toBeNull();
+    // The action is a real button: it is clicked, and reached with Tab and
+    // pressed with Space.
+    const action = canvas.getByRole("button", { name: "Take Action" });
+    await userEvent.click(action);
     await expect(args.onAction).toHaveBeenCalledTimes(1);
+    action.blur();
+    await userEvent.tab();
+    await expect(action).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await expect(args.onAction).toHaveBeenCalledTimes(2);
   },
   parameters: {
     docs: {
       description: {
         story:
-          "When the notice asks for one step, the bar offers it in place of the close cross: the underlined **Take Action** label after the message calls `onAction` (`btnText`).",
+          "When the notice asks for one step, the bar offers it in place of the close cross: the underlined **Take Action** button after the message calls `onAction` (`btnText`).",
       },
       source: {
         code: `<SnackBar
@@ -310,7 +328,7 @@ export const Maintenance: Story = {
     await expect(canvas.getByTestId("snackbar-message")).toHaveTextContent(
       "System maintenance is scheduled for tonight at 10 PM",
     );
-    await userEvent.click(canvas.getByRole("button"));
+    await userEvent.click(canvas.getByRole("button", { name: "Close" }));
     await expect(args.onAction).toHaveBeenCalledTimes(1);
   },
   parameters: {
@@ -374,7 +392,8 @@ export const RightToLeft: Story = {
     const header = canvas.getByTestId("snackbar-header");
     await expect(getComputedStyle(header).direction).toBe("rtl");
     await expect(
-      canvas.getByRole("button").getBoundingClientRect().left,
+      canvas.getByRole("button", { name: "Close" }).getBoundingClientRect()
+        .left,
     ).toBeLessThan(header.getBoundingClientRect().left);
   },
   args: {

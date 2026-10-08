@@ -2,7 +2,7 @@ import CrossReactSvg from "../../assets/icons/12/cross.react.svg";
 import InfoReactSvg from "../../assets/danger.toast.react.svg";
 
 import React from "react";
-import ReactDOM from "react-dom/client";
+import { createRoot, type Root } from "react-dom/client";
 import * as ReactCountdownNamespace from "react-countdown";
 import { zeroPad } from "react-countdown";
 import classNames from "classnames";
@@ -25,32 +25,58 @@ declare global {
   }
 }
 
+// The one root the static `show` renders into, the node it lives on, and
+// whether `show` created that node (and so has to remove it again).
+let staticRoot: Root | null = null;
+let staticNode: HTMLElement | null = null;
+let ownsStaticNode = false;
+
 class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
   static show(barConfig: BarConfig) {
     const { parentElementId, ...rest } = barConfig;
 
-    let parentElementNode =
-      parentElementId && document.getElementById(parentElementId);
+    const target = parentElementId
+      ? document.getElementById(parentElementId)
+      : null;
 
-    if (!parentElementNode) {
-      const snackbarNode = document.createElement("div");
-      snackbarNode.id = "snackbar";
-      document.body.appendChild(snackbarNode);
-      parentElementNode = snackbarNode;
+    // A bar already shown somewhere else is closed first; one shown in the
+    // same place is re-rendered in its existing root.
+    if (staticRoot && (target ? staticNode !== target : !ownsStaticNode)) {
+      SnackBar.close();
+    }
+
+    if (!staticRoot) {
+      let node = target;
+      let owns = false;
+
+      if (!node) {
+        node = document.createElement("div");
+        node.id = "snackbar";
+        document.body.appendChild(node);
+        owns = true;
+      }
+
+      staticRoot = createRoot(node);
+      staticNode = node;
+      ownsStaticNode = owns;
     }
 
     window.snackbar = barConfig;
 
-    ReactDOM.createRoot(parentElementNode).render(<SnackBar {...rest} />);
+    staticRoot.render(<SnackBar {...rest} />);
   }
 
   static close() {
-    const config = window.snackbar as BarConfig | undefined;
-    if (config && config.parentElementId) {
-      const snackbar = document.querySelector("#snackbar-container");
-      if (snackbar) snackbar.remove();
-      // ReactDOM.unmountComponentAtNode(window.snackbar.parentElementId);
+    if (staticRoot) {
+      staticRoot.unmount();
+      staticRoot = null;
     }
+
+    if (ownsStaticNode && staticNode) staticNode.remove();
+
+    staticNode = null;
+    ownsStaticNode = false;
+    window.snackbar = undefined;
   }
 
   constructor(props: SnackbarProps) {
@@ -123,6 +149,11 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
       backgroundImg,
       onAction: _onAction, // Excluded from rest to prevent DOM warning
       onLoad: _onLoad, // Excluded from rest to prevent DOM warning
+      isMaintenance: _isMaintenance, // Not a DOM attribute
+      onClose: _onClose, // Not a DOM attribute
+      skipBlur: _skipBlur, // Not a DOM attribute
+      closeButtonLabel = "Close",
+      id = "snackbar-container",
       ...rest
     } = this.props;
 
@@ -150,19 +181,24 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
           }}
         />
         {isLoaded ? (
-          <div
+          <button
+            type="button"
             className={classNames(styles.actionWrapper, styles.action)}
             onClick={this.onActionClick}
+            aria-label={closeButtonLabel}
+            data-testid="snackbar-close"
           >
-            <CrossReactSvg className={styles.crossIcon} />
-          </div>
+            <CrossReactSvg className={styles.crossIcon} aria-hidden="true" />
+          </button>
         ) : null}
       </div>
     ) : (
       <div
         {...rest}
         data-testid="snackbar-container"
-        id="snackbar-container"
+        id={id}
+        role="status"
+        aria-live="polite"
         style={snackbarStyle}
         className={styles.snackbar}
       >
@@ -224,9 +260,14 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
               </Text>
 
               {btnText ? (
-                <Text className={styles.button} onClick={this.onActionClick}>
+                <button
+                  type="button"
+                  className={styles.button}
+                  onClick={this.onActionClick}
+                  data-testid="snackbar-action"
+                >
                   {btnText}
-                </Text>
+                </button>
               ) : null}
 
               {countDownTime > -1 ? (
@@ -242,10 +283,12 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
         {!btnText ? (
           <button
             className={styles.action}
-            type="submit"
+            type="button"
             onClick={this.onActionClick}
+            aria-label={closeButtonLabel}
+            data-testid="snackbar-close"
           >
-            <CrossReactSvg className={styles.crossIcon} />
+            <CrossReactSvg className={styles.crossIcon} aria-hidden="true" />
           </button>
         ) : null}
       </div>

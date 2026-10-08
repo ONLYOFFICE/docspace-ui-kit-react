@@ -16,7 +16,7 @@ export type SnackbarProps = {
    */
   headerText?: string;
   /**
-   * Label of the inline action, drawn as underlined text after the message. Setting it removes the close cross.
+   * Label of the inline action, a `<button>` drawn as underlined text after the message. Setting it removes the close cross.
    */
   btnText?: string;
   /**
@@ -68,7 +68,7 @@ export type SnackbarProps = {
    */
   onLoad?: () => void;
   /**
-   * Ignored. Nothing reads this prop, and it reaches the DOM as an unknown attribute.
+   * Ignored. Nothing reads this prop; it is kept off the DOM.
    */
   isMaintenance?: boolean;
   /**
@@ -87,6 +87,14 @@ export type SnackbarProps = {
    * Smaller line drawn next to the header.
    */
   additionalHeaderText?: string;
+  /**
+   * Accessible name of the close cross, which is an icon with no text of its own.
+   */
+  closeButtonLabel?: string;
+  /**
+   * DOM `id` of the bar. Give each bar its own when more than one can be on the page at once.
+   */
+  id?: string;
 };
 
 /**
@@ -96,7 +104,7 @@ export type SnackbarProps = {
  */
 export type BarConfig = SnackbarProps & {
   /**
-   * `id` of the element the static `SnackBar.show` renders into. When it matches nothing, a `<div id="snackbar">` is appended to `document.body` instead.
+   * `id` of the element the static `SnackBar.show` renders into. When it matches nothing, a `<div id="snackbar">` is appended to `document.body` instead, and removed again by `SnackBar.close`.
    */
   parentElementId: string;
 };
