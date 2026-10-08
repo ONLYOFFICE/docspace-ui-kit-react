@@ -4,8 +4,8 @@
 
 First release under its own name and from its own repository. It was `@docspace/ui-kit@0.0.1`,
 a workspace package of the DocSpace client resolved to its source root; it is now
-`@onlyoffice/apps-ui-kit`, built and consumed as a package. The version follows the DocSpace
-4.0 line.
+`@onlyoffice/apps-ui-kit`, built and consumed as a package. The version follows the
+ONLYOFFICE Apps 4.0 line.
 
 ### Changed
 
