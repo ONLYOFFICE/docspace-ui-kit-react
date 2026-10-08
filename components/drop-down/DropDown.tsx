@@ -53,6 +53,8 @@ const DropDown = ({
   withDynamicScrollbar,
   backDrop,
   dataTestId,
+  id,
+  role = "listbox",
 }: DropDownProps) => {
   const { isRTL } = useInterfaceDirection();
 
@@ -358,7 +360,8 @@ const DropDown = ({
           style={dropDownStyles}
           className={dropDownClasses}
           data-testid={dataTestId ?? "dropdown"}
-          role="listbox"
+          id={id}
+          role={role}
         >
           {/* withDynamicScrollbar: use project Scrollbar instead of VirtualList */}
           {useDynamicScrollbar ? (

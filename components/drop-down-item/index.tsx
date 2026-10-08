@@ -118,6 +118,7 @@ const DropDownItem = ({
   stopMouseDownPropagation,
   betaLabel,
   paidLabel,
+  role = "option",
   ...rest
 }: DropDownItemProps) => {
   const t = useCommonTranslation();
@@ -207,8 +208,8 @@ const DropDownItem = ({
         withDisabledTooltip && isTouchDevice ? tooltip : undefined
       }
       data-tooltip-place="bottom-end"
-      role={isSeparator ? "separator" : "option"}
-      aria-selected={isSelected}
+      role={isSeparator ? "separator" : role}
+      aria-selected={role === "option" ? isSelected : undefined}
       aria-disabled={disabled}
       style={
         { "--drop-down-min-width": minWidth, ...style } as React.CSSProperties

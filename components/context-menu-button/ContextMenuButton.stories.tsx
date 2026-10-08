@@ -126,12 +126,12 @@ const meta = {
     onClick: {
       action: "onClick",
       description:
-        "Called on a click on the icon: in `dropdown` mode on the click that closes an open menu, in `toggle` mode on every click instead of opening a menu",
+        "Called when the button opens the menu in `dropdown` mode (not when it closes it), and in `toggle` mode on every click or Enter/Space instead of opening a menu",
     },
     onClose: {
       action: "onClose",
       description:
-        "Called when the menu closes by itself after a click outside it",
+        "Called when the menu closes by itself: a click outside it, Escape or Tab",
     },
     opened: {
       control: "boolean",
@@ -143,8 +143,7 @@ const meta = {
     },
     data: {
       control: false,
-      description:
-        "Items shown before the first click; read once, after which `getData` decides what the menu holds",
+      description: "Items of the menu when there is no `getData`",
       table: {
         defaultValue: { summary: "[]" },
       },
@@ -152,7 +151,7 @@ const meta = {
     getData: {
       control: false,
       description:
-        "Returns the menu items; called on every click, and required in practice, since a click without it throws",
+        "Returns the menu items; called each time the menu opens, and used instead of `data` when set",
     },
     iconName: {
       control: "text",
@@ -182,13 +181,11 @@ const meta = {
     },
     onMouseOver: {
       action: "onMouseOver",
-      description:
-        "Called when a mouse button is pressed on the icon, despite the name",
+      description: "Called when the pointer moves onto the icon",
     },
     onMouseOut: {
       action: "onMouseOut",
-      description:
-        "Called when the middle or right mouse button is released on the icon, despite the name",
+      description: "Called when the pointer moves off the icon",
     },
     zIndex: {
       control: "number",
@@ -241,42 +238,80 @@ const Wrapper = (props: { children: React.ReactNode }) => {
 };
 
 export const Default: Story = {
-  // A fresh getData on every render lets the memoised component pick up control changes
   render: (args) => (
     <Wrapper>
-      <ContextMenuButton {...args} getData={() => args.getData?.() ?? []} />
+      <ContextMenuButton {...args} />
     </Wrapper>
   ),
   play: async ({ args, canvas, userEvent }) => {
-    const icon = canvas.getByTestId("icon-button");
+    // A named menu button, collapsed.
+    const icon = canvas.getByRole("button", { name: "Actions" });
+    await expect(icon).toHaveAttribute("aria-haspopup", "menu");
+    await expect(icon).toHaveAttribute("aria-expanded", "false");
+
     await userEvent.click(icon);
     await expect(
-      screen.getByRole("option", { name: "Option 1" }),
+      screen.getByRole("menuitem", { name: "Option 1" }),
     ).toBeVisible();
-    // onClick fires on the click that closes the menu, not the one opening it.
-    await expect(args.onClick).not.toHaveBeenCalled();
+    await expect(icon).toHaveAttribute("aria-expanded", "true");
+    await expect(screen.getByRole("menu")).toHaveAttribute(
+      "id",
+      icon.getAttribute("aria-controls"),
+    );
+    // onClick reports the click that opens the menu.
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
 
     // An item runs its own onClick and closes the menu.
-    await userEvent.click(screen.getByRole("option", { name: "Option 2" }));
+    await userEvent.click(screen.getByRole("menuitem", { name: "Option 2" }));
     await expect(onOption2).toHaveBeenCalledTimes(1);
     await waitFor(() =>
-      expect(screen.queryByRole("option", { name: "Option 1" })).toBeNull(),
+      expect(screen.queryByRole("menuitem", { name: "Option 1" })).toBeNull(),
     );
 
-    // Clicking the dots again closes an open menu and calls onClick.
+    // Clicking the dots again opens (onClick) and then closes (no onClick).
     await userEvent.click(icon);
     await userEvent.click(icon);
-    await expect(args.onClick).toHaveBeenCalledTimes(1);
-    await expect(screen.queryByRole("option", { name: "Option 1" })).toBeNull();
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+    await expect(
+      screen.queryByRole("menuitem", { name: "Option 1" }),
+    ).toBeNull();
 
     // A click outside closes it and reports onClose.
     await userEvent.click(icon);
     await expect(
-      screen.getByRole("option", { name: "Option 1" }),
+      screen.getByRole("menuitem", { name: "Option 1" }),
     ).toBeVisible();
     await userEvent.click(document.body);
     await waitFor(() => expect(args.onClose).toHaveBeenCalledTimes(1));
-    await expect(screen.queryByRole("option", { name: "Option 1" })).toBeNull();
+    await expect(
+      screen.queryByRole("menuitem", { name: "Option 1" }),
+    ).toBeNull();
+
+    // The keyboard: Tab to the button, Enter opens the menu on its first
+    // item, the arrows move, Enter runs the item and focus comes back.
+    await userEvent.tab();
+    await expect(icon).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    const first = await screen.findByRole("menuitem", { name: "Option 1" });
+    await waitFor(() => expect(first).toHaveFocus());
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(
+      screen.getByRole("menuitem", { name: "Option 2" }),
+    ).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(onOption2).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(icon).toHaveFocus());
+    await expect(icon).toHaveAttribute("aria-expanded", "false");
+
+    // Escape closes the menu, reports onClose and returns focus.
+    await userEvent.keyboard(" ");
+    await waitFor(() =>
+      expect(screen.getByRole("menuitem", { name: "Option 1" })).toHaveFocus(),
+    );
+    await userEvent.keyboard("{Escape}");
+    await expect(args.onClose).toHaveBeenCalledTimes(2);
+    await expect(icon).toHaveFocus();
+    await expect(icon).toHaveAttribute("aria-expanded", "false");
   },
   args: {
     title: "Actions",
@@ -297,7 +332,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          'The row-level "more" button: click the dots to open the menu and click again or outside it to close it. Change any other prop live in the Controls panel below.',
+          'The row-level "more" button: click the dots, or focus them and press Enter, Space or an arrow key, to open the menu, and click again, press Escape or click outside it to close it. In the open menu the arrow keys move between items and Enter runs one. Change any other prop live in the Controls panel below.',
       },
       source: {
         code: `<ContextMenuButton
@@ -332,10 +367,14 @@ const DisabledTemplate = () => {
 export const Disabled: Story = {
   render: () => <DisabledTemplate />,
   play: async ({ canvas, userEvent }) => {
-    const icon = canvas.getByTestId("icon-button");
+    const icon = canvas.getByRole("button", { name: "Actions" });
     await expect(icon).toHaveAttribute("aria-disabled", "true");
+    await expect(icon).toHaveAttribute("tabindex", "-1");
     await userEvent.click(icon);
-    await expect(screen.queryByRole("option")).toBeNull();
+    await expect(screen.queryByRole("menuitem")).toBeNull();
+    icon.focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(screen.queryByRole("menuitem")).toBeNull();
   },
   parameters: {
     docs: {
@@ -527,7 +566,7 @@ export const CssCustomization: Story = {
   play: async ({ canvas }) => {
     // opened shows the menu without a click, inline because usePortal is off.
     await expect(
-      canvas.getByRole("option", { name: "Option 1" }),
+      canvas.getByRole("menuitem", { name: "Option 1" }),
     ).toBeVisible();
   },
   parameters: {

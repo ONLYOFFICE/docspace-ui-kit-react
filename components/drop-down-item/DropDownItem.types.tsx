@@ -113,6 +113,13 @@ export type DropDownItemProps = {
   style?: React.CSSProperties;
   /** HTML ID attribute for the root element */
   id?: string;
+  /**
+   * ARIA role of the item, matching the menu's: `option` in a listbox,
+   * `menuitem` in a menu. A separator is always `separator`, and
+   * `aria-selected` is only set on an `option`.
+   * @default "option"
+   */
+  role?: "option" | "menuitem";
   /** Position in the tab order. The default of -1 keeps the item off it.
    * @default -1 */
   tabIndex?: number;

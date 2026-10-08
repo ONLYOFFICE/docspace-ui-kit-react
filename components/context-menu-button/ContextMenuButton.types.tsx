@@ -5,18 +5,17 @@ import type { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
 export interface ContextMenuButtonProps {
   /** Opens the menu from outside. Changing it opens or closes the menu. */
   opened?: boolean;
-  /**
-   * Items of the menu, read **once** to seed the internal state. Every later
-   * change is ignored — `getData` is what the open menu is built from.
-   */
+  /** Items of the menu, used when there is no `getData`. */
   data?: ContextMenuModel[];
   /**
-   * Builds the items when the button is clicked. It is not optional in
-   * practice: the click handler calls it without checking, so a button without
-   * it throws on the first click.
+   * Builds the items each time the menu opens. When it is set, `data` is not
+   * used.
    */
   getData?: () => ContextMenuModel[];
-  /** Hover tooltip of the icon. It needs `RootTooltip` mounted. */
+  /**
+   * Accessible name of the button, and its hover tooltip, which needs
+   * `RootTooltip` mounted.
+   */
   title?: string;
   /** URL of the icon, fetched at runtime. Without it the kit's vertical dots are drawn. */
   iconName?: string;
@@ -41,14 +40,15 @@ export interface ContextMenuButtonProps {
   onMouseEnter?: (e: React.MouseEvent) => void;
   /** Called when the pointer leaves the icon. */
   onMouseLeave?: (e: React.MouseEvent) => void;
-  /** Called on **mouse down** on the icon, despite the name. */
+  /** Called when the pointer moves onto the icon or one of its children. */
   onMouseOver?: (e: React.MouseEvent) => void;
-  /** Called on **mouse up** on the icon, despite the name, and only for the middle and right buttons. */
+  /** Called when the pointer moves off the icon or one of its children. */
   onMouseOut?: (e: React.MouseEvent) => void;
   /**
-   * Called on a click — after the menu has opened in `dropdown` mode, and
-   * instead of opening anything in `toggle` mode, where it is how you render a
-   * menu of your own.
+   * Called when the button opens the menu in `dropdown` mode (not when it
+   * closes it), and instead of opening anything in `toggle` mode, where it is
+   * how you render a menu of your own. Opened with Enter or Space, it receives
+   * the keyboard event.
    */
   onClick?: (e: React.MouseEvent) => void;
   /** Preferred horizontal side of the menu.
@@ -64,7 +64,10 @@ export interface ContextMenuButtonProps {
   id?: string;
   /** Applied to that wrapper. */
   style?: React.CSSProperties;
-  /** Ignored. It reaches the menu, which does not read it either. */
+  /**
+   * Ignored. It reaches the menu, which does not read it either.
+   * @deprecated Has no effect.
+   */
   columnCount?: number;
   /**
    * `toggle` renders no menu of its own and leaves `onClick` to open one;
@@ -72,7 +75,7 @@ export interface ContextMenuButtonProps {
    * @default ContextMenuButtonDisplayType.dropdown
    */
   displayType?: ContextMenuButtonDisplayType;
-  /** Called when the menu closes by itself, after a click outside. */
+  /** Called when the menu closes by itself: a click outside, Escape or Tab. */
   onClose?: () => void;
   /** Whether the menu is rendered in a portal on `document.body`.
    * @default true */
@@ -81,14 +84,20 @@ export interface ContextMenuButtonProps {
   dropDownClassName?: string;
   /** Applied to the icon. */
   iconClassName?: string;
-  /** Draws a rounded border around the icon, 32px square. */
+  /**
+   * Puts the icon in a 32px square box with rounded corners. The box draws no
+   * line unless `--cmb-border` supplies a width and style, such as `1px solid`.
+   */
   displayIconBorder?: boolean;
   /** Colours the icon by filling its shapes rather than stroking them.
    * @default true */
   isFill?: boolean;
   /** Stacking order of the menu. */
   zIndex?: number;
-  /** Ignored. Nothing reads this prop. */
+  /**
+   * Ignored. Nothing reads this prop.
+   * @deprecated Has no effect.
+   */
   asideHeader?: React.ReactNode;
   /** Value of `data-testid` on the wrapper.
    * @default "context-menu-button" */

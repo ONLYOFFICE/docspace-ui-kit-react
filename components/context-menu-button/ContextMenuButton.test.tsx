@@ -56,4 +56,82 @@ describe("<ContextMenuButton />", () => {
 
     outside.remove();
   });
+
+  it("is a named menu button that opens from the keyboard", () => {
+    render(<ContextMenuButton {...baseProps} usePortal={false} />);
+
+    const button = screen.getByRole("button", { name: "Actions" });
+    expect(button).toHaveAttribute("tabindex", "0");
+    expect(button).toHaveAttribute("aria-haspopup", "menu");
+    expect(button).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.keyDown(button, { key: "Enter" });
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("menu")).toHaveAttribute(
+      "id",
+      button.getAttribute("aria-controls"),
+    );
+    expect(screen.getByRole("menuitem", { name: "label" })).toBeInTheDocument();
+
+    fireEvent.keyDown(button, { key: "Escape" });
+    expect(button).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("calls onClick on the click that opens the menu, not the one closing it", () => {
+    const onClick = vi.fn();
+    render(<ContextMenuButton {...baseProps} onClick={onClick} />);
+    const button = screen.getByRole("button", { name: "Actions" });
+
+    fireEvent.click(button);
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(button).toHaveAttribute("aria-expanded", "true");
+
+    fireEvent.click(button);
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(button).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("opens with data alone when there is no getData", () => {
+    render(
+      <ContextMenuButton
+        {...baseProps}
+        getData={undefined}
+        data={[{ key: "only", label: "Only item" }]}
+      />,
+    );
+    const button = screen.getByRole("button", { name: "Actions" });
+
+    expect(() => fireEvent.click(button)).not.toThrow();
+    expect(
+      screen.getByRole("menuitem", { name: "Only item" }),
+    ).toBeInTheDocument();
+  });
+
+  it("re-renders for props other than the four it used to compare", () => {
+    const { rerender } = render(<ContextMenuButton {...baseProps} />);
+    expect(screen.getByRole("button", { name: "Actions" })).toBeInTheDocument();
+
+    rerender(<ContextMenuButton {...baseProps} title="More" />);
+    expect(screen.getByRole("button", { name: "More" })).toBeInTheDocument();
+  });
+
+  it("calls onMouseOver and onMouseOut on the matching events", () => {
+    const onMouseOver = vi.fn();
+    const onMouseOut = vi.fn();
+    render(
+      <ContextMenuButton
+        {...baseProps}
+        onMouseOver={onMouseOver}
+        onMouseOut={onMouseOut}
+      />,
+    );
+    const button = screen.getByRole("button", { name: "Actions" });
+
+    fireEvent.mouseDown(button);
+    expect(onMouseOver).not.toHaveBeenCalled();
+    fireEvent.mouseOver(button);
+    expect(onMouseOver).toHaveBeenCalledTimes(1);
+    fireEvent.mouseOut(button);
+    expect(onMouseOut).toHaveBeenCalledTimes(1);
+  });
 });
