@@ -379,16 +379,27 @@ export const MultiSelectWithTabs: Story = {
     await shown("Alex Morgan");
     await pick("Kenji Sato");
 
-    // The guests have a tab of their own; the selection carries across.
-    // (Without a roomId the Groups tab asks for people, not groups, so it is
-    // not checked here.)
+    // Without a roomId the Groups tab lists the portal's groups -- and only
+    // them, no people. The selection carries across tabs.
+    await userEvent.click(screen.getByText("Groups"));
+    await shown("Marketing");
+    await expect(row("Legal")).toBeVisible();
+    await waitFor(() => expect(screen.queryByText("Alex Morgan")).toBeNull());
+    await expect(screen.queryByText("Daniel Kim")).toBeNull();
+    await pick("Marketing");
+
+    // The guests have a tab of their own.
     await userEvent.click(screen.getByText("Guests"));
     await shown("Daniel Kim");
     await expect(screen.queryByText("Alex Morgan")).toBeNull();
     await pick("Daniel Kim");
 
     await userEvent.click(screen.getByTestId("selector_submit_button"));
-    await expect(submitted(args)).toEqual(["Kenji Sato", "Daniel Kim"]);
+    await expect(submitted(args)).toEqual([
+      "Kenji Sato",
+      "Marketing",
+      "Daniel Kim",
+    ]);
     await userEvent.click(screen.getByTestId("selector_cancel_button"));
     await expect(args.onCancel).toHaveBeenCalledTimes(1);
   },
