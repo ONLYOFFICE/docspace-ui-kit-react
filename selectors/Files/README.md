@@ -1,6 +1,6 @@
 # Files Selector
 
-A comprehensive file and folder browser selector for navigating the DocSpace file system. Supports rooms, folders, files, and AI agents with breadcrumb navigation, search, and filtering.
+A comprehensive file and folder browser selector for navigating the ONLYOFFICE Apps file system. Supports rooms, folders, files, and AI agents with breadcrumb navigation, search, and filtering.
 
 ## What It Does
 

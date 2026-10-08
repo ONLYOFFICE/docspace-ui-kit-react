@@ -227,7 +227,7 @@ export function PlanMarker() {
   needs `<RootTooltip />` from [`Tooltip`](../tooltip/README.md) mounted once near the root of
   the app, or nothing appears.
 - **An ancestor with the class `ai-agents` repaints the badge** grey and cancels its hover. That
-  is the DocSpace portal's own hook and there is no prop for it.
+  is the ONLYOFFICE Apps portal's own hook and there is no prop for it.
 
 ## CSS variables
 

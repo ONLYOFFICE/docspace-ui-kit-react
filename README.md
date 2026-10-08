@@ -946,7 +946,7 @@ function MyComponent() {
 
 ## Development
 
-This package is developed standalone — clone it and run `pnpm install`. No DocSpace
+This package is developed standalone — clone it and run `pnpm install`. No DocSpace-client
 checkout is required for development, Storybook or tests; `locales/en` is committed so
 everything works out of the box.
 

@@ -5,7 +5,7 @@
   "kind": "compound",
   "category": "Layout",
   "status": "portal-internal",
-  "summary": "DocSpace's left panel: a fixed column with a header slot, a main button, a scrolling body and the profile block.",
+  "summary": "The ONLYOFFICE Apps left panel: a fixed column with a header slot, a main button, a scrolling body and the profile block.",
   "import": { "subpath": "components/article", "barrel": true, "default": true },
   "exports": ["default", "ArticleProfile", "ArticleProfileProps", "ArticleProps"],
   "providers": ["ThemeProvider", "TranslationProvider"],
@@ -18,7 +18,7 @@
 
 # Article
 
-DocSpace's left panel: a fixed column with a header slot, a main button, a scrolling body and the
+The ONLYOFFICE Apps left panel: a fixed column with a header slot, a main button, a scrolling body and the
 profile block. Almost everything in it is decided by the portal — the tariff, the Zendesk account,
 the developer tools, the signed-in person — which is why it takes some thirty props.
 

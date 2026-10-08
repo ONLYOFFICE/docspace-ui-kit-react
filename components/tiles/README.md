@@ -5,7 +5,7 @@
   "kind": "compound",
   "category": "Data display",
   "status": "public",
-  "summary": "The card view of the DocSpace listing: a sorting container, four kinds of tile and the slot their names go in.",
+  "summary": "The card view of the ONLYOFFICE Apps listing: a sorting container, four kinds of tile and the slot their names go in.",
   "propsType": null,
   "import": { "subpath": "components/tiles", "barrel": true, "default": false },
   "exports": ["TileContainer", "TileContent", "BaseTile", "FileTile", "FolderTile", "RoomTile", "TemplateTile"],
@@ -19,7 +19,7 @@
 
 # Tiles
 
-The card view of the DocSpace listing: a sorting container, four kinds of tile and the slot their
+The card view of the ONLYOFFICE Apps listing: a sorting container, four kinds of tile and the slot their
 names go in. It is the counterpart of [`Rows`](../rows/README.md), and like that family it is
 shaped around the portal's data rather than around cards in general.
 

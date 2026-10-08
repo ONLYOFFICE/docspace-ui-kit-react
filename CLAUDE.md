@@ -32,6 +32,7 @@ Path-scoped detail that does not belong here, loaded when the matching files are
 | `source-checks.md`       | the client-side checks that used to cover this source (hex, ASCII, indentation, assets, deps, licence headers), why none of them run here now, and AGPL-3.0-only without per-file headers                                        |
 | `cross-platform.md`      | why every command has to run on Windows too, what `package.json` scripts may not contain, and why `path.sep` does not make an id POSIX                                                                                           |
 | `vscode-tasks.md`        | the three layers behind the status-bar buttons in `ui-kit.code-workspace`                                                                                                                                                        |
+| `product-naming.md`      | DocSpace is now ONLYOFFICE Apps: what to rename in user-facing text, which names stay, and the grep that finds leftovers                                                                                                         |
 
 ## Tech Stack
 
@@ -222,21 +223,10 @@ applies. Three levels, fastest first:
 
 ## Product naming
 
-The product formerly called DocSpace is **ONLYOFFICE Apps**. Every piece of user-facing text
-uses that name: UI strings, stories, the samples and other `.mdx` pages, and the READMEs the
-package ships.
-
-- **Where space is tight — buttons, links, badges — `ONLYOFFICE` alone is enough**: "Sign in
-  with ONLYOFFICE", "Open in ONLYOFFICE".
-- **Roles use the product's own words**, which carry no product name: Owner, Full admin, Room
-  admin, Power user, User, Guest.
-- **Names of things are not copy, so they stay**: `@onlyoffice/docspace-api-sdk`, the
-  `DocSpace-client` repository and its paths, API routes, `docspace` in URLs, environment and
-  config keys, CSS classes and test ids. Engineering notes here (`CLAUDE.md`, `.claude/rules/`)
-  keep "DocSpace" where it names that codebase.
-- **Inside a component the name comes from `getBrandName("ProductName")`**, because a
-  white-label portal renames the product again; `t("Common:ProductName")` is refused by the
-  `no-constants-via-i18n` lint plugin. Samples and documentation write the name out.
+The product formerly called DocSpace is **ONLYOFFICE Apps**, and every piece of user-facing
+text — UI strings, stories, `.mdx` pages, the READMEs the package ships — uses that name.
+Names of things (the `DocSpace-client` repository, package names, URLs, keys, identifiers)
+stay. `.claude/rules/product-naming.md` has the full list and the grep for leftovers.
 
 ## Paths
 

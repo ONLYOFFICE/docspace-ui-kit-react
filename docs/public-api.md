@@ -1,7 +1,7 @@
 # Public API
 
 What `@onlyoffice/apps-ui-kit` promises to external consumers, what it keeps for the
-DocSpace portal, and what it guarantees about neither.
+ONLYOFFICE Apps portal, and what it guarantees about neither.
 
 **Status:** largely landed. The `exports` map, the dependency split and the build that serves
 them are in the tree; what remains open is listed at the end, and one thing this document
@@ -21,7 +21,7 @@ being reachable. The client now consumes a packed tarball
 `packages/shared`), so that enforcement is live: 4 060 deep-subpath import sites across 1 575
 files resolve through the map rather than through a symlink.
 
-**The barrel is a second contract, and a stricter one.** DocSpace plugins never install this
+**The barrel is a second contract, and a stricter one.** ONLYOFFICE Apps plugins never install this
 package: the portal re-exports the root barrel to them in one line and refuses every subpath,
 so `index.ts` is the whole plugin UI API and dropping a name from it breaks plugins with no
 compile error in either repository. The client barely uses the barrel — 11 import sites against
@@ -111,7 +111,7 @@ index.js -> billing/wallet/...       -> selectors/People/index.js          -> ax
 
 Since `axios` is an _optional_ peer, `npm i @onlyoffice/apps-ui-kit` does not install it, and a
 bare `import { Button } from "@onlyoffice/apps-ui-kit"` then fails to resolve for anyone who
-bundles the barrel themselves. Observed, not inferred: the DocSpace plugin preview harness
+bundles the barrel themselves. Observed, not inferred: the ONLYOFFICE Apps plugin preview harness
 reports `Could not resolve "axios" imported by "@onlyoffice/apps-ui-kit"` on a freshly generated
 plugin. The portal is unaffected, because it supplies `axios` and hands plugins its own mounted
 copy of the kit at runtime.
@@ -129,7 +129,7 @@ pulls. Two ways out, and they are not equivalent:
 Unresolved; tracked as open question 6.
 
 **`utils/socket`.** The only importer of `socket.io-client` and
-`@socket.io/component-emitter` in the whole library, and meaningful only against a DocSpace
+`@socket.io/component-emitter` in the whole library, and meaningful only against an ONLYOFFICE Apps
 portal's socket server. Keeping it out of the public surface moves both dependencies to
 optional peers rather than removing them: the module still ships (`dist/esm/utils/socket`), and
 it is reachable by subpath, but an external install downloads neither package.

@@ -5,7 +5,7 @@
   "kind": "compound",
   "category": "Data display",
   "status": "public",
-  "summary": "The file list of the DocSpace portal, in three parts: the container, the row and the row's content.",
+  "summary": "The file list of the ONLYOFFICE Apps portal, in three parts: the container, the row and the row's content.",
   "propsType": null,
   "import": { "subpath": "components/rows", "barrel": true, "default": false },
   "exports": ["Row", "RowContent", "RowContainer", "IndexIconButtons", "RowSkeleton", "RowsSkeleton"],
@@ -19,7 +19,7 @@
 
 # Rows
 
-The file list of the DocSpace portal, in three parts: the container, the row and the row's
+The file list of the ONLYOFFICE Apps portal, in three parts: the container, the row and the row's
 content. It is shaped around that list, not around lists in general — read the three pages
 below before choosing it.
 

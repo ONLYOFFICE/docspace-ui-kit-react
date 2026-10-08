@@ -5,7 +5,7 @@
   "kind": "compound",
   "category": "Layout",
   "status": "portal-internal",
-  "summary": "DocSpace's page body: a sticky header and filter, a scrolling body, and the info and chat panels beside it.",
+  "summary": "The ONLYOFFICE Apps page body: a sticky header and filter, a scrolling body, and the info and chat panels beside it.",
   "import": { "subpath": "components/section", "barrel": true, "default": true },
   "exports": ["default", "SectionProps"],
   "providers": ["ThemeProvider", "TranslationProvider"],
@@ -29,7 +29,7 @@
 
 # Section
 
-DocSpace's page body: a sticky header and filter, a scrolling body, and the info and chat panels
+The ONLYOFFICE Apps page body: a sticky header and filter, a scrolling body, and the info and chat panels
 beside it. It is the other half of the portal's layout, next to [`Article`](../article/README.md),
 and it is also what supplies the kit's layout context to everything inside it.
 
@@ -37,7 +37,7 @@ and it is also what supplies the kit's layout context to everything inside it.
 
 - **This is portal-internal.** Nearly ninety props, most of them wiring for the portal's upload and
   operations machinery, and about a quarter of them dead.
-- Use it when you are rebuilding the DocSpace page layout and want the same header, filter, info
+- Use it when you are rebuilding the ONLYOFFICE Apps page layout and want the same header, filter, info
   panel and scroll behaviour.
 - **Several kit components need to be inside one.** It is the only source of the layout context
   `sectionWidth` and `sectionHeight`, which [`Navigation`](../navigation/README.md)'s breadcrumb box

@@ -23,7 +23,7 @@ preview. It is what a room gets instead of an uploaded picture — the tile that
 [`RoomIcon`](../room-icon/README.md) then draws.
 
 **Portal-internal.** `t` is required, and the icon picker asks for keys outside the `Common`
-namespace the package ships, so two of its labels are empty anywhere but in DocSpace.
+namespace the package ships, so two of its labels are empty anywhere but in ONLYOFFICE Apps.
 
 ## Use this when / not when
 

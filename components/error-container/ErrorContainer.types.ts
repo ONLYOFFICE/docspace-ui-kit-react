@@ -23,7 +23,7 @@ export type ErrorContainerProps = {
   /** Takes the container out of the flow — `position: absolute` at full width — for the document editor, which mounts it over a layout of its own.
    * @default false */
   isEditor?: boolean;
-  /** Hides the portal logo above the illustration. Set it outside a DocSpace portal, where the logo endpoint does not resolve.
+  /** Hides the portal logo above the illustration. Set it outside an ONLYOFFICE Apps portal, where the logo endpoint does not resolve.
    * @default false */
   hideLogo?: boolean;
   /** Rendered last, below the button: the place for a support link or a details block. */

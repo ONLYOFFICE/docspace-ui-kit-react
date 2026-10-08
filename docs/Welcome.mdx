@@ -23,7 +23,7 @@ pnpm build && pnpm pack   # -> onlyoffice-apps-ui-kit-4.0.0.tgz
 Pack with **pnpm**, not npm: the `exports` map lives under `publishConfig`, which is a pnpm
 feature, and an npm-packed tarball ends up with no `exports` and no `main` at all.
 
-DocSpace **plugins** install nothing. The portal hands a plugin its own already-mounted copy of
+ONLYOFFICE Apps **plugins** install nothing. The portal hands a plugin its own already-mounted copy of
 the kit and refuses every subpath, so for a plugin the root barrel is the entire API — see
 **Utils** for what that means in practice.
 
@@ -87,7 +87,7 @@ the bundles you need — `Common.json`, `Payments.json` and `Settings.json` ship
 `pnpm sync-locales` refreshes the other languages from a DocSpace client checkout.
 
 There is also a composed `Providers` root, and it is **portal-specific**: it adds `ApiProvider`
-and fetches portal settings and the current user on mount, so it needs a DocSpace endpoint to
+and fetches portal settings and the current user on mount, so it needs an ONLYOFFICE Apps endpoint to
 talk to. That is why it is deliberately not re-exported from `providers` — import it by its own
 subpath, as a default export:
 

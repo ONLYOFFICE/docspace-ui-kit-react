@@ -2,7 +2,7 @@
 
 Everything a React application needs to do once, before any component of this kit renders
 correctly: install it, mount two providers, and know which import forms exist. It is written for an
-application of your own — a DocSpace **plugin** installs nothing and composes no providers, because
+application of your own — an ONLYOFFICE Apps **plugin** installs nothing and composes no providers, because
 the portal has already done both.
 
 <!-- Every tsx block below is a complete module and is compiled by `pnpm check:readme --compile`. -->
@@ -233,7 +233,7 @@ next time the build layout changes.
 
 ## Public and portal-internal
 
-Some modules only work inside DocSpace: `selectors`, `billing`, `uploader`, `ai-agent`,
+Some modules only work inside ONLYOFFICE Apps: `selectors`, `billing`, `uploader`, `ai-agent`,
 `document-editor`, `api`, `providers/api`. They expect a portal URL, an API key and a signed-in
 person, and outside that context they fail at runtime rather than at build time.
 

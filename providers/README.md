@@ -2,7 +2,7 @@
 
 All-in-one composition of `ErrorBoundary`, `ApiProvider`, `TranslationProvider`, and `ThemeProvider`.
 
-**Portal-internal, and not in this folder's barrel.** `Providers` reaches the DocSpace REST API
+**Portal-internal, and not in this folder's barrel.** `Providers` reaches the ONLYOFFICE Apps REST API
 for portal settings, so it only works where that API answers; `providers/index.ts` exports the
 three public providers and not this one. An application of its own composes
 [`ThemeProvider`](./theme/README.md) and [`TranslationProvider`](./translation/README.md)
@@ -30,7 +30,7 @@ If `settings` or `user` are not provided as props, they are fetched automaticall
 
 | Prop            | Type                                           | Required | Description                                       |
 | --------------- | ---------------------------------------------- | -------- | ------------------------------------------------- |
-| `url`           | `string`                                       | Yes      | Base URL of the DocSpace API                      |
+| `url`           | `string`                                       | Yes      | Base URL of the ONLYOFFICE Apps API               |
 | `apiKey`        | `string`                                       | Yes      | API key for authentication                        |
 | `errorFallback` | `ReactNode \| ((error: Error) => ReactNode)`   | No       | Custom error fallback UI                          |
 | `onError`       | `(error: Error, errorInfo: ErrorInfo) => void` | No       | Callback when an error is caught                  |
