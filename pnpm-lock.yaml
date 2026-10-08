@@ -276,8 +276,8 @@ importers:
         specifier: 3.1.1
         version: 3.1.1(supports-color@7.2.0)
       '@onlyoffice/ai-chat':
-        specifier: file:onlyoffice-ai-chat-0.6.39.tgz
-        version: file:onlyoffice-ai-chat-0.6.39.tgz(7a7b4ec48006fe1b5aa7472a03ec4507)
+        specifier: ^1.0.0
+        version: 1.0.0(7a7b4ec48006fe1b5aa7472a03ec4507)
       '@onlyoffice/document-editor-react':
         specifier: 2.1.1
         version: 2.1.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1507,9 +1507,8 @@ packages:
       '@emnapi/core': ^1.7.1 || ^2.0.0-alpha.4
       '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.4
 
-  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.6.39.tgz':
-    resolution: {integrity: sha512-ABamSr+edeqc93zxjZ+SwB+Fj6xQkiTlSCIii6jMHZKWuEJzfu+Ap0rGwbcK4FRwnbEPwmXv4yvlVwYfYJGHAA==, tarball: file:onlyoffice-ai-chat-0.6.39.tgz}
-    version: 0.6.39
+  '@onlyoffice/ai-chat@1.0.0':
+    resolution: {integrity: sha512-KAIwc3kofvem8fv8TzTw/IO3jEc5fT7Dbgiy+vAceSH1eaUUYfl5Q6oMvi0R094RlEBBb6l+3RJogYN6327N5g==}
     peerDependencies:
       '@anthropic-ai/sdk': ^0.60.0
       '@assistant-ui/react': ^0.11.0
@@ -6993,7 +6992,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.4
     optional: true
 
-  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.6.39.tgz(7a7b4ec48006fe1b5aa7472a03ec4507)':
+  '@onlyoffice/ai-chat@1.0.0(7a7b4ec48006fe1b5aa7472a03ec4507)':
     dependencies:
       '@assistant-ui/react': 0.11.58(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.7.0(react@19.2.8))
       assistant-stream: 0.2.47
