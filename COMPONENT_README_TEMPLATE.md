@@ -345,7 +345,7 @@ being checked, not how a deadline is met.
 Batch prompt:
 
 ```
-Rewrite the READMEs for [combobox, toggle-button, checkbox] following README_TEMPLATE.md
+Rewrite the READMEs for [combobox, toggle-button, checkbox] following COMPONENT_README_TEMPLATE.md
 and components/button/README.md. For each component, in order: complete the JSDoc on every
 prop in the .types file (adding @portal and @default where the guide says), write the
 metadata block, run `pnpm readme:props --write --only components/<folder>`, write the hand
@@ -359,7 +359,7 @@ Do not edit anything between props:start and props:end by hand.
 Single component:
 
 ```
-Rewrite components/aside/README.md following README_TEMPLATE.md. Read the component, its
+Rewrite components/aside/README.md following COMPONENT_README_TEMPLATE.md. Read the component, its
 types, its stylesheet and its tests first, and tell me what you found that the current
 README gets wrong before you write.
 ```

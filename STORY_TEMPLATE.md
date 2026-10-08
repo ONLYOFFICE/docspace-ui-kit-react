@@ -128,7 +128,7 @@ So a story file carries no `parameters.docs.description.component`, and its
 `CssCustomization` text says what the example sets, not which variables exist. A fact you
 would have written as a Features or Accessibility bullet belongs in the README's
 "Behaviour the types don't state" or "Accessibility"; a variable and its caveats in its
-"CSS variables" table. Verify it against the code first — `README_TEMPLATE.md` governs the
+"CSS variables" table. Verify it against the code first — `COMPONENT_README_TEMPLATE.md` governs the
 README.
 
 What stays in the story is what a README cannot hold: the canvases, the controls, the
