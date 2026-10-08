@@ -1,6 +1,6 @@
 # Uploader
 
-A complete file upload component with chunked upload support, progress tracking, and file size validation. Built on top of the `Dropzone` component and DocSpace API SDK, it handles the entire upload workflow including session management, parallel chunk uploads, and folder structure preservation.
+A complete file upload component with chunked upload support, progress tracking, and file size validation. Built on top of the `Dropzone` component and ONLYOFFICE Apps API SDK, it handles the entire upload workflow including session management, parallel chunk uploads, and folder structure preservation.
 
 ## Usage
 

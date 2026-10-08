@@ -256,8 +256,8 @@ export const WelcomePage = () => {
             </Text>
             <div className={styles.subline}>
               <Text as="span" fontSize="13px" lineHeight="20px">
-                Version 4.0.0 &bull; AGPL-3.0-only &bull; not on the public npm
-                registry yet
+                Version 4.0.0 &bull; AGPL-3.0-only &bull; on npm as
+                @onlyoffice/apps-ui-kit
               </Text>
               <Link
                 type={LinkType.page}

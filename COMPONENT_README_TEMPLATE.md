@@ -110,6 +110,14 @@ Needs `ThemeProvider` above it in the tree, and say what goes wrong without it.
 ## Related                                     M
 ````
 
+## Keeping a passage off the API site
+
+A README is read in three places: the repository, the package and api.onlyoffice.com. A passage
+for people changing the kit -- how to regenerate a block, where a test lives -- belongs in the
+first two and is noise on the site. Wrap it in `<!-- site: skip -->` ... `<!-- site: end -->`,
+each marker on a line of its own; `pnpm run docs` drops the lines between, and Storybook, GitHub
+and the package show them as before. See `docs-generation.md`.
+
 ## Metadata block
 
 An HTML comment on line 1. It is invisible on GitHub, on npm and in Storybook, and it is
@@ -337,7 +345,7 @@ being checked, not how a deadline is met.
 Batch prompt:
 
 ```
-Rewrite the READMEs for [combobox, toggle-button, checkbox] following README_TEMPLATE.md
+Rewrite the READMEs for [combobox, toggle-button, checkbox] following COMPONENT_README_TEMPLATE.md
 and components/button/README.md. For each component, in order: complete the JSDoc on every
 prop in the .types file (adding @portal and @default where the guide says), write the
 metadata block, run `pnpm readme:props --write --only components/<folder>`, write the hand
@@ -351,7 +359,7 @@ Do not edit anything between props:start and props:end by hand.
 Single component:
 
 ```
-Rewrite components/aside/README.md following README_TEMPLATE.md. Read the component, its
+Rewrite components/aside/README.md following COMPONENT_README_TEMPLATE.md. Read the component, its
 types, its stylesheet and its tests first, and tell me what you found that the current
 README gets wrong before you write.
 ```

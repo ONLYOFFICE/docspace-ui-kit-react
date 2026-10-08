@@ -6,7 +6,7 @@ Provides API client instances (`profilesApi`, `commonSettingsApi`) to the compon
 
 | Prop       | Type              | Required | Description                           |
 | ---------- | ----------------- | -------- | ------------------------------------- |
-| `url`      | `string`          | Yes      | Base URL of the DocSpace API          |
+| `url`      | `string`          | Yes      | Base URL of the ONLYOFFICE Apps API   |
 | `apiKey`   | `string`          | Yes      | API key for authentication            |
 | `children` | `React.ReactNode` | Yes      | Child components that consume the API |
 

@@ -1,29 +1,28 @@
 # @onlyoffice/apps-ui-kit
 
-> React UI component library behind [ONLYOFFICE DocSpace](https://github.com/ONLYOFFICE/DocSpace-client).
+> React UI component library behind [ONLYOFFICE Apps](https://github.com/ONLYOFFICE/DocSpace-client).
 
 [![React](https://img.shields.io/badge/react-19-blue)](https://react.dev)
 
 ## About This Library
 
-`@onlyoffice/apps-ui-kit` provides the React components and color system used across the ONLYOFFICE DocSpace frontend products. It began life inside the [DocSpace-client monorepo](https://github.com/ONLYOFFICE/DocSpace-client) and is now developed as a standalone package.
+`@onlyoffice/apps-ui-kit` provides the React components and color system used across the ONLYOFFICE Apps frontend products. It began life inside the [DocSpace-client monorepo](https://github.com/ONLYOFFICE/DocSpace-client) and is now developed as a standalone package.
 
 <p align="center">
   <a href="https://github.com/ONLYOFFICE/DocSpace">
-    <img width="800" src="https://static-blog.onlyoffice.com/wp-content/uploads/2025/05/12164704/DocSpace-API-roadmap.png" alt="ONLYOFFICE DocSpace">
+    <img width="800" src="https://static-blog.onlyoffice.com/wp-content/uploads/2025/05/12164704/DocSpace-API-roadmap.png" alt="ONLYOFFICE Apps">
   </a>
 </p>
 
-> **Note:** version `4.0.0`, **not yet published to npm**. DocSpace consumes a packed tarball
-> built from this repository. See [CHANGELOG.md](CHANGELOG.md) — 4.0.0 renamed the package,
-> made it ESM-only and put an `exports` map in front of every subpath.
+> **Note:** version `4.0.0` renamed the package, made it ESM-only and put an `exports` map in
+> front of every subpath. See [CHANGELOG.md](CHANGELOG.md).
 
 > **New here?** [`docs/getting-started.md`](docs/getting-started.md) is the one page to read first:
 > what to install, the two providers to mount, why the stylesheet needs no import, and which
 > import form to use. [`docs/components.md`](docs/components.md) is the catalogue, with a table
 > for choosing between the components that are easy to confuse.
 
-> **Scope:** not every directory in this package is public API. Modules coupled to a DocSpace portal — `api/`, `billing/`, `selectors/`, `uploader/`, `ai-agent/`, `document-editor/` and `providers/api` — ship in the package but are intended for ONLYOFFICE's own products. See [`docs/public-api.md`](docs/public-api.md).
+> **Scope:** not every directory in this package is public API. Modules coupled to an ONLYOFFICE Apps portal — `api/`, `billing/`, `selectors/`, `uploader/`, `ai-agent/`, `document-editor/` and `providers/api` — ship in the package but are intended for ONLYOFFICE's own products. See [`docs/public-api.md`](docs/public-api.md).
 
 ## Features ✨
 
@@ -41,8 +40,6 @@
 
 ## Installation
 
-Once published:
-
 ```bash
 # pnpm
 pnpm add @onlyoffice/apps-ui-kit
@@ -54,7 +51,7 @@ npm install @onlyoffice/apps-ui-kit
 yarn add @onlyoffice/apps-ui-kit
 ```
 
-Until then, install a packed tarball built from this repository:
+To try a build of this repository instead, pack it and install the file:
 
 ```bash
 pnpm build && pnpm pack
@@ -190,8 +187,8 @@ import {
 > `StatusMessage`. Three are default exports, which `export *` does not re-export; the other
 > folders are not registered in `components/index.ts`. Import them by subpath —
 > `import { Selector } from "@onlyoffice/apps-ui-kit/components/selector"`,
-> `import FilterInput from "@onlyoffice/apps-ui-kit/components/filter"` — and note that a
-> DocSpace plugin cannot reach them at all, since the portal gives plugins the main entry and
+> `import FilterInput from "@onlyoffice/apps-ui-kit/components/filter"` — and note that an
+> ONLYOFFICE Apps plugin cannot reach them at all, since the portal gives plugins the main entry and
 > refuses every subpath.
 
 ### Import specific components
@@ -884,13 +881,13 @@ The `TranslationProvider` resolves the active language in this priority order:
 3. `settings.culture` (from portal settings)
 4. `"en"` (fallback)
 
-If `settings` and `user` are not passed as props, they are fetched automatically from the DocSpace API using the `url` and `apiKey` provided.
+If `settings` and `user` are not passed as props, they are fetched automatically from the ONLYOFFICE Apps API using the `url` and `apiKey` provided.
 
 ### Props Reference
 
 | Prop            | Type                                           | Required | Description                                            |
 | --------------- | ---------------------------------------------- | -------- | ------------------------------------------------------ |
-| `url`           | `string`                                       | Yes      | Base URL of the DocSpace API                           |
+| `url`           | `string`                                       | Yes      | Base URL of the ONLYOFFICE Apps API                    |
 | `apiKey`        | `string`                                       | Yes      | API key for authentication                             |
 | `translations`  | `TTranslations`                                | No       | Translation resources map                              |
 | `locale`        | `string`                                       | No       | Locale override (e.g., `"en"`, `"ru"`)                 |
@@ -949,7 +946,7 @@ function MyComponent() {
 
 ## Development
 
-This package is developed standalone — clone it and run `pnpm install`. No DocSpace
+This package is developed standalone — clone it and run `pnpm install`. No DocSpace-client
 checkout is required for development, Storybook or tests; `locales/en` is committed so
 everything works out of the box.
 

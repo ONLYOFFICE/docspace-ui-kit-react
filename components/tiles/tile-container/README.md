@@ -25,7 +25,7 @@ which of four groups it belongs to.
 
 ## Use this when / not when
 
-- Use to render a DocSpace-shaped listing: rooms or templates at the top, then folders, then
+- Use to render an ONLYOFFICE Apps-shaped listing: rooms or templates at the top, then folders, then
   files, each in its own grid.
 - Not as a general card grid — **a child without an `item` prop is dropped without a word**, so
   your own markup between the tiles never appears. Write a plain CSS grid instead.

@@ -32,6 +32,7 @@ Path-scoped detail that does not belong here, loaded when the matching files are
 | `source-checks.md`       | the client-side checks that used to cover this source (hex, ASCII, indentation, assets, deps, licence headers), why none of them run here now, and AGPL-3.0-only without per-file headers                                        |
 | `cross-platform.md`      | why every command has to run on Windows too, what `package.json` scripts may not contain, and why `path.sep` does not make an id POSIX                                                                                           |
 | `vscode-tasks.md`        | the three layers behind the status-bar buttons in `ui-kit.code-workspace`                                                                                                                                                        |
+| `product-naming.md`      | DocSpace is now ONLYOFFICE Apps: what to rename in user-facing text, which names stay, and the grep that finds leftovers                                                                                                         |
 
 ## Tech Stack
 
@@ -115,8 +116,9 @@ css/fonts.css and fonts/ are COMMITTED as well — Storybook imports the stylesh
 Docker E2E image has no DocSpace beside it. `pnpm sync-locales` refreshes them; the library
 build does not use them.
 
-Gitignored, absent from a fresh clone: dist/, locales/* except locales/en, and the
-Playwright output (playwright-report/, test-results/).
+Gitignored, absent from a fresh clone: dist/, locales/* except locales/en, the
+Playwright output (playwright-report/, test-results/), and the API-site output: site-docs/
+(`pnpm run docs`) and site-screenshots/ (`pnpm docs:screenshots`).
 ```
 
 ## Common Commands
@@ -172,6 +174,17 @@ pnpm tsc
 # checkout. Run by hand, never part of build/test. Needs DOCSPACE_CLIENT_ROOT
 # (default ../../DocSpace/client) and fails loudly without it.
 pnpm sync-locales
+
+# API-site pages for api.onlyoffice.com (site/docspace/ui-kit): a copy of
+# Storybook -- one page per docs entry, in its tree, with stories and React
+# blocks as pictures -- into gitignored site-docs/. docs:check also compiles
+# every page as MDX (CI runs it); docs:sync copies the result into
+# ../api.onlyoffice.com (API_SITE_ROOT). See docs-generation.md.
+pnpm docs:build         # Storybook, Chromium if missing, pictures, pages -- the site's one command
+pnpm docs:sync          # docs:build, then copy into the site checkout
+pnpm run docs               # pages only, seconds, no browser (what CI checks)
+pnpm docs:check
+pnpm docs:screenshots
 ```
 
 ## Working with DocSpace
@@ -215,21 +228,10 @@ applies. Three levels, fastest first:
 
 ## Product naming
 
-The product formerly called DocSpace is **ONLYOFFICE Apps**. Every piece of user-facing text
-uses that name: UI strings, stories, the samples and other `.mdx` pages, and the READMEs the
-package ships.
-
-- **Where space is tight — buttons, links, badges — `ONLYOFFICE` alone is enough**: "Sign in
-  with ONLYOFFICE", "Open in ONLYOFFICE".
-- **Roles use the product's own words**, which carry no product name: Owner, Full admin, Room
-  admin, Power user, User, Guest.
-- **Names of things are not copy, so they stay**: `@onlyoffice/docspace-api-sdk`, the
-  `DocSpace-client` repository and its paths, API routes, `docspace` in URLs, environment and
-  config keys, CSS classes and test ids. Engineering notes here (`CLAUDE.md`, `.claude/rules/`)
-  keep "DocSpace" where it names that codebase.
-- **Inside a component the name comes from `getBrandName("ProductName")`**, because a
-  white-label portal renames the product again; `t("Common:ProductName")` is refused by the
-  `no-constants-via-i18n` lint plugin. Samples and documentation write the name out.
+The product formerly called DocSpace is **ONLYOFFICE Apps**, and every piece of user-facing
+text — UI strings, stories, `.mdx` pages, the READMEs the package ships — uses that name.
+Names of things (the `DocSpace-client` repository, package names, URLs, keys, identifiers)
+stay. `.claude/rules/product-naming.md` has the full list and the grep for leftovers.
 
 ## Paths
 

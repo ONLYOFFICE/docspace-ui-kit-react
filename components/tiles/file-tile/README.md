@@ -20,7 +20,7 @@
 # FileTile
 
 Tile for a document: a thumbnail with badges over it, and a name row with a checkbox and a menu.
-It is the card form of one file in the DocSpace listing, and the only tile in the family with a
+It is the card form of one file in the ONLYOFFICE Apps listing, and the only tile in the family with a
 preview image.
 
 ## Use this when / not when

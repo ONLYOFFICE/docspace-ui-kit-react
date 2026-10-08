@@ -147,7 +147,7 @@ export const propsMarkdown = (resolved) => {
     lines.push(
       "#### Portal-only props",
       "",
-      "These need DocSpace portal context and do nothing in a standalone app.",
+      "These need ONLYOFFICE Apps portal context and do nothing in a standalone app.",
       "",
       table(ordered(portal)),
       "",

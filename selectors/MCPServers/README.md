@@ -4,7 +4,7 @@ A selector component for choosing available MCP (Model Context Protocol) servers
 
 ## What It Does
 
-- Fetches and displays a list of available MCP servers from the DocSpace AI API
+- Fetches and displays a list of available MCP servers from the ONLYOFFICE Apps AI API
 - Supports multi-select mode — users can select/deselect multiple servers
 - Pre-selects servers that are already connected (`initedSelectedServers`)
 - Handles paginated loading of servers in batches of 100
@@ -55,7 +55,7 @@ const AIAgentSettings = () => {
 ```tsx
 enum ServerType {
   Custom, // Custom MCP server
-  Portal, // The portal's own server (uses portal logo)
+  Portal, // ONLYOFFICE Apps portal server (uses portal logo)
   GitHub, // GitHub integration
   Box, // Box integration
 }

@@ -1,4 +1,4 @@
-// Checks the component READMEs against the contract in `README_TEMPLATE.md`.
+// Checks the component READMEs against the contract in `COMPONENT_README_TEMPLATE.md`.
 //
 //   pnpm check:readme                     every component
 //   pnpm check:readme --only button       one, folder name or path
@@ -13,7 +13,7 @@
 // ignored prop and no error at all, so `state.visibility` is checked against
 // the resolved props rather than believed.
 //
-// The section list and its order come from `README_TEMPLATE.md`, which is the
+// The section list and its order come from `COMPONENT_README_TEMPLATE.md`, which is the
 // source of truth for what a component's documentation says; the authoring rule
 // and the `component-docs` skill were rewritten to match rather than the other
 // way round.
@@ -137,7 +137,7 @@ const headingAndLead = (readme) => {
   return { heading: match[1], lead: match[2].replace(/\s+/g, " ").trim() };
 };
 
-// The `##` sections, in the order `README_TEMPLATE.md` puts them. `when` is
+// The `##` sections, in the order `COMPONENT_README_TEMPLATE.md` puts them. `when` is
 // what makes a conditional section required and forbidden otherwise; a section
 // without it is mandatory.
 const SECTIONS = [
@@ -337,7 +337,7 @@ const shippedMatchers = () => {
  *
  * These read as working links here and are dead in the tarball, which is the
  * copy most people have: a published `docs/` page shipped a link to
- * `README_TEMPLATE.md`, a contributor document `files` does not carry. Only
+ * `COMPONENT_README_TEMPLATE.md`, a contributor document `files` does not carry. Only
  * pages that ship are worth checking, and only links that resolve inside the
  * repository -- a link to a file that does not exist at all is a different
  * fault, and one the repository's own reader hits first.

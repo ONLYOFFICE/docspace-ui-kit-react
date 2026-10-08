@@ -16,7 +16,7 @@ const meta = {
       control: "text",
       description:
         "Text label shown at the inline start of the toggle; an empty string hides it",
-      table: { defaultValue: { summary: "<product name> design" } },
+      table: { defaultValue: { summary: "ONLYOFFICE Apps design" } },
     },
     labelOld: {
       control: "text",
@@ -42,7 +42,7 @@ const meta = {
       table: {
         defaultValue: {
           summary:
-            "You are about to leave the new Dashboard and return to the classic <product name> view.",
+            "You are about to leave the new Dashboard and return to the classic ONLYOFFICE Apps view.",
         },
       },
     },
@@ -73,7 +73,7 @@ const meta = {
       control: "text",
       description:
         "Accessible name a screen reader announces for the switch; the English default is not translated",
-      table: { defaultValue: { summary: "Switch <product name> design" } },
+      table: { defaultValue: { summary: "Switch ONLYOFFICE Apps design" } },
     },
     onNavigate: {
       action: "onNavigate",
@@ -111,9 +111,9 @@ export const Default: Story = {
     await expect(toggle).toHaveAttribute("aria-checked", "true");
 
     // The default strings name the product through the brand lookup
-    // (Storybook registers "ONLYOFFICE"), never the old "DocSpace".
-    await expect(toggle).toHaveAccessibleName("Switch ONLYOFFICE design");
-    await expect(canvas.getByText("ONLYOFFICE design")).toBeVisible();
+    // (Storybook registers the brands fixture), never the old "DocSpace".
+    await expect(toggle).toHaveAccessibleName("Switch ONLYOFFICE Apps design");
+    await expect(canvas.getByText("ONLYOFFICE Apps design")).toBeVisible();
     await expect(canvas.queryByText(/DocSpace/)).toBeNull();
 
     // Leaving NEW asks first; Cancel keeps NEW and goes nowhere.

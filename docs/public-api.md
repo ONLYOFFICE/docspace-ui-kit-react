@@ -1,7 +1,7 @@
 # Public API
 
 What `@onlyoffice/apps-ui-kit` promises to external consumers, what it keeps for the
-DocSpace portal, and what it guarantees about neither.
+ONLYOFFICE Apps portal, and what it guarantees about neither.
 
 **Status:** largely landed. The `exports` map, the dependency split and the build that serves
 them are in the tree; what remains open is listed at the end, and one thing this document
@@ -21,7 +21,7 @@ being reachable. The client now consumes a packed tarball
 `packages/shared`), so that enforcement is live: 4 060 deep-subpath import sites across 1 575
 files resolve through the map rather than through a symlink.
 
-**The barrel is a second contract, and a stricter one.** DocSpace plugins never install this
+**The barrel is a second contract, and a stricter one.** ONLYOFFICE Apps plugins never install this
 package: the portal re-exports the root barrel to them in one line and refuses every subpath,
 so `index.ts` is the whole plugin UI API and dropping a name from it breaks plugins with no
 compile error in either repository. The client barely uses the barrel — 11 import sites against
@@ -111,7 +111,7 @@ index.js -> billing/wallet/...       -> selectors/People/index.js          -> ax
 
 Since `axios` is an _optional_ peer, `npm i @onlyoffice/apps-ui-kit` does not install it, and a
 bare `import { Button } from "@onlyoffice/apps-ui-kit"` then fails to resolve for anyone who
-bundles the barrel themselves. Observed, not inferred: the DocSpace plugin preview harness
+bundles the barrel themselves. Observed, not inferred: the ONLYOFFICE Apps plugin preview harness
 reports `Could not resolve "axios" imported by "@onlyoffice/apps-ui-kit"` on a freshly generated
 plugin. The portal is unaffected, because it supplies `axios` and hands plugins its own mounted
 copy of the kit at runtime.
@@ -129,7 +129,7 @@ pulls. Two ways out, and they are not equivalent:
 Unresolved; tracked as open question 6.
 
 **`utils/socket`.** The only importer of `socket.io-client` and
-`@socket.io/component-emitter` in the whole library, and meaningful only against a DocSpace
+`@socket.io/component-emitter` in the whole library, and meaningful only against an ONLYOFFICE Apps
 portal's socket server. Keeping it out of the public surface moves both dependencies to
 optional peers rather than removing them: the module still ships (`dist/esm/utils/socket`), and
 it is reachable by subpath, but an external install downloads neither package.
@@ -152,16 +152,16 @@ The `exports` map therefore declares them, and the build emits them. The distinc
 editorial, not mechanical — which is why it has to be written down here rather than enforced by
 resolution alone.
 
-| Module            | Client imports | Why not public API                                                                                                              |
-| ----------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `ai-agent`        | 80             | Depends on `@onlyoffice/ai-chat`, which cannot currently be published. Ships anyway, via optional peer dependencies — see below |
-| `billing`         | 68             | Portal tariff/payment flows; depends on the API layer and MobX stores                                                           |
-| `selectors`       | 70             | Data-driven pickers (People, Room, Files, Groups, MCPServers, AIAgent) built on the API layer and MobX                          |
-| `uploader`        | 7              | Depends on `selectors/Files` and `providers/api`                                                                                |
-| `document-editor` | 2              | Wrapper around `@onlyoffice/document-editor-react`; external consumers should use that package directly                         |
-| `api`             | —              | Portal REST client                                                                                                              |
-| `providers/api`   | —              | Portal API provider; sole importer of `axios`                                                                                   |
-| `utils/socket`    | —              | See above                                                                                                                       |
+| Module            | Client imports | Why not public API                                                                                      |
+| ----------------- | -------------- | ------------------------------------------------------------------------------------------------------- |
+| `ai-agent`        | 80             | Depends on `@onlyoffice/ai-chat`, an optional peer the consumer installs from npm — see below           |
+| `billing`         | 68             | Portal tariff/payment flows; depends on the API layer and MobX stores                                   |
+| `selectors`       | 70             | Data-driven pickers (People, Room, Files, Groups, MCPServers, AIAgent) built on the API layer and MobX  |
+| `uploader`        | 7              | Depends on `selectors/Files` and `providers/api`                                                        |
+| `document-editor` | 2              | Wrapper around `@onlyoffice/document-editor-react`; external consumers should use that package directly |
+| `api`             | —              | Portal REST client                                                                                      |
+| `providers/api`   | —              | Portal API provider; sole importer of `axios`                                                           |
+| `utils/socket`    | —              | See above                                                                                               |
 
 **Two of them are in the root barrel**: `index.ts` exports `uploader` and `billing` alongside
 the public modules, so they are portal-internal by tiering and public by resolution — and, since
@@ -172,12 +172,14 @@ unreachable from a plugin. That inconsistency is what leaks `axios` into the cor
 Any of these could be promoted to public later if there is external demand (D5). Promotion is
 cheap — it means documenting and committing to semver, not moving code.
 
-## Shipping `ai-agent` without a publishable `ai-chat`
+## Shipping `ai-agent` as an optional peer of `ai-chat`
 
-`@onlyoffice/ai-chat` is a vendored `file:` tarball, and a published package with a `file:`
-dependency is uninstallable for everyone. But `ai-agent` has to ship. The resolution is
-**optional peer dependencies** — the same pattern `ai-chat` itself uses, and one that needs no
-exception to the "externalize everything" build rule.
+`@onlyoffice/ai-chat` used to be a vendored `file:` tarball, and a published package with a
+`file:` dependency is uninstallable for everyone. It is on npm now (`^1.0.0`), but the
+arrangement made for the tarball stays, because it is right on its own terms: most consumers
+never import `ai-agent`, and should not download a chat UI with 32 peers of its own. The
+resolution is **optional peer dependencies** — the same pattern `ai-chat` itself uses, and one
+that needs no exception to the "externalize everything" build rule.
 
 - `@onlyoffice/ai-chat` is declared as a **peer dependency marked optional**
   (`peerDependenciesMeta`).
@@ -185,17 +187,16 @@ exception to the "externalize everything" build rule.
   `@onlyoffice/ai-chat` specifier.
 - `npm i @onlyoffice/apps-ui-kit` installs cleanly for everyone: an unsatisfied optional
   peer is neither fetched nor an error.
-- Consumers who never import `ai-agent/*` — every external consumer, for now — are unaffected.
-- The monorepo supplies `ai-chat` itself: the tarball declaration moves to the consuming
-  package, or stays in the ui-kit workspace manifest for development.
+- Consumers who never import `ai-agent/*` are unaffected.
+- A consumer that does import it installs `@onlyoffice/ai-chat` 1.x itself, from npm. This
+  repository keeps a registry copy in `devDependencies` for the build, tests and Storybook.
 
 The failure mode is loud and honest: importing `ai-agent/*` without supplying `ai-chat` fails at
 build time naming the missing package. That is the opposite of the silent failures this
 separation exists to prevent.
 
-`ai-agent` is therefore unusable for external consumers until `ai-chat` is published. That
-follows from the constraint, not from this design, and it is acceptable precisely because
-`ai-agent` carries no public contract.
+`ai-agent` still carries no public contract: it is reachable by anyone who installs `ai-chat`,
+but it is portal-coupled and not covered by semver.
 
 ## Dependency consequences
 
@@ -323,8 +324,8 @@ Partly machine-checked. What runs:
   field overrides are a pnpm feature, and an npm-packed tarball has no `exports` and no `main`,
   so `--pack` reports total failure for the wrong reason.
 - **`scripts/check-dist.mjs`**, at the end of `pnpm build` — no bundled dependencies, every
-  emitted module an `index` file, and a `"use client"` in `dist` for each of the 55 modules that
-  declare one.
+  emitted module an `index` file, and a `"use client"` in `dist` for every module that
+  declares one.
 - **An API-surface snapshot** — `docs/plugin-surface.json`, written and diffed by
   `.claude/scripts/plugin-surface/surface.mjs`. It fails on a removed or re-kinded export, which
   is the change no compiler reports. `pnpm surface:check`, in the pre-push gate and in CI, fails
@@ -340,8 +341,8 @@ harness in another repository rather than by anything here.
 ## Open questions
 
 1. ~~Does the published package ship the portal-internal modules?~~ **Answered: yes.** They
-   ship; `ai-agent` works through optional peer dependencies until `@onlyoffice/ai-chat` can be
-   published.
+   ship; `ai-agent` works through optional peer dependencies. `@onlyoffice/ai-chat` has since
+   been published (1.0.0), and the peer range is `^1.0.0`.
    ~~The 15 packages nobody imports~~ **Done: moved to optional peers.** `mobx`, `mobx-react`,
    `axios`, `socket.io-client`, `@socket.io/component-emitter`, `react-router`,
    `react-markdown`, `react-syntax-highlighter`, `rehype-katex`, `rehype-raw`, `remark-gfm`,

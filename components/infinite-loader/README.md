@@ -19,7 +19,7 @@
 # InfiniteLoader
 
 Virtualised list or grid that asks for the next page as the user scrolls towards the end. It is
-built for the DocSpace portal's layout: by default it looks for the portal's own scroll element
+built for the ONLYOFFICE Apps portal's layout: by default it looks for the portal's own scroll element
 by id, and `scrollElement` points it at any other.
 
 ## Use this when / not when

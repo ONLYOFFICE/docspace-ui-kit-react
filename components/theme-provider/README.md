@@ -188,7 +188,7 @@ export function BrandedApp() {
   `undefined` while the document still gets `ltr`.
 - **The `.light` and `.dark` classes this folder defines carry the portal's payment-page colours**
   alongside the page background and text colour — seven `--payment-callback-*` properties that only
-  the DocSpace billing screens read.
+  the ONLYOFFICE Apps billing screens read.
 
 ## Accessibility
 

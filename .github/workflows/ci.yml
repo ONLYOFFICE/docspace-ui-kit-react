@@ -68,6 +68,13 @@ jobs:
       - name: Check the API-surface snapshot
         run: pnpm surface:check
 
+      # The API-site pages (scripts/docs/): every README and Getting-started
+      # page has to land in a Storybook group, resolve its links and compile as
+      # MDX. The site builds in another repository, so this is the only place a
+      # README that breaks it is caught before docs:sync.
+      - name: Check the API-site pages
+        run: pnpm docs:check
+
   storybook:
     name: "Build Storybook"
     runs-on: ubuntu-latest

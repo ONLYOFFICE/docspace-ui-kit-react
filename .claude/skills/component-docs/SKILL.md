@@ -20,7 +20,7 @@ is missing from a flat listing.
 
 ## Writing a README
 
-[`README_TEMPLATE.md`](../../../README_TEMPLATE.md) is the contract and
+[`COMPONENT_README_TEMPLATE.md`](../../../COMPONENT_README_TEMPLATE.md) is the contract and
 [`components/button/README.md`](../../../components/button/README.md) is the worked example.
 Read both before starting; what follows is the procedure, not a second description of the
 shape.
