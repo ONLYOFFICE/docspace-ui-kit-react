@@ -4,6 +4,7 @@ import classNames from "classnames";
 import { RectangleSkeleton } from "../rectangle";
 import { Tooltip } from "../tooltip";
 import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect";
+import { consumeKey } from "../../utils/consume-key";
 
 import ArrowLeftIcon from "../../assets/arrow-left.react.svg";
 import ArrowRightIcon from "../../assets/icons/16/right.arrow.react.svg";
@@ -286,6 +287,7 @@ export const QuickActions = ({
     else return;
 
     e.preventDefault();
+    consumeKey(e);
     next.focus();
     next.scrollIntoView?.({ block: "nearest", inline: "nearest" });
   };

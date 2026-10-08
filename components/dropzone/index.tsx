@@ -9,6 +9,7 @@ import { PreparationPortalProgress } from "../progress-bar/PreparationPortalProg
 import { Badge } from "../badge";
 import { DropDown } from "../drop-down";
 import { IconSizeType } from "../../utils";
+import { consumeKey } from "../../utils/consume-key";
 
 import { DropzoneProps } from "./Dropzone.types";
 import styles from "./Dropzone.module.scss";
@@ -133,6 +134,7 @@ const Dropzone = ({
     if (e.target !== e.currentTarget) return;
     if (e.key !== "Enter" && e.key !== " ") return;
     e.preventDefault();
+    consumeKey(e);
     openFolderDialog();
   };
 
@@ -169,13 +171,15 @@ const Dropzone = ({
     if (e.key === "Enter" || e.key === " ") {
       // Keep the key away from the area, which would open the file dialog.
       e.preventDefault();
-      e.stopPropagation();
+      consumeKey(e);
       setIsFormatsOpen((prev) => !prev);
       return;
     }
 
+    // Consumed whole, keyup included: a dialog around the area closes on an
+    // Escape keyup on window.
     if (e.key === "Escape" && isFormatsOpen) {
-      e.stopPropagation();
+      consumeKey(e);
       setIsFormatsOpen(false);
     }
   };

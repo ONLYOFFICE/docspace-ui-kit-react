@@ -517,6 +517,24 @@ describe("QuickActions", () => {
       expect(tiles[0]).toHaveFocus();
     });
 
+    // The portal's file list moves its selection on arrows that reach the
+    // document; walking the strip must not move it too.
+    it("keeps the arrows it walks with from the document's listeners", () => {
+      const onDocumentKeyDown = vi.fn();
+      document.addEventListener("keydown", onDocumentKeyDown);
+      render(<QuickActions {...LABELS} items={buildFiveItems()} />);
+      const tiles = Array.from(
+        screen.getByRole("toolbar").querySelectorAll("button"),
+      );
+      tiles[0].focus();
+
+      fireEvent.keyDown(tiles[0], { key: "ArrowRight" });
+
+      expect(tiles[1]).toHaveFocus();
+      expect(onDocumentKeyDown).not.toHaveBeenCalled();
+      document.removeEventListener("keydown", onDocumentKeyDown);
+    });
+
     it("walks the other way round in RTL", () => {
       render(<QuickActions {...LABELS} items={buildFiveItems()} />);
 

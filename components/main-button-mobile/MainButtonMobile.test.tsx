@@ -85,6 +85,32 @@ describe("<MainButtonMobile />", () => {
     );
   });
 
+  // Escape closes the sheet only: not a dialog around it (Escape keyup on
+  // window) and not the portal's selection (Escape keydown on the document).
+  it("keeps its Escape from document and window listeners", () => {
+    const onDocumentKeyDown = vi.fn();
+    const onWindowKeyUp = vi.fn();
+    document.addEventListener("keydown", onDocumentKeyDown);
+    window.addEventListener("keyup", onWindowKeyUp);
+    const onClose = vi.fn();
+    render(
+      <MainButtonMobile
+        buttonOptions={buttonOptions}
+        opened
+        onClose={onClose}
+      />,
+    );
+
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    fireEvent.keyUp(document.body, { key: "Escape" });
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(onDocumentKeyDown).not.toHaveBeenCalled();
+    expect(onWindowKeyUp).not.toHaveBeenCalled();
+    document.removeEventListener("keydown", onDocumentKeyDown);
+    window.removeEventListener("keyup", onWindowKeyUp);
+  });
+
   it("marks the sheet as a menu of menu items", () => {
     render(<MainButtonMobile buttonOptions={buttonOptions} opened />);
     expect(screen.getByRole("menu")).toBeInTheDocument();

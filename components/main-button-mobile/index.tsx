@@ -11,6 +11,7 @@ import classNames from "classnames";
 import { useTranslation } from "react-i18next";
 
 import ButtonAlertReactSvg from "../../assets/button.alert.react.svg";
+import { consumeKey } from "../../utils/consume-key";
 
 import { Scrollbar } from "../scrollbar";
 import { Backdrop } from "../backdrop";
@@ -216,19 +217,22 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
     }
   }, [withMenu, isOpen, sheetId]);
 
-  // Escape closes the sheet and gives focus back to the button.
+  // Escape closes the sheet and gives focus back to the button. It listens in
+  // the capture phase and consumes the key, so the portal's document hotkeys
+  // (Escape clears the selection) and a dialog around it do not also act.
   useEffect(() => {
     if (!isOpen) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
+      consumeKey(e);
       onCloseRef.current?.();
       setIsOpen(false);
       floatingButtonRef.current?.focus();
     };
 
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
   }, [isOpen]);
 
   // A click the keyboard made (Enter or Space on the button) has no pointer
@@ -297,6 +301,7 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
       case " ":
         if (index === -1) return;
         e.preventDefault();
+        consumeKey(e);
         items[index].click();
         return;
       default:
@@ -304,6 +309,7 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
     }
 
     e.preventDefault();
+    consumeKey(e);
     next?.focus();
   };
 
