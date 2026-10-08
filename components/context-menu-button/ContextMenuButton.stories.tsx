@@ -131,7 +131,7 @@ const meta = {
     onClose: {
       action: "onClose",
       description:
-        "Called when the menu closes by itself: a click outside it, Escape or Tab",
+        "Called whenever the open menu closes: a click outside it, Escape, Tab, a second click on the button or a chosen item",
     },
     opened: {
       control: "boolean",
@@ -261,17 +261,19 @@ export const Default: Story = {
     // onClick reports the click that opens the menu.
     await expect(args.onClick).toHaveBeenCalledTimes(1);
 
-    // An item runs its own onClick and closes the menu.
+    // An item runs its own onClick, closes the menu and reports onClose.
     await userEvent.click(screen.getByRole("menuitem", { name: "Option 2" }));
     await expect(onOption2).toHaveBeenCalledTimes(1);
     await waitFor(() =>
       expect(screen.queryByRole("menuitem", { name: "Option 1" })).toBeNull(),
     );
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
 
-    // Clicking the dots again opens (onClick) and then closes (no onClick).
+    // Clicking the dots again opens (onClick) and then closes (onClose).
     await userEvent.click(icon);
     await userEvent.click(icon);
     await expect(args.onClick).toHaveBeenCalledTimes(2);
+    await expect(args.onClose).toHaveBeenCalledTimes(2);
     await expect(
       screen.queryByRole("menuitem", { name: "Option 1" }),
     ).toBeNull();
@@ -282,7 +284,7 @@ export const Default: Story = {
       screen.getByRole("menuitem", { name: "Option 1" }),
     ).toBeVisible();
     await userEvent.click(document.body);
-    await waitFor(() => expect(args.onClose).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(args.onClose).toHaveBeenCalledTimes(3));
     await expect(
       screen.queryByRole("menuitem", { name: "Option 1" }),
     ).toBeNull();
@@ -309,7 +311,8 @@ export const Default: Story = {
       expect(screen.getByRole("menuitem", { name: "Option 1" })).toHaveFocus(),
     );
     await userEvent.keyboard("{Escape}");
-    await expect(args.onClose).toHaveBeenCalledTimes(2);
+    // Enter on Option 2 above was the fourth close, Escape the fifth.
+    await expect(args.onClose).toHaveBeenCalledTimes(5);
     await expect(icon).toHaveFocus();
     await expect(icon).toHaveAttribute("aria-expanded", "false");
   },
