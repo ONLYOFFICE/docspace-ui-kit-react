@@ -931,20 +931,23 @@ export const WithChatPanel: Story = {
     await expect(getComputedStyle(panel).width).toBe("400px");
 
     // Dragging the inner edge to the left widens the panel; the width is
-    // reported once, on release. The drag measures the panel with its 1px
-    // border, so the result may be a pixel wider than 440.
+    // reported once, on release. The drag measures the panel's content box,
+    // not its rect with the 1px border, so it lands on exactly 440.
     const resizer = within(panel).getByTestId("chat-panel-resizer");
     const x = resizer.getBoundingClientRect().left + 2;
     fireEvent.mouseDown(resizer, { button: 0, clientX: x });
     fireEvent.mouseMove(window, { clientX: x - 40 });
-    const dragged = Number.parseFloat(getComputedStyle(panel).width);
-    await expect(Math.abs(dragged - 440)).toBeLessThanOrEqual(1);
+    await expect(getComputedStyle(panel).width).toBe("440px");
     await expect(args.setChatPanelWidth).not.toHaveBeenCalled();
     fireEvent.mouseUp(window);
     await expect(args.setChatPanelWidth).toHaveBeenCalledTimes(1);
-    const reported = (args.setChatPanelWidth as ReturnType<typeof fn>).mock
-      .calls[0][0] as number;
-    await expect(Math.abs(reported - 440)).toBeLessThanOrEqual(1);
+    await expect(args.setChatPanelWidth).toHaveBeenLastCalledWith(440);
+
+    // A grab released without moving commits the width unchanged.
+    const x2 = resizer.getBoundingClientRect().left + 2;
+    fireEvent.mouseDown(resizer, { button: 0, clientX: x2 });
+    fireEvent.mouseUp(window);
+    await expect(args.setChatPanelWidth).toHaveBeenLastCalledWith(440);
   },
   parameters: {
     docs: {

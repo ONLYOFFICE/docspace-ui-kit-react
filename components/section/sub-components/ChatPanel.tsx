@@ -33,6 +33,14 @@ const contentWidth = (panel: HTMLElement) => {
     : Number.POSITIVE_INFINITY;
 };
 
+// Width of the panel's content box -- the box `--chat-panel-width` sets. The
+// panel is `content-box` with a 1px inline-start border, so its rect is one
+// pixel wider than the variable; measuring the rect would grow the panel by
+// that pixel on every grab. `offsetWidth - clientWidth` is the border (and a
+// scrollbar, should one ever appear), taken off the fractional rect width.
+const panelWidth = (panel: HTMLElement) =>
+  panel.getBoundingClientRect().width - (panel.offsetWidth - panel.clientWidth);
+
 /**
  * Right-side region dedicated to the AI Chat panel. Unlike `InfoPanel` it never
  * switches into the portal-based "Aside" overlay on tablet/mobile: it always
@@ -121,7 +129,7 @@ const ChatPanel = ({
         // Sub-pixel rounding of the flex row is not a deficit worth acting on.
         if (deficit < 1) return;
 
-        const current = panel.getBoundingClientRect().width;
+        const current = panelWidth(panel);
         const next = Math.max(
           MIN_CHAT_PANEL_WIDTH,
           Math.round(current - deficit),
@@ -164,7 +172,7 @@ const ChatPanel = ({
       // than the drag restarted, when it crosses the fullscreen boundary — that
       // is what makes the gesture continuous in both directions.
       let anchorX = e.clientX;
-      let anchorWidth = panel.getBoundingClientRect().width;
+      let anchorWidth = panelWidth(panel);
       let fullscreen = !!isFullscreen;
 
       // Grow only into the slack the content next to the panel still has above
@@ -181,7 +189,9 @@ const ChatPanel = ({
             ),
       );
 
-      let nextWidth = anchorWidth;
+      // A grab released without moving commits the width the panel already
+      // has -- rounded, like every other width this drag reports.
+      let nextWidth = Math.round(anchorWidth);
       let committed = false;
 
       const onMouseMove = (event: MouseEvent) => {
