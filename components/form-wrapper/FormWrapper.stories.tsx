@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, within } from "storybook/test";
+import { expect, fn, within } from "storybook/test";
 
 import { Button, ButtonSize } from "../button";
 import { FieldContainer } from "../field-container";
@@ -35,6 +35,11 @@ const meta = {
     style: {
       control: "object",
       description: "Inline styles applied to the card",
+    },
+    onSubmit: {
+      control: false,
+      description:
+        "Makes the card a form; called on submit with the navigation prevented",
     },
   },
 } satisfies Meta<typeof FormWrapper>;
@@ -116,7 +121,13 @@ const SignInFormTemplate = (args: ComponentProps<typeof FormWrapper>) => {
           scale
         />
       </FieldContainer>
-      <Button primary scale size={ButtonSize.normal} label="Sign in" />
+      <Button
+        primary
+        scale
+        type="submit"
+        size={ButtonSize.normal}
+        label="Sign in"
+      />
     </FormWrapper>
   );
 };
@@ -125,8 +136,14 @@ export const WithLoginForm: Story = {
   render: (args) => <SignInFormTemplate {...args} />,
   args: {
     children: null,
+    onSubmit: fn(),
+    "aria-label": "Sign in",
   },
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ args, canvas, userEvent }) => {
+    // With onSubmit the card is the form, a landmark named by aria-label.
+    const form = canvas.getByRole("form", { name: "Sign in" });
+    await expect(form).toBe(canvas.getByTestId("form-wrapper"));
+
     // Each caption names its field.
     const email = canvas.getByLabelText("Email");
     await userEvent.type(email, "user@example.com");
@@ -145,22 +162,28 @@ export const WithLoginForm: Story = {
       0,
     );
     await expect(card).toContainElement(button);
+
+    // Enter in a field submits the form, and the page stays where it is.
+    await userEvent.type(password, "{Enter}");
+    await expect(args.onSubmit).toHaveBeenCalledTimes(1);
+    await userEvent.click(button);
+    await expect(args.onSubmit).toHaveBeenCalledTimes(2);
   },
   parameters: {
     docs: {
       description: {
         story:
-          "A sign-in form as the card is meant to hold it: an email field, a password field and a primary button. Each field row is given a width of 100% and each control `scale`, so they span the card instead of shrinking to their content.",
+          "A sign-in form as the card is meant to hold it: an email field, a password field and a primary submit button. With `onSubmit` the card is the `<form>`, so Enter in either field submits it. Each caption is tied to its field through `labelFor` and the control's `id`; each field row is given a width of 100% and each control `scale`, so they span the card instead of shrinking to their content.",
       },
       source: {
-        code: `<FormWrapper>
-  <FieldContainer isVertical labelVisible labelText="Email" style={{ width: "100%" }}>
-    <TextInput type={InputType.email} size={InputSize.base} value={email} onChange={onEmailChange} scale />
+        code: `<FormWrapper onSubmit={onSignIn} aria-label="Sign in">
+  <FieldContainer isVertical labelVisible labelText="Email" labelFor="sign-in-email" style={{ width: "100%" }}>
+    <TextInput id="sign-in-email" type={InputType.email} size={InputSize.base} value={email} onChange={onEmailChange} scale />
   </FieldContainer>
-  <FieldContainer isVertical labelVisible labelText="Password" style={{ width: "100%" }}>
-    <TextInput type={InputType.password} size={InputSize.base} value={password} onChange={onPasswordChange} scale />
+  <FieldContainer isVertical labelVisible labelText="Password" labelFor="sign-in-password" style={{ width: "100%" }}>
+    <TextInput id="sign-in-password" type={InputType.password} size={InputSize.base} value={password} onChange={onPasswordChange} scale />
   </FieldContainer>
-  <Button primary scale size={ButtonSize.normal} label="Sign in" />
+  <Button primary scale type="submit" size={ButtonSize.normal} label="Sign in" />
 </FormWrapper>`,
       },
     },
@@ -235,17 +258,17 @@ export const WithRegistrationForm: Story = {
       },
       source: {
         code: `<FormWrapper>
-  <FieldContainer isVertical labelVisible labelText="Full name" style={{ width: "100%" }}>
-    <TextInput type={InputType.text} size={InputSize.base} value={name} onChange={onNameChange} scale />
+  <FieldContainer isVertical labelVisible labelText="Full name" labelFor="register-name" style={{ width: "100%" }}>
+    <TextInput id="register-name" type={InputType.text} size={InputSize.base} value={name} onChange={onNameChange} scale />
   </FieldContainer>
-  <FieldContainer isVertical labelVisible labelText="Email" style={{ width: "100%" }}>
-    <TextInput type={InputType.email} size={InputSize.base} value={email} onChange={onEmailChange} scale />
+  <FieldContainer isVertical labelVisible labelText="Email" labelFor="register-email" style={{ width: "100%" }}>
+    <TextInput id="register-email" type={InputType.email} size={InputSize.base} value={email} onChange={onEmailChange} scale />
   </FieldContainer>
-  <FieldContainer isVertical labelVisible labelText="Password" style={{ width: "100%" }}>
-    <TextInput type={InputType.password} size={InputSize.base} value={password} onChange={onPasswordChange} scale />
+  <FieldContainer isVertical labelVisible labelText="Password" labelFor="register-password" style={{ width: "100%" }}>
+    <TextInput id="register-password" type={InputType.password} size={InputSize.base} value={password} onChange={onPasswordChange} scale />
   </FieldContainer>
-  <FieldContainer isVertical labelVisible labelText="Confirm password" style={{ width: "100%" }}>
-    <TextInput type={InputType.password} size={InputSize.base} value={confirm} onChange={onConfirmChange} scale />
+  <FieldContainer isVertical labelVisible labelText="Confirm password" labelFor="register-confirm" style={{ width: "100%" }}>
+    <TextInput id="register-confirm" type={InputType.password} size={InputSize.base} value={confirm} onChange={onConfirmChange} scale />
   </FieldContainer>
   <Button primary scale size={ButtonSize.normal} label="Create account" />
 </FormWrapper>`,
@@ -285,6 +308,8 @@ export const CssCustomization: Story = {
     // The width variables size the content box; the padding is added on top.
     await expect(style.width).toBe("400px");
     await expect(style.paddingLeft).toBe("40px");
+    // So the card itself is the width plus the padding on both sides.
+    await expect(Math.round(card.getBoundingClientRect().width)).toBe(480);
   },
   parameters: {
     docs: {
