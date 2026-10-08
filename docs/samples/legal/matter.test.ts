@@ -106,21 +106,26 @@ describe("byAttention", () => {
 describe("updatedAgo", () => {
   const now = new Date(2026, 8, 25, 15, 0);
 
-  // `updatedAgo` speaks the reader's locale on purpose, so the expected words
-  // come from the same formatter rather than being spelled in English: the
-  // test must pass on a machine in any locale, and the day count is what is
-  // under test, not the language.
-  const inLocale = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
-
   it("counts calendar days, not 24-hour periods", () => {
     expect(updatedAgo(new Date(2026, 8, 25, 1, 0).toISOString(), now)).toBe(
-      inLocale.format(0, "day"),
+      "today",
     );
     expect(updatedAgo(new Date(2026, 8, 24, 23, 0).toISOString(), now)).toBe(
-      inLocale.format(-1, "day"),
+      "yesterday",
     );
     expect(updatedAgo(new Date(2026, 8, 20).toISOString(), now)).toBe(
-      inLocale.format(-5, "day"),
+      "5 days ago",
+    );
+  });
+
+  // The page around it is English, so the phrase is English too whatever the
+  // browser's locale -- spelled out here, so a machine in any locale checks it.
+  it("speaks English, like the rest of the page", () => {
+    expect(updatedAgo(new Date(2026, 6, 25).toISOString(), now)).toBe(
+      "2 months ago",
+    );
+    expect(updatedAgo(new Date(2024, 8, 25).toISOString(), now)).toBe(
+      "2 years ago",
     );
   });
 
