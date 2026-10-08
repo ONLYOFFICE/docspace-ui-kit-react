@@ -76,9 +76,7 @@ export const Default: Story = {
       timeout: 3000,
     });
     await expect(canvas.getByText("Household budget.xlsx")).toBeVisible();
-    // The filter pushes the applied query back into the field; an edit made
-    // before that lands is overwritten, so let the search settle first.
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    // Clearing right away: the late echo of "budget" must not come back.
     await userEvent.clear(canvas.getByPlaceholderText(/^Search in /));
     await listed(context, "Notes.docx");
 
