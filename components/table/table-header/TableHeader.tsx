@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import throttle from "lodash/throttle";
@@ -88,6 +53,18 @@ export const TableHeader = (props: TableHeaderProps) => {
   const [hideColumns, setHideColumns] = useState(false);
   const [minWidthsIndex, setMinWidthsIndex] = useState<number[]>([]);
 
+  // Column ids repeat across tables; search this header only.
+  // Before the ref is attached, never fall back to another table.
+  const getContainer = () =>
+    containerRef.current ??
+    headerRef.current?.closest<HTMLDivElement>(".table-container") ??
+    document.getElementById("table-container");
+
+  const getColumnNode = (index: Nullable<number> | string) =>
+    headerRef.current
+      ? headerRef.current.querySelector<HTMLElement>(`[id="column_${index}"]`)
+      : document.getElementById(`column_${index}`);
+
   const { isRTL } = useInterfaceDirection();
 
   const getNextColumn = (array: TTableColumn[], index: number) => {
@@ -105,7 +82,9 @@ export const TableHeader = (props: TableHeaderProps) => {
   const updateTableRows = (str: string) => {
     if (!useReactWindow) return;
 
-    const rows = document.querySelectorAll(".table-row, .table-list-item");
+    const rows = (getContainer() ?? document).querySelectorAll(
+      ".table-row, .table-list-item",
+    );
 
     if (rows?.length) {
       for (let i = 0; i < rows.length; i += 1) {
@@ -131,7 +110,7 @@ export const TableHeader = (props: TableHeaderProps) => {
     if (colIndex < 0) return;
 
     while (colIndex >= 0) {
-      leftColumn = document.getElementById(`column_${colIndex}`);
+      leftColumn = getColumnNode(colIndex);
       if (leftColumn) {
         if (leftColumn.dataset.enable === "true") break;
         else colIndex -= 1;
@@ -180,7 +159,7 @@ export const TableHeader = (props: TableHeaderProps) => {
     let colIndex = index || +columnIndex + 1;
 
     while (colIndex !== columns.length) {
-      rightColumn = document.getElementById(`column_${colIndex}`);
+      rightColumn = getColumnNode(colIndex);
       if (rightColumn) {
         if (rightColumn.dataset.enable === "true") break;
         else colIndex += 1;
@@ -190,7 +169,7 @@ export const TableHeader = (props: TableHeaderProps) => {
     const offset = getSubstring(widths[+columnIndex]) - newWidth;
     const column2Width = getSubstring(widths[colIndex]);
 
-    const defaultColumn = document.getElementById(`column_${colIndex}`);
+    const defaultColumn = getColumnNode(colIndex);
     if (!defaultColumn || defaultColumn.dataset.defaultSize) return;
 
     const minSize = rightColumn?.dataset.minWidth
@@ -218,7 +197,7 @@ export const TableHeader = (props: TableHeaderProps) => {
     const columnIndex = columnIndexRef.current;
 
     if (columnIndex === null) return;
-    const column = document.getElementById(`column_${columnIndex}`);
+    const column = getColumnNode(columnIndex);
 
     if (!column) return;
 
@@ -288,6 +267,17 @@ export const TableHeader = (props: TableHeaderProps) => {
   };
 
   function resetColumns(isResized: boolean = false) {
+    // While the container is collapsed (e.g. the host hides #section behind a
+    // fullscreen overlay, giving it width 0), recomputing against a zero width
+    // yields garbage column sizes that would get persisted and corrupt the
+    // layout once the container is restored — skip until it has a real width.
+    const collapsedContainer = getContainer();
+    if (
+      collapsedContainer &&
+      collapsedContainer.getBoundingClientRect().width < 1
+    )
+      return;
+
     if (!infoPanelVisible) localStorage.removeItem(columnStorageName);
     else localStorage.removeItem(columnInfoPanelStorageName || "");
 
@@ -299,9 +289,7 @@ export const TableHeader = (props: TableHeaderProps) => {
       .filter((x) => !x.default)
       .filter((x) => !x.isShort);
 
-    const container = containerRef.current
-      ? containerRef.current
-      : document.getElementById("table-container");
+    const container = getContainer();
 
     if (!container) return;
 
@@ -390,7 +378,7 @@ export const TableHeader = (props: TableHeaderProps) => {
       const unfixedSize = checkingForUnfixedSize(item, defaultColumnSize);
       if (!unfixedSize) return;
 
-      const column = document.getElementById(`column_${index}`);
+      const column = getColumnNode(index);
       const minWidth = column?.dataset?.minWidth;
       const minSize = minWidth ? +minWidth : MIN_SIZE_NAME_COLUMN;
 
@@ -408,7 +396,7 @@ export const TableHeader = (props: TableHeaderProps) => {
       const unfixedSize = checkingForUnfixedSize(item, defaultColumnSize);
       if (!unfixedSize) return;
 
-      const column = document.getElementById(`column_${index}`);
+      const column = getColumnNode(index);
       const minWidth = column?.dataset?.minWidth;
       const minSize = minWidth ? +minWidth : MIN_SIZE_NAME_COLUMN;
 
@@ -503,11 +491,14 @@ export const TableHeader = (props: TableHeaderProps) => {
 
     let activeColumnIndex = null;
 
-    const container = containerRef.current
-      ? containerRef.current
-      : document.getElementById("table-container");
+    const container = getContainer();
 
     if (!container) return;
+
+    // Bail while the container is collapsed (width 0) — see resetColumns. This
+    // also makes the synthetic resize the host fires on fullscreen enter safe:
+    // it lands here at width 0 and is ignored instead of persisting garbage.
+    if (container.getBoundingClientRect().width < 1) return;
 
     const storageSize =
       !resetColumnsSize && localStorage.getItem(columnStorageName);
@@ -593,7 +584,7 @@ export const TableHeader = (props: TableHeaderProps) => {
       let containerMinWidth = containerWidth - defaultSize - SETTINGS_SIZE;
 
       tableInfoPanelContainer.forEach((item, index) => {
-        const column = document.getElementById(`column_${index}`);
+        const column = getColumnNode(index);
 
         const enable =
           index === tableContainer.length - 1 ||
@@ -626,7 +617,7 @@ export const TableHeader = (props: TableHeaderProps) => {
           columns.find((col) => col.isShort && col.enable)?.minWidth || 0;
 
         tableInfoPanelContainer.forEach((item, index) => {
-          const column = document.getElementById(`column_${index}`);
+          const column = getColumnNode(index);
 
           if (shortColumnSize && index === 0) {
             gridTemplateColumns.push(`${shortColumnSize}px`);
@@ -692,7 +683,7 @@ export const TableHeader = (props: TableHeaderProps) => {
             let overWidth = 0;
 
             tableInfoPanelContainer.forEach((item, index) => {
-              const column = document.getElementById(`column_${index}`);
+              const column = getColumnNode(index);
 
               const shortColumSize =
                 column?.dataset?.shortColum && column.dataset.minWidth;
@@ -824,7 +815,7 @@ export const TableHeader = (props: TableHeaderProps) => {
             const oldWidthIndexAndName = indexColumnWidth + nameColumnWidth;
 
             tableInfoPanelContainer.forEach((item, index) => {
-              const column = document.getElementById(`column_${index}`);
+              const column = getColumnNode(index);
 
               const enable =
                 index === tableInfoPanelContainer.length - 1 ||
@@ -969,7 +960,7 @@ export const TableHeader = (props: TableHeaderProps) => {
           for (const index in tableContainer) {
             const item = tableContainer[index];
 
-            const column = document.getElementById(`column_${index}`);
+            const column = getColumnNode(index);
             const enable =
               +index === tableContainer.length - 1 ||
               (column ? column.dataset.enable === "true" : item !== "0px");
@@ -1182,8 +1173,21 @@ export const TableHeader = (props: TableHeaderProps) => {
 
     window.addEventListener("resize", throttledResize);
 
+    // Also recompute on container-driven width changes that never fire a window
+    // resize — e.g. a host collapsing/expanding #section for a fullscreen
+    // overlay, or a side panel opening next to the table. Observing the
+    // container makes the table self-sufficient regardless of what moved it; a
+    // collapsed (width 0) container is handled by the guards in onResize.
+    // Setting gridTemplateColumns doesn't change the container's own box, so
+    // this can't feed back into itself.
+    const container = containerRef.current;
+    const resizeObserver = new ResizeObserver(throttledResize);
+    if (container) resizeObserver.observe(container);
+
     return () => {
       window.removeEventListener("resize", throttledResize);
+      resizeObserver.disconnect();
+      throttledResize.cancel();
     };
   });
 
@@ -1299,10 +1303,7 @@ export const TableHeader = (props: TableHeaderProps) => {
             >
               <TableSettings
                 columns={columns}
-                disableSettings={
-                  (infoPanelVisible || hideColumns || isIndexEditingModeProp) ??
-                  false
-                }
+                disableSettings={hideColumns || Boolean(isIndexEditingModeProp)}
               />
             </TooltipContainer>
           ) : null}

@@ -1,0 +1,18 @@
+// DocSpace SVGs ship hardcoded fills, and the widget's <Icon> drops the
+// `color` prop for component overrides (it only recolors bundled/URL icons).
+// So recolor the visible shapes here to the chat's icon color. A presentation
+// `fill` attribute loses to this CSS rule, so no `!important` is needed;
+// `white` knockouts and `none` are left intact.
+.icon {
+  // path:not([fill="white"]):not([fill="none"]) {
+  //   fill: currentColor;
+  // }
+}
+
+// Glyphs the widget paints with a theme token through `<Icon color>` — the very
+// prop it drops for component overrides. Carry the token here instead, so a
+// DocSpace shape drawn with `currentColor` matches what the bundled icon would
+// have looked like in both themes.
+.tertiary {
+  color: var(--text-tertiary);
+}

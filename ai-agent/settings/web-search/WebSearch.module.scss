@@ -1,0 +1,25 @@
+.webSearch {
+  :global(.web-search-root) {
+    gap: 16px;
+  }
+
+  :global(.web-search-fields) {
+    gap: 16px;
+    max-width: 340px;
+  }
+
+  :global(.web-search-field-header) {
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 20px;
+    letter-spacing: 0px;
+  }
+
+  a {
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 15px;
+    letter-spacing: 0px;
+    --link-secondary-color: var(--accent-main);
+  }
+}

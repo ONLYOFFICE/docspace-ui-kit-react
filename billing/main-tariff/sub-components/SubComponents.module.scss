@@ -1,7 +1,10 @@
 // ===== CurrentUsersCountContainer =====
 
 .currentUsersContainer {
-  height: fit-content;
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   .currentAdminsNumber {
     &.isDisabled {
@@ -52,6 +55,49 @@
     max-width: 520px;
   }
 
+  .proratedNow {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 40px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    background: var(--payment-price-container-bg-text);
+
+    .proratedNowLabel {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .proratedNowInfo {
+      cursor: pointer;
+    }
+
+    .proratedNowPrice {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--payment-price-color);
+    }
+
+    .proratedNowLoader {
+      display: flex;
+      align-items: center;
+    }
+
+    &.isDisabled {
+      color: var(--payment-price-container-disable-color);
+
+      .proratedNowPrice {
+        color: var(--payment-price-container-disable-price-color);
+      }
+    }
+  }
+
   .paymentPriceTotalPrice {
     display: flex;
     justify-content: center;
@@ -65,6 +111,18 @@
 
     .largerFontSize {
       font-size: 48px;
+    }
+
+    .totalPriceLine {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      max-width: 100%;
+    }
+
+    .totalPriceSuffix {
+      white-space: nowrap;
+      margin-inline-start: auto;
     }
 
     .totalTariffDescription {

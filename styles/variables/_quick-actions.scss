@@ -1,0 +1,18 @@
+// Quick-actions tile metrics. Shared so consumers that cap the banner width can
+// derive that cap from the real tile geometry instead of hardcoding a pixel
+// total that silently goes stale when the tile size or gap changes.
+$tile-max-width: 184px;
+$tile-height: 147px;
+$tile-padding: 22px;
+$gap: 8px;
+
+// The widest banner (Rooms: 5 room tiles + AI chat). A consumer capping the
+// banner sizes the cap from this, so the whole set is reachable without
+// scrolling whenever the viewport is wide enough to hold it.
+$max-tiles-per-row: 6;
+
+// Width needed for $max-tiles-per-row tiles at their widest, plus the gaps
+// between them.
+@function row-width($tiles: $max-tiles-per-row) {
+  @return $tiles * $tile-max-width + ($tiles - 1) * $gap;
+}

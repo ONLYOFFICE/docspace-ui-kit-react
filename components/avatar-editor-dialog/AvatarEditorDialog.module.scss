@@ -1,0 +1,38 @@
+@use "../../styles/mixins";
+
+.modalDialog {
+  :global(#modal-dialog) {
+    max-height: fit-content;
+
+    :global(.modal-header) {
+      height: 54px;
+      min-height: 54px;
+    }
+
+    :global(.modal-footer) {
+      box-sizing: border-box;
+      max-height: 72px;
+    }
+
+    :global(.modal-body) {
+      height: var(--modal-body-height, auto);
+    }
+  }
+}
+
+.imageEditorWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  :global(.avatar-editor) {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+
+    @include mixins.mobile {
+      justify-content: center;
+    }
+  }
+}

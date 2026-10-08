@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { useState, useEffect } from "react";
 import { useCommonTranslation } from "../../../utils/i18n";
 import { CommonTrans } from "../../../utils/i18n/CommonTrans";
@@ -47,7 +12,7 @@ import { Text } from "../../../components/text";
 import { ComboBox, ComboBoxSize, TOption } from "../../../components/combobox";
 import { DatePicker } from "../../../components/date-picker";
 import { toastr } from "../../../components/toast";
-import { useApi } from "../../../providers";
+import { useApi } from "../../../providers/api";
 import { EmployeeStatus } from "@onlyoffice/docspace-api-sdk";
 import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
 import FilterIcon from "../../../components/filter/sub-components/FilterIcon";
@@ -63,8 +28,8 @@ import styles from "./styles/TransactionHistory.module.scss";
 import TableLoader from "./sub-components/TableLoader";
 import { Link } from "../../../components/link";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-import { getBrandName } from "../../../constants/brands";
 import { Encoder } from "../../../utils/encoder";
+import { isDocsConnectServiceName } from "../../utils/docs-connect";
 
 type TransactionHistoryReportResponse = {
   error?: string;
@@ -81,8 +46,11 @@ type TransactionHistoryProps = {
   serviceName?: string;
   headerTitle?: string;
   hideTypeFilter?: boolean;
+  hideContactFilter?: boolean;
   withoutRoleFilter?: boolean;
   maxWidth?: number | string;
+  emptyTitle?: string;
+  emptyDescription?: string;
 };
 
 const filter = (withoutRoleFilter?: boolean): PeopleFilter => ({
@@ -98,8 +66,11 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     serviceName,
     headerTitle,
     hideTypeFilter,
+    hideContactFilter,
     withoutRoleFilter,
     maxWidth,
+    emptyTitle,
+    emptyDescription,
   } = props;
 
   const { paymentApi } = useApi();
@@ -128,6 +99,13 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
   const { isNotPaidPeriod } = store.tariff;
 
   const t = useCommonTranslation();
+
+  useEffect(
+    () => () => {
+      resetTransactionFilter();
+    },
+    [resetTransactionFilter],
+  );
 
   const typeOfHistoty: TOption[] = [
     {
@@ -336,6 +314,11 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     const isCredit = filterSelectedTypeKey !== "debit";
     const isDebit = filterSelectedTypeKey !== "credit";
 
+    const serviceNames: string | string[] | undefined =
+      isDocsConnectServiceName(serviceName)
+        ? store.docsConnectServiceNames
+        : serviceName;
+
     try {
       await paymentApi.createCustomerOperationsReport({
         customerOperationsReportRequestDto: {
@@ -344,7 +327,9 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
           credit: isCredit,
           debit: isDebit,
           participantName: filterContact?.id,
-          serviceName,
+          // TODO: remove the cast once the SDK types serviceName as
+          // string | string[] — the API accepts a repeated ServiceName param.
+          serviceName: serviceNames as string,
         },
       });
 
@@ -483,7 +468,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
         />
       ) : null}
       {datesComponent}
-      {contactSelector}
+      {hideContactFilter ? null : contactSelector}
       {isTransactionFilterModified ? (
         <Link
           onClick={onClearFilter}
@@ -513,9 +498,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     ? {}
     : {
         withInfo: true as const,
-        infoText: t("OnlyPortalAdminsShown", {
-          productName: getBrandName("ProductName"),
-        }),
+        infoText: t("OnlyPortalAdminsShown"),
       };
 
   const selectorComponent = isSelectorVisible ? (
@@ -535,13 +518,10 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
       filter={() => filter(withoutRoleFilter)}
       {...infoProps}
       emptyScreenHeader={t("NotFoundMembers")}
-      emptyScreenDescription={t("PeopleSelectorInfo", {
-        productName: getBrandName("ProductName"),
-      })}
+      emptyScreenDescription={t("Common:PeopleSelectorInfo")}
     />
   ) : null;
 
-  console.log("isTransactionLoading", isTransactionLoading);
   return (
     <>
       <div className={styles.transactionHistoryHeader}>
@@ -566,6 +546,8 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
           isTransactionHistoryExist={isTransactionHistoryExist!}
           serviceName={serviceName}
           maxWidth={maxWidth}
+          emptyTitle={emptyTitle}
+          emptyDescription={emptyDescription}
         />
       )}
 
@@ -594,7 +576,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
             />
             <Text as="span" className={styles.downloadReportDescription}>
               {t("ReportSaveLocation", {
-                sectionName: t("MyDocuments"),
+                sectionName: t("Files"),
               })}
             </Text>
           </div>
@@ -612,7 +594,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
           isSelectorVisible={isSelectorVisible}
           selectorComponent={selectorComponent}
           datesComponent={datesComponent}
-          contactSelector={contactSelector}
+          contactSelector={hideContactFilter ? null : contactSelector}
           typeOfHistoty={typeOfHistoty}
           selectedType={
             isFilterDialogVisible
@@ -643,4 +625,3 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
 };
 
 export default observer(TransactionHistory);
-

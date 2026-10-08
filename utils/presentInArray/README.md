@@ -33,14 +33,14 @@ presentInArray([".docx", ".pdf"], ".txt");
 presentInArray(array: string[], search: string, caseInsensitive?: boolean): boolean
 ```
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `array` | `string[]` | — | Array to search in |
-| `search` | `string` | — | String to find |
-| `caseInsensitive` | `boolean` | `false` | Convert search to lowercase before matching |
+| Parameter         | Type       | Default | Description                                 |
+| ----------------- | ---------- | ------- | ------------------------------------------- |
+| `array`           | `string[]` | —       | Array to search in                          |
+| `search`          | `string`   | —       | String to find                              |
+| `caseInsensitive` | `boolean`  | `false` | Convert search to lowercase before matching |
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
+| File       | Description               |
+| ---------- | ------------------------- |
 | `index.ts` | `presentInArray` function |

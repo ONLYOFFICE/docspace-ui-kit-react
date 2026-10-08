@@ -1,0 +1,70 @@
+.modelAssignment {
+  --settings-header-color: var(--text-color);
+  --settings-description-color: var(--settings-common-description-color);
+  --field-container-header-color: var(--text-color);
+  --icon-button-color: currentColor;
+
+  // The widget's content column width is token-driven
+  // (max-w-[var(--model-assignment-max-width,560px)]).
+  --model-assignment-max-width: 700px;
+
+  background-color: transparent;
+
+  :global([class*="--settings-header-color"]) {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 22px;
+    letter-spacing: 0px;
+    margin-bottom: 4px;
+  }
+
+  :global(.default-ai-setup) {
+    box-sizing: border-box;
+    margin-bottom: 20px;
+
+    border-radius: 6px;
+  }
+
+  .defaultSetupTitle {
+    margin-bottom: 4px;
+  }
+
+  .defaultSetupDescription {
+    margin-bottom: 4px;
+
+    color: var(--settings-common-description-color);
+  }
+
+  // Task override rows. The widget builds them from Tailwind arbitrary-value
+  // utilities (no stable class), so target the margin token baked into the
+  // row's class string (mb-[var(--model-assignment-task-margin-bottom,12px)]).
+  :global([class*="--model-assignment-task-margin-bottom"]) {
+    margin-bottom: 0;
+    padding-block: 12px;
+
+    border-bottom: 1px solid var(--payment-card-border-color);
+
+    :global(.flex-row) {
+      height: 32px;
+      justify-content: space-between;
+
+      :global(.grow) {
+        max-width: 342px;
+        width: 100%;
+      }
+    }
+
+    :global([class*="--field-container-header-color"]) {
+      font-family: Arial;
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 14px;
+      line-height: 20px;
+      letter-spacing: 0%;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}

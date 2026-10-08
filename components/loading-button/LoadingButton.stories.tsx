@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -43,68 +8,61 @@ const meta = {
   title: "UI/Feedback/LoadingButton",
   component: LoadingButton,
   parameters: {
-    docs: {
-      description: {
-        component: `Loading button that displays a circular progress indicator. Used to show file conversion or processing progress.
-
-### Features
-
-- **Progress Indicator**: Circular loading animation with percentage
-- **Conversion Mode**: Special state for file conversion operations
-- **Default Mode**: Alternative display mode
-- **Color Customization**: Configurable loader and background colors
-- **Clickable**: Supports click handler for cancel/action operations
-
-### Usage
-
-\`\`\`tsx
-import { LoadingButton } from "@docspace/ui-kit/components/loading-button";
-
-// Basic loading button
-<LoadingButton percent={45} />
-
-// In conversion mode
-<LoadingButton percent={60} inConversion />
-
-// With custom colors
-<LoadingButton percent={30} loaderColor="#2DA7DB" backgroundColor="#f5f5f5" />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
+    id: {
+      control: false,
+      description:
+        "Ignored: nothing reads this prop, and the element carries no `id`",
+    },
+    className: {
+      control: false,
+      description:
+        "Ignored: nothing reads this prop; style the ring through the CSS custom properties",
+    },
+    style: {
+      control: false,
+      description: "Ignored: nothing reads this prop",
+    },
     percent: {
       control: { type: "number", min: 0, max: 100 },
-      description: "Progress value in percent (0-100)",
+      description:
+        "How much of the ring is filled, 0-100; at 0 a half ring spins instead of showing an arc",
       table: {
         defaultValue: { summary: "0" },
       },
     },
     inConversion: {
       control: "boolean",
-      description: "Indicates whether conversion is in progress",
+      description:
+        "Whether the cross in the middle is dropped, leaving the ring on its own",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isDefaultMode: {
       control: "boolean",
-      description: "Indicates whether the component is in default mode",
+      description:
+        "Whether the ring and the cross are drawn in the theme's grey instead of the accent colour, with the cross changing colour on hover",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     loaderColor: {
       control: "color",
-      description: "Color of the loading indicator",
+      description:
+        "CSS colour of the ring and of the cross; overrides the accent colour",
     },
     backgroundColor: {
       control: "color",
-      description: "Background color of the component",
+      description: "CSS colour of the disc behind the cross",
     },
     onClick: {
       action: "onClick",
-      description: "Function called when the button is clicked",
+      description:
+        "Called with no arguments when anything inside the 16px square is clicked, including the cross",
     },
   },
 } satisfies Meta<typeof LoadingButton>;
@@ -134,6 +92,17 @@ export const Default: Story = {
     percent: 0,
     inConversion: false,
     isDefaultMode: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The ring as it first appears, before any progress is known: at the default `percent` of 0 a half ring spins. Change the percentage, drop the cross or pick colours live in the Controls panel below.",
+      },
+      source: {
+        code: `<LoadingButton percent={0} onClick={() => cancelUpload()} />`,
+      },
+    },
   },
 };
 
@@ -165,7 +134,7 @@ export const ProgressStages: Story = {
     docs: {
       description: {
         story:
-          "Loading buttons at various progress stages from 0% to 100%. Shows how the circular indicator fills as progress increases.",
+          "Five rings labelled with their `percent`, to show how far the arc reaches at each stage: at 0% a half ring spins, the look for an operation whose size is not known yet, and from 25% on the arc grows clockwise until it closes at 100%.",
       },
       source: {
         code: `<LoadingButton percent={0} />
@@ -194,7 +163,7 @@ export const InConversion: Story = {
     docs: {
       description: {
         story:
-          "Loading buttons in conversion mode. Used when a file is being converted to a different format.",
+          "The same rings with no cross in the middle (`inConversion`), for a marker that shows progress and nothing else: at 0% the ring spins, at 50% it is half filled, at 100% it is closed.",
       },
       source: {
         code: `<LoadingButton percent={0} inConversion />
@@ -219,7 +188,7 @@ export const DefaultMode: Story = {
     docs: {
       description: {
         story:
-          "Loading button in default mode. Provides an alternative visual display for the loading indicator.",
+          "The ring and the cross in the theme's grey instead of the accent colour (`isDefaultMode`), for an item that is waiting rather than running. Hover the ring to see the cross change colour.",
       },
       source: {
         code: `<LoadingButton percent={45} isDefaultMode />`,
@@ -234,6 +203,11 @@ const CustomColorsTemplate = () => {
       <LoadingButton percent={60} loaderColor="#2DA7DB" />
       <LoadingButton percent={60} loaderColor="#4CAF50" />
       <LoadingButton percent={60} loaderColor="#FF5722" />
+      <LoadingButton
+        percent={60}
+        loaderColor="#FF5722"
+        backgroundColor="#FFE0D6"
+      />
     </Wrapper>
   );
 };
@@ -244,12 +218,13 @@ export const CustomColors: Story = {
     docs: {
       description: {
         story:
-          "Loading buttons with custom loader colors. Useful for matching the loading indicator to your application theme.",
+          "Colours set per instance, for a ring that has to match its surroundings rather than the theme: the first three change the ring and the cross (`loaderColor`), the last also tints the disc behind the cross (`backgroundColor`).",
       },
       source: {
         code: `<LoadingButton percent={60} loaderColor="#2DA7DB" />
 <LoadingButton percent={60} loaderColor="#4CAF50" />
-<LoadingButton percent={60} loaderColor="#FF5722" />`,
+<LoadingButton percent={60} loaderColor="#FF5722" />
+<LoadingButton percent={60} loaderColor="#FF5722" backgroundColor="#FFE0D6" />`,
       },
     },
   },
@@ -271,21 +246,26 @@ export const CssCustomization: Story = {
       }
     >
       <LoadingButton percent={60} />
-      <LoadingButton percent={30} />
-      <LoadingButton percent={0} />
+      <LoadingButton percent={30} isDefaultMode />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--loading-button-accent\` | Progress fill color | \`--accent-main\` |
-| \`--loading-button-idle\` | Default mode fill color | theme token |
-| \`--loading-button-hover-fill\` | Hover fill color | theme token |
-| \`--loading-button-custom-bg\` | Center circle background | theme token |`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The first ring shows the accent and the disc colours; the second sets \`isDefaultMode\` to show the idle colour, and hovering it shows the hover colour.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--loading-button-accent": "#7c3aed",
+    "--loading-button-idle": "#a78bfa",
+    "--loading-button-hover-fill": "#4c1d95",
+    "--loading-button-custom-bg": "#ede9fe",
+  }}
+>
+  <LoadingButton percent={60} />
+  <LoadingButton percent={30} isDefaultMode />
+</div>`,
       },
     },
   },

@@ -3,7 +3,9 @@ import React, { useMemo } from "react";
 import classNames from "classnames";
 
 import { Text } from "../../../components/text";
+import { Tooltip } from "../../../components/tooltip";
 import { truncateNumberToFraction } from "../../utils/common";
+import { formatterCurrencyWithoutTranction } from "../../wallet/utils";
 import RefreshIconButton from "../refresh-icon-button";
 import styles from "./BalanceAmount.module.scss";
 
@@ -27,6 +29,8 @@ type BalanceAmountProps = {
   withoutMargin?: boolean;
   mainFontSize?: string;
   fractionFontSize?: string;
+  titleFontSize?: string;
+  tooltipId?: string;
 };
 
 const typeClassMap: Record<string, string> = {
@@ -49,18 +53,24 @@ const BalanceAmount = (props: BalanceAmountProps) => {
     amount = 0,
     currency = "USD",
     language = "en",
-    maximumFractionDigits = 3,
+    maximumFractionDigits = 2,
     className,
     withoutMargin = false,
     mainFontSize,
     fractionFontSize,
+    titleFontSize = "18px",
+    tooltipId,
   } = props;
+
+  const minDisplayedAmount = 1 / 10 ** maximumFractionDigits;
+  const isBelowMinimum =
+    tooltipId !== undefined && amount > 0 && amount < minDisplayedAmount;
 
   const tokens: BalanceAmountToken[] = useMemo(() => {
     const safeAmount = Number.isFinite(amount) ? amount : 0;
 
     const truncatedStr = truncateNumberToFraction(
-      safeAmount,
+      isBelowMinimum ? minDisplayedAmount : safeAmount,
       maximumFractionDigits,
     );
     const truncated = Number(truncatedStr);
@@ -73,22 +83,31 @@ const BalanceAmount = (props: BalanceAmountProps) => {
     });
 
     return formatter.formatToParts(truncated);
-  }, [amount, currency, language, maximumFractionDigits]);
+  }, [
+    amount,
+    currency,
+    language,
+    maximumFractionDigits,
+    isBelowMinimum,
+    minDisplayedAmount,
+  ]);
 
   return (
     <div className={className}>
       {title ? (
         <div className={styles.headerContainer}>
-          <Text isBold fontSize="18px" className={styles.balanceTitle}>
-            {title}
-          </Text>
+          <div className={styles.titleRow}>
+            <Text isBold fontSize={titleFontSize} className={styles.title}>
+              {title}
+            </Text>
 
-          {showRefresh && onRefresh ? (
-            <RefreshIconButton
-              onRefresh={onRefresh}
-              isRefreshing={isRefreshing}
-            />
-          ) : null}
+            {showRefresh && onRefresh ? (
+              <RefreshIconButton
+                onRefresh={onRefresh}
+                isRefreshing={isRefreshing}
+              />
+            ) : null}
+          </div>
 
           {progressText ? (
             <Text
@@ -106,6 +125,7 @@ const BalanceAmount = (props: BalanceAmountProps) => {
       <div
         className={classNames(styles.balanceAmountContainer, {
           [styles.withoutMargin]: withoutMargin,
+          [styles.tooltipAnchor]: isBelowMinimum,
         })}
         style={{
           ...(mainFontSize &&
@@ -117,7 +137,9 @@ const BalanceAmount = (props: BalanceAmountProps) => {
               "--balance-fraction-font-size": fractionFontSize,
             } as React.CSSProperties)),
         }}
+        data-tooltip-id={isBelowMinimum ? tooltipId : undefined}
       >
+        {isBelowMinimum ? <Text className={styles.literal}>{"<"}</Text> : null}
         {tokens.map((token) => (
           <Text
             key={`${token.type}-${token.value}`}
@@ -127,9 +149,21 @@ const BalanceAmount = (props: BalanceAmountProps) => {
           </Text>
         ))}
       </div>
+
+      {isBelowMinimum ? (
+        <Tooltip
+          id={tooltipId}
+          place="top-end"
+          getContent={() => (
+            <Text fontSize="12px" noSelect>
+              {formatterCurrencyWithoutTranction(language, amount, currency)}
+            </Text>
+          )}
+          dataTestId={`${tooltipId}_tooltip`}
+        />
+      ) : null}
     </div>
   );
 };
 
 export default BalanceAmount;
-

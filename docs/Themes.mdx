@@ -4,46 +4,43 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 # Themes
 
-The UI Kit ships with Base (light) and Dark themes built on **styled-components**.
-`ThemeProvider` resolves the active theme, sets CSS custom properties, and exposes theme tokens to all child components.
+The UI Kit ships with Base (light) and Dark themes. Styling is **SCSS Modules plus CSS
+custom properties** — there is no runtime CSS-in-JS. `ThemeProvider` resolves the active
+theme, stamps it on the document, and sets the custom properties that every component's
+stylesheet reads.
 
 ## Setting up ThemeProvider
 
 ```tsx
-import { ThemeProvider } from "@docspace/ui-kit/providers/theme";
-import { ThemeKeys } from "@docspace/ui-kit/enums";
+import { ThemeProvider } from "@onlyoffice/apps-ui-kit/providers/theme";
+import { ThemeKeys } from "@onlyoffice/apps-ui-kit/enums";
 
 <ThemeProvider initialTheme={ThemeKeys.BaseStr} locale="en">
   <App />
 </ThemeProvider>
 ```
 
-Or use the composite `Providers` component:
-
-```tsx
-import { Providers } from "@docspace/ui-kit/providers";
-
-<Providers
-  url="https://your-docspace.com/api"
-  apiKey="your-api-key"
-  initialTheme={ThemeKeys.DarkStr}
-  locale="en"
->
-  <App />
-</Providers>
-```
+There is also a composite `Providers` component, which mounts `ApiProvider` and fetches portal
+settings on mount. **It is for the portal, not for an application of your own**: it requires a
+ONLYOFFICE Apps URL and an API key, and without a portal behind them every request it makes fails. It
+is deliberately not re-exported from `providers`. Compose `ThemeProvider` and
+`TranslationProvider` yourself instead — see
+[Getting started](?path=/docs/getting-started-welcome--docs).
 
 ### Provider props
 
 - **`initialTheme`** (`ThemeKeys`) — starting theme: `BaseStr`, `DarkStr`, or `SystemStr`
 - **`systemTheme`** (`ThemeKeys`) — override detected OS preference
-- **`colorTheme`** (`CustomColorThemesSettingsDto`) — custom color palette; fetched from API if omitted
+- **`colorTheme`** (`CustomColorThemesSettingsDto`) — the portal's accent palette. **Pass it.**
+  Omitted, the provider calls the ONLYOFFICE Apps REST API on mount to ask for one; outside a portal that
+  request fails, the rejection is not caught, and it is never retried. `{ themes: [], selected: 0 }`
+  says "no portal, no accent override".
 - **`locale`** (`string`) — language code for RTL detection and font selection
 
 ### ThemeKeys enum
 
 ```ts
-import { ThemeKeys } from "@docspace/ui-kit/enums";
+import { ThemeKeys } from "@onlyoffice/apps-ui-kit/enums";
 
 ThemeKeys.BaseStr    // "Base" — light theme
 ThemeKeys.DarkStr    // "Dark" — dark theme
@@ -61,23 +58,39 @@ The hook resolves the active theme in this order:
 
 When `SystemStr` is used, a `matchMedia` listener automatically switches the theme when the OS preference changes.
 
-## Using theme in styled-components
+## Where a component's colours come from
 
-Every styled component receives the full theme object via props:
+Nothing reads the theme object to paint a component. Each component has its own
+`*.module.scss`, and that stylesheet declares its tokens under the theme class and reads
+them back through `var()`:
 
-```tsx
-import styled from "styled-components";
+```scss
+:global(.light) {
+  :local {
+    .card {
+      --card-background: #{colors.$white};
+      --card-text-color: #{colors.$black};
+    }
+  }
+}
 
-const StyledCard = styled.div`
-  background-color: ${(props) => props.theme.backgroundColor};
-  color: ${(props) => props.theme.text.color};
-  font-family: ${(props) => props.theme.fontFamily};
-`;
+.card {
+  background-color: var(--card-background);
+  color: var(--card-text-color);
+}
 ```
 
-### Theme object structure
+`ThemeProvider` only decides *which* theme is active; the values come from the stylesheet
+that ships next to the component. An undefined token fails silently, so add both halves
+together.
 
-The theme object contains 100+ nested categories for component-specific tokens:
+### Theme object
+
+`Base` and `Dark` are still exported from `@onlyoffice/apps-ui-kit/providers/theme`, and
+`useTheme` still resolves one of them. Only three of their fields drive anything today —
+`isBase`, `interfaceDirection` and `fontFamily`, which `ThemeProvider` turns into the DOM
+attributes below. The remaining ~130 per-component categories are a leftover from the
+CSS-in-JS era; no component in the package reads them:
 
 ```ts
 {
@@ -106,7 +119,7 @@ The theme object contains 100+ nested categories for component-specific tokens:
 Read the current theme state from any component:
 
 ```tsx
-import { useTheme } from "@docspace/ui-kit/context/ThemeContext";
+import { useTheme } from "@onlyoffice/apps-ui-kit/context/ThemeContext";
 
 function MyComponent() {
   const { theme, isBase, currentColorScheme } = useTheme();
@@ -168,7 +181,7 @@ These colors are set as CSS custom properties on the document:
 --color-scheme-text-buttons
 ```
 
-If `colorTheme` is not provided, it is fetched automatically from the DocSpace API.
+If `colorTheme` is not provided, it is fetched automatically from the ONLYOFFICE Apps API.
 
 ## DOM attributes
 
@@ -178,11 +191,11 @@ If `colorTheme` is not provided, it is fetched automatically from the DocSpace A
 - `<html data-dir="ltr|rtl">`
 - `<body class="light|dark ltr|rtl">`
 
-CSS custom properties set on `<html>`:
+CSS custom properties:
 
 ```
---interface-direction: "ltr" | "rtl"
---font-family: "Open Sans, sans-serif, Arial"
+<html> --interface-direction: "ltr" | "rtl"
+<body> --font-family: "Open Sans, sans-serif, Arial"
 ```
 
 ## RTL support
@@ -195,14 +208,15 @@ import {
   getDirectionByLanguage,
   getCorrectTextAlign,
   getCorrectBorderRadius,
-} from "@docspace/ui-kit/providers/theme";
+} from "@onlyoffice/apps-ui-kit/providers/theme";
 
 isLanguageRtl("ar");           // true
 getDirectionByLanguage("en");  // "ltr"
 getDirectionByLanguage("he");  // "rtl"
 ```
 
-Helper functions for styled-components:
+Helper functions, for the cases a value has to be flipped in JavaScript rather than by a
+CSS logical property:
 
 ```ts
 // Flip text-align for RTL
@@ -217,10 +231,10 @@ getCorrectFourValuesStyle("0 8px 0 0", "rtl");  // "0 0 0 8px"
 
 ## Global color tokens
 
-Available in `@docspace/ui-kit/providers/theme`:
+Available in `@onlyoffice/apps-ui-kit/providers/theme`:
 
 ```ts
-import { globalColors } from "@docspace/ui-kit/providers/theme";
+import { globalColors } from "@onlyoffice/apps-ui-kit/providers/theme";
 
 globalColors.white           // "#ffffff"
 globalColors.black           // "#333333"

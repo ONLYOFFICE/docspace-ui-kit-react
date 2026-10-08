@@ -1,40 +1,5 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 import { globalColors } from "../../providers/theme";
 
@@ -46,27 +11,49 @@ import { ContextMenuButton } from "./ContextMenuButton";
 import { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
 
 const baseData = (): ContextMenuModel[] => [
-	{
-		key: "key",
-		label: "label",
-		onClick: vi.fn(),
-	},
+  {
+    key: "key",
+    label: "label",
+    onClick: vi.fn(),
+  },
 ];
 
 const baseProps = {
-	title: "Actions",
-	iconName: VerticalDotsReactSvgUrl,
-	size: 16,
-	color: globalColors.gray,
-	getData: baseData,
-	isDisabled: false,
-	displayType: ContextMenuButtonDisplayType.dropdown,
-	data: baseData(),
+  title: "Actions",
+  iconName: VerticalDotsReactSvgUrl,
+  size: 16,
+  color: globalColors.gray,
+  getData: baseData,
+  isDisabled: false,
+  displayType: ContextMenuButtonDisplayType.dropdown,
+  data: baseData(),
 };
 
 describe("<ContextMenuButton />", () => {
-	it("renders without error", () => {
-		render(<ContextMenuButton {...baseProps} />);
-		expect(screen.getByTestId("context-menu-button")).toBeInTheDocument();
-	});
+  it("renders without error", () => {
+    render(<ContextMenuButton {...baseProps} />);
+    expect(screen.getByTestId("context-menu-button")).toBeInTheDocument();
+  });
+
+  it("closes the dropdown on an outside mousedown whose click is swallowed", () => {
+    const onClose = vi.fn();
+
+    render(<ContextMenuButton {...baseProps} opened onClose={onClose} />);
+
+    const dropDown = screen.getByTestId("dropdown");
+
+    expect(dropDown).toHaveClass("open");
+
+    const outside = document.createElement("div");
+    outside.addEventListener("click", (e) => e.stopPropagation());
+    document.body.appendChild(outside);
+
+    fireEvent.mouseDown(outside);
+    fireEvent.click(outside);
+
+    expect(dropDown).not.toHaveClass("open");
+    expect(onClose).toHaveBeenCalledTimes(1);
+
+    outside.remove();
+  });
 });

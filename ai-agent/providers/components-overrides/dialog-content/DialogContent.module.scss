@@ -1,0 +1,13 @@
+.body {
+  padding-inline: 16px;
+  padding-block: 0px 16px;
+}
+
+.warning {
+  padding-inline: 16px;
+}
+
+.warning p {
+  font-size: var(--modal-dialog-body-font-size, 13px);
+  line-height: var(--modal-dialog-body-line-height, 20px);
+}

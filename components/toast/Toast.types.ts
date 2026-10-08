@@ -1,63 +1,35 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { ToastType } from "./Toast.enums";
 
 export type ToastProps = {
-  /** Accepts class  */
+  /** Applied to the container the toasts are stacked in. */
   className?: string;
-  /** Accepts id */
+  /** Ignored. Nothing reads this prop; the container carries no `id`. */
   id?: string;
-  /** Accepts css style  */
+  /** Applied to that container as inline style. */
   style?: React.CSSProperties;
-  /** Title inside a toast */
+  /** Ignored. A toast's title is the second argument of `toastr.success` and its siblings. */
   title?: string;
-  /** Sets the color and icon of the toast */
+  /** Ignored. A toast's type is the `toastr` method you call. */
   type?: ToastType;
-  /** Any components or data inside a toast */
+  /** Ignored. A toast's body is the first argument of `toastr.success` and its siblings. */
   data?: React.ReactNode | string;
-  /** If false: toast disappeared after clicking on any area of toast. If true: toast disappeared after clicking on close button */
+  /** Ignored. It is the fourth argument of `toastr.success` and its siblings. */
   withCross?: boolean;
-  /** Time (in milliseconds) for showing your toast. Setting in 0 let you to show toast constantly until clicking on it */
+  /** Ignored. It is the third argument of `toastr.success` and its siblings. */
   timeout?: number;
-
+  /** Whether the container renders nothing until the first client-side effect, for a server-rendered tree. */
   isSSR?: boolean;
 };
 
+/**
+ * Shape `toastr.error` unwraps a message from: an axios-style error, a fetch
+ * response or a plain `Error`. The first field that is set wins.
+ */
 export type TData = {
+  /** Body of a failed API call; `response.data.error.message` is read first. */
   response?: { data: { error: { message: string } } };
+  /** Status text of a response, read when there is no API error message. */
   statusText?: string;
+  /** Message of an `Error`, read last. */
   message?: string;
 };

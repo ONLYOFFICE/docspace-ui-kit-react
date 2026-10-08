@@ -1,65 +1,53 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { DateTime } from "luxon";
 
 import type { Nullable } from "../../types";
 
+export type DateTimePickerTranslations = {
+  /** Label of the morning option in the meridiem drop-down. */
+  AM: string;
+  /** Label of the afternoon option. */
+  PM: string;
+};
+
 export type DateTimePickerProps = {
-  /** Date object */
+  /** Date and time the component starts on. */
   initialDate?: Nullable<DateTime | Date | string>;
-  /** Select date text */
+  /** Text of the button shown while no date is chosen. */
   selectDateText: string;
-  /** Allows to set classname */
+  /** Applied to the outermost element. */
   className: string;
-  /** Allows to set id */
+  /** Applied to the outermost element. */
   id: string;
-  /** Allow you to handle changing events of component */
+  /**
+   * Called whenever either half changes, with the combined date and time, or
+   * `null` when the date is cleared.
+   */
   onChange: (d: null | DateTime) => void;
-  /** Specifies min choosable calendar date */
+  /** Earliest selectable day in the calendar. */
   minDate?: DateTime | Date;
-  /** Specifies max choosable calendar date */
+  /** Latest selectable day in the calendar. */
   maxDate?: DateTime | Date;
-  /** Specifies calendar locale */
+  /**
+   * BCP 47 tag the calendar is written in. It also decides whether the time is
+   * shown as 12-hour or 24-hour.
+   */
   locale: string;
-  /** Indicates the input field has an error  */
+  /** Whether the control is drawn in its error colours. */
   hasError: boolean;
-  /** Allows to set first shown date in calendar */
+  /** Month the calendar opens on. */
   openDate: DateTime | Date;
-  /** Allows to set data-testid */
+  /**
+   * `data-testid` of the outermost element.
+   * @default "date-time-picker"
+   */
   dataTestId?: string;
+  /** Whether the date chip's clearing cross is hidden. */
   hideCross?: boolean;
+  /** Whether a picked day is reported at the end of that day rather than at midnight. */
   useMaxTime?: boolean;
+  /**
+   * Labels of the AM and PM options. Required: the component reads them while
+   * rendering, and nothing here translates them for you.
+   */
+  translations: DateTimePickerTranslations;
 };

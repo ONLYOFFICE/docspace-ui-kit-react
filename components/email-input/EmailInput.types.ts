@@ -1,44 +1,12 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { TextInputProps } from "../text-input";
 import type { EmailSettings } from "../../utils/email";
 
 export type TValidate = {
+  /** The value that was checked. */
   value: string;
+  /** Whether the address parsed cleanly. */
   isValid: boolean;
+  /** Translation keys for what went wrong, not messages ready to show. */
   errors?: string[];
 };
 
@@ -46,13 +14,26 @@ export type EmailInputProps = Omit<
   TextInputProps,
   "type" | "onAnimationStart" | "testId"
 > & {
-  /** Email validation specific props */
+  /**
+   * Replaces the built-in parser outright. Return the same shape; the component
+   * uses `isValid` to decide whether to colour the field.
+   */
   customValidate?: (value: string) => TValidate;
+  /** Options for the built-in parser: which forms of address to accept. */
   emailSettings?: EmailSettings;
-  /** Validation callback */
+  /**
+   * Called after every keystroke with the result of the check, whichever parser
+   * ran.
+   */
   onValidateInput?: (data: TValidate) => void;
-  /** Animation handler */
+  /**
+   * Native `animationstart` on the field. It exists to catch the browser's
+   * autofill animation, which fires no change event.
+   */
   handleAnimationStart?: (e: React.AnimationEvent<HTMLInputElement>) => void;
-  /** Test id */
+  /**
+   * `data-testid` of the field.
+   * @default "email-input"
+   */
   dataTestId?: string;
 };

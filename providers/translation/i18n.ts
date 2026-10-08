@@ -1,92 +1,77 @@
 "use client";
 
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
-import i18n from "i18next";
+import i18next, { type i18n } from "i18next";
 import { initReactI18next } from "react-i18next";
 
+import { registerCommonI18nInstance } from "../../utils/i18n/i18n-utils";
+
+// Own instance, not the i18next singleton: @onlyoffice/ai-chat also calls
+// `init()` on the singleton, which would reset `ns`/`defaultNS`/`language`
+// out from under host translations. Keeping a dedicated instance isolates
+// host resources from any other library that touches the global.
 export type TTranslations = Map<string, Map<string, Record<string, string>>>;
 
+// Build a private i18next instance instead of mutating the default singleton —
+// keeps DocSpace resources isolated from any third-party packages that also
+// `init` i18next.
+let instance: ReturnType<typeof i18next.createInstance> | null = null;
 let isInitialized = false;
 
 function loadResources(translations: TTranslations) {
+  if (!instance) return;
   translations.forEach((nsList, lang) => {
     nsList.forEach((resources, ns) => {
-      i18n.addResourceBundle(lang, ns, resources, true, true);
+      instance?.addResourceBundle(lang, ns, resources, true, true);
     });
   });
 }
 
-export const getI18NInstance = (lng: string, translations: TTranslations) => {
+export const getI18NInstance = (
+  lng: string,
+  translations: TTranslations,
+): i18n => {
+  if (!instance) {
+    instance = i18next.createInstance();
+  }
   if (!isInitialized) {
-    i18n.use(initReactI18next).init({
+    instance.use(initReactI18next).init({
       lng,
       fallbackLng: "en",
       load: "currentOnly",
       debug: false,
       interpolation: {
         escapeValue: false,
-        format(value, format) {
-          if (format === "lowercase") return value.toLowerCase();
-          return value;
-        },
       },
       ns: ["Common"],
       defaultNS: "Common",
       react: {
         useSuspense: false,
       },
-      initImmediate: false,
+      initAsync: false,
     });
     isInitialized = true;
-  } else if (i18n.language !== lng) {
-    i18n.changeLanguage(lng);
+  } else if (instance.language !== lng) {
+    instance.changeLanguage(lng);
   }
 
   loadResources(translations);
+  const i18n = instance;
+
+  // Expose the private instance for SSR lookups in getCommonTranslation,
+  // where window.i18n is not available.
+  registerCommonI18nInstance(i18n);
 
   if (typeof window !== "undefined") {
     const win = window as unknown as {
       i18n?: {
         t?: typeof i18n.t;
         loaded?: Record<string, { data: Record<string, string> }>;
+        instance?: typeof i18n;
       };
     };
     if (!win.i18n) win.i18n = {};
     win.i18n.t = i18n.t.bind(i18n);
+    win.i18n.instance = i18n;
 
     const loaded: Record<string, { data: Record<string, string> }> = {};
     translations.forEach((nsList, lang) => {

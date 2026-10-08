@@ -1,0 +1,38 @@
+.title {
+  color: var(--text-color);
+}
+
+.subtitle {
+  color: var(--payment-inactive-color);
+}
+
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.amount {
+  color: var(--text-color);
+  white-space: nowrap;
+}
+
+.row {
+  min-height: 58px;
+  box-sizing: border-box;
+
+  [data-testid="tablet-side-info"] {
+    color: var(--payment-inactive-color);
+  }
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  svg path {
+    fill: var(--payment-inactive-color);
+  }
+}

@@ -1,0 +1,1200 @@
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+
+import i18nextSingleton from "i18next";
+import { comparer, reaction } from "mobx";
+import {
+  I18nextProvider as ReactI18nextProvider,
+  useTranslation,
+} from "react-i18next";
+
+import {
+  ApiProvider,
+  CallbacksManager,
+  ChatEventBus,
+  ComponentsProvider,
+  DEFAULT_SERVER_API_ROUTES,
+  EventsProvider,
+  I18nProvider,
+  ImagesProvider,
+  MiddlewareRunner,
+  PlatformProvider,
+  Servers,
+  StoresProvider,
+  ThemeProvider,
+  ToolsProvider,
+  WidgetConfigProvider,
+  createServerAPI,
+  createStores,
+  useProfiles,
+  useServers,
+  useStores,
+  useThread,
+  type WidgetConfig,
+} from "@onlyoffice/ai-chat";
+import type {
+  ChatCallbacks,
+  HostTool,
+  Profile,
+  ProfilePickerAction,
+  ProviderType,
+  ServerAPIConfig,
+  Suggestion,
+  ToolCallApproveContext,
+  WebSearchProviderId,
+} from "@onlyoffice/ai-chat";
+
+import "@onlyoffice/ai-chat/styles";
+
+// Re-exported so the host can type the `suggestions` array it builds and
+// passes in (the section→chips logic lives in the host, not here).
+export type { Suggestion } from "@onlyoffice/ai-chat";
+// The per-composer-state chip lists the host fills in, and the switching
+// between them, live in ./suggestions — re-exported so the prop's type stays
+// importable from the provider module the host already imports.
+export type { SuggestionSet } from "./suggestions";
+
+import { toastr } from "../../components/toast";
+import { Link, LinkType } from "../../components/link";
+import { useIsMobile } from "../../hooks/use-is-mobile";
+
+import { AiChatAvailabilityContext } from "./availability";
+import { ChatIntro } from "../chat-intro";
+import { AnalyzeIntro } from "../new-chat/components/analyze-intro";
+import { storageAdapter } from "./storage";
+import { usePlatformAdapter } from "./platform";
+import { componentOverrides } from "./components-overrides";
+import { imageOverrides } from "./images-overrides";
+import { storeKeys } from "./stores";
+import { normalizeAiChatLocale } from "./locale";
+import { portalThemes } from "./themes";
+import {
+  AgentRoomIdSync,
+  AiChatStore,
+  AiChatStoreProvider,
+  AiChatStoresBridge,
+} from "./ai-chat-store";
+import {
+  EDITOR_TOOLS_EVENT,
+  attachHostToolsRuntime,
+  attachOpenResultFile,
+  attachCloseEditorPanel,
+  buildEditorToolGroup,
+  fileManagementTools,
+  openGeneratedFileWithToolCall,
+  type EditorToolsChangedDetail,
+} from "./host-tool-groups";
+import {
+  releaseGeneratedFileWindow,
+  reserveGeneratedFileWindow,
+} from "./host-tool-groups/generated-file-window";
+import { addDialogSubmitInterceptor } from "./components-overrides/dialog-footer/submit-interceptors";
+import { useApi as useFilesApi } from "../../providers/api";
+import { ContextRoomProvider, type ContextRoom } from "./context-room";
+import ContextRoomWatcher from "./context-room/ContextRoomWatcher";
+import {
+  useAnalyzeQuestions,
+  useComposerTyping,
+  useFilesIntegration,
+  type AttachedFileInfo,
+  type ReadSuggestedQuestions,
+  type SuggestedQuestion,
+} from "./files";
+import { resolveSuggestions, type SuggestionSet } from "./suggestions";
+import { composeCallbacks } from "./compose-callbacks";
+import {
+  analyzeModeCallbacks,
+  analyzeSentMiddleware,
+} from "./analyze-sent-middleware";
+import { OnFilesAttachedContext } from "./files/attached-report";
+import {
+  AttachmentLimitContext,
+  resolveAttachmentCap,
+  type AttachmentCap,
+} from "./files/attachment-limit";
+import { CHAT_ATTACHMENT_LIMIT } from "./files/limits";
+import { uploadFilesToChat } from "./files/upload-files";
+import { openAttachedFile } from "./files/open-file";
+
+// The host app (DocSpace) uses `i18n.createInstance()` and provides that
+// instance via `<I18nextProvider>` at the app root. ai-chat, however, calls
+// `i18n.use(initReactI18next).init(...)` on the default i18next singleton.
+// Result: ai-chat's resources land in the singleton, but its `useI18n` hook
+// resolves through `useTranslation()` which reads the host's instance from
+// React context — so all ai-chat keys come back as raw keys.
+//
+// We bracket ai-chat's `<I18nProvider>` with two `<I18nextProvider>`s: the
+// outer one swaps the singleton in so ai-chat's internal `I18nBridge`
+// (which calls `useTranslation()`) sees its own resources, and the inner
+// one restores the host's instance for `children`, so the rest of the app
+// keeps using DocSpace translations.
+const AiChatI18nIsolator = ({
+  locale,
+  translations,
+  children,
+}: {
+  locale: string;
+  /** Per-key overrides of the chat lib's own strings (host-translated). */
+  translations?: React.ComponentProps<typeof I18nProvider>["translations"];
+  children: ReactNode;
+}) => {
+  const { i18n: hostI18n } = useTranslation();
+  return (
+    <ReactI18nextProvider i18n={i18nextSingleton}>
+      <I18nProvider locale={locale} translations={translations}>
+        <ReactI18nextProvider i18n={hostI18n}>{children}</ReactI18nextProvider>
+      </I18nProvider>
+    </ReactI18nextProvider>
+  );
+};
+
+type AiAgentProvidersProps = {
+  locale: string;
+  theme?: string;
+  callbacks?: ChatCallbacks;
+  isStandalone?: boolean;
+  /**
+   * Whether the AI chat is offered on the current view. Computed by the host
+   * and shared with descendants via context / `useIsAiChatAvailable()`.
+   */
+  isAvailable?: boolean;
+  /**
+   * Whether the current session may use the AI API at all. `false` for
+   * anonymous sessions (login redirect, public rooms, public preview) and
+   * for users the server bars from AI (guests). The providers still mount
+   * — descendants may call `useStores()` — but store hydration is skipped
+   * and the availability context is forced off, so no /api/2.0/ai requests
+   * fire and no chat UI is offered.
+   */
+  canUseAi?: boolean;
+  getAgentRoomId?: () => number | null;
+  openResultFile?: (fileId: number | string) => void;
+  closeEditorPanel?: () => void;
+  entityId?: string;
+  /**
+   * Secondary scope for the request context (agent tools, workspace
+   * steering, profile fallback) when talking to an AI agent from outside
+   * its room: threads/history and uploads keep following `entityId`,
+   * only sends carry this value — see `WidgetConfig.contextEntityId`.
+   */
+  contextEntityId?: string;
+  /**
+   * Explicitly controls the composer model picker. The chat lib hides the
+   * picker whenever `entityId` is set, but DocSpace scopes the chat by the
+   * current folder/room, so `entityId` alone no longer means "agent chat".
+   * Pass `true` to hide the picker entirely (highest priority — it also
+   * suppresses the read-only label). To keep the fixed model visible instead
+   * of hidden — e.g. inside AI agent rooms — leave this `false` and use
+   * {@link profilePickerReadOnly} / {@link isAgentRoom}.
+   */
+  hideProfilePicker?: boolean;
+  /**
+   * Renders the composer model picker as a read-only label — the current
+   * profile's name as plain static text (secondary color, truncated, no
+   * dropdown) instead of an interactive combo. Forwarded to
+   * `WidgetConfig.profilePickerReadOnly`; it overrides the `entityId`
+   * default-hide heuristic (the label is shown even in entity chats) but
+   * NOT an explicit `hideProfilePicker` `true`, which still hides
+   * everything. Use where the host fixes the profile but still wants to
+   * surface which model answers — e.g. an AI agent room viewer who lacks
+   * the right to change the assignment.
+   */
+  profilePickerReadOnly?: boolean;
+  /**
+   * Marks the current scope as an AI agent room, whose assigned profile
+   * must win over a session pick carried in from another scope. On a scope
+   * switch into such a room the session chat profile is reset so the room's
+   * model assignment drives the chat (and the read-only label). Kept
+   * separate from `hideProfilePicker`/`profilePickerReadOnly` because an
+   * *editable* agent room shows the picker yet still needs this reset.
+   */
+  isAgentRoom?: boolean;
+  /**
+   * Extra items appended to the composer's model picker dropdown after a
+   * separator below the profile list. Entries with `items` open a nested
+   * submenu. No effect when the picker is hidden.
+   */
+  profilePickerActions?: ProfilePickerAction[];
+  /**
+   * Displays `label` as the picker value while the aliased profile drives
+   * every request — see {@link ProfilePickerAlias}. The alias survives
+   * store rebuilds (entity switches) and thread switches; pass `null` to
+   * drop it.
+   */
+  profilePickerAlias?: ProfilePickerAlias | null;
+  /**
+   * Fired on explicit user picks in the model picker: a plain profile row
+   * (`actionId` undefined) or a profilePickerActions row with `profileId`
+   * (`actionId` = that action's id). Not fired by programmatic changes.
+   */
+  onProfilePickerSelect?: (profile: Profile, actionId?: string) => void;
+  /**
+   * Host override for the chat error box content (title / description /
+   * action) by normalized error code — see {@link WidgetConfig.formatChatError}.
+   * Return `null` to keep the library default (localized text + Retry).
+   */
+  formatChatError?: WidgetConfig["formatChatError"];
+  /**
+   * Fired when an opened thread's persisted context settles: the agent
+   * entity the conversation last ran against, or `null` for a plain
+   * conversation. Not fired while the value is unknown (fetch in flight,
+   * local echo of a just-created thread) — the host keeps its own state
+   * then. Use it to restore/drop the picked agent per thread.
+   */
+  onThreadContextChange?: (
+    contextEntityId: string | null,
+    threadId: string,
+  ) => void;
+  composerHeader?: ReactNode;
+  composerDisabled?: boolean;
+  /**
+   * Welcome-screen suggestion chips. The host builds the lists for the current
+   * section (room / folder context) and passes them in ready-made; which list
+   * is shown depends on what the composer currently holds — see
+   * {@link SuggestionSet}. A bare array is treated as `{ default: [...] }`.
+   */
+  suggestions?: Suggestion[] | SuggestionSet;
+  /**
+   * The room the user is standing in, offered to the chat as context. When
+   * the chat opens, `ContextRoomSync` connects it if it holds a `.ai` folder
+   * and the composer shows it with the folder's skills; `null` (outside a
+   * room, or a room kind that cannot hold the folder) drops any connection.
+   * There is no room picker: the current room is the only candidate.
+   */
+  contextRoom?: ContextRoom | null;
+  /**
+   * How many attachments the composer accepts in the section the host is
+   * showing. Defaults to the widget's own `CHAT_ATTACHMENT_LIMIT`; the Forms
+   * section passes 1, because a question there is about a single form and its
+   * responses. Values above the widget's cap are ignored (it enforces its
+   * own), and every attach entry point honors it — picker, device upload,
+   * "Ask AI" row action, drag-and-drop.
+   */
+  attachmentLimit?: number;
+  /**
+   * Where the AI backend lives and how to authenticate against it. Omit it
+   * and the chat talks to `/api/2.0/ai` on the page's own origin with the
+   * session cookie — what the DocSpace client, served from the portal, wants.
+   * Pass it when the page is served from elsewhere (Storybook pointed at a
+   * portal from the toolbar): every chat request then goes to
+   * `${origin}/api/2.0/ai` carrying `headers`, e.g. an `Authorization:
+   * Bearer <key>`. The requests never send credentials, so a key has to
+   * travel as a header.
+   */
+  serverApi?: AiServerApi;
+  children: ReactNode;
+};
+
+/** Target of the chat's HTTP transport — see `AiAgentProvidersProps.serverApi`. */
+export type AiServerApi = {
+  /** Portal origin, without a trailing slash and without `/api/2.0/ai`. */
+  origin: string;
+  /** Sent with every chat request. */
+  headers?: Record<string, string>;
+};
+
+// Server-mode API config: backend is mounted at the same origin as the
+// client under /api/2.0/ai. Engines are intentionally not constructed
+// — every method call goes over HTTP via createServerAPI / ApiProvider.
+const SERVER_API_BASE_URL = "/api/2.0/ai";
+
+// Next.js evaluates this useMemo during SSR for "use client" components,
+// where `window` is undefined. Fall back to an empty origin — the actual
+// API calls only fire from useEffect-driven code that runs after hydration.
+const getOrigin = () =>
+  typeof window === "undefined" ? "" : window.location.origin;
+
+const buildServerApiConfig = (
+  origin: string,
+  headers?: Record<string, string>,
+): ServerAPIConfig => ({
+  origin,
+  baseUrl: SERVER_API_BASE_URL,
+  headers,
+  routes: DEFAULT_SERVER_API_ROUTES,
+});
+
+// Hydrates Zustand stores (profiles, threads, prompts, servers/tools) from
+// the server on mount. Lives inside StoresProvider + ToolsProvider so it
+// can read the stores/servers context. Without this, persisted data
+// (like AI profiles) would only appear after the first in-session write.
+// `enabled: false` (anonymous session) keeps the stores empty instead of
+// firing fetches that would all come back 401.
+const StoresHydrator = ({ enabled }: { enabled: boolean }) => {
+  useProfiles({ isReady: enabled });
+  useThread({ isReady: enabled });
+  useServers({ isReady: enabled });
+  return null;
+};
+
+/**
+ * Host-driven alias for the composer model picker: the profile is selected
+ * as the session chat profile while the picker displays `label` (e.g. an AI
+ * agent name) instead of the profile's own name.
+ */
+export type ProfilePickerAlias = {
+  profileId: string;
+  label: string;
+};
+
+// Applies the alias whenever the host's pick changes (and once profiles
+// hydrate). Deliberately NOT keyed on the thread: a thread switch restores
+// the thread's own profile, and the host re-drives the alias per thread
+// through onThreadContextChange — see ThreadContextBridge.
+const ProfilePickerAliasBridge = ({
+  alias,
+}: {
+  alias?: ProfilePickerAlias | null;
+}) => {
+  const { useProfilesStore } = useStores();
+  const initialized = useProfilesStore((s) => s.initialized);
+  const getProfileById = useProfilesStore((s) => s.getProfileById);
+  const setSessionChatProfile = useProfilesStore(
+    (s) => s.setSessionChatProfile,
+  );
+
+  useEffect(() => {
+    if (!alias || !initialized) return;
+    const profile = getProfileById(alias.profileId);
+    if (!profile) return;
+    setSessionChatProfile({ ...profile, name: alias.label });
+  }, [alias, initialized, getProfileById, setSessionChatProfile]);
+
+  return null;
+};
+
+// Hands the opened thread's persisted context back to the host: the engine
+// stamps contextEntityId into stored user messages, the message store
+// derives the thread's value on load (`undefined` = not settled — a fetch
+// in flight or the local echo of a just-created thread — never reported;
+// the host's own state is the truth then), and this bridge reports the
+// settled value so the host can restore or drop its per-thread agent state.
+const ThreadContextBridge = ({
+  onThreadContextChange,
+}: {
+  onThreadContextChange?: (
+    contextEntityId: string | null,
+    threadId: string,
+  ) => void;
+}) => {
+  const { useMessageStore, useThreadsStore } = useStores();
+  const threadId = useThreadsStore((s) => s.threadId);
+  const threadContext = useMessageStore((s) => s.threadContextEntityId);
+
+  useEffect(() => {
+    if (!onThreadContextChange || !threadId) return;
+    if (threadContext === undefined) return;
+    onThreadContextChange(threadContext, threadId);
+  }, [onThreadContextChange, threadId, threadContext]);
+
+  return null;
+};
+
+// The chat-facing tool name (what the LLM calls, e.g.
+// `onlyoffice_generate_docx`) differs from the name the editor's AI plugin
+// expects in `ai_onCallTool`. The backend used to bridge this via
+// `generationToolCallState.toolName` (server: ASC.AI/Core/Tools/Editor/*.cs).
+// Now that we drive the call from the host, we map it here. The model's tool
+// arguments (description / topic / slideCount / style) are forwarded as-is;
+// the plugin reads what it needs.
+//
+// The server renamed the tools from the `docspace_` to the `onlyoffice_`
+// prefix (Bug 83490); both spellings are kept so a portal running an older
+// backend keeps generating.
+const EDITOR_TOOL_NAME_BY_CHAT_TOOL: Record<string, string> = {
+  onlyoffice_generate_docx: "generateDocx",
+  onlyoffice_generate_form: "generateForm",
+  onlyoffice_generate_presentation: "generatePresentationWithTheme",
+  docspace_generate_docx: "generateDocx",
+  docspace_generate_form: "generateForm",
+  docspace_generate_presentation: "generatePresentationWithTheme",
+};
+
+// Server-side document generation tools. The backend creates the file and
+// returns it in the tool result. We hide the "Always allow" checkbox for them
+// (one-off confirmation only) and open the generated file once approved.
+const GENERATE_TOOL_NAMES = Object.keys(EDITOR_TOOL_NAME_BY_CHAT_TOOL);
+
+// The chat tool name of the tool-call the approval dialog is currently
+// showing, or undefined when no call is pending.
+const getPendingToolName = (
+  manageToolData: ReturnType<
+    ReturnType<typeof useStores>["useServersStore"]["getState"]
+  >["manageToolData"],
+): string | undefined => {
+  if (!manageToolData) return undefined;
+  const part: unknown = manageToolData.message.content[manageToolData.idx];
+  if (!part || typeof part !== "object") return undefined;
+  const { type, toolName } = part as { type?: unknown; toolName?: unknown };
+  return type === "tool-call" && typeof toolName === "string"
+    ? toolName
+    : undefined;
+};
+
+// Reserves the editor tab INSIDE the "Allow" click of a generate tool. The
+// generated file is opened only when the tool result streams back, which is
+// outside the user gesture — so the popup blocker would veto `window.open`
+// there (Chrome allows it for roughly 5 s after the click, a slow backend
+// loses the race). While a generate tool awaits approval, the dialog's
+// submit runs `reserveGeneratedFileWindow`; `openGeneratedFileWithToolCall`
+// then navigates that tab. When the pending call goes away without the tab
+// being used (deny, failed stream, no file id) the blank tab is closed.
+const GenerateToolApprovalBridge = () => {
+  const { useServersStore } = useStores();
+  const pendingToolName = useServersStore((s) =>
+    getPendingToolName(s.manageToolData),
+  );
+  const isGeneratePending =
+    pendingToolName !== undefined &&
+    GENERATE_TOOL_NAMES.includes(pendingToolName);
+
+  useEffect(() => {
+    if (!isGeneratePending) return;
+    const remove = addDialogSubmitInterceptor(reserveGeneratedFileWindow);
+    return () => {
+      remove();
+      // The dialog is gone: either the tab was consumed by
+      // openGeneratedFileWithToolCall (then this is a no-op) or the call did
+      // not produce a file — drop the spare tab.
+      releaseGeneratedFileWindow();
+    };
+  }, [isGeneratePending]);
+
+  return null;
+};
+
+/**
+ * Reports a failure from one of the scope-switch reloads below. Those are
+ * deliberately not awaited (navigation must not wait on them), so their
+ * rejections have nowhere else to go: the step name is logged for support,
+ * and the user is told that the chat is showing stale data for this room —
+ * on screen it still holds the previous scope's model assignment and tools.
+ *
+ * Not a hook, so the string comes from `getCommonTranslation` (reads
+ * `window.i18n`) rather than `useCommonTranslation`.
+ */
+// A 403 means the user has no access to this room/agent (e.g. opening an agent
+// created by another admin). The host already surfaces that as a "view-only"
+// notice, so the raw error toast is noise that races it on open (Bug 83181).
+// The chat lib's server API rejects with a plain `Error` whose message is
+// `HTTP <status>` — the status is only in the text, not a `.status` property —
+// so the message is checked alongside the axios-style shapes.
+const isForbiddenError = (error: unknown): boolean => {
+  const e = error as {
+    response?: { status?: number };
+    status?: number;
+    message?: unknown;
+  };
+  if (e?.response?.status === 403 || e?.status === 403) return true;
+  return typeof e?.message === "string" && /\bHTTP\s+403\b/.test(e.message);
+};
+
+const logRescopeFailure = (step: string, reload: Promise<unknown>): void => {
+  void reload.catch((error: unknown) => {
+    console.error(`[ai-agent] scope switch: ${step} failed`, error);
+    if (!isForbiddenError(error)) toastr.error(error as Error);
+  });
+};
+
+// Illustration + tagline above the suggestion chips of an empty chat. Static
+// (it reads its own string through window.i18n), so one element is created
+// once and reused instead of being rebuilt per render.
+const chatIntro = <ChatIntro />;
+// Static, so it never invalidates the widget config memo.
+const analyzeIntro = <AnalyzeIntro />;
+
+// The fields `select` reads, kept in state and refreshed whenever one of them
+// changes -- the narrow observation `useObserver(fn)` gave, without that
+// deprecated hook and without making the whole provider an `observer`, which
+// would re-render it for every observable its body happens to read.
+// `fireImmediately` covers a change between the first render and the effect.
+const useObservedFields = <T extends object>(select: () => T): T => {
+  const [fields, setFields] = useState(select);
+  const selectRef = useRef(select);
+  selectRef.current = select;
+  useEffect(
+    () =>
+      reaction(
+        () => selectRef.current(),
+        (next) =>
+          setFields((prev) => (comparer.shallow(prev, next) ? prev : next)),
+        { equals: comparer.shallow, fireImmediately: true },
+      ),
+    [],
+  );
+  return fields;
+};
+
+const AiAgentProviders = ({
+  locale,
+  theme,
+  callbacks,
+  isStandalone,
+  isAvailable = false,
+  canUseAi = true,
+  getAgentRoomId,
+  openResultFile,
+  closeEditorPanel,
+  entityId,
+  contextEntityId,
+  hideProfilePicker = false,
+  profilePickerReadOnly,
+  isAgentRoom = false,
+  profilePickerActions,
+  profilePickerAlias,
+  onProfilePickerSelect,
+  formatChatError,
+  onThreadContextChange,
+  composerHeader,
+  composerDisabled,
+  suggestions,
+  contextRoom,
+  attachmentLimit,
+  serverApi,
+  children,
+}: AiAgentProvidersProps) => {
+  const { t } = useTranslation("Common");
+  const aiChatLocale = normalizeAiChatLocale(locale);
+  const { foldersApi, operationsApi, filesSettingsApi, aiApi } = useFilesApi();
+
+  const aiChatTranslations = useMemo(
+    () => ({
+      ModelAssignmentDescription: t("Common:ModelAssignmentDescription"),
+      ...(isStandalone
+        ? null
+        : { EnableWebSearch: t("Common:EnableWebSearchInBilling") }),
+    }),
+    [isStandalone, t],
+  );
+
+  // The panel store is created here rather than by `AiChatStoreProvider`
+  // below, because the analyze mode lives on it and everything this body
+  // assembles — the attachment cap, the composer actions, the chips — is
+  // derived from that mode. Only the flat fields are observed, never the mode
+  // object itself.
+  const aiChatStore = useMemo(() => new AiChatStore(), []);
+  const {
+    analyzeActive,
+    analyzePending,
+    analyzeAttachmentId,
+    analyzeFileName,
+  } = useObservedFields(() => ({
+    analyzeActive: aiChatStore.isAnalyzeMode,
+    analyzePending: aiChatStore.isAnalyzePending,
+    analyzeAttachmentId: aiChatStore.analyzeAttachmentId,
+    analyzeFileName: aiChatStore.analyzeFormTitle,
+  }));
+
+  // Ids of attached files the backend flagged as analyzable. The attachments
+  // store keeps only `{id, title, kind, path, type}` per ref, so `canAnalyze`
+  // exists in the attach response alone and is remembered here. Ids of removed
+  // attachments are harmless — the lookup always intersects with the current
+  // refs.
+  const [analyzableIds, setAnalyzableIds] = useState<string[]>([]);
+
+  const isMobile = useIsMobile();
+
+  const onFilesAttached = useCallback(
+    (attached: AttachedFileInfo[]) => {
+      // The form's chip is on the draft now. `useAttachHostFilesToChat`
+      // entered the mode when the attach started — this is the other half:
+      // from here an empty draft means the user removed the chip, not that
+      // the attach is still in flight. Started again as well, for the entry
+      // routes that report an attach without having gone through the hook.
+      const subject = attached.find((f) => f.analyzeOnly && f.entryId);
+      if (subject) {
+        aiChatStore.startAnalyzeMode({
+          entryId: subject.entryId,
+          title: subject.title,
+        });
+        // `subject.id` is what `attachments/save-files-many` minted for the
+        // form; the starter questions are asked for by that, not by the host
+        // file id, so this report is the first moment the poll can start.
+        aiChatStore.markAnalyzeAttached(subject.entryId, subject.id);
+      }
+
+      const analyzable = attached.filter((f) => f.canAnalyze);
+      if (analyzable.length === 0) return;
+
+      setAnalyzableIds((prev) => [...prev, ...analyzable.map((f) => f.id)]);
+    },
+    [aiChatStore],
+  );
+
+  // Never above what the widget itself enforces: a host asking for more would
+  // only make the cap toast quote a number the store does not honor.
+  const sectionAttachmentLimit = Math.min(
+    Math.max(1, attachmentLimit ?? CHAT_ATTACHMENT_LIMIT),
+    CHAT_ATTACHMENT_LIMIT,
+  );
+
+  // File-attachment integration: the composer "attach" actions, the message
+  // "Save as file" handler, and the supporting dialogs/device-upload input.
+  // Device uploads are stored as portal files in the chat's entity scope.
+  const {
+    composerActions: attachActions,
+    onSaveAsFile,
+    exportFormats,
+    overlay,
+  } = useFilesIntegration({
+    entityId,
+    onFilesAttached,
+  });
+
+  // Platform adapter passed downstream. Its `file` adapter is wired to the
+  // host's save handler, and it tracks the host locale/theme internally (the
+  // adapter identity stays stable, so chat stores aren't rebuilt).
+  const platform = usePlatformAdapter({
+    locale: aiChatLocale,
+    theme,
+    onSaveAsFile,
+    onOpenFile: openAttachedFile,
+    exportFormats,
+  });
+
+  // Tools that occupy the "editor" host group. `open_file` swaps this to the
+  // editor's native tool list (addImage, checkSpelling, ...) once the panel
+  // is up, and restores it back on close. A DOM CustomEvent drives the swap
+  // so handlers (which run outside React) can trigger a re-render.
+  const [editorTools, setEditorTools] =
+    useState<HostTool[]>(fileManagementTools);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { detail } = e as CustomEvent<EditorToolsChangedDetail>;
+      setEditorTools(detail.tools);
+    };
+    window.addEventListener(EDITOR_TOOLS_EVENT, handler);
+    return () => window.removeEventListener(EDITOR_TOOLS_EVENT, handler);
+  }, []);
+
+  const hostToolGroups = useMemo(
+    () => [buildEditorToolGroup(editorTools)],
+    [editorTools],
+  );
+
+  // After the user approves a generate tool, the lib resolves its result and
+  // calls this before closing the dialog / resuming the stream. The result
+  // carries the created file (`data.id`) and the second arg carries the
+  // tool-call context (`toolName` + `toolArgs`). We open the file in a new tab
+  // and re-run the same tool inside the editor with the model's original
+  // arguments via postMessage (replacing the old `?withTool=true` URL flag).
+  // Dedupe by file id so a re-emitted result doesn't reopen.
+  const openedGenerateFilesRef = useRef<Set<number | string>>(new Set());
+
+  const onToolCallApproveResult = useCallback(
+    (result: unknown, ctx: ToolCallApproveContext) => {
+      // Trace the flow only — never dump tool args or the result payload
+      // (they may carry user content).
+      console.log(`[ai-agent] onToolCallApproveResult: ${ctx.toolName}`);
+      // The tool result arrives as a JSON string (the backend serializes it
+      // for the LLM); parse it before reading the created file id, but keep
+      // accepting a ready object in case the lib changes the contract.
+      type GenerateResult = { id?: unknown; data?: { id?: unknown } } | null;
+      let payload: GenerateResult = null;
+      if (typeof result === "string") {
+        try {
+          payload = JSON.parse(result) as GenerateResult;
+        } catch {
+          payload = null;
+        }
+      } else {
+        payload = result as GenerateResult;
+      }
+      const rawId = payload?.data?.id ?? payload?.id;
+      if (typeof rawId !== "number" && typeof rawId !== "string") {
+        console.warn(
+          `[ai-agent] onToolCallApproveResult: no file id in the "${ctx.toolName}" result — skip`,
+        );
+        return;
+      }
+      if (openedGenerateFilesRef.current.has(rawId)) {
+        console.log(
+          `[ai-agent] onToolCallApproveResult: file ${rawId} already opened — skip`,
+        );
+        return;
+      }
+
+      // Map the chat tool name to the name the editor's AI plugin expects.
+      // An unknown name means the backend renamed a tool and this map was not
+      // updated: the plugin would ignore the raw name and leave the opened
+      // file empty with no error, so fail loudly here instead.
+      const editorToolName = EDITOR_TOOL_NAME_BY_CHAT_TOOL[ctx.toolName];
+      if (!editorToolName) {
+        console.warn(
+          `[ai-agent] onToolCallApproveResult: "${ctx.toolName}" is not a known generate tool — the editor plugin tool name is unmapped, skip`,
+        );
+        return;
+      }
+
+      openedGenerateFilesRef.current.add(rawId);
+
+      console.log(
+        `[ai-agent] opening generated file ${rawId} with editor tool "${editorToolName}"`,
+      );
+      const opened = openGeneratedFileWithToolCall(
+        rawId,
+        editorToolName,
+        ctx.toolArgs,
+      );
+      if (opened) return;
+
+      // The tab was blocked (no reservation and the gesture had expired, or
+      // popups are blocked outright). Offer a click — a fresh user gesture —
+      // that opens the file and runs the generation tool in it.
+      const toastId = toastr.info(
+        <Link
+          type={LinkType.action}
+          isHovered
+          onClick={() => {
+            if (
+              openGeneratedFileWithToolCall(rawId, editorToolName, ctx.toolArgs)
+            ) {
+              toastr.dismiss(toastId);
+            }
+          }}
+        >
+          {t("Common:OpenGeneratedDocument")}
+        </Link>,
+        null,
+        0,
+        true,
+      );
+    },
+    [t],
+  );
+
+  // Reduced to primitives so a host passing a fresh `serverApi` object on
+  // every render does not rebuild the whole chat bundle below: only a real
+  // change of target or credentials does.
+  const serverOrigin = serverApi?.origin || getOrigin();
+  const serverHeadersKey = serverApi?.headers
+    ? JSON.stringify(serverApi.headers)
+    : "";
+
+  const { stores, ctx, serverApiConfig } = useMemo(() => {
+    const eventBus = new ChatEventBus();
+    const callbacksManager = new CallbacksManager();
+    const middlewareRunner = new MiddlewareRunner([
+      analyzeSentMiddleware(aiChatStore),
+    ]);
+    const servers = new Servers(platform, eventBus);
+
+    const appCtx = {
+      storage: storageAdapter,
+      platform,
+      servers,
+      eventBus,
+      callbacksManager,
+      middlewareRunner,
+      // Standalone portals don't ship with the ONLYOFFICE AI cloud — skip
+      // the auto-register, hide the built-in "onlyoffice" provider type
+      // from Add/Edit model dropdowns, and hide the matching row in
+      // Web Search settings.
+      onlyofficeConfig: isStandalone ? undefined : { baseUrl: serverOrigin },
+      hiddenProviders: isStandalone
+        ? (["onlyoffice"] as ProviderType[])
+        : undefined,
+      hiddenWebSearchProviders: isStandalone
+        ? (["ONLYOFFICE"] as WebSearchProviderId[])
+        : undefined,
+    };
+
+    const config = buildServerApiConfig(
+      serverOrigin,
+      serverHeadersKey
+        ? (JSON.parse(serverHeadersKey) as Record<string, string>)
+        : undefined,
+    );
+    // No `engines` argument → every method call routes over HTTP to the
+    // backend mounted at `${origin}${baseUrl}`.
+    const api = createServerAPI(config);
+    const appStores = createStores({
+      keys: storeKeys,
+      ctx: appCtx,
+      api,
+      // Initial scope only — deliberately not a dependency. Scope changes
+      // re-scope the live bundle below instead of re-creating it, which
+      // would blink the whole chat (and every profiles-gated UI).
+      entityId,
+      // Cursor pagination for threads and messages: the sidebar loads 100
+      // threads and infinite-scrolls, and every full-history read is paged
+      // instead of one unbounded request. The portal backend honors the
+      // `count`/`cursor` params. This bundle is host-created, so the flag
+      // has to be set here — `WidgetConfig.enablePagination` only reaches
+      // the stores the library builds for itself.
+      enablePagination: true,
+    });
+
+    return { stores: appStores, ctx: appCtx, serverApiConfig: config };
+  }, [isStandalone, platform, aiChatStore, serverOrigin, serverHeadersKey]);
+
+  // While "Analyze responses" is on, the chat is about that one form: the cap
+  // drops to one and the composer's attach actions go away, so the "+" menu
+  // stops offering something the cap would then refuse. The mode is state on
+  // the panel store, not a property of the draft — it outlives the message
+  // that takes the form off the composer (see `AiChatStore.analyzeMode`).
+
+  // The number the composer enforces and the reason the refusal quotes — see
+  // `resolveAttachmentCap` for why the analyze mode ends up with no slots at
+  // all once its first message is out.
+  const attachmentCap = useMemo<AttachmentCap>(
+    () =>
+      resolveAttachmentCap({
+        analyzeActive,
+        analyzePending,
+        analyzeFileName,
+        sectionLimit: sectionAttachmentLimit,
+      }),
+    [analyzeActive, analyzePending, analyzeFileName, sectionAttachmentLimit],
+  );
+
+  const composerActions = useMemo(
+    () => (analyzeActive ? [] : attachActions),
+    [analyzeActive, attachActions],
+  );
+
+  // The starter questions of the form being analyzed: asked for once, then
+  // waited for on the socket. In this mode the message is about this form's
+  // answers, so the static chips are not shown in the meantime — a generic
+  // chip would ask the wrong question.
+  const readSuggestedQuestions = useCallback<ReadSuggestedQuestions>(
+    (attachmentId, signal) => aiApi.getSuggestedQuestions(attachmentId, signal),
+    [aiApi],
+  );
+
+  // Asked for by the attachment the form became, so the wait starts only once
+  // the attach has reported it back.
+  const { questions: analyzeQuestions, onTyping } = useAnalyzeQuestions(
+    readSuggestedQuestions,
+    analyzeAttachmentId,
+  );
+
+  // Writing your own question makes the suggestions moot — stop waiting for
+  // them (and let the wait end for good, the chips are not coming back).
+  useComposerTyping(analyzeActive, onTyping);
+
+  // Whether the PREVIOUS scope was an agent room — needed to tell a real
+  // thread-scope change from plain folder navigation (see the effect below).
+  // Updated only by that effect, so between entityId changes it holds the
+  // agent-ness of the scope the chat currently shows.
+  const wasAgentRoomRef = useRef(isAgentRoom);
+
+  // Live re-scope on entityId changes (room navigation, agent pick): the
+  // bundle — and everything not scope-bound (profiles list, servers UI,
+  // router page) — stays intact; only what the scope owns is reloaded.
+  // Threads re-init themselves through `WidgetConfig.entityId` (the
+  // useThread hydration effect), so they are not touched here.
+  useEffect(() => {
+    if (stores.getEntityId() === entityId) {
+      // Same scope, but the host may have (re)resolved its agent-ness after
+      // the id (folder data loads progressively) — keep the ref in sync so
+      // the NEXT navigation compares against the correct previous state.
+      wasAgentRoomRef.current = isAgentRoom;
+      return;
+    }
+    stores.setEntityId(entityId);
+
+    const wasAgentRoom = wasAgentRoomRef.current;
+    wasAgentRoomRef.current = isAgentRoom;
+
+    const profiles = stores.useProfilesStore.getState();
+    const threads = stores.useThreadsStore.getState();
+    const servers = stores.useServersStore.getState();
+    const attachments = stores.useAttachmentsStore.getState();
+
+    // Thread storage knows only two scopes — an agent room or the global
+    // area (the backend folds every non-agent entityId to global). So plain
+    // navigation between folders/rooms never changes which threads the chat
+    // shows, and the open conversation (including a streaming session in the
+    // side panel) must survive it: keep the thread and the composer
+    // attachments, only the send scope (`setEntityId` above) follows the
+    // location. Crossing an agent-room boundary in either direction — or
+    // between two agent rooms — is a real scope change and resets as before.
+    // `hideProfilePicker` hosts predate `isAgentRoom` and treat every
+    // entityId as an agent scope, so they keep the reset unconditionally.
+    const threadScopeChanged = wasAgentRoom || isAgentRoom || hideProfilePicker;
+
+    if (threadScopeChanged) {
+      // A scope switch right after an explicit picker selection (agent pick
+      // sets the aliased profile, plain pick sets the profile itself) must
+      // not wipe that selection — the default reset runs AFTER the alias
+      // bridge and would drop it. Reset the session so the room's own
+      // assignment wins whenever the host fixes the model for the scope:
+      // either an agent room (`isAgentRoom` — its picker may still be shown as
+      // a read-only label or an editable combo) or a fully hidden picker
+      // (`hideProfilePicker`, kept as a fallback so callers that hide the
+      // picker keep the pre-`isAgentRoom` reset behavior).
+      threads.onSwitchToNewThread({
+        keepSessionProfile: !(isAgentRoom || hideProfilePicker),
+      });
+    }
+    // Sessions barred from AI (anonymous public room / public preview,
+    // guests) must not fire the reloads below: every request would answer
+    // 401 (hydration is off for them too — see `StoresHydrator enabled`).
+    // The local scope sync above still runs so the stores are consistent
+    // if the ability ever flips on.
+    if (!canUseAi) return;
+
+    // Fire-and-forget by design — navigation must not wait on these. Each
+    // one is a store action that rejects on a failed read, so they get an
+    // explicit handler: an unhandled rejection on every failed room switch
+    // is noise nobody can act on, and the previous scope's data staying on
+    // screen is a milder failure than the chat refusing to open.
+    logRescopeFailure(
+      "profiles:modelAssignment",
+      profiles.reloadModelAssignment(),
+    );
+    logRescopeFailure(
+      "profiles:extendedThinking",
+      profiles.reloadExtendedThinking(),
+    );
+    logRescopeFailure("servers:reload", servers.reload());
+    if (threadScopeChanged) {
+      logRescopeFailure(
+        "attachments:clearFiles",
+        attachments.clearAttachmentFiles(),
+      );
+      logRescopeFailure(
+        "attachments:clearImages",
+        attachments.clearAttachmentImages(),
+      );
+    }
+  }, [entityId, isAgentRoom, hideProfilePicker, stores, canUseAi]);
+
+  const onDropFiles = useCallback(
+    (files: File[]) =>
+      uploadFilesToChat(files, {
+        entityId,
+        foldersApi,
+        operationsApi,
+        filesSettingsApi,
+        useAttachmentsStore: stores.useAttachmentsStore,
+        onFilesAttached,
+        attachmentCap,
+        t,
+      }),
+    [
+      entityId,
+      foldersApi,
+      operationsApi,
+      filesSettingsApi,
+      stores,
+      onFilesAttached,
+      attachmentCap,
+      t,
+    ],
+  );
+
+  // Which chips to show depends on what the composer holds right now, so the
+  // attachment refs are read straight from the store the widget writes to —
+  // that covers drag-and-drop and chip removal, not just the attach dialog.
+  // Images live in their own bucket (attachFilesToChat re-keys them), so
+  // both lists are counted.
+  const attachedFileIds = stores.useAttachmentsStore((s) =>
+    [...s.attachmentFiles, ...s.attachmentImages].map((f) => f.id).join(","),
+  );
+
+  const resolvedSuggestions = useMemo(
+    () =>
+      resolveSuggestions(
+        suggestions,
+        attachedFileIds === "" ? [] : attachedFileIds.split(","),
+        analyzableIds,
+        { active: analyzeActive, questions: analyzeQuestions },
+      ),
+    [
+      suggestions,
+      attachedFileIds,
+      analyzableIds,
+      analyzeActive,
+      analyzeQuestions,
+    ],
+  );
+
+  const ownCallbacks = useMemo<ChatCallbacks>(
+    () => analyzeModeCallbacks(aiChatStore),
+    [aiChatStore],
+  );
+
+  const chatCallbacks = useMemo(
+    () => composeCallbacks(callbacks, ownCallbacks),
+    [callbacks, ownCallbacks],
+  );
+
+  const widgetConfig = useMemo<WidgetConfig>(
+    () => ({
+      composerActions,
+      composerHeader,
+      composerDisabled,
+      entityId,
+      contextEntityId,
+      // Host-driven model-picker visibility: the lib falls back to hiding
+      // whenever entityId is set, but here entityId means "current
+      // folder/room scope", not "agent chat" — only agents fix the model.
+      hideProfilePicker,
+      // Read-only label instead of an interactive picker (overrides the
+      // entityId hide-heuristic, deferring to an explicit hideProfilePicker).
+      profilePickerReadOnly,
+      profilePickerActions,
+      onProfilePickerSelect,
+      dropdownNavigation: isMobile ? "drilldown" : "flyout",
+      formatChatError,
+      // Hide "Always allow" only for generate tools (matched by full name).
+      hideToolAllowAlways: GENERATE_TOOL_NAMES,
+      onToolCallApproveResult,
+      composerActionSendSize: 32,
+      composerPlaceholder: t("AskAnyQuestion"),
+      webSearchSaveMode: "button",
+      welcomeDescription: t("Common:WelcomeAiChatDescription"),
+      // Context-specific chips: the host builds the lists for the current
+      // section, and the set is narrowed above by what is attached.
+      suggestions: resolvedSuggestions,
+      // Rendered by the library above the chips, under the same "empty chat"
+      // gate — no chips, no intro.
+      suggestionsHeader: analyzeActive ? analyzeIntro : chatIntro,
+
+      // Route drag-and-drop through the portal-upload + attach flow (same as
+      // the "Upload from device" button) instead of the library's in-memory
+      // default, so dropped DOCX/PDF/XLSX are supported too.
+      onDropFiles,
+      // The context room is the room the user is in, connected by
+      // ContextRoomSync; the composer's picker lists the other rooms with a
+      // .ai folder. DocSpace is one cloud to the library, so the picker
+      // skips the cloud level and lists the rooms straight away.
+      hideContextClouds: true,
+    }),
+    [
+      composerActions,
+      composerHeader,
+      composerDisabled,
+      entityId,
+      contextEntityId,
+      analyzeActive,
+      hideProfilePicker,
+      profilePickerReadOnly,
+      profilePickerActions,
+      onProfilePickerSelect,
+      isMobile,
+      formatChatError,
+      onToolCallApproveResult,
+      onDropFiles,
+      resolvedSuggestions,
+      t,
+    ],
+  );
+
+  useEffect(
+    () =>
+      attachHostToolsRuntime({
+        servers: ctx.servers,
+        useServersStore: stores.useServersStore,
+        eventBus: ctx.eventBus,
+      }),
+    [ctx.servers, ctx.eventBus, stores.useServersStore],
+  );
+
+  useEffect(() => {
+    if (openResultFile) attachOpenResultFile(openResultFile);
+  }, [openResultFile]);
+
+  useEffect(() => {
+    if (closeEditorPanel) attachCloseEditorPanel(closeEditorPanel);
+  }, [closeEditorPanel]);
+
+  return (
+    <AiChatAvailabilityContext.Provider value={isAvailable && canUseAi}>
+      <EventsProvider
+        callbacksManager={ctx.callbacksManager}
+        callbacks={chatCallbacks}
+      >
+        <PlatformProvider platform={platform}>
+          <AiChatI18nIsolator
+            locale={aiChatLocale}
+            translations={aiChatTranslations}
+          >
+            <ComponentsProvider overrides={componentOverrides}>
+              <WidgetConfigProvider config={widgetConfig}>
+                <ApiProvider config={serverApiConfig}>
+                  <StoresProvider stores={stores}>
+                    <ThemeProvider theme={theme} customThemes={portalThemes}>
+                      <ImagesProvider overrides={imageOverrides}>
+                        <ToolsProvider
+                          hostToolGroups={hostToolGroups}
+                          servers={ctx.servers}
+                          eventBus={ctx.eventBus}
+                        >
+                          <StoresHydrator enabled={canUseAi} />
+                          <ProfilePickerAliasBridge
+                            alias={profilePickerAlias}
+                          />
+                          <ThreadContextBridge
+                            onThreadContextChange={onThreadContextChange}
+                          />
+                          <GenerateToolApprovalBridge />
+                          <AiChatStoreProvider store={aiChatStore}>
+                            <ContextRoomProvider room={contextRoom}>
+                              <ContextRoomWatcher />
+                              <AiChatStoresBridge />
+                              {getAgentRoomId ? null : <AgentRoomIdSync />}
+                              {/* The per-section attachment cap covers the
+                                  host subtree and the chat's own dialogs
+                                  alike — picker, device upload, "Ask AI" row
+                                  action, drop zone. */}
+                              <AttachmentLimitContext.Provider
+                                value={attachmentCap}
+                              >
+                                {/* The host subtree attaches files too (the
+                                    "Ask AI" action, the chat-panel drop
+                                    zone): hand it the same reporter the
+                                    dialogs get as a prop, so `canAnalyze`
+                                    survives every entry point. */}
+                                <OnFilesAttachedContext.Provider
+                                  value={onFilesAttached}
+                                >
+                                  {children}
+                                </OnFilesAttachedContext.Provider>
+                                {overlay}
+                              </AttachmentLimitContext.Provider>
+                            </ContextRoomProvider>
+                          </AiChatStoreProvider>
+                        </ToolsProvider>
+                      </ImagesProvider>
+                    </ThemeProvider>
+                  </StoresProvider>
+                </ApiProvider>
+              </WidgetConfigProvider>
+            </ComponentsProvider>
+          </AiChatI18nIsolator>
+        </PlatformProvider>
+      </EventsProvider>
+    </AiChatAvailabilityContext.Provider>
+  );
+};
+
+export default AiAgentProviders;
+
+export { useIsAiChatAvailable } from "./availability";
+export { useContextRoom, type ContextRoom } from "./context-room";
+export { useApi, useI18n, useStores } from "@onlyoffice/ai-chat";
+export { DEFAULT_SERVER_API_ROUTES } from "@onlyoffice/ai-chat";
+export type {
+  ComposerAction,
+  Profile,
+  ProfilePickerAction,
+  ServerAPIConfig,
+} from "@onlyoffice/ai-chat";
+export type { SaveAsFileHandler } from "./platform";
+
+export {
+  AiChatStore,
+  AiChatStoreProvider,
+  useAiChatStore,
+} from "./ai-chat-store";
+export type { AiChatRouterPage } from "./ai-chat-store";

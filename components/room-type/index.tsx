@@ -1,38 +1,4 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
+import type { MouseEventHandler } from "react";
 import { useTranslation } from "react-i18next";
 import classNames from "classnames";
 
@@ -60,20 +26,36 @@ const RoomType = ({
   id,
   selectedId,
   disabledFormRoom,
+  disabledPublicRoom,
   isTemplate,
   isTemplateRoom,
+  isFormSection,
 }: RoomTypeProps) => {
   const { t } = useTranslation(["Common"]);
 
   const room = {
     type: roomType,
-    title: getRoomTypeTitleTranslation(t, roomType, isTemplate),
-    description: getRoomTypeDescriptionTranslation(t, roomType, isTemplate),
+    title: getRoomTypeTitleTranslation(t, roomType, isTemplate, isFormSection),
+    description: getRoomTypeDescriptionTranslation(
+      t,
+      roomType,
+      isTemplate,
+      isFormSection,
+    ),
   };
 
   const isFormRoom = roomType === RoomsType.FormRoom;
+  const isPublicRoom = roomType === RoomsType.PublicRoom;
 
-  const disabled = isFormRoom && disabledFormRoom;
+  const disabled =
+    (isFormRoom && disabledFormRoom) || (isPublicRoom && disabledPublicRoom);
+
+  // `listItem` and `dropdownItem` render the disabled state, so they also
+  // refuse the click. Styling alone left the handler live.
+  const handleClick: MouseEventHandler<HTMLElement> = (e) => {
+    if (disabled) return;
+    onClick?.(e);
+  };
 
   const arrowClassName =
     type === "dropdownButton"
@@ -94,16 +76,19 @@ const RoomType = ({
 
       <div className="choose_room-info_wrapper">
         <div className="choose_room-title">
-          <Text className="choose_room-title-text">{t(room.title)}</Text>
+          <Text className="choose_room-title-text">{room.title}</Text>
         </div>
-        <Text className="choose_room-description">{t(room.description)}</Text>
+        <Text className="choose_room-description">{room.description}</Text>
       </div>
 
       <IconButton
         className={arrowClassName}
         iconNode={<ArrowReactSvg />}
         size={16}
-        onClick={onClick}
+        // No onClick: the arrow sits inside the root, which already handles
+        // the click. Passing the handler here too made one click call it
+        // twice. isClickable keeps the pointer cursor the handler used to set.
+        isClickable={!disabled}
       />
     </>
   );
@@ -113,10 +98,12 @@ const RoomType = ({
       as="div"
       className={classNames(styles.roomType, styles.listItem, {
         [styles.isOpen]: isOpen,
+        [styles.disabled]: disabled,
       })}
       id={id}
-      title={disabled ? "" : t(room.title)}
-      onClick={onClick}
+      title={disabled ? "" : room.title}
+      onClick={handleClick}
+      aria-disabled={disabled || undefined}
       data-tooltip-id={disabled ? "create-room-tooltip" : undefined}
       data-testid="room-type-list-item"
       data-selected-id={selectedId}
@@ -127,7 +114,7 @@ const RoomType = ({
     <TooltipContainer
       as="div"
       id={id}
-      title={t(room.title)}
+      title={room.title}
       onClick={onClick}
       className={classNames(styles.roomType, styles.dropDownButton, {
         [styles.isOpen]: isOpen,
@@ -141,11 +128,14 @@ const RoomType = ({
     <TooltipContainer
       as="div"
       id={id}
-      title={t(room.title)}
-      onClick={onClick}
+      title={disabled ? "" : room.title}
+      onClick={handleClick}
+      aria-disabled={disabled || undefined}
       data-selected-id={selectedId}
+      data-tooltip-id={disabled ? "create-room-tooltip" : undefined}
       className={classNames(styles.roomType, styles.dropDownItem, {
         [styles.isOpen]: isOpen,
+        [styles.disabled]: disabled,
       })}
       data-testid="room-type-dropdown-item"
     >
@@ -155,7 +145,7 @@ const RoomType = ({
     <TooltipContainer
       as="div"
       id={id}
-      title={t(room.title)}
+      title={room.title}
       data-selected-id={selectedId}
       className={classNames(styles.roomType, styles.displayItem, {
         [styles.isOpen]: isOpen,
@@ -165,5 +155,7 @@ const RoomType = ({
     </TooltipContainer>
   );
 };
+
+export type { RoomTypeProps };
 
 export default RoomType;

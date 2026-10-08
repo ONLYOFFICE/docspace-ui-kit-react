@@ -1,53 +1,12 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { default as i18ninstance } from "i18next";
 
-/**
- * Gets a cookie value by name
- */
-export const getCookie = (name: string): string | undefined => {
-  if (typeof document === "undefined") return undefined;
+import { getCookie } from "../cookie";
 
-  const matches = document.cookie.match(
-    new RegExp(
-      `(?:^|; )${name.replace(/([.$?*|{}()[\]\\/+^])/g, "\\$1")}=([^;]*)`,
-    ),
-  );
-  return matches ? decodeURIComponent(matches[1]) : undefined;
-};
+// One implementation of `getCookie`, in utils/cookie. This module used to carry
+// a second, narrower copy; both reached the root barrel, where `export *` drops
+// a name that resolves to two different declarations -- silently removing it
+// from the plugin API. Re-exported here so `utils/i18n` keeps the name.
+export { getCookie };
 
 export type WindowI18n = {
   t?: (key: string, options?: Record<string, string | number>) => string;
@@ -88,6 +47,26 @@ export const getCurrentCommonLanguage = (): string => {
 
 const DEFAULT_NAMESPACES = ["Common"];
 
+// Sentinel returned by i18next when a key is truly missing. Comparing the
+// result against the key itself is not enough: a valid English translation
+// can be identical to its key (e.g. "Search" -> "Search").
+const MISSING_KEY = "\u0000missing\u0000";
+
+type TCommonI18nInstance = {
+  t: (key: string, options?: Record<string, string | number>) => string;
+};
+
+// The host's i18next instance holding Common resources. TranslationProvider
+// keeps a private instance (not the i18next singleton), so during SSR --
+// where window.i18n does not exist -- translations must be read from here.
+let commonI18nInstance: TCommonI18nInstance | undefined;
+
+export const registerCommonI18nInstance = (
+  instance: TCommonI18nInstance,
+): void => {
+  commonI18nInstance = instance;
+};
+
 /**
  * Gets a translation from window.i18n.
  * Uses i18next t function if available (set by TranslationProvider),
@@ -102,16 +81,33 @@ export const getCommonTranslation = (
   interpolation?: Record<string, unknown>,
   namespaces: string[] = DEFAULT_NAMESPACES,
 ): string => {
-  if (typeof window === "undefined") return i18ninstance?.t(key);
+  if (typeof window === "undefined") {
+    const inst =
+      commonI18nInstance ??
+      (i18ninstance.isInitialized ? i18ninstance : undefined);
+    if (!inst) return "";
+    const result = inst.t(key, {
+      ...(interpolation as Record<string, string | number>),
+      defaultValue: MISSING_KEY,
+    });
+    return result && result !== MISSING_KEY ? result : "";
+  }
 
   const i18n = getWindowI18n();
 
+  // A t() result equal to the key is ambiguous: it is either a valid
+  // identity translation ("Search" -> "Search") or a t() implementation that
+  // echoes unknown keys ignoring defaultValue. Prefer the `loaded` lookup in
+  // that case and keep the echoed value as a last-resort fallback.
+  let identityResult: string | undefined;
+
   if (i18n?.t) {
-    const result = i18n.t(
-      key,
-      interpolation as Record<string, string | number>,
-    );
-    if (result && result !== key) return result;
+    const result = i18n.t(key, {
+      ...(interpolation as Record<string, string | number>),
+      defaultValue: MISSING_KEY,
+    });
+    if (result && result !== MISSING_KEY && result !== key) return result;
+    if (result === key) identityResult = result;
   }
 
   if (i18n?.loaded) {
@@ -121,7 +117,13 @@ export const getCommonTranslation = (
     const searchNamespaces = hasPrefix ? [key.split(":")[0]] : namespaces;
     const bareKey = hasPrefix ? key.split(":").slice(1).join(":") : key;
 
-    const langsToTry = lang !== "en" ? [lang, "en"] : [lang];
+    // Loaded URLs keep the raw language (e.g. "en-GB/Common.json"), while
+    // `lang` is normalized ("en"), so try the raw language first.
+    const rawLang =
+      i18n.instance?.resolvedLanguage ?? i18n.instance?.language ?? lang;
+    const langsToTry = [rawLang, lang, "en"].filter(
+      (value, index, arr) => arr.indexOf(value) === index,
+    );
 
     const loadedUrls = Object.getOwnPropertyNames(i18n.loaded);
 
@@ -162,6 +164,8 @@ export const getCommonTranslation = (
       }
     }
   }
+
+  if (identityResult) return identityResult;
 
   console.error(
     `[i18n] Missing translation for key "${key}". Ensure the TranslationProvider is mounted or window.i18n.loaded contains the required namespaces [${namespaces.join(", ")}].`,

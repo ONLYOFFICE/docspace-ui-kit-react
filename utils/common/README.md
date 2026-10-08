@@ -1,6 +1,6 @@
 # common
 
-Shared utility functions for user types, room types, folder icons, and translation helpers used across the DocSpace UI.
+Shared utility functions for user types, room types, folder icons, and translation helpers used across the ONLYOFFICE Apps UI.
 
 ## What It Does
 
@@ -30,7 +30,7 @@ import {
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
-| `index.ts` | All utility functions and constants |
-| `common.test.ts` | Unit tests (Vitest) |
+| File             | Description                         |
+| ---------------- | ----------------------------------- |
+| `index.ts`       | All utility functions and constants |
+| `common.test.ts` | Unit tests (Vitest)                 |

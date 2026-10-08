@@ -48,16 +48,28 @@
       position: absolute;
 
       --context-menu-border-radius: var(--context-menu-radius, 6px);
-      --context-menu-item-padding: var(--context-menu-menu-item-padding, 0 16px);
+      --context-menu-item-padding: var(
+        --context-menu-menu-item-padding,
+        0 16px
+      );
       --context-menu-header-height: var(--context-menu-header-row-height, 55px);
       --context-menu-header-padding: var(
         --context-menu-header-inner-padding,
         6px 16px
       );
-      --context-menu-separator-margin: var(--context-menu-divider-margin, 6px 16px);
+      --context-menu-separator-margin: var(
+        --context-menu-divider-margin,
+        6px 16px
+      );
       --context-menu-item-font-size: var(--context-menu-item-text-size, 13px);
-      --context-menu-item-font-weight: var(--context-menu-item-text-weight, 600);
-      --context-menu-header-font-size: var(--context-menu-header-text-size, 15px);
+      --context-menu-item-font-weight: var(
+        --context-menu-item-text-weight,
+        600
+      );
+      --context-menu-header-font-size: var(
+        --context-menu-header-text-size,
+        15px
+      );
       --context-menu-item-line-height: var(--context-menu-item-height, 36px);
 
       background: var(--context-menu-bg, var(--context-menu-background));
@@ -66,7 +78,10 @@
       -moz-border-radius: var(--context-menu-border-radius);
       -webkit-border-radius: var(--context-menu-border-radius);
       box-shadow: var(--context-menu-shadow, var(--context-menu-box-shadow));
-      -moz-box-shadow: var(--context-menu-shadow, var(--context-menu-box-shadow));
+      -moz-box-shadow: var(
+        --context-menu-shadow,
+        var(--context-menu-box-shadow)
+      );
       -webkit-box-shadow: var(
         --context-menu-shadow,
         var(--context-menu-box-shadow)
@@ -153,7 +168,10 @@
       -moz-border-radius: var(--context-menu-border-radius);
       -webkit-border-radius: var(--context-menu-border-radius);
       box-shadow: var(--context-menu-shadow, var(--context-menu-box-shadow));
-      -moz-box-shadow: var(--context-menu-shadow, var(--context-menu-box-shadow));
+      -moz-box-shadow: var(
+        --context-menu-shadow,
+        var(--context-menu-box-shadow)
+      );
       -webkit-box-shadow: var(
         --context-menu-shadow,
         var(--context-menu-box-shadow)
@@ -341,7 +359,10 @@
           path[fill],
           circle[fill],
           rect[fill] {
-            fill: var(--context-menu-text, var(--context-menu-header-text-color));
+            fill: var(
+              --context-menu-text,
+              var(--context-menu-header-text-color)
+            );
           }
 
           path[stroke],
@@ -487,6 +508,57 @@
   &.noHover:hover {
     background-color: var(--sub-menu-item-background-color);
   }
+}
+
+/* Two-line item: the regular row plus an always-visible description under it.
+   The selectors repeat the .contextMenu > :global nesting of the item styles
+   above, otherwise those win on specificity. */
+.contextMenu :global(.p-contextmenu) .menuItemWithDescription {
+  /* the base item truncates a single line; this one wraps instead */
+  overflow: visible;
+  white-space: normal;
+
+  :global(.p-menuitem-link) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    overflow: visible;
+
+    padding: var(--context-menu-item-with-description-padding, 8px 12px);
+  }
+
+  :global(.p-menuitem-text) {
+    line-height: 16px;
+  }
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.itemDescription {
+  --context-menu-item-description-color: #{colors.$gray};
+
+  :global(.dark) & {
+    --context-menu-item-description-color: #{colors.$gray-dark};
+  }
+
+  /* a fixed width, so the menu itself is sized by the description - but never
+     wider than the screen, which is what the mobile sheet is */
+  width: var(--context-menu-item-description-width, 330px);
+  max-width: calc(100vw - 24px);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  white-space: pre-line;
+
+  color: var(
+    --context-menu-item-description,
+    var(--context-menu-item-description-color)
+  );
 }
 
 .activeDescendant {

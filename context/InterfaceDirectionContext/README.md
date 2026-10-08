@@ -7,7 +7,7 @@ React context and hook for managing interface direction (LTR/RTL).
 ### Provider
 
 ```tsx
-import { InterfaceDirectionProvider } from './InterfaceDirectionContext';
+import { InterfaceDirectionProvider } from "./InterfaceDirectionContext";
 
 function App() {
   return (
@@ -21,13 +21,13 @@ function App() {
 ### Hook
 
 ```tsx
-import { useInterfaceDirection } from './InterfaceDirectionContext';
+import { useInterfaceDirection } from "./InterfaceDirectionContext";
 
 function MyComponent() {
   const { interfaceDirection, isRTL } = useInterfaceDirection();
 
   return (
-    <div style={{ textAlign: isRTL ? 'right' : 'left' }}>
+    <div style={{ textAlign: isRTL ? "right" : "left" }}>
       Direction: {interfaceDirection}
     </div>
   );
@@ -37,11 +37,14 @@ function MyComponent() {
 ## API
 
 ### `InterfaceDirectionProvider`
+
 - `interfaceDirection`: `"ltr" | "rtl"` - Interface direction
 - `children`: React children
 
 ### `useInterfaceDirection()`
+
 Returns:
+
 - `interfaceDirection`: `"ltr" | "rtl"` - Current direction
 - `isRTL`: `boolean` - True if RTL
 
@@ -50,12 +53,14 @@ Returns:
 ```tsx
 function Navigation() {
   const { isRTL } = useInterfaceDirection();
-  
+
   return (
-    <nav style={{ 
-      paddingLeft: isRTL ? 0 : '1rem',
-      paddingRight: isRTL ? '1rem' : 0 
-    }}>
+    <nav
+      style={{
+        paddingLeft: isRTL ? 0 : "1rem",
+        paddingRight: isRTL ? "1rem" : 0,
+      }}
+    >
       {/* content */}
     </nav>
   );

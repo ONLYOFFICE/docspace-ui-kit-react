@@ -1,49 +1,31 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
-import { makeAutoObservable, observable } from "mobx";
+import { makeAutoObservable, observable, runInAction } from "mobx";
 import type { PaymentApi } from "@onlyoffice/docspace-api-sdk";
 import { toastr } from "../../components/toast";
 import type { TBalance } from "../types";
 import type { TTranslation } from "../../utils/common";
 import { formatCurrencyValue } from "../utils/common";
-import { AI_ENUM, AI_TOOLS, BACKUP_SERVICE, STORAGE_ENUM } from "../constants";
-import type { TAiToolsPrices } from "../types";
+import { parseAiPrices } from "../utils/parsers";
+import {
+  AI_ENUM,
+  AI_SEARCH,
+  AI_TOOLS,
+  BACKUP_SERVICE,
+  STORAGE_ENUM,
+} from "../constants";
+import { isDocsConnectServiceName } from "../utils/docs-connect";
+import type {
+  TAiToolsPrices,
+  TServiceUsageMonthly,
+  TUsagePeriodKey,
+} from "../types";
+import { getUsageRange } from "../usage/utils";
+import type { DateTime } from "luxon";
+import { now } from "../../utils/date";
 import type PaymentStore from "./PaymentStore";
 import type { TApiClient } from "../../providers/api/ApiProvider";
 import { formatterCurrencyWithoutTranction } from "../wallet/utils";
+
+const USAGE_TRACKED_SERVICES: string[] = [AI_TOOLS, AI_SEARCH, BACKUP_SERVICE];
 
 class ServicesStore {
   private paymentApi: PaymentApi;
@@ -58,6 +40,12 @@ class ServicesStore {
 
   isInitServicesData = false;
 
+  /** Service page whose data is loading right now. */
+  pendingServiceName: string | null = null;
+
+  /** Service the stored service data belongs to; null before the first load. */
+  loadedServiceName: string | null = null;
+
   isAiPaywallInit = false;
 
   isVisibleWalletSettings = false;
@@ -70,11 +58,19 @@ class ServicesStore {
 
   confirmActionType: string | null = null;
 
-  aiToolsBalance: TBalance = null;
-
   aiToolsPrices: TAiToolsPrices | null = null;
 
   usedBackupsCount: number = 0;
+
+  freeBackupsUsed: number = 0;
+
+  paidBackupsUsed: number = 0;
+
+  get serviceUsage() {
+    return this.paymentStore.serviceUsage;
+  }
+
+  serviceUsageMonthly: TServiceUsageMonthly[] = [];
 
   aiModelAvailabilityMap: Map<string, boolean> = new Map();
 
@@ -110,69 +106,6 @@ class ServicesStore {
     return this.paymentStore.language ?? "en";
   }
 
-  private get aiBalanceData() {
-    if (this.aiToolsBalance && typeof this.aiToolsBalance !== "number")
-      return this.aiToolsBalance;
-    return null;
-  }
-
-  get aiServiceBalance(): number {
-    const balance = this.aiBalanceData;
-    if (balance?.subAccounts && balance.subAccounts.length > 0)
-      return balance.subAccounts[0].amount ?? 0;
-
-    return 0.0;
-  }
-
-  get isAiServiceLowBalance() {
-    if (!this.wasFirstAiServiceTopUp) return false;
-
-    return this.aiServiceBalance < 1;
-  }
-
-  get aiServiceCodeCurrency(): string {
-    const balance = this.aiBalanceData;
-    if (balance?.subAccounts && balance.subAccounts.length > 0)
-      return balance.subAccounts[0].currency ?? "USD";
-
-    return "USD";
-  }
-
-  get aiServiceLastCreditAmount() {
-    if (!this.aiToolsBalance || typeof this.aiToolsBalance === "number")
-      return null;
-
-    return this.aiToolsBalance.lastCredit?.amount ?? null;
-  }
-
-  get aiServiceLastCreditCurrency() {
-    if (!this.aiToolsBalance || typeof this.aiToolsBalance === "number")
-      return "";
-
-    return this.aiToolsBalance.lastCredit?.currency ?? "USD";
-  }
-
-  get aiServiceLastCreditDate() {
-    if (!this.aiToolsBalance || typeof this.aiToolsBalance === "number")
-      return null;
-
-    return this.aiToolsBalance.lastCredit?.date ?? null;
-  }
-
-  get aiModelsCurrency() {
-    const currency = this.aiToolsPrices?.currency;
-    if (!currency) return "USD";
-
-    return currency.code ?? "USD";
-  }
-
-  get aiModelsCurrencySymbol() {
-    const currency = this.aiToolsPrices?.currency;
-    if (!currency) return "$";
-
-    return currency.symbol ?? "$";
-  }
-
   get minimumInputPrice() {
     const inputValues: Array<number | undefined> = [];
 
@@ -201,12 +134,6 @@ class ServicesStore {
     return values.length ? Math.min(...values) : 0;
   }
 
-  get wasFirstAiServiceTopUp() {
-    if (!this.aiToolsBalance) return false;
-
-    return (this.aiBalanceData?.subAccounts?.length ?? 0) !== 0;
-  }
-
   setPartialUpgradeFee = (partialUpgradeFee: number) => {
     this.partialUpgradeFee = partialUpgradeFee;
   };
@@ -222,6 +149,9 @@ class ServicesStore {
   setIsInitServiceData = (isInitServicesData: boolean) => {
     this.isInitServicesData = isInitServicesData;
   };
+
+  isServiceDataPending = (serviceName: string) =>
+    this.loadedServiceName !== serviceName;
 
   setIsAiPaywallInit = (value: boolean) => {
     this.isAiPaywallInit = value;
@@ -239,26 +169,6 @@ class ServicesStore {
     this.featureCountData = featureCountData;
   };
 
-  formatAiModelsCurrency = (amount: number) => {
-    return formatterCurrencyWithoutTranction(
-      this.language,
-      amount,
-      this.aiModelsCurrency,
-      0,
-    );
-  };
-
-  formatAiServiceCurrency = (
-    item: number | null = null,
-    fractionDigits: number = 3,
-    currency: string = this.aiServiceCodeCurrency,
-  ) => {
-    const amount = item ?? this.aiServiceBalance;
-
-    return formatCurrencyValue(this.language, amount, currency, fractionDigits);
-  };
-
-  // TODO: Replace with SDK method once it is available in the API SDK
   fetchAiPrices = async () => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
@@ -269,8 +179,12 @@ class ServicesStore {
         { signal: abortController.signal },
       );
 
-      if (!data?.response) return;
-      this.aiToolsPrices = data.response as unknown as TAiToolsPrices;
+      const prices = parseAiPrices(data?.response);
+      if (!prices) return;
+
+      runInAction(() => {
+        this.aiToolsPrices = prices;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -304,7 +218,9 @@ class ServicesStore {
         nextMap.set(modelId, false);
       });
 
-      this.aiModelAvailabilityMap = nextMap;
+      runInAction(() => {
+        this.aiModelAvailabilityMap = nextMap;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -345,61 +261,164 @@ class ServicesStore {
         { signal: abortController.signal },
       );
 
-      const nextMap = new Map(this.aiModelAvailabilityMap);
-      if (enabled) nextMap.delete(modelId);
-      else nextMap.set(modelId, false);
-      this.aiModelAvailabilityMap = nextMap;
+      runInAction(() => {
+        const nextMap = new Map(this.aiModelAvailabilityMap);
+        if (enabled) nextMap.delete(modelId);
+        else nextMap.set(modelId, false);
+        this.aiModelAvailabilityMap = nextMap;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
     } finally {
-      const nextSet = new Set(this.aiModelAvailabilityUpdatingSet);
-      nextSet.delete(modelId);
-      this.aiModelAvailabilityUpdatingSet = nextSet;
+      runInAction(() => {
+        const nextSet = new Set(this.aiModelAvailabilityUpdatingSet);
+        nextSet.delete(modelId);
+        this.aiModelAvailabilityUpdatingSet = nextSet;
+      });
     }
   };
 
-  // TODO: Replace with SDK method once it is available in the API SDK
-  fetchAiServiceBalance = async (refresh?: boolean) => {
-    const abortController = new AbortController();
-    this.addAbortController(abortController);
-
-    try {
-      const { data } = await this.#rawApiClient.instance.get(
-        `api/2.0/portal/payment/customer/aibalance`,
-        {
-          params: refresh ? { refresh: true } : {},
-          signal: abortController.signal,
-        },
-      );
-
-      if (!data?.response) return;
-
-      this.aiToolsBalance = data.response as unknown as TBalance;
-    } catch (error: unknown) {
-      if (error instanceof Error && error.name === "CanceledError") return;
-      console.error(error);
-    }
-  };
-
-  fetchBackupsCount = async () => {
+  fetchBackupsCount = async (from?: DateTime, to?: DateTime) => {
     const abortController = new AbortController();
     this.abortControllers.push(abortController);
 
     try {
       const { data } = await this.#rawApiClient.instance.get(
         "api/2.0/backup/getbackupscount",
-        { signal: abortController.signal },
+        {
+          signal: abortController.signal,
+          params: {
+            from: from
+              ? this.paymentStore.formatDate(from, "start")
+              : undefined,
+            to: to ? this.paymentStore.formatDate(to, "end") : undefined,
+          },
+        },
       );
 
       if (data?.response == null) return;
 
-      this.usedBackupsCount = data.response as number;
+      runInAction(() => {
+        this.usedBackupsCount = data.response as number;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
     }
   };
+
+  fetchBackupsCountByPaid = async (from?: DateTime, to?: DateTime) => {
+    const abortController = new AbortController();
+    this.abortControllers.push(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/backup/getbackupscountbypaid",
+        {
+          signal: abortController.signal,
+          params: {
+            from: from
+              ? this.paymentStore.formatDate(from, "start")
+              : undefined,
+            to: to ? this.paymentStore.formatDate(to, "end") : undefined,
+          },
+        },
+      );
+
+      const response = data?.response as
+        { free?: number; paid?: number } | undefined;
+
+      if (response == null) return;
+
+      runInAction(() => {
+        this.freeBackupsUsed = response.free ?? 0;
+        this.paidBackupsUsed = response.paid ?? 0;
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
+  };
+
+  fetchServiceUsage = (
+    params: Parameters<typeof this.paymentStore.fetchWalletUsage>[0] = {},
+  ) => this.paymentStore.fetchWalletUsage(params);
+
+  fetchServiceUsageMonthly = async ({
+    from,
+    to,
+  }: {
+    from?: DateTime;
+    to?: DateTime;
+  } = {}) => {
+    const abortController = new AbortController();
+    this.abortControllers.push(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/payment/customer/usage/monthly",
+        {
+          signal: abortController.signal,
+          params: {
+            StartDate: from
+              ? this.paymentStore.formatDate(from, "start")
+              : undefined,
+            EndDate: to ? this.paymentStore.formatDate(to, "end") : undefined,
+          },
+        },
+      );
+
+      const response = data?.response;
+
+      runInAction(() => {
+        this.serviceUsageMonthly = (
+          Array.isArray(response) ? response : (response?.collection ?? [])
+        ) as TServiceUsageMonthly[];
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
+  };
+
+  initUsageData = async (period: TUsagePeriodKey) => {
+    const range = getUsageRange(period);
+
+    // The usage page overwrites the shared rows with a whole period. Only rows
+    // of the current month match what a service page requests for itself, so
+    // any other period invalidates them.
+    if (period !== "thisMonth") this.loadedServiceName = null;
+
+    await Promise.all([
+      this.paymentStore.initWalletPayerAndBalance(false),
+      this.fetchServiceUsage(range),
+      this.fetchServiceUsageMonthly(range),
+    ]);
+  };
+
+  get walletMonthToDateSpend(): number {
+    return this.serviceUsage.reduce((sum, item) => sum + item.totalAmount, 0);
+  }
+
+  get backupUsage() {
+    return (
+      this.serviceUsage.find((usage) => usage.service === BACKUP_SERVICE) ??
+      null
+    );
+  }
+
+  get aiUsage() {
+    return (
+      this.serviceUsage.find((usage) => usage.service === AI_TOOLS) ?? null
+    );
+  }
+
+  get aiSearchUsage() {
+    return (
+      this.serviceUsage.find((usage) => usage.service === AI_SEARCH) ?? null
+    );
+  }
 
   initServiceData = async (
     t: TTranslation,
@@ -409,12 +428,20 @@ class ServicesStore {
   ) => {
     const isRefresh = window.location.href.includes("complete=true");
 
+    this.pendingServiceName = serviceName;
+
     const {
       fetchTransactionHistory,
       initWalletPayerAndBalance,
       setServiceQuota,
+      handleServicesQuotas,
       fetchCardLinked,
+      resetTransactionHistory,
     } = this.paymentStore;
+
+    resetTransactionHistory();
+
+    const isDocsConnect = isDocsConnectServiceName(serviceName);
 
     try {
       let resolvedServiceName = serviceName;
@@ -424,10 +451,17 @@ class ServicesStore {
           (await setServiceQuota(serviceEnum)) ?? serviceName;
       }
 
+      if (isDocsConnect) await handleServicesQuotas();
+
       const serviceQuotaRequest =
-        serviceEnum !== STORAGE_ENUM
+        serviceEnum !== STORAGE_ENUM && !isDocsConnect
           ? [setServiceQuota(serviceEnum ?? serviceName)]
           : [];
+
+      // The AI search enable flow checks the AI tools state.
+      if (serviceName === AI_SEARCH) {
+        serviceQuotaRequest.push(setServiceQuota(AI_ENUM));
+      }
 
       const requests: Promise<unknown>[] = [
         ...serviceQuotaRequest,
@@ -436,16 +470,25 @@ class ServicesStore {
         initWalletPayerAndBalance(isRefresh),
       ];
 
-      if (serviceName === AI_TOOLS) {
+      if (serviceName === AI_TOOLS || serviceName === AI_SEARCH) {
+        requests.push(this.paymentStore.fetchServiceFeePercent(serviceName));
+      }
+
+      const monthStart = now().startOf("month");
+      const monthEnd = now().endOf("month");
+
+      if (USAGE_TRACKED_SERVICES.includes(serviceName)) {
         requests.push(
-          this.fetchAiPrices(),
-          this.fetchAiServiceBalance(),
-          this.fetchAiModelAvailabilitySettings(),
+          this.fetchServiceUsage({
+            serviceName,
+            from: monthStart,
+            to: monthEnd,
+          }),
         );
       }
 
       if (serviceName === BACKUP_SERVICE) {
-        requests.push(this.fetchBackupsCount());
+        requests.push(this.fetchBackupsCountByPaid(monthStart, monthEnd));
       }
 
       await Promise.all(requests);
@@ -477,28 +520,12 @@ class ServicesStore {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
       toastr.error(t("Common:UnexpectedError"));
-    }
-  };
-
-  aiPaywallInit = async (t: TTranslation) => {
-    const { initWalletPayerAndBalance } = this.paymentStore;
-
-    try {
-      await Promise.all([
-        initWalletPayerAndBalance(false),
-        this.fetchAiPrices(),
-        this.fetchAiServiceBalance(),
-      ]);
-
-      this.setIsAiPaywallInit(true);
-
-      return this.wasFirstAiServiceTopUp;
-    } catch (error) {
-      if (error instanceof Error && error.name === "CanceledError")
-        return false;
-      console.error(error);
-      toastr.error(t("Common:UnexpectedError"));
-      return false;
+    } finally {
+      // After the awaits above, so outside this method's action.
+      runInAction(() => {
+        if (this.pendingServiceName === serviceName)
+          this.loadedServiceName = serviceName;
+      });
     }
   };
 
@@ -521,7 +548,10 @@ class ServicesStore {
       const quotas = await handleServicesQuotas();
 
       const hasAiService = quotas?.some(
-        (service) => service.serviceName === AI_ENUM,
+        (service) => service.serviceName === AI_TOOLS,
+      );
+      const hasAiSearchService = quotas?.some(
+        (service) => service.serviceName === AI_SEARCH,
       );
 
       const requests: Promise<unknown>[] = [
@@ -529,8 +559,19 @@ class ServicesStore {
         this.paymentStore.tariff.fetchPortalTariff(),
       ];
 
+      if (this.paymentStore.onServicesInit) {
+        requests.push(this.paymentStore.onServicesInit());
+      }
+
       if (hasAiService) {
-        requests.push(this.fetchAiServiceBalance(), this.fetchAiPrices());
+        requests.push(
+          this.fetchAiPrices(),
+          this.paymentStore.fetchServiceFeePercent(AI_TOOLS),
+        );
+      }
+
+      if (hasAiSearchService) {
+        requests.push(this.paymentStore.fetchServiceFeePercent(AI_SEARCH));
       }
 
       await Promise.all(requests);
@@ -559,6 +600,25 @@ class ServicesStore {
       }
 
       this.setIsInitServicesPage(true);
+
+      if (!isRefresh) {
+        const actionTypeParam = new URL(window.location.href).searchParams.get(
+          "actionType",
+        );
+
+        if (actionTypeParam) {
+          this.setConfirmActionType(actionTypeParam);
+          this.setVisibleWalletSetting(true);
+
+          const cleanUrl = new URL(window.location.href);
+          cleanUrl.searchParams.delete("actionType");
+          window.history.replaceState(
+            {},
+            document.title,
+            `${cleanUrl.pathname}${cleanUrl.search}`,
+          );
+        }
+      }
 
       if (isRefresh) {
         const url = new URL(window.location.href);
@@ -601,4 +661,3 @@ class ServicesStore {
 }
 
 export default ServicesStore;
-

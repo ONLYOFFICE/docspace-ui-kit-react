@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 type PickedDivProps = Pick<
   React.ComponentPropsWithoutRef<"div">,
   "className" | "id" | "style"
@@ -45,26 +10,62 @@ type HeaderIcon = {
   onClick: () => void;
 };
 
-export type AsideHeaderProps = PickedDivProps & {
-  /** Header content - can be a string or a ReactNode */
+export type AsideHeaderProps = {
+  /** Applied to the header element. */
+  className?: string;
+  /** Applied to the header element. */
+  id?: string;
+  /** Applied to the header element. */
+  style?: React.CSSProperties;
+  /**
+   * Title of the panel. A string is rendered as bold 21px text; any other node
+   * is rendered inside a `Heading` that truncates with an ellipsis. Nothing is
+   * rendered when it is absent, including no placeholder.
+   */
   header?: string | React.ReactNode;
-  /** Array of icons to display in the header */
+  /**
+   * Extra icon buttons between the title and the close cross. Each needs a
+   * `key`, an `onClick` and either `iconNode` (JSX, preferred) or `url` — a URL
+   * fetched at runtime, not an asset name.
+   */
   headerIcons?: HeaderIcon[];
-  /** Additional component to render in the header */
+  /**
+   * Arbitrary node rendered after the icons and before the close cross, for a
+   * control that is not an icon.
+   */
   headerComponent?: React.ReactNode;
-  /** Whether the header is in a loading state */
+  /**
+   * Replaces the whole header — title, icons and close cross alike — with a
+   * skeleton bar. There is no way out of a header that is loading.
+   */
   isLoading?: boolean;
-  /** Whether to hide the bottom border */
+  /**
+   * Hides the bottom border, which otherwise spans the full width of the panel
+   * regardless of the header's own side margins.
+   */
   withoutBorder?: boolean;
-  /** Custom height for the header */
+  /**
+   * Height of the header as a CSS length, applied through the
+   * `--aside-header-custom-height` custom property. Without it the header is
+   * 53px.
+   */
   headerHeight?: string;
-  /** Whether to show the close button */
+  /**
+   * Whether the close cross is rendered. It is the only control that calls
+   * `onCloseClick`.
+   * @default true
+   */
   isCloseable?: boolean;
-  /** Click handler for the close button */
+  /** Called by the close cross. */
   onCloseClick?: () => void;
-  /** Whether to show the back button */
+  /**
+   * Whether a back arrow is rendered before the title. It is mirrored in RTL.
+   * @default false
+   */
   isBackButton?: boolean;
-  /** Click handler for the back button */
+  /** Called by the back arrow. */
   onBackClick?: () => void;
+  /** Value of `data-testid` on the header.
+   * @default "aside-header" */
   dataTestId?: string;
-};
+} & PickedDivProps;

@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
@@ -47,8 +12,13 @@ import {
   ModalDialogType,
 } from "../../../../components/modal-dialog";
 import { toastr } from "../../../../components/toast";
-import { useApi } from "../../../../providers";
-import { calculateTotalPrice } from "../../../utils/common";
+import { useApi } from "../../../../providers/api";
+import { calculateTotalPrice, getConvertedSize } from "../../../utils/common";
+import { isInsufficientFundsError } from "../../../utils/insufficientFunds";
+import {
+  openStripeCheckout,
+  waitForTopUpCompletion,
+} from "../../../utils/stripe-flow";
 import {
   DISK_STORAGE,
   STORAGE_DEACTIVATION_VISITED,
@@ -66,6 +36,7 @@ import CurrentSubscription from "./CurrentSubscription";
 import OrderSummary from "./OrderSummary";
 import WalletContainer from "./WalletContainer";
 import TopUpContainer from "./TopUpContainer";
+import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import StorageWarning from "./StorageWarning";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
@@ -95,6 +66,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     currentStoragePlanSize = 0,
     hasScheduledStorageChange,
     fetchPortalTariff,
+    fetchCustomerInfo,
+    isDelayedPaymentMethod,
   } = paymentStore.tariff;
 
   const {
@@ -105,6 +78,9 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     formatWalletCurrency,
     walletBalance,
     walletCodeCurrency,
+    isPayer,
+    isStripeCheckoutRequired,
+    language,
   } = paymentStore;
 
   const {
@@ -129,6 +105,9 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     isVisibleWalletSettings,
   );
   const [isRequestDialog, setIsRequestDialog] = useState(false);
+  const [isWalletTopUpVisible, setIsWalletTopUpVisible] = useState(false);
+  const openWalletTopUp = () => setIsWalletTopUpVisible(true);
+  const closeWalletTopUp = () => setIsWalletTopUpVisible(false);
   const [debouncedAmount, setDebouncedAmount] = useState(amount);
 
   const navigate = useNavigate();
@@ -228,6 +207,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
       localStorage.removeItem(STORAGE_DEACTIVATION_VISITED);
     }
 
+    paymentStore.resetPreviousStorageSubscription();
+
     setIsLoading(false);
   };
 
@@ -287,7 +268,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
   );
 
   const handleStoragePlanChange = useCallback(
-    async (isCancellation: boolean = false) => {
+    async (isCancellation: boolean = false, skipTopUp: boolean = false) => {
       if (isLoading) return;
 
       setIsLoading(true);
@@ -301,7 +282,15 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
       const isNewSubscription = !hasStorageSubscription;
 
       try {
-        if (!isCancellation && isBalanceInsufficient && recommendedAmount > 0) {
+        // skipTopUp: the Stripe checkout callback has already deposited the
+        // required amount, re-depositing here would charge the card twice.
+        if (
+          !isCancellation &&
+          !skipTopUp &&
+          !isDelayedPaymentMethod &&
+          isBalanceInsufficient &&
+          recommendedAmount > 0
+        ) {
           await paymentApi.topUpDeposit({
             topUpDepositRequestDto: {
               amount: recommendedAmount,
@@ -325,11 +314,13 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
         if (isNewSubscription) {
           await fetchPortalTariff!(true);
 
-          const targetPath = `${paymentStore.routes.diskStorage}?complete=true`;
-
           if (!window.location.pathname.includes("/disk-storage")) {
+            const targetPath = `${paymentStore.routes.diskStorage}?complete=true`;
             navigate(targetPath);
+            return;
           }
+
+          onClose();
           return;
         }
 
@@ -348,7 +339,16 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
 
         onClose();
       } catch (e) {
-        toastr.error(e as Error);
+        if (isInsufficientFundsError(e)) {
+          toastr.error(
+            isPayer
+              ? t("InsufficientFundsCheckCredits")
+              : t("InsufficientFundsContactPayerShort"),
+            t("InsufficientFunds"),
+          );
+        } else {
+          toastr.error(e as Error);
+        }
         setIsLoading(false);
       }
     },
@@ -358,13 +358,83 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
       isBalanceInsufficient,
       recommendedAmount,
       walletCodeCurrency,
+      isPayer,
+      t,
     ],
   );
 
-  const onBuy = useCallback(
-    () => handleStoragePlanChange(),
-    [handleStoragePlanChange],
-  );
+  const stripeAbortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      stripeAbortRef.current?.abort();
+    };
+  }, []);
+
+  const fetchCardLinkedForCheckout = (backUrl?: string, successUrl?: string) =>
+    paymentStore.fetchCardLinked(backUrl, successUrl, false);
+
+  const fetchBalanceValue = async (isRefresh?: boolean) => {
+    await fetchBalance(isRefresh);
+    return paymentStore.walletBalance ?? 0;
+  };
+
+  const onStripeBuy = async () => {
+    if (isLoading) return;
+
+    const controller = new AbortController();
+    stripeAbortRef.current = controller;
+    const { signal } = controller;
+
+    setIsLoading(true);
+
+    try {
+      const chargeAmount =
+        recommendedAmount > 0 ? recommendedAmount : Math.ceil(totalPrice);
+
+      await openStripeCheckout(
+        {
+          walletCodeCurrency: walletCodeCurrency ?? "",
+          language: language ?? "en",
+          fetchCardLinked: fetchCardLinkedForCheckout,
+        },
+        String(chargeAmount),
+        storageServiceName ?? DISK_STORAGE,
+        {
+          storage: getConvertedSize(t, +debouncedAmount * 1024 ** 3),
+          price: String(totalPrice),
+        },
+      );
+
+      const completion = await waitForTopUpCompletion(
+        {
+          walletBalance: walletBalance ?? 0,
+          fetchCustomerInfo,
+          fetchBalance: fetchBalanceValue,
+        },
+        signal,
+      );
+
+      if (signal.aborted) return;
+
+      if (completion.isDelayedPaymentMethod) {
+        setIsLoading(false);
+        onClose();
+        return;
+      }
+
+      await handleStoragePlanChange(false, true);
+    } catch (e) {
+      console.error("[storage-topup] flow failed", e);
+      if (!signal.aborted) {
+        toastr.error(t("UnexpectedError"));
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const onBuy = () =>
+    isStripeCheckoutRequired ? onStripeBuy() : handleStoragePlanChange();
 
   const onSendRequest = useCallback(() => {
     setIsRequestDialog(true);
@@ -408,7 +478,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
   return (
     <PaymentProvider>
       <ModalDialog
-        visible={visible}
+        visible={visible && !isWalletTopUpVisible}
+        hideContent={isWalletTopUpVisible}
         onClose={onClose}
         displayType={ModalDialogType.aside}
         containerVisible={isVisibleContainer}
@@ -422,6 +493,10 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
         </ModalDialog.Header>
         <ModalDialog.Body>
           <div className={styles.dialogBody}>
+            <Text className={styles.dialogDescription} fontSize="12px">
+              {t("AdjustStorageToExactAmount")}
+            </Text>
+
             <WalletContainer isBalanceInsufficient={isBalanceInsufficient} />
 
             <div className={styles.inputSection}>
@@ -510,6 +585,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
             isLoading={isLoading}
             onBuy={onBuy}
             onSendRequest={onSendRequest}
+            onTopUpWallet={openWalletTopUp}
             isPaymentBlockedByBalance={isPaymentBlockedByBalance}
             isBalanceInsufficient={isBalanceInsufficient}
             recommendedAmount={recommendedAmount}
@@ -518,9 +594,17 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
           />
         </ModalDialog.Footer>
       </ModalDialog>
+
+      {isWalletTopUpVisible ? (
+        <SimpleTopUpDialog
+          visible={isWalletTopUpVisible}
+          onClose={closeWalletTopUp}
+          minValue={recommendedAmount > 0 ? `${recommendedAmount}` : undefined}
+          serviceName={storageServiceName ?? DISK_STORAGE}
+        />
+      ) : null}
     </PaymentProvider>
   );
 };
 
 export default observer(StoragePlanUpgrade);
-

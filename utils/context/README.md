@@ -20,13 +20,12 @@ import { Context, Provider, Consumer } from "../../utils/context";
 import { Provider } from "../../utils/context";
 
 const Layout = ({ children }) => {
-  const [dimensions, setDimensions] = useState({ sectionWidth: 800, sectionHeight: 600 });
+  const [dimensions, setDimensions] = useState({
+    sectionWidth: 800,
+    sectionHeight: 600,
+  });
 
-  return (
-    <Provider value={dimensions}>
-      {children}
-    </Provider>
-  );
+  return <Provider value={dimensions}>{children}</Provider>;
 };
 ```
 
@@ -41,6 +40,6 @@ const MyComponent = () => {
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
+| File       | Description                                    |
+| ---------- | ---------------------------------------------- |
 | `index.ts` | Context creation and Provider/Consumer exports |

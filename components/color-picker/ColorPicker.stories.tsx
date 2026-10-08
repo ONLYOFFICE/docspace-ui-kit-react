@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { useState } from "react";
 import type { ComponentProps, CSSProperties } from "react";
 
@@ -43,49 +8,25 @@ import { globalColors } from "../../providers/theme";
 import { ColorPicker } from ".";
 
 const meta = {
-  title: "UI/Interactive elements/ColorPicker",
+  title: "UI/Form controls/ColorPicker",
   component: ColorPicker,
   parameters: {
-    docs: {
-      description: {
-        component: `Visual color picker component for selecting colors using a gradient area, hue slider, or hex code input. Supports both standalone picker mode and a full interface with apply/cancel actions.
-
-### Features
-
-- **Visual Picker**: Gradient-based color selection area
-- **Hue Slider**: Slider control for hue selection
-- **Hex Input**: Direct hex code entry with label
-- **Action Buttons**: Apply and cancel buttons with customizable labels
-- **Picker-Only Mode**: Minimal mode showing just the color picker area
-- **Controlled Component**: Supports external state management
-
-### Usage
-
-\`\`\`tsx
-import { ColorPicker } from "@docspace/ui-kit/components/color-picker";
-
-// Full picker with buttons
-<ColorPicker
-  appliedColor="#4781D1"
-  onApply={(color) => console.log("Applied:", color)}
-  onClose={() => console.log("Cancelled")}
-  isPickerOnly={false}
-/>
-
-// Picker only (no buttons or hex input)
-<ColorPicker appliedColor="#FF0000" isPickerOnly />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     appliedColor: {
       control: "color",
-      description: "Currently selected color in hex format",
+      description:
+        "Hex color the picker starts on. It is read once, on mount, so a later change does not move the pointers",
+      table: {
+        defaultValue: { summary: "globalColors.lightBlueMain" },
+      },
     },
     isPickerOnly: {
       control: "boolean",
-      description: "Show only the color picker without hex input and buttons",
+      description:
+        'Draws a "Custom" title and a closing cross above the picker and drops the hex field and both buttons',
       table: {
         defaultValue: { summary: "false" },
       },
@@ -112,13 +53,24 @@ import { ColorPicker } from "@docspace/ui-kit/components/color-picker";
       },
     },
     onApply: {
-      description: "Callback when the apply button is clicked",
+      description:
+        "Called with the chosen hex color when the apply button is clicked",
     },
     onClose: {
-      description: "Callback when the cancel button is clicked",
+      description:
+        "Called by the cancel button, and by the closing cross in picker-only mode; the picker does not hide itself",
     },
     handleChange: {
-      description: "Callback on every color change",
+      description:
+        "Called with the hex color on every pointer move and every valid hex code typed",
+    },
+    className: {
+      control: "text",
+      description: "Class name added to the outermost element",
+    },
+    id: {
+      control: "text",
+      description: "Id of the outermost element",
     },
   },
 } satisfies Meta<typeof ColorPicker>;
@@ -126,82 +78,6 @@ import { ColorPicker } from "@docspace/ui-kit/components/color-picker";
 type Story = StoryObj<ComponentProps<typeof ColorPicker>>;
 
 export default meta;
-
-const CssCustomizationTemplate = () => {
-  return (
-    <div
-      style={
-        {
-          // === ColorPicker — hex input field ===
-          "--color-picker-border-style": "1px solid #0082c9",
-          "--color-picker-bg": "#f0f8ff",
-          "--color-picker-text-color": "#004f82",
-          "--color-picker-input-radius": "8px",
-          "--color-picker-input-height": "36px",
-          // === ColorPicker — hue slider ===
-          "--color-picker-hue-height": "16px",
-          "--color-picker-hue-radius": "8px",
-          // === Button (Apply/Cancel buttons) ===
-          "--button-root-bg": "#0082c9",
-          "--button-root-border": "1px solid #0082c9",
-          "--button-root-hover-bg": "#006ba6",
-          "--button-root-border-radius": "8px",
-          "--button-root-color": "#fff",
-        } as CSSProperties
-      }
-    >
-      <ColorPicker
-        isPickerOnly={false}
-        appliedColor={globalColors.lightBlueMain}
-        applyButtonLabel="Apply"
-        cancelButtonLabel="Cancel"
-        hexCodeLabel="Hex code"
-        onApply={() => {}}
-        onClose={() => {}}
-        handleChange={() => {}}
-      />
-    </div>
-  );
-};
-
-export const CssCustomization: Story = {
-  render: () => <CssCustomizationTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story: `CSS Custom Properties for external customization:
-
-**ColorPicker — hex input**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--color-picker-border-style\` | Hex input border | theme-based |
-| \`--color-picker-bg\` | Hex input background | theme-based |
-| \`--color-picker-text-color\` | Hex input text color | theme-based |
-| \`--color-picker-input-height\` | Hex input height | \`32px\` |
-| \`--color-picker-input-padding\` | Hex input padding | \`6px 8px\` |
-| \`--color-picker-input-radius\` | Hex input border radius | \`3px\` |
-| \`--color-picker-width\` | Picker container width | \`195px\` |
-
-**ColorPicker — hue slider**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--color-picker-hue-height\` | Hue slider height | \`12px\` |
-| \`--color-picker-hue-radius\` | Hue slider border radius | \`6px\` |
-
-**Button (Apply/Cancel)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--button-root-bg\` | Primary button background | theme accent |
-| \`--button-root-border\` | Primary button border | theme accent |
-| \`--button-root-hover-bg\` | Primary button hover background | theme accent |
-| \`--button-root-border-radius\` | Button border radius | \`3px\` |`,
-      },
-    },
-  },
-};
 
 export const Default: Story = {
   render: (args) => <ColorPicker {...args} />,
@@ -214,6 +90,22 @@ export const Default: Story = {
     onClose: () => console.log("Close clicked"),
     onApply: (color) => console.log("Apply clicked with color:", color),
     handleChange: (color) => console.log("Color changed to:", color),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The full picker a settings form shows: drag either pointer or type a hex code, then apply or cancel. Change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<ColorPicker
+  isPickerOnly={false}
+  appliedColor="#4781D1"
+  onApply={(color) => console.log("Applied:", color)}
+  onClose={() => console.log("Cancelled")}
+/>`,
+      },
+    },
   },
 };
 
@@ -233,7 +125,7 @@ export const PickerOnly: Story = {
     docs: {
       description: {
         story:
-          "Picker-only mode shows just the color gradient area and hue slider, without hex input or action buttons.",
+          'The compact shape for a drop-down: a "Custom" title and a closing cross above the square and the strip, with no hex field and no buttons (`isPickerOnly`). The caller reads the color from `handleChange` and hides the picker from `onClose`.',
       },
       source: {
         code: `<ColorPicker isPickerOnly appliedColor="#4781D1" />`,
@@ -262,7 +154,7 @@ export const CustomLabels: Story = {
     docs: {
       description: {
         story:
-          "Button and input labels can be customized for different locales or UI contexts.",
+          "The component translates none of its texts, so a caller passes its own for the buttons and the hex caption (`applyButtonLabel`, `cancelButtonLabel`, `hexCodeLabel`).",
       },
       source: {
         code: `<ColorPicker
@@ -277,14 +169,14 @@ export const CustomLabels: Story = {
   },
 };
 
-const ControlledTemplate = () => {
+const LiveColorReadoutTemplate = () => {
   const [color, setColor] = useState(globalColors.lightBlueMain);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       <ColorPicker
         isPickerOnly={false}
-        appliedColor={color}
+        appliedColor={globalColors.lightBlueMain}
         handleChange={(newColor) => setColor(newColor)}
         onApply={(newColor) => {
           setColor(newColor);
@@ -299,20 +191,20 @@ const ControlledTemplate = () => {
   );
 };
 
-export const Controlled: Story = {
-  render: () => <ControlledTemplate />,
+export const LiveColorReadout: Story = {
+  render: () => <LiveColorReadoutTemplate />,
   parameters: {
     docs: {
       description: {
         story:
-          "Controlled component using React state to track the selected color in real time.",
+          "Drag a pointer or type a hex code and watch the line under the picker follow: the caller keeps its own copy of the color from every change (`handleChange`), which is how it previews a color before it is applied. The picker keeps its own state, so the caller cannot move the pointers by changing `appliedColor` afterwards.",
       },
       source: {
         code: `const [color, setColor] = useState("#4781D1");
 
 <ColorPicker
   isPickerOnly={false}
-  appliedColor={color}
+  appliedColor="#4781D1"
   handleChange={(newColor) => setColor(newColor)}
   onApply={(newColor) => setColor(newColor)}
   onClose={() => console.log("Closed")}
@@ -339,7 +231,7 @@ export const PresetColor: Story = {
     docs: {
       description: {
         story:
-          "Color picker initialized with a preset color value (#FF0000 red).",
+          'A picker that opens on a color the user saved earlier starts from it: here red (`appliedColor="#FF0000"`), with the hex field showing the same code.',
       },
       source: {
         code: `<ColorPicker
@@ -353,3 +245,112 @@ export const PresetColor: Story = {
   },
 };
 
+const RightToLeftTemplate = () => {
+  return (
+    <div dir="rtl">
+      <ColorPicker
+        isPickerOnly={false}
+        appliedColor={globalColors.lightBlueMain}
+        applyButtonLabel={"\u062a\u0637\u0628\u064a\u0642"}
+        cancelButtonLabel={"\u0625\u0644\u063a\u0627\u0621"}
+        hexCodeLabel={"\u0631\u0645\u0632 \u0627\u0644\u0644\u0648\u0646"}
+        onApply={(color) => console.log("Applied:", color)}
+        onClose={() => console.log("Closed")}
+      />
+    </div>
+  );
+};
+
+export const RightToLeft: Story = {
+  render: () => <RightToLeftTemplate />,
+  globals: { direction: "rtl" },
+  parameters: {
+    noPadding: true,
+    docs: {
+      // Framed: an inline RTL story would flip the whole Docs page
+      story: { inline: false, height: "418px" },
+      description: {
+        story:
+          'The picker in a right-to-left layout with Arabic texts: the picker moves to the right edge, the hex caption and code align right and the apply button sits to the right of cancel, while the square and the strip keep their left-to-right gradients. The wrapper carries `dir="rtl"`; the direction also comes from the theme\'s `interfaceDirection` (the Direction toolbar).',
+      },
+      source: {
+        code: `<div dir="rtl">
+  <ColorPicker
+    isPickerOnly={false}
+    appliedColor="#4781D1"
+    applyButtonLabel="..."
+    cancelButtonLabel="..."
+    hexCodeLabel="..."
+  />
+</div>`,
+      },
+    },
+  },
+};
+
+const CssCustomizationTemplate = () => {
+  return (
+    <div
+      style={
+        {
+          // === ColorPicker — picker and hue slider ===
+          "--color-picker-width": "240px",
+          "--color-picker-hue-height": "16px",
+          "--color-picker-hue-radius": "8px",
+          // === ColorPicker — hex input field ===
+          "--color-picker-border-style": "1px solid #0082c9",
+          "--color-picker-bg": "#f0f8ff",
+          "--color-picker-text-color": "#004f82",
+          "--color-picker-input-height": "36px",
+          "--color-picker-input-padding": "6px 12px",
+          "--color-picker-input-radius": "8px",
+          // === Button — apply (primary) ===
+          "--button-primary-bg": "#0082c9",
+          "--button-primary-border": "1px solid #0082c9",
+          "--button-primary-color": "#fff",
+          "--button-primary-bg-hover": "#006ba6",
+          // === Button — cancel (secondary) ===
+          "--button-root-bg": "#f0f8ff",
+          "--button-root-border": "1px solid #0082c9",
+          "--button-root-color": "#004f82",
+          "--button-root-bg-hover": "#d6ecf8",
+          "--button-root-border-radius": "8px",
+        } as CSSProperties
+      }
+    >
+      <ColorPicker
+        isPickerOnly={false}
+        appliedColor={globalColors.lightBlueMain}
+        applyButtonLabel="Apply"
+        cancelButtonLabel="Cancel"
+        hexCodeLabel="Hex code"
+        onApply={() => {}}
+        onClose={() => {}}
+        handleChange={() => {}}
+      />
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The button variables reach the apply and cancel pair through the same wrapper; hover either button to see its hover background.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--color-picker-width": "240px",
+    "--color-picker-border-style": "1px solid #0082c9",
+    "--button-primary-bg": "#0082c9",
+    "--button-root-border-radius": "8px",
+  }}
+>
+  <ColorPicker isPickerOnly={false} appliedColor="#4781D1" />
+</div>`,
+      },
+    },
+  },
+};

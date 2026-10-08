@@ -1,65 +1,39 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { TColorScheme } from "../../context/ThemeContext";
 import { FloatingButtonIcons } from "./FloatingButton.enums";
 
 export type FloatingButtonProps = {
-  /** Accepts id */
+  /** Applied to the circle, not to the wrapper that positions it. */
   id?: string;
-  /** Accepts class */
+  /** Applied to the circle, after the component's own classes. */
   className?: string;
-  /** Accepts CSS style */
+  /** Applied to the circle as inline style. */
   style?: React.CSSProperties;
-  /** Sets the icon on the button */
+  /** Which of the built-in icons is drawn in the middle. Ignored when `iconUrl` is set. */
   icon?: keyof typeof FloatingButtonIcons;
-   /** Custom icon URL */
+  /** URL of an image to draw instead of the built-in icon, at 20px wide. */
   iconUrl?: string;
-  /** Displays the alert */
+  /** Whether the badge shows the warning triangle. `stopped` wins over it. */
   alert?: boolean;
-  /**  Sets a callback function that is triggered when the button is clicked */
+  /** Called with the event when the circle is clicked. The cancel cross has its own handler. */
   onClick?: (e: React.MouseEvent) => void;
-  /** CSS color */
+  /** CSS colour of the circle and of the progress ring. Without it the accent colour is used. */
   color?: string;
+  /** Called when the cancel cross is clicked. */
   clearUploadedFilesHistory?: () => void;
+  /** Whether the progress ring is left out entirely, leaving the bare circle. */
   withoutProgress?: boolean;
+  /** Whether the cancel cross exists at all. It is only visible on hover unless `showCloseIcon` is set. */
   showCancelButton?: boolean;
+  /** Whether that cross stays visible without hovering. */
   showCloseIcon?: boolean;
+  /** Whether the operation is finished: the ring fades out and the circle pulses once. */
   completed?: boolean;
+  /** Shows the "stopped" status icon: the operation was aborted by the user.
+   * Takes precedence over `alert` and `completed`. */
+  stopped?: boolean;
+  /** Whether the status badge is suppressed whatever `stopped`, `alert` and `completed` say. */
   withoutStatus?: boolean;
-  /** Loading indicator */
+  /** How much of the ring is filled, 0–100. Without it the ring spins instead. */
   percent?: number;
 };
 

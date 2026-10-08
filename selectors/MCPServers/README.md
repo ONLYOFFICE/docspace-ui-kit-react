@@ -4,7 +4,7 @@ A selector component for choosing available MCP (Model Context Protocol) servers
 
 ## What It Does
 
-- Fetches and displays a list of available MCP servers from the DocSpace AI API
+- Fetches and displays a list of available MCP servers from the ONLYOFFICE Apps AI API
 - Supports multi-select mode — users can select/deselect multiple servers
 - Pre-selects servers that are already connected (`initedSelectedServers`)
 - Handles paginated loading of servers in batches of 100
@@ -15,22 +15,22 @@ A selector component for choosing available MCP (Model Context Protocol) servers
 ## Import
 
 ```tsx
-import MCPServersSelector from "@docspace/ui-kit/selectors/MCPServers";
+import MCPServersSelector from "@onlyoffice/apps-ui-kit/selectors/MCPServers";
 ```
 
 ## Props
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `onSubmit` | `(servers: TSelectorItem[]) => void` | Yes | Callback with the selected servers when submitted |
-| `onClose` | `VoidFunction` | Yes | Callback to fully close the selector |
-| `onBackClick` | `VoidFunction` | Yes | Callback for the back button (navigates to previous view) |
-| `initedSelectedServers` | `string[]` | No | IDs of servers that should be pre-selected |
+| Prop                    | Type                                 | Required | Description                                               |
+| ----------------------- | ------------------------------------ | -------- | --------------------------------------------------------- |
+| `onSubmit`              | `(servers: TSelectorItem[]) => void` | Yes      | Callback with the selected servers when submitted         |
+| `onClose`               | `VoidFunction`                       | Yes      | Callback to fully close the selector                      |
+| `onBackClick`           | `VoidFunction`                       | Yes      | Callback for the back button (navigates to previous view) |
+| `initedSelectedServers` | `string[]`                           | No       | IDs of servers that should be pre-selected                |
 
 ## Usage
 
 ```tsx
-import MCPServersSelector from "@docspace/ui-kit/selectors/MCPServers";
+import MCPServersSelector from "@onlyoffice/apps-ui-kit/selectors/MCPServers";
 
 const AIAgentSettings = () => {
   const handleSubmit = (servers) => {
@@ -53,15 +53,15 @@ const AIAgentSettings = () => {
 
 ```tsx
 enum ServerType {
-  Custom,   // Custom MCP server
-  Portal,   // DocSpace portal server (uses portal logo)
-  GitHub,   // GitHub integration
-  Box,      // Box integration
+  Custom, // Custom MCP server
+  Portal, // ONLYOFFICE Apps portal server (uses portal logo)
+  GitHub, // GitHub integration
+  Box, // Box integration
 }
 ```
 
 ## Key Files
 
-| File | Description |
-|------|-------------|
+| File        | Description                                                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `index.tsx` | Main component with server fetching, multi-select logic, and rendering. Also exports `ServerType` enum and `TServer` type |

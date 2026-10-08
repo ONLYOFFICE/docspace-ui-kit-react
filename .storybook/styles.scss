@@ -1,0 +1,34 @@
+@use "../styles/variables/colors";
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#storybook-root {
+  padding: 0;
+  margin: 0;
+}
+
+// Storybook standing in for the portal's theme layer.
+//
+// This package consumes ~1 000 custom properties that DocSpace-client defines in
+// `packages/shared/styles/theme.scss` and does not ship any of them (see
+// `.claude/rules/theming.md`). Most stories never notice. The info-panel tokens
+// below are the ones a *host* is expected to supply -- `Section` reads them to
+// draw the panel surface, and the AI chat panel is rendered inside it -- so
+// without them a story of a panel has no surface to sit on and no edge against
+// the content beside it.
+//
+// Values match the client's theme.scss exactly, so what a story shows is what a
+// portal shows. Only tokens whose absence changes the shape of a story belong
+// here; the point of not shipping the rest is that a missing one stays visible.
+.light {
+  --info-panel-background: #{colors.$white};
+  --info-panel-border-color: #{colors.$gray-light-mid};
+}
+
+.dark {
+  --info-panel-background: #{colors.$black};
+  --info-panel-border-color: #{colors.$gray-dark-strong};
+}

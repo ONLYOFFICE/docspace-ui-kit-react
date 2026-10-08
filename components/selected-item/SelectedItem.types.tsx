@@ -1,80 +1,48 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
-type TLabel = string | React.ReactNode;
-
 export interface SelectedItemProps {
-  /** Selected item text */
-  label: TLabel;
-  /** Sets the 'width: fit-content' property */
+  /** Text of the chip. A falsy label renders nothing at all. */
+  label: React.ReactNode;
+  /** Whether the chip shrinks to its content. Without it the chip fills the width of its container. */
   isInline?: boolean;
-  /** Sets a callback function that is triggered when the cross icon is clicked */
+  /** Called when the cross is clicked, with `propKey`, `label`, `group` (`""` when it was not set) and the event. */
   onClose: (
     propKey: string | number,
-    label: TLabel,
+    label: React.ReactNode,
     group?: string,
     e?: React.MouseEvent,
   ) => void;
-  /** Sets a callback function that is triggered when the selected item is clicked */
+  /** Called when the chip is clicked, with `propKey`, `label`, `group` and the event. A click on the cross reaches it too, after `onClose`. */
   onClick?: (
     propKey: string | number,
-    label: TLabel,
+    label: React.ReactNode,
     group?: string,
     e?: React.MouseEvent<HTMLElement>,
   ) => void;
-  /** Sets the button to present a disabled state */
+  /** Whether the chip is inert. Both handlers stop firing and the label and the cross grey out. */
   isDisabled?: boolean;
-  /** Accepts class  */
+  /** Applied to the outermost element. */
   className?: string;
-  /** Accepts id */
+  /** Applied to the outermost element. */
   id?: string;
-  /** Accepts css style */
+  /** Ignored. Nothing reads this prop; style the chip through `className` or the custom properties. */
   style?: React.CSSProperties;
-  /** Accepts key to remove item */
+  /** Identifier handed back to `onClose` and `onClick`. It is not used for anything else. */
   propKey: string | number;
-  /** Accepts group key to remove item */
+  /** Second identifier handed back to both handlers, for chips that belong to several filters. */
   group?: string;
-  /** Passes ref to component */
+  /** Ref to the outermost element. */
   forwardedRef?: React.RefObject<HTMLDivElement | null>;
+  /** Applied to the cross button, in addition to the class the component needs there itself. */
   classNameCloseButton?: string;
+  /** Whether the cross is left out. `onClose` then has nothing to fire it. */
   hideCross?: boolean;
+  /** Text of the kit's shared tooltip for a truncated label; it shows only once `RootTooltip` is mounted. */
   title?: string;
+  /** `data-testid` of the outermost element. */
   dataTestId?: string;
-  /** Icon as SVG URL string or React SVG component */
+  /** Glyph before the label: an SVG URL, or a component rendered with no props. */
   icon?: string | React.FC<React.SVGProps<SVGSVGElement>>;
+  /** Ignored. Nothing reads this prop; passing `onClick` is what makes the chip clickable. */
   clickable?: boolean;
-  /** Sets the item as active/selected state */
+  /** Whether the chip is drawn in its selected colours. */
   isActive?: boolean;
 }

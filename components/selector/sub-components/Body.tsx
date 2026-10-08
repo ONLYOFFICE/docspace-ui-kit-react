@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { useLayoutEffect, useRef, useState } from "react";
 import InfiniteLoader from "react-window-infinite-loader";
 import { VariableSizeList as List } from "react-window";
@@ -49,8 +14,16 @@ import { BreadCrumbsContext } from "../contexts/BreadCrumbs";
 import { TabsContext } from "../contexts/Tabs";
 import { SelectAllContext } from "../contexts/SelectAll";
 import { InfoBarContext } from "../contexts/InfoBar";
+import {
+  EmptyScreenContext,
+  EmptyScreenProvider,
+} from "../contexts/EmptyScreen";
 
-import type { BodyProps } from "../Selector.types";
+import type {
+  BodyProps,
+  TSelectorEmptyScreen,
+  TSelectorItem,
+} from "../Selector.types";
 
 import { InfoBar } from "./InfoBar";
 import { Search } from "./Search";
@@ -63,6 +36,33 @@ import { VirtualScroll } from "./VirtualScroll";
 import { Tabs } from "../../tabs";
 import InputItem from "./InputItem";
 
+const DimmedEmptyScreen = ({
+  emptyScreenCtx,
+  wasSearchActive,
+  displayItems,
+  inputItemVisible,
+  hideBackButton,
+  height,
+}: {
+  emptyScreenCtx: TSelectorEmptyScreen;
+  wasSearchActive: boolean;
+  displayItems: TSelectorItem[];
+  inputItemVisible: boolean;
+  hideBackButton?: boolean;
+  height: number;
+}) => (
+  <div className={styles.dimmedEmptyScreen} style={{ height }}>
+    <EmptyScreenProvider {...emptyScreenCtx}>
+      <EmptyScreen
+        withSearch={wasSearchActive}
+        items={displayItems}
+        inputItemVisible={inputItemVisible}
+        hideBackButton={hideBackButton}
+      />
+    </EmptyScreenProvider>
+  </div>
+);
+
 const CONTAINER_PADDING = 16;
 const HEADER_HEIGHT = 54;
 const TABS_HEIGHT = 33;
@@ -73,7 +73,8 @@ const BODY_DESCRIPTION_TEXT_HEIGHT = 32;
 const SELECT_ALL_HEIGHT = 61;
 const FOOTER_HEIGHT = 73;
 const FOOTER_WITH_NEW_NAME_HEIGHT = 145;
-const FOOTER_WITH_CHECKBOX_HEIGHT = 181;
+const FOOTER_WITH_CHECKBOX_HEIGHT = 110;
+const FOOTER_WITH_NEW_NAME_AND_CHECKBOX_HEIGHT = 181;
 const ERROR_FOOTER_HEIGHT = 20;
 
 const Body = ({
@@ -88,6 +89,7 @@ const Body = ({
   totalItems,
   renderCustomItem,
   isLoading,
+  isContentLoading,
 
   rowLoader,
 
@@ -121,6 +123,7 @@ const Body = ({
   const { withSearch } = React.use(SearchContext);
   const isSearch = React.use(SearchValueContext);
   const { withInfoBar } = React.use(InfoBarContext);
+  const emptyScreenCtx = React.use(EmptyScreenContext);
 
   const { withBreadCrumbs, isBreadCrumbsLoading } =
     React.useContext(BreadCrumbsContext);
@@ -135,20 +138,73 @@ const Body = ({
 
   const bodyRef = React.useRef<HTMLDivElement>(null);
   const listOptionsRef = React.useRef<null | InfiniteLoader>(null);
+  const listRef = React.useRef<List | null>(null);
   const resizeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
 
-  const isEmptyInput =
-    items.length === 2 && items[1].isInputItem && items[0].isCreateNewItem;
+  // A content refresh dims the body and wins over the skeleton
+  const loadingMode: "skeleton" | "dimmed" | "none" = isContentLoading
+    ? "dimmed"
+    : isLoading
+      ? "skeleton"
+      : "none";
+  const isDimmed = loadingMode === "dimmed";
 
-  const itemsCount = hasNextPage
-    ? items.length + 1
-    : items.length === 1 && items[0].isCreateNewItem
+  // Store previous items for dimming display during content loading
+  const previousItemsRef = React.useRef(items);
+  const previousTotalRef = React.useRef(totalItems);
+
+  // Save EmptyScreen context when empty screen is actually displayed
+  const savedEmptyScreenCtxRef = React.useRef(emptyScreenCtx);
+
+  // Track whether search was active before content loading started
+  const wasSearchActiveRef = React.useRef(false);
+
+  // Track whether the last settled render displayed the EmptyScreen, so a
+  // refresh started from it dims that empty screen, not a stale list
+  const wasEmptyScreenRef = React.useRef(false);
+
+  const wasEmptyScreen = wasEmptyScreenRef.current;
+
+  // Use previous items when content is loading and current items are empty,
+  // but only if the EmptyScreen was not displayed before the refresh
+  const displayItems =
+    isDimmed && items.length === 0 && !wasEmptyScreen
+      ? previousItemsRef.current
+      : items;
+
+  const displayTotal =
+    isDimmed && items.length === 0 && !wasEmptyScreen
+      ? previousTotalRef.current
+      : totalItems;
+
+  const isEmptyInput =
+    displayItems.length === 2 &&
+    displayItems[1].isInputItem &&
+    displayItems[0].isCreateNewItem;
+
+  const displayHasNextPage = isDimmed ? false : hasNextPage;
+
+  const itemsCount = displayHasNextPage
+    ? displayItems.length + 1
+    : displayItems.length === 1 && displayItems[0].isCreateNewItem
       ? 0
       : isEmptyInput
         ? 1
-        : items.length;
+        : displayItems.length;
+
+  const showsEmptyScreen = itemsCount === 0 && loadingMode === "none";
+
+  React.useEffect(() => {
+    if (!isDimmed) {
+      wasSearchActiveRef.current = isSearch;
+      previousItemsRef.current = items;
+      previousTotalRef.current = totalItems;
+      savedEmptyScreenCtxRef.current = emptyScreenCtx;
+      wasEmptyScreenRef.current = showsEmptyScreen;
+    }
+  }, [isDimmed, isSearch, items, totalItems, emptyScreenCtx, showsEmptyScreen]);
 
   const isShareFormEmpty =
     itemsCount === 0 &&
@@ -164,6 +220,10 @@ const Body = ({
       listOptionsRef.current.resetloadMoreItemsCache(true);
     }
   }, []);
+
+  React.useEffect(() => {
+    listRef.current?.resetAfterIndex(0);
+  }, [items]);
 
   const onBodyResize = React.useCallback(() => {
     if (bodyRef && bodyRef.current) {
@@ -252,8 +312,11 @@ const Body = ({
 
   let listHeight = bodyHeight - infoBarHeight - injectedElementHeight;
 
-  const showSearch = withSearch && (isSearch || itemsCount > 0);
-  const showSelectAll = (isMultiSelect && withSelectAll && !isSearch) || false;
+  const effectiveIsSearch =
+    isSearch || (isDimmed && wasSearchActiveRef.current);
+  const showSearch = withSearch && (effectiveIsSearch || itemsCount > 0);
+  const showSelectAll =
+    (isMultiSelect && withSelectAll && !effectiveIsSearch) || false;
 
   if (withPadding) {
     listHeight -= CONTAINER_PADDING;
@@ -278,8 +341,10 @@ const Body = ({
   if (descriptionText) listHeight -= BODY_DESCRIPTION_TEXT_HEIGHT;
 
   const getFooterHeight = () => {
-    if (withErrorFooter && withFooterCheckbox && withFooterInput)
-      return FOOTER_WITH_CHECKBOX_HEIGHT + ERROR_FOOTER_HEIGHT;
+    if (withFooterCheckbox && withFooterInput)
+      return withErrorFooter
+        ? FOOTER_WITH_NEW_NAME_AND_CHECKBOX_HEIGHT + ERROR_FOOTER_HEIGHT
+        : FOOTER_WITH_NEW_NAME_AND_CHECKBOX_HEIGHT;
     if (withFooterCheckbox) return FOOTER_WITH_CHECKBOX_HEIGHT;
     if (withFooterInput) return FOOTER_WITH_NEW_NAME_HEIGHT;
     return FOOTER_HEIGHT;
@@ -293,8 +358,9 @@ const Body = ({
   const cloneProps = { ref: injectedElementRef };
 
   const getItemSize = (index: number): number => {
-    if (items[index]?.isSeparator) {
-      return 16;
+    const item = items[index];
+    if (item?.isSeparator) {
+      return item?.isSectionSeparator ? 25 : 16;
     }
 
     return 48;
@@ -338,9 +404,9 @@ const Body = ({
         />
       ) : null}
 
-      <Search isSearch={itemsCount > 0 || isSearch} />
+      <Search isSearch={itemsCount > 0 || !!effectiveIsSearch} />
 
-      {withInfo && !isLoading ? (
+      {withInfo && loadingMode !== "skeleton" ? (
         <Info
           withInfo={withInfo}
           infoText={infoText}
@@ -348,9 +414,11 @@ const Body = ({
         />
       ) : null}
 
-      {isLoading ? (
-        <Scrollbar style={{ height: listHeight }}>{rowLoader}</Scrollbar>
-      ) : itemsCount === 0 ? (
+      {loadingMode === "skeleton" ? (
+        <Scrollbar style={{ height: listHeight > 0 ? listHeight : "100%" }}>
+          {rowLoader}
+        </Scrollbar>
+      ) : showsEmptyScreen ? (
         <div style={{ height: listHeight }}>
           <EmptyScreen
             withSearch={isSearch}
@@ -359,8 +427,22 @@ const Body = ({
             hideBackButton={hideBackButton}
           />
         </div>
+      ) : isDimmed && wasEmptyScreen ? (
+        <DimmedEmptyScreen
+          emptyScreenCtx={savedEmptyScreenCtxRef.current}
+          wasSearchActive={wasSearchActiveRef.current}
+          displayItems={displayItems}
+          inputItemVisible={inputItemVisible}
+          hideBackButton={hideBackButton}
+          height={listHeight}
+        />
       ) : (
-        <>
+        <div
+          className={classNames(
+            styles.bodyContentWrapper,
+            isDimmed && styles.bodyContentDimmed,
+          )}
+        >
           {descriptionText ? (
             <Text className={styles.bodyDescriptionText}>
               {descriptionText}
@@ -384,7 +466,7 @@ const Body = ({
                 } as React.CSSProperties
               }
             >
-              {items.map((item, index) => (
+              {displayItems.map((item, index) => (
                 <div
                   key={item.id}
                   style={{
@@ -397,7 +479,7 @@ const Body = ({
                     index={index}
                     style={{ flexGrow: 1 }}
                     data={{
-                      items,
+                      items: displayItems,
                       onSelect,
                       isMultiSelect: isMultiSelect || false,
                       rowLoader,
@@ -415,25 +497,27 @@ const Body = ({
                 </div>
               ))}
             </Scrollbar>
-          ) : items.length === 2 && items[1]?.isInputItem ? (
+          ) : displayItems.length === 2 && displayItems[1]?.isInputItem ? (
             <InputItem
-              defaultInputValue={savedInputValue ?? items[1].defaultInputValue}
-              onAcceptInput={items[1].onAcceptInput}
-              onCancelInput={items[1].onCancelInput}
+              defaultInputValue={
+                savedInputValue ?? displayItems[1].defaultInputValue
+              }
+              onAcceptInput={displayItems[1].onAcceptInput}
+              onCancelInput={displayItems[1].onCancelInput}
               style={{}}
-              color={items[1].color}
-              roomType={items[1].roomType}
-              cover={items[1].cover}
-              icon={items[1].icon}
+              color={displayItems[1].color}
+              roomType={displayItems[1].roomType}
+              cover={displayItems[1].cover}
+              icon={displayItems[1].icon}
               setInputItemVisible={setInputItemVisible}
               setSavedInputValue={setSavedInputValue}
-              placeholder={items[1].placeholder}
+              placeholder={displayItems[1].placeholder}
             />
           ) : (
             <InfiniteLoader
               ref={listOptionsRef}
               isItemLoaded={isItemLoaded}
-              itemCount={totalItems}
+              itemCount={displayTotal}
               loadMoreItems={onLoadMoreItems}
             >
               {({ onItemsRendered, ref }) => (
@@ -443,7 +527,7 @@ const Body = ({
                   width="100%"
                   itemCount={itemsCount}
                   itemData={{
-                    items: isEmptyInput ? [items[1]] : items,
+                    items: isEmptyInput ? [displayItems[1]] : displayItems,
                     onSelect,
                     isMultiSelect: isMultiSelect || false,
                     rowLoader,
@@ -460,7 +544,12 @@ const Body = ({
                   }}
                   itemSize={getItemSize}
                   onItemsRendered={onItemsRendered}
-                  ref={ref}
+                  ref={(node: List | null) => {
+                    if (typeof ref === "function") {
+                      (ref as (r: List | null) => void)(node);
+                    }
+                    listRef.current = node;
+                  }}
                   outerElementType={VirtualScroll}
                 >
                   {Item}
@@ -468,7 +557,7 @@ const Body = ({
               )}
             </InfiniteLoader>
           )}
-        </>
+        </div>
       )}
     </div>
   );

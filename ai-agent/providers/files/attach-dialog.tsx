@@ -1,0 +1,212 @@
+"use client";
+
+import React from "react";
+import { observer } from "mobx-react";
+import { useTranslation } from "react-i18next";
+import { FileType, FolderType } from "@onlyoffice/docspace-api-sdk";
+import { useStores } from "@onlyoffice/ai-chat";
+
+import FilesSelector from "../../../selectors/Files";
+import type { TSelectorItem } from "../../../components/selector";
+import { toastr, type TData } from "../../../components/toast";
+import useGetIcon from "../../hooks/useGetIcon";
+
+import { getOnlyofficeFileType } from "./file-type";
+import { attachFilesToChat, type OnFilesAttached } from "./attach-files";
+import { splitDuplicateAttachments } from "./duplicate-attachments";
+import { useAttachmentLimit } from "./attachment-limit";
+import { hasFormResults } from "./form-attachments";
+import { notifyAlreadyAttached, notifyAttachmentLimit } from "./notices";
+import { reserveAttachmentChips } from "./limits";
+import useDeviceType from "./use-device-type";
+
+type AttachDialogProps = {
+  onClose: () => void;
+  // Reports the attached files so the caller can keep the record flags the
+  // attachments store drops (`canAnalyze`).
+  onFilesAttached?: OnFilesAttached;
+};
+
+// Rendered inside <AiAgentProviders> so `useStores()` resolves the
+// AttachmentsStore from the widget's context. `addAttachmentFile` round-trips
+// to the AI backend, which resolves the entryId server-side — `content` here
+// is a placeholder and is ignored by the host integration.
+const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
+  const { onClose, onFilesAttached } = props;
+  const { t } = useTranslation(["Common"]);
+  const { currentDeviceType } = useDeviceType();
+  const { getIcon } = useGetIcon();
+  const { useAttachmentsStore } = useStores();
+  // What the composer accepts here, and why — the reason picks the wording
+  // of the refusal toast.
+  const cap = useAttachmentLimit();
+
+  const selectedFilesRef = React.useRef<TSelectorItem[]>([]);
+
+  const onSelectItem = React.useCallback((item: TSelectorItem) => {
+    if ("isFolder" in item && item.isFolder) return;
+    const idx = selectedFilesRef.current.findIndex((f) => f.id === item.id);
+    if (idx >= 0) {
+      selectedFilesRef.current = selectedFilesRef.current.filter(
+        (f) => f.id !== item.id,
+      );
+    } else {
+      selectedFilesRef.current = [...selectedFilesRef.current, item];
+    }
+  }, []);
+
+  const onSubmit = React.useCallback<
+    React.ComponentProps<typeof FilesSelector>["onSubmit"]
+  >(
+    async (
+      _selectedItemId,
+      _folderTitle,
+      _isPublic,
+      _breadCrumbs,
+      _fileName,
+      _isChecked,
+      _selectedTreeNode,
+      selectedFileInfo,
+    ) => {
+      // Align the input array with the original selector items so we know
+      // which records to re-key as images after `addAttachmentFile`.
+      const sources =
+        selectedFilesRef.current.length > 0
+          ? selectedFilesRef.current.map((f) => ({
+              id: f.id,
+              title: f.label,
+              fileType: "fileType" in f ? f.fileType : undefined,
+              fileExst: "fileExst" in f ? (f.fileExst ?? "") : "",
+              isForm: "isForm" in f ? f.isForm : undefined,
+              externalDbTableName:
+                "externalDbTableName" in f ? f.externalDbTableName : undefined,
+            }))
+          : selectedFileInfo
+            ? [
+                {
+                  id: selectedFileInfo.id,
+                  title: selectedFileInfo.title,
+                  fileType: selectedFileInfo.fileType,
+                  fileExst: selectedFileInfo.fileExst ?? "",
+                  isForm: (selectedFileInfo as { isForm?: boolean }).isForm,
+                  externalDbTableName: (
+                    selectedFileInfo as { externalDbTableName?: string | null }
+                  ).externalDbTableName,
+                },
+              ]
+            : [];
+
+      // One chip per file: a pick that is already on the message (or picked
+      // twice across folders) is dropped before any chip is reserved.
+      const { keep } = splitDuplicateAttachments(
+        useAttachmentsStore,
+        sources.map((s) => String(s.id)),
+      );
+      const picked = keep.map((index) => sources[index]);
+      const duplicates = sources.length - picked.length;
+
+      const inputs = picked.map((s) => ({
+        path: String(s.id),
+        title: s.fileExst ? `${s.title}${s.fileExst}` : s.title,
+        type: getOnlyofficeFileType(s.fileExst || s.title),
+        content: "",
+        hasFormResults: hasFormResults(s),
+      }));
+
+      const imageIndices = new Set<number>();
+      picked.forEach((s, i) => {
+        if (s.fileType === FileType.Image) imageIndices.add(i);
+      });
+
+      // Reserve the loading chips before closing so they are already in the
+      // composer when the dialog disappears; the reservation also applies
+      // the attachment cap (extra picks simply get no chip).
+      const pendingIds = reserveAttachmentChips(
+        useAttachmentsStore,
+        inputs.map((input) => ({
+          title: input.title,
+          kind: "file" as const,
+          type: input.type,
+        })),
+        cap.limit,
+      );
+      const accepted = inputs.slice(0, pendingIds.length);
+
+      onClose();
+      // Both drops are silent by design — the duplicate filter runs before
+      // the reservation, the cap truncates it — so a pick that produced no
+      // chip would just look like nothing happened. Reported after the
+      // dialog closes so the toasts are not covered by it.
+      notifyAlreadyAttached(t, duplicates);
+      notifyAttachmentLimit(t, inputs.length - accepted.length, cap);
+      if (accepted.length === 0) return;
+
+      try {
+        // `imageIndices` at or past `accepted.length` are never looked up.
+        const attached = await attachFilesToChat(
+          useAttachmentsStore,
+          accepted,
+          imageIndices,
+          pendingIds,
+        );
+        onFilesAttached?.(attached);
+      } catch (e) {
+        useAttachmentsStore.getState().failPendingAttachments(pendingIds);
+        toastr.error(e as TData);
+      }
+    },
+    [onClose, onFilesAttached, useAttachmentsStore, cap, t],
+  );
+
+  const getIsDisabled = React.useCallback<
+    React.ComponentProps<typeof FilesSelector>["getIsDisabled"]
+  >((isFirstLoad, _a, _b, _c, _d, _e, selectedFileInfo) => {
+    if (isFirstLoad) return true;
+    return selectedFilesRef.current.length === 0 && !selectedFileInfo;
+  }, []);
+
+  return (
+    <FilesSelector
+      isPanelVisible
+      openRoot
+      isMultiSelect
+      withRecentTreeFolder
+      withFavoritesTreeFolder
+      // The legacy chat's attach picker listed the AI agents section (files
+      // from an agent's storage are attachable) and greyed out entries the
+      // user cannot Ask AI about; both props were lost when the picker was
+      // rewritten for the chat-lib integration.
+      withAIAgentsTreeFolder
+      disableBySecurity="AskAi"
+      isRoomsOnly={false}
+      isThirdParty={false}
+      withCreate={false}
+      withSearch
+      withBreadCrumbs
+      withoutBackButton
+      withCancelButton
+      withFooterInput={false}
+      withFooterCheckbox={false}
+      onCancel={onClose}
+      onSubmit={onSubmit}
+      onSelectItem={onSelectItem}
+      getIcon={getIcon}
+      getIsDisabled={getIsDisabled}
+      currentFolderId=""
+      rootFolderType={FolderType.USER}
+      disabledItems={[]}
+      filterParam="ALL"
+      submitButtonLabel={t("Common:SelectAction", { defaultValue: "Select" })}
+      cancelButtonLabel={t("Common:CancelButton", { defaultValue: "Cancel" })}
+      descriptionText=""
+      footerCheckboxLabel=""
+      footerInputHeader=""
+      currentFooterInputValue=""
+      getFilesArchiveError={() => ""}
+      currentDeviceType={currentDeviceType}
+    />
+  );
+});
+AttachDialog.displayName = "AttachDialog";
+
+export default AttachDialog;

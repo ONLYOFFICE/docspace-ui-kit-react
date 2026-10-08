@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, {
   useState,
   useLayoutEffect,
@@ -86,9 +51,11 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
   operationsAlert,
   operationsCanceled,
   operationsCompleted = false,
+  operationsStopped = false,
   clearOperationsData,
   clearPanelOperationsData,
   cancelUpload,
+  cancelSecondaryOperationById,
   mainButtonVisible,
   needErrorChecking,
   showCancelButton,
@@ -319,6 +286,19 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
       );
     }
 
+    if (operationsStopped) {
+      const operationName = operationsLength
+        ? operations[0].label
+        : panelOperations[0].label;
+
+      return (
+        <Text fontWeight={600}>
+          {t("StoppedOperation", {
+            operationName,
+          })}
+        </Text>
+      );
+    }
     if (operationsCanceled) {
       const canceledLabel = operationsLength
         ? operations[0].label
@@ -354,6 +334,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
           <Text fontWeight={600}>
             {operationName}
             <br />
+            {/* t("Common:ErrorUploadingFiles", { count: getErrorCount() }) */}
             {t("ErrorUploadingFiles", {
               count: getErrorCount()!,
             })}
@@ -415,6 +396,11 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
   };
 
   const checkError = needErrorChecking && !disableOpenPanel;
+
+  // Both flags mean "aborted by the user": `operationsStopped` comes from the
+  // secondary operations (copy/move/delete...), `operationsCanceled` from the
+  // upload. They are terminal states, so they win over alert/completed.
+  const isStopped = operationsStopped || Boolean(operationsCanceled);
 
   const hideMainButtonHandler = useCallback(
     (flag: boolean) => setHideMainButton(flag),
@@ -478,6 +464,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
               iconUrl={getIconUrl()}
               alert={operationsAlert}
               completed={operationsCompleted}
+              stopped={isStopped}
               onClick={handleFloatingButtonClick}
               {...(!isSeveralOperations && {
                 showCancelButton,
@@ -511,6 +498,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
                 clearPanelOperationsData?.(operationName);
               }}
               onCancel={onCancelOperation}
+              cancelSecondaryOperationById={cancelSecondaryOperationById}
               onOpenPanel={handleOperationClick}
             />
           </DropDown>

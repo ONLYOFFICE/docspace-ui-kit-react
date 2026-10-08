@@ -19,42 +19,33 @@ RUN apt-get -y update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PNPM
-RUN npm install -g pnpm@10.28.2
+RUN npm install -g pnpm@12.4.1
 
 WORKDIR /app
 
 RUN pnpm config set store-dir /root/.local/share/pnpm/store
 
-# Copy package manifests for layer caching
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-COPY common/tests/package-lock.json ./common/tests/package-lock.json
-COPY common/tests/package.json ./common/tests/package.json
-COPY packages/client/package.json ./packages/client/package.json
-COPY packages/client/onlyoffice-docspace-plugin-sdk-*.tgz ./packages/client/
-COPY packages/client/onlyoffice-docspace-sdk-js-*.tgz ./packages/client/
-COPY packages/shared/package.json ./packages/shared/package.json
-COPY libs/ui-kit/package.json ./libs/ui-kit/package.json
-COPY libs/ui-kit/onlyoffice-docspace-api-sdk-*.tgz ./libs/ui-kit/
+# Manifests first, for layer caching.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 
-RUN pnpm install --frozen-lockfile
+# CI=true is scoped to this one command on purpose. It skips the
+# `lefthook install` in the prepare script, which cannot work because the
+# image has no .git. A persistent `ENV CI=true` would be wrong here: it flips
+# Playwright's runtime defaults (retries, workers, forbidOnly), which the
+# container is meant to take from the invocation, not from the image.
+RUN CI=true pnpm install --frozen-lockfile
 
 # Install Playwright browsers
 RUN npm uninstall -g playwright playwright-core @playwright/test
-RUN cd /app/libs/ui-kit && pnpm exec playwright install chromium --with-deps
+RUN CI=true pnpm exec playwright install chromium --with-deps
 
-# Copy source code
-COPY common/ ./common/
-COPY packages/client/ ./packages/client/
-COPY packages/shared/ ./packages/shared/
-COPY libs/ui-kit/ ./libs/ui-kit/
-COPY public/ ./public/
+# Copy source code. Everything Storybook needs is committed -- locales/en,
+# assets/icons, css/fonts.css and fonts/ -- so the image builds with no
+# DocSpace checkout anywhere near it. `pnpm sync-locales` is a manual refresh
+# against a client checkout and is deliberately not run here.
+COPY . .
 
-# Copy locales needed by Storybook
-RUN pnpm --filter @docspace/ui-kit run copy-assets
-
-WORKDIR /app/libs/ui-kit
-
-# Build Storybook static for test:ci mode (not needed for local dev mode)
-# RUN pnpm run storybook-build
+# Storybook is started by playwright.config.ts' webServer on port 6007, so the
+# image deliberately ships no storybook-static build.

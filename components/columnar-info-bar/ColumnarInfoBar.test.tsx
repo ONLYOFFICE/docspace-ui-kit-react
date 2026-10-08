@@ -1,37 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
@@ -55,19 +21,55 @@ describe("ColumnarInfoBar", () => {
     expect(screen.getByText("Active")).toBeInTheDocument();
   });
 
-  it("renders headerText when provided", () => {
-    render(<ColumnarInfoBar columns={columns} headerText="Your profile details" />);
-    expect(screen.getByText("Your profile details")).toBeInTheDocument();
-  });
+  it.each(["default", "neutral", "page"] as const)(
+    "renders headerText as a level-3 heading (%s variant)",
+    (variant) => {
+      render(
+        <ColumnarInfoBar
+          columns={columns}
+          headerText="Your profile details"
+          variant={variant}
+        />,
+      );
+      expect(
+        screen.getByRole("heading", { level: 3, name: "Your profile details" }),
+      ).toBeInTheDocument();
+    },
+  );
 
-  it("does not render a header when headerText is omitted", () => {
-    render(<ColumnarInfoBar columns={columns} />);
-    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
-  });
+  it.each(["default", "neutral", "page"] as const)(
+    "does not render a header when headerText is omitted (%s variant)",
+    (variant) => {
+      render(<ColumnarInfoBar columns={columns} variant={variant} />);
+      expect(screen.queryByRole("heading")).not.toBeInTheDocument();
+    },
+  );
 
   it("renders close button when onAction is provided", () => {
     render(<ColumnarInfoBar columns={columns} onAction={vi.fn()} />);
     expect(screen.getByRole("button", { name: /close/i })).toBeInTheDocument();
+  });
+
+  it.each(["default", "page"] as const)(
+    "labels the close button with closeLabel (%s variant)",
+    (variant) => {
+      render(
+        <ColumnarInfoBar
+          columns={columns}
+          onAction={vi.fn()}
+          closeLabel="Fermer"
+          variant={variant}
+        />,
+      );
+      expect(
+        screen.getByRole("button", { name: "Fermer" }),
+      ).toBeInTheDocument();
+    },
+  );
+
+  it("defaults the close button label to Close", () => {
+    render(<ColumnarInfoBar columns={columns} onAction={vi.fn()} />);
+    expect(screen.getByRole("button")).toHaveAttribute("aria-label", "Close");
   });
 
   it("does not render close button when onAction is omitted", () => {
@@ -92,7 +94,10 @@ describe("ColumnarInfoBar", () => {
 
   it("renders ReactNode values inside columns", () => {
     const columnsWithNode = [
-      { label: "Status", value: <span data-testid="status-badge">200 OK</span> },
+      {
+        label: "Status",
+        value: <span data-testid="status-badge">200 OK</span>,
+      },
     ];
     render(<ColumnarInfoBar columns={columnsWithNode} />);
     expect(screen.getByTestId("status-badge")).toBeInTheDocument();

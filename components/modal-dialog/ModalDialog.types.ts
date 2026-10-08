@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { RefObject } from "react";
 import { AsideHeaderProps } from "../aside";
 
@@ -93,9 +58,14 @@ export type ModalSubComponentsProps = AsideHeaderProps & {
   containerVisible?: boolean;
   /** Displays double line in footer */
   isDoubleFooterLine?: boolean;
-  /** Sets the displayed dialog to be closed or open */
+  /** Whether the user may close the dialog at all. Every route to `onClose` —
+   * the header's cross, Escape, a backdrop click — runs through one guard, so
+   * `false` stops all three and leaves closing entirely to the caller.
+   * @default true */
   isCloseable?: boolean;
-  /**  Disables closing the modal when the backdrop is clicked */
+  /** Whether a click on the backdrop closes the dialog. Unlike `isCloseable`,
+   * this stops only that one route; the cross and Escape keep working.
+   * @default true */
   closeOnBackdropClick?: boolean;
   /** Enables embedded mode */
   embedded?: boolean;
@@ -116,13 +86,28 @@ export type ModalSubComponentsProps = AsideHeaderProps & {
   /** Forces body scroll regardless of display type */
   withBodyScrollForcibly?: boolean;
 
+  /** Draws a one-pixel border on the dialog's inline-start edge, where an aside
+   * meets the page. Set `--modal-dialog-aside-border` to recolour it.
+   * @default false */
   withBorder?: boolean;
   /** Test id */
   dataTestId?: string;
 
+  /** Makes the body's scrollbar publish itself through `ScrollbarContext`, so a
+   * descendant can scroll it. Off unless something inside needs that. */
   scrollbarCreateContext?: boolean;
   /** Controls the visibility of the backdrop overlay */
   backdropVisible?: boolean;
+
+  /** Accessible name of the dialog, landing on the element that carries
+   * `role="dialog"`. Prefer `aria-labelledby` when the heading is already on
+   * screen; a dialog with neither is announced as an unnamed dialog. */
+  "aria-label"?: string;
+  /** `id` of the element naming the dialog — usually the heading passed to
+   * `ModalDialog.Header`, given an `id` of its own. */
+  "aria-labelledby"?: string;
+  /** `id` of the element describing the dialog, announced after the name. */
+  "aria-describedby"?: string;
 };
 
 export type ModalDialogProps = Partial<

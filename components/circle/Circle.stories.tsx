@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ComponentProps } from "react";
 
@@ -44,167 +9,115 @@ const meta = {
   argTypes: {
     radius: {
       control: "text",
-      description: "Radius of the circle",
+      description:
+        "Radius of the circle, in user units. It sizes the circle only, not the element around it",
       table: {
-        defaultValue: { summary: "25" },
+        defaultValue: { summary: "12" },
       },
     },
     x: {
       control: "text",
-      description: "X coordinate of circle center",
+      description:
+        "Horizontal position of the circle's centre, in user units. A value smaller than `radius` cuts off the circle's left side, which the default does",
       table: {
-        defaultValue: { summary: "25" },
+        defaultValue: { summary: "3" },
       },
     },
     y: {
       control: "text",
-      description: "Y coordinate of circle center",
+      description:
+        "Vertical position of the circle's centre, in user units. A value smaller than `radius` cuts off the circle's top",
       table: {
-        defaultValue: { summary: "25" },
+        defaultValue: { summary: "12" },
       },
     },
     width: {
       control: "text",
-      description: "Width of the SVG container",
+      description:
+        "Width of the SVG element. The default fills the parent's width",
       table: {
-        defaultValue: { summary: "50" },
+        defaultValue: { summary: "100%" },
       },
     },
     height: {
       control: "text",
-      description: "Height of the SVG container",
+      description:
+        "Height of the SVG element. The default fills the parent's height, and shrinks to nothing in a parent without one",
       table: {
-        defaultValue: { summary: "50" },
+        defaultValue: { summary: "100%" },
+      },
+    },
+    title: {
+      control: "text",
+      description:
+        "Accessible name of the placeholder, read by screen readers and shown as the browser's tooltip on hover. Empty by default, which leaves the placeholder unnamed",
+      table: {
+        defaultValue: { summary: '""' },
       },
     },
     backgroundColor: {
       control: "color",
-      description: "Background color of the skeleton",
+      description:
+        "Colour of the circle at rest. Black by default in every theme",
       table: {
-        defaultValue: { summary: "#000000" },
+        defaultValue: { summary: "#000" },
       },
     },
     foregroundColor: {
       control: "color",
-      description: "Foreground color of the skeleton",
+      description: "Colour of the lighter band that sweeps across the circle",
       table: {
-        defaultValue: { summary: "#000000" },
+        defaultValue: { summary: "#000" },
       },
     },
     backgroundOpacity: {
       control: { type: "range", min: 0, max: 1, step: 0.1 },
-      description: "Opacity of the background",
+      description: "Opacity of the resting colour",
       table: {
         defaultValue: { summary: "0.1" },
       },
     },
     foregroundOpacity: {
       control: { type: "range", min: 0, max: 1, step: 0.1 },
-      description: "Opacity of the foreground",
+      description: "Opacity of the sweeping band's colour",
       table: {
         defaultValue: { summary: "0.15" },
       },
     },
     speed: {
       control: { type: "range", min: 0.5, max: 3, step: 0.1 },
-      description: "Animation speed in seconds",
+      description:
+        "Duration of one sweep, in seconds: a larger value moves the band more slowly",
       table: {
         defaultValue: { summary: "2" },
       },
     },
     animate: {
       control: "boolean",
-      description: "Whether to animate the skeleton",
+      description:
+        "Whether the band sweeps at all. Off, the circle is a still shape",
       table: {
         defaultValue: { summary: "true" },
       },
     },
+    className: {
+      control: "text",
+      description: "Class name added to the SVG element",
+    },
+    style: {
+      control: "object",
+      description: "Inline style applied to the SVG element",
+    },
   },
   parameters: {
-    docs: {
-      description: {
-        component: `A circular skeleton loader component with customizable dimensions, colors, and animation.
-
-### Features
-
-- **Configurable Dimensions**: Set width, height, radius, and center coordinates
-- **Custom Colors**: Adjustable background and foreground colors with independent opacity controls
-- **Animation Control**: Toggle animation on/off and adjust animation speed
-- **SVG Based**: Renders as an SVG circle for crisp display at any resolution
-
-### Usage
-
-\`\`\`tsx
-import { CircleSkeleton } from "@docspace/ui-kit/components/circle";
-
-<CircleSkeleton width="50" height="50" radius="20" x="25" y="25" />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
 } satisfies Meta<typeof CircleSkeleton>;
 
 type Story = StoryObj<ComponentProps<typeof CircleSkeleton>>;
 
 export default meta;
-
-export const CssCustomization: Story = {
-  render: () => (
-    <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-      <CircleSkeleton
-        width="40"
-        height="40"
-        radius="20"
-        x="20"
-        y="20"
-        backgroundColor="#0082c9"
-        foregroundColor="#cce5f6"
-        backgroundOpacity={0.15}
-        foregroundOpacity={0.3}
-      />
-      <CircleSkeleton
-        width="56"
-        height="56"
-        radius="28"
-        x="28"
-        y="28"
-        backgroundColor="#0082c9"
-        foregroundColor="#cce5f6"
-        backgroundOpacity={0.15}
-        foregroundOpacity={0.3}
-      />
-      <CircleSkeleton
-        width="80"
-        height="80"
-        radius="40"
-        x="40"
-        y="40"
-        backgroundColor="#0082c9"
-        foregroundColor="#cce5f6"
-        backgroundOpacity={0.15}
-        foregroundOpacity={0.3}
-      />
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: `The CircleSkeleton component uses props for styling (no CSS custom properties):
-
-| Prop | Description | Default |
-|------|-------------|---------|
-| \`backgroundColor\` | Skeleton background color | theme-based |
-| \`foregroundColor\` | Skeleton shimmer color | theme-based |
-| \`backgroundOpacity\` | Background opacity | \`0.1\` |
-| \`foregroundOpacity\` | Foreground opacity | \`0.15\` |
-| \`radius\` | Circle radius in SVG units | \`12\` |
-| \`x\` / \`y\` | Circle center coordinates | \`3\` / \`12\` |
-| \`speed\` | Animation speed (seconds) | \`2\` |
-| \`animate\` | Toggle animation | \`true\` |`,
-      },
-    },
-  },
-};
 
 export const Default: Story = {
   render: (args) => <CircleSkeleton {...args} />,
@@ -218,7 +131,8 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Default circle skeleton with standard dimensions.",
+        story:
+          "A circle of radius 20 centred in a 50 by 50 box — the radius, the centre and the box size are set together, because the component's own defaults cut the circle off. Change any prop live in the Controls panel below.",
       },
       source: {
         code: `<CircleSkeleton width="50" height="50" radius="20" x="25" y="25" />`,
@@ -288,7 +202,7 @@ export const CustomColors: Story = {
     docs: {
       description: {
         story:
-          "Circle skeleton with custom background and foreground colors and opacity values.",
+          "A light grey circle for a surface where the default black at low opacity is too faint or the wrong tone, such as a dark one (`backgroundColor`, `foregroundColor` and their opacities).",
       },
       source: {
         code: `<CircleSkeleton
@@ -320,7 +234,8 @@ export const NoAnimation: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Static circle skeleton with animation disabled.",
+        story:
+          "A still circle with no sweeping band, for a page that must not animate or a reader who asked for reduced motion (`animate`).",
       },
       source: {
         code: `<CircleSkeleton width="50" height="50" radius="20" x="25" y="25" animate={false} />`,
@@ -342,7 +257,8 @@ export const SlowAnimation: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Circle skeleton with a slower animation speed of 2.5 seconds.",
+        story:
+          "The band takes 2.5 seconds per sweep instead of 2, for a calmer placeholder on a page that waits longer (`speed`).",
       },
       source: {
         code: `<CircleSkeleton width="50" height="50" radius="20" x="25" y="25" speed={2.5} />`,
@@ -373,6 +289,66 @@ export const AvatarGroup: Story = {
   <CircleSkeleton width="40" height="40" radius="20" x="20" y="20" />
   <CircleSkeleton width="40" height="40" radius="20" x="20" y="20" />
 </div>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+      <CircleSkeleton
+        width="40"
+        height="40"
+        radius="20"
+        x="20"
+        y="20"
+        backgroundColor="#0082c9"
+        foregroundColor="#cce5f6"
+        backgroundOpacity={0.15}
+        foregroundOpacity={0.3}
+      />
+      <CircleSkeleton
+        width="56"
+        height="56"
+        radius="28"
+        x="28"
+        y="28"
+        backgroundColor="#0082c9"
+        foregroundColor="#cce5f6"
+        backgroundOpacity={0.15}
+        foregroundOpacity={0.3}
+      />
+      <CircleSkeleton
+        width="80"
+        height="80"
+        radius="40"
+        x="40"
+        y="40"
+        backgroundColor="#0082c9"
+        foregroundColor="#cce5f6"
+        backgroundOpacity={0.15}
+        foregroundOpacity={0.3}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `The component reads no CSS custom property -- see the behaviour notes on this page; its colours come from props. All three circles here set the same four props, at three sizes.`,
+      },
+      source: {
+        code: `<CircleSkeleton
+  width="40"
+  height="40"
+  radius="20"
+  x="20"
+  y="20"
+  backgroundColor="#0082c9"
+  foregroundColor="#cce5f6"
+  backgroundOpacity={0.15}
+  foregroundOpacity={0.3}
+/>`,
       },
     },
   },

@@ -1,0 +1,282 @@
+{
+  "version": "2.0.0",
+  "problemMatcher": [],
+  // Every task runs from the repository root. Set here once rather than with a
+  // `cd ${workspaceFolder} ; …` in front of each command: `;` is a statement
+  // separator in sh and PowerShell but not in cmd.exe, so the prefix made every
+  // button depend on which shell the editor happened to pick.
+  "options": { "cwd": "${workspaceFolder}" },
+  "tasks": [
+    {
+      "label": "Storybook | dev server",
+      "type": "shell",
+      "command": "pnpm run storybook",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
+    },
+    {
+      "label": "Storybook | build static",
+      "type": "shell",
+      "command": "pnpm run storybook-build",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Storybook | serve the built site",
+      "type": "shell",
+      "command": "pnpm run storybook-serve",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
+    },
+
+    {
+      "label": "Check | Tsc",
+      "type": "shell",
+      "command": "pnpm run tsc",
+      "group": { "kind": "test", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Check | Biome",
+      "type": "shell",
+      "command": "pnpm run lint",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Check | Biome:fix",
+      "type": "shell",
+      "command": "pnpm run lint:fix",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Check | Vitest",
+      "type": "shell",
+      "command": "pnpm run test",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Check | Vitest:watch",
+      "type": "shell",
+      "command": "pnpm run test:watch",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      }
+    },
+    {
+      "label": "Check | Vitest:ui",
+      "type": "shell",
+      "command": "pnpm run test:ui",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
+    },
+    {
+      "label": "Check | Vitest:coverage",
+      "type": "shell",
+      "command": "pnpm run test:coverage",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Check | Prettier",
+      "type": "shell",
+      "command": "pnpm run format",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Check | Prettier:fix",
+      "type": "shell",
+      "command": "pnpm run format:fix",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Check | the whole pre-push gate",
+      "type": "shell",
+      "command": "pnpm run format:gate && pnpm run lint && pnpm run tsc && pnpm run test",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+
+    {
+      "label": "Package | build",
+      "type": "shell",
+      "command": "pnpm run build",
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Package | build:watch",
+      "type": "shell",
+      "command": "pnpm run build:watch",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
+    },
+    {
+      "label": "Package | verify (publint + attw)",
+      "type": "shell",
+      "command": "pnpm run verify:package",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Package | pack the tarball",
+      "type": "shell",
+      "command": "pnpm run build && pnpm pack",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Package | what a publish would ship (dry)",
+      "type": "shell",
+      "command": "pnpm pack --dry-run",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Package | build and verify",
+      "type": "shell",
+      "command": "pnpm run build && pnpm run verify:package",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Package | clean dist",
+      "type": "shell",
+      "command": "pnpm run clean",
+      "presentation": { "reveal": "silent", "panel": "shared", "close": true }
+    },
+
+    {
+      "label": "Audit | plugin API surface",
+      "type": "shell",
+      "command": "node .claude/scripts/plugin-surface/surface.mjs",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Audit | accept the current plugin surface",
+      "type": "shell",
+      "command": "node .claude/scripts/plugin-surface/surface.mjs --write",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Audit | drift against the plugin skill",
+      "type": "shell",
+      "command": "node .claude/scripts/ui-kit-reference/check-drift.mjs",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Audit | tokens, hex and RTL (changed files)",
+      "type": "shell",
+      "command": "node .claude/scripts/audit-tokens/audit.mjs --changed",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Audit | tokens, hex and RTL (whole package)",
+      "type": "shell",
+      "command": "node .claude/scripts/audit-tokens/audit.mjs",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Audit | manifest invariants",
+      "type": "shell",
+      "command": "node .claude/scripts/release-check/manifest.mjs",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Audit | documentation gaps",
+      "type": "shell",
+      "command": "node .claude/scripts/component-docs/gaps.mjs",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Audit | scaffold a component",
+      "type": "shell",
+      "command": "node .claude/scripts/new-component/scaffold.mjs ${input:componentName}",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+
+    {
+      "label": "E2E | run against a built Storybook",
+      "type": "shell",
+      "command": "pnpm run test:e2e",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "E2E | Playwright UI",
+      "type": "shell",
+      "command": "pnpm run test:e2e:ui",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
+    },
+    {
+      "label": "E2E | Docker: build the image",
+      "type": "shell",
+      "command": "pnpm run test:e2e:docker:build",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "E2E | Docker: run",
+      "type": "shell",
+      "command": "pnpm run test:e2e:docker:start",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "E2E | Docker: update screenshots",
+      "type": "shell",
+      "command": "pnpm run test:e2e:docker:update-screenshots",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "E2E | show the last report",
+      "type": "shell",
+      "command": "pnpm run test:e2e:report",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
+    },
+
+    {
+      "label": "Sync | locales, fonts and css from a client checkout",
+      "type": "shell",
+      "command": "pnpm run sync-locales",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Sync | icons from a client checkout",
+      "type": "shell",
+      "command": "pnpm run sync-images",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    },
+    {
+      "label": "Sync | install dependencies",
+      "type": "shell",
+      "command": "pnpm install",
+      "presentation": { "reveal": "always", "panel": "new", "focus": true }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "componentName",
+      "type": "promptString",
+      "description": "Component folder name, kebab-case (e.g. status-chip)"
+    }
+  ]
+}

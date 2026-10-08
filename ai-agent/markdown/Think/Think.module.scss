@@ -1,0 +1,67 @@
+.think {
+  // margin-bottom: 16px;
+
+  &.withMarginTop {
+    margin-top: var(--chat-message-gap, 16px);
+  }
+
+  .thinkBlock {
+    background-color: var(--chat-message-tool-block-color);
+    padding: var(--chat-tool-call-body-padding);
+    border-radius: var(--chat-border-radius);
+  }
+
+  .thinkTitle {
+    width: fit-content;
+
+    display: flex;
+    align-items: center;
+
+    gap: var(--chat-message-content-gap);
+
+    height: var(--chat-icon-md);
+
+    cursor: pointer;
+
+    .toolFinishIcon {
+      width: var(--chat-icon-xs);
+      height: var(--chat-icon-xs);
+
+      div {
+        width: var(--chat-icon-xs);
+        height: var(--chat-icon-xs);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      svg {
+        height: var(--chat-icon-xs);
+
+        path {
+          fill: var(--chat-input-send-button-background);
+        }
+      }
+    }
+  }
+
+  .thinkTitleOpened {
+    margin-bottom: var(--chat-spacing-sm);
+  }
+
+  .icon {
+    transition: transform 0.2s ease;
+
+    width: var(--chat-icon-xs);
+    height: var(--chat-icon-xs);
+
+    path {
+      fill: var(--text-color) !important;
+    }
+  }
+
+  .iconOpened {
+    transform: rotate(90deg);
+  }
+}

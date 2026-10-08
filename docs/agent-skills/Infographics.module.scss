@@ -1,0 +1,331 @@
+@use "../../styles/variables/colors" as *;
+
+// Private tokens with light defaults, swapped under the kit's `.dark`. The
+// two series are the kit's accent for "with the skill" and a neutral gray for
+// the baseline: a reference, not a second category.
+.benefits,
+.figure {
+  --ig-border: #{$gray-light-mid};
+  --ig-surface: #{$white};
+  --ig-soft: #{$gray-light};
+  --ig-text: #{$black};
+  --ig-muted: #{$gray-text};
+  --ig-accent: #{$light-blue-main};
+  --ig-accent-soft: rgba(71, 129, 209, 0.1);
+  --ig-baseline: #{$gray};
+  --ig-bad: #{$light-error-status};
+  --ig-bad-soft: rgba(242, 71, 36, 0.08);
+  --ig-good: #{$light-status-positive};
+  --ig-good-soft: rgba(53, 173, 23, 0.1);
+
+  margin: 16px 0 32px;
+  padding: 0;
+  color: var(--ig-text);
+  font-family: "Open Sans", sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+
+  :global(.dark) & {
+    --ig-border: #{$gray-dark-strong};
+    --ig-surface: #{$gray-dark-mid};
+    --ig-soft: #{$dark-gray-light};
+    --ig-text: #{$white};
+    --ig-muted: #{$dark-gray-dark};
+    --ig-accent: #{$light-second-main};
+    --ig-accent-soft: rgba(82, 153, 224, 0.16);
+    --ig-baseline: #{$dark-grey-hover};
+    --ig-bad: #{$dark-error-status};
+    --ig-bad-soft: rgba(224, 100, 81, 0.14);
+    --ig-good: #{$dark-status-positive};
+    --ig-good-soft: rgba(59, 164, 32, 0.16);
+  }
+}
+
+// What the skill takes care of.
+.benefits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  list-style: none;
+}
+
+.benefit {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--ig-border);
+  border-radius: 10px;
+  background: var(--ig-surface);
+}
+
+.benefitIcon {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ig-good-soft);
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  path {
+    fill: var(--ig-good);
+  }
+}
+
+.benefitTitle {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.benefitNote {
+  color: var(--ig-muted);
+}
+
+.benefitCode {
+  margin-block-start: auto;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--ig-accent-soft);
+  color: var(--ig-accent);
+  font-family: monospace;
+  font-size: 12px;
+  word-break: break-word;
+}
+
+// Flow.
+.flowRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 8px 12px;
+
+  & + & {
+    margin-block-start: 12px;
+  }
+}
+
+.flowLabel {
+  flex: 0 0 96px;
+  align-self: center;
+  font-weight: 700;
+
+  @media (max-width: 600px) {
+    flex-basis: 100%;
+  }
+}
+
+.flow {
+  display: flex;
+  flex: 1 1 280px;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @media (max-width: 600px) {
+    row-gap: 24px;
+  }
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex: 1 1 120px;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--ig-border);
+  border-radius: 8px;
+  background: var(--ig-surface);
+
+  // The arrow to the next step, in the gap between them.
+  &:not(:last-child)::after {
+    content: "→";
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-end: -18px;
+    transform: translateY(-50%);
+    color: var(--ig-muted);
+
+    :global([dir="rtl"]) & {
+      content: "←";
+    }
+  }
+
+  // Stacked on a narrow screen: the arrow points down, under the step.
+  @media (max-width: 600px) {
+    flex-basis: 100%;
+
+    &:not(:last-child)::after,
+    :global([dir="rtl"]) &:not(:last-child)::after {
+      content: "↓";
+      inset-block-start: auto;
+      inset-block-end: -20px;
+      inset-inline-end: 50%;
+      transform: none;
+    }
+  }
+
+  &[data-tone="bad"] {
+    border-color: var(--ig-bad);
+    background: var(--ig-bad-soft);
+  }
+
+  &[data-tone="good"] {
+    border-color: var(--ig-good);
+    background: var(--ig-good-soft);
+  }
+}
+
+.stepTitle {
+  font-weight: 600;
+}
+
+.stepNote {
+  color: var(--ig-muted);
+  font-size: 12px;
+}
+
+// Results chart.
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-block-end: 12px;
+  color: var(--ig-muted);
+}
+
+.key {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--ig-accent);
+
+  &[data-series="without"] {
+    margin-inline-start: 12px;
+    background: var(--ig-baseline);
+  }
+}
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chartRow {
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) 1fr;
+  align-items: center;
+  gap: 12px;
+
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+.suite {
+  font-weight: 600;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  // The 2px surface gap between adjacent bars.
+  gap: 2px;
+}
+
+.barRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bar {
+  height: 14px;
+  min-width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--ig-accent);
+
+  &[data-series="without"] {
+    background: var(--ig-baseline);
+  }
+
+  :global([dir="rtl"]) & {
+    border-radius: 4px 0 0 4px;
+  }
+}
+
+.barValue {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+// Sync diagram.
+.sync {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+
+  & + & {
+    margin-block-start: 12px;
+  }
+}
+
+.node {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  border: 1px solid var(--ig-border);
+  border-radius: 8px;
+  background: var(--ig-surface);
+
+  &[data-tone="manual"] {
+    border-style: dashed;
+  }
+}
+
+.nodeTitle {
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.nodeNote {
+  color: var(--ig-muted);
+  font-size: 12px;
+}
+
+.edge {
+  color: var(--ig-muted);
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.caption {
+  margin-block-start: 12px;
+  color: var(--ig-muted);
+  font-size: 12px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

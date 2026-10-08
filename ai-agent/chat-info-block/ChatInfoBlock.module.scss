@@ -1,0 +1,16 @@
+@use "../../styles/variables";
+
+.chatInfoBlock {
+  box-sizing: border-box;
+
+  width: 100%;
+  max-width: var(--chat-content-max-width);
+
+  padding: var(--chat-info-block-padding, 12px 16px);
+
+  svg {
+    path {
+      fill: variables.$light-status-warning !important;
+    }
+  }
+}

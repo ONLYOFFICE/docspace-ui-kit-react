@@ -1,0 +1,347 @@
+import { type ReactNode, useEffect, useRef, useState } from "react";
+import { observer } from "mobx-react";
+import type { DateTime } from "luxon";
+
+import { Text } from "../../components/text";
+import { Link } from "../../components/link";
+import { RectangleSkeleton } from "../../components/rectangle";
+import { Loader } from "../../components/loader";
+import { LoaderTypes } from "../../components/loader/Loader.enums";
+import { useCommonTranslation } from "../../utils/i18n";
+import { CommonTrans } from "../../utils/i18n/CommonTrans";
+import { formatDateLocalized, getAppTimezone } from "../../utils/date";
+
+import { useApi } from "../../providers/api";
+import { usePaymentStore } from "../store/PaymentStoreProvider";
+import { useServicesStore } from "../store/ServicesStoreProvider";
+import type { TUsagePeriodKey } from "../types";
+
+import PeriodSelect from "./sub-components/PeriodSelect";
+import SpendingBreakdown from "./sub-components/SpendingBreakdown";
+import BalanceAmount from "../shared/balance-amount";
+
+import { getUsageRange } from "./utils";
+import { toastr } from "../../components/toast";
+import styles from "./styles/Usage.module.scss";
+
+const LOADER_DELAY_MS = 500;
+
+type UsageProps = {
+  /** Open the tariff plan page from the subscription breakdown row. */
+  onTariffPlanClick?: () => void;
+  /** Open the corresponding service detail page from its breakdown row. */
+  onDiskStorageClick?: () => void;
+  onBackupClick?: () => void;
+  onAIServicesClick?: () => void;
+  onAISearchClick?: () => void;
+  onDocsConnectClick?: () => void;
+};
+
+const Usage = ({
+  onTariffPlanClick,
+  onDiskStorageClick,
+  onBackupClick,
+  onAIServicesClick,
+  onAISearchClick,
+  onDocsConnectClick,
+}: UsageProps) => {
+  const t = useCommonTranslation();
+  const { paymentApi, rawApiClient } = useApi();
+  const {
+    language,
+    formatDate,
+    openOnNewPage,
+    isCardLinkedToPortal,
+    walletCodeCurrency,
+    setFilterStartDate,
+    setFilterEndDate,
+    savedUsagePeriod,
+    setSavedUsagePeriod,
+  } = usePaymentStore();
+  const { serviceUsage, initUsageData } = useServicesStore();
+
+  const [period, setPeriod] = useState<TUsagePeriodKey>(
+    () => savedUsagePeriod ?? "thisMonth",
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [isReportLoading, setIsReportLoading] = useState(false);
+  const [isReportInProgress, setIsReportInProgress] = useState(false);
+  const [breakdownView, setBreakdownView] = useState<"services" | "month">(
+    "services",
+  );
+
+  const loaderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const requestIdRef = useRef(0);
+
+  const clearLoaderTimer = () => {
+    if (loaderTimerRef.current) {
+      clearTimeout(loaderTimerRef.current);
+      loaderTimerRef.current = null;
+    }
+  };
+
+  const loadUsage = async (
+    nextPeriod: TUsagePeriodKey,
+    deferLoader = false,
+  ) => {
+    const requestId = ++requestIdRef.current;
+    clearLoaderTimer();
+
+    if (deferLoader) {
+      loaderTimerRef.current = setTimeout(
+        () => setIsLoading(true),
+        LOADER_DELAY_MS,
+      );
+    } else {
+      setIsLoading(true);
+    }
+
+    try {
+      await initUsageData(nextPeriod);
+    } finally {
+      if (requestId === requestIdRef.current) {
+        clearLoaderTimer();
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const onSelectPeriod = (nextPeriod: TUsagePeriodKey) => {
+    setPeriod(nextPeriod);
+    loadUsage(nextPeriod, true);
+  };
+
+  useEffect(() => {
+    setSavedUsagePeriod(null);
+    loadUsage(period);
+
+    return clearLoaderTimer;
+  }, []);
+
+  const totalSpend = serviceUsage.reduce(
+    (sum, item) => sum + item.totalAmount,
+    0,
+  );
+
+  const { from, to } = getUsageRange(period);
+
+  const openKeepingPeriod = (openPage?: () => void) => {
+    if (!openPage) return;
+
+    return () => {
+      setSavedUsagePeriod(period);
+      openPage();
+    };
+  };
+
+  const openWithPeriod = (openServicePage?: () => void) => {
+    if (!openServicePage) return;
+
+    return openKeepingPeriod(() => {
+      setFilterStartDate(from);
+      setFilterEndDate(to);
+      openServicePage();
+    });
+  };
+
+  const monthText = from.setLocale(language || "en").toFormat("LLLL yyyy");
+  const startDate = formatDateLocalized(from, "DATE_MED", {
+    locale: language,
+    timezone: getAppTimezone(),
+  });
+  const endDate = formatDateLocalized(to, "DATE_MED", {
+    locale: language,
+    timezone: getAppTimezone(),
+  });
+
+  const dateRangeSpan = <Text as="span" className={styles.totalRange} />;
+
+  const periodCaption: Record<TUsagePeriodKey, ReactNode> = {
+    thisMonth: t("ForPeriod", { period: monthText }),
+    lastMonth: t("ForPeriod", { period: monthText }),
+    last3Months: (
+      <CommonTrans
+        i18nKey="ForLast3Months"
+        values={{ startDate, endDate }}
+        components={{ 1: dateRangeSpan }}
+      />
+    ),
+    last6Months: (
+      <CommonTrans
+        i18nKey="ForLast6Months"
+        values={{ startDate, endDate }}
+        components={{ 1: dateRangeSpan }}
+      />
+    ),
+    last12Months: (
+      <CommonTrans
+        i18nKey="ForLast12Months"
+        values={{ startDate, endDate }}
+        components={{ 1: dateRangeSpan }}
+      />
+    ),
+    thisYear: (
+      <CommonTrans
+        i18nKey="ForThisYear"
+        values={{ startDate, endDate }}
+        components={{ 1: dateRangeSpan }}
+      />
+    ),
+    lastYear: (
+      <CommonTrans
+        i18nKey="ForLastYear"
+        values={{ startDate, endDate }}
+        components={{ 1: dateRangeSpan }}
+      />
+    ),
+  };
+
+  const onDownloadReport = async (
+    serviceName?: string,
+    range?: { from: DateTime; to: DateTime },
+  ) => {
+    const isMainReport = !serviceName && !range;
+
+    if (isReportInProgress) return;
+
+    setIsReportInProgress(true);
+    if (isMainReport) setIsReportLoading(true);
+
+    const reportPath =
+      breakdownView === "month"
+        ? "api/2.0/portal/payment/customer/usage/monthly/report"
+        : "api/2.0/portal/payment/customer/usage/report";
+
+    const reportRequest = {
+      startDate: formatDate!(range?.from ?? from, "start"),
+      endDate: formatDate!(range?.to ?? to, "end"),
+      credit: true,
+      debit: true,
+      ...(serviceName ? { serviceName } : {}),
+    };
+
+    try {
+      if (isMainReport) {
+        await rawApiClient.instance.post(reportPath, reportRequest);
+      } else {
+        await paymentApi.createCustomerOperationsReport({
+          customerOperationsReportRequestDto: reportRequest,
+        });
+      }
+
+      const result = await new Promise<{ resultFileUrl?: string }>(
+        (resolve, reject) => {
+          const check = async () => {
+            try {
+              const res = isMainReport
+                ? await rawApiClient.instance.get(reportPath)
+                : await paymentApi.getCustomerOperationsReport();
+              const response = res?.data?.response as
+                | {
+                    isCompleted?: boolean;
+                    resultFileUrl?: string;
+                    error?: string;
+                  }
+                | undefined;
+
+              if (!response) {
+                reject(new Error(t("UnexpectedError")));
+                return;
+              }
+              if (response.error) {
+                reject(new Error(response.error));
+                return;
+              }
+              if (response.isCompleted) {
+                resolve(response);
+                return;
+              }
+              setTimeout(check, 1000);
+            } catch (err) {
+              reject(err);
+            }
+          };
+          check();
+        },
+      );
+
+      if (result.resultFileUrl) {
+        window.open(result.resultFileUrl, openOnNewPage ? "_blank" : "_self");
+      }
+    } catch (e) {
+      toastr.error(e as Error);
+    } finally {
+      setIsReportInProgress(false);
+      if (isMainReport) setIsReportLoading(false);
+    }
+  };
+
+  return (
+    <div className={styles.usage}>
+      <Text className={styles.description}>{t("UsageDescription")}</Text>
+
+      <div className={styles.controls}>
+        <PeriodSelect value={period} onSelect={onSelectPeriod} />
+        {!isLoading && isCardLinkedToPortal && serviceUsage.length > 0 ? (
+          <div className={styles.downloadReportLink}>
+            <Link
+              fontSize="13px"
+              fontWeight={600}
+              color="accent"
+              textDecoration="underline dashed"
+              onClick={
+                isReportInProgress ? undefined : () => onDownloadReport()
+              }
+              dataTestId="usage_download_report"
+              className={
+                isReportInProgress
+                  ? styles.downloadReportLinkDisabled
+                  : undefined
+              }
+            >
+              {t("DownloadReportBtnText")}
+            </Link>
+            {isReportLoading ? (
+              <Loader color="" size="16px" type={LoaderTypes.track} />
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+
+      <div className={styles.totalCard}>
+        <Text className={styles.totalLabel}>{t("TotalSpend")}</Text>
+        {isLoading ? (
+          <RectangleSkeleton width="120px" height="24px" borderRadius="3px" />
+        ) : (
+          <BalanceAmount
+            showRefresh={false}
+            amount={totalSpend}
+            currency={walletCodeCurrency}
+            language={language}
+            mainFontSize="18px"
+            fractionFontSize="12px"
+            withoutMargin
+            tooltipId="usage-total-spend"
+          />
+        )}
+        <Text className={styles.totalCaption}>{periodCaption[period]}</Text>
+      </div>
+
+      <SpendingBreakdown
+        period={period}
+        isLoading={isLoading}
+        onTariffPlanClick={openKeepingPeriod(onTariffPlanClick)}
+        onDiskStorageClick={openWithPeriod(onDiskStorageClick)}
+        onBackupClick={openWithPeriod(onBackupClick)}
+        onAIServicesClick={openWithPeriod(onAIServicesClick)}
+        onAISearchClick={openWithPeriod(onAISearchClick)}
+        onDocsConnectClick={openWithPeriod(onDocsConnectClick)}
+        onDownloadReport={onDownloadReport}
+        isDownloadBlocked={isReportInProgress}
+        onViewChange={setBreakdownView}
+      />
+    </div>
+  );
+};
+
+export default observer(Usage);

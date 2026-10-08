@@ -1,0 +1,209 @@
+import { useStores } from "@onlyoffice/ai-chat";
+
+import { rememberFormAttachments } from "./form-attachments";
+import {
+  holdAttachPaths,
+  rememberAttachedPaths,
+  splitDuplicateAttachments,
+} from "./duplicate-attachments";
+
+type AttachmentsStore = ReturnType<typeof useStores>["useAttachmentsStore"];
+
+export type AttachFileInput = {
+  // Host entryId; the AI backend resolves the record server-side.
+  path: string;
+  title: string;
+  // ONLYOFFICE c_oAscFileType code (see getOnlyofficeFileType).
+  type: number;
+  content: string;
+  /**
+   * The host file is a form with a results table (see `hasFormResults`).
+   * Local metadata only: the attachments API maps the fields it sends
+   * explicitly, so this never reaches the backend — it is remembered per ref
+   * (see {@link rememberFormAttachments}) for the in-chat form hints.
+   */
+  hasFormResults?: boolean;
+  /**
+   * This attachment is the subject of the message: while it is on the draft
+   * the composer takes nothing else (see `useAnalyzeLock`). Set by the
+   * "Analyze responses" entry point, which is about this one form's
+   * responses.
+   */
+  analyzeOnly?: boolean;
+};
+
+/**
+ * What the backend reported about a freshly attached file, keyed by
+ * attachment id. `addAttachmentFile` keeps only `{id, title, kind, path,
+ * type}` in the store, so anything else the record carried — notably
+ * `canAnalyze` for forms — is available in the attach response alone and has
+ * to be remembered by the caller.
+ */
+export type AttachedFileInfo = {
+  id: string;
+  /**
+   * Host entry id the ref came from (`AttachFileInput.path`). The starter
+   * questions are fetched by it, not by the attachment id — the endpoint
+   * looks the form up in DocSpace.
+   */
+  entryId: string;
+  /** Attached as the subject of the message (see `AttachFileInput`). */
+  analyzeOnly?: boolean;
+  /**
+   * File name as the host sent it. The attachment record carries a title too,
+   * but this is the one the user saw in the file list — it is what the
+   * analyze banner names.
+   */
+  title: string;
+  /** The backend can analyze this file's contents (an analyzable form). */
+  canAnalyze?: boolean;
+};
+
+/** Reports what was attached, so the caller can keep the extra flags. */
+export type OnFilesAttached = (attached: AttachedFileInfo[]) => void;
+
+/**
+ * Attaches host files to the AI chat composer through the attachments
+ * store, then re-keys the refs flagged in `imageIndices` to
+ * `attachmentImages`. The library hardcodes `kind: "file"` for refs produced
+ * by `addAttachmentFile` even when the backend resolved an image, so without
+ * this the chip would show the unknown-format icon instead of a preview.
+ *
+ * `imageIndices` are positions into `inputs`; the matching freshly-added refs
+ * are moved (added refs preserve input order).
+ *
+ * `pendingIds` are loading-chip leases from `beginPendingAttachments`, one
+ * per input in the same order — passing them swaps each placeholder for its
+ * real chip atomically and keeps the reservation from being counted twice
+ * against the attachment cap. Known bounded gap: cancelling a single loading
+ * chip mid-batch shifts the positions the store settles, so `imageIndices`
+ * can tag a neighbouring ref (wrong icon, nothing worse); the proper fix is
+ * a per-input `kind` in `addAttachmentFile` — a library follow-up.
+ *
+ * A file may be attached to a message only once: inputs whose `path` (the host
+ * entryId) is already attached — or repeated within the batch — are dropped
+ * here and their loading chips released, so every entry point gets the rule
+ * without repeating it.
+ *
+ * Returns what stayed attached as files, so the caller can keep the record
+ * flags the store drops (see {@link AttachedFileInfo}). Duplicates, records
+ * past the store's cap, or those whose lease was revoked mid-flight are
+ * dropped, so the result can be shorter than `inputs`.
+ */
+export const attachFilesToChat = async (
+  useAttachmentsStore: AttachmentsStore,
+  allInputs: AttachFileInput[],
+  allImageIndices: Set<number>,
+  allPendingIds?: string[],
+): Promise<AttachedFileInfo[]> => {
+  if (allInputs.length === 0) return [];
+
+  // One file, one chip: drop the inputs whose entryId is already on the
+  // message (or repeated inside this very batch) and hand their loading chips
+  // back, then re-index the parallel arrays onto what is left.
+  const { keep, duplicates } = splitDuplicateAttachments(
+    useAttachmentsStore,
+    allInputs.map((input) => input.path),
+  );
+
+  if (duplicates.length > 0 && allPendingIds) {
+    useAttachmentsStore
+      .getState()
+      .failPendingAttachments(
+        duplicates
+          .map((index) => allPendingIds[index])
+          .filter((id): id is string => Boolean(id)),
+      );
+  }
+
+  const inputs = keep.map((index) => allInputs[index]);
+  const imageIndices = new Set(
+    keep
+      .map((index, position) => (allImageIndices.has(index) ? position : -1))
+      .filter((position) => position >= 0),
+  );
+  const pendingIds = allPendingIds
+    ? keep
+        .map((index) => allPendingIds[index])
+        .filter((id): id is string => Boolean(id))
+    : undefined;
+
+  if (inputs.length === 0) return [];
+
+  // Identify the freshly added refs by id, not by a pre-await length: the
+  // upload window is long and user-visible now, and deleting an existing
+  // chip meanwhile would shift a positional slice.
+  const beforeIds = new Set(
+    useAttachmentsStore.getState().attachmentFiles.map((f) => f.id),
+  );
+
+  // Claim the paths for the whole round trip, so a second attach started
+  // before the refs land sees them as taken.
+  const releasePaths = holdAttachPaths(
+    useAttachmentsStore,
+    inputs.map((input) => input.path),
+  );
+  const records =
+    (await useAttachmentsStore
+      .getState()
+      .addAttachmentFile(inputs, { pendingIds })
+      .finally(releasePaths)) ?? [];
+
+  // Remember which host file each ref came from: `path` is optional on the
+  // attachment record, so the duplicate check must not depend on the backend
+  // echoing it back. Records line up with `inputs` — the same assumption the
+  // image re-keying below already makes.
+  rememberAttachedPaths(
+    useAttachmentsStore,
+    records
+      .map((record, i) => ({ id: record.id, path: inputs[i]?.path }))
+      .filter((entry): entry is { id: string; path: string } =>
+        Boolean(entry.path),
+      ),
+  );
+
+  rememberFormAttachments(useAttachmentsStore, {
+    withResults: records
+      .filter((_record, i) => inputs[i]?.hasFormResults)
+      .map((record) => record.id),
+    analyzeOnly: records
+      .filter((_record, i) => inputs[i]?.analyzeOnly)
+      .map((record) => record.id),
+  });
+
+  // Pair each record with the input it came from before dropping the images,
+  // or the filtered array's positions would no longer line up with `inputs`.
+  const attached = records
+    .map((record, index) => ({ record, input: inputs[index] }))
+    .filter((_, index) => !imageIndices.has(index))
+    .map(({ record, input }) => ({
+      id: record.id,
+      entryId: input?.path ?? "",
+      title: input?.title ?? record.title,
+      analyzeOnly: input?.analyzeOnly,
+      canAnalyze: record.canAnalyze,
+    }));
+
+  if (imageIndices.size === 0) return attached;
+
+  useAttachmentsStore.setState((s) => {
+    const added = s.attachmentFiles.filter((ref) => !beforeIds.has(ref.id));
+    const stayingFiles = s.attachmentFiles.filter((ref) =>
+      beforeIds.has(ref.id),
+    );
+    const movedImages: typeof s.attachmentImages = [];
+    added.forEach((ref, i) => {
+      if (imageIndices.has(i)) {
+        movedImages.push({ ...ref, kind: "image" });
+      } else {
+        stayingFiles.push(ref);
+      }
+    });
+    return {
+      attachmentFiles: stayingFiles,
+      attachmentImages: [...s.attachmentImages, ...movedImages],
+    };
+  });
+
+  return attached;
+};

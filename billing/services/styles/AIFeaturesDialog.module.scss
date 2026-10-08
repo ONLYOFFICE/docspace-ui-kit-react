@@ -1,0 +1,144 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 768px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.introTitle {
+  color: var(--text-color);
+}
+
+.introDescription {
+  line-height: 20px;
+  color: var(--payment-text-color);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  box-sizing: border-box;
+  background: var(--background-cards-color);
+  border-radius: 6px;
+}
+
+.cardText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardTitle {
+  color: var(--text-color);
+}
+
+.cardDescription {
+  line-height: 16px;
+  color: var(--payment-text-color);
+}
+
+.mcpIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent-main) 10%, transparent);
+
+  svg path {
+    fill: var(--accent-main);
+  }
+}
+
+.cardIcon {
+  display: flex;
+  width: 32px;
+  height: 32px;
+
+  svg rect,
+  svg path {
+    fill: var(--accent-main);
+  }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: var(--payment-card-border-color);
+}
+
+.dividerLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--payment-inactive-color);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  font-size: 13px;
+  line-height: 20px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent-main) 15%, transparent);
+  color: var(--accent-main);
+}
+
+.tagIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+
+  svg {
+    width: auto;
+    height: 16px;
+  }
+
+  svg path,
+  svg rect,
+  svg circle {
+    fill: var(--accent-main);
+  }
+}
+
+.andMore {
+  padding: 7px 12px;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--accent-main);
+}

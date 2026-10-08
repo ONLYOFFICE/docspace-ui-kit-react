@@ -1,84 +1,44 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
 
 import AtReactSvgUrl from "../../assets/@.react.svg?url";
+import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 
-import { AvatarPure, AvatarRole, AvatarSize } from ".";
+import {
+  AvatarActionKeys,
+  AvatarPure,
+  AvatarRole,
+  AvatarSize,
+  type TAvatarModel,
+} from ".";
+
+// An inline picture: no network request and no photo of a real person.
+const samplePicture = `data:image/svg+xml;utf8,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#8fb3d9"/><circle cx="100" cy="82" r="36" fill="#f3f6fa"/><path d="M36 200a64 64 0 0 1 128 0z" fill="#f3f6fa"/></svg>',
+)}`;
+
+const editModel: TAvatarModel[] = [
+  {
+    key: AvatarActionKeys.PROFILE_AVATAR_UPLOAD,
+    label: "Upload picture",
+    icon: CatalogFolderReactSvgUrl,
+    onClick: (ref) => ref?.current?.click(),
+  },
+  {
+    key: AvatarActionKeys.PROFILE_AVATAR_DELETE,
+    label: "Delete picture",
+    icon: CatalogFolderReactSvgUrl,
+    onClick: fn(),
+  },
+];
 
 const meta = {
   title: "UI/Data display/Avatar",
   component: AvatarPure,
   parameters: {
-    docs: {
-      description: {
-        component: `A component for displaying user or group avatars with support for images, initials, icons, role indicators, and editing functionality.
-
-### Features
-
-- **Multiple Display Modes**: Images, initials, icons, or default placeholder
-- **Six Sizes**: min (32px), small (36px), base (40px), medium (48px), big (80px), max (124px)
-- **Role Indicators**: Owner, admin, guest, user, manager, collaborator badges
-- **Group Avatars**: Specialized styling for group representations
-- **Editing Support**: Built-in edit mode with dropdown menu
-- **Tooltips**: Optional role tooltips on hover
-
-### Usage
-
-\`\`\`tsx
-import { Avatar, AvatarSize, AvatarRole } from "@docspace/ui-kit/components/avatar";
-
-// Avatar with image
-<Avatar
-  size={AvatarSize.max}
-  role={AvatarRole.admin}
-  source="https://example.com/photo.jpg"
-  userName="John Smith"
-/>
-
-// Avatar with initials
-<Avatar
-  size={AvatarSize.medium}
-  role={AvatarRole.user}
-  userName="John Doe"
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=878-37278&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -89,33 +49,86 @@ import { Avatar, AvatarSize, AvatarRole } from "@docspace/ui-kit/components/avat
     size: {
       control: "select",
       options: Object.values(AvatarSize),
-      description: "Size of the avatar",
-      table: {
-        defaultValue: { summary: "medium" },
-      },
+      description:
+        "Diameter of the avatar, from 24px (`extraSmall`) to 124px (`max`); the initials and the role badge are sized to match, and `extraSmall` is meant for a picture only",
     },
     role: {
       control: "select",
       options: Object.values(AvatarRole),
-      description: "User role for badge display",
-      table: {
-        defaultValue: { summary: "user" },
-      },
+      description:
+        "Which role badge is drawn at the bottom corner: only `owner` and `admin` draw one, every other value draws none",
     },
     source: {
       control: "text",
-      description: "Image URL or SVG path",
+      description:
+        "The picture: a URL shown as an image, a path to a `.svg` file drawn as an icon, or a React element rendered as given",
     },
     userName: {
       control: "text",
-      description: "User name for initials generation",
+      description:
+        "Name the initials are built from when there is no `source`: the first letter of each of the first two words",
     },
     editing: {
       control: "boolean",
-      description: "Enable edit mode (only works with size='max')",
+      description:
+        "Shows the edit button at the bottom corner, in place of the role badge — a pencil when `hasAvatar`, a plus otherwise; drawn only at `size` `max`",
       table: {
         defaultValue: { summary: "false" },
       },
+    },
+    hasAvatar: {
+      control: "boolean",
+      description:
+        "Whether there already is a picture: it picks the pencil over the plus, and makes a click open the `model` menu instead of the file dialog",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    model: {
+      // The icons are data URIs too long to edit, and they stretch the table.
+      control: false,
+      description:
+        "Actions of the edit menu, in order; the first one runs directly when there is no picture yet, and the one keyed `AvatarActionKeys.PROFILE_AVATAR_UPLOAD` receives the file input's ref",
+    },
+    roleIcon: {
+      control: false,
+      description: "Badge to draw instead of the one `role` would choose",
+    },
+    isNotIcon: {
+      control: "boolean",
+      description:
+        "Shows a `.svg` `source` as a picture instead of drawing it as an icon",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    imgClassName: {
+      control: "text",
+      description: "Class added to the `<img>` of a picture `source`",
+      table: {
+        defaultValue: { summary: '""' },
+      },
+    },
+    className: {
+      control: "text",
+      description:
+        "Class added to the avatar and, again, to the picture area inside it",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Value of `data-testid` on the avatar",
+      table: {
+        defaultValue: { summary: "avatar" },
+      },
+    },
+    id: {
+      control: false,
+      description: "Ignored: nothing reads it and no `id` reaches the page",
+    },
+    style: {
+      control: false,
+      description:
+        "Ignored: nothing reads it and no inline style reaches the page",
     },
     hideRoleIcon: {
       control: "boolean",
@@ -126,39 +139,55 @@ import { Avatar, AvatarSize, AvatarRole } from "@docspace/ui-kit/components/avat
     },
     withTooltip: {
       control: "boolean",
-      description: "Show tooltip on role icon hover",
+      description:
+        "Shows `tooltipContent` while the role badge is hovered; without a badge (`role` other than `owner` or `admin`) nothing appears",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     tooltipContent: {
       control: "text",
-      description: "Content for the tooltip",
+      description: "Text of the role badge tooltip",
     },
     isGroup: {
       control: "boolean",
-      description: "Display as group avatar (uppercase initials)",
+      description:
+        "Draws the initials in upper case and bold, on the group background",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isDefaultSource: {
       control: "boolean",
-      description: "Show default avatar when source is blank",
+      description:
+        "Shows the kit's placeholder illustration when there is neither `source` nor `userName`",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     noClick: {
       control: "boolean",
-      description: "Disable click interactions",
+      description:
+        "Keeps a click on the avatar from opening the edit menu or the file dialog; `onClick` still fires",
       table: {
         defaultValue: { summary: "false" },
       },
     },
-    editAction: { action: "editAction" },
-    onClick: { action: "onClick" },
-    onChangeFile: { action: "onChangeFile" },
+    editAction: {
+      control: false,
+      description:
+        "Ignored: nothing reads it; the edit button runs the first `model` entry",
+    },
+    onClick: {
+      action: "onClick",
+      description:
+        "Called on a click and on a middle-button press; passing it replaces the edit behaviour, so the menu and the file dialog no longer open from the avatar",
+    },
+    onChangeFile: {
+      action: "onChangeFile",
+      description:
+        "Called when a file is picked in the hidden file input, which is rendered only when this is given; without it the avatar is not editable",
+    },
   },
 } satisfies Meta<typeof AvatarPure>;
 
@@ -209,6 +238,17 @@ export const Default: Story = {
     tooltipContent: "",
     withTooltip: false,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "An avatar with nothing to show yet: with no picture and no name it falls back to a camera icon on the neutral background. Change any prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<Avatar size={AvatarSize.max} role={AvatarRole.user} />`,
+      },
+    },
+  },
 };
 
 export const WithImage: Story = {
@@ -216,8 +256,7 @@ export const WithImage: Story = {
   args: {
     size: AvatarSize.max,
     role: AvatarRole.admin,
-    source:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face",
+    source: samplePicture,
     userName: "John Smith",
     editing: false,
     hideRoleIcon: false,
@@ -228,7 +267,7 @@ export const WithImage: Story = {
     docs: {
       description: {
         story:
-          "Avatar displaying an image with admin role badge and tooltip on hover.",
+          "A picture with the admin badge at its bottom corner; hover the badge to read its tooltip (`withTooltip`, `tooltipContent`).",
       },
       source: {
         code: `<Avatar
@@ -253,8 +292,6 @@ export const WithInitials: Story = {
     userName: "John Doe",
     editing: false,
     hideRoleIcon: false,
-    tooltipContent: "John Doe - Guest",
-    withTooltip: true,
   },
   parameters: {
     docs: {
@@ -267,8 +304,6 @@ export const WithInitials: Story = {
   size={AvatarSize.max}
   role={AvatarRole.guest}
   userName="John Doe"
-  withTooltip
-  tooltipContent="John Doe - Guest"
 />`,
       },
     },
@@ -326,7 +361,7 @@ export const AllSizes: Story = {
     docs: {
       description: {
         story:
-          "All available avatar sizes: min (32px), small (36px), base (40px), medium (48px), big (80px), max (124px).",
+          "All seven sizes side by side: max (124px), big (80px), medium (48px), base (40px), small (36px), min (32px) and extraSmall (24px); the initials and the admin badge shrink with the avatar.",
       },
       source: {
         code: `<Avatar size={AvatarSize.min} role={AvatarRole.admin} userName="John Doe" />
@@ -334,7 +369,8 @@ export const AllSizes: Story = {
 <Avatar size={AvatarSize.base} role={AvatarRole.admin} userName="John Doe" />
 <Avatar size={AvatarSize.medium} role={AvatarRole.admin} userName="John Doe" />
 <Avatar size={AvatarSize.big} role={AvatarRole.admin} userName="John Doe" />
-<Avatar size={AvatarSize.max} role={AvatarRole.admin} userName="John Doe" />`,
+<Avatar size={AvatarSize.max} role={AvatarRole.admin} userName="John Doe" />
+<Avatar size={AvatarSize.extraSmall} role={AvatarRole.admin} userName="John Doe" />`,
       },
     },
   },
@@ -368,7 +404,7 @@ export const AllRoles: Story = {
     docs: {
       description: {
         story:
-          "All available role badges: owner (crown), admin, user, guest, manager, collaborator, and none.",
+          "Every `role` value on the same avatar: only Owner and Admin draw a badge at the bottom corner, User, Guest, Manager, Collaborator and None draw none.",
       },
       source: {
         code: `<Avatar size={AvatarSize.big} role={AvatarRole.owner} userName="Owner" />
@@ -392,8 +428,6 @@ export const GroupAvatar: Story = {
     userName: "Project Team",
     isGroup: true,
     hideRoleIcon: true,
-    tooltipContent: "Project Team Group",
-    withTooltip: true,
   },
   parameters: {
     docs: {
@@ -424,12 +458,15 @@ export const EditingMode: Story = {
     editing: true,
     hideRoleIcon: true,
     hasAvatar: false,
+    model: editModel,
+    // Set so no onClick action is injected: one would replace the edit behaviour.
+    onClick: undefined,
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Avatar in editing mode showing the plus button for upload. Only available at max size.",
+          "A person with no picture yet: the plus button at the corner, or a click anywhere on the avatar, opens the file dialog straight away through the first `model` action, and the chosen file reaches `onChangeFile`. The button is drawn only at `size` `max`.",
       },
       source: {
         code: `<Avatar
@@ -439,6 +476,15 @@ export const EditingMode: Story = {
   editing
   hideRoleIcon
   hasAvatar={false}
+  model={[
+    {
+      key: AvatarActionKeys.PROFILE_AVATAR_UPLOAD,
+      label: "Upload picture",
+      icon: iconUrl,
+      onClick: (ref) => ref?.current?.click(),
+    },
+  ]}
+  onChangeFile={handleFile}
 />`,
       },
     },
@@ -450,18 +496,20 @@ export const EditingWithAvatar: Story = {
   args: {
     size: AvatarSize.max,
     role: AvatarRole.owner,
-    source:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face",
+    source: samplePicture,
     userName: "Jane Smith",
     editing: true,
     hideRoleIcon: true,
     hasAvatar: true,
+    model: editModel,
+    // Set so no onClick action is injected: one would replace the edit behaviour.
+    onClick: undefined,
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Avatar in editing mode with existing image showing pencil edit button.",
+          "A person who already has a picture: the pencil at the corner, or a click on the avatar, opens a menu of the `model` actions — **Upload picture** opens the file dialog, **Delete picture** runs its own handler.",
       },
       source: {
         code: `<Avatar
@@ -472,6 +520,21 @@ export const EditingWithAvatar: Story = {
   editing
   hideRoleIcon
   hasAvatar
+  model={[
+    {
+      key: AvatarActionKeys.PROFILE_AVATAR_UPLOAD,
+      label: "Upload picture",
+      icon: iconUrl,
+      onClick: (ref) => ref?.current?.click(),
+    },
+    {
+      key: AvatarActionKeys.PROFILE_AVATAR_DELETE,
+      label: "Delete picture",
+      icon: iconUrl,
+      onClick: handleDelete,
+    },
+  ]}
+  onChangeFile={handleFile}
 />`,
       },
     },
@@ -523,41 +586,6 @@ export const WithCustomRoleIcon: Story = {
   },
 };
 
-export const CssCustomization: Story = {
-  render: () => (
-    <div
-      style={
-        {
-          display: "flex",
-          gap: "16px",
-          alignItems: "center",
-          "--avatar-radius": "8px",
-          "--avatar-initials-weight": "400",
-          "--avatar-initials-bg": "#7c3aed",
-        } as CSSProperties
-      }
-    >
-      <AvatarPure size={AvatarSize.big} userName="John Doe" role={AvatarRole.admin} />
-      <AvatarPure size={AvatarSize.big} userName="Jane Smith" role={AvatarRole.user} />
-      <AvatarPure size={AvatarSize.medium} userName="AB" role={AvatarRole.guest} />
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--avatar-radius\` | Border radius | \`50%\` |
-| \`--avatar-bg\` | Background color (no image/initials) | theme token |
-| \`--avatar-initials-bg\` | Background color when showing initials | theme token |
-| \`--avatar-initials-weight\` | Font weight of initials | \`600\` |`,
-      },
-    },
-  },
-};
-
 export const DefaultSource: Story = {
   render: (args) => <AvatarPure {...args} />,
   args: {
@@ -580,6 +608,112 @@ export const DefaultSource: Story = {
   role={AvatarRole.user}
   isDefaultSource
 />`,
+      },
+    },
+  },
+};
+
+const RightToLeftTemplate = () => {
+  return (
+    <div dir="rtl">
+      <Wrapper>
+        <AvatarPure
+          size={AvatarSize.big}
+          role={AvatarRole.admin}
+          userName="John Doe"
+          withTooltip
+          tooltipContent="Admin"
+        />
+        <AvatarPure
+          size={AvatarSize.max}
+          role={AvatarRole.none}
+          source={samplePicture}
+          editing
+          hasAvatar
+          model={editModel}
+          onChangeFile={fn()}
+        />
+      </Wrapper>
+    </div>
+  );
+};
+
+// Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
+export const RightToLeft: Story = {
+  render: () => <RightToLeftTemplate />,
+  globals: { direction: "rtl" },
+  parameters: {
+    noPadding: true,
+    docs: {
+      story: { inline: false, height: "150px" },
+      description: {
+        story:
+          'The same avatars under a right-to-left interface: the admin badge and the pencil move from the bottom-right corner to the bottom-left one, and the badge tooltip opens to the left of it. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+      },
+      source: {
+        code: `<div dir="rtl">
+  <Avatar
+    size={AvatarSize.big}
+    role={AvatarRole.admin}
+    userName="John Doe"
+    withTooltip
+    tooltipContent="Admin"
+  />
+  <Avatar
+    size={AvatarSize.max}
+    role={AvatarRole.none}
+    source={pictureUrl}
+    editing
+    hasAvatar
+    model={model}
+    onChangeFile={handleFile}
+  />
+</div>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          display: "flex",
+          gap: "16px",
+          alignItems: "center",
+          "--avatar-radius": "8px",
+          "--avatar-initials-weight": "400",
+          "--avatar-initials-bg": "#7c3aed",
+          "--avatar-bg": "#c4b5fd",
+        } as CSSProperties
+      }
+    >
+      <AvatarPure
+        size={AvatarSize.big}
+        userName="John Doe"
+        role={AvatarRole.admin}
+      />
+      <AvatarPure size={AvatarSize.big} role={AvatarRole.user} />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `Four variables set on one wrapper -- the variables are listed under CSS variables on this page. The first avatar, with initials, shows the radius, the initials background and the weight; the second, with neither picture nor name, is there for \`--avatar-bg\`.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--avatar-radius": "8px",
+    "--avatar-initials-weight": "400",
+    "--avatar-initials-bg": "#7c3aed",
+    "--avatar-bg": "#c4b5fd",
+  }}
+>
+  <Avatar size={AvatarSize.big} role={AvatarRole.admin} userName="John Doe" />
+  <Avatar size={AvatarSize.big} role={AvatarRole.user} />
+</div>`,
       },
     },
   },

@@ -1,58 +1,37 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
+import type { AriaAttributes } from "react";
 
 import type { AsideHeaderProps } from "./aside-header";
 
 /**
  * Props for the Aside component.
  */
-export type AsideProps = AsideHeaderProps & {
-  /** Controls the visibility of the aside panel */
-  visible: boolean;
-  /** Enables scaling animation */
-  scale?: boolean;
-  /** Additional CSS class names */
-  className?: string;
-  /** Sets the z-index of the aside panel */
-  zIndex?: number;
-  /** Content to be rendered inside the aside panel */
-  children: React.ReactNode;
-  /** Disables body scroll when aside is open */
-  withoutBodyScroll?: boolean;
-  /** Callback function when the aside is closed */
-  onClose?: () => void;
-  /** Removes the header section if true */
-  withoutHeader?: boolean;
-};
+export type AsideProps = AsideHeaderProps &
+  AriaAttributes & {
+    /** Whether the panel is slid in. It only switches a CSS transform — the
+     * panel and its children stay mounted and in the tab order either way, so
+     * render the component conditionally to close it properly. */
+    visible: boolean;
+    /** Makes the panel take the full width of the viewport instead of its
+     * 480px.
+     * @default false */
+    scale?: boolean;
+    /** Applied to the `<aside>` element. */
+    className?: string;
+    /** Stacking order of the panel. It sits above the page but below nothing
+     * in particular — a `Backdrop` of your own needs a lower value.
+     * @default 400 */
+    zIndex?: number;
+    /** Content of the panel, below the header. */
+    children: React.ReactNode;
+    /** Renders the children directly instead of inside the kit's `Scrollbar`.
+     * It does **not** lock the page's scroll, despite the name.
+     * @default false */
+    withoutBodyScroll?: boolean;
+    /** Called by the header's close cross. Nothing else closes the panel: there
+     * is no backdrop, no Escape handling and no click-outside. */
+    onClose?: () => void;
+    /** Renders no header at all — which also removes the only control that
+     * calls `onClose`.
+     * @default false */
+    withoutHeader?: boolean;
+  };

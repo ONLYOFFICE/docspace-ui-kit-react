@@ -120,6 +120,14 @@
   }
 }
 
+.stickyHeaderOuter {
+  position: sticky;
+  position: -webkit-sticky;
+  z-index: 1;
+  padding-bottom: 20px;
+  background: var(--tabs-primary-bg, var(--tabs-background-color-primary));
+}
+
 .sticky {
   height: var(--tabs-height-primary);
   position: sticky;

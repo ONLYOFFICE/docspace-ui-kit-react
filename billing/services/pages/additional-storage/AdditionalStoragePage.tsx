@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { useState, useRef, useEffect } from "react";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
@@ -51,13 +16,16 @@ import BalanceAmount from "../../../shared/balance-amount";
 import SettingsIcon from "../../../../assets/icons/16/catalog-settings-common.svg";
 import PencilIcon from "../../../../assets/pencil.react.svg";
 import RemoveSessionIcon from "../../../../assets/remove.session.svg";
+import AlertIcon from "../../../../assets/plugin.incompatible.react.svg";
 
 import TransactionHistory from "../../../shared/transaction-history";
 import styles from "./AdditionalStoragePage.module.scss";
 import { DISK_STORAGE, STORAGE_ENUM } from "../../../constants";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
+import UnlinkedCardBanner from "../../../shared/unlinked-card-banner";
+import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import { calculateTotalPrice, getConvertedSize } from "../../../utils/common";
-import { useApi } from "../../../../providers";
+import { useApi } from "../../../../providers/api";
 import { toastr } from "../../../../components/toast";
 import StoragePlanUpgrade from "../../panels/additional-storage/StoragePlanUpgrade";
 import StoragePlanCancel from "../../panels/additional-storage/StoragePlanCancel";
@@ -69,6 +37,7 @@ import { useServicesActions } from "../../hooks/useServicesActions";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
 import StorageTariffDeactivated from "../../../dialogs/StorageTariffDeactivated";
+import RemoveStorageSubscription from "../../../dialogs/RemoveStorageSubscription";
 
 type AdditionalStoragePageProps = {
   fetchPortalTariff?: () => Promise<void>;
@@ -92,6 +61,9 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     isShowStorageTariffDeactivatedModal,
     setStorageDeactivationVisited,
     isServiceActionDisabled,
+    isShowPreviousStoragePlan,
+    showUnlinkedCardBanner,
+    walletBalance = 0,
   } = paymentStore;
 
   const {
@@ -102,6 +74,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     previousStoragePlanSize,
     isGracePeriod,
     hasStorageSubscription = false,
+    isDelayedPaymentMethod,
     fetchPortalTariff,
   } = paymentStore.tariff;
 
@@ -113,6 +86,11 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
   const [isCancelDialogVisible, setIsCancelDialogVisible] = useState(false);
   const [isCancelLoading, setIsCancelLoading] = useState(false);
   const [isGracePeriodModalVisible, setIsGracePeriodModalVisible] =
+    useState(false);
+  const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
+  const openTopUpDialog = () => setIsTopUpDialogVisible(true);
+  const closeTopUpDialog = () => setIsTopUpDialogVisible(false);
+  const [isRemovePreviousPlanVisible, setIsRemovePreviousPlanVisible] =
     useState(false);
 
   useEffect(() => {
@@ -196,10 +174,19 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
   const onCloseGracePeriod = () => {
     setIsGracePeriodModalVisible(false);
   };
-  const monthlyPrice = calculateTotalPrice(
-    currentStoragePlanSize,
-    storagePriceIncrement,
-  );
+  const planSize = isShowPreviousStoragePlan
+    ? previousStoragePlanSize
+    : currentStoragePlanSize;
+
+  const monthlyPrice = calculateTotalPrice(planSize, storagePriceIncrement);
+  const renewalShortfall = Math.max(0, Math.ceil(monthlyPrice - walletBalance));
+  const isDelayedPaymentTopUp = isDelayedPaymentMethod && renewalShortfall > 0;
+
+  const getRenewLabel = () => {
+    if (renewalShortfall <= 0) return t("RenewSubscription");
+    if (isDelayedPaymentMethod) return t("TopUpWallet");
+    return t("TopUpAndRenew");
+  };
   const balance = formatWalletCurrency();
 
   const contextMenuItems = [
@@ -216,10 +203,6 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
       onClick: openCancelDialog,
     },
   ];
-
-  const keyProp = isScheduled
-    ? { tKey: "SubscriptionAutoCancellation" }
-    : { tKey: "SubscriptionWillBeAutomaticallyRenewed" };
 
   if (shouldShowLoader) return <AdditionalStoragePageLoader />;
 
@@ -244,7 +227,32 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         description={t("AdjustStorageToExactAmount")}
       />
 
-      <WalletInfo shortView withoutBackground balance={balance} />
+      {isShowPreviousStoragePlan ? (
+        <div className={styles.deactivatedBanner}>
+          <span className={styles.deactivatedBannerIcon} aria-hidden="true">
+            <AlertIcon />
+          </span>
+          <div className={styles.deactivatedBannerText}>
+            <Text className={styles.deactivatedTitle}>
+              {t("SubscriptionDeactivated")}
+            </Text>
+            <Text className={styles.deactivatedDescription}>
+              {t("SubscriptionDeactivatedDescription")}
+            </Text>
+          </div>
+        </div>
+      ) : null}
+
+      <WalletInfo
+        withoutBackground
+        balance={balance}
+        onTopUp={openTopUpDialog}
+      />
+      {showUnlinkedCardBanner ? (
+        <div className={styles.unlinkedBanner}>
+          <UnlinkedCardBanner />
+        </div>
+      ) : null}
 
       {isScheduled ? (
         <div style={{ marginTop: 16 }}>
@@ -257,99 +265,153 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         </div>
       ) : null}
 
-      <div className={styles.subscriptionCard}>
-        <div className={styles.subscriptionHeader}>
-          <Text fontWeight={700} fontSize="14px">
-            {previousStoragePlanSize
-              ? t("NoActiveSubscription")
-              : t("CurrentSubscription")}
-          </Text>
-          {isDisabled || isScheduled || previousStoragePlanSize ? null : (
-            <>
-              <div
-                className={styles.settingsIcon}
-                onClick={(e) => contextMenuRef.current?.show(e)}
-              >
-                <SettingsIcon />
-              </div>
-              <ContextMenu ref={contextMenuRef} model={contextMenuItems} />
-            </>
-          )}
-        </div>
-
-        {currentStoragePlanSize ? (
-          <div className={styles.priceContainer}>
-            <BalanceAmount
-              amount={monthlyPrice}
-              currency={walletCodeCurrency}
-              language={paymentStore.language}
-              showRefresh={false}
-              withoutMargin
-              mainFontSize="28px"
-              fractionFontSize="20px"
-            />
-            <Text fontWeight={700} fontSize="20px">
-              <CommonTrans
-                i18nKey="SizePerMonth"
-                values={{
-                  size: `${currentStoragePlanSize} ${t("Gigabyte")}`,
-                }}
-                components={{
-                  1: (
-                    <Text
-                      as="span"
-                      fontSize="20px"
-                      className={styles.sizeText}
-                      fontWeight={700}
-                    />
-                  ),
-                }}
-              />
+      <div className={styles.subscriptionSection}>
+        {isShowPreviousStoragePlan ? (
+          <div className={styles.subscriptionHeader}>
+            <Text fontWeight={700} fontSize="14px">
+              {t("PreviousSubscription")}
             </Text>
+            <span className={styles.statusBadge}>{t("Inactive")}</span>
+          </div>
+        ) : !hasStorageSubscription ? (
+          <div className={styles.noSubscriptionCard}>
+            <Text fontWeight={700} fontSize="14px">
+              {t("NoActiveSubscription")}
+            </Text>
+            <Button
+              label={t("BuyStorage")}
+              size={ButtonSize.small}
+              primary
+              onClick={openUpgradeDialog}
+              isDisabled={isDisabled}
+              scale
+            />
+          </div>
+        ) : (
+          <div className={styles.subscriptionHeader}>
+            <Text fontWeight={700} fontSize="14px">
+              {t("CurrentSubscription")}
+            </Text>
+            {isDisabled || isScheduled ? null : (
+              <>
+                <div
+                  className={styles.settingsIcon}
+                  onClick={(e) => contextMenuRef.current?.show(e)}
+                >
+                  <SettingsIcon />
+                </div>
+                <ContextMenu ref={contextMenuRef} model={contextMenuItems} />
+              </>
+            )}
+          </div>
+        )}
+
+        {planSize ? (
+          <div
+            className={`${styles.summaryGrid} ${
+              isShowPreviousStoragePlan ? styles.summaryGridMuted : ""
+            }`}
+          >
+            <div className={styles.summaryCard}>
+              <Text className={styles.cardLabel}>{t("MonthlyCharge")}</Text>
+              <BalanceAmount
+                amount={monthlyPrice}
+                currency={walletCodeCurrency}
+                language={paymentStore.language}
+                showRefresh={false}
+                withoutMargin
+                mainFontSize="18px"
+                fractionFontSize="12px"
+                className={styles.cardAmount}
+              />
+              <Text className={styles.cardCaption}>
+                {t("PerStorage", {
+                  currency: formatWalletCurrency(storagePriceIncrement, 2),
+                  amount: getConvertedSize(t, storageSizeIncrement || 0),
+                })}
+              </Text>
+            </div>
+
+            <div className={styles.summaryCard}>
+              <Text className={styles.cardLabel}>{t("StorageAdded")}</Text>
+              <Text className={styles.cardValue}>
+                {`${planSize} ${t("Gigabyte")}`}
+              </Text>
+              <Text className={styles.cardCaption}>
+                {t("AdditionalDiskSpace")}
+              </Text>
+            </div>
           </div>
         ) : null}
 
-        {isScheduled ? null : (
-          <Button
-            className={styles.increaseButton}
-            label={
-              previousStoragePlanSize ? t("BuyStorage") : t("EditSubscription")
-            }
-            size={ButtonSize.small}
-            primary
-            onClick={openUpgradeDialog}
-            isDisabled={isDisabled}
-          />
-        )}
-      </div>
+        {isShowPreviousStoragePlan ? (
+          <div className={styles.actionRow}>
+            <Button
+              label={getRenewLabel()}
+              size={ButtonSize.small}
+              primary
+              onClick={
+                isDelayedPaymentTopUp ? openTopUpDialog : openUpgradeDialog
+              }
+              isDisabled={isDisabled}
+            />
+            <Button
+              label={t("RemoveSubscription")}
+              size={ButtonSize.small}
+              onClick={() => setIsRemovePreviousPlanVisible(true)}
+            />
+          </div>
+        ) : !isScheduled || currentStoragePlanSize ? (
+          <div className={styles.actionRow}>
+            {currentStoragePlanSize && !isScheduled ? (
+              <Button
+                label={t("EditSubscription")}
+                size={ButtonSize.small}
+                primary
+                onClick={openUpgradeDialog}
+                isDisabled={isDisabled}
+                className="edit-subscription"
+              />
+            ) : null}
 
-      {currentStoragePlanSize ? (
-        <Text className={styles.renewalText}>
-          {isDowngrade ? (
-            <CommonTrans
-              i18nKey="SubscriptionAutoRenewedWithUpdate"
-              values={{
-                finalDate: storageExpiryDate,
-                price: formatWalletCurrency(getTotalNextStoragePrice(), 2),
-                amount: `${nextStoragePlanSize} ${t("Gigabyte")}`,
-              }}
-              components={{
-                1: <Text fontWeight="600" as="span" />,
-              }}
-            />
-          ) : (
-            <CommonTrans
-              i18nKey={keyProp.tKey}
-              values={{
-                finalDate: storageExpiryDate,
-              }}
-              components={{
-                1: <Text fontWeight="600" as="span" />,
-              }}
-            />
-          )}
-        </Text>
-      ) : null}
+            {currentStoragePlanSize ? (
+              <Text className={styles.renewalText}>
+                {isDowngrade ? (
+                  <CommonTrans
+                    i18nKey="SubscriptionAutoRenewedWithUpdate"
+                    values={{
+                      finalDate: storageExpiryDate,
+                      price: formatWalletCurrency(
+                        getTotalNextStoragePrice(),
+                        2,
+                      ),
+                      amount: `${nextStoragePlanSize} ${t("Gigabyte")}`,
+                    }}
+                    components={{
+                      1: <Text fontWeight="600" as="span" />,
+                    }}
+                  />
+                ) : isScheduled ? (
+                  // Each key written out in `i18nKey="..."`: scripts/copy-locales.js
+                  // finds the keys to vendor by that literal, and a key chosen
+                  // through a variable never reached locales/en.
+                  <CommonTrans
+                    i18nKey="SubscriptionAutoCancellation"
+                    values={{ finalDate: storageExpiryDate }}
+                    components={{ 1: <Text fontWeight="600" as="span" /> }}
+                  />
+                ) : (
+                  <CommonTrans
+                    i18nKey="SubscriptionWillBeAutomaticallyRenewed"
+                    values={{ finalDate: storageExpiryDate }}
+                    components={{ 1: <Text fontWeight="600" as="span" /> }}
+                  />
+                )}
+              </Text>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
 
       <div className={styles.transactionSection}>
         <TransactionHistory
@@ -368,7 +430,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         <StoragePlanUpgrade
           visible={isStorageDialogVisible}
           onClose={onCloseUpgradeStorage}
-          {...(previousStoragePlanSize && {
+          {...(isShowPreviousStoragePlan && {
             previousValue: previousStoragePlanSize.toString(),
           })}
         />
@@ -385,9 +447,22 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
           onClose={onCloseGracePeriod}
         />
       ) : null}
+      {isRemovePreviousPlanVisible ? (
+        <RemoveStorageSubscription
+          visible={isRemovePreviousPlanVisible}
+          onClose={() => setIsRemovePreviousPlanVisible(false)}
+        />
+      ) : null}
+      {isTopUpDialogVisible ? (
+        <SimpleTopUpDialog
+          visible={isTopUpDialogVisible}
+          onClose={closeTopUpDialog}
+          minValue={isDelayedPaymentTopUp ? `${renewalShortfall}` : undefined}
+          serviceName={storageServiceName ?? DISK_STORAGE}
+        />
+      ) : null}
     </div>
   );
 };
 
 export default observer(AdditionalStoragePage);
-

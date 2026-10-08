@@ -1,51 +1,30 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { TextProps } from "../text";
 
 type PickedTextProps = Pick<TextProps, "fontWeight" | "fontSize">;
 
-type PickedHtmlElementProps = Pick<
-  React.HTMLAttributes<HTMLElement>,
-  "id" | "className" | "style"
->;
+// Declared here rather than picked out of React's attribute interfaces: a
+// picked prop carries React's documentation, which for these is none at all,
+// and each of them does something specific to this component.
+type ElementProps = {
+  /** Applied to the outer element **and** to the inner `<label>`, so it appears
+   * twice in the document. */
+  id?: string;
+  /** Applied to the outer element **and** to the inner `<label>`. */
+  className?: string;
+  /** Applied to the outer element **and** to the inner `<label>`, so a margin
+   * or a padding set here takes effect at both levels. */
+  style?: React.CSSProperties;
+};
 
-type PickedInputProps = Pick<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  "name" | "onChange"
->;
+type InputProps = {
+  /** Name of the hidden checkbox input, for a form that reads the control by
+   * name rather than by state. */
+  name?: string;
+  /** Called with the checkbox's change event; the new state is
+   * `event.target.checked`. Required in practice, since `isChecked` makes the
+   * input controlled. */
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+};
 
 /** Props for the toggle icon SVG component */
 export type ToggleIconProps = Pick<
@@ -55,20 +34,28 @@ export type ToggleIconProps = Pick<
 
 /** Props for the main ToggleButton component */
 export type ToggleButtonProps = PickedTextProps &
-  PickedHtmlElementProps &
-  PickedInputProps & {
-    /** Label text to display next to the toggle */
+  ElementProps &
+  InputProps & {
+    /** Text rendered beside the switch, in a `Text` span. Omit it and the
+     * component is the 28×16 switch alone. */
     label?: string;
-    /** Whether the toggle is in checked state */
+    /** Whether the switch is on. The control is fully controlled: this is the
+     * `checked` of a real checkbox input, so pass `onChange` with it or React
+     * warns and the switch never moves. */
     isChecked?: boolean;
-    /** Whether the toggle is disabled */
+    /** Disables the underlying input and stops pointer events on the whole
+     * control, and dims the switch and the label. */
     isDisabled?: boolean;
-    /** Whether the toggle is in loading state */
+    /** Pulses the knob to show work in progress. It does **not** disable the
+     * control — a click during it still reaches `onChange`. */
     isLoading?: boolean;
-    /** Whether animations are disabled */
+    /** Runs the state transitions with a duration of zero instead of animating
+     * them. The animation is otherwise always on. */
     noAnimation?: boolean;
-    /** Data test id for the toggle button */
+    /** Value of `data-testid` on the outer element.
+     * @default "toggle-button" */
     dataTestId?: string;
-    /** Data tooltip id for the toggle button */
+    /** Value of `data-tooltip-id` on the outer element, which is how a
+     * `Tooltip` elsewhere in the tree anchors itself to this control. */
     dataTooltipId?: string;
   };

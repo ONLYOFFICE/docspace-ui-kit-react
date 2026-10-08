@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 @use "../../styles/mixins";
 @use "../../styles/variables/colors";
 
@@ -454,6 +419,22 @@
   }
 }
 
+.buttonsContainer {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+  margin-inline-start: 20px;
+
+  // The AI chat slot carries an inline width (its measured labelled width), so
+  // this row's automatic min-content floor would otherwise be that full width
+  // and flex would refuse to squeeze it - the label could never collapse no
+  // matter how narrow the header got. Releasing the floor lets the deficit
+  // reach the slot once .container has bottomed out; the slot's own
+  // `min-width: 32px` is what actually stops the shrink, at the bare icon.
+  min-width: 0;
+}
+
 .infoPanelToggleWrapper {
   // bridge var
   --navigation-info-panel-bg-v: var(
@@ -462,28 +443,30 @@
   );
 
   align-self: center;
-  margin-inline-start: 20px;
   padding: 0;
 
   :global {
-    .info-panel-toggle {
-      margin-inline-end: 8px;
+    // One constant 32x32 footprint (30px box + 1px border) for both states.
+    // The active state used to be the only one with a box, so switching the
+    // info panel on grew this wrapper by 8px and shoved the controls beside
+    // it sideways. Centring the icon here puts it in exactly the same place
+    // the old 8px trailing margin did, so the icon itself does not move.
+    .info-panel-toggle-bg {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 30px;
+      width: 30px;
+      border: 1px solid transparent;
+      border-radius: 50%;
     }
   }
 
   &[data-visible="true"] {
     :global {
       .info-panel-toggle-bg {
-        height: 30px;
-        width: 30px;
         background: var(--navigation-info-panel-bg-v);
-        border: 1px solid var(--navigation-info-panel-bg-v);
-        border-radius: 50%;
-
-        .info-panel-toggle {
-          margin: auto;
-          margin-top: 25%;
-        }
+        border-color: var(--navigation-info-panel-bg-v);
 
         path {
           fill: var(--accent-main) !important;
@@ -506,6 +489,99 @@
       margin-inline-start: auto;
     }
   }
+}
+
+// "AI chat" button. The slot always asks the row for the full labelled width
+// (set inline from the measured mirror) and is allowed to shrink to the bare
+// icon, so AiChatBtn can read "the label no longer fits" straight off
+// `clientWidth`. Collapsing never changes what the slot requests, so the
+// measurement cannot feed back into itself. See AiChatBtn.tsx.
+.aiChatSlot {
+  --navigation-chat-radius-v: var(--navigation-chat-radius, 6px);
+
+  position: relative;
+  align-self: center;
+  display: flex;
+  align-items: center;
+
+  // Keeping the request at the full labelled width is what stops the collapse
+  // from feeding back into its own measurement, but it means a collapsed
+  // button is narrower than the space the slot still holds. Park it at the
+  // trailing edge so that leftover sits behind the preceding controls instead
+  // of opening a gap between the button and the edge of the header.
+  justify-content: flex-end;
+
+  // Shrink target: the bare icon button, 34px wide - see COLLAPSED_WIDTH in
+  // AiChatBtn.tsx for where the 34 comes from. Shrinking below it would clip
+  // the icon itself.
+  flex: 0 1 auto;
+  min-width: 34px;
+  overflow: hidden;
+
+  :global {
+    .ai-chat-button {
+      flex: 0 0 auto;
+      height: 32px;
+      padding: 6px 10px;
+      border-radius: var(--navigation-chat-radius-v);
+      white-space: nowrap;
+
+      .button-content {
+        gap: 8px;
+      }
+
+      .icon {
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  // No room for the label: keep the icon only. The label stays in the DOM so
+  // Button's aria-label still names the control.
+  &[data-collapsed="true"] {
+    :global {
+      // Must not match the mirror. The mirror is what `naturalWidth` is
+      // measured from, so collapsing it would shrink the measurement to the
+      // icon width, which immediately un-collapses the button, which
+      // re-expands the mirror - the two states then alternate every frame and
+      // the button visibly flickers.
+      .ai-chat-button:not(.ai-chat-button_mirror) {
+        padding-inline: 8px;
+
+        // Button renders `div.icon` + the label span as siblings; drop only
+        // the label. `:not(.icon)` keeps this correct even if the icon
+        // wrapper ever changes element type.
+        .button-content > span:not(.icon) {
+          display: none;
+        }
+      }
+    }
+  }
+
+  // Panel open: the design system's pressed accent tint.
+  &[data-open="true"] {
+    :global {
+      .ai-chat-button {
+        background-color: var(--button-background-accent-active);
+      }
+    }
+  }
+}
+
+.aiChatMirror {
+  position: absolute;
+  top: 0;
+  inset-inline-start: 0;
+  // Intrinsic width regardless of how narrow the slot has been squeezed.
+  width: max-content;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.aiChatIconSpacer {
+  display: block;
+  width: 16px;
+  height: 16px;
 }
 
 .box {
@@ -575,6 +651,16 @@
   display: grid;
   align-items: center;
   height: 100%;
+
+  // The header row splits any width deficit between this grid and
+  // .buttonsContainer. Flex hands that deficit out in proportion to base
+  // sizes, and this grid's base is the whole row, so the AI chat button would
+  // otherwise lose ~17px - and drop its label - while the title still had
+  // plenty of room to truncate. A far larger shrink factor makes this side
+  // give up space first; .buttonsContainer is only squeezed once the title
+  // and control buttons have bottomed out at their min-content widths.
+  // No-op for hosts whose .buttonsContainer cannot shrink at all.
+  flex-shrink: 1000;
 
   &[data-is-drop-box-component="false"][data-is-desktop="true"][data-is-public-room="false"] {
     width: 100%;
@@ -704,6 +790,12 @@
       gap: 8px;
 
       @include mixins.truncate;
+
+      // `truncate` only clips what already has a width to clip against. As a
+      // grid item this box still has an automatic min-content floor, so without
+      // this it sizes to the untruncated title and the ellipsis never appears -
+      // the overflow is pushed onto the trailing controls instead.
+      min-width: 0;
     }
 
     .navigation-header-separator {
@@ -729,6 +821,11 @@
       @include mixins.truncate;
       min-height: 33px;
       gap: 8px;
+
+      // Same reason as `.badges-container` above: this is the flex item that
+      // actually carries the name, so it needs its own floor released for the
+      // ellipsis to land here rather than the name overflowing its parent.
+      min-width: 0;
 
       @include mixins.mobile {
         min-height: auto;
@@ -756,7 +853,12 @@
   &[data-show-title="true"] {
     :global {
       .title-block {
-        min-width: 43px;
+        // Keeps a sliver of the name visible instead of letting it collapse to
+        // nothing, but capped at the space actually available: as a plain
+        // `min-width` this was a hard floor that outranked the `min-width: 0`
+        // the ellipsis needs, so on a narrow header the name overflowed onto
+        // the trailing controls rather than truncating.
+        min-width: min(43px, 100%);
       }
     }
   }
@@ -764,18 +866,43 @@
   @include mixins.tablet-and-below {
     width: 100%;
 
-    grid-template-columns: 49px 1fr auto;
+    // The title takes what it needs and the trailing controls take the rest -
+    // the same shape as the desktop rules above and as the
+    // `[data-show-navigation-button="true"]` rule, which is the one layout in
+    // this file that already got the tablet header right.
+    //
+    // `1fr` on the title was the other way round, and `1fr` is greedy: it took
+    // every pixel the title's own `auto` neighbour did not claim, leaving the
+    // control column at the 90px `min-width` of `.controlButtonContainer` no
+    // matter how empty the header was. That column carries the tariff line,
+    // so on a 1023px header the line came out 40px wide - "Try the Bus..." -
+    // with 750px of nothing beside it. The floor keeps the controls whole the
+    // other way too: a long folder name now truncates instead of squeezing
+    // them, which is the order the header is supposed to degrade in.
+    // `minmax(0, auto)` rather than a bare `auto` on the title: an `auto` track
+    // refuses to go below its own min-content, and the title's min-content is
+    // the whole untruncated room name. On a phone that is wider than the header
+    // itself, so the track kept its full width, the trailing control column was
+    // pushed past the header's edge and the AI chat button ended up underneath
+    // the name. Releasing the floor lets the track shrink, which is what
+    // actually puts the ellipsis in - the controls keep their own `minmax`
+    // floor, so the degradation order is unchanged.
+    grid-template-columns: 49px minmax(0, auto) minmax(186px, 1fr);
 
     &[data-is-root-folder="true"][data-with-logo="true"] {
-      grid-template-columns: 59px 1fr auto;
+      grid-template-columns: 59px minmax(0, auto) minmax(186px, 1fr);
     }
 
     &[data-is-root-folder="true"][data-with-logo="false"] {
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(0, auto) minmax(186px, 1fr);
     }
 
+    // Same flip as above. This one is the framed/SDK header, which the client
+    // E2E suite cannot reach, so it follows the other three by symmetry rather
+    // than from a measurement - leaving it inverted would just park the same
+    // bug where nothing here can see it.
     &[data-with-logo="true"] {
-      grid-template-columns: 43px 49px 1fr auto;
+      grid-template-columns: 43px 49px minmax(0, auto) minmax(186px, 1fr);
     }
 
     // &[data-with-chat="true"] {
@@ -783,15 +910,17 @@
     // }
 
     &[data-is-root-folder="false"][data-is-frame="true"][data-is-frame-logo="true"] {
-      grid-template-columns: 49px 49px 1fr auto;
+      grid-template-columns: 49px 49px minmax(0, auto) 1fr;
     }
 
     &[data-is-root-folder="true"][data-is-frame="true"][data-with-logo="true"] {
-      grid-template-columns: 59px auto 1fr auto;
+      grid-template-columns: 59px minmax(0, auto) minmax(0, auto) 1fr;
     }
   }
 
   @include mixins.mobile {
+    // Hiding the logo is the one part of the mobile header that is specific to
+    // the standalone app - a framed host supplies its own.
     &[data-is-frame="false"] {
       :global {
         .navigation-logo,
@@ -799,16 +928,24 @@
           display: none;
         }
       }
+    }
 
-      grid-template-columns: 29px auto 1fr !important;
+    // The grid, by contrast, applies to every mobile header. It used to be
+    // gated on `[data-is-frame="false"]` too, so a framed header (the SDK) fell
+    // through to the tablet rules on a phone and its trailing controls - the AI
+    // chat button among them - were pushed out from under a long folder name.
+    //
+    // `minmax(0, auto)` for the same reason as the tablet block above: a bare
+    // `auto` cannot shrink below the untruncated title, so the name has to be
+    // allowed to give way before anything else does.
+    grid-template-columns: 29px minmax(0, auto) 1fr !important;
 
-      &[data-is-show-back-button="true"][data-with-logo="false"][data-is-root-folder="true"] {
-        grid-template-columns: 34px auto 1fr !important;
-      }
+    &[data-is-show-back-button="true"][data-with-logo="false"][data-is-root-folder="true"] {
+      grid-template-columns: 34px minmax(0, auto) 1fr !important;
+    }
 
-      &[data-is-root-folder="true"] {
-        grid-template-columns: auto 1fr !important;
-      }
+    &[data-is-root-folder="true"] {
+      grid-template-columns: minmax(0, auto) 1fr !important;
     }
   }
 }

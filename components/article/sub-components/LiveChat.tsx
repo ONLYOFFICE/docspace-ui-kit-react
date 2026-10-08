@@ -1,144 +1,86 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { useCallback, useEffect } from "react";
 
 import { useInterfaceDirection } from "../../../context/InterfaceDirectionContext";
-import { useTheme } from "../../../context/ThemeContext";
-import { LIVE_CHAT_LOCAL_STORAGE_KEY } from "../../../constants";
+import { useIsMobile } from "../../../hooks/use-is-mobile";
+import { INFO_PANEL_WIDTH } from "../../../utils/device";
+import {
+  FLOATING_CORNER_GAP,
+  FLOATING_CORNER_INSET,
+  FLOATING_CORNER_INSET_MOBILE,
+  FLOATING_CORNER_SIZE,
+} from "../../../constants";
 import { Zendesk } from "../zendesk";
 import { zendeskAPI } from "../zendesk/Zendesk.utils";
-import { ArticleZendeskProps } from "../Article.types";
+import { ArticleLiveChatProps } from "../Article.types";
 
-import { useCommonTranslation, getTranslationReady } from "../../../utils";
+import "./LiveChat.module.scss";
 
-const baseConfig = {
-  webWidget: {
-    zIndex: 201,
-    chat: {
-      menuOptions: { emailTranscript: false },
-    },
-  },
-};
+/**
+ * Where the widget's iframes stand in the stacking order: over the page,
+ * under the app's dialogs and panels. The widget's own default is 999999.
+ */
+const Z_INDEX = 201;
 
+/**
+ * Loads the Zendesk widget and keeps its settings in step with the app: the
+ * locale, the side it opens on, the corner its launcher stands in. The
+ * launcher is the vendor's own and the only way into the chat; the app only
+ * moves it clear of whatever else it pins to that corner, and scales its
+ * iframe down to the corner's button size (LiveChat.module.scss).
+ *
+ * The account serves the messaging Web Widget, so every command goes through
+ * the `messenger` namespace. The Web Widget (Classic) `webWidget` commands are
+ * not ignored there, they throw ("Method webWidget.hide does not exist"), and
+ * the messaging widget has no API for the launcher label, the colour or a
+ * visitor prefill: those are Admin Center settings.
+ */
 const ArticleLiveChat = ({
   languageBaseName,
-  zendeskEmail,
-  chatDisplayName,
-  withMainButton,
-  isMobileArticle,
   zendeskKey,
-  showProgress,
   isShowLiveChat,
-  isInfoPanelVisible,
-}: ArticleZendeskProps) => {
-  const t = useCommonTranslation();
-  const ready = getTranslationReady();
-  const { currentColorScheme } = useTheme();
+  withFloatingButton = false,
+  isInfoPanelVisible = false,
+}: ArticleLiveChatProps) => {
   const { isRTL } = useInterfaceDirection();
-  const infoPanelOffset = isInfoPanelVisible ? 400 : 0;
+  const isMobileWidth = useIsMobile();
 
   useEffect(() => {
-    zendeskAPI.addChanges("webWidget", "updateSettings", {
-      offset:
-        withMainButton && isMobileArticle
-          ? {
-              horizontal: "68px",
-              vertical: "11px",
-            }
-          : {
-              horizontal: showProgress
-                ? `${`${infoPanelOffset + 90}px`}`
-                : `${`${infoPanelOffset + 4}px`}`,
-              vertical: "11px",
-            },
-    });
-  }, [
-    withMainButton,
-    isMobileArticle,
-    showProgress,
-    isInfoPanelVisible,
-    infoPanelOffset,
-  ]);
+    zendeskAPI.addChanges("messenger:set", "locale", languageBaseName);
+  }, [languageBaseName]);
 
   useEffect(() => {
-    zendeskAPI.addChanges("webWidget", "setLocale", languageBaseName);
+    // The launcher is the only element of the floating corner stack that CSS
+    // does not place, so it repeats the inset the others get from
+    // styles/variables/_floating-corner.scss - otherwise it lines up with
+    // nothing. It shares that corner with the app's create button and with the
+    // upload progress button, and steps one button width aside whenever either
+    // of them is on screen. Above mobile the info panel is a docked column the
+    // corner moves clear of; on a phone the panel takes the whole screen and
+    // there is nothing to step around. The offsets are pixels from the
+    // viewport edge, on both axes.
+    const inset = isMobileWidth
+      ? FLOATING_CORNER_INSET_MOBILE
+      : FLOATING_CORNER_INSET;
+    const dodge = withFloatingButton
+      ? FLOATING_CORNER_SIZE + FLOATING_CORNER_GAP
+      : 0;
+    const infoPanel =
+      isInfoPanelVisible && !isMobileWidth ? INFO_PANEL_WIDTH : 0;
+    const offset = { horizontal: inset + dodge + infoPanel, vertical: inset };
 
-    if (ready)
-      zendeskAPI.addChanges("webWidget", "updateSettings", {
-        launcher: {
-          label: {
-            "*": t("Support"),
-          },
-          chatLabel: {
-            "*": t("Support"),
-          },
-        },
-      });
-  }, [languageBaseName, ready, t]);
-
-  useEffect(() => {
-    zendeskAPI.addChanges("webWidget", "updateSettings", {
-      color: {
-        theme: currentColorScheme?.main?.accent,
+    // The widget keeps a second offset for what it takes to be a phone. It
+    // gets the same one, so the breakpoint stays ours - useIsMobile, which is
+    // what the create button's stylesheet keys off too.
+    zendeskAPI.addChanges("messenger:set", "customization", {
+      position: {
+        side: isRTL ? "left" : "right",
+        offset: { web: offset, mobile: offset },
       },
     });
-  }, [currentColorScheme?.main?.accent]);
-
-  useEffect(() => {
-    zendeskAPI.addChanges("webWidget", "prefill", {
-      email: {
-        value: zendeskEmail,
-      },
-      name: {
-        value: chatDisplayName ? chatDisplayName.trim() : "",
-      },
-    });
-  }, [zendeskEmail, chatDisplayName]);
-
-  useEffect(() => {
-    zendeskAPI.addChanges("webWidget", "updateSettings", {
-      position: { horizontal: isRTL ? "left" : "right" },
-    });
-  }, [isRTL]);
+  }, [withFloatingButton, isInfoPanelVisible, isMobileWidth, isRTL]);
 
   const onZendeskLoaded = useCallback(() => {
-    const isShowChat =
-      localStorage.getItem(LIVE_CHAT_LOCAL_STORAGE_KEY) === "true" || false;
-
-    zendeskAPI.addChanges("webWidget", isShowChat ? "show" : "hide");
+    zendeskAPI.addChanges("messenger:set", "zIndex", Z_INDEX);
   }, []);
 
   return zendeskKey ? (
@@ -146,7 +88,6 @@ const ArticleLiveChat = ({
       defer
       zendeskKey={zendeskKey}
       onLoaded={onZendeskLoaded}
-      config={baseConfig}
       isShowLiveChat={isShowLiveChat}
     />
   ) : null;

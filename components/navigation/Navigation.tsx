@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { useCallback } from "react";
 
 import { Consumer, DomHelpers } from "../../utils";
@@ -41,6 +6,7 @@ import { Backdrop } from "../backdrop";
 import ArrowButton from "./sub-components/ArrowBtn";
 import ControlButtons from "./sub-components/ControlBtn";
 import ToggleInfoPanelButton from "./sub-components/ToggleInfoPanelBtn";
+import AiChatButton from "./sub-components/AiChatBtn";
 import NavigationLogo from "./sub-components/LogoBlock";
 import DropBox from "./sub-components/DropBox";
 
@@ -97,6 +63,9 @@ const Navigation = ({
   contextMenuHeader,
   analyzeResponsesButton,
   titleTooltip,
+  toggleChatPanel,
+  isChatPanelVisible,
+  hideChatButton,
 
   ...rest
 }: TNavigationProps) => {
@@ -108,6 +77,12 @@ const Navigation = ({
   const containerRef = React.useRef<HTMLDivElement | null>(null);
 
   const isDesktop = currentDeviceType === DeviceType.desktop;
+
+  // Desktop keeps both of these in the right-hand button row; below that
+  // breakpoint the info panel toggle is dropped and the AI chat button moves
+  // into the control buttons (see ControlBtn).
+  const showChatButton = isDesktop && !!toggleChatPanel && !hideChatButton;
+  const showInfoPanelToggle = isDesktop && !hideInfoPanel;
 
   const toggleDropBox = useCallback(() => {
     if (navigationItems?.length === 0) return;
@@ -347,17 +322,35 @@ const Navigation = ({
               isPlusButtonVisible={isPlusButtonVisible}
               contextMenuHeader={contextMenuHeader}
               analyzeResponsesButton={analyzeResponsesButton}
+              toggleChatPanel={toggleChatPanel}
+              isChatPanelVisible={isChatPanelVisible}
+              hideChatButton={hideChatButton}
             />
           </div>
-
-          {isDesktop && !hideInfoPanel ? (
-            <ToggleInfoPanelButton
-              id="info-panel-toggle--open"
-              isRootFolder={isRootFolder}
-              toggleInfoPanel={toggleInfoPanel}
-              isInfoPanelVisible={isInfoPanelVisible}
-              titles={titles}
-            />
+          {/* Rendered only when it actually holds something: the container
+              carries a 20px inline-start margin, and an empty one still
+              reserves it, pushing the control buttons away from the header's
+              trailing edge below the desktop breakpoint. */}
+          {showChatButton || showInfoPanelToggle ? (
+            <div className={styles.buttonsContainer}>
+              {showChatButton ? (
+                <AiChatButton
+                  id="ai-chat-button"
+                  toggleChatPanel={toggleChatPanel!}
+                  isChatPanelVisible={isChatPanelVisible ?? false}
+                  titles={titles}
+                />
+              ) : null}
+              {showInfoPanelToggle ? (
+                <ToggleInfoPanelButton
+                  id="info-panel-toggle--open"
+                  isRootFolder={isRootFolder}
+                  toggleInfoPanel={toggleInfoPanel}
+                  isInfoPanelVisible={isInfoPanelVisible}
+                  titles={titles}
+                />
+              ) : null}
+            </div>
           ) : null}
         </>
       )}

@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { ComponentProps, CSSProperties } from "react";
 import { useState } from "react";
 
@@ -46,33 +11,8 @@ const meta = {
   title: "UI/Layout/Portal",
   component: Portal,
   parameters: {
-    docs: {
-      description: {
-        component: `Portal renders children into a DOM node outside the parent component's DOM hierarchy using React portals.
-
-### Features
-
-- **DOM Escape Hatch**: Renders content outside the parent DOM tree
-- **Custom Target**: Append to any DOM element via \`appendTo\` prop
-- **Visibility Control**: Toggle portal content visibility without unmounting
-- **Default to Body**: Renders to \`document.body\` when no target is specified
-
-### Usage
-
-\`\`\`tsx
-import { Portal } from "@docspace/ui-kit/components/portal";
-
-// Render into document.body
-<Portal element={<div>Portal content</div>} />
-
-// Render into a specific container
-<Portal element={<div>Portal content</div>} appendTo={containerRef} />
-
-// Control visibility
-<Portal element={<div>Toggleable content</div>} visible={isVisible} />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     element: {
@@ -81,16 +21,18 @@ import { Portal } from "@docspace/ui-kit/components/portal";
     },
     visible: {
       control: "boolean",
-      description: "Controls portal content visibility",
+      description:
+        "Whether the content is rendered; turning it off unmounts the content, so anything it held is lost",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     appendTo: {
-      description: "Target DOM element to append the portal to",
+      description:
+        "Element to append the content to; when it is null on a render the content goes to the end of document.body",
       control: false,
       table: {
-        defaultValue: { summary: "document.body" },
+        defaultValue: { summary: "null" },
       },
     },
   },
@@ -99,65 +41,6 @@ import { Portal } from "@docspace/ui-kit/components/portal";
 type Story = StoryObj<ComponentProps<typeof Portal>>;
 
 export default meta;
-
-const CssCustomizationTemplate = () => {
-  const [container, setContainer] = useState<HTMLElement | null>(null);
-
-  return (
-    <div
-      ref={setContainer}
-      className={styles.customContainer}
-      style={
-        {
-          // === Portal popup element ===
-          "--portal-popup-bg": "#e6f3fb",
-          "--portal-popup-shadow": "0 4px 16px rgba(0, 130, 201, 0.3)",
-          "--portal-popup-radius": "12px",
-          "--portal-popup-padding": "24px 32px",
-          "--portal-popup-color": "#004f82",
-        } as CSSProperties
-      }
-    >
-      <p>Portal target container</p>
-      {container && (
-        <Portal
-          element={
-            <div className={styles.popup}>
-              Custom styled portal content
-            </div>
-          }
-          appendTo={container}
-        />
-      )}
-    </div>
-  );
-};
-
-export const CssCustomization: Story = {
-  render: () => <CssCustomizationTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story: `CSS Custom Properties for the popup demo element used in Portal stories:
-
-**Portal popup (demo element)**
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--portal-popup-bg\` | Popup background color | \`#ffffff\` |
-| \`--portal-popup-shadow\` | Popup box shadow | \`0 4px 12px rgba(0,0,0,0.15)\` |
-| \`--portal-popup-radius\` | Popup border radius | \`6px\` |
-| \`--portal-popup-padding\` | Popup inner padding | \`20px\` |
-| \`--portal-popup-color\` | Popup text color | theme-based |
-| \`--portal-popup-z-index\` | Popup z-index | \`1000\` |
-
-> The Portal component itself is a DOM escape hatch — it has no visual styling of its own.
-> These CSS vars apply to the \`.popup\` demo element used in stories.
-> Set them on the portal target container or on \`document.body\` to customize portal content.`,
-      },
-    },
-  },
-};
 
 export const Default: Story = {
   render: (args) => {
@@ -171,14 +54,16 @@ export const Default: Story = {
     );
   },
   args: {
-    element: <div className={styles.popup}>This content is rendered in a portal</div>,
+    element: (
+      <div className={styles.popup}>This content is rendered in a portal</div>
+    ),
     visible: true,
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Default portal rendering content into a custom container element.",
+          "The content passed in `element` shows inside the dashed container that owns it, not beside the text it was declared next to (`appendTo`). Switch `visible` in the Controls panel below to unmount and mount it again.",
       },
       source: {
         code: `<Portal element={<div>Portal content</div>} visible appendTo={containerElement} />`,
@@ -206,7 +91,7 @@ export const Hidden: Story = {
     docs: {
       description: {
         story:
-          "Portal with visible set to false. The content is not rendered.",
+          "The container stays empty: with `visible` off the content is not hidden but not mounted at all, so nothing of it reaches the DOM.",
       },
       source: {
         code: `<Portal element={<div>Hidden content</div>} visible={false} appendTo={containerElement} />`,
@@ -266,7 +151,7 @@ const MultiplePortalsTemplate = () => {
         <>
           <Portal
             element={
-              <div className={`${styles.popup} ${styles.blue}`}>
+              <div className={`${styles.popup} ${styles.blue} ${styles.top30}`}>
                 First Portal
               </div>
             }
@@ -274,7 +159,9 @@ const MultiplePortalsTemplate = () => {
           />
           <Portal
             element={
-              <div className={`${styles.popup} ${styles.purple}`}>
+              <div
+                className={`${styles.popup} ${styles.purple} ${styles.top50}`}
+              >
                 Second Portal
               </div>
             }
@@ -282,7 +169,9 @@ const MultiplePortalsTemplate = () => {
           />
           <Portal
             element={
-              <div className={`${styles.popup} ${styles.green}`}>
+              <div
+                className={`${styles.popup} ${styles.green} ${styles.top70}`}
+              >
                 Third Portal
               </div>
             }
@@ -300,7 +189,7 @@ export const MultiplePortals: Story = {
     docs: {
       description: {
         story:
-          "Multiple portals rendered into the same container, demonstrating portal stacking.",
+          "Three portals share one container: each is appended after the last, and the portals do nothing about overlap, so every node carries its own position.",
       },
       source: {
         code: `<Portal element={<div>First Portal</div>} appendTo={container} />
@@ -349,7 +238,7 @@ export const ToggleVisibility: Story = {
     docs: {
       description: {
         story:
-          "Portal with togglable visibility. The visible prop controls whether the content is rendered.",
+          "Click Show Portal and Close to open and close the content from outside and from inside it. Each close unmounts the content (`visible`), so state held inside it starts over on the next open.",
       },
       source: {
         code: `<Portal
@@ -357,6 +246,93 @@ export const ToggleVisibility: Story = {
   visible={isVisible}
   appendTo={container}
 />`,
+      },
+    },
+  },
+};
+
+const IntoDocumentBodyTemplate = () => (
+  <div className={styles.customContainer}>
+    <p>The portal is declared inside this box</p>
+    <Portal
+      element={
+        <div className={`${styles.popup} ${styles.green}`}>
+          Rendered at the end of the page body
+        </div>
+      }
+    />
+  </div>
+);
+
+export const IntoDocumentBody: Story = {
+  render: () => <IntoDocumentBodyTemplate />,
+  parameters: {
+    docs: {
+      // The fixed popup would cover the Docs page, so the story gets a frame.
+      story: { inline: false, height: "300px" },
+      description: {
+        story:
+          "With no `appendTo`, the content leaves the dashed box it is declared in and lands at the end of the page body, centred on the window by its own fixed position.",
+      },
+      source: {
+        code: `<Portal element={<div style={{ position: "fixed" }}>Content</div>} />`,
+      },
+    },
+  },
+};
+
+const CssCustomizationTemplate = () => {
+  const [container, setContainer] = useState<HTMLElement | null>(null);
+
+  return (
+    <div
+      ref={setContainer}
+      className={styles.customContainer}
+      style={
+        {
+          // === Portal popup element ===
+          "--portal-popup-bg": "#e6f3fb",
+          "--portal-popup-shadow": "0 4px 16px rgba(0, 130, 201, 0.3)",
+          "--portal-popup-radius": "12px",
+          "--portal-popup-padding": "24px 32px",
+          "--portal-popup-color": "#004f82",
+        } as CSSProperties
+      }
+    >
+      <p>Portal target container</p>
+      {container && (
+        <Portal
+          element={
+            <div className={styles.popup}>Custom styled portal content</div>
+          }
+          appendTo={container}
+        />
+      )}
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Portal has no styles of its own, so the README lists no CSS variables for it: the `--portal-popup-*` variables set here belong to this page's demo popup, and are set on the container the portal appends to so the content picks them up there.",
+      },
+      source: {
+        code: `<div
+  ref={setContainer}
+  style={{
+    "--portal-popup-bg": "#e6f3fb",
+    "--portal-popup-shadow": "0 4px 16px rgba(0, 130, 201, 0.3)",
+    "--portal-popup-radius": "12px",
+    "--portal-popup-padding": "24px 32px",
+    "--portal-popup-color": "#004f82",
+  }}
+>
+  <Portal element={<div className="popup">Styled content</div>} appendTo={container} />
+</div>`,
       },
     },
   },

@@ -1,0 +1,19 @@
+.upcomingPayments {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &.rowView {
+    gap: 0;
+  }
+}
+
+.introText {
+  margin: 16px 0;
+  max-width: 660px;
+
+  p {
+    color: var(--payment-text-color);
+  }
+}

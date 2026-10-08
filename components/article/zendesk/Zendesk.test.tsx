@@ -20,10 +20,9 @@ describe("Zendesk", () => {
     // Clear all mocks
     vi.clearAllMocks();
 
-    // Reset window.zE and zESettings
+    // Reset window.zE
     // @ts-expect-error Fix types
     delete window.zE;
-    delete window.zESettings;
 
     // Mock createElement and appendChild
     mockScript = document.createElement("script");
@@ -75,20 +74,6 @@ describe("Zendesk", () => {
     expect(document.body.appendChild).toHaveBeenCalled();
   });
 
-  it("should set window.zESettings with provided config", () => {
-    const mockConfig = { webWidget: { color: { theme: "#000000" } } };
-
-    render(
-      <Zendesk
-        zendeskKey={mockZendeskKey}
-        isShowLiveChat
-        config={mockConfig}
-      />,
-    );
-
-    expect(window.zESettings).toEqual(mockConfig);
-  });
-
   it("should call onLoaded callback when script loads", () => {
     const onLoaded = vi.fn();
     vi.mocked(zendeskAPI.getChanges).mockReturnValue([]);
@@ -111,8 +96,8 @@ describe("Zendesk", () => {
 
   it("should process waiting changes when script loads", () => {
     const mockChanges = [
-      ["webWidget", "show"],
-      ["webWidget", "updateSettings", { color: { theme: "#000000" } }],
+      ["messenger", "hide"],
+      ["messenger:set", "locale", "en"],
     ];
     vi.mocked(zendeskAPI.getChanges).mockReturnValue(mockChanges);
 

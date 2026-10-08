@@ -1,47 +1,17 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 export type DropDownItemProps = {
   // Display and Layout Props
   /** Whether to render the item as a separator line instead of content */
   isSeparator?: boolean;
   /** Whether to render the item as a header with special styling */
   isHeader?: boolean;
-  /** Custom height of the dropdown item in pixels */
+  /**
+   * Height the enclosing `DropDown` reserves for this item in its virtualised
+   * list, in pixels. It does not style the item — the row is 32px tall until
+   * you also set `--drop-down-item-height` — and it reaches the DOM as an
+   * attribute.
+   */
   height?: number;
-  /** Custom height of the dropdown item for tablet devices in pixels */
+  /** The same, used instead of `height` on a tablet-width viewport. */
   heightTablet?: number;
   /** Whether to use modern compact styling with minimal padding */
   isModern?: boolean;
@@ -51,7 +21,11 @@ export type DropDownItemProps = {
   truncateText?: boolean;
 
   // Icon Related Props
-  /** URL or path to the icon to display at the start of the item */
+  /**
+   * Icon at the start of the item. A component or element is rendered as given;
+   * a string is a URL — a path containing `.svg` or `images/` is fetched and
+   * inlined, anything else becomes an `<img>`.
+   */
   icon?: string | React.ReactElement | React.ElementType;
   /** Whether the icon should be filled with the current text color. If false, uses original icon colors */
   fillIcon?: boolean;
@@ -65,13 +39,20 @@ export type DropDownItemProps = {
   // Content Props
   /** Primary text content or React node to display in the item */
   label?: string | React.ReactNode;
-  /** Additional React nodes to render after the label */
+  /**
+   * Content of the item, used **instead of** `label` — it is rendered only when
+   * `label` is empty, not alongside it. `additionalElement` is the one that
+   * comes after the label.
+   */
   children?: React.ReactNode;
   /** Additional element to render at the end of the item, after all other content */
   additionalElement?: React.ReactNode;
 
   // State and Interaction Props
-  /** Whether the item is in a disabled state and cannot be interacted with */
+  /**
+   * Stops `onClick` firing and greys the item out. The enclosing `DropDown`
+   * also drops disabled items from its list unless `showDisabledItems` is set.
+   */
   disabled?: boolean;
   /** Whether the item is in an active/pressed state */
   isActive?: boolean;
@@ -89,7 +70,7 @@ export type DropDownItemProps = {
   isBeta?: boolean;
   /** Whether to show a paid badge next to the item */
   isPaidBadge?: boolean;
-  /** Sets paid badge label */
+  /** Text of the paid badge, used instead of the translated default. */
   badgeLabel?: string;
   /** Whether to show an external link icon at the end of the item */
   withExternalLink?: boolean;
@@ -105,7 +86,11 @@ export type DropDownItemProps = {
   checked?: boolean;
 
   // Event Handlers
-  /** Callback function triggered when the item is clicked */
+  /**
+   * Called on a click on the item, and on a change of the toggle when
+   * `withToggle` is set — hence the event union. It is not called while the
+   * item is disabled.
+   */
   onClick?: (
     e: React.MouseEvent<HTMLElement> | React.ChangeEvent<HTMLInputElement>,
   ) => void;
@@ -113,7 +98,10 @@ export type DropDownItemProps = {
   onMouseDown?: (e: React.MouseEvent<HTMLElement>) => void;
   /** Callback function triggered when a selected item is clicked */
   onClickSelectedItem?: () => void;
-  /** Callback function to control the open state of a parent dropdown */
+  /**
+   * Called with `false` after every click, disabled ones included, for the
+   * enclosing menu to close itself.
+   */
   setOpen?: (open: boolean) => void;
 
   // Styling Props
@@ -123,16 +111,29 @@ export type DropDownItemProps = {
   style?: React.CSSProperties;
   /** HTML ID attribute for the root element */
   id?: string;
-  /** Tab index for keyboard navigation order */
+  /** Position in the tab order. The default of -1 keeps the item off it.
+   * @default -1 */
   tabIndex?: number;
   /** Sets minimum width for the root element */
   minWidth?: string;
 
+  /** Value of `data-testid` on the item.
+   * @default "drop-down-item" */
   testId?: string;
 
+  /**
+   * Hint shown when the item is disabled, on a touch device only. It needs
+   * `RootTooltip` mounted, and it does nothing on an enabled item or with a
+   * pointer.
+   */
   tooltip?: string;
+  /** Secondary line rendered under the item label and always visible - what
+   * choosing this item means. The item grows to fit it. */
+  description?: React.ReactNode;
 
+  /** Text of the beta badge, used instead of the host's own constant. */
   betaLabel?: string;
+  /** Text of the paid badge, used instead of the translated default. */
   paidLabel?: string;
 
   /** When true, stops mousedown propagation to prevent click-outside detection from closing dropdown before click fires */

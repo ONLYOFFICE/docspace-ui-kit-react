@@ -1,40 +1,5 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ChangeEvent, ComponentProps } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -42,42 +7,11 @@ import { Slider } from ".";
 import type { SliderProps } from "./Slider.types";
 
 const meta = {
-  title: "UI/Interactive elements/Slider",
+  title: "UI/Form controls/Slider",
   component: Slider,
   parameters: {
-    docs: {
-      description: {
-        component: `Slider is a range input for selecting numeric values within a defined range.
-
-### Features
-
-- **Min/Max Range**: Configurable minimum and maximum values
-- **Custom Step Size**: Control the increment/decrement granularity
-- **Pouring Effect**: Visual fill indicator showing the selected portion of the track
-- **Disabled State**: Prevents interaction when disabled
-- **Custom Sizing**: Adjustable thumb and track dimensions
-- **RTL Support**: Works correctly in right-to-left layouts
-
-### Accessibility
-
-- Keyboard navigation with arrow keys
-- \`aria-valuemin\`, \`aria-valuemax\`, \`aria-valuenow\` attributes
-
-### Usage
-
-\`\`\`tsx
-import { Slider } from "@docspace/ui-kit/components/slider";
-
-<Slider min={0} max={100} value={50} onChange={handleChange} />
-
-// With custom step
-<Slider min={0} max={10} step={2} value={4} onChange={handleChange} />
-
-// Disabled
-<Slider min={0} max={100} value={30} isDisabled />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     min: {
@@ -101,7 +35,8 @@ import { Slider } from "@docspace/ui-kit/components/slider";
     },
     isDisabled: {
       control: "boolean",
-      description: "Disables the slider input",
+      description:
+        "Greys the handle and the filled part of the track, blocks dragging and arrow keys, and takes the slider out of the tab order",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -110,7 +45,60 @@ import { Slider } from "@docspace/ui-kit/components/slider";
       control: "boolean",
       description: "Shows the filled portion of the track",
       table: {
-        defaultValue: { summary: "true" },
+        defaultValue: { summary: "false" },
+      },
+    },
+    thumbWidth: {
+      control: "text",
+      description: "Width of the input thumb",
+      table: {
+        defaultValue: { summary: "24px" },
+      },
+    },
+    thumbHeight: {
+      control: "text",
+      description: "Height of the input thumb",
+      table: {
+        defaultValue: { summary: "24px" },
+      },
+    },
+    thumbBorderWidth: {
+      control: "text",
+      description: "Border width of the input thumb",
+      table: {
+        defaultValue: { summary: "6px" },
+      },
+    },
+    runnableTrackHeight: {
+      control: "text",
+      description: "Height of the runnable track the thumb slides along",
+      table: {
+        defaultValue: { summary: "8px" },
+      },
+    },
+    onChange: {
+      action: "onChange",
+      description:
+        "Called on every move of the handle with the input's change event, whose `target.value` is a string; the handle cannot move without it",
+    },
+    id: {
+      control: "text",
+      description:
+        "`id` of the input, for a `<label for>` that gives the slider its name",
+    },
+    className: {
+      control: "text",
+      description: "Extra class names added to the input",
+    },
+    style: {
+      control: "object",
+      description: "Inline styles applied to the input",
+    },
+    dataTestId: {
+      control: "text",
+      description: "`data-testid` of the input",
+      table: {
+        defaultValue: { summary: "slider" },
       },
     },
   },
@@ -122,7 +110,10 @@ export default meta;
 
 const SliderWithState = (props: SliderProps) => {
   const { value: initialValue, onChange } = props;
-  const [value, setValue] = useState<number>(initialValue || 50);
+  const [value, setValue] = useState<number>(initialValue ?? 50);
+
+  // Follows the value control in the Controls panel after the first render.
+  useEffect(() => setValue(initialValue ?? 50), [initialValue]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = Number.parseFloat(e.target.value);
@@ -147,10 +138,10 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default slider with a range of 0-100 and the pouring effect enabled.",
+          "A 0–100 slider with the track filled up to the handle (`withPouring`), the usual choice for a setting such as volume or zoom; drag the handle or change any other prop live in the Controls panel below.",
       },
       source: {
-        code: `<Slider min={0} max={100} value={50} onChange={handleChange} />`,
+        code: `<Slider min={0} max={100} value={50} withPouring onChange={handleChange} />`,
       },
     },
   },
@@ -170,10 +161,10 @@ export const DisabledState: Story = {
     docs: {
       description: {
         story:
-          "Disabled slider that cannot be interacted with. The thumb and track appear muted.",
+          "For a setting that cannot be changed right now: the handle and the filled part of the track turn paler, the unfilled track stays as it is, and the handle no longer moves by mouse or keyboard (`isDisabled`).",
       },
       source: {
-        code: `<Slider min={0} max={100} value={50} isDisabled />`,
+        code: `<Slider min={0} max={100} value={50} withPouring isDisabled />`,
       },
     },
   },
@@ -196,7 +187,7 @@ export const WithCustomSteps: Story = {
           "Slider with a custom step size of 5, allowing values of 0, 5, and 10 only.",
       },
       source: {
-        code: `<Slider min={0} max={10} step={5} value={5} onChange={handleChange} />`,
+        code: `<Slider min={0} max={10} step={5} value={5} withPouring onChange={handleChange} />`,
       },
     },
   },
@@ -242,10 +233,10 @@ export const WithCustomSize: Story = {
     value: 50,
     isDisabled: false,
     withPouring: true,
-    thumbWidth: "24px",
-    thumbHeight: "24px",
-    thumbBorderWidth: "2px",
-    runnableTrackHeight: "8px",
+    thumbWidth: "32px",
+    thumbHeight: "32px",
+    thumbBorderWidth: "8px",
+    runnableTrackHeight: "14px",
   },
   parameters: {
     docs: {
@@ -255,18 +246,19 @@ export const WithCustomSize: Story = {
       },
       source: {
         code: `<Slider
-  min={0} max={100} value={50}
-  thumbWidth="24px"
-  thumbHeight="24px"
-  thumbBorderWidth="2px"
-  runnableTrackHeight="8px"
+  min={0} max={100} value={50} withPouring
+  thumbWidth="32px"
+  thumbHeight="32px"
+  thumbBorderWidth="8px"
+  runnableTrackHeight="14px"
 />`,
       },
     },
   },
 };
 
-export const RTL: Story = {
+// Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
+export const RightToLeft: Story = {
   render: (args) => (
     <div dir="rtl" style={{ width: "300px", padding: "20px" }}>
       <SliderWithState {...args} />
@@ -280,15 +272,18 @@ export const RTL: Story = {
     isDisabled: false,
     withPouring: true,
   },
+  globals: { direction: "rtl" },
   parameters: {
+    noPadding: true,
     docs: {
+      story: { inline: false, height: "122px" },
       description: {
         story:
-          "Slider in a right-to-left layout. The track fills from right to left.",
+          "In a right-to-left interface the minimum sits at the right edge: the fill starts there and grows to the left as the handle is dragged left.",
       },
       source: {
         code: `<div dir="rtl">
-  <Slider min={0} max={100} value={50} onChange={handleChange} />
+  <Slider min={0} max={100} value={50} withPouring onChange={handleChange} />
 </div>`,
       },
     },
@@ -306,7 +301,7 @@ export const CssCustomization: Story = {
             padding: "20px",
             "--slider-handle-color": "#7c3aed",
             "--slider-pouring-image": "linear-gradient(#7c3aed, #7c3aed)",
-            "--slider-fill-color": "#e9d5ff",
+            "--slider-background-color": "#ede9fe",
             "--slider-size": "12px",
             "--slider-handle-size": "28px",
             "--slider-track-radius": "6px",
@@ -322,25 +317,32 @@ export const CssCustomization: Story = {
             setValue(Number(e.target.value))
           }
         />
+        <Slider min={0} max={100} value={40} withPouring isDisabled />
       </div>
     );
   },
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--slider-handle-color\` | Thumb background color | theme token |
-| \`--slider-pouring-image\` | Fill image for the poured portion (must be a \`linear-gradient\` or other \`<image>\`) | theme token |
-| \`--slider-fill-color\` | Filled track color (Firefox / moz range) | theme token |
-| \`--slider-background-color\` | Track (unfilled) background color | theme token |
-| \`--slider-size\` | Track height | \`8px\` |
-| \`--slider-handle-size\` | Thumb width and height | \`24px\` |
-| \`--slider-track-radius\` | Border radius of track and thumb | \`5.6px\` |`,
+The first slider shows every variable. The second is disabled, to show that the theme does not swap in its own colors there: it mixes the disabled thumb and fill from \`--slider-handle-color\`, so a custom accent survives as a paler version of itself.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--slider-handle-color": "#7c3aed",
+    "--slider-pouring-image": "linear-gradient(#7c3aed, #7c3aed)",
+    "--slider-background-color": "#ede9fe",
+    "--slider-size": "12px",
+    "--slider-handle-size": "28px",
+    "--slider-track-radius": "6px",
+  }}
+>
+  <Slider min={0} max={100} value={value} withPouring onChange={handleChange} />
+  <Slider min={0} max={100} value={40} withPouring isDisabled />
+</div>`,
       },
     },
   },
 };
-

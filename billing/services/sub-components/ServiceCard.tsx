@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React from "react";
 import classNames from "classnames";
 import { ToggleButton } from "../../../components/toggle-button";
@@ -44,7 +9,9 @@ import CheckIcon from "../../../assets/icons/16/check.round.react.svg";
 import InfoIcon from "../../../assets/info.outline.react.svg";
 interface ServiceCardProps {
   onClick: (e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>) => void;
-  onToggle: (e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>) => void;
+  onToggle?: (
+    e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>,
+  ) => void;
   priceTitle?: string | null;
   id?: string | null;
   image?: string | null;
@@ -60,7 +27,9 @@ interface ServiceCardProps {
   isInactiveColor?: boolean;
   priceTooltip?: React.ReactNode;
   icon?: React.ReactNode;
-  withoutIcon?:boolean;
+  withoutIcon?: boolean;
+  className?: string;
+  withoutGreenColor?: boolean;
 }
 
 const ServiceCard: React.FC<ServiceCardProps> = ({
@@ -81,14 +50,17 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   isInactiveColor,
   priceTooltip,
   icon,
-  withoutIcon
+  withoutIcon,
+  className,
+  withoutGreenColor,
 }) => {
   const tooltipId = tooltip ? `serviceCardTooltip_${id}` : undefined;
+  const priceTooltipId = priceTooltip ? `servicePriceTooltip_${id}` : undefined;
 
   return (
     <div
       key={id}
-      className={classNames(styles.serviceContainer, {
+      className={classNames(styles.serviceContainer, className, {
         [styles.disabled]: cardDisabled,
       })}
       {...(!cardDisabled ? { onClick } : {})}
@@ -147,10 +119,11 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
                   isEnabled &&
                   !isWarningColor &&
                   !isInactiveColor &&
-                  !isErrorColor,
+                  !isErrorColor &&
+                  !withoutGreenColor,
                 [styles.inactiveColor]: isInactiveColor,
               })}
-              {...(priceTooltip && { "data-tooltip-id": "serviceTooltip" })}
+              {...(priceTooltipId && { "data-tooltip-id": priceTooltipId })}
             >
               {withoutIcon ? null : icon ? (
                 icon
@@ -162,12 +135,13 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
               <Text fontWeight={600} fontSize="12px">
                 {priceDescription}
               </Text>
-              {priceTooltip ? (
+              {priceTooltipId ? (
                 <Tooltip
-                  id="serviceTooltip"
+                  id={priceTooltipId}
                   place="bottom"
                   maxWidth="300px"
                   float
+                  offset={20}
                   getContent={() => priceTooltip}
                   dataTestId="service_change_shedule_tooltip"
                 />
@@ -191,4 +165,3 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 };
 
 export default ServiceCard;
-

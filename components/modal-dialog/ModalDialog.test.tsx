@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { screen, render } from "@testing-library/react";
@@ -388,10 +353,28 @@ describe("ModalDialog", () => {
         </ModalDialog>,
       );
 
-      const backdrop = screen.getByRole("dialog");
+      const backdrop = document.getElementById("modal-onMouseDown-close");
+      if (!backdrop) throw new Error("no click-to-close layer");
       await userEvent.click(backdrop);
 
       expect(mockOnClose).toHaveBeenCalled();
+    });
+
+    // The role sits on the content, not on the click-to-close layer that spans
+    // the viewport, and the caller's name reaches it. Before, `aria-label` was
+    // swept into the rest props and landed on the header -- and only when a
+    // header was rendered -- so the dialog could not be named at all.
+    it("names the dialog on the element that carries the role", () => {
+      render(
+        <ModalDialog {...defaultProps} aria-label="Delete room">
+          <ModalDialog.Body>Modal Body Content</ModalDialog.Body>
+        </ModalDialog>,
+      );
+
+      const dialog = screen.getByRole("dialog");
+      expect(dialog).toHaveAttribute("id", "modal-dialog");
+      expect(dialog).toHaveAccessibleName("Delete room");
+      expect(dialog).toHaveAttribute("aria-modal", "true");
     });
 
     it("hides content when hideContent is true", () => {

@@ -16,38 +16,15 @@ import { ComponentName } from ".";
 
 const meta = {
   // 1. Title follows: "UI/<category>/<ComponentName>"
-  //    Categories: Interactive elements, Data display, Layout, Navigation, Feedback, etc.
+  //    The category must match the README's metadata block; see Categories below.
   title: "UI/<category>/<ComponentName>",
   component: ComponentName,
   parameters: {
-    docs: {
-      description: {
-        // 2. Component description with Features, Accessibility (if applicable), and Usage sections
-        component: `Short description of what the component does.
-
-### Features
-
-- **Feature 1**: Description
-- **Feature 2**: Description
-- **Feature 3**: Description
-
-### Accessibility
-
-(Only if the component has ARIA attributes or accessibility features)
-
-- \`aria-label\`: Description
-- \`aria-disabled\`: Description
-
-### Usage
-
-\`\`\`tsx
-import { ComponentName } from "@docspace/ui-kit/components/component-name";
-
-// Example usage
-<ComponentName prop1="value" prop2={true} />
-\`\`\``,
-      },
-    },
+    // 2. No component description. The Docs page is the component's README.md,
+    //    rendered by .storybook/blocks/DocsPage.tsx; see "Where the description
+    //    lives" below.
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     // 3. Figma design link (if available)
     design: {
       type: "figma",
@@ -127,7 +104,7 @@ export const VariantStory: Story = {
 
 1. [ ] **License header** - Keep the full AGPL license comment
 2. [ ] **Meta title** - `"UI/<category>/<ComponentName>"` format
-3. [ ] **Component description** - Include Features, optional Accessibility, and Usage sections
+3. [ ] **No component description** - The README is the Docs page; a fact the story would state goes into the README
 4. [ ] **argTypes** - Document every significant prop with control type, description, and default
 5. [ ] **Default story** - Interactive story with `render: (args) => ...` and sensible `args`
 6. [ ] **Variant stories** - One per major prop/state (disabled, loading, sizes, types, etc.)
@@ -135,26 +112,69 @@ export const VariantStory: Story = {
 8. [ ] **Source code** - Each story has `parameters.docs.source.code` with clean examples
 9. [ ] **Template functions** - Extract complex renders into named `*Template` components
 10. [ ] **Wrapper** - Use a layout wrapper for stories with multiple items
+11. [ ] **Story order** - `Default` first, `CssCustomization` last; `RightToLeft`, when present, right before it
+12. [ ] **`CssCustomization` has no table** - It demonstrates the variables; the README's `## CSS variables` lists them
+
+## Where the description lives
+
+The component's `README.md` is its only description. The Docs page renders it
+(`.storybook/blocks/DocsPage.tsx`): the intro — purpose, when to use, import — above the
+primary story, the reference sections below the stories, and the README's generated
+`## Props` left to the Controls table. The README ships in the package and is synced into the
+`ui-kit` agent skill; a story is in neither, so a fact written only in a story reaches nobody
+who installed the kit.
+
+So a story file carries no `parameters.docs.description.component`, and its
+`CssCustomization` text says what the example sets, not which variables exist. A fact you
+would have written as a Features or Accessibility bullet belongs in the README's
+"Behaviour the types don't state" or "Accessibility"; a variable and its caveats in its
+"CSS variables" table. Verify it against the code first — `COMPONENT_README_TEMPLATE.md` governs the
+README.
+
+What stays in the story is what a README cannot hold: the canvases, the controls, the
+`argTypes` descriptions, each story's `description.story` saying why it exists, and
+`source.code`.
+
+One exception: a story file whose own folder has no README — the table's parts, the
+skeletons, `ArticleItem` — keeps a one-sentence `description.component`, because its Docs page
+has nothing else to show. It names the parent page that describes the part in full, and the
+facts live in the parent README.
 
 ## Story Naming Conventions
 
-| Pattern | Example |
-|---------|---------|
-| Default interactive | `Default` |
-| Size variants | `Sizes` or `SmallSize`, `LargeSize` |
-| State variants | `DisabledState`, `LoadingState`, `HoveredState` |
-| Type/style variants | `PrimaryButtons`, `SecondaryButtons` |
-| Feature demos | `WithIcon`, `WithTooltip`, `WithCallback` |
+| Pattern             | Example                                         |
+| ------------------- | ----------------------------------------------- |
+| Default interactive | `Default`                                       |
+| Size variants       | `Sizes` or `SmallSize`, `LargeSize`             |
+| State variants      | `DisabledState`, `LoadingState`, `HoveredState` |
+| Type/style variants | `PrimaryButtons`, `SecondaryButtons`            |
+| Feature demos       | `WithIcon`, `WithTooltip`, `WithCallback`       |
+| Direction           | `RightToLeft` (never `RTL`)                     |
+
+## Pictures for the API site
+
+The site's pages (`docs-generation.md`) photograph every story. Two tags steer that:
+`tags: ["picture"]` on the story the page should open with, when it is not the first one;
+`tags: ["no-picture"]` on a story that is listed but not photographed -- one that paints a
+page of its own in both themes, as `FieldContainer`'s `CustomStyling` does. Do not name a
+story `Primary` or `ArgsTable`: those shot names belong to the page.
 
 ## Categories
 
-- `Interactive elements` - Button, Checkbox, RadioButton, Toggle, TextInput, etc.
-- `Data display` - Badge, Tag, Avatar, Table, Tabs, etc.
-- `Layout` - Section, Article, Portal, etc.
-- `Navigation` - Paging, Navigation, Link, etc.
-- `Feedback` - Toast, Snackbar, Loader, ProgressBar, etc.
-- `Overlays` - ModalDialog, DropDown, ContextMenu, Tooltip, Aside, etc.
-- `Form` - FieldContainer, PasswordInput, EmailInput, SearchInput, etc.
+Seven, and they are the same seven a README's `category` may hold. The two must agree:
+`pnpm check:readme` compares them and reports `W_CATEGORY_STORY` when they do not.
+
+- `Interactive elements` - Button, IconButton, Link, Tag, etc.
+- `Form controls` - FieldContainer, TextInput, Textarea, ComboBox, Checkbox, Slider, etc.
+- `Overlays` - ModalDialog, Aside, DropDown, ContextMenu, Tooltip, etc.
+- `Data display` - Badge, Avatar, Text, Card, Table, Tiles, etc.
+- `Layout` - Section, Article, Portal, Scrollbar, etc.
+- `Navigation` - Navigation, Paging, Tabs, Filter, etc.
+- `Feedback` - Toast, Snackbar, Loader, ProgressBar, skeletons, etc.
+
+A story title may also use one of these grouping sections, which keep a family together in
+the sidebar and count as their category above: `Table` and `Tiles` and `Rows` (Data
+display), `Layout components` (Layout), `Status components` and `Skeletons` (Feedback).
 
 ## How to Use This With Claude Code
 
@@ -172,6 +192,7 @@ Rewrite the story for the badge component following the Button story pattern
 ```
 
 Claude will:
+
 1. Read the component's source to understand its props
 2. Read the existing story
-3. Rewrite the story following this template
+3. Rewrite the story following this template, putting any description into the README

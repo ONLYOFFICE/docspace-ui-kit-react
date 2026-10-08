@@ -1,43 +1,7 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React from "react";
 
 import EmptyScreenRoomSelectorLight from "../../assets/emptyview/empty.room.selector.light.svg";
 import EmptyScreenRoomSelectorDark from "../../assets/emptyview/empty.room.selector.dark.svg";
-import faviconUrl from "../../assets/favicon.ico";
 
 import { useCommonTranslation } from "../../utils/i18n";
 import {
@@ -49,22 +13,10 @@ import {
 import { useTheme } from "../../context/ThemeContext";
 import { useApi } from "../../providers/api/ApiProvider";
 import { getBrandName } from "../../constants/brands";
+import { ServerType } from "../../enums";
+import { getServerIcon } from "../../utils/ai/getServerIcon";
 
-const getServerIcon = (type: ServerType, _isBase: boolean) => {
-  switch (type) {
-    case ServerType.Portal:
-      return faviconUrl;
-    default:
-      return null;
-  }
-};
-
-export enum ServerType {
-  Custom,
-  Portal,
-  GitHub,
-  Box,
-}
+export { ServerType };
 
 export type TServer = {
   id: string;
@@ -92,6 +44,28 @@ type MCPServersSelectorProps = TSelectorWithAside & {
   initedSelectedServers?: string[];
 };
 
+// `tools/list-system-tools` answers either as the legacy flat
+// `serverType -> tools` map or as `{ groups, errors, system }`. `groups`
+// also carries the registered custom servers' tools, so only the explicit
+// `system` list says which names are host-configured servers; deriving that
+// from the keys labelled a custom server with the product name and the
+// portal logo. Without `system` (an older service) the keys are the best
+// available guess.
+const normalizeSystemListing = (
+  raw: Record<string, unknown> | undefined,
+): { groups: Record<string, unknown>; system: string[] } => {
+  const nested = raw?.groups;
+  if (nested && typeof nested === "object" && !Array.isArray(nested)) {
+    const groups = nested as Record<string, unknown>;
+    const system = Array.isArray(raw?.system)
+      ? raw.system.filter((name): name is string => typeof name === "string")
+      : Object.keys(groups);
+    return { groups, system };
+  }
+  const groups = raw ?? {};
+  return { groups, system: Object.keys(groups) };
+};
+
 const MCPServersSelector = ({
   initedSelectedServers,
   onSubmit,
@@ -102,7 +76,7 @@ const MCPServersSelector = ({
   withBlur,
 }: MCPServersSelectorProps) => {
   const t = useCommonTranslation();
-  const { apiClient } = useApi();
+  const { apiClient, baseUrl } = useApi();
   const { isBase } = useTheme();
 
   const [servers, setServers] = React.useState<TSelectorItem[]>([]);
@@ -113,31 +87,36 @@ const MCPServersSelector = ({
     React.useState<TSelectorItem[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
-  const startCurrentIndexRef = React.useRef(0);
   const [totalServers, setTotalServers] = React.useState(0);
 
   const isRequestLoading = React.useRef(false);
 
+  // Servers are keyed by name in the chat-lib model: system servers come from
+  // the service config (list-system-tools groups), the rest are portal-level
+  // custom servers (list-custom-servers without an entityId).
   const convertServerToOption = React.useCallback(
-    (server: TServer): TSelectorItem => {
-      const name =
-        server.serverType === ServerType.Portal
-          ? `${getBrandName("OrganizationName")} ${getBrandName("ProductName")}`
-          : server.name;
-
+    (name: string, isSystem: boolean): TSelectorItem => {
       return {
-        key: server.id,
-        id: server.id,
-        label: name,
+        key: name,
+        id: name,
+        label: isSystem
+          ? `${getBrandName("OrganizationName")} ${getBrandName("ProductName")}`
+          : name,
+        // The portal's own logo comes from the portal the clients talk to.
+        // A relative "/logo.ashx" would resolve against the page's origin,
+        // which is the portal only when the app is served from it -- not in
+        // Storybook, and not in an application hosted anywhere else.
         icon:
-          (server.icon?.icon32 || getServerIcon(server.serverType, isBase)) ??
-          "",
+          getServerIcon(
+            isSystem ? ServerType.Portal : ServerType.Custom,
+            isBase,
+            baseUrl.replace(/\/+$/, ""),
+          ) ?? "",
         isMCP: true,
-        isSelected: initedSelectedServers?.includes(server.id),
-        isDisabled: server.needReset,
+        isSelected: initedSelectedServers?.includes(name),
       };
     },
-    [isBase, initedSelectedServers, t],
+    [isBase, initedSelectedServers, t, baseUrl],
   );
 
   const fetchServers = React.useCallback(async () => {
@@ -147,12 +126,35 @@ const MCPServersSelector = ({
     setIsLoading(true);
 
     try {
-      const response = await apiClient.request<{
-        response: TServer[];
-        total: number;
-      }>(`/api/2.0/ai/servers/available?startIndex=0&count=100`);
+      const [systemTools, customServers] = await Promise.all([
+        apiClient.request<Record<string, unknown>>(
+          `/api/2.0/ai/tools/list-system-tools`,
+        ),
+        apiClient.request<Record<string, unknown>>(
+          `/api/2.0/ai/tools/list-custom-servers`,
+        ),
+      ]);
 
-      const items = response.response.map(convertServerToOption);
+      const listing = normalizeSystemListing(systemTools);
+      // A system server that failed tool enumeration (down, misconfigured)
+      // still gets a group in the response — just an empty one (the lib's
+      // listTools returns [] on error). Hide those: a server with no tools
+      // is useless to attach. A name that is also a portal-level custom
+      // server is a custom server, whatever the listing says: system
+      // servers never appear in the portal's custom map.
+      const systemNames = listing.system.filter((name) => {
+        if (name in (customServers ?? {})) return false;
+        const tools = listing.groups[name];
+        return Array.isArray(tools) && tools.length > 0;
+      });
+      const customNames = Object.keys(customServers ?? {}).filter(
+        (name) => !systemNames.includes(name),
+      );
+
+      const items = [
+        ...systemNames.map((name) => convertServerToOption(name, true)),
+        ...customNames.map((name) => convertServerToOption(name, false)),
+      ];
 
       const selectedItems = items.filter((i) => i.isSelected);
 
@@ -160,8 +162,7 @@ const MCPServersSelector = ({
       setInitedSelectedServersItems(selectedItems);
       setSelectedServers(selectedItems);
 
-      setTotalServers(response.total);
-      startCurrentIndexRef.current = 100;
+      setTotalServers(items.length);
     } catch (e) {
       console.error(e);
     }
@@ -170,36 +171,8 @@ const MCPServersSelector = ({
     setIsLoading(false);
   }, [apiClient, convertServerToOption]);
 
-  const fetchMoreServer = React.useCallback(async () => {
-    if (isRequestLoading.current) return;
-    isRequestLoading.current = true;
-
-    try {
-      const response = await apiClient.request<{
-        response: TServer[];
-        total: number;
-      }>(
-        `/api/2.0/ai/servers/available?startIndex=${startCurrentIndexRef.current}&count=100`,
-      );
-
-      const items = response.response.map(convertServerToOption);
-
-      setServers((prev) => [...prev, ...items]);
-
-      const selectedItems = items.filter((i) => i.isSelected);
-
-      setInitedSelectedServersItems((prev) => [...prev, ...selectedItems]);
-      setSelectedServers((prev) => [...prev, ...selectedItems]);
-
-      startCurrentIndexRef.current += 100;
-      setTotalServers(response.total);
-    } catch (e) {
-      console.error(e);
-    }
-
-    isRequestLoading.current = false;
-    setIsLoading(false);
-  }, [apiClient, convertServerToOption]);
+  // The tools lists are not paginated — everything arrives in one response.
+  const fetchMoreServer = React.useCallback(async () => {}, []);
 
   const onSelect = (item: TSelectorItem) => {
     const isIncluded = selectedServers.some((i) => i.id === item.id);
@@ -239,7 +212,6 @@ const MCPServersSelector = ({
       })}
       emptyScreenDescription={t("NoMCPServersDescription", {
         mcpServers: t("MCPSettingTitle"),
-        productName: getBrandName("ProductName"),
         aiAgent: t("AIAgent"),
       })}
       searchEmptyScreenImage={

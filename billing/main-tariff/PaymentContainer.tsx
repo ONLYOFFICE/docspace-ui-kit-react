@@ -1,40 +1,5 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import HelpReactSvg from "../../assets/help.react.svg";
-import React from "react";
+import React, { useState } from "react";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 
@@ -45,20 +10,48 @@ import { HelpButton } from "../../components/help-button";
 import type { TTranslation } from "../../utils/common";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
+import { useApi } from "../../providers/api";
+import { toastr } from "../../components/toast";
+import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 
 import CurrentTariffContainer from "./CurrentTariffContainer";
 import PriceCalculation from "./PriceCalculation";
 import BenefitsContainer from "./BenefitsContainer";
 import ContactContainer from "./ContactContainer";
+import WalletInfo from "../shared/top-up-balance/sub-components/WalletInfo";
+import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import StorageWarning from "../services/panels/additional-storage/StorageWarning";
+import UnlinkedCardBanner from "../shared/unlinked-card-banner";
 import styles from "./MainTariff.module.scss";
 import { getBrandName } from "../../constants/brands";
 
 const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
+  const { paymentApi } = useApi();
   const store = usePaymentStore();
-  const { formatPaymentCurrency } = store;
+  const {
+    formatPaymentCurrency,
+    formatFuturePaymentCurrency,
+    getTotalCostByFormula,
+    isAlreadyPaid,
+    cardLinkedOnFreeTariff,
+    formatWalletCurrency,
+  } = store;
 
-  const { isFreeTariff, isNonProfit, currentTariffPlanTitle, isYearTariff } =
-    store.quotas;
+  const [isTopUpVisible, setIsTopUpVisible] = useState(false);
+  const [isCancelDowngradeLoading, setIsCancelDowngradeLoading] =
+    useState(false);
+
+  const onTopUp = () => setIsTopUpVisible(true);
+  const onCloseTopUp = () => setIsTopUpVisible(false);
+
+  const {
+    isFreeTariff,
+    isNonProfit,
+    currentTariffPlanTitle,
+    isYearTariff,
+    maxCountManagersByQuota,
+    fetchPortalQuota,
+  } = store.quotas;
   const {
     isPaidPeriod,
     isPaymentDateValid,
@@ -67,10 +60,45 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     gracePeriodEndDate,
     delayDaysCount,
     paymentDate,
+    hasScheduledTariffAdminsChange,
+    currentTariffAdminsCount,
+    nextTariffAdminsCount,
+    fetchPortalTariff,
   } = store.tariff;
+  const { fetchBalance, showUnlinkedCardBanner } = store;
   const { tariffPlanTitle, planCost } = store.paymentQuotas;
 
   const startValue = planCost.value;
+
+  const handleCancelTariffDowngrade = async () => {
+    setIsCancelDowngradeLoading(true);
+
+    try {
+      const res = await paymentApi.updateWalletPayment({
+        walletQuantityRequestDto: {
+          quantity: { adminwallet: null },
+          productQuantityType: ProductQuantityType.Set,
+        },
+      });
+      if (res?.data?.response === false) {
+        toastr.error(t("ErrorNotification"));
+        return;
+      }
+      await Promise.all([
+        fetchPortalTariff(true),
+        fetchBalance(true),
+        fetchPortalQuota(true),
+      ]);
+      toastr.success(
+        t("BusinessUpdated", { planName: currentTariffPlanTitle }),
+      );
+    } catch (e) {
+      console.error(e);
+      toastr.error(t("ErrorNotification"));
+    } finally {
+      setIsCancelDowngradeLoading(false);
+    }
+  };
 
   const renderTooltip = () => {
     return (
@@ -82,16 +110,8 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
           <>
             <Text isBold>{t("ManagerTypesDescription")}</Text>
             <br />
-            <Text isBold>
-              {t("PortalAdmin", {
-                productName: getBrandName("ProductName"),
-              })}
-            </Text>
-            <Text>
-              {t("AdministratorDescription", {
-                productName: getBrandName("ProductName"),
-              })}
-            </Text>
+            <Text isBold>{t("PortalAdmin")}</Text>
+            <Text>{t("AdministratorDescription")}</Text>
             <br />
             <Text isBold>{t("RoomAdmin")}</Text>
             <Text>{t("RoomManagerDescription")}</Text>
@@ -165,17 +185,6 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
       );
     }
 
-    if (isNotPaidPeriod) {
-      return (
-        <Text fontSize="16px" isBold className={styles.paymentInfoSuggestion}>
-          <CommonTrans
-            i18nKey="RenewSubscriptionPlanName"
-            values={{ planName: tariffPlanTitle }}
-          />
-        </Text>
-      );
-    }
-
     if (isGracePeriod) {
       return (
         <Text
@@ -184,10 +193,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
           className={styles.paymentInfoGracePeriod}
           color="var(--settings-payment-warning-color)"
         >
-          <CommonTrans
-            i18nKey="DelayedPayment"
-            values={{ date: paymentDate, planName: currentTariffPlanTitle }}
-          />
+          {t("PaymentDelayActive")}
         </Text>
       );
     }
@@ -200,35 +206,57 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
       return (
         <Text fontSize="14px" lineHeight="16px">
           <CommonTrans
-            i18nKey="GracePeriodActivatedInfo"
+            i18nKey="GracePeriodActivatedNotice"
             values={{
               fromDate: paymentDate,
               byDate: gracePeriodEndDate,
               delayDaysCount,
+              productName: getBrandName("ProductName"),
             }}
             components={{
-              1: <Text as="span" />,
+              1: <Text as="span" fontWeight={600} />,
             }}
           />
-
-          <Text as="span" fontSize="14px" lineHeight="16px">
-            {t("GracePeriodActivatedDescription", {
-              productName: getBrandName("ProductName"),
-            })}
-          </Text>
         </Text>
       );
 
     if (isPaidPeriod && isPaymentDateValid && !isNonProfit)
       return (
+        // A div, not Text's default <p>: the HelpButton below renders a <div>,
+        // which a <p> may not contain.
         <Text
+          as="div"
           fontSize="14px"
           lineHeight="16px"
           className={styles.paymentInfoManagersPrice}
         >
-          <CommonTrans
-            i18nKey="BusinessFinalDateInfo"
-            values={{ finalDate: paymentDate }}
+          {hasScheduledTariffAdminsChange && nextTariffAdminsCount ? (
+            <CommonTrans
+              i18nKey="BusinessRenewalPricingInfo"
+              values={{
+                finalDate: paymentDate,
+                price: formatFuturePaymentCurrency(
+                  getTotalCostByFormula(nextTariffAdminsCount),
+                ),
+                adminsCount: nextTariffAdminsCount,
+                perAdminPrice: formatPaymentCurrency(startValue),
+              }}
+              components={{ 1: <Text fontWeight={600} as="span" /> }}
+            />
+          ) : (
+            <CommonTrans
+              i18nKey="BusinessRenewalNotice"
+              values={{ finalDate: paymentDate }}
+            />
+          )}
+          &nbsp;
+          <HelpButton
+            className="payment-tooltip"
+            offsetRight={0}
+            iconNode={<HelpReactSvg />}
+            style={{ display: "inline-block", verticalAlign: "middle" }}
+            tooltipContent={<Text>{t("RenewalChargeOrderTooltip")}</Text>}
+            dataTestId="renewal_charge_order_help_button"
           />
         </Text>
       );
@@ -238,12 +266,32 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     <div className={styles.paymentBody}>
       {isNotPaidPeriod ? expiredTitleSubscriptionWarning() : currentPlanTitle()}
 
-      <CurrentTariffContainer />
+      {isNotPaidPeriod ? null : <CurrentTariffContainer />}
 
       {planSuggestion()}
+
+      {!isNonProfit && hasScheduledTariffAdminsChange ? (
+        <div style={{ marginTop: 16, marginBottom: 12 }}>
+          <StorageWarning
+            title={t("TariffAdminAdjustmentScheduled", {
+              fromCount: currentTariffAdminsCount,
+              toCount: nextTariffAdminsCount ?? 0,
+            })}
+            body={t("TariffAdminAdjustmentWarning", {
+              admins: maxCountManagersByQuota,
+            })}
+            onCancelChange={handleCancelTariffDowngrade}
+            isCancelLoading={isCancelDowngradeLoading}
+          />
+        </div>
+      ) : null}
+
       {planDescription()}
 
-      {!isNonProfit && !isGracePeriod && !isNotPaidPeriod ? (
+      {!isNonProfit &&
+      !isGracePeriod &&
+      !isNotPaidPeriod &&
+      !hasScheduledTariffAdminsChange ? (
         <div className={styles.paymentInfoWrapper}>
           <Text
             fontWeight={600}
@@ -269,15 +317,38 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
         </div>
       ) : null}
 
+      {!isNonProfit && (isAlreadyPaid || cardLinkedOnFreeTariff) ? (
+        <div className={styles.walletInfoWrapper}>
+          <WalletInfo
+            balance={formatWalletCurrency()}
+            onTopUp={onTopUp}
+            withoutBackground
+          />
+        </div>
+      ) : null}
+
+      {!isNonProfit && showUnlinkedCardBanner ? (
+        <div className={styles.unlinkedBanner}>
+          <UnlinkedCardBanner />
+        </div>
+      ) : null}
+
       <div className={styles.paymentInfo}>
         {!isNonProfit ? <PriceCalculation t={t} /> : null}
 
         <BenefitsContainer t={t} />
       </div>
       <ContactContainer t={t} />
+
+      {isTopUpVisible ? (
+        <SimpleTopUpDialog
+          visible={isTopUpVisible}
+          onClose={onCloseTopUp}
+          onConfirm={onCloseTopUp}
+        />
+      ) : null}
     </div>
   );
 });
 
 export default PaymentContainer;
-

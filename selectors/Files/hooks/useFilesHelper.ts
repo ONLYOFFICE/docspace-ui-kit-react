@@ -1,44 +1,10 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { use } from "react";
 import {
   FolderType,
   RoomType,
   type FolderDtoInteger,
   type FileDtoInteger,
+  type FolderContentDtoInteger,
 } from "@onlyoffice/docspace-api-sdk";
 
 import FolderSvg from "../../../assets/icons/32/folder.svg";
@@ -54,12 +20,18 @@ import useInputItemHelper from "../../utils/hooks/useInputItemHelper";
 import { SettingsContext } from "../../utils/contexts/Settings";
 import { LoadersContext } from "../../utils/contexts/Loaders";
 
-import { PAGE_COUNT } from "../../utils/constants";
+import {
+  PAGE_COUNT,
+  FORMS_ROOT_FOLDER_TYPE,
+  FORMS_SECTION_ID,
+} from "../../utils/constants";
 import type { UseFilesHelpersProps } from "../FilesSelector.types";
 import {
   convertFilesToItems,
   convertFoldersToItems,
   getDefaultBreadCrumb,
+  buildSpecialFolderItems,
+  buildScopedFolderUrl,
 } from "../../utils";
 
 import { getFilterParams } from "../FilesSelector.utils";
@@ -75,6 +47,7 @@ const useFilesHelper = ({
   searchValue,
   disabledItems,
   disabledFolderType,
+  pinnedRootId,
   includedItems,
   setSelectedItemSecurity,
   isThirdParty,
@@ -102,21 +75,30 @@ const useFilesHelper = ({
 
   setIsInsideKnowledge,
   setIsInsideResultStorage,
+  setIsInsidePrivateRoom,
 
   disableBySecurity,
   withSubFolders,
+
+  recentFolder,
+  favoritesFolder,
+  withRecentTreeFolder,
+  withFavoritesTreeFolder,
+  activeSpecialScope,
+  formsSection,
 }: UseFilesHelpersProps) => {
   const t = useCommonTranslation();
   const {
-    isFirstLoad,
-    setIsFirstLoad,
+    isFullLoadActive,
+    finishFullLoad,
+    finishContentLoading,
     setIsNextPageLoading,
-    setIsBreadCrumbsLoading,
+    hideSectionLoader,
   } = use(LoadersContext);
 
   const { getIcon, extsWebEdited, filesSettingsLoading } = use(SettingsContext);
 
-  const { foldersApi } = useApi();
+  const { foldersApi, apiClient } = useApi();
 
   const { addInputItem } = useInputItemHelper({
     withCreate,
@@ -126,16 +108,24 @@ const useFilesHelper = ({
 
   const requestRunning = React.useRef(false);
   const initRef = React.useRef(isInit);
-  const firstLoadRef = React.useRef(isFirstLoad);
+  const firstLoadRef = React.useRef(isFullLoadActive);
   const disabledItemsRef = React.useRef(disabledItems);
+  const formsSectionRef = React.useRef(formsSection);
+  const privateRoomCacheRef = React.useRef<Map<number | string, boolean>>(
+    new Map(),
+  );
 
   React.useEffect(() => {
     disabledItemsRef.current = disabledItems;
   }, [disabledItems]);
 
   React.useEffect(() => {
-    firstLoadRef.current = isFirstLoad;
-  }, [isFirstLoad]);
+    formsSectionRef.current = formsSection;
+  }, [formsSection]);
+
+  React.useEffect(() => {
+    firstLoadRef.current = isFullLoadActive;
+  }, [isFullLoadActive]);
 
   React.useEffect(() => {
     initRef.current = isInit;
@@ -164,7 +154,12 @@ const useFilesHelper = ({
         folderId: string | number,
         isErrorPath = false,
       ) => {
-        if (initRef.current && getRootData && folderId !== "@my") {
+        if (
+          initRef.current &&
+          getRootData &&
+          folderId !== "@my" &&
+          !activeSpecialScope
+        ) {
           // NOTE: folderId can be string but types cannot be fixed right now, using type assertion
           const folderInfoRes = await foldersApi.getFolderInfo({
             folderId: folderId as number,
@@ -181,6 +176,7 @@ const useFilesHelper = ({
               toastr.error(error);
 
               requestRunning.current = false;
+              finishContentLoading();
               return;
             }
 
@@ -192,24 +188,45 @@ const useFilesHelper = ({
               toastr.error(error);
             }
             requestRunning.current = false;
+            finishContentLoading();
             return;
           }
         }
 
         const currentSearch = searchValue || "";
 
-        // NOTE: folderId can be string but types cannot be fixed right now, using type assertion
-        const folderRes = await foldersApi.getFolderByFolderId({
-          folderId: folderId as number,
-          filterType: filterParams.filterType,
-          applyFilterOption: filterParams.applyFilterOption,
-          extension: filterParams.extension,
-          count: PAGE_COUNT,
-          startIndex,
-          filterValue: currentSearch,
-          withSubFolders,
-        });
-        const currentFolder = folderRes.data.response!;
+        let currentFolder: FolderContentDtoInteger;
+
+        if (activeSpecialScope) {
+          const url = buildScopedFolderUrl({
+            folderId: activeSpecialScope.folderId,
+            startIndex,
+            count: PAGE_COUNT,
+            search: currentSearch,
+            filterParams,
+            folderType: activeSpecialScope.folderType,
+            withSubFolders,
+          });
+
+          const { response } = await apiClient.request<{
+            response: FolderContentDtoInteger;
+          }>(url);
+
+          currentFolder = response;
+        } else {
+          // NOTE: folderId can be string but types cannot be fixed right now, using type assertion
+          const folderRes = await foldersApi.getFolderByFolderId({
+            folderId: folderId as number,
+            filterType: filterParams.filterType,
+            applyFilterOption: filterParams.applyFilterOption,
+            extension: filterParams.extension,
+            count: PAGE_COUNT,
+            startIndex,
+            filterValue: currentSearch,
+            withSubFolders,
+          });
+          currentFolder = folderRes.data.response!;
+        }
 
         const { folders, files, total, count, pathParts, current } =
           currentFolder;
@@ -251,6 +268,33 @@ const useFilesHelper = ({
 
         setIsInsideKnowledge(isInsideKnowledge);
         setIsInsideResultStorage(isInsideResultStorage);
+
+        const roomPart = (
+          pathParts as { id: number | string; roomType?: number }[]
+        ).find((p) => typeof p.roomType !== "undefined");
+
+        let isInsidePrivateRoom = false;
+        if (roomPart) {
+          if (current?.id === roomPart.id) {
+            isInsidePrivateRoom = current?.private === true;
+            privateRoomCacheRef.current.set(roomPart.id, isInsidePrivateRoom);
+          } else if (privateRoomCacheRef.current.has(roomPart.id)) {
+            isInsidePrivateRoom =
+              privateRoomCacheRef.current.get(roomPart.id) ?? false;
+          } else {
+            try {
+              const roomInfoRes = await foldersApi.getFolderInfo({
+                folderId: roomPart.id as number,
+              });
+              isInsidePrivateRoom = roomInfoRes.data.response?.private === true;
+              privateRoomCacheRef.current.set(roomPart.id, isInsidePrivateRoom);
+            } catch {
+              isInsidePrivateRoom = false;
+            }
+          }
+        }
+
+        setIsInsidePrivateRoom(isInsidePrivateRoom);
 
         if (initRef.current) {
           let foundParentId = false;
@@ -302,13 +346,32 @@ const useFilesHelper = ({
           //   if (item.roomType) breadCrumbs[idx].isRoom = true;
           // });
 
-          if (!isThirdParty && !isRoomsOnly && !isUserOnly)
+          if (pinnedRootId != null) {
+            const pinIndex = breadCrumbs.findIndex(
+              (bc) => bc.id.toString() === pinnedRootId.toString(),
+            );
+            if (pinIndex > 0) breadCrumbs.splice(0, pinIndex);
+          } else if (!isThirdParty && !isRoomsOnly && !isUserOnly) {
             breadCrumbs.unshift({ ...getDefaultBreadCrumb(t) });
+          }
+
+          // The Forms section is a client-only root that is not part of the
+          // server path, so it is missing from pathParts. Re-insert it after
+          // the root crumb so returning to it keeps searchArea=Forms.
+          if (formsSectionRef.current && !isThirdParty) {
+            const insertIndex = breadCrumbs.findIndex((bc) => +bc.id === 0) + 1;
+            breadCrumbs.splice(insertIndex, 0, {
+              label: t("Forms"),
+              id: FORMS_SECTION_ID,
+              isRoom: true,
+              rootFolderType: FORMS_ROOT_FOLDER_TYPE as FolderType,
+            });
+          }
 
           onSetBaseFolderPath?.(isErrorPath ? [] : breadCrumbs);
 
           setBreadCrumbs(breadCrumbs);
-          setIsBreadCrumbsLoading(false);
+          hideSectionLoader("breadcrumbs");
         }
 
         if (firstLoadRef.current || startIndex === 0) {
@@ -344,6 +407,35 @@ const useFilesHelper = ({
           } else {
             setTotal(total);
           }
+
+          if (
+            !activeSpecialScope &&
+            current!.rootFolderType === FolderType.USER &&
+            current!.parentId === 0 &&
+            !searchValue &&
+            startIndex === 0 &&
+            (withRecentTreeFolder || withFavoritesTreeFolder)
+          ) {
+            const specialItems = buildSpecialFolderItems({
+              section: "files",
+              recentFolder,
+              favoritesFolder,
+              withRecent: withRecentTreeFolder,
+              withFavorites: withFavoritesTreeFolder,
+              // Scope filter for Recent/Favorites: keep My Documents content
+              // only, so room files do not leak into this section.
+              folderType: FolderType.USER,
+              withSeparator: itemList.length > 0,
+              t,
+            });
+
+            if (specialItems.length) {
+              itemList.unshift(...specialItems);
+              const base = withCreate && security?.Create ? total + 1 : total;
+              setTotal(base + specialItems.length);
+            }
+          }
+
           setItems(itemList);
         } else {
           setItems((prevState) => {
@@ -354,7 +446,7 @@ const useFilesHelper = ({
         setIsRoot(false);
         setIsInit(false);
         setIsNextPageLoading(false);
-        setIsFirstLoad(false);
+        finishFullLoad();
       };
 
       try {
@@ -364,18 +456,30 @@ const useFilesHelper = ({
       } catch (e) {
         sessionStorage.removeItem("filesSelectorPath");
         if (isThirdParty && rootThirdPartyId) {
-          await setSettings(rootThirdPartyId, true);
+          try {
+            await setSettings(rootThirdPartyId, true);
+          } catch (fallbackError) {
+            toastr.error(fallbackError as TData);
+          } finally {
+            requestRunning.current = false;
+            finishFullLoad();
+          }
 
           toastr.error(e as TData);
-          requestRunning.current = false;
           return;
         }
 
         if (isRoomsOnly && getRoomList) {
-          await getRoomList(0, null, true, true);
+          try {
+            await getRoomList(0, null, true, true);
+          } catch (fallbackError) {
+            toastr.error(fallbackError as TData);
+          } finally {
+            requestRunning.current = false;
+            finishFullLoad();
+          }
 
           toastr.error(e as TData);
-          requestRunning.current = false;
           return;
         }
 
@@ -387,12 +491,18 @@ const useFilesHelper = ({
         if (onSetBaseFolderPath) {
           onSetBaseFolderPath([]);
         }
-        setIsFirstLoad(false);
+        finishFullLoad();
         toastr.error(e as TData);
       }
     },
     [
       foldersApi,
+      apiClient,
+      activeSpecialScope,
+      recentFolder,
+      favoritesFolder,
+      withRecentTreeFolder,
+      withFavoritesTreeFolder,
       filesSettingsLoading,
       setIsNextPageLoading,
       withCreate,
@@ -408,14 +518,15 @@ const useFilesHelper = ({
       setSelectedTreeNode,
       setIsRoot,
       setIsInit,
-      setIsFirstLoad,
+      finishFullLoad,
+      finishContentLoading,
       isRoomsOnly,
       getRoomList,
       onSetBaseFolderPath,
       getFilesArchiveError,
       isThirdParty,
       setBreadCrumbs,
-      setIsBreadCrumbsLoading,
+      hideSectionLoader,
       roomsFolderId,
       setIsSelectedParentFolder,
       setItems,

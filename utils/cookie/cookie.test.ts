@@ -1,43 +1,9 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
-vi.mock("../../constants", () => ({
-  LANGUAGE: "language",
-}));
+// The real constant, not a mock: test/setup.ts loads utils/i18n, which imports
+// this module, so utils/cookie is already in the module cache by the time a
+// `vi.mock` here could apply -- it would silently do nothing.
+import { LANGUAGE } from "../../constants";
 
 import { getCookie, setCookie, deleteCookie } from ".";
 
@@ -93,22 +59,22 @@ describe("cookie utils", () => {
     it("returns culture from URL for LANGUAGE on LinkInvite page", () => {
       window.history.replaceState({}, "", "/confirm/LinkInvite?culture=de-DE");
 
-      document.cookie = "language=en-US; path=/";
-      expect(getCookie("language")).toBe("de-DE");
+      document.cookie = `${LANGUAGE}=en-US; path=/`;
+      expect(getCookie(LANGUAGE)).toBe("de-DE");
     });
 
     it("falls back to cookie when culture param is missing", () => {
       window.history.replaceState({}, "", "/confirm/LinkInvite");
 
-      document.cookie = "language=en-US; path=/";
-      expect(getCookie("language")).toBe("en-US");
+      document.cookie = `${LANGUAGE}=en-US; path=/`;
+      expect(getCookie(LANGUAGE)).toBe("en-US");
     });
 
     it("falls back to cookie when pathname does not match", () => {
       window.history.replaceState({}, "", "/other?culture=de-DE");
 
-      document.cookie = "language=en-US; path=/";
-      expect(getCookie("language")).toBe("en-US");
+      document.cookie = `${LANGUAGE}=en-US; path=/`;
+      expect(getCookie(LANGUAGE)).toBe("en-US");
     });
 
     it("does not apply URL logic for non-LANGUAGE cookies", () => {

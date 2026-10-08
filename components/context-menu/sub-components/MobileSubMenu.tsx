@@ -12,9 +12,9 @@ import { Badge } from "../../badge";
 import { ToggleButton } from "../../toggle-button";
 
 import type {
-	ContextMenuModel,
-	ContextMenuType,
-	TOnMobileItemClick,
+  ContextMenuModel,
+  ContextMenuType,
+  TOnMobileItemClick,
 } from "../ContextMenu.types";
 import { globalColors } from "../../../providers/theme";
 
@@ -23,292 +23,338 @@ import styles from "../ContextMenu.module.scss";
 import { ContextMenuSkeleton } from "./Skeleton";
 
 interface MobileSubMenuProps {
-	onLeafClick: (e: React.MouseEvent) => void;
-	root?: boolean;
-	resetMenu: boolean;
-	mobileSubMenuItems?: ContextMenuModel[];
-	onMobileItemClick?: TOnMobileItemClick;
+  onLeafClick: (e: React.MouseEvent) => void;
+  root?: boolean;
+  resetMenu: boolean;
+  mobileSubMenuItems?: ContextMenuModel[];
+  onMobileItemClick?: TOnMobileItemClick;
 }
 
 const MenuItem = ({
-	item,
-	onClick,
-	style,
+  item,
+  onClick,
+  style,
 }: {
-	item: ContextMenuType;
-	onClick: (e: React.MouseEvent) => void;
-	style: React.CSSProperties;
+  item: ContextMenuType;
+  onClick: (e: React.MouseEvent) => void;
+  style: React.CSSProperties;
 }) => {
-	const { isBase } = useTheme();
+  const { isBase } = useTheme();
 
-	if (item.disabled) return null;
+  if (item.disabled) return null;
 
-	const subMenuIconClassName = "p-submenu-icon";
+  const subMenuIconClassName = "p-submenu-icon";
 
-	const className = classNames(
-		"p-menuitem",
-		{ "p-menuitem-active": false },
-		{ "p-menuitem-with-toggle": item.withToggle },
-		item?.className || "",
-	);
+  const className = classNames(
+    "p-menuitem",
+    { "p-menuitem-active": false },
+    { "p-menuitem-with-toggle": item.withToggle },
+    item?.className || "",
+  );
 
-	const linkClassName = classNames("p-menuitem-link", "not-selectable", {
-		"p-disabled": item.disabled || item.disableColor,
-		"p-disabled-styles-toggle": item.disabled && item.disabledStylesType === "toggle",
-		[styles.menuItemWithToggle]: item.withToggle,
-	});
+  const linkClassName = classNames("p-menuitem-link", "not-selectable", {
+    "p-disabled": item.disabled || item.disableColor,
+    "p-disabled-styles-toggle":
+      item.disabled && item.disabledStylesType === "toggle",
+    [styles.menuItemWithToggle]: item.withToggle,
+  });
 
-	const iconClassName = classNames("p-menuitem-icon", {
-		"p-disabled": item.disabled || item.disableColor,
-		"p-disabled-styles-toggle": item.disabled && item.disabledStylesType === "toggle",
-	});
+  const iconClassName = classNames("p-menuitem-icon", {
+    "p-disabled": item.disabled || item.disableColor,
+    "p-disabled-styles-toggle":
+      item.disabled && item.disabledStylesType === "toggle",
+  });
 
-	const renderIcon = () => {
-		if (!item.icon) return null;
+  const renderIcon = () => {
+    if (!item.icon) return null;
 
-		return !item.icon.includes("images/") ? (
-			<img src={item.icon} alt="plugin img" className={iconClassName} />
-		) : (
-			<ReactSVG wrapper="span" className={iconClassName} src={item.icon} />
-		);
-	};
+    return !item.icon.includes("images/") ? (
+      <img src={item.icon} alt="plugin img" className={iconClassName} />
+    ) : (
+      <ReactSVG wrapper="span" className={iconClassName} src={item.icon} />
+    );
+  };
 
-	const dataKeys = Object.fromEntries(
-		Object.entries(item).filter((el) => el[0].indexOf("data-") === 0),
-	);
+  const dataKeys = Object.fromEntries(
+    Object.entries(item).filter((el) => el[0].indexOf("data-") === 0),
+  );
 
-	if (item.withToggle) {
-		return (
-			<li
-				id={item.id}
-				key={item.key}
-				data-testid={item.dataTestId ?? item.key}
-				role="none"
-				className={className}
-				style={{ ...item.style, ...style }}
-			>
-				<a
-					href={item.url || "#"}
-					className={linkClassName}
-					target={item.target}
-					{...dataKeys}
-					onClick={onClick}
-					role="menuitem"
-				>
-					{renderIcon()}
-					{item.label ? (
-						<span className="p-menuitem-text not-selectable">{item.label}</span>
-					) : null}
-					<ToggleButton
-						isChecked={item.checked || false}
-						onChange={() => onClick}
-						noAnimation
-						isDisabled={item?.disabled ?? false}
-						style={{ width: "28px", height: "16px" }}
-					/>
-				</a>
-			</li>
-		);
-	}
+  if (item.withToggle) {
+    return (
+      <li
+        id={item.id}
+        key={item.key}
+        data-testid={item.dataTestId ?? item.key}
+        role="none"
+        className={className}
+        style={{ ...item.style, ...style }}
+      >
+        <a
+          href={item.url || "#"}
+          className={linkClassName}
+          target={item.target}
+          {...dataKeys}
+          onClick={onClick}
+          role="menuitem"
+        >
+          {renderIcon()}
+          {item.label ? (
+            <span className="p-menuitem-text not-selectable">{item.label}</span>
+          ) : null}
+          <ToggleButton
+            isChecked={item.checked || false}
+            onChange={() => onClick}
+            noAnimation
+            isDisabled={item?.disabled ?? false}
+            style={{ width: "28px", height: "16px" }}
+          />
+        </a>
+      </li>
+    );
+  }
 
-	return (
-		<li
-			id={item.id}
-			key={item.key}
-			data-testid={item.dataTestId ?? item.key}
-			role="none"
-			className={className}
-			style={{ ...item.style, ...style }}
-		>
-			<a
-				href={item.url || "#"}
-				className={linkClassName}
-				target={item.target}
-				{...dataKeys}
-				onClick={onClick}
-				role="menuitem"
-			>
-				{renderIcon()}
-				{item.label ? (
-					<span className="p-menuitem-text not-selectable">{item.label}</span>
-				) : null}
-				{item.items ? <ArrowIcon className="p-submenu-icon" /> : null}
-				{item.isPaidBadge ? (
-					<Badge
-						label={item.badgeLabel}
-						className={`${subMenuIconClassName} p-submenu-badge`}
-						style={{ marginInlineStart: "10px" }}
-						backgroundColor={
-							item.isPaidBadge
-								? isBase
-									? globalColors.favoritesStatus
-									: globalColors.favoriteStatusDark
-								: globalColors.lightBlueMain
-						}
-						fontSize="9px"
-						fontWeight={700}
-						borderRadius="50px"
-						noHover
-						isPaidBadge={item.isPaidBadge}
-						isHovered={false}
-					/>
-				) : null}
-			</a>
-		</li>
-	);
+  const itemRow = (
+    <>
+      {renderIcon()}
+      {item.label ? (
+        <span className="p-menuitem-text not-selectable">{item.label}</span>
+      ) : null}
+      {item.items ? <ArrowIcon className="p-submenu-icon" /> : null}
+      {item.isPaidBadge ? (
+        <Badge
+          label={item.badgeLabel}
+          className={`${subMenuIconClassName} p-submenu-badge`}
+          style={{ marginInlineStart: "10px" }}
+          backgroundColor={
+            item.isPaidBadge
+              ? isBase
+                ? globalColors.favoritesStatus
+                : globalColors.favoriteStatusDark
+              : globalColors.lightBlueMain
+          }
+          fontSize="9px"
+          fontWeight={700}
+          borderRadius="50px"
+          noHover
+          isPaidBadge={item.isPaidBadge}
+          isHovered={false}
+        />
+      ) : null}
+    </>
+  );
+
+  // An item that explains itself is laid out as two lines, same as on desktop.
+  const hasDescription = Boolean(item.description);
+
+  return (
+    <li
+      id={item.id}
+      key={item.key}
+      data-testid={item.dataTestId ?? item.key}
+      role="none"
+      className={classNames(className, {
+        [styles.menuItemWithDescription]: hasDescription,
+      })}
+      style={{ ...item.style, ...style }}
+    >
+      <a
+        href={item.url || "#"}
+        className={linkClassName}
+        target={item.target}
+        {...dataKeys}
+        onClick={onClick}
+        role="menuitem"
+      >
+        {hasDescription ? (
+          <>
+            <span className={styles.itemRow}>{itemRow}</span>
+            <span className={styles.itemDescription}>{item.description}</span>
+          </>
+        ) : (
+          itemRow
+        )}
+      </a>
+    </li>
+  );
 };
 
 const Separator = ({
-	index,
-	style,
+  index,
+  style,
 }: {
-	index: number;
-	style: React.CSSProperties;
+  index: number;
+  style: React.CSSProperties;
 }) => (
-	<li
-		key={`separator_${index}`}
-		className="p-menu-separator not-selectable"
-		role="separator"
-		style={style}
-	/>
+  <li
+    key={`separator_${index}`}
+    className="p-menu-separator not-selectable"
+    role="separator"
+    style={style}
+  />
 );
 
 export const MobileSubMenu = ({
-	onLeafClick,
-	root,
-	resetMenu,
-	mobileSubMenuItems,
-	onMobileItemClick,
+  onLeafClick,
+  root,
+  resetMenu,
+  mobileSubMenuItems,
+  onMobileItemClick,
 }: MobileSubMenuProps) => {
-	const [submenu, setSubmenu] = useState<ContextMenuModel[] | null>(null);
-	const subMenuRef = useRef<HTMLUListElement>(null);
+  const [submenu, setSubmenu] = useState<ContextMenuModel[] | null>(null);
+  const [measuredRowsHeight, setMeasuredRowsHeight] = useState(0);
+  const subMenuRef = useRef<HTMLUListElement>(null);
 
-	const position = useCallback(() => {
-		if (!subMenuRef.current) return;
+  const position = useCallback(() => {
+    if (!subMenuRef.current) return;
 
-		const parentItem = subMenuRef.current.parentElement;
-		if (!parentItem) return;
+    const parentItem = subMenuRef.current.parentElement;
+    if (!parentItem) return;
 
-		const containerOffset = DomHelpers.getOffset(parentItem);
-		const viewport = DomHelpers.getViewport();
-		const subListWidth = subMenuRef.current.offsetParent
-			? subMenuRef.current.offsetWidth
-			: DomHelpers.getHiddenElementOuterWidth(subMenuRef.current);
-		const itemOuterWidth = DomHelpers.getOuterWidth(
-			parentItem.children[0] as HTMLElement,
-		);
+    const containerOffset = DomHelpers.getOffset(parentItem);
+    const viewport = DomHelpers.getViewport();
+    const subListWidth = subMenuRef.current.offsetParent
+      ? subMenuRef.current.offsetWidth
+      : DomHelpers.getHiddenElementOuterWidth(subMenuRef.current);
+    const itemOuterWidth = DomHelpers.getOuterWidth(
+      parentItem.children[0] as HTMLElement,
+    );
 
-		subMenuRef.current.style.top = "0px";
-		if (
-			parseInt(`${containerOffset.left}`, 10) + itemOuterWidth + subListWidth >
-			viewport.width - (DomHelpers.calculateScrollbarWidth() ?? 0)
-		) {
-			subMenuRef.current.style.left = `${-1 * subListWidth}px`;
-		} else {
-			subMenuRef.current.style.left = `${itemOuterWidth}px`;
-		}
-	}, []);
+    subMenuRef.current.style.top = "0px";
+    if (
+      parseInt(`${containerOffset.left}`, 10) + itemOuterWidth + subListWidth >
+      viewport.width - (DomHelpers.calculateScrollbarWidth() ?? 0)
+    ) {
+      subMenuRef.current.style.left = `${-1 * subListWidth}px`;
+    } else {
+      subMenuRef.current.style.left = `${itemOuterWidth}px`;
+    }
+  }, []);
 
-	const isActive = useCallback(() => root || !resetMenu, [root, resetMenu]);
+  const isActive = useCallback(() => root || !resetMenu, [root, resetMenu]);
 
-	useEffect(() => {
-		if (isActive()) {
-			position();
-		}
-	}, [isActive, position]);
+  useEffect(() => {
+    if (isActive()) {
+      position();
+    }
+  }, [isActive, position]);
 
-	useEffect(() => {
-		if (!mobileSubMenuItems?.length) return;
-		setSubmenu(mobileSubMenuItems);
-		position();
-	}, [mobileSubMenuItems, position]);
+  useEffect(() => {
+    if (!mobileSubMenuItems?.length) return;
+    setSubmenu(mobileSubMenuItems);
+    position();
+  }, [mobileSubMenuItems, position]);
 
-	const handleItemClick = useCallback(
-		(e: React.MouseEvent, item: ContextMenuType) => {
-			if (item.disabled) {
-				e.preventDefault();
-				return;
-			}
+  // Items carrying a description are two lines tall and how tall exactly
+  // depends on where their text wraps, so the fixed row height below cannot
+  // size the list: those rows are measured once they are on screen.
+  const hasItemDescriptions = submenu?.some(
+    (item: ContextMenuModel) =>
+      item && !item.isSeparator && "description" in item && !!item.description,
+  );
 
-			if (!item.url) {
-				e.preventDefault();
-			}
+  useEffect(() => {
+    if (!hasItemDescriptions || !isActive()) return;
 
-			item.onClick?.({ originalEvent: e, action: item.action, item });
+    const list = subMenuRef.current;
+    if (!list) return;
 
-			if (item.withToggle) return;
+    const rows = Array.from(list.querySelectorAll<HTMLElement>("li")).filter(
+      (row) => row.parentElement?.closest("ul") === list,
+    );
 
-			if (item.items || item.onLoad) {
-				onMobileItemClick?.(e, item.label as string, item.items, item.onLoad);
-			} else {
-				onLeafClick(e);
-			}
-		},
-		[onLeafClick, onMobileItemClick],
-	);
+    const total = rows.reduce((sum, row) => sum + row.offsetHeight, 0);
 
-	const renderMenu = useCallback(
-		(model: ContextMenuModel[]) => {
-			if (!model?.length) return null;
+    if (total > 0) setMeasuredRowsHeight(total);
+  }, [hasItemDescriptions, isActive, submenu]);
 
-			const activeModel = model.filter(
-				(item: ContextMenuModel) => item && !item.disabled,
-			);
+  const handleItemClick = useCallback(
+    (e: React.MouseEvent, item: ContextMenuType) => {
+      if (item.disabled) {
+        e.preventDefault();
+        return;
+      }
 
-			const rowHeights: number[] = activeModel.map((item: ContextMenuModel) =>
-				!item ? 0 : item.isSeparator ? 13 : 36,
-			);
+      if (!item.url) {
+        e.preventDefault();
+      }
 
-			const totalHeight: number = rowHeights.reduce((a, b) => a + b, 0);
-			const viewport = DomHelpers.getViewport();
-			const listHeight =
-				totalHeight + 61 > viewport.height - 64
-					? viewport.height - 125
-					: totalHeight + 5;
+      item.onClick?.({ originalEvent: e, action: item.action, item });
 
-			return (
-				<Scrollbar style={{ height: listHeight }}>
-					{model.map((item: ContextMenuModel, index: number) => {
-						if (item.disabled) return null;
+      if (item.withToggle) return;
 
-						if (item.isSeparator || !("label" in item)) {
-							return (
-								<Separator
-									key={item.key}
-									index={index}
-									style={item.style || {}}
-								/>
-							);
-						}
+      if (item.items || item.onLoad) {
+        onMobileItemClick?.(e, item.label as string, item.items, item.onLoad);
+      } else {
+        onLeafClick(e);
+      }
+    },
+    [onLeafClick, onMobileItemClick],
+  );
 
-						return (
-							<MenuItem
-								key={item.key}
-								item={item as ContextMenuType}
-								onClick={(e) => handleItemClick(e, item as ContextMenuType)}
-								style={item.style || {}}
-							/>
-						);
-					})}
-				</Scrollbar>
-			);
-		},
-		[handleItemClick],
-	);
+  const renderMenu = useCallback(
+    (model: ContextMenuModel[]) => {
+      if (!model?.length) return null;
 
-	const className = classNames({ "p-submenu-list": !root });
+      const activeModel = model.filter(
+        (item: ContextMenuModel) => item && !item.disabled,
+      );
 
-	return (
-		<CSSTransition
-			nodeRef={subMenuRef}
-			classNames="p-contextmenusub"
-			in={isActive()}
-			timeout={{ enter: 0, exit: 0 }}
-			unmountOnExit
-		>
-			<ul ref={subMenuRef} className={`${className} not-selectable`}>
-				{submenu ? renderMenu(submenu) : <ContextMenuSkeleton />}
-			</ul>
-		</CSSTransition>
-	);
+      const rowHeights: number[] = activeModel.map((item: ContextMenuModel) =>
+        !item ? 0 : item.isSeparator ? 13 : 36,
+      );
+
+      const totalHeight: number =
+        (hasItemDescriptions && measuredRowsHeight) ||
+        rowHeights.reduce((a, b) => a + b, 0);
+      const viewport = DomHelpers.getViewport();
+      const listHeight =
+        totalHeight + 61 > viewport.height - 64
+          ? viewport.height - 125
+          : totalHeight + 5;
+
+      return (
+        <Scrollbar style={{ height: listHeight }}>
+          {model.map((item: ContextMenuModel, index: number) => {
+            if (item.disabled) return null;
+
+            if (item.isSeparator || !("label" in item)) {
+              return (
+                <Separator
+                  key={item.key}
+                  index={index}
+                  style={item.style || {}}
+                />
+              );
+            }
+
+            return (
+              <MenuItem
+                key={item.key}
+                item={item as ContextMenuType}
+                onClick={(e) => handleItemClick(e, item as ContextMenuType)}
+                style={item.style || {}}
+              />
+            );
+          })}
+        </Scrollbar>
+      );
+    },
+    [handleItemClick, hasItemDescriptions, measuredRowsHeight],
+  );
+
+  const className = classNames({ "p-submenu-list": !root });
+
+  return (
+    <CSSTransition
+      nodeRef={subMenuRef}
+      classNames="p-contextmenusub"
+      in={isActive()}
+      timeout={{ enter: 0, exit: 0 }}
+      unmountOnExit
+    >
+      <ul ref={subMenuRef} className={`${className} not-selectable`}>
+        {submenu ? renderMenu(submenu) : <ContextMenuSkeleton />}
+      </ul>
+    </CSSTransition>
+  );
 };

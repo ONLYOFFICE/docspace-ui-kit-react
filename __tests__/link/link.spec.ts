@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { type Page, expect, test } from "@playwright/test";
 
 // Title: "UI/Navigation/Link"
@@ -63,6 +28,37 @@ test.describe("Link — light", () => {
   test("css customization", async ({ page }) => {
     await gotoStory(page, "css-customization");
     await expect(page).toHaveScreenshot("link-css-customization.png");
+  });
+
+  test("with text overflow", async ({ page }) => {
+    await gotoStory(page, "with-text-overflow");
+    await expect(page).toHaveScreenshot("link-with-text-overflow.png");
+  });
+
+  test("keyboard accessible action", async ({ page }) => {
+    await gotoStory(page, "keyboard-accessible-action");
+    await page.keyboard.press("Tab");
+    await expect(
+      page.getByRole("button", { name: "Move to archive" }),
+    ).toBeFocused();
+    await expect(page).toHaveScreenshot("link-keyboard-accessible-action.png");
+  });
+
+  test("with tooltip", async ({ page }) => {
+    await gotoStory(page, "with-tooltip");
+    await page.getByTestId("link").hover();
+    await expect(page.getByText("Opens the shared folder")).toBeVisible();
+    await expect(page).toHaveScreenshot("link-with-tooltip.png");
+  });
+
+  test("custom color", async ({ page }) => {
+    await gotoStory(page, "custom-color");
+    await expect(page).toHaveScreenshot("link-custom-color.png");
+  });
+
+  test("text decorations", async ({ page }) => {
+    await gotoStory(page, "text-decorations");
+    await expect(page).toHaveScreenshot("link-text-decorations.png");
   });
 });
 

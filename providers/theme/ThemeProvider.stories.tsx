@@ -1,6 +1,6 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useTheme } from "styled-components";
+import { useTheme } from "../../context/ThemeContext";
 
 import { ThemeKeys } from "../../enums";
 
@@ -8,33 +8,9 @@ import ThemeProvider from "./ThemeProvider";
 
 const meta: Meta<typeof ThemeProvider> = {
   title: "Components/Providers/ThemeProvider",
-  tags: ["!autodocs"],
   component: ThemeProvider,
-  parameters: {
-    docs: {
-      description: {
-        component: `ThemeProvider resolves the active theme (light/dark/system) and provides it to child components via the \`ThemeProviderComponent\`.
-
-### Features
-
-- Resolves theme based on \`initialTheme\`, \`systemTheme\`, and system preference
-- Fetches color theme from API if not provided
-- Monitors system theme preference changes
-- Supports RTL via the \`locale\` prop
-
-### Usage
-
-\`\`\`tsx
-import { ThemeProvider } from "@docspace/ui-kit/providers/theme";
-import { ThemeKeys } from "@docspace/ui-kit/enums";
-
-<ThemeProvider initialTheme={ThemeKeys.BaseStr}>
-  <App />
-</ThemeProvider>
-\`\`\``,
-      },
-    },
-  },
+  // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+  // there is no second description to keep in step with it.
 };
 
 export default meta;
@@ -42,8 +18,8 @@ export default meta;
 type Story = StoryObj<typeof ThemeProvider>;
 
 const ThemedContent = () => {
-  const theme = useTheme();
-  const isDark = !theme.isBase;
+  const { isBase } = useTheme();
+  const isDark = !isBase;
 
   return (
     <div
@@ -69,8 +45,8 @@ const ThemedContent = () => {
           backgroundColor: isDark ? "#444" : "#f5f5f5",
         }}
       >
-        <p>Theme styling is applied via styled-components context.</p>
-        <p>Background color changes based on theme.isBase property.</p>
+        <p>Theme styling is applied via ThemeContext.</p>
+        <p>Background color changes based on isBase property.</p>
       </div>
     </div>
   );

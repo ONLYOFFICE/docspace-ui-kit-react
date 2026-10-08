@@ -1,39 +1,4 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import type {
   PaymentApi,
   TenantQuotaFeatureDto,
@@ -43,6 +8,9 @@ import type { TNumericPaymentFeature, TBooleanPaymentFeature } from "../types";
 import { MANAGER, YEAR_KEY } from "../constants";
 import { TOTAL_SIZE } from "./CurrentQuotasStore";
 import type CurrentQuotasStore from "./CurrentQuotasStore";
+
+/** Quota id of the future tariff used by MigrateToWalletDialog. */
+const FUTURE_TARIFF_QUOTA_ID = -14;
 
 class PaymentQuotasStore {
   private paymentApi: PaymentApi;
@@ -54,6 +22,11 @@ class PaymentQuotasStore {
   portalPaymentQuotas: QuotaDto | null = null;
 
   portalPaymentQuotasFeatures: Map<string, TenantQuotaFeatureDto> = new Map();
+
+  /** Future tariff quota (id -14), kept for MigrateToWalletDialog. */
+  futurePaymentQuotas: QuotaDto | null = null;
+
+  futurePaymentQuotasFeatures: Map<string, TenantQuotaFeatureDto> = new Map();
 
   isLoaded = false;
 
@@ -102,17 +75,23 @@ class PaymentQuotasStore {
     };
   }
 
+  get futurePlanCost() {
+    const price = this.futurePaymentQuotas?.price;
+    return {
+      value: price?.value ?? 0,
+      isoCurrencySymbol: price?.isoCurrencySymbol ?? "USD",
+    };
+  }
+
   get stepAddingQuotaManagers() {
     const result = this.portalPaymentQuotasFeatures.get(MANAGER) as
-      | TNumericPaymentFeature
-      | undefined;
+      TNumericPaymentFeature | undefined;
     return result?.value ?? null;
   }
 
   get stepAddingQuotaTotalSize() {
     const result = this.portalPaymentQuotasFeatures.get(TOTAL_SIZE) as
-      | TNumericPaymentFeature
-      | undefined;
+      TNumericPaymentFeature | undefined;
     return result?.value ?? null;
   }
 
@@ -122,11 +101,13 @@ class PaymentQuotasStore {
 
     try {
       const res = await this.paymentApi.getPaymentQuotas(
-        {
-          wallet: false,
-        },
+        {},
         {
           signal: abortController.signal,
+          // TODO: move `additional` into the typed request once the SDK
+          // regenerates PaymentApiGetPaymentQuotasRequest with this field.
+          // Passed via axios params so it is appended to the query string.
+          params: { additional: false },
         },
       );
 
@@ -153,8 +134,7 @@ class PaymentQuotasStore {
       const quotasByYear = new Map<boolean, QuotaWithMap>(
         Array.from(quotasById.values()).map((q) => {
           const yearFeature = q.featuresMap.get(YEAR_KEY) as
-            | TBooleanPaymentFeature
-            | undefined;
+            TBooleanPaymentFeature | undefined;
           return [yearFeature?.value ?? false, q];
         }),
       );
@@ -173,10 +153,27 @@ class PaymentQuotasStore {
         matchedQuota = quotasByYear.get(true);
       }
 
-      if (!matchedQuota) return;
+      // After the await above, so outside the action makeAutoObservable made
+      // of this method; one action also keeps observers from seeing the new
+      // future quota beside the old portal one.
+      runInAction(() => {
+        if (currentQuotaId !== FUTURE_TARIFF_QUOTA_ID) {
+          const futureQuota = quotasById.get(FUTURE_TARIFF_QUOTA_ID);
+          this.futurePaymentQuotas = futureQuota ?? null;
+          this.futurePaymentQuotasFeatures =
+            futureQuota?.featuresMap ?? new Map();
+        } else {
+          this.futurePaymentQuotas = null;
+          this.futurePaymentQuotasFeatures = new Map();
+        }
 
-      this.portalPaymentQuotas = matchedQuota;
-      this.portalPaymentQuotasFeatures = matchedQuota.featuresMap;
+        if (!matchedQuota) return;
+
+        this.portalPaymentQuotas = matchedQuota;
+        this.portalPaymentQuotasFeatures = matchedQuota.featuresMap;
+      });
+
+      if (!matchedQuota) return;
 
       this.setIsLoaded(true);
     } catch (error: unknown) {

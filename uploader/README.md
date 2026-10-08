@@ -1,11 +1,11 @@
 # Uploader
 
-A complete file upload component with chunked upload support, progress tracking, and file size validation. Built on top of the `Dropzone` component and DocSpace API SDK, it handles the entire upload workflow including session management, parallel chunk uploads, and folder structure preservation.
+A complete file upload component with chunked upload support, progress tracking, and file size validation. Built on top of the `Dropzone` component and ONLYOFFICE Apps API SDK, it handles the entire upload workflow including session management, parallel chunk uploads, and folder structure preservation.
 
 ## Usage
 
 ```tsx
-import { Uploader } from "@docspace/ui-kit/uploader";
+import { Uploader } from "@onlyoffice/apps-ui-kit/uploader";
 
 <Uploader
   targetId="12345"
@@ -17,32 +17,32 @@ import { Uploader } from "@docspace/ui-kit/uploader";
   secondaryText="or drag and drop files here"
   onUploadSuccess={(files) => console.log("Uploaded:", files)}
   onUploadError={(error) => console.error("Error:", error)}
-/>
+/>;
 ```
 
 ## Properties
 
-| Prop                 | Type                                      | Default | Description                                                    |
-|----------------------|-------------------------------------------|---------|----------------------------------------------------------------|
-| `width`              | `string`                                  | `100%`  | Width of the uploader container                                |
-| `height`             | `string`                                  | `100%`  | Height of the uploader container                               |
-| `targetId`           | `string`                                  | —       | Target folder ID for uploads                                   |
-| `accept`             | `string`                                  | —       | Accepted file types (e.g., `.pdf,.doc,.docx`)                  |
-| `shortText`          | `string`                                  | —       | Short text displaying supported file extensions                |
-| `fullText`           | `string`                                  | —       | Full list of extensions (shown in expandable dropdown)         |
-| `badgeValue`         | `number`                                  | —       | Badge showing count of additional formats (e.g., +5)           |
-| `linkMainText`       | `string`                                  | —       | Main text displayed in the dropzone                            |
-| `secondaryText`      | `string`                                  | —       | Secondary text displayed in the dropzone                       |
-| `extensionsText`     | `string`                                  | —       | Text displaying supported file extensions                      |
-| `isFolderUpload`     | `boolean`                                 | `false` | Enables folder upload mode                                     |
-| `isMultipleUpload`   | `boolean`                                 | `true`  | Allows multiple files/folders upload                           |
-| `maxPerUploadSize`   | `string`                                  | —       | Maximum size per single upload (e.g., `10MB`)                  |
-| `maxTotalUploadSize` | `string`                                  | —       | Maximum total upload size (e.g., `100MB`)                      |
-| `filesSettings`      | `UploaderFilesSettings`                   | —       | Server file settings (chunk size, thread count, etc.)          |
-| `onUploadProgress`   | `(data: UploadProgressData) => void`      | —       | Called on each upload progress update per file                 |
-| `onUploadSuccess`    | `(data: unknown[]) => void`               | —       | Called when all files are uploaded successfully                |
-| `onUploadError`      | `(data: { error: string }) => void`       | —       | Called when upload fails                                       |
-| `getFolderUrl`       | `(folderId: number) => string`            | —       | Callback to generate folder URL for success toast link.        |
+| Prop                 | Type                                 | Default | Description                                                                   |
+| -------------------- | ------------------------------------ | ------- | ----------------------------------------------------------------------------- |
+| `width`              | `string`                             | `100%`  | Width of the uploader container                                               |
+| `height`             | `string`                             | `100%`  | Height of the uploader container                                              |
+| `targetId`           | `string \| number`                   | —       | Target folder: a number for a portal folder, a string for third-party storage |
+| `accept`             | `string`                             | —       | Accepted file types (e.g., `.pdf,.doc,.docx`)                                 |
+| `shortText`          | `string`                             | —       | Short text displaying supported file extensions                               |
+| `fullText`           | `string`                             | —       | Full list of extensions (shown in expandable dropdown)                        |
+| `badgeValue`         | `number`                             | —       | Badge showing count of additional formats (e.g., +5)                          |
+| `linkMainText`       | `string`                             | —       | Main text displayed in the dropzone                                           |
+| `secondaryText`      | `string`                             | —       | Secondary text displayed in the dropzone                                      |
+| `extensionsText`     | `string`                             | —       | Text displaying supported file extensions                                     |
+| `isFolderUpload`     | `boolean`                            | `false` | Enables folder upload mode                                                    |
+| `isMultipleUpload`   | `boolean`                            | `true`  | Allows multiple files/folders upload                                          |
+| `maxPerUploadSize`   | `string`                             | —       | Maximum size per single upload (e.g., `10MB`)                                 |
+| `maxTotalUploadSize` | `string`                             | —       | Maximum total upload size (e.g., `100MB`)                                     |
+| `filesSettings`      | `UploaderFilesSettings`              | —       | Server file settings (chunk size, thread count, etc.)                         |
+| `onUploadProgress`   | `(data: UploadProgressData) => void` | —       | Called on each upload progress update per file                                |
+| `onUploadSuccess`    | `(data: unknown[]) => void`          | —       | Called when all files are uploaded successfully                               |
+| `onUploadError`      | `(data: { error: string }) => void`  | —       | Called when upload fails                                                      |
+| `getFolderUrl`       | `(folderId: number) => string`       | —       | Callback to generate folder URL for success toast link.                       |
 
 ## Examples
 
@@ -109,5 +109,5 @@ import { Uploader } from "@docspace/ui-kit/uploader";
 - **Parallel Upload**: Multiple chunks and files can be uploaded in parallel. Configure via `filesSettings.maxUploadThreadCount` and `filesSettings.maxUploadFilesCount`.
 - **Folder Structure**: When uploading folders, the component preserves the folder structure by creating necessary directories on the server.
 - **Size Validation**: Use `maxPerUploadSize` and `maxTotalUploadSize` to limit file sizes. Supports formats like `10MB`, `1GB`, `500KB`.
-- **API Provider Required**: This component requires `ApiProvider` from `@docspace/ui-kit/providers/api` to be present in the component tree.
+- **API Provider Required**: This component requires `ApiProvider` from `@onlyoffice/apps-ui-kit/providers/api` to be present in the component tree.
 - **Toast Notifications**: The component shows toast notifications for success and error states. Ensure `Toast` component is rendered in your app.

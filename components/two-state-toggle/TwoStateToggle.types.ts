@@ -1,62 +1,56 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 export type TwoStateToggleProps = {
-  /** Text label shown to the left of the toggle */
+  /**
+   * Text to the left of the pill. An empty string removes it.
+   * @default "ONLYOFFICE Apps design"
+   */
   title?: string;
-  /** Label for the classic DocSpace view (left side of pill) */
+  /**
+   * Label on the left half of the pill, the classic view.
+   * @default "OLD"
+   */
   labelOld?: string;
-  /** Label for the new Dashboard view (right side of pill) */
+  /**
+   * Label on the right half, the new dashboard.
+   * @default "NEW"
+   */
   labelNew?: string;
-  /** Confirmation modal title (shown when switching NEW → OLD) */
+  /**
+   * Heading of the dialog shown when leaving the new view.
+   * @default "Switch to Old Design"
+   */
   confirmTitle?: string;
-  /** Confirmation modal main body text */
+  /**
+   * First paragraph of that dialog.
+   * @default "You are about to leave the new Dashboard and return to the classic ONLYOFFICE Apps view."
+   */
   confirmBody?: string;
-  /** Hint shown below the body — e.g. how to return to new view */
+  /**
+   * Second paragraph of that dialog. An empty string removes it.
+   * @default "You can return to the new Dashboard at any time by navigating to /dashboard."
+   */
   confirmHint?: string;
-  /** Confirmation modal "proceed" button label */
+  /**
+   * Label of that dialog's primary button.
+   * @default "Switch"
+   */
   confirmOk?: string;
-  /** Confirmation modal "cancel" button label */
+  /**
+   * Label of its cancel button.
+   * @default "Cancel"
+   */
   confirmCancel?: string;
   /**
-   * Called when the user navigates to a new URL.
-   * Provide React Router's `navigate` here to avoid a full page reload
-   * when switching to the new Dashboard view.
-   * Falls back to `window.location.href` when omitted.
+   * Accessible name of the switch button. The English default is not
+   * translated for you.
+   * @default "Switch ONLYOFFICE Apps design"
+   */
+  ariaLabel?: string;
+  /**
+   * Called with the URL to go to — `/dashboard` or `/`, both hard-coded. Pass
+   * your router's navigate here; without it the component assigns
+   * `window.location.href` and the page reloads.
    */
   onNavigate?: (url: string) => void;
-  /** Additional CSS class applied to the wrapper */
+  /** Applied to the wrapper around the title and the pill. */
   className?: string;
 };

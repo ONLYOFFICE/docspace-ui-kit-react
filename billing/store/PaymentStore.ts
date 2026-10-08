@@ -1,39 +1,5 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { makeAutoObservable, runInAction } from "mobx";
+import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 import type {
   PaymentApi,
   PaymentUrlRequestDto,
@@ -47,42 +13,95 @@ import type {
   OperationDto,
 } from "@onlyoffice/docspace-api-sdk";
 
-/** SDK types date as ApiDateTime but API returns an ISO string. */
-export type WalletOperationDto = Omit<OperationDto, "date"> & {
+export type TransactionSourceType =
+  "Agent" | "File" | "Folder" | "Room" | "Form";
+
+export type OperationTokenUsage = {
+  totalTokens: number;
+  promptTokens: number;
+  completionTokens: number;
+  cachedTokens: number;
+  cacheWriteTokens: number;
+  reasoningTokens: number;
+  imageTokens: number;
+};
+
+export type WalletOperationDto = Omit<
+  OperationDto,
+  "date" | "agentId" | "agentTitle"
+> & {
   date?: string;
-  agentId?: string | null;
-  agentTitle?: string | null;
+  sourceId?: string | null;
+  sourceTitle?: string | null;
+  sourceType?: TransactionSourceType | null;
+  tokenUsage?: OperationTokenUsage | null;
 };
 
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
-import type { TBalance } from "../types";
-import { formatCurrencyValue } from "../utils/common";
+import type {
+  TAccountingPrice,
+  TActiveService,
+  TBalance,
+  TServiceUsage,
+  TUsagePeriodKey,
+} from "../types";
+import { formatCurrencyValue, formatPercentValue } from "../utils/common";
+import {
+  getCardLinkedOnFreeTariff,
+  getCardLinkedOnNonProfit,
+  getIsCardLinkedToPortal,
+  getIsCardMissingOrInactive,
+  getIsPayer,
+  getWalletBalanceAmount,
+  getWalletBalanceCurrency,
+  formatPaymentDate,
+} from "../utils/paymentSelectors";
+import {
+  applyServiceQuotaToMap,
+  parseServicesQuotasMap,
+} from "../utils/parsers";
+import { getUsageRange } from "../usage/utils";
+import { getServiceRoute } from "../utils/url";
+import { isDocsConnectServiceName } from "../utils/docs-connect";
 import { combineUrl } from "../../utils/combineUrl";
 import { getCookie } from "../../utils/cookie";
 import { LANGUAGE } from "../../constants";
 import { AnalyticsEvents } from "../../enums";
 import {
   AI_ENUM,
+  AI_SEARCH,
+  AI_SEARCH_ENUM,
+  AI_TOOLS,
   BACKUP_SERVICE,
   STORAGE_TARIFF_DEACTIVATED,
   STORAGE_DEACTIVATION_VISITED,
+  STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED,
   WEB_SEARCH,
+  DOCS_CONNECT_SERVICE,
+  DOCS_CONNECT_DEVPACK_SERVICE,
+  DOCS_CONNECT_PRODUCT,
+  DOCS_CONNECT_DEVPACK_PRODUCT,
 } from "../constants";
 import type { TTranslation } from "../../utils/common";
 import {
   now,
   subtractFromDate,
   formatDate as formatDateUtil,
+  formatDateLocalized,
+  getAppTimezone,
   isSameDay,
 } from "../../utils/date";
-import type { DateTime } from "luxon";
+import { DateTime } from "luxon";
 import type {
   TPaymentConfig,
   TPaymentRoutes,
   TServiceFeatureWithPrice,
+  TUpcomingPayment,
+  TUpcomingPaymentResponse,
   TWalletServiceQuota,
 } from "../types";
+import type { TApiClient } from "../../providers/api/ApiProvider";
 import CurrentTariffStatusStore from "./CurrentTariffStatusStore";
 import CurrentQuotasStore from "./CurrentQuotasStore";
 import PaymentQuotasStore from "./PaymentQuotasStore";
@@ -106,6 +125,8 @@ class PaymentStore {
 
   private commonSettingsApi: CommonSettingsApi;
 
+  #rawApiClient: TApiClient;
+
   private abortControllers: AbortController[] = [];
 
   private _currentUserEmail = "";
@@ -128,14 +149,37 @@ class PaymentStore {
 
   openOnNewPage = true;
 
+  onServicesInit: (() => Promise<unknown>) | undefined = undefined;
+
   utcOffset = "";
+
+  /** Accounting service fee percents by wallet service name. */
+  serviceFeePercents = new Map<string, number>();
+
+  get aiToolsFeePercent() {
+    return this.formatServiceFeePercent(AI_TOOLS);
+  }
+
+  get aiSearchFeePercent() {
+    return this.formatServiceFeePercent(AI_SEARCH);
+  }
+
+  formatServiceFeePercent = (serviceName: string) => {
+    const value = this.serviceFeePercents.get(serviceName);
+    if (value === undefined) return;
+
+    return formatPercentValue(this.language, value);
+  };
 
   routes: TPaymentRoutes = {
     portalPayments: "",
     services: "",
     aiServices: "",
+    aiSearch: "",
     backup: "",
     diskStorage: "",
+    docsConnect: "",
+    wallet: "",
   };
 
   licenseQuota: Record<string, unknown> | null = null;
@@ -161,6 +205,12 @@ class PaymentStore {
 
   totalPrice = 30;
 
+  futureTotalPrice = 0;
+
+  tariffDueTodayAmount: number | null = null;
+
+  isTariffDueTodayCalculating = false;
+
   managersCount = 1;
 
   maxAvailableManagersCount = 999;
@@ -179,7 +229,11 @@ class PaymentStore {
 
   isInitWalletPage = false;
 
+  isInitOverviewPage = false;
+
   isPaymentMethodInit = false;
+
+  serviceUsage: TServiceUsage[] = [];
 
   balance: TBalance = 0;
 
@@ -190,6 +244,10 @@ class PaymentStore {
   transactionHistory: WalletOperationDto[] = [];
 
   isTransactionHistoryExist = false;
+
+  upcomingPaymentsData: TUpcomingPaymentResponse[] = [];
+
+  activeServices: TActiveService[] = [];
 
   autoPayments: TenantWalletSettings | null = null;
 
@@ -216,6 +274,8 @@ class PaymentStore {
 
   isStorageDeactivationVisited = false;
 
+  isPreviousStorageSubscriptionRemoved = false;
+
   filterSelectedTypeKey = "allTransactions";
 
   filterStartDate: DateTime = (
@@ -225,6 +285,8 @@ class PaymentStore {
   filterEndDate: DateTime = now().setLocale(getCookie(LANGUAGE) ?? "en");
 
   filterContact: TTransactionFilterContact | null = null;
+
+  savedUsagePeriod: TUsagePeriodKey | null = null;
 
   isTransactionLoading = false;
 
@@ -249,15 +311,22 @@ class PaymentStore {
     profilesApi: ProfilesApi,
     portalQuotaApi: PortalQuotaApi,
     commonSettingsApi: CommonSettingsApi,
+    rawApiClient: TApiClient,
   ) {
     this.paymentApi = paymentApi;
     this.profilesApi = profilesApi;
     this.commonSettingsApi = commonSettingsApi;
+    this.#rawApiClient = rawApiClient;
 
     this.tariff = new CurrentTariffStatusStore(portalQuotaApi, paymentApi);
     this.quotas = new CurrentQuotasStore(paymentApi);
     this.paymentQuotas = new PaymentQuotasStore(paymentApi);
     this.paymentQuotas.setCurrentQuotasStore(this.quotas);
+
+    if (typeof window !== "undefined") {
+      this.isPreviousStorageSubscriptionRemoved =
+        localStorage.getItem(STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED) === "true";
+    }
 
     makeAutoObservable(this);
   }
@@ -280,6 +349,8 @@ class PaymentStore {
       this.mobileBreakpoint = config.mobileBreakpoint;
     if (config.desktopBreakpoint !== undefined)
       this.desktopBreakpoint = config.desktopBreakpoint;
+    if (config.onServicesInit !== undefined)
+      this.onServicesInit = config.onServicesInit;
   };
 
   private addAbortController(controller: AbortController) {
@@ -314,18 +385,10 @@ class PaymentStore {
   }
 
   get isPayer() {
-    if (!this._currentUserEmail || !this.tariff.walletCustomerEmail)
-      return false;
-
-    return (
-      this._currentUserEmail.toLowerCase() ===
-      this.tariff.walletCustomerEmail.toLowerCase()
-    );
+    return getIsPayer(this._currentUserEmail, this.tariff.walletCustomerEmail);
   }
 
   get isServiceActionDisabled() {
-    if (this.isCardLinkedToPortal) return !this.isPayer;
-
     return false;
   }
 
@@ -357,15 +420,41 @@ class PaymentStore {
   }
 
   get isCardLinkedToPortal() {
-    return (
-      this.cardLinkedOnNonProfit ||
-      this.cardLinkedOnFreeTariff ||
-      (!this.quotas.isNonProfit && !this.quotas.isFreeTariff)
-    );
+    return getIsCardLinkedToPortal({
+      isNonProfit: this.quotas.isNonProfit,
+      isFreeTariff: this.quotas.isFreeTariff,
+      walletCustomerEmail: this.tariff.walletCustomerEmail,
+    });
   }
 
   get isAutoPaymentExist() {
     return this.autoPayments?.enabled;
+  }
+
+  get isCardMissingOrInactive() {
+    return getIsCardMissingOrInactive({
+      isNonProfit: this.quotas.isNonProfit,
+      isFreeTariff: this.quotas.isFreeTariff,
+      walletCustomerEmail: this.tariff.walletCustomerEmail,
+      walletCustomerStatusNotActive: this.tariff.walletCustomerStatusNotActive,
+    });
+  }
+
+  get isStripeCheckoutRequired() {
+    return this.isCardMissingOrInactive;
+  }
+
+  get showUnlinkedCardBanner() {
+    return (
+      !this.tariff.isNotPaidPeriod &&
+      !!this.tariff.walletCustomerStatusNotActive
+    );
+  }
+
+  get needsWalletMigration() {
+    return (
+      !this.quotas.isFreeTariff && !this.tariff.hasTariffWalletSubscription
+    );
   }
 
   get isAutoTopUpInProgress() {
@@ -383,19 +472,19 @@ class PaymentStore {
   }
 
   get walletCodeCurrency(): string {
-    const balance = this.balanceData;
-    if (balance?.subAccounts && balance.subAccounts.length > 0)
-      return balance.subAccounts[0].currency ?? "USD";
-
-    return "USD";
+    return getWalletBalanceCurrency(this.balance);
   }
 
   get walletBalance(): number {
-    const balance = this.balanceData;
-    if (balance?.subAccounts && balance.subAccounts.length > 0)
-      return balance.subAccounts[0].amount ?? 0;
+    return getWalletBalanceAmount(this.balance);
+  }
 
-    return 0.0;
+  get isLowWalletBalance() {
+    if (!this.isCardLinkedToPortal) return false;
+
+    if (!this.isAiToolsServiceOn) return false;
+
+    return this.walletBalance < 1;
   }
 
   get wasFirstTopUp() {
@@ -412,14 +501,17 @@ class PaymentStore {
   }
 
   get cardLinkedOnFreeTariff() {
-    return this.quotas.isFreeTariff && !!this.tariff.walletCustomerEmail;
+    return getCardLinkedOnFreeTariff(
+      this.quotas.isFreeTariff,
+      this.tariff.walletCustomerEmail,
+    );
   }
 
   get cardLinkedOnNonProfit() {
-    if (!this.quotas.isNonProfit) return false;
-    if (!this.tariff.walletCustomerEmail) return false;
-
-    return true;
+    return getCardLinkedOnNonProfit(
+      this.quotas.isNonProfit,
+      this.tariff.walletCustomerEmail,
+    );
   }
 
   get storageSizeIncrement() {
@@ -440,6 +532,17 @@ class PaymentStore {
     return (
       this.servicesQuotasFeatures.get(TOTAL_SIZE) as TServiceFeatureWithPrice
     )?.serviceName;
+  }
+
+  get docsConnectServiceNames(): string[] {
+    const resolve = (product: string, fallback: string) =>
+      (this.servicesQuotasFeatures.get(product) as TServiceFeatureWithPrice)
+        ?.serviceName ?? fallback;
+
+    return [
+      resolve(DOCS_CONNECT_PRODUCT, DOCS_CONNECT_SERVICE),
+      resolve(DOCS_CONNECT_DEVPACK_PRODUCT, DOCS_CONNECT_DEVPACK_SERVICE),
+    ];
   }
 
   get backupServicePrice() {
@@ -467,6 +570,10 @@ class PaymentStore {
     return this.servicesQuotasFeatures.get(AI_ENUM)?.value;
   }
 
+  get isAiSearchServiceOn() {
+    return this.servicesQuotasFeatures.get(AI_SEARCH_ENUM)?.value;
+  }
+
   get availableBackupsCount() {
     if (this.backupServicePrice === 0) return 0;
     if (this.walletBalance === 0) return 0;
@@ -482,6 +589,10 @@ class PaymentStore {
 
   setIsInitPaymentPage = (value: boolean) => {
     this.isInitPaymentPage = value;
+  };
+
+  setServiceFeePercent = (serviceName: string, value: number) => {
+    this.serviceFeePercents.set(serviceName, value);
   };
 
   setMinBalance = (value: string) => {
@@ -512,6 +623,10 @@ class PaymentStore {
     this.isInitWalletPage = value;
   };
 
+  setIsInitOverviewPage = (value: boolean) => {
+    this.isInitOverviewPage = value;
+  };
+
   setPaymentMethodInit = (value: boolean) => {
     this.isPaymentMethodInit = value;
   };
@@ -527,6 +642,16 @@ class PaymentStore {
   setStorageDeactivationVisited = (value: boolean) => {
     this.isStorageDeactivationVisited = value;
     localStorage.setItem(STORAGE_DEACTIVATION_VISITED, "true");
+  };
+
+  removePreviousStorageSubscription = () => {
+    this.isPreviousStorageSubscriptionRemoved = true;
+    localStorage.setItem(STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED, "true");
+  };
+
+  resetPreviousStorageSubscription = () => {
+    this.isPreviousStorageSubscriptionRemoved = false;
+    localStorage.removeItem(STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED);
   };
 
   setPaymentLink = (link: string) => {
@@ -545,23 +670,129 @@ class PaymentStore {
     this.previousBalance = this.balance;
   };
 
+  fetchUpcomingPayments = async () => {
+    const abortController = new AbortController();
+    this.addAbortController(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/tariff/upcoming",
+        { signal: abortController.signal },
+      );
+
+      runInAction(() => {
+        this.upcomingPaymentsData =
+          (data?.response as TUpcomingPaymentResponse[]) ?? [];
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
+  };
+
+  fetchActiveServices = async () => {
+    const abortController = new AbortController();
+    this.addAbortController(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/payment/activeservices",
+        { signal: abortController.signal },
+      );
+
+      runInAction(() => {
+        this.activeServices = (data?.response as TActiveService[]) ?? [];
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
+  };
+
+  fetchServiceFeePercent = async (serviceName: string) => {
+    const abortController = new AbortController();
+    this.addAbortController(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        `api/2.0/portal/payment/accounting/prices/${serviceName}`,
+        { params: { active: true }, signal: abortController.signal },
+      );
+
+      const prices = data?.response as TAccountingPrice[] | undefined;
+      const percent = prices?.[0]?.extraCharge;
+      if (percent !== undefined)
+        this.setServiceFeePercent(serviceName, percent);
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
+  };
+
+  /** Upcoming payments in chronological order (the API does not sort them). */
+  get upcomingPayments(): TUpcomingPayment[] {
+    return [...this.upcomingPaymentsData]
+      .sort((a, b) => Date.parse(a.dueDate) - Date.parse(b.dueDate))
+      .map((item): TUpcomingPayment => {
+        const serviceRoute = item.wallet
+          ? getServiceRoute(this.routes, item.name)
+          : undefined;
+
+        return {
+          id: String(item.id),
+          renewalDate: formatDateLocalized(item.dueDate, "DATE_FULL", {
+            locale: this.language,
+            timezone: getAppTimezone(),
+          }),
+          renewalDateShort: formatDateLocalized(
+            item.dueDate,
+            "DATE_MONTH_DAY",
+            {
+              locale: this.language,
+              timezone: getAppTimezone(),
+            },
+          ),
+          dueDate: item.dueDate,
+          title: item.title,
+          quantity: item.quantity,
+          unitOfMeasure: item.unitOfMeasure,
+          amount: item.amount,
+          actionType: serviceRoute ? "edit-subscription" : "edit-plan",
+          actionRoute: serviceRoute ?? this.routes.portalPayments,
+        };
+      });
+  }
+
   formatWalletCurrency = (
     item: number | null = null,
-    fractionDigits: number = 3,
+    fractionDigits: number = 2,
+    currency?: string,
   ) => {
     const amount = item ?? this.walletBalance;
 
     return formatCurrencyValue(
       this.language,
       amount,
-      this.walletCodeCurrency,
+      currency || this.walletCodeCurrency,
       fractionDigits,
     );
   };
 
-  formatPaymentCurrency = (item: number = 0, fractionDigits: number = 0) => {
-    const amount = item || this.walletBalance;
+  formatPaymentCurrency = (item?: number, fractionDigits: number = 0) => {
+    const amount = item ?? this.walletBalance;
     const { isoCurrencySymbol } = this.paymentQuotas.planCost;
+
+    return formatCurrencyValue(
+      this.language,
+      amount,
+      isoCurrencySymbol || "USD",
+      fractionDigits,
+    );
+  };
+
+  formatFuturePaymentCurrency = (item?: number, fractionDigits: number = 0) => {
+    const amount = item ?? this.walletBalance;
+    const { isoCurrencySymbol } = this.paymentQuotas.futurePlanCost;
 
     return formatCurrencyValue(
       this.language,
@@ -587,10 +818,52 @@ class PaymentStore {
 
       if (!res?.data?.response) return;
 
-      this.balance = res.data.response as unknown as TBalance;
+      runInAction(() => {
+        this.balance = res.data.response as unknown as TBalance;
+      });
     } catch (e: unknown) {
       if (e instanceof Error && e.name === "CanceledError") return;
       throw e;
+    }
+  };
+
+  fetchWalletUsage = async ({
+    serviceName,
+    from,
+    to,
+    participantName,
+  }: {
+    serviceName?: string;
+    from?: DateTime;
+    to?: DateTime;
+    participantName?: string;
+  } = {}) => {
+    const abortController = new AbortController();
+    this.addAbortController(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/payment/customer/usage",
+        {
+          signal: abortController.signal,
+          params: {
+            offset: 0,
+            limit: 25,
+            ServiceName: serviceName,
+            StartDate: from ? this.formatDate(from, "start") : undefined,
+            EndDate: to ? this.formatDate(to, "end") : undefined,
+            ParticipantName: participantName,
+          },
+        },
+      );
+
+      runInAction(() => {
+        this.serviceUsage = (data?.response?.collection ??
+          []) as TServiceUsage[];
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
     }
   };
 
@@ -619,11 +892,21 @@ class PaymentStore {
     this.filterContact = contact;
   };
 
+  setSavedUsagePeriod = (period: TUsagePeriodKey | null) => {
+    this.savedUsagePeriod = period;
+  };
+
   resetTransactionFilter = () => {
     this.filterStartDate = this.defaultFilterStartDate;
     this.filterEndDate = this.defaultFilterEndDate;
     this.filterSelectedTypeKey = "allTransactions";
     this.filterContact = null;
+  };
+
+  resetTransactionHistory = () => {
+    this.transactionHistory = [];
+    this.isTransactionHistoryExist = false;
+    this.isTransactionLoading = true;
   };
 
   getEndTransactionDate = (format = "yyyy-MM-dd'T'HH:mm:ss") => {
@@ -635,18 +918,14 @@ class PaymentStore {
     return date ? formatDateUtil(date, format) : "";
   };
 
-  formatDate = (date: DateTime, timeType?: "start" | "end") => {
-    if (!timeType) {
-      return formatDateUtil(date, "yyyy-MM-dd'T'HH:mm:ss", { locale: "en" });
-    }
+  formatDate = (date: DateTime, timeType?: "start" | "end") =>
+    formatPaymentDate(date, timeType);
 
-    const dateStr = formatDateUtil(date, "yyyy-MM-dd", { locale: "en" });
-    const timeTypeValue = timeType === "start" ? "00:00:00" : "23:59:59";
-
-    return `${dateStr}T${timeTypeValue}`;
-  };
-
-  fetchTransactionHistory = async (serviceName?: string) => {
+  fetchTransactionHistory = async (
+    serviceName?: string,
+    from?: DateTime,
+    to?: DateTime,
+  ) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
@@ -662,14 +941,21 @@ class PaymentStore {
       this.filterSelectedTypeKey,
     );
 
+    const serviceNames: string | string[] | undefined =
+      isDocsConnectServiceName(serviceName)
+        ? this.docsConnectServiceNames
+        : serviceName;
+
     try {
       const res = await this.paymentApi.getCustomerOperations(
         {
           offset: 0,
           limit: 25,
-          serviceName,
-          startDate: this.formatDate(this.filterStartDate, "start"),
-          endDate: this.formatDate(this.filterEndDate, "end"),
+          // TODO: remove the cast once the SDK types serviceName as
+          // string | string[] — the API accepts a repeated ServiceName param.
+          serviceName: serviceNames as string,
+          startDate: this.formatDate(from ?? this.filterStartDate, "start"),
+          endDate: this.formatDate(to ?? this.filterEndDate, "end"),
           credit: isCredit,
           debit: isDebit,
           participantName: this.filterContact?.id,
@@ -682,19 +968,25 @@ class PaymentStore {
       const data = res.data.response as unknown as {
         collection: WalletOperationDto[];
       };
-      this.transactionHistory = data.collection;
-      this.isTransactionHistoryExist = data.collection.length > 0;
+      runInAction(() => {
+        this.transactionHistory = data.collection;
+        this.isTransactionHistoryExist = data.collection.length > 0;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       toastr.error(error as Error);
-      this.isTransactionLoading = true;
+      runInAction(() => {
+        this.isTransactionLoading = true;
+      });
     } finally {
-      if (this._transactionTimerId) {
-        clearTimeout(this._transactionTimerId);
-        this._transactionTimerId = null;
-      }
+      runInAction(() => {
+        if (this._transactionTimerId) {
+          clearTimeout(this._transactionTimerId);
+          this._transactionTimerId = null;
+        }
 
-      this.isTransactionLoading = false;
+        this.isTransactionLoading = false;
+      });
     }
   };
 
@@ -713,48 +1005,61 @@ class PaymentStore {
         ?.response;
 
       if (!data) return;
-      this.autoPayments = data;
-      this.isAutomaticPaymentsEnabled = data.enabled ?? false;
+      runInAction(() => {
+        this.autoPayments = data;
+        this.isAutomaticPaymentsEnabled = data.enabled ?? false;
 
-      if (data.enabled) {
-        this.setMinBalance((data.minBalance ?? 0).toString());
-        this.setUpToBalance((data.upToBalance ?? 0).toString());
-      }
+        if (data.enabled) {
+          this.setMinBalance((data.minBalance ?? 0).toString());
+          this.setUpToBalance((data.upToBalance ?? 0).toString());
+        }
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
     }
   };
 
-  fetchCardLinked = async (url?: string, successUrl?: string) => {
+  fetchCardLinked = async (
+    url?: string,
+    successUrl?: string,
+    persist: boolean = true,
+  ) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
-    const backUrl = url || `${window.location.href}?complete=true`;
+    const backUrl = url || `${window.location.href}`;
     const resolvedSuccessUrl =
       successUrl ||
       combineUrl(
         window.location.origin,
-        "/portal-settings/payments/wallet?complete=true&type=wallet",
+        "/billing/wallet?complete=true&type=wallet",
       );
     try {
       const res = await this.paymentApi.getCheckoutSetupUrl(
-        { backUrl },
-        {
-          signal: abortController.signal,
-          // TEMP: SDK schema lacks `successUrl`; passing it via axios `params`
-          // until the SDK is regenerated to include it in the request type.
-          params: { successUrl: resolvedSuccessUrl },
-        },
+        { backUrl, successUrl: resolvedSuccessUrl },
+        { signal: abortController.signal },
       );
 
-      if (!res?.data?.response) return;
+      if (!res?.data?.response) return "";
 
-      this.cardLinked = res.data.response as unknown as string;
+      const linkUrl = res.data.response as unknown as string;
+
+      // The top-up flow passes persist=false so its checkout URL (built with a
+      // top-up successUrl) is only returned, not written to the shared
+      // this.cardLinked that UnlinkedCardBanner and other consumers rely on.
+      if (persist)
+        runInAction(() => {
+          this.cardLinked = linkUrl;
+        });
+
+      return linkUrl;
     } catch (error: unknown) {
-      if (error instanceof Error && error.name === "CanceledError") return;
+      if (error instanceof Error && error.name === "CanceledError") return "";
       console.error(error);
     }
+
+    return "";
   };
 
   updateAutoPayments = async () => {
@@ -772,11 +1077,14 @@ class PaymentStore {
 
       const data = res?.data as unknown as { response?: TenantWalletSettings };
 
-      if (!data?.response) {
+      const settings = data?.response;
+      if (!settings) {
         throw new Error();
       }
 
-      this.autoPayments = data.response;
+      runInAction(() => {
+        this.autoPayments = settings;
+      });
     } catch (error) {
       toastr.error(error as string);
     }
@@ -803,9 +1111,11 @@ class PaymentStore {
       };
     });
 
-    this.servicesQuotasFeatures = new Map(
-      quotas.map((feature) => [feature.id ?? "", feature]),
-    ) as Map<string, TenantQuotaFeatureDto | TServiceFeatureWithPrice>;
+    runInAction(() => {
+      this.servicesQuotasFeatures = new Map(
+        quotas.map((feature) => [feature.id ?? "", feature]),
+      ) as Map<string, TenantQuotaFeatureDto | TServiceFeatureWithPrice>;
+    });
 
     return services;
   };
@@ -823,9 +1133,18 @@ class PaymentStore {
 
   isShowStorageTariffDeactivated = () => {
     if (!this.tariff.previousStoragePlanSize) return false;
+    if (this.isPreviousStorageSubscriptionRemoved) return false;
 
     return localStorage.getItem(STORAGE_TARIFF_DEACTIVATED) !== "true";
   };
+
+  get isShowPreviousStoragePlan() {
+    return (
+      !this.tariff.hasStorageSubscription &&
+      !!this.tariff.previousStoragePlanSize &&
+      !this.isPreviousStorageSubscriptionRemoved
+    );
+  }
 
   setPaymentAccount = async () => {
     const abortController = new AbortController();
@@ -840,7 +1159,9 @@ class PaymentStore {
 
       const link = res.data.response as unknown as string;
       if (link.indexOf("error") === -1) {
-        this.accountLink = link;
+        runInAction(() => {
+          this.accountLink = link;
+        });
       } else {
         console.error(link);
       }
@@ -871,26 +1192,8 @@ class PaymentStore {
     if (!res?.data?.response) return;
 
     const service = res.data.response as unknown as TWalletServiceQuota;
-    const feature = service.features?.[0];
 
-    const featureWithPrice = {
-      ...feature,
-      price: service.price,
-      serviceName: service.serviceName,
-    } as TServiceFeatureWithPrice;
-
-    const existingEntry = Array.from(
-      this.servicesQuotasFeatures.entries(),
-    ).find(
-      ([, value]) =>
-        (value as TServiceFeatureWithPrice).serviceName === service.serviceName,
-    );
-
-    const key = existingEntry
-      ? existingEntry[0]
-      : (service.features?.[0]?.id?.toString() ?? "");
-
-    this.servicesQuotasFeatures.set(key, featureWithPrice);
+    applyServiceQuotaToMap(service, this.servicesQuotasFeatures);
 
     return service.serviceName;
   };
@@ -898,11 +1201,11 @@ class PaymentStore {
   getBasicPaymentLink = async (managersCount: number) => {
     const backUrl = combineUrl(
       window.location.origin,
-      "/portal-settings/payments/portal-payments?cancel=true&type=tariff",
+      "/billing/tariff-plan?cancel=true&type=tariff",
     );
     const successUrl = combineUrl(
       window.location.origin,
-      "/portal-settings/payments/portal-payments?complete=true&type=tariff",
+      "/billing/tariff-plan?complete=true&type=tariff",
     );
 
     const abortController = new AbortController();
@@ -931,11 +1234,11 @@ class PaymentStore {
   getPaymentLink = async (token?: AbortSignal) => {
     const backUrl = combineUrl(
       window.location.origin,
-      "/portal-settings/payments/portal-payments?cancel=true&type=tariff",
+      "/billing/tariff-plan?cancel=true&type=tariff",
     );
     const successUrl = combineUrl(
       window.location.origin,
-      "/portal-settings/payments/portal-payments?complete=true&type=tariff",
+      "/billing/tariff-plan?complete=true&type=tariff",
     );
 
     try {
@@ -986,7 +1289,7 @@ class PaymentStore {
       requests.push(this.getBasicPaymentLink(this.quotas.addedManagersCount));
     }
 
-    requests.push(this.tariff.fetchPortalTariff());
+    requests.push(this.tariff.fetchPortalTariff(), this.fetchBalance());
 
     try {
       await Promise.all(requests);
@@ -1026,6 +1329,7 @@ class PaymentStore {
     requests.push(
       this.getSettingsPayment(),
       this.paymentQuotas.fetchPaymentQuotas(),
+      this.fetchBalance(isRefresh),
     );
 
     if (this.isAlreadyPaid && this.isStripePortalAvailable) {
@@ -1115,17 +1419,25 @@ class PaymentStore {
     }
   };
 
-  walletInit = async (t: TTranslation, integrationUrl?: string) => {
+  walletInit = async (
+    t: TTranslation,
+    integrationUrl?: string,
+    onInit?: () => Promise<void> | void,
+  ) => {
     const isRefresh = window.location.href.includes("complete=true");
 
     if (!isRefresh) {
       if (this.isVisibleWalletSettings) this.setVisibleWalletSetting(false);
     }
 
+    this.resetTransactionHistory();
+
     const requests: Promise<unknown>[] = [];
     try {
       await Promise.all([this.initWalletPayerAndBalance(isRefresh)]);
-      this.previousBalance = this.balance;
+      runInAction(() => {
+        this.previousBalance = this.balance;
+      });
 
       if (this.isCardLinkedToPortal) {
         if (this.isStripePortalAvailable) {
@@ -1139,6 +1451,9 @@ class PaymentStore {
         requests.push(this.fetchAutoPayments(), this.fetchTransactionHistory());
       } else {
         requests.push(this.fetchCardLinked(integrationUrl));
+        runInAction(() => {
+          this.isTransactionLoading = false;
+        });
       }
 
       if (this.isShowStorageTariffDeactivated() && this.isPayer) {
@@ -1146,7 +1461,13 @@ class PaymentStore {
         requests.push(this.handleServicesQuotas());
       }
 
-      requests.push(this.tariff.fetchPortalTariff());
+      requests.push(
+        this.tariff.fetchPortalTariff(),
+        this.fetchUpcomingPayments(),
+        this.fetchWalletUsage(getUsageRange("thisMonth")),
+      );
+
+      if (onInit) requests.push(Promise.resolve(onInit()));
 
       await Promise.all(requests);
 
@@ -1180,8 +1501,28 @@ class PaymentStore {
       }
     } catch (error) {
       if (error instanceof Error && error.name === "CanceledError") return;
+      runInAction(() => {
+        this.isTransactionLoading = false;
+      });
       toastr.error(t("Common:UnexpectedError"));
       console.error(error);
+    }
+  };
+
+  overviewInit = async (t: TTranslation, integrationUrl?: string) => {
+    try {
+      await Promise.all([
+        this.walletInit(t, integrationUrl),
+        this.handleServicesQuotas(),
+        this.fetchActiveServices(),
+        this.paymentQuotas.fetchPaymentQuotas(),
+        this.quotas.fetchPortalQuota(),
+      ]);
+    } catch (error) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    } finally {
+      this.setIsInitOverviewPage(true);
     }
   };
 
@@ -1206,18 +1547,20 @@ class PaymentStore {
         max,
       } = newSettings;
 
-      this.buyUrl = buyUrl ?? "";
-      this.salesEmail = salesEmail ?? "";
-      this.standaloneMode = standaloneMode;
-      this.maxAvailableManagersCount = max;
+      runInAction(() => {
+        this.buyUrl = buyUrl ?? "";
+        this.salesEmail = salesEmail ?? "";
+        this.standaloneMode = standaloneMode;
+        this.maxAvailableManagersCount = max;
 
-      if (currentLicense) {
-        if (currentLicense.dueDate)
-          this.currentLicense.expiresDate = new Date(currentLicense.dueDate);
+        if (currentLicense) {
+          if (currentLicense.dueDate)
+            this.currentLicense.expiresDate = new Date(currentLicense.dueDate);
 
-        if (currentLicense.trial)
-          this.currentLicense.trialMode = currentLicense.trial;
-      }
+          if (currentLicense.trial)
+            this.currentLicense.trialMode = currentLicense.trial;
+        }
+      });
     } catch (e: unknown) {
       if (e instanceof Error && e.name === "CanceledError") return;
       console.error(e);
@@ -1227,6 +1570,110 @@ class PaymentStore {
   getTotalCostByFormula = (value: number) => {
     const costValuePerManager = this.paymentQuotas.planCost.value;
     if (costValuePerManager) return value * +costValuePerManager;
+  };
+
+  getFutureTotalCostByFormula = (value: number) => {
+    const costValuePerManager = this.paymentQuotas.futurePlanCost.value;
+    if (costValuePerManager) return value * +costValuePerManager;
+  };
+
+  get futureSubscriptionAmount() {
+    return this.getFutureTotalCostByFormula(this.managersCount) ?? 0;
+  }
+
+  executeWalletUpdate = async (
+    quantity: number,
+    type: (typeof ProductQuantityType)[keyof typeof ProductQuantityType],
+    t: TTranslation,
+  ) => {
+    this.setIsLoading(true);
+
+    try {
+      const dueTodayAmount = this.tariffDueTodayAmount ?? this.totalPrice;
+      const isBalanceInsufficient = this.walletBalance < dueTodayAmount;
+
+      if (
+        type === ProductQuantityType.Add &&
+        isBalanceInsufficient &&
+        !this.tariff.isDelayedPaymentMethod
+      ) {
+        const recommendedAmount = Math.ceil(
+          dueTodayAmount - this.walletBalance,
+        );
+        if (recommendedAmount > 0) {
+          await this.paymentApi.topUpDeposit({
+            topUpDepositRequestDto: {
+              amount: recommendedAmount,
+              currency: this.walletCodeCurrency || "USD",
+            },
+          });
+        }
+      }
+
+      const updateRes = await this.paymentApi.updateWalletPayment({
+        walletQuantityRequestDto: {
+          quantity: { adminwallet: quantity },
+          productQuantityType: type,
+        },
+      });
+
+      if (updateRes?.data?.response === false) {
+        toastr.error(t("ErrorNotification"));
+        return false;
+      }
+
+      if (type === ProductQuantityType.Add) {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: AnalyticsEvents.Purchase,
+          ecommerce: { items: [{ item_name: "DocSpace Business" }] },
+        });
+      }
+
+      await Promise.all([
+        this.tariff.fetchPortalTariff(true),
+        this.fetchBalance(true),
+        this.quotas.fetchPortalQuota(true),
+      ]);
+
+      toastr.success(
+        t("BusinessUpdated", { planName: this.quotas.currentTariffPlanTitle }),
+      );
+
+      return true;
+    } catch (e) {
+      console.error(e);
+      toastr.error(t("ErrorNotification"));
+      return false;
+    } finally {
+      this.setIsLoading(false);
+    }
+  };
+
+  getConfirmButtonLabel = (t: TTranslation) => {
+    const { isFreeTariff, maxCountManagersByQuota } = this.quotas;
+    const isDowngrade =
+      !isFreeTariff && this.managersCount < maxCountManagersByQuota;
+    if (isDowngrade) return t("ScheduleChange");
+
+    const isTheSameCount =
+      !isFreeTariff && this.managersCount === maxCountManagersByQuota;
+    const dueTodayAmount = this.tariffDueTodayAmount ?? this.totalPrice;
+    const isBalanceInsufficient = this.walletBalance < dueTodayAmount;
+
+    if (this.isTariffDueTodayCalculating) return t("UpgradeNow");
+
+    if (this.tariffDueTodayAmount !== null && !isTheSameCount) {
+      if (isBalanceInsufficient)
+        return this.tariff.isDelayedPaymentMethod
+          ? t("TopUpWallet")
+          : t("TopUpAndUpgrade");
+      return t("PayAndUpgrade", {
+        amount: this.formatPaymentCurrency(dueTodayAmount),
+      });
+    }
+
+    return t("UpgradeNow");
   };
 
   resetTariffContainerToBasic = () => {
@@ -1260,6 +1707,19 @@ class PaymentStore {
   setTotalPrice = (value: number) => {
     const price = this.getTotalCostByFormula(value);
     if (price !== this.totalPrice && price) this.totalPrice = price;
+  };
+
+  setFutureTotalPrice = (value: number) => {
+    const price = this.getFutureTotalCostByFormula(value);
+    if (price !== this.futureTotalPrice && price) this.futureTotalPrice = price;
+  };
+
+  setTariffDueTodayAmount = (value: number | null) => {
+    this.tariffDueTodayAmount = value;
+  };
+
+  setIsTariffDueTodayCalculating = (value: boolean) => {
+    this.isTariffDueTodayCalculating = value;
   };
 
   setManagersCount = (managers: number) => {
@@ -1298,9 +1758,11 @@ class PaymentStore {
         isOwner: boolean;
       };
 
-      this._currentUserEmail = user.email ?? "";
-      this.userId = user.id ?? "";
-      this.isOwner = user.isOwner ?? false;
+      runInAction(() => {
+        this._currentUserEmail = user.email ?? "";
+        this.userId = user.id ?? "";
+        this.isOwner = user.isOwner ?? false;
+      });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -1329,4 +1791,3 @@ class PaymentStore {
 }
 
 export default PaymentStore;
-

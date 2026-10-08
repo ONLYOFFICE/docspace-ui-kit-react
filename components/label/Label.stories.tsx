@@ -1,132 +1,89 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import { RootTooltip } from "../tooltip";
 
 import { Label } from ".";
 
 const meta = {
-  title: "UI/Data display/Label",
+  title: "UI/Form controls/Label",
   component: Label,
   parameters: {
-    docs: {
-      description: {
-        component: `Label component displays field names in forms with support for required indicators and error states.
-
-### Features
-
-- **Required Indicator**: Show a red asterisk (*) for required fields
-- **Error State**: Highlight the label in red for validation errors
-- **Truncation**: Truncate overflowing text with ellipsis
-- **Inline Display**: Render inline alongside form controls
-- **Form Association**: Associates with form controls via \`htmlFor\`
-- **Children Support**: Render additional content (e.g., "(optional)") inside the label
-
-### Accessibility
-
-- \`aria-required\`: Indicates when the associated field is required
-- \`aria-invalid\`: Indicates when the associated field has an error
-
-### Usage
-
-\`\`\`tsx
-import { Label } from "@docspace/ui-kit/components/label";
-
-// Basic label
-<Label text="First name" htmlFor="firstName" />
-
-// Required field
-<Label text="Email" htmlFor="email" isRequired />
-
-// Error state
-<Label text="Password" htmlFor="password" error />
-
-// With children
-<Label text="Phone" htmlFor="phone">
-  <span>(optional)</span>
-</Label>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     text: {
       control: "text",
-      description: "The text content of the label",
+      description: "The label's text",
     },
     title: {
       control: "text",
-      description: "Title attribute for hover tooltip",
+      description:
+        "Text of the kit's shared tooltip that opens when the pointer rests on the label; it needs `RootTooltip` mounted",
     },
     htmlFor: {
       control: "text",
-      description: "Associates the label with a form control",
+      description:
+        "The `id` of the field this labels, so clicking the label focuses that field",
     },
     isRequired: {
       control: "boolean",
-      description: "Shows a required field indicator (*)",
+      description:
+        "Appends a red asterisk to the text and sets `aria-required` on the label; the field itself still needs `required`",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     error: {
       control: "boolean",
-      description: "Displays the label in error state (red color)",
+      description:
+        "Turns the text red and sets `aria-invalid` on the label; the error message is not part of this component",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     truncate: {
       control: "boolean",
-      description: "Truncates text that overflows with ellipsis",
+      description:
+        "Cuts text that does not fit on one line with an ellipsis; the label is inline by default, so it needs `display: block` and a width to cut against",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isInline: {
       control: "boolean",
-      description: "Displays the label inline",
+      description:
+        "Makes the label an inline block, so it keeps its own width and padding on the line beside the field; without it the label is a plain inline element",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     display: {
-      control: "select",
-      options: ["block", "inline", "inline-block", "flex"],
-      description: "CSS display property",
+      control: false,
+      description:
+        "Written onto the label as an HTML `display` attribute and does not change how it is laid out; set `display` through `style` instead",
+    },
+    children: {
+      control: "text",
+      description:
+        "Content rendered after the text and the asterisk, inside the same label",
+    },
+    className: {
+      control: false,
+      description: "Class name added to the label",
+    },
+    id: {
+      control: "text",
+      description: "The label's own `id`",
+    },
+    style: {
+      control: false,
+      description: "Inline styles applied to the label",
+    },
+    tooltipMaxWidth: {
+      control: false,
+      description: "Ignored: nothing reads this prop",
     },
   },
 } satisfies Meta<typeof Label>;
@@ -150,44 +107,26 @@ const Wrapper = (props: { children: React.ReactNode }) => {
 };
 
 export const Default: Story = {
-  render: (args) => <Label {...args} />,
+  render: (args) => (
+    <>
+      <Label {...args} />
+      <RootTooltip />
+    </>
+  ),
   args: {
     text: "First name",
     title: "Enter your first name",
     htmlFor: "firstName",
   },
-};
-
-export const CssCustomization: Story = {
-  render: () => (
-    <div
-      style={
-        {
-          "--label-required-color": "#0082c9",
-          "--label-error-color": "#d0021b",
-          "--text-size": "14px",
-          "--text-weight": "700",
-        } as CSSProperties
-      }
-    >
-      <Wrapper>
-        <Label text="Display name" htmlFor="displayName" isRequired />
-        <Label text="Email address" htmlFor="email" isRequired error />
-        <Label text="Bio" htmlFor="bio" />
-      </Wrapper>
-    </div>
-  ),
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--label-required-color\` | Color of the required asterisk (*) | error status color |
-| \`--label-error-color\` | Label text color in error state | error status color |
-| \`--text-size\` | Font size (via Text component) | \`13px\` |
-| \`--text-weight\` | Font weight (via Text component) | \`400\` |`,
+        story:
+          "The plain caption for a field, in semibold text; rest the pointer on it to read the tooltip (`title`), and change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<Label text="First name" htmlFor="firstName" title="Enter your first name" />
+<RootTooltip />`,
       },
     },
   },
@@ -217,10 +156,11 @@ const TruncatedTemplate = () => {
     <div style={{ width: 150, border: "1px solid #ccc", padding: 8 }}>
       <Label
         text="This is a very long label that will be truncated"
-        title="Full text shown on hover"
+        title="This is a very long label that will be truncated"
         truncate
         style={{ display: "block" }}
       />
+      <RootTooltip />
     </div>
   );
 };
@@ -237,7 +177,7 @@ const InlineTemplate = () => {
 const WithChildrenTemplate = () => {
   return (
     <Label text="Phone number" htmlFor="phone">
-      <span style={{ marginLeft: 8, color: "#666" }}>(optional)</span>
+      <span style={{ marginInlineStart: 8, color: "#666" }}>(optional)</span>
     </Label>
   );
 };
@@ -288,7 +228,7 @@ export const RequiredLabels: Story = {
     docs: {
       description: {
         story:
-          "Labels with a required field indicator (*) to mark mandatory form fields.",
+          "For fields a form cannot be sent without: each caption ends with a red asterisk (`isRequired`). The asterisk is hidden from screen readers, so the input needs `required` as well.",
       },
       source: {
         code: `<Label text="Email address" htmlFor="email" isRequired />
@@ -305,7 +245,7 @@ export const ErrorState: Story = {
     docs: {
       description: {
         story:
-          "Labels in error state display red text to indicate validation failures.",
+          "For a field that failed validation: the caption turns red (`error`), with or without the asterisk. The error message is not part of the label; render it next to the field.",
       },
       source: {
         code: `<Label text="Password" htmlFor="password" error />
@@ -321,12 +261,18 @@ export const TruncatedLabel: Story = {
     docs: {
       description: {
         story:
-          "Label that truncates with an ellipsis when it exceeds the container width.",
+          "For a caption longer than the space it gets: in a 150px box the text stays on one line and ends with an ellipsis (`truncate`, with `display: block` so the label takes the box's width). Rest the pointer on it to read the full text in the tooltip (`title`), which needs `RootTooltip` mounted, as this story does.",
       },
       source: {
         code: `<div style={{ width: 150 }}>
-  <Label text="This is a very long label that will be truncated" truncate />
-</div>`,
+  <Label
+    text="This is a very long label that will be truncated"
+    title="This is a very long label that will be truncated"
+    truncate
+    style={{ display: "block" }}
+  />
+</div>
+<RootTooltip />`,
       },
     },
   },
@@ -338,7 +284,7 @@ export const InlineLabel: Story = {
     docs: {
       description: {
         story:
-          "Inline label displayed next to a form control in a horizontal layout.",
+          "For a caption beside its field rather than above it: the label sits on the same line as the input (`isInline`).",
       },
       source: {
         code: `<Label text="Username" htmlFor="username" isInline />
@@ -354,11 +300,11 @@ export const WithChildren: Story = {
     docs: {
       description: {
         story:
-          "Label with additional child content rendered alongside the text.",
+          'For a note that belongs to the caption, such as "(optional)": content passed as children follows the text inside the same label (`children`).',
       },
       source: {
         code: `<Label text="Phone number" htmlFor="phone">
-  <span style={{ marginLeft: 8, color: "#666" }}>(optional)</span>
+  <span style={{ marginInlineStart: 8, color: "#666" }}>(optional)</span>
 </Label>`,
       },
     },
@@ -371,7 +317,7 @@ export const FormExample: Story = {
     docs: {
       description: {
         story:
-          "Complete form example showing labels with required, error, and optional states.",
+          "How the states read together in a form: a required field, a required field in error and an optional one, each label tied to its input by `htmlFor`, so clicking a caption focuses its field.",
       },
       source: {
         code: `<Label text="Username" htmlFor="username" isRequired />
@@ -384,6 +330,47 @@ export const FormExample: Story = {
   <span>(optional)</span>
 </Label>
 <textarea id="bio" />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--label-required-color": "#0082c9",
+          "--label-error-color": "#d0021b",
+          "--text-size": "14px",
+        } as CSSProperties
+      }
+    >
+      <Wrapper>
+        <Label text="Display name" htmlFor="displayName" isRequired />
+        <Label text="Email address" htmlFor="email" isRequired error />
+      </Wrapper>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `Both colours and the font size set on one wrapper -- the variables are listed under CSS variables on this page.
+
+- **Display name** shows the asterisk colour (\`--label-required-color\`) and the font size.
+- **Email address** adds \`error\` to show the text colour in the error state (\`--label-error-color\`).`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--label-required-color": "#0082c9",
+    "--label-error-color": "#d0021b",
+    "--text-size": "14px",
+  }}
+>
+  <Label text="Display name" htmlFor="displayName" isRequired />
+  <Label text="Email address" htmlFor="email" isRequired error />
+</div>`,
       },
     },
   },

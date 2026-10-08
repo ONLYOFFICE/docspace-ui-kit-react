@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -45,72 +10,62 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `TableHeaderCell renders a single column header with sorting and resizing capabilities.
+        component: `TableHeaderCell is the title of one column in a TableHeader, with its sort arrow and the handle that resizes it.
 
-### Features
-
-- **Sorting Indicator**: Displays an arrow icon when the column is the active sort field
-- **Resizable**: Drag handle for adjusting column width
-- **Checkbox Column**: Optional checkbox for row selection in the header
-- **Short Column Mode**: Compact layout for narrow columns like index numbers
-
-### Usage
-
-\`\`\`tsx
-import { TableHeaderCell } from "@docspace/ui-kit/components/table/sub-components/table-header-cell";
-
-<TableHeaderCell
-  column={{
-    key: "name",
-    title: "Name",
-    enable: true,
-    sortBy: SortByFieldName.Name,
-    resizable: true,
-  }}
-  index={0}
-  sortBy={SortByFieldName.Name}
-  sorted
-  sortingVisible
-  resizable
-  onMouseDown={handleResize}
-/>
-\`\`\``,
+The Table README describes it in full.`,
       },
     },
   },
   argTypes: {
-    column: { control: false },
-    onMouseDown: { control: false, table: { disable: true } },
-    tagRef: { control: false, table: { disable: true } },
-    sortBy: {
-      control: "select",
-      options: [SortByFieldName.Name, SortByFieldName.Author],
-      description: "Current sort field for the table",
-    },
-    sorted: {
-      control: "boolean",
-      description: "Whether the table is currently sorted",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    sortingVisible: {
-      control: "boolean",
-      description: "Whether sorting indicators are visible on hover",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    resizable: {
-      control: "boolean",
-      description: "Whether the column can be resized by dragging",
-      table: {
-        defaultValue: { summary: "false" },
-      },
+    column: {
+      control: false,
+      description:
+        "The column to render: its title, its sort field and callbacks, and the flags that shape the cell",
     },
     index: {
       control: "number",
-      description: "Column index position in the header",
+      description:
+        "Position of the column, which becomes the cell's id `column_<index>`",
+    },
+    sortBy: {
+      control: "select",
+      options: [SortByFieldName.Name, SortByFieldName.Author],
+      description:
+        "Field the table is sorted by; the column with the same `sortBy` keeps its arrow visible",
+    },
+    sorted: {
+      control: "boolean",
+      description: "Direction of the sort; turning it off turns the arrow over",
+    },
+    sortingVisible: {
+      control: "boolean",
+      description:
+        "Shows the sort arrow and lets clicks on the title and the arrow sort the table",
+    },
+    resizable: {
+      control: "boolean",
+      description: "Draws the resize handle at the end of the cell",
+    },
+    defaultSize: {
+      control: "number",
+      description:
+        "Width in pixels the column returns to when the widths are reset",
+    },
+    testId: {
+      control: "text",
+      description: "Value of the cell's `data-testid` attribute",
+      table: {
+        defaultValue: { summary: "table-header-cell" },
+      },
+    },
+    onMouseDown: {
+      control: false,
+      description: "Called when the resize handle is pressed",
+    },
+    tagRef: {
+      control: false,
+      description:
+        "Ref attached to the cell when the column asks for it with `withTagRef`",
     },
   },
 
@@ -152,7 +107,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default header cell for a non-resizable column. Sorting is visible but the column is not the current sort field.",
+          "The title of a column the table is not sorted by; hover it to see the arrow that sorts by this column, and change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<TableHeaderCell
@@ -179,14 +134,19 @@ export const Resizable: Story = {
   render: (args) => <TableHeaderCell {...args} />,
   args: {
     ...Default.args,
-    column: { ...Default.args?.column, key: "name", title: "Name", resizable: true },
+    column: {
+      ...Default.args?.column,
+      key: "name",
+      title: "Name",
+      resizable: true,
+    },
     resizable: true,
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Resizable header cell with a drag handle for adjusting column width.",
+          "The short bar at the end of the cell is the handle a user drags to widen the column (`resizable`); here it only reports the press, since TableHeader does the resizing.",
       },
       source: {
         code: `<TableHeaderCell
@@ -218,7 +178,7 @@ export const SortedByThisColumn: Story = {
     docs: {
       description: {
         story:
-          "Header cell where the current sort field matches this column, showing an active sort indicator.",
+          "The column the table is sorted by keeps its arrow on screen without a hover, so the user sees what the list is ordered by (`sortBy` matches the column's `sortBy`).",
       },
       source: {
         code: `<TableHeaderCell
@@ -256,7 +216,7 @@ export const WithoutSorting: Story = {
     docs: {
       description: {
         story:
-          "Header cell with sorting indicators hidden. No sort icon appears on hover.",
+          "A column that cannot sort: no arrow on hover and clicks on the title do nothing, for a list whose order is fixed (`sortingVisible` off).",
       },
       source: {
         code: `<TableHeaderCell
@@ -297,7 +257,7 @@ export const WithUncheckedCheckbox: Story = {
     docs: {
       description: {
         story:
-          "Header cell with an unchecked checkbox. The checkbox is visually hidden when not checked.",
+          "A column with a select-all checkbox that nothing is ticked in yet shows only its title; the checkbox appears once a row is selected.",
       },
       source: {
         code: `<TableHeaderCell
@@ -340,7 +300,7 @@ export const WithCheckedCheckbox: Story = {
     docs: {
       description: {
         story:
-          "Header cell with a checked checkbox, indicating all rows are selected.",
+          "The select-all checkbox before the title once every row is selected (`checkbox.value`); a click on it calls `checkbox.onChange`.",
       },
       source: {
         code: `<TableHeaderCell
@@ -383,7 +343,7 @@ export const WithIndeterminateCheckbox: Story = {
     docs: {
       description: {
         story:
-          "Header cell with an indeterminate checkbox, indicating partial row selection.",
+          "The same checkbox partly ticked, for a selection that covers some rows but not all (`checkbox.isIndeterminate`).",
       },
       source: {
         code: `<TableHeaderCell
@@ -430,7 +390,7 @@ export const ShortColumn: Story = {
     docs: {
       description: {
         story:
-          "Short column header with a compact layout. The gap between the title and resize handle is reduced to 12px.",
+          "A narrow column, such as a row number, keeps 12 pixels before its handle instead of 22, so the title is not cut off (`isShort`).",
       },
       source: {
         code: `<TableHeaderCell

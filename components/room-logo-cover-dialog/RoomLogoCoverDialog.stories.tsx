@@ -1,0 +1,321 @@
+import type { ComponentProps } from "react";
+import { useEffect, useState } from "react";
+import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
+
+import type { TTranslation } from "../../utils";
+import type { ICover } from "../../types";
+import type { TColorScheme } from "../../providers/theme/themes";
+import { Button, ButtonSize } from "../button";
+
+import enCommon from "../../locales/en/Common.json";
+
+import { RoomLogoCoverDialog } from ".";
+
+// The dialog takes its translator as a prop rather than using the hook, so
+// the stories hand it the kit's own English bundle. `Common:` keys and the
+// bare `WithoutIcon` come from there; `CreateEditRoomDialog:Icon` lives in a
+// namespace the kit does not ship, which is what an application outside the
+// portal has to supply too.
+const EXTRA_LABELS: Record<string, string> = {
+  "CreateEditRoomDialog:Icon": "Icon",
+};
+const common = enCommon as Record<string, string>;
+const t = ((key: string) =>
+  EXTRA_LABELS[key] ??
+  common[key.replace(/^Common:/, "")] ??
+  key) as TTranslation;
+
+// The 56 covers the portal serves from `files/rooms/covers`, copied from the
+// server (products/ASC.Files/Core/Covers/default). `data` is the inline SVG
+// markup, which is what that endpoint returns.
+const coverFiles = import.meta.glob<string>(
+  "../../test/fixtures/room-covers/*.svg",
+  { query: "?raw", import: "default", eager: true },
+);
+
+const covers: ICover[] = Object.entries(coverFiles)
+  .map(([path, data]) => ({
+    id: path.replace(/^.*\//, "").replace(/\.svg$/, ""),
+    data,
+  }))
+  .sort((a, b) => a.id.localeCompare(b.id));
+
+const accentScheme: TColorScheme = {
+  main: { accent: "#4781D1", buttons: "#5299E0" },
+};
+
+// The dialog picks its aside layout from window.innerWidth, so on Docs the
+// story runs in a phone-sized frame of its own.
+const withPhoneFrame: Decorator = (Story, context) => {
+  if (context.viewMode !== "docs") return <Story />;
+
+  return (
+    <iframe
+      title={context.name}
+      src={`iframe.html?viewMode=story&id=${context.id}`}
+      style={{ width: 414, height: 760, border: 0 }}
+    />
+  );
+};
+
+const meta = {
+  title: "UI/Overlays/RoomLogoCoverDialog",
+  component: RoomLogoCoverDialog,
+  parameters: {
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
+    docs: {
+      // Every story opens a modal over the whole page, so on Docs each gets
+      // a document of its own.
+      story: { inline: false, height: "760px" },
+    },
+  },
+  args: {
+    onClose: fn(),
+    onApply: fn(),
+  },
+  argTypes: {
+    t: {
+      control: false,
+      description:
+        "Translation function. The dialog asks it for the heading, the button labels and the picker labels, some of them outside the `Common` namespace the kit ships",
+    },
+    visible: {
+      control: "boolean",
+      description:
+        "Whether the dialog is on screen. Opening it again discards whatever was chosen the last time",
+    },
+    covers: {
+      control: false,
+      description:
+        "The icons to offer, each as raw SVG markup that is written into the page as it is. An empty array leaves the icon picker out",
+    },
+    title: {
+      control: "text",
+      description:
+        "Room title, whose first and last initials are drawn on the preview while no icon is chosen",
+      table: { defaultValue: { summary: '""' } },
+    },
+    initialColor: {
+      control: "text",
+      description:
+        "Colour selected when the dialog opens, as `#rrggbb`. A colour outside the presets appears as an extra swatch after them",
+      table: { defaultValue: { summary: "#FF6680" } },
+    },
+    initialCover: {
+      control: false,
+      description:
+        "Icon selected when the dialog opens, or `null` for the initials",
+      table: { defaultValue: { summary: "null" } },
+    },
+    isBaseTheme: {
+      control: "boolean",
+      description:
+        "Whether the preview tile is drawn for the light theme. Taken from the theme when it is not passed",
+      table: { defaultValue: { summary: "from the theme" } },
+    },
+    currentColorScheme: {
+      control: "object",
+      description:
+        "The portal's accent colours; the hovered and the chosen icon are drawn in `main.accent`. Without it neither is highlighted",
+    },
+    onClose: {
+      action: "onClose",
+      description:
+        "Called by the cancel button, the header cross, Escape and a click outside the dialog, but not while the colour picker is open",
+    },
+    onApply: {
+      action: "onApply",
+      description:
+        "Called with the chosen colour and icon, or `null` for the initials, when apply is clicked. The dialog does not close itself",
+    },
+  },
+} satisfies Meta<typeof RoomLogoCoverDialog>;
+
+type Story = StoryObj<ComponentProps<typeof RoomLogoCoverDialog>>;
+
+export default meta;
+
+type DemoProps = Pick<
+  ComponentProps<typeof RoomLogoCoverDialog>,
+  | "visible"
+  | "title"
+  | "initialColor"
+  | "initialCover"
+  | "isBaseTheme"
+  | "currentColorScheme"
+  | "onClose"
+  | "onApply"
+> & { covers?: ICover[] };
+
+const RoomLogoCoverDialogDemo = ({
+  visible,
+  covers: coverList = covers,
+  onClose,
+  onApply,
+  ...rest
+}: DemoProps) => {
+  const [isVisible, setIsVisible] = useState(!!visible);
+
+  useEffect(() => {
+    setIsVisible(!!visible);
+  }, [visible]);
+
+  return (
+    <>
+      <Button
+        label="Open dialog"
+        size={ButtonSize.small}
+        onClick={() => setIsVisible(true)}
+      />
+      <RoomLogoCoverDialog
+        {...rest}
+        t={t}
+        visible={isVisible}
+        covers={coverList}
+        onClose={() => {
+          onClose?.();
+          setIsVisible(false);
+        }}
+        onApply={(color, cover) => {
+          onApply?.(color, cover);
+          setIsVisible(false);
+        }}
+      />
+    </>
+  );
+};
+
+export const Default: Story = {
+  render: (args) => <RoomLogoCoverDialogDemo {...args} />,
+  args: {
+    visible: true,
+    isBaseTheme: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The dialog as it opens for a room with no logo yet: the first preset colour, no icon and no title. Pick a colour and an icon to watch the preview change, and apply or cancel to see the callbacks in the Actions panel; the button reopens it.",
+      },
+      source: {
+        code: `<RoomLogoCoverDialog
+  t={t}
+  visible={visible}
+  covers={covers}
+  onClose={() => setVisible(false)}
+  onApply={(color, cover) => setVisible(false)}
+/>`,
+      },
+    },
+  },
+};
+
+export const WithPreselectedCover: Story = {
+  render: (args) => <RoomLogoCoverDialogDemo {...args} />,
+  args: {
+    ...Default.args,
+    initialCover: covers[1],
+    initialColor: "#4781D1",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Reopening the dialog for a room that already has a logo: its icon is on the tile and its colour, which is not one of the presets, sits as an extra swatch after them with a pencil to change it (`initialCover`, `initialColor`).",
+      },
+      source: {
+        code: `<RoomLogoCoverDialog
+  {...dialogProps}
+  initialCover={covers[1]}
+  initialColor="#4781D1"
+/>`,
+      },
+    },
+  },
+};
+
+export const InitialsFromTitle: Story = {
+  render: (args) => <RoomLogoCoverDialogDemo {...args} />,
+  args: {
+    ...Default.args,
+    title: "Quarterly reports",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "With no icon chosen the tile carries the room's initials, here QR for a room called Quarterly reports (`title`). Pick an icon and it replaces them; the without-icon chip brings them back.",
+      },
+      source: {
+        code: `<RoomLogoCoverDialog {...dialogProps} title="Quarterly reports" />`,
+      },
+    },
+  },
+};
+
+export const WithAccentColors: Story = {
+  render: (args) => <RoomLogoCoverDialogDemo {...args} />,
+  args: {
+    ...Default.args,
+    initialCover: covers[1],
+    currentColorScheme: accentScheme,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Pass the portal's colour scheme so the chosen icon sits on a tint of its accent colour; without it the chosen icon looks like the rest (`currentColorScheme`).",
+      },
+      source: {
+        code: `<RoomLogoCoverDialog
+  {...dialogProps}
+  initialCover={covers[1]}
+  currentColorScheme={{ main: { accent: "#4781D1" } }}
+/>`,
+      },
+    },
+  },
+};
+
+export const WithoutIconPicker: Story = {
+  render: (args) => <RoomLogoCoverDialogDemo {...args} covers={[]} />,
+  args: {
+    ...Default.args,
+    title: "Quarterly reports",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "When there are no icons to offer, the icon picker is left out and the dialog chooses only the colour behind the initials (`covers={[]}`).",
+      },
+      source: {
+        code: `<RoomLogoCoverDialog {...dialogProps} covers={[]} />`,
+      },
+    },
+  },
+};
+
+export const OnPhone: Story = {
+  render: (args) => <RoomLogoCoverDialogDemo {...args} />,
+  decorators: [withPhoneFrame],
+  globals: { viewport: { value: "mobile2", isRotated: false } },
+  args: {
+    ...Default.args,
+    title: "Quarterly reports",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "On a phone the dialog becomes a full-screen panel, with the preview and the icons centred, and the plus button opens the colour picker in a modal of its own.",
+      },
+      source: {
+        code: `<RoomLogoCoverDialog {...dialogProps} title="Quarterly reports" />`,
+      },
+      story: { inline: true },
+    },
+  },
+};

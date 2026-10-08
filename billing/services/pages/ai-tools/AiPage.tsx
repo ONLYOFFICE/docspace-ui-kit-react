@@ -1,77 +1,37 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { useState, useEffect } from "react";
 import { useCommonTranslation } from "../../../../utils/i18n";
-import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
-// import { useNavigate } from "react-router";
 
-import { Button, ButtonSize } from "../../../../components/button";
 import { Text } from "../../../../components/text";
-import { Tabs, type TTabItem } from "../../../../components/tabs";
 import { Link } from "../../../../components/link";
+import { RectangleSkeleton } from "../../../../components/rectangle";
 
 import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
 import { AI_ENUM, AI_TOOLS } from "../../../constants";
-import { DeviceType } from "../../../../enums";
+import { formatCompactNumber } from "../../../utils/common";
 
 import TransactionHistory from "../../../shared/transaction-history";
-import BalanceAmount from "../../../shared/balance-amount";
 
 import ServiceToggleSection from "../../sub-components/ServiceToggleSection";
-import { finishRefreshingWithMinCycle } from "../../../utils/refreshing";
-
 import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
 
-import PricingBillingBody from "../../panels/ai-service/PricingBillingBody";
-
-import ModelSettingsTable from "./sub-components/ModelSettingsTable";
 import AiPageLoader from "./AiPageLoader";
 
+import SpendAmount from "../../../shared/spend-amount";
 import styles from "./AiPage.module.scss";
-import { formatDateLocalized, getAppTimezone } from "../../../../utils/date";
-import { useApi } from "../../../../providers";
+import {
+  now,
+  formatWithTimezone,
+  getAppTimezone,
+} from "../../../../utils/date";
+import { useApi } from "../../../../providers/api";
 import { toastr } from "../../../../components";
-import AIServiceDialog from "../../panels/ai-service/AIServiceDialog";
-import AiSimpleTopUpDialog from "../../panels/ai-service/AiSimpleTopUpDialog";
+import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
+import UnlinkedCardBanner from "../../../shared/unlinked-card-banner";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
-import { getBrandName } from "../../../../constants/brands";
 
 type AiPageProps = {
   currentDeviceType?: string;
@@ -79,17 +39,19 @@ type AiPageProps = {
   integrationUrl?: string;
   withoutWallet?: boolean;
   simpleTopUp?: boolean;
-  withBottomMargin?:boolean;
+  withBottomMargin?: boolean;
+  onViewMore?: () => void;
+  onOpenSupportedModels?: () => void;
 };
 
 const AiPage = (props: AiPageProps) => {
   const {
-    currentDeviceType,
     getAIConfig,
     integrationUrl,
     withoutWallet,
-    simpleTopUp,
-    withBottomMargin
+    withBottomMargin,
+    onViewMore,
+    onOpenSupportedModels,
   } = props;
 
   const { paymentApi } = useApi();
@@ -97,84 +59,61 @@ const AiPage = (props: AiPageProps) => {
   const servicesStore = useServicesStore();
 
   const {
-    fetchTransactionHistory,
     changeServiceState,
     isAiToolsServiceOn,
     isServiceActionDisabled,
     formatWalletCurrency,
+    isLowWalletBalance,
+    showUnlinkedCardBanner,
   } = paymentStore;
 
   const { logoText, language } = paymentStore;
 
-  const {
-    aiServiceCodeCurrency,
-    aiServiceBalance,
-    fetchAiServiceBalance,
-    aiServiceLastCreditAmount,
-    aiServiceLastCreditCurrency,
-    formatAiServiceCurrency,
-    aiServiceLastCreditDate,
-    isAiServiceLowBalance,
-    isInitServicesData,
-    // wasFirstAiServiceTopUp,
-    initServiceData,
-  } = servicesStore;
+  const { isInitServicesData, initServiceData, aiUsage, isServiceDataPending } =
+    servicesStore;
 
   const t = useCommonTranslation();
 
-  const [selectedTabId, setSelectedTabId] = useState("usage");
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isPricingBillingVisible, setIsPricingBillingVisible] = useState(false);
+  const isUsageLoading = isServiceDataPending(AI_TOOLS);
+
   const [isTopUpVisible, setIsTopUpVisible] = useState(false);
-  const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
   const [isTopUpConfirmVisible, setIsTopUpConfirmVisible] = useState(false);
 
   const isDisabled = isServiceActionDisabled!;
 
-  // const navigate = useNavigate();
-
   useEffect(() => {
-    if (!isInitServicesData) {
-      initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
-    }
+    initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
   }, []);
 
-  // useEffect(() => {
-  //   if (isInitServicesData && !wasFirstAiServiceTopUp) {
-  //     navigate(paymentStore.routes.services);
-  //   }
-  // }, [isInitServicesData, wasFirstAiServiceTopUp]);
+  useEffect(() => {
+    if (!isInitServicesData) return;
 
-  const onRefresh = async () => {
-    if (isRefreshing) return;
+    const params = new URLSearchParams(window.location.search);
 
-    setIsRefreshing(true);
+    if (params.get("activate") !== AI_TOOLS) return;
 
-    const startTime = Date.now();
-    try {
-      await Promise.all([
-        fetchAiServiceBalance(true),
-        fetchTransactionHistory(AI_TOOLS),
-      ]);
-    } finally {
-      finishRefreshingWithMinCycle({
-        startTime,
-        setRefreshing: setIsRefreshing,
-      });
+    if (
+      !paymentStore.isAiToolsServiceOn &&
+      paymentStore.isCardLinkedToPortal &&
+      !paymentStore.isServiceActionDisabled
+    ) {
+      onConfirm();
     }
-  };
+
+    params.delete("activate");
+    const query = params.toString();
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}${query ? `?${query}` : ""}`,
+    );
+  }, [isInitServicesData]);
 
   const onToggleChange = () => {
     onConfirm();
   };
 
-  const onCloseConfirmDialog = () => {
-    setIsConfirmDialogVisible(false);
-  };
-
   const onConfirm = async () => {
-    setIsConfirmDialogVisible(false);
-
     const raw = {
       service: TenantWalletService.AITools,
       enabled: !isAiToolsServiceOn,
@@ -203,54 +142,11 @@ const AiPage = (props: AiPageProps) => {
     }
   };
 
-  const confirmationDialogContent = isAiToolsServiceOn
-    ? {
-        title: t("Confirmation"),
-        body: [
-          t("DisableAIToolsConfirm", {
-            organizationName: logoText,
-          }),
-          <CommonTrans
-            key="DisableAIToolsConfirmBalance"
-            i18nKey="DisableAIToolsConfirmBalance"
-            values={{
-              balance: formatAiServiceCurrency(
-                aiServiceBalance ?? 0,
-                3,
-                aiServiceCodeCurrency,
-              ),
-            }}
-            components={{
-              1: <span style={{ fontWeight: 600 }} />,
-            }}
-          />,
-          t("DisableAIToolsConfirmReEnable"),
-        ],
-      }
-    : {
-        title: t("Confirmation"),
-        body: [
-          t("AIToolsDescription", {
-            productName: getBrandName("ProductName"),
-            organizationName: logoText,
-          }),
-          t("WantToContinue"),
-        ],
-      };
-
-  const onOpenPricingBilling = () => {
-    setIsPricingBillingVisible(true);
-  };
-
-  const onClosePricingBilling = () => {
-    setIsPricingBillingVisible(false);
-  };
-
   const onOpenTopUp = () => {
-    if (!isAiToolsServiceOn && !simpleTopUp) {
-      setIsTopUpConfirmVisible(true);
-      return;
-    }
+    // if (!isAiToolsServiceOn && !simpleTopUp) {
+    //   setIsTopUpConfirmVisible(true);
+    //   return;
+    // }
 
     setIsTopUpVisible(true);
   };
@@ -268,166 +164,140 @@ const AiPage = (props: AiPageProps) => {
     setIsTopUpVisible(false);
   };
 
-  const tabsItems: TTabItem[] = [
-    {
-      id: "usage",
-      name: t("Usage"),
-      content: (
-        <div>
-          <TransactionHistory
-            withoutHeader={currentDeviceType !== DeviceType.mobile}
-            serviceName={AI_TOOLS}
-            withoutRoleFilter
-          />
-        </div>
-      ),
-    },
-    {
-      id: "model-settings",
-      name: t("ModelSettings"),
-      content: <ModelSettingsTable isDisabled={isDisabled} />,
-    },
-  ];
-
   if (!isInitServicesData) return <AiPageLoader />;
 
   const balance = formatWalletCurrency();
 
+  const monthSpend = aiUsage?.totalAmount ?? 0;
+  const monthTokens = aiUsage?.totalQuantity ?? 0;
+  const monthTokensText = formatCompactNumber(monthTokens, language);
+  const monthLabel = formatWithTimezone(now(), "LLLL yyyy", {
+    locale: language,
+    timezone: getAppTimezone(),
+  });
+
   return (
     <div className={styles.container}>
-      <PricingBillingBody
-        visible={isPricingBillingVisible}
-        onClose={onClosePricingBilling}
-        isBackButton={false}
-        withoutFooter
+      {isTopUpVisible ? (
+        <SimpleTopUpDialog
+          visible={isTopUpVisible}
+          onClose={onCloseTopUp}
+          serviceName={AI_TOOLS}
+        />
+      ) : null}
+
+      <ServiceToggleSection
+        isEnabled={isAiToolsServiceOn}
+        onToggle={onToggleChange}
+        title={t("EnableAIFeatures")}
+        description={t("EnableAIFeaturesDescription")}
+        testId="service-ai-toggle-button"
+        isDisabled={isDisabled}
+        withBottomMargin={withBottomMargin}
       />
 
-      {isTopUpVisible ? (
-        simpleTopUp ? (
-          <AiSimpleTopUpDialog
-            visible={isTopUpVisible}
-            onClose={onCloseTopUp}
-          />
-        ) : (
-          <AIServiceDialog visible={isTopUpVisible} onClose={onCloseTopUp} />
-        )
+      {isAiToolsServiceOn && isLowWalletBalance ? (
+        <Text fontSize="15px" fontWeight={600} className={styles.lowBalance}>
+          {t("LowCreditsBalance")}
+        </Text>
       ) : null}
 
-      <div className={styles.toggleSection}>
-        <ServiceToggleSection
-          isEnabled={isAiToolsServiceOn}
-          onToggle={onToggleChange}
-          title={t("EnableOrganizationAI", { organizationName: logoText })}
-          description={t("EnableAIDescription")}
-          testId="service-ai-toggle-button"
-          isDisabled={isDisabled}
-          withBottomMargin={withBottomMargin}
-        />
+      {withoutWallet ? null : (
+        <>
+          <WalletInfo
+            withoutBackground
+            balance={balance}
+            onTopUp={onOpenTopUp}
+          />
+          {showUnlinkedCardBanner ? (
+            <div className={styles.unlinkedBanner}>
+              <UnlinkedCardBanner />
+            </div>
+          ) : null}
+        </>
+      )}
 
-        {withoutWallet ? null : (
-          <WalletInfo shortView withoutBackground balance={balance} />
-        )}
-
-        {isAiToolsServiceOn && isAiServiceLowBalance ? (
-          <Text fontSize="15px" fontWeight={600} className={styles.lowBalance}>
-            {t("LowBalance")}
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <Text fontWeight="700" fontSize="14px">
+            {t("Usage")}
           </Text>
-        ) : null}
-      </div>
+          {onViewMore ? (
+            <Link
+              className={styles.viewMoreLink}
+              fontSize="13px"
+              fontWeight="600"
+              color="accent"
+              textDecoration="underline"
+              onClick={onViewMore}
+              dataTestId="ai_view_more_link"
+            >
+              {t("ViewMore")}
+            </Link>
+          ) : null}
+        </div>
 
-      <div className={styles.balanceSection}>
-        <div className={styles.balanceCard}>
-          <BalanceAmount
-            amount={aiServiceBalance}
-            currency={aiServiceCodeCurrency}
-            title={t("AvailableCredits")}
-            onRefresh={onRefresh}
-            isRefreshing={isRefreshing}
-            language={language}
-          />
+        <div className={styles.cardsGrid}>
+          <div className={styles.card}>
+            <Text className={styles.cardLabel}>{t("MonthSpend")}</Text>
+            {isUsageLoading ? (
+              <RectangleSkeleton
+                width="80px"
+                height="24px"
+                borderRadius="3px"
+              />
+            ) : (
+              <SpendAmount
+                amount={monthSpend}
+                className={styles.cardValue}
+                fontSize="18px"
+                fontWeight={700}
+                tooltipId="ai-tools-month-spend"
+              />
+            )}
+            <Text className={styles.cardCaption}>
+              {t("ForPeriod", { period: monthLabel })}
+            </Text>
+          </div>
 
-          <Button
-            size={ButtonSize.small}
-            primary
-            label={t("TopUpCredits")}
-            onClick={onOpenTopUp}
-            scale
-            testId="top_up_credits_button"
-            isDisabled={isDisabled}
-          />
+          <div className={styles.card}>
+            <Text className={styles.cardLabel}>{t("MonthUsage")}</Text>
+            {isUsageLoading ? (
+              <RectangleSkeleton
+                width="80px"
+                height="24px"
+                borderRadius="3px"
+              />
+            ) : (
+              <Text className={styles.cardValue}>{monthTokensText}</Text>
+            )}
+            <Text className={styles.cardCaption}>
+              {t("TokensProcessedInMonth", { month: monthLabel })}
+            </Text>
+          </div>
         </div>
       </div>
-      <div className={styles.lastTopUpRow}>
-        {aiServiceLastCreditAmount ? (
-          <Text className={styles.lastTopUpLabel}>
-            <CommonTrans
-              i18nKey="LastTopUp"
-              components={{
-                1: (
-                  <Text
-                    fontWeight={600}
-                    as="span"
-                    className={styles.lastTopUpLabel}
-                  />
-                ),
-                2: (
-                  <Text
-                    fontWeight={600}
-                    as="span"
-                    className={styles.lastTopUpValue}
-                  />
-                ),
-              }}
-              values={{
-                currency: formatAiServiceCurrency(
-                  aiServiceLastCreditAmount,
-                  3,
-                  aiServiceLastCreditCurrency,
-                ),
-                date: formatDateLocalized(
-                  aiServiceLastCreditDate,
-                  "DATE_FULL",
-                  {
-                    locale: language,
-                    timezone: getAppTimezone(),
-                  },
-                ),
-              }}
-            />
-          </Text>
-        ) : null}
 
+      <Text as="span" fontSize="13px" className={styles.pricingRow}>
         <Link
-          className={styles.pricingLink}
-          onClick={onOpenPricingBilling}
-          textDecoration="underline dotted"
+          fontSize="13px"
+          fontWeight={600}
           color="accent"
+          textDecoration="underline dotted"
+          onClick={onOpenSupportedModels}
+          dataTestId="ai_see_pricing_link"
         >
-          <Text fontSize="13px" fontWeight={600}>
-            {t("AIPricingAndBilling")}
-          </Text>
+          {t("SeePricing")}
         </Link>
-      </div>
+      </Text>
 
-      <div className={styles.tabsWrapper}>
-        <Tabs
-          items={tabsItems}
-          selectedItemId={selectedTabId}
-          onSelect={(item) => setSelectedTabId(item.id)}
-          withoutStickyIntend
-          //withAnimation
+      <div>
+        <TransactionHistory
+          serviceName={AI_TOOLS}
+          withoutRoleFilter
+          hideTypeFilter
         />
       </div>
-
-      {isConfirmDialogVisible ? (
-        <ConfirmationDialog
-          visible={isConfirmDialogVisible}
-          onClose={onCloseConfirmDialog}
-          onConfirm={onConfirm}
-          title={confirmationDialogContent.title}
-          bodyText={confirmationDialogContent.body}
-        />
-      ) : null}
 
       {isTopUpConfirmVisible ? (
         <ConfirmationDialog

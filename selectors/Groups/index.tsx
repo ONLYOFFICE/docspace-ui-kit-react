@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { useCallback, useRef, useState } from "react";
 
 import EmptyScreenGroupLight from "../../assets/emptyview/empty.groups.light.svg";
@@ -47,7 +12,9 @@ import {
   type TSelectorItem,
   type TSelectorWithAside,
 } from "../../components/selector";
+import { toastr, type TData } from "../../components/toast";
 import { useTheme } from "../../context/ThemeContext";
+import useContentLoading from "../utils/hooks/useContentLoading";
 
 import type { GroupsSelectorProps } from "./GroupsSelector.types";
 
@@ -81,8 +48,10 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
   const [isNextPageLoading, setIsNextPageLoading] = useState(false);
   const [itemsList, setItemsList] = useState<TSelectorItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<TSelectorItem | null>(null);
+  const { isContentLoading, startContentLoading, finishContentLoading } =
+    useContentLoading();
 
-  const isFirstLoad = useRef(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const afterSearch = useRef(false);
   const totalRef = useRef(0);
 
@@ -101,23 +70,29 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       doubleClickCallback();
     }
   };
-  const onSearch = useCallback((value: string, callback?: () => void) => {
-    isFirstLoad.current = true;
-    afterSearch.current = true;
-    setSearchValue(() => {
-      return value;
-    });
-    callback?.();
-  }, []);
+  const onSearch = useCallback(
+    (value: string, callback?: () => void) => {
+      afterSearch.current = true;
+      startContentLoading();
+      setSearchValue(() => {
+        return value;
+      });
+      callback?.();
+    },
+    [startContentLoading],
+  );
 
-  const onClearSearch = useCallback((callback?: () => void) => {
-    isFirstLoad.current = true;
-    afterSearch.current = true;
-    setSearchValue(() => {
-      return "";
-    });
-    callback?.();
-  }, []);
+  const onClearSearch = useCallback(
+    (callback?: () => void) => {
+      afterSearch.current = true;
+      startContentLoading();
+      setSearchValue(() => {
+        return "";
+      });
+      callback?.();
+    },
+    [startContentLoading],
+  );
 
   const onSubmitAction = useCallback(
     (items: TSelectorItem[]) => {
@@ -131,40 +106,43 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       const pageCount = 100;
       setIsNextPageLoading(true);
 
-      const res = await groupApi.getGroups({
-        count: pageCount,
-        startIndex,
-        filterValue: searchValue,
-      });
-
-      const items = res.data.response ?? [];
-      const total = res.data.count ?? 0;
-
-      const convertedItems: TSelectorItem[] = items.map((group) => ({
-        id: group.id,
-        label: group.name ?? "",
-        name: group.name ?? "",
-        isGroup: true,
-      }));
-
-      if (isFirstLoad.current) {
-        totalRef.current = total;
-        setItemsList([...convertedItems]);
-        setHasNextPage(convertedItems.length < total);
-
-        isFirstLoad.current = false;
-      } else {
-        setItemsList((value) => {
-          const arr = [...value, ...convertedItems];
-          setHasNextPage(arr.length < total);
-          return arr;
+      try {
+        const res = await groupApi.getGroups({
+          count: pageCount,
+          startIndex,
+          filterValue: searchValue,
         });
-        isFirstLoad.current = false;
-      }
 
-      setIsNextPageLoading(false);
+        const items = res.data.response ?? [];
+        const total = res.data.count ?? 0;
+
+        const convertedItems: TSelectorItem[] = items.map((group) => ({
+          id: group.id,
+          label: group.name ?? "",
+          name: group.name ?? "",
+          isGroup: true,
+        }));
+
+        if (startIndex === 0) {
+          totalRef.current = total;
+          setItemsList([...convertedItems]);
+          setHasNextPage(convertedItems.length < total);
+        } else {
+          setItemsList((value) => {
+            const arr = [...value, ...convertedItems];
+            setHasNextPage(arr.length < total);
+            return arr;
+          });
+        }
+      } catch (error) {
+        toastr.error(error as TData);
+      } finally {
+        setIsNextPageLoading(false);
+        setIsFirstLoad(false);
+        finishContentLoading();
+      }
     },
-    [searchValue, groupApi],
+    [searchValue, groupApi, finishContentLoading],
   );
 
   const withAside: TSelectorWithAside = useAside
@@ -204,13 +182,14 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}
       loadNextPage={onLoadNextPage}
-      isLoading={isFirstLoad.current}
+      isLoading={isFirstLoad}
+      isContentLoading={isContentLoading}
       searchLoader={<SearchLoader />}
       onSelect={onSelect}
       rowLoader={
         <RowLoader
           isMultiSelect={false}
-          isContainer={isFirstLoad.current}
+          isContainer={isFirstLoad}
           isUser={false}
         />
       }

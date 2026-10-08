@@ -1,65 +1,49 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import { IndexRange } from "react-virtualized";
 
 export type RowContainerProps = {
-  /** Height of one Row element. Required for the proper functioning of the scroll */
+  /**
+   * Height of one row in pixels, which the virtualised list uses for every row
+   * alike. A row that is taller is clipped.
+   * @default 50
+   */
   itemHeight?: number;
-  /** Allows setting fixed block height for Row */
+  /**
+   * Height of the container as a CSS length, read only while `useReactWindow`
+   * is on. Without it the container is 100% of its parent, which has to have a
+   * height of its own; with virtualisation off the container is as tall as its
+   * rows and this prop does nothing.
+   */
   manualHeight?: string;
-  /** Child elements */
+  /** The rows. It must be an array, one entry per row. */
   children: React.ReactNode[];
-  /** Enables react-window for efficient rendering of large lists */
+  /**
+   * Whether the rows are virtualised and paged in as the user scrolls. Turn it
+   * off for a short list: the virtual list needs the portal's own scroll
+   * container and measures its width by a literal element id.
+   * @default true
+   */
   useReactWindow?: boolean;
-  /** Accepts class */
+  /** Applied to the container. */
   className?: string;
-  /** Accepts id */
+  /**
+   * Id of the container. The virtual list finds the container by the literal id
+   * `rowContainer` to measure its width, so changing this — or rendering two
+   * containers — leaves the rows with a width of zero.
+   * @default "rowContainer"
+   */
   id?: string;
-  /** Accepts css style */
+  /** Applied to the container. */
   style?: React.CSSProperties;
   /** Sets a callback function that is called when the list scroll positions change */
   onScroll?: () => void;
-  /** The property required for the infinite loader */
+  /** How many rows are loaded so far. Read by the virtual list only. */
   filesLength?: number;
-  /** The property required for the infinite loader */
+  /** How many rows there are in total. Read by the virtual list only. */
   itemCount?: number;
-  /** The property required for the infinite loader */
+  /** Called with the range to load when the user scrolls near the end. */
   fetchMoreFiles?: (params: IndexRange) => Promise<void>;
-  /** The property required for the infinite loader */
+  /** Whether there is another page to ask for. */
   hasMoreFiles?: boolean;
-  /** Disables text selection */
+  /** Disables text selection, which is on by default inside the container. */
   noSelect?: boolean;
 };

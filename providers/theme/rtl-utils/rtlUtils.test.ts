@@ -51,11 +51,15 @@ describe("rtl-utils", () => {
 
   describe("getCorrectFourValuesStyle", () => {
     it("swaps horizontal values for rtl", () => {
-      expect(getCorrectFourValuesStyle("1px 2px 3px 4px", "rtl")).toBe("1px 4px 3px 2px");
+      expect(getCorrectFourValuesStyle("1px 2px 3px 4px", "rtl")).toBe(
+        "1px 4px 3px 2px",
+      );
     });
 
     it("returns same string for ltr or invalid format", () => {
-      expect(getCorrectFourValuesStyle("1px 2px 3px 4px", "ltr")).toBe("1px 2px 3px 4px");
+      expect(getCorrectFourValuesStyle("1px 2px 3px 4px", "ltr")).toBe(
+        "1px 2px 3px 4px",
+      );
       expect(getCorrectFourValuesStyle("1px 2px", "rtl")).toBe("1px 2px");
     });
   });
@@ -67,8 +71,12 @@ describe("rtl-utils", () => {
     });
 
     it("handles 3 and 4 values", () => {
-      expect(getCorrectBorderRadius("10px 20px 30px", "rtl")).toBe("20px 10px 20px 30px");
-      expect(getCorrectBorderRadius("10px 20px 30px 40px", "rtl")).toBe("20px 10px 40px 30px");
+      expect(getCorrectBorderRadius("10px 20px 30px", "rtl")).toBe(
+        "20px 10px 20px 30px",
+      );
+      expect(getCorrectBorderRadius("10px 20px 30px 40px", "rtl")).toBe(
+        "20px 10px 40px 30px",
+      );
     });
 
     it("returns original for ltr", () => {
@@ -79,14 +87,18 @@ describe("rtl-utils", () => {
 
   describe("getFontFamilyDependingOnLanguage", () => {
     it("uses system font for arabic locale", () => {
-      expect(getFontFamilyDependingOnLanguage("ar-SA")).toBe(SYSTEM_FONT_FAMILY);
+      expect(getFontFamilyDependingOnLanguage("ar-SA")).toBe(
+        SYSTEM_FONT_FAMILY,
+      );
     });
 
     it("uses default font for other locales", () => {
       RTL_LANGUAGES.filter((lng) => lng !== "ar-SA").forEach((lng) => {
         expect(getFontFamilyDependingOnLanguage(lng)).toBe(DEFAULT_FONT_FAMILY);
       });
-      expect(getFontFamilyDependingOnLanguage("en-US")).toBe(DEFAULT_FONT_FAMILY);
+      expect(getFontFamilyDependingOnLanguage("en-US")).toBe(
+        DEFAULT_FONT_FAMILY,
+      );
     });
   });
 });

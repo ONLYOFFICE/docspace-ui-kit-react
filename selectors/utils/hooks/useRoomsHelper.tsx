@@ -1,42 +1,9 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { use } from "react";
 
 import {
+  RoomType as ApiRoomType,
   StorageFilter,
+  FolderType,
   type RoomType as RoomTypeEnum,
   type FolderDtoInteger,
   type SearchArea,
@@ -44,14 +11,24 @@ import {
 import { useApi } from "../../../providers/api";
 import { RoomsTypeValues } from "../../../utils/common";
 import RoomType from "../../../components/room-type";
+import { Tooltip } from "../../../components/tooltip";
 import type { TSelectorItem, TBreadCrumb } from "../../../components/selector";
+import { toastr, type TData } from "../../../components/toast";
 
 import { LoadersContext } from "../contexts/Loaders";
 
-import { PAGE_COUNT } from "../constants";
+import {
+  PAGE_COUNT,
+  FORMS_SEARCH_AREA,
+  ROOMS_SECTION_FOLDER_TYPES,
+} from "../constants";
 import type { UseRoomsHelperProps } from "../types";
 import { useCommonTranslation } from "../../../utils/i18n";
-import { convertRoomsToItems, getDefaultBreadCrumb } from "..";
+import {
+  convertRoomsToItems,
+  getDefaultBreadCrumb,
+  buildSpecialFolderItems,
+} from "..";
 
 import useInputItemHelper from "./useInputItemHelper";
 
@@ -66,11 +43,13 @@ const useRoomsHelper = ({
   searchValue,
   searchArea,
   roomType,
+  formsSection,
   isRoomsOnly,
 
   isInit,
   setIsInit,
   withCreate,
+  disabledCreatePublicRoom,
   disableThirdParty,
   excludeItems,
   createDefineRoomLabel,
@@ -80,14 +59,20 @@ const useRoomsHelper = ({
   subscribe,
   setSelectedItemSecurity,
   setSelectedTreeNode,
+  isRoomDisabled,
+
+  recentFolder,
+  favoritesFolder,
+  withRecentTreeFolder,
+  withFavoritesTreeFolder,
 }: UseRoomsHelperProps) => {
   const t = useCommonTranslation();
   const {
     setIsNextPageLoading,
-    setIsBreadCrumbsLoading,
-    setIsFirstLoad,
+    hideSectionLoader,
+    finishFullLoad,
 
-    isFirstLoad,
+    isFullLoadActive,
   } = use(LoadersContext);
 
   const { roomsApi } = useApi();
@@ -96,34 +81,62 @@ const useRoomsHelper = ({
 
   const requestRunning = React.useRef(false);
   const initRef = React.useRef(isInit);
-  const firstLoadRef = React.useRef(isFirstLoad);
+  const firstLoadRef = React.useRef(isFullLoadActive);
 
   React.useEffect(() => {
-    firstLoadRef.current = isFirstLoad;
-  }, [isFirstLoad]);
+    firstLoadRef.current = isFullLoadActive;
+  }, [isFullLoadActive]);
 
   React.useEffect(() => {
     initRef.current = isInit;
   }, [isInit]);
 
+  // The type dropdown only opens outside the Forms section (a forms-scoped
+  // listing gets createRoomType and creates the room straight away), and form
+  // filling rooms cannot be created from the Rooms section.
   const createDropDownItems = React.useMemo(() => {
-    return RoomsTypeValues.map((value) => {
+    return RoomsTypeValues.filter(
+      (value) => value !== ApiRoomType.FillingFormsRoom,
+    ).map((value) => {
+      const isPublicRoomDisabled =
+        !!disabledCreatePublicRoom && value === ApiRoomType.PublicRoom;
+
       const onClick = () => {
+        if (isPublicRoomDisabled) return;
+
         addInputItem("", "", value as RoomTypeEnum, t("EnterName"));
       };
 
-      return (
+      const roomTypeElement = (
         <RoomType
           key={value}
           roomType={value}
           selectedId={value}
           type="dropdownItem"
           isOpen={false}
+          disabledPublicRoom={disabledCreatePublicRoom}
           onClick={onClick}
         />
       );
+
+      if (!isPublicRoomDisabled) return roomTypeElement;
+
+      const tooltipId = `create-room-type-disabled-${value}`;
+
+      return (
+        <div key={value} id={tooltipId}>
+          {roomTypeElement}
+          <Tooltip
+            id={`${tooltipId}-instance`}
+            anchorSelect={`#${tooltipId}`}
+            place="bottom"
+            float
+            getContent={() => t("PublicRoomCreationDisabled")}
+          />
+        </div>
+      );
     });
-  }, [addInputItem, t]);
+  }, [addInputItem, disabledCreatePublicRoom, t]);
 
   const getRoomList = React.useCallback(
     async (sIndex: number) => {
@@ -132,125 +145,188 @@ const useRoomsHelper = ({
       requestRunning.current = true;
       setIsNextPageLoading(true);
 
-      let startIndex = sIndex;
+      try {
+        let startIndex = sIndex;
 
-      if (withCreate) {
-        startIndex -= startIndex % 100;
-      }
-
-      const filterValue = searchValue || "";
-
-      let typeFilter: RoomTypeEnum[] | undefined;
-
-      if (roomType || createDefineRoomType) {
-        const types: RoomTypeEnum[] = roomType
-          ? Array.isArray(roomType)
-            ? [...roomType]
-            : [roomType]
-          : [];
-        if (createDefineRoomType && !types.includes(createDefineRoomType)) {
-          types.push(createDefineRoomType);
+        if (withCreate) {
+          startIndex -= startIndex % 100;
         }
-        typeFilter = types.length > 0 ? types : undefined;
-      }
 
-      const res = await roomsApi.getRoomsFolder({
-        type: typeFilter,
-        searchArea: searchArea as SearchArea,
-        storageFilter: disableThirdParty ? StorageFilter.Internal : undefined,
-        count: PAGE_COUNT,
-        startIndex,
-        filterValue,
-      });
-      const roomsFromApi = res.data.response!;
+        const filterValue = searchValue || "";
 
-      const { folders, total, count, current } = roomsFromApi;
+        let typeFilter: RoomTypeEnum[] | undefined;
 
-      if (initRef.current) {
-        const { title, id } = current!;
+        if (roomType || createDefineRoomType) {
+          const types: RoomTypeEnum[] = roomType
+            ? Array.isArray(roomType)
+              ? [...roomType]
+              : [roomType]
+            : [];
+          if (createDefineRoomType && !types.includes(createDefineRoomType)) {
+            types.push(createDefineRoomType);
+          }
+          typeFilter = types.length > 0 ? types : undefined;
+        }
 
-        if (isRoomsOnly) subscribe(id!);
+        if (!typeFilter && formsSection !== undefined) {
+          typeFilter = formsSection
+            ? [ApiRoomType.FillingFormsRoom]
+            : Object.values(ApiRoomType).filter(
+                (value) =>
+                  value !== ApiRoomType.FillingFormsRoom &&
+                  value !== ApiRoomType.AiRoom,
+              );
+        }
 
-        const breadCrumbs: TBreadCrumb[] = [
-          { label: title!, id: id!, isRoom: true },
-        ];
+        // Form filling rooms live only in the Forms section, so a listing scoped
+        // to them must ask for that search area - otherwise the server looks
+        // inside the Rooms section and returns nothing.
+        const isFormRoomOnlyFilter =
+          !!typeFilter &&
+          typeFilter.length > 0 &&
+          typeFilter.every((value) => value === ApiRoomType.FillingFormsRoom);
 
-        if (!isRoomsOnly) breadCrumbs.unshift({ ...getDefaultBreadCrumb(t) });
+        const effectiveSearchArea = searchArea
+          ? (searchArea as SearchArea)
+          : formsSection || isFormRoomOnlyFilter
+            ? (FORMS_SEARCH_AREA as unknown as SearchArea)
+            : undefined;
 
-        onSetBaseFolderPath?.(breadCrumbs);
+        const res = await roomsApi.getRoomsFolder({
+          type: typeFilter,
+          searchArea: effectiveSearchArea,
+          storageFilter: disableThirdParty ? StorageFilter.Internal : undefined,
+          count: PAGE_COUNT,
+          startIndex,
+          filterValue,
+        });
+        const roomsFromApi = res.data.response!;
 
-        setBreadCrumbs?.(breadCrumbs);
+        const { folders, total, count, current } = roomsFromApi;
 
-        setIsBreadCrumbsLoading(false);
-      }
+        if (initRef.current) {
+          const { title, id } = current!;
 
-      const itemList: TSelectorItem[] = convertRoomsToItems(
-        folders ?? [],
-        t,
-      ).filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true));
+          if (isRoomsOnly) subscribe(id!);
 
-      setHasNextPage(count === PAGE_COUNT);
+          const breadCrumbs: TBreadCrumb[] = [
+            { label: title!, id: id!, isRoom: true },
+          ];
 
-      setSelectedItemSecurity?.(current!.security!);
+          if (!isRoomsOnly) breadCrumbs.unshift({ ...getDefaultBreadCrumb(t) });
 
-      setSelectedTreeNode?.({
-        ...current!,
-        path: roomsFromApi.pathParts,
-      } as FolderDtoInteger);
+          onSetBaseFolderPath?.(breadCrumbs);
 
-      if (firstLoadRef.current || startIndex === 0) {
-        const { security } = current!;
+          setBreadCrumbs?.(breadCrumbs);
 
-        if (withCreate && security?.Create) {
-          setTotal(total + 1);
-          const createItem: TSelectorItem = {
-            isCreateNewItem: true,
-            label: createDefineRoomLabel ?? t("NewRoom"),
-            id: "create-room-item",
-            key: "create-room-item",
-            hotkey: "r",
-            isRoomsOnly,
-            createDefineRoomType,
-            dropDownItems: createDefineRoomType
-              ? undefined
-              : createDropDownItems,
+          hideSectionLoader("breadcrumbs");
+        }
 
-            onBackClick: () => {
-              setIsRoot?.(true);
-              setSelectedItemType?.(undefined);
-              setBreadCrumbs?.((val) => {
-                const newVal = [...val];
+        const itemList: TSelectorItem[] = convertRoomsToItems(
+          folders ?? [],
+          t,
+          isRoomDisabled,
+        ).filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true));
 
-                newVal.pop();
+        setHasNextPage(count === PAGE_COUNT);
 
-                return newVal;
-              });
-              getRootData?.();
-            },
-          };
+        setSelectedItemSecurity?.(current!.security!);
 
-          if (createDefineRoomType) {
-            createItem.onCreateClick = () =>
-              addInputItem("", "", createDefineRoomType, createDefineRoomLabel);
+        setSelectedTreeNode?.({
+          ...current!,
+          path: roomsFromApi.pathParts,
+        } as FolderDtoInteger);
+
+        if (firstLoadRef.current || startIndex === 0) {
+          const { security } = current!;
+
+          if (withCreate && security?.Create) {
+            setTotal(total + 1);
+            const createRoomType =
+              createDefineRoomType ??
+              (formsSection ? ApiRoomType.FillingFormsRoom : undefined);
+            const createItem: TSelectorItem = {
+              isCreateNewItem: true,
+              label: createDefineRoomLabel ?? t("NewRoom"),
+              id: "create-room-item",
+              key: "create-room-item",
+              hotkey: "r",
+              isRoomsOnly,
+              createDefineRoomType: createRoomType,
+              dropDownItems: createRoomType ? undefined : createDropDownItems,
+
+              onBackClick: () => {
+                setIsRoot?.(true);
+                setSelectedItemType?.(undefined);
+                setBreadCrumbs?.((val) => {
+                  const newVal = [...val];
+
+                  newVal.pop();
+
+                  return newVal;
+                });
+                getRootData?.();
+              },
+            };
+
+            if (createRoomType) {
+              createItem.onCreateClick = () =>
+                addInputItem("", "", createRoomType, createDefineRoomLabel);
+            }
+
+            itemList.unshift(createItem);
+          } else {
+            setTotal(total);
           }
 
-          itemList.unshift(createItem);
-        } else {
-          setTotal(total);
-        }
-        setItems?.(itemList);
-      } else {
-        setItems?.((prevState) => {
-          if (prevState) return [...prevState, ...itemList];
-          return [...itemList];
-        });
-      }
+          if (
+            startIndex === 0 &&
+            !searchValue &&
+            (withRecentTreeFolder || withFavoritesTreeFolder)
+          ) {
+            const specialItems = buildSpecialFolderItems({
+              section: formsSection ? "forms" : "rooms",
+              recentFolder,
+              favoritesFolder,
+              withRecent: withRecentTreeFolder,
+              withFavorites: withFavoritesTreeFolder,
+              // Scope filter for Recent/Favorites: the types of the rooms to
+              // keep, not the root section - so this stays FillingFormsRoom (15)
+              // for Forms, and the room types making up the Rooms section (not
+              // VirtualRooms, which would leak form-filling and AI rooms back in).
+              folderType: formsSection
+                ? FolderType.FillingFormsRoom
+                : ROOMS_SECTION_FOLDER_TYPES,
+              withSeparator: itemList.length > 0,
+              t,
+            });
 
-      requestRunning.current = false;
-      setIsNextPageLoading(false);
-      setIsRoot?.(false);
-      setIsInit(false);
-      setIsFirstLoad(false);
+            if (specialItems.length) {
+              itemList.unshift(...specialItems);
+              const base = withCreate && security?.Create ? total + 1 : total;
+              setTotal(base + specialItems.length);
+            }
+          }
+
+          setItems?.(itemList);
+        } else {
+          setItems?.((prevState) => {
+            if (prevState) return [...prevState, ...itemList];
+            return [...itemList];
+          });
+        }
+
+        setIsRoot?.(false);
+        setIsInit(false);
+      } catch (error) {
+        toastr.error(error as TData);
+      } finally {
+        requestRunning.current = false;
+        setIsNextPageLoading(false);
+        // Also ends the content refresh; skipping it on the error path would
+        // leave the skeleton on screen and hideSectionLoader a permanent no-op
+        finishFullLoad();
+      }
     },
     [
       roomsApi,
@@ -260,14 +336,14 @@ const useRoomsHelper = ({
       setSelectedItemSecurity,
       setIsRoot,
       setIsInit,
-      setIsFirstLoad,
       setIsNextPageLoading,
       roomType,
+      formsSection,
       isRoomsOnly,
       subscribe,
       onSetBaseFolderPath,
       setBreadCrumbs,
-      setIsBreadCrumbsLoading,
+      hideSectionLoader,
       withCreate,
       setItems,
       setTotal,
@@ -281,6 +357,12 @@ const useRoomsHelper = ({
       excludeItems,
       setSelectedTreeNode,
       t,
+      recentFolder,
+      favoritesFolder,
+      withRecentTreeFolder,
+      withFavoritesTreeFolder,
+      isRoomDisabled,
+      finishFullLoad,
     ],
   );
 

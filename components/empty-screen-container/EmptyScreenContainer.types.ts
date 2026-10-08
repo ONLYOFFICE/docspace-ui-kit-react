@@ -1,63 +1,28 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ReactNode } from "react";
 
 export type EmptyScreenContainerProps = {
-  /** URL source for the empty state image */
+  /** Source of the illustration. The stylesheet pins the image to 200×140, and to 150×105 below 600px, so supply artwork of that shape. */
   imageSrc: string;
-  /** Alternative text for the image for accessibility */
+  /** Alternative text for the illustration. Pass an empty string when the artwork repeats what the text below already says. */
   imageAlt: string;
-  /** Main header text displayed below the image */
+  /** The large line under the image, 19px and bold. */
   headerText: string;
-  /** Optional subheading text displayed below the header */
+  /** Optional 600-weight line between the header and the description. It has no styling of its own beyond that weight. */
   subheadingText?: string;
-  /** Optional description text or React node displayed below the subheading */
+  /** Optional explanatory line at 12px, in the muted colour. */
   descriptionText?: string | ReactNode;
-  /** Optional buttons or other interactive elements */
+  /** Actions under the text, stacked in a 16px column and centred. */
   buttons?: ReactNode;
-  /** Additional CSS class name */
+  /** Added after the component's own classes on the outer element. */
   className?: string;
-  /** HTML id attribute */
+  /** Ignored. Nothing reads this prop and the component spreads no unknown props, so it never reaches the DOM. */
   id?: string;
-  /** Custom CSS styles for the container */
+  /** Ignored. Nothing reads this prop; style the outer element through `className`. */
   style?: CSSProperties;
-  /** Custom CSS styles for the image */
+  /** Inline style of the `<img>`, and the only way past its fixed size. It is dropped between 601px and 1023px, where the component passes an empty object instead. */
   imageStyle?: CSSProperties;
-  /** Custom CSS styles for the buttons container */
+  /** Inline style of the row that holds `buttons`. */
   buttonStyle?: CSSProperties;
-  /** Whether to display without filter styling */
+  /** Adds the height of the filter bar to the top padding — 91px in place of 52px — for a screen that has no filter above it. It removes nothing. */
   withoutFilter?: boolean;
 };

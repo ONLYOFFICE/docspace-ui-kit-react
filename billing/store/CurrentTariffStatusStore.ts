@@ -1,45 +1,9 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import {
   type PaymentApi,
   type PortalQuotaApi,
   type Tariff,
   type Quota,
-  type CustomerInfoDto,
   PaymentMethodStatus,
 } from "@onlyoffice/docspace-api-sdk";
 import {
@@ -49,6 +13,10 @@ import {
   isValidDate,
   now,
 } from "../../utils/date";
+import { daysUntil } from "../utils/common";
+import { TOTAL_SIZE } from "../constants";
+import { isDocsConnectService } from "../utils/docs-connect";
+import type { TCustomerInfo, TWalletServiceQuota } from "../types";
 
 class CurrentTariffStatusStore {
   private portalQuotaApi: PortalQuotaApi;
@@ -63,9 +31,18 @@ class CurrentTariffStatusStore {
 
   private _previousWalletQuota: Quota[] = [];
 
-  payerInfo: CustomerInfoDto = {
+  private _tariffWalletQuota: (Quota & { additional?: boolean }) | null = null;
+
+  private _storageServiceId: number | null = null;
+
+  private _docsConnectServiceIds: number[] = [];
+
+  private _walletServicesResolved = false;
+
+  payerInfo: TCustomerInfo = {
     portalId: null,
     paymentMethodStatus: 0,
+    isDelayedPaymentMethod: false,
     email: null,
     payer: undefined,
   };
@@ -135,6 +112,12 @@ class CurrentTariffStatusStore {
     });
   }
 
+  get daysUntilPayment() {
+    const dueDate = this.portalTariffStatus?.dueDate;
+    if (!dueDate || !this.isPaymentDateValid) return 0;
+    return Math.max(0, daysUntil(dueDate));
+  }
+
   get gracePeriodEndDate() {
     const tariff = this.portalTariffStatus;
     if (!tariff) return "";
@@ -190,6 +173,24 @@ class CurrentTariffStatusStore {
     return this._walletQuotas[0]?.dueDate;
   }
 
+  get hasTariffWalletSubscription() {
+    return this._tariffWalletQuota !== null;
+  }
+
+  get currentTariffAdminsCount() {
+    return this._tariffWalletQuota?.quantity ?? null;
+  }
+
+  get hasScheduledTariffAdminsChange() {
+    if (!this._tariffWalletQuota) return false;
+    return (this._tariffWalletQuota.nextQuantity ?? -1) >= 0;
+  }
+
+  get nextTariffAdminsCount() {
+    if (!this._tariffWalletQuota) return null;
+    return this._tariffWalletQuota.nextQuantity ?? null;
+  }
+
   get storageExpiryDate() {
     if (!this.storageSubscriptionExpiryDate) return "";
     return formatDateLocalized(
@@ -204,9 +205,7 @@ class CurrentTariffStatusStore {
 
   get daysUntilStorageExpiry() {
     if (!this.storageSubscriptionExpiryDate) return 0;
-    return Math.floor(
-      dateDiff(this.storageSubscriptionExpiryDate, now(), "days"),
-    );
+    return daysUntil(this.storageSubscriptionExpiryDate);
   }
 
   get walletCustomerEmail() {
@@ -229,6 +228,37 @@ class CurrentTariffStatusStore {
     return this.payerInfo.payer ?? null;
   }
 
+  get isDelayedPaymentMethod() {
+    return this.payerInfo.isDelayedPaymentMethod === true;
+  }
+
+  private resolveWalletServiceIds = async () => {
+    if (this._walletServicesResolved) return;
+
+    try {
+      const res = await this.paymentApi.getWalletServices({});
+      const services = (res?.data?.response ??
+        []) as unknown as TWalletServiceQuota[];
+
+      runInAction(() => {
+        this._storageServiceId =
+          services.find((service) =>
+            (service.features ?? []).some(
+              (feature) => feature.id === TOTAL_SIZE,
+            ),
+          )?.id ?? null;
+        this._docsConnectServiceIds = services
+          .filter((service) => isDocsConnectService(service))
+          .map((service) => service.id);
+        this._walletServicesResolved = true;
+      });
+    } catch {
+      runInAction(() => {
+        this._walletServicesResolved = false;
+      });
+    }
+  };
+
   fetchPortalTariff = async (isRefresh?: boolean) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
@@ -247,23 +277,50 @@ class CurrentTariffStatusStore {
 
       const tariff = res.data.response as unknown as Tariff;
 
-      this.portalTariffStatus = tariff;
+      // After an await, so outside the action makeAutoObservable made of this
+      // method; MobX strict mode wants every write wrapped.
+      runInAction(() => {
+        this.portalTariffStatus = tariff;
+      });
 
-      const walletQuota = tariff.quotas?.find((q: Quota) => q.wallet === true);
+      type WalletQuota = Quota & { additional?: boolean };
+      const walletQuotas: WalletQuota[] =
+        (tariff.quotas as WalletQuota[])?.filter((q) => q.wallet === true) ??
+        [];
 
-      if (walletQuota) {
+      if (walletQuotas.length > 0) await this.resolveWalletServiceIds();
+
+      const candidates = walletQuotas.filter(
+        (q) => q.id == null || !this._docsConnectServiceIds.includes(q.id),
+      );
+
+      const storageQuota =
+        this._storageServiceId != null
+          ? walletQuotas.find((q) => q.id === this._storageServiceId)
+          : candidates.find((q) => q.additional !== false);
+      const tariffQuota = candidates.find((q) => q.additional === false);
+
+      runInAction(() => {
         // QuotaState.Overdue = 1
-        if ((walletQuota.state as unknown as number) === 1) {
-          this._previousWalletQuota = [walletQuota];
-          this._walletQuotas = [];
+        if (storageQuota) {
+          if ((storageQuota.state as unknown as number) === 1) {
+            this._previousWalletQuota = [storageQuota];
+            this._walletQuotas = [];
+          } else {
+            this._walletQuotas = [storageQuota];
+            this._previousWalletQuota = [];
+          }
         } else {
-          this._walletQuotas = [walletQuota];
+          this._walletQuotas = [];
           this._previousWalletQuota = [];
         }
-      } else {
-        this._walletQuotas = [];
-        this._previousWalletQuota = [];
-      }
+
+        if (tariffQuota && (tariffQuota.state as unknown as number) !== 1) {
+          this._tariffWalletQuota = tariffQuota;
+        } else {
+          this._tariffWalletQuota = null;
+        }
+      });
 
       this.setIsLoaded(true);
 
@@ -290,14 +347,17 @@ class CurrentTariffStatusStore {
 
       if (!res?.data?.response) return;
 
-      const info = res.data.response as unknown as CustomerInfoDto;
+      const info = res.data.response as unknown as TCustomerInfo;
 
-      this.payerInfo = {
-        portalId: null,
-        paymentMethodStatus: info.paymentMethodStatus ?? 0,
-        email: info.email ?? null,
-        payer: info.payer,
-      };
+      runInAction(() => {
+        this.payerInfo = {
+          portalId: null,
+          paymentMethodStatus: info.paymentMethodStatus ?? 0,
+          isDelayedPaymentMethod: info.isDelayedPaymentMethod ?? false,
+          email: info.email ?? null,
+          payer: info.payer,
+        };
+      });
 
       return this.payerInfo;
     } catch (error: unknown) {

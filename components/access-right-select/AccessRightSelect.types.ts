@@ -1,86 +1,79 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { TComboboxProps } from "../combobox";
 
 type PropsFromCombobox = Pick<
-	TComboboxProps,
-	| "className"
-	| "selectedOption"
-	| "advancedOptions"
-	| "scaled"
-	| "scaledOptions"
-	| "size"
-	| "manualWidth"
-	| "onSelect"
-	| "directionX"
-	| "directionY"
-	| "fixedDirection"
-	| "isAside"
-	| "manualY"
-	| "withoutBackground"
-	| "withBackground"
-	| "withBlur"
-	| "type"
-	| "noBorder"
-	| "isDisabled"
-	| "isMobileView"
-	| "shouldShowBackdrop"
-	| "dataTestId"
-	| "noSelect"
-	| "isLoading"
-	| "showDisabledItems"
-	| "withBackdrop"
-	| "title"
-	| "displaySelectedOption"
+  TComboboxProps,
+  | "className"
+  | "selectedOption"
+  | "advancedOptions"
+  | "scaled"
+  | "scaledOptions"
+  | "size"
+  | "manualWidth"
+  | "onSelect"
+  | "directionX"
+  | "directionY"
+  | "fixedDirection"
+  | "isAside"
+  | "manualY"
+  | "withoutBackground"
+  | "withBackground"
+  | "withBlur"
+  | "type"
+  | "noBorder"
+  | "isDisabled"
+  | "isMobileView"
+  | "shouldShowBackdrop"
+  | "dataTestId"
+  | "noSelect"
+  | "isLoading"
+  | "showDisabledItems"
+  | "withBackdrop"
+  | "title"
+  | "displaySelectedOption"
 >;
 
 export type AccessRightSelectProps = PropsFromCombobox & {
-	/** List of access options */
-	accessOptions: TComboboxProps["options"];
-	isSelectionDisabled?: boolean;
-	selectionErrorText?: React.ReactNode;
-	availableAccess?: number[];
-	topSpace?: number;
-	modernView?: boolean;
-	fillIcon?: boolean;
-	isDefaultMode?: boolean;
-	comboIcon?: string;
-	usePortalBackdrop?: boolean;
-	directionX?: string;
-	directionY?: string;
-	dataTestId?: string;
-	setIsOpenItemAccess?: React.Dispatch<React.SetStateAction<boolean>>;
+  /**
+   * The access levels to choose from. Each is rendered as a row with its icon,
+   * label, description and quota badge; an entry with `isSeparator` becomes a
+   * divider. Ignored when `advancedOptions` is given.
+   */
+  accessOptions: TComboboxProps["options"];
+  /**
+   * Whether picking a level other than the current one is refused. What is
+   * still allowed is `availableAccess`; everything else raises a toast.
+   */
+  isSelectionDisabled?: boolean;
+  /** The toast shown when a refused level is picked. */
+  selectionErrorText?: React.ReactNode;
+  /**
+   * The `access` values that may still be chosen while `isSelectionDisabled` is
+   * set. Without it only the current level is allowed.
+   */
+  availableAccess?: number[];
+  /** Passed straight to `ComboBox`: space above the drop-down, in pixels. */
+  topSpace?: number;
+  /** Passed straight to `ComboBox`: its compact presentation. */
+  modernView?: boolean;
+  /** Passed straight to `ComboBox`: whether the arrow icon is recoloured. */
+  fillIcon?: boolean;
+  /**
+   * Passed straight to `ComboBox`: renders the open list in a portal at the end of the page,
+   * positioned against the button; `false` renders it in place, next to the button, where a
+   * wrapper's CSS variables reach it.
+   * @default true
+   */
+  isDefaultMode?: boolean;
+  /** Passed straight to `ComboBox`: URL of an icon to show instead of the arrow. */
+  comboIcon?: string;
+  /** Passed straight to `ComboBox`: whether the backdrop is rendered in a portal. */
+  usePortalBackdrop?: boolean;
+  /** Which side of the button the drop-down opens towards. */
+  directionX?: string;
+  /** Whether the drop-down opens above or below the button. */
+  directionY?: string;
+  /** `data-testid` of the combo button. */
+  dataTestId?: string;
+  /** Passed straight to `ComboBox`: told when the drop-down opens and closes. */
+  setIsOpenItemAccess?: React.Dispatch<React.SetStateAction<boolean>>;
 };

@@ -1,0 +1,118 @@
+import { Meta, Story } from "@storybook/addon-docs/blocks";
+
+import { Source } from "../../../../.storybook/blocks/Source";
+
+import * as PortalConnectionStories from "./PortalConnection.stories";
+import hookSource from "../usePortal.ts?raw";
+import imageSource from "../usePortalImage.ts?raw";
+import source from "./PortalConnection.tsx?raw";
+
+<Meta of={PortalConnectionStories} />
+
+# Connect to a portal
+
+The page every screen in this track leans on: is there an ONLYOFFICE Apps
+portal behind this page, and who does it think we are?
+
+<Story of={PortalConnectionStories.Default} />
+
+Most readers see **Demo data** — nothing is configured, so the page renders its
+own. That is deliberate: a documentation page that breaks without a portal is a
+broken page, and every screen in this track keeps demo data behind the same
+shape it fetches.
+
+## Pointing it at your own portal
+
+**On the published Storybook**, and anywhere you would rather not touch files:
+the **API** control in the toolbar. It keeps the portal's URL and key in this
+browser's `localStorage` and switches between saved portals per story. Nothing
+leaves the browser.
+
+**Working locally**, the same two values can live in `.env`:
+
+```bash
+# .env
+VITE_PROVIDER_API_URL=https://your-portal.onlyoffice.com
+VITE_PROVIDER_API_KEY=sk-...
+```
+
+A static build **drops both on purpose**. Vite inlines every
+`import.meta.env.VITE_*` it reads, so without that a key in the builder's
+`.env` would sit in plain text in `assets/iframe-*.js` of the published site —
+`.storybook/main.ts` blanks them for production builds, and the published pages
+start in demo mode.
+
+Nothing else to wire: `.storybook/decorators/withApiProvider.tsx` already wraps
+every story in `ApiProvider`, so `useApi()` works in any sample without a
+provider of its own.
+
+## The hook the rest of the track shares
+
+`usePortal()` makes the two opening calls and turns them into four states —
+`demo`, `loading`, `connected`, `error` — because those are the four different
+things a screen has to say. The part worth copying is the classification of
+failures:
+
+| What came back | What it means | What the screen says |
+| --- | --- | --- |
+| 401 / 403 | the portal answered and refused the key | Key refused |
+| no status at all | the browser never got an answer — nearly always CORS, sometimes a wrong host | No answer |
+| any other status | the portal answered something unplanned | Unexpected answer |
+
+Telling the second apart from the first is the whole point. A CORS failure
+carries no status code, so it looks like a broken token, and that is how an
+afternoon goes missing.
+
+<Source code={hookSource} language="tsx" />
+
+## Pictures from the portal need the key too
+
+An avatar comes back as `/storage/userPhotos/…` — a path on the portal, and one
+that answers **403** to a request that is not signed in. The ONLYOFFICE Apps client
+never notices, because it is served from the portal's origin and the browser
+sends the session cookie with every `<img>`. A page anywhere else has no such
+cookie, and an `<img>` cannot carry a header.
+
+So the picture is fetched with the key and handed to `<img>` as a blob:
+
+```ts
+const src = usePortalImage(user.avatarMedium); // blob:… once it arrives, "" until then
+
+<Avatar source={src} userName={user.displayName} … />
+```
+
+`usePortalImage` resolves the path against the portal, requests it through the
+provider's own axios client — which already carries `Authorization` — and turns
+the answer into an object URL. It sends the key **only to the portal's host**: an
+absolute URL anywhere else is returned untouched, because signing a request to
+a third party hands them the key. It revokes the object URL when the path
+changes, and on any failure returns `""`, so `Avatar` draws initials rather
+than a broken image.
+
+This works from any origin, the published Storybook included, because the
+portal answers both `/api/2.0` and `/storage` with
+`Access-Control-Allow-Origin: *` and allows the `Authorization` header. The
+request must not send credentials: a wildcard origin and cookies do not mix,
+which is one more reason the key travels as a header.
+
+<Source code={imageSource} language="tsx" />
+
+## Whose identity is this?
+
+An API key is **one user** — the key's owner. It is the right shape for the
+lawyer's workspace, where the application acts for the firm, and the wrong one
+for a client cabinet that claims to show a client only their own matters:
+filtering rooms by a client's name is a layout demonstration, not an
+authorisation.
+
+[Who is signed in](?path=/docs/samples-legal-practice-setup-who-is-signed-in--docs)
+takes that seriously: the portal's own session when the application is served
+from its origin, and OAuth when it is not.
+
+## The code
+
+Imports here are relative to this repository. In your application they come
+from the package — `@onlyoffice/apps-ui-kit/providers/api` for the provider and
+the hook, and the component subpaths for everything the screen draws with.
+
+<Source code={source} language="tsx" />

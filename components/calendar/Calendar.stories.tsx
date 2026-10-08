@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { useState } from "react";
 
 import type { ComponentProps } from "react";
@@ -74,45 +39,11 @@ const locales = [
 ];
 
 const meta = {
-  title: "UI/Interactive elements/Calendar",
+  title: "UI/Form controls/Calendar",
   component: Calendar,
   parameters: {
-    docs: {
-      description: {
-        component: `Calendar component for selecting dates. Displays a monthly view with navigation between months and years.
-
-### Features
-
-- **Date Selection**: Click to select a specific date
-- **Month/Year Navigation**: Browse through months and years
-- **Locale Support**: Supports 25+ locales for date formatting and weekday names
-- **Date Range Constraints**: Configurable min/max date boundaries
-- **Initial Date**: Set the initially visible month/year
-- **Custom Styling**: Accepts className and inline styles
-
-### Usage
-
-\`\`\`tsx
-import { Calendar } from "@docspace/ui-kit/components/calendar";
-
-// Basic usage
-<Calendar
-  locale="en"
-  selectedDate={selectedDate}
-  setSelectedDate={setSelectedDate}
-/>
-
-// With date constraints
-<Calendar
-  locale="en"
-  selectedDate={selectedDate}
-  setSelectedDate={setSelectedDate}
-  minDate={new Date("2024/01/01")}
-  maxDate={new Date("2030/01/01")}
-/>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=651-4406&mode=design&t=RrB9MOQGCnUPghij-0",
@@ -122,26 +53,40 @@ import { Calendar } from "@docspace/ui-kit/components/calendar";
     locale: {
       control: "select",
       options: locales,
-      description: "Specifies the calendar locale",
+      description:
+        "Locale tag the month and weekday names are written in; any tag the browser knows works, the list holds common ones",
       table: {
         defaultValue: { summary: "en" },
       },
     },
     minDate: {
       control: "date",
-      description: "Specifies the minimum selectable date",
+      description:
+        "Earliest selectable day; earlier days are greyed out and the arrows stop at its month",
+      table: {
+        defaultValue: { summary: "1970-01-01" },
+      },
     },
     maxDate: {
       control: "date",
-      description: "Specifies the maximum selectable date",
+      description:
+        "Latest selectable day; later days are greyed out and the arrows stop at its month",
+      table: {
+        defaultValue: { summary: "ten years from today" },
+      },
     },
     initialDate: {
       control: "date",
-      description: "First shown date when the calendar opens",
+      description:
+        "First shown date when the calendar opens; a date outside the range opens the nearer boundary instead",
+      table: {
+        defaultValue: { summary: "today" },
+      },
     },
     isMobile: {
       control: "boolean",
-      description: "Enables mobile-optimized layout",
+      description:
+        "Widens the gap between the two arrow buttons from 8px to 12px; the larger touch layout itself switches on by window width",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -150,9 +95,54 @@ import { Calendar } from "@docspace/ui-kit/components/calendar";
       control: "text",
       description: "Additional CSS class for the calendar container",
     },
+    id: {
+      control: "text",
+      description: "Id of the calendar container",
+    },
+    style: {
+      control: "object",
+      description: "Inline styles of the calendar container",
+    },
+    selectedDate: {
+      control: false,
+      description:
+        "The highlighted day, as a Luxon DateTime; its time is kept when another day is picked",
+    },
+    setSelectedDate: {
+      action: "setSelectedDate",
+      description: "Called with the newly picked day, before onChange",
+    },
     onChange: {
       action: "onChange",
-      description: "Callback function called when the selected date changes",
+      description:
+        "Called with the newly picked day, right after setSelectedDate and with the same value",
+    },
+    useMaxTime: {
+      control: "boolean",
+      description:
+        "Reports a picked day at 23:59:59.999 instead of keeping the time of the previous selection",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isScroll: {
+      control: "boolean",
+      description:
+        "Wraps the grid in a scroll area and drops the calendar's top, right and bottom padding",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    dataTestId: {
+      control: "text",
+      description: "data-testid of the calendar container",
+      table: {
+        defaultValue: { summary: "calendar" },
+      },
+    },
+    forwardedRef: {
+      control: false,
+      description: "Ref to the calendar container",
     },
   },
 } satisfies Meta<typeof Calendar>;
@@ -160,6 +150,10 @@ import { Calendar } from "@docspace/ui-kit/components/calendar";
 type Story = StoryObj<ComponentProps<typeof Calendar>>;
 
 export default meta;
+
+// The date control hands back a timestamp, which the component does not parse.
+const toDate = (value?: DateTime | Date | number) =>
+  typeof value === "number" ? new Date(value) : value;
 
 const InteractiveCalendar = ({
   locale,
@@ -169,27 +163,33 @@ const InteractiveCalendar = ({
   isMobile,
   className,
   id,
-}: {
-  locale: string;
-  minDate?: DateTime | Date;
-  maxDate?: DateTime | Date;
-  initialDate?: DateTime | Date;
-  isMobile?: boolean;
-  className?: string;
-  id?: string;
-}) => {
+  style,
+  onChange,
+  setSelectedDate: onSetSelectedDate,
+  useMaxTime,
+  isScroll,
+  dataTestId,
+}: Omit<ComponentProps<typeof Calendar>, "selectedDate">) => {
   const [selectedDate, setSelectedDate] = useState<DateTime>(now());
   return (
     <Calendar
       locale={locale}
       selectedDate={selectedDate}
-      setSelectedDate={setSelectedDate}
-      minDate={minDate}
-      maxDate={maxDate}
-      initialDate={initialDate}
+      setSelectedDate={(date) => {
+        setSelectedDate(date);
+        onSetSelectedDate?.(date);
+      }}
+      onChange={onChange}
+      minDate={toDate(minDate)}
+      maxDate={toDate(maxDate)}
+      initialDate={toDate(initialDate)}
       isMobile={isMobile}
       className={className}
       id={id}
+      style={style}
+      useMaxTime={useMaxTime}
+      isScroll={isScroll}
+      dataTestId={dataTestId}
     />
   );
 };
@@ -201,6 +201,24 @@ export const Default: Story = {
     maxDate: new Date(`${new Date().getFullYear() + 10}/01/01`),
     minDate: new Date("1970/01/01"),
     initialDate: new Date(),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The calendar as it opens: today is filled with the accent colour. Click a day to select it and watch the Actions panel, click the title to switch to months and then years, and change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `const [selectedDate, setSelectedDate] = useState(now());
+
+<Calendar
+  locale="en"
+  selectedDate={selectedDate}
+  setSelectedDate={setSelectedDate}
+  onChange={handleChange}
+/>`,
+      },
+    },
   },
 };
 
@@ -296,9 +314,50 @@ export const LocaleExamples: Story = {
   },
 };
 
+const RightToLeftTemplate = () => {
+  const [selectedDate, setSelectedDate] = useState<DateTime>(now());
+  return (
+    <div dir="rtl">
+      <Calendar
+        locale="ar-SA"
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+      />
+    </div>
+  );
+};
+
+// Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
+export const RightToLeft: Story = {
+  render: () => <RightToLeftTemplate />,
+  globals: { direction: "rtl" },
+  parameters: {
+    noPadding: true,
+    docs: {
+      story: { inline: false, height: "402px" },
+      description: {
+        story:
+          'The calendar in a right-to-left layout with Arabic names: the weeks run from right to left, the title moves to the right edge and the arrows to the left, while the chevron after the title stays on its right, before the text. The wrapper carries `dir="rtl"`; the direction also comes from the theme\'s `interfaceDirection` (the Direction toolbar).',
+      },
+      source: {
+        code: `<div dir="rtl">
+  <Calendar
+    locale="ar-SA"
+    selectedDate={selectedDate}
+    setSelectedDate={setSelectedDate}
+  />
+</div>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => {
-    const [selectedDate, setSelectedDate] = useState<DateTime>(now());
+    const today = now();
+    const [selectedDate, setSelectedDate] = useState<DateTime>(
+      today.set({ day: today.day === 15 ? 16 : 15 }),
+    );
     return (
       <div
         style={
@@ -310,6 +369,7 @@ export const CssCustomization: Story = {
             "--calendar-radius": "12px",
             "--calendar-padding": "24px",
             "--calendar-width": "340px",
+            "--calendar-height": "360px",
             // Title
             "--calendar-title": "#0082c9",
             "--calendar-title-size": "16px",
@@ -321,7 +381,13 @@ export const CssCustomization: Story = {
             "--calendar-weekday": "#0082c9",
             // Date items
             "--calendar-accent": "#0082c9",
+            "--calendar-selected-text": "#ffffff",
+            "--calendar-current-radius": "8px",
+            "--calendar-focused-radius": "8px",
+            "--calendar-focused-bg": "#ffffff",
+            "--calendar-focused-text": "#0082c9",
             "--calendar-hover-bg": "#cce5f6",
+            "--calendar-hover-radius": "8px",
             "--calendar-past": "#5ab4e5",
             "--calendar-disabled": "#cce5f6",
           } as React.CSSProperties
@@ -331,7 +397,7 @@ export const CssCustomization: Story = {
           locale="en"
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
-          initialDate={new Date()}
+          minDate={today.startOf("month")}
         />
       </div>
     );
@@ -339,7 +405,29 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: "CSS custom property overrides applied to the calendar container.",
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The calendar opens with a selected day other than today, so the today and selected-day variables both show, and with \`minDate\` at the start of this month, so the days of the previous month and the left arrow show their disabled colours. Hover a day and an arrow to see the hover variables.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--calendar-bg": "#e6f3fb",
+    "--calendar-border": "#0082c9",
+    "--calendar-radius": "12px",
+    "--calendar-title": "#0082c9",
+    "--calendar-accent": "#0082c9",
+    "--calendar-focused-bg": "#ffffff",
+    "--calendar-hover-bg": "#cce5f6",
+    "--calendar-past": "#5ab4e5",
+    "--calendar-disabled": "#cce5f6",
+  }}
+>
+  <Calendar
+    locale="en"
+    selectedDate={selectedDate}
+    setSelectedDate={setSelectedDate}
+    minDate={startOfThisMonth}
+  />
+</div>`,
       },
     },
   },

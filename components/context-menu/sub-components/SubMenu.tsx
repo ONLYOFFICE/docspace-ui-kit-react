@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { useRef, useState, useEffect, type JSX } from "react";
 import classNames from "classnames";
 
@@ -137,6 +102,7 @@ const SubMenu = (props: SubMenuProps) => {
   const [model, setModel] = useState(props?.model);
   const [isLoading, setIsLoading] = useState(false);
   const [widthSubMenu, setWidthSubMenu] = useState<null | number>(null);
+  const [measuredRowsHeight, setMeasuredRowsHeight] = useState(0);
 
   const prevWidthSubMenu = useRef<number | null>(null);
   const subMenuRef = useRef<HTMLUListElement>(null);
@@ -376,6 +342,34 @@ const SubMenu = (props: SubMenuProps) => {
     }
   }, [props.model]);
 
+  // Items carrying a description are two lines tall and how tall exactly
+  // depends on where their text wraps - which differs per language. The fixed
+  // row height the list is sized by cannot know that, so those rows are
+  // measured once they are on screen.
+  const hasItemDescriptions = model?.some(
+    (item: ContextMenuModel) =>
+      item && !item.isSeparator && "description" in item && !!item.description,
+  );
+
+  // A submenu list only exists in the DOM once it is open, so this has to run
+  // again when that happens - and again when the width it wraps at changes.
+  const isMenuOpen = isActive();
+
+  useEffect(() => {
+    if (!hasItemDescriptions || !isMenuOpen) return;
+
+    const list = subMenuRef.current;
+    if (!list) return;
+
+    const rows = Array.from(list.querySelectorAll<HTMLElement>("li")).filter(
+      (row) => row.parentElement?.closest("ul") === list,
+    );
+
+    const total = rows.reduce((sum, row) => sum + row.offsetHeight, 0);
+
+    if (total > 0) setMeasuredRowsHeight(total);
+  }, [hasItemDescriptions, isMenuOpen, model, widthSubMenu]);
+
   const renderSeparator = (index: number, style: React.CSSProperties) => (
     <li
       key={`separator_${index}`}
@@ -393,7 +387,7 @@ const SubMenu = (props: SubMenuProps) => {
     if (showDisabledItems ? false : item.disabled) return;
     // TODO: Not render disabled items
 
-    const activeItem = activeItems?.find((x) => x.key === item.key);
+    const activeItem = activeItems?.find((x) => x?.key === item.key);
 
     const active = !!activeItem;
 
@@ -405,11 +399,13 @@ const SubMenu = (props: SubMenuProps) => {
 
     const linkClassName = classNames("p-menuitem-link", "not-selectable", {
       "p-disabled": item.disabled || item.disableColor,
-      "p-disabled-styles-toggle": item.disabled && item.disabledStylesType === "toggle",
+      "p-disabled-styles-toggle":
+        item.disabled && item.disabledStylesType === "toggle",
     });
     const iconClassName = classNames("p-menuitem-icon", {
       "p-disabled": item.disabled || item.disableColor,
-      "p-disabled-styles-toggle": item.disabled && item.disabledStylesType === "toggle",
+      "p-disabled-styles-toggle":
+        item.disabled && item.disabledStylesType === "toggle",
     });
     const subMenuIconClassName = "p-submenu-icon";
 
@@ -427,7 +423,7 @@ const SubMenu = (props: SubMenuProps) => {
       }
 
       if (item.iconNode) {
-        return <span className={iconClassName || ""}>{item.iconNode}</span>
+        return <span className={iconClassName || ""}>{item.iconNode}</span>;
       }
 
       if (!item.icon) return null;
@@ -462,6 +458,10 @@ const SubMenu = (props: SubMenuProps) => {
     };
 
     const icon = renderIcon();
+
+    // An item that explains itself is laid out as two lines: the regular row
+    // and the description under it.
+    const hasDescription = Boolean(item.description);
 
     const label = item.label && (
       <span
@@ -506,14 +506,8 @@ const SubMenu = (props: SubMenuProps) => {
         />
       ) : null;
 
-    let content = (
-      <a
-        href={item.url || "#"}
-        className={linkClassName || ""}
-        target={item.target}
-        {...dataKeys}
-        role="menuitem"
-      >
+    const itemRow = (
+      <>
         {icon}
         {label}
         {checked}
@@ -540,6 +534,25 @@ const SubMenu = (props: SubMenuProps) => {
             isHovered={false}
           />
         ) : null}
+      </>
+    );
+
+    let content = (
+      <a
+        href={item.url || "#"}
+        className={linkClassName || ""}
+        target={item.target}
+        {...dataKeys}
+        role="menuitem"
+      >
+        {hasDescription ? (
+          <>
+            <span className={styles.itemRow}>{itemRow}</span>
+            <span className={styles.itemDescription}>{item.description}</span>
+          </>
+        ) : (
+          itemRow
+        )}
       </a>
     );
 
@@ -565,7 +578,10 @@ const SubMenu = (props: SubMenuProps) => {
       item.tooltipTarget === "toggle" ? toggleTooltipId : itemTooltipId;
 
     const isActiveDescendant =
-      currentIndex === index && activeLevel == menuLevel && !item.disabled;
+      !isMobileDevice &&
+      currentIndex === index &&
+      activeLevel == menuLevel &&
+      !item.disabled;
 
     return (
       <li
@@ -583,6 +599,7 @@ const SubMenu = (props: SubMenuProps) => {
               })
             : classNames(className, {
                 [styles.activeDescendant]: isActiveDescendant,
+                [styles.menuItemWithDescription]: hasDescription,
               })
         }
         style={{ ...item.style, ...style }}
@@ -671,11 +688,13 @@ const SubMenu = (props: SubMenuProps) => {
     };
 
     model.forEach((item) => {
+      if (!item) return;
+
       const contextMenuTypeItem = item as ContextMenuType;
 
       const level = menuLevel + 1;
 
-      const activeItem = activeItems?.find((x) => x.key === item.key);
+      const activeItem = activeItems?.find((x) => x?.key === item.key);
 
       if (contextMenuTypeItem?.items || contextMenuTypeItem?.onLoad) {
         submenu.push(
@@ -721,7 +740,9 @@ const SubMenu = (props: SubMenuProps) => {
       return 36;
     });
 
-    const height = rowHeights.reduce((a, b) => a + b, 0);
+    const height =
+      (hasItemDescriptions && measuredRowsHeight) ||
+      rowHeights.reduce((a, b) => a + b, 0);
     const viewport = DomHelpers.getViewport();
     const paddingList = 12;
     const marginsList = 32;

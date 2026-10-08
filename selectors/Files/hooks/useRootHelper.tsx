@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import React, { use } from "react";
 
 import {
@@ -42,7 +7,12 @@ import {
 import { useApi } from "../../../providers/api";
 import { useCommonTranslation } from "../../../utils/i18n";
 import type { TSelectorItem } from "../../../components/selector";
+import { toastr, type TData } from "../../../components/toast";
 import { getDefaultBreadCrumb } from "../../utils";
+import {
+  FORMS_ROOT_FOLDER_TYPE,
+  FORMS_SECTION_ID,
+} from "../../utils/constants";
 import { LoadersContext } from "../../utils/contexts/Loaders";
 
 import CatalogDocumentsSvg from "../../../assets/icons/16/catalog.documents.react.svg";
@@ -73,9 +43,9 @@ const catalogIcons: Partial<Record<FolderType, React.FC>> = {
 
 // Canonical display order of root folders, matching the left-side Article menu.
 const rootFolderDisplayOrder: FolderType[] = [
-  FolderType.AiAgents,
   FolderType.USER,
   FolderType.VirtualRooms,
+  FolderType.AiAgents,
   FolderType.SHARE,
   FolderType.Favorites,
   FolderType.Recent,
@@ -100,9 +70,10 @@ const useRootHelper = ({
 
   setItems,
   treeFolders,
-  withRecentTreeFolder,
-  withFavoritesTreeFolder,
   withAIAgentsTreeFolder,
+  withFormsTreeFolder,
+  setRecentFolder,
+  setFavoritesFolder,
 
   setTotal,
   setHasNextPage,
@@ -110,7 +81,7 @@ const useRootHelper = ({
   setIsInit,
 }: UseRootHelperProps) => {
   const t = useCommonTranslation();
-  const { setIsBreadCrumbsLoading, setIsNextPageLoading, setIsFirstLoad } =
+  const { hideSectionLoader, setIsNextPageLoading, finishFullLoad } =
     use(LoadersContext);
 
   const { foldersApi } = useApi();
@@ -125,102 +96,124 @@ const useRootHelper = ({
     setBreadCrumbs([getDefaultBreadCrumb(t)]);
     setIsRoot(true);
     setIsNextPageLoading(true);
-    setIsBreadCrumbsLoading(false);
-    const newItems: TSelectorItem[] = [];
+    hideSectionLoader("breadcrumbs");
 
-    let currentTree: FolderDtoInteger[] | null = null;
+    try {
+      const newItems: TSelectorItem[] = [];
 
-    if (treeFolders && treeFolders?.length > 0) {
-      currentTree = treeFolders;
-    } else {
-      const res = await foldersApi.getRootFolders();
-      const rootFolders = res.data.response ?? [];
-      currentTree = rootFolders
-        .map((item) => item.current)
-        .filter((f): f is FolderDtoInteger => f != null);
-    }
+      let currentTree: FolderDtoInteger[] | null = null;
 
-    const orderedTree = [...(currentTree ?? [])].sort(
-      (a, b) => getRootFolderOrder(a) - getRootFolderOrder(b),
-    );
-
-    orderedTree.forEach((folder) => {
-      const IconComponent = folder.rootFolderType
-        ? catalogIcons[folder.rootFolderType]
-        : undefined;
-      const avatar = IconComponent ? (
-        <IconComponent key={folder.rootFolderType} />
-      ) : undefined;
-
-      if (
-        (!isUserOnly && folder.rootFolderType === FolderType.VirtualRooms) ||
-        folder.rootFolderType === FolderType.USER ||
-        (withRecentTreeFolder && folder.rootFolderType === FolderType.Recent) ||
-        (withFavoritesTreeFolder &&
-          folder.rootFolderType === FolderType.Favorites) ||
-        (withAIAgentsTreeFolder &&
-          folder.rootFolderType === FolderType.AiAgents)
-      ) {
-        let title = "";
-
-        switch (folder.rootFolderType) {
-          case FolderType.USER:
-            title = t("MyDocuments");
-            break;
-          case FolderType.VirtualRooms:
-            title = t("Rooms");
-            break;
-          case FolderType.Favorites:
-            title = t("Favorites");
-            break;
-          case FolderType.Recent:
-            title = t("Recent");
-            break;
-          case FolderType.AiAgents:
-            title = t("AIAgents");
-            break;
-          default:
-            break;
-        }
-
-        newItems.push({
-          label: title,
-          id: folder.id!,
-          parentId: folder.parentId!,
-          rootFolderType: folder.rootFolderType,
-          filesCount: folder.filesCount!,
-          foldersCount: folder.foldersCount!,
-          security: folder.security!,
-          isFolder: true,
-          avatar,
-          disableMultiSelect: true,
-        });
+      if (treeFolders && treeFolders?.length > 0) {
+        currentTree = treeFolders;
+      } else {
+        const res = await foldersApi.getRootFolders();
+        const rootFolders = res.data.response ?? [];
+        currentTree = rootFolders
+          .map((item) => item.current)
+          .filter((f): f is FolderDtoInteger => f != null);
       }
-    });
 
-    setItems(newItems);
-    setTotal(newItems.length);
-    setHasNextPage(false);
-    setIsNextPageLoading(false);
-    setIsInit(false);
-    setIsFirstLoad(false);
-    requestRunning.current = false;
+      const orderedTree = [...(currentTree ?? [])].sort(
+        (a, b) => getRootFolderOrder(a) - getRootFolderOrder(b),
+      );
+
+      orderedTree.forEach((folder) => {
+        if (folder.rootFolderType === FolderType.Recent)
+          setRecentFolder?.(folder);
+        if (folder.rootFolderType === FolderType.Favorites)
+          setFavoritesFolder?.(folder);
+
+        const IconComponent = folder.rootFolderType
+          ? catalogIcons[folder.rootFolderType]
+          : undefined;
+        const avatar = IconComponent ? (
+          <IconComponent key={folder.rootFolderType} />
+        ) : undefined;
+
+        if (
+          (!isUserOnly && folder.rootFolderType === FolderType.VirtualRooms) ||
+          folder.rootFolderType === FolderType.USER ||
+          (withAIAgentsTreeFolder &&
+            folder.rootFolderType === FolderType.AiAgents)
+        ) {
+          let title = "";
+
+          switch (folder.rootFolderType) {
+            case FolderType.USER:
+              title = t("Files");
+              break;
+            case FolderType.VirtualRooms:
+              title = t("Rooms");
+              break;
+            case FolderType.AiAgents:
+              title = t("AIAgents");
+              break;
+            default:
+              break;
+          }
+
+          newItems.push({
+            label: title,
+            id: folder.id!,
+            parentId: folder.parentId!,
+            rootFolderType: folder.rootFolderType,
+            filesCount: folder.filesCount!,
+            foldersCount: folder.foldersCount!,
+            security: folder.security!,
+            isFolder: true,
+            avatar,
+            disableMultiSelect: true,
+          });
+
+          if (
+            withFormsTreeFolder &&
+            !isUserOnly &&
+            folder.rootFolderType === FolderType.VirtualRooms
+          ) {
+            newItems.push({
+              label: t("Forms"),
+              id: FORMS_SECTION_ID,
+              parentId: folder.parentId!,
+              rootFolderType: FORMS_ROOT_FOLDER_TYPE as FolderType,
+              filesCount: folder.filesCount!,
+              foldersCount: folder.foldersCount!,
+              security: folder.security!,
+              isFolder: true,
+              avatar: <CatalogDocumentsSvg />,
+              disableMultiSelect: true,
+            });
+          }
+        }
+      });
+
+      setItems(newItems);
+      setTotal(newItems.length);
+      setHasNextPage(false);
+      setIsInit(false);
+    } catch (error) {
+      toastr.error(error as TData);
+    } finally {
+      requestRunning.current = false;
+      setIsNextPageLoading(false);
+      finishFullLoad();
+    }
   }, [
     foldersApi,
     isUserOnly,
-    setIsFirstLoad,
+    finishFullLoad,
     setBreadCrumbs,
     setHasNextPage,
-    setIsBreadCrumbsLoading,
+    hideSectionLoader,
     setIsInit,
     setIsNextPageLoading,
     setItems,
     setTotal,
     t,
     treeFolders,
-    withRecentTreeFolder,
-    withFavoritesTreeFolder,
     withAIAgentsTreeFolder,
+    withFormsTreeFolder,
+    setRecentFolder,
+    setFavoritesFolder,
   ]);
 
   return { isRoot, setIsRoot, getRootData };

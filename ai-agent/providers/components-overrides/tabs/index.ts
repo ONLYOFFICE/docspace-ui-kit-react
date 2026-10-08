@@ -1,0 +1,1 @@
+export { TabsOverride } from "./Tabs";

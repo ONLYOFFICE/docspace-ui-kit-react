@@ -1,0 +1,63 @@
+@use "../../../../styles/variables/colors";
+
+.benefits {
+  box-sizing: border-box;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  // Overridable card colors. Defaults resolve to the light-theme tokens
+  // and are redefined for `.dark`, so the block still renders correctly
+  // when no theme class sits on an ancestor.
+  --chat-ai-benefits-intro-color: #{colors.$black};
+  --chat-ai-benefits-bg-color: #{colors.$gray-light};
+  --chat-ai-benefits-text-color: #{colors.$black};
+  --chat-ai-benefits-icon-color: #{colors.$gray-text};
+
+  :global(.dark) & {
+    --chat-ai-benefits-intro-color: #{colors.$white};
+    --chat-ai-benefits-bg-color: #{colors.$dark-gray-light};
+    --chat-ai-benefits-text-color: #{colors.$white};
+    --chat-ai-benefits-icon-color: #{colors.$dark-gray-dark};
+  }
+}
+
+.intro {
+  color: var(--chat-ai-benefits-intro-color);
+}
+
+.list {
+  margin: 0;
+  padding-block: 12px;
+
+  padding-inline: 12px 8px;
+
+  list-style: none;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  border-radius: 6px;
+  background-color: var(--chat-ai-benefits-bg-color);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: var(--chat-ai-benefits-text-color);
+}
+
+.icon {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+
+  path {
+    fill: var(--chat-ai-benefits-icon-color);
+  }
+}

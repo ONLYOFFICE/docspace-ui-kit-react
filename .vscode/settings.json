@@ -1,0 +1,69 @@
+{
+  // Folder-level settings. The workspace file carries the buttons and the
+  // formatter bindings; these are the ones worth having even when the folder
+  // is opened directly rather than through ui-kit.code-workspace.
+
+  // dist/ and storybook-static/ are build output; css/, fonts/ and locales hold
+  // vendored assets refreshed by `pnpm sync-locales`. Searching them buries
+  // every real hit -- dist alone mirrors the whole source tree.
+  "search.exclude": {
+    "**/dist": true,
+    "**/storybook-static": true,
+    "**/coverage": true,
+    "**/node_modules": true,
+    "css": true,
+    "fonts": true,
+    "locales/**": true,
+    "pnpm-lock.yaml": true
+  },
+  "files.watcherExclude": {
+    "**/dist/**": true,
+    "**/storybook-static/**": true,
+    "**/coverage/**": true,
+    "**/node_modules/**": true
+  },
+
+  // The repo is strict-mode TypeScript with the workspace copy pinned in
+  // devDependencies; VS Code's bundled version drifts from it.
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
+  // SCSS modules use CSS custom properties the portal defines, so the built-in
+  // validator reports unknown-variable noise on correct files.
+  "scss.validate": true,
+  "css.lint.unknownProperties": "ignore",
+
+  // Format on save, through Prettier, for every language `pnpm format` covers.
+  // formatOnSave alone is not enough: without a per-language binding VS Code
+  // picks its own built-in formatter, which disagrees with Prettier, and the
+  // file flips back and forth between saving here and running the script. The
+  // extension reads .prettierrc.yaml and .prettierignore, so a save produces
+  // the same bytes as `pnpm format:fix` and skips pnpm-lock.yaml, locales/,
+  // css/ and *.mdx exactly as the script does.
+  "editor.formatOnSave": true,
+  "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[javascript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[javascriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[scss]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[css]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[html]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  // Markdown and YAML are a large part of what is committed here -- component
+  // READMEs, docs/, .claude/rules, lefthook.yml, the CI workflow -- and
+  // `prettier --check .` checks all of them, so they need the binding too.
+  // proseWrap is "preserve", so a save does not reflow paragraphs.
+  "[markdown]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[yaml]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  // JSON goes to Prettier too. `pnpm format` runs Prettier over .json, so
+  // binding these to VS Code's own formatter made the two disagree -- it keeps
+  // a short object on one line, Prettier expands it past 80 columns -- and
+  // files flipped between saving here and running the script.
+  "[json]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[jsonc]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+
+  // Biome lints, it does not format here.
+  "editor.codeActionsOnSave": {
+    "source.organizeImports.biome": "never",
+    "quickfix.biome": "never"
+  }
+}

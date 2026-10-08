@@ -1,86 +1,34 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Heading, HeadingLevel, HeadingSize } from ".";
 
+const HEADING_LEVELS = Object.values(HeadingLevel).filter(
+  (value): value is HeadingLevel => typeof value === "number",
+);
+
 const meta = {
   title: "UI/Data display/Heading",
   component: Heading,
   parameters: {
-    docs: {
-      description: {
-        component: `Heading component for rendering semantic heading elements with configurable levels, sizes, and types.
-
-### Features
-
-- **Semantic Levels**: Renders h1-h6 elements for proper document hierarchy
-- **Five Sizes**: xsmall, small, medium, large, and xlarge preset sizes
-- **Type Variants**: Default, header, menu, and content styling types
-- **Truncation**: Truncate overflowing text with ellipsis
-- **Inline Display**: Render headings inline alongside other content
-- **Custom Styling**: Override color, fontSize, fontWeight, and lineHeight
-- **Tooltip Support**: Available via HeadingWithTooltip wrapper
-
-### Usage
-
-\`\`\`tsx
-import { Heading, HeadingLevel, HeadingSize } from "@docspace/ui-kit/components/heading";
-
-// Basic heading
-<Heading level={HeadingLevel.h1} size={HeadingSize.large}>Page Title</Heading>
-
-// Menu-style heading
-<Heading level={HeadingLevel.h3} type="menu">Menu Section</Heading>
-
-// Truncated heading
-<Heading level={HeadingLevel.h2} truncate>Very long heading text...</Heading>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     level: {
-      control: "select",
-      options: Object.keys(HeadingLevel).filter((key) =>
-        Number.isNaN(Number(key)),
-      ),
-      description: "HTML heading level (h1-h6)",
+      // Numeric options labelled h1-h6, not `mapping: HeadingLevel`: a numeric
+      // enum maps both ways (`HeadingLevel[1] === "h1"`), so the mapping
+      // turned the default `level: 1` into "h1" and the element into <hh1>.
+      control: {
+        type: "select",
+        labels: Object.fromEntries(
+          HEADING_LEVELS.map((level) => [level, HeadingLevel[level]]),
+        ),
+      },
+      options: HEADING_LEVELS,
+      description:
+        "Which heading element is rendered, `h1` through `h6`. It changes only the element, not the size: an `h3` can be the largest text on the page",
       table: {
         defaultValue: { summary: "h1" },
       },
@@ -88,45 +36,80 @@ import { Heading, HeadingLevel, HeadingSize } from "@docspace/ui-kit/components/
     size: {
       control: "select",
       options: Object.values(HeadingSize),
-      description: "Heading size preset",
+      description:
+        "One of five preset sizes, from 15px (`xsmall`) to 27px (`xlarge`). Has no effect while `type` is set",
       table: {
         defaultValue: { summary: "medium" },
       },
     },
     type: {
       control: "select",
-      options: ["default", "header", "menu", "content"],
-      description: "Heading type variant",
+      options: ["header", "menu", "content"],
+      description:
+        "Bold preset that replaces `size`: `content` 18px, `menu` 23px, `header` 28px, each with a 50px line height. Unset, the heading follows `size`",
     },
     color: {
       control: "color",
-      description: "Text color",
+      description:
+        "Text colour, as an inline style. Any CSS colour; unset, the heading is black, or white in the dark theme",
     },
     truncate: {
       control: "boolean",
-      description: "Truncate overflowing text with ellipsis",
+      description:
+        "Holds the heading on one line and ends it with an ellipsis. It needs a parent of bounded width; on its own the heading grows instead",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isInline: {
       control: "boolean",
-      description: "Display heading inline",
+      description:
+        "Renders the heading inline, so it sits in the same line as the text around it instead of on a line of its own",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     fontSize: {
       control: "text",
-      description: "Custom font size override",
+      description:
+        "Font size, as an inline style, in any CSS unit. Wins over both `size` and `type`",
     },
     fontWeight: {
       control: "text",
-      description: "Custom font weight override",
+      description:
+        "Font weight, as an inline style. Wins over the 600 of the plain heading and the bold of `type`",
     },
     lineHeight: {
       control: "text",
-      description: "Custom line height override",
+      description:
+        "Line height, as an inline style. Wins over the 50px line height of `type`",
+    },
+    as: {
+      control: false,
+      description:
+        "Element or component to render instead of the `h1`-`h6` tag; `level` is then ignored",
+    },
+    title: {
+      control: "text",
+      description:
+        "Native tooltip text, shown by the browser on hover. `HeadingWithTooltip` shows it in the shared tooltip instead",
+    },
+    children: {
+      control: "text",
+      description: "Heading text",
+    },
+    id: {
+      control: "text",
+      description: "`id` of the rendered element",
+    },
+    className: {
+      control: "text",
+      description: "Added after the component's own classes",
+    },
+    style: {
+      control: "object",
+      description:
+        "Inline style of the element. Its `color`, `fontSize`, `fontWeight` and `lineHeight` are replaced by the props of the same name",
     },
   },
 } satisfies Meta<typeof Heading>;
@@ -155,6 +138,19 @@ export const Default: Story = {
     level: HeadingLevel.h1,
     size: HeadingSize.large,
     children: "Default Heading",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A large `h1`, the title of a page or panel; change the level, size, type or any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<Heading level={HeadingLevel.h1} size={HeadingSize.large}>
+  Default Heading
+</Heading>`,
+      },
+    },
   },
 };
 
@@ -227,16 +223,10 @@ const CustomStyledTemplate = () => {
       <Heading level={HeadingLevel.h1} color="blue">
         Blue Heading
       </Heading>
-      <Heading
-        level={HeadingLevel.h1}
-        style={{ fontStyle: "italic" }}
-      >
+      <Heading level={HeadingLevel.h1} style={{ fontStyle: "italic" }}>
         Italic Heading
       </Heading>
-      <Heading
-        level={HeadingLevel.h1}
-        style={{ textDecoration: "underline" }}
-      >
+      <Heading level={HeadingLevel.h1} style={{ textDecoration: "underline" }}>
         Underlined Heading
       </Heading>
     </Wrapper>
@@ -249,7 +239,7 @@ export const Levels: Story = {
     docs: {
       description: {
         story:
-          "All six heading levels (h1-h6) for semantic document structure.",
+          "Six headings, `h1` through `h6`, all at the same medium size: the level decides the element a screen reader builds the page outline from, not how large the text looks (`level`).",
       },
       source: {
         code: `<Heading level={HeadingLevel.h1}>H1 Heading</Heading>
@@ -269,7 +259,7 @@ export const Sizes: Story = {
     docs: {
       description: {
         story:
-          "All five size presets from xsmall to xlarge, independent of the heading level.",
+          "Five `h1` headings from 15px to 27px: pick the size for the visual weight the layout needs, whatever level the heading has (`size`).",
       },
       source: {
         code: `<Heading level={HeadingLevel.h1} size={HeadingSize.xsmall}>XSmall Heading</Heading>
@@ -288,7 +278,7 @@ export const Types: Story = {
     docs: {
       description: {
         story:
-          "Different heading types: default, header, menu, and content, each with distinct styling.",
+          "**Default Type** has no `type` and follows `size`; **Header Type** is 28px at weight 600, **Menu Type** 23px bold and **Content Type** 18px bold, all three on a 50px line height, for titles that must line up with a 50px row (`type`).",
       },
       source: {
         code: `<Heading level={HeadingLevel.h1}>Default Type</Heading>
@@ -306,7 +296,7 @@ export const TruncatedHeading: Story = {
     docs: {
       description: {
         story:
-          "Heading that truncates with an ellipsis when it exceeds the container width.",
+          "A long title in a 250px column stays on one line and ends with an ellipsis, for headers that must not wrap; without a bounded parent the heading grows instead (`truncate`).",
       },
       source: {
         code: `<div style={{ width: 250 }}>
@@ -325,7 +315,7 @@ export const CustomStyled: Story = {
     docs: {
       description: {
         story:
-          "Headings with custom color and style overrides for unique visual treatments.",
+          "One-off looks without a stylesheet: **Blue Heading** sets the colour through the `color` prop, **Italic Heading** and **Underlined Heading** pass other CSS through `style`.",
       },
       source: {
         code: `<Heading level={HeadingLevel.h1} color="blue">Blue Heading</Heading>
@@ -344,26 +334,28 @@ export const CssCustomization: Story = {
           "--heading-text-color": "#7B4FBF",
           "--heading-weight": "800",
           "--heading-size-content": "22px",
+          "--heading-size-menu": "26px",
+          "--heading-size-header": "32px",
+          "--heading-lh": "40px",
         } as CSSProperties
       }
     >
       <Heading level={HeadingLevel.h2} type="content">
         Custom Heading
       </Heading>
+      <Heading level={HeadingLevel.h2}>Plain Heading</Heading>
+      <Heading level={HeadingLevel.h2} type="menu">
+        Menu Heading
+      </Heading>
+      <Heading level={HeadingLevel.h2} type="header">
+        Header Heading
+      </Heading>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-\`\`\`css
---heading-text-color     /* color override */
---heading-weight         /* font-weight override */
---heading-size-content   /* content type font-size (default 18px) */
---heading-size-menu      /* menu type font-size (default 23px) */
---heading-size-header    /* header type font-size (default 28px) */
-\`\`\``,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. **Custom Heading** (\`type="content"\`) shows the colour, \`--heading-size-content\` and \`--heading-lh\`; **Plain Heading** has no \`type\` and is there for \`--heading-weight\`; **Menu Heading** and **Header Heading** show \`--heading-size-menu\` and \`--heading-size-header\`.`,
       },
       source: {
         code: `<div
@@ -371,10 +363,20 @@ export const CssCustomization: Story = {
     "--heading-text-color": "#7B4FBF",
     "--heading-weight": "800",
     "--heading-size-content": "22px",
+    "--heading-size-menu": "26px",
+    "--heading-size-header": "32px",
+    "--heading-lh": "40px",
   }}
 >
   <Heading level={HeadingLevel.h2} type="content">
     Custom Heading
+  </Heading>
+  <Heading level={HeadingLevel.h2}>Plain Heading</Heading>
+  <Heading level={HeadingLevel.h2} type="menu">
+    Menu Heading
+  </Heading>
+  <Heading level={HeadingLevel.h2} type="header">
+    Header Heading
   </Heading>
 </div>`,
       },

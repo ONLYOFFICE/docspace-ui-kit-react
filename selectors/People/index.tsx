@@ -1,39 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
-
 import EmptyScreenPersonsLight from "../../assets/emptyFilter/empty.filter.people.light.svg";
 import EmptyScreenPersonsDark from "../../assets/emptyFilter/empty.filter.people.dark.svg";
 
@@ -71,16 +35,32 @@ import { globalColors } from "../../providers/theme";
 
 import { toastr } from "../../components/toast";
 import { useTheme } from "../../context/ThemeContext";
+import useContentLoading from "../utils/hooks/useContentLoading";
 
 import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import StyledSendClockIcon from "./components/SendClockIcon";
 import styles from "./PeopleSelector.module.scss";
 import { Encoder } from "../../utils/encoder";
-import { getBrandName } from "../../constants/brands";
+import { EmployeeType } from "../../enums";
 
 const PEOPLE_TAB_ID = "0";
 const GROUP_TAB_ID = "1";
 const GUESTS_TAB_ID = "2";
+
+const toSdkEmployeeType = (type: EmployeeType): SdkEmployeeType | undefined => {
+  switch (type) {
+    case EmployeeType.RoomAdmin:
+      return "RoomAdmin";
+    case EmployeeType.Admin:
+      return "DocSpaceAdmin";
+    case EmployeeType.User:
+      return "User";
+    case EmployeeType.Guest:
+      return "Guest";
+    default:
+      return undefined;
+  }
+};
 
 const toListItem = (
   item: EmployeeFullDto | GroupDto,
@@ -110,8 +90,7 @@ const toListItem = (
     } = item;
 
     const access = (item as Record<string, unknown>).access as
-      | number
-      | undefined;
+      number | undefined;
 
     const role = getUserType(item);
 
@@ -140,8 +119,8 @@ const toListItem = (
       id: userId,
       email: email ?? "",
       avatar: userAvatar,
-      label: displayName || email || "",
-      displayName: displayName || email || "",
+      label: Encoder.htmlDecode(displayName || email || ""),
+      displayName: Encoder.htmlDecode(displayName || email || ""),
       role: avatarRole,
       userType: role as unknown as SdkEmployeeType,
       isOwner: isOwner ?? false,
@@ -268,7 +247,9 @@ const PeopleSelector = ({
   const [hasNextPage, setHasNextPage] = useState(true);
   const [isNextPageLoading, setIsNextPageLoading] = useState(false);
   const [selectedItems, setSelectedItems] = useState<TSelectorItem[]>([]);
-  const isFirstLoadRef = useRef(true);
+  const { isContentLoading, startContentLoading, finishContentLoading } =
+    useContentLoading();
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const afterSearch = useRef(false);
   const totalRef = useRef(0);
   const searchTab = useRef(PEOPLE_TAB_ID);
@@ -418,6 +399,9 @@ const PeopleSelector = ({
             {
               id,
               employeeStatus: currentFilter.employeeStatus,
+              employeeTypes: currentFilter.role
+                ?.map(toSdkEmployeeType)
+                .filter((t): t is SdkEmployeeType => !!t),
               includeShared,
               area,
               count: pageCount,
@@ -460,7 +444,7 @@ const PeopleSelector = ({
           ? responseTotal - totalDifferent - 1
           : responseTotal - totalDifferent;
 
-        if (isFirstLoadRef.current) {
+        if (startIndex === 0) {
           const newItems = withOutCurrentAuthorizedUser
             ? removeCurrentUserFromList(data)
             : moveCurrentUserToTopOfList(data);
@@ -490,12 +474,19 @@ const PeopleSelector = ({
         totalRef.current = newTotal;
 
         setIsNextPageLoading(false);
-        isFirstLoadRef.current = false;
+        setIsFirstLoad(false);
+        finishContentLoading();
       } catch (error) {
+        // On cancel a superseding request is already running and owns the
+        // loading flags, so they must not be reset here
         if (axios.isCancel(error)) return;
 
         console.error(error);
         toastr.error(error as Error);
+
+        setIsNextPageLoading(false);
+        setIsFirstLoad(false);
+        finishContentLoading();
       }
     },
     [
@@ -526,8 +517,8 @@ const PeopleSelector = ({
     setHasNextPage(true);
     setTotal(-1);
     totalRef.current = 0;
-    isFirstLoadRef.current = true;
-  }, []);
+    startContentLoading();
+  }, [startContentLoading]);
 
   const onSearch = useCallback(
     (value: string, callback?: VoidFunction) => {
@@ -551,12 +542,9 @@ const PeopleSelector = ({
         return "";
       });
 
-      // Trigger initial load after clearing search
-      loadNextPage(0);
-
       callback?.();
     },
-    [resetSelectorList, loadNextPage],
+    [resetSelectorList],
   );
 
   const emptyScreenImage = isBase ? (
@@ -590,8 +578,7 @@ const PeopleSelector = ({
     onSearch,
     onClearSearch,
     searchLoader: <SearchLoader />,
-    isSearchLoading:
-      isFirstLoadRef.current && !searchValue && !afterSearch.current,
+    isSearchLoading: isFirstLoad && !searchValue && !afterSearch.current,
   };
 
   const infoProps: TSelectorInfo = withInfo
@@ -674,9 +661,8 @@ const PeopleSelector = ({
       if (setActiveTab) setActiveTab(`${tab}`);
       setActiveTabId(`${tab}`);
       onSearch("");
-      resetSelectorList();
     },
-    [onSearch, resetSelectorList, setActiveTab],
+    [onSearch, setActiveTab],
   );
 
   const withTabsProps: TSelectorTabs =
@@ -770,9 +756,7 @@ const PeopleSelector = ({
             ? t("NotFoundGuestsDescriptionAgent")
             : t("NotFoundGuestsDescription")
           : activeTabId === PEOPLE_TAB_ID
-            ? t("EmptyDescription", {
-                productName: getBrandName("ProductName"),
-              })
+            ? t("EmptyDescription")
             : t("GroupsNotFoundDescription"))
       }
       searchEmptyScreenImage={emptyScreenImage}
@@ -795,11 +779,12 @@ const PeopleSelector = ({
       loadNextPage={loadNextPage}
       isMultiSelect={isMultiSelect ?? false}
       totalItems={total}
-      isLoading={isFirstLoadRef.current}
+      isLoading={isFirstLoad}
+      isContentLoading={isContentLoading}
       rowLoader={
         <RowLoader
           isUser
-          isContainer={isFirstLoadRef.current}
+          isContainer={isFirstLoad}
           isMultiSelect={isMultiSelect}
         />
       }

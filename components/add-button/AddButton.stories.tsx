@@ -1,41 +1,9 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "storybook/test";
+
+import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
 
 import { AddButton } from ".";
 
@@ -43,93 +11,133 @@ const meta = {
   title: "UI/Interactive elements/AddButton",
   component: AddButton,
   parameters: {
-    docs: {
-      description: {
-        component: `AddButton is a compact action button for adding items, typically used in selectors and lists.
-
-### Features
-
-- **Optional Label**: Text displayed next to the icon
-- **Loading State**: Spinner replaces icon during async operations
-- **Accent Style**: Accent color variant for emphasis
-- **Disabled State**: Prevents interaction
-- **Custom Icon**: Configurable icon and icon size
-- **Truncation**: Long labels can be truncated
-- **Keyboard Support**: Responds to Enter key when focused
-
-### Usage
-
-\`\`\`tsx
-import { AddButton } from "@docspace/ui-kit/components/add-button";
-
-// Basic add button
-<AddButton title="Add item" onClick={handleAdd} />
-
-// With label
-<AddButton title="Add user" label="Add user" onClick={handleAdd} />
-
-// Accent style
-<AddButton title="Create new" isAction onClick={handleCreate} />
-
-// Loading state
-<AddButton title="Adding..." isLoading />
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
+  },
+  args: {
+    onClick: fn(),
   },
   argTypes: {
     title: {
       control: "text",
-      description: "Tooltip text",
+      description:
+        "Tooltip shown on hover, drawn by the kit's own tooltip rather than the browser's",
     },
     label: {
       control: "text",
-      description: "Text label next to the button",
+      description:
+        "Text drawn after the square; clicking it adds too. Without it the button is the square alone",
+    },
+    onClick: {
+      control: false,
+      description:
+        "Called with the event when the square or the label is clicked, and on Enter while the button has focus",
     },
     isDisabled: {
       control: "boolean",
-      description: "Disabled state",
+      description:
+        "Makes the button inert: the icon greys out, the label dims and clicks are ignored",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isAction: {
       control: "boolean",
-      description: "Use accent colors",
+      description:
+        "Tints the square with the theme's accent colour instead of grey",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isLoading: {
       control: "boolean",
-      description: "Show loading spinner instead of icon",
+      description:
+        "Shows a spinner in place of the icon and ignores clicks while it is set",
       table: {
         defaultValue: { summary: "false" },
       },
     },
+    iconNode: {
+      control: false,
+      description: "Icon element drawn in the square instead of the plus",
+    },
+    iconName: {
+      control: "text",
+      description:
+        "URL of an icon fetched at runtime; ignored when `iconNode` is set",
+    },
     iconSize: {
       control: "number",
-      description: "Icon size in pixels",
+      description:
+        "Size of the icon inside the square, in pixels; the square keeps its size",
       table: {
         defaultValue: { summary: "12" },
       },
     },
     size: {
       control: "text",
-      description: "Button container size",
+      description:
+        "Side of the square, as a CSS length; applied only when the theme supplies a colour scheme",
     },
     fontSize: {
       control: "text",
-      description: "Label font size",
+      description: "Font size of the label, as a CSS length",
       table: {
         defaultValue: { summary: "13px" },
       },
     },
+    lineHeight: {
+      control: "text",
+      description: "Line height of the label, as a CSS length",
+      table: {
+        defaultValue: { summary: "20px" },
+      },
+    },
     truncate: {
       control: "boolean",
-      description: "Truncate label text",
+      description:
+        "Cuts the label with an ellipsis instead of wrapping it, once the parent limits the width",
       table: {
         defaultValue: { summary: "false" },
+      },
+    },
+    titleText: {
+      control: "text",
+      description:
+        "Browser tooltip of the label, shown on hovering the text, unlike `title`",
+    },
+    noSelect: {
+      control: "boolean",
+      description: "Stops the label from being selected with the pointer",
+    },
+    dir: {
+      control: "select",
+      options: ["ltr", "rtl", "auto"],
+      description: "Writing direction of the label text",
+    },
+    tabIndex: {
+      control: "number",
+      description:
+        "Tab order of the button; without it the button cannot be focused and Enter does nothing",
+    },
+    className: {
+      control: "text",
+      description:
+        "Class added to the wrapper that holds the square and the label",
+    },
+    id: {
+      control: "text",
+      description: "Id of the square, not of the wrapper",
+    },
+    style: {
+      control: "object",
+      description: "Inline style of the square, not of the wrapper",
+    },
+    testId: {
+      control: "text",
+      description: "`data-testid` of the square",
+      table: {
+        defaultValue: { summary: "selector-add-button" },
       },
     },
   },
@@ -155,11 +163,21 @@ const Wrapper = (props: { children: React.ReactNode }) => {
 };
 
 export const Default: Story = {
-  render: (args) => (
-    <AddButton {...args} onClick={() => alert("Add clicked")} />
-  ),
+  render: (args) => <AddButton {...args} />,
   args: {
     title: "Add item",
+    tabIndex: 0,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The bare square with a plus, for a list that needs one more item and has room for no label. Click it, or press Tab and then Enter, and the Actions panel logs the call (`onClick`, `tabIndex`); change any other prop live in the Controls panel below.",
+      },
+      source: {
+        code: `<AddButton title="Add item" tabIndex={0} onClick={handleAdd} />`,
+      },
+    },
   },
 };
 
@@ -183,7 +201,7 @@ export const WithLabel: Story = {
     docs: {
       description: {
         story:
-          "AddButton with text labels. Left: default style. Right: accent style.",
+          "A label says what gets added when a bare plus would leave the reader guessing, and clicking the words adds too. **Add user** is the grey square; **Add group** is the accent tint (`isAction`).",
       },
       source: {
         code: `<AddButton title="Add item" label="Add user" onClick={handleClick} />
@@ -213,7 +231,7 @@ export const DisabledStates: Story = {
     docs: {
       description: {
         story:
-          "Disabled add buttons cannot be interacted with and have reduced opacity.",
+          "A disabled button stays in place so the reader sees the action exists but is not available now: the square turns a lighter grey, the icon greys out and the label dims, and clicks and Enter are ignored (`isDisabled`).",
       },
       source: {
         code: `<AddButton title="Add item" isDisabled />
@@ -238,7 +256,7 @@ export const AccentStyle: Story = {
     docs: {
       description: {
         story:
-          "Accent style uses theme accent colors for emphasis. Left: default. Right: accent.",
+          "The accent tint marks the add button that matters most on a screen. **Default** is the grey square; **Accent** is tinted with the theme's accent colour (`isAction`).",
       },
       source: {
         code: `<AddButton title="Default" onClick={handleClick} />
@@ -258,7 +276,7 @@ export const LoadingState: Story = {
     docs: {
       description: {
         story:
-          "Loading state replaces the icon with a spinner. The button cannot be clicked while loading.",
+          "While the item is being added, a spinner stands in for the icon so a second click does not add it twice; clicks are ignored until loading ends, and the square keeps its size (`isLoading`).",
       },
       source: {
         code: `<AddButton title="Adding..." isLoading />`,
@@ -286,7 +304,7 @@ export const TruncatedLabel: Story = {
     docs: {
       description: {
         story:
-          "Long labels can be truncated when the container width is limited.",
+          "In a narrow column a long label is cut with an ellipsis instead of wrapping under the square; the parent here is 150px wide (`truncate`).",
       },
       source: {
         code: `<AddButton title="Add item" label="Very long label text..." truncate onClick={handleClick} />`,
@@ -309,6 +327,57 @@ const CustomSizeTemplate = () => {
   );
 };
 
+export const CustomIconSize: Story = {
+  render: () => <CustomSizeTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A bigger square and icon suit a roomier layout. **Default** is the 32px square with a 12px icon; **Large icon** is a 36px square (`size`) with a 16px icon (`iconSize`).",
+      },
+      source: {
+        code: `<AddButton title="Default" onClick={handleClick} />
+<AddButton title="Large icon" iconSize={16} size="36px" onClick={handleClick} />`,
+      },
+    },
+  },
+};
+
+const CustomIconTemplate = () => {
+  return (
+    <Wrapper>
+      <AddButton
+        title="Add folder"
+        label="Add folder"
+        iconSize={16}
+        iconNode={<CatalogFolderIcon />}
+        onClick={() => {}}
+      />
+    </Wrapper>
+  );
+};
+
+export const WithCustomIcon: Story = {
+  render: () => <CustomIconTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "When a plus does not say enough about what gets added, the square can carry any icon; here a folder icon at 16px (`iconNode`, `iconSize`). An icon given by URL is fetched at runtime instead (`iconName`).",
+      },
+      source: {
+        code: `<AddButton
+  title="Add folder"
+  label="Add folder"
+  iconSize={16}
+  iconNode={<FolderIcon />}
+  onClick={handleAdd}
+/>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
     <div
@@ -320,17 +389,27 @@ export const CssCustomization: Story = {
           "--add-button-radius": "50%",
           "--add-button-dimension": "40px",
           "--add-button-bg": "#7c3aed",
-          "--add-button-bg-hover": "#6d28d9",
+          "--add-button-bg-hover": "#a78bfa",
+          "--add-button-bg-active": "#4c1d95",
           "--add-button-icon-color": "#ffffff",
           "--add-button-icon-color-hover": "#ffffff",
+          "--add-button-icon-color-active": "#ddd6fe",
+          "--add-button-text-gap": "16px",
+          "--add-button-text-disabled": "#c4b5fd",
         } as CSSProperties
       }
     >
-      <AddButton title="Custom add" iconSize={20} onClick={() => {}} />
       <AddButton
         title="With label"
         label="Add item"
         iconSize={20}
+        onClick={() => {}}
+      />
+      <AddButton
+        title="Disabled"
+        label="Disabled"
+        iconSize={20}
+        isDisabled
         onClick={() => {}}
       />
     </div>
@@ -338,37 +417,29 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--add-button-radius\` | Border radius | \`3px\` |
-| \`--add-button-dimension\` | Width and height | \`32px\` |
-| \`--add-button-bg\` | Background color | theme token |
-| \`--add-button-bg-hover\` | Hover background color | theme token |
-| \`--add-button-bg-active\` | Active background color | theme token |
-| \`--add-button-icon-color\` | Icon fill color | theme token |
-| \`--add-button-icon-color-hover\` | Icon fill on hover | theme token |
-| \`--add-button-text-disabled\` | Label color when disabled | theme token |
-| \`--add-button-text-gap\` | Gap between button and label | \`8px\` |`,
-      },
-    },
-  },
-};
-
-export const CustomIconSize: Story = {
-  render: () => <CustomSizeTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Icon size and container size can be customized. Left: default (12px icon). Right: larger (16px icon, 36px container).",
+**Add item** shows the square, icon and gap variables; hover and press it near its edge to see the hover and active colours. **Disabled** is there for \`--add-button-text-disabled\`, the only variable that survives the disabled state: the theme draws its square and icon in its own greys.`,
       },
       source: {
-        code: `<AddButton title="Default" onClick={handleClick} />
-<AddButton title="Large icon" iconSize={16} size="36px" onClick={handleClick} />`,
+        code: `<div
+  style={{
+    "--add-button-radius": "50%",
+    "--add-button-dimension": "40px",
+    "--add-button-bg": "#7c3aed",
+    "--add-button-bg-hover": "#a78bfa",
+    "--add-button-bg-active": "#4c1d95",
+    "--add-button-icon-color": "#ffffff",
+    "--add-button-icon-color-hover": "#ffffff",
+    "--add-button-icon-color-active": "#ddd6fe",
+    "--add-button-text-gap": "16px",
+    "--add-button-text-disabled": "#c4b5fd",
+  }}
+>
+  <AddButton label="Add item" iconSize={20} onClick={handleAdd} />
+  <AddButton label="Disabled" iconSize={20} isDisabled />
+</div>`,
       },
     },
   },
 };
-

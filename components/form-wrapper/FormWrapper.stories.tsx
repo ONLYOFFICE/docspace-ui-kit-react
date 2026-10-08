@@ -1,40 +1,10 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
+import { useState } from "react";
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import { Button, ButtonSize } from "../button";
+import { FieldContainer } from "../field-container";
+import { InputSize, InputType, TextInput } from "../text-input";
 
 import { FormWrapper } from "./index";
 
@@ -44,42 +14,26 @@ const meta = {
   title: "UI/Form controls/FormWrapper",
   component: FormWrapper,
   parameters: {
-    docs: {
-      description: {
-        component: `A styled container component that wraps form content with consistent padding, background, and border-radius. Typically used on login and registration pages.
-
-### Features
-
-- **Consistent Styling**: Provides unified padding, background, and border-radius for forms
-- **Flexible Content**: Accepts any React children as form content
-- **Customizable**: Supports custom className, id, and inline styles
-
-### Usage
-
-\`\`\`tsx
-import { FormWrapper } from "@docspace/ui-kit/components/form-wrapper";
-
-<FormWrapper>
-  <Input placeholder="Email" />
-  <Input placeholder="Password" type="password" />
-  <Button primary label="Sign In" />
-</FormWrapper>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
+    children: {
+      control: false,
+      description:
+        "The form content; every child is centred horizontally in the card",
+    },
     className: {
       control: "text",
-      description: "Additional CSS class names",
+      description: "Additional class names applied to the card",
     },
     id: {
       control: "text",
-      description: "HTML id attribute",
+      description: "HTML id applied to the card",
     },
     style: {
       control: "object",
-      description: "Custom inline styles",
+      description: "Inline styles applied to the card",
     },
   },
 } satisfies Meta<typeof FormWrapper>;
@@ -102,7 +56,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Basic form wrapper with simple content to demonstrate the container styling.",
+          "The card on its own around a heading and a line of text, to judge its width, padding, corners and shadow before a form goes in. Change the class, id or inline styles live in the Controls panel below.",
       },
       source: {
         code: `<FormWrapper>
@@ -114,84 +68,140 @@ export const Default: Story = {
   },
 };
 
-export const WithLoginForm: Story = {
-  render: (args) => <FormWrapper {...args} />,
-  args: {
-    children: (
-      <form className={styles.demoForm}>
-        <input className={styles.demoInput} type="email" placeholder="Email" />
-        <input
-          className={styles.demoInput}
-          type="password"
-          placeholder="Password"
+// A field row shrinks to its content in the centred card unless given a width
+const fullWidth: CSSProperties = { width: "100%" };
+
+const SignInFormTemplate = (args: ComponentProps<typeof FormWrapper>) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  return (
+    <FormWrapper {...args}>
+      <FieldContainer
+        isVertical
+        labelVisible
+        labelText="Email"
+        style={fullWidth}
+      >
+        <TextInput
+          type={InputType.email}
+          size={InputSize.base}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          scale
         />
-        <button className={styles.demoButton} type="button">
-          Sign In
-        </button>
-      </form>
-    ),
+      </FieldContainer>
+      <FieldContainer
+        isVertical
+        labelVisible
+        labelText="Password"
+        style={fullWidth}
+      >
+        <TextInput
+          type={InputType.password}
+          size={InputSize.base}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          scale
+        />
+      </FieldContainer>
+      <Button primary scale size={ButtonSize.normal} label="Sign in" />
+    </FormWrapper>
+  );
+};
+
+export const WithLoginForm: Story = {
+  render: (args) => <SignInFormTemplate {...args} />,
+  args: {
+    children: null,
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Form wrapper containing a typical login form with email and password fields.",
+          "A sign-in form as the card is meant to hold it: an email field, a password field and a primary button. Each field row is given a width of 100% and each control `scale`, so they span the card instead of shrinking to their content.",
       },
       source: {
         code: `<FormWrapper>
-  <form>
-    <Input type="email" placeholder="Email" />
-    <Input type="password" placeholder="Password" />
-    <Button primary label="Sign In" />
-  </form>
+  <FieldContainer isVertical labelVisible labelText="Email" style={{ width: "100%" }}>
+    <TextInput type={InputType.email} size={InputSize.base} value={email} onChange={onEmailChange} scale />
+  </FieldContainer>
+  <FieldContainer isVertical labelVisible labelText="Password" style={{ width: "100%" }}>
+    <TextInput type={InputType.password} size={InputSize.base} value={password} onChange={onPasswordChange} scale />
+  </FieldContainer>
+  <Button primary scale size={ButtonSize.normal} label="Sign in" />
 </FormWrapper>`,
       },
     },
   },
 };
 
+const RegistrationFormTemplate = (args: ComponentProps<typeof FormWrapper>) => {
+  const [values, setValues] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirm: "",
+  });
+  const fields = [
+    { key: "name", label: "Full name", type: InputType.text },
+    { key: "email", label: "Email", type: InputType.email },
+    { key: "password", label: "Password", type: InputType.password },
+    { key: "confirm", label: "Confirm password", type: InputType.password },
+  ] as const;
+
+  return (
+    <FormWrapper {...args}>
+      {fields.map((field) => (
+        <FieldContainer
+          key={field.key}
+          isVertical
+          labelVisible
+          labelText={field.label}
+          style={fullWidth}
+        >
+          <TextInput
+            type={field.type}
+            size={InputSize.base}
+            value={values[field.key]}
+            onChange={(e) =>
+              setValues((prev) => ({ ...prev, [field.key]: e.target.value }))
+            }
+            scale
+          />
+        </FieldContainer>
+      ))}
+      <Button primary scale size={ButtonSize.normal} label="Create account" />
+    </FormWrapper>
+  );
+};
+
 export const WithRegistrationForm: Story = {
-  render: (args) => <FormWrapper {...args} />,
+  render: (args) => <RegistrationFormTemplate {...args} />,
   args: {
-    children: (
-      <form className={styles.demoForm}>
-        <input
-          className={styles.demoInput}
-          type="text"
-          placeholder="Full Name"
-        />
-        <input className={styles.demoInput} type="email" placeholder="Email" />
-        <input
-          className={styles.demoInput}
-          type="password"
-          placeholder="Password"
-        />
-        <input
-          className={styles.demoInput}
-          type="password"
-          placeholder="Confirm Password"
-        />
-        <button className={styles.demoButton} type="button">
-          Create Account
-        </button>
-      </form>
-    ),
+    children: null,
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Form wrapper containing a registration form with name, email, and password fields.",
+          "A longer form with four fields, to show that the card keeps its fixed width and only grows taller as fields are added.",
       },
       source: {
         code: `<FormWrapper>
-  <form>
-    <Input type="text" placeholder="Full Name" />
-    <Input type="email" placeholder="Email" />
-    <Input type="password" placeholder="Password" />
-    <Input type="password" placeholder="Confirm Password" />
-    <Button primary label="Create Account" />
-  </form>
+  <FieldContainer isVertical labelVisible labelText="Full name" style={{ width: "100%" }}>
+    <TextInput type={InputType.text} size={InputSize.base} value={name} onChange={onNameChange} scale />
+  </FieldContainer>
+  <FieldContainer isVertical labelVisible labelText="Email" style={{ width: "100%" }}>
+    <TextInput type={InputType.email} size={InputSize.base} value={email} onChange={onEmailChange} scale />
+  </FieldContainer>
+  <FieldContainer isVertical labelVisible labelText="Password" style={{ width: "100%" }}>
+    <TextInput type={InputType.password} size={InputSize.base} value={password} onChange={onPasswordChange} scale />
+  </FieldContainer>
+  <FieldContainer isVertical labelVisible labelText="Confirm password" style={{ width: "100%" }}>
+    <TextInput type={InputType.password} size={InputSize.base} value={confirm} onChange={onConfirmChange} scale />
+  </FieldContainer>
+  <Button primary scale size={ButtonSize.normal} label="Create account" />
 </FormWrapper>`,
       },
     },
@@ -225,16 +235,24 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--form-wrapper-bg\` | Background color | theme token |
-| \`--form-wrapper-shadow\` | Box shadow | theme token |
-| \`--form-wrapper-radius\` | Border radius | \`12px\` |
-| \`--form-wrapper-padding\` | Inner padding | \`32px\` |
-| \`--form-wrapper-max-width\` | Maximum width | \`320px\` |
-| \`--form-wrapper-min-width\` | Minimum width | \`320px\` |`,
+        story: `Every overridable variable set on a wrapper around one card -- the variables are listed under CSS variables on this page. Set the minimum and the maximum width together: either one alone is clamped by the other.`,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--form-wrapper-bg": "#1e1b4b",
+    "--form-wrapper-shadow": "0 8px 32px rgba(124,58,237,0.4)",
+    "--form-wrapper-radius": "24px",
+    "--form-wrapper-padding": "40px",
+    "--form-wrapper-max-width": "400px",
+    "--form-wrapper-min-width": "400px",
+  }}
+>
+  <FormWrapper>
+    <h3>Custom Styled Form</h3>
+    <p>Customized with CSS variables</p>
+  </FormWrapper>
+</div>`,
       },
     },
   },

@@ -1,38 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
 import type React from "react";
 import type { ComponentProps, CSSProperties } from "react";
 import { useState } from "react";
@@ -45,53 +10,22 @@ const meta = {
   title: "UI/Interactive elements/DragAndDrop",
   component: DragAndDrop,
   parameters: {
-    docs: {
-      description: {
-        component: `DragAndDrop component for handling file drag and drop operations.
-
-### Features
-
-- **Drop Zone**: Designate areas as file drop targets
-- **Drag State Tracking**: Visual feedback when items are being dragged over
-- **Drag Disable**: Optionally disable drag functionality
-- **Custom Styling**: Support for custom styles and class names
-- **Event Callbacks**: Handlers for drop, dragOver, dragLeave, and mouseDown events
-- **Ref Forwarding**: Forward refs for direct DOM access
-
-### Usage
-
-\`\`\`tsx
-import { DragAndDrop } from "@docspace/ui-kit/components/drag-and-drop";
-
-// Basic drop zone
-<DragAndDrop
-  isDropZone
-  onDrop={(files) => handleFiles(files)}
-  onDragOver={(isDragActive, e) => setDragging(isDragActive)}
-  onDragLeave={(e) => setDragging(false)}
->
-  <div>Drop files here</div>
-</DragAndDrop>
-
-// Disabled drag zone
-<DragAndDrop isDragDisabled>
-  <div>Drag disabled</div>
-</DragAndDrop>
-\`\`\``,
-      },
-    },
+    // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
+    // there is no second description to keep in step with it.
   },
   argTypes: {
     isDropZone: {
       control: "boolean",
-      description: "Sets the component as a dropzone",
+      description:
+        "Passes drag events on to a drop target around this one, which then takes the drop in place of this element's `onDrop`. Without it the events stop here",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     dragging: {
       control: "boolean",
-      description: "Shows that the item is being dragged now",
+      description:
+        "Your own flag that a drag is in progress. The element is highlighted only while it is set, and gets the stronger accept colour while files are held over it",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -99,36 +33,54 @@ import { DragAndDrop } from "@docspace/ui-kit/components/drag-and-drop";
     isDragDisabled: {
       control: "boolean",
       description:
-        "Indicates that dragging files to this element is not allowed",
+        "Fades the element to 40%. The drop is not blocked: `onDrop` still fires",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     onDrop: {
       action: "dropped",
-      description: "Callback when files are dropped",
+      description:
+        "Called with the dropped files; not called when the drop carried none",
     },
     onDragOver: {
       action: "dragOver",
-      description: "Callback when dragging over the zone",
+      description:
+        "Called on every drag-over with the drag-active flag from the last render, which is still `false` on the first event of a drag",
     },
     onDragLeave: {
       action: "dragLeave",
-      description: "Callback when dragging leaves the zone",
+      description: "Called when the dragged files leave the element",
     },
     onMouseDown: {
       action: "mouseDown",
-      description: "Callback when the mouse button is pressed",
+      description: "Called when the pointer is pressed on the element",
     },
     children: {
-      description: "Children elements rendered inside the drop zone",
+      description:
+        "What the drop target wraps; the element fills its parent's height around it",
     },
     className: {
       control: "text",
-      description: "Additional CSS class name",
+      description:
+        "Added after the component's own classes on the outer element",
     },
     style: {
-      description: "Inline styles applied to the component",
+      description:
+        "Inline style of the outer element, also the place to override the drag colours and the faded opacity",
+    },
+    value: {
+      control: false,
+      description: "Ignored: nothing reads it",
+    },
+    targetFile: {
+      control: false,
+      description: "Ignored: nothing calls it",
+    },
+    forwardedRef: {
+      control: false,
+      description:
+        "Ignored: the element's ref belongs to the drop library, and this one is never attached",
     },
   },
 } satisfies Meta<typeof DragAndDrop>;
@@ -167,7 +119,6 @@ const InteractiveDropZone = (args: ComponentProps<typeof DragAndDrop>) => {
     alignItems: "center",
     justifyContent: "center",
     transition: "all 0.2s ease",
-    backgroundColor: isDragging ? "#F8F9F9" : "transparent",
   };
 
   const textStyle: React.CSSProperties = {
@@ -179,35 +130,171 @@ const InteractiveDropZone = (args: ComponentProps<typeof DragAndDrop>) => {
   return (
     <DragAndDrop
       {...args}
+      dragging={args.dragging ?? isDragging}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
       <div style={dropZoneStyle}>
         <p style={textStyle}>
-          {isDragging
-            ? "Drop files here"
-            : "Drag and drop files here or click to select"}
+          {isDragging ? "Drop files here" : "Drag files here"}
         </p>
       </div>
     </DragAndDrop>
   );
 };
 
+export const Default: Story = {
+  render: (args) => <InteractiveDropZone {...args} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The usual setup: the host keeps its own drag flag and passes it back. Drag files from your desktop over the box to see the background change and the dropped files arrive in the Actions panel (`onDragOver`, `dragging`, `onDrop`).",
+      },
+      source: {
+        code: `const [dragging, setDragging] = useState(false);
+
+<DragAndDrop
+  dragging={dragging}
+  onDragOver={(isDragActive) => setDragging(isDragActive)}
+  onDragLeave={() => setDragging(false)}
+  onDrop={(files) => {
+    setDragging(false);
+    upload(files);
+  }}
+>
+  <div>Drag files here</div>
+</DragAndDrop>`,
+      },
+    },
+  },
+};
+
+export const WithDraggingState: Story = {
+  render: (args) => <InteractiveDropZone {...args} />,
+  args: {
+    dragging: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The drag background held on without an actual drag, to check how the highlight looks in each theme (`dragging`). Drag a file over it to see the stronger accept colour on top.",
+      },
+      source: {
+        code: `<DragAndDrop dragging onDrop={(files) => upload(files)}>
+  <div>Drop files here</div>
+</DragAndDrop>`,
+      },
+    },
+  },
+};
+
+export const Disabled: Story = {
+  render: (args) => <InteractiveDropZone {...args} />,
+  args: {
+    isDragDisabled: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A target the user may not upload to, faded to 40% (`isDragDisabled`). The fade is only a look: drop a file and it still arrives in the Actions panel, so the host has to ignore it in `onDrop`.",
+      },
+      source: {
+        code: `<DragAndDrop
+  isDragDisabled
+  onDrop={(files) => {
+    if (canUpload) upload(files);
+  }}
+>
+  <div>Drag files here</div>
+</DragAndDrop>`,
+      },
+    },
+  },
+};
+
+const NestedTargetsDemo = (args: ComponentProps<typeof DragAndDrop>) => {
+  const [outerDrops, setOuterDrops] = useState(0);
+  const [innerDrops, setInnerDrops] = useState(0);
+
+  const boxStyle: React.CSSProperties = {
+    padding: "16px",
+    border: "2px dashed #D0D5DA",
+    borderRadius: "6px",
+    color: "var(--text-color)",
+  };
+
+  return (
+    <DragAndDrop onDrop={() => setOuterDrops((n) => n + 1)}>
+      <div style={boxStyle}>
+        <p style={{ marginTop: 0 }}>Outer target: {outerDrops} drops</p>
+        <DragAndDrop
+          {...args}
+          onDrop={(files) => {
+            setInnerDrops((n) => n + 1);
+            args.onDrop?.(files);
+          }}
+        >
+          <div style={boxStyle}>Inner target: {innerDrops} drops</div>
+        </DragAndDrop>
+      </div>
+    </DragAndDrop>
+  );
+};
+
+export const NestedTargets: Story = {
+  render: (args) => <NestedTargetsDemo {...args} />,
+  args: {
+    isDropZone: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A folder row inside a panel that also takes files. Drop a file on the inner box: with `isDropZone` on, the outer counter goes up and the inner one does not, because the drop is handed to the outer target. Turn `isDropZone` off in the Controls panel below and the inner box keeps the drop.",
+      },
+      source: {
+        code: `<DragAndDrop onDrop={uploadToPanel}>
+  <div>Panel</div>
+  <DragAndDrop isDropZone onDrop={uploadToFolder}>
+    <div>Folder</div>
+  </DragAndDrop>
+</DragAndDrop>`,
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "400px" }}>
-      {/* Dragging state — shows --dnd-dragging-bg */}
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+        width: "400px",
+      }}
+    >
       <div
         style={
           {
+            display: "flex",
+            flexDirection: "column",
+            gap: "16px",
             "--dnd-dragging-bg": "#e6f3fb",
             "--dnd-accept-bg": "#cce5f6",
-            "--dnd-disabled-opacity": "0.3",
+            "--dnd-disabled-opacity": "0.25",
           } as CSSProperties
         }
       >
-        <DragAndDrop isDropZone dragging style={{ height: "120px", borderRadius: "8px" }}>
+        <DragAndDrop
+          isDropZone
+          dragging
+          style={{ height: "120px", borderRadius: "8px" }}
+        >
           <div
             style={{
               height: "100%",
@@ -220,17 +307,16 @@ export const CssCustomization: Story = {
             Dragging — custom bg via --dnd-dragging-bg
           </div>
         </DragAndDrop>
-      </div>
 
-      {/* Disabled state — shows --dnd-disabled-opacity */}
-      <div
-        style={
-          {
-            "--dnd-disabled-opacity": "0.25",
-          } as CSSProperties
-        }
-      >
-        <DragAndDrop isDropZone isDragDisabled style={{ height: "80px", borderRadius: "8px", border: "2px dashed #0082c9" }}>
+        <DragAndDrop
+          isDropZone
+          isDragDisabled
+          style={{
+            height: "80px",
+            borderRadius: "8px",
+            border: "2px dashed #0082c9",
+          }}
+        >
           <div
             style={{
               height: "100%",
@@ -249,83 +335,23 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `CSS Custom Properties for external customization:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| \`--dnd-dragging-bg\` | Background during active drag | theme-based |
-| \`--dnd-accept-bg\` | Background when accepting a drop | theme-based |
-| \`--dnd-disabled-opacity\` | Opacity when drag is disabled | \`0.4\` |`,
-      },
-    },
-  },
-};
-
-export const Default: Story = {
-  render: (args) => <InteractiveDropZone {...args} />,
-  args: {
-    isDropZone: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Default drop zone that accepts file drops. Drag files over the area to see visual feedback.",
+        story: `One wrapper sets all three -- the variables are listed under CSS variables on this page. The first box is held in the dragging state for \`--dnd-dragging-bg\`; drag a file over it to see \`--dnd-accept-bg\`. The second box is there for \`--dnd-disabled-opacity\`, which only \`isDragDisabled\` switches on.`,
       },
       source: {
-        code: `<DragAndDrop
-  isDropZone
-  onDrop={(files) => console.log("Dropped:", files)}
-  onDragOver={(isDragActive, e) => setDragging(isDragActive)}
-  onDragLeave={(e) => setDragging(false)}
+        code: `<div
+  style={{
+    "--dnd-dragging-bg": "#e6f3fb",
+    "--dnd-accept-bg": "#cce5f6",
+    "--dnd-disabled-opacity": "0.25",
+  }}
 >
-  <div>Drag and drop files here or click to select</div>
-</DragAndDrop>`,
-      },
-    },
-  },
-};
-
-export const WithDraggingState: Story = {
-  render: (args) => <InteractiveDropZone {...args} />,
-  args: {
-    isDropZone: true,
-    dragging: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Drop zone with the dragging state forced to true, showing the visual appearance during an active drag operation.",
-      },
-      source: {
-        code: `<DragAndDrop
-  isDropZone
-  dragging
-  onDrop={(files) => console.log("Dropped:", files)}
->
-  <div>Drop files here</div>
-</DragAndDrop>`,
-      },
-    },
-  },
-};
-
-export const Disabled: Story = {
-  render: (args) => <InteractiveDropZone {...args} />,
-  args: {
-    isDropZone: false,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Drop zone with isDropZone set to false, disabling the drop target functionality.",
-      },
-      source: {
-        code: `<DragAndDrop isDropZone={false}>
-  <div>Drop zone disabled</div>
-</DragAndDrop>`,
+  <DragAndDrop dragging>
+    <div>Dragging</div>
+  </DragAndDrop>
+  <DragAndDrop isDragDisabled>
+    <div>Disabled</div>
+  </DragAndDrop>
+</div>`,
       },
     },
   },

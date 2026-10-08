@@ -1,0 +1,283 @@
+import React, { useEffect, useRef, useState } from "react";
+import { observer } from "mobx-react";
+
+import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
+import { Button, ButtonSize } from "../../../components/button";
+import { Text } from "../../../components/text";
+import { toastr } from "../../../components/toast";
+
+import { useCommonTranslation } from "../../../utils/i18n";
+import {
+  openStripeCheckout,
+  type TTopUpCompletionDeps,
+  waitForTopUpCompletion,
+} from "../../utils/stripe-flow";
+import { AnalyticsEvents } from "../../../enums";
+
+import WarningIcon from "../../../assets/danger.toast.react.svg";
+import Amount from "./sub-components/Amount";
+import { AmountProvider, useAmountValue } from "../../wallet/context";
+
+import type PaymentStore from "../../store/PaymentStore";
+import type { PaymentApi } from "@onlyoffice/docspace-api-sdk";
+
+import styles from "./styles/SimpleTopUpDialog.module.scss";
+
+export type TSimpleTopUpDeps = {
+  paymentApi: PaymentApi;
+  formatWalletCurrency: PaymentStore["formatWalletCurrency"];
+  walletCodeCurrency: string;
+  fetchBalance: (isRefresh?: boolean) => Promise<number>;
+  fetchTransactionHistory?: PaymentStore["fetchTransactionHistory"];
+  walletCustomerStatusNotActive: boolean;
+  /** the saved method credits the wallet only once the transfer settles */
+  isDelayedPaymentMethod: boolean;
+  isStripeCheckoutRequired: boolean;
+  language: string;
+  fetchCardLinked: (
+    backUrl?: string,
+    successUrl?: string,
+  ) => Promise<string | null | undefined>;
+  walletBalance: number;
+  fetchCustomerInfo: TTopUpCompletionDeps["fetchCustomerInfo"];
+};
+
+const MIN_AMOUNT = "10";
+
+type SimpleTopUpDialogBaseProps = {
+  visible: boolean;
+  onClose: () => void;
+  onConfirm?: () => Promise<void> | void;
+  recommendedAmount?: string;
+  /** minimum allowed top-up; also pre-fills the input */
+  minValue?: string;
+  /** optional service to activate after the top-up (passed to the callback URL) */
+  service?: string;
+  /** current service whose transaction history is refetched after the top-up */
+  serviceName?: string;
+  /** optional extra query params appended to the success/callback URL */
+  successParams?: Record<string, string>;
+  /** overrides the default description under the header */
+  descriptionText?: React.ReactNode;
+  /** overrides the default helper text under the amount input */
+  helperText?: React.ReactNode;
+};
+
+export type SimpleTopUpDialogProps = SimpleTopUpDialogBaseProps &
+  TSimpleTopUpDeps;
+
+const SimpleTopUpDialogContent = observer(
+  ({
+    visible,
+    onClose,
+    onConfirm,
+    isStripeCheckoutRequired,
+    minValue,
+    paymentApi,
+    formatWalletCurrency,
+    walletCodeCurrency,
+    fetchBalance,
+    fetchTransactionHistory,
+    walletCustomerStatusNotActive,
+    isDelayedPaymentMethod,
+    language,
+    fetchCardLinked,
+    walletBalance,
+    fetchCustomerInfo,
+    service,
+    serviceName,
+    successParams,
+    descriptionText,
+    helperText,
+  }: SimpleTopUpDialogProps) => {
+    const t = useCommonTranslation();
+
+    const { amount, hasError } = useAmountValue();
+
+    const [isLoading, setIsLoading] = useState(false);
+
+    const abortControllerRef = useRef<AbortController | null>(null);
+
+    useEffect(() => {
+      return () => {
+        abortControllerRef.current?.abort();
+      };
+    }, []);
+
+    const isDisabled = isLoading || !amount || hasError;
+
+    const isStripeFlow = isStripeCheckoutRequired;
+
+    const onStripeContinue = async () => {
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+      const { signal } = controller;
+
+      setIsLoading(true);
+
+      try {
+        await openStripeCheckout(
+          { walletCodeCurrency, language, fetchCardLinked },
+          amount,
+          service,
+          successParams,
+        );
+
+        if (isDelayedPaymentMethod) {
+          onClose();
+          return;
+        }
+
+        const completion = await waitForTopUpCompletion(
+          { walletBalance, fetchCustomerInfo, fetchBalance },
+          signal,
+        );
+
+        if (signal.aborted) return;
+
+        if (!completion.isDelayedPaymentMethod) await onConfirm?.();
+
+        if (signal.aborted) return;
+
+        onClose();
+      } catch (error) {
+        console.error("[first-topup] flow failed", error);
+        if (!signal.aborted) toastr.error(t("UnexpectedError"));
+      } finally {
+        if (!signal.aborted) setIsLoading(false);
+      }
+    };
+
+    const onInstantTopUp = async () => {
+      setIsLoading(true);
+
+      try {
+        const res = await paymentApi.topUpDeposit({
+          topUpDepositRequestDto: {
+            amount: +amount,
+            currency: walletCodeCurrency,
+          },
+        });
+
+        if (!res?.data?.response) throw new Error(t("UnexpectedError"));
+
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: AnalyticsEvents.WalletTopUp });
+
+        const requests: Promise<unknown>[] = [fetchBalance(true)];
+        if (fetchTransactionHistory)
+          requests.push(fetchTransactionHistory(serviceName));
+        await Promise.allSettled(requests);
+
+        if (isDelayedPaymentMethod) {
+          toastr.success(t("TopUpDelayedPaymentMethodWarning"));
+        } else {
+          toastr.success(t("WalletToppedUp"));
+          await onConfirm?.();
+        }
+
+        onClose();
+      } catch (error) {
+        toastr.error(error as Error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const onContinue = async () => {
+      if (isDisabled) return;
+
+      if (isStripeFlow) await onStripeContinue();
+      else await onInstantTopUp();
+    };
+
+    return (
+      <ModalDialog
+        visible={visible}
+        onClose={onClose}
+        displayType={ModalDialogType.modal}
+        autoMaxHeight
+        withBodyScroll
+      >
+        <ModalDialog.Header>{t("TopUpCredits")}</ModalDialog.Header>
+
+        <ModalDialog.Body>
+          <div className={styles.body}>
+            {isDelayedPaymentMethod ? (
+              <div
+                className={styles.warning}
+                data-testid="top_up_delayed_payment_method_warning"
+              >
+                <WarningIcon className={styles.warningIcon} />
+                <Text
+                  as="span"
+                  fontSize="12px"
+                  fontWeight={600}
+                  lineHeight="16px"
+                  className={styles.warningText}
+                >
+                  {t("TopUpDelayedPaymentMethodWarning")}
+                </Text>
+              </div>
+            ) : null}
+
+            <Text className={styles.description}>
+              {descriptionText ??
+                (isStripeFlow
+                  ? t("TopUpCreditsDescription")
+                  : t("TopUpCreditsAmountDescription"))}
+            </Text>
+
+            <Amount
+              formatWalletCurrency={formatWalletCurrency}
+              isDisabled={isLoading}
+              walletCustomerStatusNotActive={walletCustomerStatusNotActive}
+              minValue={minValue ?? MIN_AMOUNT}
+              withoutCustomerCheck
+            />
+
+            <Text fontSize="12px" className={styles.helperText}>
+              {helperText ??
+                (isStripeFlow
+                  ? t("TopUpCreditsChargeHint")
+                  : t("TopUpTakeSomeTimeToComplete"))}
+            </Text>
+          </div>
+        </ModalDialog.Body>
+
+        <ModalDialog.Footer>
+          <div className={styles.footerButtons}>
+            <Button
+              key="ContinueToStripeButton"
+              label={isStripeFlow ? t("ContinueToStripe") : t("TopUp")}
+              size={ButtonSize.normal}
+              primary
+              scale
+              onClick={onContinue}
+              isLoading={isLoading}
+              isDisabled={isDisabled}
+              testId="first_topup_continue_to_stripe"
+            />
+            <Button
+              key="CancelButton"
+              label={t("CancelButton")}
+              size={ButtonSize.normal}
+              scale
+              onClick={onClose}
+              isDisabled={isLoading}
+              testId="first_topup_cancel"
+            />
+          </div>
+        </ModalDialog.Footer>
+      </ModalDialog>
+    );
+  },
+);
+
+const SimpleTopUpDialog: React.FC<SimpleTopUpDialogProps> = (props) => (
+  <AmountProvider initialAmount={props.minValue ?? props.recommendedAmount}>
+    <SimpleTopUpDialogContent {...props} />
+  </AmountProvider>
+);
+
+export default SimpleTopUpDialog;
