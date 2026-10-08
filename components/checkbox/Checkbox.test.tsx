@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 
 import type { CheckboxProps } from "./Checkbox.types";
 import { Checkbox } from ".";
+import styles from "./Checkbox.module.scss";
 
 const defaultProps: CheckboxProps = {
   name: "checkbox",
@@ -14,6 +15,21 @@ describe("<Checkbox />", () => {
   it("renders without error", () => {
     render(<Checkbox {...defaultProps} />);
     expect(screen.getByTestId("checkbox")).toBeInTheDocument();
+  });
+
+  // jsdom does no layout, so the ellipsis itself is checked by the
+  // WithTruncation story; here, that truncate reaches the wrapper whose
+  // stylesheet lets the text shrink, and only with truncate.
+  it("marks the label wrapper for truncation only with truncate", () => {
+    const { container, rerender } = render(
+      <Checkbox {...defaultProps} label="A long label" />,
+    );
+    const wrapper = container.querySelector(
+      `.${styles.wrapper}`,
+    ) as HTMLElement;
+    expect(wrapper).not.toHaveClass(styles.truncate);
+    rerender(<Checkbox {...defaultProps} label="A long label" truncate />);
+    expect(wrapper).toHaveClass(styles.truncate);
   });
 
   it("renders with label", () => {

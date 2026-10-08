@@ -339,6 +339,18 @@ export const WithTruncation: Story = {
     const text = canvas.getByText(/^This is a very long label/);
     await expect(text).toHaveStyle({ whiteSpace: "nowrap" });
     await expect(text.getClientRects()).toHaveLength(1);
+    // ...and cut at the container's edge with an ellipsis, rather than
+    // running out of it: the text box is narrower than its content, and the
+    // checkbox as a whole does not overflow its 200px parent.
+    await expect(getComputedStyle(text).textOverflow).toBe("ellipsis");
+    await expect(text.scrollWidth).toBeGreaterThan(text.clientWidth);
+    const checkbox = canvas.getByTestId("checkbox");
+    await expect(checkbox.scrollWidth).toBeLessThanOrEqual(
+      checkbox.clientWidth,
+    );
+    await expect(text.getBoundingClientRect().right).toBeLessThanOrEqual(
+      (checkbox.parentElement as HTMLElement).getBoundingClientRect().right,
+    );
   },
   parameters: {
     docs: {

@@ -147,7 +147,11 @@ const CheckboxPure = ({
         isIndeterminate={isIndeterminate || false}
         onKeyDown={onIconKeyDown}
       />
-      <div className={`${styles.wrapper} wrapper`}>
+      <div
+        className={classNames(styles.wrapper, "wrapper", {
+          [styles.truncate]: truncate,
+        })}
+      >
         {label ? (
           <Text
             as="span"
