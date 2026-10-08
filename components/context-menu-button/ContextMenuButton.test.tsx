@@ -122,6 +122,34 @@ describe("<ContextMenuButton />", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  // A dialog closes on an Escape keyup on window, and the portal's file list
+  // acts on Enter and the arrows from a document keydown listener: keys the
+  // menu button handles must not reach either.
+  it("keeps the keys it handles from window and document listeners", () => {
+    const onDocumentKeyDown = vi.fn();
+    const onWindowKeyUp = vi.fn();
+    document.addEventListener("keydown", onDocumentKeyDown);
+    window.addEventListener("keyup", onWindowKeyUp);
+
+    render(<ContextMenuButton {...baseProps} usePortal={false} />);
+    const button = screen.getByRole("button", { name: "Actions" });
+
+    fireEvent.keyDown(button, { key: "Enter" });
+    fireEvent.keyUp(button, { key: "Enter" });
+    const item = screen.getByRole("menuitem", { name: "label" });
+    fireEvent.keyDown(item, { key: "ArrowDown" });
+    fireEvent.keyUp(item, { key: "ArrowDown" });
+    fireEvent.keyDown(item, { key: "Escape" });
+    fireEvent.keyUp(button, { key: "Escape" });
+
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(onDocumentKeyDown).not.toHaveBeenCalled();
+    expect(onWindowKeyUp).not.toHaveBeenCalled();
+
+    document.removeEventListener("keydown", onDocumentKeyDown);
+    window.removeEventListener("keyup", onWindowKeyUp);
+  });
+
   it("opens with data alone when there is no getData", () => {
     render(
       <ContextMenuButton

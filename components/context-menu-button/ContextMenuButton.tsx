@@ -7,6 +7,7 @@ import classNames from "classnames";
 import VerticalDotsReactSvg from "../../assets/icons/16/vertical-dots.react.svg";
 
 import { isTablet, isMobile } from "../../utils";
+import { consumeKey } from "../../utils/consume-key";
 
 import { DropDownItem } from "../drop-down-item";
 import { DropDown } from "../drop-down";
@@ -185,6 +186,7 @@ const ContextMenuButtonPure = ({
     if (state.displayType === "toggle") {
       if (key !== "Enter" && key !== " ") return;
       e.preventDefault();
+      consumeKey(e);
       setState((s) => ({ ...s, data: readData() }));
       onClick?.(e as unknown as React.MouseEvent);
       return;
@@ -192,6 +194,7 @@ const ContextMenuButtonPure = ({
 
     if (key === "Enter" || key === " " || key === "ArrowDown") {
       e.preventDefault();
+      consumeKey(e);
       if (state.isOpen && key !== "ArrowDown") onCloseAction();
       else if (state.isOpen) getMenuItems()[0]?.focus();
       else openMenu(e, "first");
@@ -200,6 +203,7 @@ const ContextMenuButtonPure = ({
 
     if (key === "ArrowUp") {
       e.preventDefault();
+      consumeKey(e);
       if (state.isOpen) getMenuItems().at(-1)?.focus();
       else openMenu(e, "last");
       return;
@@ -207,6 +211,7 @@ const ContextMenuButtonPure = ({
 
     if (key === "Escape" && state.isOpen) {
       e.preventDefault();
+      consumeKey(e);
       onCloseAction();
     }
   };
@@ -253,6 +258,7 @@ const ContextMenuButtonPure = ({
 
       const move = (index: number) => {
         e.preventDefault();
+        consumeKey(e);
         items[(index + items.length) % items.length]?.focus();
       };
 
@@ -269,11 +275,13 @@ const ContextMenuButtonPure = ({
         case " ":
           if (current === -1) return;
           e.preventDefault();
+          consumeKey(e);
           items[current].click();
           focusButton();
           return;
         case "Escape":
           e.preventDefault();
+          consumeKey(e);
           onCloseAction();
           focusButton();
           return;
