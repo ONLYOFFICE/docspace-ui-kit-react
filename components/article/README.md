@@ -351,6 +351,24 @@ an icon, a label and an optional badge. With `showText` off it shows only the ic
 prop becomes the tooltip; `isEndOfBlock` closes a group with a bottom margin of 16px (24px
 below 1024px). It has no README of its own; its variables are listed below.
 
+- **With a `LinkRouter`** (and without `isDisabled`) the row is rendered inside that link, built
+  from `linkData` (`to={linkData.path}`, `state={linkData.state}`): the link is the focusable
+  control, carries `aria-current="page"` on the active row, and the browser's own link handling
+  — a middle click or Ctrl+click to open a new tab — applies. `onClick` is still called for a
+  pointer click on the row and for Enter on the link, but not for a middle click. Without a
+  `LinkRouter`, `linkData` is not read.
+- **Without a link** the row itself is the control: `role="button"` in the tab order, activated
+  by Enter and Space, with `aria-current="page"` while `isActive`. A middle click calls
+  `onClick` too, with `e.button === 1`.
+- **The row is always named by `text`**, also with `showText` off, when the label is kept as
+  visually hidden text; the `title` tooltip and the initial letter add nothing to the name. The
+  label's truncation, which decides whether `title` is shown, is measured again whenever `text`
+  changes.
+- **With `onClickBadge` the badge is a button of its own** — focusable, activated by Enter and
+  Space, named by `badgeTitle`, else by `labelBadge`, else by `text` — and its click never
+  reaches the row's `onClick`. It sits inside the row's control, so a screen reader meets an
+  interactive element nested in another.
+
 ## CSS variables
 
 | Variable                            | Default            | Effect                                                                                                                                                        |

@@ -71,13 +71,21 @@ export const Default: Story = {
   args: {},
   play: async ({ args, canvas, userEvent }) => {
     await expect(canvas.getByText("Documents")).toBeVisible();
-    // The click lands on the overlay behind the label, which takes no
-    // pointer events of its own; onClick gets the row's id.
+    // The click lands on the overlay drawn over the row and reaches the row;
+    // onClick gets the row's id.
     await userEvent.click(canvas.getByTestId("article-item-sibling"));
     await expect(args.onClick).toHaveBeenCalledWith(
       expect.anything(),
       "documents",
     );
+
+    // The row is a button in the tab order, and Enter activates it.
+    const item = canvas.getByRole("button", { name: "Documents" });
+    item.blur();
+    await userEvent.tab();
+    await expect(item).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
   },
 };
 
@@ -87,9 +95,14 @@ export const IconOnly: Story = {
     showBadge: false,
   },
   play: async ({ canvas }) => {
-    // Icon only: no label is rendered.
-    await expect(canvas.queryByText("Documents")).toBeNull();
-    await expect(canvas.getByTestId("article-item")).toBeVisible();
+    // Icon only: no label is drawn, but the row is still named by it.
+    const hiddenLabel = canvas.getByText("Documents");
+    await expect(hiddenLabel.getBoundingClientRect().width).toBeLessThanOrEqual(
+      1,
+    );
+    await expect(
+      canvas.getByRole("button", { name: "Documents" }),
+    ).toBeVisible();
   },
   decorators: [
     (Story) => (
@@ -109,6 +122,17 @@ export const WithBadge: Story = {
     // A badge click reports the badge, not the row.
     await userEvent.click(canvas.getByText("42"));
     await expect(args.onClickBadge).toHaveBeenCalledWith("documents");
+    await expect(args.onClick).not.toHaveBeenCalled();
+
+    // The badge is a button of its own, named by its count here, and the
+    // keyboard reaches it after the row.
+    const badge = canvas.getByRole("button", { name: "42" });
+    badge.blur();
+    await userEvent.tab();
+    await userEvent.tab();
+    await expect(badge).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await expect(args.onClickBadge).toHaveBeenCalledTimes(2);
     await expect(args.onClick).not.toHaveBeenCalled();
   },
 };
@@ -141,6 +165,10 @@ export const Active: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByTestId("article-item").className).toMatch(
       /active/,
+    );
+    await expect(canvas.getByTestId("article-item")).toHaveAttribute(
+      "aria-current",
+      "page",
     );
     await expect(canvas.getByText("New")).toBeVisible();
   },

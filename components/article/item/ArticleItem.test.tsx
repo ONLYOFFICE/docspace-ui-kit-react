@@ -39,9 +39,13 @@ describe("<ArticleItem />", () => {
     expect(screen.getByText("Documents")).toBeInTheDocument();
   });
 
-  it("hides text when showText is false", () => {
-    render(<ArticleItem {...baseProps} showText={false} />);
-    expect(screen.queryByText("Documents")).not.toBeInTheDocument();
+  it("draws no label when showText is false, yet stays named by text", () => {
+    render(<ArticleItem {...baseProps} showText={false} showBadge={false} />);
+    // Only the visually hidden copy of the label is left.
+    expect(screen.getByText("Documents").className).toMatch(/visuallyHidden/);
+    expect(
+      screen.getByRole("button", { name: "Documents" }),
+    ).toBeInTheDocument();
   });
 
   it("shows initial letter when showInitial is true", () => {
@@ -109,5 +113,75 @@ describe("<ArticleItem />", () => {
     );
     render(<ArticleItem {...baseProps} badgeComponent={<CustomBadge />} />);
     expect(screen.getByTestId("custom-badge")).toBeInTheDocument();
+  });
+
+  describe("keyboard and semantics", () => {
+    it("is a focusable button that Enter and Space activate", () => {
+      render(<ArticleItem {...baseProps} id="docs" showBadge={false} />);
+      const item = screen.getByRole("button", { name: "Documents" });
+      expect(item).toHaveAttribute("tabindex", "0");
+      item.focus();
+      fireEvent.keyDown(item, { key: "Enter" });
+      fireEvent.keyDown(item, { key: " " });
+      expect(mockOnClick).toHaveBeenCalledTimes(2);
+      expect(mockOnClick).toHaveBeenLastCalledWith(expect.anything(), "docs");
+    });
+
+    it("marks the active item with aria-current", () => {
+      render(<ArticleItem {...baseProps} isActive showBadge={false} />);
+      expect(screen.getByRole("button", { name: "Documents" })).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
+    });
+
+    it("makes the badge a named button that Enter activates on its own", () => {
+      render(<ArticleItem {...baseProps} badgeTitle="Empty trash" />);
+      const badge = screen.getByRole("button", { name: "Empty trash" });
+      badge.focus();
+      fireEvent.keyDown(badge, { key: "Enter" });
+      expect(mockOnClickBadge).toHaveBeenCalledTimes(1);
+      expect(mockOnClick).not.toHaveBeenCalled();
+    });
+
+    it("leaves the control to the link when LinkRouter is given", () => {
+      const LinkRouter = ({
+        children,
+        onClick,
+        ...rest
+      }: {
+        children?: React.ReactNode;
+        onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+      }) => (
+        <a href="#docs" onClick={onClick} {...rest}>
+          {children}
+        </a>
+      );
+      render(
+        <ArticleItem
+          {...baseProps}
+          showBadge={false}
+          isActive
+          LinkRouter={LinkRouter}
+        />,
+      );
+      const link = screen.getByRole("link", { name: "Documents" });
+      expect(link).toHaveAttribute("aria-current", "page");
+      expect(screen.queryByRole("button")).toBeNull();
+
+      // Enter on the link clicks the link itself, and that is reported.
+      fireEvent.click(link);
+      expect(mockOnClick).toHaveBeenCalledTimes(1);
+
+      // A pointer click inside is reported once, not twice.
+      fireEvent.click(screen.getByTestId("article-item-sibling"));
+      expect(mockOnClick).toHaveBeenCalledTimes(2);
+
+      // A middle click is the browser's, to open a new tab.
+      fireEvent.mouseDown(screen.getByTestId("article-item-sibling"), {
+        button: 1,
+      });
+      expect(mockOnClick).toHaveBeenCalledTimes(2);
+    });
   });
 });

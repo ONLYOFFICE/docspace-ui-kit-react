@@ -40,7 +40,7 @@ export type ArticleItemProps = PickedDivProps & {
   text: string;
   /** Sets the catalog item to display text */
   showText?: boolean;
-  /** Invokes a function upon clicking on a catalog item */
+  /** Called with the event and `id` when the item is clicked or activated with Enter or Space; inside a link, also when the link is activated from the keyboard. A middle click calls it only when the item is not a link. */
   onClick?: (e: React.MouseEvent, id?: string) => void;
   /** Invokes a function upon dragging and dropping a catalog item */
   onDrop?: (id?: string, text?: string, item?: ArticleItemType) => void;
@@ -48,7 +48,7 @@ export type ArticleItemProps = PickedDivProps & {
   showInitial?: boolean;
   /** Sets the catalog item as end of block */
   isEndOfBlock?: boolean;
-  /** Sets catalog item active */
+  /** Marks the current item: highlighted, and `aria-current="page"`. */
   isActive?: boolean;
   /** Sets the catalog item available for drag`n`drop */
   isDragging?: boolean;
@@ -60,7 +60,7 @@ export type ArticleItemProps = PickedDivProps & {
   labelBadge?: string | number;
   /** Sets custom badge icon */
   iconBadge?: string;
-  /** Invokes a function upon clicking on the catalog item badge */
+  /** Called with `id` when the badge is clicked or activated with Enter or Space. With it the badge is a button named by `badgeTitle` (else `labelBadge`). */
   onClickBadge?: (id?: string) => void;
   /** Sets the catalog item to be displayed as a header */
   isHeader?: boolean;
@@ -68,19 +68,24 @@ export type ArticleItemProps = PickedDivProps & {
   isFirstHeader?: boolean;
   /** Accepts folder id */
   folderId?: string;
-  /** Title for the badge tooltip */
+  /** Title for the badge tooltip, and the badge button's accessible name */
   badgeTitle?: string;
   /** Custom badge component */
   badgeComponent?: React.ReactNode;
-  /** Title for the item tooltip */
+  /** Native tooltip of the item, shown while the label is hidden or truncated. The item's accessible name is always `text`. */
   title?: string;
-  /** Link data for routing */
+  /** Address and router state of the item. Read only with `LinkRouter`, which renders the item inside that link. */
   linkData: TArticleLinkData;
   /** Item data */
   item?: ArticleItemType;
   /** Catalog item icon for SSR */
   iconNode?: React.ReactNode;
+  /** Whether a click plays the progress animation on the item's background. */
   withAnimation?: boolean;
+  /** `data-tooltip-id` of the item, for a shared tooltip anchored by it. */
   dataTooltipId?: string;
+  /** Whether the item is rendered without its `LinkRouter` link. */
   isDisabled?: boolean;
+  /** Set by the wrapper when the item is rendered inside its `LinkRouter` link, which is then the focusable control. */
+  isLink?: boolean;
 };

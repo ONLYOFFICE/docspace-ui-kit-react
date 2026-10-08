@@ -44,6 +44,7 @@ export const ArticleItemPure = (props: ArticleItemProps) => {
     iconNode,
     withAnimation,
     dataTooltipId,
+    isLink = false,
   } = props;
 
   // Animation hook
@@ -67,16 +68,38 @@ export const ArticleItemPure = (props: ArticleItemProps) => {
       triggerAnimation();
     }
   };
+  // A middle click on a link is the browser's: it opens the address in a new
+  // tab. Only an item that is not a link reports it.
   const onMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 1) return;
+    if (e.button !== 1 || isLink) return;
 
     onClickAction(e);
   };
+
+  // Enter and Space on the item (when it is not inside a link, which has its
+  // own) and on the badge make a real click, so the handlers receive the
+  // mouse event they are typed for.
+  const onActivateKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.target !== e.currentTarget) return;
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    e.currentTarget.click();
+  };
+
   const onClickBadgeAction = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onClickBadge?.(id);
   };
+
+  const badgeButtonProps = onClickBadge
+    ? {
+        role: "button",
+        tabIndex: 0,
+        "aria-label": badgeTitle || (labelBadge ? String(labelBadge) : text),
+        onKeyDown: onActivateKeyDown,
+      }
+    : {};
 
   const onMouseUpAction = () => {
     if (isDragging) onDrop?.(id, text, item);
@@ -100,12 +123,24 @@ export const ArticleItemPure = (props: ArticleItemProps) => {
 
   const tooltipTitle = !showText || isTextTruncated ? title : undefined;
 
+  // Measured again whenever the label itself changes, not only the tooltip.
   useEffect(() => {
     const textElement = textRef.current;
     if (!showText || !textElement) return;
 
     setIsTextTruncated(textElement.scrollWidth > textElement.clientWidth);
-  }, [showText, title]);
+  }, [showText, text, title]);
+
+  // Inside a link the link is the control: the item adds no role of its own,
+  // so there is no interactive element nested in another.
+  const itemControlProps = isLink
+    ? {}
+    : {
+        role: "button",
+        tabIndex: 0,
+        "aria-current": isActive ? ("page" as const) : undefined,
+        onKeyDown: onActivateKeyDown,
+      };
 
   const renderItem = () => {
     return (
@@ -121,6 +156,10 @@ export const ArticleItemPure = (props: ArticleItemProps) => {
         title={tooltipTitle}
         ref={parentElementRef}
         data-tooltip-id={dataTooltipId}
+        onClick={onClickAction}
+        onMouseUp={onMouseUpAction}
+        onMouseDown={onMouseDown}
+        {...itemControlProps}
       >
         <div
           className={classNames(styles.articleItemSibling, {
@@ -135,9 +174,6 @@ export const ArticleItemPure = (props: ArticleItemProps) => {
           })}
           style={{ "--end-width": `${endWidth}%` } as React.CSSProperties}
           id={folderId}
-          onClick={onClickAction}
-          onMouseUp={onMouseUpAction}
-          onMouseDown={onMouseDown}
           data-testid="article-item-sibling"
           ref={animationElementRef}
         />
@@ -154,7 +190,10 @@ export const ArticleItemPure = (props: ArticleItemProps) => {
           {!showText ? (
             <>
               {showInitial ? (
-                <Text className={classNames(styles.articleItemInitialText)}>
+                <Text
+                  className={classNames(styles.articleItemInitialText)}
+                  aria-hidden="true"
+                >
                   {getInitial(text)}
                 </Text>
               ) : null}
@@ -165,11 +204,16 @@ export const ArticleItemPure = (props: ArticleItemProps) => {
                     [styles.showText]: showText,
                   })}
                   onClick={onClickBadgeAction}
+                  {...badgeButtonProps}
                 />
               ) : null}
             </>
           ) : null}
         </div>
+        {!showText ? (
+          // The label is not drawn, but the item is still named by it.
+          <span className={styles.visuallyHidden}>{text}</span>
+        ) : null}
         {showText ? (
           <Text
             ref={textRef}
@@ -189,6 +233,7 @@ export const ArticleItemPure = (props: ArticleItemProps) => {
             })}
             onClick={onClickBadgeAction}
             title={badgeTitle}
+            {...badgeButtonProps}
           >
             {iconBadge ? (
               <ReactSVG className={styles.articleItemIcon} src={iconBadge} />
