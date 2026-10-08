@@ -53,8 +53,8 @@ listed above. Type a wrapper's props yourself, or import the type from its file 
 
 The four slots must be direct children of `ModalDialog`; see the behaviour notes below.
 
-Two things about `visible` that the example below encodes. It only toggles CSS classes, so
-mounting the dialog conditionally is what actually closes it — and inside that conditional
+Two things about `visible` that the example below encodes. It only hides the dialog, it does
+not unmount it, so mounting the dialog conditionally is what actually removes it — and inside that conditional
 the prop is always `true`, which is why it is written bare rather than as `visible={visible}`.
 
 ```tsx
@@ -299,9 +299,10 @@ export function RenameDialog({
 ## Behaviour the types don't state
 
 - **`visible` does not mount or unmount anything.** The dialog and all of its children are
-  rendered into the document whether `visible` is true or false; the prop only toggles CSS
-  classes. Effects, subscriptions and fetches inside the body therefore run while the dialog
-  is invisible. Render `<ModalDialog>` conditionally when that matters.
+  rendered into the document whether `visible` is true or false; the prop toggles CSS classes,
+  and while it is false the outer element also carries `aria-hidden="true"` and `inert` and the
+  surface drops `aria-modal`. Effects, subscriptions and fetches inside the body therefore run
+  while the dialog is invisible. Render `<ModalDialog>` conditionally when that matters.
 - **The four slots render nothing by themselves.** `ModalDialog.Header`, `.Body`, `.Footer`
   and `.Container` are marker components that return `null`; the dialog scans its children
   for their display names and renders the content itself. Consequences: a slot must be a
@@ -395,6 +396,9 @@ Page-level:
 
 - `role="dialog"` and `aria-modal="true"` sit on the dialog surface, the `#modal-dialog`
   element. They used to sit on the click-to-close layer, which spans the whole viewport.
+- **A closed dialog is not a dialog to assistive technology.** While `visible` is false the
+  outer element is `aria-hidden="true"` and `inert`, and the surface has no `aria-modal`, so a
+  screen reader neither finds the hidden dialog nor treats the page behind it as unavailable.
 - **Name it with `aria-labelledby` or `aria-label`.** Both reach the element carrying the role.
   Prefer `aria-labelledby` pointing at the heading you already render in
   `ModalDialog.Header` — give that heading an `id` — and fall back to `aria-label` when there
@@ -402,9 +406,9 @@ Page-level:
 - `aria-describedby` reaches the same element, for the sentence that explains what the dialog
   is asking.
 - **Focus is not managed.** The component neither moves focus into the dialog when it opens
-  nor traps it, and because the markup stays in the document while `visible` is false, its
-  controls remain in the tab order of the page behind it. Conditional rendering — as in the
-  examples above — is what keeps that from happening.
+  nor traps it, and does not return it when the dialog closes. While `visible` is false the
+  dialog's controls are out of the Tab order (`inert`), so a closed dialog no longer steals Tab
+  stops from the page behind it.
 - The close button carries `aria-label="close"`; `isCloseable={false}` and `embedded` remove it.
 
 ## Test ids

@@ -432,9 +432,15 @@ export const Default: Story = {
   play: async (context) => {
     const { args, userEvent } = context;
     await expect(dialog()).not.toBeVisible();
+    // Closed, it is mounted but no dialog to assistive technology, and its
+    // controls are out of the Tab order.
+    await expect(screen.queryByRole("dialog")).toBeNull();
+    await expect(screen.getByTestId("modal")).toHaveAttribute("inert");
+    await expect(dialog()).not.toHaveAttribute("aria-modal");
 
     const modal = await open(context);
     await expect(modal).toHaveAttribute("aria-modal", "true");
+    await expect(screen.getByRole("dialog")).toBe(modal);
     await expect(within(modal).getByText("Change password")).toBeVisible();
     await expect(within(modal).getAllByText(/^Section \d+$/)).toHaveLength(1);
 

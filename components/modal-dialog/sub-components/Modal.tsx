@@ -181,6 +181,13 @@ const Modal = ({
         [styles.modalActive]: visible,
       })}
       data-testid={dataTestId ?? "modal"}
+      // Closed, the dialog stays mounted (the aside slides out, and callers
+      // rely on the markup being there) but must not be a dialog to anyone:
+      // `aria-hidden` takes it out of the accessibility tree, so a screen
+      // reader is not told the rest of the page is inert by a dialog nobody
+      // can see, and `inert` takes its controls out of the Tab order.
+      aria-hidden={visible ? undefined : true}
+      inert={!visible}
     >
       <ModalBackdrop
         className={classNames({
@@ -206,7 +213,7 @@ const Modal = ({
               id="modal-dialog"
               ref={contentRef}
               role="dialog"
-              aria-modal="true"
+              aria-modal={visible ? true : undefined}
               aria-label={ariaLabel}
               aria-labelledby={ariaLabelledBy}
               aria-describedby={ariaDescribedBy}

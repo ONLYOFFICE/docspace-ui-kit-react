@@ -377,6 +377,39 @@ describe("ModalDialog", () => {
       expect(dialog).toHaveAttribute("aria-modal", "true");
     });
 
+    // Closed, the dialog stays mounted; it used to stay a `role="dialog"`
+    // with `aria-modal="true"` as well, telling a screen reader that the
+    // whole page behind an invisible dialog was out of bounds.
+    it("takes a closed dialog out of the accessibility tree and the Tab order", () => {
+      const { rerender } = render(
+        <ModalDialog {...defaultProps} visible={false} aria-label="Delete room">
+          <ModalDialog.Body>
+            <button type="button">Inside</button>
+          </ModalDialog.Body>
+        </ModalDialog>,
+      );
+
+      expect(screen.queryByRole("dialog")).toBeNull();
+      const outer = screen.getByTestId("modal");
+      expect(outer).toHaveAttribute("aria-hidden", "true");
+      expect(outer).toHaveAttribute("inert");
+      expect(screen.getByTestId("modal-dialog")).not.toHaveAttribute(
+        "aria-modal",
+      );
+
+      rerender(
+        <ModalDialog {...defaultProps} visible aria-label="Delete room">
+          <ModalDialog.Body>
+            <button type="button">Inside</button>
+          </ModalDialog.Body>
+        </ModalDialog>,
+      );
+
+      expect(screen.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
+      expect(outer).not.toHaveAttribute("aria-hidden");
+      expect(outer).not.toHaveAttribute("inert");
+    });
+
     it("hides content when hideContent is true", () => {
       render(
         <ModalDialog {...defaultProps} hideContent>
