@@ -33,7 +33,7 @@ export type FloatingButtonProps = {
   stopped?: boolean;
   /** Whether the status badge is suppressed whatever `stopped`, `alert` and `completed` say. */
   withoutStatus?: boolean;
-  /** How much of the ring is filled, 0–100, clamped to that range. `0` is an empty ring; only an absent `percent` spins it. */
+  /** How much of the ring is filled, 0–100, clamped to that range. An absent `percent` or `0` spins the ring, for a progress not known yet. */
   percent?: number;
   /** Accessible name of the circle and of its progress bar. Defaults to the icon's name followed by "button" (`"upload button"`), so pass a translated one. */
   label?: string;

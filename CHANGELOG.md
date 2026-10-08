@@ -83,8 +83,6 @@ under _Changed_.
   English titles ("dual ring", "oval", "track"), and the wrapper no longer sets `aria-busy`. A
   `Loader` without `type` now draws the oval instead of rendering its label as text;
   `LoaderTypes.base` still renders the text.
-- **`FloatingButton` draws an empty ring at `percent={0}`.** Only an absent `percent` spins the
-  ring now; any number, clamped to 0..100, draws an arc.
 - **`ErrorContainer` no longer writes fixed element ids.** The `container-inner`, `header`,
   `text`, `customized-text`, `button-container`, `button` and illustration ids (`background`,
   `birds`, `baloon`, ...) are gone; the parts are styled through module classes, so two error
@@ -288,7 +286,9 @@ under _Changed_.
   portal with `usePortalBackdrop`, and a `backDrop` you pass replaces it rather than adding to it.
 - **`DropDown` closes on an outside tap on mobile devices.** The listener was registered for one
   event named `"click, touchend"`, which never fires; it now listens for `click` and `touchend`
-  separately. A menu rendered open from the start also gets its `eventTypes` listeners now.
+  separately, and ignores the tap that opened the menu, which is still bubbling when the
+  listeners are attached. A menu rendered open from the start also gets its `eventTypes`
+  listeners now.
 - **`DropDownItem`'s external-link icon is a real link.** It is now
   `<a href={externalLinkPath} target="_blank">`, focusable and named "Open <label>" (override with
   the new `externalLinkLabel`). With `onExternalLinkClick` a plain click still goes to the callback
@@ -315,7 +315,9 @@ under _Changed_.
   Tab work as in the WAI-ARIA menu button pattern. `DropDown` gains a `role` prop and applies its
   `id`; `DropDownItem` gains a `role` prop.
 - **`ContextMenuButton.onClick` fires when the menu opens**, not on the click that closes it, and
-  every prop now reaches the component (the memo compared only four). Without `getData` the
+  `onClose` fires on every close, a second click on the button and a chosen item included, so
+  the two pair up (a caller that locks scrolling in `onClick` and unlocks it in `onClose` is no
+  longer left locked). Every prop now reaches the component (the memo compared only four). Without `getData` the
   button shows `data` instead of throwing, and `onMouseOver` / `onMouseOut` fire on mouseover and
   mouseout rather than mousedown and mouseup.
 - **`ProgressBar` announces what it shows.** `percent` is clamped to 0..100 at both ends (a

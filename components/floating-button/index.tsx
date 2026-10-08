@@ -115,9 +115,11 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
 
     const isCompleted = completed;
 
-    // A number, 0 included, is a known progress; only an absent percent
-    // means "not known yet" and spins the ring.
-    const hasPercent = typeof percent === "number" && !Number.isNaN(percent);
+    // A positive number is a known progress and draws an arc. An absent
+    // percent, or 0, spins the ring: the portal starts every operation at 0
+    // and many never report a value in between, so 0 means "not known yet".
+    const hasPercent =
+      typeof percent === "number" && !Number.isNaN(percent) && percent > 0;
     const progressValue = hasPercent
       ? Math.min(100, Math.max(0, percent))
       : undefined;

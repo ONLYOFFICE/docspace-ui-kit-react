@@ -175,15 +175,23 @@ describe("FloatingButton", () => {
       expect(bar).toHaveAttribute("aria-valuenow", "100");
     });
 
-    it("draws an empty ring, not a spinner, at percent 0", () => {
+    // The portal starts every operation at percent 0 and many never report
+    // a value in between: 0 has to keep the spinner, or they look stalled.
+    it("spins the ring at percent 0, as for an unknown progress", () => {
       renderComponent(<FloatingButton {...defaultProps} percent={0} />);
       const ring = screen.getByTestId("floating-button-progress")
         .firstElementChild as HTMLElement;
-      expect(ring.style.getPropertyValue("--percent-percentage")).toBe("0%");
-      expect(screen.getByRole("progressbar")).toHaveAttribute(
+      expect(ring.style.getPropertyValue("--percent-percentage")).toBe("");
+      expect(screen.getByRole("progressbar")).not.toHaveAttribute(
         "aria-valuenow",
-        "0",
       );
+    });
+
+    it("draws an arc for the first percent above 0", () => {
+      renderComponent(<FloatingButton {...defaultProps} percent={1} />);
+      const ring = screen.getByTestId("floating-button-progress")
+        .firstElementChild as HTMLElement;
+      expect(ring.style.getPropertyValue("--percent-percentage")).toBe("1%");
     });
 
     it("gives the cancel cross a name and a real button", () => {
