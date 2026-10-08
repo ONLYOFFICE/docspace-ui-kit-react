@@ -137,16 +137,17 @@ export function ScheduledSend() {
 
 - **The time only appears once a date is chosen.** Until then the control is just the date
   button; there is no way to set a time first.
-- **The time is a display until it is clicked.** Clicking the clock swaps it for
-  [`TimePicker`](../time-picker/README.md) plus the meridiem drop-down; an outside click, Enter
-  or Tab swaps it back. The editor takes focus as soon as it opens.
+- **The time is a display until it is clicked.** Clicking the clock, or pressing Enter or Space
+  on it, swaps it for [`TimePicker`](../time-picker/README.md) plus the meridiem drop-down; an
+  outside click, Enter or Tab swaps it back. The editor takes focus as soon as it opens.
 - **Clearing the date hides the time.** The chip's cross (unless `hideCross`) empties the day,
   removes the time beside it and reports `null` to `onChange`.
 - **12-hour or 24-hour is decided by `locale`, not by a prop.** The component treats anything
   starting `en`, plus `en-GB` explicitly, as 12-hour — so a British locale gets AM/PM, and every
   other locale gets a 24-hour clock with no meridiem control.
-- **Choosing a meridiem shifts the time by twelve hours rather than setting it.** Picking AM
-  subtracts twelve and picking PM adds twelve, whichever half the value was already in.
+- **Choosing a meridiem sets that half of the day.** Picking PM for a morning time adds twelve
+  hours and picking AM for an afternoon time subtracts twelve; picking the half the time is
+  already in changes nothing and does not call `onChange`. The day never moves.
 - **`translations` is required but was missing from the exported props type** until now; it is
   read while rendering, so an object with `AM` and `PM` has to be passed.
 - **`className`, `id`, `selectDateText` and `hasError` are required by the type** even though
@@ -179,14 +180,15 @@ The parts it is built from keep their own variables, which reach them from the s
 ## Accessibility
 
 - The time display is a `<span role="button">` with `tabIndex={0}` and an `aria-label` giving
-  the current time, but no key handler — Enter and Space do not open the editor.
-- That `aria-label` always writes the time on a 24-hour clock (`Current time: 14:30`), even
-  when the display shows `02:30 PM`.
+  the current time; Enter and Space open the editor, as a click does.
+- That `aria-label` writes the time on the clock the display uses — `Current time: 02:30 PM` on
+  a 12-hour locale, `Current time: 14:30` otherwise. The words "Current time" are English and
+  not translated.
 - The time editor takes focus when it opens; Enter or Tab closes it again.
-- The "select date" button is a `role="button"` named by `selectDateText` and reports
-  `aria-expanded` while the calendar is open.
-- The date half inherits [`DatePicker`](../date-picker/README.md)'s limits: the calendar cannot
-  be operated from the keyboard.
+- The "select date" button is a `role="button"` named by `selectDateText`, opened by Enter and
+  Space, and reports `aria-expanded` while the calendar is open.
+- The date half is [`DatePicker`](../date-picker/README.md), so its keyboard support applies:
+  the calendar's days are buttons named by their full date, picked with Enter or Space.
 - `aria-invalid` is set on the wrapper from `hasError`, but no message is tied to it.
 - `aria-label` on the wrapper is `selectDateText`, which describes the button rather than the
   whole control.

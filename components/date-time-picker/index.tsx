@@ -60,6 +60,13 @@ const DateTimePicker = (props: DateTimePickerProps) => {
   );
 
   const showTimePicker = () => setIsTimeFocused(true);
+
+  const onTimeCellKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
+    if (e.key === ButtonKeys.enter || e.key === " ") {
+      e.preventDefault();
+      showTimePicker();
+    }
+  };
   const hideTimePicker = () => setIsTimeFocused(false);
 
   const handleChange = (d: DateTime | null) => {
@@ -100,9 +107,11 @@ const DateTimePicker = (props: DateTimePickerProps) => {
     setSelectedFormat(opt);
     if (!date) return;
 
-    if (opt.key === "AM") {
+    // Set the half of the day, do not toggle it: choosing the half the time
+    // is already in leaves it where it is, on the same day.
+    if (opt.key === "AM" && date.hour >= 12) {
       handleChange(subtractFromDate(date, 12, "hours"));
-    } else {
+    } else if (opt.key === "PM" && date.hour < 12) {
       handleChange(addToDate(date, 12, "hours"));
     }
   };
@@ -125,6 +134,10 @@ const DateTimePicker = (props: DateTimePickerProps) => {
 
     setIsTwelveHourFormat(is12Hour);
   }, [initialDate, locale]);
+
+  const shownTime = date
+    ? formatDate(date, isTwelveHourFormat ? "hh:mm a" : "HH:mm")
+    : "";
 
   return (
     <div
@@ -161,7 +174,6 @@ const DateTimePicker = (props: DateTimePickerProps) => {
                 tabIndex={0}
                 onBlur={hideTimePicker}
                 focusOnRender
-                aria-label="Time picker"
                 isTwelveHourFormat={isTwelveHourFormat}
                 meridiem={String(selectedFormat.key)}
               />
@@ -180,9 +192,10 @@ const DateTimePicker = (props: DateTimePickerProps) => {
                 [styles.hasError]: hasError,
               })}
               onClick={showTimePicker}
+              onKeyDown={onTimeCellKeyDown}
               data-testid="date-time-picker-time-display"
               role="button"
-              aria-label={`Current time: ${formatDate(date, "HH:mm")}`}
+              aria-label={`Current time: ${shownTime}`}
               tabIndex={0}
             >
               <ClockIcon
@@ -190,9 +203,7 @@ const DateTimePicker = (props: DateTimePickerProps) => {
                 aria-hidden="true"
                 data-testid="date-time-picker-clock-icon"
               />
-              {isTwelveHourFormat
-                ? formatDate(date, "hh:mm a")
-                : formatDate(date, "HH:mm")}
+              {shownTime}
             </span>
           )
         ) : null}
