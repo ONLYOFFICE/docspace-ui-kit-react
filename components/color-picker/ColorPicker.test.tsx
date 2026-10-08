@@ -114,17 +114,51 @@ describe("ColorPicker component", () => {
   it("has correct ARIA attributes", () => {
     render(<ColorPicker {...defaultProps} />);
 
-    const colorPicker = screen.getByTestId("color-picker");
-    expect(colorPicker).toHaveAttribute("role", "dialog");
-    expect(colorPicker).toHaveAttribute("aria-label", "Color picker");
+    // A named group, not a dialog it does not behave as.
+    const colorPicker = screen.getByRole("group", { name: "Color picker" });
+    expect(colorPicker).toBe(screen.getByTestId("color-picker"));
+    expect(screen.queryByRole("dialog")).toBeNull();
 
-    const hexInput = screen.getByTestId("color-picker-hex-input");
-    expect(hexInput).toHaveAttribute("aria-label", "Hex color value");
+    // The caption names the hex field.
+    expect(screen.getByLabelText("Hex code:")).toBe(
+      screen.getByTestId("color-picker-hex-input"),
+    );
 
-    const applyButton = screen.getByTestId("color-picker-apply");
-    expect(applyButton).toHaveAttribute("aria-label", "Apply");
+    // The buttons are named by their translated text.
+    expect(screen.getByRole("button", { name: "Apply" })).toBe(
+      screen.getByTestId("color-picker-apply"),
+    );
+    expect(screen.getByRole("button", { name: "Cancel" })).toBe(
+      screen.getByTestId("color-picker-cancel"),
+    );
+  });
 
-    const cancelButton = screen.getByTestId("color-picker-cancel");
-    expect(cancelButton).toHaveAttribute("aria-label", "Cancel");
+  it("takes translated names for the group, the field and the cross", () => {
+    render(
+      <ColorPicker
+        isPickerOnly
+        appliedColor={globalColors.lightBlueMain}
+        ariaLabel="Farbwahl"
+        closeButtonLabel="Schliessen"
+      />,
+    );
+    expect(screen.getByRole("group", { name: "Farbwahl" })).toBeInTheDocument();
+    expect(screen.getByTestId("color-picker-close")).toHaveAttribute(
+      "aria-label",
+      "Schliessen",
+    );
+
+    render(<ColorPicker {...defaultProps} hexCodeLabel="Hex-Wert" />);
+    expect(screen.getByLabelText("Hex-Wert:")).toBe(
+      screen.getAllByTestId("color-picker-hex-input")[0],
+    );
+  });
+
+  it("calls onClose on Escape", () => {
+    render(<ColorPicker {...defaultProps} onClose={mockOnClose} />);
+    fireEvent.keyDown(screen.getByTestId("color-picker-hex-input"), {
+      key: "Escape",
+    });
+    expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 });

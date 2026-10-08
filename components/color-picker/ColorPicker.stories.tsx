@@ -34,23 +34,40 @@ const meta = {
     },
     applyButtonLabel: {
       control: "text",
-      description: "Label for the apply button",
+      description:
+        "Label for the apply button; left out, the kit's translation of Apply",
       table: {
-        defaultValue: { summary: "Apply" },
+        defaultValue: { summary: 't("Common:ApplyButton")' },
       },
     },
     cancelButtonLabel: {
       control: "text",
-      description: "Label for the cancel button",
+      description:
+        "Label for the cancel button; left out, the kit's translation of Cancel",
       table: {
-        defaultValue: { summary: "Cancel" },
+        defaultValue: { summary: 't("Common:CancelButton")' },
       },
     },
     hexCodeLabel: {
       control: "text",
-      description: "Label for the hex code input field",
+      description: "Caption of the hex field, which also names the field",
       table: {
         defaultValue: { summary: "Hex code" },
+      },
+    },
+    ariaLabel: {
+      control: "text",
+      description: "Accessible name of the picker's group",
+      table: {
+        defaultValue: { summary: "Color picker" },
+      },
+    },
+    closeButtonLabel: {
+      control: "text",
+      description:
+        "Accessible name of the closing cross drawn in picker-only mode",
+      table: {
+        defaultValue: { summary: "Close color picker" },
       },
     },
     onApply: {
@@ -84,7 +101,7 @@ type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
 
 // Replaces the hex field's code; the field reports only a complete one.
 const typeHex = async ({ canvas, userEvent }: PlayContext, hex: string) => {
-  const input = canvas.getByLabelText("Hex color value");
+  const input = canvas.getByLabelText("Hex code:");
   await userEvent.clear(input);
   await userEvent.type(input, hex);
   return input;
@@ -106,9 +123,11 @@ export const Default: Story = {
   },
   play: async (context) => {
     const { args, canvas, userEvent } = context;
+    // A named group: it claims no dialog role it would not live up to.
     await expect(
-      canvas.getByRole("dialog", { name: "Color picker" }),
+      canvas.getByRole("group", { name: "Color picker" }),
     ).toBeVisible();
+    await expect(canvas.queryByRole("dialog")).toBeNull();
 
     // A complete hex code moves the picker and is reported.
     await typeHex(context, "00ff00");
@@ -121,6 +140,11 @@ export const Default: Story = {
     await expect(args.onApply).toHaveBeenCalledWith("#00ff00");
     await userEvent.click(canvas.getByRole("button", { name: "Cancel" }));
     await expect(args.onClose).toHaveBeenCalledTimes(1);
+
+    // Escape is the keyboard's cancel.
+    canvas.getByLabelText("Hex code:").focus();
+    await userEvent.keyboard("{Escape}");
+    await expect(args.onClose).toHaveBeenCalledTimes(2);
   },
   parameters: {
     docs: {
@@ -156,7 +180,7 @@ export const PickerOnly: Story = {
   play: async ({ canvas, userEvent }) => {
     // A title and a cross; no hex field and no buttons.
     await expect(canvas.getByTestId("color-picker-title")).toBeVisible();
-    await expect(canvas.queryByLabelText("Hex color value")).toBeNull();
+    await expect(canvas.queryByTestId("color-picker-hex-input")).toBeNull();
     await expect(canvas.queryByTestId("color-picker-buttons")).toBeNull();
 
     await userEvent.click(canvas.getByTestId("color-picker-close"));
@@ -199,12 +223,16 @@ export const CustomLabels: Story = {
     await expect(
       canvas.getByTestId("color-picker-hex-label"),
     ).toHaveTextContent("Color Code:");
+    // The caption is the field's name.
+    await expect(canvas.getByLabelText("Color Code:")).toBe(
+      canvas.getByTestId("color-picker-hex-input"),
+    );
   },
   parameters: {
     docs: {
       description: {
         story:
-          "The component translates none of its texts, so a caller passes its own for the buttons and the hex caption (`applyButtonLabel`, `cancelButtonLabel`, `hexCodeLabel`).",
+          "A caller replaces the button texts and the hex caption with its own (`applyButtonLabel`, `cancelButtonLabel`, `hexCodeLabel`). Left out, the buttons take the kit's translations of Apply and Cancel, while the caption, the group name and the cross's name are English defaults to override; the caption also names the hex field.",
       },
       source: {
         code: `<ColorPicker
@@ -286,7 +314,7 @@ export const PresetColor: Story = {
   render: () => <PresetColorTemplate />,
   play: async ({ canvas }) => {
     // The hex field opens on the saved color.
-    const input = canvas.getByLabelText("Hex color value") as HTMLInputElement;
+    const input = canvas.getByLabelText("Hex code:") as HTMLInputElement;
     await expect(input.value.toLowerCase()).toBe("#ff0000");
   },
   parameters: {
@@ -405,7 +433,7 @@ const CssCustomizationTemplate = () => {
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvas }) => {
-    const input = getComputedStyle(canvas.getByLabelText("Hex color value"));
+    const input = getComputedStyle(canvas.getByLabelText("Hex code:"));
     await expect(input.borderTopColor).toBe("rgb(0, 130, 201)");
     await expect(input.backgroundColor).toBe("rgb(240, 248, 255)");
     await expect(input.height).toBe("36px");

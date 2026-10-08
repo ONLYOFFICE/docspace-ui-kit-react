@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { HexColorPicker, HexColorInput } from "react-colorful";
 import classNames from "classnames";
 
@@ -19,14 +19,29 @@ const ColorPicker = ({
   onClose = () => {},
   onApply = () => {},
   appliedColor = globalColors.lightBlueMain,
-  applyButtonLabel = "Apply",
-  cancelButtonLabel = "Cancel",
+  applyButtonLabel,
+  cancelButtonLabel,
   isPickerOnly = false,
   handleChange,
   hexCodeLabel = "Hex code",
+  ariaLabel = "Color picker",
+  closeButtonLabel = "Close color picker",
 }: ColorPickerProps) => {
   const t = useCommonTranslation();
   const [color, setColor] = useState(() => appliedColor);
+  const hexInputId = useId();
+
+  const applyLabel = applyButtonLabel ?? t("ApplyButton");
+  const cancelLabel = cancelButtonLabel ?? t("CancelButton");
+
+  // Escape is the keyboard's cancel: the same notification as the cancel
+  // button and the cross.
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      onClose();
+    }
+  };
 
   const onColorChange = (newColor: string) => {
     setColor(newColor);
@@ -38,8 +53,9 @@ const ColorPicker = ({
       className={classNames(styles.wrapper, className)}
       id={id}
       data-testid="color-picker"
-      role="dialog"
-      aria-label="Color picker"
+      role="group"
+      aria-label={ariaLabel}
+      onKeyDown={onKeyDown}
     >
       {isPickerOnly ? (
         <div className={styles.hexHeader}>
@@ -62,7 +78,7 @@ const ColorPicker = ({
               iconNode={<CrossIconSvg />}
               isFill
               data-testid="color-picker-close"
-              aria-label="Close color picker"
+              aria-label={closeButtonLabel}
             />
           </div>
         </div>
@@ -81,18 +97,20 @@ const ColorPicker = ({
             data-testid="color-picker-hex-container"
           >
             <Text
+              as="label"
+              htmlFor={hexInputId}
               className={styles.hexValueLabel}
               data-testid="color-picker-hex-label"
             >
               {hexCodeLabel}:
             </Text>
             <HexColorInput
+              id={hexInputId}
               prefixed
               color={color}
               onChange={onColorChange}
               className={styles.hexValue}
               data-testid="color-picker-hex-input"
-              aria-label="Hex color value"
               spellCheck="false"
             />
           </div>
@@ -105,19 +123,17 @@ const ColorPicker = ({
               primary
               scale
               size={ButtonSize.small}
-              label={applyButtonLabel}
+              label={applyLabel}
               onClick={() => onApply(color)}
               testId="color-picker-apply"
-              aria-label={applyButtonLabel}
             />
             <Button
               className={styles.cancelButton}
               scale
               size={ButtonSize.small}
-              label={cancelButtonLabel}
+              label={cancelLabel}
               onClick={onClose}
               testId="color-picker-cancel"
-              aria-label={cancelButtonLabel}
             />
           </div>
         ) : null}
