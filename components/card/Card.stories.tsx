@@ -72,6 +72,13 @@ export const Default: Story = {
       canvas.getByText("Card body content goes here."),
     ).toBeVisible();
     await expect(card.querySelector("footer")).toBeNull();
+    // A string title is the card's heading, an h3 by default.
+    await expect(
+      canvas.getByRole("heading", { level: 3, name: "Card title" }),
+    ).toBeVisible();
+    // The section scopes the header, so it is not a page banner landmark.
+    // (Testing Library's role queries ignore that scoping, so check the tag.)
+    await expect(card.tagName).toBe("SECTION");
   },
   parameters: {
     docs: {
@@ -229,6 +236,8 @@ export const FullExample: Story = {
     const card = canvas.getByTestId("card");
     const tags = Array.from(card.children).map((child) => child.tagName);
     await expect(tags).toEqual(["HEADER", "DIV", "FOOTER"]);
+    // Inside the card's section neither is a page landmark.
+    await expect(card.tagName).toBe("SECTION");
     await expect(
       canvas.getByRole("button", { name: "Open settings" }).closest("footer"),
     ).not.toBeNull();
