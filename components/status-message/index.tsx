@@ -1,4 +1,6 @@
 import React from "react";
+import classNames from "classnames";
+
 import DangerToastReactSvg from "../../assets/danger.toast.react.svg";
 
 import { IconSizeType } from "../../utils/common-icons-style";
@@ -7,95 +9,129 @@ import { Text } from "../text";
 
 import type { StatusMessageProps } from "./StatusMessage.types";
 
+type Shown = {
+  message: string | React.ReactNode;
+  isWarning: boolean;
+};
+
+// The fade is 0.3s. If its transitionend never arrives (the change came
+// before the browser started the transition, an ancestor is display: none,
+// animations are off) the swap happens on this timer instead.
+const FADE_FALLBACK_MS = 400;
+
 const StatusMessage: React.FC<StatusMessageProps> = ({
   message,
   isWarning,
 }) => {
+  const initial: Shown | null = message
+    ? { message, isWarning: !!isWarning }
+    : null;
+
+  // What is on screen. The ref mirrors the state for the effects below.
+  const [shown, setShown] = React.useState<Shown | null>(initial);
+  const shownRef = React.useRef<Shown | null>(initial);
   const [isVisible, setIsVisible] = React.useState(true);
 
-  const [isShowComponent, setIsShowComponent] = React.useState(!!message);
-  const messageRef = React.useRef<HTMLDivElement>(null);
-  const prevMessageRef = React.useRef<string | React.ReactNode | undefined>(
-    message,
+  // What replaces it once the fade-out ends; undefined while nothing is
+  // waiting, null when the bar is to be removed.
+  const pendingRef = React.useRef<Shown | null | undefined>(undefined);
+  const timerRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
   );
-  const prevIsWarningRef = React.useRef<boolean | undefined>(isWarning);
-  const shouldShowAfterAnimationRef = React.useRef(false);
+  const messageRef = React.useRef<HTMLDivElement>(null);
+
+  const commit = React.useCallback((next: Shown | null) => {
+    shownRef.current = next;
+    setShown(next);
+  }, []);
+
+  const finishFade = React.useCallback(() => {
+    if (pendingRef.current === undefined) return;
+
+    const next = pendingRef.current;
+    pendingRef.current = undefined;
+    clearTimeout(timerRef.current);
+    timerRef.current = undefined;
+
+    commit(next);
+    setIsVisible(true);
+  }, [commit]);
 
   React.useEffect(() => {
-    if (prevMessageRef.current) {
-      if (!message || prevMessageRef.current !== message) {
-        setIsVisible(false);
-        shouldShowAfterAnimationRef.current = true;
-        return;
-      }
+    const current = shownRef.current;
+    const next: Shown | null = message
+      ? { message, isWarning: !!isWarning }
+      : null;
 
-      if (!shouldShowAfterAnimationRef.current) {
+    // Nothing on screen, or the same text as on screen: no fade is needed,
+    // and a fade in flight is called off. A change of isWarning alone lands
+    // here and repaints at once.
+    if (!current || (next && next.message === current.message)) {
+      pendingRef.current = undefined;
+      clearTimeout(timerRef.current);
+      timerRef.current = undefined;
+
+      if (next) {
+        commit(next);
         setIsVisible(true);
-        prevMessageRef.current = message;
-        prevIsWarningRef.current = isWarning;
+      } else if (current) {
+        commit(null);
       }
-
       return;
     }
 
-    prevMessageRef.current = message;
-    prevIsWarningRef.current = isWarning;
-    if (!message) return;
+    // A different text, or none: fade the current one out first. Further
+    // changes during the fade only replace what comes after it.
+    pendingRef.current = next;
+    setIsVisible(false);
 
-    setIsShowComponent(true);
-    setIsVisible(true);
-  }, [message, isWarning]);
+    if (timerRef.current === undefined) {
+      timerRef.current = setTimeout(finishFade, FADE_FALLBACK_MS);
+    }
+  }, [message, isWarning, commit, finishFade]);
+
+  React.useEffect(
+    () => () => {
+      clearTimeout(timerRef.current);
+    },
+    [],
+  );
+
+  const isMounted = shown !== null;
 
   React.useEffect(() => {
     const element = messageRef.current;
     if (!element) return;
 
-    const handleEnd = () => {
-      const resetStates = () => {
-        shouldShowAfterAnimationRef.current = false;
-        prevMessageRef.current = message;
-        prevIsWarningRef.current = isWarning;
-      };
-
-      if (!message) {
-        setIsShowComponent(false);
-        resetStates();
-        return;
-      }
-
-      if (shouldShowAfterAnimationRef.current && prevMessageRef.current) {
-        setIsShowComponent(true);
-        setIsVisible(true);
-        resetStates();
-        return;
-      }
-
-      if (!prevMessageRef.current) {
-        setIsShowComponent(false);
-      }
-    };
-
-    element.addEventListener("animationend", handleEnd);
-    element.addEventListener("transitionend", handleEnd);
+    element.addEventListener("animationend", finishFade);
+    element.addEventListener("transitionend", finishFade);
 
     return () => {
-      element.removeEventListener("animationend", handleEnd);
-      element.removeEventListener("transitionend", handleEnd);
+      element.removeEventListener("animationend", finishFade);
+      element.removeEventListener("transitionend", finishFade);
     };
-  }, [message]);
+  }, [isMounted, finishFade]);
 
-  if (!isShowComponent) return null;
+  if (!shown) return null;
 
   return (
     <div
       ref={messageRef}
-      className={`${styles.body} ${!isVisible ? styles.hide : ""} ${prevIsWarningRef.current ? styles.warning : ""}`}
+      // An error interrupts; a warning waits for a pause.
+      role={shown.isWarning ? "status" : "alert"}
+      aria-atomic="true"
+      className={classNames(styles.body, {
+        [styles.hide]: !isVisible,
+        [styles.warning]: shown.isWarning,
+      })}
+      data-testid="status-message"
     >
       <DangerToastReactSvg
         className={styles.dangerToastIcon}
         data-size={IconSizeType.medium}
+        aria-hidden="true"
       />
-      <Text>{prevMessageRef.current}</Text>
+      <Text>{shown.message}</Text>
     </div>
   );
 };

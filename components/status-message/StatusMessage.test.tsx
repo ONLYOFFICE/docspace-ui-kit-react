@@ -254,4 +254,60 @@ describe("<StatusMessage />", () => {
       );
     });
   });
+
+  describe("Without transition events", () => {
+    it("swaps the text on its own when transitionend never comes", async () => {
+      const { rerender } = renderComponent({ message: "First" });
+
+      rerender(<StatusMessage message="Second" />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Second")).toBeInTheDocument();
+      });
+      const bar = screen.getByText("Second").parentElement;
+      expect(bar?.classList.contains(styles.hide)).toBeFalsy();
+    });
+
+    it("removes the bar when a new text is cleared before any transition", async () => {
+      const { rerender, container } = renderComponent({ message: "First" });
+
+      // A new text and an empty one in neighbouring updates: no fade ever
+      // starts, so no transitionend fires.
+      rerender(<StatusMessage message="Second" />);
+      rerender(<StatusMessage message="" />);
+
+      await waitFor(() => {
+        expect(container.firstChild).toBeNull();
+      });
+    });
+  });
+
+  describe("Accessibility and isWarning", () => {
+    it("is an alert for an error and a status for a warning", () => {
+      const { rerender } = renderComponent({ message: "Failed" });
+      expect(screen.getByRole("alert")).toHaveTextContent("Failed");
+
+      rerender(<StatusMessage message="Failed" isWarning />);
+      expect(screen.getByRole("status")).toHaveTextContent("Failed");
+    });
+
+    it("repaints when only isWarning changes", () => {
+      const { rerender } = renderComponent({ message: "Same text" });
+      const bar = screen.getByText("Same text").parentElement;
+      expect(bar?.classList.contains(styles.warning)).toBeFalsy();
+
+      rerender(<StatusMessage message="Same text" isWarning />);
+      expect(bar?.classList.contains(styles.warning)).toBeTruthy();
+      expect(bar?.classList.contains(styles.hide)).toBeFalsy();
+    });
+
+    it("calls off the fade when the text returns to the one on screen", () => {
+      const { rerender } = renderComponent({ message: "A" });
+      rerender(<StatusMessage message="B" />);
+      rerender(<StatusMessage message="A" />);
+
+      const bar = screen.getByText("A").parentElement;
+      expect(bar?.classList.contains(styles.hide)).toBeFalsy();
+    });
+  });
 });

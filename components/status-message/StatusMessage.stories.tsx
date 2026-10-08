@@ -50,12 +50,16 @@ export const Default: Story = {
     const text = await canvas.findByText("This is a status message");
     await waitFor(() => expect(text).toBeVisible());
     await expect(barOf(text).className).not.toMatch(/warning/);
+    // An error is an alert: it is announced as soon as it appears.
+    await expect(canvas.getByRole("alert")).toHaveTextContent(
+      "This is a status message",
+    );
   },
   parameters: {
     docs: {
       description: {
         story:
-          "The error bar as a form shows it after a failed action. Type a new text in the Controls panel below to watch the old one fade out first; the warning switch there takes effect with the next text change (`isWarning`).",
+          "The error bar as a form shows it after a failed action. Type a new text in the Controls panel below to watch the old one fade out first; the warning switch there repaints the bar at once (`isWarning`).",
       },
       source: {
         code: `<StatusMessage message="This is a status message" />`,
@@ -120,6 +124,10 @@ export const WarningMessage: Story = {
   play: async ({ canvas }) => {
     const text = await canvas.findByText("This is a warning message");
     await expect(barOf(text).className).toMatch(/warning/);
+    // A warning is a polite status rather than an alert.
+    await expect(canvas.getByRole("status")).toHaveTextContent(
+      "This is a warning message",
+    );
   },
   parameters: {
     docs: {
@@ -187,12 +195,10 @@ export const MessageSwap: Story = {
       { timeout: 3000 },
     );
     await expect(canvas.queryByText("First message")).toBeNull();
-    // Let the new text finish fading in: the bar is removed on the end of
-    // its fade-out, which never comes if the fade-in had not started.
-    await waitFor(() =>
-      expect(getComputedStyle(barOf(second)).opacity).toBe("1"),
-    );
+    await expect(barOf(second)).toBeInTheDocument();
 
+    // Cleared straight away, before the new text has faded in: the bar is
+    // still removed, even though no fade-out transition ever runs.
     await userEvent.click(canvas.getByRole("button", { name: "Clear" }));
     await waitFor(
       () => expect(canvas.queryByText("Second message")).toBeNull(),
@@ -212,6 +218,56 @@ export const MessageSwap: Story = {
 <Button label="Message A" onClick={() => setMessage("First message")} />
 <Button label="Message B" onClick={() => setMessage("Second message")} />
 <Button label="Clear" onClick={() => setMessage("")} />`,
+      },
+    },
+  },
+};
+
+const QuickChangeTemplate = () => {
+  const [message, setMessage] = useState("Saving failed");
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <StatusMessage message={message} />
+      <Button
+        label="New text, then clear"
+        size={ButtonSize.small}
+        onClick={() => {
+          setMessage("Retrying");
+          requestAnimationFrame(() => setMessage(""));
+        }}
+      />
+    </div>
+  );
+};
+
+export const QuickChange: Story = {
+  render: () => <QuickChangeTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await canvas.findByText("Saving failed");
+
+    // A new text and an empty one in neighbouring frames: the browser never
+    // starts the fade, so no transitionend fires, and the bar still goes.
+    await userEvent.click(
+      canvas.getByRole("button", { name: "New text, then clear" }),
+    );
+    await waitFor(
+      () => {
+        expect(canvas.queryByText("Saving failed")).toBeNull();
+        expect(canvas.queryByText("Retrying")).toBeNull();
+      },
+      { timeout: 3000 },
+    );
+    await expect(canvas.queryByRole("alert")).toBeNull();
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Changes faster than the fade: **New text, then clear** sets a new message and an empty one in the next frame. The bar fades out and is removed rather than staying behind invisible.",
+      },
+      source: {
+        code: `setMessage("Retrying");
+requestAnimationFrame(() => setMessage(""));`,
       },
     },
   },
