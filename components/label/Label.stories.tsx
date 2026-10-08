@@ -31,7 +31,7 @@ const meta = {
     isRequired: {
       control: "boolean",
       description:
-        "Appends a red asterisk to the text and sets `aria-required` on the label; the field itself still needs `required`",
+        "Appends a red asterisk, hidden from screen readers, to the text; the field itself needs `required`",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -39,7 +39,7 @@ const meta = {
     error: {
       control: "boolean",
       description:
-        "Turns the text red and sets `aria-invalid` on the label; the error message is not part of this component",
+        "Turns the text red; the field itself needs `aria-invalid`, and the error message is not part of this component",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -241,6 +241,11 @@ export const RequiredLabels: Story = {
     await expect(marks).toHaveLength(3);
     await expect(marks[0]).toHaveTextContent("*");
     await expect(marks[0]).toHaveAttribute("aria-hidden", "true");
+    // ARIA allows neither state on a <label>; the label states none.
+    for (const label of canvas.getAllByTestId("label")) {
+      await expect(label).not.toHaveAttribute("aria-required");
+      await expect(label).not.toHaveAttribute("aria-invalid");
+    }
   },
   parameters: {
     docs: {

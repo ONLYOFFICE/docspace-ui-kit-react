@@ -2,15 +2,15 @@ import type React from "react";
 
 export type LabelProps = {
   /**
-   * Appends a red asterisk to the text and sets `aria-required` on the label.
-   * It does not mark the field itself — put `required` on your input too.
+   * Appends a red asterisk, hidden from assistive technology, to the text. It
+   * does not mark the field itself — put `required` on your input too.
    * @default false
    */
   isRequired?: boolean;
 
   /**
-   * Turns the text red and sets `aria-invalid` on the label. The error message
-   * is not part of this component.
+   * Turns the text red. It does not mark the field itself — put `aria-invalid`
+   * on your input. The error message is not part of this component.
    * @default false
    */
   error?: boolean;

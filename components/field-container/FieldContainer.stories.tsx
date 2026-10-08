@@ -230,9 +230,14 @@ export const Default: Story = {
 export const Required: Story = {
   render: Template,
   play: async ({ canvas }) => {
-    // The asterisk after the caption. The label also carries aria-required,
-    // which ARIA does not allow on a label, so it is not checked here.
+    // The asterisk after the caption, hidden from screen readers; the input
+    // itself is what is announced as required.
     await expect(canvas.getByTestId("required-mark")).toHaveTextContent("*");
+    const input = canvas.getByLabelText(/Email:/);
+    await expect(input).toHaveAttribute("aria-required", "true");
+    await expect(canvas.getByTestId("label")).not.toHaveAttribute(
+      "aria-required",
+    );
   },
   args: {
     ...Default.args,
@@ -245,7 +250,7 @@ export const Required: Story = {
     docs: {
       description: {
         story:
-          "Marks a field the form cannot be sent without: an asterisk follows the caption, and the label is announced as required (`isRequired`).",
+          "Marks a field the form cannot be sent without: an asterisk follows the caption, and the input gets `aria-required`, so it is announced as required (`isRequired`).",
       },
       source: {
         code: `<FieldContainer
@@ -265,6 +270,10 @@ export const WithError: Story = {
   render: Template,
   play: async ({ canvas }) => {
     await expect(canvas.getByText("This field is required")).toBeVisible();
+    // The input is the invalid one, and the message describes it.
+    const input = canvas.getByLabelText(/Username:/);
+    await expect(input).toHaveAttribute("aria-invalid", "true");
+    await expect(input).toHaveAccessibleDescription("This field is required");
   },
   args: {
     ...Default.args,

@@ -22,6 +22,13 @@ describe("Label Component", () => {
     expect(label).toHaveTextContent("*");
   });
 
+  it("puts no aria-required or aria-invalid on the label", () => {
+    render(<Label {...baseProps} isRequired error />);
+    const label = screen.getByTestId("label");
+    expect(label).not.toHaveAttribute("aria-required");
+    expect(label).not.toHaveAttribute("aria-invalid");
+  });
+
   it("applies error styles when error prop is true", () => {
     render(<Label {...baseProps} error />);
     const label = screen.getByTestId("label");

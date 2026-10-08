@@ -38,8 +38,6 @@ const Label = (props: LabelProps) => {
       data-truncate={truncate}
       data-inline={isInline}
       data-error={error}
-      aria-required={isRequired}
-      aria-invalid={error}
     >
       {text}{" "}
       {isRequired ? (

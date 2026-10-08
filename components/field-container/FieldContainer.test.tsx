@@ -30,10 +30,44 @@ describe("<FieldContainer />", () => {
     expect(screen.getByText("Test Label:")).toBeInTheDocument();
   });
 
-  it("renders with required attribute", () => {
-    render(<FieldContainer {...defaultProps} isRequired />);
+  it("marks the control, not the label, as required and invalid", () => {
+    const { rerender } = render(
+      <FieldContainer
+        {...defaultProps}
+        labelFor="field"
+        isRequired
+        hasError
+        errorMessage="Fill this in"
+      >
+        <input id="field" />
+      </FieldContainer>,
+    );
     const label = screen.getByText("Test Label:");
-    expect(label).toHaveAttribute("aria-required", "true");
+    const input = screen.getByRole("textbox");
+    expect(label).not.toHaveAttribute("aria-required");
+    expect(input).toHaveAttribute("aria-required", "true");
+    expect(input).toHaveAttribute("aria-invalid", "true");
+    expect(input).toHaveAccessibleDescription("Fill this in");
+
+    rerender(
+      <FieldContainer {...defaultProps} labelFor="field">
+        <input id="field" />
+      </FieldContainer>,
+    );
+    expect(input).not.toHaveAttribute("aria-required");
+    expect(input).not.toHaveAttribute("aria-invalid");
+    expect(input).not.toHaveAttribute("aria-describedby");
+  });
+
+  it("leaves a state the control already sets alone", () => {
+    render(
+      <FieldContainer {...defaultProps} isRequired hasError>
+        <input aria-invalid="false" required />
+      </FieldContainer>,
+    );
+    const input = screen.getByRole("textbox");
+    expect(input).toHaveAttribute("aria-invalid", "false");
+    expect(input).toHaveAttribute("aria-required", "true");
   });
 
   it("applies custom className", () => {
