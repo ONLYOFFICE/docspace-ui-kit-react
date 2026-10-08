@@ -178,7 +178,7 @@ export const SmallCircle: Story = {
     docs: {
       description: {
         story:
-          "A square with half its width as the corner radius turns into a circle (`borderRadius`), for an avatar placeholder that keeps the SSR-safe ids `CircleSkeleton` lacks.",
+          "A square with half its width as the corner radius turns into a circle (`borderRadius`), for an avatar placeholder drawn with the same API as the rectangles around it.",
       },
       source: {
         code: `<RectangleSkeleton width="40px" height="40px" borderRadius="50%" />`,

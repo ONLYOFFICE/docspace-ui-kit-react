@@ -70,7 +70,7 @@ export type TagType = {
   icon?: string | React.FC<React.SVGProps<SVGSVGElement>>;
   /** Passed back through `onSelectTag`. */
   providerType?: number;
-  /** Ignored by `Tags`, which wires every tag to `onSelectTag` instead. */
+  /** Called by `Tags` when this tag is clicked, instead of `onSelectTag`. */
   onClick?: () => void;
   /** Marks the tag as the overflow or create trigger. `Tags` sets this itself. */
   isOptionTag?: boolean;
