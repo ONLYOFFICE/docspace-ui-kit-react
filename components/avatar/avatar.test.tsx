@@ -131,7 +131,9 @@ describe("<Avatar />", () => {
           isNotIcon
         />,
       );
-      expect(screen.getByRole("img")).toBeInTheDocument();
+      // With no userName the picture has an empty alt and is decorative.
+      const img = screen.getByTestId("avatar").querySelector("img");
+      expect(img).toHaveAttribute("alt", "");
     });
   });
 
@@ -443,6 +445,99 @@ describe("Avatar utilities", () => {
       const svg = container.querySelector("svg");
       expect(svg).toBeInTheDocument();
       expect(svg).toHaveAttribute("data-size", IconSizeType.scale);
+    });
+  });
+
+  describe("accessibility", () => {
+    it("is not a button when nothing is clickable", () => {
+      render(<Avatar {...baseProps} />);
+      const avatar = screen.getByTestId("avatar");
+      expect(avatar).not.toHaveAttribute("role");
+      expect(avatar).not.toHaveAttribute("tabindex");
+    });
+
+    it("is a named, focusable button with onClick, and Enter clicks it", () => {
+      const onClick = vi.fn();
+      render(<Avatar {...baseProps} userName="Jane Doe" onClick={onClick} />);
+      const avatar = screen.getByRole("button", { name: "Jane Doe" });
+      expect(avatar).toHaveAttribute("tabindex", "0");
+
+      fireEvent.keyDown(avatar, { key: "Enter" });
+      fireEvent.keyDown(avatar, { key: " " });
+      expect(onClick).toHaveBeenCalledTimes(2);
+    });
+
+    it("is a button when it is editable", () => {
+      render(<Avatar {...baseProps} onChangeFile={vi.fn()} />);
+      expect(screen.getByTestId("avatar")).toHaveAttribute("role", "button");
+    });
+
+    it("is not a button when editable but noClick is set", () => {
+      render(<Avatar {...baseProps} onChangeFile={vi.fn()} noClick />);
+      expect(screen.getByTestId("avatar")).not.toHaveAttribute("role");
+    });
+
+    it("names the picture after the user", () => {
+      render(
+        <Avatar
+          {...baseProps}
+          source="https://example.com/a.jpg"
+          userName="Jane Doe"
+        />,
+      );
+      expect(screen.getByRole("img", { name: "Jane Doe" })).toBeInTheDocument();
+    });
+
+    it("keeps the tooltip id stable across renders", () => {
+      const props = {
+        ...baseProps,
+        role: AvatarRole.admin,
+        withTooltip: true,
+        tooltipContent: "Admin",
+      };
+      const { container, rerender } = render(<Avatar {...props} />);
+      const badge = () =>
+        container.querySelector(".avatar_role-wrapper") as HTMLElement;
+      const first = badge().getAttribute("data-tooltip-id");
+
+      rerender(<Avatar {...props} tooltipContent="Administrator" />);
+      expect(first).toMatch(/^roleTooltip_/);
+      expect(badge().getAttribute("data-tooltip-id")).toBe(first);
+    });
+
+    it("gives every file input an id of its own", () => {
+      render(
+        <>
+          <Avatar {...baseProps} onChangeFile={vi.fn()} />
+          <Avatar {...baseProps} onChangeFile={vi.fn()} />
+        </>,
+      );
+      const [first, second] = screen.getAllByTestId("file-input");
+      expect(first.id).not.toBe("customAvatarInput");
+      expect(first.id).not.toBe(second.id);
+    });
+  });
+
+  describe("svg detection", () => {
+    it.each([
+      "/photos/photo.svg.png",
+      "/photo?file=x.svg",
+      "/a.png#b.svg",
+      "data:image/svg+xml;base64,PHN2Zy8+",
+    ])("draws %s as a picture", (source) => {
+      render(<Avatar {...baseProps} source={source} userName="" />);
+      const avatar = screen.getByTestId("avatar");
+      expect(avatar.querySelector("img")).toHaveAttribute("src", source);
+      expect(avatar.querySelector(".icon")).toBeNull();
+    });
+
+    it("draws a path ending in .svg as an icon, whatever its query", () => {
+      render(
+        <Avatar {...baseProps} source="/icons/user.svg?v=2" userName="" />,
+      );
+      const avatar = screen.getByTestId("avatar");
+      expect(avatar.querySelector("img")).toBeNull();
+      expect(avatar.querySelector(".icon")).toBeInTheDocument();
     });
   });
 });

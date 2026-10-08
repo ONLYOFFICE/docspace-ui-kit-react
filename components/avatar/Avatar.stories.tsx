@@ -2,7 +2,6 @@ import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, screen, waitFor } from "storybook/test";
 
-import AtReactSvgUrl from "../../assets/@.react.svg?url";
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 
 import {
@@ -278,7 +277,15 @@ export const WithImage: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     const avatar = canvas.getByTestId("avatar");
-    await expect(canvas.getByRole("img", { name: "avatar" })).toBeVisible();
+    // The picture is named after the person, not the word "avatar", and
+    // so is the clickable avatar around it.
+    await expect(avatar.querySelector("img")).toHaveAttribute(
+      "alt",
+      "John Smith",
+    );
+    await expect(
+      canvas.getByRole("button", { name: "John Smith" }),
+    ).toBeVisible();
     // The admin badge opens its tooltip on hover.
     const badge = badgeOf(avatar) as HTMLElement;
     await userEvent.hover(badge);
@@ -344,10 +351,10 @@ export const WithIcon: Story = {
   args: {
     size: AvatarSize.max,
     role: AvatarRole.user,
-    // The avatar treats a source as an icon when the string contains
-    // ".svg"; Vite inlines this small file as a data URL, which does not, so
-    // the fragment gives it one without changing the image.
-    source: `${AtReactSvgUrl}#icon.svg`,
+    // A URL whose path ends in ".svg" is drawn as an icon. Storybook serves
+    // assets/ under /static; an imported URL would not do, since Vite may
+    // inline a small file as a data: URL, which is always a picture.
+    source: "/static/@.react.svg",
     userName: "",
     editing: false,
     hideRoleIcon: false,
@@ -445,6 +452,8 @@ const AllRolesTemplate = () => {
 export const AllRoles: Story = {
   render: () => <AllRolesTemplate />,
   play: async ({ canvas }) => {
+    // Nothing here is clickable, so no avatar claims to be a button.
+    await expect(canvas.queryAllByRole("button")).toHaveLength(0);
     // Only Owner and Admin draw a badge.
     const withBadge = canvas
       .getAllByTestId("avatar")
@@ -583,13 +592,29 @@ export const EditingWithAvatar: Story = {
     onChangeFile: fn(),
   },
   play: async ({ canvas, userEvent }) => {
-    // With a picture, the pencil opens the menu of model actions.
-    await userEvent.click(canvas.getByTestId("edit_avatar_icon_button"));
-    await waitFor(() =>
-      expect(screen.getByText("Upload picture")).toBeVisible(),
-    );
+    const isMenuOpen = () =>
+      screen
+        .queryAllByText("Upload picture")
+        .some((item) => item.checkVisibility());
+
+    // With a picture, the pencil toggles the menu of model actions: one
+    // click opens it, the next closes it.
+    const pencil = canvas.getByTestId("edit_avatar_icon_button");
+    await userEvent.click(pencil);
+    await waitFor(() => expect(isMenuOpen()).toBe(true));
+    await userEvent.click(pencil);
+    await waitFor(() => expect(isMenuOpen()).toBe(false));
+
+    // The avatar itself is a named button: Enter opens the same menu.
+    const avatar = canvas.getByRole("button", { name: "Jane Smith" });
+    avatar.focus();
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(isMenuOpen()).toBe(true));
+
+    // Picking an entry runs it and closes the menu, which stays closed.
     await userEvent.click(screen.getByText("Delete picture"));
     await expect(editModel[1].onClick).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(isMenuOpen()).toBe(false));
   },
   parameters: {
     docs: {
