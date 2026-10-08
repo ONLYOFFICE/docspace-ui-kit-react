@@ -76,10 +76,17 @@ const customServers: Record<string, Record<string, unknown>> = clone(
 );
 const disabledTools: Record<string, string[]> = {};
 const allowAlways: string[] = [];
-const preferences: { deepMode: boolean | null; reasoningLevel: string } = {
+const preferences: {
+  deepMode: boolean | null;
+  reasoningLevel: string;
+  toolPermissionMode: string;
+} = {
   deepMode: null,
   reasoningLevel: "off",
+  // The library's own default (DEFAULT_TOOL_PERMISSION_MODE).
+  toolPermissionMode: "auto",
 };
+const TOOL_PERMISSION_MODES = ["ask", "auto", "allow"];
 let webSearch: Record<string, unknown> | null = null;
 
 const { threads, messages } = seedChatHistory();
@@ -373,6 +380,11 @@ const READS: Record<string, Read> = {
   "preferences/get-deep-mode": () => preferences.deepMode ?? false,
   "preferences/is-deep-mode-set": () => preferences.deepMode !== null,
   "preferences/get-reasoning-level": () => preferences.reasoningLevel,
+  "preferences/get-tool-permission-mode": () => preferences.toolPermissionMode,
+
+  // The rooms with an .ai folder the composer's context picker offers: the
+  // demo portal has none, so the picker is empty and no room skills are read.
+  "context/get-context-folders": () => [],
 
   "prompts/list": () => [],
   "prompts/list-folders": () => [],
@@ -499,6 +511,12 @@ const WRITES: Record<string, Write> = {
   },
   "preferences/set-reasoning-level": ([value]) => {
     preferences.reasoningLevel = String(value ?? "off");
+    return success;
+  },
+  "preferences/set-tool-permission-mode": ([value]) => {
+    if (TOOL_PERMISSION_MODES.includes(String(value))) {
+      preferences.toolPermissionMode = String(value);
+    }
     return success;
   },
 
