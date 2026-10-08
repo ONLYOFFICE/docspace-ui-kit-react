@@ -39,6 +39,30 @@ describe("<Slider />", () => {
     expect(slider).toHaveAttribute("step", "5");
   });
 
+  it("passes the ARIA naming and value text onto the input", () => {
+    render(
+      <>
+        <Slider
+          {...defaultProps}
+          aria-labelledby="volume-label"
+          aria-describedby="volume-hint"
+          aria-valuetext="40 percent"
+        />
+        <span id="volume-label">Volume</span>
+        <span id="volume-hint">Applies to every room</span>
+      </>,
+    );
+    const slider = screen.getByRole("slider");
+    expect(slider).toHaveAccessibleName("Volume");
+    expect(slider).toHaveAccessibleDescription("Applies to every room");
+    expect(slider).toHaveAttribute("aria-valuetext", "40 percent");
+  });
+
+  it("takes aria-label as its name", () => {
+    render(<Slider {...defaultProps} aria-label="Zoom" />);
+    expect(screen.getByRole("slider", { name: "Zoom" })).toBeInTheDocument();
+  });
+
   it("handles value changes correctly", () => {
     render(<Slider {...defaultProps} />);
 

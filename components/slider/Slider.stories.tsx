@@ -146,10 +146,16 @@ export const Default: Story = {
     isDisabled: false,
     withPouring: true,
     onChange: fn(),
+    "aria-label": "Volume",
+    "aria-valuetext": "50 percent",
   },
   play: async ({ args, canvas, userEvent }) => {
     const slider = canvas.getByRole("slider");
     await expect(slider).toHaveValue("50");
+    // The ARIA props reach the input: the slider has a name with no
+    // wrapping <label>, and says what its number means.
+    await expect(slider).toHaveAccessibleName("Volume");
+    await expect(slider).toHaveAttribute("aria-valuetext", "50 percent");
 
     await userEvent.tab();
     await expect(slider).toHaveFocus();
@@ -165,7 +171,15 @@ export const Default: Story = {
           "A 0–100 slider with the track filled up to the handle (`withPouring`), the usual choice for a setting such as volume or zoom; drag the handle or change any other prop live in the Controls panel below.",
       },
       source: {
-        code: `<Slider min={0} max={100} value={50} withPouring onChange={handleChange} />`,
+        code: `<Slider
+  min={0}
+  max={100}
+  value={50}
+  withPouring
+  aria-label="Volume"
+  aria-valuetext="50 percent"
+  onChange={handleChange}
+/>`,
       },
     },
   },
