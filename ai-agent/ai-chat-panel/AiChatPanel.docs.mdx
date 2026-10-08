@@ -68,10 +68,12 @@ what is attached.
 
 <Story of={AiChatPanelStories.WithSuggestions} />
 
-### A fixed model, not shown
+### A fixed model
 
-`hideProfilePicker` removes the picker and its label altogether, for a chat that always talks
-to one assistant.
+`hideProfilePicker` locks the picker, for a chat that always talks to one assistant. Despite the
+name it does not remove it: `@onlyoffice/ai-chat` (0.6.0 on) keeps a locked picker on screen,
+because its menu also carries the reasoning Effort row. The menu then holds the current model as
+an inert row and Effort under it -- no other model and no picker actions.
 
 <Story of={AiChatPanelStories.WithoutModelPicker} />
 

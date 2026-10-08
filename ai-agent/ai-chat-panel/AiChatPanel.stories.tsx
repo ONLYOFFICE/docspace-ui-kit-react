@@ -279,16 +279,30 @@ export const WithSuggestions: Story = {
 };
 
 export const WithoutModelPicker: Story = {
-  play: async () => {
+  play: async ({ userEvent }) => {
     await expect(await composer()).toBeEnabled();
     await expect(screen.getByText(NOTE)).toBeVisible();
+
+    // @onlyoffice/ai-chat (0.6.0 on) locks the picker rather than removing
+    // it, because its menu also carries the Effort row: the current model is
+    // still named, and the menu offers no other model.
+    const picker = await waitFor(() => screen.getByTestId("model-selector"), {
+      timeout: 5000,
+    });
+    await waitFor(() => expect(picker).toHaveTextContent("Demo assistant"));
+    await userEvent.click(picker);
+    await waitFor(() =>
+      expect(screen.getAllByText("Demo assistant").length).toBeGreaterThan(1),
+    );
+    await expect(screen.queryByText("Demo writer")).toBeNull();
+    await userEvent.keyboard("{Escape}");
   },
   parameters: {
     ...withChat({ hideProfilePicker: true }),
     docs: {
       description: {
         story:
-          "The host fixes the model and shows nothing about it: `hideProfilePicker` removes the picker entirely, label included. For an embedded chat that always talks to one assistant.",
+          "The host fixes the model: `hideProfilePicker` locks the picker. It still names the current model and keeps the Effort row, but offers no other model and no picker actions. `@onlyoffice/ai-chat` has rendered it this way since 0.6.0; there is no option that removes it.",
       },
       source: {
         code: `<AiAgentProviders locale="en" isAvailable hideProfilePicker>
