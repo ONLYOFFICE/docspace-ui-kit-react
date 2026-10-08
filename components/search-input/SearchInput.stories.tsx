@@ -255,8 +255,8 @@ const iconBlock = (field: HTMLElement) =>
 
 const box = (element: Element) => element.getBoundingClientRect();
 
-// The main button is a div (MainButton), wrapped with the plus icon in the
-// element that takes the click; found by the text it shows.
+// The main button (MainButton) is wrapped with the plus icon in the element
+// that takes the click; found by the text it shows.
 const mainButton = (
   canvas: { getByText: (text: string) => HTMLElement },
   text: string,
