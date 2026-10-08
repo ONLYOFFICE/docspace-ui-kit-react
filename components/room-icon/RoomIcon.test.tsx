@@ -168,4 +168,78 @@ describe("<RoomIcon />", () => {
     const roomIcon = screen.getByTestId("room-icon");
     expect(roomIcon).toHaveAttribute("data-is-template", "true");
   });
+
+  describe("logo menu", () => {
+    const isOpen = () =>
+      /open/.test(screen.getByTestId("dropdown").className ?? "");
+
+    it("opens on the pencil and closes on a second click", () => {
+      render(<RoomIcon {...baseProps} withEditing model={mockModel} />);
+      const pencil = screen.getByTestId("icon-button");
+
+      fireEvent.click(pencil);
+      expect(isOpen()).toBe(true);
+
+      fireEvent.click(pencil);
+      expect(isOpen()).toBe(false);
+    });
+
+    it("closes when an entry is picked, without reopening", () => {
+      render(<RoomIcon {...baseProps} withEditing model={mockModel} />);
+      fireEvent.click(screen.getByTestId("room-icon"));
+      expect(isOpen()).toBe(true);
+
+      fireEvent.click(screen.getByText("Remove"));
+      expect(mockModel[1].onClick).toHaveBeenCalledTimes(1);
+      expect(isOpen()).toBe(false);
+    });
+
+    it("does not open without entries", () => {
+      render(<RoomIcon {...baseProps} withEditing model={[]} />);
+      fireEvent.click(screen.getByTestId("room-icon"));
+      expect(isOpen()).toBe(false);
+    });
+  });
+
+  it("gives every file input an id of its own", () => {
+    render(
+      <>
+        <RoomIcon {...baseProps} withEditing onChangeFile={vi.fn()} />
+        <RoomIcon {...baseProps} withEditing onChangeFile={vi.fn()} />
+      </>,
+    );
+    const [first, second] = screen.getAllByTestId("customFileInput");
+    expect(first.id).not.toBe("customFileInput");
+    expect(first.id).not.toBe(second.id);
+  });
+
+  it("marks a colourless logo that failed to load as a wrong image", async () => {
+    const OriginalImage = window.Image;
+    class FailingImage {
+      onerror: (() => void) | null = null;
+      set src(_value: string) {
+        setTimeout(() => this.onerror?.(), 0);
+      }
+    }
+    window.Image = FailingImage as unknown as typeof Image;
+
+    try {
+      render(
+        <RoomIcon
+          title="Broken"
+          color="4781D1"
+          logo={{ medium: "broken.png" } as never}
+        />,
+      );
+      await vi.waitFor(() =>
+        expect(screen.getByTestId("room-icon")).toHaveAttribute(
+          "data-is-wrong-image",
+          "true",
+        ),
+      );
+      expect(screen.getByTestId("room-title")).toHaveTextContent("B");
+    } finally {
+      window.Image = OriginalImage;
+    }
+  });
 });

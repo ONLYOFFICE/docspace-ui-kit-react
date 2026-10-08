@@ -99,7 +99,7 @@ const meta = {
       // The icons are data URIs too long to edit, and they stretch the table.
       control: false,
       description:
-        "Entries of the logo menu, each with a label, an icon and a click handler; the upload entry is handed the hidden file input",
+        "Entries of the logo menu, each with a label, an icon and a click handler; the upload entry is handed the hidden file input. With none, no menu opens",
     },
     dropDownManualX: {
       control: "text",
@@ -135,7 +135,7 @@ const meta = {
     onBadgeClick: {
       action: "onBadgeClick",
       description:
-        "Called when the badge is clicked; the click also reaches the tile and toggles the logo menu",
+        "Called when the badge is clicked; the click also reaches the tile and toggles the logo menu, when the tile has one",
     },
     tooltipContent: {
       control: "text",
@@ -326,11 +326,18 @@ export const WithEditing: Story = {
   play: async ({ canvas, userEvent }: PlayContext) => {
     const icon = canvas.getByTestId("room-icon");
     await expect(icon).toHaveAttribute("data-has-editing", "true");
-    // The pencil opens the logo menu; picking an entry runs it and closes.
-    await userEvent.click(
-      icon.querySelector(".open-edit-logo-icon") as HTMLElement,
-    );
+    // The pencil toggles the logo menu: one click opens it, the next
+    // closes it - the tile does not count the same click twice.
+    const pencil = icon.querySelector(".open-edit-logo-icon") as HTMLElement;
+    await userEvent.click(pencil);
     await waitFor(() => expect(screen.getByText("Upload")).toBeVisible());
+    await userEvent.click(pencil);
+    await waitFor(() => expect(isMenuOpen()).toBe(false));
+
+    // A click on the tile opens it too; picking an entry runs it and
+    // closes the menu, which stays closed.
+    await userEvent.click(icon);
+    await waitFor(() => expect(isMenuOpen()).toBe(true));
     await userEvent.click(screen.getByText("Edit"));
     await expect(mockModel[1].onClick).toHaveBeenCalledTimes(1);
     await waitFor(() => expect(isMenuOpen()).toBe(false));

@@ -40,7 +40,7 @@ type RoomIconExpansion = {
   hoverSrc?: string;
   /** Adds the pencil button and the menu it opens. It also makes the tile 64px wide at the least. */
   withEditing?: boolean;
-  /** Called with the change event of the hidden file input. Passing it is what renders that input at all. */
+  /** Called with the change event of the hidden file input. Passing it is what renders that input at all; its id is generated per instance. */
   onChangeFile?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   /** Draws a dashed empty frame with a camera glyph and a plus button, for a room that has no logo yet.
    * It replaces every other content, including the initials. */
@@ -48,7 +48,7 @@ type RoomIconExpansion = {
   /** Horizontal offset of the logo menu.
    * @default "-10px" */
   dropDownManualX?: string;
-  /** Entries of the logo menu. Without it the menu opens empty. */
+  /** Entries of the logo menu. Without any, clicking the tile, the pencil or the plus opens nothing. */
   model?: TModel[];
   /** The room's logo: a URL, or the portal's logo object. An object with a `cover` is inlined as a base64 SVG and recoloured; otherwise `medium` is used as a URL. */
   logo?: TLogo | string;
@@ -84,7 +84,7 @@ type RoomIconBadge = {
   badgeIconNode?: React.ReactNode;
   /** Keeps the glyph's own colours instead of filling it with the tile's background colour. */
   badgeIconColor?: string;
-  /** Called when the badge is clicked. The click also reaches the tile, which toggles the logo menu. */
+  /** Called when the badge is clicked. The click also reaches the tile, which toggles the logo menu when the tile has one. */
   onBadgeClick?: () => void;
 };
 
@@ -95,7 +95,7 @@ type RoomIconNonBadge = {
   badgeIconNode?: undefined;
   /** Keeps the glyph's own colours instead of filling it with the tile's background colour. */
   badgeIconColor?: undefined;
-  /** Called when the badge is clicked. The click also reaches the tile, which toggles the logo menu. */
+  /** Called when the badge is clicked. The click also reaches the tile, which toggles the logo menu when the tile has one. */
   onBadgeClick?: undefined;
 };
 
