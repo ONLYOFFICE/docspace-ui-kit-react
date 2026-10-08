@@ -10,12 +10,14 @@ import { cssTransition, ToastContainer } from "react-toastify";
 import classNames from "classnames";
 
 import { Portal } from "../portal";
+import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 
 import type { ToastProps } from "./Toast.types";
 import styles from "./Toast.module.scss";
 import { useMobileViewport } from "./hooks/useMobileViewport";
 import { getToastClassName } from "./utils/getToastClassName";
 import { useIsServer } from "./hooks/useIsServer";
+import { CloseButton } from "./sub-components/CloseButton";
 
 const Slide = cssTransition({
   enter: "SlideIn",
@@ -46,63 +48,76 @@ const setInstances = (update: () => void) => {
   listeners.forEach((listener) => listener());
 };
 
-const Toast = React.memo(({ className, style, isSSR }: ToastProps) => {
-  const isServer = useIsServer();
-  const offset = useMobileViewport();
+const Toast = React.memo(
+  ({ className, style, isSSR, closeButtonLabel = "Close" }: ToastProps) => {
+    const isServer = useIsServer();
+    const offset = useMobileViewport();
+    const { isRTL } = useInterfaceDirection();
 
-  const [instance] = useState(() => Symbol("Toast"));
-  const owner = useSyncExternalStore(subscribe, getOwner, () => undefined);
+    const [instance] = useState(() => Symbol("Toast"));
+    const owner = useSyncExternalStore(subscribe, getOwner, () => undefined);
 
-  // A layout effect, so a lone Toast mounts its container before the first
-  // paint rather than one effect pass later.
-  useLayoutEffect(() => {
-    setInstances(() => instances.push(instance));
+    // A layout effect, so a lone Toast mounts its container before the first
+    // paint rather than one effect pass later.
+    useLayoutEffect(() => {
+      setInstances(() => instances.push(instance));
 
-    return () =>
-      setInstances(() => instances.splice(instances.indexOf(instance), 1));
-  }, [instance]);
+      return () =>
+        setInstances(() => instances.splice(instances.indexOf(instance), 1));
+    }, [instance]);
 
-  useEffect(() => {
-    const root = document.documentElement;
+    useEffect(() => {
+      const root = document.documentElement;
 
-    root.style.setProperty("--toast-top-offset", `${offset}px`);
-  }, [offset]);
+      root.style.setProperty("--toast-top-offset", `${offset}px`);
+    }, [offset]);
 
-  const handleToastClick = React.useCallback(() => {
-    const toasts = document.getElementsByClassName("Toastify__toast");
-    Array.from(toasts).forEach((toast) => {
-      (toast as HTMLElement).style.setProperty("position", "static");
-    });
-  }, []);
+    const handleToastClick = React.useCallback(() => {
+      const toasts = document.getElementsByClassName("Toastify__toast");
+      Array.from(toasts).forEach((toast) => {
+        (toast as HTMLElement).style.setProperty("position", "static");
+      });
+    }, []);
 
-  if (isServer && isSSR) return null;
-  if (owner !== instance) return null;
+    const renderCloseButton = React.useCallback(
+      ({
+        closeToast,
+      }: {
+        closeToast: (e: React.MouseEvent<HTMLElement>) => void;
+      }) => <CloseButton closeToast={closeToast} label={closeButtonLabel} />,
+      [closeButtonLabel],
+    );
 
-  const element = (
-    <ToastContainer
-      containerId="toast-container"
-      className={classNames(className, styles.toast)}
-      draggable
-      position="top-right"
-      toastClassName={getToastClassName}
-      rtl
-      hideProgressBar
-      newestOnTop
-      pauseOnFocusLoss={false}
-      style={style}
-      icon={false}
-      transition={Slide}
-      onClick={handleToastClick}
-      data-testid="toast"
-    />
-  );
+    if (isServer && isSSR) return null;
+    if (owner !== instance) return null;
 
-  const rootElement = document?.getElementById("root");
+    const element = (
+      <ToastContainer
+        containerId="toast-container"
+        className={classNames(className, styles.toast)}
+        draggable
+        position="top-right"
+        toastClassName={getToastClassName}
+        rtl={isRTL}
+        closeButton={renderCloseButton}
+        hideProgressBar
+        newestOnTop
+        pauseOnFocusLoss={false}
+        style={style}
+        icon={false}
+        transition={Slide}
+        onClick={handleToastClick}
+        data-testid="toast"
+      />
+    );
 
-  return (
-    <Portal element={element} appendTo={rootElement || undefined} visible />
-  );
-});
+    const rootElement = document?.getElementById("root");
+
+    return (
+      <Portal element={element} appendTo={rootElement || undefined} visible />
+    );
+  },
+);
 
 Toast.displayName = "Toast";
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { screen, act, render } from "@testing-library/react";
+import { screen, act, render, fireEvent } from "@testing-library/react";
+import { InterfaceDirectionProvider } from "../../context/InterfaceDirectionContext";
 import { Toast } from ".";
 import { toastr } from "./sub-components/Toastr";
 
@@ -211,5 +212,90 @@ describe("<Toast />", () => {
       }),
     ).not.toThrow();
     expect(screen.getAllByText("After a remount")).toHaveLength(1);
+  });
+
+  it("gives every toast a named close button, also without withCross", () => {
+    render(<Toast />);
+
+    act(() => {
+      toastr.success("No cross", "Title", 0);
+    });
+
+    // The button is there for the keyboard even when the toast closes on click.
+    const close = screen.getByRole("button", { name: "Close" });
+    expect(close).toHaveAttribute("type", "button");
+
+    const toast = close.closest(".Toastify__toast");
+    expect(toast).toHaveAttribute("data-in", "true");
+
+    act(() => {
+      fireEvent.click(close);
+    });
+
+    // The toast starts its exit transition.
+    expect(toast).toHaveAttribute("data-in", "false");
+  });
+
+  it("takes the close button's name from closeButtonLabel", () => {
+    render(<Toast closeButtonLabel="Dismiss" />);
+
+    act(() => {
+      toastr.info("Named", "Title", 0, true);
+    });
+
+    expect(screen.getByRole("button", { name: "Dismiss" })).toBeInTheDocument();
+  });
+
+  it("follows the interface direction instead of always being rtl", () => {
+    const { unmount } = render(<Toast />);
+
+    act(() => {
+      toastr.info("Direction", "Title", 0);
+    });
+
+    expect(
+      document.querySelector(".Toastify__toast-container--rtl"),
+    ).toBeNull();
+    act(() => {
+      toastr.clear();
+      vi.runAllTimers();
+    });
+    unmount();
+
+    render(
+      <InterfaceDirectionProvider interfaceDirection="rtl">
+        <Toast />
+      </InterfaceDirectionProvider>,
+    );
+
+    act(() => {
+      toastr.info("Direction", "Title", 0);
+    });
+
+    expect(
+      document.querySelector(".Toastify__toast-container--rtl"),
+    ).not.toBeNull();
+  });
+
+  it("shows a number as text", () => {
+    render(<Toast />);
+
+    act(() => {
+      toastr.error(404 as unknown as string);
+    });
+
+    expect(screen.getByText("404")).toBeInTheDocument();
+  });
+
+  it("falls back to the English default title without translations", () => {
+    render(<Toast />);
+
+    act(() => {
+      toastr.success("Saved");
+      toastr.warning("Careful");
+    });
+
+    expect(screen.getByText("Done")).toBeInTheDocument();
+    expect(screen.getByText("Alert")).toBeInTheDocument();
   });
 });

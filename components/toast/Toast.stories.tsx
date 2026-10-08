@@ -1,7 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, screen, waitFor } from "storybook/test";
+import { expect, screen, waitFor, within } from "storybook/test";
 
 import { Toast, ToastType, toastr } from ".";
 import { Button, ButtonSize } from "../button";
@@ -107,6 +107,12 @@ const playType =
     const toast = await openToast(context, message);
     await expect(toast).toHaveAttribute("data-type", type);
     await expect(toast).toHaveTextContent(title);
+
+    // Without withCross the close button is there for the keyboard only:
+    // named, but visually hidden until it is focused.
+    const card = toast.closest(".Toastify__toast") as HTMLElement;
+    const close = within(card).getByRole("button", { name: "Close" });
+    await expect(close.getBoundingClientRect().width).toBeLessThanOrEqual(1);
 
     await context.userEvent.click(toast);
     await waitFor(() => expect(screen.queryByText(message)).toBeNull());
@@ -389,20 +395,59 @@ export const WithCloseButton: Story = {
     await new Promise((resolve) => setTimeout(resolve, 300));
     await expect(screen.getByText(message)).toBeVisible();
 
-    const cross = toast
-      .closest(".Toastify__toast")
-      ?.querySelector(".closeButton") as HTMLElement;
-    await context.userEvent.click(cross);
+    // The cross is a named button, closed here from the keyboard.
+    const cross = within(
+      toast.closest(".Toastify__toast") as HTMLElement,
+    ).getByRole("button", { name: "Close" });
+    await expect(cross).toBeVisible();
+    cross.focus();
+    await context.userEvent.keyboard("{Enter}");
     await waitFor(() => expect(screen.queryByText(message)).toBeNull());
   },
   parameters: {
     docs: {
       description: {
         story:
-          "For a message the user must read before it goes: the toast stays until its cross is clicked (`timeout` 0, `withCross`), and a click on the toast itself no longer closes it.",
+          "For a message the user must read before it goes: the toast stays until its cross is clicked or pressed (`timeout` 0, `withCross`), and a click on the toast itself no longer closes it.",
       },
       source: {
         code: `toastr.success("Click the close button to dismiss", "Dismissible Toast", 0, true);`,
+      },
+    },
+  },
+};
+
+export const KeyboardDismiss: Story = {
+  render: () => (
+    <TriggerTemplate
+      label="Show Toast"
+      onClick={() => toastr.info("Closes from the keyboard too", "Info", 0)}
+    />
+  ),
+  play: async (context) => {
+    const message = "Closes from the keyboard too";
+    const toast = await openToast(context, message);
+    const close = within(
+      toast.closest(".Toastify__toast") as HTMLElement,
+    ).getByRole("button", { name: "Close" });
+
+    // Hidden from sight until it has keyboard focus, then drawn as the cross.
+    await expect(close.getBoundingClientRect().width).toBeLessThanOrEqual(1);
+    await context.userEvent.tab();
+    await expect(close).toHaveFocus();
+    await expect(close.getBoundingClientRect().width).toBeGreaterThan(1);
+
+    await context.userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(screen.queryByText(message)).toBeNull());
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A toast with no cross and no timeout (`timeout` 0) still closes from the keyboard: Tab reaches its close button, which appears as the cross while it has focus, and Enter closes the toast. A mouse closes it by clicking anywhere on it.",
+      },
+      source: {
+        code: `toastr.info("Closes from the keyboard too", "Info", 0);`,
       },
     },
   },
