@@ -3,6 +3,7 @@ import React from "react";
 import { Text } from "../text";
 
 import styles from "./ProgressBar.module.scss";
+import { clampPercent } from "./ProgressBar.utils";
 
 import type { ProgressBarProps } from "./ProgressBar.types";
 
@@ -16,7 +17,7 @@ const ProgressBar = ({
   style,
   ...rest
 }: ProgressBarProps) => {
-  const progressPercent = percent > 100 ? 100 : percent;
+  const progressPercent = clampPercent(percent);
 
   return (
     <div className={styles.container} style={style}>
@@ -34,9 +35,12 @@ const ProgressBar = ({
         className={`${styles.progressBar} ${className || ""}`}
         data-testid="progress-bar"
         role="progressbar"
-        aria-valuenow={progressPercent}
+        // An indeterminate progress bar has no current value: leaving
+        // aria-valuenow out is what tells assistive technology so.
+        aria-valuenow={isInfiniteProgress ? undefined : progressPercent}
         aria-valuemin={0}
         aria-valuemax={100}
+        aria-busy={isInfiniteProgress || undefined}
         aria-label={label}
         data-status={status || undefined}
         data-error={error || undefined}
@@ -55,16 +59,38 @@ const ProgressBar = ({
           />
         )}
       </div>
-      {status || error ? (
+      {/* Always mounted, so a status that appears or changes later is
+          announced: a live region inserted together with its text is not. */}
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        data-testid="progress-bar-status"
+      >
+        {status && !error ? (
+          <Text
+            className={styles.statusText}
+            fontSize="12px"
+            fontWeight="400"
+            lineHeight="16px"
+            as="p"
+            title={status}
+          >
+            {status}
+          </Text>
+        ) : null}
+      </div>
+      {error ? (
         <Text
-          className={error ? styles.statusError : styles.statusText}
+          className={styles.statusError}
           fontSize="12px"
           fontWeight="400"
           lineHeight="16px"
           as="p"
-          title={error || status}
+          title={error}
+          role="alert"
         >
-          {error || status}
+          {error}
         </Text>
       ) : null}
     </div>

@@ -94,6 +94,10 @@ export const WithStatus: Story = {
   },
   play: async ({ canvas }) => {
     await expect(canvas.getByText("3 of 4 files processed")).toBeVisible();
+    // The status line is announced: it sits in a polite live region.
+    await expect(canvas.getByRole("status")).toHaveTextContent(
+      "3 of 4 files processed",
+    );
   },
   parameters: {
     docs: {
@@ -117,6 +121,10 @@ export const WithError: Story = {
   },
   play: async ({ canvas }) => {
     await expect(canvas.getByText("Network connection error")).toBeVisible();
+    // The error is an alert, announced as soon as it appears.
+    await expect(canvas.getByRole("alert")).toHaveTextContent(
+      "Network connection error",
+    );
     // The bar stays where the operation stopped.
     await expect(canvas.getByRole("progressbar")).toHaveAttribute(
       "aria-valuenow",
@@ -147,12 +155,16 @@ export const InfiniteProgress: Story = {
     // The sliding strip replaces the fill.
     await expect(canvas.getByTestId("progress-bar-animation")).toBeVisible();
     await expect(canvas.queryByTestId("progress-bar-percent")).toBeNull();
+    // The bar is indeterminate: no value is reported, and it is busy.
+    const bar = canvas.getByRole("progressbar", { name: "Please wait..." });
+    await expect(bar).not.toHaveAttribute("aria-valuenow");
+    await expect(bar).toHaveAttribute("aria-busy", "true");
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Use it when the operation cannot report how far it has got: a short strip slides across the track until the bar is removed (`isInfiniteProgress`).",
+          "Use it when the operation cannot report how far it has got: a short strip slides across the track until the bar is removed, and the bar is announced as busy with no value (`isInfiniteProgress`).",
       },
       source: {
         code: `<ProgressBar percent={0} label="Please wait..." isInfiniteProgress />`,
@@ -191,6 +203,41 @@ export const Complete: Story = {
   },
 };
 
+export const OutOfRange: Story = {
+  render: (args) => (
+    <>
+      <ProgressBar {...args} percent={-20} label="Below the range" />
+      <ProgressBar {...args} percent={140} label="Above the range" />
+    </>
+  ),
+  args: {
+    percent: 0,
+  },
+  play: async ({ canvas }) => {
+    // Both ends are clamped: the reported value and the fill agree.
+    const below = canvas.getByRole("progressbar", { name: "Below the range" });
+    await expect(below).toHaveAttribute("aria-valuenow", "0");
+    await expect(
+      within(below).getByTestId("progress-bar-percent").style.width,
+    ).toBe("0%");
+    const above = canvas.getByRole("progressbar", { name: "Above the range" });
+    await expect(above).toHaveAttribute("aria-valuenow", "100");
+  },
+  parameters: {
+    controls: { disable: true },
+    docs: {
+      description: {
+        story:
+          "`percent` is clamped to 0..100 at both ends: a negative value draws an empty bar and reports 0, a value over 100 fills it and reports 100.",
+      },
+      source: {
+        code: `<ProgressBar percent={-20} label="Below the range" />
+<ProgressBar percent={140} label="Above the range" />`,
+      },
+    },
+  },
+};
+
 type PreparationStory = StoryObj<
   ComponentProps<typeof PreparationPortalProgress>
 >;
@@ -204,6 +251,11 @@ export const PreparationPortal: PreparationStory = {
   play: async ({ canvas }) => {
     await expect(canvas.getByText("75 %")).toBeVisible();
     await expect(canvas.getByText("Setting things up...")).toBeVisible();
+    // The caption names the bar, and percent is its reported value.
+    const bar = canvas.getByRole("progressbar", {
+      name: "Setting things up...",
+    });
+    await expect(bar).toHaveAttribute("aria-valuenow", "75");
   },
   parameters: {
     controls: { include: ["percent", "text", "className"] },
