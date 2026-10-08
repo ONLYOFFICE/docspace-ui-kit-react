@@ -1,4 +1,4 @@
-import type { MouseEventHandler } from "react";
+import type { KeyboardEventHandler, MouseEventHandler } from "react";
 import { useTranslation } from "react-i18next";
 import classNames from "classnames";
 
@@ -57,6 +57,21 @@ const RoomType = ({
     onClick?.(e);
   };
 
+  // The interactive layouts are buttons: Enter and Space click them, so the
+  // handler still receives the mouse event it is typed for.
+  const handleKeyDown: KeyboardEventHandler<HTMLElement> = (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    if (e.target !== e.currentTarget) return;
+    e.preventDefault();
+    e.currentTarget.click();
+  };
+
+  const buttonProps = {
+    role: "button",
+    tabIndex: 0,
+    onKeyDown: handleKeyDown,
+  } as const;
+
   const arrowClassName =
     type === "dropdownButton"
       ? "choose_room-forward_btn dropdown-button"
@@ -103,6 +118,7 @@ const RoomType = ({
       id={id}
       title={disabled ? "" : room.title}
       onClick={handleClick}
+      {...buttonProps}
       aria-disabled={disabled || undefined}
       data-tooltip-id={disabled ? "create-room-tooltip" : undefined}
       data-testid="room-type-list-item"
@@ -116,6 +132,8 @@ const RoomType = ({
       id={id}
       title={room.title}
       onClick={onClick}
+      {...buttonProps}
+      aria-expanded={isOpen}
       className={classNames(styles.roomType, styles.dropDownButton, {
         [styles.isOpen]: isOpen,
       })}
@@ -130,6 +148,7 @@ const RoomType = ({
       id={id}
       title={disabled ? "" : room.title}
       onClick={handleClick}
+      {...buttonProps}
       aria-disabled={disabled || undefined}
       data-selected-id={selectedId}
       data-tooltip-id={disabled ? "create-room-tooltip" : undefined}

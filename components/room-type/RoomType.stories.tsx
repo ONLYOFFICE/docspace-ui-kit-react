@@ -127,9 +127,15 @@ export const Default: Story = {
     // One call per click, on the arrow as anywhere else in the row.
     await userEvent.click(arrowOf(row));
     await expect(args.onClick).toHaveBeenCalledTimes(1);
-    // Neither the row nor the arrow is a tab stop.
-    await expect(row).not.toHaveAttribute("tabindex");
+    // The row is the one tab stop - the arrow inside is not - and Enter
+    // or Space activates it.
+    await expect(row).toHaveAttribute("role", "button");
     await expect(row.querySelector("[tabindex]")).toBeNull();
+    row.focus();
+    await expect(row).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" ");
+    await expect(args.onClick).toHaveBeenCalledTimes(3);
   },
   parameters: {
     docs: {
@@ -162,8 +168,12 @@ export const DropdownButton: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const button = canvas.getByTestId("room-type-dropdown-button");
     await expect(button.className).toMatch(/isOpen/);
+    await expect(button).toHaveAttribute("aria-expanded", "true");
     await userEvent.click(button);
     await expect(args.onClick).toHaveBeenCalledTimes(1);
+    button.focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
   },
   parameters: {
     docs: {
@@ -194,8 +204,12 @@ export const DropdownItem: Story = {
     onClick: fn(),
   },
   play: async ({ args, canvas, userEvent }) => {
-    await userEvent.click(canvas.getByTestId("room-type-dropdown-item"));
+    const entry = canvas.getByTestId("room-type-dropdown-item");
+    await userEvent.click(entry);
     await expect(args.onClick).toHaveBeenCalledTimes(1);
+    entry.focus();
+    await userEvent.keyboard(" ");
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
   },
   parameters: {
     docs: {
@@ -311,9 +325,13 @@ export const DisabledState: Story = {
     for (const row of [card, entry]) {
       await expect(row).toHaveAttribute("aria-disabled", "true");
     }
-    // Shown, but neither calls onClick.
+    // Shown and still focusable, but neither calls onClick, by pointer or
+    // by key.
     await userEvent.click(card);
     await userEvent.click(entry);
+    card.focus();
+    await expect(card).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
     await expect(args.onClick).not.toHaveBeenCalled();
   },
   parameters: {

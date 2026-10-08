@@ -64,6 +64,53 @@ describe("<RoomType />", () => {
 
       expect(onClick).toHaveBeenCalledTimes(1);
     });
+
+    it("is a focusable button that Enter and Space activate", () => {
+      const onClick = vi.fn();
+      render(
+        <RoomType
+          {...baseProps}
+          type={type}
+          roomType={RoomsType.CustomRoom}
+          onClick={onClick}
+        />,
+      );
+
+      const root = screen.getByTestId(testId);
+      expect(root).toHaveAttribute("role", "button");
+      expect(root).toHaveAttribute("tabindex", "0");
+      expect(root.querySelector("[tabindex]")).toBeNull();
+
+      fireEvent.keyDown(root, { key: "Enter" });
+      fireEvent.keyDown(root, { key: " " });
+      fireEvent.keyDown(root, { key: "a" });
+
+      expect(onClick).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  it("tells whether the dropdown button is open", () => {
+    const { rerender } = render(
+      <RoomType
+        {...baseProps}
+        type="dropdownButton"
+        roomType={RoomsType.CustomRoom}
+        onClick={vi.fn()}
+      />,
+    );
+    const button = screen.getByTestId("room-type-dropdown-button");
+    expect(button).toHaveAttribute("aria-expanded", "false");
+
+    rerender(
+      <RoomType
+        {...baseProps}
+        isOpen
+        type="dropdownButton"
+        roomType={RoomsType.CustomRoom}
+        onClick={vi.fn()}
+      />,
+    );
+    expect(button).toHaveAttribute("aria-expanded", "true");
   });
 
   describe("disabled", () => {
@@ -85,8 +132,11 @@ describe("<RoomType />", () => {
       const root = screen.getByTestId(testId);
       fireEvent.click(root);
       fireEvent.click(getArrow(root));
+      fireEvent.keyDown(root, { key: "Enter" });
 
       expect(onClick).not.toHaveBeenCalled();
+      // Still on the tab order, so the reason it is disabled can be found.
+      expect(root).toHaveAttribute("tabindex", "0");
       expect(root).toHaveAttribute("aria-disabled", "true");
       expect(root).toHaveAttribute("data-tooltip-id", "create-room-tooltip");
     });

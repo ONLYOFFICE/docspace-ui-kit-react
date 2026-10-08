@@ -13,7 +13,7 @@ export type RoomTypeProps = {
   id?: string;
   /** Written to `data-selected-id` and read by nothing else. Required all the same. */
   selectedId: string | number;
-  /** Called with the event when the row is clicked, once per click wherever inside the row it lands. A disabled row does not call it at all. */
+  /** Called with the event when the row is clicked, once per click wherever inside the row it lands, and when Enter or Space is pressed on it (as a click). A disabled row does not call it at all. */
   onClick: React.MouseEventHandler<HTMLElement>;
   /** Greys the row out while `roomType` is `FormRoom`, marks it `aria-disabled` and stops it calling `onClick`. */
   disabledFormRoom?: boolean;
