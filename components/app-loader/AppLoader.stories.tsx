@@ -29,6 +29,10 @@ export const Default: Story = {
     await expect(box.width).toBe(window.innerWidth);
     await expect(box.height).toBe(window.innerHeight);
     await expect(sheet.firstElementChild).toBeVisible();
+    // The wait is announced: the inner loader is a status region.
+    await expect(canvas.getByRole("status")).toHaveTextContent(
+      "Loading content, please wait.",
+    );
   },
   parameters: {
     docs: {
