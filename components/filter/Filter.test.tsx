@@ -121,6 +121,58 @@ describe("Filter Component", () => {
       expect(onClearFilter).toHaveBeenCalled();
       expect(setClearSearch).toHaveBeenCalledWith(false);
     });
+
+    it("does not let a stale query the host applies late overwrite a newer edit", async () => {
+      const user = userEvent.setup();
+      const onSearch = vi.fn();
+      const { rerender } = renderComponent({ onSearch });
+      const field = screen.getByPlaceholderText(
+        "Search...",
+      ) as HTMLInputElement;
+
+      await user.type(field, "budget");
+      await vi.waitFor(() => expect(onSearch).toHaveBeenCalledWith("budget"), {
+        timeout: 3000,
+      });
+      // The user clears the field before the host has applied "budget".
+      await user.clear(field);
+      await vi.waitFor(() => expect(onSearch).toHaveBeenLastCalledWith(""), {
+        timeout: 3000,
+      });
+
+      // Now the host catches up with the older query...
+      rerender(
+        <Filter
+          {...baseProps}
+          onSearch={onSearch}
+          getSelectedInputValue={() => "budget"}
+        />,
+      );
+      // ...which must not come back into the field, nor be searched again.
+      expect(field.value).toBe("");
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      expect(onSearch).toHaveBeenLastCalledWith("");
+
+      // A new identity returning the same value brings nothing new either.
+      rerender(
+        <Filter
+          {...baseProps}
+          onSearch={onSearch}
+          getSelectedInputValue={() => "budget"}
+        />,
+      );
+      expect(field.value).toBe("");
+
+      // A value the user never sent is the host's own, and is shown.
+      rerender(
+        <Filter
+          {...baseProps}
+          onSearch={onSearch}
+          getSelectedInputValue={() => "external"}
+        />,
+      );
+      expect(field.value).toBe("external");
+    }, 10000);
   });
 });
 

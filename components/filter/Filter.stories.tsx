@@ -272,7 +272,7 @@ const meta = {
     onSearch: {
       action: "onSearch",
       description:
-        "Called with the search string itself on every keystroke, and with an empty string when the cross in the box is clicked",
+        "Called with the search string itself once typing pauses for a second, and with an empty string when the cross in the box is clicked",
     },
     onClearFilter: {
       action: "onClearFilter",
@@ -291,7 +291,7 @@ const meta = {
     getSelectedInputValue: {
       control: false,
       description:
-        "Returns the text the search box shows; give it a stable identity, because the component focuses the field each time the function changes",
+        "Returns the text the search box shows, read each time the function changes; a value it returned before, or a query the user has already replaced, leaves the field alone",
     },
     initSearchValue: {
       control: "text",

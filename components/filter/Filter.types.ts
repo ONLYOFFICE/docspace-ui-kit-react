@@ -213,7 +213,7 @@ export type SortButtonProps = {
 };
 
 export type SearchInputProps = {
-  /** Called with the search string on every keystroke — the string itself, not an event. The component keeps no value of its own beyond the caret. */
+  /** Called with the search string — the string itself, not an event — once typing pauses for a second, and with `""` when the cross clears the box. */
   onSearch: (value: string) => void;
   /** Called when the search box is cleared through `clearSearch`. */
   onClearFilter: () => void;
@@ -223,7 +223,7 @@ export type SearchInputProps = {
   /** Called with `false` once a requested clear has been carried out. */
   setClearSearch: (value: boolean) => void;
 
-  /** Returns the text the search box should show. **Give it a stable identity**: the effect that reads it also focuses the field, so a new function on every render keeps stealing focus. */
+  /** Returns the text the search box should show; it is read whenever its identity changes. A value equal to the last one read, or a query the user has already replaced, leaves the field alone; any other value is put in the field, which is focused when the value is not empty. */
   getSelectedInputValue: () => string;
 
   /** Placeholder of the search box. Nothing translates it for you. */
