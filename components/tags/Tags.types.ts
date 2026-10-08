@@ -12,20 +12,24 @@ export type TagsProps = {
   columnCount: number;
   /** Applied to the outermost element as inline style. */
   style?: React.CSSProperties;
-  /** Called with `{ label, roomType, providerType }` when a tag, or an entry of the overflow drop-down, is clicked. */
+  /** Called with `{ label, roomType, providerType }` when a tag, or an entry of the overflow drop-down, is clicked or activated with Enter or Space. A tag with its own `TagType.onClick` calls that instead. */
   onSelectTag: (tag: TagClickEvent) => void;
   /** Called when the pointer enters any tag. It is not told which one. */
   onMouseEnter?: VoidFunction;
   /** Called when the pointer leaves any tag. */
   onMouseLeave?: VoidFunction;
-  /** Ref to the overflow tag, for a menu of your own anchored to it. */
+  /** Ref to the overflow tag, for a menu of your own anchored to it. When there is no overflow tag it points at the create tag. */
   optionTagRef?: RefObject<HTMLDivElement | null>;
   /** Called when the overflow tag or the create tag is clicked. Passing it replaces the built-in drop-down. */
   onOptionTagClick?: VoidFunction;
-  /** Whether a plus tag is drawn for creating a new one. It is dropped as soon as the tags overflow. */
+  /** Whether a plus tag is drawn for creating a new one. It comes after the overflow tag when the tags overflow. */
   showCreateTag?: boolean;
   /** Passed to the overflow drop-down, where it removes the leading margin of each entry. */
   removeTagIcon?: boolean;
+  /** Accessible name of the row, which is a `role="group"`. */
+  ariaLabel?: string;
+  /** Accessible name and `title` of the plus tag drawn by `showCreateTag`. Defaults to the translated "Add". */
+  createTagLabel?: string;
 };
 
 /** Props for the dropdown tags component */

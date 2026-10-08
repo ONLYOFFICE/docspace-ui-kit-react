@@ -1,4 +1,12 @@
-import { FC, useCallback, useRef, useState } from "react";
+import {
+  FC,
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import classNames from "classnames";
 
 import { useUnmount } from "../../hooks/useUnmount";
@@ -20,6 +28,16 @@ export const TagsDropdown: FC<DropDownTagsProps> = ({
   const [openDropdown, setOpenDropdown] = useState(false);
   const tagRef = useRef<HTMLDivElement>(null);
   const isMountedRef = useRef(true);
+  const entryIdPrefix = useId();
+
+  const entryId = (index: number) => `${entryIdPrefix}-tag-entry-${index}`;
+
+  const focusEntry = (index: number) => {
+    const count = advancedOptions.length;
+    if (!count) return;
+    const next = (index + count) % count;
+    document.getElementById(entryId(next))?.focus();
+  };
 
   const onClickOutside = useCallback((e: Event) => {
     const target = e.target as HTMLElement;
@@ -38,22 +56,82 @@ export const TagsDropdown: FC<DropDownTagsProps> = ({
     setOpenDropdown(true);
   };
 
-  const onClickAction = useCallback(
-    (e: React.MouseEvent | React.ChangeEvent) => {
+  const closeAndReturnFocus = () => {
+    setOpenDropdown(false);
+    tagRef.current?.focus();
+  };
+
+  const selectEntry = useCallback(
+    (label: string) => {
       const { roomType, providerType, isDisabled, isDeleted } = tagProps;
 
       if (onClick && !isDisabled && !isDeleted) {
-        const target = e.target as HTMLDivElement;
-        const label = target.dataset.tag;
-
-        if (!label) return;
-
         onClick({ roomType, label, providerType });
         setOpenDropdown(false);
       }
     },
     [onClick, tagProps],
   );
+
+  // DropDownItem takes no key handler, so the open menu listens on the
+  // document for keys pressed on one of its own entries.
+  useEffect(() => {
+    if (!openDropdown) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const onTag = !!target && target === tagRef.current;
+      const index = advancedOptions.findIndex(
+        (_, i) => target?.id === entryId(i),
+      );
+
+      if (e.key === "Escape" && (onTag || index !== -1)) {
+        e.preventDefault();
+        closeAndReturnFocus();
+        return;
+      }
+
+      if (index === -1) return;
+
+      switch (e.key) {
+        case "Enter":
+        case " ":
+          e.preventDefault();
+          selectEntry(advancedOptions[index]);
+          tagRef.current?.focus();
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          focusEntry(index + 1);
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          focusEntry(index - 1);
+          break;
+        default:
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [openDropdown, advancedOptions, selectEntry]);
+
+  // The overflow tag opens a list box; say so, and whether it is open.
+  useLayoutEffect(() => {
+    const tag = tagRef.current;
+    if (!tag) return;
+    tag.setAttribute("aria-haspopup", "listbox");
+    tag.setAttribute("aria-expanded", String(openDropdown));
+  }, [openDropdown]);
+
+  // Opened from the keyboard, the focus is on the overflow tag: move it to
+  // the first entry so the hidden labels can be reached.
+  useEffect(() => {
+    if (!openDropdown) return;
+    if (document.activeElement !== tagRef.current) return;
+    const frame = requestAnimationFrame(() => focusEntry(0));
+    return () => cancelAnimationFrame(frame);
+  }, [openDropdown]);
 
   useUnmount(() => {
     isMountedRef.current = false;
@@ -69,11 +147,13 @@ export const TagsDropdown: FC<DropDownTagsProps> = ({
         isDefaultMode
         directionY="both"
       >
-        {advancedOptions.map((tag) => (
+        {advancedOptions.map((tag, index) => (
           <DropDownItem
             className="tag__dropdown-item tag"
             key={tag}
-            onClick={onClickAction}
+            id={entryId(index)}
+            tabIndex={0}
+            onClick={() => selectEntry(tag)}
             data-tag={tag}
             testId={"tag_dropdown_item"}
           >

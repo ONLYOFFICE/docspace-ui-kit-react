@@ -236,4 +236,139 @@ describe("<Tags />", () => {
     optionTag.click();
     expect(onOptionTagClickMock).toHaveBeenCalledTimes(1);
   });
+
+  it("names the row through ariaLabel and gives it a group role", () => {
+    render(<Tags {...baseProps} ariaLabel="Room tags" />);
+    const row = screen.getByRole("group", { name: "Room tags" });
+    expect(row).toBe(screen.getByTestId("tags"));
+  });
+
+  it("makes every tag a focusable button", () => {
+    render(<Tags {...baseProps} />);
+    const tag = screen.getByTestId("tag_item_tag1");
+    expect(tag).toHaveAttribute("role", "button");
+    expect(tag).toHaveAttribute("tabindex", "0");
+  });
+
+  it("selects a tag with Enter and with Space", () => {
+    const onSelectTag = vi.fn();
+    render(<Tags {...baseProps} onSelectTag={onSelectTag} />);
+    const tag = screen.getByTestId("tag_item_tag1");
+
+    fireEvent.keyDown(tag, { key: "Enter" });
+    fireEvent.keyDown(tag, { key: " " });
+
+    expect(onSelectTag).toHaveBeenCalledTimes(2);
+    expect(onSelectTag).toHaveBeenCalledWith(
+      expect.objectContaining({ label: "tag1" }),
+    );
+  });
+
+  it("calls a tag's own onClick instead of onSelectTag", () => {
+    const onSelectTag = vi.fn();
+    const own = vi.fn();
+    render(
+      <Tags
+        {...baseProps}
+        tags={[{ label: "Own", onClick: own }, "Plain"]}
+        onSelectTag={onSelectTag}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId("tag_item_Own"));
+    expect(own).toHaveBeenCalledTimes(1);
+    expect(onSelectTag).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByTestId("tag_item_Plain"));
+    expect(onSelectTag).toHaveBeenCalledTimes(1);
+  });
+
+  it("gives the create tag a name and a test id of its own", () => {
+    const onOptionTagClick = vi.fn();
+    render(
+      <Tags
+        {...baseProps}
+        columnCount={3}
+        showCreateTag
+        createTagLabel="Add tag"
+        onOptionTagClick={onOptionTagClick}
+      />,
+    );
+
+    const plus = screen.getByRole("button", { name: "Add tag" });
+    expect(plus).toHaveAttribute("data-testid", "tag_item_create");
+    fireEvent.keyDown(plus, { key: "Enter" });
+    expect(onOptionTagClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the create tag when the tags overflow", () => {
+    Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+      configurable: true,
+      value: 500,
+    });
+    render(
+      <Tags
+        {...baseProps}
+        tags={["tag1", "tag2", "tag3"]}
+        columnCount={1}
+        showCreateTag
+        onOptionTagClick={vi.fn()}
+      />,
+    );
+
+    const row = screen.getByTestId("tags");
+    expect(screen.getByText("+2")).toBeInTheDocument();
+    expect(row.lastElementChild).toHaveAttribute(
+      "data-testid",
+      "tag_item_create",
+    );
+  });
+
+  it("points optionTagRef at the overflow tag, not the create tag", () => {
+    Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+      configurable: true,
+      value: 500,
+    });
+    const optionRef = React.createRef<HTMLDivElement>();
+    render(
+      <Tags
+        {...baseProps}
+        tags={["tag1", "tag2", "tag3"]}
+        columnCount={1}
+        showCreateTag
+        optionTagRef={optionRef}
+        onOptionTagClick={vi.fn()}
+      />,
+    );
+
+    expect(optionRef.current).toHaveTextContent("+2");
+  });
+
+  it("renders two tags with the same label", () => {
+    render(<Tags {...baseProps} tags={["Same", "Same"]} />);
+    expect(screen.getAllByTestId("tag_item_Same")).toHaveLength(2);
+  });
+
+  it("routes an overflow entry to the hidden tag's own onClick", () => {
+    Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+      configurable: true,
+      value: 500,
+    });
+    const onSelectTag = vi.fn();
+    const own = vi.fn();
+    render(
+      <Tags
+        {...baseProps}
+        tags={["tag1", { label: "Hidden", onClick: own }]}
+        columnCount={1}
+        onSelectTag={onSelectTag}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("..."));
+    fireEvent.click(screen.getByText("Hidden"));
+
+    expect(own).toHaveBeenCalledTimes(1);
+    expect(onSelectTag).not.toHaveBeenCalled();
+  });
 });

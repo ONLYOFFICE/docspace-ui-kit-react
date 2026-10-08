@@ -33,7 +33,7 @@ const meta = {
     showCreateTag: {
       control: "boolean",
       description:
-        "Draws a plus tag after the others, or before them when every tag is shown; it disappears as soon as the tags overflow",
+        "Draws a plus tag after the others (after the overflow tag when they overflow), or before them when every tag is shown",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -70,6 +70,18 @@ const meta = {
       description:
         "Ref to the overflow tag, for anchoring a menu of your own to it",
     },
+    ariaLabel: {
+      control: "text",
+      description: "Accessible name of the row, which is a group",
+      table: {
+        defaultValue: { summary: '"Tags container"' },
+      },
+    },
+    createTagLabel: {
+      control: "text",
+      description:
+        'Accessible name and tooltip of the plus tag; the translated "Add" by default',
+    },
     id: {
       control: "text",
       description: "Applied to the outermost element",
@@ -105,6 +117,19 @@ export const Default: Story = {
       expect.objectContaining({ label: "Design" }),
     );
     await expect(canvas.getByTestId("tag_item_Development")).toBeVisible();
+
+    // Every tag is a button on the tab order, and Enter selects it.
+    await expect(
+      canvas.getByRole("group", { name: "Tags container" }),
+    ).toBeVisible();
+    canvas.getByRole("button", { name: "Design" }).focus();
+    await userEvent.tab();
+    const development = canvas.getByRole("button", { name: "Development" });
+    await expect(development).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onSelectTag).toHaveBeenLastCalledWith(
+      expect.objectContaining({ label: "Development" }),
+    );
   },
 };
 
@@ -180,6 +205,22 @@ export const WithOverflow: Story = {
         .filter((entry) => entry.checkVisibility());
       expect(open).toHaveLength(0);
     });
+
+    // The same from the keyboard: Enter on "..." moves the focus to the
+    // first entry, the arrows move it, and Enter selects.
+    const more = canvas.getByRole("button", { name: "..." });
+    await expect(more).toHaveAttribute("aria-haspopup", "listbox");
+    more.focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(more).toHaveAttribute("aria-expanded", "true");
+    await waitFor(() =>
+      expect(screen.getAllByTestId("tag_dropdown_item")[0]).toHaveFocus(),
+    );
+    await userEvent.keyboard("{ArrowDown}{ArrowDown}{Enter}");
+    await expect(args.onSelectTag).toHaveBeenLastCalledWith(
+      expect.objectContaining({ label: "Tag6" }),
+    );
+    await expect(more).toHaveFocus();
   },
   parameters: {
     docs: {
@@ -272,11 +313,13 @@ export const WithCreateTag: Story = {
     onOptionTagClick: fn(),
   },
   play: async ({ args, canvas, userEvent }) => {
-    // The plus tag comes last. Its label is empty, so it is found by
-    // its test id; it has no accessible name.
+    // The plus tag comes last, named by createTagLabel (the translated
+    // "Add" by default) and with a test id of its own.
     const row = canvas.getByTestId("tags");
     const plus = row.lastElementChild as HTMLElement;
-    await expect(plus).toHaveAttribute("data-testid", "tag_item_");
+    await expect(plus).toHaveAttribute("data-testid", "tag_item_create");
+    await expect(plus).toHaveAccessibleName(/\S/);
+    await expect(plus).toHaveAttribute("role", "button");
     await userEvent.click(plus);
     await expect(args.onOptionTagClick).toHaveBeenCalledTimes(1);
     await expect(args.onSelectTag).not.toHaveBeenCalled();
@@ -285,7 +328,7 @@ export const WithCreateTag: Story = {
     docs: {
       description: {
         story:
-          "A plus tag after the two tags, for offering to add one more (`showCreateTag`); clicking it calls `onOptionTagClick`, and it disappears once the tags overflow.",
+          "A plus tag after the two tags, for offering to add one more (`showCreateTag`); clicking it calls `onOptionTagClick`, and once the tags overflow it stays, after the overflow tag.",
       },
       source: {
         code: `<Tags
