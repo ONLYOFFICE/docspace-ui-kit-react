@@ -5,11 +5,9 @@ import styles from "../Loader.module.scss";
 export const DualRing = ({
   size,
   color,
-  label,
 }: {
   size?: string;
   color?: string;
-  label?: string;
 }) => {
   const style = {
     "--loader-size": size,
@@ -22,11 +20,10 @@ export const DualRing = ({
       style={style}
       viewBox="0 0 100 100"
       xmlns="http://www.w3.org/2000/svg"
-      aria-label={label}
+      aria-hidden="true"
+      focusable="false"
       data-testid="dual-ring-loader"
     >
-      <title>dual ring</title>
-
       <circle
         cx="50"
         cy="50"

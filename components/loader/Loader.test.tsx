@@ -62,4 +62,33 @@ describe("<Loader />", () => {
     render(<Loader {...baseProps} id="custom-loader" />);
     expect(screen.getByTestId("loader")).toHaveAttribute("id", "custom-loader");
   });
+
+  it("is a status region whose text is the label", () => {
+    render(<Loader type={LoaderTypes.oval} label="Fetching files" />);
+    const status = screen.getByRole("status");
+    expect(status).toHaveTextContent("Fetching files");
+    expect(status).not.toHaveAttribute("aria-busy");
+    expect(screen.getByTestId("oval-loader")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+  });
+
+  it("reads the label for rombs too", () => {
+    render(<Loader type={LoaderTypes.rombs} label="Starting" />);
+    expect(screen.getByRole("status")).toHaveTextContent("Starting");
+  });
+
+  it("has no built-in English title and a default label", () => {
+    render(<Loader type={LoaderTypes.dualRing} />);
+    expect(document.querySelector("title")).toBeNull();
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Loading content, please wait.",
+    );
+  });
+
+  it("draws the oval when no type is given", () => {
+    render(<Loader />);
+    expect(screen.getByTestId("oval-loader")).toBeInTheDocument();
+  });
 });

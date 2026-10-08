@@ -7,22 +7,35 @@ import { Track } from "./sub-components/Track";
 
 import type { LoaderProps } from "./Loader.types";
 import { LoaderTypes } from "./Loader.enums";
+import styles from "./Loader.module.scss";
 
 export { LoaderTypes };
 
-const Loader = ({ ...props }: LoaderProps) => {
-  const { type, color, size, label, className, style, id } = props;
+const DEFAULT_LABEL = "Loading content, please wait.";
 
-  const svgRenderer = (t?: LoaderTypes) => {
+const Loader = (props: LoaderProps) => {
+  const {
+    type = LoaderTypes.oval,
+    color,
+    size,
+    label = DEFAULT_LABEL,
+    className,
+    style,
+    id,
+  } = props;
+
+  const animationProps = { ...props, type, label };
+
+  const svgRenderer = (t: LoaderTypes) => {
     switch (t) {
       case LoaderTypes.oval:
-        return <Oval {...props} />;
+        return <Oval {...animationProps} />;
       case LoaderTypes.dualRing:
-        return <DualRing {...props} />;
+        return <DualRing {...animationProps} />;
       case LoaderTypes.rombs:
-        return <Rombs {...props} />;
+        return <Rombs {...animationProps} />;
       case LoaderTypes.track:
-        return <Track {...props} />;
+        return <Track {...animationProps} />;
       default:
         return (
           <span style={{ ...style }}>
@@ -34,23 +47,31 @@ const Loader = ({ ...props }: LoaderProps) => {
     }
   };
 
+  // The animations are decorative (aria-hidden); the label is the text of
+  // the status region, so it is what assistive technology reads. The base
+  // type shows the label itself.
   return (
     <div
-      aria-busy="true"
+      role="status"
       className={className}
       style={style}
       id={id}
       data-testid="loader"
     >
       {svgRenderer(type)}
+      {type !== LoaderTypes.base && label ? (
+        <span className={styles.visuallyHidden} data-testid="loader-label">
+          {label}
+        </span>
+      ) : null}
     </div>
   );
 };
 
 Loader.default = {
-  type: LoaderTypes.base,
+  type: LoaderTypes.oval,
   size: "40px",
-  label: "Loading content, please wait.",
+  label: DEFAULT_LABEL,
 };
 
 export { Loader };

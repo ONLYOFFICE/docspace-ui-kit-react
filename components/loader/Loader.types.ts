@@ -6,17 +6,18 @@ export type LoaderProps = {
   /** Any CSS colour, applied as the stroke of the animation and the colour of
    * the `base` type's text. */
   color?: string;
-  /** Which animation to render. There is **no default**, and `base` is not an
-   * animation: both it and an absent `type` fall through to a branch that
-   * renders `label` as plain text and nothing else. Pass `oval`, `dualRing`,
-   * `rombs` or `track` for something that spins. */
+  /** Which animation to render: `oval`, `dualRing`, `rombs` or `track`.
+   * Without it the loader is an `oval`. `base` is not an animation: it renders
+   * `label` as plain text and nothing else. */
   type?: LoaderTypes;
   /** Size of the animation as a CSS length, applied to both axes. The
    * stylesheet falls back to 40px for most types and 20px for `track`. For the
    * `base` type this is the font size of the text instead. */
   size?: string;
-  /** Accessible name of the animation, set as its `aria-label`. For the `base`
-   * type it is not a label at all but the entire rendered content. */
+  /** What assistive technology reads: the visually hidden text of the
+   * loader's `role="status"` region, under the decorative animation. For the
+   * `base` type it is the visible content instead. Defaults to "Loading
+   * content, please wait." */
   label?: string;
   /** Applied to the wrapper around the animation, not to the animation. */
   className?: string;

@@ -22,9 +22,9 @@ const meta = {
       control: "select",
       options: Object.values(LoaderTypes),
       description:
-        "Which animation to draw: `oval`, `dual-ring`, `rombs` or `track`; `base` or no value renders `label` as plain text instead",
+        "Which animation to draw: `oval` (the default), `dual-ring`, `rombs` or `track`; `base` renders `label` as plain text instead",
       table: {
-        defaultValue: { summary: "undefined" },
+        defaultValue: { summary: "oval" },
       },
     },
     color: {
@@ -132,10 +132,9 @@ export const Default: Story = {
     label: "Loading content, please wait...",
   },
   play: async ({ canvas }) => {
-    // base renders the label as text at `size`, inside a busy wrapper.
-    await expect(canvas.getByTestId("loader")).toHaveAttribute(
-      "aria-busy",
-      "true",
+    // base renders the label as text at `size`, inside a status region.
+    await expect(canvas.getByRole("status")).toHaveTextContent(
+      "Loading content, please wait...",
     );
     const text = canvas.getByText("Loading content, please wait...");
     await expect(getComputedStyle(text).fontSize).toBe("18px");
@@ -144,7 +143,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A line of plain text instead of an animation, for a place where a moving spinner would distract: this is what you get with `type` set to `base` or left out, so pick an animation explicitly when you want one. Change any other prop live in the Controls panel below.",
+          "A line of plain text instead of an animation, for a place where a moving spinner would distract: this is what you get with `type` set to `base`; left out, `type` draws the oval. Change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<Loader type={LoaderTypes.base} size="18px" label="Loading content, please wait..." />`,
@@ -162,8 +161,10 @@ export const Oval: Story = {
     label: "Loading...",
   },
   play: async ({ canvas }) => {
+    // The animation is decorative; the label is the status region's text.
     const oval = canvas.getByTestId("oval-loader");
-    await expect(oval).toHaveAttribute("aria-label", "Loading...");
+    await expect(oval).toHaveAttribute("aria-hidden", "true");
+    await expect(canvas.getByRole("status")).toHaveTextContent("Loading...");
     await expect(widthOf(oval)).toBe(40);
   },
   parameters: {
@@ -188,8 +189,11 @@ export const DualRing: Story = {
     label: "Loading...",
   },
   play: async ({ canvas }) => {
+    // No built-in "dual ring" title: the label is what is read.
     const ring = canvas.getByTestId("dual-ring-loader");
-    await expect(ring).toHaveAttribute("aria-label", "Loading...");
+    await expect(ring).toHaveAttribute("aria-hidden", "true");
+    await expect(ring.querySelector("title")).toBeNull();
+    await expect(canvas.getByRole("status")).toHaveTextContent("Loading...");
     await expect(widthOf(ring)).toBe(40);
   },
   parameters: {
@@ -225,10 +229,10 @@ export const Rombs: Story = {
     label: "Loading...",
   },
   play: async ({ canvas }) => {
-    // Three diamonds; rombs ignores label.
+    // Three decorative diamonds; the label is read like any other type's.
     const rombs = canvas.getByTestId("rombs-loader");
-    await expect(rombs).toBeInTheDocument();
-    await expect(rombs).not.toHaveAttribute("aria-label");
+    await expect(rombs).toHaveAttribute("aria-hidden", "true");
+    await expect(canvas.getByRole("status")).toHaveTextContent("Loading...");
   },
   parameters: {
     docs: {
@@ -252,7 +256,8 @@ export const Track: Story = {
   },
   play: async ({ canvas }) => {
     const track = canvas.getByTestId("track-loader");
-    await expect(track).toHaveAttribute("aria-label", "Loading...");
+    await expect(track).toHaveAttribute("aria-hidden", "true");
+    await expect(canvas.getByRole("status")).toHaveTextContent("Loading...");
     await expect(widthOf(track)).toBe(30);
   },
   parameters: {
@@ -460,10 +465,7 @@ export const OnPrimaryButton: Story = {
     label: "Saving",
   },
   play: async ({ canvas }) => {
-    await expect(canvas.getByTestId("track-loader")).toHaveAttribute(
-      "aria-label",
-      "Saving",
-    );
+    await expect(canvas.getByRole("status")).toHaveTextContent("Saving");
     await expect(canvas.getByTestId("loader")).toHaveAttribute(
       "id",
       "primary-track",
