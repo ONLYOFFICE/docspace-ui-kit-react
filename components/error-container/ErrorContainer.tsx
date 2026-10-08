@@ -36,7 +36,15 @@ const ErrorContainer = (props: ErrorContainerProps) => {
         data-testid="ErrorContainer"
       >
         {!hideLogo ? <PortalLogo isResizable /> : null}
-        <div className={styles.illustration} aria-hidden="true">
+        {/* The ids container-inner, header, text and customized-text are kept
+            for the portal's stylesheets, which select them (the preparation
+            portal dialog sizes the illustration through #container-inner).
+            Style through className and the module classes instead. */}
+        <div
+          id="container-inner"
+          className={styles.illustration}
+          aria-hidden="true"
+        >
           <svg
             className={styles.background}
             width="753"
@@ -362,13 +370,18 @@ const ErrorContainer = (props: ErrorContainerProps) => {
           </svg>
         </div>
         {headerText ? (
-          <Heading className={styles.title} type="header">
+          <Heading id="header" className={styles.title} type="header">
             {headerText}
           </Heading>
         ) : null}
-        {bodyText ? <Text className={styles.text}>{bodyText}</Text> : null}
+        {bodyText ? (
+          <Text id="text" className={styles.text}>
+            {bodyText}
+          </Text>
+        ) : null}
         {customizedBodyText ? (
           <Text
+            id="customized-text"
             className={styles.customizedText}
             fontWeight={600}
             fontSize="13px"

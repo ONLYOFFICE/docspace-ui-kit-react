@@ -106,16 +106,20 @@ export const Default: Story = {
     await expect(canvas.getByAltText("portal logo")).toBeInTheDocument();
     // No buttonText, so no button even though onClickButton is set.
     await expect(canvas.queryByRole("button")).toBeNull();
-    // The illustration is decorative: every SVG sits under aria-hidden,
-    // and no part of the page writes an element id that a second
-    // container would duplicate.
+    // The illustration is decorative: every SVG sits under aria-hidden.
+    // Only the four ids the portal's stylesheets select are written.
     const root = canvas.getByTestId("ErrorContainer");
     const svgs = Array.from(root.querySelectorAll("svg"));
     await expect(svgs.length).toBeGreaterThan(0);
     for (const svg of svgs) {
       await expect(svg.closest('[aria-hidden="true"]')).not.toBeNull();
     }
-    await expect(root.querySelectorAll("[id]")).toHaveLength(0);
+    const ids = Array.from(root.querySelectorAll("[id]"), (e) => e.id);
+    await expect(
+      ids.every((id) =>
+        ["container-inner", "header", "text", "customized-text"].includes(id),
+      ),
+    ).toBe(true);
   },
   parameters: {
     docs: {

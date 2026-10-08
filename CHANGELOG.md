@@ -83,11 +83,13 @@ under _Changed_.
   English titles ("dual ring", "oval", "track"), and the wrapper no longer sets `aria-busy`. A
   `Loader` without `type` now draws the oval instead of rendering its label as text;
   `LoaderTypes.base` still renders the text.
-- **`ErrorContainer` no longer writes fixed element ids.** The `container-inner`, `header`,
-  `text`, `customized-text`, `button-container`, `button` and illustration ids (`background`,
-  `birds`, `baloon`, ...) are gone; the parts are styled through module classes, so two error
-  pages in one document no longer duplicate ids. A stylesheet or test that targeted those ids
-  must select by role or by the outer element's `className` instead.
+- **`ErrorContainer` writes fewer fixed element ids.** The `button-container`, `button` and
+  illustration ids (`background`, `birds`, `baloon`, ...) are gone; the parts are styled through
+  module classes. `container-inner`, `header`, `text` and `customized-text` stay, because the
+  portal's stylesheets select them (the preparation portal dialog sizes the illustration through
+  `#container-inner`); two error pages in one document still share those four. A stylesheet or
+  test that targeted one of the removed ids must select by role or by the outer element's
+  `className` instead.
 - **`Card`'s outer element is a `<section>`, and a string `title` is a heading.** Its `<header>`
   and `<footer>` no longer become page-level `banner` / `contentinfo` landmarks. A string `title`
   renders as an `<h3>` (new `titleLevel` prop for another level) with the same look; a node

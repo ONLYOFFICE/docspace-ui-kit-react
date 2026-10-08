@@ -79,27 +79,31 @@ describe("ErrorContainer", () => {
     expect(container.className).toContain(className);
   });
 
-  it("writes no element ids of its own, so two containers do not collide", () => {
+  // The portal's stylesheets select these ids (PreparationPortalDialog sizes
+  // the illustration through #container-inner), so they stay; every other id
+  // is gone, which keeps the illustration's own ids from colliding.
+  it("keeps only the ids the portal styles, and no others", () => {
     const { container } = render(
-      <>
-        <ErrorContainer
-          hideLogo
-          headerText="First"
-          bodyText="Body"
-          customizedBodyText="Extra"
-          buttonText="Retry"
-          onClickButton={mockOnClick}
-        />
-        <ErrorContainer
-          hideLogo
-          headerText="Second"
-          buttonText="Retry"
-          onClickButton={mockOnClick}
-        />
-      </>,
+      <ErrorContainer
+        hideLogo
+        headerText="First"
+        bodyText="Body"
+        customizedBodyText="Extra"
+        buttonText="Retry"
+        onClickButton={mockOnClick}
+      />,
     );
 
-    expect(container.querySelectorAll("[id]")).toHaveLength(0);
+    const ids = Array.from(container.querySelectorAll("[id]"), (e) => e.id);
+    expect(ids.sort()).toEqual(
+      ["container-inner", "customized-text", "header", "text"].sort(),
+    );
+    expect(container.querySelector("#container-inner svg")).not.toBeNull();
+    expect(container.querySelector("#header")).toHaveTextContent("First");
+    expect(container.querySelector("#text")).toHaveTextContent("Body");
+    expect(container.querySelector("#customized-text")).toHaveTextContent(
+      "Extra",
+    );
   });
 
   it("hides the decorative illustration from assistive technology", () => {

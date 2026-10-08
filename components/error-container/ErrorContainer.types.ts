@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 
 export type ErrorContainerProps = {
-  /** Value of `id` on the outer element. Nothing inside the component carries an `id`, so two containers on a page cannot collide. */
+  /** Value of `id` on the outer element. It does not rename the four fixed ids inside (`container-inner`, `header`, `text`, `customized-text`). */
   id?: string;
   /** Added after the component's own classes on the outer element. */
   className?: string;
