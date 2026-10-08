@@ -188,13 +188,13 @@ export function SettingsList() {
 
 ## Behaviour the types don't state
 
-- **A disabled row is still in the DOM as an `<a>`, without an `href`.** That element is not
-  focusable and is not announced as a link, so the row disappears from keyboard and screen
-  reader navigation rather than being announced as unavailable. Nothing sets `aria-disabled`.
-- **`isDisabled` does not dim the title.** The stylesheet has a rule for a disabled title, but
-  the class that would trigger it is never put on the link — only the subtitle is recoloured.
-  Even that is invisible in the light theme, where the disabled colour is the same grey as the
-  normal subtitle; only the dark theme dims it.
+- **A disabled row keeps its title as a link that says it is unavailable.** The `<a>` loses its
+  `href` and its click handler, and gets `role="link"`, `aria-disabled="true"` and
+  `tabIndex={0}` instead, so it stays in the Tab order and a screen reader announces it as an
+  unavailable link. Enter and clicks do nothing.
+- **`isDisabled` dims the whole row.** The title, the subtitle and the arrow all take
+  `--category-item-disabled-color`, a lighter grey than the normal subtitle in the light theme
+  and a darker one in the dark theme.
 - **The click handler does not stop the navigation.** `onClickLink` runs and the browser then
   follows `url`; call `preventDefault` yourself when you route in JavaScript.
 - **The paid badge is suppressed on management pages.** The component calls a helper that tests
@@ -206,7 +206,7 @@ export function SettingsList() {
   while it is unset the declaration is invalid and the title inherits the surrounding text
   colour rather than taking `Link`'s own. That is what makes the row's title look like a
   heading; set the variable if you want it to look like a link.
-- **The arrow always renders**, disabled or not, and carries two literal class names for portal
+- **The arrow always renders**, disabled or not (dimmed when disabled), and carries two literal class names for portal
   stylesheets — `settings_unavailable` on the arrow and `header` on the title link. It flips in
   RTL through the `.rtl` class the theme provider puts on `<body>`.
 - **`--category-item-subheader-size` does nothing.** The class that reads it is not applied to
@@ -215,25 +215,24 @@ export function SettingsList() {
 
 ## CSS variables
 
-| Variable                            | Default                             | Effect                               |
-| ----------------------------------- | ----------------------------------- | ------------------------------------ |
-| `--category-item-title-color`       | none — the title inherits           | Colour of the title link             |
-| `--category-item-description-color` | grey text; lighter grey in dark     | Colour of the subtitle               |
-| `--category-item-arrow-color`       | black; white in dark                | Fill of the trailing arrow           |
-| `--category-item-disabled-color`    | the subtitle's grey; dimmer in dark | Colour of the subtitle when disabled |
-| `--category-item-margin`            | `20px`                              | Bottom margin of the whole row       |
+| Variable                            | Default                         | Effect                                                |
+| ----------------------------------- | ------------------------------- | ----------------------------------------------------- |
+| `--category-item-title-color`       | none — the title inherits       | Colour of the title link                              |
+| `--category-item-description-color` | grey text; lighter grey in dark | Colour of the subtitle                                |
+| `--category-item-arrow-color`       | black; white in dark            | Fill of the trailing arrow                            |
+| `--category-item-disabled-color`    | light grey; dimmer grey in dark | Colour of the title, subtitle and arrow when disabled |
+| `--category-item-margin`            | `20px`                          | Bottom margin of the whole row                        |
 
 ## Accessibility
 
 - The title is the link, and `Link` gives it an `aria-label` equal to that title, so it is
   announced by its own text.
-- A disabled row loses its `href` and therefore its place in the tab order. There is no
-  `aria-disabled` and no other announcement — if the reason matters, put it in the subtitle,
-  which is the one part that visibly changes.
+- A disabled row's title stays focusable and is announced as a link with `aria-disabled`, so a
+  keyboard or screen-reader user finds it and hears that it is unavailable. If the reason
+  matters, put it in the subtitle.
 - The subtitle is a separate element with no `aria-describedby` tying it to the link; a screen
   reader reaching the link by keyboard hears the title alone.
-- The arrow is an inline SVG with no `aria-hidden` and no title, so some screen readers announce
-  it as an unlabelled graphic after the link.
+- The arrow is decorative and `aria-hidden`.
 - Nothing here manages focus, and the row is not a `listitem` — wrap the set in a `<ul>` of
   your own if the count matters to the reader.
 
