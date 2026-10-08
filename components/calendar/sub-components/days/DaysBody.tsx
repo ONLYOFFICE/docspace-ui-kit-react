@@ -19,6 +19,7 @@ export const DaysBody = ({
     handleDateChange,
     minDate,
     maxDate,
+    locale,
   );
   const weekdayElements = getWeekdayElements(locale);
 

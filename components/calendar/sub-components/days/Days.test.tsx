@@ -134,6 +134,7 @@ describe("Days Component", () => {
       defaultProps.handleDateChange,
       defaultProps.minDate,
       defaultProps.maxDate,
+      undefined,
     );
   });
 

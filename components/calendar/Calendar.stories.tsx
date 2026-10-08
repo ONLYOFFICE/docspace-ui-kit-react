@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { DateTime } from "luxon";
+import { DateTime } from "luxon";
 import { expect, fn, within } from "storybook/test";
 
 import { now } from "../../utils/date";
@@ -225,9 +225,20 @@ export const Default: Story = {
     await expect(title(calendar).textContent?.toLowerCase()).toBe(
       monthTitle(today),
     );
-    await expect(
-      calendar.querySelector('[class*="isCurrent"]'),
-    ).toHaveTextContent(String(today.day));
+    const fullDate = (date: DateTime) =>
+      date.setLocale("en").toLocaleString(DateTime.DATE_FULL);
+    // Today is also the selected day here: it carries both marks and both
+    // states, and is named by its full date rather than by its number.
+    const todayButton = within(calendar).getByRole("button", {
+      name: fullDate(today),
+    });
+    await expect(todayButton).toHaveTextContent(String(today.day));
+    await expect(todayButton).toHaveAttribute("aria-current", "date");
+    await expect(todayButton).toHaveAttribute("aria-pressed", "true");
+    await expect(todayButton.className).toMatch(/isCurrent/);
+    await expect(todayButton.className).toMatch(/focused/);
+    // The selection ring is drawn around today's fill, not swallowed by it.
+    await expect(getComputedStyle(todayButton).boxShadow).not.toBe("none");
 
     // Picking a day reports it to both callbacks and rings it.
     const target = today.day === 15 ? 16 : 15;
@@ -240,6 +251,12 @@ export const Default: Story = {
     );
     await expect(args.onChange).toHaveBeenCalledWith(picked);
     await expect(dayButton(calendar, target).className).toMatch(/focused/);
+    await expect(
+      within(calendar).getByRole("button", {
+        name: fullDate(today.set({ day: target })),
+      }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(todayButton).toHaveAttribute("aria-pressed", "false");
 
     // The arrows page through months.
     await userEvent.click(
@@ -282,7 +299,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The calendar as it opens: today is filled with the accent colour. Click a day to select it and watch the Actions panel, click the title to switch to months and then years, and change any other prop live in the Controls panel below.",
+          'The calendar as it opens: today is filled with the accent colour and, being the selected day too, ringed as well. Each day is named by its full date, the selected one is `aria-pressed` and today is `aria-current="date"`. Click a day to select it and watch the Actions panel, click the title to switch to months and then years, and change any other prop live in the Controls panel below.',
       },
       source: {
         code: `const [selectedDate, setSelectedDate] = useState(now());

@@ -364,6 +364,21 @@
     color: var(--calendar-focused-text-v);
   }
 
+  // Today and the selected day at once: keep today's fill and draw the selection ring
+  // outside it, separated by a gap in the calendar's background colour.
+  &.isCurrent.focused {
+    border-color: var(--calendar-bg-v);
+    border-radius: var(--calendar-focused-radius-v);
+    background-color: var(--calendar-accent-v);
+    color: var(--calendar-selected-text-v);
+    box-shadow: 0 0 0 2px var(--calendar-accent-v);
+
+    &:hover,
+    &:focus {
+      background-color: var(--calendar-accent-v);
+    }
+  }
+
   @include mixins.mobile {
     font-size: 16px;
     width: 40px;

@@ -137,4 +137,50 @@ describe("getDayElements", () => {
       expect(day.closest("button")).toBeDisabled();
     });
   });
+  it("names every day by its full date and marks the selected one", () => {
+    const elements = getDayElements(
+      mockObservedDate,
+      mockSelectedDate,
+      handleDateChange,
+      mockMinDate,
+      mockMaxDate,
+      "en",
+    );
+    render(<>{elements}</>);
+
+    // Oct 1 and Nov 1 share the number but not the name.
+    expect(
+      screen.getByRole("button", { name: "October 1, 2023" }),
+    ).toBeDefined();
+    expect(
+      screen.getByRole("button", { name: "November 1, 2023" }),
+    ).toBeDefined();
+
+    const selected = screen.getByRole("button", { name: "October 15, 2023" });
+    expect(selected).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.getByRole("button", { name: "October 14, 2023" }),
+    ).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("keeps the selection drawn when the selected day is today", () => {
+    const today = DateTime.now();
+    const elements = getDayElements(
+      today,
+      today,
+      handleDateChange,
+      today.minus({ years: 1 }),
+      today.plus({ years: 1 }),
+      "en",
+    );
+    render(<>{elements}</>);
+
+    const day = screen.getByRole("button", {
+      name: today.setLocale("en").toLocaleString(DateTime.DATE_FULL),
+    });
+    expect(day).toHaveAttribute("aria-current", "date");
+    expect(day).toHaveAttribute("aria-pressed", "true");
+    expect(day.className).toContain(styles.isCurrent);
+    expect(day.className).toContain(styles.focused);
+  });
 });
