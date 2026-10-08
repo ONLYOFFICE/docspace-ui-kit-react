@@ -10,6 +10,7 @@ import {
 import classNames from "classnames";
 
 import { useUnmount } from "../../hooks/useUnmount";
+import { consumeKey } from "../../utils/consume-key";
 
 import { DropDown } from "../drop-down";
 import { DropDownItem } from "../drop-down-item";
@@ -74,7 +75,9 @@ export const TagsDropdown: FC<DropDownTagsProps> = ({
   );
 
   // DropDownItem takes no key handler, so the open menu listens on the
-  // document for keys pressed on one of its own entries.
+  // document for keys pressed on one of its own entries. It listens in the
+  // capture phase, ahead of the portal's own document hotkeys, so that a key
+  // it handles (consumeKey) reaches neither them nor a dialog around it.
   useEffect(() => {
     if (!openDropdown) return;
 
@@ -87,6 +90,7 @@ export const TagsDropdown: FC<DropDownTagsProps> = ({
 
       if (e.key === "Escape" && (onTag || index !== -1)) {
         e.preventDefault();
+        consumeKey(e);
         closeAndReturnFocus();
         return;
       }
@@ -97,23 +101,26 @@ export const TagsDropdown: FC<DropDownTagsProps> = ({
         case "Enter":
         case " ":
           e.preventDefault();
+          consumeKey(e);
           selectEntry(advancedOptions[index]);
           tagRef.current?.focus();
           break;
         case "ArrowDown":
           e.preventDefault();
+          consumeKey(e);
           focusEntry(index + 1);
           break;
         case "ArrowUp":
           e.preventDefault();
+          consumeKey(e);
           focusEntry(index - 1);
           break;
         default:
       }
     };
 
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    document.addEventListener("keydown", onKeyDown, true);
+    return () => document.removeEventListener("keydown", onKeyDown, true);
   }, [openDropdown, advancedOptions, selectEntry]);
 
   // The overflow tag opens a list box; say so, and whether it is open.

@@ -37,6 +37,21 @@ describe("<Tags />", () => {
     expect(screen.getByText("tag2")).toBeInTheDocument();
   });
 
+  // In the portal's file list an Enter that reaches the document opens the
+  // selected item; Enter on a tag must only select the tag.
+  it("keeps Enter on a tag from the document's listeners", () => {
+    const onSelectTag = vi.fn();
+    const onDocumentKeyDown = vi.fn();
+    document.addEventListener("keydown", onDocumentKeyDown);
+
+    render(<Tags {...baseProps} tags={["tag1"]} onSelectTag={onSelectTag} />);
+    fireEvent.keyDown(screen.getByTestId("tag_item_tag1"), { key: "Enter" });
+
+    expect(onSelectTag).toHaveBeenCalledTimes(1);
+    expect(onDocumentKeyDown).not.toHaveBeenCalled();
+    document.removeEventListener("keydown", onDocumentKeyDown);
+  });
+
   it("calls onSelectTag when a tag is clicked", () => {
     const onSelectTagMock = vi.fn();
     render(

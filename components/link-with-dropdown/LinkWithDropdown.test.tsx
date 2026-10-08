@@ -157,6 +157,30 @@ describe("LinkWithDropdown", () => {
     expect(trigger).toHaveAttribute("aria-expanded", "true");
   });
 
+  // Inside a ModalDialog, which closes on an Escape keyup on window, Escape
+  // has to close the menu and leave the dialog open.
+  it("keeps the keys it handles from window and document listeners", () => {
+    const onDocumentKeyDown = vi.fn();
+    const onWindowKeyUp = vi.fn();
+    document.addEventListener("keydown", onDocumentKeyDown);
+    window.addEventListener("keyup", onWindowKeyUp);
+
+    render(
+      <LinkWithDropdown data={mockData}>Link with dropdown</LinkWithDropdown>,
+    );
+    const trigger = screen.getByRole("button", { name: "Link with dropdown" });
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    fireEvent.keyUp(trigger, { key: "Enter" });
+    fireEvent.keyDown(trigger, { key: "Escape" });
+    fireEvent.keyUp(trigger, { key: "Escape" });
+
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(onDocumentKeyDown).not.toHaveBeenCalled();
+    expect(onWindowKeyUp).not.toHaveBeenCalled();
+    document.removeEventListener("keydown", onDocumentKeyDown);
+    window.removeEventListener("keyup", onWindowKeyUp);
+  });
+
   it("is out of the tab order and ignores keys while disabled", () => {
     render(
       <LinkWithDropdown data={mockData} isDisabled>

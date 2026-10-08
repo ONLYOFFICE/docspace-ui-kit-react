@@ -3,6 +3,7 @@ import classNames from "classnames";
 import React, { FC, useCallback } from "react";
 
 import { useUnmount } from "../../hooks/useUnmount";
+import { consumeKey } from "../../utils/consume-key";
 import { useCommonTranslation } from "../../utils/i18n";
 import { Tag, type TagClickEvent, type TagType } from "../tag";
 
@@ -128,6 +129,9 @@ const Tags: FC<TagsProps> = ({
         return;
 
       e.preventDefault();
+      // The portal's file list opens the selected item on an Enter that
+      // reaches the document; a tag in that list must not do both.
+      consumeKey(e);
       target.click();
     },
     [],

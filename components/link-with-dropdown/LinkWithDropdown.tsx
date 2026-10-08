@@ -8,6 +8,7 @@ import { DropDown } from "../drop-down";
 import { DropDownItem } from "../drop-down-item";
 import { Scrollbar } from "../scrollbar";
 import { Text } from "../text";
+import { consumeKey } from "../../utils/consume-key";
 
 import styles from "./LinkWithDropdown.module.scss";
 import { LinkWithDropDownProps } from "./LinkWithDropdown.types";
@@ -68,12 +69,15 @@ const LinkWithDropdown = ({
     if (e.key === "Enter" || e.key === " ") {
       // Space would otherwise scroll the page.
       e.preventDefault();
+      consumeKey(e);
       onOpen();
       return;
     }
 
     if (e.key === "Escape" && state.isOpen) {
       e.preventDefault();
+      // Not to the dialog around it, which closes on Escape too.
+      consumeKey(e);
       setIsOpen(false);
     }
   };
