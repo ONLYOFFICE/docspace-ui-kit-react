@@ -33,6 +33,8 @@
     "**/*.stories.tsx",
     "**/*.story.helper.ts",
     "**/*.story.helper.tsx",
+    "**/stories.utils.ts",
+    "**/stories.utils.tsx",
     "__tests__",
     "test",
     ".storybook",
