@@ -82,6 +82,37 @@ describe("PortalLogo", () => {
     );
   });
 
+  it("names the image with the alt prop, defaulting to the old string", () => {
+    const { unmount } = render(<PortalLogo />);
+    expect(screen.getByRole("img", { name: "portal logo" })).toBeVisible();
+    unmount();
+
+    render(<PortalLogo alt="Acme portal" />);
+    expect(screen.getByRole("img", { name: "Acme portal" })).toHaveAttribute(
+      "alt",
+      "Acme portal",
+    );
+  });
+
+  it("gives the fallback mark the same accessible name", () => {
+    render(<PortalLogo alt="Acme portal" />);
+    fireEvent.error(screen.getByRole("img"));
+
+    const fallback = screen.getByRole("img", { name: "Acme portal" });
+    expect(fallback.tagName.toLowerCase()).toBe("svg");
+  });
+
+  it("hides the fallback mark from assistive technology when alt is empty", () => {
+    render(<PortalLogo alt="" />);
+    fireEvent.error(screen.getByRole("presentation", { hidden: true }));
+
+    expect(screen.getByTestId("svg-mock")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    expect(screen.queryByRole("img")).toBeNull();
+  });
+
   it("does not add resize listener when isResizable is false", () => {
     const addEventListenerSpy = vi.spyOn(window, "addEventListener");
     render(<PortalLogo isResizable={false} />);

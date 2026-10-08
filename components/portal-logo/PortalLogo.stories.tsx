@@ -1,6 +1,6 @@
 import React, { type ComponentProps, type CSSProperties } from "react";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
-import { expect, waitFor } from "storybook/test";
+import { expect, waitFor, within } from "storybook/test";
 
 import PortalLogo from "./PortalLogo";
 
@@ -69,6 +69,14 @@ const meta = {
         "Follows the window width and, at 600px and narrower, shows the small logo in a bar fixed across the top of the window. Without it the logo is hidden at those widths",
       table: {
         defaultValue: { summary: "false" },
+      },
+    },
+    alt: {
+      control: "text",
+      description:
+        "Accessible name of the logo, on the image and on the fallback logo alike. An empty string makes the logo decorative",
+      table: {
+        defaultValue: { summary: '"portal logo"' },
       },
     },
   },
@@ -210,6 +218,7 @@ export const FallbackLogo: Story = {
   render: (args) => <PortalLogo {...args} />,
   args: {
     isResizable: false,
+    alt: "Acme portal",
   },
   play: async ({ canvasElement }) => {
     // The failed request swaps the whole component for the bundled logo.
@@ -217,17 +226,22 @@ export const FallbackLogo: Story = {
       expect(canvasElement.querySelector("svg.logo-wrapper")).not.toBeNull(),
     );
     await expect(canvasElement.querySelector("img")).toBeNull();
+    // The bundled mark keeps the logo's accessible name.
+    const mark = within(canvasElement).getByRole("img", {
+      name: "Acme portal",
+    });
+    await expect(mark).toBe(canvasElement.querySelector("svg.logo-wrapper"));
   },
   parameters: {
     keepFallback: true,
     docs: {
       description: {
         story:
-          "What a page shows when the portal's logo cannot be loaded: the bundled logo takes the image's place, at its own size, so the page never has an empty gap or a broken-image icon.",
+          "What a page shows when the portal's logo cannot be loaded: the bundled logo takes the image's place, at its own size, so the page never has an empty gap or a broken-image icon. It keeps the name passed in `alt`, so a screen reader still hears which portal this is.",
       },
       source: {
         code: `// /logo.ashx fails to load
-<PortalLogo />`,
+<PortalLogo alt="Acme portal" />`,
       },
     },
   },

@@ -13,7 +13,11 @@ import { useTheme } from "../../context/ThemeContext";
 import type { PortalLogoProps } from "./PortalLogo.types";
 import styles from "./PortalLogo.module.scss";
 
-const PortalLogo = ({ className, isResizable = false }: PortalLogoProps) => {
+const PortalLogo = ({
+  className,
+  isResizable = false,
+  alt = "portal logo",
+}: PortalLogoProps) => {
   const [isError, setIsError] = useState(false);
 
   const { isBase } = useTheme();
@@ -50,7 +54,14 @@ const PortalLogo = ({ className, isResizable = false }: PortalLogoProps) => {
   });
 
   if (isError) {
-    return <LightSmallLogo className={classNames("logo-wrapper", className)} />;
+    return (
+      <LightSmallLogo
+        className={classNames("logo-wrapper", className)}
+        role={alt ? "img" : undefined}
+        aria-label={alt || undefined}
+        aria-hidden={alt ? undefined : true}
+      />
+    );
   }
 
   return (
@@ -59,7 +70,7 @@ const PortalLogo = ({ className, isResizable = false }: PortalLogoProps) => {
         <img
           src={logo}
           className={classNames("logo-wrapper", className)}
-          alt="portal logo"
+          alt={alt}
           onError={() => setIsError(true)}
         />
       ) : null}
