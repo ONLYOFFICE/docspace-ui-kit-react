@@ -468,7 +468,14 @@ const DropDown = ({
     // No early return on a missing ref: in portal mode the menu element only
     // appears after the portal mounts, so a menu rendered open would
     // otherwise never get its listeners.
+    // The event being dispatched now is the one that opened the menu: in a
+    // browser React commits the open state, and this effect attaches the
+    // window listeners, while that click or tap is still bubbling, so it
+    // would reach window and close the menu at once.
+    const openingEvent = typeof window !== "undefined" ? window.event : null;
     const listener = (evt: Event) => {
+      if (openingEvent && evt === openingEvent) return;
+
       const target = evt.target as HTMLElement;
 
       if (dropDownRef.current?.contains(target)) return;

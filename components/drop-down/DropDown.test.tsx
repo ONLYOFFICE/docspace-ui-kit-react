@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { flushSync } from "react-dom";
 import { screen, fireEvent, render } from "@testing-library/react";
 
 const device = vi.hoisted(() => ({ isMobile: false }));
@@ -286,6 +288,46 @@ describe("<DropDown />", () => {
         );
       },
     );
+
+    it("does not close on the tap that opened it", () => {
+      device.isMobile = true;
+      const clickOutsideAction = vi.fn();
+
+      const Opener = () => {
+        const [open, setOpen] = useState(false);
+        return (
+          <>
+            {/* In a browser a real tap runs microtasks between listeners, so
+                React commits the open state and its effects attach the window
+                listeners while the tap is still bubbling. flushSync does the
+                same inside a test, where a dispatched event runs none. */}
+            <button
+              type="button"
+              onClick={() => flushSync(() => setOpen(true))}
+            >
+              Open
+            </button>
+            <DropDown
+              {...baseProps}
+              open={open}
+              withBackdrop={false}
+              clickOutsideAction={clickOutsideAction}
+            >
+              <div>Content</div>
+            </DropDown>
+          </>
+        );
+      };
+      render(<Opener />);
+
+      fireEvent.click(screen.getByRole("button", { name: "Open" }));
+      expect(screen.getByText("Content")).toBeInTheDocument();
+      expect(clickOutsideAction).not.toHaveBeenCalled();
+
+      // The next tap outside still closes it.
+      fireEvent(document.body, new Event("click", { bubbles: true }));
+      expect(clickOutsideAction).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("position calculation", () => {
