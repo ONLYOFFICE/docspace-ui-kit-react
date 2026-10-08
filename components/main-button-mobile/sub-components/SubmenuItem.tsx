@@ -51,6 +51,8 @@ const SubmenuItem = ({
         isActive={isOpenSubMenu}
         isSubMenu
         noHover={noHover}
+        role="menuitem"
+        aria-expanded={isOpenSubMenu}
       />
       {isOpenSubMenu
         ? option.items?.map((suboption: ActionOption) => {
@@ -75,6 +77,7 @@ const SubmenuItem = ({
                 icon={suboption.icon}
                 withoutIcon={suboption.withoutIcon}
                 noHover={noHover}
+                role="menuitem"
               />
             );
           })

@@ -213,11 +213,31 @@
   inset-inline-end: var(--main-button-mobile-badge-offset, 10px);
 }
 
-.alertIcon {
+.alertButton {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
   cursor: pointer;
-  vertical-align: top !important;
 
-  @include mixins.common-icons-style;
+  &:focus-visible {
+    outline: 2px solid var(--main-button-mobile-button-color);
+    outline-offset: 2px;
+    border-radius: 50%;
+  }
+}
+
+// The badge's SVG fills its box, so --main-button-mobile-badge-size scales
+// the icon and not only the box around it.
+.alertIcon {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+  vertical-align: top;
 }
 
 // ProgressBar styles
