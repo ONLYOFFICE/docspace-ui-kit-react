@@ -215,15 +215,25 @@ export const WithCloseButton: Story = {
   },
   play: async ({ args, canvas, userEvent }) => {
     // The cross only reports the click; the bar stays on screen.
-    await userEvent.click(canvas.getByTestId("icon-button"));
+    const close = canvas.getByRole("button", { name: "Close" });
+    await userEvent.click(close);
     await expect(args.onClose).toHaveBeenCalledTimes(1);
     await expect(canvas.getByTestId("public_room_bar")).toBeVisible();
+
+    // It is a real button: reached with Tab, pressed with Enter or Space.
+    close.blur();
+    await userEvent.tab();
+    await expect(close).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onClose).toHaveBeenCalledTimes(2);
+    await userEvent.keyboard(" ");
+    await expect(args.onClose).toHaveBeenCalledTimes(3);
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Let the reader dismiss a note they have read: a close cross appears on the right (`onClose`). Clicking it only reports the click in the Actions panel; the bar stays until the host stops rendering it.",
+          "Let the reader dismiss a note they have read: a close button appears on the right (`onClose`), named by `closeLabel` and operable from the keyboard. Pressing it only reports the click in the Actions panel; the bar stays until the host stops rendering it.",
       },
       source: {
         code: `const [isShown, setIsShown] = useState(true);
@@ -289,6 +299,7 @@ export const CssCustomization: Story = {
           "--public-room-bar-top-margin": "8px",
           "--public-room-bar-bottom-margin": "24px",
           "--public-room-bar-header-gap": "12px",
+          "--public-room-bar-close-icon": "#0082c9",
         } as CSSProperties
       }
     >
@@ -296,6 +307,7 @@ export const CssCustomization: Story = {
         headerText="Public Room"
         bodyText="This room is accessible to anyone with the link"
         barIsVisible={false}
+        onClose={() => {}}
       />
     </div>
   ),
@@ -303,6 +315,11 @@ export const CssCustomization: Story = {
     const style = getComputedStyle(canvas.getByTestId("public_room_bar"));
     await expect(style.backgroundColor).toBe("rgb(230, 243, 251)");
     await expect(style.borderRadius).toBe("12px");
+    // The close-icon variable paints the cross.
+    const cross = canvas
+      .getByRole("button", { name: "Close" })
+      .querySelector("path") as SVGPathElement;
+    await expect(getComputedStyle(cross).fill).toBe("rgb(0, 130, 201)");
   },
   parameters: {
     docs: {
@@ -321,11 +338,13 @@ export const CssCustomization: Story = {
     "--public-room-bar-top-margin": "8px",
     "--public-room-bar-bottom-margin": "24px",
     "--public-room-bar-header-gap": "12px",
+    "--public-room-bar-close-icon": "#0082c9",
   }}
 >
   <PublicRoomBar
     headerText="Public Room"
     bodyText="This room is accessible to anyone with the link"
+    onClose={onClose}
   />
 </div>`,
       },

@@ -5,7 +5,6 @@ import CrossIcon from "../../assets/icons/12/cross.react.svg";
 import PeopleIcon from "../../assets/icons/16/people.react.svg";
 
 import { Text } from "../text";
-import { IconButton } from "../icon-button";
 
 import styles from "./PublicRoomBar.module.scss";
 import type { PublicRoomBarProps } from "./PublicRoomBar.types";
@@ -27,6 +26,7 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
     barIsVisible,
     className,
     dataTestId,
+    closeLabel = "Close",
     ...rest
   } = props;
 
@@ -50,7 +50,9 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
       ref={ref}
       data-testid={dataTestId ?? "public_room_bar"}
     >
-      <div className={styles.textContainer}>
+      {/* A polite live region around the text only, so a bar that appears
+          is announced without its close button. */}
+      <div className={styles.textContainer} role="status">
         {!hideHeader ? (
           <div className={styles.headerBody}>
             <div className={styles.headerIcon}>{icon}</div>
@@ -69,13 +71,17 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
         </Text>
       </div>
 
+      {/* A native button; its test id is kept from the IconButton it replaced. */}
       {onClose ? (
-        <IconButton
+        <button
+          type="button"
           className={styles.closeIcon}
-          size={12}
-          iconNode={<CrossIcon />}
-          onClick={onClose}
-        />
+          aria-label={closeLabel}
+          onClick={() => onClose()}
+          data-testid="icon-button"
+        >
+          <CrossIcon aria-hidden="true" focusable="false" />
+        </button>
       ) : null}
     </div>
   );

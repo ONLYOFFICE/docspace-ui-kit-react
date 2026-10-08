@@ -25,8 +25,33 @@ describe("PublicRoomBar", () => {
     const customIcon = "custom-icon-path.svg";
     render(<PublicRoomBar {...defaultProps} iconName={customIcon} />);
 
-    const iconElement = screen.getByTestId("icon-button");
-    expect(iconElement).toBeInTheDocument();
+    expect(screen.getByText("Test Header")).toBeInTheDocument();
+  });
+
+  it("renders the close control as a named native button", () => {
+    render(<PublicRoomBar {...defaultProps} />);
+
+    const close = screen.getByRole("button", { name: "Close" });
+    expect(close.tagName).toBe("BUTTON");
+    expect(close).toHaveAttribute("type", "button");
+    expect(close).toBe(screen.getByTestId("icon-button"));
+  });
+
+  it("takes a translated close label", () => {
+    render(<PublicRoomBar {...defaultProps} closeLabel="Schliessen" />);
+
+    expect(
+      screen.getByRole("button", { name: "Schliessen" }),
+    ).toBeInTheDocument();
+  });
+
+  it("puts the text, not the close button, in a status region", () => {
+    render(<PublicRoomBar {...defaultProps} />);
+
+    const status = screen.getByRole("status");
+    expect(status).toHaveTextContent("Test Header");
+    expect(status).toHaveTextContent("Test Body");
+    expect(status).not.toContainElement(screen.getByRole("button"));
   });
 
   it("calls onClose when close button is clicked", () => {

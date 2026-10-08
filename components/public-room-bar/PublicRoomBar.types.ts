@@ -13,6 +13,8 @@ export interface PublicRoomBarProps {
   hideHeader?: boolean;
   /** Called when the close button is clicked. The button exists only while this is set, and the bar does not hide itself. */
   onClose?: () => void;
+  /** Accessible name of the close button (its `aria-label`). Defaults to the English `"Close"`; pass a translated string. Ignored without `onClose`. */
+  closeLabel?: string;
   /** Added after the component's own classes on the outer element. */
   className?: string;
   /** Inline style of the outer element, and where the `--public-room-bar-*` custom properties go. */
