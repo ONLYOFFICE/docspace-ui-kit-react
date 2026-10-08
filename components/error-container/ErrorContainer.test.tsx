@@ -79,6 +79,52 @@ describe("ErrorContainer", () => {
     expect(container.className).toContain(className);
   });
 
+  it("writes no element ids of its own, so two containers do not collide", () => {
+    const { container } = render(
+      <>
+        <ErrorContainer
+          hideLogo
+          headerText="First"
+          bodyText="Body"
+          customizedBodyText="Extra"
+          buttonText="Retry"
+          onClickButton={mockOnClick}
+        />
+        <ErrorContainer
+          hideLogo
+          headerText="Second"
+          buttonText="Retry"
+          onClickButton={mockOnClick}
+        />
+      </>,
+    );
+
+    expect(container.querySelectorAll("[id]")).toHaveLength(0);
+  });
+
+  it("hides the decorative illustration from assistive technology", () => {
+    render(<ErrorContainer hideLogo headerText="Error" />);
+
+    const svgs = screen.getByTestId("ErrorContainer").querySelectorAll("svg");
+    expect(svgs.length).toBeGreaterThan(0);
+    svgs.forEach((svg) => {
+      expect(svg.closest('[aria-hidden="true"]')).not.toBeNull();
+    });
+    expect(screen.queryAllByRole("img")).toHaveLength(0);
+  });
+
+  it("paints the illustration through theme tokens, not literal fills", () => {
+    render(<ErrorContainer hideLogo />);
+
+    const painted = screen
+      .getByTestId("ErrorContainer")
+      .querySelectorAll("path, rect, circle, ellipse");
+    painted.forEach((shape) => {
+      const fill = shape.getAttribute("fill");
+      expect(fill === null || fill === "none").toBe(true);
+    });
+  });
+
   it("renders with children", () => {
     const childText = "Child component";
 

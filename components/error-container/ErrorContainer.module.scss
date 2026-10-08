@@ -1,5 +1,14 @@
 @use "../../styles/variables/colors";
 @use "../../styles/mixins";
+@use "sass:color";
+
+// The two greyed reds of the right-hand mountain and the balloon's basket.
+$mauve: color.mix(colors.$gray, colors.$main-red, 79%);
+$mauve-light: color.mix(
+  colors.$big-gray-dark-mid,
+  colors.$dark-error-status,
+  84%
+);
 
 .container {
   --error-container-background: #{colors.$white};
@@ -38,17 +47,154 @@
   border: 0;
   box-sizing: border-box;
 
+  // The illustration's palette. Each colour is a tint of a kit colour towards
+  // white; the dark theme shades the same hues towards the page black instead,
+  // so the landscape keeps its look without glowing on a dark page.
+  --error-container-sky: #{color.mix(
+      colors.$main-blue-light,
+      colors.$white,
+      9%
+    )};
+  --error-container-bird: #{color.mix(
+      colors.$light-blue-view,
+      colors.$white,
+      34%
+    )};
+  --error-container-cloud: #{color.mix(
+      colors.$light-blue-view,
+      colors.$white,
+      22%
+    )};
+  --error-container-rope: #{color.mix(
+      colors.$light-blue-view,
+      colors.$white,
+      25%
+    )};
+  --error-container-rose: #{color.mix(
+      colors.$editor-red-color,
+      colors.$white,
+      33%
+    )};
+  --error-container-rose-light: #{color.mix(
+      colors.$editor-red-color,
+      colors.$white,
+      28%
+    )};
+  --error-container-mauve: #{$mauve};
+  --error-container-mauve-light: #{$mauve-light};
+  --error-container-peach: #{color.mix(colors.$dark-link, colors.$white, 20%)};
+  --error-container-peach-light: #{color.mix(
+      colors.$red-romb,
+      colors.$white,
+      17%
+    )};
+  --error-container-snow: #{colors.$white};
+
+  :global(.dark) & {
+    --error-container-sky: #{color.mix(
+        colors.$main-blue-light,
+        colors.$black,
+        14%
+      )};
+    --error-container-bird: #{color.mix(
+        colors.$light-blue-view,
+        colors.$black,
+        45%
+      )};
+    --error-container-cloud: #{color.mix(
+        colors.$light-blue-view,
+        colors.$black,
+        28%
+      )};
+    --error-container-rope: #{color.mix(
+        colors.$light-blue-view,
+        colors.$black,
+        35%
+      )};
+    --error-container-rose: #{color.mix(
+        colors.$editor-red-color,
+        colors.$black,
+        45%
+      )};
+    --error-container-rose-light: #{color.mix(
+        colors.$editor-red-color,
+        colors.$black,
+        38%
+      )};
+    --error-container-mauve: #{color.mix($mauve, colors.$black, 45%)};
+    --error-container-mauve-light: #{color.mix(
+        $mauve-light,
+        colors.$black,
+        50%
+      )};
+    --error-container-peach: #{color.mix(colors.$dark-link, colors.$black, 30%)};
+    --error-container-peach-light: #{color.mix(
+        colors.$red-romb,
+        colors.$black,
+        24%
+      )};
+    --error-container-snow: #{color.mix(colors.$gray, colors.$black, 40%)};
+  }
+
+  .fillSky {
+    fill: var(--error-container-sky);
+  }
+
+  .fillBird {
+    fill: var(--error-container-bird);
+  }
+
+  .fillCloud {
+    fill: var(--error-container-cloud);
+  }
+
+  .fillRope {
+    fill: var(--error-container-rope);
+  }
+
+  .strokeRope {
+    stroke: var(--error-container-rope);
+  }
+
+  .fillRose {
+    fill: var(--error-container-rose);
+  }
+
+  .fillRoseLight {
+    fill: var(--error-container-rose-light);
+  }
+
+  .fillMauve {
+    fill: var(--error-container-mauve);
+  }
+
+  .fillMauveLight {
+    fill: var(--error-container-mauve-light);
+  }
+
+  .fillPeach {
+    fill: var(--error-container-peach);
+  }
+
+  .fillPeachLight {
+    fill: var(--error-container-peach-light);
+  }
+
+  .fillSnow {
+    fill: var(--error-container-snow);
+  }
+
   &.isEditor {
     width: 100%;
     position: absolute;
   }
 
-  :global(#container-inner) {
+  .illustration {
     position: relative;
     margin: 64px 16px 48px 16px;
   }
 
-  :global(#header) {
+  h1.title {
     font-weight: 700;
     font-size: 23px;
     line-height: 28px;
@@ -56,7 +202,7 @@
     text-align: center;
   }
 
-  :global(#text) {
+  .text {
     font-weight: 600;
     font-size: 14px;
     line-height: 16px;
@@ -66,12 +212,12 @@
     padding: 0;
   }
 
-  :global(#button-container) {
+  .buttonContainer {
     width: 320px;
     margin-top: 24px;
   }
 
-  :global(#customized-text) {
+  .customizedText {
     color: var(--error-container-text-value);
   }
 
@@ -88,24 +234,24 @@
       padding: 18px 18px 0 18px;
     }
 
-    :global(#header) {
+    h1.title {
       margin-top: 12px;
     }
 
-    :global(#container-inner) {
+    .illustration {
       margin: 12px 16px 36px 16px;
     }
 
-    :global(#button-container) {
+    .buttonContainer {
       width: 100%;
     }
 
-    :global(#button) {
+    .button {
       width: 100%;
     }
   }
 
-  :global(#background) {
+  .background {
     width: 100%;
     height: auto;
     -webkit-animation: fadein_background 1s;
@@ -115,7 +261,7 @@
     animation: fadein_background 1s;
   }
 
-  :global(#birds) {
+  .birds {
     position: absolute;
     left: 56.8%;
     top: 27.4%;
@@ -129,7 +275,7 @@
     animation: fadein_birds 1s;
   }
 
-  :global(#mountain-left) {
+  .mountainLeft {
     position: absolute;
     left: 10.66%;
     top: 63.01%;
@@ -143,7 +289,7 @@
     animation: fadein_mountain-left 1s;
   }
 
-  :global(#mountain-right) {
+  .mountainRight {
     position: absolute;
     left: 58.66%;
     top: 54.79%;
@@ -157,7 +303,7 @@
     animation: fadein_mountain-right 1s;
   }
 
-  :global(#mountain-center) {
+  .mountainCenter {
     position: absolute;
     left: 24.8%;
     top: 45.47%;
@@ -171,7 +317,7 @@
     animation: fadein_mountain-center 1s;
   }
 
-  :global(#white-cloud-behind) {
+  .whiteCloudBehind {
     position: absolute;
     left: 57.33%;
     top: 63.01%;
@@ -195,7 +341,7 @@
       move_white-cloud-behind 1s linear 1s infinite alternate;
   }
 
-  :global(#white-cloud-center) {
+  .whiteCloudCenter {
     position: absolute;
     left: 31.33%;
     top: 73.97%;
@@ -219,7 +365,7 @@
       move_white-cloud-center 1s linear 1s infinite alternate;
   }
 
-  :global(#white-cloud-left) {
+  .whiteCloudLeft {
     position: absolute;
     left: -0.66%;
     top: 80.82%;
@@ -233,7 +379,7 @@
     animation: fadein_white-cloud-left 1s ease-in;
   }
 
-  :global(#white-cloud-right) {
+  .whiteCloudRight {
     position: absolute;
     left: 81.33%;
     top: 86.3%;
@@ -247,7 +393,7 @@
     animation: fadein_white-cloud-right 1s ease-in;
   }
 
-  :global(#blue-cloud-left) {
+  .blueCloudLeft {
     position: absolute;
     left: 0;
     top: 43.83%;
@@ -261,7 +407,7 @@
     animation: fadein_blue-cloud-left 1s ease-in;
   }
 
-  :global(#blue-cloud-right) {
+  .blueCloudRight {
     position: absolute;
     left: 87.33%;
     top: 24.65%;
@@ -275,7 +421,7 @@
     animation: fadein_blue-cloud-right 1s ease-in;
   }
 
-  :global(#baloon) {
+  .balloon {
     position: absolute;
     left: 25.33%;
     top: 13.69%;
