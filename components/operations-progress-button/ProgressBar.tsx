@@ -83,12 +83,9 @@ const ProgressBar = ({
           {...(onOpenPanel && { onClick: onOpenPanel })}
         >
           <div>
-            <IconButton
-              {...(onOpenPanel && { onClick: onOpenPanel })}
-              iconNode={icon}
-              size={16}
-              color="white"
-            />
+            {/* No onClick of its own: a click on the icon bubbles to the
+                row's handler, which would otherwise open the panel twice. */}
+            <IconButton iconNode={icon} size={16} color="white" />
             {!withoutStatus && (stopped || alert || completed) ? (
               <div
                 className={classNames(styles.infoIcon, {
@@ -109,12 +106,9 @@ const ProgressBar = ({
           </div>
           <div className={styles.labelWrapper}>
             <Text
-              className={classNames(
-                (styles.progressHeader,
-                {
-                  [styles.withClick]: onOpenPanel,
-                }),
-              )}
+              className={classNames(styles.progressHeader, {
+                [styles.withClick]: !!onOpenPanel,
+              })}
               fontSize="14px"
               fontWeight={600}
               truncate

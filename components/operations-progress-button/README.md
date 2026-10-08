@@ -242,6 +242,8 @@ export function UploadOutcome({
   centred above the bottom edge naming the folder under the pointer, which then flies into the
   corner when the drop starts an upload. `dropTargetFolderName`, `isDragging` and
   `clearDropPreviewLocation` are only about that one.
+- **A click on a row's icon opens the panel once.** The icon has no handler of its own; the click
+  reaches the row's.
 - **The cancel cross is offered only for a single operation** and calls `cancelUpload(t)` —
   with the translation function, not with the operation. `onCancelOperation` is declared and
   never read.
@@ -278,13 +280,16 @@ variables too.
 
 ## Accessibility
 
-- **The badge is a `<div>` with a click handler**, from
-  [`FloatingButton`](../floating-button/README.md): no role, no `tabIndex`, no key handler, so
-  neither the panel nor the list can be opened from the keyboard.
-- Its `aria-label` is the icon's name plus the word "button", in English whatever the
-  interface language.
-- The progress is conveyed by the ring alone — no `role="progressbar"`, no `aria-valuenow`,
-  and nothing announces that an operation finished.
+- **The badge is a [`FloatingButton`](../floating-button/README.md) with a click handler**, so it
+  is a `role="button"` in the tab order that Enter and Space press: the panel or the list opens
+  from the keyboard. A badge with nothing to open is still focusable, and pressing it does
+  nothing.
+- Its name is the icon's name plus the word "button", in English whatever the interface
+  language — this component passes no `label` down.
+- The ring's progress is reported by the badge's visually hidden `role="progressbar"`; nothing
+  announces that an operation finished.
+- The cancel cross is a named `<button>` (the translated "Cancel"), reached with Tab after the
+  badge and shown while it has focus.
 - The list is a [`DropDown`](../drop-down/README.md) with no `role="menu"` and no focus
   management; Escape does not close it, though a click on the backdrop does.
 - The tooltip is the only place the operation is named, and it is opened by hover or tap.
@@ -293,7 +298,8 @@ variables too.
 
 The component sets none, and neither do its rows. Query it through the ids
 [`FloatingButton`](../floating-button/README.md) renders — `floating-button`,
-`floating-button-progress`, `floating-button-alert` — or by the tooltip's text.
+`floating-button-progress`, `floating-button-alert`, `floating-button-close-icon` — or by the
+tooltip's text.
 
 ## Related
 

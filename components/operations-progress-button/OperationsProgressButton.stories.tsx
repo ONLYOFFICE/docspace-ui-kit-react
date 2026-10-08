@@ -270,14 +270,22 @@ export const UploadInProgress: Story = {
     showCancelButton: true,
   },
   play: async ({ args, canvas, userEvent }) => {
-    await userEvent.click(canvas.getByTestId("floating-button-close-icon"));
+    // The cross is a named button. It takes the pointer only once a real
+    // hover reveals it, which a play function cannot produce, so it is
+    // pressed from the keyboard here: Tab past the circle, then Enter.
+    const cancel = canvas.getByRole("button", { name: "Cancel" });
+    canvas.getByRole("button", { name: "upload button" }).focus();
+    await userEvent.tab();
+    await expect(cancel).toHaveFocus();
+    await expect(getComputedStyle(cancel).pointerEvents).toBe("auto");
+    await userEvent.keyboard("{Enter}");
     await expect(args.cancelUpload).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Lets the user stop a running operation: hover the button to reveal the cancel cross beside it (`showCancelButton`); clicking it calls `cancelUpload`.",
+          "Lets the user stop a running operation: hover the button, or Tab past it, to reveal the cancel cross beside it (`showCancelButton`); clicking or pressing it calls `cancelUpload`.",
       },
       source: {
         code: `<OperationsProgressButton
@@ -418,9 +426,19 @@ export const MultipleOperations: Story = {
     const list = await openList(context);
     await expect(within(list).getByText("Uploading files")).toBeVisible();
     await expect(within(list).getByText("Copying documents")).toBeVisible();
-    // The panel operation's row opens its panel and closes the list.
-    await userEvent.click(within(list).getByText("Moving folder"));
+    // The panel operation's row opens its panel and closes the list. A click
+    // on the row's icon opens it once, not once for the icon and again for
+    // the row it bubbles to.
+    const row = within(list)
+      .getByText("Moving folder")
+      .closest("[class*='progressMainContainer']") as HTMLElement;
+    await userEvent.click(within(row).getByTestId("icon-button"));
+    await expect(showPanel).toHaveBeenCalledTimes(1);
     await expect(showPanel).toHaveBeenCalledWith(true);
+    // The label carries its header class, with the pointer of a clickable row.
+    await expect(within(row).getByText("Moving folder").className).toMatch(
+      /progressHeader/,
+    );
     await waitFor(() =>
       expect(document.querySelector(".progress-container")).toBeNull(),
     );
