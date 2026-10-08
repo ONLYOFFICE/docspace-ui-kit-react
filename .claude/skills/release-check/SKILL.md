@@ -96,17 +96,18 @@ node .claude/scripts/release-check/registry.mjs
 
 A vendored package (a tarball committed beside `package.json`, installed as a `file:`
 devDependency) has to be on npm **before** this one is published: consumers never see the dev
-copy, only the peer range, and a peer range can only be met from a registry. `@onlyoffice/ai-chat`
-is the one this applies to today, and it is not on npm yet. Its peer range is a placeholder until
-then — fixed to the published version at publish time, not during merges.
+copy, only the peer range, and a peer range can only be met from a registry. No peer is vendored
+today: `@onlyoffice/ai-chat`, the last one, is on npm since 1.0.0 and resolves from the registry,
+so this section reports zero vendored peers. It still runs, for the next package that arrives as
+a tarball before its first release.
 
 The script fails on a `file:` spec in `dependencies` or `peerDependencies`, on a vendored peer
 missing from npm, and on a peer range that no published version satisfies (npm resolves the
 range, so a prerelease such as `0.5.130-docs.8` does not meet `^0.5.121`). It needs the network;
 exit 2 means the registry could not be asked, not that the check passed.
 
-Before a merge, a "not on npm" finding here is expected: report it as a standing note, not a
-blocker. Before a publish it blocks.
+While a peer is vendored, a "not on npm" finding before a merge is expected: report it as a
+standing note, not a blocker. Before a publish it blocks.
 
 ## Report
 

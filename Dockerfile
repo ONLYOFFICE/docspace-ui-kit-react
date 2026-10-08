@@ -25,11 +25,8 @@ WORKDIR /app
 
 RUN pnpm config set store-dir /root/.local/share/pnpm/store
 
-# Manifests first, for layer caching. The ai-chat tarball has to come with
-# them: package.json depends on it as `file:onlyoffice-ai-chat-*.tgz`, so the
-# install fails without it.
+# Manifests first, for layer caching.
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY onlyoffice-ai-chat-*.tgz ./
 
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 

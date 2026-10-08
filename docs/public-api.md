@@ -152,16 +152,16 @@ The `exports` map therefore declares them, and the build emits them. The distinc
 editorial, not mechanical — which is why it has to be written down here rather than enforced by
 resolution alone.
 
-| Module            | Client imports | Why not public API                                                                                                              |
-| ----------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `ai-agent`        | 80             | Depends on `@onlyoffice/ai-chat`, which cannot currently be published. Ships anyway, via optional peer dependencies — see below |
-| `billing`         | 68             | Portal tariff/payment flows; depends on the API layer and MobX stores                                                           |
-| `selectors`       | 70             | Data-driven pickers (People, Room, Files, Groups, MCPServers, AIAgent) built on the API layer and MobX                          |
-| `uploader`        | 7              | Depends on `selectors/Files` and `providers/api`                                                                                |
-| `document-editor` | 2              | Wrapper around `@onlyoffice/document-editor-react`; external consumers should use that package directly                         |
-| `api`             | —              | Portal REST client                                                                                                              |
-| `providers/api`   | —              | Portal API provider; sole importer of `axios`                                                                                   |
-| `utils/socket`    | —              | See above                                                                                                                       |
+| Module            | Client imports | Why not public API                                                                                      |
+| ----------------- | -------------- | ------------------------------------------------------------------------------------------------------- |
+| `ai-agent`        | 80             | Depends on `@onlyoffice/ai-chat`, an optional peer the consumer installs from npm — see below           |
+| `billing`         | 68             | Portal tariff/payment flows; depends on the API layer and MobX stores                                   |
+| `selectors`       | 70             | Data-driven pickers (People, Room, Files, Groups, MCPServers, AIAgent) built on the API layer and MobX  |
+| `uploader`        | 7              | Depends on `selectors/Files` and `providers/api`                                                        |
+| `document-editor` | 2              | Wrapper around `@onlyoffice/document-editor-react`; external consumers should use that package directly |
+| `api`             | —              | Portal REST client                                                                                      |
+| `providers/api`   | —              | Portal API provider; sole importer of `axios`                                                           |
+| `utils/socket`    | —              | See above                                                                                               |
 
 **Two of them are in the root barrel**: `index.ts` exports `uploader` and `billing` alongside
 the public modules, so they are portal-internal by tiering and public by resolution — and, since
@@ -172,12 +172,14 @@ unreachable from a plugin. That inconsistency is what leaks `axios` into the cor
 Any of these could be promoted to public later if there is external demand (D5). Promotion is
 cheap — it means documenting and committing to semver, not moving code.
 
-## Shipping `ai-agent` without a publishable `ai-chat`
+## Shipping `ai-agent` as an optional peer of `ai-chat`
 
-`@onlyoffice/ai-chat` is a vendored `file:` tarball, and a published package with a `file:`
-dependency is uninstallable for everyone. But `ai-agent` has to ship. The resolution is
-**optional peer dependencies** — the same pattern `ai-chat` itself uses, and one that needs no
-exception to the "externalize everything" build rule.
+`@onlyoffice/ai-chat` used to be a vendored `file:` tarball, and a published package with a
+`file:` dependency is uninstallable for everyone. It is on npm now (`^1.0.0`), but the
+arrangement made for the tarball stays, because it is right on its own terms: most consumers
+never import `ai-agent`, and should not download a chat UI with 32 peers of its own. The
+resolution is **optional peer dependencies** — the same pattern `ai-chat` itself uses, and one
+that needs no exception to the "externalize everything" build rule.
 
 - `@onlyoffice/ai-chat` is declared as a **peer dependency marked optional**
   (`peerDependenciesMeta`).
@@ -185,17 +187,16 @@ exception to the "externalize everything" build rule.
   `@onlyoffice/ai-chat` specifier.
 - `npm i @onlyoffice/apps-ui-kit` installs cleanly for everyone: an unsatisfied optional
   peer is neither fetched nor an error.
-- Consumers who never import `ai-agent/*` — every external consumer, for now — are unaffected.
-- The monorepo supplies `ai-chat` itself: the tarball declaration moves to the consuming
-  package, or stays in the ui-kit workspace manifest for development.
+- Consumers who never import `ai-agent/*` are unaffected.
+- A consumer that does import it installs `@onlyoffice/ai-chat` 1.x itself, from npm. This
+  repository keeps a registry copy in `devDependencies` for the build, tests and Storybook.
 
 The failure mode is loud and honest: importing `ai-agent/*` without supplying `ai-chat` fails at
 build time naming the missing package. That is the opposite of the silent failures this
 separation exists to prevent.
 
-`ai-agent` is therefore unusable for external consumers until `ai-chat` is published. That
-follows from the constraint, not from this design, and it is acceptable precisely because
-`ai-agent` carries no public contract.
+`ai-agent` still carries no public contract: it is reachable by anyone who installs `ai-chat`,
+but it is portal-coupled and not covered by semver.
 
 ## Dependency consequences
 
@@ -340,8 +341,8 @@ harness in another repository rather than by anything here.
 ## Open questions
 
 1. ~~Does the published package ship the portal-internal modules?~~ **Answered: yes.** They
-   ship; `ai-agent` works through optional peer dependencies until `@onlyoffice/ai-chat` can be
-   published.
+   ship; `ai-agent` works through optional peer dependencies. `@onlyoffice/ai-chat` has since
+   been published (1.0.0), and the peer range is `^1.0.0`.
    ~~The 15 packages nobody imports~~ **Done: moved to optional peers.** `mobx`, `mobx-react`,
    `axios`, `socket.io-client`, `@socket.io/component-emitter`, `react-router`,
    `react-markdown`, `react-syntax-highlighter`, `rehype-katex`, `rehype-raw`, `remark-gfm`,

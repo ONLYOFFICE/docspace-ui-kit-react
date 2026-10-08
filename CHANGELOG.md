@@ -58,6 +58,10 @@ _Changed_ before upgrading.
 - **`Article`'s `showProgress` is optional, and it and `isInfoPanelVisible` are deprecated.**
   Both only moved the live chat launcher, which the component no longer draws, so neither is
   read. Passing them still compiles; they go in the next major
+- **The `@onlyoffice/ai-chat` peer is `^1.0.0`, from npm.** It was `^0.6.32`, met only by a
+  tarball vendored in this repository; ai-chat is now published, and the tarball is gone. The
+  peer is still optional, so nothing changes for a consumer that does not import `ai-agent/`;
+  one that does has to install ai-chat 1.x
 
 ### Added
 
