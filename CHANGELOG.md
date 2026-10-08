@@ -193,6 +193,13 @@ under _Changed_.
 
 ### Fixed
 
+- **Keys a component handles no longer reach the page's or a dialog's listeners.** The keyboard
+  support added to `ContextMenuButton`, `LinkWithDropdown`, `Tags`, `QuickActions`,
+  `MainButtonMobile` and `Dropzone` let its keys bubble on, so Escape in a menu inside a
+  `ModalDialog` (which closes on an Escape `keyup` on `window`) closed the dialog too, and in
+  the portal's file list Enter on a tag or in a menu also opened the selected item, the arrows
+  moved the selection and Escape cleared it. Each now stops the key it acts on and swallows the
+  matching `keyup`.
 - The AI agent's editor tool calls go to the portal's own origin only. They carry what the
   model writes into a document, and were posted to the editor panel's iframe and to the
   generated-file tab with the target origin `"*"`, so a window that had meanwhile navigated
