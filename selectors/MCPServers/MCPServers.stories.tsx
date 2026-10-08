@@ -215,12 +215,14 @@ export const WithPreselection: Story = {
   play: async ({ args }: PlayContext) => {
     await listed();
     // The portal's own server carries the product's name once -- Storybook's
-    // brands make it "ONLYOFFICE", not "ONLYOFFICE ONLYOFFICE".
+    // brands make it "ONLYOFFICE Apps", not "ONLYOFFICE ONLYOFFICE Apps".
     await expect(
-      within(row("ONLYOFFICE")).getByText("ONLYOFFICE", { exact: true }),
+      within(row("ONLYOFFICE Apps")).getByText("ONLYOFFICE Apps", {
+        exact: true,
+      }),
     ).toBeVisible();
     await expect(screen.queryByText(/ONLYOFFICE\s+ONLYOFFICE/)).toBeNull();
-    await expect(ticked("ONLYOFFICE")).toBe(true);
+    await expect(ticked("ONLYOFFICE Apps")).toBe(true);
     await expect(ticked("Demo CRM")).toBe(false);
 
     // Adding one more keeps the preselected server.

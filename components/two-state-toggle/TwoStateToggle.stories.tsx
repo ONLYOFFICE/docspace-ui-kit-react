@@ -300,7 +300,7 @@ export const CssCustomization: Story = {
       borderRadius: "18px",
       backgroundColor: "rgb(46, 125, 50)",
     });
-    await expect(canvas.getByText("ONLYOFFICE design")).toHaveStyle({
+    await expect(canvas.getByText("ONLYOFFICE Apps design")).toHaveStyle({
       color: "rgb(46, 125, 50)",
     });
     // The focus ring mixes the custom accent (46, 125, 50 in 0-1 sRGB).
