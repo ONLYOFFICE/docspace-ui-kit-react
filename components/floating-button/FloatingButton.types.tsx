@@ -10,15 +10,15 @@ export type FloatingButtonProps = {
   style?: React.CSSProperties;
   /** Which of the built-in icons is drawn in the middle. Ignored when `iconUrl` is set. */
   icon?: keyof typeof FloatingButtonIcons;
-  /** URL of an image to draw instead of the built-in icon, at 20px wide. */
+  /** URL of an image to draw instead of the built-in icon, at 20px wide. It is decorative (`alt=""`); the circle is named by `label`. */
   iconUrl?: string;
   /** Whether the badge shows the warning triangle. `stopped` wins over it. */
   alert?: boolean;
-  /** Called with the event when the circle is clicked. The cancel cross has its own handler. */
+  /** Called with the event when the circle is clicked, or pressed with Enter or Space. With it the circle is a button in the tab order. The cancel cross has its own handler. */
   onClick?: (e: React.MouseEvent) => void;
   /** CSS colour of the circle and of the progress ring. Without it the accent colour is used. */
   color?: string;
-  /** Called when the cancel cross is clicked. */
+  /** Called when the cancel cross is clicked or pressed. */
   clearUploadedFilesHistory?: () => void;
   /** Whether the progress ring is left out entirely, leaving the bare circle. */
   withoutProgress?: boolean;
@@ -33,8 +33,12 @@ export type FloatingButtonProps = {
   stopped?: boolean;
   /** Whether the status badge is suppressed whatever `stopped`, `alert` and `completed` say. */
   withoutStatus?: boolean;
-  /** How much of the ring is filled, 0–100. Without it the ring spins instead. */
+  /** How much of the ring is filled, 0–100, clamped to that range. `0` is an empty ring; only an absent `percent` spins it. */
   percent?: number;
+  /** Accessible name of the circle and of its progress bar. Defaults to the icon's name followed by "button" (`"upload button"`), so pass a translated one. */
+  label?: string;
+  /** Accessible name of the cancel cross. Defaults to the translated "Cancel". */
+  cancelLabel?: string;
 };
 
 export type DefaultStylesProps = {

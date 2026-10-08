@@ -23,6 +23,8 @@ import BackupIcon from "../../assets/icons/24/backup.react.svg";
 
 import classNames from "classnames";
 
+import { useCommonTranslation } from "../../utils/i18n";
+
 import { FloatingButtonProps } from "./FloatingButton.types";
 import { FloatingButtonIcons } from "./FloatingButton.enums";
 import styles from "./FloatingButton.module.scss";
@@ -75,12 +77,17 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
       showCloseIcon,
       withoutStatus = false,
       percent,
+      label,
+      cancelLabel,
     },
     ref,
   ) => {
+    const t = useCommonTranslation();
+
     const iconComponent = useMemo(() => {
       if (iconUrl) {
-        return <img width={20} src={iconUrl} alt="icon" />;
+        // Decorative: the circle is named by `label`.
+        return <img width={20} src={iconUrl} alt="" />;
       }
       return (
         ICON_COMPONENTS[icon] ?? ICON_COMPONENTS[FloatingButtonIcons.other]
@@ -106,7 +113,24 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
       icon as (typeof accentIcons)[number],
     );
 
-    const isCompleted = completed || (completed && percent && percent >= 100);
+    const isCompleted = completed;
+
+    // A number, 0 included, is a known progress; only an absent percent
+    // means "not known yet" and spins the ring.
+    const hasPercent = typeof percent === "number" && !Number.isNaN(percent);
+    const progressValue = hasPercent
+      ? Math.min(100, Math.max(0, percent))
+      : undefined;
+
+    const buttonLabel = label ?? `${icon} button`;
+    const cancelName = cancelLabel ?? (t("Common:CancelButton") || "Cancel");
+
+    const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      // A real click, so onClick receives the mouse event it is typed for.
+      e.currentTarget.click();
+    };
 
     return (
       <div
@@ -122,7 +146,10 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
           onClick={onClick}
           data-testid="floating-button"
           data-role="button"
-          aria-label={`${icon} button`}
+          {...(onClick
+            ? { role: "button", tabIndex: 0, onKeyDown }
+            : { role: "img" })}
+          aria-label={buttonLabel}
           className={classNames(styles.circleWrap, buttonClassName, {
             [styles.loading]: !isCompleted,
             [styles.completed]: isCompleted,
@@ -146,11 +173,11 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
             {withoutProgress ? null : (
               <div
                 className={classNames(styles.loader, {
-                  [styles.withProgress]: !!percent,
+                  [styles.withProgress]: hasPercent,
                 })}
-                {...(percent && {
+                {...(hasPercent && {
                   style: {
-                    "--percent-percentage": `${percent}%`,
+                    "--percent-percentage": `${progressValue}%`,
                   } as React.CSSProperties,
                 })}
               />
@@ -196,12 +223,29 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
           </div>
         </div>
 
+        {withoutProgress ? null : (
+          // Outside the circle, whose role makes its children presentational.
+          <div
+            className={styles.visuallyHidden}
+            role="progressbar"
+            aria-label={buttonLabel}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={isCompleted ? 100 : progressValue}
+            data-testid="floating-button-progressbar"
+          />
+        )}
+
         {showCancelButton ? (
-          <CloseIcon
+          <button
+            type="button"
             className="layout-progress-bar_close-icon"
             onClick={handleProgressClear}
+            aria-label={cancelName}
             data-testid="floating-button-close-icon"
-          />
+          >
+            <CloseIcon aria-hidden="true" focusable="false" />
+          </button>
         ) : null}
       </div>
     );

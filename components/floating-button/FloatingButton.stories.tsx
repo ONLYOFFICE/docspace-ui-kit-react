@@ -163,14 +163,23 @@ export const Default: Story = {
     onClick: fn(),
   },
   play: async ({ args, canvas, userEvent }) => {
-    const button = canvas.getByTestId("floating-button");
-    await expect(button).toHaveAttribute("aria-label", "upload button");
+    const button = canvas.getByRole("button", { name: "upload button" });
     await expect(canvas.getByTestId("icon-upload")).toBeInTheDocument();
     // No percent: the ring spins, with no progress value of its own.
     const ring = ringOf(button);
     await expect(ring?.style.getPropertyValue("--percent-percentage")).toBe("");
+    await expect(canvas.getByRole("progressbar")).not.toHaveAttribute(
+      "aria-valuenow",
+    );
     await userEvent.click(button);
     await expect(args.onClick).toHaveBeenCalledTimes(1);
+
+    // The circle is a button for the keyboard too.
+    button.blur();
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
   },
   parameters: {
     docs: {
@@ -195,6 +204,11 @@ export const WithProgress: Story = {
     const ring = ringOf(canvas.getByTestId("floating-button"));
     await expect(ring?.style.getPropertyValue("--percent-percentage")).toBe(
       "45%",
+    );
+    // The percentage is reported to assistive technology as well.
+    await expect(canvas.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "45",
     );
   },
   parameters: {
@@ -466,7 +480,11 @@ export const CustomIconImage: Story = {
   render: () => <FloatingButton iconUrl={sampleIconUrl} />,
   play: async ({ canvas }) => {
     // iconUrl replaces the built-in icon with a 20px image.
-    const img = canvas.getByRole("img", { name: "icon" });
+    // The image is decorative: the circle carries the name.
+    const img = canvas
+      .getByTestId("floating-button")
+      .querySelector("img") as HTMLImageElement;
+    await expect(img).toHaveAttribute("alt", "");
     await expect(img).toHaveAttribute("width", "20");
     await expect(canvas.queryByTestId("icon-other")).toBeNull();
   },

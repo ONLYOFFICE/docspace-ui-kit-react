@@ -134,14 +134,76 @@ describe("FloatingButton", () => {
       );
     });
 
-    it("is keyboard accessible", () => {
+    it("is a keyboard-operable button when it has onClick", () => {
       const onClick = vi.fn();
       renderComponent(<FloatingButton {...defaultProps} onClick={onClick} />);
 
-      const button = screen.getByTestId("floating-button");
-      fireEvent.keyPress(button, { key: "Enter", code: 13, charCode: 13 });
+      const button = screen.getByRole("button", { name: "upload button" });
+      expect(button).toHaveAttribute("tabindex", "0");
 
-      expect(onClick).toHaveBeenCalledTimes(0);
+      fireEvent.keyDown(button, { key: "Enter" });
+      fireEvent.keyDown(button, { key: " " });
+
+      expect(onClick).toHaveBeenCalledTimes(2);
+    });
+
+    it("is not a button without onClick", () => {
+      renderComponent(<FloatingButton {...defaultProps} />);
+      expect(screen.queryByRole("button")).toBeNull();
+    });
+
+    it("takes its name from label", () => {
+      renderComponent(
+        <FloatingButton {...defaultProps} onClick={vi.fn()} label="Uploads" />,
+      );
+      expect(
+        screen.getByRole("button", { name: "Uploads" }),
+      ).toBeInTheDocument();
+    });
+
+    it("reports the percent through a progress bar", () => {
+      const { rerender } = renderComponent(
+        <FloatingButton {...defaultProps} percent={45} />,
+      );
+      const bar = screen.getByRole("progressbar", { name: "upload button" });
+      expect(bar).toHaveAttribute("aria-valuenow", "45");
+
+      rerender(<FloatingButton {...defaultProps} percent={undefined} />);
+      expect(bar).not.toHaveAttribute("aria-valuenow");
+
+      rerender(<FloatingButton {...defaultProps} completed />);
+      expect(bar).toHaveAttribute("aria-valuenow", "100");
+    });
+
+    it("draws an empty ring, not a spinner, at percent 0", () => {
+      renderComponent(<FloatingButton {...defaultProps} percent={0} />);
+      const ring = screen.getByTestId("floating-button-progress")
+        .firstElementChild as HTMLElement;
+      expect(ring.style.getPropertyValue("--percent-percentage")).toBe("0%");
+      expect(screen.getByRole("progressbar")).toHaveAttribute(
+        "aria-valuenow",
+        "0",
+      );
+    });
+
+    it("gives the cancel cross a name and a real button", () => {
+      const clear = vi.fn();
+      renderComponent(
+        <FloatingButton
+          {...defaultProps}
+          showCancelButton
+          clearUploadedFilesHistory={clear}
+        />,
+      );
+      const cancel = screen.getByRole("button", { name: "Cancel" });
+      expect(cancel).toHaveAttribute("type", "button");
+      fireEvent.click(cancel);
+      expect(clear).toHaveBeenCalledTimes(1);
+    });
+
+    it("treats an iconUrl image as decorative", () => {
+      renderComponent(<FloatingButton iconUrl="/icon.svg" />);
+      expect(document.querySelector("img")).toHaveAttribute("alt", "");
     });
   });
 });
