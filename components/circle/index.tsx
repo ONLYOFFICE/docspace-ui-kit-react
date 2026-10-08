@@ -1,3 +1,4 @@
+import { useId } from "react";
 import ContentLoader from "react-content-loader";
 
 import { LOADER_STYLE } from "../../constants";
@@ -7,7 +8,7 @@ export type { CircleSkeletonProps };
 
 export const CircleSkeleton = ({
   title = LOADER_STYLE.title,
-  x = "3",
+  x = "12",
   y = "12",
   radius = "12",
   width = "100%",
@@ -18,21 +19,32 @@ export const CircleSkeleton = ({
   foregroundOpacity = LOADER_STYLE.foregroundOpacity,
   speed = LOADER_STYLE.speed,
   animate = LOADER_STYLE.animate,
+  uniqueKey,
   ...rest
-}: CircleSkeletonProps) => (
-  <ContentLoader
-    title={title}
-    width={width}
-    height={height}
-    backgroundColor={backgroundColor}
-    foregroundColor={foregroundColor}
-    backgroundOpacity={backgroundOpacity}
-    foregroundOpacity={foregroundOpacity}
-    speed={speed}
-    animate={animate}
-    {...rest}
-    data-testid="circle-skeleton"
-  >
-    <circle cx={x} cy={y} r={radius} />
-  </ContentLoader>
-);
+}: CircleSkeletonProps) => {
+  // react-content-loader otherwise picks a random uniqueKey per render, which
+  // produces SSR/client SVG-id mismatches and triggers React hydration errors.
+  const stableKey = useId();
+
+  return (
+    <ContentLoader
+      title={title}
+      width={width}
+      height={height}
+      backgroundColor={backgroundColor}
+      foregroundColor={foregroundColor}
+      backgroundOpacity={backgroundOpacity}
+      foregroundOpacity={foregroundOpacity}
+      speed={speed}
+      animate={animate}
+      uniqueKey={uniqueKey ?? stableKey}
+      // Without a title the skeleton is a decorative placeholder: hide it
+      // rather than expose an unnamed image. Mark the region aria-busy.
+      aria-hidden={title ? undefined : true}
+      {...rest}
+      data-testid="circle-skeleton"
+    >
+      <circle cx={x} cy={y} r={radius} />
+    </ContentLoader>
+  );
+};

@@ -9,6 +9,7 @@ vi.mock("react-content-loader", () => ({
     height,
     className,
     style,
+    uniqueKey,
     ...rest
   }: {
     children?: React.ReactNode;
@@ -17,10 +18,12 @@ vi.mock("react-content-loader", () => ({
     height?: string;
     className?: string;
     style?: React.CSSProperties;
+    uniqueKey?: string;
     [key: string]: unknown;
   }) => (
     <svg
       data-testid="circle-skeleton"
+      data-unique-key={uniqueKey}
       width={width}
       height={height}
       className={className}
@@ -63,7 +66,8 @@ describe("<CircleSkeleton />", () => {
     render(<CircleSkeleton />);
     const skeleton = screen.getByTestId("circle-skeleton");
     const circle = skeleton.querySelector("circle");
-    expect(circle).toHaveAttribute("cx", "3");
+    // cx equals the radius, so the default circle is not cut off.
+    expect(circle).toHaveAttribute("cx", "12");
     expect(circle).toHaveAttribute("cy", "12");
     expect(circle).toHaveAttribute("r", "12");
   });
@@ -80,6 +84,42 @@ describe("<CircleSkeleton />", () => {
     const skeleton = screen.getByTestId("circle-skeleton");
     const title = skeleton.querySelector("title");
     expect(title).toBeNull();
+  });
+
+  it("hides an untitled skeleton from assistive technology", () => {
+    render(<CircleSkeleton />);
+    expect(screen.getByTestId("circle-skeleton")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+  });
+
+  it("keeps a titled skeleton exposed", () => {
+    render(<CircleSkeleton title="Loading avatar" />);
+    expect(screen.getByTestId("circle-skeleton")).not.toHaveAttribute(
+      "aria-hidden",
+    );
+  });
+
+  it("passes a stable uniqueKey, the same on every render", () => {
+    const { rerender } = render(<CircleSkeleton />);
+    const first = screen
+      .getByTestId("circle-skeleton")
+      .getAttribute("data-unique-key");
+    expect(first).toBeTruthy();
+
+    rerender(<CircleSkeleton radius="20" />);
+    expect(
+      screen.getByTestId("circle-skeleton").getAttribute("data-unique-key"),
+    ).toBe(first);
+  });
+
+  it("uses the uniqueKey it is given", () => {
+    render(<CircleSkeleton uniqueKey="avatar" />);
+    expect(screen.getByTestId("circle-skeleton")).toHaveAttribute(
+      "data-unique-key",
+      "avatar",
+    );
   });
 
   it("renders with custom className", () => {

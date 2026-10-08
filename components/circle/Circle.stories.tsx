@@ -19,9 +19,9 @@ const meta = {
     x: {
       control: "text",
       description:
-        "Horizontal position of the circle's centre, in user units. A value smaller than `radius` cuts off the circle's left side, which the default does",
+        "Horizontal position of the circle's centre, in user units. A value smaller than `radius` cuts off the circle's left side; the default equals the default radius",
       table: {
-        defaultValue: { summary: "3" },
+        defaultValue: { summary: "12" },
       },
     },
     y: {
@@ -51,7 +51,7 @@ const meta = {
     title: {
       control: "text",
       description:
-        "Accessible name of the placeholder, read by screen readers and shown as the browser's tooltip on hover. Empty by default, which leaves the placeholder unnamed",
+        "Accessible name of the placeholder, read by screen readers and shown as the browser's tooltip on hover. Empty by default, and an untitled placeholder is hidden from screen readers",
       table: {
         defaultValue: { summary: '""' },
       },
@@ -149,12 +149,14 @@ export const Default: Story = {
     const svg = await expectCircle(context, 50, 20);
     // The band sweeps by default.
     await expect(svg.querySelector("animateTransform")).not.toBeNull();
+    // Untitled, the placeholder is decoration and hidden from screen readers.
+    await expect(svg).toHaveAttribute("aria-hidden", "true");
   },
   parameters: {
     docs: {
       description: {
         story:
-          "A circle of radius 20 centred in a 50 by 50 box — the radius, the centre and the box size are set together, because the component's own defaults cut the circle off. Change any prop live in the Controls panel below.",
+          "A circle of radius 20 centred in a 50 by 50 box — the radius, the centre and the box size are set together, because a centre closer to an edge than the radius cuts the circle off. Change any prop live in the Controls panel below.",
       },
       source: {
         code: `<CircleSkeleton width="50" height="50" radius="20" x="25" y="25" />`,
