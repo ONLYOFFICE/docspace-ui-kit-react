@@ -35,7 +35,8 @@ describe("LinkWithDropdown", () => {
 
     const button = screen.getByRole("button", { name: "Link with dropdown" });
     expect(button).toBeInTheDocument();
-    expect(button).toHaveAttribute("aria-haspopup", "true");
+    expect(button).toHaveAttribute("aria-haspopup", "listbox");
+    expect(button).toHaveAttribute("tabindex", "0");
     expect(button).toHaveAttribute("aria-expanded", "false");
   });
 
@@ -140,5 +141,50 @@ describe("LinkWithDropdown", () => {
     const textElement = screen.getByText("Link with dropdown");
     expect(textElement).toHaveClass(styles.textOverflow);
     expect(textElement).toHaveAttribute("title", title);
+  });
+
+  it("opens and closes from the keyboard", () => {
+    render(
+      <LinkWithDropdown data={mockData}>Link with dropdown</LinkWithDropdown>,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Link with dropdown" });
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    fireEvent.keyDown(trigger, { key: "Escape" });
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    fireEvent.keyDown(trigger, { key: " " });
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("is out of the tab order and ignores keys while disabled", () => {
+    render(
+      <LinkWithDropdown data={mockData} isDisabled>
+        Link with dropdown
+      </LinkWithDropdown>,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Link with dropdown" });
+    expect(trigger).toHaveAttribute("tabindex", "-1");
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("drops the 200px cap when manualWidth is set", () => {
+    const { rerender } = render(
+      <LinkWithDropdown data={mockData} isOpen>
+        Link with dropdown
+      </LinkWithDropdown>,
+    );
+    expect(screen.getByTestId("dropdown")).toHaveClass(styles.fixedMaxWidth);
+
+    rerender(
+      <LinkWithDropdown data={mockData} isOpen manualWidth="300px">
+        Link with dropdown
+      </LinkWithDropdown>,
+    );
+    expect(screen.getByTestId("dropdown")).not.toHaveClass(
+      styles.fixedMaxWidth,
+    );
   });
 });

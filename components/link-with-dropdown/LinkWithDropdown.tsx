@@ -62,6 +62,22 @@ const LinkWithDropdown = ({
     setIsOpen(!state.isOpen);
   };
 
+  const onKeyDown = (e: React.KeyboardEvent<HTMLAnchorElement>) => {
+    if (isDisabled) return;
+
+    if (e.key === "Enter" || e.key === " ") {
+      // Space would otherwise scroll the page.
+      e.preventDefault();
+      onOpen();
+      return;
+    }
+
+    if (e.key === "Escape" && state.isOpen) {
+      e.preventDefault();
+      setIsOpen(false);
+    }
+  };
+
   const onCheckManualWidth = () => {
     const padding = 32;
     if (ref.current) {
@@ -166,7 +182,9 @@ const LinkWithDropdown = ({
           )}
           style={{ color }}
           role="button"
-          aria-haspopup="true"
+          tabIndex={isDisabled ? -1 : 0}
+          onKeyDown={onKeyDown}
+          aria-haspopup="listbox"
           aria-expanded={state.isOpen}
           aria-disabled={isDisabled}
           {...rest}
@@ -189,11 +207,12 @@ const LinkWithDropdown = ({
       </span>
       <DropDown
         className={
-          classNames(
-            "fixed-max-width",
-            dropDownClassName || "",
-            styles.fixedMaxWidth,
-          ) || ""
+          // An explicit manualWidth is the width; the 200px cap only applies
+          // to a menu that sizes itself.
+          classNames(dropDownClassName || "", {
+            "fixed-max-width": !manualWidth,
+            [styles.fixedMaxWidth]: !manualWidth,
+          }) || ""
         }
         manualWidth={
           manualWidth || (showScroll ? onCheckManualWidth() : undefined)

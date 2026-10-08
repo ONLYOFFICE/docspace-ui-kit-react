@@ -252,6 +252,18 @@ export const Default: Story = {
     await userEvent.click(screen.getByRole("option", { name: "Button 2" }));
     await expect(dropdownItems[1].onClick).toHaveBeenCalledTimes(1);
     await expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    // The trigger is in the tab order and works from the keyboard.
+    await userEvent.tab();
+    await expect(trigger).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await userEvent.keyboard("{Escape}");
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await userEvent.keyboard(" ");
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await userEvent.keyboard(" ");
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
   },
   args: {
     children: "Default Link",
@@ -383,6 +395,11 @@ export const Disabled: Story = {
     await expect(trigger).toHaveAttribute("aria-disabled", "true");
     await userEvent.click(trigger);
     await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    // Out of the tab order, and the keys do nothing either.
+    await expect(trigger).toHaveAttribute("tabindex", "-1");
+    trigger.focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
   },
   parameters: {
     docs: {
@@ -450,16 +467,17 @@ export const WithCustomWidth: Story = {
   render: () => <WithCustomWidthTemplate />,
   play: async (context) => {
     await opens(context, "Custom Width Link");
-    // The width reaches the menu as its --manual-width.
-    await expect(
-      screen.getByRole("listbox").style.getPropertyValue("--manual-width"),
-    ).toBe("300px");
+    // The width reaches the menu as its --manual-width, and the 200px cap
+    // of a self-sizing menu does not apply to it.
+    const menu = screen.getByRole("listbox");
+    await expect(menu.style.getPropertyValue("--manual-width")).toBe("300px");
+    await expect(Math.round(menu.getBoundingClientRect().width)).toBe(300);
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Link with a manually set dropdown width for controlling the menu size.",
+          "Link with a manually set dropdown width for controlling the menu size: `manualWidth` sets the width exactly, past the 200px a self-sizing menu stops at.",
       },
       source: {
         code: `<LinkWithDropdown data={items} manualWidth="300px">Custom Width Link</LinkWithDropdown>`,
