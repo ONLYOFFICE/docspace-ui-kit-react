@@ -124,8 +124,12 @@ export const WithImage: Story = {
     imgSrc: CatalogFolderIconUrl,
   },
   play: async ({ canvas }) => {
-    // The image replaces the letter.
-    await expect(canvas.getByRole("img", { name: "mcp icon" })).toBeVisible();
+    // The image replaces the letter; the tile is one image named after the
+    // server, the picture inside it carries no name of its own.
+    await expect(
+      canvas.getByRole("img", { name: "Document search" }),
+    ).toBeVisible();
+    await expect(canvas.getAllByRole("img")).toHaveLength(1);
     await expect(canvas.getByTestId("mcp-icon")).not.toHaveTextContent("D");
   },
   parameters: {
@@ -198,7 +202,14 @@ const AllSizesWithImageTemplate = () => {
 export const AllSizesWithImage: Story = {
   render: () => <AllSizesWithImageTemplate />,
   play: async ({ canvas }) => {
-    const images = canvas.getAllByRole("img", { name: "mcp icon" });
+    // Each tile is one image named after the server; the <img> inside it
+    // is hidden from assistive technology.
+    await expect(
+      canvas.getAllByRole("img", { name: "Document search" }),
+    ).toHaveLength(4);
+    const images = canvas
+      .getAllByTestId("mcp-icon")
+      .map((icon) => icon.querySelector("img") as HTMLElement);
     await expect(images).toHaveLength(4);
     // Each image fills its own square.
     for (const img of images) {
@@ -234,7 +245,10 @@ export const BrokenImageFallback: Story = {
     await waitFor(() =>
       expect(canvas.getByTestId("mcp-icon")).toHaveTextContent(/^D$/),
     );
-    await expect(canvas.queryByRole("img")).toBeNull();
+    const icon = canvas.getByTestId("mcp-icon");
+    await expect(icon.querySelector("img")).toBeNull();
+    // The letter is hidden; the name is still the server's.
+    await expect(icon).toHaveAccessibleName("Document search");
   },
   parameters: {
     docs: {
@@ -265,7 +279,7 @@ export const WithImageNode: Story = {
     docs: {
       description: {
         story:
-          "Use for an icon your bundler has already inlined as a component: the element is drawn in place of the letter, and nothing replaces it if it is empty (`imgNode`).",
+          "Use for an icon your bundler has already inlined as a component: the element is drawn in place of the letter (`imgNode`). An `<img>` inside it that fails to load falls back to the letter; an empty node is not replaced.",
       },
       source: {
         code: `import FolderIcon from "./folder.react.svg";

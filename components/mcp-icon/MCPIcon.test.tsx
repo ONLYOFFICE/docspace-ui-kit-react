@@ -45,7 +45,9 @@ describe("<MCPIcon />", () => {
       title: "Test",
       imgSrc: "https://example.com/icon.svg",
     });
-    const imgElement = screen.getByRole("img");
+    const imgElement = screen
+      .getByTestId("mcp-icon")
+      .querySelector("img") as HTMLElement;
     expect(imgElement).toBeInTheDocument();
     expect(imgElement).toHaveAttribute("src", "https://example.com/icon.svg");
   });
@@ -53,7 +55,9 @@ describe("<MCPIcon />", () => {
   it("falls back to title when image fails to load", async () => {
     renderComponent({ title: "Fallback", imgSrc: "invalid-url.jpg" });
 
-    const imgElement = screen.getByRole("img");
+    const imgElement = screen
+      .getByTestId("mcp-icon")
+      .querySelector("img") as HTMLElement;
 
     act(() => {
       imgElement.dispatchEvent(new Event("error"));
@@ -70,7 +74,9 @@ describe("<MCPIcon />", () => {
       imgSrc: "invalid-url.jpg",
     });
 
-    const imgElement = screen.getByRole("img");
+    const imgElement = screen
+      .getByTestId("mcp-icon")
+      .querySelector("img") as HTMLElement;
 
     act(() => {
       imgElement.dispatchEvent(new Event("error"));
@@ -85,11 +91,52 @@ describe("<MCPIcon />", () => {
     );
 
     await waitFor(() => {
-      const newImgElement = screen.getByRole("img");
+      const newImgElement = screen
+        .getByTestId("mcp-icon")
+        .querySelector("img") as HTMLElement;
       expect(newImgElement).toHaveAttribute(
         "src",
         "https://example.com/new-icon.svg",
       );
+    });
+  });
+
+  describe("accessibility", () => {
+    it("is an image named after the server, with or without a picture", () => {
+      const { rerender } = renderComponent({ title: "Hugging Face" });
+      expect(
+        screen.getByRole("img", { name: "Hugging Face" }),
+      ).toBeInTheDocument();
+
+      rerender(<MCPIcon title="Hugging Face" imgSrc="logo.png" />);
+      expect(
+        screen.getByRole("img", { name: "Hugging Face" }),
+      ).toBeInTheDocument();
+      expect(screen.getAllByRole("img")).toHaveLength(1);
+    });
+
+    it("hides itself when there is no name", () => {
+      renderComponent({ title: "" });
+      expect(screen.getByTestId("mcp-icon")).toHaveAttribute(
+        "aria-hidden",
+        "true",
+      );
+    });
+
+    it("falls back to the letter when an image inside imgNode fails", async () => {
+      renderComponent({
+        title: "Node",
+        imgNode: <img src="broken.png" alt="" data-testid="node-img" />,
+      });
+
+      act(() => {
+        screen.getByTestId("node-img").dispatchEvent(new Event("error"));
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText("N")).toBeInTheDocument();
+      });
+      expect(screen.queryByTestId("node-img")).toBeNull();
     });
   });
 });
