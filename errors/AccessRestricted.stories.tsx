@@ -46,12 +46,11 @@ export default meta;
 
 export const Default: Story = {
   play: async ({ canvas }) => {
-    const page = canvas.getByTestId("ErrorContainer");
     // The heading and text come from the English locale.
     await expect(
       canvas.getByRole("heading", { name: "Access denied" }),
     ).toBeVisible();
-    await expect(page.querySelector("#text")).toHaveTextContent(
+    await expect(canvas.getByTestId("text")).toHaveTextContent(
       "Your IP address is not included in the list of allowed IP addresses",
     );
   },

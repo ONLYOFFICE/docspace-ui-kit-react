@@ -46,12 +46,11 @@ export default meta;
 
 export const Default: Story = {
   play: async ({ canvas }) => {
-    const page = canvas.getByTestId("ErrorContainer");
     // The heading and text come from the English locale.
     await expect(
       canvas.getByRole("heading", { name: "Invalid link" }),
     ).toBeVisible();
-    await expect(page.querySelector("#text")).toHaveTextContent(
+    await expect(canvas.getByTestId("text")).toHaveTextContent(
       "The link you are trying to open does not exist.",
     );
   },
