@@ -32,4 +32,11 @@ export type ColorInputProps = {
    * @default "color-input"
    */
   dataTestId?: string;
+  /**
+   * Accessible name of the hex field. Left out, the kit's own translation of
+   * "Color" (`Common:Color`) is used.
+   */
+  inputLabel?: string;
+  /** Accessible name of the swatch button that opens the picker. It is not translated for you. */
+  pickerButtonLabel?: string;
 };

@@ -92,11 +92,21 @@ export default meta;
 
 const statesChange = fn();
 
+// The swatch is a button named after the picker it opens.
 const swatchOf = (field: HTMLElement) =>
-  field.querySelector<HTMLElement>('[class*="colorBlock"]') as HTMLElement;
+  within(field).getByRole("button", { name: "Color picker" });
+
+// Whether a hex colour is fully saturated and fully bright: one channel at
+// 255 and one at 0.
+const isPure = (hex: string) => {
+  const channels = [1, 3, 5].map((i) =>
+    Number.parseInt(hex.slice(i, i + 2), 16),
+  );
+  return Math.max(...channels) === 255 && Math.min(...channels) === 0;
+};
 
 // The picker stays mounted while the drop-down is closed, so "open" means
-// the dialog is actually on screen.
+// the picker is actually on screen.
 const shownPicker = () =>
   screen
     .queryAllByTestId("color-picker")
@@ -137,46 +147,62 @@ export const Default: Story = {
   },
   play: async ({ args, canvas, userEvent }) => {
     const field = canvas.getByTestId("color-input");
-    const input = within(field).getByRole("textbox");
+    const input = within(field).getByRole("textbox", { name: "Color" });
     await expect(input).toHaveValue("#4781D1");
 
     // A 3-digit prefix is already a complete code, so it is reported on
     // the way to the 6-digit one.
     await userEvent.clear(input);
-    await userEvent.type(input, "ff0000");
-    await expect(args.handleChange).toHaveBeenCalledWith("#ff0");
-    await expect(args.handleChange).toHaveBeenLastCalledWith("#FF0000");
-    await expect(input).toHaveValue("#FF0000");
+    await userEvent.type(input, "00FF00");
+    await expect(args.handleChange).toHaveBeenCalledWith("#00F");
+    await expect(args.handleChange).toHaveBeenLastCalledWith("#00FF00");
+    await expect(input).toHaveValue("#00FF00");
     await expect(swatchOf(field).style.getPropertyValue("--block-color")).toBe(
-      "#FF0000",
+      "#00FF00",
     );
 
-    // The swatch opens the picker; its cross closes it.
-    await userEvent.click(swatchOf(field));
+    // The swatch is a button: Enter opens the picker.
+    const swatch = swatchOf(field);
+    await expect(swatch).toHaveAttribute("aria-expanded", "false");
+    swatch.focus();
+    await userEvent.keyboard("{Enter}");
     await waitFor(() => expect(pickerShown()).toBe(true));
+    await expect(swatch).toHaveAttribute("aria-expanded", "true");
     const picker = shownPicker() as HTMLElement;
-    await expect(picker).toHaveAttribute("role", "dialog");
+    await expect(picker).toHaveAttribute("role", "group");
 
-    // A move in the picker reports a colour and repaints the field.
+    // The picker opens on the typed green, not on the colour the field
+    // started with.
     const hue = within(picker).getByRole("slider", { name: "Hue" });
+    await expect(hue).toHaveAttribute("aria-valuenow", "120");
+    await expect(
+      within(picker).getByRole("slider", { name: "Color" }),
+    ).toHaveAttribute("aria-valuetext", "Saturation 100%, Brightness 100%");
+
+    // A move in the picker reports a colour and repaints the field; it keeps
+    // the green's full saturation and brightness.
     const calls = (args.handleChange as ReturnType<typeof fn>).mock.calls;
     const before = calls.length;
     await userEvent.click(hue);
     await expect(calls.length).toBeGreaterThan(before);
     const picked = calls[calls.length - 1][0] as string;
-    await expect(picked).not.toBe("#FF0000");
+    await expect(picked.toUpperCase()).not.toBe("#00FF00");
+    await expect(isPure(picked)).toBe(true);
     await expect(input).toHaveValue(picked.toUpperCase());
 
+    // The cross closes it and hands the focus back to the swatch.
     await userEvent.click(
       within(shownPicker() as HTMLElement).getByLabelText("Close color picker"),
     );
     await waitFor(() => expect(pickerShown()).toBe(false));
+    await expect(swatch).toHaveFocus();
+    await expect(swatch).toHaveAttribute("aria-expanded", "false");
   },
   parameters: {
     docs: {
       description: {
         story:
-          "The field on its own, starting on the kit's blue. Type a hex code or click the swatch to pick one, and change any other prop live in the Controls panel below.",
+          "The field on its own, starting on the kit's blue. Type a hex code, or click the swatch (or focus it and press Enter) to pick one: the picker opens on the colour the field holds. Change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<ColorInput
@@ -271,8 +297,11 @@ export const States: Story = {
     await expect(input(error)).toHaveAttribute("data-error", "true");
     await expect(input(warning)).toHaveAttribute("data-warning", "true");
 
+    await expect(input(error)).toHaveAttribute("aria-invalid", "true");
+
     // The disabled field takes no typing and its swatch no clicks.
     await expect(input(disabled)).toBeDisabled();
+    await expect(swatchOf(disabled)).toBeDisabled();
     await expect(getComputedStyle(swatchOf(disabled)).pointerEvents).toBe(
       "none",
     );

@@ -55,6 +55,9 @@
 .colorBlock {
   position: absolute;
   inset-inline-end: 8px;
+  box-sizing: border-box;
+  padding: 0;
+  border: none;
   cursor: pointer;
   width: var(--color-input-swatch-size-v);
   height: var(--color-input-swatch-size-v);

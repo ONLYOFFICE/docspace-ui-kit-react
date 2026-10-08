@@ -160,4 +160,56 @@ describe("ColorInput component", () => {
 
     expect(dropdown).toHaveAttribute("data-open", "false");
   });
+
+  it("makes the swatch a named, keyboard-operable button", () => {
+    render(<ColorInput />);
+
+    const swatch = screen.getByRole("button", { name: "Color picker" });
+    expect(swatch.tagName).toBe("BUTTON");
+    expect(swatch).toHaveAttribute("type", "button");
+    expect(swatch).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.click(swatch);
+    expect(swatch).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByTestId("dropdown")).toHaveAttribute("data-open", "true");
+
+    // The cross hands the focus back to the swatch.
+    fireEvent.click(screen.getByTestId("color-picker-close"));
+    expect(swatch).toHaveAttribute("aria-expanded", "false");
+    expect(swatch).toHaveFocus();
+  });
+
+  it("names the hex field and disables the swatch with it", () => {
+    const { rerender } = render(<ColorInput />);
+    expect(screen.getByRole("textbox", { name: "Color" })).toBeInTheDocument();
+
+    rerender(
+      <ColorInput
+        isDisabled
+        hasError
+        inputLabel="Accent"
+        pickerButtonLabel="Pick accent"
+      />,
+    );
+    const input = screen.getByRole("textbox", { name: "Accent" });
+    expect(input).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByRole("button", { name: "Pick accent" })).toBeDisabled();
+  });
+
+  it("opens the picker on the colour the field holds now", () => {
+    render(<ColorInput defaultColor="#4781D1" />);
+
+    const input = screen.getByRole("textbox", { name: "Color" });
+    fireEvent.change(input, { target: { value: "#FF0000" } });
+
+    fireEvent.click(screen.getByRole("button", { name: "Color picker" }));
+
+    // The picker's saturation pointer sits where #FF0000 puts it (100%
+    // saturation, 100% brightness), not where the starting blue did.
+    const saturation = screen.getByRole("slider", { name: "Color" });
+    expect(saturation).toHaveAttribute(
+      "aria-valuetext",
+      "Saturation 100%, Brightness 100%",
+    );
+  });
 });

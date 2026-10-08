@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { HexColorInput } from "react-colorful";
 import classNames from "classnames";
 
@@ -8,6 +8,7 @@ import { DropDown } from "../drop-down";
 import { ColorInputProps } from "./ColorInput.types";
 import { ColorPicker } from "../color-picker";
 import { globalColors } from "../../providers/theme";
+import { useCommonTranslation } from "../../utils";
 import styles from "./ColorInput.module.scss";
 
 const ColorInput = ({
@@ -21,14 +22,31 @@ const ColorInput = ({
   hasError,
   hasWarning,
   dataTestId,
+  inputLabel,
+  pickerButtonLabel = "Color picker",
 }: ColorInputProps) => {
+  const t = useCommonTranslation();
   const [color, setColor] = useState(
     defaultColor || globalColors.lightBlueMain,
   );
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  // Bumped on every opening: the picker reads its colour only when it mounts,
+  // and the closed drop-down keeps it mounted, so it is remounted to start
+  // from the colour the field holds now rather than the one it first had.
+  const [pickerKey, setPickerKey] = useState(0);
+  const swatchRef = useRef<HTMLButtonElement>(null);
 
   const closePicker = () => setIsPickerOpen(false);
-  const togglePicker = () => setIsPickerOpen((isOpen) => !isOpen);
+  const togglePicker = () => {
+    if (!isPickerOpen) setPickerKey((key) => key + 1);
+    setIsPickerOpen(!isPickerOpen);
+  };
+
+  // The picker's cross and Escape hand the focus back to the swatch.
+  const onPickerClose = () => {
+    closePicker();
+    swatchRef.current?.focus();
+  };
 
   const onChange = (value: string) => {
     handleChange?.(value);
@@ -59,13 +77,21 @@ const ColorInput = ({
           data-scale={scale ? "true" : undefined}
           data-disabled={isDisabled ? "true" : undefined}
           disabled={isDisabled}
+          aria-label={inputLabel ?? t("Color")}
+          aria-invalid={hasError || undefined}
         />
-        <span
+        <button
+          type="button"
+          ref={swatchRef}
           className={classNames(styles.colorBlock, {
             [styles.disabled]: isDisabled,
           })}
           style={colorBlockStyles}
           onClick={togglePicker}
+          disabled={isDisabled}
+          aria-label={pickerButtonLabel}
+          aria-expanded={isPickerOpen}
+          data-testid="color-input-swatch"
         />
       </div>
 
@@ -80,10 +106,11 @@ const ColorInput = ({
           className={classNames(styles.dropDownItemHex, "drop-down-item-hex")}
         >
           <ColorPicker
+            key={pickerKey}
             appliedColor={color}
             handleChange={onChange}
             isPickerOnly
-            onClose={closePicker}
+            onClose={onPickerClose}
           />
         </DropDownItem>
       </DropDown>
