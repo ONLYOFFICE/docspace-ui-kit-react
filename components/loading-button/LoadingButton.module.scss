@@ -129,6 +129,17 @@
 }
 
 .loadingButton {
+  // The disc is a sibling of the ring, so it declares the ring's colours too.
+  :global(.light) & {
+    --loading-button-color: #{colors.$light-second-main};
+    --loading-button-bg: #{colors.$white};
+  }
+
+  :global(.dark) & {
+    --loading-button-color: #{colors.$white};
+    --loading-button-bg: #{colors.$black};
+  }
+
   width: 12px;
   height: 12px;
   border-radius: 50%;

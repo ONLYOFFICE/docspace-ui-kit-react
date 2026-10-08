@@ -15,17 +15,15 @@ const meta = {
   argTypes: {
     id: {
       control: false,
-      description:
-        "Ignored: nothing reads this prop, and the element carries no `id`",
+      description: "DOM `id` of the outer 16px square",
     },
     className: {
       control: false,
-      description:
-        "Ignored: nothing reads this prop; style the ring through the CSS custom properties",
+      description: "Added to the outer 16px square",
     },
     style: {
       control: false,
-      description: "Ignored: nothing reads this prop",
+      description: "Inline style of the outer 16px square",
     },
     percent: {
       control: { type: "number", min: 0, max: 100 },
@@ -63,7 +61,16 @@ const meta = {
     onClick: {
       action: "onClick",
       description:
-        "Called with no arguments when anything inside the 16px square is clicked, including the cross",
+        "Called with no arguments when anything inside the 16px square is clicked, including the cross, and when the cancel control is pressed with Enter or Space",
+    },
+    cancelLabel: {
+      control: "text",
+      description:
+        'Accessible name of the cancel control; the translated "Cancel" by default',
+    },
+    progressLabel: {
+      control: "text",
+      description: "Accessible name of the ring's progress bar",
     },
   },
 } satisfies Meta<typeof LoadingButton>;
@@ -119,6 +126,19 @@ export const Default: Story = {
     // A click anywhere in the square, the cross included, cancels.
     await userEvent.click(canvas.getByTestId("loading-button-container"));
     await expect(args.onClick).toHaveBeenCalledTimes(1);
+
+    // The cancel control is reached with Tab and pressed with Enter or Space.
+    const cancel = canvas.getByRole("button", { name: "Cancel" });
+    await userEvent.tab();
+    await expect(cancel).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+    await userEvent.keyboard(" ");
+    await expect(args.onClick).toHaveBeenCalledTimes(3);
+
+    // At 0 the progress is unknown: the progress bar reports no value.
+    const progress = canvas.getByRole("progressbar", { name: "Progress" });
+    await expect(progress).not.toHaveAttribute("aria-valuenow");
   },
   parameters: {
     docs: {
@@ -157,7 +177,7 @@ const ProgressStagesTemplate = () => {
 
 export const ProgressStages: Story = {
   render: () => <ProgressStagesTemplate />,
-  play: async ({ canvasElement }) => {
+  play: async ({ canvas, canvasElement }) => {
     await expect(ringsOf(canvasElement).map(percentOf)).toEqual([
       "0",
       "25",
@@ -165,6 +185,12 @@ export const ProgressStages: Story = {
       "75",
       "100",
     ]);
+    // Each known percentage is reported to assistive technology.
+    await expect(
+      canvas
+        .getAllByRole("progressbar")
+        .map((bar) => bar.getAttribute("aria-valuenow")),
+    ).toEqual([null, "25", "50", "75", "100"]);
   },
   parameters: {
     docs: {
