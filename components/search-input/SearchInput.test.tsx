@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { screen, render, waitFor } from "@testing-library/react";
+import { fireEvent, screen, render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { InputSize } from "../text-input";
@@ -126,6 +126,43 @@ describe("<SearchInput />", () => {
 
     rerender(<SearchInput {...baseProps} value="updated" />);
     expect(input).toHaveValue("updated");
+  });
+
+  it("does not take back a value it reported once the user has moved on", async () => {
+    const onChange = vi.fn();
+    const { rerender } = render(
+      <SearchInput {...baseProps} onChange={onChange} refreshTimeout={50} />,
+    );
+    const input = screen.getByTestId("text-input");
+
+    fireEvent.change(input, { target: { value: "budget" } });
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith("budget"));
+    // The user clears the field before the parent has re-rendered...
+    fireEvent.change(input, { target: { value: "" } });
+    // ...and the parent then hands back the value reported a moment ago.
+    rerender(
+      <SearchInput
+        {...baseProps}
+        value="budget"
+        onChange={onChange}
+        refreshTimeout={50}
+      />,
+    );
+
+    expect(input).toHaveValue("");
+    await waitFor(() => expect(onChange).toHaveBeenLastCalledWith(""));
+  });
+
+  it("still takes a value from the parent it never reported", () => {
+    const { rerender } = render(
+      <SearchInput {...baseProps} value="budget" refreshTimeout={50} />,
+    );
+    const input = screen.getByTestId("text-input");
+    fireEvent.change(input, { target: { value: "budgetx" } });
+
+    rerender(<SearchInput {...baseProps} value="" refreshTimeout={50} />);
+
+    expect(input).toHaveValue("");
   });
 
   it("renders main button when showMainButton and mainButtonProps are provided", () => {

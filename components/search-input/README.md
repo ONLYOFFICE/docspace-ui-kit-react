@@ -185,7 +185,10 @@ export function InstantSearch({ onSearch }: { onSearch: (t: string) => void }) {
   `onClearSearch` and deliberately suppresses the change callback, so a handler that only
   listens to `onChange` keeps filtering by the old term.
 - The field keeps its own copy of the text while the user types and re-seeds it from `value`
-  whenever that prop changes, so a parent can reset it but cannot override a keystroke.
+  whenever that prop changes, so a parent can reset it but cannot override a keystroke. The one
+  change it does not take is the value it has just reported through `onChange`: a parent that
+  stores the term and passes it back after the user has typed on would otherwise put the old
+  term back in the field.
 - The icon at the end of the field is a magnifier while the field is empty and turns into the
   clear cross as soon as it holds text. `showClearButton` only adds the cross to an empty field
   too; a field with text always has it. Only the cross is clickable.

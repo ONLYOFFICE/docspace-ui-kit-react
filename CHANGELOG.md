@@ -492,6 +492,10 @@ under _Changed_.
   host applied after the user had already changed or cleared the box came back into it and was
   searched again. Such a stale value, or a new `getSelectedInputValue` returning the value already
   shown, now leaves the field alone; any other value is still shown, and focused when not empty.
+- **`SearchInput` no longer puts back the term it has just reported.** A parent that stores the
+  `onChange` value and passes it back as `value` could re-render after the user had already
+  typed on or cleared the field; the field took the old term back and searched it again. That
+  echo is now ignored; any other change of `value` still re-seeds the field.
 - **The errors story helper is no longer published.** `dist/types/errors/stories.utils`, a
   Storybook-only i18n stand-in, was reachable as `./errors/stories.utils`; the declaration build
   now excludes it.

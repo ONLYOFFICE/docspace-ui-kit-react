@@ -50,10 +50,15 @@ const SearchInput = ({
 
   const afterClear = useRef(false);
   const prevValueRef = useRef(value);
+  // The last value reported through onChange. A parent that stores it and
+  // passes it back as `value` may do so after the user has typed on; that
+  // echo is not a new value and must not overwrite the field.
+  const reportedRef = useRef<string | undefined>(undefined);
 
   const debouncedOnChange = useDebounce(
     useCallback(() => {
       if (!afterClear.current) {
+        reportedRef.current = prevValueRef.current;
         onChange?.(prevValueRef.current);
       }
     }, [onChange]),
@@ -81,6 +86,9 @@ const SearchInput = ({
   }, [onClearSearch]);
 
   useEffect(() => {
+    const echo = value === reportedRef.current;
+    reportedRef.current = undefined;
+    if (echo) return;
     if (prevValueRef.current !== value) {
       prevValueRef.current = value;
       setInputValue(value);
