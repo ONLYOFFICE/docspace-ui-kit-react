@@ -36,7 +36,7 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Greys the field out and stops a click from opening the file picker",
+        "Greys the field out and makes it inert: no click, drop or key opens or fills it, and it leaves the tab order",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -44,7 +44,7 @@ const meta = {
     isLoading: {
       control: "boolean",
       description:
-        "Replaces the icon with a spinner, greys the field and stops a click from opening the file picker; with a button label the button stays and only the click is stopped",
+        "Replaces the icon with a spinner and makes the field inert, as `isDisabled` does; with a button label the button stays in place of the spinner",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -87,10 +87,11 @@ const meta = {
     accept: {
       control: "object",
       description:
-        'File extensions or MIME types the picker offers and a drop accepts, such as `[".pdf", "image/*"]`; a file of any other type is refused with an error toast',
-      table: {
-        defaultValue: { summary: '[""]' },
-      },
+        'File extensions or MIME types the picker offers and a drop accepts, such as `[".pdf", "image/*"]`; a file of any other type is refused. Left out, any file is accepted',
+    },
+    onReject: {
+      description:
+        "Called with the files `accept` refused; while it is set the field shows no error toast of its own",
     },
     onInput: {
       description:
@@ -195,9 +196,7 @@ export const Default: Story = {
   },
   args: {
     placeholder: "Choose file",
-    // Without accept the default [""] admits only files with no MIME type,
-    // so the field would refuse every ordinary file.
-    accept: [".pdf", ".docx", ".xlsx", ".txt"],
+    // No accept: any file is admitted.
     size: InputSize.base,
     scale: false,
     isDisabled: false,
@@ -339,6 +338,19 @@ export const States: Story = {
     const warning = borderOf(field(canvas, "Warning state"));
     await expect(new Set([normal, error, warning]).size).toBe(3);
     await expect(field(canvas, "Disabled")).toBeDisabled();
+    // Disabled and loading fields are inert: out of the tab order.
+    const disabledRoot = rootOf(field(canvas, "Disabled"));
+    await expect(disabledRoot).not.toHaveAttribute("tabindex");
+    await expect(disabledRoot).toHaveAttribute("aria-disabled", "true");
+    await expect(rootOf(field(canvas, "Loading"))).not.toHaveAttribute(
+      "tabindex",
+    );
+    // An enabled one is a single tab stop: the field inside is not.
+    await expect(rootOf(field(canvas, "Normal"))).toHaveAttribute(
+      "tabindex",
+      "0",
+    );
+    await expect(field(canvas, "Normal")).toHaveAttribute("tabindex", "-1");
     // Loading swaps the folder icon for a loader.
     const loading = rootOf(field(canvas, "Loading"));
     await expect(loading.querySelector("[class*='loader' i]")).not.toBeNull();
@@ -347,7 +359,7 @@ export const States: Story = {
     docs: {
       description: {
         story:
-          "Use these to tell the user about the chosen file: **Error state** and **Warning state** recolour the border (`hasError`, `hasWarning`), **Disabled** greys the field and ignores clicks (`isDisabled`), and **Loading** shows a spinner in place of the icon (`isLoading`).",
+          "Use these to tell the user about the chosen file: **Error state** and **Warning state** recolour the border (`hasError`, `hasWarning`), **Disabled** greys the field and ignores clicks, drops and keys (`isDisabled`), and **Loading** shows a spinner in place of the icon and is just as inert (`isLoading`).",
       },
       source: {
         code: `<FileInput placeholder="Normal" />
@@ -499,6 +511,8 @@ export const WithButton: Story = {
       await expect(rect(browse).left).toBeGreaterThanOrEqual(
         rect(input).right - 1,
       );
+      // The wrapper is the focus stop, not the button inside it.
+      await expect(browse).toHaveAttribute("tabindex", "-1");
     }
   },
   parameters: {

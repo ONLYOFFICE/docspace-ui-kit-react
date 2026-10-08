@@ -26,7 +26,7 @@ const FileInputPure = ({
   scale = false,
   hasError = false,
   hasWarning = false,
-  accept = [""],
+  accept,
   id,
   buttonLabel,
   isLoading = false,
@@ -35,6 +35,7 @@ const FileInputPure = ({
   idButton,
   isDocumentIcon = false,
   isMultiple = true,
+  onReject,
   className,
   "data-test-id": dataTestId,
   ...rest
@@ -44,9 +45,17 @@ const FileInputPure = ({
 
   const [fileName, setFileName] = React.useState("");
 
-  const onDrop = (acceptedFiles: File[]) => {
+  const onDrop = (
+    acceptedFiles: File[],
+    fileRejections: { file: File }[] = [],
+  ) => {
+    if (fileRejections.length > 0) {
+      onReject?.(fileRejections.map(({ file }) => file));
+    }
+
     if (acceptedFiles.length === 0) {
-      toastr.error(t("NotSupportedFormat"));
+      // With onReject the consumer reports the refusal itself.
+      if (!onReject) toastr.error(t("NotSupportedFormat"));
       return;
     }
 
@@ -115,14 +124,20 @@ const FileInputPure = ({
     [styles.disabled]: isDisabled,
   });
 
+  // An empty list, or the old default of [""], means "any file": react-dropzone
+  // would otherwise read [""] as "only files with no MIME type".
+  const acceptedTypes = accept?.filter(Boolean);
+  const isInert = isDisabled || isLoading;
+
   const onClickProp =
     fromStorage && !isDisabled ? { onClick: rest.onClick } : {};
 
   return (
     <Dropzone
       onDrop={onDrop}
-      noClick={isDisabled || isLoading}
-      accept={accept}
+      disabled={isInert}
+      noClick={isInert}
+      accept={acceptedTypes?.length ? acceptedTypes : undefined}
       multiple={isMultiple}
     >
       {({ getRootProps, getInputProps }) => (
@@ -130,7 +145,7 @@ const FileInputPure = ({
           className={wrapperClasses}
           id={idButton}
           data-testid={dataTestId ?? "file-input"}
-          aria-disabled={isDisabled ? "true" : "false"}
+          aria-disabled={isInert ? "true" : "false"}
           role="button"
           {...rest}
           {...getRootProps()}
@@ -147,6 +162,8 @@ const FileInputPure = ({
             scale={scale}
             type={InputType.text}
             withBorder
+            // The wrapper is the one focus stop; the field only shows names.
+            tabIndex={-1}
             {...onClickProp}
           />
           {!fromStorage ? (
@@ -166,6 +183,7 @@ const FileInputPure = ({
               label={buttonLabel}
               size={buttonSize}
               type="button"
+              tabIndex={-1}
             />
           ) : (
             <div className={iconClasses} {...onClickProp}>

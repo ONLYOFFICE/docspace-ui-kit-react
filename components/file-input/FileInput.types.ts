@@ -23,17 +23,23 @@ export type FileInputProps = {
   /** Applied to the hidden `<input type="file">`, not to the wrapper. */
   id?: string;
   /**
-   * Whether the field is greyed and a click no longer opens the file dialog.
-   * A drop is still accepted, and Enter or Space still opens the dialog.
+   * Whether the field is greyed and inert: a click, a drop, Enter and Space all
+   * do nothing, and the control leaves the tab order.
    */
   isDisabled?: boolean;
   /**
-   * Whether a spinner replaces the icon. It also disables the field, and it is
-   * ignored when `buttonLabel` is set, since the button has no loading form.
+   * Whether a spinner replaces the icon. It also makes the control inert, as
+   * `isDisabled` does; the spinner is not shown when `buttonLabel` is set, since
+   * the button has no loading form.
    */
   isLoading?: boolean;
   /** Ignored. Nothing reads this prop. */
   name?: string;
+  /**
+   * Called with the files `accept` turned away. While it is set the component
+   * shows no toast of its own for a refused pick or drop.
+   */
+  onReject?: (files: File[]) => void;
   /**
    * Called with the chosen files: a single `File` when one was picked, an array
    * when several were. Check for an array before reading `.name`.
@@ -41,8 +47,7 @@ export type FileInputProps = {
   onInput?: (file: File | File[]) => void;
   /**
    * Extensions and MIME types the dialog offers and a drop accepts, such as
-   * `[".pdf", "image/*"]`. The default `[""]` matches only files with no MIME
-   * type, so pass it whenever the field is used.
+   * `[".pdf", "image/*"]`. Left out, empty, or `[""]`, any file is accepted.
    */
   accept?: string[];
   /** Renders a button with this label in place of the icon. */
