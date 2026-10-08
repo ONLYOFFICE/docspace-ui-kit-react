@@ -49,6 +49,19 @@ describe("<Button />", () => {
     expect(button).toHaveAttribute("aria-busy", "true");
   });
 
+  // The loader inside is decorative: its status text would otherwise join
+  // the name of a button that is named by its content.
+  it("keeps its name while loading", () => {
+    render(
+      <Button size={ButtonSize.small} isLoading>
+        Export
+      </Button>,
+    );
+
+    expect(screen.getByRole("button")).toHaveAccessibleName("Export");
+    expect(screen.queryByRole("status")).toBeNull();
+  });
+
   it("renders with custom className", () => {
     render(<Button {...baseProps} className="custom-class" />);
     expect(screen.getByTestId("button").className).toContain("custom-class");

@@ -19,6 +19,11 @@ export type LoaderProps = {
    * `base` type it is the visible content instead. Defaults to "Loading
    * content, please wait." */
   label?: string;
+  /** Draws the animation only: no `role="status"`, no hidden label, and the
+   * wrapper is `aria-hidden`. For a loader inside a control (a button, a
+   * combo box, a list row) whose own `aria-busy` already says it is busy;
+   * otherwise the label would become part of the control's name. */
+  isDecorative?: boolean;
   /** Applied to the wrapper around the animation, not to the animation. */
   className?: string;
   /** Applied to the wrapper. */

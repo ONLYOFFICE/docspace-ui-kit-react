@@ -91,4 +91,20 @@ describe("<Loader />", () => {
     render(<Loader />);
     expect(screen.getByTestId("oval-loader")).toBeInTheDocument();
   });
+
+  // Inside a button the status text would join the button's name, and a
+  // button's children are presentational anyway: the host says it is busy.
+  it("adds nothing to the accessibility tree when decorative", () => {
+    render(
+      <button type="button">
+        Save
+        <Loader type={LoaderTypes.track} isDecorative />
+      </button>,
+    );
+
+    expect(screen.queryByRole("status")).toBeNull();
+    expect(screen.queryByTestId("loader-label")).toBeNull();
+    expect(screen.getByTestId("loader")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByRole("button")).toHaveAccessibleName("Save");
+  });
 });

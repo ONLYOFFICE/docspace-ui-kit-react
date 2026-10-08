@@ -166,6 +166,7 @@ export const BaseTile = ({
             </div>
           ) : (
             <Loader
+              isDecorative
               className={styles.loader}
               color=""
               size="20px"

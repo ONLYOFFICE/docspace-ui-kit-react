@@ -153,6 +153,7 @@ const Row = React.memo((props: RowProps) => {
     >
       {inProgress ? (
         <Loader
+          isDecorative
           className={classNames(
             styles.rowProgressLoader,
             "row-progress-loader",

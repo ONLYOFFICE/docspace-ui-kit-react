@@ -216,6 +216,7 @@ const Dropzone = ({
           />
         ) : (
           <Loader
+            isDecorative
             className={classNames(styles.dropzoneLoader, loaderClassName)}
             size="30px"
             type={LoaderTypes.track}

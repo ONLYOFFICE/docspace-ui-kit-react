@@ -189,6 +189,7 @@ const FileInputPure = ({
             <div className={iconClasses} {...onClickProp}>
               {isLoading ? (
                 <Loader
+                  isDecorative
                   className={styles.loader}
                   size="20px"
                   type={LoaderTypes.track}

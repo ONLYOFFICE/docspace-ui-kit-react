@@ -22,9 +22,11 @@ const Loader = (props: LoaderProps) => {
     className,
     style,
     id,
+    isDecorative = false,
   } = props;
 
-  const animationProps = { ...props, type, label };
+  const { isDecorative: _isDecorative, ...rest } = props;
+  const animationProps = { ...rest, type, label };
 
   const svgRenderer = (t: LoaderTypes) => {
     switch (t) {
@@ -49,7 +51,22 @@ const Loader = (props: LoaderProps) => {
 
   // The animations are decorative (aria-hidden); the label is the text of
   // the status region, so it is what assistive technology reads. The base
-  // type shows the label itself.
+  // type shows the label itself. A decorative loader is hidden whole: its
+  // host control carries the busy state.
+  if (isDecorative) {
+    return (
+      <div
+        aria-hidden="true"
+        className={className}
+        style={style}
+        id={id}
+        data-testid="loader"
+      >
+        {svgRenderer(type)}
+      </div>
+    );
+  }
+
   return (
     <div
       role="status"

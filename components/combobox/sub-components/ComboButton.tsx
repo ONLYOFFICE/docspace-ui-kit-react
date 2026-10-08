@@ -261,6 +261,7 @@ export const ComboButton: React.FC<TComboButtonProps> = ({
       </div>
       {isLoading ? (
         <Loader
+          isDecorative
           className={styles.loader}
           type={LoaderTypes.track}
           size="20px"

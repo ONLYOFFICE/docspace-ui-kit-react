@@ -98,7 +98,7 @@ const AddButton = (props: AddButtonProps) => {
         data-testid={testId}
       >
         {isLoading ? (
-          <Loader color="" size="20px" type={LoaderTypes.track} />
+          <Loader isDecorative color="" size="20px" type={LoaderTypes.track} />
         ) : (
           <IconButton
             size={iconSize}

@@ -82,7 +82,10 @@ under _Changed_.
   "Loading content, please wait."; the animations are `aria-hidden` and lose their built-in
   English titles ("dual ring", "oval", "track"), and the wrapper no longer sets `aria-busy`. A
   `Loader` without `type` now draws the oval instead of rendering its label as text;
-  `LoaderTypes.base` still renders the text.
+  `LoaderTypes.base` still renders the text. A loader inside a control takes the new
+  `isDecorative` prop, which leaves the animation alone and `aria-hidden`, so the status text does
+  not become part of the control's name; `Button`, the combo box, `AddButton`, `FileInput`,
+  `Dropzone`, rows and tiles use it, and a loader you place inside your own button should too.
 - **`ErrorContainer` writes fewer fixed element ids.** The `button-container`, `button` and
   illustration ids (`background`, `birds`, `baloon`, ...) are gone; the parts are styled through
   module classes. `container-inner`, `header`, `text` and `customized-text` stay, because the
