@@ -1,7 +1,8 @@
 export type TwoStateToggleProps = {
   /**
-   * Text to the left of the pill. An empty string removes it.
-   * @default "DocSpace design"
+   * Text to the left of the pill. An empty string removes it. The default
+   * names the product through `getBrandName("ProductName")`.
+   * @default "<product name> design"
    */
   title?: string;
   /**
@@ -20,8 +21,9 @@ export type TwoStateToggleProps = {
    */
   confirmTitle?: string;
   /**
-   * First paragraph of that dialog.
-   * @default "You are about to leave the new Dashboard and return to the classic DocSpace view."
+   * First paragraph of that dialog. The default names the product through
+   * `getBrandName("ProductName")`.
+   * @default "You are about to leave the new Dashboard and return to the classic <product name> view."
    */
   confirmBody?: string;
   /**
@@ -40,9 +42,10 @@ export type TwoStateToggleProps = {
    */
   confirmCancel?: string;
   /**
-   * Accessible name of the switch button. The English default is not
-   * translated for you.
-   * @default "Switch DocSpace design"
+   * Accessible name of the switch button. The English default, which names
+   * the product through `getBrandName("ProductName")`, is not translated for
+   * you.
+   * @default "Switch <product name> design"
    */
   ariaLabel?: string;
   /**

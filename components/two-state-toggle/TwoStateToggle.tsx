@@ -4,6 +4,7 @@ import classNames from "classnames";
 import { Button, ButtonSize } from "../button";
 import { ModalDialog } from "../modal-dialog";
 import { Text } from "../text";
+import { getBrandName } from "../../constants/brands";
 
 import type { TwoStateToggleProps } from "./TwoStateToggle.types";
 import styles from "./TwoStateToggle.module.scss";
@@ -29,21 +30,37 @@ const writeStoredDesign = (value: "new" | "old") => {
   }
 };
 
+// The product's name as the portal brands it. The library's own lookup is the
+// identity until an application registers one, so an unwired lookup -- which
+// answers with the key itself -- falls back to the product's current name.
+const PRODUCT_NAME_KEY = "ProductName";
+const getProductName = (): string => {
+  const name = getBrandName(PRODUCT_NAME_KEY).trim();
+  return name && name !== PRODUCT_NAME_KEY ? name : "ONLYOFFICE Apps";
+};
+
 const TwoStateToggle = ({
-  title = "DocSpace design",
+  title: titleProp,
   labelOld = "OLD",
   labelNew = "NEW",
   confirmTitle = "Switch to Old Design",
-  confirmBody = "You are about to leave the new Dashboard and return to the classic DocSpace view.",
+  confirmBody: confirmBodyProp,
   confirmHint = "You can return to the new Dashboard at any time by navigating to /dashboard.",
   confirmOk = "Switch",
   confirmCancel = "Cancel",
-  ariaLabel = "Switch DocSpace design",
+  ariaLabel: ariaLabelProp,
   onNavigate,
   className,
 }: TwoStateToggleProps) => {
+  const productName = getProductName();
+  const title = titleProp ?? `${productName} design`;
+  const confirmBody =
+    confirmBodyProp ??
+    `You are about to leave the new Dashboard and return to the classic ${productName} view.`;
+  const ariaLabel = ariaLabelProp ?? `Switch ${productName} design`;
+
   // isNew === true  → new Dashboard  (useDocSpace = "new")
-  // isNew === false → classic DocSpace (useDocSpace = "old")
+  // isNew === false → classic view (useDocSpace = "old")
   const [isNew, setIsNew] = React.useState(readStoredIsNew);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
 

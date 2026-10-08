@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { TwoStateToggle } from ".";
+import { getBrandName, setBrandLookup } from "../../constants/brands";
 
 vi.mock("react-device-detect", () => ({
   isSafari: false,
@@ -28,6 +29,40 @@ describe("TwoStateToggle", () => {
     expect(
       screen.getByRole("switch", { name: "Switch DocSpace design" }),
     ).toBeInTheDocument();
+  });
+
+  it("names the product through the brand lookup, not a literal", () => {
+    const saved = (globalThis as Record<symbol, unknown>)[
+      Symbol.for("@onlyoffice/apps-ui-kit#brandLookup")
+    ];
+    setBrandLookup((key) => (key === "ProductName" ? "Acme Apps" : key));
+    try {
+      render(<TwoStateToggle />);
+      expect(
+        screen.getByRole("switch", { name: "Switch Acme Apps design" }),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Acme Apps design")).toBeInTheDocument();
+    } finally {
+      (globalThis as Record<symbol, unknown>)[
+        Symbol.for("@onlyoffice/apps-ui-kit#brandLookup")
+      ] = saved;
+    }
+    expect(getBrandName("ProductName")).not.toBe("Acme Apps");
+  });
+
+  it("falls back to ONLYOFFICE Apps when no brand lookup is registered", () => {
+    const slot = Symbol.for("@onlyoffice/apps-ui-kit#brandLookup");
+    const holder = globalThis as Record<symbol, unknown>;
+    const saved = holder[slot];
+    delete holder[slot];
+    try {
+      render(<TwoStateToggle />);
+      expect(
+        screen.getByRole("switch", { name: "Switch ONLYOFFICE Apps design" }),
+      ).toBeInTheDocument();
+    } finally {
+      holder[slot] = saved;
+    }
   });
 
   it("uses ariaLabel when given", () => {

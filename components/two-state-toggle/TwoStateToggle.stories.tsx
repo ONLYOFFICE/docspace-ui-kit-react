@@ -16,7 +16,7 @@ const meta = {
       control: "text",
       description:
         "Text label shown at the inline start of the toggle; an empty string hides it",
-      table: { defaultValue: { summary: "DocSpace design" } },
+      table: { defaultValue: { summary: "<product name> design" } },
     },
     labelOld: {
       control: "text",
@@ -42,7 +42,7 @@ const meta = {
       table: {
         defaultValue: {
           summary:
-            "You are about to leave the new Dashboard and return to the classic DocSpace view.",
+            "You are about to leave the new Dashboard and return to the classic <product name> view.",
         },
       },
     },
@@ -73,7 +73,7 @@ const meta = {
       control: "text",
       description:
         "Accessible name a screen reader announces for the switch; the English default is not translated",
-      table: { defaultValue: { summary: "Switch DocSpace design" } },
+      table: { defaultValue: { summary: "Switch <product name> design" } },
     },
     onNavigate: {
       action: "onNavigate",
@@ -103,13 +103,18 @@ export default meta;
 
 export const Default: Story = {
   args: {
-    title: "DocSpace design",
     labelOld: "OLD",
     labelNew: "NEW",
   },
   play: async ({ args, canvas, userEvent }) => {
     const toggle = canvas.getByRole("switch");
     await expect(toggle).toHaveAttribute("aria-checked", "true");
+
+    // The default strings name the product through the brand lookup
+    // (Storybook registers "ONLYOFFICE"), never the old "DocSpace".
+    await expect(toggle).toHaveAccessibleName("Switch ONLYOFFICE design");
+    await expect(canvas.getByText("ONLYOFFICE design")).toBeVisible();
+    await expect(canvas.queryByText(/DocSpace/)).toBeNull();
 
     // Leaving NEW asks first; Cancel keeps NEW and goes nowhere.
     await userEvent.click(toggle);
@@ -149,9 +154,6 @@ export const ShowingOldState: Story = {
       return <Story />;
     },
   ],
-  args: {
-    title: "DocSpace design",
-  },
   play: async ({ args, canvas, userEvent }) => {
     const toggle = canvas.getByRole("switch");
     await expect(toggle).toHaveAttribute("aria-checked", "false");
@@ -298,7 +300,7 @@ export const CssCustomization: Story = {
       borderRadius: "18px",
       backgroundColor: "rgb(46, 125, 50)",
     });
-    await expect(canvas.getByText("DocSpace design")).toHaveStyle({
+    await expect(canvas.getByText("ONLYOFFICE design")).toHaveStyle({
       color: "rgb(46, 125, 50)",
     });
     // The focus ring mixes the custom accent (46, 125, 50 in 0-1 sRGB).
