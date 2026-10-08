@@ -1,9 +1,9 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { SelectionAreaProps } from "./SelectionArea.types";
+import type { SelectionAreaProps, TOnMove } from "./SelectionArea.types";
 
 import { useState } from "react";
-import { expect, fireEvent, screen, waitFor } from "storybook/test";
+import { expect, fireEvent, fn, screen, waitFor } from "storybook/test";
 
 import { SelectionArea } from "./SelectionArea";
 import styles from "./SelectionArea.stories.module.scss";
@@ -94,7 +94,15 @@ const meta = {
     onMove: {
       control: false,
       description:
-        "Called on every animation frame of a drag with every covered item (`added`) and every uncovered one (`removed`). The story uses it to highlight the covered items",
+        "Called once with `clear: true` when a drag passes 10px, then on every animation frame with every covered item (`added`) and every uncovered one (`removed`). The story uses it to highlight the covered items",
+    },
+    startAreaSelector: {
+      control: false,
+      description:
+        "CSS selector of the region a drag may start in; the default is the portal's `#sectionScroll`, which the story's wrapper carries",
+      table: {
+        defaultValue: { summary: '"#sectionScroll"' },
+      },
     },
     onMouseDown: {
       action: "onMouseDown",
@@ -139,15 +147,13 @@ const SelectionTemplate = ({
 }: SelectionAreaProps & { gridClassName?: string }) => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
-  const handleMove = ({
-    added,
-    removed,
-  }: {
-    added: Element[];
-    removed: Element[];
-  }) => {
+  const handleMove = (move: TOnMove) => {
+    args.onMove?.(move);
+    const { added, removed, clear } = move;
+
     setSelectedItems((prev) => {
-      const newItems = [...prev];
+      // `clear` starts a new drag: the previous selection is dropped.
+      const newItems = clear ? [] : [...prev];
 
       added.forEach((element) => {
         const valueElement =
@@ -231,6 +237,7 @@ const SelectionTemplate = ({
 export const Default: Story = {
   render: (args) => <SelectionTemplate {...args} />,
   args: {
+    onMove: fn(),
     viewAs: "tile",
     folderHeaderHeight: 0,
     defaultHeaderHeight: 0,
@@ -244,13 +251,19 @@ export const Default: Story = {
     ],
     isRooms: false,
   },
-  play: async () => {
+  play: async ({ args }) => {
     const tile = (n: number) => screen.getByText(`Item ${n}`);
     // A drag from tile 1 into tile 2 covers both, and nothing below.
     const release = await drag(tile(1), centre(tile(2)));
     await waitFor(() => expect(isSelected(tile(2))).toBe(true));
     await expect(isSelected(tile(1))).toBe(true);
     await expect(isSelected(tile(5))).toBe(false);
+    // The first report of the drag is the one that clears the selection.
+    await expect(args.onMove).toHaveBeenNthCalledWith(1, {
+      added: [],
+      removed: [],
+      clear: true,
+    });
     release();
     await expect(screen.getByTestId("selection-area")).not.toBeVisible();
 
