@@ -111,4 +111,54 @@ describe("<DropDownItem />", () => {
     );
     expect(screen.getByTestId("additional")).toBeInTheDocument();
   });
+
+  describe("external link", () => {
+    const externalProps = {
+      ...baseProps,
+      label: "Help center",
+      withExternalLink: true,
+      externalLinkPath: "https://example.com/help",
+    };
+
+    it("is a focusable link to externalLinkPath with a name", () => {
+      render(<DropDownItem {...externalProps} />);
+      const link = screen.getByRole("link", { name: /Help center/ });
+
+      expect(link).toHaveAttribute("href", "https://example.com/help");
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    });
+
+    it("uses externalLinkLabel as the accessible name", () => {
+      render(<DropDownItem {...externalProps} externalLinkLabel="Open help" />);
+
+      expect(
+        screen.getByRole("link", { name: "Open help" }),
+      ).toBeInTheDocument();
+    });
+
+    it("leaves a plain click to onExternalLinkClick and not to the row", () => {
+      const onExternalLinkClick = vi.fn();
+      render(
+        <DropDownItem
+          {...externalProps}
+          onExternalLinkClick={onExternalLinkClick}
+        />,
+      );
+      const link = screen.getByRole("link", { name: /Help center/ });
+      const notPrevented = fireEvent.click(link);
+
+      expect(onExternalLinkClick).toHaveBeenCalledTimes(1);
+      expect(notPrevented).toBe(false);
+      expect(baseProps.onClick).not.toHaveBeenCalled();
+    });
+
+    it("follows the href when there is no callback", () => {
+      render(<DropDownItem {...externalProps} />);
+      const link = screen.getByRole("link", { name: /Help center/ });
+
+      expect(fireEvent.click(link)).toBe(true);
+      expect(baseProps.onClick).not.toHaveBeenCalled();
+    });
+  });
 });

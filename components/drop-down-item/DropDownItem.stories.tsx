@@ -682,18 +682,25 @@ export const WithExternalLink: Story = {
     onExternalLinkClick: fn(),
   },
   play: async ({ args, canvas, userEvent }) => {
-    // The icon is the only link inside the row's option.
-    const option = canvas.getByRole("option", { name: "Help center" });
-    const external = option.querySelector("a") as HTMLElement;
+    // The icon is a real link: it has the address and a name, and it is
+    // reachable with the keyboard.
+    const external = canvas.getByRole("link", { name: "Open Help center" });
+    await expect(external).toHaveAttribute("href", "https://example.com/help");
+    await expect(external).toHaveAttribute("target", "_blank");
+    external.focus();
+    await expect(external).toHaveFocus();
+    // With onExternalLinkClick the plain click is left to the callback.
     await userEvent.click(external);
     await expect(args.onExternalLinkClick).toHaveBeenCalledTimes(1);
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onExternalLinkClick).toHaveBeenCalledTimes(2);
     await expect(args.onClick).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
       description: {
         story:
-          "An entry can carry a second target at its end: **Help center** shows an external-link icon (`withExternalLink`, `externalLinkPath`); click the icon to see `onExternalLinkClick` in the Actions panel while `onClick` stays silent, and open the link from that callback yourself.",
+          'An entry can carry a second target at its end: **Help center** shows an external-link icon (`withExternalLink`, `externalLinkPath`). The icon is a focusable link to `externalLinkPath` named "Open Help center" (`externalLinkLabel` overrides it). Without `onExternalLinkClick` it opens the address in a new tab; with it, as here, a plain click goes to the callback instead (see the Actions panel) while `onClick` stays silent.',
       },
       source: {
         code: `<DropDownItem
@@ -701,7 +708,7 @@ export const WithExternalLink: Story = {
   icon={SettingsIcon}
   withExternalLink
   externalLinkPath="https://example.com/help"
-  onExternalLinkClick={() => window.open(helpUrl, "_blank")}
+  onExternalLinkClick={() => navigate("/help")}
 />`,
       },
     },

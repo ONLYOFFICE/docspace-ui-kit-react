@@ -14,7 +14,7 @@ import { useCommonTranslation } from "../../utils/i18n";
 
 import { ToggleButton } from "../toggle-button";
 import { Badge } from "../badge";
-import { Link, LinkType } from "../link";
+import { Link, LinkTarget, LinkType } from "../link";
 
 import type { DropDownItemProps } from "./DropDownItem.types";
 import styles from "./DropDownItem.module.scss";
@@ -110,6 +110,7 @@ const DropDownItem = ({
   withExternalLink,
   externalLinkPath,
   onExternalLinkClick,
+  externalLinkLabel,
   testId,
   tooltip,
   description,
@@ -125,6 +126,10 @@ const DropDownItem = ({
 
   const resolvedBetaLabel = betaLabel || getConstName("BetaLabel") || "";
   const resolvedPaidLabel = paidLabel || t("Paid") || "";
+
+  const resolvedExternalLinkLabel =
+    externalLinkLabel ||
+    (typeof label === "string" && label ? `${t("Open")} ${label}` : t("Open"));
 
   const withDisabledTooltip = disabled && tooltip;
   const hasDescription = Boolean(description);
@@ -292,12 +297,21 @@ const DropDownItem = ({
         <Link
           type={LinkType.action}
           className={styles.externalLink}
-          onClick={(e) => {
+          href={externalLinkPath}
+          target={LinkTarget.blank}
+          rel="noopener noreferrer"
+          ariaLabel={resolvedExternalLinkLabel}
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
-            onExternalLinkClick?.();
+            if (!onExternalLinkClick) return;
+            // The callback owns the navigation, as it did before the anchor
+            // had an href; middle-click and modified clicks still use it.
+            if (!e.ctrlKey && !e.metaKey && !e.shiftKey && e.button === 0)
+              e.preventDefault();
+            onExternalLinkClick();
           }}
         >
-          <ExternalLinkReactSvgUrl />
+          <ExternalLinkReactSvgUrl aria-hidden="true" focusable="false" />
         </Link>
       ) : null}
 
