@@ -121,12 +121,20 @@ export const Default: Story = {
     await expect(
       canvas.getByRole("img", { name: "Empty Screen Filter image" }),
     ).toBeVisible();
-    await expect(
-      canvas.getByText("No results matching your search could be found"),
-    ).toBeVisible();
+    // The header is a real heading, at the stylesheet's 19px.
+    const heading = canvas.getByRole("heading", {
+      level: 3,
+      name: "No results matching your search could be found",
+    });
+    await expect(heading).toBeVisible();
+    await expect(getComputedStyle(heading).fontSize).toBe("19px");
     await expect(
       canvas.getByText("No files to be displayed in this section"),
     ).toBeVisible();
+    // The text is a polite live region; the actions are outside it.
+    const status = canvas.getByRole("status");
+    await expect(status).toContainElement(heading);
+    await expect(status).not.toHaveTextContent("Reset filter");
 
     await userEvent.click(canvas.getByText("Reset filter"));
     await expect(onResetFilter).toHaveBeenCalledTimes(1);

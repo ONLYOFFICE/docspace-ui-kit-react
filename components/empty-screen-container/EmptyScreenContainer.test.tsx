@@ -68,6 +68,43 @@ describe("<EmptyScreenContainer />", () => {
     expect(image).toHaveStyle(imageStyle);
   });
 
+  it("renders the header as a heading, an h3 unless told otherwise", () => {
+    const { unmount } = render(<EmptyScreenContainer {...baseProps} />);
+    expect(
+      screen.getByRole("heading", { level: 3, name: baseProps.headerText }),
+    ).toBeInTheDocument();
+    unmount();
+
+    render(<EmptyScreenContainer {...baseProps} headingLevel={2} />);
+    expect(
+      screen.getByRole("heading", { level: 2, name: baseProps.headerText }),
+    ).toBeInTheDocument();
+  });
+
+  it("puts the text in a status live region", () => {
+    render(<EmptyScreenContainer {...baseProps} subheadingText="Sub" />);
+
+    const status = screen.getByRole("status");
+    expect(status).toHaveTextContent(baseProps.headerText);
+    expect(status).toHaveTextContent("Sub");
+    expect(status).toHaveTextContent(baseProps.descriptionText);
+    expect(status).not.toHaveTextContent("Go to home");
+  });
+
+  it("passes id and style to the outer element", () => {
+    render(
+      <EmptyScreenContainer
+        {...baseProps}
+        id="empty-files"
+        style={{ marginTop: "12px" }}
+      />,
+    );
+
+    const container = screen.getByTestId("empty-screen-container");
+    expect(container).toHaveAttribute("id", "empty-files");
+    expect(container).toHaveStyle({ marginTop: "12px" });
+  });
+
   it("applies custom styles to buttons when provided", () => {
     const buttonStyle = { marginTop: "20px" };
     render(<EmptyScreenContainer {...baseProps} buttonStyle={buttonStyle} />);
