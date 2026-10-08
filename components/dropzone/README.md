@@ -232,8 +232,8 @@ export function UploadWithFormats({ send }: { send: (files: File[]) => void }) {
 - **`accept` is react-dropzone 11's form**, not the newer object one: a MIME type, an extension
   such as `.docx`, a comma-separated list, or an array of those.
 - **Folder mode ignores `accept`** and hands it to the drop library only when `isFolderUpload` is
-  off. It also sets the library's `noClick` and `noKeyboard`, and puts its own click handler on the
-  area, which opens a hidden `webkitdirectory` input.
+  off. It also sets the library's `noClick`, and puts its own click and Enter/Space handlers on
+  the area, which open a hidden `webkitdirectory` input.
 - **It listens to the whole document.** `dragenter`, `dragleave` and `drop` are watched on
   `document` with a depth counter, so the area can highlight itself while a file is dragged
   anywhere on the page: a faint tint while the file is anywhere over the page, a stronger one once
@@ -250,7 +250,8 @@ export function UploadWithFormats({ send }: { send: (files: File[]) => void }) {
 - **The icon is rendered two different ways.** A string becomes an `<img>` with the fixed English
   `alt="Upload"`; a component is called with the class and the test id as props.
 - **The format line is only clickable with `fullExstsText`.** Without it the chevron, the
-  drop-down and the pointer cursor are all absent.
+  drop-down and the pointer cursor are all absent. With it, a click on the line toggles the full
+  list, and a click anywhere outside the line and the list closes it.
 - **The whole upload path goes through a custom file reader**, which walks a dropped directory and
   attaches each file's relative path. Replacing it with `getFilesFromEvent` replaces that too.
 
@@ -289,17 +290,20 @@ default comes out as no shadow at all.
 
 - The area is the drop library's `<div>` with `role="button"`, named `File upload area` or
   `Folder upload area`; the library gives it a `tabIndex` and Enter and Space handling,
-  so the file dialog is reachable from the keyboard — **except in folder mode**, where the library's
-  keyboard handling is switched off and only a pointer click opens the directory picker.
+  so the file dialog is reachable from the keyboard. In folder mode the area keeps its `tabIndex`
+  and Enter or Space opens the directory picker instead.
 - **Every ARIA label here is hard-coded English**: `File upload area`, `Folder upload area`,
-  `File input`, `Folder input`, `Supported file types`, and the image's `alt="Upload"`. None of them
+  `File input`, `Folder input`, `Supported file types` (on a format line without
+  `fullExstsText`), and the image's `alt="Upload"`. None of them
   takes a prop, so a localised application still announces them in English.
 - The prompt is the kit's `Link` with a click handler and no `href`, so it is not a focus stop of
   its own; the surrounding area is what takes focus.
 - `aria-busy` follows `isLoading` and `aria-disabled` follows `isDisabled`, both on the outer
   element, and the text block is an `aria-live="polite"` region.
-- The format drop-down opens on click on a `<div>` with no role and no `aria-expanded`, so it is not
-  reachable or announced.
+- With `fullExstsText` the format line is `role="button"` with `tabIndex` 0 and `aria-expanded`,
+  named by its own text. Enter and Space toggle the full list and Escape closes it. It sits
+  inside the area, which is itself `role="button"`, so a screen reader meets one button inside
+  another.
 
 ## Test ids
 

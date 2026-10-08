@@ -72,7 +72,10 @@ const Dropzone = ({
   const dropzoneOptions = {
     maxFiles,
     noClick: isDisabled || isFolderUpload,
-    noKeyboard: isDisabled || isFolderUpload,
+    // Folder mode keeps the area focusable and handles the keys itself
+    // (handleFolderKeyDown), since the library's own handler opens a file
+    // dialog, not a directory picker.
+    noKeyboard: isDisabled,
     noDrag: isDisabled,
     ...(!isFolderUpload && accept ? { accept } : {}),
     onDrop: handleDrop,
@@ -126,6 +129,13 @@ const Dropzone = ({
     }
   };
 
+  const handleFolderKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.target !== e.currentTarget) return;
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    openFolderDialog();
+  };
+
   const handleFileClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isDisabled) {
@@ -153,7 +163,27 @@ const Dropzone = ({
     }
   };
 
+  const handleFormatsKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (!fullExstsText) return;
+
+    if (e.key === "Enter" || e.key === " ") {
+      // Keep the key away from the area, which would open the file dialog.
+      e.preventDefault();
+      e.stopPropagation();
+      setIsFormatsOpen((prev) => !prev);
+      return;
+    }
+
+    if (e.key === "Escape" && isFormatsOpen) {
+      e.stopPropagation();
+      setIsFormatsOpen(false);
+    }
+  };
+
   const handleFormatsClose = (e: Event, open: boolean) => {
+    // The row toggles the list itself; an event on it is not "outside".
+    if (formatsRef.current?.contains(e.target as Node)) return;
+
     if (!open) {
       setIsFormatsOpen(false);
     }
@@ -196,7 +226,9 @@ const Dropzone = ({
               : "File upload area",
             "data-testid": "dropzone-input-area",
           })}
-          {...(isFolderUpload ? { onClick: openFolderDialog } : {})}
+          {...(isFolderUpload
+            ? { onClick: openFolderDialog, onKeyDown: handleFolderKeyDown }
+            : {})}
         >
           {isFolderUpload ? (
             <input
@@ -267,7 +299,14 @@ const Dropzone = ({
                 [styles.clickable]: !!fullExstsText,
               })}
               data-testid="dropzone-file-types"
-              aria-label="Supported file types"
+              {...(fullExstsText
+                ? {
+                    role: "button",
+                    tabIndex: isDisabled ? -1 : 0,
+                    "aria-expanded": isFormatsOpen,
+                    onKeyDown: handleFormatsKeyDown,
+                  }
+                : { "aria-label": "Supported file types" })}
               onClick={handleFormatsClick}
             >
               <div
@@ -303,6 +342,7 @@ const Dropzone = ({
                     directionY="bottom"
                     withBackdrop={false}
                     isDefaultMode={false}
+                    eventTypes={["click"]}
                   >
                     <div className={styles.dropzoneFormatsContent}>
                       {fullExstsText}

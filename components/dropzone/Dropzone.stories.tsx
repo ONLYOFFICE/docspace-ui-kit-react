@@ -372,17 +372,18 @@ export const FolderUpload: Story = {
   play: async (context) => {
     const { canvas } = context;
     // Folder mode: a directory picker, no format line.
-    await expect(
-      canvas.getByRole("button", { name: "Folder upload area" }),
-    ).toBeVisible();
+    const area = canvas.getByRole("button", { name: "Folder upload area" });
+    await expect(area).toBeVisible();
     await expect(getInput(context)).toHaveAttribute("webkitdirectory");
+    // The area stays in the tab order, so the picker opens from the keyboard.
+    await expect(area).toHaveAttribute("tabindex", "0");
     await expect(canvas.queryByTestId("dropzone-file-types")).toBeNull();
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Use to upload a directory tree: a click anywhere opens a folder dialog, each file arrives with its path inside the folder, and the format line is not shown (`isFolderUpload`).",
+          "Use to upload a directory tree: a click anywhere, or Enter or Space on the focused area, opens a folder dialog, each file arrives with its path inside the folder, and the format line is not shown (`isFolderUpload`).",
       },
       source: {
         code: `<Dropzone
@@ -535,22 +536,40 @@ export const WithFormatsList: Story = {
   play: async ({ args, canvas, userEvent }) => {
     await expect(canvas.getByText("+4")).toBeVisible();
 
-    // The format line opens the full list instead of the file dialog.
-    await userEvent.click(canvas.getByTestId("dropzone-file-types"));
+    // The format line is a button that opens the full list instead of the
+    // file dialog.
+    const line = canvas.getByRole("button", { name: /PDF, DOC, DOCX/ });
+    await expect(line).toHaveAttribute("aria-expanded", "false");
+    await userEvent.click(line);
     const full = await screen.findByText("PDF, DOC, DOCX, ODT, RTF, TXT, EPUB");
     await waitFor(() => expect(full).toBeVisible());
+    await expect(line).toHaveAttribute("aria-expanded", "true");
     await expect(args.onDrop).not.toHaveBeenCalled();
 
-    // Clicking the line again closes it. An outside click does not: the
-    // drop-down has no backdrop and listens for no outside events.
-    await userEvent.click(canvas.getByTestId("dropzone-file-types"));
+    // Clicking the line again closes it.
+    await userEvent.click(line);
     await waitFor(() => expect(full).not.toBeVisible());
+
+    // So does a click outside the dropzone.
+    await userEvent.click(line);
+    await waitFor(() => expect(full).toBeVisible());
+    await userEvent.click(document.body);
+    await waitFor(() => expect(full).not.toBeVisible());
+    await expect(line).toHaveAttribute("aria-expanded", "false");
+
+    // From the keyboard: Enter opens it, Escape closes it.
+    line.focus();
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(full).toBeVisible());
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(full).not.toBeVisible());
+    await expect(line).toHaveFocus();
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Use when the accepted formats do not fit on one line: the short line carries a `+4` pill for the rest (`formatsPlusBadgeValue`); click it to open the full list in a drop-down, and click outside to close it (`fullExstsText`).",
+          "Use when the accepted formats do not fit on one line: the short line carries a `+4` pill for the rest (`formatsPlusBadgeValue`); click it, or focus it and press Enter, to open the full list in a drop-down, and click outside or press Escape to close it (`fullExstsText`).",
       },
       source: {
         code: `<Dropzone
