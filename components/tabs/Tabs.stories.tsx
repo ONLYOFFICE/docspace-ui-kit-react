@@ -89,7 +89,7 @@ const meta = {
     hotkeysId: {
       control: "text",
       description:
-        "Name that keeps several segmented bars on one page apart, so clicking one turns on the arrow keys of that bar only. Secondary tabs only",
+        "Suffix of the class `secondary-tabs-scroll-<hotkeysId>` put on the tab scroller, for a caller that queries it. Keyboard navigation does not need it. Secondary tabs only",
     },
     layoutId: {
       control: "text",
@@ -168,11 +168,16 @@ export const Default: Story = {
     );
     await expect(canvas.getByText("Selected tab: Documents")).toBeVisible();
 
-    // The disabled tab is kept from the pointer by its stylesheet; the click
-    // handler itself does not check isDisabled.
-    await expect(
-      getComputedStyle(canvas.getByTestId("Contacts_tab")).pointerEvents,
-    ).toBe("none");
+    // The disabled tab is kept from the pointer by its stylesheet, and the
+    // click handler refuses it as well: a click that gets through (here a
+    // DOM click, which ignores pointer-events) selects nothing.
+    const contacts = canvas.getByTestId("Contacts_tab");
+    await expect(getComputedStyle(contacts).pointerEvents).toBe("none");
+    contacts.click();
+    await expect(args.onSelect).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: "Contacts" }),
+    );
+    await expect(canvas.getByText("Selected tab: Documents")).toBeVisible();
   },
   parameters: {
     docs: {
@@ -191,22 +196,6 @@ export const Default: Story = {
   },
 };
 
-// The secondary tabs pick a tab through react-hotkeys-hook 3, whose
-// hotkeys-js matches named keys by the legacy keyCode. A keyboard sets it;
-// userEvent does not, so Enter is dispatched here with it.
-const pressEnterWithKeyCode = () => {
-  document.activeElement?.dispatchEvent(
-    new KeyboardEvent("keydown", {
-      key: "Enter",
-      code: "Enter",
-      keyCode: 13,
-      which: 13,
-      bubbles: true,
-      cancelable: true,
-    }),
-  );
-};
-
 export const Secondary: Story = {
   render: (args) => <Template {...args} />,
   args: {
@@ -215,15 +204,35 @@ export const Secondary: Story = {
     selectedItemId: data[0].id,
     onSelect: fn(),
   },
-  play: async ({ args, canvas, userEvent }) => {
-    // The keys the description promises: Tab onto the row, an arrow moves
-    // the focus from Overview, Enter picks the focused tab.
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const tablist = canvas.getByRole("tablist");
+    const overview = canvas.getByRole("tab", { name: "Overview" });
+    const documents = canvas.getByRole("tab", { name: "Documents" });
+    await expect(overview).toHaveAttribute("aria-selected", "true");
+
+    // The keys the description promises: Tab lands on the selected tab, an
+    // arrow moves the focus to Documents, Enter picks it.
     await userEvent.tab();
+    await expect(overview).toHaveFocus();
     await userEvent.keyboard("{ArrowRight}");
-    pressEnterWithKeyCode();
+    await expect(documents).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
     await expect(args.onSelect).toHaveBeenLastCalledWith(
       expect.objectContaining({ id: "Documents" }),
     );
+    await expect(documents).toHaveAttribute("aria-selected", "true");
+
+    // Tab leaves the bar again: nothing on the page takes the key.
+    await userEvent.tab();
+    await expect(tablist).not.toContainElement(
+      document.activeElement as HTMLElement,
+    );
+
+    // Without hotkeysId the scroller gets no "...-undefined" class that a
+    // second bar would share.
+    await expect(
+      canvasElement.querySelector('[class*="secondary-tabs-scroll-"]'),
+    ).toBeNull();
 
     await userEvent.click(canvas.getByTestId("Milestones_subtab"));
     await expect(args.onSelect).toHaveBeenLastCalledWith(
@@ -233,11 +242,9 @@ export const Secondary: Story = {
   },
   parameters: {
     docs: {
-      // Framed: the keyboard handler listens on the window and would take keys from the Docs page.
-      story: { inline: false, height: "240px" },
       description: {
         story:
-          "The segmented control (`type={TabsTypes.Secondary}`), for switching between views of the same content; every tab takes the width of the widest label and the selected background slides to the clicked tab. Click a tab, then press Tab and use the arrow keys, Home, End and Enter to pick one from the keyboard.",
+          "The segmented control (`type={TabsTypes.Secondary}`), for switching between views of the same content; every tab takes the width of the widest label and the selected background slides to the clicked tab. From the keyboard, Tab lands on the selected tab, the arrow keys, Home and End move the focus, Enter or Space picks the focused tab, and Tab moves on to the rest of the page.",
       },
       source: {
         code: `<Tabs
@@ -273,8 +280,6 @@ export const Scaled: Story = {
   },
   parameters: {
     docs: {
-      // Framed: the keyboard handler listens on the window and would take keys from the Docs page.
-      story: { inline: false, height: "240px" },
       description: {
         story:
           "The segmented control spread across the whole width of its container, every tab an equal share (`scaled`) — for a bar that should line up with the edges of the panel it sits in. The underlined row ignores `scaled`.",
@@ -308,8 +313,6 @@ export const Loading: Story = {
   },
   parameters: {
     docs: {
-      // Framed: the keyboard handler listens on the window and would take keys from the Docs page.
-      story: { inline: false, height: "240px" },
       description: {
         story:
           "While the labels are still arriving, the segmented bar is kept hidden so that it is not sized to placeholder text (`isLoading`); only the selected tab's content shows. Turn `isLoading` off in the Controls panel below and the bar appears, every tab as wide as the widest label. The component draws no loader of its own, and the underlined row ignores `isLoading`.",
@@ -397,8 +400,6 @@ export const WithIcons: Story = {
   },
   parameters: {
     docs: {
-      // Framed: the keyboard handler listens on the window and would take keys from the Docs page.
-      story: { inline: false, height: "240px" },
       description: {
         story:
           "An icon before every label of the segmented control (the item's `iconName`, an SVG URL), recoloured with the label as a tab is selected or hovered — for tabs that are recognised faster by a picture. The underlined row does not draw icons.",
@@ -609,8 +610,6 @@ export const OverflowingTabs: Story = {
   },
   parameters: {
     docs: {
-      // Framed: the keyboard handler listens on the window and would take keys from the Docs page.
-      story: { inline: false, height: "155px" },
       description: {
         story: `More tabs than a 360px column holds, for a bar whose tabs cannot be cut down:
 
@@ -749,8 +748,6 @@ export const CssCustomization: Story = {
   },
   parameters: {
     docs: {
-      // Framed: the keyboard handler listens on the window and would take keys from the Docs page.
-      story: { inline: false, height: "260px" },
       description: {
         story: `Every variable either bar can show without overflowing, set on one wrapper -- the variables are listed under CSS variables on this page. The first instance is the underlined row, for the \`--tabs-primary-*\`, underline and weight variables; the second is the segmented control (\`type={TabsTypes.Secondary}\`), for the \`--tabs-secondary-*\` ones. Hover the tabs to see the hover colours.`,
       },

@@ -1,138 +1,61 @@
-import { useEffect, useCallback } from "react";
-import { useHotkeys, Options } from "react-hotkeys-hook";
-import { isMobile } from "react-device-detect";
+import type React from "react";
 import { TTabsHotkey } from "../../Tabs.types";
 
+/**
+ * Keyboard model of the segmented bar, scoped to its own tab list: the
+ * returned handler goes on the `role="tablist"` element, so it only sees keys
+ * pressed while focus is on one of this bar's tabs. Nothing is registered on
+ * `window`, so Tab is never taken and two bars never react to each other.
+ *
+ * Left and Right move the focus (swapped in a right-to-left layout) and wrap
+ * at either end, Home and End jump to the first and last tab, Enter and Space
+ * select the focused one.
+ */
 const useTabsHotkeys = ({
-  enabledHotkeys,
-  setHotkeysIsActive,
   items,
   focusedTabIndex,
-  setFocusedTabIndex,
-  scrollToTab,
-  onSelect,
-  hotkeysId,
+  focusTab,
+  selectTab,
 }: TTabsHotkey) => {
-  const activateHotkeys = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Tab" && !isMobile) {
-        e.preventDefault();
+  const onKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
 
-        const tabsElement = document.getElementsByClassName(
-          `secondary-tabs-scroll-${hotkeysId}`,
-        );
+    const count = items.length;
+    if (!count) return;
 
-        (tabsElement[0] as HTMLElement)?.focus();
-        setHotkeysIsActive(!enabledHotkeys);
-      }
-    },
-    [enabledHotkeys, setHotkeysIsActive, hotkeysId],
-  );
+    const isRtl =
+      typeof window !== "undefined" &&
+      window.getComputedStyle(e.currentTarget).direction === "rtl";
 
-  const setFocusedTab = (index: number) => {
-    setFocusedTabIndex(index);
-    scrollToTab(index);
-  };
+    const next = focusedTabIndex >= count - 1 ? 0 : focusedTabIndex + 1;
+    const prev = focusedTabIndex <= 0 ? count - 1 : focusedTabIndex - 1;
 
-  const focusNextTab = () => {
-    if (focusedTabIndex === items.length - 1) setFocusedTab(0);
-    else setFocusedTab(focusedTabIndex + 1);
-  };
+    switch (e.key) {
+      case "ArrowRight":
+        focusTab(isRtl ? prev : next);
+        break;
+      case "ArrowLeft":
+        focusTab(isRtl ? next : prev);
+        break;
+      case "Home":
+        focusTab(0);
+        break;
+      case "End":
+        focusTab(count - 1);
+        break;
+      case "Enter":
+      case " ":
+        selectTab(focusedTabIndex);
+        break;
+      default:
+        return;
+    }
 
-  const focusPrevTab = () => {
-    if (focusedTabIndex === 0) setFocusedTab(items.length - 1);
-    else setFocusedTab(focusedTabIndex - 1);
-  };
-
-  const onSelectTab = (e: KeyboardEvent) => {
-    e.stopPropagation();
     e.preventDefault();
-    onSelect?.(items[focusedTabIndex]);
+    e.stopPropagation();
   };
 
-  const focusFirstTab = () => {
-    setFocusedTab(0);
-  };
-  const focusLastTab = () => {
-    setFocusedTab(items.length - 1);
-  };
-
-  const hotkeysFilter = {
-    filter: (ev: KeyboardEvent) => {
-      const eElement = ev.target as HTMLElement;
-      const eInputElement = ev.target as HTMLInputElement;
-      return (
-        eInputElement?.type === "checkbox" || eElement?.tagName !== "INPUT"
-      );
-    },
-    filterPreventDefault: false,
-    enableOnTags: ["INPUT"],
-    enabled: enabledHotkeys,
-  } as Options;
-
-  const onKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (enabledHotkeys) {
-        const isDefaultKeys =
-          [
-            "PageUp",
-            "PageDown",
-            "Home",
-            "End",
-            "Space",
-            "ArrowUp",
-            "ArrowDown",
-            "ArrowLeft",
-            "ArrowRight",
-          ].indexOf(e.code) > -1;
-
-        if (isDefaultKeys) {
-          e.preventDefault();
-        }
-      }
-
-      activateHotkeys(e);
-    },
-    [activateHotkeys],
-  );
-
-  useEffect(() => {
-    window.addEventListener("keydown", onKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [onKeyDown]);
-
-  useHotkeys(
-    "*",
-    (e: KeyboardEvent) => {
-      if (e.shiftKey || e.ctrlKey) return;
-
-      switch (e.key) {
-        case "ArrowRight": {
-          return focusNextTab();
-        }
-
-        case "ArrowLeft": {
-          return focusPrevTab();
-        }
-
-        default:
-          break;
-      }
-    },
-    hotkeysFilter,
-  );
-
-  // Select focused tab
-  useHotkeys("Enter, Space", onSelectTab, hotkeysFilter);
-
-  // Focus first tab
-  useHotkeys("Home", focusFirstTab, hotkeysFilter);
-
-  // Focus last tab
-  useHotkeys("End", focusLastTab, hotkeysFilter);
+  return { onKeyDown };
 };
 
 export default useTabsHotkeys;

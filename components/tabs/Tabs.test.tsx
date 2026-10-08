@@ -199,6 +199,21 @@ describe("Tabs", () => {
     expect(onClickMock).toHaveBeenCalled();
   });
 
+  it("ignores a click on a disabled tab", () => {
+    const onSelectMock = vi.fn();
+    const onClickMock = vi.fn();
+    const items = [
+      arrayItems[0],
+      { ...arrayItems[1], isDisabled: true, onClick: onClickMock },
+    ];
+    render(
+      <Tabs items={items} selectedItemId="tab0" onSelect={onSelectMock} />,
+    );
+    fireEvent.click(screen.getByTestId("tab1_tab"));
+    expect(onSelectMock).not.toHaveBeenCalled();
+    expect(onClickMock).not.toHaveBeenCalled();
+  });
+
   it("applies custom className", () => {
     const { container } = render(
       <Tabs
@@ -619,21 +634,84 @@ describe("Tabs", () => {
       }
     });
 
-    it("handles global mouseup to set active element and deactivate hotkeys", () => {
+    it("is a tablist with one tab stop, and leaves the document's mouseup alone", () => {
+      const addSpy = vi.spyOn(document, "addEventListener");
+      render(
+        <Tabs
+          items={arrayItems}
+          type={TabsTypes.Secondary}
+          selectedItemId="tab1"
+        />,
+      );
+
+      expect(screen.getByRole("tablist")).toBeInTheDocument();
+      const tabs = screen.getAllByRole("tab");
+      expect(tabs).toHaveLength(2);
+      expect(tabs[1]).toHaveAttribute("aria-selected", "true");
+      expect(tabs[1]).toHaveAttribute("tabindex", "0");
+      expect(tabs[0]).toHaveAttribute("tabindex", "-1");
+      expect(addSpy).not.toHaveBeenCalledWith("mouseup", expect.any(Function));
+      addSpy.mockRestore();
+    });
+
+    it("does not take the Tab key from the page", () => {
       render(
         <Tabs
           items={arrayItems}
           type={TabsTypes.Secondary}
           selectedItemId="tab0"
+          hotkeysId="bar"
         />,
       );
+      const event = new KeyboardEvent("keydown", {
+        key: "Tab",
+        bubbles: true,
+        cancelable: true,
+      });
+      window.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(false);
+    });
 
-      const target = document.createElement("div");
-      target.focus = vi.fn();
+    it("moves the focus with the arrows and selects with Enter", () => {
+      const onSelectMock = vi.fn();
+      render(
+        <Tabs
+          items={arrayItems}
+          type={TabsTypes.Secondary}
+          selectedItemId="tab0"
+          onSelect={onSelectMock}
+        />,
+      );
+      const [first, second] = screen.getAllByRole("tab");
+      first.focus();
+      fireEvent.keyDown(first, { key: "ArrowRight" });
+      expect(second).toHaveFocus();
+      expect(second).toHaveAttribute("tabindex", "0");
+      fireEvent.keyDown(second, { key: "Enter" });
+      expect(onSelectMock).toHaveBeenCalledWith(arrayItems[1]);
+    });
 
-      fireEvent.mouseUp(document, { target });
-
-      expect(target.focus).toHaveBeenCalled();
+    it("refuses a disabled tab by click and by keyboard", () => {
+      const onSelectMock = vi.fn();
+      const onClickMock = vi.fn();
+      const items = [
+        arrayItems[0],
+        { ...arrayItems[1], isDisabled: true, onClick: onClickMock },
+      ];
+      render(
+        <Tabs
+          items={items}
+          type={TabsTypes.Secondary}
+          selectedItemId="tab0"
+          onSelect={onSelectMock}
+        />,
+      );
+      const disabled = screen.getByTestId("tab1_subtab");
+      expect(disabled).toHaveAttribute("aria-disabled", "true");
+      fireEvent.click(disabled);
+      fireEvent.keyDown(disabled, { key: "Enter" });
+      expect(onSelectMock).not.toHaveBeenCalled();
+      expect(onClickMock).not.toHaveBeenCalled();
     });
   });
 });

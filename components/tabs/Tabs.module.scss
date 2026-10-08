@@ -318,7 +318,7 @@
       }
     }
 
-    &.focused,
+    &:focus-visible,
     &:hover:not(.selected) {
       background-color: var(
         --tabs-secondary-hover-bg,

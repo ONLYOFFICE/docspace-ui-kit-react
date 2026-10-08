@@ -176,7 +176,7 @@ const PrimaryTabs = (props: TabsProps) => {
               classes,
             )}
             onClick={() => {
-              if (index === selectedItemIndex) return;
+              if (index === selectedItemIndex || item.isDisabled) return;
               if (!withAnimation) item.onClick?.();
               setSelectedItem(item, index);
             }}
