@@ -324,8 +324,8 @@ Partly machine-checked. What runs:
   field overrides are a pnpm feature, and an npm-packed tarball has no `exports` and no `main`,
   so `--pack` reports total failure for the wrong reason.
 - **`scripts/check-dist.mjs`**, at the end of `pnpm build` — no bundled dependencies, every
-  emitted module an `index` file, and a `"use client"` in `dist` for each of the 55 modules that
-  declare one.
+  emitted module an `index` file, and a `"use client"` in `dist` for every module that
+  declares one.
 - **An API-surface snapshot** — `docs/plugin-surface.json`, written and diffed by
   `.claude/scripts/plugin-surface/surface.mjs`. It fails on a removed or re-kinded export, which
   is the change no compiler reports. `pnpm surface:check`, in the pre-push gate and in CI, fails

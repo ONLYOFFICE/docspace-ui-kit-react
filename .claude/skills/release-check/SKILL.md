@@ -21,7 +21,8 @@ pnpm build && pnpm verify:package
 `verify:package` packs with **pnpm** — `publishConfig` overrides are a pnpm feature, and an
 npm-packed tarball has no `exports` and no `main`, so every check fails for the wrong reason.
 `pnpm build` ends in `scripts/check-dist.mjs`: no bundled dependencies, every emitted module an
-`index` file, and a `"use client"` in dist for each of the 55 modules that declare one.
+`index` file, and a `"use client"` in dist for every module that declares one
+(the build prints the count).
 
 Skip this section with `--quick` only when the gate has already run on this exact tree.
 
