@@ -157,7 +157,7 @@ const AIAgentSelectorComponent = ({
     [startContentLoading],
   );
 
-  const { getAgentList: onLoadNextPage } = useAgentsHelper({
+  const { getAgentList } = useAgentsHelper({
     withCreate: true,
     isInit: isInitRef.current,
     setIsInit,
@@ -173,6 +173,20 @@ const AIAgentSelectorComponent = ({
     subscribe,
     disableBySecurity,
   });
+
+  // `Selector` asks for page 0 on mount (and again whenever this callback
+  // changes). With `withInit` that first page is `initItems`, already on
+  // screen, so it is not fetched: asking the portal would replace the items
+  // the caller passed. A search, or clearing one, fetches as usual, and so do
+  // later pages when `initHasNextPage` says there are more.
+  const onLoadNextPage = React.useCallback(
+    async (startIndex: number) => {
+      if (withInit && startIndex === 0 && !afterSearch.current) return;
+
+      await getAgentList(startIndex);
+    },
+    [withInit, getAgentList],
+  );
 
   React.useEffect(() => {
     const withInfo =

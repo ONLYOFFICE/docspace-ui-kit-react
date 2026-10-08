@@ -266,21 +266,33 @@ export const WithInit: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   play: async ({ args }: PlayContext) => {
-    // The selector still fetches its first page on mount, so the list that
-    // settles is whatever the portal answers; only the picking is checked.
-    // A click that lands while that page loads is ignored, so pick again
-    // until Select comes on; the pause keeps a second click from unpicking.
-    await waitFor(
-      async () => {
-        if (submit().hasAttribute("disabled")) {
-          await userEvent.click(rows()[0]);
-        }
-        expect(submit()).toBeEnabled();
-      },
-      { interval: 500, timeout: 8000 },
-    );
+    // The items passed in are the list: the first page is not fetched, so the
+    // demo portal's agents never replace them.
+    await waitFor(() => expect(row("Test agent")).toBeVisible());
+    await expect(row("Support agent")).toBeVisible();
+    await expect(row("Restricted agent")).toBeVisible();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await expect(screen.queryByText("Contract reviewer")).toBeNull();
+    await expect(rows()).toHaveLength(3);
+
+    await userEvent.click(row("Support agent"));
+    await expect(submit()).toBeEnabled();
     await userEvent.click(submit());
     await expect(args.onSubmit).toHaveBeenCalledTimes(1);
+    const [items] = (args.onSubmit as ReturnType<typeof fn>).mock.calls[0] as [
+      TSelectorItem[],
+    ];
+    await expect(items[0].label).toBe("Support agent");
+
+    // A search is a new question, so it does go to the portal.
+    const search = screen
+      .getByTestId("selector_search_input")
+      .querySelector("input") as HTMLInputElement;
+    await userEvent.type(search, "contract");
+    await waitFor(() => expect(row("Contract reviewer")).toBeVisible(), {
+      timeout: 5000,
+    });
+    await expect(screen.queryByText("Test agent")).toBeNull();
   },
   args: {
     withPadding: true,
@@ -303,7 +315,8 @@ export const WithInit: Story = {
     docs: {
       description: {
         story:
-          "Pre-loaded mode using `withInit`. No API requests are made — items are passed directly. " +
+          "Pre-loaded mode using `withInit`. The first page is not requested: `initItems` is the list until the reader searches, " +
+          "and a search asks the portal as usual. " +
           "The third item has `UseChat: false` and will appear disabled when `disableBySecurity` is set.",
       },
       source: {

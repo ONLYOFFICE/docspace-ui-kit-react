@@ -9,7 +9,7 @@ A selector component for choosing AI Agents from the DocSpace system. Provides a
 - Filters out excluded items via `excludeItems` prop
 - Enforces security: agents without `UseChat` permission are not selectable
 - Shows an info bar prompting the user to choose an agent
-- Supports SSR initialization with pre-fetched data (`withInit`)
+- Supports SSR initialization with pre-fetched data (`withInit`): `initItems` is the list as passed -- the first page is not requested again on mount. A search (or clearing one) and further pages (`initHasNextPage`) are fetched as usual
 - Subscribes to WebSocket events for real-time list updates (e.g., new agents created)
 
 ## Import
