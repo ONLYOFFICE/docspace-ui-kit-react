@@ -10,6 +10,7 @@ A selector component for choosing available MCP (Model Context Protocol) servers
 - Handles paginated loading of servers in batches of 100
 - Disables servers that need a reset (`needReset` flag)
 - Shows server icons with fallback to portal logo for Portal-type servers
+- Labels the portal's own (system) server with the product name from `getBrandName("ProductName")`, prefixed with `getBrandName("OrganizationName")` only when the product name does not already contain it ("ONLYOFFICE DocSpace", but "ONLYOFFICE" or "ONLYOFFICE Apps" as they are)
 - Supports four server types: Custom, Portal, GitHub, Box
 
 ## Import
@@ -54,7 +55,7 @@ const AIAgentSettings = () => {
 ```tsx
 enum ServerType {
   Custom, // Custom MCP server
-  Portal, // DocSpace portal server (uses portal logo)
+  Portal, // The portal's own server (uses portal logo)
   GitHub, // GitHub integration
   Box, // Box integration
 }
@@ -62,6 +63,7 @@ enum ServerType {
 
 ## Key Files
 
-| File        | Description                                                                                                               |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `index.tsx` | Main component with server fetching, multi-select logic, and rendering. Also exports `ServerType` enum and `TServer` type |
+| File                  | Description                                                                                                               |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `index.tsx`           | Main component with server fetching, multi-select logic, and rendering. Also exports `ServerType` enum and `TServer` type |
+| `MCPServers.utils.ts` | `systemServerLabel` -- the system server's label from the brand lookup                                                    |

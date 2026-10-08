@@ -214,6 +214,12 @@ export const WithPreselection: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   play: async ({ args }: PlayContext) => {
     await listed();
+    // The portal's own server carries the product's name once -- Storybook's
+    // brands make it "ONLYOFFICE", not "ONLYOFFICE ONLYOFFICE".
+    await expect(
+      within(row("ONLYOFFICE")).getByText("ONLYOFFICE", { exact: true }),
+    ).toBeVisible();
+    await expect(screen.queryByText(/ONLYOFFICE\s+ONLYOFFICE/)).toBeNull();
     await expect(ticked("ONLYOFFICE")).toBe(true);
     await expect(ticked("Demo CRM")).toBe(false);
 

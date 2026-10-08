@@ -12,7 +12,7 @@ import {
 } from "../../components/selector";
 import { useTheme } from "../../context/ThemeContext";
 import { useApi } from "../../providers/api/ApiProvider";
-import { getBrandName } from "../../constants/brands";
+import { systemServerLabel } from "./MCPServers.utils";
 import { ServerType } from "../../enums";
 import { getServerIcon } from "../../utils/ai/getServerIcon";
 
@@ -99,9 +99,7 @@ const MCPServersSelector = ({
       return {
         key: name,
         id: name,
-        label: isSystem
-          ? `${getBrandName("OrganizationName")} ${getBrandName("ProductName")}`
-          : name,
+        label: isSystem ? systemServerLabel() : name,
         // The portal's own logo comes from the portal the clients talk to.
         // A relative "/logo.ashx" would resolve against the page's origin,
         // which is the portal only when the app is served from it -- not in
