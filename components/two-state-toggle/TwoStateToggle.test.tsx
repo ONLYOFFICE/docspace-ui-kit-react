@@ -26,7 +26,7 @@ describe("TwoStateToggle", () => {
     render(<TwoStateToggle />);
 
     expect(
-      screen.getByRole("switch", { name: "Switch DocSpace design" }),
+      screen.getByRole("switch", { name: "Switch ONLYOFFICE Apps design" }),
     ).toBeInTheDocument();
   });
 

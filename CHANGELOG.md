@@ -36,6 +36,9 @@ a workspace package of the DocSpace client resolved to its source root; it is no
 - **`Aside`** is a flex column whose body fills the remaining height; only `aria-*` props go
   to the `<aside>`, everything else to the header
 - `DateTimePickerProps` includes the required `translations`
+- **`TwoStateToggle`** defaults name the product ONLYOFFICE Apps: `title` is
+  "ONLYOFFICE Apps design", `ariaLabel` "Switch ONLYOFFICE Apps design", and `confirmBody` ends
+  "…the classic ONLYOFFICE Apps view." A test querying the old accessible name fails
 - `ThemeProvider` no longer fetches the portal palette (the call never worked); pass
   `colorTheme`
 

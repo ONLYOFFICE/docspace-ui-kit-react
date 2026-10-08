@@ -15,7 +15,7 @@ const meta = {
       control: "text",
       description:
         "Text label shown at the inline start of the toggle; an empty string hides it",
-      table: { defaultValue: { summary: "DocSpace design" } },
+      table: { defaultValue: { summary: "ONLYOFFICE Apps design" } },
     },
     labelOld: {
       control: "text",
@@ -41,7 +41,7 @@ const meta = {
       table: {
         defaultValue: {
           summary:
-            "You are about to leave the new Dashboard and return to the classic DocSpace view.",
+            "You are about to leave the new Dashboard and return to the classic ONLYOFFICE Apps view.",
         },
       },
     },
@@ -72,7 +72,7 @@ const meta = {
       control: "text",
       description:
         "Accessible name a screen reader announces for the switch; the English default is not translated",
-      table: { defaultValue: { summary: "Switch DocSpace design" } },
+      table: { defaultValue: { summary: "Switch ONLYOFFICE Apps design" } },
     },
     onNavigate: {
       action: "onNavigate",
@@ -99,7 +99,7 @@ export default meta;
 
 export const Default: Story = {
   args: {
-    title: "DocSpace design",
+    title: "ONLYOFFICE Apps design",
     labelOld: "OLD",
     labelNew: "NEW",
   },
@@ -124,7 +124,7 @@ export const ShowingOldState: Story = {
     },
   ],
   args: {
-    title: "DocSpace design",
+    title: "ONLYOFFICE Apps design",
   },
   parameters: {
     docs: {

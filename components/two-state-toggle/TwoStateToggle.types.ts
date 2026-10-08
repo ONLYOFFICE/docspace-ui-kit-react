@@ -1,7 +1,7 @@
 export type TwoStateToggleProps = {
   /**
    * Text to the left of the pill. An empty string removes it.
-   * @default "DocSpace design"
+   * @default "ONLYOFFICE Apps design"
    */
   title?: string;
   /**
@@ -21,7 +21,7 @@ export type TwoStateToggleProps = {
   confirmTitle?: string;
   /**
    * First paragraph of that dialog.
-   * @default "You are about to leave the new Dashboard and return to the classic DocSpace view."
+   * @default "You are about to leave the new Dashboard and return to the classic ONLYOFFICE Apps view."
    */
   confirmBody?: string;
   /**
@@ -42,7 +42,7 @@ export type TwoStateToggleProps = {
   /**
    * Accessible name of the switch button. The English default is not
    * translated for you.
-   * @default "Switch DocSpace design"
+   * @default "Switch ONLYOFFICE Apps design"
    */
   ariaLabel?: string;
   /**
