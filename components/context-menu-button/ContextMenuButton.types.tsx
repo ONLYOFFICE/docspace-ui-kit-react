@@ -75,7 +75,7 @@ export interface ContextMenuButtonProps {
    * @default ContextMenuButtonDisplayType.dropdown
    */
   displayType?: ContextMenuButtonDisplayType;
-  /** Called when the menu closes by itself: a click outside, Escape or Tab. */
+  /** Called whenever the open menu closes: a click outside, Escape, Tab, a second click on the button or a chosen item. Pairs with `onClick`, which reports the opening. */
   onClose?: () => void;
   /** Whether the menu is rendered in a portal on `document.body`.
    * @default true */

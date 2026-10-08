@@ -159,8 +159,9 @@ const ContextMenuButtonPure = ({
       return;
     }
 
+    // Every close goes through onCloseAction, so onClose pairs with onClick.
     if (state.isOpen) {
-      toggle(false);
+      onCloseAction();
       return;
     }
 
@@ -191,7 +192,7 @@ const ContextMenuButtonPure = ({
 
     if (key === "Enter" || key === " " || key === "ArrowDown") {
       e.preventDefault();
-      if (state.isOpen && key !== "ArrowDown") toggle(false);
+      if (state.isOpen && key !== "ArrowDown") onCloseAction();
       else if (state.isOpen) getMenuItems()[0]?.focus();
       else openMenu(e, "first");
       return;
@@ -312,7 +313,7 @@ const ContextMenuButtonPure = ({
       const open = state.displayType === "dropdown";
       item.onClick?.({ originalEvent: e, action: open, item });
     }
-    toggle();
+    onCloseAction();
   };
 
   const callNewMenu = (e: React.MouseEvent) => {

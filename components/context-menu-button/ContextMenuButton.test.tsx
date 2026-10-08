@@ -91,6 +91,37 @@ describe("<ContextMenuButton />", () => {
     expect(button).toHaveAttribute("aria-expanded", "false");
   });
 
+  // A caller pairs onClick (opened) with onClose (closed), e.g. to lock and
+  // unlock a panel's scroll; every way of closing has to report it.
+  it.each([
+    ["the button is clicked again", "click"],
+    ["Enter is pressed on the button", "Enter"],
+    ["an item is chosen", "item"],
+  ])("calls onClose when %s", (_, how) => {
+    const onClick = vi.fn();
+    const onClose = vi.fn();
+    render(
+      <ContextMenuButton
+        {...baseProps}
+        usePortal={false}
+        onClick={onClick}
+        onClose={onClose}
+      />,
+    );
+    const button = screen.getByRole("button", { name: "Actions" });
+
+    fireEvent.click(button);
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onClose).not.toHaveBeenCalled();
+
+    if (how === "click") fireEvent.click(button);
+    else if (how === "Enter") fireEvent.keyDown(button, { key: "Enter" });
+    else fireEvent.click(screen.getByRole("menuitem", { name: "label" }));
+
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it("opens with data alone when there is no getData", () => {
     render(
       <ContextMenuButton
