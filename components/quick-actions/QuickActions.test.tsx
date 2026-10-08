@@ -464,4 +464,69 @@ describe("QuickActions", () => {
       });
     });
   });
+
+  describe("tile tooltips and the strip's keyboard", () => {
+    const tooltipped = (id: string) => [
+      {
+        id,
+        icon: <span />,
+        label: `Tile ${id}`,
+        tooltipContent: "Hint",
+      },
+    ];
+
+    it("anchors each tooltip to an id of its own, whatever the item ids", () => {
+      render(
+        <>
+          <QuickActions {...LABELS} items={tooltipped("same id: 1")} />
+          <QuickActions {...LABELS} items={tooltipped("same id: 1")} />
+        </>,
+      );
+
+      const anchors = screen
+        .getAllByRole("button", { name: "Tile same id: 1" })
+        .map((tile) => tile.parentElement?.id ?? "");
+
+      expect(anchors).toHaveLength(2);
+      expect(anchors[0]).not.toBe(anchors[1]);
+      anchors.forEach((id) => {
+        expect(id).not.toContain("same");
+        expect(document.querySelector(`#${id}`)).not.toBeNull();
+      });
+    });
+
+    it("is a horizontal toolbar that the arrow keys, Home and End walk", () => {
+      render(<QuickActions {...LABELS} items={buildFiveItems()} />);
+
+      const track = screen.getByRole("toolbar");
+      expect(track).toHaveAttribute("aria-orientation", "horizontal");
+
+      const tiles = Array.from(track.querySelectorAll("button"));
+      tiles[0].focus();
+
+      fireEvent.keyDown(tiles[0], { key: "ArrowRight" });
+      expect(tiles[1]).toHaveFocus();
+
+      fireEvent.keyDown(tiles[1], { key: "ArrowLeft" });
+      expect(tiles[0]).toHaveFocus();
+
+      fireEvent.keyDown(tiles[0], { key: "End" });
+      expect(tiles[tiles.length - 1]).toHaveFocus();
+
+      fireEvent.keyDown(tiles[tiles.length - 1], { key: "Home" });
+      expect(tiles[0]).toHaveFocus();
+    });
+
+    it("walks the other way round in RTL", () => {
+      render(<QuickActions {...LABELS} items={buildFiveItems()} />);
+
+      const track = screen.getByRole("toolbar");
+      track.style.direction = "rtl";
+      const tiles = Array.from(track.querySelectorAll("button"));
+      tiles[0].focus();
+
+      fireEvent.keyDown(tiles[0], { key: "ArrowLeft" });
+      expect(tiles[1]).toHaveFocus();
+    });
+  });
 });

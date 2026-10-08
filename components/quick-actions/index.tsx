@@ -126,9 +126,16 @@ const useScrollAffordance = (
   return affordance;
 };
 
+// `useId` values carry characters (colons, guillemets) that a bare `#id`
+// selector cannot hold.
+const useSelectorSafeId = () => React.useId().replace(/[^A-Za-z0-9_-]/g, "-");
+
 const QuickActionTile = ({ item }: { item: QuickActionItem }) => {
+  // From `useId`, not from the item's id: two banners can offer a tile with the
+  // same id, and an id with a space or a colon would break the selector.
+  const tooltipAnchorId = `quick-action-tooltip${useSelectorSafeId()}`;
+
   const {
-    id,
     icon,
     label,
     onClick,
@@ -187,8 +194,6 @@ const QuickActionTile = ({ item }: { item: QuickActionItem }) => {
 
   if (!tooltipContent) return tile;
 
-  const tooltipAnchorId = `quick-action-tooltip-${id}`;
-
   return (
     <div id={tooltipAnchorId} className={styles.tileTooltipAnchor}>
       {tile}
@@ -231,9 +236,7 @@ export const QuickActions = ({
   // that replaced the placeholder.
   const [track, setTrack] = React.useState<HTMLDivElement | null>(null);
 
-  // `useId` values carry colons, which a bare `#id` selector cannot hold.
-  const instanceId = React.useId().replace(/:/g, "-");
-  const closeAnchorId = `quick-actions-close-${instanceId}`;
+  const closeAnchorId = `quick-actions-close${useSelectorSafeId()}`;
 
   // The ids, not the array identity: the consumer rebuilds `items` on every
   // render, so identity would rewind the strip continuously. The count alone
@@ -260,6 +263,31 @@ export const QuickActions = ({
     const distance = page * getDirectionSign(track) * (towardEnd ? 1 : -1);
 
     track.scrollBy({ left: distance, behavior: "smooth" });
+  };
+
+  // Arrow keys move focus along the strip (in reading order, so mirrored in
+  // RTL), Home and End jump to its ends; focusing a tile scrolls it in.
+  const onTrackKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!track) return;
+    const tiles = Array.from(
+      track.querySelectorAll<HTMLElement>("a[href], button:not(:disabled)"),
+    );
+    const index = tiles.indexOf(document.activeElement as HTMLElement);
+    if (index === -1) return;
+
+    const forward = getDirectionSign(track) === 1 ? "ArrowRight" : "ArrowLeft";
+    const back = forward === "ArrowRight" ? "ArrowLeft" : "ArrowRight";
+
+    let next: HTMLElement | undefined;
+    if (e.key === forward) next = tiles[Math.min(index + 1, tiles.length - 1)];
+    else if (e.key === back) next = tiles[Math.max(index - 1, 0)];
+    else if (e.key === "Home") next = tiles[0];
+    else if (e.key === "End") next = tiles[tiles.length - 1];
+    else return;
+
+    e.preventDefault();
+    next.focus();
+    next.scrollIntoView?.({ block: "nearest", inline: "nearest" });
   };
 
   if (isLoading) {
@@ -293,6 +321,9 @@ export const QuickActions = ({
       <div
         ref={setTrack}
         className={styles.grid}
+        role="toolbar"
+        aria-orientation="horizontal"
+        onKeyDown={onTrackKeyDown}
         data-testid="quick-actions-track"
       >
         {items.map((item) => (

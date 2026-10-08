@@ -355,13 +355,26 @@ export const Carousel: Story = {
     await expect(
       await canvas.findByRole("button", { name: "Previous" }),
     ).toBeInTheDocument();
+
+    // The strip is a toolbar the keyboard walks: End reaches the last tile,
+    // Home brings the first one back into view.
+    await expect(track).toBe(canvas.getByRole("toolbar"));
+    const tiles = Array.from(track.querySelectorAll("button"));
+    tiles[0].focus();
+    await userEvent.keyboard("{End}");
+    await expect(tiles[tiles.length - 1]).toHaveFocus();
+    await userEvent.keyboard("{Home}");
+    await expect(tiles[0]).toHaveFocus();
+    await waitFor(() => expect(track.scrollLeft).toBe(0));
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(tiles[1]).toHaveFocus();
   },
   parameters: {
     docs: {
       description: {
         story: `Five tiles, more than the banner holds. The tiles keep their width and the strip scrolls sideways; wheel, trackpad, touch swipe and the arrows all move the same strip.
 
-At the start only the forward arrow is shown; scroll and the back arrow appears, and at the far end the forward one goes. The arrows float over the strip, so nothing moves when they appear. With a mouse they fade in while the banner is hovered or focused; on a touch screen they stay visible.`,
+At the start only the forward arrow is shown; scroll and the back arrow appears, and at the far end the forward one goes. From the keyboard, the arrow keys, Home and End move between the tiles and bring each into view. The arrows float over the strip, so nothing moves when they appear. With a mouse they fade in while the banner is hovered or focused; on a touch screen they stay visible.`,
       },
       source: {
         code: `<QuickActions
