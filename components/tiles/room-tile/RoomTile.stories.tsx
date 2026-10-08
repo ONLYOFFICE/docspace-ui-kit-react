@@ -178,7 +178,7 @@ const meta = {
     },
     selectTag: {
       description:
-        "Called with a clicked tag that carries a label and a room type; a plain text tag never reaches it",
+        "Called with a clicked tag of the room's own, plain text tags included; the generated tags go to `selectOption`",
     },
     selectOption: {
       description:
@@ -259,11 +259,12 @@ export const Default: Story = {
     await userEvent.click(within(tile).getByText("Room Content"));
     await expect(args.thumbnailClick).toHaveBeenCalledTimes(1);
 
-    // The tag and the badge have their own handlers.
+    // The tag and the badge have their own handlers; neither opens the room.
     await userEvent.click(within(tile).getByText("Collaboration"));
     await expect(args.selectTag).toHaveBeenCalledWith(
       expect.objectContaining({ label: "Collaboration" }),
     );
+    await expect(args.thumbnailClick).toHaveBeenCalledTimes(1);
     const opened = (args.thumbnailClick as ReturnType<typeof fn>).mock.calls
       .length;
     await userEvent.click(
@@ -421,7 +422,7 @@ export const GeneratedTags: Story = {
     },
     getRoomTypeName: () => "Collaboration",
   },
-  play: async ({ canvas }) => {
+  play: async ({ args, canvas, userEvent }) => {
     const tile = canvas.getByTestId("tile");
     // Two tags made by the tile: the storage first, as its icon alone,
     // then the room type.
@@ -431,6 +432,22 @@ export const GeneratedTags: Story = {
       expect(tags[0].querySelector("svg, img")).not.toBeNull(),
     );
     await expect(tags[1]).toHaveTextContent("Collaboration");
+
+    // Each reaches selectOption with which of the two it was; neither
+    // reaches selectTag or opens the room.
+    await userEvent.click(tags[0]);
+    await expect(args.selectOption).toHaveBeenLastCalledWith({
+      option: "typeProvider",
+      value: "1",
+    });
+    tags[1].focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.selectOption).toHaveBeenLastCalledWith({
+      option: "defaultTypeRoom",
+      value: String(RoomsType.EditingRoom),
+    });
+    await expect(args.selectTag).not.toHaveBeenCalled();
+    await expect(args.thumbnailClick).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {

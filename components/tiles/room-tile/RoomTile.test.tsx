@@ -27,16 +27,20 @@ interface TagProps {
   providerType?: number | string;
 }
 
-// Mock Tags component to mimic key behaviour
+// Mock Tags component to mimic key behaviour: the root carries only the
+// className it is given, and a tag with its own onClick calls that instead
+// of onSelectTag.
 vi.mock("../../tags", () => ({
   Tags: ({
     tags,
+    className,
     onSelectTag,
   }: {
     tags: TagProps[];
+    className?: string;
     onSelectTag?: (tag: TagProps) => void;
   }) => (
-    <div data-testid="tags" className="tags">
+    <div data-testid="tags" className={className}>
       {tags.map((tag) => {
         const normalized =
           typeof tag === "string"
@@ -44,8 +48,8 @@ vi.mock("../../tags", () => ({
             : (tag as TagProps);
         const label = normalized.label;
         const handleClick = () => {
-          normalized.onClick?.();
-          onSelectTag?.(normalized);
+          if (normalized.onClick) normalized.onClick();
+          else onSelectTag?.(normalized);
         };
 
         return (
@@ -236,6 +240,44 @@ describe("RoomTile", () => {
       option: "defaultTypeRoom",
       value: mockRoomType,
     });
+  });
+
+  it("does not open the room when a tag is clicked", () => {
+    const thumbnailClick = vi.fn();
+    const selectTag = vi.fn();
+    renderRoomTile({ thumbnailClick, selectTag });
+
+    fireEvent.click(screen.getByText("Custom Tag"));
+
+    expect(selectTag).toHaveBeenCalledWith(
+      expect.objectContaining({ label: "Custom Tag" }),
+    );
+    expect(thumbnailClick).not.toHaveBeenCalled();
+  });
+
+  it("does not hand a generated tag to selectTag", () => {
+    const selectTag = vi.fn();
+    const selectOption = vi.fn();
+    renderRoomTile({ selectTag, selectOption });
+
+    fireEvent.click(screen.getByLabelText("provider-key"));
+
+    expect(selectOption).toHaveBeenCalledTimes(1);
+    expect(selectTag).not.toHaveBeenCalled();
+  });
+
+  it("hands a plain string tag to selectTag", () => {
+    const selectTag = vi.fn();
+    renderRoomTile({
+      selectTag,
+      item: { ...mockItem, tags: ["Plain"], providerType: undefined },
+    });
+
+    fireEvent.click(screen.getByLabelText("Plain"));
+
+    expect(selectTag).toHaveBeenCalledWith(
+      expect.objectContaining({ label: "Plain" }),
+    );
   });
 
   it("renders badges when provided", () => {
