@@ -148,7 +148,7 @@ const meta: Meta<StoryArgs> = {
     accept: {
       control: "text",
       description:
-        "Accepted file types as a comma-separated string (e.g., '.pdf,.doc,.docx')",
+        "Accepted file types as a comma-separated string (e.g., '.pdf,.doc,.docx'). '*', '*/*' or empty accept any file",
     },
     shortText: {
       control: "text",
@@ -416,15 +416,19 @@ export const WithTotalSizeLimit: Story = {
 export const AnyFiles: Story = {
   play: async () => {
     await choosesFolder();
+    // An unknown extension with no MIME type: refused before "*" meant any.
     drops([file("Archive.xyz", "application/octet-stream")]);
     await toast("Uploaded elements: 1");
+    await expect(
+      screen.queryByText(/rejected due to unsupported format/),
+    ).toBeNull();
   },
   args: {
     ...defaultArgs,
     storyId: "any-files",
-    // react-dropzone 11 has no wildcard: "*" (or "*/*") refuses every file.
-    // Only an empty accept lets any type through.
-    accept: "",
+    // "*" (like "*/*", "" or no accept at all) means any file: the Uploader
+    // hands the drop library an empty accept, its only "anything".
+    accept: "*",
     shortText: "Any files",
     fullText: undefined,
     badgeValue: undefined,

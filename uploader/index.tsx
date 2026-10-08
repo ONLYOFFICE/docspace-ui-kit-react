@@ -17,6 +17,7 @@ import {
 import { getCommonTranslation } from "../utils";
 import { prepareFolderUpload } from "./utils/folder";
 import { isEmptyDirectoryFile } from "./utils/path";
+import { normalizeAccept } from "./utils/accept";
 import { getErrorMessage } from "../utils/getErrorMessage";
 import { useApi } from "../providers/api";
 
@@ -400,7 +401,7 @@ const Uploader = ({
         }}
         onDrop={onDrop}
         onDropRejected={onDropRejected}
-        accept={accept}
+        accept={normalizeAccept(accept)}
         linkMainText={linkMainText ?? getCommonTranslation("Upload")}
         linkSecondaryText={getSecondaryText()}
         exstsText={
