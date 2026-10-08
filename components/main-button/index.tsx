@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useId, useRef, useState } from "react";
 import classNames from "classnames";
 import TriangleNavigationDownReactSvgUrl from "../../assets/triangle.navigation.down.react.svg";
 import { GuidanceRefKey } from "../../enums";
@@ -21,13 +21,22 @@ const MainButton = (props: MainButtonProps) => {
     id,
     setRefMap,
     anchorRef,
+    // Declared for backward compatibility and never read; taken out here so
+    // it no longer reaches the DOM as an unknown attribute.
+    opened: _opened,
     ...rest
   } = props;
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<ContextMenuRefType>(null);
   const [buttonWidth, setButtonWidth] = useState<number | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const menuId = useId();
+
+  // Stable, so the menu does not rebuild its `hide` on every render.
+  const onMenuShow = useCallback(() => setIsOpen(true), []);
+  const onMenuHide = useCallback(() => setIsOpen(false), []);
 
   // The element used to position the dropdown. Defaults to the button itself;
   // callers can override (e.g. SearchInput wraps the button in a larger pill).
@@ -41,7 +50,10 @@ const MainButton = (props: MainButtonProps) => {
         const rect = target.getBoundingClientRect();
         setButtonWidth(rect.width);
         if (setRefMap) {
-          setRefMap(GuidanceRefKey.MainButton, buttonRef);
+          setRefMap(
+            GuidanceRefKey.MainButton,
+            buttonRef as unknown as React.RefObject<HTMLDivElement | null>,
+          );
         }
       }
     };
@@ -77,6 +89,25 @@ const MainButton = (props: MainButtonProps) => {
     }
   };
 
+  // The menu reads its hotkeys from `keyup` on `window`. Enter clicks a native
+  // button on `keydown`, so the `keyup` of the same press would reach the menu
+  // it has just opened and pick its first item: that `keyup` is kept to the
+  // button. While the menu is open, Enter belongs to the menu (it picks the
+  // highlighted item), so the button does not click again.
+  const enterOpensMenu = useRef(false);
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key !== "Enter" || !isDropdown) return;
+    if (isOpen) e.preventDefault();
+    else enterOpensMenu.current = true;
+  };
+
+  const onKeyUp = (e: React.KeyboardEvent) => {
+    if (e.key !== "Enter" || !enterOpensMenu.current) return;
+    enterOpensMenu.current = false;
+    e.stopPropagation();
+  };
+
   // A menu whose items explain themselves is wider than the button, so it is
   // sized by its content instead of being clamped to the button width.
   // A caller may leave holes in the model for options it decided not to offer
@@ -98,25 +129,39 @@ const MainButton = (props: MainButtonProps) => {
       data-testid="main-button"
     >
       <TooltipContainer
-        as="div"
+        as="button"
+        type="button"
         {...rest}
         id={id}
         ref={buttonRef}
         className={buttonClasses}
         onClick={onMainButtonClick}
+        onKeyDown={onKeyDown}
+        onKeyUp={onKeyUp}
+        // Not the native `disabled`: that would take the button out of the
+        // tab order and silence a tooltip on it.
+        aria-disabled={isDisabled || undefined}
+        aria-haspopup={isDropdown ? "menu" : undefined}
+        aria-expanded={isDropdown ? isOpen : undefined}
+        aria-controls={isDropdown && isOpen ? menuId : undefined}
       >
-        <Text className={styles.text}>{text}</Text>
+        <Text as="span" className={styles.text}>
+          {text}
+        </Text>
         {isDropdown ? (
           <>
             {hideArrow ? null : (
-              <div className={styles.img}>
+              <span className={styles.img} aria-hidden="true">
                 <TriangleNavigationDownReactSvgUrl />
-              </div>
+              </span>
             )}
             <ContextMenu
+              id={menuId}
               className={styles.menu}
-              model={model}
+              model={model ?? []}
               ref={menuRef}
+              onShow={onMenuShow}
+              onHide={onMenuHide}
               appendTo={
                 typeof document !== "undefined" ? document.body : undefined
               }

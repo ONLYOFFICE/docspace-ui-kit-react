@@ -90,6 +90,16 @@
     var(--main-button-line-height)
   );
 
+  // The element is a native <button>: take back everything the user agent
+  // gives one, so it draws exactly as the plain box it used to be.
+  appearance: none;
+  border: none;
+  margin: 0;
+  inline-size: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+
   -webkit-tap-highlight-color: var(--tap-highlight-color);
   position: relative;
   display: flex;
@@ -103,6 +113,11 @@
   -moz-border-radius: var(--main-button-radius-value);
   -webkit-border-radius: var(--main-button-radius-value);
   line-height: var(--main-button-line-height-value);
+
+  &:focus-visible {
+    outline: 2px solid var(--main-button-bg-value);
+    outline-offset: 2px;
+  }
 
   &:not(.disabled) {
     &:hover {
