@@ -76,6 +76,43 @@ describe("EmptyViewItem", () => {
     expect(contextMenuShowMock).not.toHaveBeenCalled();
   });
 
+  it.each([
+    ["Enter", "Enter"],
+    ["Space", " "],
+  ])("activates with %s like a click", (_name, key) => {
+    const onClick = vi.fn();
+    renderComponent({ onClick });
+
+    const item = screen.getByRole("button", { name: defaultProps.title });
+    fireEvent.keyDown(item, { key });
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onClick.mock.calls[0][0].type).toBe("click");
+  });
+
+  it("ignores other keys, and keys pressed inside the item", () => {
+    const onClick = vi.fn();
+    renderComponent({ onClick });
+
+    const item = screen.getByRole("button", { name: defaultProps.title });
+    fireEvent.keyDown(item, { key: "a" });
+    fireEvent.keyDown(screen.getByText(defaultProps.title), { key: "Enter" });
+
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it("opens the context menu from the keyboard", () => {
+    const model = [{ key: "copy", label: "Copy" }] as ContextMenuModel[];
+    renderComponent({ model });
+
+    fireEvent.keyDown(
+      screen.getByRole("button", { name: defaultProps.title }),
+      { key: "Enter" },
+    );
+
+    expect(contextMenuShowMock).toHaveBeenCalledTimes(1);
+  });
+
   it("shows context menu when model is provided", () => {
     const model = [{ key: "copy", label: "Copy" }] as ContextMenuModel[];
     const onClick = vi.fn();

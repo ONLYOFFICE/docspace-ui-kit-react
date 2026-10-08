@@ -157,11 +157,14 @@ export function EmptyFolder({
 - **Option types are told apart by shape, not only by `type`.** An option with a `to` field is
   a link whatever else it carries; `button`, `separator` and `action` are matched on `type`;
   anything else falls through to an item. A link option therefore cannot also be a button.
-- **A link option without `LinkRouter` silently stops navigating.** It renders as an action
-  link with the same icon and text, and the `to` you passed is ignored. Pass your router's
-  `Link` component, or use an `action` option with an `onClick`.
-- `isNext: true` has the same effect on purpose, for a link that should run a handler rather
-  than navigate.
+- **A link option without `LinkRouter` is a plain anchor, not a router link.** It renders the
+  kit's action `Link` with `to` as its `href`. When the option has an `onClick`, a plain click
+  runs it and the default navigation is prevented, so the handler decides what happens; a
+  Ctrl-, Cmd-, Shift- or middle-click is left to the browser and opens `to` in a new tab or
+  window. With no `onClick`, a click is a full page navigation to `to` — pass your router's
+  `Link` component to avoid the reload.
+- `isNext: true` renders that same anchor even when a `LinkRouter` is passed, for a link whose
+  handler navigates on its own.
 - An item with a `model` opens that context menu on click and does not call its `onClick`.
 - An item with `disabled: true` is not rendered at all — there is no greyed-out state.
 - A `button` option is `primary` unless you say otherwise, and is always `ButtonSize.small`.
@@ -204,13 +207,14 @@ items have no override either.
 - The title renders as an `<h3>` and the description as a `<p>`; the wrapper has no landmark
   role, so place it inside your own region.
 - An item is a `<div>` with `role="button"`, `tabIndex={0}` and an `aria-label` of its
-  `title`, so it is in the Tab order and announced by its title — but it has no key handler,
-  so Enter and Space do not activate it.
+  `title`, so it is in the Tab order and announced by its title. Enter and Space activate it
+  as a click does: `onClick` receives a click event, and an item with a `model` opens its
+  context menu under the item.
 - An `action` option is a `<div>` with `role="button"` and `tabIndex={0}`, named by its own
-  text; it has no key handler either, so Enter and Space do not activate it.
+  text, and Enter and Space activate it the same way.
 - A `button` option is a native `<button>`, activated by Enter and Space. A link option is
-  whatever your `LinkRouter` renders; without one (or with `isNext`) it is an `<a>` with no
-  `href`, which has no role and is not in the Tab order.
+  whatever your `LinkRouter` renders; without one (or with `isNext`) it is an `<a>` whose
+  `href` is `to`, so it is a link in the Tab order, activated by Enter.
 - The icon you pass is rendered as given; mark it `aria-hidden` unless it carries meaning the
   title does not.
 

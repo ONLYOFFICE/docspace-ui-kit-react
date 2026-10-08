@@ -6,10 +6,13 @@ import { Button, ButtonSize } from "../../../button";
 
 import { EmptyViewItem } from "../EmptyViewItem";
 import {
+  isActivationKey,
   isEmptyActionOption,
   isEmptyButtonOption,
   isEmptyLinkOptions,
   isEmptySeparatorOption,
+  isPlainClick,
+  toHref,
 } from "../../EmptyView.utils";
 import styles from "../../EmptyView.module.scss";
 
@@ -23,9 +26,15 @@ const EmptyViewOption = ({ option, LinkRouter }: EmptyViewOptionProps) => {
           type={LinkType.action}
           id={option.key.toString()}
           className={classNames(styles.link, option.className)}
-          onClick={(e) =>
-            option.onClick?.(e as React.MouseEvent<HTMLAnchorElement>)
-          }
+          // A real href keeps the link in the Tab order, announced as a link,
+          // and lets a modified click open it in a new tab.
+          href={toHref(option.to)}
+          onClick={(e) => {
+            if (!option.onClick) return;
+            // The handler owns a plain click, as it did before the href.
+            if (isPlainClick(e)) e.preventDefault();
+            option.onClick(e as React.MouseEvent<HTMLAnchorElement>);
+          }}
         >
           {option.icon}
           <span>{option.description}</span>
@@ -60,6 +69,13 @@ const EmptyViewOption = ({ option, LinkRouter }: EmptyViewOptionProps) => {
       }
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.target !== e.currentTarget || !isActivationKey(e)) return;
+      e.preventDefault();
+      // A real click event, so the handler receives the MouseEvent it is typed for.
+      e.currentTarget.click();
+    };
+
     return (
       <div
         id={option.key.toString()}
@@ -67,6 +83,7 @@ const EmptyViewOption = ({ option, LinkRouter }: EmptyViewOptionProps) => {
           [styles.secondary]: option.className === "secondary",
         })}
         onClick={handleClick}
+        onKeyDown={handleKeyDown}
         role="button"
         tabIndex={0}
       >

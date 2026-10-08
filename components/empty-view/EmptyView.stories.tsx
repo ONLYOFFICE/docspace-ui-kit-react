@@ -262,6 +262,13 @@ export const SuggestionCards: Story = {
     );
     await expect(onCreateFolder).toHaveBeenCalledTimes(1);
 
+    // The card works from the keyboard too: Enter and Space activate it.
+    canvas.getByRole("button", { name: "Create a folder" }).focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(onCreateFolder).toHaveBeenCalledTimes(2);
+    await userEvent.keyboard(" ");
+    await expect(onCreateFolder).toHaveBeenCalledTimes(3);
+
     // A card with a model opens a menu of choices instead.
     await userEvent.click(canvas.getByRole("button", { name: "Upload files" }));
     // The menu fades in, so the item is found first and seen a moment later.
@@ -411,6 +418,17 @@ export const TextActionsWithSeparator: Story = {
       canvas.getByRole("button", { name: "Create a document" }),
     );
     await expect(create.onClick).toHaveBeenCalledTimes(1);
+
+    // Actions are reachable with Tab and activated by Enter and Space.
+    canvas.getByRole("button", { name: "Upload a file" }).focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(upload.onClick).toHaveBeenCalledTimes(2);
+    await userEvent.tab();
+    await expect(
+      canvas.getByRole("button", { name: "Create a document" }),
+    ).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await expect(create.onClick).toHaveBeenCalledTimes(2);
   },
   parameters: {
     docs: {
@@ -479,6 +497,54 @@ export const WithExtraContent: Story = {
   extraContent={<Text fontSize="12px" fontWeight="600">Ask a teammate to share a file with you.</Text>}
   options={[{ key: "refresh", icon: <CrossIcon />, to: "/files", description: "Clear Filter" }]}
   LinkRouter={RouterLink}
+/>`,
+      },
+    },
+  },
+};
+
+export const LinkWithoutRouter: Story = {
+  render: (args) => <EmptyView {...args} />,
+  args: {
+    icon: <EmptyRoomsLightSvg />,
+    title: "No results",
+    description: "Nothing matches the current filter.",
+    options: [
+      {
+        key: "clear",
+        icon: <CrossSvg />,
+        to: "/files?filter=none",
+        description: "Clear filter",
+        onClick: fn().mockName("Clear filter"),
+      },
+    ],
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const [clear] = (args.options ?? []) as { onClick: () => void }[];
+    // Without a LinkRouter the option is still a real link to its `to`:
+    // in the Tab order and announced as a link.
+    const link = canvas.getByRole("link", { name: "Clear filter" });
+    await expect(link).toHaveAttribute("href", "/files?filter=none");
+    await userEvent.tab();
+    await expect(link).toHaveFocus();
+    // The handler owns a plain click and Enter; the page does not navigate.
+    await userEvent.keyboard("{Enter}");
+    await expect(clear.onClick).toHaveBeenCalledTimes(1);
+    await userEvent.click(link);
+    await expect(clear.onClick).toHaveBeenCalledTimes(2);
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A link option with no `LinkRouter` — or with `isNext` — renders the kit's own link, with `to` as its `href`. A plain click and Enter run its `onClick` and stay on the page; a Ctrl- or middle-click opens `to` in a new tab, and an option with no `onClick` navigates to it.",
+      },
+      source: {
+        code: `<EmptyView
+  icon={<EmptyIcon />}
+  title="No results"
+  description="Nothing matches the current filter."
+  options={[{ key: "clear", icon: <CrossIcon />, to: "/files?filter=none", description: "Clear filter", onClick: clearFilter }]}
 />`,
       },
     },

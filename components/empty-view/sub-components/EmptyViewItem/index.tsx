@@ -6,6 +6,7 @@ import { Text } from "../../../text";
 import { ContextMenu, type ContextMenuRefType } from "../../../context-menu";
 
 import styles from "../../EmptyView.module.scss";
+import { isActivationKey } from "../../EmptyView.utils";
 import type { EmptyViewItemProps } from "../../EmptyView.types";
 
 export const EmptyViewItem = ({
@@ -27,6 +28,25 @@ export const EmptyViewItem = ({
     contextRef.current?.show(event);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    // Keys pressed inside the open context menu bubble here through React.
+    if (event.target !== event.currentTarget || !isActivationKey(event)) return;
+    event.preventDefault();
+
+    // Dispatch a real click so onClick receives the MouseEvent it is typed
+    // for, placed at the item's lower start corner so a context menu opened
+    // from the keyboard appears under the item rather than at the page origin.
+    const rect = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.dispatchEvent(
+      new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+        clientX: rect.left,
+        clientY: rect.bottom,
+      }),
+    );
+  };
+
   const elementProps = { className: styles.itemIcon };
 
   return (
@@ -36,6 +56,7 @@ export const EmptyViewItem = ({
       tabIndex={0}
       aria-label={title}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
       className={styles.itemWrapper}
     >
       <ContextMenu ref={contextRef} model={model ?? []} />
