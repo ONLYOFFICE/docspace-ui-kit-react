@@ -78,6 +78,35 @@ const meta = {
       description:
         "Called when typing completes the minutes field: after two digits, a single digit above 5, a third digit or a value above 59; leaving the field with the mouse or Tab does not call it",
     },
+    ariaLabel: {
+      control: "text",
+      description: "Accessible name of the group; pass a translated string",
+      table: {
+        defaultValue: { summary: '"Time picker"' },
+      },
+    },
+    hoursLabel: {
+      control: "text",
+      description: "Accessible name of the hours field",
+      table: {
+        defaultValue: { summary: '"Hours"' },
+      },
+    },
+    minutesLabel: {
+      control: "text",
+      description: "Accessible name of the minutes field",
+      table: {
+        defaultValue: { summary: '"Minutes"' },
+      },
+    },
+    autoAdvance: {
+      control: "boolean",
+      description:
+        "Whether typing moves the focus: a complete hour jumps to minutes and a complete minute blurs the field and calls `onBlur`; off, the focus stays put and `onBlur` is never called",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
     forwardedRef: {
       control: false,
       description: "Ref to the outer box, a <div>",
@@ -146,6 +175,10 @@ export const Default: Story = {
     const group = canvas.getByRole("group", { name: "Time picker" });
     const hours = within(group).getByLabelText("Hours");
     const minutes = within(group).getByLabelText("Minutes");
+    // Plain text fields, not search fields.
+    await expect(hours).toHaveAttribute("type", "text");
+    await expect(minutes).toHaveAttribute("type", "text");
+    await expect(hours).not.toHaveAttribute("aria-invalid");
     await expect(hours).toHaveValue("10");
     await expect(minutes).toHaveValue("30");
 
@@ -192,6 +225,15 @@ export const WithError: Story = {
   play: async ({ canvas }) => {
     const group = canvas.getByTestId("time-picker");
     await expect(group.className).toMatch(/hasError/);
+    // The error reaches assistive technology, not only the border colour.
+    await expect(within(group).getByLabelText("Hours")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    await expect(within(group).getByLabelText("Minutes")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
     // The fields stay editable.
     await expect(within(group).getByLabelText("Hours")).toBeEnabled();
   },
@@ -199,7 +241,7 @@ export const WithError: Story = {
     docs: {
       description: {
         story:
-          "The border turns red to flag a time the form rejected (`hasError`); the fields stay editable so it can be corrected in place.",
+          "The border turns red to flag a time the form rejected (`hasError`), and both fields are marked `aria-invalid`; the fields stay editable so it can be corrected in place.",
       },
       source: {
         code: `<TimePicker initialTime={createDateTime(2025, 1, 27, 10, 30, 0)} hasError onChange={(time) => console.log(time)} />`,

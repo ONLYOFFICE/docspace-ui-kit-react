@@ -30,6 +30,10 @@ const TimePicker = ({
   testId,
   isTwelveHourFormat,
   meridiem,
+  ariaLabel = "Time picker",
+  hoursLabel = "Hours",
+  minutesLabel = "Minutes",
+  autoAdvance = true,
 }: TimePickerProps) => {
   const hoursInputRef = useRef<HTMLInputElement>(null);
   const minutesInputRef = useRef<HTMLInputElement>(null);
@@ -60,6 +64,15 @@ const TimePicker = ({
   const blurMinutesInput = () => {
     onBlur?.();
     minutesInputRef.current?.blur();
+  };
+
+  // The automatic moves between the fields, which `autoAdvance` turns off.
+  const advanceToMinutes = () => {
+    if (autoAdvance) focusMinutesInput();
+  };
+
+  const completeMinutes = () => {
+    if (autoAdvance) blurMinutesInput();
   };
 
   const report = (h: string, m: string) => {
@@ -106,7 +119,7 @@ const TimePicker = ({
     const h = e.target.value;
 
     if (h.length > 2) {
-      focusMinutesInput();
+      advanceToMinutes();
       return;
     }
 
@@ -119,7 +132,7 @@ const TimePicker = ({
     const maxHours = isTwelveHourFormat ? 12 : 23;
 
     if (+h > maxHours) {
-      focusMinutesInput();
+      advanceToMinutes();
       if (h.length === 2) changeHours(`0${h[0]}`);
       return;
     }
@@ -128,11 +141,11 @@ const TimePicker = ({
 
     if (h.length === 1 && +h > maxHoursDigit) {
       changeHours(`0${h}`);
-      focusMinutesInput();
+      advanceToMinutes();
       return;
     }
 
-    if (h.length === 2) focusMinutesInput();
+    if (h.length === 2) advanceToMinutes();
 
     changeHours(h);
   };
@@ -141,7 +154,7 @@ const TimePicker = ({
     const m = e.target.value;
 
     if (m.length > 2) {
-      blurMinutesInput();
+      completeMinutes();
       return;
     }
 
@@ -152,17 +165,17 @@ const TimePicker = ({
     if (!/^\d+$/.test(m)) return;
 
     if (+m > 59) {
-      onBlur?.();
+      if (autoAdvance) onBlur?.();
       return;
     }
 
     if (m.length === 1 && +m > 5) {
       changeMinutes(`0${m}`);
-      blurMinutesInput();
+      completeMinutes();
       return;
     }
     if (m.length === 2) {
-      blurMinutesInput();
+      completeMinutes();
     }
 
     changeMinutes(m);
@@ -181,7 +194,7 @@ const TimePicker = ({
       ref={forwardedRef}
       data-testid={testId ?? "time-picker"}
       role="group"
-      aria-label="Time picker"
+      aria-label={ariaLabel}
     >
       <TextInput
         className={classNameInput ? `${classNameInput}-hours-input` : undefined}
@@ -192,13 +205,14 @@ const TimePicker = ({
         onBlur={onHoursBlur}
         tabIndex={tabIndex}
         onFocus={focusInput}
-        type={InputType.search}
+        type={InputType.text}
         onContextMenu={preventDefaultContext}
         autoComplete="off"
         inputMode="numeric"
         size={InputSize.base}
         data-test-id="hours-input"
-        aria-label="Hours"
+        aria-label={hoursLabel}
+        aria-invalid={hasError || undefined}
       />
       :
       <TextInput
@@ -213,13 +227,14 @@ const TimePicker = ({
         onBlur={onMinutesBlur}
         tabIndex={tabIndex}
         onFocus={focusInput}
-        type={InputType.search}
+        type={InputType.text}
         onContextMenu={preventDefaultContext}
         autoComplete="off"
         inputMode="numeric"
         size={InputSize.base}
         data-test-id="minutes-input"
-        aria-label="Minutes"
+        aria-label={minutesLabel}
+        aria-invalid={hasError || undefined}
       />
     </div>
   );
