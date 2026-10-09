@@ -130,6 +130,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
   const ssrRendered = React.useRef(false);
   const ssrTypeRendered = React.useRef(false);
   const clearSearchCallback = React.useRef<null | VoidFunction>(null);
+  const specialScopesRef = React.useRef(new Map<string, SpecialFolderScope>());
 
   const withInitProps = withInit
     ? {
@@ -403,11 +404,16 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
             return newBreadCrumbs;
           });
 
-          setSelectedItemId(item.id);
+          const specialScope = specialScopesRef.current.get(String(item.id));
+
+          setSelectedItemId(specialScope ? specialScope.folderId : item.id);
           selectedFileInfoRef.current = null;
           setSelectedFileInfo(null);
-          setActiveSpecialScope(null);
-          if (item.isAgent) {
+          setActiveSpecialScope(specialScope ?? null);
+          if (specialScope) {
+            setIsFormsSection(false);
+            setSelectedItemType("files");
+          } else if (item.isAgent) {
             setSelectedItemType("agents");
           } else if (item.isRoom) {
             setIsFormsSection(
@@ -453,6 +459,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         if (specialScope) {
           navigatingRef.current = true;
           startFullLoad();
+          specialScopesRef.current.set(String(item.id), specialScope);
           setActiveSpecialScope(specialScope);
           setBreadCrumbs((value) => [
             ...value,
