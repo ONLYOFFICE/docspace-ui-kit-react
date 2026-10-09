@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";var t;function n(){return(n=e((()=>{t=(e,t)=>{if(!e)return!1;try{return Object.hasOwn(e,t)}catch{return!1}}})))()}export{n,t};

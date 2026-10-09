@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";var t;function n(){return(n=e((()=>{t=(e,t)=>{let n=e?.response?.status;return n===401||n===403?`The portal answered ${n}: this identity may not ${t}.`:n===void 0?`No answer from the portal -- usually CORS, sometimes a wrong host.`:`The portal answered ${n}.`}})))()}export{n,t};

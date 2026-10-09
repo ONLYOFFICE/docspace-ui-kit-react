@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";var t;function n(){return(n=e((()=>{t=(e,t=!1,n=!1,r,i=!1)=>{let a=``;if(i){let e=window.sessionStorage?.getItem(`logoUpdateTimestamp`);e&&(a=`&t=${e}`)}return`/logo.ashx?logotype=${e}&dark=${t}&default=${n}${r?`&culture=${r}`:``}${a}`}})))()}export{n,t};

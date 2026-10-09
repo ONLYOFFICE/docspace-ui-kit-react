@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";function t(e){let t=e.default;return typeof t==`object`&&t&&`default`in t?t.default:t}function n(){return(n=e((()=>{})))()}export{t as n,n as t};

@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{t}from"./react-C21x__mS.js";import{r as n,t as r}from"./context-BWv2b06y.js";function i({i18n:e,defaultNS:t,children:n}){let i=(0,a.useMemo)(()=>({i18n:e,defaultNS:t}),[e,t]);return(0,a.createElement)(r.Provider,{value:i},n)}var a;function o(){return(o=e((()=>{a=t(),n()})))()}export{o as n,i as t};

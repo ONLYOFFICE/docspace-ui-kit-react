@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Signing in</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <!--
+      The OAuth redirect URI for the legal-practice samples. The portal sends
+      the sign-in popup here with ?code&state (or ?error); this page hands them
+      to the window that opened it and closes. It deliberately does nothing
+      else: the code is only useful together with the verifier, which never
+      left the opener.
+
+      A plain .html file on purpose: Storybook's dev server serves a static
+      file only by its full path, never as a directory index. `serve`, which
+      redirects *.html to a clean URL and drops the query on the way, is told
+      not to by serve.json next to this file.
+    -->
+    <p id="message">Finishing sign-in…</p>
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var answer = {
+          source: "docspace-oauth-callback",
+          code: params.get("code"),
+          state: params.get("state"),
+          error: params.get("error"),
+        };
+
+        if (window.opener) {
+          window.opener.postMessage(answer, window.location.origin);
+          window.close();
+        } else {
+          document.getElementById("message").textContent =
+            "This window was not opened by the sample, so there is nowhere to send the sign-in to. You can close it.";
+        }
+      })();
+    </script>
+  </body>
+</html>

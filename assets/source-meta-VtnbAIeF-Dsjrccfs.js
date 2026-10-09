@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";function t(e){if(!e?.id)return;let t={[n.id]:e.id};return e.type&&(t[n.type]=e.type),e.title&&(t[n.title]=e.title),t}var n;function r(){return(r=e((()=>{n={id:`source_id`,type:`source_type`,title:`source_title`}})))()}export{r as n,t};

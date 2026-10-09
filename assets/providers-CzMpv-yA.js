@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";var t;function n(){return(n=e((()=>{t=class{creds;constructor(e){this.creds=e}async checkResponsesApi(e,t){return!1}reasoningSupportFor(e,t){return this.creds.reasoningSupport??t(e)}}})))()}export{n,t};

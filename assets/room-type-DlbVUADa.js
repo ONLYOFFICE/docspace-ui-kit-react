@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";var t;function n(){return(n=e((()=>{t={FillingFormsRoom:1,EditingRoom:2,CustomRoom:5,PublicRoom:6,VirtualDataRoom:8,AiRoom:9}})))()}export{n,t};

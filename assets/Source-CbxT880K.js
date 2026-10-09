@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-C0FnF6B9.js";import{d as t,h as n}from"./blocks-D1qLjfJS.js";import{n as r,r as i}from"./dist-DdxEwIsW.js";import{t as a}from"./jsx-runtime-BdxMnOeJ.js";var o,s;function c(){return(c=e((()=>{n(),r(),o=a(),s=e=>{let n=i();return(0,o.jsx)(t,{dark:n,...e})}})))()}export{c as n,s as t};
