@@ -55,7 +55,7 @@ To try a build of this repository instead, pack it and install the file:
 
 ```bash
 pnpm build && pnpm pack
-pnpm add file:../path/to/onlyoffice-apps-ui-kit-4.0.0.tgz
+pnpm add file:../path/to/onlyoffice-apps-ui-kit-4.0.1.tgz
 ```
 
 **Peer dependencies:** four are required — `react` and `react-dom` ^19.0.0, plus `i18next`

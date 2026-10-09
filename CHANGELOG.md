@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.0.1
+
+### Changed
+
+- `@onlyoffice/ai-chat` peer requirement raised to `^1.0.1`
+
 ## 4.0.0
 
 First release under its own name and from its own repository. It was `@docspace/ui-kit@0.0.1`,
