@@ -1,6 +1,6 @@
 {
   "name": "@onlyoffice/apps-ui-kit",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "ONLYOFFICE Apps UI Component Library",
   "license": "AGPL-3.0-only",
   "homepage": "https://www.onlyoffice.com",
@@ -75,7 +75,7 @@
   },
   "//peerDependencies": "Only packages this library imports directly. Transitive dependencies of @onlyoffice/ai-chat (the assistant-ui, radix, codemirror, LLM-vendor SDKs and friends) are declared by ai-chat itself as its own peers -- re-declaring them here duplicated a list nothing kept in sync. Everything below is verified imported somewhere under this package root.",
   "peerDependencies": {
-    "@onlyoffice/ai-chat": "^1.0.0",
+    "@onlyoffice/ai-chat": "^1.0.1",
     "@onlyoffice/document-editor-react": "2.1.1",
     "@socket.io/component-emitter": "3.1.2",
     "axios": "^1.19.0",
@@ -183,7 +183,7 @@
     "@assistant-ui/react-markdown": "^0.11.10",
     "@biomejs/biome": "2.4.16",
     "@mdx-js/mdx": "3.1.1",
-    "@onlyoffice/ai-chat": "^1.0.0",
+    "@onlyoffice/ai-chat": "^1.0.1",
     "@onlyoffice/document-editor-react": "2.1.1",
     "@playwright/test": "1.58.1",
     "@radix-ui/react-dialog": "^1.1.23",

@@ -18,7 +18,7 @@ npm install @onlyoffice/apps-ui-kit
 To try a build of this repository instead, pack it and install the file:
 
 ```bash
-pnpm build && pnpm pack   # -> onlyoffice-apps-ui-kit-4.0.0.tgz
+pnpm build && pnpm pack   # -> onlyoffice-apps-ui-kit-4.0.1.tgz
 ```
 
 Pack with **pnpm, not npm**: the `exports` map lives under `publishConfig`, which npm does not
