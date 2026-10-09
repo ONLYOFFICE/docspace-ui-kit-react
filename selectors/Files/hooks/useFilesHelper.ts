@@ -109,6 +109,7 @@ const useFilesHelper = ({
   const requestRunning = React.useRef(false);
   const initRef = React.useRef(isInit);
   const firstLoadRef = React.useRef(isFullLoadActive);
+  const specialItemsCountRef = React.useRef(0);
   const disabledItemsRef = React.useRef(disabledItems);
   const formsSectionRef = React.useRef(formsSection);
   const privateRoomCacheRef = React.useRef<Map<number | string, boolean>>(
@@ -138,7 +139,8 @@ const useFilesHelper = ({
       requestRunning.current = true;
       setIsNextPageLoading(true);
 
-      let startIndex = sIndex;
+      let startIndex =
+        sIndex > 0 ? Math.max(0, sIndex - specialItemsCountRef.current) : 0;
 
       if (withCreate) {
         startIndex -= startIndex % 100;
@@ -408,6 +410,8 @@ const useFilesHelper = ({
             setTotal(total);
           }
 
+          if (startIndex === 0) specialItemsCountRef.current = 0;
+
           if (
             !activeSpecialScope &&
             current!.rootFolderType === FolderType.USER &&
@@ -431,6 +435,7 @@ const useFilesHelper = ({
 
             if (specialItems.length) {
               itemList.unshift(...specialItems);
+              specialItemsCountRef.current = specialItems.length;
               const base = withCreate && security?.Create ? total + 1 : total;
               setTotal(base + specialItems.length);
             }

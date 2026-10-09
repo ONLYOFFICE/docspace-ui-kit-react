@@ -82,6 +82,7 @@ const useRoomsHelper = ({
   const requestRunning = React.useRef(false);
   const initRef = React.useRef(isInit);
   const firstLoadRef = React.useRef(isFullLoadActive);
+  const specialItemsCountRef = React.useRef(0);
 
   React.useEffect(() => {
     firstLoadRef.current = isFullLoadActive;
@@ -146,7 +147,8 @@ const useRoomsHelper = ({
       setIsNextPageLoading(true);
 
       try {
-        let startIndex = sIndex;
+        let startIndex =
+          sIndex > 0 ? Math.max(0, sIndex - specialItemsCountRef.current) : 0;
 
         if (withCreate) {
           startIndex -= startIndex % 100;
@@ -279,6 +281,8 @@ const useRoomsHelper = ({
             setTotal(total);
           }
 
+          if (startIndex === 0) specialItemsCountRef.current = 0;
+
           if (
             startIndex === 0 &&
             !searchValue &&
@@ -303,6 +307,7 @@ const useRoomsHelper = ({
 
             if (specialItems.length) {
               itemList.unshift(...specialItems);
+              specialItemsCountRef.current = specialItems.length;
               const base = withCreate && security?.Create ? total + 1 : total;
               setTotal(base + specialItems.length);
             }
