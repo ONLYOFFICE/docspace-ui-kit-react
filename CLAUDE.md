@@ -6,11 +6,11 @@ frontend products (client, login, doceditor, management, sdk).
 **This is now a standalone repository, not a submodule of DocSpace-client.** It builds,
 tests and runs Storybook on its own, with no DocSpace checkout beside it. Consumers
 depend on the **published package** — they resolve it to `dist`, not to the source root
-as they did under the monorepo. DocSpace-client currently consumes a packed tarball;
-publication to npm has not happened yet; the manifest is at `4.0.0` and the package is
-`@onlyoffice/apps-ui-kit`, AGPL-3.0-only.
+as they did under the monorepo. The package is `@onlyoffice/apps-ui-kit`, AGPL-3.0-only,
+published on npm since `4.0.0`; DocSpace-client depends on it from the registry
+(`^4.0.0`), not from a tarball.
 
-The separation work lives on `feature/ui-kit-separation`. See `docs/public-api.md` for
+The separation landed in `master` with 4.0.0. See `docs/public-api.md` for
 the published surface and the tiering of public versus portal-internal modules.
 
 **Consequence worth keeping in mind:** there is no longer a client build compiling these
