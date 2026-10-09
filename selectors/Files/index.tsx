@@ -822,7 +822,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
     onSubmit: onSubmitAction,
     disableSubmitButton: getIsDisabled(
-      isFullLoadActive && showBodyLoader,
+      isFullLoadActive,
       isSelectedParentFolder,
       selectedItemId,
       selectedItemType,
