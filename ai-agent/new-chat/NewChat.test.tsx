@@ -8,7 +8,11 @@ import type { ChatNoAccessScreenProps } from "./components/chat-no-access-screen
 type Page = "chat" | "settings" | "initial-setup" | "history";
 
 const routerState: { currentPage: Page } = { currentPage: "chat" };
-const widgetState = { threadId: "", profiles: [] as unknown[] };
+const widgetState = {
+  threadId: "",
+  profiles: [] as unknown[],
+  initialized: true,
+};
 const setCurrentPage = vi.fn((page: Page) => {
   routerState.currentPage = page;
 });
@@ -23,7 +27,10 @@ vi.mock("@onlyoffice/ai-chat", () => ({
     useRouter: <T,>(selector: (s: unknown) => T) =>
       selector({ currentPage: routerState.currentPage, setCurrentPage }),
     useProfilesStore: <T,>(selector: (s: unknown) => T) =>
-      selector({ profiles: widgetState.profiles }),
+      selector({
+        profiles: widgetState.profiles,
+        initialized: widgetState.initialized,
+      }),
     useThreadsStore: <T,>(selector: (s: unknown) => T) =>
       selector({ threadId: widgetState.threadId }),
   }),
@@ -38,7 +45,12 @@ vi.mock("../chat-toolbar", () => ({
 }));
 
 vi.mock("./components/chat-no-access-screen", () => ({
-  ChatNoAccessScreen: () => <div data-testid="no-access-screen" />,
+  ChatNoAccessScreen: ({ modelsDisabled }: { modelsDisabled?: boolean }) => (
+    <div
+      data-testid="no-access-screen"
+      data-models-disabled={modelsDisabled ? "" : undefined}
+    />
+  ),
 }));
 
 vi.mock("../providers/ai-chat-store/AiChatStoreProvider", () => ({
@@ -62,6 +74,7 @@ describe("<NewChat />", () => {
     routerState.currentPage = "chat";
     widgetState.threadId = "";
     widgetState.profiles = [];
+    widgetState.initialized = true;
     vi.stubGlobal("DocSpace", { navigate });
   });
 
@@ -91,13 +104,113 @@ describe("<NewChat />", () => {
       expect(screen.queryByTestId("chat-page")).not.toBeInTheDocument();
     });
 
-    // AI is available portal-wide but this user has no profile yet: the setup
+    // A standalone portal with AI available but no profile yet: the setup
     // screen, not the no-access empty view, is what unblocks them.
-    it("renders the widget setup screen when AI is ready", () => {
+    it("renders the widget setup screen when standalone AI is ready", () => {
+      render(
+        <NewChat
+          aiReady
+          noAccessProps={{ ...noAccessProps, standalone: true }}
+        />,
+      );
+
+      expect(screen.getByTestId("chat-page")).toBeInTheDocument();
+      expect(screen.queryByTestId("no-access-screen")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("every model disabled in AI settings", () => {
+    // The bug this guards against: a cloud portal whose admin turned off all
+    // models got the widget's "connect a provider" setup screen instead.
+    it("renders the models-disabled screen on a cloud portal", () => {
+      render(<NewChat aiReady noAccessProps={noAccessProps} />);
+
+      const screenEl = screen.getByTestId("no-access-screen");
+      expect(screenEl).toHaveAttribute("data-models-disabled");
+      expect(screen.queryByTestId("chat-page")).not.toBeInTheDocument();
+    });
+
+    it("renders the models-disabled screen on the initial-setup page", () => {
+      routerState.currentPage = "initial-setup";
+
+      render(<NewChat aiReady noAccessProps={noAccessProps} />);
+
+      expect(screen.getByTestId("no-access-screen")).toHaveAttribute(
+        "data-models-disabled",
+      );
+    });
+
+    it("keeps the agent toolbar above the models-disabled screen", () => {
+      render(<NewChat isAgents aiReady noAccessProps={noAccessProps} />);
+
+      expect(screen.getByTestId("chat-toolbar")).toBeInTheDocument();
+      expect(screen.getByTestId("no-access-screen")).toBeInTheDocument();
+    });
+
+    it("waits for the profiles list before deciding", () => {
+      widgetState.initialized = false;
+
       render(<NewChat aiReady noAccessProps={noAccessProps} />);
 
       expect(screen.getByTestId("chat-page")).toBeInTheDocument();
       expect(screen.queryByTestId("no-access-screen")).not.toBeInTheDocument();
+    });
+
+    it("keeps the last answer while the profiles store rehydrates", () => {
+      const { rerender } = render(
+        <NewChat aiReady noAccessProps={noAccessProps} />,
+      );
+
+      widgetState.initialized = false;
+      rerender(<NewChat aiReady noAccessProps={noAccessProps} />);
+
+      expect(screen.getByTestId("no-access-screen")).toHaveAttribute(
+        "data-models-disabled",
+      );
+    });
+
+    // Image-only gateway models are not switched off along with the chat
+    // ones: the list is not empty, the composer's picker just has nothing.
+    it("renders the models-disabled screen when only image models are left", () => {
+      widgetState.profiles = [{ id: "nano-banana", capabilities: 0x02 }];
+
+      render(<NewChat isAgents aiReady noAccessProps={noAccessProps} />);
+
+      expect(screen.getByTestId("no-access-screen")).toHaveAttribute(
+        "data-models-disabled",
+      );
+      expect(screen.queryByTestId("chat-page")).not.toBeInTheDocument();
+    });
+
+    it("counts a profile without a capability mask as a chat model", () => {
+      widgetState.profiles = [{ id: "legacy" }, { id: "img", capabilities: 2 }];
+
+      render(<NewChat aiReady noAccessProps={noAccessProps} />);
+
+      expect(screen.getByTestId("chat-page")).toBeInTheDocument();
+    });
+
+    it("renders the chat once a model is available", () => {
+      widgetState.profiles = [{ id: "profile-1" }];
+
+      render(<NewChat aiReady noAccessProps={noAccessProps} />);
+
+      expect(screen.getByTestId("chat-page")).toBeInTheDocument();
+      expect(screen.queryByTestId("no-access-screen")).not.toBeInTheDocument();
+    });
+
+    it("leaves hosts without noAccessProps on the widget's own screen", () => {
+      render(<NewChat aiReady />);
+
+      expect(screen.getByTestId("chat-page")).toBeInTheDocument();
+    });
+
+    it("keeps the running chat when a thread is open", () => {
+      widgetState.threadId = "thread-1";
+
+      render(<NewChat aiReady noAccessProps={noAccessProps} />);
+
+      expect(screen.getByTestId("chat-page")).toBeInTheDocument();
     });
   });
 

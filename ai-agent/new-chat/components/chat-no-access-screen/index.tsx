@@ -21,12 +21,19 @@ export type ChatNoAccessScreenProps = {
   onTopUpAndActivateAI?: () => void;
   isActivating?: boolean;
   aiToolsFeePercent?: string | null;
+  /**
+   * AI is on, but the admin has turned off every model in AI settings. Set
+   * by `NewChat`, not by the host: it replaces the activation copy with the
+   * "models are disabled" one and offers admins the way back to AI settings.
+   */
+  modelsDisabled?: boolean;
 };
 
 export const ChatNoAccessScreen = ({
   isPortalAdmin,
   standalone,
   isAgents = false,
+  modelsDisabled = false,
   isCardLinkedToPortal,
   goToAISettings,
   onActivateAI,
@@ -43,8 +50,16 @@ export const ChatNoAccessScreen = ({
     isAgents,
     standalone,
     isPortalAdmin,
+    modelsDisabled,
     t,
   });
+
+  const openAISettings = {
+    type: "button",
+    title: t("OpenAISettings"),
+    key: "open-ai-settings",
+    onClick: goToAISettings,
+  } as const;
 
   const goToAIProviderSettings = {
     type: "button",
@@ -75,13 +90,16 @@ export const ChatNoAccessScreen = ({
     return [activateOrTopUpAI];
   };
 
-  const options = !isPortalAdmin
-    ? []
-    : standalone
-      ? goToAISettings
-        ? [goToAIProviderSettings]
-        : []
-      : getSaasAdminOptions();
+  const getOptions = () => {
+    if (!isPortalAdmin) return [];
+    // Models are turned back on in AI settings; activation has nothing to
+    // offer here, AI is already on.
+    if (modelsDisabled) return goToAISettings ? [openAISettings] : [];
+    if (standalone) return goToAISettings ? [goToAIProviderSettings] : [];
+    return getSaasAdminOptions();
+  };
+
+  const options = getOptions();
 
   return (
     <EmptyView

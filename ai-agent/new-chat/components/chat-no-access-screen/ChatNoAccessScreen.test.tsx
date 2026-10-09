@@ -264,3 +264,68 @@ describe("<ChatNoAccessScreen /> chat panel copy", () => {
     expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
   });
 });
+
+describe("<ChatNoAccessScreen /> every model disabled", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const disabledProps = {
+    standalone: false,
+    isPortalAdmin: true,
+    isAgents: true,
+    modelsDisabled: true,
+    isCardLinkedToPortal: true,
+    onActivateAI: vi.fn(),
+    goToAISettings: vi.fn(),
+  };
+
+  it("sends an agent's admin to the AI settings instead of activating AI", () => {
+    render(<ChatNoAccessScreen {...disabledProps} />);
+
+    expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
+      "AIModelsDisabledTitle",
+    );
+    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
+      "AIModelsDisabledAgentAdminDescription",
+    );
+
+    const button = screen.getByTestId("option-open-ai-settings");
+    expect(button).toHaveTextContent("OpenAISettings");
+    button.click();
+    expect(disabledProps.goToAISettings).toHaveBeenCalledTimes(1);
+
+    expect(screen.queryByTestId("option-activate-ai")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("chat-ai-benefits")).not.toBeInTheDocument();
+  });
+
+  it("uses the chat panel wording outside an agent", () => {
+    render(<ChatNoAccessScreen {...disabledProps} isAgents={false} />);
+
+    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
+      "AIModelsDisabledChatAdminDescription",
+    );
+    expect(screen.getByTestId("option-open-ai-settings")).toBeInTheDocument();
+    expect(screen.queryByTestId("chat-ai-benefits")).not.toBeInTheDocument();
+  });
+
+  it("asks anyone else to contact the admin, with no buttons", () => {
+    render(<ChatNoAccessScreen {...disabledProps} isPortalAdmin={false} />);
+
+    expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
+      "AIModelsDisabledTitle",
+    );
+    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
+      "AIModelsDisabledUserDescription",
+    );
+    expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
+  });
+
+  it("drops the button when the host cannot open the AI settings", () => {
+    render(
+      <ChatNoAccessScreen {...disabledProps} goToAISettings={undefined} />,
+    );
+
+    expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
+  });
+});

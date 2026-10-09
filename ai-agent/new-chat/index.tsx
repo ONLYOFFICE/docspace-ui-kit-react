@@ -18,6 +18,16 @@ import type { ChatProps } from "./chat.types";
 // The in-chat AI settings section now lives in DocSpace portal settings.
 const AI_SETTINGS_URL = "/portal-settings/ai-settings";
 
+// The Chat bit of a profile's capability mask (ASC.AI.Integration).
+const CHAT_CAPABILITY = 0x01;
+
+// Whether a profile can drive a chat round, the way the widget's model
+// pickers decide it: no mask predates capability reporting and is allowed, an
+// explicit one must carry the Chat bit. Image-only gateway models (Nano
+// Banana) stay in the profiles list, but the picker never offers them.
+const isChatCapable = ({ capabilities }: { capabilities?: number }) =>
+  !capabilities || (capabilities & CHAT_CAPABILITY) !== 0;
+
 const NewChat: React.FC<ChatProps> = observer(
   ({ aiReady = true, noAccessProps, isAgents }) => {
     const isDesktop = useIsDesktop();
@@ -27,6 +37,8 @@ const NewChat: React.FC<ChatProps> = observer(
     const setCurrentPage = stores.useRouter((s) => s.setCurrentPage);
     const profiles = stores.useProfilesStore((s) => s.profiles);
     const hasProfiles = profiles.length > 0;
+    const hasChatProfiles = profiles.some(isChatCapable);
+    const profilesInitialized = stores.useProfilesStore((s) => s.initialized);
     // Empty string when no thread is selected (see ThreadsStoreState.threadId).
     const threadId = stores.useThreadsStore((s) => s.threadId);
 
@@ -42,11 +54,46 @@ const NewChat: React.FC<ChatProps> = observer(
       ? { paddingBottom: keyboardInset }
       : undefined;
 
-    const showActivationScreen = !!noAccessProps && !aiReady && !threadId;
+    // Whether the hydrated profiles list has no chat model; `null` until the
+    // first one lands. The stores are rebuilt with an empty, not-yet-hydrated
+    // list on every scope switch, so the last answer stands in until the new
+    // list arrives rather than blinking the screen below in and out.
+    const [lastNoChatProfiles, setLastNoChatProfiles] = React.useState<
+      boolean | null
+    >(() => (profilesInitialized ? !hasChatProfiles : null));
+
+    React.useEffect(() => {
+      if (profilesInitialized) setLastNoChatProfiles(!hasChatProfiles);
+    }, [profilesInitialized, hasChatProfiles]);
+
+    const noChatProfiles = profilesInitialized
+      ? !hasChatProfiles
+      : lastNoChatProfiles;
+
+    // A cloud portal whose admin turned off every model in AI settings: AI
+    // itself is on, but the model catalogue - and so the profiles list - holds
+    // no chat model. With an empty list <ChatPage /> takes that for a portal
+    // with no provider and shows its own "connect a provider" setup screen;
+    // with only image models left it shows a chat whose model picker is empty.
+    // Neither tells the user why. A standalone portal has no model switches;
+    // there an empty list means AI is not set up, and the host reports that
+    // through `aiReady`.
+    const modelsDisabled =
+      !!noAccessProps &&
+      !noAccessProps.standalone &&
+      aiReady &&
+      noChatProfiles === true;
+
+    const showActivationScreen =
+      !!noAccessProps && (!aiReady || modelsDisabled) && !threadId;
     const showToolbar = (hasProfiles || showActivationScreen) && isAgents;
 
     const chatBody = showActivationScreen ? (
-      <ChatNoAccessScreen {...noAccessProps} isAgents={!!isAgents} />
+      <ChatNoAccessScreen
+        {...noAccessProps}
+        isAgents={!!isAgents}
+        modelsDisabled={modelsDisabled}
+      />
     ) : (
       <ChatPage />
     );
