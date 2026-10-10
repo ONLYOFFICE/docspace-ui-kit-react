@@ -95,6 +95,61 @@ describe("useRoomsHelper", () => {
     expect(mocks.getRoomsFolder).toHaveBeenCalledTimes(2);
   });
 
+  it("applies only the latest full load when an older response arrives later", async () => {
+    const roomsResponse = (title: string) => ({
+      data: {
+        response: {
+          folders: [{ id: title, title, roomType: RoomsType.CustomRoom }],
+          total: 1,
+          count: 1,
+          current: { id: 1, title: "Rooms", security: {} },
+        },
+      },
+    });
+
+    let resolveStale: (value: unknown) => void = () => {};
+    mocks.getRoomsFolder
+      .mockImplementationOnce(
+        () => new Promise((resolve) => (resolveStale = resolve)),
+      )
+      .mockResolvedValueOnce(roomsResponse("latest"));
+
+    const setItems = vi.fn();
+    const { result } = setup({ setItems });
+
+    let stale: Promise<void> = Promise.resolve();
+    await act(async () => {
+      stale = result.current.rooms.getRoomList(0);
+      await result.current.rooms.getRoomList(0);
+    });
+
+    await act(async () => {
+      resolveStale(roomsResponse("stale"));
+      await stale;
+    });
+
+    expect(mocks.getRoomsFolder).toHaveBeenCalledTimes(2);
+
+    const labels = setItems.mock.calls.map(([items]) =>
+      (items as TSelectorItem[]).map((item) => item.label),
+    );
+    expect(labels).toEqual([["latest"]]);
+    expect(result.current.loaders.isFullLoadActive).toBe(false);
+  });
+
+  it("skips a next page while another request is running", async () => {
+    mocks.getRoomsFolder.mockImplementationOnce(() => new Promise(() => {}));
+
+    const { result } = setup();
+
+    await act(async () => {
+      void result.current.rooms.getRoomList(0);
+      await result.current.rooms.getRoomList(100);
+    });
+
+    expect(mocks.getRoomsFolder).toHaveBeenCalledTimes(1);
+  });
+
   it("omits the form filling room from the create-room type dropdown", async () => {
     mocks.getRoomsFolder.mockResolvedValue({
       data: {

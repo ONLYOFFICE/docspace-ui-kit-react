@@ -80,6 +80,7 @@ const useRoomsHelper = ({
   const { addInputItem } = useInputItemHelper({ withCreate, setItems });
 
   const requestRunning = React.useRef(false);
+  const requestIdRef = React.useRef(0);
   const initRef = React.useRef(isInit);
   const firstLoadRef = React.useRef(isFullLoadActive);
   const specialItemsCountRef = React.useRef(0);
@@ -141,7 +142,10 @@ const useRoomsHelper = ({
 
   const getRoomList = React.useCallback(
     async (sIndex: number) => {
-      if (requestRunning.current) return;
+      if (requestRunning.current && sIndex > 0) return;
+
+      const requestId = ++requestIdRef.current;
+      const isLatest = () => requestId === requestIdRef.current;
 
       requestRunning.current = true;
       setIsNextPageLoading(true);
@@ -202,6 +206,9 @@ const useRoomsHelper = ({
           startIndex,
           filterValue,
         });
+
+        if (!isLatest()) return;
+
         const roomsFromApi = res.data.response!;
 
         const { folders, total, count, current } = roomsFromApi;
@@ -324,13 +331,15 @@ const useRoomsHelper = ({
         setIsRoot?.(false);
         setIsInit(false);
       } catch (error) {
-        toastr.error(error as TData);
+        if (isLatest()) toastr.error(error as TData);
       } finally {
-        requestRunning.current = false;
-        setIsNextPageLoading(false);
-        // Also ends the content refresh; skipping it on the error path would
-        // leave the skeleton on screen and hideSectionLoader a permanent no-op
-        finishFullLoad();
+        if (isLatest()) {
+          requestRunning.current = false;
+          setIsNextPageLoading(false);
+          // Also ends the content refresh; skipping it on the error path would
+          // leave the skeleton on screen and hideSectionLoader a permanent no-op
+          finishFullLoad();
+        }
       }
     },
     [
