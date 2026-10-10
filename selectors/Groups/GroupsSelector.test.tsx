@@ -150,4 +150,64 @@ describe("<GroupsSelector />", () => {
     await waitFor(() => expect(mocks.lastProps.isContentLoading).toBe(false));
     expect(labels()).toEqual(["Beta"]);
   });
+
+  it("keeps the latest search when an earlier one answers after it", async () => {
+    mocks.getGroups.mockResolvedValueOnce(groupsPage(["Alpha", "Abacus"]));
+
+    renderSelector();
+    await waitFor(() => expect(labels()).toEqual(["Alpha", "Abacus"]));
+
+    let resolveA: (value: unknown) => void = () => {};
+    mocks.getGroups.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveA = resolve;
+      }),
+    );
+    act(() => mocks.lastProps.onSearch("a"));
+    await waitFor(() => expect(mocks.getGroups).toHaveBeenCalledTimes(2));
+
+    mocks.getGroups.mockResolvedValueOnce(groupsPage(["Abacus"]));
+    act(() => mocks.lastProps.onSearch("ab"));
+    await waitFor(() => expect(labels()).toEqual(["Abacus"]));
+
+    await act(async () => resolveA(groupsPage(["Alpha", "Abacus"])));
+
+    expect(labels()).toEqual(["Abacus"]);
+    expect(mocks.lastProps.isContentLoading).toBe(false);
+  });
+
+  it("stays dimmed until the latest search answers", async () => {
+    mocks.getGroups.mockResolvedValueOnce(groupsPage(["Alpha", "Abacus"]));
+
+    renderSelector();
+    await waitFor(() => expect(labels()).toEqual(["Alpha", "Abacus"]));
+
+    let resolveA: (value: unknown) => void = () => {};
+    let resolveAb: (value: unknown) => void = () => {};
+    mocks.getGroups.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveA = resolve;
+      }),
+    );
+    act(() => mocks.lastProps.onSearch("a"));
+    await waitFor(() => expect(mocks.getGroups).toHaveBeenCalledTimes(2));
+
+    mocks.getGroups.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveAb = resolve;
+      }),
+    );
+    act(() => mocks.lastProps.onSearch("ab"));
+    await waitFor(() => expect(mocks.getGroups).toHaveBeenCalledTimes(3));
+
+    await act(async () => resolveA(groupsPage(["Alpha", "Abacus"])));
+
+    expect(mocks.lastProps.isContentLoading).toBe(true);
+    expect(labels()).toEqual(["Alpha", "Abacus"]);
+
+    await act(async () => resolveAb(groupsPage(["Abacus"])));
+
+    await waitFor(() => expect(mocks.lastProps.isContentLoading).toBe(false));
+    expect(labels()).toEqual(["Abacus"]);
+  });
 });
