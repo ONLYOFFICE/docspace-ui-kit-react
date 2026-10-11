@@ -5,11 +5,9 @@ permissions:
 
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows:
-      - Release
-    types:
-      - completed
+  push:
+    tags:
+      - "v*"
 
 jobs:
   publish:
