@@ -46,8 +46,8 @@ jobs:
           fi
           repo="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY"
           commit=$(git commit-tree "$tree" \
-            -p "$(git rev-list --max-parents=0 FETCH_HEAD)" \
+            -p FETCH_HEAD \
             -m "Update following ${GITHUB_SHA::8}" \
             -m "Commit: $repo/commit/$GITHUB_SHA" \
             -m "Run: $repo/actions/runs/$GITHUB_RUN_ID")
-          git push --force --quiet origin "$commit:refs/heads/gh-pages"
+          git push --quiet origin "$commit:refs/heads/gh-pages"
