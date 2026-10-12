@@ -54,6 +54,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const afterSearch = useRef(false);
   const totalRef = useRef(0);
+  const requestIdRef = useRef(0);
 
   const onSelect = (
     item: TSelectorItem,
@@ -104,6 +105,8 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
   const onLoadNextPage = useCallback(
     async (startIndex: number) => {
       const pageCount = 100;
+      const requestId = ++requestIdRef.current;
+      const isLatest = () => requestId === requestIdRef.current;
       setIsNextPageLoading(true);
 
       try {
@@ -112,6 +115,8 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
           startIndex,
           filterValue: searchValue,
         });
+
+        if (!isLatest()) return;
 
         const items = res.data.response ?? [];
         const total = res.data.count ?? 0;
@@ -135,11 +140,13 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
           });
         }
       } catch (error) {
-        toastr.error(error as TData);
+        if (isLatest()) toastr.error(error as TData);
       } finally {
-        setIsNextPageLoading(false);
-        setIsFirstLoad(false);
-        finishContentLoading();
+        if (isLatest()) {
+          setIsNextPageLoading(false);
+          setIsFirstLoad(false);
+          finishContentLoading();
+        }
       }
     },
     [searchValue, groupApi, finishContentLoading],

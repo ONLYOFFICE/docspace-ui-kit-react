@@ -24,9 +24,7 @@ export * from "@onlyoffice/apps-ui-kit";
 ```
 
 — and `react/shim.ts` publishes that module as a blob URL, then rewrites every plugin import
-of `@onlyoffice/apps-ui-kit` to point at it. (That specifier is the one on
-`feature/ui-kit-separation`; the branches shipping today still say `@docspace/ui-kit` — the
-table at the end of this file has the state per branch.) A second copy inside the plugin
+of `@onlyoffice/apps-ui-kit` to point at it. A second copy inside the plugin
 bundle would read no portal context and fall back to light LTR, so the plugin never bundles
 the kit.
 
@@ -100,23 +98,17 @@ guess rather than reading the wrong tree. Its knowledge of the kit is a **snapsh
 nothing checks that the snapshot is fresh —
 `node .claude/scripts/ui-kit-reference/check-drift.mjs` is what checks the checkable part of it.
 
-### The rename is a three-repository merge
+### The rename landed in all three repositories at once
 
-The specifier the portal's shim accepts is branch-dependent, and all three repositories now
-carry a matching `feature/ui-kit-separation`:
+The specifier the portal's shim accepts had to change in the client, in this package and in
+the skill together, because the shim throws on any bare specifier it does not know. The three
+`feature/ui-kit-separation` branches merged on 2 October 2026 — into the client's and this
+repository's `release/v4.0.0` (!753 and !108) and into agent-skills' `main`. Since then the
+client depends on `@onlyoffice/apps-ui-kit` from npm, this repository publishes it, and
+agent-skills installs it from npm at `UI_KIT_RANGE` in `scripts/generator/project-files.mjs`,
+which `check-drift.mjs` checks admits this package.
 
-| Repository                                          | On `develop` / `release/v4.0.0` / `main`                      | On `feature/ui-kit-separation`                                           |
-| --------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| DocSpace-client (`react/uiKit.ts`, `react/shim.ts`) | `@docspace/ui-kit`; `master` has no module-plugin shim at all | `@onlyoffice/apps-ui-kit`                                                |
-| this repository                                     | `@docspace/ui-kit@0.0.1`, everything in `dependencies`        | `@onlyoffice/apps-ui-kit@4.0.0`, ESM-only, `exports` map, optional peers |
-| agent-skills (`scripts/contract.mjs`, `vendor/`)    | `@docspace/ui-kit`, `vendor/docspace-ui-kit-0.0.1.tgz`        | `@onlyoffice/apps-ui-kit`, `vendor/onlyoffice-apps-ui-kit-4.0.0.tgz`     |
-
-The shim throws on any bare specifier it does not know, so **the three branches have to land
-together**. Merging the client alone stops every existing plugin with an error naming
-`@docspace/ui-kit`; merging agent-skills alone makes the generator emit plugins the live portal
-refuses. Nothing enforces the ordering — it is a release decision.
-
-What stays true regardless of branch: a layout change here invalidates prose in
+What stays true: a layout change here invalidates prose in
 `references/ui-kit.md` that nobody re-reads. The traps it records (`FieldContainer.labelVisible`,
 `ToggleButton`'s absolute label, `Textarea`'s missing width, `SearchInput.onChange`) are
 checked by the drift script; the layout and spacing prose is not.
@@ -127,7 +119,6 @@ and say in the commit message whether it still holds.
 
 ## Version skew is the normal state
 
-The client consumes a packed tarball (`file:../../onlyoffice-apps-ui-kit.tgz` in both
-`packages/client` and `packages/shared`), and plugins run against whatever the deployed portal
-bundled. A plugin author's local kit and the portal's kit are different builds by default.
+The client installs the kit from npm (`^4.0.1` in `packages/client` and `packages/shared`),
+and plugins run against whatever the deployed portal bundled. A plugin author's local kit and the portal's kit are different builds by default.
 Anything a plugin relies on must therefore be a stable export, not a recently added one.

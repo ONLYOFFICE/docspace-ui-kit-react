@@ -375,6 +375,12 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`Uploader` accepts any file with `accept="*"`.** `accept` went to react-dropzone unchanged, where `"*"` and `"*/*"` refuse every file - including in the README's own examples. `"*"`, `"*/*"`, `""` and a missing `accept` now all mean any file, and `accept` is optional in `UploaderProps`.
 - **The legal sample's relative dates are in English.** "updated yesterday" and "Sent 5 days ago" followed the browser's locale inside an otherwise English page; they are now formatted in English.
 
+## 4.0.1
+
+### Changed
+
+- `@onlyoffice/ai-chat` peer requirement raised to `^1.0.1`
+
 ## 4.0.0
 
 First release under its own name and from its own repository. It was `@docspace/ui-kit@0.0.1`,

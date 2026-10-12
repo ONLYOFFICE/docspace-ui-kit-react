@@ -76,7 +76,7 @@ const openDocs = (id: string) => {
 
 const facts = [
   { label: "Package", value: "@onlyoffice/apps-ui-kit" },
-  { label: "Version", value: "4.0.0" },
+  { label: "Version", value: "4.0.1" },
   { label: "Licence", value: "AGPL-3.0-only" },
   { label: "Peers", value: "react 19, react-dom 19, i18next" },
 ];
@@ -256,7 +256,7 @@ export const WelcomePage = () => {
             </Text>
             <div className={styles.subline}>
               <Text as="span" fontSize="13px" lineHeight="20px">
-                Version 4.0.0 &bull; AGPL-3.0-only &bull; on npm as
+                Version 4.0.1 &bull; AGPL-3.0-only &bull; on npm as
                 @onlyoffice/apps-ui-kit
               </Text>
               <Link

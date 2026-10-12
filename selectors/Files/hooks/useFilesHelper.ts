@@ -107,8 +107,10 @@ const useFilesHelper = ({
   });
 
   const requestRunning = React.useRef(false);
+  const requestIdRef = React.useRef(0);
   const initRef = React.useRef(isInit);
   const firstLoadRef = React.useRef(isFullLoadActive);
+  const specialItemsCountRef = React.useRef(0);
   const disabledItemsRef = React.useRef(disabledItems);
   const formsSectionRef = React.useRef(formsSection);
   const privateRoomCacheRef = React.useRef<Map<number | string, boolean>>(
@@ -133,12 +135,17 @@ const useFilesHelper = ({
 
   const getFileList = React.useCallback(
     async (sIndex: number) => {
-      if (requestRunning.current || filesSettingsLoading) return;
+      if ((requestRunning.current && sIndex > 0) || filesSettingsLoading)
+        return;
+
+      const requestId = ++requestIdRef.current;
+      const isLatest = () => requestId === requestIdRef.current;
 
       requestRunning.current = true;
       setIsNextPageLoading(true);
 
-      let startIndex = sIndex;
+      let startIndex =
+        sIndex > 0 ? Math.max(0, sIndex - specialItemsCountRef.current) : 0;
 
       if (withCreate) {
         startIndex -= startIndex % 100;
@@ -164,6 +171,9 @@ const useFilesHelper = ({
           const folderInfoRes = await foldersApi.getFolderInfo({
             folderId: folderId as number,
           });
+
+          if (!isLatest()) return;
+
           const folder = folderInfoRes.data.response!;
 
           const isArchive = folder.rootFolderType === FolderType.Archive;
@@ -228,6 +238,8 @@ const useFilesHelper = ({
           currentFolder = folderRes.data.response!;
         }
 
+        if (!isLatest()) return;
+
         const { folders, files, total, count, pathParts, current } =
           currentFolder;
 
@@ -291,6 +303,8 @@ const useFilesHelper = ({
             } catch {
               isInsidePrivateRoom = false;
             }
+
+            if (!isLatest()) return;
           }
         }
 
@@ -408,6 +422,8 @@ const useFilesHelper = ({
             setTotal(total);
           }
 
+          if (startIndex === 0) specialItemsCountRef.current = 0;
+
           if (
             !activeSpecialScope &&
             current!.rootFolderType === FolderType.USER &&
@@ -431,6 +447,7 @@ const useFilesHelper = ({
 
             if (specialItems.length) {
               itemList.unshift(...specialItems);
+              specialItemsCountRef.current = specialItems.length;
               const base = withCreate && security?.Create ? total + 1 : total;
               setTotal(base + specialItems.length);
             }
@@ -452,8 +469,10 @@ const useFilesHelper = ({
       try {
         await setSettings(id);
 
-        requestRunning.current = false;
+        if (isLatest()) requestRunning.current = false;
       } catch (e) {
+        if (!isLatest()) return;
+
         sessionStorage.removeItem("filesSelectorPath");
         if (isThirdParty && rootThirdPartyId) {
           try {

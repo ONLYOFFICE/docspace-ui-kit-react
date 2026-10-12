@@ -142,6 +142,8 @@ const Selector = ({
   const [footerVisible, setFooterVisible] = React.useState<boolean>(false);
 
   const [renderedItems, setRenderedItems] = React.useState<TSelectorItem[]>([]);
+  const [renderedItemsSource, setRenderedItemsSource] =
+    React.useState<TSelectorItem[]>();
   const [newSelectedItems, setNewSelectedItems] = React.useState<
     TSelectorItem[]
   >([]);
@@ -477,6 +479,8 @@ const Selector = ({
 
   React.useLayoutEffect(() => {
     if (items) {
+      setRenderedItemsSource(items);
+
       if (
         !selectedItems ||
         (selectedItems && selectedItems.length === 0) ||
@@ -689,7 +693,7 @@ const Selector = ({
           items={bodyItems}
           isMultiSelect={isMultiSelect}
           onSelect={onSelectAction}
-          hasNextPage={hasNextPage}
+          hasNextPage={hasNextPage && renderedItemsSource === items}
           isNextPageLoading={isNextPageLoading}
           loadMoreItems={loadMoreItems}
           renderCustomItem={renderCustomItem}
