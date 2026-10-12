@@ -445,6 +445,32 @@ const getPendingToolName = (
 // submit runs `reserveGeneratedFileWindow`; `openGeneratedFileWithToolCall`
 // then navigates that tab. When the pending call goes away without the tab
 // being used (deny, failed stream, no file id) the blank tab is closed.
+// The widget keeps the confirmation dialog open with a loader from "Allow"
+// until the tool result streams back, so `onToolCallApproveResult` can open
+// the generated file inside the user's gesture window. That wait only serves
+// the generate tools above; any other server-side tool (the document agent,
+// minutes of work) would hold the dialog for its whole run. For those the
+// dialog is released the moment the approval is sent: the library's own
+// release later finds nothing pending and is a no-op.
+const LongToolApprovalBridge = () => {
+  const { useServersStore } = useStores();
+  const isApprovingTool = useServersStore((s) => s.isApprovingTool);
+  const pendingToolName = useServersStore((s) =>
+    getPendingToolName(s.manageToolData),
+  );
+  const setIsApprovingTool = useServersStore((s) => s.setIsApprovingTool);
+  const setManageToolData = useServersStore((s) => s.setManageToolData);
+
+  useEffect(() => {
+    if (!isApprovingTool || pendingToolName === undefined) return;
+    if (GENERATE_TOOL_NAMES.includes(pendingToolName)) return;
+    setIsApprovingTool(false);
+    setManageToolData(undefined);
+  }, [isApprovingTool, pendingToolName, setIsApprovingTool, setManageToolData]);
+
+  return null;
+};
+
 const GenerateToolApprovalBridge = () => {
   const { useServersStore } = useStores();
   const pendingToolName = useServersStore((s) =>
@@ -1138,6 +1164,7 @@ const AiAgentProviders = ({
                             onThreadContextChange={onThreadContextChange}
                           />
                           <GenerateToolApprovalBridge />
+                          <LongToolApprovalBridge />
                           <AiChatStoreProvider store={aiChatStore}>
                             <ContextRoomProvider room={contextRoom}>
                               <ContextRoomWatcher />
