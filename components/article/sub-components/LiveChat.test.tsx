@@ -32,9 +32,23 @@ vi.mock("../../../context/InterfaceDirectionContext", () => ({
   useInterfaceDirection: () => ({ isRTL: isRTL() }),
 }));
 
+const theme = vi.fn<
+  () => {
+    isBase: boolean;
+    currentColorScheme?: {
+      main: { accent: string };
+      text: { accent: string };
+    };
+  }
+>(() => ({ isBase: true }));
+vi.mock("../../../context/ThemeContext", () => ({
+  useTheme: () => theme(),
+}));
+
 type Offset = { horizontal: number; vertical: number };
 type Customization = {
   position: { side: "left" | "right"; offset: { web: Offset; mobile: Offset } };
+  theme: Record<string, string>;
 };
 
 /**
@@ -57,8 +71,8 @@ describe("ArticleLiveChat", () => {
       .mock.calls.filter((call) => typeof call[1] === "string")
       .map((call) => `${call[0]} ${call[1]}`);
 
-  /** The last placement the widget was handed. */
-  const position = () => {
+  /** The last customization the widget was handed. */
+  const customization = () => {
     const call = vi
       .mocked(zendeskAPI.addChanges)
       .mock.calls.filter(
@@ -66,13 +80,67 @@ describe("ArticleLiveChat", () => {
       )
       .at(-1);
 
-    return (call?.[2] as Customization | undefined)?.position;
+    return call?.[2] as Customization | undefined;
   };
+
+  /** The last placement the widget was handed. */
+  const position = () => customization()?.position;
 
   beforeEach(() => {
     vi.clearAllMocks();
     isMobile.mockReturnValue(false);
     isRTL.mockReturnValue(false);
+    theme.mockReturnValue({ isBase: true });
+  });
+
+  it("paints the widget in the portal's accent on the light theme", () => {
+    theme.mockReturnValue({
+      isBase: true,
+      currentColorScheme: {
+        main: { accent: "#AA0000" },
+        text: { accent: "#000001" },
+      },
+    });
+    render(<ArticleLiveChat {...props} />);
+
+    expect(customization()?.theme).toMatchObject({
+      primary: "#AA0000",
+      onPrimary: "#000001",
+      action: "#AA0000",
+      onAction: "#000001",
+      onSecondaryAction: "#AA0000",
+      message: "#AA0000",
+      onMessage: "#000001",
+      background: "#ffffff",
+      onBackground: "#333333",
+    });
+  });
+
+  it("follows the dark theme and a later accent change", () => {
+    theme.mockReturnValue({ isBase: false });
+    const { rerender } = render(<ArticleLiveChat {...props} />);
+
+    // No colour scheme yet: the default accent, white on it.
+    expect(customization()?.theme).toMatchObject({
+      primary: "#4781D1",
+      onPrimary: "#ffffff",
+      background: "#333333",
+      onBackground: "#ffffff",
+      onBusinessMessage: "#ffffff",
+    });
+
+    theme.mockReturnValue({
+      isBase: false,
+      currentColorScheme: {
+        main: { accent: "#00AA00" },
+        text: { accent: "#ffffff" },
+      },
+    });
+    rerender(<ArticleLiveChat {...props} />);
+
+    expect(customization()?.theme.primary).toBe("#00AA00");
+    // The placement rides along, so the theme cannot reset it.
+    expect(position()?.side).toBe("right");
   });
 
   it("hands the app's locale to the widget and follows a change", () => {
