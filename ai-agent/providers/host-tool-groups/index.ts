@@ -131,9 +131,11 @@ const READY_MESSAGE = "editorDocumentReady";
 // Both editors -- the panel's iframe and the generated-file tab -- load the
 // portal's own /doceditor, so their origin is this page's. Tool calls carry
 // what the model writes into the document; addressed to this origin rather
-// than "*", one whose window has meanwhile navigated elsewhere (a sign-in
-// redirect, a link followed in the tab) is dropped by the browser instead of
-// being delivered to that other page.
+// than "*", one whose window has meanwhile navigated to another origin (a
+// link followed in the tab to an outside site, a single sign-on provider) is
+// dropped by the browser instead of being delivered to that other page. It
+// does not tell the editor from another page of the same portal: the portal's
+// own /login is same-origin and would still receive it.
 const editorOrigin = () => window.location.origin;
 
 const editorUrl = (fileId: number | string) =>
