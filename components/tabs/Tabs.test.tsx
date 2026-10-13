@@ -377,9 +377,10 @@ describe("Tabs", () => {
         },
       });
 
+      const onTab2Click = vi.fn();
       const items = [
         { id: "1", name: "Tab 1", content: "1" },
-        { id: "2", name: "Tab 2", content: "2" },
+        { id: "2", name: "Tab 2", content: "2", onClick: onTab2Click },
         { id: "3", name: "Tab 3", content: "3" },
       ];
 
@@ -409,12 +410,12 @@ describe("Tabs", () => {
       // In JSDOM with these mocks, withArrows should become true
       // We might need to wait for state updates if they are async
 
-      if (arrowRight) {
-        expect(arrowRight).toBeInTheDocument();
-        // Test arrow click
-        (arrowRight as HTMLElement).click();
-        expect(onSelectMock).toHaveBeenCalledWith(items[1]);
-      }
+      expect(arrowRight).toBeInTheDocument();
+      // The arrow selects the next tab the way a click on it does, the
+      // tab's own onClick included.
+      (arrowRight as HTMLElement).click();
+      expect(onSelectMock).toHaveBeenCalledWith(items[1]);
+      expect(onTab2Click).toHaveBeenCalledTimes(1);
 
       // Restore original offsetWidth
       if (originalOffsetWidth) {

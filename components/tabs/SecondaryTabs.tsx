@@ -209,14 +209,16 @@ const SecondaryTabs = (props: TabsProps) => {
   const prevIndex = findEnabled(selectedItemIndex, -1);
   const nextIndex = findEnabled(selectedItemIndex, 1);
 
+  // The arrows select as a click on the tab does: its own onClick first,
+  // then onSelect, and the tab is scrolled into view.
   const onSelectPrev = () => {
     if (prevIndex < 0) return;
-    onSelect?.(items[prevIndex]);
+    selectTab(prevIndex);
   };
 
   const onSelectNext = () => {
     if (nextIndex < 0) return;
-    onSelect?.(items[nextIndex]);
+    selectTab(nextIndex);
   };
 
   const containerW =

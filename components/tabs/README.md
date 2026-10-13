@@ -215,8 +215,9 @@ export function LazyTabs() {
 - **The bar is `position: sticky`, not fixed.** It sticks inside the nearest scrolling ancestor,
   and `stickyTop` is written straight into `top` — if nothing scrolls above it, the bar never
   moves. `withoutStickyIntend` removes the spacer element drawn under it.
-- **The arrows on the segmented bar move the selection, not the scroll.** They call `onSelect`
-  with the nearest item that is not disabled, and they only appear when the tabs overflow and
+- **The arrows on the segmented bar move the selection, not the scroll.** They select the nearest
+  item that is not disabled as a click on it would — its own `onClick`, then `onSelect` — and
+  scroll it into view. They only appear when the tabs overflow and
   the device is not a phone.
 - **A disabled item cannot be selected at all.** The click handler refuses it on both bars, and
   the segmented bar's keyboard and arrows skip it; it is also made inert in CSS.
