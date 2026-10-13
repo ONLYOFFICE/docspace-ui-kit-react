@@ -58,8 +58,9 @@ const readText = (element: HTMLElement) => {
 /**
  * The same, for content that is drawn as nodes: the plain text of the
  * element `ref` points at, for a visually hidden region beside it. It is
- * read from the DOM after every commit once the delay has passed, so a
- * change of the content is announced too. Copying the nodes into the region
+ * read from the DOM after every commit once the delay has passed, and on
+ * every change of that element's DOM, so a change of the content is
+ * announced too, even one this component did not render. Copying the nodes into the region
  * instead would duplicate any link or button among them as an invisible tab
  * stop.
  */
@@ -72,6 +73,24 @@ export const useLiveRegionTextOf = (ref: RefObject<HTMLElement | null>) => {
   useEffect(() => {
     if (ready && ref.current) setText(readText(ref.current));
   });
+
+  // The content can also change without this component rendering: a child
+  // with state of its own, a translation that arrives late, an SVG injected
+  // after it loads. Those are read when the DOM changes.
+  useEffect(() => {
+    const element = ref.current;
+    if (!ready || !element || typeof MutationObserver === "undefined") return;
+
+    const observer = new MutationObserver(() => setText(readText(element)));
+    observer.observe(element, {
+      subtree: true,
+      childList: true,
+      characterData: true,
+      attributeFilter: ["aria-hidden"],
+    });
+
+    return () => observer.disconnect();
+  }, [ready, ref]);
 
   return ready ? text : undefined;
 };
