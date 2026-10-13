@@ -222,3 +222,4 @@ const Tags: FC<TagsProps> = ({
 };
 
 export { Tags };
+export type { TOptionTagKind };

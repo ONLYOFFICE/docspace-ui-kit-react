@@ -1,7 +1,7 @@
 {
   "entry": "index.ts",
   "package": "@onlyoffice/apps-ui-kit",
-  "total": 711,
+  "total": 712,
   "values": 464,
   "exports": {
     "ADMIN": {
@@ -1753,6 +1753,10 @@
     "TOption": {
       "kind": "type",
       "origin": "components/combobox"
+    },
+    "TOptionTagKind": {
+      "kind": "type",
+      "origin": "components/tags"
     },
     "TPathParts": {
       "kind": "type",
