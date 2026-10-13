@@ -147,7 +147,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   control in its body (the one `labelFor` names, or its first `input`, `textarea` or `select`)
   gets `aria-required` with `isRequired`, `aria-invalid` with `hasError`, and `aria-describedby`
   pointing at the error message while it shows. Attributes the control already carries are left
-  alone. A bare `Label` with `isRequired` or `error` is now visual only; put `required` and
+  alone, and what it added is taken off only while it still holds that value. A control that
+  mounts after the container is described too, and a radio button stands for its
+  `role="radiogroup"`. A bare `Label` with `isRequired` or `error` is now visual only; put `required` and
   `aria-invalid` on your input
 - **`Checkbox`'s `truncate` cuts the label with an ellipsis.** The text ran out of a narrow
   container on one line instead, because its wrapper could not shrink and the span could not
@@ -195,7 +197,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   the two pair up (a caller that locks scrolling in `onClick` and unlocks it in `onClose` is no
   longer left locked). Every prop now reaches the component (the memo compared only four). Without `getData` the
   button shows `data` instead of throwing, and `onMouseOver` / `onMouseOut` fire on mouseover and
-  mouseout rather than mousedown and mouseup.
+  mouseout rather than mousedown and mouseup. In `toggle` mode Enter and Space hand `onClick` a
+  click event at the button's bottom-left corner, so `ContextMenu.show(e)` places the menu there
+  instead of at NaN.
 - **`ProgressBar` announces what it shows.** `percent` is clamped to 0..100 at both ends (a
   non-number counts as 0); `isInfiniteProgress` leaves `aria-valuenow` out and sets `aria-busy`,
   so the bar is no longer announced as "0 %"; the status line sits in an always-mounted polite
@@ -206,8 +210,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `percent` outside 0..100 no longer overflows the track.
 - **`SnackBar`'s controls are keyboard-operable buttons.** The close cross is a
   `<button type="button">` (it no longer submits a surrounding form) named by the new
-  `closeButtonLabel` prop, default `"Close"`; the `btnText` action and the campaign banner's
-  cross are buttons too. The bar is `role="status"` with `aria-live="polite"`.
+  `closeButtonLabel` prop, defaulting to the translated `Common:CloseButton` ("Close"); the
+  `btnText` action and the campaign banner's cross are buttons too. The bar is `role="status"`
+  with `aria-live="polite"`; its `countDownTime` counter is hidden from it, so the ticks are not
+  announced.
 - **`SnackBar.show`/`SnackBar.close` manage one React root.** Repeated `show` calls re-render the
   same root instead of stacking new ones and new `#snackbar` divs; `close()` unmounts it with or
   without `parentElementId` and removes the `#snackbar` node `show` created. The bar's DOM id is
@@ -273,7 +279,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   field's accessible name.
 - **`ColumnarInfoBar`'s pairs are a description list.** Labels and values render as `<dt>` and
   `<dd>` inside a `<dl>`, so a screen reader ties each value to its label; the default and
-  `neutral` bars carry `role="status"`. The layout is unchanged.
+  `neutral` bars carry `role="status"` on their content, the close button outside it. The layout is unchanged.
 - **`ColumnarInfoBar variant="neutral"` no longer cuts off long content.** The reveal animation
   kept its 150px height cap forever; the cap now lifts when the animation ends.
 - **`PublicRoomBar`'s close cross is a real button.** It was an `IconButton` `div` with no role,
@@ -323,7 +329,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   when its URL path ends in `.svg` - `photo.svg.png` and `?file=x.svg` are pictures now - and a
   `data:` URL, an inline SVG included, is always a picture
 - **A broken `<img>` inside `MCPIcon`'s `imgNode` falls back to the letter**, as a broken `imgSrc`
-  already did
+  already did, and a new `imgSrc` or `imgNode` is tried again after one failed
 - **`MainButton` can be reached and opened from the keyboard.** It is now a native `<button type="button">` (user agent styles reset, so it looks the same): Enter and Space open the menu or call `onAction`, `aria-haspopup`, `aria-expanded` and `aria-controls` follow the menu, and `isDisabled` sets `aria-disabled` while leaving the button focusable. The Enter that opens the menu no longer also picks its first item.
 - **`MainButtonMobile`'s iOS scroll background works, and a page without `.section-scroll` no longer throws.** Two comparisons read ref objects instead of their values, so the sheet never darkened on scrolling up.
 - **`--main-button-mobile-badge-size` scales the alert badge's icon**, not only the box around it.
@@ -382,7 +388,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **The system MCP server's label no longer repeats the brand.** `MCPServersSelector` labelled the portal's own server `OrganizationName ProductName`, which read "ONLYOFFICE ONLYOFFICE" where the product name is ONLYOFFICE. The organisation is now prefixed only when the product name does not already contain it: "ONLYOFFICE DocSpace" is unchanged, "ONLYOFFICE" and "ONLYOFFICE Apps" are shown as they are.
 - **`PeopleSelector`'s Groups tab lists groups when there is no `roomId`.** It used to run the people search and showed every user, guests included. It now loads the portal's groups (`groupApi.getGroups`); with a `roomId` the room's sharing query is used as before.
 - **`FilesSelector` calls `headerProps.onCloseClick`.** The header's close cross always called `onCancel`, ignoring the handler passed in `headerProps`. The caller's `onCloseClick` now runs, with `onCancel` as the fallback when it is absent; the footer's Cancel button still calls `onCancel`. A consumer that passed a no-op `onCloseClick` and relied on the cross cancelling should pass `onCancel` there.
-- **`Uploader` accepts any file with `accept="*"`.** `accept` went to react-dropzone unchanged, where `"*"` and `"*/*"` refuse every file - including in the README's own examples. `"*"`, `"*/*"`, `""` and a missing `accept` now all mean any file, and `accept` is optional in `UploaderProps`.
+- **`Uploader` accepts any file with `accept="*"`.** `accept` went to react-dropzone unchanged, where `"*"` and `"*/*"` refuse every file - including in the README's own examples. `"*"`, `"*/*"`, `""` and a missing `accept` now all mean any file, and `accept` is optional in `UploaderProps`. A list is passed on trimmed and without blank entries: `".pdf,"` used to let every file with no MIME type through.
 - **The legal sample's relative dates are in English.** "updated yesterday" and "Sent 5 days ago" followed the browser's locale inside an otherwise English page; they are now formatted in English.
 
 ## 4.0.1
