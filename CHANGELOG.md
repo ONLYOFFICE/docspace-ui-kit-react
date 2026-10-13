@@ -163,7 +163,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   Without the callback it has no `href` and does nothing, as before.
 - **`LinkWithDropdown` works from the keyboard.** The trigger is in the tab order (out of it while
   `isDisabled`), Enter and Space toggle the menu and Escape closes it; `aria-haspopup` is now
-  `"listbox"`.
+  `"listbox"`. The arrows open the menu and move focus into it, then between its items; Home and
+  End jump, Enter and Space choose, and Escape returns focus to the link.
 - **`LinkWithDropdown`'s `manualWidth` can exceed 200px.** The 200px cap now applies only to a menu
   that sizes itself.
 - **`Dropzone`'s full format list closes on a click outside** and is keyboard-operable: with

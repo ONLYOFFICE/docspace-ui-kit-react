@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 import { isMobileOnly } from "react-device-detect";
 import classNames from "classnames";
 
@@ -63,6 +63,20 @@ const LinkWithDropdown = ({
     setIsOpen(!state.isOpen);
   };
 
+  const triggerRef = useRef<HTMLAnchorElement | null>(null);
+  const menuId = `link-with-dropdown${useId().replace(/:/g, "")}-menu`;
+  // Set when the list was opened by an arrow key: which item takes focus.
+  const focusOnOpen = useRef<"first" | "last" | null>(null);
+
+  const getItems = () =>
+    Array.from(
+      document
+        .getElementById(menuId)
+        ?.querySelectorAll<HTMLElement>(
+          ".drop-down-item:not([aria-disabled='true'])",
+        ) ?? [],
+    );
+
   const onKeyDown = (e: React.KeyboardEvent<HTMLAnchorElement>) => {
     if (isDisabled) return;
 
@@ -74,6 +88,21 @@ const LinkWithDropdown = ({
       return;
     }
 
+    // The arrows go into the list, opening it first if need be.
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      consumeKey(e);
+      const target = e.key === "ArrowDown" ? "first" : "last";
+      if (state.isOpen) {
+        const items = getItems();
+        (target === "first" ? items[0] : items.at(-1))?.focus();
+      } else {
+        focusOnOpen.current = target;
+        setIsOpen(true);
+      }
+      return;
+    }
+
     if (e.key === "Escape" && state.isOpen) {
       e.preventDefault();
       // Not to the dialog around it, which closes on Escape too.
@@ -81,6 +110,81 @@ const LinkWithDropdown = ({
       setIsOpen(false);
     }
   };
+
+  // Opened by an arrow key: move focus into the list once its items are on
+  // screen.
+  useEffect(() => {
+    if (!state.isOpen || !focusOnOpen.current) return;
+
+    let frame = 0;
+    let attempts = 0;
+    const tryFocus = () => {
+      const items = getItems();
+      const target = focusOnOpen.current === "last" ? items.at(-1) : items[0];
+      target?.focus();
+      if (target && document.activeElement === target) {
+        focusOnOpen.current = null;
+        return;
+      }
+      attempts += 1;
+      if (attempts < 20) frame = requestAnimationFrame(tryFocus);
+    };
+    tryFocus();
+
+    return () => cancelAnimationFrame(frame);
+    // getItems reads the DOM by menuId, which does not change.
+  }, [state.isOpen]);
+
+  // Roving focus inside the open list: arrows, Home and End move, Enter and
+  // Space choose, Escape closes and returns to the link, Tab closes.
+  useEffect(() => {
+    if (!state.isOpen) return;
+    const menu = document.getElementById(menuId);
+    if (!menu) return;
+
+    const onMenuKeyDown = (e: KeyboardEvent) => {
+      const items = getItems();
+      const current = items.indexOf(document.activeElement as HTMLElement);
+      const move = (index: number) => {
+        e.preventDefault();
+        consumeKey(e);
+        items[(index + items.length) % items.length]?.focus();
+      };
+
+      switch (e.key) {
+        case "ArrowDown":
+          return move(current + 1);
+        case "ArrowUp":
+          return move(current - 1);
+        case "Home":
+          return move(0);
+        case "End":
+          return move(items.length - 1);
+        case "Enter":
+        case " ":
+          if (current === -1) return;
+          e.preventDefault();
+          consumeKey(e);
+          items[current].click();
+          triggerRef.current?.focus();
+          return;
+        case "Escape":
+          e.preventDefault();
+          consumeKey(e);
+          setIsOpen(false);
+          triggerRef.current?.focus();
+          return;
+        case "Tab":
+          setIsOpen(false);
+          return;
+        default:
+      }
+    };
+
+    menu.addEventListener("keydown", onMenuKeyDown);
+    return () => menu.removeEventListener("keydown", onMenuKeyDown);
+    // getItems reads the DOM by menuId, which does not change.
+  }, [state.isOpen, menuId]);
 
   const onCheckManualWidth = () => {
     const padding = 32;
@@ -185,11 +289,13 @@ const LinkWithDropdown = ({
             className,
           )}
           style={{ color }}
+          ref={triggerRef}
           role="button"
           tabIndex={isDisabled ? -1 : 0}
           onKeyDown={onKeyDown}
           aria-haspopup="listbox"
           aria-expanded={state.isOpen}
+          aria-controls={state.isOpen ? menuId : undefined}
           aria-disabled={isDisabled}
           {...rest}
         >
@@ -221,6 +327,7 @@ const LinkWithDropdown = ({
         manualWidth={
           manualWidth || (showScroll ? onCheckManualWidth() : undefined)
         }
+        id={menuId}
         open={state.isOpen}
         fixedDirection={fixedDirection}
         isDefaultMode={isDefaultMode}

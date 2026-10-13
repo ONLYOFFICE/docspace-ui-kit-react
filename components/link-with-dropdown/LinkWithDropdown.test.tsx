@@ -212,8 +212,29 @@ describe("LinkWithDropdown", () => {
     );
   });
 
-  // Known defect (review of spike/vitest-addon): Enter opens the list but focus stays on the link and ArrowDown cannot reach an item without maxHeight. Flip to it() once fixed.
-  it.fails("lets a keyboard user reach an item after opening the list", () => {
+  it("walks the list with the arrows and returns to the link on Escape", () => {
+    render(
+      <LinkWithDropdown data={mockData}>Link with dropdown</LinkWithDropdown>,
+    );
+    const trigger = screen.getByRole("button", { name: "Link with dropdown" });
+    trigger.focus();
+
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    fireEvent.keyDown(trigger, { key: "ArrowDown" });
+    const first = screen.getByTestId("link_with_drop_down_key1");
+    expect(first).toHaveFocus();
+
+    fireEvent.keyDown(first, { key: "ArrowDown" });
+    expect(screen.getByTestId("link_with_drop_down_key2")).toHaveFocus();
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, {
+      key: "Escape",
+    });
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(trigger).toHaveFocus();
+  });
+
+  it("lets a keyboard user reach an item after opening the list", () => {
     render(
       <LinkWithDropdown data={mockData}>Link with dropdown</LinkWithDropdown>,
     );
