@@ -476,6 +476,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`DateTimePicker`'s AM/PM sets the hour** instead of shifting by 12 hours, which was an hour off
   on a day the clocks change.
 - **The samples' declarations are no longer published.** `dist/types/docs` is gone.
+- **A key pressed during a `QuickActions` arrow's scroll still brings its tile into view.** The
+  key stops the arrow's smooth scroll where it has got to, and in Chromium on Linux the tile's
+  own scroll was lost with it, leaving the first tile clipped after Home.
 - **`PeopleSelector` loads every group with `withOutCurrentAuthorizedUser`.** It took one off the
   total of a list of groups too, where the current user never is, so the last group of a
   paginated list was never requested.
