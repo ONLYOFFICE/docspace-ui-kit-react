@@ -74,7 +74,7 @@ export type DropDownItemProps = {
   badgeLabel?: string;
   /** Whether to show an external link icon at the end of the item */
   withExternalLink?: boolean;
-  /** URL of the external link icon: its `href`, opened in a new tab unless `onExternalLinkClick` handles the click */
+  /** URL of the external link icon. It becomes the icon's `href` only together with `onExternalLinkClick`; without the callback the icon does not navigate */
   externalLinkPath?: string;
   /** Called when the external link icon is activated; a plain click is then left to it and the `href` is not followed */
   onExternalLinkClick?: () => void;

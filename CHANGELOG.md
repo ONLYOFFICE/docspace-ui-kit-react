@@ -156,10 +156,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   separately, and ignores the tap that opened the menu, which is still bubbling when the
   listeners are attached. A menu rendered open from the start also gets its `eventTypes`
   listeners now.
-- **`DropDownItem`'s external-link icon is a real link.** It is now
-  `<a href={externalLinkPath} target="_blank">`, focusable and named "Open <label>" (override with
-  the new `externalLinkLabel`). With `onExternalLinkClick` a plain click still goes to the callback
-  and the `href` is not followed, so router-based handlers keep working.
+- **`DropDownItem`'s external-link icon is a real link when it can navigate.** With
+  `onExternalLinkClick` it is `<a href={externalLinkPath}>`, focusable and named "Open <label>"
+  (override with the new `externalLinkLabel`); a plain click goes to the callback and the `href`
+  is not followed, so router-based handlers keep working, and a middle click opens a new tab.
+  Without the callback it has no `href` and does nothing, as before.
 - **`LinkWithDropdown` works from the keyboard.** The trigger is in the tab order (out of it while
   `isDisabled`), Enter and Space toggle the menu and Escape closes it; `aria-haspopup` is now
   `"listbox"`.

@@ -298,9 +298,16 @@ const DropDownItem = ({
         <Link
           type={LinkType.action}
           className={styles.externalLink}
-          href={externalLinkPath}
-          target={LinkTarget.blank}
-          rel="noopener noreferrer"
+          // Only a callback makes the path navigable: the SDK passes a path
+          // its parent frame resolves and no callback, and a link of its own
+          // would open a dead tab. The href is there for a middle click.
+          {...(onExternalLinkClick
+            ? {
+                href: externalLinkPath,
+                target: LinkTarget.blank,
+                rel: "noopener noreferrer",
+              }
+            : {})}
           ariaLabel={resolvedExternalLinkLabel}
           onClick={(e: React.MouseEvent) => {
             e.stopPropagation();

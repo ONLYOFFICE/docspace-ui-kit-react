@@ -121,7 +121,7 @@ describe("<DropDownItem />", () => {
     };
 
     it("is a focusable link to externalLinkPath with a name", () => {
-      render(<DropDownItem {...externalProps} />);
+      render(<DropDownItem {...externalProps} onExternalLinkClick={vi.fn()} />);
       const link = screen.getByRole("link", { name: /Help center/ });
 
       expect(link).toHaveAttribute("href", "https://example.com/help");
@@ -130,7 +130,13 @@ describe("<DropDownItem />", () => {
     });
 
     it("uses externalLinkLabel as the accessible name", () => {
-      render(<DropDownItem {...externalProps} externalLinkLabel="Open help" />);
+      render(
+        <DropDownItem
+          {...externalProps}
+          externalLinkLabel="Open help"
+          onExternalLinkClick={vi.fn()}
+        />,
+      );
 
       expect(
         screen.getByRole("link", { name: "Open help" }),
@@ -153,30 +159,17 @@ describe("<DropDownItem />", () => {
       expect(baseProps.onClick).not.toHaveBeenCalled();
     });
 
-    it("follows the href when there is no callback", () => {
-      render(<DropDownItem {...externalProps} />);
-      const link = screen.getByRole("link", { name: /Help center/ });
-
-      expect(fireEvent.click(link)).toBe(true);
-      expect(baseProps.onClick).not.toHaveBeenCalled();
-    });
-
-    // Either fix is correct: drop the href without a callback, or prevent
-    // the default action of a plain click.
     const navigatesOnPlainClick = (link: HTMLElement): boolean => {
       if (!link.hasAttribute("href")) return false;
       return fireEvent.click(link);
     };
 
-    // Known defect (review of spike/vitest-addon): without onExternalLinkClick the external link keeps href and target=_blank, so a plain click navigates. Flip to it() once fixed.
-    it.fails(
-      "does not navigate on a plain click without onExternalLinkClick",
-      () => {
-        render(<DropDownItem {...externalProps} externalLinkPath="/help" />);
-        const link = screen.getByLabelText(/Help center/);
+    // The SDK passes a path its parent frame resolves, and no callback.
+    it("does not navigate on a plain click without onExternalLinkClick", () => {
+      render(<DropDownItem {...externalProps} externalLinkPath="/help" />);
+      const link = screen.getByLabelText(/Help center/);
 
-        expect(navigatesOnPlainClick(link)).toBe(false);
-      },
-    );
+      expect(navigatesOnPlainClick(link)).toBe(false);
+    });
   });
 });
