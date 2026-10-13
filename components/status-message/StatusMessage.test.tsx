@@ -1,5 +1,6 @@
+import { Activity } from "react";
 import { describe, it, expect, vi } from "vitest";
-import { screen, render, waitFor } from "@testing-library/react";
+import { screen, render, waitFor, act } from "@testing-library/react";
 
 import StatusMessage from ".";
 import styles from "./StatusMessage.module.scss";
@@ -279,6 +280,36 @@ describe("<StatusMessage />", () => {
       await waitFor(() => {
         expect(container.firstChild).toBeNull();
       });
+    });
+  });
+
+  describe("Replayed effects", () => {
+    // Hiding an Activity runs every effect cleanup and showing it again
+    // replays the effects, as StrictMode does on mount.
+    it("re-arms the fallback timer when a fade survives a replay", () => {
+      vi.useFakeTimers();
+      try {
+        const at = (mode: "visible" | "hidden", message: string) => (
+          <Activity mode={mode}>
+            <StatusMessage message={message} />
+          </Activity>
+        );
+
+        const { rerender } = render(at("visible", "First"));
+        rerender(at("visible", "Second"));
+        rerender(at("hidden", "Second"));
+        rerender(at("visible", "Second"));
+
+        act(() => {
+          vi.advanceTimersByTime(500);
+        });
+
+        expect(screen.getByText("Second")).toBeInTheDocument();
+        const bar = screen.getByText("Second").parentElement;
+        expect(bar?.classList.contains(styles.hide)).toBeFalsy();
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 

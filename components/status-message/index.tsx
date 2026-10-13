@@ -90,9 +90,13 @@ const StatusMessage: React.FC<StatusMessageProps> = ({
     }
   }, [message, isWarning, commit, finishFade]);
 
+  // Forget the timer as well as clearing it: under StrictMode, or when the
+  // component is hidden and shown again, effects are replayed, and a stale id
+  // left here would stop the fade effect from ever arming a new fallback.
   React.useEffect(
     () => () => {
       clearTimeout(timerRef.current);
+      timerRef.current = undefined;
     },
     [],
   );
