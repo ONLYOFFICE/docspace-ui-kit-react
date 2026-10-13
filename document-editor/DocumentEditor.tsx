@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { DocumentEditor as OODocumentEditor } from "@onlyoffice/document-editor-react";
-import type { IConfig } from "@onlyoffice/document-editor-react";
 import { useApi } from "../providers/api";
-import type { DocumentEditorProps } from "./DocumentEditor.types";
+import type { DocumentEditorProps, IConfig } from "./DocumentEditor.types";
 
 export const DocumentEditor = (props: DocumentEditorProps) => {
   const {

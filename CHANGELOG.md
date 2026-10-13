@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.0.2
+
+### Changed
+
+- `@onlyoffice/document-editor-react` peer raised from `2.1.1` to `2.2.0`. That release
+  dropped its own `IConfig` and takes the editor configuration type, `Config`, from
+  `@onlyoffice/doceditor-types`, which is now an optional peer here as well (`^9.3.1`)
+- `document-editor` still exports `IConfig`, now as an alias of that `Config`
+
 ## 4.0.1
 
 ### Changed
