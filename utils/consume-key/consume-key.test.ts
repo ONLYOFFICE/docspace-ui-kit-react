@@ -38,34 +38,21 @@ describe("consumeKey", () => {
     button.remove();
   });
 
-  it("lets the element the keyup lands on, and a React root, still hear it", () => {
-    // Stands in for the container React listens on.
-    const root = document.createElement("div");
-    const button = document.createElement("button");
-    root.appendChild(button);
-    document.body.appendChild(root);
-    const onButtonKeyUp = vi.fn();
-    const onRootKeyUp = vi.fn();
-    const onDocumentKeyUp = vi.fn();
-    const onWindowKeyUp = vi.fn();
-    button.addEventListener("keyup", onButtonKeyUp);
-    root.addEventListener("keyup", onRootKeyUp);
-    document.addEventListener("keyup", onDocumentKeyUp);
-    window.addEventListener("keyup", onWindowKeyUp);
+  it("swallows the keyup before a document capture-phase listener", () => {
+    // RoomLogoCoverDialog in the portal closes on an Escape keyup caught on
+    // document in the capture phase; the ColorPicker inside it consumes that
+    // Escape to close only itself.
+    const onDocumentCaptureKeyUp = vi.fn();
+    document.addEventListener("keyup", onDocumentCaptureKeyUp, true);
 
     consumeKey({ key: "Escape", stopPropagation: () => {} });
-    button.dispatchEvent(
+    document.body.dispatchEvent(
       new KeyboardEvent("keyup", { key: "Escape", bubbles: true }),
     );
 
-    expect(onButtonKeyUp).toHaveBeenCalledTimes(1);
-    expect(onRootKeyUp).toHaveBeenCalledTimes(1);
-    expect(onDocumentKeyUp).not.toHaveBeenCalled();
-    expect(onWindowKeyUp).not.toHaveBeenCalled();
+    expect(onDocumentCaptureKeyUp).not.toHaveBeenCalled();
 
-    document.removeEventListener("keyup", onDocumentKeyUp);
-    window.removeEventListener("keyup", onWindowKeyUp);
-    root.remove();
+    document.removeEventListener("keyup", onDocumentCaptureKeyUp, true);
   });
 
   it("lets a keyup of another key through", () => {
