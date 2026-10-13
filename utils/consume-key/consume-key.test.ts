@@ -38,6 +38,36 @@ describe("consumeKey", () => {
     button.remove();
   });
 
+  it("lets the element the keyup lands on, and a React root, still hear it", () => {
+    // Stands in for the container React listens on.
+    const root = document.createElement("div");
+    const button = document.createElement("button");
+    root.appendChild(button);
+    document.body.appendChild(root);
+    const onButtonKeyUp = vi.fn();
+    const onRootKeyUp = vi.fn();
+    const onDocumentKeyUp = vi.fn();
+    const onWindowKeyUp = vi.fn();
+    button.addEventListener("keyup", onButtonKeyUp);
+    root.addEventListener("keyup", onRootKeyUp);
+    document.addEventListener("keyup", onDocumentKeyUp);
+    window.addEventListener("keyup", onWindowKeyUp);
+
+    consumeKey({ key: "Escape", stopPropagation: () => {} });
+    button.dispatchEvent(
+      new KeyboardEvent("keyup", { key: "Escape", bubbles: true }),
+    );
+
+    expect(onButtonKeyUp).toHaveBeenCalledTimes(1);
+    expect(onRootKeyUp).toHaveBeenCalledTimes(1);
+    expect(onDocumentKeyUp).not.toHaveBeenCalled();
+    expect(onWindowKeyUp).not.toHaveBeenCalled();
+
+    document.removeEventListener("keyup", onDocumentKeyUp);
+    window.removeEventListener("keyup", onWindowKeyUp);
+    root.remove();
+  });
+
   it("lets a keyup of another key through", () => {
     const onWindowKeyUp = vi.fn();
     window.addEventListener("keyup", onWindowKeyUp);
