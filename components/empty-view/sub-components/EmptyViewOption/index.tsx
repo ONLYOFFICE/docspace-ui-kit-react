@@ -20,19 +20,35 @@ import type { EmptyViewOptionProps } from "../../EmptyView.types";
 
 const EmptyViewOption = ({ option, LinkRouter }: EmptyViewOptionProps) => {
   if (isEmptyLinkOptions(option)) {
-    if (option.isNext || !LinkRouter)
+    if (option.isNext || !LinkRouter) {
+      const href = toHref(option.to);
+      // An address makes a real link: in the Tab order, announced as a link,
+      // and a modified click opens it in a new tab. Without one (the SDK's
+      // "Clear filter" passes `to: ""`) it is an action, a button, since a
+      // new tab of the current page would be no link at all.
+      const asButton = href
+        ? { href }
+        : {
+            role: "button",
+            tabIndex: 0,
+            onKeyDown: (e: React.KeyboardEvent) => {
+              if (!isActivationKey(e)) return;
+              e.preventDefault();
+              (e.currentTarget as HTMLElement).click();
+            },
+          };
+
       return (
         <Link
           type={LinkType.action}
           id={option.key.toString()}
           className={classNames(styles.link, option.className)}
-          // A real href keeps the link in the Tab order, announced as a link,
-          // and lets a modified click open it in a new tab.
-          href={toHref(option.to)}
+          {...asButton}
           onClick={(e) => {
-            if (!option.onClick) return;
-            // The handler owns a plain click, as it did before the href.
-            if (isPlainClick(e)) e.preventDefault();
+            // The handler owns a plain click only; a modified or middle click
+            // is the browser's, so it does not also run the handler.
+            if (!option.onClick || !isPlainClick(e)) return;
+            e.preventDefault();
             option.onClick(e as React.MouseEvent<HTMLAnchorElement>);
           }}
         >
@@ -40,6 +56,7 @@ const EmptyViewOption = ({ option, LinkRouter }: EmptyViewOptionProps) => {
           <span>{option.description}</span>
         </Link>
       );
+    }
     return (
       <LinkRouter
         id={option.key.toString()}

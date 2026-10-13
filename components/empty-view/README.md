@@ -160,9 +160,11 @@ export function EmptyFolder({
 - **A link option without `LinkRouter` is a plain anchor, not a router link.** It renders the
   kit's action `Link` with `to` as its `href`. When the option has an `onClick`, a plain click
   runs it and the default navigation is prevented, so the handler decides what happens; a
-  Ctrl-, Cmd-, Shift- or middle-click is left to the browser and opens `to` in a new tab or
-  window. With no `onClick`, a click is a full page navigation to `to` — pass your router's
-  `Link` component to avoid the reload.
+  Ctrl-, Cmd-, Shift- or middle-click is left to the browser alone, which opens `to` in a new
+  tab or window, and does not also run the handler. With no `onClick`, a click is a full page
+  navigation to `to` — pass your router's `Link` component to avoid the reload. An empty `to`
+  makes it a button rather than a link: no `href`, `role="button"`, in the Tab order, run by a
+  plain click, Enter or Space.
 - `isNext: true` renders that same anchor even when a `LinkRouter` is passed, for a link whose
   handler navigates on its own.
 - An item with a `model` opens that context menu on click and does not call its `onClick`.
@@ -214,7 +216,8 @@ items have no override either.
   text, and Enter and Space activate it the same way.
 - A `button` option is a native `<button>`, activated by Enter and Space. A link option is
   whatever your `LinkRouter` renders; without one (or with `isNext`) it is an `<a>` whose
-  `href` is `to`, so it is a link in the Tab order, activated by Enter.
+  `href` is `to`, so it is a link in the Tab order, activated by Enter — or, when `to` is empty,
+  an `<a role="button">` without `href`, activated by Enter and Space.
 - The icon you pass is rendered as given; mark it `aria-hidden` unless it carries meaning the
   title does not.
 

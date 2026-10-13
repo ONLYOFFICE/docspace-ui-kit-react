@@ -147,9 +147,31 @@ describe("EmptyViewOption", () => {
     expect(plain).toBe(false); // default prevented: no navigation
     expect(onClick).toHaveBeenCalledTimes(1);
 
+    // Left to the browser, which opens a new tab -- and only that: the
+    // handler does not also run in the current page.
     const modified = fireEvent.click(link, { ctrlKey: true });
-    expect(modified).toBe(true); // left to the browser: opens a new tab
-    expect(onClick).toHaveBeenCalledTimes(2);
+    expect(modified).toBe(true);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("makes a fallback Link with no address a button", () => {
+    const onClick = vi.fn();
+    const option: EmptyViewLinkType = {
+      key: "link-5",
+      to: "",
+      icon: <MockIcon />,
+      description: "Clear filter",
+      onClick,
+    };
+
+    render(<EmptyViewOption option={option} />);
+
+    const action = screen.getByRole("button", { name: "Clear filter" });
+    expect(action).not.toHaveAttribute("href");
+    expect(action).toHaveAttribute("tabindex", "0");
+
+    fireEvent.keyDown(action, { key: "Enter" });
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 
   it("lets the fallback Link navigate when it has no handler", () => {

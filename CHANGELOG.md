@@ -252,8 +252,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   activate them as a click does; a card with a `model` opens its context menu under the card.
 - **`EmptyView` link options without `LinkRouter` (or with `isNext`) are real links.** They carry
   `to` as their `href`, so they are in the Tab order and announced as links. With an `onClick`,
-  a plain click still runs only the handler; a modified or middle click opens `to` in a new tab,
-  and an option without `onClick` now navigates to `to` instead of doing nothing.
+  a plain click still runs only the handler; a modified or middle click opens `to` in a new tab
+  without also running it, and an option without `onClick` now navigates to `to` instead of
+  doing nothing. An option whose `to` is empty is a button instead (`role="button"`, no `href`).
 - **`EmptyScreenContainer` has a heading and announces itself.** `headerText` renders as an
   `<h3>` (a new `headingLevel` prop picks another level), the subheading as a `<p>` and the
   description as a block, inside a `role="status"` wrapper that takes no layout space. The
