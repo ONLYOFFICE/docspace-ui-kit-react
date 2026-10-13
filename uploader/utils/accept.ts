@@ -5,7 +5,8 @@
  * `"*"` and even `"*\/*"` refuse every file, and only an empty value lets any
  * type through. So a list that names `*` or `*\/*` anywhere, an empty string
  * and a missing value all become `""` -- any file. Anything else (".pdf,.docx",
- * "image/*") is passed on as it is.
+ * "image/*") is passed on trimmed and without blank entries: a blank entry
+ * (".pdf,") matches every file that has no MIME type and lets it through.
  */
 export const normalizeAccept = (accept?: string): string => {
   if (!accept) return "";
@@ -18,5 +19,5 @@ export const normalizeAccept = (accept?: string): string => {
   if (!entries.length) return "";
   if (entries.some((entry) => entry === "*" || entry === "*/*")) return "";
 
-  return accept;
+  return entries.join(",");
 };
