@@ -137,4 +137,20 @@ describe("<MainButtonMobile />", () => {
     expect(screen.queryByRole("button", { name: "Alert" })).toBeNull();
     expect(screen.getByRole("img", { name: "Alert" })).toBeInTheDocument();
   });
+
+  // The name comes from the portal's Common:Alert, through the kit's own
+  // lookup rather than an I18nextProvider.
+  it("names the alert badge from the loaded Common translations", () => {
+    const w = window as unknown as {
+      i18n?: { loaded: Record<string, { data: Record<string, string> }> };
+    };
+    w.i18n = { loaded: { "en/Common.json": { data: { Alert: "Warnung" } } } };
+    document.cookie = "asc_language=en";
+    try {
+      render(<MainButtonMobile alert />);
+      expect(screen.getByRole("img", { name: "Warnung" })).toBeInTheDocument();
+    } finally {
+      w.i18n = undefined;
+    }
+  });
 });
