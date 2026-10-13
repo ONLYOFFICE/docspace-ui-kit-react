@@ -47,8 +47,10 @@ export interface ContextMenuButtonProps {
   /**
    * Called when the button opens the menu in `dropdown` mode (not when it
    * closes it), and instead of opening anything in `toggle` mode, where it is
-   * how you render a menu of your own. Opened with Enter or Space, it receives
-   * the keyboard event.
+   * how you render a menu of your own. Opened from the keyboard, it receives
+   * a click event positioned at the button's bottom-left corner, with the
+   * button as `target` and `currentTarget`, so `ContextMenu.show(e)` places
+   * the menu under the button.
    */
   onClick?: (e: React.MouseEvent) => void;
   /** Preferred horizontal side of the menu.

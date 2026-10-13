@@ -241,9 +241,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   the two pair up (a caller that locks scrolling in `onClick` and unlocks it in `onClose` is no
   longer left locked). Every prop now reaches the component (the memo compared only four). Without `getData` the
   button shows `data` instead of throwing, and `onMouseOver` / `onMouseOut` fire on mouseover and
-  mouseout rather than mousedown and mouseup. In `toggle` mode Enter and Space hand `onClick` a
-  click event at the button's bottom-left corner, so `ContextMenu.show(e)` places the menu there
-  instead of at NaN.
+  mouseout rather than mousedown and mouseup. Opened from the keyboard, in either mode, `onClick`
+  gets a click event at the button's bottom-left corner, with the button as `target` and
+  `currentTarget`, so `ContextMenu.show(e)` places the menu there instead of at NaN and a
+  handler typed for a mouse event never receives a keyboard one.
 - **`ProgressBar` announces what it shows.** `percent` is clamped to 0..100 at both ends (a
   non-number counts as 0); `isInfiniteProgress` leaves `aria-valuenow` out and sets `aria-busy`,
   so the bar is no longer announced as "0 %"; the status line sits in an always-mounted polite

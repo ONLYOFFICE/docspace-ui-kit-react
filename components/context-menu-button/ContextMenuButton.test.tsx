@@ -91,6 +91,36 @@ describe("<ContextMenuButton />", () => {
     expect(button).toHaveAttribute("aria-expanded", "false");
   });
 
+  // onClick is typed for a mouse event, and callers hand it to
+  // ContextMenu.show(e), which reads the position.
+  it.each([
+    ["dropdown", ContextMenuButtonDisplayType.dropdown],
+    ["toggle", ContextMenuButtonDisplayType.toggle],
+  ])(
+    "hands onClick a positioned click at the button from the keyboard in %s mode",
+    (_mode, displayType) => {
+      const onClick = vi.fn();
+      render(
+        <ContextMenuButton
+          {...baseProps}
+          displayType={displayType}
+          onClick={onClick}
+        />,
+      );
+      const button = screen.getByRole("button", { name: "Actions" });
+
+      fireEvent.keyDown(button, { key: "Enter" });
+
+      expect(onClick).toHaveBeenCalledTimes(1);
+      const [event] = onClick.mock.calls[0];
+      expect(event).toBeInstanceOf(MouseEvent);
+      expect(event.type).toBe("click");
+      expect(event.currentTarget).toBe(button);
+      expect(event.target).toBe(button);
+      expect(typeof event.pageX).toBe("number");
+    },
+  );
+
   // A caller pairs onClick (opened) with onClose (closed), e.g. to lock and
   // unlock a panel's scroll; every way of closing has to report it.
   it.each([
