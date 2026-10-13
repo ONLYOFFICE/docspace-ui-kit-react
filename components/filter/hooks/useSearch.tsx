@@ -6,6 +6,10 @@ import { SearchInput } from "../../search-input";
 
 import { SearchInputProps } from "../Filter.types";
 
+// How many unreported queries are remembered. A host that never reports its
+// value back would otherwise grow the list for as long as the user types.
+const MAX_PENDING_QUERIES = 20;
+
 const useSearch = ({
   onSearch,
   onClearFilter,
@@ -31,13 +35,16 @@ const useSearch = ({
   // edit the user has made since.
   const lastAppliedRef = React.useRef<string | undefined>(undefined);
   // Every query sent to `onSearch` that the host has not reported back yet, in
-  // order. When the host reports an older one of them, that is a stale echo of
-  // a query the user has already replaced, and it is not pushed into the field.
+  // order, oldest first and capped at MAX_PENDING_QUERIES. When the host
+  // reports one of them other than the newest, that is a stale echo of a
+  // query the user has already replaced, and it is not pushed into the field.
   const sentRef = React.useRef<string[]>([]);
 
   const send = React.useCallback(
     (value: string) => {
       sentRef.current.push(value);
+      if (sentRef.current.length > MAX_PENDING_QUERIES)
+        sentRef.current = sentRef.current.slice(-MAX_PENDING_QUERIES);
       // Keep the field's value in step with what the user typed, so that a
       // later push of a host value is a real change and not a stale one.
       setInputValue(value);
@@ -78,14 +85,18 @@ const useSearch = ({
     if (value === lastAppliedRef.current) return;
     lastAppliedRef.current = value;
 
+    // Echoes arrive in the order the queries were sent, so match the oldest
+    // pending one: with "a", "ab", "a" sent, the first "a" reported is the
+    // first query, and the "ab" that follows it is still stale.
     const sent = sentRef.current;
-    const sentIndex = sent.lastIndexOf(value);
+    const sentIndex = sent.indexOf(value);
     if (sentIndex !== -1 && sentIndex < sent.length - 1) {
       // The host applied a query the user has since replaced: drop it and
       // everything sent before it, and leave the field as the user left it.
       sentRef.current = sent.slice(sentIndex + 1);
       return;
     }
+    // The newest query reported back, or a value of the host's own.
     sentRef.current = [];
 
     if (value && searchRef.current) {
