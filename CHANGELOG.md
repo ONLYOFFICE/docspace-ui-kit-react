@@ -244,7 +244,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   mouseout rather than mousedown and mouseup. Opened from the keyboard, in either mode, `onClick`
   gets a click event at the button's bottom-left corner, with the button as `target` and
   `currentTarget`, so `ContextMenu.show(e)` places the menu there instead of at NaN and a
-  handler typed for a mouse event never receives a keyboard one.
+  handler typed for a mouse event never receives a keyboard one. It is never dispatched, but it
+  carries `isDefaultPrevented()`, `isPropagationStopped()` and `persist()`, so a handler written
+  for React's event can call them. A handler that told a key from a click by `e.key` or `e.type`
+  no longer can.
 - **`ProgressBar` announces what it shows.** `percent` is clamped to 0..100 at both ends (a
   non-number counts as 0); `isInfiniteProgress` leaves `aria-valuenow` out and sets `aria-busy`,
   so the bar is no longer announced as "0 %"; the status line sits in an always-mounted polite
@@ -439,7 +442,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`Loader`, `SnackBar`, `ColumnarInfoBar` and a `live` `PublicRoomBar` are announced when they
   appear.** Each was a status region inserted together with its text, which screen readers mostly
   do not read; the announcing region now mounts empty and receives its text 100 ms later, while
-  what is drawn appears at once.
+  what is drawn appears at once. `SnackBar`, `ColumnarInfoBar` and `PublicRoomBar` read that text
+  from what they draw, and read it again whenever it changes, a part that updates on its own
+  included.
 - **`LinkWithDropdown`'s keys skip separators and headers**, and a caller's `onKeyDown` or
   `tabIndex` no longer switches the keyboard support off: unknown props go first, and a caller's
   `onKeyDown` runs before the built-in keys and can opt out with `preventDefault()`.
