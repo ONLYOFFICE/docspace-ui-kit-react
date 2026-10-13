@@ -259,8 +259,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `btnText` action and the campaign banner's cross are buttons too. The bar is `role="status"`
   with `aria-live="polite"`; its `countDownTime` counter is hidden from it, so the ticks are not
   announced.
-- **`SnackBar.show`/`SnackBar.close` manage one React root.** Repeated `show` calls re-render the
-  same root instead of stacking new ones and new `#snackbar` divs; `close()` unmounts it with or
+- **`SnackBar.show`/`SnackBar.close` manage one React root.** Repeated `show` calls mount a fresh
+  bar in the same root (its `onLoad` runs each time) instead of stacking new roots and new
+  `#snackbar` divs, and a `show` right after `close`, even inside a commit, takes that root back; `close()` unmounts it with or
   without `parentElementId` and removes the `#snackbar` node `show` created. The bar's DOM id is
   now the `id` prop (default `snackbar-container`), and `isMaintenance`, `onClose` and `skipBlur`
   no longer leak onto the DOM.

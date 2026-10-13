@@ -239,6 +239,18 @@ describe("SnackBar", () => {
       expect(window.snackbar).toBeUndefined();
     });
 
+    it("mounts a fresh bar on every show, so each one's onLoad runs", () => {
+      const onLoad = vi.fn();
+      act(() =>
+        SnackBar.show({ ...defaultProps, onLoad, parentElementId: "" }),
+      );
+      act(() =>
+        SnackBar.show({ ...defaultProps, onLoad, parentElementId: "" }),
+      );
+      expect(onLoad).toHaveBeenCalledTimes(2);
+      expect(screen.getAllByTestId("snackbar-container")).toHaveLength(1);
+    });
+
     it("unmounts the bar from a given parent and leaves the parent", async () => {
       const parent = document.createElement("div");
       parent.id = "main-bar";
@@ -314,6 +326,41 @@ describe("SnackBar", () => {
       expect(screen.getByTestId("snackbar-message")).toHaveTextContent(
         "Second",
       );
+      expect(error).not.toHaveBeenCalled();
+    });
+
+    // The countdown's onComplete closes the bar while React commits, and a
+    // caller may show the next one right there.
+    it("shows the next bar from inside a commit without a synchronous unmount", async () => {
+      const parent = document.createElement("div");
+      parent.id = "main-bar";
+      document.body.appendChild(parent);
+      const error = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      act(() =>
+        SnackBar.show({ ...defaultProps, parentElementId: "main-bar" }),
+      );
+
+      const Replacer = () => {
+        useLayoutEffect(() => {
+          SnackBar.close();
+          SnackBar.show({
+            ...defaultProps,
+            text: "Next",
+            parentElementId: "main-bar",
+          });
+        }, []);
+        return null;
+      };
+
+      await act(async () => {
+        render(<Replacer />);
+      });
+
+      expect(
+        parent.querySelectorAll('[data-testid="snackbar-container"]'),
+      ).toHaveLength(1);
+      expect(screen.getByTestId("snackbar-message")).toHaveTextContent("Next");
       expect(error).not.toHaveBeenCalled();
     });
   });

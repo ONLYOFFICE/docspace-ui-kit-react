@@ -230,16 +230,18 @@ stores the config on `window.snackbar`. It is how the portal shows a bar from ou
 
 Prefer rendering `<SnackBar/>` yourself. If you do call it:
 
-- there is **one** static bar at a time. A second `show` into the same place re-renders the bar
-  in the root it already has; a `show` into a different place closes the first bar before it
+- there is **one** static bar at a time. A second `show` into the same place mounts a fresh bar
+  in the root it already has, so its `onLoad` runs and its `skipBlur` applies; a `show` into a
+  different place closes the first bar before it
   mounts the new one. Without `parentElementId` the same `<div id="snackbar">` is reused, so the
   document never holds two of them;
 - `SnackBar.close()` unmounts that root, with or without `parentElementId`. The element named by
   `parentElementId` is left in place, empty; the `<div id="snackbar">` that `show` appended is
   removed. `window.snackbar` is cleared at once, but the unmount and the removal wait for a
   microtask, because `close` is often called while React is committing — from the countdown's
-  `onAction` — where a synchronous unmount is refused. A `show` called before that microtask runs
-  finishes the unmount first and mounts the new bar in a fresh root;
+  `onAction` — where a synchronous unmount is refused. A `show` into the same place called before
+  that microtask runs takes the root back instead, so `close()` then `show()` works from inside a
+  commit too;
 - `close()` only knows about the bar `show` mounted. A `<SnackBar/>` you rendered yourself is
   yours to remove.
 

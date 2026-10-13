@@ -36,12 +36,23 @@ let staticRoot: Root | null = null;
 let staticNode: HTMLElement | null = null;
 let ownsStaticNode = false;
 
-// The unmount a `close` has scheduled and not yet run. `close` can be called
-// while React is committing -- the countdown's onComplete is -- where a
-// synchronous root.unmount() is refused with an error, so it waits for a
-// microtask. A `show` that comes first runs it at once instead, so the new
-// bar never lands in a root that is about to go.
-let pendingUnmount: (() => void) | null = null;
+// The roots `close` has scheduled to unmount and not yet unmounted. `close`
+// can be called while React is committing -- the countdown's onComplete is
+// -- where a synchronous root.unmount() is refused with an error, so it waits
+// for a microtask. A `show` for the same place that comes first takes the
+// root back instead of unmounting it, which would be the same synchronous
+// unmount `close` avoided; a pending root anywhere else goes on its own.
+type TPendingRoot = {
+  root: Root;
+  node: HTMLElement | null;
+  owns: boolean;
+  cancelled: boolean;
+};
+let pendingRoots: TPendingRoot[] = [];
+
+// Counts the bars `show` has rendered, as their key: each one is a bar of
+// its own, mounted afresh, so its onLoad runs and its props take effect.
+let showCount = 0;
 
 /**
  * The bar's announcement: a visually hidden polite live region beside the
@@ -100,16 +111,25 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
   static show(barConfig: BarConfig) {
     const { parentElementId, ...rest } = barConfig;
 
-    pendingUnmount?.();
-
     const target = parentElementId
       ? document.getElementById(parentElementId)
       : null;
 
     // A bar already shown somewhere else is closed first; one shown in the
-    // same place is re-rendered in its existing root.
+    // same place is rendered in its existing root.
     if (staticRoot && (target ? staticNode !== target : !ownsStaticNode)) {
       SnackBar.close();
+    }
+
+    const pending = staticRoot
+      ? undefined
+      : pendingRoots.find((p) => (target ? p.node === target : p.owns));
+    if (pending) {
+      pending.cancelled = true;
+      pendingRoots = pendingRoots.filter((p) => p !== pending);
+      staticRoot = pending.root;
+      staticNode = pending.node;
+      ownsStaticNode = pending.owns;
     }
 
     if (!staticRoot) {
@@ -130,12 +150,14 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
 
     window.snackbar = barConfig;
 
-    staticRoot.render(<SnackBar {...rest} />);
+    showCount += 1;
+    staticRoot.render(<SnackBar key={showCount} {...rest} />);
   }
 
   static close() {
     const root = staticRoot;
-    const node = ownsStaticNode ? staticNode : null;
+    const node = staticNode;
+    const owns = ownsStaticNode;
 
     staticRoot = null;
     staticNode = null;
@@ -143,21 +165,19 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
     window.snackbar = undefined;
 
     if (!root) {
-      node?.remove();
+      if (owns) node?.remove();
       return;
     }
 
-    let done = false;
-    const unmount = () => {
-      if (done) return;
-      done = true;
-      if (pendingUnmount === unmount) pendingUnmount = null;
-      root.unmount();
-      node?.remove();
-    };
+    const pending: TPendingRoot = { root, node, owns, cancelled: false };
+    pendingRoots.push(pending);
 
-    pendingUnmount = unmount;
-    queueMicrotask(unmount);
+    queueMicrotask(() => {
+      if (pending.cancelled) return;
+      pendingRoots = pendingRoots.filter((p) => p !== pending);
+      root.unmount();
+      if (owns) node?.remove();
+    });
   }
 
   // What the announcement reads: the header line and the message.
