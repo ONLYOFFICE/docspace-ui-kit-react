@@ -215,16 +215,17 @@ export function InviteMenu({ onInvite }: { onInvite: (role: string) => void }) {
 
 Set them on any ancestor. Each has a theme value behind it; these are the overrides.
 
-| Variable                         | Default                | Effect                     |
-| -------------------------------- | ---------------------- | -------------------------- |
-| `--main-button-bg`               | accent, else `#4781D1` | Background of the button.  |
-| `--main-button-color`            | white                  | Colour of the text.        |
-| `--main-button-icon-color`       | white                  | Fill of the arrow.         |
-| `--main-button-radius`           | `3px`                  | Corner radius.             |
-| `--main-button-inner-padding`    | `5px 14px 5px 12px`    | Padding inside the button. |
-| `--main-button-text-size`        | `16px`                 | Font size of the label.    |
-| `--main-button-text-weight`      | `700`                  | Font weight of the label.  |
-| `--main-button-text-line-height` | `22px`                 | Line height of the label.  |
+| Variable                         | Default                | Effect                             |
+| -------------------------------- | ---------------------- | ---------------------------------- |
+| `--main-button-bg`               | accent, else `#4781D1` | Background of the button.          |
+| `--main-button-color`            | white                  | Colour of the text.                |
+| `--main-button-icon-color`       | white                  | Fill of the arrow.                 |
+| `--main-button-radius`           | `3px`                  | Corner radius.                     |
+| `--main-button-inner-padding`    | `5px 14px 5px 12px`    | Padding inside the button.         |
+| `--main-button-text-size`        | `16px`                 | Font size of the label.            |
+| `--main-button-text-weight`      | `700`                  | Font weight of the label.          |
+| `--main-button-text-line-height` | `22px`                 | Line height of the label.          |
+| `--main-button-focus-color`      | accent, else `#4781D1` | Colour of the keyboard focus ring. |
 
 The background falls back to the kit's blue when the theme carries no colour scheme, so unlike
 [`FloatingButton`](../floating-button/README.md) this one is never invisible.
@@ -233,7 +234,8 @@ The background falls back to the kit's blue when the theme carries no colour sch
 
 - **The button is a native `<button>`**, named by `text`. It is in the tab order, and Enter or
   Space activates it: in dropdown mode they open the menu, otherwise they call `onAction`.
-  A `:focus-visible` outline in the button's background colour shows keyboard focus.
+  A `:focus-visible` outline in the accent colour (`--main-button-focus-color`) shows keyboard focus,
+  independent of the background, so it stays visible where a host makes that transparent.
 - In dropdown mode the button carries `aria-haspopup="menu"`, `aria-expanded` that follows the
   menu, and, while the menu is open, `aria-controls` pointing at it. With `isDropdown={false}`
   none of the three is set.

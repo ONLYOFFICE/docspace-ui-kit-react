@@ -114,8 +114,18 @@
   -webkit-border-radius: var(--main-button-radius-value);
   line-height: var(--main-button-line-height-value);
 
+  // The ring has a colour of its own, the accent, not the button's
+  // background: a host that makes the background transparent (SearchInput)
+  // would otherwise make the ring invisible.
   &:focus-visible {
-    outline: 2px solid var(--main-button-bg-value);
+    outline: 2px solid
+      var(
+        --main-button-focus-color,
+        var(
+          --accent-main,
+          var(--color-scheme-main-accent, #{colors.$light-blue-main})
+        )
+      );
     outline-offset: 2px;
   }
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MainButton } from ".";
 
 vi.mock("react-svg", () => ({
@@ -150,6 +150,44 @@ describe("<MainButton />", () => {
     fireEvent.keyUp(button, { key: "Enter", code: "Enter" });
     expect(onKeyUp).not.toHaveBeenCalled();
     window.removeEventListener("keyup", onKeyUp);
+  });
+
+  it("leaves Enter inside the open menu to the element it was pressed on", async () => {
+    // jsdom refuses the `view` the button gives the event that opens the menu.
+    const NativeMouseEvent = window.MouseEvent;
+    vi.stubGlobal(
+      "MouseEvent",
+      class extends NativeMouseEvent {
+        constructor(type: string, init?: MouseEventInit) {
+          super(type, { ...init, view: null });
+        }
+      },
+    );
+    const model = [{ key: "item1", label: "Item 1" }];
+    render(<MainButton {...defaultProps} model={model} />);
+    const button = screen.getByRole("button", { name: "Test Button" });
+    fireEvent.click(button);
+    vi.unstubAllGlobals();
+    await waitFor(() =>
+      expect(button).toHaveAttribute("aria-expanded", "true"),
+    );
+
+    // On the button itself, Enter belongs to the open menu.
+    expect(fireEvent.keyDown(button, { key: "Enter", code: "Enter" })).toBe(
+      false,
+    );
+
+    // Read before the menu's own hotkeys on `window` see the key: what the
+    // button's handler did to it is all that is observed.
+    let preventedBeforeWindow: boolean | undefined;
+    const onDocumentKeyDown = (e: KeyboardEvent) => {
+      preventedBeforeWindow = e.defaultPrevented;
+    };
+    document.addEventListener("keydown", onDocumentKeyDown);
+    const item = await screen.findByText("Item 1");
+    fireEvent.keyDown(item, { key: "Enter", code: "Enter" });
+    document.removeEventListener("keydown", onDocumentKeyDown);
+    expect(preventedBeforeWindow).toBe(false);
   });
 
   it("does not pass `opened` to the DOM", () => {

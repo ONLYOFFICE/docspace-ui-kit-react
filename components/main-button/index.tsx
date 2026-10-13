@@ -94,15 +94,20 @@ const MainButton = (props: MainButtonProps) => {
   // it has just opened and pick its first item: that `keyup` is kept to the
   // button. While the menu is open, Enter belongs to the menu (it picks the
   // highlighted item), so the button does not click again.
+  // The menu is a React child of the button, portalled or not, so keys
+  // pressed inside it bubble here too: only the button's own are handled, or
+  // an Enter on a link in the menu would lose its native activation.
   const enterOpensMenu = useRef(false);
 
   const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.target !== e.currentTarget) return;
     if (e.key !== "Enter" || !isDropdown) return;
     if (isOpen) e.preventDefault();
     else enterOpensMenu.current = true;
   };
 
   const onKeyUp = (e: React.KeyboardEvent) => {
+    if (e.target !== e.currentTarget) return;
     if (e.key !== "Enter" || !enterOpensMenu.current) return;
     enterOpensMenu.current = false;
     e.stopPropagation();
