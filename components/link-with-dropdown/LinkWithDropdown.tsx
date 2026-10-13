@@ -68,16 +68,27 @@ const LinkWithDropdown = ({
   // Set when the list was opened by an arrow key: which item takes focus.
   const focusOnOpen = useRef<"first" | "last" | null>(null);
 
+  // Only the entries a user can choose: separators (role="separator") and
+  // headers render as rows too, and focusing one shows nothing chosen while
+  // Enter on it closes the menu.
   const getItems = () =>
     Array.from(
       document
         .getElementById(menuId)
         ?.querySelectorAll<HTMLElement>(
-          ".drop-down-item:not([aria-disabled='true'])",
+          ".drop-down-item:not([role='separator']):not(.drop-down-item_header):not([aria-disabled='true'])",
         ) ?? [],
     );
 
+  // The props type declares no handlers, but untyped callers spread them in.
+  const { onKeyDown: callerOnKeyDown } = rest as typeof rest &
+    Pick<React.HTMLAttributes<HTMLAnchorElement>, "onKeyDown">;
+
   const onKeyDown = (e: React.KeyboardEvent<HTMLAnchorElement>) => {
+    // A caller's onKeyDown runs first and can opt out of the built-in keys
+    // with preventDefault().
+    callerOnKeyDown?.(e);
+    if (e.defaultPrevented) return;
     if (isDisabled) return;
 
     if (e.key === "Enter" || e.key === " ") {
@@ -236,7 +247,9 @@ const LinkWithDropdown = ({
       <DropDownItem
         key={key}
         {...restProp}
-        className={classNames(styles.dropDownItem, "drop-down-item")}
+        className={classNames(styles.dropDownItem, "drop-down-item", {
+          "drop-down-item_header": "isHeader" in item && item.isHeader,
+        })}
         id={`${item.key}`}
         onClick={onClickDropDownItem}
         testId={`link_with_drop_down_${item.key}`}
@@ -288,6 +301,9 @@ const LinkWithDropdown = ({
             },
             className,
           )}
+          // Unknown props first, so they cannot replace the keyboard wiring
+          // below; a caller's onKeyDown is composed into ours instead.
+          {...rest}
           style={{ color }}
           ref={triggerRef}
           role="button"
@@ -297,7 +313,6 @@ const LinkWithDropdown = ({
           aria-expanded={state.isOpen}
           aria-controls={state.isOpen ? menuId : undefined}
           aria-disabled={isDisabled}
-          {...rest}
         >
           {withExpander ? (
             <div
