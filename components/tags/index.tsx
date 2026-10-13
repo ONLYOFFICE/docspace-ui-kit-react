@@ -11,7 +11,7 @@ import styles from "./Tags.module.scss";
 import { TagsDropdown } from "./Tags.dropdown";
 import { createTag } from "./Tags.constants";
 import { calculateRenderedTags, isTagType } from "./Tags.utils";
-import type { TagsProps } from "./Tags.types";
+import type { TagsProps, TOptionTagKind } from "./Tags.types";
 
 /**
  * Makes every tag in the row a keyboard-operable button. `Tag` renders a
@@ -94,9 +94,10 @@ const Tags: FC<TagsProps> = ({
 
   useUnmount(() => callBackRef.current?.());
 
-  const handleOptionTagClick = useCallback(() => {
-    onOptionTagClick?.();
-  }, [onOptionTagClick]);
+  const handleOptionTagClick = useCallback(
+    (kind: TOptionTagKind) => onOptionTagClick?.(kind),
+    [onOptionTagClick],
+  );
 
   // A tag that carries its own `onClick` reports through it rather than
   // through `onSelectTag`, in the row and in the overflow drop-down alike.
@@ -185,7 +186,8 @@ const Tags: FC<TagsProps> = ({
         const props = tag.isOptionTag
           ? {
               ref: takesOptionRef ? optionTagRef : undefined,
-              onClick: handleOptionTagClick,
+              onClick: () =>
+                handleOptionTagClick(isCreateTag ? "create" : "overflow"),
             }
           : {
               onClick: tag.onClick ? () => tag.onClick?.() : onSelectTag,

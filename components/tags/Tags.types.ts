@@ -1,6 +1,9 @@
 import type { RefObject } from "react";
 import type { TagClickEvent, TagProps, TagType } from "../tag/Tag.types";
 
+/** Which tag `onOptionTagClick` was called for: the overflow tag that stands for the hidden tags, or the plus tag drawn by `showCreateTag`. */
+export type TOptionTagKind = "overflow" | "create";
+
 export type TagsProps = {
   /** Applied to the outermost element. */
   id?: string;
@@ -20,8 +23,8 @@ export type TagsProps = {
   onMouseLeave?: VoidFunction;
   /** Ref to the overflow tag, for a menu of your own anchored to it. When there is no overflow tag it points at the create tag. */
   optionTagRef?: RefObject<HTMLDivElement | null>;
-  /** Called when the overflow tag or the create tag is clicked. Passing it replaces the built-in drop-down. */
-  onOptionTagClick?: VoidFunction;
+  /** Called when the overflow tag or the create tag is clicked, with `"overflow"` or `"create"` to say which. Passing it replaces the built-in drop-down. */
+  onOptionTagClick?: (kind: TOptionTagKind) => void;
   /** Whether a plus tag is drawn for creating a new one. It comes after the overflow tag when the tags overflow. */
   showCreateTag?: boolean;
   /** Passed to the overflow drop-down, where it removes the leading margin of each entry. */

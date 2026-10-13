@@ -249,6 +249,28 @@ describe("<Tags />", () => {
     expect(onOptionTagClickMock).toHaveBeenCalledTimes(1);
   });
 
+  it("tells onOptionTagClick whether the overflow or the create tag was clicked", () => {
+    const onOptionTagClick = vi.fn();
+
+    render(
+      <Tags
+        {...baseProps}
+        tags={["tag1", "tag2", "tag3"]}
+        columnCount={2}
+        showCreateTag
+        createTagLabel="Add tag"
+        onOptionTagClick={onOptionTagClick}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("+1"));
+    expect(onOptionTagClick).toHaveBeenLastCalledWith("overflow");
+
+    fireEvent.click(screen.getByTestId("tag_item_create"));
+    expect(onOptionTagClick).toHaveBeenLastCalledWith("create");
+    expect(onOptionTagClick).toHaveBeenCalledTimes(2);
+  });
+
   it("names the row through ariaLabel and gives it a group role", () => {
     render(<Tags {...baseProps} ariaLabel="Room tags" />);
     const row = screen.getByRole("group", { name: "Room tags" });
