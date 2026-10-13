@@ -93,7 +93,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`EmptyScreenContainer` is no live region, and `ec-header` is one class.** An empty state is
   read like the rest of the page instead of being announced on every route load. The header's
   19px size and 700 weight are set through `Text`'s variables by a single class, so a rule of
-  your own of two classes or more on `ec-header` wins by specificity, not by stylesheet order.
+  your own of two classes or more on `ec-header` wins by specificity, not by stylesheet order. It
+  used to be an inline size that no stylesheet rule could beat: the portal's template gallery
+  error view (`.errorView .ec-header`) now gets its own 23px (21px on mobile).
 - **`SnackBar` announces through a hidden region, and `SnackBar.close()` unmounts a microtask
   later.** The visible bar is no longer `role="status"`; a visually hidden region beside it
   (`data-testid="snackbar-announcement"`) carries the header and text. `close()` clears the
@@ -104,11 +106,21 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `onClick` itself, so a `preventDefault()` there cancels the navigation again; the click is
   still reported once.
 - **`Dropzone`'s format line sits beside the drop area, not inside it.** The drop area
-  (`dropzone-input-area`) still covers the whole box, but a file dropped onto the format line
-  itself is ignored; a selector that expected `dropzone-file-types` inside the area must look
+  (`dropzone-input-area`) still covers the whole box, and clicks and drops on a plain format line
+  reach it as before; with `fullExstsText` the line takes its own clicks, but a drop on it still
+  reaches the area. A selector that expected `dropzone-file-types` inside the area must look
   beside it.
 - **`MainButton` draws its focus ring in the accent**, through the new
   `--main-button-focus-color`, instead of in its background colour.
+- **`PublicRoomBar` is announced only with the new `live` prop.** Its header and body are drawn
+  at once and no longer sit in a `role="status"` region; with `live` a visually hidden status
+  region beside them (`data-testid="public_room_bar_announcement"`) takes their text 100 ms
+  after mount. Set it on a bar that appears in response to something; a bar that is part of a
+  panel or dialog from the start is read with it.
+- **`ColumnarInfoBar` announces through a hidden region.** The default and `neutral` bars' heading
+  and columns are drawn at once and are no `role="status"` region any more; a visually hidden one
+  beside them carries their text. A test that looked for the content inside `role="status"`
+  must look for its text there instead.
 - **Busy rows and tiles carry `aria-busy`.** `Row` and the base, file and folder tiles set it
   while `inProgress`, since their loader is decorative.
 
@@ -309,15 +321,13 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   sources, now pass `labelFor` with a matching control `id`, so the Email caption is the
   field's accessible name.
 - **`ColumnarInfoBar`'s pairs are a description list.** Labels and values render as `<dt>` and
-  `<dd>` inside a `<dl>`, so a screen reader ties each value to its label; the default and
-  `neutral` bars carry `role="status"` on their content, the close button outside it. The layout is unchanged.
+  `<dd>` inside a `<dl>`, so a screen reader ties each value to its label. The layout is unchanged.
 - **`ColumnarInfoBar variant="neutral"` no longer cuts off long content.** The reveal animation
   kept its 150px height cap forever; the cap now lifts when the animation ends.
 - **`PublicRoomBar`'s close cross is a real button.** It was an `IconButton` `div` with no role,
   focus or name; it is now a native `<button type="button">` named by a new `closeLabel` prop
   (default `"Close"`), reachable with Tab and pressed with Enter or Space. It keeps
-  `data-testid="icon-button"`, and `--public-room-bar-close-icon` now paints it. The header and
-  body sit in a `role="status"` region.
+  `data-testid="icon-button"`, and `--public-room-bar-close-icon` now paints it.
 - **`CircleSkeleton` server-renders without a hydration mismatch.** It takes a `uniqueKey` prop
   and falls back to `useId()`, as `RectangleSkeleton` does.
 - **`CircleSkeleton`'s default circle is whole, and an untitled one is hidden.** The default `x`
@@ -415,32 +425,34 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **The errors story helper is no longer published.** `dist/types/errors/stories.utils`, a
   Storybook-only i18n stand-in, was reachable as `./errors/stories.utils`; the declaration build
   now excludes it.
-- **`AIAgentSelector` keeps the `initItems` it is given.** With `withInit` the selector still fetched the first page from the portal on mount and replaced the pre-loaded list with the answer. The first page is no longer requested while `excludeItems`, `disableBySecurity` and the translation are what `initItems` were shown with; once one of them changes it is fetched as usual. A search, clearing one, and further pages (`initHasNextPage`) are fetched as before.
+- **`AIAgentSelector` keeps the `initItems` it is given.** With `withInit` the selector still fetched the first page from the portal on mount and replaced the pre-loaded list with the answer. The first page is no longer requested while `excludeItems` and `disableBySecurity` are what `initItems` were shown with; once one of them changes it is fetched as usual. A change of language alone, as hydration makes on a page served in English, keeps the items. A search, clearing one, and further pages (`initHasNextPage`) are fetched as before.
 - **The system MCP server's label no longer repeats the brand.** `MCPServersSelector` labelled the portal's own server `OrganizationName ProductName`, which read "ONLYOFFICE ONLYOFFICE" where the product name is ONLYOFFICE. The organisation is now prefixed only when the product name does not already contain it: "ONLYOFFICE DocSpace" is unchanged, "ONLYOFFICE" and "ONLYOFFICE Apps" are shown as they are.
 - **`PeopleSelector`'s Groups tab lists groups when there is no `roomId`.** It used to run the people search and showed every user, guests included. It now loads the portal's groups (`groupApi.getGroups`); with a `roomId` the room's sharing query is used as before.
 - **`FilesSelector` calls `headerProps.onCloseClick`.** The header's close cross always called `onCancel`, ignoring the handler passed in `headerProps`. The caller's `onCloseClick` now runs, with `onCancel` as the fallback when it is absent; the footer's Cancel button still calls `onCancel`. A consumer that passed a no-op `onCloseClick` and relied on the cross cancelling should pass `onCancel` there.
 - **`Uploader` accepts any file with `accept="*"`.** `accept` went to react-dropzone unchanged, where `"*"` and `"*/*"` refuse every file - including in the README's own examples. `"*"`, `"*/*"`, `""` and a missing `accept` now all mean any file, and `accept` is optional in `UploaderProps`. A list is passed on trimmed and without blank entries: `".pdf,"` used to let every file with no MIME type through.
 - **The legal sample's relative dates are in English.** "updated yesterday" and "Sent 5 days ago" followed the browser's locale inside an otherwise English page; they are now formatted in English.
-- **`Loader`, `ColumnarInfoBar` and `PublicRoomBar` are announced when they appear.** Each was a
-  status region inserted together with its text, which screen readers mostly do not read; the
-  region now mounts empty and receives its text one render later.
+- **`Loader`, `SnackBar`, `ColumnarInfoBar` and a `live` `PublicRoomBar` are announced when they
+  appear.** Each was a status region inserted together with its text, which screen readers mostly
+  do not read; the announcing region now mounts empty and receives its text 100 ms later, while
+  what is drawn appears at once.
 - **`LinkWithDropdown`'s keys skip separators and headers**, and a caller's `onKeyDown` or
   `tabIndex` no longer switches the keyboard support off: unknown props go first, and a caller's
   `onKeyDown` runs before the built-in keys and can opt out with `preventDefault()`.
 - **An open `DropDown` closes on an outside click that re-renders its owner.** The listener
   ignored that click as the one that opened the menu whenever `clickOutsideAction` changed
   identity, which `ContextMenuButton` and `LinkWithDropdown` do on every render.
-- **`ComboBox` leaves its optional block's keys alone**, as its click handler does, and lets the
-  arrows scroll an `advancedOptions` panel instead of cancelling them.
+- **`ComboBox` leaves its optional block's keys alone**, as its click handler does -- its own
+  block only, so a combo box placed in another's block keeps its keys -- and lets the arrows
+  scroll an `advancedOptions` panel instead of cancelling them, still keeping them from the
+  page's hotkeys.
 - **The segmented `Tabs` arrows start from the focused tab**, after a click on the tab already
   selected too, and a shorter item list no longer leaves the bar without a Tab stop.
-- **`Filter`'s search ignores every stale echo.** With "a", "ab", "a" sent and echoed slowly, the
-  stale "ab" was pushed into the field; echoes are now matched oldest first.
+- **`Filter`'s search remembers at most 20 unreported queries**, so a host that never reports
+  its value back does not grow the list without end.
 - **`SearchInput` takes a value set after its cross was used**, even one equal to the last value
   it reported.
-- **A key a component handles no longer hides its `keyup` from React.** The `keyup` is stopped at
-  `<html>`, so the element under focus and `onKeyUp` handlers still receive it, while page and
-  dialog listeners on `document` and `window` do not.
+- **`MainButton` leaves the keys of its menu alone.** Its Enter handling also caught keys
+  bubbling from the open menu, so Enter on a link in it lost its native activation.
 - **`StatusMessage` no longer sticks mid-fade** after its effects are replayed (StrictMode, a
   re-shown `Activity`).
 - **`toastr` shows nothing instead of throwing** for an object with no prototype.
