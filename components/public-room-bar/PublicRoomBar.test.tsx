@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { renderToStaticMarkup } from "react-dom/server";
 
 import PublicRoomBar from "./index";
 
@@ -52,6 +53,19 @@ describe("PublicRoomBar", () => {
     expect(status).toHaveTextContent("Test Header");
     expect(status).toHaveTextContent("Test Body");
     expect(status).not.toContainElement(screen.getByRole("button"));
+  });
+
+  // The first render is all the server renders: the region is in it, empty,
+  // so the text arrives as a change to a region already on the page.
+  it("mounts the status region empty and fills it after mount", () => {
+    const host = document.createElement("div");
+    host.innerHTML = renderToStaticMarkup(<PublicRoomBar {...defaultProps} />);
+    const region = host.querySelector('[role="status"]');
+    expect(region).not.toBeNull();
+    expect(region).toBeEmptyDOMElement();
+
+    render(<PublicRoomBar {...defaultProps} />);
+    expect(screen.getByRole("status")).toHaveTextContent("Test Body");
   });
 
   it("calls onClose when close button is clicked", () => {

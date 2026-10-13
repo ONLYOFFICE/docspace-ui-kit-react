@@ -209,8 +209,9 @@ background in both themes.
 
 - The header and body sit in a `role="status"` element, a polite live region; the close button
   is outside it, so an announcement reads the text alone. A screen reader announces changes to a
-  live region already on the page, so a bar that mounts already filled may be read only when the
-  user reaches it.
+  live region already on the page and usually not one inserted together with its text, so the
+  region mounts empty and the header and body are rendered into it right after mount: the bar is
+  announced when it appears, and again when its text changes.
 - **The close cross is a real button**: in the Tab order, pressed with Enter or Space, with a
   visible focus ring, and named by `closeLabel` — the translated `Common:CloseButton` ("Close") unless you pass
   another.
