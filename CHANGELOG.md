@@ -1,5 +1,12 @@
 # Change Log
 
+## 4.0.2
+
+### Changed
+
+- `@onlyoffice/ai-chat` peer requirement raised to `^1.0.3`
+- AI settings: the MCP servers page edits the tenant-wide disabled tool list (`toolPrefsScope="tenant"`), so a tool an administrator switches off is off for every user (Bug 84381)
+
 ## 4.0.1
 
 ### Changed
