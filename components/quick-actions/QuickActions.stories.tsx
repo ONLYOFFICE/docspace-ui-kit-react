@@ -357,7 +357,10 @@ export const Carousel: Story = {
     ).toBeInTheDocument();
 
     // The strip is a toolbar the keyboard walks: End reaches the last tile,
-    // Home brings the first one back into view.
+    // Home brings the first one back into view. The Next arrow's smooth
+    // scroll is usually still running here, on purpose: a key pressed during
+    // it must still land the tile in view (Chromium on Linux used to leave
+    // the strip where the interrupted animation stopped).
     await expect(track).toBe(canvas.getByRole("toolbar"));
     const tiles = Array.from(track.querySelectorAll("button"));
     tiles[0].focus();

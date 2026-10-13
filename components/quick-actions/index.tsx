@@ -290,6 +290,13 @@ export const QuickActions = ({
     consumeKey(e);
     next.focus();
     next.scrollIntoView?.({ block: "nearest", inline: "nearest" });
+    // An arrow button's smooth scroll still running when the key comes is
+    // stopped by the key press itself, wherever it has got to, and in
+    // Chromium on Linux that drops the scroll above as well. Asking again on
+    // the next frame, after the animation is gone, lands the tile in view.
+    requestAnimationFrame(() =>
+      next.scrollIntoView?.({ block: "nearest", inline: "nearest" }),
+    );
   };
 
   if (isLoading) {
