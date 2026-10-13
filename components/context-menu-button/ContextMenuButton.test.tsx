@@ -193,4 +193,33 @@ describe("<ContextMenuButton />", () => {
     fireEvent.mouseOut(button);
     expect(onMouseOut).toHaveBeenCalledTimes(1);
   });
+
+  // Consumers hand the event to ContextMenu.show(e), which positions the menu
+  // at e.pageX / e.pageY: a keyboard press must give it coordinates too.
+  // Known defect (review of spike/vitest-addon): toggle mode passes the KeyboardEvent to onClick as a MouseEvent, so pageX/pageY are undefined and ContextMenu.show(e) positions at NaN. Flip to it() once fixed.
+  it.fails(
+    "calls onClick in toggle mode with an event that has coordinates",
+    () => {
+      const onClick = vi.fn();
+      render(
+        <ContextMenuButton
+          {...baseProps}
+          displayType={ContextMenuButtonDisplayType.toggle}
+          onClick={onClick}
+        />,
+      );
+      const button = screen.getByRole("button", { name: "Actions" });
+
+      fireEvent.keyDown(button, { key: "Enter" });
+
+      expect(onClick).toHaveBeenCalledTimes(1);
+      const event = onClick.mock.calls[0][0];
+      expect(Number.isFinite(event.pageX), `pageX is ${event.pageX}`).toBe(
+        true,
+      );
+      expect(Number.isFinite(event.pageY), `pageY is ${event.pageY}`).toBe(
+        true,
+      );
+    },
+  );
 });

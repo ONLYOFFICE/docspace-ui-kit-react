@@ -160,5 +160,23 @@ describe("<DropDownItem />", () => {
       expect(fireEvent.click(link)).toBe(true);
       expect(baseProps.onClick).not.toHaveBeenCalled();
     });
+
+    // Either fix is correct: drop the href without a callback, or prevent
+    // the default action of a plain click.
+    const navigatesOnPlainClick = (link: HTMLElement): boolean => {
+      if (!link.hasAttribute("href")) return false;
+      return fireEvent.click(link);
+    };
+
+    // Known defect (review of spike/vitest-addon): without onExternalLinkClick the external link keeps href and target=_blank, so a plain click navigates. Flip to it() once fixed.
+    it.fails(
+      "does not navigate on a plain click without onExternalLinkClick",
+      () => {
+        render(<DropDownItem {...externalProps} externalLinkPath="/help" />);
+        const link = screen.getByLabelText(/Help center/);
+
+        expect(navigatesOnPlainClick(link)).toBe(false);
+      },
+    );
   });
 });

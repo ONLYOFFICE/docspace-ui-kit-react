@@ -414,4 +414,27 @@ describe("ComboBox", () => {
     const button = screen.getByRole("button");
     expect(button).toHaveAttribute("tabindex", "1");
   });
+
+  // Known defect (review of spike/vitest-addon): Escape on the open list does not call consumeKey, so its keyup reaches window and closes a surrounding ModalDialog. Flip to it() once fixed.
+  it.fails(
+    "keeps the Escape keyup that closed the list from window listeners",
+    () => {
+      const onWindowKeyUp = vi.fn();
+      window.addEventListener("keyup", onWindowKeyUp);
+
+      render(<ComboBox {...baseProps} />);
+      const button = screen.getByRole("button");
+
+      fireEvent.keyDown(button, { key: "ArrowDown" });
+      expect(button).toHaveAttribute("aria-expanded", "true");
+      fireEvent.keyDown(button, { key: "Escape" });
+      fireEvent.keyUp(button, { key: "Escape" });
+
+      expect(button).toHaveAttribute("aria-expanded", "false");
+      window.removeEventListener("keyup", onWindowKeyUp);
+      expect(onWindowKeyUp).not.toHaveBeenCalledWith(
+        expect.objectContaining({ key: "Escape" }),
+      );
+    },
+  );
 });

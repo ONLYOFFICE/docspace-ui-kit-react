@@ -54,6 +54,7 @@ export default defineConfig({
             "errors/**/*.test.{ts,tsx}",
             "ui/**/*.test.{ts,tsx}",
             "utils/**/*.test.{ts,tsx}",
+            "uploader/**/*.test.{ts,tsx}",
             "context/**/*.test.{ts,tsx}",
             "providers/**/*.test.{ts,tsx}",
             "hooks/**/*.test.{ts,tsx}",

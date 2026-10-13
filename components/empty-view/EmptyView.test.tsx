@@ -112,4 +112,31 @@ describe("EmptyView", () => {
     const body = screen.queryByTestId("empty-view-body");
     expect(body).not.toBeInTheDocument();
   });
+
+  // Known defect (review of spike/vitest-addon): a Ctrl/Cmd+click on an isNext link with an onClick both opens the href in a new tab and runs onClick. Flip to it() once fixed.
+  it.fails(
+    "leaves a modified click on an isNext link with no address to the browser",
+    () => {
+      const onClick = vi.fn();
+      renderComponent({
+        ...mockProps,
+        options: [
+          {
+            key: "next-action",
+            icon: <MockIcon />,
+            to: "",
+            isNext: true,
+            description: "Next Action",
+            onClick,
+          },
+        ],
+      });
+
+      const link = screen.getByText("Next Action");
+      fireEvent.click(link, { ctrlKey: true });
+      fireEvent.click(link, { metaKey: true });
+
+      expect(onClick).not.toHaveBeenCalled();
+    },
+  );
 });

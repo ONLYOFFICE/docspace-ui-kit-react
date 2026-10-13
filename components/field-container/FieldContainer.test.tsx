@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { describe, it, expect } from "vitest";
-import { screen, render } from "@testing-library/react";
+import { screen, render, waitFor } from "@testing-library/react";
 
 import { FieldContainer } from "./FieldContainer";
 import { InputSize, InputType, TextInput } from "../text-input";
@@ -119,4 +119,31 @@ describe("<FieldContainer />", () => {
       maxLabelWidth,
     );
   });
+
+  // Known defect (review of spike/vitest-addon): the ARIA effect does not rerun when the control mounts later. Flip to it() once fixed.
+  it.fails(
+    "marks a control that mounts after the container as required",
+    async () => {
+      const LateInput = () => {
+        const [ready, setReady] = useState(false);
+        useEffect(() => {
+          setReady(true);
+        }, []);
+        return ready ? (
+          <input id="late-field" data-testid="late-input" />
+        ) : null;
+      };
+
+      render(
+        <FieldContainer labelText="Late:" labelFor="late-field" isRequired>
+          <LateInput />
+        </FieldContainer>,
+      );
+
+      const input = await screen.findByTestId("late-input");
+      await waitFor(() => {
+        expect(input).toHaveAttribute("aria-required", "true");
+      });
+    },
+  );
 });
