@@ -6,8 +6,10 @@ export type ColorPickerProps = {
   id?: string;
 
   /**
-   * Called by the cancel button, and by the closing cross in `isPickerOnly`
-   * mode. Nothing here unmounts the picker; that is the caller's job.
+   * Called by the cancel button, by the closing cross in `isPickerOnly`
+   * mode, and on Escape. Nothing here unmounts the picker; that is the
+   * caller's job. Left out, Escape is not handled and propagates to the
+   * page (a surrounding `ModalDialog` closes on it as usual).
    */
   onClose?: () => void;
 

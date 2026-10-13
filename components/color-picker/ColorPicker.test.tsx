@@ -156,10 +156,36 @@ describe("ColorPicker component", () => {
 
   it("calls onClose on Escape", () => {
     render(<ColorPicker {...defaultProps} onClose={mockOnClose} />);
-    fireEvent.keyDown(screen.getByTestId("color-picker-hex-input"), {
-      key: "Escape",
-    });
+    const input = screen.getByTestId("color-picker-hex-input");
+    fireEvent.keyDown(input, { key: "Escape" });
+    // Completes the press, so the keyup consumeKey waits for is not left
+    // to swallow the next test's.
+    fireEvent.keyUp(input, { key: "Escape" });
     expect(mockOnClose).toHaveBeenCalledTimes(1);
+  });
+
+  // With nothing to close, Escape must still reach a ModalDialog around it.
+  it("lets Escape propagate when no onClose is passed", () => {
+    const onParentKeyDown = vi.fn();
+    const onWindowKeyUp = vi.fn();
+    window.addEventListener("keyup", onWindowKeyUp);
+
+    render(
+      <div onKeyDown={onParentKeyDown}>
+        <ColorPicker {...defaultProps} />
+      </div>,
+    );
+    const input = screen.getByTestId("color-picker-hex-input");
+    fireEvent.keyDown(input, { key: "Escape" });
+    fireEvent.keyUp(input, { key: "Escape" });
+
+    window.removeEventListener("keyup", onWindowKeyUp);
+    expect(onParentKeyDown).toHaveBeenCalledWith(
+      expect.objectContaining({ key: "Escape" }),
+    );
+    expect(onWindowKeyUp).toHaveBeenCalledWith(
+      expect.objectContaining({ key: "Escape" }),
+    );
   });
 
   // The colour scheme dialog around the picker closes on an Escape keyup.

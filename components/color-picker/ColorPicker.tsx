@@ -17,7 +17,7 @@ import { ColorPickerProps } from "./ColorPicker.types";
 const ColorPicker = ({
   className,
   id,
-  onClose = () => {},
+  onClose,
   onApply = () => {},
   appliedColor = globalColors.lightBlueMain,
   applyButtonLabel,
@@ -36,10 +36,12 @@ const ColorPicker = ({
   const cancelLabel = cancelButtonLabel ?? t("CancelButton");
 
   // Escape is the keyboard's cancel: the same notification as the cancel
-  // button and the cross. It is consumed whole, keyup included, so a
-  // ModalDialog the picker sits in (the colour scheme dialog) stays open.
+  // button and the cross. With an onClose it is consumed whole, keyup
+  // included, so a ModalDialog the picker sits in (the colour scheme dialog)
+  // stays open. Without one the picker has nothing to close, so Escape is
+  // left alone and reaches whatever is listening further up.
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Escape") {
+    if (e.key === "Escape" && onClose) {
       consumeKey(e);
       onClose();
     }
@@ -76,7 +78,7 @@ const ColorPicker = ({
             <IconButton
               className={styles.tableHeaderIconButton}
               size={16}
-              onClick={onClose}
+              onClick={() => onClose?.()}
               iconNode={<CrossIconSvg />}
               isFill
               data-testid="color-picker-close"
@@ -134,7 +136,7 @@ const ColorPicker = ({
               scale
               size={ButtonSize.small}
               label={cancelLabel}
-              onClick={onClose}
+              onClick={() => onClose?.()}
               testId="color-picker-cancel"
             />
           </div>
