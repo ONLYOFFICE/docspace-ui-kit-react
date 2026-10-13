@@ -92,8 +92,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 ### Fixed
 
 - **Keys a component handles no longer reach the page's or a dialog's listeners.** The keyboard
-  support added to `ContextMenuButton`, `LinkWithDropdown`, `Tags`, `QuickActions`,
-  `MainButtonMobile` and `Dropzone` let its keys bubble on, so Escape in a menu inside a
+  support added to `ComboBox`, `ColorPicker`, `ContextMenuButton`, `LinkWithDropdown`, `Tags`,
+  `QuickActions`, `MainButtonMobile` and `Dropzone` let its keys bubble on, so Escape in a menu inside a
   `ModalDialog` (which closes on an Escape `keyup` on `window`) closed the dialog too, and in
   the portal's file list Enter on a tag or in a menu also opened the selected item, the arrows
   moved the selection and Escape cleared it. Each now stops the key it acts on and swallows the

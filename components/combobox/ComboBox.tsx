@@ -4,6 +4,7 @@ import { isMobileOnly, isMobile, isTablet } from "react-device-detect";
 import classNames from "classnames";
 
 import EmptyIcon from "../../assets/empty.svg";
+import { consumeKey } from "../../utils/consume-key";
 
 import { DropDown } from "../drop-down";
 import { DropDownItem } from "../drop-down-item";
@@ -292,6 +293,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
       if (!["Enter", " ", "ArrowDown", "ArrowUp"].includes(e.key)) return;
       if (!navigable && !withAdvancedOptions) return;
       e.preventDefault();
+      consumeKey(e);
 
       const selectedIndex = options.findIndex((option) =>
         withLabel
@@ -313,6 +315,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
       case "ArrowDown":
       case "ArrowUp":
         e.preventDefault();
+        consumeKey(e);
         if (navigable)
           setActiveIndex((index) =>
             stepActiveIndex(index, e.key === "ArrowUp" ? -1 : 1),
@@ -323,12 +326,15 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
         // Custom content may hold a button of its own; leave the key to it.
         if (!navigable) break;
         e.preventDefault();
+        consumeKey(e);
         const option = options[activeIndex];
         if (option && isOptionPickable(option)) optionClick(option, e);
         break;
       }
       case "Escape":
         e.preventDefault();
+        // Not to a ModalDialog around it, which closes on an Escape keyup.
+        consumeKey(e);
         setOpenFromKeyboard(e, false);
         break;
       case "Tab":
