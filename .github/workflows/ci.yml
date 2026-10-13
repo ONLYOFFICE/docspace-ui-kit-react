@@ -147,7 +147,7 @@ jobs:
           name: story-test-screenshots
           path: |
             **/__screenshots__/**
-            !node_modules/**
+            !**/node_modules/**
           if-no-files-found: ignore
           retention-days: 7
 
