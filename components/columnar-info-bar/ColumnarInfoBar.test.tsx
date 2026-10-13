@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { renderToStaticMarkup } from "react-dom/server";
 
 import { ColumnarInfoBar } from "./ColumnarInfoBar";
 
@@ -47,6 +48,21 @@ describe("ColumnarInfoBar", () => {
       expect(screen.getByRole("status")).toHaveTextContent("John Smith");
     },
   );
+
+  // The first render is all the server renders: the region is in it, empty,
+  // so the text arrives as a change to a region already on the page.
+  it("mounts the live region empty and fills it after mount", () => {
+    const host = document.createElement("div");
+    host.innerHTML = renderToStaticMarkup(
+      <ColumnarInfoBar headerText="Details" columns={columns} />,
+    );
+    const region = host.querySelector('[role="status"]');
+    expect(region).not.toBeNull();
+    expect(region).toBeEmptyDOMElement();
+
+    render(<ColumnarInfoBar headerText="Details" columns={columns} />);
+    expect(screen.getByRole("status")).toHaveTextContent("Details");
+  });
 
   it("is not a live region in the page variant", () => {
     render(<ColumnarInfoBar columns={columns} variant="page" />);

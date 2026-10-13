@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 
 import CrossReactSvg from "../../assets/icons/12/cross.react.svg";
+import { useLiveRegionText } from "../../hooks/useLiveRegionText";
 
 import type { ColumnarInfoBarProps } from "./ColumnarInfoBar.types";
 import styles from "./ColumnarInfoBar.module.scss";
@@ -38,11 +39,28 @@ const ColumnarInfoBar = ({
     </dl>
   );
 
+  const header = headerText ? (
+    <h3 className={styles.header}>{headerText}</h3>
+  ) : null;
+
+  // The default and neutral bars appear in response to something, so their
+  // content is a polite live region -- the content only, so the close
+  // button's name is not read out with the message. A region inserted
+  // together with its text is usually not announced, so it mounts empty and
+  // the header and columns are filled in once it is on the page. The page
+  // block is static and renders its content at once.
+  const liveContent = useLiveRegionText(
+    <>
+      {header}
+      {list}
+    </>,
+  );
+
   if (variant === "page") {
     return (
       <div className={className} style={style}>
         <div className={styles.pageHeader}>
-          {headerText ? <h3 className={styles.header}>{headerText}</h3> : null}
+          {header}
           {onAction ? (
             <button
               type="button"
@@ -59,14 +77,10 @@ const ColumnarInfoBar = ({
     );
   }
 
-  // The default and neutral bars appear in response to something, so their
-  // content is a polite live region -- the content only, so the close
-  // button's name is not read out with the message. The page block is static.
   return (
     <div className={className} style={style}>
       <div className={styles.content} role="status">
-        {headerText ? <h3 className={styles.header}>{headerText}</h3> : null}
-        {list}
+        {liveContent}
       </div>
       {onAction ? (
         <button
