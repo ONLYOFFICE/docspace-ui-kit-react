@@ -66,17 +66,41 @@ const FieldContainer = ({
   // whatever is added here is taken off again when the prop turns off -- only
   // while it still holds the value written here, so an attribute the control
   // has since set itself is not removed. The body is watched, so a control
-  // that mounts later, or is swapped for another, is described too.
+  // that mounts later, or is swapped for another, is described too, and so is
+  // the control's own aria-describedby: a control that re-renders it drops the
+  // error id, which is then appended again.
   useEffect(() => {
     const body = bodyRef.current;
     if (!body) return;
 
     let control: HTMLElement | null = null;
     let undo: (() => void)[] = [];
+    let describedByUndone = false;
 
     const revert = () => {
       for (const step of undo) step();
       undo = [];
+      describedByUndone = false;
+    };
+
+    // Idempotent: it writes only when the id is missing, so the mutation its
+    // own write causes finds the id in place and writes nothing again.
+    const describe = (target: HTMLElement) => {
+      const ids = splitIds(target.getAttribute("aria-describedby"));
+      if (ids.includes(errorId)) return;
+      target.setAttribute("aria-describedby", [...ids, errorId].join(" "));
+      if (describedByUndone) return;
+      describedByUndone = true;
+      undo.push(() => {
+        const rest = splitIds(target.getAttribute("aria-describedby")).filter(
+          (value) => value !== errorId,
+        );
+        if (rest.length) {
+          target.setAttribute("aria-describedby", rest.join(" "));
+        } else {
+          target.removeAttribute("aria-describedby");
+        }
+      });
     };
 
     const apply = (target: HTMLElement) => {
@@ -90,28 +114,15 @@ const FieldContainer = ({
 
       if (isRequired) setIfAbsent("aria-required", "true");
       if (hasError) setIfAbsent("aria-invalid", "true");
-
-      if (showError) {
-        const ids = splitIds(target.getAttribute("aria-describedby"));
-        if (!ids.includes(errorId)) {
-          target.setAttribute("aria-describedby", [...ids, errorId].join(" "));
-          undo.push(() => {
-            const rest = splitIds(
-              target.getAttribute("aria-describedby"),
-            ).filter((value) => value !== errorId);
-            if (rest.length) {
-              target.setAttribute("aria-describedby", rest.join(" "));
-            } else {
-              target.removeAttribute("aria-describedby");
-            }
-          });
-        }
-      }
+      if (showError) describe(target);
     };
 
     const sync = () => {
       const next = findControl(body, labelFor);
-      if (next === control) return;
+      if (next === control) {
+        if (control && showError) describe(control);
+        return;
+      }
       revert();
       control = next;
       if (control) apply(control);
@@ -121,7 +132,12 @@ const FieldContainer = ({
     if (!isRequired && !hasError && !showError) return revert;
 
     const observer = new MutationObserver(sync);
-    observer.observe(body, { childList: true, subtree: true });
+    observer.observe(body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["aria-describedby"],
+    });
 
     return () => {
       observer.disconnect();

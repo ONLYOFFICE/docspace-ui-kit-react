@@ -176,4 +176,41 @@ describe("<FieldContainer />", () => {
       expect(input).toHaveAttribute("aria-required", "true");
     });
   });
+
+  it("appends the error id again when the control rewrites its own description", async () => {
+    const DescribedInput = ({ hint }: { hint: string }) => (
+      <>
+        <span id={hint}>Hint</span>
+        <input aria-describedby={hint} />
+      </>
+    );
+
+    const { rerender } = render(
+      <FieldContainer labelText="Name:" hasError errorMessage="Required">
+        <DescribedInput hint="hint-a" />
+      </FieldContainer>,
+    );
+    const input = screen.getByRole("textbox");
+    const errorId = screen.getByText("Required").id;
+    expect(input.getAttribute("aria-describedby")).toBe(`hint-a ${errorId}`);
+
+    // React writes the control's own value over the one the container
+    // extended; the observer puts the error id back, once.
+    rerender(
+      <FieldContainer labelText="Name:" hasError errorMessage="Required">
+        <DescribedInput hint="hint-b" />
+      </FieldContainer>,
+    );
+    await waitFor(() => {
+      expect(input.getAttribute("aria-describedby")).toBe(`hint-b ${errorId}`);
+    });
+
+    // Turning the error off still takes only its own id away.
+    rerender(
+      <FieldContainer labelText="Name:">
+        <DescribedInput hint="hint-b" />
+      </FieldContainer>,
+    );
+    expect(input).toHaveAttribute("aria-describedby", "hint-b");
+  });
 });

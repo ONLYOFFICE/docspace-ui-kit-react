@@ -264,7 +264,8 @@ light and dark themes, so it cannot be overridden from outside.
 - The field body is watched, so a control that mounts after the container, or replaces another,
   is described as well.
 - While the error message shows, it gets a generated `id` and the control's `aria-describedby`
-  gains that id, so the message is read with the field. It is not a live region: a screen
+  gains that id, so the message is read with the field. A control that rewrites its own
+  `aria-describedby` on a later render gets the id appended again. It is not a live region: a screen
   reader does not announce it the moment it appears.
 - A control the container cannot find — a custom widget with no native input — gets none of
   this; name it with `labelFor` or set the attributes on it yourself.
