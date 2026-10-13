@@ -36,7 +36,13 @@ describe("<ArticleItem />", () => {
 
   it("displays text when showText is true", () => {
     render(<ArticleItem {...baseProps} />);
-    expect(screen.getByText("Documents")).toBeInTheDocument();
+    // The drawn label; the control carries the same text as its name.
+    expect(
+      screen.getByText("Documents", { selector: ".articleItemText" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "Documents" }),
+    ).toBeInTheDocument();
   });
 
   it("draws no label when showText is false, yet stays named by text", () => {
@@ -187,32 +193,27 @@ describe("<ArticleItem />", () => {
     const interactiveAncestor = (el: HTMLElement): Element | null =>
       el.parentElement?.closest('[role="button"], a[href], button') ?? null;
 
-    // Known defect (review of spike/vitest-addon): with onClickBadge the badge is role=button inside the item, itself role=button. Flip to it() once fixed.
-    it.fails("does not nest the badge button inside the item button", () => {
+    it("does not nest the badge button inside the item button", () => {
       render(<ArticleItem {...baseProps} badgeTitle="Empty trash" />);
       const badge = screen.getByRole("button", { name: "Empty trash" });
 
       expect(interactiveAncestor(badge)).toBeNull();
     });
 
-    // Known defect (review of spike/vitest-addon): with onClickBadge and LinkRouter the badge is role=button inside the <a href>. Flip to it() once fixed.
-    it.fails(
-      "does not nest the badge button inside the LinkRouter link",
-      () => {
-        const LinkRouter = ({ children }: { children?: React.ReactNode }) => (
-          <a href="#docs">{children}</a>
-        );
-        render(
-          <ArticleItem
-            {...baseProps}
-            badgeTitle="Empty trash"
-            LinkRouter={LinkRouter}
-          />,
-        );
-        const badge = screen.getByRole("button", { name: "Empty trash" });
+    it("does not nest the badge button inside the LinkRouter link", () => {
+      const LinkRouter = ({ children }: { children?: React.ReactNode }) => (
+        <a href="#docs">{children}</a>
+      );
+      render(
+        <ArticleItem
+          {...baseProps}
+          badgeTitle="Empty trash"
+          LinkRouter={LinkRouter}
+        />,
+      );
+      const badge = screen.getByRole("button", { name: "Empty trash" });
 
-        expect(interactiveAncestor(badge)).toBeNull();
-      },
-    );
+      expect(interactiveAncestor(badge)).toBeNull();
+    });
   });
 });

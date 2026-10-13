@@ -409,22 +409,24 @@
     }
   }
 
-  &:not(.mobileDevice) {
-    &:hover:not(.animationReady):not(.animatedProgress) {
+  // The control layer covers this one, so its hover is read off the row.
+  .articleItemContainer:hover > &:not(.mobileDevice) {
+    &:not(.animationReady):not(.animatedProgress) {
       background-color: var(--article-item-sibling-hover-bg-color);
     }
 
-    &.active:hover:not(.animationReady):not(.animatedProgress) {
+    &.active:not(.animationReady):not(.animatedProgress) {
       background-color: var(--article-item-sibling-active-hover-bg-color);
     }
   }
 
   &.dragging {
     background: var(--article-item-dnd-bg-color) !important;
+  }
 
-    &:hover:not(.animationReady):not(.animatedProgress) {
-      background: var(--article-item-dnd-hover-bg-color) !important;
-    }
+  .articleItemContainer:hover
+    > &.dragging:not(.animationReady):not(.animatedProgress) {
+    background: var(--article-item-dnd-hover-bg-color) !important;
   }
 
   &.dragActive {
@@ -449,7 +451,16 @@
   border: 0;
 }
 
-.articleItemContainer:focus-visible,
+// The item's control: a transparent layer over the whole row, above the
+// background and the label (which ignore the pointer) and below the badge.
+.articleItemControl {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: var(--article-item-border-radius, 3px);
+}
+
+.articleItemControl:focus-visible,
 .articleItemBadgeWrapper:focus-visible {
   outline: 2px solid var(--article-item-img-svg-active-fill);
   outline-offset: -2px;

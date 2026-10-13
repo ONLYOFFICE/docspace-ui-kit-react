@@ -10,30 +10,33 @@ type Props = {
 } & ArticleItemProps;
 
 export const ArticleItem = (props: Props) => {
-  const { linkData, isDisabled, LinkRouter, onClick, id, isActive } = props;
+  const { linkData, isDisabled, LinkRouter, isActive } = props;
 
   const isLink = Boolean(!isDisabled && LinkRouter);
 
-  const component = <ArticleItemComponent {...props} isLink={isLink} />;
+  // The link is the item's control: a layer over the row, beside the badge
+  // rather than around it. A click on it, from the pointer or from Enter,
+  // bubbles to the item, which reports it through `onClick` once.
+  // `aria-current` and `className` are not in LinkRouterProps, but a router
+  // link passes them on to its anchor like any other attribute.
+  const renderLink =
+    isLink && LinkRouter
+      ? (className: string, children: React.ReactNode) => (
+          <LinkRouter
+            {...({
+              className,
+              style: { textDecoration: "none" },
+              to: linkData?.path,
+              state: linkData?.state,
+              "aria-current": isActive ? "page" : undefined,
+            } as LinkRouterProps)}
+          >
+            {children}
+          </LinkRouter>
+        )
+      : undefined;
 
-  if (!isLink || !LinkRouter) return component;
-
-  // A pointer click lands on the item inside and reaches `onClick` there.
-  // Enter on the focused link clicks the link itself, which the item never
-  // sees, so it is reported here.
-  const onLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (e.target === e.currentTarget) onClick?.(e, id);
-  };
-
-  // `aria-current` is not in LinkRouterProps, but a router link passes it on
-  // to its anchor like any other attribute.
-  const linkProps = {
-    style: { textDecoration: "none" },
-    to: linkData?.path,
-    state: linkData?.state,
-    onClick: onLinkClick,
-    "aria-current": isActive ? "page" : undefined,
-  } as LinkRouterProps;
-
-  return <LinkRouter {...linkProps}>{component}</LinkRouter>;
+  return (
+    <ArticleItemComponent {...props} isLink={isLink} renderLink={renderLink} />
+  );
 };

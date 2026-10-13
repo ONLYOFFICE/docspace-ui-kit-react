@@ -70,7 +70,9 @@ export default meta;
 export const Default: Story = {
   args: {},
   play: async ({ args, canvas, userEvent }) => {
-    await expect(canvas.getByText("Documents")).toBeVisible();
+    await expect(
+      canvas.getByText("Documents", { selector: ".articleItemText" }),
+    ).toBeVisible();
     // The click lands on the overlay drawn over the row and reaches the row;
     // onClick gets the row's id.
     await userEvent.click(canvas.getByTestId("article-item-sibling"));
@@ -166,7 +168,8 @@ export const Active: Story = {
     await expect(canvas.getByTestId("article-item").className).toMatch(
       /active/,
     );
-    await expect(canvas.getByTestId("article-item")).toHaveAttribute(
+    // The item's control, not the row, is the current page.
+    await expect(canvas.getByTestId("article-item-control")).toHaveAttribute(
       "aria-current",
       "page",
     );
@@ -240,15 +243,19 @@ export const EndOfBlock: Story = {
 
 export const CssCustomization: Story = {
   play: async ({ canvas }) => {
-    await expect(canvas.getByText("Documents")).toHaveStyle({
+    await expect(
+      canvas.getByText("Documents", { selector: ".articleItemText" }),
+    ).toHaveStyle({
       color: "rgb(34, 34, 34)",
       fontWeight: "400",
     });
-    await expect(canvas.getByText("Active Item")).toHaveStyle({
+    await expect(
+      canvas.getByText("Active Item", { selector: ".articleItemText" }),
+    ).toHaveStyle({
       color: "rgb(255, 255, 255)",
     });
     const active = canvas
-      .getByText("Active Item")
+      .getByText("Active Item", { selector: ".articleItemText" })
       .closest("[data-testid='article-item']")
       ?.querySelector("[data-testid='article-item-sibling']") as HTMLElement;
     await expect(active).toHaveStyle({
