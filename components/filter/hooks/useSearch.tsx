@@ -85,11 +85,13 @@ const useSearch = ({
     if (value === lastAppliedRef.current) return;
     lastAppliedRef.current = value;
 
-    // Echoes arrive in the order the queries were sent, so match the oldest
-    // pending one: with "a", "ab", "a" sent, the first "a" reported is the
-    // first query, and the "ab" that follows it is still stale.
+    // Match the newest pending query of that value. The portal aborts a
+    // search the user has replaced, so it often reports only the last of
+    // them: with "a", "ab", "a" sent, a lone "a" is that last query, and
+    // everything before it is settled. The cost falls on a host that reports
+    // every query in order: its late "ab" then reads as a value of its own.
     const sent = sentRef.current;
-    const sentIndex = sent.indexOf(value);
+    const sentIndex = sent.lastIndexOf(value);
     if (sentIndex !== -1 && sentIndex < sent.length - 1) {
       // The host applied a query the user has since replaced: drop it and
       // everything sent before it, and leave the field as the user left it.

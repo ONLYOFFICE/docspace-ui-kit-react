@@ -42,7 +42,23 @@ const Harness = ({
 };
 
 describe("useSearch", () => {
-  it("ignores every stale echo of a query typed twice", () => {
+  it("ignores a stale echo of a query the user has replaced", () => {
+    const onSearch = vi.fn();
+    const { rerender } = render(<Harness hostValue="" onSearch={onSearch} />);
+    const field = screen.getByTestId("search") as HTMLInputElement;
+
+    fireEvent.change(field, { target: { value: "a" } });
+    fireEvent.change(field, { target: { value: "ab" } });
+    expect(onSearch.mock.calls.map(([v]) => v)).toEqual(["a", "ab"]);
+
+    // The host reports "a" late, after the user has typed on.
+    rerender(<Harness hostValue="a" onSearch={onSearch} />);
+    expect(field.value).toBe("ab");
+  });
+
+  // The portal aborts the search a newer one replaces, so it reports only the
+  // last query of a burst.
+  it("settles a burst when only its last query is reported", () => {
     const onSearch = vi.fn();
     const { rerender } = render(<Harness hostValue="" onSearch={onSearch} />);
     const field = screen.getByTestId("search") as HTMLInputElement;
@@ -50,17 +66,12 @@ describe("useSearch", () => {
     fireEvent.change(field, { target: { value: "a" } });
     fireEvent.change(field, { target: { value: "ab" } });
     fireEvent.change(field, { target: { value: "a" } });
-    expect(onSearch.mock.calls.map(([v]) => v)).toEqual(["a", "ab", "a"]);
 
-    // The host reports each query back, slowly and in order.
-    rerender(<Harness hostValue="a" onSearch={onSearch} />);
-    expect(field.value).toBe("a");
-    rerender(<Harness hostValue="ab" onSearch={onSearch} />);
-    expect(field.value).toBe("a");
     rerender(<Harness hostValue="a" onSearch={onSearch} />);
     expect(field.value).toBe("a");
 
-    // Everything is reported; a value of the host's own is shown.
+    // Nothing is pending any more, so the host's own "ab" (a saved filter,
+    // navigation) is shown.
     rerender(<Harness hostValue="ab" onSearch={onSearch} />);
     expect(field.value).toBe("ab");
   });
