@@ -91,6 +91,15 @@ const SecondaryTabs = (props: TabsProps) => {
     setFocusedTabIndex(Math.max(selectedItemIndex, 0));
   }, [selectedItemIndex]);
 
+  // A shorter list must not leave the tab stop past its end, where no tab
+  // would carry tabIndex 0 and Tab would skip the whole bar.
+  const lastTabIndex = Math.max(items.length - 1, 0);
+  const rovingTabIndex = Math.min(focusedTabIndex, lastTabIndex);
+
+  useEffect(() => {
+    setFocusedTabIndex((index) => Math.min(index, lastTabIndex));
+  }, [lastTabIndex]);
+
   const setSelectedItem = (selectedTabItem: TTabItem, index: number): void => {
     onSelect?.(selectedTabItem);
     setFocusedTabIndex(index);
@@ -113,7 +122,7 @@ const SecondaryTabs = (props: TabsProps) => {
 
   const { onKeyDown } = useTabsHotkeys({
     items,
-    focusedTabIndex,
+    focusedTabIndex: rovingTabIndex,
     focusTab,
     selectTab,
   });
@@ -261,7 +270,10 @@ const SecondaryTabs = (props: TabsProps) => {
             role="tab"
             aria-selected={isSelected}
             aria-disabled={item.isDisabled || undefined}
-            tabIndex={index === focusedTabIndex ? 0 : -1}
+            tabIndex={index === rovingTabIndex ? 0 : -1}
+            // Whatever put focus here -- a click on the tab already selected,
+            // a script -- the arrows have to start from this tab.
+            onFocus={() => setFocusedTabIndex(index)}
             onClick={() => selectTab(index)}
             style={
               scaled

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { screen, render, fireEvent } from "@testing-library/react";
+import { screen, render, fireEvent, act } from "@testing-library/react";
 
 import { Tabs } from ".";
 import { TabsTypes } from "./Tabs.enums";
@@ -689,6 +689,58 @@ describe("Tabs", () => {
       expect(second).toHaveAttribute("tabindex", "0");
       fireEvent.keyDown(second, { key: "Enter" });
       expect(onSelectMock).toHaveBeenCalledWith(arrayItems[1]);
+    });
+
+    const threeItems: TTabItem[] = [
+      ...arrayItems,
+      { id: "tab2", name: "Title3", content: <div>Third</div> },
+    ];
+
+    it("moves the arrows from a tab focused by a click that selects nothing", () => {
+      render(
+        <Tabs
+          items={threeItems}
+          type={TabsTypes.Secondary}
+          selectedItemId="tab0"
+        />,
+      );
+      const [first, second] = screen.getAllByRole("tab");
+      first.focus();
+      fireEvent.keyDown(first, { key: "ArrowRight" });
+      expect(second).toHaveFocus();
+
+      // A click on the tab already selected focuses it and selects nothing.
+      act(() => first.focus());
+      fireEvent.click(first);
+      fireEvent.keyDown(first, { key: "ArrowRight" });
+      expect(second).toHaveFocus();
+    });
+
+    it("keeps one tab in the tab order when the list shrinks", () => {
+      const { rerender } = render(
+        <Tabs
+          items={threeItems}
+          type={TabsTypes.Secondary}
+          selectedItemId="tab0"
+        />,
+      );
+      const tabs = screen.getAllByRole("tab");
+      tabs[0].focus();
+      fireEvent.keyDown(tabs[0], { key: "End" });
+      expect(tabs[2]).toHaveFocus();
+
+      rerender(
+        <Tabs
+          items={arrayItems}
+          type={TabsTypes.Secondary}
+          selectedItemId="tab0"
+        />,
+      );
+      const remaining = screen.getAllByRole("tab");
+      expect(remaining).toHaveLength(2);
+      expect(
+        remaining.filter((tab) => tab.getAttribute("tabindex") === "0"),
+      ).toHaveLength(1);
     });
 
     it("refuses a disabled tab by click and by keyboard", () => {
