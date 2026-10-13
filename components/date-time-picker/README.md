@@ -145,9 +145,11 @@ export function ScheduledSend() {
 - **12-hour or 24-hour is decided by `locale`, not by a prop.** The component treats anything
   starting `en`, plus `en-GB` explicitly, as 12-hour — so a British locale gets AM/PM, and every
   other locale gets a 24-hour clock with no meridiem control.
-- **Choosing a meridiem sets that half of the day.** Picking PM for a morning time adds twelve
-  hours and picking AM for an afternoon time subtracts twelve; picking the half the time is
-  already in changes nothing and does not call `onChange`. The day never moves.
+- **Choosing a meridiem sets that half of the day.** Picking PM for a morning time sets the hour
+  twelve later on the clock and picking AM for an afternoon time sets it twelve earlier — the
+  clock hour, not twelve elapsed hours, so a day the clocks change does not end an hour off;
+  picking the half the time is already in changes nothing and does not call `onChange`. The day
+  never moves.
 - **`translations` is required but was missing from the exported props type** until now; it is
   read while rendering, so an object with `AM` and `PM` has to be passed.
 - **`className`, `id`, `selectDateText` and `hasError` are required by the type** even though

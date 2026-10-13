@@ -6,12 +6,7 @@ import ClockIcon from "../../assets/clock.react.svg";
 
 import { ButtonKeys } from "../../enums";
 
-import {
-  parseToDateTime,
-  formatDate,
-  addToDate,
-  subtractFromDate,
-} from "../../utils/date";
+import { parseToDateTime, formatDate } from "../../utils/date";
 
 import { TimePicker } from "../time-picker";
 import { DatePicker } from "../date-picker";
@@ -108,11 +103,13 @@ const DateTimePicker = (props: DateTimePickerProps) => {
     if (!date) return;
 
     // Set the half of the day, do not toggle it: choosing the half the time
-    // is already in leaves it where it is, on the same day.
+    // is already in leaves it where it is, on the same day. The hour is set,
+    // not shifted by a 12-hour duration, which lands an hour off on a day the
+    // clocks change.
     if (opt.key === "AM" && date.hour >= 12) {
-      handleChange(subtractFromDate(date, 12, "hours"));
+      handleChange(date.set({ hour: date.hour - 12 }));
     } else if (opt.key === "PM" && date.hour < 12) {
-      handleChange(addToDate(date, 12, "hours"));
+      handleChange(date.set({ hour: date.hour + 12 }));
     }
   };
 

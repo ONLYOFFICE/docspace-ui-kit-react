@@ -2,6 +2,7 @@ import { describe, it, expect, afterEach, vi } from "vitest";
 import { screen, render, fireEvent, within } from "@testing-library/react";
 import { DateTimePicker, DateTimePickerProps } from ".";
 import styles from "./DateTimePicker.module.scss";
+import { DateTime } from "luxon";
 import { createDateTime } from "../../utils/date";
 
 describe("DateTimePicker", () => {
@@ -153,4 +154,37 @@ describe("DateTimePicker", () => {
     choose("AM");
     expect(onChange).toHaveBeenCalledTimes(1);
   });
+
+  // Clocks in Berlin go back at 03:00 on 2025-10-26 and forward at 02:00 on
+  // 2025-03-30, so twelve hours of elapsed time is not twelve on the clock.
+  it.each([
+    { label: "fall-back", day: 26, month: 10, from: 13, to: 1, pick: "AM" },
+    { label: "spring-forward", day: 30, month: 3, from: 1, to: 13, pick: "PM" },
+  ])(
+    "keeps the clock time on a $label day",
+    ({ day, month, from, to, pick }) => {
+      const onChange = vi.fn();
+      render(
+        <DateTimePicker
+          {...defaultProps}
+          initialDate={DateTime.fromObject(
+            { year: 2025, month, day, hour: from, minute: 30 },
+            { zone: "Europe/Berlin" },
+          )}
+          onChange={onChange}
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId("date-time-picker-time-display"));
+      const editor = screen.getByTestId("time-picker").parentElement!;
+      fireEvent.click(within(editor).getByRole("button", { name: /AM|PM/ }));
+      fireEvent.click(screen.getByRole("option", { name: pick }));
+
+      expect(onChange).toHaveBeenCalledTimes(1);
+      const picked = onChange.mock.calls[0][0];
+      expect(picked.hour).toBe(to);
+      expect(picked.minute).toBe(30);
+      expect(picked.day).toBe(day);
+    },
+  );
 });
