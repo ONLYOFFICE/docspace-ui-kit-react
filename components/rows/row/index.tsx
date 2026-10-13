@@ -150,6 +150,7 @@ const Row = React.memo((props: RowProps) => {
         className,
       )}
       data-testid={dataTestId ?? "row"}
+      aria-busy={inProgress || undefined}
     >
       {inProgress ? (
         <Loader

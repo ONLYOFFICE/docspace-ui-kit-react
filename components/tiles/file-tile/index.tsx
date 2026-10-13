@@ -279,6 +279,7 @@ const FileTile = ({
       onContextMenu={onContextMenu}
       onClick={onFileClick}
       data-testid={dataTestId ?? "tile"}
+      aria-busy={inProgress || undefined}
     >
       <div className={fileTileTopClassNames} onClick={thumbnailClick}>
         {icon}

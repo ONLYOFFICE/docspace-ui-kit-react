@@ -147,6 +147,7 @@ export const BaseTile = ({
       onClick={onRoomClick}
       onContextMenu={onContextMenu}
       data-testid={dataTestId ?? "tile"}
+      aria-busy={inProgress || undefined}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
     >
