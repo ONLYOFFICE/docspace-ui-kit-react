@@ -373,7 +373,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   when its URL path ends in `.svg` - `photo.svg.png` and `?file=x.svg` are pictures now - and a
   `data:` URL, an inline SVG included, is always a picture
 - **A broken `<img>` inside `MCPIcon`'s `imgNode` falls back to the letter**, as a broken `imgSrc`
-  already did, and a new `imgSrc` or `imgNode` is tried again after one failed
+  already did, and a new `imgSrc` or `imgNode` is tried again after one failed. A node with a
+  string `src` is remembered by it, so one rebuilt on every render does not retry, and flash,
+  the same broken picture each time
 - **`MainButton` can be reached and opened from the keyboard.** It is now a native `<button type="button">` (user agent styles reset, so it looks the same): Enter and Space open the menu or call `onAction`, `aria-haspopup`, `aria-expanded` and `aria-controls` follow the menu, and `isDisabled` sets `aria-disabled` while leaving the button focusable. The Enter that opens the menu no longer also picks its first item.
 - **`MainButtonMobile`'s iOS scroll background works, and a page without `.section-scroll` no longer throws.** Two comparisons read ref objects instead of their values, so the sheet never darkened on scrolling up.
 - **`--main-button-mobile-badge-size` scales the alert badge's icon**, not only the box around it.
@@ -451,7 +453,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **The segmented `Tabs` arrows start from the focused tab**, after a click on the tab already
   selected too, and a shorter item list no longer leaves the bar without a Tab stop.
 - **`Filter`'s search remembers at most 20 unreported queries**, so a host that never reports
-  its value back does not grow the list without end.
+  its value back does not grow the list without end. A report of the value the field already has
+  settles the queries before it, so after "a", "ab", "a" a later "ab" of the host's own (Back, a
+  saved filter) is shown instead of being dropped as a stale echo, and after `clearSearch` the
+  host's previous value is shown again when it comes back.
 - **`SearchInput` takes a value set after its cross was used**, even one equal to the last value
   it reported.
 - **`MainButton` leaves the keys of its menu alone.** Its Enter handling also caught keys
@@ -466,6 +471,17 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`DateTimePicker`'s AM/PM sets the hour** instead of shifting by 12 hours, which was an hour off
   on a day the clocks change.
 - **The samples' declarations are no longer published.** `dist/types/docs` is gone.
+- **`PeopleSelector` loads every group with `withOutCurrentAuthorizedUser`.** It took one off the
+  total of a list of groups too, where the current user never is, so the last group of a
+  paginated list was never requested.
+- **The segmented `Tabs` arrows run the tab's own `onClick`**, as a click on the tab does, and
+  scroll the tab they select into view. They used to call `onSelect` alone.
+- **`ArticleItem`'s badge passes Enter and Space to a `badgeComponent`'s own click.** The keys
+  clicked the wrapper, so a badge that opens something in its own click handler (the portal's
+  new-files badge) did nothing from the keyboard.
+- **`MainButtonMobile`'s alert badge is named without an `I18nextProvider`.** It read
+  "Common:Alert" outside the portal; it now uses the kit's translation lookup with "Alert" as the
+  fallback.
 
 ## 4.0.1
 
