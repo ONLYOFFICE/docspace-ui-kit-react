@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { ColumnarInfoBar } from "./ColumnarInfoBar";
@@ -42,16 +42,22 @@ describe("ColumnarInfoBar", () => {
   );
 
   it.each(["default", "neutral"] as const)(
-    "is a status live region (%s variant)",
-    (variant) => {
+    "announces its content through a status region (%s variant)",
+    async (variant) => {
       render(<ColumnarInfoBar columns={columns} variant={variant} />);
-      expect(screen.getByRole("status")).toHaveTextContent("John Smith");
+      await waitFor(() =>
+        expect(screen.getByRole("status")).toHaveTextContent(
+          "Name John Smith Email john@example.com Status Active",
+        ),
+      );
     },
   );
 
-  // The first render is all the server renders: the region is in it, empty,
-  // so the text arrives as a change to a region already on the page.
-  it("mounts the live region empty and fills it after mount", () => {
+  // The server renders the first render only, and the client's first render
+  // matches it: the region is in it, empty, and the text arrives a moment
+  // later as a change to a region already on the page. The content itself is
+  // drawn at once.
+  it("mounts the live region empty and fills it a moment later", async () => {
     const host = document.createElement("div");
     host.innerHTML = renderToStaticMarkup(
       <ColumnarInfoBar headerText="Details" columns={columns} />,
@@ -61,7 +67,25 @@ describe("ColumnarInfoBar", () => {
     expect(region).toBeEmptyDOMElement();
 
     render(<ColumnarInfoBar headerText="Details" columns={columns} />);
-    expect(screen.getByRole("status")).toHaveTextContent("Details");
+    expect(screen.getByRole("heading", { name: "Details" })).toBeVisible();
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent("Details"),
+    );
+  });
+
+  it("announces a change of its content", async () => {
+    const { rerender } = render(
+      <ColumnarInfoBar headerText="Details" columns={columns} />,
+    );
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent("Details"),
+    );
+
+    rerender(<ColumnarInfoBar headerText="Updated" columns={columns} />);
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent("Updated"),
+    );
   });
 
   it("is not a live region in the page variant", () => {

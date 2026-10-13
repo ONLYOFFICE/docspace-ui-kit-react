@@ -269,7 +269,7 @@ reaches.
 - **The bar is announced through a visually hidden `role="status"` region inside it** (a polite
   live region), so a screen reader reads it when it appears without interrupting the user. The
   region mounts empty and receives the header, the extra header line and the message — or the
-  text of `htmlContent` — right after mount, because a live region inserted together with its
+  text of `htmlContent` — 100 ms after mount, because a live region inserted together with its
   text is usually not announced. The visible bar draws at once and is not a live region itself,
   so the action and the close cross are not read out with the message. The campaign banner
   (`isCampaigns`) is an iframe and is not announced. The `countDownTime` counter is hidden from

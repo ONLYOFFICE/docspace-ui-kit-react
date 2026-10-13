@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import PublicRoomBar from "./index";
@@ -46,26 +46,63 @@ describe("PublicRoomBar", () => {
     ).toBeInTheDocument();
   });
 
-  it("puts the text, not the close button, in a status region", () => {
+  it("is no live region unless asked to be", () => {
     render(<PublicRoomBar {...defaultProps} />);
 
-    const status = screen.getByRole("status");
-    expect(status).toHaveTextContent("Test Header");
-    expect(status).toHaveTextContent("Test Body");
-    expect(status).not.toContainElement(screen.getByRole("button"));
+    expect(screen.queryByRole("status")).toBeNull();
+    expect(screen.getByText("Test Body")).toBeVisible();
   });
 
-  // The first render is all the server renders: the region is in it, empty,
-  // so the text arrives as a change to a region already on the page.
-  it("mounts the status region empty and fills it after mount", () => {
+  it("with live, announces the text, not the close button", async () => {
+    render(<PublicRoomBar {...defaultProps} live />);
+
+    const status = screen.getByRole("status");
+    await waitFor(() =>
+      expect(status).toHaveTextContent("Test Header Test Body"),
+    );
+    expect(status).not.toHaveTextContent("Close");
+  });
+
+  // The server renders the first render only, and the client's first render
+  // matches it: the region is in it, empty, and the text arrives a moment
+  // later as a change to a region already on the page. The text itself is
+  // drawn at once.
+  it("with live, mounts the status region empty and fills it a moment later", async () => {
     const host = document.createElement("div");
-    host.innerHTML = renderToStaticMarkup(<PublicRoomBar {...defaultProps} />);
+    host.innerHTML = renderToStaticMarkup(
+      <PublicRoomBar {...defaultProps} live />,
+    );
     const region = host.querySelector('[role="status"]');
     expect(region).not.toBeNull();
     expect(region).toBeEmptyDOMElement();
 
-    render(<PublicRoomBar {...defaultProps} />);
-    expect(screen.getByRole("status")).toHaveTextContent("Test Body");
+    render(<PublicRoomBar {...defaultProps} live />);
+    expect(screen.getByText("Test Body")).toBeVisible();
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent("Test Body"),
+    );
+  });
+
+  it("with live, does not copy a link in the text into the region", async () => {
+    render(
+      <PublicRoomBar
+        {...defaultProps}
+        live
+        bodyText={
+          <span>
+            Share the <a href="#room">room link</a>
+          </span>
+        }
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Share the room link",
+      ),
+    );
+    expect(screen.getAllByRole("link")).toHaveLength(1);
   });
 
   it("calls onClose when close button is clicked", () => {

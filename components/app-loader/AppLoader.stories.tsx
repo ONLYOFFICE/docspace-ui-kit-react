@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect } from "storybook/test";
+import { expect, waitFor } from "storybook/test";
 
 import AppLoader from "./index";
 
@@ -30,7 +30,9 @@ export const Default: Story = {
     await expect(box.height).toBe(window.innerHeight);
     await expect(sheet.firstElementChild).toBeVisible();
     // The wait is announced: the inner loader is a status region.
-    await expect(canvas.getByRole("status")).toHaveTextContent("Loading...");
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent("Loading..."),
+    );
   },
   parameters: {
     docs: {

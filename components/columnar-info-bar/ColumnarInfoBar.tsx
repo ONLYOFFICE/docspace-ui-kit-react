@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 import CrossReactSvg from "../../assets/icons/12/cross.react.svg";
-import { useLiveRegionText } from "../../hooks/useLiveRegionText";
+import { useLiveRegionTextOf } from "../../hooks/useLiveRegionText";
 
 import type { ColumnarInfoBarProps } from "./ColumnarInfoBar.types";
 import styles from "./ColumnarInfoBar.module.scss";
@@ -43,18 +43,15 @@ const ColumnarInfoBar = ({
     <h3 className={styles.header}>{headerText}</h3>
   ) : null;
 
-  // The default and neutral bars appear in response to something, so their
-  // content is a polite live region -- the content only, so the close
-  // button's name is not read out with the message. A region inserted
-  // together with its text is usually not announced, so it mounts empty and
-  // the header and columns are filled in once it is on the page. The page
-  // block is static and renders its content at once.
-  const liveContent = useLiveRegionText(
-    <>
-      {header}
-      {list}
-    </>,
-  );
+  // The default and neutral bars appear in response to something, so they
+  // are announced -- their content only, so the close button's name is not
+  // read out with the message. The content is drawn at once and is not live
+  // itself: a region inserted together with its text is usually not
+  // announced, so a visually hidden status region beside it stays empty for
+  // a moment and then takes the content's text. The page block is static
+  // and announces nothing.
+  const contentRef = useRef<HTMLDivElement>(null);
+  const announcement = useLiveRegionTextOf(contentRef);
 
   if (variant === "page") {
     return (
@@ -79,9 +76,17 @@ const ColumnarInfoBar = ({
 
   return (
     <div className={className} style={style}>
-      <div className={styles.content} role="status">
-        {liveContent}
+      <div className={styles.content} ref={contentRef}>
+        {header}
+        {list}
       </div>
+      <span
+        role="status"
+        className={styles.visuallyHidden}
+        data-testid="columnar-info-bar-announcement"
+      >
+        {announcement}
+      </span>
       {onAction ? (
         <button
           type="button"

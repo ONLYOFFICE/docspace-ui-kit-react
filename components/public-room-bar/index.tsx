@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import classNames from "classnames";
 import { ReactSVG } from "react-svg";
 
@@ -6,7 +7,7 @@ import PeopleIcon from "../../assets/icons/16/people.react.svg";
 
 import { Text } from "../text";
 import { useCommonTranslation } from "../../utils/i18n";
-import { useLiveRegionText } from "../../hooks/useLiveRegionText";
+import { useLiveRegionTextOf } from "../../hooks/useLiveRegionText";
 
 import styles from "./PublicRoomBar.module.scss";
 import type { PublicRoomBarProps } from "./PublicRoomBar.types";
@@ -29,6 +30,7 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
     className,
     dataTestId,
     closeLabel: closeLabelProp,
+    live = false,
     ...rest
   } = props;
 
@@ -41,31 +43,12 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
   const icon =
     typeof iconName === "string" ? <ReactSVG src={iconName} /> : iconName;
 
-  const text = (
-    <>
-      {!hideHeader ? (
-        <div className={styles.headerBody}>
-          <div className={styles.headerIcon}>{icon}</div>
-          <Text className={styles.header} fontWeight={600} as={headerAs}>
-            {headerText}
-          </Text>
-        </div>
-      ) : null}
-      <Text
-        className={styles.body}
-        fontSize="12px"
-        fontWeight={400}
-        as={bodyAs}
-      >
-        {bodyText}
-      </Text>
-    </>
-  );
-
-  // A region inserted together with its text is usually not announced, so
-  // the live region mounts empty and the text is rendered into it right
-  // after mount.
-  const liveText = useLiveRegionText(text);
+  // With `live`, a visually hidden status region beside the text takes the
+  // text's words a moment after the bar mounts, since a region inserted
+  // together with its text is usually not announced. The text itself is
+  // drawn at once and is not live, and the close button is outside both.
+  const textRef = useRef<HTMLDivElement>(null);
+  const announcement = useLiveRegionTextOf(textRef);
 
   return (
     <div
@@ -81,11 +64,33 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
       ref={ref}
       data-testid={dataTestId ?? "public_room_bar"}
     >
-      {/* A polite live region around the text only, so the announcement
-          leaves out the close button. It is filled after mount, above. */}
-      <div className={styles.textContainer} role="status">
-        {liveText}
+      <div className={styles.textContainer} ref={textRef}>
+        {!hideHeader ? (
+          <div className={styles.headerBody}>
+            <div className={styles.headerIcon}>{icon}</div>
+            <Text className={styles.header} fontWeight={600} as={headerAs}>
+              {headerText}
+            </Text>
+          </div>
+        ) : null}
+        <Text
+          className={styles.body}
+          fontSize="12px"
+          fontWeight={400}
+          as={bodyAs}
+        >
+          {bodyText}
+        </Text>
       </div>
+      {live ? (
+        <span
+          role="status"
+          className={styles.visuallyHidden}
+          data-testid="public_room_bar_announcement"
+        >
+          {announcement}
+        </span>
+      ) : null}
 
       {/* A native button; its test id is kept from the IconButton it replaced. */}
       {onClose ? (

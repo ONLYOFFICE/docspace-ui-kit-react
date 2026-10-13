@@ -1,7 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
 
 import { SnackBar } from "./Snackbar";
 import type { SnackbarProps, TextAlignValue } from "./Snackbar.types";
@@ -172,8 +172,10 @@ export const Default: Story = {
     await expect(canvas.getByTestId("snackbar-icon")).toBeInTheDocument();
 
     // The bar is a polite live region, so its appearance is announced.
-    await expect(canvas.getByRole("status")).toHaveTextContent(
-      "Important notification message",
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent(
+        "Important notification message",
+      ),
     );
 
     // The close cross is a named, non-submitting button that calls onAction,

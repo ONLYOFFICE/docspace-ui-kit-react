@@ -31,10 +31,9 @@ const Loader = (props: LoaderProps) => {
 
   const label = labelProp ?? (t("LoadingProcessing") || DEFAULT_LABEL);
   // A status region inserted together with its text is usually not
-  // announced, so the region mounts empty and the label follows once it is
-  // on the page. A decorative loader is no region and shows its text at once.
+  // announced, so the region's hidden label stays empty for a moment and
+  // the label follows (useLiveRegionText). What is drawn is not delayed.
   const liveLabel = useLiveRegionText(label);
-  const shownLabel = isDecorative ? label : liveLabel;
 
   const { isDecorative: _isDecorative, ...rest } = props;
   const animationProps = { ...rest, type, label };
@@ -50,21 +49,22 @@ const Loader = (props: LoaderProps) => {
       case LoaderTypes.track:
         return <Track {...animationProps} />;
       default:
+        // Drawn at once and hidden from assistive technology, which reads
+        // the region's own label instead.
         return (
-          <span style={{ ...style }}>
+          <span style={{ ...style }} aria-hidden="true">
             <Text color={color} fontSize={size}>
-              {shownLabel}
+              {label}
             </Text>
           </span>
         );
     }
   };
 
-  // The animations are decorative (aria-hidden); the label is the text of
-  // the status region, filled in after mount, so it is what assistive
-  // technology reads and announces. The base type shows the label itself. A
-  // decorative loader is hidden whole: its host control carries the busy
-  // state.
+  // The animations, and the base type's drawn text, are hidden from
+  // assistive technology; the region's visually hidden label, filled in
+  // shortly after mount, is what it reads and announces. A decorative loader
+  // is hidden whole: its host control carries the busy state.
   if (isDecorative) {
     return (
       <div
@@ -88,11 +88,9 @@ const Loader = (props: LoaderProps) => {
       data-testid="loader"
     >
       {svgRenderer(type)}
-      {type !== LoaderTypes.base ? (
-        <span className={styles.visuallyHidden} data-testid="loader-label">
-          {liveLabel}
-        </span>
-      ) : null}
+      <span className={styles.visuallyHidden} data-testid="loader-label">
+        {liveLabel}
+      </span>
     </div>
   );
 };

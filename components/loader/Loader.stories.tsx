@@ -1,6 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, within } from "storybook/test";
+import { expect, within, waitFor } from "storybook/test";
 
 import { Loader } from ".";
 import { LoaderTypes } from "./Loader.enums";
@@ -133,8 +133,10 @@ export const Default: Story = {
   },
   play: async ({ canvas }) => {
     // base renders the label as text at `size`, inside a status region.
-    await expect(canvas.getByRole("status")).toHaveTextContent(
-      "Loading content, please wait...",
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent(
+        "Loading content, please wait...",
+      ),
     );
     const text = canvas.getByText("Loading content, please wait...");
     await expect(getComputedStyle(text).fontSize).toBe("18px");
@@ -164,7 +166,9 @@ export const Oval: Story = {
     // The animation is decorative; the label is the status region's text.
     const oval = canvas.getByTestId("oval-loader");
     await expect(oval).toHaveAttribute("aria-hidden", "true");
-    await expect(canvas.getByRole("status")).toHaveTextContent("Loading...");
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent("Loading..."),
+    );
     await expect(widthOf(oval)).toBe(40);
   },
   parameters: {
@@ -193,7 +197,9 @@ export const DualRing: Story = {
     const ring = canvas.getByTestId("dual-ring-loader");
     await expect(ring).toHaveAttribute("aria-hidden", "true");
     await expect(ring.querySelector("title")).toBeNull();
-    await expect(canvas.getByRole("status")).toHaveTextContent("Loading...");
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent("Loading..."),
+    );
     await expect(widthOf(ring)).toBe(40);
   },
   parameters: {
@@ -232,7 +238,9 @@ export const Rombs: Story = {
     // Three decorative diamonds; the label is read like any other type's.
     const rombs = canvas.getByTestId("rombs-loader");
     await expect(rombs).toHaveAttribute("aria-hidden", "true");
-    await expect(canvas.getByRole("status")).toHaveTextContent("Loading...");
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent("Loading..."),
+    );
   },
   parameters: {
     docs: {
@@ -257,7 +265,9 @@ export const Track: Story = {
   play: async ({ canvas }) => {
     const track = canvas.getByTestId("track-loader");
     await expect(track).toHaveAttribute("aria-hidden", "true");
-    await expect(canvas.getByRole("status")).toHaveTextContent("Loading...");
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent("Loading..."),
+    );
     await expect(widthOf(track)).toBe(30);
   },
   parameters: {
@@ -465,7 +475,9 @@ export const OnPrimaryButton: Story = {
     label: "Saving",
   },
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole("status")).toHaveTextContent("Saving");
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent("Saving"),
+    );
     await expect(canvas.getByTestId("loader")).toHaveAttribute(
       "id",
       "primary-track",

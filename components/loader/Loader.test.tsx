@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { screen, render } from "@testing-library/react";
+import { screen, render, waitFor } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { LoaderTypes } from "./Loader.enums";
@@ -64,10 +64,15 @@ describe("<Loader />", () => {
     expect(screen.getByTestId("loader")).toHaveAttribute("id", "custom-loader");
   });
 
-  it("is a status region whose text is the label", () => {
+  it("is a status region whose text is the label", async () => {
     render(<Loader type={LoaderTypes.oval} label="Fetching files" />);
     const status = screen.getByRole("status");
-    expect(status).toHaveTextContent("Fetching files");
+    await waitFor(() =>
+      expect(screen.getByTestId("loader-label")).toHaveTextContent(
+        "Fetching files",
+      ),
+    );
+    expect(status).toContainElement(screen.getByTestId("loader-label"));
     expect(status).not.toHaveAttribute("aria-busy");
     expect(screen.getByTestId("oval-loader")).toHaveAttribute(
       "aria-hidden",
@@ -75,34 +80,51 @@ describe("<Loader />", () => {
     );
   });
 
-  // The first render is all the server renders: the region and its hidden
-  // label are in it, empty, so the label arrives as a change to a region
-  // already on the page.
+  // The server renders the first render only, and the client's first render
+  // matches it: the region's hidden label is in it, empty, and the label
+  // arrives a moment later as a change to a region already on the page.
   it.each([LoaderTypes.oval, LoaderTypes.base])(
-    "mounts the %s status region empty and fills it after mount",
-    (type) => {
+    "mounts the %s status label empty and fills it a moment later",
+    async (type) => {
       const host = document.createElement("div");
       host.innerHTML = renderToStaticMarkup(
         <Loader type={type} label="Fetching files" />,
       );
-      expect(host.querySelector('[role="status"]')).not.toHaveTextContent(
-        "Fetching files",
-      );
+      expect(
+        host.querySelector('[data-testid="loader-label"]'),
+      ).toBeEmptyDOMElement();
 
       render(<Loader type={type} label="Fetching files" />);
-      expect(screen.getByRole("status")).toHaveTextContent("Fetching files");
+      expect(screen.getByTestId("loader-label")).toBeEmptyDOMElement();
+      await waitFor(() =>
+        expect(screen.getByTestId("loader-label")).toHaveTextContent(
+          "Fetching files",
+        ),
+      );
     },
   );
 
-  it("reads the label for rombs too", () => {
-    render(<Loader type={LoaderTypes.rombs} label="Starting" />);
-    expect(screen.getByRole("status")).toHaveTextContent("Starting");
+  it("draws the base type's text at once, hidden from assistive technology", () => {
+    render(<Loader type={LoaderTypes.base} label="Fetching files" />);
+    const drawn = screen.getByText("Fetching files");
+    expect(drawn.closest('[aria-hidden="true"]')).not.toBeNull();
   });
 
-  it("has no built-in English title and a default label", () => {
+  it("reads the label for rombs too", async () => {
+    render(<Loader type={LoaderTypes.rombs} label="Starting" />);
+    await waitFor(() =>
+      expect(screen.getByTestId("loader-label")).toHaveTextContent("Starting"),
+    );
+  });
+
+  it("has no built-in English title and a default label", async () => {
     render(<Loader type={LoaderTypes.dualRing} />);
     expect(document.querySelector("title")).toBeNull();
-    expect(screen.getByRole("status")).toHaveTextContent("Loading...");
+    await waitFor(() =>
+      expect(screen.getByTestId("loader-label")).toHaveTextContent(
+        "Loading...",
+      ),
+    );
   });
 
   it("draws the oval when no type is given", () => {

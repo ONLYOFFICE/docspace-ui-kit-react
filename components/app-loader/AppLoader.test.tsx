@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect } from "vitest";
-import { screen, render } from "@testing-library/react";
+import { screen, render, waitFor } from "@testing-library/react";
 
 import AppLoader from "./index";
 
@@ -12,19 +12,25 @@ describe("AppLoader", () => {
     expect(loader).toBeInTheDocument();
   });
 
-  it("announces the wait through a status region", () => {
+  it("announces the wait through a status region", async () => {
     render(<AppLoader />);
 
-    expect(screen.getByRole("status")).toHaveTextContent("Loading...");
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent("Loading..."),
+    );
     expect(screen.getByTestId("app-loader")).toHaveAttribute(
       "aria-busy",
       "true",
     );
   });
 
-  it("announces the label it is given", () => {
+  it("announces the label it is given", async () => {
     render(<AppLoader label="Starting the portal" />);
 
-    expect(screen.getByRole("status")).toHaveTextContent("Starting the portal");
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Starting the portal",
+      ),
+    );
   });
 });

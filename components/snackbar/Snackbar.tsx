@@ -42,9 +42,10 @@ let pendingUnmount: (() => void) | null = null;
 
 /**
  * The bar's announcement: a visually hidden polite live region beside the
- * visible content. It mounts empty and gets its text after mount, because a
- * region inserted together with its text is usually not announced; the
- * visible bar draws at once and is not live itself.
+ * visible content. It mounts empty and gets its text LIVE_REGION_DELAY later
+ * (useLiveRegionText), because a region inserted together with its text is
+ * usually not announced; the visible bar draws at once and is not live
+ * itself.
  */
 const SnackbarAnnouncement = ({
   html,

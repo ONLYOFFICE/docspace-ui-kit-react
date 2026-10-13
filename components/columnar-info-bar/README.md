@@ -233,13 +233,14 @@ element under both the light and the dark theme — and `neutral` and `page` add
   ignored.
 - `headerText` renders as an `<h3>`. Check that level against the page around it — the component
   does not adapt it, so a bar placed under an `<h1>` skips `<h2>`.
-- The default and `neutral` bars carry `role="status"`, a polite live region, because they
-  appear in response to something. The region is the heading and the columns only; the close
-  button sits outside it, so its name is not read out with the message. A screen reader announces
-  changes to a live region already on the page and usually not one inserted together with its
-  text, so the region mounts empty and the heading and columns are rendered into it right after
-  mount — the bar is announced when it appears, and again when its content changes. The `page`
-  variant is static content, has no role and renders its content at once.
+- The default and `neutral` bars are announced, because they appear in response to something.
+  The heading and the columns are drawn at once and are not live themselves; beside them a
+  visually hidden `role="status"` region carries their text, so the close button's name is not
+  read out with the message. A screen reader announces changes to a live region already on the
+  page and usually not one inserted together with its text, so that region stays empty for
+  100 ms and then takes the text — the bar is announced when it appears, and again when its
+  content changes. A virtual cursor meets the text twice, once drawn and once in the region. The
+  `page` variant is static content and announces nothing.
 - Nothing here traps focus or moves it.
 
 ## Test ids

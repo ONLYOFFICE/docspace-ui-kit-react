@@ -21,6 +21,8 @@ export interface PublicRoomBarProps {
   style?: React.CSSProperties;
   /** Removes the bar's own 20px top margin, for a bar that already sits under something. It shows and hides nothing, whatever the name suggests. */
   barIsVisible?: boolean;
+  /** Announces the bar's text to screen readers when the bar appears and when the text changes, through a visually hidden status region. Set it for a bar that shows up in response to something; leave it off for one that is part of a panel or dialog from the start, which is read with the rest of the page. */
+  live?: boolean;
   /** Value of `data-testid` on the outer element.
    * @default "public_room_bar" */
   dataTestId?: string;

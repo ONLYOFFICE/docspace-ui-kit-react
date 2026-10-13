@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { useLayoutEffect } from "react";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  waitFor,
+} from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { SnackBar } from "./Snackbar";
 
@@ -75,7 +81,7 @@ describe("SnackBar", () => {
     ).toHaveAttribute("type", "button");
   });
 
-  it("announces through a hidden status region, not the visible bar", () => {
+  it("announces through a hidden status region, not the visible bar", async () => {
     render(<SnackBar {...defaultProps} />);
     const bar = screen.getByTestId("snackbar-container");
     expect(bar).not.toHaveAttribute("role");
@@ -84,7 +90,9 @@ describe("SnackBar", () => {
 
     const status = screen.getByRole("status");
     expect(status).toBe(screen.getByTestId("snackbar-announcement"));
-    expect(status).toHaveTextContent("Test header Test message");
+    await waitFor(() =>
+      expect(status).toHaveTextContent("Test header Test message"),
+    );
     expect(status).not.toHaveTextContent(defaultProps.btnText);
   });
 
@@ -101,7 +109,7 @@ describe("SnackBar", () => {
     expect(region).toBeEmptyDOMElement();
   });
 
-  it("announces injected HTML as its text", () => {
+  it("announces injected HTML as its text", async () => {
     render(
       <SnackBar
         {...defaultProps}
@@ -110,7 +118,7 @@ describe("SnackBar", () => {
       />,
     );
     const status = screen.getByRole("status");
-    expect(status).toHaveTextContent("Tom & Jerry more");
+    await waitFor(() => expect(status).toHaveTextContent("Tom & Jerry more"));
     expect(status.querySelector("a")).toBeNull();
   });
 
