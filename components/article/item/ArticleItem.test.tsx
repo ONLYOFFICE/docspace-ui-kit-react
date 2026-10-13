@@ -195,6 +195,33 @@ describe("<ArticleItem />", () => {
       expect(mockOnClick).not.toHaveBeenCalled();
     });
 
+    // The article re-renders its whole list on every route change; an item
+    // whose props did not change has to be skipped by the memo.
+    it("does not render an unchanged linked item again", () => {
+      let linkRenders = 0;
+      const LinkRouter = ({
+        children,
+        onClick,
+      }: {
+        children?: React.ReactNode;
+        onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+      }) => {
+        linkRenders += 1;
+        return (
+          <a href="#docs" onClick={onClick}>
+            {children}
+          </a>
+        );
+      };
+      const props = { ...baseProps, showBadge: false, LinkRouter };
+
+      const { rerender } = render(<ArticleItem {...props} />);
+      const afterMount = linkRenders;
+      rerender(<ArticleItem {...props} />);
+
+      expect(linkRenders).toBe(afterMount);
+    });
+
     it("leaves the control to the link when LinkRouter is given", () => {
       const LinkRouter = ({
         children,
