@@ -166,6 +166,22 @@ const dayButton = (calendar: HTMLElement, day: number) =>
 const monthTitle = (date: DateTime, locale = "en") =>
   date.setLocale(locale).toFormat("MMMM yyyy").toLowerCase();
 
+// "Today" as the calendar drew it, read off its aria-current day, not the
+// clock as it reads when the play function runs: a run that crosses midnight
+// between the render and the assertions would otherwise compare against
+// tomorrow. Only today and yesterday can be the drawn day.
+const renderedToday = (calendar: HTMLElement) => {
+  const label = calendar
+    .querySelector('[aria-current="date"]')
+    ?.getAttribute("aria-label");
+  const clock = now();
+  const today = [clock, clock.minus({ days: 1 })].find(
+    (date) => date.setLocale("en").toLocaleString(DateTime.DATE_FULL) === label,
+  );
+  if (!today) throw new Error("No day of the calendar is marked as today");
+  return today;
+};
+
 // The date control hands back a timestamp, which the component does not parse.
 const toDate = (value?: DateTime | Date | number) =>
   typeof value === "number" ? new Date(value) : value;
@@ -221,7 +237,7 @@ export const Default: Story = {
   },
   play: async ({ args, canvas, userEvent }) => {
     const calendar = canvas.getByTestId("calendar");
-    const today = now();
+    const today = renderedToday(calendar);
     await expect(title(calendar).textContent?.toLowerCase()).toBe(
       monthTitle(today),
     );
@@ -333,7 +349,7 @@ export const WithDateConstraints: Story = {
   render: () => <WithDateConstraintsTemplate />,
   play: async ({ canvas, userEvent }) => {
     const calendar = canvas.getByTestId("calendar");
-    const today = now();
+    const today = renderedToday(calendar);
     const previous = within(calendar).getByRole("button", { name: "Previous" });
     const next = within(calendar).getByRole("button", { name: "Next" });
 
@@ -421,9 +437,10 @@ const LocaleExamplesTemplate = () => {
 export const LocaleExamples: Story = {
   render: () => <LocaleExamplesTemplate />,
   play: async ({ canvas }) => {
-    const today = now();
     const calendars = canvas.getAllByTestId("calendar");
     await expect(calendars).toHaveLength(4);
+    // The first calendar is the English one, whose day names the helper reads.
+    const today = renderedToday(calendars[0]);
     // Each title is the month written in its own locale.
     for (const [index, locale] of ["en", "ru", "de", "ja"].entries()) {
       await expect(title(calendars[index]).textContent?.toLowerCase()).toBe(

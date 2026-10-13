@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { DateTime } from "luxon";
 import { expect, fn, screen, waitFor, within } from "storybook/test";
 
-import { now } from "../../utils/date";
+import { now, parseToDateTime } from "../../utils/date";
 
 import { DateTimePicker } from ".";
 
@@ -191,8 +191,11 @@ export const Default: Story = {
     await userEvent.click(select);
     await expect(select).toHaveAttribute("aria-expanded", "true");
     const calendar = await canvas.findByTestId("calendar");
-    // Days are named by their full date; the 15th of the shown month.
-    const fifteenth = now()
+    // Days are named by their full date; the 15th of the shown month. That
+    // month is the story's own openDate, not the clock as it reads now, so a
+    // run that crosses midnight into a new month still finds the day.
+    const shownMonth = parseToDateTime(fromControl(args.openDate)) ?? now();
+    const fifteenth = shownMonth
       .set({ day: 15 })
       .setLocale("en")
       .toLocaleString(DateTime.DATE_FULL);
