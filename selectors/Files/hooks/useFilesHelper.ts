@@ -479,6 +479,10 @@ const useFilesHelper = ({
             await setSettings(rootThirdPartyId, true);
           } catch (fallbackError) {
             toastr.error(fallbackError as TData);
+            // A fallback that loaded ends the page load itself; one that
+            // failed would leave it on, and the Selector asks for no further
+            // page while it is.
+            if (isLatest()) setIsNextPageLoading(false);
           } finally {
             requestRunning.current = false;
             finishFullLoad();
