@@ -39,7 +39,7 @@ export const CircleSkeleton = ({
       animate={animate}
       uniqueKey={uniqueKey ?? stableKey}
       // Without a title the skeleton is a decorative placeholder: hide it
-      // rather than expose an unnamed image. Mark the region aria-busy.
+      // rather than expose an unnamed image.
       aria-hidden={title ? undefined : true}
       {...rest}
       data-testid="circle-skeleton"
