@@ -8,10 +8,10 @@ import React, {
 } from "react";
 import { isIOS, isMobile } from "react-device-detect";
 import classNames from "classnames";
-import { useTranslation } from "react-i18next";
 
 import ButtonAlertReactSvg from "../../assets/button.alert.react.svg";
 import { consumeKey } from "../../utils/consume-key";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import { Scrollbar } from "../scrollbar";
 import { Backdrop } from "../backdrop";
@@ -50,7 +50,9 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
     dropdownStyle,
   } = props;
 
-  const { t } = useTranslation(["Common"]);
+  const t = useCommonTranslation();
+  // The English fallback when no translations are loaded.
+  const alertLabel = t("Alert") || "Alert";
   const [isOpen, setIsOpen] = useState(opened);
   const sheetId = useId();
 
@@ -483,7 +485,7 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
               <button
                 type="button"
                 className={styles.alertButton}
-                aria-label={t("Common:Alert")}
+                aria-label={alertLabel}
                 onClick={onAlertClickAction}
               >
                 <ButtonAlertReactSvg
@@ -496,7 +498,7 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
               <ButtonAlertReactSvg
                 className={styles.alertIcon}
                 role="img"
-                aria-label={t("Common:Alert")}
+                aria-label={alertLabel}
               />
             )}
           </div>
