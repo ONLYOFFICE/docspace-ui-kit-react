@@ -103,6 +103,28 @@ describe("useSearch", () => {
     expect(field.value).toBe("ab");
   });
 
+  // The known cost of settling on a repeat: a new getter for another filter
+  // looks like the echo, so a late "ab" the host applied before aborting it
+  // is shown until its "a" arrives. Pinned so a change to it is deliberate.
+  it("shows a late replaced query briefly after an unrelated getter change", () => {
+    const onSearch = vi.fn();
+    const { rerender } = render(<Harness hostValue="a" onSearch={onSearch} />);
+    const field = screen.getByTestId("search") as HTMLInputElement;
+
+    fireEvent.change(field, { target: { value: "ab" } });
+    fireEvent.change(field, { target: { value: "a" } });
+
+    // Another filter changes before the search is answered.
+    rerender(<Harness hostValue="a" revision={1} onSearch={onSearch} />);
+    expect(field.value).toBe("a");
+
+    rerender(<Harness hostValue="ab" revision={1} onSearch={onSearch} />);
+    expect(field.value).toBe("ab");
+
+    rerender(<Harness hostValue="a" revision={1} onSearch={onSearch} />);
+    expect(field.value).toBe("a");
+  });
+
   it("takes the host's previous value again after a clear", () => {
     const onSearch = vi.fn();
     const { rerender } = render(<Harness hostValue="a" onSearch={onSearch} />);

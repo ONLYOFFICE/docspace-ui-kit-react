@@ -96,7 +96,11 @@ const useSearch = ({
     // The value the field already took brings nothing new to the field, but
     // it still settles the queries up to it: a burst that ends where it
     // started ("a", then "ab", "a") is reported as that same "a", and an
-    // "ab" left pending would hide the host's own "ab" later on.
+    // "ab" left pending would hide the host's own "ab" later on. The getter
+    // also changes for reasons of its own (another filter), and that repeat
+    // cannot be told from the echo: it settles the queries too, so a late
+    // "ab" the host applied before aborting it shows for a moment, until the
+    // "a" that follows it. Briefly wrong beats an "ab" refused for good.
     if (value === lastAppliedRef.current) {
       if (sentIndex !== -1) sentRef.current = sent.slice(sentIndex + 1);
       return;
