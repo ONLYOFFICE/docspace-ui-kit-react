@@ -185,12 +185,14 @@ const AIAgentSelectorComponent = ({
   // changes -- which it does for reasons of its own, not only when the list
   // should change. With `withInit` page 0 is `initItems`, already on screen,
   // so it is not fetched while it still describes the list: asking the portal
-  // would replace the items the caller passed. Once `excludeItems`,
-  // `disableBySecurity` or the translation differ from what `initItems` were
-  // shown with, page 0 is fetched as usual from then on. A search, or
-  // clearing one, fetches too, and so do later pages when `initHasNextPage`
-  // says there are more.
-  const initInputs = React.useRef({ excludeItems, disableBySecurity, t });
+  // would replace the items the caller passed. Once `excludeItems` or
+  // `disableBySecurity` differ from what `initItems` were shown with, page 0
+  // is fetched as usual from then on. The translation is not compared: it
+  // changes with the language, which is what hydration does on a page served
+  // in English to a user of another, and the caller's items stay right. A
+  // search, or clearing one, fetches too, and so do later pages when
+  // `initHasNextPage` says there are more.
+  const initInputs = React.useRef({ excludeItems, disableBySecurity });
   const initItemsCurrent = React.useRef(true);
 
   const onLoadNextPage = React.useCallback(
@@ -203,7 +205,6 @@ const AIAgentSelectorComponent = ({
       ) {
         const init = initInputs.current;
         const unchanged =
-          init.t === t &&
           init.disableBySecurity === disableBySecurity &&
           sameIds(init.excludeItems, excludeItems);
 
@@ -214,7 +215,7 @@ const AIAgentSelectorComponent = ({
 
       await getAgentList(startIndex);
     },
-    [withInit, getAgentList, t, disableBySecurity, excludeItems],
+    [withInit, getAgentList, disableBySecurity, excludeItems],
   );
 
   React.useEffect(() => {

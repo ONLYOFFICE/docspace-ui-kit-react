@@ -34,6 +34,18 @@ vi.mock("../../context/ThemeContext", () => ({
   useTheme: () => ({ isBase: true }),
 }));
 
+// A translation function of a new identity on every render, as the real one
+// becomes when the language arrives after hydration. Nothing here may take
+// that for a change of the list.
+vi.mock("../../utils/i18n", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../utils/i18n")>();
+
+  return {
+    ...actual,
+    useCommonTranslation: () => (key: string) => key,
+  };
+});
+
 vi.mock("../utils/hooks/useSocketHelper", () => ({
   default: () => ({ subscribe: () => {} }),
 }));
