@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { screen, render, waitFor } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 
@@ -146,5 +146,16 @@ describe("<Loader />", () => {
     expect(screen.queryByTestId("loader-label")).toBeNull();
     expect(screen.getByTestId("loader")).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByRole("button")).toHaveAccessibleName("Save");
+  });
+
+  // A list of busy rows renders one decorative loader each.
+  it("schedules no live-region timer when it is decorative", () => {
+    vi.useFakeTimers();
+    try {
+      render(<Loader type={LoaderTypes.track} isDecorative />);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

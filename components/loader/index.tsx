@@ -16,6 +16,21 @@ export { LoaderTypes };
 // The English fallback when no translations are loaded.
 const DEFAULT_LABEL = "Loading...";
 
+// The region's visually hidden label. A status region inserted together
+// with its text is usually not announced, so it stays empty for a moment and
+// the label follows (useLiveRegionText); what is drawn is not delayed. A
+// component of its own, so a decorative loader -- one per busy row or button
+// -- does not pay for the timer and the extra render.
+const LoaderLabel = ({ label }: { label: string }) => {
+  const liveLabel = useLiveRegionText(label);
+
+  return (
+    <span className={styles.visuallyHidden} data-testid="loader-label">
+      {liveLabel}
+    </span>
+  );
+};
+
 const Loader = (props: LoaderProps) => {
   const t = useCommonTranslation();
   const {
@@ -30,10 +45,6 @@ const Loader = (props: LoaderProps) => {
   } = props;
 
   const label = labelProp ?? (t("LoadingProcessing") || DEFAULT_LABEL);
-  // A status region inserted together with its text is usually not
-  // announced, so the region's hidden label stays empty for a moment and
-  // the label follows (useLiveRegionText). What is drawn is not delayed.
-  const liveLabel = useLiveRegionText(label);
 
   const { isDecorative: _isDecorative, ...rest } = props;
   const animationProps = { ...rest, type, label };
@@ -88,9 +99,7 @@ const Loader = (props: LoaderProps) => {
       data-testid="loader"
     >
       {svgRenderer(type)}
-      <span className={styles.visuallyHidden} data-testid="loader-label">
-        {liveLabel}
-      </span>
+      <LoaderLabel label={label} />
     </div>
   );
 };
