@@ -24,13 +24,17 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `:focus-visible` instead of the `focused` class
 - **`Loader` is a `role="status"` region and draws the oval by default.** Its `label` is the
   region's visually hidden text for every animation type (`rombs` included), defaulting to
-  "Loading content, please wait."; the animations are `aria-hidden` and lose their built-in
-  English titles ("dual ring", "oval", "track"), and the wrapper no longer sets `aria-busy`. A
-  `Loader` without `type` now draws the oval instead of rendering its label as text;
-  `LoaderTypes.base` still renders the text. A loader inside a control takes the new
-  `isDecorative` prop, which leaves the animation alone and `aria-hidden`, so the status text does
-  not become part of the control's name; `Button`, the combo box, `AddButton`, `FileInput`,
-  `Dropzone`, rows and tiles use it, and a loader you place inside your own button should too.
+  `Common:LoadingProcessing` ("Loading..."); the animations are `aria-hidden` and lose their
+  built-in English titles ("dual ring", "oval", "track"), and the wrapper no longer sets
+  `aria-busy`. A `Loader` without `type` now draws a 40px oval where it used to render an empty
+  span, and `Loader.default` is `{ type: oval, size: "40px", label: "Loading..." }` instead of
+  `{ type: base, label: "Loading content, please wait." }`; `LoaderTypes.base` still renders the
+  label as visible text, which without a `label` is now "Loading...". Every loader without
+  `isDecorative` adds that hidden text to whatever it sits in, a table cell included. A loader
+  inside a control takes the new `isDecorative` prop, which leaves the animation alone and
+  `aria-hidden`, so the status text does not become part of the control's name; `Button`, the
+  combo box, `AddButton`, `FileInput`, `Dropzone`, rows and tiles use it, and a loader you place
+  inside your own button or busy row should too.
 - **`ErrorContainer` writes fewer fixed element ids.** The `button-container`, `button` and
   illustration ids (`background`, `birds`, `baloon`, ...) are gone; the parts are styled through
   module classes. `container-inner`, `header`, `text` and `customized-text` stay, because the
@@ -80,6 +84,33 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`SelectionArea` can start a drag outside `#sectionScroll`.** The new `startAreaSelector` prop
   names the region a drag may start in; the default stays `#sectionScroll`.
 - **`hideProfilePicker` is documented as the lock it is.** `@onlyoffice/ai-chat` 0.6.0 and later lock the composer's model picker instead of removing it (its menu also carries the Effort row). The prop's JSDoc, the AiChatPanel docs page and the `WithoutModelPicker` story said it removed the picker; nothing in this package's behaviour changed.
+- **`Tags`' `onOptionTagClick` says which tag was clicked.** It is called with `"overflow"` or
+  `"create"` (the new `TOptionTagKind` type), because the overflow tag and the create tag can now
+  be on screen together. A handler that takes no argument keeps working.
+- **`ColorPicker`'s `onClose` has no default, and Escape needs one.** Without `onClose` Escape is
+  left to whatever listens further up, so a picker in a `ModalDialog` no longer stops Escape from
+  closing the dialog; with one, Escape is consumed and calls it as before.
+- **`EmptyScreenContainer` is no live region, and `ec-header` is one class.** An empty state is
+  read like the rest of the page instead of being announced on every route load. The header's
+  19px size and 700 weight are set through `Text`'s variables by a single class, so a rule of
+  your own of two classes or more on `ec-header` wins by specificity, not by stylesheet order.
+- **`SnackBar` announces through a hidden region, and `SnackBar.close()` unmounts a microtask
+  later.** The visible bar is no longer `role="status"`; a visually hidden region beside it
+  (`data-testid="snackbar-announcement"`) carries the header and text. `close()` clears the
+  bar's bookkeeping at once but unmounts on the next microtask, so it is safe to call while React
+  renders (from the countdown's `onComplete`); a test that checks the DOM right after `close()`
+  has to wait for it.
+- **An `ArticleItem` link reports its click before the router navigates.** The link calls
+  `onClick` itself, so a `preventDefault()` there cancels the navigation again; the click is
+  still reported once.
+- **`Dropzone`'s format line sits beside the drop area, not inside it.** The drop area
+  (`dropzone-input-area`) still covers the whole box, but a file dropped onto the format line
+  itself is ignored; a selector that expected `dropzone-file-types` inside the area must look
+  beside it.
+- **`MainButton` draws its focus ring in the accent**, through the new
+  `--main-button-focus-color`, instead of in its background colour.
+- **Busy rows and tiles carry `aria-busy`.** `Row` and the base, file and folder tiles set it
+  while `inProgress`, since their loader is decorative.
 
 ### Added
 
@@ -230,7 +261,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   their own `toString()` are shown as text), and the default titles fall back to the English
   `Done`/`Warning`/`Alert`/`Info` when no `TranslationProvider` is mounted.
 - **`AppLoader` announces the wait.** The loader inside it is a status region reading the new
-  `label` prop (default "Loading content, please wait."), and the sheet carries
+  `label` prop (default `Common:LoadingProcessing`, "Loading..."), and the sheet carries
   `aria-busy="true"`.
 - **`LoadingButton` can be cancelled from the keyboard and reports its progress.** With
   `onClick`, the disc in the middle is a `role="button"` in the tab order, pressed with Enter or
@@ -384,12 +415,42 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **The errors story helper is no longer published.** `dist/types/errors/stories.utils`, a
   Storybook-only i18n stand-in, was reachable as `./errors/stories.utils`; the declaration build
   now excludes it.
-- **`AIAgentSelector` keeps the `initItems` it is given.** With `withInit` the selector still fetched the first page from the portal on mount and replaced the pre-loaded list with the answer. The first page is no longer requested; a search, clearing one, and further pages (`initHasNextPage`) are fetched as before.
+- **`AIAgentSelector` keeps the `initItems` it is given.** With `withInit` the selector still fetched the first page from the portal on mount and replaced the pre-loaded list with the answer. The first page is no longer requested while `excludeItems`, `disableBySecurity` and the translation are what `initItems` were shown with; once one of them changes it is fetched as usual. A search, clearing one, and further pages (`initHasNextPage`) are fetched as before.
 - **The system MCP server's label no longer repeats the brand.** `MCPServersSelector` labelled the portal's own server `OrganizationName ProductName`, which read "ONLYOFFICE ONLYOFFICE" where the product name is ONLYOFFICE. The organisation is now prefixed only when the product name does not already contain it: "ONLYOFFICE DocSpace" is unchanged, "ONLYOFFICE" and "ONLYOFFICE Apps" are shown as they are.
 - **`PeopleSelector`'s Groups tab lists groups when there is no `roomId`.** It used to run the people search and showed every user, guests included. It now loads the portal's groups (`groupApi.getGroups`); with a `roomId` the room's sharing query is used as before.
 - **`FilesSelector` calls `headerProps.onCloseClick`.** The header's close cross always called `onCancel`, ignoring the handler passed in `headerProps`. The caller's `onCloseClick` now runs, with `onCancel` as the fallback when it is absent; the footer's Cancel button still calls `onCancel`. A consumer that passed a no-op `onCloseClick` and relied on the cross cancelling should pass `onCancel` there.
 - **`Uploader` accepts any file with `accept="*"`.** `accept` went to react-dropzone unchanged, where `"*"` and `"*/*"` refuse every file - including in the README's own examples. `"*"`, `"*/*"`, `""` and a missing `accept` now all mean any file, and `accept` is optional in `UploaderProps`. A list is passed on trimmed and without blank entries: `".pdf,"` used to let every file with no MIME type through.
 - **The legal sample's relative dates are in English.** "updated yesterday" and "Sent 5 days ago" followed the browser's locale inside an otherwise English page; they are now formatted in English.
+- **`Loader`, `ColumnarInfoBar` and `PublicRoomBar` are announced when they appear.** Each was a
+  status region inserted together with its text, which screen readers mostly do not read; the
+  region now mounts empty and receives its text one render later.
+- **`LinkWithDropdown`'s keys skip separators and headers**, and a caller's `onKeyDown` or
+  `tabIndex` no longer switches the keyboard support off: unknown props go first, and a caller's
+  `onKeyDown` runs before the built-in keys and can opt out with `preventDefault()`.
+- **An open `DropDown` closes on an outside click that re-renders its owner.** The listener
+  ignored that click as the one that opened the menu whenever `clickOutsideAction` changed
+  identity, which `ContextMenuButton` and `LinkWithDropdown` do on every render.
+- **`ComboBox` leaves its optional block's keys alone**, as its click handler does, and lets the
+  arrows scroll an `advancedOptions` panel instead of cancelling them.
+- **The segmented `Tabs` arrows start from the focused tab**, after a click on the tab already
+  selected too, and a shorter item list no longer leaves the bar without a Tab stop.
+- **`Filter`'s search ignores every stale echo.** With "a", "ab", "a" sent and echoed slowly, the
+  stale "ab" was pushed into the field; echoes are now matched oldest first.
+- **`SearchInput` takes a value set after its cross was used**, even one equal to the last value
+  it reported.
+- **A key a component handles no longer hides its `keyup` from React.** The `keyup` is stopped at
+  `<html>`, so the element under focus and `onKeyUp` handlers still receive it, while page and
+  dialog listeners on `document` and `window` do not.
+- **`StatusMessage` no longer sticks mid-fade** after its effects are replayed (StrictMode, a
+  re-shown `Activity`).
+- **`toastr` shows nothing instead of throwing** for an object with no prototype.
+- **`EmptyView`'s keyboard-opened context menu opens at the item's start corner in RTL.**
+- **A held Space toggles `Checkbox` once.**
+- **`FieldContainer` keeps its error in the control's description** when the control rewrites its
+  own `aria-describedby`.
+- **`DateTimePicker`'s AM/PM sets the hour** instead of shifting by 12 hours, which was an hour off
+  on a day the clocks change.
+- **The samples' declarations are no longer published.** `dist/types/docs` is gone.
 
 ## 4.0.1
 
