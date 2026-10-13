@@ -126,7 +126,9 @@ export function ServerList({ servers }: { servers: Server[] }) {
 ### An inline SVG instead of a URL
 
 `imgNode` takes a node, which is how you pass an icon your bundler has already inlined. It wins
-over `imgSrc`, and it has no failure path — whatever you give it is what renders.
+over `imgSrc`. An inline SVG cannot fail to load; an `<img>` inside the node can, and then the
+letter takes over as it does for `imgSrc`. The failure is remembered by the element's `src`, so a
+node rebuilt on every render with the same broken `src` stays on the letter.
 
 ```tsx
 import {
