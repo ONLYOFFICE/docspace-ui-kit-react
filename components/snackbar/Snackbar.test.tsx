@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { useLayoutEffect } from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { SnackBar } from "./Snackbar";
 
 describe("SnackBar", () => {
@@ -73,11 +75,43 @@ describe("SnackBar", () => {
     ).toHaveAttribute("type", "button");
   });
 
-  it("is a polite live region", () => {
+  it("announces through a hidden status region, not the visible bar", () => {
     render(<SnackBar {...defaultProps} />);
-    const bar = screen.getByRole("status");
-    expect(bar).toHaveAttribute("aria-live", "polite");
+    const bar = screen.getByTestId("snackbar-container");
+    expect(bar).not.toHaveAttribute("role");
+    expect(bar).not.toHaveAttribute("aria-live");
     expect(bar).toHaveAttribute("id", "snackbar-container");
+
+    const status = screen.getByRole("status");
+    expect(status).toBe(screen.getByTestId("snackbar-announcement"));
+    expect(status).toHaveTextContent("Test header Test message");
+    expect(status).not.toHaveTextContent(defaultProps.btnText);
+  });
+
+  // The first render is all the server renders: the region is in it, empty,
+  // while the visible bar already has its text.
+  it("mounts the status region empty and fills it after mount", () => {
+    const host = document.createElement("div");
+    host.innerHTML = renderToStaticMarkup(<SnackBar {...defaultProps} />);
+    expect(
+      host.querySelector('[data-testid="snackbar-message"]'),
+    ).toHaveTextContent("Test message");
+    const region = host.querySelector('[role="status"]');
+    expect(region).not.toBeNull();
+    expect(region).toBeEmptyDOMElement();
+  });
+
+  it("announces injected HTML as its text", () => {
+    render(
+      <SnackBar
+        {...defaultProps}
+        htmlContent="<p>Tom &amp; Jerry <a href='/x'>more</a></p>"
+        text={undefined}
+      />,
+    );
+    const status = screen.getByRole("status");
+    expect(status).toHaveTextContent("Tom & Jerry more");
+    expect(status.querySelector("a")).toBeNull();
   });
 
   it("takes its DOM id from the id prop", () => {
@@ -146,12 +180,18 @@ describe("SnackBar", () => {
   });
 
   describe("static show / close", () => {
-    afterEach(() => {
-      act(() => SnackBar.close());
+    // close() unmounts on a microtask, so it is awaited.
+    const close = () =>
+      act(async () => {
+        SnackBar.close();
+      });
+
+    afterEach(async () => {
+      await close();
       document.body.innerHTML = "";
     });
 
-    it("reuses one node and one root across calls without a parent", () => {
+    it("reuses one node and one root across calls without a parent", async () => {
       act(() => SnackBar.show({ ...defaultProps, parentElementId: "" }));
       act(() =>
         SnackBar.show({ ...defaultProps, text: "Second", parentElementId: "" }),
@@ -162,12 +202,12 @@ describe("SnackBar", () => {
         "Second",
       );
 
-      act(() => SnackBar.close());
+      await close();
       expect(document.getElementById("snackbar")).toBeNull();
       expect(window.snackbar).toBeUndefined();
     });
 
-    it("unmounts the bar from a given parent and leaves the parent", () => {
+    it("unmounts the bar from a given parent and leaves the parent", async () => {
       const parent = document.createElement("div");
       parent.id = "main-bar";
       document.body.appendChild(parent);
@@ -177,9 +217,72 @@ describe("SnackBar", () => {
       );
       expect(parent.hasChildNodes()).toBe(true);
 
-      act(() => SnackBar.close());
+      await close();
       expect(parent.hasChildNodes()).toBe(false);
       expect(document.getElementById("main-bar")).toBe(parent);
+    });
+  });
+
+  describe("static close during a commit", () => {
+    afterEach(async () => {
+      await act(async () => {
+        SnackBar.close();
+      });
+      document.body.innerHTML = "";
+      vi.restoreAllMocks();
+    });
+
+    // react-countdown calls onComplete while React commits; onAction then
+    // usually closes the bar.
+    it("does not unmount the root synchronously", async () => {
+      const error = vi.spyOn(console, "error").mockImplementation(() => {});
+      act(() => SnackBar.show({ ...defaultProps, parentElementId: "" }));
+
+      const Closer = () => {
+        useLayoutEffect(() => {
+          SnackBar.close();
+        }, []);
+        return null;
+      };
+
+      await act(async () => {
+        render(<Closer />);
+      });
+
+      expect(document.getElementById("snackbar")).toBeNull();
+      expect(window.snackbar).toBeUndefined();
+      expect(
+        error.mock.calls.some((call) =>
+          String(call[0]).includes("synchronously unmount"),
+        ),
+      ).toBe(false);
+    });
+
+    it("shows a new bar in a fresh root right after close", async () => {
+      const parent = document.createElement("div");
+      parent.id = "main-bar";
+      document.body.appendChild(parent);
+      const error = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      act(() =>
+        SnackBar.show({ ...defaultProps, parentElementId: "main-bar" }),
+      );
+      await act(async () => {
+        SnackBar.close();
+        SnackBar.show({
+          ...defaultProps,
+          text: "Second",
+          parentElementId: "main-bar",
+        });
+      });
+
+      expect(
+        parent.querySelectorAll('[data-testid="snackbar-container"]'),
+      ).toHaveLength(1);
+      expect(screen.getByTestId("snackbar-message")).toHaveTextContent(
+        "Second",
+      );
+      expect(error).not.toHaveBeenCalled();
     });
   });
 

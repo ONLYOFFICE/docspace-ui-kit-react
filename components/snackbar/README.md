@@ -236,7 +236,10 @@ Prefer rendering `<SnackBar/>` yourself. If you do call it:
   document never holds two of them;
 - `SnackBar.close()` unmounts that root, with or without `parentElementId`. The element named by
   `parentElementId` is left in place, empty; the `<div id="snackbar">` that `show` appended is
-  removed. `window.snackbar` is cleared;
+  removed. `window.snackbar` is cleared at once, but the unmount and the removal wait for a
+  microtask, because `close` is often called while React is committing — from the countdown's
+  `onAction` — where a synchronous unmount is refused. A `show` called before that microtask runs
+  finishes the unmount first and mounts the new bar in a fresh root;
 - `close()` only knows about the bar `show` mounted. A `<SnackBar/>` you rendered yourself is
   yours to remove.
 
@@ -263,10 +266,14 @@ reaches.
 
 ## Accessibility
 
-- **The bar is a `role="status"` with `aria-live="polite"`**, so a screen reader reads it when it
-  appears without interrupting the user. The campaign banner (`isCampaigns`) is an iframe and is
-  not a live region. The `countDownTime` counter is hidden from assistive technology: it changes
-  every second, and inside the live region each tick would be announced.
+- **The bar is announced through a visually hidden `role="status"` region inside it** (a polite
+  live region), so a screen reader reads it when it appears without interrupting the user. The
+  region mounts empty and receives the header, the extra header line and the message — or the
+  text of `htmlContent` — right after mount, because a live region inserted together with its
+  text is usually not announced. The visible bar draws at once and is not a live region itself,
+  so the action and the close cross are not read out with the message. The campaign banner
+  (`isCampaigns`) is an iframe and is not announced. The `countDownTime` counter is hidden from
+  assistive technology and left out of the announcement: it changes every second.
 - The close cross — of the bar and of the campaign banner — is a `<button type="button">`, so it
   never submits a surrounding form. It is named by `closeButtonLabel`, the translated `Common:CloseButton`
   ("Close") by default; the icon inside is `aria-hidden`.
@@ -280,6 +287,7 @@ reaches.
 | Element          | `data-testid`              |
 | ---------------- | -------------------------- |
 | The bar          | `snackbar-container`       |
+| The announcement | `snackbar-announcement`    |
 | The message      | `snackbar-message`         |
 | The header       | `snackbar-header`          |
 | The extra header | `snackbar-additional-info` |

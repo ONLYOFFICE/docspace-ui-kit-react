@@ -8,6 +8,7 @@ import { zeroPad } from "react-countdown";
 import classNames from "classnames";
 import xss from "xss";
 
+import { useLiveRegionText } from "../../hooks/useLiveRegionText";
 import { interopDefault } from "../../utils/interop-default";
 import { getCommonTranslation } from "../../utils/i18n";
 import { Heading, HeadingSize } from "../heading";
@@ -32,9 +33,57 @@ let staticRoot: Root | null = null;
 let staticNode: HTMLElement | null = null;
 let ownsStaticNode = false;
 
+// The unmount a `close` has scheduled and not yet run. `close` can be called
+// while React is committing -- the countdown's onComplete is -- where a
+// synchronous root.unmount() is refused with an error, so it waits for a
+// microtask. A `show` that comes first runs it at once instead, so the new
+// bar never lands in a root that is about to go.
+let pendingUnmount: (() => void) | null = null;
+
+/**
+ * The bar's announcement: a visually hidden polite live region beside the
+ * visible content. It mounts empty and gets its text after mount, because a
+ * region inserted together with its text is usually not announced; the
+ * visible bar draws at once and is not live itself.
+ */
+const SnackbarAnnouncement = ({
+  html,
+  children,
+}: {
+  html?: string;
+  children?: React.ReactNode;
+}) => {
+  // Injected HTML is announced as its text, decoded by the browser's parser
+  // (which runs no script) rather than injected a second time.
+  const [htmlText, setHtmlText] = React.useState<string>();
+
+  React.useEffect(() => {
+    if (!html) {
+      setHtmlText(undefined);
+      return;
+    }
+    const doc = new DOMParser().parseFromString(xss(html), "text/html");
+    setHtmlText(doc.body.textContent?.trim() ?? "");
+  }, [html]);
+
+  const text = useLiveRegionText(html ? htmlText : children);
+
+  return (
+    <span
+      role="status"
+      className={styles.visuallyHidden}
+      data-testid="snackbar-announcement"
+    >
+      {text}
+    </span>
+  );
+};
+
 class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
   static show(barConfig: BarConfig) {
     const { parentElementId, ...rest } = barConfig;
+
+    pendingUnmount?.();
 
     const target = parentElementId
       ? document.getElementById(parentElementId)
@@ -68,16 +117,30 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
   }
 
   static close() {
-    if (staticRoot) {
-      staticRoot.unmount();
-      staticRoot = null;
-    }
+    const root = staticRoot;
+    const node = ownsStaticNode ? staticNode : null;
 
-    if (ownsStaticNode && staticNode) staticNode.remove();
-
+    staticRoot = null;
     staticNode = null;
     ownsStaticNode = false;
     window.snackbar = undefined;
+
+    if (!root) {
+      node?.remove();
+      return;
+    }
+
+    let done = false;
+    const unmount = () => {
+      if (done) return;
+      done = true;
+      if (pendingUnmount === unmount) pendingUnmount = null;
+      root.unmount();
+      node?.remove();
+    };
+
+    pendingUnmount = unmount;
+    queueMicrotask(unmount);
   }
 
   constructor(props: SnackbarProps) {
@@ -123,9 +186,9 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
     if (completed) return null;
     const { fontSize, fontWeight } = this.props;
 
-    // Render a countdown. It changes every second inside the bar's live
-    // region, so it is hidden from assistive technology, which would
-    // otherwise announce each tick.
+    // Render a countdown. It changes every second, so it is hidden from
+    // assistive technology and left out of the announcement, which would
+    // otherwise be repeated on each tick.
     return (
       <Text
         as="p"
@@ -208,8 +271,6 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
         {...rest}
         data-testid="snackbar-container"
         id={id}
-        role="status"
-        aria-live="polite"
         style={snackbarStyle}
         className={styles.snackbar}
       >
@@ -302,6 +363,11 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
             <CrossReactSvg className={styles.crossIcon} aria-hidden="true" />
           </button>
         ) : null}
+        <SnackbarAnnouncement html={htmlContent}>
+          {headerText ? <>{headerText} </> : null}
+          {additionalHeaderText ? <>{additionalHeaderText} </> : null}
+          {text}
+        </SnackbarAnnouncement>
       </div>
     );
   }
