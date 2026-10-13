@@ -28,7 +28,8 @@ type TFocusTarget = "first" | "last" | null;
 // A click event positioned at the element's bottom-left corner, for an
 // action the keyboard started. It is never dispatched, so it is given the
 // target, currentTarget and nativeEvent a handler typed for a React mouse
-// event reads.
+// event reads, and the methods React adds to its events, so a handler that
+// calls isDefaultPrevented() or persist() does not throw.
 const keyboardClickAt = (element: HTMLElement | null): React.MouseEvent => {
   const rect = element?.getBoundingClientRect();
   const left = rect?.left ?? 0;
@@ -44,6 +45,17 @@ const keyboardClickAt = (element: HTMLElement | null): React.MouseEvent => {
   Object.defineProperty(event, "target", { value: element });
   Object.defineProperty(event, "currentTarget", { value: element });
   Object.defineProperty(event, "nativeEvent", { value: event });
+  let propagationStopped = false;
+  const stopPropagation = event.stopPropagation.bind(event);
+  Object.assign(event, {
+    stopPropagation: () => {
+      propagationStopped = true;
+      stopPropagation();
+    },
+    isDefaultPrevented: () => event.defaultPrevented,
+    isPropagationStopped: () => propagationStopped,
+    persist: () => {},
+  });
   return event as unknown as React.MouseEvent;
 };
 

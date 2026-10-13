@@ -118,6 +118,12 @@ describe("<ContextMenuButton />", () => {
       expect(event.currentTarget).toBe(button);
       expect(event.target).toBe(button);
       expect(typeof event.pageX).toBe("number");
+      // The methods a React event has, which a handler may call.
+      event.persist();
+      event.preventDefault();
+      event.stopPropagation();
+      expect(event.isDefaultPrevented()).toBe(true);
+      expect(event.isPropagationStopped()).toBe(true);
     },
   );
 
