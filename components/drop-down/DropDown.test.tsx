@@ -330,6 +330,42 @@ describe("<DropDown />", () => {
     });
   });
 
+  it("does not ignore an outside mousedown that re-renders the open menu", () => {
+    const clickOutsideAction = vi.fn();
+    let bump: () => void = () => {};
+
+    const Host = () => {
+      const [, setCount] = useState(0);
+      bump = () => flushSync(() => setCount((c) => c + 1));
+      return (
+        <DropDown
+          {...baseProps}
+          open
+          withBackdrop={false}
+          eventTypes="mousedown"
+          // A new function every render, as ContextMenuButton passes.
+          clickOutsideAction={(e, next) => clickOutsideAction(e, next)}
+        >
+          <div>Content</div>
+        </DropDown>
+      );
+    };
+    render(<Host />);
+
+    // Something on the way to window re-renders the host while the
+    // mousedown is still being dispatched, so the listener is re-attached.
+    const onDocumentMouseDown = () => bump();
+    document.addEventListener("mousedown", onDocumentMouseDown);
+    try {
+      fireEvent.mouseDown(document.body);
+    } finally {
+      document.removeEventListener("mousedown", onDocumentMouseDown);
+    }
+
+    expect(clickOutsideAction).toHaveBeenCalledTimes(1);
+    expect(clickOutsideAction).toHaveBeenCalledWith(expect.any(Event), false);
+  });
+
   describe("position calculation", () => {
     const mockViewport = (width: number, height: number) => {
       const originalGetViewport = window.innerWidth;
