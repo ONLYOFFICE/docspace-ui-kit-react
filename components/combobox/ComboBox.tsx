@@ -39,6 +39,9 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
   // };
 
   const { withBackdrop = true, onBackdropClick, onToggle } = props;
+  // Read by the click and the key handlers alike, so the default lives here
+  // once.
+  const { disableIconClick = true } = props;
 
   const handleClickOutside = React.useCallback(
     (e: Event) => {
@@ -68,7 +71,6 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     e,
   ) => {
     const {
-      disableIconClick = true,
       disableItemClick,
       isDisabled,
       onToggle,
@@ -289,7 +291,6 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     if (target.closest("input, textarea, [contenteditable='true']")) return;
     // The same exclusion comboBoxClick makes: the optional children block
     // (`children`) keeps its own keys while disableIconClick is on.
-    const { disableIconClick = true } = props;
     if (disableIconClick && isInOptionalBlock(target, e.currentTarget)) return;
     if (
       isDisabled ||
