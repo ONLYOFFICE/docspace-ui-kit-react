@@ -135,8 +135,7 @@ describe("ColumnarInfoBar", () => {
     expect(screen.getByTestId("status-badge")).toBeInTheDocument();
   });
 
-  // Known defect (review of spike/vitest-addon): role=status wraps the onAction button too, so its label is announced with the bar. Flip to it() once fixed.
-  it.fails.each(["default", "neutral"] as const)(
+  it.each(["default", "neutral"] as const)(
     "keeps the close button out of the status live region (%s variant)",
     (variant) => {
       render(

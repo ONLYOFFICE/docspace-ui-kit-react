@@ -234,7 +234,8 @@ element under both the light and the dark theme — and `neutral` and `page` add
 - `headerText` renders as an `<h3>`. Check that level against the page around it — the component
   does not adapt it, so a bar placed under an `<h1>` skips `<h2>`.
 - The default and `neutral` bars carry `role="status"`, a polite live region, because they
-  appear in response to something. A screen reader announces changes to a live region already on
+  appear in response to something. The region is the heading and the columns only; the close
+  button sits outside it, so its name is not read out with the message. A screen reader announces changes to a live region already on
   the page; a bar that mounts already filled may be read only when the user reaches it, so keep
   it mounted and change its content when the announcement matters. The `page` variant is static
   content and has no role.

@@ -59,11 +59,12 @@ const ColumnarInfoBar = ({
     );
   }
 
-  // The default and neutral bars appear in response to something, so they
-  // are a polite live region; the page block is static content.
+  // The default and neutral bars appear in response to something, so their
+  // content is a polite live region -- the content only, so the close
+  // button's name is not read out with the message. The page block is static.
   return (
-    <div className={className} style={style} role="status">
-      <div className={styles.content}>
+    <div className={className} style={style}>
+      <div className={styles.content} role="status">
         {headerText ? <h3 className={styles.header}>{headerText}</h3> : null}
         {list}
       </div>
