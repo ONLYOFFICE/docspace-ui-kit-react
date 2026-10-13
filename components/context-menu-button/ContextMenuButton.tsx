@@ -25,6 +25,23 @@ const MENU_ITEM_SELECTOR = '[role="menuitem"]:not([aria-disabled="true"])';
 
 type TFocusTarget = "first" | "last" | null;
 
+// A click event positioned at the element's bottom-left corner, for an
+// action the keyboard started.
+const keyboardClickAt = (element: HTMLElement | null) => {
+  const rect = element?.getBoundingClientRect();
+  const left = rect?.left ?? 0;
+  const bottom = rect?.bottom ?? 0;
+  const event = new MouseEvent("click", {
+    bubbles: true,
+    cancelable: true,
+    clientX: left,
+    clientY: bottom,
+  });
+  Object.defineProperty(event, "pageX", { value: left + window.scrollX });
+  Object.defineProperty(event, "pageY", { value: bottom + window.scrollY });
+  return event;
+};
+
 const ContextMenuButtonPure = ({
   opened = false,
   data = [],
@@ -188,7 +205,12 @@ const ContextMenuButtonPure = ({
       e.preventDefault();
       consumeKey(e);
       setState((s) => ({ ...s, data: readData() }));
-      onClick?.(e as unknown as React.MouseEvent);
+      // Callers hand the event to ContextMenu.show(e), which places the menu
+      // at e.pageX / e.pageY; a key press has neither, so it gets a click at
+      // the button's bottom-left corner, as MainButton does.
+      onClick?.(
+        keyboardClickAt(buttonRef.current) as unknown as React.MouseEvent,
+      );
       return;
     }
 
