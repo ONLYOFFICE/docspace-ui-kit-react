@@ -137,6 +137,20 @@ jobs:
       - name: Run the stories as tests
         run: pnpm test:stories
 
+      # Browser mode saves a screenshot of every failing story in a
+      # `__screenshots__` folder beside its story file. They are the only view
+      # of what the failure looked like, so keep them with the run.
+      - name: Upload failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: story-test-screenshots
+          path: |
+            **/__screenshots__/**
+            !node_modules/**
+          if-no-files-found: ignore
+          retention-days: 7
+
   package:
     name: "Build & verify the package"
     runs-on: ubuntu-latest
