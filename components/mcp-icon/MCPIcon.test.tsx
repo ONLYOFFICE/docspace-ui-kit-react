@@ -140,30 +140,26 @@ describe("<MCPIcon />", () => {
     });
   });
 
-  // Known defect (review of spike/vitest-addon): imgError is reset only when imgSrc changes, so a new imgNode stays hidden. Flip to it() once fixed.
-  it.fails(
-    "shows a new imgNode after the previous one failed to load",
-    async () => {
-      const { rerender } = renderComponent({
-        title: "Node",
-        imgNode: <img src="broken.png" alt="" data-testid="node-img-a" />,
-      });
+  it("shows a new imgNode after the previous one failed to load", async () => {
+    const { rerender } = renderComponent({
+      title: "Node",
+      imgNode: <img src="broken.png" alt="" data-testid="node-img-a" />,
+    });
 
-      act(() => {
-        screen.getByTestId("node-img-a").dispatchEvent(new Event("error"));
-      });
-      await waitFor(() => {
-        expect(screen.getByText("N")).toBeInTheDocument();
-      });
+    act(() => {
+      screen.getByTestId("node-img-a").dispatchEvent(new Event("error"));
+    });
+    await waitFor(() => {
+      expect(screen.getByText("N")).toBeInTheDocument();
+    });
 
-      rerender(
-        <MCPIcon
-          title="Node"
-          imgNode={<img src="fixed.png" alt="" data-testid="node-img-b" />}
-        />,
-      );
+    rerender(
+      <MCPIcon
+        title="Node"
+        imgNode={<img src="fixed.png" alt="" data-testid="node-img-b" />}
+      />,
+    );
 
-      expect(screen.getByTestId("node-img-b")).toBeInTheDocument();
-    },
-  );
+    expect(screen.getByTestId("node-img-b")).toBeInTheDocument();
+  });
 });

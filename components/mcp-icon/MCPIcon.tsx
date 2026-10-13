@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import classNames from "classnames";
 
 import { Text } from "../text";
@@ -36,17 +36,15 @@ export const MCPIcon = (props: MCPIconProps) => {
     dataTestId = "mcp-icon",
   } = props;
 
-  const [imgError, setImgError] = useState(false);
+  // The picture that failed to load. The error belongs to that source, so a
+  // new `imgSrc` or a new `imgNode` is tried afresh.
+  const source = imgNode ?? imgSrc;
+  const [failedSource, setFailedSource] = useState<unknown>(null);
+  const imgError = !!source && failedSource === source;
 
-  const showImg = (!!imgSrc || !!imgNode) && !imgError;
+  const showImg = !!source && !imgError;
 
-  useEffect(() => {
-    if (imgSrc && imgError) {
-      setImgError(false);
-    }
-  }, [imgSrc]);
-
-  const onImageError = () => setImgError(true);
+  const onImageError = () => setFailedSource(source);
 
   const name = title?.trim();
 
