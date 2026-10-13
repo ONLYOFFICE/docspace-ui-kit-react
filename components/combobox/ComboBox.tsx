@@ -279,6 +279,10 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
   const onComboKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
     if (target.closest("input, textarea, [contenteditable='true']")) return;
+    // The same exclusion comboBoxClick makes: the optional children block
+    // (`children`) keeps its own keys while disableIconClick is on.
+    const { disableIconClick = true } = props;
+    if (disableIconClick && target.closest(".optionalBlock")) return;
     if (
       isDisabled ||
       isLoading ||
@@ -314,12 +318,14 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     switch (e.key) {
       case "ArrowDown":
       case "ArrowUp":
+        // Nothing to step through: leave the arrows to custom content and to
+        // the page's own scrolling.
+        if (!navigable) break;
         e.preventDefault();
         consumeKey(e);
-        if (navigable)
-          setActiveIndex((index) =>
-            stepActiveIndex(index, e.key === "ArrowUp" ? -1 : 1),
-          );
+        setActiveIndex((index) =>
+          stepActiveIndex(index, e.key === "ArrowUp" ? -1 : 1),
+        );
         break;
       case "Enter":
       case " ": {

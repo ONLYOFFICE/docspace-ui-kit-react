@@ -288,7 +288,9 @@ export function TimezonePicker({ zones }: { zones: TOption[] }) {
   highlighted option; Escape and Tab close the list. Focus never leaves the button, and with
   `dropDownMaxHeight` the highlighted row is scrolled into view. With `advancedOptions` the keys
   open and close the list but move no highlight, since custom content is not a list of
-  `options`; Enter and Space are left to the content, and so is any key typed into a field.
+  `options`; once it is open, Enter, Space and the arrows are left to the content, and so is
+  any key typed into a field. Keys pressed inside `children` are left alone too, as clicks
+  there are, unless `disableIconClick` is false.
 - **`onToggle` hears the keyboard too.** The keys that open and close the list call it with a
   `KeyboardEvent`, so a handler that reads `clientX` or `button` has to check which event it got.
 - **Loading hides the choice.** `isLoading` draws a spinner in the button and hides its label,

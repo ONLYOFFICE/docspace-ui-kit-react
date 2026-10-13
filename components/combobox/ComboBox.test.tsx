@@ -312,6 +312,70 @@ describe("ComboBox", () => {
     expect(enter.defaultPrevented).toBe(false);
   });
 
+  it("leaves the arrows alone in an open list with advancedOptions", () => {
+    render(
+      <ComboBox
+        {...baseProps}
+        options={[]}
+        advancedOptions={
+          <>
+            <button type="button">Inside</button>
+            <span>Note</span>
+          </>
+        }
+      />,
+    );
+    const combo = screen.getAllByRole("button")[0];
+    fireEvent.click(combo);
+    expect(combo).toHaveAttribute("aria-expanded", "true");
+
+    for (const key of ["ArrowDown", "ArrowUp"]) {
+      const event = new KeyboardEvent("keydown", {
+        key,
+        bubbles: true,
+        cancelable: true,
+      });
+      combo.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(false);
+    }
+    expect(combo).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("leaves keys in the children block to the children", () => {
+    render(
+      <ComboBox {...baseProps}>
+        <button type="button">Extra</button>
+      </ComboBox>,
+    );
+    const combo = screen.getAllByRole("button")[0];
+    const extra = screen.getByRole("button", { name: "Extra" });
+
+    for (const key of ["Enter", " ", "ArrowDown"]) {
+      const event = new KeyboardEvent("keydown", {
+        key,
+        bubbles: true,
+        cancelable: true,
+      });
+      extra.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(false);
+    }
+    expect(combo).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("handles keys in the children block when disableIconClick is off", () => {
+    render(
+      <ComboBox {...baseProps} disableIconClick={false}>
+        <button type="button">Extra</button>
+      </ComboBox>,
+    );
+    const combo = screen.getAllByRole("button")[0];
+
+    fireEvent.keyDown(screen.getByRole("button", { name: "Extra" }), {
+      key: "ArrowDown",
+    });
+    expect(combo).toHaveAttribute("aria-expanded", "true");
+  });
+
   it("does not open from the keyboard while disabled", () => {
     render(<ComboBox {...baseProps} isDisabled />);
     const button = screen.getByRole("button");
