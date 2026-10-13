@@ -162,23 +162,20 @@ describe("ColorPicker component", () => {
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
-  // Known defect (review of spike/vitest-addon): Escape only stops the keydown, not the matching keyup, which reaches window and closes a surrounding ModalDialog. Flip to it() once fixed.
-  it.fails(
-    "keeps the Escape keyup that closed it from window listeners",
-    () => {
-      const onWindowKeyUp = vi.fn();
-      window.addEventListener("keyup", onWindowKeyUp);
+  // The colour scheme dialog around the picker closes on an Escape keyup.
+  it("keeps the Escape keyup that closed it from window listeners", () => {
+    const onWindowKeyUp = vi.fn();
+    window.addEventListener("keyup", onWindowKeyUp);
 
-      render(<ColorPicker {...defaultProps} onClose={mockOnClose} />);
-      const input = screen.getByTestId("color-picker-hex-input");
-      fireEvent.keyDown(input, { key: "Escape" });
-      fireEvent.keyUp(input, { key: "Escape" });
+    render(<ColorPicker {...defaultProps} onClose={mockOnClose} />);
+    const input = screen.getByTestId("color-picker-hex-input");
+    fireEvent.keyDown(input, { key: "Escape" });
+    fireEvent.keyUp(input, { key: "Escape" });
 
-      expect(mockOnClose).toHaveBeenCalledTimes(1);
-      window.removeEventListener("keyup", onWindowKeyUp);
-      expect(onWindowKeyUp).not.toHaveBeenCalledWith(
-        expect.objectContaining({ key: "Escape" }),
-      );
-    },
-  );
+    expect(mockOnClose).toHaveBeenCalledTimes(1);
+    window.removeEventListener("keyup", onWindowKeyUp);
+    expect(onWindowKeyUp).not.toHaveBeenCalledWith(
+      expect.objectContaining({ key: "Escape" }),
+    );
+  });
 });

@@ -9,6 +9,7 @@ import { Text } from "../text";
 import { IconButton } from "../icon-button";
 import { globalColors } from "../../providers/theme";
 import { useCommonTranslation } from "../../utils";
+import { consumeKey } from "../../utils/consume-key";
 
 import styles from "./ColorPicker.module.scss";
 import { ColorPickerProps } from "./ColorPicker.types";
@@ -35,10 +36,11 @@ const ColorPicker = ({
   const cancelLabel = cancelButtonLabel ?? t("CancelButton");
 
   // Escape is the keyboard's cancel: the same notification as the cancel
-  // button and the cross.
+  // button and the cross. It is consumed whole, keyup included, so a
+  // ModalDialog the picker sits in (the colour scheme dialog) stays open.
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Escape") {
-      e.stopPropagation();
+      consumeKey(e);
       onClose();
     }
   };
