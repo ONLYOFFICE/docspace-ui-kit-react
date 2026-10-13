@@ -1,5 +1,6 @@
 import { Text } from "../text";
 import { useCommonTranslation } from "../../utils/i18n";
+import { useLiveRegionText } from "../../hooks/useLiveRegionText";
 
 import { Oval } from "./sub-components/Oval";
 import { DualRing } from "./sub-components/DualRing";
@@ -29,6 +30,11 @@ const Loader = (props: LoaderProps) => {
   } = props;
 
   const label = labelProp ?? (t("LoadingProcessing") || DEFAULT_LABEL);
+  // A status region inserted together with its text is usually not
+  // announced, so the region mounts empty and the label follows once it is
+  // on the page. A decorative loader is no region and shows its text at once.
+  const liveLabel = useLiveRegionText(label);
+  const shownLabel = isDecorative ? label : liveLabel;
 
   const { isDecorative: _isDecorative, ...rest } = props;
   const animationProps = { ...rest, type, label };
@@ -47,7 +53,7 @@ const Loader = (props: LoaderProps) => {
         return (
           <span style={{ ...style }}>
             <Text color={color} fontSize={size}>
-              {label}
+              {shownLabel}
             </Text>
           </span>
         );
@@ -55,9 +61,10 @@ const Loader = (props: LoaderProps) => {
   };
 
   // The animations are decorative (aria-hidden); the label is the text of
-  // the status region, so it is what assistive technology reads. The base
-  // type shows the label itself. A decorative loader is hidden whole: its
-  // host control carries the busy state.
+  // the status region, filled in after mount, so it is what assistive
+  // technology reads and announces. The base type shows the label itself. A
+  // decorative loader is hidden whole: its host control carries the busy
+  // state.
   if (isDecorative) {
     return (
       <div
@@ -81,9 +88,9 @@ const Loader = (props: LoaderProps) => {
       data-testid="loader"
     >
       {svgRenderer(type)}
-      {type !== LoaderTypes.base && label ? (
+      {type !== LoaderTypes.base ? (
         <span className={styles.visuallyHidden} data-testid="loader-label">
-          {label}
+          {liveLabel}
         </span>
       ) : null}
     </div>

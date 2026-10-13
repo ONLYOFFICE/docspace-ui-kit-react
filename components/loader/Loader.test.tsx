@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { screen, render } from "@testing-library/react";
+import { renderToStaticMarkup } from "react-dom/server";
 
 import { LoaderTypes } from "./Loader.enums";
 
@@ -73,6 +74,25 @@ describe("<Loader />", () => {
       "true",
     );
   });
+
+  // The first render is all the server renders: the region and its hidden
+  // label are in it, empty, so the label arrives as a change to a region
+  // already on the page.
+  it.each([LoaderTypes.oval, LoaderTypes.base])(
+    "mounts the %s status region empty and fills it after mount",
+    (type) => {
+      const host = document.createElement("div");
+      host.innerHTML = renderToStaticMarkup(
+        <Loader type={type} label="Fetching files" />,
+      );
+      expect(host.querySelector('[role="status"]')).not.toHaveTextContent(
+        "Fetching files",
+      );
+
+      render(<Loader type={type} label="Fetching files" />);
+      expect(screen.getByRole("status")).toHaveTextContent("Fetching files");
+    },
+  );
 
   it("reads the label for rombs too", () => {
     render(<Loader type={LoaderTypes.rombs} label="Starting" />);

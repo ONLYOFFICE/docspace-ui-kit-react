@@ -183,8 +183,10 @@ animation, so pass `color` instead.
 ## Accessibility
 
 - The wrapper is a `role="status"` region, and `label` is its text: visually hidden under the
-  animations, the visible content of the `base` type. A screen reader reads the label, and
-  announces it when it changes. Without `label` it reads the translated `Common:LoadingProcessing` ("Loading...") — pass a
+  animations, the visible content of the `base` type. The region mounts empty and the label is
+  rendered into it right after mount, because a live region inserted together with its text is
+  usually not announced; so a screen reader announces the loader when it appears and again when
+  the label changes. Without `label` it reads the translated `Common:LoadingProcessing` ("Loading...") — pass a
   translated label in a localised UI.
 - The animations — `oval`, `dualRing`, `rombs`, `track` — are `aria-hidden` and carry no title
   or `aria-label` of their own, so every type is announced the same way, by its label.
