@@ -241,6 +241,17 @@
     background: none;
     line-height: 0;
     transition: opacity 0.4s ease;
+    // The icon's own size. Hosts size this element (the operations panel
+    // makes it 24px), and the icon fills it, as it did when the class sat
+    // on the <svg> itself.
+    width: 20px;
+    height: 20px;
+
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
 
     &:focus-visible {
       opacity: 1;
