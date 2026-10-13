@@ -134,6 +134,33 @@ describe("<AIAgentSelector withInit />", () => {
     await waitFor(() => expect(labels()).toContain("From the portal"));
   });
 
+  it("fetches page 0 again when the items it was built from change", async () => {
+    const props = {
+      withInit: true as const,
+      initItems: [agent(1, "Test agent"), agent(2, "Support agent")],
+      initTotal: 2,
+      initHasNextPage: false,
+      onSubmit: vi.fn(),
+      onClose: vi.fn(),
+    };
+    const excludeItems = [3];
+    const { rerender } = render(
+      <AIAgentSelector {...props} excludeItems={excludeItems} />,
+    );
+
+    // The same props again: still nothing to fetch.
+    rerender(<AIAgentSelector {...props} excludeItems={excludeItems} />);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    expect(mocks.request).not.toHaveBeenCalled();
+
+    rerender(<AIAgentSelector {...props} excludeItems={[2]} />);
+
+    await waitFor(() => expect(mocks.request).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(labels()).toContain("From the portal"));
+  });
+
   it("fetches the first page on mount without withInit", async () => {
     render(<AIAgentSelector onSubmit={vi.fn()} onClose={vi.fn()} />);
 

@@ -27,6 +27,13 @@ import {
 import type { AIAgentSelectorProps } from "./AIAgent.types";
 import { convertToItems } from "./AIAgent.utils";
 
+type TExcludeItems = AIAgentSelectorProps["excludeItems"];
+
+const sameIds = (a: TExcludeItems, b: TExcludeItems) =>
+  a === b ||
+  ((a?.length ?? 0) === (b?.length ?? 0) &&
+    (a ?? []).every((id, index) => id === b?.[index]));
+
 const AIAgentSelectorComponent = ({
   id,
   className,
@@ -174,18 +181,40 @@ const AIAgentSelectorComponent = ({
     disableBySecurity,
   });
 
-  // `Selector` asks for page 0 on mount (and again whenever this callback
-  // changes). With `withInit` that first page is `initItems`, already on
-  // screen, so it is not fetched: asking the portal would replace the items
-  // the caller passed. A search, or clearing one, fetches as usual, and so do
-  // later pages when `initHasNextPage` says there are more.
+  // `Selector` asks for page 0 on mount, and again whenever this callback
+  // changes -- which it does for reasons of its own, not only when the list
+  // should change. With `withInit` page 0 is `initItems`, already on screen,
+  // so it is not fetched while it still describes the list: asking the portal
+  // would replace the items the caller passed. Once `excludeItems`,
+  // `disableBySecurity` or the translation differ from what `initItems` were
+  // shown with, page 0 is fetched as usual from then on. A search, or
+  // clearing one, fetches too, and so do later pages when `initHasNextPage`
+  // says there are more.
+  const initInputs = React.useRef({ excludeItems, disableBySecurity, t });
+  const initItemsCurrent = React.useRef(true);
+
   const onLoadNextPage = React.useCallback(
     async (startIndex: number) => {
-      if (withInit && startIndex === 0 && !afterSearch.current) return;
+      if (
+        withInit &&
+        startIndex === 0 &&
+        !afterSearch.current &&
+        initItemsCurrent.current
+      ) {
+        const init = initInputs.current;
+        const unchanged =
+          init.t === t &&
+          init.disableBySecurity === disableBySecurity &&
+          sameIds(init.excludeItems, excludeItems);
+
+        if (unchanged) return;
+
+        initItemsCurrent.current = false;
+      }
 
       await getAgentList(startIndex);
     },
-    [withInit, getAgentList],
+    [withInit, getAgentList, t, disableBySecurity, excludeItems],
   );
 
   React.useEffect(() => {
