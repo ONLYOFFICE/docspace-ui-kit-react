@@ -2,6 +2,8 @@ import React from "react";
 
 import ArrowIcon from "../../../../assets/icons/12/arrow.right.svg";
 
+import { useInterfaceDirection } from "../../../../context/InterfaceDirectionContext";
+
 import { Text } from "../../../text";
 import { ContextMenu, type ContextMenuRefType } from "../../../context-menu";
 
@@ -19,6 +21,7 @@ export const EmptyViewItem = ({
   id,
 }: EmptyViewItemProps) => {
   const contextRef = React.useRef<ContextMenuRefType>(null);
+  const { isRTL } = useInterfaceDirection();
 
   if (disabled) return;
 
@@ -34,14 +37,15 @@ export const EmptyViewItem = ({
     event.preventDefault();
 
     // Dispatch a real click so onClick receives the MouseEvent it is typed
-    // for, placed at the item's lower start corner so a context menu opened
-    // from the keyboard appears under the item rather than at the page origin.
+    // for, placed at the item's lower start corner -- the left one, or the
+    // right one in RTL -- so a context menu opened from the keyboard appears
+    // under the item rather than at the page origin.
     const rect = event.currentTarget.getBoundingClientRect();
     event.currentTarget.dispatchEvent(
       new MouseEvent("click", {
         bubbles: true,
         cancelable: true,
-        clientX: rect.left,
+        clientX: isRTL ? rect.right : rect.left,
         clientY: rect.bottom,
       }),
     );
