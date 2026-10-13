@@ -328,6 +328,9 @@ describe("ComboBox", () => {
     const combo = screen.getAllByRole("button")[0];
     fireEvent.click(combo);
     expect(combo).toHaveAttribute("aria-expanded", "true");
+    // Stands in for the portal's page hotkeys, which listen on window.
+    const onWindowKeyDown = vi.fn();
+    window.addEventListener("keydown", onWindowKeyDown);
 
     for (const key of ["ArrowDown", "ArrowUp"]) {
       const event = new KeyboardEvent("keydown", {
@@ -338,7 +341,10 @@ describe("ComboBox", () => {
       combo.dispatchEvent(event);
       expect(event.defaultPrevented).toBe(false);
     }
+    expect(onWindowKeyDown).not.toHaveBeenCalled();
     expect(combo).toHaveAttribute("aria-expanded", "true");
+
+    window.removeEventListener("keydown", onWindowKeyDown);
   });
 
   it("leaves keys in the children block to the children", () => {

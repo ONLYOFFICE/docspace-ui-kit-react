@@ -318,11 +318,13 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     switch (e.key) {
       case "ArrowDown":
       case "ArrowUp":
-        // Nothing to step through: leave the arrows to custom content and to
-        // the page's own scrolling.
+        // The open list owns the arrows either way, so they stay out of the
+        // page's hotkeys (which would move the file selection behind it).
+        // With nothing to step through, their default action is left alone,
+        // so custom content can scroll with them.
+        consumeKey(e);
         if (!navigable) break;
         e.preventDefault();
-        consumeKey(e);
         setActiveIndex((index) =>
           stepActiveIndex(index, e.key === "ArrowUp" ? -1 : 1),
         );
