@@ -162,4 +162,29 @@ describe("<MCPIcon />", () => {
 
     expect(screen.getByTestId("node-img-b")).toBeInTheDocument();
   });
+
+  // A context menu builds its item icons afresh on every render.
+  it("keeps the letter when a failed imgNode is rebuilt with the same src", async () => {
+    const { rerender } = renderComponent({
+      title: "Node",
+      imgNode: <img src="broken.png" alt="" data-testid="node-img" />,
+    });
+
+    act(() => {
+      screen.getByTestId("node-img").dispatchEvent(new Event("error"));
+    });
+    await waitFor(() => {
+      expect(screen.getByText("N")).toBeInTheDocument();
+    });
+
+    rerender(
+      <MCPIcon
+        title="Node"
+        imgNode={<img src="broken.png" alt="" data-testid="node-img" />}
+      />,
+    );
+
+    expect(screen.queryByTestId("node-img")).toBeNull();
+    expect(screen.getByText("N")).toBeInTheDocument();
+  });
 });

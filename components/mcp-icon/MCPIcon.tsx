@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { isValidElement, useState } from "react";
 import classNames from "classnames";
 
 import { Text } from "../text";
@@ -25,6 +25,19 @@ export type MCPIconProps = {
 
 const getFirstChar = (title: string) => title?.at(0)?.toUpperCase() ?? "";
 
+// What a failed load is remembered by. A node is usually built afresh on
+// every render -- a context menu model is -- so an element with a string
+// `src` is known by that src, not by its identity, or the broken picture
+// would be tried, and flash, again on every render.
+const getSourceKey = (imgNode: React.ReactNode, imgSrc?: string): unknown => {
+  if (imgNode == null || imgNode === false) return imgSrc;
+  if (isValidElement<{ src?: unknown }>(imgNode)) {
+    const { src } = imgNode.props;
+    if (typeof src === "string") return `node:${src}`;
+  }
+  return imgNode;
+};
+
 export const MCPIcon = (props: MCPIconProps) => {
   const {
     size = MCPIconSize.Large,
@@ -37,8 +50,8 @@ export const MCPIcon = (props: MCPIconProps) => {
   } = props;
 
   // The picture that failed to load. The error belongs to that source, so a
-  // new `imgSrc` or a new `imgNode` is tried afresh.
-  const source = imgNode ?? imgSrc;
+  // new `imgSrc` or a different `imgNode` is tried afresh.
+  const source = getSourceKey(imgNode, imgSrc);
   const [failedSource, setFailedSource] = useState<unknown>(null);
   const imgError = !!source && failedSource === source;
 
