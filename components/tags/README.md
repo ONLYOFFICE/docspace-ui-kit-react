@@ -211,7 +211,7 @@ is set on `:root` or `body`; a wrapper, or the `style` prop, never does. It is i
 - The built-in overflow tag carries `aria-haspopup="listbox"` and `aria-expanded`. Opened from
   the keyboard, it moves the focus to the first entry; the Up and Down arrows move between
   entries, Enter or Space selects one and returns the focus to the overflow tag, and Escape
-  closes the menu and does the same.
+  closes the menu and does the same. Tab closes it too and moves on from the overflow tag.
 - It has no list semantics: the tags are not `<li>`s and the row is not a `<ul>`, so a screen
   reader reads a run of labels with no sense of how many there are.
 - The overflow menu is a [`DropDown`](../drop-down/README.md) and inherits its behaviour,

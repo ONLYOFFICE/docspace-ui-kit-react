@@ -308,6 +308,10 @@ const ContextMenuButtonPure = ({
           focusButton();
           return;
         case "Tab":
+          // The menu is portalled to the end of the body, so the browser's
+          // Tab from one of its items would leave the page. Hand the focus
+          // back to the button first, and the Tab moves on from there.
+          focusButton();
           onCloseAction();
           return;
         default:

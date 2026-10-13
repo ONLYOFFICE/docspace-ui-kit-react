@@ -405,4 +405,25 @@ describe("<Tags />", () => {
     expect(own).toHaveBeenCalledTimes(1);
     expect(onSelectTag).not.toHaveBeenCalled();
   });
+
+  it("hands the focus back to the overflow tag on Tab from an entry", () => {
+    Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+      configurable: true,
+      value: 500,
+    });
+    render(<Tags {...baseProps} tags={["tag1", "Hidden"]} columnCount={1} />);
+
+    const overflow = screen.getByText("...").closest<HTMLElement>("[tabindex]");
+    if (!overflow) throw new Error("no overflow tag");
+    fireEvent.click(overflow);
+    const entry = screen.getByText("Hidden").closest<HTMLElement>("[id]");
+    if (!entry) throw new Error("no overflow entry");
+    entry.focus();
+
+    const notPrevented = fireEvent.keyDown(entry, { key: "Tab" });
+
+    expect(notPrevented).toBe(true);
+    expect(overflow).toHaveFocus();
+    expect(overflow).toHaveAttribute("aria-expanded", "false");
+  });
 });

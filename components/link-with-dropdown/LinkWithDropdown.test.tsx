@@ -234,6 +234,24 @@ describe("LinkWithDropdown", () => {
     expect(trigger).toHaveFocus();
   });
 
+  it("hands the focus back to the link on Tab and lets the Tab through", () => {
+    render(
+      <LinkWithDropdown data={mockData}>Link with dropdown</LinkWithDropdown>,
+    );
+    const trigger = screen.getByRole("button", { name: "Link with dropdown" });
+    trigger.focus();
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    fireEvent.keyDown(trigger, { key: "ArrowDown" });
+    const first = screen.getByTestId("link_with_drop_down_key1");
+    expect(first).toHaveFocus();
+
+    const notPrevented = fireEvent.keyDown(first, { key: "Tab" });
+
+    expect(notPrevented).toBe(true);
+    expect(trigger).toHaveFocus();
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("skips separators and headers when walking the list", () => {
     render(
       <LinkWithDropdown

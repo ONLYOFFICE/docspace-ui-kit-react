@@ -150,6 +150,22 @@ describe("<ContextMenuButton />", () => {
     window.removeEventListener("keyup", onWindowKeyUp);
   });
 
+  // The menu is portalled to the end of the body: a Tab from one of its
+  // items has to start from the button, or it leaves the page.
+  it("hands the focus back to the button on Tab and lets the Tab through", () => {
+    render(<ContextMenuButton {...baseProps} />);
+    const button = screen.getByRole("button", { name: "Actions" });
+
+    fireEvent.click(button);
+    const item = screen.getByRole("menuitem", { name: "label" });
+    item.focus();
+    const notPrevented = fireEvent.keyDown(item, { key: "Tab" });
+
+    expect(notPrevented).toBe(true);
+    expect(button).toHaveFocus();
+    expect(button).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("opens with data alone when there is no getData", () => {
     render(
       <ContextMenuButton

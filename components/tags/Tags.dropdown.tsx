@@ -115,6 +115,12 @@ export const TagsDropdown: FC<DropDownTagsProps> = ({
           consumeKey(e);
           focusEntry(index - 1);
           break;
+        case "Tab":
+          // The list is portalled, so Tab from an entry would leave the
+          // page: the focus goes back to the overflow tag and Tab moves on
+          // from there.
+          closeAndReturnFocus();
+          break;
         default:
       }
     };

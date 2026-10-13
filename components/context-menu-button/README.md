@@ -220,7 +220,7 @@ variable.
   `toggle` mode renders no menu, so it carries neither `aria-haspopup` nor `aria-expanded`.
 - Enter, Space and ArrowDown open the menu with focus on the first item, ArrowUp on the last.
   Inside it the arrow keys, Home and End move focus, Enter and Space run the item and return focus
-  to the button, Escape closes the menu and returns focus, and Tab closes it.
+  to the button, Escape closes the menu and returns focus, and Tab closes it and moves on from the button.
 - The wrapper and the icon both carry `aria-disabled` while `isDisabled`.
 
 ## Test ids

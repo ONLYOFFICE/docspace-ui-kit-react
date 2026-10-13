@@ -217,7 +217,7 @@ outer box, so `--link-with-dropdown-bg` shows only while the link is closed and 
   move focus to its first or last item; Escape closes it.
 - Inside the open menu the arrows move between the items, Home and End jump to the ends, Enter
   and Space choose the focused item and return focus to the link, Escape closes the menu and
-  returns focus to the link, and Tab closes it. Keys it acts on stay with it, so a dialog around
+  returns focus to the link, and Tab closes it and moves on from the link. Keys it acts on stay with it, so a dialog around
   it does not close on that Escape.
 - The menu is a [`DropDown`](../drop-down/README.md) and inherits its behaviour, including the
   outside-click close and the lack of focus trapping.

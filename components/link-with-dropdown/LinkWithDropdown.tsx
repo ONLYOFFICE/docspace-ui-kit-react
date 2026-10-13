@@ -186,6 +186,10 @@ const LinkWithDropdown = ({
           triggerRef.current?.focus();
           return;
         case "Tab":
+          // The menu is portalled, so Tab from one of its items would leave
+          // the page: the focus goes back to the link and Tab moves on from
+          // there.
+          triggerRef.current?.focus();
           setIsOpen(false);
           return;
         default:
