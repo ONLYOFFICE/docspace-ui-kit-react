@@ -265,7 +265,8 @@ reaches.
 
 - **The bar is a `role="status"` with `aria-live="polite"`**, so a screen reader reads it when it
   appears without interrupting the user. The campaign banner (`isCampaigns`) is an iframe and is
-  not a live region.
+  not a live region. The `countDownTime` counter is hidden from assistive technology: it changes
+  every second, and inside the live region each tick would be announced.
 - The close cross — of the bar and of the campaign banner — is a `<button type="button">`, so it
   never submits a surrounding form. It is named by `closeButtonLabel`, `"Close"` by default; the
   icon inside is `aria-hidden`. Pass a translated label in a localised UI.

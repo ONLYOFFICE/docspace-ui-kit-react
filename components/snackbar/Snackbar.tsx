@@ -122,9 +122,16 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
     if (completed) return null;
     const { fontSize, fontWeight } = this.props;
 
-    // Render a countdown
+    // Render a countdown. It changes every second inside the bar's live
+    // region, so it is hidden from assistive technology, which would
+    // otherwise announce each tick.
     return (
-      <Text as="p" fontSize={fontSize} fontWeight={fontWeight}>
+      <Text
+        as="p"
+        fontSize={fontSize}
+        fontWeight={fontWeight}
+        aria-hidden="true"
+      >
         {zeroPad(minutes)}:{zeroPad(seconds)}
       </Text>
     );

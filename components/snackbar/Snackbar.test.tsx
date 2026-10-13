@@ -183,8 +183,7 @@ describe("SnackBar", () => {
     });
   });
 
-  // Known defect (review of spike/vitest-addon): the countDownTime countdown re-renders every second inside the role=status aria-live=polite region. Flip to it() once fixed.
-  it.fails("keeps the per-second countdown out of the live region", () => {
+  it("keeps the per-second countdown out of the live region", () => {
     render(<SnackBar {...defaultProps} countDownTime={65000} />);
     const countdown = screen.getByText(/^\d{2}:\d{2}$/);
     const liveRegion = screen.getByRole("status");
