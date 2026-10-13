@@ -187,7 +187,12 @@ describe("<ContextMenuButton />", () => {
   });
 
   // The menu is portalled to the end of the body: a Tab from one of its
-  // items has to start from the button, or it leaves the page.
+  // items has to start from the button, or it leaves the page. What is
+  // checked is that the focus is on the button and the Tab is not cancelled;
+  // the move itself is the browser's, and Chromium, Firefox and WebKit all
+  // move on from the element focused during keydown. Neither jsdom nor
+  // user-event's tab() can show it: user-event picks the next element from
+  // the keydown's target, so a play function would test the simulation.
   it("hands the focus back to the button on Tab and lets the Tab through", () => {
     render(<ContextMenuButton {...baseProps} />);
     const button = screen.getByRole("button", { name: "Actions" });
