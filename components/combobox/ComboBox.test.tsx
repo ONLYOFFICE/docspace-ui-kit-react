@@ -368,6 +368,20 @@ describe("ComboBox", () => {
     expect(combo).toHaveAttribute("aria-expanded", "false");
   });
 
+  it("keeps the keys of a combo box rendered in another's children block", () => {
+    render(
+      <ComboBox {...baseProps}>
+        <ComboBox {...baseProps} />
+      </ComboBox>,
+    );
+    const [outer, inner] = screen.getAllByRole("button");
+
+    fireEvent.keyDown(inner, { key: "ArrowDown" });
+
+    expect(inner).toHaveAttribute("aria-expanded", "true");
+    expect(outer).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("handles keys in the children block when disableIconClick is off", () => {
     render(
       <ComboBox {...baseProps} disableIconClick={false}>

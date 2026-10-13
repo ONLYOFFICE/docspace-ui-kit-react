@@ -56,6 +56,14 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     [isOpen, setIsOpenItemAccess, withBackdrop, onBackdropClick, onToggle],
   );
 
+  // Whether the event came from this combo box's own optional children block.
+  // The lookup stops at the combo box, so an `.optionalBlock` of an outer
+  // combo box this one is rendered in does not count.
+  const isInOptionalBlock = (target: HTMLElement, root: Element) => {
+    const block = target.closest(".optionalBlock");
+    return !!block && root.contains(block);
+  };
+
   const comboBoxClick: React.MouseEventHandler<HTMLDivElement | Element> = (
     e,
   ) => {
@@ -77,7 +85,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
       (disableItemClickFirstLevel &&
         target.closest(".item-by-first-level") &&
         (isMobileOnly || isMobile || isTablet)) ||
-      (disableIconClick && e && target.closest(".optionalBlock")) ||
+      (disableIconClick && e && isInOptionalBlock(target, e.currentTarget)) ||
       target.classList.contains("ScrollbarsCustom") ||
       target.classList.contains("ScrollbarsCustom-Thumb") ||
       target.classList.contains("ScrollbarsCustom-Track") ||
@@ -282,7 +290,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     // The same exclusion comboBoxClick makes: the optional children block
     // (`children`) keeps its own keys while disableIconClick is on.
     const { disableIconClick = true } = props;
-    if (disableIconClick && target.closest(".optionalBlock")) return;
+    if (disableIconClick && isInOptionalBlock(target, e.currentTarget)) return;
     if (
       isDisabled ||
       isLoading ||
