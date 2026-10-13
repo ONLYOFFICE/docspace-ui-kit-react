@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import type { CheckboxProps } from "./Checkbox.types";
@@ -119,5 +119,27 @@ describe("<Checkbox />", () => {
 
     expect(handleChange).not.toHaveBeenCalled();
     expect(checkbox).not.toBeChecked();
+  });
+
+  it("toggles once while Space is held, ignoring its auto-repeats", () => {
+    const handleChange = vi.fn();
+    const { container } = render(
+      <Checkbox {...defaultProps} onChange={handleChange} />,
+    );
+    // The icon is swapped for the checked one on toggle, so look it up anew.
+    const icon = () => {
+      const svg = container.querySelector("svg");
+      if (!svg) throw new Error("checkbox icon not rendered");
+      return svg;
+    };
+
+    fireEvent.keyDown(icon(), { key: " " });
+    const repeat = fireEvent.keyDown(icon(), { key: " ", repeat: true });
+    fireEvent.keyDown(icon(), { key: " ", repeat: true });
+
+    expect(handleChange).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("checkbox")).toBeChecked();
+    // A repeat is still kept from scrolling the page.
+    expect(repeat).toBe(false);
   });
 });

@@ -105,11 +105,13 @@ const CheckboxPure = ({
   // The icon holds focus in place of the hidden input, so it has to answer
   // the key the input would: Space presses it, through a click on the input,
   // which fires the same change event a pointer does. Enter does nothing on a
-  // native checkbox either. preventDefault keeps Space from scrolling the page.
+  // native checkbox either. preventDefault keeps Space from scrolling the page,
+  // auto-repeats included; a held Space toggles once, as on a native checkbox.
   const onIconKeyDown = React.useCallback(
     (e: React.KeyboardEvent<SVGSVGElement>) => {
       if (e.key !== " ") return;
       e.preventDefault();
+      if (e.repeat) return;
       ref.current?.click();
     },
     [],
