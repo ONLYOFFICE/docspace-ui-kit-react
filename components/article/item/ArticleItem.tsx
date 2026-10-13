@@ -16,11 +16,13 @@ import styles from "./ArticleItem.module.scss";
 const getInitial = (text: string) => text.substring(0, 1).toUpperCase();
 
 type ArticleItemPureProps = ArticleItemProps & {
-  /** Renders the item's control as a router link: given the link's class
-   * and its content, returns the link. Set by the wrapper in `index.tsx`. */
+  /** Renders the item's control as a router link: given the link's class,
+   * its content and its click handler, returns the link. Set by the wrapper
+   * in `index.tsx`. */
   renderLink?: (
     className: string,
     children: React.ReactNode,
+    onClick: React.MouseEventHandler<HTMLAnchorElement>,
   ) => React.ReactNode;
 };
 
@@ -77,6 +79,26 @@ export const ArticleItemPure = (props: ArticleItemPureProps) => {
     if (withAnimation) {
       triggerAnimation();
     }
+  };
+
+  // A click on the link is reported by the link's own handler, which a router
+  // link calls before it navigates -- so `preventDefault()` in `onClick` still
+  // cancels the navigation. The same click then bubbles to the row, which must
+  // not report it a second time.
+  const linkClickEventRef = useRef<Event | null>(null);
+
+  const onLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    linkClickEventRef.current = e.nativeEvent;
+    onClickAction(e);
+  };
+
+  const onRowClick = (e: React.MouseEvent) => {
+    if (linkClickEventRef.current === e.nativeEvent) {
+      linkClickEventRef.current = null;
+      return;
+    }
+
+    onClickAction(e);
   };
   // A middle click on a link is the browser's: it opens the address in a new
   // tab. Only an item that is not a link reports it.
@@ -144,13 +166,14 @@ export const ArticleItemPure = (props: ArticleItemPureProps) => {
   // The control is a transparent layer over the whole row -- a button, or the
   // router link -- named by the item's text. The row itself is no control, so
   // the badge, which has a button of its own, sits beside the control rather
-  // than inside it. A click on the layer bubbles to the row's handler; Enter
-  // and Space on it make that click too.
+  // than inside it. A click on the button layer bubbles to the row's handler;
+  // Enter and Space on it make that click too. The link layer reports its
+  // click itself, before the router navigates.
   const renderControl = () => {
     const name = <span className={styles.visuallyHidden}>{text}</span>;
 
     if (isLink && renderLink)
-      return renderLink(styles.articleItemControl, name);
+      return renderLink(styles.articleItemControl, name, onLinkClick);
 
     return (
       <span
@@ -180,7 +203,7 @@ export const ArticleItemPure = (props: ArticleItemPureProps) => {
         title={tooltipTitle}
         ref={parentElementRef}
         data-tooltip-id={dataTooltipId}
-        onClick={onClickAction}
+        onClick={onRowClick}
         onMouseUp={onMouseUpAction}
         onMouseDown={onMouseDown}
       >

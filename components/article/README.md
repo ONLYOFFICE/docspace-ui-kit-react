@@ -358,8 +358,9 @@ below 1024px). It has no README of its own; its variables are listed below.
   `linkData` (`to={linkData.path}`, `state={linkData.state}`): it is the focusable control,
   carries `aria-current="page"` on the active row, and the browser's own link handling — a
   middle click or Ctrl+click to open a new tab — applies. `onClick` is called for a pointer
-  click on the row and for Enter on the link, but not for a middle click. Without a
-  `LinkRouter`, `linkData` is not read.
+  click on the row and for Enter on the link, but not for a middle click. It is the link's own
+  click handler, so a router link calls it before navigating, and `e.preventDefault()` in
+  `onClick` cancels the navigation. Without a `LinkRouter`, `linkData` is not read.
 - **Without a link** the layer is a `role="button"` in the tab order, activated by Enter and
   Space, with `aria-current="page"` while `isActive`. A middle click calls `onClick` too, with
   `e.button === 1`.

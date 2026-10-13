@@ -40,7 +40,7 @@ export type ArticleItemProps = PickedDivProps & {
   text: string;
   /** Sets the catalog item to display text */
   showText?: boolean;
-  /** Called with the event and `id` when the item is clicked or activated with Enter or Space; inside a link, also when the link is activated from the keyboard. A middle click calls it only when the item is not a link. */
+  /** Called with the event and `id` when the item is clicked or activated with Enter or Space; inside a link, also when the link is activated from the keyboard. A middle click calls it only when the item is not a link. Inside a link it runs before the router navigates, so `e.preventDefault()` cancels the navigation. */
   onClick?: (e: React.MouseEvent, id?: string) => void;
   /** Invokes a function upon dragging and dropping a catalog item */
   onDrop?: (id?: string, text?: string, item?: ArticleItemType) => void;

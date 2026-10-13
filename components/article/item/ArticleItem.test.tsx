@@ -190,6 +190,57 @@ describe("<ArticleItem />", () => {
       expect(mockOnClick).toHaveBeenCalledTimes(2);
     });
 
+    it("runs onClick before the link navigates, so preventDefault cancels it", () => {
+      const navigate = vi.fn();
+      // Like react-router's Link: the consumer's onClick first, then the
+      // navigation unless that handler prevented it.
+      const LinkRouter = ({
+        children,
+        onClick,
+        to,
+        state: _state,
+        ...rest
+      }: {
+        children?: React.ReactNode;
+        onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+        to: unknown;
+        state?: unknown;
+      }) => (
+        <a
+          href="#docs"
+          {...rest}
+          onClick={(e) => {
+            onClick?.(e);
+            if (!e.defaultPrevented) navigate(to);
+            e.preventDefault();
+          }}
+        >
+          {children}
+        </a>
+      );
+      const onClick = vi.fn((e: React.MouseEvent) => {
+        e.preventDefault();
+      });
+      render(
+        <ArticleItem
+          {...baseProps}
+          showBadge={false}
+          linkData={{ path: "/docs", state: {} }}
+          onClick={onClick}
+          LinkRouter={LinkRouter}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("link", { name: "Documents" }));
+      expect(onClick).toHaveBeenCalledTimes(1);
+      expect(navigate).not.toHaveBeenCalled();
+
+      onClick.mockImplementation(() => {});
+      fireEvent.click(screen.getByRole("link", { name: "Documents" }));
+      expect(onClick).toHaveBeenCalledTimes(2);
+      expect(navigate).toHaveBeenCalledWith("/docs");
+    });
+
     const interactiveAncestor = (el: HTMLElement): Element | null =>
       el.parentElement?.closest('[role="button"], a[href], button') ?? null;
 
