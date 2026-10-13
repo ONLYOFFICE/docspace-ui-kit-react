@@ -169,7 +169,8 @@ const Dropzone = ({
     if (!fullExstsText) return;
 
     if (e.key === "Enter" || e.key === " ") {
-      // Keep the key away from the area, which would open the file dialog.
+      // Keep the page from scrolling on Space, and the key from the page's
+      // own hotkeys.
       e.preventDefault();
       consumeKey(e);
       setIsFormatsOpen((prev) => !prev);
@@ -223,79 +224,85 @@ const Dropzone = ({
           />
         )
       ) : (
-        <div
-          {...getRootProps({
-            className: styles.dropzone,
-            "aria-label": isFolderUpload
-              ? "Folder upload area"
-              : "File upload area",
-            "data-testid": "dropzone-input-area",
-          })}
-          {...(isFolderUpload
-            ? { onClick: openFolderDialog, onKeyDown: handleFolderKeyDown }
-            : {})}
-        >
-          {isFolderUpload ? (
-            <input
-              ref={folderInputRef}
-              type="file"
-              disabled={isDisabled}
-              style={{ display: "none" }}
-              onChange={handleFolderChange}
-              {...({
-                webkitdirectory: "",
-                directory: "",
-              } as React.InputHTMLAttributes<HTMLInputElement>)}
-              aria-label="Folder input"
-              data-testid="dropzone-input"
-            />
-          ) : (
-            <input
-              disabled={isDisabled}
-              {...getInputProps({
-                "aria-label": "File input",
-                "data-testid": "dropzone-input",
-              })}
-            />
-          )}
-          {icon &&
-            (typeof icon === "string" ? (
-              <img
-                src={icon}
-                alt="Upload"
-                className={classNames(styles.dropzoneIcon, iconClassName)}
-                data-testid="dropzone-icon"
+        // The drop area and the format line are siblings: the area is the
+        // library's role="button", and the line is a button of its own when
+        // it opens the full list, so it may not sit inside the area. The
+        // area still covers the whole box (see .dropzone::before).
+        <div className={styles.dropzoneBody}>
+          <div
+            {...getRootProps({
+              className: styles.dropzone,
+              "aria-label": isFolderUpload
+                ? "Folder upload area"
+                : "File upload area",
+              "data-testid": "dropzone-input-area",
+            })}
+            {...(isFolderUpload
+              ? { onClick: openFolderDialog, onKeyDown: handleFolderKeyDown }
+              : {})}
+          >
+            {isFolderUpload ? (
+              <input
+                ref={folderInputRef}
+                type="file"
+                disabled={isDisabled}
+                style={{ display: "none" }}
+                onChange={handleFolderChange}
+                {...({
+                  webkitdirectory: "",
+                  directory: "",
+                } as React.InputHTMLAttributes<HTMLInputElement>)}
+                aria-label="Folder input"
+                data-testid="dropzone-input"
               />
             ) : (
-              React.createElement(icon, {
-                className: classNames(styles.dropzoneIcon, iconClassName),
-                "data-testid": "dropzone-icon",
-              } as React.SVGProps<SVGSVGElement>)
-            ))}
-          <div
-            className={styles.dropzoneLink}
-            data-testid="dropzone-text"
-            aria-live="polite"
-            aria-relevant="additions removals"
-          >
-            <Link
-              className={classNames(styles.dropzoneLink, {
-                [styles.main]: true,
-              })}
-              data-testid="dropzone-main-text"
-              color="accent"
-              onClick={isFolderUpload ? openFolderDialog : handleFileClick}
+              <input
+                disabled={isDisabled}
+                {...getInputProps({
+                  "aria-label": "File input",
+                  "data-testid": "dropzone-input",
+                })}
+              />
+            )}
+            {icon &&
+              (typeof icon === "string" ? (
+                <img
+                  src={icon}
+                  alt="Upload"
+                  className={classNames(styles.dropzoneIcon, iconClassName)}
+                  data-testid="dropzone-icon"
+                />
+              ) : (
+                React.createElement(icon, {
+                  className: classNames(styles.dropzoneIcon, iconClassName),
+                  "data-testid": "dropzone-icon",
+                } as React.SVGProps<SVGSVGElement>)
+              ))}
+            <div
+              className={styles.dropzoneLink}
+              data-testid="dropzone-text"
+              aria-live="polite"
+              aria-relevant="additions removals"
             >
-              {linkMainText}
-            </Link>
-            <span
-              className={classNames(styles.dropzoneLink, {
-                [styles.secondary]: true,
-              })}
-              data-testid="dropzone-secondary-text"
-            >
-              {linkSecondaryText}
-            </span>
+              <Link
+                className={classNames(styles.dropzoneLink, {
+                  [styles.main]: true,
+                })}
+                data-testid="dropzone-main-text"
+                color="accent"
+                onClick={isFolderUpload ? openFolderDialog : handleFileClick}
+              >
+                {linkMainText}
+              </Link>
+              <span
+                className={classNames(styles.dropzoneLink, {
+                  [styles.secondary]: true,
+                })}
+                data-testid="dropzone-secondary-text"
+              >
+                {linkSecondaryText}
+              </span>
+            </div>
           </div>
           {!isFolderUpload && (
             <div

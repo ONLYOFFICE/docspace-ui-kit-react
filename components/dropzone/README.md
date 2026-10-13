@@ -301,9 +301,10 @@ default comes out as no shadow at all.
 - `aria-busy` follows `isLoading` and `aria-disabled` follows `isDisabled`, both on the outer
   element, and the text block is an `aria-live="polite"` region.
 - With `fullExstsText` the format line is `role="button"` with `tabIndex` 0 and `aria-expanded`,
-  named by its own text. Enter and Space toggle the full list and Escape closes it. It sits
-  inside the area, which is itself `role="button"`, so a screen reader meets one button inside
-  another.
+  named by its own text. Enter and Space toggle the full list and Escape closes it. It is a
+  sibling of the area, not a child, so no button sits inside another; the area's hit box still
+  covers the whole box behind the line, so a click or a drop anywhere else in it reaches the
+  area. A drop on the format line itself is ignored.
 
 ## Test ids
 
