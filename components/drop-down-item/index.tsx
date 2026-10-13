@@ -300,7 +300,8 @@ const DropDownItem = ({
           className={styles.externalLink}
           // Only a callback makes the path navigable: the SDK passes a path
           // its parent frame resolves and no callback, and a link of its own
-          // would open a dead tab. The href is there for a middle click.
+          // would open a dead tab. The href is there for a middle or
+          // modified click, which the browser opens in a new tab.
           {...(onExternalLinkClick
             ? {
                 href: externalLinkPath,
@@ -312,10 +313,12 @@ const DropDownItem = ({
           onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
             if (!onExternalLinkClick) return;
-            // The callback owns the navigation, as it did before the anchor
-            // had an href; middle-click and modified clicks still use it.
-            if (!e.ctrlKey && !e.metaKey && !e.shiftKey && e.button === 0)
-              e.preventDefault();
+            // A modified click is the browser's: it opens the href in a new
+            // tab or window, and the callback, which navigates the current
+            // page, would move this one as well. A plain click is the
+            // callback's, as it was before the anchor had an href.
+            if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+            e.preventDefault();
             onExternalLinkClick();
           }}
         >

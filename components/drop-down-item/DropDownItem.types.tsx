@@ -76,7 +76,7 @@ export type DropDownItemProps = {
   withExternalLink?: boolean;
   /** URL of the external link icon. It becomes the icon's `href` only together with `onExternalLinkClick`; without the callback the icon does not navigate */
   externalLinkPath?: string;
-  /** Called when the external link icon is activated; a plain click is then left to it and the `href` is not followed */
+  /** Called on a plain click of the external link icon, which then does not follow the `href`; a middle or modified click is left to the browser and does not call it */
   onExternalLinkClick?: () => void;
   /** Accessible name of the external link icon. Defaults to the translated "Open" followed by `label`. */
   externalLinkLabel?: string;

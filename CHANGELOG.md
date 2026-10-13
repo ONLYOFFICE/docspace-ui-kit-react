@@ -211,7 +211,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`DropDownItem`'s external-link icon is a real link when it can navigate.** With
   `onExternalLinkClick` it is `<a href={externalLinkPath}>`, focusable and named "Open <label>"
   (override with the new `externalLinkLabel`); a plain click goes to the callback and the `href`
-  is not followed, so router-based handlers keep working, and a middle click opens a new tab.
+  is not followed, so router-based handlers keep working. A middle, Ctrl-, Cmd- or Shift-click
+  is left to the browser, which opens the `href` in a new tab, and does not call the callback.
   Without the callback it has no `href` and does nothing, as before.
 - **`LinkWithDropdown` works from the keyboard.** The trigger is in the tab order (out of it while
   `isDisabled`), Enter and Space toggle the menu and Escape closes it; `aria-haspopup` is now

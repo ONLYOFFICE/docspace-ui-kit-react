@@ -159,6 +159,26 @@ describe("<DropDownItem />", () => {
       expect(baseProps.onClick).not.toHaveBeenCalled();
     });
 
+    it.each([
+      ["Ctrl", { ctrlKey: true }],
+      ["Cmd", { metaKey: true }],
+      ["Shift", { shiftKey: true }],
+    ])("leaves a %s-click to the browser alone", (_key, modifier) => {
+      const onExternalLinkClick = vi.fn();
+      render(
+        <DropDownItem
+          {...externalProps}
+          onExternalLinkClick={onExternalLinkClick}
+        />,
+      );
+      const link = screen.getByRole("link", { name: /Help center/ });
+      const notPrevented = fireEvent.click(link, modifier);
+
+      expect(notPrevented).toBe(true);
+      expect(onExternalLinkClick).not.toHaveBeenCalled();
+      expect(baseProps.onClick).not.toHaveBeenCalled();
+    });
+
     const navigatesOnPlainClick = (link: HTMLElement): boolean => {
       if (!link.hasAttribute("href")) return false;
       return fireEvent.click(link);
