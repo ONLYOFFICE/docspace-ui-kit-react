@@ -24,15 +24,23 @@ vi.mock("../../search-input", () => ({
 const Harness = ({
   hostValue,
   onSearch,
+  revision = 0,
+  clearSearch = false,
 }: {
   hostValue: string;
   onSearch: (value: string) => void;
+  // A new getter for the same value, as the host makes on any filter change.
+  revision?: number;
+  clearSearch?: boolean;
 }) => {
-  const getSelectedInputValue = React.useCallback(() => hostValue, [hostValue]);
+  const getSelectedInputValue = React.useCallback(
+    () => hostValue,
+    [hostValue, revision],
+  );
   const { searchComponent } = useSearch({
     onSearch,
     onClearFilter: () => {},
-    clearSearch: false,
+    clearSearch,
     setClearSearch: () => {},
     getSelectedInputValue,
     placeholder: "Search",
@@ -74,6 +82,38 @@ describe("useSearch", () => {
     // navigation) is shown.
     rerender(<Harness hostValue="ab" onSearch={onSearch} />);
     expect(field.value).toBe("ab");
+  });
+
+  // The burst ends on the value the host already has, so its report is the
+  // same value again; the burst is settled all the same.
+  it("settles a burst that ends on the value the host already has", () => {
+    const onSearch = vi.fn();
+    const { rerender } = render(<Harness hostValue="a" onSearch={onSearch} />);
+    const field = screen.getByTestId("search") as HTMLInputElement;
+    expect(field.value).toBe("a");
+
+    fireEvent.change(field, { target: { value: "ab" } });
+    fireEvent.change(field, { target: { value: "a" } });
+
+    rerender(<Harness hostValue="a" revision={1} onSearch={onSearch} />);
+    expect(field.value).toBe("a");
+
+    // Back navigation restores the host's own "ab" later on.
+    rerender(<Harness hostValue="ab" revision={1} onSearch={onSearch} />);
+    expect(field.value).toBe("ab");
+  });
+
+  it("takes the host's previous value again after a clear", () => {
+    const onSearch = vi.fn();
+    const { rerender } = render(<Harness hostValue="a" onSearch={onSearch} />);
+    const field = screen.getByTestId("search") as HTMLInputElement;
+
+    rerender(<Harness hostValue="a" clearSearch onSearch={onSearch} />);
+    expect(field.value).toBe("");
+
+    // The host resets clearSearch and hands back its value under a new getter.
+    rerender(<Harness hostValue="a" revision={1} onSearch={onSearch} />);
+    expect(field.value).toBe("a");
   });
 
   it("forgets the oldest queries of a host that never reports back", () => {

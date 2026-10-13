@@ -73,6 +73,9 @@ const useSearch = ({
   React.useEffect(() => {
     if (clearSearch) {
       sentRef.current = [];
+      // The field is empty now: a host that puts back the value it had
+      // before the clear is a change again, not a repeat.
+      lastAppliedRef.current = "";
       setInputValue("");
       onClearFilter?.();
       setClearSearch(false);
@@ -82,9 +85,6 @@ const useSearch = ({
   React.useEffect(() => {
     const value = getSelectedInputValue?.() ?? "";
 
-    if (value === lastAppliedRef.current) return;
-    lastAppliedRef.current = value;
-
     // Match the newest pending query of that value. The portal aborts a
     // search the user has replaced, so it often reports only the last of
     // them: with "a", "ab", "a" sent, a lone "a" is that last query, and
@@ -92,6 +92,16 @@ const useSearch = ({
     // every query in order: its late "ab" then reads as a value of its own.
     const sent = sentRef.current;
     const sentIndex = sent.lastIndexOf(value);
+
+    // The value the field already took brings nothing new to the field, but
+    // it still settles the queries up to it: a burst that ends where it
+    // started ("a", then "ab", "a") is reported as that same "a", and an
+    // "ab" left pending would hide the host's own "ab" later on.
+    if (value === lastAppliedRef.current) {
+      if (sentIndex !== -1) sentRef.current = sent.slice(sentIndex + 1);
+      return;
+    }
+    lastAppliedRef.current = value;
     if (sentIndex !== -1 && sentIndex < sent.length - 1) {
       // The host applied a query the user has since replaced: drop it and
       // everything sent before it, and leave the field as the user left it.
