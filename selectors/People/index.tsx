@@ -453,12 +453,16 @@ const PeopleSelector = ({
             ),
           );
 
-        const newTotal = withOutCurrentAuthorizedUser
+        // The current user is one of the people, never one of the groups:
+        // only a list of people has them to leave out and count off.
+        const withoutCurrentUser = withOutCurrentAuthorizedUser && !isGroupsTab;
+
+        const newTotal = withoutCurrentUser
           ? responseTotal - totalDifferent - 1
           : responseTotal - totalDifferent;
 
         if (startIndex === 0) {
-          const newItems = withOutCurrentAuthorizedUser
+          const newItems = withoutCurrentUser
             ? removeCurrentUserFromList(data)
             : moveCurrentUserToTopOfList(data);
 
@@ -473,7 +477,7 @@ const PeopleSelector = ({
               (item) => !ids.has(item.id) && ids.add(item.id),
             );
 
-            const newItems = withOutCurrentAuthorizedUser
+            const newItems = withoutCurrentUser
               ? removeCurrentUserFromList(filteredTempItems)
               : moveCurrentUserToTopOfList(filteredTempItems);
 

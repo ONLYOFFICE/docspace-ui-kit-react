@@ -9,6 +9,8 @@ type CapturedProps = {
   items: TSelectorItem[];
   loadNextPage: (startIndex: number) => void;
   tabsData?: { id: string; onClick: () => void }[];
+  hasNextPage?: boolean;
+  totalItems?: number;
 };
 
 const mocks = vi.hoisted(() => {
@@ -63,10 +65,10 @@ vi.mock("../../components/selector", async (importOriginal) => {
 
 const { default: PeopleSelector } = await import("./index");
 
-const groups = (names: string[]) => ({
+const groups = (names: string[], count = names.length) => ({
   data: {
     response: names.map((name) => ({ id: `g-${name}`, name })),
-    count: names.length,
+    count,
   },
 });
 
@@ -123,6 +125,24 @@ describe("<PeopleSelector /> Groups tab", () => {
 
     await waitFor(() => expect(labels()).toEqual(["Legal", "Sales"]));
     expect(mocks.searchUsersByExtendedFilter).toHaveBeenCalledTimes(1);
+  });
+
+  // The current user is left out of people, never of groups: a group list
+  // has no current user in it to subtract.
+  it("counts every portal group without the current user", async () => {
+    mocks.getGroups.mockResolvedValue(groups(["Legal", "Sales"], 3));
+    render(
+      <PeopleSelector
+        withGroups
+        isGroupsOnly
+        withOutCurrentAuthorizedUser
+        {...submit}
+      />,
+    );
+
+    await waitFor(() => expect(labels()).toEqual(["Legal", "Sales"]));
+    expect(mocks.lastProps.totalItems).toBe(3);
+    expect(mocks.lastProps.hasNextPage).toBe(true);
   });
 
   it("keeps the room's sharing query when a roomId is given", async () => {
