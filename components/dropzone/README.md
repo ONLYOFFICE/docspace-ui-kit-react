@@ -304,7 +304,9 @@ default comes out as no shadow at all.
   named by its own text. Enter and Space toggle the full list and Escape closes it. It is a
   sibling of the area, not a child, so no button sits inside another; the area's hit box still
   covers the whole box behind the line, so a click or a drop anywhere else in it reaches the
-  area. A drop on the format line itself is ignored.
+  area. While anything is dragged over the page the line lets the pointer through, so a drop on
+  it reaches the area too. Without `fullExstsText` the line is plain text and always lets clicks
+  and drops through to the area.
 
 ## Test ids
 

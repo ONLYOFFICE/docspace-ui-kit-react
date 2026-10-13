@@ -176,6 +176,15 @@ const chooseUnchecked = (input: HTMLInputElement, files: File[]) => {
 const getInput = ({ canvas }: PlayContext) =>
   canvas.getByTestId("dropzone-input") as HTMLInputElement;
 
+// What a click or a drop at the middle of the element would land on.
+const hitAtCentre = (element: HTMLElement) => {
+  const rect = element.getBoundingClientRect();
+  return document.elementFromPoint(
+    rect.left + rect.width / 2,
+    rect.top + rect.height / 2,
+  );
+};
+
 export const Default: Story = {
   args: defaultArgs,
   play: async (context) => {
@@ -183,6 +192,12 @@ export const Default: Story = {
     // The area is a focusable button named for its purpose.
     const area = canvas.getByRole("button", { name: "File upload area" });
     await expect(area).toHaveAttribute("tabindex", "0");
+
+    // The plain format line sits beside the area, over its hit box, and lets
+    // clicks and drops through to it.
+    await expect(hitAtCentre(canvas.getByTestId("dropzone-file-types"))).toBe(
+      area,
+    );
 
     await userEvent.upload(getInput(context), pdf("report.pdf"));
     await waitFor(() => expect(args.onDrop).toHaveBeenCalledTimes(1));
@@ -540,6 +555,16 @@ export const WithFormatsList: Story = {
     // file dialog.
     const line = canvas.getByRole("button", { name: /PDF, DOC, DOCX/ });
     await expect(line).toHaveAttribute("aria-expanded", "false");
+    await expect(line.contains(hitAtCentre(line))).toBe(true);
+
+    // While anything is dragged over the page, the line lets the drag
+    // through to the area, so a drop on it is taken.
+    const area = canvas.getByRole("button", { name: "File upload area" });
+    fireEvent.dragEnter(document.body);
+    await waitFor(() => expect(hitAtCentre(line)).toBe(area));
+    fireEvent.drop(document.body);
+    await waitFor(() => expect(line.contains(hitAtCentre(line))).toBe(true));
+
     await userEvent.click(line);
     const full = await screen.findByText("PDF, DOC, DOCX, ODT, RTF, TXT, EPUB");
     await waitFor(() => expect(full).toBeVisible());

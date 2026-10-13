@@ -229,6 +229,16 @@
   gap: var(--dropzone-gap-v);
 
   color: var(--dropzone-exsts-color-v);
+
+  // The line sits over the drop area's ::before, outside the area itself.
+  // Plain text, it lets clicks and drops through to the area, as it did when
+  // it was inside it; a button keeps its clicks but lets every drag through,
+  // so a drop on it is taken and the area's drag highlight does not flicker.
+  &:not(.clickable),
+  .isDraggingOnPage &,
+  .isDragOver & {
+    pointer-events: none;
+  }
 }
 
 .dropzoneExstsTextContainer {
