@@ -18,7 +18,7 @@ type CloseButtonProps = {
 
 // A real button, so it is focusable and answers Enter and Space. On a toast
 // opened without `withCross` it is visually hidden until it takes keyboard
-// focus (see `.closeButton` in Toast.module.scss): the mouse closes such a
+// focus (see `.iconButton` in Toast.module.scss): the mouse closes such a
 // toast by clicking it, the keyboard through this button.
 export const CloseButton = ({
   closeToast,

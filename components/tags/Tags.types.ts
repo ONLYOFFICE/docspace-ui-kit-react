@@ -26,7 +26,7 @@ export type TagsProps = {
   showCreateTag?: boolean;
   /** Passed to the overflow drop-down, where it removes the leading margin of each entry. */
   removeTagIcon?: boolean;
-  /** Accessible name of the row, which is a `role="group"`. */
+  /** Accessible name of the row, which is a `role="group"`. Defaults to the translated `Common:Tags` ("Tags"). */
   ariaLabel?: string;
   /** Accessible name and `title` of the plus tag drawn by `showCreateTag`. Defaults to the translated "Add". */
   createTagLabel?: string;

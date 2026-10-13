@@ -19,7 +19,7 @@ export type ToastProps = {
   timeout?: number;
   /** Whether the container renders nothing until the first client-side effect, for a server-rendered tree. */
   isSSR?: boolean;
-  /** Accessible name of the close button every toast carries. Pass a translated string in a localised UI. */
+  /** Accessible name of the close button every toast carries. Defaults to the translated `Common:CloseButton` ("Close"). */
   closeButtonLabel?: string;
 };
 

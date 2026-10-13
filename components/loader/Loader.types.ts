@@ -16,8 +16,8 @@ export type LoaderProps = {
   size?: string;
   /** What assistive technology reads: the visually hidden text of the
    * loader's `role="status"` region, under the decorative animation. For the
-   * `base` type it is the visible content instead. Defaults to "Loading
-   * content, please wait." */
+   * `base` type it is the visible content instead. Defaults to the
+   * translated `Common:LoadingProcessing` ("Loading..."). */
   label?: string;
   /** Draws the animation only: no `role="status"`, no hidden label, and the
    * wrapper is `aria-hidden`. For a loader inside a control (a button, a

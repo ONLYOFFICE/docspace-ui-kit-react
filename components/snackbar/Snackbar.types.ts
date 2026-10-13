@@ -89,6 +89,7 @@ export type SnackbarProps = {
   additionalHeaderText?: string;
   /**
    * Accessible name of the close cross, which is an icon with no text of its own.
+   * Defaults to the translated `Common:CloseButton` ("Close").
    */
   closeButtonLabel?: string;
   /**

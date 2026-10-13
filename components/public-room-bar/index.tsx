@@ -5,6 +5,7 @@ import CrossIcon from "../../assets/icons/12/cross.react.svg";
 import PeopleIcon from "../../assets/icons/16/people.react.svg";
 
 import { Text } from "../text";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import styles from "./PublicRoomBar.module.scss";
 import type { PublicRoomBarProps } from "./PublicRoomBar.types";
@@ -26,9 +27,12 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
     barIsVisible,
     className,
     dataTestId,
-    closeLabel = "Close",
+    closeLabel: closeLabelProp,
     ...rest
   } = props;
+
+  const t = useCommonTranslation();
+  const closeLabel = closeLabelProp ?? (t("CloseButton") || "Close");
 
   const headerAs = typeof headerText !== "string" ? "div" : undefined;
   const bodyAs = typeof bodyText !== "string" ? "div" : undefined;

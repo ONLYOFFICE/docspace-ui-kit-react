@@ -82,9 +82,7 @@ describe("<Loader />", () => {
   it("has no built-in English title and a default label", () => {
     render(<Loader type={LoaderTypes.dualRing} />);
     expect(document.querySelector("title")).toBeNull();
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "Loading content, please wait.",
-    );
+    expect(screen.getByRole("status")).toHaveTextContent("Loading...");
   });
 
   it("draws the oval when no type is given", () => {

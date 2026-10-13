@@ -15,10 +15,7 @@ describe("<Tags />", () => {
   it("renders without error", () => {
     render(<Tags {...baseProps} />);
     expect(screen.getByTestId("tags")).toBeInTheDocument();
-    expect(screen.getByTestId("tags")).toHaveAttribute(
-      "aria-label",
-      "Tags container",
-    );
+    expect(screen.getByTestId("tags")).toHaveAttribute("aria-label", "Tags");
   });
 
   it("renders with no tags", () => {

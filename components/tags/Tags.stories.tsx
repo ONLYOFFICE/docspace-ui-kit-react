@@ -74,7 +74,7 @@ const meta = {
       control: "text",
       description: "Accessible name of the row, which is a group",
       table: {
-        defaultValue: { summary: '"Tags container"' },
+        defaultValue: { summary: '"Tags" (translated)' },
       },
     },
     createTagLabel: {
@@ -119,9 +119,7 @@ export const Default: Story = {
     await expect(canvas.getByTestId("tag_item_Development")).toBeVisible();
 
     // Every tag is a button on the tab order, and Enter selects it.
-    await expect(
-      canvas.getByRole("group", { name: "Tags container" }),
-    ).toBeVisible();
+    await expect(canvas.getByRole("group", { name: "Tags" })).toBeVisible();
     canvas.getByRole("button", { name: "Design" }).focus();
     await userEvent.tab();
     const development = canvas.getByRole("button", { name: "Development" });

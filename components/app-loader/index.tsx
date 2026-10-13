@@ -8,11 +8,10 @@ import type { AppLoaderProps } from "./AppLoader.types";
 
 export type { AppLoaderProps };
 
-const AppLoader = ({
-  label = "Loading content, please wait.",
-}: AppLoaderProps) => {
-  // The inner Loader is the role="status" region, and the label is its text;
-  // the sheet itself is busy for as long as it is mounted.
+const AppLoader = ({ label }: AppLoaderProps) => {
+  // The inner Loader is the role="status" region, and the label is its text
+  // (the Loader's own translated default when none is passed); the sheet
+  // itself is busy for as long as it is mounted.
   return (
     <div
       className={styles.loaderContainer}

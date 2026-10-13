@@ -15,9 +15,7 @@ describe("AppLoader", () => {
   it("announces the wait through a status region", () => {
     render(<AppLoader />);
 
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "Loading content, please wait.",
-    );
+    expect(screen.getByRole("status")).toHaveTextContent("Loading...");
     expect(screen.getByTestId("app-loader")).toHaveAttribute(
       "aria-busy",
       "true",

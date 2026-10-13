@@ -17,7 +17,11 @@ import styles from "./Toast.module.scss";
 import { useMobileViewport } from "./hooks/useMobileViewport";
 import { getToastClassName } from "./utils/getToastClassName";
 import { useIsServer } from "./hooks/useIsServer";
-import { CloseButton } from "./sub-components/CloseButton";
+import { useCommonTranslation } from "../../utils/i18n";
+import {
+  CloseButton,
+  DEFAULT_CLOSE_BUTTON_LABEL,
+} from "./sub-components/CloseButton";
 
 const Slide = cssTransition({
   enter: "SlideIn",
@@ -49,7 +53,10 @@ const setInstances = (update: () => void) => {
 };
 
 const Toast = React.memo(
-  ({ className, style, isSSR, closeButtonLabel = "Close" }: ToastProps) => {
+  ({ className, style, isSSR, closeButtonLabel: labelProp }: ToastProps) => {
+    const t = useCommonTranslation();
+    const closeButtonLabel =
+      labelProp ?? (t("CloseButton") || DEFAULT_CLOSE_BUTTON_LABEL);
     const isServer = useIsServer();
     const offset = useMobileViewport();
     const { isRTL } = useInterfaceDirection();

@@ -1,4 +1,5 @@
 import { Text } from "../text";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import { Oval } from "./sub-components/Oval";
 import { DualRing } from "./sub-components/DualRing";
@@ -11,19 +12,23 @@ import styles from "./Loader.module.scss";
 
 export { LoaderTypes };
 
-const DEFAULT_LABEL = "Loading content, please wait.";
+// The English fallback when no translations are loaded.
+const DEFAULT_LABEL = "Loading...";
 
 const Loader = (props: LoaderProps) => {
+  const t = useCommonTranslation();
   const {
     type = LoaderTypes.oval,
     color,
     size,
-    label = DEFAULT_LABEL,
+    label: labelProp,
     className,
     style,
     id,
     isDecorative = false,
   } = props;
+
+  const label = labelProp ?? (t("LoadingProcessing") || DEFAULT_LABEL);
 
   const { isDecorative: _isDecorative, ...rest } = props;
   const animationProps = { ...rest, type, label };

@@ -46,10 +46,11 @@ const Tags: FC<TagsProps> = ({
   showCreateTag,
   onOptionTagClick,
   optionTagRef,
-  ariaLabel = "Tags container",
+  ariaLabel: ariaLabelProp,
   createTagLabel,
 }) => {
   const t = useCommonTranslation();
+  const ariaLabel = ariaLabelProp ?? (t("Tags") || "Tags");
   const [renderedTags, setRenderedTags] = React.useState<TagType[]>([]);
   const [containerWidth, setContainerWidth] = React.useState(0);
   const callBackRef = React.useRef<VoidFunction | undefined | null>(null);

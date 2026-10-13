@@ -9,6 +9,7 @@ import classNames from "classnames";
 import xss from "xss";
 
 import { interopDefault } from "../../utils/interop-default";
+import { getCommonTranslation } from "../../utils/i18n";
 import { Heading, HeadingSize } from "../heading";
 import { Text } from "../text";
 
@@ -159,10 +160,13 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
       isMaintenance: _isMaintenance, // Not a DOM attribute
       onClose: _onClose, // Not a DOM attribute
       skipBlur: _skipBlur, // Not a DOM attribute
-      closeButtonLabel = "Close",
+      closeButtonLabel: closeButtonLabelProp,
       id = "snackbar-container",
       ...rest
     } = this.props;
+
+    const closeButtonLabel =
+      closeButtonLabelProp ?? (getCommonTranslation("CloseButton") || "Close");
 
     const headerStyles = headerText ? {} : { display: "none" };
 
