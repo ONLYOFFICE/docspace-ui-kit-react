@@ -122,6 +122,30 @@ describe("SnackBar", () => {
     expect(status.querySelector("a")).toBeNull();
   });
 
+  it("announces a message with a link as text, without copying the link", async () => {
+    render(
+      <SnackBar
+        {...defaultProps}
+        text={
+          <>
+            Confirm your email.{" "}
+            <a href="/resend" data-testid="link">
+              Resend
+            </a>
+          </>
+        }
+      />,
+    );
+    const status = screen.getByRole("status");
+    await waitFor(() =>
+      expect(status).toHaveTextContent(
+        "Test header Confirm your email. Resend",
+      ),
+    );
+    expect(status.querySelector("a")).toBeNull();
+    expect(screen.getAllByTestId("link")).toHaveLength(1);
+  });
+
   it("takes its DOM id from the id prop", () => {
     render(<SnackBar {...defaultProps} id="quota-bar" />);
     expect(screen.getByTestId("snackbar-container")).toHaveAttribute(

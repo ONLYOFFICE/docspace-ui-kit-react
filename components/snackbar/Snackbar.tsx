@@ -8,7 +8,10 @@ import { zeroPad } from "react-countdown";
 import classNames from "classnames";
 import xss from "xss";
 
-import { useLiveRegionText } from "../../hooks/useLiveRegionText";
+import {
+  useLiveRegionText,
+  useLiveRegionTextOf,
+} from "../../hooks/useLiveRegionText";
 import { interopDefault } from "../../utils/interop-default";
 import { getCommonTranslation } from "../../utils/i18n";
 import { Heading, HeadingSize } from "../heading";
@@ -46,13 +49,20 @@ let pendingUnmount: (() => void) | null = null;
  * (useLiveRegionText), because a region inserted together with its text is
  * usually not announced; the visible bar draws at once and is not live
  * itself.
+ *
+ * The header and the message are read as plain text from the elements that
+ * draw them (useLiveRegionTextOf). Rendering them here a second time would
+ * copy any link the portal puts in the message -- ConfirmEmailBar's and
+ * QuotasBar's -- as an invisible tab stop with the same test id.
  */
 const SnackbarAnnouncement = ({
   html,
-  children,
+  headerRef,
+  messageRef,
 }: {
   html?: string;
-  children?: React.ReactNode;
+  headerRef: React.RefObject<HTMLElement | null>;
+  messageRef: React.RefObject<HTMLElement | null>;
 }) => {
   // Injected HTML is announced as its text, decoded by the browser's parser
   // (which runs no script) rather than injected a second time.
@@ -67,7 +77,13 @@ const SnackbarAnnouncement = ({
     setHtmlText(doc.body.textContent?.trim() ?? "");
   }, [html]);
 
-  const text = useLiveRegionText(html ? htmlText : children);
+  const liveHtmlText = useLiveRegionText(htmlText);
+  const headerText = useLiveRegionTextOf(headerRef);
+  const messageText = useLiveRegionTextOf(messageRef);
+
+  const text = html
+    ? liveHtmlText
+    : [headerText, messageText].filter(Boolean).join(" ") || undefined;
 
   return (
     <span
@@ -143,6 +159,11 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
     pendingUnmount = unmount;
     queueMicrotask(unmount);
   }
+
+  // What the announcement reads: the header line and the message.
+  headerRef = React.createRef<HTMLDivElement>();
+
+  messageRef = React.createRef<HTMLDivElement>();
 
   constructor(props: SnackbarProps) {
     super(props);
@@ -299,7 +320,7 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
                   />
                 </div>
               ) : null}
-              <div className={styles.headerContainer}>
+              <div className={styles.headerContainer} ref={this.headerRef}>
                 <Heading
                   size={HeadingSize.xsmall}
                   isInline
@@ -328,6 +349,7 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
                 fontSize={fontSize}
                 fontWeight={fontWeight}
                 data-testid="snackbar-message"
+                ref={this.messageRef}
               >
                 {text}
               </Text>
@@ -364,11 +386,11 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
             <CrossReactSvg className={styles.crossIcon} aria-hidden="true" />
           </button>
         ) : null}
-        <SnackbarAnnouncement html={htmlContent}>
-          {headerText ? <>{headerText} </> : null}
-          {additionalHeaderText ? <>{additionalHeaderText} </> : null}
-          {text}
-        </SnackbarAnnouncement>
+        <SnackbarAnnouncement
+          html={htmlContent}
+          headerRef={this.headerRef}
+          messageRef={this.messageRef}
+        />
       </div>
     );
   }
