@@ -153,6 +153,31 @@ describe("<SearchInput />", () => {
     await waitFor(() => expect(onChange).toHaveBeenLastCalledWith(""));
   });
 
+  it("takes a reported value back from the parent after the cross cleared it", async () => {
+    const onChange = vi.fn();
+    const { container, rerender } = render(
+      <SearchInput {...baseProps} onChange={onChange} refreshTimeout={50} />,
+    );
+    const input = screen.getByTestId("text-input");
+
+    // Reported, and never handed back: the parent's value stays "".
+    fireEvent.change(input, { target: { value: "budget" } });
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith("budget"));
+    fireEvent.click(container.getElementsByClassName("search-cross")[0]);
+    expect(input).toHaveValue("");
+
+    // The parent now sets that value deliberately -- a saved search, say.
+    rerender(
+      <SearchInput
+        {...baseProps}
+        value="budget"
+        onChange={onChange}
+        refreshTimeout={50}
+      />,
+    );
+    expect(input).toHaveValue("budget");
+  });
+
   it("still takes a value from the parent it never reported", () => {
     const { rerender } = render(
       <SearchInput {...baseProps} value="budget" refreshTimeout={50} />,
