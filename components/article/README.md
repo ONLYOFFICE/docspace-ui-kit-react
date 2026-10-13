@@ -370,7 +370,10 @@ below 1024px). It has no README of its own; its variables are listed below.
   whenever `text` changes.
 - **With `onClickBadge` the badge is a button of its own** — focusable, activated by Enter and
   Space, named by `badgeTitle`, else by `labelBadge`, else by `text` — and its click never
-  reaches the row's `onClick`. It sits beside the row's control, not inside it. With `showText`
+  reaches the row's `onClick`. Enter and Space click a `badgeComponent` itself, as a pointer
+  would, so a badge that handles and stops its own click (the portal's new-files badge opening
+  its panel) does the same from the keyboard; `onClickBadge` runs only if that click reaches
+  the wrapper. It sits beside the row's control, not inside it. With `showText`
   off the badge is only a dot: its click still works with the pointer, and it is not a control.
 
 ## CSS variables

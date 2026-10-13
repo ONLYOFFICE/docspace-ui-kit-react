@@ -150,6 +150,51 @@ describe("<ArticleItem />", () => {
       expect(mockOnClick).not.toHaveBeenCalled();
     });
 
+    // The portal's NewFilesBadge opens its panel in its own click handler and
+    // stops the click there, as a mouse click on it does.
+    it("lets a badgeComponent handle Enter the way it handles a click", () => {
+      const onBadgeClick = vi.fn();
+      const CustomBadge = () => (
+        <div
+          data-testid="custom-badge"
+          onClick={(e) => {
+            e.stopPropagation();
+            onBadgeClick();
+          }}
+        >
+          5
+        </div>
+      );
+      render(
+        <ArticleItem
+          {...baseProps}
+          badgeTitle="New files"
+          badgeComponent={<CustomBadge />}
+        />,
+      );
+      const badge = screen.getByRole("button", { name: "New files" });
+      badge.focus();
+      fireEvent.keyDown(badge, { key: "Enter" });
+      expect(onBadgeClick).toHaveBeenCalledTimes(1);
+      expect(mockOnClickBadge).not.toHaveBeenCalled();
+      expect(mockOnClick).not.toHaveBeenCalled();
+    });
+
+    it("still reports Enter on a badgeComponent that leaves the click alone", () => {
+      render(
+        <ArticleItem
+          {...baseProps}
+          badgeTitle="New files"
+          badgeComponent={<span>5</span>}
+        />,
+      );
+      const badge = screen.getByRole("button", { name: "New files" });
+      badge.focus();
+      fireEvent.keyDown(badge, { key: " " });
+      expect(mockOnClickBadge).toHaveBeenCalledTimes(1);
+      expect(mockOnClick).not.toHaveBeenCalled();
+    });
+
     it("leaves the control to the link when LinkRouter is given", () => {
       const LinkRouter = ({
         children,

@@ -124,12 +124,29 @@ export const ArticleItemPure = (props: ArticleItemPureProps) => {
     onClickBadge?.(id);
   };
 
+  // A badgeComponent may handle its own click and stop it there -- the
+  // portal's NewFilesBadge opens its panel that way -- so the key clicks
+  // what a pointer would hit, the drawn badge, and the click bubbles from
+  // it to the wrapper exactly as a mouse click does.
+  const onBadgeKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    const drawn = !iconBadge && badgeComponent;
+    const inner = e.currentTarget.firstElementChild;
+    if (!drawn || !(inner instanceof HTMLElement)) {
+      onActivateKeyDown(e);
+      return;
+    }
+    if (e.target !== e.currentTarget) return;
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    inner.click();
+  };
+
   const badgeButtonProps = onClickBadge
     ? {
         role: "button",
         tabIndex: 0,
         "aria-label": badgeTitle || (labelBadge ? String(labelBadge) : text),
-        onKeyDown: onActivateKeyDown,
+        onKeyDown: onBadgeKeyDown,
       }
     : {};
 
