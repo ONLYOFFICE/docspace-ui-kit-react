@@ -118,9 +118,10 @@ still true, and all still unenforced.
   `ui-kit` agent skill syncs; stories are in neither.
 - **`vitest.config.ts` holds two projects.** `unit` is Vitest + React Testing Library in
   jsdom, and it **lists the directories it runs** — `components`, `selectors`, `ai-agent`,
-  `errors`, `ui`, `utils`, `context`, `providers`, `hooks`, `scripts`, and `docs`, for the
-  logic the samples carry (PKCE, role mapping). A test placed under `billing/`, `uploader/`,
-  `document-editor/` or `api/` is collected by nothing and passes by never running.
+  `errors`, `ui`, `utils`, `uploader`, `context`, `providers`, `hooks`, `scripts` (which also
+  collects `*.test.mjs`), and `docs`, for the logic the samples carry (PKCE, role mapping). A
+  test placed under `billing/`, `document-editor/` or `api/` is collected by nothing and passes
+  by never running.
   `storybook` renders every story in Chromium through `@storybook/addon-vitest` — a smoke test
   that it renders, plus its `play` function — with the demo portal's service worker served and
   `VITE_PROVIDER_*` blanked, so no story reaches a live portal.
