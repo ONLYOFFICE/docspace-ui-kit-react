@@ -81,14 +81,22 @@ describe("<EmptyScreenContainer />", () => {
     ).toBeInTheDocument();
   });
 
-  it("puts the text in a status live region", () => {
+  // It mounts already filled, often as a whole page on route load: a live
+  // region would announce every empty page or, mounted with its text, nothing.
+  it("is not a live region", () => {
     render(<EmptyScreenContainer {...baseProps} subheadingText="Sub" />);
 
-    const status = screen.getByRole("status");
-    expect(status).toHaveTextContent(baseProps.headerText);
-    expect(status).toHaveTextContent("Sub");
-    expect(status).toHaveTextContent(baseProps.descriptionText);
-    expect(status).not.toHaveTextContent("Go to home");
+    expect(screen.queryByRole("status")).toBeNull();
+    expect(screen.getByText("Sub")).toBeInTheDocument();
+  });
+
+  it("sizes the header through Text's variables, not an inline style", () => {
+    render(<EmptyScreenContainer {...baseProps} />);
+
+    const header = screen.getByRole("heading", { name: baseProps.headerText });
+    expect(header).toHaveClass("ec-header");
+    expect(header.style.fontSize).toBe("");
+    expect(header.style.fontWeight).toBe("");
   });
 
   it("passes id and style to the outer element", () => {

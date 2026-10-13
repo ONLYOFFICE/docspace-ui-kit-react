@@ -173,10 +173,10 @@ export function NoResults() {
 - **The 640px width only applies above 1424px.** At or below that the element becomes
   `fit-content` capped at 640px, then 480px below 1024px and 343px below 600px. Setting
   `--empty-screen-width` therefore changes nothing on most screens.
-- **The heading is 19px and bold from the stylesheet**, so a `className` rule on `ec-header` can
-  change it; nothing is set inline.
-- **The three text lines sit in a `display: contents` wrapper** with `role="status"`. It takes
-  no space and leaves the lines as items of the centred column.
+- **The heading is 19px and bold from the stylesheet**, through `Text`'s `--text-size` and
+  `--text-weight` on a single-class rule; nothing is set inline. A rule of two classes or more on
+  `ec-header` (`.my-page .ec-header`) overrides it whatever order the stylesheets load in; a
+  single-class rule ties with `Text`'s own and depends on that order.
 - **`subheadingText` has no styling of its own** beyond being 600-weight: the class the component
   puts on it is not defined in the stylesheet, and the two modifier classes that a subheading or
   a description add to the wrapper both set a rule the wrapper already has.
@@ -206,10 +206,11 @@ export function NoResults() {
 - **`headerText` is a real heading**, an `<h3>` by default; set `headingLevel` so it fits the
   outline of the page around it. `subheadingText` is a paragraph and `descriptionText` a block,
   because the description may hold markup of your own.
-- **The text is a polite live region** (`role="status"`), so an empty state that replaces a list
-  in place — a search with no results — is announced. Screen readers announce changes to a live
-  region, so the reliable case is a container that stays mounted while its text changes; one that
-  mounts already filled may be read only when the user reaches it.
+- **The text is not a live region.** The element mounts with its text, usually as the whole
+  page, so a `role="status"` would either announce every empty page on route load or, being
+  inserted together with its text, nothing at all. When an empty state replaces a list in place
+  — a search with no results — announce the outcome from a region that stays mounted, such as the
+  one around the search field.
 - The actions are whatever you pass; their roles and labels are yours to get right. A link
   styled as an action still needs an `href` to be reachable by keyboard.
 

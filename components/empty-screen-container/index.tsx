@@ -46,39 +46,34 @@ const EmptyScreenContainer = (props: EmptyScreenContainerProps) => {
         className={classNames(styles.image, "ec-image")}
       />
 
-      {/* A polite live region around the text, so an empty state that
-          replaces a list is announced. `display: contents` keeps the lines
-          direct flex items of the column. */}
-      <div role="status" className={styles.message}>
-        {headerText ? (
-          <Text
-            as={`h${headingLevel}`}
-            className={classNames(styles.header, "ec-header")}
-          >
-            {headerText}
-          </Text>
-        ) : null}
+      {headerText ? (
+        <Text
+          as={`h${headingLevel}`}
+          className={classNames(styles.header, "ec-header")}
+        >
+          {headerText}
+        </Text>
+      ) : null}
 
-        {subheadingText ? (
-          <Text
-            as="p"
-            fontWeight="600"
-            className={classNames(styles.subheading, "ec-subheading")}
-          >
-            {subheadingText}
-          </Text>
-        ) : null}
+      {subheadingText ? (
+        <Text
+          as="p"
+          fontWeight="600"
+          className={classNames(styles.subheading, "ec-subheading")}
+        >
+          {subheadingText}
+        </Text>
+      ) : null}
 
-        {descriptionText ? (
-          <Text
-            as="div"
-            fontSize="12px"
-            className={classNames(styles.description, "ec-desc")}
-          >
-            {descriptionText}
-          </Text>
-        ) : null}
-      </div>
+      {descriptionText ? (
+        <Text
+          as="div"
+          fontSize="12px"
+          className={classNames(styles.description, "ec-desc")}
+        >
+          {descriptionText}
+        </Text>
+      ) : null}
 
       {buttons ? (
         <div

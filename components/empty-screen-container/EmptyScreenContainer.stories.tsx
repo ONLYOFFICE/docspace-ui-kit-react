@@ -131,10 +131,8 @@ export const Default: Story = {
     await expect(
       canvas.getByText("No files to be displayed in this section"),
     ).toBeVisible();
-    // The text is a polite live region; the actions are outside it.
-    const status = canvas.getByRole("status");
-    await expect(status).toContainElement(heading);
-    await expect(status).not.toHaveTextContent("Reset filter");
+    // The page is not a live region: it mounts with its text.
+    await expect(canvas.queryByRole("status")).toBeNull();
 
     await userEvent.click(canvas.getByText("Reset filter"));
     await expect(onResetFilter).toHaveBeenCalledTimes(1);
