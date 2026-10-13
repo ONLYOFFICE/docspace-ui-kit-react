@@ -287,6 +287,18 @@ describe("<Toast />", () => {
     expect(screen.getByText("404")).toBeInTheDocument();
   });
 
+  it("shows an object without a prototype instead of throwing", () => {
+    render(<Toast />);
+
+    expect(() =>
+      act(() => {
+        toastr.error(Object.create(null) as unknown as string, "Failed");
+      }),
+    ).not.toThrow();
+
+    expect(screen.getByText("Failed")).toBeInTheDocument();
+  });
+
   it("falls back to the English default title without translations", () => {
     render(<Toast />);
 

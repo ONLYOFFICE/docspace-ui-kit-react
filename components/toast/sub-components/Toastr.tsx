@@ -163,13 +163,19 @@ const processErrorData = (
   }
 
   // Any other object is shown through its own toString(), if it has one
-  // (a URL, a custom error class); a plain object has nothing to show.
+  // (a URL, a custom error class); a plain object has nothing to show, and
+  // neither has one without a prototype, whose toString is undefined.
   if (
     data &&
     typeof data === "object" &&
+    typeof data.toString === "function" &&
     data.toString !== Object.prototype.toString
   ) {
-    return String(data);
+    try {
+      return String(data);
+    } catch {
+      return "";
+    }
   }
 
   return "";
