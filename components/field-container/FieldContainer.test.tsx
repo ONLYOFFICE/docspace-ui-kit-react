@@ -120,30 +120,60 @@ describe("<FieldContainer />", () => {
     );
   });
 
-  // Known defect (review of spike/vitest-addon): the ARIA effect does not rerun when the control mounts later. Flip to it() once fixed.
-  it.fails(
-    "marks a control that mounts after the container as required",
-    async () => {
-      const LateInput = () => {
-        const [ready, setReady] = useState(false);
-        useEffect(() => {
-          setReady(true);
-        }, []);
-        return ready ? (
-          <input id="late-field" data-testid="late-input" />
-        ) : null;
-      };
+  it("states a radio group's state on the group, not its first option", () => {
+    render(
+      <FieldContainer labelText="Plan:" isRequired>
+        <div role="radiogroup" data-testid="group">
+          <input type="radio" name="plan" data-testid="first" />
+          <input type="radio" name="plan" />
+        </div>
+      </FieldContainer>,
+    );
 
-      render(
-        <FieldContainer labelText="Late:" labelFor="late-field" isRequired>
-          <LateInput />
-        </FieldContainer>,
-      );
+    expect(screen.getByTestId("group")).toHaveAttribute(
+      "aria-required",
+      "true",
+    );
+    expect(screen.getByTestId("first")).not.toHaveAttribute("aria-required");
+  });
 
-      const input = await screen.findByTestId("late-input");
-      await waitFor(() => {
-        expect(input).toHaveAttribute("aria-required", "true");
-      });
-    },
-  );
+  it("does not take off an attribute the control has since set itself", () => {
+    const { rerender } = render(
+      <FieldContainer labelText="Name:" hasError>
+        <input data-testid="field" />
+      </FieldContainer>,
+    );
+    const field = screen.getByTestId("field");
+    expect(field).toHaveAttribute("aria-invalid", "true");
+
+    // The control now says it is invalid for a reason of its own.
+    field.setAttribute("aria-invalid", "grammar");
+    rerender(
+      <FieldContainer labelText="Name:" hasError={false}>
+        <input data-testid="field" />
+      </FieldContainer>,
+    );
+    expect(field).toHaveAttribute("aria-invalid", "grammar");
+  });
+
+  it("marks a control that mounts after the container as required", async () => {
+    const LateInput = () => {
+      const [ready, setReady] = useState(false);
+      useEffect(() => {
+        setReady(true);
+      }, []);
+      return ready ? <input id="late-field" data-testid="late-input" /> : null;
+    };
+
+    render(
+      <FieldContainer labelText="Late:" labelFor="late-field" isRequired>
+        <LateInput />
+      </FieldContainer>,
+    );
+
+    const input = await screen.findByTestId("late-input");
+    await waitFor(() => {
+      expect(input).toHaveAttribute("aria-required", "true");
+    });
+  });
 });

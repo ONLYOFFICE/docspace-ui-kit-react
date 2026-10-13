@@ -12,15 +12,22 @@ const displayInlineBlock = { display: "inline-block" };
 
 // The form control the container describes: the element `labelFor` names when
 // it sits in the field body, otherwise the body's first input, textarea or
-// select.
+// select. A radio button stands for its group: the state belongs on the
+// `radiogroup` around it, never on the first option alone.
 const findControl = (body: HTMLElement, labelFor?: string) => {
-  if (labelFor) {
-    const named = body.ownerDocument.getElementById(labelFor);
-    if (named && body.contains(named)) return named;
+  const named = labelFor ? body.ownerDocument.getElementById(labelFor) : null;
+  const control =
+    named && body.contains(named)
+      ? named
+      : body.querySelector<HTMLElement>(
+          'input:not([type="hidden"]), textarea, select',
+        );
+
+  if (control instanceof HTMLInputElement && control.type === "radio") {
+    const group = control.closest<HTMLElement>('[role="radiogroup"]');
+    return group && body.contains(group) ? group : null;
   }
-  return body.querySelector<HTMLElement>(
-    'input:not([type="hidden"]), textarea, select',
-  );
+  return control;
 };
 
 const splitIds = (value: string | null) =>
@@ -56,42 +63,69 @@ const FieldContainer = ({
   // `isRequired` and `hasError` describe the field, so they are stated on the
   // control, where ARIA allows them and a screen reader reads them -- not on
   // the <label>. An attribute the control already carries is left alone, and
-  // whatever is added here is taken off again when the prop turns off.
+  // whatever is added here is taken off again when the prop turns off -- only
+  // while it still holds the value written here, so an attribute the control
+  // has since set itself is not removed. The body is watched, so a control
+  // that mounts later, or is swapped for another, is described too.
   useEffect(() => {
     const body = bodyRef.current;
     if (!body) return;
-    const control = findControl(body, labelFor);
-    if (!control) return;
 
-    const undo: (() => void)[] = [];
-    const setIfAbsent = (name: string, value: string) => {
-      if (control.hasAttribute(name)) return;
-      control.setAttribute(name, value);
-      undo.push(() => control.removeAttribute(name));
+    let control: HTMLElement | null = null;
+    let undo: (() => void)[] = [];
+
+    const revert = () => {
+      for (const step of undo) step();
+      undo = [];
     };
 
-    if (isRequired) setIfAbsent("aria-required", "true");
-    if (hasError) setIfAbsent("aria-invalid", "true");
-
-    if (showError) {
-      const ids = splitIds(control.getAttribute("aria-describedby"));
-      if (!ids.includes(errorId)) {
-        control.setAttribute("aria-describedby", [...ids, errorId].join(" "));
+    const apply = (target: HTMLElement) => {
+      const setIfAbsent = (name: string, value: string) => {
+        if (target.hasAttribute(name)) return;
+        target.setAttribute(name, value);
         undo.push(() => {
-          const rest = splitIds(
-            control.getAttribute("aria-describedby"),
-          ).filter((value) => value !== errorId);
-          if (rest.length) {
-            control.setAttribute("aria-describedby", rest.join(" "));
-          } else {
-            control.removeAttribute("aria-describedby");
-          }
+          if (target.getAttribute(name) === value) target.removeAttribute(name);
         });
+      };
+
+      if (isRequired) setIfAbsent("aria-required", "true");
+      if (hasError) setIfAbsent("aria-invalid", "true");
+
+      if (showError) {
+        const ids = splitIds(target.getAttribute("aria-describedby"));
+        if (!ids.includes(errorId)) {
+          target.setAttribute("aria-describedby", [...ids, errorId].join(" "));
+          undo.push(() => {
+            const rest = splitIds(
+              target.getAttribute("aria-describedby"),
+            ).filter((value) => value !== errorId);
+            if (rest.length) {
+              target.setAttribute("aria-describedby", rest.join(" "));
+            } else {
+              target.removeAttribute("aria-describedby");
+            }
+          });
+        }
       }
-    }
+    };
+
+    const sync = () => {
+      const next = findControl(body, labelFor);
+      if (next === control) return;
+      revert();
+      control = next;
+      if (control) apply(control);
+    };
+
+    sync();
+    if (!isRequired && !hasError && !showError) return revert;
+
+    const observer = new MutationObserver(sync);
+    observer.observe(body, { childList: true, subtree: true });
 
     return () => {
-      for (const revert of undo) revert();
+      observer.disconnect();
+      revert();
     };
   }, [isRequired, hasError, showError, labelFor, errorId]);
 

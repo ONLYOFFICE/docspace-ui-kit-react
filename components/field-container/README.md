@@ -255,14 +255,19 @@ light and dark themes, so it cannot be overridden from outside.
   element `labelFor` names, or else the first `input`, `textarea` or `select` in the field
   body — and gives it `aria-required="true"` while `isRequired` is set and
   `aria-invalid="true"` while `hasError` is set. An attribute the control already carries is
-  left as it is, and what the container added is removed when the prop turns off. (These used
-  to be put on the `<label>`, where ARIA does not allow them and nothing announced them.) The
-  asterisk is `aria-hidden`, so a screen reader hears "required" from the control instead.
+  left as it is, and what the container added is removed when the prop turns off — only while
+  it still holds the value the container wrote. (These used to be put on the `<label>`, where
+  ARIA does not allow them and nothing announced them.) The asterisk is `aria-hidden`, so a
+  screen reader hears "required" from the control instead.
+- **A radio button stands for its group.** The states go on the `role="radiogroup"` element
+  around it, not on the first option; radios with no such group get none.
+- The field body is watched, so a control that mounts after the container, or replaces another,
+  is described as well.
 - While the error message shows, it gets a generated `id` and the control's `aria-describedby`
   gains that id, so the message is read with the field. It is not a live region: a screen
   reader does not announce it the moment it appears.
-- A control the container cannot find — a custom widget with no native input, or one that
-  mounts later — gets none of this; set the attributes on it yourself.
+- A control the container cannot find — a custom widget with no native input — gets none of
+  this; name it with `labelFor` or set the attributes on it yourself.
 
 ## Test ids
 
