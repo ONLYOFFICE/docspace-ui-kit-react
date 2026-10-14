@@ -3,9 +3,13 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { act, render, screen, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { DeviceType } from "../../enums";
+import { DeviceType, FilterGroups } from "../../enums";
 import Filter from ".";
-import { TGetSelectedSortData, TSortDataItem } from "./Filter.types";
+import {
+  CustomItemRenderProps,
+  TGetSelectedSortData,
+  TSortDataItem,
+} from "./Filter.types";
 import { TViewAs } from "../../types";
 import {
   ViewSelector,
@@ -120,6 +124,108 @@ describe("Filter Component", () => {
 
       expect(onClearFilter).toHaveBeenCalled();
       expect(setClearSearch).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe("Custom items", () => {
+    const getFilterData = () =>
+      Promise.resolve([
+        {
+          key: FilterGroups.filterOther,
+          group: FilterGroups.filterOther,
+          label: "Metadata",
+          isHeader: true,
+        },
+        {
+          key: "metadata",
+          group: FilterGroups.filterOther,
+          label: "",
+          isCustom: true,
+        },
+      ]);
+
+    const openFilter = async (props = {}) => {
+      await act(async () => {
+        renderComponent({ getFilterData, ...props });
+      });
+      await userEvent.click(screen.getByTestId("filter_icon_button"));
+    };
+
+    it("applies the value the host sets", async () => {
+      const onFilter = vi.fn();
+      const renderCustomItem = ({ onChange }: CustomItemRenderProps) => (
+        <button
+          type="button"
+          onClick={() => onChange({ key: "stage", label: "Stage" })}
+        >
+          Set
+        </button>
+      );
+
+      await openFilter({ onFilter, renderCustomItem });
+      await userEvent.click(await screen.findByText("Set"));
+      await userEvent.click(screen.getByTestId("filter_apply_button"));
+
+      expect(onFilter).toHaveBeenCalledWith([
+        { group: FilterGroups.filterOther, key: "stage", label: "Stage" },
+      ]);
+    });
+
+    it("opens and closes the nested step", async () => {
+      const renderCustomItem = ({
+        openPanel,
+        closePanel,
+      }: CustomItemRenderProps) => (
+        <button
+          type="button"
+          onClick={() =>
+            openPanel(() => (
+              <button type="button" onClick={closePanel}>
+                Back
+              </button>
+            ))
+          }
+        >
+          Open
+        </button>
+      );
+
+      await openFilter({ renderCustomItem });
+      await userEvent.click(await screen.findByText("Open"));
+      await userEvent.click(await screen.findByText("Back"));
+
+      expect(screen.queryByText("Back")).not.toBeInTheDocument();
+    });
+
+    it("shows a value as its chips and removes them one by one", async () => {
+      const removeSelectedItem = vi.fn();
+
+      await act(async () => {
+        renderComponent({
+          removeSelectedItem,
+          getSelectedFilterData: () =>
+            Promise.resolve([
+              {
+                key: "state",
+                group: FilterGroups.filterOther,
+                label: "Case file",
+                chips: [
+                  { key: "stage", label: "Stage is Discovery" },
+                  { key: "court", label: "Court is Supreme" },
+                ],
+              },
+            ]),
+        });
+      });
+
+      expect(screen.getByText("Stage is Discovery")).toBeInTheDocument();
+
+      await userEvent.click(screen.getByText("Court is Supreme"));
+
+      expect(removeSelectedItem).toHaveBeenCalledWith({
+        key: "court",
+        group: FilterGroups.filterOther,
+      });
     });
   });
 });

@@ -21,6 +21,24 @@ export type SelectorRenderProps = {
 
 export type TRenderSelector = (props: SelectorRenderProps) => React.ReactNode;
 
+export type TCustomItemValue = {
+  key: string;
+  label?: string;
+};
+
+export type CustomItemRenderProps = {
+  group: FilterGroups;
+  value?: TCustomItemValue;
+  onChange: (value: TCustomItemValue | null) => void;
+  openPanel: (render: () => React.ReactNode) => void;
+  closePanel: () => void;
+  closeFilter: () => void;
+};
+
+export type TRenderCustomItem = (
+  props: CustomItemRenderProps,
+) => React.ReactNode;
+
 export type TSortDataItem = {
   id: string;
   className?: string;
@@ -101,12 +119,21 @@ export type TTagItem = {
   isMultiSelect?: boolean;
 };
 
+export type TCustomItem = {
+  group: FilterGroups;
+  key: string;
+  isCustom: true;
+  label?: string;
+  isSelected?: boolean;
+};
+
 export type TGroupItem =
   | TTagItem
   | TCheckboxItem
   | TWithOptionItem
   | TSelectorItem
-  | TToggleButtonItem;
+  | TToggleButtonItem
+  | TCustomItem;
 
 export interface FilterBlockItemProps {
   group: FilterGroups;
@@ -119,6 +146,7 @@ export interface FilterBlockItemProps {
   showSelector: TShowSelector;
   isFirst: boolean;
   withMultiItems: boolean;
+  renderCustom?: (item: TCustomItem) => React.ReactNode;
 }
 
 export type TItem = {
@@ -138,6 +166,8 @@ export type TItem = {
   isMultiSelect?: boolean;
   selectedLabel?: string;
   isCheckbox?: boolean;
+  isCustom?: boolean;
+  chips?: { key: string; label: string }[];
 };
 
 export type TGetFilterData = () => Promise<TItem[]>;
@@ -179,6 +209,8 @@ export type FilterBlockProps = {
 
   /** Renders the selector the panel opens for a person or a room group. Without it that step is empty — this package ships no portal selector. */
   renderSelector?: TRenderSelector;
+  /** Renders a group item marked `isCustom`. Without it such an item is empty. */
+  renderCustomItem?: TRenderCustomItem;
 };
 
 export type FilterButtonProps = Omit<FilterBlockProps, "hideFilterBlock"> & {

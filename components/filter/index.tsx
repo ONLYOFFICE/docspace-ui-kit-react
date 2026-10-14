@@ -100,6 +100,7 @@ const FilterInput = React.memo(
     initSelectedFilterData,
 
     renderSelector,
+    renderCustomItem,
     setEditRoomGroupsDialogVisible,
     getAllRoomGroups,
     roomGroups,
@@ -618,6 +619,7 @@ const FilterInput = React.memo(
               userId={userId}
               disableThirdParty={disableThirdParty}
               renderSelector={renderSelector}
+              renderCustomItem={renderCustomItem}
             />
           ) : null}
 

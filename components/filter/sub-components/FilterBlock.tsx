@@ -11,7 +11,13 @@ import { ModalDialog, ModalDialogType } from "../../modal-dialog";
 import { IconButton } from "../../icon-button";
 import { useCommonTranslation } from "../../../utils/i18n";
 import styles from "../Filter.module.scss";
-import { FilterBlockProps, TGroupItem, TItem } from "../Filter.types";
+import {
+  FilterBlockProps,
+  TCustomItem,
+  TCustomItemValue,
+  TGroupItem,
+  TItem,
+} from "../Filter.types";
 import {
   removeGroupManagerFilterValueIfNeeded,
   syncGroupManagerCheckBox,
@@ -35,6 +41,7 @@ const FilterBlock = ({
   isContactsGuestsPage,
   disableThirdParty,
   renderSelector,
+  renderCustomItem,
 }: FilterBlockProps) => {
   const t = useCommonTranslation();
   const [showSelector, setShowSelector] = React.useState<{
@@ -46,6 +53,10 @@ const FilterBlock = ({
     type: null,
     group: null,
   });
+
+  const [customPanel, setCustomPanel] = React.useState<{
+    render: () => React.ReactNode;
+  } | null>(null);
 
   const [filterData, setFilterData] = React.useState<TItem[]>([]);
   const [filterValues, setFilterValues] = React.useState<TGroupItem[]>([]);
@@ -358,6 +369,52 @@ const FilterBlock = ({
     setShowSelector((val) => ({ ...val, show: false }));
   }, []);
 
+  const changeCustomValue = React.useCallback(
+    (group: FilterGroups, value: TCustomItemValue | null) => {
+      setFilterValues((values) => {
+        const rest = values.filter((item) => item.group !== group);
+
+        return value
+          ? [...rest, { group, key: value.key, label: value.label }]
+          : rest;
+      });
+    },
+    [],
+  );
+
+  const openCustomPanel = React.useCallback(
+    (render: () => React.ReactNode) => setCustomPanel({ render }),
+    [],
+  );
+
+  const closeCustomPanel = React.useCallback(() => setCustomPanel(null), []);
+
+  const renderCustom = React.useCallback(
+    (item: TCustomItem) => {
+      const value = filterValues.find((v) => v.group === item.group);
+
+      return renderCustomItem?.({
+        group: item.group,
+        value:
+          value && !Array.isArray(value.key)
+            ? { key: `${value.key}`, label: value.label }
+            : undefined,
+        onChange: (next) => changeCustomValue(item.group, next),
+        openPanel: openCustomPanel,
+        closePanel: closeCustomPanel,
+        closeFilter: hideFilterBlock,
+      });
+    },
+    [
+      filterValues,
+      renderCustomItem,
+      changeCustomValue,
+      openCustomPanel,
+      closeCustomPanel,
+      hideFilterBlock,
+    ],
+  );
+
   const selectOption = React.useCallback(
     (items: { id?: string | number; label?: string }[]) => {
       setShowSelector((val) => ({
@@ -443,7 +500,7 @@ const FilterBlock = ({
       visible
       onClose={hideFilterBlock}
       withBodyScroll
-      containerVisible={showSelector.show}
+      containerVisible={showSelector.show || !!customPanel}
       data-testid="filter_modal_dialog"
     >
       {showSelector.show && renderSelector ? (
@@ -460,6 +517,12 @@ const FilterBlock = ({
               disableThirdParty,
             })}
           </div>
+        </ModalDialog.Container>
+      ) : null}
+
+      {customPanel ? (
+        <ModalDialog.Container>
+          <div className={styles.filterBlock}>{customPanel.render()}</div>
         </ModalDialog.Container>
       ) : null}
 
@@ -513,6 +576,7 @@ const FilterBlock = ({
                     changeFilterValue={changeFilterValue}
                     showSelector={changeShowSelector}
                     withMultiItems={item.withMultiItems || false}
+                    renderCustom={renderCustom}
                   />
                 );
               })}
