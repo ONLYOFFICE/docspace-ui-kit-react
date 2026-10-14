@@ -321,7 +321,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `to` as their `href`, so they are in the Tab order and announced as links. With an `onClick`,
   a plain click still runs only the handler; a modified or middle click opens `to` in a new tab
   without also running it, and an option without `onClick` now navigates to `to` instead of
-  doing nothing. An option whose `to` is empty is a button instead (`role="button"`, no `href`).
+  doing nothing. An option whose `to` is empty is a button instead (`role="button"`, no `href`),
+  and every click on it runs `onClick`, a modified one included, since it has no address to open.
 - **`EmptyScreenContainer` has a heading and announces itself.** `headerText` renders as an
   `<h3>` (a new `headingLevel` prop picks another level), the subheading as a `<p>` and the
   description as a block, inside a `role="status"` wrapper that takes no layout space. The

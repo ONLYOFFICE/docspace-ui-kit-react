@@ -163,8 +163,8 @@ export function EmptyFolder({
   Ctrl-, Cmd-, Shift- or middle-click is left to the browser alone, which opens `to` in a new
   tab or window, and does not also run the handler. With no `onClick`, a click is a full page
   navigation to `to` — pass your router's `Link` component to avoid the reload. An empty `to`
-  makes it a button rather than a link: no `href`, `role="button"`, in the Tab order, run by a
-  plain click, Enter or Space.
+  makes it a button rather than a link: no `href`, `role="button"`, in the Tab order, run by
+  Enter, Space or any click, a modified one included, since there is no address to open.
 - `isNext: true` renders that same anchor even when a `LinkRouter` is passed, for a link whose
   handler navigates on its own.
 - An item with a `model` opens that context menu on click and does not call its `onClick`.

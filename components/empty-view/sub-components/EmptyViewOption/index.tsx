@@ -45,9 +45,11 @@ const EmptyViewOption = ({ option, LinkRouter }: EmptyViewOptionProps) => {
           className={classNames(styles.link, option.className)}
           {...asButton}
           onClick={(e) => {
-            // The handler owns a plain click only; a modified or middle click
-            // is the browser's, so it does not also run the handler.
-            if (!option.onClick || !isPlainClick(e)) return;
+            // On a link the handler owns a plain click only; a modified or
+            // middle click is the browser's, which opens the address, so it
+            // does not also run the handler. A button has no address for the
+            // browser to open, so every click is its action.
+            if (!option.onClick || (href && !isPlainClick(e))) return;
             e.preventDefault();
             option.onClick(e as React.MouseEvent<HTMLAnchorElement>);
           }}
