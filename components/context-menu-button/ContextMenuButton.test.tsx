@@ -308,8 +308,7 @@ describe("<ContextMenuButton />", () => {
 
   // ContextMenu.position puts the menu's right edge at pageX in RTL, so the
   // keyboard click has to sit at the button's right edge there.
-  // Known defect (review of spike/vitest-addon, round 2): keyboardClickAt always uses rect.left, but ContextMenu anchors at pageX from the right in RTL. Flip to it() once fixed.
-  it.fails("places the keyboard click at the lower right corner in RTL", () => {
+  it("places the keyboard click at the lower right corner in RTL", () => {
     const onClick = vi.fn();
     render(
       <InterfaceDirectionProvider interfaceDirection="rtl">

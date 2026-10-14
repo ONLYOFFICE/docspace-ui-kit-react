@@ -246,7 +246,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   longer left locked). Every prop now reaches the component (the memo compared only four). Without `getData` the
   button shows `data` instead of throwing, and `onMouseOver` / `onMouseOut` fire on mouseover and
   mouseout rather than mousedown and mouseup. Opened from the keyboard, in either mode, `onClick`
-  gets a click event at the button's bottom-left corner, with the button as `target` and
+  gets a click event at the button's lower start corner (bottom-right in RTL, where the menu's
+  right edge is aligned with it), with the button as `target` and
   `currentTarget`, so `ContextMenu.show(e)` places the menu there instead of at NaN and a
   handler typed for a mouse event never receives a keyboard one. It is never dispatched, but it
   carries `isDefaultPrevented()`, `isPropagationStopped()` and `persist()`, so a handler written

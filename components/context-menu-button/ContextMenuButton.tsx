@@ -8,6 +8,7 @@ import VerticalDotsReactSvg from "../../assets/icons/16/vertical-dots.react.svg"
 
 import { isTablet, isMobile } from "../../utils";
 import { consumeKey } from "../../utils/consume-key";
+import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 
 import { DropDownItem } from "../drop-down-item";
 import { DropDown } from "../drop-down";
@@ -25,14 +26,18 @@ const MENU_ITEM_SELECTOR = '[role="menuitem"]:not([aria-disabled="true"])';
 
 type TFocusTarget = "first" | "last" | null;
 
-// A click event positioned at the element's bottom-left corner, for an
-// action the keyboard started. It is never dispatched, so it is given the
+// A click event positioned at the element's lower start corner -- the left
+// one, or the right one in RTL, where ContextMenu puts the menu's right edge
+// at pageX -- for an action the keyboard started. It is never dispatched, so it is given the
 // target, currentTarget and nativeEvent a handler typed for a React mouse
 // event reads, and the methods React adds to its events, so a handler that
 // calls isDefaultPrevented() or persist() does not throw.
-const keyboardClickAt = (element: HTMLElement | null): React.MouseEvent => {
+const keyboardClickAt = (
+  element: HTMLElement | null,
+  isRTL: boolean,
+): React.MouseEvent => {
   const rect = element?.getBoundingClientRect();
-  const left = rect?.left ?? 0;
+  const left = (isRTL ? rect?.right : rect?.left) ?? 0;
   const bottom = rect?.bottom ?? 0;
   const event = new MouseEvent("click", {
     bubbles: true,
@@ -95,6 +100,7 @@ const ContextMenuButtonPure = ({
   fixedDirection = false,
   testId,
 }: ContextMenuButtonProps) => {
+  const { isRTL } = useInterfaceDirection();
   const ref = React.useRef<HTMLDivElement | null>(null);
   const buttonRef = React.useRef<HTMLDivElement | null>(null);
   const reactId = React.useId();
@@ -186,7 +192,7 @@ const ContextMenuButtonPure = ({
     // onClick reports the click that opens the menu; a key press is reported
     // as a click at the button, so the handler gets the mouse event its type
     // promises, with a position (see the toggle mode below).
-    onClick?.("key" in e ? keyboardClickAt(buttonRef.current) : e);
+    onClick?.("key" in e ? keyboardClickAt(buttonRef.current, isRTL) : e);
   };
 
   const onIconButtonClick = (e: React.MouseEvent) => {
@@ -226,8 +232,8 @@ const ContextMenuButtonPure = ({
       setState((s) => ({ ...s, data: readData() }));
       // Callers hand the event to ContextMenu.show(e), which places the menu
       // at e.pageX / e.pageY; a key press has neither, so it gets a click at
-      // the button's bottom-left corner, as MainButton does.
-      onClick?.(keyboardClickAt(buttonRef.current));
+      // the button's lower start corner.
+      onClick?.(keyboardClickAt(buttonRef.current, isRTL));
       return;
     }
 
