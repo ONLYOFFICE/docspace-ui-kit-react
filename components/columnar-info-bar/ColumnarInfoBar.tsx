@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 
 import CrossReactSvg from "../../assets/icons/12/cross.react.svg";
 import { useLiveRegionTextOf } from "../../hooks/useLiveRegionText";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import type { ColumnarInfoBarProps } from "./ColumnarInfoBar.types";
 import styles from "./ColumnarInfoBar.module.scss";
@@ -13,8 +14,11 @@ const ColumnarInfoBar = ({
   onLoad,
   style,
   variant = "default",
-  closeLabel = "Close",
+  closeLabel: closeLabelProp,
 }: ColumnarInfoBarProps) => {
+  const t = useCommonTranslation();
+  const closeLabel = closeLabelProp ?? (t("CloseButton") || "Close");
+
   useEffect(() => {
     onLoad?.();
   }, []);

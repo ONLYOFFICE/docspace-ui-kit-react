@@ -50,7 +50,7 @@ const meta = {
       description:
         "Name screen readers announce for the close button; ignored when `onAction` is not set",
       table: {
-        defaultValue: { summary: "Close" },
+        defaultValue: { summary: 'Common:CloseButton ("Close")' },
       },
     },
   },
