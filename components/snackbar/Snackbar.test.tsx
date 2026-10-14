@@ -376,33 +376,52 @@ describe("SnackBar", () => {
     expect(announced).toBe(false);
   });
 
-  // Known defect (review of spike/vitest-addon, round 2): onClickIFrame's setTimeout is never cleared, so onAction fires after unmount. Flip to it() once fixed.
-  it.fails(
-    "does not call onAction after unmount when the iframe took focus",
-    () => {
-      vi.useFakeTimers();
-      try {
-        const onAction = vi.fn();
-        const { unmount } = render(
-          <SnackBar
-            {...defaultProps}
-            isCampaigns
-            htmlContent="https://example.com"
-            onAction={onAction}
-          />,
-        );
-        const iframe = screen.getByTestId("snackbar-iframe");
-        iframe.focus();
-        expect(document.activeElement).toBe(iframe);
-        fireEvent.blur(window);
+  it("calls onAction once the iframe has taken focus", () => {
+    vi.useFakeTimers();
+    try {
+      const onAction = vi.fn();
+      render(
+        <SnackBar
+          {...defaultProps}
+          isCampaigns
+          htmlContent="https://example.com"
+          onAction={onAction}
+        />,
+      );
+      screen.getByTestId("snackbar-iframe").focus();
+      fireEvent.blur(window);
 
-        unmount();
-        vi.runAllTimers();
+      vi.advanceTimersByTime(500);
 
-        expect(onAction).not.toHaveBeenCalled();
-      } finally {
-        vi.useRealTimers();
-      }
-    },
-  );
+      expect(onAction).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("does not call onAction after unmount when the iframe took focus", () => {
+    vi.useFakeTimers();
+    try {
+      const onAction = vi.fn();
+      const { unmount } = render(
+        <SnackBar
+          {...defaultProps}
+          isCampaigns
+          htmlContent="https://example.com"
+          onAction={onAction}
+        />,
+      );
+      const iframe = screen.getByTestId("snackbar-iframe");
+      iframe.focus();
+      expect(document.activeElement).toBe(iframe);
+      fireEvent.blur(window);
+
+      unmount();
+      vi.runAllTimers();
+
+      expect(onAction).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

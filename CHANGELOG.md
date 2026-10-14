@@ -138,6 +138,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`SnackBar` no longer calls `onAction` after it unmounts.** A click into an iframe schedules
+  `onAction` half a second later, and that timer survived the bar, so a bar closed in the
+  meantime reported an action anyway.
 - **No `[i18n] Missing translation` error without translations.** `getCommonTranslation` logged
   it whenever `window.i18n` was absent, so an app with no `TranslationProvider` got one on every
   render of a component with a translated default (`Loader`, `Toast`, `Tags`, `SnackBar`). With

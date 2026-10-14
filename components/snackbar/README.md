@@ -200,8 +200,8 @@ export function TimedBar() {
 - **`onClose` is never called** — the cross calls `onAction`, like everything else. So does the
   countdown, and so does a click that lands inside an iframe.
 - **Clicking anywhere in an iframe dismisses the bar.** A `blur` listener on `window` checks
-  whether the focused element is an `<iframe>` and, half a second later, calls `onAction`. Set
-  `skipBlur` to turn that off.
+  whether the focused element is an `<iframe>` and, half a second later, calls `onAction` --
+  unless the bar has unmounted by then. Set `skipBlur` to turn that off.
 - **`btnText` and the cross are exclusive.** The cross is only rendered when `btnText` is
   empty, so a bar with an action has no other way to be dismissed.
 - **`fontSize` and `fontWeight` do not reach the message.** The message carries

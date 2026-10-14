@@ -185,6 +185,9 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
 
   messageRef = React.createRef<HTMLDivElement>();
 
+  // The pending onAction after a click into the iframe, cancelled on unmount.
+  iframeActionTimer: ReturnType<typeof setTimeout> | undefined;
+
   constructor(props: SnackbarProps) {
     super(props);
     this.state = { isLoaded: false };
@@ -199,6 +202,7 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
 
   componentWillUnmount() {
     window.removeEventListener("blur", this.onClickIFrame);
+    clearTimeout(this.iframeActionTimer);
   }
 
   onActionClick = (e?: React.MouseEvent) => {
@@ -211,7 +215,8 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
       document.activeElement &&
       document.activeElement.nodeName.toLowerCase() === "iframe"
     ) {
-      setTimeout(() => this.onActionClick(), 500);
+      clearTimeout(this.iframeActionTimer);
+      this.iframeActionTimer = setTimeout(() => this.onActionClick(), 500);
     }
   };
 
