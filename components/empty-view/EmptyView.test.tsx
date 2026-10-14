@@ -135,4 +135,31 @@ describe("EmptyView", () => {
 
     expect(onClick).not.toHaveBeenCalled();
   });
+  // With no href there is nothing for the browser to open, so a modified
+  // click is still the option's action.
+  // Known defect (review of spike/vitest-addon, round 2): the plain-click guard also drops modified clicks on an option with no href, so nothing happens. Flip to it() once fixed, and delete the "leaves a modified click on an isNext link with no address to the browser" test above, which pins the defect.
+  it.fails("runs a no-address option's onClick on a modified click", () => {
+    const onClick = vi.fn();
+    renderComponent({
+      ...mockProps,
+      options: [
+        {
+          key: "clear-filter",
+          icon: <MockIcon />,
+          to: "",
+          isNext: true,
+          description: "Clear filter",
+          onClick,
+        },
+      ],
+    });
+
+    const option = screen.getByRole("button", { name: "Clear filter" });
+    expect(option).not.toHaveAttribute("href");
+
+    fireEvent.click(option, { ctrlKey: true });
+    fireEvent.click(option, { shiftKey: true });
+
+    expect(onClick).toHaveBeenCalledTimes(2);
+  });
 });

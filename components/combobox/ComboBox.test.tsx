@@ -518,4 +518,37 @@ describe("ComboBox", () => {
       expect.objectContaining({ key: "Escape" }),
     );
   });
+  // Holding Escape: the first keydown closes the list, the autorepeat ones
+  // arrive with the list already closed, and the keyup comes only on release
+  // -- which may be well past consumeKey's one-second guard.
+  // Known defect (review of spike/vitest-addon, round 2): consumeKey releases its keyup listener after 1s, so a held Escape's keyup reaches window. Flip to it() once fixed.
+  it.fails("keeps a held Escape's late keyup from window listeners", () => {
+    vi.useFakeTimers();
+    const onWindowKeyUp = vi.fn();
+    window.addEventListener("keyup", onWindowKeyUp);
+
+    try {
+      render(<ComboBox {...baseProps} />);
+      const button = screen.getByRole("button");
+
+      fireEvent.keyDown(button, { key: "ArrowDown" });
+      fireEvent.keyUp(button, { key: "ArrowDown" });
+      expect(button).toHaveAttribute("aria-expanded", "true");
+
+      fireEvent.keyDown(button, { key: "Escape" });
+      expect(button).toHaveAttribute("aria-expanded", "false");
+      for (let i = 0; i < 3; i += 1) {
+        vi.advanceTimersByTime(400);
+        fireEvent.keyDown(button, { key: "Escape", repeat: true });
+      }
+      fireEvent.keyUp(button, { key: "Escape" });
+
+      expect(onWindowKeyUp).not.toHaveBeenCalledWith(
+        expect.objectContaining({ key: "Escape" }),
+      );
+    } finally {
+      window.removeEventListener("keyup", onWindowKeyUp);
+      vi.useRealTimers();
+    }
+  });
 });

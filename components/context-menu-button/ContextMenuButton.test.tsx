@@ -6,6 +6,7 @@ import { globalColors } from "../../providers/theme";
 import VerticalDotsReactSvgUrl from "../../assets/icons/16/vertical-dots.react.svg?url";
 
 import type { ContextMenuModel } from "../context-menu";
+import { InterfaceDirectionProvider } from "../../context/InterfaceDirectionContext";
 
 import { ContextMenuButton } from "./ContextMenuButton";
 import { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
@@ -270,5 +271,62 @@ describe("<ContextMenuButton />", () => {
     const event = onClick.mock.calls[0][0];
     expect(Number.isFinite(event.pageX), `pageX is ${event.pageX}`).toBe(true);
     expect(Number.isFinite(event.pageY), `pageY is ${event.pageY}`).toBe(true);
+  });
+  const mockButtonRect = (button: HTMLElement) =>
+    vi.spyOn(button, "getBoundingClientRect").mockReturnValue({
+      left: 100,
+      right: 140,
+      top: 10,
+      bottom: 30,
+      width: 40,
+      height: 20,
+      x: 100,
+      y: 10,
+      toJSON: () => ({}),
+    });
+
+  it("places the keyboard click at the lower left corner in LTR", () => {
+    const onClick = vi.fn();
+    render(
+      <InterfaceDirectionProvider interfaceDirection="ltr">
+        <ContextMenuButton
+          {...baseProps}
+          displayType={ContextMenuButtonDisplayType.toggle}
+          onClick={onClick}
+        />
+      </InterfaceDirectionProvider>,
+    );
+    const button = screen.getByRole("button", { name: "Actions" });
+    mockButtonRect(button);
+
+    fireEvent.keyDown(button, { key: "Enter" });
+
+    const [event] = onClick.mock.calls[0];
+    expect(event.clientX).toBe(100);
+    expect(event.clientY).toBe(30);
+  });
+
+  // ContextMenu.position puts the menu's right edge at pageX in RTL, so the
+  // keyboard click has to sit at the button's right edge there.
+  // Known defect (review of spike/vitest-addon, round 2): keyboardClickAt always uses rect.left, but ContextMenu anchors at pageX from the right in RTL. Flip to it() once fixed.
+  it.fails("places the keyboard click at the lower right corner in RTL", () => {
+    const onClick = vi.fn();
+    render(
+      <InterfaceDirectionProvider interfaceDirection="rtl">
+        <ContextMenuButton
+          {...baseProps}
+          displayType={ContextMenuButtonDisplayType.toggle}
+          onClick={onClick}
+        />
+      </InterfaceDirectionProvider>,
+    );
+    const button = screen.getByRole("button", { name: "Actions" });
+    mockButtonRect(button);
+
+    fireEvent.keyDown(button, { key: "Enter" });
+
+    const [event] = onClick.mock.calls[0];
+    expect(event.clientX).toBe(140);
+    expect(event.pageX).toBe(140 + window.scrollX);
   });
 });

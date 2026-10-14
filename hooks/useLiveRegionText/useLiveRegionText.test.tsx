@@ -45,4 +45,44 @@ describe("useLiveRegionTextOf", () => {
 
     await waitFor(() => expect(status).toHaveTextContent("Quota exceeded"));
   });
+
+  // Known defect (review of spike/vitest-addon, round 2): the MutationObserver effect depends on [ready, ref] only and stays on the old node after a swap. Flip to it() once fixed.
+  it.fails(
+    "follows DOM changes in an element swapped in under the same ref",
+    async () => {
+      const Swapper = ({ second }: { second: boolean }) => {
+        const ref = React.useRef<HTMLDivElement>(null);
+        const text = useLiveRegionTextOf(ref);
+
+        return (
+          <>
+            {second ? (
+              <div key="second" ref={ref} data-testid="second">
+                Second
+              </div>
+            ) : (
+              <div key="first" ref={ref}>
+                First
+              </div>
+            )}
+            <span role="status">{text}</span>
+          </>
+        );
+      };
+
+      const { rerender } = render(<Swapper second={false} />);
+      const status = screen.getByRole("status");
+      await waitFor(() => expect(status).toHaveTextContent("First"));
+
+      rerender(<Swapper second />);
+      await waitFor(() => expect(status).toHaveTextContent("Second"));
+
+      // Changed outside React: only a MutationObserver on the new node sees it.
+      act(() => {
+        screen.getByTestId("second").textContent = "Updated";
+      });
+
+      await waitFor(() => expect(status).toHaveTextContent("Updated"));
+    },
+  );
 });

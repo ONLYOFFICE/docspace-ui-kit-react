@@ -4,6 +4,7 @@ import { screen, render, waitFor } from "@testing-library/react";
 
 import { FieldContainer } from "./FieldContainer";
 import { InputSize, InputType, TextInput } from "../text-input";
+import { RadioButtonGroup } from "../radio-button-group";
 
 describe("<FieldContainer />", () => {
   const defaultProps = {
@@ -213,4 +214,42 @@ describe("<FieldContainer />", () => {
     );
     expect(input).toHaveAttribute("aria-describedby", "hint-b");
   });
+  // Known defect (review of spike/vitest-addon, round 2): findControl only accepts a [role="radiogroup"] ancestor, which RadioButtonGroup does not render, so its state lands on nothing. Flip to it() once fixed.
+  it.fails(
+    "describes the kit's own RadioButtonGroup as invalid and required",
+    () => {
+      render(
+        <FieldContainer
+          labelText="Fruit:"
+          hasError
+          isRequired
+          errorMessage="Pick one"
+        >
+          <RadioButtonGroup
+            name="fruit"
+            selected=""
+            onClick={() => {}}
+            options={[
+              { value: "apple", label: "Apple" },
+              { value: "pear", label: "Pear" },
+            ]}
+          />
+        </FieldContainer>,
+      );
+
+      const radios = screen.getAllByRole("radio");
+      const errorId = screen.getByText("Pick one").id;
+      const group = screen
+        .getByTestId("field-container")
+        .querySelector<HTMLElement>('[aria-invalid="true"]');
+
+      expect(group).not.toBeNull();
+      radios.forEach((radio) => {
+        expect(group).toContainElement(radio);
+      });
+      expect(group?.getAttribute("aria-describedby")?.split(" ")).toContain(
+        errorId,
+      );
+    },
+  );
 });

@@ -190,4 +190,24 @@ describe("ColumnarInfoBar", () => {
       expect(screen.getByRole("status")).not.toContainElement(button);
     },
   );
+
+  // Known defect (review of spike/vitest-addon, round 2): closeLabel defaults to hardcoded English "Close" instead of Common:CloseButton. Flip to it() once fixed.
+  it.fails(
+    "defaults the close button label to the translated Common:CloseButton",
+    () => {
+      const win = window as unknown as { i18n?: unknown };
+      const saved = win.i18n;
+      win.i18n = {
+        loaded: { "en/Common.json": { data: { CloseButton: "Schliessen" } } },
+      };
+      try {
+        render(<ColumnarInfoBar columns={columns} onAction={vi.fn()} />);
+        expect(
+          screen.getByRole("button", { name: "Schliessen" }),
+        ).toBeInTheDocument();
+      } finally {
+        win.i18n = saved;
+      }
+    },
+  );
 });
