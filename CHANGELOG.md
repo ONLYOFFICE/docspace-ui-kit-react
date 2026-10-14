@@ -5,7 +5,12 @@
 ### Changed
 
 - `@onlyoffice/ai-chat` peer requirement raised to `^1.0.3`
-- AI settings: the MCP servers page edits the tenant-wide disabled tool list (`toolPrefsScope="tenant"`), so a tool an administrator switches off is off for every user (Bug 84381)
+- `@onlyoffice/ai-chat` 1.0.4 for development: the composer's tool cards follow the round's context scope
+- AI settings: `McpServers` takes a `toolPrefsScope` prop. Pass `"tenant"` where the viewer administers the portal, so a tool switched off there is off for every user; omitted, the page edits the viewer's own list (Bug 84381)
+
+### Fixed
+
+- The E2E Docker image copies the vendored ai-chat tarball before `pnpm install`
 
 ## 4.0.1
 
