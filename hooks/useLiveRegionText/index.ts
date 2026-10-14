@@ -67,19 +67,24 @@ const readText = (element: HTMLElement) => {
 export const useLiveRegionTextOf = (ref: RefObject<HTMLElement | null>) => {
   const ready = useLiveRegionReady();
   const [text, setText] = useState<string>();
+  // The element `ref` points at as of the last commit. A ref object never
+  // changes, so it cannot tell the observer below that a different element
+  // has been mounted under it; this does.
+  const [element, setElement] = useState<HTMLElement | null>(null);
 
-  // No dependency list: the content can change with any render. Setting the
-  // same string again does not re-render.
+  // No dependency list: the content can change with any render, and so can
+  // the element. Setting the same string or element again does not re-render.
   useEffect(() => {
-    if (ready && ref.current) setText(readText(ref.current));
+    if (!ready) return;
+    setElement(ref.current);
+    if (ref.current) setText(readText(ref.current));
   });
 
   // The content can also change without this component rendering: a child
   // with state of its own, a translation that arrives late, an SVG injected
   // after it loads. Those are read when the DOM changes.
   useEffect(() => {
-    const element = ref.current;
-    if (!ready || !element || typeof MutationObserver === "undefined") return;
+    if (!element || typeof MutationObserver === "undefined") return;
 
     const observer = new MutationObserver(() => setText(readText(element)));
     observer.observe(element, {
@@ -90,7 +95,7 @@ export const useLiveRegionTextOf = (ref: RefObject<HTMLElement | null>) => {
     });
 
     return () => observer.disconnect();
-  }, [ready, ref]);
+  }, [element]);
 
   return ready ? text : undefined;
 };
