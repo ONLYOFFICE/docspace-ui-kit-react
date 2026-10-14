@@ -491,6 +491,18 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   "Common:Alert" outside the portal; it now uses the kit's translation lookup with "Alert" as the
   fallback.
 
+## 4.0.2
+
+### Changed
+
+- `@onlyoffice/ai-chat` peer requirement raised to `^1.0.4` (the composer's tool cards follow the round's context scope; files and images share one attachment cap)
+- AI settings: `McpServers` takes a `toolPrefsScope` prop. Pass `"tenant"` where the viewer administers the portal, so a tool switched off there is off for every user; omitted, the page edits the viewer's own list (Bug 84381)
+
+### Fixed
+
+- Files and images share one 5-attachment cap on a message, including the Forms section's single slot (Bug 84379)
+- The E2E Docker image copies the vendored ai-chat tarball before `pnpm install`
+
 ## 4.0.1
 
 ### Changed

@@ -25,8 +25,10 @@ WORKDIR /app
 
 RUN pnpm config set store-dir /root/.local/share/pnpm/store
 
-# Manifests first, for layer caching.
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Manifests first, for layer caching. `*.tgz` brings the vendored
+# @onlyoffice/ai-chat tarball the lockfile resolves as a `file:` dependency;
+# .dockerignore keeps local ui-kit packs out.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml *.tgz ./
 
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 
