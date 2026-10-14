@@ -500,6 +500,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- AI chat: the copy buttons (message, code block, tool card) work on a portal served over plain HTTP. The platform adapter now supplies `copyToClipboard`, which falls back to `copy-to-clipboard` where the Clipboard API is unavailable outside a secure context (Bug 84481)
 - Files and images share one 5-attachment cap on a message, including the Forms section's single slot (Bug 84379)
 - The E2E Docker image copies the vendored ai-chat tarball before `pnpm install`
 
