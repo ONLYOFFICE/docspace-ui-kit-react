@@ -95,6 +95,12 @@ export const getCommonTranslation = (
 
   const i18n = getWindowI18n();
 
+  // No translations at all -- an app that mounts no TranslationProvider, or
+  // a render before it mounts -- is not a missing key: the caller falls back
+  // to its English default, as the SSR path above does without one. The
+  // error below is for a key absent from translations that are there.
+  if (!i18n) return "";
+
   // A t() result equal to the key is ambiguous: it is either a valid
   // identity translation ("Search" -> "Search") or a t() implementation that
   // echoes unknown keys ignoring defaultValue. Prefer the `loaded` lookup in

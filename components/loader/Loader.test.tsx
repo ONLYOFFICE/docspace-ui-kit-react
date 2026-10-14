@@ -160,25 +160,21 @@ describe("<Loader />", () => {
   });
 
   // A standalone npm consumer mounts no TranslationProvider.
-  // Known defect (review of spike/vitest-addon, round 2): getCommonTranslation calls console.error when window.i18n is absent, on every default-label render. Flip to it() once fixed.
-  it.fails(
-    "logs no error and falls back to English without translations",
-    async () => {
-      const win = window as unknown as { i18n?: unknown };
-      const saved = win.i18n;
-      delete win.i18n;
-      const error = vi.spyOn(console, "error").mockImplementation(() => {});
-      try {
-        expect(win.i18n).toBeUndefined();
-        render(<Loader />);
-        await waitFor(() =>
-          expect(screen.getByRole("status")).toHaveTextContent("Loading..."),
-        );
-        expect(error).not.toHaveBeenCalled();
-      } finally {
-        error.mockRestore();
-        win.i18n = saved;
-      }
-    },
-  );
+  it("logs no error and falls back to English without translations", async () => {
+    const win = window as unknown as { i18n?: unknown };
+    const saved = win.i18n;
+    delete win.i18n;
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      expect(win.i18n).toBeUndefined();
+      render(<Loader />);
+      await waitFor(() =>
+        expect(screen.getByRole("status")).toHaveTextContent("Loading..."),
+      );
+      expect(error).not.toHaveBeenCalled();
+    } finally {
+      error.mockRestore();
+      win.i18n = saved;
+    }
+  });
 });

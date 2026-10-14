@@ -138,6 +138,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **No `[i18n] Missing translation` error without translations.** `getCommonTranslation` logged
+  it whenever `window.i18n` was absent, so an app with no `TranslationProvider` got one on every
+  render of a component with a translated default (`Loader`, `Toast`, `Tags`, `SnackBar`). With
+  no `window.i18n` it now returns `""` silently and the component uses its English default; a key
+  missing from translations that are loaded is still logged.
 - **Default accessible names are translated where the portal has a key.** The close buttons of
   `Toast`, `SnackBar`, `PublicRoomBar` and `ColumnarInfoBar` default to `Common:CloseButton` ("Close"), the `Tags`
   row to `Common:Tags` ("Tags", was the English "Tags container"), and `Loader` and `AppLoader`

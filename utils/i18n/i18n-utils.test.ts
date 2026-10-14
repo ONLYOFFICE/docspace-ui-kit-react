@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 
 import { getCommonTranslation } from "./i18n-utils";
 
@@ -16,6 +16,32 @@ const identityT = (key: string) => key;
 describe("getCommonTranslation", () => {
   afterEach(() => {
     delete (window as MutableWindow).i18n;
+  });
+
+  it("returns an empty string and logs nothing without window.i18n", () => {
+    // test/setup.ts mounts translations for the whole run.
+    delete (window as MutableWindow).i18n;
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      expect(getCommonTranslation("CloseButton")).toBe("");
+      expect(error).not.toHaveBeenCalled();
+    } finally {
+      error.mockRestore();
+    }
+  });
+
+  it("logs a key missing from the translations that are loaded", () => {
+    (window as MutableWindow).i18n = {
+      loaded: { "en/Common.json": { data: { Other: "Other" } } },
+    };
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      expect(getCommonTranslation("CloseButton")).toBe("");
+      expect(error).toHaveBeenCalledTimes(1);
+      expect(error.mock.calls[0][0]).toContain('"CloseButton"');
+    } finally {
+      error.mockRestore();
+    }
   });
 
   it("resolves a Common key from the combined _combined.json bundle", () => {
