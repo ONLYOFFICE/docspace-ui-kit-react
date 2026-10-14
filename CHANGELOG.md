@@ -123,6 +123,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   must look for its text there instead.
 - **Busy rows and tiles carry `aria-busy`.** `Row` and the base, file and folder tiles set it
   while `inProgress`, since their loader is decorative.
+- **`RadioButtonGroup` is a `role="radiogroup"`.** Its wrapper `<div>` was a plain container, so
+  `FieldContainer`, which describes radios through the group around them, put `aria-invalid`,
+  `aria-required` and the error's `aria-describedby` on nothing. A query for the group by role now
+  finds it; it still has no accessible name of its own.
 
 ### Added
 

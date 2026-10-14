@@ -261,6 +261,7 @@ light and dark themes, so it cannot be overridden from outside.
   screen reader hears "required" from the control instead.
 - **A radio button stands for its group.** The states go on the `role="radiogroup"` element
   around it, not on the first option; radios with no such group get none.
+  [`RadioButtonGroup`](../radio-button-group/README.md) is such a group.
 - The field body is watched, so a control that mounts after the container, or replaces another,
   is described as well.
 - While the error message shows, it gets a generated `id` and the control's `aria-describedby`
