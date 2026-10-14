@@ -521,8 +521,7 @@ describe("ComboBox", () => {
   // Holding Escape: the first keydown closes the list, the autorepeat ones
   // arrive with the list already closed, and the keyup comes only on release
   // -- which may be well past consumeKey's one-second guard.
-  // Known defect (review of spike/vitest-addon, round 2): consumeKey releases its keyup listener after 1s, so a held Escape's keyup reaches window. Flip to it() once fixed.
-  it.fails("keeps a held Escape's late keyup from window listeners", () => {
+  it("keeps a held Escape's late keyup from window listeners", () => {
     vi.useFakeTimers();
     const onWindowKeyUp = vi.fn();
     window.addEventListener("keyup", onWindowKeyUp);

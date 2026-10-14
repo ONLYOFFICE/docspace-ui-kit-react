@@ -24,8 +24,16 @@ export const consumeKey = (e: HandledKeyEvent) => {
 
   const { key } = e;
 
+  // A keyup that never arrives (the window lost focus mid-press, or macOS
+  // dropped the keyup of a key released under Cmd) must not leave the
+  // listener to swallow some later, unrelated press. Autorepeat keydowns say
+  // the key is still held, so each one restarts the wait.
+  const GIVE_UP_AFTER = 1000;
+  let timer: number;
+
   const release = () => {
     window.removeEventListener("keyup", onKeyUp, true);
+    window.removeEventListener("keydown", onKeyDown, true);
     window.clearTimeout(timer);
   };
 
@@ -35,9 +43,14 @@ export const consumeKey = (e: HandledKeyEvent) => {
     release();
   };
 
-  // A keyup that never arrives (the window lost focus mid-press) must not
-  // leave the listener to swallow some later, unrelated press.
-  const timer = window.setTimeout(release, 1000);
+  const onKeyDown = (down: KeyboardEvent) => {
+    if (down.key !== key || !down.repeat) return;
+    window.clearTimeout(timer);
+    timer = window.setTimeout(release, GIVE_UP_AFTER);
+  };
+
+  timer = window.setTimeout(release, GIVE_UP_AFTER);
 
   window.addEventListener("keyup", onKeyUp, true);
+  window.addEventListener("keydown", onKeyDown, true);
 };

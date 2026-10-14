@@ -87,4 +87,46 @@ describe("consumeKey", () => {
 
     window.removeEventListener("keyup", onWindowKeyUp);
   });
+  it("keeps waiting while the key autorepeats", () => {
+    vi.useFakeTimers();
+    const onWindowKeyUp = vi.fn();
+    window.addEventListener("keyup", onWindowKeyUp);
+
+    consumeKey({ key: "Escape", stopPropagation: () => {} });
+    for (let i = 0; i < 3; i += 1) {
+      vi.advanceTimersByTime(900);
+      document.body.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "Escape",
+          repeat: true,
+          bubbles: true,
+        }),
+      );
+    }
+    document.body.dispatchEvent(
+      new KeyboardEvent("keyup", { key: "Escape", bubbles: true }),
+    );
+    expect(onWindowKeyUp).not.toHaveBeenCalled();
+
+    window.removeEventListener("keyup", onWindowKeyUp);
+  });
+
+  it("does not wait longer for a new press of the key", () => {
+    vi.useFakeTimers();
+    const onWindowKeyUp = vi.fn();
+    window.addEventListener("keyup", onWindowKeyUp);
+
+    consumeKey({ key: "Enter", stopPropagation: () => {} });
+    vi.advanceTimersByTime(900);
+    document.body.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
+    );
+    vi.advanceTimersByTime(100);
+    document.body.dispatchEvent(
+      new KeyboardEvent("keyup", { key: "Enter", bubbles: true }),
+    );
+    expect(onWindowKeyUp).toHaveBeenCalledTimes(1);
+
+    window.removeEventListener("keyup", onWindowKeyUp);
+  });
 });
