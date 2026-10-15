@@ -8,6 +8,11 @@
   dropped its own `IConfig` and takes the editor configuration type, `Config`, from
   `@onlyoffice/doceditor-types`, which is now an optional peer here as well (`^9.3.1`)
 - `document-editor` still exports `IConfig`, now as an alias of that `Config`
+- `@onlyoffice/document-editor-react` peer raised further to `2.3.0`, and the
+  `@onlyoffice/doceditor-types` peer widened to `>=9.3.1` so that its `10.0.0` line
+  (the types for ONLYOFFICE Docs 10.0, which drop the deprecated `showReviewChanges`,
+  `reviewDisplay` and `trackChanges` customization keys) satisfies it the same way it
+  satisfies `document-editor-react` itself
 
 ## 4.0.1
 

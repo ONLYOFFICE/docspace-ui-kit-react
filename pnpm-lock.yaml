@@ -279,11 +279,11 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1(7a7b4ec48006fe1b5aa7472a03ec4507)
       '@onlyoffice/doceditor-types':
-        specifier: 9.4.3
-        version: 9.4.3
+        specifier: 10.0.0
+        version: 10.0.0
       '@onlyoffice/document-editor-react':
-        specifier: 2.2.0
-        version: 2.2.0(@onlyoffice/doceditor-types@9.4.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: 2.3.0
+        version: 2.3.0(@onlyoffice/doceditor-types@10.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@playwright/test':
         specifier: 1.58.1
         version: 1.58.1
@@ -1606,14 +1606,14 @@ packages:
       zustand:
         optional: true
 
-  '@onlyoffice/doceditor-types@9.4.3':
-    resolution: {integrity: sha512-hI9JzMbZVE6R37PbmAiVBTa3VNeMi1k64HT0BoNuvbA7z92sI6euGNrtEpCWLjVse6/9mP3itp0ry4x6HLD+mw==}
+  '@onlyoffice/doceditor-types@10.0.0':
+    resolution: {integrity: sha512-yGZbDBI6adWOP0Amn2I8UYPz5dP5BF6jVyqfhLU8TqlEQTVF6FY/+fMbTJCo+qCw2RG588+kk3SvkhDJTAMr8A==}
 
   '@onlyoffice/docspace-api-sdk@3.7.0':
     resolution: {integrity: sha512-zzhvkBZj7RelLDxGg/OnonG2vFwurlI2FaPSSHPiYXosu5y4lopQnSkoxoZ1uXgnWAKREjt1d0p+nkdtTH5xkA==}
 
-  '@onlyoffice/document-editor-react@2.2.0':
-    resolution: {integrity: sha512-SPgeJ1lK+I5mpcCUi6Qz98QVtlZR6axxCArgHoKNNBfFqXNmb6iDOf5Z1QUiVQ0xr57oo84D0ptyXZaF8K51nA==}
+  '@onlyoffice/document-editor-react@2.3.0':
+    resolution: {integrity: sha512-0g4j4iLUMYSRIAHnFilnXbMKwIIk8UIct+qnHMySW2r5cx8ii/zK8yaO2Meeqyd1bzmji5MTTkXcLJ+XHS6YeA==}
     peerDependencies:
       '@onlyoffice/doceditor-types': '>=9.3.1'
       react: ^16.9.0 || ^17 || ^18 || ^19
@@ -7025,7 +7025,7 @@ snapshots:
       tailwind-merge: 3.7.0
       zustand: 5.0.15(@types/react@19.2.10)(react@19.2.8)(use-sync-external-store@1.7.0(react@19.2.8))
 
-  '@onlyoffice/doceditor-types@9.4.3': {}
+  '@onlyoffice/doceditor-types@10.0.0': {}
 
   '@onlyoffice/docspace-api-sdk@3.7.0(debug@4.4.3(supports-color@7.2.0))':
     dependencies:
@@ -7033,9 +7033,9 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@onlyoffice/document-editor-react@2.2.0(@onlyoffice/doceditor-types@9.4.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@onlyoffice/document-editor-react@2.3.0(@onlyoffice/doceditor-types@10.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
-      '@onlyoffice/doceditor-types': 9.4.3
+      '@onlyoffice/doceditor-types': 10.0.0
       lodash: 4.18.1
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
