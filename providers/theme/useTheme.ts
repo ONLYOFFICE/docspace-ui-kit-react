@@ -9,7 +9,7 @@ import { match, P } from "ts-pattern";
 // at build time, so the palette's shape stays described and nothing ships.
 import type {
   CustomColorThemesSettingsDto,
-  CustomColorThemesSettingsItem,
+  CustomColorThemeDto,
 } from "@onlyoffice/docspace-api-sdk";
 
 import { getSystemTheme } from "../../utils/get-system-theme";
@@ -30,7 +30,7 @@ type MatchType = [ThemeKeys | undefined, ThemeKeys | undefined];
 
 function findColorTheme(
   colorTheme?: CustomColorThemesSettingsDto,
-): CustomColorThemesSettingsItem | undefined {
+): CustomColorThemeDto | undefined {
   if (!colorTheme) return undefined;
   return colorTheme.themes?.find((theme) => theme.id === colorTheme.selected);
 }
@@ -39,7 +39,7 @@ function resolveTheme(
   initialTheme: ThemeKeys | undefined,
   systemTheme: ThemeKeys | undefined,
   lang: string,
-  colorScheme: CustomColorThemesSettingsItem | undefined,
+  colorScheme: CustomColorThemeDto | undefined,
 ): TTheme {
   const interfaceDirection = getDirectionByLanguage(lang);
   const fontFamily = getFontFamilyDependingOnLanguage(lang);
@@ -87,7 +87,7 @@ const useTheme = ({
   const effectiveLang = lang || "en";
 
   const [currentColorTheme, setCurrentColorTheme] = React.useState<
-    CustomColorThemesSettingsItem | undefined
+    CustomColorThemeDto | undefined
   >(() => findColorTheme(colorTheme));
 
   const [theme, setTheme] = React.useState<TTheme>(() =>

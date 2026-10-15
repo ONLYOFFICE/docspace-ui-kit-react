@@ -1,9 +1,6 @@
 import React, { use } from "react";
 
-import {
-  FolderType,
-  type FolderDtoInteger,
-} from "@onlyoffice/docspace-api-sdk";
+import { FolderType, type FolderDto } from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../../providers/api";
 import { useCommonTranslation } from "../../../utils/i18n";
 import type { TSelectorItem } from "../../../components/selector";
@@ -55,7 +52,7 @@ const rootFolderDisplayOrder: FolderType[] = [
   FolderType.TRASH,
 ];
 
-const getRootFolderOrder = (folder: FolderDtoInteger) => {
+const getRootFolderOrder = (folder: FolderDto) => {
   const index =
     folder.rootFolderType != null
       ? rootFolderDisplayOrder.indexOf(folder.rootFolderType)
@@ -101,7 +98,7 @@ const useRootHelper = ({
     try {
       const newItems: TSelectorItem[] = [];
 
-      let currentTree: FolderDtoInteger[] | null = null;
+      let currentTree: FolderDto[] | null = null;
 
       if (treeFolders && treeFolders?.length > 0) {
         currentTree = treeFolders;
@@ -110,7 +107,7 @@ const useRootHelper = ({
         const rootFolders = res.data.response ?? [];
         currentTree = rootFolders
           .map((item) => item.current)
-          .filter((f): f is FolderDtoInteger => f != null);
+          .filter((f): f is FolderDto => f != null);
       }
 
       const orderedTree = [...(currentTree ?? [])].sort(

@@ -3,12 +3,12 @@ import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 import type {
   PaymentApi,
   PaymentUrlRequestDto,
-  ProfilesApi,
+  PeopleProfilesApi,
   PortalQuotaApi,
   CommonSettingsApi,
   TenantQuotaFeatureDto,
   QuotaDto,
-  TenantWalletSettings,
+  TenantWalletSettingsDto,
   TenantWalletService,
   OperationDto,
 } from "@onlyoffice/docspace-api-sdk";
@@ -26,10 +26,7 @@ export type OperationTokenUsage = {
   imageTokens: number;
 };
 
-export type WalletOperationDto = Omit<
-  OperationDto,
-  "date" | "agentId" | "agentTitle"
-> & {
+export type WalletOperationDto = Omit<OperationDto, "date"> & {
   date?: string;
   sourceId?: string | null;
   sourceTitle?: string | null;
@@ -121,7 +118,7 @@ const getTransactionType = (key: string) => ({
 class PaymentStore {
   private paymentApi: PaymentApi;
 
-  private profilesApi: ProfilesApi;
+  private profilesApi: PeopleProfilesApi;
 
   private commonSettingsApi: CommonSettingsApi;
 
@@ -249,7 +246,7 @@ class PaymentStore {
 
   activeServices: TActiveService[] = [];
 
-  autoPayments: TenantWalletSettings | null = null;
+  autoPayments: TenantWalletSettingsDto | null = null;
 
   minBalance: string = "";
 
@@ -308,7 +305,7 @@ class PaymentStore {
 
   constructor(
     paymentApi: PaymentApi,
-    profilesApi: ProfilesApi,
+    profilesApi: PeopleProfilesApi,
     portalQuotaApi: PortalQuotaApi,
     commonSettingsApi: CommonSettingsApi,
     rawApiClient: TApiClient,
@@ -941,19 +938,20 @@ class PaymentStore {
       this.filterSelectedTypeKey,
     );
 
-    const serviceNames: string | string[] | undefined =
-      isDocsConnectServiceName(serviceName)
-        ? this.docsConnectServiceNames
-        : serviceName;
+    const serviceNames: string[] | undefined = isDocsConnectServiceName(
+      serviceName,
+    )
+      ? this.docsConnectServiceNames
+      : serviceName === undefined
+        ? undefined
+        : [serviceName];
 
     try {
       const res = await this.paymentApi.getCustomerOperations(
         {
           offset: 0,
           limit: 25,
-          // TODO: remove the cast once the SDK types serviceName as
-          // string | string[] — the API accepts a repeated ServiceName param.
-          serviceName: serviceNames as string,
+          serviceName: serviceNames,
           startDate: this.formatDate(from ?? this.filterStartDate, "start"),
           endDate: this.formatDate(to ?? this.filterEndDate, "end"),
           credit: isCredit,
@@ -1001,8 +999,9 @@ class PaymentStore {
 
       if (!res) return;
 
-      const data = (res?.data as unknown as { response?: TenantWalletSettings })
-        ?.response;
+      const data = (
+        res?.data as unknown as { response?: TenantWalletSettingsDto }
+      )?.response;
 
       if (!data) return;
       runInAction(() => {
@@ -1065,7 +1064,7 @@ class PaymentStore {
   updateAutoPayments = async () => {
     try {
       const res = await this.paymentApi.setTenantWalletSettings({
-        tenantWalletSettingsWrapper: {
+        tenantWalletSettingsRequestDto: {
           settings: {
             enabled: this.isAutomaticPaymentsEnabled,
             minBalance: +this.minBalance,
@@ -1075,7 +1074,9 @@ class PaymentStore {
         },
       });
 
-      const data = res?.data as unknown as { response?: TenantWalletSettings };
+      const data = res?.data as unknown as {
+        response?: TenantWalletSettingsDto;
+      };
 
       const settings = data?.response;
       if (!settings) {
@@ -1777,7 +1778,7 @@ class PaymentStore {
   ) => {
     try {
       await this.paymentApi.sendPaymentRequest({
-        salesRequestsDto: {
+        salesRequestDto: {
           email,
           userName,
           message,

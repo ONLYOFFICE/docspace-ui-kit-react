@@ -46,7 +46,7 @@ export const buildParentFolderMap = async (
 
     const res = await foldersApi.createFolder({
       folderId: parentId as number,
-      createFolder: { title: name },
+      createFolderRequest: { title: name },
     });
     const created = res.data?.response;
     if (!created?.id) {

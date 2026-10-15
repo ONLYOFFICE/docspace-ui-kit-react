@@ -1,10 +1,10 @@
 import type {
   FolderType,
   RoomType,
-  FolderDtoInteger,
-  FileEntryDtoIntegerAllOfSecurity,
+  FolderDto,
   SearchArea,
 } from "@onlyoffice/docspace-api-sdk";
+import type { TFileEntrySecurity } from "../../../types";
 
 import type { TSelectorItem, TBreadCrumb } from "../../../components/selector";
 
@@ -48,12 +48,12 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
     React.SetStateAction<"rooms" | "files" | "agents" | undefined>
   >;
   setSelectedItemSecurity?: React.Dispatch<
-    React.SetStateAction<FileEntryDtoIntegerAllOfSecurity | undefined>
+    React.SetStateAction<TFileEntrySecurity | undefined>
   >;
-  setSelectedTreeNode?: React.Dispatch<React.SetStateAction<FolderDtoInteger>>;
-  isRoomDisabled?: (room: FolderDtoInteger) => boolean;
-  recentFolder?: FolderDtoInteger | null;
-  favoritesFolder?: FolderDtoInteger | null;
+  setSelectedTreeNode?: React.Dispatch<React.SetStateAction<FolderDto>>;
+  isRoomDisabled?: (room: FolderDto) => boolean;
+  recentFolder?: FolderDto | null;
+  favoritesFolder?: FolderDto | null;
   withRecentTreeFolder?: boolean;
   withFavoritesTreeFolder?: boolean;
 };
@@ -79,12 +79,12 @@ export type UseAgentsHelperProps = TUseInputItemHelper & {
     React.SetStateAction<"rooms" | "files" | "agents" | undefined>
   >;
   setSelectedItemSecurity?: React.Dispatch<
-    React.SetStateAction<FileEntryDtoIntegerAllOfSecurity | undefined>
+    React.SetStateAction<TFileEntrySecurity | undefined>
   >;
-  setSelectedTreeNode?: React.Dispatch<React.SetStateAction<FolderDtoInteger>>;
+  setSelectedTreeNode?: React.Dispatch<React.SetStateAction<FolderDto>>;
   disableBySecurity?: string;
-  recentFolder?: FolderDtoInteger | null;
-  favoritesFolder?: FolderDtoInteger | null;
+  recentFolder?: FolderDto | null;
+  favoritesFolder?: FolderDto | null;
   withRecentTreeFolder?: boolean;
   withFavoritesTreeFolder?: boolean;
 };
@@ -98,5 +98,5 @@ export type UseSocketHelperProps = {
   filterParam?: string | number;
   withCreate?: boolean;
   disableBySecurity?: string;
-  isRoomDisabled?: (room: FolderDtoInteger) => boolean;
+  isRoomDisabled?: (room: FolderDto) => boolean;
 };

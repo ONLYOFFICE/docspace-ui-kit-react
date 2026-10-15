@@ -1,4 +1,4 @@
-import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
+import type { FolderDto } from "@onlyoffice/docspace-api-sdk";
 
 /**
  * A matter is a room. Everything the practice needs to know about it that the
@@ -58,7 +58,7 @@ export type Matter = {
   /** Tags other than the two this application reads. */
   otherTags: string[];
   /** The portal's logo object, as `RoomIcon` takes it. */
-  logo?: FolderDtoInteger["logo"];
+  logo?: FolderDto["logo"];
 };
 
 /**
@@ -76,7 +76,7 @@ export type PortalAuthor = { displayName?: string | null } | null;
 
 /** What a room looks like on the wire, as far as a matter is concerned. */
 export type RoomLike = Pick<
-  FolderDtoInteger,
+  FolderDto,
   "id" | "title" | "tags" | "logo" | "filesCount" | "foldersCount"
 > & {
   createdBy?: PortalAuthor;

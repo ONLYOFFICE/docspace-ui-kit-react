@@ -217,7 +217,7 @@ const Usage = ({
       endDate: formatDate!(range?.to ?? to, "end"),
       credit: true,
       debit: true,
-      ...(serviceName ? { serviceName } : {}),
+      ...(serviceName ? { serviceName: [serviceName] } : {}),
     };
 
     try {

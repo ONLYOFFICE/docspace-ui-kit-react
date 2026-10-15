@@ -1,13 +1,10 @@
-import {
-  type FolderDtoInteger,
-  type FileEntryDtoIntegerAllOfSecurity,
-  FolderType,
-} from "@onlyoffice/docspace-api-sdk";
+import { type FolderDto, FolderType } from "@onlyoffice/docspace-api-sdk";
+import type { TFileEntrySecurity } from "../../types";
 
 import type { TSelectorItem } from "../../components/selector";
 
 export const convertToItems = (
-  folders: FolderDtoInteger[],
+  folders: FolderDto[],
   disableBySecurity?: string,
 ) => {
   const items: TSelectorItem[] = folders.map((folder) => {
@@ -48,7 +45,7 @@ export const convertToItems = (
     // Same rule as getAgentList in useAgentsHelper: a right a folder's security
     // does not carry at all (a file-only one such as AskAi) must not disable
     // the agent, or the initial items and the loaded pages disagree.
-    const key = disableBySecurity as keyof FileEntryDtoIntegerAllOfSecurity;
+    const key = disableBySecurity as keyof TFileEntrySecurity;
     const isDisabledBySecurity = disableBySecurity
       ? !security || (key in security && !security[key])
       : false;

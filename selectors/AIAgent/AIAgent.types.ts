@@ -1,4 +1,4 @@
-import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
+import type { FolderDto } from "@onlyoffice/docspace-api-sdk";
 import type { TInfoBarData, TSelectorItem } from "../../components/selector";
 import type { WithFlag } from "../../types";
 
@@ -6,7 +6,7 @@ export type TInitValue = WithFlag<
   "withInit",
   {
     withInit: true;
-    initItems: FolderDtoInteger[];
+    initItems: FolderDto[];
     initTotal: number;
     initHasNextPage: boolean;
     initSearchValue?: string;

@@ -7,7 +7,7 @@ import { Portal } from "../../components/portal";
 import {
   FolderType,
   RoomType,
-  type FolderDtoInteger,
+  type FolderDto,
 } from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../providers/api/ApiProvider";
 import { DeviceType } from "../../enums";
@@ -198,11 +198,11 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       createDefineRoomType === RoomType.FillingFormsRoom,
   );
 
-  const [recentFolder, setRecentFolder] = React.useState<
-    FolderDtoInteger | undefined
-  >(undefined);
+  const [recentFolder, setRecentFolder] = React.useState<FolderDto | undefined>(
+    undefined,
+  );
   const [favoritesFolder, setFavoritesFolder] = React.useState<
-    FolderDtoInteger | undefined
+    FolderDto | undefined
   >(undefined);
   const [activeSpecialScope, setActiveSpecialScope] =
     React.useState<SpecialFolderScope | null>(null);
@@ -535,7 +535,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           try {
             const res = await filesApi.createFile({
               folderId: Number(item.id),
-              createFileJsonElement: {
+              createFileRequest: {
                 title: t("NewDocument"),
               },
             });
@@ -543,7 +543,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
             if (fileId != null) {
               await filesApi.deleteFile({
                 fileId,
-                _delete: {
+                deleteFileRequest: {
                   deleteAfter: true,
                   immediately: true,
                 },

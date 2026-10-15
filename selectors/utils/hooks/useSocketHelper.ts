@@ -7,10 +7,7 @@ import socket, {
 } from "../../../utils/socket";
 
 import { useApi } from "../../../providers/api";
-import type {
-  FileDtoInteger,
-  FolderDtoInteger,
-} from "@onlyoffice/docspace-api-sdk";
+import type { FileDto, FolderDto } from "@onlyoffice/docspace-api-sdk";
 
 import type { TSelectorItem } from "../../../components/selector";
 import {
@@ -113,7 +110,7 @@ const useSocketHelper = ({
   const addItem = React.useCallback(
     async (opt: TOptSocket) => {
       if (!opt?.data) return;
-      const data: FileDtoInteger | FolderDtoInteger = JSON.parse(opt.data);
+      const data: FileDto | FolderDto = JSON.parse(opt.data);
 
       if (
         "folderId" in data && data.folderId
@@ -227,7 +224,7 @@ const useSocketHelper = ({
     async (opt: TOptSocket) => {
       if (!opt?.data) return;
 
-      const data: FileDtoInteger | FolderDtoInteger = JSON.parse(opt.data);
+      const data: FileDto | FolderDto = JSON.parse(opt.data);
 
       if (
         (("folderId" in data &&

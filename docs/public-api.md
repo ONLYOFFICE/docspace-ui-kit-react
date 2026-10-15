@@ -218,8 +218,8 @@ three public providers actually import. Notably including:
 
 **`@onlyoffice/docspace-api-sdk`**, imported by 15 core files — `components/selector` (5),
 `providers/theme` (2), `providers/translation`, `utils/common` and others — almost entirely for
-types and enums such as `RoomType`, `FolderType` and `CustomColorThemesSettingsItem`. It was a
-`file:` tarball, which is unpublishable; it is now `^3.7.0` from public npm. The switch is done,
+types and enums such as `RoomType`, `FolderType` and `CustomColorThemeDto`. It was a
+`file:` tarball, which is unpublishable; it is now `^4.0.0`, resolved from a committed tarball until 4.0.0 is on npm. The switch is done,
 but it was **not** a swap of identical artifacts, and the reason to record that is below:
 
 |                                | npm 3.7.0                                                                                   | vendored 3.7.0 |

@@ -2,8 +2,8 @@ import { makeAutoObservable, runInAction } from "mobx";
 import {
   type PaymentApi,
   type PortalQuotaApi,
-  type Tariff,
-  type Quota,
+  type TariffDto,
+  type TariffQuotaDto,
   PaymentMethodStatus,
 } from "@onlyoffice/docspace-api-sdk";
 import {
@@ -18,6 +18,20 @@ import { TOTAL_SIZE } from "../constants";
 import { isDocsConnectService } from "../utils/docs-connect";
 import type { TCustomerInfo, TWalletServiceQuota } from "../types";
 
+/**
+ * `ApiDateTime` as the server writes it: its JSON converter emits an ISO-8601
+ * string, not the `{ utcTime, timeZoneOffset }` object the SDK declares, so the
+ * tariff is read through these shapes.
+ */
+type TWireDates<T, K extends keyof T> = Omit<T, K> & { [P in K]?: string };
+
+export type TWalletQuota = TWireDates<TariffQuotaDto, "dueDate">;
+
+export type TTariff = TWireDates<
+  TariffDto,
+  "dueDate" | "delayDueDate" | "licenseDate"
+> & { quotas?: TWalletQuota[] | null };
+
 class CurrentTariffStatusStore {
   private portalQuotaApi: PortalQuotaApi;
 
@@ -25,13 +39,13 @@ class CurrentTariffStatusStore {
 
   private abortControllers: AbortController[] = [];
 
-  portalTariffStatus: Tariff | null = null;
+  portalTariffStatus: TTariff | null = null;
 
-  private _walletQuotas: Quota[] = [];
+  private _walletQuotas: TWalletQuota[] = [];
 
-  private _previousWalletQuota: Quota[] = [];
+  private _previousWalletQuota: TWalletQuota[] = [];
 
-  private _tariffWalletQuota: (Quota & { additional?: boolean }) | null = null;
+  private _tariffWalletQuota: TWalletQuota | null = null;
 
   private _storageServiceId: number | null = null;
 
@@ -275,7 +289,7 @@ class CurrentTariffStatusStore {
 
       if (!res?.data?.response) return;
 
-      const tariff = res.data.response as unknown as Tariff;
+      const tariff = res.data.response as unknown as TTariff;
 
       // After an await, so outside the action makeAutoObservable made of this
       // method; MobX strict mode wants every write wrapped.
@@ -283,7 +297,7 @@ class CurrentTariffStatusStore {
         this.portalTariffStatus = tariff;
       });
 
-      type WalletQuota = Quota & { additional?: boolean };
+      type WalletQuota = TWalletQuota;
       const walletQuotas: WalletQuota[] =
         (tariff.quotas as WalletQuota[])?.filter((q) => q.wallet === true) ??
         [];

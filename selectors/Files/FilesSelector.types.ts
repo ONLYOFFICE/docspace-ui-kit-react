@@ -1,18 +1,23 @@
 import type {
-  FileDtoInteger,
-  FolderDtoInteger,
+  FileDto,
+  FolderDto,
   FolderType,
   RoomType,
   FileType,
   FilesSettingsDto,
-  FileEntryDtoIntegerAllOfSecurity,
 } from "@onlyoffice/docspace-api-sdk";
+import type { TFileEntrySecurity } from "../../types";
 export type {
   FilesSettingsDto,
-  FolderDtoInteger,
+  FolderDto,
   FolderType as SdkFolderType,
-  FileEntryDtoIntegerAllOfSecurity,
+  TFileEntrySecurity,
 };
+/** @deprecated SDK 3.7.0 names, kept for consumers; see `types/index.ts`. */
+export type {
+  FileEntryDtoIntegerAllOfSecurity,
+  FolderDtoInteger,
+} from "../../types";
 
 import type {
   TSelectorItem,
@@ -47,14 +52,14 @@ export interface UseRootHelperProps {
   setHasNextPage: React.Dispatch<React.SetStateAction<boolean>>;
 
   setIsInit: (value: boolean) => void;
-  treeFolders?: FolderDtoInteger[];
+  treeFolders?: FolderDto[];
   withRecentTreeFolder?: boolean;
   withFavoritesTreeFolder?: boolean;
   withAIAgentsTreeFolder?: boolean;
   withFormsTreeFolder?: boolean;
   isUserOnly?: boolean;
-  setRecentFolder?: (folder?: FolderDtoInteger) => void;
-  setFavoritesFolder?: (folder?: FolderDtoInteger) => void;
+  setRecentFolder?: (folder?: FolderDto) => void;
+  setFavoritesFolder?: (folder?: FolderDto) => void;
 }
 
 export type UseSocketHelperProps = {
@@ -93,10 +98,7 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
   >;
   setSelectedItemSecurity?: React.Dispatch<
     React.SetStateAction<
-      | FileEntryDtoIntegerAllOfSecurity
-      | FileEntryDtoIntegerAllOfSecurity
-      | FileEntryDtoIntegerAllOfSecurity
-      | undefined
+      TFileEntrySecurity | TFileEntrySecurity | TFileEntrySecurity | undefined
     >
   >;
   searchArea?: SearchArea;
@@ -118,10 +120,10 @@ export type UseFilesHelpersProps = {
   pinnedRootId?: number | string;
   includedItems?: (string | number)[];
   setSelectedItemSecurity: (
-    value: FileEntryDtoIntegerAllOfSecurity | FileEntryDtoIntegerAllOfSecurity,
+    value: TFileEntrySecurity | TFileEntrySecurity,
   ) => void;
   isThirdParty: boolean;
-  setSelectedTreeNode: (treeNode: FolderDtoInteger) => void;
+  setSelectedTreeNode: (treeNode: FolderDto) => void;
   filterParam?: string | number;
   getRootData?: () => Promise<void>;
   onSetBaseFolderPath?: (
@@ -155,8 +157,8 @@ export type UseFilesHelpersProps = {
   disableBySecurity?: string;
   withSubFolders?: boolean;
 
-  recentFolder?: FolderDtoInteger | null;
-  favoritesFolder?: FolderDtoInteger | null;
+  recentFolder?: FolderDto | null;
+  favoritesFolder?: FolderDto | null;
   withRecentTreeFolder?: boolean;
   withFavoritesTreeFolder?: boolean;
   activeSpecialScope?: SpecialFolderScope | null;
@@ -184,7 +186,7 @@ export type TFilesSelectorInit = WithFlag<
     withInit: true;
     initTotal: number;
     initHasNextPage: boolean;
-    initItems: FolderDtoInteger[] | (FolderDtoInteger | FileDtoInteger)[];
+    initItems: FolderDto[] | (FolderDto | FileDto)[];
     initBreadCrumbs: TBreadCrumb[];
     initSelectedItemType: "rooms" | "files" | "agents";
     initSelectedItemId: string | number;
@@ -204,7 +206,7 @@ export type FilesSelectorProps = TInfoBar &
   ) & {
     disabledItems: (string | number)[];
     disabledFolderType?: FolderType;
-    isRoomDisabled?: (room: FolderDtoInteger) => boolean;
+    isRoomDisabled?: (room: FolderDto) => boolean;
     pinnedRootId?: number | string;
     includedItems?: (string | number)[];
     filterParam?: string | number;
@@ -214,7 +216,7 @@ export type FilesSelectorProps = TInfoBar &
     cancelButtonLabel: string;
     shareKey?: string;
 
-    treeFolders?: FolderDtoInteger[];
+    treeFolders?: FolderDto[];
     withRecentTreeFolder?: boolean;
     withFavoritesTreeFolder?: boolean;
     withAIAgentsTreeFolder?: boolean;
@@ -242,7 +244,7 @@ export type FilesSelectorProps = TInfoBar &
       breadCrumbs: TBreadCrumb[],
       fileName: string,
       isChecked: boolean,
-      selectedTreeNode: FolderDtoInteger,
+      selectedTreeNode: FolderDto,
       selectedFileInfo: TSelectedFileInfo,
       isInsideKnowledge?: boolean,
       isInsideResultStorage?: boolean,
@@ -255,9 +257,9 @@ export type FilesSelectorProps = TInfoBar &
       selectedItemType: "rooms" | "files" | "agents" | undefined,
       isRoot: boolean,
       selectedItemSecurity:
-        | FileEntryDtoIntegerAllOfSecurity
-        | FileEntryDtoIntegerAllOfSecurity
-        | FileEntryDtoIntegerAllOfSecurity
+        | TFileEntrySecurity
+        | TFileEntrySecurity
+        | TFileEntrySecurity
         | undefined,
       selectedFileInfo: TSelectedFileInfo,
       isDisabledFolder?: boolean,

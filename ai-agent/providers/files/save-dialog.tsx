@@ -169,7 +169,7 @@ const SaveDialog = ({
             try {
               await filesApi.createTextFile({
                 folderId,
-                createTextOrHtmlFile: { title, content },
+                createTextOrHtmlFileRequest: { title, content },
               });
               exportedToast(title);
             } catch (e) {

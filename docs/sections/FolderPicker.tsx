@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import type {
-  FileEntryDtoIntegerAllOfSecurity,
-  RoomType,
-} from "@onlyoffice/docspace-api-sdk";
+import type { RoomType } from "@onlyoffice/docspace-api-sdk";
+import type { TFileEntrySecurity } from "../../types";
 
 import CatalogDocumentsSvg from "../../assets/icons/16/catalog.documents.react.svg";
 import CatalogRoomsSvg from "../../assets/icons/16/catalog.rooms.react.svg";
@@ -51,7 +49,7 @@ const FORM_FOLDER_ICONS: Record<"done" | "progress" | "none", string> = {
 
 // A read-only picker opens and chooses; it reads no permission, so every row
 // carries the same empty set.
-const NO_SECURITY = {} as FileEntryDtoIntegerAllOfSecurity;
+const NO_SECURITY = {} as TFileEntrySecurity;
 
 const sectionRow = (kind: SectionKind): TSelectorItem => ({
   id: SECTION_ID,

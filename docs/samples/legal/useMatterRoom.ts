@@ -60,7 +60,7 @@ export const useMatterRoom = (roomId: number) => {
       }
       await foldersApi.createFolder({
         folderId: parentId,
-        createFolder: { title },
+        createFolderRequest: { title },
       });
     },
     [baseUrl, foldersApi],

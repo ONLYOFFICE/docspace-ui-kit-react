@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
+import type { FolderDto } from "@onlyoffice/docspace-api-sdk";
 
 import { convertToItems } from "./AIAgent.utils";
 
 const agent = (id: number, security?: Record<string, boolean>) =>
-  ({ id, title: `Agent ${id}`, security }) as unknown as FolderDtoInteger;
+  ({ id, title: `Agent ${id}`, security }) as unknown as FolderDto;
 
 describe("convertToItems", () => {
   it("disables nothing without disableBySecurity", () => {

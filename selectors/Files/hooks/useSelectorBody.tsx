@@ -20,10 +20,7 @@ import {
   type TSelectorSearch,
   type TSelectorSubmitButton,
 } from "../../../components/selector";
-import {
-  FolderType,
-  type FolderDtoInteger,
-} from "@onlyoffice/docspace-api-sdk";
+import { FolderType, type FolderDto } from "@onlyoffice/docspace-api-sdk";
 import { useTheme } from "../../../context/ThemeContext";
 
 import type { FilesSelectorProps } from "../FilesSelector.types";
@@ -51,7 +48,7 @@ type PickedSelectorBodyProps = Pick<
 > & { isRoot: boolean; selectedItemType?: string };
 
 type SelectedTreeNodeProps = {
-  selectedTreeNode: FolderDtoInteger;
+  selectedTreeNode: FolderDto;
 };
 
 const useSelectorBody = ({

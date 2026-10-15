@@ -1,6 +1,6 @@
 import type {
   TSelectedFileInfo,
-  FileEntryDtoIntegerAllOfSecurity,
+  TFileEntrySecurity,
 } from "../selectors/Files/FilesSelector.types";
 
 type DataSet = {
@@ -61,7 +61,7 @@ export const getIsDisabled = (
   selectedItemId: string | number | undefined,
   selectedItemType: "rooms" | "files" | "agents" | undefined,
   isRoot: boolean,
-  _selectedItemSecurity: FileEntryDtoIntegerAllOfSecurity | undefined,
+  _selectedItemSecurity: TFileEntrySecurity | undefined,
   _selectedFileInfo: TSelectedFileInfo,
   isDisabledFolder?: boolean,
 ) => {

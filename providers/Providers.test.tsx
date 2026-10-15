@@ -36,7 +36,7 @@ vi.mock("@onlyoffice/docspace-api-sdk", () => {
   class MockPortalQuotaApi {}
   return {
     Configuration: MockConfiguration,
-    ProfilesApi: MockProfilesApi,
+    PeopleProfilesApi: MockProfilesApi,
     CommonSettingsApi: MockCommonSettingsApi,
     CommonSettingsApiAxiosParamCreator: () => ({
       getPortalColorTheme: vi.fn().mockResolvedValue({ themes: [] }),

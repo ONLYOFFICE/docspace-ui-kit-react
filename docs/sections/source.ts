@@ -1,13 +1,12 @@
 import {
-  type FileDtoInteger,
-  type FolderContentDtoInteger,
-  type FolderDtoInteger,
+  type FileDto,
+  type FolderContentDto,
+  type FolderDto,
   FilterType,
   FolderType,
   RoomType,
   SearchArea,
   SortOrder,
-  SubjectFilter,
 } from "@onlyoffice/docspace-api-sdk";
 
 import { FileType, FilterGroups } from "../../enums";
@@ -317,12 +316,12 @@ const PAGE = 100;
 
 /** The wire carries full DTOs where the SDK types promise only the base. */
 export const toListing = (
-  content: FolderContentDtoInteger | undefined,
+  content: FolderContentDto | undefined,
   kind: SectionKind,
   folderId: number | null,
 ): SectionListing => {
-  const folders = (content?.folders ?? []) as FolderDtoInteger[];
-  const files = (content?.files ?? []) as FileDtoInteger[];
+  const folders = (content?.folders ?? []) as FolderDto[];
+  const files = (content?.files ?? []) as FileDto[];
 
   const items: SectionItem[] = [
     ...folders.map((folder): SectionItem => {
@@ -408,7 +407,7 @@ export const toListing = (
  *
  * Every filter goes to the server rather than being applied to a page:
  * `filterType` for My documents and inside a folder or room, `type` for the
- * rooms list, `subjectId` with `SubjectFilter.Owner` for "Owner: Me", which
+ * rooms list, `subjectId` for "Owner: Me", which
  * needs the caller's own id and asks for it once.
  */
 export const portalSource = (
@@ -446,9 +445,7 @@ export const portalSource = (
     }
 
     const roomType = type ? ROOM_FILTER[type] : undefined;
-    const owner = ownedByMe(query)
-      ? { subjectId: await myId(), subjectFilter: SubjectFilter.Owner }
-      : {};
+    const owner = ownedByMe(query) ? { subjectId: await myId() } : {};
 
     return api.roomsApi.getRoomsFolder({
       ...paging,

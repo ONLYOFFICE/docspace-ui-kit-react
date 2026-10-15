@@ -1,4 +1,4 @@
-import type { FolderDtoInteger, RoomType } from "@onlyoffice/docspace-api-sdk";
+import type { FolderDto, RoomType } from "@onlyoffice/docspace-api-sdk";
 
 import type { WithFlag } from "../../types";
 import type {
@@ -14,7 +14,7 @@ export type TInitValue = WithFlag<
   "withInit",
   {
     withInit: true;
-    initItems: FolderDtoInteger[];
+    initItems: FolderDto[];
     initTotal: number;
     initHasNextPage: boolean;
     initSearchValue?: string;

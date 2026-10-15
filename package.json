@@ -149,7 +149,7 @@
   },
   "dependencies": {
     "@floating-ui/dom": "1.6.13",
-    "@onlyoffice/docspace-api-sdk": "^3.7.0",
+    "@onlyoffice/docspace-api-sdk": "^4.0.0",
     "classnames": "2.5.1",
     "cnbuilder": "3.1.0",
     "copy-to-clipboard": "3.3.3",

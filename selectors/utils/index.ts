@@ -1,9 +1,6 @@
 import React from "react";
-import type {
-  FileDtoInteger,
-  FolderDtoInteger,
-  FileEntryDtoIntegerAllOfSecurity,
-} from "@onlyoffice/docspace-api-sdk";
+import type { FileDto, FolderDto } from "@onlyoffice/docspace-api-sdk";
+import type { TFileEntrySecurity } from "../../types";
 import { FolderType, RoomType } from "@onlyoffice/docspace-api-sdk";
 
 import CatalogFavoritesSvg from "../../assets/icons/16/catalog.favorites.react.svg";
@@ -26,9 +23,9 @@ import { DEFAULT_FILE_EXTS } from "./constants";
 import { getBrandName } from "../../constants/brands";
 
 export const convertRoomsToItems = (
-  rooms: FolderDtoInteger[],
+  rooms: FolderDto[],
   t?: (key: string, interpolation?: Record<string, string | number>) => string,
-  isRoomDisabled?: (room: FolderDtoInteger) => boolean,
+  isRoomDisabled?: (room: FolderDto) => boolean,
 ): TSelectorItem[] => {
   const translate = t ?? getCommonTranslation;
   const items = rooms.map((room) => {
@@ -87,7 +84,7 @@ export const convertRoomsToItems = (
 };
 
 export const convertFilesToItems: (
-  files: FileDtoInteger[],
+  files: FileDto[],
   getIcon: (
     fileExst: string,
   ) => React.FC<React.SVGProps<SVGSVGElement>> | string | null,
@@ -95,7 +92,7 @@ export const convertFilesToItems: (
   includedItems?: (number | string)[],
   disableBySecurity?: string,
 ) => TSelectorItem[] = (
-  files: FileDtoInteger[],
+  files: FileDto[],
   getIcon: (
     fileExst: string,
   ) => React.FC<React.SVGProps<SVGSVGElement>> | string | null,
@@ -126,7 +123,7 @@ export const convertFilesToItems: (
       : false;
 
     const isDisabledBySecurity = disableBySecurity
-      ? !security?.[disableBySecurity as keyof FileEntryDtoIntegerAllOfSecurity]
+      ? !security?.[disableBySecurity as keyof TFileEntrySecurity]
       : false;
 
     return {
@@ -155,7 +152,7 @@ export const convertFilesToItems: (
 };
 
 const isDisableFolder = (
-  folder: FolderDtoInteger,
+  folder: FolderDto,
   disabledItems: (number | string)[],
   filterParam?: string | number,
 ) => {
@@ -163,17 +160,17 @@ const isDisableFolder = (
 };
 
 export const convertFoldersToItems: (
-  folders: FolderDtoInteger[],
+  folders: FolderDto[],
   disabledItems: (number | string)[],
   filterParam?: string | number,
   disabledFolderType?: FolderType,
 ) => TSelectorItem[] = (
-  folders: FolderDtoInteger[],
+  folders: FolderDto[],
   disabledItems: (number | string)[],
   filterParam?: string | number,
   disabledFolderType?: FolderType,
 ) => {
-  const items = folders.map((folder: FolderDtoInteger) => {
+  const items = folders.map((folder: FolderDto) => {
     const {
       id,
       title,
@@ -230,8 +227,8 @@ export const buildSpecialFolderItems = ({
   t,
 }: {
   section: SpecialFolderScope["section"];
-  recentFolder?: FolderDtoInteger | null;
-  favoritesFolder?: FolderDtoInteger | null;
+  recentFolder?: FolderDto | null;
+  favoritesFolder?: FolderDto | null;
   withRecent?: boolean;
   withFavorites?: boolean;
   folderType?: SpecialFolderScope["folderType"];
@@ -242,7 +239,7 @@ export const buildSpecialFolderItems = ({
 
   const build = (
     kind: "recent" | "favorites",
-    folder: FolderDtoInteger,
+    folder: FolderDto,
     Icon: React.FC,
     label: string,
     rootFolderType: FolderType,
@@ -254,7 +251,7 @@ export const buildSpecialFolderItems = ({
     rootFolderType,
     filesCount: folder.filesCount ?? 0,
     foldersCount: folder.foldersCount ?? 0,
-    security: folder.security ?? ({} as FileEntryDtoIntegerAllOfSecurity),
+    security: folder.security ?? ({} as TFileEntrySecurity),
     isFolder: true,
     avatar: React.createElement(Icon),
     disableMultiSelect: true,

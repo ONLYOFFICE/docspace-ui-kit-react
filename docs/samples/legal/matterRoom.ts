@@ -1,7 +1,4 @@
-import type {
-  FileDtoInteger,
-  FolderDtoInteger,
-} from "@onlyoffice/docspace-api-sdk";
+import type { FileDto, FolderDto } from "@onlyoffice/docspace-api-sdk";
 
 import { isoOf, type PortalAuthor, type PortalTime } from "./matter";
 
@@ -26,7 +23,7 @@ export const CLIENT_FOLDER = "From the client";
 export const FIRM_FOLDER = "From the firm";
 
 export type FolderLike = Pick<
-  FolderDtoInteger,
+  FolderDto,
   "id" | "title" | "filesCount" | "foldersCount"
 > & {
   createdBy?: PortalAuthor;
@@ -35,7 +32,7 @@ export type FolderLike = Pick<
 };
 
 export type FileLike = Pick<
-  FileDtoInteger,
+  FileDto,
   "id" | "title" | "fileExst" | "folderId" | "pureContentLength" | "webUrl"
 > & {
   createdBy?: PortalAuthor;

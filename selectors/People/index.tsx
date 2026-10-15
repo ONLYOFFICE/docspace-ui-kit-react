@@ -21,7 +21,7 @@ import {
 } from "../../components/selector";
 import {
   EmployeeStatus,
-  Area,
+  AccountSearchArea,
   type EmployeeFullDto,
   type GroupDto,
   type EmployeeType as SdkEmployeeType,
@@ -322,11 +322,11 @@ const PeopleSelector = ({
         const currentFilter =
           typeof filter === "function" ? filter() : (filter ?? {});
 
-        let area: Area | undefined;
+        let area: AccountSearchArea | undefined;
         if (activeTabId === GUESTS_TAB_ID) {
-          area = Area.Guests;
+          area = AccountSearchArea.Guests;
         } else if (activeTabId === PEOPLE_TAB_ID) {
-          area = currentFilter.area ?? Area.People;
+          area = currentFilter.area ?? AccountSearchArea.People;
         }
 
         const includeShared = onlyRoomMembers || currentFilter.includeShared;

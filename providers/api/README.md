@@ -16,7 +16,7 @@ Returns an object with:
 
 | Property            | Type                | Description                    |
 | ------------------- | ------------------- | ------------------------------ |
-| `profilesApi`       | `ProfilesApi`       | API client for user profiles   |
+| `profilesApi`       | `PeopleProfilesApi` | API client for user profiles   |
 | `commonSettingsApi` | `CommonSettingsApi` | API client for common settings |
 
 Throws an error if used outside of `ApiProvider`.

@@ -4,7 +4,7 @@ import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
 
 import { RoomType } from "@onlyoffice/docspace-api-sdk";
-import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
+import type { FolderDto } from "@onlyoffice/docspace-api-sdk";
 
 import AIAgentSelector from ".";
 import type { AIAgentSelectorProps } from "./AIAgent.types";
@@ -182,7 +182,7 @@ export const Default: Story = {
   },
 };
 
-const initItems: FolderDtoInteger[] = [
+const initItems: FolderDto[] = [
   {
     id: 1,
     title: "Test agent",
@@ -191,7 +191,7 @@ const initItems: FolderDtoInteger[] = [
     parentId: 0,
     filesCount: 0,
     foldersCount: 0,
-    security: { UseChat: true } as FolderDtoInteger["security"],
+    security: { UseChat: true } as FolderDto["security"],
     logo: { medium: "", large: "", small: "", color: "5299e0", original: "" },
   },
   {
@@ -202,7 +202,7 @@ const initItems: FolderDtoInteger[] = [
     parentId: 0,
     filesCount: 3,
     foldersCount: 0,
-    security: { UseChat: true } as FolderDtoInteger["security"],
+    security: { UseChat: true } as FolderDto["security"],
     logo: { medium: "", large: "", small: "", color: "2db482", original: "" },
   },
   {
@@ -213,7 +213,7 @@ const initItems: FolderDtoInteger[] = [
     parentId: 0,
     filesCount: 0,
     foldersCount: 0,
-    security: { UseChat: false } as FolderDtoInteger["security"],
+    security: { UseChat: false } as FolderDto["security"],
     logo: { medium: "", large: "", small: "", color: "f97a0b", original: "" },
   },
 ];

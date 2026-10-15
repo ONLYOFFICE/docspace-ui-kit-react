@@ -1,11 +1,11 @@
 import {
   FolderType,
-  type FolderDtoInteger,
+  type FolderDto,
   type RoomType,
 } from "@onlyoffice/docspace-api-sdk";
 import type { TSelectorItem } from "../../components/selector";
 
-export const convertToItems = (folders: FolderDtoInteger[]) => {
+export const convertToItems = (folders: FolderDto[]) => {
   const items: TSelectorItem[] = folders.map((folder) => {
     const {
       id,

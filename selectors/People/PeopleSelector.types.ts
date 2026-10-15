@@ -1,7 +1,7 @@
 import type {
   EmployeeFullDto,
   EmployeeStatus as EmployeeStatusType,
-  Area,
+  AccountSearchArea,
 } from "@onlyoffice/docspace-api-sdk";
 import type {
   TSelectorAccessRights,
@@ -17,7 +17,7 @@ import type { EmployeeType } from "../../enums";
 export type PeopleFilter = {
   employeeStatus?: EmployeeStatusType;
   role?: EmployeeType[];
-  area?: Area;
+  area?: AccountSearchArea;
   includeShared?: boolean;
 };
 

@@ -6,7 +6,7 @@ import socket from "../../utils/socket";
 
 import {
   Configuration,
-  ProfilesApi,
+  PeopleProfilesApi,
   CommonSettingsApi,
   FoldersApi,
   RoomsApi,
@@ -55,7 +55,7 @@ export const createApiClient = (
 export type TApiClient = ReturnType<typeof createApiClient>;
 
 export type TApiContext = {
-  profilesApi: ProfilesApi;
+  profilesApi: PeopleProfilesApi;
   commonSettingsApi: CommonSettingsApi;
   foldersApi: FoldersApi;
   roomsApi: RoomsApi;
@@ -111,7 +111,7 @@ const ApiProvider = ({
     });
 
     return {
-      profilesApi: new ProfilesApi(configuration),
+      profilesApi: new PeopleProfilesApi(configuration),
       commonSettingsApi: new CommonSettingsApi(configuration),
       foldersApi: new FoldersApi(configuration),
       roomsApi: new RoomsApi(configuration),

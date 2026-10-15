@@ -231,7 +231,7 @@ Mock the SDK classes in your tests:
 ```tsx
 vi.mock("@onlyoffice/docspace-api-sdk", () => ({
   Configuration: class {},
-  ProfilesApi: class {
+  PeopleProfilesApi: class {
     getSelfProfile = vi.fn().mockResolvedValue({
       data: { response: { cultureName: "en" } },
     });

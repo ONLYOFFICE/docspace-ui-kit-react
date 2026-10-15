@@ -23,3 +23,15 @@ minimumReleaseAgeExclude:
   - "@rolldown/binding-linux-x64-musl@1.2.2"
   - "@onlyoffice/doceditor-types@10.0.0"
   - "@onlyoffice/document-editor-react@2.3.0"
+  # Released alongside this package too; the 4.0.0 override below has to be
+  # installable the day the tarball is swapped for the registry entry.
+  - "@onlyoffice/docspace-api-sdk"
+overrides:
+  # @onlyoffice/docspace-api-sdk 4.0.0 is not on npm yet: the manifest keeps the
+  # registry range (^4.0.0) so the packed package is right for the day it is
+  # published, and this override resolves it from the clean pack of the
+  # docspace-api-sdk-typescript release/v4.0.0 branch, committed next to this
+  # file. The filename carries the version: a rebuilt pack gets a new name, or
+  # pnpm keeps the cached copy. Remove the override and the tarball once 4.0.0
+  # is published.
+  "@onlyoffice/docspace-api-sdk": "file:onlyoffice-docspace-api-sdk-4.0.0.tgz"

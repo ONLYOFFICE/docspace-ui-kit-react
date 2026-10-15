@@ -3,7 +3,7 @@ import type { DefaultEventsMap } from "@socket.io/component-emitter";
 
 import type {
   EmployeeFullDto,
-  FileDtoInteger,
+  FileDto,
   GroupDto,
 } from "@onlyoffice/docspace-api-sdk";
 
@@ -241,7 +241,7 @@ export type TOptSocket = {
  */
 export type ExportChatEventData =
   | {
-      resultFile: FileDtoInteger;
+      resultFile: FileDto;
     }
   | {
       resultFile: null;

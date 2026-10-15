@@ -301,7 +301,9 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
 
         const walletRes = await paymentApi.updateWalletPayment({
           walletQuantityRequestDto: {
-            quantity: value !== null ? { storage: value } : null,
+            // One service per request; a null count tells the server to drop the
+            // service, which is what cancelling the plan asks for.
+            quantity: { storage: value },
             productQuantityType: productType,
           },
         });

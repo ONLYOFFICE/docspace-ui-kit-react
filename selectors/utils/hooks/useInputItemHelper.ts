@@ -53,7 +53,7 @@ const useInputItemHelper = ({
         if (currentSelectedItemId) {
           const res = await foldersApi.createFolder({
             folderId: Number(currentSelectedItemId),
-            createFolder: {
+            createFolderRequest: {
               title: value.trimEnd(),
             },
           });

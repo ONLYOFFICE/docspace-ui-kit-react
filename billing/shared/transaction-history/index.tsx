@@ -314,10 +314,13 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     const isCredit = filterSelectedTypeKey !== "debit";
     const isDebit = filterSelectedTypeKey !== "credit";
 
-    const serviceNames: string | string[] | undefined =
-      isDocsConnectServiceName(serviceName)
-        ? store.docsConnectServiceNames
-        : serviceName;
+    const serviceNames: string[] | undefined = isDocsConnectServiceName(
+      serviceName,
+    )
+      ? store.docsConnectServiceNames
+      : serviceName === undefined
+        ? undefined
+        : [serviceName];
 
     try {
       await paymentApi.createCustomerOperationsReport({
@@ -327,9 +330,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
           credit: isCredit,
           debit: isDebit,
           participantName: filterContact?.id,
-          // TODO: remove the cast once the SDK types serviceName as
-          // string | string[] — the API accepts a repeated ServiceName param.
-          serviceName: serviceNames as string,
+          serviceName: serviceNames,
         },
       });
 

@@ -1,10 +1,7 @@
 import React, { use } from "react";
 
-import {
-  FolderType,
-  type FolderDtoInteger,
-  type FileEntryDtoIntegerAllOfSecurity,
-} from "@onlyoffice/docspace-api-sdk";
+import { FolderType, type FolderDto } from "@onlyoffice/docspace-api-sdk";
+import type { TFileEntrySecurity } from "../../../types";
 import type { TSelectorItem, TBreadCrumb } from "../../../components/selector";
 import { toastr, type TData } from "../../../components/toast";
 
@@ -91,8 +88,8 @@ const useAgentsHelper = ({
 
         const { response } = await apiClient.request<{
           response: {
-            folders: FolderDtoInteger[];
-            current: FolderDtoInteger;
+            folders: FolderDto[];
+            current: FolderDto;
             pathParts: { folderType?: number }[];
             total: number;
             count: number;
@@ -119,14 +116,12 @@ const useAgentsHelper = ({
         const itemList: TSelectorItem[] = convertRoomsToItems(folders, t)
           .filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true))
           .map((item) => {
-            const security = item.security as
-              FileEntryDtoIntegerAllOfSecurity | undefined;
+            const security = item.security as TFileEntrySecurity | undefined;
             // The Files selector passes one right for both files and agents.
             // A file-only right (AskAi in the chat attach picker) is never
             // on a folder's security, so it must not gate the agent itself —
             // otherwise every agent is disabled and cannot be opened.
-            const key =
-              disableBySecurity as keyof FileEntryDtoIntegerAllOfSecurity;
+            const key = disableBySecurity as keyof TFileEntrySecurity;
             const isDisabledBySecurity = disableBySecurity
               ? !security || (key in security && !security[key])
               : false;

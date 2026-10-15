@@ -3,11 +3,11 @@ import React, { use } from "react";
 import type { TBreadCrumb, TSelectorItem } from "../../../components/selector";
 import {
   FolderType,
-  type FolderDtoInteger,
-  type FileDtoInteger,
-  type FileEntryDtoIntegerAllOfSecurity,
+  type FolderDto,
+  type FileDto,
   type FileType,
 } from "@onlyoffice/docspace-api-sdk";
+import type { TFileEntrySecurity } from "../../../types";
 import { useCommonTranslation } from "../../../utils/i18n";
 
 import type {
@@ -31,7 +31,7 @@ type UseSelectorStateProps = Pick<
 >;
 
 const transformInitItems = (
-  items: (FolderDtoInteger | FileDtoInteger)[],
+  items: (FolderDto | FileDto)[],
   disabledItems: (string | number)[],
   withCreate: boolean,
   getIcon: (
@@ -44,22 +44,18 @@ const transformInitItems = (
   disableBySecurity?: string,
 ) => {
   const rooms = convertRoomsToItems(
-    items.filter(
-      (item) => "roomType" in item && item.roomType,
-    ) as FolderDtoInteger[],
+    items.filter((item) => "roomType" in item && item.roomType) as FolderDto[],
     t,
   );
   const folders = convertFoldersToItems(
     items.filter(
       (item) => "parentId" in item && item.parentId && !item.roomType,
-    ) as FolderDtoInteger[],
+    ) as FolderDto[],
     disabledItems,
     filterParam,
   );
   const files = convertFilesToItems(
-    items.filter(
-      (item) => "folderId" in item && item.folderId,
-    ) as FileDtoInteger[],
+    items.filter((item) => "folderId" in item && item.folderId) as FileDto[],
     getIcon,
     filterParam,
     undefined,
@@ -131,10 +127,10 @@ const useSelectorState = ({
     number | string | undefined
   >(withInit ? initSelectedItemId : undefined);
   const [selectedItemSecurity, setSelectedItemSecurity] = React.useState<
-    FileEntryDtoIntegerAllOfSecurity | undefined
+    TFileEntrySecurity | undefined
   >(undefined);
   const [selectedTreeNode, setSelectedTreeNode] = React.useState(
-    {} as FolderDtoInteger & { path?: { folderType?: FolderType }[] },
+    {} as FolderDto & { path?: { folderType?: FolderType }[] },
   );
   const [selectedFileInfo, setSelectedFileInfo] = React.useState<{
     id: number | string;
@@ -170,7 +166,7 @@ const useSelectorState = ({
       (f) => f.folderType === FolderType.Knowledge,
     );
     const isInsideResultStorageState = !!selectedTreeNode?.path?.find(
-      (f) => f.folderType === FolderType.ResultStorage,
+      (f) => f.folderType === FolderType.ChatOutputs,
     );
     setWithCreateState(
       withCreate && !isInsideKnowledgeState && !isInsideResultStorageState,

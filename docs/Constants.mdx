@@ -103,11 +103,13 @@ literal key `ProductName`. A realm-global slot survives that.
 | `ServerType`, `ToolsPermission`, `ChatReasoningEffort`, `VectorizationStatus` | AI agent and MCP server concepts           |
 | `ErrorKeys`, `ParseErrorTypes`                     | Error identifiers, including the email parser's                   |
 
-Six of these — `SdkDateToAutoCleanUp`, `SdkSortedByType`,
-`SdkFilesSettingsDtoDefaultSharingAccessRightsEnum` and the `EmployeeFullDto`,
-`FileDtoInteger`, `GroupDto` types below — come from `@onlyoffice/docspace-api-sdk` and are
-re-exported as they are. They move when that dependency is upgraded, so treat them as less
-stable than the kit's own.
+Several of these — `SdkDateToAutoCleanUp`, `SdkSortedByType`,
+`SdkFilesSettingsDtoDefaultSharingAccessRightsEnum` and the `EmployeeFullDto`, `FileDto`,
+`FolderDto`, `GroupDto` types below — come from `@onlyoffice/docspace-api-sdk` and are
+re-exported as they are; `TFileEntrySecurity` is derived from its `FileEntryDto`. They move
+when that dependency is upgraded, so treat them as less stable than the kit's own.
+`FileDtoInteger`, `FolderDtoInteger` and `FileEntryDtoIntegerAllOfSecurity` are the SDK 3.7.0
+names, kept as deprecated aliases until the next major.
 
 ## Types
 

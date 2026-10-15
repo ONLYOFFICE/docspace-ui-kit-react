@@ -1,4 +1,4 @@
-import type { CustomColorThemesSettingsItem } from "@onlyoffice/docspace-api-sdk";
+import type { CustomColorThemeDto } from "@onlyoffice/docspace-api-sdk";
 
 import { DEFAULT_FONT_FAMILY } from "./constants";
 
@@ -3182,5 +3182,5 @@ const Base = getBaseTheme();
 export default Base;
 
 export type TTheme = ReturnType<typeof getBaseTheme> & {
-  currentColorScheme?: CustomColorThemesSettingsItem;
+  currentColorScheme?: CustomColorThemeDto;
 };

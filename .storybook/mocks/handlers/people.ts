@@ -33,7 +33,7 @@ const TYPE_TEST: Record<string, (person: DemoEmployee) => boolean> = {
 const filterPeople = (url: URL) => {
   const params = url.searchParams;
   const text = params.get("filterValue") ?? params.get("query") ?? "";
-  // `Area`: 1 people, 2 guests, 0 or absent both.
+  // `AccountSearchArea`: 1 people, 2 guests, 0 or absent both.
   const area = params.get("area");
   const status = params.get("employeeStatus");
   const types = [

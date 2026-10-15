@@ -365,7 +365,7 @@ export const sdkSeedClient = (
     const folder = (
       await api.foldersApi.createFolder({
         folderId: parentId,
-        createFolder: { title },
+        createFolderRequest: { title },
       })
     ).data.response;
     if (folder?.id === undefined) {
@@ -377,7 +377,7 @@ export const sdkSeedClient = (
   createDocument: async (folderId, title) => {
     await api.filesApi.createFile({
       folderId,
-      createFileJsonElement: { title },
+      createFileRequest: { title },
     });
   },
 

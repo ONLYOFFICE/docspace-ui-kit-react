@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import {
-  type FolderDtoInteger,
-  SearchArea,
-} from "@onlyoffice/docspace-api-sdk";
+import { type FolderDto, SearchArea } from "@onlyoffice/docspace-api-sdk";
 
 import { useApi } from "../../../providers/api";
 import { explainPortalError } from "./explain";
@@ -67,7 +64,7 @@ export const useMatters = (): MattersState & { reload: () => void } => {
       try {
         const me = (await profilesApi.getSelfProfile()).data.response;
 
-        const rooms: FolderDtoInteger[] = [];
+        const rooms: FolderDto[] = [];
         let total = Infinity;
         while (rooms.length < Math.min(total, MAX_ROOMS)) {
           const page = (

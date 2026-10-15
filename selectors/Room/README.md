@@ -57,7 +57,7 @@ import RoomSelector from "@onlyoffice/apps-ui-kit/selectors/Room";
 | `useAside`                  | `boolean`                                           | No                   | Render in an Aside panel                                  |
 | `onClose`                   | `() => void`                                        | No                   | Close callback for Aside                                  |
 | `withInit`                  | `boolean`                                           | No                   | SSR initialization mode                                   |
-| `initItems`                 | `FolderDtoInteger[]`                                | When `withInit=true` | Pre-fetched room items                                    |
+| `initItems`                 | `FolderDto[]`                                       | When `withInit=true` | Pre-fetched room items                                    |
 | `initTotal`                 | `number`                                            | When `withInit=true` | Total room count                                          |
 | `initHasNextPage`           | `boolean`                                           | When `withInit=true` | Whether more pages exist                                  |
 | `initSearchValue`           | `string`                                            | No                   | Initial search value for SSR                              |
@@ -119,8 +119,8 @@ const GroupingPanel = () => {
 
 ## Key Files
 
-| File                    | Description                                                                                                                              |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `index.tsx`             | Main component with room fetching, selection tracking, and rendering                                                                     |
-| `RoomSelector.types.ts` | TypeScript definitions for props including `TInitValue` for SSR                                                                          |
-| `RoomSelector.utils.ts` | `convertToItems` utility — transforms `FolderDtoInteger[]` into `TSelectorItem[]` with room metadata (logo, cover, tags, lifetime, etc.) |
+| File                    | Description                                                                                                                       |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `index.tsx`             | Main component with room fetching, selection tracking, and rendering                                                              |
+| `RoomSelector.types.ts` | TypeScript definitions for props including `TInitValue` for SSR                                                                   |
+| `RoomSelector.utils.ts` | `convertToItems` utility — transforms `FolderDto[]` into `TSelectorItem[]` with room metadata (logo, cover, tags, lifetime, etc.) |

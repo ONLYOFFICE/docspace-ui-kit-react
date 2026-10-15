@@ -5,7 +5,7 @@ import {
   StorageFilter,
   FolderType,
   type RoomType as RoomTypeEnum,
-  type FolderDtoInteger,
+  type FolderDto,
   type SearchArea,
 } from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../../providers/api";
@@ -244,7 +244,7 @@ const useRoomsHelper = ({
         setSelectedTreeNode?.({
           ...current!,
           path: roomsFromApi.pathParts,
-        } as FolderDtoInteger);
+        } as FolderDto);
 
         if (firstLoadRef.current || startIndex === 0) {
           const { security } = current!;

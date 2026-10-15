@@ -81,9 +81,11 @@ a plugin. Either treat those names as API or stop re-exporting them from the bar
 quietly add a 23rd. Everything else: inline JSX SVG in the plugin, or a file under the plugin's
 own `assets/` through `plugin.iconUrl`.
 
-Six types also reach the barrel from `@onlyoffice/docspace-api-sdk` (`EmployeeFullDto`,
-`FileDtoInteger`, `GroupDto`, `SdkDateToAutoCleanUp`, `SdkSortedByType`,
-`SdkFilesSettingsDtoDefaultSharingAccessRightsEnum`) through `types/` and `enums/`. A plugin
+Seven types also reach the barrel from `@onlyoffice/docspace-api-sdk` (`EmployeeFullDto`,
+`FileDto`, `FolderDto`, `GroupDto`, `SdkDateToAutoCleanUp`, `SdkSortedByType`,
+`SdkFilesSettingsDtoDefaultSharingAccessRightsEnum`) through `types/` and `enums/`, plus
+`TFileEntrySecurity`, derived from the SDK's `FileEntryDto`, and the deprecated 3.7.0 aliases
+`FileDtoInteger`, `FolderDtoInteger` and `FileEntryDtoIntegerAllOfSecurity`. A plugin
 inherits them without ever declaring that package, and they move when it is upgraded.
 
 `node .claude/scripts/plugin-surface/surface.mjs` lists both groups; the `plugin-surface` skill

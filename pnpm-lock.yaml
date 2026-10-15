@@ -162,6 +162,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@onlyoffice/docspace-api-sdk': file:onlyoffice-docspace-api-sdk-4.0.0.tgz
+
 importers:
 
   .:
@@ -170,8 +173,8 @@ importers:
         specifier: 1.6.13
         version: 1.6.13
       '@onlyoffice/docspace-api-sdk':
-        specifier: ^3.7.0
-        version: 3.7.0(debug@4.4.3(supports-color@7.2.0))
+        specifier: file:onlyoffice-docspace-api-sdk-4.0.0.tgz
+        version: file:onlyoffice-docspace-api-sdk-4.0.0.tgz(debug@4.4.3(supports-color@7.2.0))
       classnames:
         specifier: 2.5.1
         version: 2.5.1
@@ -1610,8 +1613,9 @@ packages:
   '@onlyoffice/doceditor-types@10.0.0':
     resolution: {integrity: sha512-yGZbDBI6adWOP0Amn2I8UYPz5dP5BF6jVyqfhLU8TqlEQTVF6FY/+fMbTJCo+qCw2RG588+kk3SvkhDJTAMr8A==}
 
-  '@onlyoffice/docspace-api-sdk@3.7.0':
-    resolution: {integrity: sha512-zzhvkBZj7RelLDxGg/OnonG2vFwurlI2FaPSSHPiYXosu5y4lopQnSkoxoZ1uXgnWAKREjt1d0p+nkdtTH5xkA==}
+  '@onlyoffice/docspace-api-sdk@file:onlyoffice-docspace-api-sdk-4.0.0.tgz':
+    resolution: {integrity: sha512-aLNLp2ysb1+OckHX+/TU04ZGvgG0fynXiPB/FA/HXuebWBh0zLO7BHgqma5yiI3be7qJXDVtzLSFVPz/RGKbnA==, tarball: file:onlyoffice-docspace-api-sdk-4.0.0.tgz}
+    version: 4.0.0
 
   '@onlyoffice/document-editor-react@2.3.0':
     resolution: {integrity: sha512-0g4j4iLUMYSRIAHnFilnXbMKwIIk8UIct+qnHMySW2r5cx8ii/zK8yaO2Meeqyd1bzmji5MTTkXcLJ+XHS6YeA==}
@@ -7028,7 +7032,7 @@ snapshots:
 
   '@onlyoffice/doceditor-types@10.0.0': {}
 
-  '@onlyoffice/docspace-api-sdk@3.7.0(debug@4.4.3(supports-color@7.2.0))':
+  '@onlyoffice/docspace-api-sdk@file:onlyoffice-docspace-api-sdk-4.0.0.tgz(debug@4.4.3(supports-color@7.2.0))':
     dependencies:
       axios: 1.13.5(debug@4.4.3(supports-color@7.2.0))
     transitivePeerDependencies:

@@ -6,8 +6,8 @@ import type {
   FileShare,
   FileType,
   FolderType,
-  FileEntryDtoIntegerAllOfSecurity,
 } from "@onlyoffice/docspace-api-sdk";
+import type { TFileEntrySecurity } from "../../types";
 
 import type {
   ICover,
@@ -804,7 +804,7 @@ export type TSelectorItemFile = MergeTypes<
     /** Root section it belongs to. */
     rootFolderType: string | number;
     /** What the current user may do with it. */
-    security: FileEntryDtoIntegerAllOfSecurity;
+    security: TFileEntrySecurity;
     /** The icon: a URL, or an SVG component the row renders itself. */
     icon: TSvgComponent | string;
   }
@@ -824,7 +824,7 @@ export type TSelectorItemFolder = MergeTypes<
     /** How many sub-folders it holds. */
     foldersCount: number;
     /** What the current user may do with it. */
-    security: FileEntryDtoIntegerAllOfSecurity;
+    security: TFileEntrySecurity;
     /** The icon: a URL, or an SVG component the row renders itself. */
     icon?: TSvgComponent | string;
     /** Picture drawn instead of the folder icon. */
@@ -850,7 +850,7 @@ export type TSelectorItemRoom = MergeTypes<
     /** How many sub-folders it holds. */
     foldersCount: number;
     /** What the current user may do with it. */
-    security: FileEntryDtoIntegerAllOfSecurity;
+    security: TFileEntrySecurity;
     /** URL of the room's own logo. */
     icon?: string;
     /** Colour of the generated logo, when there is no picture. */

@@ -32,7 +32,7 @@ import AIAgentSelector from "@onlyoffice/apps-ui-kit/selectors/AIAgent";
 | `withPadding`       | `boolean`                                           | No                   | Whether to add padding to the selector                                                                                                                                       |
 | `disableBySecurity` | `string`                                            | No                   | Security property key to check; disables items whose security sets it to `false` or that have no security at all. A key a folder's security does not carry at all is ignored |
 | `withInit`          | `boolean`                                           | No                   | Enable SSR mode with pre-fetched data                                                                                                                                        |
-| `initItems`         | `FolderDtoInteger[]`                                | When `withInit=true` | Pre-fetched items for SSR                                                                                                                                                    |
+| `initItems`         | `FolderDto[]`                                       | When `withInit=true` | Pre-fetched items for SSR                                                                                                                                                    |
 | `initTotal`         | `number`                                            | When `withInit=true` | Total count for SSR                                                                                                                                                          |
 | `initHasNextPage`   | `boolean`                                           | When `withInit=true` | Whether more pages exist for SSR                                                                                                                                             |
 | `initSearchValue`   | `string`                                            | No                   | Initial search value for SSR                                                                                                                                                 |
@@ -60,8 +60,8 @@ const MyComponent = () => {
 
 ## Key Files
 
-| File               | Description                                                                       |
-| ------------------ | --------------------------------------------------------------------------------- |
-| `index.tsx`        | Main component with selector logic and rendering                                  |
-| `AIAgent.types.ts` | TypeScript type definitions for props                                             |
-| `AIAgent.utils.ts` | `convertToItems` utility — transforms `FolderDtoInteger[]` into `TSelectorItem[]` |
+| File               | Description                                                                |
+| ------------------ | -------------------------------------------------------------------------- |
+| `index.tsx`        | Main component with selector logic and rendering                           |
+| `AIAgent.types.ts` | TypeScript type definitions for props                                      |
+| `AIAgent.utils.ts` | `convertToItems` utility — transforms `FolderDto[]` into `TSelectorItem[]` |

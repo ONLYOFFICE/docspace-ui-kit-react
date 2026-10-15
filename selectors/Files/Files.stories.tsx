@@ -5,6 +5,7 @@ import {
   FilterType,
   ApplyFilterOption,
 } from "@onlyoffice/docspace-api-sdk";
+import type { TFileEntrySecurity } from "../../types";
 
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
@@ -14,7 +15,6 @@ import FilesSelector from ".";
 import type {
   FilesSelectorProps,
   TSelectedFileInfo,
-  FileEntryDtoIntegerAllOfSecurity,
 } from "./FilesSelector.types";
 
 import { withPortalGate } from "../../.storybook/decorators/PortalGate";
@@ -298,7 +298,7 @@ const getIsDisabled = (
   selectedItemId: string | number | undefined,
   selectedItemType: "rooms" | "files" | "agents" | undefined,
   isRoot: boolean,
-  _selectedItemSecurity: FileEntryDtoIntegerAllOfSecurity | undefined,
+  _selectedItemSecurity: TFileEntrySecurity | undefined,
   _selectedFileInfo: TSelectedFileInfo,
   isDisabledFolder?: boolean,
 ) => {

@@ -2,9 +2,9 @@ import React, { use } from "react";
 import {
   FolderType,
   RoomType,
-  type FolderDtoInteger,
-  type FileDtoInteger,
-  type FolderContentDtoInteger,
+  type FolderDto,
+  type FileDto,
+  type FolderContentDto,
 } from "@onlyoffice/docspace-api-sdk";
 
 import FolderSvg from "../../../assets/icons/32/folder.svg";
@@ -205,7 +205,7 @@ const useFilesHelper = ({
 
         const currentSearch = searchValue || "";
 
-        let currentFolder: FolderContentDtoInteger;
+        let currentFolder: FolderContentDto;
 
         if (activeSpecialScope) {
           const url = buildScopedFolderUrl({
@@ -219,7 +219,7 @@ const useFilesHelper = ({
           });
 
           const { response } = await apiClient.request<{
-            response: FolderContentDtoInteger;
+            response: FolderContentDto;
           }>(url);
 
           currentFolder = response;
@@ -246,14 +246,14 @@ const useFilesHelper = ({
         setSelectedItemSecurity(current!.security!);
 
         const foldersList: TSelectorItem[] = convertFoldersToItems(
-          (folders ?? []) as FolderDtoInteger[],
+          (folders ?? []) as FolderDto[],
           disabledItemsRef.current,
           filterParam,
           disabledFolderType,
         );
 
         const filesList: TSelectorItem[] = convertFilesToItems(
-          (files ?? []) as FileDtoInteger[],
+          (files ?? []) as FileDto[],
           getIcon,
           filterParam,
           includedItems,
@@ -267,7 +267,7 @@ const useFilesHelper = ({
         setSelectedTreeNode?.({
           ...current!,
           path: pathParts,
-        } as FolderDtoInteger);
+        } as FolderDto);
 
         const isInsideKnowledge = pathParts.some(
           (x: { folderType?: FolderType }) =>
@@ -275,7 +275,7 @@ const useFilesHelper = ({
         );
         const isInsideResultStorage = pathParts.some(
           (x: { folderType?: FolderType }) =>
-            x.folderType === FolderType.ResultStorage,
+            x.folderType === FolderType.ChatOutputs,
         );
 
         setIsInsideKnowledge(isInsideKnowledge);

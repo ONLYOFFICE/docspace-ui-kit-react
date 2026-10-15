@@ -8,7 +8,7 @@ import { Text } from "../../../../components/text";
 import { toastr } from "../../../../components/toast";
 import { TextInput, InputType } from "../../../../components/text-input";
 import { Button, ButtonSize } from "../../../../components/button";
-import type { TenantWalletSettings } from "@onlyoffice/docspace-api-sdk";
+import type { TenantWalletSettingsDto } from "@onlyoffice/docspace-api-sdk";
 
 import CheckRoundSvg from "../../../../assets/icons/16/check.round.react.svg";
 
@@ -23,7 +23,7 @@ type AutoPaymentsProps = {
 };
 
 type CurrentPaymentSettingsProps = {
-  autoPayments: TenantWalletSettings;
+  autoPayments: TenantWalletSettingsDto;
   formatWalletCurrency?: (item?: number, fractionDigits?: number) => string;
 };
 

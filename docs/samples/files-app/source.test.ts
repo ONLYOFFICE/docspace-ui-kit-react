@@ -341,11 +341,11 @@ describe("portalSource", () => {
 
     expect(api.filesApi.updateFile).toHaveBeenCalledWith({
       fileId: 9001,
-      updateFile: { title: "Plan.xlsx" },
+      updateFileRequest: { title: "Plan.xlsx" },
     });
     expect(api.foldersApi.renameFolder).toHaveBeenCalledWith({
       folderId: 2011,
-      createFolder: { title: "Reports 2026" },
+      createFolderRequest: { title: "Reports 2026" },
     });
   });
 

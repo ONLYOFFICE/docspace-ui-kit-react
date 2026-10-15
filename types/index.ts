@@ -1,10 +1,32 @@
 import type {
   EmployeeFullDto,
-  FileDtoInteger,
+  FileDto,
+  FileEntryDto,
+  FolderDto,
   GroupDto,
 } from "@onlyoffice/docspace-api-sdk";
 
-export type { EmployeeFullDto, FileDtoInteger, GroupDto };
+export type { EmployeeFullDto, FileDto, FolderDto, GroupDto };
+
+/**
+ * What the current user may do with a file entry: the `security` map of
+ * `FileEntryDto`. Derived from the DTO rather than imported under the name the
+ * SDK generator gives that inline object (`AiFileEntryDtoAllOfSecurity` in
+ * 4.0.0), which follows the first schema that carries it and moves between
+ * regenerations.
+ */
+export type TFileEntrySecurity = NonNullable<FileEntryDto["security"]>;
+
+/**
+ * @deprecated SDK 4.0.0 names: use `FileDto`, `FolderDto` and
+ * `TFileEntrySecurity`. Kept so that a consumer compiled against 3.7.0 names
+ * keeps building; removed in the next major.
+ */
+export type FileDtoInteger = FileDto;
+/** @deprecated Use `FolderDto`. */
+export type FolderDtoInteger = FolderDto;
+/** @deprecated Use `TFileEntrySecurity`. */
+export type FileEntryDtoIntegerAllOfSecurity = TFileEntrySecurity;
 
 import type {
   ShareAccessRights,

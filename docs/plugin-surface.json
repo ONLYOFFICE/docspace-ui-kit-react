@@ -1,7 +1,7 @@
 {
   "entry": "index.ts",
   "package": "@onlyoffice/apps-ui-kit",
-  "total": 711,
+  "total": 716,
   "values": 464,
   "exports": {
     "ADMIN": {
@@ -742,10 +742,18 @@
       "kind": "type",
       "origin": "components/tiles/file-tile"
     },
-    "FileDtoInteger": {
+    "FileDto": {
       "kind": "type",
       "origin": "types",
       "external": "@onlyoffice/docspace-api-sdk"
+    },
+    "FileDtoInteger": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "FileEntryDtoIntegerAllOfSecurity": {
+      "kind": "type",
+      "origin": "types"
     },
     "FileFillingFormStatus": {
       "kind": "enum",
@@ -814,6 +822,15 @@
     "FolderChildProps": {
       "kind": "type",
       "origin": "components/tiles/folder-tile"
+    },
+    "FolderDto": {
+      "kind": "type",
+      "origin": "types",
+      "external": "@onlyoffice/docspace-api-sdk"
+    },
+    "FolderDtoInteger": {
+      "kind": "type",
+      "origin": "types"
     },
     "FolderItem": {
       "kind": "interface",
@@ -1651,6 +1668,10 @@
       "origin": "components/tooltip"
     },
     "TFile": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TFileEntrySecurity": {
       "kind": "type",
       "origin": "types"
     },

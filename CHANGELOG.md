@@ -4,6 +4,28 @@
 
 ### Changed
 
+- `@onlyoffice/docspace-api-sdk` raised to `^4.0.0`. Until that release is on npm the package
+  resolves from `onlyoffice-docspace-api-sdk-4.0.0.tgz` at the repository root through a pnpm
+  override, a clean pack of the `release/v4.0.0` branch of `docspace-api-sdk-typescript`; the
+  override and the tarball go away once it is published
+- The SDK 4.0.0 renames follow through the public types: `FileDtoInteger` → `FileDto`,
+  `FolderDtoInteger` → `FolderDto`, and `FileEntryDtoIntegerAllOfSecurity` →
+  `TFileEntrySecurity`, derived from `FileEntryDto["security"]` rather than imported under the
+  name the SDK generator gives that object. The 3.7.0 names stay as deprecated aliases in
+  `types/` and `selectors/Files/FilesSelector.types` until the next major
+- `providers/api`: `profilesApi` is a `PeopleProfilesApi`; the SDK gave the `ProfilesApi` name
+  to the AI profiles API
+- Billing reads `BalanceDto`, `TariffDto`, `TariffQuotaDto` and `TenantWalletSettingsDto`
+  (tariff dates are typed as the ISO strings the server writes, not the SDK's `ApiDateTime`
+  object); the theme providers take `CustomColorThemeDto`; the people selector's `area` is an
+  `AccountSearchArea`
+- Rooms are no longer listed with `subjectFilter`, which the 4.0 API dropped, and `searchArea`
+  is sent by name (`Active`, `Archive`, …) instead of by number, as the 4.0 API declares it
+- `FolderType.ResultStorage` is `FolderType.ChatOutputs` (the same value, 33)
+- Transaction history and reports pass `serviceName` as the string array the API takes; the
+  wallet top-up settings, sales request, file create, rename, delete and text-file bodies use
+  the 4.0 parameter names; cancelling the storage plan sends `{ storage: null }`, the one-pair
+  body the server reads
 - `@onlyoffice/document-editor-react` peer raised from `2.1.1` to `2.2.0`. That release
   dropped its own `IConfig` and takes the editor configuration type, `Config`, from
   `@onlyoffice/doceditor-types`, which is now an optional peer here as well (`^9.3.1`)

@@ -4,7 +4,6 @@ import {
   RoomType,
   SearchArea,
   SortOrder,
-  SubjectFilter,
 } from "@onlyoffice/docspace-api-sdk";
 import { describe, expect, it, vi } from "vitest";
 
@@ -304,7 +303,6 @@ describe("portalSource", () => {
       sortBy: "AZ",
       sortOrder: SortOrder.Ascending,
       subjectId: "me-id",
-      subjectFilter: SubjectFilter.Owner,
       searchArea: SearchArea.Active,
       type: [RoomType.VirtualDataRoom],
     });

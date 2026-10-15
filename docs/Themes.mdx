@@ -130,7 +130,7 @@ function MyComponent() {
 
 - **`theme`** (`"Base" | "Dark"`) — current theme name
 - **`isBase`** (`boolean`) — `true` if light theme is active
-- **`currentColorScheme`** (`CustomColorThemesSettingsItem`) — active color scheme (accent colors)
+- **`currentColorScheme`** (`CustomColorThemeDto`) — active color scheme (accent colors)
 
 ## Custom color themes
 
@@ -141,10 +141,10 @@ Custom color themes override the accent colors used across the UI.
 ```ts
 type CustomColorThemesSettingsDto = {
   selected: string;  // ID of the active color theme
-  themes?: CustomColorThemesSettingsItem[];
+  themes?: CustomColorThemeDto[];
 };
 
-type CustomColorThemesSettingsItem = {
+type CustomColorThemeDto = {
   id: string;
   name?: string;
   main?: { accent?: string; buttons?: string };

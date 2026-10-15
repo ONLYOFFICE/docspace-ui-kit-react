@@ -1,8 +1,8 @@
 import {
   type DeleteBatchRequestDto,
-  type FileDtoInteger,
-  type FolderContentDtoInteger,
-  type FolderDtoInteger,
+  type FileDto,
+  type FolderContentDto,
+  type FolderDto,
   FilterType,
   type OperationsApi,
   SearchArea,
@@ -159,13 +159,13 @@ const whenOf = (value: unknown): string =>
     ? value
     : ((value as { utcTime?: string } | undefined)?.utcTime ?? "");
 
-const authorOf = (entry: FolderDtoInteger | FileDtoInteger) =>
+const authorOf = (entry: FolderDto | FileDto) =>
   entry.updatedBy?.displayName ?? entry.createdBy?.displayName ?? "";
 
 /** The wire's `pathParts`, typed `any` by the SDK: `{ id, title, roomType? }` per level. */
 type PathPart = { id?: number; title?: string; roomType?: number | null };
 
-const isRoomDto = (folder: FolderDtoInteger | PathPart) =>
+const isRoomDto = (folder: FolderDto | PathPart) =>
   folder.roomType !== undefined && folder.roomType !== null;
 
 const PAGE = 100;
@@ -223,13 +223,13 @@ export const portalSource = (
   };
 
   const toListing = (
-    content: FolderContentDtoInteger | undefined,
+    content: FolderContentDto | undefined,
     query: Query,
   ): Listing => {
     const current = content?.current;
     // The wire carries full DTOs where the SDK types promise only the base.
-    const folders = (content?.folders ?? []) as FolderDtoInteger[];
-    const files = (content?.files ?? []) as FileDtoInteger[];
+    const folders = (content?.folders ?? []) as FolderDto[];
+    const files = (content?.files ?? []) as FileDto[];
     const parts = (
       Array.isArray(content?.pathParts) ? content.pathParts : []
     ) as PathPart[];
@@ -299,14 +299,14 @@ export const portalSource = (
     createFolder: async (parentId, title) => {
       await api.foldersApi.createFolder({
         folderId: parentId,
-        createFolder: { title },
+        createFolderRequest: { title },
       });
     },
 
     createDocument: async (parentId, title) => {
       await api.filesApi.createFile({
         folderId: parentId,
-        createFileJsonElement: { title },
+        createFileRequest: { title },
       });
     },
 
@@ -314,12 +314,12 @@ export const portalSource = (
       if (entry.kind === "file") {
         await api.filesApi.updateFile({
           fileId: entry.id,
-          updateFile: { title },
+          updateFileRequest: { title },
         });
       } else {
         await api.foldersApi.renameFolder({
           folderId: entry.id,
-          createFolder: { title },
+          createFolderRequest: { title },
         });
       }
     },
