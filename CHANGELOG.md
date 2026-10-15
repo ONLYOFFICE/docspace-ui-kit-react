@@ -17,6 +17,14 @@
   before handing it to `document-editor-react`, which deprecated those flat props in
   2.3.0. The component's own props are unchanged; a value set in `config` wins over the
   matching prop, and `events_onAppReady` still receives the editor instance
+- `@onlyoffice/ai-chat` peer requirement raised to `^1.0.4` (the composer's tool cards follow the round's context scope; files and images share one attachment cap)
+- AI settings: `McpServers` takes a `toolPrefsScope` prop. Pass `"tenant"` where the viewer administers the portal, so a tool switched off there is off for every user; omitted, the page edits the viewer's own list (Bug 84381)
+
+### Fixed
+
+- AI chat: the copy buttons (message, code block, tool card) work on a portal served over plain HTTP. The platform adapter now supplies `copyToClipboard`, which falls back to `copy-to-clipboard` where the Clipboard API is unavailable outside a secure context (Bug 84481)
+- Files and images share one 5-attachment cap on a message, including the Forms section's single slot (Bug 84379)
+- The E2E Docker image copies the vendored ai-chat tarball before `pnpm install`
 
 ## 4.0.1
 

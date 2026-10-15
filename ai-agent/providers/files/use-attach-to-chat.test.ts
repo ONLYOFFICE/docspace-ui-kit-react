@@ -289,6 +289,23 @@ describe("useAttachHostFilesToChat accounting", () => {
     ]);
   });
 
+  // Files and images share the cap: an image attached earlier sits in
+  // `attachmentImages` after its re-key and still takes the only slot.
+  it("counts an attached image against the section cap", async () => {
+    storeState.attachmentImages = [{ ...attachedRef("91"), kind: "image" }];
+
+    const result = await attachUnderLimit([file(1)], 1);
+
+    expect(result).toEqual({
+      attached: 0,
+      skippedFolders: 0,
+      skippedOverLimit: 1,
+      cap: { limit: 1, reason: "section" },
+      duplicates: 0,
+    });
+    expect(storeState.beginPendingAttachments).not.toHaveBeenCalled();
+  });
+
   // After the first message of an analyze chat the draft is empty, so a
   // cap of one would happily let the next dropped file take the free slot —
   // the mode is still on, and the chat is still about the form.

@@ -2,7 +2,8 @@
  * Composer attachment cap. Mirrors `ATTACHMENT_LIMIT` in the widget's
  * attachments store. The store's `beginPendingAttachments` is the actual
  * enforcement point (it also counts uploads still in flight); this constant
- * exists for user-facing copy that quotes the number.
+ * exists for user-facing copy that quotes the number. Files and images share
+ * it: five attachments on a message in all.
  *
  * Its own module so the toast helpers can quote it without pulling the chat
  * widget (and its CSS side effects) into every importer.
@@ -12,26 +13,31 @@ export const CHAT_ATTACHMENT_LIMIT = 5;
 /** The slice of the store state both cap checks below read. */
 type BucketState = {
   attachmentFiles: unknown[];
+  attachmentImages: unknown[];
   pendingAttachments: { kind: "file" | "image" }[];
 };
 
 /**
- * What the file bucket holds: the refs standing in it plus the placeholders of
- * the uploads still in flight — the same two things the store's own cap check
- * adds up. Images have their own bucket, but every host attach path reserves
- * `kind: "file"` (images are re-keyed only after the attach), so this is the
- * bucket a cap applies to.
+ * What the message holds: the file and image refs standing on it plus the
+ * placeholders of the uploads still in flight — the same things the store's
+ * own cap check adds up. The images count too: the cap is shared, and an
+ * image attached from the host sits in `attachmentImages` once it is re-keyed
+ * after the attach.
  *
  * Read as the enforced cap right after a truncated reservation, and as the
  * current occupancy at any other time — see the two callers.
  */
-const countFileBucket = (state: BucketState): number =>
+const countAttachments = (state: BucketState): number =>
   state.attachmentFiles.length +
-  state.pendingAttachments.filter((p) => p.kind === "file").length;
+  state.attachmentImages.length +
+  state.pendingAttachments.length;
 
-/** Room left under a cap stricter than the widget's own. */
+/**
+ * Room left under a cap stricter than the widget's own. An image on the draft
+ * takes the Forms section's single slot just as a file does.
+ */
 const freeSlots = (state: BucketState, limit: number): number =>
-  Math.max(0, limit - countFileBucket(state));
+  Math.max(0, limit - countAttachments(state));
 
 /**
  * Complain loudly (once per session) when the copy's number and the cap the
@@ -42,14 +48,14 @@ const freeSlots = (state: BucketState, limit: number): number =>
  * the store state, not on the package's exports — so {@link
  * CHAT_ATTACHMENT_LIMIT} can only ever be a copy of it, and it is a copy the
  * user sees (the cap toast quotes it). `beginPendingAttachments` accepts
- * inputs while the bucket is below the cap, so the moment it refuses one the
- * bucket is exactly full and its occupancy *is* the cap — which is why this
+ * inputs while the message is below the cap, so the moment it refuses one the
+ * message is exactly full and its occupancy *is* the cap — which is why this
  * may only be called right after a reservation the store truncated.
  */
 let driftReported = false;
 const warnOnAttachmentLimitDrift = (state: BucketState) => {
   if (driftReported) return;
-  const enforced = countFileBucket(state);
+  const enforced = countAttachments(state);
   if (enforced === CHAT_ATTACHMENT_LIMIT) return;
   driftReported = true;
   console.warn(
