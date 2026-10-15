@@ -13,6 +13,10 @@
   (the types for ONLYOFFICE Docs 10.0, which drop the deprecated `showReviewChanges`,
   `reviewDisplay` and `trackChanges` customization keys) satisfies it the same way it
   satisfies `document-editor-react` itself
+- `document-editor` folds its `width`, `height` and `events_*` props into `config`
+  before handing it to `document-editor-react`, which deprecated those flat props in
+  2.3.0. The component's own props are unchanged; a value set in `config` wins over the
+  matching prop, and `events_onAppReady` still receives the editor instance
 
 ## 4.0.1
 

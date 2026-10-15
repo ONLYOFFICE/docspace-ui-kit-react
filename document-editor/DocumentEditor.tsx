@@ -3,6 +3,35 @@ import { DocumentEditor as OODocumentEditor } from "@onlyoffice/document-editor-
 import { useApi } from "../providers/api";
 import type { DocumentEditorProps, IConfig } from "./DocumentEditor.types";
 
+type EditorEvents = NonNullable<IConfig["events"]>;
+
+const EVENT_PROP_PREFIX = "events_";
+
+// `events_*` props are deprecated upstream in favour of `config.events`;
+// `events_onAppReady` keeps receiving the editor instance, as before.
+const splitEventProps = (
+  id: string,
+  rest: Record<string, unknown>,
+): { events: EditorEvents; passthrough: Record<string, unknown> } => {
+  const events: Record<string, unknown> = {};
+  const passthrough: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(rest)) {
+    if (!key.startsWith(EVENT_PROP_PREFIX) || typeof value !== "function") {
+      passthrough[key] = value;
+      continue;
+    }
+
+    const name = key.slice(EVENT_PROP_PREFIX.length);
+    events[name] =
+      name === "onAppReady"
+        ? () => value(window.DocEditor?.instances[id] ?? {})
+        : value;
+  }
+
+  return { events: events as EditorEvents, passthrough };
+};
+
 export const DocumentEditor = (props: DocumentEditorProps) => {
   const {
     id,
@@ -101,16 +130,22 @@ export const DocumentEditor = (props: DocumentEditorProps) => {
     return null;
   }
 
+  const { events, passthrough } = splitEventProps(id, restProps);
+  const editorConfig: IConfig = {
+    ...config,
+    width: config.width ?? width,
+    height: config.height ?? height,
+    events: { ...events, ...config.events },
+  };
+
   return (
     <OODocumentEditor
       id={id}
       documentServerUrl={documentServerUrl}
-      config={config}
-      width={width}
-      height={height}
+      config={editorConfig}
       shardkey={shardkey}
       onLoadComponentError={onLoadComponentError}
-      {...restProps}
+      {...passthrough}
     />
   );
 };
