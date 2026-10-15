@@ -77,48 +77,45 @@ if (declaredPackage !== pkg.name)
   );
 else note(ok, "package name", `both say ${pkg.name}`);
 
-// --- B. the vendored tarball -------------------------------------------------
+// --- B. the range the generator installs ------------------------------------
 
-const vendorDir = path.join(PLUGIN_SDK, "vendor");
-const vendored = fs.existsSync(vendorDir)
-  ? fs.readdirSync(vendorDir).filter((f) => f.endsWith(".tgz"))
-  : [];
-// The kit tarball is whichever one carries this description; matching on the
-// file name would miss it across exactly the rename this check exists to catch.
-const kitTarball = vendored.find((file) => {
-  try {
-    const manifest = execFileSync(
-      "tar",
-      ["-xzOf", path.join(vendorDir, file), "package/package.json"],
-      { encoding: "utf8" },
-    );
-    const parsed = JSON.parse(manifest);
-    return /ui-kit/i.test(parsed.name ?? "") || /ui.kit/i.test(file);
-  } catch {
-    return false;
-  }
-});
+// A generated plugin installs the kit from npm at UI_KIT_RANGE and keeps it
+// external, so the range decides which kit it compiles against: it has to
+// admit this package, and it must not run ahead of the portal.
+const generatorFiles =
+  read(path.join(PLUGIN_SDK, "scripts/generator/project-files.mjs")) ?? "";
+const kitRange = generatorFiles.match(
+  /UI_KIT_RANGE\s*=\s*["']([^"']+)["']/,
+)?.[1];
+// Caret ranges only, which is the one form the generator writes.
+const admits = (range, version) => {
+  const r = range
+    ?.match(/^\^(\d+)\.(\d+)\.(\d+)$/)
+    ?.slice(1)
+    .map(Number);
+  const v = version
+    .match(/^(\d+)\.(\d+)\.(\d+)/)
+    ?.slice(1)
+    .map(Number);
+  if (!r || !v) return false;
+  return v[0] === r[0] && (v[1] > r[1] || (v[1] === r[1] && v[2] >= r[2]));
+};
 
-if (!kitTarball)
-  note(findings, "vendored tarball", "no kit tarball in vendor/");
-else {
-  const manifest = JSON.parse(
-    execFileSync(
-      "tar",
-      ["-xzOf", path.join(vendorDir, kitTarball), "package/package.json"],
-      { encoding: "utf8" },
-    ),
+if (!kitRange)
+  note(
+    findings,
+    "installed range",
+    "no UI_KIT_RANGE in scripts/generator/project-files.mjs",
   );
-  if (manifest.name !== pkg.name || manifest.version !== pkg.version)
-    note(
-      findings,
-      "vendored tarball",
-      `vendor/${kitTarball} is ${manifest.name}@${manifest.version}, ` +
-        `this package is ${pkg.name}@${pkg.version}.\n` +
-        "    Re-pack with `pnpm build && pnpm pack` and replace it.",
-    );
-  else note(ok, "vendored tarball", `${manifest.name}@${manifest.version}`);
-}
+else if (!admits(kitRange, pkg.version))
+  note(
+    findings,
+    "installed range",
+    `UI_KIT_RANGE is ${kitRange}, this package is ${pkg.version}.\n` +
+      "    Move the range with the one the portal installs, then run the\n" +
+      "    skill's self-test.",
+  );
+else note(ok, "installed range", `${kitRange} admits ${pkg.version}`);
 
 // --- C. where the skill tells a plugin author to read props and CSS ---------
 

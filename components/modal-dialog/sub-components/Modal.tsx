@@ -180,6 +180,8 @@ const Modal = ({
       className={classNames(styles.modal, {
         [styles.modalActive]: visible,
       })}
+      inert={!visible}
+      aria-hidden={visible ? undefined : true}
       data-testid={dataTestId ?? "modal"}
     >
       <ModalBackdrop

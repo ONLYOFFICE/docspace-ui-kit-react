@@ -52,6 +52,7 @@ const useAgentsHelper = ({
   const requestRunning = React.useRef(false);
   const initRef = React.useRef(isInit);
   const firstLoadRef = React.useRef(isFullLoadActive);
+  const specialItemsCountRef = React.useRef(0);
 
   React.useEffect(() => {
     firstLoadRef.current = isFullLoadActive;
@@ -69,7 +70,8 @@ const useAgentsHelper = ({
       setIsNextPageLoading(true);
 
       try {
-        const startIndex = sIndex;
+        const startIndex =
+          sIndex > 0 ? Math.max(0, sIndex - specialItemsCountRef.current) : 0;
 
         const filterValue = searchValue || "";
 
@@ -146,6 +148,8 @@ const useAgentsHelper = ({
         if (firstLoadRef.current || startIndex === 0) {
           setTotal(total);
 
+          if (startIndex === 0) specialItemsCountRef.current = 0;
+
           if (
             startIndex === 0 &&
             !searchValue &&
@@ -164,6 +168,7 @@ const useAgentsHelper = ({
 
             if (specialItems.length) {
               itemList.unshift(...specialItems);
+              specialItemsCountRef.current = specialItems.length;
               setTotal(total + specialItems.length);
             }
           }

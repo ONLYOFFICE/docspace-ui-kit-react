@@ -10,6 +10,8 @@ export type NoAccessCopyProps = {
   isAgents: boolean;
   standalone: boolean;
   isPortalAdmin: boolean;
+  /** AI is on, but the admin has turned off every model in AI settings. */
+  modelsDisabled?: boolean;
   t: Translate;
 };
 
@@ -97,8 +99,32 @@ const getChatCopy = ({
   return { title, description, showBenefits: !standalone };
 };
 
+const getModelsDisabledCopy = ({
+  isAgents,
+  isPortalAdmin,
+  t,
+}: Omit<NoAccessCopyProps, "standalone" | "modelsDisabled">): NoAccessCopy => {
+  const description = match([isAgents, isPortalAdmin])
+    // agent, admin: the agent's own model is the one to turn back on
+    .with([true, true], () => t("AIModelsDisabledAgentAdminDescription"))
+    // chat panel, admin: any model will do
+    .with([false, true], () => t("AIModelsDisabledChatAdminDescription"))
+    // anyone else: only an admin can turn models back on
+    .otherwise(() => t("AIModelsDisabledUserDescription"));
+
+  return {
+    title: t("AIModelsDisabledTitle"),
+    description,
+    showBenefits: false,
+  };
+};
+
 export const getNoAccessCopy = ({
   isAgents,
+  modelsDisabled,
   ...rest
-}: NoAccessCopyProps): NoAccessCopy =>
-  isAgents ? getAgentsCopy(rest) : getChatCopy(rest);
+}: NoAccessCopyProps): NoAccessCopy => {
+  if (modelsDisabled) return getModelsDisabledCopy({ isAgents, ...rest });
+
+  return isAgents ? getAgentsCopy(rest) : getChatCopy(rest);
+};

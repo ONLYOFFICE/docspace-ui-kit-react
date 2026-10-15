@@ -33,6 +33,7 @@ const makeStore = () => ({
     beginPendingAttachments,
     failPendingAttachments,
     attachmentFiles: [],
+    attachmentImages: [],
     pendingAttachments: [] as { kind: "file" | "image" }[],
   }),
 });

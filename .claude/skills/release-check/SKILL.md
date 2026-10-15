@@ -63,10 +63,9 @@ node .claude/scripts/ui-kit-reference/check-drift.mjs
 ```
 
 `agent-skills/skills/plugin-sdk` documents this kit for plugin authors: the package specifier,
-a vendored tarball, prop defaults and layout traps. Nothing keeps it fresh. It is clean against
-its own `feature/ui-kit-separation` branch and stale against `main` by design — the rename lands
-in all three repositories at once ([plugin-api.md](../../rules/plugin-api.md)), so check which
-branch is out before reading the result. A **new** finding blocks: it means this change
+the range it installs, prop defaults and layout traps. Nothing keeps it fresh. The checker reads
+the agent-skills checkout beside this repository, so have it on the branch that targets this
+release before reading the result. A **new** finding blocks: it means this change
 invalidated documentation somebody is reading right now.
 
 ## 5 -- what the change adds stylistically

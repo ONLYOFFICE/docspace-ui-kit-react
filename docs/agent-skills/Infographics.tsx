@@ -29,7 +29,7 @@ const BENEFITS = [
   {
     title: "Only the CSS you use",
     note: "Each component brings its own styles, nothing to import",
-    code: 'import { Button } from "@onlyoffice/apps-ui-kit"',
+    code: 'import { Button } from "@onlyoffice/apps-ui-kit/components/button"',
   },
   {
     title: "The right modules for the job",
