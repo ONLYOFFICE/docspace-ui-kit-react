@@ -1,9 +1,13 @@
-import type {
-  IConfig,
-  DocumentEditorProps as OODocumentEditorProps,
-} from "@onlyoffice/document-editor-react";
+import type { Config } from "@onlyoffice/doceditor-types";
+import type { DocumentEditorProps as OODocumentEditorProps } from "@onlyoffice/document-editor-react";
 
-export type { IConfig };
+/**
+ * Editor configuration, as the document server's API defines it.
+ * `@onlyoffice/document-editor-react` 2.2 stopped exporting its own `IConfig`
+ * and takes `Config` from `@onlyoffice/doceditor-types`; the old name stays
+ * here so that importers of this subpath keep compiling.
+ */
+export type IConfig = Config;
 
 type EditorProps = Omit<OODocumentEditorProps, "documentServerUrl" | "config">;
 

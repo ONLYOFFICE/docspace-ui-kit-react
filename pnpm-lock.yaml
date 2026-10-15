@@ -278,9 +278,12 @@ importers:
       '@onlyoffice/ai-chat':
         specifier: file:onlyoffice-ai-chat-1.0.4.tgz
         version: file:onlyoffice-ai-chat-1.0.4.tgz(7a7b4ec48006fe1b5aa7472a03ec4507)
+      '@onlyoffice/doceditor-types':
+        specifier: 10.0.0
+        version: 10.0.0
       '@onlyoffice/document-editor-react':
-        specifier: 2.1.1
-        version: 2.1.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: 2.3.0
+        version: 2.3.0(@onlyoffice/doceditor-types@10.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@playwright/test':
         specifier: 1.58.1
         version: 1.58.1
@@ -1604,12 +1607,16 @@ packages:
       zustand:
         optional: true
 
+  '@onlyoffice/doceditor-types@10.0.0':
+    resolution: {integrity: sha512-yGZbDBI6adWOP0Amn2I8UYPz5dP5BF6jVyqfhLU8TqlEQTVF6FY/+fMbTJCo+qCw2RG588+kk3SvkhDJTAMr8A==}
+
   '@onlyoffice/docspace-api-sdk@3.7.0':
     resolution: {integrity: sha512-zzhvkBZj7RelLDxGg/OnonG2vFwurlI2FaPSSHPiYXosu5y4lopQnSkoxoZ1uXgnWAKREjt1d0p+nkdtTH5xkA==}
 
-  '@onlyoffice/document-editor-react@2.1.1':
-    resolution: {integrity: sha512-b0SnFPmT+OEyJons18PPHpwtFABVCI4nr3gPtAAImar1PhN9tNc9703Yo5KPYsHhIgVq+FqHSWgunI9GJnKa5w==}
+  '@onlyoffice/document-editor-react@2.3.0':
+    resolution: {integrity: sha512-0g4j4iLUMYSRIAHnFilnXbMKwIIk8UIct+qnHMySW2r5cx8ii/zK8yaO2Meeqyd1bzmji5MTTkXcLJ+XHS6YeA==}
     peerDependencies:
+      '@onlyoffice/doceditor-types': '>=9.3.1'
       react: ^16.9.0 || ^17 || ^18 || ^19
       react-dom: ^16.9.0 || ^17 || ^18 || ^19
 
@@ -4188,9 +4195,6 @@ packages:
 
   lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
-
-  lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
 
   lodash@4.18.1:
     resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
@@ -7022,15 +7026,18 @@ snapshots:
       tailwind-merge: 3.7.0
       zustand: 5.0.15(@types/react@19.2.10)(react@19.2.8)(use-sync-external-store@1.7.0(react@19.2.8))
 
+  '@onlyoffice/doceditor-types@10.0.0': {}
+
   '@onlyoffice/docspace-api-sdk@3.7.0(debug@4.4.3(supports-color@7.2.0))':
     dependencies:
       axios: 1.13.5(debug@4.4.3(supports-color@7.2.0))
     transitivePeerDependencies:
       - debug
 
-  '@onlyoffice/document-editor-react@2.1.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@onlyoffice/document-editor-react@2.3.0(@onlyoffice/doceditor-types@10.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
-      lodash: 4.17.21
+      '@onlyoffice/doceditor-types': 10.0.0
+      lodash: 4.18.1
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
 
@@ -9475,8 +9482,6 @@ snapshots:
   lodash.clonedeep@4.5.0: {}
 
   lodash.debounce@4.0.8: {}
-
-  lodash@4.17.21: {}
 
   lodash@4.18.1: {}
 

@@ -40,8 +40,8 @@ Demonstrates how to use custom events to interact with the editor.
 
 ```tsx
 const onDocumentReady = () => {
-  const documentEditor = window.DocEditor.instances["custom-event"];
-  documentEditor.showMessage("Welcome to ONLYOFFICE Editor!");
+  const documentEditor = window.DocEditor?.instances["custom-event"];
+  documentEditor?.showMessage("Welcome to ONLYOFFICE Editor!");
 };
 
 <DocumentEditor 
