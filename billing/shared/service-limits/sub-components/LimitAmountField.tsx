@@ -16,7 +16,6 @@ type LimitAmountFieldProps = {
   currencySymbol: string;
   isSymbolAfter?: boolean;
   isDisabled?: boolean;
-  hasError?: boolean;
   errorMessage?: string;
   isAutoFocussed?: boolean;
   onEnter?: () => void;
@@ -29,13 +28,13 @@ const LimitAmountField = ({
   currencySymbol,
   isSymbolAfter,
   isDisabled,
-  hasError,
   errorMessage,
   isAutoFocussed,
   onEnter,
   testId,
 }: LimitAmountFieldProps) => {
   const t = useCommonTranslation();
+  const hasError = Boolean(errorMessage);
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const next = e.target.value;

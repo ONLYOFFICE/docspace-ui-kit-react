@@ -26,6 +26,15 @@ const ServiceLimitsLoader: React.FC = () => {
 
         <RectangleSkeleton width="240px" height="12px" borderRadius="3px" />
       </div>
+
+      <div className={styles.sectionHeader}>
+        <RectangleSkeleton width="28px" height="16px" borderRadius="8px" />
+        <RectangleSkeleton width="120px" height="16px" borderRadius="3px" />
+      </div>
+
+      <div className={styles.sectionBody}>
+        <RectangleSkeleton width="320px" height="16px" borderRadius="3px" />
+      </div>
     </div>
   );
 };

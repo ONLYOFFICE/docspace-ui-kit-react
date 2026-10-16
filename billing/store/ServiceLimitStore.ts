@@ -22,11 +22,15 @@ class ServiceLimitStore {
 
   portalUsage: TServiceLimitUsage | null = null;
 
+  userLimit: TServiceLimit | null = null;
+
   isLoading = false;
 
   isInit = false;
 
   isPortalSaving = false;
+
+  isUserSaving = false;
 
   constructor(api: AxiosInstance) {
     this.#api = api;
@@ -34,15 +38,12 @@ class ServiceLimitStore {
     makeAutoObservable(this);
   }
 
-  get isPortalLimitEnabled(): boolean {
-    return Boolean(this.portalLimit?.enabled);
-  }
-
   fetchAll = async (serviceName: string) => {
     if (this.serviceName !== serviceName) {
       this.serviceName = serviceName;
       this.portalLimit = null;
       this.portalUsage = null;
+      this.userLimit = null;
       this.isInit = false;
     }
 
@@ -111,6 +112,28 @@ class ServiceLimitStore {
       amountValue: amount,
       period,
     });
+  };
+
+  saveUserLimit = async (amount: number, period: TServiceLimitPeriod) => {
+    this.userLimit = {
+      id: this.userLimit?.id ?? 0,
+      serviceName: this.serviceName ?? "",
+      participant: null,
+      amountValue: amount,
+      currency: this.portalLimit?.currency ?? null,
+      quantityValue: null,
+      serviceUnit: null,
+      period,
+      enabled: true,
+      created: this.userLimit?.created ?? "",
+      modified: "",
+    };
+  };
+
+  setUserLimitEnabled = async (enabled: boolean) => {
+    if (!this.userLimit) return;
+
+    this.userLimit = { ...this.userLimit, enabled };
   };
 
   setPortalLimitEnabled = async (enabled: boolean) => {

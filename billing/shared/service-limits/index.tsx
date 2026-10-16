@@ -5,32 +5,46 @@ import { Link, LinkTarget } from "../../../components/link";
 import { Text } from "../../../components/text";
 import { toastr } from "../../../components/toast";
 import { useCommonTranslation } from "../../../utils/i18n";
+import { CommonTrans } from "../../../utils/i18n/CommonTrans";
+import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useServiceLimitStore } from "../../store/ServiceLimitStoreProvider";
 
-import PortalLimitSection from "./PortalLimitSection";
+import LimitSection from "./LimitSection";
 import ServiceLimitsLoader from "./sub-components/ServiceLimitsLoader";
 import styles from "./styles/ServiceLimits.module.scss";
 
 type ServiceLimitsProps = {
   serviceName: string;
-  portalLimitDescription: string;
   helpUrl?: string;
-  isDisabled?: boolean;
+  onOpenContacts?: () => void;
 };
 
 const ServiceLimits = ({
   serviceName,
-  portalLimitDescription,
   helpUrl,
-  isDisabled,
+  onOpenContacts,
 }: ServiceLimitsProps) => {
   const t = useCommonTranslation();
   const limitStore = useServiceLimitStore();
-  const { isInit } = limitStore;
+  const paymentStore = usePaymentStore();
+  const {
+    isInit,
+    portalLimit,
+    portalUsage,
+    isPortalSaving,
+    savePortalLimit,
+    setPortalLimitEnabled,
+    userLimit,
+    isUserSaving,
+    saveUserLimit,
+    setUserLimitEnabled,
+  } = limitStore;
+  const { walletCodeCurrency } = paymentStore;
 
   useEffect(() => {
     const loadLimits = async () => {
       try {
+        if (!walletCodeCurrency) await paymentStore.fetchBalance();
         await limitStore.fetchAll(serviceName);
       } catch (error) {
         toastr.error(error as Error);
@@ -41,6 +55,16 @@ const ServiceLimits = ({
   }, [limitStore, serviceName]);
 
   if (!isInit) return <ServiceLimitsLoader />;
+
+  const contactsLink = (
+    <Link
+      fontSize="13px"
+      fontWeight={600}
+      color="accent"
+      onClick={onOpenContacts}
+      dataTestId="user_limit_contacts_link"
+    />
+  );
 
   return (
     <div className={styles.container} data-testid="service_limits">
@@ -61,9 +85,31 @@ const ServiceLimits = ({
         ) : null}
       </Text>
 
-      <PortalLimitSection
-        description={portalLimitDescription}
-        isDisabled={isDisabled}
+      <LimitSection
+        title={t("PortalLimit")}
+        description={t("PortalLimitDescription")}
+        limit={portalLimit}
+        usage={portalUsage}
+        isSaving={isPortalSaving}
+        onSave={savePortalLimit}
+        onSetEnabled={setPortalLimitEnabled}
+        testId="portal_limit"
+      />
+
+      <LimitSection
+        title={t("PerUserLimit")}
+        description={
+          <CommonTrans
+            i18nKey="PerUserLimitDescription"
+            components={{ 1: contactsLink }}
+          />
+        }
+        limit={userLimit}
+        usage={null}
+        isSaving={isUserSaving}
+        onSave={saveUserLimit}
+        onSetEnabled={setUserLimitEnabled}
+        testId="user_limit"
       />
     </div>
   );

@@ -710,8 +710,9 @@
   "LimitSpentOf": "Spent {{spent}} of {{limit}}.",
   "LimitSpentOfPercent": "Spent {{spent}} of {{limit}} ({{percent}}%).",
   "LimitSpentThisPeriod": "Spent {{spent}} this period.",
-  "Limits": "Limits",
+  "PerUserLimit": "Limit per user",
+  "PerUserLimitDescription": "Applies the same limit to every user. AI spending per user and individual limits are managed in <1>Contacts</1>.",
   "PortalLimit": "Portal limit",
   "PortalLimitDescription": "Applies to all users. AI requests pause when it is reached.",
-  "ServiceLimitsDescription": "Set spending limits for the whole portal or for specific users."
+  "ServiceLimitsDescription": "Set spending limits for the whole portal and per user."
 }
