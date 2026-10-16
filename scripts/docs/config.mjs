@@ -73,6 +73,14 @@ export const siteRoot = () =>
 export const REPO_URL = "https://github.com/ONLYOFFICE/docspace-ui-kit-react";
 
 /**
+ * The branch "Edit this page" opens the source on, whatever DOCS_REVISION the
+ * pages were built from. An edit is a pull request against master, and a
+ * build from a feature branch would otherwise send readers to a branch that
+ * is deleted once it is merged.
+ */
+export const EDIT_BRANCH = "master";
+
+/**
  * A published Storybook to link each page to, from STORYBOOK_URL. Unset, the
  * pages carry no "Open in Storybook" link and a `?path=` link in the prose is
  * reduced to its text.

@@ -429,6 +429,16 @@ describe("renderMdx", () => {
     expect(out).not.toContain("AGPL");
     expect(out).not.toMatch(/---\n*$/);
   });
+
+  it("sends an edit to master, whatever revision the page was built from", () => {
+    const out = renderMdx("# Welcome\n\nText.\n", {
+      ...context("docs/Welcome.mdx"),
+      revision: "feature/site-docs",
+    });
+    expect(out).toContain(
+      'custom_edit_url: "https://github.com/ONLYOFFICE/docspace-ui-kit-react/blob/master/docs/Welcome.mdx"',
+    );
+  });
 });
 
 describe("pictures", () => {

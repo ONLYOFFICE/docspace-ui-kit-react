@@ -33,7 +33,7 @@ CI runs `pnpm docs:check` in the lint job.
 
 | Variable        | Effect                                                                                                                                           |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `DOCS_REVISION` | Branch or commit the "Edit this page" and source links point at. Default: `master`, the one branch the GitHub mirror carries                     |
+| `DOCS_REVISION` | Branch or commit the source links point at. Default: `master`, the one branch the GitHub mirror carries. "Edit this page" always opens `master`  |
 | `STORYBOOK_URL` | A published Storybook. Set, every component page gets an "Open in Storybook" link, and `docs:screenshots` reads it instead of `storybook-static` |
 | `API_SITE_ROOT` | The api.onlyoffice.com checkout for `docs:sync`. Default: `../api.onlyoffice.com`                                                                |
 
@@ -191,7 +191,9 @@ every story and docs entry, so nothing is guessed; the export-to-id rule (`WithI
    it -- the version and licence line under Welcome -- is the page's Storybook footer and goes
    too. A page whose H1 was inside a React element gets one from its title.
 3. **Front matter**: `description` from the metadata `summary` (or the component description),
-   and `custom_edit_url` pointing at the source file.
+   and `custom_edit_url` pointing at the source file on `master` (`EDIT_BRANCH` in
+   `scripts/docs/config.mjs`), whatever `DOCS_REVISION` the pages were built from: an edit is a
+   pull request against `master`, and a feature branch is deleted once it is merged.
 4. **Portal-only pages.** A README whose `status` is `portal-internal`, or a page whose source
    is under a directory in `PORTAL_DIRS` (`scripts/docs/config.mjs`), opens with a warning
    admonition that says so and links to the tiers section of the Installation page.
