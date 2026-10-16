@@ -16,6 +16,7 @@ import {
   firstParagraph,
   firstSentence,
   rewriteLinks,
+  skippedHeadings,
   slugify,
   stripHtmlComments,
   stripSiteSkips,
@@ -262,6 +263,20 @@ describe("wrapApiTables", () => {
     const { text } = wrapApiTables(input);
     expect(text).toContain('<APITable name="Props">');
     expect(text).toContain('<APITable name="Header">');
+  });
+});
+
+describe("skippedHeadings", () => {
+  it("reports a heading more than one level under the one before it", () => {
+    expect(
+      skippedHeadings(
+        "# Error404\n\nIntro.\n\n### Features\n\n## Usage\n\n#### Deep\n\n```md\n# in code\n#### not a heading\n```\n",
+      ),
+    ).toEqual([
+      { after: "# Error404", heading: "### Features" },
+      { after: "## Usage", heading: "#### Deep" },
+    ]);
+    expect(skippedHeadings("# A\n\n## B\n\n### C\n\n## D\n")).toEqual([]);
   });
 });
 
