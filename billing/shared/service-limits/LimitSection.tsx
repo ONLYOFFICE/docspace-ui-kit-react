@@ -11,6 +11,7 @@ import { useLimitForm } from "./hooks/useLimitForm";
 import LimitActions from "./sub-components/LimitActions";
 import LimitAmountField from "./sub-components/LimitAmountField";
 import LimitPeriodComboBox from "./sub-components/LimitPeriodComboBox";
+import LimitStatus from "./sub-components/LimitStatus";
 import type {
   TServiceLimit,
   TServiceLimitPeriod,
@@ -61,6 +62,7 @@ const LimitSection = ({
     setPeriod,
     amount,
     amountError,
+    isOutOfRange,
     isDirty,
     canSave,
     reset,
@@ -143,6 +145,16 @@ const LimitSection = ({
                 testId={`${testId}_amount_input`}
               />
             </div>
+
+            {isOutOfRange ? null : (
+              <LimitStatus
+                limit={limit}
+                usage={usage}
+                draftAmount={amount}
+                currency={currency}
+                testId={`${testId}_status`}
+              />
+            )}
 
             <LimitActions
               canSave={canSave}
