@@ -650,6 +650,15 @@ describe("blocks", () => {
     );
     expect(() => BLOCK_RENDERERS.WelcomePage(root)).toThrow("styles.title");
   });
+
+  it("renders the Welcome hero with the version and licence package.json holds", () => {
+    const { version, license } = JSON.parse(
+      fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"),
+    );
+    const out = BLOCK_RENDERERS.WelcomePage(process.cwd());
+    expect(out).toContain(`Version ${version} • ${license} • on npm as`);
+    expect(out).toContain(`| ${version} | ${license} |`);
+  });
 });
 
 describe("collect", () => {
