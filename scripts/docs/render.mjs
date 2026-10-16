@@ -4,7 +4,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { REPO_URL, storybookUrl } from "./config.mjs";
+import { EDIT_BRANCH, REPO_URL, storybookUrl } from "./config.mjs";
 import { BLOCK_RENDERERS } from "./blocks.mjs";
 import { parseMdx } from "./mdx.mjs";
 import { storyKey } from "./pictures.mjs";
@@ -38,6 +38,9 @@ export const THEMED_IMAGE_IMPORT = [
   "import ThemedImage from",
   "'@theme/ThemedImage';",
 ].join(" ");
+
+/** The "Edit this page" link of a page: its source on EDIT_BRANCH. */
+export const editUrl = (source) => `${REPO_URL}/blob/${EDIT_BRANCH}/${source}`;
 
 /**
  * The component's picture, in the reader's colour mode: Docusaurus's
@@ -370,7 +373,7 @@ const afterIntro = (text, line) => {
 
 /** A README, rewritten. */
 export const renderReadme = (raw, context) => {
-  const { page, pictures, revision, storyId } = context;
+  const { page, pictures, storyId } = context;
   let text = stripHtmlComments(stripSiteSkips(raw))
     .replace(GENERATED_NOTE, "")
     .trim();
@@ -404,7 +407,7 @@ export const renderReadme = (raw, context) => {
   return (
     frontMatter({
       description: page.meta?.summary,
-      custom_edit_url: `${REPO_URL}/blob/${revision}/${page.source}`,
+      custom_edit_url: editUrl(page.source),
     }) +
     text +
     "\n"
@@ -417,7 +420,7 @@ export const renderReadme = (raw, context) => {
  * story, the args table, the stories.
  */
 export const renderAutodocs = (raw, context) => {
-  const { page, pictures, revision } = context;
+  const { page, pictures } = context;
   const parts = [`# ${page.label}`, ""];
   const note = portalNote(context);
   if (note) parts.push(note, "");
@@ -438,7 +441,7 @@ export const renderAutodocs = (raw, context) => {
   return (
     frontMatter({
       description: summaryOf(page, raw),
-      custom_edit_url: `${REPO_URL}/blob/${revision}/${page.source}`,
+      custom_edit_url: editUrl(page.source),
     }) +
     text +
     "\n"
@@ -451,7 +454,7 @@ export const renderAutodocs = (raw, context) => {
  * anything else by the element's as the Docs page renders it.
  */
 export const renderMdx = (raw, context) => {
-  const { page, pictures, revision, assets, warn } = context;
+  const { page, pictures, assets, warn } = context;
   const { blocks, lines, imports } = parseMdx(raw);
   const kept = [];
   let blockIndex = 0;
@@ -547,7 +550,7 @@ export const renderMdx = (raw, context) => {
   return (
     frontMatter({
       description: summaryOf(page, raw),
-      custom_edit_url: `${REPO_URL}/blob/${revision}/${page.source}`,
+      custom_edit_url: editUrl(page.source),
     }) +
     text +
     "\n"
@@ -556,7 +559,7 @@ export const renderMdx = (raw, context) => {
 
 /** A plain Markdown file from `docs/`. */
 export const renderMarkdown = (raw, context) => {
-  const { page, revision } = context;
+  const { page } = context;
   let text = stripHtmlComments(stripSiteSkips(raw))
     .replace(GENERATED_NOTE, "")
     .trim();
@@ -565,7 +568,7 @@ export const renderMarkdown = (raw, context) => {
   return (
     frontMatter({
       description: summaryOf(page, raw),
-      custom_edit_url: `${REPO_URL}/blob/${revision}/${page.source}`,
+      custom_edit_url: editUrl(page.source),
     }) +
     text +
     "\n"
@@ -603,7 +606,7 @@ const overviewTable = (caption, header, rows, { code = true } = {}) =>
 
 /** The page of a category: its README when it has one, sections.mjs otherwise. */
 export const renderCategory = (category, context) => {
-  const { revision, summaries, warn } = context;
+  const { summaries, warn } = context;
   const section = SECTIONS[category.key];
   const rows = (category.sequence ?? []).map(({ type, item }) =>
     type === "category"
@@ -642,7 +645,7 @@ export const renderCategory = (category, context) => {
 
   return (
     frontMatter({
-      custom_edit_url: `${REPO_URL}/blob/${revision}/${SECTIONS_FILE}`,
+      custom_edit_url: editUrl(SECTIONS_FILE),
     }) +
     `# ${section?.title ?? category.label}\n\n` +
     (section ? `${section.description}\n\n` : "") +
