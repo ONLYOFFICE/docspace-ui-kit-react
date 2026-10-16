@@ -16,6 +16,7 @@ import {
   firstParagraph,
   firstSentence,
   rewriteLinks,
+  skippedHeadings,
   slugify,
   stripHtmlComments,
   stripSiteSkips,
@@ -265,6 +266,20 @@ describe("wrapApiTables", () => {
   });
 });
 
+describe("skippedHeadings", () => {
+  it("reports a heading more than one level under the one before it", () => {
+    expect(
+      skippedHeadings(
+        "# Error404\n\nIntro.\n\n### Features\n\n## Usage\n\n#### Deep\n\n```md\n# in code\n#### not a heading\n```\n",
+      ),
+    ).toEqual([
+      { after: "# Error404", heading: "### Features" },
+      { after: "## Usage", heading: "#### Deep" },
+    ]);
+    expect(skippedHeadings("# A\n\n## B\n\n### C\n\n## D\n")).toEqual([]);
+  });
+});
+
 describe("slugify", () => {
   it("drops the number prefix Docusaurus would drop from the id", () => {
     expect(slugify("01. My matters")).toBe("my-matters");
@@ -469,6 +484,12 @@ describe("pictures", () => {
         ]),
         byStoryId: new Map(),
       },
+      pictures: new Map([
+        [
+          "primary",
+          { light: "filter-light.png", dark: "filter-dark.png", width: 300 },
+        ],
+      ]),
       revision: "master",
       storyId: () => "x",
       warn: () => {},
@@ -476,8 +497,10 @@ describe("pictures", () => {
     expect(out).toContain(
       "# Filter\n\n:::warning[Portal only]\n\nWorks only inside an ONLYOFFICE Apps portal",
     );
+    // The picture goes under the intro, as on every page, not into the
+    // warning, whose opening line is what an insert after the H1 meets first.
     expect(out).toContain(
-      "[public API](../../getting-started/installation.md#public-and-portal-internal).\n\n:::\n\nIntro.",
+      '[public API](../../getting-started/installation.md#public-and-portal-internal).\n\n:::\n\nIntro.\n\n<ThemedImage alt="Filter"',
     );
   });
 });
@@ -626,6 +649,15 @@ describe("blocks", () => {
       "export const WelcomePage = () => <h1 className={styles.heading}>Kit</h1>;",
     );
     expect(() => BLOCK_RENDERERS.WelcomePage(root)).toThrow("styles.title");
+  });
+
+  it("renders the Welcome hero with the version and licence package.json holds", () => {
+    const { version, license } = JSON.parse(
+      fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"),
+    );
+    const out = BLOCK_RENDERERS.WelcomePage(process.cwd());
+    expect(out).toContain(`Version ${version} • ${license} • on npm as`);
+    expect(out).toContain(`| ${version} | ${license} |`);
   });
 });
 

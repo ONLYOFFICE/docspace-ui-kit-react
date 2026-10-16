@@ -223,6 +223,15 @@ Sidebar doc ids carry the `docspace/ui-kit` prefix, every category links to its 
 and the three top-level categories are expanded, as the SDK's are. The site spreads
 `ui-kit-sidebar.cjs` into its own category, as it does `typedoc-sidebar.cjs` for the SDK.
 
+## What a strict run refuses
+
+Besides a title it cannot read, a link it cannot resolve and a group `sections.mjs` has no
+entry for, a `[warn]` -- and so `pnpm run docs`, `pnpm docs:check` and CI -- fails on a heading
+that skips a level: an `### Features` straight under the H1, or a `####` under `## Props`. The
+site's outline and its "on this page" list are built from the levels, so a skipped one is a hole
+in both. The fix is in the source: the MDX page, or `scripts/lib/readme-tables.mjs` for a
+heading `pnpm readme:props` writes.
+
 ## Fixing a problem
 
 Fix it at the source, in this order: the README, the MDX page or the story; the config in

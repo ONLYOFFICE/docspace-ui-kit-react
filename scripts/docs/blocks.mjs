@@ -72,9 +72,39 @@ const evaluate = (node, scope) => {
   return undefined;
 };
 
-/** The top-level `const name = ...` literals of a module, by name, in order. */
-const constants = (source) => {
+/**
+ * The top-level `const name = ...` literals of a module, by name, in order,
+ * after the names it imports from a JSON file -- `version` and `license`
+ * from `package.json` -- which are read from that file. Any other import is
+ * a component or an icon and stays out of scope.
+ */
+const constants = (source, root) => {
   const scope = new Map();
+  for (const statement of source.statements) {
+    if (
+      root &&
+      ts.isImportDeclaration(statement) &&
+      ts.isStringLiteral(statement.moduleSpecifier) &&
+      statement.moduleSpecifier.text.endsWith(".json") &&
+      statement.importClause?.namedBindings &&
+      ts.isNamedImports(statement.importClause.namedBindings)
+    ) {
+      const json = JSON.parse(
+        fs.readFileSync(
+          path.join(
+            root,
+            path.dirname(source.fileName),
+            statement.moduleSpecifier.text,
+          ),
+          "utf8",
+        ),
+      );
+      for (const element of statement.importClause.namedBindings.elements) {
+        const imported = (element.propertyName ?? element.name).text;
+        if (imported in json) scope.set(element.name.text, json[imported]);
+      }
+    }
+  }
   for (const statement of source.statements) {
     if (!ts.isVariableStatement(statement)) continue;
     for (const declaration of statement.declarationList.declarations) {
@@ -89,14 +119,23 @@ const constants = (source) => {
   return scope;
 };
 
-/** JSX text inside an element, as one line; `{"→"}` and the like included. */
-const textOf = (element) => {
+/**
+ * JSX text inside an element, as one line; `{"→"}` and the like included,
+ * and `{version}` as the constant it names when `scope` holds it.
+ */
+const textOf = (element, scope = new Map()) => {
   const parts = [];
   const visit = (node) => {
     if (ts.isJsxText(node)) parts.push(node.text);
     else if (ts.isJsxExpression(node)) {
       if (node.expression && ts.isStringLiteral(node.expression)) {
         parts.push(node.expression.text);
+      } else if (
+        node.expression &&
+        ts.isIdentifier(node.expression) &&
+        scope.has(node.expression.text)
+      ) {
+        parts.push(String(scope.get(node.expression.text)));
       }
     } else ts.forEachChild(node, visit);
   };
@@ -178,10 +217,10 @@ const table = (header, rows) =>
  */
 const welcomePage = (root) => {
   const source = parse(root, "docs/welcome/WelcomePage.tsx");
-  const data = constants(source);
+  const data = constants(source, root);
   const all = elements(source);
   const byStyle = (key) =>
-    all.filter((el) => styleOf(el) === key).map((el) => textOf(el));
+    all.filter((el) => styleOf(el) === key).map((el) => textOf(el, data));
   const byTag = (tag) =>
     all.filter((el) => openingOf(el).tagName.getText() === tag);
 
@@ -193,8 +232,8 @@ const welcomePage = (root) => {
   if (subline) {
     lines.push(
       link
-        ? `${textOf(subline)} -- [${textOf(link)}](${attributesOf(link).href})`
-        : textOf(subline),
+        ? `${textOf(subline, data)} -- [${textOf(link)}](${attributesOf(link).href})`
+        : textOf(subline, data),
       "",
     );
   }
