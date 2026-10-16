@@ -36,11 +36,15 @@ const LimitStatus = ({
   const spent = formatWalletCurrency(usage.amountConsumed, 2, currency);
   const date = formatPeriodEnd(usage.periodEnd, language);
 
-  const renderStatus = (
-    i18nKey: string,
-    values: Record<string, string | number>,
-    highlightClass: string = styles.statusWarning,
-  ) => (
+  const renderStatus = ({
+    i18nKey,
+    values,
+    highlightClass = styles.statusWarning,
+  }: {
+    i18nKey: string;
+    values: Record<string, string | number>;
+    highlightClass?: string;
+  }) => (
     <Text className={styles.status} dataTestId={testId}>
       <CommonTrans
         i18nKey={i18nKey}
@@ -55,7 +59,10 @@ const LimitStatus = ({
   if (draftAmount !== null && draftAmount < usage.amountConsumed) {
     const amount = formatWalletCurrency(draftAmount, 2, currency);
 
-    return renderStatus("LimitBelowSpent", { spent, amount, date });
+    return renderStatus({
+      i18nKey: "LimitBelowSpent",
+      values: { spent, amount, date },
+    });
   }
 
   const limitValue = limit?.enabled ? limit.amountValue : null;
@@ -65,21 +72,26 @@ const LimitStatus = ({
   const limitText = formatWalletCurrency(limitValue, 2, currency);
 
   if (isLimitReached(usage.amountConsumed, limitValue)) {
-    return renderStatus("LimitReached", { date }, styles.statusReached);
+    return renderStatus({
+      i18nKey: "LimitReached",
+      values: { date },
+      highlightClass: styles.statusReached,
+    });
   }
 
   if (isLimitApproaching(usage.amountConsumed, limitValue)) {
     const percent = getLimitUsagePercent(usage.amountConsumed, limitValue);
 
-    return renderStatus("LimitSpentOfPercent", {
-      spent,
-      limit: limitText,
-      percent,
-      date,
+    return renderStatus({
+      i18nKey: "LimitSpentOfPercent",
+      values: { spent, limit: limitText, percent, date },
     });
   }
 
-  return renderStatus("LimitSpentOf", { spent, limit: limitText, date });
+  return renderStatus({
+    i18nKey: "LimitSpentOf",
+    values: { spent, limit: limitText, date },
+  });
 };
 
 export default observer(LimitStatus);
