@@ -556,16 +556,23 @@ console.log(`Taking ${total} picture(s) with ${SHOT_WORKERS} workers...`);
 // fifty pictures can take longer than that, and a quiet log reads as a hang.
 const heartbeat = setInterval(() => console.log(progress()), HEARTBEAT_MS);
 
+// A picture is tried this many times before it is given up on.
+const ATTEMPTS = 2;
+
 // One context per theme for the worker's whole run: the preview bundle is
-// fetched and parsed once per context, then served from its cache. A page
-// is replaced after a failure, whatever state the failure left it in.
+// fetched and parsed once per context, then served from its cache. A failure
+// replaces the context, not just the page: on a loaded runner a renderer
+// dies mid-run ("Unable to capture screenshot", then every wait in that
+// context times out), and a new page in the same context inherits the dead
+// renderer. The picture is then tried once more in the fresh context.
 const worker = async () => {
   const contexts = {};
   const pages = {};
-  for (const [name, theme] of Object.entries(THEMES)) {
-    contexts[name] = await newContext(browser, theme);
+  const open = async (name) => {
+    contexts[name] = await newContext(browser, THEMES[name]);
     pages[name] = await contexts[name].newPage();
-  }
+  };
+  for (const name of Object.keys(THEMES)) await open(name);
   while (queue.length > 0) {
     const job = queue.shift();
     inFlight.add(job);
@@ -575,12 +582,18 @@ const worker = async () => {
       const themes =
         job.shot.kind === "controls" ? ["light"] : Object.keys(THEMES);
       for (const [i, name] of themes.entries()) {
-        try {
-          await job.run(pages[name], served.url, job.files[i]);
-        } catch (error) {
-          await pages[name].close().catch(() => {});
-          pages[name] = await contexts[name].newPage();
-          throw error;
+        for (let attempt = 1; ; attempt += 1) {
+          try {
+            await job.run(pages[name], served.url, job.files[i]);
+            break;
+          } catch (error) {
+            await contexts[name].close().catch(() => {});
+            await open(name);
+            if (attempt === ATTEMPTS) throw error;
+            console.warn(
+              `[retry] ${job.page.source} (${job.shot.name}, ${name}): ${error.message.split("\n")[0]}`,
+            );
+          }
         }
       }
       done += 1;
