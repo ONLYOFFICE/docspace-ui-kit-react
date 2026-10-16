@@ -469,6 +469,12 @@ describe("pictures", () => {
         ]),
         byStoryId: new Map(),
       },
+      pictures: new Map([
+        [
+          "primary",
+          { light: "filter-light.png", dark: "filter-dark.png", width: 300 },
+        ],
+      ]),
       revision: "master",
       storyId: () => "x",
       warn: () => {},
@@ -476,8 +482,10 @@ describe("pictures", () => {
     expect(out).toContain(
       "# Filter\n\n:::warning[Portal only]\n\nWorks only inside an ONLYOFFICE Apps portal",
     );
+    // The picture goes under the intro, as on every page, not into the
+    // warning, whose opening line is what an insert after the H1 meets first.
     expect(out).toContain(
-      "[public API](../../getting-started/installation.md#public-and-portal-internal).\n\n:::\n\nIntro.",
+      '[public API](../../getting-started/installation.md#public-and-portal-internal).\n\n:::\n\nIntro.\n\n<ThemedImage alt="Filter"',
     );
   });
 });
