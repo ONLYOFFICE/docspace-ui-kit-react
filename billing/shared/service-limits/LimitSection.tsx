@@ -23,6 +23,7 @@ import styles from "./styles/ServiceLimits.module.scss";
 type LimitSectionProps = {
   title: string;
   description: React.ReactNode;
+  enabledHint?: React.ReactNode;
   limit: TServiceLimit | null;
   usage: TServiceLimitUsage | null;
   isSaving: boolean;
@@ -34,6 +35,7 @@ type LimitSectionProps = {
 const LimitSection = ({
   title,
   description,
+  enabledHint,
   limit,
   usage,
   isSaving,
@@ -127,6 +129,10 @@ const LimitSection = ({
 
         {isFormVisible ? (
           <>
+            {enabledHint ? (
+              <Text className={styles.sectionDescription}>{enabledHint}</Text>
+            ) : null}
+
             <div className={styles.controls}>
               <LimitPeriodComboBox
                 value={period}

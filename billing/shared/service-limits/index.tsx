@@ -69,7 +69,10 @@ const ServiceLimits = ({
   return (
     <div className={styles.container} data-testid="service_limits">
       <Text className={styles.description}>
-        {t("ServiceLimitsDescription")}
+        <CommonTrans
+          i18nKey="ServiceLimitsDescription"
+          components={{ 1: <Text as="span" fontWeight={600} /> }}
+        />
         {helpUrl ? (
           <Link
             className={styles.helpLink}
@@ -98,9 +101,10 @@ const ServiceLimits = ({
 
       <LimitSection
         title={t("PerUserLimit")}
-        description={
+        description={t("PerUserLimitDescription")}
+        enabledHint={
           <CommonTrans
-            i18nKey="PerUserLimitDescription"
+            i18nKey="PerUserLimitContactsHint"
             components={{ 1: contactsLink }}
           />
         }

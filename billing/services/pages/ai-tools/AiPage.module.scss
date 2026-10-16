@@ -66,9 +66,19 @@
 }
 
 .pricingRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
   margin-top: 16px;
   line-height: 20px;
   color: var(--text-color);
+}
+
+.linkSeparator {
+  width: 1px;
+  height: 12px;
+  background: var(--payment-inactive-color);
 }
 
 .lowBalance {
