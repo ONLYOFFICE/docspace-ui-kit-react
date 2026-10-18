@@ -4,6 +4,8 @@ import EmptyScreenFilterFilesLight from "../../../assets/emptyFilter/empty.filte
 import EmptyScreenFilterFilesDark from "../../../assets/emptyFilter/empty.filter.files.dark.svg";
 import EmptyScreenRoomsLight from "../../../assets/emptyview/empty.rooms.root.user.light.svg";
 import EmptyScreenRoomsDark from "../../../assets/emptyview/empty.rooms.root.user.dark.svg";
+import EmptyScreenRoomsAgentLight from "../../../assets/emptyview/empty.agents.info.light.svg";
+import EmptyScreenRoomsAgentDark from "../../../assets/emptyview/empty.agents.info.dark.svg";
 
 import { useCommonTranslation } from "../../../utils/i18n";
 import {
@@ -212,6 +214,32 @@ const useSelectorBody = ({
     return t("EmptyRoomsHeader");
   }, [isKnowledgeFolder, isEmptyFilesRootScreen, isEmptyAgentsRootScreen, t]);
 
+  const emptyScreenImage = useMemo(() => {
+    if (isEmptyAgentsRootScreen)
+      return isBase ? (
+        <EmptyScreenRoomsAgentLight />
+      ) : (
+        <EmptyScreenRoomsAgentDark />
+      );
+
+    return isBase ? <EmptyScreenRoomsLight /> : <EmptyScreenRoomsDark />;
+  }, [isBase, isEmptyAgentsRootScreen]);
+
+  const searchEmptyScreenImage = useMemo(() => {
+    if (isEmptyAgentsRootScreen)
+      return isBase ? (
+        <EmptyScreenRoomsAgentLight />
+      ) : (
+        <EmptyScreenRoomsAgentDark />
+      );
+
+    return isBase ? (
+      <EmptyScreenFilterFilesLight />
+    ) : (
+      <EmptyScreenFilterFilesDark />
+    );
+  }, [isBase, isEmptyAgentsRootScreen]);
+
   const emptyScreenDescription = isEmptyFilesRootScreen
     ? ""
     : isEmptyAgentsRootScreen
@@ -235,18 +263,10 @@ const useSelectorBody = ({
       maxSelectedItems={maxSelectedItems}
       items={items}
       onSelect={onSelect}
-      emptyScreenImage={
-        isBase ? <EmptyScreenRoomsLight /> : <EmptyScreenRoomsDark />
-      }
+      emptyScreenImage={emptyScreenImage}
       emptyScreenHeader={emptyScreenHeader}
       emptyScreenDescription={emptyScreenDescription}
-      searchEmptyScreenImage={
-        isBase ? (
-          <EmptyScreenFilterFilesLight />
-        ) : (
-          <EmptyScreenFilterFilesDark />
-        )
-      }
+      searchEmptyScreenImage={searchEmptyScreenImage}
       searchEmptyScreenHeader={t("NotFoundTitle")}
       searchEmptyScreenDescription={t("EmptyFilterDescriptionText")}
       isLoading={showBodyLoader}
