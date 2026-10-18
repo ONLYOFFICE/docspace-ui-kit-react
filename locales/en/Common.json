@@ -231,7 +231,6 @@
   "EmptyFilterDescriptionText": "No files or folders match this filter. Try a different one or clear filter to view all files.",
   "EmptyHeader": "No other accounts here yet",
   "EmptyRoomsDescriptionText": "Please create the first room in {{sectionName}}.",
-  "EmptyRoomsDescriptionTextAgent": "Please create the first agent in {{sectionName}}.",
   "EmptyRoomsHeader": "No rooms here yet",
   "EmptyRoomsHeaderAgent": "No agents here yet",
   "Enable": "Enable",

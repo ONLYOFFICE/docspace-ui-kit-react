@@ -209,7 +209,8 @@ const useSelectorBody = ({
 
     if (isEmptyFilesRootScreen) return t("SelectorEmptyScreenHeader");
 
-    if (isEmptyAgentsRootScreen) return t("EmptyRoomsHeaderAgent");
+    if (isEmptyAgentsRootScreen)
+      return t("NoAIAgents", { aiAgents: t("AIAgents") });
 
     return t("EmptyRoomsHeader");
   }, [isKnowledgeFolder, isEmptyFilesRootScreen, isEmptyAgentsRootScreen, t]);
@@ -240,15 +241,28 @@ const useSelectorBody = ({
     );
   }, [isBase, isEmptyAgentsRootScreen]);
 
-  const emptyScreenDescription = isEmptyFilesRootScreen
-    ? ""
-    : isEmptyAgentsRootScreen
-      ? t("EmptyRoomsDescriptionTextAgent", {
-          sectionName: t("AIAgents"),
-        })
-      : t("EmptyRoomsDescriptionText", {
-          sectionName: t("Rooms"),
-        });
+  const searchEmptyScreenHeader = useMemo(() => {
+    if (isEmptyAgentsRootScreen)
+      return t("NoAIAgentsSearch", { aiAgents: t("AIAgents") });
+
+    return t("NotFoundTitle");
+  }, [isEmptyAgentsRootScreen, t]);
+
+  const NoAIAgentsSearchDescription = useMemo(() => {
+    if (isEmptyAgentsRootScreen) return t("NoAIAgentsSearchDescription");
+
+    return t("NotFoundDescription");
+  }, [isEmptyAgentsRootScreen, t]);
+
+  const emptyScreenDescription = useMemo(() => {
+    if (isEmptyFilesRootScreen) return "";
+
+    if (isEmptyAgentsRootScreen) return t("NoAIAgentsDescription");
+
+    return t("EmptyRoomsDescriptionText", {
+      sectionName: t("Rooms"),
+    });
+  }, [isEmptyFilesRootScreen, isEmptyAgentsRootScreen, t]);
 
   const SelectorBody = (
     <Selector
@@ -267,8 +281,8 @@ const useSelectorBody = ({
       emptyScreenHeader={emptyScreenHeader}
       emptyScreenDescription={emptyScreenDescription}
       searchEmptyScreenImage={searchEmptyScreenImage}
-      searchEmptyScreenHeader={t("NotFoundTitle")}
-      searchEmptyScreenDescription={t("EmptyFilterDescriptionText")}
+      searchEmptyScreenHeader={searchEmptyScreenHeader}
+      searchEmptyScreenDescription={NoAIAgentsSearchDescription}
       isLoading={showBodyLoader}
       isContentLoading={isContentLoading}
       rowLoader={
