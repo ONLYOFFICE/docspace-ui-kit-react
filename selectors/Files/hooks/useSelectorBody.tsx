@@ -248,7 +248,7 @@ const useSelectorBody = ({
     return t("NotFoundTitle");
   }, [isEmptyAgentsRootScreen, t]);
 
-  const NoAIAgentsSearchDescription = useMemo(() => {
+  const searchEmptyScreenDescription = useMemo(() => {
     if (isEmptyAgentsRootScreen) return t("NoAIAgentsSearchDescription");
 
     return t("NotFoundDescription");
@@ -282,7 +282,7 @@ const useSelectorBody = ({
       emptyScreenDescription={emptyScreenDescription}
       searchEmptyScreenImage={searchEmptyScreenImage}
       searchEmptyScreenHeader={searchEmptyScreenHeader}
-      searchEmptyScreenDescription={NoAIAgentsSearchDescription}
+      searchEmptyScreenDescription={searchEmptyScreenDescription}
       isLoading={showBodyLoader}
       isContentLoading={isContentLoading}
       rowLoader={
