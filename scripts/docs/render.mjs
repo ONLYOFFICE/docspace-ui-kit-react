@@ -377,13 +377,15 @@ export const renderReadme = (raw, context) => {
   text = rewriteLinks(text, linkResolver(context));
   text = escapeForMdx(text);
   text = reshapePropsTables(text);
-  text = afterH1(text, portalNote(context));
   text = afterIntro(
     text,
     storybookLine(page.title ? `${storyId(page.title)}--docs` : null),
   );
   // Inserted after the link, so it lands first: right under the intro.
   text = afterIntro(text, pictureOf(pictures, "primary", page.label));
+  // Last, so that the intro the two lines above looked for is the README's
+  // first paragraph and not the warning's opening line.
+  text = afterH1(text, portalNote(context));
   const stories = storiesSection(page, pictures);
   if (stories) {
     const at = text.indexOf(REFERENCE_FROM);
