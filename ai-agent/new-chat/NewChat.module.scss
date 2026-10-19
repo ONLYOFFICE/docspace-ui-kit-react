@@ -1,5 +1,5 @@
 @use "../../styles/variables/colors";
-@use "../../styles/variables/devices";
+@use "../../styles/mixins";
 
 :global(.aui-root) {
   --chat-scroll-to-bottom-gap: 24px;
@@ -205,7 +205,7 @@
     box-sizing: border-box;
   }
 
-  @container chat-panel (width <= #{devices.$mobile}) {
+  @include mixins.mobileContainer(chat-panel) {
     :global(.chat-no-access-screen) svg {
       width: 150px;
       height: 105px;
