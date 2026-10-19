@@ -66,6 +66,23 @@ const config: StorybookConfig = {
       })();
     </script>`,
 
+  previewHead: (head) => `${head}
+    <script>
+      window.addEventListener("vite:preloadError", function (event) {
+        var key = "sb-preload-error-reload";
+        var now = Date.now();
+        try {
+          var last = Number(sessionStorage.getItem(key)) || 0;
+          if (now - last < 10000) return;
+          sessionStorage.setItem(key, String(now));
+        } catch (error) {
+          return;
+        }
+        event.preventDefault();
+        window.location.reload();
+      });
+    </script>`,
+
   addons: [
     "@storybook/addon-links",
     "@vueless/storybook-dark-mode",
