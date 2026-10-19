@@ -167,7 +167,6 @@ export const DualRing: Story = {
   args: {
     type: LoaderTypes.dualRing,
     size: "40px",
-    color: "#333333",
     label: "Loading...",
   },
   parameters: {
@@ -176,7 +175,7 @@ export const DualRing: Story = {
         story: "Dual ring animation with two concentric spinning rings.",
       },
       source: {
-        code: `<Loader type={LoaderTypes.dualRing} size="40px" color="#333333" />`,
+        code: `<Loader type={LoaderTypes.dualRing} size="40px" />`,
       },
     },
   },
