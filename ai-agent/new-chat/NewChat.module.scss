@@ -1,4 +1,5 @@
 @use "../../styles/variables/colors";
+@use "../../styles/variables/devices";
 
 :global(.aui-root) {
   --chat-scroll-to-bottom-gap: 24px;
@@ -15,6 +16,9 @@
 }
 
 .chatPanel {
+  container-name: chat-panel;
+  container-type: inline-size;
+
   :global(.aui-root) {
     --aui-font-base: 15px;
   }
@@ -199,6 +203,13 @@
   :global(.chat-no-access-screen) {
     padding-inline: 16px;
     box-sizing: border-box;
+  }
+
+  @container chat-panel (width <= #{devices.$mobile}) {
+    :global(.chat-no-access-screen) svg {
+      width: 150px;
+      height: 105px;
+    }
   }
 
   // Suggestion chips → 2-column cards (per the mockup). The library renders
