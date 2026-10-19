@@ -2,4 +2,8 @@
 
 .catalogFolderIcon {
   @include mixins.common-icons-style;
+
+  path {
+    fill: var(--text-color);
+  }
 }

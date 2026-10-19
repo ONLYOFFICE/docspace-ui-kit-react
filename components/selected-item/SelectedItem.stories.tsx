@@ -3,7 +3,7 @@ import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
 
-import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
+import CatalogFolderIcon from "../../.storybook/utils/ThemedFolderIcon";
 import { RootTooltip } from "../tooltip";
 import { SelectedItem } from ".";
 import styles from "./SelectedItem.stories.module.scss";
