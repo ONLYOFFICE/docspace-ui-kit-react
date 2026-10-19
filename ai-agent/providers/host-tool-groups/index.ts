@@ -202,7 +202,8 @@ const callEditorTool = async (
       resolve(value);
     };
     const onMessage = (event: MessageEvent) => {
-      if (event.source !== target) return;
+      if (event.source !== target || event.origin !== window.location.origin)
+        return;
       const payload = event.data;
       if (
         !payload ||
@@ -403,6 +404,7 @@ export const openEditorPanel = (fileId: number | string): void => {
   // Set up message listeners for editor ready + dynamic tool registration.
   let listenerActive = true;
   const onMessage = (event: MessageEvent) => {
+    if (event.origin !== window.location.origin) return;
     const sourceWindow = event.source as Window | null;
     if (sourceWindow) {
       try {
@@ -532,7 +534,11 @@ export const openGeneratedFileWithToolCall = (
   };
 
   const onReady = (event: MessageEvent) => {
-    if (event.source !== editorWindow) return;
+    if (
+      event.source !== editorWindow ||
+      event.origin !== window.location.origin
+    )
+      return;
     const data = event.data;
     if (
       !data ||

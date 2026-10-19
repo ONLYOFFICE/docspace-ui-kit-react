@@ -265,8 +265,8 @@ export const ViewMode: Story = {
 export const WithCustomEvent: Story = {
   render: (args: StoryArgs) => {
     const onDocumentReady = () => {
-      const documentEditor = window.DocEditor.instances[args.id];
-      documentEditor.showMessage("Welcome to ONLYOFFICE Editor!");
+      const documentEditor = window.DocEditor?.instances[args.id];
+      documentEditor?.showMessage("Welcome to ONLYOFFICE Editor!");
     };
 
     return (
@@ -295,8 +295,7 @@ export const FillSpreadsheetWithData: Story = {
     };
 
     const fillSpreadsheetData = () => {
-      // @ts-ignore - DocEditor is provided by ONLYOFFICE at runtime
-      const documentEditor = window.DocEditor?.instances?.[args.id];
+      const documentEditor = window.DocEditor?.instances[args.id];
       const currentDataSet = dataSets.find(
         (ds) => ds.key === selectedDataSet.key,
       );
