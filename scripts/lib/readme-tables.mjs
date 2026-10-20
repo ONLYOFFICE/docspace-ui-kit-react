@@ -123,7 +123,7 @@ export const propsMarkdown = (resolved) => {
   for (const [folder, props] of inheritedGroups) {
     const from = props[0].declaredIn ?? path.posix.basename(folder);
     lines.push(
-      `#### Inherited from \`${from}\``,
+      `### Inherited from \`${from}\``,
       "",
       `Declared by [\`${folder}\`](../../${folder}/README.md) and accepted here too.`,
       "",
@@ -134,7 +134,7 @@ export const propsMarkdown = (resolved) => {
 
   if (resolved.wrapperProps.length > 0) {
     lines.push(
-      "#### Added by the wrapper the folder exports",
+      "### Added by the wrapper the folder exports",
       "",
       "The `index` module exports a wrapped component, so these are accepted on top of the props above.",
       "",
@@ -145,7 +145,7 @@ export const propsMarkdown = (resolved) => {
 
   if (portal.length > 0) {
     lines.push(
-      "#### Portal-only props",
+      "### Portal-only props",
       "",
       "These need ONLYOFFICE Apps portal context and do nothing in a standalone app.",
       "",

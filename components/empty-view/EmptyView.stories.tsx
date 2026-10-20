@@ -5,7 +5,7 @@ import { expect, fn, screen, waitFor } from "storybook/test";
 
 import EmptyRoomsLightSvg from "../../assets/emptyview/empty.rooms.root.light.svg";
 import CrossSvg from "../../assets/icons/12/cross.react.svg";
-import FolderSvg from "../../assets/icons/16/catalog.folder.react.svg";
+import FolderSvg from "../../.storybook/utils/ThemedFolderIcon";
 import { Text } from "../text";
 import { EmptyView } from ".";
 import type { EmptyViewProps } from "./EmptyView.types";

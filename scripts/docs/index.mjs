@@ -32,6 +32,7 @@ import {
   renderReadme,
   summaryOf,
 } from "./render.mjs";
+import { skippedHeadings } from "./markdown.mjs";
 import { pictureFiles, pictureNames, shotsOf } from "./pictures.mjs";
 import { renderSidebar } from "./sidebar.mjs";
 
@@ -74,6 +75,14 @@ for (const category of everyCategory) {
     summaries.set(page.source, summaryOf(page, read(page.source)));
   }
 }
+
+/** A rendered page, with a [warn] for every heading that skips a level. */
+const checked = (source, text) => {
+  for (const { after, heading } of skippedHeadings(text)) {
+    warn(`${source}: "${heading}" skips a level after "${after}"`);
+  }
+  return text;
+};
 
 /** @type {Map<string, string>} output path -> content */
 const files = new Map();
@@ -124,19 +133,23 @@ const RENDER = {
 
 for (const category of everyCategory) {
   const index = `${category.slug}/index.md`;
+  const indexSource = category.readme?.source ?? "scripts/docs/sections.mjs";
   files.set(
     index,
-    renderCategory(category, {
-      root: ROOT,
-      source: category.readme?.source ?? "scripts/docs/sections.mjs",
-      out: index,
-      readmeText: category.readme ? read(category.readme.source) : "",
-      pages,
-      revision: rev,
-      storyId,
-      summaries,
-      warn,
-    }),
+    checked(
+      indexSource,
+      renderCategory(category, {
+        root: ROOT,
+        source: indexSource,
+        out: index,
+        readmeText: category.readme ? read(category.readme.source) : "",
+        pages,
+        revision: rev,
+        storyId,
+        summaries,
+        warn,
+      }),
+    ),
   );
 
   for (const page of category.pages) {
@@ -144,18 +157,21 @@ for (const category of everyCategory) {
     const assets = new Map();
     files.set(
       out,
-      RENDER[page.kind](read(page.source), {
-        root: ROOT,
-        source: page.source,
-        out,
-        page,
-        pages,
-        pictures: picturesOf(category, page),
-        assets,
-        revision: rev,
-        storyId,
-        warn,
-      }),
+      checked(
+        page.source,
+        RENDER[page.kind](read(page.source), {
+          root: ROOT,
+          source: page.source,
+          out,
+          page,
+          pages,
+          pictures: picturesOf(category, page),
+          assets,
+          revision: rev,
+          storyId,
+          warn,
+        }),
+      ),
     );
     for (const [name, from] of assets) {
       copies.set(`${category.slug}/${name}`, path.join(ROOT, from));

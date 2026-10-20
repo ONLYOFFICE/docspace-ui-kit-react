@@ -317,7 +317,7 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
           contextTitle={item.title}
           contextOptions={contextOptions(item)}
         >
-          <RowContent>
+          <RowContent sideColor="var(--section-story-muted)">
             <Link
               type={LinkType.action}
               isTextOverflow

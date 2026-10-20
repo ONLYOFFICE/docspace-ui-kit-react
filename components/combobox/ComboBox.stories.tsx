@@ -694,6 +694,7 @@ const WithIconsTemplate = () => {
         directionY="bottom"
         fixedDirection
         isDefaultMode={false}
+        fillIcon
       />
     </Wrapper>
   );
@@ -742,6 +743,7 @@ export const WithIcons: Story = {
     { key: 3, label: "Download", icon: DownloadIcon },
   ]}
   selectedOption={{ key: 0, label: "Select Type" }}
+  fillIcon
 />`,
       },
     },
@@ -783,6 +785,7 @@ const WithOptionDescriptionsTemplate = () => {
         displaySelectedOption
         modernView
         scaled={false}
+        fillIcon
       />
     </Wrapper>
   );
@@ -817,6 +820,7 @@ export const WithOptionDescriptions: Story = {
   displaySelectedOption
   modernView
   scaled={false}
+  fillIcon
 />`,
       },
     },
@@ -1066,6 +1070,7 @@ export const RightToLeft: Story = {
         scaled={false}
         isDefaultMode={false}
         fixedDirection
+        fillIcon
       />
     </div>
   ),
@@ -1103,6 +1108,7 @@ export const RightToLeft: Story = {
     selectedOption={selected}
     onSelect={setSelected}
     scaled={false}
+    fillIcon
   />
 </div>`,
       },

@@ -203,6 +203,27 @@ export const headings = (text) =>
     .filter(Boolean)
     .map((match) => ({ depth: match[1].length, text: match[2] }));
 
+/**
+ * Every heading that is more than one level below the heading before it --
+ * an H3 straight under the H1 -- as `{ after, heading }` lines. The site's
+ * outline and its "on this page" list are built from the levels, so a
+ * skipped one is a hole in both.
+ */
+export const skippedHeadings = (text) => {
+  const found = [];
+  let previous;
+  for (const heading of headings(text)) {
+    if (previous && heading.depth > previous.depth + 1) {
+      found.push({
+        after: `${"#".repeat(previous.depth)} ${previous.text}`,
+        heading: `${"#".repeat(heading.depth)} ${heading.text}`,
+      });
+    }
+    previous = heading;
+  }
+  return found;
+};
+
 /** The first paragraph after the H1, as one line of text. */
 export const firstParagraph = (text) => {
   const lines = splitLines(text);
