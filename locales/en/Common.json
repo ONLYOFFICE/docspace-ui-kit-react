@@ -219,7 +219,7 @@
   "EmptyAIAgentsNotActiveYetDescription": "Activate AI features to create agents with their own knowledge base, share them with your team, and let them run tasks across your apps.",
   "EmptyAIAgentsNotActiveYetDescriptionLine2": "AI usage is billed from your wallet balance",
   "EmptyAIAgentsNotActiveYetTitle": "AI features aren’t active yet",
-  "EmptyAIAgentsSelectorDescription": "Create a new agent to move files to its knowledge base.",
+  "EmptyAIAgentsSelectorDescription": "Create a new agent to add files to its knowledge base.",
   "EmptyAIChatNotActiveYetAdminDescription": "Activate {{aiChat}} to start conversations in this section.",
   "EmptyAIChatNotActiveYetTitle": "{{aiChat}} isn’t active yet",
   "EmptyAIChatNotActiveYetUserDescription": "Contact your Full admin to activate {{aiChat}} for this workspace.",
