@@ -1,11 +1,4 @@
-import { use, useMemo } from "react";
-
-import EmptyScreenFilterFilesLight from "../../../assets/emptyFilter/empty.filter.files.light.svg";
-import EmptyScreenFilterFilesDark from "../../../assets/emptyFilter/empty.filter.files.dark.svg";
-import EmptyScreenRoomsLight from "../../../assets/emptyview/empty.rooms.root.user.light.svg";
-import EmptyScreenRoomsDark from "../../../assets/emptyview/empty.rooms.root.user.dark.svg";
-import EmptyScreenRoomsAgentLight from "../../../assets/emptyview/empty.agents.info.light.svg";
-import EmptyScreenRoomsAgentDark from "../../../assets/emptyview/empty.agents.info.dark.svg";
+import { use } from "react";
 
 import { useCommonTranslation } from "../../../utils/i18n";
 import {
@@ -22,13 +15,10 @@ import {
   type TSelectorSearch,
   type TSelectorSubmitButton,
 } from "../../../components/selector";
-import {
-  FolderType,
-  type FolderDtoInteger,
-} from "@onlyoffice/docspace-api-sdk";
-import { useTheme } from "../../../context/ThemeContext";
+import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
 
 import type { FilesSelectorProps } from "../FilesSelector.types";
+import useEmptyScreenProps from "./useEmptyScreenProps";
 import { LoadersContext } from "../../utils/contexts/Loaders";
 import { SettingsContext } from "../../utils/contexts/Settings";
 
@@ -121,7 +111,6 @@ const useSelectorBody = ({
   PickedSelectorBodyProps &
   SelectedTreeNodeProps) => {
   const t = useCommonTranslation();
-  const { isBase } = useTheme();
 
   const {
     showBreadCrumbsLoader,
@@ -198,71 +187,14 @@ const useSelectorBody = ({
       }
     : {};
 
-  const isKnowledgeFolder = selectedTreeNode?.type === FolderType.Knowledge;
-  const isEmptyFilesRootScreen = selectedItemType === "files";
-  const isEmptyAgentsRootScreen = selectedItemType === "agents";
-
-  const emptyScreenHeader = useMemo(() => {
-    if (isKnowledgeFolder) {
-      return t("SelectorEmptyScreenHeaderKnowledge");
-    }
-
-    if (isEmptyFilesRootScreen) return t("SelectorEmptyScreenHeader");
-
-    if (isEmptyAgentsRootScreen)
-      return t("NoAIAgents", { aiAgents: t("AIAgents") });
-
-    return t("EmptyRoomsHeader");
-  }, [isKnowledgeFolder, isEmptyFilesRootScreen, isEmptyAgentsRootScreen, t]);
-
-  const emptyScreenImage = useMemo(() => {
-    if (isEmptyAgentsRootScreen)
-      return isBase ? (
-        <EmptyScreenRoomsAgentLight />
-      ) : (
-        <EmptyScreenRoomsAgentDark />
-      );
-
-    return isBase ? <EmptyScreenRoomsLight /> : <EmptyScreenRoomsDark />;
-  }, [isBase, isEmptyAgentsRootScreen]);
-
-  const searchEmptyScreenImage = useMemo(() => {
-    if (isEmptyAgentsRootScreen)
-      return isBase ? (
-        <EmptyScreenRoomsAgentLight />
-      ) : (
-        <EmptyScreenRoomsAgentDark />
-      );
-
-    return isBase ? (
-      <EmptyScreenFilterFilesLight />
-    ) : (
-      <EmptyScreenFilterFilesDark />
-    );
-  }, [isBase, isEmptyAgentsRootScreen]);
-
-  const searchEmptyScreenHeader = useMemo(() => {
-    if (isEmptyAgentsRootScreen)
-      return t("NoAIAgentsSearch", { aiAgents: t("AIAgents") });
-
-    return t("NotFoundTitle");
-  }, [isEmptyAgentsRootScreen, t]);
-
-  const searchEmptyScreenDescription = useMemo(() => {
-    if (isEmptyAgentsRootScreen) return t("NoAIAgentsSearchDescription");
-
-    return t("EmptyFilterDescriptionText");
-  }, [isEmptyAgentsRootScreen, t]);
-
-  const emptyScreenDescription = useMemo(() => {
-    if (isEmptyFilesRootScreen) return "";
-
-    if (isEmptyAgentsRootScreen) return t("EmptyAIAgentsSelectorDescription");
-
-    return t("EmptyRoomsDescriptionText", {
-      sectionName: t("Rooms"),
-    });
-  }, [isEmptyFilesRootScreen, isEmptyAgentsRootScreen, t]);
+  const {
+    emptyScreenImage,
+    emptyScreenHeader,
+    emptyScreenDescription,
+    searchEmptyScreenImage,
+    searchEmptyScreenHeader,
+    searchEmptyScreenDescription,
+  } = useEmptyScreenProps({ selectedItemType, selectedTreeNode });
 
   const SelectorBody = (
     <Selector
