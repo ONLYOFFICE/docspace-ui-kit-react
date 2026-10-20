@@ -14,23 +14,17 @@ import ServiceLimitsLoader from "./sub-components/ServiceLimitsLoader";
 import styles from "./styles/ServiceLimits.module.scss";
 
 type ServiceLimitsProps = {
-  serviceName: string;
   helpUrl?: string;
   onOpenContacts?: () => void;
 };
 
-const ServiceLimits = ({
-  serviceName,
-  helpUrl,
-  onOpenContacts,
-}: ServiceLimitsProps) => {
+const ServiceLimits = ({ helpUrl, onOpenContacts }: ServiceLimitsProps) => {
   const t = useCommonTranslation();
   const limitStore = useServiceLimitStore();
   const paymentStore = usePaymentStore();
   const {
     isInit,
     portalLimit,
-    portalUsage,
     isPortalSaving,
     savePortalLimit,
     setPortalLimitEnabled,
@@ -45,14 +39,14 @@ const ServiceLimits = ({
     const loadLimits = async () => {
       try {
         if (!walletCodeCurrency) await paymentStore.fetchBalance();
-        await limitStore.fetchAll(serviceName);
+        await limitStore.fetchAll();
       } catch (error) {
         toastr.error(error as Error);
       }
     };
 
     loadLimits();
-  }, [limitStore, serviceName]);
+  }, [limitStore]);
 
   if (!isInit) return <ServiceLimitsLoader />;
 
@@ -92,7 +86,7 @@ const ServiceLimits = ({
         title={t("PortalLimit")}
         description={t("PortalLimitDescription")}
         limit={portalLimit}
-        usage={portalUsage}
+        usage={portalLimit?.usage ?? null}
         isSaving={isPortalSaving}
         onSave={savePortalLimit}
         onSetEnabled={setPortalLimitEnabled}

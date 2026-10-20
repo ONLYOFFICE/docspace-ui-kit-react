@@ -4,68 +4,73 @@ import type {
   TCreateServiceLimitRequest,
   TServiceLimit,
   TServiceLimitPeriod,
+  TServiceLimitScope,
   TServiceLimitUsage,
   TUpdateServiceLimitRequest,
 } from "./types";
 
 const BASE_PATH = "api/2.0/portal/payment/servicelimit";
 
-const PERIOD_BY_CODE: TServiceLimitPeriod[] = [
-  "None",
-  "Hour",
-  "Day",
-  "Week",
-  "Month",
-  "Year",
-  "ThreeYears",
-];
+const PERIODS: TServiceLimitPeriod[] = ["Day", "Week", "Month", "Lifetime"];
 
-export const periodToCode = (period: TServiceLimitPeriod): number =>
-  Math.max(0, PERIOD_BY_CODE.indexOf(period));
+const SCOPES: TServiceLimitScope[] = ["Total", "Global", "Custom"];
 
-const normalizePeriod = (value: unknown): TServiceLimitPeriod => {
-  if (typeof value === "number") return PERIOD_BY_CODE[value] ?? "None";
+const normalizeEnum = <T extends string>(
+  values: T[],
+  value: unknown,
+  fallback: T,
+): T => {
+  if (typeof value === "number") return values[value - 1] ?? fallback;
   if (typeof value === "string") {
-    const found = PERIOD_BY_CODE.find(
-      (period) => period.toLowerCase() === value.toLowerCase(),
+    const found = values.find(
+      (item) => item.toLowerCase() === value.toLowerCase(),
     );
     if (found) return found;
     const code = Number(value);
-    if (!Number.isNaN(code)) return PERIOD_BY_CODE[code] ?? "None";
+    if (!Number.isNaN(code)) return values[code - 1] ?? fallback;
   }
-  return "None";
+  return fallback;
 };
+
+const normalizePeriod = (value: unknown): TServiceLimitPeriod =>
+  normalizeEnum(PERIODS, value, "Day");
+
+const normalizeScope = (value: unknown): TServiceLimitScope =>
+  normalizeEnum(SCOPES, value, "Total");
 
 const toNullableNumber = (value: unknown): number | null =>
   value === null || value === undefined || value === "" ? null : Number(value);
 
+const toNullableString = (value: unknown): string | null =>
+  value === null || value === undefined || value === "" ? null : String(value);
+
+const normalizeUsage = (raw: Record<string, unknown>): TServiceLimitUsage => ({
+  periodStart: String(raw.periodStart ?? ""),
+  periodEnd: toNullableString(raw.periodEnd),
+  amountConsumed: Number(raw.amountConsumed ?? 0),
+  amountAvailable: toNullableNumber(raw.amountAvailable),
+  quantityConsumed: Number(raw.quantityConsumed ?? 0),
+  quantityAvailable: toNullableNumber(raw.quantityAvailable),
+});
+
 const normalizeLimit = (raw: Record<string, unknown>): TServiceLimit => ({
   id: Number(raw.id),
-  serviceName: String(raw.serviceName ?? ""),
-  participant: raw.participant ? String(raw.participant) : null,
+  serviceGroupName: String(raw.serviceGroupName ?? ""),
+  scope: normalizeScope(raw.scope),
+  participant: toNullableString(raw.participant),
   amountValue: toNullableNumber(raw.amountValue),
-  currency: raw.currency ? String(raw.currency) : null,
+  currency: toNullableString(raw.currency),
   quantityValue: toNullableNumber(raw.quantityValue),
-  serviceUnit: raw.serviceUnit ? String(raw.serviceUnit) : null,
+  serviceUnit: toNullableString(raw.serviceUnit),
   period: normalizePeriod(raw.period),
+  usageFrom: toNullableString(raw.usageFrom),
   enabled: Boolean(raw.enabled),
   created: String(raw.created ?? ""),
   modified: String(raw.modified ?? ""),
-});
-
-const normalizeUsage = (raw: Record<string, unknown>): TServiceLimitUsage => ({
-  serviceLimitId: Number(raw.serviceLimitId),
-  period: normalizePeriod(raw.period),
-  periodStart: String(raw.periodStart ?? ""),
-  periodEnd: String(raw.periodEnd ?? ""),
-  amountValue: toNullableNumber(raw.amountValue),
-  amountConsumed: Number(raw.amountConsumed ?? 0),
-  amountAvailable: toNullableNumber(raw.amountAvailable),
-  currency: raw.currency ? String(raw.currency) : null,
-  quantityValue: toNullableNumber(raw.quantityValue),
-  quantityConsumed: Number(raw.quantityConsumed ?? 0),
-  quantityAvailable: toNullableNumber(raw.quantityAvailable),
-  serviceUnit: raw.serviceUnit ? String(raw.serviceUnit) : null,
+  usage:
+    raw.usage && typeof raw.usage === "object"
+      ? normalizeUsage(raw.usage as Record<string, unknown>)
+      : null,
 });
 
 const isNotFound = (error: unknown): boolean =>
@@ -80,14 +85,12 @@ const unwrap = <T>(data: unknown): T | null => {
   return response;
 };
 
-export const getCustomerServiceLimit = async (
+const getLimit = async (
   api: AxiosInstance,
-  serviceName: string,
+  path: string,
 ): Promise<TServiceLimit | null> => {
   try {
-    const { data } = await api.get(
-      `${BASE_PATH}/customer/${encodeURIComponent(serviceName)}`,
-    );
+    const { data } = await api.get(path);
     const raw = unwrap<Record<string, unknown>>(data);
     return raw ? normalizeLimit(raw) : null;
   } catch (error) {
@@ -96,28 +99,28 @@ export const getCustomerServiceLimit = async (
   }
 };
 
-export const getServiceLimitUsage = async (
+export const getTotalServiceLimit = (
+  api: AxiosInstance,
+): Promise<TServiceLimit | null> => getLimit(api, `${BASE_PATH}/total`);
+
+export const getGlobalServiceLimit = (
+  api: AxiosInstance,
+): Promise<TServiceLimit | null> => getLimit(api, `${BASE_PATH}/global`);
+
+export const getServiceLimit = (
   api: AxiosInstance,
   id: number,
-): Promise<TServiceLimitUsage | null> => {
-  try {
-    const { data } = await api.get(`${BASE_PATH}/${id}/usage`);
-    const raw = unwrap<Record<string, unknown>>(data);
-    return raw ? normalizeUsage(raw) : null;
-  } catch (error) {
-    if (isNotFound(error)) return null;
-    throw error;
-  }
-};
+): Promise<TServiceLimit | null> => getLimit(api, `${BASE_PATH}/${id}`);
 
 export const createServiceLimit = async (
   api: AxiosInstance,
   request: TCreateServiceLimitRequest,
 ): Promise<TServiceLimit> => {
   const { data } = await api.post(BASE_PATH, {
-    serviceName: request.serviceName,
+    scope: request.scope,
+    ...(request.userId ? { userId: request.userId } : {}),
     amountValue: request.amountValue,
-    period: periodToCode(request.period),
+    period: request.period,
   });
   const raw = unwrap<Record<string, unknown>>(data);
   if (!raw) throw new Error("Service limit was not created");
@@ -130,11 +133,19 @@ export const updateServiceLimit = async (
 ): Promise<TServiceLimit> => {
   const { data } = await api.put(BASE_PATH, {
     id: request.id,
-    amountValue: request.amountValue,
-    enabled: request.enabled,
-    ...(request.period ? { period: periodToCode(request.period) } : {}),
+    ...(request.amountValue !== undefined
+      ? { amountValue: request.amountValue }
+      : {}),
+    ...(request.enabled !== undefined ? { enabled: request.enabled } : {}),
   });
   const raw = unwrap<Record<string, unknown>>(data);
   if (!raw) throw new Error("Service limit was not updated");
   return normalizeLimit(raw);
+};
+
+export const deleteServiceLimit = async (
+  api: AxiosInstance,
+  id: number,
+): Promise<void> => {
+  await api.delete(`${BASE_PATH}/${id}`);
 };

@@ -4,11 +4,10 @@ import { formatWithTimezone, getAppTimezone } from "../../../../utils/date";
 import type { TServiceLimitPeriod } from "./types";
 
 export const LIMIT_PERIODS: TServiceLimitPeriod[] = [
-  "Hour",
   "Day",
   "Week",
   "Month",
-  "Year",
+  "Lifetime",
 ];
 
 export const DEFAULT_LIMIT_PERIOD: TServiceLimitPeriod = "Day";
@@ -18,16 +17,12 @@ export const getPeriodLabel = (
   period: TServiceLimitPeriod,
 ): string => {
   switch (period) {
-    case "Hour":
-      return t("LimitPerHour");
     case "Week":
       return t("LimitPerWeek");
     case "Month":
       return t("LimitPerMonth");
-    case "Year":
-      return t("LimitPerYear");
-    case "ThreeYears":
-      return t("LimitPerThreeYears");
+    case "Lifetime":
+      return t("LimitLifetime");
     default:
       return t("LimitPerDay");
   }
@@ -95,6 +90,35 @@ export const isCurrencySymbolAfter = (
 
 const toZonedIso = (value: string): string =>
   /(Z|[+-]\d{2}:?\d{2})$/.test(value) ? value : `${value}Z`;
+
+export const getPeriodEnd = (
+  period: TServiceLimitPeriod,
+  now: Date = new Date(),
+): string | null => {
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth();
+  const day = now.getUTCDate();
+
+  let nextStart: number;
+
+  switch (period) {
+    case "Day":
+      nextStart = Date.UTC(year, month, day + 1);
+      break;
+    case "Week": {
+      const daysToMonday = 7 - ((now.getUTCDay() + 6) % 7);
+      nextStart = Date.UTC(year, month, day + daysToMonday);
+      break;
+    }
+    case "Month":
+      nextStart = Date.UTC(year, month + 1, 1);
+      break;
+    default:
+      return null;
+  }
+
+  return new Date(nextStart - 1000).toISOString();
+};
 
 export const formatPeriodEnd = (
   periodEnd: string | null | undefined,

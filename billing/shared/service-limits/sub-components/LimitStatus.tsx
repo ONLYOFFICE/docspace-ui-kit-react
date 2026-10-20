@@ -9,6 +9,7 @@ import type { TServiceLimit, TServiceLimitUsage } from "../common/types";
 import {
   formatPeriodEnd,
   getLimitUsagePercent,
+  getPeriodEnd,
   isLimitApproaching,
   isLimitReached,
 } from "../common/utils";
@@ -22,6 +23,17 @@ type LimitStatusProps = {
   testId: string;
 };
 
+const highlight = (className: string) => ({
+  1: <Text as="span" fontWeight={600} className={className} />,
+});
+
+/**
+ * Every translation key is written out as a literal: the locale sync finds
+ * keys by scanning for them, and a key built at runtime would be dropped.
+ * A lifetime limit never resets, so its usage has no period end and its
+ * texts have no date. A limit read without its spending, such as the one for
+ * every user, still says when it resets, since the periods are calendar-aligned.
+ */
 const LimitStatus = ({
   limit,
   usage,
@@ -31,38 +43,52 @@ const LimitStatus = ({
 }: LimitStatusProps) => {
   const { language, formatWalletCurrency } = usePaymentStore();
 
-  if (!usage) return null;
-
-  const spent = formatWalletCurrency(usage.amountConsumed, 2, currency);
-  const date = formatPeriodEnd(usage.periodEnd, language);
-
-  const renderStatus = ({
-    i18nKey,
-    values,
-    highlightClass = styles.statusWarning,
-  }: {
-    i18nKey: string;
-    values: Record<string, string | number>;
-    highlightClass?: string;
-  }) => (
+  const render = (content: React.ReactNode) => (
     <Text className={styles.status} dataTestId={testId}>
-      <CommonTrans
-        i18nKey={i18nKey}
-        values={values}
-        components={{
-          1: <Text as="span" fontWeight={600} className={highlightClass} />,
-        }}
-      />
+      {content}
     </Text>
   );
 
-  if (draftAmount !== null && draftAmount < usage.amountConsumed) {
-    const amount = formatWalletCurrency(draftAmount, 2, currency);
+  if (!usage) {
+    const periodEnd = limit?.enabled ? getPeriodEnd(limit.period) : null;
 
-    return renderStatus({
-      i18nKey: "LimitBelowSpent",
-      values: { spent, amount, date },
-    });
+    if (!periodEnd) return null;
+
+    return render(
+      <CommonTrans
+        i18nKey="LimitResets"
+        values={{ date: formatPeriodEnd(periodEnd, language) }}
+      />,
+    );
+  }
+
+  const spent = formatWalletCurrency(usage.amountConsumed, 2, currency);
+  const date = formatPeriodEnd(usage.periodEnd, language);
+  const hasReset = Boolean(usage.periodEnd);
+  const warning = highlight(styles.statusWarning);
+
+  if (draftAmount !== null && draftAmount < usage.amountConsumed) {
+    const values = {
+      spent,
+      amount: formatWalletCurrency(draftAmount, 2, currency),
+      date,
+    };
+
+    return render(
+      hasReset ? (
+        <CommonTrans
+          i18nKey="LimitBelowSpent"
+          values={values}
+          components={warning}
+        />
+      ) : (
+        <CommonTrans
+          i18nKey="LimitBelowSpentLifetime"
+          values={values}
+          components={warning}
+        />
+      ),
+    );
   }
 
   const limitValue = limit?.enabled ? limit.amountValue : null;
@@ -72,26 +98,59 @@ const LimitStatus = ({
   const limitText = formatWalletCurrency(limitValue, 2, currency);
 
   if (isLimitReached(usage.amountConsumed, limitValue)) {
-    return renderStatus({
-      i18nKey: "LimitReached",
-      values: { date },
-      highlightClass: styles.statusReached,
-    });
+    const reached = highlight(styles.statusReached);
+
+    return render(
+      hasReset ? (
+        <CommonTrans
+          i18nKey="LimitReached"
+          values={{ date }}
+          components={reached}
+        />
+      ) : (
+        <CommonTrans i18nKey="LimitReachedLifetime" components={reached} />
+      ),
+    );
   }
 
   if (isLimitApproaching(usage.amountConsumed, limitValue)) {
     const percent = getLimitUsagePercent(usage.amountConsumed, limitValue);
+    const values = { spent, limit: limitText, percent, date };
 
-    return renderStatus({
-      i18nKey: "LimitSpentOfPercent",
-      values: { spent, limit: limitText, percent, date },
-    });
+    return render(
+      hasReset ? (
+        <CommonTrans
+          i18nKey="LimitSpentOfPercent"
+          values={values}
+          components={warning}
+        />
+      ) : (
+        <CommonTrans
+          i18nKey="LimitSpentOfPercentLifetime"
+          values={values}
+          components={warning}
+        />
+      ),
+    );
   }
 
-  return renderStatus({
-    i18nKey: "LimitSpentOf",
-    values: { spent, limit: limitText, date },
-  });
+  const values = { spent, limit: limitText, date };
+
+  return render(
+    hasReset ? (
+      <CommonTrans
+        i18nKey="LimitSpentOf"
+        values={values}
+        components={warning}
+      />
+    ) : (
+      <CommonTrans
+        i18nKey="LimitSpentOfLifetime"
+        values={values}
+        components={warning}
+      />
+    ),
+  );
 };
 
 export default observer(LimitStatus);
