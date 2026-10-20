@@ -86,6 +86,7 @@ export const startDemoPortal = async (extra: AnyHandler[] = []) => {
       }),
     ],
     handlers: all,
+    context: { quiet: true },
     onUnhandledFrame: "bypass",
   });
 
