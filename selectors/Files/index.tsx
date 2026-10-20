@@ -212,7 +212,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     disabledItems,
     disabledFolderType,
     filterParam,
-    withCreate: withCreateState,
     disableBySecurity,
     isRoomDisabled,
     setItems,

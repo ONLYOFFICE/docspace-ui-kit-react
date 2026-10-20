@@ -138,7 +138,6 @@ const AIAgentSelectorComponent = ({
   );
 
   const { subscribe } = useSocketHelper({
-    withCreate: true,
     setTotal,
     setItems,
     disabledItems: [],

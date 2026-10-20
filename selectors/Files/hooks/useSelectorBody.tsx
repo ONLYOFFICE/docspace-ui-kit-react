@@ -194,7 +194,11 @@ const useSelectorBody = ({
     searchEmptyScreenImage,
     searchEmptyScreenHeader,
     searchEmptyScreenDescription,
-  } = useEmptyScreenProps({ selectedItemType, selectedTreeNode });
+  } = useEmptyScreenProps({
+    selectedItemType,
+    selectedTreeNode,
+    canCreateAgent: items.some((item) => item.isCreateNewItem),
+  });
 
   const SelectorBody = (
     <Selector

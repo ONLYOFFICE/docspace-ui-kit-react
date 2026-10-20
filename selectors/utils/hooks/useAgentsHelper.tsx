@@ -52,6 +52,12 @@ const useAgentsHelper = ({
     isFullLoadActive,
   } = use(LoadersContext);
 
+  // Read at click time, so a host passing a new function on every render does
+  // not refetch the list; only whether there is one decides the item.
+  const onCreateAIAgentRef = React.useRef(onCreateAIAgent);
+  onCreateAIAgentRef.current = onCreateAIAgent;
+  const withCreateAgent = Boolean(onCreateAIAgent);
+
   const requestRunning = React.useRef(false);
   const initRef = React.useRef(isInit);
   const firstLoadRef = React.useRef(isFullLoadActive);
@@ -155,13 +161,13 @@ const useAgentsHelper = ({
 
           // Counted with the special items: none of them is a server row, so
           // the next page's offset must leave all of them out.
-          if (startIndex === 0 && onCreateAIAgent && current.security?.Create) {
+          if (startIndex === 0 && withCreateAgent && current.security?.Create) {
             itemList.unshift({
               isCreateNewItem: true,
               label: t("NewAgent"),
               id: "create-agent-item",
               key: "create-agent-item",
-              onCreateClick: onCreateAIAgent,
+              onCreateClick: () => onCreateAIAgentRef.current?.(),
               onBackClick: () => {
                 setIsRoot?.(true);
                 setSelectedItemType?.(undefined);
@@ -239,7 +245,7 @@ const useAgentsHelper = ({
       withRecentTreeFolder,
       withFavoritesTreeFolder,
       finishFullLoad,
-      onCreateAIAgent,
+      withCreateAgent,
       setSelectedItemType,
       getRootData,
     ],

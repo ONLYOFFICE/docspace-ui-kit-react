@@ -41,7 +41,6 @@ const useSocketHelper = ({
   disabledItems,
   disabledFolderType,
   filterParam,
-  withCreate,
   setItems,
   setBreadCrumbs,
   setTotal,
@@ -179,25 +178,22 @@ const useSocketHelper = ({
             return newValue;
           }
 
-          // The folder typed into the input row takes that row's place.
-          const inputIdx = withCreate
-            ? value.findIndex((v) => v.isInputItem)
-            : -1;
+          // A new folder goes in above the listed ones, below the rows the
+          // list keeps on top: Recent and Favorites, their separator and the
+          // create item. It never takes an open input row's place -- that row
+          // may be another folder still being typed; the input's own
+          // reconcile drops the row once its folder is listed.
+          let idx = 0;
 
-          if (inputIdx > -1) {
-            newValue.splice(inputIdx, 1, item);
+          while (
+            idx < value.length &&
+            (value[idx].isCreateNewItem ||
+              value[idx].specialFolderScope ||
+              value[idx].isSeparator)
+          )
+            idx += 1;
 
-            return newValue;
-          }
-
-          // Created elsewhere -- by a create dialog, or by another user. It
-          // goes in below the create item, which the list keeps on top, and
-          // must not take the place of a folder already listed.
-          newValue.splice(
-            value.findIndex((v) => v.isCreateNewItem) + 1,
-            0,
-            item,
-          );
+          newValue.splice(idx, 0, item);
 
           return newValue;
         }
@@ -238,7 +234,6 @@ const useSocketHelper = ({
       getIcon,
       setItems,
       setTotal,
-      withCreate,
       disableBySecurity,
       isRoomDisabled,
     ],

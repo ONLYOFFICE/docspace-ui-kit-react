@@ -4,7 +4,7 @@ import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { TSelectorItem } from "../../../components/selector";
-import { convertRoomsToItems } from "..";
+import { buildSpecialFolderItems, convertRoomsToItems } from "..";
 import useSocketHelper from "./useSocketHelper";
 
 const mocks = vi.hoisted(() => {
@@ -65,24 +65,19 @@ const inputItem: TSelectorItem = {
 const listed = (id: number) => convertRoomsToItems([agent(id)])[0];
 
 // Runs the socket "create" of agent `id` against `items` and returns the ids
-// the list ends with.
-const create = async (
-  items: TSelectorItem[],
-  id: number,
-  withCreate: boolean,
-) => {
+// the list ends with, and the total it ends with from `total`.
+const create = async (items: TSelectorItem[], id: number, total = 0) => {
   let list = items;
+  let count = total;
   const setItems = vi.fn((update) => {
     list = typeof update === "function" ? update(list) : update;
   });
+  const setTotal = vi.fn((update) => {
+    count = typeof update === "function" ? update(count) : update;
+  });
 
   const { result } = renderHook(() =>
-    useSocketHelper({
-      setItems,
-      setTotal: vi.fn(),
-      disabledItems: [],
-      withCreate,
-    }),
+    useSocketHelper({ setItems, setTotal, disabledItems: [] }),
   );
 
   act(() => result.current.subscribe(AGENTS_ROOT));
@@ -94,8 +89,22 @@ const create = async (
       h({ cmd: "create", type: "folder", data: JSON.stringify(agent(id)) });
   });
 
-  return list.map((i) => i.id);
+  return { ids: list.map((i) => i.id), total: count };
 };
+
+const folderDto = (id: number): FolderDtoInteger => ({ id, title: `f${id}` });
+
+// Recent, Favorites and their separator, as the helpers build them.
+const specialRows = () =>
+  buildSpecialFolderItems({
+    section: "agents",
+    recentFolder: folderDto(100),
+    favoritesFolder: folderDto(101),
+    withRecent: true,
+    withFavorites: true,
+    withSeparator: true,
+    t: (key) => key,
+  });
 
 describe("useSocketHelper create", () => {
   beforeEach(() => {
@@ -103,35 +112,43 @@ describe("useSocketHelper create", () => {
     mocks.getRoomInfo.mockReset();
   });
 
-  it.each([true, false])(
-    "puts a dialog-created agent below the create item, keeping the rest (withCreate %s)",
-    async (withCreate) => {
-      expect(
-        await create([createItem, listed(1), listed(2)], 3, withCreate),
-      ).toEqual(["create-agent-item", 3, 1, 2]);
-    },
-  );
+  it("puts a dialog-created agent below the create item, keeping the rest", async () => {
+    expect(await create([createItem, listed(1), listed(2)], 3, 3)).toEqual({
+      ids: ["create-agent-item", 3, 1, 2],
+      total: 4,
+    });
+  });
 
   it("fills an empty list with the agent alone", async () => {
-    expect(await create([createItem], 3, true)).toEqual([
+    expect((await create([createItem], 3)).ids).toEqual([
       "create-agent-item",
       3,
     ]);
   });
 
-  it("puts the folder typed into the input row in that row's place", async () => {
-    expect(await create([createItem, inputItem, listed(1)], 3, true)).toEqual([
+  it("keeps Recent, Favorites and the create item above a new agent", async () => {
+    const rows = [...specialRows(), createItem];
+    const { ids } = await create([...rows, listed(1)], 3);
+
+    expect(ids).toEqual([...rows.map((r) => r.id), 3, 1]);
+  });
+
+  it("never takes the place of an open input row", async () => {
+    // The row may be another folder still being typed; its own reconcile
+    // drops it once its folder is listed.
+    expect((await create([createItem, inputItem, listed(1)], 3)).ids).toEqual([
       "create-agent-item",
       3,
+      "new-folder-input",
       1,
     ]);
   });
 
-  it("does not list a folder twice", async () => {
-    expect(await create([createItem, listed(3), listed(1)], 3, true)).toEqual([
+  it("updates a folder already listed in place rather than twice", async () => {
+    expect((await create([createItem, listed(1), listed(3)], 3)).ids).toEqual([
       "create-agent-item",
-      3,
       1,
+      3,
     ]);
   });
 
@@ -143,7 +160,6 @@ describe("useSocketHelper create", () => {
         setItems: vi.fn(),
         setTotal: vi.fn(),
         disabledItems: [],
-        withCreate: true,
       }),
     );
     act(() => result.current.subscribe(AGENTS_ROOT));

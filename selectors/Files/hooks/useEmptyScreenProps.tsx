@@ -17,6 +17,8 @@ import { useTheme } from "../../../context/ThemeContext";
 type UseEmptyScreenPropsArgs = {
   selectedItemType?: string;
   selectedTreeNode?: FolderDtoInteger;
+  /** The list offers "New agent": the host can create one and the user may. */
+  canCreateAgent?: boolean;
 };
 
 // What the Files selector shows on an empty list and on an empty search, by
@@ -24,6 +26,7 @@ type UseEmptyScreenPropsArgs = {
 const useEmptyScreenProps = ({
   selectedItemType,
   selectedTreeNode,
+  canCreateAgent,
 }: UseEmptyScreenPropsArgs) => {
   const t = useCommonTranslation();
   const { isBase } = useTheme();
@@ -82,12 +85,15 @@ const useEmptyScreenProps = ({
   const emptyScreenDescription = useMemo(() => {
     if (isEmptyFilesRootScreen) return "";
 
-    if (isEmptyAgentsRootScreen) return t("EmptyAIAgentsSelectorDescription");
+    // The description asks the user to create an agent, so it goes with the
+    // "New agent" link and not without it.
+    if (isEmptyAgentsRootScreen)
+      return canCreateAgent ? t("EmptyAIAgentsSelectorDescription") : "";
 
     return t("EmptyRoomsDescriptionText", {
       sectionName: t("Rooms"),
     });
-  }, [isEmptyFilesRootScreen, isEmptyAgentsRootScreen, t]);
+  }, [isEmptyFilesRootScreen, isEmptyAgentsRootScreen, canCreateAgent, t]);
 
   return {
     emptyScreenImage,

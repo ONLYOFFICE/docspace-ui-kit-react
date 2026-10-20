@@ -223,7 +223,6 @@ const RoomSelectorComponent = ({
   );
 
   const { subscribe } = useSocketHelper({
-    withCreate,
     setTotal,
     setItems,
     disabledItems: [],

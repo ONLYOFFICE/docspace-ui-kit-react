@@ -198,6 +198,36 @@ describe("useAgentsHelper", () => {
       expect(setItems.mock.calls[0][0][0]).toMatchObject({ id: 1 });
     });
 
+    it("sits below Recent and Favorites, all of them left out of the offset", async () => {
+      const folder = (id: number) => ({ id, title: `f${id}` });
+      const props = {
+        onCreateAIAgent: vi.fn(),
+        withRecentTreeFolder: true,
+        withFavoritesTreeFolder: true,
+        recentFolder: folder(100),
+        favoritesFolder: folder(101),
+      };
+      const { setItems, setTotal } = await loadPage(0, props);
+
+      expect(
+        setItems.mock.calls[0][0].map((i: { id: unknown }) => i.id),
+      ).toEqual([
+        "special-recent",
+        "special-favorites",
+        expect.anything(),
+        "create-agent-item",
+        1,
+      ]);
+      // 1 agent + Recent, Favorites, separator and "New agent".
+      expect(setTotal).toHaveBeenLastCalledWith(5);
+
+      mocks.request.mockClear();
+      await loadPage(104, props);
+
+      // Row 104 on screen is server row 100, the first of page 1.
+      expect(mocks.request.mock.calls[1][0]).toContain("page=1&");
+    });
+
     it("is left out of the next page's offset", async () => {
       await loadPage(101, { onCreateAIAgent: vi.fn() });
 

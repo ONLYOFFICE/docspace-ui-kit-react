@@ -97,7 +97,6 @@ export type UseSocketHelperProps = {
   disabledItems: (string | number)[];
   disabledFolderType?: FolderType;
   filterParam?: string | number;
-  withCreate?: boolean;
   disableBySecurity?: string;
   isRoomDisabled?: (room: FolderDtoInteger) => boolean;
 };
