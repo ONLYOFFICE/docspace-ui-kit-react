@@ -613,7 +613,7 @@ const WRITES: Record<string, Write> = {
 const route = (url: URL) =>
   url.pathname.replace(/^\/api\/2\.0\/ai\//, "").replace(/\/+$/, "");
 
-// Unknown routes fall through to the worker's 404 and its warning, so a
+// Unknown routes fall through to the demo portal's 404 and its warning, so a
 // route the fixtures do not cover shows up in the console.
 const aiService = http.all(api("ai/:area/:action"), async ({ request }) => {
   const url = new URL(request.url);

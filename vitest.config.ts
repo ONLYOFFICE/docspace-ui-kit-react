@@ -81,8 +81,8 @@ export default defineConfig({
             storybookScript: "pnpm storybook --no-open",
           }),
         ],
-        // staticDirs maps .storybook/public to the root; the demo portal's
-        // mockServiceWorker.js has to be served from there here too.
+        // staticDirs maps .storybook/public to the root; serve it from there
+        // here too.
         publicDir: ".storybook/public",
         // Stories render with no portal, as on the published Storybook. A key in
         // a developer's .env would otherwise send the tests to a live portal.

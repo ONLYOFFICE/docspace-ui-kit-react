@@ -33,7 +33,7 @@ const meta: Meta<StoryArgs> = {
       // are set per story, from what each page measures plus some room.
       story: { inline: false },
       description: {
-        component: `The portal's AI settings screens, from \`ai-agent/settings\`. Each is a page of \`@onlyoffice/ai-chat\` with the kit's layout applied, and reads and writes the same AI service the chat talks to, so it has to sit inside \`AiAgentProviders\`. Without a portal the stories run against the demo portal the mock service worker plays, under a banner that says so: its models, assignments and MCP servers are made up, and a change is saved in memory only, until the page is reloaded.
+        component: `The portal's AI settings screens, from \`ai-agent/settings\`. Each is a page of \`@onlyoffice/ai-chat\` with the kit's layout applied, and reads and writes the same AI service the chat talks to, so it has to sit inside \`AiAgentProviders\`. Without a portal the stories run against a demo portal mocked inside the page, under a banner that says so: its models, assignments and MCP servers are made up, and a change is saved in memory only, until the page is reloaded.
 
 \`\`\`tsx
 import AiAgentProviders from "@onlyoffice/apps-ui-kit/ai-agent/providers";

@@ -126,7 +126,7 @@ runs as the key's owner — their threads, their models. The portal's AI service
 the Storybook origin, which it does once `core:cors` allows it.
 
 With nothing configured, the chat talks to the demo portal instead, under a **Demo data**
-banner: a mock service worker answers it from `.storybook/mocks/`, in `pnpm storybook` and the
+banner: mocks inside the page answer it from `.storybook/mocks/`, in `pnpm storybook` and the
 static build alike. It has three made-up models, two past threads, and a streamed reply that
 echoes the prompt; everything is kept in memory until the page reloads, and nothing reaches a
 model. **Connect a portal** on the banner opens the API Config form.

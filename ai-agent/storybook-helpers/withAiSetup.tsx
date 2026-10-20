@@ -44,9 +44,9 @@ export type AiChatStoryProviderProps = Omit<
 // other module, and the story waits for `getSelfProfile()` before mounting.
 //
 // With no portal selected the chat talks to the demo portal instead, which
-// the mock service worker plays (`.storybook/mocks/handlers/ai.ts`), under
+// msw plays in the preview frame (`.storybook/mocks/handlers/ai.ts`), under
 // the same "Demo data" banner `PortalGate` puts above every other module.
-// The worker runs in the static build too, so the published Storybook shows
+// The interception runs in the static build too, so the published Storybook shows
 // a working chat rather than a card.
 const AiSetupGate = ({
   title,

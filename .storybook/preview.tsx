@@ -14,7 +14,7 @@ import { parseLocaleConstants } from "../utils/parse-locale-constants";
 import brandsData from "../test/fixtures/brands.json";
 import globalTypes from "./globals";
 import withApiProvider from "./decorators/withApiProvider";
-import { startDemoPortal } from "./mocks/worker";
+import { startDemoPortal } from "./mocks/network";
 import { syncNestedPreviewGlobals } from "./utils/nestedPreviewGlobals";
 import enCommon from "../locales/en/Common.json";
 import enPayments from "../locales/en/Payments.json";
@@ -249,8 +249,8 @@ const preview: Preview = {
   ],
 
   // The demo portal has to be answering before the first story asks it
-  // anything; `startDemoPortal` starts the worker once and resolves at once
-  // after that.
+  // anything; `startDemoPortal` patches fetch and XHR once and only swaps the
+  // handlers after that.
   loaders: [
     async () => {
       await startDemoPortal();
