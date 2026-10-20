@@ -37,6 +37,7 @@ describe("openGeneratedFileWithToolCall", () => {
     window.dispatchEvent(
       new MessageEvent("message", {
         data: { type: "editorDocumentReady" },
+        origin: window.location.origin,
         source: tab,
       }),
     );
@@ -60,7 +61,24 @@ describe("openGeneratedFileWithToolCall", () => {
     window.dispatchEvent(
       new MessageEvent("message", {
         data: { type: "editorDocumentReady" },
+        origin: window.location.origin,
         source: window,
+      }),
+    );
+
+    expect(postMessage).not.toHaveBeenCalled();
+  });
+
+  it("ignores a ready signal from the tab once it is on another origin", () => {
+    const tab = editor.contentWindow as Window;
+    const postMessage = vi.spyOn(tab, "postMessage");
+
+    openGeneratedFileWithToolCall(42, "generate", {});
+    window.dispatchEvent(
+      new MessageEvent("message", {
+        data: { type: "editorDocumentReady" },
+        origin: "https://attacker.example",
+        source: tab,
       }),
     );
 
