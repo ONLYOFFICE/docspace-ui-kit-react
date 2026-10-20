@@ -36,7 +36,10 @@ const me = (await profilesApi.getSelfProfile()).data.response; // EmployeeFullDt
 `VITE_PROVIDER_API_URL` / `VITE_PROVIDER_API_KEY` from `.env` (gitignored; `.env.example` shows
 the shape, and the `VITE_` prefix is what exposes them to the browser), and the `apiConfig`
 toolbar global switches between portals saved in `localStorage` by
-`.storybook/utils/apiProviders.ts`. Two deliberate settings there:
+`.storybook/utils/apiProviders.ts`. The last pick is saved there too and becomes the initial
+`apiConfig`, so a bare `localhost:6006` opens on it; a `globals=` in the URL still wins, and a
+fresh browser profile — the story tests, the console scan, the screenshots — starts in demo
+mode. Two deliberate settings there:
 
 - `initSocket={false}` — the socket would otherwise connect to the portal from every story.
 - `useBearerForRawClient` — the raw client sends `Bearer <key>`, which is what an API key needs
