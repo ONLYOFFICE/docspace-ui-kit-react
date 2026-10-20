@@ -22,9 +22,12 @@ const useAgentsHelper = ({
   setItems,
   setBreadCrumbs,
   setIsRoot,
+  setSelectedItemType,
+  getRootData,
   onSetBaseFolderPath,
 
   searchValue,
+  onCreateAIAgent,
 
   isInit,
   setIsInit,
@@ -150,6 +153,26 @@ const useAgentsHelper = ({
 
           if (startIndex === 0) specialItemsCountRef.current = 0;
 
+          // Counted with the special items: none of them is a server row, so
+          // the next page's offset must leave all of them out.
+          if (startIndex === 0 && onCreateAIAgent && current.security?.Create) {
+            itemList.unshift({
+              isCreateNewItem: true,
+              label: t("NewAgent"),
+              id: "create-agent-item",
+              key: "create-agent-item",
+              onCreateClick: onCreateAIAgent,
+              onBackClick: () => {
+                setIsRoot?.(true);
+                setSelectedItemType?.(undefined);
+                setBreadCrumbs?.((val) => val.slice(0, -1));
+                getRootData?.();
+              },
+            });
+            specialItemsCountRef.current = 1;
+            setTotal(total + 1);
+          }
+
           if (
             startIndex === 0 &&
             !searchValue &&
@@ -168,8 +191,8 @@ const useAgentsHelper = ({
 
             if (specialItems.length) {
               itemList.unshift(...specialItems);
-              specialItemsCountRef.current = specialItems.length;
-              setTotal(total + specialItems.length);
+              specialItemsCountRef.current += specialItems.length;
+              setTotal(total + specialItemsCountRef.current);
             }
           }
 
@@ -216,6 +239,9 @@ const useAgentsHelper = ({
       withRecentTreeFolder,
       withFavoritesTreeFolder,
       finishFullLoad,
+      onCreateAIAgent,
+      setSelectedItemType,
+      getRootData,
     ],
   );
 

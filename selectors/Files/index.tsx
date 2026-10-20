@@ -84,6 +84,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     createDefineRoomLabel,
     createDefineRoomType,
     disabledCreatePublicRoom,
+    onCreateAIAgent,
 
     shareKey,
     formProps,
@@ -260,6 +261,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     setSelectedTreeNode,
     searchValue,
     withCreate: withCreateState,
+    onCreateAIAgent,
+    getRootData,
     disableBySecurity,
 
     recentFolder,

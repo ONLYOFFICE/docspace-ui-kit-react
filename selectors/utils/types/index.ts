@@ -60,6 +60,7 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
 
 export type UseAgentsHelperProps = TUseInputItemHelper & {
   searchValue?: string;
+  onCreateAIAgent?: () => void;
   // isRoomsOnly: boolean;
   excludeItems?: (number | string | undefined)[];
   isInit: boolean;

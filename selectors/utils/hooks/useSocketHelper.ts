@@ -166,19 +166,40 @@ const useSocketHelper = ({
         if (opt.type === "folder") {
           setTotal((v) => v + 1);
 
-          if (withCreate) {
-            const newValue = [...value];
+          const newValue = [...value];
 
-            let idx = 1;
+          // Already listed: the input row's own reconcile got there first.
+          const listedIdx = value.findIndex(
+            (v) => v.isFolder && idsEqual(v.id, item.id),
+          );
 
-            if (value[0]?.isInputItem) idx = 0;
-
-            newValue.splice(idx, 1, item);
+          if (listedIdx > -1) {
+            newValue.splice(listedIdx, 1, item);
 
             return newValue;
           }
 
-          return [item, ...value];
+          // The folder typed into the input row takes that row's place.
+          const inputIdx = withCreate
+            ? value.findIndex((v) => v.isInputItem)
+            : -1;
+
+          if (inputIdx > -1) {
+            newValue.splice(inputIdx, 1, item);
+
+            return newValue;
+          }
+
+          // Created elsewhere -- by a create dialog, or by another user. It
+          // goes in below the create item, which the list keeps on top, and
+          // must not take the place of a folder already listed.
+          newValue.splice(
+            value.findIndex((v) => v.isCreateNewItem) + 1,
+            0,
+            item,
+          );
+
+          return newValue;
         }
 
         if (opt.type === "file") {

@@ -286,6 +286,12 @@ export type FilesSelectorProps = TInfoBar &
     createDefineRoomType?: RoomType;
     /** Disables the Public room type in the create-room dropdown */
     disabledCreatePublicRoom?: boolean;
+    /**
+     * Shows a "New agent" item in the AI agents list, and on its empty screen,
+     * when the user may create agents there. The selector cannot create one
+     * itself -- an agent needs the host's create dialog -- so this opens it.
+     */
+    onCreateAIAgent?: () => void;
     formProps?: FormPropsType;
     withPadding?: boolean;
     checkCreating?: boolean;

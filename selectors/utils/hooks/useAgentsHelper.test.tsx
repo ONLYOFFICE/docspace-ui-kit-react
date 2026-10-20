@@ -133,4 +133,76 @@ describe("useAgentsHelper", () => {
   it("disables agents that are denied an agent-level right", async () => {
     expect(await loadAgents("UseChat")).toEqual({ 1: false, 2: true });
   });
+
+  describe("New agent item", () => {
+    const loadPage = async (
+      sIndex: number,
+      props: Partial<Parameters<typeof useAgentsHelper>[0]>,
+      canCreate = true,
+    ) => {
+      mocks.request.mockResolvedValue({
+        response: {
+          folders: [agent(1, { Read: true })],
+          total: 1,
+          count: 1,
+          current: { security: { Create: canCreate } },
+          pathParts: [],
+        },
+      });
+
+      const setItems = vi.fn();
+      const setTotal = vi.fn();
+      const { result } = setup({ setItems, setTotal, ...props });
+
+      await act(async () => {
+        await result.current.agents.getAgentList(0);
+      });
+      if (sIndex > 0) {
+        await act(async () => {
+          await result.current.agents.getAgentList(sIndex);
+        });
+      }
+
+      return { setItems, setTotal };
+    };
+
+    it("leads the list and opens the host's create dialog", async () => {
+      const onCreateAIAgent = vi.fn();
+      const { setItems, setTotal } = await loadPage(0, { onCreateAIAgent });
+
+      const [first, second] = setItems.mock.calls[0][0];
+      expect(first).toMatchObject({
+        isCreateNewItem: true,
+        label: "New agent",
+      });
+      expect(second).toMatchObject({ id: 1 });
+      expect(setTotal).toHaveBeenLastCalledWith(2);
+
+      first.onCreateClick();
+      expect(onCreateAIAgent).toHaveBeenCalledOnce();
+    });
+
+    it("is absent without a create callback", async () => {
+      const { setItems } = await loadPage(0, {});
+
+      expect(setItems.mock.calls[0][0][0]).toMatchObject({ id: 1 });
+    });
+
+    it("is absent when the user may not create agents", async () => {
+      const { setItems } = await loadPage(
+        0,
+        { onCreateAIAgent: vi.fn() },
+        false,
+      );
+
+      expect(setItems.mock.calls[0][0][0]).toMatchObject({ id: 1 });
+    });
+
+    it("is left out of the next page's offset", async () => {
+      await loadPage(101, { onCreateAIAgent: vi.fn() });
+
+      // Row 101 on screen is server row 100, the first of page 1.
+      expect(mocks.request.mock.calls[1][0]).toContain("page=1&");
+    });
+  });
 });
