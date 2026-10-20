@@ -17,6 +17,7 @@ import withApiProvider from "./decorators/withApiProvider";
 import { getSelectedApiConfig } from "./utils/apiProviders";
 import { startDemoPortal } from "./mocks/network";
 import { syncNestedPreviewGlobals } from "./utils/nestedPreviewGlobals";
+import { keepDocsScrollOnFocus } from "./utils/nestedPreviewFocus";
 import enCommon from "../locales/en/Common.json";
 import enPayments from "../locales/en/Payments.json";
 import enSettings from "../locales/en/Settings.json";
@@ -44,6 +45,7 @@ setBrandLookup(getBrand);
 // in iframes of their own (`docs.story.inline: false`) -- the AI chat and
 // settings among them.
 syncNestedPreviewGlobals();
+keepDocsScrollOnFocus();
 
 const lightColorScheme: TColorScheme = {
   id: 1,
