@@ -257,7 +257,7 @@ const useSelectorBody = ({
   const emptyScreenDescription = useMemo(() => {
     if (isEmptyFilesRootScreen) return "";
 
-    if (isEmptyAgentsRootScreen) return t("NoAIAgentsDescription");
+    if (isEmptyAgentsRootScreen) return t("EmptyAIAgentsSelectorDescription");
 
     return t("EmptyRoomsDescriptionText", {
       sectionName: t("Rooms"),
