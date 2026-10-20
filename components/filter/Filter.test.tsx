@@ -253,6 +253,33 @@ describe("Filter Component", () => {
         group: FilterGroups.filterOther,
       });
     });
+
+    it("removes only the chip clicked when another group shares its key", async () => {
+      await act(async () => {
+        renderComponent({
+          getSelectedFilterData: () =>
+            Promise.resolve([
+              {
+                key: "date",
+                group: FilterGroups.filterOther,
+                label: "Modified",
+                chips: [{ key: "from", label: "From 1 Jan" }],
+              },
+              {
+                key: "size",
+                group: FilterGroups.filterType,
+                label: "Size",
+                chips: [{ key: "from", label: "From 10 MB" }],
+              },
+            ]),
+        });
+      });
+
+      await userEvent.click(screen.getByText("From 1 Jan"));
+
+      expect(screen.queryByText("From 1 Jan")).not.toBeInTheDocument();
+      expect(screen.getByText("From 10 MB")).toBeInTheDocument();
+    });
   });
 });
 
