@@ -206,7 +206,7 @@
   }
 
   @include mixins.mobileContainer(chat-panel) {
-    :global(.chat-no-access-screen) svg {
+    :global(.chat-no-access-screen) header svg {
       width: 150px;
       height: 105px;
     }
