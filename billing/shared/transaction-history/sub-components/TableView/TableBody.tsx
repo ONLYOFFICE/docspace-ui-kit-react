@@ -15,11 +15,7 @@ import {
   getServiceQuantity,
 } from "../../../../wallet/utils";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
-import {
-  getTransactionSourceLabel,
-  hasTransactionSource,
-  isAiServiceName,
-} from "../../utils";
+import { getTransactionSourceLabel, hasTransactionSource } from "../../utils";
 import { TokenUsageAnchor } from "../TokenUsage";
 
 interface TransactionRowProps {
@@ -83,9 +79,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         </Text>
       </TableCell>
       <TableCell>
-        <TokenUsageAnchor
-          usage={isAiServiceName(serviceName) ? transaction.tokenUsage : null}
-        >
+        <TokenUsageAnchor usage={transaction.tokenUsage}>
           <Text fontWeight={600} fontSize="11px">
             {getServiceQuantity(
               t,

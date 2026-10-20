@@ -189,7 +189,8 @@ const callEditorTool = async (
       resolve(value);
     };
     const onMessage = (event: MessageEvent) => {
-      if (event.source !== target) return;
+      if (event.source !== target || event.origin !== window.location.origin)
+        return;
       const payload = event.data;
       if (
         !payload ||
@@ -208,15 +209,9 @@ const callEditorTool = async (
         }),
       );
     }, EDITOR_TOOL_TIMEOUT_MS);
-    // SECURITY: targetOrigin is "*", which broadcasts the tool-call payload
-    // (callId + arguments) to any frame loaded in the editor panel window,
-    // including cross-origin iframes (violates postMessage same-origin guidance,
-    // flagged by MDN). The editor iframe src is built from window.location.origin,
-    // so it is same-origin in practice — capture that origin when the iframe
-    // loads and pass it here instead of "*" to scope the message to the editor.
     target.postMessage(
       { type: CALL_TOOL_MESSAGE, callId, name, arguments: args },
-      "*",
+      window.location.origin,
     );
   });
 };
@@ -396,6 +391,7 @@ export const openEditorPanel = (fileId: number | string): void => {
   // Set up message listeners for editor ready + dynamic tool registration.
   let listenerActive = true;
   const onMessage = (event: MessageEvent) => {
+    if (event.origin !== window.location.origin) return;
     const sourceWindow = event.source as Window | null;
     if (sourceWindow) {
       try {
@@ -527,7 +523,11 @@ export const openGeneratedFileWithToolCall = (
   };
 
   const onReady = (event: MessageEvent) => {
-    if (event.source !== editorWindow) return;
+    if (
+      event.source !== editorWindow ||
+      event.origin !== window.location.origin
+    )
+      return;
     const data = event.data;
     if (
       !data ||
@@ -547,7 +547,7 @@ export const openGeneratedFileWithToolCall = (
         name: toolName,
         arguments: toolArgs,
       },
-      "*",
+      window.location.origin,
     );
   };
 
