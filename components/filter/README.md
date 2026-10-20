@@ -328,9 +328,10 @@ export function FilterWithChips() {
 - **The search box has no value prop.** What it shows comes from `getSelectedInputValue`, what you
   get back is the string, and clearing it is the `clearSearch` pulse described above.
 - **The filter panel works on a copy.** It opens as a side panel of grouped options — tags,
-  checkboxes, toggles, drop-down lists and selector steps — and the whole selection reaches
-  `onFilter` only when Apply is pressed; closing it discards the changes. The one exception is the
-  clear icon in the panel's header, which calls `onFilter([])` at once when filters were in force.
+  checkboxes, toggles, drop-down lists, selector steps and groups the host draws itself — and the
+  whole selection reaches `onFilter` only when Apply is pressed; closing it discards the changes.
+  The one exception is the clear icon in the panel's header, which calls `onFilter([])` at once
+  when filters were in force.
 - **The sort menu marks the current field with an arrow** pointing in the current direction; picking
   that field again reverses the direction, and picking another keeps it.
 - **The sort button disappears** whenever `isIndexing`, `isFlowsPage` or `isRecentFolder` is set,
@@ -360,9 +361,13 @@ export function FilterWithChips() {
   step that slides in like the selectors. The step's render function gets the same props, rebuilt
   on every render, so a step that stays open sees the value it has just set. The value is a string
   key, applied and compared like any other, so the apply button and `onFilter` need nothing extra.
+  Anything richer — a range, a set of conditions — is serialized into that key by the host. A group
+  holds one value: two custom items in one group share it, and `onChange` from either replaces it.
+  A group of the host's own is not a member of `FilterGroups`, so typed code casts its name
+  (`"filter-rating" as FilterGroups`).
 - **One filter can show as several chips.** A selected item with `chips` is drawn as one chip per
-  entry, and removing one calls `removeSelectedItem` with that chip's key. The panel still sees the
-  item as a single value.
+  entry, and removing one calls `removeSelectedItem` with that chip's key and the item's group. The
+  panel still sees the item as a single value.
 - The bar is a full-width flex column: a 32px row of controls with an 8px margin under it, then the
   chips, then the grouping row.
 
@@ -389,7 +394,7 @@ export function FilterWithChips() {
 | `--filter-tag-radius`           | `16px`  | Corner radius of an option tag                                                                                  |
 | `--filter-tag-height`           | `28px`  | Height of an option tag                                                                                         |
 | `--filter-separator`            | theme   | Colour of the line between groups in the filter panel                                                           |
-| `--filter-bg`                   | theme   | Background of the step `renderSelector` fills inside the panel — not of the panel itself                        |
+| `--filter-bg`                   | theme   | Background of the step `renderSelector` or `openPanel` fills inside the panel — not of the panel itself         |
 | `--filter-width`                | `480px` | Width of that step                                                                                              |
 
 The two sort-menu view icons are coloured by position, not by which view they are: the rules
@@ -411,6 +416,9 @@ the chips and the buttons inside the bar read their own components' variables �
   `sortByTitle`; the panel's heading comes from `filterHeader`, and nothing translates any of them.
 - The filter panel is a [`ModalDialog`](../modal-dialog/README.md): `role="dialog"` with
   `aria-modal`, closed by Escape. The bar passes it no `aria-label`, so it is announced unnamed.
+- A nested step — a selector, or a custom item's `openPanel` step — replaces the panel's whole
+  content: the control that opened it leaves the page and focus falls back to `<body>`, closing the
+  step does not return it, and Escape closes the whole panel rather than the step.
 - The hidden measurement copy of the grouping row is `aria-hidden`, so it is not read twice.
 - The search box is the kit's [`SearchInput`](../search-input/README.md) and is the one part of the
   bar a keyboard user can use — but it takes focus by itself whenever the value getter changes.

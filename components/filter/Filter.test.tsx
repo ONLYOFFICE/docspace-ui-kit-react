@@ -171,6 +171,58 @@ describe("Filter Component", () => {
       ]);
     });
 
+    it("hands a value in force to renderCustomItem whole", async () => {
+      const selected = [
+        {
+          key: '{"stage":"discovery","court":"supreme"}',
+          group: FilterGroups.filterOther,
+          label: "Case file",
+          chips: [
+            { key: "stage", label: "Stage is Discovery" },
+            { key: "court", label: "Court is Supreme" },
+          ],
+        },
+      ];
+      const renderCustomItem = vi.fn(() => null);
+
+      await openFilter({
+        renderCustomItem,
+        initSelectedFilterData: selected,
+        getSelectedFilterData: () => selected,
+      });
+
+      await vi.waitFor(() =>
+        expect(renderCustomItem).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            value: { key: selected[0].key, label: "Case file" },
+          }),
+        ),
+      );
+    });
+
+    it("drops the value when the host sets null", async () => {
+      const onFilter = vi.fn();
+      const selected = [
+        { key: "stage", group: FilterGroups.filterOther, label: "Stage" },
+      ];
+      const renderCustomItem = ({ onChange }: CustomItemRenderProps) => (
+        <button type="button" onClick={() => onChange(null)}>
+          Clear
+        </button>
+      );
+
+      await openFilter({
+        onFilter,
+        renderCustomItem,
+        initSelectedFilterData: selected,
+        getSelectedFilterData: () => selected,
+      });
+      await userEvent.click(await screen.findByText("Clear"));
+      await userEvent.click(screen.getByTestId("filter_apply_button"));
+
+      expect(onFilter).toHaveBeenCalledWith([]);
+    });
+
     it("opens and closes the nested step", async () => {
       const renderCustomItem = ({
         openPanel,

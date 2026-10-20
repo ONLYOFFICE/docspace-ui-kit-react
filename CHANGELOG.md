@@ -20,11 +20,17 @@
 - `@onlyoffice/ai-chat` peer requirement raised to `^1.0.4` (the composer's tool cards follow the round's context scope; files and images share one attachment cap)
 - AI settings: `McpServers` takes a `toolPrefsScope` prop. Pass `"tenant"` where the viewer administers the portal, so a tool switched off there is off for every user; omitted, the page edits the viewer's own list (Bug 84381)
 
+### Added
+
+- Filter: a group can draw itself. An item marked `isCustom` is rendered by the new `renderCustomItem` prop, which gets the group's pending value, `onChange` to set it and `openPanel` / `closePanel` for a nested step; the value is a string key, applied and compared like any other
+- Filter: a selected item can carry `chips`, drawn as one chip each under the bar. Removing one calls `removeSelectedItem` with that chip's key and the item's group; the panel still treats the item as one value
+
 ### Fixed
 
 - AI chat: the copy buttons (message, code block, tool card) work on a portal served over plain HTTP. The platform adapter now supplies `copyToClipboard`, which falls back to `copy-to-clipboard` where the Clipboard API is unavailable outside a secure context (Bug 84481)
 - Files and images share one 5-attachment cap on a message, including the Forms section's single slot (Bug 84379)
 - The E2E Docker image copies the vendored ai-chat tarball before `pnpm install`
+- Filter: removing a chip no longer hides a chip of another group that shares its key
 
 ## 4.0.1
 
