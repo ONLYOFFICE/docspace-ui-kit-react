@@ -1,7 +1,10 @@
+import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
+import { RoomType } from "@onlyoffice/docspace-api-sdk";
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { TSelectorItem } from "../../../components/selector";
+import { convertRoomsToItems } from "..";
 import useSocketHelper from "./useSocketHelper";
 
 const mocks = vi.hoisted(() => {
@@ -33,28 +36,33 @@ vi.mock("../../../providers/api", () => ({
 
 const AGENTS_ROOT = 10;
 
-const agent = (id: number) => ({
+const agent = (id: number): FolderDtoInteger => ({
   id,
   title: `agent${id}`,
   parentId: AGENTS_ROOT,
-  roomType: 9,
+  roomType: RoomType.AiRoom,
   security: {},
 });
 
-const createItem = {
+const createItem: TSelectorItem = {
   id: "create-agent-item",
   label: "New agent",
   isCreateNewItem: true,
-} as unknown as TSelectorItem;
+  onBackClick: () => {},
+};
 
-const inputItem = {
+const inputItem: TSelectorItem = {
   id: "new-folder-input",
   label: "",
   isInputItem: true,
-} as unknown as TSelectorItem;
+  defaultInputValue: "",
+  icon: "",
+  onAcceptInput: () => {},
+  onCancelInput: () => {},
+};
 
-const listed = (id: number) =>
-  ({ id, label: `agent${id}`, isFolder: true }) as unknown as TSelectorItem;
+// Listed the way the agents helper lists them.
+const listed = (id: number) => convertRoomsToItems([agent(id)])[0];
 
 // Runs the socket "create" of agent `id` against `items` and returns the ids
 // the list ends with.
