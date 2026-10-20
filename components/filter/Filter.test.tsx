@@ -197,6 +197,32 @@ describe("Filter Component", () => {
       expect(screen.queryByText("Back")).not.toBeInTheDocument();
     });
 
+    it("hands the nested step the value it has just set", async () => {
+      const renderCustomItem = ({ openPanel }: CustomItemRenderProps) => (
+        <button
+          type="button"
+          onClick={() =>
+            openPanel(({ value, onChange }) => (
+              <button
+                type="button"
+                onClick={() => onChange({ key: "stage", label: "Stage" })}
+              >
+                {value?.label ?? "Pick"}
+              </button>
+            ))
+          }
+        >
+          Open
+        </button>
+      );
+
+      await openFilter({ renderCustomItem });
+      await userEvent.click(await screen.findByText("Open"));
+      await userEvent.click(await screen.findByText("Pick"));
+
+      expect(await screen.findByText("Stage")).toBeInTheDocument();
+    });
+
     it("shows a value as its chips and removes them one by one", async () => {
       const removeSelectedItem = vi.fn();
 

@@ -30,7 +30,7 @@ export type CustomItemRenderProps = {
   group: FilterGroups;
   value?: TCustomItemValue;
   onChange: (value: TCustomItemValue | null) => void;
-  openPanel: (render: () => React.ReactNode) => void;
+  openPanel: (render: TRenderCustomItem) => void;
   closePanel: () => void;
   closeFilter: () => void;
 };

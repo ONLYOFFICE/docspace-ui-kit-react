@@ -12,11 +12,13 @@ import { IconButton } from "../../icon-button";
 import { useCommonTranslation } from "../../../utils/i18n";
 import styles from "../Filter.module.scss";
 import {
+  CustomItemRenderProps,
   FilterBlockProps,
   TCustomItem,
   TCustomItemValue,
   TGroupItem,
   TItem,
+  TRenderCustomItem,
 } from "../Filter.types";
 import {
   removeGroupManagerFilterValueIfNeeded,
@@ -55,7 +57,8 @@ const FilterBlock = ({
   });
 
   const [customPanel, setCustomPanel] = React.useState<{
-    render: () => React.ReactNode;
+    group: FilterGroups;
+    render: TRenderCustomItem;
   } | null>(null);
 
   const [filterData, setFilterData] = React.useState<TItem[]>([]);
@@ -382,37 +385,32 @@ const FilterBlock = ({
     [],
   );
 
-  const openCustomPanel = React.useCallback(
-    (render: () => React.ReactNode) => setCustomPanel({ render }),
-    [],
-  );
-
   const closeCustomPanel = React.useCallback(() => setCustomPanel(null), []);
 
-  const renderCustom = React.useCallback(
-    (item: TCustomItem) => {
-      const value = filterValues.find((v) => v.group === item.group);
+  // Rebuilt on every render and handed to the nested step as well, so a step
+  // that stays open reads the pending value as it is now, not as it was.
+  const getCustomItemProps = React.useCallback(
+    (group: FilterGroups): CustomItemRenderProps => {
+      const value = filterValues.find((v) => v.group === group);
 
-      return renderCustomItem?.({
-        group: item.group,
+      return {
+        group,
         value:
           value && !Array.isArray(value.key)
             ? { key: `${value.key}`, label: value.label }
             : undefined,
-        onChange: (next) => changeCustomValue(item.group, next),
-        openPanel: openCustomPanel,
+        onChange: (next) => changeCustomValue(group, next),
+        openPanel: (render) => setCustomPanel({ group, render }),
         closePanel: closeCustomPanel,
         closeFilter: hideFilterBlock,
-      });
+      };
     },
-    [
-      filterValues,
-      renderCustomItem,
-      changeCustomValue,
-      openCustomPanel,
-      closeCustomPanel,
-      hideFilterBlock,
-    ],
+    [filterValues, changeCustomValue, closeCustomPanel, hideFilterBlock],
+  );
+
+  const renderCustom = React.useCallback(
+    (item: TCustomItem) => renderCustomItem?.(getCustomItemProps(item.group)),
+    [renderCustomItem, getCustomItemProps],
   );
 
   const selectOption = React.useCallback(
@@ -522,7 +520,9 @@ const FilterBlock = ({
 
       {customPanel ? (
         <ModalDialog.Container>
-          <div className={styles.filterBlock}>{customPanel.render()}</div>
+          <div className={styles.filterBlock}>
+            {customPanel.render(getCustomItemProps(customPanel.group))}
+          </div>
         </ModalDialog.Container>
       ) : null}
 

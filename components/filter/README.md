@@ -357,8 +357,9 @@ export function FilterWithChips() {
   opens a step this package cannot fill.
 - **A group can draw itself.** An item marked `isCustom` is rendered by `renderCustomItem`, which
   gets the group's pending value, `onChange` to set it and `openPanel` / `closePanel` for a nested
-  step that slides in like the selectors. The value is a string key, applied and compared like any
-  other, so the apply button and `onFilter` need nothing extra.
+  step that slides in like the selectors. The step's render function gets the same props, rebuilt
+  on every render, so a step that stays open sees the value it has just set. The value is a string
+  key, applied and compared like any other, so the apply button and `onFilter` need nothing extra.
 - **One filter can show as several chips.** A selected item with `chips` is drawn as one chip per
   entry, and removing one calls `removeSelectedItem` with that chip's key. The panel still sees the
   item as a single value.
