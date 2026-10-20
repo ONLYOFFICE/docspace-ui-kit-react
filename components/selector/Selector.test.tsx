@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Selector } from "./Selector";
@@ -117,5 +117,44 @@ describe("<Selector /> loading modes", () => {
     expect(screen.getByText("Third item")).toBeInTheDocument();
     expect(screen.queryByText("First item")).not.toBeInTheDocument();
     expect(document.querySelector(".bodyContentDimmed")).toBeNull();
+  });
+});
+
+describe("<Selector /> Escape", () => {
+  it("closes the selector", () => {
+    const onCancel = vi.fn();
+    renderSelector({ onCancel });
+
+    fireEvent.keyDown(window, { key: "Escape" });
+
+    expect(onCancel).toHaveBeenCalledOnce();
+  });
+
+  it("leaves the selector open under a dialog opened from it", () => {
+    const onCancel = vi.fn();
+    renderSelector({ onCancel });
+
+    // Portalled after the selector, as ModalDialog is.
+    const dialog = document.createElement("div");
+    dialog.setAttribute("role", "dialog");
+    document.body.appendChild(dialog);
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    dialog.remove();
+
+    expect(onCancel).not.toHaveBeenCalled();
+  });
+
+  it("closes when it sits inside the dialog itself", () => {
+    const onCancel = vi.fn();
+    const dialog = document.createElement("div");
+    dialog.setAttribute("role", "dialog");
+    document.body.appendChild(dialog);
+
+    render(<Selector {...makeProps({ onCancel })} />, { container: dialog });
+    fireEvent.keyDown(window, { key: "Escape" });
+    dialog.remove();
+
+    expect(onCancel).toHaveBeenCalledOnce();
   });
 });
