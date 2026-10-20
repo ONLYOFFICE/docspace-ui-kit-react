@@ -180,8 +180,6 @@ const Modal = ({
       className={classNames(styles.modal, {
         [styles.modalActive]: visible,
       })}
-      inert={!visible}
-      aria-hidden={visible ? undefined : true}
       data-testid={dataTestId ?? "modal"}
       // Closed, the dialog stays mounted (the aside slides out, and callers
       // rely on the markup being there) but must not be a dialog to anyone:
