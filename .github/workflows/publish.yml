@@ -35,6 +35,19 @@ jobs:
           GIT_COMMITTER_EMAIL: 41898283+github-actions[bot]@users.noreply.github.com
         run: |
           git fetch --quiet origin gh-pages
+          # Pages serves every file with max-age=600, and an open tab keeps the
+          # chunk map it loaded, so the previous build's chunks must outlive
+          # it by one deploy. build-assets.txt lists the chunks a build made;
+          # the previous one's are restored where this build has none, which
+          # keeps exactly one generation back instead of all of them.
+          (cd storybook-static && find assets -type f | LC_ALL=C sort > build-assets.txt)
+          if git cat-file -e FETCH_HEAD:build-assets.txt 2>/dev/null; then
+            git show FETCH_HEAD:build-assets.txt | LC_ALL=C sort > "$RUNNER_TEMP/previous-assets.txt"
+            LC_ALL=C comm -23 "$RUNNER_TEMP/previous-assets.txt" storybook-static/build-assets.txt > "$RUNNER_TEMP/kept-assets.txt"
+            if [ -s "$RUNNER_TEMP/kept-assets.txt" ]; then
+              git -C storybook-static checkout FETCH_HEAD --pathspec-from-file="$RUNNER_TEMP/kept-assets.txt"
+            fi
+          fi
           git add --all
           tree=$(git write-tree)
           if [ "$tree" = "$(git rev-parse 'FETCH_HEAD^{tree}')" ]; then

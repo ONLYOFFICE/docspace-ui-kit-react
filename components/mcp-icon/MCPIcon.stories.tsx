@@ -2,7 +2,7 @@ import type { ComponentProps, CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, waitFor } from "storybook/test";
 
-import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
+import CatalogFolderIcon from "../../.storybook/utils/ThemedFolderIcon";
 import CatalogFolderIconUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 
 import { MCPIcon, MCPIconSize } from ".";

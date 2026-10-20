@@ -3,7 +3,7 @@ import type { ComponentProps, CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 
-import FolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
+import FolderIcon from "../../.storybook/utils/ThemedFolderIcon";
 
 import { Card } from "./Card";
 import styles from "./Card.module.scss";

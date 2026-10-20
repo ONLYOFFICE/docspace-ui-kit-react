@@ -580,9 +580,21 @@ const TableContent = () => {
 
   const rows = mockFiles.map((file) => (
     <TableRow key={`row-${file.name}`}>
-      <TableCell>{file.name}</TableCell>
-      <TableCell>{file.type}</TableCell>
-      <TableCell>{file.tags}</TableCell>
+      <TableCell>
+        <Text fontWeight={600} truncate>
+          {file.name}
+        </Text>
+      </TableCell>
+      <TableCell>
+        <Text fontSize="12px" fontWeight={600} truncate>
+          {file.type}
+        </Text>
+      </TableCell>
+      <TableCell>
+        <Text fontSize="12px" fontWeight={600} truncate>
+          {file.tags}
+        </Text>
+      </TableCell>
     </TableRow>
   ));
 
@@ -640,7 +652,7 @@ export const Default: Story = {
               border: "2px dashed #2196F3",
               borderRadius: "4px",
               position: "relative",
-              background: "white",
+              background: "var(--background-color)",
               zIndex: 202,
             }}
           >
@@ -663,7 +675,7 @@ export const Default: Story = {
               border: "2px dashed #FF9800",
               borderRadius: "4px",
               position: "relative",
-              background: "white",
+              background: "var(--background-color)",
               zIndex: 202,
             }}
           >

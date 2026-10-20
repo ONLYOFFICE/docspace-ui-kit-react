@@ -261,6 +261,7 @@ const meta = {
   },
   args: {
     usePortalBackdrop: true,
+    fillIcon: true,
     onSelect: fn(),
   },
 } satisfies Meta<typeof AccessRightSelect>;
@@ -348,6 +349,7 @@ const DisplayTypesTemplate = () => (
         scaled={false}
         size={ComboBoxSize.content}
         manualWidth="fit-content"
+        fillIcon
       />
       <AccessRightSelect
         accessOptions={data}
@@ -356,6 +358,7 @@ const DisplayTypesTemplate = () => (
         scaled={false}
         size={ComboBoxSize.content}
         manualWidth="fit-content"
+        fillIcon
       />
       <AccessRightSelect
         accessOptions={data}
@@ -364,6 +367,7 @@ const DisplayTypesTemplate = () => (
         scaled={false}
         size={ComboBoxSize.content}
         manualWidth="fit-content"
+        fillIcon
       />
     </Row>
   </Wrapper>
@@ -409,6 +413,7 @@ const RestrictedChoicesTemplate = () => (
       scaled={false}
       size={ComboBoxSize.content}
       manualWidth="fit-content"
+      fillIcon
     />
     <Toast />
   </Wrapper>
@@ -561,6 +566,7 @@ const CssCustomizationTemplate = () => {
             size={ComboBoxSize.content}
             manualWidth="320px"
             isDefaultMode={false}
+            fillIcon
           />
           <AccessRightSelect
             accessOptions={data}

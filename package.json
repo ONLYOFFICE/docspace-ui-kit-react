@@ -76,7 +76,7 @@
   },
   "//peerDependencies": "Only packages this library imports directly. Transitive dependencies of @onlyoffice/ai-chat (the assistant-ui, radix, codemirror, LLM-vendor SDKs and friends) are declared by ai-chat itself as its own peers -- re-declaring them here duplicated a list nothing kept in sync. Everything below is verified imported somewhere under this package root.",
   "peerDependencies": {
-    "@onlyoffice/ai-chat": "^1.0.4",
+    "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-1.0.4.tgz",
     "@onlyoffice/doceditor-types": ">=9.3.1",
     "@onlyoffice/document-editor-react": "2.3.0",
     "@socket.io/component-emitter": "3.1.2",
