@@ -22,7 +22,7 @@ export const useServiceLimitStore = () => {
   return store;
 };
 
-export const ServiceLimitStoreProvider = ({
+const ServiceLimitStoreProviderInner = ({
   children,
 }: TServiceLimitStoreProviderProps) => {
   const { rawApiClient } = useApi();
@@ -36,5 +36,19 @@ export const ServiceLimitStoreProvider = ({
     <ServiceLimitStoreContext.Provider value={store}>
       {children}
     </ServiceLimitStoreContext.Provider>
+  );
+};
+
+export const ServiceLimitStoreProvider = ({
+  children,
+}: TServiceLimitStoreProviderProps) => {
+  const existingStore = React.useContext(ServiceLimitStoreContext);
+
+  if (existingStore) {
+    return <>{children}</>;
+  }
+
+  return (
+    <ServiceLimitStoreProviderInner>{children}</ServiceLimitStoreProviderInner>
   );
 };
