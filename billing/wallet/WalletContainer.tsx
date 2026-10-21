@@ -14,6 +14,7 @@ import { finishRefreshingWithMinCycle } from "../utils/refreshing";
 
 import TransactionHistory from "../shared/transaction-history";
 import UpcomingPayments from "./sub-components/UpcomingPayments";
+import InvoicesHistory from "./sub-components/InvoicesHistory";
 import WalletRefilledModal from "./WalletRefilledModal";
 import AutoPaymentInfo from "./sub-components/AutoPaymentInfo";
 import DelayedPaymentMethodBanner from "./sub-components/DelayedPaymentMethodBanner";
@@ -25,7 +26,11 @@ import { useServicesStore } from "../store/ServicesStoreProvider";
 import { getBrandName } from "../../constants/brands";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
 
-const WALLET_TAB_IDS = ["transaction-history", "upcoming-payments"];
+const WALLET_TAB_IDS = [
+  "transaction-history",
+  "invoice-history",
+  "upcoming-payments",
+];
 
 const getInitialTabId = () => {
   const requested = new URLSearchParams(window.location.search).get("tab");
@@ -158,6 +163,11 @@ const Wallet = (props: WalletProps) => {
           <TransactionHistory withoutRoleFilter withoutHeader />
         </div>
       ),
+    },
+    {
+      id: "invoice-history",
+      name: t("InvoiceHistory"),
+      content: <InvoicesHistory />,
     },
     {
       id: "upcoming-payments",

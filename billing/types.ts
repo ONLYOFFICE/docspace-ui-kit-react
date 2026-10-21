@@ -167,6 +167,14 @@ export type TUpcomingPaymentResponse = {
   currency: string;
 };
 
+export type TInvoice = {
+  id: string;
+  date: string;
+  amount: number;
+  currency: string;
+  url: string;
+};
+
 export type TServiceUsage = {
   service: string;
   serviceUnit: string;

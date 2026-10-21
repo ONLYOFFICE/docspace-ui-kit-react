@@ -1,0 +1,49 @@
+.invoicesHistory {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.tableContainer :global(.table-container_header) {
+  position: static !important;
+}
+
+.tableContainer :global([class*="emptyTableContainer"]) {
+  height: 0 !important;
+}
+
+.cellText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.invoiceLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  color: var(--payment-text-color);
+}
+
+.externalIcon {
+  flex-shrink: 0;
+
+  path {
+    fill: var(--payment-inactive-color);
+  }
+}
+
+.row {
+  min-height: 58px;
+  box-sizing: border-box;
+  cursor: pointer;
+
+  [data-testid="tablet-side-info"] {
+    color: var(--payment-text-color);
+  }
+}
+
+.rowLink {
+  display: flex;
+  align-items: center;
+}
