@@ -1,6 +1,6 @@
 # People Selector
 
-A feature-rich selector component for choosing users and groups from the DocSpace system. Supports tabs for Members/Groups/Guests, multi-select, access rights, and room-scoped filtering.
+A feature-rich selector component for choosing users and groups from the ONLYOFFICE Apps system. Supports tabs for Members/Groups/Guests, multi-select, access rights, and room-scoped filtering.
 
 ## What It Does
 

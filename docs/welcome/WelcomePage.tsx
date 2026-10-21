@@ -1,5 +1,7 @@
 import { useDarkMode } from "@vueless/storybook-dark-mode";
 
+import { license, version } from "../../package.json";
+
 import ArrowIcon from "../../assets/arrow2.react.svg";
 import TickIcon from "../../assets/icons/12/tick.react.svg";
 import PlanetIcon from "../../assets/icons/12/planet.react.svg";
@@ -76,8 +78,8 @@ const openDocs = (id: string) => {
 
 const facts = [
   { label: "Package", value: "@onlyoffice/apps-ui-kit" },
-  { label: "Version", value: "4.0.0" },
-  { label: "Licence", value: "AGPL-3.0-only" },
+  { label: "Version", value: version },
+  { label: "Licence", value: license },
   { label: "Peers", value: "react 19, react-dom 19, i18next" },
 ];
 
@@ -256,8 +258,8 @@ export const WelcomePage = () => {
             </Text>
             <div className={styles.subline}>
               <Text as="span" fontSize="13px" lineHeight="20px">
-                Version 4.0.0 &bull; AGPL-3.0-only &bull; not on the public npm
-                registry yet
+                Version {version} &bull; {license} &bull; on npm as
+                @onlyoffice/apps-ui-kit
               </Text>
               <Link
                 type={LinkType.page}

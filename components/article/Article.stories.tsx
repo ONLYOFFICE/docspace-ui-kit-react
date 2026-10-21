@@ -209,16 +209,6 @@ const meta = {
       description: "Key of the Zendesk account the live chat connects to",
       table: { type: { summary: "string" } },
     },
-    zendeskEmail: {
-      control: false,
-      description: "Address the live chat pre-fills",
-      table: { type: { summary: "string" } },
-    },
-    chatDisplayName: {
-      control: false,
-      description: "Name the live chat shows for the visitor",
-      table: { type: { summary: "string" } },
-    },
     languageBaseName: {
       control: false,
       description: "Locale handed to the live chat",
@@ -254,8 +244,6 @@ const defaultProps: ArticleProps = {
   withCustomArticleHeader: false,
   isBurgerLoading: false,
   languageBaseName: "en",
-  zendeskEmail: "support@example.com",
-  chatDisplayName: "Support Chat",
   isMobileArticle: false,
   zendeskKey: "your-zendesk-key",
   showBackButton: false,

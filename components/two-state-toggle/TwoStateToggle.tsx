@@ -30,15 +30,15 @@ const writeStoredDesign = (value: "new" | "old") => {
 };
 
 const TwoStateToggle = ({
-  title = "DocSpace design",
+  title = "ONLYOFFICE Apps design",
   labelOld = "OLD",
   labelNew = "NEW",
   confirmTitle = "Switch to Old Design",
-  confirmBody = "You are about to leave the new Dashboard and return to the classic DocSpace view.",
+  confirmBody = "You are about to leave the new Dashboard and return to the classic ONLYOFFICE Apps view.",
   confirmHint = "You can return to the new Dashboard at any time by navigating to /dashboard.",
   confirmOk = "Switch",
   confirmCancel = "Cancel",
-  ariaLabel = "Switch DocSpace design",
+  ariaLabel = "Switch ONLYOFFICE Apps design",
   onNavigate,
   className,
 }: TwoStateToggleProps) => {

@@ -1,7 +1,10 @@
-class ZendeskAPI {
-  waitingChanges: (string | object)[][] = [];
+/** One `zE(...)` call: the command, then whatever it takes - a locale, a z-index, a listener, a settings object. */
+type ZendeskArgs = (string | number | object)[];
 
-  addChanges = (...args: (string | object)[]) => {
+class ZendeskAPI {
+  waitingChanges: ZendeskArgs[] = [];
+
+  addChanges = (...args: ZendeskArgs) => {
     if (typeof window?.document?.createElement !== "undefined" && window?.zE) {
       window?.zE?.apply(null, args);
     } else {

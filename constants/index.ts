@@ -56,6 +56,18 @@ export const ASIDE_PADDING_AFTER_LAST_ITEM = "12px";
  */
 export const LIVE_CHAT_LOCAL_STORAGE_KEY = "live_chat_state";
 
+// Geometry of the floating corner stack, mirroring
+// styles/variables/_floating-corner.scss - keep the two in sync. The Zendesk
+// launcher is placed by script instead of by CSS, so it can only line up with
+// the create button pinned to the same corner by reading the same numbers.
+export const FLOATING_CORNER_INSET = 24;
+
+export const FLOATING_CORNER_INSET_MOBILE = 16;
+
+export const FLOATING_CORNER_SIZE = 48;
+
+export const FLOATING_CORNER_GAP = 16;
+
 export const LANGUAGE = "asc_language";
 
 export const FOLDER_FORM_VALIDATION = /[*+:"<>?|\\\/]/gim;

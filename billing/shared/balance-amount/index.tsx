@@ -3,7 +3,9 @@ import React, { useMemo } from "react";
 import classNames from "classnames";
 
 import { Text } from "../../../components/text";
+import { Tooltip } from "../../../components/tooltip";
 import { truncateNumberToFraction } from "../../utils/common";
+import { formatterCurrencyWithoutTranction } from "../../wallet/utils";
 import RefreshIconButton from "../refresh-icon-button";
 import styles from "./BalanceAmount.module.scss";
 
@@ -28,6 +30,7 @@ type BalanceAmountProps = {
   mainFontSize?: string;
   fractionFontSize?: string;
   titleFontSize?: string;
+  tooltipId?: string;
 };
 
 const typeClassMap: Record<string, string> = {
@@ -56,13 +59,18 @@ const BalanceAmount = (props: BalanceAmountProps) => {
     mainFontSize,
     fractionFontSize,
     titleFontSize = "18px",
+    tooltipId,
   } = props;
+
+  const minDisplayedAmount = 1 / 10 ** maximumFractionDigits;
+  const isBelowMinimum =
+    tooltipId !== undefined && amount > 0 && amount < minDisplayedAmount;
 
   const tokens: BalanceAmountToken[] = useMemo(() => {
     const safeAmount = Number.isFinite(amount) ? amount : 0;
 
     const truncatedStr = truncateNumberToFraction(
-      safeAmount,
+      isBelowMinimum ? minDisplayedAmount : safeAmount,
       maximumFractionDigits,
     );
     const truncated = Number(truncatedStr);
@@ -75,7 +83,14 @@ const BalanceAmount = (props: BalanceAmountProps) => {
     });
 
     return formatter.formatToParts(truncated);
-  }, [amount, currency, language, maximumFractionDigits]);
+  }, [
+    amount,
+    currency,
+    language,
+    maximumFractionDigits,
+    isBelowMinimum,
+    minDisplayedAmount,
+  ]);
 
   return (
     <div className={className}>
@@ -110,6 +125,7 @@ const BalanceAmount = (props: BalanceAmountProps) => {
       <div
         className={classNames(styles.balanceAmountContainer, {
           [styles.withoutMargin]: withoutMargin,
+          [styles.tooltipAnchor]: isBelowMinimum,
         })}
         style={{
           ...(mainFontSize &&
@@ -121,7 +137,9 @@ const BalanceAmount = (props: BalanceAmountProps) => {
               "--balance-fraction-font-size": fractionFontSize,
             } as React.CSSProperties)),
         }}
+        data-tooltip-id={isBelowMinimum ? tooltipId : undefined}
       >
+        {isBelowMinimum ? <Text className={styles.literal}>{"<"}</Text> : null}
         {tokens.map((token) => (
           <Text
             key={`${token.type}-${token.value}`}
@@ -131,6 +149,19 @@ const BalanceAmount = (props: BalanceAmountProps) => {
           </Text>
         ))}
       </div>
+
+      {isBelowMinimum ? (
+        <Tooltip
+          id={tooltipId}
+          place="top-end"
+          getContent={() => (
+            <Text fontSize="12px" noSelect>
+              {formatterCurrencyWithoutTranction(language, amount, currency)}
+            </Text>
+          )}
+          dataTestId={`${tooltipId}_tooltip`}
+        />
+      ) : null}
     </div>
   );
 };

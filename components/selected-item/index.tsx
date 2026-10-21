@@ -37,7 +37,7 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
   const handleOnClick = (e: React.MouseEvent<HTMLElement>) => {
     const target = e.target as HTMLElement;
 
-    if (!isDisabled && !target.classList.contains("selected-tag-removed"))
+    if (!isDisabled && !target.closest(".selected-tag-removed"))
       onClick?.(propKey, label, group, e);
   };
 

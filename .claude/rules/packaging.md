@@ -88,7 +88,8 @@ tree-shakes an unused class-name map and drops the stylesheet import with it.
 
 ## `"use client"`
 
-55 modules carry the directive. Rollup drops module-level directives while bundling and warns
+Every module that declares the directive must keep it; `pnpm build` prints how many with
+`"use client" preserved: N modules.` Rollup drops module-level directives while bundling and warns
 once per file, invisibly. `preserveUseClient` restores it per chunk and `check-dist.mjs`
 asserts a match **by module name**, not by count — equal totals can hide one module losing the
 directive while another gains it. Without it, every Next.js App Router consumer breaks on the

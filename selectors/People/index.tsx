@@ -41,10 +41,26 @@ import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import StyledSendClockIcon from "./components/SendClockIcon";
 import styles from "./PeopleSelector.module.scss";
 import { Encoder } from "../../utils/encoder";
+import { EmployeeType } from "../../enums";
 
 const PEOPLE_TAB_ID = "0";
 const GROUP_TAB_ID = "1";
 const GUESTS_TAB_ID = "2";
+
+const toSdkEmployeeType = (type: EmployeeType): SdkEmployeeType | undefined => {
+  switch (type) {
+    case EmployeeType.RoomAdmin:
+      return "RoomAdmin";
+    case EmployeeType.Admin:
+      return "DocSpaceAdmin";
+    case EmployeeType.User:
+      return "User";
+    case EmployeeType.Guest:
+      return "Guest";
+    default:
+      return undefined;
+  }
+};
 
 const toListItem = (
   item: EmployeeFullDto | GroupDto,
@@ -383,6 +399,9 @@ const PeopleSelector = ({
             {
               id,
               employeeStatus: currentFilter.employeeStatus,
+              employeeTypes: currentFilter.role
+                ?.map(toSdkEmployeeType)
+                .filter((t): t is SdkEmployeeType => !!t),
               includeShared,
               area,
               count: pageCount,

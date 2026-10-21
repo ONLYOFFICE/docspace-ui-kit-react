@@ -34,16 +34,9 @@ import { DocsPage } from "./blocks/DocsPage";
 // without this every brand name rendered as its own key -- the Files selector
 // breadcrumb read "ProductName" rather than the product. test/setup.ts does the
 // same for Vitest.
-//
-// `ProductName` is overridden rather than taken from the fixture: the fixture
-// mirrors the portal's own brands.json, which still says "DocSpace", and
-// test/setup.ts plus the expectations in errors/Errors.test.tsx are pinned to
-// that value. Storybook shows the
-// product under its current name; everything else still comes from the fixture.
-const { get: getBrand } = parseLocaleConstants({
-  ...(brandsData as Record<string, string>),
-  ProductName: "ONLYOFFICE",
-});
+const { get: getBrand } = parseLocaleConstants(
+  brandsData as Record<string, string>,
+);
 setBrandLookup(getBrand);
 
 // The API Config and direction toolbars reach the stories a Docs page renders
@@ -199,6 +192,11 @@ const preview: Preview = {
 
   initialGlobals: {
     apiConfig: "default",
+    // "page" paints the story on a white or black page with a 20px margin.
+    // "transparent" drops both, for scripts/docs/screenshots.mjs, which
+    // photographs stories for the API site and needs the component alone.
+    // Set from the URL: iframe.html?id=...&globals=canvas:transparent.
+    canvas: "page",
   },
 
   decorators: [
@@ -222,7 +220,8 @@ const preview: Preview = {
       ]);
 
       const isDocs = context.viewMode === "docs";
-      const noPadding = context.parameters?.noPadding;
+      const transparent = context.globals.canvas === "transparent";
+      const noPadding = context.parameters?.noPadding || transparent;
 
       return (
         <TranslationProvider locale="en" translations={translations}>
@@ -232,9 +231,11 @@ const preview: Preview = {
           >
             <div
               style={{
-                backgroundColor: isDark
-                  ? globalColors.black
-                  : globalColors.white,
+                backgroundColor: transparent
+                  ? "transparent"
+                  : isDark
+                    ? globalColors.black
+                    : globalColors.white,
                 color: isDark ? globalColors.white : globalColors.black,
                 padding: isDocs || noPadding ? "0" : "20px",
               }}

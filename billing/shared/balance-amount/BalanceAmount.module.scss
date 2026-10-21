@@ -7,6 +7,10 @@
   &.withoutMargin {
     margin: 0;
   }
+
+  &.tooltipAnchor {
+    width: fit-content;
+  }
 }
 
 .headerContainer {

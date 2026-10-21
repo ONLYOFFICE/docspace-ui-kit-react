@@ -4,7 +4,6 @@ import { zendeskAPI } from "./Zendesk.utils";
 
 declare global {
   interface Window {
-    zESettings: unknown;
     zE: {
       apply: (...args: unknown[]) => void;
     };
@@ -15,17 +14,10 @@ interface Props {
   zendeskKey: string;
   defer?: boolean;
   onLoaded?: () => void;
-  config?: object;
   isShowLiveChat: boolean;
 }
 
-const Zendesk = ({
-  zendeskKey,
-  defer,
-  onLoaded,
-  config,
-  isShowLiveChat,
-}: Props) => {
+const Zendesk = ({ zendeskKey, defer, onLoaded, isShowLiveChat }: Props) => {
   const onScriptLoaded = useCallback(() => {
     const waitingChanges = zendeskAPI.getChanges();
     if (waitingChanges.length > 0) {
@@ -67,10 +59,8 @@ const Zendesk = ({
       isShowLiveChat
     ) {
       insertScript(zendeskKey, defer);
-
-      window.zESettings = { ...(config || {}) };
     }
-  }, [zendeskKey, defer, insertScript, config, isShowLiveChat]);
+  }, [zendeskKey, defer, insertScript, isShowLiveChat]);
 
   return null;
 };

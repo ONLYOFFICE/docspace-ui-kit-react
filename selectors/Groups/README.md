@@ -1,6 +1,6 @@
 # Groups Selector
 
-A selector component for choosing user groups from the DocSpace system. Provides a searchable, paginated list of groups.
+A selector component for choosing user groups from the ONLYOFFICE Apps system. Provides a searchable, paginated list of groups.
 
 ## What It Does
 
@@ -9,7 +9,7 @@ A selector component for choosing user groups from the DocSpace system. Provides
 - Provides search with automatic list reset and re-fetch
 - Loads groups in paginated batches of 100
 - Supports rendering inside an Aside panel or inline
-- Uses the DocSpace Groups API (`groupApi.getGroups`) to fetch data
+- Uses the ONLYOFFICE Apps Groups API (`groupApi.getGroups`) to fetch data
 
 ## Import
 

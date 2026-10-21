@@ -157,9 +157,16 @@ function copyDirSync(src, dest) {
   }
 }
 
+// The client's copy opens with its license header; this repository keeps no
+// per-file headers (LICENSE covers it), so the header is dropped on the way in.
+const LICENSE_HEADER = /^\/\*\*[\s\S]*?Ascensio System SIA[\s\S]*?\*\/\s*/;
+
 if (fs.existsSync(FONTS_CSS_SRC)) {
   fs.mkdirSync(FONTS_CSS_DEST, { recursive: true });
-  fs.copyFileSync(FONTS_CSS_SRC, path.join(FONTS_CSS_DEST, "fonts.css"));
+  const css = fs
+    .readFileSync(FONTS_CSS_SRC, "utf8")
+    .replace(LICENSE_HEADER, "");
+  fs.writeFileSync(path.join(FONTS_CSS_DEST, "fonts.css"), css);
   console.log("Copied css/fonts.css");
 } else {
   console.error(`fonts.css not found: ${FONTS_CSS_SRC}`);

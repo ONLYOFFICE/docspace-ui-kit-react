@@ -82,9 +82,7 @@ const Article = ({
   trialDaysLeft,
 
   languageBaseName,
-  zendeskEmail,
   isMobileArticle,
-  chatDisplayName,
   zendeskKey,
   showProgress,
   user,
@@ -315,10 +313,15 @@ const Article = ({
               {!isMobile && isLiveChatAvailable ? (
                 <ArticleLiveChat
                   languageBaseName={languageBaseName}
-                  zendeskEmail={zendeskEmail}
-                  chatDisplayName={chatDisplayName}
                   zendeskKey={zendeskKey}
                   isShowLiveChat={isShowLiveChat}
+                  withFloatingButton={
+                    (!!withMainButton &&
+                      !!articleMainButtonContent &&
+                      isMobileArticle) ||
+                    showProgress
+                  }
+                  isInfoPanelVisible={isInfoPanelVisible}
                 />
               ) : null}
             </>

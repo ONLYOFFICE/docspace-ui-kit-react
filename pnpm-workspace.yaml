@@ -12,12 +12,14 @@ allowBuilds:
   # postinstall only prints a version-scheme advisory to stderr, no artifacts
   protobufjs: false
 minimumReleaseAgeExclude:
-  # Vendored tarball (onlyoffice-ai-chat-*.tgz), never published to npm, so the
-  # age check 404s on the registry. Listed without a version so it survives
-  # tarball bumps; the artifact is committed and reviewed in this repo.
+  # Our own package, released alongside this one: a fresh ai-chat release has
+  # to be installable the day it is published, not after the age window.
+  # Listed without a version so it survives bumps.
   - "@onlyoffice/ai-chat"
   - "@rolldown/binding-android-arm64@1.2.2"
   - "@rolldown/binding-linux-arm-gnueabihf@1.2.2"
   - "@rolldown/binding-linux-arm64-musl@1.2.2"
   - "@rolldown/binding-linux-s390x-gnu@1.2.2"
   - "@rolldown/binding-linux-x64-musl@1.2.2"
+  - "@onlyoffice/doceditor-types@10.0.0"
+  - "@onlyoffice/document-editor-react@2.3.0"

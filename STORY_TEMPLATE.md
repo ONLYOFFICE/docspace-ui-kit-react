@@ -128,7 +128,7 @@ So a story file carries no `parameters.docs.description.component`, and its
 `CssCustomization` text says what the example sets, not which variables exist. A fact you
 would have written as a Features or Accessibility bullet belongs in the README's
 "Behaviour the types don't state" or "Accessibility"; a variable and its caveats in its
-"CSS variables" table. Verify it against the code first — `README_TEMPLATE.md` governs the
+"CSS variables" table. Verify it against the code first — `COMPONENT_README_TEMPLATE.md` governs the
 README.
 
 What stays in the story is what a README cannot hold: the canvases, the controls, the
@@ -150,6 +150,14 @@ facts live in the parent README.
 | Type/style variants | `PrimaryButtons`, `SecondaryButtons`            |
 | Feature demos       | `WithIcon`, `WithTooltip`, `WithCallback`       |
 | Direction           | `RightToLeft` (never `RTL`)                     |
+
+## Pictures for the API site
+
+The site's pages (`docs-generation.md`) photograph every story. Two tags steer that:
+`tags: ["picture"]` on the story the page should open with, when it is not the first one;
+`tags: ["no-picture"]` on a story that is listed but not photographed -- one that paints a
+page of its own in both themes, as `FieldContainer`'s `CustomStyling` does. Do not name a
+story `Primary` or `ArgsTable`: those shot names belong to the page.
 
 ## Categories
 

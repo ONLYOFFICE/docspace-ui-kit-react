@@ -23,7 +23,7 @@ cancel pair. It owns the preview it hands back on save, and nothing else — the
 and the open state all stay in your code.
 
 **Portal-internal.** `t` is required, and the two footer labels and the editor's replace control
-are asked for by key, so the component needs the portal's translation context. Outside DocSpace,
+are asked for by key, so the component needs the portal's translation context. Outside ONLYOFFICE Apps,
 supply a `t` of your own.
 
 ## Use this when / not when

@@ -19,7 +19,7 @@
 # Navigation
 
 The file manager's header: breadcrumb title, back arrow, and the row of buttons that acts on the
-current folder. It is built for DocSpace's own document browser and expects that shape of data —
+current folder. It is built for the ONLYOFFICE Apps document browser and expects that shape of data —
 a folder trail, two context menu getters and a device type you tell it about.
 
 ## Use this when / not when

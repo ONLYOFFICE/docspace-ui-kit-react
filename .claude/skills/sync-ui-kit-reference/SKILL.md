@@ -1,6 +1,6 @@
 ---
 name: sync-ui-kit-reference
-description: Check the DocSpace plugin skill's documentation of this kit (agent-skills/skills/plugin-sdk) against this source, and apply the fixes -- package name, vendored tarball, dist paths, component names, CSS variables, behavioural traps
+description: Check the DocSpace plugin skill's documentation of this kit (agent-skills/skills/plugin-sdk) against this source, and apply the fixes -- package name, installed range, dist paths, component names, CSS variables, behavioural traps
 argument-hint: "[--skills <path>]"
 ---
 
@@ -22,7 +22,7 @@ node .claude/scripts/ui-kit-reference/check-drift.mjs
 
 Finds the skill at `../agent-skills`, or `AGENT_SKILLS_ROOT`, or `--skills <path>`, and fails
 loudly rather than guessing. Exit 1 on any drift. It checks six things: the package specifier in
-`scripts/contract.mjs`, the vendored tarball's name and version, the `dist/` paths the reference
+`scripts/contract.mjs`, the range the generator installs the kit at, the `dist/` paths the reference
 tells authors to read, every PascalCase name it backticks against `docs/plugin-surface.json`,
 every CSS variable in its table against this package plus the client's `theme.scss`, and ten
 behavioural claims against the components that make them true.
@@ -31,26 +31,22 @@ behavioural claims against the components that make them true.
 
 **Package name.** `UI_KIT_PACKAGE` in `scripts/contract.mjs`. It is not a cosmetic rename: the
 portal's shim throws on any bare specifier it does not know, so the skill's value and the
-portal's must match exactly. All three repositories carry a `feature/ui-kit-separation` branch
-and they land together — [plugin-api.md](../../rules/plugin-api.md) has the table. Changing it
-early breaks plugins just as thoroughly as changing it late.
+portal's must match exactly. The three repositories renamed it together on 2 October 2026
+([plugin-api.md](../../rules/plugin-api.md) has the history); it changes again only when the
+portal's shim does.
 
-Anything that touches the specifier, the tarball or the externals list has to be re-verified by
+Anything that touches the specifier, the installed range or the externals list has to be re-verified by
 the skill's own suite, `node skills/plugin-sdk/scripts/test-validator.mjs`, and by
 `claude plugin validate . --strict` — its CONTRIBUTING requires both. Note that the externals
 are written as a **regex** (`/^@onlyoffice\/apps-ui-kit(\/.*)?$/`) in `templates/vite.config`,
 the eval fixture and `validator-tests/fixtures.mjs`; a grep for the plain package name does not
 find those three, and missing them fails 11 expectations.
 
-**Vendored tarball.** Re-pack from this repository, with pnpm — `npm pack` leaves
-`publishConfig` unapplied and produces a tarball with no `exports` at all:
-
-```bash
-pnpm build && pnpm verify:package && pnpm pack --pack-destination /tmp
-```
-
-Then replace the file in `agent-skills/skills/plugin-sdk/vendor/`, delete the old one, and grep
-the skill for the old file name — `scripts/generator/options.mjs` and `SKILL.md` mention it.
+**Installed range.** `UI_KIT_RANGE` in `scripts/generator/project-files.mjs` is what a
+generated plugin installs from npm, and the bundle keeps the kit external, so it only decides
+what the plugin compiles against. Move it with the range the portal installs
+(`packages/client/package.json` in DocSpace-client), never ahead of it: a plugin compiled
+against a newer kit than the portal bundles can import a name the portal's copy lacks.
 
 **Dist paths.** The reference points at `dist/cjs/**/<Name>.module.scss.js` for a component's
 real CSS. That directory does not exist: the build is ESM-only. The equivalent is
@@ -86,8 +82,8 @@ will not flag either, because the exported name did not change.
 
 ## Step 4 -- committing
 
-`agent-skills` is a separate repository. Work on its `feature/ui-kit-separation` branch, which
-is the counterpart of this one; do not commit to `main` without the user saying so. Present the
-diff, say which of the three branches still has to move, and let them decide when to push.
+`agent-skills` is a separate repository whose default branch is `main`. Make the changes on a
+branch there and do not commit to `main` without the user saying so. Present the diff and let
+them decide when to push.
 
 Its commit convention: one line, imperative, no type prefix.

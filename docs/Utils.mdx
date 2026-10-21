@@ -19,7 +19,7 @@ Two ways, and which one is right depends on who you are.
 import { isMobile } from "@onlyoffice/apps-ui-kit/utils/device";
 import { formatDate } from "@onlyoffice/apps-ui-kit/utils/date";
 
-// DocSpace plugins: the root barrel is the only entry the portal exposes.
+// ONLYOFFICE Apps plugins: the root barrel is the only entry the portal exposes.
 // A subpath import throws at plugin load.
 import { isMobile, formatDate } from "@onlyoffice/apps-ui-kit";
 ```
@@ -164,7 +164,7 @@ portal's own rules.
 
 ## Portal domain helpers
 
-These encode DocSpace concepts rather than generic browser behaviour.
+These encode ONLYOFFICE Apps concepts rather than generic browser behaviour.
 
 | Module                          | Exports                                                                                                                     |
 | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
@@ -187,11 +187,11 @@ These encode DocSpace concepts rather than generic browser behaviour.
 ## What is deliberately not in the barrel
 
 Three modules ship in the package and resolve by subpath, but are left out of
-`utils/index.ts` — so they are not reachable from a DocSpace plugin:
+`utils/index.ts` — so they are not reachable from an ONLYOFFICE Apps plugin:
 
 - **`utils/socket`** — `SocketHelper`, `SocketEvents` and `SocketCommands`, the portal's
   WebSocket singleton. It is the only importer of `socket.io-client`, which is an optional
-  peer dependency, and it is meaningless without a DocSpace portal to talk to.
+  peer dependency, and it is meaningless without an ONLYOFFICE Apps portal to talk to.
 - **`utils/interop-default`** — a Node CJS/ESM interop shim used by the build, not
   application code.
 - **`utils/add-log`** — socket logging gated on `window.ClientConfig`.

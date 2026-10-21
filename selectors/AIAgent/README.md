@@ -1,6 +1,6 @@
 # AIAgent Selector
 
-A selector component for choosing AI Agents from the DocSpace system. Provides a searchable, paginated list of available AI agents with real-time WebSocket updates.
+A selector component for choosing AI Agents from the ONLYOFFICE Apps system. Provides a searchable, paginated list of available AI agents with real-time WebSocket updates.
 
 ## What It Does
 

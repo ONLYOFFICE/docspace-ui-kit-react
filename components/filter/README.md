@@ -25,7 +25,7 @@ getters and it tells you what changed.
 ## Use this when / not when
 
 - **This is portal-internal.** Its filter groups, its contacts pages and its room grouping row are
-  DocSpace's; the type even names the pages it can be on.
+  the portal's own; the type even names the pages it can be on.
 - Use it above a listing that already has a filter model of the shape the panel expects.
 - Not for a plain search box — [`SearchInput`](../search-input/README.md) is that, and this renders
   one inside itself.

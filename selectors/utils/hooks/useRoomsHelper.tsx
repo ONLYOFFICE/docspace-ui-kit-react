@@ -80,8 +80,10 @@ const useRoomsHelper = ({
   const { addInputItem } = useInputItemHelper({ withCreate, setItems });
 
   const requestRunning = React.useRef(false);
+  const requestIdRef = React.useRef(0);
   const initRef = React.useRef(isInit);
   const firstLoadRef = React.useRef(isFullLoadActive);
+  const specialItemsCountRef = React.useRef(0);
 
   React.useEffect(() => {
     firstLoadRef.current = isFullLoadActive;
@@ -140,13 +142,17 @@ const useRoomsHelper = ({
 
   const getRoomList = React.useCallback(
     async (sIndex: number) => {
-      if (requestRunning.current) return;
+      if (requestRunning.current && sIndex > 0) return;
+
+      const requestId = ++requestIdRef.current;
+      const isLatest = () => requestId === requestIdRef.current;
 
       requestRunning.current = true;
       setIsNextPageLoading(true);
 
       try {
-        let startIndex = sIndex;
+        let startIndex =
+          sIndex > 0 ? Math.max(0, sIndex - specialItemsCountRef.current) : 0;
 
         if (withCreate) {
           startIndex -= startIndex % 100;
@@ -200,6 +206,9 @@ const useRoomsHelper = ({
           startIndex,
           filterValue,
         });
+
+        if (!isLatest()) return;
+
         const roomsFromApi = res.data.response!;
 
         const { folders, total, count, current } = roomsFromApi;
@@ -279,6 +288,8 @@ const useRoomsHelper = ({
             setTotal(total);
           }
 
+          if (startIndex === 0) specialItemsCountRef.current = 0;
+
           if (
             startIndex === 0 &&
             !searchValue &&
@@ -303,6 +314,7 @@ const useRoomsHelper = ({
 
             if (specialItems.length) {
               itemList.unshift(...specialItems);
+              specialItemsCountRef.current = specialItems.length;
               const base = withCreate && security?.Create ? total + 1 : total;
               setTotal(base + specialItems.length);
             }
@@ -319,13 +331,15 @@ const useRoomsHelper = ({
         setIsRoot?.(false);
         setIsInit(false);
       } catch (error) {
-        toastr.error(error as TData);
+        if (isLatest()) toastr.error(error as TData);
       } finally {
-        requestRunning.current = false;
-        setIsNextPageLoading(false);
-        // Also ends the content refresh; skipping it on the error path would
-        // leave the skeleton on screen and hideSectionLoader a permanent no-op
-        finishFullLoad();
+        if (isLatest()) {
+          requestRunning.current = false;
+          setIsNextPageLoading(false);
+          // Also ends the content refresh; skipping it on the error path would
+          // leave the skeleton on screen and hideSectionLoader a permanent no-op
+          finishFullLoad();
+        }
       }
     },
     [

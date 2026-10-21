@@ -24,7 +24,7 @@ components/<kebab-name>/
   README.md            shipped in the package (`files` in package.json)
 ```
 
-The README follows [`README_TEMPLATE.md`](../../README_TEMPLATE.md), which is the contract:
+The README follows [`COMPONENT_README_TEMPLATE.md`](../../COMPONENT_README_TEMPLATE.md), which is the contract:
 a metadata block on line 1, a fixed order of sections, a prop table generated from the JSDoc
 between markers, and at least one compiling example. `pnpm check:readme` enforces it, in
 pre-push and in CI. Every folder is on the template — `scripts/readme-allowlist.json`, which

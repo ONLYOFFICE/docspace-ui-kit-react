@@ -26,7 +26,7 @@ the tooltip that names what is running.
 
 - **This component is portal-internal.** Its wording comes from the portal's `Common`
   translations, its operation names from the portal's `OPERATIONS_NAME`, and each entry has to
-  hand it a `showPanel` callback into a panel the portal owns. Outside DocSpace it renders a
+  hand it a `showPanel` callback into a panel the portal owns. Outside ONLYOFFICE Apps it renders a
   disc whose tooltip is empty.
 - Use inside the portal for the whole queue of background operations at once.
 - For one operation of your own, use [`FloatingButton`](../floating-button/README.md)

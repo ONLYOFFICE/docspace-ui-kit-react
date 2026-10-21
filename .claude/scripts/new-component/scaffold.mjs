@@ -198,7 +198,7 @@ describe("${Pascal}", () => {
   // Shipped in the published package: `files` in package.json lists
   // components/**/README.md.
   // It is also the Storybook Docs page (.storybook/blocks/DocsPage.tsx), so it
-  // is the only description the component has. README_TEMPLATE.md governs it;
+  // is the only description the component has. COMPONENT_README_TEMPLATE.md governs it;
   // the TODO category fails \`pnpm check:readme\` until a real one is chosen.
   "README.md": `<!-- ui-kit-doc {
   "schema": 1,

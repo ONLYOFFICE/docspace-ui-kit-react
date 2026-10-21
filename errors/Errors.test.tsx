@@ -18,7 +18,7 @@ const mockTranslations: Record<string, string> = {
   InvalidLink: "Invalid link",
   LinkDoesNotExist: "This link does not exist",
   ErrorDeactivatedText: "This workspace is deactivated",
-  ProductName: "DocSpace",
+  ProductName: "ONLYOFFICE Apps",
   AccessDenied: "Access denied",
   PortalRestriction: "Access to this workspace is restricted",
 };

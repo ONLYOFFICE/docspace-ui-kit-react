@@ -15,6 +15,7 @@
       "!**/node_modules",
       "!**/dist",
       "!**/storybook-static",
+      "!**/site-docs",
       "!**/playwright-report",
       "!**/test-results",
       "!**/.git",

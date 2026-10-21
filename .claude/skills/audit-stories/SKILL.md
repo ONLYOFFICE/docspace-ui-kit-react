@@ -220,7 +220,7 @@ follows it:
   `parameters.docs.description.component` — only the one-line comment
   Button's has — because the Docs page renders the README instead. A
   fact you would have written there is added to the README section it
-  belongs in, under `README_TEMPLATE.md`, and verified against the code
+  belongs in, under `COMPONENT_README_TEMPLATE.md`, and verified against the code
   first: a capability or a trap into "Behaviour the types don't state"
   (or a `###` under "Recipes" when it is a use no example shows), a
   variable into "CSS variables". The README's `## Accessibility` lists
@@ -509,7 +509,7 @@ audited component from one never looked at, and how long ago:
   (`"storiesAudit": "2026-09-28"`), placed as the last field, after
   `testIds`. A stamp already there is overwritten, never duplicated.
   `scripts/lib/readme-meta.mjs` refuses any other form and a date in
-  the future; `README_TEMPLATE.md` lists the field.
+  the future; `COMPONENT_README_TEMPLATE.md` lists the field.
 - **Stamp when the stories are in order**: the fixes the user asked
   for are applied and verified in the browser, or the audit found
   nothing to fix. A report still waiting for its fixes, a run the user

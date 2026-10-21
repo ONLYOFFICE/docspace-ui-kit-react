@@ -117,7 +117,7 @@ configuration arrives; `events_onAppReady` is when the editor is up.
 
 ## Config Object
 
-The `config` prop accepts an `IConfig` object that follows the ONLYOFFICE Document Server API specification. Key configuration sections include:
+The `config` prop accepts an `IConfig` object that follows the ONLYOFFICE Document Server API specification. `IConfig` is an alias of `Config` from `@onlyoffice/doceditor-types`, which has to be installed next to `@onlyoffice/document-editor-react`. Key configuration sections include:
 
 ### Document Configuration
 

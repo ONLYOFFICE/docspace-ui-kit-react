@@ -1,4 +1,4 @@
-import React, { use, useCallback } from "react";
+import React, { use, useCallback, useEffect } from "react";
 import { SearchInput } from "../../search-input";
 import { InputSize } from "../../text-input";
 
@@ -16,6 +16,10 @@ const Search = React.memo(({ isSearch }: SearchProps) => {
     onSearch,
   } = use(SearchContext);
   const setIsSearch = use(SearchDispatchContext);
+
+  useEffect(() => {
+    if (!searchValue) setIsSearch(false);
+  }, [searchValue, setIsSearch]);
 
   const onClearSearchAction = useCallback(() => {
     onClearSearch?.(() => setIsSearch(false));

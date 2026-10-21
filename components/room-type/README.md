@@ -28,7 +28,7 @@ list, the collapsed button at the top of a dropdown, and an entry inside that dr
 - Not for the glyph alone — that is [`RoomLogo`](../room-logo/README.md), which this component
   renders inside itself.
 - Not for a particular existing room — that is [`RoomIcon`](../room-icon/README.md).
-- Not as a generic option row: every string is a `Common` translation key of the DocSpace
+- Not as a generic option row: every string is a `Common` translation key of the ONLYOFFICE Apps
   portal, so a row about anything else comes out blank.
 
 **Portal-internal.** All six titles and all six descriptions come from the portal's `Common`

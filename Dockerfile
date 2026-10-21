@@ -19,17 +19,16 @@ RUN apt-get -y update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PNPM
-RUN npm install -g pnpm@12.4.1
+RUN npm install -g pnpm@12.11.2
 
 WORKDIR /app
 
 RUN pnpm config set store-dir /root/.local/share/pnpm/store
 
-# Manifests first, for layer caching. The ai-chat tarball has to come with
-# them: package.json depends on it as `file:onlyoffice-ai-chat-*.tgz`, so the
-# install fails without it.
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY onlyoffice-ai-chat-*.tgz ./
+# Manifests first, for layer caching. `*.tgz` brings the vendored
+# @onlyoffice/ai-chat tarball the lockfile resolves as a `file:` dependency;
+# .dockerignore keeps local ui-kit packs out.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml *.tgz ./
 
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 

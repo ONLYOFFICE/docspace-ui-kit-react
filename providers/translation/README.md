@@ -30,7 +30,7 @@ is **not** among them, despite the prompt it draws: that prompt is a prop like a
   do not depend on each other.
 - Mount it even in an English-only application. The package ships `en` and the components still
   need the table handed to them.
-- Not inside a DocSpace plugin: the portal supplies the instance, and a second one competes with
+- Not inside an ONLYOFFICE Apps plugin: the portal supplies the instance, and a second one competes with
   it for the same global.
 - Not for your own application's copy. It can share the map — add a namespace of your own beside
   `Common` — but the components only ever read `Common`.

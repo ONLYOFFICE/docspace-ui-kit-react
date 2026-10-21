@@ -21,7 +21,7 @@ describe("ZendeskAPI", () => {
 
   describe("addChanges", () => {
     it("should add changes to waitingChanges when Zendesk is not initialized", () => {
-      const args = ["webWidget", "hide"];
+      const args = ["messenger", "hide"];
       zendeskAPI.addChanges(...args);
 
       expect(zendeskAPI.getChanges()).toHaveLength(1);
@@ -32,7 +32,7 @@ describe("ZendeskAPI", () => {
       const mockZE = vi.fn();
       window.zE = mockZE;
 
-      const args = ["webWidget", "show"];
+      const args = ["messenger", "show"];
       zendeskAPI.addChanges(...args);
 
       expect(mockZE).toHaveBeenCalledWith(...args);
@@ -40,9 +40,9 @@ describe("ZendeskAPI", () => {
     });
 
     it("should handle multiple changes when Zendesk is not initialized", () => {
-      const args1 = ["webWidget", "show"];
+      const args1 = ["messenger", "show"];
       const args2 = [
-        "webWidget",
+        "messenger",
         "updateSettings",
         { color: { theme: "#000000" } },
       ];
@@ -59,7 +59,7 @@ describe("ZendeskAPI", () => {
       const mockZE = vi.fn();
       window.zE = mockZE;
 
-      const args = ["webWidget", "show"];
+      const args = ["messenger", "show"];
       zendeskAPI.addChanges(...args);
 
       expect(zendeskAPI.getChanges()).toHaveLength(0);
@@ -72,8 +72,8 @@ describe("ZendeskAPI", () => {
     });
 
     it("should return all queued changes", () => {
-      const args1 = ["webWidget", "show"];
-      const args2 = ["webWidget", "hide"];
+      const args1 = ["messenger", "show"];
+      const args2 = ["messenger", "hide"];
 
       zendeskAPI.addChanges(...args1);
       zendeskAPI.addChanges(...args2);
@@ -87,8 +87,8 @@ describe("ZendeskAPI", () => {
 
   describe("clearChanges", () => {
     it("should clear all waiting changes", () => {
-      zendeskAPI.addChanges("webWidget", "show");
-      zendeskAPI.addChanges("webWidget", "hide");
+      zendeskAPI.addChanges("messenger", "show");
+      zendeskAPI.addChanges("messenger", "hide");
       expect(zendeskAPI.getChanges()).toHaveLength(2);
 
       zendeskAPI.clearChanges();

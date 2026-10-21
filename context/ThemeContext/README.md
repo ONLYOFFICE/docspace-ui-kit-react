@@ -1,6 +1,6 @@
 # ThemeContext
 
-React Context for managing application theme state and color schemes in DocSpace UI Kit.
+React Context for managing application theme state and color schemes in ONLYOFFICE Apps UI Kit.
 
 ## Features
 

@@ -1,8 +1,8 @@
 // Publish order: every vendored package has to be on npm before this one is.
 //
 // Some packages reach this repository as a tarball committed beside
-// package.json -- `@onlyoffice/ai-chat` today -- because they are not on the
-// registry yet. The dev copy is then a `file:` spec, which is fine: consumers
+// package.json because they are not on the registry yet -- `@onlyoffice/ai-chat`
+// did until its 1.0.0 release; none does today. The dev copy is then a `file:` spec, which is fine: consumers
 // never see devDependencies. The peer range is what they see, and it can only
 // be satisfied from a registry. Publishing this package while its peer exists
 // nowhere on npm ships a manifest no consumer can install cleanly.

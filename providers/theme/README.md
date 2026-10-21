@@ -22,7 +22,7 @@ that this provider's output defines, so a tree without it renders with those pro
 ## Use this when / not when
 
 - Mount it once, at the root of an application of your own, around everything that uses the kit.
-- Not inside a DocSpace plugin. The portal has already mounted it, and a second one would write
+- Not inside an ONLYOFFICE Apps plugin. The portal has already mounted it, and a second one would write
   the same attributes twice.
 - Not [`ThemeProviderComponent`](../../components/theme-provider/README.md) directly — that is
   the older layer this provider is built on, and it takes a whole theme object rather than a

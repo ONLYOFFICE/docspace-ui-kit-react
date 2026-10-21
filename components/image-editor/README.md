@@ -23,7 +23,7 @@ or a logo. It holds nothing: the file, the crop and the rendered preview all liv
 and come back through callbacks.
 
 **Portal-internal.** `t` is required and the labels are asked for by key, so the component needs
-the portal's translation context. Outside DocSpace, supply a `t` of your own — see the example.
+the portal's translation context. Outside ONLYOFFICE Apps, supply a `t` of your own — see the example.
 
 ## Use this when / not when
 

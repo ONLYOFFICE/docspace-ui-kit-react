@@ -1,10 +1,10 @@
 # Room Selector
 
-A selector component for choosing rooms from the DocSpace system. Supports single-select and multi-select modes with search, filtering by room type, and real-time WebSocket updates.
+A selector component for choosing rooms from the ONLYOFFICE Apps system. Supports single-select and multi-select modes with search, filtering by room type, and real-time WebSocket updates.
 
 ## What It Does
 
-- Displays a searchable, paginated list of DocSpace rooms
+- Displays a searchable, paginated list of ONLYOFFICE Apps rooms
 - Supports both single-select and multi-select modes
 - Filters rooms by type (`roomType` prop) and search area
 - Supports room creation via `withCreate` + `createDefineRoomLabel`/`createDefineRoomType`

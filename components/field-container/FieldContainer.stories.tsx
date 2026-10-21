@@ -328,6 +328,9 @@ export const WithInlineHelp: Story = {
 };
 
 export const CustomStyling: Story = {
+  // The story paints its own light page, so the dark picture for the API
+  // site is unreadable; the story stays, its picture does not.
+  tags: ["no-picture"],
   render: Template,
   args: {
     ...Default.args,

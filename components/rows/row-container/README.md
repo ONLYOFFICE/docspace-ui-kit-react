@@ -20,7 +20,7 @@
 # RowContainer
 
 Scrolling list the rows go in, virtualised and paged in as the user reaches the end. Its
-virtualisation is built for the DocSpace portal and needs the portal's own scroll element.
+virtualisation is built for the ONLYOFFICE Apps portal and needs the portal's own scroll element.
 
 ## Use this when / not when
 

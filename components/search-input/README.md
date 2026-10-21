@@ -27,7 +27,7 @@ the control above a list that the list filters itself by.
 - Not as an ordinary text field — [`TextInput`](../text-input/README.md) reports every
   keystroke through the change event, which this one does not.
 - Not for the portal's own filter bar with its sort and view controls, which is
-  [`Filter`](../filter/README.md) and only works inside DocSpace.
+  [`Filter`](../filter/README.md) and only works inside ONLYOFFICE Apps.
 
 ## Import
 

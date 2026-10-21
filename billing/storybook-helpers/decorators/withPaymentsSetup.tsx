@@ -17,7 +17,7 @@ const defaultConfig: TPaymentConfig = {
     backup: "/billing/addons/backup",
     diskStorage: "/billing/addons/disk-storage",
   },
-  logoText: "DocSpace",
+  logoText: "ONLYOFFICE",
   openOnNewPage: true,
 };
 
