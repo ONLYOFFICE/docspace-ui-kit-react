@@ -397,7 +397,7 @@
   "NoDocsConnectTransactionDescription": "Once you subscribe, the transaction history and charges will appear here.",
   "NoFindingsFound2": "No findings found",
   "NoInvoices": "No invoices yet",
-  "NoInvoicesDescription": "Once you top up the wallet, your invoices will be displayed here.",
+  "NoInvoicesDescription": "Invoices for your wallet top-ups will appear here.",
   "NoMCPServers": "No {{mcpServers}} connected yet",
   "NoMCPServersDescription": "Go to Settings >> AI settings >> {{mcpServers}} to connect servers for this {{aiAgent}}.",
   "NoPaymentMethod": "No payment method linked",
