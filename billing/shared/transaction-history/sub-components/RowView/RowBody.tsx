@@ -15,11 +15,7 @@ import {
   getServiceQuantity,
 } from "../../../../wallet/utils";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
-import {
-  getTransactionSourceLabel,
-  hasTransactionSource,
-  isAiServiceName,
-} from "../../utils";
+import { getTransactionSourceLabel, hasTransactionSource } from "../../utils";
 import { TokenUsageAnchor } from "../TokenUsage";
 import tokenStyles from "../TokenUsage/TokenUsage.module.scss";
 
@@ -51,7 +47,7 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
   );
 
   const correctDate = getCorrectDate(language, date);
-  const usage = isAiServiceName(serviceName) ? transaction.tokenUsage : null;
+  const usage = transaction.tokenUsage;
 
   const getRowChildren = () => {
     const children = [
