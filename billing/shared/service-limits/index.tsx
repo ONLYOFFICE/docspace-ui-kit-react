@@ -20,10 +20,9 @@ type ServiceLimitsProps = {
 
 const ServiceLimits = ({ helpUrl, onOpenContacts }: ServiceLimitsProps) => {
   const t = useCommonTranslation();
-  const limitStore = useServiceLimitStore();
-  const paymentStore = usePaymentStore();
   const {
     isInit,
+    fetchAll,
     portalLimit,
     isPortalSaving,
     savePortalLimit,
@@ -32,23 +31,26 @@ const ServiceLimits = ({ helpUrl, onOpenContacts }: ServiceLimitsProps) => {
     isUserSaving,
     saveUserLimit,
     setUserLimitEnabled,
-  } = limitStore;
-  const { walletCodeCurrency } = paymentStore;
+  } = useServiceLimitStore();
+  const { balance, fetchBalance } = usePaymentStore();
 
   useEffect(() => {
     const loadLimits = async () => {
+      const requests = [fetchAll()];
+
+      if (!balance) requests.push(fetchBalance());
+
       try {
-        if (!walletCodeCurrency) await paymentStore.fetchBalance();
-        await limitStore.fetchAll();
+        await Promise.all(requests);
       } catch (error) {
         toastr.error(error as Error);
       }
     };
 
     loadLimits();
-  }, [limitStore]);
+  }, [fetchAll]);
 
-  if (!isInit) return <ServiceLimitsLoader />;
+  if (!isInit || !balance) return <ServiceLimitsLoader />;
 
   const contactsLink = (
     <Link
