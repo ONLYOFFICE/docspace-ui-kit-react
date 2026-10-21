@@ -12,8 +12,8 @@ import React, {
 /**
  * The room the chat may connect as context: the room the user is standing
  * in, as the host names it. `null` outside a room (or in a room kind that
- * cannot hold a `.ai` folder). The connection itself is made — and checked
- * against the room's `.ai` folder — by `ContextRoomSync` when the chat opens.
+ * is not an Instructions room). The connection itself is made — and checked
+ * against the room's skill files — by `ContextRoomSync` when the chat opens.
  */
 export type ContextRoom = {
   id: string;

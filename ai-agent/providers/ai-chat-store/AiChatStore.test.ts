@@ -209,3 +209,80 @@ describe("AiChatStore analyze mode", () => {
     expect(store.isAnalyzeMode).toBe(false);
   });
 });
+
+describe("AiChatStore folder context picker", () => {
+  it("is off by default and switches with the host's flag", () => {
+    const store = new AiChatStore();
+    expect(store.folderContextPickerEnabled).toBe(false);
+    store.setFolderContextPickerEnabled(true);
+    expect(store.folderContextPickerEnabled).toBe(true);
+    store.setFolderContextPickerEnabled(false);
+    expect(store.folderContextPickerEnabled).toBe(false);
+  });
+});
+
+describe("AiChatStore project view", () => {
+  it("carries the project title and the composer flag the host sets", () => {
+    const store = new AiChatStore();
+    expect(store.projectTitle).toBeNull();
+    expect(store.composerContextHidden).toBe(false);
+    store.setProjectTitle("Contract review");
+    store.setComposerContextHidden(true);
+    expect(store.projectTitle).toBe("Contract review");
+    expect(store.composerContextHidden).toBe(true);
+    store.setProjectTitle(null);
+    store.setComposerContextHidden(false);
+    expect(store.projectTitle).toBeNull();
+    expect(store.composerContextHidden).toBe(false);
+  });
+});
+
+describe("AiChatStore presets", () => {
+  it("opens a preset fullscreen on a fresh conversation and hands the settings to the bridge", () => {
+    const store = new AiChatStore();
+    store.setAgentId(5);
+    const settings = {
+      profileId: "p1",
+      profileName: "Claude",
+      contextRoom: { cloud: "docspace", id: "12", name: "Skills" },
+      knowledgeRoom: null,
+    };
+    store.openPreset(settings);
+    expect(store.isVisible).toBe(true);
+    expect(store.userFullscreen).toBe(true);
+    expect(store.agentId).toBeNull();
+    expect(store.pendingPreset).toEqual(settings);
+    store.consumePendingPreset();
+    expect(store.pendingPreset).toBeNull();
+  });
+
+  it("applies a preset to the open chat without touching the panel", () => {
+    const store = new AiChatStore();
+    store.open();
+    store.setPanelWidth(640);
+    const settings = {
+      profileId: "p2",
+      profileName: "GPT",
+      contextRoom: null,
+      knowledgeRoom: { cloud: "docspace", id: "9", name: "Docs" },
+    };
+    store.applyPreset(settings);
+    expect(store.pendingPreset).toEqual(settings);
+    expect(store.pendingPresetFresh).toBe(false);
+    expect(store.userFullscreen).toBe(false);
+    expect(store.panelWidth).toBe(640);
+    store.consumePendingPreset();
+    expect(store.pendingPreset).toBeNull();
+    expect(store.pendingPresetFresh).toBe(true);
+  });
+
+  it("keeps the save hook the host wires", () => {
+    const store = new AiChatStore();
+    expect(store.onSavePreset).toBeNull();
+    const hook = () => {};
+    store.setOnSavePreset(hook);
+    expect(store.onSavePreset).toBe(hook);
+    store.setOnSavePreset(null);
+    expect(store.onSavePreset).toBeNull();
+  });
+});

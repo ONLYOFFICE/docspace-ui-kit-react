@@ -84,6 +84,8 @@ vi.mock(".", () => {
     "folderInProgress.svg": ["folderInProgress"],
     "room/custom.svg": ["customRoom"],
     "room/ai.svg": ["aiRoom"],
+    "room/instructions.svg": ["instructionsRoom"],
+    "room/knowledge.svg": ["knowledgeRoom"],
     "room/editing.svg": ["editingRoom"],
     "room/form.svg": ["formRoom"],
     "room/public.svg": ["publicRoom"],

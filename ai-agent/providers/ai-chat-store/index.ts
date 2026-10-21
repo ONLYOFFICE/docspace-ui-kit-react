@@ -1,5 +1,9 @@
 export { default as AiChatStore } from "./AiChatStore";
-export type { AiChatRouterPage } from "./AiChatStore";
+export type {
+  AiChatPresetRoom,
+  AiChatPresetSettings,
+  AiChatRouterPage,
+} from "./AiChatStore";
 export { DEFAULT_CHAT_PANEL_WIDTH } from "./AiChatStore";
 export {
   AiChatStoreProvider,

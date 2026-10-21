@@ -50,6 +50,8 @@ export enum ButtonKeys {
  * |  6   | PublicRoom      |
  * |  8   | VirtualDataRoom |
  * |  9   | AIRoom          |
+ * |  10  | InstructionsRoom|
+ * |  11  | KnowledgeRoom   |
  */
 export enum RoomsType {
   FormRoom = 1,
@@ -61,6 +63,10 @@ export enum RoomsType {
   PublicRoom = 6,
   VirtualDataRoom = 8,
   AIRoom = 9,
+  /** Room whose Markdown files are skills (instructions) for the AI. */
+  InstructionsRoom = 10,
+  /** Room whose files are vectorized as a RAG knowledge base scoped to the room. */
+  KnowledgeRoom = 11,
 }
 
 /**
@@ -159,6 +165,8 @@ export enum FolderType {
   Forms = 36,
   /** The `.ai` folder in a room's root: its Markdown files are the room's chat skills. */
   Ai = 37,
+  InstructionsRoom = 38,
+  KnowledgeRoom = 39,
 }
 
 export enum GuidanceRefKey {

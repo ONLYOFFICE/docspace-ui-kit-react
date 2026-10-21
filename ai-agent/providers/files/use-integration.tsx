@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { reaction } from "mobx";
 import { useTranslation } from "react-i18next";
 import type { ComposerAction, ExportFormat } from "@onlyoffice/ai-chat";
 
@@ -10,10 +11,12 @@ import CatalogDocuments from "../../../assets/icons/16/catalog.documents.react.s
 import UploadIcon from "../../../assets/icons/16/upload.react.svg";
 
 import type { SaveAsFileHandler } from "../platform";
+import type { AiChatStore } from "../ai-chat-store";
 
 import DeviceUploader, { type DeviceUploaderHandle } from "./device-uploader";
 import type { OnFilesAttached } from "./attach-files";
 import AttachDialog from "./attach-dialog";
+import ContextFolderDialog from "./context-folder-dialog";
 import SaveDialog from "./save-dialog";
 import { EXPORT_FORMAT_IDS, EXTENSION_BY_FORMAT } from "./export-format";
 import styles from "./styles.module.scss";
@@ -21,6 +24,9 @@ import styles from "./styles.module.scss";
 export type FilesIntegration = {
   // Composer "attach" actions (add files from the host / upload from device).
   composerActions: ComposerAction[];
+  // Opens the folder picker behind the composer's Context slot; unset where
+  // the host does not offer folder context.
+  onPickFolderContext?: () => void;
   // Message "Save as file" handler, wired into platform.file.saveAsFile.
   onSaveAsFile: SaveAsFileHandler;
   // Thread export formats, wired into platform.file.getExportFormats.
@@ -40,8 +46,13 @@ export type FilesIntegration = {
 export const useFilesIntegration = ({
   entityId,
   onFilesAttached,
+  aiChatStore,
 }: {
   entityId?: string;
+  // The panel store, whose `folderContextPickerEnabled` flag turns on the
+  // composer's Context slot. Passed in: <AiAgentProviders> creates the store
+  // itself and renders its provider below this hook's call.
+  aiChatStore?: AiChatStore | null;
   // Reports every file attached through the dialog or a device upload, so the
   // caller can keep the record flags the attachments store drops
   // (`canAnalyze`).
@@ -51,6 +62,27 @@ export const useFilesIntegration = ({
 
   const [pickerVisible, setPickerVisible] = React.useState(false);
   const closePicker = React.useCallback(() => setPickerVisible(false), []);
+
+  // The Context slot: any folder as the round's context, where the host asks
+  // for it (see AiChatStore.folderContextPickerEnabled). Read off the panel
+  // store so the entry follows the host's switch without a config rebuild.
+  // <AiAgentProviders> is no observer, so the flag is mirrored into state.
+  const [folderContextEnabled, setFolderContextEnabled] = React.useState(
+    () => aiChatStore?.folderContextPickerEnabled ?? false,
+  );
+  React.useEffect(() => {
+    if (!aiChatStore) return undefined;
+    return reaction(
+      () => aiChatStore.folderContextPickerEnabled,
+      setFolderContextEnabled,
+      { fireImmediately: true },
+    );
+  }, [aiChatStore]);
+  const [contextPickerVisible, setContextPickerVisible] = React.useState(false);
+  const closeContextPicker = React.useCallback(
+    () => setContextPickerVisible(false),
+    [],
+  );
 
   // Pending message-save request: holds the markdown content, default name, and
   // the resolver for the library's awaiting saveAsFile promise. Set when the
@@ -130,10 +162,19 @@ export const useFilesIntegration = ({
     [t, i18n.language],
   );
 
+  const onPickFolderContext = React.useMemo(
+    () =>
+      folderContextEnabled ? () => setContextPickerVisible(true) : undefined,
+    [folderContextEnabled],
+  );
+
   const overlay = (
     <>
       {pickerVisible ? (
         <AttachDialog onClose={closePicker} onFilesAttached={onFilesAttached} />
+      ) : null}
+      {contextPickerVisible ? (
+        <ContextFolderDialog onClose={closeContextPicker} />
       ) : null}
       {saveRequest ? (
         <SaveDialog
@@ -151,5 +192,11 @@ export const useFilesIntegration = ({
     </>
   );
 
-  return { composerActions, onSaveAsFile, exportFormats, overlay };
+  return {
+    composerActions,
+    onPickFolderContext,
+    onSaveAsFile,
+    exportFormats,
+    overlay,
+  };
 };

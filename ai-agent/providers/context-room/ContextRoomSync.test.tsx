@@ -21,8 +21,8 @@ vi.mock("@onlyoffice/ai-chat", () => ({
   useStores: () => ({ useCloudsStore }),
 }));
 
-const hasRoomAiFolder = vi.fn<(roomId: string) => Promise<boolean>>();
-const aiApi = { hasRoomAiFolder };
+const hasRoomSkills = vi.fn<(roomId: string) => Promise<boolean>>();
+const aiApi = { hasRoomSkills };
 
 vi.mock("../../../providers/api", () => ({
   useApi: () => ({ aiApi }),
@@ -60,7 +60,7 @@ describe("ContextRoomSync", () => {
   });
 
   it("re-reads the skills when the chat reopens in the room already connected", async () => {
-    hasRoomAiFolder.mockResolvedValue(true);
+    hasRoomSkills.mockResolvedValue(true);
     clouds.selectedContextFolder = {
       cloud: CONTEXT_ROOM_CLOUD,
       room: { id: "12", name: "Sales" },
@@ -77,7 +77,7 @@ describe("ContextRoomSync", () => {
   });
 
   it("hands the store the new name of the room already connected", async () => {
-    hasRoomAiFolder.mockResolvedValue(true);
+    hasRoomSkills.mockResolvedValue(true);
     clouds.selectedContextFolder = {
       cloud: CONTEXT_ROOM_CLOUD,
       room: { id: "12", name: "Sales" },
@@ -93,12 +93,12 @@ describe("ContextRoomSync", () => {
     expect(clouds.clearContextFolder).not.toHaveBeenCalled();
   });
 
-  it("connects the room once its .ai folder is confirmed", async () => {
-    hasRoomAiFolder.mockResolvedValue(true);
+  it("connects the room once its skill files are confirmed", async () => {
+    hasRoomSkills.mockResolvedValue(true);
     renderSync({ id: "12", name: "Sales" });
     await flush();
 
-    expect(hasRoomAiFolder).toHaveBeenCalledWith("12");
+    expect(hasRoomSkills).toHaveBeenCalledWith("12");
     expect(clouds.selectContextFolder).toHaveBeenCalledWith(
       CONTEXT_ROOM_CLOUD,
       { id: "12", name: "Sales" },
@@ -106,8 +106,8 @@ describe("ContextRoomSync", () => {
     expect(clouds.clearContextFolder).not.toHaveBeenCalled();
   });
 
-  it("drops the connection for a room without a .ai folder", async () => {
-    hasRoomAiFolder.mockResolvedValue(false);
+  it("drops the connection for a room without skills", async () => {
+    hasRoomSkills.mockResolvedValue(false);
     renderSync({ id: "12", name: "Sales" });
     await flush();
 
@@ -115,8 +115,8 @@ describe("ContextRoomSync", () => {
     expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
   });
 
-  it("treats a failed check as no folder", async () => {
-    hasRoomAiFolder.mockRejectedValue(new Error("boom"));
+  it("treats a failed check as no skills", async () => {
+    hasRoomSkills.mockRejectedValue(new Error("boom"));
     renderSync({ id: "12", name: "Sales" });
     await flush();
 
@@ -128,12 +128,12 @@ describe("ContextRoomSync", () => {
     renderSync(null);
     await flush();
 
-    expect(hasRoomAiFolder).not.toHaveBeenCalled();
+    expect(hasRoomSkills).not.toHaveBeenCalled();
     expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
   });
 
   it("follows the room while the chat stays open", async () => {
-    hasRoomAiFolder.mockResolvedValue(true);
+    hasRoomSkills.mockResolvedValue(true);
     const { rerender } = renderSync({ id: "12", name: "Sales" });
     await flush();
 
@@ -144,7 +144,7 @@ describe("ContextRoomSync", () => {
     );
     await flush();
     // Same room, new object: nothing re-runs.
-    expect(hasRoomAiFolder).toHaveBeenCalledTimes(1);
+    expect(hasRoomSkills).toHaveBeenCalledTimes(1);
 
     rerender(
       <ContextRoomProvider room={{ id: "13", name: "Legal" }}>
@@ -152,7 +152,7 @@ describe("ContextRoomSync", () => {
       </ContextRoomProvider>,
     );
     await flush();
-    expect(hasRoomAiFolder).toHaveBeenLastCalledWith("13");
+    expect(hasRoomSkills).toHaveBeenLastCalledWith("13");
     expect(clouds.selectContextFolder).toHaveBeenLastCalledWith(
       CONTEXT_ROOM_CLOUD,
       { id: "13", name: "Legal" },
@@ -171,7 +171,7 @@ describe("ContextRoomSync", () => {
     const sales = { id: "12", name: "Sales" };
 
     const openConnectAndClose = async () => {
-      hasRoomAiFolder.mockResolvedValue(true);
+      hasRoomSkills.mockResolvedValue(true);
       const view = render(<Chat room={sales} open />);
       await flush();
       expect(clouds.selectContextFolder).toHaveBeenCalledTimes(1);
@@ -187,7 +187,7 @@ describe("ContextRoomSync", () => {
       view.rerender(<Chat room={sales} open />);
       await flush();
 
-      expect(hasRoomAiFolder).not.toHaveBeenCalled();
+      expect(hasRoomSkills).not.toHaveBeenCalled();
       expect(clouds.selectContextFolder).not.toHaveBeenCalled();
       expect(clouds.clearContextFolder).not.toHaveBeenCalled();
     });
@@ -202,7 +202,7 @@ describe("ContextRoomSync", () => {
       view.rerender(<Chat room={sales} open />);
       await flush();
 
-      expect(hasRoomAiFolder).not.toHaveBeenCalled();
+      expect(hasRoomSkills).not.toHaveBeenCalled();
       expect(clouds.selectContextFolder).not.toHaveBeenCalled();
       expect(clouds.clearContextFolder).not.toHaveBeenCalled();
       expect(clouds.fetchRoomSkills).not.toHaveBeenCalled();
@@ -215,7 +215,7 @@ describe("ContextRoomSync", () => {
       view.rerender(<Chat room={{ id: "12", name: "Sales EMEA" }} open />);
       await flush();
 
-      expect(hasRoomAiFolder).not.toHaveBeenCalled();
+      expect(hasRoomSkills).not.toHaveBeenCalled();
       expect(clouds.selectContextFolder).toHaveBeenCalledWith(
         CONTEXT_ROOM_CLOUD,
         { id: "12", name: "Sales EMEA" },
@@ -229,12 +229,12 @@ describe("ContextRoomSync", () => {
         cloud: CONTEXT_ROOM_CLOUD,
         room: { id: "77", name: "Legal" },
       };
-      hasRoomAiFolder.mockResolvedValue(true);
+      hasRoomSkills.mockResolvedValue(true);
 
       view.rerender(<Chat room={{ id: "13", name: "HR" }} open />);
       await flush();
 
-      expect(hasRoomAiFolder).toHaveBeenCalledWith("13");
+      expect(hasRoomSkills).toHaveBeenCalledWith("13");
       expect(clouds.selectContextFolder).toHaveBeenCalledWith(
         CONTEXT_ROOM_CLOUD,
         { id: "13", name: "HR" },
@@ -242,16 +242,16 @@ describe("ContextRoomSync", () => {
     });
 
     it("checks again when the first check never landed", async () => {
-      hasRoomAiFolder.mockReturnValueOnce(new Promise<boolean>(() => {}));
+      hasRoomSkills.mockReturnValueOnce(new Promise<boolean>(() => {}));
       const view = render(<Chat room={sales} open />);
       await flush();
       view.rerender(<Chat room={sales} open={false} />);
-      hasRoomAiFolder.mockResolvedValue(true);
+      hasRoomSkills.mockResolvedValue(true);
 
       view.rerender(<Chat room={sales} open />);
       await flush();
 
-      expect(hasRoomAiFolder).toHaveBeenCalledTimes(2);
+      expect(hasRoomSkills).toHaveBeenCalledTimes(2);
       expect(clouds.selectContextFolder).toHaveBeenCalledWith(
         CONTEXT_ROOM_CLOUD,
         sales,
@@ -261,7 +261,7 @@ describe("ContextRoomSync", () => {
 
   it("ignores a late answer for a room that was left", async () => {
     let resolve: (value: boolean) => void = () => {};
-    hasRoomAiFolder.mockReturnValueOnce(
+    hasRoomSkills.mockReturnValueOnce(
       new Promise<boolean>((r) => {
         resolve = r;
       }),

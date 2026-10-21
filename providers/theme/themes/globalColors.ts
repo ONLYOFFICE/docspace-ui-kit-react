@@ -47,6 +47,8 @@ export const globalColors = {
   purple: "#6D4EC2",
   secondPurple: "#8570BD",
   secondPurpleDark: "#544C6A",
+  portalPurple: "#F3E5F5",
+  portalGreen: "#E8F5E9",
   mainBlueLight: "#13B7EC",
   secondBlue: "#11A3D4",
   mainYellow: "#FFD30F",

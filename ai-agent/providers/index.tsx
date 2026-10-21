@@ -262,9 +262,9 @@ type AiAgentProvidersProps = {
   suggestions?: Suggestion[] | SuggestionSet;
   /**
    * The room the user is standing in, offered to the chat as context. When
-   * the chat opens, `ContextRoomSync` connects it if it holds a `.ai` folder
-   * and the composer shows it with the folder's skills; `null` (outside a
-   * room, or a room kind that cannot hold the folder) drops any connection.
+   * the chat opens, `ContextRoomSync` connects it if it is an Instructions
+   * room holding a skill file, and the composer shows it with the room's
+   * skills; `null` (outside a room, or a room of another kind) drops any connection.
    * There is no room picker: the current room is the only candidate.
    */
   contextRoom?: ContextRoom | null;
@@ -610,11 +610,13 @@ const AiAgentProviders = ({
     analyzePending,
     analyzeAttachmentId,
     analyzeFileName,
+    composerContextHidden,
   } = useObservedFields(() => ({
     analyzeActive: aiChatStore.isAnalyzeMode,
     analyzePending: aiChatStore.isAnalyzePending,
     analyzeAttachmentId: aiChatStore.analyzeAttachmentId,
     analyzeFileName: aiChatStore.analyzeFormTitle,
+    composerContextHidden: aiChatStore.composerContextHidden,
   }));
 
   // Ids of attached files the backend flagged as analyzable. The attachments
@@ -665,12 +667,15 @@ const AiAgentProviders = ({
   // Device uploads are stored as portal files in the chat's entity scope.
   const {
     composerActions: attachActions,
+    onPickFolderContext,
     onSaveAsFile,
     exportFormats,
     overlay,
   } = useFilesIntegration({
     entityId,
     onFilesAttached,
+    // Created above, so the hook cannot read it from context here.
+    aiChatStore,
   });
 
   // Platform adapter passed downstream. Its `file` adapter is wired to the
@@ -1091,10 +1096,18 @@ const AiAgentProviders = ({
       // default, so dropped DOCX/PDF/XLSX are supported too.
       onDropFiles,
       // The context room is the room the user is in, connected by
-      // ContextRoomSync; the composer's picker lists the other rooms with a
-      // .ai folder. DocSpace is one cloud to the library, so the picker
+      // ContextRoomSync; the composer's picker lists the other Instructions
+      // rooms. DocSpace is one cloud to the library, so the picker
       // skips the cloud level and lists the rooms straight away.
       hideContextClouds: true,
+      // DocSpace knows every room and folder id, so a connected skills room
+      // or context folder becomes the round's scope (tools, allow-always
+      // preferences, assignment fallback) — see the library's option doc.
+      contextRoomScopesRounds: true,
+      // The AI project view lists the sources beside the chat, so the
+      // composer drops its own chips and pickers there.
+      hideComposerContext: composerContextHidden,
+      onPickFolderContext,
     }),
     [
       composerActions,
@@ -1112,6 +1125,8 @@ const AiAgentProviders = ({
       onToolCallApproveResult,
       onDropFiles,
       resolvedSuggestions,
+      composerContextHidden,
+      onPickFolderContext,
       t,
     ],
   );

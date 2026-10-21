@@ -103,7 +103,7 @@ const NewChat: React.FC<ChatProps> = observer(
     const chatPanel = (
       <>
         {/* The chat is open: connect the current room as context if it
-            holds a .ai folder (see ContextRoomSync). */}
+            holds a skill file (see ContextRoomSync). */}
         <ContextRoomSync />
         {showToolbar ? <ChatToolbar /> : null}
         {chatBody}

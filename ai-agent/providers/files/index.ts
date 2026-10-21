@@ -22,6 +22,9 @@ export {
 } from "./use-attach-to-chat";
 export { CHAT_ATTACHMENT_LIMIT } from "./limits";
 export { useFilesIntegration, type FilesIntegration } from "./use-integration";
+// The "Add context" folder picker, for a host that offers the same choice
+// outside the composer menu (the AI project view's context card).
+export { default as ContextFolderDialog } from "./context-folder-dialog";
 export { notifyAlreadyAttached, notifyAttachmentLimit } from "./notices";
 // Provided by AiAgentProviders from its `attachmentLimit` prop; the host
 // subtree reads it through the attach hook's result, not directly.

@@ -1,4 +1,4 @@
-import { makeAutoObservable, reaction } from "mobx";
+import { makeAutoObservable, observable, reaction } from "mobx";
 
 export type AiChatRouterPage =
   "chat" | "settings" | "history" | "initial-setup";
@@ -37,6 +37,21 @@ export type AnalyzeMode = {
 // `--chat-panel-width` in Section.module.scss: the panel renders at this width
 // until the user drags the resizer, and every open starts from it again.
 export const DEFAULT_CHAT_PANEL_WIDTH = 400;
+
+/** A room as a preset remembers it: the chat library's cloud + id pair, plus the name to show. */
+export type AiChatPresetRoom = { cloud: string; id: string; name: string };
+
+/**
+ * The chat settings a host saves as a preset and hands back to open one: the
+ * model (profile), the Instructions room connected for its skills and the
+ * Knowledge room the chat searches. `null` fields mean "nothing connected".
+ */
+export type AiChatPresetSettings = {
+  profileId: string | null;
+  profileName: string | null;
+  contextRoom: AiChatPresetRoom | null;
+  knowledgeRoom: AiChatPresetRoom | null;
+};
 
 // Single source of truth for the AI Chat panel UI: visibility + fullscreen
 // + selected agent + mirrors of the upstream router page and profiles
@@ -78,6 +93,48 @@ class AiChatStore {
   pendingNewChat = false;
 
   /**
+   * Host hook behind the header's save button: called with the chat's
+   * current settings. `null` (the default) hides the button — a host that
+   * keeps no presets shows nothing.
+   */
+  onSavePreset: ((settings: AiChatPresetSettings) => void) | null = null;
+
+  /**
+   * Settings waiting to be applied to the chat stores by AiChatStoresBridge
+   * once the panel is up — set by `openPreset`, cleared when applied.
+   */
+  pendingPreset: AiChatPresetSettings | null = null;
+
+  /**
+   * Whether `pendingPreset` opens a fresh conversation (`openPreset`, the
+   * presets page) or is applied to the open chat as it is (`applyPreset`,
+   * the model picker's "Choose AI Preset").
+   */
+  pendingPresetFresh = true;
+
+  /**
+   * Whether the composer shows its Context slot: a host that lets the user
+   * connect any folder as the round's context (the projects page) switches
+   * it on; off (the default) the slot is not shown.
+   */
+  folderContextPickerEnabled = false;
+
+  /**
+   * Name of the AI project the open chat was started from, shown as the
+   * panel title in place of "AI Chat"; `null` for an ordinary chat. Set and
+   * cleared by the host, which knows its projects.
+   */
+  projectTitle: string | null = null;
+
+  /**
+   * Whether the composer leaves the connected sources out (no room chips,
+   * no room pickers): set by a host that shows and manages them beside the
+   * chat, as the AI project view does. Mirrored into the widget's
+   * `hideComposerContext`.
+   */
+  composerContextHidden = false;
+
+  /**
    * The chat is analyzing one PDF form's responses ("Analyze responses"), or
    * `null` for an ordinary chat.
    *
@@ -89,7 +146,9 @@ class AiChatStore {
   analyzeMode: AnalyzeMode | null = null;
 
   constructor() {
-    makeAutoObservable(this);
+    // The save hook is a host callback, kept by reference: wrapping it as an
+    // action would hand the button a bound wrapper instead of the function.
+    makeAutoObservable(this, { onSavePreset: observable.ref });
   }
 
   get isAnalyzeMode(): boolean {
@@ -192,6 +251,51 @@ class AiChatStore {
 
   consumePendingNewChat = () => {
     this.pendingNewChat = false;
+  };
+
+  setOnSavePreset = (
+    hook: ((settings: AiChatPresetSettings) => void) | null,
+  ) => {
+    this.onSavePreset = hook;
+  };
+
+  // Open the panel fullscreen on a fresh conversation set up as the preset
+  // says: the model, the skills room and the knowledge base are applied by
+  // AiChatStoresBridge, which holds the chat stores this store does not.
+  openPreset = (settings: AiChatPresetSettings) => {
+    this.endAnalyzeMode();
+    this.agentId = null;
+    this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
+    this.isVisible = true;
+    this.userFullscreen = true;
+    this.pendingPreset = settings;
+    this.pendingPresetFresh = true;
+  };
+
+  // Apply a preset to the chat as it stands — the conversation, the panel
+  // size and the page stay; only the model and the rooms change. Used by the
+  // model picker's "Choose AI Preset" entry, which is only reachable while
+  // the panel is open.
+  applyPreset = (settings: AiChatPresetSettings) => {
+    this.pendingPreset = settings;
+    this.pendingPresetFresh = false;
+  };
+
+  consumePendingPreset = () => {
+    this.pendingPreset = null;
+    this.pendingPresetFresh = true;
+  };
+
+  setFolderContextPickerEnabled = (value: boolean) => {
+    this.folderContextPickerEnabled = value;
+  };
+
+  setProjectTitle = (title: string | null) => {
+    this.projectTitle = title;
+  };
+
+  setComposerContextHidden = (value: boolean) => {
+    this.composerContextHidden = value;
   };
 
   close = () => {

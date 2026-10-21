@@ -8,10 +8,9 @@ import { useApi } from "../../../providers/api";
 import { useContextRoom, useSyncedContextRoom } from "./index";
 
 // DocSpace is a single cloud to the chat library. The AI service lists the
-// rooms with a `.ai` folder under the same label (`CONTEXT_CLOUD` in
-// ASC.AI.Chat), so the room connected here and a room picked from the
-// list compare equal; the label itself is never shown, the menu skips the
-// cloud level.
+// Instructions rooms under the same label (`CONTEXT_CLOUD` in ASC.AI.Chat),
+// so the room connected here and a room picked from the list compare
+// equal; the label itself is never shown, the menu skips the cloud level.
 export const CONTEXT_ROOM_CLOUD = "docspace";
 
 /**
@@ -78,13 +77,13 @@ const ContextRoomSync = () => {
     let cancelled = false;
     let settled = false;
     aiApi
-      .hasRoomAiFolder(roomId)
+      .hasRoomSkills(roomId)
       .catch(() => false)
-      .then((hasAiFolder) => {
+      .then((hasSkills) => {
         settled = true;
         if (cancelled) return;
         const current = useCloudsStore.getState();
-        if (!hasAiFolder) {
+        if (!hasSkills) {
           current.clearContextFolder();
           return;
         }

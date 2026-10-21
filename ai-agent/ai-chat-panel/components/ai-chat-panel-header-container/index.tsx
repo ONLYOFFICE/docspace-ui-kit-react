@@ -9,6 +9,7 @@ import { useStores } from "../../../providers";
 import { useAiChatStore } from "../../../providers/ai-chat-store";
 
 import AiChatPanelHeader from "../ai-chat-panel-header";
+import AiChatPanelSave from "../ai-chat-panel-save";
 
 // Store-connected AI chat panel header: wires the shared AiChatStore to the
 // presentational AiChatPanelHeader (title, close, fullscreen). Host-agnostic, so
@@ -42,9 +43,10 @@ const AiChatPanelHeaderContainer: React.FC = observer(() => {
       title={
         store.isAnalyzeMode
           ? t("Common:AnalyzeResponsesMode")
-          : t("Common:AIChatButton")
+          : (store.projectTitle ?? t("Common:AIChatButton"))
       }
       onClose={handleClose}
+      rightExtras={<AiChatPanelSave />}
       isFullscreen={store.effectiveFullscreen}
       onToggleFullscreen={isDesktop ? store.toggleFullscreen : undefined}
     />
