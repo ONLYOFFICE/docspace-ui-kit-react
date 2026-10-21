@@ -68,6 +68,35 @@ const Uploader = ({
 
       const totalBytes = onlyFiles.reduce((sum, f) => sum + f.size, 0);
       let uploadedBytes = 0;
+      const sendingBytes = new Map<object, number>();
+
+      const reportPercent = () => {
+        let sending = 0;
+        for (const bytes of sendingBytes.values()) sending += bytes;
+        setUploadPercent(
+          Math.round(((uploadedBytes + sending) / totalBytes) * 100),
+        );
+      };
+
+      const trackChunk = (chunk: { size: number }) => ({
+        onUploadProgress: ({
+          loaded,
+          total,
+        }: {
+          loaded: number;
+          total?: number;
+        }) => {
+          if (!total) return;
+          sendingBytes.set(chunk, (loaded / total) * chunk.size);
+          reportPercent();
+        },
+      });
+
+      const chunkDone = (chunk: { size: number }) => {
+        sendingBytes.delete(chunk);
+        uploadedBytes += chunk.size;
+        reportPercent();
+      };
 
       setUploadPercent(0);
 
@@ -115,23 +144,22 @@ const Uploader = ({
           for (const chunk of chunks) {
             const chunkBlob = chunk.data.get("file") as Blob;
 
-            const res = await operationsApi.uploadSession({
-              folderId: targetFolderId as unknown as number,
-              sessionId,
-              file: chunkBlob as File,
-            });
+            const res = await operationsApi.uploadSession(
+              {
+                folderId: targetFolderId as unknown as number,
+                sessionId,
+                file: chunkBlob as File,
+              },
+              trackChunk(chunk),
+            );
 
             lastChunkResult = res.data;
 
             uploadedChunks += 1;
-            uploadedBytes += chunk.size;
+            chunkDone(chunk);
             const filePercent = Math.round(
               (uploadedChunks / chunks.length) * 100,
             );
-            const overallPercent = Math.round(
-              (uploadedBytes / totalBytes) * 100,
-            );
-            setUploadPercent(overallPercent);
 
             onUploadProgress?.({
               sessionId,
@@ -150,22 +178,21 @@ const Uploader = ({
             async (chunk) => {
               const chunkBlob = chunk.data.get("file") as Blob;
 
-              await operationsApi.uploadAsyncSession({
-                folderId: targetFolderId as unknown as number,
-                sessionId,
-                chunkNumber: chunk.index,
-                file: chunkBlob as File,
-              });
+              await operationsApi.uploadAsyncSession(
+                {
+                  folderId: targetFolderId as unknown as number,
+                  sessionId,
+                  chunkNumber: chunk.index,
+                  file: chunkBlob as File,
+                },
+                trackChunk(chunk),
+              );
 
               uploadedChunks += 1;
-              uploadedBytes += chunk.size;
+              chunkDone(chunk);
               const filePercent = Math.round(
                 (uploadedChunks / chunks.length) * 100,
               );
-              const overallPercent = Math.round(
-                (uploadedBytes / totalBytes) * 100,
-              );
-              setUploadPercent(overallPercent);
 
               onUploadProgress?.({
                 sessionId,

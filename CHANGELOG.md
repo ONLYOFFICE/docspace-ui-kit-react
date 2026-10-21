@@ -8,6 +8,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`Uploader`'s progress bar moves while a chunk is being sent.** The percentage used to grow
+  only when a whole chunk (5 MB by default) had been answered, so a file under one chunk went
+  from 0 to done in a single step; it now also counts the bytes of chunks still on their way,
+  from axios's upload progress. `onUploadProgress` is unchanged and still reports per chunk
 - **`ComboBox`'s `onToggle` may receive a keyboard event.** The keys that open and close the
   list call it too, so its first argument is typed
   `React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>`. A handler declared

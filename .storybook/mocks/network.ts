@@ -71,6 +71,112 @@ const observeDemoImages = () => {
   });
 };
 
+const UPLOAD_BYTES_PER_MS = 1024;
+const MIN_UPLOAD_MS = 1500;
+
+const formDataSize = (body: FormData) => {
+  let size = 0;
+  for (const [, value] of body) {
+    size += value instanceof Blob ? value.size : value.length;
+  }
+  return size;
+};
+
+type ProgressListener = (event: ProgressEvent) => void;
+
+const sendSlowly = (
+  xhr: XMLHttpRequest,
+  body: FormData,
+  listeners: ProgressListener[],
+) => {
+  const total = formDataSize(body);
+  const duration = Math.max(MIN_UPLOAD_MS, total / UPLOAD_BYTES_PER_MS);
+  const started = performance.now();
+
+  const tick = () => {
+    const loaded = Math.min(
+      total,
+      ((performance.now() - started) / duration) * total,
+    );
+    const event = new ProgressEvent("progress", {
+      lengthComputable: true,
+      loaded,
+      total,
+    });
+    for (const listener of listeners) listener(event);
+    if (loaded < total) setTimeout(tick, 100);
+    else xhr.send(body);
+  };
+
+  tick();
+};
+
+const throttleDemoUploads = () => {
+  globalThis.XMLHttpRequest = new Proxy(globalThis.XMLHttpRequest, {
+    construct(target, args) {
+      const xhr: XMLHttpRequest = Reflect.construct(target, args);
+      let isDemoPost = false;
+      const progressListeners: ProgressListener[] = [];
+
+      return new Proxy(xhr, {
+        get(request, property) {
+          if (property === "upload") {
+            return new Proxy(request.upload, {
+              get(upload, name) {
+                if (name === "addEventListener") {
+                  return (
+                    type: string,
+                    listener: ProgressListener,
+                    ...rest: unknown[]
+                  ) => {
+                    if (type === "progress") progressListeners.push(listener);
+                    return Reflect.apply(upload.addEventListener, upload, [
+                      type,
+                      listener,
+                      ...rest,
+                    ]);
+                  };
+                }
+                const value = Reflect.get(upload, name);
+                return typeof value === "function" ? value.bind(upload) : value;
+              },
+              set(upload, name, value) {
+                return Reflect.set(upload, name, value);
+              },
+            });
+          }
+          if (property === "open") {
+            return (method: string, url: string | URL, ...rest: unknown[]) => {
+              isDemoPost =
+                method.toUpperCase() === "POST" &&
+                String(url).startsWith(DEMO_PORTAL_URL);
+              return Reflect.apply(request.open, request, [
+                method,
+                url,
+                ...rest,
+              ]);
+            };
+          }
+          if (property === "send") {
+            return (body?: Document | XMLHttpRequestBodyInit | null) => {
+              if (isDemoPost && body instanceof FormData) {
+                sendSlowly(request, body, progressListeners);
+              } else {
+                request.send(body);
+              }
+            };
+          }
+          const value = Reflect.get(request, property);
+          return typeof value === "function" ? value.bind(request) : value;
+        },
+        set(request, property, value) {
+          return Reflect.set(request, property, value);
+        },
+      });
+    },
+  });
+};
+
 export const startDemoPortal = async (extra: AnyHandler[] = []) => {
   const all = [...extra, ...handlers, unhandled];
 
@@ -91,6 +197,7 @@ export const startDemoPortal = async (extra: AnyHandler[] = []) => {
   });
 
   network.enable();
+  throttleDemoUploads();
   state.__demoPortal = { network };
 
   observeDemoImages();
