@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn, screen, userEvent, waitFor } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
@@ -168,7 +168,7 @@ const Template = (props: StoryArgs) => (
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async ({ args }: PlayContext) => {
+  play: async ({ args, userEvent }: PlayContext) => {
     // The demo portal's agents, with nothing picked yet.
     await waitFor(() => expect(row("Contract reviewer")).toBeVisible());
     await expect(screen.getByText("Choose an AI agent")).toBeVisible();
@@ -265,7 +265,7 @@ const initItems: FolderDtoInteger[] = [
 export const WithInit: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async ({ args }: PlayContext) => {
+  play: async ({ args, userEvent }: PlayContext) => {
     // The items passed in are the list: the first page is not fetched, so the
     // demo portal's agents never replace them.
     await waitFor(() => expect(row("Test agent")).toBeVisible());

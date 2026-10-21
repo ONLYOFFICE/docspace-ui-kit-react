@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn, screen, userEvent, waitFor } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
@@ -299,7 +299,7 @@ const shown = (label: string) =>
   waitFor(() => expect(row(label)).toBeVisible(), { timeout: 3000 });
 
 // Rows arrive a few at a time; wait for the one to click.
-const pick = async (label: string) =>
+const pick = async (label: string, userEvent: PlayContext["userEvent"]) =>
   userEvent.click(await waitFor(() => row(label), { timeout: 3000 }));
 
 const submitted = (args: StoryArgs) =>
@@ -308,10 +308,13 @@ const submitted = (args: StoryArgs) =>
   ).map((item) => item.label);
 
 // The demo portal's members; its guests are listed only on their own tab.
-const picksAMember = async (args: StoryArgs) => {
+const picksAMember = async (
+  args: StoryArgs,
+  userEvent: PlayContext["userEvent"],
+) => {
   await shown("Alex Morgan");
   await expect(screen.queryByText("Daniel Kim")).toBeNull();
-  await pick("Kenji Sato");
+  await pick("Kenji Sato", userEvent);
   await userEvent.click(screen.getByTestId("selector_submit_button"));
   await expect(submitted(args)).toEqual(["Kenji Sato"]);
 };
@@ -333,8 +336,8 @@ const Template = (props: StoryArgs) => (
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async ({ args }: PlayContext) => {
-    await picksAMember(args);
+  play: async ({ args, userEvent }: PlayContext) => {
+    await picksAMember(args, userEvent);
     await userEvent.click(screen.getByTestId("aside_header_close_icon_button"));
     await expect(args.headerProps?.onCloseClick).toHaveBeenCalledTimes(1);
   },
@@ -375,9 +378,9 @@ export const Default: Story = {
 export const MultiSelectWithTabs: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async ({ args }: PlayContext) => {
+  play: async ({ args, userEvent }: PlayContext) => {
     await shown("Alex Morgan");
-    await pick("Kenji Sato");
+    await pick("Kenji Sato", userEvent);
 
     // Without a roomId the Groups tab lists the portal's groups -- and only
     // them, no people. The selection carries across tabs.
@@ -386,13 +389,13 @@ export const MultiSelectWithTabs: Story = {
     await expect(row("Legal")).toBeVisible();
     await waitFor(() => expect(screen.queryByText("Alex Morgan")).toBeNull());
     await expect(screen.queryByText("Daniel Kim")).toBeNull();
-    await pick("Marketing");
+    await pick("Marketing", userEvent);
 
     // The guests have a tab of their own.
     await userEvent.click(screen.getByText("Guests"));
     await shown("Daniel Kim");
     await expect(screen.queryByText("Alex Morgan")).toBeNull();
-    await pick("Daniel Kim");
+    await pick("Daniel Kim", userEvent);
 
     await userEvent.click(screen.getByTestId("selector_submit_button"));
     await expect(submitted(args)).toEqual([
@@ -452,8 +455,8 @@ export const MultiSelectWithTabs: Story = {
 export const AsideMode: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async ({ args }: PlayContext) => {
-    await picksAMember(args);
+  play: async ({ args, userEvent }: PlayContext) => {
+    await picksAMember(args, userEvent);
   },
   args: {
     useAside: true,

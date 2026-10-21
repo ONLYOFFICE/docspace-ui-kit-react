@@ -132,7 +132,13 @@ const Wrapper = (props: { children: React.ReactNode }) => {
 
 export const Default: Story = {
   render: (args) => (
-    <div style={{ height: "410px" }}>
+    <div
+      style={{
+        height: "410px",
+        overflow: "hidden",
+        transform: "translateZ(0)",
+      }}
+    >
       <ColorInput {...args} />
     </div>
   ),
@@ -217,7 +223,15 @@ export const Default: Story = {
 
 const SizesTemplate = () => {
   return (
-    <Wrapper>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        gap: "16px",
+        minHeight: "420px",
+      }}
+    >
       {(Object.values(InputSize) as Array<InputSize>).map((size) => (
         <ColorInput
           key={size}
@@ -226,7 +240,7 @@ const SizesTemplate = () => {
           handleChange={fn()}
         />
       ))}
-    </Wrapper>
+    </div>
   );
 };
 

@@ -10,6 +10,10 @@ body {
   margin: 0;
 }
 
+.docs-story iframe {
+  display: block;
+}
+
 // Storybook standing in for the portal's theme layer.
 //
 // This package consumes ~1 000 custom properties that DocSpace-client defines in

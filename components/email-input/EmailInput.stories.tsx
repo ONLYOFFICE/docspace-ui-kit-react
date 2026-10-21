@@ -259,7 +259,14 @@ export const Default: Story = {
 
 const SizesTemplate = () => {
   return (
-    <Wrapper>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        gap: "16px",
+      }}
+    >
       <EmailInputWithValidation size={InputSize.base} placeholder="Base size" />
       <EmailInputWithValidation
         size={InputSize.middle}
@@ -269,7 +276,7 @@ const SizesTemplate = () => {
         size={InputSize.large}
         placeholder="Large size"
       />
-    </Wrapper>
+    </div>
   );
 };
 

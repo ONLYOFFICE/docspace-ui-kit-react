@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn, screen, userEvent, waitFor, within } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
@@ -141,7 +141,10 @@ const submitted = (args: StoryArgs) =>
   ).map((server) => server.id);
 
 // Ticking servers and pressing Add hands them over, then goes back.
-const addsServers = async (args: StoryArgs) => {
+const addsServers = async (
+  args: StoryArgs,
+  userEvent: PlayContext["userEvent"],
+) => {
   await userEvent.click(row("Demo CRM"));
   await userEvent.click(row("Demo knowledge base"));
   await userEvent.click(screen.getByTestId("selector_submit_button"));
@@ -167,12 +170,12 @@ const Template = (props: StoryArgs) => (
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async ({ args }: PlayContext) => {
+  play: async ({ args, userEvent }: PlayContext) => {
     await listed();
     await expect(screen.getByText("Available MCP servers")).toBeVisible();
     // Nothing is ticked, so there is nothing to submit yet.
     await expect(screen.queryByTestId("selector_submit_button")).toBeNull();
-    await addsServers(args);
+    await addsServers(args, userEvent);
 
     // The header's back arrow is the other way out.
     await userEvent.click(screen.getByTestId("aside_header_back_icon_button"));
@@ -212,7 +215,7 @@ export const Default: Story = {
 export const WithPreselection: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async ({ args }: PlayContext) => {
+  play: async ({ args, userEvent }: PlayContext) => {
     await listed();
     // The portal's own server carries the product's name once -- Storybook's
     // brands make it "ONLYOFFICE Apps", not "ONLYOFFICE ONLYOFFICE Apps".
@@ -265,7 +268,7 @@ export const WithPreselection: Story = {
 export const AsideMode: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async ({ args }: PlayContext) => {
+  play: async ({ args, userEvent }: PlayContext) => {
     await listed();
     // Cancel goes back without submitting.
     await userEvent.click(row("Demo CRM"));

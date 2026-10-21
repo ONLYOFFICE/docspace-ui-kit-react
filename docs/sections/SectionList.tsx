@@ -7,7 +7,6 @@ import ViewRowsReactSvg from "../../assets/view-rows.react.svg";
 import { Button, ButtonSize } from "../../components/button";
 import Filter from "../../components/filter";
 import type { TItem } from "../../components/filter";
-import { Heading, HeadingLevel, HeadingSize } from "../../components/heading";
 import { Link, LinkType } from "../../components/link";
 import Navigation from "../../components/navigation";
 import { RoomIcon } from "../../components/room-icon";
@@ -319,7 +318,7 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
         >
           <RowContent sideColor="var(--section-story-muted)">
             <Link
-              type={LinkType.action}
+              type={LinkType.page}
               isTextOverflow
               fontSize="13px"
               isBold
@@ -378,14 +377,10 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
     </>
   );
 
-  const header = atRoot ? (
-    <Heading level={HeadingLevel.h1} size={HeadingSize.medium} truncate>
-      {current.title}
-    </Heading>
-  ) : (
+  const header = (
     <Navigation
       title={current.title}
-      isRootFolder={false}
+      isRootFolder={atRoot}
       canCreate={false}
       showText
       isDesktop={isDesktop}

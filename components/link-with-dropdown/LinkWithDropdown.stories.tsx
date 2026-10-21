@@ -533,17 +533,25 @@ export const TextOverflow: Story = {
 
 const OpenMenuTemplate = () => {
   return (
-    <LinkWithDropdown
-      data={dropdownItems}
-      fontSize="13px"
-      withExpander
-      isOpen
-      directionY="bottom"
-      fixedDirection
-      isDefaultMode={false}
+    <div
+      style={{
+        height: "260px",
+        overflow: "hidden",
+        transform: "translateZ(0)",
+      }}
     >
-      Open Link
-    </LinkWithDropdown>
+      <LinkWithDropdown
+        data={dropdownItems}
+        fontSize="13px"
+        withExpander
+        isOpen
+        directionY="bottom"
+        fixedDirection
+        isDefaultMode={false}
+      >
+        Open Link
+      </LinkWithDropdown>
+    </div>
   );
 };
 

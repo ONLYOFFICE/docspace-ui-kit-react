@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn, screen, userEvent, waitFor } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 import { RoomType, SearchArea } from "@onlyoffice/docspace-api-sdk";
 
 import { Toast } from "../../components/toast";
@@ -310,7 +310,11 @@ const submitted = (args: StoryArgs) =>
   ).map((item) => item.label);
 
 // Picking a room and confirming hands it to onSubmit.
-const picks = async (args: StoryArgs, label: string) => {
+const picks = async (
+  args: StoryArgs,
+  label: string,
+  userEvent: PlayContext["userEvent"],
+) => {
   await userEvent.click(row(label));
   await userEvent.click(screen.getByTestId("selector_submit_button"));
   await expect(submitted(args)).toEqual([label]);
@@ -333,7 +337,7 @@ const Template = (props: StoryArgs) => (
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async ({ args }: PlayContext) => {
+  play: async ({ args, userEvent }: PlayContext) => {
     await shown("Contracts 2026");
 
     // The demo portal filters the rooms by the search.
@@ -349,7 +353,7 @@ export const Default: Story = {
     await userEvent.clear(search);
     await shown("Contracts 2026");
 
-    await picks(args, "Press kit");
+    await picks(args, "Press kit", userEvent);
     await userEvent.click(screen.getByTestId("aside_header_close_icon_button"));
     await expect(args.headerProps?.onCloseClick).toHaveBeenCalledTimes(1);
   },
@@ -392,7 +396,7 @@ export const Default: Story = {
 export const MultiSelect: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async ({ args }: PlayContext) => {
+  play: async ({ args, userEvent }: PlayContext) => {
     await shown("Contracts 2026");
     await userEvent.click(row("Contracts 2026"));
     await userEvent.click(row("Press kit"));
@@ -450,13 +454,13 @@ export const MultiSelect: Story = {
 export const FilteredByRoomType: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async ({ args }: PlayContext) => {
+  play: async ({ args, userEvent }: PlayContext) => {
     // Only the custom rooms are asked for.
     await shown("Contracts 2026");
     await expect(row("Sales proposals")).toBeVisible();
     await expect(row("Board meetings")).toBeVisible();
     await expect(screen.queryByText("Press kit")).toBeNull();
-    await picks(args, "Board meetings");
+    await picks(args, "Board meetings", userEvent);
   },
   args: {
     withHeader: true,
@@ -500,9 +504,9 @@ export const FilteredByRoomType: Story = {
 export const AsideMode: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async ({ args }: PlayContext) => {
+  play: async ({ args, userEvent }: PlayContext) => {
     await shown("Contracts 2026");
-    await picks(args, "Sales proposals");
+    await picks(args, "Sales proposals", userEvent);
   },
   args: {
     useAside: true,

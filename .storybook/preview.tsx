@@ -18,6 +18,7 @@ import { getSelectedApiConfig } from "./utils/apiProviders";
 import { startDemoPortal } from "./mocks/network";
 import { syncNestedPreviewGlobals } from "./utils/nestedPreviewGlobals";
 import { keepDocsScrollOnFocus } from "./utils/nestedPreviewFocus";
+import { slowDownPlay } from "./utils/playDelay";
 import enCommon from "../locales/en/Common.json";
 import enPayments from "../locales/en/Payments.json";
 import enSettings from "../locales/en/Settings.json";
@@ -260,6 +261,8 @@ const preview: Preview = {
       return {};
     },
   ],
+
+  beforeEach: slowDownPlay,
 
   tags: ["autodocs"],
 };

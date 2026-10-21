@@ -122,8 +122,8 @@ const meta = {
     (Story) => (
       <div
         style={{
-          height: "70px",
-          width: "100px",
+          minHeight: "70px",
+          minWidth: "100px",
           display: "flex",
           justifyContent: "flex-start",
           position: "relative",

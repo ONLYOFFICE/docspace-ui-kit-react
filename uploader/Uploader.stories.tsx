@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import type { StoryObj, Meta } from "@storybook/react-vite";
-import { expect, fireEvent, screen, userEvent, waitFor } from "storybook/test";
+import { expect, fireEvent, screen, waitFor } from "storybook/test";
 import { FolderType } from "@onlyoffice/docspace-api-sdk";
 
 import { Uploader } from "./index";
@@ -221,6 +221,8 @@ const meta: Meta<StoryArgs> = {
 
 type Story = StoryObj<StoryArgs>;
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
 const REQUIRED = "Required — please select a target folder";
 
 const row = (label: string) => {
@@ -238,7 +240,7 @@ const toast = (text: string | RegExp) =>
 
 // The target comes from the Files selector behind the field; the demo
 // portal answers it and takes the upload.
-const choosesFolder = async () => {
+const choosesFolder = async (userEvent: PlayContext["userEvent"]) => {
   await expect(screen.getByText(REQUIRED)).toBeVisible();
   await userEvent.click(screen.getByPlaceholderText("Choose folder"));
   await userEvent.click(
@@ -282,8 +284,8 @@ const input = () =>
     '[data-testid="sdk-uploader"] input[type="file"]',
   ) as HTMLInputElement;
 
-const uploads = async () => {
-  await choosesFolder();
+const uploads = async (userEvent: PlayContext["userEvent"]) => {
+  await choosesFolder(userEvent);
   drops([file("Notes.pdf", "application/pdf")]);
   await toast("Uploaded elements: 1");
 };
@@ -304,9 +306,9 @@ const defaultArgs: Omit<StoryArgs, "getFolderUrl"> = {
 };
 
 export const Default: Story = {
-  play: async () => {
+  play: async ({ userEvent }: PlayContext) => {
     await expect(screen.getByText("Upload files")).toBeVisible();
-    await uploads();
+    await uploads(userEvent);
   },
   args: {
     ...defaultArgs,
@@ -315,8 +317,8 @@ export const Default: Story = {
 };
 
 export const SingleFileUpload: Story = {
-  play: async () => {
-    await uploads();
+  play: async ({ userEvent }: PlayContext) => {
+    await uploads(userEvent);
   },
   args: {
     ...defaultArgs,
@@ -394,8 +396,8 @@ export const WithSizeLimit: Story = {
 };
 
 export const WithTotalSizeLimit: Story = {
-  play: async () => {
-    await choosesFolder();
+  play: async ({ userEvent }: PlayContext) => {
+    await choosesFolder(userEvent);
     // Eleven files under the per-file limit, over the total one.
     drops(
       Array.from({ length: 11 }, (_, index) =>
@@ -414,8 +416,8 @@ export const WithTotalSizeLimit: Story = {
 };
 
 export const AnyFiles: Story = {
-  play: async () => {
-    await choosesFolder();
+  play: async ({ userEvent }: PlayContext) => {
+    await choosesFolder(userEvent);
     // An unknown extension with no MIME type: refused before "*" meant any.
     drops([file("Archive.xyz", "application/octet-stream")]);
     await toast("Uploaded elements: 1");
@@ -438,8 +440,8 @@ export const AnyFiles: Story = {
 };
 
 export const CustomSettings: Story = {
-  play: async () => {
-    await choosesFolder();
+  play: async ({ userEvent }: PlayContext) => {
+    await choosesFolder(userEvent);
     drops([
       file("One.pdf", "application/pdf"),
       file("Two.pdf", "application/pdf"),

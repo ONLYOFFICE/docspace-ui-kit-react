@@ -367,6 +367,7 @@ export const CompletedOperation: Story = {
   },
   parameters: {
     docs: {
+      story: { inline: false, height: "200px" },
       description: {
         story:
           "The button clears itself away once the work is done: it shows a tick (`operationsCompleted`) and slides out of view 4 seconds later, then calls `clearOperationsData`. Keep the pointer over it to hold it on screen.",

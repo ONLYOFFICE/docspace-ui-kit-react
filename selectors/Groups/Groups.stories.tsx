@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn, screen, userEvent, waitFor } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
@@ -132,7 +132,10 @@ const row = (label: string) => {
   return found;
 };
 
-const picksAGroup = async (args: StoryArgs) => {
+const picksAGroup = async (
+  args: StoryArgs,
+  userEvent: PlayContext["userEvent"],
+) => {
   await userEvent.click(await waitFor(() => row("Marketing")));
   await userEvent.click(screen.getByTestId("selector_submit_button"));
   await expect(args.onSubmit).toHaveBeenCalledTimes(1);
@@ -159,10 +162,10 @@ const Template = (props: StoryArgs) => (
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async ({ args }: PlayContext) => {
+  play: async ({ args, userEvent }: PlayContext) => {
     await waitFor(() => expect(screen.getByText("Legal")).toBeVisible());
     await expect(screen.getByText("Select Group")).toBeVisible();
-    await picksAGroup(args);
+    await picksAGroup(args, userEvent);
   },
   args: {
     withHeader: true,
@@ -202,9 +205,9 @@ export const Default: Story = {
 export const AsideMode: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async ({ args }: PlayContext) => {
+  play: async ({ args, userEvent }: PlayContext) => {
     await waitFor(() => expect(screen.getByText("Legal")).toBeVisible());
-    await picksAGroup(args);
+    await picksAGroup(args, userEvent);
   },
   args: {
     useAside: true,

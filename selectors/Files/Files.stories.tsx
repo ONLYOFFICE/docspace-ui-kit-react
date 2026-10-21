@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, screen, userEvent, waitFor } from "storybook/test";
+import { expect, screen, waitFor } from "storybook/test";
 import {
   FolderType,
   RoomType,
@@ -292,6 +292,8 @@ export default meta;
 
 type Story = StoryObj<StoryArgs>;
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
 /** Shared helpers */
 const getIsDisabled = (
   isFirstLoad: boolean,
@@ -328,7 +330,7 @@ const shown = (label: string) =>
 const submit = () => screen.getByTestId("selector_submit_button");
 
 // While a folder loads, its list stays on screen dimmed and takes no clicks.
-const pick = async (label: string) => {
+const pick = async (label: string, userEvent: PlayContext["userEvent"]) => {
   const target = await waitFor(
     () => {
       const found = row(label);
@@ -341,8 +343,12 @@ const pick = async (label: string) => {
 };
 
 // Opens a room or folder and waits for something inside it.
-const opens = async (label: string, inside: string) => {
-  await pick(label);
+const opens = async (
+  label: string,
+  inside: string,
+  userEvent: PlayContext["userEvent"],
+) => {
+  await pick(label, userEvent);
   await shown(inside);
 };
 
@@ -392,13 +398,13 @@ const Template = (props: StoryArgs) => (
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async () => {
+  play: async ({ userEvent }: PlayContext) => {
     await shown("Contracts 2026");
     // The rooms list itself is not a destination.
     await expect(submit()).toBeDisabled();
 
     // Inside a room the room itself is the destination.
-    await opens("Contracts 2026", "Signed");
+    await opens("Contracts 2026", "Signed", userEvent);
     await expect(submit()).toBeEnabled();
     await userEvent.click(submit());
     await toast('Saved to "Contracts 2026"');
@@ -465,12 +471,12 @@ export const RoomsOnly: Story = {
 
 export const WithFooterInput: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async () => {
+  play: async ({ userEvent }: PlayContext) => {
     await shown("Contracts 2026");
     const name = screen.getByDisplayValue("My Document");
     await expect(screen.getByText("File name")).toBeVisible();
 
-    await opens("Contracts 2026", "Signed");
+    await opens("Contracts 2026", "Signed", userEvent);
     await userEvent.clear(name);
     await userEvent.type(name, "Signed copy");
     await userEvent.click(submit());
@@ -503,15 +509,15 @@ export const WithFooterInput: Story = {
 
 export const WithFileTypeFilter: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async () => {
+  play: async ({ userEvent }: PlayContext) => {
     await shown("Contracts 2026");
     await expect(screen.getByText("Select a PDF file")).toBeVisible();
 
     // Only PDFs are offered inside a folder.
-    await opens("Contracts 2026", "Signed");
+    await opens("Contracts 2026", "Signed", userEvent);
     // File rows drop the extension.
-    await opens("Signed", "Contoso supply agreement");
-    await pick("Contoso supply agreement");
+    await opens("Signed", "Contoso supply agreement", userEvent);
+    await pick("Contoso supply agreement", userEvent);
     await expect(submit()).toBeEnabled();
   },
   args: {
@@ -575,9 +581,9 @@ export const WithRoomCreation: Story = {
 };
 
 export const AsidePanel: Story = {
-  play: async () => {
+  play: async ({ userEvent }: PlayContext) => {
     await shown("Contracts 2026");
-    await opens("Contracts 2026", "Signed");
+    await opens("Contracts 2026", "Signed", userEvent);
     await userEvent.click(submit());
     await toast('Saved to "Contracts 2026"');
   },
@@ -631,7 +637,7 @@ export const AsidePanel: Story = {
 
 export const WithHeader: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
-  play: async () => {
+  play: async ({ userEvent }: PlayContext) => {
     await shown("Contracts 2026");
     await expect(screen.getByText("Select destination")).toBeVisible();
     // The header's close calls headerProps.onCloseClick, not onCancel.

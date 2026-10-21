@@ -793,38 +793,46 @@ export const CssCustomization: Story = {
   },
   render: () => (
     <div
-      style={
-        {
-          position: "relative",
-          height: "20px",
-          width: "240px",
-          "--drop-down-item-color": "#4c1d95",
-          "--drop-down-item-icon-fill": "#7c3aed",
-          "--drop-down-item-hover-bg": "#ede9fe",
-          "--drop-down-item-divider": "#c4b5fd",
-          "--drop-down-item-disabled-color": "#a78bfa",
-          "--drop-down-item-height": "40px",
-          "--drop-down-item-font-size": "14px",
-          "--drop-down-item-font-weight": "400",
-          "--drop-down-item-padding": "0 20px",
-          "--drop-down-item-header-height": "56px",
-          "--drop-down-item-header-font-size": "18px",
-        } as CSSProperties
-      }
+      style={{
+        height: "240px",
+        overflow: "hidden",
+        transform: "translateZ(0)",
+      }}
     >
-      <DropDown
-        open
-        directionY="bottom"
-        fixedDirection
-        isDefaultMode={false}
-        showDisabledItems
+      <div
+        style={
+          {
+            position: "relative",
+            height: "20px",
+            width: "240px",
+            "--drop-down-item-color": "#4c1d95",
+            "--drop-down-item-icon-fill": "#7c3aed",
+            "--drop-down-item-hover-bg": "#ede9fe",
+            "--drop-down-item-divider": "#c4b5fd",
+            "--drop-down-item-disabled-color": "#a78bfa",
+            "--drop-down-item-height": "40px",
+            "--drop-down-item-font-size": "14px",
+            "--drop-down-item-font-weight": "400",
+            "--drop-down-item-padding": "0 20px",
+            "--drop-down-item-header-height": "56px",
+            "--drop-down-item-header-font-size": "18px",
+          } as CSSProperties
+        }
       >
-        <DropDownItem isHeader label="Header" />
-        <DropDownItem label="Custom Item" icon={SettingsReactSvgUrl} />
-        <DropDownItem label="Another Item" icon={SettingsReactSvgUrl} />
-        <DropDownItem isSeparator />
-        <DropDownItem label="Disabled Item" disabled />
-      </DropDown>
+        <DropDown
+          open
+          directionY="bottom"
+          fixedDirection
+          isDefaultMode={false}
+          showDisabledItems
+        >
+          <DropDownItem isHeader label="Header" />
+          <DropDownItem label="Custom Item" icon={SettingsReactSvgUrl} />
+          <DropDownItem label="Another Item" icon={SettingsReactSvgUrl} />
+          <DropDownItem isSeparator />
+          <DropDownItem label="Disabled Item" disabled />
+        </DropDown>
+      </div>
     </div>
   ),
   parameters: {

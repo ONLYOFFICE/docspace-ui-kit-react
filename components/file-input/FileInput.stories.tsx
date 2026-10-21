@@ -242,7 +242,14 @@ const borderOf = (input: HTMLElement) => getComputedStyle(input).borderTopColor;
 
 const SizesTemplate = () => {
   return (
-    <Wrapper>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        gap: "16px",
+      }}
+    >
       <FileInput
         size={InputSize.base}
         placeholder="Base size"
@@ -258,7 +265,7 @@ const SizesTemplate = () => {
         placeholder="Large size"
         aria-label="Large size file input"
       />
-    </Wrapper>
+    </div>
   );
 };
 

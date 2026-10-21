@@ -462,7 +462,14 @@ export const NotConfiguredForUser: Story = {
 
 export const RightToLeft: Story = {
   play: async () => {
-    await composer();
+    // The widget names the composer in Arabic; the placeholder is the kit's.
+    await waitFor(
+      () =>
+        screen.getByPlaceholderText(
+          "Ask any question or describe what you need",
+        ),
+      { timeout: 5000 },
+    );
     await expect(document.documentElement).toHaveAttribute("data-dir", "rtl");
     // The widget's own note switches to Arabic; the kit's texts stay English.
     await waitFor(() => expect(screen.queryByText(NOTE)).toBeNull());

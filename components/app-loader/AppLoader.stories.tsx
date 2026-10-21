@@ -12,6 +12,9 @@ const meta = {
     // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
     // there is no second description to keep in step with it.
     layout: "fullscreen",
+    docs: {
+      story: { inline: false, height: "320px" },
+    },
   },
 } satisfies Meta<typeof AppLoader>;
 
