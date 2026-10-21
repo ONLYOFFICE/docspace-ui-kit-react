@@ -144,9 +144,7 @@ const SignedInAs = () => {
             <Text fontSize="14px" fontWeight={600}>
               {state.profile?.displayName}
             </Text>
-            <Text fontSize="12px">
-              {state.profile?.title} · {state.profile?.email}
-            </Text>
+            <Text fontSize="12px">{state.profile?.email}</Text>
           </div>
         </div>
       ) : null}
@@ -167,9 +165,7 @@ export const Default: Story = {
   },
   play: async ({ canvas }) => {
     await waitFor(() => expect(canvas.getByText("Alex Morgan")).toBeVisible());
-    await expect(
-      canvas.getByText(/Managing partner · alex\.morgan@example\.com/),
-    ).toBeVisible();
+    await expect(canvas.getByText("alex.morgan@example.com")).toBeVisible();
   },
   parameters: {
     docs: {

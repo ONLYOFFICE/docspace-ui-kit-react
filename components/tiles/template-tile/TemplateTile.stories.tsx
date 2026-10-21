@@ -325,23 +325,25 @@ const Template = ({
     <div style={{ maxWidth: "300px", margin: "30px" }}>
       <TemplateTile {...args} checked={checked} onSelect={onSelect}>
         <TileContent>
-          <Link
-            type={LinkType.page}
-            fontSize="16px"
-            lineHeight="20px"
-            fontWeight={700}
-            isTextOverflow
-          >
-            {args.item.title}
-          </Link>
-          <Text
-            fontSize="13px"
-            fontWeight={400}
-            color={globalColors.lightGrayDark}
-            truncate
-          >
-            Public room
-          </Text>
+          <>
+            <Link
+              type={LinkType.page}
+              fontSize="16px"
+              lineHeight="20px"
+              fontWeight={700}
+              isTextOverflow
+            >
+              {args.item.title}
+            </Link>
+            <Text
+              fontSize="13px"
+              fontWeight={400}
+              color={globalColors.lightGrayDark}
+              truncate
+            >
+              Public room
+            </Text>
+          </>
         </TileContent>
       </TemplateTile>
     </div>
