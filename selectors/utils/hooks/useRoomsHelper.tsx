@@ -9,6 +9,7 @@ import {
   type SearchArea,
 } from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../../providers/api";
+import type { TRoomTypeValue } from "../../../types";
 import { RoomsTypeValues } from "../../../utils/common";
 import RoomType from "../../../components/room-type";
 import { Tooltip } from "../../../components/tooltip";
@@ -163,7 +164,7 @@ const useRoomsHelper = ({
         let typeFilter: RoomTypeEnum[] | undefined;
 
         if (roomType || createDefineRoomType) {
-          const types: RoomTypeEnum[] = roomType
+          const types: TRoomTypeValue[] = roomType
             ? Array.isArray(roomType)
               ? [...roomType]
               : [roomType]
@@ -171,7 +172,8 @@ const useRoomsHelper = ({
           if (createDefineRoomType && !types.includes(createDefineRoomType)) {
             types.push(createDefineRoomType);
           }
-          typeFilter = types.length > 0 ? types : undefined;
+          // The server takes every room type; only the SDK enum lags behind.
+          typeFilter = types.length > 0 ? (types as RoomTypeEnum[]) : undefined;
         }
 
         if (!typeFilter && formsSection !== undefined) {

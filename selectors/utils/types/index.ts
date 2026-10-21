@@ -1,10 +1,12 @@
 import type {
-  FolderType,
-  RoomType,
   FolderDtoInteger,
   FileEntryDtoIntegerAllOfSecurity,
   SearchArea,
 } from "@onlyoffice/docspace-api-sdk";
+import type {
+  TFolderTypeValue as FolderType,
+  TRoomTypeValue as RoomType,
+} from "../../../types";
 
 import type { TSelectorItem, TBreadCrumb } from "../../../components/selector";
 

@@ -1,6 +1,8 @@
 import React from "react";
 
-import type { RoomType } from "@onlyoffice/docspace-api-sdk";
+import type { RoomType as SdkRoomType } from "@onlyoffice/docspace-api-sdk";
+
+import type { TRoomTypeValue as RoomType } from "../../../types";
 
 import { useApi } from "../../../providers/api/ApiProvider";
 import type { TSelectorItem } from "../../../components/selector";
@@ -63,7 +65,11 @@ const useInputItemHelper = ({
           if (created) [createdItem] = convertFoldersToItems([created], []);
         } else if (roomType) {
           const res = await roomsApi.createRoom({
-            createRoomRequestDto: { roomType, title: value },
+            // The server takes every room type; only the SDK enum lags.
+            createRoomRequestDto: {
+              roomType: roomType as SdkRoomType,
+              title: value,
+            },
           });
 
           const created = res.data?.response;

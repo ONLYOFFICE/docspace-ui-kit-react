@@ -1,6 +1,6 @@
-import type { FolderDtoInteger, RoomType } from "@onlyoffice/docspace-api-sdk";
+import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
 
-import type { WithFlag } from "../../types";
+import type { TRoomTypeValue as RoomType, WithFlag } from "../../types";
 import type {
   TSelectorCancelButton,
   TSelectorHeader,

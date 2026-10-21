@@ -2,12 +2,14 @@ import type React from "react";
 import type {
   EmployeeStatus,
   EmployeeType,
-  RoomType,
   FileShare,
   FileType,
-  FolderType,
   FileEntryDtoIntegerAllOfSecurity,
 } from "@onlyoffice/docspace-api-sdk";
+import type {
+  TFolderTypeValue as FolderType,
+  TRoomTypeValue as RoomType,
+} from "../../types";
 
 import type {
   ICover,

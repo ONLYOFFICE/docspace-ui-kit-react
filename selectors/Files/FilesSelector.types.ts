@@ -1,8 +1,7 @@
 import type {
   FileDtoInteger,
   FolderDtoInteger,
-  FolderType,
-  RoomType,
+  FolderType as SdkFolderType,
   FileType,
   FilesSettingsDto,
   FileEntryDtoIntegerAllOfSecurity,
@@ -10,7 +9,7 @@ import type {
 export type {
   FilesSettingsDto,
   FolderDtoInteger,
-  FolderType as SdkFolderType,
+  SdkFolderType,
   FileEntryDtoIntegerAllOfSecurity,
 };
 
@@ -21,7 +20,12 @@ import type {
   TSelectorHeader,
   SpecialFolderScope,
 } from "../../components/selector";
-import type { WithFlag, Nullable } from "../../types";
+import type {
+  WithFlag,
+  Nullable,
+  TFolderTypeValue as FolderType,
+  TRoomTypeValue as RoomType,
+} from "../../types";
 import type {
   ApplyFilterOption,
   SearchArea,
