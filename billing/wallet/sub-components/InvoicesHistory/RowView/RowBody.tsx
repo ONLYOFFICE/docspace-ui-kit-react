@@ -36,10 +36,12 @@ const InvoiceRow: React.FC<InvoiceRowProps> = ({
           href={url}
           target={LinkTarget.blank}
           rel="noopener noreferrer"
-          ariaLabel={t("ViewInvoice")}
-          className={styles.rowLink}
+          fontSize="13px"
+          fontWeight={600}
+          className={styles.invoiceLink}
           dataTestId="invoice_link"
         >
+          {t("ViewInvoice")}
           <ExternalLinkIcon className={styles.externalIcon} aria-hidden />
         </Link>
       }
