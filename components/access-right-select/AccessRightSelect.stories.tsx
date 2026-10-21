@@ -548,7 +548,7 @@ const CssCustomizationTemplate = () => {
           // === Combobox (trigger button) ===
           "--combobox-radius": "8px",
           // === DropDown (options panel) ===
-          "--dropdown-bg": "#e6f3fb",
+          "--dropdown-bg": "light-dark(#e6f3fb, #16303e)",
           "--dropdown-border-style": "1px solid #0082c9",
           "--dropdown-shadow": "0 4px 16px rgba(0, 130, 201, 0.25)",
           "--dropdown-radius": "12px",
@@ -632,7 +632,7 @@ export const CssCustomization: Story = {
     "--access-right-select-gap": "12px",
     "--access-right-select-item-padding": "10px 0",
     "--combobox-radius": "8px",
-    "--dropdown-bg": "#e6f3fb",
+    "--dropdown-bg": "light-dark(#e6f3fb, #16303e)",
     "--dropdown-border-style": "1px solid #0082c9",
     "--dropdown-shadow": "0 4px 16px rgba(0, 130, 201, 0.25)",
     "--dropdown-radius": "12px",

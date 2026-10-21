@@ -313,6 +313,7 @@ export const WithAlert: Story = {
     style: cornerStyle,
     actionOptions,
   },
+  globals: { viewport: { value: "mobile2", isRotated: false } },
   play: async ({ args, canvas, userEvent }) => {
     // With withAlertClick the badge is a named button, reachable by Tab.
     const badge = canvas.getByRole("button", { name: "Alert" });
@@ -443,7 +444,7 @@ export const CssCustomization: Story = {
           "--main-button-mobile-button-color": "#7c3aed",
           "--main-button-mobile-icon-fill": "#ffffff",
           "--main-button-mobile-badge-size": "14px",
-          "--main-button-mobile-badge-offset": "8px",
+          "--main-button-mobile-badge-offset": "4px",
           "--main-button-mobile-dropdown-item-padding": "8px 20px",
           "--main-button-mobile-button-options-background-color": "#5b21b6",
         } as CSSProperties
@@ -457,12 +458,13 @@ export const CssCustomization: Story = {
       />
     </div>
   ),
+  globals: { viewport: { value: "mobile2", isRotated: false } },
   play: async () => {
     // The size variable sizes the badge's box and the icon inside it.
     const icon = getAlertBadge() as SVGElement;
     const box = icon.parentElement as HTMLElement;
     await expect(getComputedStyle(box).width).toBe("14px");
-    await expect(getComputedStyle(box).top).toBe("8px");
+    await expect(getComputedStyle(box).top).toBe("4px");
     await expect(icon.getBoundingClientRect().width).toBeCloseTo(14, 0);
     // Without withAlertClick the badge is a named image, not a button.
     await expect(icon).toHaveAttribute("role", "img");
@@ -471,7 +473,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables are listed under CSS variables on this page. One instance, with the alert badge on so the badge variables show. Open the menu to see the item padding and the lower group's background.`,
+        story: `The variables are listed under CSS variables on this page. One instance, with \`alert\` on: the red exclamation mark on the button's rim is the alert badge, there so its size and offset variables show. Open the menu to see the item padding and the lower group's background.`,
       },
       source: {
         code: `<div
@@ -479,7 +481,7 @@ export const CssCustomization: Story = {
     "--main-button-mobile-button-color": "#7c3aed",
     "--main-button-mobile-icon-fill": "#ffffff",
     "--main-button-mobile-badge-size": "14px",
-    "--main-button-mobile-badge-offset": "8px",
+    "--main-button-mobile-badge-offset": "4px",
     "--main-button-mobile-dropdown-item-padding": "8px 20px",
     "--main-button-mobile-button-options-background-color": "#5b21b6",
   }}

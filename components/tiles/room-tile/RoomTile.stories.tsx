@@ -1,7 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fireEvent, fn, screen, waitFor, within } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import type { RoomTileProps } from "./RoomTile.types";
 
@@ -19,6 +19,7 @@ import { IconSizeType } from "../../../utils";
 
 import { RoomTile } from ".";
 import { TileContent } from "../tile-content";
+import RenameField from "../../../.storybook/utils/RenameField";
 
 const element = <PublicRoomIconReactSvg />;
 
@@ -220,15 +221,19 @@ const Template = ({
     <div style={{ maxWidth: "300px", margin: "30px" }}>
       <RoomTile {...args} checked={checked} onSelect={onSelect}>
         <TileContent>
-          <Link
-            type={LinkType.page}
-            fontSize="16px"
-            lineHeight="22px"
-            fontWeight={600}
-            isTextOverflow
-          >
-            {args.item.title}
-          </Link>
+          {args.isEdit ? (
+            <RenameField title={args.item.title} />
+          ) : (
+            <Link
+              type={LinkType.page}
+              fontSize="16px"
+              lineHeight="22px"
+              fontWeight={600}
+              isTextOverflow
+            >
+              {args.item.title}
+            </Link>
+          )}
         </TileContent>
       </RoomTile>
     </div>
@@ -295,7 +300,7 @@ export const Default: Story = {
       expect.objectContaining({ id: "room-1" }),
     );
 
-    fireEvent.contextMenu(tile, { button: 2 });
+    await userEvent.click(within(tile).getByTestId("context-menu-button"));
     await userEvent.click(await menuItem("Delete"));
     await expect(onDeleteOption).toHaveBeenCalledTimes(1);
   },
@@ -555,7 +560,11 @@ export const RenamingState: Story = {
   isEdit
 >
   <TileContent>
-    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Sample Room</Link>
+    <div style={{ display: "flex", gap: 4 }}>
+      <TextInput value={title} onChange={onRename} scale />
+      <Button size={ButtonSize.small} icon={<CheckIcon />} onClick={onSave} />
+      <Button size={ButtonSize.small} icon={<CrossIcon />} onClick={onCancel} />
+    </div>
   </TileContent>
 </RoomTile>`,
       },
@@ -611,12 +620,12 @@ export const CssCustomization: Story = {
     <div
       style={
         {
-          "--tile-bg": "#f4f9fd",
+          "--tile-bg": "light-dark(#f4f9fd, #132530)",
           "--tile-border-style": "1px solid #0082c9",
           "--tile-radius": "16px",
-          "--tile-hover-bg": "#cce5f6",
+          "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
           "--tile-icon-color": "#0082c9",
-          "--tile-tag-hover-bg": "#e6f3fb",
+          "--tile-tag-hover-bg": "light-dark(#e6f3fb, #16303e)",
           "--tile-hotkey-color": "#e0662e",
           "--tile-padding": "12px 0",
           "--tile-row-gap": "12px",
@@ -683,12 +692,12 @@ Two instances:
       },
       source: {
         code: `<div style={{
-  "--tile-bg": "#f4f9fd",
+  "--tile-bg": "light-dark(#f4f9fd, #132530)",
   "--tile-border-style": "1px solid #0082c9",
   "--tile-radius": "16px",
-  "--tile-hover-bg": "#cce5f6",
+  "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
   "--tile-icon-color": "#0082c9",
-  "--tile-tag-hover-bg": "#e6f3fb",
+  "--tile-tag-hover-bg": "light-dark(#e6f3fb, #16303e)",
   "--tile-hotkey-color": "#e0662e",
   "--tile-padding": "12px 0",
   "--tile-row-gap": "12px",

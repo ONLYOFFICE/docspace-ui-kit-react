@@ -1,7 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fireEvent, fn, screen, waitFor, within } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import type { BaseTileProps } from "./BaseTile.types";
 
@@ -11,6 +11,7 @@ import WordSvgUrl from "../../../assets/icons/32/word.svg";
 import PdfSvgUrl from "../../../assets/icons/32/pdf.svg";
 import SlideSvgUrl from "../../../assets/icons/32/slide.svg";
 import { Link, LinkType } from "../../link";
+import RenameField from "../../../.storybook/utils/RenameField";
 import { globalColors } from "../../../providers/theme";
 
 import { BaseTile } from ".";
@@ -268,7 +269,7 @@ export const Default: Story = {
     await expect(args.onRoomClick).toHaveBeenCalled();
 
     // A right click opens the menu.
-    fireEvent.contextMenu(tile, { button: 2 });
+    await userEvent.pointer({ keys: "[MouseRight]", target: tile });
     await expect(args.tileContextClick).toHaveBeenCalledWith(true);
     await userEvent.click(await menuItem("Delete"));
     await expect(onDeleteOption).toHaveBeenCalledTimes(1);
@@ -424,7 +425,13 @@ export const WithBottomContent: Story = {
     ...Default.args,
     topContent: documentTitle,
     bottomContent: (
-      <div style={{ padding: "8px", fontSize: "12px", color: "#666" }}>
+      <div
+        style={{
+          padding: "8px",
+          fontSize: "12px",
+          color: "light-dark(#666, #a3a9ae)",
+        }}
+      >
         Additional information
       </div>
     ),
@@ -498,6 +505,11 @@ export const RenamingState: Story = {
   args: {
     ...Default.args,
     isEdit: true,
+    topContent: (
+      <TileContent>
+        <RenameField title="Document.docx" />
+      </TileContent>
+    ),
   },
   play: async ({ canvas }) => {
     const tile = canvas.getByTestId("tile");
@@ -517,7 +529,15 @@ export const RenamingState: Story = {
   item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
   element={<WordSvgUrl />}
   contextOptions={contextOptions}
-  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
+  topContent={
+    <TileContent>
+      <div style={{ display: "flex", gap: 4 }}>
+        <TextInput value={title} onChange={onRename} scale />
+        <Button size={ButtonSize.small} icon={<CheckIcon />} onClick={onSave} />
+        <Button size={ButtonSize.small} icon={<CrossIcon />} onClick={onCancel} />
+      </div>
+    </TileContent>
+  }
   isEdit
 />`,
       },
@@ -561,12 +581,12 @@ export const CssCustomization: Story = {
     <div
       style={
         {
-          "--tile-bg": "#e6f3fb",
+          "--tile-bg": "light-dark(#e6f3fb, #16303e)",
           "--tile-border-style": "1px solid #0082c9",
           "--tile-radius": "16px",
-          "--tile-hover-bg": "#cce5f6",
+          "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
           "--tile-icon-color": "#0082c9",
-          "--tile-hotkey-color": "#00304d",
+          "--tile-hotkey-color": "light-dark(#00304d, #a8d8f2)",
           "--tile-padding": "12px 0",
           "--tile-row-gap": "12px",
         } as CSSProperties

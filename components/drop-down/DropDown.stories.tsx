@@ -894,7 +894,7 @@ const CssCustomizationTemplate = () => {
       style={
         {
           "--dropdown-radius": "12px",
-          "--dropdown-bg": "#f5f3ff",
+          "--dropdown-bg": "light-dark(#f5f3ff, #221b3a)",
           "--dropdown-border-style": "1px solid #7c3aed",
           "--dropdown-shadow": "0 4px 20px rgba(124, 58, 237, 0.25)",
           "--dropdown-inner-padding": "12px 0",
@@ -941,7 +941,7 @@ export const CssCustomization: Story = {
       source: {
         code: `<div style={{
   "--dropdown-radius": "12px",
-  "--dropdown-bg": "#f5f3ff",
+  "--dropdown-bg": "light-dark(#f5f3ff, #221b3a)",
   "--dropdown-border-style": "1px solid #7c3aed",
   "--dropdown-shadow": "0 4px 20px rgba(124,58,237,0.25)",
   "--dropdown-inner-padding": "12px 0",

@@ -629,10 +629,10 @@ export const CssCustomization: Story = {
         {
           "--empty-view-title-color": "#0082c9",
           "--empty-view-header-font-size": "18px",
-          "--empty-view-desc-color": "#5b6b7a",
+          "--empty-view-desc-color": "light-dark(#5b6b7a, #a3a9ae)",
           "--empty-view-link-accent": "#0082c9",
-          "--empty-view-link-background": "#e6f3fb",
-          "--empty-view-link-hover-background": "#cce5f6",
+          "--empty-view-link-background": "light-dark(#e6f3fb, #16303e)",
+          "--empty-view-link-hover-background": "light-dark(#cce5f6, #1f4a61)",
           "--empty-view-link-radius": "50px",
           "--empty-view-link-padding": "8px 16px",
           "--empty-view-link-text-size": "14px",
@@ -641,8 +641,8 @@ export const CssCustomization: Story = {
           "--empty-view-item-padding": "16px 20px",
           "--empty-view-item-gap": "16px",
           "--empty-view-icon-size": "24px",
-          "--empty-view-item-hover-background": "#e6f3fb",
-          "--empty-view-item-title-color": "#004f82",
+          "--empty-view-item-hover-background": "light-dark(#e6f3fb, #16303e)",
+          "--empty-view-item-title-color": "light-dark(#004f82, #7cc3ea)",
           "--empty-view-item-desc-color": "#7a8a99",
           "--empty-view-divider-color": "#0082c9",
           "--empty-view-width": "400px",
@@ -689,7 +689,7 @@ export const CssCustomization: Story = {
         code: `<div
   style={{
     "--empty-view-title-color": "#0082c9",
-    "--empty-view-link-background": "#e6f3fb",
+    "--empty-view-link-background": "light-dark(#e6f3fb, #16303e)",
     "--empty-view-link-radius": "50px",
     "--empty-view-item-radius": "12px",
     "--empty-view-divider-color": "#0082c9",

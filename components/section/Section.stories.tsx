@@ -8,6 +8,10 @@ import ViewRowsReactSvg from "../../assets/view-rows.react.svg";
 import ViewTilesReactSvg from "../../assets/view-tiles.react.svg";
 import FileCells, { storyFiles } from "../../.storybook/utils/FileCells";
 import { DeviceType, FilterGroups, SortByFieldName } from "../../enums";
+import {
+  deviceFor,
+  useWindowDevice,
+} from "../../.storybook/utils/useWindowDevice";
 import Filter from "../filter";
 import Navigation from "../navigation/Navigation";
 import { TableBody, TableContainer, TableHeader, TableRow } from "../table";
@@ -610,10 +614,16 @@ const sectionLabelStyle: React.CSSProperties = {
   pointerEvents: "none",
 };
 
-export const Default: Story = {
-  render: (args) => (
-    <div style={{ width: "100%", height: "600px" }}>
-      <Section {...args}>
+const DefaultPage = (args: ComponentProps<typeof Section>) => {
+  const device = useWindowDevice();
+  const isDesktop = device === DeviceType.desktop;
+
+  return (
+    <div style={{ display: "flex", width: "100%", height: "600px" }}>
+      <Section
+        {...args}
+        currentDeviceType={isDesktop ? args.currentDeviceType : device}
+      >
         <Section.SectionHeader>
           <div
             style={{
@@ -629,12 +639,12 @@ export const Default: Story = {
               style={{
                 ...sectionLabelStyle,
                 color: "#2196F3",
-                backgroundColor: "#E3F2FD",
+                backgroundColor: "light-dark(#E3F2FD, #132a3d)",
               }}
             >
               Header
             </span>
-            <NavigationHeader />
+            <NavigationHeader device={device} />
           </div>
         </Section.SectionHeader>
         <Section.SectionFilter>
@@ -652,18 +662,17 @@ export const Default: Story = {
               style={{
                 ...sectionLabelStyle,
                 color: "#FF9800",
-                backgroundColor: "#FFF3E0",
+                backgroundColor: "light-dark(#FFF3E0, #3d2a14)",
               }}
             >
               Filter
             </span>
-            <FilterContent />
+            <FilterContent device={device} />
           </div>
         </Section.SectionFilter>
         <Section.SectionBody>
           <div
             style={{
-              marginLeft: "-20px",
               marginTop: "8px",
               border: "2px dashed #4CAF50",
               borderRadius: "4px",
@@ -674,18 +683,22 @@ export const Default: Story = {
               style={{
                 ...sectionLabelStyle,
                 color: "#4CAF50",
-                backgroundColor: "#E8F5E9",
+                backgroundColor: "light-dark(#E8F5E9, #1b3320)",
               }}
             >
               Body
             </span>
-            <TableContent />
+            {isDesktop ? <TableContent /> : <ListContent />}
           </div>
         </Section.SectionBody>
         <Section.SectionFooter>{null}</Section.SectionFooter>
       </Section>
     </div>
-  ),
+  );
+};
+
+export const Default: Story = {
+  render: (args) => <DefaultPage {...args} />,
   args: {
     currentDeviceType: DeviceType.desktop,
     withBodyScroll: true,
@@ -693,6 +706,12 @@ export const Default: Story = {
     isInfoPanelAvailable: false,
   },
   play: async ({ canvasElement }) => {
+    if (deviceFor(window.innerWidth) !== DeviceType.desktop) {
+      const body = part(canvasElement, ".section-body") as HTMLElement;
+      await expect(within(body).getByText("My Documents")).toBeVisible();
+      await expect(part(body, ".section-body_filter")).not.toBeNull();
+      return;
+    }
     const sticky = part(
       canvasElement,
       ".section-sticky-container",
@@ -710,6 +729,8 @@ export const Default: Story = {
     await expect(part(canvasElement, "#InfoPanelWrapper")).toBeNull();
   },
   parameters: {
+    layout: "fullscreen",
+    noPadding: true,
     docs: {
       description: {
         story:
@@ -1198,12 +1219,18 @@ export const WithContextMenu: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     // A right click outside the body opens nothing.
-    fireEvent.contextMenu(canvas.getByText("My Documents"));
+    await userEvent.pointer({
+      keys: "[MouseRight]",
+      target: canvas.getByText("My Documents"),
+    });
     await expect(
       screen.queryByRole("menuitem", { name: "Upload file" }),
     ).toBeNull();
 
-    fireEvent.contextMenu(canvas.getByText("Meeting Notes.docx"));
+    await userEvent.pointer({
+      keys: "[MouseRight]",
+      target: canvas.getByText("Meeting Notes.docx"),
+    });
     const upload = await screen.findByRole("menuitem", { name: "Upload file" });
     await waitFor(() => expect(upload).toBeVisible());
     await expect(
@@ -1457,18 +1484,19 @@ export const CssCustomization: Story = {
           width: "100%",
           height: "600px",
           // === Section — pinned header strip ===
-          "--section-bg": "#e6f3fb",
+          "--section-bg": "light-dark(#e6f3fb, #16303e)",
           "--section-header-size": "56px",
           "--section-footer-margin": "24px",
           // === Info panel ===
-          "--info-panel-background": "#f5fbff",
+          "--info-panel-background": "light-dark(#f5fbff, #132530)",
           "--info-panel-border-color": "#0082c9",
           "--info-panel-width": "300px",
           // === Chat panel ===
-          "--chat-panel-background": "#fff8e6",
+          "--chat-panel-background": "light-dark(#fff8e6, #3a2f12)",
           "--chat-panel-border-color": "#c98a00",
           "--chat-panel-width": "300px",
-          "--chat-panel-drop-overlay-background": "#fff1cc",
+          "--chat-panel-drop-overlay-background":
+            "light-dark(#fff1cc, #4a3a12)",
           "--chat-panel-drop-border-color": "#c98a00",
           "--chat-panel-drop-inset-top": "72px",
         } as React.CSSProperties
@@ -1532,16 +1560,16 @@ export const CssCustomization: Story = {
   style={{
     display: "flex",
     height: 600,
-    "--section-bg": "#e6f3fb",
+    "--section-bg": "light-dark(#e6f3fb, #16303e)",
     "--section-header-size": "56px",
     "--section-footer-margin": "24px",
-    "--info-panel-background": "#f5fbff",
+    "--info-panel-background": "light-dark(#f5fbff, #132530)",
     "--info-panel-border-color": "#0082c9",
     "--info-panel-width": "300px",
-    "--chat-panel-background": "#fff8e6",
+    "--chat-panel-background": "light-dark(#fff8e6, #3a2f12)",
     "--chat-panel-border-color": "#c98a00",
     "--chat-panel-width": "300px",
-    "--chat-panel-drop-overlay-background": "#fff1cc",
+    "--chat-panel-drop-overlay-background": "light-dark(#fff1cc, #4a3a12)",
     "--chat-panel-drop-border-color": "#c98a00",
     "--chat-panel-drop-inset-top": "72px",
   }}

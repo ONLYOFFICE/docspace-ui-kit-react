@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fireEvent, fn, screen, waitFor } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import { ContextMenuModel } from "../../context-menu";
 import FileCells, { storyFiles } from "../../../.storybook/utils/FileCells";
@@ -204,9 +204,9 @@ export const Default: Story = {
     await userEvent.dblClick(canvas.getByText("Document"));
     await expect(args.onDoubleClick).toHaveBeenCalled();
 
-    // A right click anywhere in the row opens its menu.
-    fireEvent.contextMenu(canvas.getByText("Finance"), { button: 2 });
-    await expect(args.fileContextClick).toHaveBeenCalledWith(true);
+    // The menu button opens the row's menu beside it.
+    await userEvent.click(canvas.getByTestId("context-menu-button"));
+    await expect(args.fileContextClick).toHaveBeenCalledWith(false);
     await userEvent.click(await menuItem("Delete"));
     await expect(onDeleteOption).toHaveBeenCalledTimes(1);
     await waitFor(() => expect(args.onHideContextMenu).toHaveBeenCalled());

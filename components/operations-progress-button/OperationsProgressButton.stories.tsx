@@ -1,7 +1,13 @@
 import type { ComponentProps, CSSProperties } from "react";
+import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, screen, waitFor, within } from "storybook/test";
+
+import { ModalDialog, ModalDialogType } from "../modal-dialog";
+import { ProgressBar } from "../progress-bar";
+import { Text } from "../text";
+import { globalColors } from "../../providers/theme";
 
 import OperationsProgressButton from ".";
 import type { Operation } from "./OperationsProgressButton.types";
@@ -179,6 +185,84 @@ export default meta;
 const Template = (args: ComponentProps<typeof OperationsProgressButton>) => (
   <OperationsProgressButton {...args} />
 );
+
+const uploadNames = [
+  "Annual Report 2025.docx",
+  "Q4 Budget.xlsx",
+  "Team Presentation.pptx",
+  "Contract Draft.pdf",
+  "Meeting Notes.docx",
+  "Sales Forecast.xlsx",
+];
+
+const uploads = Array.from({ length: 30 }, (_, index) => {
+  const base = uploadNames[index % uploadNames.length];
+  const copy = Math.floor(index / uploadNames.length);
+  const name = copy ? base.replace(/(\.\w+)$/, ` (${copy})$1`) : base;
+  const percent = index < 12 ? 100 : index === 12 ? 40 : 0;
+  return { name, percent };
+});
+
+const uploadStatus = (percent: number) => {
+  if (percent === 100) return "Done";
+  if (percent === 0) return "Waiting";
+  return `${percent}%`;
+};
+
+const HostPanelTemplate = (
+  args: ComponentProps<typeof OperationsProgressButton>,
+) => {
+  const [open, setOpen] = useState(false);
+  const [operation] = args.panelOperations ?? [];
+
+  const panelOperations = (args.panelOperations ?? []).map((item) => ({
+    ...item,
+    showPanel: (visible: boolean) => {
+      item.showPanel?.(visible);
+      setOpen(visible);
+    },
+  }));
+
+  return (
+    <>
+      <OperationsProgressButton {...args} panelOperations={panelOperations} />
+      <ModalDialog
+        visible={open && !!operation}
+        displayType={ModalDialogType.aside}
+        onClose={() => setOpen(false)}
+      >
+        <ModalDialog.Header>{operation?.label}</ModalDialog.Header>
+        <ModalDialog.Body>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+              paddingBlock: "8px",
+            }}
+          >
+            {uploads.map((file) => (
+              <div
+                key={file.name}
+                style={{ display: "flex", flexDirection: "column", gap: "6px" }}
+              >
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <Text fontWeight={600}>{file.name}</Text>
+                  <Text color={globalColors.gray}>
+                    {uploadStatus(file.percent)}
+                  </Text>
+                </div>
+                <ProgressBar percent={file.percent} />
+              </div>
+            ))}
+          </div>
+        </ModalDialog.Body>
+      </ModalDialog>
+    </>
+  );
+};
 
 type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
 
@@ -512,7 +596,7 @@ export const StoppedOperation: Story = {
 };
 
 export const OpensPanelOnClick: Story = {
-  render: Template,
+  render: HostPanelTemplate,
   args: {
     panelOperations: [
       {
@@ -539,12 +623,15 @@ export const OpensPanelOnClick: Story = {
     await expect(tooltip).toHaveTextContent("12 of 30 files");
     await userEvent.click(canvas.getByTestId("floating-button"));
     await expect(showPanel).toHaveBeenCalledWith(true);
+    await waitFor(() =>
+      expect(screen.getByText("Team Presentation.pptx")).toBeVisible(),
+    );
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Leads the user to the details of a single operation: click the button to open the operation's own panel (`showPanel`), and hover it to read a second line under the label (`description`).",
+          "Leads the user to the details of a single operation: click the button to open the operation's own panel (`showPanel`), and hover it to read a second line under the label (`description`). The panel is the page's, not the button's; the story draws a stand-in for it on the right.",
       },
       source: {
         code: `<OperationsProgressButton
@@ -646,8 +733,8 @@ export const CssCustomization: Story = {
     <div
       style={
         {
-          "--ops-progress-dropdown-bg": "#e6f3fb",
-          "--ops-progress-dropdown-hover": "#cce5f6",
+          "--ops-progress-dropdown-bg": "#0d3a52",
+          "--ops-progress-dropdown-hover": "#16506f",
           "--ops-progress-dropdown-margin": "16px",
           "--ops-progress-list-padding": "0px 12px",
           "--ops-progress-bar-padding": "10px 16px",
@@ -655,7 +742,7 @@ export const CssCustomization: Story = {
           "--ops-progress-items-gap": "12px",
           "--ops-progress-label-gap": "4px",
           "--ops-progress-icon-color": "#0082c9",
-          "--ops-progress-icon-hover": "#006ba6",
+          "--ops-progress-icon-hover": "#4fb0e6",
           "--ops-progress-error-icon": "#0082c9",
           "--ops-progress-stopped-icon": "#f03032",
           "--floating-circle-button-background": "#0082c9",
@@ -715,7 +802,7 @@ export const CssCustomization: Story = {
     await expect(within(list).getByText("Moving to trash")).toBeVisible();
     const dropDown = list.closest('[data-testid="dropdown"]') as HTMLElement;
     await expect(getComputedStyle(dropDown).backgroundColor).toBe(
-      "rgb(230, 243, 251)",
+      "rgb(13, 58, 82)",
     );
   },
   parameters: {

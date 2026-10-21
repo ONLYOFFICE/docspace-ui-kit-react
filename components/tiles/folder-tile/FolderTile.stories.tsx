@@ -14,6 +14,7 @@ import { Badge } from "../../badge";
 
 import { FolderTile } from ".";
 import { TileContent } from "../tile-content";
+import RenameField from "../../../.storybook/utils/RenameField";
 
 const element = <Folder32ReactSvg />;
 
@@ -244,9 +245,13 @@ const Template = ({
     <div style={{ maxWidth: "300px", margin: "30px" }}>
       <FolderTile {...args} checked={checked} onSelect={onSelect}>
         <TileContent>
-          <Link type={LinkType.page} fontWeight={600} isTextOverflow>
-            {args.item.title}
-          </Link>
+          {args.isEdit ? (
+            <RenameField title={args.item.title} />
+          ) : (
+            <Link type={LinkType.page} fontWeight={600} isTextOverflow>
+              {args.item.title}
+            </Link>
+          )}
         </TileContent>
       </FolderTile>
     </div>
@@ -294,8 +299,8 @@ export const Default: Story = {
     await expect(onBadgeClick).toHaveBeenCalledTimes(1);
     await expect(args.onSelect).toHaveBeenCalledTimes(selections);
 
-    fireEvent.contextMenu(tile, { button: 2 });
-    await expect(args.tileContextClick).toHaveBeenCalledWith(true);
+    await userEvent.click(within(tile).getByTestId("context-menu-button"));
+    await expect(args.tileContextClick).toHaveBeenCalledWith(false);
     await userEvent.click(await menuItem("Copy"));
     await expect(onCopyOption).toHaveBeenCalledTimes(1);
 
@@ -499,7 +504,13 @@ export const RenamingState: Story = {
   badges={badges}
   isEdit
 >
-  <TileContent><Link type="page" fontWeight={600} isTextOverflow>My Folder</Link></TileContent>
+  <TileContent>
+    <div style={{ display: "flex", gap: 4 }}>
+      <TextInput value={title} onChange={onRename} scale />
+      <Button size={ButtonSize.small} icon={<CheckIcon />} onClick={onSave} />
+      <Button size={ButtonSize.small} icon={<CrossIcon />} onClick={onCancel} />
+    </div>
+  </TileContent>
 </FolderTile>`,
       },
     },

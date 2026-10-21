@@ -434,13 +434,13 @@ export const CssCustomization: Story = {
       style={
         {
           width: "400px",
-          "--snackbar-background": "#eef2ff",
-          "--snackbar-text-color": "#b91c1c",
-          "--snackbar-accent-color": "#4f46e5",
+          "--snackbar-background": "light-dark(#eef2ff, #1e2240)",
+          "--snackbar-text-color": "light-dark(#b91c1c, #fca5a5)",
+          "--snackbar-accent-color": "light-dark(#4f46e5, #a5b4fc)",
           "--snackbar-accent-width": "6px",
           "--snackbar-text-size": "13px",
           "--snackbar-content-padding": "16px 24px",
-          "--snackbar-icon-fill": "#4f46e5",
+          "--snackbar-icon-fill": "light-dark(#4f46e5, #a5b4fc)",
         } as CSSProperties
       }
     >
@@ -469,13 +469,13 @@ export const CssCustomization: Story = {
       source: {
         code: `<div
   style={{
-    "--snackbar-background": "#eef2ff",
-    "--snackbar-text-color": "#b91c1c",
-    "--snackbar-accent-color": "#4f46e5",
+    "--snackbar-background": "light-dark(#eef2ff, #1e2240)",
+    "--snackbar-text-color": "light-dark(#b91c1c, #fca5a5)",
+    "--snackbar-accent-color": "light-dark(#4f46e5, #a5b4fc)",
     "--snackbar-accent-width": "6px",
     "--snackbar-text-size": "13px",
     "--snackbar-content-padding": "16px 24px",
-    "--snackbar-icon-fill": "#4f46e5",
+    "--snackbar-icon-fill": "light-dark(#4f46e5, #a5b4fc)",
   }}
 >
   <SnackBar

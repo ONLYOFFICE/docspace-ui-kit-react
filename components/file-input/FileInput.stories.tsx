@@ -627,18 +627,18 @@ const CssCustomizationTemplate = () => {
           width: "320px",
           // === FileInput — border and radius ===
           "--file-input-border": "#0082c9",
-          "--file-input-hover-border": "#006ba6",
-          "--file-input-focus-border": "#004f82",
+          "--file-input-hover-border": "light-dark(#006ba6, #4fb0e6)",
+          "--file-input-focus-border": "light-dark(#004f82, #7cc3ea)",
           "--file-input-radius": "8px",
           // === FileInput — validation states ===
           "--file-input-warning-border": "#e67e00",
           "--file-input-error-border": "#c0392b",
-          "--file-input-disabled-border": "#b0cce3",
+          "--file-input-disabled-border": "light-dark(#b0cce3, #2d5570)",
           "--file-input-placeholder-color": "#7aa8c7",
           // === TextInput (inner text field) ===
-          "--text-input-bg": "#f0f8ff",
-          "--text-input-color": "#004f82",
-          "--text-input-radius": "8px 0 0 8px",
+          "--text-input-bg": "light-dark(#f0f8ff, #132530)",
+          "--text-input-color": "light-dark(#004f82, #7cc3ea)",
+          "--text-input-radius": "8px",
         } as CSSProperties
       }
     >
@@ -705,16 +705,16 @@ export const CssCustomization: Story = {
         code: `<div
   style={{
     "--file-input-border": "#0082c9",
-    "--file-input-hover-border": "#006ba6",
-    "--file-input-focus-border": "#004f82",
+    "--file-input-hover-border": "light-dark(#006ba6, #4fb0e6)",
+    "--file-input-focus-border": "light-dark(#004f82, #7cc3ea)",
     "--file-input-radius": "8px",
     "--file-input-warning-border": "#e67e00",
     "--file-input-error-border": "#c0392b",
-    "--file-input-disabled-border": "#b0cce3",
+    "--file-input-disabled-border": "light-dark(#b0cce3, #2d5570)",
     "--file-input-placeholder-color": "#7aa8c7",
-    "--text-input-bg": "#f0f8ff",
-    "--text-input-color": "#004f82",
-    "--text-input-radius": "8px 0 0 8px",
+    "--text-input-bg": "light-dark(#f0f8ff, #132530)",
+    "--text-input-color": "light-dark(#004f82, #7cc3ea)",
+    "--text-input-radius": "8px",
   }}
 >
   <FileInput placeholder="Choose file" size={InputSize.base} scale />

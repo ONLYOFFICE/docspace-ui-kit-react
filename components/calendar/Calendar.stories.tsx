@@ -523,7 +523,7 @@ export const CssCustomization: Story = {
         style={
           {
             // Calendar container
-            "--calendar-bg": "#e6f3fb",
+            "--calendar-bg": "light-dark(#e6f3fb, #16303e)",
             "--calendar-border": "#0082c9",
             "--calendar-shadow": "0 4px 16px rgba(0,130,201,0.25)",
             "--calendar-radius": "12px",
@@ -536,7 +536,7 @@ export const CssCustomization: Story = {
             // Navigation arrows
             "--calendar-outline": "#0082c9",
             "--calendar-arrow": "#0082c9",
-            "--calendar-disabled-arrow": "#cce5f6",
+            "--calendar-disabled-arrow": "light-dark(#cce5f6, #1f4a61)",
             // Weekday labels
             "--calendar-weekday": "#0082c9",
             // Date items
@@ -544,12 +544,12 @@ export const CssCustomization: Story = {
             "--calendar-selected-text": "#ffffff",
             "--calendar-current-radius": "8px",
             "--calendar-focused-radius": "8px",
-            "--calendar-focused-bg": "#ffffff",
+            "--calendar-focused-bg": "light-dark(#ffffff, #0d2633)",
             "--calendar-focused-text": "#0082c9",
-            "--calendar-hover-bg": "#cce5f6",
+            "--calendar-hover-bg": "light-dark(#cce5f6, #1f4a61)",
             "--calendar-hover-radius": "8px",
             "--calendar-past": "#5ab4e5",
-            "--calendar-disabled": "#cce5f6",
+            "--calendar-disabled": "light-dark(#cce5f6, #1f4a61)",
           } as React.CSSProperties
         }
       >
@@ -585,15 +585,15 @@ export const CssCustomization: Story = {
       source: {
         code: `<div
   style={{
-    "--calendar-bg": "#e6f3fb",
+    "--calendar-bg": "light-dark(#e6f3fb, #16303e)",
     "--calendar-border": "#0082c9",
     "--calendar-radius": "12px",
     "--calendar-title": "#0082c9",
     "--calendar-accent": "#0082c9",
-    "--calendar-focused-bg": "#ffffff",
-    "--calendar-hover-bg": "#cce5f6",
+    "--calendar-focused-bg": "light-dark(#ffffff, #0d2633)",
+    "--calendar-hover-bg": "light-dark(#cce5f6, #1f4a61)",
     "--calendar-past": "#5ab4e5",
-    "--calendar-disabled": "#cce5f6",
+    "--calendar-disabled": "light-dark(#cce5f6, #1f4a61)",
   }}
 >
   <Calendar

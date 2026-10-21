@@ -479,10 +479,15 @@ export const CssCustomization: Story = {
       <Backdrop visible withBackground onClick={fn()} />
       <div
         style={{
-          position: "relative",
-          zIndex: 11,
-          color: "#fff",
-          padding: "16px",
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 204,
+          padding: "24px 32px",
+          borderRadius: "8px",
+          background: "var(--background-color)",
+          color: "var(--text-color)",
           fontWeight: 600,
         }}
       >

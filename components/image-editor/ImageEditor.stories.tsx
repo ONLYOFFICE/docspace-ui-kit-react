@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { TImage } from "./ImageEditor.types";
 
 import SelectorPreviewSvgUrl from "../../assets/selector.form.room.empty.screen.light.react.svg?url";
+import DefaultUserPhotoUrl from "../../assets/default_user_photo_size_82-82.png";
 import { ImageEditor } from "./index";
 
 const meta = {
@@ -188,9 +189,10 @@ export const Default: Story = {
     const input = canvasElement.querySelector(
       "#customFileInput",
     ) as HTMLInputElement;
+    const blob = await (await fetch(DefaultUserPhotoUrl)).blob();
     await userEvent.upload(
       input,
-      new File(["png"], "photo.png", { type: "image/png" }),
+      new File([blob], "photo.png", { type: "image/png" }),
     );
     await waitFor(() => expect(canvas.getByRole("slider")).toBeVisible());
   },

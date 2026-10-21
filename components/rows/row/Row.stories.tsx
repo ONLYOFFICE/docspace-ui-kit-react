@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 
 import React from "react";
-import { expect, fireEvent, fn, screen, waitFor, within } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 import { useArgs } from "storybook/preview-api";
 
 import CatalogFolderReactSvg from "../../../assets/icons/16/catalog.folder.react.svg";
@@ -320,9 +320,9 @@ export const Default: Story = {
     await userEvent.click(within(row).getByText("Sample text"));
     await expect(args.onRowClick).toHaveBeenCalled();
 
-    // A right click anywhere on the row opens the menu.
-    fireEvent.contextMenu(within(row).getByText("Sample text"), { button: 2 });
-    await expect(args.onContextClick).toHaveBeenCalledWith(true);
+    // The menu button opens the menu beside it.
+    await userEvent.click(within(row).getByTestId("context-menu-button"));
+    await expect(args.onContextClick).toHaveBeenCalledWith(false);
     await expect(await menuItem("Edit")).toBeVisible();
     await userEvent.keyboard("{Escape}");
     await waitFor(() => expect(args.rowContextClose).toHaveBeenCalled());

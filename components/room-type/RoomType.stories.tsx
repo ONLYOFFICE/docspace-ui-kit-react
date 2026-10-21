@@ -500,12 +500,12 @@ export const CssCustomization = {
       style={
         {
           width: "320px",
-          "--room-type-item-bg": "#e6f3fb",
+          "--room-type-item-bg": "light-dark(#e6f3fb, #16303e)",
           "--room-type-item-border": "#0082c9",
-          "--room-type-item-hover-bg": "#cde7f5",
+          "--room-type-item-hover-bg": "light-dark(#cde7f5, #1f4a61)",
           "--room-type-item-radius": "12px",
           "--room-type-item-padding": "12px",
-          "--room-type-description-color": "#0a5a8a",
+          "--room-type-description-color": "light-dark(#0a5a8a, #5cb8e8)",
           "--room-type-gap": "20px",
         } as CSSProperties
       }
@@ -532,12 +532,12 @@ export const CssCustomization = {
       source: {
         code: `<div
   style={{
-    "--room-type-item-bg": "#e6f3fb",
+    "--room-type-item-bg": "light-dark(#e6f3fb, #16303e)",
     "--room-type-item-border": "#0082c9",
-    "--room-type-item-hover-bg": "#cde7f5",
+    "--room-type-item-hover-bg": "light-dark(#cde7f5, #1f4a61)",
     "--room-type-item-radius": "12px",
     "--room-type-item-padding": "12px",
-    "--room-type-description-color": "#0a5a8a",
+    "--room-type-description-color": "light-dark(#0a5a8a, #5cb8e8)",
     "--room-type-gap": "20px",
   }}
 >

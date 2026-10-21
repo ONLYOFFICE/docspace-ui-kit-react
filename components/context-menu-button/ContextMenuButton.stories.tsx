@@ -536,13 +536,13 @@ const CssCustomizationTemplate = () => {
     <div
       style={
         {
-          "--dropdown-bg": "#e6f3fb",
+          "--dropdown-bg": "light-dark(#e6f3fb, #16303e)",
           "--dropdown-border-style": "1px solid #0082c9",
           "--dropdown-shadow": "0 4px 16px rgba(0, 130, 201, 0.25)",
           "--dropdown-radius": "12px",
           "--dropdown-inner-padding": "4px 0",
           "--cmb-border": "1px solid #0082c9",
-          "--cmb-hover-border": "#003f63",
+          "--cmb-hover-border": "light-dark(#003f63, #a8d8f2)",
           "--cmb-size": "36px",
           "--cmb-radius": "8px",
           "--cmb-icon-padding": "8px 9px",
@@ -580,13 +580,13 @@ export const CssCustomization: Story = {
       source: {
         code: `<div
   style={{
-    "--dropdown-bg": "#e6f3fb",
+    "--dropdown-bg": "light-dark(#e6f3fb, #16303e)",
     "--dropdown-border-style": "1px solid #0082c9",
     "--dropdown-shadow": "0 4px 16px rgba(0, 130, 201, 0.25)",
     "--dropdown-radius": "12px",
     "--dropdown-inner-padding": "4px 0",
     "--cmb-border": "1px solid #0082c9",
-    "--cmb-hover-border": "#003f63",
+    "--cmb-hover-border": "light-dark(#003f63, #a8d8f2)",
     "--cmb-size": "36px",
     "--cmb-radius": "8px",
     "--cmb-icon-padding": "8px 9px",

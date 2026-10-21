@@ -1645,16 +1645,22 @@ const CustomizationTemplate = (args: SelectorProps) => (
     style={
       {
         "--selector-border": "2px solid rgb(37, 99, 235)",
-        "--selector-body-description-text": "rgb(22, 101, 52)",
+        "--selector-body-description-text":
+          "light-dark(rgb(22, 101, 52), rgb(134, 239, 172))",
         "--selector-breadcrumbs-prev-item-color": "rgb(190, 24, 93)",
         "--selector-breadcrumbs-arrow-right-color": "rgb(234, 88, 12)",
-        "--selector-info-background-color": "rgb(254, 243, 199)",
-        "--selector-info-color": "rgb(146, 64, 14)",
-        "--selector-item-hover-background": "rgb(219, 234, 254)",
-        "--selector-item-selected-background": "rgb(220, 252, 231)",
+        "--selector-info-background-color":
+          "light-dark(rgb(254, 243, 199), rgb(66, 50, 15))",
+        "--selector-info-color":
+          "light-dark(rgb(146, 64, 14), rgb(253, 186, 116))",
+        "--selector-item-hover-background":
+          "light-dark(rgb(219, 234, 254), rgb(30, 41, 70))",
+        "--selector-item-selected-background":
+          "light-dark(rgb(220, 252, 231), rgb(20, 60, 35))",
         "--selector-item-disabled-text-color": "rgb(248, 113, 113)",
         "--selector-item-input-button-border": "1px solid rgb(124, 58, 237)",
-        "--selector-item-input-button-border-hover": "rgb(46, 16, 101)",
+        "--selector-item-input-button-border-hover":
+          "light-dark(rgb(46, 16, 101), rgb(196, 181, 253))",
         "--selector-empty-screen-description-color": "rgb(190, 24, 93)",
         "--selector-empty-screen-pressed-button-color": "rgb(190, 24, 93)",
       } as React.CSSProperties
@@ -1713,16 +1719,16 @@ export const CssCustomization: Story = {
         code: `<div
   style={{
     "--selector-border": "2px solid rgb(37, 99, 235)",
-    "--selector-body-description-text": "rgb(22, 101, 52)",
+    "--selector-body-description-text": "light-dark(rgb(22, 101, 52), rgb(134, 239, 172))",
     "--selector-breadcrumbs-prev-item-color": "rgb(190, 24, 93)",
     "--selector-breadcrumbs-arrow-right-color": "rgb(234, 88, 12)",
-    "--selector-info-background-color": "rgb(254, 243, 199)",
-    "--selector-info-color": "rgb(146, 64, 14)",
-    "--selector-item-hover-background": "rgb(219, 234, 254)",
-    "--selector-item-selected-background": "rgb(220, 252, 231)",
+    "--selector-info-background-color": "light-dark(rgb(254, 243, 199), rgb(66, 50, 15))",
+    "--selector-info-color": "light-dark(rgb(146, 64, 14), rgb(253, 186, 116))",
+    "--selector-item-hover-background": "light-dark(rgb(219, 234, 254), rgb(30, 41, 70))",
+    "--selector-item-selected-background": "light-dark(rgb(220, 252, 231), rgb(20, 60, 35))",
     "--selector-item-disabled-text-color": "rgb(248, 113, 113)",
     "--selector-item-input-button-border": "1px solid rgb(124, 58, 237)",
-    "--selector-item-input-button-border-hover": "rgb(46, 16, 101)",
+    "--selector-item-input-button-border-hover": "light-dark(rgb(46, 16, 101), rgb(196, 181, 253))",
     "--selector-empty-screen-description-color": "rgb(190, 24, 93)",
     "--selector-empty-screen-pressed-button-color": "rgb(190, 24, 93)",
   }}

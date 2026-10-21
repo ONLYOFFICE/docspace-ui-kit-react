@@ -212,10 +212,10 @@ export const CssCustomization: Story = {
   },
   parameters: {
     tileVariables: {
-      "--tile-bg": "#e6f3fb",
+      "--tile-bg": "light-dark(#e6f3fb, #16303e)",
       "--tile-border-style": "1px solid #0082c9",
       "--tile-radius": "16px",
-      "--tile-hover-bg": "#cce5f6",
+      "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
     } as CSSProperties,
     docs: {
       description: {

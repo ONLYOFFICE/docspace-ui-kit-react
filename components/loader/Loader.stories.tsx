@@ -304,7 +304,15 @@ const AllTypesTemplate = () => {
       </LabeledItem>
       <LabeledItem label="Rombs">
         {/* The diamonds are positioned absolutely and bounce by 120px */}
-        <div style={{ position: "relative", width: "130px", height: "190px" }}>
+        <div
+          style={{
+            position: "relative",
+            boxSizing: "border-box",
+            width: "130px",
+            height: "190px",
+            paddingInlineStart: "33px",
+          }}
+        >
           <Loader type={LoaderTypes.rombs} size="65px" label="Rombs loader" />
         </div>
       </LabeledItem>
@@ -458,7 +466,13 @@ export const OnPrimaryButton: Story = {
     <div
       style={{
         display: "inline-flex",
-        padding: "10px 24px",
+        alignItems: "center",
+        justifyContent: "center",
+        boxSizing: "border-box",
+        minWidth: "100px",
+        height: "32px",
+        padding: "0 28px",
+        lineHeight: 0,
         borderRadius: "3px",
         background: "var(--color-scheme-main-buttons)",
       }}

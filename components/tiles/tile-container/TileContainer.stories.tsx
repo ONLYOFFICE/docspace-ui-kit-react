@@ -284,10 +284,10 @@ export const CssCustomization: Story = {
     <div
       style={
         {
-          "--tile-bg": "#f4f9fd",
+          "--tile-bg": "light-dark(#f4f9fd, #132530)",
           "--tile-border-style": "1px solid #0082c9",
           "--tile-radius": "16px",
-          "--tile-hover-bg": "#cce5f6",
+          "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
           "--tile-container-gap": "32px",
         } as CSSProperties
       }
@@ -314,10 +314,10 @@ export const CssCustomization: Story = {
       },
       source: {
         code: `<div style={{
-  "--tile-bg": "#f4f9fd",
+  "--tile-bg": "light-dark(#f4f9fd, #132530)",
   "--tile-border-style": "1px solid #0082c9",
   "--tile-radius": "16px",
-  "--tile-hover-bg": "#cce5f6",
+  "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
   "--tile-container-gap": "32px",
 }}>
   <TileContainer headingFiles="Files">

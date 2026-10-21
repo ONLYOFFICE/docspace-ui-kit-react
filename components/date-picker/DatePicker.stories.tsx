@@ -639,7 +639,7 @@ export const RightToLeft: Story = {
 };
 
 const cssVariables = {
-  "--calendar-bg": "#e6f3fb",
+  "--calendar-bg": "light-dark(#e6f3fb, #16303e)",
   "--calendar-border": "#0082c9",
   "--calendar-shadow": "0 4px 16px rgba(0,130,201,0.25)",
   "--calendar-radius": "12px",
@@ -647,7 +647,7 @@ const cssVariables = {
   "--calendar-title-size": "16px",
   "--calendar-outline": "#0082c9",
   "--calendar-arrow": "#0082c9",
-  "--calendar-disabled-arrow": "#a0c8e8",
+  "--calendar-disabled-arrow": "light-dark(#a0c8e8, #2f5f80)",
   "--calendar-weekday": "#0082c9",
   "--calendar-accent": "#0082c9",
   "--calendar-selected-text": "#ffffff",
@@ -655,18 +655,18 @@ const cssVariables = {
   "--calendar-focused-radius": "8px",
   "--calendar-focused-bg": "#ffffff",
   "--calendar-focused-text": "#0082c9",
-  "--calendar-hover-bg": "#cce5f6",
+  "--calendar-hover-bg": "light-dark(#cce5f6, #1f4a61)",
   "--calendar-hover-radius": "8px",
   "--calendar-past": "#5ca8d9",
-  "--calendar-disabled": "#a0c8e8",
-  "--add-button-bg": "#cce5f6",
-  "--add-button-bg-hover": "#b3d9f0",
-  "--add-button-bg-active": "#99cceb",
+  "--calendar-disabled": "light-dark(#a0c8e8, #2f5f80)",
+  "--add-button-bg": "light-dark(#cce5f6, #1f4a61)",
+  "--add-button-bg-hover": "light-dark(#b3d9f0, #285a75)",
+  "--add-button-bg-active": "light-dark(#99cceb, #2f5f80)",
   "--add-button-icon-color": "#0082c9",
-  "--add-button-icon-color-hover": "#004f82",
+  "--add-button-icon-color-hover": "light-dark(#004f82, #7cc3ea)",
   "--add-button-radius": "8px",
-  "--selected-item-bg": "#cce5f6",
-  "--selected-item-bg-hover": "#b3d9f0",
+  "--selected-item-bg": "light-dark(#cce5f6, #1f4a61)",
+  "--selected-item-bg-hover": "light-dark(#b3d9f0, #285a75)",
   "--selected-item-radius": "8px",
 } as React.CSSProperties;
 
@@ -714,13 +714,13 @@ export const CssCustomization: Story = {
       source: {
         code: `<div
   style={{
-    "--calendar-bg": "#e6f3fb",
+    "--calendar-bg": "light-dark(#e6f3fb, #16303e)",
     "--calendar-border": "#0082c9",
     "--calendar-accent": "#0082c9",
-    "--calendar-hover-bg": "#cce5f6",
-    "--add-button-bg": "#cce5f6",
+    "--calendar-hover-bg": "light-dark(#cce5f6, #1f4a61)",
+    "--add-button-bg": "light-dark(#cce5f6, #1f4a61)",
     "--add-button-icon-color": "#0082c9",
-    "--selected-item-bg": "#cce5f6",
+    "--selected-item-bg": "light-dark(#cce5f6, #1f4a61)",
     "--selected-item-radius": "8px",
   }}
 >

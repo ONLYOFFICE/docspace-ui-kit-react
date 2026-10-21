@@ -452,7 +452,7 @@ export const CssCustomization: Story = {
       style={
         {
           display: "flex",
-          "--tag-bg": "#EDE7F6",
+          "--tag-bg": "light-dark(#EDE7F6, #2a2147)",
           "--tag-border-style": "1px solid #9C27B0",
           "--tag-radius": "16px",
           "--tag-inner-padding": "4px 14px",
@@ -474,7 +474,7 @@ export const CssCustomization: Story = {
         code: `<div
   style={{
     display: "flex",
-    "--tag-bg": "#EDE7F6",
+    "--tag-bg": "light-dark(#EDE7F6, #2a2147)",
     "--tag-border-style": "1px solid #9C27B0",
     "--tag-radius": "16px",
     "--tag-inner-padding": "4px 14px",

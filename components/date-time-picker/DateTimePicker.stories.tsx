@@ -502,21 +502,26 @@ export const CssCustomization: Story = {
         {
           height: "500px",
           // DateTimePicker time cell
-          "--date-time-picker-cell-bg": "#cce5f6",
+          "--date-time-picker-cell-bg": "light-dark(#cce5f6, #1f4a61)",
           "--date-time-picker-icon": "#0082c9",
           "--date-time-picker-cell-height": "28px",
           "--date-time-picker-cell-radius": "6px",
           "--date-time-picker-cell-padding": "6px 12px",
+          "--selected-item-bg": "light-dark(#cce5f6, #1f4a61)",
+          "--selected-item-bg-hover": "light-dark(#b3d9f0, #285a75)",
+          "--selected-item-height": "28px",
+          "--selected-item-radius": "6px",
+          "--selected-item-padding": "6px 12px",
           // TimePicker sub-component
           "--time-input-focus-border": "#0082c9",
-          "--time-input-bg": "#e6f3fb",
+          "--time-input-bg": "light-dark(#e6f3fb, #16303e)",
           "--time-input-radius": "6px",
           // Calendar sub-component
-          "--calendar-bg": "#e6f3fb",
+          "--calendar-bg": "light-dark(#e6f3fb, #16303e)",
           "--calendar-border": "#0082c9",
           "--calendar-title": "#0082c9",
           "--calendar-accent": "#0082c9",
-          "--calendar-hover-bg": "#cce5f6",
+          "--calendar-hover-bg": "light-dark(#cce5f6, #1f4a61)",
         } as React.CSSProperties
       }
     >
@@ -544,24 +549,29 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. Click the time to see the time editor and the day chip to see the calendar; the day chip, the "select date" button and the AM/PM drop-down keep their own variables, listed in the SelectedItem, AddButton and ComboBox stories.`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. Click the time to see the time editor and the day chip to see the calendar; the day chip is a SelectedItem and takes its variables, set here to match the time cell; the "select date" button and the AM/PM drop-down keep their own, listed in the AddButton and ComboBox stories.`,
       },
       source: {
         code: `<div
   style={{
-    "--date-time-picker-cell-bg": "#cce5f6",
+    "--date-time-picker-cell-bg": "light-dark(#cce5f6, #1f4a61)",
     "--date-time-picker-icon": "#0082c9",
     "--date-time-picker-cell-height": "28px",
     "--date-time-picker-cell-radius": "6px",
     "--date-time-picker-cell-padding": "6px 12px",
+    "--selected-item-bg": "light-dark(#cce5f6, #1f4a61)",
+    "--selected-item-bg-hover": "light-dark(#b3d9f0, #285a75)",
+    "--selected-item-height": "28px",
+    "--selected-item-radius": "6px",
+    "--selected-item-padding": "6px 12px",
     "--time-input-focus-border": "#0082c9",
-    "--time-input-bg": "#e6f3fb",
+    "--time-input-bg": "light-dark(#e6f3fb, #16303e)",
     "--time-input-radius": "6px",
-    "--calendar-bg": "#e6f3fb",
+    "--calendar-bg": "light-dark(#e6f3fb, #16303e)",
     "--calendar-border": "#0082c9",
     "--calendar-title": "#0082c9",
     "--calendar-accent": "#0082c9",
-    "--calendar-hover-bg": "#cce5f6",
+    "--calendar-hover-bg": "light-dark(#cce5f6, #1f4a61)",
   }}
 >
   <DateTimePicker

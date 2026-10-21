@@ -1513,12 +1513,12 @@ export const CssCustomization: Story = {
         code: `/* A rule more specific than the theme's own .light .root */
 .light nav.custom-nav,
 .dark nav.custom-nav {
-  --nav-menu-group-label-color: #7c3aed;
-  --nav-menu-item-text-color: #4c1d95;
+  --nav-menu-group-label-color: light-dark(#7c3aed, #a78bfa);
+  --nav-menu-item-text-color: light-dark(#4c1d95, #c4b5fd);
   --nav-menu-item-text-active-color: #ffffff;
-  --nav-menu-item-icon-color: #7c3aed;
+  --nav-menu-item-icon-color: light-dark(#7c3aed, #a78bfa);
   --nav-menu-item-icon-active-color: #ffffff;
-  --nav-menu-item-bg-hover: #ede9fe;
+  --nav-menu-item-bg-hover: light-dark(#ede9fe, #2a2147);
   --nav-menu-item-bg-active: #6d28d9;
   --nav-menu-signal-dot-color: #db2777;
   --nav-menu-separator-color: #a78bfa;

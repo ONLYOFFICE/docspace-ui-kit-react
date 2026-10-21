@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, waitFor } from "storybook/test";
+import { useDarkMode } from "@vueless/storybook-dark-mode";
 
 import { Slider } from "../slider";
 import { Text } from "../text";
@@ -120,6 +121,11 @@ const Template = (args: ComponentProps<typeof ThemeProviderComponent>) => (
   </AfterPreviewProvider>
 );
 
+const ToolbarTheme = (args: ComponentProps<typeof ThemeProviderComponent>) => {
+  const isDark = useDarkMode();
+  return <Template {...args} theme={{ ...args.theme, isBase: !isDark }} />;
+};
+
 type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
 
 // The panel reads back what the provider wrote onto the page.
@@ -130,15 +136,16 @@ const readsBack = ({ canvas }: PlayContext, line: string | RegExp) =>
 const framed = { inline: false, height: "250px" };
 
 export const Default: Story = {
-  render: (args) => <Template {...args} />,
+  render: (args) => <ToolbarTheme {...args} />,
   args: {
     theme: defaultTheme,
     children: null,
   },
   play: async (context) => {
-    await readsBack(context, "data-theme: light");
+    const theme = document.body.classList.contains("dark") ? "dark" : "light";
+    await readsBack(context, `data-theme: ${theme}`);
     await readsBack(context, "data-dir: ltr");
-    await readsBack(context, /^body class: .*\blight\b/);
+    await readsBack(context, new RegExp(`^body class: .*\\b${theme}\\b`));
     await expect(getComputedStyle(document.body).fontFamily).toMatch(
       /Open Sans/,
     );
@@ -149,7 +156,7 @@ export const Default: Story = {
       story: framed,
       description: {
         story:
-          "The light theme in the left-to-right direction: the panel reads back what the component wrote onto the page, and its background and text take the theme's colours. Change the theme object live in the Controls panel below; the toolbar's theme and direction switches write over it until the story reloads.",
+          "The theme the toolbar's switch picks, in the left-to-right direction: the panel reads back what the component wrote onto the page, and its background and text take the theme's colours. `isBase` follows the toolbar here; change the rest of the theme object live in the Controls panel below.",
       },
       source: {
         code: `<ThemeProviderComponent

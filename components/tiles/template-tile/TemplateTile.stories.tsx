@@ -1,7 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fireEvent, fn, screen, waitFor, within } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import type { TemplateTileProps, TemplateItem } from "./TemplateTile.types";
 
@@ -17,6 +17,7 @@ import { Text } from "../../text";
 
 import { TemplateTile } from ".";
 import { TileContent } from "../tile-content";
+import RenameField from "../../../.storybook/utils/RenameField";
 import { IconButton } from "../../icon-button";
 
 const onDeleteOption = fn();
@@ -325,25 +326,29 @@ const Template = ({
     <div style={{ maxWidth: "300px", margin: "30px" }}>
       <TemplateTile {...args} checked={checked} onSelect={onSelect}>
         <TileContent>
-          <>
-            <Link
-              type={LinkType.page}
-              fontSize="16px"
-              lineHeight="20px"
-              fontWeight={700}
-              isTextOverflow
-            >
-              {args.item.title}
-            </Link>
-            <Text
-              fontSize="13px"
-              fontWeight={400}
-              color={globalColors.lightGrayDark}
-              truncate
-            >
-              Public room
-            </Text>
-          </>
+          {args.isEdit ? (
+            <RenameField title={args.item.title} />
+          ) : (
+            <>
+              <Link
+                type={LinkType.page}
+                fontSize="16px"
+                lineHeight="20px"
+                fontWeight={700}
+                isTextOverflow
+              >
+                {args.item.title}
+              </Link>
+              <Text
+                fontSize="13px"
+                fontWeight={400}
+                color={globalColors.lightGrayDark}
+                truncate
+              >
+                Public room
+              </Text>
+            </>
+          )}
         </TileContent>
       </TemplateTile>
     </div>
@@ -392,7 +397,7 @@ export const Default: Story = {
       expect.objectContaining({ id: "template-1" }),
     );
 
-    fireEvent.contextMenu(tile, { button: 2 });
+    await userEvent.click(within(tile).getByTestId("context-menu-button"));
     await userEvent.click(await menuItem("Delete"));
     await expect(onDeleteOption).toHaveBeenCalledTimes(1);
   },
@@ -416,7 +421,7 @@ export const Default: Story = {
 >
   <TileContent>
     <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
-    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+    <Text fontSize="13px" color="light-dark(#657077, #a3a9ae)" truncate>Public room</Text>
   </TileContent>
 </TemplateTile>`,
       },
@@ -453,7 +458,7 @@ export const Checked: Story = {
 >
   <TileContent>
     <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
-    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+    <Text fontSize="13px" color="light-dark(#657077, #a3a9ae)" truncate>Public room</Text>
   </TileContent>
 </TemplateTile>`,
       },
@@ -495,7 +500,7 @@ export const WithSpaceQuota: Story = {
 >
   <TileContent>
     <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
-    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+    <Text fontSize="13px" color="light-dark(#657077, #a3a9ae)" truncate>Public room</Text>
   </TileContent>
 </TemplateTile>`,
       },
@@ -539,7 +544,7 @@ export const WithReadOnlyQuota: Story = {
 >
   <TileContent>
     <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
-    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+    <Text fontSize="13px" color="light-dark(#657077, #a3a9ae)" truncate>Public room</Text>
   </TileContent>
 </TemplateTile>`,
       },
@@ -573,7 +578,7 @@ export const BlockingOperation: Story = {
 >
   <TileContent>
     <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
-    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+    <Text fontSize="13px" color="light-dark(#657077, #a3a9ae)" truncate>Public room</Text>
   </TileContent>
 </TemplateTile>`,
       },
@@ -609,7 +614,7 @@ export const InProgress: Story = {
 >
   <TileContent>
     <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
-    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+    <Text fontSize="13px" color="light-dark(#657077, #a3a9ae)" truncate>Public room</Text>
   </TileContent>
 </TemplateTile>`,
       },
@@ -643,7 +648,7 @@ export const WithHotkeyBorder: Story = {
 >
   <TileContent>
     <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
-    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+    <Text fontSize="13px" color="light-dark(#657077, #a3a9ae)" truncate>Public room</Text>
   </TileContent>
 </TemplateTile>`,
       },
@@ -678,8 +683,11 @@ export const RenamingState: Story = {
   isEdit
 >
   <TileContent>
-    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
-    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+    <div style={{ display: "flex", gap: 4 }}>
+      <TextInput value={title} onChange={onRename} scale />
+      <Button size={ButtonSize.small} icon={<CheckIcon />} onClick={onSave} />
+      <Button size={ButtonSize.small} icon={<CrossIcon />} onClick={onCancel} />
+    </div>
   </TileContent>
 </TemplateTile>`,
       },
@@ -692,12 +700,12 @@ export const CssCustomization: Story = {
     <div
       style={
         {
-          "--tile-bg": "#f4f9fd",
+          "--tile-bg": "light-dark(#f4f9fd, #132530)",
           "--tile-border-style": "1px solid #0082c9",
           "--tile-radius": "16px",
-          "--tile-hover-bg": "#cce5f6",
+          "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
           "--tile-icon-color": "#0082c9",
-          "--tile-sub-color": "#006fa6",
+          "--tile-sub-color": "light-dark(#006fa6, #4fb0e6)",
           "--tile-hotkey-color": "#e0662e",
         } as CSSProperties
       }
@@ -756,12 +764,12 @@ Two instances:
       },
       source: {
         code: `<div style={{
-  "--tile-bg": "#f4f9fd",
+  "--tile-bg": "light-dark(#f4f9fd, #132530)",
   "--tile-border-style": "1px solid #0082c9",
   "--tile-radius": "16px",
-  "--tile-hover-bg": "#cce5f6",
+  "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
   "--tile-icon-color": "#0082c9",
-  "--tile-sub-color": "#006fa6",
+  "--tile-sub-color": "light-dark(#006fa6, #4fb0e6)",
   "--tile-hotkey-color": "#e0662e",
 }}>
   <TemplateTile item={template} element={<TemplateIcon />} contextOptions={options} badges={badges} columnCount={1} openUser={openOwnerProfile} showStorageInfo SpaceQuotaComponent={SpaceQuota}>

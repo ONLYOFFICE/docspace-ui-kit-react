@@ -5,6 +5,7 @@ import { useArgs } from "storybook/preview-api";
 import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import withBundledLogos from "../../.storybook/decorators/withBundledLogos";
+import { useWindowDevice } from "../../.storybook/utils/useWindowDevice";
 import CatalogAiAgentsReactSvgUrl from "../../assets/icons/16/catalog.ai-agents.react.svg?url";
 import CatalogFavoritesReactSvgUrl from "../../assets/icons/16/catalog.favorites.react.svg?url";
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
@@ -12,13 +13,18 @@ import CatalogRecentReactSvgUrl from "../../assets/icons/16/catalog-settings-res
 import CatalogRoomsReactSvgUrl from "../../assets/icons/16/catalog.rooms.react.svg?url";
 import CatalogSharedReactSvgUrl from "../../assets/icons/16/catalog.shared.outline.svg?url";
 import CatalogTrashReactSvgUrl from "../../assets/icons/16/catalog.trash.react.svg?url";
+import ArticleHideMenuIcon from "../../assets/article-hide-menu-icon.react.svg";
+import { useTheme } from "../../context/ThemeContext";
 import {
   DeviceType,
   EmployeeActivationStatus,
   EmployeeStatus,
+  WhiteLabelLogoType,
 } from "../../enums";
+import { getLogoUrl } from "../../utils/getLogoUrl";
 import { Button, ButtonSize } from "../button";
 import type { ContextMenuModel } from "../context-menu";
+import { IconButton } from "../icon-button";
 
 import Article from ".";
 import type { ArticleProps } from "./Article.types";
@@ -384,6 +390,51 @@ const renderInteractive = (args: ArticleProps) => {
   );
 };
 
+const SidebarHeader = ({
+  showText,
+  toggleShowText,
+}: Pick<ArticleProps, "showText" | "toggleShowText">) => {
+  const { isBase } = useTheme();
+  const logo = getLogoUrl(
+    WhiteLabelLogoType.LightSmall,
+    !isBase,
+    false,
+    "",
+    true,
+  );
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: showText ? "space-between" : "center",
+        gap: "8px",
+        width: "100%",
+      }}
+    >
+      {showText ? (
+        <img
+          className="logo-icon_svg"
+          src={logo}
+          alt="ONLYOFFICE"
+          style={{ height: "24px", maxWidth: "130px", minWidth: 0 }}
+        />
+      ) : null}
+      <IconButton
+        iconNode={<ArticleHideMenuIcon />}
+        size={20}
+        isFill={false}
+        isStroke
+        hoverColor="accent"
+        onClick={toggleShowText}
+        title={showText ? "Hide menu" : "Show menu"}
+        aria-label={showText ? "Hide menu" : "Show menu"}
+      />
+    </div>
+  );
+};
+
 // Docs ignores the viewport preset; give the story a window of its own there.
 const withFrame =
   (width: number, height: number): Decorator =>
@@ -680,15 +731,30 @@ export const WithoutFooterBlocks: Story = {
 
 export const CollapsedOnTablet: Story = {
   // The catalog follows the column: icons only while it is collapsed.
-  render: (args) =>
-    renderInteractive({
-      ...args,
-      children: [
-        <Article.Body key="body">
-          <ArticleCatalog showText={args.showText} />
-        </Article.Body>,
-      ],
-    }),
+  render: function Render(args) {
+    const [, updateArgs] = useArgs<ArticleProps>();
+    const toggleShowText = () => updateArgs({ showText: !args.showText });
+
+    return (
+      <Template
+        {...args}
+        toggleShowText={toggleShowText}
+        toggleArticleOpen={() => updateArgs({ articleOpen: !args.articleOpen })}
+      >
+        {[
+          <Article.Header key="header">
+            <SidebarHeader
+              showText={args.showText}
+              toggleShowText={toggleShowText}
+            />
+          </Article.Header>,
+          <Article.Body key="body">
+            <ArticleCatalog showText={args.showText} />
+          </Article.Body>,
+        ]}
+      </Template>
+    );
+  },
   decorators: [withFrame(834, 640)],
   globals: { viewport: { value: "tablet", isRotated: false } },
   args: {
@@ -698,6 +764,7 @@ export const CollapsedOnTablet: Story = {
     showText: false,
     currentDeviceType: DeviceType.tablet,
     isMobileArticle: true,
+    withCustomArticleHeader: true,
     children: [bodySlot],
   },
   play: async ({ canvas, canvasElement }) => {
@@ -713,22 +780,39 @@ export const CollapsedOnTablet: Story = {
       "data-icon-only",
       "true",
     );
+    // The header holds only the toggle, no logo.
+    await expect(
+      within(article(canvasElement)).getAllByTestId("icon-button")[0],
+    ).toBeVisible();
+    await expect(canvas.queryByAltText("ONLYOFFICE")).toBeNull();
   },
   parameters: {
     docs: {
       description: {
         story:
-          "A 60px column of icons in a tablet-width window, which leaves the page most of the screen (`showText` off). Click the handle at the foot to expand it and again to collapse it (`toggleShowText`).",
+          "A 60px column of icons in a tablet-width window, which leaves the page most of the screen (`showText` off). The header is the page's own, as in the ONLYOFFICE Apps client: a toggle that expands the column, and the logo beside it once expanded (`withCustomArticleHeader`, `toggleShowText`).",
       },
       source: {
         code: `const [showText, setShowText] = useState(false);
+const toggleShowText = () => setShowText((value) => !value);
 
 <Article
   {...panelProps}
   currentDeviceType={DeviceType.tablet}
   showText={showText}
-  toggleShowText={() => setShowText((value) => !value)}
+  toggleShowText={toggleShowText}
+  withCustomArticleHeader
 >
+  <Article.Header>
+    {showText ? <img src={logoUrl} alt="ONLYOFFICE" /> : null}
+    <IconButton
+      iconNode={<ArticleHideMenuIcon />}
+      size={20}
+      isFill={false}
+      isStroke
+      onClick={toggleShowText}
+    />
+  </Article.Header>
   <Article.Body>
     {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
@@ -765,6 +849,7 @@ export const OnPhone: Story = {
     await expect(canvas.queryByTestId("profile_username")).toBeNull();
   },
   parameters: {
+    layout: "fullscreen",
     docs: {
       description: {
         story:
@@ -850,36 +935,59 @@ export const RightToLeft: Story = {
   },
 };
 
-const CssCustomizationTemplate = () => (
-  <div
-    style={
-      {
-        display: "flex",
-        gap: "32px",
-        // === Article — sidebar background and borders ===
-        "--article-bg": "#e6f3fb",
-        "--article-border": "1px solid #0082c9",
-        // === Article — profile section ===
-        "--article-profile-bg": "#cce5f6",
-        "--article-profile-border": "1px solid #0082c9",
-        // === Article — back button ===
-        "--article-back-color": "#0082c9",
-      } as CSSProperties
-    }
-  >
-    <div style={{ height: "600px", position: "relative" }}>
-      <Article {...defaultProps} user={mockUser} getActions={getActions} />
+const CssCustomizationTemplate = () => {
+  const isPhone = useWindowDevice() === DeviceType.mobile;
+
+  return (
+    <div
+      id={isPhone ? "root" : undefined}
+      style={
+        {
+          display: "flex",
+          gap: "32px",
+          // === Article — sidebar background and borders ===
+          "--article-bg": "light-dark(#e6f3fb, #16303e)",
+          "--article-border": "1px solid #0082c9",
+          // === Article — profile section ===
+          "--article-profile-bg": "light-dark(#cce5f6, #1f4a61)",
+          "--article-profile-border": "1px solid #0082c9",
+          // === Article — back button ===
+          "--article-back-color": "#0082c9",
+        } as CSSProperties
+      }
+    >
+      {isPhone ? (
+        <Article
+          {...defaultProps}
+          user={mockUser}
+          getActions={getActions}
+          currentDeviceType={DeviceType.mobile}
+          isMobileArticle
+          showBackButton
+          articleOpen
+        />
+      ) : (
+        <>
+          <div style={{ height: "600px", position: "relative" }}>
+            <Article
+              {...defaultProps}
+              user={mockUser}
+              getActions={getActions}
+            />
+          </div>
+          <div style={{ height: "600px", position: "relative" }}>
+            <Article
+              {...defaultProps}
+              user={mockUser}
+              getActions={getActions}
+              showBackButton
+            />
+          </div>
+        </>
+      )}
     </div>
-    <div style={{ height: "600px", position: "relative" }}>
-      <Article
-        {...defaultProps}
-        user={mockUser}
-        getActions={getActions}
-        showBackButton
-      />
-    </div>
-  </div>
-);
+  );
+};
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
@@ -890,13 +998,15 @@ export const CssCustomization: Story = {
     await expect(panel.borderRightColor).toBe("rgb(0, 130, 201)");
   },
   parameters: {
+    layout: "fullscreen",
+    noPadding: true,
     docs: {
       description: {
         story:
-          "Five of the panel's variables set on one wrapper -- the variables are listed under CSS variables on this page. The first panel shows the background, the borders and the profile block; the second adds the back button (`showBackButton`) for `--article-back-color`.",
+          "Five of the panel's variables set on one wrapper -- the variables are listed under CSS variables on this page. The first panel shows the background, the borders and the profile block; the second adds the back button (`showBackButton`) for `--article-back-color`. In a phone-width window the story shows one panel as the mobile sheet, with the back button; the phone layout has no profile block.",
       },
       source: {
-        code: `<div style={{ "--article-bg": "#e6f3fb", "--article-border": "1px solid #0082c9", "--article-back-color": "#0082c9" }}>
+        code: `<div style={{ "--article-bg": "light-dark(#e6f3fb, #16303e)", "--article-border": "1px solid #0082c9", "--article-back-color": "#0082c9" }}>
   <Article {...panelProps} showBackButton>
     <Article.Body>
       {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}

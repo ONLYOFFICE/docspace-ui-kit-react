@@ -455,9 +455,9 @@ export const CssCustomization: Story = {
         {
           "--radio-button-dot-color": "#7c3aed",
           "--radio-button-circle-color": "#7c3aed",
-          "--radio-button-circle-hover-color": "#3b0764",
-          "--radio-button-background": "#f3e8ff",
-          "--radio-button-label-color": "#4c1d95",
+          "--radio-button-circle-hover-color": "light-dark(#3b0764, #d8b4fe)",
+          "--radio-button-background": "light-dark(#f3e8ff, #2d1f45)",
+          "--radio-button-label-color": "light-dark(#4c1d95, #c4b5fd)",
           "--radio-button-gap": "16px",
         } as CSSProperties
       }
@@ -475,9 +475,9 @@ export const CssCustomization: Story = {
   style={{
     "--radio-button-dot-color": "#7c3aed",
     "--radio-button-circle-color": "#7c3aed",
-    "--radio-button-circle-hover-color": "#3b0764",
-    "--radio-button-background": "#f3e8ff",
-    "--radio-button-label-color": "#4c1d95",
+    "--radio-button-circle-hover-color": "light-dark(#3b0764, #d8b4fe)",
+    "--radio-button-background": "light-dark(#f3e8ff, #2d1f45)",
+    "--radio-button-label-color": "light-dark(#4c1d95, #c4b5fd)",
     "--radio-button-gap": "16px",
   }}
 >

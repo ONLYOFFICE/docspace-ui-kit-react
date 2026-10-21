@@ -1308,17 +1308,17 @@ export const CssCustomization: Story = {
         {
           height: "140px",
           "--filter-btn-border": "1px solid #0082c9",
-          "--filter-btn-hover-border": "1px solid #004f7a",
+          "--filter-btn-hover-border": "1px solid light-dark(#004f7a, #7cc3ea)",
           "--filter-btn-open-fill": "#0082c9",
           "--filter-btn-radius": "6px",
-          "--filter-sort-bg": "#e6f3fb",
-          "--filter-sort-selected-bg": "#cce5f6",
+          "--filter-sort-bg": "light-dark(#e6f3fb, #16303e)",
+          "--filter-sort-selected-bg": "light-dark(#cce5f6, #1f4a61)",
           "--filter-sort-fill": "#0082c9",
-          "--filter-view-fill": "#e6f3fb",
+          "--filter-view-fill": "light-dark(#e6f3fb, #16303e)",
           "--filter-view-checked": "#0082c9",
           "--filter-view-border": "#0082c9",
-          "--filter-view-hover-border": "#004f7a",
-          "--filter-view-hover-icon": "#004f7a",
+          "--filter-view-hover-border": "light-dark(#004f7a, #7cc3ea)",
+          "--filter-view-hover-icon": "light-dark(#004f7a, #7cc3ea)",
         } as React.CSSProperties
       }
     >
@@ -1341,17 +1341,17 @@ export const CssCustomization: Story = {
       source: {
         code: `<div style={{
   "--filter-btn-border": "1px solid #0082c9",
-  "--filter-btn-hover-border": "1px solid #004f7a",
+  "--filter-btn-hover-border": "1px solid light-dark(#004f7a, #7cc3ea)",
   "--filter-btn-open-fill": "#0082c9",
   "--filter-btn-radius": "6px",
-  "--filter-sort-bg": "#e6f3fb",
-  "--filter-sort-selected-bg": "#cce5f6",
+  "--filter-sort-bg": "light-dark(#e6f3fb, #16303e)",
+  "--filter-sort-selected-bg": "light-dark(#cce5f6, #1f4a61)",
   "--filter-sort-fill": "#0082c9",
-  "--filter-view-fill": "#e6f3fb",
+  "--filter-view-fill": "light-dark(#e6f3fb, #16303e)",
   "--filter-view-checked": "#0082c9",
   "--filter-view-border": "#0082c9",
-  "--filter-view-hover-border": "#004f7a",
-  "--filter-view-hover-icon": "#004f7a",
+  "--filter-view-hover-border": "light-dark(#004f7a, #7cc3ea)",
+  "--filter-view-hover-icon": "light-dark(#004f7a, #7cc3ea)",
 }}>
   <Filter {...props} />
 </div>`,

@@ -6,6 +6,8 @@ import { expect, fn, waitFor } from "storybook/test";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 import { Badge } from "../badge";
+import { Button, ButtonSize } from "../button";
+import { RectangleSkeleton } from "../rectangle";
 import { Tabs } from ".";
 import { data } from "./data";
 import { TabsTypes } from "./Tabs.enums";
@@ -297,8 +299,28 @@ export const Scaled: Story = {
   },
 };
 
+const LoadingDemo = (args: TabsProps) => {
+  const [isLoading, setIsLoading] = useState(args.isLoading);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <div>
+        <Button
+          size={ButtonSize.small}
+          label={isLoading ? "Labels arrived" : "Load again"}
+          onClick={() => setIsLoading((value) => !value)}
+        />
+      </div>
+      {isLoading ? (
+        <RectangleSkeleton width="360px" height="32px" title="Loading tabs" />
+      ) : null}
+      <Template {...args} isLoading={isLoading} />
+    </div>
+  );
+};
+
 export const Loading: Story = {
-  render: (args) => <Template {...args} />,
+  render: (args) => <LoadingDemo {...args} />,
   play: async ({ canvas }) => {
     // The bar waits for its labels; the selected content shows meanwhile.
     await expect(tab(canvas, "Overview")).not.toBeVisible();
@@ -315,7 +337,7 @@ export const Loading: Story = {
     docs: {
       description: {
         story:
-          "While the labels are still arriving, the segmented bar is kept hidden so that it is not sized to placeholder text (`isLoading`); only the selected tab's content shows. Turn `isLoading` off in the Controls panel below and the bar appears, every tab as wide as the widest label. The component draws no loader of its own, and the underlined row ignores `isLoading`.",
+          "While the labels are still arriving, the segmented bar is kept hidden so that it is not sized to placeholder text (`isLoading`); only the selected tab's content shows. Turn `isLoading` off in the Controls panel below and the bar appears, every tab as wide as the widest label. The component draws no loader of its own, so the page puts a skeleton where the bar will be, as this story does. Click **Labels arrived** to see the bar replace the skeleton, and **Load again** to go back; the underlined row ignores `isLoading`.",
       },
       source: {
         code: `<Tabs

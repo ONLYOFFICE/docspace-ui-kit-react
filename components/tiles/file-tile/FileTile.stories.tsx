@@ -19,6 +19,7 @@ import { FileType } from "../../../enums";
 
 import { FileTile } from ".";
 import { TileContent } from "../tile-content";
+import RenameField from "../../../.storybook/utils/RenameField";
 import { IconButton } from "../../icon-button";
 
 const wordElement = <WordSvgUrl />;
@@ -290,17 +291,21 @@ const Template = ({
     <div style={{ maxWidth: "300px", margin: "30px" }}>
       <FileTile {...args} checked={checked} onSelect={onSelect}>
         <TileContent>
-          <Link
-            type={LinkType.page}
-            title={args.item.title}
-            fontWeight={600}
-            isTextOverflow
-          >
-            {args.item.title.replace(/\.[^.]+$/, "")}
-            <span style={{ color: globalColors.gray }}>
-              {args.item.fileExst}
-            </span>
-          </Link>
+          {args.isEdit ? (
+            <RenameField title={args.item.title} />
+          ) : (
+            <Link
+              type={LinkType.page}
+              title={args.item.title}
+              fontWeight={600}
+              isTextOverflow
+            >
+              {args.item.title.replace(/\.[^.]+$/, "")}
+              <span style={{ color: globalColors.gray }}>
+                {args.item.fileExst}
+              </span>
+            </Link>
+          )}
         </TileContent>
       </FileTile>
     </div>
@@ -358,8 +363,8 @@ export const Default: Story = {
     await userEvent.click(within(tile).getByTestId("file-thumbnail"));
     await expect(args.thumbnailClick).toHaveBeenCalled();
 
-    fireEvent.contextMenu(tile, { button: 2 });
-    await expect(args.tileContextClick).toHaveBeenCalledWith(true);
+    await userEvent.click(within(tile).getByTestId("context-menu-button"));
+    await expect(args.tileContextClick).toHaveBeenCalledWith(false);
     await userEvent.click(await menuItem("Copy"));
     await expect(onCopyOption).toHaveBeenCalledTimes(1);
   },
@@ -568,9 +573,11 @@ export const RenamingState: Story = {
   isEdit
 >
   <TileContent>
-    <Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>
-      Document<span style={{ color: "#A3A9AE" }}>.docx</span>
-    </Link>
+    <div style={{ display: "flex", gap: 4 }}>
+      <TextInput value={title} onChange={onRename} scale />
+      <Button size={ButtonSize.small} icon={<CheckIcon />} onClick={onSave} />
+      <Button size={ButtonSize.small} icon={<CrossIcon />} onClick={onCancel} />
+    </div>
   </TileContent>
 </FileTile>`,
       },
@@ -583,24 +590,24 @@ export const CssCustomization: Story = {
     <div
       style={
         {
-          "--tile-bg": "#f4f9fd",
+          "--tile-bg": "light-dark(#f4f9fd, #132530)",
           "--tile-border-style": "1px solid #0082c9",
           "--tile-radius": "16px",
           "--tile-height": "240px",
-          "--tile-hover-bg": "#cce5f6",
+          "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
           "--tile-hover-text-decoration": "none",
-          "--tile-badge-bg": "#e6f3fb",
+          "--tile-badge-bg": "light-dark(#e6f3fb, #16303e)",
           "--tile-badge-radius": "8px",
           "--tile-badge-box-shadow": "0 2px 8px rgba(0,130,201,0.3)",
           "--tile-text-size": "13px",
           "--tile-text-weight": "600",
-          "--tile-text-color": "#004d77",
+          "--tile-text-color": "light-dark(#004d77, #7cc3ea)",
           "--tile-text-line-height": "20px",
           "--tile-bottom-padding-inline": "8px",
           "--tile-thumbnail-padding-inline": "16px",
           "--tile-thumbnail-height": "140px",
           "--tile-thumbnail-image-radius": "8px",
-          "--tile-thumbnail-image-hover-bg": "#e6f3fb",
+          "--tile-thumbnail-image-hover-bg": "light-dark(#e6f3fb, #16303e)",
           "--tile-thumbnail-transition": "background 0.6s",
           "--tile-option-button-padding-end": "8px",
           "--tile-hotkey-color": "#e0662e",
@@ -686,24 +693,24 @@ Two instances:
       },
       source: {
         code: `<div style={{
-  "--tile-bg": "#f4f9fd",
+  "--tile-bg": "light-dark(#f4f9fd, #132530)",
   "--tile-border-style": "1px solid #0082c9",
   "--tile-radius": "16px",
   "--tile-height": "240px",
-  "--tile-hover-bg": "#cce5f6",
+  "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
   "--tile-hover-text-decoration": "none",
-  "--tile-badge-bg": "#e6f3fb",
+  "--tile-badge-bg": "light-dark(#e6f3fb, #16303e)",
   "--tile-badge-radius": "8px",
   "--tile-badge-box-shadow": "0 2px 8px rgba(0,130,201,0.3)",
   "--tile-text-size": "13px",
   "--tile-text-weight": "600",
-  "--tile-text-color": "#004d77",
+  "--tile-text-color": "light-dark(#004d77, #7cc3ea)",
   "--tile-text-line-height": "20px",
   "--tile-bottom-padding-inline": "8px",
   "--tile-thumbnail-padding-inline": "16px",
   "--tile-thumbnail-height": "140px",
   "--tile-thumbnail-image-radius": "8px",
-  "--tile-thumbnail-image-hover-bg": "#e6f3fb",
+  "--tile-thumbnail-image-hover-bg": "light-dark(#e6f3fb, #16303e)",
   "--tile-thumbnail-transition": "background 0.6s",
   "--tile-option-button-padding-end": "8px",
   "--tile-hotkey-color": "#e0662e",
