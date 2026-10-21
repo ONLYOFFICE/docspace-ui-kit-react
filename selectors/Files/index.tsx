@@ -84,6 +84,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     createDefineRoomLabel,
     createDefineRoomType,
     disabledCreatePublicRoom,
+    onCreateAIAgent,
+    agentsEmptyDescription,
 
     shareKey,
     formProps,
@@ -211,7 +213,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     disabledItems,
     disabledFolderType,
     filterParam,
-    withCreate: withCreateState,
     disableBySecurity,
     isRoomDisabled,
     setItems,
@@ -260,6 +261,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     setSelectedTreeNode,
     searchValue,
     withCreate: withCreateState,
+    onCreateAIAgent,
+    getRootData,
     disableBySecurity,
 
     recentFolder,
@@ -864,6 +867,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     isRoot,
 
     selectedItemType,
+    agentsEmptyDescription,
   });
 
   const selectorComponent = embedded ? (
