@@ -22,9 +22,12 @@ const useAgentsHelper = ({
   setItems,
   setBreadCrumbs,
   setIsRoot,
+  setSelectedItemType,
+  getRootData,
   onSetBaseFolderPath,
 
   searchValue,
+  onCreateAIAgent,
 
   isInit,
   setIsInit,
@@ -48,6 +51,12 @@ const useAgentsHelper = ({
 
     isFullLoadActive,
   } = use(LoadersContext);
+
+  // Read at click time, so a host passing a new function on every render does
+  // not refetch the list; only whether there is one decides the item.
+  const onCreateAIAgentRef = React.useRef(onCreateAIAgent);
+  onCreateAIAgentRef.current = onCreateAIAgent;
+  const withCreateAgent = Boolean(onCreateAIAgent);
 
   const requestRunning = React.useRef(false);
   const initRef = React.useRef(isInit);
@@ -150,6 +159,26 @@ const useAgentsHelper = ({
 
           if (startIndex === 0) specialItemsCountRef.current = 0;
 
+          // Counted with the special items: none of them is a server row, so
+          // the next page's offset must leave all of them out.
+          if (startIndex === 0 && withCreateAgent && current.security?.Create) {
+            itemList.unshift({
+              isCreateNewItem: true,
+              label: t("NewAgent"),
+              id: "create-agent-item",
+              key: "create-agent-item",
+              onCreateClick: () => onCreateAIAgentRef.current?.(),
+              onBackClick: () => {
+                setIsRoot?.(true);
+                setSelectedItemType?.(undefined);
+                setBreadCrumbs?.((val) => val.slice(0, -1));
+                getRootData?.();
+              },
+            });
+            specialItemsCountRef.current = 1;
+            setTotal(total + 1);
+          }
+
           if (
             startIndex === 0 &&
             !searchValue &&
@@ -168,8 +197,8 @@ const useAgentsHelper = ({
 
             if (specialItems.length) {
               itemList.unshift(...specialItems);
-              specialItemsCountRef.current = specialItems.length;
-              setTotal(total + specialItems.length);
+              specialItemsCountRef.current += specialItems.length;
+              setTotal(total + specialItemsCountRef.current);
             }
           }
 
@@ -216,6 +245,9 @@ const useAgentsHelper = ({
       withRecentTreeFolder,
       withFavoritesTreeFolder,
       finishFullLoad,
+      withCreateAgent,
+      setSelectedItemType,
+      getRootData,
     ],
   );
 
