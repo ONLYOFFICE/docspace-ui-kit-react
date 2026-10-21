@@ -441,12 +441,15 @@ const Selector = ({
       if (inputItemVisible) return;
       // A dialog opened from the selector (e.g. "New agent" opens the host's
       // create dialog) is portalled after it and closes on this same Escape;
-      // it must not take the selector down with it. A dialog the selector
-      // itself sits in does not count.
+      // it must not take the selector down with it. Only a modal dialog
+      // counts -- a popover such as ColorPicker is also role="dialog" -- and
+      // not one the selector itself sits in.
       const root = selectorRef.current;
       const isUnderDialog =
         !!root &&
-        Array.from(document.querySelectorAll('[role="dialog"]')).some(
+        Array.from(
+          document.querySelectorAll('[role="dialog"][aria-modal="true"]'),
+        ).some(
           (dialog) =>
             !dialog.contains(root) &&
             !!(
