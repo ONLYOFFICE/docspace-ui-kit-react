@@ -12,7 +12,7 @@ import CatalogFolderReactSvgUrl from "../../../assets/icons/16/catalog.folder.re
 
 import { RoomsType } from "../../../enums";
 
-import { Link } from "../../link";
+import { Link, LinkType } from "../../link";
 import { Text } from "../../text";
 import { IconButton } from "../../icon-button";
 import { IconSizeType } from "../../../utils";
@@ -220,7 +220,15 @@ const Template = ({
     <div style={{ maxWidth: "300px", margin: "30px" }}>
       <RoomTile {...args} checked={checked} onSelect={onSelect}>
         <TileContent>
-          <Link>Room Content</Link>
+          <Link
+            type={LinkType.page}
+            fontSize="16px"
+            lineHeight="22px"
+            fontWeight={600}
+            isTextOverflow
+          >
+            {args.item.title}
+          </Link>
         </TileContent>
       </RoomTile>
     </div>
@@ -256,7 +264,7 @@ export const Default: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const tile = canvas.getByTestId("tile");
     // A click on the tile opens the room.
-    await userEvent.click(within(tile).getByText("Room Content"));
+    await userEvent.click(within(tile).getByText("Sample Room"));
     await expect(args.thumbnailClick).toHaveBeenCalledTimes(1);
 
     // The tag and the badge have their own handlers; neither opens the room.
@@ -275,9 +283,15 @@ export const Default: Story = {
     await expect(onPinBadge).toHaveBeenCalledTimes(1);
     await expect(args.thumbnailClick).toHaveBeenCalledTimes(opened);
 
-    await userEvent.click(within(tile).getByRole("checkbox", { hidden: true }));
+    const checkbox = within(tile).getByRole("checkbox", { hidden: true });
+    await userEvent.click(checkbox);
     await expect(args.onSelect).toHaveBeenCalledWith(
       true,
+      expect.objectContaining({ id: "room-1" }),
+    );
+    await userEvent.click(checkbox);
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      false,
       expect.objectContaining({ id: "room-1" }),
     );
 
@@ -303,7 +317,9 @@ export const Default: Story = {
   thumbnailClick={openRoom}
   onSelect={handleSelect}
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Sample Room</Link>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -337,7 +353,9 @@ export const Checked: Story = {
   checked={true}
   onSelect={handleSelect}
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Sample Room</Link>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -370,7 +388,9 @@ export const InProgress: Story = {
   contextOptions={contextOptions}
   inProgress={true}
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Sample Room</Link>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -401,7 +421,9 @@ export const BlockingOperation: Story = {
   contextOptions={contextOptions}
   isBlockingOperation={true}
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Sample Room</Link>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -464,7 +486,9 @@ export const GeneratedTags: Story = {
   selectOption={filterByOption}
   columnCount={1}
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Shared storage</Link>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -495,7 +519,9 @@ export const WithHotkeyBorder: Story = {
   contextOptions={contextOptions}
   showHotkeyBorder
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Sample Room</Link>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -528,7 +554,9 @@ export const RenamingState: Story = {
   contextOptions={contextOptions}
   isEdit
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Sample Room</Link>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -569,7 +597,9 @@ export const CustomBottomRow: Story = {
     <Text fontSize="12px">{isHovered ? "Open room" : \`\${tags.length} tag\`}</Text>
   )}
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Sample Room</Link>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -619,7 +649,15 @@ export const CssCustomization: Story = {
             columnCount={1}
           >
             <TileContent>
-              <Link>{title}</Link>
+              <Link
+                type={LinkType.page}
+                fontSize="16px"
+                lineHeight="22px"
+                fontWeight={600}
+                isTextOverflow
+              >
+                {title}
+              </Link>
             </TileContent>
           </RoomTile>
         </div>
@@ -656,10 +694,10 @@ Two instances:
   "--tile-row-gap": "12px",
 }}>
   <RoomTile item={room} element={<RoomLogo />} contextOptions={options} badges={badges} columnCount={1}>
-    <TileContent><Link>Sample Room</Link></TileContent>
+    <TileContent><Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600}>Sample Room</Link></TileContent>
   </RoomTile>
   <RoomTile item={teamRoom} element={<RoomLogo />} contextOptions={options} badges={badges} columnCount={1} showHotkeyBorder>
-    <TileContent><Link>Team Room</Link></TileContent>
+    <TileContent><Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600}>Team Room</Link></TileContent>
   </RoomTile>
 </div>`,
       },

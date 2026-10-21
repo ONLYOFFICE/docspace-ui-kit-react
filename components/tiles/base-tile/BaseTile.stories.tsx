@@ -10,12 +10,27 @@ import { useState } from "react";
 import WordSvgUrl from "../../../assets/icons/32/word.svg";
 import PdfSvgUrl from "../../../assets/icons/32/pdf.svg";
 import SlideSvgUrl from "../../../assets/icons/32/slide.svg";
-import { Link } from "../../link";
+import { Link, LinkType } from "../../link";
+import { globalColors } from "../../../providers/theme";
 
 import { BaseTile } from ".";
 import { TileContent } from "../tile-content";
 
 const wordElement = <WordSvgUrl />;
+
+const documentTitle = (
+  <TileContent>
+    <Link
+      type={LinkType.page}
+      title="Document.docx"
+      fontWeight={600}
+      isTextOverflow
+    >
+      Document
+      <span style={{ color: globalColors.gray }}>.docx</span>
+    </Link>
+  </TileContent>
+);
 
 const onEditOption = fn();
 const onDeleteOption = fn();
@@ -226,11 +241,7 @@ export const Default: Story = {
     },
     element: wordElement,
     contextOptions,
-    topContent: (
-      <TileContent>
-        <Link>Document.docx</Link>
-      </TileContent>
-    ),
+    topContent: documentTitle,
     getContextModel: () => contextOptions,
   },
   beforeEach: () => {
@@ -250,8 +261,10 @@ export const Default: Story = {
       expect.objectContaining({ id: "tile-1" }),
     );
     await expect(checkbox).toBeChecked();
+    await userEvent.click(checkbox);
+    await expect(checkbox).not.toBeChecked();
 
-    await userEvent.click(within(tile).getByText("Document.docx"));
+    await userEvent.click(within(tile).getByText("Document"));
     await expect(args.onRoomClick).toHaveBeenCalled();
 
     // A right click opens the menu.
@@ -272,7 +285,7 @@ export const Default: Story = {
   item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
   element={<WordSvgUrl />}
   contextOptions={contextOptions}
-  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
   onSelect={handleSelect}
   getContextModel={() => contextOptions}
 />`,
@@ -305,7 +318,7 @@ export const Checked: Story = {
   item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
   element={<WordSvgUrl />}
   contextOptions={contextOptions}
-  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
   checked={true}
   onSelect={handleSelect}
 />`,
@@ -334,7 +347,7 @@ export const Active: Story = {
   item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
   element={<WordSvgUrl />}
   contextOptions={contextOptions}
-  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
   isActive={true}
 />`,
       },
@@ -367,7 +380,7 @@ export const InProgress: Story = {
   item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
   element={<WordSvgUrl />}
   contextOptions={contextOptions}
-  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
   inProgress={true}
 />`,
       },
@@ -397,7 +410,7 @@ export const WithHotkeyBorder: Story = {
   item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
   element={<WordSvgUrl />}
   contextOptions={contextOptions}
-  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
   showHotkeyBorder={true}
 />`,
       },
@@ -409,11 +422,7 @@ export const WithBottomContent: Story = {
   render: Template,
   args: {
     ...Default.args,
-    topContent: (
-      <TileContent>
-        <Link>Document.docx</Link>
-      </TileContent>
-    ),
+    topContent: documentTitle,
     bottomContent: (
       <div style={{ padding: "8px", fontSize: "12px", color: "#666" }}>
         Additional information
@@ -423,7 +432,7 @@ export const WithBottomContent: Story = {
   play: async ({ canvas }) => {
     const details = canvas.getByText("Additional information");
     await expect(details.getBoundingClientRect().top).toBeGreaterThanOrEqual(
-      canvas.getByText("Document.docx").getBoundingClientRect().bottom,
+      canvas.getByText("Document").getBoundingClientRect().bottom,
     );
   },
   parameters: {
@@ -437,7 +446,7 @@ export const WithBottomContent: Story = {
   item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
   element={<WordSvgUrl />}
   contextOptions={contextOptions}
-  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
   bottomContent={<div>Additional information</div>}
 />`,
       },
@@ -476,7 +485,7 @@ export const WithMenuButton: Story = {
   item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx", contextOptions: [] }}
   element={<WordSvgUrl />}
   contextOptions={contextOptions}
-  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
   getContextModel={() => contextOptions}
 />`,
       },
@@ -508,7 +517,7 @@ export const RenamingState: Story = {
   item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
   element={<WordSvgUrl />}
   contextOptions={contextOptions}
-  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
   isEdit
 />`,
       },
@@ -539,7 +548,7 @@ export const BlockingOperation: Story = {
   item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
   element={<WordSvgUrl />}
   contextOptions={contextOptions}
-  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
   isBlockingOperation
 />`,
       },

@@ -9,7 +9,7 @@ import { useState } from "react";
 
 import Folder32ReactSvg from "../../../assets/icons/32/folder.svg";
 import ImageReactSvg from "../../../assets/icons/96/folder.svg";
-import { Link } from "../../link";
+import { Link, LinkType } from "../../link";
 import { Badge } from "../../badge";
 
 import { FolderTile } from ".";
@@ -244,7 +244,9 @@ const Template = ({
     <div style={{ maxWidth: "300px", margin: "30px" }}>
       <FolderTile {...args} checked={checked} onSelect={onSelect}>
         <TileContent>
-          <Link>Folder Content</Link>
+          <Link type={LinkType.page} fontWeight={600} isTextOverflow>
+            {args.item.title}
+          </Link>
         </TileContent>
       </FolderTile>
     </div>
@@ -271,7 +273,7 @@ export const Default: Story = {
   },
   play: async ({ args, canvas, userEvent }) => {
     const tile = canvas.getByTestId("tile");
-    const content = within(tile).getByText("Folder Content");
+    const content = within(tile).getByText("My Folder");
 
     // A click selects the folder alone; Ctrl and Shift add to the selection.
     await userEvent.click(content);
@@ -296,6 +298,12 @@ export const Default: Story = {
     await expect(args.tileContextClick).toHaveBeenCalledWith(true);
     await userEvent.click(await menuItem("Copy"));
     await expect(onCopyOption).toHaveBeenCalledTimes(1);
+
+    await userEvent.click(within(tile).getByRole("checkbox", { hidden: true }));
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      false,
+      expect.objectContaining({ id: "folder-1" }),
+    );
   },
   parameters: {
     docs: {
@@ -311,7 +319,7 @@ export const Default: Story = {
   badges={badges}
   onSelect={handleSelect}
 >
-  <TileContent><Link>Folder Content</Link></TileContent>
+  <TileContent><Link type="page" fontWeight={600} isTextOverflow>My Folder</Link></TileContent>
 </FolderTile>`,
       },
     },
@@ -339,7 +347,7 @@ export const Big: Story = {
     const tile = canvas.getByTestId("tile");
     const picture = within(tile).getByTestId("file-thumbnail");
     await expect(picture.getBoundingClientRect().bottom).toBeLessThanOrEqual(
-      within(tile).getByText("Folder Content").getBoundingClientRect().top,
+      within(tile).getByText("My Folder").getBoundingClientRect().top,
     );
   },
   parameters: {
@@ -358,7 +366,7 @@ export const Big: Story = {
   temporaryIcon={<ImageReactSvg />}
   onSelect={handleSelect}
 >
-  <TileContent><Link>Folder Content</Link></TileContent>
+  <TileContent><Link type="page" fontWeight={600} isTextOverflow>My Folder</Link></TileContent>
 </FolderTile>`,
       },
     },
@@ -392,7 +400,7 @@ export const Checked: Story = {
   checked={true}
   onSelect={handleSelect}
 >
-  <TileContent><Link>Folder Content</Link></TileContent>
+  <TileContent><Link type="page" fontWeight={600} isTextOverflow>My Folder</Link></TileContent>
 </FolderTile>`,
       },
     },
@@ -425,7 +433,7 @@ export const InProgress: Story = {
   contextOptions={contextOptions}
   inProgress={true}
 >
-  <TileContent><Link>Folder Content</Link></TileContent>
+  <TileContent><Link type="page" fontWeight={600} isTextOverflow>My Folder</Link></TileContent>
 </FolderTile>`,
       },
     },
@@ -457,7 +465,7 @@ export const WithHotkeyBorder: Story = {
   badges={badges}
   showHotkeyBorder
 >
-  <TileContent><Link>Folder Content</Link></TileContent>
+  <TileContent><Link type="page" fontWeight={600} isTextOverflow>My Folder</Link></TileContent>
 </FolderTile>`,
       },
     },
@@ -491,7 +499,7 @@ export const RenamingState: Story = {
   badges={badges}
   isEdit
 >
-  <TileContent><Link>Folder Content</Link></TileContent>
+  <TileContent><Link type="page" fontWeight={600} isTextOverflow>My Folder</Link></TileContent>
 </FolderTile>`,
       },
     },
@@ -511,9 +519,7 @@ export const RightToLeft: Story = {
     const icon = (
       tile.querySelector('[class*="iconContainer"]') as HTMLElement
     ).getBoundingClientRect();
-    const name = within(tile)
-      .getByText("Folder Content")
-      .getBoundingClientRect();
+    const name = within(tile).getByText("My Folder").getBoundingClientRect();
     await expect(icon.left).toBeGreaterThanOrEqual(name.right);
   },
   args: {
@@ -531,7 +537,7 @@ export const RightToLeft: Story = {
       source: {
         code: `<div dir="rtl">
   <FolderTile item={folder} element={<Folder32ReactSvg />} contextOptions={contextOptions} badges={badges}>
-    <TileContent><Link>Folder Content</Link></TileContent>
+    <TileContent><Link type="page" fontWeight={600} isTextOverflow>My Folder</Link></TileContent>
   </FolderTile>
 </div>`,
       },

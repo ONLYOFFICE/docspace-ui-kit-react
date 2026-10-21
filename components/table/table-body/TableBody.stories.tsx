@@ -3,11 +3,10 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, waitFor, within } from "storybook/test";
 
 import { useEffect, useRef, useState } from "react";
-import { uuid as uuidv4 } from "../../../utils/";
+import FileCells, { storyFiles } from "../../../.storybook/utils/FileCells";
 
 import { TableBody } from "./TableBody";
 import { TableRow } from "../table-row";
-import { TableCell } from "../sub-components/table-cell";
 import { Scrollbar } from "../../scrollbar";
 import { TableContainer } from "../table-container";
 
@@ -121,13 +120,6 @@ The Table README describes it in full.`,
 
       return (
         <div>
-          <div style={{ marginBottom: "20px", fontSize: "14px" }}>
-            <p>
-              <strong>Note:</strong> TableBody component for displaying table
-              rows with support for infinite scrolling and virtual scrolling
-              using react-window.
-            </p>
-          </div>
           <Scrollbar
             id="sectionScroll"
             style={{ height: "400px" }}
@@ -163,20 +155,24 @@ export default meta;
 const mountedRows = (root: HTMLElement) =>
   within(root).queryAllByTestId("table-row");
 
-const createMockRows = (count: number) => {
-  return Array(count)
-    .fill(null)
-    .map((_, index) => (
+// The ten sample files, then numbered copies of them.
+const createMockRows = (count: number) =>
+  Array.from({ length: count }, (_, index) => {
+    const file = storyFiles[index % storyFiles.length];
+    const copy = Math.floor(index / storyFiles.length);
+    const name = copy
+      ? file.name.replace(/(\.[^.]+)$/, ` (${copy + 1})$1`)
+      : file.name;
+
+    return (
       <TableRow
-        key={uuidv4()}
+        key={name}
         style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 24px" }}
       >
-        <TableCell>{`Cell ${index + 1}-1`}</TableCell>
-        <TableCell>{`Cell ${index + 1}-2`}</TableCell>
-        <TableCell>{`Cell ${index + 1}-3`}</TableCell>
+        <FileCells file={{ ...file, name }} />
       </TableRow>
-    ));
-};
+    );
+  });
 
 export const Default: Story = {
   render: (args) => <TableBody {...args} />,
@@ -197,8 +193,8 @@ export const Default: Story = {
     await waitFor(() => expect(mountedRows(body).length).toBeGreaterThan(0));
     // Only the rows near the 400px view are mounted.
     await expect(mountedRows(body).length).toBeLessThan(20);
-    await expect(canvas.getByText("Cell 1-1")).toBeVisible();
-    await expect(canvas.queryByText("Cell 20-1")).toBeNull();
+    await expect(canvas.getByText("Annual Report 2025")).toBeVisible();
+    await expect(canvas.queryByText("Architecture Diagram (2)")).toBeNull();
   },
   parameters: {
     docs: {
@@ -234,7 +230,9 @@ export const WithoutReactWindow: Story = {
     // Every row at once.
     const body = await waitFor(() => canvas.getByTestId("table-body"));
     await expect(mountedRows(body)).toHaveLength(20);
-    await expect(canvas.getByText("Cell 20-1")).toBeInTheDocument();
+    await expect(
+      canvas.getByText("Architecture Diagram (2)"),
+    ).toBeInTheDocument();
   },
   parameters: {
     docs: {
@@ -271,7 +269,9 @@ export const WithMoreFiles: Story = {
     hasMoreFiles: true,
   },
   play: async ({ args, canvas }) => {
-    await waitFor(() => expect(canvas.getByText("Cell 5-1")).toBeVisible());
+    await waitFor(() =>
+      expect(canvas.getByText("Meeting Notes")).toBeVisible(),
+    );
     // The loader acts on a scroll of the section; with the placeholders in
     // view, the next page is asked for.
     const scroller = document.querySelector(

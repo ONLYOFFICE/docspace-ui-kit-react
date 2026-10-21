@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fireEvent, fn, screen, waitFor } from "storybook/test";
 
 import { ContextMenuModel } from "../../context-menu";
-import { TableCell } from "../sub-components/table-cell";
+import FileCells, { storyFiles } from "../../../.storybook/utils/FileCells";
 import { TableRow } from "./TableRow";
 
 const meta = {
@@ -181,19 +181,7 @@ const menuItem = async (name: string) => {
   return item;
 };
 
-const RowContent = (
-  <>
-    <TableCell>
-      <span>Cell 1</span>
-    </TableCell>
-    <TableCell>
-      <span>Cell 2</span>
-    </TableCell>
-    <TableCell>
-      <span>Cell 3</span>
-    </TableCell>
-  </>
-);
+const RowContent = <FileCells file={storyFiles[0]} />;
 
 export const Default: Story = {
   render: (args) => <TableRow {...args} />,
@@ -211,13 +199,13 @@ export const Default: Story = {
     const row = canvas.getByTestId("table-row");
     await expect(row).toHaveClass("custom-row-class", "table-container_row");
 
-    await userEvent.click(canvas.getByText("Cell 1"));
+    await userEvent.click(canvas.getByText("Annual Report 2025"));
     await expect(args.onClick).toHaveBeenCalled();
-    await userEvent.dblClick(canvas.getByText("Cell 2"));
+    await userEvent.dblClick(canvas.getByText("Document"));
     await expect(args.onDoubleClick).toHaveBeenCalled();
 
     // A right click anywhere in the row opens its menu.
-    fireEvent.contextMenu(canvas.getByText("Cell 3"), { button: 2 });
+    fireEvent.contextMenu(canvas.getByText("Finance"), { button: 2 });
     await expect(args.fileContextClick).toHaveBeenCalledWith(true);
     await userEvent.click(await menuItem("Delete"));
     await expect(onDeleteOption).toHaveBeenCalledTimes(1);
@@ -234,9 +222,9 @@ export const Default: Story = {
   contextOptions={contextOptions}
   style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr) 24px" }}
 >
-  <TableCell><span>Cell 1</span></TableCell>
-  <TableCell><span>Cell 2</span></TableCell>
-  <TableCell><span>Cell 3</span></TableCell>
+  <TableCell>{nameCell}</TableCell>
+  <TableCell><Text fontSize="12px" fontWeight={600} color="#A3A9AE">Document</Text></TableCell>
+  <TableCell><Text fontSize="12px" fontWeight={600} color="#A3A9AE">Finance</Text></TableCell>
 </TableRow>`,
       },
     },
@@ -252,7 +240,7 @@ export const IndexEditingMode: Story = {
     isIndexEditingMode: true,
   },
   play: async ({ canvas, canvasElement }) => {
-    await expect(canvas.getByText("Cell 3")).toBeVisible();
+    await expect(canvas.getByText("Finance")).toBeVisible();
     // No last cell with a menu while the index is edited.
     await expect(
       canvasElement.querySelector(".context-menu-container"),
@@ -269,9 +257,9 @@ export const IndexEditingMode: Story = {
   isIndexEditingMode
   style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr) 24px" }}
 >
-  <TableCell><span>Cell 1</span></TableCell>
-  <TableCell><span>Cell 2</span></TableCell>
-  <TableCell><span>Cell 3</span></TableCell>
+  <TableCell>{nameCell}</TableCell>
+  <TableCell><Text fontSize="12px" fontWeight={600} color="#A3A9AE">Document</Text></TableCell>
+  <TableCell><Text fontSize="12px" fontWeight={600} color="#A3A9AE">Finance</Text></TableCell>
 </TableRow>`,
       },
     },

@@ -6,21 +6,22 @@ import { expect, within } from "storybook/test";
 import type { TileContainerProps } from "./TileContainer.types";
 
 import WordSvgUrl from "../../../assets/icons/32/word.svg";
-import PdfSvgUrl from "../../../assets/icons/32/pdf.svg";
 import SlideSvgUrl from "../../../assets/icons/32/slide.svg";
+import CellSvgUrl from "../../../assets/icons/32/cell.svg";
 import ImageReactSvg from "../../../assets/emptyview/empty.rooms.root.light.svg";
 
 import { TileContainer } from ".";
 import { TileContent } from "../tile-content";
 import { FileType } from "../../../enums";
-import { Link } from "../../link";
+import { Link, LinkType } from "../../link";
+import { globalColors } from "../../../providers/theme";
 import { FileTile } from "../file-tile";
 import { FolderTile } from "../folder-tile";
 import Folder32ReactSvg from "../../../assets/icons/32/folder.svg";
 
 const wordElement = <WordSvgUrl />;
-const pdfElement = <PdfSvgUrl />;
 const slideElement = <SlideSvgUrl />;
+const cellElement = <CellSvgUrl />;
 
 const mockFiles = [
   {
@@ -47,6 +48,20 @@ const mockFolders = [
   { id: "f1", title: "Projects", isFolder: true },
   { id: "f2", title: "Archive", isFolder: true },
 ];
+
+const fileIcon = (fileType: FileType) =>
+  fileType === FileType.Spreadsheet
+    ? cellElement
+    : fileType === FileType.Presentation
+      ? slideElement
+      : wordElement;
+
+const fileTitle = (file: { title: string; fileExst: string }) => (
+  <Link type={LinkType.page} title={file.title} fontWeight={600} isTextOverflow>
+    {file.title.slice(0, -file.fileExst.length)}
+    <span style={{ color: globalColors.gray }}>{file.fileExst}</span>
+  </Link>
+);
 
 const mockContextOptions = [
   { key: "edit", label: "Edit" },
@@ -139,17 +154,9 @@ const ContainerTemplate = (args: TileContainerProps) => {
           item={file}
           contextOptions={mockContextOptions}
           temporaryIcon={<ImageReactSvg />}
-          element={
-            file.fileType === FileType.Spreadsheet
-              ? slideElement
-              : file.fileType === FileType.Presentation
-                ? pdfElement
-                : wordElement
-          }
+          element={fileIcon(file.fileType)}
         >
-          <TileContent>
-            <Link>{file.title}</Link>
-          </TileContent>
+          <TileContent>{fileTitle(file)}</TileContent>
         </FileTile>
       ))}
     </TileContainer>
@@ -176,13 +183,13 @@ export const Default: Story = {
       source: {
         code: `<TileContainer useReactWindow={false} headingFiles="Files">
   <FileTile item={file1} element={<WordSvgUrl />} contextOptions={options}>
-    <TileContent><Link>Document.docx</Link></TileContent>
+    <TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>
   </FileTile>
-  <FileTile item={file2} element={<PdfSvgUrl />} contextOptions={options}>
-    <TileContent><Link>Presentation.pptx</Link></TileContent>
+  <FileTile item={file2} element={<SlideSvgUrl />} contextOptions={options}>
+    <TileContent><Link type="page" title="Presentation.pptx" fontWeight={600} isTextOverflow>Presentation<span style={{ color: "#A3A9AE" }}>.pptx</span></Link></TileContent>
   </FileTile>
-  <FileTile item={file3} element={<SlideSvgUrl />} contextOptions={options}>
-    <TileContent><Link>Spreadsheet.xlsx</Link></TileContent>
+  <FileTile item={file3} element={<CellSvgUrl />} contextOptions={options}>
+    <TileContent><Link type="page" title="Spreadsheet.xlsx" fontWeight={600} isTextOverflow>Spreadsheet<span style={{ color: "#A3A9AE" }}>.xlsx</span></Link></TileContent>
   </FileTile>
 </TileContainer>`,
       },
@@ -199,11 +206,9 @@ export const FoldersAndFiles: Story = {
           item={file}
           contextOptions={mockContextOptions}
           temporaryIcon={<ImageReactSvg />}
-          element={wordElement}
+          element={fileIcon(file.fileType)}
         >
-          <TileContent>
-            <Link>{file.title}</Link>
-          </TileContent>
+          <TileContent>{fileTitle(file)}</TileContent>
         </FileTile>
       ))}
       {mockFolders.map((folder) => (
@@ -214,7 +219,9 @@ export const FoldersAndFiles: Story = {
           element={<Folder32ReactSvg />}
         >
           <TileContent>
-            <Link>{folder.title}</Link>
+            <Link type={LinkType.page} fontWeight={600} isTextOverflow>
+              {folder.title}
+            </Link>
           </TileContent>
         </FolderTile>
       ))}
@@ -246,16 +253,16 @@ export const FoldersAndFiles: Story = {
       source: {
         code: `<TileContainer headingFolders="Folders" headingFiles="Files">
   <FileTile item={{ id: "1", title: "Document.docx", fileExst: ".docx" }} element={<WordSvgUrl />} contextOptions={options}>
-    <TileContent><Link>Document.docx</Link></TileContent>
+    <TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>
   </FileTile>
-  <FileTile item={{ id: "2", title: "Presentation.pptx", fileExst: ".pptx" }} element={<WordSvgUrl />} contextOptions={options}>
-    <TileContent><Link>Presentation.pptx</Link></TileContent>
+  <FileTile item={{ id: "2", title: "Presentation.pptx", fileExst: ".pptx" }} element={<SlideSvgUrl />} contextOptions={options}>
+    <TileContent><Link type="page" title="Presentation.pptx" fontWeight={600} isTextOverflow>Presentation<span style={{ color: "#A3A9AE" }}>.pptx</span></Link></TileContent>
   </FileTile>
   <FolderTile item={{ id: "f1", title: "Projects", isFolder: true }} element={<Folder32ReactSvg />} contextOptions={options}>
-    <TileContent><Link>Projects</Link></TileContent>
+    <TileContent><Link type="page" fontWeight={600} isTextOverflow>Projects</Link></TileContent>
   </FolderTile>
   <FolderTile item={{ id: "f2", title: "Archive", isFolder: true }} element={<Folder32ReactSvg />} contextOptions={options}>
-    <TileContent><Link>Archive</Link></TileContent>
+    <TileContent><Link type="page" fontWeight={600} isTextOverflow>Archive</Link></TileContent>
   </FolderTile>
 </TileContainer>`,
       },
@@ -292,17 +299,9 @@ export const CssCustomization: Story = {
             item={file}
             contextOptions={mockContextOptions}
             temporaryIcon={<ImageReactSvg />}
-            element={
-              file.fileType === FileType.Spreadsheet
-                ? slideElement
-                : file.fileType === FileType.Presentation
-                  ? pdfElement
-                  : wordElement
-            }
+            element={fileIcon(file.fileType)}
           >
-            <TileContent>
-              <Link>{file.title}</Link>
-            </TileContent>
+            <TileContent>{fileTitle(file)}</TileContent>
           </FileTile>
         ))}
       </TileContainer>
@@ -324,7 +323,11 @@ export const CssCustomization: Story = {
   <TileContainer headingFiles="Files">
     {files.map((file) => (
       <FileTile key={file.id} item={file} element={<WordIcon />} contextOptions={options}>
-        <TileContent><Link>{file.title}</Link></TileContent>
+        <TileContent>
+          <Link type="page" title={file.title} fontWeight={600} isTextOverflow>
+            {name}<span style={{ color: "#A3A9AE" }}>{file.fileExst}</span>
+          </Link>
+        </TileContent>
       </FileTile>
     ))}
   </TileContainer>

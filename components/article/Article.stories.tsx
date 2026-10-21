@@ -5,6 +5,13 @@ import { useArgs } from "storybook/preview-api";
 import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import withBundledLogos from "../../.storybook/decorators/withBundledLogos";
+import CatalogAiAgentsReactSvgUrl from "../../assets/icons/16/catalog.ai-agents.react.svg?url";
+import CatalogFavoritesReactSvgUrl from "../../assets/icons/16/catalog.favorites.react.svg?url";
+import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
+import CatalogRecentReactSvgUrl from "../../assets/icons/16/catalog-settings-restore.svg?url";
+import CatalogRoomsReactSvgUrl from "../../assets/icons/16/catalog.rooms.react.svg?url";
+import CatalogSharedReactSvgUrl from "../../assets/icons/16/catalog.shared.outline.svg?url";
+import CatalogTrashReactSvgUrl from "../../assets/icons/16/catalog.trash.react.svg?url";
 import {
   DeviceType,
   EmployeeActivationStatus,
@@ -15,6 +22,7 @@ import type { ContextMenuModel } from "../context-menu";
 
 import Article from ".";
 import type { ArticleProps } from "./Article.types";
+import { ArticleItem } from "./item";
 
 const meta = {
   title: "UI/Layout/Article",
@@ -221,6 +229,44 @@ type Story = StoryObj<ComponentProps<typeof Article>>;
 
 export default meta;
 
+const catalog = [
+  { id: "files", text: "Files", icon: CatalogFolderReactSvgUrl },
+  { id: "shared", text: "Shared with me", icon: CatalogSharedReactSvgUrl },
+  { id: "recent", text: "Recent files", icon: CatalogRecentReactSvgUrl },
+  {
+    id: "favorites",
+    text: "Favorite files",
+    icon: CatalogFavoritesReactSvgUrl,
+  },
+  { id: "trash", text: "Trash", icon: CatalogTrashReactSvgUrl },
+  { id: "rooms", text: "Rooms", icon: CatalogRoomsReactSvgUrl },
+  { id: "agents", text: "AI agents", icon: CatalogAiAgentsReactSvgUrl },
+];
+
+// The catalog the portal draws in the body, Files open.
+const ArticleCatalog = ({
+  showText = true,
+  labels,
+}: {
+  showText?: boolean;
+  labels?: string[];
+}) => (
+  <>
+    {catalog.map((item, index) => (
+      <ArticleItem
+        key={item.id}
+        id={item.id}
+        icon={item.icon}
+        text={labels?.[index] ?? item.text}
+        showText={showText}
+        isActive={item.id === "files"}
+        isEndOfBlock={item.id === "trash"}
+        linkData={{ path: "", state: {} }}
+      />
+    ))}
+  </>
+);
+
 const defaultProps: ArticleProps = {
   showText: true,
   setShowText: fn(),
@@ -255,7 +301,7 @@ const defaultProps: ArticleProps = {
   limitedAccessDevToolsForUsers: false,
   children: [
     <Article.Body key="body">
-      <div>Navigation items</div>
+      <ArticleCatalog />
     </Article.Body>,
   ],
 };
@@ -309,7 +355,7 @@ const article = (root: HTMLElement) =>
 
 const bodySlot = (
   <Article.Body key="body">
-    <div>Navigation items</div>
+    <ArticleCatalog />
   </Article.Body>
 );
 
@@ -367,7 +413,9 @@ export const Default: Story = {
   play: async ({ args, canvas, canvasElement, userEvent }) => {
     const panel = article(canvasElement);
     await expect(panel).toHaveAttribute("data-show-text", "true");
-    await expect(within(panel).getByText("Navigation items")).toBeVisible();
+    await expect(
+      within(panel).getByText("Rooms", { selector: ".articleItemText" }),
+    ).toBeVisible();
     await expect(canvas.getByTestId("profile_username")).toHaveTextContent(
       "Team member",
     );
@@ -398,7 +446,7 @@ export const Default: Story = {
   getActions={getActions}
 >
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -419,7 +467,9 @@ export const WithMainButton: Story = {
     // Above the navigation.
     const button = canvas.getByRole("button", { name: "New document" });
     await expect(button.getBoundingClientRect().bottom).toBeLessThanOrEqual(
-      canvas.getByText("Navigation items").getBoundingClientRect().top,
+      canvas
+        .getByText("Files", { selector: ".articleItemText" })
+        .getBoundingClientRect().top,
     );
   },
   parameters: {
@@ -434,7 +484,7 @@ export const WithMainButton: Story = {
     <Button primary scale size={ButtonSize.normal} label="New document" />
   </Article.MainButton>
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -473,7 +523,7 @@ export const CustomHeader: Story = {
     <h3>Documents</h3>
   </Article.Header>
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -504,7 +554,7 @@ export const WithBackButton: Story = {
       source: {
         code: `<Article {...panelProps} showBackButton onBack={goBack}>
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -528,7 +578,9 @@ export const LoadingState: Story = {
     await expect(canvas.queryByTestId("profile_username")).toBeNull();
     await expect(canvas.queryByTestId("dev-tools-bar")).toBeNull();
     // The body is still rendered.
-    await expect(canvas.getByText("Navigation items")).toBeVisible();
+    await expect(
+      canvas.getByText("Files", { selector: ".articleItemText" }),
+    ).toBeVisible();
   },
   parameters: {
     docs: {
@@ -539,7 +591,7 @@ export const LoadingState: Story = {
       source: {
         code: `<Article {...panelProps} isBurgerLoading showArticleLoader>
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -562,7 +614,9 @@ export const WithCustomSlot: Story = {
       .getByText("Storage: 2 GB of 10 GB")
       .getBoundingClientRect();
     await expect(slot.top).toBeGreaterThanOrEqual(
-      canvas.getByText("Navigation items").getBoundingClientRect().bottom,
+      canvas
+        .getByText("Files", { selector: ".articleItemText" })
+        .getBoundingClientRect().bottom,
     );
     await expect(slot.bottom).toBeLessThanOrEqual(
       canvas.getByTestId("dev-tools-bar").getBoundingClientRect().top,
@@ -577,7 +631,7 @@ export const WithCustomSlot: Story = {
       source: {
         code: `<Article {...panelProps} customSlot={<div>Storage: 2 GB of 10 GB</div>}>
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -595,7 +649,9 @@ export const WithoutFooterBlocks: Story = {
     children: [bodySlot],
   },
   play: async ({ canvas }) => {
-    await expect(canvas.getByText("Navigation items")).toBeVisible();
+    await expect(
+      canvas.getByText("Files", { selector: ".articleItemText" }),
+    ).toBeVisible();
     await expect(canvas.queryByTestId("profile_username")).toBeNull();
     await expect(canvas.queryByTestId("dev-tools-bar")).toBeNull();
   },
@@ -614,7 +670,7 @@ export const WithoutFooterBlocks: Story = {
   isAdmin={false}
 >
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -623,13 +679,13 @@ export const WithoutFooterBlocks: Story = {
 };
 
 export const CollapsedOnTablet: Story = {
-  // Plain text has no icon form, so the body keeps it for the expanded column.
+  // The catalog follows the column: icons only while it is collapsed.
   render: (args) =>
     renderInteractive({
       ...args,
       children: [
         <Article.Body key="body">
-          <div>{args.showText ? "Navigation items" : null}</div>
+          <ArticleCatalog showText={args.showText} />
         </Article.Body>,
       ],
     }),
@@ -650,7 +706,9 @@ export const CollapsedOnTablet: Story = {
       "data-show-text",
       "false",
     );
-    await expect(canvas.queryByText("Navigation items")).toBeNull();
+    await expect(
+      canvas.queryByText("Rooms", { selector: ".articleItemText" }),
+    ).toBeNull();
     await expect(canvas.getByTestId("dev-tools-bar")).toHaveAttribute(
       "data-icon-only",
       "true",
@@ -672,7 +730,7 @@ export const CollapsedOnTablet: Story = {
   toggleShowText={() => setShowText((value) => !value)}
 >
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -723,13 +781,23 @@ export const OnPhone: Story = {
   setArticleOpen={setArticleOpen}
 >
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
     },
   },
 };
+
+const rtlLabels = [
+  "الملفات",
+  "تمت مشاركتها معي",
+  "الملفات الأخيرة",
+  "الملفات المفضلة",
+  "سلة المهملات",
+  "الغرف",
+  "وكلاء الذكاء الاصطناعي",
+];
 
 export const RightToLeft: Story = {
   render: (args) => (
@@ -756,7 +824,7 @@ export const RightToLeft: Story = {
     showBackButton: true,
     children: [
       <Article.Body key="body">
-        <div>عناصر التنقل</div>
+        <ArticleCatalog labels={rtlLabels} />
       </Article.Body>,
     ],
   },
@@ -773,7 +841,7 @@ export const RightToLeft: Story = {
         code: `<div dir="rtl">
   <Article {...panelProps} showBackButton>
     <Article.Body>
-      <nav>عناصر التنقل</nav>
+      {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
     </Article.Body>
   </Article>
 </div>`,
@@ -831,7 +899,7 @@ export const CssCustomization: Story = {
         code: `<div style={{ "--article-bg": "#e6f3fb", "--article-border": "1px solid #0082c9", "--article-back-color": "#0082c9" }}>
   <Article {...panelProps} showBackButton>
     <Article.Body>
-      <nav>Navigation items</nav>
+      {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
     </Article.Body>
   </Article>
 </div>`,

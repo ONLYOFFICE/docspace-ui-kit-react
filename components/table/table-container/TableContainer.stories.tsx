@@ -4,12 +4,11 @@ import { expect, fn, within } from "storybook/test";
 import type { TableContainerProps } from "../Table.types";
 
 import { useRef } from "react";
-import { uuid as uuidv4 } from "../../../utils/";
+import FileCells, { storyFiles } from "../../../.storybook/utils/FileCells";
 
 import { TableContainer } from "./TableContainer";
 import { Scrollbar } from "../../scrollbar";
 import { TableRow } from "../table-row";
-import { TableCell } from "../sub-components/table-cell";
 import { TableHeader } from "../table-header";
 import { SortByFieldName } from "../../../enums";
 import { TableBody } from "../table-body";
@@ -23,8 +22,8 @@ const onColumnToggle = fn();
 
 const mockColumns = [
   {
-    key: "Column 1",
-    title: "Column 1",
+    key: "Name",
+    title: "Name",
     resizable: true,
     enable: true,
     default: true,
@@ -34,8 +33,8 @@ const mockColumns = [
     onClick: onColumnSort,
   },
   {
-    key: "Column 2",
-    title: "Column 2",
+    key: "Type",
+    title: "Type",
     enable: true,
     resizable: true,
     sortBy: SortByFieldName.Type,
@@ -43,8 +42,8 @@ const mockColumns = [
     onClick: onColumnSort,
   },
   {
-    key: "Column 3",
-    title: "Column 3",
+    key: "Tags",
+    title: "Tags",
     enable: true,
     resizable: true,
     sortBy: SortByFieldName.Tags,
@@ -54,17 +53,12 @@ const mockColumns = [
   },
 ];
 
-const createTableRows = (count: number) => {
-  return Array.from({ length: count }, (_, index) => {
-    return (
-      <TableRow key={uuidv4()}>
-        <TableCell>{`Cell ${index + 1}-1`}</TableCell>
-        <TableCell>{`Cell ${index + 1}-2`}</TableCell>
-        <TableCell>{`Cell ${index + 1}-3`}</TableCell>
-      </TableRow>
-    );
-  });
-};
+const createTableRows = (count: number) =>
+  storyFiles.slice(0, count).map((file) => (
+    <TableRow key={file.name}>
+      <FileCells file={file} />
+    </TableRow>
+  ));
 
 const TableContainerWrapper = (props: TableContainerProps) => {
   const { useReactWindow } = props;
@@ -144,13 +138,6 @@ The Table README describes it in full.`,
     (Story) => {
       return (
         <div>
-          <div style={{ marginBottom: "20px", fontSize: "14px" }}>
-            <p>
-              <strong>Note:</strong> TableContainer is a wrapper for table
-              elements (header, body, rows, cells). When used with react-window,
-              it sets specific styles to properly contain virtualized content.
-            </p>
-          </div>
           <div style={{ position: "relative" }}>
             <Scrollbar
               id="sectionScroll"
@@ -186,13 +173,13 @@ export const Default: Story = {
     // The header sizes the grid's columns.
     await expect(container.style.gridTemplateColumns).not.toBe("");
     const header = canvas.getByTestId("table-header");
-    await expect(within(header).getByText("Column 3")).toBeVisible();
+    await expect(within(header).getByText("Tags")).toBeVisible();
     await expect(
       within(canvas.getByTestId("table-body")).getAllByTestId("table-row"),
     ).toHaveLength(10);
 
     // A column title sorts by its field.
-    await userEvent.click(within(header).getByText("Column 2"));
+    await userEvent.click(within(header).getByText("Type"));
     await expect(onColumnSort).toHaveBeenCalledWith(
       SortByFieldName.Type,
       expect.anything(),

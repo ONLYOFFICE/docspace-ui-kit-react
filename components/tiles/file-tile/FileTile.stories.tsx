@@ -11,7 +11,8 @@ import WordSvgUrl from "../../../assets/icons/32/word.svg";
 
 import ImageReactSvg from "../../../assets/emptyview/empty.rooms.root.light.svg";
 import LockedReact12Svg from "../../../assets/icons/12/lock.react.svg";
-import { Link } from "../../link";
+import { Link, LinkType } from "../../link";
+import { globalColors } from "../../../providers/theme";
 import { Badge } from "../../badge";
 import { IconSizeType } from "../../../utils";
 import { FileType } from "../../../enums";
@@ -289,7 +290,17 @@ const Template = ({
     <div style={{ maxWidth: "300px", margin: "30px" }}>
       <FileTile {...args} checked={checked} onSelect={onSelect}>
         <TileContent>
-          <Link>File Content</Link>
+          <Link
+            type={LinkType.page}
+            title={args.item.title}
+            fontWeight={600}
+            isTextOverflow
+          >
+            {args.item.title.replace(/\.[^.]+$/, "")}
+            <span style={{ color: globalColors.gray }}>
+              {args.item.fileExst}
+            </span>
+          </Link>
         </TileContent>
       </FileTile>
     </div>
@@ -319,7 +330,7 @@ export const Default: Story = {
   },
   play: async ({ args, canvas, userEvent }) => {
     const tile = canvas.getByTestId("tile");
-    const content = within(tile).getByText("File Content");
+    const content = within(tile).getByText("Document");
 
     // A click on the tile selects it, alone.
     await userEvent.click(content);
@@ -368,7 +379,11 @@ export const Default: Story = {
   temporaryIcon={<ImageReactSvg />}
   onSelect={handleSelect}
 >
-  <TileContent><Link>File Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>
+      Document<span style={{ color: "#A3A9AE" }}>.docx</span>
+    </Link>
+  </TileContent>
 </FileTile>`,
       },
     },
@@ -402,7 +417,11 @@ export const Checked: Story = {
   checked={true}
   onSelect={handleSelect}
 >
-  <TileContent><Link>File Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>
+      Document<span style={{ color: "#A3A9AE" }}>.docx</span>
+    </Link>
+  </TileContent>
 </FileTile>`,
       },
     },
@@ -435,7 +454,11 @@ export const InProgress: Story = {
   contextOptions={contextOptions}
   inProgress={true}
 >
-  <TileContent><Link>File Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>
+      Document<span style={{ color: "#A3A9AE" }}>.docx</span>
+    </Link>
+  </TileContent>
 </FileTile>`,
       },
     },
@@ -470,7 +493,11 @@ export const WithThumbnail: Story = {
   temporaryIcon={<ImageReactSvg />}
   badges={badges}
 >
-  <TileContent><Link>File Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>
+      Document<span style={{ color: "#A3A9AE" }}>.docx</span>
+    </Link>
+  </TileContent>
 </FileTile>`,
       },
     },
@@ -502,7 +529,11 @@ export const WithHotkeyBorder: Story = {
   temporaryIcon={<ImageReactSvg />}
   showHotkeyBorder
 >
-  <TileContent><Link>File Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>
+      Document<span style={{ color: "#A3A9AE" }}>.docx</span>
+    </Link>
+  </TileContent>
 </FileTile>`,
       },
     },
@@ -536,7 +567,11 @@ export const RenamingState: Story = {
   temporaryIcon={<ImageReactSvg />}
   isEdit
 >
-  <TileContent><Link>File Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>
+      Document<span style={{ color: "#A3A9AE" }}>.docx</span>
+    </Link>
+  </TileContent>
 </FileTile>`,
       },
     },

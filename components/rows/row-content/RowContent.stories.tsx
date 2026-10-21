@@ -105,6 +105,7 @@ export const Default: Story = {
   args: {
     disableSideInfo: false,
     convertSideInfo: true,
+    sideColor: globalColors.gray,
     onClick: fn(),
   },
   play: async ({ args, canvas }) => {
@@ -129,7 +130,7 @@ export const Default: Story = {
           "The content of one file row: the title, a status icon beside it, and the details **Modified today**, **24 KB** and **Version 2** joined into one line under them. Click anywhere in it to see `onClick` in the Actions panel, and change any other prop live in the Controls panel below.",
       },
       source: {
-        code: `<RowContent onClick={handleClick}>
+        code: `<RowContent sideColor="#A3A9AE" onClick={handleClick}>
   <Text fontSize="15px" fontWeight={600} truncate>Quarterly report.docx</Text>
   <CatalogFolderReactSvg />
   <Text>Modified today</Text>

@@ -264,7 +264,9 @@ type Story = StoryObj<ComponentProps<typeof Navigation>>;
 export default meta;
 
 const Wrapper = (props: { children: React.ReactNode }) => (
-  <div style={{ height: "240px" }}>{props.children}</div>
+  <div style={{ height: "240px" }}>
+    <div style={{ height: "69px" }}>{props.children}</div>
+  </div>
 );
 
 // The header and its right-hand button row are sibling elements; this row lays them out side by side
@@ -325,7 +327,6 @@ const defaultArgs = {
     infoPanel: "Info Panel",
     actions: "Actions",
     contextMenu: "Context Menu",
-    warningText: "Warning",
   },
   withMenu: true,
   onPlusClick: fn(),
@@ -364,7 +365,6 @@ export const Default: Story = {
     // The parent folder's name sits before the current one.
     const parent = part(canvasElement, ".room-title") as HTMLElement;
     await expect(parent).toHaveTextContent("Shared with me");
-    await expect(within(canvasElement).getByText("Warning")).toBeVisible();
 
     await userEvent.click(part(canvasElement, ".arrow-button") as HTMLElement);
     await expect(args.onBackToParentFolder).toHaveBeenCalledTimes(1);
@@ -392,7 +392,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The header of a nested folder: the back arrow, the parent folder's name, the current folder's name and a notice chip. Click the folder's name to open the drop box with the whole trail; change any other prop live in the Controls panel below.",
+          "The header of a nested folder: the back arrow, the parent folder's name and the current folder's name. Click the folder's name to open the drop box with the whole trail; change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<Navigation
@@ -739,7 +739,10 @@ export const CssCustomization: Story = {
       }
     >
       <HeaderRow>
-        <Navigation {...defaultArgs} />
+        <Navigation
+          {...defaultArgs}
+          titles={{ ...defaultArgs.titles, warningText: "Warning" }}
+        />
       </HeaderRow>
       <HeaderRow>
         <Navigation

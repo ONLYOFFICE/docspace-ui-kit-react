@@ -1,22 +1,16 @@
 import type { ComponentProps } from "react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
-import { useArgs } from "storybook/preview-api";
 import { expect, fireEvent, fn, screen, waitFor, within } from "storybook/test";
 
 import ViewRowsReactSvg from "../../assets/view-rows.react.svg";
 import ViewTilesReactSvg from "../../assets/view-tiles.react.svg";
+import FileCells, { storyFiles } from "../../.storybook/utils/FileCells";
 import { DeviceType, FilterGroups, SortByFieldName } from "../../enums";
 import Filter from "../filter";
 import Navigation from "../navigation/Navigation";
-import {
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHeader,
-  TableRow,
-} from "../table";
+import { TableBody, TableContainer, TableHeader, TableRow } from "../table";
 import { Tabs } from "../tabs";
 import { Text } from "../text";
 import type { Operation } from "../operations-progress-button/OperationsProgressButton.types";
@@ -454,18 +448,7 @@ const mockColumns = [
   },
 ];
 
-const mockFiles = [
-  { name: "Annual Report 2025.docx", type: "Document", tags: "Finance" },
-  { name: "Q4 Budget.xlsx", type: "Spreadsheet", tags: "Finance" },
-  { name: "Team Presentation.pptx", type: "Presentation", tags: "Marketing" },
-  { name: "Logo Design.png", type: "Image", tags: "Design" },
-  { name: "Meeting Notes.docx", type: "Document", tags: "General" },
-  { name: "Product Roadmap.pdf", type: "PDF", tags: "Product" },
-  { name: "User Research.docx", type: "Document", tags: "UX" },
-  { name: "Sprint Backlog.xlsx", type: "Spreadsheet", tags: "Engineering" },
-  { name: "Brand Guidelines.pdf", type: "PDF", tags: "Marketing" },
-  { name: "Architecture Diagram.png", type: "Image", tags: "Engineering" },
-];
+const mockFiles = storyFiles;
 
 const NavigationHeader = ({
   device = DeviceType.desktop,
@@ -580,21 +563,7 @@ const TableContent = () => {
 
   const rows = mockFiles.map((file) => (
     <TableRow key={`row-${file.name}`}>
-      <TableCell>
-        <Text fontWeight={600} truncate>
-          {file.name}
-        </Text>
-      </TableCell>
-      <TableCell>
-        <Text fontSize="12px" fontWeight={600} truncate>
-          {file.type}
-        </Text>
-      </TableCell>
-      <TableCell>
-        <Text fontSize="12px" fontWeight={600} truncate>
-          {file.tags}
-        </Text>
-      </TableCell>
+      <FileCells file={file} />
     </TableRow>
   ));
 
@@ -737,9 +706,7 @@ export const Default: Story = {
     ).toBeVisible();
     await expect(getComputedStyle(sticky).position).toBe("sticky");
     const scroll = part(canvasElement, ".section-scroll") as HTMLElement;
-    await expect(
-      within(scroll).getByText("Annual Report 2025.docx"),
-    ).toBeVisible();
+    await expect(within(scroll).getByText("Annual Report 2025")).toBeVisible();
     await expect(part(canvasElement, "#InfoPanelWrapper")).toBeNull();
   },
   parameters: {
@@ -894,17 +861,23 @@ export const WithInfoPanel: Story = {
   },
 };
 
-// A resize drag writes its width back into the control.
-const renderChatPanel = (args: ComponentProps<typeof Section>) => {
-  const [, updateArgs] = useArgs();
+// A resize drag keeps its width in the story's own state: writing it into the
+// args re-renders the story, which clears the spies a play is checking.
+const ChatPanelStory = (args: ComponentProps<typeof Section>) => {
+  const [width, setWidth] = useState(args.chatPanelWidth);
+
+  useEffect(() => {
+    setWidth(args.chatPanelWidth);
+  }, [args.chatPanelWidth]);
 
   return (
     <PageFrame>
       <Section
         {...args}
+        chatPanelWidth={width}
         setChatPanelWidth={(value) => {
           args.setChatPanelWidth?.(value);
-          updateArgs({ chatPanelWidth: value });
+          setWidth(value);
         }}
       >
         <Section.SectionHeader>
@@ -927,7 +900,7 @@ const renderChatPanel = (args: ComponentProps<typeof Section>) => {
 };
 
 export const WithChatPanel: Story = {
-  render: renderChatPanel,
+  render: (args) => <ChatPanelStory {...args} />,
   args: {
     currentDeviceType: DeviceType.desktop,
     withBodyScroll: true,

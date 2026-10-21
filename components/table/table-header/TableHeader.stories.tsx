@@ -165,22 +165,6 @@ The Table README describes it in full.`,
     },
   },
   tags: ["!autodocs"],
-  decorators: [
-    (Story) => {
-      return (
-        <div>
-          <div style={{ marginBottom: "20px", fontSize: "14px" }}>
-            <p>
-              <strong>Note:</strong> TableHeader component for displaying table
-              headers with support for column resizing, sorting, and column
-              visibility settings.
-            </p>
-          </div>
-          <Story />
-        </div>
-      );
-    },
-  ],
 } satisfies Meta<typeof TableHeader>;
 
 type Story = StoryObj<ComponentProps<typeof TableHeader>>;

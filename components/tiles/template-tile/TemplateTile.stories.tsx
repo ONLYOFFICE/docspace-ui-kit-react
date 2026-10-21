@@ -9,7 +9,8 @@ import React, { useState } from "react";
 import PublicRoomTemplateIconReactSvg from "../../../assets/icons/32/template/public.svg";
 import CreateRoomReactSvg from "../../../assets/create.room.react.svg";
 import { ContextMenuModel } from "../../context-menu";
-import { Link } from "../../link";
+import { Link, LinkType } from "../../link";
+import { globalColors } from "../../../providers/theme";
 import { IconSizeType } from "../../../utils";
 import { ComboBox, ComboBoxSize } from "../../combobox";
 import { Text } from "../../text";
@@ -324,7 +325,23 @@ const Template = ({
     <div style={{ maxWidth: "300px", margin: "30px" }}>
       <TemplateTile {...args} checked={checked} onSelect={onSelect}>
         <TileContent>
-          <Link>Template Content</Link>
+          <Link
+            type={LinkType.page}
+            fontSize="16px"
+            lineHeight="20px"
+            fontWeight={700}
+            isTextOverflow
+          >
+            {args.item.title}
+          </Link>
+          <Text
+            fontSize="13px"
+            fontWeight={400}
+            color={globalColors.lightGrayDark}
+            truncate
+          >
+            Public room
+          </Text>
         </TileContent>
       </TemplateTile>
     </div>
@@ -361,9 +378,15 @@ export const Default: Story = {
     );
     await expect(onCreateRoomBadge).toHaveBeenCalledTimes(1);
 
-    await userEvent.click(within(tile).getByRole("checkbox", { hidden: true }));
+    const checkbox = within(tile).getByRole("checkbox", { hidden: true });
+    await userEvent.click(checkbox);
     await expect(args.onSelect).toHaveBeenCalledWith(
       true,
+      expect.objectContaining({ id: "template-1" }),
+    );
+    await userEvent.click(checkbox);
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      false,
       expect.objectContaining({ id: "template-1" }),
     );
 
@@ -389,7 +412,10 @@ export const Default: Story = {
   columnCount={1}
   openUser={openOwnerProfile}
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
+    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -423,7 +449,10 @@ export const Checked: Story = {
   checked={true}
   onSelect={handleSelect}
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
+    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -462,7 +491,10 @@ export const WithSpaceQuota: Story = {
   showStorageInfo={true}
   SpaceQuotaComponent={SpaceQuota}
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
+    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -503,7 +535,10 @@ export const WithReadOnlyQuota: Story = {
   showStorageInfo={true}
   SpaceQuotaComponent={SpaceQuota}
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
+    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -534,7 +569,10 @@ export const BlockingOperation: Story = {
   contextOptions={contextOptions}
   isBlockingOperation={true}
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
+    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -567,7 +605,10 @@ export const InProgress: Story = {
   contextOptions={contextOptions}
   inProgress
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
+    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -598,7 +639,10 @@ export const WithHotkeyBorder: Story = {
   contextOptions={contextOptions}
   showHotkeyBorder
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
+    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -631,7 +675,10 @@ export const RenamingState: Story = {
   contextOptions={contextOptions}
   isEdit
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
+    <Text fontSize="13px" color="#657077" truncate>Public room</Text>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -671,7 +718,13 @@ export const CssCustomization: Story = {
             SpaceQuotaComponent={MockSpaceQuota}
           >
             <TileContent>
-              <Link>
+              <Link
+                type={LinkType.page}
+                fontSize="16px"
+                lineHeight="20px"
+                fontWeight={700}
+                isTextOverflow
+              >
                 {showHotkeyBorder ? "Team Template" : "Sample Template"}
               </Link>
             </TileContent>
