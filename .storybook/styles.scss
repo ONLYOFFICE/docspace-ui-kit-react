@@ -28,11 +28,13 @@ body {
 // portal shows. Only tokens whose absence changes the shape of a story belong
 // here; the point of not shipping the rest is that a missing one stays visible.
 .light {
+  color-scheme: light;
   --info-panel-background: #{colors.$white};
   --info-panel-border-color: #{colors.$gray-light-mid};
 }
 
 .dark {
+  color-scheme: dark;
   --info-panel-background: #{colors.$black};
   --info-panel-border-color: #{colors.$gray-dark-strong};
 }
