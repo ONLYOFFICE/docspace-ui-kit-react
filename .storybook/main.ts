@@ -181,9 +181,6 @@ const config: StorybookConfig = {
       "@anthropic-ai/sdk": stub("anthropic-sdk.mjs"),
       "@google/genai": stub("google-genai.mjs"),
       "@mistralai/mistralai": stub("mistralai.mjs"),
-      codemirror: stub("codemirror.mjs"),
-      "@codemirror/state": stub("codemirror-state.mjs"),
-      "@codemirror/lang-json": stub("codemirror-lang-json.mjs"),
     };
 
     config.resolve = config.resolve || {};

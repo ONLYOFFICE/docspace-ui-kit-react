@@ -149,8 +149,10 @@ export const McpServersList: Story = {
     await userEvent.click(
       screen.getByRole("button", { name: "Edit configuration" }),
     );
-    const cancel = await waitFor(() =>
-      screen.getByRole("button", { name: "Cancel" }),
+    // The editor loads on first open.
+    const cancel = await waitFor(
+      () => screen.getByRole("button", { name: "Cancel" }),
+      { timeout: 5000 },
     );
     await expect(screen.getByRole("button", { name: "Save" })).toBeVisible();
     await userEvent.click(cancel);
