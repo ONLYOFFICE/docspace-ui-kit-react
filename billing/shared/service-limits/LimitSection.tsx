@@ -134,12 +134,6 @@ const LimitSection = ({
             ) : null}
 
             <div className={styles.controls}>
-              <LimitPeriodComboBox
-                value={period}
-                onChange={setPeriod}
-                isDisabled={isLocked}
-                testId={`${testId}_period_combobox`}
-              />
               <LimitAmountField
                 value={amountText}
                 onChange={setAmountText}
@@ -149,6 +143,12 @@ const LimitSection = ({
                 errorMessage={amountError}
                 onEnter={canSave ? onSubmit : undefined}
                 testId={`${testId}_amount_input`}
+              />
+              <LimitPeriodComboBox
+                value={period}
+                onChange={setPeriod}
+                isDisabled={isLocked}
+                testId={`${testId}_period_combobox`}
               />
             </div>
 
