@@ -20,7 +20,7 @@
 
 The portal's white-label logo, fetched from the ONLYOFFICE Apps server and swapped for the theme. It is
 the mark at the top of the login and confirmation pages: one `<img>` pointed at the portal's
-`logo.ashx`, with a bundled fallback when that request fails.
+`logo.ashx`, with a bundled fallback, in the light or the dark version to match the theme, when that request fails.
 
 ## Use this when / not when
 

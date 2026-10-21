@@ -142,6 +142,16 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`FileTile`'s `--tile-height` sizes the whole tile.** The thumbnail area kept its 156px and
+  the name row its 64px, so a taller tile ended in an empty band under the name row, outside the
+  hover and checked background. The thumbnail area now takes whatever the name row leaves; at
+  the default 222px nothing changes.
+- **`PortalLogo`'s fallback follows the theme.** When `logo.ashx` fails, the bundled logo it
+  draws instead was always the light one, whose dark lettering vanished on a dark page and left
+  only the mark; the dark theme now gets the light-lettered version. `ErrorContainer` shows it.
+- **`Article`'s logo starts at the panel's edge.** The header gives the logo a 211px box, sized
+  for a white-label logo, and a narrower one such as the default ONLYOFFICE mark was centred in
+  it; it now sits at the start of the row, on the right in a right-to-left interface.
 - **`SnackBar` no longer calls `onAction` after it unmounts.** A click into an iframe schedules
   `onAction` half a second later, and that timer survived the bar, so a bar closed in the
   meantime reported an action anyway.

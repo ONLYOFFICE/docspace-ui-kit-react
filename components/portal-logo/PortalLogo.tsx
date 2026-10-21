@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { isMobileOnly } from "react-device-detect";
 import classNames from "classnames";
 import LightSmallLogo from "../../assets/logo/lightsmall.svg";
+import DarkLightSmallLogo from "../../assets/logo/dark_lightsmall.svg";
 
 import { size as deviceSize } from "../../utils";
 import { getLogoUrl } from "../../utils/getLogoUrl";
@@ -54,8 +55,10 @@ const PortalLogo = ({
   });
 
   if (isError) {
+    const FallbackLogo = isBase ? LightSmallLogo : DarkLightSmallLogo;
+
     return (
-      <LightSmallLogo
+      <FallbackLogo
         className={classNames("logo-wrapper", className)}
         role={alt ? "img" : undefined}
         aria-label={alt || undefined}

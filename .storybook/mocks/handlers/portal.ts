@@ -1,12 +1,14 @@
 import { http, HttpResponse } from "msw";
 
 import lightSmallLogo from "../../../assets/logo/lightsmall.svg?raw";
+import darkLightSmallLogo from "../../../assets/logo/dark_lightsmall.svg?raw";
 import darkLogoMark from "../../../assets/logo/dark_leftmenu.svg?raw";
 
 import { DEMO_PORTAL_URL } from "../demoPortal";
 
 // `WhiteLabelLogoType.Favicon`: the square mark, not the wordmark.
 const FAVICON = "3";
+const LEFT_MENU = "6";
 
 // The ONLYOFFICE mark is the first 48 units of the light wordmark; cropping
 // the viewBox gives the square logo without a second copy of the artwork.
@@ -25,7 +27,8 @@ const logoFor = (params: URLSearchParams) => {
   if (params.get("logotype") === FAVICON) {
     return isDark ? darkLogoMark : lightLogoMark;
   }
-  return lightSmallLogo;
+  if (params.get("logotype") === LEFT_MENU) return darkLogoMark;
+  return isDark ? darkLightSmallLogo : lightSmallLogo;
 };
 
 export const demoLogoDataUrl = (src: string) => {
