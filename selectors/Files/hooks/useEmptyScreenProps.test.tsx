@@ -74,4 +74,16 @@ describe("useEmptyScreenProps", () => {
     expect(filesRoot.emptyScreenHeader).toBe("No files and folders here yet");
     expect(filesRoot.emptyScreenDescription).toBe("");
   });
+  it("shows the host's reason when the list offers no New agent", () => {
+    expect(
+      texts("agents", { agentsEmptyDescription: "Connect a provider" })
+        .emptyScreenDescription,
+    ).toBe("Connect a provider");
+    expect(
+      texts("agents", {
+        canCreateAgent: true,
+        agentsEmptyDescription: "Connect a provider",
+      }).emptyScreenDescription,
+    ).toBe("Create a new agent to add files to its knowledge base.");
+  });
 });

@@ -292,6 +292,11 @@ export type FilesSelectorProps = TInfoBar &
      * itself -- an agent needs the host's create dialog -- so this opens it.
      */
     onCreateAIAgent?: () => void;
+    /**
+     * Description of the empty AI agents list when it offers no "New agent",
+     * e.g. why agents cannot be created yet. Empty by default.
+     */
+    agentsEmptyDescription?: string;
     formProps?: FormPropsType;
     withPadding?: boolean;
     checkCreating?: boolean;

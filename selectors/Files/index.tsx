@@ -85,6 +85,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     createDefineRoomType,
     disabledCreatePublicRoom,
     onCreateAIAgent,
+    agentsEmptyDescription,
 
     shareKey,
     formProps,
@@ -866,6 +867,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     isRoot,
 
     selectedItemType,
+    agentsEmptyDescription,
   });
 
   const selectorComponent = embedded ? (
