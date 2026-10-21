@@ -69,8 +69,8 @@ class ServiceLimitStore {
 
     try {
       await this.#applyLimit("Total", this.portalLimit, amount, period);
-      await this.fetchPortalLimit();
     } finally {
+      await this.fetchPortalLimit().catch(() => {});
       runInAction(() => {
         this.isPortalSaving = false;
       });
@@ -82,8 +82,8 @@ class ServiceLimitStore {
 
     try {
       await this.#applyLimit("Global", this.userLimit, amount, period);
-      await this.fetchUserLimit();
     } finally {
+      await this.fetchUserLimit().catch(() => {});
       runInAction(() => {
         this.isUserSaving = false;
       });
