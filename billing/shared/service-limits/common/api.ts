@@ -57,7 +57,7 @@ const normalizeLimit = (raw: Record<string, unknown>): TServiceLimit => ({
   id: Number(raw.id),
   serviceGroupName: String(raw.serviceGroupName ?? ""),
   scope: normalizeScope(raw.scope),
-  participant: toNullableString(raw.participant),
+  userId: toNullableString(raw.userId),
   amountValue: toNullableNumber(raw.amountValue),
   currency: toNullableString(raw.currency),
   quantityValue: toNullableNumber(raw.quantityValue),

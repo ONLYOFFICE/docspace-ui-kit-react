@@ -14,7 +14,7 @@ export type TServiceLimit = {
   id: number;
   serviceGroupName: string;
   scope: TServiceLimitScope;
-  participant: string | null;
+  userId: string | null;
   amountValue: number | null;
   currency: string | null;
   quantityValue: number | null;
