@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
+import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 
 import { Text } from "../../../../components/text";
 import { TextInput, InputType } from "../../../../components/text-input";
@@ -268,7 +269,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
   );
 
   const handleStoragePlanChange = useCallback(
-    async (isCancellation: boolean = false, skipTopUp: boolean = false) => {
+    async (isCancellation: boolean = false) => {
       if (isLoading) return;
 
       setIsLoading(true);
@@ -282,11 +283,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
       const isNewSubscription = !hasStorageSubscription;
 
       try {
-        // skipTopUp: the Stripe checkout callback has already deposited the
-        // required amount, re-depositing here would charge the card twice.
         if (
           !isCancellation &&
-          !skipTopUp &&
           !isDelayedPaymentMethod &&
           isBalanceInsufficient &&
           recommendedAmount > 0
@@ -388,6 +386,9 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
 
     setIsLoading(true);
 
+    const amountValue = +debouncedAmount;
+    const isNewSubscription = !hasStorageSubscription;
+
     try {
       const chargeAmount =
         recommendedAmount > 0 ? recommendedAmount : Math.ceil(totalPrice);
@@ -401,16 +402,32 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
         String(chargeAmount),
         storageServiceName ?? DISK_STORAGE,
         {
-          storage: getConvertedSize(t, +debouncedAmount * 1024 ** 3),
+          storage: getConvertedSize(t, amountValue * 1024 ** 3),
+          storageQuantity: String(
+            isUpgradeStoragePlan
+              ? calculateDifferenceBetweenPlan(amountValue)
+              : amountValue,
+          ),
+          storageType: String(
+            isUpgradeStoragePlan
+              ? ProductQuantityType.Add
+              : ProductQuantityType.Set,
+          ),
           price: String(totalPrice),
         },
       );
+
+      const isStoragePurchased = async () => {
+        await fetchPortalTariff!(true);
+        return paymentStore.tariff.currentStoragePlanSize === amountValue;
+      };
 
       const completion = await waitForTopUpCompletion(
         {
           walletBalance: walletBalance ?? 0,
           fetchCustomerInfo,
           fetchBalance: fetchBalanceValue,
+          isPurchaseCompleted: isStoragePurchased,
         },
         signal,
       );
@@ -423,12 +440,25 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
         return;
       }
 
-      await handleStoragePlanChange(false, true);
+      fetchBalance(true);
+      fetchTransactionHistory(storageServiceName ?? DISK_STORAGE);
+
+      if (
+        isNewSubscription &&
+        !window.location.pathname.includes("/disk-storage")
+      ) {
+        navigate(`${paymentStore.routes.diskStorage}?complete=true`);
+        return;
+      }
+
+      await resetIntervalSuccess(false);
+      onClose();
     } catch (e) {
       console.error("[storage-topup] flow failed", e);
       if (!signal.aborted) {
         toastr.error(t("UnexpectedError"));
         setIsLoading(false);
+        onClose();
       }
     }
   };

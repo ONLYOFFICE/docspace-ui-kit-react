@@ -86,6 +86,8 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
     service,
     admins,
     storage,
+    storageQuantity,
+    storageType,
     plan,
     price,
     users,
@@ -103,6 +105,8 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
         service: "",
         admins: "",
         storage: "",
+        storageQuantity: "",
+        storageType: "",
         plan: "",
         price: "",
         users: "",
@@ -126,6 +130,8 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
       service: urlParams.get("service") || "",
       admins: urlParams.get("admins") || "",
       storage: urlParams.get("storage") || "",
+      storageQuantity: urlParams.get("storageQuantity") || "",
+      storageType: urlParams.get("storageType") || "",
       plan: urlParams.get("plan") || "",
       price: urlParams.get("price") || "",
       users: urlParams.get("users") || "",
@@ -228,6 +234,23 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
               productQuantityType: ProductQuantityType.Add,
             },
           });
+
+          setStepIndex(3);
+        }
+
+        if (Number(storageQuantity) > 0) {
+          const storageRes = await paymentApi.updateWalletPayment({
+            walletQuantityRequestDto: {
+              quantity: { storage: Number(storageQuantity) },
+              productQuantityType:
+                Number(storageType) === ProductQuantityType.Add
+                  ? ProductQuantityType.Add
+                  : ProductQuantityType.Set,
+            },
+          });
+
+          if (storageRes?.data?.response === false)
+            throw new Error(t("UnexpectedError"));
 
           setStepIndex(3);
         }
