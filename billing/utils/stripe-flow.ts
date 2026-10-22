@@ -105,6 +105,7 @@ export type TTopUpCompletionDeps = {
     refresh?: boolean,
   ) => Promise<TTopUpCustomerInfo | null | undefined>;
   fetchBalance: (isRefresh?: boolean) => Promise<number>;
+  isPurchaseCompleted?: () => Promise<boolean>;
 };
 
 export const waitForTopUpCompletion = async (
@@ -112,6 +113,7 @@ export const waitForTopUpCompletion = async (
     walletBalance: initialBalance,
     fetchCustomerInfo,
     fetchBalance,
+    isPurchaseCompleted,
   }: TTopUpCompletionDeps,
   signal: AbortSignal,
 ) => {
@@ -125,10 +127,14 @@ export const waitForTopUpCompletion = async (
 
   if (isDelayedPaymentMethod) return { isDelayedPaymentMethod };
 
-  await pollUntil(async () => {
-    const newBalance = await fetchBalance(true);
-    return newBalance > initialBalance;
-  }, signal);
+  await pollUntil(
+    isPurchaseCompleted ??
+      (async () => {
+        const newBalance = await fetchBalance(true);
+        return newBalance > initialBalance;
+      }),
+    signal,
+  );
 
   return { isDelayedPaymentMethod };
 };

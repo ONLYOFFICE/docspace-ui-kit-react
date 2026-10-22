@@ -6,6 +6,7 @@ import UpdatePlanButtonContainer from "./UpdatePlanButtonContainer";
 
 const mockStore = vi.hoisted(() => ({
   current: {} as Record<string, unknown>,
+  isPurchaseCompleted: undefined as (() => Promise<boolean>) | undefined,
 }));
 
 vi.mock("../../store/PaymentStoreProvider", () => ({
@@ -13,12 +14,21 @@ vi.mock("../../store/PaymentStoreProvider", () => ({
 }));
 
 vi.mock("../../shared/top-up-balance/SimpleTopUpDialogWrapper", () => ({
-  default: ({ onConfirm }: { onConfirm?: () => void }) => (
-    <div
-      data-testid="top-up-dialog"
-      data-flow={onConfirm ? "instant" : "stripe"}
-    />
-  ),
+  default: ({
+    onConfirm,
+    isPurchaseCompleted,
+  }: {
+    onConfirm?: () => void;
+    isPurchaseCompleted?: () => Promise<boolean>;
+  }) => {
+    mockStore.isPurchaseCompleted = isPurchaseCompleted;
+    return (
+      <div
+        data-testid="top-up-dialog"
+        data-flow={onConfirm ? "instant" : "stripe"}
+      />
+    );
+  },
 }));
 
 vi.mock("./MigrateToWalletDialog", () => ({ default: () => null }));
@@ -95,6 +105,7 @@ const renderWithStore = (store: ReturnType<typeof createStore>) => {
 describe("<UpdatePlanButtonContainer /> repurchase", () => {
   beforeEach(() => {
     mockStore.current = {};
+    mockStore.isPurchaseCompleted = undefined;
   });
 
   it("opens the Stripe top-up instead of charging when a paid quota has no active card", () => {
@@ -179,5 +190,67 @@ describe("<UpdatePlanButtonContainer /> repurchase", () => {
       "data-flow",
       "stripe",
     );
+  });
+});
+
+describe("<UpdatePlanButtonContainer /> Stripe purchase completion", () => {
+  const openStripeTopUp = () => {
+    const store = createStore({ isCardMissingOrInactive: true });
+    fireEvent.click(renderWithStore(store));
+    return store;
+  };
+
+  const purchaseCheck = () => {
+    const check = mockStore.isPurchaseCompleted;
+    if (!check) throw new Error("isPurchaseCompleted was not passed");
+    return check;
+  };
+
+  beforeEach(() => {
+    mockStore.current = {};
+    mockStore.isPurchaseCompleted = undefined;
+  });
+
+  it("is not completed while the portal is still not paid", async () => {
+    const store = openStripeTopUp();
+
+    expect(await purchaseCheck()()).toBe(false);
+
+    expect(store.tariff.fetchPortalTariff).toHaveBeenCalledWith(true);
+    expect(store.quotas.fetchPortalQuota).toHaveBeenCalledWith(true);
+    expect(store.resetTariffContainerToBasic).not.toHaveBeenCalled();
+  });
+
+  it("is completed once the refreshed tariff is paid and refreshes the page", async () => {
+    const store = openStripeTopUp();
+    store.tariff.fetchPortalTariff.mockImplementation(async () => {
+      store.tariff.isNotPaidPeriod = false;
+    });
+
+    expect(await purchaseCheck()()).toBe(true);
+
+    expect(store.fetchBalance).toHaveBeenCalledWith(true);
+    expect(store.paymentQuotas.fetchPaymentQuotas).toHaveBeenCalled();
+    expect(store.resetTariffContainerToBasic).toHaveBeenCalled();
+  });
+
+  it("is not completed while the quota has fewer admins than selected", async () => {
+    const store = openStripeTopUp();
+    store.tariff.fetchPortalTariff.mockImplementation(async () => {
+      store.tariff.isNotPaidPeriod = false;
+    });
+    store.quotas.maxCountManagersByQuota = 3;
+
+    expect(await purchaseCheck()()).toBe(false);
+  });
+
+  it("is not completed while the quota is still free", async () => {
+    const store = openStripeTopUp();
+    store.tariff.fetchPortalTariff.mockImplementation(async () => {
+      store.tariff.isNotPaidPeriod = false;
+    });
+    store.quotas.isFreeTariff = true;
+
+    expect(await purchaseCheck()()).toBe(false);
   });
 });

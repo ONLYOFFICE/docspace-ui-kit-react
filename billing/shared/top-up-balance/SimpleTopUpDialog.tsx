@@ -57,6 +57,8 @@ type SimpleTopUpDialogBaseProps = {
   serviceName?: string;
   /** optional extra query params appended to the success/callback URL */
   successParams?: Record<string, string>;
+  /** waited for instead of a balance increase when the callback page makes the purchase */
+  isPurchaseCompleted?: () => Promise<boolean>;
   /** overrides the default description under the header */
   descriptionText?: React.ReactNode;
   /** overrides the default helper text under the amount input */
@@ -87,6 +89,7 @@ const SimpleTopUpDialogContent = observer(
     service,
     serviceName,
     successParams,
+    isPurchaseCompleted,
     descriptionText,
     helperText,
   }: SimpleTopUpDialogProps) => {
@@ -129,7 +132,12 @@ const SimpleTopUpDialogContent = observer(
         }
 
         const completion = await waitForTopUpCompletion(
-          { walletBalance, fetchCustomerInfo, fetchBalance },
+          {
+            walletBalance,
+            fetchCustomerInfo,
+            fetchBalance,
+            isPurchaseCompleted,
+          },
           signal,
         );
 
@@ -142,7 +150,10 @@ const SimpleTopUpDialogContent = observer(
         onClose();
       } catch (error) {
         console.error("[first-topup] flow failed", error);
-        if (!signal.aborted) toastr.error(t("UnexpectedError"));
+        if (!signal.aborted) {
+          toastr.error(t("UnexpectedError"));
+          if (isPurchaseCompleted) onClose();
+        }
       } finally {
         if (!signal.aborted) setIsLoading(false);
       }

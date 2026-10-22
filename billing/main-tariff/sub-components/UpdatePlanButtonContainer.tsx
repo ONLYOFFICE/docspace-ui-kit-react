@@ -121,6 +121,23 @@ const UpdatePlanButtonContainer = ({
     setIsVisibleDowngradePlanDialog(false);
   };
 
+  const isTariffPurchased = async () => {
+    await Promise.all([fetchPortalTariff(true), fetchPortalQuota(true)]);
+
+    const isPurchased =
+      !store.quotas.isFreeTariff &&
+      !store.tariff.isGracePeriod &&
+      !store.tariff.isNotPaidPeriod &&
+      store.quotas.maxCountManagersByQuota >= managersCount;
+
+    if (isPurchased) {
+      await Promise.all([fetchBalance(true), fetchPaymentQuotas()]);
+      resetTariffContainerToBasic();
+    }
+
+    return isPurchased;
+  };
+
   const onTopUpConfirm = async () => {
     closeTopUpDialog();
 
@@ -236,6 +253,7 @@ const UpdatePlanButtonContainer = ({
           visible={isTopUpDialogVisible}
           onClose={closeTopUpDialog}
           onConfirm={isCardMissingOrInactive ? undefined : onTopUpConfirm}
+          isPurchaseCompleted={isTariffPurchased}
           minValue={topUpShortfall > 0 ? `${topUpShortfall}` : undefined}
           successParams={{
             admins: `${managersCount}`,
