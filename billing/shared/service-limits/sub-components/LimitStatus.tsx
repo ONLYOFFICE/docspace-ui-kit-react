@@ -5,7 +5,11 @@ import { Text } from "../../../../components/text";
 import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 
-import type { TServiceLimit, TServiceLimitUsage } from "../common/types";
+import type {
+  TServiceLimit,
+  TServiceLimitPeriod,
+  TServiceLimitUsage,
+} from "../common/types";
 import {
   formatPeriodEnd,
   getLimitUsagePercent,
@@ -18,6 +22,7 @@ type LimitStatusProps = {
   limit: TServiceLimit | null;
   usage: TServiceLimitUsage | null;
   draftAmount: number | null;
+  draftPeriod: TServiceLimitPeriod;
   currency: string;
   testId: string;
 };
@@ -31,12 +36,13 @@ const highlight = (className: string) => ({
  * keys by scanning for them, and a key built at runtime would be dropped.
  * A lifetime limit never resets, so its usage has no period end and its
  * texts have no date. A limit read without its spending, such as the one for
- * every user, has no period end to show either.
+ * every user, still says when it resets, from the period end sent with it.
  */
 const LimitStatus = ({
   limit,
   usage,
   draftAmount,
+  draftPeriod,
   currency,
   testId,
 }: LimitStatusProps) => {
@@ -48,7 +54,19 @@ const LimitStatus = ({
     </Text>
   );
 
-  if (!usage) return null;
+  if (!usage) {
+    const periodEnd =
+      limit?.enabled && draftPeriod === limit.period ? limit.periodEnd : null;
+
+    if (!periodEnd) return null;
+
+    return render(
+      <CommonTrans
+        i18nKey="LimitResets"
+        values={{ date: formatPeriodEnd(periodEnd, language) }}
+      />,
+    );
+  }
 
   const spent = formatWalletCurrency(usage.amountConsumed, 2, currency);
   const date = formatPeriodEnd(usage.periodEnd, language);

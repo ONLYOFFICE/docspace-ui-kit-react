@@ -157,6 +157,7 @@ const LimitSection = ({
                 limit={limit}
                 usage={usage}
                 draftAmount={amount}
+                draftPeriod={period}
                 currency={currency}
                 testId={`${testId}_status`}
               />

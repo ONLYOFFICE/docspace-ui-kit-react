@@ -63,6 +63,7 @@ const normalizeLimit = (raw: Record<string, unknown>): TServiceLimit => ({
   quantityValue: toNullableNumber(raw.quantityValue),
   serviceUnit: toNullableString(raw.serviceUnit),
   period: normalizePeriod(raw.period),
+  periodEnd: toNullableString(raw.periodEnd),
   usageFrom: toNullableString(raw.usageFrom),
   enabled: Boolean(raw.enabled),
   created: String(raw.created ?? ""),

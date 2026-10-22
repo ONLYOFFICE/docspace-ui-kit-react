@@ -20,6 +20,7 @@ export type TServiceLimit = {
   quantityValue: number | null;
   serviceUnit: string | null;
   period: TServiceLimitPeriod;
+  periodEnd: string | null;
   usageFrom: string | null;
   enabled: boolean;
   created: string;
