@@ -56,7 +56,7 @@ vi.mock("../../components/toast", () => ({
 const DUE_TODAY = 15;
 const t = (key: string) => key;
 
-const createStore = async (balance: number) => {
+const createStore = async (balance: number, dueToday = DUE_TODAY) => {
   server.balance = balance;
 
   const store = new PaymentStore(
@@ -68,7 +68,7 @@ const createStore = async (balance: number) => {
   );
 
   await store.fetchBalance();
-  store.setTariffDueTodayAmount(DUE_TODAY);
+  store.setTariffDueTodayAmount(dueToday);
   server.getCustomerBalance.mockClear();
 
   return store;
@@ -163,5 +163,39 @@ describe("PaymentStore.executeWalletUpdate", () => {
 
     expect(server.topUpDeposit).not.toHaveBeenCalled();
     expect(server.updateWalletPayment).toHaveBeenCalledTimes(1);
+  });
+
+  describe("with a fractional amount due today", () => {
+    const tWithValues = (key: string, params?: Record<string, unknown>) =>
+      params?.amount ? `${key}: ${params.amount}` : key;
+
+    it("upgrades without a top-up when the balance covers the exact amount", async () => {
+      const store = await createStore(10.5, 10.2);
+
+      expect(store.getConfirmButtonLabel(tWithValues)).toBe(
+        "PayAndUpgrade: $10.20",
+      );
+      expect(await upgrade(store)).toBe(true);
+
+      expect(server.topUpDeposit).not.toHaveBeenCalled();
+      expect(server.updateWalletPayment).toHaveBeenCalledTimes(1);
+    });
+
+    it("rounds only the top-up up to a whole unit", async () => {
+      const store = await createStore(10, 10.2);
+
+      expect(store.getConfirmButtonLabel(tWithValues)).toBe("TopUpAndUpgrade");
+      expect(await upgrade(store)).toBe(true);
+
+      expect(depositedAmounts()).toEqual([1]);
+    });
+
+    it("formats whole amounts without and fractional amounts with cents", async () => {
+      const store = await createStore(0);
+
+      expect(store.formatDueTodayAmount(15)).toBe("$15");
+      expect(store.formatDueTodayAmount(10.2)).toBe("$10.20");
+      expect(store.formatDueTodayAmount(14.74)).toBe("$14.74");
+    });
   });
 });

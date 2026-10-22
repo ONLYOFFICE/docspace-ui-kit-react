@@ -790,6 +790,9 @@ class PaymentStore {
     );
   };
 
+  formatDueTodayAmount = (amount: number) =>
+    this.formatPaymentCurrency(amount, Number.isInteger(amount) ? 0 : 2);
+
   formatFuturePaymentCurrency = (item?: number, fractionDigits: number = 0) => {
     const amount = item ?? this.walletBalance;
     const { isoCurrencySymbol } = this.paymentQuotas.futurePlanCost;
@@ -1674,7 +1677,7 @@ class PaymentStore {
           ? t("TopUpWallet")
           : t("TopUpAndUpgrade");
       return t("PayAndUpgrade", {
-        amount: this.formatPaymentCurrency(dueTodayAmount),
+        amount: this.formatDueTodayAmount(dueTodayAmount),
       });
     }
 
