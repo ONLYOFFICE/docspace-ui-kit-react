@@ -1588,6 +1588,8 @@ class PaymentStore {
   ) => {
     this.setIsLoading(true);
 
+    let isUpdated = false;
+
     try {
       const dueTodayAmount = this.tariffDueTodayAmount ?? this.totalPrice;
       const isBalanceInsufficient = this.walletBalance < dueTodayAmount;
@@ -1622,6 +1624,8 @@ class PaymentStore {
         return false;
       }
 
+      isUpdated = true;
+
       if (type === ProductQuantityType.Add) {
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({
@@ -1646,6 +1650,7 @@ class PaymentStore {
       toastr.error(t("ErrorNotification"));
       return false;
     } finally {
+      if (!isUpdated) await this.fetchBalance(true).catch(() => undefined);
       this.setIsLoading(false);
     }
   };
