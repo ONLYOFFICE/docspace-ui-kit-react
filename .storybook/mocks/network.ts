@@ -26,8 +26,10 @@ const unhandled = http.all(`${DEMO_PORTAL_URL}/*`, ({ request }) => {
 
 type DemoNetwork = NetworkApi<InterceptorSource[]>;
 
+// `network` is null when the interceptor failed to start: the failure is
+// remembered so later stories neither retry it nor report it again.
 const state = globalThis as {
-  __demoPortal?: { network: DemoNetwork };
+  __demoPortal?: { network: DemoNetwork | null };
 };
 
 const unregisterLegacyWorker = async () => {
@@ -181,22 +183,35 @@ export const startDemoPortal = async (extra: AnyHandler[] = []) => {
   const all = [...extra, ...handlers, unhandled];
 
   if (state.__demoPortal) {
-    state.__demoPortal.network.resetHandlers(...all);
+    state.__demoPortal.network?.resetHandlers(...all);
     return;
   }
 
-  const network = defineNetwork({
-    sources: [
-      new InterceptorSource({
-        interceptors: [new FetchInterceptor(), new XMLHttpRequestInterceptor()],
-      }),
-    ],
-    handlers: all,
-    context: { quiet: true },
-    onUnhandledFrame: "bypass",
-  });
+  let network: DemoNetwork;
+  try {
+    network = defineNetwork({
+      sources: [
+        new InterceptorSource({
+          interceptors: [
+            new FetchInterceptor(),
+            new XMLHttpRequestInterceptor(),
+          ],
+        }),
+      ],
+      handlers: all,
+      context: { quiet: true },
+      onUnhandledFrame: "bypass",
+    });
 
-  network.enable();
+    network.enable();
+  } catch (error) {
+    // Without the interceptor the stories still render, into the "failed"
+    // state of whatever they gate on; say why once instead of on every story.
+    console.error("[demo portal] the request interceptor did not start", error);
+    state.__demoPortal = { network: null };
+    return;
+  }
+
   throttleDemoUploads();
   state.__demoPortal = { network };
 
