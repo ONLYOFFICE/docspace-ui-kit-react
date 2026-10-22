@@ -131,7 +131,7 @@ const UpdatePlanButtonContainer = ({
 
   const getPayTariffLabel = () => {
     if (isDelayedPaymentTopUp) return t("TopUpWallet");
-    if (!isCardLinkedToPortal || isBalanceInsufficient)
+    if (isCardMissingOrInactive || isBalanceInsufficient)
       return t("TopUpAndUpgrade");
     return t("UpgradeNow");
   };
@@ -152,9 +152,9 @@ const UpdatePlanButtonContainer = ({
       }
 
       if (canPayTariff) {
-        isCardLinkedToPortal
-          ? executeWalletUpdate(managersCount, ProductQuantityType.Add, t)
-          : openTopUpDialog();
+        isCardMissingOrInactive
+          ? openTopUpDialog()
+          : executeWalletUpdate(managersCount, ProductQuantityType.Add, t);
         return;
       }
 

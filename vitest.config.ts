@@ -39,6 +39,7 @@ export default defineConfig({
       "components/**/*.test.{ts,tsx}",
       "selectors/**/*.test.{ts,tsx}",
       "ai-agent/**/*.test.{ts,tsx}",
+      "billing/**/*.test.{ts,tsx}",
       "errors/**/*.test.{ts,tsx}",
       "ui/**/*.test.{ts,tsx}",
       "utils/**/*.test.{ts,tsx}",
