@@ -9,7 +9,6 @@ import type { TServiceLimit, TServiceLimitUsage } from "../common/types";
 import {
   formatPeriodEnd,
   getLimitUsagePercent,
-  getPeriodEnd,
   isLimitApproaching,
   isLimitReached,
 } from "../common/utils";
@@ -32,7 +31,7 @@ const highlight = (className: string) => ({
  * keys by scanning for them, and a key built at runtime would be dropped.
  * A lifetime limit never resets, so its usage has no period end and its
  * texts have no date. A limit read without its spending, such as the one for
- * every user, still says when it resets, since the periods are calendar-aligned.
+ * every user, has no period end to show either.
  */
 const LimitStatus = ({
   limit,
@@ -49,18 +48,7 @@ const LimitStatus = ({
     </Text>
   );
 
-  if (!usage) {
-    const periodEnd = limit?.enabled ? getPeriodEnd(limit.period) : null;
-
-    if (!periodEnd) return null;
-
-    return render(
-      <CommonTrans
-        i18nKey="LimitResets"
-        values={{ date: formatPeriodEnd(periodEnd, language) }}
-      />,
-    );
-  }
+  if (!usage) return null;
 
   const spent = formatWalletCurrency(usage.amountConsumed, 2, currency);
   const date = formatPeriodEnd(usage.periodEnd, language);
