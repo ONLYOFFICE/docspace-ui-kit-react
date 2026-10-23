@@ -196,9 +196,20 @@ const TRANSPARENT =
       ` [class*="_${name}_"] { border: none !important; padding: 0 !important; }`,
   ).join("");
 
+/**
+ * Parks the cursor outside the viewport. A page keeps its mouse position
+ * across navigations, and Chromium gives `:hover` to whatever the next
+ * document lays out under it: after a recipe's click or hover on a trigger,
+ * the component photographed next in the same page was in its hover state
+ * -- a tile with its hover background -- and which one that was depended on
+ * the worker the job landed in, so the pictures changed from run to run.
+ */
+const parkMouse = (page) => page.mouse.move(-1, -1);
+
 /** A story in story view, cropped to what it paints. */
 const shootStory = async (page, base, id, recipe, file) => {
   await page.setViewportSize(VIEWPORT);
+  await parkMouse(page);
   await page.goto(
     `${base}/iframe.html?id=${id}&viewMode=story&globals=canvas:transparent`,
     { waitUntil: "networkidle" },
@@ -343,6 +354,7 @@ const shootStory = async (page, base, id, recipe, file) => {
 /** A Docs page, ready: its content rendered and settled. */
 const openDocs = async (page, base, docsId) => {
   await page.setViewportSize(DOCS_VIEWPORT);
+  await parkMouse(page);
   // Not `networkidle`: a page with the AI chat on it polls, and the network
   // never goes quiet. Rendered content is the signal.
   await page.goto(
