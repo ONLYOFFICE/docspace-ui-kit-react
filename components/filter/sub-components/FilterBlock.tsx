@@ -11,7 +11,15 @@ import { ModalDialog, ModalDialogType } from "../../modal-dialog";
 import { IconButton } from "../../icon-button";
 import { useCommonTranslation } from "../../../utils/i18n";
 import styles from "../Filter.module.scss";
-import { FilterBlockProps, TGroupItem, TItem } from "../Filter.types";
+import {
+  CustomItemRenderProps,
+  FilterBlockProps,
+  TCustomItem,
+  TCustomItemValue,
+  TGroupItem,
+  TItem,
+  TRenderCustomItem,
+} from "../Filter.types";
 import {
   removeGroupManagerFilterValueIfNeeded,
   syncGroupManagerCheckBox,
@@ -35,6 +43,7 @@ const FilterBlock = ({
   isContactsGuestsPage,
   disableThirdParty,
   renderSelector,
+  renderCustomItem,
 }: FilterBlockProps) => {
   const t = useCommonTranslation();
   const [showSelector, setShowSelector] = React.useState<{
@@ -46,6 +55,11 @@ const FilterBlock = ({
     type: null,
     group: null,
   });
+
+  const [customPanel, setCustomPanel] = React.useState<{
+    group: FilterGroups;
+    render: TRenderCustomItem;
+  } | null>(null);
 
   const [filterData, setFilterData] = React.useState<TItem[]>([]);
   const [filterValues, setFilterValues] = React.useState<TGroupItem[]>([]);
@@ -358,6 +372,47 @@ const FilterBlock = ({
     setShowSelector((val) => ({ ...val, show: false }));
   }, []);
 
+  const changeCustomValue = React.useCallback(
+    (group: FilterGroups, value: TCustomItemValue | null) => {
+      setFilterValues((values) => {
+        const rest = values.filter((item) => item.group !== group);
+
+        return value
+          ? [...rest, { group, key: value.key, label: value.label }]
+          : rest;
+      });
+    },
+    [],
+  );
+
+  const closeCustomPanel = React.useCallback(() => setCustomPanel(null), []);
+
+  // Rebuilt on every render and handed to the nested step as well, so a step
+  // that stays open reads the pending value as it is now, not as it was.
+  const getCustomItemProps = React.useCallback(
+    (group: FilterGroups): CustomItemRenderProps => {
+      const value = filterValues.find((v) => v.group === group);
+
+      return {
+        group,
+        value:
+          value && !Array.isArray(value.key)
+            ? { key: `${value.key}`, label: value.label }
+            : undefined,
+        onChange: (next) => changeCustomValue(group, next),
+        openPanel: (render) => setCustomPanel({ group, render }),
+        closePanel: closeCustomPanel,
+        closeFilter: hideFilterBlock,
+      };
+    },
+    [filterValues, changeCustomValue, closeCustomPanel, hideFilterBlock],
+  );
+
+  const renderCustom = React.useCallback(
+    (item: TCustomItem) => renderCustomItem?.(getCustomItemProps(item.group)),
+    [renderCustomItem, getCustomItemProps],
+  );
+
   const selectOption = React.useCallback(
     (items: { id?: string | number; label?: string }[]) => {
       setShowSelector((val) => ({
@@ -443,7 +498,7 @@ const FilterBlock = ({
       visible
       onClose={hideFilterBlock}
       withBodyScroll
-      containerVisible={showSelector.show}
+      containerVisible={showSelector.show || !!customPanel}
       data-testid="filter_modal_dialog"
     >
       {showSelector.show && renderSelector ? (
@@ -459,6 +514,14 @@ const FilterBlock = ({
               userId,
               disableThirdParty,
             })}
+          </div>
+        </ModalDialog.Container>
+      ) : null}
+
+      {customPanel ? (
+        <ModalDialog.Container>
+          <div className={styles.filterBlock}>
+            {customPanel.render(getCustomItemProps(customPanel.group))}
           </div>
         </ModalDialog.Container>
       ) : null}
@@ -513,6 +576,7 @@ const FilterBlock = ({
                     changeFilterValue={changeFilterValue}
                     showSelector={changeShowSelector}
                     withMultiItems={item.withMultiItems || false}
+                    renderCustom={renderCustom}
                   />
                 );
               })}
