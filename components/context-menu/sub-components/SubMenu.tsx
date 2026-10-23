@@ -487,6 +487,19 @@ const SubMenu = (props: SubMenuProps) => {
       onClick(e);
     };
 
+    // A middle-click already ran onClick on mousedown, and preventDefault there
+    // does not stop the browser from opening the href in a new tab afterwards -
+    // only cancelling auxclick does. Without this an item handling the new tab
+    // itself opened two, and one with no url opened the current page + "#".
+    // Same rule as onItemClick, so middle- and left-click agree.
+    const onAuxClick = (e: React.MouseEvent) => {
+      if (e.button !== 1) return;
+
+      if (item.disabled || !item.url || (item.onClick && item.preventNewTab)) {
+        e.preventDefault();
+      }
+    };
+
     const onDoubleClick = (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
@@ -601,6 +614,7 @@ const SubMenu = (props: SubMenuProps) => {
         onClick={onClick}
         onDoubleClick={onDoubleClick}
         onMouseDown={onMouseDown}
+        onAuxClick={onAuxClick}
         onMouseEnter={(e) => onItemMouseEnter(e, item)}
         onMouseMove={() => mouseMoveHandler?.(index, model, menuLevel)}
       >
