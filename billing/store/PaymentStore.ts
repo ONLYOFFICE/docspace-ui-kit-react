@@ -835,14 +835,19 @@ class PaymentStore {
     from,
     to,
     participantName,
+    signal,
   }: {
     serviceName?: string;
     from?: DateTime;
     to?: DateTime;
     participantName?: string;
+    signal?: AbortSignal;
   } = {}) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
+    signal?.addEventListener("abort", () => abortController.abort(), {
+      once: true,
+    });
 
     try {
       const { data } = await this.#rawApiClient.instance.get(
