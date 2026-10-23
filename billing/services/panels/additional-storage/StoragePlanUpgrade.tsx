@@ -454,7 +454,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
       }
 
       await resetIntervalSuccess(false);
-      onClose();
+      if (!isUpgradeStoragePlan) onClose();
     } catch (e) {
       console.error("[storage-topup] flow failed", e);
       if (!signal.aborted) {

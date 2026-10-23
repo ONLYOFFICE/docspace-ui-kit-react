@@ -179,6 +179,19 @@ describe("<StoragePlanUpgrade /> Stripe purchase", () => {
     expect(mocks.updateWalletPayment).not.toHaveBeenCalled();
   });
 
+  it("closes the panel once after an upgrade", async () => {
+    createStores(100);
+    mocks.difference = 100;
+
+    const onClose = await buyStorage("200");
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    await new Promise((resolve) => {
+      setTimeout(resolve, 50);
+    });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it("is completed only once the tariff has the selected storage size", async () => {
     const tariff = createStores(0);
     mocks.difference = 100;

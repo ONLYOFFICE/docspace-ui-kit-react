@@ -228,12 +228,15 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
         if (walletServicesToActivate.length > 0) setStepIndex(3);
 
         if (admins) {
-          await paymentApi.updateWalletPayment({
+          const adminsRes = await paymentApi.updateWalletPayment({
             walletQuantityRequestDto: {
               quantity: { adminwallet: Number(admins) },
               productQuantityType: ProductQuantityType.Add,
             },
           });
+
+          if (adminsRes?.data?.response === false)
+            throw new Error(t("UnexpectedError"));
 
           setStepIndex(3);
         }
@@ -256,7 +259,7 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
         }
 
         if (isDocsConnect && docsConnectAddUsers > 0) {
-          await paymentApi.updateWalletPayment({
+          const docsConnectRes = await paymentApi.updateWalletPayment({
             walletQuantityRequestDto: {
               quantity: {
                 [withDevPack
@@ -266,6 +269,9 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
               productQuantityType: ProductQuantityType.Add,
             },
           });
+
+          if (docsConnectRes?.data?.response === false)
+            throw new Error(t("UnexpectedError"));
 
           setStepIndex(3);
         }

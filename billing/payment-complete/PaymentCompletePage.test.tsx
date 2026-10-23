@@ -135,6 +135,48 @@ describe("<PaymentCompletePage /> storage purchase", () => {
   });
 });
 
+describe("<PaymentCompletePage /> refused purchases", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    mocks.getCustomerInfo.mockResolvedValue({
+      data: {
+        response: {
+          paymentMethodStatus: PaymentMethodStatus.Set,
+          isDelayedPaymentMethod: false,
+        },
+      },
+    });
+    mocks.topUpDeposit.mockResolvedValue({ data: { response: true } });
+    mocks.updateWalletPayment.mockResolvedValue({ data: { response: false } });
+  });
+
+  it("shows the activation error when the admins purchase is refused", async () => {
+    openCallback(
+      "/billing/payment-complete?currency=USD&amount=80&type=wallet&language=en&admins=4&plan=Business",
+    );
+
+    await waitFor(() =>
+      expect(screen.getByTestId("error")).toBeInTheDocument(),
+    );
+    expect(mocks.updateWalletPayment).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId("success")).not.toBeInTheDocument();
+  });
+
+  it("shows the activation error when the Docs Connect purchase is refused", async () => {
+    openCallback(
+      "/billing/payment-complete?currency=USD&amount=11&type=wallet&language=en&service=docs-connect&users=1&add=1&price=8",
+    );
+
+    await waitFor(() =>
+      expect(screen.getByTestId("error")).toBeInTheDocument(),
+    );
+    expect(mocks.updateWalletPayment).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId("success")).not.toBeInTheDocument();
+  });
+});
+
 describe("getFlavorContent redirects", () => {
   const t = (key: string) => key;
   const params = { plan: "", service: "", storage: "" };
