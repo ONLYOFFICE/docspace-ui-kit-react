@@ -18,6 +18,7 @@ export const WALLET_REDIRECT_URL = "/billing/wallet";
 export const BILLING_OVERVIEW_REDIRECT_URL = "/billing/overview";
 export const TARIFF_REDIRECT_URL = "/billing/tariff-plan";
 export const BACKUP_REDIRECT_URL = "/billing/addons/backup";
+export const DOCS_CONNECT_REDIRECT_URL = "/billing/addons/docs-connect";
 
 export enum PaymentFlavor {
   Tariff = "tariff",
@@ -38,8 +39,8 @@ export type TFlavorContent = {
   /** set only when the flavor needs texts different from the wallet ones */
   errorTitle?: string;
   errorHint?: string;
-  errorButtonLabel?: string;
   redirectUrl: string;
+  errorRedirectUrl?: string;
 };
 
 // AI search isn't part of the SDK's TenantWalletService enum yet; the backend
@@ -165,8 +166,8 @@ export const getFlavorContent = (
         successButtonLabel: t("Common:DocsConnectCallbackGoTo"),
         errorTitle: t("Common:DocsConnectCallbackErrorTitle"),
         errorHint: t("Common:DocsConnectCallbackErrorHint"),
-        errorButtonLabel: t("Common:DocsConnectCallbackGoTo"),
         redirectUrl: DOCS_CONNECT_ROUTE,
+        errorRedirectUrl: DOCS_CONNECT_REDIRECT_URL,
       };
     case PaymentFlavor.Backup:
       return {

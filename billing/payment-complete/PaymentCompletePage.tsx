@@ -303,6 +303,11 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
     window.location.href = pageContent.redirectUrl;
   };
 
+  const onRetryClick = () => {
+    window.location.href =
+      pageContent.errorRedirectUrl ?? pageContent.redirectUrl;
+  };
+
   const onBackToBillingClick = () => {
     window.location.href = delayedContent.redirectUrl;
   };
@@ -367,16 +372,14 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
               title={t("AddonActivationFailed")}
               hint={t("AddonActivationFailedHint")}
               buttonLabel={t("TryAgainInAddon")}
-              onGoToServiceClick={onGoToBillingClick}
+              onGoToServiceClick={onRetryClick}
             />
           ) : (
             <ErrorCard
               title={pageContent.errorTitle ?? t("WalletTopUpErrorTitle")}
               hint={pageContent.errorHint ?? t("WalletTopUpCallbackErrorHint")}
-              buttonLabel={
-                pageContent.errorButtonLabel ?? t("WalletTopUpErrorRetry")
-              }
-              onGoToServiceClick={onGoToBillingClick}
+              buttonLabel={t("WalletTopUpErrorRetry")}
+              onGoToServiceClick={onRetryClick}
             />
           )
         ) : null}

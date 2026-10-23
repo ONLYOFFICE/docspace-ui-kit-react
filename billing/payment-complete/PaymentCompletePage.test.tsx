@@ -6,6 +6,13 @@ import {
 } from "@onlyoffice/docspace-api-sdk";
 
 import PaymentCompletePage from "./PaymentCompletePage";
+import {
+  BACKUP_REDIRECT_URL,
+  DOCS_CONNECT_REDIRECT_URL,
+  PaymentFlavor,
+  getFlavorContent,
+} from "./PaymentCompletePage.utils";
+import { DOCS_CONNECT_ROUTE } from "../constants";
 
 const mocks = vi.hoisted(() => ({
   getCustomerInfo: vi.fn(),
@@ -125,5 +132,24 @@ describe("<PaymentCompletePage /> storage purchase", () => {
     );
     expect(mocks.topUpDeposit).toHaveBeenCalledTimes(1);
     expect(mocks.updateWalletPayment).not.toHaveBeenCalled();
+  });
+});
+
+describe("getFlavorContent redirects", () => {
+  const t = (key: string) => key;
+  const params = { plan: "", service: "", storage: "" };
+
+  it("sends a failed Docs Connect purchase to the billing add-on page", () => {
+    const content = getFlavorContent(t, PaymentFlavor.DocsConnect, params);
+
+    expect(content.redirectUrl).toBe(DOCS_CONNECT_ROUTE);
+    expect(content.errorRedirectUrl).toBe(DOCS_CONNECT_REDIRECT_URL);
+  });
+
+  it("keeps one address for the other flavors", () => {
+    const content = getFlavorContent(t, PaymentFlavor.Backup, params);
+
+    expect(content.redirectUrl).toBe(BACKUP_REDIRECT_URL);
+    expect(content.errorRedirectUrl).toBeUndefined();
   });
 });
