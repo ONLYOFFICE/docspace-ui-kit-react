@@ -318,6 +318,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
             return;
           }
 
+          fetchBalance();
+          fetchTransactionHistory(storageServiceName ?? DISK_STORAGE);
           onClose();
           return;
         }

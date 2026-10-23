@@ -114,7 +114,7 @@ const createStores = (currentStoragePlanSize: number) => {
   return tariff;
 };
 
-const buyThroughStripe = async (newSize: string) => {
+const buyStorage = async (newSize: string) => {
   const onClose = vi.fn();
   render(
     <StoragePlanUpgrade visible onClose={onClose} previousValue={newSize} />,
@@ -154,7 +154,7 @@ describe("<StoragePlanUpgrade /> Stripe purchase", () => {
     createStores(0);
     mocks.difference = 100;
 
-    const onClose = await buyThroughStripe("100");
+    const onClose = await buyStorage("100");
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(successParams()).toMatchObject({
@@ -169,7 +169,7 @@ describe("<StoragePlanUpgrade /> Stripe purchase", () => {
     createStores(100);
     mocks.difference = 100;
 
-    const onClose = await buyThroughStripe("200");
+    const onClose = await buyStorage("200");
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(successParams()).toMatchObject({
@@ -183,7 +183,7 @@ describe("<StoragePlanUpgrade /> Stripe purchase", () => {
     const tariff = createStores(0);
     mocks.difference = 100;
 
-    await buyThroughStripe("100");
+    await buyStorage("100");
     await waitFor(() =>
       expect(mocks.waitForTopUpCompletion).toHaveBeenCalled(),
     );
@@ -205,10 +205,36 @@ describe("<StoragePlanUpgrade /> Stripe purchase", () => {
       new Error("Polling timeout"),
     );
 
-    const onClose = await buyThroughStripe("200");
+    const onClose = await buyStorage("200");
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(mocks.toastError).toHaveBeenCalledTimes(1);
     expect(mocks.updateWalletPayment).not.toHaveBeenCalled();
+  });
+});
+
+describe("<StoragePlanUpgrade /> purchase with a linked card", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    window.history.pushState({}, "", "/billing/addons/disk-storage");
+
+    mocks.isUpgrade = true;
+    mocks.difference = 100;
+    mocks.topUpDeposit.mockResolvedValue({ data: { response: true } });
+    mocks.updateWalletPayment.mockResolvedValue({ data: { response: true } });
+  });
+
+  it("refreshes the balance and the history after the first purchase", async () => {
+    createStores(0);
+    mocks.paymentStore.isStripeCheckoutRequired = false;
+
+    const onClose = await buyStorage("100");
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(mocks.updateWalletPayment).toHaveBeenCalledTimes(1);
+    expect(mocks.paymentStore.fetchBalance).toHaveBeenCalled();
+    expect(mocks.paymentStore.fetchTransactionHistory).toHaveBeenCalledWith(
+      "disk-storage",
+    );
   });
 });
