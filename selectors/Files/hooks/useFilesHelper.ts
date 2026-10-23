@@ -34,7 +34,7 @@ import {
   buildScopedFolderUrl,
 } from "../../utils";
 
-import { getFilterParams } from "../FilesSelector.utils";
+import { getFilterParams, toSelectorFile } from "../FilesSelector.utils";
 
 const useFilesHelper = ({
   setHasNextPage,
@@ -86,6 +86,7 @@ const useFilesHelper = ({
   withFavoritesTreeFolder,
   activeSpecialScope,
   formsSection,
+  onFilesLoaded,
 }: UseFilesHelpersProps) => {
   const t = useCommonTranslation();
   const {
@@ -116,6 +117,13 @@ const useFilesHelper = ({
   const privateRoomCacheRef = React.useRef<Map<number | string, boolean>>(
     new Map(),
   );
+  // Read through a ref so a new callback does not rebuild getFileList, whose
+  // identity the selector watches to reload the folder.
+  const onFilesLoadedRef = React.useRef(onFilesLoaded);
+
+  React.useEffect(() => {
+    onFilesLoadedRef.current = onFilesLoaded;
+  }, [onFilesLoaded]);
 
   React.useEffect(() => {
     disabledItemsRef.current = disabledItems;
@@ -460,6 +468,14 @@ const useFilesHelper = ({
             return [...itemList];
           });
         }
+        onFilesLoadedRef.current?.(
+          ((files ?? []) as FileDtoInteger[]).map(toSelectorFile),
+          {
+            folderId: current!.id!,
+            roomId: roomPart?.id,
+            isInsidePrivateRoom,
+          },
+        );
         setIsRoot(false);
         setIsInit(false);
         setIsNextPageLoading(false);
