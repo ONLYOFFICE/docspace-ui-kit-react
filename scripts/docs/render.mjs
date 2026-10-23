@@ -81,10 +81,10 @@ const PROPS_HEADER = ["Prop", "Type", "Required", "Default", "Description"];
 /**
  * Reshapes the five-column Props tables the READMEs carry into the three
  * columns docspace-sdk-js publishes -- `Property | Type | Description` -- so
- * the site's <APITable> has room for the description. `Required` becomes the
- * optional marker after the code span (`` `label`? ``, outside the span so the
- * row id carries no `?`), and `Default` closes the description as
- * `Default: \`x\`.`, both as the SDK writes them.
+ * the site's <APITable> has room for the description. `Required` opens the
+ * description as `**Required.**`, the sentence the SDK's JSDoc writes by hand;
+ * there is no optional marker, so the row id carries no `?`. `Default` closes
+ * the description as `Default: \`x\`.`, as the SDK writes it.
  */
 export const reshapePropsTables = (text) => {
   const lines = splitLines(text).map(({ text: line }) => line);
@@ -104,12 +104,15 @@ export const reshapePropsTables = (text) => {
       const cells = cellsOf(lines[row]);
       if (cells.length !== 5) continue;
       const [name, type, required, fallback, description] = cells;
-      const optional = required === "no" ? "?" : "";
+      const withRequired =
+        required === "no"
+          ? description
+          : `**Required.** ${description.trimStart()}`.trimEnd();
       const withDefault =
         fallback === "" || fallback === "–" || fallback === "-"
-          ? description
-          : `${description.replace(/\s+$/, "")}${/[.!?]$/.test(description) ? "" : "."} Default: ${fallback}.`;
-      lines[row] = `| ${name}${optional} | ${type} | ${withDefault} |`;
+          ? withRequired
+          : `${withRequired.replace(/\s+$/, "")}${/[.!?]$/.test(withRequired) ? "" : "."} Default: ${fallback}.`;
+      lines[row] = `| ${name} | ${type} | ${withDefault} |`;
     }
   }
 
@@ -281,8 +284,8 @@ const storybookLine = (title) => {
 
 /**
  * Storybook's args table as the three-column Props table the README pages
- * carry: the optional marker outside the code span, the default closing the
- * description.
+ * carry: `**Required.**` opening the description, the default closing it, and
+ * no optional marker.
  */
 const controlsTable = (rows) =>
   rows.length === 0
@@ -295,14 +298,14 @@ const controlsTable = (rows) =>
           const text = escapeForMdx(row.description ?? "");
           const sentence = text && !/[.!?]$/.test(text) ? `${text}.` : text;
           const description = [
+            row.required ? "**Required.**" : "",
             sentence,
             row.default ? `Default: \`${row.default}\`.` : "",
           ]
             .filter(Boolean)
             .join(" ");
           const type = row.type ? `\`${cell(row.type)}\`` : "";
-          const name = `\`${row.name}\`${row.required ? "" : "?"}`;
-          return `| ${name} | ${type} | ${cell(description)} |`;
+          return `| \`${row.name}\` | ${type} | ${cell(description)} |`;
         }),
       ].join("\n");
 

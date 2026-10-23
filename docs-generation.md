@@ -181,9 +181,11 @@ every story and docs entry, so nothing is guessed; the export-to-id rule (`WithI
    link at `DOCS_REVISION`; a link to a file that does not exist is a `[warn]`. Prose is escaped
    for MDX: `{`/`}`, a `<` that would open a JSX element, autolinks, void tags; code blocks and
    inline code are never touched. Each Props table is reshaped into the SDK's three columns,
-   `Property | Type | Description`: `Required` becomes the optional marker after the code span
-   (`` `label`? ``, outside the span so the row id has no `?`) and `Default` closes the
-   description as ``Default: `x`.``. Five columns do not fit the site's `<APITable>`, which the
+   `Property | Type | Description`: `Required` opens the description as `**Required.**`, the
+   sentence the SDK's JSDoc writes by hand, and `Default` closes it as ``Default: `x`.``. There
+   is no optional `?` marker, the SDK dropped its own, so a row id is the plain name. The args
+   table of an `autodocs` page or a `<Controls />` block is written the same way. Five columns
+   do not fit the site's `<APITable>`, which the
    tables are then wrapped in; as in the SDK, they get a `name` only when their row ids collide.
    The primary picture goes under the intro. A Stories section, listing each story's name,
    description (`docs.description.story`) and picture, is placed before the Minimal example
