@@ -5,9 +5,6 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        // `react-svg` uses `@tanem/svg-injector`, which schedules timers that
-        // can fire after the test environment is torn down. Mock it to avoid
-        // the resulting "SVGSVGElement is not defined" unhandled errors.
         find: /^react-svg$/,
         replacement: path.resolve(
           __dirname,
@@ -45,9 +42,8 @@ export default defineConfig({
       "context/**/*.test.{ts,tsx}",
       "providers/**/*.test.{ts,tsx}",
       "hooks/**/*.test.{ts,tsx}",
+      "billing/**/*.test.{ts,tsx}",
       "scripts/**/*.test.{ts,mjs}",
-      // The legal-practice samples carry real logic -- PKCE, role mapping --
-      // that readers copy into applications, so it is tested like the kit.
       "docs/**/*.test.{ts,tsx}",
     ],
     css: {

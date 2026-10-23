@@ -180,6 +180,7 @@ class PaymentStore {
     diskStorage: "",
     docsConnect: "",
     wallet: "",
+    paymentMethod: "",
   };
 
   licenseQuota: Record<string, unknown> | null = null;

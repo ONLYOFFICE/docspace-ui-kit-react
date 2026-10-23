@@ -42,6 +42,7 @@ type AiPageProps = {
   withBottomMargin?: boolean;
   onViewMore?: () => void;
   onOpenSupportedModels?: () => void;
+  onOpenLimits?: () => void;
 };
 
 const AiPage = (props: AiPageProps) => {
@@ -52,6 +53,7 @@ const AiPage = (props: AiPageProps) => {
     withBottomMargin,
     onViewMore,
     onOpenSupportedModels,
+    onOpenLimits,
   } = props;
 
   const { paymentApi } = useApi();
@@ -143,11 +145,6 @@ const AiPage = (props: AiPageProps) => {
   };
 
   const onOpenTopUp = () => {
-    // if (!isAiToolsServiceOn && !simpleTopUp) {
-    //   setIsTopUpConfirmVisible(true);
-    //   return;
-    // }
-
     setIsTopUpVisible(true);
   };
 
@@ -288,6 +285,17 @@ const AiPage = (props: AiPageProps) => {
           dataTestId="ai_see_pricing_link"
         >
           {t("SeePricing")}
+        </Link>
+        <span className={styles.linkSeparator} aria-hidden="true" />
+        <Link
+          fontSize="13px"
+          fontWeight={600}
+          color="accent"
+          textDecoration="underline dotted"
+          onClick={onOpenLimits}
+          dataTestId="ai_set_limit_link"
+        >
+          {t("SetSpendingLimit")}
         </Link>
       </Text>
 
