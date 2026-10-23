@@ -25,6 +25,7 @@
 - AI chat: the copy buttons (message, code block, tool card) work on a portal served over plain HTTP. The platform adapter now supplies `copyToClipboard`, which falls back to `copy-to-clipboard` where the Clipboard API is unavailable outside a secure context (Bug 84481)
 - Files and images share one 5-attachment cap on a message, including the Forms section's single slot (Bug 84379)
 - The E2E Docker image copies the vendored ai-chat tarball before `pnpm install`
+- Context menu (desktop and mobile sheet) and `DropDownItem`: a string icon is fetched and inlined through `react-svg` only when it is a `.svg` on the page's own origin or, where it already was, an SVG data URL. Anything else, a cross-origin `.svg` included, is an `<img>`, so a custom action whose icon lives on the integrator's domain no longer needs CORS headers there and no longer loses its icon. The old rule looked for `images/` or `.svg` in the path and inlined such icons from any origin; a cross-origin SVG now keeps its own colours instead of taking the text colour
 
 ## 4.0.1
 

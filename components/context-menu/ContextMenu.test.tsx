@@ -100,6 +100,34 @@ describe("<ContextMenu />", () => {
     expect(onClick).toHaveBeenCalled();
   });
 
+  it("inlines only an icon the page may fetch itself", () => {
+    const ref = React.createRef<ContextMenuRefType>();
+    const ownSvg = "/static/images/icons/16/trash.react.svg";
+    const foreignSvg = "https://cdn.example.com/icon.svg";
+
+    render(
+      <ContextMenu
+        ref={ref}
+        model={[
+          { key: "own", label: "Own icon", icon: ownSvg },
+          { key: "foreign", label: "Foreign icon", icon: foreignSvg },
+        ]}
+        withHotkeys={false}
+      />,
+    );
+
+    showAt(ref, 100);
+
+    expect(screen.getByTestId("mocked-react-svg")).toHaveAttribute(
+      "data-src",
+      ownSvg,
+    );
+    expect(screen.getByAltText("plugin icon")).toHaveAttribute(
+      "src",
+      foreignSvg,
+    );
+  });
+
   it("keeps the menu inside the layout viewport when opened near its edge", () => {
     // jsdom does not lay out, so the measured item width comes from the mock
     Element.prototype.getBoundingClientRect = () =>
