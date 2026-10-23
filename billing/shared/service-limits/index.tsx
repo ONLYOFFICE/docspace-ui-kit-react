@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react";
+import { useNavigate } from "react-router";
 
 import { Link, LinkTarget } from "../../../components/link";
 import { Text } from "../../../components/text";
@@ -20,6 +21,7 @@ type ServiceLimitsProps = {
 
 const ServiceLimits = ({ helpUrl, onOpenContacts }: ServiceLimitsProps) => {
   const t = useCommonTranslation();
+  const navigate = useNavigate();
   const {
     isInit,
     fetchAll,
@@ -32,11 +34,17 @@ const ServiceLimits = ({ helpUrl, onOpenContacts }: ServiceLimitsProps) => {
     saveUserLimit,
     setUserLimitEnabled,
   } = useServiceLimitStore();
-  const { balance, fetchBalance } = usePaymentStore();
+  const { balance, fetchBalance, routes, tariff } = usePaymentStore();
+  const { walletCustomerEmail, fetchCustomerInfo } = tariff;
+
+  const [isCustomerChecked, setIsCustomerChecked] = useState(false);
 
   useEffect(() => {
     const loadLimits = async () => {
-      const requests = [fetchAll()];
+      const requests: Promise<unknown>[] = [
+        fetchAll(),
+        fetchCustomerInfo().finally(() => setIsCustomerChecked(true)),
+      ];
 
       if (!balance) requests.push(fetchBalance());
 
@@ -50,7 +58,12 @@ const ServiceLimits = ({ helpUrl, onOpenContacts }: ServiceLimitsProps) => {
     loadLimits();
   }, [fetchAll]);
 
-  if (!isInit || !balance) return <ServiceLimitsLoader />;
+  const hasCustomer = !!walletCustomerEmail;
+
+  if (!isInit || !isCustomerChecked || (hasCustomer && !balance))
+    return <ServiceLimitsLoader />;
+
+  const paymentMethodRoute = routes.paymentMethod;
 
   const contactsLink = (
     <Link
@@ -84,6 +97,24 @@ const ServiceLimits = ({ helpUrl, onOpenContacts }: ServiceLimitsProps) => {
         ) : null}
       </Text>
 
+      {hasCustomer ? null : (
+        <Text className={styles.notice}>
+          {t("ServiceLimitsNoPaymentMethod")}
+          {paymentMethodRoute ? (
+            <Link
+              className={styles.noticeLink}
+              fontSize="13px"
+              fontWeight={600}
+              color="accent"
+              onClick={() => navigate(paymentMethodRoute)}
+              dataTestId="service_limits_add_payment_method_link"
+            >
+              {t("AddPaymentMethod")}
+            </Link>
+          ) : null}
+        </Text>
+      )}
+
       <LimitSection
         title={t("PortalLimit")}
         description={t("PortalLimitDescription")}
@@ -92,6 +123,7 @@ const ServiceLimits = ({ helpUrl, onOpenContacts }: ServiceLimitsProps) => {
         isSaving={isPortalSaving}
         onSave={savePortalLimit}
         onSetEnabled={setPortalLimitEnabled}
+        isDisabled={!hasCustomer}
         testId="portal_limit"
       />
 
@@ -109,6 +141,7 @@ const ServiceLimits = ({ helpUrl, onOpenContacts }: ServiceLimitsProps) => {
         isSaving={isUserSaving}
         onSave={saveUserLimit}
         onSetEnabled={setUserLimitEnabled}
+        isDisabled={!hasCustomer}
         testId="user_limit"
       />
     </div>

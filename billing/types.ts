@@ -234,6 +234,7 @@ export type TPaymentRoutes = {
   diskStorage: string;
   docsConnect?: string;
   wallet?: string;
+  paymentMethod?: string;
 };
 
 export type TPaymentConfig = {

@@ -29,6 +29,7 @@ type LimitSectionProps = {
   isSaving: boolean;
   onSave: (amount: number, period: TServiceLimitPeriod) => Promise<void>;
   onSetEnabled: (enabled: boolean) => Promise<void>;
+  isDisabled?: boolean;
   testId: string;
 };
 
@@ -41,6 +42,7 @@ const LimitSection = ({
   isSaving,
   onSave,
   onSetEnabled,
+  isDisabled = false,
   testId,
 }: LimitSectionProps) => {
   const t = useCommonTranslation();
@@ -49,8 +51,10 @@ const LimitSection = ({
     language,
     walletCodeCurrency,
     formatWalletCurrency,
-    isServiceActionDisabled: isDisabled,
+    isServiceActionDisabled,
   } = usePaymentStore();
+
+  const isActionDisabled = isDisabled || isServiceActionDisabled;
 
   const currency = limit?.currency ?? walletCodeCurrency;
 
@@ -72,13 +76,13 @@ const LimitSection = ({
     limit,
     currency,
     isSaving,
-    isDisabled,
+    isDisabled: isActionDisabled,
     formatCurrency: formatWalletCurrency,
     t,
   });
 
   const isFormVisible = isEnabled || isDraft;
-  const isLocked = isDisabled || isSaving;
+  const isLocked = isActionDisabled || isSaving;
 
   const onToggle = async () => {
     if (!isEnabled) {
