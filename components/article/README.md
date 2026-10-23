@@ -24,7 +24,7 @@ the developer tools, the signed-in person — which is why it takes some thirty 
 
 ## Use this when / not when
 
-- **This is portal-internal.** It is the DocSpace client's own sidebar, down to the Zendesk widget,
+- **This is portal-internal.** It is the ONLYOFFICE Apps client's own sidebar, down to the Zendesk widget,
   the `/developer-tools` path and the "download the apps" block. Outside that product most of its
   props have no source.
 - Use it when you are rebuilding that layout and can supply a portal-shaped set of props.

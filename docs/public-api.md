@@ -265,7 +265,7 @@ document said they were, and they were declared for a while: the LLM vendor SDKs
 assistant-ui packages, codemirror, radix and the rest. They were removed again, because nothing
 in this package imports them and pnpm installs neither peers nor optional peers — so declaring
 them satisfied nothing and only duplicated a list nobody kept in sync. `ai-chat` declares its
-own peers; supplying them is the consuming app's job, and the DocSpace client carries the list
+own peers; supplying them is the consuming app's job, and the ONLYOFFICE Apps client carries the list
 in its `pnpm-workspace.yaml` catalog for the apps that render the AI agent.
 
 ### The 15 packages nobody imported — resolved

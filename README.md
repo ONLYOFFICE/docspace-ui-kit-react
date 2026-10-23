@@ -952,7 +952,7 @@ everything works out of the box.
 
 > `css/fonts.css` and `fonts/` are vendored here too, for the same reason: Storybook
 > imports the stylesheet, so a fresh clone has to have it. `pnpm sync-locales` (with
-> `DOCSPACE_CLIENT_ROOT` pointing at a DocSpace client checkout) refreshes them along
+> `DOCSPACE_CLIENT_ROOT` pointing at a checkout of the ONLYOFFICE Apps client) refreshes them along
 > with the non-English locales — run it when the upstream fonts or strings change.
 
 ### Line endings (Windows: one-time migration)
@@ -1052,7 +1052,7 @@ pnpm test:e2e:docker:clear         # drop the image
 differ between macOS and Linux, so a baseline taken on the host fails everywhere else. The
 image carries the same fonts and the same pinned Chromium for everyone.
 
-Both the report layout and the reporters match the DocSpace client's packages: `dot` for the
+Both the report layout and the reporters match the ONLYOFFICE Apps client's packages: `dot` for the
 console, an HTML report and `test-results.json`, all under `playwright-report/`.
 
 ```bash

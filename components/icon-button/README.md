@@ -168,7 +168,7 @@ export function DeleteButton({ onDelete }: { onDelete: () => void }) {
 
 - **`iconName` is a URL.** It goes to `react-svg` as `src`, which fetches it and inlines the
   markup, so an asset name, an import of the SVG as a component, or a build-time alias of the
-  DocSpace client will not work. `iconNode` avoids the request entirely.
+  ONLYOFFICE Apps client will not work. `iconNode` avoids the request entirely.
 - **It renders a `<div>`, not a `<button>`.** There is no implicit role, no tab stop and no
   Enter or Space activation. A button anyone can use from the keyboard needs `tabIndex`,
   `onKeyDown` and a role of your own — the minimal example shows the minimum.
