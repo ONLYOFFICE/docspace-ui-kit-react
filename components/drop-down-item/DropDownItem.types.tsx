@@ -23,8 +23,8 @@ export type DropDownItemProps = {
   // Icon Related Props
   /**
    * Icon at the start of the item. A component or element is rendered as given;
-   * a string is a URL — a path containing `.svg` or `images/` is fetched and
-   * inlined, anything else becomes an `<img>`.
+   * a string is a URL — a same-origin `.svg` or an SVG data URL is fetched and
+   * inlined, anything else, a cross-origin `.svg` included, becomes an `<img>`.
    */
   icon?: string | React.ReactElement | React.ElementType;
   /** Whether the icon should be filled with the current text color. If false, uses original icon colors */

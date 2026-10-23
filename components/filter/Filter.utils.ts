@@ -226,13 +226,15 @@ const convertFilterDataToSelectedItems = (filterData: TItem[]): TItem[] => {
   const newSelectedItems: TItem[] = [];
 
   filterData.forEach((item) => {
-    const groupItems = Array.isArray(item.key)
-      ? (item.key.map((key) => ({
-          key,
-          group: item.group,
-          label: key,
-        })) as TItem[])
-      : [item];
+    const groupItems = item.chips?.length
+      ? item.chips.map((chip) => ({ ...chip, group: item.group }))
+      : Array.isArray(item.key)
+        ? (item.key.map((key) => ({
+            key,
+            group: item.group,
+            label: key,
+          })) as TItem[])
+        : [item];
 
     newSelectedItems.push(...groupItems);
   });

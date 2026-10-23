@@ -19,6 +19,7 @@ import { IconButton } from "../../icon-button";
 import { Badge } from "../../badge";
 import { MCPIcon, MCPIconSize } from "../../mcp-icon";
 import { Tooltip } from "../../tooltip";
+import { isInlinedSvgUrl, isSvgDataUrl } from "../../drop-down-item/iconSource";
 
 import type {
   ContextMenuModel,
@@ -428,16 +429,11 @@ const SubMenu = (props: SubMenuProps) => {
 
       if (!item.icon) return null;
 
-      // Handle data URI SVGs
-      if (item.icon.startsWith("data:image/svg+xml")) {
+      if (isSvgDataUrl(item.icon)) {
         return <ReactSVG className={iconClassName || ""} src={item.icon} />;
       }
 
-      // Handle regular images
-      if (
-        (!item.icon.includes("images/") && !item.icon.includes(".svg")) ||
-        item.icon.includes("webplugins")
-      ) {
+      if (!isInlinedSvgUrl(item.icon)) {
         return (
           <img
             src={item.icon}
@@ -447,7 +443,6 @@ const SubMenu = (props: SubMenuProps) => {
         );
       }
 
-      // Handle SVG URLs
       return (
         <ReactSVG
           wrapper="span"

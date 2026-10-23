@@ -3,9 +3,13 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { act, render, screen, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { DeviceType } from "../../enums";
+import { DeviceType, FilterGroups } from "../../enums";
 import Filter from ".";
-import { TGetSelectedSortData, TSortDataItem } from "./Filter.types";
+import {
+  CustomItemRenderProps,
+  TGetSelectedSortData,
+  TSortDataItem,
+} from "./Filter.types";
 import { TViewAs } from "../../types";
 import {
   ViewSelector,
@@ -120,6 +124,213 @@ describe("Filter Component", () => {
 
       expect(onClearFilter).toHaveBeenCalled();
       expect(setClearSearch).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe("Custom items", () => {
+    const getFilterData = () =>
+      Promise.resolve([
+        {
+          key: FilterGroups.filterOther,
+          group: FilterGroups.filterOther,
+          label: "Metadata",
+          isHeader: true,
+        },
+        {
+          key: "metadata",
+          group: FilterGroups.filterOther,
+          label: "",
+          isCustom: true,
+        },
+      ]);
+
+    const openFilter = async (props = {}) => {
+      await act(async () => {
+        renderComponent({ getFilterData, ...props });
+      });
+      await userEvent.click(screen.getByTestId("filter_icon_button"));
+    };
+
+    it("applies the value the host sets", async () => {
+      const onFilter = vi.fn();
+      const renderCustomItem = ({ onChange }: CustomItemRenderProps) => (
+        <button
+          type="button"
+          onClick={() => onChange({ key: "stage", label: "Stage" })}
+        >
+          Set
+        </button>
+      );
+
+      await openFilter({ onFilter, renderCustomItem });
+      await userEvent.click(await screen.findByText("Set"));
+      await userEvent.click(screen.getByTestId("filter_apply_button"));
+
+      expect(onFilter).toHaveBeenCalledWith([
+        { group: FilterGroups.filterOther, key: "stage", label: "Stage" },
+      ]);
+    });
+
+    it("hands a value in force to renderCustomItem whole", async () => {
+      const selected = [
+        {
+          key: '{"stage":"discovery","court":"supreme"}',
+          group: FilterGroups.filterOther,
+          label: "Case file",
+          chips: [
+            { key: "stage", label: "Stage is Discovery" },
+            { key: "court", label: "Court is Supreme" },
+          ],
+        },
+      ];
+      const renderCustomItem = vi.fn(() => null);
+
+      await openFilter({
+        renderCustomItem,
+        initSelectedFilterData: selected,
+        getSelectedFilterData: () => selected,
+      });
+
+      await vi.waitFor(() =>
+        expect(renderCustomItem).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            value: { key: selected[0].key, label: "Case file" },
+          }),
+        ),
+      );
+    });
+
+    it("drops the value when the host sets null", async () => {
+      const onFilter = vi.fn();
+      const selected = [
+        { key: "stage", group: FilterGroups.filterOther, label: "Stage" },
+      ];
+      const renderCustomItem = ({ onChange }: CustomItemRenderProps) => (
+        <button type="button" onClick={() => onChange(null)}>
+          Clear
+        </button>
+      );
+
+      await openFilter({
+        onFilter,
+        renderCustomItem,
+        initSelectedFilterData: selected,
+        getSelectedFilterData: () => selected,
+      });
+      await userEvent.click(await screen.findByText("Clear"));
+      await userEvent.click(screen.getByTestId("filter_apply_button"));
+
+      expect(onFilter).toHaveBeenCalledWith([]);
+    });
+
+    it("opens and closes the nested step", async () => {
+      const renderCustomItem = ({
+        openPanel,
+        closePanel,
+      }: CustomItemRenderProps) => (
+        <button
+          type="button"
+          onClick={() =>
+            openPanel(() => (
+              <button type="button" onClick={closePanel}>
+                Back
+              </button>
+            ))
+          }
+        >
+          Open
+        </button>
+      );
+
+      await openFilter({ renderCustomItem });
+      await userEvent.click(await screen.findByText("Open"));
+      await userEvent.click(await screen.findByText("Back"));
+
+      expect(screen.queryByText("Back")).not.toBeInTheDocument();
+    });
+
+    it("hands the nested step the value it has just set", async () => {
+      const renderCustomItem = ({ openPanel }: CustomItemRenderProps) => (
+        <button
+          type="button"
+          onClick={() =>
+            openPanel(({ value, onChange }) => (
+              <button
+                type="button"
+                onClick={() => onChange({ key: "stage", label: "Stage" })}
+              >
+                {value?.label ?? "Pick"}
+              </button>
+            ))
+          }
+        >
+          Open
+        </button>
+      );
+
+      await openFilter({ renderCustomItem });
+      await userEvent.click(await screen.findByText("Open"));
+      await userEvent.click(await screen.findByText("Pick"));
+
+      expect(await screen.findByText("Stage")).toBeInTheDocument();
+    });
+
+    it("shows a value as its chips and removes them one by one", async () => {
+      const removeSelectedItem = vi.fn();
+
+      await act(async () => {
+        renderComponent({
+          removeSelectedItem,
+          getSelectedFilterData: () =>
+            Promise.resolve([
+              {
+                key: "state",
+                group: FilterGroups.filterOther,
+                label: "Case file",
+                chips: [
+                  { key: "stage", label: "Stage is Discovery" },
+                  { key: "court", label: "Court is Supreme" },
+                ],
+              },
+            ]),
+        });
+      });
+
+      expect(screen.getByText("Stage is Discovery")).toBeInTheDocument();
+
+      await userEvent.click(screen.getByText("Court is Supreme"));
+
+      expect(removeSelectedItem).toHaveBeenCalledWith({
+        key: "court",
+        group: FilterGroups.filterOther,
+      });
+    });
+
+    it("removes only the chip clicked when another group shares its key", async () => {
+      await act(async () => {
+        renderComponent({
+          getSelectedFilterData: () =>
+            Promise.resolve([
+              {
+                key: "date",
+                group: FilterGroups.filterOther,
+                label: "Modified",
+                chips: [{ key: "from", label: "From 1 Jan" }],
+              },
+              {
+                key: "size",
+                group: FilterGroups.filterType,
+                label: "Size",
+                chips: [{ key: "from", label: "From 10 MB" }],
+              },
+            ]),
+        });
+      });
+
+      await userEvent.click(screen.getByText("From 1 Jan"));
+
+      expect(screen.queryByText("From 1 Jan")).not.toBeInTheDocument();
+      expect(screen.getByText("From 10 MB")).toBeInTheDocument();
     });
   });
 });
