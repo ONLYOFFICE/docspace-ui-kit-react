@@ -24,6 +24,7 @@ import {
 import {
   linkResolver,
   pngWidth,
+  renderAutodocs,
   renderMdx,
   renderReadme,
   reshapePropsTables,
@@ -322,6 +323,7 @@ describe("reshapePropsTables", () => {
     "| `label` | `string` | no | – | Button text |",
     "| `onClick` | `() => void` | **yes** | – | Called on click. |",
     '| `size` | `"a" \\| "b"` | no | `"a"` | The size |',
+    '| `mode` | `string` | **yes** | `"x"` | The mode |',
     "",
     "| Variable | Default | Effect |",
     "| --- | --- | --- |",
@@ -331,11 +333,17 @@ describe("reshapePropsTables", () => {
   it("folds Required and Default into the SDK's three columns", () => {
     const out = reshapePropsTables(readme);
     expect(out).toContain("| Property | Type | Description |");
-    expect(out).toContain("| `label`? | `string` | Button text |");
-    expect(out).toContain("| `onClick` | `() => void` | Called on click. |");
+    expect(out).toContain("| `label` | `string` | Button text |");
     expect(out).toContain(
-      '| `size`? | `"a" \\| "b"` | The size. Default: `"a"`. |',
+      "| `onClick` | `() => void` | **Required.** Called on click. |",
     );
+    expect(out).toContain(
+      '| `size` | `"a" \\| "b"` | The size. Default: `"a"`. |',
+    );
+    expect(out).toContain(
+      '| `mode` | `string` | **Required.** The mode. Default: `"x"`. |',
+    );
+    expect(out).not.toContain("?");
   });
 
   it("leaves other tables and code alone", () => {
@@ -346,10 +354,57 @@ describe("reshapePropsTables", () => {
     expect(out.match(/\| Prop \| Type \| Required/g)).toHaveLength(1);
   });
 
-  it("gives APITable rows ids without the optional marker", () => {
+  it("gives APITable rows plain ids and no table name", () => {
     const { text } = wrapApiTables(reshapePropsTables(readme));
     expect(text).toContain("<APITable>\n\n| Property");
     expect(text).not.toContain('name="');
+  });
+});
+
+describe("renderAutodocs", () => {
+  it("marks required args in the description and writes no marker", () => {
+    const out = renderAutodocs("", {
+      root: process.cwd(),
+      source: "components/table/TableCell.stories.tsx",
+      out: "ui/table/table-cell.md",
+      page: {
+        label: "TableCell",
+        source: "components/table/TableCell.stories.tsx",
+      },
+      pages: { bySource: new Map(), byStoryId: new Map() },
+      pictures: new Map([
+        [
+          "args-table",
+          {
+            rows: [
+              {
+                name: "children",
+                type: "ReactNode",
+                required: true,
+                description: "The cell content",
+              },
+              {
+                name: "hasAccess",
+                type: "boolean",
+                required: false,
+                default: "true",
+                description: "Whether the cell is clickable.",
+              },
+            ],
+          },
+        ],
+      ]),
+      revision: "master",
+      storyId: () => "x",
+      warn: () => {},
+    });
+    expect(out).toContain(
+      "| `children` | `ReactNode` | **Required.** The cell content. |",
+    );
+    expect(out).toContain(
+      "| `hasAccess` | `boolean` | Whether the cell is clickable. Default: `true`. |",
+    );
+    expect(out).not.toContain("`?");
   });
 });
 
