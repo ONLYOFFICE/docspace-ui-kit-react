@@ -10,6 +10,7 @@ import { useTheme } from "../../../context/ThemeContext";
 import { Scrollbar } from "../../scrollbar";
 import { Badge } from "../../badge";
 import { ToggleButton } from "../../toggle-button";
+import { isInlinedSvgUrl } from "../../drop-down-item/iconSource";
 
 import type {
   ContextMenuModel,
@@ -68,10 +69,10 @@ const MenuItem = ({
   const renderIcon = () => {
     if (!item.icon) return null;
 
-    return !item.icon.includes("images/") ? (
-      <img src={item.icon} alt="plugin img" className={iconClassName} />
-    ) : (
+    return isInlinedSvgUrl(item.icon) ? (
       <ReactSVG wrapper="span" className={iconClassName} src={item.icon} />
+    ) : (
+      <img src={item.icon} alt="plugin img" className={iconClassName} />
     );
   };
 
