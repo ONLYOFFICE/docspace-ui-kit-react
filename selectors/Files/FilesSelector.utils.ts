@@ -1,6 +1,10 @@
 import { ApplyFilterOption, FilterType } from "@onlyoffice/docspace-api-sdk";
+import type { FileDtoInteger } from "@onlyoffice/docspace-api-sdk";
 import { FilesSelectorFilterTypes } from "../../enums";
 import { TEMPLATE_GALLERY_FORMATS } from "../../constants";
+import type { TSelectorItem } from "../../components/selector";
+import { getTitleWithoutExtension } from "../../utils/getTitleWithoutExtension";
+import type { TFilesSelectorFile } from "./FilesSelector.types";
 
 export const getFilterParams = (
   filterParam: string | number,
@@ -109,4 +113,47 @@ export const getFilterParams = (
   }
 
   return result;
+};
+
+/** A file of the server's folder listing, as the host callbacks see it. */
+export const toSelectorFile = (file: FileDtoInteger): TFilesSelectorFile => ({
+  id: file.id!,
+  title: file.title ?? "",
+  fileExst: file.fileExst ?? undefined,
+  encrypted: file.encrypted ?? undefined,
+  viewUrl: file.viewUrl ?? undefined,
+});
+
+/**
+ * The rows with the titles `resolveItemTitle` supplies for files. Folders,
+ * rooms and files it leaves undefined keep their own titles.
+ */
+export const applyResolvedTitles = (
+  items: TSelectorItem[],
+  resolveItemTitle?: (file: TFilesSelectorFile) => string | undefined,
+): TSelectorItem[] => {
+  if (!resolveItemTitle) return items;
+
+  return items.map((item) => {
+    if (item.isFolder || item.fileExst === undefined) return item;
+
+    const title = (item as { title?: string }).title ?? item.label;
+    const resolved = resolveItemTitle({
+      id: item.id!,
+      title,
+      fileExst: item.fileExst,
+      encrypted: item.encrypted,
+      viewUrl: item.viewUrl,
+    });
+    if (!resolved || resolved === title) return item;
+
+    return {
+      ...item,
+      title: resolved,
+      label: getTitleWithoutExtension(
+        { title: resolved, fileExst: item.fileExst },
+        false,
+      ),
+    } as TSelectorItem;
+  });
 };

@@ -2,6 +2,15 @@
 
 ## 4.0.2
 
+### Added
+
+- `FilesSelector` takes three optional props for files whose title on the server is not
+  their name, such as end-to-end encrypted files: `resolveItemTitle` supplies the title a
+  file row shows (and the selected file's title in `onSubmit`), `itemTitlesVersion`
+  redraws the rows when those titles change, and `onFilesLoaded` reports each loaded page
+  of files with the folder, the room on its path and whether that room is private. File
+  rows carry `encrypted`. Search and sorting still use the server's titles
+
 ### Changed
 
 - `@onlyoffice/document-editor-react` peer raised from `2.1.1` to `2.2.0`. That release

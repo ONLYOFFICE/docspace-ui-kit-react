@@ -24,43 +24,46 @@ import FilesSelector from "@onlyoffice/apps-ui-kit/selectors/Files";
 
 ## Props
 
-| Prop                        | Type                                                                                                                                                              | Required     | Description                                              |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | -------------------------------------------------------- |
-| `onSubmit`                  | `(selectedItemId, folderTitle, isPublic, breadCrumbs, fileName, isChecked, selectedTreeNode, selectedFileInfo, isInsideKnowledge, isInsideResultStorage) => void` | Yes          | Callback on submit with full context                     |
-| `onCancel`                  | `() => void`                                                                                                                                                      | Yes          | Callback to close/cancel the selector                    |
-| `getIsDisabled`             | `(isFirstLoad, isSelectedParentFolder, ...) => boolean`                                                                                                           | Yes          | Function to determine if submit is disabled              |
-| `getFilesArchiveError`      | `(name: string) => string`                                                                                                                                        | Yes          | Error message generator for archived items               |
-| `disabledItems`             | `(string \| number)[]`                                                                                                                                            | Yes          | IDs of folders that cannot be selected as targets        |
-| `isRoomsOnly`               | `boolean`                                                                                                                                                         | Yes          | Restrict navigation to rooms level only                  |
-| `isThirdParty`              | `boolean`                                                                                                                                                         | Yes          | Whether navigating third-party storage                   |
-| `currentFolderId`           | `number \| string`                                                                                                                                                | Yes          | Initial folder to open                                   |
-| `rootFolderType`            | `FolderType`                                                                                                                                                      | Yes          | Root folder type for context                             |
-| `isPanelVisible`            | `boolean`                                                                                                                                                         | Yes          | Controls visibility of the selector panel                |
-| `currentDeviceType`         | `DeviceType`                                                                                                                                                      | Yes          | Current device type for responsive behavior              |
-| `filesSettings` / `getIcon` | `FilesSettingsDto` / `TGetIcon`                                                                                                                                   | One required | File settings or icon resolver function                  |
-| `submitButtonLabel`         | `string`                                                                                                                                                          | Yes          | Text for the submit button                               |
-| `cancelButtonLabel`         | `string`                                                                                                                                                          | Yes          | Text for the cancel button                               |
-| `withBreadCrumbs`           | `boolean`                                                                                                                                                         | Yes          | Show breadcrumb navigation                               |
-| `withoutBackButton`         | `boolean`                                                                                                                                                         | Yes          | Hide the back button                                     |
-| `withSearch`                | `boolean`                                                                                                                                                         | Yes          | Enable search functionality                              |
-| `withCancelButton`          | `boolean`                                                                                                                                                         | Yes          | Show cancel button                                       |
-| `withFooterInput`           | `boolean`                                                                                                                                                         | Yes          | Show input field in footer                               |
-| `withFooterCheckbox`        | `boolean`                                                                                                                                                         | Yes          | Show checkbox in footer                                  |
-| `footerInputHeader`         | `string`                                                                                                                                                          | Yes          | Header text for footer input                             |
-| `currentFooterInputValue`   | `string`                                                                                                                                                          | Yes          | Default value for footer input                           |
-| `footerCheckboxLabel`       | `string`                                                                                                                                                          | Yes          | Label for footer checkbox                                |
-| `descriptionText`           | `string`                                                                                                                                                          | Yes          | Description text shown in the selector                   |
-| `withCreate`                | `boolean`                                                                                                                                                         | Yes          | Enable room/folder creation                              |
-| `disabledCreatePublicRoom`  | `boolean`                                                                                                                                                         | No           | Disable the Public room type in the create-room dropdown |
-| `onCreateAIAgent`           | `() => void`                                                                                                                                                      | No           | Add a "New agent" item that opens the host dialog        |
-| `agentsEmptyDescription`    | `string`                                                                                                                                                          | No           | Empty agents list text when it has no "New agent"        |
-| `embedded`                  | `boolean`                                                                                                                                                         | No           | Render without Aside wrapper                             |
-| `treeFolders`               | `FolderDtoInteger[]`                                                                                                                                              | No           | Tree folder structure for root navigation                |
-| `roomType`                  | `RoomType \| RoomType[]`                                                                                                                                          | No           | Filter rooms by type                                     |
-| `filterParam`               | `string \| number`                                                                                                                                                | No           | File type filter                                         |
-| `shareKey`                  | `string`                                                                                                                                                          | No           | Share key for public access                              |
-| `withInit`                  | `boolean`                                                                                                                                                         | No           | SSR initialization mode                                  |
-| `disableBySecurity`         | `string`                                                                                                                                                          | No           | Security key to disable items                            |
+| Prop                        | Type                                                                                                                                                              | Required     | Description                                                             |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ----------------------------------------------------------------------- |
+| `onSubmit`                  | `(selectedItemId, folderTitle, isPublic, breadCrumbs, fileName, isChecked, selectedTreeNode, selectedFileInfo, isInsideKnowledge, isInsideResultStorage) => void` | Yes          | Callback on submit with full context                                    |
+| `onCancel`                  | `() => void`                                                                                                                                                      | Yes          | Callback to close/cancel the selector                                   |
+| `getIsDisabled`             | `(isFirstLoad, isSelectedParentFolder, ...) => boolean`                                                                                                           | Yes          | Function to determine if submit is disabled                             |
+| `getFilesArchiveError`      | `(name: string) => string`                                                                                                                                        | Yes          | Error message generator for archived items                              |
+| `disabledItems`             | `(string \| number)[]`                                                                                                                                            | Yes          | IDs of folders that cannot be selected as targets                       |
+| `isRoomsOnly`               | `boolean`                                                                                                                                                         | Yes          | Restrict navigation to rooms level only                                 |
+| `isThirdParty`              | `boolean`                                                                                                                                                         | Yes          | Whether navigating third-party storage                                  |
+| `currentFolderId`           | `number \| string`                                                                                                                                                | Yes          | Initial folder to open                                                  |
+| `rootFolderType`            | `FolderType`                                                                                                                                                      | Yes          | Root folder type for context                                            |
+| `isPanelVisible`            | `boolean`                                                                                                                                                         | Yes          | Controls visibility of the selector panel                               |
+| `currentDeviceType`         | `DeviceType`                                                                                                                                                      | Yes          | Current device type for responsive behavior                             |
+| `filesSettings` / `getIcon` | `FilesSettingsDto` / `TGetIcon`                                                                                                                                   | One required | File settings or icon resolver function                                 |
+| `submitButtonLabel`         | `string`                                                                                                                                                          | Yes          | Text for the submit button                                              |
+| `cancelButtonLabel`         | `string`                                                                                                                                                          | Yes          | Text for the cancel button                                              |
+| `withBreadCrumbs`           | `boolean`                                                                                                                                                         | Yes          | Show breadcrumb navigation                                              |
+| `withoutBackButton`         | `boolean`                                                                                                                                                         | Yes          | Hide the back button                                                    |
+| `withSearch`                | `boolean`                                                                                                                                                         | Yes          | Enable search functionality                                             |
+| `withCancelButton`          | `boolean`                                                                                                                                                         | Yes          | Show cancel button                                                      |
+| `withFooterInput`           | `boolean`                                                                                                                                                         | Yes          | Show input field in footer                                              |
+| `withFooterCheckbox`        | `boolean`                                                                                                                                                         | Yes          | Show checkbox in footer                                                 |
+| `footerInputHeader`         | `string`                                                                                                                                                          | Yes          | Header text for footer input                                            |
+| `currentFooterInputValue`   | `string`                                                                                                                                                          | Yes          | Default value for footer input                                          |
+| `footerCheckboxLabel`       | `string`                                                                                                                                                          | Yes          | Label for footer checkbox                                               |
+| `descriptionText`           | `string`                                                                                                                                                          | Yes          | Description text shown in the selector                                  |
+| `withCreate`                | `boolean`                                                                                                                                                         | Yes          | Enable room/folder creation                                             |
+| `disabledCreatePublicRoom`  | `boolean`                                                                                                                                                         | No           | Disable the Public room type in the create-room dropdown                |
+| `onCreateAIAgent`           | `() => void`                                                                                                                                                      | No           | Add a "New agent" item that opens the host dialog                       |
+| `agentsEmptyDescription`    | `string`                                                                                                                                                          | No           | Empty agents list text when it has no "New agent"                       |
+| `embedded`                  | `boolean`                                                                                                                                                         | No           | Render without Aside wrapper                                            |
+| `treeFolders`               | `FolderDtoInteger[]`                                                                                                                                              | No           | Tree folder structure for root navigation                               |
+| `roomType`                  | `RoomType \| RoomType[]`                                                                                                                                          | No           | Filter rooms by type                                                    |
+| `filterParam`               | `string \| number`                                                                                                                                                | No           | File type filter                                                        |
+| `shareKey`                  | `string`                                                                                                                                                          | No           | Share key for public access                                             |
+| `withInit`                  | `boolean`                                                                                                                                                         | No           | SSR initialization mode                                                 |
+| `disableBySecurity`         | `string`                                                                                                                                                          | No           | Security key to disable items                                           |
+| `resolveItemTitle`          | `(file: TFilesSelectorFile) => string \| undefined`                                                                                                               | No           | Title to show for a file instead of the server's, e.g. a decrypted name |
+| `itemTitlesVersion`         | `number`                                                                                                                                                          | No           | Change it to redraw rows when resolved titles change                    |
+| `onFilesLoaded`             | `(files: TFilesSelectorFile[], context: TFilesSelectorLoadedFiles) => void`                                                                                       | No           | Called with each loaded page of files and the room they sit in          |
 
 ## Usage
 
@@ -111,13 +114,38 @@ const MoveDialog = () => {
 };
 ```
 
+## Titles the server does not hold
+
+The selector lists files under the titles the server sends. An end-to-end
+encrypted file has an opaque one there; its name is known only to the host.
+`resolveItemTitle` lets the host supply the title to show, `itemTitlesVersion`
+redraws the rows when the host learns new titles, and `onFilesLoaded` tells the
+host which files a page brought and which room they sit in, so it can prepare
+their titles. The resolved title is also the selected file's title in
+`onSubmit`. Search and sorting still use the server's titles.
+
+```tsx
+const titlesVersion = useNameCacheVersion();
+
+<FilesSelector
+  {...props}
+  resolveItemTitle={(file) =>
+    file.encrypted ? nameCache.get(file.id) : undefined
+  }
+  itemTitlesVersion={titlesVersion}
+  onFilesLoaded={(files, { roomId, isInsidePrivateRoom }) => {
+    if (isInsidePrivateRoom) recoverNames(files, roomId);
+  }}
+/>;
+```
+
 ## Key Files
 
 | File                        | Description                                                  |
 | --------------------------- | ------------------------------------------------------------ |
 | `index.tsx`                 | Main component orchestrating rooms, files, agents navigation |
 | `FilesSelector.types.ts`    | TypeScript definitions for all props and helper types        |
-| `FilesSelector.utils.ts`    | `getFilterParams` — maps filter params to API filter types   |
+| `FilesSelector.utils.ts`    | `getFilterParams`, and the host-supplied file titles         |
 | `hooks/useFilesHelper.ts`   | Hook for fetching and managing file/folder lists             |
 | `hooks/useRootHelper.tsx`   | Hook for root-level tree folder navigation                   |
 | `hooks/useSelectorState.ts` | Hook managing selector state (breadcrumbs, items, selection) |
