@@ -155,6 +155,9 @@ margin, clamped to the viewport, taken at 2x and shown at 1x. The demo-data bann
 dashed story frames (`STORY_CHROME`, matched by CSS-module class prefix) are hidden first: they
 are scenery, not the component. A block is photographed as the element Storybook rendered,
 matched to the MDX by position among the page's non-Markdown blocks.
+The cursor is parked outside the viewport before every picture: a page keeps its mouse position
+across navigations, so after a recipe's gesture the component photographed next in the same page
+was otherwise in its hover state, and which one that was changed from run to run.
 
 `pnpm run docs` copies the pictures beside the pages and puts a Docusaurus `<ThemedImage>` where
 each belongs, so the reader sees the theme they are in. A picture not taken leaves no trace on
