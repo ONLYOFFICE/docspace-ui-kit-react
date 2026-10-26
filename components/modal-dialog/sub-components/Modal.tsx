@@ -61,6 +61,35 @@ const Modal = ({
   const internalContentRef = React.useRef<null | HTMLDivElement>(null);
   const contentRef = sheetRef ?? internalContentRef;
 
+  // Opened, the dialog takes the focus unless something inside already has
+  // it (a field the caller focuses itself), so Tab starts in the dialog rather
+  // than in the page behind it. Closed, the focus goes back to where it was --
+  // as long as nothing else has taken it in between.
+  React.useEffect(() => {
+    if (!visible) return;
+    const content = contentRef.current;
+    if (!content) return;
+
+    const previous = document.activeElement;
+    if (content.contains(previous)) return;
+
+    content.focus({ preventScroll: true });
+
+    return () => {
+      const { activeElement } = document;
+      const focusLeftWithDialog =
+        !activeElement ||
+        activeElement === document.body ||
+        content.contains(activeElement);
+      if (
+        focusLeftWithDialog &&
+        previous instanceof HTMLElement &&
+        previous.isConnected
+      )
+        previous.focus({ preventScroll: true });
+    };
+  }, [visible, contentRef]);
+
   const headerComponent = React.isValidElement(header)
     ? (header.props as { children: React.ReactNode }).children
     : null;
@@ -213,6 +242,7 @@ const Modal = ({
               id="modal-dialog"
               ref={contentRef}
               role="dialog"
+              tabIndex={-1}
               aria-modal={visible ? true : undefined}
               aria-label={ariaLabel}
               aria-labelledby={ariaLabelledBy}

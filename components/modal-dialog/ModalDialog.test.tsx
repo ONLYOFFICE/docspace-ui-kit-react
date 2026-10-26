@@ -410,6 +410,47 @@ describe("ModalDialog", () => {
       expect(outer).not.toHaveAttribute("inert");
     });
 
+    // Opened from the keyboard, the dialog used to leave the focus on the
+    // trigger behind it, so Tab walked the page before reaching the dialog.
+    it("takes the focus when it opens and hands it back when it closes", () => {
+      const Harness = ({ visible }: { visible: boolean }) => (
+        <>
+          <button type="button">Trigger</button>
+          <ModalDialog {...defaultProps} visible={visible} aria-label="Room">
+            <ModalDialog.Body>
+              <button type="button">Inside</button>
+            </ModalDialog.Body>
+          </ModalDialog>
+        </>
+      );
+      const { rerender } = render(<Harness visible={false} />);
+      const trigger = screen.getByRole("button", { name: "Trigger" });
+      trigger.focus();
+
+      rerender(<Harness visible />);
+      expect(screen.getByRole("dialog")).toHaveFocus();
+
+      rerender(<Harness visible={false} />);
+      expect(trigger).toHaveFocus();
+    });
+
+    it("leaves the focus on a field the dialog's content focused itself", () => {
+      const AutoFocused = () => {
+        const ref = React.useRef<HTMLInputElement>(null);
+        React.useEffect(() => ref.current?.focus(), []);
+        return <input ref={ref} aria-label="Name" />;
+      };
+      render(
+        <ModalDialog {...defaultProps}>
+          <ModalDialog.Body>
+            <AutoFocused />
+          </ModalDialog.Body>
+        </ModalDialog>,
+      );
+
+      expect(screen.getByLabelText("Name")).toHaveFocus();
+    });
+
     it("hides content when hideContent is true", () => {
       render(
         <ModalDialog {...defaultProps} hideContent>
