@@ -125,6 +125,29 @@ describe("<MainButtonMobile />", () => {
     expect(buttonOptions[0].onClick).toHaveBeenCalledTimes(1);
   });
 
+  // The sheet sits over the page; Tab must not walk into the page behind it.
+  it("closes on Tab from an item and hands focus back to the button", () => {
+    const onClose = vi.fn();
+    render(
+      <MainButtonMobile
+        buttonOptions={buttonOptions}
+        opened
+        onClose={onClose}
+      />,
+    );
+    const [first] = screen.getAllByRole("menuitem");
+    first.focus();
+
+    const tab = fireEvent.keyDown(first, { key: "Tab" });
+
+    // The browser's own Tab still moves on, now from the button.
+    expect(tab).toBe(true);
+    const button = screen.getByTestId("floating-button");
+    expect(button).toHaveFocus();
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it("makes the alert badge a named button only with withAlertClick", () => {
     const onAlertClick = vi.fn();
     const { rerender } = render(

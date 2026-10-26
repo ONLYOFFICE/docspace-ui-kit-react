@@ -279,8 +279,16 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
   };
 
   // Arrow keys move between the items, Home and End jump to the ends, and
-  // Enter or Space chooses the focused one.
+  // Enter or Space chooses the focused one. Tab leaves the menu as in the
+  // WAI-ARIA menu button pattern: the sheet closes and the key moves on from
+  // the button, rather than into the page behind the open sheet.
   const onSheetKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Tab") {
+      floatingButtonRef.current?.focus();
+      toggle(false);
+      return;
+    }
+
     const items = getMenuItems();
     if (!items.length) return;
     const index = items.indexOf(document.activeElement as HTMLElement);
