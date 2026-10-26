@@ -45,7 +45,7 @@ const InvoiceHistoryTableHeader = (props: TableHeaderProps) => {
     <TableHeader
       columns={defaultColumns}
       showSettings={false}
-      useReactWindow={false}
+      useReactWindow
       {...props}
     />
   );

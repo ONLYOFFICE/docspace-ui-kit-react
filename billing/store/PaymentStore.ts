@@ -111,6 +111,8 @@ import PaymentQuotasStore from "./PaymentQuotasStore";
 
 export const TOTAL_SIZE = "total_size";
 
+const INVOICES_PAGE_SIZE = 25;
+
 export type TTransactionFilterContact = {
   id: string;
   displayName?: string;
@@ -254,7 +256,11 @@ class PaymentStore {
 
   invoices: TInvoice[] = [];
 
+  invoicesTotal = 0;
+
   isInitInvoices = false;
+
+  isLoadingMoreInvoices = false;
 
   activeServices: TActiveService[] = [];
 
@@ -699,23 +705,38 @@ class PaymentStore {
     }
   };
 
-  fetchInvoices = async () => {
+  get hasMoreInvoices() {
+    return this.invoices.length < this.invoicesTotal;
+  }
+
+  #requestInvoices = async (offset: number) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
-    try {
-      const { data } = await this.#rawApiClient.instance.get(
-        "api/2.0/portal/payment/customer/deposits",
-        {
-          params: { status: "Completed", offset: 0, limit: 25 },
-          signal: abortController.signal,
-        },
-      );
+    const { data } = await this.#rawApiClient.instance.get(
+      "api/2.0/portal/payment/customer/deposits",
+      {
+        params: { status: "Completed", offset, limit: INVOICES_PAGE_SIZE },
+        signal: abortController.signal,
+      },
+    );
 
-      const page = data?.response as TInvoicesPage | null | undefined;
+    const page = data?.response as TInvoicesPage | null | undefined;
+    const collection = page?.collection ?? [];
+
+    return {
+      collection,
+      total: page?.totalQuantity ?? offset + collection.length,
+    };
+  };
+
+  fetchInvoices = async () => {
+    try {
+      const { collection, total } = await this.#requestInvoices(0);
 
       runInAction(() => {
-        this.invoices = page?.collection ?? [];
+        this.invoices = collection;
+        this.invoicesTotal = total;
       });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
@@ -725,6 +746,30 @@ class PaymentStore {
     runInAction(() => {
       this.isInitInvoices = true;
     });
+  };
+
+  fetchMoreInvoices = async () => {
+    if (this.isLoadingMoreInvoices || !this.hasMoreInvoices) return;
+
+    this.isLoadingMoreInvoices = true;
+
+    try {
+      const { collection, total } = await this.#requestInvoices(
+        this.invoices.length,
+      );
+
+      runInAction(() => {
+        this.invoices = [...this.invoices, ...collection];
+        this.invoicesTotal = collection.length ? total : this.invoices.length;
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      toastr.error(error as Error);
+    } finally {
+      runInAction(() => {
+        this.isLoadingMoreInvoices = false;
+      });
+    }
   };
 
   openInvoice = async (id: number, t: TTranslation) => {

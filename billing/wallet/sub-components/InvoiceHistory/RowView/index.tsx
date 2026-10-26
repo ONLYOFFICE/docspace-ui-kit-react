@@ -18,14 +18,20 @@ const RowView = ({
   invoices,
   onOpenInvoice,
 }: InvoiceHistoryRowViewProps) => {
-  const { formatWalletCurrency, language } = usePaymentStore();
+  const {
+    formatWalletCurrency,
+    language,
+    invoicesTotal,
+    hasMoreInvoices,
+    fetchMoreInvoices,
+  } = usePaymentStore();
 
   return (
     <RowContainer
-      useReactWindow={false}
-      fetchMoreFiles={() => Promise.resolve()}
-      hasMoreFiles={false}
-      itemCount={invoices.length}
+      useReactWindow
+      fetchMoreFiles={fetchMoreInvoices}
+      hasMoreFiles={hasMoreInvoices}
+      itemCount={invoicesTotal}
       filesLength={invoices.length}
       itemHeight={58}
     >

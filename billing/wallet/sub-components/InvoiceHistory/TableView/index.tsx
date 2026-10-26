@@ -26,7 +26,14 @@ const TableView = ({
   invoices,
   onOpenInvoice,
 }: InvoiceHistoryTableViewProps) => {
-  const { formatWalletCurrency, userId, language } = usePaymentStore();
+  const {
+    formatWalletCurrency,
+    userId,
+    language,
+    invoicesTotal,
+    hasMoreInvoices,
+    fetchMoreInvoices,
+  } = usePaymentStore();
 
   const columnStorageName = `${COLUMNS_SIZE}=${userId}`;
   const columnInfoPanelStorageName = `${INFO_PANEL_COLUMNS_SIZE}=${userId}`;
@@ -35,7 +42,7 @@ const TableView = ({
   return (
     <TableContainer
       forwardedRef={ref as React.RefObject<HTMLDivElement>}
-      useReactWindow={false}
+      useReactWindow
       className={styles.tableContainer}
     >
       <TableHeader
@@ -46,14 +53,14 @@ const TableView = ({
         itemHeight={48}
       />
       <TableBody
-        useReactWindow={false}
+        useReactWindow
         columnStorageName={columnStorageName}
         columnInfoPanelStorageName={columnInfoPanelStorageName}
         itemHeight={48}
         filesLength={invoices.length}
-        fetchMoreFiles={() => Promise.resolve()}
-        hasMoreFiles={false}
-        itemCount={invoices.length}
+        fetchMoreFiles={fetchMoreInvoices}
+        hasMoreFiles={hasMoreInvoices}
+        itemCount={invoicesTotal}
       >
         {invoices.map((invoice) => (
           <TableRow
