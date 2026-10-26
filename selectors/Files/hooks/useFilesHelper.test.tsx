@@ -115,6 +115,18 @@ describe("useFilesHelper", () => {
     expect(result.current.loaders.isNextPageLoading).toBe(false);
   });
 
+  it("ends the page load when the folder fails and no root loader is given", async () => {
+    mocks.getFolderByFolderId.mockRejectedValue(new Error("request failed"));
+
+    const { result } = setup({ selectedItemId: 5, getRootData: undefined });
+
+    await act(async () => {
+      await result.current.files.getFileList(0);
+    });
+
+    expect(result.current.loaders.isNextPageLoading).toBe(false);
+  });
+
   it("hands the loaded files and their private room to onFilesLoaded", async () => {
     mocks.getFolderByFolderId.mockResolvedValue({
       data: { response: roomListing },
