@@ -175,6 +175,9 @@ export function RoutedSidebar({ path }: { path: string }) {
 
 `iconOnly` hides the labels and the sub-menus. The active section's children are flattened into
 the top-level list instead, so the current branch stays reachable.
+Each entry keeps its label as its accessible name and shows it as a tooltip on hover — a link
+entry too, for which `LinkRouter` must pass a `ref` and the props it does not know on to its
+anchor, as react-router's `Link` does.
 
 ```tsx
 import { useState } from "react";

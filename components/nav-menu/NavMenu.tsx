@@ -1,10 +1,11 @@
-import React, { forwardRef, useState, useEffect } from "react";
+import React, { forwardRef, useState, useEffect, useMemo } from "react";
 import { ReactSVG } from "react-svg";
 import classNames from "classnames";
 
 import { useAnimation } from "../../hooks/useAnimation";
 import { Badge } from "../badge";
 import { TooltipContainer } from "../tooltip";
+import { createTooltipWrapper } from "../tooltip/sub-components/createTooltipWrapper";
 import ExpandArrowIcon from "../../assets/arrow.react.svg";
 
 import {
@@ -128,6 +129,12 @@ const NavMenuSubItemWrapper = ({
   );
 };
 
+type RailLinkType = ReturnType<
+  typeof createTooltipWrapper<
+    React.ComponentProps<NonNullable<NavMenuProps["LinkRouter"]>>
+  >
+>;
+
 type NavMenuItemWrapperProps = {
   item: NavMenuItem;
   isActive: boolean;
@@ -141,6 +148,7 @@ type NavMenuItemWrapperProps = {
   onSubItemClick: (sub: NavSubItem, meta: NavMenuClickMeta) => void;
   onToggleExpand: (item: NavMenuItem) => void;
   LinkRouter?: NavMenuProps["LinkRouter"];
+  RailLink?: RailLinkType;
 };
 
 const NavMenuItemWrapper = ({
@@ -156,6 +164,7 @@ const NavMenuItemWrapper = ({
   onSubItemClick,
   onToggleExpand,
   LinkRouter,
+  RailLink,
 }: NavMenuItemWrapperProps) => {
   const {
     animationPhase,
@@ -187,6 +196,9 @@ const NavMenuItemWrapper = ({
   const showBadge = item.showBadge || activeBadgeComponent != null;
 
   const itemClassName = classNames(styles.item, { [styles.active]: isActive });
+
+  // The rail hides the label, so the entry carries it as its name.
+  const railLabel = iconOnly ? item.label : undefined;
 
   const content = (
     <>
@@ -233,7 +245,19 @@ const NavMenuItemWrapper = ({
           })}
           style={{ "--end-width": `${endWidth}%` } as React.CSSProperties}
         />
-        {isLink && item.linkData && LinkRouter ? (
+        {isLink && item.linkData && RailLink && iconOnly ? (
+          <RailLink
+            to={item.linkData.path}
+            state={item.linkData.state}
+            className={itemClassName}
+            data-item-id={item.id}
+            title={item.label}
+            aria-label={railLabel}
+            onClick={handleClick}
+          >
+            {content}
+          </RailLink>
+        ) : isLink && item.linkData && LinkRouter ? (
           <LinkRouter
             to={item.linkData.path}
             state={item.linkData.state}
@@ -254,7 +278,8 @@ const NavMenuItemWrapper = ({
                 ? isExpanded
                 : undefined
             }
-            title={iconOnly ? item.label : undefined}
+            title={railLabel}
+            aria-label={railLabel}
             onClick={handleClick}
           >
             {content}
@@ -365,6 +390,12 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
         return target ? new Set([target]) : new Set();
       });
     }, [activeItemId, groups, withExpandControl]);
+
+    // The rail's links show their hidden label as a tooltip, as its buttons do.
+    const RailLink = useMemo(
+      () => (LinkRouter ? createTooltipWrapper(LinkRouter) : undefined),
+      [LinkRouter],
+    );
 
     const handleItemClick = (item: NavMenuItem, meta: NavMenuClickMeta) => {
       // An onClick that returns `false` handled the interaction itself (e.g.
@@ -494,6 +525,7 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
                     onSubItemClick={handleSubItemClick}
                     onToggleExpand={handleToggleExpand}
                     LinkRouter={LinkRouter}
+                    RailLink={RailLink}
                   />
                 ))}
               </ul>

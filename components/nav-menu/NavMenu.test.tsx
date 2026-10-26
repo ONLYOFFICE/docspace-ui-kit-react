@@ -641,6 +641,73 @@ describe("<NavMenu />", () => {
       );
     });
 
+    // The rail hides the label: a link entry got neither a name nor a
+    // tooltip, unlike a button entry.
+    it("names a link entry and gives it a tooltip when iconOnly", () => {
+      const LinkRouter = ({
+        to,
+        children,
+        ...rest
+      }: {
+        to: unknown;
+        children?: React.ReactNode;
+      }) => (
+        <a href={String(to)} {...rest}>
+          {children}
+        </a>
+      );
+      render(
+        <NavMenu
+          iconOnly
+          LinkRouter={LinkRouter}
+          groups={[
+            {
+              id: "g",
+              items: [
+                { id: "home", label: "Home", linkData: { path: "/home" } },
+              ],
+            },
+          ]}
+        />,
+      );
+
+      const link = screen.getByRole("link");
+      expect(link).toHaveAttribute("aria-label", "Home");
+      expect(link).toHaveAttribute("title", "Home");
+    });
+
+    it("leaves a link entry's name to its text outside the rail", () => {
+      const LinkRouter = ({
+        to,
+        children,
+        ...rest
+      }: {
+        to: unknown;
+        children?: React.ReactNode;
+      }) => (
+        <a href={String(to)} {...rest}>
+          {children}
+        </a>
+      );
+      render(
+        <NavMenu
+          LinkRouter={LinkRouter}
+          groups={[
+            {
+              id: "g",
+              items: [
+                { id: "home", label: "Home", linkData: { path: "/home" } },
+              ],
+            },
+          ]}
+        />,
+      );
+
+      const link = screen.getByRole("link", { name: "Home" });
+      expect(link).not.toHaveAttribute("aria-label");
+      expect(link).not.toHaveAttribute("title");
+    });
+
     it("flattens sub-items of the active parent into the top-level list when iconOnly", () => {
       render(<NavMenu groups={groups} iconOnly activeItemId="ai-files" />);
       // Active parent and its children render as siblings, without an expand step.
