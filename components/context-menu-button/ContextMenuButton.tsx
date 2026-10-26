@@ -227,6 +227,10 @@ const ContextMenuButtonPure = ({
 
     if (state.displayType === "toggle") {
       if (key !== "Enter" && key !== " ") return;
+      // The caller's ContextMenu is on screen (it is mounted only while
+      // visible) and picks its highlighted item on the Enter keyup on
+      // window: the button neither opens it again nor swallows that keyup.
+      if (document.querySelector(".p-contextmenu")) return;
       e.preventDefault();
       consumeKey(e);
       setState((s) => ({ ...s, data: readData() }));
