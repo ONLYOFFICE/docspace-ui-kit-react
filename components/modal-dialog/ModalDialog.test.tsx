@@ -48,7 +48,7 @@ describe("ModalDialog", () => {
       </ModalDialog>,
     );
 
-    const closeButton = screen.getByLabelText("close");
+    const closeButton = screen.getByLabelText("Close");
     await userEvent.click(closeButton);
 
     expect(mockOnClose).toHaveBeenCalledTimes(1);
@@ -62,7 +62,7 @@ describe("ModalDialog", () => {
       </ModalDialog>,
     );
 
-    const closeButton = screen.queryByLabelText("close");
+    const closeButton = screen.queryByLabelText("Close");
     expect(closeButton).not.toBeInTheDocument();
   });
 
@@ -471,7 +471,7 @@ describe("ModalDialog", () => {
         </ModalDialog>,
       );
 
-      const closeButton = screen.queryByLabelText("close");
+      const closeButton = screen.queryByLabelText("Close");
       expect(closeButton).not.toBeInTheDocument();
     });
 
