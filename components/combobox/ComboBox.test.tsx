@@ -6,6 +6,7 @@ import { ComboBox } from "./ComboBox";
 import { ComboBoxDisplayType, ComboBoxSize } from "./ComboBox.enums";
 import styles from "./ComboBox.module.scss";
 import * as DropDownModule from "../drop-down";
+import { ModalDialog } from "../modal-dialog";
 import type { DropDownProps } from "../drop-down/DropDown.types";
 
 const mockOptions = [
@@ -243,9 +244,87 @@ describe("ComboBox", () => {
 
     fireEvent.click(screen.getByRole("button"));
 
-    fireEvent.keyDown(document, { key: "Escape" });
+    fireEvent.keyDown(document, { key: "Tab" });
 
     expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("closes the list on Escape", async () => {
+    const user = userEvent.setup();
+    const setIsOpenItemAccess = vi.fn();
+    const onBackdropClick = vi.fn();
+
+    render(
+      <ComboBox
+        {...baseProps}
+        setIsOpenItemAccess={setIsOpenItemAccess}
+        onBackdropClick={onBackdropClick}
+      />,
+    );
+
+    const button = screen.getByRole("button");
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-expanded", "true");
+
+    await user.keyboard("{Escape}");
+
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(setIsOpenItemAccess).toHaveBeenLastCalledWith(false);
+    expect(onBackdropClick).toHaveBeenCalledTimes(1);
+    expect(baseProps.onSelect).not.toHaveBeenCalled();
+  });
+
+  it("keeps the Escape that closes the list from reaching window keyup listeners", async () => {
+    const user = userEvent.setup();
+    const onWindowKeyUp = vi.fn();
+    window.addEventListener("keyup", onWindowKeyUp);
+
+    render(<ComboBox {...baseProps} />);
+
+    await user.click(screen.getByRole("button"));
+    await user.keyboard("{Escape}");
+    expect(onWindowKeyUp).not.toHaveBeenCalled();
+
+    await user.keyboard("{Escape}");
+    expect(onWindowKeyUp).toHaveBeenCalledTimes(1);
+
+    window.removeEventListener("keyup", onWindowKeyUp);
+  });
+
+  it("closes only the list, not the modal dialog it sits in, on Escape", async () => {
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+
+    render(
+      <ModalDialog visible onClose={onClose}>
+        <ModalDialog.Body>
+          <ComboBox {...baseProps} />
+        </ModalDialog.Body>
+      </ModalDialog>,
+    );
+
+    const button = screen.getByRole("button", { name: "Option 1" });
+    await user.click(button);
+    await user.keyboard("{Escape}");
+
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(onClose).not.toHaveBeenCalled();
+
+    await user.keyboard("{Escape}");
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("leaves a list controlled through onToggle open on Escape", async () => {
+    const user = userEvent.setup();
+    const onToggle = vi.fn();
+
+    render(<ComboBox {...baseProps} onToggle={onToggle} />);
+
+    const button = screen.getByRole("button");
+    await user.click(button);
+    await user.keyboard("{Escape}");
+
+    expect(button).toHaveAttribute("aria-expanded", "true");
   });
 
   it("derives optionsCount from advancedOptions excluding separator-like keys", () => {

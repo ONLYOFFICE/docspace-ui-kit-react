@@ -155,11 +155,37 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
           }
           break;
         }
+        case "Escape": {
+          if (onToggle && !(withBackdrop && onBackdropClick)) return;
+
+          e.preventDefault();
+
+          const onEscapeKeyUp = (event: KeyboardEvent) => {
+            if (event.key !== "Escape") return;
+            event.stopPropagation();
+            window.removeEventListener("keyup", onEscapeKeyUp, true);
+          };
+          window.addEventListener("keyup", onEscapeKeyUp, true);
+
+          setIsOpenItemAccess?.(false);
+          setIsOpen(false);
+
+          if (withBackdrop) onBackdropClick?.(e);
+          break;
+        }
         default:
           break;
       }
     },
-    [isOpen, props.options, optionClick],
+    [
+      isOpen,
+      props.options,
+      optionClick,
+      onToggle,
+      withBackdrop,
+      onBackdropClick,
+      setIsOpenItemAccess,
+    ],
   );
 
   React.useEffect(() => {
