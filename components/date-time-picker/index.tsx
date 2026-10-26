@@ -92,10 +92,33 @@ const DateTimePicker = (props: DateTimePickerProps) => {
       setIsTimeFocused(false);
     }
   };
+  // Keys that leave the time editor open: Tab or Shift+Tab to another of its
+  // own fields, and Enter on the AM/PM box, which opens it or picks the
+  // highlighted half of the day. Closing on those unmounted the box before it
+  // could act, so the keyboard could never change AM/PM.
+  const staysInTimePicker = (event: KeyboardEvent) => {
+    const picker = timePickerRef.current;
+    const { target } = event;
+    if (!picker || !(target instanceof Element) || !picker.contains(target))
+      return false;
+
+    if (event.key === ButtonKeys.enter)
+      return target.closest("[aria-haspopup]") !== null;
+
+    const fields = Array.from(
+      picker.querySelectorAll("input, [tabindex]:not([tabindex='-1'])"),
+    );
+    const index = fields.findIndex(
+      (field) => field === target || field.contains(target),
+    );
+    const next = index + (event.shiftKey ? -1 : 1);
+    return index !== -1 && next >= 0 && next < fields.length;
+  };
+
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === ButtonKeys.enter || event.key === ButtonKeys.tab) {
-      setIsTimeFocused(false);
-    }
+    if (event.key !== ButtonKeys.enter && event.key !== ButtonKeys.tab) return;
+    if (staysInTimePicker(event)) return;
+    setIsTimeFocused(false);
   };
 
   const onSelectFormat = (opt: TOption) => {

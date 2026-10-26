@@ -108,6 +108,49 @@ describe("DateTimePicker", () => {
     expect(screen.getByTestId("time-picker")).toBeInTheDocument();
   });
 
+  // Any Tab or Enter closed the editor: Tab from the hours never reached the
+  // minutes or the AM/PM box, and Enter in that box unmounted it unpicked.
+  it("stays open while Tab moves between its own fields", () => {
+    render(<DateTimePicker {...defaultProps} />);
+    fireEvent.click(screen.getByTestId("date-time-picker-time-display"));
+
+    const [hours, minutes] = within(
+      screen.getByTestId("time-picker"),
+    ).getAllByRole("textbox");
+    fireEvent.keyDown(hours, { key: "Tab" });
+    expect(screen.getByTestId("time-picker")).toBeInTheDocument();
+    fireEvent.keyDown(minutes, { key: "Tab", shiftKey: true });
+    expect(screen.getByTestId("time-picker")).toBeInTheDocument();
+
+    // Shift+Tab out of the first field leaves the editor, which closes.
+    fireEvent.keyDown(hours, { key: "Tab", shiftKey: true });
+    expect(screen.queryByTestId("time-picker")).not.toBeInTheDocument();
+  });
+
+  it("picks AM or PM from the keyboard", () => {
+    const onChange = vi.fn();
+    render(
+      <DateTimePicker
+        {...defaultProps}
+        initialDate={createDateTime(2025, 1, 27, 22, 0, 0)}
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByTestId("date-time-picker-time-display"));
+
+    const editor = screen.getByTestId("time-picker").parentElement!;
+    const meridiem = within(editor).getByRole("button", { name: /AM|PM/ });
+    fireEvent.keyDown(meridiem, { key: "Enter" });
+    expect(screen.getByTestId("time-picker")).toBeInTheDocument();
+    expect(meridiem).toHaveAttribute("aria-expanded", "true");
+
+    fireEvent.keyDown(meridiem, { key: "ArrowUp" });
+    fireEvent.keyDown(meridiem, { key: "Enter" });
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange.mock.calls[0][0].hour).toBe(10);
+    expect(screen.getByTestId("time-picker")).toBeInTheDocument();
+  });
+
   it("speaks a 24-hour time for a 24-hour locale", () => {
     render(
       <DateTimePicker

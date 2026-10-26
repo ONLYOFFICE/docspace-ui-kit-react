@@ -139,7 +139,8 @@ export function ScheduledSend() {
   button; there is no way to set a time first.
 - **The time is a display until it is clicked.** Clicking the clock, or pressing Enter or Space
   on it, swaps it for [`TimePicker`](../time-picker/README.md) plus the meridiem drop-down; an
-  outside click, Enter or Tab swaps it back. The editor takes focus as soon as it opens.
+  outside click, Enter in a time field, or Tab out of the editor swaps it back. The editor takes
+  focus as soon as it opens.
 - **Clearing the date hides the time.** The chip's cross (unless `hideCross`) empties the day,
   removes the time beside it and reports `null` to `onChange`.
 - **12-hour or 24-hour is decided by `locale`, not by a prop.** The component treats anything
@@ -186,7 +187,10 @@ The parts it is built from keep their own variables, which reach them from the s
 - That `aria-label` writes the time on the clock the display uses — `Current time: 02:30 PM` on
   a 12-hour locale, `Current time: 14:30` otherwise. The words "Current time" are English and
   not translated.
-- The time editor takes focus when it opens; Enter or Tab closes it again.
+- The time editor takes focus when it opens. Tab and Shift+Tab move between the hours, the
+  minutes and the AM/PM box without closing it; Enter in a time field, or Tab past its last
+  field, closes it. On the AM/PM box Enter opens the list and picks the highlighted half of the
+  day.
 - The "select date" button is a `role="button"` named by `selectDateText`, opened by Enter and
   Space, and reports `aria-expanded` while the calendar is open.
 - The date half is [`DatePicker`](../date-picker/README.md), so its keyboard support applies:
