@@ -199,17 +199,19 @@ export function InstantSearch({ onSearch }: { onSearch: (t: string) => void }) {
 - The main button needs both `showMainButton` and `mainButtonProps`; either alone renders
   nothing. It carries the plus icon (or `mainButtonIcon`), and a click anywhere on its blue
   wrapper, padding included, is passed to the `MainButton`, which opens the dropdown built from
-  `mainButtonProps.model`.
+  `mainButtonProps.model`. Focused from the keyboard, the whole wrapper gets the focus ring,
+  not the button inside it.
 
 ## CSS variables
 
-| Variable                          | Default | Effect                                                                                            |
-| --------------------------------- | ------- | ------------------------------------------------------------------------------------------------- |
-| `--search-input-max-height`       | `32px`  | Height of the field                                                                               |
-| `--search-input-radius`           | `3px`   | Corner radius of the icon buttons                                                                 |
-| `--search-input-gap`              | `8px`   | Space between the main button and the field                                                       |
-| `--search-input-icon-fill`        | theme   | Colour of the icon while the field is empty (the magnifier, or the cross under `showClearButton`) |
-| `--search-input-icon-filled-fill` | theme   | Colour of the cross once the field holds text                                                     |
+| Variable                                 | Default | Effect                                                                                            |
+| ---------------------------------------- | ------- | ------------------------------------------------------------------------------------------------- |
+| `--search-input-max-height`              | `32px`  | Height of the field                                                                               |
+| `--search-input-radius`                  | `3px`   | Corner radius of the icon buttons                                                                 |
+| `--search-input-gap`                     | `8px`   | Space between the main button and the field                                                       |
+| `--search-input-icon-fill`               | theme   | Colour of the icon while the field is empty (the magnifier, or the cross under `showClearButton`) |
+| `--search-input-icon-filled-fill`        | theme   | Colour of the cross once the field holds text                                                     |
+| `--search-input-main-button-focus-color` | accent  | Colour of the keyboard focus ring around the main button's wrapper                                |
 
 The field itself is a [`TextInput`](../text-input/README.md) inside an `InputBlock`, so its
 colours and radius come from that component's variables, set on a wrapper around the search
