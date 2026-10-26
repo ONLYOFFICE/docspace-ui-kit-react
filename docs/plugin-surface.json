@@ -1,7 +1,7 @@
 {
   "entry": "index.ts",
   "package": "@onlyoffice/apps-ui-kit",
-  "total": 712,
+  "total": 713,
   "values": 464,
   "exports": {
     "ADMIN": {
@@ -1108,6 +1108,10 @@
     },
     "NavMenu": {
       "kind": "variable",
+      "origin": "components/nav-menu"
+    },
+    "NavMenuClickMeta": {
+      "kind": "type",
       "origin": "components/nav-menu"
     },
     "NavMenuGroup": {

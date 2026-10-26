@@ -243,6 +243,7 @@ describe("<NavMenu />", () => {
       expect(onClick).toHaveBeenCalledOnce();
       expect(onClick).toHaveBeenCalledWith(
         expect.objectContaining({ id: "item-1", label: "Item One" }),
+        { isLink: false },
       );
     });
 
@@ -270,6 +271,7 @@ describe("<NavMenu />", () => {
       expect(onSubClick).toHaveBeenCalledOnce();
       expect(onSubClick).toHaveBeenCalledWith(
         expect.objectContaining({ id: "child-1", label: "Child One" }),
+        { isLink: false },
       );
     });
 
@@ -292,6 +294,89 @@ describe("<NavMenu />", () => {
 
       expect(onClickFirst).toHaveBeenCalledOnce();
       expect(onClickSecond).not.toHaveBeenCalled();
+    });
+
+    // A modified click on a link opens it in a new tab; the entry's onClick
+    // acts in this tab (the portal navigated it as well) and must not run.
+    it("leaves a modified click on a link entry to the browser", async () => {
+      const onItemClick = vi.fn();
+      const onSubClick = vi.fn();
+      const LinkRouter = ({
+        to,
+        children,
+        ...rest
+      }: {
+        to: unknown;
+        children?: React.ReactNode;
+        className?: string;
+        onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+      }) => (
+        <a
+          href={String(to)}
+          {...rest}
+          onClick={(e) => {
+            rest.onClick?.(e);
+            e.preventDefault();
+          }}
+        >
+          {children}
+        </a>
+      );
+      const linkGroups: NavMenuGroup[] = [
+        {
+          id: "g1",
+          items: [
+            {
+              id: "home",
+              label: "Home",
+              linkData: { path: "/home" },
+              onClick: onItemClick,
+            },
+            {
+              id: "files",
+              label: "Files",
+              children: [
+                {
+                  id: "trash",
+                  label: "Trash",
+                  linkData: { path: "/trash" },
+                  onClick: onSubClick,
+                },
+              ],
+            },
+          ],
+        },
+      ];
+
+      render(
+        <NavMenu
+          groups={linkGroups}
+          defaultExpandedId="files"
+          LinkRouter={LinkRouter}
+        />,
+      );
+
+      const user = userEvent.setup();
+      for (const modifier of ["Control", "Meta", "Shift"]) {
+        await user.keyboard(`{${modifier}>}`);
+        await user.click(screen.getByRole("link", { name: "Home" }));
+        await user.click(screen.getByRole("link", { name: "Trash" }));
+        await user.keyboard(`{/${modifier}}`);
+      }
+      expect(onItemClick).not.toHaveBeenCalled();
+      expect(onSubClick).not.toHaveBeenCalled();
+
+      await user.click(screen.getByRole("link", { name: "Home" }));
+      await user.click(screen.getByRole("link", { name: "Trash" }));
+      expect(onItemClick).toHaveBeenCalledOnce();
+      expect(onSubClick).toHaveBeenCalledOnce();
+      // The link navigated already; the handler is told so.
+      expect(onItemClick).toHaveBeenCalledWith(expect.anything(), {
+        isLink: true,
+      });
+      expect(onSubClick).toHaveBeenCalledWith(expect.anything(), {
+        isLink: true,
+      });
     });
   });
 

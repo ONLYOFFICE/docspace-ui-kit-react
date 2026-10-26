@@ -317,6 +317,10 @@ export function SidebarWithDialog() {
 - **Only a leaf can be a link.** The link branch requires the item to have no children, so a
   section header is always a `<button>` even when it carries `linkData`.
 - **`linkData` without `LinkRouter` is ignored**, silently.
+- **The link navigates; `onClick` is for what goes with it.** A link entry's own click already
+  changes the route, so an `onClick` that navigates as well pushes the same entry twice. A click
+  with Ctrl, Cmd, Shift or Alt is the browser's (a new tab or window) and does not call `onClick`
+  at all; a middle click never reaches it either.
 - **In the collapsed rail the label is a tooltip**, delivered through the kit's shared tooltip —
   which renders nothing unless `<RootTooltip />` is mounted somewhere in the application.
 - **`icon` is fetched over the network** as an SVG when the menu renders; `iconNode` is rendered as

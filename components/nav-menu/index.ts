@@ -5,6 +5,7 @@ export type {
   NavMenuItem,
   NavSubItem,
   NavMenuLinkData,
+  NavMenuClickMeta,
 } from "./NavMenu.types";
 
 export * from "./icons";
