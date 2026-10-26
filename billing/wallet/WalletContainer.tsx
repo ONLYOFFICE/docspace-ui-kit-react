@@ -69,6 +69,7 @@ const Wallet = (props: WalletProps) => {
     fetchBalance,
     refreshTransactionHistory,
     refreshInvoices,
+    isStripePortalAvailable,
     canUpdateTariff,
     recommendedAmount,
     walletHelpUrl,
@@ -181,17 +182,25 @@ const Wallet = (props: WalletProps) => {
         </div>
       ),
     },
-    {
-      id: "invoice-history",
-      name: t("InvoiceHistory"),
-      content: <InvoiceHistory />,
-    },
+    ...(isStripePortalAvailable
+      ? [
+          {
+            id: "invoice-history",
+            name: t("InvoiceHistory"),
+            content: <InvoiceHistory />,
+          },
+        ]
+      : []),
     {
       id: "upcoming-payments",
       name: t("UpcomingPayments"),
       content: <UpcomingPayments />,
     },
   ];
+
+  const activeTabId = tabsItems.some(({ id }) => id === selectedTabId)
+    ? selectedTabId
+    : WALLET_TAB_IDS[0];
 
   return (
     <div className={styles.walletContainer}>
@@ -326,7 +335,7 @@ const Wallet = (props: WalletProps) => {
       <div className={styles.tabsWrapper}>
         <Tabs
           items={tabsItems}
-          selectedItemId={selectedTabId}
+          selectedItemId={activeTabId}
           onSelect={onSelectTab}
           withoutStickyIntend
         />
