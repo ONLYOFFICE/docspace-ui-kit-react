@@ -74,10 +74,9 @@ const TopUpButtons: React.FC<TopUpButtonsProps> = ({
         });
       }
 
-      const requests: Promise<unknown>[] = [
-        fetchBalance!(),
-        fetchTransactionHistory!(serviceName),
-      ];
+      fetchTransactionHistory!(serviceName);
+
+      const requests: Promise<unknown>[] = [fetchBalance!()];
 
       if (serviceName) {
         requests.push(fetchServiceBalance!());

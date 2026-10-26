@@ -153,11 +153,9 @@ const Wallet = (props: WalletProps) => {
     const startTime = Date.now();
 
     try {
-      await Promise.all([
-        fetchBalance!(true),
-        refreshTransactionHistory(),
-        refreshInvoices(),
-      ]);
+      refreshTransactionHistory();
+      refreshInvoices();
+      await fetchBalance!(true);
     } catch (e) {
       toastr.error(e as Error);
     } finally {
