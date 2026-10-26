@@ -49,6 +49,30 @@ describe("<AddButton />", () => {
     expect(screen.getByTestId("selector-add-button").style.color).toBe("red");
   });
 
+  // role="button" without a tab stop could not be reached at all, and most
+  // callers never passed a tabIndex.
+  it("is a tab stop that Enter and Space activate, and refuses both while disabled", () => {
+    const onClick = vi.fn();
+    const { rerender } = render(<AddButton {...baseProps} onClick={onClick} />);
+    const wrapper = screen.getByRole("button");
+    expect(wrapper).toHaveAttribute("tabindex", "0");
+
+    fireEvent.keyDown(wrapper, { key: "Enter" });
+    fireEvent.keyDown(wrapper, { key: " " });
+    expect(onClick).toHaveBeenCalledTimes(2);
+
+    rerender(<AddButton {...baseProps} isDisabled onClick={onClick} />);
+    expect(wrapper).toHaveAttribute("tabindex", "-1");
+    expect(wrapper).toHaveAttribute("aria-disabled", "true");
+    fireEvent.keyDown(wrapper, { key: "Enter" });
+    expect(onClick).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps a tabIndex the caller passes", () => {
+    render(<AddButton {...baseProps} tabIndex={-1} />);
+    expect(screen.getByRole("button")).toHaveAttribute("tabindex", "-1");
+  });
+
   it("handles click when not disabled", () => {
     const onClick = vi.fn();
     render(<AddButton {...baseProps} onClick={onClick} />);

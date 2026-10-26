@@ -49,11 +49,21 @@ const AddButton = (props: AddButtonProps) => {
     if (!isDisabled && !isLoading) onClick?.(e);
   };
 
-  const onKeyDownAction = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !isDisabled && !isLoading) {
-      onClick?.(e as unknown as React.MouseEvent);
-    }
+  // The wrapper is the button, so Enter and Space click it, as they would a
+  // real one; the click reaches onClickAction like a mouse click does.
+  const onKeyDownAction = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    if (e.target !== e.currentTarget) return;
+    e.preventDefault();
+    if (isDisabled || isLoading) return;
+    e.currentTarget
+      .querySelector<HTMLElement>(`.${styles.selectorButton}`)
+      ?.click();
   };
+
+  // A role="button" the keyboard cannot reach is no button: it is in the Tab
+  // order unless disabled, and a caller's tabIndex still wins.
+  const wrapperTabIndex = tabIndex ?? (isDisabled ? -1 : 0);
 
   const buttonClassName = classNames(styles.selectorButton, {
     [styles.isAction]: isAction,
@@ -83,9 +93,10 @@ const AddButton = (props: AddButtonProps) => {
     <div
       data-testid="selector-add-button-container"
       className={containerClassName}
-      tabIndex={tabIndex}
+      tabIndex={wrapperTabIndex}
       onKeyDown={onKeyDownAction}
       role="button"
+      aria-disabled={isDisabled || undefined}
     >
       <TooltipContainer
         as="div"

@@ -174,10 +174,9 @@ export const Default: Story = {
   render: (args) => <AddButton {...args} />,
   args: {
     title: "Add item",
-    tabIndex: 0,
   },
   play: async ({ args, canvas, userEvent }) => {
-    // With tabIndex the wrapper is a tab stop, and Enter adds.
+    // The wrapper is a tab stop, and Enter adds.
     await userEvent.tab();
     await expect(canvas.getByRole("button")).toHaveFocus();
     await userEvent.keyboard("{Enter}");
@@ -190,10 +189,10 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The bare square with a plus, for a list that needs one more item and has room for no label. Click it, or press Tab and then Enter, and the Actions panel logs the call (`onClick`, `tabIndex`); change any other prop live in the Controls panel below.",
+          "The bare square with a plus, for a list that needs one more item and has room for no label. Click it, or press Tab and then Enter, and the Actions panel logs the call (`onClick`); change any other prop live in the Controls panel below.",
       },
       source: {
-        code: `<AddButton title="Add item" tabIndex={0} onClick={handleAdd} />`,
+        code: `<AddButton title="Add item" onClick={handleAdd} />`,
       },
     },
   },
