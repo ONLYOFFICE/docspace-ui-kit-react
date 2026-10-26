@@ -328,4 +328,38 @@ describe("<ContextMenuButton />", () => {
     expect(event.clientX).toBe(140);
     expect(event.pageX).toBe(140 + window.scrollX);
   });
+
+  // The caller's ContextMenu keeps focus on the button and picks its
+  // highlighted item on the Enter keyup on window.
+  it("leaves Enter to the caller's menu while that menu is on screen", () => {
+    const onClick = vi.fn();
+    render(
+      <ContextMenuButton
+        {...baseProps}
+        displayType={ContextMenuButtonDisplayType.toggle}
+        onClick={onClick}
+      />,
+    );
+    const button = screen.getByRole("button", { name: "Actions" });
+    const menu = document.createElement("div");
+    menu.className = "p-contextmenu";
+    document.body.appendChild(menu);
+    const addSpy = vi.spyOn(window, "addEventListener");
+
+    try {
+      const keyDown = fireEvent.keyDown(button, { key: "Enter" });
+
+      expect(onClick).not.toHaveBeenCalled();
+      expect(keyDown).toBe(true);
+      // No keyup swallower is armed, so the menu gets its keyup.
+      expect(addSpy).not.toHaveBeenCalledWith(
+        "keyup",
+        expect.any(Function),
+        true,
+      );
+    } finally {
+      addSpy.mockRestore();
+      menu.remove();
+    }
+  });
 });

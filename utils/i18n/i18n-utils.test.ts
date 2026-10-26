@@ -30,6 +30,42 @@ describe("getCommonTranslation", () => {
     }
   });
 
+  // The portal creates window.i18n before it fetches the bundles, and its
+  // loading spinner asks for a Common label in between.
+  it("logs nothing while the namespace's bundle has not arrived", () => {
+    (window as MutableWindow).i18n = {
+      t: (_key: string, options?: { defaultValue?: string }) =>
+        options?.defaultValue ?? _key,
+      instance: { language: "en" },
+      loaded: {},
+    };
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      expect(getCommonTranslation("LoadingProcessing")).toBe("");
+      expect(error).not.toHaveBeenCalled();
+    } finally {
+      error.mockRestore();
+    }
+  });
+
+  it("still logs a key missing from a loaded combined bundle", () => {
+    (window as MutableWindow).i18n = {
+      t: (_key: string, options?: { defaultValue?: string }) =>
+        options?.defaultValue ?? _key,
+      instance: { language: "en" },
+      loaded: {
+        "/locales/en/_combined.json": { data: { Common: { Other: "Other" } } },
+      },
+    };
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      expect(getCommonTranslation("CloseButton")).toBe("");
+      expect(error).toHaveBeenCalledTimes(1);
+    } finally {
+      error.mockRestore();
+    }
+  });
+
   it("logs a key missing from the translations that are loaded", () => {
     (window as MutableWindow).i18n = {
       loaded: { "en/Common.json": { data: { Other: "Other" } } },

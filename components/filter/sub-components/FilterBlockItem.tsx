@@ -34,6 +34,7 @@ const FilterBlockItem = ({
   showSelector,
   isFirst,
   withMultiItems,
+  renderCustom,
 }: FilterBlockItemProps) => {
   const changeFilterValueAction = (
     key: string,
@@ -359,6 +360,12 @@ const FilterBlockItem = ({
 
           // Otherwise show all items
           return groupItem.map((item: TGroupItem) => {
+            if ("isCustom" in item && item.isCustom)
+              return (
+                <React.Fragment key={item.key}>
+                  {renderCustom?.(item)}
+                </React.Fragment>
+              );
             if ("displaySelectorType" in item && item.displaySelectorType)
               return getSelectorItem(item);
             if ("isToggle" in item && item.isToggle) return getToggleItem(item);

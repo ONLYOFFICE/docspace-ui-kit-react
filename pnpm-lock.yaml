@@ -285,8 +285,8 @@ importers:
         specifier: 0.45.5
         version: 0.45.5(supports-color@7.2.0)
       '@onlyoffice/ai-chat':
-        specifier: file:onlyoffice-ai-chat-1.0.4.tgz
-        version: file:onlyoffice-ai-chat-1.0.4.tgz(9e0ecd8c38e0cfdb6fa08acfdd3a061b)
+        specifier: file:onlyoffice-ai-chat-1.0.2-20261022.tgz
+        version: file:onlyoffice-ai-chat-1.0.2-20261022.tgz(9e0ecd8c38e0cfdb6fa08acfdd3a061b)
       '@onlyoffice/doceditor-types':
         specifier: 10.0.0
         version: 10.0.0
@@ -1579,9 +1579,9 @@ packages:
       '@emnapi/core': ^1.7.1 || ^2.0.0-alpha.4
       '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.4
 
-  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-1.0.4.tgz':
-    resolution: {integrity: sha512-ej11+5Atzs+qVK7eyfWGnkG5tGC4f+8REn1sEvwCyJ2XO0bLJWIH/o0iwBTKt362dlg05iN26hTKlchdrC/GOA==, tarball: file:onlyoffice-ai-chat-1.0.4.tgz}
-    version: 1.0.4
+  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-1.0.2-20261022.tgz':
+    resolution: {integrity: sha512-Rn2fxVUR4Ydl37CcmGmECqKudYk6KGjnydUuNOp8mGSD6hTPB5LlPtYwllBgZuJo+YH7Nl6+ifv/kErpk3+FCQ==, tarball: file:onlyoffice-ai-chat-1.0.2-20261022.tgz}
+    version: 1.0.2-20261022
     peerDependencies:
       '@anthropic-ai/sdk': ^0.60.0
       '@assistant-ui/react': ^0.11.0
@@ -1614,6 +1614,7 @@ packages:
       rehype-katex: ^7.0.1
       remark-gfm: ^4.0.1
       remark-math: ^6.0.0
+      shiki: ^3.11.0
       tailwind-merge: ^3.3.1
       zustand: ^5.0.7
     peerDependenciesMeta:
@@ -1670,6 +1671,8 @@ packages:
       remark-gfm:
         optional: true
       remark-math:
+        optional: true
+      shiki:
         optional: true
       tailwind-merge:
         optional: true
@@ -7176,7 +7179,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.4
     optional: true
 
-  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-1.0.4.tgz(9e0ecd8c38e0cfdb6fa08acfdd3a061b)':
+  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-1.0.2-20261022.tgz(9e0ecd8c38e0cfdb6fa08acfdd3a061b)':
     dependencies:
       '@assistant-ui/react': 0.11.58(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(use-sync-external-store@1.7.0(react@19.2.8))
       assistant-stream: 0.2.47

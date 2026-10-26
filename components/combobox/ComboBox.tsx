@@ -7,7 +7,7 @@ import EmptyIcon from "../../assets/empty.svg";
 import { consumeKey } from "../../utils/consume-key";
 
 import { DropDown } from "../drop-down";
-import { DropDownItem } from "../drop-down-item";
+import { DropDownItem, type DropDownItemProps } from "../drop-down-item";
 import { TooltipContainer } from "../tooltip";
 
 import { ComboButton } from "./sub-components/ComboButton";
@@ -144,17 +144,45 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     [props.displaySelectedOption, selectedOption?.label],
   );
 
+  // `advancedOptions` whose children are all DropDownItems (AccessRightSelect
+  // draws its rich rows that way) is still a list, and the keyboard walks it
+  // like `options`. Any other custom content keeps its own keys.
+  const advancedItems = React.useMemo(() => {
+    const { advancedOptions } = props;
+    if (!React.isValidElement(advancedOptions)) return null;
+
+    const children = React.Children.toArray(advancedOptions.props.children);
+    const items: React.ReactElement<DropDownItemProps>[] = [];
+    for (const child of children) {
+      if (!React.isValidElement(child) || child.type !== DropDownItem)
+        return null;
+      items.push(child as React.ReactElement<DropDownItemProps>);
+    }
+    return items.length ? items : null;
+  }, [props.advancedOptions]);
+
+  // Which entries of the list the keyboard can land on, in order.
+  const pickable = React.useMemo(
+    () =>
+      advancedItems
+        ? advancedItems.map(
+            ({ props: item }) => !item.isSeparator && !item.disabled,
+          )
+        : (props.options ?? []).map(isOptionPickable),
+    [advancedItems, props.options, isOptionPickable],
+  );
+
   const stepActiveIndex = React.useCallback(
     (from: number, step: 1 | -1) => {
-      const list = props.options ?? [];
-      const start = from === -1 && step === -1 ? list.length : from;
-      for (let i = 1; i <= list.length; i += 1) {
-        const index = (start + step * i + list.length * 2) % list.length;
-        if (isOptionPickable(list[index])) return index;
+      const start = from === -1 && step === -1 ? pickable.length : from;
+      for (let i = 1; i <= pickable.length; i += 1) {
+        const index =
+          (start + step * i + pickable.length * 2) % pickable.length;
+        if (pickable[index]) return index;
       }
       return -1;
     },
-    [props.options, isOptionPickable],
+    [pickable],
   );
 
   React.useEffect(() => {
@@ -284,8 +312,9 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
 
   // The keys a listbox button answers: Enter, Space and the arrows open the
   // list; the arrows then move the highlight, Enter or Space picks it, and
-  // Escape or Tab closes the list. Arrow navigation covers `options` only --
-  // custom `advancedOptions` content is not a list of them.
+  // Escape or Tab closes the list. Arrow navigation covers `options`, and
+  // `advancedOptions` made of DropDownItems; other custom content is not a
+  // list, and keeps its keys.
   const onComboKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
     if (target.closest("input, textarea, [contenteditable='true']")) return;
@@ -300,7 +329,9 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     )
       return;
 
-    const navigable = !withAdvancedOptions && options.length > 0;
+    const navigable = withAdvancedOptions
+      ? !!advancedItems
+      : options.length > 0;
 
     if (!isOpen) {
       if (!["Enter", " ", "ArrowDown", "ArrowUp"].includes(e.key)) return;
@@ -308,15 +339,17 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
       e.preventDefault();
       consumeKey(e);
 
-      const selectedIndex = options.findIndex((option) =>
-        withLabel
-          ? option.label === selectedOption?.label
-          : option.key === selectedOption?.key,
-      );
+      const selectedIndex = advancedItems
+        ? advancedItems.findIndex(({ props: item }) => item.isSelected)
+        : options.findIndex((option) =>
+            withLabel
+              ? option.label === selectedOption?.label
+              : option.key === selectedOption?.key,
+          );
       setActiveIndex(
         !navigable
           ? -1
-          : selectedIndex !== -1 && isOptionPickable(options[selectedIndex])
+          : selectedIndex !== -1 && pickable[selectedIndex]
             ? selectedIndex
             : stepActiveIndex(-1, e.key === "ArrowUp" ? -1 : 1),
       );
@@ -344,8 +377,14 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
         if (!navigable) break;
         e.preventDefault();
         consumeKey(e);
-        const option = options[activeIndex];
-        if (option && isOptionPickable(option)) optionClick(option, e);
+        if (!pickable[activeIndex]) break;
+        if (advancedItems) {
+          // A click on the row picks it exactly as the mouse does: the row's
+          // own onClick runs, and the click closes the list on its way up.
+          document.getElementById(`${listboxId}-${activeIndex}`)?.click();
+          break;
+        }
+        optionClick(options[activeIndex], e);
         break;
       }
       case "Escape":
@@ -519,7 +558,20 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     ],
   );
 
-  const dropDownContent = advancedOptions || renderedOptions;
+  // A list of advanced rows gets the same ids and highlight as `options`.
+  const dropDownContent =
+    advancedItems && React.isValidElement(advancedOptions)
+      ? React.cloneElement(
+          advancedOptions,
+          undefined,
+          advancedItems.map((item, index) =>
+            React.cloneElement(item, {
+              id: `${listboxId}-${index}`,
+              isActiveDescendant: isOpen && index === activeIndex,
+            }),
+          ),
+        )
+      : advancedOptions || renderedOptions;
 
   const dropDownElement = React.useMemo(
     () => (

@@ -1,0 +1,124 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  max-width: 660px;
+}
+
+.description {
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--text-color);
+  margin-bottom: 24px;
+}
+
+.helpLink {
+  margin-inline-start: 4px;
+}
+
+.notice {
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  border-radius: 6px;
+  background: var(--payment-background-color);
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--text-color);
+}
+
+.noticeLink {
+  margin-inline-start: 4px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 32px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.toggle {
+  position: static;
+  flex-shrink: 0;
+  width: 28px;
+}
+
+.sectionBody {
+  display: flex;
+  flex-direction: column;
+  padding-inline-start: 40px;
+
+  @media (max-width: 600px) {
+    padding-inline-start: 0;
+  }
+}
+
+.sectionDescription {
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--payment-inactive-color);
+}
+
+.controls {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.periodCombobox {
+  padding: 0;
+}
+
+.amountField {
+  --input-block-children-padding: 0;
+
+  .amountInput {
+    width: 110px;
+  }
+}
+
+.currencySymbol {
+  padding-inline-start: 8px;
+  font-size: 13px;
+  color: var(--payment-inactive-color);
+}
+
+.symbolAfter {
+  flex-direction: row-reverse;
+
+  .currencySymbol {
+    padding-inline: 0 8px;
+  }
+}
+
+.status {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--payment-inactive-color);
+  margin-top: 8px;
+}
+
+.statusWarning {
+  color: var(--payment-warning-color);
+}
+
+.statusReached {
+  color: var(--warning-color);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.reminder {
+  color: var(--payment-inactive-color);
+}

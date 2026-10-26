@@ -41,6 +41,7 @@ import {
   LoadersContextProvider,
 } from "../utils/contexts/Loaders";
 import { getDefaultBreadCrumb } from "../utils";
+import { applyResolvedTitles } from "./FilesSelector.utils";
 import { FORMS_ROOT_FOLDER_TYPE, FORMS_SECTION_ID } from "../utils/constants";
 
 const FilesSelectorComponent = (props: FilesSelectorProps) => {
@@ -84,6 +85,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     createDefineRoomLabel,
     createDefineRoomType,
     disabledCreatePublicRoom,
+    onCreateAIAgent,
+    agentsEmptyDescription,
 
     shareKey,
     formProps,
@@ -108,6 +111,9 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     renderInPortal,
     disableBySecurity,
     withSubFolders,
+    resolveItemTitle,
+    itemTitlesVersion,
+    onFilesLoaded,
   } = props;
 
   const t = useCommonTranslation();
@@ -211,7 +217,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     disabledItems,
     disabledFolderType,
     filterParam,
-    withCreate: withCreateState,
     disableBySecurity,
     isRoomDisabled,
     setItems,
@@ -260,6 +265,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     setSelectedTreeNode,
     searchValue,
     withCreate: withCreateState,
+    onCreateAIAgent,
+    getRootData,
     disableBySecurity,
 
     recentFolder,
@@ -344,6 +351,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     applyFilterOption,
     disableBySecurity,
     withSubFolders,
+    onFilesLoaded,
 
     recentFolder,
     favoritesFolder,
@@ -819,6 +827,12 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           : afterSearch.current || !!items.length
     : false;
 
+  // itemTitlesVersion stands for titles that changed outside the items.
+  const displayItems = React.useMemo(
+    () => applyResolvedTitles(items, resolveItemTitle),
+    [items, resolveItemTitle, itemTitlesVersion],
+  );
+
   const SelectorBody = useSelectorBody({
     ...props,
 
@@ -855,7 +869,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           ? getRoomList
           : getFileList,
 
-    items,
+    items: displayItems,
     onSelect: onSelectAction,
 
     hasNextPage,
@@ -864,6 +878,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     isRoot,
 
     selectedItemType,
+    agentsEmptyDescription,
   });
 
   const selectorComponent = embedded ? (

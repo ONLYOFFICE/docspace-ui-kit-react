@@ -46,6 +46,7 @@ type AiSearchPageProps = {
   withBottomMargin?: boolean;
   onViewMore?: () => void;
   onOpenWebSearch?: () => void;
+  onOpenLimits?: () => void;
 };
 
 const AiSearchPage = (props: AiSearchPageProps) => {
@@ -56,6 +57,7 @@ const AiSearchPage = (props: AiSearchPageProps) => {
     withBottomMargin,
     onViewMore,
     onOpenWebSearch,
+    onOpenLimits,
   } = props;
 
   const { paymentApi } = useApi();
@@ -321,6 +323,17 @@ const AiSearchPage = (props: AiSearchPageProps) => {
           dataTestId="ai_search_see_pricing_link"
         >
           {t("SeePricing")}
+        </Link>
+        <span className={styles.linkSeparator} aria-hidden="true" />
+        <Link
+          fontSize="13px"
+          fontWeight={600}
+          color="accent"
+          textDecoration="underline dotted"
+          onClick={onOpenLimits}
+          dataTestId="ai_search_set_limit_link"
+        >
+          {t("SetSpendingLimit")}
         </Link>
       </Text>
 

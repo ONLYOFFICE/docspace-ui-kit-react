@@ -1,8 +1,10 @@
 import { useTranslation } from "react-i18next";
 
-import AiIllustration from "../../assets/aIIllustration.svg";
+import AiIllustrationDark from "../../assets/aIIllustration.dark.svg";
+import AiIllustrationLight from "../../assets/aIIllustration.light.svg";
 
 import { Text } from "../../components/text";
+import { useTheme } from "../../context/ThemeContext";
 
 import styles from "./ChatIntro.module.scss";
 
@@ -15,10 +17,13 @@ import styles from "./ChatIntro.module.scss";
  */
 export const ChatIntro = () => {
   const { t } = useTranslation("Common");
+  const { isBase } = useTheme();
+
+  const Icon = isBase ? AiIllustrationLight : AiIllustrationDark;
 
   return (
     <div className={styles.chatIntro} data-testid="chat-intro">
-      <AiIllustration className={styles.illustration} />
+      <Icon className={styles.illustration} />
       <Text
         fontSize="13px"
         fontWeight="600"
