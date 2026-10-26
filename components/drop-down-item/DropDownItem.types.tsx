@@ -11,7 +11,7 @@ export type DropDownItemProps = {
    * attribute.
    */
   height?: number;
-  /** The same, used instead of `height` on a tablet-width viewport. */
+  /** The same, used instead of `height` on a tablet-width viewport. Unlike `height`, it stays off the DOM. */
   heightTablet?: number;
   /** Whether to use modern compact styling with minimal padding */
   isModern?: boolean;

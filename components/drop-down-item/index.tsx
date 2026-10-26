@@ -114,6 +114,9 @@ const DropDownItem = ({
   betaLabel,
   paidLabel,
   role = "option",
+  // DropDown reads this off the element to size its virtualised rows; it is
+  // no attribute, so it must not reach the div.
+  heightTablet: _heightTablet,
   ...rest
 }: DropDownItemProps) => {
   const t = useCommonTranslation();

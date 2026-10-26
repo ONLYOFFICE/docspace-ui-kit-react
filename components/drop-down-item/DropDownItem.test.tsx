@@ -31,6 +31,15 @@ describe("<DropDownItem />", () => {
     expect(screen.getByText("Test Item")).toBeInTheDocument();
   });
 
+  // DropDown reads it off the element; on the div React warned about an
+  // unknown prop (the client's tag dropdown sets it).
+  it("keeps heightTablet off the DOM", () => {
+    render(<DropDownItem {...baseProps} heightTablet={32} />);
+    const item = screen.getByTestId("drop-down-item");
+    expect(item).not.toHaveAttribute("heightTablet");
+    expect(item).not.toHaveAttribute("heighttablet");
+  });
+
   it("handles disabled state", () => {
     render(<DropDownItem {...baseProps} disabled />);
     const item = screen.getByTestId("drop-down-item");
