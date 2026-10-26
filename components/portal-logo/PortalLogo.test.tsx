@@ -156,6 +156,38 @@ describe("PortalLogo", () => {
       }
     });
 
+    // isResizable swaps the src of the same element on a resize; the late
+    // rejection of the logo it replaced must not hide the one now shown.
+    it("ignores a late rejection for a src it no longer shows", async () => {
+      let rejectFirst: (reason: Error) => void = () => {};
+      const { decodeMock, restore } = settle(
+        () =>
+          new Promise<void>((_resolve, reject) => {
+            rejectFirst = reject;
+          }),
+      );
+      try {
+        render(<PortalLogo alt="Acme portal" isResizable />);
+        await waitFor(() => expect(decodeMock).toHaveBeenCalledTimes(1));
+        const image = screen.getByRole("img", { name: "Acme portal" });
+        const firstSrc = image.getAttribute("src");
+
+        mockResizeEvent(375);
+        await waitFor(() =>
+          expect(image.getAttribute("src")).not.toBe(firstSrc),
+        );
+        await act(async () => {
+          rejectFirst(new Error("broken"));
+        });
+
+        expect(screen.getByRole("img", { name: "Acme portal" }).tagName).toBe(
+          "IMG",
+        );
+      } finally {
+        restore();
+      }
+    });
+
     it("leaves an image still loading to onError", async () => {
       const { decodeMock, restore } = settle(
         () => Promise.reject(new Error("broken")),

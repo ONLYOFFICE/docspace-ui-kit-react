@@ -26,7 +26,13 @@ const PortalLogo = ({
   // decodes fine.
   const catchEarlyError = React.useCallback(
     (image: HTMLImageElement | null) => {
-      if (image?.complete) image.decode?.().catch(() => setIsError(true));
+      if (!image?.complete) return;
+      // A resize can swap the src of this same element before decode()
+      // settles; a late rejection then belongs to an image no longer shown.
+      const { src } = image;
+      image.decode?.().catch(() => {
+        if (image.src === src) setIsError(true);
+      });
     },
     [],
   );
