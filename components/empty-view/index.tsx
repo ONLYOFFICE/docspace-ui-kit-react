@@ -20,7 +20,7 @@ const EmptyView = ({
       className={`${styles.wrapper}${className ? ` ${className}` : ""}`}
       data-testid="empty-view"
     >
-      <div className={styles.header}>
+      <header className={styles.header}>
         {icon}
         <Text
           as="h3"
@@ -33,7 +33,7 @@ const EmptyView = ({
         <Text as="p" fontSize="12px" className={styles.subheading}>
           {description}
         </Text>
-      </div>
+      </header>
       {extraContent ? extraContent : null}
       {options ? (
         <div

@@ -193,3 +193,50 @@ describe("<DropDownItem />", () => {
     });
   });
 });
+
+describe("<DropDownItem /> icon source", () => {
+  const ownSvg = "/static/images/icons/16/trash.react.svg";
+
+  it("inlines a .svg on the page's own origin", () => {
+    render(<DropDownItem {...baseProps} icon={ownSvg} />);
+
+    expect(screen.getByTestId("mocked-react-svg")).toHaveAttribute(
+      "data-src",
+      ownSvg,
+    );
+    expect(screen.queryByAltText("plugin-logo")).not.toBeInTheDocument();
+  });
+
+  it("inlines an SVG data URL", () => {
+    const dataUrl = "data:image/svg+xml;base64,PHN2Zy8+";
+
+    render(<DropDownItem {...baseProps} icon={dataUrl} />);
+
+    expect(screen.getByTestId("mocked-react-svg")).toHaveAttribute(
+      "data-src",
+      dataUrl,
+    );
+  });
+
+  it("draws a cross-origin .svg as an image, without fetching it", () => {
+    const foreignSvg = "https://cdn.example.com/icon.svg";
+
+    render(<DropDownItem {...baseProps} icon={foreignSvg} />);
+
+    expect(screen.getByAltText("plugin-logo")).toHaveAttribute(
+      "src",
+      foreignSvg,
+    );
+    expect(screen.queryByTestId("mocked-react-svg")).not.toBeInTheDocument();
+  });
+
+  it("draws a bitmap as an image, even under images/", () => {
+    render(<DropDownItem {...baseProps} icon="/static/images/logo.png" />);
+
+    expect(screen.getByAltText("plugin-logo")).toHaveAttribute(
+      "src",
+      "/static/images/logo.png",
+    );
+    expect(screen.queryByTestId("mocked-react-svg")).not.toBeInTheDocument();
+  });
+});

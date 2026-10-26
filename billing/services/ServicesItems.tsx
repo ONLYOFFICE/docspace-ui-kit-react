@@ -38,6 +38,7 @@ type ServicesItemsProps = {
   cardDisabled?: boolean;
   onOpenSupportedModels?: () => void;
   onOpenWebSearch?: () => void;
+  onOpenLimits?: () => void;
   docsConnectState?: TDocsConnectCardState;
   onDocsConnectToggle?: () => void;
 };
@@ -49,6 +50,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   isTablet,
   onOpenSupportedModels,
   onOpenWebSearch,
+  onOpenLimits,
   docsConnectState,
   onDocsConnectToggle,
 }) => {
@@ -135,6 +137,13 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     onOpenWebSearch?.();
   };
 
+  const onLimitsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    onOpenLimits?.();
+  };
+
   const textTooltip = (
     <>
       <Text fontWeight={600} fontSize="12px">
@@ -153,6 +162,23 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             })}
       </Text>
     </>
+  );
+
+  const withLimitLink = (pricing: React.ReactNode, testId: string) => (
+    <span className={styles.linksRow}>
+      {pricing}
+      <span className={styles.linkSeparator} aria-hidden="true" />
+      <Link
+        fontSize="13px"
+        fontWeight={600}
+        color="accent"
+        textDecoration="underline dotted"
+        onClick={onLimitsClick}
+        dataTestId={testId}
+      >
+        {t("SetSpendingLimit")}
+      </Link>
+    </span>
   );
 
   const priceDescription = (
@@ -206,7 +232,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
       case AI_ENUM:
         if (isLowWalletBalance) {
-          return (
+          return withLimitLink(
             <CommonTrans
               i18nKey="AIPricingLowBalanceWithPricing"
               values={{ price: formatWalletCurrency() }}
@@ -222,11 +248,12 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                   />
                 ),
               }}
-            />
+            />,
+            "ai_set_limit_link",
           );
         }
 
-        return (
+        return withLimitLink(
           <Link
             fontSize="13px"
             fontWeight={600}
@@ -236,10 +263,11 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             dataTestId="ai_see_pricing_link"
           >
             {t("SeePricing")}
-          </Link>
+          </Link>,
+          "ai_set_limit_link",
         );
       case AI_SEARCH_ENUM:
-        return (
+        return withLimitLink(
           <Link
             fontSize="13px"
             fontWeight={600}
@@ -249,7 +277,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             dataTestId="ai_search_see_pricing_link"
           >
             {t("SeePricing")}
-          </Link>
+          </Link>,
+          "ai_search_set_limit_link",
         );
       default:
         return "";

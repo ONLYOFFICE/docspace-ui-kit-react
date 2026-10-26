@@ -17,6 +17,7 @@ import { Badge } from "../badge";
 import { Link, LinkTarget, LinkType } from "../link";
 
 import type { DropDownItemProps } from "./DropDownItem.types";
+import { isInlinedSvgUrl, isSvgDataUrl } from "./iconSource";
 import styles from "./DropDownItem.module.scss";
 import { TooltipContainer } from "../tooltip";
 import { getConstName } from "../../constants/consts";
@@ -30,13 +31,7 @@ const IconComponent = ({
   icon: string | React.ReactElement | React.ElementType;
   fillIcon?: boolean;
 }) => {
-  const isImageSrc = (src: string) =>
-    (!src.includes("images/") && !src.includes(".svg")) ||
-    src.includes("webplugins");
-
-  const isDataUrlSvg = (src: string) => src.startsWith("data:image/svg+xml");
-
-  if (typeof icon === "string" && isDataUrlSvg(icon)) {
+  if (typeof icon === "string" && isSvgDataUrl(icon)) {
     return (
       <ReactSVG
         className={
@@ -49,7 +44,7 @@ const IconComponent = ({
     );
   }
 
-  if (typeof icon === "string" && isImageSrc(icon)) {
+  if (typeof icon === "string" && !isInlinedSvgUrl(icon)) {
     return (
       <img className="drop-down-icon_image" src={icon} alt="plugin-logo" />
     );

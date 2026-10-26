@@ -29,6 +29,29 @@ import type {
 import type { DeviceType } from "../../enums";
 import type { TGetIcon } from "../utils/types";
 
+/** A file of the list, as `resolveItemTitle` and `onFilesLoaded` see it. */
+export type TFilesSelectorFile = {
+  id: number | string;
+  /** The title the server sent, extension included. */
+  title: string;
+  /** Extension including the dot. */
+  fileExst?: string;
+  /** Whether the file is end-to-end encrypted. */
+  encrypted?: boolean;
+  /** The file's download URL. */
+  viewUrl?: string;
+};
+
+/** Where the files handed to `onFilesLoaded` sit. */
+export type TFilesSelectorLoadedFiles = {
+  /** The folder whose contents loaded. */
+  folderId: number | string;
+  /** The room on the folder's path, if the folder lies in one. */
+  roomId?: number | string;
+  /** Whether that room is a private (end-to-end encrypted) room. */
+  isInsidePrivateRoom: boolean;
+};
+
 export type TCreateDefineRoom = {
   label: string;
   type: RoomType;
@@ -161,6 +184,10 @@ export type UseFilesHelpersProps = {
   withFavoritesTreeFolder?: boolean;
   activeSpecialScope?: SpecialFolderScope | null;
   formsSection?: boolean;
+  onFilesLoaded?: (
+    files: TFilesSelectorFile[],
+    context: TFilesSelectorLoadedFiles,
+  ) => void;
 };
 
 export type TUseInputItemHelper = {
@@ -286,6 +313,17 @@ export type FilesSelectorProps = TInfoBar &
     createDefineRoomType?: RoomType;
     /** Disables the Public room type in the create-room dropdown */
     disabledCreatePublicRoom?: boolean;
+    /**
+     * Shows a "New agent" item in the AI agents list, and on its empty screen,
+     * when the user may create agents there. The selector cannot create one
+     * itself -- an agent needs the host's create dialog -- so this opens it.
+     */
+    onCreateAIAgent?: () => void;
+    /**
+     * Description of the empty AI agents list when it offers no "New agent",
+     * e.g. why agents cannot be created yet. Empty by default.
+     */
+    agentsEmptyDescription?: string;
     formProps?: FormPropsType;
     withPadding?: boolean;
     checkCreating?: boolean;
@@ -300,4 +338,27 @@ export type FilesSelectorProps = TInfoBar &
     disableBySecurity?: string;
     folderFormValidation?: RegExp;
     withSubFolders?: boolean;
+
+    /**
+     * The title to show for a file instead of the one the server sent, such
+     * as the decrypted name of an end-to-end encrypted file. Return undefined
+     * to keep the server's title. Called for every file row on each render,
+     * so keep it pure and cheap. The shown title is also what `onSubmit`
+     * receives as the selected file's title; search and sorting still work on
+     * the server's titles.
+     */
+    resolveItemTitle?: (file: TFilesSelectorFile) => string | undefined;
+    /**
+     * Change it when the titles `resolveItemTitle` returns have changed, so
+     * the rows already on screen are redrawn without a new request.
+     */
+    itemTitlesVersion?: number;
+    /**
+     * Called with the files of each page of a folder once that page has
+     * loaded, and where they sit, so the host can prepare their titles.
+     */
+    onFilesLoaded?: (
+      files: TFilesSelectorFile[],
+      context: TFilesSelectorLoadedFiles,
+    ) => void;
   };

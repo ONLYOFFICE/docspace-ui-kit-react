@@ -19,6 +19,7 @@ import { IconButton } from "../../icon-button";
 import { Badge } from "../../badge";
 import { MCPIcon, MCPIconSize } from "../../mcp-icon";
 import { Tooltip } from "../../tooltip";
+import { isInlinedSvgUrl, isSvgDataUrl } from "../../drop-down-item/iconSource";
 
 import type {
   ContextMenuModel,
@@ -428,16 +429,11 @@ const SubMenu = (props: SubMenuProps) => {
 
       if (!item.icon) return null;
 
-      // Handle data URI SVGs
-      if (item.icon.startsWith("data:image/svg+xml")) {
+      if (isSvgDataUrl(item.icon)) {
         return <ReactSVG className={iconClassName || ""} src={item.icon} />;
       }
 
-      // Handle regular images
-      if (
-        (!item.icon.includes("images/") && !item.icon.includes(".svg")) ||
-        item.icon.includes("webplugins")
-      ) {
+      if (!isInlinedSvgUrl(item.icon)) {
         return (
           <img
             src={item.icon}
@@ -447,7 +443,6 @@ const SubMenu = (props: SubMenuProps) => {
         );
       }
 
-      // Handle SVG URLs
       return (
         <ReactSVG
           wrapper="span"
@@ -490,6 +485,19 @@ const SubMenu = (props: SubMenuProps) => {
       if (e.button !== 1) return;
 
       onClick(e);
+    };
+
+    // A middle-click already ran onClick on mousedown, and preventDefault there
+    // does not stop the browser from opening the href in a new tab afterwards -
+    // only cancelling auxclick does. Without this an item handling the new tab
+    // itself opened two, and one with no url opened the current page + "#".
+    // Same rule as onItemClick, so middle- and left-click agree.
+    const onAuxClick = (e: React.MouseEvent) => {
+      if (e.button !== 1) return;
+
+      if (item.disabled || !item.url || (item.onClick && item.preventNewTab)) {
+        e.preventDefault();
+      }
     };
 
     const onDoubleClick = (e: React.MouseEvent) => {
@@ -606,6 +614,7 @@ const SubMenu = (props: SubMenuProps) => {
         onClick={onClick}
         onDoubleClick={onDoubleClick}
         onMouseDown={onMouseDown}
+        onAuxClick={onAuxClick}
         onMouseEnter={(e) => onItemMouseEnter(e, item)}
         onMouseMove={() => mouseMoveHandler?.(index, model, menuLevel)}
       >

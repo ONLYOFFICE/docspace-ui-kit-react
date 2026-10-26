@@ -139,6 +139,7 @@ const Selector = ({
 
   displayFileExtension,
 }: SelectorProps) => {
+  const selectorRef = React.useRef<HTMLDivElement>(null);
   const [footerVisible, setFooterVisible] = React.useState<boolean>(false);
 
   const [renderedItems, setRenderedItems] = React.useState<TSelectorItem[]>([]);
@@ -438,6 +439,25 @@ const Selector = ({
   React.useEffect(() => {
     const onKeyboardAction = (e: KeyboardEvent) => {
       if (inputItemVisible) return;
+      // A dialog opened from the selector (e.g. "New agent" opens the host's
+      // create dialog) is portalled after it and closes on this same Escape;
+      // it must not take the selector down with it. Only a modal dialog
+      // counts -- a popover such as ColorPicker is also role="dialog" -- and
+      // not one the selector itself sits in.
+      const root = selectorRef.current;
+      const isUnderDialog =
+        !!root &&
+        Array.from(
+          document.querySelectorAll('[role="dialog"][aria-modal="true"]'),
+        ).some(
+          (dialog) =>
+            !dialog.contains(root) &&
+            !!(
+              root.compareDocumentPosition(dialog) &
+              Node.DOCUMENT_POSITION_FOLLOWING
+            ),
+        );
+      if (isUnderDialog) return;
       if (e.key === ButtonKeys.esc) {
         onCancel?.();
       }
@@ -661,6 +681,7 @@ const Selector = ({
 
   const selectorComponent = (
     <div
+      ref={selectorRef}
       id={id}
       className={classNames(styles.selector, className)}
       style={style}

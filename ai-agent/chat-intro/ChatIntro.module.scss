@@ -1,7 +1,8 @@
 .chatIntro {
   // Overridable metrics/colors, so a host embedding the chat in a tighter
   // panel can scale the block without touching the markup.
-  --chat-intro-illustration-size: 112px;
+  --chat-intro-illustration-size-w: 150px;
+  --chat-intro-illustration-size-h: 105px;
   --chat-intro-gap: 13px;
   --chat-intro-padding-block: 8px;
   --chat-intro-font-size: 14px;
@@ -22,8 +23,8 @@
 
   // The artwork is a square viewBox whose card is horizontally centered,
   // so a single size keeps its proportions.
-  width: var(--chat-intro-illustration-size);
-  height: var(--chat-intro-illustration-size);
+  width: var(--chat-intro-illustration-size-w);
+  height: var(--chat-intro-illustration-size-h);
 }
 
 .text {

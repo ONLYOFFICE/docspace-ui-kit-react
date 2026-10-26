@@ -58,6 +58,7 @@ export default defineConfig({
             "context/**/*.test.{ts,tsx}",
             "providers/**/*.test.{ts,tsx}",
             "hooks/**/*.test.{ts,tsx}",
+            "billing/**/*.test.{ts,tsx}",
             "scripts/**/*.test.{ts,mjs}",
             // The legal-practice samples carry real logic -- PKCE, role mapping --
             // that readers copy into applications, so it is tested like the kit.
