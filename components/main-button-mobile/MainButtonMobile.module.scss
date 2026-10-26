@@ -106,6 +106,15 @@
 
     .drop-down-item-button {
       color: var(--main-button-mobile-dropdown-button-color);
+      // The item's own hover tint and keyboard ring are drawn for a light
+      // list; on this coloured block they take the block's colours, or the
+      // white label would sit on a near-white highlight.
+      --drop-down-item-hover-bg: var(
+        --main-button-mobile-dropdown-hover-button-color
+      );
+      --drop-down-item-focus-ring-color: var(
+        --main-button-mobile-dropdown-button-color
+      );
 
       svg {
         path[fill] {
