@@ -1,7 +1,7 @@
 import React from "react";
 
-import AiAgentsEmptyDarkIcon from "../../../../assets/emptyview/empty.ai-agents.icon.dark.svg";
-import AiAgentsEmptyLightIcon from "../../../../assets/emptyview/empty.ai-agents.icon.light.svg";
+import AiAgentsNotAvailableDarkIcon from "../../../../assets/ai.chat.not.available.dark.svg";
+import AiAgentsNotAvailableLightIcon from "../../../../assets/ai.chat.not.available.light.svg";
 
 import { EmptyView } from "../../../../components/empty-view";
 import { useTheme } from "../../../../context/ThemeContext";
@@ -44,7 +44,11 @@ export const ChatNoAccessScreen = ({
   const { isBase } = useTheme();
   const t = useCommonTranslation();
 
-  const icon = isBase ? <AiAgentsEmptyLightIcon /> : <AiAgentsEmptyDarkIcon />;
+  const icon = isBase ? (
+    <AiAgentsNotAvailableLightIcon />
+  ) : (
+    <AiAgentsNotAvailableDarkIcon />
+  );
 
   const { title, description, showBenefits } = getNoAccessCopy({
     isAgents,

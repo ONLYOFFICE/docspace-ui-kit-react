@@ -41,7 +41,6 @@ const useSocketHelper = ({
   disabledItems,
   disabledFolderType,
   filterParam,
-  withCreate,
   setItems,
   setBreadCrumbs,
   setTotal,
@@ -166,19 +165,37 @@ const useSocketHelper = ({
         if (opt.type === "folder") {
           setTotal((v) => v + 1);
 
-          if (withCreate) {
-            const newValue = [...value];
+          const newValue = [...value];
 
-            let idx = 1;
+          // Already listed: the input row's own reconcile got there first.
+          const listedIdx = value.findIndex(
+            (v) => v.isFolder && idsEqual(v.id, item.id),
+          );
 
-            if (value[0]?.isInputItem) idx = 0;
-
-            newValue.splice(idx, 1, item);
+          if (listedIdx > -1) {
+            newValue.splice(listedIdx, 1, item);
 
             return newValue;
           }
 
-          return [item, ...value];
+          // A new folder goes in above the listed ones, below the rows the
+          // list keeps on top: Recent and Favorites, their separator and the
+          // create item. It never takes an open input row's place -- that row
+          // may be another folder still being typed; the input's own
+          // reconcile drops the row once its folder is listed.
+          let idx = 0;
+
+          while (
+            idx < value.length &&
+            (value[idx].isCreateNewItem ||
+              value[idx].specialFolderScope ||
+              value[idx].isSeparator)
+          )
+            idx += 1;
+
+          newValue.splice(idx, 0, item);
+
+          return newValue;
         }
 
         if (opt.type === "file") {
@@ -217,7 +234,6 @@ const useSocketHelper = ({
       getIcon,
       setItems,
       setTotal,
-      withCreate,
       disableBySecurity,
       isRoomDisabled,
     ],

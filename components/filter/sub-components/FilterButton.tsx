@@ -22,6 +22,7 @@ const FilterButton = ({
   userId,
   disableThirdParty,
   renderSelector,
+  renderCustomItem,
 }: FilterButtonProps) => {
   const [showFilterBlock, setShowFilterBlock] = React.useState(false);
 
@@ -57,6 +58,7 @@ const FilterButton = ({
           userId={userId}
           disableThirdParty={disableThirdParty}
           renderSelector={renderSelector}
+          renderCustomItem={renderCustomItem}
         />
       ) : null}
     </>

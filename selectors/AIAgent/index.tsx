@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo } from "react";
 
 import InfoIconSvgUrl from "../../assets/info.outline.react.svg";
-import EmptyScreenAIAgentsSelectorLight from "../../assets/ai.agents.selector.light.react.svg";
-import EmptyScreenAIAgentsSelectorDark from "../../assets/ai.agents.selector.dark.react.svg";
+import EmptyScreenAIAgentsSelectorLight from "../../assets/emptyview/empty.agents.info.light.svg";
+import EmptyScreenAIAgentsSelectorDark from "../../assets/emptyview/empty.agents.info.dark.svg";
 
 import { useTheme } from "../../context/ThemeContext";
 import { useCommonTranslation } from "../../utils/i18n";
@@ -138,7 +138,6 @@ const AIAgentSelectorComponent = ({
   );
 
   const { subscribe } = useSocketHelper({
-    withCreate: true,
     setTotal,
     setItems,
     disabledItems: [],

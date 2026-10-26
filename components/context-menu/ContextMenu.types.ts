@@ -41,7 +41,11 @@ export type ContextMenuType = {
   key: string | number;
   /** What the item reads. A string also becomes its hover tooltip. */
   label: string | React.ReactNode;
-  /** URL of the item's icon, fetched at runtime. `iconNode` is the alternative. */
+  /**
+   * URL of the item's icon. A same-origin `.svg` or an SVG data URL is fetched
+   * and inlined, anything else, a cross-origin `.svg` included, becomes an
+   * `<img>`. `iconNode` is the alternative.
+   */
   icon?: string;
   /** Greys the item out and stops its `onClick`. */
   disabled?: boolean;

@@ -100,6 +100,7 @@ const FilterInput = React.memo(
     initSelectedFilterData,
 
     renderSelector,
+    renderCustomItem,
     setEditRoomGroupsDialogVisible,
     getAllRoomGroups,
     roomGroups,
@@ -210,7 +211,7 @@ const FilterInput = React.memo(
       ) => {
         const newItems = selectedItems
           .map((item) => ({ ...item }))
-          .filter((item) => item.key !== key);
+          .filter((item) => !(item.key === key && item.group === group));
 
         setSelectedItems(newItems);
 
@@ -618,6 +619,7 @@ const FilterInput = React.memo(
               userId={userId}
               disableThirdParty={disableThirdParty}
               renderSelector={renderSelector}
+              renderCustomItem={renderCustomItem}
             />
           ) : null}
 

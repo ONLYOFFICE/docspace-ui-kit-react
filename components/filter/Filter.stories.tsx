@@ -9,8 +9,15 @@ import ViewRowsReactSvg from "../../assets/view-rows.react.svg";
 import ViewTilesReactSvg from "../../assets/view-tiles.react.svg";
 
 import { DeviceType, FilterGroups, FilterKeys } from "../../enums";
+import { Button, ButtonSize } from "../button";
+import { Text } from "../text";
 import Filter from ".";
-import type { FilterProps, TItem, TSortDataItem } from "./Filter.types";
+import type {
+  CustomItemRenderProps,
+  FilterProps,
+  TItem,
+  TSortDataItem,
+} from "./Filter.types";
 import {
   ViewSelector,
   type ViewSelectorProps,
@@ -181,6 +188,95 @@ const optionKindItems = [
     isCheckbox: true,
   },
 ] as TItem[];
+
+// A host's own group: the enum lists only the groups the portal ships.
+const ratingGroup = "filter-rating" as FilterGroups;
+
+const ratingOptions = [
+  { key: "3", label: "3 stars and up" },
+  { key: "4", label: "4 stars and up" },
+  { key: "5", label: "5 stars" },
+];
+
+const customGroupItems = [
+  {
+    key: ratingGroup,
+    group: ratingGroup,
+    label: "Rating",
+    isHeader: true,
+    isLast: true,
+  },
+  { key: "rating", group: ratingGroup, label: "", isCustom: true },
+] as TItem[];
+
+const RatingStep = ({
+  onChange,
+  closePanel,
+}: Pick<CustomItemRenderProps, "onChange" | "closePanel">) => (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "8px",
+      padding: "16px",
+    }}
+  >
+    <Text fontSize="16px" fontWeight={700}>
+      Rating
+    </Text>
+    {ratingOptions.map((option) => (
+      <Button
+        key={option.key}
+        label={option.label}
+        size={ButtonSize.small}
+        scale
+        onClick={() => {
+          onChange(option);
+          closePanel();
+        }}
+      />
+    ))}
+    <Button label="Back" size={ButtonSize.small} scale onClick={closePanel} />
+  </div>
+);
+
+const renderRatingItem = ({
+  value,
+  onChange,
+  openPanel,
+  closePanel,
+}: CustomItemRenderProps) => (
+  <div style={{ display: "flex", gap: "8px" }}>
+    <Button
+      label={value?.label ?? "Choose rating"}
+      size={ButtonSize.small}
+      onClick={() =>
+        openPanel(() => (
+          <RatingStep onChange={onChange} closePanel={closePanel} />
+        ))
+      }
+    />
+    {value ? (
+      <Button
+        label="Clear"
+        size={ButtonSize.small}
+        onClick={() => onChange(null)}
+      />
+    ) : null}
+  </div>
+);
+
+const multiChipSelection: TItem[] = [
+  {
+    key: '{"rating":"4","reviews":"10"}',
+    group: ratingGroup,
+    label: "Rating",
+    chips: [
+      { key: "rating", label: "Rating: 4 stars and up" },
+      { key: "reviews", label: "Reviews: 10 and more" },
+    ],
+  },
+];
 
 const groupIcon = {
   id: "folder",
@@ -369,6 +465,11 @@ const meta = {
       control: false,
       description:
         "Renders the step the panel opens when a group picks a person or a room; without it that step stays empty",
+    },
+    renderCustomItem: {
+      control: false,
+      description:
+        "Renders a group item marked `isCustom`, with the group's pending value, `onChange` to set it and `openPanel` / `closePanel` for a nested step; without it such an item stays empty",
     },
     userId: {
       control: "text",
@@ -950,6 +1051,42 @@ export const WithFilterChips: Story = {
   },
 };
 
+export const OneFilterManyChips: Story = {
+  render: (args) => <FilterTemplate {...args} />,
+  args: {
+    initSelectedFilterData: multiChipSelection,
+    getSelectedFilterData: () => multiChipSelection,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "One filter value drawn as several chips, for a filter made of conditions the reader should see and drop one by one. Each entry of `chips` becomes a chip; clicking one calls `removeSelectedItem` with that chip's key and the item's group, and the host rebuilds the value without it.",
+      },
+      source: {
+        code: `const selected = [
+  {
+    key: serializedValue,
+    group: "filter-rating",
+    label: "Rating",
+    chips: [
+      { key: "rating", label: "Rating: 4 stars and up" },
+      { key: "reviews", label: "Reviews: 10 and more" },
+    ],
+  },
+];
+
+<Filter
+  initSelectedFilterData={selected}
+  getSelectedFilterData={() => selected}
+  removeSelectedItem={({ key, group }) => dropCondition(group, key)}
+  {...props}
+/>`,
+      },
+    },
+  },
+};
+
 export const PanelOptionKinds: Story = {
   render: (args) => <OpenPanelTemplate {...args} />,
   args: {
@@ -978,6 +1115,40 @@ export const PanelOptionKinds: Story = {
     { key: FilterGroups.filterFolders, group: FilterGroups.filterFolders, label: "Search", isHeader: true, withoutHeader: true, isLast: true },
     { key: FilterKeys.excludeSubfolders, group: FilterGroups.filterFolders, label: "Exclude subfolders", isCheckbox: true },
   ])}
+  {...props}
+/>`,
+      },
+    },
+  },
+};
+
+export const CustomGroupItem: Story = {
+  render: (args) => <OpenPanelTemplate {...args} />,
+  args: {
+    getFilterData: () => Promise.resolve(customGroupItems),
+    renderCustomItem: renderRatingItem,
+  },
+  parameters: {
+    docs: {
+      story: panelDocsStory,
+      description: {
+        story:
+          "A group the host draws itself, for a filter none of the built-in kinds can express. The item is marked `isCustom` and rendered by `renderCustomItem`: **Choose rating** opens a nested step with `openPanel`, a choice there sets the pending value with `onChange` and returns with `closePanel`. The value is applied and compared like any other, so Apply and `onFilter` need nothing extra.",
+      },
+      source: {
+        code: `<Filter
+  getFilterData={() => Promise.resolve([
+    { key: "filter-rating", group: "filter-rating", label: "Rating", isHeader: true, isLast: true },
+    { key: "rating", group: "filter-rating", label: "", isCustom: true },
+  ])}
+  renderCustomItem={({ value, onChange, openPanel, closePanel }) => (
+    <Button
+      label={value?.label ?? "Choose rating"}
+      onClick={() => openPanel(() => (
+        <RatingStep onChange={onChange} closePanel={closePanel} />
+      ))}
+    />
+  )}
   {...props}
 />`,
       },
