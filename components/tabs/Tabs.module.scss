@@ -277,12 +277,24 @@
       }
     }
 
-    // Drawn inside the tab: the scroller around the bar clips anything
-    // outside it.
+    // The keyboard ring is a frame of its own: an outline inside the tab
+    // crosses the letters, and one outside is clipped at the top and the
+    // bottom by the scroller around the bar. The frame stays within the
+    // tab's height, above the underline, and reaches a little past the label
+    // on either side.
+    position: relative;
+
     &:focus-visible {
-      outline: 2px solid var(--accent-main);
-      outline-offset: -2px;
-      border-radius: 3px;
+      outline: none;
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0 -4px var(--tabs-indicator-height, 4px);
+        border: 2px solid var(--accent-main);
+        border-radius: 3px;
+        pointer-events: none;
+      }
     }
   }
 
