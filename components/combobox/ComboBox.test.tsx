@@ -6,6 +6,7 @@ import { ComboBox } from "./ComboBox";
 import { ComboBoxDisplayType, ComboBoxSize } from "./ComboBox.enums";
 import styles from "./ComboBox.module.scss";
 import * as DropDownModule from "../drop-down";
+import { DropDownItem } from "../drop-down-item";
 import type { DropDownProps } from "../drop-down/DropDown.types";
 
 const mockOptions = [
@@ -345,6 +346,89 @@ describe("ComboBox", () => {
     expect(combo).toHaveAttribute("aria-expanded", "true");
 
     window.removeEventListener("keydown", onWindowKeyDown);
+  });
+
+  // AccessRightSelect draws its rich rows as advancedOptions DropDownItems.
+  describe("advancedOptions made of DropDownItems", () => {
+    const renderRows = (onPick: (key: string) => void) =>
+      render(
+        <ComboBox
+          {...baseProps}
+          options={[]}
+          advancedOptions={
+            <div style={{ display: "contents" }}>
+              <DropDownItem key="manager" onClick={() => onPick("manager")}>
+                Manager
+              </DropDownItem>
+              <DropDownItem key="s1" isSeparator />
+              <DropDownItem
+                key="editor"
+                disabled
+                onClick={() => onPick("editor")}
+              >
+                Editor
+              </DropDownItem>
+              <DropDownItem
+                key="viewer"
+                isSelected
+                onClick={() => onPick("viewer")}
+              >
+                Viewer
+              </DropDownItem>
+            </div>
+          }
+        />,
+      );
+
+    const highlighted = (button: HTMLElement) =>
+      document.getElementById(
+        button.getAttribute("aria-activedescendant") ?? "",
+      );
+
+    it("opens on the selected row and walks the others, skipping what cannot be picked", () => {
+      renderRows(vi.fn());
+      const button = screen.getAllByRole("button")[0];
+
+      fireEvent.keyDown(button, { key: "Enter" });
+      expect(button).toHaveAttribute("aria-expanded", "true");
+      expect(highlighted(button)).toHaveTextContent("Viewer");
+      expect(highlighted(button)).toHaveAttribute("data-focused", "true");
+
+      fireEvent.keyDown(button, { key: "ArrowDown" });
+      expect(highlighted(button)).toHaveTextContent("Manager");
+      fireEvent.keyDown(button, { key: "ArrowDown" });
+      expect(highlighted(button)).toHaveTextContent("Viewer");
+      fireEvent.keyDown(button, { key: "ArrowUp" });
+      expect(highlighted(button)).toHaveTextContent("Manager");
+    });
+
+    it("picks the highlighted row with Enter, as a click on it does", () => {
+      const onPick = vi.fn();
+      renderRows(onPick);
+      const button = screen.getAllByRole("button")[0];
+
+      fireEvent.keyDown(button, { key: "Enter" });
+      fireEvent.keyDown(button, { key: "ArrowDown" });
+      fireEvent.keyDown(button, { key: "Enter" });
+
+      expect(onPick).toHaveBeenCalledTimes(1);
+      expect(onPick).toHaveBeenCalledWith("manager");
+      expect(button).toHaveAttribute("aria-expanded", "false");
+    });
+
+    it("keeps the arrows from the page's hotkeys", () => {
+      renderRows(vi.fn());
+      const button = screen.getAllByRole("button")[0];
+      fireEvent.keyDown(button, { key: "Enter" });
+
+      const onWindowKeyDown = vi.fn();
+      window.addEventListener("keydown", onWindowKeyDown);
+      const down = fireEvent.keyDown(button, { key: "ArrowDown" });
+      window.removeEventListener("keydown", onWindowKeyDown);
+
+      expect(down).toBe(false);
+      expect(onWindowKeyDown).not.toHaveBeenCalled();
+    });
   });
 
   it("leaves keys in the children block to the children", () => {
