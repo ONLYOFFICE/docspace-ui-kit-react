@@ -452,6 +452,7 @@ const Selector = ({
         ).some(
           (dialog) =>
             !dialog.contains(root) &&
+            !dialog.closest('[inert], [aria-hidden="true"]') &&
             !!(
               root.compareDocumentPosition(dialog) &
               Node.DOCUMENT_POSITION_FOLLOWING

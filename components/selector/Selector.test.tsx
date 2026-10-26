@@ -159,6 +159,25 @@ describe("<Selector /> Escape", () => {
 
     expect(onCancel).toHaveBeenCalledOnce();
   });
+  it("closes past a closed modal dialog left mounted after it", () => {
+    const onCancel = vi.fn();
+    renderSelector({ onCancel });
+
+    const closedModal = document.createElement("div");
+    closedModal.setAttribute("inert", "");
+    closedModal.setAttribute("aria-hidden", "true");
+    const dialog = document.createElement("div");
+    dialog.setAttribute("role", "dialog");
+    dialog.setAttribute("aria-modal", "true");
+    closedModal.appendChild(dialog);
+    document.body.appendChild(closedModal);
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    closedModal.remove();
+
+    expect(onCancel).toHaveBeenCalledOnce();
+  });
+
   it("closes past a non-modal role=dialog element such as a popover", () => {
     const onCancel = vi.fn();
     renderSelector({ onCancel });
