@@ -102,6 +102,79 @@ describe("PortalLogo", () => {
     expect(fallback.tagName.toLowerCase()).toBe("svg");
   });
 
+  // A server-rendered logo that failed before hydration never reaches onError;
+  // it stayed a broken image (the SDK's public-room password page).
+  describe("an image that settled before it mounted", () => {
+    const settle = (decode: () => Promise<void>, complete = true) => {
+      const completeSpy = vi
+        .spyOn(HTMLImageElement.prototype, "complete", "get")
+        .mockReturnValue(complete);
+      // jsdom has no decode(); the component calls it only when present.
+      const decodeMock = vi.fn(decode);
+      Object.defineProperty(HTMLImageElement.prototype, "decode", {
+        configurable: true,
+        value: decodeMock,
+      });
+      return {
+        decodeMock,
+        restore: () => {
+          completeSpy.mockRestore();
+          Reflect.deleteProperty(HTMLImageElement.prototype, "decode");
+        },
+      };
+    };
+
+    it("shows the fallback when the image failed", async () => {
+      const { restore } = settle(() => Promise.reject(new Error("broken")));
+      try {
+        render(<PortalLogo alt="Acme portal" />);
+
+        await waitFor(() =>
+          expect(
+            screen
+              .getByRole("img", { name: "Acme portal" })
+              .tagName.toLowerCase(),
+          ).toBe("svg"),
+        );
+      } finally {
+        restore();
+      }
+    });
+
+    it("keeps the image when it decoded", async () => {
+      const { decodeMock, restore } = settle(() => Promise.resolve());
+      try {
+        render(<PortalLogo alt="Acme portal" />);
+        await waitFor(() => expect(decodeMock).toHaveBeenCalled());
+        await act(async () => {});
+
+        expect(screen.getByRole("img", { name: "Acme portal" }).tagName).toBe(
+          "IMG",
+        );
+      } finally {
+        restore();
+      }
+    });
+
+    it("leaves an image still loading to onError", async () => {
+      const { decodeMock, restore } = settle(
+        () => Promise.reject(new Error("broken")),
+        false,
+      );
+      try {
+        render(<PortalLogo alt="Acme portal" />);
+        await act(async () => {});
+
+        expect(decodeMock).not.toHaveBeenCalled();
+        expect(screen.getByRole("img", { name: "Acme portal" }).tagName).toBe(
+          "IMG",
+        );
+      } finally {
+        restore();
+      }
+    });
+  });
+
   it("hides the fallback mark from assistive technology when alt is empty", () => {
     render(<PortalLogo alt="" />);
     fireEvent.error(screen.getByRole("presentation", { hidden: true }));

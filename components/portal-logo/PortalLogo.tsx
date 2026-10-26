@@ -20,6 +20,16 @@ const PortalLogo = ({
   alt = "portal logo",
 }: PortalLogoProps) => {
   const [isError, setIsError] = useState(false);
+  // A server-rendered logo can fail before the page hydrates; its error event
+  // has fired by then and onError never runs, leaving a broken image. decode()
+  // rejects for such an image, and only for it: an SVG with no intrinsic size
+  // decodes fine.
+  const catchEarlyError = React.useCallback(
+    (image: HTMLImageElement | null) => {
+      if (image?.complete) image.decode?.().catch(() => setIsError(true));
+    },
+    [],
+  );
 
   const { isBase } = useTheme();
 
@@ -71,6 +81,7 @@ const PortalLogo = ({
     <div className={wrapperClassName}>
       {logo ? (
         <img
+          ref={catchEarlyError}
           src={logo}
           className={classNames("logo-wrapper", className)}
           alt={alt}

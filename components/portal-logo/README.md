@@ -126,7 +126,8 @@ export function SmallerLogo() {
 - **A failed request replaces everything.** The `onError` handler swaps the whole component for a
   bundled small logo — the wrapper and its layout classes included, so the fixed mobile bar
   disappears with it. `className` still reaches that fallback, and so does `alt`, as the mark's
-  `aria-label`.
+  `aria-label`. A server-rendered image that failed before the page hydrated is caught when React
+  attaches it: a complete image whose `decode()` rejects is swapped the same way.
 - **Two separate ideas of "mobile" are in play**: the measured window width decides the layout,
   while `react-device-detect`'s user-agent check decides the `not-mobile` class that carries the
   desktop 386×44 sizing. A narrow window on a desktop browser gets the desktop size rule and the
