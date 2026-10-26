@@ -68,6 +68,20 @@ describe("<AddButton />", () => {
     expect(onClick).toHaveBeenCalledTimes(2);
   });
 
+  // Loading dropped Enter and Space silently while the button was announced
+  // as an ordinary, enabled one.
+  it("announces a loading button as disabled and busy, and keeps its tab stop", () => {
+    const onClick = vi.fn();
+    render(<AddButton {...baseProps} isLoading onClick={onClick} />);
+    const wrapper = screen.getByRole("button");
+
+    expect(wrapper).toHaveAttribute("aria-disabled", "true");
+    expect(wrapper).toHaveAttribute("aria-busy", "true");
+    expect(wrapper).toHaveAttribute("tabindex", "0");
+    fireEvent.keyDown(wrapper, { key: "Enter" });
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
   it("keeps a tabIndex the caller passes", () => {
     render(<AddButton {...baseProps} tabIndex={-1} />);
     expect(screen.getByRole("button")).toHaveAttribute("tabindex", "-1");

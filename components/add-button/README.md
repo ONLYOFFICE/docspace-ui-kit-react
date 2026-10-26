@@ -198,12 +198,11 @@ Set them on any ancestor.
 ## Accessibility
 
 - The wrapper is a `<div role="button">`: focusable, activated by Enter and Space,
-  `aria-disabled` while `isDisabled`, with an accent focus ring (`--add-button-focus-color`).
+  `aria-disabled` while `isDisabled` or `isLoading` (and `aria-busy` while loading), with an
+  accent focus ring (`--add-button-focus-color`). A loading button keeps its tab stop.
 - **There is no accessible name unless you provide one.** `label` is rendered as ordinary text
   inside the same wrapper, so it does name the button — but a button without `label` has none,
   and `title` does not supply it.
-- `aria-disabled` is not set. A disabled button is still announced as an ordinary button; only
-  the click and the Enter key are dropped.
 - The icon square itself is an [`IconButton`](../icon-button/README.md) inside the wrapper,
   which is a `<div>` with no role of its own.
 

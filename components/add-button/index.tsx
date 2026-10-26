@@ -96,7 +96,10 @@ const AddButton = (props: AddButtonProps) => {
       tabIndex={wrapperTabIndex}
       onKeyDown={onKeyDownAction}
       role="button"
-      aria-disabled={isDisabled || undefined}
+      // Loading drops the key and the click as disabled does, so it is
+      // announced the same way, and as busy. The focus stays where it is.
+      aria-disabled={isDisabled || isLoading || undefined}
+      aria-busy={isLoading || undefined}
     >
       <TooltipContainer
         as="div"
