@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 
 import { Consumer } from "../../../../utils";
 import { EmptyView } from "../../../../components/empty-view";
+import { DeviceType } from "../../../../enums";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { useTheme } from "../../../../context/ThemeContext";
 
@@ -12,18 +13,23 @@ import NoInvoicesDarkIcon from "../../../../assets/no.transactions.filter.dark.t
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import useDeviceType from "../../../hooks/useDeviceType";
 import useViewEffect from "../../../../hooks/useViewEffect";
+import TableLoader from "../../../shared/transaction-history/sub-components/TableLoader";
 
 import TableView from "./TableView";
 import RowView from "./RowView";
-import { FAKE_INVOICES } from "./fakeInvoices";
-import styles from "./InvoicesHistory.module.scss";
+import styles from "./InvoiceHistory.module.scss";
 
-const InvoicesHistory = () => {
-  const { mobileBreakpoint, desktopBreakpoint } = usePaymentStore();
+const InvoiceHistory = () => {
+  const {
+    invoices,
+    isInitInvoices,
+    fetchInvoices,
+    openInvoice,
+    mobileBreakpoint,
+    desktopBreakpoint,
+  } = usePaymentStore();
   const { isBase } = useTheme();
   const t = useCommonTranslation();
-
-  const invoices = FAKE_INVOICES;
 
   const [viewAs, setViewAs] = useState("table");
 
@@ -33,6 +39,23 @@ const InvoicesHistory = () => {
   });
 
   useViewEffect({ view: viewAs, setView: setViewAs, currentDeviceType });
+
+  useEffect(() => {
+    fetchInvoices();
+  }, [fetchInvoices]);
+
+  const onOpenInvoice = (id: number) => openInvoice(id, t);
+
+  if (!isInitInvoices) {
+    return (
+      <div className={styles.invoiceHistory}>
+        <TableLoader
+          isMobile={currentDeviceType === DeviceType.mobile}
+          isTablet={currentDeviceType === DeviceType.tablet}
+        />
+      </div>
+    );
+  }
 
   if (!invoices.length) {
     return (
@@ -46,18 +69,20 @@ const InvoicesHistory = () => {
   }
 
   return (
-    <div className={styles.invoicesHistory}>
+    <div className={styles.invoiceHistory}>
       <Consumer>
         {(context) =>
           viewAs === "table" ? (
             <TableView
               sectionWidth={context.sectionWidth || 0}
               invoices={invoices}
+              onOpenInvoice={onOpenInvoice}
             />
           ) : (
             <RowView
               sectionWidth={context.sectionWidth || 0}
               invoices={invoices}
+              onOpenInvoice={onOpenInvoice}
             />
           )
         }
@@ -66,4 +91,4 @@ const InvoicesHistory = () => {
   );
 };
 
-export default observer(InvoicesHistory);
+export default observer(InvoiceHistory);

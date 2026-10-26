@@ -43,6 +43,8 @@ import type {
   TAccountingPrice,
   TActiveService,
   TBalance,
+  TInvoice,
+  TInvoicesPage,
   TServiceUsage,
   TUsagePeriodKey,
 } from "../types";
@@ -126,6 +128,8 @@ class PaymentStore {
   private commonSettingsApi: CommonSettingsApi;
 
   #rawApiClient: TApiClient;
+
+  #openingInvoiceIds = new Set<number>();
 
   private abortControllers: AbortController[] = [];
 
@@ -246,6 +250,10 @@ class PaymentStore {
   isTransactionHistoryExist = false;
 
   upcomingPaymentsData: TUpcomingPaymentResponse[] = [];
+
+  invoices: TInvoice[] = [];
+
+  isInitInvoices = false;
 
   activeServices: TActiveService[] = [];
 
@@ -687,6 +695,58 @@ class PaymentStore {
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
+    }
+  };
+
+  fetchInvoices = async () => {
+    const abortController = new AbortController();
+    this.addAbortController(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/payment/customer/deposits",
+        {
+          params: { status: "Completed", offset: 0, limit: 25 },
+          signal: abortController.signal,
+        },
+      );
+
+      const page = data?.response as TInvoicesPage | null | undefined;
+
+      runInAction(() => {
+        this.invoices = page?.collection ?? [];
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      toastr.error(error as Error);
+    }
+
+    runInAction(() => {
+      this.isInitInvoices = true;
+    });
+  };
+
+  openInvoice = async (id: number, t: TTranslation) => {
+    if (this.#openingInvoiceIds.has(id)) return;
+    this.#openingInvoiceIds.add(id);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        `api/2.0/portal/payment/customer/deposits/${id}/invoice`,
+      );
+
+      const url = data?.response as string | undefined;
+
+      if (!url) {
+        toastr.error(t("Common:UnexpectedError"));
+        return;
+      }
+
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (error: unknown) {
+      toastr.error(error as Error);
+    } finally {
+      this.#openingInvoiceIds.delete(id);
     }
   };
 

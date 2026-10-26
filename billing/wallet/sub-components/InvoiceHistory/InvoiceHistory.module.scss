@@ -1,4 +1,4 @@
-.invoicesHistory {
+.invoiceHistory {
   width: 100%;
   margin-top: 16px;
 
@@ -40,9 +40,12 @@
 .row {
   min-height: 58px;
   box-sizing: border-box;
-  cursor: pointer;
 
   [data-testid="tablet-side-info"] {
     color: var(--payment-text-color);
   }
+}
+
+.rowWithInvoice {
+  cursor: pointer;
 }

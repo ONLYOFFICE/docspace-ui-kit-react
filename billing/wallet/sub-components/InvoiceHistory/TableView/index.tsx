@@ -9,21 +9,23 @@ import type { TInvoice } from "../../../../types";
 import { getCorrectDate } from "../../../../../utils/date/getCorrectDate";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
-import styles from "../InvoicesHistory.module.scss";
+import styles from "../InvoiceHistory.module.scss";
 
 const TABLE_VERSION = "1";
-const COLUMNS_SIZE = `invoicesHistoryColumnsSize_ver-${TABLE_VERSION}`;
-const INFO_PANEL_COLUMNS_SIZE = `infoPanelInvoicesHistoryColumnsSize_ver-${TABLE_VERSION}`;
+const COLUMNS_SIZE = `invoiceHistoryColumnsSize_ver-${TABLE_VERSION}`;
+const INFO_PANEL_COLUMNS_SIZE = `infoPanelInvoiceHistoryColumnsSize_ver-${TABLE_VERSION}`;
 
-type InvoicesHistoryTableViewProps = {
+type InvoiceHistoryTableViewProps = {
   sectionWidth: number;
   invoices: TInvoice[];
+  onOpenInvoice: (id: number) => void;
 };
 
 const TableView = ({
   sectionWidth,
   invoices,
-}: InvoicesHistoryTableViewProps) => {
+  onOpenInvoice,
+}: InvoiceHistoryTableViewProps) => {
   const { formatWalletCurrency, userId, language } = usePaymentStore();
 
   const columnStorageName = `${COLUMNS_SIZE}=${userId}`;
@@ -58,7 +60,8 @@ const TableView = ({
             key={invoice.id}
             date={getCorrectDate(language, invoice.date)}
             amount={formatWalletCurrency(invoice.amount, 2, invoice.currency)}
-            url={invoice.url}
+            hasInvoice={invoice.hasInvoice}
+            onOpenInvoice={() => onOpenInvoice(invoice.id)}
           />
         ))}
       </TableBody>

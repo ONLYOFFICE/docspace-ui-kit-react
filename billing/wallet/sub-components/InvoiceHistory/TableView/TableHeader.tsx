@@ -12,7 +12,7 @@ type TableHeaderProps = {
   itemHeight: number;
 };
 
-const InvoicesHistoryTableHeader = (props: TableHeaderProps) => {
+const InvoiceHistoryTableHeader = (props: TableHeaderProps) => {
   const t = useCommonTranslation();
 
   const defaultColumns = [
@@ -51,4 +51,4 @@ const InvoicesHistoryTableHeader = (props: TableHeaderProps) => {
   );
 };
 
-export default observer(InvoicesHistoryTableHeader);
+export default observer(InvoiceHistoryTableHeader);

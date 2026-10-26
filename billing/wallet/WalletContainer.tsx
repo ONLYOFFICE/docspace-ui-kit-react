@@ -14,7 +14,7 @@ import { finishRefreshingWithMinCycle } from "../utils/refreshing";
 
 import TransactionHistory from "../shared/transaction-history";
 import UpcomingPayments from "./sub-components/UpcomingPayments";
-import InvoicesHistory from "./sub-components/InvoicesHistory";
+import InvoiceHistory from "./sub-components/InvoiceHistory";
 import WalletRefilledModal from "./WalletRefilledModal";
 import AutoPaymentInfo from "./sub-components/AutoPaymentInfo";
 import DelayedPaymentMethodBanner from "./sub-components/DelayedPaymentMethodBanner";
@@ -167,7 +167,7 @@ const Wallet = (props: WalletProps) => {
     {
       id: "invoice-history",
       name: t("InvoiceHistory"),
-      content: <InvoicesHistory />,
+      content: <InvoiceHistory />,
     },
     {
       id: "upcoming-payments",

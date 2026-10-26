@@ -167,12 +167,24 @@ export type TUpcomingPaymentResponse = {
   currency: string;
 };
 
+export type TInvoiceStatus = "Pending" | "Completed" | "Rejected" | "Canceled";
+
 export type TInvoice = {
-  id: string;
+  id: number;
   date: string;
   amount: number;
   currency: string;
-  url: string;
+  status: TInvoiceStatus;
+  hasInvoice: boolean;
+};
+
+export type TInvoicesPage = {
+  collection: TInvoice[];
+  offset: number;
+  limit: number;
+  totalQuantity: number;
+  totalPage: number;
+  currentPage: number;
 };
 
 export type TServiceUsage = {
