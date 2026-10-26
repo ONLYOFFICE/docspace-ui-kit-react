@@ -87,6 +87,20 @@ describe("<RoomType />", () => {
 
       expect(onClick).toHaveBeenCalledTimes(2);
     });
+
+    // A chosen type moves focus on (the portal focuses the room name, whose
+    // Enter keyup creates the room): the same press must not act there too.
+    it("keeps the keyup of the key that chose it from the page", () => {
+      render(<RoomType {...baseProps} type={type} onClick={vi.fn()} />);
+      const onWindowKeyUp = vi.fn();
+      window.addEventListener("keyup", onWindowKeyUp);
+
+      fireEvent.keyDown(screen.getByTestId(testId), { key: "Enter" });
+      fireEvent.keyUp(document.body, { key: "Enter" });
+
+      window.removeEventListener("keyup", onWindowKeyUp);
+      expect(onWindowKeyUp).not.toHaveBeenCalled();
+    });
   });
 
   it("tells whether the dropdown button is open", () => {

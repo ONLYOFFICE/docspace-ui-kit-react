@@ -10,6 +10,7 @@ import { RoomLogo } from "../room-logo";
 import { IconButton } from "../icon-button";
 import { Text } from "../text";
 import { TooltipContainer } from "../tooltip";
+import { consumeKey } from "../../utils/consume-key";
 
 import {
   getRoomTypeDescriptionTranslation,
@@ -58,11 +59,15 @@ const RoomType = ({
   };
 
   // The interactive layouts are buttons: Enter and Space click them, so the
-  // handler still receives the mouse event it is typed for.
+  // handler still receives the mouse event it is typed for. The key's keyup
+  // is consumed too: the click moves focus on (a chosen type focuses the room
+  // name, whose Enter keyup creates the room), and the same press must not
+  // act there as well.
   const handleKeyDown: KeyboardEventHandler<HTMLElement> = (e) => {
     if (e.key !== "Enter" && e.key !== " ") return;
     if (e.target !== e.currentTarget) return;
     e.preventDefault();
+    consumeKey(e);
     e.currentTarget.click();
   };
 
