@@ -277,6 +277,7 @@ private to it.
 | `--button-font-size-xs` / `-sm` / `-md` / `-lg` | `12px` / `13px` / `14px` / `16px` | Font size per `ButtonSize`                                    |
 | `--button-root-border-radius`                   | `3px`                             | Corner radius (the `accent` variant uses `6px` regardless)    |
 | `--button-text-weight`                          | `600`                             | Label weight                                                  |
+| `--button-focus-color`                          | accent                            | Colour of the keyboard focus ring                             |
 
 Each state colour also has an override. The secondary variant reads the `--button-root-*` set,
 the primary one the matching `--button-primary-*` set; the `filled` and `accent` variants read
@@ -313,9 +314,9 @@ item and shrinks to its label.
 - **An icon-only button has no accessible name.** With no `label` there is no `aria-label`
   either, and a custom one would be overwritten. Give it a `label`, or use
   [`IconButton`](../icon-button/README.md).
-- **The focus ring is removed and not replaced** (`:focus { outline: none }`), so keyboard
-  focus is invisible unless the consuming application styles it. Add a `:focus-visible` rule
-  of your own if the button is reachable by keyboard.
+- **Only the keyboard gets a focus ring.** A click leaves no outline (`:focus`), while
+  `:focus-visible` draws a 2px ring in the accent, 2px clear of the button so it also shows on
+  the primary variant; `--button-focus-color` overrides its colour.
 
 ## Test ids
 
