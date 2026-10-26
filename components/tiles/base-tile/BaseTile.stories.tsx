@@ -7,30 +7,47 @@ import type { BaseTileProps } from "./BaseTile.types";
 
 import { useState } from "react";
 
-import WordSvgUrl from "../../../assets/icons/32/word.svg";
-import PdfSvgUrl from "../../../assets/icons/32/pdf.svg";
-import SlideSvgUrl from "../../../assets/icons/32/slide.svg";
+import PublicRoomIconReactSvg from "../../../assets/icons/32/room/public.svg";
+import { RoomsType } from "../../../enums";
 import { Link, LinkType } from "../../link";
+import { Tags } from "../../tags";
 import RenameField from "../../../.storybook/utils/RenameField";
-import { globalColors } from "../../../providers/theme";
 
 import { BaseTile } from ".";
 import { TileContent } from "../tile-content";
 
-const wordElement = <WordSvgUrl />;
+// The client never draws a BaseTile of its own: it is the frame RoomTile and
+// TemplateTile fill. The stories fill it the way RoomTile does -- the room's
+// logo, its name, the menu button and a row of tags -- so that each one shows
+// a tile as a reader meets it.
+const roomElement = <PublicRoomIconReactSvg />;
 
-const documentTitle = (
+const roomTitle = (
   <TileContent>
     <Link
       type={LinkType.page}
-      title="Document.docx"
+      fontSize="16px"
+      lineHeight="22px"
       fontWeight={600}
       isTextOverflow
     >
-      Document
-      <span style={{ color: globalColors.gray }}>.docx</span>
+      Marketing
     </Link>
   </TileContent>
+);
+
+const onSelectTag = fn();
+
+const roomTags = (
+  <Tags
+    columnCount={2}
+    tags={[
+      { label: "Public room", roomType: RoomsType.PublicRoom },
+      "Campaigns",
+      "Q4",
+    ]}
+    onSelectTag={onSelectTag}
+  />
 );
 
 const onEditOption = fn();
@@ -59,6 +76,30 @@ const contextOptions = [
     disabled: false,
   },
 ];
+
+// The `contextOptions` key on the item is what draws the three-dot button.
+const roomItem = {
+  id: "room-1",
+  title: "Marketing",
+  contextOptions,
+} as BaseTileProps["item"];
+
+// The code panel of every story: the Default tile plus that story's props.
+const sourceOf = (extra = "") => `<BaseTile
+  item={{ id: "room-1", title: "Marketing", contextOptions }}
+  element={<PublicRoomIcon />}
+  contextOptions={contextOptions}
+  topContent={
+    <TileContent>
+      <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>
+        Marketing
+      </Link>
+    </TileContent>
+  }
+  bottomContent={<Tags columnCount={2} tags={tags} onSelectTag={selectTag} />}
+  getContextModel={() => contextOptions}
+  onSelect={handleSelect}${extra}
+/>`;
 
 const meta = {
   title: "UI/Tiles/BaseTile",
@@ -235,18 +276,17 @@ const Template = ({
 export const Default: Story = {
   render: Template,
   args: {
-    item: {
-      id: "tile-1",
-      title: "Document.docx",
-      fileExst: ".docx",
-    },
-    element: wordElement,
+    item: roomItem,
+    element: roomElement,
     contextOptions,
-    topContent: documentTitle,
+    topContent: roomTitle,
+    bottomContent: roomTags,
     getContextModel: () => contextOptions,
   },
   beforeEach: () => {
+    onEditOption.mockClear();
     onDeleteOption.mockClear();
+    onSelectTag.mockClear();
   },
   play: async ({ args, canvas, userEvent }) => {
     const tile = canvas.getByTestId("tile");
@@ -259,16 +299,26 @@ export const Default: Story = {
     await userEvent.click(checkbox);
     await expect(args.onSelect).toHaveBeenCalledWith(
       true,
-      expect.objectContaining({ id: "tile-1" }),
+      expect.objectContaining({ id: "room-1" }),
     );
     await expect(checkbox).toBeChecked();
     await userEvent.click(checkbox);
     await expect(checkbox).not.toBeChecked();
 
-    await userEvent.click(within(tile).getByText("Document"));
+    await userEvent.click(within(tile).getByText("Marketing"));
     await expect(args.onRoomClick).toHaveBeenCalled();
 
-    // A right click opens the menu.
+    await userEvent.click(within(tile).getByText("Campaigns"));
+    await expect(onSelectTag).toHaveBeenCalledWith(
+      expect.objectContaining({ label: "Campaigns" }),
+    );
+
+    // The three-dot button opens the menu...
+    await userEvent.click(within(tile).getByTestId("context-menu-button"));
+    await userEvent.click(await menuItem("Edit"));
+    await expect(onEditOption).toHaveBeenCalledTimes(1);
+
+    // ...and so does a right click.
     await userEvent.pointer({ keys: "[MouseRight]", target: tile });
     await expect(args.tileContextClick).toHaveBeenCalledWith(true);
     await userEvent.click(await menuItem("Delete"));
@@ -279,17 +329,10 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A document as a tile: its icon, its name, and a checkbox that takes the icon's place on hover. Tick it, right-click the tile for its menu, and change any other prop live in the Controls panel below.",
+          "A room as a tile, filled the way `RoomTile` fills it: the logo, the name, the three-dot menu and a row of tags. Hover the logo and tick the checkbox, open the menu from the button or with a right-click, and change any other prop live in the Controls panel below. The button is drawn only when the item carries a `contextOptions` key of its own, whatever the `contextOptions` prop holds.",
       },
       source: {
-        code: `<BaseTile
-  item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
-  element={<WordSvgUrl />}
-  contextOptions={contextOptions}
-  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
-  onSelect={handleSelect}
-  getContextModel={() => contextOptions}
-/>`,
+        code: sourceOf(),
       },
     },
   },
@@ -315,14 +358,7 @@ export const Checked: Story = {
           "A selected tile, as it looks among others the reader has picked: the checkbox stays ticked in place of the icon and the background stays tinted (`checked`).",
       },
       source: {
-        code: `<BaseTile
-  item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
-  element={<WordSvgUrl />}
-  contextOptions={contextOptions}
-  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
-  checked={true}
-  onSelect={handleSelect}
-/>`,
+        code: sourceOf("\n  checked"),
       },
     },
   },
@@ -344,13 +380,7 @@ export const Active: Story = {
           "The tile whose menu is open or that an action is running on keeps the hover background after the pointer leaves, so the reader can tell which one it is (`isActive`).",
       },
       source: {
-        code: `<BaseTile
-  item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
-  element={<WordSvgUrl />}
-  contextOptions={contextOptions}
-  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
-  isActive={true}
-/>`,
+        code: sourceOf("\n  isActive"),
       },
     },
   },
@@ -377,13 +407,7 @@ export const InProgress: Story = {
           "A tile whose item is busy, being copied or converted: a small loader stands where the icon and the checkbox were (`inProgress`).",
       },
       source: {
-        code: `<BaseTile
-  item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
-  element={<WordSvgUrl />}
-  contextOptions={contextOptions}
-  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
-  inProgress={true}
-/>`,
+        code: sourceOf("\n  inProgress"),
       },
     },
   },
@@ -407,94 +431,45 @@ export const WithHotkeyBorder: Story = {
           "The tile the keyboard is on while the reader moves through the grid with the arrow keys: an accent border marks it (`showHotkeyBorder`). The tile does not handle the keys itself.",
       },
       source: {
-        code: `<BaseTile
-  item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
-  element={<WordSvgUrl />}
-  contextOptions={contextOptions}
-  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
-  showHotkeyBorder={true}
-/>`,
+        code: sourceOf("\n  showHotkeyBorder"),
       },
     },
   },
 };
 
-export const WithBottomContent: Story = {
+export const WithCustomBottomContent: Story = {
   render: Template,
   args: {
     ...Default.args,
-    topContent: documentTitle,
     bottomContent: (
       <div
         style={{
-          padding: "8px",
           fontSize: "12px",
+          lineHeight: "24px",
           color: "light-dark(#666, #a3a9ae)",
         }}
       >
-        Additional information
+        12 files, updated today
       </div>
     ),
   },
   play: async ({ canvas }) => {
-    const details = canvas.getByText("Additional information");
+    const details = canvas.getByText("12 files, updated today");
     await expect(details.getBoundingClientRect().top).toBeGreaterThanOrEqual(
-      canvas.getByText("Document").getBoundingClientRect().bottom,
+      canvas.getByText("Marketing").getBoundingClientRect().bottom,
     );
   },
   parameters: {
     docs: {
       description: {
         story:
-          "A tile with a second row under the title, for tags or a line of details (`bottomContent`).",
+          "The second row holds whatever the tile is given, not only tags: here a line of details (`bottomContent`).",
       },
       source: {
-        code: `<BaseTile
-  item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
-  element={<WordSvgUrl />}
-  contextOptions={contextOptions}
-  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
-  bottomContent={<div>Additional information</div>}
-/>`,
-      },
-    },
-  },
-};
-
-export const WithMenuButton: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    item: {
-      id: "tile-1",
-      title: "Document.docx",
-      fileExst: ".docx",
-      contextOptions: [],
-    } as BaseTileProps["item"],
-  },
-  play: async ({ args, canvas, userEvent }) => {
-    // The three-dot button opens the same menu.
-    const button = within(canvas.getByTestId("tile")).getByTestId(
-      "context-menu-button",
-    );
-    await userEvent.click(button);
-    await expect(await menuItem("Edit")).toBeVisible();
-    await expect(args.tileContextClick).toHaveBeenCalled();
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "A tile whose actions are reachable without a right-click: the three-dot button opens the same menu. It is drawn only when the item carries a `contextOptions` key of its own, whatever the `contextOptions` prop holds.",
-      },
-      source: {
-        code: `<BaseTile
-  item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx", contextOptions: [] }}
-  element={<WordSvgUrl />}
-  contextOptions={contextOptions}
-  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
-  getContextModel={() => contextOptions}
-/>`,
+        code: sourceOf().replace(
+          /bottomContent=\{.*\}/,
+          "bottomContent={<div>12 files, updated today</div>}",
+        ),
       },
     },
   },
@@ -507,7 +482,7 @@ export const RenamingState: Story = {
     isEdit: true,
     topContent: (
       <TileContent>
-        <RenameField title="Document.docx" />
+        <RenameField title="Marketing" />
       </TileContent>
     ),
   },
@@ -525,11 +500,9 @@ export const RenamingState: Story = {
           "A tile whose name is being edited: the icon and the checkbox go, so the title row can hold a text field across the tile, and hovering no longer tints it (`isEdit`).",
       },
       source: {
-        code: `<BaseTile
-  item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
-  element={<WordSvgUrl />}
-  contextOptions={contextOptions}
-  topContent={
+        code: sourceOf("\n  isEdit").replace(
+          /topContent=\{[\s\S]*?\n  \}/,
+          `topContent={
     <TileContent>
       <div style={{ display: "flex", gap: 4 }}>
         <TextInput value={title} onChange={onRename} scale />
@@ -537,9 +510,8 @@ export const RenamingState: Story = {
         <Button size={ButtonSize.small} icon={<CrossIcon />} onClick={onCancel} />
       </div>
     </TileContent>
-  }
-  isEdit
-/>`,
+  }`,
+        ),
       },
     },
   },
@@ -564,13 +536,7 @@ export const BlockingOperation: Story = {
           "A tile an operation is running over, which must not be picked or opened until it ends: hover it, click it or right-click it and nothing happens (`isBlockingOperation`). It looks the same as an idle tile, so show the operation somewhere else.",
       },
       source: {
-        code: `<BaseTile
-  item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
-  element={<WordSvgUrl />}
-  contextOptions={contextOptions}
-  topContent={<TileContent><Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>Document<span style={{ color: "#A3A9AE" }}>.docx</span></Link></TileContent>}
-  isBlockingOperation
-/>`,
+        code: sourceOf("\n  isBlockingOperation"),
       },
     },
   },
@@ -594,33 +560,23 @@ export const CssCustomization: Story = {
     >
       <div style={{ maxWidth: "300px", margin: "30px" }}>
         <BaseTile
-          item={
-            {
-              id: "tile-1",
-              title: "Document.docx",
-              fileExst: ".docx",
-              contextOptions: [],
-            } as BaseTileProps["item"]
-          }
-          element={wordElement}
+          item={roomItem}
+          element={roomElement}
           contextOptions={contextOptions}
-          topContent={
-            <TileContent>
-              <Link>Document.docx</Link>
-            </TileContent>
-          }
+          topContent={roomTitle}
+          bottomContent={roomTags}
           onSelect={fn()}
           getContextModel={() => contextOptions}
         />
       </div>
       <div style={{ maxWidth: "300px", margin: "30px" }}>
         <BaseTile
-          item={{ id: "tile-2", title: "Report.docx", fileExst: ".docx" }}
-          element={wordElement}
+          item={{ id: "room-2", title: "Sales" }}
+          element={roomElement}
           contextOptions={contextOptions}
           topContent={
             <TileContent>
-              <Link>Report.docx</Link>
+              <Link>Sales</Link>
             </TileContent>
           }
           showHotkeyBorder

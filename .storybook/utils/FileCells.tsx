@@ -47,6 +47,14 @@ const elementContainerStyle: React.CSSProperties = {
   alignItems: "center",
 };
 
+// As the client's files table sets it. The label is laid out with a 12px gap
+// after the box for a text it does not have, so at its natural width it is
+// centred in the 32px container 8px to the left of the icon it replaces;
+// narrowed to 12px, the box overflows into that gap and lands on the icon.
+const checkboxStyle: React.CSSProperties = {
+  width: "12px",
+};
+
 const nameStyle: React.CSSProperties = {
   paddingBlock: "14px",
   paddingInlineEnd: "8px",
@@ -80,6 +88,7 @@ const FileCells = ({
             <div className="table-container_element">{icons[exst]}</div>
             <Checkbox
               className="table-container_row-checkbox"
+              style={checkboxStyle}
               isChecked={checked}
               onChange={(e) => onSelect?.(e.target.checked)}
             />
