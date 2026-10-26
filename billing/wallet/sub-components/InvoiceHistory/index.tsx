@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 
 import { Consumer } from "../../../../utils";
+import { Text } from "../../../../components/text";
 import { EmptyView } from "../../../../components/empty-view";
 import { DeviceType } from "../../../../enums";
 import { useCommonTranslation } from "../../../../utils/i18n";
@@ -70,6 +71,9 @@ const InvoiceHistory = () => {
 
   return (
     <div className={styles.invoiceHistory}>
+      <div className={styles.introText}>
+        <Text>{t("InvoiceHistoryDescription")}</Text>
+      </div>
       <Consumer>
         {(context) =>
           viewAs === "table" ? (

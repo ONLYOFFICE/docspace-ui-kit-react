@@ -317,6 +317,7 @@
   "InvalidLink": "Invalid link",
   "Invited": "Invited",
   "InvoiceHistory": "Invoice history",
+  "InvoiceHistoryDescription": "View invoices for your completed wallet top-ups.",
   "ItemsSuccessfullyUploaded": "Uploaded elements: {{count}}",
   "Kilobyte": "KB",
   "Last12Months": "Last 12 months",

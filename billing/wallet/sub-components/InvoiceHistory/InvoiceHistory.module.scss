@@ -7,6 +7,15 @@
   }
 }
 
+.introText {
+  margin-bottom: 16px;
+  max-width: 660px;
+
+  p {
+    color: var(--payment-text-color);
+  }
+}
+
 .tableContainer :global(.table-container_header) {
   position: static !important;
 }
