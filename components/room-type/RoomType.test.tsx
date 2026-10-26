@@ -155,6 +155,29 @@ describe("<RoomType />", () => {
       expect(root).toHaveAttribute("data-tooltip-id", "create-room-tooltip");
     });
 
+    // Enter on a disabled type swallowed the keyup that followed anywhere
+    // on the page, though nothing was chosen.
+    it("leaves the keyup to the page when a disabled type ignores the key", () => {
+      render(
+        <RoomType
+          {...baseProps}
+          roomType={RoomsType.FormRoom}
+          disabledFormRoom
+          onClick={vi.fn()}
+        />,
+      );
+      const onWindowKeyUp = vi.fn();
+      window.addEventListener("keyup", onWindowKeyUp);
+
+      fireEvent.keyDown(screen.getByTestId("room-type-list-item"), {
+        key: "Enter",
+      });
+      fireEvent.keyUp(document.body, { key: "Enter" });
+
+      window.removeEventListener("keyup", onWindowKeyUp);
+      expect(onWindowKeyUp).toHaveBeenCalledTimes(1);
+    });
+
     it("ignores clicks on a disabled PublicRoom", () => {
       const onClick = vi.fn();
       render(
