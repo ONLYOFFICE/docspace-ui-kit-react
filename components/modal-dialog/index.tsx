@@ -39,6 +39,8 @@ Footer.displayName = MODAL_DIALOG_FOOTER_NAME;
 const Container = ({ children }: { children: React.ReactNode }) => null;
 Container.displayName = MODAL_DIALOG_CONTAINER_NAME;
 
+const openDialogs: string[] = [];
+
 const ModalDialog = ({
   ref,
   id,
@@ -90,6 +92,18 @@ const ModalDialog = ({
   );
   const [modalSwipeOffset, setModalSwipeOffset] = useState(0);
 
+  const dialogId = React.useId();
+
+  useEffect(() => {
+    if (!visible || embedded) return;
+
+    openDialogs.push(dialogId);
+    return () => {
+      const index = openDialogs.lastIndexOf(dialogId);
+      if (index !== -1) openDialogs.splice(index, 1);
+    };
+  }, [visible, embedded, dialogId]);
+
   const returnWindowPositionAfterKeyboard = () => {
     if (isSafari && isTablet && window.scrollY !== 0) window.scrollTo(0, 0);
   };
@@ -109,6 +123,8 @@ const ModalDialog = ({
     const onSwipeEnd = () => setModalSwipeOffset(0);
 
     const onKeyPress = (e: KeyboardEvent) => {
+      if (openDialogs[openDialogs.length - 1] !== dialogId) return;
+
       if ((e.key === "Esc" || e.key === "Escape") && visible) onCloseEvent();
 
       if (
@@ -141,6 +157,7 @@ const ModalDialog = ({
     onCloseEvent,
     visible,
     onBackClick,
+    dialogId,
   ]);
 
   useEffect(() => {

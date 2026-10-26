@@ -162,6 +162,80 @@ describe("ModalDialog", () => {
       expect(mockOnClose).not.toHaveBeenCalled();
     });
 
+    it("closes only the last opened dialog on Escape", async () => {
+      const onCloseFirst = vi.fn();
+      const onCloseSecond = vi.fn();
+
+      const renderDialogs = (firstVisible: boolean, secondVisible: boolean) => (
+        <>
+          <ModalDialog visible={firstVisible} onClose={onCloseFirst}>
+            <ModalDialog.Body>First</ModalDialog.Body>
+          </ModalDialog>
+          <ModalDialog visible={secondVisible} onClose={onCloseSecond}>
+            <ModalDialog.Body>Second</ModalDialog.Body>
+          </ModalDialog>
+        </>
+      );
+
+      const { rerender } = render(renderDialogs(true, true));
+
+      await userEvent.keyboard("{Escape}");
+
+      expect(onCloseSecond).toHaveBeenCalledTimes(1);
+      expect(onCloseFirst).not.toHaveBeenCalled();
+
+      rerender(renderDialogs(true, false));
+      await userEvent.keyboard("{Escape}");
+
+      expect(onCloseFirst).toHaveBeenCalledTimes(1);
+      expect(onCloseSecond).toHaveBeenCalledTimes(1);
+    });
+
+    it("treats a mounted dialog opened later as the top one", async () => {
+      const onCloseFirst = vi.fn();
+      const onCloseSecond = vi.fn();
+
+      const renderDialogs = (firstVisible: boolean) => (
+        <>
+          <ModalDialog visible={firstVisible} onClose={onCloseFirst}>
+            <ModalDialog.Body>First</ModalDialog.Body>
+          </ModalDialog>
+          <ModalDialog visible onClose={onCloseSecond}>
+            <ModalDialog.Body>Second</ModalDialog.Body>
+          </ModalDialog>
+        </>
+      );
+
+      const { rerender } = render(renderDialogs(false));
+      rerender(renderDialogs(true));
+
+      await userEvent.keyboard("{Escape}");
+
+      expect(onCloseFirst).toHaveBeenCalledTimes(1);
+      expect(onCloseSecond).not.toHaveBeenCalled();
+    });
+
+    it("calls onBackClick only on the last opened dialog", async () => {
+      const onBackFirst = vi.fn();
+      const onBackSecond = vi.fn();
+
+      render(
+        <>
+          <ModalDialog visible onClose={vi.fn()} onBackClick={onBackFirst}>
+            <ModalDialog.Body>First</ModalDialog.Body>
+          </ModalDialog>
+          <ModalDialog visible onClose={vi.fn()} onBackClick={onBackSecond}>
+            <ModalDialog.Body>Second</ModalDialog.Body>
+          </ModalDialog>
+        </>,
+      );
+
+      await userEvent.keyboard("{Backspace}");
+
+      expect(onBackSecond).toHaveBeenCalledTimes(1);
+      expect(onBackFirst).not.toHaveBeenCalled();
+    });
+
     it("does not call onClose on Escape when visible is false", async () => {
       render(
         <ModalDialog {...defaultProps} visible={false}>
