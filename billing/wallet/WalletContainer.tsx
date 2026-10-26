@@ -67,7 +67,8 @@ const Wallet = (props: WalletProps) => {
     isVisibleWalletSettings,
     wasChangeBalance,
     fetchBalance,
-    fetchTransactionHistory,
+    refreshTransactionHistory,
+    refreshInvoices,
     canUpdateTariff,
     recommendedAmount,
     walletHelpUrl,
@@ -152,7 +153,11 @@ const Wallet = (props: WalletProps) => {
     const startTime = Date.now();
 
     try {
-      await Promise.all([fetchBalance!(true), fetchTransactionHistory!()]);
+      await Promise.all([
+        fetchBalance!(true),
+        refreshTransactionHistory(),
+        refreshInvoices(),
+      ]);
     } catch (e) {
       toastr.error(e as Error);
     } finally {

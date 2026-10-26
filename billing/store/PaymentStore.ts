@@ -748,6 +748,10 @@ class PaymentStore {
     });
   };
 
+  refreshInvoices = async () => {
+    if (this.isInitInvoices) await this.fetchInvoices();
+  };
+
   fetchMoreInvoices = async () => {
     if (this.isLoadingMoreInvoices || !this.hasMoreInvoices) return;
 
@@ -1041,17 +1045,20 @@ class PaymentStore {
     serviceName?: string,
     from?: DateTime,
     to?: DateTime,
+    silent = false,
   ) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
-    this._transactionTimerId = setTimeout(() => {
-      runInAction(() => {
-        if (this._transactionTimerId !== null) {
-          this.isTransactionLoading = true;
-        }
-      });
-    }, 500);
+    if (!silent) {
+      this._transactionTimerId = setTimeout(() => {
+        runInAction(() => {
+          if (this._transactionTimerId !== null) {
+            this.isTransactionLoading = true;
+          }
+        });
+      }, 500);
+    }
 
     const { isCredit, isDebit } = getTransactionType(
       this.filterSelectedTypeKey,
@@ -1091,20 +1098,22 @@ class PaymentStore {
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       toastr.error(error as Error);
-      runInAction(() => {
-        this.isTransactionLoading = true;
-      });
     } finally {
-      runInAction(() => {
-        if (this._transactionTimerId) {
-          clearTimeout(this._transactionTimerId);
-          this._transactionTimerId = null;
-        }
+      if (!silent) {
+        runInAction(() => {
+          if (this._transactionTimerId) {
+            clearTimeout(this._transactionTimerId);
+            this._transactionTimerId = null;
+          }
 
-        this.isTransactionLoading = false;
-      });
+          this.isTransactionLoading = false;
+        });
+      }
     }
   };
+
+  refreshTransactionHistory = (serviceName?: string) =>
+    this.fetchTransactionHistory(serviceName, undefined, undefined, true);
 
   fetchAutoPayments = async () => {
     const abortController = new AbortController();

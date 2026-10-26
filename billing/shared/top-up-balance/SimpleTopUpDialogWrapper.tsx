@@ -20,7 +20,8 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
   const {
     formatWalletCurrency,
     walletCodeCurrency,
-    fetchTransactionHistory,
+    refreshTransactionHistory,
+    refreshInvoices,
     language,
     walletBalance,
   } = store;
@@ -33,6 +34,13 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
   const fetchBalance = async (isRefresh?: boolean) => {
     await store.fetchBalance(isRefresh);
     return store.walletBalance ?? 0;
+  };
+
+  const fetchTransactionHistory = async (serviceName?: string) => {
+    await Promise.all([
+      refreshTransactionHistory(serviceName),
+      refreshInvoices(),
+    ]);
   };
 
   const fetchCardLinked = async (backUrl?: string, successUrl?: string) => {
