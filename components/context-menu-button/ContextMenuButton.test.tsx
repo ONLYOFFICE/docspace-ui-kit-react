@@ -332,7 +332,10 @@ describe("<ContextMenuButton />", () => {
   // The caller's ContextMenu keeps focus on the button and picks its
   // highlighted item on the Enter keyup on window.
   it("leaves Enter to the caller's menu while that menu is on screen", () => {
-    const onClick = vi.fn();
+    const menu = document.createElement("div");
+    menu.className = "p-contextmenu";
+    // Like a caller: its onClick shows the ContextMenu.
+    const onClick = vi.fn(() => document.body.appendChild(menu));
     render(
       <ContextMenuButton
         {...baseProps}
@@ -341,25 +344,59 @@ describe("<ContextMenuButton />", () => {
       />,
     );
     const button = screen.getByRole("button", { name: "Actions" });
-    const menu = document.createElement("div");
-    menu.className = "p-contextmenu";
-    document.body.appendChild(menu);
-    const addSpy = vi.spyOn(window, "addEventListener");
 
     try {
-      const keyDown = fireEvent.keyDown(button, { key: "Enter" });
+      fireEvent.keyDown(button, { key: "Enter" });
+      fireEvent.keyUp(document.body, { key: "Enter" });
+      expect(onClick).toHaveBeenCalledTimes(1);
 
-      expect(onClick).not.toHaveBeenCalled();
-      expect(keyDown).toBe(true);
-      // No keyup swallower is armed, so the menu gets its keyup.
-      expect(addSpy).not.toHaveBeenCalledWith(
-        "keyup",
-        expect.any(Function),
-        true,
-      );
-    } finally {
-      addSpy.mockRestore();
+      const addSpy = vi.spyOn(window, "addEventListener");
+      try {
+        const keyDown = fireEvent.keyDown(button, { key: "Enter" });
+
+        expect(onClick).toHaveBeenCalledTimes(1);
+        expect(keyDown).toBe(true);
+        // No keyup swallower is armed, so the menu gets its keyup.
+        expect(addSpy).not.toHaveBeenCalledWith(
+          "keyup",
+          expect.any(Function),
+          true,
+        );
+      } finally {
+        addSpy.mockRestore();
+      }
+
+      // Once that menu has closed (ContextMenu unmounts), Enter opens it again.
       menu.remove();
+      fireEvent.keyDown(button, { key: "Enter" });
+      expect(onClick).toHaveBeenCalledTimes(2);
+    } finally {
+      menu.remove();
+    }
+  });
+
+  // The guard looked for any ContextMenu on the page, so another menu left
+  // open elsewhere made this button ignore Enter and Space.
+  it("still opens its menu while an unrelated ContextMenu is open", () => {
+    const onClick = vi.fn();
+    render(
+      <ContextMenuButton
+        {...baseProps}
+        displayType={ContextMenuButtonDisplayType.toggle}
+        onClick={onClick}
+      />,
+    );
+    const other = document.createElement("div");
+    other.className = "p-contextmenu";
+    document.body.appendChild(other);
+
+    try {
+      fireEvent.keyDown(screen.getByRole("button", { name: "Actions" }), {
+        key: "Enter",
+      });
+      expect(onClick).toHaveBeenCalledTimes(1);
+    } finally {
+      other.remove();
     }
   });
 });

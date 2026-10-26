@@ -107,6 +107,10 @@ const ContextMenuButtonPure = ({
   const menuId = `${id ?? `context-menu-button${reactId.replace(/:/g, "")}`}-menu`;
   // Set when the menu was opened from the keyboard: which item takes focus.
   const focusOnOpen = React.useRef<TFocusTarget>(null);
+  // Toggle mode: the caller's menu this button opened, found as the
+  // ContextMenu that appeared. ContextMenu unmounts on close, so the menu is
+  // open exactly while this element is in the document.
+  const ownMenu = React.useRef<Element | null>(null);
   const throttledResize = React.useRef<null | DebouncedFunc<() => void>>(null);
 
   const [state, setState] = React.useState({
@@ -213,6 +217,22 @@ const ContextMenuButtonPure = ({
 
   const focusButton = () => buttonRef.current?.focus();
 
+  // The caller renders its ContextMenu after onClick returns, so the new menu
+  // is looked for once now and once after the next frame.
+  const openCallerMenu = (e: React.MouseEvent) => {
+    const before = new Set(document.querySelectorAll(".p-contextmenu"));
+    const findOwnMenu = () => {
+      const opened = Array.from(
+        document.querySelectorAll(".p-contextmenu"),
+      ).find((menu) => !before.has(menu));
+      if (opened) ownMenu.current = opened;
+    };
+
+    onClick?.(e);
+    findOwnMenu();
+    requestAnimationFrame(findOwnMenu);
+  };
+
   const getMenuItems = () =>
     Array.from(
       document
@@ -227,17 +247,18 @@ const ContextMenuButtonPure = ({
 
     if (state.displayType === "toggle") {
       if (key !== "Enter" && key !== " ") return;
-      // The caller's ContextMenu is on screen (it is mounted only while
-      // visible) and picks its highlighted item on the Enter keyup on
-      // window: the button neither opens it again nor swallows that keyup.
-      if (document.querySelector(".p-contextmenu")) return;
+      // The caller's ContextMenu this button opened is on screen and picks
+      // its highlighted item on the Enter keyup on window: the button neither
+      // opens it again nor swallows that keyup. Another page's menu does not
+      // count.
+      if (ownMenu.current?.isConnected) return;
       e.preventDefault();
       consumeKey(e);
       setState((s) => ({ ...s, data: readData() }));
       // Callers hand the event to ContextMenu.show(e), which places the menu
       // at e.pageX / e.pageY; a key press has neither, so it gets a click at
       // the button's lower start corner.
-      onClick?.(keyboardClickAt(buttonRef.current, isRTL));
+      openCallerMenu(keyboardClickAt(buttonRef.current, isRTL));
       return;
     }
 
@@ -384,7 +405,7 @@ const ContextMenuButtonPure = ({
     }
 
     setState((s) => ({ ...s, data: readData() }));
-    onClick?.(e);
+    openCallerMenu(e);
   };
 
   const isDropdown = state.displayType !== ContextMenuButtonDisplayType.toggle;
