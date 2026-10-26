@@ -65,6 +65,7 @@ import {
 } from "../utils/parsers";
 import { getUsageRange } from "../usage/utils";
 import { getServiceRoute } from "../utils/url";
+import { openLoadingTab } from "../utils/loadingTab";
 import { isDocsConnectServiceName } from "../utils/docs-connect";
 import { combineUrl } from "../../utils/combineUrl";
 import { getCookie } from "../../utils/cookie";
@@ -728,6 +729,14 @@ class PaymentStore {
 
   openInvoice = async (id: number, t: TTranslation) => {
     if (this.#openingInvoiceIds.has(id)) return;
+
+    const tab = openLoadingTab(t("Common:LoadingProcessing"));
+
+    if (!tab) {
+      toastr.error(t("Common:UnexpectedError"));
+      return;
+    }
+
     this.#openingInvoiceIds.add(id);
 
     try {
@@ -738,12 +747,14 @@ class PaymentStore {
       const url = data?.response as string | undefined;
 
       if (!url) {
+        tab.close();
         toastr.error(t("Common:UnexpectedError"));
         return;
       }
 
-      window.open(url, "_blank", "noopener,noreferrer");
+      tab.location.href = url;
     } catch (error: unknown) {
+      tab.close();
       toastr.error(error as Error);
     } finally {
       this.#openingInvoiceIds.delete(id);
