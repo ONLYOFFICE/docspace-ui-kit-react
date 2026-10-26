@@ -101,6 +101,11 @@ export const getCommonTranslation = (
   // error below is for a key absent from translations that are there.
   if (!i18n) return "";
 
+  // Whether a bundle of any namespace searched has arrived. window.i18n exists
+  // from the first render, its bundles only once fetched: a render before then
+  // (the app's own loading spinner) is not a missing key either.
+  let namespaceLoaded = false;
+
   // A t() result equal to the key is ambiguous: it is either a valid
   // identity translation ("Search" -> "Search") or a t() implementation that
   // echoes unknown keys ignoring defaultValue. Prefer the `loaded` lookup in
@@ -152,6 +157,7 @@ export const getCommonTranslation = (
           (k) => k.indexOf(`${tryLang}/${ns}.json`) > -1,
         );
         if (perNsUrls.length > 0) {
+          namespaceLoaded = true;
           const i18nKey = perNsUrls.length === 1 ? perNsUrls[0] : perNsUrls[1];
           const value = i18n.loaded[i18nKey]?.data?.[bareKey];
           if (typeof value === "string") return interpolate(value);
@@ -163,6 +169,7 @@ export const getCommonTranslation = (
         for (const url of loadedUrls) {
           if (url.indexOf(`${tryLang}/_combined.json`) === -1) continue;
           const nsData = i18n.loaded[url]?.data?.[ns];
+          if (nsData && typeof nsData === "object") namespaceLoaded = true;
           const value =
             nsData && typeof nsData === "object" ? nsData[bareKey] : undefined;
           if (typeof value === "string") return interpolate(value);
@@ -172,6 +179,8 @@ export const getCommonTranslation = (
   }
 
   if (identityResult) return identityResult;
+
+  if (!namespaceLoaded) return "";
 
   console.error(
     `[i18n] Missing translation for key "${key}". Ensure the TranslationProvider is mounted or window.i18n.loaded contains the required namespaces [${namespaces.join(", ")}].`,
