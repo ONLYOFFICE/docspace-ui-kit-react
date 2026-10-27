@@ -755,11 +755,13 @@ class PaymentStore {
   };
 
   invoiceHistoryInit = async () => {
-    try {
-      await this.tariff.fetchCustomerInfo();
-    } catch (error: unknown) {
-      if (error instanceof Error && error.name === "CanceledError") return;
-      console.error(error);
+    if (!this.isOwner) {
+      try {
+        await this.tariff.fetchCustomerInfo();
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === "CanceledError") return;
+        console.error(error);
+      }
     }
 
     if (this.isStripePortalAvailable) {
