@@ -1,5 +1,33 @@
 # Change Log
 
+## 4.0.2
+
+### Added
+
+- `AiAgentProviders` takes `chatIntro`: what an empty chat shows above the suggestion chips in place of the default illustration and tagline (an AI project puts its logo, name and sources there).
+- `RoomsType.AiProjectRoom` (12), `FolderType.AiProjectRoom` (40) and `FolderType.AiProjects`
+  (41) for the AI projects of the DocSpace client; `RoomLogo` and the room type title /
+  description helpers know the new type (the AI room icon stands in until a dedicated one lands)
+- `AiChatStore.openProject` and `AiChatProjectSettings`: a project opens the chat with its model
+  and the lists of its Instructions / Knowledge rooms, every one of them connected
+- `AiAgentProviders` takes `contextRoom` as one room or a list; `ContextRoomProvider` gets a
+  `rooms` prop and `useContextRooms`
+
+### Changed
+
+- **Several context and knowledge rooms per chat**, on `@onlyoffice/ai-chat` 1.0.2:
+  `AiChatPresetSettings` carries `contextRooms` and `knowledgeRooms` (arrays) in place of
+  `contextRoom` / `knowledgeRoom`; `AiChatPanelSave` hands the host every connected room;
+  `ContextRoomSync` connects each offered room that holds skills and `ContextRoomWatcher`
+  follows every connected room on its own (one losing its skills is disconnected alone)
+- `@onlyoffice/ai-chat` peer requirement raised to `^1.0.2`
+
+### Fixed
+
+- `ContextRoomWatcher` refreshes the picker's room list right after it connects an offered room
+  that gained its first skill (the scheduled refresh was cancelled by the effect rerun)
+- `ContextRoomSync` no longer reads the skills a second time when the store already did
+
 ## 4.0.1
 
 ### Changed
