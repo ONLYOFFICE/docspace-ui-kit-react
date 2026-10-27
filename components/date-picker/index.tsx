@@ -150,9 +150,11 @@ const DatePicker = (props: DatePickerProps) => {
           onKeyDown={onSelectorKeyDown}
         >
           {/* AddButton draws itself as a role="button" of its own; hidden from
-              assistive technology so the selector is the one button announced. */}
+              assistive technology so the selector is the one button announced,
+              and out of the Tab order so it is the one tab stop. */}
           <span aria-hidden="true" className={styles.addButton}>
             <AddButton
+              tabIndex={-1}
               title={selectDateText}
               className="add-delivery-date-button"
               iconNode={<CalendarIcon />}
