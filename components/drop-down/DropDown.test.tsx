@@ -289,6 +289,34 @@ describe("<DropDown />", () => {
       },
     );
 
+    it("closes once on a tap on its backdrop and cancels the tap's click", () => {
+      device.isMobile = true;
+      const clickOutsideAction = vi.fn();
+
+      render(
+        <DropDown
+          {...baseProps}
+          open
+          withBackdrop
+          clickOutsideAction={clickOutsideAction}
+        >
+          <div>Content</div>
+        </DropDown>,
+      );
+
+      // The backdrop takes the touchend itself: the window listener must not
+      // close the menu a second time, and the click the browser would
+      // synthesise from the tap must not reach the page under the backdrop.
+      const touchEnd = new Event("touchend", {
+        bubbles: true,
+        cancelable: true,
+      });
+      fireEvent(screen.getByTestId("backdrop"), touchEnd);
+
+      expect(clickOutsideAction).toHaveBeenCalledTimes(1);
+      expect(touchEnd.defaultPrevented).toBe(true);
+    });
+
     it("does not close on the tap that opened it", () => {
       device.isMobile = true;
       const clickOutsideAction = vi.fn();
