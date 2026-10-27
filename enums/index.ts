@@ -52,6 +52,7 @@ export enum ButtonKeys {
  * |  9   | AIRoom          |
  * |  10  | InstructionsRoom|
  * |  11  | KnowledgeRoom   |
+ * |  12  | AiProjectRoom   |
  */
 export enum RoomsType {
   FormRoom = 1,
@@ -67,6 +68,11 @@ export enum RoomsType {
   InstructionsRoom = 10,
   /** Room whose files are vectorized as a RAG knowledge base scoped to the room. */
   KnowledgeRoom = 11,
+  /**
+   * An AI project: a room-like entry that binds a model, Instructions rooms
+   * and Knowledge rooms for its members' chats. Holds no files of its own.
+   */
+  AiProjectRoom = 12,
 }
 
 /**
@@ -167,6 +173,10 @@ export enum FolderType {
   Ai = 37,
   InstructionsRoom = 38,
   KnowledgeRoom = 39,
+  /** An AI project (see `RoomsType.AiProjectRoom`). */
+  AiProjectRoom = 40,
+  /** The root the AI projects are listed under. */
+  AiProjects = 41,
 }
 
 export enum GuidanceRefKey {

@@ -67,6 +67,9 @@ const RoomLogoPure = ({
           return InstructionsRoomSvg;
         case RoomsType.KnowledgeRoom:
           return KnowledgeRoomSvg;
+        // No dedicated project icon yet: the AI room's one stands in.
+        case RoomsType.AiProjectRoom:
+          return AIRoomSvg;
         default:
           return null;
       }
@@ -89,6 +92,8 @@ const RoomLogoPure = ({
         return InstructionsRoomSvg;
       case RoomsType.KnowledgeRoom:
         return KnowledgeRoomSvg;
+      case RoomsType.AiProjectRoom:
+        return AIRoomSvg;
       default:
         return null;
     }

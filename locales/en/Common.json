@@ -58,6 +58,8 @@
   "AIPaywallCallbackStepActivate": "Activating AI features",
   "AIPricingLowBalanceWithPricing": "Available credits: {{price}}. Credits running low | <1>See pricing</1>",
   "AIProvider": "AI provider",
+  "AIProjectRoomDescription": "A project that binds a model, Instructions rooms and Knowledge rooms for the chats of its members.",
+  "AIProjectRoomTitle": "AI project",
   "AIRoomDescription": "A versatile chat powered by your chosen text model. Use it to solve everyday tasks and collaborate on text documents, spreadsheets, and presentations. All files added to the room are automatically used as context during your conversations with the chat.",
   "AIRoomTitle": "AI Room",
   "AISearch": "AI search",
