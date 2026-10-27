@@ -38,7 +38,8 @@ export type TGetSelectedSortData = () => {
   sortId: TSortBy;
 };
 
-export type TOnChangeViewAs = () => void;
+/** Called by the view selector with the chosen view ("row" / "tile"). */
+export type TOnChangeViewAs = (view: string) => void;
 
 export type TOnSort = (key: string, sortDirection: string) => void;
 
