@@ -750,10 +750,6 @@ class PaymentStore {
     });
   };
 
-  refreshInvoices = async () => {
-    if (this.isInitInvoices) await this.fetchInvoices();
-  };
-
   invoiceHistoryInit = async () => {
     if (!this.isOwner) {
       try {

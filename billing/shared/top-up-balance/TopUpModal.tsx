@@ -48,7 +48,6 @@ const TopUpModal = (props: TopUpModalProps) => {
   const {
     fetchBalance,
     refreshTransactionHistory,
-    refreshInvoices,
     cardLinked,
     accountLink,
     walletCodeCurrency: currency,
@@ -72,10 +71,7 @@ const TopUpModal = (props: TopUpModalProps) => {
   };
 
   const onFetchHistory = async () => {
-    await Promise.all([
-      refreshTransactionHistory(serviceName),
-      refreshInvoices(),
-    ]);
+    await refreshTransactionHistory(serviceName);
   };
 
   return (
