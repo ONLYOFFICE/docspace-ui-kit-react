@@ -15,6 +15,11 @@
   }
 }
 
+.introLoader {
+  margin-bottom: 16px;
+  max-width: 300px;
+}
+
 .tableContainer :global(.table-container_header) {
   position: static !important;
 }

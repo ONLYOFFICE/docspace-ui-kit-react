@@ -4,6 +4,7 @@ import { observer } from "mobx-react";
 import { Consumer } from "../../utils";
 import { Text } from "../../components/text";
 import { EmptyView } from "../../components/empty-view";
+import { RectangleSkeleton } from "../../components/rectangle";
 import { DeviceType } from "../../enums";
 import { useCommonTranslation } from "../../utils/i18n";
 import { useTheme } from "../../context/ThemeContext";
@@ -51,6 +52,14 @@ const InvoiceHistory = () => {
   if (!isInitInvoices) {
     return (
       <div className={styles.invoiceHistory}>
+        <div className={styles.introLoader}>
+          <RectangleSkeleton
+            uniqueKey="invoice-history-description"
+            height="20px"
+            borderRadius="3px"
+            width="100%"
+          />
+        </div>
         <TableLoader
           isMobile={currentDeviceType === DeviceType.mobile}
           isTablet={currentDeviceType === DeviceType.tablet}
