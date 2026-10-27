@@ -155,8 +155,14 @@ const config: StorybookConfig = {
     // imported.
     const stub = (file: string) => path.resolve(__dirname, "stubs", file);
 
+    // An alias key also matches as a prefix, so "react-shiki" alone would turn
+    // ai-chat's `react-shiki/core` import into "react-shiki.mjs/core". The
+    // subpath goes first: the first matching entry wins.
     const missingAiChatPeers = {
+      "react-shiki/core": stub("react-shiki.mjs"),
       "react-shiki": stub("react-shiki.mjs"),
+      "shiki/core": stub("shiki.mjs"),
+      "shiki/engine/javascript": stub("shiki.mjs"),
       openai: stub("openai.mjs"),
       "@anthropic-ai/sdk": stub("anthropic-sdk.mjs"),
       "@google/genai": stub("google-genai.mjs"),
