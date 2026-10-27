@@ -273,6 +273,10 @@ export type SearchInputProps = {
   mainButtonProps?: MainButtonProps;
   /** Icon node rendered inside the MainButton (12x12) */
   mainButtonIcon?: React.ReactNode;
+  /** Leaves the search field out of the bar; the main button stays. Nothing
+   * calls `onSearch`, and `initSearchValue` and `getSelectedInputValue` are
+   * shown nowhere. */
+  hideSearch?: boolean;
 };
 
 export type TRoomGroupIcon = {

@@ -70,4 +70,7 @@ export type SearchInputProps = {
   mainButtonIcon?: React.ReactNode;
   /** data-testid for the main button wrapper element */
   mainButtonDataTestId?: string;
+  /** Leaves the field out, so only the main button is drawn. The block still
+   * takes its width, so whatever follows it stays where it was. */
+  hideField?: boolean;
 };
