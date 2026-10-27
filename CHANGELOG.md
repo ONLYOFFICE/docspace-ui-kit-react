@@ -299,7 +299,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `<button type="button">` named by the new `Toast` prop `closeButtonLabel` (default `"Close"`)
   instead of an unnamed, unfocusable `IconButton`; a toast opened without `withCross` carries the
   same button, visually hidden until it takes focus, so a toast with `timeout` 0 can always be
-  closed with Tab and Enter.
+  closed with Tab and Enter. The cross keeps the grey it had as an `IconButton`.
 - **`Toast` follows the interface direction.** `react-toastify`'s `rtl` flag comes from
   `ThemeProvider`'s interface direction instead of being on in every language.
 - **`toastr.*` no longer shows an empty toast for a number** (numbers, booleans and objects with

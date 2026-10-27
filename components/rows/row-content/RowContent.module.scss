@@ -67,9 +67,9 @@
   }
 }
 
+// No font of its own: the line inherits the body's 13px regular, which is
+// what the client's rows and its e2e screenshots are drawn with.
 .tabletSideInfo {
   display: block;
-  font-size: 12px;
-  font-weight: 600;
   @include mixins.truncate;
 }

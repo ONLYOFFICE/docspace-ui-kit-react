@@ -27,6 +27,12 @@
       fill: var(--toastr-close-button-color);
     }
   }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover svg path {
+      fill: var(--toastr-close-button-hover-color);
+    }
+  }
 }
 
 // A toast opened without `withCross` closes on click; its close button is
@@ -75,7 +81,8 @@
       --toast-warning-hover-bg: #{$black};
 
       --toastr-text-color: #{$dark-gray-dark};
-      --toastr-close-button-color: #{$dark-gray-dark};
+      --toastr-close-button-color: #{$gray-dark};
+      --toastr-close-button-hover-color: #{$white};
 
       --toastr-title-success-color: #{$dark-toast-done};
       --toastr-svg-success-color: #{$dark-toast-done};
@@ -118,7 +125,10 @@
   --toast-warning-hover-bg: #{$light-toast-alert};
 
   --toastr-text-color: #{$black};
-  --toastr-close-button-color: #{$black};
+  // The grey the cross had as an IconButton, whose own fill rule outranked
+  // this one until the close button became a native <button>.
+  --toastr-close-button-color: #{$gray};
+  --toastr-close-button-hover-color: #{$light-gray-dark};
 
   --toastr-title-success-color: #{$dark-black};
   --toastr-svg-success-color: #{$black};
