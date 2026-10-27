@@ -13,6 +13,9 @@
   --section-story-pill-bg: #{$gray-light};
   --section-story-pill-text: var(--text-secondary, #{$gray-text});
   --section-story-muted: var(--text-secondary, #{$gray-text});
+  // The line under a row's name and a file's extension, in the client's
+  // `filesSection.rowView.sideColor`.
+  --section-story-row-side: #{$gray};
 
   position: relative;
   display: flex;
@@ -32,7 +35,60 @@
     --section-story-pill-bg: #{$gray-dark-mid};
     --section-story-pill-text: var(--text-secondary, #{$dark-gray-dark});
     --section-story-muted: var(--text-secondary, #{$dark-gray-dark});
+    --section-story-row-side: #{$gray-dark};
   }
+}
+
+// The client's FilesRow: 56px high, the icon 12px from the name.
+.row {
+  height: 56px;
+
+  :global(.styled-element) {
+    height: 32px;
+    margin-inline-end: 12px;
+  }
+}
+
+.extension {
+  color: var(--section-story-row-side);
+}
+
+// The table fills the body; the header measures this element.
+.table {
+  width: 100%;
+}
+
+// The table's header is `position: fixed`, so it stays put while the section
+// scrolls under it -- in the client, whose page itself never scrolls. A docs
+// page does, and a header fixed to the viewport stays behind when the story
+// moves. The section's scrollbar root, which does not scroll itself, becomes
+// the header's containing block: it still holds through a scroll inside the
+// section and now goes with the section when the page scrolls.
+.frame :global(#sectionScroll) {
+  transform: translateZ(0);
+}
+
+// The client's name cell: the 32px icon, 12px, then the name.
+.nameCell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.nameIcon {
+  display: flex;
+  flex: none;
+  width: 32px;
+  height: 32px;
+}
+
+.tiles {
+  padding-block-start: 4px;
+}
+
+.tileHeading {
+  margin-block: 16px 12px;
 }
 
 // Title, then where the rows come from, then the one action on the right.

@@ -3,7 +3,9 @@ import { RoomType } from "@onlyoffice/docspace-api-sdk";
 
 import FolderComplete32Svg from "../../assets/icons/32/folderComplete.svg";
 import FolderInProgress32Svg from "../../assets/icons/32/folderInProgress.svg";
+import Planet12SvgUrl from "../../assets/icons/12/planet.react.svg?url";
 import ViewRowsReactSvg from "../../assets/view-rows.react.svg";
+import ViewTilesReactSvg from "../../assets/view-tiles.react.svg";
 import { Button, ButtonSize } from "../../components/button";
 import Filter from "../../components/filter";
 import type { TItem } from "../../components/filter";
@@ -23,10 +25,15 @@ import { explainPortalError } from "../samples/legal/explain";
 import { demoSource } from "./demo";
 import { FolderPicker } from "./FolderPicker";
 import {
+  changedAt,
+  NameText,
+  SectionTable,
+  SectionTiles,
+} from "./SectionViews";
+import {
   DEFAULT_ROOM_COLOR,
   filterGroupsFor,
   formFolderOf,
-  itemCount,
   portalSource,
   SECTION_TITLES,
   type SectionFilter,
@@ -54,22 +61,20 @@ const groupOf = (
   filterGroupsFor(kind, folderId).find((offered) => offered.group === group)
     ?.kitGroup;
 
-const ROOM_TYPE_LABELS: Partial<Record<RoomType, string>> = {
-  [RoomType.EditingRoom]: "Collaboration room",
-  [RoomType.PublicRoom]: "Public room",
-  [RoomType.CustomRoom]: "Custom room",
-  [RoomType.VirtualDataRoom]: "Virtual data room",
-  [RoomType.FillingFormsRoom]: "Form filling room",
-};
+// The room types the portal marks with a globe once a public link opens them
+// (`getRoomBadgeUrl` in the client).
+const LINKED_ROOM_TYPES: ReadonlySet<RoomType | undefined> = new Set([
+  RoomType.PublicRoom,
+  RoomType.FillingFormsRoom,
+  RoomType.CustomRoom,
+]);
 
-const dateOf = (iso: string) =>
-  iso
-    ? new Date(iso).toLocaleDateString("en-US", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      })
-    : "";
+/**
+ * The two choices the client's view selector offers. "List" is a table on a
+ * desktop and rows on anything narrower, which is how the client resolves it
+ * (`onChangeViewAs` in its section filter).
+ */
+type ViewChoice = "list" | "tile";
 
 type ListingState = {
   listing: SectionListing | null;
@@ -165,9 +170,14 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
   const currentDeviceType = useDeviceType();
   const isDesktop = currentDeviceType === DeviceType.desktop;
   const [clearSearch, setClearSearch] = useState(false);
+  const [view, setView] = useState<ViewChoice>("list");
+  const viewAs = view === "tile" ? "tile" : isDesktop ? "table" : "row";
 
   const { folderId } = query;
   const atRoot = folderId === null;
+  // Rooms and Forms open on their rooms; a room, a folder and My documents
+  // list folders and files.
+  const roomsList = atRoot && kind !== "files";
   const groups = filterGroupsFor(kind, folderId);
   const items = listing?.items ?? [];
   const crumbs = listing?.crumbs ?? [];
@@ -255,11 +265,22 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
     [query.filters, kind, folderId],
   );
 
-  // One view only, and the selector is hidden -- but the component still
-  // asks for the list, during render, so it must keep its identity.
+  // The client's two choices. The component asks for them during render, so
+  // the function keeps its identity.
   const getViewSettingsData = useCallback(
     () => [
-      { id: "row", label: "List", value: "row", icon: <ViewRowsReactSvg /> },
+      {
+        id: "view-switch_rows",
+        label: "List",
+        value: "row",
+        icon: <ViewRowsReactSvg />,
+      },
+      {
+        id: "view-switch_tiles",
+        label: "Tiles",
+        value: "tile",
+        icon: <ViewTilesReactSvg />,
+      },
     ],
     [],
   );
@@ -282,15 +303,20 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
       filters: state.filters.filter((filter) => filter.key !== key),
     }));
 
-  const iconOf = (item: SectionItem) => {
+  const iconOf = (item: SectionItem, size = 32) => {
     if (item.kind === "room") {
       return (
         <RoomIcon
           title={item.title}
           color={item.color || DEFAULT_ROOM_COLOR}
           showDefault
-          size="32px"
+          size={`${size}px`}
           radius="6px"
+          badgeUrl={
+            item.shared && LINKED_ROOM_TYPES.has(item.roomType)
+              ? Planet12SvgUrl
+              : undefined
+          }
         />
       );
     }
@@ -300,13 +326,18 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
     if (formFolder) {
       const Icon =
         formFolder === "done" ? FolderComplete32Svg : FolderInProgress32Svg;
-      return <Icon width={32} height={32} />;
+      return <Icon width={size} height={size} />;
     }
     return (
-      <FileIcon fileExst={item.kind === "folder" ? "folder" : item.fileExst} />
+      <FileIcon
+        fileExst={item.kind === "folder" ? "folder" : item.fileExst}
+        size={size === 32 ? 32 : 96}
+      />
     );
   };
 
+  // The client's row (FilesRowContent): the name, a slot for badges, and one
+  // line under it.
   const rows = (
     <RowContainer useReactWindow={false} itemHeight={56}>
       {items.map((item) => (
@@ -315,34 +346,37 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
           element={iconOf(item)}
           contextTitle={item.title}
           contextOptions={contextOptions(item)}
+          className={styles.row}
         >
-          <RowContent sideColor="var(--section-story-muted)">
+          <RowContent sideColor="var(--section-story-row-side)">
             <Link
               type={LinkType.page}
+              title={item.title}
+              fontSize="15px"
+              fontWeight={600}
+              containerWidth="55%"
               isTextOverflow
-              fontSize="13px"
-              isBold
+              truncate
               onClick={() => open(item)}
             >
-              {item.title}
+              <NameText item={item} />
             </Link>
             <div />
-            <Text as="span" fontSize="12px" containerMinWidth="140px">
-              {item.kind === "room"
-                ? (ROOM_TYPE_LABELS[item.roomType as RoomType] ?? "Room")
-                : item.by}
-            </Text>
-            <Text as="span" fontSize="12px" containerMinWidth="120px">
-              {item.kind === "room" ? item.by : dateOf(item.updated)}
-            </Text>
-            <Text as="span" fontSize="12px" containerMinWidth="80px">
-              {item.kind === "room" ? dateOf(item.updated) : item.detail}
+            <Text
+              fontSize="12px"
+              fontWeight={400}
+              containerMinWidth="200px"
+              containerWidth="15%"
+            >
+              {changedAt(item.updated)}
             </Text>
           </RowContent>
         </Row>
       ))}
     </RowContainer>
   );
+
+  const viewProps = { kind, items, roomsList, iconOf, open, contextOptions };
 
   const body = error ? (
     <div className={styles.state}>
@@ -368,12 +402,33 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
     </Text>
   ) : (
     <>
-      <Text fontSize="12px" isBold className={styles.count}>
-        {listing.total > items.length
-          ? `First ${items.length} of ${listing.total}`
-          : itemCount(items.length)}
-      </Text>
-      {rows}
+      {/* The client has no count above its list. A portal list longer than
+          one page is the exception: say that only its start is shown. */}
+      {listing.total > items.length ? (
+        <Text fontSize="12px" isBold className={styles.count}>
+          {`First ${items.length} of ${listing.total}`}
+        </Text>
+      ) : null}
+      {viewAs === "row" ? (
+        rows
+      ) : viewAs === "table" ? (
+        <SectionTable
+          {...viewProps}
+          sortBy={query.sortBy}
+          ascending={query.ascending}
+          onSort={(sortBy) =>
+            setQuery((state) => ({
+              ...state,
+              sortBy,
+              // A second click on the sorted column turns the order round.
+              ascending:
+                state.sortBy === sortBy ? !state.ascending : sortBy === "AZ",
+            }))
+          }
+        />
+      ) : (
+        <SectionTiles {...viewProps} />
+      )}
     </>
   );
 
@@ -440,7 +495,7 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
         currentDeviceType={currentDeviceType}
         withBodyScroll
         isHeaderVisible
-        viewAs="row"
+        viewAs={viewAs}
         settingsStudio={false}
       >
         <Section.SectionHeader>
@@ -472,7 +527,7 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
 
         <Section.SectionFilter>
           <Filter
-            viewAs="row"
+            viewAs={viewAs}
             view={`section-${kind}`}
             placeholder={`Search in ${current.title}`}
             filterTitle="Filter"
@@ -481,7 +536,7 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
             selectorLabel="Select"
             userId="1"
             currentDeviceType={currentDeviceType}
-            viewSelectorVisible={false}
+            viewSelectorVisible
             isRooms={kind !== "files" && atRoot}
             isContactsPage={false}
             isContactsPeoplePage={false}
@@ -495,7 +550,11 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
             setClearSearch={setClearSearch}
             onSearch={(value) => onSearchDebounced(value ?? "")}
             onClearFilter={() => onSearchDebounced("")}
-            onChangeViewAs={noop}
+            // The selector calls this only when the view changes, and there
+            // are two, so a call is always a switch to the other one.
+            onChangeViewAs={() =>
+              setView((value) => (value === "tile" ? "list" : "tile"))
+            }
             onSort={(key, direction) =>
               setQuery((state) => ({
                 ...state,

@@ -3,6 +3,7 @@ import { expect, screen, waitFor } from "storybook/test";
 
 import { withDemoBanner } from "../../.storybook/decorators/PortalGate";
 
+import { rowName } from "./rowName";
 import { SectionList } from "./SectionList";
 
 const meta = {
@@ -50,11 +51,15 @@ type Story = StoryObj<typeof meta>;
 
 type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
 
-// The list loads its in-memory demo data after mounting.
+// The list loads its in-memory demo data after mounting. A row is found by its
+// link's title, the whole name: the text splits a file's extension off.
 const listed = (context: PlayContext, title: string) =>
-  waitFor(() => expect(context.canvas.getByText(title)).toBeVisible(), {
-    timeout: 3000,
-  });
+  waitFor(
+    () => expect(context.canvas.getByText(rowName(title))).toBeVisible(),
+    {
+      timeout: 3000,
+    },
+  );
 
 const opensPicker = async (context: PlayContext) => {
   await context.userEvent.click(
@@ -72,10 +77,15 @@ export const Default: Story = {
 
     // Search narrows the list.
     await userEvent.type(canvas.getByPlaceholderText(/^Search in /), "budget");
-    await waitFor(() => expect(canvas.queryByText("Notes.docx")).toBeNull(), {
-      timeout: 3000,
-    });
-    await expect(canvas.getByText("Household budget.xlsx")).toBeVisible();
+    await waitFor(
+      () => expect(canvas.queryByText(rowName("Notes.docx"))).toBeNull(),
+      {
+        timeout: 3000,
+      },
+    );
+    await expect(
+      canvas.getByText(rowName("Household budget.xlsx")),
+    ).toBeVisible();
     // Clearing right away: the late echo of "budget" must not come back.
     await userEvent.clear(canvas.getByPlaceholderText(/^Search in /));
     await listed(context, "Notes.docx");
