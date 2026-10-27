@@ -44,6 +44,8 @@ export const openLoadingTab = (text: string) => {
   const doc = tab.document;
   doc.documentElement.lang = document.documentElement.lang;
   doc.documentElement.dir = document.documentElement.dir;
+  doc.documentElement.style.colorScheme =
+    document.documentElement.getAttribute("data-theme") ?? "light dark";
   doc.title = text;
 
   const style = doc.createElement("style");
