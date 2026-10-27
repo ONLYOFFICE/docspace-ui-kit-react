@@ -1,7 +1,7 @@
 import React from "react";
 
-import { TableCell, TableRow } from "../../../../../components/table";
-import { Text } from "../../../../../components/text";
+import { TableCell, TableRow } from "../../../components/table";
+import { Text } from "../../../components/text";
 
 import InvoiceLink from "../InvoiceLink";
 import styles from "../InvoiceHistory.module.scss";

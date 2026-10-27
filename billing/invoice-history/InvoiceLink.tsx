@@ -1,8 +1,8 @@
 import React from "react";
 
-import { Link, LinkType } from "../../../../components/link";
-import { useCommonTranslation } from "../../../../utils/i18n";
-import ExternalLinkIcon from "../../../../assets/external.link.svg";
+import { Link, LinkType } from "../../components/link";
+import { useCommonTranslation } from "../../utils/i18n";
+import ExternalLinkIcon from "../../assets/external.link.svg";
 
 import styles from "./InvoiceHistory.module.scss";
 

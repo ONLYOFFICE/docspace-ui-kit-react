@@ -753,6 +753,24 @@ class PaymentStore {
     if (this.isInitInvoices) await this.fetchInvoices();
   };
 
+  invoiceHistoryInit = async () => {
+    try {
+      await this.tariff.fetchCustomerInfo();
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
+
+    if (this.isStripePortalAvailable) {
+      await this.fetchInvoices();
+      return;
+    }
+
+    runInAction(() => {
+      this.isInitInvoices = true;
+    });
+  };
+
   fetchMoreInvoices = async () => {
     if (this.isLoadingMoreInvoices || !this.hasMoreInvoices) return;
 

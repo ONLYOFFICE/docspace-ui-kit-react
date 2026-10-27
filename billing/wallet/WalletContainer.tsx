@@ -14,7 +14,6 @@ import { finishRefreshingWithMinCycle } from "../utils/refreshing";
 
 import TransactionHistory from "../shared/transaction-history";
 import UpcomingPayments from "./sub-components/UpcomingPayments";
-import InvoiceHistory from "./sub-components/InvoiceHistory";
 import WalletRefilledModal from "./WalletRefilledModal";
 import AutoPaymentInfo from "./sub-components/AutoPaymentInfo";
 import DelayedPaymentMethodBanner from "./sub-components/DelayedPaymentMethodBanner";
@@ -26,11 +25,7 @@ import { useServicesStore } from "../store/ServicesStoreProvider";
 import { getBrandName } from "../../constants/brands";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
 
-const WALLET_TAB_IDS = [
-  "transaction-history",
-  "invoice-history",
-  "upcoming-payments",
-];
+const WALLET_TAB_IDS = ["transaction-history", "upcoming-payments"];
 
 const getInitialTabId = () => {
   const requested = new URLSearchParams(window.location.search).get("tab");
@@ -68,8 +63,6 @@ const Wallet = (props: WalletProps) => {
     wasChangeBalance,
     fetchBalance,
     refreshTransactionHistory,
-    refreshInvoices,
-    isStripePortalAvailable,
     canUpdateTariff,
     recommendedAmount,
     walletHelpUrl,
@@ -155,7 +148,6 @@ const Wallet = (props: WalletProps) => {
 
     try {
       refreshTransactionHistory();
-      refreshInvoices();
       await fetchBalance!(true);
     } catch (e) {
       toastr.error(e as Error);
@@ -182,25 +174,12 @@ const Wallet = (props: WalletProps) => {
         </div>
       ),
     },
-    ...(isStripePortalAvailable
-      ? [
-          {
-            id: "invoice-history",
-            name: t("InvoiceHistory"),
-            content: <InvoiceHistory />,
-          },
-        ]
-      : []),
     {
       id: "upcoming-payments",
       name: t("UpcomingPayments"),
       content: <UpcomingPayments />,
     },
   ];
-
-  const activeTabId = tabsItems.some(({ id }) => id === selectedTabId)
-    ? selectedTabId
-    : WALLET_TAB_IDS[0];
 
   return (
     <div className={styles.walletContainer}>
@@ -335,7 +314,7 @@ const Wallet = (props: WalletProps) => {
       <div className={styles.tabsWrapper}>
         <Tabs
           items={tabsItems}
-          selectedItemId={activeTabId}
+          selectedItemId={selectedTabId}
           onSelect={onSelectTab}
           withoutStickyIntend
         />

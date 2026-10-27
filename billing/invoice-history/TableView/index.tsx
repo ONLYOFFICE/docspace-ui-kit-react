@@ -1,12 +1,12 @@
 import React, { useRef } from "react";
 import { observer } from "mobx-react";
 
-import { TableBody, TableContainer } from "../../../../../components/table";
+import { TableBody, TableContainer } from "../../../components/table";
 
-import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
-import type { TInvoice } from "../../../../types";
+import { usePaymentStore } from "../../store/PaymentStoreProvider";
+import type { TInvoice } from "../../types";
 
-import { getCorrectDate } from "../../../../../utils/date/getCorrectDate";
+import { getCorrectDate } from "../../../utils/date/getCorrectDate";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
 import styles from "../InvoiceHistory.module.scss";

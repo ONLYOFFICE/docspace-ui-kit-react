@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 
-import { Consumer } from "../../../../utils";
-import { Text } from "../../../../components/text";
-import { EmptyView } from "../../../../components/empty-view";
-import { DeviceType } from "../../../../enums";
-import { useCommonTranslation } from "../../../../utils/i18n";
-import { useTheme } from "../../../../context/ThemeContext";
+import { Consumer } from "../../utils";
+import { Text } from "../../components/text";
+import { EmptyView } from "../../components/empty-view";
+import { DeviceType } from "../../enums";
+import { useCommonTranslation } from "../../utils/i18n";
+import { useTheme } from "../../context/ThemeContext";
 
-import NoInvoicesIcon from "../../../../assets/no.transactions.filter.react.svg";
-import NoInvoicesDarkIcon from "../../../../assets/no.transactions.filter.dark.theme.react.svg";
+import NoInvoicesIcon from "../../assets/no.transactions.filter.react.svg";
+import NoInvoicesDarkIcon from "../../assets/no.transactions.filter.dark.theme.react.svg";
 
-import { usePaymentStore } from "../../../store/PaymentStoreProvider";
-import useDeviceType from "../../../hooks/useDeviceType";
-import useViewEffect from "../../../../hooks/useViewEffect";
-import TableLoader from "../../../shared/transaction-history/sub-components/TableLoader";
+import { usePaymentStore } from "../store/PaymentStoreProvider";
+import useDeviceType from "../hooks/useDeviceType";
+import useViewEffect from "../../hooks/useViewEffect";
+import TableLoader from "../shared/transaction-history/sub-components/TableLoader";
 
 import TableView from "./TableView";
 import RowView from "./RowView";
@@ -24,7 +24,8 @@ const InvoiceHistory = () => {
   const {
     invoices,
     isInitInvoices,
-    fetchInvoices,
+    isStripePortalAvailable,
+    invoiceHistoryInit,
     openInvoice,
     mobileBreakpoint,
     desktopBreakpoint,
@@ -42,8 +43,8 @@ const InvoiceHistory = () => {
   useViewEffect({ view: viewAs, setView: setViewAs, currentDeviceType });
 
   useEffect(() => {
-    fetchInvoices();
-  }, [fetchInvoices]);
+    invoiceHistoryInit();
+  }, [invoiceHistoryInit]);
 
   const onOpenInvoice = (id: number) => openInvoice(id, t);
 
@@ -57,6 +58,8 @@ const InvoiceHistory = () => {
       </div>
     );
   }
+
+  if (!isStripePortalAvailable) return null;
 
   if (!invoices.length) {
     return (

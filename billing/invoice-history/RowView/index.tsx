@@ -1,10 +1,10 @@
 import { observer } from "mobx-react";
 
-import { RowContainer } from "../../../../../components/rows";
-import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
-import type { TInvoice } from "../../../../types";
+import { RowContainer } from "../../../components/rows";
+import { usePaymentStore } from "../../store/PaymentStoreProvider";
+import type { TInvoice } from "../../types";
 
-import { getCorrectDate } from "../../../../../utils/date/getCorrectDate";
+import { getCorrectDate } from "../../../utils/date/getCorrectDate";
 import InvoiceRow from "./RowBody";
 
 type InvoiceHistoryRowViewProps = {

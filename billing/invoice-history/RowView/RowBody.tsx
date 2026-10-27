@@ -1,8 +1,8 @@
 import React from "react";
 import classNames from "classnames";
 
-import { Row, RowContent } from "../../../../../components/rows";
-import { Text } from "../../../../../components/text";
+import { Row, RowContent } from "../../../components/rows";
+import { Text } from "../../../components/text";
 
 import InvoiceLink from "../InvoiceLink";
 import styles from "../InvoiceHistory.module.scss";

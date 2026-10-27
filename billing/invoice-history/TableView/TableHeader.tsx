@@ -1,8 +1,8 @@
 import React from "react";
 import { observer } from "mobx-react";
 
-import { TableHeader } from "../../../../../components/table";
-import { useCommonTranslation } from "../../../../../utils/i18n";
+import { TableHeader } from "../../../components/table";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 type TableHeaderProps = {
   containerRef: React.RefObject<HTMLDivElement>;
