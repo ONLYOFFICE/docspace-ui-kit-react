@@ -19,6 +19,19 @@ type Shown = {
 // animations are off) the swap happens on this timer instead.
 const FADE_FALLBACK_MS = 400;
 
+// The text a message reads as. A JSX message is a new element on every
+// render of the parent, so comparing identity would fade it out and back in --
+// and, the bar being a live region, announce it again -- on every keystroke.
+const textOf = (node: React.ReactNode): string => {
+  if (node === null || node === undefined || typeof node === "boolean")
+    return "";
+  if (typeof node === "string" || typeof node === "number") return `${node}`;
+  if (Array.isArray(node)) return node.map(textOf).join("");
+  if (React.isValidElement<{ children?: React.ReactNode }>(node))
+    return textOf(node.props.children);
+  return "";
+};
+
 const StatusMessage: React.FC<StatusMessageProps> = ({
   message,
   isWarning,
@@ -66,7 +79,12 @@ const StatusMessage: React.FC<StatusMessageProps> = ({
     // Nothing on screen, or the same text as on screen: no fade is needed,
     // and a fade in flight is called off. A change of isWarning alone lands
     // here and repaints at once.
-    if (!current || (next && next.message === current.message)) {
+    if (
+      !current ||
+      (next &&
+        (next.message === current.message ||
+          textOf(next.message) === textOf(current.message)))
+    ) {
       pendingRef.current = undefined;
       clearTimeout(timerRef.current);
       timerRef.current = undefined;

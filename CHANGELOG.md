@@ -163,8 +163,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **Default accessible names are translated where the portal has a key.** The close buttons of
   `Toast`, `SnackBar`, `PublicRoomBar` and `ColumnarInfoBar` default to `Common:CloseButton` ("Close"), the `Tags`
   row to `Common:Tags` ("Tags", was the English "Tags container"), and `Loader` and `AppLoader`
-  to `Common:LoadingProcessing` ("Loading...", was the English "Loading content, please wait.").
-  The three keys are in `locales/en/Common.json`. Names with no key in the portal yet (the
+  to `Common:LoadingProcessing` ("Loading...", was the English "Loading content, please wait."),
+  and a `ContextMenuButton` without `title` to `Common:MoreOptions` ("More options"; it had no
+  name at all, though it is a Tab stop). The four keys are in `locales/en/Common.json`. Names with no key in the portal yet (the
   colour picker's, `TimePicker`'s, `FloatingButton`'s, `LoadingButton`'s "Progress" and
   `PortalLogo`'s `alt`) stay English defaults of their props.
 - **Keys a component handles no longer reach the page's or a dialog's listeners.** The keyboard
@@ -174,12 +175,6 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   the portal's file list Enter on a tag or in a menu also opened the selected item, the arrows
   moved the selection and Escape cleared it. Each now stops the key it acts on and swallows the
   matching `keyup`, however long the key is held.
-- The AI agent's editor tool calls go to the portal's own origin only. They carry what the
-  model writes into a document, and were posted to the editor panel's iframe and to the
-  generated-file tab with the target origin `"*"`, so a window that had meanwhile navigated
-  elsewhere — a sign-in redirect, a link followed in the tab — would have received them. Both
-  windows open the portal's `/doceditor`, so the calls are now addressed to
-  `window.location.origin` and the browser drops one whose window holds any other page
 - `ComboBox` works from the keyboard. The button answered no key, so a list could not be opened
   without a pointer, and the ArrowDown and Enter handler on the document looked for options by a
   test id its own options never carry — so it moved nothing, and while a list was open it
@@ -607,6 +602,12 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - The E2E Docker image copies the vendored ai-chat tarball before `pnpm install`
 - Filter: removing a chip no longer hides a chip of another group that shares its key
 - Context menu (desktop and mobile sheet) and `DropDownItem`: a string icon is fetched and inlined through `react-svg` only when it is a `.svg` on the page's own origin or, where it already was, an SVG data URL. Anything else, a cross-origin `.svg` included, is an `<img>`, so a custom action whose icon lives on the integrator's domain no longer needs CORS headers there and no longer loses its icon. The old rule looked for `images/` or `.svg` in the path and inlined such icons from any origin; a cross-origin SVG now keeps its own colours instead of taking the text colour
+- The AI agent's editor tool calls go to the portal's own origin only. They carry what the
+  model writes into a document, and were posted to the editor panel's iframe and to the
+  generated-file tab with the target origin `"*"`, so a window that had meanwhile navigated
+  elsewhere — a sign-in redirect, a link followed in the tab — would have received them. Both
+  windows open the portal's `/doceditor`, so the calls are now addressed to
+  `window.location.origin` and the browser drops one whose window holds any other page.
 
 ## 4.0.1
 
