@@ -150,6 +150,19 @@ describe("<SearchInput />", () => {
     expect(screen.queryByText("New room")).not.toBeInTheDocument();
   });
 
+  it("draws only the main button when hideField is set", () => {
+    render(
+      <SearchInput
+        {...baseProps}
+        hideField
+        showMainButton
+        mainButtonProps={{ text: "New room", model: [] }}
+      />,
+    );
+    expect(screen.getByText("New room")).toBeInTheDocument();
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+  });
+
   it("does not render main button when mainButtonProps is not provided", () => {
     render(<SearchInput {...baseProps} showMainButton />);
     expect(screen.queryByTestId("main-button")).not.toBeInTheDocument();

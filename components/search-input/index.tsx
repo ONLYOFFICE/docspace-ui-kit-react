@@ -45,6 +45,7 @@ const SearchInput = ({
   mainButtonProps,
   mainButtonIcon = <PlusIconSvg />,
   mainButtonDataTestId,
+  hideField = false,
 }: SearchInputProps) => {
   const [inputValue, setInputValue] = useState(value);
 
@@ -146,36 +147,38 @@ const SearchInput = ({
           />
         </div>
       ) : null}
-      <div className={styles.searchInputField}>
-        <InputBlock
-          className="search-input-block"
-          forwardedRef={forwardedRef}
-          onClick={onClick}
-          id={id}
-          name={name}
-          value={inputValue}
-          size={size}
-          scale={scale}
-          isDisabled={isDisabled}
-          onChange={handleInputChange}
-          onFocus={onFocus}
-          // onBlur={handleBlur}
-          type={InputType.text}
-          iconNode={iconNode}
-          iconButtonClassName={
-            inputValue || showClearButton ? "search-cross" : "search-loupe"
-          }
-          isIconFill
-          iconSize={iconSizeValue}
-          onIconClick={
-            inputValue || showClearButton ? handleClearSearch : undefined
-          }
-          placeholder={placeholder}
-          tabIndex={tabIndex}
-        >
-          {children}
-        </InputBlock>
-      </div>
+      {hideField ? null : (
+        <div className={styles.searchInputField}>
+          <InputBlock
+            className="search-input-block"
+            forwardedRef={forwardedRef}
+            onClick={onClick}
+            id={id}
+            name={name}
+            value={inputValue}
+            size={size}
+            scale={scale}
+            isDisabled={isDisabled}
+            onChange={handleInputChange}
+            onFocus={onFocus}
+            // onBlur={handleBlur}
+            type={InputType.text}
+            iconNode={iconNode}
+            iconButtonClassName={
+              inputValue || showClearButton ? "search-cross" : "search-loupe"
+            }
+            isIconFill
+            iconSize={iconSizeValue}
+            onIconClick={
+              inputValue || showClearButton ? handleClearSearch : undefined
+            }
+            placeholder={placeholder}
+            tabIndex={tabIndex}
+          >
+            {children}
+          </InputBlock>
+        </div>
+      )}
     </div>
   );
 };
