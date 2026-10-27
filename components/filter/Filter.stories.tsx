@@ -408,6 +408,11 @@ const meta = {
       description:
         "Icon shown at 12 by 12 pixels inside the main button; a plus when omitted",
     },
+    hideSearch: {
+      control: "boolean",
+      description:
+        "Leaves the search field out of the bar; the main button, the filter and the sort controls stay",
+    },
     isIndexEditingMode: {
       control: "boolean",
       description:
@@ -1230,6 +1235,31 @@ export const WithMainButton: Story = {
       },
       source: {
         code: `<Filter
+  showMainButton
+  mainButtonProps={{ text: "New", model: menuItems }}
+  {...props}
+/>`,
+      },
+    },
+  },
+};
+
+export const WithoutSearch: Story = {
+  render: (args) => <FilterTemplate {...args} />,
+  args: {
+    hideSearch: true,
+    showMainButton: true,
+    mainButtonProps: { text: "New", model: [] },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A listing whose content the server cannot search: the field is left out and the main button keeps its place, with the filter and sort controls at the end of the row (`hideSearch`).",
+      },
+      source: {
+        code: `<Filter
+  hideSearch
   showMainButton
   mainButtonProps={{ text: "New", model: menuItems }}
   {...props}

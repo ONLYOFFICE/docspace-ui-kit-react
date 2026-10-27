@@ -19,6 +19,7 @@ const useSearch = ({
   showMainButton,
   mainButtonProps,
   mainButtonIcon,
+  hideSearch,
 }: SearchInputProps) => {
   const searchRef = React.useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = React.useState(initSearchValue ?? "");
@@ -92,6 +93,7 @@ const useSearch = ({
       showMainButton={showMainButton}
       mainButtonProps={mainButtonProps}
       mainButtonIcon={mainButtonIcon}
+      hideField={hideSearch}
     />
   );
   return { searchComponent };

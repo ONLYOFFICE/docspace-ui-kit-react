@@ -125,6 +125,21 @@ describe("Filter Component", () => {
       expect(onClearFilter).toHaveBeenCalled();
       expect(setClearSearch).toHaveBeenCalledWith(false);
     });
+
+    it("leaves the field out and keeps the main button when hideSearch is set", async () => {
+      await act(async () => {
+        renderComponent({
+          hideSearch: true,
+          showMainButton: true,
+          mainButtonProps: { text: "New", model: [] },
+          initSearchValue: "draft",
+        });
+      });
+
+      expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+      expect(screen.queryByDisplayValue("draft")).not.toBeInTheDocument();
+      expect(screen.getByText("New")).toBeInTheDocument();
+    });
   });
 
   describe("Custom items", () => {
