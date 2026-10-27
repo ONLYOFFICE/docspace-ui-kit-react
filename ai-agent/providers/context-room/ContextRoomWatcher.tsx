@@ -11,15 +11,12 @@ import socket, {
   type TOptSocket,
 } from "../../../utils/socket";
 import { CONTEXT_ROOM_CLOUD } from "./ContextRoomSync";
-import { useContextRoom } from "./index";
+import { useContextRooms } from "./index";
 
 /** Skill re-reads are coalesced over this window: an upload lands as several events. */
 const SKILLS_REFRESH_DELAY_MS = 300;
 
 const roomPart = (id: string) => `DIR-${id}`;
-
-const sameId = (a: unknown, b: unknown): boolean =>
-  a !== undefined && a !== null && String(a) === String(b);
 
 type EntryEventData = {
   id?: number | string;
@@ -50,8 +47,8 @@ const isMarkdown = (data: EntryEventData | undefined): boolean =>
   ).toLowerCase() === ".md";
 
 /**
- * Follows the connected context room on the socket, and the room the user
- * is in while it is not connected. Lives above the chat pane, so the
+ * Follows the connected context rooms on the socket, and the rooms the host
+ * offers while they are not connected. Lives above the chat pane, so the
  * connection stays true to the portal even while the chat is closed.
  *
  * The skills of a room are the Markdown files in the root of an
@@ -59,11 +56,12 @@ const isMarkdown = (data: EntryEventData | undefined): boolean =>
  * connected room it listens in two places, because the portal announces a
  * change to the folder that holds the entry: the room (files added,
  * changed, removed -> the skills are read again, and a room left without
- * one is disconnected) and the rooms root (the room renamed -> the button
+ * one is disconnected) and the rooms root (the room renamed -> the pill
  * takes the new name; the room removed, or the user's access to it ->
- * disconnected).
+ * disconnected). Each connected room is followed on its own: one of them
+ * losing its skills disconnects that room alone.
  *
- * For the current room that is not connected it listens to the room: the
+ * For an offered room that is not connected it listens to the room: the
  * first skill file appearing there connects the room, as opening the chat
  * would have. An Instructions room without a skill file connects nothing.
  *
@@ -78,10 +76,10 @@ const isMarkdown = (data: EntryEventData | undefined): boolean =>
  * taking its subscription away would silence it.
  */
 const ContextRoomWatcher = () => {
-  const current = useContextRoom();
+  const offered = useContextRooms();
   const { aiApi } = useApi();
   const { useCloudsStore } = useStores();
-  const selected = useCloudsStore((s) => s.selectedContextFolder);
+  const selected = useCloudsStore((s) => s.selectedContextFolders);
   const contextFolders = useCloudsStore((s) => s.contextFolders);
   const listedRoomsKey = contextFolders
     .filter((folder) => folder.cloud === CONTEXT_ROOM_CLOUD)
@@ -89,20 +87,45 @@ const ContextRoomWatcher = () => {
     .sort()
     .join("\u0000");
 
-  const connectedRoomId =
-    selected?.cloud === CONTEXT_ROOM_CLOUD ? selected.room.id : undefined;
-  const connectedRoomName =
-    selected?.cloud === CONTEXT_ROOM_CLOUD ? selected.room.name : undefined;
-  const currentRoomId = current?.id;
-  const currentRoomName = current?.name;
+  // The rooms of this portal that are connected, and the offered ones that
+  // are not, as keys: the effect reruns on a change of either set or name.
+  const connected = selected
+    .filter((item) => item.cloud === CONTEXT_ROOM_CLOUD)
+    .map((item) => item.room);
+  const connectedKey = connected
+    .map((room) => `${room.id}\u0000${room.name}`)
+    .join("\u0001");
+  const offeredKey = offered
+    .map((room) => `${room.id}\u0000${room.name}`)
+    .join("\u0001");
+  const connectedRef = useRef(connected);
+  connectedRef.current = connected;
+  const offeredRef = useRef(offered);
+  offeredRef.current = offered;
 
   const refreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    const connectedRooms = connectedRef.current;
+    const offeredRooms = offeredRef.current;
+    const connectedIds = new Set(connectedRooms.map((room) => room.id));
+    const nameOf = new Map(connectedRooms.map((room) => [room.id, room.name]));
+    // Offered rooms not yet connected are watched for their first skill
+    // file — unless the user picked a room of their own from the list: that
+    // choice stands, as it does for a reopen of the chat.
+    const offeredIds = new Set(offeredRooms.map((room) => room.id));
+    const userPicked = connectedRooms.some((room) => !offeredIds.has(room.id));
+    const watched = userPicked
+      ? []
+      : offeredRooms.filter((room) => !connectedIds.has(room.id));
     const listedRoomIds = new Set(
       listedRoomsKey ? listedRoomsKey.split("\u0000") : [],
     );
-    if (!connectedRoomId && !currentRoomId && listedRoomIds.size === 0) {
+    if (
+      connectedIds.size === 0 &&
+      watched.length === 0 &&
+      listedRoomIds.size === 0
+    ) {
       return undefined;
     }
 
@@ -134,15 +157,13 @@ const ContextRoomWatcher = () => {
       }, SKILLS_REFRESH_DELAY_MS);
     };
 
-    // Whether the connected room was confirmed as a skills room: file events
-    // in it are acted on only after that, a lookup that failed leaves the
-    // connection as it is.
-    let connectedConfirmed = false;
-    // Whether the current, not connected room is a skills room without a
-    // skill file yet: the first Markdown file landing there connects it.
-    let currentAwaitsSkill = false;
-    const watchCurrent = !!currentRoomId && !connectedRoomId;
+    // Connected rooms whose skills folder the lookup confirmed.
+    const confirmed = new Set<string>();
+    // Watched rooms that hold no skill yet.
+    const awaitingSkill = new Set<string>();
 
+    // Re-read the skills of every connected room; a room left without one
+    // is disconnected on its own.
     const scheduleSkillsRefresh = () => {
       scheduleListRefresh();
       if (refreshTimer.current) clearTimeout(refreshTimer.current);
@@ -152,25 +173,33 @@ const ContextRoomWatcher = () => {
         void Promise.resolve(clouds.fetchRoomSkills()).then(() => {
           if (cancelled) return;
           const state = useCloudsStore.getState();
-          if (
-            state.selectedContextFolder?.cloud === CONTEXT_ROOM_CLOUD &&
-            state.selectedContextFolder.room.id === connectedRoomId &&
-            state.roomSkills.length === 0
-          ) {
-            state.clearContextFolder();
+          for (const item of state.selectedContextFolders) {
+            if (item.cloud !== CONTEXT_ROOM_CLOUD) continue;
+            if (!connectedIds.has(item.room.id)) continue;
+            const hasSkill = state.roomSkills.some(
+              (skill) =>
+                skill.cloud === CONTEXT_ROOM_CLOUD &&
+                skill.roomId === item.room.id,
+            );
+            if (!hasSkill) {
+              state.deselectContextFolder(CONTEXT_ROOM_CLOUD, item.room.id);
+            }
           }
         });
       }, SKILLS_REFRESH_DELAY_MS);
     };
 
-    const connectCurrent = () => {
-      if (!currentRoomId || currentRoomName === undefined) return;
+    const connectWatched = (roomId: string) => {
+      const room = watched.find((item) => item.id === roomId);
+      if (!room) return;
       const clouds = useCloudsStore.getState();
       clouds.selectContextFolder(CONTEXT_ROOM_CLOUD, {
-        id: currentRoomId,
-        name: currentRoomName,
+        id: room.id,
+        name: room.name,
       });
-      scheduleListRefresh();
+      // Connecting reruns this effect, whose cleanup would cancel a
+      // scheduled refresh: the list is read right away instead.
+      void clouds.fetchContextFolders();
     };
 
     const handle = (opt?: TOptSocket) => {
@@ -186,54 +215,57 @@ const ContextRoomWatcher = () => {
       if (touchesListed) scheduleListRefresh();
 
       if (opt.type === "file") {
-        if (connectedConfirmed && sameId(data?.folderId, connectedRoomId)) {
+        const folderId =
+          data?.folderId === undefined ? undefined : String(data.folderId);
+        if (folderId !== undefined && confirmed.has(folderId)) {
           scheduleSkillsRefresh();
           return;
         }
         if (
-          watchCurrent &&
-          currentAwaitsSkill &&
+          folderId !== undefined &&
+          awaitingSkill.has(folderId) &&
           opt.cmd !== "delete" &&
-          sameId(data?.folderId, currentRoomId) &&
           isMarkdown(data)
         ) {
-          currentAwaitsSkill = false;
-          connectCurrent();
+          awaitingSkill.delete(folderId);
+          connectWatched(folderId);
         }
         return;
       }
 
       if (opt.type !== "folder") return;
 
-      if (connectedRoomId && sameId(opt.id, connectedRoomId)) {
-        if (opt.cmd === "delete") {
-          clouds.clearContextFolder();
-          return;
-        }
-        if (
-          opt.cmd === "update" &&
-          data?.title &&
-          data.title !== connectedRoomName
-        ) {
-          clouds.selectContextFolder(CONTEXT_ROOM_CLOUD, {
-            id: connectedRoomId,
-            name: data.title,
-          });
-        }
+      const id = String(opt.id);
+      if (!connectedIds.has(id)) return;
+      if (opt.cmd === "delete") {
+        clouds.deselectContextFolder(CONTEXT_ROOM_CLOUD, id);
+        return;
+      }
+      if (
+        opt.cmd === "update" &&
+        data?.title &&
+        data.title !== nameOf.get(id)
+      ) {
+        clouds.selectContextFolder(CONTEXT_ROOM_CLOUD, {
+          id,
+          name: data.title,
+        });
       }
     };
 
     socket?.on(SocketEvents.ModifyFolder, handle);
 
-    if (watchCurrent && currentRoomId) {
-      subscribe([currentRoomId]);
-      aiApi
-        .getRoomSkillsFolder(currentRoomId)
-        .catch(() => null)
-        .then((folder) => {
-          if (cancelled || !folder || folder.hasSkills) return;
-          currentAwaitsSkill = true;
-        });
+    if (watched.length > 0) {
+      subscribe(watched.map((room) => room.id));
+      for (const room of watched) {
+        aiApi
+          .getRoomSkillsFolder(room.id)
+          .catch(() => null)
+          .then((folder) => {
+            if (cancelled || !folder || folder.hasSkills) return;
+            awaitingSkill.add(room.id);
+          });
+      }
     }
 
     if (listedRoomIds.size > 0) {
@@ -249,10 +281,10 @@ const ContextRoomWatcher = () => {
       }
     }
 
-    if (connectedRoomId) {
+    for (const roomId of connectedIds) {
       let failed = false;
       aiApi
-        .getRoomSkillsFolder(connectedRoomId)
+        .getRoomSkillsFolder(roomId)
         .catch((error: unknown) => {
           const status = (error as { status?: number }).status;
           if (status === 401 || status === 403) return null;
@@ -262,10 +294,12 @@ const ContextRoomWatcher = () => {
         .then((folder) => {
           if (cancelled || failed) return;
           if (!folder || !folder.hasSkills) {
-            useCloudsStore.getState().clearContextFolder();
+            useCloudsStore
+              .getState()
+              .deselectContextFolder(CONTEXT_ROOM_CLOUD, roomId);
             return;
           }
-          connectedConfirmed = true;
+          confirmed.add(roomId);
           subscribe([folder.roomsRootId, folder.roomId]);
         });
     }
@@ -288,15 +322,7 @@ const ContextRoomWatcher = () => {
         });
       }
     };
-  }, [
-    aiApi,
-    connectedRoomId,
-    connectedRoomName,
-    currentRoomId,
-    currentRoomName,
-    listedRoomsKey,
-    useCloudsStore,
-  ]);
+  }, [aiApi, connectedKey, offeredKey, listedRoomsKey, useCloudsStore]);
 
   return null;
 };

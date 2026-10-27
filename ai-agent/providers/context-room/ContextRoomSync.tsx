@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { useStores } from "@onlyoffice/ai-chat";
 
 import { useApi } from "../../../providers/api";
-import { useContextRoom, useSyncedContextRoom } from "./index";
+import { useContextRooms, useSyncedContextRoom } from "./index";
 
 // DocSpace is a single cloud to the chat library. The AI service lists the
 // Instructions rooms under the same label (`CONTEXT_CLOUD` in ASC.AI.Chat),
@@ -14,7 +14,8 @@ import { useContextRoom, useSyncedContextRoom } from "./index";
 export const CONTEXT_ROOM_CLOUD = "docspace";
 
 /**
- * Connects the room the user is in as the chat's context, by default.
+ * Connects the rooms the host offers (the room the user is in, or an AI
+ * project's Instructions rooms) as the chat's context, by default.
  * Mounted inside the chat pane, so it runs when the chat opens and whenever
  * the room changes while it stays open — not on every navigation with the
  * chat closed.
@@ -31,84 +32,92 @@ export const CONTEXT_ROOM_CLOUD = "docspace";
  * skills are read again and a new name is taken over.
  */
 const ContextRoomSync = () => {
-  const room = useContextRoom();
+  const rooms = useContextRooms();
   const synced = useSyncedContextRoom();
   const { aiApi } = useApi();
   const { useCloudsStore } = useStores();
 
-  const roomId = room?.id;
-  const roomName = room?.name;
+  // The set of rooms is the sync key; a rename alone hands the store the
+  // new name without another skills check.
+  const idsKey = rooms.map((room) => room.id).join("\u0000");
+  const namesKey = rooms.map((room) => room.name).join("\u0000");
+  const roomsRef = useRef(rooms);
+  roomsRef.current = rooms;
 
   useEffect(() => {
+    const rooms = roomsRef.current;
     const clouds = useCloudsStore.getState();
-    const here = roomId ?? null;
-    const isCurrentRoom = (
-      selected: typeof clouds.selectedContextFolder,
-    ): boolean =>
-      !!roomId &&
-      selected?.cloud === CONTEXT_ROOM_CLOUD &&
-      selected.room.id === roomId;
+    const here = idsKey || null;
+    const connectedIds = (
+      selected: typeof clouds.selectedContextFolders,
+    ): string[] =>
+      selected
+        .filter((item) => item.cloud === CONTEXT_ROOM_CLOUD)
+        .map((item) => item.room.id);
 
     if (synced.current === here) {
-      // The chat reopened where it was: the user's choice since stands.
-      if (
-        roomId &&
-        roomName !== undefined &&
-        isCurrentRoom(clouds.selectedContextFolder)
-      ) {
-        // The pick is skipped for the room already connected, except that
-        // a changed name is taken over; the skills are read here — a file
-        // added to the folder since should show up now.
-        clouds.selectContextFolder(CONTEXT_ROOM_CLOUD, {
-          id: roomId,
-          name: roomName,
-        });
+      // Same rooms as last time: the ones still connected take over their
+      // names and are read again; a Disconnect, or another room picked
+      // from the list, stands.
+      const stillConnected = rooms.filter((room) =>
+        connectedIds(clouds.selectedContextFolders).includes(room.id),
+      );
+      if (stillConnected.length > 0) {
+        for (const room of stillConnected) {
+          clouds.selectContextFolder(CONTEXT_ROOM_CLOUD, {
+            id: room.id,
+            name: room.name,
+          });
+        }
         void clouds.fetchRoomSkills();
       }
       return undefined;
     }
 
     synced.current = here;
-    if (!roomId || roomName === undefined) {
+    if (rooms.length === 0) {
       clouds.clearContextFolder();
       return undefined;
     }
 
     let cancelled = false;
     let settled = false;
-    aiApi
-      .hasRoomSkills(roomId)
-      .catch(() => false)
-      .then((hasSkills) => {
-        settled = true;
-        if (cancelled) return;
-        const current = useCloudsStore.getState();
-        if (!hasSkills) {
-          current.clearContextFolder();
-          return;
-        }
-        const sameRoom = isCurrentRoom(current.selectedContextFolder);
-        current.selectContextFolder(CONTEXT_ROOM_CLOUD, {
-          id: roomId,
-          name: roomName,
-        });
-        if (sameRoom) {
-          // Picked from the list before coming here: the store keeps the
-          // skills and switches, so read the skills again for the visit.
-          void current.fetchRoomSkills();
-        }
-      });
+    Promise.all(
+      rooms.map((room) => aiApi.hasRoomSkills(room.id).catch(() => false)),
+    ).then((flags) => {
+      settled = true;
+      if (cancelled) return;
+      const current = useCloudsStore.getState();
+      const withSkills = rooms.filter((_, index) => flags[index]);
+      if (withSkills.length === 0) {
+        current.clearContextFolder();
+        return;
+      }
+      // The store reads the skills of a changed list itself (it compares
+      // cloud, id and name in order); an unchanged list is read again here,
+      // as a reopen of the chat wants.
+      const before = current.selectedContextFolders;
+      const unchanged =
+        before.length === withSkills.length &&
+        before.every(
+          (item, index) =>
+            item.cloud === CONTEXT_ROOM_CLOUD &&
+            item.room.id === withSkills[index].id &&
+            item.room.name === withSkills[index].name,
+        );
+      current.selectContextFolders(CONTEXT_ROOM_CLOUD, withSkills);
+      if (unchanged) {
+        void current.fetchRoomSkills();
+      }
+    });
 
     return () => {
       cancelled = true;
-      // The check did not land (the chat closed, the room changed): let the
-      // next run in this room start over instead of trusting a state that
-      // was never applied.
       if (!settled && synced.current === here) {
         synced.current = undefined;
       }
     };
-  }, [aiApi, roomId, roomName, synced, useCloudsStore]);
+  }, [aiApi, idsKey, namesKey, synced, useCloudsStore]);
 
   return null;
 };

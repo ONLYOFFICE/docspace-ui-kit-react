@@ -28,21 +28,19 @@ const AiChatPanelSave = observer(() => {
   // chat's, else the default one — a chat never touched still runs on a
   // model, and that is the one to save.
   const profile = useProfilesStore(selectCurrentChatProfile);
-  const contextFolder = useCloudsStore((s) => s.selectedContextFolder);
-  const knowledgeFolder = useCloudsStore((s) => s.selectedKnowledgeFolder);
+  const contextFolders = useCloudsStore((s) => s.selectedContextFolders);
+  const knowledgeFolders = useCloudsStore((s) => s.selectedKnowledgeFolders);
 
   if (!store.onSavePreset) return null;
 
-  const asPresetRoom = (
-    selected: { cloud: string; room: { id: string; name: string } } | null,
-  ): AiChatPresetRoom | null =>
-    selected
-      ? {
-          cloud: selected.cloud,
-          id: selected.room.id,
-          name: selected.room.name,
-        }
-      : null;
+  const asPresetRoom = (selected: {
+    cloud: string;
+    room: { id: string; name: string };
+  }): AiChatPresetRoom => ({
+    cloud: selected.cloud,
+    id: selected.room.id,
+    name: selected.room.name,
+  });
 
   const onClick = () => {
     // A picked agent shows its profile under the agent's name; the project
@@ -53,8 +51,8 @@ const AiChatPanelSave = observer(() => {
     store.onSavePreset?.({
       profileId: model?.id ?? null,
       profileName: model?.name ?? null,
-      contextRoom: asPresetRoom(contextFolder),
-      knowledgeRoom: asPresetRoom(knowledgeFolder),
+      contextRooms: contextFolders.map(asPresetRoom),
+      knowledgeRooms: knowledgeFolders.map(asPresetRoom),
     });
   };
 

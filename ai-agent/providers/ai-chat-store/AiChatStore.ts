@@ -43,15 +43,38 @@ export type AiChatPresetRoom = { cloud: string; id: string; name: string };
 
 /**
  * The chat settings a host saves as a preset and hands back to open one: the
- * model (profile), the Instructions room connected for its skills and the
- * Knowledge room the chat searches. `null` fields mean "nothing connected".
+ * model (profile), the Instructions rooms connected for their skills and
+ * the Knowledge rooms the chat searches. Empty lists mean "nothing
+ * connected".
  */
 export type AiChatPresetSettings = {
   profileId: string | null;
   profileName: string | null;
-  contextRoom: AiChatPresetRoom | null;
-  knowledgeRoom: AiChatPresetRoom | null;
+  contextRooms: AiChatPresetRoom[];
+  knowledgeRooms: AiChatPresetRoom[];
 };
+
+/**
+ * An AI project as the host opens it in the chat: the model and every
+ * Instructions / Knowledge room linked to it — a preset under the names
+ * the project uses (`AiChatStore.openProject`).
+ */
+export type AiChatProjectSettings = {
+  profileId: string | null;
+  profileName: string | null;
+  instructionsRooms: AiChatPresetRoom[];
+  knowledgeRooms: AiChatPresetRoom[];
+};
+
+/** The preset a project opens as. */
+export const projectToPreset = (
+  project: AiChatProjectSettings,
+): AiChatPresetSettings => ({
+  profileId: project.profileId,
+  profileName: project.profileName,
+  contextRooms: project.instructionsRooms,
+  knowledgeRooms: project.knowledgeRooms,
+});
 
 // Single source of truth for the AI Chat panel UI: visibility + fullscreen
 // + selected agent + mirrors of the upstream router page and profiles
@@ -270,6 +293,12 @@ class AiChatStore {
     this.userFullscreen = true;
     this.pendingPreset = settings;
     this.pendingPresetFresh = true;
+  };
+
+  // Open an AI project: a fresh fullscreen conversation on the project's
+  // model with every one of its rooms connected.
+  openProject = (project: AiChatProjectSettings) => {
+    this.openPreset(projectToPreset(project));
   };
 
   // Apply a preset to the chat as it stands — the conversation, the panel

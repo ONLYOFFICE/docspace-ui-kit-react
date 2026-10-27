@@ -73,9 +73,10 @@ const AiChatStoresBridge = () => {
   );
 
   // A preset opens a fresh conversation with its rooms connected and its
-  // model picked. The skills room is also handed to the host's `contextRoom`
-  // by the host itself, so ContextRoomSync keeps it when the pane mounts;
-  // the knowledge base and the model have no such sync and are set here.
+  // model picked. The skills rooms are also handed to the host's
+  // `contextRoom` by the host itself, so ContextRoomSync keeps them when the
+  // pane mounts; the knowledge bases and the model have no such sync and
+  // are set here.
   useEffect(
     () =>
       reaction(
@@ -89,18 +90,43 @@ const AiChatStoresBridge = () => {
               .onSwitchToNewThread({ keepSessionProfile: true });
           }
           const clouds = stores.useCloudsStore.getState();
-          if (preset.contextRoom) {
-            const { cloud, id, name } = preset.contextRoom;
-            clouds.selectContextFolder(cloud, { id, name });
-          } else {
-            clouds.clearContextFolder();
-          }
-          if (preset.knowledgeRoom) {
-            const { cloud, id, name } = preset.knowledgeRoom;
-            clouds.selectKnowledgeFolder(cloud, { id, name });
-          } else {
-            clouds.clearKnowledgeFolder();
-          }
+          // The rooms of a preset share one cloud (the portal); a mixed
+          // list is connected one room at a time.
+          const connect = (
+            rooms: typeof preset.contextRooms,
+            replace: (
+              cloud: string,
+              list: { id: string; name: string }[],
+            ) => void,
+            add: (cloud: string, room: { id: string; name: string }) => void,
+            clear: () => void,
+          ) => {
+            const clouds = new Set(rooms.map((room) => room.cloud));
+            if (clouds.size <= 1) {
+              const cloud = rooms[0]?.cloud;
+              if (cloud)
+                replace(
+                  cloud,
+                  rooms.map(({ id, name }) => ({ id, name })),
+                );
+              else clear();
+              return;
+            }
+            clear();
+            for (const { cloud, id, name } of rooms) add(cloud, { id, name });
+          };
+          connect(
+            preset.contextRooms,
+            clouds.selectContextFolders,
+            clouds.selectContextFolder,
+            clouds.clearContextFolder,
+          );
+          connect(
+            preset.knowledgeRooms,
+            clouds.selectKnowledgeFolders,
+            clouds.selectKnowledgeFolder,
+            clouds.clearKnowledgeFolder,
+          );
           // A preset holds no context folder: a fresh conversation starts
           // without one, whatever the previous chat had connected; applied in
           // place, the chat keeps the folder the user connected.

@@ -7,11 +7,12 @@ import { act, render } from "@testing-library/react";
 import { ContextRoomProvider } from "./index";
 
 const clouds = {
-  selectedContextFolder: null as null | {
+  selectedContextFolders: [] as {
     cloud: string;
     room: { id: string; name: string };
-  },
+  }[],
   selectContextFolder: vi.fn(),
+  selectContextFolders: vi.fn(),
   clearContextFolder: vi.fn(),
   fetchRoomSkills: vi.fn(),
 };
@@ -56,21 +57,20 @@ const Chat = ({
 describe("ContextRoomSync", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    clouds.selectedContextFolder = null;
+    clouds.selectedContextFolders = [];
   });
 
   it("re-reads the skills when the chat reopens in the room already connected", async () => {
     hasRoomSkills.mockResolvedValue(true);
-    clouds.selectedContextFolder = {
-      cloud: CONTEXT_ROOM_CLOUD,
-      room: { id: "12", name: "Sales" },
-    };
+    clouds.selectedContextFolders = [
+      { cloud: CONTEXT_ROOM_CLOUD, room: { id: "12", name: "Sales" } },
+    ];
     renderSync({ id: "12", name: "Sales" });
     await flush();
 
-    expect(clouds.selectContextFolder).toHaveBeenCalledWith(
+    expect(clouds.selectContextFolders).toHaveBeenCalledWith(
       CONTEXT_ROOM_CLOUD,
-      { id: "12", name: "Sales" },
+      [{ id: "12", name: "Sales" }],
     );
     expect(clouds.fetchRoomSkills).toHaveBeenCalledTimes(1);
     expect(clouds.clearContextFolder).not.toHaveBeenCalled();
@@ -78,18 +78,18 @@ describe("ContextRoomSync", () => {
 
   it("hands the store the new name of the room already connected", async () => {
     hasRoomSkills.mockResolvedValue(true);
-    clouds.selectedContextFolder = {
-      cloud: CONTEXT_ROOM_CLOUD,
-      room: { id: "12", name: "Sales" },
-    };
+    clouds.selectedContextFolders = [
+      { cloud: CONTEXT_ROOM_CLOUD, room: { id: "12", name: "Sales" } },
+    ];
     renderSync({ id: "12", name: "Sales EMEA" });
     await flush();
 
-    expect(clouds.selectContextFolder).toHaveBeenCalledWith(
+    expect(clouds.selectContextFolders).toHaveBeenCalledWith(
       CONTEXT_ROOM_CLOUD,
-      { id: "12", name: "Sales EMEA" },
+      [{ id: "12", name: "Sales EMEA" }],
     );
-    expect(clouds.fetchRoomSkills).toHaveBeenCalledTimes(1);
+    // A changed name is a changed list: the store reads the skills itself.
+    expect(clouds.fetchRoomSkills).not.toHaveBeenCalled();
     expect(clouds.clearContextFolder).not.toHaveBeenCalled();
   });
 
@@ -99,10 +99,12 @@ describe("ContextRoomSync", () => {
     await flush();
 
     expect(hasRoomSkills).toHaveBeenCalledWith("12");
-    expect(clouds.selectContextFolder).toHaveBeenCalledWith(
+    expect(clouds.selectContextFolders).toHaveBeenCalledWith(
       CONTEXT_ROOM_CLOUD,
-      { id: "12", name: "Sales" },
+      [{ id: "12", name: "Sales" }],
     );
+    // A new set: the store reads the skills itself.
+    expect(clouds.fetchRoomSkills).not.toHaveBeenCalled();
     expect(clouds.clearContextFolder).not.toHaveBeenCalled();
   });
 
@@ -111,8 +113,34 @@ describe("ContextRoomSync", () => {
     renderSync({ id: "12", name: "Sales" });
     await flush();
 
-    expect(clouds.selectContextFolder).not.toHaveBeenCalled();
+    expect(clouds.selectContextFolders).not.toHaveBeenCalled();
     expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
+  });
+
+  it("connects only the rooms that hold skills, in the host's order", async () => {
+    hasRoomSkills.mockImplementation(async (roomId) => roomId !== "13");
+    render(
+      <ContextRoomProvider
+        rooms={[
+          { id: "12", name: "Sales" },
+          { id: "13", name: "Empty" },
+          { id: "14", name: "Legal" },
+        ]}
+      >
+        <ContextRoomSync />
+      </ContextRoomProvider>,
+    );
+    await flush();
+
+    expect(hasRoomSkills).toHaveBeenCalledTimes(3);
+    expect(clouds.selectContextFolders).toHaveBeenCalledWith(
+      CONTEXT_ROOM_CLOUD,
+      [
+        { id: "12", name: "Sales" },
+        { id: "14", name: "Legal" },
+      ],
+    );
+    expect(clouds.clearContextFolder).not.toHaveBeenCalled();
   });
 
   it("treats a failed check as no skills", async () => {
@@ -120,7 +148,7 @@ describe("ContextRoomSync", () => {
     renderSync({ id: "12", name: "Sales" });
     await flush();
 
-    expect(clouds.selectContextFolder).not.toHaveBeenCalled();
+    expect(clouds.selectContextFolders).not.toHaveBeenCalled();
     expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
   });
 
@@ -153,9 +181,9 @@ describe("ContextRoomSync", () => {
     );
     await flush();
     expect(hasRoomSkills).toHaveBeenLastCalledWith("13");
-    expect(clouds.selectContextFolder).toHaveBeenLastCalledWith(
+    expect(clouds.selectContextFolders).toHaveBeenLastCalledWith(
       CONTEXT_ROOM_CLOUD,
-      { id: "13", name: "Legal" },
+      [{ id: "13", name: "Legal" }],
     );
 
     rerender(
@@ -174,7 +202,7 @@ describe("ContextRoomSync", () => {
       hasRoomSkills.mockResolvedValue(true);
       const view = render(<Chat room={sales} open />);
       await flush();
-      expect(clouds.selectContextFolder).toHaveBeenCalledTimes(1);
+      expect(clouds.selectContextFolders).toHaveBeenCalledTimes(1);
       view.rerender(<Chat room={sales} open={false} />);
       vi.clearAllMocks();
       return view;
@@ -182,7 +210,7 @@ describe("ContextRoomSync", () => {
 
     it("leaves a Disconnect alone", async () => {
       const view = await openConnectAndClose();
-      clouds.selectedContextFolder = null; // the user disconnected
+      clouds.selectedContextFolders = []; // the user disconnected
 
       view.rerender(<Chat room={sales} open />);
       await flush();
@@ -194,10 +222,9 @@ describe("ContextRoomSync", () => {
 
     it("leaves another room picked from the list alone", async () => {
       const view = await openConnectAndClose();
-      clouds.selectedContextFolder = {
-        cloud: CONTEXT_ROOM_CLOUD,
-        room: { id: "77", name: "Legal" },
-      };
+      clouds.selectedContextFolders = [
+        { cloud: CONTEXT_ROOM_CLOUD, room: { id: "77", name: "Legal" } },
+      ];
 
       view.rerender(<Chat room={sales} open />);
       await flush();
@@ -210,7 +237,9 @@ describe("ContextRoomSync", () => {
 
     it("refreshes the current room when it is still the one connected", async () => {
       const view = await openConnectAndClose();
-      clouds.selectedContextFolder = { cloud: CONTEXT_ROOM_CLOUD, room: sales };
+      clouds.selectedContextFolders = [
+        { cloud: CONTEXT_ROOM_CLOUD, room: sales },
+      ];
 
       view.rerender(<Chat room={{ id: "12", name: "Sales EMEA" }} open />);
       await flush();
@@ -225,19 +254,18 @@ describe("ContextRoomSync", () => {
 
     it("a move to another room overrides the pick", async () => {
       const view = await openConnectAndClose();
-      clouds.selectedContextFolder = {
-        cloud: CONTEXT_ROOM_CLOUD,
-        room: { id: "77", name: "Legal" },
-      };
+      clouds.selectedContextFolders = [
+        { cloud: CONTEXT_ROOM_CLOUD, room: { id: "77", name: "Legal" } },
+      ];
       hasRoomSkills.mockResolvedValue(true);
 
       view.rerender(<Chat room={{ id: "13", name: "HR" }} open />);
       await flush();
 
       expect(hasRoomSkills).toHaveBeenCalledWith("13");
-      expect(clouds.selectContextFolder).toHaveBeenCalledWith(
+      expect(clouds.selectContextFolders).toHaveBeenCalledWith(
         CONTEXT_ROOM_CLOUD,
-        { id: "13", name: "HR" },
+        [{ id: "13", name: "HR" }],
       );
     });
 
@@ -252,9 +280,9 @@ describe("ContextRoomSync", () => {
       await flush();
 
       expect(hasRoomSkills).toHaveBeenCalledTimes(2);
-      expect(clouds.selectContextFolder).toHaveBeenCalledWith(
+      expect(clouds.selectContextFolders).toHaveBeenCalledWith(
         CONTEXT_ROOM_CLOUD,
-        sales,
+        [sales],
       );
     });
   });

@@ -20,14 +20,14 @@ const { profilesState, cloudsState } = vi.hoisted(() => ({
     } | null,
   },
   cloudsState: {
-    selectedContextFolder: null as null | {
+    selectedContextFolders: [] as {
       cloud: string;
       room: { id: string; name: string };
-    },
-    selectedKnowledgeFolder: null as null | {
+    }[],
+    selectedKnowledgeFolders: [] as {
       cloud: string;
       room: { id: string; name: string };
-    },
+    }[],
   },
 }));
 
@@ -70,8 +70,8 @@ describe("AiChatPanelSave", () => {
   beforeEach(() => {
     profilesState.sessionChatProfile = null;
     profilesState.chatProfile = { id: "p1", name: "GPT 5.6 Luna" };
-    cloudsState.selectedContextFolder = null;
-    cloudsState.selectedKnowledgeFolder = null;
+    cloudsState.selectedContextFolders = [];
+    cloudsState.selectedKnowledgeFolders = [];
   });
 
   it("renders nothing while the host keeps no presets", () => {
@@ -96,25 +96,27 @@ describe("AiChatPanelSave", () => {
     const onSavePreset = vi.fn();
     store.setOnSavePreset(onSavePreset);
     profilesState.sessionChatProfile = { id: "p2", name: "Claude" };
-    cloudsState.selectedContextFolder = {
-      cloud: "docspace",
-      room: { id: "12", name: "Sales skills" },
-    };
-    cloudsState.selectedKnowledgeFolder = {
-      cloud: "docspace",
-      room: { id: "77", name: "Legal" },
-    };
+    cloudsState.selectedContextFolders = [
+      { cloud: "docspace", room: { id: "12", name: "Sales skills" } },
+      { cloud: "docspace", room: { id: "13", name: "Legal tone" } },
+    ];
+    cloudsState.selectedKnowledgeFolders = [
+      { cloud: "docspace", room: { id: "77", name: "Legal" } },
+    ];
     renderSave(store);
     fireEvent.click(screen.getByTestId("ai-chat-panel-save"));
     expect(onSavePreset).toHaveBeenCalledWith({
       profileId: "p2",
       profileName: "Claude",
-      contextRoom: { cloud: "docspace", id: "12", name: "Sales skills" },
-      knowledgeRoom: { cloud: "docspace", id: "77", name: "Legal" },
+      contextRooms: [
+        { cloud: "docspace", id: "12", name: "Sales skills" },
+        { cloud: "docspace", id: "13", name: "Legal tone" },
+      ],
+      knowledgeRooms: [{ cloud: "docspace", id: "77", name: "Legal" }],
     });
   });
 
-  it("falls back to the assigned chat model and reports unconnected rooms as null", () => {
+  it("falls back to the assigned chat model and reports no rooms as empty lists", () => {
     const store = new AiChatStore();
     const onSavePreset = vi.fn();
     store.setOnSavePreset(onSavePreset);
@@ -123,8 +125,8 @@ describe("AiChatPanelSave", () => {
     expect(onSavePreset).toHaveBeenCalledWith({
       profileId: "p1",
       profileName: "GPT 5.6 Luna",
-      contextRoom: null,
-      knowledgeRoom: null,
+      contextRooms: [],
+      knowledgeRooms: [],
     });
   });
 

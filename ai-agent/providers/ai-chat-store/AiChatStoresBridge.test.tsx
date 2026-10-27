@@ -5,8 +5,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const { clouds, profiles, threads } = vi.hoisted(() => ({
   clouds: {
     selectContextFolder: vi.fn(),
+    selectContextFolders: vi.fn(),
     clearContextFolder: vi.fn(),
     selectKnowledgeFolder: vi.fn(),
+    selectKnowledgeFolders: vi.fn(),
     clearKnowledgeFolder: vi.fn(),
     clearFolderContext: vi.fn(),
   },
@@ -55,8 +57,8 @@ const renderBridge = (store: AiChatStore) =>
 const PRESET = {
   profileId: "p1",
   profileName: "Claude",
-  contextRoom: null,
-  knowledgeRoom: null,
+  contextRooms: [],
+  knowledgeRooms: [],
 };
 
 describe("AiChatStoresBridge", () => {
@@ -98,6 +100,63 @@ describe("AiChatStoresBridge", () => {
       id: "p1",
       name: "Claude",
     });
+  });
+
+  it("connects a preset's rooms as whole lists", async () => {
+    const store = new AiChatStore();
+    profiles.initialized = true;
+    renderBridge(store);
+    await act(async () => {
+      store.openPreset({
+        ...PRESET,
+        contextRooms: [
+          { cloud: "docspace", id: "1", name: "Brand" },
+          { cloud: "docspace", id: "2", name: "Legal" },
+        ],
+        knowledgeRooms: [{ cloud: "docspace", id: "9", name: "Docs" }],
+      });
+    });
+    expect(clouds.selectContextFolders).toHaveBeenCalledWith("docspace", [
+      { id: "1", name: "Brand" },
+      { id: "2", name: "Legal" },
+    ]);
+    expect(clouds.selectKnowledgeFolders).toHaveBeenCalledWith("docspace", [
+      { id: "9", name: "Docs" },
+    ]);
+    expect(clouds.clearContextFolder).not.toHaveBeenCalled();
+    expect(clouds.clearKnowledgeFolder).not.toHaveBeenCalled();
+  });
+
+  it("clears the rooms of an empty preset and adds a mixed-cloud list one by one", async () => {
+    const store = new AiChatStore();
+    profiles.initialized = true;
+    renderBridge(store);
+    await act(async () => {
+      store.openPreset(PRESET);
+    });
+    expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
+    expect(clouds.clearKnowledgeFolder).toHaveBeenCalledTimes(1);
+    expect(clouds.selectContextFolders).not.toHaveBeenCalled();
+
+    await act(async () => {
+      store.openPreset({
+        ...PRESET,
+        contextRooms: [
+          { cloud: "a", id: "1", name: "One" },
+          { cloud: "b", id: "2", name: "Two" },
+        ],
+      });
+    });
+    expect(clouds.clearContextFolder).toHaveBeenCalledTimes(2);
+    expect(clouds.selectContextFolder).toHaveBeenCalledWith("a", {
+      id: "1",
+      name: "One",
+    });
+    expect(clouds.selectContextFolder).toHaveBeenCalledWith("b", {
+      id: "2",
+      name: "Two",
+    });
+    expect(clouds.selectContextFolders).not.toHaveBeenCalled();
   });
 
   it("drops the context folder when the host switches the slot off", () => {

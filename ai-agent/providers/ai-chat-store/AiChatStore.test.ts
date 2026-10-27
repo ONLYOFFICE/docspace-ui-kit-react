@@ -237,6 +237,33 @@ describe("AiChatStore project view", () => {
   });
 });
 
+describe("AiChatStore projects", () => {
+  it("opens a project as a preset of every one of its rooms", () => {
+    const store = new AiChatStore();
+    store.openProject({
+      profileId: "p1",
+      profileName: "GPT",
+      instructionsRooms: [
+        { cloud: "docspace", id: "1", name: "Brand voice" },
+        { cloud: "docspace", id: "2", name: "Legal tone" },
+      ],
+      knowledgeRooms: [],
+    });
+    expect(store.isVisible).toBe(true);
+    expect(store.userFullscreen).toBe(true);
+    expect(store.pendingPresetFresh).toBe(true);
+    expect(store.pendingPreset).toEqual({
+      profileId: "p1",
+      profileName: "GPT",
+      contextRooms: [
+        { cloud: "docspace", id: "1", name: "Brand voice" },
+        { cloud: "docspace", id: "2", name: "Legal tone" },
+      ],
+      knowledgeRooms: [],
+    });
+  });
+});
+
 describe("AiChatStore presets", () => {
   it("opens a preset fullscreen on a fresh conversation and hands the settings to the bridge", () => {
     const store = new AiChatStore();
@@ -244,8 +271,8 @@ describe("AiChatStore presets", () => {
     const settings = {
       profileId: "p1",
       profileName: "Claude",
-      contextRoom: { cloud: "docspace", id: "12", name: "Skills" },
-      knowledgeRoom: null,
+      contextRooms: [{ cloud: "docspace", id: "12", name: "Skills" }],
+      knowledgeRooms: [],
     };
     store.openPreset(settings);
     expect(store.isVisible).toBe(true);
@@ -263,8 +290,8 @@ describe("AiChatStore presets", () => {
     const settings = {
       profileId: "p2",
       profileName: "GPT",
-      contextRoom: null,
-      knowledgeRoom: { cloud: "docspace", id: "9", name: "Docs" },
+      contextRooms: [],
+      knowledgeRooms: [{ cloud: "docspace", id: "9", name: "Docs" }],
     };
     store.applyPreset(settings);
     expect(store.pendingPreset).toEqual(settings);

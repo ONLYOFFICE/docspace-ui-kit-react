@@ -261,13 +261,20 @@ type AiAgentProvidersProps = {
    */
   suggestions?: Suggestion[] | SuggestionSet;
   /**
-   * The room the user is standing in, offered to the chat as context. When
-   * the chat opens, `ContextRoomSync` connects it if it is an Instructions
-   * room holding a skill file, and the composer shows it with the room's
-   * skills; `null` (outside a room, or a room of another kind) drops any connection.
-   * There is no room picker: the current room is the only candidate.
+   * What an empty chat shows above the suggestion chips in place of the
+   * default illustration and tagline: an AI project puts its logo, name and
+   * a line on its model and sources there. Rendered by the library inside
+   * its thread layout, only while the chat is empty.
    */
-  contextRoom?: ContextRoom | null;
+  chatIntro?: React.ReactNode;
+  /**
+   * The room the user is standing in, offered to the chat as context, or
+   * the rooms of an AI project. When the chat opens, `ContextRoomSync`
+   * connects each one that is an Instructions room holding a skill file,
+   * and the composer shows them with their skills; `null` or an empty list
+   * (outside a room, or a room of another kind) drops any connection.
+   */
+  contextRoom?: ContextRoom | ContextRoom[] | null;
   /**
    * How many attachments the composer accepts in the section the host is
    * showing. Defaults to the widget's own `CHAT_ATTACHMENT_LIMIT`; the Forms
@@ -531,7 +538,7 @@ const logRescopeFailure = (step: string, reload: Promise<unknown>): void => {
 // Illustration + tagline above the suggestion chips of an empty chat. Static
 // (it reads its own string through window.i18n), so one element is created
 // once and reused instead of being rebuilt per render.
-const chatIntro = <ChatIntro />;
+const defaultChatIntro = <ChatIntro />;
 // Static, so it never invalidates the widget config memo.
 const analyzeIntro = <AnalyzeIntro />;
 
@@ -580,6 +587,7 @@ const AiAgentProviders = ({
   composerHeader,
   composerDisabled,
   suggestions,
+  chatIntro,
   contextRoom,
   attachmentLimit,
   serverApi,
@@ -1089,7 +1097,9 @@ const AiAgentProviders = ({
       suggestions: resolvedSuggestions,
       // Rendered by the library above the chips, under the same "empty chat"
       // gate — no chips, no intro.
-      suggestionsHeader: analyzeActive ? analyzeIntro : chatIntro,
+      suggestionsHeader: analyzeActive
+        ? analyzeIntro
+        : (chatIntro ?? defaultChatIntro),
 
       // Route drag-and-drop through the portal-upload + attach flow (same as
       // the "Upload from device" button) instead of the library's in-memory
@@ -1125,6 +1135,7 @@ const AiAgentProviders = ({
       onToolCallApproveResult,
       onDropFiles,
       resolvedSuggestions,
+      chatIntro,
       composerContextHidden,
       onPickFolderContext,
       t,
@@ -1181,7 +1192,15 @@ const AiAgentProviders = ({
                           <GenerateToolApprovalBridge />
                           <LongToolApprovalBridge />
                           <AiChatStoreProvider store={aiChatStore}>
-                            <ContextRoomProvider room={contextRoom}>
+                            <ContextRoomProvider
+                              rooms={
+                                Array.isArray(contextRoom)
+                                  ? contextRoom
+                                  : contextRoom
+                                    ? [contextRoom]
+                                    : []
+                              }
+                            >
                               <ContextRoomWatcher />
                               <AiChatStoresBridge />
                               {getAgentRoomId ? null : <AgentRoomIdSync />}
@@ -1223,7 +1242,11 @@ const AiAgentProviders = ({
 export default AiAgentProviders;
 
 export { useIsAiChatAvailable } from "./availability";
-export { useContextRoom, type ContextRoom } from "./context-room";
+export {
+  useContextRoom,
+  useContextRooms,
+  type ContextRoom,
+} from "./context-room";
 export { useApi, useI18n, useStores } from "@onlyoffice/ai-chat";
 export { DEFAULT_SERVER_API_ROUTES } from "@onlyoffice/ai-chat";
 export type {
