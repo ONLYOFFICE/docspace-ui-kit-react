@@ -1,8 +1,9 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { screen, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { DatePicker } from "./index";
+import { now } from "../../utils/date";
 
 // DatePicker.test.tsx mocks AddButton; the real one is a tab stop of its own,
 // so the keyboard path is tested here with it in place.
@@ -10,6 +11,8 @@ describe("DatePicker keyboard, with the real AddButton", () => {
   const props = {
     locale: "en",
     selectDateText: "Select date",
+    openDate: now(),
+    onChange: vi.fn(),
   };
 
   it("is one tab stop while no date is picked", async () => {
