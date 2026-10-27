@@ -56,6 +56,11 @@ export const getIsPayer = (
   return userEmail.toLowerCase() === walletCustomerEmail.toLowerCase();
 };
 
+export const getIsStripePortalAvailable = (
+  isOwner?: boolean,
+  isPayer?: boolean,
+): boolean => !!isOwner || !!isPayer;
+
 export const formatPaymentDate = (
   date: DateTime,
   timeType?: "start" | "end",

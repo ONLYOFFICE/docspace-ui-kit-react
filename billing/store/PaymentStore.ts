@@ -55,6 +55,7 @@ import {
   getIsCardLinkedToPortal,
   getIsCardMissingOrInactive,
   getIsPayer,
+  getIsStripePortalAvailable,
   getWalletBalanceAmount,
   getWalletBalanceCurrency,
   formatPaymentDate,
@@ -409,7 +410,7 @@ class PaymentStore {
   }
 
   get isStripePortalAvailable() {
-    return this.isOwner || this.isPayer;
+    return getIsStripePortalAvailable(this.isOwner, this.isPayer);
   }
 
   get canUpdateTariff() {
