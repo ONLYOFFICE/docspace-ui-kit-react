@@ -175,12 +175,6 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   the portal's file list Enter on a tag or in a menu also opened the selected item, the arrows
   moved the selection and Escape cleared it. Each now stops the key it acts on and swallows the
   matching `keyup`, however long the key is held.
-- The AI agent's editor tool calls go to the portal's own origin only. They carry what the
-  model writes into a document, and were posted to the editor panel's iframe and to the
-  generated-file tab with the target origin `"*"`, so a window that had meanwhile navigated
-  elsewhere — a sign-in redirect, a link followed in the tab — would have received them. Both
-  windows open the portal's `/doceditor`, so the calls are now addressed to
-  `window.location.origin` and the browser drops one whose window holds any other page
 - `ComboBox` works from the keyboard. The button answered no key, so a list could not be opened
   without a pointer, and the ArrowDown and Enter handler on the document looked for options by a
   test id its own options never carry — so it moved nothing, and while a list was open it
@@ -608,6 +602,12 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - The E2E Docker image copies the vendored ai-chat tarball before `pnpm install`
 - Filter: removing a chip no longer hides a chip of another group that shares its key
 - Context menu (desktop and mobile sheet) and `DropDownItem`: a string icon is fetched and inlined through `react-svg` only when it is a `.svg` on the page's own origin or, where it already was, an SVG data URL. Anything else, a cross-origin `.svg` included, is an `<img>`, so a custom action whose icon lives on the integrator's domain no longer needs CORS headers there and no longer loses its icon. The old rule looked for `images/` or `.svg` in the path and inlined such icons from any origin; a cross-origin SVG now keeps its own colours instead of taking the text colour
+- The AI agent's editor tool calls go to the portal's own origin only. They carry what the
+  model writes into a document, and were posted to the editor panel's iframe and to the
+  generated-file tab with the target origin `"*"`, so a window that had meanwhile navigated
+  elsewhere — a sign-in redirect, a link followed in the tab — would have received them. Both
+  windows open the portal's `/doceditor`, so the calls are now addressed to
+  `window.location.origin` and the browser drops one whose window holds any other page.
 
 ## 4.0.1
 
