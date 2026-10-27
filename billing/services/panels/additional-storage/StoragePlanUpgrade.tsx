@@ -72,7 +72,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
 
   const {
     fetchBalance,
-    fetchTransactionHistory,
+    refreshTransactionHistory,
     storageServiceName,
     storagePriceIncrement,
     formatWalletCurrency,
@@ -326,7 +326,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
 
         if (isUpgradeStoragePlan) {
           fetchBalance();
-          fetchTransactionHistory(storageServiceName ?? DISK_STORAGE);
+          refreshTransactionHistory(storageServiceName ?? DISK_STORAGE);
         }
         const tariff = await fetchPortalTariff!(true);
         const quotas = tariff?.quotas ?? [];
