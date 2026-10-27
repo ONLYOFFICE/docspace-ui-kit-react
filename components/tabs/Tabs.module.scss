@@ -281,10 +281,11 @@
     // crosses the letters, and one outside is clipped at the top and the
     // bottom by the scroller around the bar. The frame stays within the
     // tab's height, above the underline, and reaches a little past the label
-    // on either side.
-    position: relative;
-
+    // on either side. Positioned only while focused: a positioned tab is
+    // painted in a layer of its own and its label loses the subpixel
+    // smoothing the client's screenshots were taken with.
     &:focus-visible {
+      position: relative;
       outline: none;
 
       &::before {
