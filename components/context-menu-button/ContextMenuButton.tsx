@@ -9,6 +9,7 @@ import VerticalDotsReactSvg from "../../assets/icons/16/vertical-dots.react.svg"
 import { isTablet, isMobile } from "../../utils";
 import { consumeKey } from "../../utils/consume-key";
 import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import { DropDownItem } from "../drop-down-item";
 import { DropDown } from "../drop-down";
@@ -101,6 +102,7 @@ const ContextMenuButtonPure = ({
   testId,
 }: ContextMenuButtonProps) => {
   const { isRTL } = useInterfaceDirection();
+  const t = useCommonTranslation();
   const ref = React.useRef<HTMLDivElement | null>(null);
   const buttonRef = React.useRef<HTMLDivElement | null>(null);
   const reactId = React.useId();
@@ -450,7 +452,9 @@ const ContextMenuButtonPure = ({
           onMouseOver,
           onMouseOut,
         }}
-        aria-label={title || undefined}
+        // A focusable button needs a name even when the caller passes no
+        // `title`, or a screen reader announces only "button, menu".
+        aria-label={title || t("MoreOptions") || "More options"}
         aria-haspopup={isDropdown ? "menu" : undefined}
         aria-expanded={isDropdown ? state.isOpen : undefined}
         aria-controls={isDropdown && state.isOpen ? menuId : undefined}

@@ -14,7 +14,8 @@ export interface ContextMenuButtonProps {
   getData?: () => ContextMenuModel[];
   /**
    * Accessible name of the button, and its hover tooltip, which needs
-   * `RootTooltip` mounted.
+   * `RootTooltip` mounted. Without it the button is named by the translated
+   * `Common:MoreOptions` and shows no tooltip.
    */
   title?: string;
   /** URL of the icon, fetched at runtime. Without it the kit's vertical dots are drawn. */

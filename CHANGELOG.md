@@ -163,8 +163,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **Default accessible names are translated where the portal has a key.** The close buttons of
   `Toast`, `SnackBar`, `PublicRoomBar` and `ColumnarInfoBar` default to `Common:CloseButton` ("Close"), the `Tags`
   row to `Common:Tags` ("Tags", was the English "Tags container"), and `Loader` and `AppLoader`
-  to `Common:LoadingProcessing` ("Loading...", was the English "Loading content, please wait.").
-  The three keys are in `locales/en/Common.json`. Names with no key in the portal yet (the
+  to `Common:LoadingProcessing` ("Loading...", was the English "Loading content, please wait."),
+  and a `ContextMenuButton` without `title` to `Common:MoreOptions` ("More options"; it had no
+  name at all, though it is a Tab stop). The four keys are in `locales/en/Common.json`. Names with no key in the portal yet (the
   colour picker's, `TimePicker`'s, `FloatingButton`'s, `LoadingButton`'s "Progress" and
   `PortalLogo`'s `alt`) stay English defaults of their props.
 - **Keys a component handles no longer reach the page's or a dialog's listeners.** The keyboard

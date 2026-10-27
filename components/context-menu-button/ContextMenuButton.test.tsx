@@ -11,6 +11,11 @@ import { InterfaceDirectionProvider } from "../../context/InterfaceDirectionCont
 import { ContextMenuButton } from "./ContextMenuButton";
 import { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
 
+vi.mock("../../utils/i18n", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../../utils/i18n")>()),
+  useCommonTranslation: () => (key: string) => key,
+}));
+
 const baseData = (): ContextMenuModel[] => [
   {
     key: "key",
@@ -230,6 +235,14 @@ describe("<ContextMenuButton />", () => {
 
     rerender(<ContextMenuButton {...baseProps} title="More" />);
     expect(screen.getByRole("button", { name: "More" })).toBeInTheDocument();
+  });
+
+  // The icon is a Tab stop; without a title it used to have no name at all.
+  it("names the button when no title is passed", () => {
+    render(<ContextMenuButton {...baseProps} title={undefined} />);
+    expect(
+      screen.getByRole("button", { name: "MoreOptions" }),
+    ).toBeInTheDocument();
   });
 
   it("calls onMouseOver and onMouseOut on the matching events", () => {
