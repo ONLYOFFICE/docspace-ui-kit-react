@@ -89,6 +89,18 @@ describe("<StatusMessage />", () => {
       });
     });
 
+    // A JSX message is a new element on every parent render; the bar is a
+    // live region, so fading it out and in again would re-announce it.
+    it("keeps a JSX message with the same text without fading", () => {
+      const { rerender } = renderComponent({
+        message: <span>Invalid name</span>,
+      });
+
+      rerender(<StatusMessage message={<span>Invalid name</span>} />);
+
+      expect(screen.getByTestId("status-message")).not.toHaveClass(styles.hide);
+    });
+
     it("removes component when message is cleared", async () => {
       const { rerender } = renderComponent({ message: "Test message" });
 
