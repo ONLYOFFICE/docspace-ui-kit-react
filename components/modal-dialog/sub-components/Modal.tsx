@@ -77,10 +77,14 @@ const Modal = ({
 
     return () => {
       const { activeElement } = document;
+      // `hideContent` unmounts the content node and mounts a new one while
+      // the dialog stays open, so the node captured above may be detached by
+      // now; the ref holds the one the focus is actually in.
       const focusLeftWithDialog =
         !activeElement ||
         activeElement === document.body ||
-        content.contains(activeElement);
+        content.contains(activeElement) ||
+        !!contentRef.current?.contains(activeElement);
       if (
         focusLeftWithDialog &&
         previous instanceof HTMLElement &&

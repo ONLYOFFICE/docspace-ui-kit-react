@@ -434,6 +434,44 @@ describe("ModalDialog", () => {
       expect(trigger).toHaveFocus();
     });
 
+    // `hideContent` swaps the content node while the dialog is open (a nested
+    // picker in CreateRoomDialog); closing afterwards must still find the
+    // focus inside the dialog and hand it back.
+    it("hands the focus back after hideContent recreated the content", () => {
+      const Harness = ({
+        visible,
+        hideContent = false,
+      }: {
+        visible: boolean;
+        hideContent?: boolean;
+      }) => (
+        <>
+          <button type="button">Trigger</button>
+          <ModalDialog
+            {...defaultProps}
+            visible={visible}
+            hideContent={hideContent}
+            aria-label="Room"
+          >
+            <ModalDialog.Body>
+              <input aria-label="Name" />
+            </ModalDialog.Body>
+          </ModalDialog>
+        </>
+      );
+      const { rerender } = render(<Harness visible={false} />);
+      const trigger = screen.getByRole("button", { name: "Trigger" });
+      trigger.focus();
+
+      rerender(<Harness visible />);
+      rerender(<Harness visible hideContent />);
+      rerender(<Harness visible />);
+      screen.getByLabelText("Name").focus();
+
+      rerender(<Harness visible={false} />);
+      expect(trigger).toHaveFocus();
+    });
+
     it("leaves the focus on a field the dialog's content focused itself", () => {
       const AutoFocused = () => {
         const ref = React.useRef<HTMLInputElement>(null);
