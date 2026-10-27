@@ -181,6 +181,10 @@ const config: StorybookConfig = {
     const missingAiChatPeers = {
       "react-shiki/core": stub("react-shiki.mjs"),
       "react-shiki": stub("react-shiki.mjs"),
+      // Only the two entry points the widget imports statically; its themes
+      // and languages are dynamic imports reached through these alone.
+      "shiki/core": stub("shiki.mjs"),
+      "shiki/engine/javascript": stub("shiki.mjs"),
       openai: stub("openai.mjs"),
       "@anthropic-ai/sdk": stub("anthropic-sdk.mjs"),
       "@google/genai": stub("google-genai.mjs"),
