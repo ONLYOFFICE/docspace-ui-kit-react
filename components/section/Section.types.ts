@@ -37,6 +37,12 @@ export type InfoPanelProps = {
   /** Not read by the section: it is never forwarded to the info panel. */
   onClose?: () => void;
   withoutBodyScroll?: boolean;
+  /** Enables the drag resizer on the panel's inline-start edge, from `INFO_PANEL_WIDTH` up to `INFO_PANEL_MAX_WIDTH` while the section keeps its own minimum. Desktop only; a double click on the edge restores the default width. */
+  isResizable?: boolean;
+  /** Current width in px; applied as `--info-panel-width`. */
+  width?: number;
+  /** Called with the committed width in px: once per drag, when the pointer is released, and on the double click that restores the default. */
+  onResize?: (value: number) => void;
 };
 
 /**
@@ -65,7 +71,7 @@ export type ChatPanelProps = {
   isResizable?: boolean;
   /** Current docked width in px; applied as `--chat-panel-width`. */
   width?: number;
-  /** Called once per drag, on mouse up, with the committed width in px. */
+  /** Called once per drag, when the pointer is released, with the committed width in px. */
   onResize?: (value: number) => void;
   /**
    * Whether the host currently renders the panel fullscreen. The width then
@@ -195,7 +201,13 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
   Omit<SectionFilterProps, "children" | "className"> &
   Omit<
     InfoPanelProps,
-    "children" | "setIsVisible" | "isVisible" | "withoutBodyScroll"
+    | "children"
+    | "setIsVisible"
+    | "isVisible"
+    | "withoutBodyScroll"
+    | "isResizable"
+    | "width"
+    | "onResize"
   > &
   Omit<SectionHeaderProps, "children" | "className"> &
   Omit<SectionContainerProps, "children" | "isSectionHeaderAvailable"> &
@@ -217,6 +229,12 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     isInfoPanelAvailable?: boolean;
     /** Removes the info panel body's scroller and the aside's, for a body that scrolls its own regions. */
     infoPanelWithoutScroll?: boolean;
+    /** Opt-in edge resizer for the info panel (desktop only), from `INFO_PANEL_WIDTH` to `INFO_PANEL_MAX_WIDTH`. Pass the width the host stores plus a setter; leave unset for a fixed-width panel. */
+    isInfoPanelResizable?: boolean;
+    /** Current width of the info panel in pixels. */
+    infoPanelWidth?: number;
+    /** Called with the committed info panel width: once per resize drag, when the pointer is released, and on the double click that restores the default. */
+    setInfoPanelWidth?: (value: number) => void;
     /** Whether the AI chat region exists at all. It defaults to `false`. */
     isChatPanelAvailable?: boolean;
     /** Whether the AI chat panel is open. */
@@ -237,7 +255,7 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     isChatPanelResizable?: boolean;
     /** Current width of the docked chat panel in pixels. */
     chatPanelWidth?: number;
-    /** Called once per resize drag, on mouse up, with the committed width. */
+    /** Called once per resize drag, when the pointer is released, with the committed width. */
     setChatPanelWidth?: (value: number) => void;
     /**
      * Turns the chat panel fullscreen on. Called when the edge resizer is

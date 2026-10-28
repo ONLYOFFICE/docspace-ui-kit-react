@@ -80,6 +80,9 @@ const Section = (props: SectionProps) => {
     settingsStudio = false,
     isInfoPanelScrollLocked,
     infoPanelWithoutScroll,
+    isInfoPanelResizable,
+    infoPanelWidth,
+    setInfoPanelWidth,
     currentDeviceType,
 
     isInfoPanelVisible,
@@ -428,6 +431,9 @@ const Section = (props: SectionProps) => {
           currentDeviceType={currentDeviceType}
           asideInfoPanel={asideInfoPanel}
           withoutBodyScroll={infoPanelWithoutScroll}
+          isResizable={isInfoPanelResizable}
+          width={infoPanelWidth}
+          onResize={setInfoPanelWidth}
         >
           <SubInfoPanelHeader>{infoPanelHeaderContent}</SubInfoPanelHeader>
           <SubInfoPanelBody

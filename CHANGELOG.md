@@ -37,6 +37,7 @@
 - Filter: a group can draw itself. An item marked `isCustom` is rendered by the new `renderCustomItem` prop, which gets the group's pending value, `onChange` to set it and `openPanel` / `closePanel` for a nested step; the value is a string key, applied and compared like any other
 - Filter: a selected item can carry `chips`, drawn as one chip each under the bar. Removing one calls `removeSelectedItem` with that chip's key and the item's group; the panel still treats the item as one value
 - Filter: `hideSearch` leaves the search field out of the bar and keeps the main button, for a listing whose content the server cannot search (end-to-end encrypted rooms). `SearchInput` gains the `hideField` prop it is built on
+- Section: the info panel can be resized from its inline-start edge on a desktop. `isInfoPanelResizable` turns it on, with the host's width in `infoPanelWidth` and a setter in `setInfoPanelWidth`. The edge drags from 400px to 800px (`INFO_PANEL_WIDTH`, and the new `INFO_PANEL_MAX_WIDTH` in `utils/device`) while the section keeps 416px, gives width back as the row shrinks, and a double click restores 400px. It shares its resizer with the chat panel
 - Article: `infoPanelWidth`, and the same prop on `ArticleLiveChat`, sets how far the live chat launcher moves clear of an open info panel, for a host whose panel is resizable. It defaults to `INFO_PANEL_WIDTH`. The `isInfoPanelVisible` docs no longer call it unread: the launcher has moved clear of the info panel again since the switch to the Zendesk messaging API
 
 ### Fixed
@@ -91,6 +92,8 @@
 - The E2E Docker image copies the vendored ai-chat tarball before `pnpm install`
 - Filter: removing a chip no longer hides a chip of another group that shares its key
 - Context menu (desktop and mobile sheet) and `DropDownItem`: a string icon is fetched and inlined through `react-svg` only when it is a `.svg` on the page's own origin or, where it already was, an SVG data URL. Anything else, a cross-origin `.svg` included, is an `<img>`, so a custom action whose icon lives on the integrator's domain no longer needs CORS headers there and no longer loses its icon. The old rule looked for `images/` or `.svg` in the path and inlined such icons from any origin; a cross-origin SVG now keeps its own colours instead of taking the text colour
+- Section: the chat panel's resize edge takes a finger or a pen, not only a mouse. It listened to mouse events alone, so a touch drag on it panned the page instead of resizing the panel
+- Section: a resizable chat panel opened after the section mounted gives width back when the row shrinks. The watch on the row was set up only for a panel already open on mount, so a chat opened later kept its dragged width and squeezed the section
 
 ## 4.0.1
 
