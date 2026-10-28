@@ -93,25 +93,18 @@ const useContextMenuHotkeys = ({
     switch (e.code) {
       case "ArrowDown":
         {
-          if (currentIndex + 1 >= menuModel.length) {
-            if (!clearModel[0].disabled) setCurrentIndex(clearModel[0].index);
-          } else {
-            const nextIndex = clearModel[clearModelIndex + 1].index;
-            if (!clearModel[clearModelIndex + 1].disabled)
-              setCurrentIndex(nextIndex);
-          }
+          const nextItem =
+            clearModel.find((elem) => elem.index > currentIndex) ??
+            clearModel[0];
+          if (!nextItem.disabled) setCurrentIndex(nextItem.index);
         }
         break;
       case "ArrowUp":
         {
-          if (currentIndex - 1 < 0) {
-            if (!clearModel.at(-1)?.disabled)
-              setCurrentIndex(clearModel.at(-1)?.index ?? menuModel.length - 1);
-          } else {
-            const prevIndex = clearModel[clearModelIndex - 1].index;
-            if (!clearModel[clearModelIndex - 1].disabled)
-              setCurrentIndex(prevIndex);
-          }
+          const prevItem =
+            clearModel.findLast((elem) => elem.index < currentIndex) ??
+            clearModel[clearModel.length - 1];
+          if (!prevItem.disabled) setCurrentIndex(prevItem.index);
         }
         break;
       case "ArrowRight":
