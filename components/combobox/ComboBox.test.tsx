@@ -429,6 +429,89 @@ describe("ComboBox", () => {
       expect(down).toBe(false);
       expect(onWindowKeyDown).not.toHaveBeenCalled();
     });
+
+    // The Filter's sort items and the table's checkbox options are found by
+    // the ids their callers set.
+    it("keeps the id a row was given, and highlights and picks it by that id", () => {
+      const onPick = vi.fn();
+      render(
+        <ComboBox
+          {...baseProps}
+          options={[]}
+          advancedOptions={
+            <div style={{ display: "contents" }}>
+              <DropDownItem
+                key="name"
+                id="sort-by_name"
+                onClick={() => onPick("name")}
+              >
+                Name
+              </DropDownItem>
+              <DropDownItem key="size" onClick={() => onPick("size")}>
+                Size
+              </DropDownItem>
+            </div>
+          }
+        />,
+      );
+      const button = screen.getAllByRole("button")[0];
+
+      fireEvent.keyDown(button, { key: "Enter" });
+
+      expect(document.getElementById("sort-by_name")).toHaveTextContent("Name");
+      expect(button).toHaveAttribute("aria-activedescendant", "sort-by_name");
+      expect(highlighted(button)).toHaveTextContent("Name");
+
+      fireEvent.keyDown(button, { key: "ArrowDown" });
+      expect(highlighted(button)).toHaveTextContent("Size");
+
+      fireEvent.keyDown(button, { key: "ArrowUp" });
+      fireEvent.keyDown(button, { key: "Enter" });
+      expect(onPick).toHaveBeenCalledWith("name");
+    });
+
+    // Two Filters on a page give their sort rows the same ids: Enter must
+    // pick the row of the list it was pressed in, not the first match.
+    it("picks its own row when another list carries the same row id", () => {
+      const onPickFirst = vi.fn();
+      const onPickSecond = vi.fn();
+      const sortList = (onPick: () => void) => (
+        <div style={{ display: "contents" }}>
+          <DropDownItem key="name" id="sort-by_name" onClick={onPick}>
+            Name
+          </DropDownItem>
+          <DropDownItem key="size">Size</DropDownItem>
+        </div>
+      );
+      render(
+        <>
+          <ComboBox
+            {...baseProps}
+            options={[]}
+            advancedOptions={sortList(onPickFirst)}
+          />
+          <ComboBox
+            {...baseProps}
+            options={[]}
+            advancedOptions={sortList(onPickSecond)}
+          />
+        </>,
+      );
+      const second = screen
+        .getAllByRole("button")
+        .filter((node) => node.getAttribute("aria-haspopup") === "listbox")[1];
+
+      fireEvent.keyDown(second, { key: "Enter" });
+
+      // Both lists are mounted, and the first one's row comes first.
+      // (An attribute selector: jsdom resolves "#id" document-wide.)
+      expect(document.querySelectorAll('[id="sort-by_name"]')).toHaveLength(2);
+
+      fireEvent.keyDown(second, { key: "Enter" });
+
+      expect(onPickSecond).toHaveBeenCalledTimes(1);
+      expect(onPickFirst).not.toHaveBeenCalled();
+    });
   });
 
   it("leaves keys in the children block to the children", () => {

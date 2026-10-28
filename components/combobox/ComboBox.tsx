@@ -161,6 +161,26 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     return items.length ? items : null;
   }, [props.advancedOptions]);
 
+  // The id a row is reached by. An advanced row keeps the id its caller gave
+  // it (the Filter's sort items, the table's checkbox options), and only a row
+  // without one gets the generated id.
+  const getOptionId = (index: number) =>
+    advancedItems?.[index]?.props.id || `${listboxId}-${index}`;
+
+  // The list's own element. A caller's row id need not be unique on the page
+  // (two Filters give their sort rows the same ids), so a row is looked up
+  // inside this list only, never in the whole document.
+  const dropDownElementId = props.dropDownId || `${listboxId}-list`;
+  const findOption = (index: number) => {
+    const optionId = getOptionId(index);
+    const list = document.getElementById(dropDownElementId);
+    return (
+      Array.from(list?.querySelectorAll<HTMLElement>("[id]") ?? []).find(
+        (node) => node.id === optionId,
+      ) ?? null
+    );
+  };
+
   // Which entries of the list the keyboard can land on, in order.
   const pickable = React.useMemo(
     () =>
@@ -381,7 +401,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
         if (advancedItems) {
           // A click on the row picks it exactly as the mouse does: the row's
           // own onClick runs, and the click closes the list on its way up.
-          document.getElementById(`${listboxId}-${activeIndex}`)?.click();
+          findOption(activeIndex)?.click();
           break;
         }
         optionClick(options[activeIndex], e);
@@ -512,6 +532,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
       forceCloseClickOutside,
       withoutBackground,
       dropDownId,
+      id: dropDownElementId,
       eventTypes: ["mousedown"],
       // The combo box handles the keys itself, on its own element; the virtual
       // list's window listener would move a second highlight and swallow every
@@ -547,6 +568,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
       forceCloseClickOutside,
       withoutBackground,
       dropDownId,
+      dropDownElementId,
       topSpace,
       usePortalBackdrop,
       style,
@@ -566,7 +588,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
           undefined,
           advancedItems.map((item, index) =>
             React.cloneElement(item, {
-              id: `${listboxId}-${index}`,
+              id: getOptionId(index),
               isActiveDescendant: isOpen && index === activeIndex,
             }),
           ),
@@ -633,7 +655,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
         innerContainerClassName="optionalBlock"
         isOpen={isOpen}
         activeDescendantId={
-          activeIndex === -1 ? undefined : `${listboxId}-${activeIndex}`
+          activeIndex === -1 ? undefined : getOptionId(activeIndex)
         }
         size={size as ComboBoxSize}
         scaled={scaled}

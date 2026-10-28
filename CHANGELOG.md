@@ -185,7 +185,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   the page, Tab included; the combo box now turns that listener off and scrolls the highlighted
   row into view. Nothing listens on the document any more. The button carries
   `aria-activedescendant`, but on `role="button"` screen readers ignore it, so the highlight is
-  visible and not yet announced
+  visible and not yet announced. The list's element takes `dropDownId` as its `id`, or a
+  generated one. An advanced row keeps the `id` its caller gave it, and Enter looks the row up
+  inside the open list only, so two lists whose rows share an id (two Filters' sort items) each
+  pick their own
 - `Checkbox` toggles from the keyboard. Focus lands on the box icon rather than the hidden
   input, and the icon answered no key, so Tab reached the checkbox and Space did nothing — a
   form could not be filled in without a pointer. Space on the focused icon now clicks the input,
