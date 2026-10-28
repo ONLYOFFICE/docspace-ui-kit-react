@@ -43,6 +43,7 @@ const ArticleLiveChat = ({
   isShowLiveChat,
   withFloatingButton = false,
   isInfoPanelVisible = false,
+  infoPanelWidth = INFO_PANEL_WIDTH,
 }: ArticleLiveChatProps) => {
   const { isRTL } = useInterfaceDirection();
   const { isBase, currentColorScheme } = useTheme();
@@ -71,8 +72,7 @@ const ArticleLiveChat = ({
     const dodge = withFloatingButton
       ? FLOATING_CORNER_SIZE + FLOATING_CORNER_GAP
       : 0;
-    const infoPanel =
-      isInfoPanelVisible && !isMobileWidth ? INFO_PANEL_WIDTH : 0;
+    const infoPanel = isInfoPanelVisible && !isMobileWidth ? infoPanelWidth : 0;
     const offset = { horizontal: inset + dodge + infoPanel, vertical: inset };
 
     // The widget keeps a second offset for what it takes to be a phone. It
@@ -104,6 +104,7 @@ const ArticleLiveChat = ({
   }, [
     withFloatingButton,
     isInfoPanelVisible,
+    infoPanelWidth,
     isMobileWidth,
     isRTL,
     isBase,

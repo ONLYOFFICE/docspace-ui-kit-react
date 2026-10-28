@@ -51,6 +51,7 @@ const Article = ({
 
   withMainButton,
   isInfoPanelVisible,
+  infoPanelWidth,
 
   hideProfileBlock,
   hideAppsBlock,
@@ -322,6 +323,7 @@ const Article = ({
                     showProgress
                   }
                   isInfoPanelVisible={isInfoPanelVisible}
+                  infoPanelWidth={infoPanelWidth}
                 />
               ) : null}
             </>
