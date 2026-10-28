@@ -83,8 +83,10 @@ export interface OperationsProgressProps {
   onCancelOperation?: (callback: () => void) => void;
   /** Ignored. Nothing reads this prop; the ring reads the first operation's `percent`. */
   percent?: number;
-  /** Whether the info panel is open, which moves the button 424px in from the trailing edge. */
+  /** Whether a side panel is open (the info panel or the AI chat), which moves the button clear of it: `sidePanelWidth` plus 24px in from that edge, 424px by default. */
   isInfoPanelVisible?: boolean;
+  /** Width in px of the open side panel while `isInfoPanelVisible` is set. Pass it when that panel is resizable, so the button stays clear of the width the person chose; without it the button assumes 400px. */
+  sidePanelWidth?: number;
   /** Name of the folder under the pointer, shown by the drag preview button. */
   dropTargetFolderName?: string | null;
   /** Whether a drag is in progress, which raises the drag preview button. */

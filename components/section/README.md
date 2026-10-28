@@ -245,7 +245,8 @@ export function PageWithInfoPanel() {
 
 To let people widen it on a desktop, add `isInfoPanelResizable` with the width you store in
 `infoPanelWidth` and a setter in `setInfoPanelWidth`. The edge drags between 400px and 800px, the
-section keeping 416px for itself, and a double click on it restores 400px.
+section keeping 416px for itself, and a double click on it restores 400px. The operations
+progress button stays clear of the width you store, and of a resizable chat panel's as well.
 
 ### Disabled / read-only
 

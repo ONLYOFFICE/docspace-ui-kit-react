@@ -38,7 +38,8 @@
 - Filter: a selected item can carry `chips`, drawn as one chip each under the bar. Removing one calls `removeSelectedItem` with that chip's key and the item's group; the panel still treats the item as one value
 - Filter: `hideSearch` leaves the search field out of the bar and keeps the main button, for a listing whose content the server cannot search (end-to-end encrypted rooms). `SearchInput` gains the `hideField` prop it is built on
 - Section: the info panel can be resized from its inline-start edge on a desktop. `isInfoPanelResizable` turns it on, with the host's width in `infoPanelWidth` and a setter in `setInfoPanelWidth`. The edge drags from 400px to 800px (`INFO_PANEL_WIDTH`, and the new `INFO_PANEL_MAX_WIDTH` in `utils/device`) while the section keeps 416px, gives width back as the row shrinks, and a double click restores 400px. It shares its resizer with the chat panel
-- Article: `infoPanelWidth`, and the same prop on `ArticleLiveChat`, sets how far the live chat launcher moves clear of an open info panel, for a host whose panel is resizable. It defaults to `INFO_PANEL_WIDTH`. The `isInfoPanelVisible` docs no longer call it unread: the launcher has moved clear of the info panel again since the switch to the Zendesk messaging API
+- Article: `sidePanelWidth`, and the same prop on `ArticleLiveChat`, sets how far the live chat launcher moves clear of the open side panel, the info panel or the AI chat, for a host whose panels are resizable; `0` when none is. Unset, `isInfoPanelVisible` still assumes `INFO_PANEL_WIDTH`. The `isInfoPanelVisible` docs no longer call it unread: the launcher has moved clear of the info panel again since the switch to the Zendesk messaging API
+- `OperationsProgressButton` takes `sidePanelWidth`, and `Section` passes it the width of the open side panel, the info panel or the chat, on a desktop, so the button stays 24px clear of a resized panel instead of sitting 424px in, under it
 
 ### Fixed
 

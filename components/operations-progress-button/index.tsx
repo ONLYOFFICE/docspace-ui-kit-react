@@ -60,6 +60,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
   needErrorChecking,
   showCancelButton,
   isInfoPanelVisible,
+  sidePanelWidth,
   dropTargetFolderName,
   isDragging,
   clearDropPreviewLocation,
@@ -440,7 +441,16 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
           [styles.mainButtonVisible]: mainButtonVisible,
           [styles.infoPanelVisible]: isInfoPanelVisible,
         })}
-        style={{ zIndex: isOpenDropdown ? "211" : "201" }}
+        style={
+          {
+            zIndex: isOpenDropdown ? "211" : "201",
+            ...(sidePanelWidth
+              ? {
+                  "--operations-progress-side-panel-width": `${sidePanelWidth}px`,
+                }
+              : undefined),
+          } as React.CSSProperties
+        }
         onMouseEnter={!isMobile ? handleMouseEnter : undefined}
         onMouseLeave={!isMobile ? handleMouseLeave : undefined}
       >
