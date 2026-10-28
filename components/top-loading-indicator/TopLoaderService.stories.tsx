@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, screen, waitFor } from "storybook/test";
 
 import { TopLoaderService } from "./index";
 
@@ -50,8 +51,35 @@ const DefaultTemplate = () => {
   );
 };
 
+// The bar lives on the page body, outside the story root.
+const valueNow = (bar: HTMLElement) =>
+  Number(bar.getAttribute("aria-valuenow"));
+
 export const Default: Story = {
   render: () => <DefaultTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Start Loading" }),
+    );
+    // The first start makes the element a progress bar.
+    const bar = screen.getByRole("progressbar");
+    await expect(bar).toHaveAttribute("data-test-id", "top-loader");
+    await waitFor(() => expect(valueNow(bar)).toBeGreaterThan(10));
+
+    // Cancel clears it at once.
+    await userEvent.click(canvas.getByRole("button", { name: "Cancel" }));
+    await expect(bar.style.width).toBe("0px");
+    await expect(valueNow(bar)).toBe(0);
+
+    // End runs it to the full width, then clears it.
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Start Loading" }),
+    );
+    await waitFor(() => expect(valueNow(bar)).toBeGreaterThan(10));
+    await userEvent.click(canvas.getByRole("button", { name: "End Loading" }));
+    await waitFor(() => expect(valueNow(bar)).toBeGreaterThan(90));
+    await waitFor(() => expect(bar.style.width).toBe("0px"), { timeout: 2000 });
+  },
   parameters: {
     docs: {
       description: {
@@ -121,6 +149,18 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async () => {
+    const bar = document.getElementById(
+      "top-loader-css-customization-demo",
+    ) as HTMLElement;
+    await expect(bar.style.width).toBe("65%");
+    await expect(getComputedStyle(bar).height).toBe("4px");
+    await expect(getComputedStyle(bar).backgroundColor).toBe(
+      "rgb(0, 130, 201)",
+    );
+    // Not driven by the service.
+    await expect(bar).not.toHaveAttribute("role");
+  },
   parameters: {
     docs: {
       description: {

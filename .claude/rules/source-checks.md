@@ -158,7 +158,8 @@ The rest of the monorepo stays AGPL-3.0-only and keeps its headers, so never poi
 `lefthook.yml` here runs `pnpm format:gate`, `pnpm lint`, `pnpm tsc`, `pnpm test`, `pnpm build`
 and `pnpm verify:package` on pre-push -- in that order, stopping at the first failure -- and
 rewrites the staged files with Prettier on pre-commit and pre-merge-commit.
-CI runs the same formatting, lint, type and test checks plus the packaging ones. None of the
+CI runs the same formatting, lint, type and test checks plus the packaging ones, and renders
+every story in Chromium (`pnpm test:stories`, which pre-push does not run). None of the
 rules above are among any of them.
 
 Formatting is the one thing on that list which is now enforced end to end -- VS Code formats on

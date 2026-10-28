@@ -114,17 +114,94 @@ describe("ColorPicker component", () => {
   it("has correct ARIA attributes", () => {
     render(<ColorPicker {...defaultProps} />);
 
-    const colorPicker = screen.getByTestId("color-picker");
-    expect(colorPicker).toHaveAttribute("role", "dialog");
-    expect(colorPicker).toHaveAttribute("aria-label", "Color picker");
+    // A named group, not a dialog it does not behave as.
+    const colorPicker = screen.getByRole("group", { name: "Color picker" });
+    expect(colorPicker).toBe(screen.getByTestId("color-picker"));
+    expect(screen.queryByRole("dialog")).toBeNull();
 
-    const hexInput = screen.getByTestId("color-picker-hex-input");
-    expect(hexInput).toHaveAttribute("aria-label", "Hex color value");
+    // The caption names the hex field.
+    expect(screen.getByLabelText("Hex code:")).toBe(
+      screen.getByTestId("color-picker-hex-input"),
+    );
 
-    const applyButton = screen.getByTestId("color-picker-apply");
-    expect(applyButton).toHaveAttribute("aria-label", "Apply");
+    // The buttons are named by their translated text.
+    expect(screen.getByRole("button", { name: "Apply" })).toBe(
+      screen.getByTestId("color-picker-apply"),
+    );
+    expect(screen.getByRole("button", { name: "Cancel" })).toBe(
+      screen.getByTestId("color-picker-cancel"),
+    );
+  });
 
-    const cancelButton = screen.getByTestId("color-picker-cancel");
-    expect(cancelButton).toHaveAttribute("aria-label", "Cancel");
+  it("takes translated names for the group, the field and the cross", () => {
+    render(
+      <ColorPicker
+        isPickerOnly
+        appliedColor={globalColors.lightBlueMain}
+        ariaLabel="Farbwahl"
+        closeButtonLabel="Schliessen"
+      />,
+    );
+    expect(screen.getByRole("group", { name: "Farbwahl" })).toBeInTheDocument();
+    expect(screen.getByTestId("color-picker-close")).toHaveAttribute(
+      "aria-label",
+      "Schliessen",
+    );
+
+    render(<ColorPicker {...defaultProps} hexCodeLabel="Hex-Wert" />);
+    expect(screen.getByLabelText("Hex-Wert:")).toBe(
+      screen.getAllByTestId("color-picker-hex-input")[0],
+    );
+  });
+
+  it("calls onClose on Escape", () => {
+    render(<ColorPicker {...defaultProps} onClose={mockOnClose} />);
+    const input = screen.getByTestId("color-picker-hex-input");
+    fireEvent.keyDown(input, { key: "Escape" });
+    // Completes the press, so the keyup consumeKey waits for is not left
+    // to swallow the next test's.
+    fireEvent.keyUp(input, { key: "Escape" });
+    expect(mockOnClose).toHaveBeenCalledTimes(1);
+  });
+
+  // With nothing to close, Escape must still reach a ModalDialog around it.
+  it("lets Escape propagate when no onClose is passed", () => {
+    const onParentKeyDown = vi.fn();
+    const onWindowKeyUp = vi.fn();
+    window.addEventListener("keyup", onWindowKeyUp);
+
+    render(
+      <div onKeyDown={onParentKeyDown}>
+        <ColorPicker {...defaultProps} />
+      </div>,
+    );
+    const input = screen.getByTestId("color-picker-hex-input");
+    fireEvent.keyDown(input, { key: "Escape" });
+    fireEvent.keyUp(input, { key: "Escape" });
+
+    window.removeEventListener("keyup", onWindowKeyUp);
+    expect(onParentKeyDown).toHaveBeenCalledWith(
+      expect.objectContaining({ key: "Escape" }),
+    );
+    expect(onWindowKeyUp).toHaveBeenCalledWith(
+      expect.objectContaining({ key: "Escape" }),
+    );
+  });
+
+  // The colour scheme dialog around the picker closes on an Escape keyup.
+  it("keeps the Escape keyup that closed it from window listeners", () => {
+    const onWindowKeyUp = vi.fn();
+    window.addEventListener("keyup", onWindowKeyUp);
+
+    render(<ColorPicker {...defaultProps} onClose={mockOnClose} />);
+    const input = screen.getByTestId("color-picker-hex-input");
+    fireEvent.keyDown(input, { key: "Escape" });
+    fireEvent.keyUp(input, { key: "Escape" });
+
+    expect(mockOnClose).toHaveBeenCalledTimes(1);
+    window.removeEventListener("keyup", onWindowKeyUp);
+    expect(onWindowKeyUp).not.toHaveBeenCalledWith(
+      expect.objectContaining({ key: "Escape" }),
+    );
   });
 });

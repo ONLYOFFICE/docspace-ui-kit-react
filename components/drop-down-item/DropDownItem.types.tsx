@@ -11,7 +11,7 @@ export type DropDownItemProps = {
    * attribute.
    */
   height?: number;
-  /** The same, used instead of `height` on a tablet-width viewport. */
+  /** The same, used instead of `height` on a tablet-width viewport. Unlike `height`, it stays off the DOM. */
   heightTablet?: number;
   /** Whether to use modern compact styling with minimal padding */
   isModern?: boolean;
@@ -74,10 +74,12 @@ export type DropDownItemProps = {
   badgeLabel?: string;
   /** Whether to show an external link icon at the end of the item */
   withExternalLink?: boolean;
-  /** URL to navigate to when the external link icon is clicked */
+  /** URL of the external link icon. It becomes the icon's `href` only together with `onExternalLinkClick`; without the callback the icon does not navigate */
   externalLinkPath?: string;
-  /** Callback triggered when the external link icon is clicked */
+  /** Called on a plain click of the external link icon, which then does not follow the `href`; a middle or modified click is left to the browser and does not call it */
   onExternalLinkClick?: () => void;
+  /** Accessible name of the external link icon. Defaults to the translated "Open" followed by `label`. */
+  externalLinkLabel?: string;
 
   // Toggle Props
   /** Whether to show a toggle switch at the end of the item */
@@ -111,6 +113,13 @@ export type DropDownItemProps = {
   style?: React.CSSProperties;
   /** HTML ID attribute for the root element */
   id?: string;
+  /**
+   * ARIA role of the item, matching the menu's: `option` in a listbox,
+   * `menuitem` in a menu. A separator is always `separator`, and
+   * `aria-selected` is only set on an `option`.
+   * @default "option"
+   */
+  role?: "option" | "menuitem";
   /** Position in the tab order. The default of -1 keeps the item off it.
    * @default -1 */
   tabIndex?: number;

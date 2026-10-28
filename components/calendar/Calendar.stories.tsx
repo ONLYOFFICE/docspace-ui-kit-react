@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { DateTime } from "luxon";
+import { DateTime } from "luxon";
+import { expect, fn, within } from "storybook/test";
 
 import { now } from "../../utils/date";
 
@@ -151,6 +152,36 @@ type Story = StoryObj<ComponentProps<typeof Calendar>>;
 
 export default meta;
 
+const title = (calendar: HTMLElement) =>
+  calendar.querySelector("h2") as HTMLElement;
+
+// A day of the shown month, not one of the greyed neighbours.
+const dayButton = (calendar: HTMLElement, day: number) =>
+  Array.from(calendar.querySelectorAll<HTMLButtonElement>("button.day")).find(
+    (button) =>
+      !/isSecondary/.test(button.className) &&
+      button.textContent === String(day),
+  ) as HTMLButtonElement;
+
+const monthTitle = (date: DateTime, locale = "en") =>
+  date.setLocale(locale).toFormat("MMMM yyyy").toLowerCase();
+
+// "Today" as the calendar drew it, read off its aria-current day, not the
+// clock as it reads when the play function runs: a run that crosses midnight
+// between the render and the assertions would otherwise compare against
+// tomorrow. Only today and yesterday can be the drawn day.
+const renderedToday = (calendar: HTMLElement) => {
+  const label = calendar
+    .querySelector('[aria-current="date"]')
+    ?.getAttribute("aria-label");
+  const clock = now();
+  const today = [clock, clock.minus({ days: 1 })].find(
+    (date) => date.setLocale("en").toLocaleString(DateTime.DATE_FULL) === label,
+  );
+  if (!today) throw new Error("No day of the calendar is marked as today");
+  return today;
+};
+
 // The date control hands back a timestamp, which the component does not parse.
 const toDate = (value?: DateTime | Date | number) =>
   typeof value === "number" ? new Date(value) : value;
@@ -201,12 +232,90 @@ export const Default: Story = {
     maxDate: new Date(`${new Date().getFullYear() + 10}/01/01`),
     minDate: new Date("1970/01/01"),
     initialDate: new Date(),
+    onChange: fn(),
+    setSelectedDate: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const calendar = canvas.getByTestId("calendar");
+    const today = renderedToday(calendar);
+    await expect(title(calendar).textContent?.toLowerCase()).toBe(
+      monthTitle(today),
+    );
+    const fullDate = (date: DateTime) =>
+      date.setLocale("en").toLocaleString(DateTime.DATE_FULL);
+    // Today is also the selected day here: it carries both marks and both
+    // states, and is named by its full date rather than by its number.
+    const todayButton = within(calendar).getByRole("button", {
+      name: fullDate(today),
+    });
+    await expect(todayButton).toHaveTextContent(String(today.day));
+    await expect(todayButton).toHaveAttribute("aria-current", "date");
+    await expect(todayButton).toHaveAttribute("aria-pressed", "true");
+    await expect(todayButton.className).toMatch(/isCurrent/);
+    await expect(todayButton.className).toMatch(/focused/);
+    // The selection ring is drawn around today's fill, not swallowed by it.
+    await expect(getComputedStyle(todayButton).boxShadow).not.toBe("none");
+
+    // Picking a day reports it to both callbacks and rings it.
+    const target = today.day === 15 ? 16 : 15;
+    await userEvent.click(dayButton(calendar, target));
+    await expect(args.setSelectedDate).toHaveBeenCalledTimes(1);
+    const picked = (args.setSelectedDate as ReturnType<typeof fn>).mock
+      .calls[0][0] as DateTime;
+    await expect(picked.toISODate()).toBe(
+      today.set({ day: target }).toISODate(),
+    );
+    await expect(args.onChange).toHaveBeenCalledWith(picked);
+    await expect(dayButton(calendar, target).className).toMatch(/focused/);
+    await expect(
+      within(calendar).getByRole("button", {
+        name: fullDate(today.set({ day: target })),
+      }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(todayButton).toHaveAttribute("aria-pressed", "false");
+
+    // The arrows page through months.
+    await userEvent.click(
+      within(calendar).getByRole("button", { name: "Next" }),
+    );
+    await expect(title(calendar).textContent?.toLowerCase()).toBe(
+      monthTitle(today.plus({ months: 1 })),
+    );
+    await userEvent.click(
+      within(calendar).getByRole("button", { name: "Previous" }),
+    );
+    await expect(title(calendar).textContent?.toLowerCase()).toBe(
+      monthTitle(today),
+    );
+
+    // The title opens the months, then the years; a year leads back to
+    // its months, and a month back to its days.
+    await userEvent.click(title(calendar));
+    await expect(title(calendar)).toHaveClass("months-header");
+    await userEvent.click(title(calendar));
+    await expect(title(calendar)).toHaveClass("years-header");
+    const nextYear = String(today.year + 1);
+    const year = Array.from(
+      calendar.querySelectorAll<HTMLButtonElement>("button.year"),
+    ).find((button) => button.textContent === nextYear) as HTMLElement;
+    await userEvent.click(year);
+    await expect(title(calendar)).toHaveClass("months-header");
+    await expect(title(calendar)).toHaveTextContent(nextYear);
+    const [january] =
+      calendar.querySelectorAll<HTMLButtonElement>("button.month");
+    await userEvent.click(january);
+    await expect(title(calendar)).toHaveClass("days-header");
+    await expect(title(calendar).textContent?.toLowerCase()).toBe(
+      monthTitle(today.set({ year: today.year + 1, month: 1 })),
+    );
+    // Browsing selects nothing.
+    await expect(args.setSelectedDate).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
       description: {
         story:
-          "The calendar as it opens: today is filled with the accent colour. Click a day to select it and watch the Actions panel, click the title to switch to months and then years, and change any other prop live in the Controls panel below.",
+          'The calendar as it opens: today is filled with the accent colour and, being the selected day too, ringed as well. Each day is named by its full date, the selected one is `aria-pressed` and today is `aria-current="date"`. Click a day to select it and watch the Actions panel, click the title to switch to months and then years, and change any other prop live in the Controls panel below.',
       },
       source: {
         code: `const [selectedDate, setSelectedDate] = useState(now());
@@ -238,6 +347,35 @@ const WithDateConstraintsTemplate = () => {
 
 export const WithDateConstraints: Story = {
   render: () => <WithDateConstraintsTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const calendar = canvas.getByTestId("calendar");
+    const today = renderedToday(calendar);
+    const previous = within(calendar).getByRole("button", { name: "Previous" });
+    const next = within(calendar).getByRole("button", { name: "Next" });
+
+    // The arrows stop at January and December of this year.
+    for (let month = today.month; month > 1; month -= 1) {
+      await userEvent.click(previous);
+    }
+    await expect(previous).toBeDisabled();
+    await expect(title(calendar).textContent?.toLowerCase()).toBe(
+      monthTitle(today.set({ month: 1 })),
+    );
+    for (let month = 1; month < 12; month += 1) {
+      await userEvent.click(next);
+    }
+    await expect(next).toBeDisabled();
+
+    // Only this year is enabled in the years view.
+    await userEvent.click(title(calendar));
+    await userEvent.click(title(calendar));
+    const enabled = Array.from(
+      calendar.querySelectorAll<HTMLButtonElement>("button.year"),
+    )
+      .filter((button) => !button.disabled)
+      .map((button) => button.textContent);
+    await expect(enabled).toEqual([String(today.year)]);
+  },
   parameters: {
     docs: {
       description: {
@@ -298,6 +436,18 @@ const LocaleExamplesTemplate = () => {
 
 export const LocaleExamples: Story = {
   render: () => <LocaleExamplesTemplate />,
+  play: async ({ canvas }) => {
+    const calendars = canvas.getAllByTestId("calendar");
+    await expect(calendars).toHaveLength(4);
+    // The first calendar is the English one, whose day names the helper reads.
+    const today = renderedToday(calendars[0]);
+    // Each title is the month written in its own locale.
+    for (const [index, locale] of ["en", "ru", "de", "ja"].entries()) {
+      await expect(title(calendars[index]).textContent?.toLowerCase()).toBe(
+        monthTitle(today, locale),
+      );
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -331,6 +481,16 @@ const RightToLeftTemplate = () => {
 export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    const calendar = canvas.getByTestId("calendar");
+    await expect(getComputedStyle(calendar).direction).toBe("rtl");
+    // The title sits at the right edge, the arrows at the left.
+    const heading = title(calendar).getBoundingClientRect();
+    const next = within(calendar)
+      .getByRole("button", { name: "Next" })
+      .getBoundingClientRect();
+    await expect(next.right).toBeLessThan(heading.left);
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -363,7 +523,7 @@ export const CssCustomization: Story = {
         style={
           {
             // Calendar container
-            "--calendar-bg": "#e6f3fb",
+            "--calendar-bg": "light-dark(#e6f3fb, #16303e)",
             "--calendar-border": "#0082c9",
             "--calendar-shadow": "0 4px 16px rgba(0,130,201,0.25)",
             "--calendar-radius": "12px",
@@ -376,7 +536,7 @@ export const CssCustomization: Story = {
             // Navigation arrows
             "--calendar-outline": "#0082c9",
             "--calendar-arrow": "#0082c9",
-            "--calendar-disabled-arrow": "#cce5f6",
+            "--calendar-disabled-arrow": "light-dark(#cce5f6, #1f4a61)",
             // Weekday labels
             "--calendar-weekday": "#0082c9",
             // Date items
@@ -384,12 +544,12 @@ export const CssCustomization: Story = {
             "--calendar-selected-text": "#ffffff",
             "--calendar-current-radius": "8px",
             "--calendar-focused-radius": "8px",
-            "--calendar-focused-bg": "#ffffff",
+            "--calendar-focused-bg": "light-dark(#ffffff, #0d2633)",
             "--calendar-focused-text": "#0082c9",
-            "--calendar-hover-bg": "#cce5f6",
+            "--calendar-hover-bg": "light-dark(#cce5f6, #1f4a61)",
             "--calendar-hover-radius": "8px",
             "--calendar-past": "#5ab4e5",
-            "--calendar-disabled": "#cce5f6",
+            "--calendar-disabled": "light-dark(#cce5f6, #1f4a61)",
           } as React.CSSProperties
         }
       >
@@ -402,6 +562,21 @@ export const CssCustomization: Story = {
       </div>
     );
   },
+  play: async ({ canvas }) => {
+    const calendar = canvas.getByTestId("calendar");
+    const box = getComputedStyle(calendar);
+    await expect(box.width).toBe("340px");
+    await expect(box.backgroundColor).toBe("rgb(230, 243, 251)");
+    await expect(box.borderTopLeftRadius).toBe("12px");
+    const current = calendar.querySelector('[class*="isCurrent"]') as Element;
+    await expect(getComputedStyle(current).backgroundColor).toBe(
+      "rgb(0, 130, 201)",
+    );
+    // minDate at the start of this month disables the way back.
+    await expect(
+      within(calendar).getByRole("button", { name: "Previous" }),
+    ).toBeDisabled();
+  },
   parameters: {
     docs: {
       description: {
@@ -410,15 +585,15 @@ export const CssCustomization: Story = {
       source: {
         code: `<div
   style={{
-    "--calendar-bg": "#e6f3fb",
+    "--calendar-bg": "light-dark(#e6f3fb, #16303e)",
     "--calendar-border": "#0082c9",
     "--calendar-radius": "12px",
     "--calendar-title": "#0082c9",
     "--calendar-accent": "#0082c9",
-    "--calendar-focused-bg": "#ffffff",
-    "--calendar-hover-bg": "#cce5f6",
+    "--calendar-focused-bg": "light-dark(#ffffff, #0d2633)",
+    "--calendar-hover-bg": "light-dark(#cce5f6, #1f4a61)",
     "--calendar-past": "#5ab4e5",
-    "--calendar-disabled": "#cce5f6",
+    "--calendar-disabled": "light-dark(#cce5f6, #1f4a61)",
   }}
 >
   <Calendar

@@ -9,6 +9,7 @@ import { Scrollbar, ScrollbarType } from "../scrollbar";
 import { LoaderWrapper } from "../loader-wrapper";
 
 import { useViewTab } from "./hooks/use-view-tab/useViewTab";
+import useTabsHotkeys from "./hooks/use-tabs-hotkeys/useTabsHotkeys";
 import { type TTabItem, type TabsProps } from "./Tabs.types";
 import { OFFSET_RIGHT, OFFSET_LEFT } from "./Tabs.constants";
 import styles from "./Tabs.module.scss";
@@ -48,6 +49,26 @@ const PrimaryTabs = (props: TabsProps) => {
 
   const tabsRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<ScrollbarType>(null);
+  const tabItemsRef = useRef<(HTMLDivElement | null)[]>([]);
+
+  // The roving tab stop: the one tab Tab lands on, and the one the arrow
+  // keys move from. It follows the selection until the keyboard moves it.
+  const [focusedTabIndex, setFocusedTabIndex] = useState(
+    Math.max(selectedItemIndex, 0),
+  );
+
+  useEffect(() => {
+    setFocusedTabIndex(Math.max(selectedItemIndex, 0));
+  }, [selectedItemIndex]);
+
+  // A shorter list must not leave the tab stop past its end, where no tab
+  // would carry tabIndex 0 and Tab would skip the whole bar.
+  const lastTabIndex = Math.max(items.length - 1, 0);
+  const rovingTabIndex = Math.min(focusedTabIndex, lastTabIndex);
+
+  useEffect(() => {
+    setFocusedTabIndex((index) => Math.min(index, lastTabIndex));
+  }, [lastTabIndex]);
 
   const isViewFirstTab = useViewTab(scrollRef, tabsRef, 0);
   const isViewLastTab = useViewTab(scrollRef, tabsRef, items.length - 1);
@@ -153,12 +174,39 @@ const PrimaryTabs = (props: TabsProps) => {
     scrollToTab(index);
   };
 
+  // A click and Enter or Space on the focused tab select the same way.
+  const selectTab = (index: number) => {
+    const item = items[index];
+    if (!item || item.isDisabled || index === selectedItemIndex) return;
+    if (!withAnimation) item.onClick?.();
+    setSelectedItem(item, index);
+  };
+
+  const focusTab = (index: number) => {
+    setFocusedTabIndex(index);
+    tabItemsRef.current[index]?.focus();
+    scrollToTab(index);
+  };
+
+  const { onKeyDown } = useTabsHotkeys({
+    items,
+    focusedTabIndex: rovingTabIndex,
+    focusTab,
+    selectTab,
+  });
+
   const classes = classNames({
     [styles.primary]: true,
   });
 
   const renderContent = (
-    <div className={classNames(styles.tabList, classes)} ref={tabsRef} id={id}>
+    <div
+      className={classNames(styles.tabList, classes)}
+      ref={tabsRef}
+      id={id}
+      role="tablist"
+      onKeyDown={onKeyDown}
+    >
       {items.map((item, index) => {
         const isSelected = index === selectedItemIndex;
 
@@ -167,6 +215,9 @@ const PrimaryTabs = (props: TabsProps) => {
         return (
           <div
             key={item.id}
+            ref={(el) => {
+              tabItemsRef.current[index] = el;
+            }}
             className={classNames(
               styles.tab,
               {
@@ -175,11 +226,14 @@ const PrimaryTabs = (props: TabsProps) => {
               },
               classes,
             )}
-            onClick={() => {
-              if (index === selectedItemIndex) return;
-              if (!withAnimation) item.onClick?.();
-              setSelectedItem(item, index);
-            }}
+            role="tab"
+            aria-selected={isSelected}
+            aria-disabled={item.isDisabled || undefined}
+            tabIndex={index === rovingTabIndex ? 0 : -1}
+            // Whatever put focus here -- a click on the tab already selected,
+            // a script -- the arrows have to start from this tab.
+            onFocus={() => setFocusedTabIndex(index)}
+            onClick={() => selectTab(index)}
             data-testid={`${item.id}_tab`}
           >
             <span className={styles.tabText} suppressHydrationWarning>

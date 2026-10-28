@@ -155,7 +155,7 @@ export function StillPlaceholder() {
   until `animate={false}` stops it; unmount the skeleton when the content arrives.
 - `uniqueKey` exists because the library picks a random id per render otherwise, which makes
   server and client markup differ. The component passes a `useId()` value when you leave it out,
-  so the default is already SSR-safe — `CircleSkeleton` has no such prop and is not.
+  so the default is already SSR-safe, as `CircleSkeleton`'s is.
 - `data-testid` is written after the spread, so it cannot be overridden; anything else you pass
   lands on the `<svg>`.
 

@@ -1,7 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import type { TemplateTileProps, TemplateItem } from "./TemplateTile.types";
 
@@ -9,28 +9,40 @@ import React, { useState } from "react";
 import PublicRoomTemplateIconReactSvg from "../../../assets/icons/32/template/public.svg";
 import CreateRoomReactSvg from "../../../assets/create.room.react.svg";
 import { ContextMenuModel } from "../../context-menu";
-import { Link } from "../../link";
+import { Link, LinkType } from "../../link";
+import { globalColors } from "../../../providers/theme";
 import { IconSizeType } from "../../../utils";
 import { ComboBox, ComboBoxSize } from "../../combobox";
 import { Text } from "../../text";
 
 import { TemplateTile } from ".";
 import { TileContent } from "../tile-content";
+import RenameField from "../../../.storybook/utils/RenameField";
 import { IconButton } from "../../icon-button";
+
+const onDeleteOption = fn();
+const onCreateRoomBadge = fn();
+
+// The menu is portalled and fades in.
+const menuItem = async (name: string) => {
+  const item = await screen.findByRole("menuitem", { name });
+  await waitFor(() => expect(item).toBeVisible());
+  return item;
+};
 
 const contextOptions: ContextMenuModel[] = [
   {
     id: "option_edit",
     key: "edit",
     label: "Edit",
-    onClick: () => {},
+    onClick: fn(),
     disabled: false,
   },
   {
     id: "option_delete",
     key: "delete",
     label: "Delete",
-    onClick: () => {},
+    onClick: onDeleteOption,
     disabled: false,
   },
 ];
@@ -120,7 +132,7 @@ const MockSpaceQuota: React.FC<MockSpaceQuotaProps> = ({
         selectedOption={selectedOption}
         size={ComboBoxSize.content}
         options={options}
-        onSelect={() => {}}
+        onSelect={fn()}
         scaled={false}
         modernView
         manualWidth="auto"
@@ -136,7 +148,7 @@ const badges = (
   <div className="badges">
     <IconButton
       iconNode={<CreateRoomReactSvg />}
-      onClick={() => {}}
+      onClick={onCreateRoomBadge}
       className="badge icons-group"
       size={IconSizeType.medium}
       hoverColor="accent"
@@ -314,7 +326,29 @@ const Template = ({
     <div style={{ maxWidth: "300px", margin: "30px" }}>
       <TemplateTile {...args} checked={checked} onSelect={onSelect}>
         <TileContent>
-          <Link>Template Content</Link>
+          {args.isEdit ? (
+            <RenameField title={args.item.title} />
+          ) : (
+            <>
+              <Link
+                type={LinkType.page}
+                fontSize="16px"
+                lineHeight="20px"
+                fontWeight={700}
+                isTextOverflow
+              >
+                {args.item.title}
+              </Link>
+              <Text
+                fontSize="13px"
+                fontWeight={400}
+                color={globalColors.lightGrayDark}
+                truncate
+              >
+                Public room
+              </Text>
+            </>
+          )}
         </TileContent>
       </TemplateTile>
     </div>
@@ -332,6 +366,40 @@ export const Default: Story = {
     getContextModel: () => contextOptions,
     columnCount: 1,
     SpaceQuotaComponent: MockSpaceQuota,
+  },
+  beforeEach: () => {
+    onDeleteOption.mockClear();
+    onCreateRoomBadge.mockClear();
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const tile = canvas.getByTestId("tile");
+    // The owner opens their profile; without a limit, storage is the space used.
+    await userEvent.click(within(tile).getByText("Team member"));
+    await expect(args.openUser).toHaveBeenCalledTimes(1);
+    await expect(within(tile).getByText("45 MB")).toBeVisible();
+
+    await userEvent.click(
+      within(tile.querySelector(".badges") as HTMLElement).getByTestId(
+        "icon-button",
+      ),
+    );
+    await expect(onCreateRoomBadge).toHaveBeenCalledTimes(1);
+
+    const checkbox = within(tile).getByRole("checkbox", { hidden: true });
+    await userEvent.click(checkbox);
+    await expect(args.onSelect).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ id: "template-1" }),
+    );
+    await userEvent.click(checkbox);
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      false,
+      expect.objectContaining({ id: "template-1" }),
+    );
+
+    await userEvent.click(within(tile).getByTestId("context-menu-button"));
+    await userEvent.click(await menuItem("Delete"));
+    await expect(onDeleteOption).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -351,7 +419,10 @@ export const Default: Story = {
   columnCount={1}
   openUser={openOwnerProfile}
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
+    <Text fontSize="13px" color="light-dark(#657077, #a3a9ae)" truncate>Public room</Text>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -363,6 +434,13 @@ export const Checked: Story = {
   args: {
     ...Default.args,
     checked: true,
+  },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(tile.className).toMatch(/checked/);
+    await expect(
+      within(tile).getByRole("checkbox", { hidden: true }),
+    ).toBeChecked();
   },
   parameters: {
     docs: {
@@ -378,7 +456,10 @@ export const Checked: Story = {
   checked={true}
   onSelect={handleSelect}
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
+    <Text fontSize="13px" color="light-dark(#657077, #a3a9ae)" truncate>Public room</Text>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -397,6 +478,12 @@ export const WithSpaceQuota: Story = {
       isCustomQuota: true,
     } as StoryTemplateItem,
   },
+  play: async ({ canvas }) => {
+    // An editable limit: a drop-down with the limit.
+    const tile = canvas.getByTestId("tile");
+    const limit = within(tile).getByTestId("combobox");
+    await expect(limit).toHaveTextContent("100 MB");
+  },
   parameters: {
     docs: {
       description: {
@@ -411,7 +498,10 @@ export const WithSpaceQuota: Story = {
   showStorageInfo={true}
   SpaceQuotaComponent={SpaceQuota}
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
+    <Text fontSize="13px" color="light-dark(#657077, #a3a9ae)" truncate>Public room</Text>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -432,6 +522,12 @@ export const WithReadOnlyQuota: Story = {
       },
     } as StoryTemplateItem,
   },
+  play: async ({ canvas }) => {
+    // Read-only: the same figures as plain text.
+    const tile = canvas.getByTestId("tile");
+    await expect(within(tile).getByText("45 MB / 100 MB")).toBeVisible();
+    await expect(within(tile).queryByTestId("combobox")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -446,7 +542,10 @@ export const WithReadOnlyQuota: Story = {
   showStorageInfo={true}
   SpaceQuotaComponent={SpaceQuota}
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
+    <Text fontSize="13px" color="light-dark(#657077, #a3a9ae)" truncate>Public room</Text>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -458,6 +557,11 @@ export const BlockingOperation: Story = {
   args: {
     ...Default.args,
     isBlockingOperation: true,
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      getComputedStyle(canvas.getByTestId("tile")).pointerEvents,
+    ).toBe("none");
   },
   parameters: {
     docs: {
@@ -472,7 +576,10 @@ export const BlockingOperation: Story = {
   contextOptions={contextOptions}
   isBlockingOperation={true}
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
+    <Text fontSize="13px" color="light-dark(#657077, #a3a9ae)" truncate>Public room</Text>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -484,6 +591,13 @@ export const InProgress: Story = {
   args: {
     ...Default.args,
     inProgress: true,
+  },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(
+      within(tile).queryByRole("checkbox", { hidden: true }),
+    ).toBeNull();
+    await expect(tile.querySelector('[class*="loader"]')).not.toBeNull();
   },
   parameters: {
     docs: {
@@ -498,7 +612,10 @@ export const InProgress: Story = {
   contextOptions={contextOptions}
   inProgress
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
+    <Text fontSize="13px" color="light-dark(#657077, #a3a9ae)" truncate>Public room</Text>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -510,6 +627,11 @@ export const WithHotkeyBorder: Story = {
   args: {
     ...Default.args,
     showHotkeyBorder: true,
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("tile").className).toMatch(
+      /showHotkeyBorder/,
+    );
   },
   parameters: {
     docs: {
@@ -524,7 +646,10 @@ export const WithHotkeyBorder: Story = {
   contextOptions={contextOptions}
   showHotkeyBorder
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="20px" fontWeight={700} isTextOverflow>Sample Template</Link>
+    <Text fontSize="13px" color="light-dark(#657077, #a3a9ae)" truncate>Public room</Text>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -536,6 +661,13 @@ export const RenamingState: Story = {
   args: {
     ...Default.args,
     isEdit: true,
+  },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(tile.className).toMatch(/isEdit/);
+    await expect(
+      within(tile).queryByRole("checkbox", { hidden: true }),
+    ).toBeNull();
   },
   parameters: {
     docs: {
@@ -550,7 +682,13 @@ export const RenamingState: Story = {
   contextOptions={contextOptions}
   isEdit
 >
-  <TileContent><Link>Template Content</Link></TileContent>
+  <TileContent>
+    <div style={{ display: "flex", gap: 4 }}>
+      <TextInput value={title} onChange={onRename} scale />
+      <Button size={ButtonSize.small} icon={<CheckIcon />} onClick={onSave} />
+      <Button size={ButtonSize.small} icon={<CrossIcon />} onClick={onCancel} />
+    </div>
+  </TileContent>
 </TemplateTile>`,
       },
     },
@@ -562,12 +700,12 @@ export const CssCustomization: Story = {
     <div
       style={
         {
-          "--tile-bg": "#f4f9fd",
+          "--tile-bg": "light-dark(#f4f9fd, #132530)",
           "--tile-border-style": "1px solid #0082c9",
           "--tile-radius": "16px",
-          "--tile-hover-bg": "#cce5f6",
+          "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
           "--tile-icon-color": "#0082c9",
-          "--tile-sub-color": "#006fa6",
+          "--tile-sub-color": "light-dark(#006fa6, #4fb0e6)",
           "--tile-hotkey-color": "#e0662e",
         } as CSSProperties
       }
@@ -584,13 +722,19 @@ export const CssCustomization: Story = {
             badges={badges}
             showStorageInfo={true}
             showHotkeyBorder={showHotkeyBorder}
-            openUser={() => {}}
+            openUser={fn()}
             getContextModel={() => contextOptions}
             columnCount={1}
             SpaceQuotaComponent={MockSpaceQuota}
           >
             <TileContent>
-              <Link>
+              <Link
+                type={LinkType.page}
+                fontSize="16px"
+                lineHeight="20px"
+                fontWeight={700}
+                isTextOverflow
+              >
                 {showHotkeyBorder ? "Team Template" : "Sample Template"}
               </Link>
             </TileContent>
@@ -599,6 +743,16 @@ export const CssCustomization: Story = {
       ))}
     </div>
   ),
+  play: async ({ canvas }) => {
+    const [sample, team] = canvas.getAllByTestId("tile");
+    await expect(getComputedStyle(sample).borderTopLeftRadius).toBe("16px");
+    await expect(
+      getComputedStyle(within(sample).getByText("Owner")).color,
+    ).toBe("rgb(0, 111, 166)");
+    await expect(getComputedStyle(team).borderTopColor).toBe(
+      "rgb(224, 102, 46)",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -610,12 +764,12 @@ Two instances:
       },
       source: {
         code: `<div style={{
-  "--tile-bg": "#f4f9fd",
+  "--tile-bg": "light-dark(#f4f9fd, #132530)",
   "--tile-border-style": "1px solid #0082c9",
   "--tile-radius": "16px",
-  "--tile-hover-bg": "#cce5f6",
+  "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
   "--tile-icon-color": "#0082c9",
-  "--tile-sub-color": "#006fa6",
+  "--tile-sub-color": "light-dark(#006fa6, #4fb0e6)",
   "--tile-hotkey-color": "#e0662e",
 }}>
   <TemplateTile item={template} element={<TemplateIcon />} contextOptions={options} badges={badges} columnCount={1} openUser={openOwnerProfile} showStorageInfo SpaceQuotaComponent={SpaceQuota}>

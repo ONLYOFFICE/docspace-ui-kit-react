@@ -1,6 +1,8 @@
 export type TwoStateToggleProps = {
   /**
-   * Text to the left of the pill. An empty string removes it.
+   * Text to the left of the pill. An empty string removes it. The default
+   * names the product through `getBrandName("ProductName")`, so a portal that
+   * rebrands the product renames it here too.
    * @default "ONLYOFFICE Apps design"
    */
   title?: string;
@@ -20,7 +22,8 @@ export type TwoStateToggleProps = {
    */
   confirmTitle?: string;
   /**
-   * First paragraph of that dialog.
+   * First paragraph of that dialog. The default names the product through
+   * `getBrandName("ProductName")`.
    * @default "You are about to leave the new Dashboard and return to the classic ONLYOFFICE Apps view."
    */
   confirmBody?: string;
@@ -40,8 +43,9 @@ export type TwoStateToggleProps = {
    */
   confirmCancel?: string;
   /**
-   * Accessible name of the switch button. The English default is not
-   * translated for you.
+   * Accessible name of the switch button. The English default, which names
+   * the product through `getBrandName("ProductName")`, is not translated for
+   * you.
    * @default "Switch ONLYOFFICE Apps design"
    */
   ariaLabel?: string;

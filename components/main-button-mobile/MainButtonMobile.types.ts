@@ -80,29 +80,49 @@ export type MainButtonMobileProps = {
   actionOptions?: ActionOption[];
   /** Items of the lower group, drawn on a background of its own. An item with `items` becomes a submenu. */
   buttonOptions?: ButtonOption[];
-  /** Ignored. Nothing reads this prop; the button's own handler is `onClick`. */
+  /**
+   * Ignored. Nothing reads this prop; the button's own handler is `onClick`.
+   * @deprecated Use `onClick` with `withMenu={false}`.
+   */
   onUploadClick?: () => void;
-  /** Ignored. Nothing reads this prop. */
+  /**
+   * Ignored. Nothing reads this prop.
+   * @deprecated
+   */
   withButton?: boolean;
-  /** Whether `onClose` is called at all. It then fires on every toggle, including the one that opens the menu. */
+  /**
+   * Ignored. `onClose` is called whenever the sheet closes, with or without it.
+   * @deprecated
+   */
   isOpenButton?: boolean;
-  /** Ignored. Nothing reads this prop; the groups have no heading. */
+  /**
+   * Ignored. Nothing reads this prop; the groups have no heading.
+   * @deprecated
+   */
   title?: string;
-  /** Ignored. Nothing reads this prop; the button draws no progress. */
+  /**
+   * Ignored. Nothing reads this prop; the button draws no progress.
+   * @deprecated
+   */
   percent?: number;
-  /** Ignored. Nothing reads this prop. */
+  /**
+   * Ignored. Nothing reads this prop.
+   * @deprecated
+   */
   sectionWidth?: number;
   /** Width of the menu, as a CSS length. */
   manualWidth?: string;
   /** Applied to the wrapper that carries the button and the menu. */
   className?: string;
-  /** Whether the menu is open. It is copied into state, so a click changes it back without telling you. */
+  /** Whether the menu is open. It is copied into state whenever it changes; the button, the backdrop, an item, Escape and Back change that state too and report it through `onOpen` and `onClose`. */
   opened?: boolean;
-  /** Called on every toggle of the menu, and only while `isOpenButton` is set. */
+  /** Called when the button opens the menu. Handle it with `onClose` to keep `opened` in step. */
+  onOpen?: () => void;
+  /** Called when the menu closes: from the button, the backdrop, a chosen item, Escape or the browser's Back. Not called on opening. */
   onClose?: () => void;
-  /** Called when the alert badge is clicked, and only while `withAlertClick` is set. */
+  /** Called when the alert badge is clicked or pressed, and only while `withAlertClick` is set. */
   onAlertClick?: () => void;
-  /** Whether clicking the alert badge calls `onAlertClick`. */
+  /** Whether the alert badge is a button (named "Alert") that calls `onAlertClick`. Without it the badge is an image. */
   withAlertClick?: boolean;
   /** Whether the button opens the menu. When `false` it calls `onClick` and the menu never opens. */
   withMenu?: boolean;
@@ -110,11 +130,14 @@ export type MainButtonMobileProps = {
   withoutButton?: boolean;
   /** Whether the alert badge is drawn over the button. It is hidden while the menu is open. */
   alert?: boolean;
-  /** Called with the event when the button is clicked, and only while `withMenu` is `false`. */
+  /** Called with the event when the button is clicked or pressed with Enter or Space, and only while `withMenu` is `false`. */
   onClick?: (e: React.MouseEvent) => void;
   /** Merged into the menu's inline style. The measured height is applied after it and wins. */
   dropdownStyle?: React.CSSProperties;
-  /** Ignored. The component uses an internal ref of the same name; use `ref` for the element. */
+  /**
+   * Ignored. The component uses an internal ref of the same name; use `ref` for the element.
+   * @deprecated Use `ref`.
+   */
   mainButtonRef?: React.RefObject<HTMLDivElement | null>;
 };
 

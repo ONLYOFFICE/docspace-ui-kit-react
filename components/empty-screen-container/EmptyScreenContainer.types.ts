@@ -5,7 +5,7 @@ export type EmptyScreenContainerProps = {
   imageSrc: string;
   /** Alternative text for the illustration. Pass an empty string when the artwork repeats what the text below already says. */
   imageAlt: string;
-  /** The large line under the image, 19px and bold. */
+  /** The heading under the image, 19px and bold, rendered as an `<h3>` unless `headingLevel` says otherwise. */
   headerText: string;
   /** Optional 600-weight line between the header and the description. It has no styling of its own beyond that weight. */
   subheadingText?: string;
@@ -15,10 +15,12 @@ export type EmptyScreenContainerProps = {
   buttons?: ReactNode;
   /** Added after the component's own classes on the outer element. */
   className?: string;
-  /** Ignored. Nothing reads this prop and the component spreads no unknown props, so it never reaches the DOM. */
+  /** Value of `id` on the outer element. */
   id?: string;
-  /** Ignored. Nothing reads this prop; style the outer element through `className`. */
+  /** Inline style of the outer element. */
   style?: CSSProperties;
+  /** Level of the heading element `headerText` renders as: `3` gives an `<h3>`. Pick the level that fits the outline of the page around it. */
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   /** Inline style of the `<img>`, and the only way past its fixed size. It is dropped between 601px and 1023px, where the component passes an empty object instead. */
   imageStyle?: CSSProperties;
   /** Inline style of the row that holds `buttons`. */

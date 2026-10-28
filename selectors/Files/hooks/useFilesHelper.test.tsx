@@ -1,8 +1,11 @@
-import React from "react";
+import React, { use } from "react";
 import { act, renderHook } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { LoadersContextProvider } from "../../utils/contexts/Loaders";
+import {
+  LoadersContext,
+  LoadersContextProvider,
+} from "../../utils/contexts/Loaders";
 import type { UseFilesHelpersProps } from "../FilesSelector.types";
 import useFilesHelper from "./useFilesHelper";
 
@@ -10,11 +13,15 @@ const mocks = vi.hoisted(() => {
   const getFolderByFolderId = vi.fn();
   const getFolderInfo = vi.fn();
 
-  // Kept stable across renders, as the helper memoizes getFileList on it.
+  // Stable across renders, as the real provider's clients are: the helper
+  // memoizes getFileList on them.
   return {
     getFolderByFolderId,
     getFolderInfo,
-    api: { foldersApi: { getFolderByFolderId, getFolderInfo }, apiClient: {} },
+    api: {
+      foldersApi: { getFolderByFolderId, getFolderInfo },
+      apiClient: { request: vi.fn() },
+    },
   };
 });
 
@@ -22,6 +29,7 @@ vi.mock("../../../providers/api", () => ({ useApi: () => mocks.api }));
 vi.mock("../../../providers/api/ApiProvider", () => ({
   useApi: () => mocks.api,
 }));
+vi.mock("../../../components/toast", () => ({ toastr: { error: vi.fn() } }));
 
 const ROOM_ID = 50;
 
@@ -50,10 +58,11 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
   <LoadersContextProvider>{children}</LoadersContextProvider>
 );
 
-const setup = (props: Partial<UseFilesHelpersProps>) =>
+const setup = (props: Partial<UseFilesHelpersProps> = {}) =>
   renderHook(
-    () =>
-      useFilesHelper({
+    () => ({
+      loaders: use(LoadersContext),
+      files: useFilesHelper({
         setBreadCrumbs: vi.fn(),
         setIsSelectedParentFolder: vi.fn(),
         setHasNextPage: vi.fn(),
@@ -67,7 +76,8 @@ const setup = (props: Partial<UseFilesHelpersProps>) =>
         isThirdParty: false,
         setSelectedTreeNode: vi.fn(),
         isRoomsOnly: false,
-        getFilesArchiveError: () => "",
+        getFilesArchiveError: () => "error",
+        getRootData: vi.fn(async () => {}),
         isInit: false,
         withCreate: false,
         setSelectedItemId: vi.fn(),
@@ -77,10 +87,46 @@ const setup = (props: Partial<UseFilesHelpersProps>) =>
         setIsInsidePrivateRoom: vi.fn(),
         ...props,
       }),
+    }),
     { wrapper },
   );
 
 describe("useFilesHelper", () => {
+  beforeEach(() => {
+    mocks.getFolderByFolderId.mockReset();
+    mocks.getFolderInfo.mockReset();
+  });
+
+  // The Selector asks for no further page while isNextPageLoading is set.
+  it("ends the page load when the third-party fallback fails too", async () => {
+    mocks.getFolderByFolderId.mockRejectedValue(new Error("request failed"));
+
+    const { result } = setup({
+      selectedItemId: 5,
+      isThirdParty: true,
+      rootThirdPartyId: "third-party-root",
+    });
+
+    await act(async () => {
+      await result.current.files.getFileList(0);
+    });
+
+    expect(mocks.getFolderByFolderId).toHaveBeenCalledTimes(2);
+    expect(result.current.loaders.isNextPageLoading).toBe(false);
+  });
+
+  it("ends the page load when the folder fails and no root loader is given", async () => {
+    mocks.getFolderByFolderId.mockRejectedValue(new Error("request failed"));
+
+    const { result } = setup({ selectedItemId: 5, getRootData: undefined });
+
+    await act(async () => {
+      await result.current.files.getFileList(0);
+    });
+
+    expect(result.current.loaders.isNextPageLoading).toBe(false);
+  });
+
   it("hands the loaded files and their private room to onFilesLoaded", async () => {
     mocks.getFolderByFolderId.mockResolvedValue({
       data: { response: roomListing },
@@ -89,7 +135,7 @@ describe("useFilesHelper", () => {
 
     const { result } = setup({ onFilesLoaded });
     await act(async () => {
-      await result.current.getFileList(0);
+      await result.current.files.getFileList(0);
     });
 
     expect(onFilesLoaded).toHaveBeenCalledTimes(1);

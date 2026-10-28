@@ -1,7 +1,10 @@
 import type { CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { DateTime } from "luxon";
+import { expect, fn, waitFor, within } from "storybook/test";
 
+import { WhenVisible } from "../../.storybook/utils/WhenVisible";
 import { createDateTime } from "../../utils/date";
 
 import { TimePicker, type TimePickerProps } from ".";
@@ -75,6 +78,35 @@ const meta = {
       description:
         "Called when typing completes the minutes field: after two digits, a single digit above 5, a third digit or a value above 59; leaving the field with the mouse or Tab does not call it",
     },
+    ariaLabel: {
+      control: "text",
+      description: "Accessible name of the group; pass a translated string",
+      table: {
+        defaultValue: { summary: '"Time picker"' },
+      },
+    },
+    hoursLabel: {
+      control: "text",
+      description: "Accessible name of the hours field",
+      table: {
+        defaultValue: { summary: '"Hours"' },
+      },
+    },
+    minutesLabel: {
+      control: "text",
+      description: "Accessible name of the minutes field",
+      table: {
+        defaultValue: { summary: '"Minutes"' },
+      },
+    },
+    autoAdvance: {
+      control: "boolean",
+      description:
+        "Whether typing moves the focus: a complete hour jumps to minutes and a complete minute blurs the field and calls `onBlur`; off, the focus stays put and `onBlur` is never called",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
     forwardedRef: {
       control: false,
       description: "Ref to the outer box, a <div>",
@@ -87,11 +119,35 @@ const meta = {
       },
     },
   },
+  args: {
+    onChange: fn(),
+    onBlur: fn(),
+  },
 } satisfies Meta<typeof TimePicker>;
 
 type Story = StoryObj<typeof meta>;
 
 export default meta;
+
+// The last time reported through onChange, as HH:mm.
+const lastReported = (onChange: unknown) => {
+  const calls = (onChange as ReturnType<typeof fn>).mock.calls;
+  const time = calls[calls.length - 1]?.[0] as DateTime | undefined;
+  return time?.toFormat("HH:mm");
+};
+
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// Typing over a field's whole value, as a user who selected it would.
+const typeOver = (
+  userEvent: PlayContext["userEvent"],
+  input: HTMLElement,
+  text: string,
+) =>
+  userEvent.type(input, text, {
+    initialSelectionStart: 0,
+    initialSelectionEnd: (input as HTMLInputElement).value.length,
+  });
 
 const Wrapper = (props: { children: React.ReactNode }) => {
   return (
@@ -114,6 +170,29 @@ export const Default: Story = {
     initialTime: createDateTime(2025, 1, 27, 10, 30, 0),
     hasError: false,
     focusOnRender: false,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const group = canvas.getByRole("group", { name: "Time picker" });
+    const hours = within(group).getByLabelText("Hours");
+    const minutes = within(group).getByLabelText("Minutes");
+    // Plain text fields, not search fields.
+    await expect(hours).toHaveAttribute("type", "text");
+    await expect(minutes).toHaveAttribute("type", "text");
+    await expect(hours).not.toHaveAttribute("aria-invalid");
+    await expect(hours).toHaveValue("10");
+    await expect(minutes).toHaveValue("30");
+
+    // A first digit above 2 is padded and the caret jumps to minutes.
+    await typeOver(userEvent, hours, "9");
+    await expect(hours).toHaveValue("09");
+    await expect(minutes).toHaveFocus();
+    await expect(lastReported(args.onChange)).toBe("09:30");
+
+    // Two minute digits complete the time and call onBlur.
+    await typeOver(userEvent, minutes, "45");
+    await expect(minutes).toHaveValue("45");
+    await expect(lastReported(args.onChange)).toBe("09:45");
+    await expect(args.onBlur).toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -143,11 +222,26 @@ export const WithError: Story = {
     initialTime: createDateTime(2025, 1, 27, 10, 30, 0),
     hasError: true,
   },
+  play: async ({ canvas }) => {
+    const group = canvas.getByTestId("time-picker");
+    await expect(group.className).toMatch(/hasError/);
+    // The error reaches assistive technology, not only the border colour.
+    await expect(within(group).getByLabelText("Hours")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    await expect(within(group).getByLabelText("Minutes")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    // The fields stay editable.
+    await expect(within(group).getByLabelText("Hours")).toBeEnabled();
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "The border turns red to flag a time the form rejected (`hasError`); the fields stay editable so it can be corrected in place.",
+          "The border turns red to flag a time the form rejected (`hasError`), and both fields are marked `aria-invalid`; the fields stay editable so it can be corrected in place.",
       },
       source: {
         code: `<TimePicker initialTime={createDateTime(2025, 1, 27, 10, 30, 0)} hasError onChange={(time) => console.log(time)} />`,
@@ -179,6 +273,18 @@ const TwelveHourFormatTemplate = ({
 
 export const TwelveHourFormat: Story = {
   render: (args) => <TwelveHourFormatTemplate onChange={args.onChange} />,
+  play: async ({ args, canvas, userEvent }) => {
+    const [am, pm] = canvas.getAllByRole("group", { name: "Time picker" });
+    // 14:30 shows as 02 on a 12-hour clock.
+    await expect(within(am).getByLabelText("Hours")).toHaveValue("10");
+    await expect(within(pm).getByLabelText("Hours")).toHaveValue("02");
+
+    // The same digits report a morning or an afternoon time, by meridiem.
+    await typeOver(userEvent, within(pm).getByLabelText("Hours"), "3");
+    await expect(lastReported(args.onChange)).toBe("15:30");
+    await typeOver(userEvent, within(am).getByLabelText("Hours"), "3");
+    await expect(lastReported(args.onChange)).toBe("03:30");
+  },
   parameters: {
     docs: {
       description: {
@@ -194,10 +300,23 @@ export const TwelveHourFormat: Story = {
 };
 
 export const FocusOnRender: Story = {
-  render: (args) => <WrappedTemplate {...args} />,
+  // Mounted once on screen: a hidden field cannot take the focus.
+  render: (args) => (
+    <WhenVisible>
+      <WrappedTemplate {...args} />
+    </WhenVisible>
+  ),
   args: {
     initialTime: createDateTime(2025, 1, 27, 10, 30, 0),
     focusOnRender: true,
+  },
+  play: async ({ canvas, userEvent }) => {
+    // The hours field takes the digits without a click.
+    const hours = await canvas.findByLabelText("Hours");
+    await waitFor(() => expect(hours).toHaveFocus());
+    await userEvent.keyboard("14");
+    await expect(hours).toHaveValue("14");
+    await expect(canvas.getByLabelText("Minutes")).toHaveFocus();
   },
   parameters: {
     docs: {
@@ -235,12 +354,12 @@ const CssCustomizationTemplate = () => {
       <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
         <TimePicker
           initialTime={createDateTime(2025, 1, 27, 10, 30, 0)}
-          onChange={() => {}}
+          onChange={fn()}
         />
         <TimePicker
           initialTime={createDateTime(2025, 1, 27, 10, 30, 0)}
           hasError
-          onChange={() => {}}
+          onChange={fn()}
         />
       </div>
     </div>
@@ -249,6 +368,16 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    const [plain, error] = canvas.getAllByTestId("time-picker");
+    await expect(getComputedStyle(plain).borderTopColor).toBe(
+      "rgb(0, 130, 201)",
+    );
+    await expect(getComputedStyle(plain).width).toBe("68px");
+    await expect(getComputedStyle(error).borderTopColor).toBe(
+      "rgb(192, 57, 43)",
+    );
+  },
   parameters: {
     docs: {
       description: {

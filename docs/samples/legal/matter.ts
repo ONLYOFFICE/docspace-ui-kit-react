@@ -136,13 +136,17 @@ const DAY = 24 * 60 * 60 * 1000;
 const startOfDay = (date: Date) =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 
-/** "today", "yesterday", "3 days ago", "2 months ago" -- in the reader's locale. */
+/**
+ * "today", "yesterday", "3 days ago", "2 months ago" -- in English, like every
+ * other word on the page. The browser's locale would make the sentences that
+ * embed it ("Sent 5 days ago. Thank you.") half English, half something else.
+ */
 export const updatedAgo = (iso: string, now: Date = new Date()) => {
   const then = Date.parse(iso);
   if (!then) return "";
 
   const days = Math.round((startOfDay(now) - startOfDay(new Date(then))) / DAY);
-  const format = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+  const format = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
   if (days < 1) return format.format(0, "day");
   if (days < 30) return format.format(-days, "day");

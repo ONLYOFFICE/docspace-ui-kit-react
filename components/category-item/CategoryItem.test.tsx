@@ -58,4 +58,21 @@ describe("CategoryItem", () => {
 
     expect(defaultProps.onClickLink).not.toHaveBeenCalled();
   });
+
+  it("keeps a disabled title focusable and marks it aria-disabled", () => {
+    render(<CategoryItem {...defaultProps} isDisabled />);
+
+    const link = screen.getByRole("link", { name: defaultProps.title });
+    expect(link).toHaveAttribute("aria-disabled", "true");
+    expect(link).toHaveAttribute("tabindex", "0");
+    expect(link).not.toHaveAttribute("href");
+  });
+
+  it("leaves an enabled title a plain link", () => {
+    render(<CategoryItem {...defaultProps} />);
+
+    const link = screen.getByRole("link", { name: defaultProps.title });
+    expect(link).not.toHaveAttribute("aria-disabled");
+    expect(link).toHaveAttribute("href", defaultProps.url);
+  });
 });

@@ -59,12 +59,22 @@ export type AsideHeaderProps = {
   /** Called by the close cross. */
   onCloseClick?: () => void;
   /**
+   * Accessible name of the close cross.
+   * @default the kit's "CloseButton" translation
+   */
+  closeLabel?: string;
+  /**
    * Whether a back arrow is rendered before the title. It is mirrored in RTL.
    * @default false
    */
   isBackButton?: boolean;
   /** Called by the back arrow. */
   onBackClick?: () => void;
+  /**
+   * Accessible name of the back arrow.
+   * @default the kit's "Back" translation
+   */
+  backLabel?: string;
   /** Value of `data-testid` on the header.
    * @default "aside-header" */
   dataTestId?: string;

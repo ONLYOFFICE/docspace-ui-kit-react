@@ -366,8 +366,8 @@
 }
 
 .progressHeader {
-  color: var(--text-primary);
-  margin-inline-end: var(--ops-progress-header-margin, 8px);
+  // No margin of its own: .labelWrapper's gap already spaces the arrow, and no
+  // colour: the label's own text colour applies.
 
   &.withClick {
     cursor: pointer;

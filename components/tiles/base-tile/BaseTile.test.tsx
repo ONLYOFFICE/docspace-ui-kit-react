@@ -158,6 +158,16 @@ describe("BaseTile", () => {
     expect(loader).toBeTruthy();
   });
 
+  it("marks the tile busy only while inProgress", () => {
+    const { rerender } = render(
+      <BaseTile {...defaultProps} inProgress topContent={<TileTopContent />} />,
+    );
+    expect(screen.getByTestId("tile")).toHaveAttribute("aria-busy", "true");
+
+    rerender(<BaseTile {...defaultProps} topContent={<TileTopContent />} />);
+    expect(screen.getByTestId("tile")).not.toHaveAttribute("aria-busy");
+  });
+
   it("renders element icon when provided", () => {
     render(<BaseTile {...defaultProps} topContent={<TileTopContent />} />);
     expect(screen.getByTestId("tile-icon")).toBeTruthy();

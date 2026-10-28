@@ -3,6 +3,7 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, within } from "storybook/test";
 
 import SearchReactSvgUrl from "../../assets/search.react.svg?url";
 
@@ -239,6 +240,12 @@ type Story = StoryObj<ComponentProps<typeof InputBlock>>;
 
 export default meta;
 
+const onSearchIconClick = fn();
+
+// The icon box at the end of the field, absent when there is no icon.
+const iconOf = (block: HTMLElement) =>
+  block.querySelector<HTMLElement>(".append .input-block-icon");
+
 const Wrapper = (props: { children: React.ReactNode }) => {
   return (
     <div
@@ -286,6 +293,19 @@ const defaultProps: InputBlockProps = {
 export const Default: Story = {
   render: (args) => <ControlledInputBlock {...args} />,
   args: defaultProps,
+  play: async ({ canvas, userEvent }) => {
+    const block = canvas.getByTestId("input-block");
+    const input = within(block).getByPlaceholderText("Enter text here");
+    await userEvent.type(input, "hello");
+    await expect(input).toHaveValue("hello");
+    // Out of the tab order unless tabIndex is passed.
+    await expect(input).toHaveAttribute("tabindex", "-1");
+    // Without onIconClick the icon is drawn disabled.
+    await expect(within(block).getByTestId("icon-button")).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -330,6 +350,13 @@ const SizesTemplate = () => {
 
 export const Sizes: Story = {
   render: () => <SizesTemplate />,
+  play: async ({ canvas }) => {
+    const size = (placeholder: string) =>
+      Number.parseFloat(
+        getComputedStyle(canvas.getByPlaceholderText(placeholder)).fontSize,
+      );
+    await expect(size("Large size")).toBeGreaterThan(size("Base size"));
+  },
   parameters: {
     docs: {
       description: {
@@ -375,6 +402,20 @@ const StatesTemplate = () => {
 
 export const States: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas }) => {
+    const [normal, error, warning, disabled, readOnly] =
+      canvas.getAllByTestId("input-block");
+    await expect(normal).toHaveAttribute("data-error", "false");
+    await expect(error).toHaveAttribute("data-error", "true");
+    await expect(warning).toHaveAttribute("data-warning", "true");
+    // Disabled drops the icon; read-only keeps it.
+    await expect(within(disabled).getByRole("textbox")).toBeDisabled();
+    await expect(iconOf(disabled)).toBeNull();
+    const readOnlyInput =
+      within(readOnly).getByDisplayValue("Read-only content");
+    await expect(readOnlyInput).toHaveAttribute("readonly");
+    await expect(iconOf(readOnly)).not.toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -406,6 +447,12 @@ const PasswordTemplate = () => {
 
 export const PasswordType: Story = {
   render: () => <PasswordTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByPlaceholderText("Enter password");
+    await expect(input).toHaveAttribute("type", "password");
+    await userEvent.type(input, "secret");
+    await expect(input).toHaveValue("secret");
+  },
   parameters: {
     docs: {
       description: {
@@ -429,7 +476,7 @@ const WithIconClickTemplate = () => {
       <ControlledInputBlock
         {...defaultProps}
         placeholder="Click the icon"
-        onIconClick={() => alert("Icon clicked!")}
+        onIconClick={onSearchIconClick}
       />
     </div>
   );
@@ -437,6 +484,17 @@ const WithIconClickTemplate = () => {
 
 export const WithIconClick: Story = {
   render: () => <WithIconClickTemplate />,
+  beforeEach: () => {
+    onSearchIconClick.mockClear();
+  },
+  play: async ({ canvas, userEvent }) => {
+    const icon = within(canvas.getByTestId("input-block")).getByTestId(
+      "icon-button",
+    );
+    await expect(icon).toHaveAttribute("aria-disabled", "false");
+    await userEvent.click(icon);
+    await expect(onSearchIconClick).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -469,6 +527,17 @@ const WithPrefixTemplate = () => {
 
 export const WithPrefix: Story = {
   render: () => <WithPrefixTemplate />,
+  play: async ({ canvas }) => {
+    const [amount, phone] = canvas.getAllByTestId("input-block");
+    // The prefix sits before the input, inside the same border.
+    const dollar = within(amount).getByText("$").getBoundingClientRect();
+    await expect(dollar.right).toBeLessThanOrEqual(
+      within(amount).getByRole("textbox").getBoundingClientRect().left + 1,
+    );
+    await expect(iconOf(amount)).toBeNull();
+    await expect(within(phone).getByText("+1")).toBeVisible();
+    await expect(iconOf(phone)).not.toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -504,6 +573,19 @@ const RightToLeftTemplate = () => {
 // Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
 export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
+  play: async ({ canvas }) => {
+    const [plain, prefixed] = canvas.getAllByTestId("input-block");
+    // The icon at the left end, the prefix at the right end.
+    const input = within(plain).getByRole("textbox").getBoundingClientRect();
+    const icon = (iconOf(plain) as HTMLElement).getBoundingClientRect();
+    await expect(icon.right).toBeLessThanOrEqual(input.left + 1);
+    const prefixInput = within(prefixed)
+      .getByRole("textbox")
+      .getBoundingClientRect();
+    await expect(
+      within(prefixed).getByText("$").getBoundingClientRect().left,
+    ).toBeGreaterThanOrEqual(prefixInput.right - 1);
+  },
   globals: { direction: "rtl" },
   parameters: {
     noPadding: true,
@@ -553,7 +635,7 @@ export const CssCustomization: Story = {
         iconName={SearchReactSvgUrl}
         placeholder="Amount"
         value="120"
-        onChange={() => {}}
+        onChange={fn()}
       >
         <span>$</span>
       </InputBlock>
@@ -563,10 +645,19 @@ export const CssCustomization: Story = {
         iconName={SearchReactSvgUrl}
         placeholder="Large size"
         value=""
-        onChange={() => {}}
+        onChange={fn()}
       />
     </div>
   ),
+  play: async ({ canvas }) => {
+    const [amount] = canvas.getAllByTestId("input-block");
+    const box = getComputedStyle(amount);
+    await expect(box.borderTopColor).toBe("rgb(196, 181, 253)");
+    await expect(box.borderTopLeftRadius).toBe("8px");
+    await expect(
+      getComputedStyle(within(amount).getByDisplayValue("120")).color,
+    ).toBe("rgb(76, 29, 149)");
+  },
   parameters: {
     docs: {
       description: {

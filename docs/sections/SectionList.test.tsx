@@ -1,10 +1,28 @@
 import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import ApiProvider from "../../providers/api/ApiProvider";
+import { rowName } from "./rowName";
 import { SectionList } from "./SectionList";
 import type { SectionKind } from "./source";
+
+// A tablet's width, where the list is rows. A desktop gets the table, whose
+// header lays its columns out by measuring them, and jsdom measures nothing;
+// the stories render the table in Chromium.
+const innerWidth = window.innerWidth;
+beforeAll(() => {
+  Object.defineProperty(window, "innerWidth", {
+    configurable: true,
+    value: 900,
+  });
+});
+afterAll(() => {
+  Object.defineProperty(window, "innerWidth", {
+    configurable: true,
+    value: innerWidth,
+  });
+});
 
 // No portal: an empty url is what the Storybook decorator hands every story
 // until one is picked in the API Config toolbar, and it selects the demo.
@@ -40,7 +58,7 @@ describe("SectionList", () => {
   ])("renders the %s demo with no create button", async (kind, row) => {
     renderSection(kind);
 
-    expect(await screen.findByText(row)).toBeInTheDocument();
+    expect(await screen.findByText(rowName(row))).toBeInTheDocument();
     expect(screen.getByText("Demo data")).toBeInTheDocument();
     expect(screen.queryByTestId("main-button")).not.toBeInTheDocument();
   });
@@ -93,7 +111,9 @@ describe("SectionList", () => {
     expect(screen.queryByText("Marketing")).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByText("Reports 2026"));
-    expect(await screen.findByText("Budget overview.xlsx")).toBeInTheDocument();
+    expect(
+      await screen.findByText(rowName("Budget overview.xlsx")),
+    ).toBeInTheDocument();
 
     const back = () => {
       const arrow = container.querySelector(".arrow-button");
@@ -102,7 +122,9 @@ describe("SectionList", () => {
     };
 
     await back();
-    expect(await screen.findByText("Q4 budget.xlsx")).toBeInTheDocument();
+    expect(
+      await screen.findByText(rowName("Q4 budget.xlsx")),
+    ).toBeInTheDocument();
 
     await back();
     expect(await screen.findByText("Marketing")).toBeInTheDocument();
@@ -113,7 +135,7 @@ describe("SectionList", () => {
     renderSection("forms");
 
     await userEvent.click(await screen.findByText("Job applications"));
-    await screen.findByText("Application form.pdf");
+    await screen.findByText(rowName("Application form.pdf"));
     await openFilter();
 
     expect(await findTag("pdf")).toBeInTheDocument();
@@ -144,36 +166,38 @@ describe("SectionList", () => {
 
     // Folders only: a file is not somewhere to go.
     expect(await picker.findByText("Reports 2026")).toBeInTheDocument();
-    expect(picker.queryByText("Q4 budget.xlsx")).toBeNull();
+    expect(picker.queryByText(rowName("Q4 budget.xlsx"))).toBeNull();
     expect(submitButton()).toBeEnabled();
 
     await userEvent.click(submitButton());
 
     // The list now stands in the picked room.
-    expect(await screen.findByText("Q4 budget.xlsx")).toBeInTheDocument();
+    expect(
+      await screen.findByText(rowName("Q4 budget.xlsx")),
+    ).toBeInTheDocument();
     expect(screen.queryByTestId("selector_submit_button")).toBeNull();
   });
 
   it("can pick the section itself", async () => {
     renderSection("files", true);
-    await screen.findByText("Notes.docx");
+    await screen.findByText(rowName("Notes.docx"));
 
     // Walk into a folder first, then pick Files from the picker.
     await userEvent.click(screen.getByText("Templates"));
-    await screen.findByText("Letter.docx");
+    await screen.findByText(rowName("Letter.docx"));
 
     const picker = await openPicker();
     await userEvent.click(picker.getByText("Files"));
     await waitFor(() => expect(submitButton()).toBeEnabled());
     await userEvent.click(submitButton());
 
-    expect(await screen.findByText("Notes.docx")).toBeInTheDocument();
-    expect(screen.queryByText("Letter.docx")).toBeNull();
+    expect(await screen.findByText(rowName("Notes.docx"))).toBeInTheDocument();
+    expect(screen.queryByText(rowName("Letter.docx"))).toBeNull();
   });
 
   it("gives each row a read-only context menu", async () => {
     renderSection("files");
-    await screen.findByText("Notes.docx");
+    await screen.findByText(rowName("Notes.docx"));
 
     const [first] = screen.getAllByTestId("context-menu-button");
     await userEvent.click(first);
@@ -184,6 +208,6 @@ describe("SectionList", () => {
 
     await userEvent.click(screen.getByText("Open"));
     // The first row is the Templates folder, which the menu opens in place.
-    expect(await screen.findByText("Letter.docx")).toBeInTheDocument();
+    expect(await screen.findByText(rowName("Letter.docx"))).toBeInTheDocument();
   });
 });

@@ -146,8 +146,8 @@ export function ExpiresAt() {
   arrows step one month, one year or ten years, depending on the view. The view resets to days
   when the calendar remounts, not when the date changes.
 - **Today is filled, the selected day is ringed**, both in the accent colour; the same goes for
-  the current and the selected month and year. When the selected day is today, only the fill
-  shows.
+  the current and the selected month and year. When the selected day is today it gets both: the
+  fill, and the ring drawn outside it with a gap in the calendar's background colour.
 - **The mobile layout follows the window, not `isMobile`.** Below 600px of window width the
   calendar takes the full width, is 420px high with 16px padding and uses larger items and
   title. `isMobile` only widens the gap between the two arrows from 8px to 12px.
@@ -201,8 +201,12 @@ platform's:
   announced only by the grid re-rendering.
 - The title that opens the month and year views is an `<h2>` with a click handler, so those
   views are reachable by mouse only.
-- Nothing states which day is selected or which is today other than colour — there is no
-  `aria-selected` or `aria-current`, and each day is named only by its number.
+- Each day's accessible name is its full date in `locale` ("October 15, 2023"), while the
+  visible text stays the number, so the greyed days of the neighbouring months are told apart
+  from this month's days with the same number.
+- The selected day has `aria-pressed="true"` and every other day `aria-pressed="false"`; today
+  has `aria-current="date"`. The current and the selected month and year are still marked by
+  colour only.
 
 ## Test ids
 

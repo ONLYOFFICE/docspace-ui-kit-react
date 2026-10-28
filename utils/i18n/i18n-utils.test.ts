@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 
 import { getCommonTranslation } from "./i18n-utils";
 
@@ -16,6 +16,68 @@ const identityT = (key: string) => key;
 describe("getCommonTranslation", () => {
   afterEach(() => {
     delete (window as MutableWindow).i18n;
+  });
+
+  it("returns an empty string and logs nothing without window.i18n", () => {
+    // test/setup.ts mounts translations for the whole run.
+    delete (window as MutableWindow).i18n;
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      expect(getCommonTranslation("CloseButton")).toBe("");
+      expect(error).not.toHaveBeenCalled();
+    } finally {
+      error.mockRestore();
+    }
+  });
+
+  // The portal creates window.i18n before it fetches the bundles, and its
+  // loading spinner asks for a Common label in between.
+  it("logs nothing while the namespace's bundle has not arrived", () => {
+    (window as MutableWindow).i18n = {
+      t: (_key: string, options?: { defaultValue?: string }) =>
+        options?.defaultValue ?? _key,
+      instance: { language: "en" },
+      loaded: {},
+    };
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      expect(getCommonTranslation("LoadingProcessing")).toBe("");
+      expect(error).not.toHaveBeenCalled();
+    } finally {
+      error.mockRestore();
+    }
+  });
+
+  it("still logs a key missing from a loaded combined bundle", () => {
+    (window as MutableWindow).i18n = {
+      t: (_key: string, options?: { defaultValue?: string }) =>
+        options?.defaultValue ?? _key,
+      instance: { language: "en" },
+      loaded: {
+        "/locales/en/_combined.json": { data: { Common: { Other: "Other" } } },
+      },
+    };
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      expect(getCommonTranslation("CloseButton")).toBe("");
+      expect(error).toHaveBeenCalledTimes(1);
+    } finally {
+      error.mockRestore();
+    }
+  });
+
+  it("logs a key missing from the translations that are loaded", () => {
+    (window as MutableWindow).i18n = {
+      loaded: { "en/Common.json": { data: { Other: "Other" } } },
+    };
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      expect(getCommonTranslation("CloseButton")).toBe("");
+      expect(error).toHaveBeenCalledTimes(1);
+      expect(error.mock.calls[0][0]).toContain('"CloseButton"');
+    } finally {
+      error.mockRestore();
+    }
   });
 
   it("resolves a Common key from the combined _combined.json bundle", () => {

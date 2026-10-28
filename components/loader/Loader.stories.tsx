@@ -1,5 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, within, waitFor } from "storybook/test";
 
 import { Loader } from ".";
 import { LoaderTypes } from "./Loader.enums";
@@ -21,9 +22,9 @@ const meta = {
       control: "select",
       options: Object.values(LoaderTypes),
       description:
-        "Which animation to draw: `oval`, `dual-ring`, `rombs` or `track`; `base` or no value renders `label` as plain text instead",
+        "Which animation to draw: `oval` (the default), `dual-ring`, `rombs` or `track`; `base` renders `label` as plain text instead",
       table: {
-        defaultValue: { summary: "undefined" },
+        defaultValue: { summary: "oval" },
       },
     },
     color: {
@@ -88,6 +89,8 @@ type Story = StoryObj<ComponentProps<typeof Loader>>;
 
 export default meta;
 
+const widthOf = (el: Element) => Math.round(el.getBoundingClientRect().width);
+
 const Wrapper = (props: { children: React.ReactNode }) => {
   return (
     <div
@@ -128,11 +131,21 @@ export const Default: Story = {
     size: "18px",
     label: "Loading content, please wait...",
   },
+  play: async ({ canvas }) => {
+    // base renders the label as text at `size`, inside a status region.
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent(
+        "Loading content, please wait...",
+      ),
+    );
+    const text = canvas.getByText("Loading content, please wait...");
+    await expect(getComputedStyle(text).fontSize).toBe("18px");
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "A line of plain text instead of an animation, for a place where a moving spinner would distract: this is what you get with `type` set to `base` or left out, so pick an animation explicitly when you want one. Change any other prop live in the Controls panel below.",
+          "A line of plain text instead of an animation, for a place where a moving spinner would distract: this is what you get with `type` set to `base`; left out, `type` draws the oval. Change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<Loader type={LoaderTypes.base} size="18px" label="Loading content, please wait..." />`,
@@ -148,6 +161,15 @@ export const Oval: Story = {
     size: "40px",
     color: globalColors.loaderLight,
     label: "Loading...",
+  },
+  play: async ({ canvas }) => {
+    // The animation is decorative; the label is the status region's text.
+    const oval = canvas.getByTestId("oval-loader");
+    await expect(oval).toHaveAttribute("aria-hidden", "true");
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent("Loading..."),
+    );
+    await expect(widthOf(oval)).toBe(40);
   },
   parameters: {
     docs: {
@@ -167,8 +189,17 @@ export const DualRing: Story = {
   args: {
     type: LoaderTypes.dualRing,
     size: "40px",
-    color: "#333333",
     label: "Loading...",
+  },
+  play: async ({ canvas }) => {
+    // No built-in "dual ring" title: the label is what is read.
+    const ring = canvas.getByTestId("dual-ring-loader");
+    await expect(ring).toHaveAttribute("aria-hidden", "true");
+    await expect(ring.querySelector("title")).toBeNull();
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent("Loading..."),
+    );
+    await expect(widthOf(ring)).toBe(40);
   },
   parameters: {
     docs: {
@@ -176,7 +207,7 @@ export const DualRing: Story = {
         story: "Dual ring animation with two concentric spinning rings.",
       },
       source: {
-        code: `<Loader type={LoaderTypes.dualRing} size="40px" color="#333333" />`,
+        code: `<Loader type={LoaderTypes.dualRing} size="40px" />`,
       },
     },
   },
@@ -202,6 +233,14 @@ export const Rombs: Story = {
     size: "65px",
     label: "Loading...",
   },
+  play: async ({ canvas }) => {
+    // Three decorative diamonds; the label is read like any other type's.
+    const rombs = canvas.getByTestId("rombs-loader");
+    await expect(rombs).toHaveAttribute("aria-hidden", "true");
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent("Loading..."),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -221,6 +260,14 @@ export const Track: Story = {
     type: LoaderTypes.track,
     size: "30px",
     label: "Loading...",
+  },
+  play: async ({ canvas }) => {
+    const track = canvas.getByTestId("track-loader");
+    await expect(track).toHaveAttribute("aria-hidden", "true");
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent("Loading..."),
+    );
+    await expect(widthOf(track)).toBe(30);
   },
   parameters: {
     docs: {
@@ -257,7 +304,15 @@ const AllTypesTemplate = () => {
       </LabeledItem>
       <LabeledItem label="Rombs">
         {/* The diamonds are positioned absolutely and bounce by 120px */}
-        <div style={{ position: "relative", width: "130px", height: "190px" }}>
+        <div
+          style={{
+            position: "relative",
+            boxSizing: "border-box",
+            width: "130px",
+            height: "190px",
+            paddingInlineStart: "33px",
+          }}
+        >
           <Loader type={LoaderTypes.rombs} size="65px" label="Rombs loader" />
         </div>
       </LabeledItem>
@@ -270,6 +325,18 @@ const AllTypesTemplate = () => {
 
 export const AllTypes: Story = {
   render: () => <AllTypesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getAllByTestId("loader")).toHaveLength(5);
+    for (const id of [
+      "oval-loader",
+      "dual-ring-loader",
+      "rombs-loader",
+      "track-loader",
+    ]) {
+      await expect(canvas.getByTestId(id)).toBeInTheDocument();
+    }
+    await expect(canvas.getByText("Base loader")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -320,6 +387,12 @@ const CustomColorsTemplate = () => {
 
 export const CustomColors: Story = {
   render: () => <CustomColorsTemplate />,
+  play: async ({ canvas }) => {
+    // color reaches the ring strokes.
+    const [orange] = canvas.getAllByTestId("dual-ring-loader");
+    const stroked = orange.querySelector("[stroke]") as Element;
+    await expect(getComputedStyle(stroked).stroke).toBe("rgb(255, 87, 34)");
+  },
   parameters: {
     docs: {
       description: {
@@ -369,6 +442,10 @@ const DifferentSizesTemplate = () => {
 
 export const DifferentSizes: Story = {
   render: () => <DifferentSizesTemplate />,
+  play: async ({ canvas }) => {
+    const widths = canvas.getAllByTestId("oval-loader").map(widthOf);
+    await expect(widths).toEqual([24, 40, 60]);
+  },
   parameters: {
     docs: {
       description: {
@@ -389,7 +466,13 @@ export const OnPrimaryButton: Story = {
     <div
       style={{
         display: "inline-flex",
-        padding: "10px 24px",
+        alignItems: "center",
+        justifyContent: "center",
+        boxSizing: "border-box",
+        minWidth: "100px",
+        height: "32px",
+        padding: "0 28px",
+        lineHeight: 0,
         borderRadius: "3px",
         background: "var(--color-scheme-main-buttons)",
       }}
@@ -403,6 +486,15 @@ export const OnPrimaryButton: Story = {
     primary: true,
     id: "primary-track",
     label: "Saving",
+  },
+  play: async ({ canvas }) => {
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent("Saving"),
+    );
+    await expect(canvas.getByTestId("loader")).toHaveAttribute(
+      "id",
+      "primary-track",
+    );
   },
   parameters: {
     docs: {
@@ -443,6 +535,12 @@ const DisabledStateTemplate = () => {
 
 export const DisabledState: Story = {
   render: () => <DisabledStateTemplate />,
+  play: async ({ canvas }) => {
+    // The disabled track is dimmed to 60%.
+    const [enabled, disabled] = canvas.getAllByTestId("track-loader");
+    await expect(getComputedStyle(enabled).opacity).toBe("1");
+    await expect(getComputedStyle(disabled).opacity).toBe("0.6");
+  },
   parameters: {
     docs: {
       description: {
@@ -489,6 +587,14 @@ export const CssCustomization: Story = {
       />
     </div>
   ),
+  play: async ({ canvas }) => {
+    // --loader-size reaches every instance without a size of its own.
+    await expect(widthOf(canvas.getByTestId("oval-loader"))).toBe(50);
+    const disabled = within(canvas.getAllByTestId("loader")[3]).getByTestId(
+      "track-loader",
+    );
+    await expect(getComputedStyle(disabled).opacity).toBe("0.25");
+  },
   parameters: {
     docs: {
       description: {

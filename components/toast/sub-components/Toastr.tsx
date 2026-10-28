@@ -7,13 +7,11 @@ import classNames from "classnames";
 import CheckToastReactSvg from "../../../assets/check.toast.react.svg";
 import DangerToastReactSvg from "../../../assets/danger.toast.react.svg";
 import InfoToastReactSvg from "../../../assets/info.toast.react.svg";
-import CrossIconReactSvg from "../../../assets/icons/12/cross.react.svg";
 
 import { IconSizeType } from "../../../utils/common-icons-style";
 import { getCommonTranslation } from "../../../utils/i18n";
 
 import { Text } from "../../text";
-import { IconButton } from "../../icon-button";
 
 import { ToastType } from "../Toast.enums";
 import type { TData } from "../Toast.types";
@@ -67,15 +65,6 @@ const Icon = ({ type, size }: { type: ToastType; size: IconSizeType }) => {
   return iconMap[type] || iconMap[ToastType.info];
 };
 
-const CloseButton = ({ closeToast }: { closeToast?: () => void }) => (
-  <IconButton
-    className={`${styles.iconButton} closeButton`}
-    onClick={closeToast}
-    iconNode={<CrossIconReactSvg />}
-    size={12}
-  />
-);
-
 const createToastContent = (
   type: ToastType,
   data: string | React.ReactNode,
@@ -108,8 +97,10 @@ const getToastOptions = (
   return {
     data,
     type,
+    // Every toast gets the container's close button. Without `withCross` the
+    // toast closes on click and the button is visually hidden until it is
+    // focused, so the keyboard can still close it.
     closeOnClick: !withCross,
-    closeButton: withCross && <CloseButton />,
     autoClose: (timeout === 0
       ? false
       : timeout < MIN_TIMEOUT_THRESHOLD
@@ -151,6 +142,14 @@ const processErrorData = (
   }
 
   if (
+    typeof data === "number" ||
+    typeof data === "bigint" ||
+    typeof data === "boolean"
+  ) {
+    return String(data);
+  }
+
+  if (
     data &&
     typeof data === "object" &&
     ("response" in data || "statusText" in data || "message" in data)
@@ -161,6 +160,22 @@ const processErrorData = (
       data?.message ||
       ""
     );
+  }
+
+  // Any other object is shown through its own toString(), if it has one
+  // (a URL, a custom error class); a plain object has nothing to show, and
+  // neither has one without a prototype, whose toString is undefined.
+  if (
+    data &&
+    typeof data === "object" &&
+    typeof data.toString === "function" &&
+    data.toString !== Object.prototype.toString
+  ) {
+    try {
+      return String(data);
+    } catch {
+      return "";
+    }
   }
 
   return "";
@@ -177,10 +192,14 @@ const createToastMethod =
   ) => {
     const message = processErrorData(data);
     const config = TOAST_CONFIGS[type];
+    // Without a TranslationProvider the lookup returns "", and the English
+    // value of each default title key is the key itself.
     const finalTitle =
       title === null
         ? ""
-        : (title ?? getCommonTranslation(config.defaultTitleKey) ?? "");
+        : (title ??
+          (getCommonTranslation(config.defaultTitleKey) ||
+            config.defaultTitleKey));
 
     return notify(
       type,

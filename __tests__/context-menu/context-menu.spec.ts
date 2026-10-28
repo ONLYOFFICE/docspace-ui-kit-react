@@ -12,8 +12,40 @@ async function gotoStory(page: Page, storyId: string) {
     state: "attached",
   });
   await expect(page.locator("body")).not.toHaveClass(/sb-show-errordisplay/);
+  // Screenshot the end state: wait until the story's play function, if it
+  // has one, is done (playDelay.ts runs it at full speed under Playwright).
+  // Under load Storybook may render the story a second time and run play
+  // again, so the render has to stay finished for a while, not just get there.
+  await page.waitForFunction(
+    () => {
+      const w = window as {
+        __STORYBOOK_PREVIEW__?: { currentRender?: { phase?: string } };
+        __settled?: { render: unknown; since: number };
+      };
+      const render = w.__STORYBOOK_PREVIEW__?.currentRender;
+      if (render?.phase !== "finished") {
+        w.__settled = undefined;
+        return false;
+      }
+      if (w.__settled?.render !== render) {
+        w.__settled = { render, since: performance.now() };
+      }
+      return performance.now() - w.__settled.since > 500;
+    },
+    undefined,
+    { polling: 50 },
+  );
   await page.waitForSelector("#storybook-root", { state: "visible" });
   await page.waitForLoadState("networkidle");
+  // A tooltip or menu the play function left open was placed before the
+  // web font arrived, a pixel off where it lands once the text settles; have
+  // it place itself again on the final layout. floating-ui's autoUpdate, which
+  // react-tooltip uses, listens for scroll, not resize.
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    window.dispatchEvent(new Event("resize"));
+    window.dispatchEvent(new Event("scroll"));
+  });
 }
 
 test.describe("ContextMenu — light", () => {
@@ -42,27 +74,35 @@ test.describe("ContextMenu — light", () => {
 });
 
 test.describe("ContextMenu — dark", () => {
+  // The theme is set the way the dark-mode toolbar sets it, so the preview
+  // decorator paints the story's surface and ThemeProvider themes it; a
+  // class on <body> alone leaves a dark component on a white page.
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        "sb-addon-themes-3",
+        JSON.stringify({ current: "dark" }),
+      );
+    });
+  });
+
   test("default dark", async ({ page }) => {
     await gotoStory(page, "default");
-    await page.evaluate(() => document.body.classList.add("dark"));
     await expect(page).toHaveScreenshot("context-menu-default-dark.png");
   });
 
   test("simple menu dark", async ({ page }) => {
     await gotoStory(page, "simple-menu");
-    await page.evaluate(() => document.body.classList.add("dark"));
     await expect(page).toHaveScreenshot("context-menu-simple-menu-dark.png");
   });
 
   test("with backdrop dark", async ({ page }) => {
     await gotoStory(page, "with-backdrop");
-    await page.evaluate(() => document.body.classList.add("dark"));
     await expect(page).toHaveScreenshot("context-menu-with-backdrop-dark.png");
   });
 
   test("css customization dark", async ({ page }) => {
     await gotoStory(page, "css-customization");
-    await page.evaluate(() => document.body.classList.add("dark"));
     await page.click('[data-testid="trigger"]', { button: "right" });
     const menu = page.locator(".p-contextmenu").first();
     await menu.waitFor({ state: "visible" });
@@ -84,8 +124,16 @@ const MOBILE_VIEWPORT = { width: 320, height: 568 };
 async function openMobileMenu(page: Page, storyId: string) {
   await page.setViewportSize(MOBILE_VIEWPORT);
   await gotoStory(page, storyId);
-  await page.click('[data-testid="trigger"]');
-  await page.locator(".p-contextmenu").first().waitFor({ state: "visible" });
+  // The story's play function opens the sheet itself, and its backdrop then
+  // swallows a click on the trigger; click only while the sheet is shut, and
+  // retry, since the play function may still be on its way to opening it.
+  const menu = page.locator(".p-contextmenu").first();
+  await expect(async () => {
+    if (!(await menu.isVisible())) {
+      await page.click('[data-testid="trigger"]', { timeout: 1000 });
+    }
+    await expect(menu).toBeVisible({ timeout: 1000 });
+  }).toPass();
 }
 
 test.describe("ContextMenu — item variants (light)", () => {
@@ -136,9 +184,20 @@ test.describe("ContextMenu — item variants (light)", () => {
 });
 
 test.describe("ContextMenu — item variants (dark)", () => {
+  // The theme is set the way the dark-mode toolbar sets it, so the preview
+  // decorator paints the story's surface and ThemeProvider themes it; a
+  // class on <body> alone leaves a dark component on a white page.
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        "sb-addon-themes-3",
+        JSON.stringify({ current: "dark" }),
+      );
+    });
+  });
+
   test("with item descriptions dark", async ({ page }) => {
     await gotoStory(page, "with-item-descriptions");
-    await page.evaluate(() => document.body.classList.add("dark"));
     const menu = await openMenu(page);
     await expect(menu).toHaveScreenshot(
       "context-menu-with-item-descriptions-dark.png",
@@ -147,24 +206,18 @@ test.describe("ContextMenu — item variants (dark)", () => {
 
   test("item variants dark", async ({ page }) => {
     await gotoStory(page, "item-variants");
-    await page.evaluate(() => document.body.classList.add("dark"));
     const menu = await openMenu(page);
     await expect(menu).toHaveScreenshot("context-menu-item-variants-dark.png");
   });
 
   test("max height dark", async ({ page }) => {
     await gotoStory(page, "max-height");
-    await page.evaluate(() => document.body.classList.add("dark"));
     const menu = await openMenu(page);
     await expect(menu).toHaveScreenshot("context-menu-max-height-dark.png");
   });
 
   test("mobile with header dark", async ({ page }) => {
-    await page.setViewportSize(MOBILE_VIEWPORT);
-    await gotoStory(page, "mobile-with-header");
-    await page.evaluate(() => document.body.classList.add("dark"));
-    await page.click('[data-testid="trigger"]');
-    await page.locator(".p-contextmenu").first().waitFor({ state: "visible" });
+    await openMobileMenu(page, "mobile-with-header");
     await expect(page).toHaveScreenshot(
       "context-menu-mobile-with-header-dark.png",
     );

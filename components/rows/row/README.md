@@ -218,6 +218,8 @@ export function LockedRow({ name }: { name: string }) {
 - The context menu opens on right-click or from a [`ContextMenuButton`](../../context-menu-button/README.md),
   which is itself a `<div>` — there is no keyboard route to it.
 - Nothing announces selection: the row carries no `aria-selected`, only a class.
+- `inProgress` sets `aria-busy="true"` on the row; the spinner it shows is decorative, so the
+  busy state is announced once, by the row.
 
 ## Test ids
 

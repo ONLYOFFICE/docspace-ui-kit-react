@@ -1,22 +1,20 @@
 import type { ComponentProps } from "react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
-import { useArgs } from "storybook/preview-api";
-import { fn } from "storybook/test";
+import { expect, fireEvent, fn, screen, waitFor, within } from "storybook/test";
 
 import ViewRowsReactSvg from "../../assets/view-rows.react.svg";
 import ViewTilesReactSvg from "../../assets/view-tiles.react.svg";
+import FileCells, { storyFiles } from "../../.storybook/utils/FileCells";
 import { DeviceType, FilterGroups, SortByFieldName } from "../../enums";
+import {
+  deviceFor,
+  useWindowDevice,
+} from "../../.storybook/utils/useWindowDevice";
 import Filter from "../filter";
 import Navigation from "../navigation/Navigation";
-import {
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHeader,
-  TableRow,
-} from "../table";
+import { TableBody, TableContainer, TableHeader, TableRow } from "../table";
 import { Tabs } from "../tabs";
 import { Text } from "../text";
 import type { Operation } from "../operations-progress-button/OperationsProgressButton.types";
@@ -374,6 +372,12 @@ const COLUMN_INFO_PANEL_STORAGE_NAME = "section-story-columns-info";
 
 const noop = () => {};
 
+const part = (root: HTMLElement, selector: string) =>
+  root.querySelector<HTMLElement>(selector);
+
+const rect = (root: HTMLElement, selector: string) =>
+  (part(root, selector) as HTMLElement).getBoundingClientRect();
+
 const mockNavigationItems = [
   { id: "1", title: "Documents", isRootRoom: false },
   { id: "2", title: "Shared with me", isRootRoom: false },
@@ -448,18 +452,7 @@ const mockColumns = [
   },
 ];
 
-const mockFiles = [
-  { name: "Annual Report 2025.docx", type: "Document", tags: "Finance" },
-  { name: "Q4 Budget.xlsx", type: "Spreadsheet", tags: "Finance" },
-  { name: "Team Presentation.pptx", type: "Presentation", tags: "Marketing" },
-  { name: "Logo Design.png", type: "Image", tags: "Design" },
-  { name: "Meeting Notes.docx", type: "Document", tags: "General" },
-  { name: "Product Roadmap.pdf", type: "PDF", tags: "Product" },
-  { name: "User Research.docx", type: "Document", tags: "UX" },
-  { name: "Sprint Backlog.xlsx", type: "Spreadsheet", tags: "Engineering" },
-  { name: "Brand Guidelines.pdf", type: "PDF", tags: "Marketing" },
-  { name: "Architecture Diagram.png", type: "Image", tags: "Engineering" },
-];
+const mockFiles = storyFiles;
 
 const NavigationHeader = ({
   device = DeviceType.desktop,
@@ -574,9 +567,7 @@ const TableContent = () => {
 
   const rows = mockFiles.map((file) => (
     <TableRow key={`row-${file.name}`}>
-      <TableCell>{file.name}</TableCell>
-      <TableCell>{file.type}</TableCell>
-      <TableCell>{file.tags}</TableCell>
+      <FileCells file={file} />
     </TableRow>
   ));
 
@@ -623,10 +614,16 @@ const sectionLabelStyle: React.CSSProperties = {
   pointerEvents: "none",
 };
 
-export const Default: Story = {
-  render: (args) => (
-    <div style={{ width: "100%", height: "600px" }}>
-      <Section {...args}>
+const DefaultPage = (args: ComponentProps<typeof Section>) => {
+  const device = useWindowDevice();
+  const isDesktop = device === DeviceType.desktop;
+
+  return (
+    <div style={{ display: "flex", width: "100%", height: "600px" }}>
+      <Section
+        {...args}
+        currentDeviceType={isDesktop ? args.currentDeviceType : device}
+      >
         <Section.SectionHeader>
           <div
             style={{
@@ -634,7 +631,7 @@ export const Default: Story = {
               border: "2px dashed #2196F3",
               borderRadius: "4px",
               position: "relative",
-              background: "white",
+              background: "var(--background-color)",
               zIndex: 202,
             }}
           >
@@ -642,12 +639,12 @@ export const Default: Story = {
               style={{
                 ...sectionLabelStyle,
                 color: "#2196F3",
-                backgroundColor: "#E3F2FD",
+                backgroundColor: "light-dark(#E3F2FD, #132a3d)",
               }}
             >
               Header
             </span>
-            <NavigationHeader />
+            <NavigationHeader device={device} />
           </div>
         </Section.SectionHeader>
         <Section.SectionFilter>
@@ -657,7 +654,7 @@ export const Default: Story = {
               border: "2px dashed #FF9800",
               borderRadius: "4px",
               position: "relative",
-              background: "white",
+              background: "var(--background-color)",
               zIndex: 202,
             }}
           >
@@ -665,18 +662,17 @@ export const Default: Story = {
               style={{
                 ...sectionLabelStyle,
                 color: "#FF9800",
-                backgroundColor: "#FFF3E0",
+                backgroundColor: "light-dark(#FFF3E0, #3d2a14)",
               }}
             >
               Filter
             </span>
-            <FilterContent />
+            <FilterContent device={device} />
           </div>
         </Section.SectionFilter>
         <Section.SectionBody>
           <div
             style={{
-              marginLeft: "-20px",
               marginTop: "8px",
               border: "2px dashed #4CAF50",
               borderRadius: "4px",
@@ -687,25 +683,54 @@ export const Default: Story = {
               style={{
                 ...sectionLabelStyle,
                 color: "#4CAF50",
-                backgroundColor: "#E8F5E9",
+                backgroundColor: "light-dark(#E8F5E9, #1b3320)",
               }}
             >
               Body
             </span>
-            <TableContent />
+            {isDesktop ? <TableContent /> : <ListContent />}
           </div>
         </Section.SectionBody>
         <Section.SectionFooter>{null}</Section.SectionFooter>
       </Section>
     </div>
-  ),
+  );
+};
+
+export const Default: Story = {
+  render: (args) => <DefaultPage {...args} />,
   args: {
     currentDeviceType: DeviceType.desktop,
     withBodyScroll: true,
     settingsStudio: false,
     isInfoPanelAvailable: false,
   },
+  play: async ({ canvasElement }) => {
+    if (deviceFor(window.innerWidth) !== DeviceType.desktop) {
+      const body = part(canvasElement, ".section-body") as HTMLElement;
+      await expect(within(body).getByText("My Documents")).toBeVisible();
+      await expect(part(body, ".section-body_filter")).not.toBeNull();
+      return;
+    }
+    const sticky = part(
+      canvasElement,
+      ".section-sticky-container",
+    ) as HTMLElement;
+    // Header and filter are pinned above the scrolling body.
+    const header = part(sticky, ".section-header_header") as HTMLElement;
+    await expect(within(header).getByText("My Documents")).toBeVisible();
+    const filter = part(sticky, ".section-header_filter") as HTMLElement;
+    await expect(
+      within(filter).getByPlaceholderText("Search..."),
+    ).toBeVisible();
+    await expect(getComputedStyle(sticky).position).toBe("sticky");
+    const scroll = part(canvasElement, ".section-scroll") as HTMLElement;
+    await expect(within(scroll).getByText("Annual Report 2025")).toBeVisible();
+    await expect(part(canvasElement, "#InfoPanelWrapper")).toBeNull();
+  },
   parameters: {
+    layout: "fullscreen",
+    noPadding: true,
     docs: {
       description: {
         story:
@@ -812,6 +837,17 @@ export const WithInfoPanel: Story = {
     canDisplay: true,
     isInfoPanelVisible: true,
   },
+  play: async ({ canvasElement }) => {
+    const panel = part(canvasElement, "#InfoPanelWrapper") as HTMLElement;
+    await expect(panel).toBeVisible();
+    await expect(
+      within(panel).getByText("Document · 42 KB · modified yesterday"),
+    ).toBeVisible();
+    // Beside the section, on its right.
+    await expect(panel.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+      rect(canvasElement, "#section").right - 1,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -846,17 +882,23 @@ export const WithInfoPanel: Story = {
   },
 };
 
-// A resize drag writes its width back into the control.
-const renderChatPanel = (args: ComponentProps<typeof Section>) => {
-  const [, updateArgs] = useArgs();
+// A resize drag keeps its width in the story's own state: writing it into the
+// args re-renders the story, which clears the spies a play is checking.
+const ChatPanelStory = (args: ComponentProps<typeof Section>) => {
+  const [width, setWidth] = useState(args.chatPanelWidth);
+
+  useEffect(() => {
+    setWidth(args.chatPanelWidth);
+  }, [args.chatPanelWidth]);
 
   return (
     <PageFrame>
       <Section
         {...args}
+        chatPanelWidth={width}
         setChatPanelWidth={(value) => {
           args.setChatPanelWidth?.(value);
-          updateArgs({ chatPanelWidth: value });
+          setWidth(value);
         }}
       >
         <Section.SectionHeader>
@@ -879,7 +921,7 @@ const renderChatPanel = (args: ComponentProps<typeof Section>) => {
 };
 
 export const WithChatPanel: Story = {
-  render: renderChatPanel,
+  render: (args) => <ChatPanelStory {...args} />,
   args: {
     currentDeviceType: DeviceType.desktop,
     withBodyScroll: true,
@@ -888,6 +930,30 @@ export const WithChatPanel: Story = {
     isChatPanelVisible: true,
     isChatPanelResizable: true,
     chatPanelWidth: 400,
+  },
+  play: async ({ args, canvasElement }) => {
+    const panel = part(canvasElement, "#ChatPanelWrapper") as HTMLElement;
+    await expect(within(panel).getByText("Chat")).toBeVisible();
+    await expect(getComputedStyle(panel).width).toBe("400px");
+
+    // Dragging the inner edge to the left widens the panel; the width is
+    // reported once, on release. The drag measures the panel's content box,
+    // not its rect with the 1px border, so it lands on exactly 440.
+    const resizer = within(panel).getByTestId("chat-panel-resizer");
+    const x = resizer.getBoundingClientRect().left + 2;
+    fireEvent.mouseDown(resizer, { button: 0, clientX: x });
+    fireEvent.mouseMove(window, { clientX: x - 40 });
+    await expect(getComputedStyle(panel).width).toBe("440px");
+    await expect(args.setChatPanelWidth).not.toHaveBeenCalled();
+    fireEvent.mouseUp(window);
+    await expect(args.setChatPanelWidth).toHaveBeenCalledTimes(1);
+    await expect(args.setChatPanelWidth).toHaveBeenLastCalledWith(440);
+
+    // A grab released without moving commits the width unchanged.
+    const x2 = resizer.getBoundingClientRect().left + 2;
+    fireEvent.mouseDown(resizer, { button: 0, clientX: x2 });
+    fireEvent.mouseUp(window);
+    await expect(args.setChatPanelWidth).toHaveBeenLastCalledWith(440);
   },
   parameters: {
     docs: {
@@ -955,6 +1021,21 @@ export const WithBanner: Story = {
     settingsStudio: false,
     scrollableBanner: false,
   },
+  play: async ({ canvasElement }) => {
+    const banner = part(canvasElement, ".section-banner") as HTMLElement;
+    await expect(
+      within(banner).getByText(
+        "Scheduled maintenance tonight from 22:00 to 23:00.",
+      ),
+    ).toBeVisible();
+    // Above the header and outside the scrolling body.
+    await expect(banner.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+      rect(canvasElement, ".section-header_header").top + 1,
+    );
+    await expect(
+      (part(canvasElement, ".section-scroll") as HTMLElement).contains(banner),
+    ).toBe(false);
+  },
   parameters: {
     docs: {
       description: {
@@ -1009,6 +1090,18 @@ export const WithSubmenu: Story = {
     withBodyScroll: true,
     settingsStudio: false,
   },
+  play: async ({ canvasElement }) => {
+    // Pinned with the header, under it.
+    const sticky = part(
+      canvasElement,
+      ".section-sticky-container",
+    ) as HTMLElement;
+    const tabs = part(sticky, ".section-tabs") as HTMLElement;
+    await expect(within(tabs).getByText("Recent")).toBeVisible();
+    await expect(tabs.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+      rect(sticky, ".section-header_header").bottom - 1,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -1056,6 +1149,15 @@ export const WithOperationsProgress: Story = {
     secondaryActiveOperations: runningOperation,
     secondaryOperationsCompleted: false,
   },
+  play: async ({ canvasElement, userEvent }) => {
+    const button = part(canvasElement, ".layout-progress-bar") as HTMLElement;
+    await expect(button).toBeVisible();
+    // Hovering it lists what is running.
+    await userEvent.hover(button);
+    await waitFor(() =>
+      expect(screen.getByText("Copying 3 items")).toBeVisible(),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -1084,9 +1186,12 @@ export const WithOperationsProgress: Story = {
   },
 };
 
+const onBodyUpload = fn();
+const onBodyCreate = fn();
+
 const getBodyContextModel = () => [
-  { key: "upload", label: "Upload file", onClick: fn() },
-  { key: "create", label: "New folder", onClick: fn() },
+  { key: "upload", label: "Upload file", onClick: onBodyUpload },
+  { key: "create", label: "New folder", onClick: onBodyCreate },
 ];
 
 export const WithContextMenu: Story = {
@@ -1107,6 +1212,33 @@ export const WithContextMenu: Story = {
     withBodyScroll: true,
     settingsStudio: false,
     getContextModel: getBodyContextModel,
+  },
+  beforeEach: () => {
+    onBodyUpload.mockClear();
+    onBodyCreate.mockClear();
+  },
+  play: async ({ canvas, userEvent }) => {
+    // A right click outside the body opens nothing.
+    await userEvent.pointer({
+      keys: "[MouseRight]",
+      target: canvas.getByText("My Documents"),
+    });
+    await expect(
+      screen.queryByRole("menuitem", { name: "Upload file" }),
+    ).toBeNull();
+
+    await userEvent.pointer({
+      keys: "[MouseRight]",
+      target: canvas.getByText("Meeting Notes.docx"),
+    });
+    const upload = await screen.findByRole("menuitem", { name: "Upload file" });
+    await waitFor(() => expect(upload).toBeVisible());
+    await expect(
+      screen.getByRole("menuitem", { name: "New folder" }),
+    ).toBeVisible();
+    await userEvent.click(upload);
+    await expect(onBodyUpload).toHaveBeenCalledTimes(1);
+    await expect(onBodyCreate).not.toHaveBeenCalled();
   },
   parameters: {
     noPadding: true,
@@ -1162,6 +1294,19 @@ export const OnTablet: Story = {
     withBodyScroll: true,
     settingsStudio: false,
   },
+  play: async ({ canvasElement }) => {
+    // The header stays pinned; the filter moves into the scrolling body.
+    const sticky = part(
+      canvasElement,
+      ".section-sticky-container",
+    ) as HTMLElement;
+    await expect(part(sticky, ".section-header_header")).not.toBeNull();
+    await expect(part(sticky, ".section-header_filter")).toBeNull();
+    const filter = part(canvasElement, ".section-body_filter") as HTMLElement;
+    await expect(
+      (part(canvasElement, ".section-body") as HTMLElement).contains(filter),
+    ).toBe(true);
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -1212,6 +1357,14 @@ export const OnPhone: Story = {
     currentDeviceType: DeviceType.mobile,
     withBodyScroll: true,
     settingsStudio: false,
+  },
+  play: async ({ canvasElement }) => {
+    // Nothing is pinned: header and filter both scroll with the body.
+    await expect(part(canvasElement, ".section-sticky-container")).toBeNull();
+    const body = part(canvasElement, ".section-body") as HTMLElement;
+    const header = part(body, ".section-body_header") as HTMLElement;
+    await expect(within(header).getByText("My Documents")).toBeVisible();
+    await expect(part(body, ".section-body_filter")).not.toBeNull();
   },
   parameters: {
     noPadding: true,
@@ -1269,6 +1422,13 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvasElement }) => {
+    // The info panel opens on the left of the section.
+    const panel = rect(canvasElement, "#InfoPanelWrapper");
+    await expect(panel.right).toBeLessThanOrEqual(
+      rect(canvasElement, "#section").left + 1,
+    );
+  },
   args: {
     currentDeviceType: DeviceType.desktop,
     withBodyScroll: true,
@@ -1324,18 +1484,19 @@ export const CssCustomization: Story = {
           width: "100%",
           height: "600px",
           // === Section — pinned header strip ===
-          "--section-bg": "#e6f3fb",
+          "--section-bg": "light-dark(#e6f3fb, #16303e)",
           "--section-header-size": "56px",
           "--section-footer-margin": "24px",
           // === Info panel ===
-          "--info-panel-background": "#f5fbff",
+          "--info-panel-background": "light-dark(#f5fbff, #132530)",
           "--info-panel-border-color": "#0082c9",
           "--info-panel-width": "300px",
           // === Chat panel ===
-          "--chat-panel-background": "#fff8e6",
+          "--chat-panel-background": "light-dark(#fff8e6, #3a2f12)",
           "--chat-panel-border-color": "#c98a00",
           "--chat-panel-width": "300px",
-          "--chat-panel-drop-overlay-background": "#fff1cc",
+          "--chat-panel-drop-overlay-background":
+            "light-dark(#fff1cc, #4a3a12)",
           "--chat-panel-drop-border-color": "#c98a00",
           "--chat-panel-drop-inset-top": "72px",
         } as React.CSSProperties
@@ -1374,6 +1535,21 @@ export const CssCustomization: Story = {
     isChatPanelVisible: true,
     chatPanelDropTargetLabel: "Drop here to attach",
   },
+  play: async ({ canvasElement }) => {
+    const info = part(canvasElement, "#InfoPanelWrapper") as HTMLElement;
+    // The width goes to the panel inside the wrapper.
+    const infoPanel = info.firstElementChild as HTMLElement;
+    await expect(getComputedStyle(infoPanel).width).toBe("300px");
+    await expect(getComputedStyle(infoPanel).backgroundColor).toBe(
+      "rgb(245, 251, 255)",
+    );
+    const chat = part(canvasElement, "#ChatPanelWrapper") as HTMLElement;
+    await expect(getComputedStyle(chat).width).toBe("300px");
+    await expect(getComputedStyle(chat).backgroundColor).toBe(
+      "rgb(255, 248, 230)",
+    );
+    await expect(within(chat).getByText("Drop here to attach")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -1384,16 +1560,16 @@ export const CssCustomization: Story = {
   style={{
     display: "flex",
     height: 600,
-    "--section-bg": "#e6f3fb",
+    "--section-bg": "light-dark(#e6f3fb, #16303e)",
     "--section-header-size": "56px",
     "--section-footer-margin": "24px",
-    "--info-panel-background": "#f5fbff",
+    "--info-panel-background": "light-dark(#f5fbff, #132530)",
     "--info-panel-border-color": "#0082c9",
     "--info-panel-width": "300px",
-    "--chat-panel-background": "#fff8e6",
+    "--chat-panel-background": "light-dark(#fff8e6, #3a2f12)",
     "--chat-panel-border-color": "#c98a00",
     "--chat-panel-width": "300px",
-    "--chat-panel-drop-overlay-background": "#fff1cc",
+    "--chat-panel-drop-overlay-background": "light-dark(#fff1cc, #4a3a12)",
     "--chat-panel-drop-border-color": "#c98a00",
     "--chat-panel-drop-inset-top": "72px",
   }}

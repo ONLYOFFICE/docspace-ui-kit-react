@@ -12,17 +12,20 @@ const Rombs = ({ size = "40px" }: { size?: string }) => {
   return (
     <>
       <div
+        aria-hidden="true"
         data-testid="rombs-loader"
         className={classNames(styles.rombsLoader, styles.blue)}
         style={style}
       />
 
       <div
+        aria-hidden="true"
         className={classNames(styles.rombsLoader, styles.green)}
         style={style}
       />
 
       <div
+        aria-hidden="true"
         className={classNames(styles.rombsLoader, styles.red)}
         style={style}
       />

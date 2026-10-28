@@ -2,19 +2,33 @@ import type { ComponentProps, CSSProperties } from "react";
 
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import { useArgs } from "storybook/preview-api";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import withBundledLogos from "../../.storybook/decorators/withBundledLogos";
+import { useWindowDevice } from "../../.storybook/utils/useWindowDevice";
+import CatalogAiAgentsReactSvgUrl from "../../assets/icons/16/catalog.ai-agents.react.svg?url";
+import CatalogFavoritesReactSvgUrl from "../../assets/icons/16/catalog.favorites.react.svg?url";
+import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
+import CatalogRecentReactSvgUrl from "../../assets/icons/16/catalog-settings-restore.svg?url";
+import CatalogRoomsReactSvgUrl from "../../assets/icons/16/catalog.rooms.react.svg?url";
+import CatalogSharedReactSvgUrl from "../../assets/icons/16/catalog.shared.outline.svg?url";
+import CatalogTrashReactSvgUrl from "../../assets/icons/16/catalog.trash.react.svg?url";
+import ArticleHideMenuIcon from "../../assets/article-hide-menu-icon.react.svg";
+import { useTheme } from "../../context/ThemeContext";
 import {
   DeviceType,
   EmployeeActivationStatus,
   EmployeeStatus,
+  WhiteLabelLogoType,
 } from "../../enums";
+import { getLogoUrl } from "../../utils/getLogoUrl";
 import { Button, ButtonSize } from "../button";
 import type { ContextMenuModel } from "../context-menu";
+import { IconButton } from "../icon-button";
 
 import Article from ".";
 import type { ArticleProps } from "./Article.types";
+import { ArticleItem } from "./item";
 
 const meta = {
   title: "UI/Layout/Article",
@@ -221,6 +235,44 @@ type Story = StoryObj<ComponentProps<typeof Article>>;
 
 export default meta;
 
+const catalog = [
+  { id: "files", text: "Files", icon: CatalogFolderReactSvgUrl },
+  { id: "shared", text: "Shared with me", icon: CatalogSharedReactSvgUrl },
+  { id: "recent", text: "Recent files", icon: CatalogRecentReactSvgUrl },
+  {
+    id: "favorites",
+    text: "Favorite files",
+    icon: CatalogFavoritesReactSvgUrl,
+  },
+  { id: "trash", text: "Trash", icon: CatalogTrashReactSvgUrl },
+  { id: "rooms", text: "Rooms", icon: CatalogRoomsReactSvgUrl },
+  { id: "agents", text: "AI agents", icon: CatalogAiAgentsReactSvgUrl },
+];
+
+// The catalog the portal draws in the body, Files open.
+const ArticleCatalog = ({
+  showText = true,
+  labels,
+}: {
+  showText?: boolean;
+  labels?: string[];
+}) => (
+  <>
+    {catalog.map((item, index) => (
+      <ArticleItem
+        key={item.id}
+        id={item.id}
+        icon={item.icon}
+        text={labels?.[index] ?? item.text}
+        showText={showText}
+        isActive={item.id === "files"}
+        isEndOfBlock={item.id === "trash"}
+        linkData={{ path: "", state: {} }}
+      />
+    ))}
+  </>
+);
+
 const defaultProps: ArticleProps = {
   showText: true,
   setShowText: fn(),
@@ -255,7 +307,7 @@ const defaultProps: ArticleProps = {
   limitedAccessDevToolsForUsers: false,
   children: [
     <Article.Body key="body">
-      <div>Navigation items</div>
+      <ArticleCatalog />
     </Article.Body>,
   ],
 };
@@ -293,16 +345,23 @@ const mockUser = {
   isAnonim: false,
 };
 
+const onProfileAction = fn();
+const onHelpAction = fn();
+const onLogoutAction = fn();
+
 const getActions = () =>
   [
-    { key: "profile", label: "Profile", onClick: fn() },
-    { key: "help", label: "Help", onClick: fn() },
-    { key: "logout", label: "Logout", onClick: fn() },
+    { key: "profile", label: "Profile", onClick: onProfileAction },
+    { key: "help", label: "Help", onClick: onHelpAction },
+    { key: "logout", label: "Logout", onClick: onLogoutAction },
   ] as ContextMenuModel[];
+
+const article = (root: HTMLElement) =>
+  within(root).getByTestId("article") as HTMLElement;
 
 const bodySlot = (
   <Article.Body key="body">
-    <div>Navigation items</div>
+    <ArticleCatalog />
   </Article.Body>
 );
 
@@ -331,6 +390,51 @@ const renderInteractive = (args: ArticleProps) => {
   );
 };
 
+const SidebarHeader = ({
+  showText,
+  toggleShowText,
+}: Pick<ArticleProps, "showText" | "toggleShowText">) => {
+  const { isBase } = useTheme();
+  const logo = getLogoUrl(
+    WhiteLabelLogoType.LightSmall,
+    !isBase,
+    false,
+    "",
+    true,
+  );
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: showText ? "space-between" : "center",
+        gap: "8px",
+        width: "100%",
+      }}
+    >
+      {showText ? (
+        <img
+          className="logo-icon_svg"
+          src={logo}
+          alt="ONLYOFFICE"
+          style={{ height: "24px", maxWidth: "130px", minWidth: 0 }}
+        />
+      ) : null}
+      <IconButton
+        iconNode={<ArticleHideMenuIcon />}
+        size={20}
+        isFill={false}
+        isStroke
+        hoverColor="accent"
+        onClick={toggleShowText}
+        title={showText ? "Hide menu" : "Show menu"}
+        aria-label={showText ? "Hide menu" : "Show menu"}
+      />
+    </div>
+  );
+};
+
 // Docs ignores the viewport preset; give the story a window of its own there.
 const withFrame =
   (width: number, height: number): Decorator =>
@@ -354,6 +458,30 @@ export const Default: Story = {
     getActions,
     children: [bodySlot],
   },
+  beforeEach: () => {
+    onHelpAction.mockClear();
+  },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const panel = article(canvasElement);
+    await expect(panel).toHaveAttribute("data-show-text", "true");
+    await expect(
+      within(panel).getByText("Rooms", { selector: ".articleItemText" }),
+    ).toBeVisible();
+    await expect(canvas.getByTestId("profile_username")).toHaveTextContent(
+      "Team member",
+    );
+
+    // The developer tools entry navigates to its page.
+    await userEvent.click(canvas.getByTestId("dev-tools-bar"));
+    await expect(args.navigate).toHaveBeenCalledWith("/developer-tools");
+
+    // The dots open the profile actions.
+    await userEvent.click(canvas.getByTestId("profile_user_icon_button"));
+    const help = await screen.findByRole("menuitem", { name: "Help" });
+    await waitFor(() => expect(help).toBeVisible());
+    await userEvent.click(help);
+    await expect(onHelpAction).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -369,7 +497,7 @@ export const Default: Story = {
   getActions={getActions}
 >
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -386,6 +514,15 @@ export const WithMainButton: Story = {
     withMainButton: true,
     children: [mainButtonSlot, bodySlot],
   },
+  play: async ({ canvas }) => {
+    // Above the navigation.
+    const button = canvas.getByRole("button", { name: "New document" });
+    await expect(button.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+      canvas
+        .getByText("Files", { selector: ".articleItemText" })
+        .getBoundingClientRect().top,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -398,7 +535,7 @@ export const WithMainButton: Story = {
     <Button primary scale size={ButtonSize.normal} label="New document" />
   </Article.MainButton>
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -420,6 +557,11 @@ export const CustomHeader: Story = {
       bodySlot,
     ],
   },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", { name: "Documents" }),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -432,7 +574,7 @@ export const CustomHeader: Story = {
     <h3>Documents</h3>
   </Article.Header>
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -449,6 +591,11 @@ export const WithBackButton: Story = {
     showBackButton: true,
     children: [bodySlot],
   },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByText("Back"));
+    await expect(args.onBack).toHaveBeenCalledTimes(1);
+    await expect(args.navigate).not.toHaveBeenCalled();
+  },
   parameters: {
     docs: {
       description: {
@@ -458,7 +605,7 @@ export const WithBackButton: Story = {
       source: {
         code: `<Article {...panelProps} showBackButton onBack={goBack}>
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -476,6 +623,16 @@ export const LoadingState: Story = {
     showArticleLoader: true,
     children: [bodySlot],
   },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("article-header-loader")).toBeVisible();
+    await expect(canvas.getByTestId("article-profile-loader")).toBeVisible();
+    await expect(canvas.queryByTestId("profile_username")).toBeNull();
+    await expect(canvas.queryByTestId("dev-tools-bar")).toBeNull();
+    // The body is still rendered.
+    await expect(
+      canvas.getByText("Files", { selector: ".articleItemText" }),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -485,7 +642,7 @@ export const LoadingState: Story = {
       source: {
         code: `<Article {...panelProps} isBurgerLoading showArticleLoader>
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -502,6 +659,20 @@ export const WithCustomSlot: Story = {
     customSlot: <div>Storage: 2 GB of 10 GB</div>,
     children: [bodySlot],
   },
+  play: async ({ canvas }) => {
+    // Between the body and the developer tools entry.
+    const slot = canvas
+      .getByText("Storage: 2 GB of 10 GB")
+      .getBoundingClientRect();
+    await expect(slot.top).toBeGreaterThanOrEqual(
+      canvas
+        .getByText("Files", { selector: ".articleItemText" })
+        .getBoundingClientRect().bottom,
+    );
+    await expect(slot.bottom).toBeLessThanOrEqual(
+      canvas.getByTestId("dev-tools-bar").getBoundingClientRect().top,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -511,7 +682,7 @@ export const WithCustomSlot: Story = {
       source: {
         code: `<Article {...panelProps} customSlot={<div>Storage: 2 GB of 10 GB</div>}>
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -528,6 +699,13 @@ export const WithoutFooterBlocks: Story = {
     limitedAccessDevToolsForUsers: true,
     children: [bodySlot],
   },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByText("Files", { selector: ".articleItemText" }),
+    ).toBeVisible();
+    await expect(canvas.queryByTestId("profile_username")).toBeNull();
+    await expect(canvas.queryByTestId("dev-tools-bar")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -543,7 +721,7 @@ export const WithoutFooterBlocks: Story = {
   isAdmin={false}
 >
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -552,16 +730,31 @@ export const WithoutFooterBlocks: Story = {
 };
 
 export const CollapsedOnTablet: Story = {
-  // Plain text has no icon form, so the body keeps it for the expanded column.
-  render: (args) =>
-    renderInteractive({
-      ...args,
-      children: [
-        <Article.Body key="body">
-          <div>{args.showText ? "Navigation items" : null}</div>
-        </Article.Body>,
-      ],
-    }),
+  // The catalog follows the column: icons only while it is collapsed.
+  render: function Render(args) {
+    const [, updateArgs] = useArgs<ArticleProps>();
+    const toggleShowText = () => updateArgs({ showText: !args.showText });
+
+    return (
+      <Template
+        {...args}
+        toggleShowText={toggleShowText}
+        toggleArticleOpen={() => updateArgs({ articleOpen: !args.articleOpen })}
+      >
+        {[
+          <Article.Header key="header">
+            <SidebarHeader
+              showText={args.showText}
+              toggleShowText={toggleShowText}
+            />
+          </Article.Header>,
+          <Article.Body key="body">
+            <ArticleCatalog showText={args.showText} />
+          </Article.Body>,
+        ]}
+      </Template>
+    );
+  },
   decorators: [withFrame(834, 640)],
   globals: { viewport: { value: "tablet", isRotated: false } },
   args: {
@@ -571,25 +764,57 @@ export const CollapsedOnTablet: Story = {
     showText: false,
     currentDeviceType: DeviceType.tablet,
     isMobileArticle: true,
+    withCustomArticleHeader: true,
     children: [bodySlot],
+  },
+  play: async ({ canvas, canvasElement }) => {
+    // Collapsed: no text, the developer tools entry as an icon only.
+    await expect(article(canvasElement)).toHaveAttribute(
+      "data-show-text",
+      "false",
+    );
+    await expect(
+      canvas.queryByText("Rooms", { selector: ".articleItemText" }),
+    ).toBeNull();
+    await expect(canvas.getByTestId("dev-tools-bar")).toHaveAttribute(
+      "data-icon-only",
+      "true",
+    );
+    // The header holds only the toggle, no logo.
+    await expect(
+      within(article(canvasElement)).getAllByTestId("icon-button")[0],
+    ).toBeVisible();
+    await expect(canvas.queryByAltText("ONLYOFFICE")).toBeNull();
   },
   parameters: {
     docs: {
       description: {
         story:
-          "A 60px column of icons in a tablet-width window, which leaves the page most of the screen (`showText` off). Click the handle at the foot to expand it and again to collapse it (`toggleShowText`).",
+          "A 60px column of icons in a tablet-width window, which leaves the page most of the screen (`showText` off). The header is the page's own, as in the ONLYOFFICE Apps client: a toggle that expands the column, and the logo beside it once expanded (`withCustomArticleHeader`, `toggleShowText`).",
       },
       source: {
         code: `const [showText, setShowText] = useState(false);
+const toggleShowText = () => setShowText((value) => !value);
 
 <Article
   {...panelProps}
   currentDeviceType={DeviceType.tablet}
   showText={showText}
-  toggleShowText={() => setShowText((value) => !value)}
+  toggleShowText={toggleShowText}
+  withCustomArticleHeader
 >
+  <Article.Header>
+    {showText ? <img src={logoUrl} alt="ONLYOFFICE" /> : null}
+    <IconButton
+      iconNode={<ArticleHideMenuIcon />}
+      size={20}
+      isFill={false}
+      isStroke
+      onClick={toggleShowText}
+    />
+  </Article.Header>
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
@@ -609,7 +834,22 @@ export const OnPhone: Story = {
     isMobileArticle: true,
     children: [bodySlot],
   },
+  play: async ({ canvas, canvasElement }) => {
+    // Portalled over a backdrop, without the profile block.
+    await expect(
+      canvasElement.querySelector('[data-testid="article"]'),
+    ).toBeNull();
+    await expect(screen.getByTestId("article")).toHaveAttribute(
+      "data-open",
+      "true",
+    );
+    await expect(
+      screen.getAllByTestId("backdrop").some((b) => b.checkVisibility()),
+    ).toBe(true);
+    await expect(canvas.queryByTestId("profile_username")).toBeNull();
+  },
   parameters: {
+    layout: "fullscreen",
     docs: {
       description: {
         story:
@@ -626,13 +866,23 @@ export const OnPhone: Story = {
   setArticleOpen={setArticleOpen}
 >
   <Article.Body>
-    <nav>Navigation items</nav>
+    {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
   </Article.Body>
 </Article>`,
       },
     },
   },
 };
+
+const rtlLabels = [
+  "الملفات",
+  "تمت مشاركتها معي",
+  "الملفات الأخيرة",
+  "الملفات المفضلة",
+  "سلة المهملات",
+  "الغرف",
+  "وكلاء الذكاء الاصطناعي",
+];
 
 export const RightToLeft: Story = {
   render: (args) => (
@@ -641,6 +891,17 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas, canvasElement }) => {
+    // The border is on the left edge; the dots left of the name.
+    const panel = getComputedStyle(article(canvasElement));
+    await expect(panel.borderLeftWidth).toBe("1px");
+    await expect(panel.borderRightWidth).toBe("0px");
+    const name = canvas.getByTestId("profile_username").getBoundingClientRect();
+    const dots = canvas
+      .getByTestId("profile_user_icon_button")
+      .getBoundingClientRect();
+    await expect(dots.right).toBeLessThanOrEqual(name.left + 1);
+  },
   args: {
     ...defaultProps,
     user: mockUser,
@@ -648,7 +909,7 @@ export const RightToLeft: Story = {
     showBackButton: true,
     children: [
       <Article.Body key="body">
-        <div>عناصر التنقل</div>
+        <ArticleCatalog labels={rtlLabels} />
       </Article.Body>,
     ],
   },
@@ -665,7 +926,7 @@ export const RightToLeft: Story = {
         code: `<div dir="rtl">
   <Article {...panelProps} showBackButton>
     <Article.Body>
-      <nav>عناصر التنقل</nav>
+      {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
     </Article.Body>
   </Article>
 </div>`,
@@ -674,50 +935,81 @@ export const RightToLeft: Story = {
   },
 };
 
-const CssCustomizationTemplate = () => (
-  <div
-    style={
-      {
-        display: "flex",
-        gap: "32px",
-        // === Article — sidebar background and borders ===
-        "--article-bg": "#e6f3fb",
-        "--article-border": "1px solid #0082c9",
-        // === Article — profile section ===
-        "--article-profile-bg": "#cce5f6",
-        "--article-profile-border": "1px solid #0082c9",
-        // === Article — back button ===
-        "--article-back-color": "#0082c9",
-      } as CSSProperties
-    }
-  >
-    <div style={{ height: "600px", position: "relative" }}>
-      <Article {...defaultProps} user={mockUser} getActions={getActions} />
+const CssCustomizationTemplate = () => {
+  const isPhone = useWindowDevice() === DeviceType.mobile;
+
+  return (
+    <div
+      id={isPhone ? "root" : undefined}
+      style={
+        {
+          display: "flex",
+          gap: "32px",
+          // === Article — sidebar background and borders ===
+          "--article-bg": "light-dark(#e6f3fb, #16303e)",
+          "--article-border": "1px solid #0082c9",
+          // === Article — profile section ===
+          "--article-profile-bg": "light-dark(#cce5f6, #1f4a61)",
+          "--article-profile-border": "1px solid #0082c9",
+          // === Article — back button ===
+          "--article-back-color": "#0082c9",
+        } as CSSProperties
+      }
+    >
+      {isPhone ? (
+        <Article
+          {...defaultProps}
+          user={mockUser}
+          getActions={getActions}
+          currentDeviceType={DeviceType.mobile}
+          isMobileArticle
+          showBackButton
+          articleOpen
+        />
+      ) : (
+        <>
+          <div style={{ height: "600px", position: "relative" }}>
+            <Article
+              {...defaultProps}
+              user={mockUser}
+              getActions={getActions}
+            />
+          </div>
+          <div style={{ height: "600px", position: "relative" }}>
+            <Article
+              {...defaultProps}
+              user={mockUser}
+              getActions={getActions}
+              showBackButton
+            />
+          </div>
+        </>
+      )}
     </div>
-    <div style={{ height: "600px", position: "relative" }}>
-      <Article
-        {...defaultProps}
-        user={mockUser}
-        getActions={getActions}
-        showBackButton
-      />
-    </div>
-  </div>
-);
+  );
+};
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvasElement }) => {
+    const [first] = within(canvasElement).getAllByTestId("article");
+    const panel = getComputedStyle(first);
+    await expect(panel.backgroundColor).toBe("rgb(230, 243, 251)");
+    await expect(panel.borderRightColor).toBe("rgb(0, 130, 201)");
+  },
   parameters: {
+    layout: "fullscreen",
+    noPadding: true,
     docs: {
       description: {
         story:
-          "Five of the panel's variables set on one wrapper -- the variables are listed under CSS variables on this page. The first panel shows the background, the borders and the profile block; the second adds the back button (`showBackButton`) for `--article-back-color`.",
+          "Five of the panel's variables set on one wrapper -- the variables are listed under CSS variables on this page. The first panel shows the background, the borders and the profile block; the second adds the back button (`showBackButton`) for `--article-back-color`. In a phone-width window the story shows one panel as the mobile sheet, with the back button; the phone layout has no profile block.",
       },
       source: {
-        code: `<div style={{ "--article-bg": "#e6f3fb", "--article-border": "1px solid #0082c9", "--article-back-color": "#0082c9" }}>
+        code: `<div style={{ "--article-bg": "light-dark(#e6f3fb, #16303e)", "--article-border": "1px solid #0082c9", "--article-back-color": "#0082c9" }}>
   <Article {...panelProps} showBackButton>
     <Article.Body>
-      <nav>Navigation items</nav>
+      {catalog.map((item) => <ArticleItem key={item.id} {...item} showText linkData={item.linkData} />)}
     </Article.Body>
   </Article>
 </div>`,

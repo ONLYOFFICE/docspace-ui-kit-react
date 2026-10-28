@@ -291,6 +291,8 @@ or an ancestor, and the fade plays once, for two seconds, when the tile mounts.
   descriptive nor translated and cannot be changed.
 - Ctrl-click and Shift-click have no keyboard equivalent, so range and additive selection are
   pointer-only.
+- `inProgress` sets `aria-busy="true"` on the tile; the loader it shows is decorative, so the
+  busy state is announced once, by the tile.
 - The badges and quick actions are your own elements; they are not announced as belonging to the
   file unless you label them.
 - The name is the one thing that should be a real link — make it one, rather than relying on the

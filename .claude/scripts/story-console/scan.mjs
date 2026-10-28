@@ -515,9 +515,7 @@ const run = async () => {
       });
     });
     page.on("response", (res) => {
-      // Answered by the demo portal's service worker: its own console.warn
-      // already names the route, so this would only say it twice.
-      if (res.status() < 400 || res.fromServiceWorker()) return;
+      if (res.status() < 400) return;
       push({
         level: "network",
         text: `${res.status()} ${res.request().method()} ${cleanUrl(res.url())}`,

@@ -61,6 +61,39 @@ const Modal = ({
   const internalContentRef = React.useRef<null | HTMLDivElement>(null);
   const contentRef = sheetRef ?? internalContentRef;
 
+  // Opened, the dialog takes the focus unless something inside already has
+  // it (a field the caller focuses itself), so Tab starts in the dialog rather
+  // than in the page behind it. Closed, the focus goes back to where it was --
+  // as long as nothing else has taken it in between.
+  React.useEffect(() => {
+    if (!visible) return;
+    const content = contentRef.current;
+    if (!content) return;
+
+    const previous = document.activeElement;
+    if (content.contains(previous)) return;
+
+    content.focus({ preventScroll: true });
+
+    return () => {
+      const { activeElement } = document;
+      // `hideContent` unmounts the content node and mounts a new one while
+      // the dialog stays open, so the node captured above may be detached by
+      // now; the ref holds the one the focus is actually in.
+      const focusLeftWithDialog =
+        !activeElement ||
+        activeElement === document.body ||
+        content.contains(activeElement) ||
+        !!contentRef.current?.contains(activeElement);
+      if (
+        focusLeftWithDialog &&
+        previous instanceof HTMLElement &&
+        previous.isConnected
+      )
+        previous.focus({ preventScroll: true });
+    };
+  }, [visible, contentRef]);
+
   const headerComponent = React.isValidElement(header)
     ? (header.props as { children: React.ReactNode }).children
     : null;
@@ -180,9 +213,14 @@ const Modal = ({
       className={classNames(styles.modal, {
         [styles.modalActive]: visible,
       })}
-      inert={!visible}
-      aria-hidden={visible ? undefined : true}
       data-testid={dataTestId ?? "modal"}
+      // Closed, the dialog stays mounted (the aside slides out, and callers
+      // rely on the markup being there) but must not be a dialog to anyone:
+      // `aria-hidden` takes it out of the accessibility tree, so a screen
+      // reader is not told the rest of the page is inert by a dialog nobody
+      // can see, and `inert` takes its controls out of the Tab order.
+      aria-hidden={visible ? undefined : true}
+      inert={!visible}
     >
       <ModalBackdrop
         className={classNames({
@@ -208,7 +246,8 @@ const Modal = ({
               id="modal-dialog"
               ref={contentRef}
               role="dialog"
-              aria-modal="true"
+              tabIndex={-1}
+              aria-modal={visible ? true : undefined}
               aria-label={ariaLabel}
               aria-labelledby={ariaLabelledBy}
               aria-describedby={ariaDescribedBy}

@@ -4,7 +4,7 @@ import type { ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 
@@ -145,6 +145,9 @@ const meta = {
       control: "boolean",
       description:
         "Leaves the field out, so only the main button is drawn; the block keeps its width",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     dataTestId: {
       control: "text",
@@ -251,7 +254,44 @@ const ControlledSearch = (props: {
   );
 };
 
+// The icon block names the icon it shows: a cross that clears the field, or
+// the magnifier.
+const iconBlock = (field: HTMLElement) =>
+  field
+    .closest("[data-testid='input-block']")
+    ?.querySelector(".search-cross, .search-loupe") as HTMLElement;
+
+const box = (element: Element) => element.getBoundingClientRect();
+
+// The main button (MainButton) is wrapped with the plus icon in the element
+// that takes the click; found by the text it shows.
+const mainButton = (
+  canvas: { getByText: (text: string) => HTMLElement },
+  text: string,
+) =>
+  (canvas.getByText(text).closest("[data-testid='main-button']") as HTMLElement)
+    .parentElement as HTMLElement;
+
 export const Default: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    const field = canvas.getByPlaceholderText("Search");
+    await expect(iconBlock(field)).toHaveClass("search-loupe");
+
+    // onChange gets the string, once typing has paused for refreshTimeout.
+    await userEvent.type(field, "report");
+    await expect(args.onChange).not.toHaveBeenCalled();
+    await waitFor(() => expect(args.onChange).toHaveBeenCalledWith("report"), {
+      timeout: 3000,
+    });
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+
+    // The cross clears the field and reports through onClearSearch only.
+    await expect(iconBlock(field)).toHaveClass("search-cross");
+    await userEvent.click(within(iconBlock(field)).getByTestId("icon-button"));
+    await expect(field).toHaveValue("");
+    await expect(args.onClearSearch).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+  },
   render: (args) => {
     const [value, setValue] = useState(args.value || "");
 
@@ -313,6 +353,15 @@ const SizesTemplate = () => {
 
 export const Sizes: Story = {
   render: () => <SizesTemplate />,
+  play: async ({ canvas }) => {
+    const base = canvas.getByDisplayValue("Base size");
+    const middle = canvas.getByDisplayValue("Middle size");
+    const large = canvas.getByDisplayValue("Large size");
+    await expect(base).toHaveStyle({ fontSize: "13px" });
+    await expect(middle).toHaveStyle({ fontSize: "13px" });
+    await expect(large).toHaveStyle({ fontSize: "16px" });
+    await expect(box(large).height).toBeGreaterThan(box(base).height);
+  },
   parameters: {
     docs: {
       description: {
@@ -341,6 +390,9 @@ const StatesTemplate = () => {
 
 export const States: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByDisplayValue("Disabled")).toBeDisabled();
+  },
   parameters: {
     docs: {
       description: {
@@ -377,6 +429,23 @@ const AutoRefreshTemplate = () => {
 
 export const AutoRefreshMode: Story = {
   render: () => <AutoRefreshTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const [auto, manual] = canvas.getAllByText(/Reported to the parent/);
+
+    await userEvent.type(
+      canvas.getByPlaceholderText("Type to auto-refresh (1s)"),
+      "abc",
+    );
+    await waitFor(
+      () => expect(auto).toHaveTextContent('Reported to the parent: "abc"'),
+      { timeout: 3000 },
+    );
+
+    // With autoRefresh off nothing reaches the parent, however long it waits.
+    await userEvent.type(canvas.getByPlaceholderText("No auto-refresh"), "xyz");
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await expect(manual).toHaveTextContent('Reported to the parent: ""');
+  },
   parameters: {
     docs: {
       description: {
@@ -431,6 +500,13 @@ export const WithButton: Story = {
     scale: true,
     placeholder: "Search",
     showMainButton: true,
+  },
+  play: async ({ canvas }) => {
+    // The button on the left, the field taking the rest of the row.
+    const create = mainButton(canvas, "Create");
+    const field = canvas.getByPlaceholderText("Search");
+    await expect(box(create).right).toBeLessThanOrEqual(box(field).left);
+    await expect(create.querySelector("svg")).not.toBeNull();
   },
   parameters: {
     docs: {
@@ -488,6 +564,26 @@ export const WithButtonAndMenu: Story = {
     placeholder: "Search",
     showMainButton: true,
   },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(mainButton(canvas, "New"));
+    await waitFor(() =>
+      expect(
+        screen.getByRole("menuitem", { name: /New document/ }),
+      ).toBeVisible(),
+    );
+    await expect(
+      screen.getByRole("menuitem", { name: /Upload/ }),
+    ).toBeVisible();
+    // Master form leads to a submenu.
+    await userEvent.hover(
+      screen.getByRole("menuitem", { name: /Master form/ }),
+    );
+    await waitFor(() =>
+      expect(
+        screen.getByRole("menuitem", { name: /From blank/ }),
+      ).toBeVisible(),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -525,6 +621,14 @@ export const PersistentClearButton: Story = {
       <ControlledSearch placeholder="Magnifier on an empty field" />
     </Wrapper>
   ),
+  play: async ({ canvas }) => {
+    await expect(
+      iconBlock(canvas.getByPlaceholderText("Cross on an empty field")),
+    ).toHaveClass("search-cross");
+    await expect(
+      iconBlock(canvas.getByPlaceholderText("Magnifier on an empty field")),
+    ).toHaveClass("search-loupe");
+  },
   parameters: {
     docs: {
       description: {
@@ -547,6 +651,14 @@ export const ContentBeforeText: Story = {
       </ControlledSearch>
     </Wrapper>
   ),
+  play: async ({ canvas, canvasElement }) => {
+    // The icon inside the field, before the text.
+    const field = canvas.getByPlaceholderText("Search in this folder");
+    const icon = canvasElement.querySelector("img") as HTMLImageElement;
+    const block = field.closest("[data-testid='input-block']") as HTMLElement;
+    await expect(block).toContainElement(icon);
+    await expect(box(icon).right).toBeLessThanOrEqual(box(field).left + 1);
+  },
   parameters: {
     docs: {
       description: {
@@ -571,6 +683,17 @@ export const DisabledMainButton: Story = {
       />
     </div>
   ),
+  play: async ({ canvas, userEvent }) => {
+    // Dimmed, and a click opens nothing.
+    const create = mainButton(canvas, "Create");
+    await expect(create.className).toMatch(/Disabled/);
+    await userEvent.click(create);
+    await expect(screen.queryByRole("menuitem")).toBeNull();
+    // The field next to it still takes text.
+    const field = canvas.getByPlaceholderText("Search");
+    await userEvent.type(field, "plan");
+    await expect(field).toHaveValue("plan");
+  },
   args: {
     size: InputSize.base,
     value: "",
@@ -615,6 +738,15 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvasElement, canvas }) => {
+    // The button at the right edge, the cross at the left end of the field.
+    const create = mainButton(canvas, "Create");
+    const field = canvasElement.querySelector("input") as HTMLInputElement;
+    await expect(box(create).left).toBeGreaterThanOrEqual(box(field).right);
+    const cross = canvasElement.querySelector(".search-cross") as HTMLElement;
+    await expect(box(cross).right).toBeLessThanOrEqual(box(field).left + 1);
+    await expect(field).toHaveStyle({ direction: "rtl" });
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -641,6 +773,28 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const block = canvas
+      .getByPlaceholderText("Custom styled search")
+      .closest("[data-testid='input-block']") as HTMLElement;
+    await expect(block).toHaveStyle({
+      backgroundColor: "rgb(245, 243, 255)",
+      borderColor: "rgb(124, 58, 237)",
+      borderRadius: "8px",
+    });
+    await expect(canvas.getByDisplayValue("Search term")).toHaveStyle({
+      color: "rgb(76, 29, 149)",
+    });
+    // The gap between the button and the field.
+    const create = mainButton(canvas, "Create");
+    const withButton = canvas.getByPlaceholderText("With button");
+    const withButtonBlock = withButton.closest(
+      "[data-testid='input-block']",
+    ) as HTMLElement;
+    await expect(
+      Math.round(box(withButtonBlock).left - box(create).right),
+    ).toBe(24);
+  },
   render: () => (
     <div
       style={

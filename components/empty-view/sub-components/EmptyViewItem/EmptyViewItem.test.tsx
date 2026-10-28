@@ -5,6 +5,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import styles from "../../EmptyView.module.scss";
 import type { EmptyViewItemProps } from "../../EmptyView.types";
 import type { ContextMenuModel } from "../../../context-menu";
+import { InterfaceDirectionProvider } from "../../../../context/InterfaceDirectionContext";
 import { EmptyViewItem } from "./index";
 
 const MockIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -75,6 +76,78 @@ describe("EmptyViewItem", () => {
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(contextMenuShowMock).not.toHaveBeenCalled();
   });
+
+  it.each([
+    ["Enter", "Enter"],
+    ["Space", " "],
+  ])("activates with %s like a click", (_name, key) => {
+    const onClick = vi.fn();
+    renderComponent({ onClick });
+
+    const item = screen.getByRole("button", { name: defaultProps.title });
+    fireEvent.keyDown(item, { key });
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onClick.mock.calls[0][0].type).toBe("click");
+  });
+
+  it("ignores other keys, and keys pressed inside the item", () => {
+    const onClick = vi.fn();
+    renderComponent({ onClick });
+
+    const item = screen.getByRole("button", { name: defaultProps.title });
+    fireEvent.keyDown(item, { key: "a" });
+    fireEvent.keyDown(screen.getByText(defaultProps.title), { key: "Enter" });
+
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it("opens the context menu from the keyboard", () => {
+    const model = [{ key: "copy", label: "Copy" }] as ContextMenuModel[];
+    renderComponent({ model });
+
+    fireEvent.keyDown(
+      screen.getByRole("button", { name: defaultProps.title }),
+      { key: "Enter" },
+    );
+
+    expect(contextMenuShowMock).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ["ltr", 10],
+    ["rtl", 110],
+  ] as const)(
+    "opens the keyboard menu at the lower start corner in %s",
+    (direction, expectedX) => {
+      const model = [{ key: "copy", label: "Copy" }] as ContextMenuModel[];
+      render(
+        <InterfaceDirectionProvider interfaceDirection={direction}>
+          <EmptyViewItem {...defaultProps} model={model} />
+        </InterfaceDirectionProvider>,
+      );
+
+      const item = screen.getByRole("button", { name: defaultProps.title });
+      vi.spyOn(item, "getBoundingClientRect").mockReturnValue({
+        left: 10,
+        right: 110,
+        top: 20,
+        bottom: 60,
+        width: 100,
+        height: 40,
+        x: 10,
+        y: 20,
+        toJSON: () => ({}),
+      });
+
+      fireEvent.keyDown(item, { key: "Enter" });
+
+      expect(contextMenuShowMock).toHaveBeenCalledTimes(1);
+      const event = contextMenuShowMock.mock.calls[0][0];
+      expect(event.clientX).toBe(expectedX);
+      expect(event.clientY).toBe(60);
+    },
+  );
 
   it("shows context menu when model is provided", () => {
     const model = [{ key: "copy", label: "Copy" }] as ContextMenuModel[];

@@ -39,6 +39,6 @@ export type AddButtonProps = {
   testId?: string;
   /** Whether a spinner replaces the icon and clicks are dropped. */
   isLoading?: boolean;
-  /** `tabIndex` of the wrapper. Without it the button cannot be focused, and the Enter handler never runs. */
+  /** `tabIndex` of the wrapper. Defaults to `0`, or `-1` while `isDisabled`; pass one only to take the button out of the Tab order or to place it. */
   tabIndex?: number;
 };

@@ -7,12 +7,21 @@ export type NavMenuLinkData = {
   state?: unknown;
 };
 
+/**
+ * How the clicked entry was drawn. A link entry's own click already changes
+ * the route through `LinkRouter`, so an `onClick` that navigates as well
+ * should do so only when `isLink` is false.
+ */
+export type NavMenuClickMeta = {
+  isLink: boolean;
+};
+
 export type NavSubItem = {
   id: string;
   label: string;
   icon?: string;
   iconNode?: React.ReactNode;
-  onClick?: (item: NavSubItem) => void;
+  onClick?: (item: NavSubItem, meta?: NavMenuClickMeta) => void;
   linkData?: NavMenuLinkData;
   /**
    * Render a thin separator line above this sub-item. Used to group related
@@ -37,7 +46,10 @@ export type NavMenuItem = {
    * modal instead of navigating, so the sub-menu shouldn't toggle behind it.
    * Any other return value (incl. a promise) keeps the default behavior.
    */
-  onClick?: (item: NavMenuItem) => void | boolean | Promise<void>;
+  onClick?: (
+    item: NavMenuItem,
+    meta?: NavMenuClickMeta,
+  ) => void | boolean | Promise<void>;
   children?: NavSubItem[];
   showBadge?: boolean;
   labelBadge?: string | number;

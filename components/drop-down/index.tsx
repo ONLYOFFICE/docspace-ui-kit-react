@@ -8,6 +8,10 @@ import { Backdrop } from "../backdrop";
 import type { DropDownProps } from "./DropDown.types";
 import { EnhancedComponent } from "./DropDown";
 
+// Two separate event names: `addEventListener` takes one name per call, so
+// a single "click, touchend" string would listen for an event that never fires.
+const MOBILE_EVENT_TYPES = ["click", "touchend"];
+
 const DropDown = (props: DropDownProps) => {
   const {
     clickOutsideAction,
@@ -27,6 +31,7 @@ const DropDown = (props: DropDownProps) => {
     enableKeyboardEvents = true,
     usePortalBackdrop = false,
     shouldShowBackdrop = false,
+    backDrop: customBackDrop,
   } = props;
 
   const toggleDropDown = (e: React.MouseEvent) => {
@@ -37,12 +42,12 @@ const DropDown = (props: DropDownProps) => {
   const eventTypesProp = forceCloseClickOutside
     ? {}
     : isMobile
-      ? { eventTypes: ["click, touchend"] }
+      ? { eventTypes: MOBILE_EVENT_TYPES }
       : eventTypes
         ? { eventTypes }
         : {};
 
-  const backDrop = withBackdrop ? (
+  const builtBackDrop = withBackdrop ? (
     <Backdrop
       visible={open || false}
       zIndex={usePortalBackdrop ? 400 : 199}
@@ -54,6 +59,11 @@ const DropDown = (props: DropDownProps) => {
     />
   ) : null;
 
+  const backDrop =
+    customBackDrop !== undefined ? customBackDrop : builtBackDrop;
+
+  // The backdrop is rendered exactly once: here, beside the menu, or inside
+  // the portal with `usePortalBackdrop`.
   return (
     <>
       {!usePortalBackdrop ? backDrop : null}
@@ -64,8 +74,8 @@ const DropDown = (props: DropDownProps) => {
         fixedDirection={fixedDirection}
         offsetX={offsetX}
         enableKeyboardEvents={enableKeyboardEvents}
-        backDrop={backDrop}
         {...props}
+        backDrop={usePortalBackdrop ? backDrop : null}
       />
     </>
   );

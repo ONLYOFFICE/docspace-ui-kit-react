@@ -6,12 +6,7 @@ import ClockIcon from "../../assets/clock.react.svg";
 
 import { ButtonKeys } from "../../enums";
 
-import {
-  parseToDateTime,
-  formatDate,
-  addToDate,
-  subtractFromDate,
-} from "../../utils/date";
+import { parseToDateTime, formatDate } from "../../utils/date";
 
 import { TimePicker } from "../time-picker";
 import { DatePicker } from "../date-picker";
@@ -60,6 +55,13 @@ const DateTimePicker = (props: DateTimePickerProps) => {
   );
 
   const showTimePicker = () => setIsTimeFocused(true);
+
+  const onTimeCellKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
+    if (e.key === ButtonKeys.enter || e.key === " ") {
+      e.preventDefault();
+      showTimePicker();
+    }
+  };
   const hideTimePicker = () => setIsTimeFocused(false);
 
   const handleChange = (d: DateTime | null) => {
@@ -90,20 +92,47 @@ const DateTimePicker = (props: DateTimePickerProps) => {
       setIsTimeFocused(false);
     }
   };
+  // Keys that leave the time editor open: Tab or Shift+Tab to another of its
+  // own fields, and Enter on the AM/PM box, which opens it or picks the
+  // highlighted half of the day. Closing on those unmounted the box before it
+  // could act, so the keyboard could never change AM/PM.
+  const staysInTimePicker = (event: KeyboardEvent) => {
+    const picker = timePickerRef.current;
+    const { target } = event;
+    if (!picker || !(target instanceof Element) || !picker.contains(target))
+      return false;
+
+    if (event.key === ButtonKeys.enter)
+      return target.closest("[aria-haspopup]") !== null;
+
+    const fields = Array.from(
+      picker.querySelectorAll("input, [tabindex]:not([tabindex='-1'])"),
+    );
+    const index = fields.findIndex(
+      (field) => field === target || field.contains(target),
+    );
+    const next = index + (event.shiftKey ? -1 : 1);
+    return index !== -1 && next >= 0 && next < fields.length;
+  };
+
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === ButtonKeys.enter || event.key === ButtonKeys.tab) {
-      setIsTimeFocused(false);
-    }
+    if (event.key !== ButtonKeys.enter && event.key !== ButtonKeys.tab) return;
+    if (staysInTimePicker(event)) return;
+    setIsTimeFocused(false);
   };
 
   const onSelectFormat = (opt: TOption) => {
     setSelectedFormat(opt);
     if (!date) return;
 
-    if (opt.key === "AM") {
-      handleChange(subtractFromDate(date, 12, "hours"));
-    } else {
-      handleChange(addToDate(date, 12, "hours"));
+    // Set the half of the day, do not toggle it: choosing the half the time
+    // is already in leaves it where it is, on the same day. The hour is set,
+    // not shifted by a 12-hour duration, which lands an hour off on a day the
+    // clocks change.
+    if (opt.key === "AM" && date.hour >= 12) {
+      handleChange(date.set({ hour: date.hour - 12 }));
+    } else if (opt.key === "PM" && date.hour < 12) {
+      handleChange(date.set({ hour: date.hour + 12 }));
     }
   };
 
@@ -125,6 +154,10 @@ const DateTimePicker = (props: DateTimePickerProps) => {
 
     setIsTwelveHourFormat(is12Hour);
   }, [initialDate, locale]);
+
+  const shownTime = date
+    ? formatDate(date, isTwelveHourFormat ? "hh:mm a" : "HH:mm")
+    : "";
 
   return (
     <div
@@ -161,7 +194,6 @@ const DateTimePicker = (props: DateTimePickerProps) => {
                 tabIndex={0}
                 onBlur={hideTimePicker}
                 focusOnRender
-                aria-label="Time picker"
                 isTwelveHourFormat={isTwelveHourFormat}
                 meridiem={String(selectedFormat.key)}
               />
@@ -180,9 +212,10 @@ const DateTimePicker = (props: DateTimePickerProps) => {
                 [styles.hasError]: hasError,
               })}
               onClick={showTimePicker}
+              onKeyDown={onTimeCellKeyDown}
               data-testid="date-time-picker-time-display"
               role="button"
-              aria-label={`Current time: ${formatDate(date, "HH:mm")}`}
+              aria-label={`Current time: ${shownTime}`}
               tabIndex={0}
             >
               <ClockIcon
@@ -190,9 +223,7 @@ const DateTimePicker = (props: DateTimePickerProps) => {
                 aria-hidden="true"
                 data-testid="date-time-picker-clock-icon"
               />
-              {isTwelveHourFormat
-                ? formatDate(date, "hh:mm a")
-                : formatDate(date, "HH:mm")}
+              {shownTime}
             </span>
           )
         ) : null}

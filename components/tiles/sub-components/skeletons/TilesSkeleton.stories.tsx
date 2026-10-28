@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 
 import React from "react";
 
@@ -142,11 +143,21 @@ type Story = StoryObj<ComponentProps<typeof TilesSkeleton>>;
 
 export default meta;
 
+// The heading bars above the folder and file placeholders.
+const headingBar = (root: HTMLElement, kind: "folders" | "files") =>
+  root.querySelector(`.${kind}`);
+
 export const Default: Story = {
   render: (args) => <TilesSkeleton {...args} />,
   args: {
     foldersCount: 2,
     filesCount: 4,
+  },
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvas.getAllByTestId("tile-skeleton-folder")).toHaveLength(2);
+    await expect(canvas.getAllByTestId("tile-skeleton-file")).toHaveLength(4);
+    await expect(headingBar(canvasElement, "folders")).not.toBeNull();
+    await expect(headingBar(canvasElement, "files")).not.toBeNull();
   },
   parameters: {
     docs: {
@@ -167,6 +178,13 @@ export const FilesWithoutHeading: Story = {
     foldersCount: 0,
     filesCount: 3,
     withTitle: false,
+  },
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvas.queryByTestId("tile-skeleton-folder")).toBeNull();
+    await expect(canvas.getAllByTestId("tile-skeleton-file")).toHaveLength(3);
+    // Neither heading bar is drawn.
+    await expect(headingBar(canvasElement, "folders")).toBeNull();
+    await expect(headingBar(canvasElement, "files")).toBeNull();
   },
   parameters: {
     docs: {
@@ -198,6 +216,17 @@ const TileShapesTemplate = () => (
 
 export const TileShapes: Story = {
   render: () => <TileShapesTemplate />,
+  play: async ({ canvas }) => {
+    const folder = canvas.getByTestId("tile-skeleton-folder");
+    const room = canvas.getByTestId("tile-skeleton-room");
+    const file = canvas.getByTestId("tile-skeleton-file");
+    // A folder is a bar; a file is a card, taller than it.
+    await expect(file.getBoundingClientRect().height).toBeGreaterThan(
+      folder.getBoundingClientRect().height,
+    );
+    await expect(room).toBeVisible();
+    await expect(canvas.getByTestId("room-tile-content")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {

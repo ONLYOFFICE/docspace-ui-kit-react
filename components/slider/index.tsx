@@ -20,6 +20,10 @@ const Slider = (props: SliderProps) => {
     thumbWidth,
     runnableTrackHeight,
     dataTestId,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledBy,
+    "aria-describedby": ariaDescribedBy,
+    "aria-valuetext": ariaValueText,
   } = props;
 
   const [sizeProp, setSizeProp] = useState("0%");
@@ -82,6 +86,10 @@ const Slider = (props: SliderProps) => {
       step={step}
       value={value}
       disabled={isDisabled}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy}
+      aria-describedby={ariaDescribedBy}
+      aria-valuetext={ariaValueText}
       data-testid={dataTestId ?? "slider"}
     />
   );

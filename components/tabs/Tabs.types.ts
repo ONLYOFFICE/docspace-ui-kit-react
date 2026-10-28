@@ -7,7 +7,7 @@ export type TTabItem = {
   name: string | React.ReactNode;
   /** What is rendered under the tab bar while this tab is the selected one. */
   content: React.ReactNode;
-  /** Whether the tab is greyed out and cannot be clicked. */
+  /** Whether the tab is greyed out and cannot be selected, by a click, the keyboard or the segmented arrows. */
   isDisabled?: boolean;
   /** Called before `onSelect` when this tab is clicked. With `withAnimation` it is awaited and the body shows a loader meanwhile. */
   onClick?: () => void | Promise<void>;
@@ -42,7 +42,7 @@ export type TabsProps = {
   isLoading?: boolean;
   /** Whether the tabs share the container's width equally instead of being measured from the longest label. Secondary tabs only. */
   scaled?: boolean;
-  /** Suffix of the class the keyboard handler focuses, which turns the arrow-key navigation on. Secondary tabs only. */
+  /** Suffix of the class `secondary-tabs-scroll-<hotkeysId>` put on the tab scroller, for a caller that queries it. Keyboard navigation does not need it. Secondary tabs only. */
   hotkeysId?: string;
   /** Applied to the tab list on primary tabs, and to the outermost element on secondary ones. */
   id?: string;
@@ -53,20 +53,12 @@ export type TabsProps = {
 };
 
 export type TTabsHotkey = {
-  /** Determines whether keyboard hotkeys are enabled for tab navigation */
-  enabledHotkeys: boolean;
-  /** Sets the active state of hotkeys */
-  setHotkeysIsActive: (focusedTabIndex: boolean) => void;
   /** Tab items to be rendered */
   items: TTabItem[];
-  /** Index of the currently focused tab */
+  /** Index of the tab that holds the keyboard focus (the roving tab stop) */
   focusedTabIndex: number;
-  /** Sets the index of the focused tab */
-  setFocusedTabIndex: (focusedTabIndex: number) => void;
-  /**  Scrolls to bring a specific tab into view */
-  scrollToTab: (index: number) => void;
-  /** Sets a callback function that is triggered when the tab is selected */
-  onSelect?: (element: TTabItem) => void;
-  /** Unique identifier for hotkey functionality */
-  hotkeysId?: string;
+  /** Moves the keyboard focus to a tab and scrolls it into view */
+  focusTab: (index: number) => void;
+  /** Selects a tab, as a click on it would */
+  selectTab: (index: number) => void;
 };

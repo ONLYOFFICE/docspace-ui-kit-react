@@ -1,7 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
 
 import { SnackBar } from "./Snackbar";
 import type { SnackbarProps, TextAlignValue } from "./Snackbar.types";
@@ -161,6 +161,33 @@ const SnackBarWrapper = (args: SnackbarProps) => (
 export const Default: Story = {
   render: (args) => <SnackBarWrapper {...args} />,
   args: baseArgs,
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(args.onLoad).toHaveBeenCalledTimes(1);
+    await expect(canvas.getByTestId("snackbar-header")).toHaveTextContent(
+      "Attention",
+    );
+    await expect(canvas.getByTestId("snackbar-message")).toHaveTextContent(
+      "Important notification message",
+    );
+    await expect(canvas.getByTestId("snackbar-icon")).toBeInTheDocument();
+
+    // The bar is a polite live region, so its appearance is announced.
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent(
+        "Important notification message",
+      ),
+    );
+
+    // The close cross is a named, non-submitting button that calls onAction,
+    // from the keyboard as well as the mouse.
+    const close = canvas.getByRole("button", { name: "Close" });
+    await expect(close).toHaveAttribute("type", "button");
+    await userEvent.click(close);
+    await expect(args.onAction).toHaveBeenCalledTimes(1);
+    close.focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onAction).toHaveBeenCalledTimes(2);
+  },
   parameters: {
     docs: {
       description: {
@@ -185,11 +212,25 @@ export const Default: Story = {
 export const WithAction: Story = {
   render: (args) => <SnackBarWrapper {...args} />,
   args: { ...baseArgs, btnText: "Take Action" },
+  play: async ({ args, canvas, userEvent }) => {
+    // The action label replaces the close cross.
+    await expect(canvas.queryByRole("button", { name: "Close" })).toBeNull();
+    // The action is a real button: it is clicked, and reached with Tab and
+    // pressed with Space.
+    const action = canvas.getByRole("button", { name: "Take Action" });
+    await userEvent.click(action);
+    await expect(args.onAction).toHaveBeenCalledTimes(1);
+    action.blur();
+    await userEvent.tab();
+    await expect(action).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await expect(args.onAction).toHaveBeenCalledTimes(2);
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "When the notice asks for one step, the bar offers it in place of the close cross: the underlined **Take Action** label after the message calls `onAction` (`btnText`).",
+          "When the notice asks for one step, the bar offers it in place of the close cross: the underlined **Take Action** button after the message calls `onAction` (`btnText`).",
       },
       source: {
         code: `<SnackBar
@@ -213,6 +254,11 @@ export const WithCountdown: Story = {
     ...baseArgs,
     countDownTime: 5000,
     text: "This message will disappear in 5 seconds",
+  },
+  play: async ({ args, canvas }) => {
+    // The timer starts at 00:05; waiting for zero would cost five seconds.
+    await expect(canvas.getByText(/^00:0[45]$/)).toBeVisible();
+    await expect(args.onAction).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -243,6 +289,15 @@ export const WithHtmlContent: Story = {
       "<p>Your storage is <b>almost full</b>. Please free up space or <a href='#'>upgrade your plan</a> to continue working without interruptions.</p>",
     text: "",
   },
+  play: async ({ canvas }) => {
+    // The HTML replaces the header and the message.
+    const html = canvas.getByTestId("snackbar-html-content");
+    await expect(html.querySelector("b")).toHaveTextContent("almost full");
+    await expect(
+      canvas.getByRole("link", { name: "upgrade your plan" }),
+    ).toBeVisible();
+    await expect(canvas.queryByTestId("snackbar-message")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -268,6 +323,16 @@ export const Maintenance: Story = {
     headerText: "Maintenance Notice",
     text: "System maintenance is scheduled for tonight at 10 PM",
   },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByTestId("snackbar-header")).toHaveTextContent(
+      "Maintenance Notice",
+    );
+    await expect(canvas.getByTestId("snackbar-message")).toHaveTextContent(
+      "System maintenance is scheduled for tonight at 10 PM",
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Close" }));
+    await expect(args.onAction).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -291,6 +356,11 @@ export const Maintenance: Story = {
 export const WithAdditionalHeaderText: Story = {
   render: (args) => <SnackBarWrapper {...args} />,
   args: { ...baseArgs, additionalHeaderText: "Today, 10:00" },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByTestId("snackbar-additional-info"),
+    ).toHaveTextContent("Today, 10:00");
+  },
   parameters: {
     docs: {
       description: {
@@ -319,6 +389,15 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The text starts at the right; the cross sits at the left end.
+    const header = canvas.getByTestId("snackbar-header");
+    await expect(getComputedStyle(header).direction).toBe("rtl");
+    await expect(
+      canvas.getByRole("button", { name: "Close" }).getBoundingClientRect()
+        .left,
+    ).toBeLessThan(header.getBoundingClientRect().left);
+  },
   args: {
     ...baseArgs,
     headerText: "\u062a\u0646\u0628\u064a\u0647",
@@ -355,13 +434,13 @@ export const CssCustomization: Story = {
       style={
         {
           width: "400px",
-          "--snackbar-background": "#eef2ff",
-          "--snackbar-text-color": "#b91c1c",
-          "--snackbar-accent-color": "#4f46e5",
+          "--snackbar-background": "light-dark(#eef2ff, #1e2240)",
+          "--snackbar-text-color": "light-dark(#b91c1c, #fca5a5)",
+          "--snackbar-accent-color": "light-dark(#4f46e5, #a5b4fc)",
           "--snackbar-accent-width": "6px",
           "--snackbar-text-size": "13px",
           "--snackbar-content-padding": "16px 24px",
-          "--snackbar-icon-fill": "#4f46e5",
+          "--snackbar-icon-fill": "light-dark(#4f46e5, #a5b4fc)",
         } as CSSProperties
       }
     >
@@ -372,10 +451,16 @@ export const CssCustomization: Story = {
         opacity={1}
         countDownTime={-1}
         sectionWidth={400}
-        onAction={() => {}}
+        onAction={fn()}
       />
     </div>
   ),
+  play: async ({ canvas }) => {
+    // The message takes the custom text colour.
+    await expect(
+      getComputedStyle(canvas.getByTestId("snackbar-message")).color,
+    ).toBe("rgb(185, 28, 28)");
+  },
   parameters: {
     docs: {
       description: {
@@ -384,13 +469,13 @@ export const CssCustomization: Story = {
       source: {
         code: `<div
   style={{
-    "--snackbar-background": "#eef2ff",
-    "--snackbar-text-color": "#b91c1c",
-    "--snackbar-accent-color": "#4f46e5",
+    "--snackbar-background": "light-dark(#eef2ff, #1e2240)",
+    "--snackbar-text-color": "light-dark(#b91c1c, #fca5a5)",
+    "--snackbar-accent-color": "light-dark(#4f46e5, #a5b4fc)",
     "--snackbar-accent-width": "6px",
     "--snackbar-text-size": "13px",
     "--snackbar-content-padding": "16px 24px",
-    "--snackbar-icon-fill": "#4f46e5",
+    "--snackbar-icon-fill": "light-dark(#4f46e5, #a5b4fc)",
   }}
 >
   <SnackBar
