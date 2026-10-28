@@ -23,6 +23,9 @@ export const consumeKey = (e: HandledKeyEvent) => {
   if (typeof window === "undefined") return;
 
   const { key } = e;
+  // The window the listeners went on. The give-up timer may fire after the
+  // global is gone (a test environment torn down), and must not look it up.
+  const win = window;
 
   // A keyup that never arrives (the window lost focus mid-press, or macOS
   // dropped the keyup of a key released under Cmd) must not leave the
@@ -32,9 +35,9 @@ export const consumeKey = (e: HandledKeyEvent) => {
   let timer: number;
 
   const release = () => {
-    window.removeEventListener("keyup", onKeyUp, true);
-    window.removeEventListener("keydown", onKeyDown, true);
-    window.clearTimeout(timer);
+    win.removeEventListener("keyup", onKeyUp, true);
+    win.removeEventListener("keydown", onKeyDown, true);
+    win.clearTimeout(timer);
   };
 
   const onKeyUp = (up: KeyboardEvent) => {
@@ -45,12 +48,12 @@ export const consumeKey = (e: HandledKeyEvent) => {
 
   const onKeyDown = (down: KeyboardEvent) => {
     if (down.key !== key || !down.repeat) return;
-    window.clearTimeout(timer);
-    timer = window.setTimeout(release, GIVE_UP_AFTER);
+    win.clearTimeout(timer);
+    timer = win.setTimeout(release, GIVE_UP_AFTER);
   };
 
-  timer = window.setTimeout(release, GIVE_UP_AFTER);
+  timer = win.setTimeout(release, GIVE_UP_AFTER);
 
-  window.addEventListener("keyup", onKeyUp, true);
-  window.addEventListener("keydown", onKeyDown, true);
+  win.addEventListener("keyup", onKeyUp, true);
+  win.addEventListener("keydown", onKeyDown, true);
 };
