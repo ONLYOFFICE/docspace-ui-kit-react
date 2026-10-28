@@ -29,10 +29,14 @@ const SecondaryTabs = (props: TabsProps) => {
     layoutId,
     isLoading,
     scaled,
+    withoutArrows = false,
     hotkeysId,
     className,
     ...rest
   } = props;
+
+  // A mobile device never shows the arrows: tabs that do not fit scroll.
+  const scrollOnly = isMobile || withoutArrows;
 
   const selectedItemIndex = !selectedItemId
     ? 0
@@ -69,7 +73,7 @@ const SecondaryTabs = (props: TabsProps) => {
       const containerWidth = containerElement.offsetWidth;
       const tabWidth = tabElement?.offsetWidth;
       const tabOffsetLeft = tabElement?.offsetLeft;
-      const arrowsWidth = isMobile ? 0 : ARROW_WIDTH;
+      const arrowsWidth = scrollOnly ? 0 : ARROW_WIDTH;
 
       if (tabOffsetLeft - TABS_GAP < containerElement.scrollLeft) {
         scrollRef.current.scrollTo(tabOffsetLeft - TABS_GAP - arrowsWidth);
@@ -83,7 +87,7 @@ const SecondaryTabs = (props: TabsProps) => {
         );
       }
     },
-    [tabsCountInContainer],
+    [tabsCountInContainer, scrollOnly],
   );
 
   useTabsHotkeys({
@@ -153,7 +157,7 @@ const SecondaryTabs = (props: TabsProps) => {
       if (maxTabsCount < items.length) {
         setTabsIsOverflowing(true);
 
-        if (isMobile) return;
+        if (scrollOnly) return;
 
         const arrowsWidth = ARROW_WIDTH * 2;
 
@@ -171,7 +175,7 @@ const SecondaryTabs = (props: TabsProps) => {
         setTabsCountInContainer(maxTabsCount);
       }
     }
-  }, [referenceTabSize, items.length, tabsIsOverflowing]);
+  }, [referenceTabSize, items.length, tabsIsOverflowing, scrollOnly]);
 
   useEffect(() => {
     scrollToTab(selectedItemIndex);
@@ -218,7 +222,7 @@ const SecondaryTabs = (props: TabsProps) => {
         items.length * TABS_GAP
       : null;
 
-  const withArrows = tabsIsOverflowing && !isMobile;
+  const withArrows = tabsIsOverflowing && !scrollOnly;
 
   const renderContent = (
     <div

@@ -42,6 +42,8 @@ export type TabsProps = {
   isLoading?: boolean;
   /** Whether the tabs share the container's width equally instead of being measured from the longest label. Secondary tabs only. */
   scaled?: boolean;
+  /** Whether tabs that do not fit only scroll, without the arrow buttons, as they always do on a mobile device. Secondary tabs only. */
+  withoutArrows?: boolean;
   /** Suffix of the class the keyboard handler focuses, which turns the arrow-key navigation on. Secondary tabs only. */
   hotkeysId?: string;
   /** Applied to the tab list on primary tabs, and to the outermost element on secondary ones. */
