@@ -57,6 +57,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withRecentTreeFolder,
     withFavoritesTreeFolder,
     withAIAgentsTreeFolder,
+    withRoomsTreeFolder = true,
     withFormsTreeFolder = true,
 
     onSetBaseFolderPath,
@@ -234,6 +235,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     setHasNextPage,
     setIsInit,
     withAIAgentsTreeFolder,
+    withRoomsTreeFolder,
     withFormsTreeFolder,
     setRecentFolder,
     setFavoritesFolder,

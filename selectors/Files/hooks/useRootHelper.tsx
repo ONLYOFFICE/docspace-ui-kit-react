@@ -71,6 +71,7 @@ const useRootHelper = ({
   setItems,
   treeFolders,
   withAIAgentsTreeFolder,
+  withRoomsTreeFolder,
   withFormsTreeFolder,
   setRecentFolder,
   setFavoritesFolder,
@@ -130,8 +131,13 @@ const useRootHelper = ({
           <IconComponent key={folder.rootFolderType} />
         ) : undefined;
 
+        const isRoomsRoot =
+          !isUserOnly && folder.rootFolderType === FolderType.VirtualRooms;
+
         if (
-          (!isUserOnly && folder.rootFolderType === FolderType.VirtualRooms) ||
+          (withRoomsTreeFolder &&
+            !isUserOnly &&
+            folder.rootFolderType === FolderType.VirtualRooms) ||
           folder.rootFolderType === FolderType.USER ||
           (withAIAgentsTreeFolder &&
             folder.rootFolderType === FolderType.AiAgents)
@@ -164,25 +170,23 @@ const useRootHelper = ({
             avatar,
             disableMultiSelect: true,
           });
+        }
 
-          if (
-            withFormsTreeFolder &&
-            !isUserOnly &&
-            folder.rootFolderType === FolderType.VirtualRooms
-          ) {
-            newItems.push({
-              label: t("Forms"),
-              id: FORMS_SECTION_ID,
-              parentId: folder.parentId!,
-              rootFolderType: FORMS_ROOT_FOLDER_TYPE as FolderType,
-              filesCount: folder.filesCount!,
-              foldersCount: folder.foldersCount!,
-              security: folder.security!,
-              isFolder: true,
-              avatar: <CatalogDocumentsSvg />,
-              disableMultiSelect: true,
-            });
-          }
+        // Forms is listed off the rooms root but is a section of its own, so it
+        // stays when Rooms itself is hidden.
+        if (withFormsTreeFolder && isRoomsRoot) {
+          newItems.push({
+            label: t("Forms"),
+            id: FORMS_SECTION_ID,
+            parentId: folder.parentId!,
+            rootFolderType: FORMS_ROOT_FOLDER_TYPE as FolderType,
+            filesCount: folder.filesCount!,
+            foldersCount: folder.foldersCount!,
+            security: folder.security!,
+            isFolder: true,
+            avatar: <CatalogDocumentsSvg />,
+            disableMultiSelect: true,
+          });
         }
       });
 
@@ -211,6 +215,7 @@ const useRootHelper = ({
     t,
     treeFolders,
     withAIAgentsTreeFolder,
+    withRoomsTreeFolder,
     withFormsTreeFolder,
     setRecentFolder,
     setFavoritesFolder,
