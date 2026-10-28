@@ -29,12 +29,16 @@ export const consumeKey = (e: HandledKeyEvent) => {
   // listener to swallow some later, unrelated press. Autorepeat keydowns say
   // the key is still held, so each one restarts the wait.
   const GIVE_UP_AFTER = 1000;
-  let timer: number;
+  let timer: ReturnType<typeof setTimeout>;
+
+  // Release touches neither `window` nor its methods: the give-up timer may
+  // fire after a test environment has torn the window's members down. The
+  // listeners go with the signal, and the timer is the global one.
+  const listeners = new AbortController();
 
   const release = () => {
-    window.removeEventListener("keyup", onKeyUp, true);
-    window.removeEventListener("keydown", onKeyDown, true);
-    window.clearTimeout(timer);
+    listeners.abort();
+    clearTimeout(timer);
   };
 
   const onKeyUp = (up: KeyboardEvent) => {
@@ -45,12 +49,13 @@ export const consumeKey = (e: HandledKeyEvent) => {
 
   const onKeyDown = (down: KeyboardEvent) => {
     if (down.key !== key || !down.repeat) return;
-    window.clearTimeout(timer);
-    timer = window.setTimeout(release, GIVE_UP_AFTER);
+    clearTimeout(timer);
+    timer = setTimeout(release, GIVE_UP_AFTER);
   };
 
-  timer = window.setTimeout(release, GIVE_UP_AFTER);
+  timer = setTimeout(release, GIVE_UP_AFTER);
 
-  window.addEventListener("keyup", onKeyUp, true);
-  window.addEventListener("keydown", onKeyDown, true);
+  const options = { capture: true, signal: listeners.signal };
+  window.addEventListener("keyup", onKeyUp, options);
+  window.addEventListener("keydown", onKeyDown, options);
 };
