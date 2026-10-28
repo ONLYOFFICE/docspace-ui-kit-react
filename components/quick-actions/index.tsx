@@ -301,8 +301,9 @@ export const QuickActions = ({
     // Chromium on Linux that drops the scroll above as well. Asking again on
     // the next frame, after the animation is gone, lands the tile in view.
     // Without such a scroll the first call is enough.
+    // The window stays open for every key in it: whether the first key stopped
+    // the scroll is not known here.
     if (performance.now() < smoothScrollUntilRef.current) {
-      smoothScrollUntilRef.current = 0;
       requestAnimationFrame(() =>
         next.scrollIntoView?.({ block: "nearest", inline: "nearest" }),
       );
