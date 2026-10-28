@@ -1446,6 +1446,12 @@ export const WithoutSearch: Story = {
     showMainButton: true,
     mainButtonProps: { text: "New", model: [] },
   },
+  play: async ({ canvas }) => {
+    const bar = within(canvas.getByTestId("filter_container"));
+    await expect(bar.getByText("New")).toBeVisible();
+    await expect(bar.queryByRole("searchbox")).not.toBeInTheDocument();
+    await expect(bar.queryByRole("textbox")).not.toBeInTheDocument();
+  },
   parameters: {
     docs: {
       description: {
