@@ -8,9 +8,15 @@ const STORY_BASE = "ui-form-controls-togglebutton";
 async function gotoStory(page: Page, storyId: string) {
   const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
   await page.goto(url);
-  await page.waitForSelector("#storybook-root", { state: "visible" });
-  // Guard: Storybook returns 200 even for missing stories
-  await expect(page.locator("text=Story not found")).toHaveCount(0);
+  // Storybook answers 200 for an unknown id and shows its error display
+  // instead of the story: fail on that now, not on a timeout further down.
+  await page.waitForSelector("body.sb-show-main, body.sb-show-errordisplay", {
+    state: "attached",
+  });
+  await expect(page.locator("body")).not.toHaveClass(/sb-show-errordisplay/);
+  // The label is absolutely positioned, so with `noPadding` (right-to-left)
+  // the root has no height and never counts as visible: wait for the label.
+  await page.locator("#storybook-root label").first().waitFor();
   await page.waitForLoadState("networkidle");
 }
 

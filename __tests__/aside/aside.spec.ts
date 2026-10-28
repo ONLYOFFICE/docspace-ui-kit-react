@@ -7,8 +7,15 @@ const STORY_BASE = "ui-overlays-aside";
 async function gotoStory(page: Page, storyId: string) {
   const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
   await page.goto(url);
-  await page.waitForSelector("#storybook-root", { state: "visible" });
-  await expect(page.locator("text=Story not found")).toHaveCount(0);
+  // Storybook answers 200 for an unknown id and shows its error display
+  // instead of the story: fail on that now, not on a timeout further down.
+  await page.waitForSelector("body.sb-show-main, body.sb-show-errordisplay", {
+    state: "attached",
+  });
+  await expect(page.locator("body")).not.toHaveClass(/sb-show-errordisplay/);
+  // The panel is fixed-position, so a story that renders nothing else (css
+  // customization) leaves the root with no size: wait for the panel instead.
+  await page.getByRole("complementary").first().waitFor();
   await page.waitForLoadState("networkidle");
 }
 

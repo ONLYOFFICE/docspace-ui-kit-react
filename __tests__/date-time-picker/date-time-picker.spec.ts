@@ -10,8 +10,13 @@ async function gotoStory(page: Page, storyId: string) {
   await page.clock.install({ time: new Date("2026-01-15T09:20:00") });
   const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
   await page.goto(url);
+  // Storybook answers 200 for an unknown id and shows its error display
+  // instead of the story: fail on that now, not on a timeout further down.
+  await page.waitForSelector("body.sb-show-main, body.sb-show-errordisplay", {
+    state: "attached",
+  });
+  await expect(page.locator("body")).not.toHaveClass(/sb-show-errordisplay/);
   await page.waitForSelector("#storybook-root", { state: "visible" });
-  await expect(page.locator("text=Story not found")).toHaveCount(0);
   await page.waitForLoadState("networkidle");
 }
 
