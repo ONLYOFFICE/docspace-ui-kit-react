@@ -22,6 +22,7 @@ const SCROLL_EPSILON = 1;
 // How much of the current view stays on screen after paging, so the tile at the
 // edge is not scrolled past unseen.
 const PAGE_OVERLAP = 64;
+const SMOOTH_SCROLL_MAX_MS = 1000;
 
 // Scrolling toward the end raises scrollLeft in LTR and lowers it (through
 // negative values) in RTL. Read the resolved direction from the element rather
@@ -257,12 +258,17 @@ export const QuickActions = ({
     ? ({ "--_measured-row-width": `${rowWidth}px` } as React.CSSProperties)
     : undefined;
 
+  // Until when an arrow button's smooth scroll may still be running. The
+  // browsers' smooth scroll takes well under a second.
+  const smoothScrollUntilRef = React.useRef(0);
+
   const scrollByPage = (towardEnd: boolean) => {
     if (!track) return;
 
     const page = Math.max(track.clientWidth - PAGE_OVERLAP, PAGE_OVERLAP);
     const distance = page * getDirectionSign(track) * (towardEnd ? 1 : -1);
 
+    smoothScrollUntilRef.current = performance.now() + SMOOTH_SCROLL_MAX_MS;
     track.scrollBy({ left: distance, behavior: "smooth" });
   };
 
@@ -294,9 +300,13 @@ export const QuickActions = ({
     // stopped by the key press itself, wherever it has got to, and in
     // Chromium on Linux that drops the scroll above as well. Asking again on
     // the next frame, after the animation is gone, lands the tile in view.
-    requestAnimationFrame(() =>
-      next.scrollIntoView?.({ block: "nearest", inline: "nearest" }),
-    );
+    // Without such a scroll the first call is enough.
+    if (performance.now() < smoothScrollUntilRef.current) {
+      smoothScrollUntilRef.current = 0;
+      requestAnimationFrame(() =>
+        next.scrollIntoView?.({ block: "nearest", inline: "nearest" }),
+      );
+    }
   };
 
   if (isLoading) {
