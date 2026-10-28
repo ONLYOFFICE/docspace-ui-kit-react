@@ -34,7 +34,7 @@ import {
   SECTION_SUBMENU_NAME,
   SECTION_BANNER_NAME,
 } from "./Section.constants";
-import { getSidePanelWidth, parseChildren } from "./Section.utils";
+import { getInfoPanelWidth, parseChildren } from "./Section.utils";
 
 export type { SectionProps };
 
@@ -295,9 +295,9 @@ const Section = (props: SectionProps) => {
   const isInfoVisible =
     canDisplay && (isInfoPanelVisible || isChatPanelVisible);
 
-  const sidePanelWidth =
+  const infoWidth =
     currentDeviceType === DeviceType.desktop
-      ? getSidePanelWidth({
+      ? getInfoPanelWidth({
           isInfoPanelVisible,
           infoPanelWidth: isInfoPanelResizable ? infoPanelWidth : undefined,
           isChatPanelVisible,
@@ -425,7 +425,7 @@ const Section = (props: SectionProps) => {
             mainButtonVisible={mainButtonVisible}
             showCancelButton={showCancelButton}
             isInfoPanelVisible={isInfoVisible}
-            sidePanelWidth={sidePanelWidth}
+            infoPanelWidth={infoWidth}
             dropTargetFolderName={dropTargetPreview}
             isDragging={dragging}
           />

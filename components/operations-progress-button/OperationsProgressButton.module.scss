@@ -188,7 +188,7 @@
 
   &.infoPanelVisible {
     inset-inline-end: calc(
-      var(--operations-progress-side-panel-width, 400px) + 24px
+      var(--operations-progress-info-panel-width, 400px) + 24px
     );
   }
 

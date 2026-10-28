@@ -88,7 +88,7 @@ export const parseChildren = (children: React.ReactNode) => {
   return arr;
 };
 
-type TSidePanels = {
+type TInfoPanelWidthArgs = {
   isInfoPanelVisible?: boolean;
   infoPanelWidth?: number;
   isChatPanelVisible?: boolean;
@@ -96,14 +96,14 @@ type TSidePanels = {
   chatPanelWidth?: number;
 };
 
-/** Width of the open side panel, the info panel or the AI chat outside fullscreen, when the host set one; `undefined` leaves the 400px default. */
-export const getSidePanelWidth = ({
+/** Width of the open info panel, or of the AI chat open in its place outside fullscreen, when the host set one; `undefined` leaves the 400px default. */
+export const getInfoPanelWidth = ({
   isInfoPanelVisible,
   infoPanelWidth,
   isChatPanelVisible,
   isChatPanelFullscreen,
   chatPanelWidth,
-}: TSidePanels) => {
+}: TInfoPanelWidthArgs) => {
   if (isInfoPanelVisible) return infoPanelWidth;
   if (isChatPanelVisible && !isChatPanelFullscreen) return chatPanelWidth;
 

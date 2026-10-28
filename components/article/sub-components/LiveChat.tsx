@@ -43,7 +43,7 @@ const ArticleLiveChat = ({
   isShowLiveChat,
   withFloatingButton = false,
   isInfoPanelVisible = false,
-  sidePanelWidth,
+  infoPanelWidth,
 }: ArticleLiveChatProps) => {
   const { isRTL } = useInterfaceDirection();
   const { isBase, currentColorScheme } = useTheme();
@@ -62,8 +62,8 @@ const ArticleLiveChat = ({
     // styles/variables/_floating-corner.scss - otherwise it lines up with
     // nothing. It shares that corner with the app's create button and with the
     // upload progress button, and steps one button width aside whenever either
-    // of them is on screen. Above mobile the info panel or the AI chat is a
-    // side panel the corner moves clear of; on a phone a panel takes the
+    // of them is on screen. Above mobile the corner moves clear of the info
+    // panel, or of the AI chat in its place; on a phone a panel takes the
     // whole screen and there is nothing to step around. The offsets are pixels
     // from the viewport edge, on both axes.
     const inset = isMobileWidth
@@ -72,10 +72,10 @@ const ArticleLiveChat = ({
     const dodge = withFloatingButton
       ? FLOATING_CORNER_SIZE + FLOATING_CORNER_GAP
       : 0;
-    const sidePanel = isMobileWidth
+    const infoPanel = isMobileWidth
       ? 0
-      : (sidePanelWidth ?? (isInfoPanelVisible ? INFO_PANEL_WIDTH : 0));
-    const offset = { horizontal: inset + dodge + sidePanel, vertical: inset };
+      : (infoPanelWidth ?? (isInfoPanelVisible ? INFO_PANEL_WIDTH : 0));
+    const offset = { horizontal: inset + dodge + infoPanel, vertical: inset };
 
     // The widget keeps a second offset for what it takes to be a phone. It
     // gets the same one, so the breakpoint stays ours - useIsMobile, which is
@@ -106,7 +106,7 @@ const ArticleLiveChat = ({
   }, [
     withFloatingButton,
     isInfoPanelVisible,
-    sidePanelWidth,
+    infoPanelWidth,
     isMobileWidth,
     isRTL,
     isBase,

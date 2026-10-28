@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { getSidePanelWidth } from "./Section.utils";
+import { getInfoPanelWidth } from "./Section.utils";
 
-describe("getSidePanelWidth", () => {
+describe("getInfoPanelWidth", () => {
   it("takes the info panel's width while it is open", () => {
     expect(
-      getSidePanelWidth({
+      getInfoPanelWidth({
         isInfoPanelVisible: true,
         infoPanelWidth: 640,
         isChatPanelVisible: true,
@@ -16,19 +16,19 @@ describe("getSidePanelWidth", () => {
 
   it("takes the open chat's width otherwise", () => {
     expect(
-      getSidePanelWidth({ isChatPanelVisible: true, chatPanelWidth: 500 }),
+      getInfoPanelWidth({ isChatPanelVisible: true, chatPanelWidth: 500 }),
     ).toBe(500);
   });
 
   it("leaves the default to a fullscreen chat, a closed panel and a width the host does not own", () => {
     expect(
-      getSidePanelWidth({
+      getInfoPanelWidth({
         isChatPanelVisible: true,
         isChatPanelFullscreen: true,
         chatPanelWidth: 500,
       }),
     ).toBeUndefined();
-    expect(getSidePanelWidth({ infoPanelWidth: 640 })).toBeUndefined();
-    expect(getSidePanelWidth({ isInfoPanelVisible: true })).toBeUndefined();
+    expect(getInfoPanelWidth({ infoPanelWidth: 640 })).toBeUndefined();
+    expect(getInfoPanelWidth({ isInfoPanelVisible: true })).toBeUndefined();
   });
 });
