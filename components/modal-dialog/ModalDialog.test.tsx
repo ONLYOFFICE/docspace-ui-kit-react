@@ -486,6 +486,39 @@ describe("ModalDialog", () => {
 
       expect(mockOnClose).not.toHaveBeenCalled();
     });
+
+    it("calls onBackClick on Backspace when embedded is true", async () => {
+      const mockOnBackClick = vi.fn();
+      render(
+        <ModalDialog {...defaultProps} embedded onBackClick={mockOnBackClick}>
+          <ModalDialog.Body>Modal Body Content</ModalDialog.Body>
+        </ModalDialog>,
+      );
+
+      await userEvent.keyboard("{backspace}");
+
+      expect(mockOnBackClick).toHaveBeenCalledTimes(1);
+    });
+
+    it("leaves Backspace to a modal dialog open over the embedded one", async () => {
+      const onBackEmbedded = vi.fn();
+      const onBackModal = vi.fn();
+      render(
+        <>
+          <ModalDialog visible embedded onBackClick={onBackEmbedded}>
+            <ModalDialog.Body>Embedded</ModalDialog.Body>
+          </ModalDialog>
+          <ModalDialog visible onClose={vi.fn()} onBackClick={onBackModal}>
+            <ModalDialog.Body>Modal</ModalDialog.Body>
+          </ModalDialog>
+        </>,
+      );
+
+      await userEvent.keyboard("{backspace}");
+
+      expect(onBackModal).toHaveBeenCalledTimes(1);
+      expect(onBackEmbedded).not.toHaveBeenCalled();
+    });
   });
 
   describe("Form functionality", () => {

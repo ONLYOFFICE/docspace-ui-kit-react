@@ -18,6 +18,29 @@ const compare = (prevProps: TComboboxProps, nextProps: TComboboxProps) => {
   return equal(prevProps, nextProps);
 };
 
+const swallowEscapeKeyUp = () => {
+  const release = () => {
+    window.removeEventListener("keyup", onKeyUp, true);
+    window.removeEventListener("keydown", onKeyDown, true);
+    window.removeEventListener("blur", release);
+  };
+
+  const onKeyUp = (event: KeyboardEvent) => {
+    if (event.key !== "Escape") return;
+    event.stopPropagation();
+    release();
+  };
+
+  const onKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Escape" && event.repeat) return;
+    release();
+  };
+
+  window.addEventListener("keyup", onKeyUp, true);
+  window.addEventListener("keydown", onKeyDown, true);
+  window.addEventListener("blur", release);
+};
+
 const ComboBoxPure: React.FC<TComboboxProps> = ({
   selectedOption: selectedOptionProps,
   setIsOpenItemAccess,
@@ -39,20 +62,28 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
 
   const { withBackdrop = true, onBackdropClick, onToggle } = props;
 
+  const isClosedByParent = !!onToggle && !(withBackdrop && onBackdropClick);
+
   const handleClickOutside = React.useCallback(
     (e: Event) => {
       const target = e.target as HTMLElement;
 
       if (ref.current?.contains(target)) return;
 
-      if (onToggle && !(withBackdrop && onBackdropClick)) return;
+      if (isClosedByParent) return;
 
       setIsOpenItemAccess?.(!isOpen);
       setIsOpen(false);
 
       if (withBackdrop) onBackdropClick?.(e);
     },
-    [isOpen, setIsOpenItemAccess, withBackdrop, onBackdropClick, onToggle],
+    [
+      isOpen,
+      setIsOpenItemAccess,
+      withBackdrop,
+      onBackdropClick,
+      isClosedByParent,
+    ],
   );
 
   const comboBoxClick: React.MouseEventHandler<HTMLDivElement | Element> = (
@@ -118,23 +149,23 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
   const handleKeyDown = React.useCallback(
     (e: KeyboardEvent) => {
       if (!isOpen || e.key !== "Escape") return;
-      if (onToggle && !(withBackdrop && onBackdropClick)) return;
+      if (isClosedByParent) return;
 
       e.preventDefault();
-
-      const onEscapeKeyUp = (event: KeyboardEvent) => {
-        if (event.key !== "Escape") return;
-        event.stopPropagation();
-        window.removeEventListener("keyup", onEscapeKeyUp, true);
-      };
-      window.addEventListener("keyup", onEscapeKeyUp, true);
+      swallowEscapeKeyUp();
 
       setIsOpenItemAccess?.(false);
       setIsOpen(false);
 
       if (withBackdrop) onBackdropClick?.(e);
     },
-    [isOpen, onToggle, withBackdrop, onBackdropClick, setIsOpenItemAccess],
+    [
+      isOpen,
+      isClosedByParent,
+      withBackdrop,
+      onBackdropClick,
+      setIsOpenItemAccess,
+    ],
   );
 
   React.useEffect(() => {

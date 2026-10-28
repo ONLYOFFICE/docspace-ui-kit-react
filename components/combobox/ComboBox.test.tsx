@@ -243,6 +243,40 @@ describe("ComboBox", () => {
     window.removeEventListener("keyup", onWindowKeyUp);
   });
 
+  it("stops swallowing Escape once the window loses focus before the keyup", async () => {
+    const user = userEvent.setup();
+    const onWindowKeyUp = vi.fn();
+    window.addEventListener("keyup", onWindowKeyUp);
+
+    render(<ComboBox {...baseProps} />);
+
+    await user.click(screen.getByRole("button"));
+    fireEvent.keyDown(document, { key: "Escape" });
+    fireEvent.blur(window);
+
+    fireEvent.keyUp(window, { key: "Escape" });
+    expect(onWindowKeyUp).toHaveBeenCalledTimes(1);
+
+    window.removeEventListener("keyup", onWindowKeyUp);
+  });
+
+  it("stops swallowing Escape once another key is pressed before the keyup", async () => {
+    const user = userEvent.setup();
+    const onWindowKeyUp = vi.fn();
+    window.addEventListener("keyup", onWindowKeyUp);
+
+    render(<ComboBox {...baseProps} />);
+
+    await user.click(screen.getByRole("button"));
+    fireEvent.keyDown(document, { key: "Escape" });
+    fireEvent.keyDown(window, { key: "Tab" });
+
+    fireEvent.keyUp(window, { key: "Escape" });
+    expect(onWindowKeyUp).toHaveBeenCalledTimes(1);
+
+    window.removeEventListener("keyup", onWindowKeyUp);
+  });
+
   it("closes only the list, not the modal dialog it sits in, on Escape", async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();

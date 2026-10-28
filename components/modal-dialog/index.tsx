@@ -123,7 +123,10 @@ const ModalDialog = ({
     const onSwipeEnd = () => setModalSwipeOffset(0);
 
     const onKeyPress = (e: KeyboardEvent) => {
-      if (openDialogs[openDialogs.length - 1] !== dialogId) return;
+      const isTopDialog = embedded
+        ? openDialogs.length === 0
+        : openDialogs[openDialogs.length - 1] === dialogId;
+      if (!isTopDialog) return;
 
       if ((e.key === "Esc" || e.key === "Escape") && visible) onCloseEvent();
 
@@ -158,6 +161,7 @@ const ModalDialog = ({
     visible,
     onBackClick,
     dialogId,
+    embedded,
   ]);
 
   useEffect(() => {
