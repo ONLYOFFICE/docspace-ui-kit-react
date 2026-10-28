@@ -86,6 +86,7 @@ vi.mock(".", () => {
     "room/ai.svg": ["aiRoom"],
     "room/instructions.svg": ["instructionsRoom"],
     "room/knowledge.svg": ["knowledgeRoom"],
+    "room/ai-project.svg": ["aiProjectRoom"],
     "room/editing.svg": ["editingRoom"],
     "room/form.svg": ["formRoom"],
     "room/public.svg": ["publicRoom"],

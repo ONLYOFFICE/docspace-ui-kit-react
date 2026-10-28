@@ -50,6 +50,7 @@ import WordCommon32 from "../../assets/icons/32/wordCommon.svg";
 import RoomAi32 from "../../assets/icons/32/room/ai.svg";
 import RoomInstructions32 from "../../assets/icons/32/room/instructions.svg";
 import RoomKnowledge32 from "../../assets/icons/32/room/knowledge.svg";
+import RoomAiProject32 from "../../assets/icons/32/room/ai-project.svg";
 import RoomArchive32 from "../../assets/icons/32/room/archive.svg";
 import RoomCustom32 from "../../assets/icons/32/room/custom.svg";
 import RoomEditing32 from "../../assets/icons/32/room/editing.svg";
@@ -214,6 +215,7 @@ export const iconsMap: Record<number, Record<string, SvgComponent>> = {
     "room/ai.svg": RoomAi32,
     "room/instructions.svg": RoomInstructions32,
     "room/knowledge.svg": RoomKnowledge32,
+    "room/ai-project.svg": RoomAiProject32,
     "room/archive.svg": RoomArchive32,
     "room/custom.svg": RoomCustom32,
     "room/editing.svg": RoomEditing32,

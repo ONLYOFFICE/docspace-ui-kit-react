@@ -34,6 +34,7 @@ enum IconNames {
   AIRoom = "room/ai.svg",
   InstructionsRoom = "room/instructions.svg",
   KnowledgeRoom = "room/knowledge.svg",
+  AiProjectRoom = "room/ai-project.svg",
 }
 
 const iconsMap: Record<IconNames, string[]> = {
@@ -118,6 +119,7 @@ const iconsMap: Record<IconNames, string[]> = {
   [IconNames.AIRoom]: ["aiRoom"],
   [IconNames.InstructionsRoom]: ["instructionsRoom"],
   [IconNames.KnowledgeRoom]: ["knowledgeRoom"],
+  [IconNames.AiProjectRoom]: ["aiProjectRoom"],
   [IconNames.EditingRoom]: ["editingRoom"],
   [IconNames.FormRoom]: ["formRoom"],
   [IconNames.PublicRoom]: ["publicRoom"],
