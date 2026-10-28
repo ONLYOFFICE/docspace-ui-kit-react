@@ -444,7 +444,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
         style={
           {
             zIndex: isOpenDropdown ? "211" : "201",
-            ...(infoPanelWidth
+            ...(infoPanelWidth !== undefined
               ? {
                   "--operations-progress-info-panel-width": `${infoPanelWidth}px`,
                 }
