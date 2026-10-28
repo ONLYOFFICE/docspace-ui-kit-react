@@ -199,12 +199,19 @@ export const Default: Story = {
     onScroll: fn(),
   },
   play: async ({ args, canvas, canvasElement }) => {
+    // A web font arriving late re-wraps the paragraphs and makes the content
+    // taller: a scroll to the end taken before that stops short of the end.
+    await document.fonts.ready;
     const scroller = canvas.getByTestId("scroller");
     const trackY = part(canvasElement, "track-vertical");
     const thumbY = part(canvasElement, "thumb-vertical");
     await expect(isShown(trackY)).toBe(true);
     await expect(getComputedStyle(trackY).opacity).toBe("1");
-    await expect(isShown(part(canvasElement, "track-horizontal"))).toBe(false);
+    // Until the first measure the scroller has no width, and the horizontal
+    // track counts as needed; it goes once the sizes are in.
+    await waitFor(() =>
+      expect(isShown(part(canvasElement, "track-horizontal"))).toBe(false),
+    );
     // The thumb is 4px until the pointer is over the track.
     await expect(getComputedStyle(thumbY).width).toBe("4px");
 
