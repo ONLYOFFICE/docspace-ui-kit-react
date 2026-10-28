@@ -74,13 +74,25 @@ const FilterBlockItem = ({
   const getSelectorItem = (item: TSelectorItem) => {
     const isRoomsSelector = item.group === FilterGroups.filterRoom;
     const isGroupsSelector = item.group === FilterGroups.filterGroup;
-    const selectorType = isRoomsSelector
-      ? FilterSelectorTypes.rooms
-      : isGroupsSelector
-        ? FilterSelectorTypes.groups
-        : FilterSelectorTypes.people;
+    const selectorType =
+      item.selectorType ??
+      (isRoomsSelector
+        ? FilterSelectorTypes.rooms
+        : isGroupsSelector
+          ? FilterSelectorTypes.groups
+          : FilterSelectorTypes.people);
+
+    // The group's choice is one of its plain options, not a pick of this
+    // selector: the selector stays an "add" link beside it.
+    const isSiblingOptionSelected = groupItem.some(
+      (gi) =>
+        gi !== item &&
+        !("displaySelectorType" in gi && gi.displaySelectorType) &&
+        gi.key === item.selectedKey,
+    );
 
     return !item.isSelected ||
+      isSiblingOptionSelected ||
       item.selectedKey === "me" ||
       item.selectedKey === FilterKeys.withoutGroup ||
       item.selectedKey === "other" ? (

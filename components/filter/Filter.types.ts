@@ -1,6 +1,6 @@
 import React from "react";
 
-import { DeviceType, FilterGroups } from "../../enums";
+import { DeviceType, FilterGroups, FilterSelectorTypes } from "../../enums";
 import { TSortBy, TViewAs } from "../../types";
 
 import { TViewSelectorOption } from "./sub-components/ViewSelector";
@@ -14,6 +14,8 @@ export type SelectorRenderProps = {
   onBackClick: () => void;
   onCloseClick: () => void;
   selectorLabel: string;
+  /** The filter group whose selector item opened the selector. */
+  group?: FilterGroups;
   isRooms: boolean;
   userId: string;
   disableThirdParty?: boolean;
@@ -60,6 +62,8 @@ export type TSelectorItem = {
   isSelected?: boolean;
   selectedKey?: string | number;
   displaySelectorType?: string;
+  /** The selector this item opens; by default it follows the group (rooms for `filterRoom`, groups for `filterGroup`, people otherwise). */
+  selectorType?: FilterSelectorTypes;
   key: string | number;
   selectedLabel?: string;
   label?: string;
@@ -136,6 +140,8 @@ export type TItem = {
   groupItem?: TGroupItem[];
   selectedKey?: string;
   displaySelectorType?: string;
+  /** The selector a `displaySelectorType` item opens; by default it follows the group. */
+  selectorType?: FilterSelectorTypes;
   isMultiSelect?: boolean;
   selectedLabel?: string;
   isCheckbox?: boolean;

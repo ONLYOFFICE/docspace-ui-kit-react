@@ -455,6 +455,7 @@ const FilterBlock = ({
               onBackClick: onArrowClick,
               onCloseClick: hideFilterBlock,
               selectorLabel,
+              group: showSelector.group ?? undefined,
               isRooms,
               userId,
               disableThirdParty,
