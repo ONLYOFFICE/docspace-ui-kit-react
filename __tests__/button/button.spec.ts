@@ -10,6 +10,12 @@ function storyUrl(storyId: string): string {
 
 async function gotoStory(page: Page, storyId: string) {
   await page.goto(storyUrl(storyId));
+  // Storybook answers 200 for an unknown id and shows its error display
+  // instead of the story: fail on that now, not on a timeout further down.
+  await page.waitForSelector("body.sb-show-main, body.sb-show-errordisplay", {
+    state: "attached",
+  });
+  await expect(page.locator("body")).not.toHaveClass(/sb-show-errordisplay/);
   // Wait for Storybook to finish rendering
   await page.waitForSelector("#storybook-root", { state: "visible" });
   // Wait for fonts and layout to stabilise
