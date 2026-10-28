@@ -23,21 +23,22 @@ export const consumeKey = (e: HandledKeyEvent) => {
   if (typeof window === "undefined") return;
 
   const { key } = e;
-  // The window the listeners went on. The give-up timer may fire after the
-  // global is gone (a test environment torn down), and must not look it up.
-  const win = window;
 
   // A keyup that never arrives (the window lost focus mid-press, or macOS
   // dropped the keyup of a key released under Cmd) must not leave the
   // listener to swallow some later, unrelated press. Autorepeat keydowns say
   // the key is still held, so each one restarts the wait.
   const GIVE_UP_AFTER = 1000;
-  let timer: number;
+  let timer: ReturnType<typeof setTimeout>;
+
+  // Release touches neither `window` nor its methods: the give-up timer may
+  // fire after a test environment has torn the window's members down. The
+  // listeners go with the signal, and the timer is the global one.
+  const listeners = new AbortController();
 
   const release = () => {
-    win.removeEventListener("keyup", onKeyUp, true);
-    win.removeEventListener("keydown", onKeyDown, true);
-    win.clearTimeout(timer);
+    listeners.abort();
+    clearTimeout(timer);
   };
 
   const onKeyUp = (up: KeyboardEvent) => {
@@ -48,12 +49,13 @@ export const consumeKey = (e: HandledKeyEvent) => {
 
   const onKeyDown = (down: KeyboardEvent) => {
     if (down.key !== key || !down.repeat) return;
-    win.clearTimeout(timer);
-    timer = win.setTimeout(release, GIVE_UP_AFTER);
+    clearTimeout(timer);
+    timer = setTimeout(release, GIVE_UP_AFTER);
   };
 
-  timer = win.setTimeout(release, GIVE_UP_AFTER);
+  timer = setTimeout(release, GIVE_UP_AFTER);
 
-  win.addEventListener("keyup", onKeyUp, true);
-  win.addEventListener("keydown", onKeyDown, true);
+  const options = { capture: true, signal: listeners.signal };
+  window.addEventListener("keyup", onKeyUp, options);
+  window.addEventListener("keydown", onKeyDown, options);
 };
