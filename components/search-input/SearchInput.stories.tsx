@@ -145,6 +145,9 @@ const meta = {
       control: "boolean",
       description:
         "Leaves the field out, so only the main button is drawn; the block keeps its width",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     dataTestId: {
       control: "text",
