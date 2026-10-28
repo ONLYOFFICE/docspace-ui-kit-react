@@ -275,7 +275,9 @@ export type SearchInputProps = {
   mainButtonIcon?: React.ReactNode;
   /** Leaves the search field out of the bar; the main button stays. Nothing
    * calls `onSearch`, and `initSearchValue` and `getSelectedInputValue` are
-   * shown nowhere. */
+   * shown nowhere. Meant for use with `showMainButton` and `mainButtonProps`:
+   * without a main button the search block stays as empty space that keeps
+   * the filter and sort controls at the end of the row. */
   hideSearch?: boolean;
 };
 
