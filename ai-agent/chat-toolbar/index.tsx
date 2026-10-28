@@ -18,9 +18,17 @@ const TOOLBAR_TOOLTIP_ID = "chat-toolbar-tooltip";
 
 export interface ChatToolbarProps {
   className?: string;
+  /**
+   * New chat keeps the session model instead of going back to the default:
+   * for a host that fixed the model for the whole place (an AI project).
+   */
+  keepSessionProfile?: boolean;
 }
 
-export const ChatToolbar: React.FC<ChatToolbarProps> = ({ className }) => {
+export const ChatToolbar: React.FC<ChatToolbarProps> = ({
+  className,
+  keepSessionProfile,
+}) => {
   const { t } = useTranslation("Common");
   const stores = useStores();
   const currentPage = stores.useRouter((s) => s.currentPage);
@@ -46,7 +54,7 @@ export const ChatToolbar: React.FC<ChatToolbarProps> = ({ className }) => {
   const handleStartNewChat = () => {
     if (!hasProfile || isNewChat) return;
 
-    startNewChat();
+    startNewChat({ keepSessionProfile });
     setCurrentPage("chat");
   };
 
