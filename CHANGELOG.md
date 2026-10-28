@@ -527,8 +527,15 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`MainButtonMobile`'s alert badge is named without an `I18nextProvider`.** It read
   "Common:Alert" outside the portal; it now uses the kit's translation lookup with "Alert" as the
   fallback.
+- `Selector` leaves search mode whenever `searchValue` becomes empty, not only when its own clear button is used. A host that cleared the value itself - on opening another folder, say - left the selector searching: an empty list kept the search field and the "nothing found" screen instead of its own empty screen, and "Select all" stayed hidden
+- The AI agent's editor tool calls go to the portal's own origin only. They carry what the
+  model writes into a document, and were posted to the editor panel's iframe and to the
+  generated-file tab with the target origin `"*"`, so a window that had meanwhile navigated
+  elsewhere — a sign-in redirect, a link followed in the tab — would have received them. Both
+  windows open the portal's `/doceditor`, so the calls are now addressed to
+  `window.location.origin` and the browser drops one whose window holds any other page.
 
-## 4.0.2
+## 4.1.0
 
 ### Added
 
@@ -615,16 +622,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   after them follow the same rule; before, the initial items still disabled every agent
 - AI chat: the copy buttons (message, code block, tool card) work on a portal served over plain HTTP. The platform adapter now supplies `copyToClipboard`, which falls back to `copy-to-clipboard` where the Clipboard API is unavailable outside a secure context (Bug 84481)
 - Files and images share one 5-attachment cap on a message, including the Forms section's single slot (Bug 84379)
-- `Selector` leaves search mode whenever `searchValue` becomes empty, not only when its own clear button is used. A host that cleared the value itself - on opening another folder, say - left the selector searching: an empty list kept the search field and the "nothing found" screen instead of its own empty screen, and "Select all" stayed hidden
 - The E2E Docker image copies the vendored ai-chat tarball before `pnpm install`
 - Filter: removing a chip no longer hides a chip of another group that shares its key
 - Context menu (desktop and mobile sheet) and `DropDownItem`: a string icon is fetched and inlined through `react-svg` only when it is a `.svg` on the page's own origin or, where it already was, an SVG data URL. Anything else, a cross-origin `.svg` included, is an `<img>`, so a custom action whose icon lives on the integrator's domain no longer needs CORS headers there and no longer loses its icon. The old rule looked for `images/` or `.svg` in the path and inlined such icons from any origin; a cross-origin SVG now keeps its own colours instead of taking the text colour
-- The AI agent's editor tool calls go to the portal's own origin only. They carry what the
-  model writes into a document, and were posted to the editor panel's iframe and to the
-  generated-file tab with the target origin `"*"`, so a window that had meanwhile navigated
-  elsewhere — a sign-in redirect, a link followed in the tab — would have received them. Both
-  windows open the portal's `/doceditor`, so the calls are now addressed to
-  `window.location.origin` and the browser drops one whose window holds any other page.
 
 ## 4.0.1
 
