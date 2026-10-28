@@ -155,6 +155,56 @@ describe("InfoPanel resizer", () => {
     await vi.waitFor(() => expect(onResize).toHaveBeenCalledWith(584));
   });
 
+  it("gives back a shared row's deficit once when two panels sit in it", async () => {
+    vi.restoreAllMocks();
+    const row = 1350;
+    const ownWidth = (el: HTMLElement) =>
+      parseFloat(el.style.getPropertyValue("--info-panel-width")) || 0;
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+      function mock(this: HTMLElement) {
+        const panels = screen
+          .getAllByTestId("info-panel-resizer")
+          .map((handle) => handle.parentElement as HTMLElement);
+        const width =
+          this.id === "section"
+            ? row - panels.reduce((sum, p) => sum + ownWidth(p), 0)
+            : ownWidth(this);
+        return { width, height: 800, top: 0, left: 0 } as DOMRect;
+      },
+    );
+    const first = vi.fn();
+    const second = vi.fn();
+
+    render(
+      <>
+        <div id="section" />
+        <InfoPanel
+          isVisible
+          canDisplay
+          currentDeviceType={DeviceType.desktop}
+          isResizable
+          width={500}
+          onResize={first}
+        >
+          First
+        </InfoPanel>
+        <InfoPanel
+          isVisible
+          canDisplay
+          currentDeviceType={DeviceType.desktop}
+          isResizable
+          width={500}
+          onResize={second}
+        >
+          Second
+        </InfoPanel>
+      </>,
+    );
+
+    await vi.waitFor(() => expect(first).toHaveBeenCalledWith(434));
+    expect(second).not.toHaveBeenCalled();
+  });
+
   it("is not rendered on mobile or when the host disables it", () => {
     const { rerender } = render(
       panel({ currentDeviceType: DeviceType.mobile }),

@@ -98,7 +98,10 @@ export const useEdgeResizer = ({
 
         const current = panel.getBoundingClientRect().width;
         const next = Math.max(minWidth, Math.round(current - deficit));
-        if (next < current) onResize(next);
+        if (next >= current) return;
+
+        panel.style.setProperty(cssVariable, `${next}px`);
+        onResize(next);
       });
     };
 
@@ -116,7 +119,7 @@ export const useEdgeResizer = ({
       observer.disconnect();
       window.removeEventListener("resize", clampToRow);
     };
-  }, [isVisible, isDockedResize, onResize, minWidth]);
+  }, [isVisible, isDockedResize, onResize, minWidth, cssVariable]);
 
   // Pointer events, not mouse events: a finger or a pen dragging the edge
   // produces no mousemove at all, only a pan the browser would scroll with.
