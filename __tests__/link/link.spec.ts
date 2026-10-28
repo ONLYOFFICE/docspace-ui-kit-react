@@ -41,6 +41,22 @@ test.describe("Link — light", () => {
 
   test("keyboard accessible action", async ({ page }) => {
     await gotoStory(page, "keyboard-accessible-action");
+    // The story's play function tabs to the link and clicks it itself; let it
+    // finish, then restart the Tab order from the body: a plain blur() keeps
+    // the link as the starting point, and the next Tab moves past it.
+    await page.waitForFunction(() => {
+      const phase = (
+        window as {
+          __STORYBOOK_PREVIEW__?: { currentRender?: { phase?: string } };
+        }
+      ).__STORYBOOK_PREVIEW__?.currentRender?.phase;
+      return phase === "completed" || phase === "finished";
+    });
+    await page.evaluate(() => {
+      document.body.tabIndex = -1;
+      document.body.focus();
+      document.body.removeAttribute("tabindex");
+    });
     await page.keyboard.press("Tab");
     await expect(
       page.getByRole("button", { name: "Move to archive" }),

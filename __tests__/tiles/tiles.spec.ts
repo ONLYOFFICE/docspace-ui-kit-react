@@ -4,7 +4,7 @@ const COMPONENTS: { id: string; name: string; stories?: string[] }[] = [
   {
     id: "ui-tiles-basetile",
     name: "base-tile",
-    stories: ["with-menu-button", "renaming-state", "blocking-operation"],
+    stories: ["renaming-state", "blocking-operation"],
   },
   {
     id: "ui-tiles-filetile",
