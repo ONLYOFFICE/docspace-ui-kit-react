@@ -89,10 +89,15 @@ const meta = {
     isInfoPanelVisible: {
       control: "boolean",
       description:
-        "Whether the info panel is open: the button moves 424px in from the trailing edge, clear of it",
+        "Whether a side panel is open (the info panel or the AI chat): the button moves `sidePanelWidth` plus 24px in from the trailing edge, clear of it, 424px by default",
       table: {
         defaultValue: { summary: "false" },
       },
+    },
+    sidePanelWidth: {
+      control: "number",
+      description:
+        "Width in pixels of the open side panel while `isInfoPanelVisible` is on, for a panel the person can resize; without it the button assumes 400px",
     },
     isDragging: {
       control: "boolean",

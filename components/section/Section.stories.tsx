@@ -35,6 +35,7 @@ const meta = {
     onDragOverEmpty: fn(),
     onDragLeaveEmpty: fn(),
     setIsInfoPanelVisible: fn(),
+    setInfoPanelWidth: fn(),
     setIsChatPanelVisible: fn(),
     setChatPanelWidth: fn(),
     onOpenUploadPanel: fn(),
@@ -123,6 +124,21 @@ const meta = {
       control: "boolean",
       description:
         "Freezes the info panel's scroller, for a drag or a menu that must not scroll the panel under it",
+    },
+    isInfoPanelResizable: {
+      control: "boolean",
+      description:
+        "Adds a drag handle on the info panel's inner edge that changes its width from 400px to 800px, by mouse or touch, on desktop only. A double click on the handle restores 400px",
+    },
+    infoPanelWidth: {
+      control: "number",
+      description:
+        "Width of the info panel in pixels while the handle is on; without it the panel is 400px wide",
+    },
+    setInfoPanelWidth: {
+      control: false,
+      description:
+        "Called once per handle drag, when the pointer is released, and on the double click that restores the default, with the new width in pixels",
     },
     isChatPanelAvailable: {
       control: "boolean",
@@ -791,10 +807,18 @@ const runningOperation: Operation[] = [
   },
 ];
 
-export const WithInfoPanel: Story = {
-  render: (args) => (
+const renderInfoPanel = (args: ComponentProps<typeof Section>) => {
+  const [, updateArgs] = useArgs();
+
+  return (
     <PageFrame>
-      <Section {...args}>
+      <Section
+        {...args}
+        setInfoPanelWidth={(value) => {
+          args.setInfoPanelWidth?.(value);
+          updateArgs({ infoPanelWidth: value });
+        }}
+      >
         <Section.SectionHeader>
           <NavigationHeader />
         </Section.SectionHeader>
@@ -804,28 +828,39 @@ export const WithInfoPanel: Story = {
         {infoPanelSlots}
       </Section>
     </PageFrame>
-  ),
+  );
+};
+
+export const WithInfoPanel: Story = {
+  render: renderInfoPanel,
   args: {
     currentDeviceType: DeviceType.desktop,
     withBodyScroll: true,
     settingsStudio: false,
     canDisplay: true,
     isInfoPanelVisible: true,
+    isInfoPanelResizable: true,
+    infoPanelWidth: 400,
   },
   parameters: {
     docs: {
       description: {
         story:
-          "A details panel beside the listing, for the properties of the selected item without leaving the page. It shows only while both `canDisplay` and `isInfoPanelVisible` are on; switch either off in the Controls panel below to close it.",
+          "A details panel beside the listing, for the properties of the selected item without leaving the page. It shows only while both `canDisplay` and `isInfoPanelVisible` are on; switch either off in the Controls panel below to close it. Drag its inner edge to make it wider or narrower (`isInfoPanelResizable`); the new width arrives when you release the pointer (`setInfoPanelWidth`), and a double click on the edge restores 400px.",
       },
       source: {
-        code: `<div style={{ display: "flex", height: 600 }}>
+        code: `const [width, setWidth] = useState(400);
+
+<div style={{ display: "flex", height: 600 }}>
   <Section
     currentDeviceType={DeviceType.desktop}
     withBodyScroll
     settingsStudio={false}
     canDisplay
     isInfoPanelVisible
+    isInfoPanelResizable
+    infoPanelWidth={width}
+    setInfoPanelWidth={setWidth}
   >
     <Section.SectionHeader>
       <Navigation title="My Documents" />
