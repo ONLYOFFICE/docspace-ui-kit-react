@@ -94,6 +94,23 @@ describe("useTabsHotkeys", () => {
     expect(selectTab).toHaveBeenLastCalledWith(2);
   });
 
+  // The tab's content may focus a field, which must not get the keyup too.
+  it("keeps the keyup of Enter and Space from what is focused next", () => {
+    for (const key of ["Enter", " "]) {
+      press(key, 1);
+
+      const field = document.createElement("input");
+      document.body.appendChild(field);
+      const onKeyUp = vi.fn();
+      field.addEventListener("keyup", onKeyUp);
+
+      field.dispatchEvent(new KeyboardEvent("keyup", { key, bubbles: true }));
+
+      expect(onKeyUp).not.toHaveBeenCalled();
+      field.remove();
+    }
+  });
+
   it("ignores keys pressed with a modifier", () => {
     press("ArrowRight", 0, { shiftKey: true });
     press("ArrowRight", 0, { ctrlKey: true });

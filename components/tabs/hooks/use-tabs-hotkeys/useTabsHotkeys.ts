@@ -1,5 +1,6 @@
 import type React from "react";
 import { TTabsHotkey } from "../../Tabs.types";
+import { consumeKey } from "../../../../utils/consume-key";
 
 /**
  * Keyboard model of the segmented bar, scoped to its own tab list: the
@@ -45,6 +46,9 @@ const useTabsHotkeys = ({
         break;
       case "Enter":
       case " ":
+        // A tab's content may move the focus into a field of its own, which
+        // must not get this press's keyup as well.
+        consumeKey(e);
         selectTab(focusedTabIndex);
         break;
       default:

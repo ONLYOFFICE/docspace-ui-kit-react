@@ -21,9 +21,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   listen for Tab on `window`, cancel it and pull focus onto itself, so a keyboard user could not
   leave it (WCAG 2.1.2). It is now `role="tablist"` with `role="tab"`, `aria-selected` and
   `aria-disabled`, one Tab stop (roving `tabindex`, on the selected tab), and a key handler on the
-  list itself: arrows (swapped in RTL), Home and End move the focus, Enter or Space selects, Tab
-  moves on. Keyboard navigation no longer needs `hotkeysId`, which now only adds its
-  `secondary-tabs-scroll-<hotkeysId>` class, and no `...-undefined` class is set without it. The
+  list itself: arrows (swapped in RTL), Home and End move the focus, Enter or Space selects and
+  swallows its own `keyup`, so a field the new content focuses does not get it, Tab moves on.
+  `PrimaryTabs` follows the same model. Keyboard navigation no longer needs `hotkeysId`, which
+  now only adds its `secondary-tabs-scroll-<hotkeysId>` class, and no `...-undefined` class is set without it. The
   document-wide `mouseup` listener is gone, and the keyboard highlight is drawn on
   `:focus-visible` instead of the `focused` class
 - **`Loader` is a `role="status"` region and draws the oval by default.** Its `label` is the
