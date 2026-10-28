@@ -32,8 +32,10 @@ const ColorPicker = ({
   const [color, setColor] = useState(() => appliedColor);
   const hexInputId = useId();
 
-  const applyLabel = applyButtonLabel ?? t("ApplyButton");
-  const cancelLabel = cancelButtonLabel ?? t("CancelButton");
+  // Before the Common bundle has loaded `t` returns "", and a button without
+  // a name is unusable: the English defaults stay as the last resort.
+  const applyLabel = applyButtonLabel ?? (t("ApplyButton") || "Apply");
+  const cancelLabel = cancelButtonLabel ?? (t("CancelButton") || "Cancel");
 
   // Escape is the keyboard's cancel: the same notification as the cancel
   // button and the cross. With an onClose it is consumed whole, keyup

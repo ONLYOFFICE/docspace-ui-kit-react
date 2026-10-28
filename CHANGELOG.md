@@ -82,7 +82,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`ColorPicker`'s hex field is named by its caption, and the buttons are translated by
   default.** The "Hex code" caption is now a `<label>` for the field, so the field's name is
   `hexCodeLabel` ("Hex code:") rather than "Hex color value"; left out, `applyButtonLabel` and
-  `cancelButtonLabel` use the kit's `Common:ApplyButton` and `Common:CancelButton` translations.
+  `cancelButtonLabel` use the kit's `Common:ApplyButton` and `Common:CancelButton` translations,
+  and "Apply" and "Cancel" while no translation is loaded. `ColorInput`'s hex field likewise
+  falls back to "Color" rather than an empty name.
 - **`InfiniteLoader` takes its scroll element as `scrollElement`.** Without it the loader still
   looks for the portal's `#sectionScroll` (`#customScrollBar` on mobile) scroller and falls back
   to the window, so the portal sees no change.

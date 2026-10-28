@@ -77,7 +77,7 @@ const ColorInput = ({
           data-scale={scale ? "true" : undefined}
           data-disabled={isDisabled ? "true" : undefined}
           disabled={isDisabled}
-          aria-label={inputLabel ?? t("Color")}
+          aria-label={inputLabel ?? (t("Color") || "Color")}
           aria-invalid={hasError || undefined}
         />
         <button
