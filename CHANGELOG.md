@@ -10,6 +10,9 @@
   redraws the rows when those titles change, and `onFilesLoaded` reports each loaded page
   of files with the folder, the room on its path and whether that room is private. File
   rows carry `encrypted`. Search and sorting still use the server's titles
+- `FilesSelector` takes `withRoomsTreeFolder` (default `true`) to leave Rooms out of the
+  root list, for a portal where the Rooms app is switched off. Forms no longer depends
+  on Rooms being listed: it is shown whenever `withFormsTreeFolder` is on
 
 ### Changed
 
