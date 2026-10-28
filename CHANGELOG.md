@@ -209,6 +209,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   mounted as `role="dialog"` with `aria-modal="true"`, so a screen reader was told the page behind
   an invisible dialog was unavailable, and its controls stayed in the Tab order. The outer element
   is now `aria-hidden` and `inert` while closed, and the surface drops `aria-modal`
+- **`ModalDialog` takes the focus on open and hands it back on close.** The focus stayed on the
+  page behind an open dialog, so the keyboard kept acting there. The dialog's surface
+  (`#modal-dialog`, now `tabindex="-1"`) takes the focus unless a field inside it is autofocused,
+  and on close the focus returns to the element that had it, also when `hideContent` recreated
+  the content while the dialog was open
 - **`TwoStateToggle`'s default strings name the product through `getBrandName("ProductName")`.**
   `title`, `confirmBody` and `ariaLabel` said "DocSpace"; they now follow the portal's branding,
   and say "ONLYOFFICE Apps" when no brand lookup is registered. Explicit props are unaffected
@@ -322,6 +327,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`StatusMessage` announces itself and repaints on `isWarning`.** An error bar is
   `role="alert"`, a warning bar `role="status"`, both `aria-atomic`; changing `isWarning` alone
   now repaints the bar at once. The bar carries `data-testid="status-message"`.
+- **`StatusMessage` keeps a JSX message that has not changed.** A JSX message is a new element on
+  every render of its parent, so the bar faded out and in again and, being a live region,
+  re-announced the error on every keystroke. Messages are now compared by their text.
 - **`FloatingButton` is operable and readable without a mouse.** With `onClick` the circle is a
   `role="button"` in the tab order, activated by Enter and Space, and named by the new `label`
   prop (the old `"<icon> button"` string remains the fallback). Its progress is a visually hidden
