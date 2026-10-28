@@ -74,6 +74,7 @@ export interface UseRootHelperProps {
   withRecentTreeFolder?: boolean;
   withFavoritesTreeFolder?: boolean;
   withAIAgentsTreeFolder?: boolean;
+  withRoomsTreeFolder?: boolean;
   withFormsTreeFolder?: boolean;
   isUserOnly?: boolean;
   setRecentFolder?: (folder?: FolderDtoInteger) => void;
@@ -245,6 +246,7 @@ export type FilesSelectorProps = TInfoBar &
     withRecentTreeFolder?: boolean;
     withFavoritesTreeFolder?: boolean;
     withAIAgentsTreeFolder?: boolean;
+    withRoomsTreeFolder?: boolean;
     withFormsTreeFolder?: boolean;
 
     onSetBaseFolderPath?: (
