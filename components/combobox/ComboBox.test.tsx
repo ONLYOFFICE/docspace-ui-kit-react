@@ -189,54 +189,6 @@ describe("ComboBox", () => {
     expect(setIsOpenItemAccess).toHaveBeenCalledWith(true);
   });
 
-  it("moves focus between options with ArrowDown key", () => {
-    render(<ComboBox {...baseProps} />);
-
-    // Open combobox so keyboard handler is active
-    fireEvent.click(screen.getByRole("button"));
-
-    const first = document.createElement("div");
-    first.setAttribute("data-testid", "drop-down-item");
-    const second = document.createElement("div");
-    second.setAttribute("data-testid", "drop-down-item");
-
-    document.body.append(first, second);
-
-    // First ArrowDown focuses first option
-
-    fireEvent.keyDown(document, { key: "ArrowDown" });
-    expect(first.getAttribute("data-focused")).toBe("true");
-    expect(second.getAttribute("data-focused")).toBe("false");
-
-    // Second ArrowDown moves focus to second option
-    fireEvent.keyDown(document, { key: "ArrowDown" });
-    expect(first.getAttribute("data-focused")).toBe("false");
-    expect(second.getAttribute("data-focused")).toBe("true");
-
-    document.body.removeChild(first);
-    document.body.removeChild(second);
-  });
-
-  it("calls onSelect when Enter is pressed on focused option", () => {
-    const onSelect = vi.fn();
-
-    render(<ComboBox {...baseProps} onSelect={onSelect} />);
-
-    // Open combobox so keyboard handler is active
-    fireEvent.click(screen.getByRole("button"));
-
-    const focusedOption = document.createElement("div");
-    focusedOption.setAttribute("data-testid", "drop-down-item");
-    focusedOption.setAttribute("data-focused", "true");
-    document.body.appendChild(focusedOption);
-
-    fireEvent.keyDown(document, { key: "Enter" });
-
-    expect(onSelect).toHaveBeenCalledWith(baseProps.options[0]);
-
-    document.body.removeChild(focusedOption);
-  });
-
   it("ignores unsupported keys in keyboard handler", () => {
     const onSelect = vi.fn();
 

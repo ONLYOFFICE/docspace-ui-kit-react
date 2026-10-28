@@ -117,75 +117,24 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
 
   const handleKeyDown = React.useCallback(
     (e: KeyboardEvent) => {
-      if (!isOpen) return;
+      if (!isOpen || e.key !== "Escape") return;
+      if (onToggle && !(withBackdrop && onBackdropClick)) return;
 
-      const options = document.querySelectorAll(
-        '[data-testid="drop-down-item"]',
-      );
-      const currentFocusedIndex = Array.from(options).findIndex(
-        (opt) => opt.getAttribute("data-focused") === "true",
-      );
+      e.preventDefault();
 
-      switch (e.key) {
-        case "ArrowDown": {
-          e.preventDefault();
-          const nextIndex =
-            currentFocusedIndex === -1
-              ? 0
-              : (currentFocusedIndex + 1) % options.length;
-          options.forEach((opt, i) => {
-            opt.setAttribute(
-              "data-focused",
-              i === nextIndex ? "true" : "false",
-            );
-          });
-          break;
-        }
-        case "Enter": {
-          e.preventDefault();
-          const focusedOption = Array.from(options).find(
-            (opt) => opt.getAttribute("data-focused") === "true",
-          );
-          if (focusedOption) {
-            const optionIndex = Array.from(options).indexOf(focusedOption);
-            const option = props.options?.[optionIndex];
-            if (option && !option.disabled) {
-              optionClick(option, e);
-            }
-          }
-          break;
-        }
-        case "Escape": {
-          if (onToggle && !(withBackdrop && onBackdropClick)) return;
+      const onEscapeKeyUp = (event: KeyboardEvent) => {
+        if (event.key !== "Escape") return;
+        event.stopPropagation();
+        window.removeEventListener("keyup", onEscapeKeyUp, true);
+      };
+      window.addEventListener("keyup", onEscapeKeyUp, true);
 
-          e.preventDefault();
+      setIsOpenItemAccess?.(false);
+      setIsOpen(false);
 
-          const onEscapeKeyUp = (event: KeyboardEvent) => {
-            if (event.key !== "Escape") return;
-            event.stopPropagation();
-            window.removeEventListener("keyup", onEscapeKeyUp, true);
-          };
-          window.addEventListener("keyup", onEscapeKeyUp, true);
-
-          setIsOpenItemAccess?.(false);
-          setIsOpen(false);
-
-          if (withBackdrop) onBackdropClick?.(e);
-          break;
-        }
-        default:
-          break;
-      }
+      if (withBackdrop) onBackdropClick?.(e);
     },
-    [
-      isOpen,
-      props.options,
-      optionClick,
-      onToggle,
-      withBackdrop,
-      onBackdropClick,
-      setIsOpenItemAccess,
-    ],
+    [isOpen, onToggle, withBackdrop, onBackdropClick, setIsOpenItemAccess],
   );
 
   React.useEffect(() => {
