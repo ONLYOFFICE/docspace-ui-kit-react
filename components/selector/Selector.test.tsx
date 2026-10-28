@@ -192,3 +192,69 @@ describe("<Selector /> Escape", () => {
     expect(onCancel).toHaveBeenCalledOnce();
   });
 });
+
+describe("<Selector /> Enter", () => {
+  it("submits the selector", () => {
+    const onSubmit = vi.fn();
+    renderSelector({ onSubmit });
+
+    fireEvent.keyUp(window, { key: "Enter" });
+
+    expect(onSubmit).toHaveBeenCalledOnce();
+  });
+
+  it("does not submit while the submit button is disabled", () => {
+    const onSubmit = vi.fn();
+    renderSelector({ onSubmit, disableSubmitButton: true });
+
+    fireEvent.keyUp(window, { key: "Enter" });
+
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("does not submit from the search input", () => {
+    const onSubmit = vi.fn();
+    renderSelector({
+      onSubmit,
+      withSearch: true,
+      searchPlaceholder: "Search",
+      searchValue: "First",
+      onSearch: vi.fn(),
+      onClearSearch: vi.fn(),
+    });
+
+    const input = document.querySelector(".selector-search-input input");
+    expect(input).not.toBeNull();
+
+    fireEvent.keyUp(input!, { key: "Enter" });
+
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("submits once from the focused submit button", () => {
+    const onSubmit = vi.fn();
+    renderSelector({ onSubmit });
+
+    fireEvent.click(screen.getByText("First item"));
+    const button = screen.getByTestId("selector_submit_button");
+    fireEvent.click(button);
+    fireEvent.keyUp(button, { key: "Enter" });
+
+    expect(onSubmit).toHaveBeenCalledOnce();
+  });
+
+  it("does not submit under a dialog opened from it", () => {
+    const onSubmit = vi.fn();
+    renderSelector({ onSubmit });
+
+    const dialog = document.createElement("div");
+    dialog.setAttribute("role", "dialog");
+    dialog.setAttribute("aria-modal", "true");
+    document.body.appendChild(dialog);
+
+    fireEvent.keyUp(window, { key: "Enter" });
+    dialog.remove();
+
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+});
