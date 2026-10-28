@@ -4,9 +4,12 @@ import { uninstrumentedUserEvent } from "storybook/test";
 
 const PLAY_DELAY = 300;
 
+// `navigator.webdriver` covers Playwright's visual specs (__tests__/), which
+// wait for the play function to finish and must not wait 300ms a step.
 const isTestRun = (): boolean =>
   "__vitest_browser__" in globalThis ||
-  /StorybookTestRunner/.test(globalThis.navigator?.userAgent ?? "");
+  /StorybookTestRunner/.test(globalThis.navigator?.userAgent ?? "") ||
+  globalThis.navigator?.webdriver === true;
 
 const accepts = (accept: string, file: File) =>
   !accept ||
