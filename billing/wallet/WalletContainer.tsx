@@ -34,6 +34,15 @@ const getInitialTabId = () => {
     : WALLET_TAB_IDS[0];
 };
 
+const setTabIdToUrl = (tabId: string) => {
+  const url = new URL(window.location.href);
+
+  if (tabId === WALLET_TAB_IDS[0]) url.searchParams.delete("tab");
+  else url.searchParams.set("tab", tabId);
+
+  window.history.replaceState(window.history.state, "", url.toString());
+};
+
 type WalletProps = {
   isMobile?: boolean;
   onViewUsage?: () => void;
@@ -53,7 +62,7 @@ const Wallet = (props: WalletProps) => {
     isVisibleWalletSettings,
     wasChangeBalance,
     fetchBalance,
-    fetchTransactionHistory,
+    refreshTransactionHistory,
     canUpdateTariff,
     recommendedAmount,
     walletHelpUrl,
@@ -138,7 +147,8 @@ const Wallet = (props: WalletProps) => {
     const startTime = Date.now();
 
     try {
-      await Promise.all([fetchBalance!(true), fetchTransactionHistory!()]);
+      refreshTransactionHistory();
+      await fetchBalance!(true);
     } catch (e) {
       toastr.error(e as Error);
     } finally {
@@ -147,6 +157,11 @@ const Wallet = (props: WalletProps) => {
         setRefreshing: setIsRefreshing,
       });
     }
+  };
+
+  const onSelectTab = (item: TTabItem) => {
+    setSelectedTabId(item.id);
+    setTabIdToUrl(item.id);
   };
 
   const tabsItems: TTabItem[] = [
@@ -300,7 +315,7 @@ const Wallet = (props: WalletProps) => {
         <Tabs
           items={tabsItems}
           selectedItemId={selectedTabId}
-          onSelect={(item) => setSelectedTabId(item.id)}
+          onSelect={onSelectTab}
           withoutStickyIntend
         />
       </div>

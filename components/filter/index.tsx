@@ -114,6 +114,7 @@ const FilterInput = React.memo(
     showMainButton,
     mainButtonProps,
     mainButtonIcon,
+    hideSearch,
   }: FilterProps) => {
     const t = useCommonTranslation();
 
@@ -129,6 +130,7 @@ const FilterInput = React.memo(
       showMainButton,
       mainButtonProps,
       mainButtonIcon,
+      hideSearch,
     });
 
     const [viewSettings, setViewSettings] = React.useState<

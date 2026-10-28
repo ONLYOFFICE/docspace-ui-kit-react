@@ -141,6 +141,11 @@ const meta = {
       control: "text",
       description: "Value of `data-testid` on the button's wrapper",
     },
+    hideField: {
+      control: "boolean",
+      description:
+        "Leaves the field out, so only the main button is drawn; the block keeps its width",
+    },
     dataTestId: {
       control: "text",
       description: "Value of `data-testid` on the outer element",
