@@ -407,10 +407,13 @@ Page-level:
   is no visible title. A dialog with neither is announced as an unnamed dialog.
 - `aria-describedby` reaches the same element, for the sentence that explains what the dialog
   is asking.
-- **Focus moves in and back, but is not trapped.** When the dialog opens it takes the focus
+- **Focus moves in, stays in, and goes back.** When the dialog opens it takes the focus
   itself (the element with the role), unless its content already focused one of its own
-  fields; when it closes, the focus goes back to where it was before. Tab is not held inside
-  the dialog. While `visible` is false the
+  fields; when it closes, the focus goes back to where it was before. While it is open, Tab
+  and Shift+Tab cycle through its controls and never reach the page behind it
+  ([`useFocusTrap`](../../hooks/useFocusTrap/README.md)); with none, the focus stays on the
+  dialog. Of dialogs open one over another only the top one holds the focus. While `visible`
+  is false the
   dialog's controls are out of the Tab order (`inert`), so a closed dialog no longer steals Tab
   stops from the page behind it.
 - The close button is named "Close", from the kit's translation, or by `closeLabel`;

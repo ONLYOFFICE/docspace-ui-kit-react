@@ -5,6 +5,7 @@ import classNames from "classnames";
 import { DialogModalSkeleton } from "./skeletons/Dialog.modal";
 import { DialogAsideSkeleton } from "./skeletons/Dialog.aside";
 import { Scrollbar } from "../../scrollbar";
+import { useFocusTrap } from "../../../hooks/useFocusTrap";
 import { AsideHeader } from "../../aside";
 import styles from "../ModalDialog.module.scss";
 import { ModalBackdrop } from "./ModalBackdrop";
@@ -102,6 +103,10 @@ const Modal = ({
         previous.focus({ preventScroll: true });
     };
   }, [visible, contentRef]);
+
+  // Tab and Shift+Tab cycle through the dialog and never reach the page
+  // behind it. `hideContent` swaps the content node, so the trap follows it.
+  useFocusTrap(contentRef, !!visible && !hideContent);
 
   const headerComponent = React.isValidElement(header)
     ? (header.props as { children: React.ReactNode }).children

@@ -2,6 +2,7 @@ import React from "react";
 import classNames from "classnames";
 
 import { Scrollbar } from "../scrollbar";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 import { AsideHeader } from "./aside-header";
 
@@ -35,6 +36,11 @@ const AsidePure = (props: AsideProps) => {
     else headerProps[key] = value;
   }
 
+  // An open panel lies over the page with a backdrop in front of it, so Tab
+  // and Shift+Tab stay in the panel.
+  const asideRef = React.useRef<HTMLElement>(null);
+  useFocusTrap(asideRef, !!visible);
+
   const asideClasses = classNames(
     styles.aside,
     className,
@@ -48,6 +54,7 @@ const AsidePure = (props: AsideProps) => {
 
   return (
     <aside
+      ref={asideRef}
       className={asideClasses}
       style={{ zIndex }}
       data-testid="aside"

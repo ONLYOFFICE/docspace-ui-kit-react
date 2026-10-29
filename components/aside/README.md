@@ -215,13 +215,16 @@ around the panel, they reach its header too.
 
 ## Accessibility
 
-- Renders a real `<aside>` element, so it is exposed as a complementary landmark. It is not a
-  dialog: no `role="dialog"`, no `aria-modal`, and focus is neither moved into it nor trapped.
+- Renders a real `<aside>` element, so it is exposed as a complementary landmark, not a dialog:
+  no `role="dialog"` and no `aria-modal`. The focus is not moved into it on open, but while
+  `visible` Tab and Shift+Tab stay inside it
+  ([`useFocusTrap`](../../hooks/useFocusTrap/README.md)): the first Tab from the page behind
+  lands on its first control, and the last one wraps to the first.
 - Because the markup stays in the document while `visible` is false, everything inside it is
   reachable by keyboard from the page behind. Conditional rendering is what prevents that.
-- The header's close cross is named "Close" (translated; `closeLabel` replaces it), but it is a
-  `<div>` with no button role and no tab stop, so a keyboard cannot reach it — and it is the
-  only control that calls `onClose`. A keyboard user needs a way out of yours.
+- The header's close cross is named "Close" (translated; `closeLabel` replaces it) and is a
+  focusable button that Enter and Space activate. It is the only control that calls `onClose`;
+  Escape does not, so a panel without the header needs a way out of its own.
 - `AriaAttributes` are part of the props type and land on the `<aside>` element alone, so an
   `aria-label` names the landmark.
 
