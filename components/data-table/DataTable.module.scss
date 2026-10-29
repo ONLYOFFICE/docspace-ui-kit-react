@@ -1,0 +1,131 @@
+@use "../../styles/variables/colors";
+
+// One stylesheet for the table and its parts. The grid comes from a single
+// custom property, --data-table-grid, which DataTable sets on its root; the
+// header row and every body row read it, so they cannot disagree.
+
+.dataTable {
+  :global(.light) & {
+    --data-table-background: #{colors.$white};
+    --data-table-border-color: #{colors.$gray-light-mid};
+    --data-table-header-text-color: #{colors.$gray};
+    --data-table-header-text-hover-color: #{colors.$light-gray-dark};
+  }
+
+  :global(.dark) & {
+    --data-table-background: #{colors.$black};
+    --data-table-border-color: #{colors.$gray-dark-strong};
+    --data-table-header-text-color: #{colors.$gray-dark};
+    --data-table-header-text-hover-color: #{colors.$white};
+  }
+
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+// ===== Header =====
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  background: var(--data-table-background);
+  border-bottom: 1px solid var(--data-table-border-color);
+}
+
+.headerRow {
+  display: grid;
+  grid-template-columns: var(--data-table-grid);
+  height: 39px;
+}
+
+.headerCell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  padding-inline-end: 8px;
+}
+
+.headerText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 38px;
+  color: var(--data-table-header-text-color);
+}
+
+.sortButton {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+
+  &:hover .headerText {
+    color: var(--data-table-header-text-hover-color);
+  }
+
+  &:focus-visible {
+    outline: 1px solid var(--data-table-header-text-hover-color);
+    outline-offset: -1px;
+  }
+}
+
+// The arrow points down (descending) as drawn; ascending mirrors it. It shows
+// on the sorted column, and on any sortable one under the pointer or focus.
+.sortIcon {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-inline-start: 4px;
+  visibility: hidden;
+
+  path {
+    fill: var(--data-table-header-text-color);
+  }
+
+  .sortButton:hover &,
+  .sortButton:focus-visible &,
+  .isSorted & {
+    visibility: visible;
+  }
+
+  .sortButton:hover & path {
+    fill: var(--data-table-header-text-hover-color);
+  }
+
+  .isAscending & {
+    transform: scaleY(-1);
+  }
+}
+
+// ===== Body =====
+
+.row {
+  display: grid;
+  grid-template-columns: var(--data-table-grid);
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-width: 0;
+  height: 48px;
+  overflow: hidden;
+
+  border-bottom: 1px solid var(--data-table-border-color);
+}
