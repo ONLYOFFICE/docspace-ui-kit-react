@@ -4,7 +4,10 @@ import { describe, expect, it, vi } from "vitest";
 import useContextMenuHotkeys from "./useContextMenuHotkeys";
 import type { ContextMenuModel } from "../ContextMenu.types";
 
-const renderMenuHotkeys = (model: ContextMenuModel[]) =>
+const renderMenuHotkeys = (
+  model: ContextMenuModel[],
+  showDisabledItems = false,
+) =>
   renderHook(() =>
     useContextMenuHotkeys({
       visible: true,
@@ -12,7 +15,7 @@ const renderMenuHotkeys = (model: ContextMenuModel[]) =>
       model,
       currentEvent: { current: new Event("contextmenu") },
       hide: vi.fn(),
-      showDisabledItems: false,
+      showDisabledItems,
     }),
   );
 
@@ -68,5 +71,20 @@ describe("useContextMenuHotkeys arrows", () => {
 
     press("ArrowUp");
     expect(result.current.currentIndex).toBe(3);
+  });
+
+  it("steps over a shown disabled item in the middle both ways", () => {
+    const model: ContextMenuModel[] = [
+      { key: "first", label: "First" },
+      { key: "disabled", label: "Disabled", disabled: true },
+      { key: "last", label: "Last" },
+    ];
+    const { result } = renderMenuHotkeys(model, true);
+
+    press("ArrowDown");
+    expect(result.current.currentIndex).toBe(2);
+
+    press("ArrowUp");
+    expect(result.current.currentIndex).toBe(0);
   });
 });

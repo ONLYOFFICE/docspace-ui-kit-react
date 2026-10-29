@@ -1,4 +1,5 @@
 import React from "react";
+import { flushSync } from "react-dom";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { screen, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -213,6 +214,49 @@ describe("ModalDialog", () => {
 
       expect(onCloseFirst).toHaveBeenCalledTimes(1);
       expect(onCloseSecond).not.toHaveBeenCalled();
+    });
+
+    it("closes only the top dialog when the one under it re-subscribed after it", async () => {
+      const onCloseFirst = vi.fn();
+      const onCloseSecond = vi.fn();
+
+      const First = ({ revision }: { revision: number }) => (
+        <ModalDialog visible onClose={() => onCloseFirst(revision)}>
+          <ModalDialog.Body>First</ModalDialog.Body>
+        </ModalDialog>
+      );
+
+      const Second = React.memo(() => {
+        const [visible, setVisible] = React.useState(true);
+        const close = React.useCallback(() => {
+          onCloseSecond();
+          flushSync(() => setVisible(false));
+        }, []);
+
+        return (
+          <ModalDialog visible={visible} onClose={close}>
+            <ModalDialog.Body>Second</ModalDialog.Body>
+          </ModalDialog>
+        );
+      });
+
+      const { rerender } = render(
+        <>
+          <First revision={0} />
+          <Second />
+        </>,
+      );
+      rerender(
+        <>
+          <First revision={1} />
+          <Second />
+        </>,
+      );
+
+      await userEvent.keyboard("{Escape}");
+
+      expect(onCloseSecond).toHaveBeenCalledTimes(1);
+      expect(onCloseFirst).not.toHaveBeenCalled();
     });
 
     it("calls onBackClick only on the last opened dialog", async () => {

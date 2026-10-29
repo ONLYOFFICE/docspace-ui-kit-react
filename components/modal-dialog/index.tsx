@@ -41,6 +41,8 @@ Container.displayName = MODAL_DIALOG_CONTAINER_NAME;
 
 const openDialogs: string[] = [];
 
+let handledKeyEvent: KeyboardEvent | null = null;
+
 const ModalDialog = ({
   ref,
   id,
@@ -126,7 +128,8 @@ const ModalDialog = ({
       const isTopDialog = embedded
         ? openDialogs.length === 0
         : openDialogs[openDialogs.length - 1] === dialogId;
-      if (!isTopDialog) return;
+      if (handledKeyEvent === e || !isTopDialog) return;
+      handledKeyEvent = e;
 
       if ((e.key === "Esc" || e.key === "Escape") && visible) onCloseEvent();
 
