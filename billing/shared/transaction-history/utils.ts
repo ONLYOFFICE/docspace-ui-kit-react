@@ -87,3 +87,24 @@ export const parseTokenUsage = (
   content: string | null,
 ): OperationTokenUsage | null =>
   content ? (JSON.parse(content) as OperationTokenUsage) : null;
+
+export const BYOK_TOOLTIP_ID = "byokTooltip";
+
+export type ByokOperation = Pick<
+  WalletOperationDto,
+  "provider" | "cost" | "debit" | "currency" | "service"
+>;
+
+export const serializeByokOperation = ({
+  provider,
+  cost,
+  debit,
+  currency,
+  service,
+}: WalletOperationDto) =>
+  JSON.stringify({ provider, cost, debit, currency, service });
+
+export const parseByokOperation = (
+  content: string | null,
+): ByokOperation | null =>
+  content ? (JSON.parse(content) as ByokOperation) : null;

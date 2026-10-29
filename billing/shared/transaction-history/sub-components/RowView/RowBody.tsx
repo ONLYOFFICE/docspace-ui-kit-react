@@ -17,6 +17,7 @@ import {
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 import { getTransactionSourceLabel, hasTransactionSource } from "../../utils";
 import { TokenUsageAnchor } from "../TokenUsage";
+import { ByokMarkAnchor } from "../ByokMark/sub-components/ByokMarkAnchor";
 import tokenStyles from "../TokenUsage/TokenUsage.module.scss";
 
 type TransactionRowViewProps = {
@@ -68,6 +69,7 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
             ({transaction.details})
           </Text>
         ) : null}
+        <ByokMarkAnchor transaction={transaction} />
       </div>,
       <div key="spacer" />,
       <Text
