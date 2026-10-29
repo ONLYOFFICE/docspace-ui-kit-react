@@ -180,7 +180,9 @@ describe("InfoPanel resizer", () => {
     render(panel({ width: 700, onResize, onShownWidthChange }));
 
     await vi.waitFor(() => expect(panelWidth()).toBe("584px"));
-    expect(onShownWidthChange).toHaveBeenLastCalledWith(584);
+    await vi.waitFor(() =>
+      expect(onShownWidthChange).toHaveBeenLastCalledWith(584),
+    );
 
     vi.restoreAllMocks();
     mockLayout(100, 584);
@@ -192,7 +194,9 @@ describe("InfoPanel resizer", () => {
     fireEvent(window, new Event("resize"));
     await vi.waitFor(() => expect(panelWidth()).toBe("700px"));
 
-    expect(onShownWidthChange).toHaveBeenLastCalledWith(700);
+    await vi.waitFor(() =>
+      expect(onShownWidthChange).toHaveBeenLastCalledWith(700),
+    );
     expect(onResize).not.toHaveBeenCalled();
   });
 

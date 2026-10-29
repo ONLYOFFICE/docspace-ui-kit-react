@@ -150,7 +150,9 @@ describe("ChatPanel resizer", () => {
     await vi.waitFor(() =>
       expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("784px"),
     );
-    expect(onShownWidthChange).toHaveBeenLastCalledWith(784);
+    await vi.waitFor(() =>
+      expect(onShownWidthChange).toHaveBeenLastCalledWith(784),
+    );
     expect(onResize).not.toHaveBeenCalled();
   });
 
