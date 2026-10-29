@@ -34,7 +34,7 @@ import {
   SECTION_SUBMENU_NAME,
   SECTION_BANNER_NAME,
 } from "./Section.constants";
-import { getInfoPanelWidth, parseChildren } from "./Section.utils";
+import { getShownInfoPanelWidth, parseChildren } from "./Section.utils";
 
 export type { SectionProps };
 
@@ -83,6 +83,7 @@ const Section = (props: SectionProps) => {
     isInfoPanelResizable,
     infoPanelWidth,
     setInfoPanelWidth,
+    onShownInfoPanelWidthChange,
     currentDeviceType,
 
     isInfoPanelVisible,
@@ -295,16 +296,26 @@ const Section = (props: SectionProps) => {
   const isInfoVisible =
     canDisplay && (isInfoPanelVisible || isChatPanelVisible);
 
-  const infoWidth =
-    currentDeviceType === DeviceType.desktop
-      ? getInfoPanelWidth({
-          isInfoPanelVisible,
-          infoPanelWidth: isInfoPanelResizable ? infoPanelWidth : undefined,
-          isChatPanelVisible,
-          isChatPanelFullscreen,
-          chatPanelWidth: isChatPanelResizable ? chatPanelWidth : undefined,
-        })
-      : undefined;
+  const shownInfoPanelWidth = getShownInfoPanelWidth({
+    isDesktop: currentDeviceType === DeviceType.desktop,
+    isInfoPanelVisible:
+      isInfoPanelAvailable && !!canDisplay && !!isInfoPanelVisible,
+    infoPanelWidth: isInfoPanelResizable ? infoPanelWidth : undefined,
+    isChatPanelVisible: isChatPanelAvailable && !!isChatPanelVisible,
+    isChatPanelFullscreen,
+    chatPanelWidth: isChatPanelResizable ? chatPanelWidth : undefined,
+  });
+
+  const hasPanels = isInfoPanelAvailable || isChatPanelAvailable;
+
+  React.useEffect(() => {
+    if (hasPanels) onShownInfoPanelWidthChange?.(shownInfoPanelWidth);
+  }, [hasPanels, shownInfoPanelWidth, onShownInfoPanelWidthChange]);
+
+  React.useEffect(
+    () => () => onShownInfoPanelWidthChange?.(0),
+    [onShownInfoPanelWidthChange],
+  );
 
   if (!isSectionAvailable) return null;
 
@@ -425,7 +436,7 @@ const Section = (props: SectionProps) => {
             mainButtonVisible={mainButtonVisible}
             showCancelButton={showCancelButton}
             isInfoPanelVisible={isInfoVisible}
-            infoPanelWidth={infoWidth}
+            infoPanelWidth={shownInfoPanelWidth || undefined}
             dropTargetFolderName={dropTargetPreview}
             isDragging={dragging}
           />

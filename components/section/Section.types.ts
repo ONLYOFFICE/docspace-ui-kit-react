@@ -235,6 +235,8 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     infoPanelWidth?: number;
     /** Called with the committed info panel width: once per resize drag, when the pointer is released, and on the double click that restores the default. */
     setInfoPanelWidth?: (value: number) => void;
+    /** Called with the width in px the open info panel, or the AI chat open in its place, takes on screen, and with `0` when neither does: how far the floating buttons in the corner have to move clear of it. Below a desktop the info panel counts as `INFO_PANEL_WIDTH` and the chat as `0`. */
+    onShownInfoPanelWidthChange?: (value: number) => void;
     /** Whether the AI chat region exists at all. It defaults to `false`. */
     isChatPanelAvailable?: boolean;
     /** Whether the AI chat panel is open. */

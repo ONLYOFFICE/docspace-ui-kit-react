@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { getInfoPanelWidth } from "./Section.utils";
+import { getShownInfoPanelWidth } from "./Section.utils";
 
-describe("getInfoPanelWidth", () => {
-  it("takes the info panel's width while it is open", () => {
+describe("getShownInfoPanelWidth", () => {
+  it("takes the info panel's width on a desktop", () => {
     expect(
-      getInfoPanelWidth({
+      getShownInfoPanelWidth({
+        isDesktop: true,
         isInfoPanelVisible: true,
         infoPanelWidth: 640,
         isChatPanelVisible: true,
@@ -14,21 +15,53 @@ describe("getInfoPanelWidth", () => {
     ).toBe(640);
   });
 
-  it("takes the open chat's width otherwise", () => {
+  it("takes the docked chat's width when the info panel is closed", () => {
     expect(
-      getInfoPanelWidth({ isChatPanelVisible: true, chatPanelWidth: 500 }),
+      getShownInfoPanelWidth({
+        isDesktop: true,
+        isChatPanelVisible: true,
+        chatPanelWidth: 500,
+      }),
     ).toBe(500);
   });
 
-  it("leaves the default to a fullscreen chat, a closed panel and a width the host does not own", () => {
+  it("falls back to the default width of a panel without a width of its own", () => {
     expect(
-      getInfoPanelWidth({
+      getShownInfoPanelWidth({ isDesktop: true, isInfoPanelVisible: true }),
+    ).toBe(400);
+    expect(
+      getShownInfoPanelWidth({ isDesktop: true, isChatPanelVisible: true }),
+    ).toBe(400);
+  });
+
+  it("counts below a desktop only the info panel, at its default width", () => {
+    expect(
+      getShownInfoPanelWidth({
+        isDesktop: false,
+        isInfoPanelVisible: true,
+        infoPanelWidth: 651,
+      }),
+    ).toBe(400);
+    expect(
+      getShownInfoPanelWidth({
+        isDesktop: false,
+        isChatPanelVisible: true,
+        chatPanelWidth: 500,
+      }),
+    ).toBe(0);
+  });
+
+  it("is 0 for a fullscreen chat and for no panel at all", () => {
+    expect(
+      getShownInfoPanelWidth({
+        isDesktop: true,
         isChatPanelVisible: true,
         isChatPanelFullscreen: true,
         chatPanelWidth: 500,
       }),
-    ).toBeUndefined();
-    expect(getInfoPanelWidth({ infoPanelWidth: 640 })).toBeUndefined();
-    expect(getInfoPanelWidth({ isInfoPanelVisible: true })).toBeUndefined();
+    ).toBe(0);
+    expect(
+      getShownInfoPanelWidth({ isDesktop: true, infoPanelWidth: 640 }),
+    ).toBe(0);
   });
 });
