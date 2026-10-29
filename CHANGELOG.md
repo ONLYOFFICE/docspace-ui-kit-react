@@ -147,6 +147,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `aria-label` / `aria-labelledby` make it a named form landmark. Without `onSubmit` it is a
   `<div>` as before. The README now states that `--form-wrapper-min-width` /
   `--form-wrapper-max-width` size the content, so the card is that width plus twice the padding.
+- **`IconButton` takes `role` and `ariaLabel`.** Its element is a `<div>` with no role, and its
+  props had none to give it, so an icon button could be made keyboard-operable with `tabIndex`
+  and `onKeyDown` but not announced as a button without a cast. Both props are rendered on the
+  element, as `Link`'s are; nothing changes for a button that passes neither.
 
 ### Fixed
 
