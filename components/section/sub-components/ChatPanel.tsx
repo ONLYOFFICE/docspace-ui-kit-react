@@ -39,6 +39,7 @@ const ChatPanel = ({
   isResizable,
   width,
   onResize,
+  onShownWidthChange,
   isFullscreen,
   onRequestFullscreen,
   onExitFullscreen,
@@ -58,16 +59,23 @@ const ChatPanel = ({
 
   const canResize = !!isResizable && currentDeviceType === DeviceType.desktop;
 
-  const { panelRef, isDockedResize, onResizerPointerDown } = useEdgeResizer({
-    isVisible,
-    canResize,
-    isFullscreen,
-    cssVariable: "--chat-panel-width",
-    minWidth: MIN_CHAT_PANEL_WIDTH,
-    onResize,
-    onRequestFullscreen,
-    onExitFullscreen,
-  });
+  const { panelRef, isDockedResize, shownWidth, onResizerPointerDown } =
+    useEdgeResizer({
+      isVisible,
+      canResize,
+      isFullscreen,
+      cssVariable: "--chat-panel-width",
+      minWidth: MIN_CHAT_PANEL_WIDTH,
+      width,
+      onResize,
+      onRequestFullscreen,
+      onExitFullscreen,
+    });
+
+  useEffect(() => {
+    onShownWidthChange?.(shownWidth);
+    return () => onShownWidthChange?.(undefined);
+  }, [shownWidth, onShownWidthChange]);
 
   if (!isVisible) return null;
 
@@ -77,8 +85,8 @@ const ChatPanel = ({
       className={classNames("chat-panel", styles.chatPanel)}
       id="ChatPanelWrapper"
       style={
-        isDockedResize && width
-          ? ({ "--chat-panel-width": `${width}px` } as React.CSSProperties)
+        isDockedResize && shownWidth
+          ? ({ "--chat-panel-width": `${shownWidth}px` } as React.CSSProperties)
           : undefined
       }
     >

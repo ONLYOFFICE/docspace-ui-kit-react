@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import styles from "../Section.module.scss";
 
@@ -51,6 +51,7 @@ type UseEdgeResizerProps = {
   minWidth: number;
   maxWidth?: number;
   defaultWidth?: number;
+  width?: number;
   onResize?: (value: number) => void;
   onRequestFullscreen?: () => void;
   onExitFullscreen?: () => void;
@@ -64,11 +65,15 @@ export const useEdgeResizer = ({
   minWidth,
   maxWidth,
   defaultWidth,
+  width,
   onResize,
   onRequestFullscreen,
   onExitFullscreen,
 }: UseEdgeResizerProps) => {
   const panelRef = useRef<HTMLDivElement>(null);
+  const widthRef = useRef(width);
+  widthRef.current = width;
+  const [fitWidth, setFitWidth] = useState<number>();
   // Set while a drag is in flight so an unmount mid-drag still detaches the
   // window listeners and un-freezes the body cursor. Its presence also marks
   // "a drag is in progress" for the reflow clamp below.
@@ -88,15 +93,9 @@ export const useEdgeResizer = ({
     if (!isDockedResize) panelRef.current?.style.removeProperty(cssVariable);
   }, [isDockedResize, cssVariable]);
 
-  // A dragged width is an absolute pixel value on a `flex-shrink: 0` element, so
-  // every later loss of row width (window resize, the article sidebar
-  // expanding) is absorbed by the section alone — far enough and its navigation
-  // header collapses. Give the width back as the row shrinks, down to the
-  // panel's own minimum. Shrink-only: growing the window again leaves the width
-  // the user last chose alone.
   useEffect(() => {
     const panel = panelRef.current;
-    if (!isVisible || !isDockedResize || !onResize || !panel) return undefined;
+    if (!isVisible || !isDockedResize || !panel) return undefined;
 
     let frame = 0;
     const clampToRow = () => {
@@ -107,16 +106,18 @@ export const useEdgeResizer = ({
         // pointer and snap the panel back to the last committed width.
         if (stopDragRef.current) return;
 
-        const deficit = MIN_SECTION_WIDTH - contentWidth(panel);
-        // Sub-pixel rounding of the flex row is not a deficit worth acting on.
-        if (deficit < 1) return;
+        const fit = Math.max(
+          minWidth,
+          Math.floor(ownWidth(panel) + contentWidth(panel) - MIN_SECTION_WIDTH),
+        );
 
-        const current = ownWidth(panel);
-        const next = Math.max(minWidth, Math.round(current - deficit));
-        if (next >= current) return;
-
-        panel.style.setProperty(cssVariable, `${next}px`);
-        onResize(next);
+        if (widthRef.current) {
+          panel.style.setProperty(
+            cssVariable,
+            `${Math.min(widthRef.current, fit)}px`,
+          );
+        }
+        setFitWidth(fit);
       });
     };
 
@@ -134,7 +135,12 @@ export const useEdgeResizer = ({
       observer.disconnect();
       window.removeEventListener("resize", clampToRow);
     };
-  }, [isVisible, isDockedResize, onResize, minWidth, cssVariable]);
+  }, [isVisible, isDockedResize, minWidth, cssVariable]);
+
+  const shownWidth =
+    isVisible && isDockedResize && width
+      ? Math.min(width, fitWidth ?? width)
+      : undefined;
 
   // Pointer events, not mouse events: a finger or a pen dragging the edge
   // produces no mousemove at all, only a pan the browser would scroll with.
@@ -291,6 +297,7 @@ export const useEdgeResizer = ({
   return {
     panelRef,
     isDockedResize,
+    shownWidth,
     onResizerPointerDown,
     onResizerDoubleClick,
   };

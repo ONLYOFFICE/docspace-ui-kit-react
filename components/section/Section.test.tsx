@@ -1,6 +1,6 @@
 import React from "react";
-import { describe, it, expect, vi } from "vitest";
-import { screen, render } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { screen, render, waitFor } from "@testing-library/react";
 
 import { DeviceType } from "../../enums";
 
@@ -79,12 +79,25 @@ describe("<Section />", () => {
         </Section>,
       );
 
-    it("reports the info panel's width on a desktop", () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it("reports the info panel's width on a desktop, narrowed to fit the window", async () => {
+      vi.spyOn(
+        HTMLElement.prototype,
+        "getBoundingClientRect",
+      ).mockImplementation(function mock(this: HTMLElement) {
+        const width = this.id === "section" ? 300 : 700;
+        return { width, height: 800, top: 0, left: 0 } as DOMRect;
+      });
       const onShownInfoPanelWidthChange = vi.fn();
 
-      renderWithInfoPanel({ infoPanelWidth: 600, onShownInfoPanelWidthChange });
+      renderWithInfoPanel({ infoPanelWidth: 700, onShownInfoPanelWidthChange });
 
-      expect(onShownInfoPanelWidthChange).toHaveBeenLastCalledWith(600);
+      await waitFor(() =>
+        expect(onShownInfoPanelWidthChange).toHaveBeenLastCalledWith(584),
+      );
     });
 
     it("counts the info panel at its default width below a desktop", () => {

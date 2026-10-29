@@ -150,6 +150,11 @@ const Section = (props: SectionProps) => {
   const containerRef = React.useRef<null | HTMLDivElement>(null);
   const timerRef = React.useRef<null | ReturnType<typeof setTimeout>>(null);
 
+  const [infoPanelShownWidth, setInfoPanelShownWidth] =
+    React.useState<number>();
+  const [chatPanelShownWidth, setChatPanelShownWidth] =
+    React.useState<number>();
+
   const [
     sectionHeaderContent,
     sectionFilterContent,
@@ -300,10 +305,10 @@ const Section = (props: SectionProps) => {
     isDesktop: currentDeviceType === DeviceType.desktop,
     isInfoPanelVisible:
       isInfoPanelAvailable && !!canDisplay && !!isInfoPanelVisible,
-    infoPanelWidth: isInfoPanelResizable ? infoPanelWidth : undefined,
+    infoPanelWidth: infoPanelShownWidth,
     isChatPanelVisible: isChatPanelAvailable && !!isChatPanelVisible,
     isChatPanelFullscreen,
-    chatPanelWidth: isChatPanelResizable ? chatPanelWidth : undefined,
+    chatPanelWidth: chatPanelShownWidth,
   });
 
   const hasPanels = isInfoPanelAvailable || isChatPanelAvailable;
@@ -457,6 +462,7 @@ const Section = (props: SectionProps) => {
           isResizable={isInfoPanelResizable}
           width={infoPanelWidth}
           onResize={setInfoPanelWidth}
+          onShownWidthChange={setInfoPanelShownWidth}
         >
           <SubInfoPanelHeader>{infoPanelHeaderContent}</SubInfoPanelHeader>
           <SubInfoPanelBody
@@ -477,6 +483,7 @@ const Section = (props: SectionProps) => {
           isResizable={isChatPanelResizable}
           width={chatPanelWidth}
           onResize={setChatPanelWidth}
+          onShownWidthChange={setChatPanelShownWidth}
           isFullscreen={isChatPanelFullscreen}
           onRequestFullscreen={setChatPanelFullscreen}
           onExitFullscreen={unsetChatPanelFullscreen}

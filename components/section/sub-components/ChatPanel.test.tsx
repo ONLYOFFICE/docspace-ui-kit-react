@@ -139,24 +139,30 @@ describe("ChatPanel resizer", () => {
     expect(onResize).toHaveBeenCalledWith(984);
   });
 
-  it("hands width back when the row shrinks below the section minimum", async () => {
-    // The section is 300px — 116px short of its 416px minimum — so a panel the
-    // user had dragged out to 900px has to give that much back.
+  it("narrows when the row shrinks below the section minimum, without saving it", async () => {
     vi.restoreAllMocks();
     mockLayout(300, 900);
     const onResize = vi.fn();
-    renderPanel({ width: 900, onResize });
+    const onShownWidthChange = vi.fn();
+    renderPanel({ width: 900, onResize, onShownWidthChange });
+    const panel = document.getElementById("ChatPanelWrapper");
 
-    await vi.waitFor(() => expect(onResize).toHaveBeenCalledWith(784));
+    await vi.waitFor(() =>
+      expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("784px"),
+    );
+    expect(onShownWidthChange).toHaveBeenLastCalledWith(784);
+    expect(onResize).not.toHaveBeenCalled();
   });
 
-  it("never gives back more than the panel's own minimum", async () => {
+  it("never narrows past the panel's own minimum", async () => {
     vi.restoreAllMocks();
     mockLayout(0, 400);
-    const onResize = vi.fn();
-    renderPanel({ width: 400, onResize });
+    renderPanel({ width: 400 });
+    const panel = document.getElementById("ChatPanelWrapper");
 
-    await vi.waitFor(() => expect(onResize).toHaveBeenCalledWith(360));
+    await vi.waitFor(() =>
+      expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("360px"),
+    );
   });
 
   it("leaves an in-flight drag alone when the row reflows under it", async () => {

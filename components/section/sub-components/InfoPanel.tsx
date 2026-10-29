@@ -28,6 +28,7 @@ const InfoPanel = ({
   isResizable,
   width,
   onResize,
+  onShownWidthChange,
 }: InfoPanelProps) => {
   const infoPanelRef = useRef<null | HTMLDivElement>(null);
 
@@ -37,6 +38,7 @@ const InfoPanel = ({
   const {
     panelRef,
     isDockedResize,
+    shownWidth,
     onResizerPointerDown,
     onResizerDoubleClick,
   } = useEdgeResizer({
@@ -46,8 +48,14 @@ const InfoPanel = ({
     minWidth: INFO_PANEL_WIDTH,
     maxWidth: INFO_PANEL_MAX_WIDTH,
     defaultWidth: INFO_PANEL_WIDTH,
+    width,
     onResize,
   });
+
+  useEffect(() => {
+    onShownWidthChange?.(shownWidth);
+    return () => onShownWidthChange?.(undefined);
+  }, [shownWidth, onShownWidthChange]);
 
   useEffect(() => {
     const onMouseDown = (e: MouseEvent) => {
@@ -104,8 +112,10 @@ const InfoPanel = ({
         ref={panelRef}
         className={classNames(styles.infoPanel)}
         style={
-          isDockedResize && width
-            ? ({ "--info-panel-width": `${width}px` } as React.CSSProperties)
+          isDockedResize && shownWidth
+            ? ({
+                "--info-panel-width": `${shownWidth}px`,
+              } as React.CSSProperties)
             : undefined
         }
       >

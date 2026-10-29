@@ -160,33 +160,44 @@ describe("InfoPanel resizer", () => {
     expect(panelWidth()).toBe("400px");
   });
 
-  it("hands width back when the row shrinks, down to the default width", async () => {
+  it("narrows to fit the window without saving it, and widens back", async () => {
     vi.restoreAllMocks();
     mockLayout(300, 700);
     const onResize = vi.fn();
-    render(panel({ width: 700, onResize }));
+    const onShownWidthChange = vi.fn();
+    render(panel({ width: 700, onResize, onShownWidthChange }));
 
-    await vi.waitFor(() => expect(onResize).toHaveBeenCalledWith(584));
+    await vi.waitFor(() => expect(panelWidth()).toBe("584px"));
+    expect(onShownWidthChange).toHaveBeenLastCalledWith(584);
 
     vi.restoreAllMocks();
-    mockLayout(100, 500);
-    onResize.mockClear();
+    mockLayout(100, 584);
     fireEvent(window, new Event("resize"));
+    await vi.waitFor(() => expect(panelWidth()).toBe("400px"));
 
-    await vi.waitFor(() => expect(onResize).toHaveBeenCalledWith(400));
+    vi.restoreAllMocks();
+    mockLayout(1000, 400);
+    fireEvent(window, new Event("resize"));
+    await vi.waitFor(() => expect(panelWidth()).toBe("700px"));
+
+    expect(onShownWidthChange).toHaveBeenLastCalledWith(700);
+    expect(onResize).not.toHaveBeenCalled();
   });
 
   it("starts watching the row once a hidden panel is shown", async () => {
     vi.restoreAllMocks();
     mockLayout(300, 700);
-    const onResize = vi.fn();
+    const onShownWidthChange = vi.fn();
     const { rerender } = render(
-      panel({ isVisible: false, width: 700, onResize }),
+      panel({ isVisible: false, width: 700, onShownWidthChange }),
     );
+    expect(onShownWidthChange).toHaveBeenLastCalledWith(undefined);
 
-    rerender(panel({ width: 700, onResize }));
+    rerender(panel({ width: 700, onShownWidthChange }));
 
-    await vi.waitFor(() => expect(onResize).toHaveBeenCalledWith(584));
+    await vi.waitFor(() =>
+      expect(onShownWidthChange).toHaveBeenLastCalledWith(584),
+    );
   });
 
   it("gives back a shared row's deficit once when two panels sit in it", async () => {
@@ -235,7 +246,15 @@ describe("InfoPanel resizer", () => {
       </>,
     );
 
-    await vi.waitFor(() => expect(first).toHaveBeenCalledWith(434));
+    const [firstPanel, secondPanel] = screen
+      .getAllByTestId("info-panel-resizer")
+      .map((handle) => handle.parentElement as HTMLElement);
+    const width = (el: HTMLElement) =>
+      el.style.getPropertyValue("--info-panel-width");
+
+    await vi.waitFor(() => expect(width(firstPanel)).toBe("434px"));
+    expect(width(secondPanel)).toBe("500px");
+    expect(first).not.toHaveBeenCalled();
     expect(second).not.toHaveBeenCalled();
   });
 

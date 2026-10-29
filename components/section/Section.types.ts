@@ -41,8 +41,10 @@ export type InfoPanelProps = {
   isResizable?: boolean;
   /** Current width in px; applied as `--info-panel-width`. */
   width?: number;
-  /** Called with the committed width in px: once per drag, when the pointer is released, and on the double click that restores the default. */
+  /** Called with the committed width in px: once per drag, when the pointer is released, and on the double click that restores the default. A width narrowed to fit the window is never committed. */
   onResize?: (value: number) => void;
+  /** Called with the width in px the panel takes on screen, narrower than `width` while the window cannot fit it, and with `undefined` once the panel is hidden or no longer resizable. */
+  onShownWidthChange?: (value?: number) => void;
 };
 
 /**
@@ -71,8 +73,10 @@ export type ChatPanelProps = {
   isResizable?: boolean;
   /** Current docked width in px; applied as `--chat-panel-width`. */
   width?: number;
-  /** Called once per drag, when the pointer is released, with the committed width in px. */
+  /** Called once per drag, when the pointer is released, with the committed width in px. A width narrowed to fit the window is never committed. */
   onResize?: (value: number) => void;
+  /** Called with the docked width in px the panel takes on screen, narrower than `width` while the window cannot fit it, and with `undefined` once the panel is hidden, fullscreen or no longer resizable. */
+  onShownWidthChange?: (value?: number) => void;
   /**
    * Whether the host currently renders the panel fullscreen. The width then
    * belongs to the layout — the resizer sets none, and only listens for the
@@ -208,6 +212,7 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     | "isResizable"
     | "width"
     | "onResize"
+    | "onShownWidthChange"
   > &
   Omit<SectionHeaderProps, "children" | "className"> &
   Omit<SectionContainerProps, "children" | "isSectionHeaderAvailable"> &
@@ -233,9 +238,9 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     isInfoPanelResizable?: boolean;
     /** Current width of the info panel in pixels. */
     infoPanelWidth?: number;
-    /** Called with the committed info panel width: once per resize drag, when the pointer is released, and on the double click that restores the default. */
+    /** Called with the committed info panel width: once per resize drag, when the pointer is released, and on the double click that restores the default. A width narrowed to fit the window is never committed, so the panel grows back once the window does. */
     setInfoPanelWidth?: (value: number) => void;
-    /** Called with the width in px the open info panel, or the AI chat open in its place, takes on screen, and with `0` when neither does: how far the floating buttons in the corner have to move clear of it. Below a desktop the info panel counts as `INFO_PANEL_WIDTH` and the chat as `0`. */
+    /** Called with the width in px the open info panel, or the AI chat open in its place, takes on screen, and with `0` when neither does: how far the floating buttons in the corner have to move clear of it. On a desktop it is the panel's actual width, a window-narrowed one included; below a desktop the info panel counts as `INFO_PANEL_WIDTH` and the chat as `0`. */
     onShownInfoPanelWidthChange?: (value: number) => void;
     /** Whether the AI chat region exists at all. It defaults to `false`. */
     isChatPanelAvailable?: boolean;
