@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import { waitForTopUpCompletion } from "./stripe-flow";
+import { isPollingTimeoutError, waitForTopUpCompletion } from "./stripe-flow";
 
 const FIVE_MINUTES = 5 * 60 * 1000;
 
@@ -52,6 +52,22 @@ describe("waitForTopUpCompletion", () => {
     await vi.advanceTimersByTimeAsync(FIVE_MINUTES + 10_000);
 
     await assertion;
+  });
+
+  it("marks only the timeout as a polling timeout", async () => {
+    const isPurchaseCompleted = vi.fn().mockResolvedValue(false);
+
+    const completion = waitForTopUpCompletion(
+      { ...createDeps(), isPurchaseCompleted },
+      new AbortController().signal,
+    ).catch((error: unknown) => error);
+    await vi.advanceTimersByTimeAsync(FIVE_MINUTES + 10_000);
+
+    expect(isPollingTimeoutError(await completion)).toBe(true);
+    expect(
+      isPollingTimeoutError(new Error("Missing Stripe checkout URL")),
+    ).toBe(false);
+    expect(isPollingTimeoutError("Polling timeout")).toBe(false);
   });
 
   it("still waits for a balance increase when no purchase check is given", async () => {

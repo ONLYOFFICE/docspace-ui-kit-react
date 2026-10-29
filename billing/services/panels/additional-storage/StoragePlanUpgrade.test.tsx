@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   paymentStore: {} as Record<string, unknown>,
   servicesStore: {} as Record<string, unknown>,
   isUpgrade: true,
+  isDowngrade: false,
   difference: 0,
   openStripeCheckout: vi.fn(),
   waitForTopUpCompletion: vi.fn(),
@@ -53,7 +54,7 @@ vi.mock("../../hooks/useServicesActions", () => ({
     calculateDifferenceBetweenPlan: () => mocks.difference,
     isWalletBalanceInsufficient: () => true,
     isPlanUpgrade: () => mocks.isUpgrade,
-    isPlanDowngrade: () => false,
+    isPlanDowngrade: () => mocks.isDowngrade,
   }),
 }));
 vi.mock("../../context/PaymentContext", () => ({
@@ -144,6 +145,7 @@ describe("<StoragePlanUpgrade /> Stripe purchase", () => {
     window.history.pushState({}, "", "/billing/addons/disk-storage");
 
     mocks.isUpgrade = true;
+    mocks.isDowngrade = false;
     mocks.openStripeCheckout.mockResolvedValue(undefined);
     mocks.waitForTopUpCompletion.mockResolvedValue({
       isDelayedPaymentMethod: false,
@@ -223,6 +225,30 @@ describe("<StoragePlanUpgrade /> Stripe purchase", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(mocks.toastError).toHaveBeenCalledTimes(1);
     expect(mocks.updateWalletPayment).not.toHaveBeenCalled();
+  });
+
+  it("schedules a downgrade without Stripe checkout or a top-up", async () => {
+    const tariff = createStores(200);
+    mocks.isUpgrade = false;
+    mocks.isDowngrade = true;
+    mocks.updateWalletPayment.mockResolvedValue({ data: { response: true } });
+    tariff.fetchPortalTariff.mockResolvedValue({
+      quotas: [{ quantity: 200, nextQuantity: 100 }],
+    });
+
+    const onClose = await buyStorage("100");
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(mocks.openStripeCheckout).not.toHaveBeenCalled();
+    expect(mocks.waitForTopUpCompletion).not.toHaveBeenCalled();
+    expect(mocks.topUpDeposit).not.toHaveBeenCalled();
+    expect(mocks.updateWalletPayment).toHaveBeenCalledWith({
+      walletQuantityRequestDto: {
+        quantity: { storage: 100 },
+        productQuantityType: ProductQuantityType.Set,
+      },
+    });
+    expect(mocks.toastError).not.toHaveBeenCalled();
   });
 });
 

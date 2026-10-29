@@ -465,8 +465,13 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     }
   };
 
+  // A downgrade costs nothing now and only schedules nextQuantity, so it never
+  // goes through Stripe: checkout would charge the full price and the wait
+  // for `quantity` would never end.
   const onBuy = () =>
-    isStripeCheckoutRequired ? onStripeBuy() : handleStoragePlanChange();
+    isStripeCheckoutRequired && !isDowngradeStoragePlan
+      ? onStripeBuy()
+      : handleStoragePlanChange();
 
   const onSendRequest = useCallback(() => {
     setIsRequestDialog(true);
