@@ -134,6 +134,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `FieldContainer`, which describes radios through the group around them, put `aria-invalid`,
   `aria-required` and the error's `aria-describedby` on nothing. A query for the group by role now
   finds it; it still has no accessible name of its own.
+- **`Checkbox` focuses its input, not its icon.** `tabIndex` now goes on the visually hidden
+  `<input type="checkbox">`, which takes the keyboard focus; the box icon is decorative,
+  `aria-hidden` and no tab stop. A test that focused the `svg` or waited for it to be focused
+  must use the input (`getByRole("checkbox")`) instead. The focused box still draws its border
+  in the focus colour.
 
 ### Added
 
@@ -192,11 +197,13 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   generated one. An advanced row keeps the `id` its caller gave it, and Enter looks the row up
   inside the open list only, so two lists whose rows share an id (two Filters' sort items) each
   pick their own
-- `Checkbox` toggles from the keyboard. Focus lands on the box icon rather than the hidden
-  input, and the icon answered no key, so Tab reached the checkbox and Space did nothing — a
-  form could not be filled in without a pointer. Space on the focused icon now clicks the input,
-  which fires the same `onChange` a pointer does; Enter still does nothing, as on a native
-  checkbox
+- `Checkbox` toggles from the keyboard and keeps the focus. Tab reached the box icon, which
+  answered no key, so Space did nothing — a form could not be filled in without a pointer. And
+  each state is drawn by its own icon, so a toggle replaced the focused icon: the focus fell to
+  the page and the next Tab did not move on from the checkbox. The input now takes the focus
+  (see _Changed_): Space toggles it as on any native checkbox, firing the same `onChange` a
+  pointer does, Enter does nothing, the focus stays put, and a screen reader announces the
+  focused control with its label and state
 - `Button`'s `tooltipText` opens only its own tooltip. A button with no `id` named its tooltip
   `button-tooltip`, the same as every other such button, and each tooltip opens for any anchor
   carrying its name — so hovering one of three buttons opened three tooltips, and the page held

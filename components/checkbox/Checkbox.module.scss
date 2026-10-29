@@ -100,12 +100,13 @@
     path {
       fill: var(--checkbox-arrow-color-default);
     }
-    &:focus {
-      outline: none;
-      rect {
-        stroke: var(--checkbox-focus-color);
-      }
-    }
+  }
+
+  // The input holds the focus and the icon right after it draws it. `:where()`
+  // keeps this under hover, pressed and the state colours, which drew over the
+  // `svg:focus` rule it replaces and still do.
+  :where(.hiddenInput:focus) + svg rect {
+    stroke: var(--checkbox-focus-color);
   }
 
   &.error {
