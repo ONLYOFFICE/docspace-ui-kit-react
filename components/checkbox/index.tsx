@@ -15,36 +15,23 @@ import styles from "./Checkbox.module.scss";
 
 export * from "./Checkbox.types";
 
+// Purely decorative: the input beside it holds the focus, so swapping one icon
+// for another as the state changes loses nothing.
 const RenderCheckboxIcon = React.memo(
   ({
     isChecked,
     isIndeterminate,
-    tabIndex,
-    onKeyDown,
   }: {
     isChecked: boolean;
     isIndeterminate: boolean;
-    tabIndex: number;
-    onKeyDown: React.KeyboardEventHandler<SVGSVGElement>;
   }) => {
+    const className = classNames(styles.checkbox, "not-selectable");
     return isIndeterminate ? (
-      <CheckboxIndeterminateIcon
-        tabIndex={tabIndex}
-        onKeyDown={onKeyDown}
-        className={classNames(styles.checkbox, "not-selectable")}
-      />
+      <CheckboxIndeterminateIcon aria-hidden className={className} />
     ) : isChecked ? (
-      <CheckboxCheckedIcon
-        tabIndex={tabIndex}
-        onKeyDown={onKeyDown}
-        className={classNames(styles.checkbox, "not-selectable")}
-      />
+      <CheckboxCheckedIcon aria-hidden className={className} />
     ) : (
-      <CheckboxIcon
-        tabIndex={tabIndex}
-        onKeyDown={onKeyDown}
-        className={classNames(styles.checkbox, "not-selectable")}
-      />
+      <CheckboxIcon aria-hidden className={className} />
     );
   },
 );
@@ -63,9 +50,8 @@ const CheckboxPure = ({
   isIndeterminate = false,
   isDisabled,
   name,
-  // The focusable element is the icon, not the hidden input below -- so this
-  // defaulting to -1 took the whole control out of the tab order, and every
-  // caller had to pass 0 to get a checkbox a keyboard could reach.
+  // Goes on the input, the focusable element; this used to default to -1,
+  // which took the whole control out of the tab order.
   tabIndex = 0,
   helpButton,
   dataTestId,
@@ -102,21 +88,6 @@ const CheckboxPure = ({
     return e.preventDefault();
   };
 
-  // The icon holds focus in place of the hidden input, so it has to answer
-  // the key the input would: Space presses it, through a click on the input,
-  // which fires the same change event a pointer does. Enter does nothing on a
-  // native checkbox either. preventDefault keeps Space from scrolling the page,
-  // auto-repeats included; a held Space toggles once, as on a native checkbox.
-  const onIconKeyDown = React.useCallback(
-    (e: React.KeyboardEvent<SVGSVGElement>) => {
-      if (e.key !== " ") return;
-      e.preventDefault();
-      if (e.repeat) return;
-      ref.current?.click();
-    },
-    [],
-  );
-
   return (
     <TooltipContainer
       as="label"
@@ -139,15 +110,12 @@ const CheckboxPure = ({
         ref={ref}
         value={value}
         onChange={onInputChange}
-        tabIndex={-1}
+        tabIndex={tabIndex}
         {...rest}
       />
       <RenderCheckboxIcon
-        // A disabled checkbox is no tab stop, as a disabled input would not be.
-        tabIndex={isDisabled ? -1 : tabIndex}
         isChecked={checked || false}
         isIndeterminate={isIndeterminate || false}
-        onKeyDown={onIconKeyDown}
       />
       <div
         className={classNames(styles.wrapper, "wrapper", {

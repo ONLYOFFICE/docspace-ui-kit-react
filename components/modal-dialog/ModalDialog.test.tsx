@@ -434,6 +434,34 @@ describe("ModalDialog", () => {
       expect(trigger).toHaveFocus();
     });
 
+    // A dialog mounted only while it is open, with a field that takes the
+    // focus as it mounts (the passphrase dialogs of the client): the field had
+    // the focus before the dialog's own effect ran, which used to pass for
+    // "nothing to hand back".
+    it("hands the focus back after a field inside took it on open", () => {
+      const Harness = ({ visible }: { visible: boolean }) => (
+        <>
+          <button type="button">Trigger</button>
+          {visible ? (
+            <ModalDialog {...defaultProps} visible aria-label="Room">
+              <ModalDialog.Body>
+                <input autoFocus aria-label="Name" />
+              </ModalDialog.Body>
+            </ModalDialog>
+          ) : null}
+        </>
+      );
+      const { rerender } = render(<Harness visible={false} />);
+      const trigger = screen.getByRole("button", { name: "Trigger" });
+      trigger.focus();
+
+      rerender(<Harness visible />);
+      expect(screen.getByLabelText("Name")).toHaveFocus();
+
+      rerender(<Harness visible={false} />);
+      expect(trigger).toHaveFocus();
+    });
+
     // `hideContent` swaps the content node while the dialog is open (a nested
     // picker in CreateRoomDialog); closing afterwards must still find the
     // focus inside the dialog and hand it back.
