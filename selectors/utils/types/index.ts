@@ -54,6 +54,8 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
   >;
   setSelectedTreeNode?: React.Dispatch<React.SetStateAction<FolderDtoInteger>>;
   isRoomDisabled?: (room: FolderDtoInteger) => boolean;
+  /** The hint shown on a disabled room (`disabledText`); read for every room, used for the disabled ones. */
+  getRoomDisabledText?: (room: FolderDtoInteger) => string | undefined;
   recentFolder?: FolderDtoInteger | null;
   favoritesFolder?: FolderDtoInteger | null;
   withRecentTreeFolder?: boolean;

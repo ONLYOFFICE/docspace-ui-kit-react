@@ -158,6 +158,14 @@ class AiChatStore {
   composerContextHidden = false;
 
   /**
+   * Whether the composer leaves the knowledge base picker out: set by the
+   * host while knowledge search is off (DocSpace with vectorization
+   * disabled), so no Knowledge room can be picked for a chat. Mirrored into
+   * the widget's `hideKnowledgePicker`.
+   */
+  knowledgePickerHidden = false;
+
+  /**
    * The chat is analyzing one PDF form's responses ("Analyze responses"), or
    * `null` for an ordinary chat.
    *
@@ -325,6 +333,10 @@ class AiChatStore {
 
   setComposerContextHidden = (value: boolean) => {
     this.composerContextHidden = value;
+  };
+
+  setKnowledgePickerHidden = (value: boolean) => {
+    this.knowledgePickerHidden = value;
   };
 
   close = () => {

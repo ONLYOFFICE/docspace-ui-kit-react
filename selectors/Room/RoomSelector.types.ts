@@ -35,6 +35,9 @@ export type RoomSelectorProps = TSelectorHeader &
     roomType?: RoomType | RoomType[];
     searchArea?: SearchArea | string;
     excludeItems?: (number | string | undefined)[];
+    /** Lists a room but greys it out, with `getRoomDisabledText` as the hint on it. */
+    isRoomDisabled?: (room: FolderDtoInteger) => boolean;
+    getRoomDisabledText?: (room: FolderDtoInteger) => string | undefined;
     setIsDataReady?: (value: boolean) => void;
     submitButtonLabel?: string;
 

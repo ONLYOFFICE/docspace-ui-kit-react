@@ -61,6 +61,7 @@ const useRoomsHelper = ({
   setSelectedItemSecurity,
   setSelectedTreeNode,
   isRoomDisabled,
+  getRoomDisabledText,
 
   recentFolder,
   favoritesFolder,
@@ -237,6 +238,7 @@ const useRoomsHelper = ({
           folders ?? [],
           t,
           isRoomDisabled,
+          getRoomDisabledText,
         ).filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true));
 
         setHasNextPage(count === PAGE_COUNT);
@@ -378,6 +380,7 @@ const useRoomsHelper = ({
       withRecentTreeFolder,
       withFavoritesTreeFolder,
       isRoomDisabled,
+      getRoomDisabledText,
       finishFullLoad,
     ],
   );

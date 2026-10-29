@@ -623,12 +623,14 @@ const AiAgentProviders = ({
     analyzeAttachmentId,
     analyzeFileName,
     composerContextHidden,
+    knowledgePickerHidden,
   } = useObservedFields(() => ({
     analyzeActive: aiChatStore.isAnalyzeMode,
     analyzePending: aiChatStore.isAnalyzePending,
     analyzeAttachmentId: aiChatStore.analyzeAttachmentId,
     analyzeFileName: aiChatStore.analyzeFormTitle,
     composerContextHidden: aiChatStore.composerContextHidden,
+    knowledgePickerHidden: aiChatStore.knowledgePickerHidden,
   }));
 
   // Ids of attached files the backend flagged as analyzable. The attachments
@@ -1124,6 +1126,9 @@ const AiAgentProviders = ({
       // The AI project view lists the sources beside the chat, so the
       // composer drops its own chips and pickers there.
       hideComposerContext: composerContextHidden,
+      // With vectorization off on the portal no Knowledge room can be picked
+      // for a chat: the composer loses its knowledge base picker.
+      hideKnowledgePicker: knowledgePickerHidden,
       onPickFolderContext,
       // Instructions rooms and knowledge bases are picked in the room
       // selector, several at once, and a connected one opens in Files from
@@ -1151,6 +1156,7 @@ const AiAgentProviders = ({
       resolvedSuggestions,
       chatIntro,
       composerContextHidden,
+      knowledgePickerHidden,
       onPickFolderContext,
       onPickContextRooms,
       onPickKnowledgeRooms,

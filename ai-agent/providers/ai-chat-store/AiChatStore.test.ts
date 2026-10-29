@@ -235,6 +235,15 @@ describe("AiChatStore project view", () => {
     expect(store.projectTitle).toBeNull();
     expect(store.composerContextHidden).toBe(false);
   });
+
+  it("carries the knowledge picker switch the host sets", () => {
+    const store = new AiChatStore();
+    expect(store.knowledgePickerHidden).toBe(false);
+    store.setKnowledgePickerHidden(true);
+    expect(store.knowledgePickerHidden).toBe(true);
+    store.setKnowledgePickerHidden(false);
+    expect(store.knowledgePickerHidden).toBe(false);
+  });
 });
 
 describe("AiChatStore projects", () => {

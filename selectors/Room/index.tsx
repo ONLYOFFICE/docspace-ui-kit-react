@@ -34,6 +34,8 @@ const RoomSelectorComponent = ({
   style,
 
   excludeItems,
+  isRoomDisabled,
+  getRoomDisabledText,
 
   withSearch,
 
@@ -259,6 +261,8 @@ const RoomSelectorComponent = ({
     disableThirdParty,
     searchArea,
     subscribe,
+    isRoomDisabled,
+    getRoomDisabledText,
   });
 
   const headerSelectorProps: TSelectorHeader = withHeader
