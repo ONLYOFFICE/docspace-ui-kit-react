@@ -35,6 +35,9 @@ export type WalletOperationDto = Omit<
   sourceTitle?: string | null;
   sourceType?: TransactionSourceType | null;
   tokenUsage?: OperationTokenUsage | null;
+  cost?: number | null;
+  byok?: boolean;
+  provider?: string | null;
 };
 
 import { toastr } from "../../components/toast";
