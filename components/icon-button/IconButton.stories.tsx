@@ -169,6 +169,16 @@ const meta = {
       description:
         "Called on a key press while the button has focus; Enter and Space do nothing unless it implements them",
     },
+    role: {
+      control: "text",
+      description:
+        'ARIA role of the element, which has none of its own; "button" for an icon button that acts',
+    },
+    ariaLabel: {
+      control: "text",
+      description:
+        "Accessible name of the button; the tooltip from `title` names nothing",
+    },
     id: {
       control: "text",
       description: "Id of the button element",
