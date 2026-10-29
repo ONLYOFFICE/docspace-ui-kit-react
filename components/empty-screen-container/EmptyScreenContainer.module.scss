@@ -73,12 +73,6 @@
     background: no-repeat 0 0 transparent;
   }
 
-  .header {
-    font-size: 16px;
-    color: var(--empty-content-header-color-value);
-    text-align: center;
-  }
-
   .description {
     line-height: 18px;
     margin-top: 8px;
@@ -152,4 +146,16 @@
       max-width: 274px;
     }
   }
+}
+
+// One class, so a consumer's rule on `ec-header` wins by specificity alone
+// (anything from two classes up) instead of by stylesheet order. The size and
+// weight go through Text's own variables: its `.text` rule, also one class,
+// reads them, so the two rules never compete for `font-size`.
+.header {
+  --text-size: 19px;
+  --text-weight: 700;
+
+  color: var(--empty-content-header-color-value);
+  text-align: center;
 }

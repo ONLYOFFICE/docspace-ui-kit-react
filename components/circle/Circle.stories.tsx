@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ComponentProps } from "react";
+import { expect } from "storybook/test";
 
 import { CircleSkeleton } from ".";
 
@@ -18,9 +19,9 @@ const meta = {
     x: {
       control: "text",
       description:
-        "Horizontal position of the circle's centre, in user units. A value smaller than `radius` cuts off the circle's left side, which the default does",
+        "Horizontal position of the circle's centre, in user units. A value smaller than `radius` cuts off the circle's left side; the default equals the default radius",
       table: {
-        defaultValue: { summary: "3" },
+        defaultValue: { summary: "12" },
       },
     },
     y: {
@@ -50,7 +51,7 @@ const meta = {
     title: {
       control: "text",
       description:
-        "Accessible name of the placeholder, read by screen readers and shown as the browser's tooltip on hover. Empty by default, which leaves the placeholder unnamed",
+        "Accessible name of the placeholder, read by screen readers and shown as the browser's tooltip on hover. Empty by default, and an untitled placeholder is hidden from screen readers",
       table: {
         defaultValue: { summary: '""' },
       },
@@ -119,6 +120,22 @@ type Story = StoryObj<ComponentProps<typeof CircleSkeleton>>;
 
 export default meta;
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// Checks the box, the circle's radius and its centre.
+const expectCircle = async (
+  { canvas }: PlayContext,
+  box: number,
+  radius: number,
+) => {
+  const svg = canvas.getByTestId("circle-skeleton");
+  await expect(svg.getBoundingClientRect().width).toBe(box);
+  const circle = svg.querySelector("circle") as SVGCircleElement;
+  await expect(circle.getAttribute("r")).toBe(String(radius));
+  await expect(circle.getAttribute("cx")).toBe(String(box / 2));
+  return svg;
+};
+
 export const Default: Story = {
   render: (args) => <CircleSkeleton {...args} />,
   args: {
@@ -128,11 +145,18 @@ export const Default: Story = {
     x: "25",
     y: "25",
   },
+  play: async (context) => {
+    const svg = await expectCircle(context, 50, 20);
+    // The band sweeps by default.
+    await expect(svg.querySelector("animateTransform")).not.toBeNull();
+    // Untitled, the placeholder is decoration and hidden from screen readers.
+    await expect(svg).toHaveAttribute("aria-hidden", "true");
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "A circle of radius 20 centred in a 50 by 50 box — the radius, the centre and the box size are set together, because the component's own defaults cut the circle off. Change any prop live in the Controls panel below.",
+          "A circle of radius 20 centred in a 50 by 50 box — the radius, the centre and the box size are set together, because a centre closer to an edge than the radius cuts the circle off. Change any prop live in the Controls panel below.",
       },
       source: {
         code: `<CircleSkeleton width="50" height="50" radius="20" x="25" y="25" />`,
@@ -149,6 +173,9 @@ export const SmallAvatar: Story = {
     radius: "16",
     x: "16",
     y: "16",
+  },
+  play: async (context) => {
+    await expectCircle(context, 32, 16);
   },
   parameters: {
     docs: {
@@ -171,6 +198,9 @@ export const LargeAvatar: Story = {
     radius: "40",
     x: "40",
     y: "40",
+  },
+  play: async (context) => {
+    await expectCircle(context, 80, 40);
   },
   parameters: {
     docs: {
@@ -197,6 +227,14 @@ export const CustomColors: Story = {
     foregroundColor: "#f5f5f5",
     backgroundOpacity: 0.8,
     foregroundOpacity: 0.4,
+  },
+  play: async (context) => {
+    const svg = await expectCircle(context, 50, 20);
+    const colors = Array.from(svg.querySelectorAll("stop")).map((stop) =>
+      stop.getAttribute("stop-color"),
+    );
+    await expect(colors).toContain("#e0e0e0");
+    await expect(colors).toContain("#f5f5f5");
   },
   parameters: {
     docs: {
@@ -231,6 +269,10 @@ export const NoAnimation: Story = {
     y: "25",
     animate: false,
   },
+  play: async (context) => {
+    const svg = await expectCircle(context, 50, 20);
+    await expect(svg.querySelector("animateTransform")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -254,6 +296,12 @@ export const SlowAnimation: Story = {
     y: "25",
     speed: 2.5,
   },
+  play: async (context) => {
+    const svg = await expectCircle(context, 50, 20);
+    await expect(
+      svg.querySelector("animateTransform")?.getAttribute("dur"),
+    ).toBe("2.5s");
+  },
   parameters: {
     docs: {
       description: {
@@ -276,6 +324,15 @@ export const AvatarGroup: Story = {
       <CircleSkeleton width="40" height="40" radius="20" x="20" y="20" />
     </div>
   ),
+  play: async ({ canvas }) => {
+    const circles = canvas.getAllByTestId("circle-skeleton");
+    await expect(circles).toHaveLength(4);
+    // Side by side in one row.
+    const tops = new Set(
+      circles.map((circle) => circle.getBoundingClientRect().top),
+    );
+    await expect(tops.size).toBe(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -332,6 +389,12 @@ export const CssCustomization: Story = {
       />
     </div>
   ),
+  play: async ({ canvas }) => {
+    const widths = canvas
+      .getAllByTestId("circle-skeleton")
+      .map((circle) => circle.getBoundingClientRect().width);
+    await expect(widths).toEqual([40, 56, 80]);
+  },
   parameters: {
     docs: {
       description: {

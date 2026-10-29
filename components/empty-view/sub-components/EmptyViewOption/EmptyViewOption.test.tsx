@@ -128,6 +128,85 @@ describe("EmptyViewOption", () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
+  it("gives the fallback Link a real href, and lets the handler own a plain click", () => {
+    const onClick = vi.fn();
+    const option: EmptyViewLinkType = {
+      key: "link-3",
+      to: { pathname: "/rooms", search: "?folder=1" },
+      icon: <MockIcon />,
+      description: "Open rooms",
+      onClick,
+    };
+
+    render(<EmptyViewOption option={option} />);
+
+    const link = screen.getByTestId("ui-link");
+    expect(link).toHaveAttribute("href", "/rooms?folder=1");
+
+    const plain = fireEvent.click(link);
+    expect(plain).toBe(false); // default prevented: no navigation
+    expect(onClick).toHaveBeenCalledTimes(1);
+
+    // Left to the browser, which opens a new tab -- and only that: the
+    // handler does not also run in the current page.
+    const modified = fireEvent.click(link, { ctrlKey: true });
+    expect(modified).toBe(true);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("makes a fallback Link with no address a button", () => {
+    const onClick = vi.fn();
+    const option: EmptyViewLinkType = {
+      key: "link-5",
+      to: "",
+      icon: <MockIcon />,
+      description: "Clear filter",
+      onClick,
+    };
+
+    render(<EmptyViewOption option={option} />);
+
+    const action = screen.getByRole("button", { name: "Clear filter" });
+    expect(action).not.toHaveAttribute("href");
+    expect(action).toHaveAttribute("tabindex", "0");
+
+    fireEvent.keyDown(action, { key: "Enter" });
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("lets the fallback Link navigate when it has no handler", () => {
+    const option: EmptyViewLinkType = {
+      key: "link-4",
+      to: "/files",
+      icon: <MockIcon />,
+      description: "Open files",
+    };
+
+    render(<EmptyViewOption option={option} />);
+
+    const link = screen.getByTestId("ui-link");
+    expect(link).toHaveAttribute("href", "/files");
+    expect(fireEvent.click(link)).toBe(true);
+  });
+
+  it.each([
+    ["Enter", "Enter"],
+    ["Space", " "],
+  ])("activates an action option with %s", (_name, key) => {
+    const onClick = vi.fn();
+    render(
+      <EmptyViewOption
+        option={{ key: "act-1", type: "action", title: "Upload", onClick }}
+      />,
+    );
+
+    const action = screen.getByRole("button", { name: "Upload" });
+    fireEvent.keyDown(action, { key });
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onClick.mock.calls[0][0].type).toBe("click");
+  });
+
   it("uses LinkRouter for standard link options", () => {
     const option: EmptyViewLinkType = {
       key: "link-2",

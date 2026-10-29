@@ -2,9 +2,10 @@ import React from "react";
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { DateTime } from "luxon";
+import { DateTime } from "luxon";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
-import { now } from "../../utils/date";
+import { now, parseToDateTime } from "../../utils/date";
 
 import { DateTimePicker } from ".";
 
@@ -130,6 +131,20 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   return <div style={{ height: "500px" }}>{props.children}</div>;
 };
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// The time shown beside a picked day: hh:mm AM/PM on a 12-hour clock.
+const TWELVE_HOUR = /^\d{2}:\d{2} (AM|PM)$/;
+const TWENTY_FOUR_HOUR = /^\d{2}:\d{2}$/;
+
+// Opens the time editor from the time display.
+const openTimeEditor = async ({ canvas, userEvent }: PlayContext) => {
+  await userEvent.click(canvas.getByTestId("date-time-picker-time-display"));
+  await waitFor(() =>
+    expect(canvas.getByLabelText("Time picker")).toBeInTheDocument(),
+  );
+};
+
 // The date control hands over a timestamp, which the component does not parse.
 const fromControl = <T,>(value: T): T =>
   (typeof value === "number" ? new Date(value) : value) as T;
@@ -158,6 +173,55 @@ export const Default: Story = {
     id: "default-date-time-picker",
     hasError: false,
     translations: { AM: "AM", PM: "PM" },
+    onChange: fn(),
+  },
+  play: async (context) => {
+    const { args, canvas, userEvent } = context;
+    // Nothing chosen: only the "Select date" button, and no time. The
+    // AddButton drawn inside it is hidden, so there is one button by that name.
+    const select = canvas.getByTestId("date-selector");
+    await expect(
+      canvas.getAllByRole("button", { name: "Select date" }),
+    ).toEqual([select]);
+    await expect(select).toHaveAttribute("aria-expanded", "false");
+    await expect(
+      canvas.queryByTestId("date-time-picker-time-display"),
+    ).toBeNull();
+
+    await userEvent.click(select);
+    await expect(select).toHaveAttribute("aria-expanded", "true");
+    const calendar = await canvas.findByTestId("calendar");
+    // Days are named by their full date; the 15th of the shown month. That
+    // month is the story's own openDate, not the clock as it reads now, so a
+    // run that crosses midnight into a new month still finds the day.
+    const shownMonth = parseToDateTime(fromControl(args.openDate)) ?? now();
+    const fifteenth = shownMonth
+      .set({ day: 15 })
+      .setLocale("en")
+      .toLocaleString(DateTime.DATE_FULL);
+    await userEvent.click(
+      within(calendar).getByRole("button", { name: fifteenth }),
+    );
+
+    // The day is reported with a time, and the time appears beside it.
+    await waitFor(() => expect(args.onChange).toHaveBeenCalled());
+    const picked = (args.onChange as ReturnType<typeof fn>).mock
+      .lastCall?.[0] as DateTime;
+    await expect(picked.day).toBe(15);
+    await expect(
+      canvas.getByTestId("date-time-picker-time-display"),
+    ).toHaveTextContent(TWELVE_HOUR);
+
+    // The time display opens the editor from the keyboard too.
+    const display = canvas.getByTestId("date-time-picker-time-display");
+    display.focus();
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() =>
+      expect(canvas.getByLabelText("Time picker")).toBeInTheDocument(),
+    );
+
+    // The English clock has an AM/PM drop-down in the editor.
+    await expect(canvas.getByRole("button", { name: /AM|PM/ })).toBeVisible();
   },
   parameters: {
     docs: {
@@ -202,6 +266,15 @@ const WithErrorTemplate = () => {
 
 export const WithError: Story = {
   render: () => <WithErrorTemplate />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("date-time-picker")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    await expect(
+      canvas.getByTestId("date-time-picker-time-display"),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -245,11 +318,68 @@ const WithInitialDateTemplate = () => {
 
 export const WithInitialDate: Story = {
   render: () => <WithInitialDateTemplate />,
+  play: async (context) => {
+    const { canvas } = context;
+    // initialDate shows the day chip and the time from the first render.
+    await expect(canvas.getByTestId("selected-item")).toBeVisible();
+    const time = canvas.getByTestId("date-time-picker-time-display");
+    await expect(time).toHaveTextContent(TWELVE_HOUR);
+    // The spoken time is the time shown, on the same 12-hour clock.
+    await expect(time).toHaveAttribute(
+      "aria-label",
+      `Current time: ${time.textContent}`,
+    );
+
+    await openTimeEditor(context);
+    await expect(canvas.getByRole("button", { name: /AM|PM/ })).toBeVisible();
+
+    // The drop-down sets the half of the day rather than toggling it:
+    // choosing the half already shown leaves the time and the day alone,
+    // and the other half moves the time by twelve hours within the same day.
+    const { userEvent } = context;
+    const shown = time.textContent ?? "";
+    const day = canvas.getByTestId("selected-item").textContent;
+    const half = shown.endsWith("PM") ? "PM" : "AM";
+    const other = half === "PM" ? "AM" : "PM";
+    const choose = async (meridiem: string) => {
+      await userEvent.click(canvas.getByRole("button", { name: /AM|PM/ }));
+      await userEvent.click(
+        await screen.findByRole("option", { name: meridiem }),
+      );
+    };
+    const closeEditor = async () => {
+      await userEvent.keyboard("{Enter}");
+      await waitFor(() =>
+        expect(
+          canvas.getByTestId("date-time-picker-time-display"),
+        ).toBeInTheDocument(),
+      );
+    };
+
+    await choose(half);
+    await closeEditor();
+    await expect(
+      canvas.getByTestId("date-time-picker-time-display"),
+    ).toHaveTextContent(shown);
+    await expect(canvas.getByTestId("selected-item")).toHaveTextContent(
+      day ?? "",
+    );
+
+    await openTimeEditor(context);
+    await choose(other);
+    await closeEditor();
+    await expect(
+      canvas.getByTestId("date-time-picker-time-display"),
+    ).toHaveTextContent(shown.replace(half, other));
+    await expect(canvas.getByTestId("selected-item")).toHaveTextContent(
+      day ?? "",
+    );
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "Use it to edit a moment that already exists, such as a saved deadline: the day chip and the time show it from the first render (`initialDate`). The English locale gives a 12-hour clock; click the time to see the AM/PM drop-down beside the editor.",
+          "Use it to edit a moment that already exists, such as a saved deadline: the day chip and the time show it from the first render (`initialDate`). The English locale gives a 12-hour clock; click the time to see the AM/PM drop-down beside the editor. Choosing AM or PM sets that half of the day: the half already shown changes nothing, and the day never moves.",
       },
       source: {
         code: `<DateTimePicker
@@ -288,6 +418,11 @@ const HiddenCrossTemplate = () => {
 
 export const HiddenCross: Story = {
   render: () => <HiddenCrossTemplate />,
+  play: async ({ canvas }) => {
+    // The day chip has no cross, so the day cannot be cleared.
+    const chip = canvas.getByTestId("selected-item");
+    await expect(within(chip).queryByTestId("icon-button")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -331,6 +466,15 @@ const TwentyFourHourClockTemplate = () => {
 
 export const TwentyFourHourClock: Story = {
   render: () => <TwentyFourHourClockTemplate />,
+  play: async (context) => {
+    const { canvas } = context;
+    // A non-English locale gives a 24-hour clock with no AM/PM control.
+    await expect(
+      canvas.getByTestId("date-time-picker-time-display"),
+    ).toHaveTextContent(TWENTY_FOUR_HOUR);
+    await openTimeEditor(context);
+    await expect(canvas.queryByRole("button", { name: /AM|PM/ })).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -358,21 +502,26 @@ export const CssCustomization: Story = {
         {
           height: "500px",
           // DateTimePicker time cell
-          "--date-time-picker-cell-bg": "#cce5f6",
+          "--date-time-picker-cell-bg": "light-dark(#cce5f6, #1f4a61)",
           "--date-time-picker-icon": "#0082c9",
           "--date-time-picker-cell-height": "28px",
           "--date-time-picker-cell-radius": "6px",
           "--date-time-picker-cell-padding": "6px 12px",
+          "--selected-item-bg": "light-dark(#cce5f6, #1f4a61)",
+          "--selected-item-bg-hover": "light-dark(#b3d9f0, #285a75)",
+          "--selected-item-height": "28px",
+          "--selected-item-radius": "6px",
+          "--selected-item-padding": "6px 12px",
           // TimePicker sub-component
           "--time-input-focus-border": "#0082c9",
-          "--time-input-bg": "#e6f3fb",
+          "--time-input-bg": "light-dark(#e6f3fb, #16303e)",
           "--time-input-radius": "6px",
           // Calendar sub-component
-          "--calendar-bg": "#e6f3fb",
+          "--calendar-bg": "light-dark(#e6f3fb, #16303e)",
           "--calendar-border": "#0082c9",
           "--calendar-title": "#0082c9",
           "--calendar-accent": "#0082c9",
-          "--calendar-hover-bg": "#cce5f6",
+          "--calendar-hover-bg": "light-dark(#cce5f6, #1f4a61)",
         } as React.CSSProperties
       }
     >
@@ -386,32 +535,43 @@ export const CssCustomization: Story = {
         className="date-time-picker"
         id="css-customization-date-time-picker"
         hasError={false}
-        onChange={() => {}}
+        onChange={fn()}
         translations={{ AM: "AM", PM: "PM" }}
       />
     </div>
   ),
+  play: async ({ canvas }) => {
+    const time = canvas.getByTestId("date-time-picker-time-display");
+    await expect(getComputedStyle(time).backgroundColor).toBe(
+      "rgb(204, 229, 246)",
+    );
+  },
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. Click the time to see the time editor and the day chip to see the calendar; the day chip, the "select date" button and the AM/PM drop-down keep their own variables, listed in the SelectedItem, AddButton and ComboBox stories.`,
+        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. Click the time to see the time editor and the day chip to see the calendar; the day chip is a SelectedItem and takes its variables, set here to match the time cell; the "select date" button and the AM/PM drop-down keep their own, listed in the AddButton and ComboBox stories.`,
       },
       source: {
         code: `<div
   style={{
-    "--date-time-picker-cell-bg": "#cce5f6",
+    "--date-time-picker-cell-bg": "light-dark(#cce5f6, #1f4a61)",
     "--date-time-picker-icon": "#0082c9",
     "--date-time-picker-cell-height": "28px",
     "--date-time-picker-cell-radius": "6px",
     "--date-time-picker-cell-padding": "6px 12px",
+    "--selected-item-bg": "light-dark(#cce5f6, #1f4a61)",
+    "--selected-item-bg-hover": "light-dark(#b3d9f0, #285a75)",
+    "--selected-item-height": "28px",
+    "--selected-item-radius": "6px",
+    "--selected-item-padding": "6px 12px",
     "--time-input-focus-border": "#0082c9",
-    "--time-input-bg": "#e6f3fb",
+    "--time-input-bg": "light-dark(#e6f3fb, #16303e)",
     "--time-input-radius": "6px",
-    "--calendar-bg": "#e6f3fb",
+    "--calendar-bg": "light-dark(#e6f3fb, #16303e)",
     "--calendar-border": "#0082c9",
     "--calendar-title": "#0082c9",
     "--calendar-accent": "#0082c9",
-    "--calendar-hover-bg": "#cce5f6",
+    "--calendar-hover-bg": "light-dark(#cce5f6, #1f4a61)",
   }}
 >
   <DateTimePicker

@@ -76,10 +76,17 @@ const customServers: Record<string, Record<string, unknown>> = clone(
 );
 const disabledTools: Record<string, string[]> = {};
 const allowAlways: string[] = [];
-const preferences: { deepMode: boolean | null; reasoningLevel: string } = {
+const preferences: {
+  deepMode: boolean | null;
+  reasoningLevel: string;
+  toolPermissionMode: string;
+} = {
   deepMode: null,
   reasoningLevel: "off",
+  // The library's own default (DEFAULT_TOOL_PERMISSION_MODE).
+  toolPermissionMode: "auto",
 };
+const TOOL_PERMISSION_MODES = ["ask", "auto", "allow"];
 let webSearch: Record<string, unknown> | null = null;
 
 const { threads, messages } = seedChatHistory();
@@ -373,6 +380,11 @@ const READS: Record<string, Read> = {
   "preferences/get-deep-mode": () => preferences.deepMode ?? false,
   "preferences/is-deep-mode-set": () => preferences.deepMode !== null,
   "preferences/get-reasoning-level": () => preferences.reasoningLevel,
+  "preferences/get-tool-permission-mode": () => preferences.toolPermissionMode,
+
+  // The rooms with an .ai folder the composer's context picker offers: the
+  // demo portal has none, so the picker is empty and no room skills are read.
+  "context/get-context-folders": () => [],
 
   "prompts/list": () => [],
   "prompts/list-folders": () => [],
@@ -501,6 +513,12 @@ const WRITES: Record<string, Write> = {
     preferences.reasoningLevel = String(value ?? "off");
     return success;
   },
+  "preferences/set-tool-permission-mode": ([value]) => {
+    if (TOOL_PERMISSION_MODES.includes(String(value))) {
+      preferences.toolPermissionMode = String(value);
+    }
+    return success;
+  },
 
   "threads/create": ([input]) =>
     createThread(
@@ -595,7 +613,7 @@ const WRITES: Record<string, Write> = {
 const route = (url: URL) =>
   url.pathname.replace(/^\/api\/2\.0\/ai\//, "").replace(/\/+$/, "");
 
-// Unknown routes fall through to the worker's 404 and its warning, so a
+// Unknown routes fall through to the demo portal's 404 and its warning, so a
 // route the fixtures do not cover shows up in the console.
 const aiService = http.all(api("ai/:area/:action"), async ({ request }) => {
   const url = new URL(request.url);

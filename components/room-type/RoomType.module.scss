@@ -96,6 +96,12 @@
   gap: var(--room-type-item-gap);
   align-items: center;
 
+  &:focus-visible {
+    outline: 2px solid
+      var(--accent-main, var(--color-scheme-main-accent, #{$light-blue-main}));
+    outline-offset: -2px;
+  }
+
   :global {
     .choose_room-logo_wrapper {
       width: 32px;

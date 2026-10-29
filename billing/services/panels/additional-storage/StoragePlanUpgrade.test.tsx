@@ -91,7 +91,7 @@ const createStores = (currentStoragePlanSize: number) => {
   mocks.paymentStore = {
     tariff,
     fetchBalance: vi.fn(),
-    fetchTransactionHistory: vi.fn(),
+    refreshTransactionHistory: vi.fn(),
     storageServiceName: "disk-storage",
     storagePriceIncrement: 0.14,
     formatWalletCurrency: () => "$0.14",
@@ -246,7 +246,7 @@ describe("<StoragePlanUpgrade /> purchase with a linked card", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(mocks.updateWalletPayment).toHaveBeenCalledTimes(1);
     expect(mocks.paymentStore.fetchBalance).toHaveBeenCalled();
-    expect(mocks.paymentStore.fetchTransactionHistory).toHaveBeenCalledWith(
+    expect(mocks.paymentStore.refreshTransactionHistory).toHaveBeenCalledWith(
       "disk-storage",
     );
   });

@@ -77,6 +77,17 @@ node .claude/scripts/audit-tokens/audit.mjs --changed --base <merge-base>
 `--changed`, never the full run: the full run reports a standing backlog that this change did
 not cause.
 
+## 5a -- vulnerable dependencies
+
+```bash
+node .claude/scripts/audit-deps/audit-deps.mjs --level moderate
+```
+
+Neither CI job runs an audit. A finding marked `reach: RUNTIME` ships to every consumer of the
+published package, and an override in `pnpm-workspace.yaml` does not travel with it - see the
+`audit-deps` skill. A new runtime finding at high or above blocks a publish; dev-only findings
+are reported, not blocking.
+
 ## 6 -- read the file list
 
 ```bash

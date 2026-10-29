@@ -112,4 +112,31 @@ describe("EmptyView", () => {
     const body = screen.queryByTestId("empty-view-body");
     expect(body).not.toBeInTheDocument();
   });
+
+  // With no href there is nothing for the browser to open, so a modified
+  // click is still the option's action.
+  it("runs a no-address option's onClick on a modified click", () => {
+    const onClick = vi.fn();
+    renderComponent({
+      ...mockProps,
+      options: [
+        {
+          key: "clear-filter",
+          icon: <MockIcon />,
+          to: "",
+          isNext: true,
+          description: "Clear filter",
+          onClick,
+        },
+      ],
+    });
+
+    const option = screen.getByRole("button", { name: "Clear filter" });
+    expect(option).not.toHaveAttribute("href");
+
+    fireEvent.click(option, { ctrlKey: true });
+    fireEvent.click(option, { shiftKey: true });
+
+    expect(onClick).toHaveBeenCalledTimes(2);
+  });
 });

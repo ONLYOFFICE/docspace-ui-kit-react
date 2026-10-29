@@ -20,6 +20,10 @@ onlyoffice-apps-ui-kit-*.tgz
 playwright-report
 test-results
 
+# Vitest browser mode's screenshots of failing stories (`pnpm test:stories`),
+# written beside each story file. CI uploads them as an artifact on failure.
+__screenshots__/
+
 # Stories-audit and story-console reports (see .claude/skills/audit-stories and
 # .claude/skills/story-console). Written on demand,
 # kept out of git so a sweep is not committed with the fixes it asks for.

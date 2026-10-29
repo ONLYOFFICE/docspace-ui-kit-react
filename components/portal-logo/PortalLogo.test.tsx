@@ -82,6 +82,142 @@ describe("PortalLogo", () => {
     );
   });
 
+  it("names the image with the alt prop, defaulting to the old string", () => {
+    const { unmount } = render(<PortalLogo />);
+    expect(screen.getByRole("img", { name: "portal logo" })).toBeVisible();
+    unmount();
+
+    render(<PortalLogo alt="Acme portal" />);
+    expect(screen.getByRole("img", { name: "Acme portal" })).toHaveAttribute(
+      "alt",
+      "Acme portal",
+    );
+  });
+
+  it("gives the fallback mark the same accessible name", () => {
+    render(<PortalLogo alt="Acme portal" />);
+    fireEvent.error(screen.getByRole("img"));
+
+    const fallback = screen.getByRole("img", { name: "Acme portal" });
+    expect(fallback.tagName.toLowerCase()).toBe("svg");
+  });
+
+  // A server-rendered logo that failed before hydration never reaches onError;
+  // it stayed a broken image (the SDK's public-room password page).
+  describe("an image that settled before it mounted", () => {
+    const settle = (decode: () => Promise<void>, complete = true) => {
+      const completeSpy = vi
+        .spyOn(HTMLImageElement.prototype, "complete", "get")
+        .mockReturnValue(complete);
+      // jsdom has no decode(); the component calls it only when present.
+      const decodeMock = vi.fn(decode);
+      Object.defineProperty(HTMLImageElement.prototype, "decode", {
+        configurable: true,
+        value: decodeMock,
+      });
+      return {
+        decodeMock,
+        restore: () => {
+          completeSpy.mockRestore();
+          Reflect.deleteProperty(HTMLImageElement.prototype, "decode");
+        },
+      };
+    };
+
+    it("shows the fallback when the image failed", async () => {
+      const { restore } = settle(() => Promise.reject(new Error("broken")));
+      try {
+        render(<PortalLogo alt="Acme portal" />);
+
+        await waitFor(() =>
+          expect(
+            screen
+              .getByRole("img", { name: "Acme portal" })
+              .tagName.toLowerCase(),
+          ).toBe("svg"),
+        );
+      } finally {
+        restore();
+      }
+    });
+
+    it("keeps the image when it decoded", async () => {
+      const { decodeMock, restore } = settle(() => Promise.resolve());
+      try {
+        render(<PortalLogo alt="Acme portal" />);
+        await waitFor(() => expect(decodeMock).toHaveBeenCalled());
+        await act(async () => {});
+
+        expect(screen.getByRole("img", { name: "Acme portal" }).tagName).toBe(
+          "IMG",
+        );
+      } finally {
+        restore();
+      }
+    });
+
+    // isResizable swaps the src of the same element on a resize; the late
+    // rejection of the logo it replaced must not hide the one now shown.
+    it("ignores a late rejection for a src it no longer shows", async () => {
+      let rejectFirst: (reason: Error) => void = () => {};
+      const { decodeMock, restore } = settle(
+        () =>
+          new Promise<void>((_resolve, reject) => {
+            rejectFirst = reject;
+          }),
+      );
+      try {
+        render(<PortalLogo alt="Acme portal" isResizable />);
+        await waitFor(() => expect(decodeMock).toHaveBeenCalledTimes(1));
+        const image = screen.getByRole("img", { name: "Acme portal" });
+        const firstSrc = image.getAttribute("src");
+
+        mockResizeEvent(375);
+        await waitFor(() =>
+          expect(image.getAttribute("src")).not.toBe(firstSrc),
+        );
+        await act(async () => {
+          rejectFirst(new Error("broken"));
+        });
+
+        expect(screen.getByRole("img", { name: "Acme portal" }).tagName).toBe(
+          "IMG",
+        );
+      } finally {
+        restore();
+      }
+    });
+
+    it("leaves an image still loading to onError", async () => {
+      const { decodeMock, restore } = settle(
+        () => Promise.reject(new Error("broken")),
+        false,
+      );
+      try {
+        render(<PortalLogo alt="Acme portal" />);
+        await act(async () => {});
+
+        expect(decodeMock).not.toHaveBeenCalled();
+        expect(screen.getByRole("img", { name: "Acme portal" }).tagName).toBe(
+          "IMG",
+        );
+      } finally {
+        restore();
+      }
+    });
+  });
+
+  it("hides the fallback mark from assistive technology when alt is empty", () => {
+    render(<PortalLogo alt="" />);
+    fireEvent.error(screen.getByRole("presentation", { hidden: true }));
+
+    expect(screen.getByTestId("svg-mock")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    expect(screen.queryByRole("img")).toBeNull();
+  });
+
   it("does not add resize listener when isResizable is false", () => {
     const addEventListenerSpy = vi.spyOn(window, "addEventListener");
     render(<PortalLogo isResizable={false} />);

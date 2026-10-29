@@ -100,6 +100,49 @@ describe("<ContextMenu />", () => {
     expect(onClick).toHaveBeenCalled();
   });
 
+  it("lets the browser open a middle-clicked link only when onClick does not", () => {
+    const ref = React.createRef<ContextMenuRefType>();
+    const onClick = vi.fn();
+
+    render(
+      <ContextMenu
+        ref={ref}
+        model={[
+          {
+            key: "handled",
+            label: "Handled",
+            url: "/a",
+            onClick,
+            preventNewTab: true,
+          },
+          { key: "plain", label: "Plain", url: "/b", onClick },
+          { key: "no-url", label: "No url", onClick },
+          { key: "disabled", label: "Disabled", url: "/c", disabled: true },
+        ]}
+        showDisabledItems
+        withHotkeys={false}
+      />,
+    );
+
+    showAt(ref, 100);
+
+    // fireEvent returns false once a listener called preventDefault.
+    const middle = (label: string) =>
+      fireEvent(
+        screen.getByText(label),
+        new MouseEvent("auxclick", {
+          bubbles: true,
+          cancelable: true,
+          button: 1,
+        }),
+      );
+
+    expect(middle("Handled")).toBe(false);
+    expect(middle("No url")).toBe(false);
+    expect(middle("Disabled")).toBe(false);
+    expect(middle("Plain")).toBe(true);
+  });
+
   it("inlines only an icon the page may fetch itself", () => {
     const ref = React.createRef<ContextMenuRefType>();
     const ownSvg = "/static/images/icons/16/trash.react.svg";

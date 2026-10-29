@@ -6,6 +6,7 @@ export type SavedApiProvider = {
 };
 
 export const STORAGE_KEY = "sb-saved-api-providers";
+export const SELECTED_KEY = "sb-selected-api-provider";
 
 export const getSavedProviders = (): SavedApiProvider[] => {
   try {
@@ -36,6 +37,19 @@ export const deleteProvider = (id: string): void => {
 
 export const getProviderById = (id: string): SavedApiProvider | undefined => {
   return getSavedProviders().find((p) => p.id === id);
+};
+
+export const getSelectedApiConfig = (): string => {
+  try {
+    const selected = localStorage.getItem(SELECTED_KEY);
+    return selected && getProviderById(selected) ? selected : "default";
+  } catch {
+    return "default";
+  }
+};
+
+export const saveSelectedApiConfig = (apiConfig: string): void => {
+  localStorage.setItem(SELECTED_KEY, apiConfig);
 };
 
 /**

@@ -150,3 +150,16 @@
 .spacer {
   flex-grow: 1;
 }
+
+.linksRow {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.linkSeparator {
+  width: 1px;
+  height: 12px;
+  background: var(--payment-inactive-color);
+}

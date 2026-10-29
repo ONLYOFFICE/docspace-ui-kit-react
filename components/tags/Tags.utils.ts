@@ -104,8 +104,13 @@ export const calculateRenderedTags = (
         : [],
     };
 
+    // The overflow tag, and the create tag after it when there is one, are
+    // fixed-width; the rest of the row is shared among the visible tags.
     const currentTagMaxWidth =
-      (containerWidth - columnCount * paddingSize - thirdPartyTagWidth) /
+      (containerWidth -
+        columnCount * paddingSize -
+        thirdPartyTagWidth -
+        createTagCount * (thirdPartyTagWidth + paddingSize)) /
       columnCount;
     const maxWidthPercent = Math.floor(
       (currentTagMaxWidth / containerWidth) * 100,
@@ -116,6 +121,10 @@ export const calculateRenderedTags = (
     }
 
     newTags.push(tagWithDropdown);
+
+    if (canShowCreate) {
+      newTags.push(createTag);
+    }
   }
 
   return newTags;

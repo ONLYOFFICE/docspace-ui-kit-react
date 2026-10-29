@@ -1,5 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 
 import ErrorContainer from "./ErrorContainer";
 
@@ -77,6 +78,9 @@ const meta = {
       description: "Inline style of the outer element",
     },
   },
+  args: {
+    onClickButton: fn(),
+  },
 } satisfies Meta<typeof ErrorContainer>;
 
 type Story = StoryObj<ComponentProps<typeof ErrorContainer>>;
@@ -89,6 +93,33 @@ export const Default: Story = {
     bodyText: "Try again later",
     headerText: "Some error has happened",
     customizedBodyText: "Customized body",
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", {
+        level: 1,
+        name: "Some error has happened",
+      }),
+    ).toBeVisible();
+    await expect(canvas.getByText("Try again later")).toBeVisible();
+    await expect(canvas.getByText("Customized body")).toBeVisible();
+    await expect(canvas.getByAltText("portal logo")).toBeInTheDocument();
+    // No buttonText, so no button even though onClickButton is set.
+    await expect(canvas.queryByRole("button")).toBeNull();
+    // The illustration is decorative: every SVG sits under aria-hidden.
+    // Only the four ids the portal's stylesheets select are written.
+    const root = canvas.getByTestId("ErrorContainer");
+    const svgs = Array.from(root.querySelectorAll("svg"));
+    await expect(svgs.length).toBeGreaterThan(0);
+    for (const svg of svgs) {
+      await expect(svg.closest('[aria-hidden="true"]')).not.toBeNull();
+    }
+    const ids = Array.from(root.querySelectorAll("[id]"), (e) => e.id);
+    await expect(
+      ids.every((id) =>
+        ["container-inner", "header", "text", "customized-text"].includes(id),
+      ),
+    ).toBe(true);
   },
   parameters: {
     docs: {
@@ -115,6 +146,10 @@ export const WithPrimaryButton: Story = {
     buttonText: "Retry",
     isPrimaryButton: true,
   },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Retry" }));
+    await expect(args.onClickButton).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -140,6 +175,14 @@ export const InEditorMode: Story = {
     isEditor: true,
     bodyText: "Editor mode error message",
     buttonText: "Close Editor",
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // isEditor takes the container out of the page flow.
+    await expect(
+      getComputedStyle(canvas.getByTestId("ErrorContainer")).position,
+    ).not.toBe("static");
+    await userEvent.click(canvas.getByRole("button", { name: "Close Editor" }));
+    await expect(args.onClickButton).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -201,6 +244,13 @@ export const WithChildren: Story = {
       </div>
     ),
   },
+  play: async ({ canvas }) => {
+    // children render below the message.
+    await expect(canvas.getAllByRole("listitem")).toHaveLength(3);
+    await expect(
+      canvas.getByText("Error Code: ERR_CONNECTION_REFUSED"),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -234,6 +284,10 @@ export const WithSecondaryButton: Story = {
     buttonText: "Go back",
     isPrimaryButton: false,
   },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Go back" }));
+    await expect(args.onClickButton).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -260,6 +314,9 @@ export const WithoutLogo: Story = {
     bodyText: "Try again later",
     hideLogo: true,
   },
+  play: async ({ canvas }) => {
+    await expect(canvas.queryByAltText("portal logo")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -277,7 +334,24 @@ export const WithoutLogo: Story = {
   },
 };
 
-export const CssCustomization = {
+export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const header = canvas.getByText("Connection error");
+    // The text variable colours customizedBodyText only.
+    await expect(canvas.getByText("Error code: 503")).toHaveStyle({
+      color: "rgb(29, 45, 68)",
+    });
+    // The background variable paints the page behind the illustration.
+    const painted = (() => {
+      for (let el: HTMLElement | null = header; el; el = el.parentElement) {
+        if (getComputedStyle(el).backgroundColor === "rgb(230, 243, 251)") {
+          return true;
+        }
+      }
+      return false;
+    })();
+    await expect(painted).toBe(true);
+  },
   render: () => (
     <div
       style={

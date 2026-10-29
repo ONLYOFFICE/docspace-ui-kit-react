@@ -1,7 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import type { RoomTileProps } from "./RoomTile.types";
 
@@ -12,20 +12,31 @@ import CatalogFolderReactSvgUrl from "../../../assets/icons/16/catalog.folder.re
 
 import { RoomsType } from "../../../enums";
 
-import { Link } from "../../link";
+import { Link, LinkType } from "../../link";
 import { Text } from "../../text";
 import { IconButton } from "../../icon-button";
 import { IconSizeType } from "../../../utils";
 
 import { RoomTile } from ".";
 import { TileContent } from "../tile-content";
+import RenameField from "../../../.storybook/utils/RenameField";
 
 const element = <PublicRoomIconReactSvg />;
+
+const onPinBadge = fn();
+const onDeleteOption = fn();
+
+// The menu is portalled and fades in.
+const menuItem = async (name: string) => {
+  const item = await screen.findByRole("menuitem", { name });
+  await waitFor(() => expect(item).toBeVisible());
+  return item;
+};
 
 const badges = (
   <div className="badges">
     <IconButton
-      onClick={() => {}}
+      onClick={onPinBadge}
       className="badge icons-group is-pinned tablet-badge tablet-pinned"
       iconNode={<UnpinReactSvg />}
       size={IconSizeType.medium}
@@ -38,14 +49,14 @@ const contextOptions = [
     id: "option_edit",
     key: "edit",
     label: "Edit",
-    onClick: () => {},
+    onClick: fn(),
     disabled: false,
   },
   {
     id: "option_delete",
     key: "delete",
     label: "Delete",
-    onClick: () => {},
+    onClick: onDeleteOption,
     disabled: false,
   },
 ];
@@ -168,7 +179,7 @@ const meta = {
     },
     selectTag: {
       description:
-        "Called with a clicked tag that carries a label and a room type; a plain text tag never reaches it",
+        "Called with a clicked tag of the room's own, plain text tags included; the generated tags go to `selectOption`",
     },
     selectOption: {
       description:
@@ -210,7 +221,19 @@ const Template = ({
     <div style={{ maxWidth: "300px", margin: "30px" }}>
       <RoomTile {...args} checked={checked} onSelect={onSelect}>
         <TileContent>
-          <Link>Room Content</Link>
+          {args.isEdit ? (
+            <RenameField title={args.item.title} />
+          ) : (
+            <Link
+              type={LinkType.page}
+              fontSize="16px"
+              lineHeight="22px"
+              fontWeight={600}
+              isTextOverflow
+            >
+              {args.item.title}
+            </Link>
+          )}
         </TileContent>
       </RoomTile>
     </div>
@@ -239,6 +262,48 @@ export const Default: Story = {
     getRoomTypeName: (type: string) => type,
     columnCount: 1,
   },
+  beforeEach: () => {
+    onPinBadge.mockClear();
+    onDeleteOption.mockClear();
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const tile = canvas.getByTestId("tile");
+    // A click on the tile opens the room.
+    await userEvent.click(within(tile).getByText("Sample Room"));
+    await expect(args.thumbnailClick).toHaveBeenCalledTimes(1);
+
+    // The tag and the badge have their own handlers; neither opens the room.
+    await userEvent.click(within(tile).getByText("Collaboration"));
+    await expect(args.selectTag).toHaveBeenCalledWith(
+      expect.objectContaining({ label: "Collaboration" }),
+    );
+    await expect(args.thumbnailClick).toHaveBeenCalledTimes(1);
+    const opened = (args.thumbnailClick as ReturnType<typeof fn>).mock.calls
+      .length;
+    await userEvent.click(
+      within(tile.querySelector(".badges") as HTMLElement).getByTestId(
+        "icon-button",
+      ),
+    );
+    await expect(onPinBadge).toHaveBeenCalledTimes(1);
+    await expect(args.thumbnailClick).toHaveBeenCalledTimes(opened);
+
+    const checkbox = within(tile).getByRole("checkbox", { hidden: true });
+    await userEvent.click(checkbox);
+    await expect(args.onSelect).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ id: "room-1" }),
+    );
+    await userEvent.click(checkbox);
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      false,
+      expect.objectContaining({ id: "room-1" }),
+    );
+
+    await userEvent.click(within(tile).getByTestId("context-menu-button"));
+    await userEvent.click(await menuItem("Delete"));
+    await expect(onDeleteOption).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -257,7 +322,9 @@ export const Default: Story = {
   thumbnailClick={openRoom}
   onSelect={handleSelect}
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Sample Room</Link>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -269,6 +336,13 @@ export const Checked: Story = {
   args: {
     ...Default.args,
     checked: true,
+  },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(tile.className).toMatch(/checked/);
+    await expect(
+      within(tile).getByRole("checkbox", { hidden: true }),
+    ).toBeChecked();
   },
   parameters: {
     docs: {
@@ -284,7 +358,9 @@ export const Checked: Story = {
   checked={true}
   onSelect={handleSelect}
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Sample Room</Link>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -296,6 +372,13 @@ export const InProgress: Story = {
   args: {
     ...Default.args,
     inProgress: true,
+  },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(
+      within(tile).queryByRole("checkbox", { hidden: true }),
+    ).toBeNull();
+    await expect(tile.querySelector('[class*="loader"]')).not.toBeNull();
   },
   parameters: {
     docs: {
@@ -310,7 +393,9 @@ export const InProgress: Story = {
   contextOptions={contextOptions}
   inProgress={true}
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Sample Room</Link>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -322,6 +407,11 @@ export const BlockingOperation: Story = {
   args: {
     ...Default.args,
     isBlockingOperation: true,
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      getComputedStyle(canvas.getByTestId("tile")).pointerEvents,
+    ).toBe("none");
   },
   parameters: {
     docs: {
@@ -336,7 +426,9 @@ export const BlockingOperation: Story = {
   contextOptions={contextOptions}
   isBlockingOperation={true}
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Sample Room</Link>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -357,6 +449,33 @@ export const GeneratedTags: Story = {
     },
     getRoomTypeName: () => "Collaboration",
   },
+  play: async ({ args, canvas, userEvent }) => {
+    const tile = canvas.getByTestId("tile");
+    // Two tags made by the tile: the storage first, as its icon alone,
+    // then the room type.
+    const tags = within(tile).getAllByTestId(/^tag_item_/);
+    await expect(tags).toHaveLength(2);
+    await waitFor(() =>
+      expect(tags[0].querySelector("svg, img")).not.toBeNull(),
+    );
+    await expect(tags[1]).toHaveTextContent("Collaboration");
+
+    // Each reaches selectOption with which of the two it was; neither
+    // reaches selectTag or opens the room.
+    await userEvent.click(tags[0]);
+    await expect(args.selectOption).toHaveBeenLastCalledWith({
+      option: "typeProvider",
+      value: "1",
+    });
+    tags[1].focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.selectOption).toHaveBeenLastCalledWith({
+      option: "defaultTypeRoom",
+      value: String(RoomsType.EditingRoom),
+    });
+    await expect(args.selectTag).not.toHaveBeenCalled();
+    await expect(args.thumbnailClick).not.toHaveBeenCalled();
+  },
   parameters: {
     docs: {
       description: {
@@ -372,7 +491,9 @@ export const GeneratedTags: Story = {
   selectOption={filterByOption}
   columnCount={1}
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Shared storage</Link>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -384,6 +505,11 @@ export const WithHotkeyBorder: Story = {
   args: {
     ...Default.args,
     showHotkeyBorder: true,
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("tile").className).toMatch(
+      /showHotkeyBorder/,
+    );
   },
   parameters: {
     docs: {
@@ -398,7 +524,9 @@ export const WithHotkeyBorder: Story = {
   contextOptions={contextOptions}
   showHotkeyBorder
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Sample Room</Link>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -410,6 +538,13 @@ export const RenamingState: Story = {
   args: {
     ...Default.args,
     isEdit: true,
+  },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(tile.className).toMatch(/isEdit/);
+    await expect(
+      within(tile).queryByRole("checkbox", { hidden: true }),
+    ).toBeNull();
   },
   parameters: {
     docs: {
@@ -424,7 +559,13 @@ export const RenamingState: Story = {
   contextOptions={contextOptions}
   isEdit
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <div style={{ display: "flex", gap: 4 }}>
+      <TextInput value={title} onChange={onRename} scale />
+      <Button size={ButtonSize.small} icon={<CheckIcon />} onClick={onSave} />
+      <Button size={ButtonSize.small} icon={<CrossIcon />} onClick={onCancel} />
+    </div>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -441,6 +582,15 @@ export const CustomBottomRow: Story = {
       </Text>
     ),
   },
+  play: async ({ canvas, userEvent }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(within(tile).getByText("1 tag")).toBeVisible();
+    // The host's row follows the pointer.
+    await userEvent.hover(tile);
+    await expect(within(tile).getByText("Open room")).toBeVisible();
+    await userEvent.unhover(tile);
+    await expect(within(tile).getByText("1 tag")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -456,7 +606,9 @@ export const CustomBottomRow: Story = {
     <Text fontSize="12px">{isHovered ? "Open room" : \`\${tags.length} tag\`}</Text>
   )}
 >
-  <TileContent><Link>Room Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600} isTextOverflow>Sample Room</Link>
+  </TileContent>
 </RoomTile>`,
       },
     },
@@ -468,12 +620,12 @@ export const CssCustomization: Story = {
     <div
       style={
         {
-          "--tile-bg": "#f4f9fd",
+          "--tile-bg": "light-dark(#f4f9fd, #132530)",
           "--tile-border-style": "1px solid #0082c9",
           "--tile-radius": "16px",
-          "--tile-hover-bg": "#cce5f6",
+          "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
           "--tile-icon-color": "#0082c9",
-          "--tile-tag-hover-bg": "#e6f3fb",
+          "--tile-tag-hover-bg": "light-dark(#e6f3fb, #16303e)",
           "--tile-hotkey-color": "#e0662e",
           "--tile-padding": "12px 0",
           "--tile-row-gap": "12px",
@@ -500,19 +652,35 @@ export const CssCustomization: Story = {
             badges={badges}
             showHotkeyBorder={showHotkeyBorder}
             getContextModel={() => contextOptions}
-            selectTag={() => {}}
-            selectOption={() => {}}
+            selectTag={fn()}
+            selectOption={fn()}
             getRoomTypeName={(type: string) => type}
             columnCount={1}
           >
             <TileContent>
-              <Link>{title}</Link>
+              <Link
+                type={LinkType.page}
+                fontSize="16px"
+                lineHeight="22px"
+                fontWeight={600}
+                isTextOverflow
+              >
+                {title}
+              </Link>
             </TileContent>
           </RoomTile>
         </div>
       ))}
     </div>
   ),
+  play: async ({ canvas }) => {
+    const [sample, team] = canvas.getAllByTestId("tile");
+    await expect(getComputedStyle(sample).borderTopLeftRadius).toBe("16px");
+    await expect(getComputedStyle(sample).rowGap).toBe("12px");
+    await expect(getComputedStyle(team).borderTopColor).toBe(
+      "rgb(224, 102, 46)",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -524,21 +692,21 @@ Two instances:
       },
       source: {
         code: `<div style={{
-  "--tile-bg": "#f4f9fd",
+  "--tile-bg": "light-dark(#f4f9fd, #132530)",
   "--tile-border-style": "1px solid #0082c9",
   "--tile-radius": "16px",
-  "--tile-hover-bg": "#cce5f6",
+  "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
   "--tile-icon-color": "#0082c9",
-  "--tile-tag-hover-bg": "#e6f3fb",
+  "--tile-tag-hover-bg": "light-dark(#e6f3fb, #16303e)",
   "--tile-hotkey-color": "#e0662e",
   "--tile-padding": "12px 0",
   "--tile-row-gap": "12px",
 }}>
   <RoomTile item={room} element={<RoomLogo />} contextOptions={options} badges={badges} columnCount={1}>
-    <TileContent><Link>Sample Room</Link></TileContent>
+    <TileContent><Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600}>Sample Room</Link></TileContent>
   </RoomTile>
   <RoomTile item={teamRoom} element={<RoomLogo />} contextOptions={options} badges={badges} columnCount={1} showHotkeyBorder>
-    <TileContent><Link>Team Room</Link></TileContent>
+    <TileContent><Link type="page" fontSize="16px" lineHeight="22px" fontWeight={600}>Team Room</Link></TileContent>
   </RoomTile>
 </div>`,
       },

@@ -79,6 +79,10 @@ export type SectionItem = {
   folderType?: FolderType;
   /** Where the portal opens a file, relative to it; empty for folders and in demo. */
   webUrl: string;
+  /** Whether a room is open through a public link, which the portal marks on its logo. */
+  shared?: boolean;
+  /** A room's own tags; empty when it has none. */
+  tags?: string[];
 };
 
 /** One ancestor in the breadcrumb. */
@@ -345,6 +349,8 @@ export const toListing = (
         ),
         color: folder.logo?.color ?? "",
         webUrl: "",
+        shared: isRoom ? !!folder.shared : undefined,
+        tags: isRoom ? (folder.tags ?? []) : undefined,
         folderType: isRoom ? undefined : (folder.type ?? undefined),
       };
     }),

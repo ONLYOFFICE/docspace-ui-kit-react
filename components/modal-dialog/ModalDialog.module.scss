@@ -86,6 +86,12 @@
   box-sizing: border-box;
   position: relative;
 
+  // The dialog itself takes the focus when it opens, only so that Tab starts
+  // inside it; the controls in it show their own rings.
+  &:focus {
+    outline: none;
+  }
+
   background-color: var(--modal-dialog-bg, var(--modal-dialog-bg-color));
   color: var(--modal-dialog-color, var(--modal-dialog-text-color));
   padding: 0 0 -16px;

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 
 import { withDemoBanner } from "../../../.storybook/decorators/PortalGate";
 import withBundledLogos from "../../../.storybook/decorators/withBundledLogos";
@@ -23,4 +24,17 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  play: async ({ canvas, userEvent }) => {
+    // The demo rooms load after mounting.
+    const room = await waitFor(() => canvas.getByText("Finance department"));
+    await expect(canvas.getByText("Board papers")).toBeVisible();
+
+    // A room opens in place.
+    await userEvent.click(room);
+    await waitFor(() =>
+      expect(canvas.getByText("Q4 budget.xlsx")).toBeVisible(),
+    );
+    await expect(canvas.queryByText("Board papers")).toBeNull();
+  },
+};

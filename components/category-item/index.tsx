@@ -32,15 +32,23 @@ export const CategoryItem = ({
 
   const onClickProp = isDisabled ? {} : { onClick: onClickLink };
   const onHrefProp = isDisabled ? {} : { href: url };
+  // Without an href an <a> has no role and leaves the Tab order. A disabled
+  // title stays a focusable link that says it is unavailable.
+  const disabledProps = isDisabled
+    ? { role: "link", "aria-disabled": true, tabIndex: 0 }
+    : {};
 
   return (
     <div className={styles.categoryItemWrapper} data-testid={dataTestId}>
       <div className={styles.categoryItemHeading}>
         <Link
-          className={classNames(styles.inheritTitleLink, "header")}
+          className={classNames(styles.inheritTitleLink, "header", {
+            [styles.disabled]: isDisabled,
+          })}
           noHover={isDisabled}
           {...onClickProp}
           {...onHrefProp}
+          {...disabledProps}
           dataTestId={dataTestId ? `${dataTestId}_category_link` : undefined}
         >
           {title}
@@ -59,7 +67,10 @@ export const CategoryItem = ({
           />
         ) : null}
         <ArrowRightIcon
-          className={classNames(styles.arrowIcon, "settings_unavailable")}
+          className={classNames(styles.arrowIcon, "settings_unavailable", {
+            [styles.disabled]: isDisabled,
+          })}
+          aria-hidden="true"
         />
       </div>
       <Text

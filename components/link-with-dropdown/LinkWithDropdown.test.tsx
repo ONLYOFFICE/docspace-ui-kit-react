@@ -35,7 +35,8 @@ describe("LinkWithDropdown", () => {
 
     const button = screen.getByRole("button", { name: "Link with dropdown" });
     expect(button).toBeInTheDocument();
-    expect(button).toHaveAttribute("aria-haspopup", "true");
+    expect(button).toHaveAttribute("aria-haspopup", "listbox");
+    expect(button).toHaveAttribute("tabindex", "0");
     expect(button).toHaveAttribute("aria-expanded", "false");
   });
 
@@ -140,5 +141,210 @@ describe("LinkWithDropdown", () => {
     const textElement = screen.getByText("Link with dropdown");
     expect(textElement).toHaveClass(styles.textOverflow);
     expect(textElement).toHaveAttribute("title", title);
+  });
+
+  it("opens and closes from the keyboard", () => {
+    render(
+      <LinkWithDropdown data={mockData}>Link with dropdown</LinkWithDropdown>,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Link with dropdown" });
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    fireEvent.keyDown(trigger, { key: "Escape" });
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    fireEvent.keyDown(trigger, { key: " " });
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+  });
+
+  // Inside a ModalDialog, which closes on an Escape keyup on window, Escape
+  // has to close the menu and leave the dialog open.
+  it("keeps the keys it handles from window and document listeners", () => {
+    const onDocumentKeyDown = vi.fn();
+    const onWindowKeyUp = vi.fn();
+    document.addEventListener("keydown", onDocumentKeyDown);
+    window.addEventListener("keyup", onWindowKeyUp);
+
+    render(
+      <LinkWithDropdown data={mockData}>Link with dropdown</LinkWithDropdown>,
+    );
+    const trigger = screen.getByRole("button", { name: "Link with dropdown" });
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    fireEvent.keyUp(trigger, { key: "Enter" });
+    fireEvent.keyDown(trigger, { key: "Escape" });
+    fireEvent.keyUp(trigger, { key: "Escape" });
+
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(onDocumentKeyDown).not.toHaveBeenCalled();
+    expect(onWindowKeyUp).not.toHaveBeenCalled();
+    document.removeEventListener("keydown", onDocumentKeyDown);
+    window.removeEventListener("keyup", onWindowKeyUp);
+  });
+
+  it("is out of the tab order and ignores keys while disabled", () => {
+    render(
+      <LinkWithDropdown data={mockData} isDisabled>
+        Link with dropdown
+      </LinkWithDropdown>,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Link with dropdown" });
+    expect(trigger).toHaveAttribute("tabindex", "-1");
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("drops the 200px cap when manualWidth is set", () => {
+    const { rerender } = render(
+      <LinkWithDropdown data={mockData} isOpen>
+        Link with dropdown
+      </LinkWithDropdown>,
+    );
+    expect(screen.getByTestId("dropdown")).toHaveClass(styles.fixedMaxWidth);
+
+    rerender(
+      <LinkWithDropdown data={mockData} isOpen manualWidth="300px">
+        Link with dropdown
+      </LinkWithDropdown>,
+    );
+    expect(screen.getByTestId("dropdown")).not.toHaveClass(
+      styles.fixedMaxWidth,
+    );
+  });
+
+  it("walks the list with the arrows and returns to the link on Escape", () => {
+    render(
+      <LinkWithDropdown data={mockData}>Link with dropdown</LinkWithDropdown>,
+    );
+    const trigger = screen.getByRole("button", { name: "Link with dropdown" });
+    trigger.focus();
+
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    fireEvent.keyDown(trigger, { key: "ArrowDown" });
+    const first = screen.getByTestId("link_with_drop_down_key1");
+    expect(first).toHaveFocus();
+
+    fireEvent.keyDown(first, { key: "ArrowDown" });
+    expect(screen.getByTestId("link_with_drop_down_key2")).toHaveFocus();
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, {
+      key: "Escape",
+    });
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(trigger).toHaveFocus();
+  });
+
+  it("hands the focus back to the link on Tab and lets the Tab through", () => {
+    render(
+      <LinkWithDropdown data={mockData}>Link with dropdown</LinkWithDropdown>,
+    );
+    const trigger = screen.getByRole("button", { name: "Link with dropdown" });
+    trigger.focus();
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    fireEvent.keyDown(trigger, { key: "ArrowDown" });
+    const first = screen.getByTestId("link_with_drop_down_key1");
+    expect(first).toHaveFocus();
+
+    const notPrevented = fireEvent.keyDown(first, { key: "Tab" });
+
+    expect(notPrevented).toBe(true);
+    expect(trigger).toHaveFocus();
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("skips separators and headers when walking the list", () => {
+    render(
+      <LinkWithDropdown
+        data={[
+          { key: "head", label: "Header", isHeader: true },
+          ...mockData,
+          { key: "tail", isSeparator: true },
+        ]}
+      >
+        Link with dropdown
+      </LinkWithDropdown>,
+    );
+    const trigger = screen.getByRole("button", { name: "Link with dropdown" });
+    trigger.focus();
+
+    // Opening with ArrowDown lands on the first choosable item, not the header.
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    fireEvent.keyDown(trigger, { key: "ArrowDown" });
+    expect(screen.getByTestId("link_with_drop_down_key1")).toHaveFocus();
+
+    // key3 is a separator between key2 and key4.
+    fireEvent.keyDown(document.activeElement as HTMLElement, {
+      key: "ArrowDown",
+    });
+    expect(screen.getByTestId("link_with_drop_down_key2")).toHaveFocus();
+    fireEvent.keyDown(document.activeElement as HTMLElement, {
+      key: "ArrowDown",
+    });
+    expect(screen.getByTestId("link_with_drop_down_key4")).toHaveFocus();
+
+    // End skips the trailing separator; ArrowDown then wraps past the header.
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: "End" });
+    expect(screen.getByTestId("link_with_drop_down_key4")).toHaveFocus();
+    fireEvent.keyDown(document.activeElement as HTMLElement, {
+      key: "ArrowDown",
+    });
+    expect(screen.getByTestId("link_with_drop_down_key1")).toHaveFocus();
+  });
+
+  it("runs a caller's onKeyDown and keeps its own keyboard support", () => {
+    const onKeyDown = vi.fn();
+    const props = { onKeyDown, tabIndex: 5 };
+    render(
+      <LinkWithDropdown data={mockData} {...props}>
+        Link with dropdown
+      </LinkWithDropdown>,
+    );
+    const trigger = screen.getByRole("button", { name: "Link with dropdown" });
+
+    expect(trigger).toHaveAttribute("tabindex", "0");
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    expect(onKeyDown).toHaveBeenCalledTimes(1);
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("leaves a key alone when the caller's onKeyDown prevents it", () => {
+    const props = {
+      onKeyDown: (e: { preventDefault: () => void }) => e.preventDefault(),
+    };
+    render(
+      <LinkWithDropdown data={mockData} {...props}>
+        Link with dropdown
+      </LinkWithDropdown>,
+    );
+    const trigger = screen.getByRole("button", { name: "Link with dropdown" });
+
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("lets a keyboard user reach an item after opening the list", () => {
+    render(
+      <LinkWithDropdown data={mockData}>Link with dropdown</LinkWithDropdown>,
+    );
+    const trigger = screen.getByRole("button", { name: "Link with dropdown" });
+    trigger.focus();
+
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    fireEvent.keyDown(document.activeElement ?? trigger, { key: "ArrowDown" });
+
+    // Either focus moved into the first item, or the focused element points
+    // at it through aria-activedescendant.
+    const firstItem = screen.getByTestId("link_with_drop_down_key1");
+    const active = document.activeElement;
+    const activeDescendantId = active?.getAttribute("aria-activedescendant");
+    const reached =
+      (active !== null && firstItem.contains(active)) ||
+      (!!activeDescendantId &&
+        firstItem.contains(document.getElementById(activeDescendantId)));
+    expect(
+      reached,
+      `focus is on ${active?.outerHTML.slice(0, 60)}, not the first item`,
+    ).toBe(true);
   });
 });

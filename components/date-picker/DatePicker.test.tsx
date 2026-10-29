@@ -99,6 +99,34 @@ describe("DatePicker tests", () => {
     });
   });
 
+  it("opens and closes the calendar with Enter and Space", async () => {
+    render(<DatePicker {...defaultProps} />);
+
+    const dateSelector = screen.getByTestId("date-selector");
+    dateSelector.focus();
+
+    await userEvent.keyboard("{Enter}");
+    expect(screen.getByTestId("calendar")).toBeInTheDocument();
+    expect(dateSelector).toHaveAttribute("aria-expanded", "true");
+
+    await userEvent.keyboard(" ");
+    expect(screen.queryByTestId("calendar")).not.toBeInTheDocument();
+    expect(dateSelector).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("hides the inner AddButton so only one button is announced", () => {
+    render(<DatePicker {...defaultProps} />);
+
+    expect(
+      screen
+        .getByTestId("mock-selector-add-button")
+        .closest('[aria-hidden="true"]'),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Select date" })).toHaveLength(
+      1,
+    );
+  });
+
   it("handles date deletion", async () => {
     const onChange = vi.fn();
     const initialDate = createDateTime(2024, 1, 15);

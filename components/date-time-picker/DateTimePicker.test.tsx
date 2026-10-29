@@ -1,7 +1,8 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { screen, render, fireEvent } from "@testing-library/react";
+import { screen, render, fireEvent, within } from "@testing-library/react";
 import { DateTimePicker, DateTimePickerProps } from ".";
 import styles from "./DateTimePicker.module.scss";
+import { DateTime } from "luxon";
 import { createDateTime } from "../../utils/date";
 
 describe("DateTimePicker", () => {
@@ -53,7 +54,9 @@ describe("DateTimePicker", () => {
     const timeDisplay = screen.getByTestId("date-time-picker-time-display");
     expect(timeDisplay).toBeInTheDocument();
     expect(timeDisplay).toHaveAttribute("role", "button");
-    expect(timeDisplay).toHaveAttribute("aria-label", "Current time: 10:00");
+    // The spoken time is the shown one, on the locale's 12-hour clock.
+    expect(timeDisplay).toHaveTextContent("10:00 AM");
+    expect(timeDisplay).toHaveAttribute("aria-label", "Current time: 10:00 AM");
 
     const clockIcon = screen.getByTestId("date-time-picker-clock-icon");
     expect(clockIcon).toBeInTheDocument();
@@ -89,4 +92,142 @@ describe("DateTimePicker", () => {
     expect(timePicker).toBeInTheDocument();
     expect(timePicker).toHaveAttribute("aria-label", "Time picker");
   });
+
+  it("opens the time editor with Enter and Space", () => {
+    const { unmount } = render(<DateTimePicker {...defaultProps} />);
+    fireEvent.keyDown(screen.getByTestId("date-time-picker-time-display"), {
+      key: "Enter",
+    });
+    expect(screen.getByTestId("time-picker")).toBeInTheDocument();
+    unmount();
+
+    render(<DateTimePicker {...defaultProps} />);
+    fireEvent.keyDown(screen.getByTestId("date-time-picker-time-display"), {
+      key: " ",
+    });
+    expect(screen.getByTestId("time-picker")).toBeInTheDocument();
+  });
+
+  // Any Tab or Enter closed the editor: Tab from the hours never reached the
+  // minutes or the AM/PM box, and Enter in that box unmounted it unpicked.
+  it("stays open while Tab moves between its own fields", () => {
+    render(<DateTimePicker {...defaultProps} />);
+    fireEvent.click(screen.getByTestId("date-time-picker-time-display"));
+
+    const [hours, minutes] = within(
+      screen.getByTestId("time-picker"),
+    ).getAllByRole("textbox");
+    fireEvent.keyDown(hours, { key: "Tab" });
+    expect(screen.getByTestId("time-picker")).toBeInTheDocument();
+    fireEvent.keyDown(minutes, { key: "Tab", shiftKey: true });
+    expect(screen.getByTestId("time-picker")).toBeInTheDocument();
+
+    // Shift+Tab out of the first field leaves the editor, which closes.
+    fireEvent.keyDown(hours, { key: "Tab", shiftKey: true });
+    expect(screen.queryByTestId("time-picker")).not.toBeInTheDocument();
+  });
+
+  it("picks AM or PM from the keyboard", () => {
+    const onChange = vi.fn();
+    render(
+      <DateTimePicker
+        {...defaultProps}
+        initialDate={createDateTime(2025, 1, 27, 22, 0, 0)}
+        onChange={onChange}
+      />,
+    );
+    fireEvent.click(screen.getByTestId("date-time-picker-time-display"));
+
+    const editor = screen.getByTestId("time-picker").parentElement!;
+    const meridiem = within(editor).getByRole("button", { name: /AM|PM/ });
+    fireEvent.keyDown(meridiem, { key: "Enter" });
+    expect(screen.getByTestId("time-picker")).toBeInTheDocument();
+    expect(meridiem).toHaveAttribute("aria-expanded", "true");
+
+    fireEvent.keyDown(meridiem, { key: "ArrowUp" });
+    fireEvent.keyDown(meridiem, { key: "Enter" });
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange.mock.calls[0][0].hour).toBe(10);
+    expect(screen.getByTestId("time-picker")).toBeInTheDocument();
+  });
+
+  it("speaks a 24-hour time for a 24-hour locale", () => {
+    render(
+      <DateTimePicker
+        {...defaultProps}
+        locale="de"
+        initialDate={createDateTime(2025, 1, 27, 14, 30, 0)}
+      />,
+    );
+    expect(screen.getByTestId("date-time-picker-time-display")).toHaveAttribute(
+      "aria-label",
+      "Current time: 14:30",
+    );
+  });
+
+  it("sets the half of the day instead of shifting by twelve hours", () => {
+    const onChange = vi.fn();
+    render(
+      <DateTimePicker
+        {...defaultProps}
+        initialDate={createDateTime(2025, 1, 27, 22, 0, 0)}
+        onChange={onChange}
+      />,
+    );
+
+    const choose = (meridiem: string) => {
+      const editor = screen.getByTestId("time-picker").parentElement!;
+      fireEvent.click(within(editor).getByRole("button", { name: /AM|PM/ }));
+      fireEvent.click(screen.getByRole("option", { name: meridiem }));
+    };
+
+    fireEvent.click(screen.getByTestId("date-time-picker-time-display"));
+
+    // Already PM: choosing PM again leaves the time on the same day.
+    choose("PM");
+    expect(onChange).not.toHaveBeenCalled();
+
+    choose("AM");
+    expect(onChange).toHaveBeenCalledTimes(1);
+    const am = onChange.mock.calls[0][0];
+    expect(am.hour).toBe(10);
+    expect(am.day).toBe(27);
+
+    // Already AM now: choosing AM again changes nothing either.
+    choose("AM");
+    expect(onChange).toHaveBeenCalledTimes(1);
+  });
+
+  // Clocks in Berlin go back at 03:00 on 2025-10-26 and forward at 02:00 on
+  // 2025-03-30, so twelve hours of elapsed time is not twelve on the clock.
+  it.each([
+    { label: "fall-back", day: 26, month: 10, from: 13, to: 1, pick: "AM" },
+    { label: "spring-forward", day: 30, month: 3, from: 1, to: 13, pick: "PM" },
+  ])(
+    "keeps the clock time on a $label day",
+    ({ day, month, from, to, pick }) => {
+      const onChange = vi.fn();
+      render(
+        <DateTimePicker
+          {...defaultProps}
+          initialDate={DateTime.fromObject(
+            { year: 2025, month, day, hour: from, minute: 30 },
+            { zone: "Europe/Berlin" },
+          )}
+          onChange={onChange}
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId("date-time-picker-time-display"));
+      const editor = screen.getByTestId("time-picker").parentElement!;
+      fireEvent.click(within(editor).getByRole("button", { name: /AM|PM/ }));
+      fireEvent.click(screen.getByRole("option", { name: pick }));
+
+      expect(onChange).toHaveBeenCalledTimes(1);
+      const picked = onChange.mock.calls[0][0];
+      expect(picked.hour).toBe(to);
+      expect(picked.minute).toBe(30);
+      expect(picked.day).toBe(day);
+    },
+  );
 });

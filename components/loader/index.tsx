@@ -1,4 +1,6 @@
 import { Text } from "../text";
+import { useCommonTranslation } from "../../utils/i18n";
+import { useLiveRegionText } from "../../hooks/useLiveRegionText";
 
 import { Oval } from "./sub-components/Oval";
 import { DualRing } from "./sub-components/DualRing";
@@ -7,25 +9,61 @@ import { Track } from "./sub-components/Track";
 
 import type { LoaderProps } from "./Loader.types";
 import { LoaderTypes } from "./Loader.enums";
+import styles from "./Loader.module.scss";
 
 export { LoaderTypes };
 
-const Loader = ({ ...props }: LoaderProps) => {
-  const { type, color, size, label, className, style, id } = props;
+// The English fallback when no translations are loaded.
+const DEFAULT_LABEL = "Loading...";
 
-  const svgRenderer = (t?: LoaderTypes) => {
+// The region's visually hidden label. A status region inserted together
+// with its text is usually not announced, so it stays empty for a moment and
+// the label follows (useLiveRegionText); what is drawn is not delayed. A
+// component of its own, so a decorative loader -- one per busy row or button
+// -- does not pay for the timer and the extra render.
+const LoaderLabel = ({ label }: { label: string }) => {
+  const liveLabel = useLiveRegionText(label);
+
+  return (
+    <span className={styles.visuallyHidden} data-testid="loader-label">
+      {liveLabel}
+    </span>
+  );
+};
+
+const Loader = (props: LoaderProps) => {
+  const t = useCommonTranslation();
+  const {
+    type = LoaderTypes.oval,
+    color,
+    size,
+    label: labelProp,
+    className,
+    style,
+    id,
+    isDecorative = false,
+  } = props;
+
+  const label = labelProp ?? (t("LoadingProcessing") || DEFAULT_LABEL);
+
+  const { isDecorative: _isDecorative, ...rest } = props;
+  const animationProps = { ...rest, type, label };
+
+  const svgRenderer = (t: LoaderTypes) => {
     switch (t) {
       case LoaderTypes.oval:
-        return <Oval {...props} />;
+        return <Oval {...animationProps} />;
       case LoaderTypes.dualRing:
-        return <DualRing {...props} />;
+        return <DualRing {...animationProps} />;
       case LoaderTypes.rombs:
-        return <Rombs {...props} />;
+        return <Rombs {...animationProps} />;
       case LoaderTypes.track:
-        return <Track {...props} />;
+        return <Track {...animationProps} />;
       default:
+        // Drawn at once and hidden from assistive technology, which reads
+        // the region's own label instead.
         return (
-          <span style={{ ...style }}>
+          <span style={{ ...style }} aria-hidden="true">
             <Text color={color} fontSize={size}>
               {label}
             </Text>
@@ -34,23 +72,42 @@ const Loader = ({ ...props }: LoaderProps) => {
     }
   };
 
+  // The animations, and the base type's drawn text, are hidden from
+  // assistive technology; the region's visually hidden label, filled in
+  // shortly after mount, is what it reads and announces. A decorative loader
+  // is hidden whole: its host control carries the busy state.
+  if (isDecorative) {
+    return (
+      <div
+        aria-hidden="true"
+        className={className}
+        style={style}
+        id={id}
+        data-testid="loader"
+      >
+        {svgRenderer(type)}
+      </div>
+    );
+  }
+
   return (
     <div
-      aria-busy="true"
+      role="status"
       className={className}
       style={style}
       id={id}
       data-testid="loader"
     >
       {svgRenderer(type)}
+      <LoaderLabel label={label} />
     </div>
   );
 };
 
 Loader.default = {
-  type: LoaderTypes.base,
+  type: LoaderTypes.oval,
   size: "40px",
-  label: "Loading content, please wait.",
+  label: DEFAULT_LABEL,
 };
 
 export { Loader };

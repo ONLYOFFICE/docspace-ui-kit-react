@@ -234,7 +234,7 @@ const PeopleSelector = ({
   isAgent,
 }: PeopleSelectorProps) => {
   const t = useCommonTranslation();
-  const { peopleSearchApi, groupSearchApi, baseUrl } = useApi();
+  const { peopleSearchApi, groupSearchApi, groupApi, baseUrl } = useApi();
   const { isBase } = useTheme();
 
   const [activeTabId, setActiveTabId] = useState<string>(
@@ -340,7 +340,20 @@ const PeopleSelector = ({
         let items: (EmployeeFullDto | GroupDto)[] = [];
         let responseTotal = 0;
 
-        if (!roomId) {
+        if (!roomId && isGroupsTab) {
+          // No room to scope "shared with" by: the tab lists the portal's
+          // groups, as GroupsSelector does.
+          const res = await groupApi.getGroups(
+            {
+              count: pageCount,
+              startIndex,
+              filterValue,
+            },
+            { signal },
+          );
+          items = res.data.response ?? [];
+          responseTotal = res.data.count ?? 0;
+        } else if (!roomId) {
           const employeeTypes =
             currentFilter.role as SearchUsersByExtendedFilterEmployeeTypesEnum[];
 
@@ -440,12 +453,16 @@ const PeopleSelector = ({
             ),
           );
 
-        const newTotal = withOutCurrentAuthorizedUser
+        // The current user is one of the people, never one of the groups:
+        // only a list of people has them to leave out and count off.
+        const withoutCurrentUser = withOutCurrentAuthorizedUser && !isGroupsTab;
+
+        const newTotal = withoutCurrentUser
           ? responseTotal - totalDifferent - 1
           : responseTotal - totalDifferent;
 
         if (startIndex === 0) {
-          const newItems = withOutCurrentAuthorizedUser
+          const newItems = withoutCurrentUser
             ? removeCurrentUserFromList(data)
             : moveCurrentUserToTopOfList(data);
 
@@ -460,7 +477,7 @@ const PeopleSelector = ({
               (item) => !ids.has(item.id) && ids.add(item.id),
             );
 
-            const newItems = withOutCurrentAuthorizedUser
+            const newItems = withoutCurrentUser
               ? removeCurrentUserFromList(filteredTempItems)
               : moveCurrentUserToTopOfList(filteredTempItems);
 
@@ -507,6 +524,7 @@ const PeopleSelector = ({
       targetEntityType,
       peopleSearchApi,
       groupSearchApi,
+      groupApi,
       disabledInvitedText,
       t,
     ],

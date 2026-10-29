@@ -8,6 +8,7 @@ import { RectangleSkeleton } from "../../rectangle";
 import { IconButton } from "../../icon-button";
 import { Text } from "../../text";
 import { Heading, HeadingSize } from "../../heading";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import type { AsideHeaderProps } from "./AsideHeader.types";
 import styles from "./AsideHeader.module.scss";
@@ -30,7 +31,13 @@ const AsideHeader = (props: AsideHeaderProps) => {
     headerHeight,
     headerComponent,
     dataTestId,
+    closeLabel: closeLabelProp,
+    backLabel: backLabelProp,
   } = props;
+
+  const t = useCommonTranslation();
+  const closeLabel = closeLabelProp ?? (t("CloseButton") || "Close");
+  const backLabel = backLabelProp ?? (t("Back") || "Back");
 
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -42,6 +49,7 @@ const AsideHeader = (props: AsideHeaderProps) => {
       onClick={onBackClick}
       isFill
       isClickable
+      aria-label={backLabel}
       dataTestId="aside_header_back_icon_button"
     />
   );
@@ -54,7 +62,7 @@ const AsideHeader = (props: AsideHeaderProps) => {
       onClick={onCloseClick}
       isClickable
       isStroke
-      aria-label="close"
+      aria-label={closeLabel}
       dataTestId="aside_header_close_icon_button"
     />
   );

@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 
 import AppLoader from "./index";
 
@@ -11,6 +12,9 @@ const meta = {
     // The Docs page is README.md, rendered by .storybook/blocks/DocsPage.tsx;
     // there is no second description to keep in step with it.
     layout: "fullscreen",
+    docs: {
+      story: { inline: false, height: "320px" },
+    },
   },
 } satisfies Meta<typeof AppLoader>;
 
@@ -20,6 +24,19 @@ export default meta;
 
 export const Default: Story = {
   render: () => <AppLoader />,
+  play: async ({ canvas }) => {
+    // The sheet is fixed to the viewport and covers the whole window.
+    const sheet = canvas.getByTestId("app-loader");
+    await expect(getComputedStyle(sheet).position).toBe("fixed");
+    const box = sheet.getBoundingClientRect();
+    await expect(box.width).toBe(window.innerWidth);
+    await expect(box.height).toBe(window.innerHeight);
+    await expect(sheet.firstElementChild).toBeVisible();
+    // The wait is announced: the inner loader is a status region.
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent("Loading..."),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -46,6 +63,11 @@ export const CssCustomization: Story = {
       <AppLoader />
     </div>
   ),
+  play: async ({ canvas }) => {
+    const style = getComputedStyle(canvas.getByTestId("app-loader"));
+    await expect(style.backgroundColor).toBe("rgb(230, 243, 251)");
+    await expect(style.zIndex).toBe("100");
+  },
   parameters: {
     docs: {
       description: {

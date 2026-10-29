@@ -66,6 +66,23 @@ const config: StorybookConfig = {
       })();
     </script>`,
 
+  previewHead: (head) => `${head}
+    <script>
+      window.addEventListener("vite:preloadError", function (event) {
+        var key = "sb-preload-error-reload";
+        var now = Date.now();
+        try {
+          var last = Number(sessionStorage.getItem(key)) || 0;
+          if (now - last < 10000) return;
+          sessionStorage.setItem(key, String(now));
+        } catch (error) {
+          return;
+        }
+        event.preventDefault();
+        window.location.reload();
+      });
+    </script>`,
+
   addons: [
     "@storybook/addon-links",
     "@vueless/storybook-dark-mode",
@@ -81,6 +98,9 @@ const config: StorybookConfig = {
         },
       },
     },
+    // Runs every story as a browser test through Vitest -- the "storybook"
+    // project in vitest.config.ts -- and adds the testing widget to the UI.
+    "@storybook/addon-vitest",
   ],
 
   framework: {
@@ -155,15 +175,20 @@ const config: StorybookConfig = {
     // imported.
     const stub = (file: string) => path.resolve(__dirname, "stubs", file);
 
+    // Ahead of `react-shiki`: aliases match by prefix in order, and the bare
+    // key would turn ai-chat's `react-shiki/core` import into a path under the
+    // stub file.
     const missingAiChatPeers = {
+      "react-shiki/core": stub("react-shiki.mjs"),
       "react-shiki": stub("react-shiki.mjs"),
+      // Only the two entry points the widget imports statically; its themes
+      // and languages are dynamic imports reached through these alone.
+      "shiki/core": stub("shiki.mjs"),
+      "shiki/engine/javascript": stub("shiki.mjs"),
       openai: stub("openai.mjs"),
       "@anthropic-ai/sdk": stub("anthropic-sdk.mjs"),
       "@google/genai": stub("google-genai.mjs"),
       "@mistralai/mistralai": stub("mistralai.mjs"),
-      codemirror: stub("codemirror.mjs"),
-      "@codemirror/state": stub("codemirror-state.mjs"),
-      "@codemirror/lang-json": stub("codemirror-lang-json.mjs"),
     };
 
     config.resolve = config.resolve || {};

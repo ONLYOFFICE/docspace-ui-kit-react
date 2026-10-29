@@ -14,8 +14,11 @@ import { parseLocaleConstants } from "../utils/parse-locale-constants";
 import brandsData from "../test/fixtures/brands.json";
 import globalTypes from "./globals";
 import withApiProvider from "./decorators/withApiProvider";
-import { startDemoPortal } from "./mocks/worker";
+import { getSelectedApiConfig } from "./utils/apiProviders";
+import { startDemoPortal } from "./mocks/network";
 import { syncNestedPreviewGlobals } from "./utils/nestedPreviewGlobals";
+import { keepDocsScrollOnFocus } from "./utils/nestedPreviewFocus";
+import { slowDownPlay } from "./utils/playDelay";
 import enCommon from "../locales/en/Common.json";
 import enPayments from "../locales/en/Payments.json";
 import enSettings from "../locales/en/Settings.json";
@@ -43,6 +46,7 @@ setBrandLookup(getBrand);
 // in iframes of their own (`docs.story.inline: false`) -- the AI chat and
 // settings among them.
 syncNestedPreviewGlobals();
+keepDocsScrollOnFocus();
 
 const lightColorScheme: TColorScheme = {
   id: 1,
@@ -191,7 +195,7 @@ const preview: Preview = {
   },
 
   initialGlobals: {
-    apiConfig: "default",
+    apiConfig: getSelectedApiConfig(),
     // "page" paints the story on a white or black page with a 20px margin.
     // "transparent" drops both, for scripts/docs/screenshots.mjs, which
     // photographs stories for the API site and needs the component alone.
@@ -249,14 +253,16 @@ const preview: Preview = {
   ],
 
   // The demo portal has to be answering before the first story asks it
-  // anything; `startDemoPortal` starts the worker once and resolves at once
-  // after that.
+  // anything; `startDemoPortal` patches fetch and XHR once and only swaps the
+  // handlers after that.
   loaders: [
     async () => {
       await startDemoPortal();
       return {};
     },
   ],
+
+  beforeEach: slowDownPlay,
 
   tags: ["autodocs"],
 };

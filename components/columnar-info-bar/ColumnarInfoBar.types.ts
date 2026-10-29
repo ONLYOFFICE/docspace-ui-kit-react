@@ -21,9 +21,6 @@ export type ColumnarInfoBarProps = {
   /** Which of the three looks to render: the warning bar with an accent edge, the bordered `neutral` card that slides open, or the padded `page` block whose columns are a two-column grid.
    * @default "default" */
   variant?: "default" | "neutral" | "page";
-  /**
-   * Accessible name of the close button (its `aria-label`). Defaults to the
-   * English `"Close"`; pass a translated string. Ignored without `onAction`.
-   */
+  /** Accessible name of the close button (its `aria-label`). Defaults to the translated `Common:CloseButton` ("Close"). Ignored without `onAction`. */
   closeLabel?: string;
 };

@@ -51,8 +51,27 @@ const RoomIcon = ({
 }: RoomIconProps) => {
   const [correctImage, setCorrectImage] = React.useState(true);
   const [openEditLogo, setOpenLogoEdit] = React.useState(false);
+  const fileInputId = `${React.useId()}-room-icon-file`;
 
-  const onToggleOpenEditLogo = () => setOpenLogoEdit(!openEditLogo);
+  // The logo menu is drawn by the pencil, the plus of the empty state and
+  // the hover overlay; with none of them, or with no entries, there is no
+  // menu to open.
+  const hasMenu =
+    !!model?.length &&
+    ((!isTemplate && !!isEmptyIcon) ||
+      (!!hoverSrc && !isArchive) ||
+      (!!withEditing && !isArchive));
+
+  // The only toggle: the outer element's click handler. The buttons inside
+  // stop their own click so it is not counted twice.
+  const onToggleOpenEditLogo = () => {
+    if (hasMenu) setOpenLogoEdit((open) => !open);
+  };
+
+  const onEditButtonClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    onToggleOpenEditLogo();
+  };
 
   const iconRef = React.useRef<HTMLDivElement>(null);
   const inputFilesElement = React.useRef<HTMLInputElement>(null);
@@ -92,7 +111,10 @@ const RoomIcon = ({
       isDefaultMode={false}
     >
       {model?.map((option) => {
-        const optionOnClickAction = () => {
+        const optionOnClickAction = (e?: React.SyntheticEvent) => {
+          // The entry sits inside the tile; its click must not reach the
+          // tile's toggle and open the menu again.
+          e?.stopPropagation();
           setOpenLogoEdit(false);
           if (option.key === ROOM_ACTION_KEYS.CREATE_EDIT_ROOM_UPLOAD) {
             return option.onClick(inputFilesElement);
@@ -139,11 +161,12 @@ const RoomIcon = ({
   const coverSize = +size.replace("px", "") * 0.625;
   const textColor = color && getTextColor(`#${color}`, 202);
 
+  // A logo object with no colour of its own whose image failed to load:
+  // the initials are drawn on no background, so they are painted black.
   const isWrongImage =
     !correctImage &&
-    imgSrc &&
-    typeof imgSrc !== "string" &&
-    logo &&
+    !!imgSrc &&
+    !!logo &&
     typeof logo !== "string" &&
     !logo?.color;
 
@@ -180,7 +203,6 @@ const RoomIcon = ({
             [styles.withEditing]: withEditing,
             [styles.isEmptyIcon]: isEmptyIcon,
             [styles.isArchive]: isArchive,
-            [styles.wrongImage]: isWrongImage,
           },
           className,
           styles.roomIcon,
@@ -199,6 +221,7 @@ const RoomIcon = ({
         data-has-editing={withEditing}
         data-is-template={isTemplate}
         data-is-empty={isEmptyIcon}
+        data-is-wrong-image={isWrongImage || undefined}
         onClick={onToggleOpenEditLogo}
       >
         {isTemplate ? (
@@ -238,7 +261,7 @@ const RoomIcon = ({
                 className="open-plus-logo-icon"
                 size={12}
                 iconNode={<PlusSvgUrl />}
-                onClick={onToggleOpenEditLogo}
+                onClick={onEditButtonClick}
                 isFill
               />
               {dropdownElement}
@@ -283,7 +306,6 @@ const RoomIcon = ({
         {hoverSrc && !isArchive ? (
           <div
             className={classNames(styles.roomIconContainer)}
-            onClick={onToggleOpenEditLogo}
             data-testid="hover-container"
           >
             <img
@@ -338,7 +360,7 @@ const RoomIcon = ({
               className="open-edit-logo-icon"
               size={12}
               iconNode={<EditPenSvgUrl />}
-              onClick={onToggleOpenEditLogo}
+              onClick={onEditButtonClick}
               isFill
             />
             {dropdownElement}
@@ -347,7 +369,7 @@ const RoomIcon = ({
       </div>
       {onChangeFile ? (
         <input
-          id="customFileInput"
+          id={fileInputId}
           data-testid="customFileInput"
           className="custom-file-input"
           type="file"

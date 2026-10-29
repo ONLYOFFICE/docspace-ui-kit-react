@@ -1,6 +1,7 @@
 import type { ComponentProps } from "react";
 import React, { useCallback, useEffect, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import type { TImage } from "../image-editor/ImageEditor.types";
 import type { TTranslation } from "../../utils";
@@ -104,6 +105,12 @@ const meta = {
         "Called with the change event of the file input when the user chooses another picture",
     },
   },
+  args: {
+    onClose: fn(),
+    onSave: fn(),
+    onChangeImage: fn(),
+    onChangeFile: fn(),
+  },
 } satisfies Meta<typeof AvatarEditorDialog>;
 
 type Story = StoryObj<ComponentProps<typeof AvatarEditorDialog>>;
@@ -111,6 +118,9 @@ type Story = StoryObj<ComponentProps<typeof AvatarEditorDialog>>;
 export default meta;
 
 type DemoProps = Partial<ComponentProps<typeof AvatarEditorDialog>>;
+
+// The dialog is portalled and stays mounted while closed.
+const dialog = () => screen.getByTestId("modal-dialog");
 
 const AvatarEditorDialogDemo = ({
   visible,
@@ -180,6 +190,39 @@ export const Default: Story = {
     title: "Change avatar",
     editorBorderRadius: 110,
   },
+  play: async ({ args, canvas, userEvent }) => {
+    await waitFor(() => expect(dialog()).toBeVisible());
+    const modal = within(dialog());
+    await expect(modal.getByText("Change avatar")).toBeVisible();
+
+    // The zoom buttons change the image through onChangeImage.
+    const slider = await waitFor(() => modal.getByRole("slider"));
+    await userEvent.click(modal.getByTestId("zoom_in_icon_button"));
+    await waitFor(() => expect(slider).toHaveValue("1.5"));
+    await expect(args.onChangeImage).toHaveBeenLastCalledWith(
+      expect.objectContaining({ zoom: 1.5 }),
+    );
+
+    // Save hands over the image and the cropped preview.
+    await userEvent.click(modal.getByRole("button", { name: "Save" }));
+    await expect(args.onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ zoom: 1.5 }),
+      expect.stringMatching(/^data:image\//),
+    );
+    await waitFor(() => expect(dialog()).not.toBeVisible());
+
+    // Cancel clears the image and closes.
+    await userEvent.click(canvas.getByRole("button", { name: "Open dialog" }));
+    await waitFor(() => expect(dialog()).toBeVisible());
+    await userEvent.click(
+      within(dialog()).getByRole("button", { name: "Cancel" }),
+    );
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
+    await expect(args.onChangeImage).toHaveBeenLastCalledWith(
+      expect.objectContaining({ uploadedFile: undefined, zoom: 1 }),
+    );
+    await waitFor(() => expect(dialog()).not.toBeVisible());
+  },
   parameters: {
     docs: {
       description: {
@@ -216,6 +259,17 @@ export const Loading: Story = {
     ...Default.args,
     isLoading: true,
   },
+  play: async () => {
+    await waitFor(() => expect(dialog()).toBeVisible());
+    const modal = within(dialog());
+    // The editor and Cancel are locked while the upload runs.
+    await expect(modal.getByRole("button", { name: "Cancel" })).toBeDisabled();
+    await expect(await waitFor(() => modal.getByRole("slider"))).toBeDisabled();
+    await expect(modal.getByTestId("image-cropper")).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -247,6 +301,13 @@ export const SquareCrop: Story = {
     ...Default.args,
     title: "Change cover",
     editorBorderRadius: 0,
+  },
+  play: async () => {
+    await waitFor(() => expect(dialog()).toBeVisible());
+    await expect(within(dialog()).getByText("Change cover")).toBeVisible();
+    await expect(
+      within(dialog()).getByTestId("image-cropper").querySelector("canvas"),
+    ).not.toBeNull();
   },
   parameters: {
     docs: {

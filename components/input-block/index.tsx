@@ -9,7 +9,6 @@ import styles from "./InputBlock.module.scss";
 
 const InputBlock = React.memo(
   ({
-    // Input props
     id,
     name,
     type,
@@ -21,7 +20,6 @@ const InputBlock = React.memo(
     mask,
     keepCharPositions = false,
 
-    // State props
     hasError = false,
     hasWarning = false,
     isDisabled = false,
@@ -29,7 +27,6 @@ const InputBlock = React.memo(
     isAutoFocussed,
     scale = false,
 
-    // Icon props
     iconName = "",
     iconNode,
     iconSize,
@@ -39,7 +36,6 @@ const InputBlock = React.memo(
     isIconFill = false,
     noIcon = false,
 
-    // Event handlers
     onChange,
     onIconClick,
     onBlur,
@@ -47,16 +43,15 @@ const InputBlock = React.memo(
     onKeyDown,
     onClick,
 
-    // Style props
     size,
     className,
     style,
 
-    // Other props
     children,
     forwardedRef,
     testId,
     dataTestId,
+    ...rest
   }: InputBlockProps) => {
     const [isFocus, setIsFocus] = useState(isAutoFocussed);
 
@@ -87,6 +82,7 @@ const InputBlock = React.memo(
     );
 
     const inputProps = {
+      ...rest,
       id,
       type,
       name,

@@ -1,5 +1,6 @@
 import React from "react";
 import { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, waitFor } from "storybook/test";
 
 import CatalogFolderReactSvgUrl from "../../../assets/icons/16/catalog.folder.react.svg?url";
 import CatalogTrashReactSvgUrl from "../../../assets/icons/16/catalog.trash.react.svg?url";
@@ -39,6 +40,9 @@ const meta = {
     text: "Documents",
     showText: true,
     linkData: defaultLinkData,
+    id: "documents",
+    onClick: fn(),
+    onClickBadge: fn(),
   },
   argTypes: {
     showText: { control: "boolean" },
@@ -57,16 +61,50 @@ const meta = {
 
 type Story = StoryObj<typeof ArticleItemPure>;
 
+// The empty layer over the row that takes the click and the drag states.
+const sibling = (canvas: { getByTestId: (id: string) => HTMLElement }) =>
+  canvas.getByTestId("article-item-sibling");
+
 export default meta;
 
 export const Default: Story = {
   args: {},
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(
+      canvas.getByText("Documents", { selector: ".articleItemText" }),
+    ).toBeVisible();
+    // The click lands on the overlay drawn over the row and reaches the row;
+    // onClick gets the row's id.
+    await userEvent.click(canvas.getByTestId("article-item-sibling"));
+    await expect(args.onClick).toHaveBeenCalledWith(
+      expect.anything(),
+      "documents",
+    );
+
+    // The row is a button in the tab order, and Enter activates it.
+    const item = canvas.getByRole("button", { name: "Documents" });
+    item.blur();
+    await userEvent.tab();
+    await expect(item).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+  },
 };
 
 export const IconOnly: Story = {
   args: {
     showText: false,
     showBadge: false,
+  },
+  play: async ({ canvas }) => {
+    // Icon only: no label is drawn, but the row is still named by it.
+    const hiddenLabel = canvas.getByText("Documents");
+    await expect(hiddenLabel.getBoundingClientRect().width).toBeLessThanOrEqual(
+      1,
+    );
+    await expect(
+      canvas.getByRole("button", { name: "Documents" }),
+    ).toBeVisible();
   },
   decorators: [
     (Story) => (
@@ -82,12 +120,41 @@ export const WithBadge: Story = {
     showBadge: true,
     labelBadge: "42",
   },
+  play: async ({ args, canvas, userEvent }) => {
+    // A badge click reports the badge, not the row.
+    await userEvent.click(canvas.getByText("42"));
+    await expect(args.onClickBadge).toHaveBeenCalledWith("documents");
+    await expect(args.onClick).not.toHaveBeenCalled();
+
+    // The badge is a button of its own, named by its count here, and the
+    // keyboard reaches it after the row.
+    const badge = canvas.getByRole("button", { name: "42" });
+    badge.blur();
+    await userEvent.tab();
+    await userEvent.tab();
+    await expect(badge).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await expect(args.onClickBadge).toHaveBeenCalledTimes(2);
+    await expect(args.onClick).not.toHaveBeenCalled();
+  },
 };
 
 export const WithCustomBadge: Story = {
   args: {
     showBadge: true,
     iconBadge: CatalogTrashReactSvgUrl,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // The icon stands in for the count, and a click on it stays on the badge.
+    const item = canvas.getByTestId("article-item");
+    const badgeIcon = await waitFor(() => {
+      const svgs = item.querySelectorAll("svg");
+      if (svgs.length < 2) throw new Error("The badge icon has not loaded");
+      return svgs[svgs.length - 1];
+    });
+    await userEvent.click(badgeIcon);
+    await expect(args.onClickBadge).toHaveBeenCalledWith("documents");
+    await expect(args.onClick).not.toHaveBeenCalled();
   },
 };
 
@@ -97,17 +164,34 @@ export const Active: Story = {
     showBadge: true,
     labelBadge: "New",
   },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("article-item").className).toMatch(
+      /active/,
+    );
+    // The item's control, not the row, is the current page.
+    await expect(canvas.getByTestId("article-item-control")).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    await expect(canvas.getByText("New")).toBeVisible();
+  },
 };
 
 export const Dragging: Story = {
   args: {
     isDragging: true,
   },
+  play: async ({ canvas }) => {
+    await expect(sibling(canvas).className).toMatch(/dragging/);
+  },
 };
 
 export const DragTarget: Story = {
   args: {
     isDragActive: true,
+  },
+  play: async ({ canvas }) => {
+    await expect(sibling(canvas).className).toMatch(/dragActive/);
   },
 };
 
@@ -116,6 +200,13 @@ export const Header: Story = {
     text: "RECENT",
     isHeader: true,
     showText: true,
+  },
+  play: async ({ canvas }) => {
+    // A header is a plain caption, not a clickable row.
+    await expect(canvas.getByTestId("article-item-header")).toHaveTextContent(
+      "RECENT",
+    );
+    await expect(canvas.queryByTestId("article-item-sibling")).toBeNull();
   },
 };
 
@@ -141,9 +232,37 @@ export const EndOfBlock: Story = {
       />
     </>
   ),
+  play: async ({ canvas }) => {
+    // isEndOfBlock closes a group with a bottom margin.
+    const [first, second] = canvas.getAllByTestId("article-item");
+    await expect(
+      parseFloat(getComputedStyle(first).marginBottom),
+    ).toBeGreaterThan(parseFloat(getComputedStyle(second).marginBottom));
+  },
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByText("Documents", { selector: ".articleItemText" }),
+    ).toHaveStyle({
+      color: "rgb(34, 34, 34)",
+      fontWeight: "400",
+    });
+    await expect(
+      canvas.getByText("Active Item", { selector: ".articleItemText" }),
+    ).toHaveStyle({
+      color: "rgb(255, 255, 255)",
+    });
+    const active = canvas
+      .getByText("Active Item", { selector: ".articleItemText" })
+      .closest("[data-testid='article-item']")
+      ?.querySelector("[data-testid='article-item-sibling']") as HTMLElement;
+    await expect(active).toHaveStyle({
+      backgroundColor: "rgb(0, 103, 158)",
+      borderRadius: "8px",
+    });
+  },
   render: () => (
     <div
       style={

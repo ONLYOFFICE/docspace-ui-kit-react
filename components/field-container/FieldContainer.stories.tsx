@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, screen, waitFor } from "storybook/test";
 
 import { InputSize, InputType, TextInput } from "../text-input";
+import { RootTooltip } from "../tooltip";
 
 import { FieldContainer } from "./FieldContainer";
 import type { FieldContainerProps } from "./FieldContainer.types";
@@ -154,24 +156,44 @@ const Template = ({ hasError, ...rest }: FieldContainerProps) => {
   const [value, setValue] = useState("");
 
   return (
-    <FieldContainer hasError={hasError} {...rest}>
-      <TextInput
-        id={rest.labelFor}
-        value={value}
-        hasError={hasError}
-        className="field-input"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          setValue(e.target.value);
-        }}
-        type={InputType.text}
-        size={InputSize.base}
-      />
-    </FieldContainer>
+    <>
+      <FieldContainer hasError={hasError} {...rest}>
+        <TextInput
+          id={rest.labelFor}
+          value={value}
+          hasError={hasError}
+          className="field-input"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setValue(e.target.value);
+          }}
+          type={InputType.text}
+          size={InputSize.base}
+        />
+      </FieldContainer>
+      {/* A string tooltipContent opens in the shared tooltip, which renders
+          only where RootTooltip is mounted. */}
+      <RootTooltip />
+    </>
   );
 };
 
 export const Default: Story = {
   render: Template,
+  play: async ({ canvas, userEvent }) => {
+    // labelFor ties the caption to the input: it names it and focuses it.
+    const input = canvas.getByLabelText("Name:");
+    await userEvent.click(canvas.getByText("Name:"));
+    await expect(input).toHaveFocus();
+
+    // The help icon opens its tooltip on click.
+    const help = canvas
+      .getByTestId("help-button")
+      .querySelector("[data-tooltip-id]");
+    await userEvent.click(help as HTMLElement);
+    await waitFor(() =>
+      expect(screen.getByText("Enter your full name")).toBeVisible(),
+    );
+  },
   args: {
     labelText: "Name:",
     labelVisible: true,
@@ -207,6 +229,16 @@ export const Default: Story = {
 
 export const Required: Story = {
   render: Template,
+  play: async ({ canvas }) => {
+    // The asterisk after the caption, hidden from screen readers; the input
+    // itself is what is announced as required.
+    await expect(canvas.getByTestId("required-mark")).toHaveTextContent("*");
+    const input = canvas.getByLabelText(/Email:/);
+    await expect(input).toHaveAttribute("aria-required", "true");
+    await expect(canvas.getByTestId("label")).not.toHaveAttribute(
+      "aria-required",
+    );
+  },
   args: {
     ...Default.args,
     isRequired: true,
@@ -218,7 +250,7 @@ export const Required: Story = {
     docs: {
       description: {
         story:
-          "Marks a field the form cannot be sent without: an asterisk follows the caption, and the label is announced as required (`isRequired`).",
+          "Marks a field the form cannot be sent without: an asterisk follows the caption, and the input gets `aria-required`, so it is announced as required (`isRequired`).",
       },
       source: {
         code: `<FieldContainer
@@ -236,6 +268,13 @@ export const Required: Story = {
 
 export const WithError: Story = {
   render: Template,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("This field is required")).toBeVisible();
+    // The input is the invalid one, and the message describes it.
+    const input = canvas.getByLabelText(/Username:/);
+    await expect(input).toHaveAttribute("aria-invalid", "true");
+    await expect(input).toHaveAccessibleDescription("This field is required");
+  },
   args: {
     ...Default.args,
     hasError: true,
@@ -269,6 +308,12 @@ export const WithError: Story = {
 
 export const VerticalLayout: Story = {
   render: Template,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("field-container")).toHaveAttribute(
+      "data-vertical",
+      "true",
+    );
+  },
   args: {
     ...Default.args,
     isVertical: true,
@@ -300,6 +345,11 @@ export const VerticalLayout: Story = {
 
 export const WithInlineHelp: Story = {
   render: Template,
+  play: async ({ canvas }) => {
+    // inlineHelpButton puts the help icon inside the label itself.
+    const help = canvas.getByTestId("help-button");
+    await expect(help.closest("label")).not.toBeNull();
+  },
   args: {
     ...Default.args,
     inlineHelpButton: true,
@@ -342,6 +392,18 @@ export const CustomStyling: Story = {
     },
     labelText: "Custom Field:",
     labelFor: "field-custom",
+  },
+  play: async ({ canvasElement, canvas }) => {
+    // The class and the inline style reach the container.
+    const container = canvasElement.querySelector(
+      ".custom-field",
+    ) as HTMLElement;
+    await expect(container).toHaveStyle({
+      backgroundColor: "rgb(245, 245, 245)",
+      padding: "16px",
+      borderRadius: "4px",
+    });
+    await expect(container).toContainElement(canvas.getByText("Custom Field:"));
   },
   parameters: {
     docs: {
@@ -420,6 +482,19 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    const error = canvas.getByText("Name must be at least 3 characters");
+    // --field-container-error-top is the message's top padding.
+    await expect(error).toHaveStyle({
+      color: "rgb(124, 58, 237)",
+      paddingTop: "8px",
+    });
+    const container = (label: string) =>
+      canvas
+        .getByText(label)
+        .closest("[data-testid='field-container']") as HTMLElement;
+    await expect(container("Full Name:")).toHaveStyle({ marginBottom: "32px" });
+  },
   parameters: {
     docs: {
       description: {

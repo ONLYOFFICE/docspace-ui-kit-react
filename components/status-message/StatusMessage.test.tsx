@@ -1,5 +1,6 @@
+import { Activity } from "react";
 import { describe, it, expect, vi } from "vitest";
-import { screen, render, waitFor } from "@testing-library/react";
+import { screen, render, waitFor, act } from "@testing-library/react";
 
 import StatusMessage from ".";
 import styles from "./StatusMessage.module.scss";
@@ -86,6 +87,18 @@ describe("<StatusMessage />", () => {
           expect(messageElement?.classList.contains(styles.hide)).toBeTruthy();
         }
       });
+    });
+
+    // A JSX message is a new element on every parent render; the bar is a
+    // live region, so fading it out and in again would re-announce it.
+    it("keeps a JSX message with the same text without fading", () => {
+      const { rerender } = renderComponent({
+        message: <span>Invalid name</span>,
+      });
+
+      rerender(<StatusMessage message={<span>Invalid name</span>} />);
+
+      expect(screen.getByTestId("status-message")).not.toHaveClass(styles.hide);
     });
 
     it("removes component when message is cleared", async () => {
@@ -252,6 +265,92 @@ describe("<StatusMessage />", () => {
         "transitionend",
         expect.any(Function),
       );
+    });
+  });
+
+  describe("Without transition events", () => {
+    it("swaps the text on its own when transitionend never comes", async () => {
+      const { rerender } = renderComponent({ message: "First" });
+
+      rerender(<StatusMessage message="Second" />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Second")).toBeInTheDocument();
+      });
+      const bar = screen.getByText("Second").parentElement;
+      expect(bar?.classList.contains(styles.hide)).toBeFalsy();
+    });
+
+    it("removes the bar when a new text is cleared before any transition", async () => {
+      const { rerender, container } = renderComponent({ message: "First" });
+
+      // A new text and an empty one in neighbouring updates: no fade ever
+      // starts, so no transitionend fires.
+      rerender(<StatusMessage message="Second" />);
+      rerender(<StatusMessage message="" />);
+
+      await waitFor(() => {
+        expect(container.firstChild).toBeNull();
+      });
+    });
+  });
+
+  describe("Replayed effects", () => {
+    // Hiding an Activity runs every effect cleanup and showing it again
+    // replays the effects, as StrictMode does on mount.
+    it("re-arms the fallback timer when a fade survives a replay", () => {
+      vi.useFakeTimers();
+      try {
+        const at = (mode: "visible" | "hidden", message: string) => (
+          <Activity mode={mode}>
+            <StatusMessage message={message} />
+          </Activity>
+        );
+
+        const { rerender } = render(at("visible", "First"));
+        rerender(at("visible", "Second"));
+        rerender(at("hidden", "Second"));
+        rerender(at("visible", "Second"));
+
+        act(() => {
+          vi.advanceTimersByTime(500);
+        });
+
+        expect(screen.getByText("Second")).toBeInTheDocument();
+        const bar = screen.getByText("Second").parentElement;
+        expect(bar?.classList.contains(styles.hide)).toBeFalsy();
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+  });
+
+  describe("Accessibility and isWarning", () => {
+    it("is an alert for an error and a status for a warning", () => {
+      const { rerender } = renderComponent({ message: "Failed" });
+      expect(screen.getByRole("alert")).toHaveTextContent("Failed");
+
+      rerender(<StatusMessage message="Failed" isWarning />);
+      expect(screen.getByRole("status")).toHaveTextContent("Failed");
+    });
+
+    it("repaints when only isWarning changes", () => {
+      const { rerender } = renderComponent({ message: "Same text" });
+      const bar = screen.getByText("Same text").parentElement;
+      expect(bar?.classList.contains(styles.warning)).toBeFalsy();
+
+      rerender(<StatusMessage message="Same text" isWarning />);
+      expect(bar?.classList.contains(styles.warning)).toBeTruthy();
+      expect(bar?.classList.contains(styles.hide)).toBeFalsy();
+    });
+
+    it("calls off the fade when the text returns to the one on screen", () => {
+      const { rerender } = renderComponent({ message: "A" });
+      rerender(<StatusMessage message="B" />);
+      rerender(<StatusMessage message="A" />);
+
+      const bar = screen.getByText("A").parentElement;
+      expect(bar?.classList.contains(styles.hide)).toBeFalsy();
     });
   });
 });

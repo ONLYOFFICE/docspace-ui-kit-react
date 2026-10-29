@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useId, useRef } from "react";
 import classNames from "classnames";
 
 import { Label } from "../label";
@@ -9,6 +9,29 @@ import { FieldContainerProps } from "./FieldContainer.types";
 import styles from "./FieldContainer.module.scss";
 
 const displayInlineBlock = { display: "inline-block" };
+
+// The form control the container describes: the element `labelFor` names when
+// it sits in the field body, otherwise the body's first input, textarea or
+// select. A radio button stands for its group: the state belongs on the
+// `radiogroup` around it, never on the first option alone.
+const findControl = (body: HTMLElement, labelFor?: string) => {
+  const named = labelFor ? body.ownerDocument.getElementById(labelFor) : null;
+  const control =
+    named && body.contains(named)
+      ? named
+      : body.querySelector<HTMLElement>(
+          'input:not([type="hidden"]), textarea, select',
+        );
+
+  if (control instanceof HTMLInputElement && control.type === "radio") {
+    const group = control.closest<HTMLElement>('[role="radiogroup"]');
+    return group && body.contains(group) ? group : null;
+  }
+  return control;
+};
+
+const splitIds = (value: string | null) =>
+  (value ?? "").split(/\s+/).filter(Boolean);
 
 const FieldContainer = ({
   isVertical,
@@ -33,6 +56,95 @@ const FieldContainer = ({
   errorColor,
   dataTestId,
 }: FieldContainerProps) => {
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const errorId = useId();
+  const showError = !!(hasError && errorMessage);
+
+  // `isRequired` and `hasError` describe the field, so they are stated on the
+  // control, where ARIA allows them and a screen reader reads them -- not on
+  // the <label>. An attribute the control already carries is left alone, and
+  // whatever is added here is taken off again when the prop turns off -- only
+  // while it still holds the value written here, so an attribute the control
+  // has since set itself is not removed. The body is watched, so a control
+  // that mounts later, or is swapped for another, is described too, and so is
+  // the control's own aria-describedby: a control that re-renders it drops the
+  // error id, which is then appended again.
+  useEffect(() => {
+    const body = bodyRef.current;
+    if (!body) return;
+
+    let control: HTMLElement | null = null;
+    let undo: (() => void)[] = [];
+    let describedByUndone = false;
+
+    const revert = () => {
+      for (const step of undo) step();
+      undo = [];
+      describedByUndone = false;
+    };
+
+    // Idempotent: it writes only when the id is missing, so the mutation its
+    // own write causes finds the id in place and writes nothing again.
+    const describe = (target: HTMLElement) => {
+      const ids = splitIds(target.getAttribute("aria-describedby"));
+      if (ids.includes(errorId)) return;
+      target.setAttribute("aria-describedby", [...ids, errorId].join(" "));
+      if (describedByUndone) return;
+      describedByUndone = true;
+      undo.push(() => {
+        const rest = splitIds(target.getAttribute("aria-describedby")).filter(
+          (value) => value !== errorId,
+        );
+        if (rest.length) {
+          target.setAttribute("aria-describedby", rest.join(" "));
+        } else {
+          target.removeAttribute("aria-describedby");
+        }
+      });
+    };
+
+    const apply = (target: HTMLElement) => {
+      const setIfAbsent = (name: string, value: string) => {
+        if (target.hasAttribute(name)) return;
+        target.setAttribute(name, value);
+        undo.push(() => {
+          if (target.getAttribute(name) === value) target.removeAttribute(name);
+        });
+      };
+
+      if (isRequired) setIfAbsent("aria-required", "true");
+      if (hasError) setIfAbsent("aria-invalid", "true");
+      if (showError) describe(target);
+    };
+
+    const sync = () => {
+      const next = findControl(body, labelFor);
+      if (next === control) {
+        if (control && showError) describe(control);
+        return;
+      }
+      revert();
+      control = next;
+      if (control) apply(control);
+    };
+
+    sync();
+    if (!isRequired && !hasError && !showError) return revert;
+
+    const observer = new MutationObserver(sync);
+    observer.observe(body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["aria-describedby"],
+    });
+
+    return () => {
+      observer.disconnect();
+      revert();
+    };
+  }, [isRequired, hasError, showError, labelFor, errorId]);
+
   const containerStyle = {
     ...style,
     "--label-width": maxLabelWidth,
@@ -109,10 +221,11 @@ const FieldContainer = ({
         )
       ) : null}
 
-      <div className={`${styles.fieldBody} field-body`}>
+      <div className={`${styles.fieldBody} field-body`} ref={bodyRef}>
         {children}
-        {hasError && errorMessage ? (
+        {showError ? (
           <Text
+            id={errorId}
             className={styles.errorContainer}
             style={errorContainerStyle}
             fontSize="12px"

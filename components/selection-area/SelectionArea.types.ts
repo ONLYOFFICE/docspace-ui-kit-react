@@ -5,7 +5,7 @@ export type TOnMove = {
   added: Element[];
   /** Every element it currently does not cover. */
   removed: Element[];
-  /** Never set. The one call that would pass it is behind a condition that is always false. */
+  /** Set on the one call made when a drag passes the 10px threshold, with empty `added` and `removed`: drop whatever an earlier drag selected. */
   clear?: boolean;
 };
 
@@ -27,9 +27,9 @@ export type SelectionAreaProps = {
   containerClass: string;
   /** Class every selectable element carries. Each one must also have a `value` attribute shaped `type_…_index`, which is how the component works out where it sits. Required. */
   selectableClass: string;
-  /** Called on every animation frame of a drag with the full covered and uncovered sets. */
+  /** Called once with `clear: true` when a drag passes the 10px threshold, then on every animation frame of the drag with the full covered and uncovered sets. */
   onMove?: ({ added, removed, clear }: TOnMove) => void;
-  /** Class of the scrolling element. The component listens to its `scroll` and shifts the rectangle to match; without a match it falls back to the document. Required. */
+  /** Class of the scrolling element. The component listens to its `scroll` and shifts the rectangle to match; without a match it uses the page's own scroller. Required. */
   scrollClass: string;
   /** `"tile"` switches to the grid arithmetic — columns, row gaps and missing tiles; anything else is treated as a single column. Required. */
   viewAs: TViewAs;
@@ -49,4 +49,6 @@ export type SelectionAreaProps = {
   defaultHeaderHeight?: number;
   /** Called on every mouse-down on the document, before the button and the target are checked — so it fires for the right button and for clicks that start no selection. */
   onMouseDown?: (event: MouseEvent) => void;
+  /** CSS selector of the region a drag may start in: a mouse-down outside every element matching it is ignored. The default is the portal's section scroller. */
+  startAreaSelector?: string;
 };

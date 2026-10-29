@@ -2,6 +2,7 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useEffect, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 
 import { RadioButton } from ".";
 
@@ -162,7 +163,22 @@ const Template = ({ isChecked, ...args }: RadioButtonProps) => {
 
 export const Default: Story = {
   render: (args) => <Template {...args} />,
+  play: async ({ args, canvas, userEvent }) => {
+    const radio = canvas.getByRole("radio", { name: "Default radio button" });
+
+    // The visually hidden input is the tab stop; Space selects it.
+    await userEvent.tab();
+    await expect(radio).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await expect(radio).toBeChecked();
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+
+    // A radio cannot be cleared by clicking it again.
+    await userEvent.click(canvas.getByText("Default radio button"));
+    await expect(radio).toBeChecked();
+  },
   args: {
+    onChange: fn(),
     value: "value",
     name: "name",
     label: "Default radio button",
@@ -211,6 +227,12 @@ const StatesTemplate = () => {
 
 export const CheckedStates: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("radio", { name: "Checked" })).toBeChecked();
+    await expect(
+      canvas.getByRole("radio", { name: "Unchecked" }),
+    ).not.toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -247,6 +269,14 @@ const DisabledTemplate = () => {
 
 export const DisabledStates: Story = {
   render: () => <DisabledTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    for (const radio of canvas.getAllByRole("radio")) {
+      await expect(radio).toBeDisabled();
+    }
+    // A disabled input is no tab stop.
+    await userEvent.tab();
+    await expect(document.activeElement).toBe(document.body);
+  },
   parameters: {
     docs: {
       description: {
@@ -284,6 +314,13 @@ const CustomStylingTemplate = () => {
 
 export const CustomStyling: Story = {
   render: () => <CustomStylingTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // No onChange here: the button keeps its own state and still selects.
+    await userEvent.click(canvas.getByText("Custom styled"));
+    await expect(
+      canvas.getByRole("radio", { name: "Custom styled" }),
+    ).toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -338,6 +375,21 @@ const WithSpacingTemplate = () => {
 
 export const WithSpacing: Story = {
   render: () => <WithSpacingTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const small = canvas.getByRole("radio", { name: "Vertical: small" });
+    const medium = canvas.getByRole("radio", { name: "Vertical: medium" });
+    const large = canvas.getByRole("radio", { name: "Vertical: large" });
+    await expect(small).toBeChecked();
+
+    await userEvent.click(canvas.getByText("Vertical: medium"));
+    await expect(medium).toBeChecked();
+    await expect(small).not.toBeChecked();
+
+    // Buttons sharing a name form one set: an arrow key moves the choice.
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(large).toBeChecked();
+    await expect(medium).not.toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -381,15 +433,31 @@ The container still lays the buttons out; \`orientation\` only decides which sid
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const radio = canvas.getByRole("radio", { name: "Custom option" });
+    await expect(radio).toBeChecked();
+    const label = canvas.getByText("Custom option");
+    await expect(label).toHaveStyle({ color: "rgb(76, 29, 149)" });
+    // --radio-button-gap: the room between the circle and the label.
+    const circle = (label.closest("label") as HTMLElement).querySelector(
+      "svg",
+    ) as SVGElement;
+    await expect(
+      Math.round(
+        label.getBoundingClientRect().left -
+          circle.getBoundingClientRect().right,
+      ),
+    ).toBe(16);
+  },
   render: () => (
     <div
       style={
         {
           "--radio-button-dot-color": "#7c3aed",
           "--radio-button-circle-color": "#7c3aed",
-          "--radio-button-circle-hover-color": "#3b0764",
-          "--radio-button-background": "#f3e8ff",
-          "--radio-button-label-color": "#4c1d95",
+          "--radio-button-circle-hover-color": "light-dark(#3b0764, #d8b4fe)",
+          "--radio-button-background": "light-dark(#f3e8ff, #2d1f45)",
+          "--radio-button-label-color": "light-dark(#4c1d95, #c4b5fd)",
           "--radio-button-gap": "16px",
         } as CSSProperties
       }
@@ -407,9 +475,9 @@ export const CssCustomization: Story = {
   style={{
     "--radio-button-dot-color": "#7c3aed",
     "--radio-button-circle-color": "#7c3aed",
-    "--radio-button-circle-hover-color": "#3b0764",
-    "--radio-button-background": "#f3e8ff",
-    "--radio-button-label-color": "#4c1d95",
+    "--radio-button-circle-hover-color": "light-dark(#3b0764, #d8b4fe)",
+    "--radio-button-background": "light-dark(#f3e8ff, #2d1f45)",
+    "--radio-button-label-color": "light-dark(#4c1d95, #c4b5fd)",
     "--radio-button-gap": "16px",
   }}
 >

@@ -10,6 +10,21 @@ body {
   margin: 0;
 }
 
+.docs-story iframe {
+  display: block;
+}
+
+// A story on a docs page sits inside the docs text, not on a portal's <body>,
+// so whatever it does not size itself -- RowContent's details line, which
+// deliberately inherits -- would come out in the docs page's larger type.
+// Give it the 13px regular that ThemeProvider sets on <body> in the portal
+// and on the canvas. `.sb-story` wraps every story a docs page shows, in a
+// Canvas block or a bare <Story of>, which the MDX sections use.
+.sb-story {
+  font-size: 13px;
+  line-height: normal;
+}
+
 // Storybook standing in for the portal's theme layer.
 //
 // This package consumes ~1 000 custom properties that DocSpace-client defines in
@@ -24,11 +39,13 @@ body {
 // portal shows. Only tokens whose absence changes the shape of a story belong
 // here; the point of not shipping the rest is that a missing one stays visible.
 .light {
+  color-scheme: light;
   --info-panel-background: #{colors.$white};
   --info-panel-border-color: #{colors.$gray-light-mid};
 }
 
 .dark {
+  color-scheme: dark;
   --info-panel-background: #{colors.$black};
   --info-panel-border-color: #{colors.$gray-dark-strong};
 }
