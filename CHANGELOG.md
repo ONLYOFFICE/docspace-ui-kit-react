@@ -213,7 +213,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   page behind an open dialog, so the keyboard kept acting there. The dialog's surface
   (`#modal-dialog`, now `tabindex="-1"`) takes the focus unless a field inside it is autofocused,
   and on close the focus returns to the element that had it, also when `hideContent` recreated
-  the content while the dialog was open
+  the content while the dialog was open. A dialog whose field takes the focus as it mounts
+  (`autoFocus`, or a focus in the content's own effect) hands it back too: the opener is read
+  before the commit that shows the dialog touches the DOM, where that field used to pass for it
 - **`TwoStateToggle`'s default strings name the product through `getBrandName("ProductName")`.**
   `title`, `confirmBody` and `ariaLabel` said "DocSpace"; they now follow the portal's branding,
   and say "ONLYOFFICE Apps" when no brand lookup is registered. Explicit props are unaffected
