@@ -316,10 +316,14 @@ const NavMenuItemWrapper = ({
         )}
       </div>
       {hasChildren && !iconOnly && (
+        // A collapsed section is only squeezed to zero height so it can
+        // animate open; `inert` keeps its links out of the Tab order and the
+        // accessibility tree until it is expanded.
         <div
           className={classNames(styles.subItems, {
             [styles.expanded]: isExpanded,
           })}
+          inert={!isExpanded}
         >
           <ul className={styles.subItemsInner}>
             {(item.children ?? []).map((subItem) => (
