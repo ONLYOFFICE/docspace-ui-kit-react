@@ -1,6 +1,9 @@
+import type React from "react";
 import FilterReactSvg from "../../../assets/filter.react.svg";
 import classNames from "classnames";
 import styles from "../Filter.module.scss";
+
+import { activateOnButtonKey } from "../../../utils/keyboard-activation";
 
 import { IconButton } from "../../icon-button";
 import { TooltipContainer } from "../../tooltip";
@@ -28,6 +31,13 @@ const FilterIcon = ({
       id={id}
       onClick={onClick}
       title={title}
+      role="button"
+      tabIndex={0}
+      aria-label={title}
+      aria-expanded={!!isOpen}
+      onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) =>
+        activateOnButtonKey(e, onClick)
+      }
       className={classNames({
         [styles.button]: true,
         [styles.isOpen]: isOpen,

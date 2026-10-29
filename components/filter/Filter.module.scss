@@ -92,6 +92,12 @@
 
   border: var(--filter-btn-border-v);
 
+  &:focus-visible {
+    outline: 2px solid
+      var(--accent-main, var(--color-scheme-main-accent, #{$light-blue-main}));
+    outline-offset: 1px;
+  }
+
   &:hover {
     border: var(--filter-btn-hover-border-v);
     svg {
@@ -1041,5 +1047,12 @@
 
   &:active {
     background: var(--selector-add-button-active-background);
+  }
+
+  // Inset: the row of group tabs around it clips anything outside.
+  &:focus-visible {
+    outline: 2px solid
+      var(--accent-main, var(--color-scheme-main-accent, #{$light-blue-main}));
+    outline-offset: -2px;
   }
 }

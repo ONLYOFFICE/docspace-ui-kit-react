@@ -193,6 +193,33 @@ describe("Filter Component", () => {
     });
   });
 
+  describe("keyboard", () => {
+    it("keeps the search field in the tab order", async () => {
+      await act(async () => {
+        renderComponent();
+      });
+
+      expect(screen.getByRole("textbox")).not.toHaveAttribute("tabindex");
+    });
+
+    it("opens the filter panel from the keyboard", async () => {
+      const user = userEvent.setup();
+      const getFilterData = vi.fn().mockResolvedValue([]);
+      await act(async () => {
+        renderComponent({ getFilterData });
+      });
+      const button = screen.getByTestId("filter_icon_button");
+
+      expect(button).toHaveAttribute("role", "button");
+      expect(button).toHaveAttribute("aria-expanded", "false");
+
+      button.focus();
+      await user.keyboard("{Enter}");
+
+      expect(button).toHaveAttribute("aria-expanded", "true");
+    });
+  });
+
   describe("Custom items", () => {
     const getFilterData = () =>
       Promise.resolve([
