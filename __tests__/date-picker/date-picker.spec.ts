@@ -5,6 +5,10 @@ import { type Page, expect, test } from "@playwright/test";
 const STORY_BASE = "ui-form-controls-datepicker";
 
 async function gotoStory(page: Page, storyId: string) {
+  // The stories draw today, and css-customization picks its selected day and
+  // minDate from it, so without a frozen clock every shot differs from its
+  // baseline the day after it was recorded.
+  await page.clock.install({ time: new Date("2026-01-15T09:20:00") });
   const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
   await page.goto(url);
   // Storybook answers 200 for an unknown id and shows its error display
