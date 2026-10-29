@@ -1,6 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import { RoomsType } from "../../enums";
 
@@ -99,6 +99,12 @@ type Story = StoryObj<ComponentProps<typeof RoomLogoPure>>;
 
 export default meta;
 
+// The glyph is told apart by its SVG markup.
+const glyphsOf = (canvasElement: HTMLElement) =>
+  Array.from(canvasElement.querySelectorAll(".room-logo_icon")).map(
+    (svg) => svg.innerHTML,
+  );
+
 const Wrapper = (props: { children: React.ReactNode }) => {
   return (
     <div
@@ -140,6 +146,11 @@ export const Default: Story = {
     isIndeterminate: false,
     onChange: fn(),
   },
+  play: async ({ canvasElement }) => {
+    await expect(glyphsOf(canvasElement)).toHaveLength(1);
+    // No checkbox unless asked for.
+    await expect(canvasElement.querySelector(".room-logo_checkbox")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -176,6 +187,12 @@ const AllRoomTypesTemplate = () => {
 
 export const AllRoomTypes: Story = {
   render: () => <AllRoomTypesTemplate />,
+  play: async ({ canvasElement }) => {
+    // A glyph of its own for each of the six types.
+    const glyphs = glyphsOf(canvasElement);
+    await expect(glyphs).toHaveLength(6);
+    await expect(new Set(glyphs).size).toBe(6);
+  },
   parameters: {
     docs: {
       description: {
@@ -199,6 +216,9 @@ export const ArchiveState: Story = {
   args: {
     type: RoomsType.CustomRoom,
     isArchive: true,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(glyphsOf(canvasElement)).toHaveLength(1);
   },
   parameters: {
     docs: {
@@ -236,6 +256,12 @@ const TemplateRoomTypesTemplate = () => {
 
 export const TemplateRoomTypes: Story = {
   render: () => <TemplateRoomTypesTemplate />,
+  play: async ({ canvasElement }) => {
+    // Five template variants plus the AI glyph, which has none.
+    const glyphs = glyphsOf(canvasElement);
+    await expect(glyphs).toHaveLength(6);
+    await expect(new Set(glyphs).size).toBe(6);
+  },
   parameters: {
     docs: {
       description: {
@@ -259,6 +285,9 @@ export const TemplateState: Story = {
   args: {
     type: RoomsType.CustomRoom,
     isTemplate: true,
+  },
+  play: async ({ canvasElement }) => {
+    await expect(glyphsOf(canvasElement)).toHaveLength(1);
   },
   parameters: {
     docs: {
@@ -293,6 +322,14 @@ export const WithCheckbox: Story = {
     isIndeterminate: false,
     onChange: fn(),
   },
+  play: async ({ args, canvasElement, userEvent }) => {
+    const checkbox = canvasElement.querySelector(
+      ".room-logo_checkbox",
+    ) as HTMLElement;
+    await expect(checkbox).toBeVisible();
+    await userEvent.click(checkbox);
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -323,6 +360,12 @@ export const CheckboxChecked: Story = {
     withCheckbox: true,
     isChecked: true,
     onChange: fn(),
+  },
+  play: async ({ canvasElement }) => {
+    const input = canvasElement.querySelector(
+      ".room-logo_checkbox input[type='checkbox']",
+    ) as HTMLInputElement;
+    await expect(input.checked).toBe(true);
   },
   parameters: {
     docs: {
@@ -356,6 +399,14 @@ export const CssCustomization = {
       <RoomLogoPure type={RoomsType.FormRoom} />
     </div>
   ),
+  play: async ({
+    canvasElement,
+  }: Parameters<NonNullable<Story["play"]>>[0]) => {
+    const box = canvasElement.querySelector(
+      ".room-logo_icon-container",
+    ) as HTMLElement;
+    await expect(Math.round(box.getBoundingClientRect().width)).toBe(40);
+  },
   parameters: {
     docs: {
       description: {

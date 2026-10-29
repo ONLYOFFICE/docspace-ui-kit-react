@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import type { StoryObj, Meta } from "@storybook/react-vite";
+import { expect, fireEvent, screen, waitFor } from "storybook/test";
 import { FolderType } from "@onlyoffice/docspace-api-sdk";
 
 import { Uploader } from "./index";
@@ -147,7 +148,7 @@ const meta: Meta<StoryArgs> = {
     accept: {
       control: "text",
       description:
-        "Accepted file types as a comma-separated string (e.g., '.pdf,.doc,.docx')",
+        "Accepted file types as a comma-separated string (e.g., '.pdf,.doc,.docx'). '*', '*/*' or empty accept any file",
     },
     shortText: {
       control: "text",
@@ -220,6 +221,75 @@ const meta: Meta<StoryArgs> = {
 
 type Story = StoryObj<StoryArgs>;
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+const REQUIRED = "Required — please select a target folder";
+
+const row = (label: string) => {
+  const found = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-testid^="selector-item-"]'),
+  ).find((item) => item.textContent?.includes(label));
+  if (!found) throw new Error(`No row labelled ${label}`);
+  return found;
+};
+
+const toast = (text: string | RegExp) =>
+  waitFor(() => expect(screen.getByText(text)).toBeVisible(), {
+    timeout: 5000,
+  });
+
+// The target comes from the Files selector behind the field; the demo
+// portal answers it and takes the upload.
+const choosesFolder = async (userEvent: PlayContext["userEvent"]) => {
+  await expect(screen.getByText(REQUIRED)).toBeVisible();
+  await userEvent.click(screen.getByPlaceholderText("Choose folder"));
+  await userEvent.click(
+    await waitFor(() => row("Contracts 2026"), { timeout: 3000 }),
+  );
+  await waitFor(() => expect(row("Signed")).toBeVisible());
+  await userEvent.click(screen.getByTestId("selector_submit_button"));
+  await waitFor(() => expect(screen.queryByText(REQUIRED)).toBeNull());
+  await expect(
+    screen.getByPlaceholderText(/Contracts 2026$/),
+  ).toBeInTheDocument();
+};
+
+const file = (name: string, type: string, size?: number) => {
+  const made = new File(["demo"], name, { type });
+  // A real 11 MB buffer is not needed to trip a size limit.
+  if (size) Object.defineProperty(made, "size", { value: size });
+  return made;
+};
+
+const MB = 1024 * 1024;
+
+// Set on the input directly: userEvent.upload drops a file the input's
+// accept refuses before the component sees it.
+const drops = (files: File[]) => {
+  const input = document.querySelector<HTMLInputElement>(
+    '[data-testid="sdk-uploader"] input[type="file"]',
+  );
+  if (!input) throw new Error("No file input");
+  const dataTransfer = new DataTransfer();
+  for (const item of files) dataTransfer.items.add(item);
+  Object.defineProperty(input, "files", {
+    value: dataTransfer.files,
+    configurable: true,
+  });
+  fireEvent.change(input);
+};
+
+const input = () =>
+  document.querySelector(
+    '[data-testid="sdk-uploader"] input[type="file"]',
+  ) as HTMLInputElement;
+
+const uploads = async (userEvent: PlayContext["userEvent"]) => {
+  await choosesFolder(userEvent);
+  drops([file("Notes.pdf", "application/pdf")]);
+  await toast("Uploaded elements: 1");
+};
+
 export default meta;
 
 const defaultArgs: Omit<StoryArgs, "getFolderUrl"> = {
@@ -236,6 +306,10 @@ const defaultArgs: Omit<StoryArgs, "getFolderUrl"> = {
 };
 
 export const Default: Story = {
+  play: async ({ userEvent }: PlayContext) => {
+    await expect(screen.getByText("Upload files")).toBeVisible();
+    await uploads(userEvent);
+  },
   args: {
     ...defaultArgs,
     storyId: "default",
@@ -243,6 +317,9 @@ export const Default: Story = {
 };
 
 export const SingleFileUpload: Story = {
+  play: async ({ userEvent }: PlayContext) => {
+    await uploads(userEvent);
+  },
   args: {
     ...defaultArgs,
     storyId: "single-file",
@@ -253,6 +330,10 @@ export const SingleFileUpload: Story = {
 };
 
 export const FolderUpload: Story = {
+  play: async () => {
+    // The picker asks for a directory.
+    await expect(input()).toHaveAttribute("webkitdirectory");
+  },
   args: {
     ...defaultArgs,
     storyId: "folder",
@@ -267,6 +348,9 @@ export const FolderUpload: Story = {
 };
 
 export const SingleFolderUpload: Story = {
+  play: async () => {
+    await expect(input()).toHaveAttribute("webkitdirectory");
+  },
   args: {
     ...defaultArgs,
     storyId: "single-folder",
@@ -281,6 +365,11 @@ export const SingleFolderUpload: Story = {
 };
 
 export const ImageUpload: Story = {
+  play: async () => {
+    // A format outside accept is refused with a toast.
+    drops([file("Notes.pdf", "application/pdf")]);
+    await toast("1 files were rejected due to unsupported format.");
+  },
   args: {
     ...defaultArgs,
     storyId: "image",
@@ -294,6 +383,10 @@ export const ImageUpload: Story = {
 };
 
 export const WithSizeLimit: Story = {
+  play: async () => {
+    drops([file("Big.pdf", "application/pdf", 11 * MB)]);
+    await toast("The file is too large. The maximum size is 10MB.");
+  },
   args: {
     ...defaultArgs,
     storyId: "size-limit",
@@ -303,6 +396,16 @@ export const WithSizeLimit: Story = {
 };
 
 export const WithTotalSizeLimit: Story = {
+  play: async ({ userEvent }: PlayContext) => {
+    await choosesFolder(userEvent);
+    // Eleven files under the per-file limit, over the total one.
+    drops(
+      Array.from({ length: 11 }, (_, index) =>
+        file(`Part ${index}.pdf`, "application/pdf", 9.5 * MB),
+      ),
+    );
+    await toast("The files are too large. The maximum size is 100MB.");
+  },
   args: {
     ...defaultArgs,
     storyId: "total-size-limit",
@@ -313,9 +416,20 @@ export const WithTotalSizeLimit: Story = {
 };
 
 export const AnyFiles: Story = {
+  play: async ({ userEvent }: PlayContext) => {
+    await choosesFolder(userEvent);
+    // An unknown extension with no MIME type: refused before "*" meant any.
+    drops([file("Archive.xyz", "application/octet-stream")]);
+    await toast("Uploaded elements: 1");
+    await expect(
+      screen.queryByText(/rejected due to unsupported format/),
+    ).toBeNull();
+  },
   args: {
     ...defaultArgs,
     storyId: "any-files",
+    // "*" (like "*/*", "" or no accept at all) means any file: the Uploader
+    // hands the drop library an empty accept, its only "anything".
     accept: "*",
     shortText: "Any files",
     fullText: undefined,
@@ -326,6 +440,14 @@ export const AnyFiles: Story = {
 };
 
 export const CustomSettings: Story = {
+  play: async ({ userEvent }: PlayContext) => {
+    await choosesFolder(userEvent);
+    drops([
+      file("One.pdf", "application/pdf"),
+      file("Two.pdf", "application/pdf"),
+    ]);
+    await toast("Uploaded elements: 2");
+  },
   args: {
     ...defaultArgs,
     storyId: "custom-settings",

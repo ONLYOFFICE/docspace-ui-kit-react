@@ -15,10 +15,7 @@ describe("<Tags />", () => {
   it("renders without error", () => {
     render(<Tags {...baseProps} />);
     expect(screen.getByTestId("tags")).toBeInTheDocument();
-    expect(screen.getByTestId("tags")).toHaveAttribute(
-      "aria-label",
-      "Tags container",
-    );
+    expect(screen.getByTestId("tags")).toHaveAttribute("aria-label", "Tags");
   });
 
   it("renders with no tags", () => {
@@ -35,6 +32,21 @@ describe("<Tags />", () => {
     render(<Tags {...baseProps} tags={["tag1", "tag2", "tag3"]} />);
     expect(screen.getByText("tag1")).toBeInTheDocument();
     expect(screen.getByText("tag2")).toBeInTheDocument();
+  });
+
+  // In the portal's file list an Enter that reaches the document opens the
+  // selected item; Enter on a tag must only select the tag.
+  it("keeps Enter on a tag from the document's listeners", () => {
+    const onSelectTag = vi.fn();
+    const onDocumentKeyDown = vi.fn();
+    document.addEventListener("keydown", onDocumentKeyDown);
+
+    render(<Tags {...baseProps} tags={["tag1"]} onSelectTag={onSelectTag} />);
+    fireEvent.keyDown(screen.getByTestId("tag_item_tag1"), { key: "Enter" });
+
+    expect(onSelectTag).toHaveBeenCalledTimes(1);
+    expect(onDocumentKeyDown).not.toHaveBeenCalled();
+    document.removeEventListener("keydown", onDocumentKeyDown);
   });
 
   it("calls onSelectTag when a tag is clicked", () => {
@@ -235,5 +247,183 @@ describe("<Tags />", () => {
     const optionTag = screen.getByText("+1");
     optionTag.click();
     expect(onOptionTagClickMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("tells onOptionTagClick whether the overflow or the create tag was clicked", () => {
+    const onOptionTagClick = vi.fn();
+
+    render(
+      <Tags
+        {...baseProps}
+        tags={["tag1", "tag2", "tag3"]}
+        columnCount={2}
+        showCreateTag
+        createTagLabel="Add tag"
+        onOptionTagClick={onOptionTagClick}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("+1"));
+    expect(onOptionTagClick).toHaveBeenLastCalledWith("overflow");
+
+    fireEvent.click(screen.getByTestId("tag_item_create"));
+    expect(onOptionTagClick).toHaveBeenLastCalledWith("create");
+    expect(onOptionTagClick).toHaveBeenCalledTimes(2);
+  });
+
+  it("names the row through ariaLabel and gives it a group role", () => {
+    render(<Tags {...baseProps} ariaLabel="Room tags" />);
+    const row = screen.getByRole("group", { name: "Room tags" });
+    expect(row).toBe(screen.getByTestId("tags"));
+  });
+
+  it("makes every tag a focusable button", () => {
+    render(<Tags {...baseProps} />);
+    const tag = screen.getByTestId("tag_item_tag1");
+    expect(tag).toHaveAttribute("role", "button");
+    expect(tag).toHaveAttribute("tabindex", "0");
+  });
+
+  it("selects a tag with Enter and with Space", () => {
+    const onSelectTag = vi.fn();
+    render(<Tags {...baseProps} onSelectTag={onSelectTag} />);
+    const tag = screen.getByTestId("tag_item_tag1");
+
+    fireEvent.keyDown(tag, { key: "Enter" });
+    fireEvent.keyDown(tag, { key: " " });
+
+    expect(onSelectTag).toHaveBeenCalledTimes(2);
+    expect(onSelectTag).toHaveBeenCalledWith(
+      expect.objectContaining({ label: "tag1" }),
+    );
+  });
+
+  it("calls a tag's own onClick instead of onSelectTag", () => {
+    const onSelectTag = vi.fn();
+    const own = vi.fn();
+    render(
+      <Tags
+        {...baseProps}
+        tags={[{ label: "Own", onClick: own }, "Plain"]}
+        onSelectTag={onSelectTag}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId("tag_item_Own"));
+    expect(own).toHaveBeenCalledTimes(1);
+    expect(onSelectTag).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByTestId("tag_item_Plain"));
+    expect(onSelectTag).toHaveBeenCalledTimes(1);
+  });
+
+  it("gives the create tag a name and a test id of its own", () => {
+    const onOptionTagClick = vi.fn();
+    render(
+      <Tags
+        {...baseProps}
+        columnCount={3}
+        showCreateTag
+        createTagLabel="Add tag"
+        onOptionTagClick={onOptionTagClick}
+      />,
+    );
+
+    const plus = screen.getByRole("button", { name: "Add tag" });
+    expect(plus).toHaveAttribute("data-testid", "tag_item_create");
+    fireEvent.keyDown(plus, { key: "Enter" });
+    expect(onOptionTagClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the create tag when the tags overflow", () => {
+    Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+      configurable: true,
+      value: 500,
+    });
+    render(
+      <Tags
+        {...baseProps}
+        tags={["tag1", "tag2", "tag3"]}
+        columnCount={1}
+        showCreateTag
+        onOptionTagClick={vi.fn()}
+      />,
+    );
+
+    const row = screen.getByTestId("tags");
+    expect(screen.getByText("+2")).toBeInTheDocument();
+    expect(row.lastElementChild).toHaveAttribute(
+      "data-testid",
+      "tag_item_create",
+    );
+  });
+
+  it("points optionTagRef at the overflow tag, not the create tag", () => {
+    Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+      configurable: true,
+      value: 500,
+    });
+    const optionRef = React.createRef<HTMLDivElement>();
+    render(
+      <Tags
+        {...baseProps}
+        tags={["tag1", "tag2", "tag3"]}
+        columnCount={1}
+        showCreateTag
+        optionTagRef={optionRef}
+        onOptionTagClick={vi.fn()}
+      />,
+    );
+
+    expect(optionRef.current).toHaveTextContent("+2");
+  });
+
+  it("renders two tags with the same label", () => {
+    render(<Tags {...baseProps} tags={["Same", "Same"]} />);
+    expect(screen.getAllByTestId("tag_item_Same")).toHaveLength(2);
+  });
+
+  it("routes an overflow entry to the hidden tag's own onClick", () => {
+    Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+      configurable: true,
+      value: 500,
+    });
+    const onSelectTag = vi.fn();
+    const own = vi.fn();
+    render(
+      <Tags
+        {...baseProps}
+        tags={["tag1", { label: "Hidden", onClick: own }]}
+        columnCount={1}
+        onSelectTag={onSelectTag}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("..."));
+    fireEvent.click(screen.getByText("Hidden"));
+
+    expect(own).toHaveBeenCalledTimes(1);
+    expect(onSelectTag).not.toHaveBeenCalled();
+  });
+
+  it("hands the focus back to the overflow tag on Tab from an entry", () => {
+    Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+      configurable: true,
+      value: 500,
+    });
+    render(<Tags {...baseProps} tags={["tag1", "Hidden"]} columnCount={1} />);
+
+    const overflow = screen.getByText("...").closest<HTMLElement>("[tabindex]");
+    if (!overflow) throw new Error("no overflow tag");
+    fireEvent.click(overflow);
+    const entry = screen.getByText("Hidden").closest<HTMLElement>("[id]");
+    if (!entry) throw new Error("no overflow entry");
+    entry.focus();
+
+    const notPrevented = fireEvent.keyDown(entry, { key: "Tab" });
+
+    expect(notPrevented).toBe(true);
+    expect(overflow).toHaveFocus();
+    expect(overflow).toHaveAttribute("aria-expanded", "false");
   });
 });

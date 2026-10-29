@@ -1,7 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
 
 import { ColumnarInfoBar } from "./ColumnarInfoBar";
 
@@ -50,7 +50,7 @@ const meta = {
       description:
         "Name screen readers announce for the close button; ignored when `onAction` is not set",
       table: {
-        defaultValue: { summary: "Close" },
+        defaultValue: { summary: 'Common:CloseButton ("Close")' },
       },
     },
   },
@@ -71,6 +71,24 @@ export const Default: Story = {
     ],
     variant: "default",
     onLoad: fn(),
+  },
+  play: async ({ args, canvas }) => {
+    await expect(args.onLoad).toHaveBeenCalledTimes(1);
+    await expect(
+      canvas.getByRole("heading", { level: 3, name: "Document details" }),
+    ).toBeVisible();
+    // Each label sits above its value, as a term and its description.
+    const owner = canvas.getByText("Owner");
+    await expect(owner.tagName).toBe("DT");
+    await expect(owner.nextElementSibling).toHaveTextContent("Team member");
+    await expect(owner.nextElementSibling?.tagName).toBe("DD");
+    await expect(canvas.getAllByRole("term")).toHaveLength(4);
+    // A hidden status region beside the content announces its text.
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent("Owner Team member"),
+    );
+    // No onAction, no close button.
+    await expect(canvas.queryByRole("button")).toBeNull();
   },
   parameters: {
     docs: {
@@ -106,6 +124,12 @@ export const ProfileDetails: Story = {
     onAction: fn(),
     onLoad: fn(),
   },
+  play: async ({ args, canvas, userEvent }) => {
+    // The close button is named by closeLabel and only calls the handler.
+    await userEvent.click(canvas.getByRole("button", { name: "Close" }));
+    await expect(args.onAction).toHaveBeenCalledTimes(1);
+    await expect(canvas.getByText("New account details")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -140,6 +164,11 @@ export const EventDetails: Story = {
     ],
     onLoad: fn(),
   },
+  play: async ({ canvas }) => {
+    await expect(canvas.queryByRole("heading")).toBeNull();
+    await expect(canvas.queryByRole("button")).toBeNull();
+    await expect(canvas.getByText("evt_01hx9z3k2m")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -172,6 +201,21 @@ export const NeutralVariant: Story = {
     ],
     onAction: fn(),
     onLoad: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // The card slides open over 0.4s after it mounts.
+    await waitFor(() =>
+      expect(
+        canvas.getByRole("heading", { name: "Before you start" }),
+      ).toBeVisible(),
+    );
+    // Once the reveal ends the 150px cap no longer applies.
+    const card = canvas.getByRole("heading", {
+      name: "Before you start",
+    }).parentElement as HTMLElement;
+    await waitFor(() => expect(getComputedStyle(card).maxHeight).toBe("none"));
+    await userEvent.click(canvas.getByRole("button", { name: "Close" }));
+    await expect(args.onAction).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -208,6 +252,14 @@ export const PageVariant: Story = {
     onAction: fn(),
     onLoad: fn(),
   },
+  play: async ({ args, canvas, userEvent }) => {
+    // The page variant puts the close button beside the heading.
+    const heading = canvas.getByRole("heading", { name: "Connection details" });
+    const close = canvas.getByRole("button", { name: "Close" });
+    await expect(close.parentElement).toBe(heading.parentElement);
+    await userEvent.click(close);
+    await expect(args.onAction).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -240,7 +292,7 @@ export const CssCustomization: Story = {
         { label: "Version", value: "2.6.0" },
         { label: "Region", value: "EU West" },
       ]}
-      onAction={() => {}}
+      onAction={fn()}
       style={
         {
           "--cib-bg": "#1e1b4b",
@@ -251,6 +303,10 @@ export const CssCustomization: Story = {
       }
     />
   ),
+  play: async ({ canvas }) => {
+    const heading = canvas.getByRole("heading", { name: "Custom colours" });
+    await expect(getComputedStyle(heading).color).toBe("rgb(165, 180, 252)");
+  },
   parameters: {
     docs: {
       description: {

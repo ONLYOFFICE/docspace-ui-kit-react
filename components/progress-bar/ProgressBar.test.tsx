@@ -37,6 +37,22 @@ describe("<ProgressBar />", () => {
       expect(progressBar).toHaveAttribute("data-progress", "100");
     });
 
+    it("clamps a negative or non-numeric percent to 0", () => {
+      const { rerender } = render(<ProgressBar percent={-20} />);
+      const bar = screen.getByRole("progressbar");
+      expect(bar).toHaveAttribute("aria-valuenow", "0");
+      expect(screen.getByTestId("progress-bar-percent").style.width).toBe("0%");
+      rerender(<ProgressBar percent={Number.NaN} />);
+      expect(bar).toHaveAttribute("aria-valuenow", "0");
+    });
+
+    it("reports no value while infinite", () => {
+      render(<ProgressBar {...defaultProps} isInfiniteProgress />);
+      const bar = screen.getByRole("progressbar");
+      expect(bar).not.toHaveAttribute("aria-valuenow");
+      expect(bar).toHaveAttribute("aria-busy", "true");
+    });
+
     it("shows infinite progress animation when enabled", () => {
       render(<ProgressBar {...defaultProps} isInfiniteProgress />);
       expect(screen.getByTestId("progress-bar-animation")).toBeInTheDocument();
@@ -64,6 +80,21 @@ describe("<ProgressBar />", () => {
       expect(errorElement.className).toContain("statusError");
       expect(errorElement).toHaveAttribute("title", error);
     });
+  });
+
+  it("keeps the status live region mounted and announces a later status", () => {
+    const { rerender } = render(<ProgressBar {...defaultProps} />);
+    const region = screen.getByRole("status");
+    expect(region).toBeEmptyDOMElement();
+    rerender(<ProgressBar {...defaultProps} status="Done" />);
+    expect(screen.getByRole("status")).toBe(region);
+    expect(region).toHaveTextContent("Done");
+  });
+
+  it("renders the error as an alert in place of the status", () => {
+    render(<ProgressBar {...defaultProps} status="Uploading" error="Failed" />);
+    expect(screen.getByRole("alert")).toHaveTextContent("Failed");
+    expect(screen.queryByText("Uploading")).toBeNull();
   });
 
   it("applies custom className when provided", () => {
@@ -98,5 +129,36 @@ describe("<PreparationPortalProgress />", () => {
     );
 
     expect(screen.getByText("Preparation portal...")).toBeInTheDocument();
+  });
+
+  it("is a progressbar named by its text, with a clamped value", () => {
+    render(<PreparationPortalProgress percent={150} text="Preparing" />);
+    const bar = screen.getByRole("progressbar", { name: "Preparing" });
+    expect(bar).toHaveAttribute("aria-valuenow", "100");
+    expect(bar).toHaveAttribute("aria-valuemin", "0");
+    expect(bar).toHaveAttribute("aria-valuemax", "100");
+    expect(screen.getByText("100 %")).toBeInTheDocument();
+  });
+
+  it("clamps a negative percent to 0", () => {
+    render(<PreparationPortalProgress percent={-5} text="Preparing" />);
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "0",
+    );
+    expect(screen.getByText("0 %")).toBeInTheDocument();
+  });
+
+  it("lets the aria props override the defaults", () => {
+    render(
+      <PreparationPortalProgress
+        percent={10}
+        text="Preparing"
+        aria-label="Setup"
+      />,
+    );
+    expect(
+      screen.getByRole("progressbar", { name: "Setup" }),
+    ).toBeInTheDocument();
   });
 });

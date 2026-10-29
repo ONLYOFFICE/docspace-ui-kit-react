@@ -1,7 +1,8 @@
 import type { ComponentProps, CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 
-import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
+import CatalogFolderIcon from "../../.storybook/utils/ThemedFolderIcon";
 import CatalogFolderIconUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 
 import { MCPIcon, MCPIconSize } from ".";
@@ -57,6 +58,8 @@ type Story = StoryObj<ComponentProps<typeof MCPIcon>>;
 
 export default meta;
 
+const sizeOf = (el: Element) => Math.round(el.getBoundingClientRect().width);
+
 const Wrapper = (props: { children: React.ReactNode }) => {
   return (
     <div
@@ -94,6 +97,12 @@ export const Default: Story = {
     title: "Document search",
     size: MCPIconSize.Large,
   },
+  play: async ({ canvas }) => {
+    // No image: the first letter, uppercased, on a 48px tile.
+    const icon = canvas.getByTestId("mcp-icon");
+    await expect(icon).toHaveTextContent(/^D$/);
+    await expect(sizeOf(icon)).toBe(48);
+  },
   parameters: {
     docs: {
       description: {
@@ -113,6 +122,15 @@ export const WithImage: Story = {
     title: "Document search",
     size: MCPIconSize.Large,
     imgSrc: CatalogFolderIconUrl,
+  },
+  play: async ({ canvas }) => {
+    // The image replaces the letter; the tile is one image named after the
+    // server, the picture inside it carries no name of its own.
+    await expect(
+      canvas.getByRole("img", { name: "Document search" }),
+    ).toBeVisible();
+    await expect(canvas.getAllByRole("img")).toHaveLength(1);
+    await expect(canvas.getByTestId("mcp-icon")).not.toHaveTextContent("D");
   },
   parameters: {
     docs: {
@@ -143,6 +161,10 @@ const AllSizesTemplate = () => {
 
 export const AllSizes: Story = {
   render: () => <AllSizesTemplate />,
+  play: async ({ canvas }) => {
+    const sizes = canvas.getAllByTestId("mcp-icon").map(sizeOf);
+    await expect([...sizes].sort((a, b) => a - b)).toEqual([16, 24, 32, 48]);
+  },
   parameters: {
     docs: {
       description: {
@@ -179,6 +201,21 @@ const AllSizesWithImageTemplate = () => {
 
 export const AllSizesWithImage: Story = {
   render: () => <AllSizesWithImageTemplate />,
+  play: async ({ canvas }) => {
+    // Each tile is one image named after the server; the <img> inside it
+    // is hidden from assistive technology.
+    await expect(
+      canvas.getAllByRole("img", { name: "Document search" }),
+    ).toHaveLength(4);
+    const images = canvas
+      .getAllByTestId("mcp-icon")
+      .map((icon) => icon.querySelector("img") as HTMLElement);
+    await expect(images).toHaveLength(4);
+    // Each image fills its own square.
+    for (const img of images) {
+      await expect(sizeOf(img)).toBe(sizeOf(img.parentElement as Element));
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -203,6 +240,16 @@ export const BrokenImageFallback: Story = {
     // An unparsable data URL fails to load without a network request.
     imgSrc: "data:image/png;base64,invalid",
   },
+  play: async ({ canvas }) => {
+    // The failed image gives way to the letter.
+    await waitFor(() =>
+      expect(canvas.getByTestId("mcp-icon")).toHaveTextContent(/^D$/),
+    );
+    const icon = canvas.getByTestId("mcp-icon");
+    await expect(icon.querySelector("img")).toBeNull();
+    // The letter is hidden; the name is still the server's.
+    await expect(icon).toHaveAccessibleName("Document search");
+  },
   parameters: {
     docs: {
       description: {
@@ -223,11 +270,16 @@ export const WithImageNode: Story = {
     size: MCPIconSize.Large,
     imgNode: <CatalogFolderIcon />,
   },
+  play: async ({ canvas }) => {
+    const icon = canvas.getByTestId("mcp-icon");
+    await expect(icon.querySelector("svg")).not.toBeNull();
+    await expect(icon).not.toHaveTextContent("D");
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "Use for an icon your bundler has already inlined as a component: the element is drawn in place of the letter, and nothing replaces it if it is empty (`imgNode`).",
+          "Use for an icon your bundler has already inlined as a component: the element is drawn in place of the letter (`imgNode`). An `<img>` inside it that fails to load falls back to the letter; an empty node is not replaced.",
       },
       source: {
         code: `import FolderIcon from "./folder.react.svg";
@@ -262,6 +314,14 @@ export const CssCustomization: Story = {
       </Wrapper>
     </div>
   ),
+  play: async ({ canvas }) => {
+    // The tile is painted by a ::before layer under the letter.
+    const [first] = canvas.getAllByTestId("mcp-icon");
+    const tile = getComputedStyle(first, "::before");
+    await expect(tile.backgroundColor).toBe("rgb(0, 130, 201)");
+    await expect(tile.opacity).toBe("0.6");
+    await expect(getComputedStyle(first).borderRadius).toBe("50%");
+  },
   parameters: {
     docs: {
       description: {

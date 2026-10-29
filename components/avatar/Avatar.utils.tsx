@@ -9,6 +9,19 @@ import type { AvatarSize, AvatarRole } from "./Avatar.enums";
 
 import styles from "./Avatar.module.scss";
 
+/**
+ * Whether a string source is an SVG file, to be fetched and inlined as an
+ * icon: a URL whose path - not its query or fragment - ends in `.svg`. A
+ * `data:` URL is always a picture, an inline SVG included: it is drawn as
+ * given rather than recoloured as an icon.
+ */
+export const isSvgSource = (source: string) => {
+  if (/^data:/i.test(source)) return false;
+
+  const [path] = source.split(/[?#]/);
+  return /\.svg$/i.test(path);
+};
+
 export const getRoleIcon = (role: AvatarRole) => {
   switch (role) {
     case "admin":

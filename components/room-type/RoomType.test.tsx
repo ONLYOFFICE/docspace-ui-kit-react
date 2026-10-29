@@ -64,6 +64,67 @@ describe("<RoomType />", () => {
 
       expect(onClick).toHaveBeenCalledTimes(1);
     });
+
+    it("is a focusable button that Enter and Space activate", () => {
+      const onClick = vi.fn();
+      render(
+        <RoomType
+          {...baseProps}
+          type={type}
+          roomType={RoomsType.CustomRoom}
+          onClick={onClick}
+        />,
+      );
+
+      const root = screen.getByTestId(testId);
+      expect(root).toHaveAttribute("role", "button");
+      expect(root).toHaveAttribute("tabindex", "0");
+      expect(root.querySelector("[tabindex]")).toBeNull();
+
+      fireEvent.keyDown(root, { key: "Enter" });
+      fireEvent.keyDown(root, { key: " " });
+      fireEvent.keyDown(root, { key: "a" });
+
+      expect(onClick).toHaveBeenCalledTimes(2);
+    });
+
+    // A chosen type moves focus on (the portal focuses the room name, whose
+    // Enter keyup creates the room): the same press must not act there too.
+    it("keeps the keyup of the key that chose it from the page", () => {
+      render(<RoomType {...baseProps} type={type} onClick={vi.fn()} />);
+      const onWindowKeyUp = vi.fn();
+      window.addEventListener("keyup", onWindowKeyUp);
+
+      fireEvent.keyDown(screen.getByTestId(testId), { key: "Enter" });
+      fireEvent.keyUp(document.body, { key: "Enter" });
+
+      window.removeEventListener("keyup", onWindowKeyUp);
+      expect(onWindowKeyUp).not.toHaveBeenCalled();
+    });
+  });
+
+  it("tells whether the dropdown button is open", () => {
+    const { rerender } = render(
+      <RoomType
+        {...baseProps}
+        type="dropdownButton"
+        roomType={RoomsType.CustomRoom}
+        onClick={vi.fn()}
+      />,
+    );
+    const button = screen.getByTestId("room-type-dropdown-button");
+    expect(button).toHaveAttribute("aria-expanded", "false");
+
+    rerender(
+      <RoomType
+        {...baseProps}
+        isOpen
+        type="dropdownButton"
+        roomType={RoomsType.CustomRoom}
+        onClick={vi.fn()}
+      />,
+    );
+    expect(button).toHaveAttribute("aria-expanded", "true");
   });
 
   describe("disabled", () => {
@@ -85,10 +146,36 @@ describe("<RoomType />", () => {
       const root = screen.getByTestId(testId);
       fireEvent.click(root);
       fireEvent.click(getArrow(root));
+      fireEvent.keyDown(root, { key: "Enter" });
 
       expect(onClick).not.toHaveBeenCalled();
+      // Still on the tab order, so the reason it is disabled can be found.
+      expect(root).toHaveAttribute("tabindex", "0");
       expect(root).toHaveAttribute("aria-disabled", "true");
       expect(root).toHaveAttribute("data-tooltip-id", "create-room-tooltip");
+    });
+
+    // Enter on a disabled type swallowed the keyup that followed anywhere
+    // on the page, though nothing was chosen.
+    it("leaves the keyup to the page when a disabled type ignores the key", () => {
+      render(
+        <RoomType
+          {...baseProps}
+          roomType={RoomsType.FormRoom}
+          disabledFormRoom
+          onClick={vi.fn()}
+        />,
+      );
+      const onWindowKeyUp = vi.fn();
+      window.addEventListener("keyup", onWindowKeyUp);
+
+      fireEvent.keyDown(screen.getByTestId("room-type-list-item"), {
+        key: "Enter",
+      });
+      fireEvent.keyUp(document.body, { key: "Enter" });
+
+      window.removeEventListener("keyup", onWindowKeyUp);
+      expect(onWindowKeyUp).toHaveBeenCalledTimes(1);
     });
 
     it("ignores clicks on a disabled PublicRoom", () => {

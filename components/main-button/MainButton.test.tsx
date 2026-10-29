@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MainButton } from ".";
 
 vi.mock("react-svg", () => ({
@@ -104,5 +104,102 @@ describe("<MainButton />", () => {
     expect(
       screen.getByTestId("main-button").querySelector(".img"),
     ).toBeInTheDocument();
+  });
+
+  it("is a native button that never submits a form", () => {
+    render(<MainButton {...defaultProps} />);
+    const button = screen.getByRole("button", { name: "Test Button" });
+    expect(button.tagName).toBe("BUTTON");
+    expect(button).toHaveAttribute("type", "button");
+  });
+
+  // Opening is covered by the stories: jsdom refuses the positioned
+  // MouseEvent the button builds for the menu.
+  it("announces the menu it opens and that it is closed", () => {
+    const model = [{ key: "item1", label: "Item 1" }];
+    render(<MainButton {...defaultProps} model={model} />);
+    const button = screen.getByRole("button", { name: "Test Button" });
+    expect(button).toHaveAttribute("aria-haspopup", "menu");
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(button).not.toHaveAttribute("aria-controls");
+  });
+
+  it("does not claim a popup when isDropdown is false", () => {
+    render(<MainButton {...defaultProps} isDropdown={false} />);
+    const button = screen.getByRole("button", { name: "Test Button" });
+    expect(button).not.toHaveAttribute("aria-haspopup");
+    expect(button).not.toHaveAttribute("aria-expanded");
+  });
+
+  it("stays focusable and sets aria-disabled when disabled", () => {
+    render(<MainButton {...defaultProps} isDisabled />);
+    const button = screen.getByRole("button", { name: "Test Button" });
+    expect(button).toHaveAttribute("aria-disabled", "true");
+    expect(button).not.toBeDisabled();
+    button.focus();
+    expect(button).toHaveFocus();
+  });
+
+  it("keeps the Enter keyup that opened the menu away from the menu", () => {
+    const onKeyUp = vi.fn();
+    window.addEventListener("keyup", onKeyUp);
+    const model = [{ key: "item1", label: "Item 1" }];
+    render(<MainButton {...defaultProps} model={model} />);
+    const button = screen.getByRole("button", { name: "Test Button" });
+    fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+    fireEvent.keyUp(button, { key: "Enter", code: "Enter" });
+    expect(onKeyUp).not.toHaveBeenCalled();
+    window.removeEventListener("keyup", onKeyUp);
+  });
+
+  it("leaves Enter inside the open menu to the element it was pressed on", async () => {
+    // jsdom refuses the `view` the button gives the event that opens the menu.
+    const NativeMouseEvent = window.MouseEvent;
+    vi.stubGlobal(
+      "MouseEvent",
+      class extends NativeMouseEvent {
+        constructor(type: string, init?: MouseEventInit) {
+          super(type, { ...init, view: null });
+        }
+      },
+    );
+    const model = [{ key: "item1", label: "Item 1" }];
+    render(<MainButton {...defaultProps} model={model} />);
+    const button = screen.getByRole("button", { name: "Test Button" });
+    fireEvent.click(button);
+    vi.unstubAllGlobals();
+    await waitFor(() =>
+      expect(button).toHaveAttribute("aria-expanded", "true"),
+    );
+
+    // On the button itself, Enter belongs to the open menu.
+    expect(fireEvent.keyDown(button, { key: "Enter", code: "Enter" })).toBe(
+      false,
+    );
+
+    // Read before the menu's own hotkeys on `window` see the key: what the
+    // button's handler did to it is all that is observed.
+    let preventedBeforeWindow: boolean | undefined;
+    const onDocumentKeyDown = (e: KeyboardEvent) => {
+      preventedBeforeWindow = e.defaultPrevented;
+    };
+    document.addEventListener("keydown", onDocumentKeyDown);
+    const item = await screen.findByText("Item 1");
+    fireEvent.keyDown(item, { key: "Enter", code: "Enter" });
+    document.removeEventListener("keydown", onDocumentKeyDown);
+    expect(preventedBeforeWindow).toBe(false);
+  });
+
+  it("does not pass `opened` to the DOM", () => {
+    render(<MainButton {...defaultProps} opened />);
+    const button = screen.getByRole("button", { name: "Test Button" });
+    expect(button).not.toHaveAttribute("opened");
+  });
+
+  it("needs no model when isDropdown is false", () => {
+    const onAction = vi.fn();
+    render(<MainButton text="Act" isDropdown={false} onAction={onAction} />);
+    fireEvent.click(screen.getByRole("button", { name: "Act" }));
+    expect(onAction).toHaveBeenCalledTimes(1);
   });
 });

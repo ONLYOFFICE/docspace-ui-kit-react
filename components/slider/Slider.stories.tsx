@@ -2,6 +2,7 @@ import type { CSSProperties, ChangeEvent, ComponentProps } from "react";
 import { useEffect, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fireEvent, fn } from "storybook/test";
 
 import { Slider } from ".";
 import type { SliderProps } from "./Slider.types";
@@ -124,6 +125,17 @@ const SliderWithState = (props: SliderProps) => {
   return <Slider {...props} value={value} onChange={handleChange} />;
 };
 
+// A range input moves on its own default action, which the browser does not
+// run for synthetic key events -- so the play functions set the value through
+// a change event and check that the handle and onChange follow it.
+const moveTo = (slider: HTMLElement, value: string) =>
+  fireEvent.change(slider, { target: { value } });
+
+// The handle is a pseudo-element whose computed style the browser does not
+// report, so it is checked through the variables its rule reads.
+const variable = (slider: HTMLElement, name: string) =>
+  getComputedStyle(slider).getPropertyValue(name).trim();
+
 export const Default: Story = {
   render: (args) => <SliderWithState {...args} />,
   args: {
@@ -133,6 +145,24 @@ export const Default: Story = {
     value: 50,
     isDisabled: false,
     withPouring: true,
+    onChange: fn(),
+    "aria-label": "Volume",
+    "aria-valuetext": "50 percent",
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const slider = canvas.getByRole("slider");
+    await expect(slider).toHaveValue("50");
+    // The ARIA props reach the input: the slider has a name with no
+    // wrapping <label>, and says what its number means.
+    await expect(slider).toHaveAccessibleName("Volume");
+    await expect(slider).toHaveAttribute("aria-valuetext", "50 percent");
+
+    await userEvent.tab();
+    await expect(slider).toHaveFocus();
+
+    moveTo(slider, "75");
+    await expect(slider).toHaveValue("75");
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -141,7 +171,15 @@ export const Default: Story = {
           "A 0–100 slider with the track filled up to the handle (`withPouring`), the usual choice for a setting such as volume or zoom; drag the handle or change any other prop live in the Controls panel below.",
       },
       source: {
-        code: `<Slider min={0} max={100} value={50} withPouring onChange={handleChange} />`,
+        code: `<Slider
+  min={0}
+  max={100}
+  value={50}
+  withPouring
+  aria-label="Volume"
+  aria-valuetext="50 percent"
+  onChange={handleChange}
+/>`,
       },
     },
   },
@@ -149,6 +187,11 @@ export const Default: Story = {
 
 export const DisabledState: Story = {
   render: (args) => <SliderWithState {...args} />,
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByRole("slider")).toBeDisabled();
+    await userEvent.tab();
+    await expect(document.activeElement).toBe(document.body);
+  },
   args: {
     min: 0,
     max: 100,
@@ -172,6 +215,15 @@ export const DisabledState: Story = {
 
 export const WithCustomSteps: Story = {
   render: (args) => <SliderWithState {...args} />,
+  play: async ({ canvas }) => {
+    const slider = canvas.getByRole("slider");
+    await expect(slider).toHaveAttribute("step", "5");
+    // The input snaps a value between steps to the nearest one.
+    moveTo(slider, "7");
+    await expect(slider).toHaveValue("5");
+    moveTo(slider, "8");
+    await expect(slider).toHaveValue("10");
+  },
   args: {
     min: 0,
     max: 10,
@@ -202,6 +254,13 @@ export const WithoutPouring: Story = {
     value: 50,
     isDisabled: false,
     withPouring: false,
+  },
+  play: async ({ canvas }) => {
+    // No fill: the track keeps one colour whatever the value.
+    const slider = canvas.getByRole("slider");
+    await expect(slider.style.backgroundSize).toBe("auto");
+    moveTo(slider, "80");
+    await expect(slider.style.backgroundSize).toBe("auto");
   },
   parameters: {
     docs: {
@@ -238,6 +297,14 @@ export const WithCustomSize: Story = {
     thumbBorderWidth: "8px",
     runnableTrackHeight: "14px",
   },
+  play: async ({ canvas }) => {
+    const slider = canvas.getByRole("slider");
+    await expect(variable(slider, "--thumb-width")).toBe("32px");
+    await expect(variable(slider, "--thumb-height")).toBe("32px");
+    await expect(variable(slider, "--thumb-border-width")).toBe("8px");
+    // The track height is the input's own height too.
+    await expect(slider).toHaveStyle({ height: "14px" });
+  },
   parameters: {
     docs: {
       description: {
@@ -273,6 +340,17 @@ export const RightToLeft: Story = {
     withPouring: true,
   },
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The fill grows from the right edge and follows the value.
+    const slider = canvas.getByRole("slider");
+    await expect(getComputedStyle(slider).direction).toBe("rtl");
+    await expect(slider.style.backgroundSize).toMatch(/^50%/);
+    moveTo(slider, "20");
+    await expect(slider.style.backgroundSize).toMatch(/^20%/);
+    await expect(getComputedStyle(slider).backgroundPositionX).toMatch(
+      /100%|right/,
+    );
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -291,6 +369,16 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const [active] = canvas.getAllByRole("slider");
+    await expect(active).toHaveStyle({
+      backgroundColor: "rgb(237, 233, 254)",
+      height: "12px",
+      borderRadius: "6px",
+    });
+    await expect(variable(active, "--slider-thumb-s")).toBe("28px");
+    await expect(variable(active, "--slider-thumb-bg")).toBe("#7c3aed");
+  },
   render: () => {
     const [value, setValue] = useState(60);
     return (

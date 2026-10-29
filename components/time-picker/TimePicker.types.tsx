@@ -46,6 +46,18 @@ type TimePickerBase = {
    * @default "time-picker"
    */
   testId?: string;
+  /** Accessible name of the group that holds the two fields. Pass a translated string. */
+  ariaLabel?: string;
+  /** Accessible name of the hours field. Pass a translated string. */
+  hoursLabel?: string;
+  /** Accessible name of the minutes field. Pass a translated string. */
+  minutesLabel?: string;
+  /**
+   * Whether typing moves the focus for you: a complete hour jumps to minutes,
+   * and a complete minute blurs the field and calls `onBlur`. Turn it off to
+   * keep the focus where the user put it; `onBlur` is then never called.
+   */
+  autoAdvance?: boolean;
 };
 
 // The 12-hour mode cannot tell 03:30 from 15:30 on its own, so it takes the

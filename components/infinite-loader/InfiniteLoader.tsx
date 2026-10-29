@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { MAX_INFINITE_LOADER_SHIFT, isMobile } from "../../utils/device";
 
@@ -7,56 +7,75 @@ import GridComponent from "./sub-components/grid/Grid";
 
 import { InfiniteLoaderProps } from "./InfiniteLoader.types";
 
+const DESKTOP_SCROLLER = "#sectionScroll .scroll-wrapper > .scroller";
+const MOBILE_SCROLLER = "#customScrollBar .scroll-wrapper > .scroller";
+
+const findPortalScroller = () =>
+  document.querySelector(isMobile() ? MOBILE_SCROLLER : DESKTOP_SCROLLER);
+
 const InfiniteLoaderComponent = (props: InfiniteLoaderProps) => {
-  const { viewAs, isLoading } = props;
+  const { viewAs, isLoading, scrollElement } = props;
 
-  const [scrollTop, setScrollTop] = useState(0);
   const [showSkeleton, setShowSkeleton] = useState(false);
+  const lastScrollTop = useRef(0);
+  const skeletonTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const scroll = isMobile()
-    ? document.querySelector("#customScrollBar .scroll-wrapper > .scroller")
-    : document.querySelector("#sectionScroll .scroll-wrapper > .scroller");
-
-  const onScroll = (e: Event) => {
-    const eventTarget = e.target as HTMLElement;
-    const currentScrollTop = eventTarget.scrollTop;
-
-    setScrollTop(currentScrollTop ?? 0);
-
-    const scrollShift = scrollTop - currentScrollTop;
-
-    if (
-      scrollShift > MAX_INFINITE_LOADER_SHIFT ||
-      scrollShift < -MAX_INFINITE_LOADER_SHIFT
-    ) {
-      setShowSkeleton(true);
-      setTimeout(() => {
-        setShowSkeleton(false);
-      }, 200);
-    }
-  };
+  const scrollTarget: Element | (Window & typeof globalThis) =
+    scrollElement ?? findPortalScroller() ?? window;
 
   useEffect(() => {
-    if (scroll) scroll.addEventListener("scroll", onScroll);
+    const readScrollTop = () =>
+      (scrollTarget instanceof Element
+        ? scrollTarget.scrollTop
+        : scrollTarget.scrollY) ?? 0;
+
+    lastScrollTop.current = readScrollTop();
+
+    const onScroll = () => {
+      const currentScrollTop = readScrollTop();
+      const scrollShift = lastScrollTop.current - currentScrollTop;
+
+      lastScrollTop.current = currentScrollTop;
+
+      if (Math.abs(scrollShift) > MAX_INFINITE_LOADER_SHIFT) {
+        setShowSkeleton(true);
+        if (skeletonTimer.current) clearTimeout(skeletonTimer.current);
+        skeletonTimer.current = setTimeout(() => {
+          skeletonTimer.current = null;
+          setShowSkeleton(false);
+        }, 200);
+      }
+    };
+
+    scrollTarget.addEventListener("scroll", onScroll);
 
     return () => {
-      if (scroll) scroll.removeEventListener("scroll", onScroll);
+      scrollTarget.removeEventListener("scroll", onScroll);
     };
-  });
+  }, [scrollTarget]);
+
+  useEffect(
+    () => () => {
+      if (skeletonTimer.current) clearTimeout(skeletonTimer.current);
+    },
+    [],
+  );
 
   if (isLoading) return null;
 
+  // The loader's own scroll element and skeleton flag win over anything in
+  // props: `showSkeleton` is computed here, never taken from the caller.
   return viewAs === "tile" ? (
     <GridComponent
-      scroll={scroll ?? window}
-      showSkeleton={showSkeleton}
       {...props}
+      scroll={scrollTarget}
+      showSkeleton={showSkeleton}
     />
   ) : (
     <ListComponent
-      scroll={scroll ?? window}
-      showSkeleton={showSkeleton}
       {...props}
+      scroll={scrollTarget}
+      showSkeleton={showSkeleton}
     />
   );
 };

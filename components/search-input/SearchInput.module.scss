@@ -52,6 +52,19 @@
     --main-button-bg: transparent;
     --main-button-inner-padding: 0;
 
+    // The button is a transparent part of this accent pill, so its own ring,
+    // in the accent too, would vanish into it: the pill draws the ring.
+    --main-button-focus-color: transparent;
+
+    &:has(:focus-visible) {
+      outline: 2px solid
+        var(
+          --search-input-main-button-focus-color,
+          var(--accent-main, #{$light-blue-main})
+        );
+      outline-offset: 2px;
+    }
+
     &:hover {
       opacity: 0.85;
     }

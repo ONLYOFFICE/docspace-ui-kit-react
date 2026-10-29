@@ -3,6 +3,7 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen } from "storybook/test";
 
 import { Toast } from "../toast";
 
@@ -226,17 +227,29 @@ const Wrapper = (props: { children: React.ReactNode }) => {
 const ControlledTextarea = (
   props: Partial<ComponentProps<typeof Textarea>> & { initialValue?: string },
 ) => {
-  const { initialValue, ...rest } = props;
+  const { initialValue, onChange, ...rest } = props;
   const [val, setValue] = useState(initialValue || rest.value || "");
 
   return (
     <Textarea
       {...rest}
       value={val}
-      onChange={(e) => setValue(e.target.value)}
+      onChange={(e) => {
+        setValue(e.target.value);
+        onChange?.(e);
+      }}
     />
   );
 };
+
+// The scrollbar frame around the field carries its error state.
+const frameOf = (field: HTMLElement) =>
+  field.closest("[data-error]") as HTMLElement;
+
+const rect = (element: Element) => element.getBoundingClientRect();
+
+const numbersIn = (frame: HTMLElement) =>
+  (frame.querySelector("pre") as HTMLElement).textContent;
 
 export const Default: Story = {
   render: (args) => <ControlledTextarea {...args} />,
@@ -247,6 +260,13 @@ export const Default: Story = {
     hasError: false,
     heightTextArea: "150px",
     value: "",
+    onChange: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const field = canvas.getByPlaceholderText("Enter text here");
+    await userEvent.type(field, "Hello");
+    await expect(field).toHaveValue("Hello");
+    await expect(args.onChange).toHaveBeenCalledTimes(5);
   },
   parameters: {
     docs: {
@@ -295,6 +315,20 @@ const StatesTemplate = () => {
 
 export const States: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByDisplayValue("Disabled textarea")).toBeDisabled();
+
+    const readOnly = canvas.getByDisplayValue("Read-only textarea");
+    await userEvent.type(readOnly, "!");
+    await expect(readOnly).toHaveValue("Read-only textarea");
+
+    await expect(
+      frameOf(canvas.getByDisplayValue("Error state")),
+    ).toHaveAttribute("data-error", "true");
+    await expect(
+      frameOf(canvas.getByDisplayValue("Normal textarea")),
+    ).toHaveAttribute("data-error", "false");
+  },
   parameters: {
     docs: {
       description: {
@@ -331,6 +365,19 @@ const WithCopyTemplate = () => {
 
 export const WithCopy: Story = {
   render: () => <WithCopyTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const text = "This text can be copied using the copy button.";
+    const field = canvas.getByDisplayValue(text) as HTMLTextAreaElement;
+
+    await userEvent.click(canvas.getByTestId("icon-button"));
+    // The toast container renders outside the field.
+    await expect(
+      await screen.findByText("Text copied to clipboard!"),
+    ).toBeVisible();
+    // The click reaches the frame too, which selects the whole text.
+    await expect(field.selectionStart).toBe(0);
+    await expect(field.selectionEnd).toBe(text.length);
+  },
   parameters: {
     docs: {
       description: {
@@ -363,6 +410,15 @@ const WithNumerationTemplate = () => {
 
 export const WithNumeration: Story = {
   render: () => <WithNumerationTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const field = canvas.getByRole("textbox");
+    const frame = frameOf(field);
+    await expect(numbersIn(frame)).toBe("1\n2\n3\n4\n5");
+    await expect(Math.round(rect(frame).height)).toBe(150);
+    // A new line gets its number.
+    await userEvent.type(field, "{Enter}Line 6");
+    await expect(numbersIn(frame)).toBe("1\n2\n3\n4\n5\n6");
+  },
   parameters: {
     docs: {
       description: {
@@ -412,6 +468,12 @@ const JSONFieldTemplate = () => {
 
 export const JSONField: Story = {
   render: () => <JSONFieldTemplate />,
+  play: async ({ canvas }) => {
+    // The field re-formats the JSON it shows, so take them in order.
+    const [valid, broken] = canvas.getAllByRole("textbox");
+    await expect(frameOf(valid)).toHaveAttribute("data-error", "false");
+    await expect(frameOf(broken)).toHaveAttribute("data-error", "true");
+  },
   parameters: {
     docs: {
       description: {
@@ -456,6 +518,15 @@ const CustomHeightTemplate = () => {
 
 export const CustomHeights: Story = {
   render: () => <CustomHeightTemplate />,
+  play: async ({ canvas }) => {
+    const heights = ["80px height", "150px height", "250px height"].map(
+      (placeholder) =>
+        Math.round(
+          rect(frameOf(canvas.getByPlaceholderText(placeholder))).height,
+        ),
+    );
+    await expect(heights).toEqual([80, 150, 250]);
+  },
   parameters: {
     docs: {
       description: {
@@ -487,6 +558,17 @@ const GrowsWithContentTemplate = () => {
 
 export const GrowsWithContent: Story = {
   render: () => <GrowsWithContentTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // The frame is as tall as its lines, and grows with each new one.
+    const field = canvas.getByRole("textbox");
+    const frame = frameOf(field);
+    const before = rect(frame).height;
+    await userEvent.type(field, "{Enter}Seventh line{Enter}Eighth line");
+    await expect(rect(frame).height).toBeGreaterThan(before);
+    await expect(field.scrollHeight).toBeLessThanOrEqual(
+      field.clientHeight + 1,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -517,6 +599,16 @@ const RightToLeftTemplate = () => {
 export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The line numbers move to the right edge.
+    const field = canvas.getByRole("textbox");
+    const frame = frameOf(field);
+    const numbers = frame.querySelector("pre") as HTMLElement;
+    await expect(numbersIn(frame)).toBe("1\n2\n3");
+    await expect(rect(numbers).left).toBeGreaterThan(
+      rect(frame).left + rect(frame).width / 2,
+    );
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -535,6 +627,14 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const [plain, numbered] = canvas.getAllByRole("textbox");
+    await expect(plain).toHaveStyle({ color: "rgb(76, 29, 149)" });
+    await expect(numbered.parentElement?.querySelector("pre")).toHaveStyle({
+      color: "rgb(139, 92, 246)",
+    });
+    await expect(frameOf(plain)).toHaveStyle({ borderRadius: "8px" });
+  },
   render: () => (
     <div
       style={

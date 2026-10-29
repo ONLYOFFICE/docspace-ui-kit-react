@@ -27,14 +27,17 @@ export type AvatarProps = {
   role: AvatarRole;
   /**
    * The picture. A React element is rendered as given; a string is a URL, shown
-   * with an `<img>` — except a path containing `.svg`, which is fetched and
-   * inlined as an icon unless `isNotIcon` is set, and one containing
+   * with an `<img>` — except a URL whose path ends in `.svg` (query and
+   * fragment aside; never a `data:` URL), which is fetched and inlined as an
+   * icon unless `isNotIcon` is set, and one containing
    * `default_user_photo`, which is replaced by the kit's own illustration.
    */
   source?: string | React.JSX.Element;
   /**
    * Name to build initials from when there is no `source`: the first letter of
    * each word, two at most. Lower case is preserved unless `isGroup` is set.
+   * It is also the picture's `alt` text and, on a clickable avatar, its
+   * accessible name.
    */
   userName?: string;
   /**
@@ -63,7 +66,8 @@ export type AvatarProps = {
   /** Text of that tooltip. */
   tooltipContent?: string;
   /**
-   * Called on a click on the avatar, and on a middle-button press. Passing it
+   * Called on a click on the avatar, on Enter or Space while it has focus, and
+   * on a middle-button press. Passing it makes the avatar a button and
    * replaces the editing behaviour entirely: the upload menu no longer opens.
    */
   onClick?: (e: React.MouseEvent) => void;

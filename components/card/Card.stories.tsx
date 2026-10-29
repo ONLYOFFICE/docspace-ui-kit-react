@@ -1,8 +1,9 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 
-import FolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
+import FolderIcon from "../../.storybook/utils/ThemedFolderIcon";
 
 import { Card } from "./Card";
 import styles from "./Card.module.scss";
@@ -64,6 +65,21 @@ export const Default: Story = {
     title: "Card title",
     children: "Card body content goes here.",
   },
+  play: async ({ canvas }) => {
+    const card = canvas.getByTestId("card");
+    await expect(card.querySelector("header")).toHaveTextContent("Card title");
+    await expect(
+      canvas.getByText("Card body content goes here."),
+    ).toBeVisible();
+    await expect(card.querySelector("footer")).toBeNull();
+    // A string title is the card's heading, an h3 by default.
+    await expect(
+      canvas.getByRole("heading", { level: 3, name: "Card title" }),
+    ).toBeVisible();
+    // The section scopes the header, so it is not a page banner landmark.
+    // (Testing Library's role queries ignore that scoping, so check the tag.)
+    await expect(card.tagName).toBe("SECTION");
+  },
   parameters: {
     docs: {
       description: {
@@ -82,6 +98,15 @@ export const WithExtra: Story = {
     title: "Backup storage",
     extra: <span className={styles.connectedStatus}>Connected</span>,
     children: "Copies of your documents are saved every night.",
+  },
+  play: async ({ canvas }) => {
+    // extra sits on the trailing edge of the header row, on one line.
+    const title = canvas.getByText("Backup storage");
+    const extra = canvas.getByText("Connected");
+    await expect(extra.getBoundingClientRect().left).toBeGreaterThan(
+      title.getBoundingClientRect().right,
+    );
+    await expect(title.closest("header")).toBe(extra.closest("header"));
   },
   parameters: {
     docs: {
@@ -102,6 +127,12 @@ export const TitleOnly: Story = {
   args: {
     title: "Title without body",
   },
+  play: async ({ canvas }) => {
+    // No children, no empty body below the header.
+    const card = canvas.getByTestId("card");
+    await expect(card.children).toHaveLength(1);
+    await expect(card.firstElementChild?.tagName).toBe("HEADER");
+  },
   parameters: {
     docs: {
       description: {
@@ -118,6 +149,13 @@ export const TitleOnly: Story = {
 export const BodyOnly: Story = {
   args: {
     children: "Body content without a header row.",
+  },
+  play: async ({ canvas }) => {
+    // Neither title nor extra: the header row is left out.
+    await expect(canvas.getByTestId("card").querySelector("header")).toBeNull();
+    await expect(
+      canvas.getByText("Body content without a header row."),
+    ).toBeVisible();
   },
   parameters: {
     docs: {
@@ -147,6 +185,11 @@ const WithIconInTitleTemplate = () => (
 
 export const WithIconInTitle: Story = {
   render: () => <WithIconInTitleTemplate />,
+  play: async ({ canvas }) => {
+    const header = canvas.getByTestId("card").querySelector("header");
+    await expect(header?.querySelector("svg")).not.toBeNull();
+    await expect(header).toHaveTextContent("Title with icon");
+  },
   parameters: {
     docs: {
       description: {
@@ -188,6 +231,17 @@ const FullExampleTemplate = () => (
 
 export const FullExample: Story = {
   render: () => <FullExampleTemplate />,
+  play: async ({ canvas }) => {
+    // Every slot, in order: header, body, footer.
+    const card = canvas.getByTestId("card");
+    const tags = Array.from(card.children).map((child) => child.tagName);
+    await expect(tags).toEqual(["HEADER", "DIV", "FOOTER"]);
+    // Inside the card's section neither is a page landmark.
+    await expect(card.tagName).toBe("SECTION");
+    await expect(
+      canvas.getByRole("button", { name: "Open settings" }).closest("footer"),
+    ).not.toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -231,6 +285,15 @@ const CssCustomizationTemplate = () => (
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    const card = canvas.getByTestId("card");
+    await expect(getComputedStyle(card).backgroundColor).toBe(
+      "rgb(232, 241, 251)",
+    );
+    await expect(
+      getComputedStyle(canvas.getByText("Custom colours")).color,
+    ).toBe("rgb(11, 61, 145)");
+  },
   parameters: {
     docs: {
       description: {

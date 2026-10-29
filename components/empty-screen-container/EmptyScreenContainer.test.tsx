@@ -68,6 +68,51 @@ describe("<EmptyScreenContainer />", () => {
     expect(image).toHaveStyle(imageStyle);
   });
 
+  it("renders the header as a heading, an h3 unless told otherwise", () => {
+    const { unmount } = render(<EmptyScreenContainer {...baseProps} />);
+    expect(
+      screen.getByRole("heading", { level: 3, name: baseProps.headerText }),
+    ).toBeInTheDocument();
+    unmount();
+
+    render(<EmptyScreenContainer {...baseProps} headingLevel={2} />);
+    expect(
+      screen.getByRole("heading", { level: 2, name: baseProps.headerText }),
+    ).toBeInTheDocument();
+  });
+
+  // It mounts already filled, often as a whole page on route load: a live
+  // region would announce every empty page or, mounted with its text, nothing.
+  it("is not a live region", () => {
+    render(<EmptyScreenContainer {...baseProps} subheadingText="Sub" />);
+
+    expect(screen.queryByRole("status")).toBeNull();
+    expect(screen.getByText("Sub")).toBeInTheDocument();
+  });
+
+  it("sizes the header through Text's variables, not an inline style", () => {
+    render(<EmptyScreenContainer {...baseProps} />);
+
+    const header = screen.getByRole("heading", { name: baseProps.headerText });
+    expect(header).toHaveClass("ec-header");
+    expect(header.style.fontSize).toBe("");
+    expect(header.style.fontWeight).toBe("");
+  });
+
+  it("passes id and style to the outer element", () => {
+    render(
+      <EmptyScreenContainer
+        {...baseProps}
+        id="empty-files"
+        style={{ marginTop: "12px" }}
+      />,
+    );
+
+    const container = screen.getByTestId("empty-screen-container");
+    expect(container).toHaveAttribute("id", "empty-files");
+    expect(container).toHaveStyle({ marginTop: "12px" });
+  });
+
   it("applies custom styles to buttons when provided", () => {
     const buttonStyle = { marginTop: "20px" };
     render(<EmptyScreenContainer {...baseProps} buttonStyle={buttonStyle} />);

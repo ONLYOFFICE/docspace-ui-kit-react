@@ -4,6 +4,7 @@ import classNames from "classnames";
 import { RectangleSkeleton } from "../rectangle";
 import { Tooltip } from "../tooltip";
 import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect";
+import { consumeKey } from "../../utils/consume-key";
 
 import ArrowLeftIcon from "../../assets/arrow-left.react.svg";
 import ArrowRightIcon from "../../assets/icons/16/right.arrow.react.svg";
@@ -21,6 +22,7 @@ const SCROLL_EPSILON = 1;
 // How much of the current view stays on screen after paging, so the tile at the
 // edge is not scrolled past unseen.
 const PAGE_OVERLAP = 64;
+const SMOOTH_SCROLL_MAX_MS = 1000;
 
 // Scrolling toward the end raises scrollLeft in LTR and lowers it (through
 // negative values) in RTL. Read the resolved direction from the element rather
@@ -126,9 +128,16 @@ const useScrollAffordance = (
   return affordance;
 };
 
+// `useId` values carry characters (colons, guillemets) that a bare `#id`
+// selector cannot hold.
+const useSelectorSafeId = () => React.useId().replace(/[^A-Za-z0-9_-]/g, "-");
+
 const QuickActionTile = ({ item }: { item: QuickActionItem }) => {
+  // From `useId`, not from the item's id: two banners can offer a tile with the
+  // same id, and an id with a space or a colon would break the selector.
+  const tooltipAnchorId = `quick-action-tooltip${useSelectorSafeId()}`;
+
   const {
-    id,
     icon,
     label,
     onClick,
@@ -187,8 +196,6 @@ const QuickActionTile = ({ item }: { item: QuickActionItem }) => {
 
   if (!tooltipContent) return tile;
 
-  const tooltipAnchorId = `quick-action-tooltip-${id}`;
-
   return (
     <div id={tooltipAnchorId} className={styles.tileTooltipAnchor}>
       {tile}
@@ -231,9 +238,7 @@ export const QuickActions = ({
   // that replaced the placeholder.
   const [track, setTrack] = React.useState<HTMLDivElement | null>(null);
 
-  // `useId` values carry colons, which a bare `#id` selector cannot hold.
-  const instanceId = React.useId().replace(/:/g, "-");
-  const closeAnchorId = `quick-actions-close-${instanceId}`;
+  const closeAnchorId = `quick-actions-close${useSelectorSafeId()}`;
 
   // The ids, not the array identity: the consumer rebuilds `items` on every
   // render, so identity would rewind the strip continuously. The count alone
@@ -253,13 +258,56 @@ export const QuickActions = ({
     ? ({ "--_measured-row-width": `${rowWidth}px` } as React.CSSProperties)
     : undefined;
 
+  // Until when an arrow button's smooth scroll may still be running. The
+  // browsers' smooth scroll takes well under a second.
+  const smoothScrollUntilRef = React.useRef(0);
+
   const scrollByPage = (towardEnd: boolean) => {
     if (!track) return;
 
     const page = Math.max(track.clientWidth - PAGE_OVERLAP, PAGE_OVERLAP);
     const distance = page * getDirectionSign(track) * (towardEnd ? 1 : -1);
 
+    smoothScrollUntilRef.current = performance.now() + SMOOTH_SCROLL_MAX_MS;
     track.scrollBy({ left: distance, behavior: "smooth" });
+  };
+
+  // Arrow keys move focus along the strip (in reading order, so mirrored in
+  // RTL), Home and End jump to its ends; focusing a tile scrolls it in.
+  const onTrackKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!track) return;
+    const tiles = Array.from(
+      track.querySelectorAll<HTMLElement>("a[href], button:not(:disabled)"),
+    );
+    const index = tiles.indexOf(document.activeElement as HTMLElement);
+    if (index === -1) return;
+
+    const forward = getDirectionSign(track) === 1 ? "ArrowRight" : "ArrowLeft";
+    const back = forward === "ArrowRight" ? "ArrowLeft" : "ArrowRight";
+
+    let next: HTMLElement | undefined;
+    if (e.key === forward) next = tiles[Math.min(index + 1, tiles.length - 1)];
+    else if (e.key === back) next = tiles[Math.max(index - 1, 0)];
+    else if (e.key === "Home") next = tiles[0];
+    else if (e.key === "End") next = tiles[tiles.length - 1];
+    else return;
+
+    e.preventDefault();
+    consumeKey(e);
+    next.focus();
+    next.scrollIntoView?.({ block: "nearest", inline: "nearest" });
+    // An arrow button's smooth scroll still running when the key comes is
+    // stopped by the key press itself, wherever it has got to, and in
+    // Chromium on Linux that drops the scroll above as well. Asking again on
+    // the next frame, after the animation is gone, lands the tile in view.
+    // Without such a scroll the first call is enough.
+    // The window stays open for every key in it: whether the first key stopped
+    // the scroll is not known here.
+    if (performance.now() < smoothScrollUntilRef.current) {
+      requestAnimationFrame(() =>
+        next.scrollIntoView?.({ block: "nearest", inline: "nearest" }),
+      );
+    }
   };
 
   if (isLoading) {
@@ -293,6 +341,9 @@ export const QuickActions = ({
       <div
         ref={setTrack}
         className={styles.grid}
+        role="toolbar"
+        aria-orientation="horizontal"
+        onKeyDown={onTrackKeyDown}
         data-testid="quick-actions-track"
       >
         {items.map((item) => (

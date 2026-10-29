@@ -312,7 +312,7 @@
     background: var(--tile-bg, var(--tile-background-color));
     justify-content: space-between;
     align-items: baseline;
-    height: 156px;
+    height: calc(var(--tile-height, 222px) - 66px);
     position: relative;
     border-radius: var(--tile-radius, 12px) var(--tile-radius, 12px) 0 0;
     transition: var(--tile-thumbnail-transition, background 0.2s);

@@ -3,13 +3,13 @@ import type React from "react";
 export type CircleSkeletonProps = {
   /**
    * Accessible name of the skeleton, rendered as the SVG's `<title>`. It is
-   * empty by default, which leaves the `role="img"` element unnamed.
+   * empty by default, and an untitled skeleton is `aria-hidden` as decoration.
    */
   title?: string;
   /**
    * Centre of the circle on the horizontal axis, in user units — the SVG's `cx`.
    * It is not an offset: a value below `radius` cuts the circle off at the left
-   * edge, which the defaults do.
+   * edge. The default equals the default `radius`, so the default circle fits.
    */
   x?: string;
   /** Centre of the circle on the vertical axis, in user units — the SVG's `cy`. */
@@ -36,4 +36,10 @@ export type CircleSkeletonProps = {
   className?: string;
   /** Applied to the `<svg>` element. */
   style?: React.CSSProperties;
+  /**
+   * Stable id the underlying react-content-loader builds its gradient and
+   * clip-path ids from. When omitted, a `useId()` value is used, so the server
+   * and the client render the same SVG ids and no hydration mismatch occurs.
+   */
+  uniqueKey?: string;
 };

@@ -1,8 +1,17 @@
-import type { ComponentProps } from "react";
+import React, { type ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
+import type { EmployeeFullDto } from "@onlyoffice/docspace-api-sdk";
 
-import ApiProvider from "./ApiProvider";
+import { Avatar, AvatarRole, AvatarSize } from "../../components/avatar";
+import { Text } from "../../components/text";
+import {
+  DEMO_API_KEY,
+  DEMO_PORTAL_URL,
+} from "../../.storybook/mocks/demoPortal";
+
+import ApiProvider, { useApi } from "./ApiProvider";
 
 const meta = {
   title: "Components/Providers/ApiProvider",
@@ -69,33 +78,115 @@ type Story = StoryObj<ComponentProps<typeof ApiProvider>>;
 
 export default meta;
 
+type SelfState =
+  | { status: "loading" }
+  | { status: "done"; profile?: EmployeeFullDto }
+  | { status: "failed"; message: string };
+
+const SignedInAs = () => {
+  const { profilesApi, baseUrl } = useApi();
+  const [state, setState] = React.useState<SelfState>({ status: "loading" });
+
+  React.useEffect(() => {
+    let cancelled = false;
+    setState({ status: "loading" });
+
+    profilesApi
+      .getSelfProfile()
+      .then(({ data }) => {
+        if (!cancelled) setState({ status: "done", profile: data.response });
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setState({
+            status: "failed",
+            message: error instanceof Error ? error.message : String(error),
+          });
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [profilesApi]);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+        padding: "16px",
+      }}
+    >
+      <Text fontSize="12px">
+        <code>useApi().profilesApi.getSelfProfile()</code> on {baseUrl}
+      </Text>
+
+      {state.status === "loading" ? (
+        <Text fontSize="13px">Asking the portal who the key belongs to...</Text>
+      ) : null}
+
+      {state.status === "failed" ? (
+        <Text fontSize="13px">The portal did not answer: {state.message}</Text>
+      ) : null}
+
+      {state.status === "done" ? (
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <Avatar
+            size={AvatarSize.base}
+            role={AvatarRole.none}
+            userName={state.profile?.displayName ?? ""}
+            source=""
+            noClick
+          />
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Text fontSize="14px" fontWeight={600}>
+              {state.profile?.displayName}
+            </Text>
+            <Text fontSize="12px">{state.profile?.email}</Text>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
 export const Default: Story = {
   render: (args) => (
     <ApiProvider {...args}>
-      <div style={{ padding: "16px" }}>
-        <p>
-          Children are rendered with access to API clients via the{" "}
-          <code>useApi()</code> hook.
-        </p>
-      </div>
+      <SignedInAs />
     </ApiProvider>
   ),
   args: {
-    url: "https://docspace.example.com",
-    apiKey: "example-api-key",
-    // Off: with it on, the story fetches the settings of and opens a socket
-    // to a portal that does not exist, from every Storybook that opens it.
+    url: DEMO_PORTAL_URL,
+    apiKey: DEMO_API_KEY,
     initSocket: false,
+  },
+  play: async ({ canvas }) => {
+    await waitFor(() => expect(canvas.getByText("Alex Morgan")).toBeVisible());
+    await expect(canvas.getByText("alex.morgan@example.com")).toBeVisible();
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Default ApiProvider wrapping child content. Children can access API clients via the useApi() hook.",
+          "A child reads the clients through `useApi()` and asks the portal whose key it holds. The story talks to the demo portal; put a portal's URL and API key in the controls to ask a real one.",
       },
       source: {
-        code: `<ApiProvider url="https://docspace.example.com" apiKey="your-api-key">
-  <App />
+        code: `const SignedInAs = () => {
+  const { profilesApi } = useApi();
+  const [me, setMe] = useState<EmployeeFullDto>();
+
+  useEffect(() => {
+    profilesApi.getSelfProfile().then(({ data }) => setMe(data.response));
+  }, [profilesApi]);
+
+  return <Text>{me?.displayName}</Text>;
+};
+
+<ApiProvider url="https://your-portal.example.com" apiKey="your-api-key" initSocket={false}>
+  <SignedInAs />
 </ApiProvider>`,
       },
     },

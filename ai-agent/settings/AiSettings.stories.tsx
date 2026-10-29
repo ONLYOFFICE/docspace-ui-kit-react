@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, screen, waitFor } from "storybook/test";
 
 import { withAiSetup } from "../storybook-helpers/withAiSetup";
 
@@ -32,7 +33,7 @@ const meta: Meta<StoryArgs> = {
       // are set per story, from what each page measures plus some room.
       story: { inline: false },
       description: {
-        component: `The portal's AI settings screens, from \`ai-agent/settings\`. Each is a page of \`@onlyoffice/ai-chat\` with the kit's layout applied, and reads and writes the same AI service the chat talks to, so it has to sit inside \`AiAgentProviders\`. Without a portal the stories run against the demo portal the mock service worker plays, under a banner that says so: its models, assignments and MCP servers are made up, and a change is saved in memory only, until the page is reloaded.
+        component: `The portal's AI settings screens, from \`ai-agent/settings\`. Each is a page of \`@onlyoffice/ai-chat\` with the kit's layout applied, and reads and writes the same AI service the chat talks to, so it has to sit inside \`AiAgentProviders\`. Without a portal the stories run against a demo portal mocked inside the page, under a banner that says so: its models, assignments and MCP servers are made up, and a change is saved in memory only, until the page is reloaded.
 
 \`\`\`tsx
 import AiAgentProviders from "@onlyoffice/apps-ui-kit/ai-agent/providers";
@@ -69,12 +70,26 @@ export default meta;
 
 type Story = StoryObj<StoryArgs>;
 
+// The pages load what the demo portal holds after mounting.
+const shown = (text: string) =>
+  waitFor(() => expect(screen.getByText(text)).toBeVisible(), {
+    timeout: 5000,
+  });
+
 export const Models: Story = {
   render: () => (
     <SettingsFrame>
       <AiModels />
     </SettingsFrame>
   ),
+  play: async () => {
+    await shown("Demo assistant");
+    await expect(screen.getByText("Demo writer")).toBeVisible();
+    await expect(screen.getByText("Demo illustrator")).toBeVisible();
+    await expect(
+      screen.getByRole("button", { name: "Add Model" }),
+    ).toBeEnabled();
+  },
   parameters: {
     docs: {
       story: { height: "460px" },
@@ -98,6 +113,11 @@ export const ModelAssignmentPage: Story = {
       <ModelAssignment />
     </SettingsFrame>
   ),
+  play: async () => {
+    await shown("Default AI model");
+    await expect(screen.getByText("Custom models per task")).toBeVisible();
+    await expect(screen.getByText("Summarization")).toBeVisible();
+  },
   parameters: {
     docs: {
       story: { height: "940px" },
@@ -121,6 +141,25 @@ export const McpServersList: Story = {
       <McpServers />
     </SettingsFrame>
   ),
+  play: async ({ userEvent }) => {
+    await shown("Demo CRM");
+    await expect(screen.getByText("Demo knowledge base")).toBeVisible();
+
+    // The configuration opens inline and closes again on Cancel.
+    await userEvent.click(
+      screen.getByRole("button", { name: "Edit configuration" }),
+    );
+    // The editor loads on first open.
+    const cancel = await waitFor(
+      () => screen.getByRole("button", { name: "Cancel" }),
+      { timeout: 5000 },
+    );
+    await expect(screen.getByRole("button", { name: "Save" })).toBeVisible();
+    await userEvent.click(cancel);
+    await waitFor(() =>
+      expect(screen.queryByRole("button", { name: "Cancel" })).toBeNull(),
+    );
+  },
   parameters: {
     docs: {
       story: { height: "500px" },
@@ -144,6 +183,18 @@ export const WebSearchSettings: Story = {
       <WebSearch />
     </SettingsFrame>
   ),
+  play: async ({ userEvent }) => {
+    await shown("Web Search Engine");
+    // Save waits for a key.
+    const save = screen.getByRole("button", { name: "Save" });
+    await expect(save).toBeDisabled();
+    // The field has no label of its own, only a placeholder.
+    await userEvent.type(
+      screen.getByPlaceholderText("Enter API key"),
+      "demo-key",
+    );
+    await expect(save).toBeEnabled();
+  },
   parameters: {
     docs: {
       story: { height: "440px" },

@@ -2,7 +2,7 @@ import type React from "react";
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fireEvent, fn, waitFor, within } from "storybook/test";
 
 import { InputSize } from "../text-input";
 
@@ -36,7 +36,7 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Greys the field out and stops a click from opening the file picker",
+        "Greys the field out and makes it inert: no click, drop or key opens or fills it, and it leaves the tab order",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -44,7 +44,7 @@ const meta = {
     isLoading: {
       control: "boolean",
       description:
-        "Replaces the icon with a spinner, greys the field and stops a click from opening the file picker; with a button label the button stays and only the click is stopped",
+        "Replaces the icon with a spinner and makes the field inert, as `isDisabled` does; with a button label the button stays in place of the spinner",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -87,10 +87,11 @@ const meta = {
     accept: {
       control: "object",
       description:
-        'File extensions or MIME types the picker offers and a drop accepts, such as `[".pdf", "image/*"]`; a file of any other type is refused with an error toast',
-      table: {
-        defaultValue: { summary: '[""]' },
-      },
+        'File extensions or MIME types the picker offers and a drop accepts, such as `[".pdf", "image/*"]`; a file of any other type is refused. Left out, any file is accepted',
+    },
+    onReject: {
+      description:
+        "Called with the files `accept` refused; while it is set the field shows no error toast of its own",
     },
     onInput: {
       description:
@@ -171,8 +172,31 @@ const Wrapper = (props: { children: React.ReactNode }) => {
 
 export const Default: Story = {
   render: (args) => <FileInput {...args} />,
+  play: async ({ args, canvas, userEvent }) => {
+    const input = canvas.getByTestId("upload-click-input");
+    await userEvent.upload(
+      input,
+      new File(["hello"], "notes.txt", { type: "text/plain" }),
+    );
+    await waitFor(() => expect(args.onInput).toHaveBeenCalledTimes(1));
+    await expect(args.onInput).toHaveBeenCalledWith(expect.any(File));
+    await expect(canvas.getByRole("textbox")).toHaveValue("notes.txt");
+
+    // Several files reach onInput as an array, their names joined.
+    await userEvent.upload(input, [
+      new File(["a"], "a.pdf", { type: "application/pdf" }),
+      new File(["b"], "b.txt", { type: "text/plain" }),
+    ]);
+    await waitFor(() => expect(args.onInput).toHaveBeenCalledTimes(2));
+    await expect(args.onInput).toHaveBeenLastCalledWith([
+      expect.any(File),
+      expect.any(File),
+    ]);
+    await expect(canvas.getByRole("textbox")).toHaveValue("a.pdf, b.txt");
+  },
   args: {
     placeholder: "Choose file",
+    // No accept: any file is admitted.
     size: InputSize.base,
     scale: false,
     isDisabled: false,
@@ -192,6 +216,7 @@ export const Default: Story = {
         code: `<FileInput
   placeholder="Choose file"
   size={InputSize.base}
+  accept={[".pdf", ".docx", ".xlsx", ".txt"]}
   aria-label="Choose file"
   onInput={(file) => console.log(file)}
 />`,
@@ -200,9 +225,31 @@ export const Default: Story = {
   },
 };
 
+type Queries = {
+  getByPlaceholderText: (text: string) => HTMLElement;
+};
+
+const rect = (element: Element) => element.getBoundingClientRect();
+
+// The text field carries the border; the root is the whole control.
+const field = (canvas: Queries, placeholder: string) =>
+  canvas.getByPlaceholderText(placeholder) as HTMLInputElement;
+
+const rootOf = (input: HTMLElement) =>
+  input.closest("[data-testid='file-input']") as HTMLElement;
+
+const borderOf = (input: HTMLElement) => getComputedStyle(input).borderTopColor;
+
 const SizesTemplate = () => {
   return (
-    <Wrapper>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        gap: "16px",
+      }}
+    >
       <FileInput
         size={InputSize.base}
         placeholder="Base size"
@@ -218,12 +265,27 @@ const SizesTemplate = () => {
         placeholder="Large size"
         aria-label="Large size file input"
       />
-    </Wrapper>
+    </div>
   );
 };
 
 export const Sizes: Story = {
   render: () => <SizesTemplate />,
+  play: async ({ canvas }) => {
+    const [base, middle, large] = [
+      "Base size",
+      "Middle size",
+      "Large size",
+    ].map((placeholder) => field(canvas, placeholder));
+    // Each size has its fixed width; base and middle share a height.
+    const widths = [base, middle, large].map((input) =>
+      Math.round(rect(rootOf(input)).width),
+    );
+    await expect(widths).toEqual([173, 300, 550]);
+    await expect(rect(middle).height).toBe(rect(base).height);
+    await expect(rect(large).height).toBeGreaterThan(rect(base).height);
+    await expect(large).toHaveStyle({ fontSize: "16px" });
+  },
   parameters: {
     docs: {
       description: {
@@ -277,11 +339,34 @@ const StatesTemplate = () => {
 
 export const States: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas }) => {
+    const normal = borderOf(field(canvas, "Normal"));
+    const error = borderOf(field(canvas, "Error state"));
+    const warning = borderOf(field(canvas, "Warning state"));
+    await expect(new Set([normal, error, warning]).size).toBe(3);
+    await expect(field(canvas, "Disabled")).toBeDisabled();
+    // Disabled and loading fields are inert: out of the tab order.
+    const disabledRoot = rootOf(field(canvas, "Disabled"));
+    await expect(disabledRoot).not.toHaveAttribute("tabindex");
+    await expect(disabledRoot).toHaveAttribute("aria-disabled", "true");
+    await expect(rootOf(field(canvas, "Loading"))).not.toHaveAttribute(
+      "tabindex",
+    );
+    // An enabled one is a single tab stop: the field inside is not.
+    await expect(rootOf(field(canvas, "Normal"))).toHaveAttribute(
+      "tabindex",
+      "0",
+    );
+    await expect(field(canvas, "Normal")).toHaveAttribute("tabindex", "-1");
+    // Loading swaps the folder icon for a loader.
+    const loading = rootOf(field(canvas, "Loading"));
+    await expect(loading.querySelector("[class*='loader' i]")).not.toBeNull();
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "Use these to tell the user about the chosen file: **Error state** and **Warning state** recolour the border (`hasError`, `hasWarning`), **Disabled** greys the field and ignores clicks (`isDisabled`), and **Loading** shows a spinner in place of the icon (`isLoading`).",
+          "Use these to tell the user about the chosen file: **Error state** and **Warning state** recolour the border (`hasError`, `hasWarning`), **Disabled** greys the field and ignores clicks, drops and keys (`isDisabled`), and **Loading** shows a spinner in place of the icon and is just as inert (`isLoading`).",
       },
       source: {
         code: `<FileInput placeholder="Normal" />
@@ -313,8 +398,38 @@ const WithAcceptFilterTemplate = () => {
   );
 };
 
+// userEvent.upload drops a file the input's accept refuses before the
+// component sees it, so the refused file is set on the input directly.
+const chooseUnchecked = (input: HTMLInputElement, file: File) => {
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+  input.files = dataTransfer.files;
+  fireEvent.change(input);
+};
+
 export const WithAcceptFilter: Story = {
   render: () => <WithAcceptFilterTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const images = canvas.getByLabelText("Image file input");
+    const field = within(images).getByRole("textbox");
+    const input = within(images).getByTestId(
+      "upload-click-input",
+    ) as HTMLInputElement;
+
+    // A file of another type is refused and leaves the field empty.
+    chooseUnchecked(
+      input,
+      new File(["x"], "notes.txt", { type: "text/plain" }),
+    );
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    await expect(field).toHaveValue("");
+
+    await userEvent.upload(
+      input,
+      new File(["x"], "photo.png", { type: "image/png" }),
+    );
+    await waitFor(() => expect(field).toHaveValue("photo.png"));
+  },
   parameters: {
     docs: {
       description: {
@@ -344,6 +459,12 @@ const ScaledTemplate = () => {
 
 export const ScaledInput: Story = {
   render: () => <ScaledTemplate />,
+  play: async ({ canvas }) => {
+    const root = rootOf(field(canvas, "Scaled file input"));
+    await expect(Math.round(rect(root).width)).toBe(
+      Math.round(rect(root.parentElement as HTMLElement).width),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -387,6 +508,20 @@ const WithButtonTemplate = () => {
 
 export const WithButton: Story = {
   render: () => <WithButtonTemplate />,
+  play: async ({ canvas }) => {
+    // A Browse button after the field, sized with it.
+    for (const placeholder of ["Base size", "Middle size", "Large size"]) {
+      const input = field(canvas, placeholder);
+      const browse = within(rootOf(input)).getByRole("button", {
+        name: "Browse",
+      });
+      await expect(rect(browse).left).toBeGreaterThanOrEqual(
+        rect(input).right - 1,
+      );
+      // The wrapper is the focus stop, not the button inside it.
+      await expect(browse).toHaveAttribute("tabindex", "-1");
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -422,6 +557,12 @@ const DocumentIconTemplate = () => {
 
 export const DocumentIcon: Story = {
   render: () => <DocumentIconTemplate />,
+  play: async ({ canvas }) => {
+    const icon = (placeholder: string) =>
+      rootOf(field(canvas, placeholder)).querySelector("svg")?.innerHTML;
+    await expect(icon("Folder icon")).toBeTruthy();
+    await expect(icon("Document icon")).not.toBe(icon("Folder icon"));
+  },
   parameters: {
     docs: {
       description: {
@@ -438,6 +579,17 @@ export const DocumentIcon: Story = {
 
 export const WithPath: Story = {
   render: (args) => <FileInput {...args} />,
+  play: async ({ args, canvas, userEvent }) => {
+    // fromStorage shows the path and has no file input to open.
+    const field = canvas.getByRole("textbox");
+    await expect(field).toHaveValue("Documents/Reports");
+    await expect(canvas.queryByTestId("upload-click-input")).toBeNull();
+
+    await userEvent.click(field);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    await userEvent.click(canvas.getByTestId("icon-button"));
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+  },
   args: {
     size: InputSize.middle,
     placeholder: "Choose a folder",
@@ -475,18 +627,18 @@ const CssCustomizationTemplate = () => {
           width: "320px",
           // === FileInput — border and radius ===
           "--file-input-border": "#0082c9",
-          "--file-input-hover-border": "#006ba6",
-          "--file-input-focus-border": "#004f82",
+          "--file-input-hover-border": "light-dark(#006ba6, #4fb0e6)",
+          "--file-input-focus-border": "light-dark(#004f82, #7cc3ea)",
           "--file-input-radius": "8px",
           // === FileInput — validation states ===
           "--file-input-warning-border": "#e67e00",
           "--file-input-error-border": "#c0392b",
-          "--file-input-disabled-border": "#b0cce3",
+          "--file-input-disabled-border": "light-dark(#b0cce3, #2d5570)",
           "--file-input-placeholder-color": "#7aa8c7",
           // === TextInput (inner text field) ===
-          "--text-input-bg": "#f0f8ff",
-          "--text-input-color": "#004f82",
-          "--text-input-radius": "8px 0 0 8px",
+          "--text-input-bg": "light-dark(#f0f8ff, #132530)",
+          "--text-input-color": "light-dark(#004f82, #7cc3ea)",
+          "--text-input-radius": "8px",
         } as CSSProperties
       }
     >
@@ -523,6 +675,22 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    const choose = field(canvas, "Choose file");
+    await expect(choose).toHaveStyle({
+      borderTopColor: "rgb(0, 130, 201)",
+      backgroundColor: "rgb(240, 248, 255)",
+    });
+    await expect(borderOf(field(canvas, "Warning state"))).toBe(
+      "rgb(230, 126, 0)",
+    );
+    await expect(borderOf(field(canvas, "Error state"))).toBe(
+      "rgb(192, 57, 43)",
+    );
+    await expect(borderOf(field(canvas, "Disabled"))).toBe(
+      "rgb(176, 204, 227)",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -537,16 +705,16 @@ export const CssCustomization: Story = {
         code: `<div
   style={{
     "--file-input-border": "#0082c9",
-    "--file-input-hover-border": "#006ba6",
-    "--file-input-focus-border": "#004f82",
+    "--file-input-hover-border": "light-dark(#006ba6, #4fb0e6)",
+    "--file-input-focus-border": "light-dark(#004f82, #7cc3ea)",
     "--file-input-radius": "8px",
     "--file-input-warning-border": "#e67e00",
     "--file-input-error-border": "#c0392b",
-    "--file-input-disabled-border": "#b0cce3",
+    "--file-input-disabled-border": "light-dark(#b0cce3, #2d5570)",
     "--file-input-placeholder-color": "#7aa8c7",
-    "--text-input-bg": "#f0f8ff",
-    "--text-input-color": "#004f82",
-    "--text-input-radius": "8px 0 0 8px",
+    "--text-input-bg": "light-dark(#f0f8ff, #132530)",
+    "--text-input-color": "light-dark(#004f82, #7cc3ea)",
+    "--text-input-radius": "8px",
   }}
 >
   <FileInput placeholder="Choose file" size={InputSize.base} scale />

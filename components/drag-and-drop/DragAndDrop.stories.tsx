@@ -3,6 +3,7 @@ import type { ComponentProps, CSSProperties } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, waitFor, within } from "storybook/test";
 
 import { DragAndDrop } from ".";
 
@@ -83,11 +84,39 @@ const meta = {
         "Ignored: the element's ref belongs to the drop library, and this one is never attached",
     },
   },
+  args: {
+    onDrop: fn(),
+    onDragOver: fn(),
+    onDragLeave: fn(),
+    onMouseDown: fn(),
+  },
 } satisfies Meta<typeof DragAndDrop>;
 
 type Story = StoryObj<ComponentProps<typeof DragAndDrop>>;
 
 export default meta;
+
+const targets = (root: HTMLElement) =>
+  Array.from(root.querySelectorAll<HTMLElement>(".drag-and-drop"));
+
+// A drag carrying one file, as the browser builds it for a desktop drag.
+// Dispatched natively: fireEvent rebuilds the DataTransfer and loses the
+// files, so the drop library would not see a file drag at all.
+const fileDrag = () => {
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(
+    new File(["report"], "report.txt", { type: "text/plain" }),
+  );
+  const send = (target: HTMLElement, type: string) =>
+    target.dispatchEvent(
+      new DragEvent(type, { bubbles: true, cancelable: true, dataTransfer }),
+    );
+  return {
+    enter: (target: HTMLElement) => send(target, "dragenter"),
+    over: (target: HTMLElement) => send(target, "dragover"),
+    drop: (target: HTMLElement) => send(target, "drop"),
+  };
+};
 
 const InteractiveDropZone = (args: ComponentProps<typeof DragAndDrop>) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -146,6 +175,31 @@ const InteractiveDropZone = (args: ComponentProps<typeof DragAndDrop>) => {
 
 export const Default: Story = {
   render: (args) => <InteractiveDropZone {...args} />,
+  play: async ({ args, canvas, canvasElement }) => {
+    const [target] = targets(canvasElement);
+    await expect(canvas.getByText("Drag files here")).toBeVisible();
+
+    // Files held over the target: the accept state and the host's flag.
+    const drag = fileDrag();
+    drag.enter(target);
+    drag.over(target);
+    await waitFor(() => expect(target.className).toMatch(/dragAccept/));
+    await expect(args.onDragOver).toHaveBeenCalled();
+    drag.over(target);
+    await waitFor(() =>
+      expect(canvas.getByText("Drop files here")).toBeVisible(),
+    );
+    await expect(target.className).toMatch(/dragging/);
+
+    // The drop hands over the files.
+    drag.drop(target);
+    await waitFor(() => expect(args.onDrop).toHaveBeenCalledTimes(1));
+    const [files] = (args.onDrop as ReturnType<typeof fn>).mock.calls[0] as [
+      File[],
+    ];
+    await expect(files.map((file) => file.name)).toEqual(["report.txt"]);
+    await waitFor(() => expect(target.className).not.toMatch(/dragAccept/));
+  },
   parameters: {
     docs: {
       description: {
@@ -176,6 +230,15 @@ export const WithDraggingState: Story = {
   args: {
     dragging: true,
   },
+  play: async ({ canvasElement }) => {
+    // Highlighted without any drag.
+    const [target] = targets(canvasElement);
+    await expect(target.className).toMatch(/dragging/);
+    await expect(target.className).not.toMatch(/dragAccept/);
+    await expect(getComputedStyle(target).backgroundColor).not.toBe(
+      "rgba(0, 0, 0, 0)",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -195,6 +258,15 @@ export const Disabled: Story = {
   render: (args) => <InteractiveDropZone {...args} />,
   args: {
     isDragDisabled: true,
+  },
+  play: async ({ args, canvasElement }) => {
+    const [target] = targets(canvasElement);
+    await expect(getComputedStyle(target).opacity).toBe("0.4");
+    // Only a look: the drop still arrives.
+    const drag = fileDrag();
+    drag.enter(target);
+    drag.drop(target);
+    await waitFor(() => expect(args.onDrop).toHaveBeenCalledTimes(1));
   },
   parameters: {
     docs: {
@@ -249,6 +321,18 @@ export const NestedTargets: Story = {
   render: (args) => <NestedTargetsDemo {...args} />,
   args: {
     isDropZone: true,
+  },
+  play: async ({ args, canvas, canvasElement }) => {
+    const [, inner] = targets(canvasElement);
+    // With isDropZone the drop is handed to the outer target.
+    const drag = fileDrag();
+    drag.enter(inner);
+    drag.drop(inner);
+    await waitFor(() =>
+      expect(canvas.getByText("Outer target: 1 drops")).toBeVisible(),
+    );
+    await expect(canvas.getByText("Inner target: 0 drops")).toBeVisible();
+    await expect(args.onDrop).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -332,6 +416,22 @@ export const CssCustomization: Story = {
       </div>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const [dragging, disabled] = targets(canvasElement);
+    await expect(getComputedStyle(dragging).backgroundColor).toBe(
+      "rgb(230, 243, 251)",
+    );
+    await expect(getComputedStyle(disabled).opacity).toBe("0.25");
+    // Files held over it switch to the accept colour.
+    const drag = fileDrag();
+    drag.enter(dragging);
+    await waitFor(() =>
+      expect(getComputedStyle(dragging).backgroundColor).toBe(
+        "rgb(204, 229, 246)",
+      ),
+    );
+    await expect(within(dragging).getByText(/^Dragging/)).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {

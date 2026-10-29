@@ -1,12 +1,14 @@
 import { http, HttpResponse } from "msw";
 
 import lightSmallLogo from "../../../assets/logo/lightsmall.svg?raw";
+import darkLightSmallLogo from "../../../assets/logo/dark_lightsmall.svg?raw";
 import darkLogoMark from "../../../assets/logo/dark_leftmenu.svg?raw";
 
 import { DEMO_PORTAL_URL } from "../demoPortal";
 
 // `WhiteLabelLogoType.Favicon`: the square mark, not the wordmark.
 const FAVICON = "3";
+const LEFT_MENU = "6";
 
 // The ONLYOFFICE mark is the first 48 units of the light wordmark; cropping
 // the viewBox gives the square logo without a second copy of the artwork.
@@ -20,6 +22,21 @@ const svg = (body: string) =>
     headers: { "Content-Type": "image/svg+xml" },
   });
 
+const logoFor = (params: URLSearchParams) => {
+  const isDark = params.get("dark") === "true";
+  if (params.get("logotype") === FAVICON) {
+    return isDark ? darkLogoMark : lightLogoMark;
+  }
+  if (params.get("logotype") === LEFT_MENU) return darkLogoMark;
+  return isDark ? darkLightSmallLogo : lightSmallLogo;
+};
+
+export const demoLogoDataUrl = (src: string) => {
+  if (!src.startsWith(`${DEMO_PORTAL_URL}/logo.ashx`)) return null;
+  const body = logoFor(new URL(src).searchParams);
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(body)}`;
+};
+
 /**
  * The portal's white-label logos, `logo.ashx?logotype=<WhiteLabelLogoType>`,
  * which anything drawing the portal's brand asks for -- the system MCP
@@ -28,12 +45,7 @@ const svg = (body: string) =>
  * rest.
  */
 export const portalHandlers = [
-  http.get(`${DEMO_PORTAL_URL}/logo.ashx`, ({ request }) => {
-    const params = new URL(request.url).searchParams;
-    const isDark = params.get("dark") === "true";
-    if (params.get("logotype") === FAVICON) {
-      return svg(isDark ? darkLogoMark : lightLogoMark);
-    }
-    return svg(lightSmallLogo);
-  }),
+  http.get(`${DEMO_PORTAL_URL}/logo.ashx`, ({ request }) =>
+    svg(logoFor(new URL(request.url).searchParams)),
+  ),
 ];

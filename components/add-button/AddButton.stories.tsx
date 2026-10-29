@@ -1,7 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
 
@@ -162,41 +162,65 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   );
 };
 
+const rect = (element: Element) => element.getBoundingClientRect();
+
+const squares = (canvas: { getAllByTestId: (id: string) => HTMLElement[] }) =>
+  canvas.getAllByTestId("selector-add-button");
+
+const iconOf = (square: HTMLElement) =>
+  square.querySelector("svg") as SVGElement;
+
 export const Default: Story = {
   render: (args) => <AddButton {...args} />,
   args: {
     title: "Add item",
-    tabIndex: 0,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // The wrapper is a tab stop, and Enter adds.
+    await userEvent.tab();
+    await expect(canvas.getByRole("button")).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+
+    await userEvent.click(canvas.getByTestId("selector-add-button"));
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
   },
   parameters: {
     docs: {
       description: {
         story:
-          "The bare square with a plus, for a list that needs one more item and has room for no label. Click it, or press Tab and then Enter, and the Actions panel logs the call (`onClick`, `tabIndex`); change any other prop live in the Controls panel below.",
+          "The bare square with a plus, for a list that needs one more item and has room for no label. Click it, or press Tab and then Enter, and the Actions panel logs the call (`onClick`); change any other prop live in the Controls panel below.",
       },
       source: {
-        code: `<AddButton title="Add item" tabIndex={0} onClick={handleAdd} />`,
+        code: `<AddButton title="Add item" onClick={handleAdd} />`,
       },
     },
   },
 };
 
-const WithLabelTemplate = () => {
+type ClickProps = Pick<ComponentProps<typeof AddButton>, "onClick">;
+
+const WithLabelTemplate = ({ onClick }: ClickProps) => {
   return (
     <Wrapper>
-      <AddButton title="Add item" label="Add user" onClick={() => {}} />
+      <AddButton title="Add item" label="Add user" onClick={onClick} />
       <AddButton
         title="Add item"
         label="Add group"
         isAction
-        onClick={() => {}}
+        onClick={onClick}
       />
     </Wrapper>
   );
 };
 
 export const WithLabel: Story = {
-  render: () => <WithLabelTemplate />,
+  render: (args) => <WithLabelTemplate onClick={args.onClick} />,
+  play: async ({ args, canvas, userEvent }) => {
+    // The words add too, not only the square.
+    await userEvent.click(canvas.getByText("Add user"));
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -211,22 +235,31 @@ export const WithLabel: Story = {
   },
 };
 
-const DisabledTemplate = () => {
+const DisabledTemplate = ({ onClick }: ClickProps) => {
   return (
     <Wrapper>
-      <AddButton title="Add item" isDisabled onClick={() => {}} />
+      <AddButton title="Add item" isDisabled tabIndex={0} onClick={onClick} />
       <AddButton
         title="Add item"
         label="Disabled with label"
         isDisabled
-        onClick={() => {}}
+        onClick={onClick}
       />
     </Wrapper>
   );
 };
 
 export const DisabledStates: Story = {
-  render: () => <DisabledTemplate />,
+  render: (args) => <DisabledTemplate onClick={args.onClick} />,
+  play: async ({ args, canvas, userEvent }) => {
+    const [square] = canvas.getAllByTestId("selector-add-button");
+    await userEvent.click(square);
+    await userEvent.click(canvas.getByText("Disabled with label"));
+
+    await userEvent.tab();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onClick).not.toHaveBeenCalled();
+  },
   parameters: {
     docs: {
       description: {
@@ -252,6 +285,12 @@ const AccentTemplate = () => {
 
 export const AccentStyle: Story = {
   render: () => <AccentTemplate />,
+  play: async ({ canvas }) => {
+    const [plain, accent] = squares(canvas);
+    await expect(getComputedStyle(accent).backgroundColor).not.toBe(
+      getComputedStyle(plain).backgroundColor,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -271,6 +310,16 @@ export const LoadingState: Story = {
   args: {
     title: "Adding...",
     isLoading: true,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const [square] = squares(canvas);
+    // A spinner in place of the plus, in a square of the same size.
+    await expect(Math.round(rect(square).width)).toBe(32);
+    await expect(
+      square.querySelector("[class*='loader' i], [data-testid*='loader' i]"),
+    ).not.toBeNull();
+    await userEvent.click(square);
+    await expect(args.onClick).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -300,6 +349,15 @@ const TruncatedTemplate = () => {
 
 export const TruncatedLabel: Story = {
   render: () => <TruncatedTemplate />,
+  play: async ({ canvas }) => {
+    const label = canvas.getByText(
+      "This is a very long label that should be truncated",
+    );
+    await expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
+    await expect(rect(label).right).toBeLessThanOrEqual(
+      rect(label.closest("div[style]") as Element).right,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -329,6 +387,13 @@ const CustomSizeTemplate = () => {
 
 export const CustomIconSize: Story = {
   render: () => <CustomSizeTemplate />,
+  play: async ({ canvas }) => {
+    const [plain, large] = squares(canvas);
+    await expect(Math.round(rect(plain).width)).toBe(32);
+    await expect(Math.round(rect(large).width)).toBe(36);
+    await expect(Math.round(rect(iconOf(plain)).width)).toBe(12);
+    await expect(Math.round(rect(iconOf(large)).width)).toBe(16);
+  },
   parameters: {
     docs: {
       description: {
@@ -359,6 +424,10 @@ const CustomIconTemplate = () => {
 
 export const WithCustomIcon: Story = {
   render: () => <CustomIconTemplate />,
+  play: async ({ canvas }) => {
+    const [square] = squares(canvas);
+    await expect(Math.round(rect(iconOf(square)).width)).toBe(16);
+  },
   parameters: {
     docs: {
       description: {
@@ -379,6 +448,22 @@ export const WithCustomIcon: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const [square] = squares(canvas);
+    await expect(square).toHaveStyle({
+      width: "40px",
+      height: "40px",
+      borderRadius: "50%",
+      backgroundColor: "rgb(124, 58, 237)",
+    });
+    // The gap is the label's own leading padding.
+    await expect(canvas.getByText("Add item")).toHaveStyle({
+      paddingInlineStart: "16px",
+    });
+    await expect(canvas.getByText("Disabled")).toHaveStyle({
+      color: "rgb(196, 181, 253)",
+    });
+  },
   render: () => (
     <div
       style={

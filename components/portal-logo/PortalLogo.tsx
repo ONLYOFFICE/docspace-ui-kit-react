@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { isMobileOnly } from "react-device-detect";
 import classNames from "classnames";
 import LightSmallLogo from "../../assets/logo/lightsmall.svg";
+import DarkLightSmallLogo from "../../assets/logo/dark_lightsmall.svg";
 
 import { size as deviceSize } from "../../utils";
 import { getLogoUrl } from "../../utils/getLogoUrl";
@@ -13,8 +14,28 @@ import { useTheme } from "../../context/ThemeContext";
 import type { PortalLogoProps } from "./PortalLogo.types";
 import styles from "./PortalLogo.module.scss";
 
-const PortalLogo = ({ className, isResizable = false }: PortalLogoProps) => {
+const PortalLogo = ({
+  className,
+  isResizable = false,
+  alt = "portal logo",
+}: PortalLogoProps) => {
   const [isError, setIsError] = useState(false);
+  // A server-rendered logo can fail before the page hydrates; its error event
+  // has fired by then and onError never runs, leaving a broken image. decode()
+  // rejects for such an image, and only for it: an SVG with no intrinsic size
+  // decodes fine.
+  const catchEarlyError = React.useCallback(
+    (image: HTMLImageElement | null) => {
+      if (!image?.complete) return;
+      // A resize can swap the src of this same element before decode()
+      // settles; a late rejection then belongs to an image no longer shown.
+      const { src } = image;
+      image.decode?.().catch(() => {
+        if (image.src === src) setIsError(true);
+      });
+    },
+    [],
+  );
 
   const { isBase } = useTheme();
 
@@ -50,16 +71,26 @@ const PortalLogo = ({ className, isResizable = false }: PortalLogoProps) => {
   });
 
   if (isError) {
-    return <LightSmallLogo className={classNames("logo-wrapper", className)} />;
+    const FallbackLogo = isBase ? LightSmallLogo : DarkLightSmallLogo;
+
+    return (
+      <FallbackLogo
+        className={classNames("logo-wrapper", className)}
+        role={alt ? "img" : undefined}
+        aria-label={alt || undefined}
+        aria-hidden={alt ? undefined : true}
+      />
+    );
   }
 
   return (
     <div className={wrapperClassName}>
       {logo ? (
         <img
+          ref={catchEarlyError}
           src={logo}
           className={classNames("logo-wrapper", className)}
-          alt="portal logo"
+          alt={alt}
           onError={() => setIsError(true)}
         />
       ) : null}

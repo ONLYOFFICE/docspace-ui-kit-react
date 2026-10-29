@@ -1,17 +1,20 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 
 import { MainButton } from ".";
+
+const onNewDocument = fn().mockName("New document");
 
 const itemsModel = [
   {
     key: 0,
     label: "New document",
     icon: CatalogFolderReactSvgUrl,
+    onClick: onNewDocument,
   },
   {
     key: 1,
@@ -73,7 +76,7 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Whether the button is inert: it dims to 60% opacity and a click neither opens the menu nor calls `onAction`",
+        "Whether the button is inert: it dims to 60% opacity, a click or a key neither opens the menu nor calls `onAction`, and `aria-disabled` is set. It stays in the tab order",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -89,18 +92,18 @@ const meta = {
     opened: {
       control: false,
       description:
-        "Ignored. Nothing reads this prop, and it reaches the button's element as an unknown attribute",
+        "Deprecated and ignored. Nothing reads this prop, and it is not passed to the button's element",
     },
     onAction: {
       action: "onAction",
       description:
-        "Called with the click event when the button is clicked. Only reached while `isDropdown` is off",
+        "Called with the click event when the button is clicked or activated with Enter or Space. Only reached while `isDropdown` is off",
     },
     model: {
       // The icons are data URIs too long to edit, and they stretch the table.
       control: false,
       description:
-        "Items of the menu: a label with an optional icon and description, a separator, or a nested list under `items`. Required even when `isDropdown` is off and nothing reads it",
+        "Items of the menu: a label with an optional icon and description, a separator, or a nested list under `items`. Only read while `isDropdown` is on, and may be left out otherwise",
     },
     hideArrow: {
       control: "boolean",
@@ -144,6 +147,27 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   return <div style={{ maxWidth: "210px" }}>{props.children}</div>;
 };
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+const clickButton = async (
+  { canvas, userEvent }: PlayContext,
+  text: string,
+) => {
+  const button = canvas.getByRole("button", { name: text });
+  await userEvent.click(button);
+  return button;
+};
+
+// The menu fades in, so an item is found first and seen a moment later.
+const findVisibleItem = async (name: string | RegExp) => {
+  const item = await screen.findByRole("menuitem", { name });
+  await waitFor(() => expect(item).toBeVisible());
+  return item;
+};
+
+const isMenuOpen = () =>
+  screen.queryAllByRole("menuitem").some((item) => item.checkVisibility());
+
 export const Default: Story = {
   render: (args) => (
     <Wrapper>
@@ -153,6 +177,24 @@ export const Default: Story = {
   args: {
     text: "Main Button",
     model: itemsModel,
+  },
+  play: async (context) => {
+    const button = await clickButton(context, "Main Button");
+    const item = await findVisibleItem("New document");
+    await expect(button).toHaveAttribute("aria-haspopup", "menu");
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+
+    // Without descriptions the menu takes the button's width.
+    const menu = item.closest(".p-contextmenu") as HTMLElement;
+    await expect(menu.getBoundingClientRect().width).toBeCloseTo(
+      button.getBoundingClientRect().width,
+      0,
+    );
+
+    await context.userEvent.click(item);
+    await expect(onNewDocument).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(isMenuOpen()).toBe(false));
+    await expect(button).toHaveAttribute("aria-expanded", "false");
   },
   parameters: {
     docs: {
@@ -182,11 +224,19 @@ const DisabledTemplate = () => {
 
 export const Disabled: Story = {
   render: () => <DisabledTemplate />,
+  play: async (context) => {
+    // A disabled button drops the click: no menu opens. It stays focusable
+    // and says it is disabled.
+    const button = await clickButton(context, "Disabled Button");
+    await expect(isMenuOpen()).toBe(false);
+    await expect(button).toHaveAttribute("aria-disabled", "true");
+    await expect(button).not.toBeDisabled();
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "MainButton in a disabled state. The button cannot be interacted with and appears with reduced opacity.",
+          "MainButton in a disabled state: it appears with reduced opacity, and a click or a key does nothing. It stays in the tab order and is announced as disabled (`isDisabled`).",
       },
       source: {
         code: `<MainButton text="Disabled Button" isDisabled isDropdown={false} model={[]} />`,
@@ -210,6 +260,16 @@ const DisabledWithDropdownTemplate = () => {
 
 export const DisabledWithDropdown: Story = {
   render: () => <DisabledWithDropdownTemplate />,
+  play: async (context) => {
+    const button = await clickButton(context, "Disabled with Dropdown");
+    // Nor does the keyboard open it.
+    button.focus();
+    await context.userEvent.keyboard("{Enter}");
+    await context.userEvent.keyboard(" ");
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    await expect(isMenuOpen()).toBe(false);
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+  },
   parameters: {
     docs: {
       description: {
@@ -234,6 +294,17 @@ export const WithAction: Story = {
     isDropdown: false,
     model: [],
     onAction: fn(),
+  },
+  play: async (context) => {
+    // isDropdown off: no arrow, and the click calls onAction.
+    const button = await clickButton(context, "Click Me");
+    await expect(context.args.onAction).toHaveBeenCalledTimes(1);
+    await expect(button.querySelector("svg")).toBeNull();
+    await expect(button).not.toHaveAttribute("aria-haspopup");
+    // Enter and Space call it too.
+    await context.userEvent.keyboard("{Enter}");
+    await context.userEvent.keyboard(" ");
+    await expect(context.args.onAction).toHaveBeenCalledTimes(3);
   },
   parameters: {
     docs: {
@@ -280,6 +351,18 @@ const WithItemDescriptionsTemplate = () => {
 
 export const WithItemDescriptions: Story = {
   render: () => <WithItemDescriptionsTemplate />,
+  play: async (context) => {
+    const button = await clickButton(context, "Create");
+    const item = await findVisibleItem(/Blank document/);
+    await expect(item).toHaveTextContent(
+      "Start from an empty page and add the content yourself.",
+    );
+    // With descriptions the menu grows past the button's width.
+    const menu = item.closest(".p-contextmenu") as HTMLElement;
+    await expect(menu.getBoundingClientRect().width).toBeGreaterThan(
+      button.getBoundingClientRect().width,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -319,11 +402,38 @@ const WithDropdownTemplate = () => {
 
 export const WithDropdown: Story = {
   render: () => <WithDropdownTemplate />,
+  play: async (context) => {
+    await clickButton(context, "Create new");
+    // A nested list opens from its parent item.
+    // On a desktop width a nested list opens when its parent is hovered.
+    await context.userEvent.hover(await findVisibleItem("Master form"));
+    await findVisibleItem("From blank");
+    await expect(screen.getAllByRole("separator").length).toBeGreaterThan(0);
+
+    // The keyboard reaches the same menu: Escape closes it, Tab focuses the
+    // button, Enter opens it without picking an item, Enter again picks the
+    // highlighted one.
+    const button = context.canvas.getByRole("button", { name: "Create new" });
+    await context.userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(isMenuOpen()).toBe(false));
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+    button.blur();
+    await context.userEvent.tab();
+    await expect(button).toHaveFocus();
+    onNewDocument.mockClear();
+    await context.userEvent.keyboard("{Enter}");
+    await findVisibleItem("New document");
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+    await expect(onNewDocument).not.toHaveBeenCalled();
+    await context.userEvent.keyboard("{Enter}");
+    await expect(onNewDocument).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(isMenuOpen()).toBe(false));
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "MainButton with a full dropdown menu including icons, nested sub-menus, and separators. Click the button to see the dropdown.",
+          "MainButton with a full dropdown menu including icons, nested sub-menus, and separators. Click the button, or Tab to it and press Enter, to see the dropdown; the arrow keys move through it and Escape closes it.",
       },
       source: {
         code: `<MainButton
@@ -357,6 +467,12 @@ export const WithoutArrow: Story = {
     model: itemsModel,
     hideArrow: true,
   },
+  play: async (context) => {
+    // No arrow, yet a click still opens the menu.
+    const button = await clickButton(context, "Create new");
+    await expect(button.querySelector("svg")).toBeNull();
+    await findVisibleItem("New document");
+  },
   parameters: {
     docs: {
       description: {
@@ -384,6 +500,15 @@ export const RightToLeft: Story = {
     model: itemsModel,
   },
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The arrow moves to the left of the label.
+    const button = canvas.getByTestId("main-button");
+    const label = canvas.getByText("\u062c\u062f\u064a\u062f");
+    const arrow = button.querySelector("svg") as SVGElement;
+    await expect(arrow.getBoundingClientRect().right).toBeLessThanOrEqual(
+      label.getBoundingClientRect().left + 1,
+    );
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -402,6 +527,20 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    // The styled button sits inside the group element.
+    await expect(
+      canvas.getByTestId("main-button").firstElementChild as HTMLElement,
+    ).toHaveStyle({
+      backgroundColor: "rgb(0, 130, 201)",
+      borderRadius: "50px",
+    });
+    await expect(canvas.getByText("New")).toHaveStyle({
+      color: "rgb(255, 255, 255)",
+      fontSize: "14px",
+      fontWeight: "600",
+    });
+  },
   render: () => (
     <div
       style={

@@ -19,10 +19,15 @@ const EmptyScreenContainer = (props: EmptyScreenContainerProps) => {
     buttonStyle,
     withoutFilter,
     className,
+    id,
+    style,
+    headingLevel = 3,
   } = props;
 
   return (
     <div
+      id={id}
+      style={style}
       className={classNames(
         styles.body,
         {
@@ -43,9 +48,7 @@ const EmptyScreenContainer = (props: EmptyScreenContainerProps) => {
 
       {headerText ? (
         <Text
-          as="span"
-          fontSize="19px"
-          fontWeight="700"
+          as={`h${headingLevel}`}
           className={classNames(styles.header, "ec-header")}
         >
           {headerText}
@@ -54,7 +57,7 @@ const EmptyScreenContainer = (props: EmptyScreenContainerProps) => {
 
       {subheadingText ? (
         <Text
-          as="span"
+          as="p"
           fontWeight="600"
           className={classNames(styles.subheading, "ec-subheading")}
         >
@@ -64,7 +67,7 @@ const EmptyScreenContainer = (props: EmptyScreenContainerProps) => {
 
       {descriptionText ? (
         <Text
-          as="span"
+          as="div"
           fontSize="12px"
           className={classNames(styles.description, "ec-desc")}
         >

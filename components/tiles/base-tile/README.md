@@ -266,9 +266,10 @@ export function TileWithMenu() {
   carries no label. Give it one through the content, or mark the tile up as a list item yourself.
 - The three-dot button has a tooltip title from the translation function, which is also its
   accessible name; without a translation provider it is an unlabelled control.
-- Neither `isBlockingOperation` nor `inProgress` sets `aria-busy` or `aria-disabled`.
-  `inProgress` changes only the appearance; `isBlockingOperation` turns off the pointer but not
-  the keyboard, so a busy tile's checkbox can still be toggled from it.
+- `inProgress` sets `aria-busy="true"` on the tile, and the loader it shows is decorative, so
+  the busy state is announced once, by the tile. `isBlockingOperation` sets neither
+  `aria-busy` nor `aria-disabled`: it turns off the pointer but not the keyboard, so a blocked
+  tile's checkbox can still be toggled from it.
 - The right-click menu replaces the browser's own and is not reachable from the keyboard: the
   three-dot button is the only path to those actions, so keep it available.
 

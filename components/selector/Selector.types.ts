@@ -707,6 +707,7 @@ type TSelectorItemEmpty = {
   access?: undefined;
   fileExst?: undefined;
   fileType?: undefined;
+  encrypted?: undefined;
   shared?: undefined;
   parentId?: undefined;
   rootFolderType?: undefined;
@@ -795,6 +796,11 @@ export type TSelectorItemFile = MergeTypes<
     fileExst: string;
     /** Which kind of document it is, which picks the icon. */
     fileType: FileType;
+    /**
+     * Whether the file is end-to-end encrypted, so the title the server holds
+     * is an opaque placeholder rather than its name.
+     */
+    encrypted?: boolean;
     /** Whether the file is a form. */
     isForm?: boolean;
     /** Backing table of an external data source, for form rows. */

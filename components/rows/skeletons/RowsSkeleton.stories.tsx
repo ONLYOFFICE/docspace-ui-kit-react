@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 
 import React from "react";
 
@@ -120,10 +121,22 @@ type Story = StoryObj<ComponentProps<typeof RowsSkeleton>>;
 
 export default meta;
 
+// The sweeping band of react-content-loader is an <animateTransform>.
+const isAnimated = (root: Element) =>
+  root.querySelector("animateTransform") !== null;
+
 export const Default: Story = {
   render: (args) => <RowsSkeleton {...args} />,
   args: {
     count: 5,
+  },
+  play: async ({ canvas }) => {
+    const list = canvas.getByTestId("rows-skeleton");
+    const rows = canvas.getAllByTestId("row-skeleton");
+    await expect(rows).toHaveLength(5);
+    await expect(isAnimated(list)).toBe(true);
+    // A square start element, not a round one.
+    await expect(rows[0].querySelector("clipPath circle")).toBeNull();
   },
   parameters: {
     docs: {
@@ -143,6 +156,10 @@ export const StaticPlaceholder: Story = {
   args: {
     count: 3,
     animate: false,
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getAllByTestId("row-skeleton")).toHaveLength(3);
+    await expect(isAnimated(canvas.getByTestId("rows-skeleton"))).toBe(false);
   },
   parameters: {
     docs: {
@@ -167,6 +184,13 @@ const RoundStartElementTemplate = () => (
 
 export const RoundStartElement: Story = {
   render: () => <RoundStartElementTemplate />,
+  play: async ({ canvas }) => {
+    const rows = canvas.getAllByTestId("row-skeleton");
+    await expect(rows).toHaveLength(3);
+    for (const row of rows) {
+      await expect(row.querySelector("clipPath circle")).not.toBeNull();
+    }
+  },
   parameters: {
     docs: {
       description: {

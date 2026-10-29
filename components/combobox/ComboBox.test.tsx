@@ -6,6 +6,7 @@ import { ComboBox } from "./ComboBox";
 import { ComboBoxDisplayType, ComboBoxSize } from "./ComboBox.enums";
 import styles from "./ComboBox.module.scss";
 import * as DropDownModule from "../drop-down";
+import { DropDownItem } from "../drop-down-item";
 import type { DropDownProps } from "../drop-down/DropDown.types";
 
 const mockOptions = [
@@ -188,52 +189,386 @@ describe("ComboBox", () => {
     expect(setIsOpenItemAccess).toHaveBeenCalledWith(true);
   });
 
-  it("moves focus between options with ArrowDown key", () => {
+  it("opens from the keyboard and highlights only options that can be picked", () => {
     render(<ComboBox {...baseProps} />);
+    const button = screen.getByRole("button");
 
-    // Open combobox so keyboard handler is active
-    fireEvent.click(screen.getByRole("button"));
+    // Option 1 is the current value, 3 is disabled and 4 a separator,
+    // so Option 2 is the only one the highlight may land on.
+    fireEvent.keyDown(button, { key: "ArrowDown" });
+    expect(button).toHaveAttribute("aria-expanded", "true");
 
-    const first = document.createElement("div");
-    first.setAttribute("data-testid", "drop-down-item");
-    const second = document.createElement("div");
-    second.setAttribute("data-testid", "drop-down-item");
+    const highlighted = () =>
+      document.getElementById(
+        button.getAttribute("aria-activedescendant") ?? "",
+      );
+    expect(highlighted()).toHaveTextContent("Option 2");
+    expect(highlighted()).toHaveAttribute("data-focused", "true");
 
-    document.body.append(first, second);
-
-    // First ArrowDown focuses first option
-
-    fireEvent.keyDown(document, { key: "ArrowDown" });
-    expect(first.getAttribute("data-focused")).toBe("true");
-    expect(second.getAttribute("data-focused")).toBe("false");
-
-    // Second ArrowDown moves focus to second option
-    fireEvent.keyDown(document, { key: "ArrowDown" });
-    expect(first.getAttribute("data-focused")).toBe("false");
-    expect(second.getAttribute("data-focused")).toBe("true");
-
-    document.body.removeChild(first);
-    document.body.removeChild(second);
+    fireEvent.keyDown(button, { key: "ArrowDown" });
+    expect(highlighted()).toHaveTextContent("Option 2");
+    fireEvent.keyDown(button, { key: "ArrowUp" });
+    expect(highlighted()).toHaveTextContent("Option 2");
   });
 
-  it("calls onSelect when Enter is pressed on focused option", () => {
+  it("picks the highlighted option with Enter and closes on Escape", () => {
     const onSelect = vi.fn();
 
     render(<ComboBox {...baseProps} onSelect={onSelect} />);
+    const button = screen.getByRole("button");
 
-    // Open combobox so keyboard handler is active
+    fireEvent.keyDown(button, { key: "Enter" });
+    fireEvent.keyDown(button, { key: "Enter" });
+    expect(onSelect).toHaveBeenCalledWith(baseProps.options[1]);
+    expect(button).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.keyDown(button, { key: " " });
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    fireEvent.keyDown(button, { key: "Escape" });
+    expect(button).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("leaves Enter elsewhere on the page alone while the list is open", () => {
+    render(<ComboBox {...baseProps} />);
     fireEvent.click(screen.getByRole("button"));
 
-    const focusedOption = document.createElement("div");
-    focusedOption.setAttribute("data-testid", "drop-down-item");
-    focusedOption.setAttribute("data-focused", "true");
-    document.body.appendChild(focusedOption);
+    const event = new KeyboardEvent("keydown", {
+      key: "Enter",
+      bubbles: true,
+      cancelable: true,
+    });
+    document.body.dispatchEvent(event);
 
-    fireEvent.keyDown(document, { key: "Enter" });
+    expect(event.defaultPrevented).toBe(false);
+  });
 
-    expect(onSelect).toHaveBeenCalledWith(baseProps.options[0]);
+  it("highlights the option Enter picks in a list with dropDownMaxHeight", () => {
+    const options = [
+      { key: "a", label: "A" },
+      { key: "b", label: "B" },
+      { key: "c", label: "C" },
+      { key: "d", label: "D" },
+    ];
+    const onSelect = vi.fn();
 
-    document.body.removeChild(focusedOption);
+    render(
+      <ComboBox
+        options={options}
+        selectedOption={options[0]}
+        onSelect={onSelect}
+        dropDownMaxHeight={200}
+        isDefaultMode={false}
+      />,
+    );
+    const button = screen.getByRole("button");
+
+    // The virtual list renders these rows, and used to overwrite the
+    // combo box's highlight with its own index.
+    fireEvent.keyDown(button, { key: "ArrowDown", code: "ArrowDown" });
+    fireEvent.keyDown(button, { key: "ArrowDown", code: "ArrowDown" });
+    const highlighted = [
+      ...document.querySelectorAll('[data-focused="true"]'),
+    ].map((node) => node.textContent);
+    expect(highlighted).toEqual(["C"]);
+
+    // Its window listener used to prevent every key, Tab included.
+    const tab = new KeyboardEvent("keydown", {
+      key: "Tab",
+      code: "Tab",
+      bubbles: true,
+      cancelable: true,
+    });
+    window.dispatchEvent(tab);
+    expect(tab.defaultPrevented).toBe(false);
+
+    fireEvent.keyDown(button, { key: "ArrowUp", code: "ArrowUp" });
+    fireEvent.keyDown(button, { key: "ArrowDown", code: "ArrowDown" });
+    fireEvent.keyDown(button, { key: "Enter", code: "Enter" });
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(onSelect).toHaveBeenCalledWith(options[2]);
+  });
+
+  it("leaves Enter to custom content in an open list with advancedOptions", () => {
+    render(
+      <ComboBox
+        {...baseProps}
+        options={[]}
+        advancedOptions={
+          <>
+            <button type="button">Inside</button>
+            <span>Note</span>
+          </>
+        }
+      />,
+    );
+    const combo = screen.getAllByRole("button")[0];
+    fireEvent.click(combo);
+
+    const enter = new KeyboardEvent("keydown", {
+      key: "Enter",
+      bubbles: true,
+      cancelable: true,
+    });
+    combo.dispatchEvent(enter);
+    expect(enter.defaultPrevented).toBe(false);
+  });
+
+  it("leaves the arrows alone in an open list with advancedOptions", () => {
+    render(
+      <ComboBox
+        {...baseProps}
+        options={[]}
+        advancedOptions={
+          <>
+            <button type="button">Inside</button>
+            <span>Note</span>
+          </>
+        }
+      />,
+    );
+    const combo = screen.getAllByRole("button")[0];
+    fireEvent.click(combo);
+    expect(combo).toHaveAttribute("aria-expanded", "true");
+    // Stands in for the portal's page hotkeys, which listen on window.
+    const onWindowKeyDown = vi.fn();
+    window.addEventListener("keydown", onWindowKeyDown);
+
+    for (const key of ["ArrowDown", "ArrowUp"]) {
+      const event = new KeyboardEvent("keydown", {
+        key,
+        bubbles: true,
+        cancelable: true,
+      });
+      combo.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(false);
+    }
+    expect(onWindowKeyDown).not.toHaveBeenCalled();
+    expect(combo).toHaveAttribute("aria-expanded", "true");
+
+    window.removeEventListener("keydown", onWindowKeyDown);
+  });
+
+  // AccessRightSelect draws its rich rows as advancedOptions DropDownItems.
+  describe("advancedOptions made of DropDownItems", () => {
+    const renderRows = (onPick: (key: string) => void) =>
+      render(
+        <ComboBox
+          {...baseProps}
+          options={[]}
+          advancedOptions={
+            <div style={{ display: "contents" }}>
+              <DropDownItem key="manager" onClick={() => onPick("manager")}>
+                Manager
+              </DropDownItem>
+              <DropDownItem key="s1" isSeparator />
+              <DropDownItem
+                key="editor"
+                disabled
+                onClick={() => onPick("editor")}
+              >
+                Editor
+              </DropDownItem>
+              <DropDownItem
+                key="viewer"
+                isSelected
+                onClick={() => onPick("viewer")}
+              >
+                Viewer
+              </DropDownItem>
+            </div>
+          }
+        />,
+      );
+
+    const highlighted = (button: HTMLElement) =>
+      document.getElementById(
+        button.getAttribute("aria-activedescendant") ?? "",
+      );
+
+    it("opens on the selected row and walks the others, skipping what cannot be picked", () => {
+      renderRows(vi.fn());
+      const button = screen.getAllByRole("button")[0];
+
+      fireEvent.keyDown(button, { key: "Enter" });
+      expect(button).toHaveAttribute("aria-expanded", "true");
+      expect(highlighted(button)).toHaveTextContent("Viewer");
+      expect(highlighted(button)).toHaveAttribute("data-focused", "true");
+
+      fireEvent.keyDown(button, { key: "ArrowDown" });
+      expect(highlighted(button)).toHaveTextContent("Manager");
+      fireEvent.keyDown(button, { key: "ArrowDown" });
+      expect(highlighted(button)).toHaveTextContent("Viewer");
+      fireEvent.keyDown(button, { key: "ArrowUp" });
+      expect(highlighted(button)).toHaveTextContent("Manager");
+    });
+
+    it("picks the highlighted row with Enter, as a click on it does", () => {
+      const onPick = vi.fn();
+      renderRows(onPick);
+      const button = screen.getAllByRole("button")[0];
+
+      fireEvent.keyDown(button, { key: "Enter" });
+      fireEvent.keyDown(button, { key: "ArrowDown" });
+      fireEvent.keyDown(button, { key: "Enter" });
+
+      expect(onPick).toHaveBeenCalledTimes(1);
+      expect(onPick).toHaveBeenCalledWith("manager");
+      expect(button).toHaveAttribute("aria-expanded", "false");
+    });
+
+    it("keeps the arrows from the page's hotkeys", () => {
+      renderRows(vi.fn());
+      const button = screen.getAllByRole("button")[0];
+      fireEvent.keyDown(button, { key: "Enter" });
+
+      const onWindowKeyDown = vi.fn();
+      window.addEventListener("keydown", onWindowKeyDown);
+      const down = fireEvent.keyDown(button, { key: "ArrowDown" });
+      window.removeEventListener("keydown", onWindowKeyDown);
+
+      expect(down).toBe(false);
+      expect(onWindowKeyDown).not.toHaveBeenCalled();
+    });
+
+    // The Filter's sort items and the table's checkbox options are found by
+    // the ids their callers set.
+    it("keeps the id a row was given, and highlights and picks it by that id", () => {
+      const onPick = vi.fn();
+      render(
+        <ComboBox
+          {...baseProps}
+          options={[]}
+          advancedOptions={
+            <div style={{ display: "contents" }}>
+              <DropDownItem
+                key="name"
+                id="sort-by_name"
+                onClick={() => onPick("name")}
+              >
+                Name
+              </DropDownItem>
+              <DropDownItem key="size" onClick={() => onPick("size")}>
+                Size
+              </DropDownItem>
+            </div>
+          }
+        />,
+      );
+      const button = screen.getAllByRole("button")[0];
+
+      fireEvent.keyDown(button, { key: "Enter" });
+
+      expect(document.getElementById("sort-by_name")).toHaveTextContent("Name");
+      expect(button).toHaveAttribute("aria-activedescendant", "sort-by_name");
+      expect(highlighted(button)).toHaveTextContent("Name");
+
+      fireEvent.keyDown(button, { key: "ArrowDown" });
+      expect(highlighted(button)).toHaveTextContent("Size");
+
+      fireEvent.keyDown(button, { key: "ArrowUp" });
+      fireEvent.keyDown(button, { key: "Enter" });
+      expect(onPick).toHaveBeenCalledWith("name");
+    });
+
+    // Two Filters on a page give their sort rows the same ids: Enter must
+    // pick the row of the list it was pressed in, not the first match.
+    it("picks its own row when another list carries the same row id", () => {
+      const onPickFirst = vi.fn();
+      const onPickSecond = vi.fn();
+      const sortList = (onPick: () => void) => (
+        <div style={{ display: "contents" }}>
+          <DropDownItem key="name" id="sort-by_name" onClick={onPick}>
+            Name
+          </DropDownItem>
+          <DropDownItem key="size">Size</DropDownItem>
+        </div>
+      );
+      render(
+        <>
+          <ComboBox
+            {...baseProps}
+            options={[]}
+            advancedOptions={sortList(onPickFirst)}
+          />
+          <ComboBox
+            {...baseProps}
+            options={[]}
+            advancedOptions={sortList(onPickSecond)}
+          />
+        </>,
+      );
+      const second = screen
+        .getAllByRole("button")
+        .filter((node) => node.getAttribute("aria-haspopup") === "listbox")[1];
+
+      fireEvent.keyDown(second, { key: "Enter" });
+
+      // Both lists are mounted, and the first one's row comes first.
+      // (An attribute selector: jsdom resolves "#id" document-wide.)
+      expect(document.querySelectorAll('[id="sort-by_name"]')).toHaveLength(2);
+
+      fireEvent.keyDown(second, { key: "Enter" });
+
+      expect(onPickSecond).toHaveBeenCalledTimes(1);
+      expect(onPickFirst).not.toHaveBeenCalled();
+    });
+  });
+
+  it("leaves keys in the children block to the children", () => {
+    render(
+      <ComboBox {...baseProps}>
+        <button type="button">Extra</button>
+      </ComboBox>,
+    );
+    const combo = screen.getAllByRole("button")[0];
+    const extra = screen.getByRole("button", { name: "Extra" });
+
+    for (const key of ["Enter", " ", "ArrowDown"]) {
+      const event = new KeyboardEvent("keydown", {
+        key,
+        bubbles: true,
+        cancelable: true,
+      });
+      extra.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(false);
+    }
+    expect(combo).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("keeps the keys of a combo box rendered in another's children block", () => {
+    render(
+      <ComboBox {...baseProps}>
+        <ComboBox {...baseProps} />
+      </ComboBox>,
+    );
+    const [outer, inner] = screen.getAllByRole("button");
+
+    fireEvent.keyDown(inner, { key: "ArrowDown" });
+
+    expect(inner).toHaveAttribute("aria-expanded", "true");
+    expect(outer).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("handles keys in the children block when disableIconClick is off", () => {
+    render(
+      <ComboBox {...baseProps} disableIconClick={false}>
+        <button type="button">Extra</button>
+      </ComboBox>,
+    );
+    const combo = screen.getAllByRole("button")[0];
+
+    fireEvent.keyDown(screen.getByRole("button", { name: "Extra" }), {
+      key: "ArrowDown",
+    });
+    expect(combo).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("does not open from the keyboard while disabled", () => {
+    render(<ComboBox {...baseProps} isDisabled />);
+    const button = screen.getByRole("button");
+
+    fireEvent.keyDown(button, { key: "ArrowDown" });
+    expect(button).toHaveAttribute("aria-expanded", "false");
   });
 
   it("ignores unsupported keys in keyboard handler", () => {
@@ -329,5 +664,57 @@ describe("ComboBox", () => {
     render(<ComboBox {...baseProps} />);
     const button = screen.getByRole("button");
     expect(button).toHaveAttribute("tabindex", "1");
+  });
+
+  // A ModalDialog around the combo box closes on an Escape keyup on window.
+  it("keeps the Escape keyup that closed the list from window listeners", () => {
+    const onWindowKeyUp = vi.fn();
+    window.addEventListener("keyup", onWindowKeyUp);
+
+    render(<ComboBox {...baseProps} />);
+    const button = screen.getByRole("button");
+
+    fireEvent.keyDown(button, { key: "ArrowDown" });
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    fireEvent.keyDown(button, { key: "Escape" });
+    fireEvent.keyUp(button, { key: "Escape" });
+
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    window.removeEventListener("keyup", onWindowKeyUp);
+    expect(onWindowKeyUp).not.toHaveBeenCalledWith(
+      expect.objectContaining({ key: "Escape" }),
+    );
+  });
+  // Holding Escape: the first keydown closes the list, the autorepeat ones
+  // arrive with the list already closed, and the keyup comes only on release
+  // -- which may be well past consumeKey's one-second guard.
+  it("keeps a held Escape's late keyup from window listeners", () => {
+    vi.useFakeTimers();
+    const onWindowKeyUp = vi.fn();
+    window.addEventListener("keyup", onWindowKeyUp);
+
+    try {
+      render(<ComboBox {...baseProps} />);
+      const button = screen.getByRole("button");
+
+      fireEvent.keyDown(button, { key: "ArrowDown" });
+      fireEvent.keyUp(button, { key: "ArrowDown" });
+      expect(button).toHaveAttribute("aria-expanded", "true");
+
+      fireEvent.keyDown(button, { key: "Escape" });
+      expect(button).toHaveAttribute("aria-expanded", "false");
+      for (let i = 0; i < 3; i += 1) {
+        vi.advanceTimersByTime(400);
+        fireEvent.keyDown(button, { key: "Escape", repeat: true });
+      }
+      fireEvent.keyUp(button, { key: "Escape" });
+
+      expect(onWindowKeyUp).not.toHaveBeenCalledWith(
+        expect.objectContaining({ key: "Escape" }),
+      );
+    } finally {
+      window.removeEventListener("keyup", onWindowKeyUp);
+      vi.useRealTimers();
+    }
   });
 });

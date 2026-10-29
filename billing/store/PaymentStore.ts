@@ -43,6 +43,8 @@ import type {
   TAccountingPrice,
   TActiveService,
   TBalance,
+  TInvoice,
+  TInvoicesPage,
   TServiceUsage,
   TUsagePeriodKey,
 } from "../types";
@@ -53,6 +55,7 @@ import {
   getIsCardLinkedToPortal,
   getIsCardMissingOrInactive,
   getIsPayer,
+  getIsStripePortalAvailable,
   getWalletBalanceAmount,
   getWalletBalanceCurrency,
   formatPaymentDate,
@@ -63,6 +66,7 @@ import {
 } from "../utils/parsers";
 import { getUsageRange } from "../usage/utils";
 import { getServiceRoute } from "../utils/url";
+import { openLoadingTab } from "../utils/loadingTab";
 import { isDocsConnectServiceName } from "../utils/docs-connect";
 import { combineUrl } from "../../utils/combineUrl";
 import { getCookie } from "../../utils/cookie";
@@ -108,6 +112,8 @@ import PaymentQuotasStore from "./PaymentQuotasStore";
 
 export const TOTAL_SIZE = "total_size";
 
+const INVOICES_PAGE_SIZE = 25;
+
 export type TTransactionFilterContact = {
   id: string;
   displayName?: string;
@@ -126,6 +132,8 @@ class PaymentStore {
   private commonSettingsApi: CommonSettingsApi;
 
   #rawApiClient: TApiClient;
+
+  #openingInvoiceIds = new Set<number>();
 
   private abortControllers: AbortController[] = [];
 
@@ -180,6 +188,7 @@ class PaymentStore {
     diskStorage: "",
     docsConnect: "",
     wallet: "",
+    paymentMethod: "",
   };
 
   licenseQuota: Record<string, unknown> | null = null;
@@ -246,6 +255,14 @@ class PaymentStore {
   isTransactionHistoryExist = false;
 
   upcomingPaymentsData: TUpcomingPaymentResponse[] = [];
+
+  invoices: TInvoice[] = [];
+
+  invoicesTotal = 0;
+
+  isInitInvoices = false;
+
+  isLoadingMoreInvoices = false;
 
   activeServices: TActiveService[] = [];
 
@@ -393,7 +410,7 @@ class PaymentStore {
   }
 
   get isStripePortalAvailable() {
-    return this.isOwner || this.isPayer;
+    return getIsStripePortalAvailable(this.isOwner, this.isPayer);
   }
 
   get canUpdateTariff() {
@@ -690,6 +707,127 @@ class PaymentStore {
     }
   };
 
+  get hasMoreInvoices() {
+    return this.invoices.length < this.invoicesTotal;
+  }
+
+  #requestInvoices = async (offset: number) => {
+    const abortController = new AbortController();
+    this.addAbortController(abortController);
+
+    const { data } = await this.#rawApiClient.instance.get(
+      "api/2.0/portal/payment/customer/deposits",
+      {
+        params: { status: "Completed", offset, limit: INVOICES_PAGE_SIZE },
+        signal: abortController.signal,
+      },
+    );
+
+    const page = data?.response as TInvoicesPage | null | undefined;
+    const collection = page?.collection ?? [];
+
+    return {
+      collection,
+      total: page?.totalQuantity ?? offset + collection.length,
+    };
+  };
+
+  fetchInvoices = async () => {
+    try {
+      const { collection, total } = await this.#requestInvoices(0);
+
+      runInAction(() => {
+        this.invoices = collection;
+        this.invoicesTotal = total;
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      toastr.error(error as Error);
+    }
+
+    runInAction(() => {
+      this.isInitInvoices = true;
+    });
+  };
+
+  invoiceHistoryInit = async () => {
+    if (!this.isOwner) {
+      try {
+        await this.tariff.fetchCustomerInfo();
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === "CanceledError") return;
+        console.error(error);
+      }
+    }
+
+    if (this.isStripePortalAvailable) {
+      await this.fetchInvoices();
+      return;
+    }
+
+    runInAction(() => {
+      this.isInitInvoices = true;
+    });
+  };
+
+  fetchMoreInvoices = async () => {
+    if (this.isLoadingMoreInvoices || !this.hasMoreInvoices) return;
+
+    this.isLoadingMoreInvoices = true;
+
+    try {
+      const { collection, total } = await this.#requestInvoices(
+        this.invoices.length,
+      );
+
+      runInAction(() => {
+        this.invoices = [...this.invoices, ...collection];
+        this.invoicesTotal = collection.length ? total : this.invoices.length;
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      toastr.error(error as Error);
+    } finally {
+      runInAction(() => {
+        this.isLoadingMoreInvoices = false;
+      });
+    }
+  };
+
+  openInvoice = async (id: number, t: TTranslation) => {
+    if (this.#openingInvoiceIds.has(id)) return;
+
+    const tab = openLoadingTab(t("Common:LoadingProcessing"));
+
+    if (!tab) {
+      toastr.error(t("Common:UnexpectedError"));
+      return;
+    }
+
+    this.#openingInvoiceIds.add(id);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        `api/2.0/portal/payment/customer/deposits/${id}/invoice`,
+      );
+
+      const url = data?.response as string | undefined;
+
+      if (!url) {
+        tab.close();
+        toastr.error(t("Common:UnexpectedError"));
+        return;
+      }
+
+      tab.location.href = url;
+    } catch (error: unknown) {
+      tab.close();
+      toastr.error(error as Error);
+    } finally {
+      this.#openingInvoiceIds.delete(id);
+    }
+  };
+
   fetchActiveServices = async () => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
@@ -933,17 +1071,20 @@ class PaymentStore {
     serviceName?: string,
     from?: DateTime,
     to?: DateTime,
+    silent = false,
   ) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
-    this._transactionTimerId = setTimeout(() => {
-      runInAction(() => {
-        if (this._transactionTimerId !== null) {
-          this.isTransactionLoading = true;
-        }
-      });
-    }, 500);
+    if (!silent) {
+      this._transactionTimerId = setTimeout(() => {
+        runInAction(() => {
+          if (this._transactionTimerId !== null) {
+            this.isTransactionLoading = true;
+          }
+        });
+      }, 500);
+    }
 
     const { isCredit, isDebit } = getTransactionType(
       this.filterSelectedTypeKey,
@@ -982,21 +1123,30 @@ class PaymentStore {
       });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
+      // A silent refresh runs in the background after an action that has
+      // already reported its own result (a top-up's success toast); an error
+      // toast after it would make the action look failed.
+      if (silent) {
+        console.error(error);
+        return;
+      }
       toastr.error(error as Error);
-      runInAction(() => {
-        this.isTransactionLoading = true;
-      });
     } finally {
-      runInAction(() => {
-        if (this._transactionTimerId) {
-          clearTimeout(this._transactionTimerId);
-          this._transactionTimerId = null;
-        }
+      if (!silent) {
+        runInAction(() => {
+          if (this._transactionTimerId) {
+            clearTimeout(this._transactionTimerId);
+            this._transactionTimerId = null;
+          }
 
-        this.isTransactionLoading = false;
-      });
+          this.isTransactionLoading = false;
+        });
+      }
     }
   };
+
+  refreshTransactionHistory = (serviceName?: string) =>
+    this.fetchTransactionHistory(serviceName, undefined, undefined, true);
 
   fetchAutoPayments = async () => {
     const abortController = new AbortController();
