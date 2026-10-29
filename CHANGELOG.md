@@ -552,6 +552,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   elsewhere — a sign-in redirect, a link followed in the tab — would have received them. Both
   windows open the portal's `/doceditor`, so the calls are now addressed to
   `window.location.origin` and the browser drops one whose window holds any other page.
+- Table: a column reset no longer squeezes the name column below its own minimum. With many columns on and a narrow list, for instance beside the AI chat, the reset took every other column's minimum out of the name column's share, down to a negative width that broke the grid: the header lost its title and the rows came out empty. The name column now keeps its minimum, and when the other columns cannot fit next to it the table shows the name column alone, as a resize already does
 
 ## 4.1.0
 
