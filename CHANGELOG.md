@@ -95,6 +95,7 @@
 - Context menu (desktop and mobile sheet) and `DropDownItem`: a string icon is fetched and inlined through `react-svg` only when it is a `.svg` on the page's own origin or, where it already was, an SVG data URL. Anything else, a cross-origin `.svg` included, is an `<img>`, so a custom action whose icon lives on the integrator's domain no longer needs CORS headers there and no longer loses its icon. The old rule looked for `images/` or `.svg` in the path and inlined such icons from any origin; a cross-origin SVG now keeps its own colours instead of taking the text colour
 - Section: the chat panel's resize edge takes a finger or a pen, not only a mouse. It listened to mouse events alone, so a touch drag on it panned the page instead of resizing the panel
 - Section: a resizable chat panel opened after the section mounted gives width back when the row shrinks. The watch on the row was set up only for a panel already open on mount, so a chat opened later kept its dragged width and squeezed the section
+- Section: a click on the chat panel's resize edge no longer widens it by 1px. The drag measured the panel together with its border and committed that width even when the pointer had not moved
 
 ## 4.0.1
 

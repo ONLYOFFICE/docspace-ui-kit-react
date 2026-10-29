@@ -24,6 +24,21 @@ const contentWidth = (panel: HTMLElement) => {
     : Number.POSITIVE_INFINITY;
 };
 
+const ownWidth = (panel: HTMLElement) => {
+  const { width } = panel.getBoundingClientRect();
+  const style = window.getComputedStyle(panel);
+  if (style.boxSizing === "border-box") return width;
+
+  const px = (value: string) => parseFloat(value) || 0;
+  return (
+    width -
+    px(style.borderLeftWidth) -
+    px(style.borderRightWidth) -
+    px(style.paddingLeft) -
+    px(style.paddingRight)
+  );
+};
+
 // Section re-measures itself through a throttled ResizeObserver; nudge the
 // resize listeners so table columns and tiles settle right away.
 const settleLayout = () => window.dispatchEvent(new Event("resize"));
@@ -96,7 +111,7 @@ export const useEdgeResizer = ({
         // Sub-pixel rounding of the flex row is not a deficit worth acting on.
         if (deficit < 1) return;
 
-        const current = panel.getBoundingClientRect().width;
+        const current = ownWidth(panel);
         const next = Math.max(minWidth, Math.round(current - deficit));
         if (next >= current) return;
 
@@ -145,7 +160,7 @@ export const useEdgeResizer = ({
       // than the drag restarted, when it crosses the fullscreen boundary — that
       // is what makes the gesture continuous in both directions.
       let anchorX = e.clientX;
-      let anchorWidth = panel.getBoundingClientRect().width;
+      let anchorWidth = ownWidth(panel);
       let fullscreen = !!isFullscreen;
 
       // Grow only into the slack the content next to the panel still has above
@@ -164,7 +179,8 @@ export const useEdgeResizer = ({
           : Math.min(maxWidth ?? Number.POSITIVE_INFINITY, dockedLimit),
       );
 
-      let nextWidth = anchorWidth;
+      const startWidth = Math.round(anchorWidth);
+      let nextWidth = startWidth;
       let committed = false;
 
       const onPointerMove = (event: PointerEvent) => {
@@ -242,7 +258,8 @@ export const useEdgeResizer = ({
         stopDrag();
         // A drag that never left fullscreen has no width to commit, and one
         // that left it on its last frame already committed the same value.
-        if (!fullscreen && !committed) onResize?.(nextWidth);
+        if (!fullscreen && !committed && nextWidth !== startWidth)
+          onResize?.(nextWidth);
         settleLayout();
       }
 

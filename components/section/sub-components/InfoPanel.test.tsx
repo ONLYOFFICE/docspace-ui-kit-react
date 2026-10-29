@@ -99,10 +99,44 @@ describe("InfoPanel resizer", () => {
     render(panel({ onResize }));
 
     drag(800, 1600);
-    expect(onResize).toHaveBeenLastCalledWith(400);
+    expect(panelWidth()).toBe("400px");
+    expect(onResize).not.toHaveBeenCalled();
 
     drag(800, -1600);
     expect(onResize).toHaveBeenLastCalledWith(800);
+  });
+
+  it("saves nothing for a click on the edge", () => {
+    const onResize = vi.fn();
+    render(panel({ width: 520, onResize }));
+
+    fireEvent.pointerDown(resizer(), { clientX: 800, button: 0 });
+    fireEvent.pointerUp(window);
+    fireEvent.pointerDown(resizer(), { clientX: 800, button: 0 });
+    fireEvent.pointerUp(window);
+    fireEvent.doubleClick(resizer());
+
+    expect(onResize).toHaveBeenCalledTimes(1);
+    expect(onResize).toHaveBeenCalledWith(400);
+  });
+
+  it("measures its own width without the border", () => {
+    vi.restoreAllMocks();
+    mockLayout(1000, 401);
+    vi.spyOn(window, "getComputedStyle").mockReturnValue({
+      direction: "ltr",
+      boxSizing: "content-box",
+      borderLeftWidth: "1px",
+      borderRightWidth: "0px",
+      paddingLeft: "0px",
+      paddingRight: "0px",
+    } as CSSStyleDeclaration);
+    const onResize = vi.fn();
+    render(panel({ onResize }));
+
+    drag(800, 700);
+
+    expect(onResize).toHaveBeenCalledWith(500);
   });
 
   it("grows only into the slack the section can give up", () => {
