@@ -53,6 +53,7 @@ type UseEdgeResizerProps = {
   defaultWidth?: number;
   width?: number;
   onResize?: (value: number) => void;
+  onLiveResize?: (value: number) => void;
   onRequestFullscreen?: () => void;
   onExitFullscreen?: () => void;
 };
@@ -67,6 +68,7 @@ export const useEdgeResizer = ({
   defaultWidth,
   width,
   onResize,
+  onLiveResize,
   onRequestFullscreen,
   onExitFullscreen,
 }: UseEdgeResizerProps) => {
@@ -246,6 +248,7 @@ export const useEdgeResizer = ({
         // table header, panel) on each pointermove. The committed value goes
         // to the store once, when the pointer is released.
         panel.style.setProperty(cssVariable, `${nextWidth}px`);
+        onLiveResize?.(nextWidth);
       };
 
       const stopDrag = () => {
@@ -281,6 +284,7 @@ export const useEdgeResizer = ({
       minWidth,
       maxWidth,
       onResize,
+      onLiveResize,
       onRequestFullscreen,
       onExitFullscreen,
     ],

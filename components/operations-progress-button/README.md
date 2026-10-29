@@ -225,8 +225,10 @@ export function UploadOutcome({
 - **It is `position: fixed` in the viewport's bottom trailing corner**, 24px in, `z-index` 400
   (200 at tablet and below). `isInfoPanelVisible` moves it 24px clear of an open info panel,
   `infoPanelWidth` wide (400px when unset, so 424px in); `mainButtonVisible` lifts it to 88px
-  from the bottom on small screens. None of it is relative to a parent: `Section` passes the
-  info panel's width itself, or the chat's when the chat is open in its place.
+  from the bottom on small screens. Inside `Section` the width is not passed as a prop:
+  `Section` sets `--operations-progress-info-panel-width` on its container, the width the open
+  info panel, or the chat open in its place, actually takes, and updates it on every frame of a
+  resize drag, so the button moves with the panel's edge.
 - **The ring's percentage is `panelOperations[0].percent`, or `operations[0].percent`** — the
   `percent` prop is declared and never read. With two or more operations no percentage is
   drawn at all.

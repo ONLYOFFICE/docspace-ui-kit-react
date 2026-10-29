@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { screen, render, waitFor } from "@testing-library/react";
+import { screen, render, waitFor, fireEvent } from "@testing-library/react";
 
 import { DeviceType } from "../../enums";
 
@@ -83,6 +83,11 @@ describe("<Section />", () => {
       vi.restoreAllMocks();
     });
 
+    const progressOffset = () =>
+      document
+        .getElementById("section")
+        ?.style.getPropertyValue("--operations-progress-info-panel-width");
+
     it("reports the info panel's width on a desktop, narrowed to fit the window", async () => {
       vi.spyOn(
         HTMLElement.prototype,
@@ -98,6 +103,49 @@ describe("<Section />", () => {
       await waitFor(() =>
         expect(onShownInfoPanelWidthChange).toHaveBeenLastCalledWith(584),
       );
+      expect(progressOffset()).toBe("584px");
+    });
+
+    it("reports the host's width at once, not a default before the panel measures", async () => {
+      vi.spyOn(
+        HTMLElement.prototype,
+        "getBoundingClientRect",
+      ).mockImplementation(function mock(this: HTMLElement) {
+        const width = this.id === "section" ? 1000 : 720;
+        return { width, height: 800, top: 0, left: 0 } as DOMRect;
+      });
+      const onShownInfoPanelWidthChange = vi.fn();
+
+      renderWithInfoPanel({ infoPanelWidth: 720, onShownInfoPanelWidthChange });
+      await waitFor(() => expect(progressOffset()).toBe("720px"));
+
+      expect(onShownInfoPanelWidthChange.mock.calls).toEqual([[720]]);
+    });
+
+    it("moves the progress button and reports the width during a drag", async () => {
+      vi.spyOn(
+        HTMLElement.prototype,
+        "getBoundingClientRect",
+      ).mockImplementation(function mock(this: HTMLElement) {
+        const width = this.id === "section" ? 1000 : 400;
+        return { width, height: 800, top: 0, left: 0 } as DOMRect;
+      });
+      const onShownInfoPanelWidthChange = vi.fn();
+      renderWithInfoPanel({ infoPanelWidth: 400, onShownInfoPanelWidthChange });
+      await waitFor(() => expect(progressOffset()).toBe("400px"));
+
+      fireEvent.pointerDown(screen.getByTestId("info-panel-resizer"), {
+        clientX: 800,
+        button: 0,
+      });
+      fireEvent.pointerMove(window, { clientX: 650 });
+
+      expect(progressOffset()).toBe("550px");
+      await waitFor(() =>
+        expect(onShownInfoPanelWidthChange).toHaveBeenLastCalledWith(550),
+      );
+
+      fireEvent.pointerUp(window);
     });
 
     it("counts the info panel at its default width below a desktop", () => {

@@ -155,6 +155,33 @@ const Section = (props: SectionProps) => {
   const [chatPanelShownWidth, setChatPanelShownWidth] =
     React.useState<number>();
 
+  const setProgressButtonOffset = React.useCallback((value?: number) => {
+    const style = containerRef.current?.style;
+    if (!style) return;
+
+    if (value)
+      style.setProperty("--operations-progress-info-panel-width", `${value}px`);
+    else style.removeProperty("--operations-progress-info-panel-width");
+  }, []);
+
+  const liveReportFrameRef = React.useRef(0);
+
+  React.useEffect(
+    () => () => cancelAnimationFrame(liveReportFrameRef.current),
+    [],
+  );
+
+  const onPanelLiveResize = React.useCallback(
+    (value: number) => {
+      setProgressButtonOffset(value);
+      cancelAnimationFrame(liveReportFrameRef.current);
+      liveReportFrameRef.current = requestAnimationFrame(() =>
+        onShownInfoPanelWidthChange?.(value),
+      );
+    },
+    [setProgressButtonOffset, onShownInfoPanelWidthChange],
+  );
+
   const [
     sectionHeaderContent,
     sectionFilterContent,
@@ -305,15 +332,24 @@ const Section = (props: SectionProps) => {
     isDesktop: currentDeviceType === DeviceType.desktop,
     isInfoPanelVisible:
       isInfoPanelAvailable && !!canDisplay && !!isInfoPanelVisible,
-    infoPanelWidth: infoPanelShownWidth,
+    infoPanelWidth:
+      infoPanelShownWidth ??
+      (isInfoPanelResizable ? infoPanelWidth : undefined),
     isChatPanelVisible: isChatPanelAvailable && !!isChatPanelVisible,
     isChatPanelFullscreen,
-    chatPanelWidth: chatPanelShownWidth,
+    chatPanelWidth:
+      chatPanelShownWidth ??
+      (isChatPanelResizable ? chatPanelWidth : undefined),
   });
+
+  React.useEffect(() => {
+    setProgressButtonOffset(shownInfoPanelWidth);
+  }, [shownInfoPanelWidth, setProgressButtonOffset]);
 
   const hasPanels = isInfoPanelAvailable || isChatPanelAvailable;
 
   React.useEffect(() => {
+    cancelAnimationFrame(liveReportFrameRef.current);
     if (hasPanels) onShownInfoPanelWidthChange?.(shownInfoPanelWidth);
   }, [hasPanels, shownInfoPanelWidth, onShownInfoPanelWidthChange]);
 
@@ -441,7 +477,6 @@ const Section = (props: SectionProps) => {
             mainButtonVisible={mainButtonVisible}
             showCancelButton={showCancelButton}
             isInfoPanelVisible={isInfoVisible}
-            infoPanelWidth={shownInfoPanelWidth || undefined}
             dropTargetFolderName={dropTargetPreview}
             isDragging={dragging}
           />
@@ -462,6 +497,7 @@ const Section = (props: SectionProps) => {
           isResizable={isInfoPanelResizable}
           width={infoPanelWidth}
           onResize={setInfoPanelWidth}
+          onLiveResize={onPanelLiveResize}
           onShownWidthChange={setInfoPanelShownWidth}
         >
           <SubInfoPanelHeader>{infoPanelHeaderContent}</SubInfoPanelHeader>
@@ -483,6 +519,7 @@ const Section = (props: SectionProps) => {
           isResizable={isChatPanelResizable}
           width={chatPanelWidth}
           onResize={setChatPanelWidth}
+          onLiveResize={onPanelLiveResize}
           onShownWidthChange={setChatPanelShownWidth}
           isFullscreen={isChatPanelFullscreen}
           onRequestFullscreen={setChatPanelFullscreen}

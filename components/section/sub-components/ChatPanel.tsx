@@ -39,6 +39,7 @@ const ChatPanel = ({
   isResizable,
   width,
   onResize,
+  onLiveResize,
   onShownWidthChange,
   isFullscreen,
   onRequestFullscreen,
@@ -68,6 +69,7 @@ const ChatPanel = ({
       minWidth: MIN_CHAT_PANEL_WIDTH,
       width,
       onResize,
+      onLiveResize,
       onRequestFullscreen,
       onExitFullscreen,
     });

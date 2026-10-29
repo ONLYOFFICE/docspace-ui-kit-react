@@ -139,6 +139,18 @@ describe("InfoPanel resizer", () => {
     expect(onResize).toHaveBeenCalledWith(500);
   });
 
+  it("reports the width of a drag as it goes", () => {
+    const onLiveResize = vi.fn();
+    render(panel({ onLiveResize }));
+
+    fireEvent.pointerDown(resizer(), { clientX: 800, button: 0 });
+    fireEvent.pointerMove(window, { clientX: 750 });
+    fireEvent.pointerMove(window, { clientX: 700 });
+    fireEvent.pointerUp(window);
+
+    expect(onLiveResize.mock.calls).toEqual([[450], [500]]);
+  });
+
   it("grows only into the slack the section can give up", () => {
     vi.restoreAllMocks();
     mockLayout(600, 400);

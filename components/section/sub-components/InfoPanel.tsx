@@ -28,6 +28,7 @@ const InfoPanel = ({
   isResizable,
   width,
   onResize,
+  onLiveResize,
   onShownWidthChange,
 }: InfoPanelProps) => {
   const infoPanelRef = useRef<null | HTMLDivElement>(null);
@@ -50,6 +51,7 @@ const InfoPanel = ({
     defaultWidth: INFO_PANEL_WIDTH,
     width,
     onResize,
+    onLiveResize,
   });
 
   useEffect(() => {

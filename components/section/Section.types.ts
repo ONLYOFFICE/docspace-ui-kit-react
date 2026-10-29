@@ -43,6 +43,8 @@ export type InfoPanelProps = {
   width?: number;
   /** Called with the committed width in px: once per drag, when the pointer is released, and on the double click that restores the default. A width narrowed to fit the window is never committed. */
   onResize?: (value: number) => void;
+  /** Called on every frame of a resize drag with the width in px so far, before it is committed. */
+  onLiveResize?: (value: number) => void;
   /** Called with the width in px the panel takes on screen, narrower than `width` while the window cannot fit it, and with `undefined` once the panel is hidden or no longer resizable. */
   onShownWidthChange?: (value?: number) => void;
 };
@@ -75,6 +77,8 @@ export type ChatPanelProps = {
   width?: number;
   /** Called once per drag, when the pointer is released, with the committed width in px. A width narrowed to fit the window is never committed. */
   onResize?: (value: number) => void;
+  /** Called on every frame of a resize drag with the width in px so far, before it is committed. */
+  onLiveResize?: (value: number) => void;
   /** Called with the docked width in px the panel takes on screen, narrower than `width` while the window cannot fit it, and with `undefined` once the panel is hidden, fullscreen or no longer resizable. */
   onShownWidthChange?: (value?: number) => void;
   /**
@@ -212,6 +216,7 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     | "isResizable"
     | "width"
     | "onResize"
+    | "onLiveResize"
     | "onShownWidthChange"
   > &
   Omit<SectionHeaderProps, "children" | "className"> &
@@ -240,7 +245,7 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     infoPanelWidth?: number;
     /** Called with the committed info panel width: once per resize drag, when the pointer is released, and on the double click that restores the default. A width narrowed to fit the window is never committed, so the panel grows back once the window does. */
     setInfoPanelWidth?: (value: number) => void;
-    /** Called with the width in px the open info panel, or the AI chat open in its place, takes on screen, and with `0` when neither does: how far the floating buttons in the corner have to move clear of it. On a desktop it is the panel's actual width, a window-narrowed one included; below a desktop the info panel counts as `INFO_PANEL_WIDTH` and the chat as `0`. */
+    /** Called with the width in px the open info panel, or the AI chat open in its place, takes on screen, and with `0` when neither does: how far the floating buttons in the corner have to move clear of it. On a desktop it is the panel's actual width, a window-narrowed one included, and it follows a resize drag once per frame; below a desktop the info panel counts as `INFO_PANEL_WIDTH` and the chat as `0`. */
     onShownInfoPanelWidthChange?: (value: number) => void;
     /** Whether the AI chat region exists at all. It defaults to `false`. */
     isChatPanelAvailable?: boolean;
