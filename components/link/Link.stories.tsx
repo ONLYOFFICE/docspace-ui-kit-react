@@ -1,6 +1,6 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import { RootTooltip } from "../tooltip";
 
@@ -193,6 +193,16 @@ export const Default: Story = {
     target: LinkTarget.blank,
     onClick: fn(),
   },
+  // No click: it would open example.com in a new tab.
+  play: async ({ canvas, userEvent }) => {
+    const link = canvas.getByRole("link", { name: "Simple link" });
+    await expect(link).toHaveAttribute("href", "https://example.com");
+    await expect(link).toHaveAttribute("target", "_blank");
+
+    // A page link has an href, so it is a tab stop of its own.
+    await userEvent.tab();
+    await expect(link).toHaveFocus();
+  },
   parameters: {
     docs: {
       description: {
@@ -211,6 +221,33 @@ export const Default: Story = {
       },
     },
   },
+};
+
+type TextQueries = { getByText: (text: string) => HTMLElement };
+
+// The <a> that carries the link's styles, found by its label.
+const link = (canvas: TextQueries, label: string) =>
+  canvas.getByText(label).closest("a") as HTMLAnchorElement;
+
+const decoration = (element: Element) => {
+  const { textDecorationLine, textDecorationStyle } = getComputedStyle(element);
+  return `${textDecorationLine} ${textDecorationStyle}`;
+};
+
+// The four states every link type shares, read off one rendered column.
+const statesOf = async (canvas: TextQueries, kind: "page" | "action") => {
+  const bold = link(canvas, `Bold ${kind} link`);
+  const regular = link(canvas, `Regular ${kind} link`);
+  await expect(Number(getComputedStyle(bold).fontWeight)).toBeGreaterThan(
+    Number(getComputedStyle(regular).fontWeight),
+  );
+  await expect(decoration(regular)).toMatch(/^none/);
+  await expect(decoration(link(canvas, `Hovered ${kind} link`))).toBe(
+    kind === "page" ? "underline solid" : "underline dashed",
+  );
+  await expect(link(canvas, `Semitransparent ${kind} link`)).toHaveStyle({
+    opacity: "0.5",
+  });
 };
 
 const PageLinksTemplate = () => {
@@ -336,6 +373,13 @@ const NoHoverTemplate = () => {
 };
 
 export const PageLinks: Story = {
+  play: async ({ canvas }) => {
+    const links = canvas.getAllByRole("link");
+    await expect(links).toHaveLength(4);
+    for (const link of links) {
+      await expect(link).toHaveAttribute("href", "https://example.com");
+    }
+  },
   render: () => <PageLinksTemplate />,
   parameters: {
     docs: {
@@ -355,6 +399,13 @@ export const PageLinks: Story = {
 
 export const ActionLinks: Story = {
   render: () => <ActionLinksTemplate />,
+  play: async ({ canvas }) => {
+    await statesOf(canvas, "action");
+    // Action links run code; none of them navigates.
+    await expect(link(canvas, "Regular action link")).not.toHaveAttribute(
+      "href",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -373,6 +424,10 @@ export const ActionLinks: Story = {
 
 export const AllVariants: Story = {
   render: () => <AllVariantsTemplate />,
+  play: async ({ canvas }) => {
+    await statesOf(canvas, "page");
+    await statesOf(canvas, "action");
+  },
   parameters: {
     docs: {
       description: {
@@ -398,6 +453,11 @@ export const AllVariants: Story = {
 
 export const HoveredState: Story = {
   render: () => <HoveredTemplate />,
+  play: async ({ canvas }) => {
+    await expect(decoration(link(canvas, "Hovered link"))).toBe(
+      "underline solid",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -413,6 +473,11 @@ export const HoveredState: Story = {
 
 export const SemitransparentState: Story = {
   render: () => <SemitransparentTemplate />,
+  play: async ({ canvas }) => {
+    await expect(link(canvas, "Semitransparent link")).toHaveStyle({
+      opacity: "0.5",
+    });
+  },
   parameters: {
     docs: {
       description: {
@@ -428,6 +493,21 @@ export const SemitransparentState: Story = {
 
 export const WithTextOverflow: Story = {
   render: () => <TextOverflowTemplate />,
+  play: async ({ canvas }) => {
+    const element = link(
+      canvas,
+      "This is a very long link that should demonstrate text overflow behavior",
+    );
+    // One line, cut with an ellipsis inside the 200px box.
+    await expect(element.getBoundingClientRect().width).toBeLessThanOrEqual(
+      200,
+    );
+    await expect(element.scrollWidth).toBeGreaterThan(element.clientWidth);
+    await expect(element).toHaveStyle({
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    });
+  },
   parameters: {
     docs: {
       description: {
@@ -447,6 +527,13 @@ export const WithTextOverflow: Story = {
 
 export const NoHoverEffect: Story = {
   render: () => <NoHoverTemplate />,
+  play: async ({ canvas }) => {
+    // The hover underline is switched off by a class; CSS :hover itself
+    // cannot be produced from a play function.
+    const element = link(canvas, "No hover effect link");
+    await expect(element.className).toMatch(/noHover/);
+    await expect(decoration(element)).toMatch(/^none/);
+  },
   parameters: {
     docs: {
       description: {
@@ -478,6 +565,13 @@ const WithTooltipTemplate = () => {
 
 export const WithTooltip: Story = {
   render: () => <WithTooltipTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.hover(canvas.getByRole("link", { name: "Shared folder" }));
+    // RootTooltip renders outside the story root.
+    await waitFor(() =>
+      expect(screen.getByText("Opens the shared folder")).toBeVisible(),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -494,14 +588,22 @@ export const WithTooltip: Story = {
   },
 };
 
-const KeyboardActionTemplate = () => {
+// The recipe the source below shows: Enter and Space run the same action a
+// click does.
+const KeyboardActionTemplate = ({ onAction }: { onAction?: () => void }) => {
   return (
     <Link
       type={LinkType.action}
       role="button"
       tabIndex={0}
-      onClick={() => {}}
-      onKeyDown={() => {}}
+      onClick={() => onAction?.()}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          // Space would otherwise scroll the page.
+          e.preventDefault();
+          onAction?.();
+        }
+      }}
     >
       Move to archive
     </Link>
@@ -509,7 +611,22 @@ const KeyboardActionTemplate = () => {
 };
 
 export const KeyboardAccessibleAction: Story = {
-  render: () => <KeyboardActionTemplate />,
+  // args.onClick is the fn() spy below; the template calls it with no event.
+  render: (args) => (
+    <KeyboardActionTemplate onAction={args.onClick as () => void} />
+  ),
+  args: { onClick: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    const link = canvas.getByRole("button", { name: "Move to archive" });
+
+    await userEvent.tab();
+    await expect(link).toHaveFocus();
+
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" ");
+    await userEvent.click(link);
+    await expect(args.onClick).toHaveBeenCalledTimes(3);
+  },
   parameters: {
     docs: {
       description: {
@@ -543,6 +660,11 @@ const CustomColorTemplate = () => {
 
 export const CustomColor: Story = {
   render: () => <CustomColorTemplate />,
+  play: async ({ canvas }) => {
+    await expect(link(canvas, "Custom colour link")).toHaveStyle({
+      color: "rgb(46, 125, 50)",
+    });
+  },
   parameters: {
     docs: {
       description: {
@@ -581,6 +703,14 @@ const TextDecorationsTemplate = () => {
 
 export const TextDecorations: Story = {
   render: () => <TextDecorationsTemplate />,
+  play: async ({ canvas }) => {
+    await expect(decoration(link(canvas, "Underlined link"))).toBe(
+      "underline solid",
+    );
+    await expect(decoration(link(canvas, "Dashed action link"))).toBe(
+      "underline dashed",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -600,6 +730,14 @@ export const TextDecorations: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    await expect(link(canvas, "Custom color link")).toHaveStyle({
+      color: "rgb(156, 39, 176)",
+    });
+    const action = link(canvas, "Custom action link");
+    await expect(decoration(action)).toBe("underline dotted");
+    await expect(action).toHaveStyle({ lineHeight: "32px" });
+  },
   render: () => (
     <div
       style={

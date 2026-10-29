@@ -2,6 +2,7 @@ import type React from "react";
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import Icon from "../../assets/button.alert.react.svg";
 import OutlineIcon from "../../assets/article-hide-menu-icon.react.svg";
@@ -208,9 +209,42 @@ const Wrapper = (props: { isScale: boolean; children: React.ReactNode }) => {
   );
 };
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+const SIZES = ["ExtraSmall", "Small", "Normal", "Medium"];
+
+const heightOf = (element: Element) => element.getBoundingClientRect().height;
+
+const style = (element: Element) => getComputedStyle(element);
+
+// The buttons of a template, one per size and in size order.
+const row = ({ canvas }: PlayContext, prefix: string) =>
+  SIZES.map(
+    (size) => canvas.getAllByRole("button", { name: `${prefix} ${size}` })[0],
+  );
+
+const growsWithSize = async (buttons: HTMLElement[]) => {
+  for (let index = 1; index < buttons.length; index += 1) {
+    await expect(heightOf(buttons[index])).toBeGreaterThan(
+      heightOf(buttons[index - 1]),
+    );
+  }
+};
+
 export const Default: Story = {
   render: (args) => <Button {...args} />,
-  args: { size: ButtonSize.small, label: "Button" },
+  args: { size: ButtonSize.small, label: "Button", onClick: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    const button = canvas.getByRole("button", { name: "Button" });
+
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+
+    // A native <button>: Enter and Space press it like a click.
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" ");
+    await expect(args.onClick).toHaveBeenCalledTimes(3);
+  },
   parameters: {
     docs: {
       description: {
@@ -475,6 +509,17 @@ const TooltipTemplate = () => {
 
 export const PrimaryButtons: Story = {
   render: () => <PrimaryTemplate />,
+  play: async (context) => {
+    const buttons = row(context, "Primary");
+    await growsWithSize(buttons);
+    // One solid accent background with white text, whatever the size.
+    const background = style(buttons[0]).backgroundColor;
+    await expect(background).not.toBe("rgba(0, 0, 0, 0)");
+    for (const button of buttons) {
+      await expect(style(button).backgroundColor).toBe(background);
+      await expect(style(button).color).toBe("rgb(255, 255, 255)");
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -493,6 +538,15 @@ export const PrimaryButtons: Story = {
 
 export const SecondaryButtons: Story = {
   render: () => <SecondaryTemplate />,
+  play: async (context) => {
+    const buttons = row(context, "Secondary");
+    await growsWithSize(buttons);
+    // On the page background, with a border.
+    for (const button of buttons) {
+      await expect(style(button).color).not.toBe("rgb(255, 255, 255)");
+      await expect(style(button).borderTopWidth).toBe("1px");
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -511,6 +565,17 @@ export const SecondaryButtons: Story = {
 
 export const WithIconButtons: Story = {
   render: () => <WithIconTemplate />,
+  play: async ({ canvas }) => {
+    // The icon comes before the label.
+    for (const button of canvas.getAllByRole("button")) {
+      const icon = button.querySelector("svg") as SVGElement;
+      const label = button.querySelector("[class*='text']") ?? button;
+      await expect(icon).not.toBeNull();
+      await expect(icon.getBoundingClientRect().left).toBeLessThan(
+        (label as Element).getBoundingClientRect().right,
+      );
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -530,6 +595,12 @@ export const WithIconButtons: Story = {
 export const IsLoadingButtons: Story = {
   name: "Loading Buttons",
   render: () => <IsLoadingTemplate />,
+  play: async ({ canvas }) => {
+    for (const button of canvas.getAllByRole("button")) {
+      await expect(button).toBeDisabled();
+      await expect(button).toHaveAttribute("aria-busy", "true");
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -548,6 +619,17 @@ export const IsLoadingButtons: Story = {
 
 export const ScaleButtons: Story = {
   render: () => <ScaleTemplate />,
+  play: async ({ canvas }) => {
+    // As wide as the column the grid gives them.
+    const width = (
+      canvas.getAllByRole("button")[0].parentElement as HTMLElement
+    ).getBoundingClientRect().width;
+    for (const button of canvas.getAllByRole("button")) {
+      await expect(Math.round(button.getBoundingClientRect().width)).toBe(
+        Math.round(width),
+      );
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -566,6 +648,12 @@ export const ScaleButtons: Story = {
 
 export const DisabledButtons: Story = {
   render: () => <DisabledTemplate />,
+  play: async ({ canvas }) => {
+    for (const button of canvas.getAllByRole("button")) {
+      await expect(button).toBeDisabled();
+      await expect(button).toHaveAttribute("aria-disabled", "true");
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -584,6 +672,12 @@ export const DisabledButtons: Story = {
 
 export const ClickedButtons: Story = {
   render: () => <ClickedTemplate />,
+  play: async (context) => {
+    // Drawn pressed with nothing pressing them.
+    for (const button of context.canvas.getAllByRole("button")) {
+      await expect(button.className).toMatch(/isClicked/);
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -602,6 +696,12 @@ export const ClickedButtons: Story = {
 
 export const HoveredButtons: Story = {
   render: () => <HoveredTemplate />,
+  play: async (context) => {
+    // Drawn hovered with the pointer elsewhere.
+    for (const button of context.canvas.getAllByRole("button")) {
+      await expect(button.className).toMatch(/isHovered/);
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -620,6 +720,16 @@ export const HoveredButtons: Story = {
 
 export const FilledButtons: Story = {
   render: () => <FilledTemplate />,
+  play: async ({ canvas }) => {
+    // No border, and the icon repainted in the text colour.
+    for (const button of canvas.getAllByRole("button")) {
+      await expect(style(button).borderTopStyle).toMatch(/none|hidden/);
+      const path = button.querySelector("svg path");
+      if (path) {
+        await expect(style(path).fill).toBe(style(button).color);
+      }
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -638,6 +748,18 @@ export const FilledButtons: Story = {
 
 export const FilledStrokeButtons: Story = {
   render: () => <FilledStrokeTemplate />,
+  play: async ({ canvas }) => {
+    // The plain filled button paints the outline icon solid; filledStroke
+    // keeps it an outline.
+    const fillOf = (name: string) =>
+      style(
+        canvas
+          .getAllByRole("button", { name })[0]
+          .querySelector("svg path") as Element,
+      ).fill;
+    await expect(fillOf("Filled Normal")).not.toBe("none");
+    await expect(fillOf("FilledStroke Normal")).toBe("none");
+  },
   parameters: {
     docs: {
       description: {
@@ -656,6 +778,18 @@ export const FilledStrokeButtons: Story = {
 
 export const WithTooltip: Story = {
   render: () => <TooltipTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.hover(canvas.getByRole("button", { name: "Hover me" }));
+    // The tooltip is portalled out of the story root, so look in the page;
+    // it mounts hidden and fades in, hence the wait.
+    await waitFor(() =>
+      expect(
+        screen.getByText("This is a primary button with a tooltip"),
+      ).toBeVisible(),
+    );
+    // One tooltip, not one per button: each has an id of its own.
+    await expect(screen.getAllByRole("tooltip")).toHaveLength(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -697,6 +831,15 @@ const AccentTemplate = () => {
 
 export const AccentButtons: Story = {
   render: () => <AccentTemplate />,
+  play: async ({ canvas }) => {
+    // Accent text on a tint, with the icon repainted to match.
+    for (const button of canvas.getAllByRole("button")) {
+      const { color, backgroundColor } = style(button);
+      await expect(backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+      const path = button.querySelector("svg path");
+      if (path) await expect(style(path).fill).toBe(color);
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -761,6 +904,27 @@ const CustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CustomizationTemplate />,
+  play: async ({ canvas }) => {
+    const [secondary, disabled] = [
+      canvas.getByRole("button", { name: "Secondary" }),
+      canvas.getAllByRole("button", { name: "Disabled" })[0],
+    ];
+    await expect(secondary).toHaveStyle({
+      backgroundColor: "rgb(253, 242, 248)",
+      color: "rgb(157, 23, 77)",
+      borderRadius: "16px",
+      height: "48px",
+      fontSize: "15px",
+      fontWeight: "700",
+    });
+    await expect(canvas.getByRole("button", { name: "Primary" })).toHaveStyle({
+      backgroundColor: "rgb(124, 58, 237)",
+    });
+    await expect(disabled).toHaveStyle({
+      borderTopStyle: "dashed",
+      color: "rgb(163, 163, 163)",
+    });
+  },
   parameters: {
     docs: {
       description: {

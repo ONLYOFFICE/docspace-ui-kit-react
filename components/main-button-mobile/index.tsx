@@ -1,4 +1,5 @@
 import React, {
+  useId,
   useState,
   useRef,
   useEffect,
@@ -9,8 +10,8 @@ import { isIOS, isMobile } from "react-device-detect";
 import classNames from "classnames";
 
 import ButtonAlertReactSvg from "../../assets/button.alert.react.svg";
-
-import { IconSizeType } from "../../utils";
+import { consumeKey } from "../../utils/consume-key";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import { Scrollbar } from "../scrollbar";
 import { Backdrop } from "../backdrop";
@@ -40,6 +41,7 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
     manualWidth,
     isOpenButton,
     onClose,
+    onOpen,
     alert,
     withMenu = true,
     onClick,
@@ -48,7 +50,11 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
     dropdownStyle,
   } = props;
 
+  const t = useCommonTranslation();
+  // The English fallback when no translations are loaded.
+  const alertLabel = t("Alert") || "Alert";
   const [isOpen, setIsOpen] = useState(opened);
+  const sheetId = useId();
 
   const [height, setHeight] = useState(`${window.innerHeight - 48}px`);
   const [openedSubmenuKey, setOpenedSubmenuKey] = useState("");
@@ -62,6 +68,7 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
   const buttonBackground = useRef<boolean>(false);
 
   const mainButtonRef = useRef<HTMLDivElement | null>(null);
+  const floatingButtonRef = useRef<HTMLDivElement | null>(null);
 
   useImperativeHandle(ref, () => ({
     contains: (target: HTMLElement) => {
@@ -76,8 +83,17 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
     setIsOpen(opened);
   }, [opened]);
 
+  // The latest values, for listeners that are attached once.
+  const isOpenRef = useRef(isOpen);
+  isOpenRef.current = isOpen;
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
-    const handlePopState = () => setIsOpen(false);
+    const handlePopState = () => {
+      if (isOpenRef.current) onCloseRef.current?.();
+      setIsOpen(false);
+    };
 
     window.addEventListener("popstate", handlePopState);
 
@@ -87,10 +103,8 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
   }, []);
 
   const setDialogBackground = (scrollHeight: number) => {
-    if (!buttonBackground) {
-      document
-        .getElementsByClassName("section-scroll")[0]
-        .classList.add("dialog-background-scroll");
+    if (!buttonBackground.current) {
+      scrollElem.current?.classList.add("dialog-background-scroll");
     }
     if (currentPosition.current && currentPosition.current < scrollHeight / 3) {
       buttonBackground.current = false;
@@ -108,7 +122,10 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
       currentPosition.current = scrollElem.current.scrollTop;
       const { scrollHeight } = scrollElem.current;
 
-      if (currentPosition < prevPosition) {
+      if (
+        prevPosition.current !== null &&
+        currentPosition.current < prevPosition.current
+      ) {
         setDialogBackground(scrollHeight);
       } else if (
         currentPosition.current &&
@@ -125,22 +142,22 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
   useEffect(() => {
     if (!isIOS) return;
 
-    scrollElem.current = document.getElementsByClassName(
-      "section-scroll",
-    )[0] as HTMLElement;
+    const elem = document.getElementsByClassName("section-scroll")[0] as
+      HTMLElement | undefined;
 
-    if (scrollElem.current && scrollElem.current.scrollTop === 0) {
-      scrollElem.current.classList.add("dialog-background-scroll");
+    // A page without a `.section-scroll` has nothing to recolour.
+    if (!elem) return;
+
+    scrollElem.current = elem;
+
+    if (elem.scrollTop === 0) {
+      elem.classList.add("dialog-background-scroll");
     }
 
-    scrollElem.current.addEventListener("scroll", scrollChangingBackground);
+    elem.addEventListener("scroll", scrollChangingBackground);
 
     return () => {
-      if (scrollElem.current)
-        scrollElem.current.removeEventListener(
-          "scroll",
-          scrollChangingBackground,
-        );
+      elem.removeEventListener("scroll", scrollChangingBackground);
     };
   }, [scrollChangingBackground]);
 
@@ -176,13 +193,80 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
     };
   }, [recalculateHeight]);
 
+  // `onOpen` and `onClose` report the change itself, so a caller that keeps
+  // `opened` in its own state can follow every way the sheet opens and closes.
   const toggle = (value: boolean) => {
-    if (isOpenButton && onClose) {
-      onClose();
-    }
+    if (value && !isOpen) onOpen?.();
+    if (!value && isOpen) onClose?.();
 
     setIsOpen(value);
   };
+
+  // The trigger is FloatingButton's circle, which takes no ARIA props of its
+  // own; the popup state is stamped on its element.
+  useEffect(() => {
+    const el = floatingButtonRef.current;
+    if (!el) return;
+    if (withMenu) {
+      el.setAttribute("aria-haspopup", "menu");
+      el.setAttribute("aria-expanded", String(Boolean(isOpen)));
+      if (isOpen) el.setAttribute("aria-controls", sheetId);
+      else el.removeAttribute("aria-controls");
+    } else {
+      el.removeAttribute("aria-haspopup");
+      el.removeAttribute("aria-expanded");
+      el.removeAttribute("aria-controls");
+    }
+  }, [withMenu, isOpen, sheetId]);
+
+  // Escape closes the sheet and gives focus back to the button. It listens in
+  // the capture phase and consumes the key, so the portal's document hotkeys
+  // (Escape clears the selection) and a dialog around it do not also act.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      consumeKey(e);
+      onCloseRef.current?.();
+      setIsOpen(false);
+      floatingButtonRef.current?.focus();
+    };
+
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
+  }, [isOpen]);
+
+  // A click the keyboard made (Enter or Space on the button) has no pointer
+  // detail; the sheet it opens takes focus on its first item.
+  const focusFirstItem = useRef(false);
+
+  const getMenuItems = () =>
+    Array.from(
+      divRef.current?.querySelectorAll<HTMLElement>(
+        '[role="menuitem"]:not([aria-disabled="true"])',
+      ) ?? [],
+    );
+
+  useEffect(() => {
+    if (!isOpen || !focusFirstItem.current) return;
+    focusFirstItem.current = false;
+
+    // The sheet is not focusable until the drop-down has drawn it, which can
+    // take a few frames; try again until the item takes focus.
+    let frame = 0;
+    let tries = 0;
+    const tryFocus = () => {
+      const first = getMenuItems()[0];
+      first?.focus();
+      if (document.activeElement !== first && tries < 10) {
+        tries += 1;
+        frame = requestAnimationFrame(tryFocus);
+      }
+    };
+    tryFocus();
+    return () => cancelAnimationFrame(frame);
+  }, [isOpen]);
 
   const onMainButtonClick = (e: React.MouseEvent) => {
     if (!withMenu) {
@@ -190,7 +274,53 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
       return;
     }
 
+    focusFirstItem.current = !isOpen && e.detail === 0;
     toggle(!isOpen);
+  };
+
+  // Arrow keys move between the items, Home and End jump to the ends, and
+  // Enter or Space chooses the focused one. Tab leaves the menu as in the
+  // WAI-ARIA menu button pattern: the sheet closes and the key moves on from
+  // the button, rather than into the page behind the open sheet.
+  const onSheetKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Tab") {
+      floatingButtonRef.current?.focus();
+      toggle(false);
+      return;
+    }
+
+    const items = getMenuItems();
+    if (!items.length) return;
+    const index = items.indexOf(document.activeElement as HTMLElement);
+
+    let next: HTMLElement | undefined;
+    switch (e.key) {
+      case "ArrowDown":
+        next = items[(index + 1) % items.length];
+        break;
+      case "ArrowUp":
+        next = items[index <= 0 ? items.length - 1 : index - 1];
+        break;
+      case "Home":
+        next = items[0];
+        break;
+      case "End":
+        next = items[items.length - 1];
+        break;
+      case "Enter":
+      case " ":
+        if (index === -1) return;
+        e.preventDefault();
+        consumeKey(e);
+        items[index].click();
+        return;
+      default:
+        return;
+    }
+
+    e.preventDefault();
+    consumeKey(e);
+    next?.focus();
   };
 
   const outsideClick = (e: React.MouseEvent) => {
@@ -208,7 +338,7 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
 
   const renderItems = () => {
     return (
-      <div ref={divRef}>
+      <div ref={divRef} onKeyDown={onSheetKeyDown}>
         {actionOptions?.length ? (
           <div className={styles.containerAction}>
             {actionOptions?.map((option: ActionOption) => {
@@ -247,6 +377,7 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
                   icon={option.icon ? option.icon : ""}
                   noHover={noHover}
                   description={option.description}
+                  role="menuitem"
                 />
               );
             })}
@@ -298,6 +429,7 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
                   )}
                   key={option.key}
                   onClick={optionOnClickAction}
+                  role="menuitem"
                 />
               );
             })}
@@ -322,6 +454,7 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
         data-testid="main-button-mobile"
       >
         <FloatingButton
+          ref={floatingButtonRef}
           className={classNames(styles.floatingButton)}
           icon={isOpen ? FloatingButtonIcons.minus : FloatingButtonIcons.plus}
           onClick={onMainButtonClick}
@@ -329,6 +462,8 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
         />
 
         <DropDown
+          id={sheetId}
+          role="menu"
           className={classNames(styles.dropDown, "mainBtnDropdown")}
           style={{ ...dropdownStyle, height }}
           open={isOpen}
@@ -354,11 +489,26 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
 
         {alert && !isOpen ? (
           <div className={styles.wrapperAlertIcon}>
-            <ButtonAlertReactSvg
-              className={styles.alertIcon}
-              data-size={IconSizeType.small}
-              onClick={onAlertClickAction}
-            />
+            {withAlertClick ? (
+              <button
+                type="button"
+                className={styles.alertButton}
+                aria-label={alertLabel}
+                onClick={onAlertClickAction}
+              >
+                <ButtonAlertReactSvg
+                  className={styles.alertIcon}
+                  aria-hidden="true"
+                  focusable="false"
+                />
+              </button>
+            ) : (
+              <ButtonAlertReactSvg
+                className={styles.alertIcon}
+                role="img"
+                aria-label={alertLabel}
+              />
+            )}
           </div>
         ) : null}
       </div>

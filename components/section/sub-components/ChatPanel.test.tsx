@@ -83,6 +83,36 @@ describe("ChatPanel resizer", () => {
     expect(onResize).toHaveBeenCalledWith(500);
   });
 
+  it("measures the content box, so the 1px border does not grow the panel", () => {
+    // The panel is content-box with a 1px inline-start border: its rect is
+    // 401px for a `--chat-panel-width` of 400px.
+    layout.panel = 401;
+    vi.spyOn(window, "getComputedStyle").mockReturnValue({
+      direction: "ltr",
+      boxSizing: "content-box",
+      borderLeftWidth: "1px",
+      borderRightWidth: "0px",
+      paddingLeft: "0px",
+      paddingRight: "0px",
+    } as CSSStyleDeclaration);
+    const onResize = vi.fn();
+    renderPanel({ onResize });
+    const panel = document.getElementById("ChatPanelWrapper") as HTMLElement;
+    const resizer = screen.getByTestId("chat-panel-resizer");
+
+    // A grab released without moving leaves the width alone.
+    fireEvent.pointerDown(resizer, { clientX: 800, button: 0 });
+    fireEvent.pointerUp(window);
+    expect(onResize).not.toHaveBeenCalled();
+
+    // A 40px drag widens it by 40px, not 41.
+    fireEvent.pointerDown(resizer, { clientX: 800, button: 0 });
+    fireEvent.pointerMove(window, { clientX: 760 });
+    expect(panel.style.getPropertyValue("--chat-panel-width")).toBe("440px");
+    fireEvent.pointerUp(window);
+    expect(onResize).toHaveBeenLastCalledWith(440);
+  });
+
   it("clamps to the minimum width and to the slack the section can give up", () => {
     const onResize = vi.fn();
     renderPanel({ onResize });

@@ -6,8 +6,10 @@ export type ColorPickerProps = {
   id?: string;
 
   /**
-   * Called by the cancel button, and by the closing cross in `isPickerOnly`
-   * mode. Nothing here unmounts the picker; that is the caller's job.
+   * Called by the cancel button, by the closing cross in `isPickerOnly`
+   * mode, and on Escape. Nothing here unmounts the picker; that is the
+   * caller's job. Left out, Escape is not handled and propagates to the
+   * page (a surrounding `ModalDialog` closes on it as usual).
    */
   onClose?: () => void;
 
@@ -30,14 +32,14 @@ export type ColorPickerProps = {
   appliedColor: string;
 
   /**
-   * Text of the apply button. It is not translated for you.
-   * @default "Apply"
+   * Text of the apply button. Left out, the kit's own translation of "Apply"
+   * (`Common:ApplyButton`) is used.
    */
   applyButtonLabel?: string;
 
   /**
-   * Text of the cancel button. It is not translated for you.
-   * @default "Cancel"
+   * Text of the cancel button. Left out, the kit's own translation of "Cancel"
+   * (`Common:CancelButton`) is used.
    */
   cancelButtonLabel?: string;
 
@@ -45,10 +47,19 @@ export type ColorPickerProps = {
   handleChange?: (color: string) => void;
 
   /**
-   * Caption before the hex field. It is not translated for you.
-   * @default "Hex code"
+   * Caption before the hex field, and the field's accessible name. It is not
+   * translated for you.
    */
   hexCodeLabel?: string;
+
+  /** Accessible name of the picker's group. It is not translated for you. */
+  ariaLabel?: string;
+
+  /**
+   * Accessible name of the closing cross drawn in `isPickerOnly` mode. It is
+   * not translated for you.
+   */
+  closeButtonLabel?: string;
 
   /** Ignored. Nothing reads this prop. */
   forwardedRef?: React.RefObject<HTMLDivElement | null>;

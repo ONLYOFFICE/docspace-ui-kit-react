@@ -28,18 +28,29 @@ const VirtualList = ({
 }: VirtualListProps) => {
   const listRef = useRef<VariableSizeList>(null);
 
-  const activeIndex = useMemo(() => {
-    let foundIndex = -1;
+  // One pass over the children for both indices: the last disabled item,
+  // where the list's own highlight starts, and the item an owner has
+  // highlighted (isActiveDescendant on it), which this list scrolls into view
+  // since only it holds the list ref.
+  const { activeIndex, ownerHighlight } = useMemo(() => {
+    let disabledIndex = -1;
+    let highlightedIndex = -1;
     React.Children.forEach(cleanChildren, (child, index) => {
-      if (
-        React.isValidElement(child) &&
-        (child.props as { disabled?: boolean })?.disabled
-      ) {
-        foundIndex = index;
-      }
+      if (!React.isValidElement(child)) return;
+      const props = child.props as {
+        disabled?: boolean;
+        isActiveDescendant?: boolean;
+      };
+      if (props.disabled) disabledIndex = index;
+      if (props.isActiveDescendant) highlightedIndex = index;
     });
-    return foundIndex;
+    return { activeIndex: disabledIndex, ownerHighlight: highlightedIndex };
   }, [cleanChildren]);
+
+  useEffect(() => {
+    if (isOpen && ownerHighlight !== -1)
+      listRef.current?.scrollToItem(ownerHighlight, "smart");
+  }, [isOpen, ownerHighlight]);
 
   const [currentIndex, setCurrentIndex] = useState(activeIndex);
   const currentIndexRef = useRef<number>(activeIndex);

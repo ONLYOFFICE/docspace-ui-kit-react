@@ -1,10 +1,11 @@
 import React from "react";
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import EmptyRoomsLightSvg from "../../assets/emptyview/empty.rooms.root.light.svg";
 import CrossSvg from "../../assets/icons/12/cross.react.svg";
-import FolderSvg from "../../assets/icons/16/catalog.folder.react.svg";
+import FolderSvg from "../../.storybook/utils/ThemedFolderIcon";
 import { Text } from "../text";
 import { EmptyView } from ".";
 import type { EmptyViewProps } from "./EmptyView.types";
@@ -92,6 +93,20 @@ export const Default: Story = {
       },
     ],
   },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", { level: 3, name: "Empty Folder" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByText(
+        "This folder is empty. Add files or folders to get started.",
+      ),
+    ).toBeVisible();
+    // With a LinkRouter the option is a real link to its `to`.
+    await expect(
+      canvas.getByRole("link", { name: "Clear Filter" }),
+    ).toHaveAttribute("href", "#");
+  },
   parameters: {
     docs: {
       description: {
@@ -120,6 +135,13 @@ export const NoOptions: Story = {
     title: "No Files Found",
     description: "There are no files matching your search criteria.",
     options: null,
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", { name: "No Files Found" }),
+    ).toBeVisible();
+    // null options: the header alone, no options block.
+    await expect(canvas.queryByTestId("empty-view-body")).toBeNull();
   },
   parameters: {
     docs: {
@@ -166,6 +188,13 @@ export const WithMultipleOptions: Story = {
       },
     ],
   },
+  play: async ({ canvas }) => {
+    // The links stack in the order given.
+    const hrefs = canvas
+      .getAllByRole("link")
+      .map((link) => link.getAttribute("href"));
+    await expect(hrefs).toEqual(["/create", "/upload", "/import"]);
+  },
   parameters: {
     docs: {
       description: {
@@ -189,12 +218,15 @@ export const WithMultipleOptions: Story = {
   },
 };
 
+const onCreateFolder = fn().mockName("Create a folder");
+
 const cardOptions: EmptyViewProps["options"] = [
   {
     key: "create",
     icon: <FolderSvg />,
     title: "Create a folder",
     description: "Keep related files together in one place.",
+    onClick: onCreateFolder,
   },
   {
     key: "upload",
@@ -222,6 +254,29 @@ export const SuggestionCards: Story = {
     title: "Nothing here yet",
     description: "Pick one of the suggestions below to get started.",
     options: cardOptions,
+  },
+  play: async ({ canvas, userEvent }) => {
+    // A plain card runs its onClick; the card is named by its title.
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Create a folder" }),
+    );
+    await expect(onCreateFolder).toHaveBeenCalledTimes(1);
+
+    // The card works from the keyboard too: Enter and Space activate it.
+    canvas.getByRole("button", { name: "Create a folder" }).focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(onCreateFolder).toHaveBeenCalledTimes(2);
+    await userEvent.keyboard(" ");
+    await expect(onCreateFolder).toHaveBeenCalledTimes(3);
+
+    // A card with a model opens a menu of choices instead.
+    await userEvent.click(canvas.getByRole("button", { name: "Upload files" }));
+    // The menu fades in, so the item is found first and seen a moment later.
+    const device = await screen.findByText("From this device");
+    await waitFor(() => expect(device).toBeVisible());
+
+    // A disabled card is not rendered at all.
+    await expect(canvas.queryByText("Browse templates")).toBeNull();
   },
   parameters: {
     docs: {
@@ -264,8 +319,19 @@ export const WithButtons: Story = {
     title: "No documents",
     description: "Create the first document or bring one in.",
     options: [
-      { key: "create", type: "button", title: "Create document" },
-      { key: "import", type: "button", title: "Import", primary: false },
+      {
+        key: "create",
+        type: "button",
+        title: "Create document",
+        onClick: fn().mockName("Create document"),
+      },
+      {
+        key: "import",
+        type: "button",
+        title: "Import",
+        primary: false,
+        onClick: fn().mockName("Import"),
+      },
       {
         key: "sync",
         type: "button",
@@ -274,6 +340,20 @@ export const WithButtons: Story = {
         isLoading: true,
       },
     ],
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const [create, importOption] = (args.options ?? []) as {
+      onClick: () => void;
+    }[];
+    // Button options are native buttons: Enter works as well as a click.
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Create document" }),
+    );
+    await expect(create.onClick).toHaveBeenCalledTimes(1);
+
+    canvas.getByRole("button", { name: "Import" }).focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(importOption.onClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -312,6 +392,7 @@ export const TextActionsWithSeparator: Story = {
         type: "action",
         icon: <FolderSvg />,
         title: "Upload a file",
+        onClick: fn().mockName("Upload a file"),
       },
       { key: "or", type: "separator", text: "or" },
       {
@@ -320,8 +401,34 @@ export const TextActionsWithSeparator: Story = {
         icon: <FolderSvg />,
         title: "Create a document",
         className: "secondary",
+        onClick: fn().mockName("Create a document"),
       },
     ],
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const [upload, , create] = (args.options ?? []) as {
+      onClick: () => void;
+    }[];
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Upload a file" }),
+    );
+    await expect(upload.onClick).toHaveBeenCalledTimes(1);
+    await expect(canvas.getByText("or")).toBeVisible();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Create a document" }),
+    );
+    await expect(create.onClick).toHaveBeenCalledTimes(1);
+
+    // Actions are reachable with Tab and activated by Enter and Space.
+    canvas.getByRole("button", { name: "Upload a file" }).focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(upload.onClick).toHaveBeenCalledTimes(2);
+    await userEvent.tab();
+    await expect(
+      canvas.getByRole("button", { name: "Create a document" }),
+    ).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await expect(create.onClick).toHaveBeenCalledTimes(2);
   },
   parameters: {
     docs: {
@@ -368,6 +475,14 @@ export const WithExtraContent: Story = {
       },
     ],
   },
+  play: async ({ canvas }) => {
+    // extraContent sits between the description and the options.
+    const extra = canvas.getByText("Ask a teammate to share a file with you.");
+    const body = canvas.getByTestId("empty-view-body");
+    await expect(
+      extra.compareDocumentPosition(body) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  },
   parameters: {
     docs: {
       description: {
@@ -388,6 +503,54 @@ export const WithExtraContent: Story = {
   },
 };
 
+export const LinkWithoutRouter: Story = {
+  render: (args) => <EmptyView {...args} />,
+  args: {
+    icon: <EmptyRoomsLightSvg />,
+    title: "No results",
+    description: "Nothing matches the current filter.",
+    options: [
+      {
+        key: "clear",
+        icon: <CrossSvg />,
+        to: "/files?filter=none",
+        description: "Clear filter",
+        onClick: fn().mockName("Clear filter"),
+      },
+    ],
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const [clear] = (args.options ?? []) as { onClick: () => void }[];
+    // Without a LinkRouter the option is still a real link to its `to`:
+    // in the Tab order and announced as a link.
+    const link = canvas.getByRole("link", { name: "Clear filter" });
+    await expect(link).toHaveAttribute("href", "/files?filter=none");
+    await userEvent.tab();
+    await expect(link).toHaveFocus();
+    // The handler owns a plain click and Enter; the page does not navigate.
+    await userEvent.keyboard("{Enter}");
+    await expect(clear.onClick).toHaveBeenCalledTimes(1);
+    await userEvent.click(link);
+    await expect(clear.onClick).toHaveBeenCalledTimes(2);
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A link option with no `LinkRouter` — or with `isNext` — renders the kit's own link, with `to` as its `href`. A plain click and Enter run its `onClick` and stay on the page; a Ctrl- or middle-click opens `to` in a new tab, and an option with no `onClick` navigates to it.",
+      },
+      source: {
+        code: `<EmptyView
+  icon={<EmptyIcon />}
+  title="No results"
+  description="Nothing matches the current filter."
+  options={[{ key: "clear", icon: <CrossIcon />, to: "/files?filter=none", description: "Clear filter", onClick: clearFilter }]}
+/>`,
+      },
+    },
+  },
+};
+
 export const RightToLeft: Story = {
   render: (args) => (
     <div dir="rtl">
@@ -395,6 +558,15 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // In the option row the icon sits to the right of its text.
+    const title = canvas.getByText("Create a folder");
+    const option = title.closest("[role='button']") as HTMLElement;
+    const icon = option.querySelector("svg") as SVGElement;
+    await expect(icon.getBoundingClientRect().left).toBeGreaterThan(
+      title.getBoundingClientRect().left,
+    );
+  },
   args: {
     icon: <EmptyRoomsLightSvg />,
     title: "This folder is empty",
@@ -432,16 +604,35 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("No Files Found")).toHaveStyle({
+      color: "rgb(0, 130, 201)",
+      fontSize: "18px",
+    });
+    await expect(
+      canvas.getByText("Upload or create files to get started."),
+    ).toHaveStyle({ color: "rgb(91, 107, 122)" });
+    const folder = canvas
+      .getByText("Create a folder")
+      .closest("[role='button']") as HTMLElement;
+    await expect(folder).toHaveStyle({
+      borderRadius: "12px",
+      padding: "16px 20px",
+    });
+    await expect(canvas.getByText("Create a folder")).toHaveStyle({
+      color: "rgb(0, 79, 130)",
+    });
+  },
   render: () => (
     <div
       style={
         {
           "--empty-view-title-color": "#0082c9",
           "--empty-view-header-font-size": "18px",
-          "--empty-view-desc-color": "#5b6b7a",
+          "--empty-view-desc-color": "light-dark(#5b6b7a, #a3a9ae)",
           "--empty-view-link-accent": "#0082c9",
-          "--empty-view-link-background": "#e6f3fb",
-          "--empty-view-link-hover-background": "#cce5f6",
+          "--empty-view-link-background": "light-dark(#e6f3fb, #16303e)",
+          "--empty-view-link-hover-background": "light-dark(#cce5f6, #1f4a61)",
           "--empty-view-link-radius": "50px",
           "--empty-view-link-padding": "8px 16px",
           "--empty-view-link-text-size": "14px",
@@ -450,8 +641,8 @@ export const CssCustomization: Story = {
           "--empty-view-item-padding": "16px 20px",
           "--empty-view-item-gap": "16px",
           "--empty-view-icon-size": "24px",
-          "--empty-view-item-hover-background": "#e6f3fb",
-          "--empty-view-item-title-color": "#004f82",
+          "--empty-view-item-hover-background": "light-dark(#e6f3fb, #16303e)",
+          "--empty-view-item-title-color": "light-dark(#004f82, #7cc3ea)",
           "--empty-view-item-desc-color": "#7a8a99",
           "--empty-view-divider-color": "#0082c9",
           "--empty-view-width": "400px",
@@ -498,7 +689,7 @@ export const CssCustomization: Story = {
         code: `<div
   style={{
     "--empty-view-title-color": "#0082c9",
-    "--empty-view-link-background": "#e6f3fb",
+    "--empty-view-link-background": "light-dark(#e6f3fb, #16303e)",
     "--empty-view-link-radius": "50px",
     "--empty-view-item-radius": "12px",
     "--empty-view-divider-color": "#0082c9",

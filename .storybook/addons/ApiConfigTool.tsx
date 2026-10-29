@@ -13,6 +13,7 @@ import { EditorIcon, TrashIcon } from "@storybook/icons";
 import {
   getSavedProviders,
   deleteProvider,
+  saveSelectedApiConfig,
   STORAGE_KEY,
   type SavedApiProvider,
 } from "../utils/apiProviders";
@@ -219,6 +220,7 @@ const ApiConfigDropdown = () => {
       if (value === "add-custom") {
         setModalOpen(true);
       } else {
+        saveSelectedApiConfig(String(value));
         updateGlobals({ apiConfig: value });
       }
     },
@@ -238,6 +240,7 @@ const ApiConfigDropdown = () => {
 
       setProviders(getSavedProviders());
       setModalOpen(false);
+      saveSelectedApiConfig(id);
       updateGlobals({ apiConfig: id });
     },
     [updateGlobals],
@@ -252,13 +255,17 @@ const ApiConfigDropdown = () => {
       e.stopPropagation();
       deleteProvider(id);
       setProviders(getSavedProviders());
+      if (id === apiConfig) {
+        saveSelectedApiConfig("default");
+        updateGlobals({ apiConfig: "default" });
+      }
       api.addNotification({
         id: `api-provider-deleted-${id}`,
         content: { headline: "Success deleted" },
         duration: 4000,
       });
     },
-    [api],
+    [api, apiConfig, updateGlobals],
   );
 
   const options = [
@@ -289,6 +296,7 @@ const ApiConfigDropdown = () => {
         onClose={handleModalClose}
       />
       <Select
+        key={apiConfig}
         icon={<EditorIcon />}
         options={options}
         ariaLabel="API Config"

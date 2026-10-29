@@ -28,6 +28,30 @@ describe("<IconButton />", () => {
     expect(screen.getByTestId("icon-button-svg")).toBeInTheDocument();
   });
 
+  it("puts role and aria-label on the element", () => {
+    render(
+      <IconButton
+        {...baseProps}
+        role="button"
+        ariaLabel="Export key"
+        tabIndex={0}
+        onClick={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Export key" })).toBe(
+      screen.getByTestId("icon-button"),
+    );
+  });
+
+  it("sets no role or name of its own", () => {
+    render(<IconButton {...baseProps} title="Export key" />);
+
+    const element = screen.getByTestId("icon-button");
+    expect(element).not.toHaveAttribute("role");
+    expect(element).not.toHaveAttribute("aria-label");
+  });
+
   it("accepts and applies id prop", () => {
     const testId = "test-id";
     render(<IconButton {...baseProps} id={testId} />);

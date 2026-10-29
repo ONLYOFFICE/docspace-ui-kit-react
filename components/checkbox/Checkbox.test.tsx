@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 
 import type { CheckboxProps } from "./Checkbox.types";
 import { Checkbox } from ".";
+import styles from "./Checkbox.module.scss";
 
 const defaultProps: CheckboxProps = {
   name: "checkbox",
@@ -14,6 +15,21 @@ describe("<Checkbox />", () => {
   it("renders without error", () => {
     render(<Checkbox {...defaultProps} />);
     expect(screen.getByTestId("checkbox")).toBeInTheDocument();
+  });
+
+  // jsdom does no layout, so the ellipsis itself is checked by the
+  // WithTruncation story; here, that truncate reaches the wrapper whose
+  // stylesheet lets the text shrink, and only with truncate.
+  it("marks the label wrapper for truncation only with truncate", () => {
+    const { container, rerender } = render(
+      <Checkbox {...defaultProps} label="A long label" />,
+    );
+    const wrapper = container.querySelector(
+      `.${styles.wrapper}`,
+    ) as HTMLElement;
+    expect(wrapper).not.toHaveClass(styles.truncate);
+    rerender(<Checkbox {...defaultProps} label="A long label" truncate />);
+    expect(wrapper).toHaveClass(styles.truncate);
   });
 
   it("renders with label", () => {
@@ -103,5 +119,48 @@ describe("<Checkbox />", () => {
 
     expect(handleChange).not.toHaveBeenCalled();
     expect(checkbox).not.toBeChecked();
+  });
+
+  it("toggles once while Space is held, ignoring its auto-repeats", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    render(
+      <Checkbox {...defaultProps} label="Saved" onChange={handleChange} />,
+    );
+
+    await user.tab();
+    await user.keyboard("[Space>3/]");
+
+    expect(handleChange).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("checkbox", { name: "Saved" })).toBeChecked();
+  });
+
+  it("keeps the focus on the checkbox when Space toggles it", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <Checkbox {...defaultProps} label="Saved" />
+        <button type="button">Continue</button>
+      </>,
+    );
+    const checkbox = screen.getByRole("checkbox", { name: "Saved" });
+
+    await user.tab();
+    expect(checkbox).toHaveFocus();
+    await user.keyboard(" ");
+
+    expect(checkbox).toBeChecked();
+    expect(checkbox).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Continue" })).toHaveFocus();
+  });
+
+  it("is no tab stop while disabled", async () => {
+    const user = userEvent.setup();
+    render(<Checkbox {...defaultProps} label="Saved" isDisabled />);
+
+    await user.tab();
+
+    expect(document.body).toHaveFocus();
   });
 });

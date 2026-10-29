@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { screen, render, fireEvent } from "@testing-library/react";
+import { screen, render, fireEvent, act } from "@testing-library/react";
 
 import { Tabs } from ".";
 import { TabsTypes } from "./Tabs.enums";
@@ -199,6 +199,21 @@ describe("Tabs", () => {
     expect(onClickMock).toHaveBeenCalled();
   });
 
+  it("ignores a click on a disabled tab", () => {
+    const onSelectMock = vi.fn();
+    const onClickMock = vi.fn();
+    const items = [
+      arrayItems[0],
+      { ...arrayItems[1], isDisabled: true, onClick: onClickMock },
+    ];
+    render(
+      <Tabs items={items} selectedItemId="tab0" onSelect={onSelectMock} />,
+    );
+    fireEvent.click(screen.getByTestId("tab1_tab"));
+    expect(onSelectMock).not.toHaveBeenCalled();
+    expect(onClickMock).not.toHaveBeenCalled();
+  });
+
   it("applies custom className", () => {
     const { container } = render(
       <Tabs
@@ -343,6 +358,109 @@ describe("Tabs", () => {
       // scrollToTab is called on mount with selectedItemIndex
       expect(mockScrollTo).toHaveBeenCalled();
     });
+
+    const primaryItems: TTabItem[] = [
+      ...arrayItems,
+      { id: "tab2", name: "Title3", content: <div>Third</div> },
+    ];
+
+    it("is a tablist with one tab stop on the selected tab", () => {
+      render(<Tabs items={primaryItems} selectedItemId="tab1" />);
+
+      expect(screen.getByRole("tablist")).toBeInTheDocument();
+      const tabs = screen.getAllByRole("tab");
+      expect(tabs).toHaveLength(3);
+      expect(tabs[1]).toHaveAttribute("aria-selected", "true");
+      expect(tabs.map((tab) => tab.getAttribute("tabindex"))).toEqual([
+        "-1",
+        "0",
+        "-1",
+      ]);
+    });
+
+    it("moves the focus with the arrows, wraps, and selects only on Enter or Space", () => {
+      const onSelectMock = vi.fn();
+      render(
+        <Tabs
+          items={primaryItems}
+          selectedItemId="tab0"
+          onSelect={onSelectMock}
+        />,
+      );
+      const [first, second, third] = screen.getAllByRole("tab");
+      first.focus();
+
+      fireEvent.keyDown(first, { key: "ArrowRight" });
+      expect(second).toHaveFocus();
+      expect(second).toHaveAttribute("tabindex", "0");
+      expect(first).toHaveAttribute("tabindex", "-1");
+      expect(onSelectMock).not.toHaveBeenCalled();
+
+      fireEvent.keyDown(second, { key: "ArrowLeft" });
+      fireEvent.keyDown(first, { key: "ArrowLeft" });
+      expect(third).toHaveFocus();
+
+      fireEvent.keyDown(third, { key: "Home" });
+      expect(first).toHaveFocus();
+      fireEvent.keyDown(first, { key: "End" });
+      expect(third).toHaveFocus();
+
+      fireEvent.keyDown(third, { key: "Enter" });
+      expect(onSelectMock).toHaveBeenCalledWith(primaryItems[2]);
+      fireEvent.keyDown(third, { key: "ArrowLeft" });
+      fireEvent.keyDown(second, { key: " " });
+      expect(onSelectMock).toHaveBeenLastCalledWith(primaryItems[1]);
+    });
+
+    it("keeps the keys it handles from the page and lets Tab through", () => {
+      render(<Tabs items={primaryItems} selectedItemId="tab0" />);
+      const [first] = screen.getAllByRole("tab");
+      const onWindowKey = vi.fn();
+      window.addEventListener("keydown", onWindowKey);
+
+      first.focus();
+      fireEvent.keyDown(first, { key: "ArrowRight" });
+      expect(onWindowKey).not.toHaveBeenCalled();
+
+      const tab = fireEvent.keyDown(screen.getAllByRole("tab")[1], {
+        key: "Tab",
+      });
+      expect(tab).toBe(true);
+      expect(onWindowKey).toHaveBeenCalledTimes(1);
+
+      window.removeEventListener("keydown", onWindowKey);
+    });
+
+    it("moves the arrows from a tab focused by a click that selects nothing", () => {
+      render(<Tabs items={primaryItems} selectedItemId="tab0" />);
+      const [first, second] = screen.getAllByRole("tab");
+      first.focus();
+      fireEvent.keyDown(first, { key: "ArrowRight" });
+      expect(second).toHaveFocus();
+
+      act(() => first.focus());
+      fireEvent.click(first);
+      fireEvent.keyDown(first, { key: "ArrowRight" });
+      expect(second).toHaveFocus();
+    });
+
+    it("refuses a disabled tab by click and by keyboard", () => {
+      const onSelectMock = vi.fn();
+      const onClickMock = vi.fn();
+      const items = [
+        arrayItems[0],
+        { ...arrayItems[1], isDisabled: true, onClick: onClickMock },
+      ];
+      render(
+        <Tabs items={items} selectedItemId="tab0" onSelect={onSelectMock} />,
+      );
+      const disabled = screen.getByTestId("tab1_tab");
+      expect(disabled).toHaveAttribute("aria-disabled", "true");
+      fireEvent.click(disabled);
+      fireEvent.keyDown(disabled, { key: "Enter" });
+      expect(onSelectMock).not.toHaveBeenCalled();
+      expect(onClickMock).not.toHaveBeenCalled();
+    });
   });
 
   describe("SecondaryTabs details", () => {
@@ -362,9 +480,10 @@ describe("Tabs", () => {
         },
       });
 
+      const onTab2Click = vi.fn();
       const items = [
         { id: "1", name: "Tab 1", content: "1" },
-        { id: "2", name: "Tab 2", content: "2" },
+        { id: "2", name: "Tab 2", content: "2", onClick: onTab2Click },
         { id: "3", name: "Tab 3", content: "3" },
       ];
 
@@ -394,12 +513,12 @@ describe("Tabs", () => {
       // In JSDOM with these mocks, withArrows should become true
       // We might need to wait for state updates if they are async
 
-      if (arrowRight) {
-        expect(arrowRight).toBeInTheDocument();
-        // Test arrow click
-        (arrowRight as HTMLElement).click();
-        expect(onSelectMock).toHaveBeenCalledWith(items[1]);
-      }
+      expect(arrowRight).toBeInTheDocument();
+      // The arrow selects the next tab the way a click on it does, the
+      // tab's own onClick included.
+      (arrowRight as HTMLElement).click();
+      expect(onSelectMock).toHaveBeenCalledWith(items[1]);
+      expect(onTab2Click).toHaveBeenCalledTimes(1);
 
       // Restore original offsetWidth
       if (originalOffsetWidth) {
@@ -619,21 +738,136 @@ describe("Tabs", () => {
       }
     });
 
-    it("handles global mouseup to set active element and deactivate hotkeys", () => {
+    it("is a tablist with one tab stop, and leaves the document's mouseup alone", () => {
+      const addSpy = vi.spyOn(document, "addEventListener");
       render(
+        <Tabs
+          items={arrayItems}
+          type={TabsTypes.Secondary}
+          selectedItemId="tab1"
+        />,
+      );
+
+      expect(screen.getByRole("tablist")).toBeInTheDocument();
+      const tabs = screen.getAllByRole("tab");
+      expect(tabs).toHaveLength(2);
+      expect(tabs[1]).toHaveAttribute("aria-selected", "true");
+      expect(tabs[1]).toHaveAttribute("tabindex", "0");
+      expect(tabs[0]).toHaveAttribute("tabindex", "-1");
+      expect(addSpy).not.toHaveBeenCalledWith("mouseup", expect.any(Function));
+      addSpy.mockRestore();
+    });
+
+    it("does not take the Tab key from the page", () => {
+      render(
+        <Tabs
+          items={arrayItems}
+          type={TabsTypes.Secondary}
+          selectedItemId="tab0"
+          hotkeysId="bar"
+        />,
+      );
+      const event = new KeyboardEvent("keydown", {
+        key: "Tab",
+        bubbles: true,
+        cancelable: true,
+      });
+      window.dispatchEvent(event);
+      expect(event.defaultPrevented).toBe(false);
+    });
+
+    it("moves the focus with the arrows and selects with Enter", () => {
+      const onSelectMock = vi.fn();
+      render(
+        <Tabs
+          items={arrayItems}
+          type={TabsTypes.Secondary}
+          selectedItemId="tab0"
+          onSelect={onSelectMock}
+        />,
+      );
+      const [first, second] = screen.getAllByRole("tab");
+      first.focus();
+      fireEvent.keyDown(first, { key: "ArrowRight" });
+      expect(second).toHaveFocus();
+      expect(second).toHaveAttribute("tabindex", "0");
+      fireEvent.keyDown(second, { key: "Enter" });
+      expect(onSelectMock).toHaveBeenCalledWith(arrayItems[1]);
+    });
+
+    const threeItems: TTabItem[] = [
+      ...arrayItems,
+      { id: "tab2", name: "Title3", content: <div>Third</div> },
+    ];
+
+    it("moves the arrows from a tab focused by a click that selects nothing", () => {
+      render(
+        <Tabs
+          items={threeItems}
+          type={TabsTypes.Secondary}
+          selectedItemId="tab0"
+        />,
+      );
+      const [first, second] = screen.getAllByRole("tab");
+      first.focus();
+      fireEvent.keyDown(first, { key: "ArrowRight" });
+      expect(second).toHaveFocus();
+
+      // A click on the tab already selected focuses it and selects nothing.
+      act(() => first.focus());
+      fireEvent.click(first);
+      fireEvent.keyDown(first, { key: "ArrowRight" });
+      expect(second).toHaveFocus();
+    });
+
+    it("keeps one tab in the tab order when the list shrinks", () => {
+      const { rerender } = render(
+        <Tabs
+          items={threeItems}
+          type={TabsTypes.Secondary}
+          selectedItemId="tab0"
+        />,
+      );
+      const tabs = screen.getAllByRole("tab");
+      tabs[0].focus();
+      fireEvent.keyDown(tabs[0], { key: "End" });
+      expect(tabs[2]).toHaveFocus();
+
+      rerender(
         <Tabs
           items={arrayItems}
           type={TabsTypes.Secondary}
           selectedItemId="tab0"
         />,
       );
+      const remaining = screen.getAllByRole("tab");
+      expect(remaining).toHaveLength(2);
+      expect(
+        remaining.filter((tab) => tab.getAttribute("tabindex") === "0"),
+      ).toHaveLength(1);
+    });
 
-      const target = document.createElement("div");
-      target.focus = vi.fn();
-
-      fireEvent.mouseUp(document, { target });
-
-      expect(target.focus).toHaveBeenCalled();
+    it("refuses a disabled tab by click and by keyboard", () => {
+      const onSelectMock = vi.fn();
+      const onClickMock = vi.fn();
+      const items = [
+        arrayItems[0],
+        { ...arrayItems[1], isDisabled: true, onClick: onClickMock },
+      ];
+      render(
+        <Tabs
+          items={items}
+          type={TabsTypes.Secondary}
+          selectedItemId="tab0"
+          onSelect={onSelectMock}
+        />,
+      );
+      const disabled = screen.getByTestId("tab1_subtab");
+      expect(disabled).toHaveAttribute("aria-disabled", "true");
+      fireEvent.click(disabled);
+      fireEvent.keyDown(disabled, { key: "Enter" });
+      expect(onSelectMock).not.toHaveBeenCalled();
+      expect(onClickMock).not.toHaveBeenCalled();
     });
   });
 });

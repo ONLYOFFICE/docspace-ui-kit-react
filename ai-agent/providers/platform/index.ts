@@ -44,12 +44,21 @@ const showHostToast: NonNullable<PlatformAdapter["showToast"]> = (
 // a secure context: on a portal served over plain HTTP `navigator.clipboard`
 // is undefined and every copy button threw (Bug 84481). There the copy falls
 // back to `copy-to-clipboard`, whose `execCommand("copy")` needs no secure
-// context and still runs inside the click that triggered it. A failed copy
-// rejects, so the button does not report "Copied".
+// context and, with nothing awaited first, still runs inside the click that
+// triggered it. The fallback after a rejected `writeText` does not: it runs
+// after an `await`, which Safari no longer counts as part of the gesture. An
+// unfocused document is the one rejection known up front, so it skips
+// `writeText` and copies synchronously instead. A failed copy rejects, so the
+// button does not report "Copied".
 export const copyToHostClipboard: NonNullable<
   PlatformAdapter["copyToClipboard"]
 > = async (text) => {
-  if (isBrowser && window.isSecureContext && navigator.clipboard) {
+  if (
+    isBrowser &&
+    window.isSecureContext &&
+    navigator.clipboard &&
+    document.hasFocus()
+  ) {
     try {
       await navigator.clipboard.writeText(text);
       return;

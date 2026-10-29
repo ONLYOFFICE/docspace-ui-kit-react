@@ -36,12 +36,22 @@ describe("<ArticleItem />", () => {
 
   it("displays text when showText is true", () => {
     render(<ArticleItem {...baseProps} />);
-    expect(screen.getByText("Documents")).toBeInTheDocument();
+    // The drawn label; the control carries the same text as its name.
+    expect(
+      screen.getByText("Documents", { selector: ".articleItemText" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "Documents" }),
+    ).toBeInTheDocument();
   });
 
-  it("hides text when showText is false", () => {
-    render(<ArticleItem {...baseProps} showText={false} />);
-    expect(screen.queryByText("Documents")).not.toBeInTheDocument();
+  it("draws no label when showText is false, yet stays named by text", () => {
+    render(<ArticleItem {...baseProps} showText={false} showBadge={false} />);
+    // Only the visually hidden copy of the label is left.
+    expect(screen.getByText("Documents").className).toMatch(/visuallyHidden/);
+    expect(
+      screen.getByRole("button", { name: "Documents" }),
+    ).toBeInTheDocument();
   });
 
   it("shows initial letter when showInitial is true", () => {
@@ -109,5 +119,224 @@ describe("<ArticleItem />", () => {
     );
     render(<ArticleItem {...baseProps} badgeComponent={<CustomBadge />} />);
     expect(screen.getByTestId("custom-badge")).toBeInTheDocument();
+  });
+
+  describe("keyboard and semantics", () => {
+    it("is a focusable button that Enter and Space activate", () => {
+      render(<ArticleItem {...baseProps} id="docs" showBadge={false} />);
+      const item = screen.getByRole("button", { name: "Documents" });
+      expect(item).toHaveAttribute("tabindex", "0");
+      item.focus();
+      fireEvent.keyDown(item, { key: "Enter" });
+      fireEvent.keyDown(item, { key: " " });
+      expect(mockOnClick).toHaveBeenCalledTimes(2);
+      expect(mockOnClick).toHaveBeenLastCalledWith(expect.anything(), "docs");
+    });
+
+    it("marks the active item with aria-current", () => {
+      render(<ArticleItem {...baseProps} isActive showBadge={false} />);
+      expect(screen.getByRole("button", { name: "Documents" })).toHaveAttribute(
+        "aria-current",
+        "page",
+      );
+    });
+
+    it("makes the badge a named button that Enter activates on its own", () => {
+      render(<ArticleItem {...baseProps} badgeTitle="Empty trash" />);
+      const badge = screen.getByRole("button", { name: "Empty trash" });
+      badge.focus();
+      fireEvent.keyDown(badge, { key: "Enter" });
+      expect(mockOnClickBadge).toHaveBeenCalledTimes(1);
+      expect(mockOnClick).not.toHaveBeenCalled();
+    });
+
+    // The portal's NewFilesBadge opens its panel in its own click handler and
+    // stops the click there, as a mouse click on it does.
+    it("lets a badgeComponent handle Enter the way it handles a click", () => {
+      const onBadgeClick = vi.fn();
+      const CustomBadge = () => (
+        <div
+          data-testid="custom-badge"
+          onClick={(e) => {
+            e.stopPropagation();
+            onBadgeClick();
+          }}
+        >
+          5
+        </div>
+      );
+      render(
+        <ArticleItem
+          {...baseProps}
+          badgeTitle="New files"
+          badgeComponent={<CustomBadge />}
+        />,
+      );
+      const badge = screen.getByRole("button", { name: "New files" });
+      badge.focus();
+      fireEvent.keyDown(badge, { key: "Enter" });
+      expect(onBadgeClick).toHaveBeenCalledTimes(1);
+      expect(mockOnClickBadge).not.toHaveBeenCalled();
+      expect(mockOnClick).not.toHaveBeenCalled();
+    });
+
+    it("still reports Enter on a badgeComponent that leaves the click alone", () => {
+      render(
+        <ArticleItem
+          {...baseProps}
+          badgeTitle="New files"
+          badgeComponent={<span>5</span>}
+        />,
+      );
+      const badge = screen.getByRole("button", { name: "New files" });
+      badge.focus();
+      fireEvent.keyDown(badge, { key: " " });
+      expect(mockOnClickBadge).toHaveBeenCalledTimes(1);
+      expect(mockOnClick).not.toHaveBeenCalled();
+    });
+
+    // The article re-renders its whole list on every route change; an item
+    // whose props did not change has to be skipped by the memo.
+    it("does not render an unchanged linked item again", () => {
+      let linkRenders = 0;
+      const LinkRouter = ({
+        children,
+        onClick,
+      }: {
+        children?: React.ReactNode;
+        onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+      }) => {
+        linkRenders += 1;
+        return (
+          <a href="#docs" onClick={onClick}>
+            {children}
+          </a>
+        );
+      };
+      const props = { ...baseProps, showBadge: false, LinkRouter };
+
+      const { rerender } = render(<ArticleItem {...props} />);
+      const afterMount = linkRenders;
+      rerender(<ArticleItem {...props} />);
+
+      expect(linkRenders).toBe(afterMount);
+    });
+
+    it("leaves the control to the link when LinkRouter is given", () => {
+      const LinkRouter = ({
+        children,
+        onClick,
+        ...rest
+      }: {
+        children?: React.ReactNode;
+        onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+      }) => (
+        <a href="#docs" onClick={onClick} {...rest}>
+          {children}
+        </a>
+      );
+      render(
+        <ArticleItem
+          {...baseProps}
+          showBadge={false}
+          isActive
+          LinkRouter={LinkRouter}
+        />,
+      );
+      const link = screen.getByRole("link", { name: "Documents" });
+      expect(link).toHaveAttribute("aria-current", "page");
+      expect(screen.queryByRole("button")).toBeNull();
+
+      // Enter on the link clicks the link itself, and that is reported.
+      fireEvent.click(link);
+      expect(mockOnClick).toHaveBeenCalledTimes(1);
+
+      // A pointer click inside is reported once, not twice.
+      fireEvent.click(screen.getByTestId("article-item-sibling"));
+      expect(mockOnClick).toHaveBeenCalledTimes(2);
+
+      // A middle click is the browser's, to open a new tab.
+      fireEvent.mouseDown(screen.getByTestId("article-item-sibling"), {
+        button: 1,
+      });
+      expect(mockOnClick).toHaveBeenCalledTimes(2);
+    });
+
+    it("runs onClick before the link navigates, so preventDefault cancels it", () => {
+      const navigate = vi.fn();
+      // Like react-router's Link: the consumer's onClick first, then the
+      // navigation unless that handler prevented it.
+      const LinkRouter = ({
+        children,
+        onClick,
+        to,
+        state: _state,
+        ...rest
+      }: {
+        children?: React.ReactNode;
+        onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+        to: unknown;
+        state?: unknown;
+      }) => (
+        <a
+          href="#docs"
+          {...rest}
+          onClick={(e) => {
+            onClick?.(e);
+            if (!e.defaultPrevented) navigate(to);
+            e.preventDefault();
+          }}
+        >
+          {children}
+        </a>
+      );
+      const onClick = vi.fn((e: React.MouseEvent) => {
+        e.preventDefault();
+      });
+      render(
+        <ArticleItem
+          {...baseProps}
+          showBadge={false}
+          linkData={{ path: "/docs", state: {} }}
+          onClick={onClick}
+          LinkRouter={LinkRouter}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole("link", { name: "Documents" }));
+      expect(onClick).toHaveBeenCalledTimes(1);
+      expect(navigate).not.toHaveBeenCalled();
+
+      onClick.mockImplementation(() => {});
+      fireEvent.click(screen.getByRole("link", { name: "Documents" }));
+      expect(onClick).toHaveBeenCalledTimes(2);
+      expect(navigate).toHaveBeenCalledWith("/docs");
+    });
+
+    const interactiveAncestor = (el: HTMLElement): Element | null =>
+      el.parentElement?.closest('[role="button"], a[href], button') ?? null;
+
+    it("does not nest the badge button inside the item button", () => {
+      render(<ArticleItem {...baseProps} badgeTitle="Empty trash" />);
+      const badge = screen.getByRole("button", { name: "Empty trash" });
+
+      expect(interactiveAncestor(badge)).toBeNull();
+    });
+
+    it("does not nest the badge button inside the LinkRouter link", () => {
+      const LinkRouter = ({ children }: { children?: React.ReactNode }) => (
+        <a href="#docs">{children}</a>
+      );
+      render(
+        <ArticleItem
+          {...baseProps}
+          badgeTitle="Empty trash"
+          LinkRouter={LinkRouter}
+        />,
+      );
+      const badge = screen.getByRole("button", { name: "Empty trash" });
+
+      expect(interactiveAncestor(badge)).toBeNull();
+    });
   });
 });

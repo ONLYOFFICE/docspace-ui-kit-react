@@ -15,31 +15,23 @@ import styles from "./Checkbox.module.scss";
 
 export * from "./Checkbox.types";
 
+// Purely decorative: the input beside it holds the focus, so swapping one icon
+// for another as the state changes loses nothing.
 const RenderCheckboxIcon = React.memo(
   ({
     isChecked,
     isIndeterminate,
-    tabIndex,
   }: {
     isChecked: boolean;
     isIndeterminate: boolean;
-    tabIndex: number;
   }) => {
+    const className = classNames(styles.checkbox, "not-selectable");
     return isIndeterminate ? (
-      <CheckboxIndeterminateIcon
-        tabIndex={tabIndex}
-        className={classNames(styles.checkbox, "not-selectable")}
-      />
+      <CheckboxIndeterminateIcon aria-hidden className={className} />
     ) : isChecked ? (
-      <CheckboxCheckedIcon
-        tabIndex={tabIndex}
-        className={classNames(styles.checkbox, "not-selectable")}
-      />
+      <CheckboxCheckedIcon aria-hidden className={className} />
     ) : (
-      <CheckboxIcon
-        tabIndex={tabIndex}
-        className={classNames(styles.checkbox, "not-selectable")}
-      />
+      <CheckboxIcon aria-hidden className={className} />
     );
   },
 );
@@ -58,9 +50,8 @@ const CheckboxPure = ({
   isIndeterminate = false,
   isDisabled,
   name,
-  // The focusable element is the icon, not the hidden input below -- so this
-  // defaulting to -1 took the whole control out of the tab order, and every
-  // caller had to pass 0 to get a checkbox a keyboard could reach.
+  // Goes on the input, the focusable element; this used to default to -1,
+  // which took the whole control out of the tab order.
   tabIndex = 0,
   helpButton,
   dataTestId,
@@ -119,16 +110,18 @@ const CheckboxPure = ({
         ref={ref}
         value={value}
         onChange={onInputChange}
-        tabIndex={-1}
+        tabIndex={tabIndex}
         {...rest}
       />
       <RenderCheckboxIcon
-        // A disabled checkbox is no tab stop, as a disabled input would not be.
-        tabIndex={isDisabled ? -1 : tabIndex}
         isChecked={checked || false}
         isIndeterminate={isIndeterminate || false}
       />
-      <div className={`${styles.wrapper} wrapper`}>
+      <div
+        className={classNames(styles.wrapper, "wrapper", {
+          [styles.truncate]: truncate,
+        })}
+      >
         {label ? (
           <Text
             as="span"

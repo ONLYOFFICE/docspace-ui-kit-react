@@ -197,8 +197,9 @@ export function AccessPicker() {
   inline `width` — and `style` is spread after, so a `width` in `style` wins over the prop.
 - **An option's `value` is its React key.** Two options sharing a value collide, and a caption
   row uses a fixed key of its own, so two `type: "text"` entries collide with each other.
-- **Nothing groups the set semantically.** The wrapper is a plain `<div>`; add a `<fieldset>`
-  with a `<legend>`, or `role="radiogroup"` with a label, yourself.
+- **The wrapper is a `role="radiogroup"` `<div>`.** That is what
+  [`FieldContainer`](../field-container/README.md) puts `aria-invalid`, `aria-required` and the
+  error's `aria-describedby` on, so a group inside one is described like any other control.
 - An option's `dataTestId` falls back to its `id` for the button's test id, while the caption row
   uses `radio-button-group_text`.
 
@@ -218,8 +219,8 @@ listed on [`RadioButton`](../radio-button/README.md).
   set and the arrow keys move within it.
 - **There is no focus ring**, because the inputs are hidden with opacity and nothing replaces
   the browser outline. See [`RadioButton`](../radio-button/README.md).
-- The group has no accessible name. Wrap it in a `<fieldset>` with a `<legend>`, or give the
-  container `role="radiogroup"` and `aria-labelledby`.
+- The wrapper is `role="radiogroup"`, but it has no accessible name and takes no `aria-label`
+  or `aria-labelledby`. Wrap it in a `<fieldset>` with a `<legend>` to name the set.
 - A `type: "text"` caption is a plain paragraph, not a legend, so it does not name the options
   that follow it for a screen reader.
 

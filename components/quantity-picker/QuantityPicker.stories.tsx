@@ -1,6 +1,7 @@
 import type { ComponentProps } from "react";
 import { useEffect, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fireEvent, fn } from "storybook/test";
 
 import { Tooltip } from "../tooltip";
 
@@ -169,6 +170,18 @@ const QuantityPickerWithState = (props: QuantityPickerProps) => {
   return <QuantityPicker {...props} value={value} onChange={handleChange} />;
 };
 
+type Canvas = {
+  getByTestId: (id: string) => HTMLElement;
+  getByRole: (role: string, options: { name: string }) => HTMLElement;
+};
+
+// The number shown in the field, and the two controls by their names.
+const field = (canvas: Canvas) => canvas.getByTestId("quantity_picker_input");
+const minus = (canvas: Canvas) =>
+  canvas.getByRole("button", { name: "Decrease" });
+const plus = (canvas: Canvas) =>
+  canvas.getByRole("button", { name: "Increase" });
+
 export const Default: Story = {
   render: (args) => <QuantityPickerWithState {...args} />,
   args: {
@@ -180,6 +193,24 @@ export const Default: Story = {
     subtitle: "Choose how many managers to add",
     decreaseLabel: "Decrease",
     increaseLabel: "Increase",
+    onChange: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(field(canvas)).toHaveValue("5");
+
+    await userEvent.click(plus(canvas));
+    await expect(field(canvas)).toHaveValue("6");
+    await expect(args.onChange).toHaveBeenLastCalledWith(6);
+
+    await userEvent.click(minus(canvas));
+    await userEvent.click(minus(canvas));
+    await expect(field(canvas)).toHaveValue("4");
+
+    // A typed number past the maximum is held at the maximum.
+    await userEvent.clear(field(canvas));
+    await userEvent.type(field(canvas), "150{Enter}");
+    await expect(field(canvas)).toHaveValue("100");
+    await expect(args.onChange).toHaveBeenLastCalledWith(100);
   },
   parameters: {
     docs: {
@@ -214,6 +245,16 @@ export const WithSlider: Story = {
     showSlider: true,
     title: "Storage",
     subtitle: "GB of additional storage",
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // The slider and the field stay in step both ways.
+    const slider = canvas.getByRole("slider");
+    await expect(slider).toHaveValue("40");
+    fireEvent.change(slider, { target: { value: "70" } });
+    await expect(field(canvas)).toHaveValue("70");
+    await expect(args.onChange).toHaveBeenLastCalledWith(70);
+    await userEvent.click(plus(canvas));
+    await expect(slider).toHaveValue("71");
   },
   parameters: {
     docs: {
@@ -250,6 +291,11 @@ export const WithPresets: Story = {
     title: "Copies",
     subtitle: "Pick a preset or enter a number",
   },
+  play: async ({ canvas, userEvent }) => {
+    // A preset adds its amount to the current value.
+    await userEvent.click(canvas.getByText("+50"));
+    await expect(field(canvas)).toHaveValue("60");
+  },
   parameters: {
     docs: {
       description: {
@@ -285,6 +331,12 @@ export const Disabled: Story = {
     title: "Managers",
     subtitle: "This amount cannot be changed",
   },
+  play: async ({ canvas }) => {
+    // Static text in place of the field, and both controls disabled.
+    await expect(canvas.getByText("Unlimited")).toBeVisible();
+    await expect(minus(canvas)).toBeDisabled();
+    await expect(plus(canvas)).toBeDisabled();
+  },
   parameters: {
     docs: {
       description: {
@@ -317,6 +369,12 @@ export const WithPlusSign: Story = {
     showPlusSign: true,
     title: "Copies",
     subtitle: "More than 100 counts as one choice",
+  },
+  play: async ({ canvas, userEvent }) => {
+    // One step past the maximum reads as the maximum with a plus sign.
+    await expect(field(canvas)).toHaveValue("100+");
+    await userEvent.click(minus(canvas));
+    await expect(field(canvas)).toHaveValue("100");
   },
   parameters: {
     docs: {
@@ -351,6 +409,12 @@ export const WithZeroAllowed: Story = {
     title: "Copies",
     subtitle: "At least 5, or none at all",
     underControlsTitle: "Press minus to drop to zero",
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(minus(canvas));
+    await expect(field(canvas)).toHaveValue("0");
+    await userEvent.click(plus(canvas));
+    await expect(field(canvas)).toHaveValue("5");
   },
   parameters: {
     docs: {
@@ -393,6 +457,18 @@ export const MinusLockedWithTooltip: Story = {
     minusDisabled: true,
     minusTooltipId: "quantity-picker-minus-tooltip",
   },
+  play: async ({ canvas, userEvent }) => {
+    // Locked, yet focusable, so the tooltip can still explain why.
+    await expect(minus(canvas)).toHaveAttribute("aria-disabled", "true");
+    await expect(minus(canvas)).toBeEnabled();
+    await userEvent.tab();
+    await expect(minus(canvas)).toHaveFocus();
+
+    await userEvent.click(minus(canvas));
+    await expect(field(canvas)).toHaveValue("5");
+    await userEvent.click(plus(canvas));
+    await expect(field(canvas)).toHaveValue("6");
+  },
   parameters: {
     docs: {
       description: {
@@ -428,6 +504,15 @@ export const WithoutControls: Story = {
     title: "Copies",
     subtitle: "Drag the slider or type a number",
   },
+  play: async ({ args, canvas, userEvent }) => {
+    // No minus or plus; the slider and the field remain.
+    await expect(canvas.queryByRole("button", { name: "Decrease" })).toBeNull();
+    await expect(canvas.queryByRole("button", { name: "Increase" })).toBeNull();
+    await userEvent.clear(field(canvas));
+    await userEvent.type(field(canvas), "12{Enter}");
+    await expect(canvas.getByRole("slider")).toHaveValue("12");
+    await expect(args.onChange).toHaveBeenLastCalledWith(12);
+  },
   parameters: {
     docs: {
       description: {
@@ -457,6 +542,12 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // Minus and plus swap sides: plus at the left end.
+    await expect(plus(canvas).getBoundingClientRect().left).toBeLessThan(
+      minus(canvas).getBoundingClientRect().left,
+    );
+  },
   args: {
     ...Default.args,
     value: 40,

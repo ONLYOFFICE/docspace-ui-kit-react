@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 
 import { ActionButton } from ".";
 
@@ -56,6 +57,7 @@ const meta = {
   },
   args: {
     label: "Clear filter",
+    onClick: fn(),
   },
 } satisfies Meta<typeof ActionButton>;
 
@@ -64,6 +66,19 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: (args) => <ActionButton {...args} />,
+  play: async ({ args, canvas, userEvent }) => {
+    const button = canvas.getByRole("button", { name: "Clear filter" });
+
+    // A native button: Tab reaches it, Enter and Space press it.
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" ");
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledTimes(3);
+  },
   parameters: {
     docs: {
       description: {
@@ -80,6 +95,11 @@ export const Default: Story = {
 export const WithIcon: Story = {
   args: {
     icon: <FilterIcon />,
+  },
+  play: async ({ canvas }) => {
+    // The icon sits before the label; the label alone names the button.
+    const button = canvas.getByRole("button", { name: "Clear filter" });
+    await expect(button.firstElementChild?.querySelector("svg")).not.toBeNull();
   },
   parameters: {
     docs: {
@@ -100,6 +120,13 @@ export const AsLink: Story = {
     href: "#",
     label: "Go to page",
   },
+  play: async ({ canvas }) => {
+    // as="a" renders a real link that takes href.
+    await expect(
+      canvas.getByRole("link", { name: "Go to page" }),
+    ).toHaveAttribute("href", "#");
+    await expect(canvas.queryByRole("button")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -117,6 +144,12 @@ export const DisabledState: Story = {
   args: {
     icon: <FilterIcon />,
     disabled: true,
+  },
+  play: async ({ args, canvas }) => {
+    const button = canvas.getByRole("button", { name: "Clear filter" });
+    await expect(button).toBeDisabled();
+    // A disabled button takes no pointer events, so the click is not tried.
+    await expect(args.onClick).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {

@@ -1,6 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import VerticalDotsReactSvgUrl from "../../assets/icons/16/vertical-dots.react.svg?url";
 
@@ -9,12 +10,19 @@ import type { ContextMenuModel } from "../context-menu";
 import { ContextMenuButton } from ".";
 import { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
 
+const onOption2 = fn().mockName("Option 2");
+
 const menuData: ContextMenuModel[] = [
-  { key: "key1", label: "Option 1" },
-  { key: "key2", label: "Option 2" },
-  { key: "key3", label: "Option 3" },
+  { key: "key1", label: "Option 1", onClick: fn().mockName("Option 1") },
+  { key: "key2", label: "Option 2", onClick: onOption2 },
+  { key: "key3", label: "Option 3", onClick: fn().mockName("Option 3") },
   { key: "key4", isSeparator: true },
-  { key: "key5", label: "Delete", disabled: false },
+  {
+    key: "key5",
+    label: "Delete",
+    disabled: false,
+    onClick: fn().mockName("Delete"),
+  },
 ];
 
 function getMenuData() {
@@ -118,12 +126,12 @@ const meta = {
     onClick: {
       action: "onClick",
       description:
-        "Called on a click on the icon: in `dropdown` mode on the click that closes an open menu, in `toggle` mode on every click instead of opening a menu",
+        "Called when the button opens the menu in `dropdown` mode (not when it closes it), and in `toggle` mode on every click or Enter/Space instead of opening a menu",
     },
     onClose: {
       action: "onClose",
       description:
-        "Called when the menu closes by itself after a click outside it",
+        "Called whenever the open menu closes: a click outside it, Escape, Tab, a second click on the button or a chosen item",
     },
     opened: {
       control: "boolean",
@@ -135,8 +143,7 @@ const meta = {
     },
     data: {
       control: false,
-      description:
-        "Items shown before the first click; read once, after which `getData` decides what the menu holds",
+      description: "Items of the menu when there is no `getData`",
       table: {
         defaultValue: { summary: "[]" },
       },
@@ -144,7 +151,7 @@ const meta = {
     getData: {
       control: false,
       description:
-        "Returns the menu items; called on every click, and required in practice, since a click without it throws",
+        "Returns the menu items; called each time the menu opens, and used instead of `data` when set",
     },
     iconName: {
       control: "text",
@@ -174,13 +181,11 @@ const meta = {
     },
     onMouseOver: {
       action: "onMouseOver",
-      description:
-        "Called when a mouse button is pressed on the icon, despite the name",
+      description: "Called when the pointer moves onto the icon",
     },
     onMouseOut: {
       action: "onMouseOut",
-      description:
-        "Called when the middle or right mouse button is released on the icon, despite the name",
+      description: "Called when the pointer moves off the icon",
     },
     zIndex: {
       control: "number",
@@ -233,12 +238,84 @@ const Wrapper = (props: { children: React.ReactNode }) => {
 };
 
 export const Default: Story = {
-  // A fresh getData on every render lets the memoised component pick up control changes
   render: (args) => (
     <Wrapper>
-      <ContextMenuButton {...args} getData={() => args.getData?.() ?? []} />
+      <ContextMenuButton {...args} />
     </Wrapper>
   ),
+  play: async ({ args, canvas, userEvent }) => {
+    // A named menu button, collapsed.
+    const icon = canvas.getByRole("button", { name: "Actions" });
+    await expect(icon).toHaveAttribute("aria-haspopup", "menu");
+    await expect(icon).toHaveAttribute("aria-expanded", "false");
+
+    await userEvent.click(icon);
+    await expect(
+      screen.getByRole("menuitem", { name: "Option 1" }),
+    ).toBeVisible();
+    await expect(icon).toHaveAttribute("aria-expanded", "true");
+    await expect(screen.getByRole("menu")).toHaveAttribute(
+      "id",
+      icon.getAttribute("aria-controls"),
+    );
+    // onClick reports the click that opens the menu.
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+
+    // An item runs its own onClick, closes the menu and reports onClose.
+    await userEvent.click(screen.getByRole("menuitem", { name: "Option 2" }));
+    await expect(onOption2).toHaveBeenCalledTimes(1);
+    await waitFor(() =>
+      expect(screen.queryByRole("menuitem", { name: "Option 1" })).toBeNull(),
+    );
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
+
+    // Clicking the dots again opens (onClick) and then closes (onClose).
+    await userEvent.click(icon);
+    await userEvent.click(icon);
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+    await expect(args.onClose).toHaveBeenCalledTimes(2);
+    await expect(
+      screen.queryByRole("menuitem", { name: "Option 1" }),
+    ).toBeNull();
+
+    // A click outside closes it and reports onClose.
+    await userEvent.click(icon);
+    await expect(
+      screen.getByRole("menuitem", { name: "Option 1" }),
+    ).toBeVisible();
+    await userEvent.click(document.body);
+    await waitFor(() => expect(args.onClose).toHaveBeenCalledTimes(3));
+    await expect(
+      screen.queryByRole("menuitem", { name: "Option 1" }),
+    ).toBeNull();
+
+    // The keyboard: Tab to the button, Enter opens the menu on its first
+    // item, the arrows move, Enter runs the item and focus comes back.
+    await userEvent.tab();
+    await expect(icon).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    const first = await screen.findByRole("menuitem", { name: "Option 1" });
+    await waitFor(() => expect(first).toHaveFocus());
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(
+      screen.getByRole("menuitem", { name: "Option 2" }),
+    ).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(onOption2).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(icon).toHaveFocus());
+    await expect(icon).toHaveAttribute("aria-expanded", "false");
+
+    // Escape closes the menu, reports onClose and returns focus.
+    await userEvent.keyboard(" ");
+    await waitFor(() =>
+      expect(screen.getByRole("menuitem", { name: "Option 1" })).toHaveFocus(),
+    );
+    await userEvent.keyboard("{Escape}");
+    // Enter on Option 2 above was the fourth close, Escape the fifth.
+    await expect(args.onClose).toHaveBeenCalledTimes(5);
+    await expect(icon).toHaveFocus();
+    await expect(icon).toHaveAttribute("aria-expanded", "false");
+  },
   args: {
     title: "Actions",
     displayType: ContextMenuButtonDisplayType.dropdown,
@@ -251,12 +328,14 @@ export const Default: Story = {
     data: menuData,
     usePortal: false,
     getData: getMenuData,
+    onClick: fn(),
+    onClose: fn(),
   },
   parameters: {
     docs: {
       description: {
         story:
-          'The row-level "more" button: click the dots to open the menu and click again or outside it to close it. Change any other prop live in the Controls panel below.',
+          'The row-level "more" button: click the dots, or focus them and press Enter, Space or an arrow key, to open the menu, and click again, press Escape or click outside it to close it. In the open menu the arrow keys move between items and Enter runs one. Change any other prop live in the Controls panel below.',
       },
       source: {
         code: `<ContextMenuButton
@@ -290,6 +369,16 @@ const DisabledTemplate = () => {
 
 export const Disabled: Story = {
   render: () => <DisabledTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const icon = canvas.getByRole("button", { name: "Actions" });
+    await expect(icon).toHaveAttribute("aria-disabled", "true");
+    await expect(icon).toHaveAttribute("tabindex", "-1");
+    await userEvent.click(icon);
+    await expect(screen.queryByRole("menuitem")).toBeNull();
+    icon.focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(screen.queryByRole("menuitem")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -329,6 +418,17 @@ const WithIconBorderTemplate = () => {
 
 export const WithIconBorder: Story = {
   render: () => <WithIconBorderTemplate />,
+  play: async ({ canvas }) => {
+    // A rounded 32px box around the dots; the default theme draws no line.
+    const button = canvas.getByTestId("context-menu-button");
+    const rect = button.getBoundingClientRect();
+    await expect([Math.round(rect.width), Math.round(rect.height)]).toEqual([
+      32, 32,
+    ]);
+    await expect(
+      parseFloat(getComputedStyle(button).borderRadius),
+    ).toBeGreaterThan(0);
+  },
   parameters: {
     docs: {
       description: {
@@ -397,6 +497,24 @@ const CustomColorsTemplate = () => {
 
 export const CustomColors: Story = {
   render: () => <CustomColorsTemplate />,
+  play: async ({ canvas }) => {
+    // Blue, green and red, in the order they are drawn.
+    const colours = [
+      "rgb(45, 167, 219)",
+      "rgb(76, 175, 80)",
+      "rgb(255, 87, 34)",
+    ];
+    const buttons = canvas.getAllByTestId("context-menu-button");
+    for (const [index, colour] of colours.entries()) {
+      // The dots are fetched and inlined after mounting.
+      const path = await waitFor(() => {
+        const found = buttons[index].querySelector("svg path");
+        if (!found) throw new Error("The icon has not loaded yet");
+        return found;
+      });
+      await expect(getComputedStyle(path).fill).toBe(colour);
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -418,13 +536,13 @@ const CssCustomizationTemplate = () => {
     <div
       style={
         {
-          "--dropdown-bg": "#e6f3fb",
+          "--dropdown-bg": "light-dark(#e6f3fb, #16303e)",
           "--dropdown-border-style": "1px solid #0082c9",
           "--dropdown-shadow": "0 4px 16px rgba(0, 130, 201, 0.25)",
           "--dropdown-radius": "12px",
           "--dropdown-inner-padding": "4px 0",
           "--cmb-border": "1px solid #0082c9",
-          "--cmb-hover-border": "#003f63",
+          "--cmb-hover-border": "light-dark(#003f63, #a8d8f2)",
           "--cmb-size": "36px",
           "--cmb-radius": "8px",
           "--cmb-icon-padding": "8px 9px",
@@ -448,6 +566,12 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    // opened shows the menu without a click, inline because usePortal is off.
+    await expect(
+      canvas.getByRole("menuitem", { name: "Option 1" }),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -456,13 +580,13 @@ export const CssCustomization: Story = {
       source: {
         code: `<div
   style={{
-    "--dropdown-bg": "#e6f3fb",
+    "--dropdown-bg": "light-dark(#e6f3fb, #16303e)",
     "--dropdown-border-style": "1px solid #0082c9",
     "--dropdown-shadow": "0 4px 16px rgba(0, 130, 201, 0.25)",
     "--dropdown-radius": "12px",
     "--dropdown-inner-padding": "4px 0",
     "--cmb-border": "1px solid #0082c9",
-    "--cmb-hover-border": "#003f63",
+    "--cmb-hover-border": "light-dark(#003f63, #a8d8f2)",
     "--cmb-size": "36px",
     "--cmb-radius": "8px",
     "--cmb-icon-padding": "8px 9px",

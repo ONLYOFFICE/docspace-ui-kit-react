@@ -1,5 +1,19 @@
+import { useState } from "react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { flushSync } from "react-dom";
 import { screen, fireEvent, render } from "@testing-library/react";
+
+const device = vi.hoisted(() => ({ isMobile: false }));
+
+vi.mock("react-device-detect", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("react-device-detect")>();
+  return {
+    ...actual,
+    get isMobile() {
+      return device.isMobile;
+    },
+  };
+});
 import styles from "./DropDown.module.scss";
 import { DropDown } from ".";
 
@@ -222,6 +236,162 @@ describe("<DropDown />", () => {
 
       expect(document.querySelector(styles.backdrop)).not.toBeInTheDocument();
     });
+
+    it("renders a single backdrop for an open menu", () => {
+      render(
+        <DropDown {...baseProps} open>
+          <div>Content</div>
+        </DropDown>,
+      );
+
+      expect(screen.getAllByTestId("backdrop")).toHaveLength(1);
+    });
+
+    it("renders a single backdrop with usePortalBackdrop", () => {
+      render(
+        <DropDown {...baseProps} open usePortalBackdrop>
+          <div>Content</div>
+        </DropDown>,
+      );
+
+      expect(screen.getAllByTestId("backdrop")).toHaveLength(1);
+    });
+  });
+
+  describe("click outside on a mobile device", () => {
+    afterEach(() => {
+      device.isMobile = false;
+    });
+
+    it.each(["click", "touchend"])(
+      "calls clickOutsideAction on a %s outside the menu",
+      (type) => {
+        device.isMobile = true;
+        const clickOutsideAction = vi.fn();
+
+        render(
+          <DropDown
+            {...baseProps}
+            open
+            withBackdrop={false}
+            clickOutsideAction={clickOutsideAction}
+          >
+            <div>Content</div>
+          </DropDown>,
+        );
+
+        fireEvent(document.body, new Event(type, { bubbles: true }));
+
+        expect(clickOutsideAction).toHaveBeenCalledWith(
+          expect.any(Event),
+          false,
+        );
+      },
+    );
+
+    it("closes once on a tap on its backdrop and cancels the tap's click", () => {
+      device.isMobile = true;
+      const clickOutsideAction = vi.fn();
+
+      render(
+        <DropDown
+          {...baseProps}
+          open
+          withBackdrop
+          clickOutsideAction={clickOutsideAction}
+        >
+          <div>Content</div>
+        </DropDown>,
+      );
+
+      // The backdrop takes the touchend itself: the window listener must not
+      // close the menu a second time, and the click the browser would
+      // synthesise from the tap must not reach the page under the backdrop.
+      const touchEnd = new Event("touchend", {
+        bubbles: true,
+        cancelable: true,
+      });
+      fireEvent(screen.getByTestId("backdrop"), touchEnd);
+
+      expect(clickOutsideAction).toHaveBeenCalledTimes(1);
+      expect(touchEnd.defaultPrevented).toBe(true);
+    });
+
+    it("does not close on the tap that opened it", () => {
+      device.isMobile = true;
+      const clickOutsideAction = vi.fn();
+
+      const Opener = () => {
+        const [open, setOpen] = useState(false);
+        return (
+          <>
+            {/* In a browser a real tap runs microtasks between listeners, so
+                React commits the open state and its effects attach the window
+                listeners while the tap is still bubbling. flushSync does the
+                same inside a test, where a dispatched event runs none. */}
+            <button
+              type="button"
+              onClick={() => flushSync(() => setOpen(true))}
+            >
+              Open
+            </button>
+            <DropDown
+              {...baseProps}
+              open={open}
+              withBackdrop={false}
+              clickOutsideAction={clickOutsideAction}
+            >
+              <div>Content</div>
+            </DropDown>
+          </>
+        );
+      };
+      render(<Opener />);
+
+      fireEvent.click(screen.getByRole("button", { name: "Open" }));
+      expect(screen.getByText("Content")).toBeInTheDocument();
+      expect(clickOutsideAction).not.toHaveBeenCalled();
+
+      // The next tap outside still closes it.
+      fireEvent(document.body, new Event("click", { bubbles: true }));
+      expect(clickOutsideAction).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("does not ignore an outside mousedown that re-renders the open menu", () => {
+    const clickOutsideAction = vi.fn();
+    let bump: () => void = () => {};
+
+    const Host = () => {
+      const [, setCount] = useState(0);
+      bump = () => flushSync(() => setCount((c) => c + 1));
+      return (
+        <DropDown
+          {...baseProps}
+          open
+          withBackdrop={false}
+          eventTypes="mousedown"
+          // A new function every render, as ContextMenuButton passes.
+          clickOutsideAction={(e, next) => clickOutsideAction(e, next)}
+        >
+          <div>Content</div>
+        </DropDown>
+      );
+    };
+    render(<Host />);
+
+    // Something on the way to window re-renders the host while the
+    // mousedown is still being dispatched, so the listener is re-attached.
+    const onDocumentMouseDown = () => bump();
+    document.addEventListener("mousedown", onDocumentMouseDown);
+    try {
+      fireEvent.mouseDown(document.body);
+    } finally {
+      document.removeEventListener("mousedown", onDocumentMouseDown);
+    }
+
+    expect(clickOutsideAction).toHaveBeenCalledTimes(1);
+    expect(clickOutsideAction).toHaveBeenCalledWith(expect.any(Event), false);
   });
 
   describe("position calculation", () => {

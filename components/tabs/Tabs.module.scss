@@ -162,6 +162,13 @@
     padding: 0;
   }
 
+  // The horizontal track is 16px tall and covers the lower half of the bar,
+  // so a click under a label landed on the track and scrolled the row
+  // instead of selecting the tab. Its 1px thumb cannot be grabbed anyway.
+  :global(.track-horizontal) {
+    pointer-events: none;
+  }
+
   :global(.track > .thumb-horizontal) {
     height: 1px !important;
   }
@@ -267,12 +274,34 @@
       }
     }
 
+    &:focus-visible:not(.selected),
     &:hover:not(.selected) {
       .tabText {
         color: var(
           --tabs-primary-hover-text,
           var(--tabs-hover-text-color-primary)
         );
+      }
+    }
+
+    // The keyboard ring is a frame of its own: an outline inside the tab
+    // crosses the letters, and one outside is clipped at the top and the
+    // bottom by the scroller around the bar. The frame stays within the
+    // tab's height, above the underline, and reaches a little past the label
+    // on either side. Positioned only while focused: a positioned tab is
+    // painted in a layer of its own and its label loses the subpixel
+    // smoothing the client's screenshots were taken with.
+    &:focus-visible {
+      position: relative;
+      outline: none;
+
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0 -4px var(--tabs-indicator-height, 4px);
+        border: 2px solid var(--accent-main);
+        border-radius: 3px;
+        pointer-events: none;
       }
     }
   }
@@ -318,7 +347,7 @@
       }
     }
 
-    &.focused,
+    &:focus-visible,
     &:hover:not(.selected) {
       background-color: var(
         --tabs-secondary-hover-bg,

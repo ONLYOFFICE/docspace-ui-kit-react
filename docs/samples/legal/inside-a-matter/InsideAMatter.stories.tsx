@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, waitFor } from "storybook/test";
 
 import { withDemoBanner } from "../../../../.storybook/decorators/PortalGate";
 
@@ -20,4 +21,18 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  play: async ({ canvas }) => {
+    // Both views read the same checklist.
+    await waitFor(() =>
+      expect(canvas.getAllByText("3 of 5 received")).toHaveLength(2),
+    );
+    await expect(
+      canvas.getAllByText("Payslips, last 3 months")[0],
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: "Ask for it" }),
+    ).toBeVisible();
+    await expect(canvas.getAllByText("Draft claim.docx")[0]).toBeVisible();
+  },
+};

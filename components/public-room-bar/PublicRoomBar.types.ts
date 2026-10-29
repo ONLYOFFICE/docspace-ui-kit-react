@@ -13,12 +13,16 @@ export interface PublicRoomBarProps {
   hideHeader?: boolean;
   /** Called when the close button is clicked. The button exists only while this is set, and the bar does not hide itself. */
   onClose?: () => void;
+  /** Accessible name of the close button (its `aria-label`). Defaults to the translated `Common:CloseButton` ("Close"). Ignored without `onClose`. */
+  closeLabel?: string;
   /** Added after the component's own classes on the outer element. */
   className?: string;
   /** Inline style of the outer element, and where the `--public-room-bar-*` custom properties go. */
   style?: React.CSSProperties;
   /** Removes the bar's own 20px top margin, for a bar that already sits under something. It shows and hides nothing, whatever the name suggests. */
   barIsVisible?: boolean;
+  /** Announces the bar's text to screen readers when the bar appears and when the text changes, through a visually hidden status region. Set it for a bar that shows up in response to something; leave it off for one that is part of a panel or dialog from the start, which is read with the rest of the page. */
+  live?: boolean;
   /** Value of `data-testid` on the outer element.
    * @default "public_room_bar" */
   dataTestId?: string;

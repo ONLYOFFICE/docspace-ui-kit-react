@@ -100,12 +100,13 @@
     path {
       fill: var(--checkbox-arrow-color-default);
     }
-    &:focus {
-      outline: none;
-      rect {
-        stroke: var(--checkbox-focus-color);
-      }
-    }
+  }
+
+  // The input holds the focus and the icon right after it draws it. `:where()`
+  // keeps this under hover, pressed and the state colours, which drew over the
+  // `svg:focus` rule it replaces and still do.
+  :where(.hiddenInput:focus) + svg rect {
+    stroke: var(--checkbox-focus-color);
   }
 
   &.error {
@@ -219,6 +220,25 @@
 
 .wrapper {
   display: inline-block;
+
+  // `truncate`: the wrapper is a flex item of the label, and a flex item does
+  // not shrink below its content without `min-width: 0`; the text is a span,
+  // and `text-overflow` only cuts a block box. Both are needed for the
+  // ellipsis to appear instead of the text running out of its container.
+  &.truncate {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+
+    .checkboxText {
+      display: block;
+      min-width: 0;
+    }
+
+    .helpButton {
+      flex-shrink: 0;
+    }
+  }
 }
 
 .helpButton {

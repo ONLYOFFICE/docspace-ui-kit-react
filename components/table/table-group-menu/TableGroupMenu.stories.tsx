@@ -1,5 +1,6 @@
 import type { ComponentProps, CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 import type { TGroupMenuItem } from "../Table.types";
 
 import ChangeToEmployeeReactSvgUrl from "../../../assets/change.to.employee.react.svg?url";
@@ -130,6 +131,23 @@ type Story = StoryObj<TableGroupMenuProps>;
 
 export default meta;
 
+// The typed `render` parameter costs `play` its context type.
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+const onChangeType = fn();
+const onInfoItem = fn();
+const onInviteItem = fn();
+const onActiveOption = fn();
+
+const menu = (canvas: { getByTestId: (id: string) => HTMLElement }) =>
+  canvas.getByTestId("table-group-menu");
+
+// A toolbar action's button.
+const action = (root: HTMLElement, id: string) =>
+  within(within(root).getByTestId(`table_group_menu_item_${id}`)).getByTestId(
+    "group-menu-item-button",
+  );
+
 const createMenuItems = (): TGroupMenuItem[] => [
   {
     id: "menu-change-type",
@@ -137,18 +155,18 @@ const createMenuItems = (): TGroupMenuItem[] => [
     label: "Change type",
     title: "Change type",
     iconUrl: ChangeToEmployeeReactSvgUrl,
-    onClick: () => {},
+    onClick: onChangeType,
     withDropDown: true,
     options: [
       {
         key: "option-1",
         label: "Option 1",
-        onClick: () => {},
+        onClick: fn(),
       },
       {
         key: "option-2",
         label: "Option 2",
-        onClick: () => {},
+        onClick: fn(),
       },
     ],
   },
@@ -157,7 +175,7 @@ const createMenuItems = (): TGroupMenuItem[] => [
     label: "Info",
     title: "Info",
     disabled: false,
-    onClick: () => {},
+    onClick: onInfoItem,
     iconUrl: InfoReactSvgUrl,
   },
   {
@@ -165,19 +183,19 @@ const createMenuItems = (): TGroupMenuItem[] => [
     label: "Invite",
     title: "Invite",
     disabled: false,
-    onClick: () => {},
+    onClick: onInviteItem,
     iconUrl: InviteAgainReactSvgUrl,
   },
 ];
 
 const checkboxOptions = (
   <>
-    <DropDownItem key="all" label="All" data-index={0} onClick={() => {}} />
+    <DropDownItem key="all" label="All" data-index={0} onClick={fn()} />
     <DropDownItem
       key="active"
       label="Active"
       data-index={1}
-      onClick={() => {}}
+      onClick={onActiveOption}
     />
   </>
 );
@@ -189,13 +207,50 @@ export const Default: Story = {
     isIndeterminate: false,
     headerMenu: createMenuItems(),
     checkboxOptions,
-    onClick: () => {},
-    onChange: () => {},
+    onClick: fn(),
+    onChange: fn(),
     withoutInfoPanelToggler: false,
     isInfoPanelVisible: false,
-    toggleInfoPanel: () => {},
+    toggleInfoPanel: fn(),
     isBlocked: false,
     withComboBox: true,
+  },
+  beforeEach: () => {
+    onInfoItem.mockClear();
+    onActiveOption.mockClear();
+  },
+  play: async ({ args, canvas, userEvent }: PlayContext) => {
+    const toolbar = menu(canvas);
+    // The select-all checkbox asks for the opposite of its state.
+    const checkbox = within(toolbar).getByRole("checkbox");
+    await expect(checkbox).not.toBeChecked();
+    await userEvent.click(checkbox);
+    await expect(args.onChange).toHaveBeenCalledWith(true);
+
+    await userEvent.click(action(toolbar, "menu-info"));
+    await expect(onInfoItem).toHaveBeenCalledTimes(1);
+    await expect(args.onClick).toHaveBeenCalled();
+
+    // The arrow beside the checkbox offers what to select.
+    await userEvent.click(
+      within(
+        within(toolbar).getByTestId("table_group_menu_combobox"),
+      ).getByRole("button"),
+    );
+    const active = await waitFor(() => {
+      const option = screen
+        .getAllByRole("option", { name: "Active" })
+        .find((item) => item.checkVisibility());
+      expect(option).toBeDefined();
+      return option as HTMLElement;
+    });
+    await userEvent.click(active);
+    await expect(onActiveOption).toHaveBeenCalledTimes(1);
+
+    await userEvent.click(
+      within(toolbar).getByTestId("info-panel-toggle-button"),
+    );
+    await expect(args.toggleInfoPanel).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -224,6 +279,12 @@ export const Checked: Story = {
     ...Default.args,
     isChecked: true,
   },
+  play: async ({ args, canvas, userEvent }: PlayContext) => {
+    const checkbox = within(menu(canvas)).getByRole("checkbox");
+    await expect(checkbox).toBeChecked();
+    await userEvent.click(checkbox);
+    await expect(args.onChange).toHaveBeenCalledWith(false);
+  },
   parameters: {
     docs: {
       description: {
@@ -249,6 +310,11 @@ export const Indeterminate: Story = {
   args: {
     ...Default.args,
     isIndeterminate: true,
+  },
+  play: async ({ canvas }: PlayContext) => {
+    await expect(
+      within(menu(canvas)).getByRole("checkbox"),
+    ).toBePartiallyChecked();
   },
   parameters: {
     docs: {
@@ -276,6 +342,13 @@ export const WithHeaderLabel: Story = {
     ...Default.args,
     headerLabel: "Custom header label",
   },
+  play: async ({ canvas }: PlayContext) => {
+    const toolbar = menu(canvas);
+    await expect(
+      within(toolbar).getByText("Custom header label"),
+    ).toBeVisible();
+    await expect(within(toolbar).queryByRole("checkbox")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -301,7 +374,11 @@ export const Closeable: Story = {
   args: {
     ...Default.args,
     isCloseable: true,
-    onCloseClick: () => {},
+    onCloseClick: fn(),
+  },
+  play: async ({ args, canvas, userEvent }: PlayContext) => {
+    await userEvent.click(within(menu(canvas)).getByTestId("close-button"));
+    await expect(args.onCloseClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -330,6 +407,12 @@ export const Blocked: Story = {
     ...Default.args,
     isBlocked: true,
   },
+  play: async ({ canvas }: PlayContext) => {
+    const toolbar = menu(canvas);
+    for (const id of ["menu-change-type", "menu-info", "menu-invite"]) {
+      await expect(action(toolbar, id)).toBeDisabled();
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -355,6 +438,13 @@ export const InfoPanelOpen: Story = {
   args: {
     ...Default.args,
     isInfoPanelVisible: true,
+  },
+  play: async ({ canvas }: PlayContext) => {
+    const toggle = within(menu(canvas)).getByTestId("info-panel-toggle-button");
+    await expect(
+      (toggle.closest('[class*="infoPanelToggleWrapper"]') as HTMLElement)
+        .className,
+    ).toMatch(/isInfoPanelVisible/);
   },
   parameters: {
     docs: {
@@ -389,6 +479,15 @@ export const RightToLeft: Story = {
     })),
   },
   globals: { direction: "rtl" },
+  play: async ({ canvas }: PlayContext) => {
+    // The checkbox starts at the right edge, before the actions.
+    const toolbar = menu(canvas);
+    const checkbox = within(toolbar)
+      .getByTestId("table_group_menu_checkbox")
+      .getBoundingClientRect();
+    const info = action(toolbar, "menu-info").getBoundingClientRect();
+    await expect(checkbox.left).toBeGreaterThan(info.right);
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -421,6 +520,12 @@ export const CssCustomization: Story = {
   ),
   args: {
     ...Default.args,
+  },
+  play: async ({ canvas }: PlayContext) => {
+    const checkbox = within(menu(canvas)).getByTestId(
+      "table_group_menu_checkbox",
+    );
+    await expect(getComputedStyle(checkbox).marginInlineStart).toBe("12px");
   },
   parameters: {
     docs: {

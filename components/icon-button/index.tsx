@@ -80,6 +80,8 @@ const IconButton = memo(
     // For test
     dataTestId,
     tooltipContent,
+    role,
+    ariaLabel,
     tooltipId,
 
     ...rest
@@ -246,6 +248,8 @@ const IconButton = memo(
         data-tooltip-id={tooltipId}
         data-tooltip-content={tooltipContent}
         aria-disabled={isDisabled}
+        role={role}
+        aria-label={ariaLabel}
         {...rest}
       >
         {iconNode ? (

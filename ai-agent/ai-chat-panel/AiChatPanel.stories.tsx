@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor } from "storybook/test";
 import { observer } from "mobx-react";
 
 import { Button, ButtonSize } from "../../components/button";
@@ -178,7 +178,30 @@ type Story = StoryObj<StoryArgs>;
 
 const withChat = (aiChat: AiChatStoryProviderProps) => ({ aiChat });
 
+// The chat mounts its providers and the demo portal's profiles first.
+const composer = () =>
+  waitFor(() => screen.getByRole("textbox", { name: "Message input" }), {
+    timeout: 5000,
+  });
+
+const NOTE = "AI Chat can make mistakes. Check important info.";
+
 export const Default: Story = {
+  play: async ({ userEvent }) => {
+    await userEvent.type(await composer(), "Hello there{Enter}");
+    // The demo portal streams a fixed reply that quotes the message, one
+    // word at a time: the quote arrives after the first paragraph does.
+    await waitFor(
+      () =>
+        expect(
+          screen.getByText("Hello there", { selector: "strong" }),
+        ).toBeVisible(),
+      { timeout: 10000 },
+    );
+    await expect(
+      screen.getByText(/^This is a demo reply from the Storybook demo/),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -219,6 +242,16 @@ const FILES_SUGGESTIONS: SuggestionSet = {
 };
 
 export const WithSuggestions: Story = {
+  play: async ({ userEvent }) => {
+    const box = await composer();
+    // A chip puts its prompt into the composer.
+    await userEvent.click(screen.getByText("Draft a document"));
+    await waitFor(() =>
+      expect(box).toHaveValue(
+        "Draft a one-page project brief for a new client.",
+      ),
+    );
+  },
   parameters: {
     ...withChat({ suggestions: FILES_SUGGESTIONS }),
     docs: {
@@ -246,12 +279,30 @@ export const WithSuggestions: Story = {
 };
 
 export const WithoutModelPicker: Story = {
+  play: async ({ userEvent }) => {
+    await expect(await composer()).toBeEnabled();
+    await expect(screen.getByText(NOTE)).toBeVisible();
+
+    // @onlyoffice/ai-chat (0.6.0 on) locks the picker rather than removing
+    // it, because its menu also carries the Effort row: the current model is
+    // still named, and the menu offers no other model.
+    const picker = await waitFor(() => screen.getByTestId("model-selector"), {
+      timeout: 5000,
+    });
+    await waitFor(() => expect(picker).toHaveTextContent("Demo assistant"));
+    await userEvent.click(picker);
+    await waitFor(() =>
+      expect(screen.getAllByText("Demo assistant").length).toBeGreaterThan(1),
+    );
+    await expect(screen.queryByText("Demo writer")).toBeNull();
+    await userEvent.keyboard("{Escape}");
+  },
   parameters: {
     ...withChat({ hideProfilePicker: true }),
     docs: {
       description: {
         story:
-          "The host fixes the model and shows nothing about it: `hideProfilePicker` removes the picker entirely, label included. For an embedded chat that always talks to one assistant.",
+          "The host fixes the model: `hideProfilePicker` locks the picker. It still names the current model and keeps the Effort row, but offers no other model and no picker actions. `@onlyoffice/ai-chat` has rendered it this way since 0.6.0; there is no option that removes it.",
       },
       source: {
         code: `<AiAgentProviders locale="en" isAvailable hideProfilePicker>
@@ -263,6 +314,12 @@ export const WithoutModelPicker: Story = {
 };
 
 export const ReadOnly: Story = {
+  play: async () => {
+    await expect(await composer()).toBeDisabled();
+    await expect(
+      screen.getByText(/^You have view-only access to this room/),
+    ).toBeVisible();
+  },
   parameters: {
     ...withChat({
       composerDisabled: true,
@@ -293,6 +350,16 @@ export const ReadOnly: Story = {
 };
 
 export const NotConfigured: Story = {
+  play: async ({ args, userEvent }) => {
+    await waitFor(() =>
+      expect(screen.getByText("AI Chat isn\u2019t active yet")).toBeVisible(),
+    );
+    await expect(
+      screen.queryByRole("textbox", { name: "Message input" }),
+    ).toBeNull();
+    await userEvent.click(screen.getByRole("button", { name: "Activate" }));
+    await expect(args.noAccessProps?.onActivateAI).toHaveBeenCalledTimes(1);
+  },
   args: {
     aiReady: false,
     noAccessProps: {
@@ -324,6 +391,15 @@ export const NotConfigured: Story = {
 };
 
 export const NotConfiguredOnServer: Story = {
+  play: async ({ args, userEvent }) => {
+    await waitFor(() =>
+      expect(screen.getByText("AI Chat is not available yet")).toBeVisible(),
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "Go to Settings" }),
+    );
+    await expect(args.noAccessProps?.goToAISettings).toHaveBeenCalledTimes(1);
+  },
   args: {
     aiReady: false,
     noAccessProps: {
@@ -353,6 +429,17 @@ export const NotConfiguredOnServer: Story = {
 };
 
 export const NotConfiguredForUser: Story = {
+  play: async () => {
+    // Nothing to set up for someone who is not an admin.
+    await waitFor(() =>
+      expect(
+        screen.getByText(
+          "Contact your Full admin to activate AI Chat for this workspace.",
+        ),
+      ).toBeVisible(),
+    );
+    await expect(screen.queryByRole("button", { name: "Activate" })).toBeNull();
+  },
   args: {
     aiReady: false,
     noAccessProps: { standalone: false, isPortalAdmin: false },
@@ -374,6 +461,22 @@ export const NotConfiguredForUser: Story = {
 };
 
 export const RightToLeft: Story = {
+  play: async () => {
+    // The widget names the composer in Arabic; the placeholder is the kit's.
+    await waitFor(
+      () =>
+        screen.getByPlaceholderText(
+          "Ask any question or describe what you need",
+        ),
+      { timeout: 5000 },
+    );
+    await expect(document.documentElement).toHaveAttribute("data-dir", "rtl");
+    // The widget's own note switches to Arabic; the kit's texts stay English.
+    await waitFor(() => expect(screen.queryByText(NOTE)).toBeNull());
+    await expect(
+      screen.getByText("Your AI assistant for documents"),
+    ).toBeVisible();
+  },
   args: { locale: "ar-SA" },
   globals: { direction: "rtl" },
   parameters: {

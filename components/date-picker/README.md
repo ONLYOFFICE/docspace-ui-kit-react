@@ -145,7 +145,8 @@ export function DeliveryDate() {
 - **`useMaxTime` only applies while nothing is chosen** — once a date is held, the flag is passed
   to the calendar as `false`, so re-picking keeps the existing time instead of the end of day.
 - The wrapper has `role="presentation"`, and the unchosen state is a `<div role="button">` around
-  an `AddButton`, so the button is nested inside a second button role.
+  an `AddButton`. The `AddButton` sits in an `aria-hidden` span, so its own `role="button"` is
+  not announced and the selector is the only button named `selectDateText`.
 - There is no disabled state and no error state; neither is a prop.
 
 ## CSS variables
@@ -179,10 +180,13 @@ with a fixed grey that no variable reaches.
 
 ## Accessibility
 
-- The "select date" control is a `<div role="button">` with `tabIndex={0}` and an `aria-label`,
-  so it is focusable — but it has no key handler, so Enter and Space do not open the calendar.
-- **The calendar itself cannot be used from the keyboard at all** — see
-  [`Calendar`](../calendar/README.md). Taken together, a keyboard-only user cannot choose a date.
+- The "select date" control is a `<div role="button">` with `tabIndex={0}`, an `aria-label` and
+  `aria-expanded`. Enter and Space toggle the calendar, as a click does. The `AddButton` drawn
+  inside it is `aria-hidden`, so a screen reader meets one button, not two.
+- The calendar's days are native buttons — see [`Calendar`](../calendar/README.md) — so after
+  opening it with Enter, Tab reaches the days and Enter or Space picks one and closes the
+  calendar. Focus is not moved into the calendar when it opens; it follows the selector in the
+  tab order. Escape does not close it.
 - The chip's clearing cross comes from [`SelectedItem`](../selected-item/README.md) and inherits
   whatever name that gives it.
 - `aria-expanded` is set on the select-date control, but not on the chip, so once a date is

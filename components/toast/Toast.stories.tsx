@@ -1,6 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, screen, waitFor, within } from "storybook/test";
 
 import { Toast, ToastType, toastr } from ".";
 import { Button, ButtonSize } from "../button";
@@ -17,6 +18,11 @@ const meta = {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?node-id=648%3A4421&mode=dev",
     },
+  },
+  // Toasts live in one shared container and outlive the story that opened
+  // them; start every story with none on screen.
+  beforeEach: () => {
+    toastr.clear();
   },
   argTypes: {
     type: {
@@ -79,6 +85,38 @@ const meta = {
 type Story = StoryObj<ComponentProps<typeof Toast>>;
 
 export default meta;
+
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// Opens the story's toast and returns its content element.
+const openToast = async (
+  { canvas, userEvent }: PlayContext,
+  message: string,
+  button = "Show Toast",
+) => {
+  await userEvent.click(canvas.getByRole("button", { name: button }));
+  const text = await screen.findByText(message);
+  return text.closest("[data-testid='toast-content']") as HTMLElement;
+};
+
+// Plays for the four single-type stories: the toast opens with its type
+// and title, and a click on it closes it.
+const playType =
+  (type: ToastType, message: string, title: string) =>
+  async (context: PlayContext) => {
+    const toast = await openToast(context, message);
+    await expect(toast).toHaveAttribute("data-type", type);
+    await expect(toast).toHaveTextContent(title);
+
+    // Without withCross the close button is there for the keyboard only:
+    // named, but visually hidden until it is focused.
+    const card = toast.closest(".Toastify__toast") as HTMLElement;
+    const close = within(card).getByRole("button", { name: "Close" });
+    await expect(close.getBoundingClientRect().width).toBeLessThanOrEqual(1);
+
+    await context.userEvent.click(toast);
+    await waitFor(() => expect(screen.queryByText(message)).toBeNull());
+  };
 
 interface ToastTemplateProps {
   type?: ToastType;
@@ -169,6 +207,8 @@ export const Default: Story = {
     timeout: 5000,
     type: ToastType.success,
   },
+  // No title given, so the type's translated default is shown.
+  play: playType(ToastType.success, "Your changes were saved", "Done"),
   parameters: {
     docs: {
       description: {
@@ -201,6 +241,11 @@ export const Success: Story = {
     timeout: 5000,
     type: ToastType.success,
   },
+  play: playType(
+    ToastType.success,
+    "Operation completed successfully",
+    "Success",
+  ),
   parameters: {
     docs: {
       description: {
@@ -233,6 +278,11 @@ export const ErrorToast: Story = {
     timeout: 5000,
     type: ToastType.error,
   },
+  play: playType(
+    ToastType.error,
+    "An error occurred while processing your request",
+    "Error",
+  ),
   parameters: {
     docs: {
       description: {
@@ -265,6 +315,11 @@ export const Warning: Story = {
     timeout: 5000,
     type: ToastType.warning,
   },
+  play: playType(
+    ToastType.warning,
+    "Please review the changes before proceeding",
+    "Warning",
+  ),
   parameters: {
     docs: {
       description: {
@@ -297,6 +352,7 @@ export const Info: Story = {
     timeout: 5000,
     type: ToastType.info,
   },
+  play: playType(ToastType.info, "New updates are available", "Information"),
   parameters: {
     docs: {
       description: {
@@ -330,11 +386,29 @@ export const WithCloseButton: Story = {
     timeout: 0,
     type: ToastType.success,
   },
+  play: async (context) => {
+    const message = "Click the close button to dismiss";
+    const toast = await openToast(context, message);
+
+    // With the cross, a click on the toast itself no longer closes it.
+    await context.userEvent.click(toast);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await expect(screen.getByText(message)).toBeVisible();
+
+    // The cross is a named button, closed here from the keyboard.
+    const cross = within(
+      toast.closest(".Toastify__toast") as HTMLElement,
+    ).getByRole("button", { name: "Close" });
+    await expect(cross).toBeVisible();
+    cross.focus();
+    await context.userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(screen.queryByText(message)).toBeNull());
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "For a message the user must read before it goes: the toast stays until its cross is clicked (`timeout` 0, `withCross`), and a click on the toast itself no longer closes it.",
+          "For a message the user must read before it goes: the toast stays until its cross is clicked or pressed (`timeout` 0, `withCross`), and a click on the toast itself no longer closes it.",
       },
       source: {
         code: `toastr.success("Click the close button to dismiss", "Dismissible Toast", 0, true);`,
@@ -343,8 +417,57 @@ export const WithCloseButton: Story = {
   },
 };
 
+export const KeyboardDismiss: Story = {
+  render: () => (
+    <TriggerTemplate
+      label="Show Toast"
+      onClick={() => toastr.info("Closes from the keyboard too", "Info", 0)}
+    />
+  ),
+  play: async (context) => {
+    const message = "Closes from the keyboard too";
+    const toast = await openToast(context, message);
+    const close = within(
+      toast.closest(".Toastify__toast") as HTMLElement,
+    ).getByRole("button", { name: "Close" });
+
+    // Hidden from sight until it has keyboard focus, then drawn as the cross.
+    await expect(close.getBoundingClientRect().width).toBeLessThanOrEqual(1);
+    await context.userEvent.tab();
+    await expect(close).toHaveFocus();
+    await expect(close.getBoundingClientRect().width).toBeGreaterThan(1);
+
+    await context.userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(screen.queryByText(message)).toBeNull());
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A toast with no cross and no timeout (`timeout` 0) still closes from the keyboard: Tab reaches its close button, which appears as the cross while it has focus, and Enter closes the toast. A mouse closes it by clicking anywhere on it.",
+      },
+      source: {
+        code: `toastr.info("Closes from the keyboard too", "Info", 0);`,
+      },
+    },
+  },
+};
+
 export const AllTypes: Story = {
   render: () => <AllTypesTemplate />,
+  play: async (context) => {
+    await openToast(context, "Info message", "Show All Toast Types");
+    // Newest on top: info first, success last.
+    const types = screen
+      .getAllByTestId("toast-content")
+      .map((toast) => toast.dataset.type);
+    await expect(types).toEqual([
+      ToastType.info,
+      ToastType.warning,
+      ToastType.error,
+      ToastType.success,
+    ]);
+  },
   parameters: {
     docs: {
       description: {
@@ -393,6 +516,12 @@ export const CustomContent: Story = {
       }
     />
   ),
+  play: async (context) => {
+    // Any React node is rendered as it is, under the title.
+    const toast = await openToast(context, "Report.docx was moved to Archive.");
+    await expect(toast).toHaveTextContent("File moved");
+    await expect(toast).toHaveTextContent("Open folder");
+  },
   parameters: {
     docs: {
       description: {
@@ -431,6 +560,19 @@ export const DefaultTitles: Story = {
       }}
     />
   ),
+  play: async (context) => {
+    const info = await openToast(context, "No title at all", "Show Toasts");
+    // null leaves the title out altogether.
+    await expect(info.querySelector(".toast-title")).toBeNull();
+
+    // undefined fills in the type's translated default.
+    const success = screen
+      .getByText("The title is filled in for the type")
+      .closest("[data-testid='toast-content']") as HTMLElement;
+    await expect(success.querySelector(".toast-title")).toHaveTextContent(
+      "Done",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -456,6 +598,16 @@ export const RightToLeft: Story = {
     />
   ),
   globals: { direction: "rtl" },
+  play: async (context) => {
+    // The toast reads right to left: the cross moves to the left end.
+    const toast = await openToast(context, "The file was saved");
+    const card = toast.closest(".Toastify__toast") as HTMLElement;
+    await expect(getComputedStyle(card).direction).toBe("rtl");
+    const cross = card.querySelector(".closeButton") as HTMLElement;
+    await expect(cross.getBoundingClientRect().left).toBeLessThan(
+      screen.getByText("The file was saved").getBoundingClientRect().left,
+    );
+  },
   args: {
     data: "The file was saved",
     title: "Saved",
@@ -509,6 +661,20 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async (context) => {
+    const toast = await openToast(
+      context,
+      "Custom success notification",
+      "Show Custom Toasts",
+    );
+    const card = toast.closest(".Toastify__toast") as HTMLElement;
+    await expect(card).toHaveStyle({ borderRadius: "12px", padding: "16px" });
+    const container = card.closest(".Toastify__toast-container") as HTMLElement;
+    await expect(Math.round(container.getBoundingClientRect().width)).toBe(360);
+    await expect(
+      Math.round(window.innerWidth - container.getBoundingClientRect().right),
+    ).toBe(32);
+  },
   parameters: {
     docs: {
       description: {

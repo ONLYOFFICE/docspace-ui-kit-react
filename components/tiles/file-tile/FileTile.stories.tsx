@@ -1,7 +1,7 @@
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fireEvent, fn, screen, waitFor, within } from "storybook/test";
 
 import type { FileTileProps } from "./FileTile.types";
 
@@ -11,13 +11,15 @@ import WordSvgUrl from "../../../assets/icons/32/word.svg";
 
 import ImageReactSvg from "../../../assets/emptyview/empty.rooms.root.light.svg";
 import LockedReact12Svg from "../../../assets/icons/12/lock.react.svg";
-import { Link } from "../../link";
+import { Link, LinkType } from "../../link";
+import { globalColors } from "../../../providers/theme";
 import { Badge } from "../../badge";
 import { IconSizeType } from "../../../utils";
 import { FileType } from "../../../enums";
 
 import { FileTile } from ".";
 import { TileContent } from "../tile-content";
+import RenameField from "../../../.storybook/utils/RenameField";
 import { IconButton } from "../../icon-button";
 
 const wordElement = <WordSvgUrl />;
@@ -27,19 +29,30 @@ const thumbnail = `data:image/svg+xml,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="160"><rect width="320" height="160" fill="#f3f4f4"/><rect x="40" y="24" width="240" height="136" fill="#ffffff"/><rect x="64" y="48" width="120" height="8" fill="#a3a9ae"/><rect x="64" y="68" width="192" height="6" fill="#d0d5da"/><rect x="64" y="84" width="176" height="6" fill="#d0d5da"/><rect x="64" y="100" width="184" height="6" fill="#d0d5da"/></svg>',
 )}`;
 
+const onCopyOption = fn();
+const onBadgeClick = fn();
+const onLockClick = fn();
+
+// The menu is portalled and fades in.
+const menuItem = async (name: string) => {
+  const item = await screen.findByRole("menuitem", { name });
+  await waitFor(() => expect(item).toBeVisible());
+  return item;
+};
+
 const contextOptions = [
   {
     id: "option_copy-to",
     key: "copy-to",
     label: "Copy",
-    onClick: () => {},
+    onClick: onCopyOption,
     disabled: false,
   },
   {
     id: "option_move-to",
     key: "move-to",
     label: "Move to",
-    onClick: () => {},
+    onClick: fn(),
     disabled: false,
   },
 ];
@@ -56,7 +69,7 @@ const badges = (
       style={{
         width: "max-content",
       }}
-      onClick={() => {}}
+      onClick={onBadgeClick}
     />
   </div>
 );
@@ -69,7 +82,7 @@ const contentElement = (
       size={IconSizeType.medium}
       data-id="file-lock"
       data-locked={false}
-      onClick={() => {}}
+      onClick={onLockClick}
       color="#A3A9AE"
       isDisabled={false}
       hoverColor="accent"
@@ -278,7 +291,21 @@ const Template = ({
     <div style={{ maxWidth: "300px", margin: "30px" }}>
       <FileTile {...args} checked={checked} onSelect={onSelect}>
         <TileContent>
-          <Link>File Content</Link>
+          {args.isEdit ? (
+            <RenameField title={args.item.title} />
+          ) : (
+            <Link
+              type={LinkType.page}
+              title={args.item.title}
+              fontWeight={600}
+              isTextOverflow
+            >
+              {args.item.title.replace(/\.[^.]+$/, "")}
+              <span style={{ color: globalColors.gray }}>
+                {args.item.fileExst}
+              </span>
+            </Link>
+          )}
         </TileContent>
       </FileTile>
     </div>
@@ -302,6 +329,45 @@ export const Default: Story = {
     temporaryIcon: <ImageReactSvg />,
     getContextModel: () => contextOptions,
   },
+  beforeEach: () => {
+    onCopyOption.mockClear();
+    onBadgeClick.mockClear();
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const tile = canvas.getByTestId("tile");
+    const content = within(tile).getByText("Document");
+
+    // A click on the tile selects it, alone.
+    await userEvent.click(content);
+    await expect(args.setSelection).toHaveBeenCalledWith([]);
+    await expect(args.onSelect).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ id: "file-1" }),
+    );
+
+    // Ctrl and Shift add to the selection instead.
+    fireEvent.click(content, { ctrlKey: true, detail: 1 });
+    await expect(args.withCtrlSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "file-1" }),
+    );
+    fireEvent.click(content, { shiftKey: true, detail: 1 });
+    await expect(args.withShiftSelect).toHaveBeenCalledTimes(1);
+
+    // A badge is not a selection click.
+    const selections = (args.onSelect as ReturnType<typeof fn>).mock.calls
+      .length;
+    await userEvent.click(within(tile).getByText("New"));
+    await expect(onBadgeClick).toHaveBeenCalledTimes(1);
+    await expect(args.onSelect).toHaveBeenCalledTimes(selections);
+
+    await userEvent.click(within(tile).getByTestId("file-thumbnail"));
+    await expect(args.thumbnailClick).toHaveBeenCalled();
+
+    await userEvent.click(within(tile).getByTestId("context-menu-button"));
+    await expect(args.tileContextClick).toHaveBeenCalledWith(false);
+    await userEvent.click(await menuItem("Copy"));
+    await expect(onCopyOption).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -318,7 +384,11 @@ export const Default: Story = {
   temporaryIcon={<ImageReactSvg />}
   onSelect={handleSelect}
 >
-  <TileContent><Link>File Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>
+      Document<span style={{ color: "#A3A9AE" }}>.docx</span>
+    </Link>
+  </TileContent>
 </FileTile>`,
       },
     },
@@ -330,6 +400,13 @@ export const Checked: Story = {
   args: {
     ...Default.args,
     checked: true,
+  },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(tile.className).toMatch(/checked/);
+    await expect(
+      within(tile).getByRole("checkbox", { hidden: true }),
+    ).toBeChecked();
   },
   parameters: {
     docs: {
@@ -345,7 +422,11 @@ export const Checked: Story = {
   checked={true}
   onSelect={handleSelect}
 >
-  <TileContent><Link>File Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>
+      Document<span style={{ color: "#A3A9AE" }}>.docx</span>
+    </Link>
+  </TileContent>
 </FileTile>`,
       },
     },
@@ -357,6 +438,13 @@ export const InProgress: Story = {
   args: {
     ...Default.args,
     inProgress: true,
+  },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(
+      within(tile).queryByRole("checkbox", { hidden: true }),
+    ).toBeNull();
+    await expect(tile.querySelector('[class*="loader"]')).not.toBeNull();
   },
   parameters: {
     docs: {
@@ -371,7 +459,11 @@ export const InProgress: Story = {
   contextOptions={contextOptions}
   inProgress={true}
 >
-  <TileContent><Link>File Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>
+      Document<span style={{ color: "#A3A9AE" }}>.docx</span>
+    </Link>
+  </TileContent>
 </FileTile>`,
       },
     },
@@ -383,6 +475,13 @@ export const WithThumbnail: Story = {
   args: {
     ...Default.args,
     thumbnail,
+  },
+  play: async ({ canvas }) => {
+    const preview = within(canvas.getByTestId("tile")).getByTestId(
+      "file-thumbnail",
+    );
+    await expect(preview.tagName).toBe("IMG");
+    await expect(preview).toHaveAttribute("src", thumbnail);
   },
   parameters: {
     docs: {
@@ -399,7 +498,11 @@ export const WithThumbnail: Story = {
   temporaryIcon={<ImageReactSvg />}
   badges={badges}
 >
-  <TileContent><Link>File Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>
+      Document<span style={{ color: "#A3A9AE" }}>.docx</span>
+    </Link>
+  </TileContent>
 </FileTile>`,
       },
     },
@@ -411,6 +514,11 @@ export const WithHotkeyBorder: Story = {
   args: {
     ...Default.args,
     showHotkeyBorder: true,
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("tile").className).toMatch(
+      /showHotkeyBorder/,
+    );
   },
   parameters: {
     docs: {
@@ -426,7 +534,11 @@ export const WithHotkeyBorder: Story = {
   temporaryIcon={<ImageReactSvg />}
   showHotkeyBorder
 >
-  <TileContent><Link>File Content</Link></TileContent>
+  <TileContent>
+    <Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>
+      Document<span style={{ color: "#A3A9AE" }}>.docx</span>
+    </Link>
+  </TileContent>
 </FileTile>`,
       },
     },
@@ -438,6 +550,13 @@ export const RenamingState: Story = {
   args: {
     ...Default.args,
     isEdit: true,
+  },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(tile.className).toMatch(/isEdit/);
+    await expect(
+      within(tile).queryByRole("checkbox", { hidden: true }),
+    ).toBeNull();
   },
   parameters: {
     docs: {
@@ -453,7 +572,13 @@ export const RenamingState: Story = {
   temporaryIcon={<ImageReactSvg />}
   isEdit
 >
-  <TileContent><Link>File Content</Link></TileContent>
+  <TileContent>
+    <div style={{ display: "flex", gap: 4 }}>
+      <TextInput value={title} onChange={onRename} scale />
+      <Button size={ButtonSize.small} icon={<CheckIcon />} onClick={onSave} />
+      <Button size={ButtonSize.small} icon={<CrossIcon />} onClick={onCancel} />
+    </div>
+  </TileContent>
 </FileTile>`,
       },
     },
@@ -465,24 +590,24 @@ export const CssCustomization: Story = {
     <div
       style={
         {
-          "--tile-bg": "#f4f9fd",
+          "--tile-bg": "light-dark(#f4f9fd, #132530)",
           "--tile-border-style": "1px solid #0082c9",
           "--tile-radius": "16px",
           "--tile-height": "240px",
-          "--tile-hover-bg": "#cce5f6",
+          "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
           "--tile-hover-text-decoration": "none",
-          "--tile-badge-bg": "#e6f3fb",
+          "--tile-badge-bg": "light-dark(#e6f3fb, #16303e)",
           "--tile-badge-radius": "8px",
           "--tile-badge-box-shadow": "0 2px 8px rgba(0,130,201,0.3)",
           "--tile-text-size": "13px",
           "--tile-text-weight": "600",
-          "--tile-text-color": "#004d77",
+          "--tile-text-color": "light-dark(#004d77, #7cc3ea)",
           "--tile-text-line-height": "20px",
           "--tile-bottom-padding-inline": "8px",
           "--tile-thumbnail-padding-inline": "16px",
           "--tile-thumbnail-height": "140px",
           "--tile-thumbnail-image-radius": "8px",
-          "--tile-thumbnail-image-hover-bg": "#e6f3fb",
+          "--tile-thumbnail-image-hover-bg": "light-dark(#e6f3fb, #16303e)",
           "--tile-thumbnail-transition": "background 0.6s",
           "--tile-option-button-padding-end": "8px",
           "--tile-hotkey-color": "#e0662e",
@@ -541,6 +666,20 @@ export const CssCustomization: Story = {
       </div>
     </div>
   ),
+  play: async ({ canvas }) => {
+    const [document, report] = canvas.getAllByTestId("tile");
+    const tile = getComputedStyle(document);
+    await expect(tile.backgroundColor).toBe("rgb(244, 249, 253)");
+    await expect(tile.borderTopLeftRadius).toBe("16px");
+    await expect(tile.height).toBe("240px");
+    await expect(
+      getComputedStyle(within(document).getByTestId("file-thumbnail"))
+        .borderTopLeftRadius,
+    ).toBe("8px");
+    const hotkey = getComputedStyle(report);
+    await expect(hotkey.borderTopWidth).toBe("2px");
+    await expect(hotkey.borderTopColor).toBe("rgb(224, 102, 46)");
+  },
   parameters: {
     docs: {
       description: {
@@ -554,24 +693,24 @@ Two instances:
       },
       source: {
         code: `<div style={{
-  "--tile-bg": "#f4f9fd",
+  "--tile-bg": "light-dark(#f4f9fd, #132530)",
   "--tile-border-style": "1px solid #0082c9",
   "--tile-radius": "16px",
   "--tile-height": "240px",
-  "--tile-hover-bg": "#cce5f6",
+  "--tile-hover-bg": "light-dark(#cce5f6, #1f4a61)",
   "--tile-hover-text-decoration": "none",
-  "--tile-badge-bg": "#e6f3fb",
+  "--tile-badge-bg": "light-dark(#e6f3fb, #16303e)",
   "--tile-badge-radius": "8px",
   "--tile-badge-box-shadow": "0 2px 8px rgba(0,130,201,0.3)",
   "--tile-text-size": "13px",
   "--tile-text-weight": "600",
-  "--tile-text-color": "#004d77",
+  "--tile-text-color": "light-dark(#004d77, #7cc3ea)",
   "--tile-text-line-height": "20px",
   "--tile-bottom-padding-inline": "8px",
   "--tile-thumbnail-padding-inline": "16px",
   "--tile-thumbnail-height": "140px",
   "--tile-thumbnail-image-radius": "8px",
-  "--tile-thumbnail-image-hover-bg": "#e6f3fb",
+  "--tile-thumbnail-image-hover-bg": "light-dark(#e6f3fb, #16303e)",
   "--tile-thumbnail-transition": "background 0.6s",
   "--tile-option-button-padding-end": "8px",
   "--tile-hotkey-color": "#e0662e",

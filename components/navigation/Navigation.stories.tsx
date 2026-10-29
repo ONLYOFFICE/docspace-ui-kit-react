@@ -2,7 +2,7 @@ import React from "react";
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import { DeviceType } from "../../enums";
 import Navigation from "./Navigation";
@@ -264,7 +264,9 @@ type Story = StoryObj<ComponentProps<typeof Navigation>>;
 export default meta;
 
 const Wrapper = (props: { children: React.ReactNode }) => (
-  <div style={{ height: "240px" }}>{props.children}</div>
+  <div style={{ height: "240px" }}>
+    <div style={{ height: "69px" }}>{props.children}</div>
+  </div>
 );
 
 // The header and its right-hand button row are sibling elements; this row lays them out side by side
@@ -281,6 +283,18 @@ const HeaderRow = (props: { children: React.ReactNode }) => (
 );
 
 const noop = () => {};
+
+const part = (root: HTMLElement, selector: string) =>
+  root.querySelector<HTMLElement>(selector);
+
+// The trail of folders opened from the title; items carry their id.
+const dropBoxItem = (id: string) => document.getElementById(id);
+
+const menuItem = async (name: string) => {
+  const item = await screen.findByRole("menuitem", { name });
+  await waitFor(() => expect(item).toBeVisible());
+  return item;
+};
 
 const defaultArgs = {
   showText: true,
@@ -313,7 +327,6 @@ const defaultArgs = {
     infoPanel: "Info Panel",
     actions: "Actions",
     contextMenu: "Context Menu",
-    warningText: "Warning",
   },
   withMenu: true,
   onPlusClick: fn(),
@@ -346,11 +359,40 @@ export const Default: Story = {
     </Wrapper>
   ),
   args: defaultArgs,
+  play: async ({ args, canvasElement, userEvent }) => {
+    const title = part(canvasElement, ".title-block-text") as HTMLElement;
+    await expect(title).toHaveTextContent("My Documents");
+    // The parent folder's name sits before the current one.
+    const parent = part(canvasElement, ".room-title") as HTMLElement;
+    await expect(parent).toHaveTextContent("Shared with me");
+
+    await userEvent.click(part(canvasElement, ".arrow-button") as HTMLElement);
+    await expect(args.onBackToParentFolder).toHaveBeenCalledTimes(1);
+
+    await userEvent.click(parent);
+    await expect(args.onClickFolder).toHaveBeenLastCalledWith(
+      "2",
+      false,
+      false,
+    );
+
+    // The title opens the whole trail; picking a folder closes it.
+    await userEvent.click(title);
+    await waitFor(() => expect(dropBoxItem("1")).toBeVisible());
+    await expect(dropBoxItem("1")).toHaveTextContent("Documents");
+    await userEvent.click(dropBoxItem("1") as HTMLElement);
+    await expect(args.onClickFolder).toHaveBeenLastCalledWith(
+      "1",
+      false,
+      undefined,
+    );
+    await waitFor(() => expect(dropBoxItem("1")).toBeNull());
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "The header of a nested folder: the back arrow, the parent folder's name, the current folder's name and a notice chip. Click the folder's name to open the drop box with the whole trail; change any other prop live in the Controls panel below.",
+          "The header of a nested folder: the back arrow, the parent folder's name and the current folder's name. Click the folder's name to open the drop box with the whole trail; change any other prop live in the Controls panel below.",
       },
       source: {
         code: `<Navigation
@@ -383,6 +425,16 @@ export const RootFolder: Story = {
     isRootFolder: true,
     title: "Documents",
   },
+  play: async ({ canvasElement, userEvent }) => {
+    // No way back, no parent name, and the title opens nothing.
+    await expect(part(canvasElement, ".arrow-button")).toBeNull();
+    await expect(part(canvasElement, ".room-title")).toBeNull();
+    await userEvent.click(
+      part(canvasElement, ".title-block-text") as HTMLElement,
+    );
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    await expect(dropBoxItem("1")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -412,6 +464,17 @@ export const TrashFolder: Story = {
       ...defaultArgs.titles,
       warningText: "Items here can be deleted permanently",
     },
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    await expect(
+      within(canvasElement).getByText("Items here can be deleted permanently"),
+    ).toBeVisible();
+    await expect(part(canvasElement, "#header_add-button")).toBeNull();
+    // The folder button opens the folder's menu.
+    await userEvent.click(
+      part(canvasElement, "#header_optional-button") as HTMLElement,
+    );
+    await expect(await menuItem("Delete")).toBeVisible();
   },
   parameters: {
     docs: {
@@ -445,6 +508,15 @@ export const WithInfoPanel: Story = {
     isInfoPanelVisible: true,
     hideInfoPanel: undefined,
   },
+  play: async ({ args, canvasElement, userEvent }) => {
+    const toggle = part(canvasElement, ".info-panel-toggle") as HTMLElement;
+    // Drawn pressed while the panel is open.
+    await expect(
+      toggle.closest("[data-visible]") as HTMLElement,
+    ).toHaveAttribute("data-visible", "true");
+    await userEvent.click(toggle);
+    await expect(args.toggleInfoPanel).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -468,6 +540,12 @@ export const WithNavigationButton: Story = {
     ...defaultArgs,
     showNavigationButton: true,
     navigationButtonLabel: "Open location",
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const button = canvas.getByTestId("navigation_button");
+    await expect(button).toHaveTextContent("Open location");
+    await userEvent.click(button);
+    await expect(args.onNavigationButtonClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -497,6 +575,25 @@ export const WithActionButtons: Story = {
     ...defaultArgs,
     isPlusButtonVisible: true,
     isContextButtonVisible: true,
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    // Each button opens its own menu.
+    await userEvent.click(
+      part(canvasElement, "#header_add-button") as HTMLElement,
+    );
+    await expect(await menuItem("Upload file")).toBeVisible();
+    await expect(screen.queryByRole("menuitem", { name: "Rename" })).toBeNull();
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("menuitem", { name: "Upload file" }),
+      ).toBeNull(),
+    );
+
+    await userEvent.click(
+      part(canvasElement, "#header_optional-button") as HTMLElement,
+    );
+    await expect(await menuItem("Rename")).toBeVisible();
   },
   parameters: {
     docs: {
@@ -538,6 +635,12 @@ export const WithAiChatButton: Story = {
     isChatPanelVisible: false,
     titles: { ...defaultArgs.titles, aiChat: "AI chat" },
   },
+  play: async ({ args, canvas, userEvent }) => {
+    const button = canvas.getByTestId("ai-chat-button");
+    await expect(button).toHaveTextContent("AI chat");
+    await userEvent.click(button);
+    await expect(args.toggleChatPanel).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -563,6 +666,20 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvasElement }) => {
+    // The back arrow at the right edge; the parent name right of the title.
+    const arrow = (
+      part(canvasElement, ".arrow-button") as HTMLElement
+    ).getBoundingClientRect();
+    const parent = (
+      part(canvasElement, ".room-title") as HTMLElement
+    ).getBoundingClientRect();
+    const title = (
+      part(canvasElement, ".title-block-text") as HTMLElement
+    ).getBoundingClientRect();
+    await expect(arrow.left).toBeGreaterThan(parent.right);
+    await expect(parent.left).toBeGreaterThanOrEqual(title.right - 1);
+  },
   args: {
     ...defaultArgs,
     title: "مستنداتي",
@@ -622,7 +739,10 @@ export const CssCustomization: Story = {
       }
     >
       <HeaderRow>
-        <Navigation {...defaultArgs} />
+        <Navigation
+          {...defaultArgs}
+          titles={{ ...defaultArgs.titles, warningText: "Warning" }}
+        />
       </HeaderRow>
       <HeaderRow>
         <Navigation
@@ -637,6 +757,18 @@ export const CssCustomization: Story = {
       </HeaderRow>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const heading = (part(canvasElement, ".title-block-text") as HTMLElement)
+      .firstElementChild as HTMLElement;
+    await expect(getComputedStyle(heading).fontSize).toBe("20px");
+    await expect(getComputedStyle(heading).fontWeight).toBe("700");
+    const warning = within(canvasElement).getAllByText("Warning")[0]
+      .parentElement as HTMLElement;
+    await expect(getComputedStyle(warning).backgroundColor).toBe(
+      "rgb(230, 243, 251)",
+    );
+    await expect(getComputedStyle(warning).borderTopLeftRadius).toBe("8px");
+  },
   parameters: {
     docs: {
       description: {

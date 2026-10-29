@@ -51,6 +51,8 @@ export const RoomTile = ({
         !(e.target instanceof Element) ||
         (!e.target.closest(".checkbox") &&
           !e.target.closest(".tags") &&
+          !e.target.closest(".room-tags") &&
+          !e.target.closest(".tag") &&
           !e.target.closest(".advanced-tag") &&
           !e.target.closest(".badges") &&
           !e.target.closest("#modal-dialog") &&
@@ -116,9 +118,7 @@ export const RoomTile = ({
     (tag: TagClickEvent) => {
       if (item.isAIAgent && !hasTags) return;
 
-      if ("label" in tag && "roomType" in tag) {
-        selectTag(tag);
-      }
+      selectTag(tag);
     },
     [item.isAIAgent, hasTags, selectTag],
   );

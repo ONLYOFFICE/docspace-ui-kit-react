@@ -49,7 +49,7 @@ export type LinkWithDropDownProps = SimpleLinkWithDropdownProps & {
   directionY?: TDirectionY;
   /** Whether the menu is wrapped in a scrollbar of its own. It only takes effect on a phone. */
   hasScroll?: boolean;
-  /** Exact width of the menu, as a CSS length. Without it the menu is as wide as its widest entry. */
+  /** Exact width of the menu, as a CSS length. Without it the menu is as wide as its widest entry, up to 200px. */
   manualWidth?: string;
   /** Passed to the menu's backdrop, which then keeps an aside panel above itself. */
   isAside?: boolean;

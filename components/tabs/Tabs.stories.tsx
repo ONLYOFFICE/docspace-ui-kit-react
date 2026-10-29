@@ -2,10 +2,12 @@ import type { ComponentProps, CSSProperties } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 import { Badge } from "../badge";
+import { Button, ButtonSize } from "../button";
+import { RectangleSkeleton } from "../rectangle";
 import { Tabs } from ".";
 import { data } from "./data";
 import { TabsTypes } from "./Tabs.enums";
@@ -89,7 +91,7 @@ const meta = {
     hotkeysId: {
       control: "text",
       description:
-        "Name that keeps several segmented bars on one page apart, so clicking one turns on the arrow keys of that bar only. Secondary tabs only",
+        "Suffix of the class `secondary-tabs-scroll-<hotkeysId>` put on the tab scroller, for a caller that queries it. Keyboard navigation does not need it. Secondary tabs only",
     },
     layoutId: {
       control: "text",
@@ -115,6 +117,19 @@ const meta = {
 type Story = StoryObj<ComponentProps<typeof Tabs>>;
 
 export default meta;
+
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+const tab = (canvas: PlayContext["canvas"], id: string) =>
+  canvas.getAllByTestId(`${id}_subtab`)[0];
+
+const width = (element: Element) => element.getBoundingClientRect().width;
+
+// The segmented control's arrows, in the order they appear on screen.
+const arrowsOnScreen = (root: HTMLElement) =>
+  Array.from(root.querySelectorAll<HTMLElement>('[class*="arrowIcon"]')).sort(
+    (a, b) => a.getBoundingClientRect().x - b.getBoundingClientRect().x,
+  );
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
   <div style={{ height: "170px" }}>{children}</div>
@@ -146,6 +161,26 @@ export const Default: Story = {
     selectedItemId: data[0].id,
     onSelect: fn(),
   },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByText("Selected tab: Overview")).toBeVisible();
+
+    await userEvent.click(canvas.getByTestId("Documents_tab"));
+    await expect(args.onSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "Documents" }),
+    );
+    await expect(canvas.getByText("Selected tab: Documents")).toBeVisible();
+
+    // The disabled tab is kept from the pointer by its stylesheet, and the
+    // click handler refuses it as well: a click that gets through (here a
+    // DOM click, which ignores pointer-events) selects nothing.
+    const contacts = canvas.getByTestId("Contacts_tab");
+    await expect(getComputedStyle(contacts).pointerEvents).toBe("none");
+    contacts.click();
+    await expect(args.onSelect).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: "Contacts" }),
+    );
+    await expect(canvas.getByText("Selected tab: Documents")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -171,13 +206,47 @@ export const Secondary: Story = {
     selectedItemId: data[0].id,
     onSelect: fn(),
   },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const tablist = canvas.getByRole("tablist");
+    const overview = canvas.getByRole("tab", { name: "Overview" });
+    const documents = canvas.getByRole("tab", { name: "Documents" });
+    await expect(overview).toHaveAttribute("aria-selected", "true");
+
+    // The keys the description promises: Tab lands on the selected tab, an
+    // arrow moves the focus to Documents, Enter picks it.
+    await userEvent.tab();
+    await expect(overview).toHaveFocus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(documents).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: "Documents" }),
+    );
+    await expect(documents).toHaveAttribute("aria-selected", "true");
+
+    // Tab leaves the bar again: nothing on the page takes the key.
+    await userEvent.tab();
+    await expect(tablist).not.toContainElement(
+      document.activeElement as HTMLElement,
+    );
+
+    // Without hotkeysId the scroller gets no "...-undefined" class that a
+    // second bar would share.
+    await expect(
+      canvasElement.querySelector('[class*="secondary-tabs-scroll-"]'),
+    ).toBeNull();
+
+    await userEvent.click(canvas.getByTestId("Milestones_subtab"));
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: "Milestones" }),
+    );
+    await expect(canvas.getByText("Selected tab: Milestones")).toBeVisible();
+  },
   parameters: {
     docs: {
-      // Framed: the keyboard handler listens on the window and would take keys from the Docs page.
-      story: { inline: false, height: "240px" },
       description: {
         story:
-          "The segmented control (`type={TabsTypes.Secondary}`), for switching between views of the same content; every tab takes the width of the widest label and the selected background slides to the clicked tab. Click a tab, then press Tab and use the arrow keys, Home, End and Enter to pick one from the keyboard.",
+          "The segmented control (`type={TabsTypes.Secondary}`), for switching between views of the same content; every tab takes the width of the widest label and the selected background slides to the clicked tab. From the keyboard, Tab lands on the selected tab, the arrow keys, Home and End move the focus, Enter or Space picks the focused tab, and Tab moves on to the rest of the page.",
       },
       source: {
         code: `<Tabs
@@ -193,6 +262,17 @@ export const Secondary: Story = {
 
 export const Scaled: Story = {
   render: (args) => <Template {...args} />,
+  play: async ({ args, canvas, userEvent }) => {
+    // Every tab an equal share of the row.
+    const widths = ["Overview", "Documents", "Milestones", "Time"].map((id) =>
+      Math.round(width(tab(canvas, id))),
+    );
+    await expect(new Set(widths).size).toBe(1);
+    await userEvent.click(tab(canvas, "Time"));
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: "Time" }),
+    );
+  },
   args: {
     items: data,
     type: TabsTypes.Secondary,
@@ -202,8 +282,6 @@ export const Scaled: Story = {
   },
   parameters: {
     docs: {
-      // Framed: the keyboard handler listens on the window and would take keys from the Docs page.
-      story: { inline: false, height: "240px" },
       description: {
         story:
           "The segmented control spread across the whole width of its container, every tab an equal share (`scaled`) — for a bar that should line up with the edges of the panel it sits in. The underlined row ignores `scaled`.",
@@ -221,8 +299,33 @@ export const Scaled: Story = {
   },
 };
 
+const LoadingDemo = (args: TabsProps) => {
+  const [isLoading, setIsLoading] = useState(args.isLoading);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <div>
+        <Button
+          size={ButtonSize.small}
+          label={isLoading ? "Labels arrived" : "Load again"}
+          onClick={() => setIsLoading((value) => !value)}
+        />
+      </div>
+      {isLoading ? (
+        <RectangleSkeleton width="360px" height="32px" title="Loading tabs" />
+      ) : null}
+      <Template {...args} isLoading={isLoading} />
+    </div>
+  );
+};
+
 export const Loading: Story = {
-  render: (args) => <Template {...args} />,
+  render: (args) => <LoadingDemo {...args} />,
+  play: async ({ canvas }) => {
+    // The bar waits for its labels; the selected content shows meanwhile.
+    await expect(tab(canvas, "Overview")).not.toBeVisible();
+    await expect(canvas.getByText("Overview content")).toBeVisible();
+  },
   args: {
     items: data,
     type: TabsTypes.Secondary,
@@ -232,11 +335,9 @@ export const Loading: Story = {
   },
   parameters: {
     docs: {
-      // Framed: the keyboard handler listens on the window and would take keys from the Docs page.
-      story: { inline: false, height: "240px" },
       description: {
         story:
-          "While the labels are still arriving, the segmented bar is kept hidden so that it is not sized to placeholder text (`isLoading`); only the selected tab's content shows. Turn `isLoading` off in the Controls panel below and the bar appears, every tab as wide as the widest label. The component draws no loader of its own, and the underlined row ignores `isLoading`.",
+          "While the labels are still arriving, the segmented bar is kept hidden so that it is not sized to placeholder text (`isLoading`); only the selected tab's content shows. Turn `isLoading` off in the Controls panel below and the bar appears, every tab as wide as the widest label. The component draws no loader of its own, so the page puts a skeleton where the bar will be, as this story does. Click **Labels arrived** to see the bar replace the skeleton, and **Load again** to go back; the underlined row ignores `isLoading`.",
       },
       source: {
         code: `<Tabs
@@ -257,6 +358,15 @@ const badgeItems: TTabItem[] = data.map((item, index) =>
 
 export const WithBadges: Story = {
   render: (args) => <Template {...args} />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("Overview_tab")).toHaveTextContent(
+      "Overview3",
+    );
+    await expect(canvas.getByTestId("Documents_tab")).toHaveTextContent(
+      "Documents4",
+    );
+    await expect(canvas.getByTestId("Time_tab")).toHaveTextContent(/^Time$/);
+  },
   args: {
     items: badgeItems,
     selectedItemId: badgeItems[0].id,
@@ -292,6 +402,18 @@ const iconItems: TTabItem[] = data.map((item) => ({
 
 export const WithIcons: Story = {
   render: (args) => <Template {...args} />,
+  play: async ({ args, canvas, userEvent }) => {
+    // The icons are fetched and inlined after mounting.
+    for (const id of ["Overview", "Documents", "Time"]) {
+      await waitFor(() =>
+        expect(tab(canvas, id).querySelector("svg")).not.toBeNull(),
+      );
+    }
+    await userEvent.click(tab(canvas, "Milestones"));
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: "Milestones" }),
+    );
+  },
   args: {
     items: iconItems,
     type: TabsTypes.Secondary,
@@ -300,8 +422,6 @@ export const WithIcons: Story = {
   },
   parameters: {
     docs: {
-      // Framed: the keyboard handler listens on the window and would take keys from the Docs page.
-      story: { inline: false, height: "240px" },
       description: {
         story:
           "An icon before every label of the segmented control (the item's `iconName`, an SVG URL), recoloured with the label as a tab is selected or hovered — for tabs that are recognised faster by a picture. The underlined row does not draw icons.",
@@ -332,6 +452,17 @@ const animatedItems: TTabItem[] = data.map((item) => ({
 
 export const AnimatedSelection: Story = {
   render: (args) => <Template {...args} />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByTestId("Documents_tab"));
+    // The old content stays while the tab's onClick promise runs.
+    await expect(canvas.getByText("Overview content")).toBeVisible();
+    await waitFor(
+      () =>
+        expect(canvas.getByText("Documents", { selector: "p" })).toBeVisible(),
+      { timeout: 4000 },
+    );
+    await expect(canvas.queryByText("Overview content")).toBeNull();
+  },
   args: {
     items: animatedItems,
     withAnimation: true,
@@ -391,6 +522,23 @@ export const WithStickyHeader: Story = {
         />
       </div>
     );
+  },
+  play: async ({ canvas }) => {
+    const heading = canvas.getByText("Project files");
+    const box = heading.closest<HTMLElement>('[style*="overflow"]');
+    if (!box) throw new Error("No scrolling box");
+    const before = heading.getBoundingClientRect().top;
+    // Scrolled, the heading and the bar stay at the top of the box.
+    box.scrollTop = 200;
+    await waitFor(() =>
+      expect(
+        canvas.getByText("Overview entry 1").getBoundingClientRect().top,
+      ).toBeLessThan(box.getBoundingClientRect().top),
+    );
+    await expect(Math.round(heading.getBoundingClientRect().top)).toBe(
+      Math.round(before),
+    );
+    await expect(canvas.getByTestId("Overview_tab")).toBeVisible();
   },
   args: {
     items: longItems,
@@ -462,6 +610,34 @@ const OverflowTemplate = (args: TabsProps) => {
 
 export const OverflowingTabs: Story = {
   render: (args) => <OverflowTemplate {...args} />,
+  play: async ({ args, canvasElement }) => {
+    // The underlined row scrolls sideways.
+    const row = canvasElement.querySelector<HTMLElement>(
+      '[data-testid="Templates_tab"]',
+    )?.parentElement;
+    if (!row) throw new Error("No primary row");
+    await expect(row.scrollWidth).toBeGreaterThan(row.clientWidth);
+
+    // The scroll track along the bottom of the bar does not take the click
+    // under a label: the whole height of the tab belongs to the tab.
+    const tab = canvasElement.querySelector<HTMLElement>(
+      '[data-testid="Documents_tab"]',
+    );
+    if (!tab) throw new Error("No Documents tab");
+    const box = tab.getBoundingClientRect();
+    for (let y = box.top + 1; y < box.bottom; y += 2) {
+      await expect(
+        tab.contains(document.elementFromPoint(box.left + box.width / 2, y)),
+      ).toBe(true);
+    }
+
+    // The segmented control's right arrow selects the next tab.
+    const [, right] = arrowsOnScreen(canvasElement);
+    right.click();
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: "Documents" }),
+    );
+  },
   args: {
     items: manyItems,
     selectedItemId: manyItems[0].id,
@@ -469,8 +645,6 @@ export const OverflowingTabs: Story = {
   },
   parameters: {
     docs: {
-      // Framed: the keyboard handler listens on the window and would take keys from the Docs page.
-      story: { inline: false, height: "155px" },
       description: {
         story: `More tabs than a 360px column holds, for a bar whose tabs cannot be cut down:
 
@@ -499,6 +673,17 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ args, canvasElement }) => {
+    // The arrows swap sides: on screen the left one selects the next tab,
+    // and the right one, with the first tab selected, selects nothing.
+    const [left, right] = arrowsOnScreen(canvasElement);
+    right.click();
+    await expect(args.onSelect).not.toHaveBeenCalled();
+    left.click();
+    await expect(args.onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: "Documents" }),
+    );
+  },
   args: {
     items: manyItems,
     selectedItemId: manyItems[0].id,
@@ -581,10 +766,23 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    const bar = canvas
+      .getAllByTestId("Overview_tab")[0]
+      .closest("[data-sticky]") as HTMLElement;
+    // The bar's own height; its bottom border comes on top.
+    await expect(bar).toHaveStyle({ height: "36px" });
+    // The selected segment takes the active text colour; its background is
+    // the sliding marker behind it.
+    await expect(canvas.getAllByText("Overview")[1]).toHaveStyle({
+      color: "rgb(255, 255, 255)",
+    });
+    await expect(canvas.getAllByText("Documents")[1]).toHaveStyle({
+      color: "rgb(109, 40, 217)",
+    });
+  },
   parameters: {
     docs: {
-      // Framed: the keyboard handler listens on the window and would take keys from the Docs page.
-      story: { inline: false, height: "260px" },
       description: {
         story: `Every variable either bar can show without overflowing, set on one wrapper -- the variables are listed under CSS variables on this page. The first instance is the underlined row, for the \`--tabs-primary-*\`, underline and weight variables; the second is the segmented control (\`type={TabsTypes.Secondary}\`), for the \`--tabs-secondary-*\` ones. Hover the tabs to see the hover colours.`,
       },

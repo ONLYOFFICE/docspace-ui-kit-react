@@ -1,7 +1,7 @@
 {
   "entry": "index.ts",
   "package": "@onlyoffice/apps-ui-kit",
-  "total": 713,
+  "total": 715,
   "values": 466,
   "exports": {
     "ADMIN": {
@@ -1118,6 +1118,10 @@
       "kind": "variable",
       "origin": "components/nav-menu"
     },
+    "NavMenuClickMeta": {
+      "kind": "type",
+      "origin": "components/nav-menu"
+    },
     "NavMenuGroup": {
       "kind": "type",
       "origin": "components/nav-menu"
@@ -1761,6 +1765,10 @@
     "TOption": {
       "kind": "type",
       "origin": "components/combobox"
+    },
+    "TOptionTagKind": {
+      "kind": "type",
+      "origin": "components/tags"
     },
     "TPathParts": {
       "kind": "type",

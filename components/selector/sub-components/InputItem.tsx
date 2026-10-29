@@ -151,7 +151,7 @@ const InputItem = ({
         onClick={onAcceptInputAction}
       >
         {isLoading ? (
-          <Loader type={LoaderTypes.track} size="16px" />
+          <Loader isDecorative type={LoaderTypes.track} size="16px" />
         ) : (
           <IconButton
             iconNode={<AcceptIconReactSvg />}

@@ -227,6 +227,7 @@ export const FolderTile = ({
       ref={forwardRef}
       onContextMenu={onContextMenu}
       data-testid={dataTestId ?? "tile"}
+      aria-busy={inProgress || undefined}
     >
       {isBigFolder ? (
         <>
@@ -261,6 +262,7 @@ export const FolderTile = ({
             </div>
           ) : (
             <Loader
+              isDecorative
               className={styles.loader}
               color=""
               size="20px"

@@ -1,6 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, within } from "storybook/test";
 
 import SettingsReactSvgUrl from "../../assets/settings.react.svg?url";
 
@@ -287,6 +288,8 @@ type Story = StoryObj<ComponentProps<typeof DropDownItem>>;
 
 export default meta;
 
+const left = (element: Element) => element.getBoundingClientRect().left;
+
 const Wrapper = (props: { children: React.ReactNode }) => {
   return (
     <div
@@ -306,6 +309,11 @@ export const Default: Story = {
   render: (args) => <DropDownItem {...args} />,
   args: {
     label: "Default Item",
+    onClick: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("option", { name: "Default Item" }));
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -344,6 +352,16 @@ const WithDescriptionTemplate = () => {
 
 export const WithDescription: Story = {
   render: () => <WithDescriptionTemplate />,
+  play: async ({ canvas }) => {
+    // The explanation sits on a line of its own under the label.
+    const editor = canvas.getByRole("option", { name: /^Editor/ });
+    const label = within(editor).getByText("Editor");
+    const description = within(editor).getByText(/^Can edit the document/);
+    await expect(description).toBeVisible();
+    await expect(
+      description.getBoundingClientRect().top,
+    ).toBeGreaterThanOrEqual(label.getBoundingClientRect().bottom);
+  },
   parameters: {
     docs: {
       description: {
@@ -376,6 +394,15 @@ const ItemTypesTemplate = () => {
 
 export const ItemTypes: Story = {
   render: () => <ItemTypesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("separator")).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("option", { name: "Selected Item" }),
+    ).toHaveAttribute("aria-selected", "true");
+    await expect(
+      canvas.getByRole("option", { name: "Disabled Item" }),
+    ).toHaveAttribute("aria-disabled", "true");
+  },
   parameters: {
     docs: {
       description: {
@@ -405,6 +432,12 @@ const WithToggleTemplate = () => {
 
 export const WithToggle: Story = {
   render: () => <WithToggleTemplate />,
+  play: async ({ canvas }) => {
+    const toggleOf = (name: string) =>
+      within(canvas.getByRole("option", { name })).getByRole("checkbox");
+    await expect(toggleOf("Toggle On")).toBeChecked();
+    await expect(toggleOf("Toggle Off")).not.toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -440,6 +473,18 @@ const WithBadgesTemplate = () => {
 
 export const WithBadges: Story = {
   render: () => <WithBadgesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(
+      within(canvas.getByRole("option", { name: /New Feature/ })).getByText(
+        "Beta",
+      ),
+    ).toBeVisible();
+    await expect(
+      within(canvas.getByRole("option", { name: /Premium Feature/ })).getByText(
+        "Pro",
+      ),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -470,6 +515,18 @@ const SubmenuTemplate = () => {
 
 export const Submenu: Story = {
   render: () => <SubmenuTemplate />,
+  play: async ({ canvas }) => {
+    const arrow = (name: string) =>
+      canvas
+        .getByRole("option", { name })
+        .querySelector('[class*="submenuArrow"]') as HTMLElement;
+    await expect(arrow("Open Submenu")).toBeVisible();
+    await expect(arrow("Open Submenu")).toHaveStyle({ transform: "none" });
+    // The open entry's arrow is turned down.
+    await expect(arrow("Active Submenu")).toHaveStyle({
+      transform: "matrix(0, 1, -1, 0, 0, 0)",
+    });
+  },
   parameters: {
     docs: {
       description: {
@@ -503,6 +560,16 @@ const WithAdditionalElementTemplate = () => {
 
 export const WithAdditionalElement: Story = {
   render: () => <WithAdditionalElementTemplate />,
+  play: async ({ canvas }) => {
+    const save = canvas.getByRole("option", { name: /^Save/ });
+    const shortcut = within(save).getByText("Ctrl+S");
+    await expect(left(shortcut)).toBeGreaterThan(
+      left(within(save).getByText("Save")),
+    );
+    await expect(
+      within(canvas.getByRole("option", { name: /^Copy/ })).getByText("Ctrl+C"),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -540,6 +607,12 @@ export const HeaderWithArrow: Story = {
   render: (args) => (
     <HeaderWithArrowTemplate headerArrowAction={args.headerArrowAction} />
   ),
+  args: { headerArrowAction: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    const header = canvas.getByRole("option", { name: "Header with Back" });
+    await userEvent.click(header.querySelector("svg") as SVGElement);
+    await expect(args.headerArrowAction).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -572,6 +645,15 @@ const TextOverflowTemplate = () => {
 
 export const WithTextOverflow: Story = {
   render: () => <TextOverflowTemplate />,
+  play: async ({ canvas }) => {
+    // The row itself cuts the label.
+    const row = canvas.getByRole("option");
+    await expect(row.scrollWidth).toBeGreaterThan(row.clientWidth);
+    await expect(row).toHaveStyle({
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    });
+  },
   parameters: {
     docs: {
       description: {
@@ -596,12 +678,29 @@ export const WithExternalLink: Story = {
     icon: SettingsReactSvgUrl,
     withExternalLink: true,
     externalLinkPath: "https://example.com/help",
+    onClick: fn(),
+    onExternalLinkClick: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // The icon is a real link: it has the address and a name, and it is
+    // reachable with the keyboard.
+    const external = canvas.getByRole("link", { name: "Open Help center" });
+    await expect(external).toHaveAttribute("href", "https://example.com/help");
+    await expect(external).toHaveAttribute("target", "_blank");
+    external.focus();
+    await expect(external).toHaveFocus();
+    // With onExternalLinkClick the plain click is left to the callback.
+    await userEvent.click(external);
+    await expect(args.onExternalLinkClick).toHaveBeenCalledTimes(1);
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onExternalLinkClick).toHaveBeenCalledTimes(2);
+    await expect(args.onClick).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
       description: {
         story:
-          "An entry can carry a second target at its end: **Help center** shows an external-link icon (`withExternalLink`, `externalLinkPath`); click the icon to see `onExternalLinkClick` in the Actions panel while `onClick` stays silent, and open the link from that callback yourself.",
+          'An entry can carry a second target at its end: **Help center** shows an external-link icon (`withExternalLink`, `externalLinkPath`). The icon is a focusable link to `externalLinkPath` named "Open Help center" (`externalLinkLabel` overrides it). Without `onExternalLinkClick` it opens the address in a new tab; with it, as here, a plain click goes to the callback instead (see the Actions panel) while `onClick` stays silent.',
       },
       source: {
         code: `<DropDownItem
@@ -609,7 +708,7 @@ export const WithExternalLink: Story = {
   icon={SettingsIcon}
   withExternalLink
   externalLinkPath="https://example.com/help"
-  onExternalLinkClick={() => window.open(helpUrl, "_blank")}
+  onExternalLinkClick={() => navigate("/help")}
 />`,
       },
     },
@@ -644,6 +743,19 @@ const RightToLeftTemplate = () => (
 export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    const [settings, more, notifications] = canvas.getAllByRole("option");
+    // The icon on the right of the label, the arrow and the switch at the
+    // left end.
+    const iconOf = (option: HTMLElement) =>
+      option.querySelector('[class*="iconWrapper"]') as Element;
+    const label = settings.querySelector('[dir="auto"]') as Element;
+    await expect(left(iconOf(settings))).toBeGreaterThan(left(label));
+    const arrow = more.querySelector('[class*="submenuArrow"]') as Element;
+    await expect(left(arrow)).toBeLessThan(left(iconOf(more)));
+    const toggle = within(notifications).getByRole("checkbox");
+    await expect(left(toggle)).toBeLessThan(left(iconOf(notifications)));
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -665,40 +777,62 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async () => {
+    const custom = screen.getByRole("option", { name: "Custom Item" });
+    await expect(custom).toHaveStyle({
+      height: "40px",
+      color: "rgb(76, 29, 149)",
+      fontSize: "14px",
+    });
+    await expect(screen.getByRole("option", { name: "Header" })).toHaveStyle({
+      height: "56px",
+    });
+    await expect(
+      screen.getByRole("option", { name: "Disabled Item" }),
+    ).toHaveStyle({ color: "rgb(167, 139, 250)" });
+  },
   render: () => (
     <div
-      style={
-        {
-          position: "relative",
-          height: "20px",
-          width: "240px",
-          "--drop-down-item-color": "#4c1d95",
-          "--drop-down-item-icon-fill": "#7c3aed",
-          "--drop-down-item-hover-bg": "#ede9fe",
-          "--drop-down-item-divider": "#c4b5fd",
-          "--drop-down-item-disabled-color": "#a78bfa",
-          "--drop-down-item-height": "40px",
-          "--drop-down-item-font-size": "14px",
-          "--drop-down-item-font-weight": "400",
-          "--drop-down-item-padding": "0 20px",
-          "--drop-down-item-header-height": "56px",
-          "--drop-down-item-header-font-size": "18px",
-        } as CSSProperties
-      }
+      style={{
+        height: "240px",
+        overflow: "hidden",
+        transform: "translateZ(0)",
+      }}
     >
-      <DropDown
-        open
-        directionY="bottom"
-        fixedDirection
-        isDefaultMode={false}
-        showDisabledItems
+      <div
+        style={
+          {
+            position: "relative",
+            height: "20px",
+            width: "240px",
+            "--drop-down-item-color": "light-dark(#4c1d95, #c4b5fd)",
+            "--drop-down-item-icon-fill": "#7c3aed",
+            "--drop-down-item-hover-bg": "light-dark(#ede9fe, #2a2147)",
+            "--drop-down-item-divider": "light-dark(#c4b5fd, #4c3d80)",
+            "--drop-down-item-disabled-color": "#a78bfa",
+            "--drop-down-item-height": "40px",
+            "--drop-down-item-font-size": "14px",
+            "--drop-down-item-font-weight": "400",
+            "--drop-down-item-padding": "0 20px",
+            "--drop-down-item-header-height": "56px",
+            "--drop-down-item-header-font-size": "18px",
+          } as CSSProperties
+        }
       >
-        <DropDownItem isHeader label="Header" />
-        <DropDownItem label="Custom Item" icon={SettingsReactSvgUrl} />
-        <DropDownItem label="Another Item" icon={SettingsReactSvgUrl} />
-        <DropDownItem isSeparator />
-        <DropDownItem label="Disabled Item" disabled />
-      </DropDown>
+        <DropDown
+          open
+          directionY="bottom"
+          fixedDirection
+          isDefaultMode={false}
+          showDisabledItems
+        >
+          <DropDownItem isHeader label="Header" />
+          <DropDownItem label="Custom Item" icon={SettingsReactSvgUrl} />
+          <DropDownItem label="Another Item" icon={SettingsReactSvgUrl} />
+          <DropDownItem isSeparator />
+          <DropDownItem label="Disabled Item" disabled />
+        </DropDown>
+      </div>
     </div>
   ),
   parameters: {

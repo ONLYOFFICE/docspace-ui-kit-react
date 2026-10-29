@@ -23,7 +23,7 @@ import styles from "./Avatar.module.scss";
 
 import type { AvatarProps, TAvatarModel } from "./Avatar.types";
 import { AvatarRole, AvatarSize, AvatarActionKeys } from "./Avatar.enums";
-import { getRoleIcon, Initials, EmptyIcon } from "./Avatar.utils";
+import { getRoleIcon, Initials, EmptyIcon, isSvgSource } from "./Avatar.utils";
 
 export {
   type AvatarProps,
@@ -63,7 +63,16 @@ const AvatarPure = ({
 
   const [openEditLogo, setOpenLogoEdit] = React.useState<boolean>(false);
 
-  const onToggleOpenEditLogo = () => setOpenLogoEdit(!openEditLogo);
+  const instanceId = React.useId();
+
+  const onToggleOpenEditLogo = () => setOpenLogoEdit((open) => !open);
+
+  // The pencil sits inside the avatar, whose own handler toggles the menu
+  // as well; the pencil keeps its click to itself so it counts once.
+  const onEditButtonClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleOpenEditLogo();
+  };
 
   useClickOutside(iconRef, () => {
     setOpenLogoEdit(false);
@@ -79,7 +88,7 @@ const AvatarPure = ({
 
   if (typeof source === "string") {
     if (source?.includes("default_user_photo")) isDefault = true;
-    else if (source?.includes(".svg")) isIcon = true;
+    else if (isSvgSource(source)) isIcon = true;
   }
 
   const avatarContent = source ? (
@@ -105,7 +114,7 @@ const AvatarPure = ({
       <img
         src={source}
         className={`${styles.image}${imgClassName ? ` ${imgClassName}` : ""}`}
-        alt="avatar"
+        alt={userName ?? ""}
       />
     )
   ) : userName ? (
@@ -122,7 +131,7 @@ const AvatarPure = ({
 
   const roleIcon = roleIconProp ?? getRoleIcon(role);
 
-  const uniqueTooltipId = withTooltip ? `roleTooltip_${Math.random()}` : "";
+  const uniqueTooltipId = withTooltip ? `roleTooltip_${instanceId}` : "";
   const tooltipPlace = isRTL ? "left" : "right";
 
   const getTooltipContent = ({ content }: TGetTooltipContent) => (
@@ -167,7 +176,10 @@ const AvatarPure = ({
       isDefaultMode={false}
     >
       {model?.map((option) => {
-        const optionOnClickAction = () => {
+        const optionOnClickAction = (e?: React.SyntheticEvent) => {
+          // The entry sits inside the avatar; its click must not reach the
+          // avatar's own handler and open the menu again.
+          e?.stopPropagation();
           setOpenLogoEdit(false);
 
           if (option.key === AvatarActionKeys.PROFILE_AVATAR_UPLOAD) {
@@ -190,6 +202,17 @@ const AvatarPure = ({
     </DropDown>
   );
 
+  // The avatar is a button only when a click does something: a handler of
+  // the host's, or the built-in upload behaviour.
+  const isInteractive = !!onClick || (!!onChangeFile && !noClick);
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    if (e.target !== e.currentTarget) return;
+    e.preventDefault();
+    e.currentTarget.click();
+  };
+
   return (
     <>
       <div
@@ -198,9 +221,12 @@ const AvatarPure = ({
         data-no-click={noClick ? "true" : "false"}
         onMouseDown={onMouseDown}
         onClick={onClick || onClickAvatar}
+        onKeyDown={isInteractive ? onKeyDown : undefined}
         ref={iconRef}
         data-testid={dataTestId ?? "avatar"}
-        role="button"
+        role={isInteractive ? "button" : undefined}
+        tabIndex={isInteractive ? 0 : undefined}
+        aria-label={isInteractive && userName ? userName : undefined}
       >
         <div
           className={classNames(styles.avatarWrapper, className)}
@@ -217,7 +243,7 @@ const AvatarPure = ({
                 <IconButton
                   className="edit_icon"
                   iconNode={<PencilReactSvgUrl />}
-                  onClick={onToggleOpenEditLogo}
+                  onClick={onEditButtonClick}
                   size={16}
                   dataTestId="edit_avatar_icon_button"
                 />
@@ -258,7 +284,7 @@ const AvatarPure = ({
       </div>
       {onChangeFile ? (
         <input
-          id="customAvatarInput"
+          id={`${instanceId}-avatar-file`}
           className="custom-file-input"
           type="file"
           onChange={onChangeFile}

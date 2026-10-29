@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import type { ComponentProps } from "react";
 
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fireEvent, fn, screen, waitFor, within } from "storybook/test";
 
 import DefaultUserPhotoUrl from "../../assets/default_user_photo_size_82-82.png";
 import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
@@ -210,6 +211,29 @@ type Story = StoryObj<ComponentProps<typeof ContextMenu>>;
 
 export default meta;
 
+// The menu is portalled, fades in, and unmounts when it closes.
+const menuItem = async (name: string | RegExp) => {
+  const item = await screen.findByRole("menuitem", { name });
+  await waitFor(() => expect(item).toBeVisible());
+  return item;
+};
+
+const menuPanel = () =>
+  document.querySelector<HTMLElement>(".p-contextmenu") as HTMLElement;
+
+const menuClosed = () =>
+  waitFor(() => expect(document.querySelector(".p-contextmenu")).toBeNull());
+
+const rightClick = (target: HTMLElement) => {
+  const box = target.getBoundingClientRect();
+  fireEvent.contextMenu(target, {
+    clientX: box.left + box.width / 2,
+    clientY: box.top + box.height / 2,
+  });
+};
+
+const onSimpleItemClick = fn();
+
 const fullMenuItems: ContextMenuModel[] = [
   { key: 0, label: "Edit", icon: CatalogFolderReactSvgUrl },
   { key: 1, label: "Preview", icon: CatalogFolderReactSvgUrl },
@@ -288,6 +312,25 @@ export const Default: Story = {
   args: {
     model: fullMenuItems,
     showDisabledItems: true,
+    onShow: fn(),
+    onHide: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    rightClick(canvas.getByTestId("trigger"));
+    await menuItem("Edit");
+    await expect(args.onShow).toHaveBeenCalled();
+    await expect(screen.getAllByRole("separator").length).toBeGreaterThan(0);
+    // The disabled item stays, greyed out.
+    const rename = await menuItem("Rename");
+    await expect(rename.className).toMatch(/p-disabled/);
+
+    // A submenu opens on hover.
+    await userEvent.hover(await menuItem("Move or copy"));
+    await expect(await menuItem("Duplicate")).toBeVisible();
+
+    await userEvent.keyboard("{Escape}");
+    await menuClosed();
+    await expect(args.onHide).toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -310,11 +353,31 @@ export const Default: Story = {
 const SimpleMenuTemplate = () => {
   const cm = useRef<ContextMenuRefType>(null);
   const simpleItems: ContextMenuModel[] = [
-    { key: 0, label: "Cut", icon: CatalogFolderReactSvgUrl },
-    { key: 1, label: "Copy", icon: CatalogFolderReactSvgUrl },
-    { key: 2, label: "Paste", icon: CatalogFolderReactSvgUrl },
+    {
+      key: 0,
+      label: "Cut",
+      icon: CatalogFolderReactSvgUrl,
+      onClick: onSimpleItemClick,
+    },
+    {
+      key: 1,
+      label: "Copy",
+      icon: CatalogFolderReactSvgUrl,
+      onClick: onSimpleItemClick,
+    },
+    {
+      key: 2,
+      label: "Paste",
+      icon: CatalogFolderReactSvgUrl,
+      onClick: onSimpleItemClick,
+    },
     { key: 3, isSeparator: true, disabled: false },
-    { key: 4, label: "Delete", icon: CatalogFolderReactSvgUrl },
+    {
+      key: 4,
+      label: "Delete",
+      icon: CatalogFolderReactSvgUrl,
+      onClick: onSimpleItemClick,
+    },
   ];
 
   return (
@@ -346,6 +409,18 @@ const SimpleMenuTemplate = () => {
 
 export const SimpleMenu: Story = {
   render: () => <SimpleMenuTemplate />,
+  beforeEach: () => {
+    onSimpleItemClick.mockClear();
+  },
+  play: async ({ canvas, userEvent }) => {
+    rightClick(canvas.getByRole("button", { name: "Right click on me" }));
+    await expect(screen.getAllByRole("menuitem")).toHaveLength(4);
+    // Picking an item calls its onClick with the item and closes the menu.
+    await userEvent.click(await menuItem("Copy"));
+    await expect(onSimpleItemClick).toHaveBeenCalledTimes(1);
+    await expect(onSimpleItemClick.mock.calls[0][0].item.key).toBe(1);
+    await menuClosed();
+  },
   parameters: {
     docs: {
       description: {
@@ -405,6 +480,16 @@ const WithBackdropTemplate = () => {
 
 export const WithBackdrop: Story = {
   render: () => <WithBackdropTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    rightClick(canvas.getByRole("button", { name: "Right click on me" }));
+    await menuItem("Option 1");
+    const backdrop = screen
+      .getAllByTestId("backdrop")
+      .find((element) => element.checkVisibility()) as HTMLElement;
+    await expect(backdrop).toBeDefined();
+    await userEvent.click(backdrop);
+    await menuClosed();
+  },
   parameters: {
     docs: {
       description: {
@@ -444,6 +529,19 @@ export const WithItemDescriptions: Story = {
   render: (args) => <MenuTemplate {...args} />,
   args: {
     model: accessItems,
+  },
+  play: async ({ canvas }) => {
+    rightClick(canvas.getByTestId("trigger"));
+    const item = await menuItem(/^Invited people only/);
+    // The description sits under the label, always visible.
+    const label = within(item).getByText("Invited people only");
+    const description = within(item).getByText(
+      "Only the people you invite by e-mail get access.",
+    );
+    await expect(description).toBeVisible();
+    await expect(
+      description.getBoundingClientRect().top,
+    ).toBeGreaterThanOrEqual(label.getBoundingClientRect().bottom - 1);
   },
   parameters: {
     docs: {
@@ -545,6 +643,33 @@ const ItemVariantsTemplate = () => {
 
 export const ItemVariants: Story = {
   render: () => <ItemVariantsTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    rightClick(canvas.getByTestId("trigger"));
+    const notifications = (await menuItem("Notifications")).closest(
+      "li",
+    ) as HTMLElement;
+    const toggle = within(notifications).getByRole("checkbox");
+    await expect(toggle).toBeChecked();
+    // A switch flips and keeps the menu open.
+    await userEvent.click(within(notifications).getByText("Notifications"));
+    await waitFor(() =>
+      expect(
+        within(
+          screen.getByText("Notifications").closest("li") as HTMLElement,
+        ).getByRole("checkbox"),
+      ).not.toBeChecked(),
+    );
+    await expect(menuPanel()).toBeVisible();
+
+    const autoSave = screen.getByText("Auto-save").closest("li") as HTMLElement;
+    await expect(within(autoSave).getByRole("checkbox")).toBeDisabled();
+    await expect(screen.getByText("New")).toBeVisible();
+    await expect(screen.getByText("Paid")).toBeVisible();
+    const help = await menuItem("Help Center");
+    await expect(help).toHaveAttribute("href", "https://example.com/help");
+    await expect(help).toHaveAttribute("target", "_blank");
+    await expect((await menuItem("Delete")).className).toMatch(/p-disabled/);
+  },
   parameters: {
     docs: {
       description: {
@@ -610,6 +735,15 @@ const DynamicModelTemplate = () => {
 
 export const DynamicModel: Story = {
   render: () => <DynamicModelTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // The model is built on every open.
+    rightClick(canvas.getByTestId("trigger"));
+    await expect(await menuItem(/^Model built at /)).toBeVisible();
+    await userEvent.click(await menuItem("Add to favorites"));
+    await menuClosed();
+    rightClick(canvas.getByTestId("trigger"));
+    await expect(await menuItem("Remove from favorites")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -682,6 +816,11 @@ export const AttachedToDocument: Story = {
     model: globalItems,
     global: true,
   },
+  play: async ({ canvas }) => {
+    // The whole document listens, not only the square.
+    rightClick(canvas.getByText("…or anywhere around: the whole page listens"));
+    await expect(await menuItem("Paste")).toBeVisible();
+  },
   parameters: {
     docs: {
       // Its document listener would hijack the other stories on the Docs page.
@@ -725,6 +864,25 @@ export const MaxHeight: Story = {
     model: manyItems,
     maxHeight: 240,
     maxHeightLowerSubmenu: 160,
+  },
+  play: async ({ canvas, userEvent }) => {
+    rightClick(canvas.getByTestId("trigger"));
+    await menuItem("Option 1");
+    // Sixteen items in a 240px list.
+    const scroller = within(menuPanel()).getAllByTestId("scroller")[0];
+    await expect(scroller.clientHeight).toBeLessThanOrEqual(240);
+    await expect(scroller.scrollHeight).toBeGreaterThan(scroller.clientHeight);
+
+    await userEvent.hover(await menuItem("Move to"));
+    // The submenu's own list scrolls within 160px.
+    let subList = (await menuItem("Folder 1")).parentElement;
+    while (subList && subList.scrollHeight <= subList.clientHeight) {
+      subList = subList.parentElement;
+    }
+    await expect(subList).not.toBeNull();
+    await expect((subList as HTMLElement).clientHeight).toBeLessThanOrEqual(
+      160,
+    );
   },
   parameters: {
     docs: {
@@ -836,6 +994,18 @@ export const MobileWithHeader: Story = {
     withBackdrop: true,
     ignoreChangeView: true,
   },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByTestId("trigger"));
+    await menuItem("Edit room");
+    // The sheet carries the header above the list.
+    const header = menuPanel().querySelector(
+      ".contextmenu-header",
+    ) as HTMLElement;
+    await expect(within(header).getByText("Contracts 2026")).toBeVisible();
+    await expect(
+      screen.getAllByTestId("backdrop").some((b) => b.checkVisibility()),
+    ).toBe(true);
+  },
   parameters: {
     docs: {
       description: {
@@ -881,6 +1051,15 @@ export const MobileWithAvatarHeader: Story = {
     header: userHeader,
     withBackdrop: true,
     ignoreChangeView: true,
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByTestId("trigger"));
+    await menuItem("Open profile");
+    const header = menuPanel().querySelector(
+      ".contextmenu-header",
+    ) as HTMLElement;
+    await expect(within(header).getByText("Team member")).toBeVisible();
+    await expect(within(header).getByTestId("avatar")).toBeVisible();
   },
   parameters: {
     docs: {
@@ -941,6 +1120,16 @@ export const AnchoredToElement: Story = {
       { key: 4, label: "Delete", icon: CatalogFolderReactSvgUrl },
     ],
   },
+  play: async ({ canvas, userEvent }) => {
+    const button = canvas.getByTestId("trigger");
+    await userEvent.click(button);
+    await menuItem("Rename");
+    // Under the button, at its left edge, wherever the pointer was.
+    const menu = menuPanel().getBoundingClientRect();
+    const anchor = button.getBoundingClientRect();
+    await expect(menu.top).toBeGreaterThanOrEqual(anchor.bottom - 1);
+    await expect(Math.abs(menu.left - anchor.left)).toBeLessThanOrEqual(2);
+  },
   parameters: {
     docs: {
       description: {
@@ -992,6 +1181,23 @@ const RightToLeftTemplate = (props: ContextMenuProps) => {
 export const RightToLeft: Story = {
   render: (args) => <RightToLeftTemplate {...args} />,
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    const trigger = canvas.getByTestId("trigger");
+    rightClick(trigger);
+    const item = await menuItem("نسخ");
+    // Opened to the left of the pointer.
+    const box = trigger.getBoundingClientRect();
+    const pointerX = box.left + box.width / 2;
+    await expect(menuPanel().getBoundingClientRect().right).toBeLessThanOrEqual(
+      pointerX + 1,
+    );
+    // The icon sits on the right of the label.
+    const icon = (
+      item.querySelector("svg, img") as Element
+    ).getBoundingClientRect();
+    const label = within(item).getByText("نسخ").getBoundingClientRect();
+    await expect(icon.left).toBeGreaterThanOrEqual(label.right - 1);
+  },
   args: {
     model: [
       { key: 0, label: "تحرير", icon: CatalogFolderReactSvgUrl },
@@ -1102,6 +1308,18 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    rightClick(canvas.getByTestId("trigger"));
+    await menuItem("Cut");
+    const panel = getComputedStyle(menuPanel());
+    await expect(panel.backgroundColor).toBe("rgb(30, 27, 75)");
+    await expect(panel.borderTopLeftRadius).toBe("12px");
+    await expect(panel.borderTopColor).toBe("rgb(67, 56, 202)");
+    await expect(
+      getComputedStyle(screen.getByText("Moves the selection to the trash"))
+        .color,
+    ).toBe("rgb(165, 180, 252)");
+  },
   parameters: {
     docs: {
       description: {
