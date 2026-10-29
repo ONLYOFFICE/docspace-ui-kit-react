@@ -802,7 +802,9 @@ const FilterInput = React.memo(
               )}
 
               {/* Hidden measurement container */}
-              <div className={styles.groupTagsMeasure} aria-hidden>
+              {/* Inert: the copies here are clickable chips, which must not
+                  join the Tab order. */}
+              <div className={styles.groupTagsMeasure} aria-hidden inert>
                 <SelectedItem
                   propKey="m-all"
                   label={isFormsSection ? t("AllSpaces") : t("AllRooms")}
