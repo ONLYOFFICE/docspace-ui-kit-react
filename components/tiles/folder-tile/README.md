@@ -242,6 +242,8 @@ fallback for both.
 - The checkbox carries no label of its own; the folder's name is a sibling, not a label, so give
   the set of tiles a structure of your own if the count and the names matter.
 - Ctrl-click and Shift-click have no keyboard equivalent.
+- `inProgress` sets `aria-busy="true"` on the tile; the loader it shows is decorative, so the
+  busy state is announced once, by the tile.
 - The right-click menu is pointer-only; the three-dot button is the keyboard path to the same
   actions, so keep it available.
 - Make the name a real link. The tile's own click handler selects rather than opens, and it is not

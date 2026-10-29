@@ -8,7 +8,6 @@ const Track = ({
   ref,
   size,
   color,
-  label,
   id,
   style,
   primary,
@@ -31,12 +30,12 @@ const Track = ({
       style={{ ...customStyle, ...style }}
       viewBox="-10 -10 220 220"
       xmlns="http://www.w3.org/2000/svg"
-      aria-label={label}
+      aria-hidden="true"
+      focusable="false"
       ref={ref}
       data-testid="track-loader"
     >
       <defs>
-        <title>track</title>
         <linearGradient
           id={`spinner-color-${id}-1`}
           gradientUnits="objectBoundingBox"

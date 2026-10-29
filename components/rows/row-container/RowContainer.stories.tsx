@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, waitFor, within } from "storybook/test";
 
 import type { IndexRange } from "react-virtualized";
 
-import CatalogFolderReactSvg from "../../../assets/icons/16/catalog.folder.react.svg";
-import { IconSizeType } from "../../../utils";
+import Word32Svg from "../../../assets/icons/32/word.svg";
 
+import { globalColors } from "../../../providers/theme";
+
+import { Link, LinkType } from "../../link";
 import { Row } from "../row";
 import { RowContent } from "../row-content";
 import { Scrollbar } from "../../scrollbar";
@@ -16,8 +18,6 @@ import { Text } from "../../text";
 import { RowContainer } from ".";
 
 import { RowContainerProps } from "./RowContainer.types";
-
-import styles from "./RowContainer.stories.module.scss";
 
 const meta = {
   title: "UI/Rows/RowContainer",
@@ -118,22 +118,30 @@ const contextOptions = [
 const renderRow = (file: { id: string; title: string; size: string }) => (
   <Row
     key={file.id}
+    mode="modern"
     checked={false}
-    element={
-      <CatalogFolderReactSvg
-        className={styles.catalogFolderIcon}
-        data-size={IconSizeType.big}
-      />
-    }
+    element={<Word32Svg width={32} height={32} />}
     contextOptions={contextOptions}
   >
-    <RowContent>
-      <Text fontSize="15px" fontWeight={600} truncate>
-        {file.title}
-      </Text>
+    <RowContent sideColor={globalColors.gray}>
+      <Link
+        type={LinkType.page}
+        title={file.title}
+        fontSize="15px"
+        fontWeight={600}
+        isTextOverflow
+        truncate
+      >
+        {file.title.replace(/\.docx$/, "")}
+        <span style={{ color: globalColors.gray }}>.docx</span>
+      </Link>
       <span />
-      <Text>Modified today</Text>
-      <Text>{file.size}</Text>
+      <Text fontSize="12px" fontWeight={400}>
+        Modified today
+      </Text>
+      <Text fontSize="12px" fontWeight={400}>
+        {file.size}
+      </Text>
     </RowContent>
   </Row>
 );
@@ -148,6 +156,12 @@ export const Default: Story = {
     useReactWindow: false,
     children: [],
   },
+  play: async ({ canvas }) => {
+    // Every row at once, without the virtual list.
+    const container = canvas.getByTestId("row-container");
+    await expect(within(container).getAllByTestId("row")).toHaveLength(20);
+    await expect(getComputedStyle(container).userSelect).not.toBe("none");
+  },
   parameters: {
     docs: {
       description: {
@@ -157,12 +171,15 @@ export const Default: Story = {
       source: {
         code: `<RowContainer useReactWindow={false}>
   {files.map((file) => (
-    <Row key={file.id} checked={false} element={<CatalogFolderReactSvg />} contextOptions={contextOptions}>
-      <RowContent>
-        <Text fontSize="15px" fontWeight={600} truncate>{file.title}</Text>
+    <Row key={file.id} mode="modern" checked={false} element={<Word32Svg />} contextOptions={contextOptions}>
+      <RowContent sideColor={globalColors.gray}>
+        <Link type={LinkType.page} title={file.title} fontSize="15px" fontWeight={600} isTextOverflow truncate>
+          {file.name}
+          <span style={{ color: globalColors.gray }}>{file.exst}</span>
+        </Link>
         <span />
-        <Text>Modified today</Text>
-        <Text>{file.size}</Text>
+        <Text fontSize="12px" fontWeight={400}>Modified today</Text>
+        <Text fontSize="12px" fontWeight={400}>{file.size}</Text>
       </RowContent>
     </Row>
   ))}
@@ -178,6 +195,11 @@ export const NoTextSelection: Story = {
     useReactWindow: false,
     noSelect: true,
     children: [],
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      getComputedStyle(canvas.getByTestId("row-container")).userSelect,
+    ).toBe("none");
   },
   parameters: {
     docs: {
@@ -253,6 +275,30 @@ export const Virtualised: Story = {
     fetchMoreFiles: fn(),
     onScroll: fn(),
     children: [],
+  },
+  play: async ({ args, canvas }) => {
+    await waitFor(() => expect(canvas.getByText("Document 1")).toBeVisible());
+    // Only the rows near the view are mounted.
+    await expect(canvas.getAllByTestId("row").length).toBeLessThan(20);
+
+    // Scrolling to the end of the loaded rows asks for the next page.
+    const scroller = document.querySelector(
+      "#sectionScroll .scroll-wrapper > .scroller",
+    ) as HTMLElement;
+    await waitFor(() => {
+      scroller.scrollTop = scroller.scrollHeight;
+      scroller.dispatchEvent(new Event("scroll"));
+      expect(args.fetchMoreFiles).toHaveBeenCalled();
+    });
+    await expect(args.onScroll).toHaveBeenCalled();
+    await waitFor(
+      () => {
+        scroller.scrollTop = scroller.scrollHeight;
+        scroller.dispatchEvent(new Event("scroll"));
+        expect(canvas.getByText("Document 21")).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
   },
   parameters: {
     noPadding: true,

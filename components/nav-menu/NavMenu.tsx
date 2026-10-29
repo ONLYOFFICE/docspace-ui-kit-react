@@ -1,20 +1,32 @@
-import React, { forwardRef, useState, useEffect } from "react";
+import React, { forwardRef, useState, useEffect, useMemo } from "react";
 import { ReactSVG } from "react-svg";
 import classNames from "classnames";
 
 import { useAnimation } from "../../hooks/useAnimation";
 import { Badge } from "../badge";
 import { TooltipContainer } from "../tooltip";
+import { createTooltipWrapper } from "../tooltip/sub-components/createTooltipWrapper";
 import ExpandArrowIcon from "../../assets/arrow.react.svg";
 
-import { NavMenuProps, NavMenuItem, NavSubItem } from "./NavMenu.types";
+import {
+  NavMenuProps,
+  NavMenuItem,
+  NavSubItem,
+  NavMenuClickMeta,
+} from "./NavMenu.types";
 import styles from "./NavMenu.module.scss";
+
+// A click with a modifier on a link is the browser's: a new tab or window
+// (Ctrl/Cmd, Shift) or a download (Alt). The link does that on its own; the
+// entry's onClick, which acts in this tab, must stay out of it.
+const isNewContextClick = (e: React.MouseEvent) =>
+  e.ctrlKey || e.metaKey || e.shiftKey || e.altKey;
 
 type NavMenuSubItemWrapperProps = {
   subItem: NavSubItem;
   isActive: boolean;
   withAnimation: boolean;
-  onSubItemClick: (sub: NavSubItem) => void;
+  onSubItemClick: (sub: NavSubItem, meta: NavMenuClickMeta) => void;
   LinkRouter?: NavMenuProps["LinkRouter"];
 };
 
@@ -34,8 +46,11 @@ const NavMenuSubItemWrapper = ({
     triggerAnimation,
   } = useAnimation(isActive);
 
-  const handleClick = () => {
-    onSubItemClick(subItem);
+  const isLink = !!subItem.linkData && !!LinkRouter;
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (isLink && isNewContextClick(e)) return;
+    onSubItemClick(subItem, { isLink });
     if (withAnimation) triggerAnimation();
   };
 
@@ -75,7 +90,7 @@ const NavMenuSubItemWrapper = ({
           })}
           style={{ "--end-width": `${endWidth}%` } as React.CSSProperties}
         />
-        {subItem.linkData && LinkRouter ? (
+        {isLink && subItem.linkData && LinkRouter ? (
           <LinkRouter
             to={subItem.linkData.path}
             state={subItem.linkData.state}
@@ -114,6 +129,12 @@ const NavMenuSubItemWrapper = ({
   );
 };
 
+type RailLinkType = ReturnType<
+  typeof createTooltipWrapper<
+    React.ComponentProps<NonNullable<NavMenuProps["LinkRouter"]>>
+  >
+>;
+
 type NavMenuItemWrapperProps = {
   item: NavMenuItem;
   isActive: boolean;
@@ -123,10 +144,11 @@ type NavMenuItemWrapperProps = {
   withAnimation: boolean;
   iconOnly: boolean;
   withExpandControl: boolean;
-  onItemClick: (item: NavMenuItem) => void;
-  onSubItemClick: (sub: NavSubItem) => void;
+  onItemClick: (item: NavMenuItem, meta: NavMenuClickMeta) => void;
+  onSubItemClick: (sub: NavSubItem, meta: NavMenuClickMeta) => void;
   onToggleExpand: (item: NavMenuItem) => void;
   LinkRouter?: NavMenuProps["LinkRouter"];
+  RailLink?: RailLinkType;
 };
 
 const NavMenuItemWrapper = ({
@@ -142,6 +164,7 @@ const NavMenuItemWrapper = ({
   onSubItemClick,
   onToggleExpand,
   LinkRouter,
+  RailLink,
 }: NavMenuItemWrapperProps) => {
   const {
     animationPhase,
@@ -152,8 +175,11 @@ const NavMenuItemWrapper = ({
     triggerAnimation,
   } = useAnimation(isActive);
 
-  const handleClick = () => {
-    onItemClick(item);
+  const isLink = !hasChildren && !!item.linkData && !!LinkRouter;
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (isLink && isNewContextClick(e)) return;
+    onItemClick(item, { isLink });
     if (withAnimation) triggerAnimation();
   };
 
@@ -170,6 +196,9 @@ const NavMenuItemWrapper = ({
   const showBadge = item.showBadge || activeBadgeComponent != null;
 
   const itemClassName = classNames(styles.item, { [styles.active]: isActive });
+
+  // The rail hides the label, so the entry carries it as its name.
+  const railLabel = iconOnly ? item.label : undefined;
 
   const content = (
     <>
@@ -216,7 +245,19 @@ const NavMenuItemWrapper = ({
           })}
           style={{ "--end-width": `${endWidth}%` } as React.CSSProperties}
         />
-        {!hasChildren && item.linkData && LinkRouter ? (
+        {isLink && item.linkData && RailLink && iconOnly ? (
+          <RailLink
+            to={item.linkData.path}
+            state={item.linkData.state}
+            className={itemClassName}
+            data-item-id={item.id}
+            title={item.label}
+            aria-label={railLabel}
+            onClick={handleClick}
+          >
+            {content}
+          </RailLink>
+        ) : isLink && item.linkData && LinkRouter ? (
           <LinkRouter
             to={item.linkData.path}
             state={item.linkData.state}
@@ -237,7 +278,8 @@ const NavMenuItemWrapper = ({
                 ? isExpanded
                 : undefined
             }
-            title={iconOnly ? item.label : undefined}
+            title={railLabel}
+            aria-label={railLabel}
             onClick={handleClick}
           >
             {content}
@@ -349,11 +391,17 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
       });
     }, [activeItemId, groups, withExpandControl]);
 
-    const handleItemClick = (item: NavMenuItem) => {
+    // The rail's links show their hidden label as a tooltip, as its buttons do.
+    const RailLink = useMemo(
+      () => (LinkRouter ? createTooltipWrapper(LinkRouter) : undefined),
+      [LinkRouter],
+    );
+
+    const handleItemClick = (item: NavMenuItem, meta: NavMenuClickMeta) => {
       // An onClick that returns `false` handled the interaction itself (e.g.
       // opened a modal) and opts out of the default expand/collapse so the
       // sub-menu doesn't toggle behind the modal.
-      const handled = item.onClick?.(item) === false;
+      const handled = item.onClick?.(item, meta) === false;
       if (handled) return;
       // Mobile: the body click is navigation-only; the chevron owns expansion.
       if (withExpandControl) return;
@@ -384,8 +432,11 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
       });
     };
 
-    const handleSubItemClick = (subItem: NavSubItem) => {
-      subItem.onClick?.(subItem);
+    const handleSubItemClick = (
+      subItem: NavSubItem,
+      meta: NavMenuClickMeta,
+    ) => {
+      subItem.onClick?.(subItem, meta);
     };
 
     // When iconOnly, flatten only the active parent's children into the list
@@ -422,7 +473,9 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
               label: sub.label,
               icon: sub.icon,
               iconNode: sub.iconNode,
-              onClick: sub.onClick ? () => sub.onClick?.(sub) : undefined,
+              onClick: sub.onClick
+                ? (_item, meta) => sub.onClick?.(sub, meta)
+                : undefined,
               linkData: sub.linkData,
               showBadge: sub.showBadge,
               labelBadge: sub.labelBadge,
@@ -472,6 +525,7 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
                     onSubItemClick={handleSubItemClick}
                     onToggleExpand={handleToggleExpand}
                     LinkRouter={LinkRouter}
+                    RailLink={RailLink}
                   />
                 ))}
               </ul>

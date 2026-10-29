@@ -2,13 +2,18 @@ import CrossReactSvg from "../../assets/icons/12/cross.react.svg";
 import InfoReactSvg from "../../assets/danger.toast.react.svg";
 
 import React from "react";
-import ReactDOM from "react-dom/client";
+import { createRoot, type Root } from "react-dom/client";
 import * as ReactCountdownNamespace from "react-countdown";
 import { zeroPad } from "react-countdown";
 import classNames from "classnames";
 import xss from "xss";
 
+import {
+  useLiveRegionText,
+  useLiveRegionTextOf,
+} from "../../hooks/useLiveRegionText";
 import { interopDefault } from "../../utils/interop-default";
+import { getCommonTranslation } from "../../utils/i18n";
 import { Heading, HeadingSize } from "../heading";
 import { Text } from "../text";
 
@@ -25,33 +30,163 @@ declare global {
   }
 }
 
+// The one root the static `show` renders into, the node it lives on, and
+// whether `show` created that node (and so has to remove it again).
+let staticRoot: Root | null = null;
+let staticNode: HTMLElement | null = null;
+let ownsStaticNode = false;
+
+// The roots `close` has scheduled to unmount and not yet unmounted. `close`
+// can be called while React is committing -- the countdown's onComplete is
+// -- where a synchronous root.unmount() is refused with an error, so it waits
+// for a microtask. A `show` for the same place that comes first takes the
+// root back instead of unmounting it, which would be the same synchronous
+// unmount `close` avoided; a pending root anywhere else goes on its own.
+type TPendingRoot = {
+  root: Root;
+  node: HTMLElement | null;
+  owns: boolean;
+  cancelled: boolean;
+};
+let pendingRoots: TPendingRoot[] = [];
+
+// Counts the bars `show` has rendered, as their key: each one is a bar of
+// its own, mounted afresh, so its onLoad runs and its props take effect.
+let showCount = 0;
+
+/**
+ * The bar's announcement: a visually hidden polite live region beside the
+ * visible content. It mounts empty and gets its text LIVE_REGION_DELAY later
+ * (useLiveRegionText), because a region inserted together with its text is
+ * usually not announced; the visible bar draws at once and is not live
+ * itself.
+ *
+ * The header and the message are read as plain text from the elements that
+ * draw them (useLiveRegionTextOf). Rendering them here a second time would
+ * copy any link the portal puts in the message -- ConfirmEmailBar's and
+ * QuotasBar's -- as an invisible tab stop with the same test id.
+ */
+const SnackbarAnnouncement = ({
+  html,
+  headerRef,
+  messageRef,
+}: {
+  html?: string;
+  headerRef: React.RefObject<HTMLElement | null>;
+  messageRef: React.RefObject<HTMLElement | null>;
+}) => {
+  // Injected HTML is announced as its text, decoded by the browser's parser
+  // (which runs no script) rather than injected a second time.
+  const [htmlText, setHtmlText] = React.useState<string>();
+
+  React.useEffect(() => {
+    if (!html) {
+      setHtmlText(undefined);
+      return;
+    }
+    const doc = new DOMParser().parseFromString(xss(html), "text/html");
+    setHtmlText(doc.body.textContent?.trim() ?? "");
+  }, [html]);
+
+  const liveHtmlText = useLiveRegionText(htmlText);
+  const headerText = useLiveRegionTextOf(headerRef);
+  const messageText = useLiveRegionTextOf(messageRef);
+
+  const text = html
+    ? liveHtmlText
+    : [headerText, messageText].filter(Boolean).join(" ") || undefined;
+
+  return (
+    <span
+      role="status"
+      className={styles.visuallyHidden}
+      data-testid="snackbar-announcement"
+    >
+      {text}
+    </span>
+  );
+};
+
 class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
   static show(barConfig: BarConfig) {
     const { parentElementId, ...rest } = barConfig;
 
-    let parentElementNode =
-      parentElementId && document.getElementById(parentElementId);
+    const target = parentElementId
+      ? document.getElementById(parentElementId)
+      : null;
 
-    if (!parentElementNode) {
-      const snackbarNode = document.createElement("div");
-      snackbarNode.id = "snackbar";
-      document.body.appendChild(snackbarNode);
-      parentElementNode = snackbarNode;
+    // A bar already shown somewhere else is closed first; one shown in the
+    // same place is rendered in its existing root.
+    if (staticRoot && (target ? staticNode !== target : !ownsStaticNode)) {
+      SnackBar.close();
+    }
+
+    const pending = staticRoot
+      ? undefined
+      : pendingRoots.find((p) => (target ? p.node === target : p.owns));
+    if (pending) {
+      pending.cancelled = true;
+      pendingRoots = pendingRoots.filter((p) => p !== pending);
+      staticRoot = pending.root;
+      staticNode = pending.node;
+      ownsStaticNode = pending.owns;
+    }
+
+    if (!staticRoot) {
+      let node = target;
+      let owns = false;
+
+      if (!node) {
+        node = document.createElement("div");
+        node.id = "snackbar";
+        document.body.appendChild(node);
+        owns = true;
+      }
+
+      staticRoot = createRoot(node);
+      staticNode = node;
+      ownsStaticNode = owns;
     }
 
     window.snackbar = barConfig;
 
-    ReactDOM.createRoot(parentElementNode).render(<SnackBar {...rest} />);
+    showCount += 1;
+    staticRoot.render(<SnackBar key={showCount} {...rest} />);
   }
 
   static close() {
-    const config = window.snackbar as BarConfig | undefined;
-    if (config && config.parentElementId) {
-      const snackbar = document.querySelector("#snackbar-container");
-      if (snackbar) snackbar.remove();
-      // ReactDOM.unmountComponentAtNode(window.snackbar.parentElementId);
+    const root = staticRoot;
+    const node = staticNode;
+    const owns = ownsStaticNode;
+
+    staticRoot = null;
+    staticNode = null;
+    ownsStaticNode = false;
+    window.snackbar = undefined;
+
+    if (!root) {
+      if (owns) node?.remove();
+      return;
     }
+
+    const pending: TPendingRoot = { root, node, owns, cancelled: false };
+    pendingRoots.push(pending);
+
+    queueMicrotask(() => {
+      if (pending.cancelled) return;
+      pendingRoots = pendingRoots.filter((p) => p !== pending);
+      root.unmount();
+      if (owns) node?.remove();
+    });
   }
+
+  // What the announcement reads: the header line and the message.
+  headerRef = React.createRef<HTMLDivElement>();
+
+  messageRef = React.createRef<HTMLDivElement>();
+
+  // The pending onAction after a click into the iframe, cancelled on unmount.
+  iframeActionTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(props: SnackbarProps) {
     super(props);
@@ -67,6 +202,7 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
 
   componentWillUnmount() {
     window.removeEventListener("blur", this.onClickIFrame);
+    clearTimeout(this.iframeActionTimer);
   }
 
   onActionClick = (e?: React.MouseEvent) => {
@@ -79,7 +215,8 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
       document.activeElement &&
       document.activeElement.nodeName.toLowerCase() === "iframe"
     ) {
-      setTimeout(() => this.onActionClick(), 500);
+      clearTimeout(this.iframeActionTimer);
+      this.iframeActionTimer = setTimeout(() => this.onActionClick(), 500);
     }
   };
 
@@ -96,9 +233,16 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
     if (completed) return null;
     const { fontSize, fontWeight } = this.props;
 
-    // Render a countdown
+    // Render a countdown. It changes every second, so it is hidden from
+    // assistive technology and left out of the announcement, which would
+    // otherwise be repeated on each tick.
     return (
-      <Text as="p" fontSize={fontSize} fontWeight={fontWeight}>
+      <Text
+        as="p"
+        fontSize={fontSize}
+        fontWeight={fontWeight}
+        aria-hidden="true"
+      >
         {zeroPad(minutes)}:{zeroPad(seconds)}
       </Text>
     );
@@ -123,8 +267,16 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
       backgroundImg,
       onAction: _onAction, // Excluded from rest to prevent DOM warning
       onLoad: _onLoad, // Excluded from rest to prevent DOM warning
+      isMaintenance: _isMaintenance, // Not a DOM attribute
+      onClose: _onClose, // Not a DOM attribute
+      skipBlur: _skipBlur, // Not a DOM attribute
+      closeButtonLabel: closeButtonLabelProp,
+      id = "snackbar-container",
       ...rest
     } = this.props;
+
+    const closeButtonLabel =
+      closeButtonLabelProp ?? (getCommonTranslation("CloseButton") || "Close");
 
     const headerStyles = headerText ? {} : { display: "none" };
 
@@ -150,19 +302,22 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
           }}
         />
         {isLoaded ? (
-          <div
+          <button
+            type="button"
             className={classNames(styles.actionWrapper, styles.action)}
             onClick={this.onActionClick}
+            aria-label={closeButtonLabel}
+            data-testid="snackbar-close"
           >
-            <CrossReactSvg className={styles.crossIcon} />
-          </div>
+            <CrossReactSvg className={styles.crossIcon} aria-hidden="true" />
+          </button>
         ) : null}
       </div>
     ) : (
       <div
         {...rest}
         data-testid="snackbar-container"
-        id="snackbar-container"
+        id={id}
         style={snackbarStyle}
         className={styles.snackbar}
       >
@@ -190,7 +345,7 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
                   />
                 </div>
               ) : null}
-              <div className={styles.headerContainer}>
+              <div className={styles.headerContainer} ref={this.headerRef}>
                 <Heading
                   size={HeadingSize.xsmall}
                   isInline
@@ -219,14 +374,20 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
                 fontSize={fontSize}
                 fontWeight={fontWeight}
                 data-testid="snackbar-message"
+                ref={this.messageRef}
               >
                 {text}
               </Text>
 
               {btnText ? (
-                <Text className={styles.button} onClick={this.onActionClick}>
+                <button
+                  type="button"
+                  className={styles.button}
+                  onClick={this.onActionClick}
+                  data-testid="snackbar-action"
+                >
                   {btnText}
-                </Text>
+                </button>
               ) : null}
 
               {countDownTime > -1 ? (
@@ -242,12 +403,19 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
         {!btnText ? (
           <button
             className={styles.action}
-            type="submit"
+            type="button"
             onClick={this.onActionClick}
+            aria-label={closeButtonLabel}
+            data-testid="snackbar-close"
           >
-            <CrossReactSvg className={styles.crossIcon} />
+            <CrossReactSvg className={styles.crossIcon} aria-hidden="true" />
           </button>
         ) : null}
+        <SnackbarAnnouncement
+          html={htmlContent}
+          headerRef={this.headerRef}
+          messageRef={this.messageRef}
+        />
       </div>
     );
   }

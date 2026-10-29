@@ -31,6 +31,15 @@ describe("<DropDownItem />", () => {
     expect(screen.getByText("Test Item")).toBeInTheDocument();
   });
 
+  // DropDown reads it off the element; on the div React warned about an
+  // unknown prop (the client's tag dropdown sets it).
+  it("keeps heightTablet off the DOM", () => {
+    render(<DropDownItem {...baseProps} heightTablet={32} />);
+    const item = screen.getByTestId("drop-down-item");
+    expect(item).not.toHaveAttribute("heightTablet");
+    expect(item).not.toHaveAttribute("heighttablet");
+  });
+
   it("handles disabled state", () => {
     render(<DropDownItem {...baseProps} disabled />);
     const item = screen.getByTestId("drop-down-item");
@@ -110,6 +119,87 @@ describe("<DropDownItem />", () => {
       <DropDownItem {...baseProps} additionalElement={additionalElement} />,
     );
     expect(screen.getByTestId("additional")).toBeInTheDocument();
+  });
+
+  describe("external link", () => {
+    const externalProps = {
+      ...baseProps,
+      label: "Help center",
+      withExternalLink: true,
+      externalLinkPath: "https://example.com/help",
+    };
+
+    it("is a focusable link to externalLinkPath with a name", () => {
+      render(<DropDownItem {...externalProps} onExternalLinkClick={vi.fn()} />);
+      const link = screen.getByRole("link", { name: /Help center/ });
+
+      expect(link).toHaveAttribute("href", "https://example.com/help");
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    });
+
+    it("uses externalLinkLabel as the accessible name", () => {
+      render(
+        <DropDownItem
+          {...externalProps}
+          externalLinkLabel="Open help"
+          onExternalLinkClick={vi.fn()}
+        />,
+      );
+
+      expect(
+        screen.getByRole("link", { name: "Open help" }),
+      ).toBeInTheDocument();
+    });
+
+    it("leaves a plain click to onExternalLinkClick and not to the row", () => {
+      const onExternalLinkClick = vi.fn();
+      render(
+        <DropDownItem
+          {...externalProps}
+          onExternalLinkClick={onExternalLinkClick}
+        />,
+      );
+      const link = screen.getByRole("link", { name: /Help center/ });
+      const notPrevented = fireEvent.click(link);
+
+      expect(onExternalLinkClick).toHaveBeenCalledTimes(1);
+      expect(notPrevented).toBe(false);
+      expect(baseProps.onClick).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      ["Ctrl", { ctrlKey: true }],
+      ["Cmd", { metaKey: true }],
+      ["Shift", { shiftKey: true }],
+    ])("leaves a %s-click to the browser alone", (_key, modifier) => {
+      const onExternalLinkClick = vi.fn();
+      render(
+        <DropDownItem
+          {...externalProps}
+          onExternalLinkClick={onExternalLinkClick}
+        />,
+      );
+      const link = screen.getByRole("link", { name: /Help center/ });
+      const notPrevented = fireEvent.click(link, modifier);
+
+      expect(notPrevented).toBe(true);
+      expect(onExternalLinkClick).not.toHaveBeenCalled();
+      expect(baseProps.onClick).not.toHaveBeenCalled();
+    });
+
+    const navigatesOnPlainClick = (link: HTMLElement): boolean => {
+      if (!link.hasAttribute("href")) return false;
+      return fireEvent.click(link);
+    };
+
+    // The SDK passes a path its parent frame resolves, and no callback.
+    it("does not navigate on a plain click without onExternalLinkClick", () => {
+      render(<DropDownItem {...externalProps} externalLinkPath="/help" />);
+      const link = screen.getByLabelText(/Help center/);
+
+      expect(navigatesOnPlainClick(link)).toBe(false);
+    });
   });
 });
 

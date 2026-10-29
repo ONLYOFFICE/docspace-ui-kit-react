@@ -20,24 +20,29 @@ const RenderCheckboxIcon = React.memo(
     isChecked,
     isIndeterminate,
     tabIndex,
+    onKeyDown,
   }: {
     isChecked: boolean;
     isIndeterminate: boolean;
     tabIndex: number;
+    onKeyDown: React.KeyboardEventHandler<SVGSVGElement>;
   }) => {
     return isIndeterminate ? (
       <CheckboxIndeterminateIcon
         tabIndex={tabIndex}
+        onKeyDown={onKeyDown}
         className={classNames(styles.checkbox, "not-selectable")}
       />
     ) : isChecked ? (
       <CheckboxCheckedIcon
         tabIndex={tabIndex}
+        onKeyDown={onKeyDown}
         className={classNames(styles.checkbox, "not-selectable")}
       />
     ) : (
       <CheckboxIcon
         tabIndex={tabIndex}
+        onKeyDown={onKeyDown}
         className={classNames(styles.checkbox, "not-selectable")}
       />
     );
@@ -97,6 +102,21 @@ const CheckboxPure = ({
     return e.preventDefault();
   };
 
+  // The icon holds focus in place of the hidden input, so it has to answer
+  // the key the input would: Space presses it, through a click on the input,
+  // which fires the same change event a pointer does. Enter does nothing on a
+  // native checkbox either. preventDefault keeps Space from scrolling the page,
+  // auto-repeats included; a held Space toggles once, as on a native checkbox.
+  const onIconKeyDown = React.useCallback(
+    (e: React.KeyboardEvent<SVGSVGElement>) => {
+      if (e.key !== " ") return;
+      e.preventDefault();
+      if (e.repeat) return;
+      ref.current?.click();
+    },
+    [],
+  );
+
   return (
     <TooltipContainer
       as="label"
@@ -127,8 +147,13 @@ const CheckboxPure = ({
         tabIndex={isDisabled ? -1 : tabIndex}
         isChecked={checked || false}
         isIndeterminate={isIndeterminate || false}
+        onKeyDown={onIconKeyDown}
       />
-      <div className={`${styles.wrapper} wrapper`}>
+      <div
+        className={classNames(styles.wrapper, "wrapper", {
+          [styles.truncate]: truncate,
+        })}
+      >
         {label ? (
           <Text
             as="span"

@@ -495,6 +495,10 @@ const useFilesHelper = ({
             await setSettings(rootThirdPartyId, true);
           } catch (fallbackError) {
             toastr.error(fallbackError as TData);
+            // A fallback that loaded ends the page load itself; one that
+            // failed would leave it on, and the Selector asks for no further
+            // page while it is.
+            if (isLatest()) setIsNextPageLoading(false);
           } finally {
             requestRunning.current = false;
             finishFullLoad();
@@ -520,7 +524,10 @@ const useFilesHelper = ({
 
         requestRunning.current = false;
 
-        getRootData?.();
+        // getRootData ends the page load itself; without it nothing would,
+        // and the Selector asks for no further page while it is on.
+        if (getRootData) getRootData();
+        else setIsNextPageLoading(false);
         if (selectedItemId) setSelectedItemId("");
 
         if (onSetBaseFolderPath) {

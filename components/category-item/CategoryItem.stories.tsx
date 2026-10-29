@@ -1,7 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import { CategoryItem } from "./index";
 
@@ -35,7 +35,7 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Removes the link's `href` and click handler and gives the subtitle the disabled colour, which is dimmer only in the dark theme; the title and arrow look unchanged",
+        "Removes the link's `href` and click handler, marks the title `aria-disabled` while keeping it focusable, and gives the title, subtitle and arrow the disabled colour",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -74,6 +74,19 @@ export const Default: Story = {
     badgeLabel: "PRO",
     onClickLink: fn(),
   },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const link = canvas.getByRole("link", { name: "Category Title" });
+    await expect(link).toHaveAttribute("href", "#");
+    // Keep the test page where it is: the handler still runs, but the
+    // browser does not follow the link.
+    canvasElement.addEventListener("click", (e) => e.preventDefault(), {
+      once: true,
+    });
+    await userEvent.click(link);
+    await expect(args.onClickLink).toHaveBeenCalledTimes(1);
+    // No badge unless asked for.
+    await expect(canvas.queryByText("PRO")).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -104,6 +117,9 @@ export const WithPaidBadge: Story = {
     withPaidBadge: true,
     badgeLabel: "PRO",
     onClickLink: fn(),
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText("PRO")).toBeVisible();
   },
   parameters: {
     docs: {
@@ -136,11 +152,28 @@ export const DisabledState: Story = {
     badgeLabel: "PRO",
     onClickLink: fn(),
   },
+  play: async ({ args, canvas, userEvent }) => {
+    // The title is still a link, focusable and announced as unavailable,
+    // but it has no href and no handler.
+    const link = canvas.getByRole("link", { name: "Disabled Category" });
+    await expect(link).toHaveAttribute("aria-disabled", "true");
+    await expect(link).not.toHaveAttribute("href");
+    await userEvent.tab();
+    await expect(link).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await userEvent.click(link);
+    await expect(args.onClickLink).not.toHaveBeenCalled();
+    // It is dimmed: the title takes the same colour as the disabled subtitle.
+    const subtitle = canvas.getByText("This category is currently unavailable");
+    await expect(getComputedStyle(link).color).toBe(
+      getComputedStyle(subtitle).color,
+    );
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "For a destination the reader cannot open right now: the title is no longer a working link (`isDisabled`). Nothing else marks it in the light theme, where the disabled subtitle colour matches the normal one; in the dark theme the subtitle dims. Say in the subtitle why the entry is unavailable.",
+          "For a destination the reader cannot open right now (`isDisabled`): the title stays focusable but is announced as an unavailable link and does nothing, and the title, subtitle and arrow all dim. Say in the subtitle why the entry is unavailable.",
       },
       source: {
         code: `<CategoryItem
@@ -178,7 +211,7 @@ const AllVariantsTemplate = () => (
       url="#"
       withPaidBadge={false}
       badgeLabel=""
-      onClickLink={() => {}}
+      onClickLink={fn()}
     />
     <CategoryItem
       title="Security"
@@ -186,7 +219,7 @@ const AllVariantsTemplate = () => (
       url="#"
       withPaidBadge
       badgeLabel="PRO"
-      onClickLink={() => {}}
+      onClickLink={fn()}
     />
     <CategoryItem
       title="Backup"
@@ -195,18 +228,27 @@ const AllVariantsTemplate = () => (
       isDisabled
       withPaidBadge={false}
       badgeLabel=""
-      onClickLink={() => {}}
+      onClickLink={fn()}
     />
   </Wrapper>
 );
 
 export const AllVariants: Story = {
   render: () => <AllVariantsTemplate />,
+  play: async ({ canvas }) => {
+    const links = canvas.getAllByRole("link").map((link) => link.textContent);
+    await expect(links).toEqual(["General Settings", "Security", "Backup"]);
+    // Backup is still listed as a link, but an unavailable one.
+    await expect(canvas.getByRole("link", { name: "Backup" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "The three looks side by side, as they appear together in one index:\n\n- **General Settings** — a plain entry\n- **Security** — the same entry with the paid badge (`withPaidBadge`)\n- **Backup** — an unavailable entry whose title is no longer a link (`isDisabled`)",
+          "The three looks side by side, as they appear together in one index:\n\n- **General Settings** — a plain entry\n- **Security** — the same entry with the paid badge (`withPaidBadge`)\n- **Backup** — an unavailable entry, dimmed, whose title is announced as a disabled link (`isDisabled`)",
       },
       source: {
         code: `<CategoryItem title="General Settings" subtitle="Manage general application settings" url="/settings/general" onClickLink={handleClick} withPaidBadge={false} badgeLabel="" />
@@ -236,6 +278,14 @@ export const RightToLeft: Story = {
     withPaidBadge: true,
     badgeLabel: "PRO",
     onClickLink: fn(),
+  },
+  play: async ({ canvas }) => {
+    // Under RTL the badge follows the title leftwards.
+    const title = canvas.getByRole("link");
+    const badge = canvas.getByText("PRO");
+    await expect(badge.getBoundingClientRect().right).toBeLessThanOrEqual(
+      title.getBoundingClientRect().left,
+    );
   },
   parameters: {
     noPadding: true,
@@ -278,7 +328,7 @@ export const CssCustomization: Story = {
         title="Files"
         subtitle="Manage files and storage settings"
         url="/settings/files"
-        onClickLink={() => {}}
+        onClickLink={fn()}
         withPaidBadge={false}
         badgeLabel=""
       />
@@ -286,13 +336,23 @@ export const CssCustomization: Story = {
         title="Security"
         subtitle="Configure passwords and two-factor authentication"
         url="/settings/security"
-        onClickLink={() => {}}
+        onClickLink={fn()}
         isDisabled
         withPaidBadge={false}
         badgeLabel=""
       />
     </div>
   ),
+  play: async ({ canvas }) => {
+    await expect(
+      getComputedStyle(canvas.getByRole("link", { name: "Files" })).color,
+    ).toBe("rgb(0, 130, 201)");
+    await expect(
+      getComputedStyle(
+        canvas.getByText("Configure passwords and two-factor authentication"),
+      ).color,
+    ).toBe("rgb(196, 196, 196)");
+  },
   parameters: {
     docs: {
       description: {

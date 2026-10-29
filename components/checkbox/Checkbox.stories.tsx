@@ -1,6 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import { HelpButton } from "../help-button";
 import { RootTooltip } from "../tooltip";
@@ -137,6 +138,22 @@ export const Default: Story = {
   render: (args) => <Checkbox {...args} />,
   args: {
     label: "Checkbox",
+    onChange: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const checkbox = canvas.getByRole("checkbox", { name: "Checkbox" });
+
+    await userEvent.click(canvas.getByText("Checkbox"));
+    await expect(checkbox).toBeChecked();
+    await userEvent.click(canvas.getByText("Checkbox"));
+    await expect(checkbox).not.toBeChecked();
+
+    // Focus lands on the box icon, not the hidden input; Space presses it.
+    await userEvent.tab();
+    await expect(document.activeElement?.tagName).toBe("svg");
+    await userEvent.keyboard(" ");
+    await expect(checkbox).toBeChecked();
+    await expect(args.onChange).toHaveBeenCalledTimes(3);
   },
   parameters: {
     docs: {
@@ -162,6 +179,14 @@ const CheckedTemplate = () => {
 
 export const CheckedStates: Story = {
   render: () => <CheckedTemplate />,
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("checkbox", { name: "Checked" }),
+    ).toBeChecked();
+    await expect(
+      canvas.getByRole("checkbox", { name: "Unchecked" }),
+    ).not.toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -187,6 +212,12 @@ const IndeterminateTemplate = () => {
 
 export const IndeterminateStates: Story = {
   render: () => <IndeterminateTemplate />,
+  play: async ({ canvas }) => {
+    // The mixed state is set on the input, so it is announced, not only drawn.
+    for (const checkbox of canvas.getAllByRole("checkbox")) {
+      await expect(checkbox).toBePartiallyChecked();
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -213,6 +244,21 @@ const DisabledTemplate = () => {
 
 export const DisabledStates: Story = {
   render: () => <DisabledTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    for (const checkbox of canvas.getAllByRole("checkbox")) {
+      await expect(checkbox).toBeDisabled();
+    }
+
+    const unchecked = canvas.getByRole("checkbox", {
+      name: "Disabled Unchecked",
+    });
+    await userEvent.click(canvas.getByText("Disabled Unchecked"));
+    await expect(unchecked).not.toBeChecked();
+
+    // No box icon is a tab stop while its checkbox is disabled.
+    await userEvent.tab();
+    await expect(document.activeElement).toBe(document.body);
+  },
   parameters: {
     docs: {
       description: {
@@ -228,6 +274,15 @@ export const DisabledStates: Story = {
   },
 };
 
+// The box is drawn by an SVG inside the label.
+const boxOf = (
+  canvas: { getByText: (text: string) => HTMLElement },
+  label: string,
+) =>
+  canvas.getByText(label).closest("label")?.querySelector("svg") as SVGElement;
+
+const style = (element: Element) => getComputedStyle(element);
+
 const ErrorTemplate = () => {
   return (
     <Wrapper>
@@ -239,6 +294,19 @@ const ErrorTemplate = () => {
 
 export const ErrorStates: Story = {
   render: () => <ErrorTemplate />,
+  play: async ({ canvas }) => {
+    // The frame turns red, checked or not.
+    for (const label of ["Unchecked with Error", "Checked with Error"]) {
+      const rect = boxOf(canvas, label).querySelector("rect") as Element;
+      await expect(style(rect).stroke).toBe("rgb(242, 71, 36)");
+    }
+    await expect(
+      canvas.getByRole("checkbox", {
+        name: "Checked with Error",
+        hidden: true,
+      }),
+    ).toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -266,6 +334,24 @@ const TruncatedTemplate = () => {
 
 export const WithTruncation: Story = {
   render: () => <TruncatedTemplate />,
+  play: async ({ canvas }) => {
+    // The label is held on one line.
+    const text = canvas.getByText(/^This is a very long label/);
+    await expect(text).toHaveStyle({ whiteSpace: "nowrap" });
+    await expect(text.getClientRects()).toHaveLength(1);
+    // ...and cut at the container's edge with an ellipsis, rather than
+    // running out of it: the text box is narrower than its content, and the
+    // checkbox as a whole does not overflow its 200px parent.
+    await expect(getComputedStyle(text).textOverflow).toBe("ellipsis");
+    await expect(text.scrollWidth).toBeGreaterThan(text.clientWidth);
+    const checkbox = canvas.getByTestId("checkbox");
+    await expect(checkbox.scrollWidth).toBeLessThanOrEqual(
+      checkbox.clientWidth,
+    );
+    await expect(text.getBoundingClientRect().right).toBeLessThanOrEqual(
+      (checkbox.parentElement as HTMLElement).getBoundingClientRect().right,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -289,6 +375,14 @@ export const WithTitle: Story = {
   args: {
     label: "Hover me",
     title: "This is a tooltip that appears on hover",
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.hover(canvas.getByText("Hover me"));
+    await waitFor(() =>
+      expect(screen.getByRole("tooltip")).toHaveTextContent(
+        "This is a tooltip that appears on hover",
+      ),
+    );
   },
   parameters: {
     docs: {
@@ -320,6 +414,12 @@ const HelpButtonTemplate = () => {
 
 export const WithHelpButton: Story = {
   render: () => <HelpButtonTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByTestId("checkbox-help-button"));
+    await expect(
+      canvas.getByRole("checkbox", { name: "Remember me" }),
+    ).not.toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -338,6 +438,22 @@ export const WithHelpButton: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const box = boxOf(canvas, "Increased spacing");
+    const rect = box.querySelector("rect") as Element;
+    await expect(style(rect).fill).toBe("rgb(227, 238, 251)");
+    await expect(style(rect).stroke).toBe("rgb(45, 110, 207)");
+    await expect(style(box.querySelector("path") as Element).fill).toBe(
+      "rgb(45, 110, 207)",
+    );
+    // --checkbox-gap: the room between the box and the label.
+    await expect(
+      Math.round(
+        canvas.getByText("Increased spacing").getBoundingClientRect().left -
+          box.getBoundingClientRect().right,
+      ),
+    ).toBe(20);
+  },
   render: () => (
     <div
       style={

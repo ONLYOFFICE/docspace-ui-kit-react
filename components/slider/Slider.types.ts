@@ -38,6 +38,17 @@ export type SliderProps = {
   isDisabled?: boolean;
   /** Applied to the input. */
   style?: React.CSSProperties;
+  /** Accessible name of the slider, for one with no visible label. */
+  "aria-label"?: string;
+  /** `id` of the element whose text names the slider. */
+  "aria-labelledby"?: string;
+  /** `id` of the element whose text describes the slider. */
+  "aria-describedby"?: string;
+  /**
+   * What the value means, read instead of the bare number: `"40 percent"`,
+   * `"2 minutes"`. Keep it in step with `value`.
+   */
+  "aria-valuetext"?: string;
   /**
    * `data-testid` of the input.
    * @default "slider"

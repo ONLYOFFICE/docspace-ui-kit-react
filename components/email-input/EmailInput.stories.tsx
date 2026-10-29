@@ -3,6 +3,7 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 
 import { EmailSettings } from "../../utils/email";
 import { InputSize } from "../text-input";
@@ -199,7 +200,19 @@ const EmailInputWithValidation = (props: {
   );
 };
 
+// The field carries data-error="true" while it shows the red border.
+const hasRedBorder = (field: HTMLElement) =>
+  field.getAttribute("data-error") === "true";
+
 export const Default: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    const field = canvas.getByPlaceholderText("Enter email address");
+    await userEvent.type(field, "user@");
+    await expect(hasRedBorder(field)).toBe(true);
+    await userEvent.type(field, "example.com");
+    await expect(hasRedBorder(field)).toBe(false);
+    await expect(args.onChange).toHaveBeenCalled();
+  },
   render: (args) => {
     const [value, setValue] = useState(args.value || "");
 
@@ -224,6 +237,7 @@ export const Default: Story = {
     isReadOnly: false,
     scale: false,
     value: "",
+    onChange: fn(),
   },
   parameters: {
     docs: {
@@ -245,7 +259,14 @@ export const Default: Story = {
 
 const SizesTemplate = () => {
   return (
-    <Wrapper>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        gap: "16px",
+      }}
+    >
       <EmailInputWithValidation size={InputSize.base} placeholder="Base size" />
       <EmailInputWithValidation
         size={InputSize.middle}
@@ -255,12 +276,25 @@ const SizesTemplate = () => {
         size={InputSize.large}
         placeholder="Large size"
       />
-    </Wrapper>
+    </div>
   );
 };
 
 export const Sizes: Story = {
   render: () => <SizesTemplate />,
+  play: async ({ canvas }) => {
+    const [base, middle, large] = [
+      "Base size",
+      "Middle size",
+      "Large size",
+    ].map((placeholder) => canvas.getByPlaceholderText(placeholder));
+    await expect(
+      [base, middle, large].map((input) =>
+        Math.round(input.getBoundingClientRect().width),
+      ),
+    ).toEqual([173, 300, 550]);
+    await expect(large).toHaveStyle({ fontSize: "16px" });
+  },
   parameters: {
     docs: {
       description: {
@@ -298,6 +332,22 @@ const StatesTemplate = () => {
 
 export const States: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await expect(
+      canvas.getByDisplayValue("disabled@example.com"),
+    ).toBeDisabled();
+
+    const readOnly = canvas.getByDisplayValue("readonly@example.com");
+    await userEvent.type(readOnly, "x");
+    await expect(readOnly).toHaveValue("readonly@example.com");
+
+    await expect(hasRedBorder(canvas.getByDisplayValue("invalid-email"))).toBe(
+      true,
+    );
+    await expect(
+      hasRedBorder(canvas.getByDisplayValue("user@example.com")),
+    ).toBe(false);
+  },
   parameters: {
     docs: {
       description: {
@@ -323,7 +373,11 @@ const CustomValidationTemplate = () => {
         customValidate={(value) => ({
           value,
           isValid: value.endsWith("@custom-domain.com"),
-          errors: value ? ["DomainNotAllowed"] : [],
+          // An error key only for an address the rule rejects.
+          errors:
+            value && !value.endsWith("@custom-domain.com")
+              ? ["DomainNotAllowed"]
+              : [],
         })}
       />
     </div>
@@ -332,6 +386,20 @@ const CustomValidationTemplate = () => {
 
 export const WithCustomValidation: Story = {
   render: () => <CustomValidationTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const field = canvas.getByPlaceholderText("Enter @custom-domain.com email");
+
+    await userEvent.type(field, "a@custom-domain.com");
+    await expect(canvas.getByText("Valid: Yes")).toBeVisible();
+    await expect(canvas.queryByText(/Errors:/)).toBeNull();
+    await expect(hasRedBorder(field)).toBe(false);
+
+    await userEvent.clear(field);
+    await userEvent.type(field, "a@other.com");
+    await expect(canvas.getByText("Valid: No")).toBeVisible();
+    await expect(canvas.getByText("Errors: DomainNotAllowed")).toBeVisible();
+    await expect(hasRedBorder(field)).toBe(true);
+  },
   parameters: {
     docs: {
       description: {
@@ -364,6 +432,15 @@ const AutomaticErrorTemplate = () => {
 
 export const AutomaticErrorState: Story = {
   render: () => <AutomaticErrorTemplate />,
+  play: async ({ canvas }) => {
+    // With hasError left out, the check alone draws the border.
+    await expect(
+      hasRedBorder(canvas.getByDisplayValue("name@example.com")),
+    ).toBe(false);
+    await expect(hasRedBorder(canvas.getByDisplayValue("name@example"))).toBe(
+      true,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -412,6 +489,15 @@ const AcceptedAddressFormsTemplate = () => {
 
 export const AcceptedAddressForms: Story = {
   render: () => <AcceptedAddressFormsTemplate />,
+  play: async ({ canvas }) => {
+    // The same "Name <address>" form: rejected by default, accepted with
+    // allowName.
+    const [strict, named] = canvas.getAllByDisplayValue(
+      "Jane Doe <jane@example.com>",
+    );
+    await expect(hasRedBorder(strict)).toBe(true);
+    await expect(hasRedBorder(named)).toBe(false);
+  },
   parameters: {
     docs: {
       description: {
@@ -444,6 +530,15 @@ const RightToLeftTemplate = () => {
 export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // Both fields align right; the address itself still reads left to right.
+    const empty = canvas.getByPlaceholderText("name@example.com");
+    const filled = canvas.getByDisplayValue("name@example.com");
+    await expect(empty).toHaveStyle({ textAlign: "right" });
+    await expect(filled).toHaveStyle({ textAlign: "right" });
+    await expect(filled).toHaveAttribute("dir", "auto");
+    await expect(getComputedStyle(filled).direction).toBe("ltr");
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -463,6 +558,22 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const empty = canvas.getByPlaceholderText("Custom styled email");
+    await expect(empty).toHaveStyle({
+      backgroundColor: "rgb(245, 243, 255)",
+      borderTopColor: "rgb(196, 181, 253)",
+      borderRadius: "8px",
+      fontSize: "14px",
+      textAlign: "center",
+    });
+    // hasError takes the theme's red over the custom border.
+    const withValue = canvas.getByDisplayValue("user@example.com");
+    await expect(withValue).toHaveStyle({ color: "rgb(76, 29, 149)" });
+    await expect(getComputedStyle(withValue).borderTopColor).not.toBe(
+      "rgb(196, 181, 253)",
+    );
+  },
   render: () => (
     <div
       style={

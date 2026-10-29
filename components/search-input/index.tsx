@@ -51,10 +51,19 @@ const SearchInput = ({
 
   const afterClear = useRef(false);
   const prevValueRef = useRef(value);
+  // The last value reported through onChange. A parent that stores it and
+  // passes it back as `value` may do so after the user has typed on; that
+  // echo is not a new value and must not overwrite the field. Each report
+  // replaces it, the next change of `value` consumes it whether it matched or
+  // not, and the cross forgets it, since a clear reports nothing through
+  // onChange. Typing does not forget it: a late echo arrives precisely after
+  // the user has typed on, which is the case this exists for.
+  const reportedRef = useRef<string | undefined>(undefined);
 
   const debouncedOnChange = useDebounce(
     useCallback(() => {
       if (!afterClear.current) {
+        reportedRef.current = prevValueRef.current;
         onChange?.(prevValueRef.current);
       }
     }, [onChange]),
@@ -78,10 +87,16 @@ const SearchInput = ({
     setInputValue("");
     prevValueRef.current = "";
     afterClear.current = true;
+    // The field no longer shows the reported value and no report replaces it,
+    // so a parent setting that value again means it.
+    reportedRef.current = undefined;
     onClearSearch?.();
   }, [onClearSearch]);
 
   useEffect(() => {
+    const echo = value === reportedRef.current;
+    reportedRef.current = undefined;
+    if (echo) return;
     if (prevValueRef.current !== value) {
       prevValueRef.current = value;
       setInputValue(value);

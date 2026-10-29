@@ -1,9 +1,9 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
-import CatalogFolderIcon from "../../assets/icons/16/catalog.folder.react.svg";
+import CatalogFolderIcon from "../../.storybook/utils/ThemedFolderIcon";
 import { RootTooltip } from "../tooltip";
 import { SelectedItem } from ".";
 import styles from "./SelectedItem.stories.module.scss";
@@ -134,6 +134,31 @@ export const Default: Story = {
     onClick: fn(),
     propKey: "item-1",
   },
+  play: async ({ args, canvas, userEvent }) => {
+    const chip = canvas.getByTestId("selected-item");
+
+    await userEvent.click(canvas.getByText("Selected item"));
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    await expect(args.onClick).toHaveBeenCalledWith(
+      "item-1",
+      "Selected item",
+      undefined,
+      expect.anything(),
+    );
+
+    // The cross removes the value. Clicked on the icon drawn inside it, where
+    // a pointer lands, the click stops at the cross: onClose fires and the
+    // chip's onClick does not.
+    const cross = within(chip).getByTestId("icon-button");
+    await userEvent.click(cross.querySelector("svg") as SVGElement);
+    await expect(args.onClose).toHaveBeenCalledWith(
+      "item-1",
+      "Selected item",
+      "",
+      expect.anything(),
+    );
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -147,6 +172,17 @@ export const Default: Story = {
   },
 };
 
+const rect = (element: Element) => element.getBoundingClientRect();
+
+// The chip around a label.
+const chipOf = (
+  canvas: { getByText: (text: string) => HTMLElement },
+  label: string,
+) =>
+  canvas
+    .getByText(label)
+    .closest("[data-testid='selected-item']") as HTMLElement;
+
 export const DisabledState: Story = {
   render: (args) => <SelectedItem {...args} />,
   args: {
@@ -154,7 +190,16 @@ export const DisabledState: Story = {
     isInline: true,
     isDisabled: true,
     onClose: fn(),
+    onClick: fn(),
     propKey: "item-disabled",
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const chip = canvas.getByTestId("selected-item");
+    await userEvent.click(canvas.getByText("Disabled item"));
+    const cross = within(chip).getByTestId("icon-button");
+    await userEvent.click(cross.querySelector("svg") as SVGElement);
+    await expect(args.onClick).not.toHaveBeenCalled();
+    await expect(args.onClose).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -171,6 +216,27 @@ export const DisabledState: Story = {
 
 export const BlockDisplay: Story = {
   render: (args) => <SelectedItem {...args} />,
+  play: async ({ args, canvas, userEvent }) => {
+    // The chip fills its container's content box and the cross sits at the
+    // far end.
+    const chip = canvas.getByTestId("selected-item");
+    const container = chip.parentElement as HTMLElement;
+    const { paddingLeft, paddingRight } = getComputedStyle(container);
+    await expect(Math.round(rect(chip).width)).toBe(
+      Math.round(
+        container.clientWidth -
+          parseFloat(paddingLeft) -
+          parseFloat(paddingRight),
+      ),
+    );
+    const cross = within(chip).getByTestId("icon-button");
+    await expect(rect(cross).left).toBeGreaterThan(
+      rect(canvas.getByText("Block display item")).right,
+    );
+    await expect(rect(chip).right - rect(cross).right).toBeLessThan(20);
+    await userEvent.click(cross.querySelector("svg") as SVGElement);
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
+  },
   args: {
     label: "Block display item",
     isInline: false,
@@ -230,6 +296,15 @@ const AllVariantsTemplate = () => {
 
 export const AllVariants: Story = {
   render: () => <AllVariantsTemplate />,
+  play: async ({ canvas }) => {
+    const enabled = chipOf(canvas, "Inline enabled");
+    const block = chipOf(canvas, "Block display item");
+    await expect(rect(block).width).toBeGreaterThan(rect(enabled).width * 2);
+    // The disabled chip greys its label.
+    await expect(
+      getComputedStyle(canvas.getByText("Inline disabled")).color,
+    ).not.toBe(getComputedStyle(canvas.getByText("Inline enabled")).color);
+  },
   parameters: {
     docs: {
       description: {
@@ -254,6 +329,14 @@ export const WithIcon: Story = {
     icon: CatalogFolderIcon,
     onClose: fn(),
     propKey: "item-icon",
+  },
+  play: async ({ canvas }) => {
+    const chip = canvas.getByTestId("selected-item");
+    const glyph = chip.querySelector("svg, img") as Element;
+    await expect(glyph).not.toBeNull();
+    await expect(rect(glyph).right).toBeLessThanOrEqual(
+      rect(canvas.getByText("Documents")).left,
+    );
   },
   parameters: {
     docs: {
@@ -280,6 +363,14 @@ export const ActiveState: Story = {
     onClose: fn(),
     propKey: "item-active",
   },
+  play: async ({ canvas }) => {
+    // A tinted background, and the label in the accent colour.
+    const chip = canvas.getByTestId("selected-item");
+    await expect(getComputedStyle(chip).backgroundColor).not.toBe(
+      "rgba(0, 0, 0, 0)",
+    );
+    await expect(chip.className).toMatch(/isActive|active/);
+  },
   parameters: {
     docs: {
       description: {
@@ -302,6 +393,13 @@ export const WithoutCross: Story = {
     onClose: fn(),
     onClick: fn(),
     propKey: "item-no-cross",
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const chip = canvas.getByTestId("selected-item");
+    await expect(within(chip).queryByTestId("icon-button")).toBeNull();
+    await userEvent.click(chip);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    await expect(args.onClose).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -330,6 +428,18 @@ export const TruncatedLabel: Story = {
     onClose: fn(),
     propKey: "item-long",
   },
+  play: async ({ canvas, userEvent }) => {
+    const label = canvas.getByText(
+      "Quarterly report drafts and shared spreadsheets",
+    );
+    await expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
+    await userEvent.hover(canvas.getByTestId("selected-item"));
+    await waitFor(() =>
+      expect(screen.getByRole("tooltip")).toHaveTextContent(
+        "Quarterly report drafts and shared spreadsheets",
+      ),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -351,6 +461,22 @@ export const TruncatedLabel: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    await expect(chipOf(canvas, "Custom item")).toHaveStyle({
+      backgroundColor: "rgb(237, 233, 254)",
+      borderRadius: "16px",
+      height: "28px",
+    });
+    await expect(canvas.getByText("Disabled")).toHaveStyle({
+      color: "rgb(167, 139, 250)",
+    });
+    await expect(chipOf(canvas, "Active")).toHaveStyle({
+      backgroundColor: "rgb(76, 29, 149)",
+    });
+    await expect(canvas.getByText("Active")).toHaveStyle({
+      color: "rgb(255, 255, 255)",
+    });
+  },
   render: () => (
     <div
       style={
@@ -358,11 +484,11 @@ export const CssCustomization: Story = {
           display: "flex",
           gap: "8px",
           flexWrap: "wrap",
-          "--selected-item-bg": "#ede9fe",
-          "--selected-item-bg-hover": "#ddd6fe",
+          "--selected-item-bg": "light-dark(#ede9fe, #2a2147)",
+          "--selected-item-bg-hover": "light-dark(#ddd6fe, #3b2f66)",
           "--selected-item-disabled-text": "#a78bfa",
-          "--selected-item-active-bg": "#4c1d95",
-          "--selected-item-active-text": "#ffffff",
+          "--selected-item-active-bg": "light-dark(#4c1d95, #c4b5fd)",
+          "--selected-item-active-text": "light-dark(#ffffff, #2a2147)",
           "--selected-item-radius": "16px",
           "--selected-item-padding": "6px 12px",
           "--selected-item-height": "28px",
@@ -402,11 +528,11 @@ export const CssCustomization: Story = {
       source: {
         code: `<div
   style={{
-    "--selected-item-bg": "#ede9fe",
-    "--selected-item-bg-hover": "#ddd6fe",
+    "--selected-item-bg": "light-dark(#ede9fe, #2a2147)",
+    "--selected-item-bg-hover": "light-dark(#ddd6fe, #3b2f66)",
     "--selected-item-disabled-text": "#a78bfa",
-    "--selected-item-active-bg": "#4c1d95",
-    "--selected-item-active-text": "#ffffff",
+    "--selected-item-active-bg": "light-dark(#4c1d95, #c4b5fd)",
+    "--selected-item-active-text": "light-dark(#ffffff, #2a2147)",
     "--selected-item-radius": "16px",
     "--selected-item-padding": "6px 12px",
     "--selected-item-height": "28px",

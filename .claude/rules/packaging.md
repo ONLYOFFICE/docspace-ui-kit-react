@@ -66,9 +66,12 @@ Every non-required peer is mirrored in `devDependencies` — pnpm does not insta
 build, tests and Storybook need a concrete copy. `@onlyoffice/ai-chat`'s own optional peers
 split in two. The ones its chat UI renders with — assistant-ui, assistant-stream, the radix
 primitives, class-variance-authority, clsx, tailwind-merge, zustand — are mirrored too, so the
-AI agent renders in Storybook, without becoming peers of this package. The rest — codemirror,
-react-shiki, the LLM vendor SDKs — are deliberately **absent**: nothing here reaches the code
-that loads them, and a copy would only pretend otherwise. The `//devDependencies` note in
+AI agent renders in Storybook, without becoming peers of this package; so are codemirror and
+`@codemirror/*`, which the MCP servers settings page needs for its JSON editor -- the AI
+Settings story opens it. The rest — react-shiki, the LLM vendor SDKs — are deliberately
+**absent**: nothing here reaches the code that loads them, and a copy would only pretend
+otherwise. Each of those is aliased to a throwing stub under `.storybook/stubs/`, so a story
+that does reach one fails loudly rather than rendering a blank. The `//devDependencies` note in
 `package.json` says the same; keep the two in step.
 
 Adding a dependency that nothing imports — or removing the last import while leaving the entry

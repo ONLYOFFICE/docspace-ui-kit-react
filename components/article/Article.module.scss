@@ -400,6 +400,12 @@
   :global(img.logo-icon_svg) {
     height: 24px;
     width: 211px;
+    object-fit: contain;
+    object-position: left center;
+
+    [data-dir="rtl"] & {
+      object-position: right center;
+    }
   }
 
   :global(.logo-icon_svg) {

@@ -4,9 +4,10 @@ import { isMobileOnly, isMobile, isTablet } from "react-device-detect";
 import classNames from "classnames";
 
 import EmptyIcon from "../../assets/empty.svg";
+import { consumeKey } from "../../utils/consume-key";
 
 import { DropDown } from "../drop-down";
-import { DropDownItem } from "../drop-down-item";
+import { DropDownItem, type DropDownItemProps } from "../drop-down-item";
 import { TooltipContainer } from "../tooltip";
 
 import { ComboButton } from "./sub-components/ComboButton";
@@ -16,29 +17,6 @@ import styles from "./ComboBox.module.scss";
 
 const compare = (prevProps: TComboboxProps, nextProps: TComboboxProps) => {
   return equal(prevProps, nextProps);
-};
-
-const swallowEscapeKeyUp = () => {
-  const release = () => {
-    window.removeEventListener("keyup", onKeyUp, true);
-    window.removeEventListener("keydown", onKeyDown, true);
-    window.removeEventListener("blur", release);
-  };
-
-  const onKeyUp = (event: KeyboardEvent) => {
-    if (event.key !== "Escape") return;
-    event.stopPropagation();
-    release();
-  };
-
-  const onKeyDown = (event: KeyboardEvent) => {
-    if (event.key === "Escape" && event.repeat) return;
-    release();
-  };
-
-  window.addEventListener("keyup", onKeyUp, true);
-  window.addEventListener("keydown", onKeyDown, true);
-  window.addEventListener("blur", release);
 };
 
 const ComboBoxPure: React.FC<TComboboxProps> = ({
@@ -61,8 +39,9 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
   // };
 
   const { withBackdrop = true, onBackdropClick, onToggle } = props;
-
-  const isClosedByParent = !!onToggle && !(withBackdrop && onBackdropClick);
+  // Read by the click and the key handlers alike, so the default lives here
+  // once.
+  const { disableIconClick = true } = props;
 
   const handleClickOutside = React.useCallback(
     (e: Event) => {
@@ -70,27 +49,28 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
 
       if (ref.current?.contains(target)) return;
 
-      if (isClosedByParent) return;
+      if (onToggle && !(withBackdrop && onBackdropClick)) return;
 
       setIsOpenItemAccess?.(!isOpen);
       setIsOpen(false);
 
       if (withBackdrop) onBackdropClick?.(e);
     },
-    [
-      isOpen,
-      setIsOpenItemAccess,
-      withBackdrop,
-      onBackdropClick,
-      isClosedByParent,
-    ],
+    [isOpen, setIsOpenItemAccess, withBackdrop, onBackdropClick, onToggle],
   );
+
+  // Whether the event came from this combo box's own optional children block.
+  // The lookup stops at the combo box, so an `.optionalBlock` of an outer
+  // combo box this one is rendered in does not count.
+  const isInOptionalBlock = (target: HTMLElement, root: Element) => {
+    const block = target.closest(".optionalBlock");
+    return !!block && root.contains(block);
+  };
 
   const comboBoxClick: React.MouseEventHandler<HTMLDivElement | Element> = (
     e,
   ) => {
     const {
-      disableIconClick = true,
       disableItemClick,
       isDisabled,
       onToggle,
@@ -107,7 +87,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
       (disableItemClickFirstLevel &&
         target.closest(".item-by-first-level") &&
         (isMobileOnly || isMobile || isTablet)) ||
-      (disableIconClick && e && target.closest(".optionalBlock")) ||
+      (disableIconClick && e && isInOptionalBlock(target, e.currentTarget)) ||
       target.classList.contains("ScrollbarsCustom") ||
       target.classList.contains("ScrollbarsCustom-Thumb") ||
       target.classList.contains("ScrollbarsCustom-Track") ||
@@ -129,7 +109,9 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     (
       option: TOption,
       event:
-        React.ChangeEvent<HTMLInputElement> | React.MouseEvent | KeyboardEvent,
+        | React.ChangeEvent<HTMLInputElement>
+        | React.MouseEvent
+        | React.KeyboardEvent,
     ) => {
       if (option.isSeparator) return;
       if (option.disabled && option.tooltip) return;
@@ -146,34 +128,86 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     [onSelect, setIsOpenItemAccess],
   );
 
-  const handleKeyDown = React.useCallback(
-    (e: KeyboardEvent) => {
-      if (!isOpen || e.key !== "Escape") return;
-      if (isClosedByParent) return;
+  // The keyboard's place in the list. Focus stays on the button throughout
+  // (the active-descendant pattern), and the options are virtualised, so the
+  // highlighted option is kept here rather than looked up in the DOM.
+  const listboxId = React.useId();
+  const [activeIndex, setActiveIndex] = React.useState(-1);
 
-      e.preventDefault();
-      swallowEscapeKeyUp();
+  // The same rule the rendered options follow: a separator, a disabled option
+  // and -- unless displaySelectedOption -- the current value cannot be picked.
+  const isOptionPickable = React.useCallback(
+    (option: TOption) =>
+      !option.isSeparator &&
+      !option.disabled &&
+      (props.displaySelectedOption || option.label !== selectedOption?.label),
+    [props.displaySelectedOption, selectedOption?.label],
+  );
 
-      setIsOpenItemAccess?.(false);
-      setIsOpen(false);
+  // `advancedOptions` whose children are all DropDownItems (AccessRightSelect
+  // draws its rich rows that way) is still a list, and the keyboard walks it
+  // like `options`. Any other custom content keeps its own keys.
+  const advancedItems = React.useMemo(() => {
+    const { advancedOptions } = props;
+    if (!React.isValidElement(advancedOptions)) return null;
 
-      if (withBackdrop) onBackdropClick?.(e);
+    const children = React.Children.toArray(advancedOptions.props.children);
+    const items: React.ReactElement<DropDownItemProps>[] = [];
+    for (const child of children) {
+      if (!React.isValidElement(child) || child.type !== DropDownItem)
+        return null;
+      items.push(child as React.ReactElement<DropDownItemProps>);
+    }
+    return items.length ? items : null;
+  }, [props.advancedOptions]);
+
+  // The id a row is reached by. An advanced row keeps the id its caller gave
+  // it (the Filter's sort items, the table's checkbox options), and only a row
+  // without one gets the generated id.
+  const getOptionId = (index: number) =>
+    advancedItems?.[index]?.props.id || `${listboxId}-${index}`;
+
+  // The list's own element. A caller's row id need not be unique on the page
+  // (two Filters give their sort rows the same ids), so a row is looked up
+  // inside this list only, never in the whole document.
+  const dropDownElementId = props.dropDownId || `${listboxId}-list`;
+  const findOption = (index: number) => {
+    const optionId = getOptionId(index);
+    const list = document.getElementById(dropDownElementId);
+    return (
+      Array.from(list?.querySelectorAll<HTMLElement>("[id]") ?? []).find(
+        (node) => node.id === optionId,
+      ) ?? null
+    );
+  };
+
+  // Which entries of the list the keyboard can land on, in order.
+  const pickable = React.useMemo(
+    () =>
+      advancedItems
+        ? advancedItems.map(
+            ({ props: item }) => !item.isSeparator && !item.disabled,
+          )
+        : (props.options ?? []).map(isOptionPickable),
+    [advancedItems, props.options, isOptionPickable],
+  );
+
+  const stepActiveIndex = React.useCallback(
+    (from: number, step: 1 | -1) => {
+      const start = from === -1 && step === -1 ? pickable.length : from;
+      for (let i = 1; i <= pickable.length; i += 1) {
+        const index =
+          (start + step * i + pickable.length * 2) % pickable.length;
+        if (pickable[index]) return index;
+      }
+      return -1;
     },
-    [
-      isOpen,
-      isClosedByParent,
-      withBackdrop,
-      onBackdropClick,
-      setIsOpenItemAccess,
-    ],
+    [pickable],
   );
 
   React.useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [handleKeyDown]);
+    if (!isOpen) setActiveIndex(-1);
+  }, [isOpen]);
 
   const {
     dropDownMaxHeight,
@@ -287,6 +321,106 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
         : 6;
   }
 
+  const setOpenFromKeyboard = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    value: boolean,
+  ) => {
+    onToggle?.(e, value);
+    setIsOpenItemAccess?.(value);
+    setIsOpen(value);
+  };
+
+  // The keys a listbox button answers: Enter, Space and the arrows open the
+  // list; the arrows then move the highlight, Enter or Space picks it, and
+  // Escape or Tab closes the list. Arrow navigation covers `options`, and
+  // `advancedOptions` made of DropDownItems; other custom content is not a
+  // list, and keeps its keys.
+  const onComboKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.closest("input, textarea, [contenteditable='true']")) return;
+    // The same exclusion comboBoxClick makes: the optional children block
+    // (`children`) keeps its own keys while disableIconClick is on.
+    if (disableIconClick && isInOptionalBlock(target, e.currentTarget)) return;
+    if (
+      isDisabled ||
+      isLoading ||
+      props.disableItemClick ||
+      displayType === ComboBoxDisplayType.toggle
+    )
+      return;
+
+    const navigable = withAdvancedOptions
+      ? !!advancedItems
+      : options.length > 0;
+
+    if (!isOpen) {
+      if (!["Enter", " ", "ArrowDown", "ArrowUp"].includes(e.key)) return;
+      if (!navigable && !withAdvancedOptions) return;
+      e.preventDefault();
+      consumeKey(e);
+
+      const selectedIndex = advancedItems
+        ? advancedItems.findIndex(({ props: item }) => item.isSelected)
+        : options.findIndex((option) =>
+            withLabel
+              ? option.label === selectedOption?.label
+              : option.key === selectedOption?.key,
+          );
+      setActiveIndex(
+        !navigable
+          ? -1
+          : selectedIndex !== -1 && pickable[selectedIndex]
+            ? selectedIndex
+            : stepActiveIndex(-1, e.key === "ArrowUp" ? -1 : 1),
+      );
+      setOpenFromKeyboard(e, true);
+      return;
+    }
+
+    switch (e.key) {
+      case "ArrowDown":
+      case "ArrowUp":
+        // The open list owns the arrows either way, so they stay out of the
+        // page's hotkeys (which would move the file selection behind it).
+        // With nothing to step through, their default action is left alone,
+        // so custom content can scroll with them.
+        consumeKey(e);
+        if (!navigable) break;
+        e.preventDefault();
+        setActiveIndex((index) =>
+          stepActiveIndex(index, e.key === "ArrowUp" ? -1 : 1),
+        );
+        break;
+      case "Enter":
+      case " ": {
+        // Custom content may hold a button of its own; leave the key to it.
+        if (!navigable) break;
+        e.preventDefault();
+        consumeKey(e);
+        if (!pickable[activeIndex]) break;
+        if (advancedItems) {
+          // A click on the row picks it exactly as the mouse does: the row's
+          // own onClick runs, and the click closes the list on its way up.
+          findOption(activeIndex)?.click();
+          break;
+        }
+        optionClick(options[activeIndex], e);
+        break;
+      }
+      case "Escape":
+        e.preventDefault();
+        // Not to a ModalDialog around it, which closes on an Escape keyup.
+        consumeKey(e);
+        setOpenFromKeyboard(e, false);
+        break;
+      case "Tab":
+        setOpenFromKeyboard(e, false);
+        break;
+      default:
+        break;
+    }
+  };
+
   const disableMobileView = optionsCount < 4 || hideMobileView;
 
   const renderedOptions = React.useMemo(() => {
@@ -295,7 +429,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     const selectedLabel = selectedOption?.label;
     const selectedKey = selectedOption?.key;
 
-    return options.map((option) => {
+    return options.map((option, index) => {
       const {
         key,
         disabled,
@@ -336,7 +470,8 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
           icon={icon}
           description={description}
           isBeta={isBeta}
-          data-focused={isOpen ? isActiveOption : undefined}
+          id={`${listboxId}-${index}`}
+          isActiveDescendant={isOpen && index === activeIndex}
           data-is-separator={option.isSeparator || undefined}
           data-type={option.type || undefined}
           aria-disabled={optionDisabled || undefined}
@@ -371,6 +506,8 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     isOpen,
     onClickSelectedItem,
     optionClick,
+    listboxId,
+    activeIndex,
   ]);
 
   const dropDownProps = React.useMemo(
@@ -395,7 +532,12 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
       forceCloseClickOutside,
       withoutBackground,
       dropDownId,
+      id: dropDownElementId,
       eventTypes: ["mousedown"],
+      // The combo box handles the keys itself, on its own element; the virtual
+      // list's window listener would move a second highlight and swallow every
+      // key, Tab included.
+      enableKeyboardEvents: false,
       topSpace,
       usePortalBackdrop,
       style,
@@ -426,6 +568,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
       forceCloseClickOutside,
       withoutBackground,
       dropDownId,
+      dropDownElementId,
       topSpace,
       usePortalBackdrop,
       style,
@@ -437,7 +580,20 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     ],
   );
 
-  const dropDownContent = advancedOptions || renderedOptions;
+  // A list of advanced rows gets the same ids and highlight as `options`.
+  const dropDownContent =
+    advancedItems && React.isValidElement(advancedOptions)
+      ? React.cloneElement(
+          advancedOptions,
+          undefined,
+          advancedItems.map((item, index) =>
+            React.cloneElement(item, {
+              id: getOptionId(index),
+              isActiveDescendant: isOpen && index === activeIndex,
+            }),
+          ),
+        )
+      : advancedOptions || renderedOptions;
 
   const dropDownElement = React.useMemo(
     () => (
@@ -482,6 +638,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
       className={comboboxClasses}
       ref={ref}
       onClick={comboBoxClick}
+      onKeyDown={onComboKeyDown}
       data-testid={dataTestId ?? "combobox"}
       title={title}
       data-scaled={scaledOptions || undefined}
@@ -497,6 +654,9 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
         innerContainer={children}
         innerContainerClassName="optionalBlock"
         isOpen={isOpen}
+        activeDescendantId={
+          activeIndex === -1 ? undefined : getOptionId(activeIndex)
+        }
         size={size as ComboBoxSize}
         scaled={scaled}
         comboIcon={comboIcon}

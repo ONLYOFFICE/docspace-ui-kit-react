@@ -1,9 +1,15 @@
 import type React from "react";
 
-import { useState, type CSSProperties, type ComponentProps } from "react";
+import {
+  useEffect,
+  useState,
+  type CSSProperties,
+  type ComponentProps,
+} from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useArgs } from "storybook/preview-api";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import CopyReactSvgUrl from "../../assets/icons/16/copy.react.svg?url";
 import DownloadReactSvgUrl from "../../assets/icons/16/download.react.svg?url";
@@ -490,6 +496,13 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   );
 };
 
+// The button is a div with the button role, named by the label it shows.
+const comboButton = (canvas: { getByRole: typeof screen.getByRole }) =>
+  canvas.getByRole("button", { expanded: false });
+
+// The list may be portalled out of the story root, so look in the page.
+const option = (name: string) => screen.getByRole("option", { name });
+
 // The combo box never changes its own selection, so the stories keep it here.
 const SelectableComboBox = (props: TComboboxProps) => {
   const [selected, setSelected] = useState<TOption>(props.selectedOption);
@@ -528,19 +541,39 @@ const defaultOptions = [
   },
 ];
 
-// Picking an option writes it back into the args, as a host would.
+// Holds the pick as a host would, and also writes it back into the args so the
+// Controls panel follows. The local state is what the button shows: an args
+// update re-renders the story inside Storybook but not under Vitest.
+const DefaultComboBox = ({
+  updateArgs,
+  ...args
+}: TComboboxProps & {
+  updateArgs: (update: Partial<TComboboxProps>) => void;
+}) => {
+  const [selected, setSelected] = useState<TOption>(args.selectedOption);
+
+  // A change made in the Controls panel reaches the button too.
+  useEffect(() => setSelected(args.selectedOption), [args.selectedOption]);
+
+  return (
+    <ComboBox
+      {...args}
+      selectedOption={selected}
+      onSelect={(option) => {
+        args.onSelect?.(option);
+        setSelected(option);
+        updateArgs({ selectedOption: option });
+      }}
+    />
+  );
+};
+
 const renderDefault = (args: TComboboxProps) => {
   const [, updateArgs] = useArgs<TComboboxProps>();
 
   return (
     <Wrapper>
-      <ComboBox
-        {...args}
-        onSelect={(option) => {
-          args.onSelect?.(option);
-          updateArgs({ selectedOption: option });
-        }}
-      />
+      <DefaultComboBox {...args} updateArgs={updateArgs} />
     </Wrapper>
   );
 };
@@ -555,6 +588,31 @@ export const Default: Story = {
     directionY: "bottom",
     fixedDirection: true,
     isDefaultMode: false,
+    onSelect: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // The pick is written back into the args, and Storybook keeps changed
+    // args in the URL, so a reload starts from the last pick rather than the
+    // placeholder. Start from whatever is selected and pick something else:
+    // the current value is disabled in the list.
+    const current = args.selectedOption?.label;
+    const target = defaultOptions.find((o) => o.label !== current);
+    if (!target) return;
+
+    const button = comboButton(canvas);
+    await expect(button).toHaveTextContent(String(current));
+
+    await userEvent.click(button);
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+
+    // Checked by what the button shows, not by the onSelect spy: inside
+    // Storybook the args update re-renders the story, which resets fn() spies,
+    // so the spy reads no calls there while it does under Vitest.
+    await userEvent.click(option(target.label));
+    await waitFor(() =>
+      expect(comboButton(canvas)).toHaveTextContent(target.label),
+    );
+    await expect(comboButton(canvas)).toHaveAttribute("aria-expanded", "false");
   },
   parameters: {
     docs: {
@@ -598,6 +656,14 @@ const DifferentSizesTemplate = () => {
 
 export const DifferentSizes: Story = {
   render: () => <DifferentSizesTemplate />,
+  play: async ({ canvas }) => {
+    // Fixed widths per size; content fits the label.
+    const widths = canvas
+      .getAllByRole("button")
+      .map((button) => Math.round(button.getBoundingClientRect().width));
+    await expect(widths.slice(0, 4)).toEqual([173, 300, 350, 500]);
+    await expect(widths[4]).toBeLessThan(173);
+  },
   parameters: {
     docs: {
       description: {
@@ -628,6 +694,7 @@ const WithIconsTemplate = () => {
         directionY="bottom"
         fixedDirection
         isDefaultMode={false}
+        fillIcon
       />
     </Wrapper>
   );
@@ -635,6 +702,33 @@ const WithIconsTemplate = () => {
 
 export const WithIcons: Story = {
   render: () => <WithIconsTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const button = comboButton(canvas);
+    const highlighted = () =>
+      document.getElementById(
+        button.getAttribute("aria-activedescendant") ?? "",
+      );
+
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+
+    // ArrowDown opens the list on its first option; focus stays on the button.
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+    await expect(highlighted()).toHaveTextContent("Move");
+
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(highlighted()).toHaveTextContent("Copy");
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(button).toHaveTextContent("Copy"));
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+    await expect(button).toHaveFocus();
+
+    await userEvent.keyboard(" ");
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+    await userEvent.keyboard("{Escape}");
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+  },
   parameters: {
     docs: {
       description: {
@@ -649,6 +743,7 @@ export const WithIcons: Story = {
     { key: 3, label: "Download", icon: DownloadIcon },
   ]}
   selectedOption={{ key: 0, label: "Select Type" }}
+  fillIcon
 />`,
       },
     },
@@ -690,6 +785,7 @@ const WithOptionDescriptionsTemplate = () => {
         displaySelectedOption
         modernView
         scaled={false}
+        fillIcon
       />
     </Wrapper>
   );
@@ -697,6 +793,13 @@ const WithOptionDescriptionsTemplate = () => {
 
 export const WithOptionDescriptions: Story = {
   render: () => <WithOptionDescriptionsTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(comboButton(canvas));
+    // displaySelectedOption keeps the current value clickable.
+    const pdf = screen.getByRole("option", { name: /^PDF/ });
+    await expect(pdf).toHaveAttribute("aria-selected", "true");
+    await expect(pdf).not.toHaveAttribute("aria-disabled", "true");
+  },
   parameters: {
     docs: {
       description: {
@@ -717,6 +820,7 @@ export const WithOptionDescriptions: Story = {
   displaySelectedOption
   modernView
   scaled={false}
+  fillIcon
 />`,
       },
     },
@@ -742,6 +846,15 @@ const DisabledTemplate = () => {
 
 export const Disabled: Story = {
   render: () => <DisabledTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const button = comboButton(canvas);
+    await expect(button).toHaveAttribute("aria-disabled", "true");
+    await expect(button).toHaveAttribute("tabindex", "-1");
+
+    await userEvent.click(button);
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+    await expect(screen.queryByRole("option")).not.toBeInTheDocument();
+  },
   parameters: {
     docs: {
       description: {
@@ -773,6 +886,43 @@ const WithSelectedOptionTemplate = () => {
 
 export const WithSelectedOption: Story = {
   render: () => <WithSelectedOptionTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const button = comboButton(canvas);
+    await userEvent.click(button);
+
+    // Without displaySelectedOption the current value cannot be picked again.
+    await expect(option("Open")).toHaveAttribute("aria-disabled", "true");
+    await expect(option("Open")).toHaveAttribute("aria-selected", "true");
+
+    await userEvent.click(option("Done"));
+    await waitFor(() => expect(button).toHaveTextContent("Done"));
+
+    // The keyboard in a list with dropDownMaxHeight, which renders through
+    // the virtual list: the row drawn as highlighted is the one the button
+    // names and the one Enter picks.
+    const drawn = () =>
+      [
+        ...document.querySelectorAll('[role="option"][data-focused="true"]'),
+      ].map((node) => node.textContent);
+    const named = () =>
+      document.getElementById(
+        button.getAttribute("aria-activedescendant") ?? "",
+      )?.textContent;
+
+    button.focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+    await expect(drawn()).toEqual(["Open"]);
+    await expect(named()).toBe("Open");
+
+    // Done is the current value and is skipped.
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(drawn()).toEqual(["In Progress"]);
+    await expect(named()).toBe("In Progress");
+
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(button).toHaveTextContent("In Progress"));
+  },
   parameters: {
     docs: {
       description: {
@@ -832,6 +982,20 @@ const CustomStylingTemplate = () => {
 
 export const CustomStyling: Story = {
   render: () => <CustomStylingTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // The selection shows as a badge in the option's own colours.
+    const badge = () => canvas.getByTestId("badge");
+    await expect(badge()).toHaveAccessibleName(/Critical/);
+    await expect(
+      badge().style.getPropertyValue("--badge-background-color"),
+    ).toBe("#FF4444");
+    await userEvent.click(comboButton(canvas));
+    await userEvent.click(await waitFor(() => option("Low")));
+    await waitFor(() => expect(badge()).toHaveAccessibleName(/Low/));
+    await expect(
+      badge().style.getPropertyValue("--badge-background-color"),
+    ).toBe("#90EE90");
+  },
   parameters: {
     docs: {
       description: {
@@ -867,6 +1031,11 @@ export const LoadingState: Story = {
       />
     </Wrapper>
   ),
+  play: async ({ canvas, userEvent }) => {
+    const button = comboButton(canvas);
+    await userEvent.click(button);
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+  },
   parameters: {
     docs: {
       description: {
@@ -901,10 +1070,29 @@ export const RightToLeft: Story = {
         scaled={false}
         isDefaultMode={false}
         fixedDirection
+        fillIcon
       />
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas, userEvent }) => {
+    const button = comboButton(canvas);
+    // The arrow sits at the left end; picking an option still works.
+    const arrow = button.querySelector(
+      "[data-test-id='combo-button-arrow']",
+    ) as Element;
+    await expect(arrow.getBoundingClientRect().left).toBeLessThan(
+      button.getBoundingClientRect().left +
+        button.getBoundingClientRect().width / 2,
+    );
+    await userEvent.click(button);
+    await userEvent.click(await waitFor(() => option("\u0646\u0633\u062e")));
+    await waitFor(() =>
+      expect(canvas.getByRole("button")).toHaveTextContent(
+        "\u0646\u0633\u062e",
+      ),
+    );
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -920,6 +1108,7 @@ export const RightToLeft: Story = {
     selectedOption={selected}
     onSelect={setSelected}
     scaled={false}
+    fillIcon
   />
 </div>`,
       },
@@ -934,6 +1123,12 @@ const baseOptions = [
 ];
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    await expect(comboButton(canvas)).toHaveStyle({
+      borderTopColor: "rgb(0, 130, 201)",
+      borderRadius: "12px",
+    });
+  },
   render: () => (
     <div
       style={

@@ -35,7 +35,7 @@ export type RoomTileProps = {
   item: RoomItem;
   /** Called with the new checked state and the `item` when the checkbox changes, or when the logo is tapped on a screen narrower than 600px. */
   onSelect?: (checked: boolean, item: RoomItem) => void;
-  /** Called with the event on a click anywhere on the tile except the checkbox, the tags, the badges, an open dialog, the three-dot button and the menu. It is the tile's open handler, not a thumbnail's. */
+  /** Called with the event on a click anywhere on the tile except the checkbox, the tag row (its tags and the overflow menu), the badges, an open dialog, the three-dot button and the menu. It is the tile's open handler, not a thumbnail's. */
   thumbnailClick?: (e: React.MouseEvent) => void;
   /** Builds the menu shown on right-click. Without it the right-click menu never opens. */
   getContextModel?: () => ContextMenuModel[];
@@ -49,9 +49,9 @@ export type RoomTileProps = {
   contextOptions: ContextMenuModel[];
   /** How many columns the tag row is laid out in. Required. */
   columnCount: number;
-  /** Called with a clicked tag, but only one that carries both a label and a room type — a plain string tag never reaches it, and neither does any tag on an AI agent that has none of its own. */
+  /** Called with `{ label, roomType, providerType }` when one of the room's own tags is clicked, plain strings included. The generated tags go to `selectOption` instead, and on an AI agent with no tags of its own nothing reaches it. */
   selectTag: (tag: TagClickEvent) => void;
-  /** Called when the generated third-party or room-type tag is clicked, with which of the two it was. Required. */
+  /** Called when a generated tag is clicked: `typeProvider` with `item.providerType` for the third-party tag, `defaultTypeRoom` with `item.roomType` for the room-type tag. Required. */
   selectOption: (option: SelectOption) => void;
   /** Turns a room type into the label of the tag shown when the room has no tags of its own. It is handed the kit's own translation function. Required. */
   getRoomTypeName: (

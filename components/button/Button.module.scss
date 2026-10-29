@@ -181,6 +181,17 @@
     outline: none;
   }
 
+  // The pointer gets no ring; the keyboard does, in the accent and clear of
+  // the button so it shows on the primary variant's accent background too.
+  &:focus-visible {
+    outline: 2px solid
+      var(
+        --button-focus-color,
+        var(--accent-main, var(--color-scheme-main-accent, #{$light-blue-main}))
+      );
+    outline-offset: 2px;
+  }
+
   &.extraSmall {
     height: var(--button-height-xs, 24px);
     font-size: var(--button-font-size-xs, 12px);

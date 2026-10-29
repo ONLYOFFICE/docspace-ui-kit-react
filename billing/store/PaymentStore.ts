@@ -1115,6 +1115,13 @@ class PaymentStore {
       });
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
+      // A silent refresh runs in the background after an action that has
+      // already reported its own result (a top-up's success toast); an error
+      // toast after it would make the action look failed.
+      if (silent) {
+        console.error(error);
+        return;
+      }
       toastr.error(error as Error);
     } finally {
       if (!silent) {

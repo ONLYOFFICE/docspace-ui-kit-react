@@ -36,8 +36,14 @@ export const DEMO_ROOTS: Record<SectionKind, number> = {
 type Node = SectionItem & { parentId: number };
 
 const DAY = 864e5;
+// A fixed moment, so the list sorts the same on every run, and a time of day
+// that varies with the age, so the rows do not all read 12:00.
 const ago = (days: number) =>
-  new Date(Date.parse("2026-09-28T09:00:00Z") - days * DAY).toISOString();
+  new Date(
+    Date.parse("2026-09-28T15:00:00Z") -
+      days * DAY -
+      ((days * 137) % 480) * 60_000,
+  ).toISOString();
 
 const base = {
   fileExst: "",
@@ -88,6 +94,16 @@ const folder = (
   folderType,
 });
 
+// A few rooms carry tags of their own, the rest only their type, as on a
+// real portal.
+const ROOM_TAGS: Record<number, string[]> = {
+  100: ["Finance", "2026"],
+  101: ["Campaigns"],
+  103: ["Legal"],
+  200: ["HR"],
+  203: ["Finance"],
+};
+
 const room = (
   id: number,
   parentId: number,
@@ -96,6 +112,7 @@ const room = (
   days: number,
   by: string,
   color: string,
+  shared = false,
 ): Node => ({
   ...base,
   id,
@@ -107,6 +124,8 @@ const room = (
   by,
   detail: "",
   color,
+  shared,
+  tags: ROOM_TAGS[id] ?? [],
 });
 
 const { files: FILES, rooms: ROOMS, forms: FORMS } = DEMO_ROOTS;
@@ -145,6 +164,7 @@ const seed = (): Node[] => [
     6,
     "Ivan Sokolov",
     "3B9E4F",
+    true,
   ),
   room(
     103,
@@ -172,6 +192,7 @@ const seed = (): Node[] => [
     18,
     DEMO_ME,
     "2A9DA8",
+    true,
   ),
   folder(110, 100, "Reports 2026", 2, "Anna Petrova"),
   folder(111, 100, "Invoices", 6, "Maria Ivanova"),
@@ -199,6 +220,7 @@ const seed = (): Node[] => [
     1,
     DEMO_ME,
     "4781D1",
+    true,
   ),
   room(
     201,
@@ -217,6 +239,7 @@ const seed = (): Node[] => [
     9,
     DEMO_ME,
     "3B9E4F",
+    true,
   ),
   room(
     203,

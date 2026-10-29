@@ -3,6 +3,7 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useState, useEffect } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import { InputSize } from "../text-input";
 
@@ -276,6 +277,23 @@ const baseTooltipProps = {
   generatorSpecial: "!@#$%^&*",
 };
 
+// The eye's block is marked password_eye--close while the value is hidden and
+// password_eye--open while it shows.
+const toggleEye = async (
+  field: HTMLElement,
+  userEvent: { click: (element: Element) => Promise<void> },
+) => {
+  const block = field
+    .closest("[data-testid='input-block']")
+    ?.querySelector("[class*='password_eye--']") as HTMLElement;
+  await userEvent.click(within(block).getByTestId("icon-button"));
+};
+
+const eyeOf = (field: HTMLElement) =>
+  field
+    .closest("[data-testid='input-block']")
+    ?.querySelector("[class*='password_eye--']") as HTMLElement;
+
 const PasswordInputTemplate = ({
   passwordSettings,
   onChange,
@@ -321,6 +339,37 @@ export const Default: Story = {
     placeholder: "password",
     maxLength: 30,
     size: InputSize.base,
+    onChange: fn(),
+    onValidateInput: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const field = canvas.getByPlaceholderText("password");
+    await expect(field).toHaveAttribute("type", "password");
+
+    // Each change reports whether every rule passes, and each rule's result.
+    await userEvent.type(field, "abc");
+    await expect(args.onValidateInput).toHaveBeenLastCalledWith(
+      false,
+      expect.objectContaining({ length: false }),
+    );
+    await userEvent.clear(field);
+    await userEvent.type(field, "Abc12!");
+    await expect(args.onValidateInput).toHaveBeenLastCalledWith(
+      true,
+      expect.objectContaining({
+        length: true,
+        digits: true,
+        capital: true,
+        special: true,
+      }),
+    );
+    await expect(field).toHaveValue("Abc12!");
+
+    // The eye shows the value and hides it again.
+    await toggleEye(field, userEvent);
+    await expect(field).toHaveAttribute("type", "text");
+    await toggleEye(field, userEvent);
+    await expect(field).toHaveAttribute("type", "password");
   },
   parameters: {
     docs: {
@@ -373,6 +422,12 @@ const SimpleViewTemplate = () => {
 
 export const SimpleView: Story = {
   render: () => <SimpleViewTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const field = canvas.getByPlaceholderText("Enter password");
+    await userEvent.type(field, "x");
+    await toggleEye(field, userEvent);
+    await expect(field).toHaveAttribute("type", "text");
+  },
   parameters: {
     docs: {
       description: {
@@ -420,6 +475,10 @@ const StatesTemplate = () => {
 
 export const States: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByPlaceholderText("Disabled")).toBeDisabled();
+    await expect(canvas.getByPlaceholderText("Normal")).toBeEnabled();
+  },
   parameters: {
     docs: {
       description: {
@@ -462,6 +521,20 @@ const CustomRulesTemplate = () => {
 
 export const CustomValidation: Story = {
   render: () => <CustomRulesTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // The tooltip lists only the rules this story turns on.
+    await userEvent.type(
+      canvas.getByPlaceholderText("Min 8 chars, uppercase & digits"),
+      "a",
+    );
+    await waitFor(() =>
+      expect(screen.getByText("Password must contain:")).toBeVisible(),
+    );
+    await expect(screen.getByText("minimum length: 8")).toBeVisible();
+    await expect(screen.getByText("digits")).toBeVisible();
+    await expect(screen.getByText("capital letters")).toBeVisible();
+    await expect(screen.queryByText(/special characters/)).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -519,6 +592,19 @@ const SizesTemplate = () => {
 
 export const Sizes: Story = {
   render: () => <SizesTemplate />,
+  play: async ({ canvas }) => {
+    const [base, middle, large] = [
+      "Base size",
+      "Middle size",
+      "Large size",
+    ].map((placeholder) => canvas.getByPlaceholderText(placeholder));
+    await expect(base).toHaveStyle({ fontSize: "13px" });
+    await expect(middle).toHaveStyle({ fontSize: "13px" });
+    await expect(large).toHaveStyle({ fontSize: "16px" });
+    await expect(large.getBoundingClientRect().height).toBeGreaterThan(
+      base.getBoundingClientRect().height,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -556,6 +642,21 @@ const GeneratorTemplate = () => {
 
 export const WithPasswordGenerator: Story = {
   render: () => <GeneratorTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const field = canvas.getByPlaceholderText("Type a character");
+    // A character opens the rules tooltip, where the generator link sits.
+    await userEvent.type(field, "a");
+    const generate = await screen.findByTestId("generate_password_link");
+    await userEvent.click(generate);
+
+    // A password that passes every rule, shown rather than masked.
+    await waitFor(() => expect(field).toHaveAttribute("type", "text"));
+    const value = (field as HTMLInputElement).value;
+    await expect(value.length).toBeGreaterThanOrEqual(6);
+    await expect(value).toMatch(/[A-Z]/);
+    await expect(value).toMatch(/\d/);
+    await expect(value).toMatch(/[!@#$%^&*]/);
+  },
   parameters: {
     docs: {
       description: {
@@ -600,6 +701,16 @@ const RightToLeftTemplate = () => {
 export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The characters line up from the right edge (the value itself is
+    // Latin, so dir="auto" keeps it left-to-right) and the eye moves to the
+    // left end of the field.
+    const field = canvas.getByDisplayValue("Passw0rd!");
+    await expect(field).toHaveStyle({ textAlign: "right" });
+    await expect(
+      eyeOf(field).getBoundingClientRect().right,
+    ).toBeLessThanOrEqual(field.getBoundingClientRect().left + 1);
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -624,6 +735,18 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const field = canvas.getByDisplayValue("Passw0rd!");
+    await expect(field).toHaveStyle({ color: "rgb(76, 29, 149)" });
+    // The border and the fill sit on the block around the field and the eye.
+    await expect(
+      field.closest("[data-testid='input-block']") as HTMLElement,
+    ).toHaveStyle({
+      backgroundColor: "rgb(245, 243, 255)",
+      borderTopColor: "rgb(124, 58, 237)",
+      borderRadius: "8px",
+    });
+  },
   render: () => (
     <div
       style={

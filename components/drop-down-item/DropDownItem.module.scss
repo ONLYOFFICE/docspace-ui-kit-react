@@ -2,6 +2,17 @@
 
 @use "../../styles/mixins";
 
+// The keyboard's place in a list: the hover tint plus a ring inside the item
+// (a ring outside would be clipped by the scrolling list), in the accent.
+@mixin keyboard-ring {
+  background-color: var(--drop-down-item-bg-hover);
+  box-shadow: inset 0 0 0 2px
+    var(
+      --drop-down-item-focus-ring-color,
+      var(--accent-main, var(--color-scheme-main-accent, #{$light-blue-main}))
+    );
+}
+
 :global(.dark) {
   :local {
     .dropDownItemIcon,
@@ -216,6 +227,13 @@
     background-color: var(--drop-down-item-bg-hover);
   }
 
+  // Where the keyboard is, in a menu that walks its items with real focus
+  // (LinkWithDropdown, ContextMenuButton, MainButtonMobile). The hover tint
+  // alone is too faint to find; the outline above is off for every item.
+  &:focus-visible:not(.separator) {
+    @include keyboard-ring;
+  }
+
   &:active:not(.separator) {
     background-color: var(--drop-down-item-bg-hover);
   }
@@ -345,8 +363,10 @@
   min-width: 0;
 }
 
+// The option a combo box's keyboard highlight is on, focus staying on the
+// combo box itself.
 .activeDescendant {
-  background-color: var(--drop-down-item-bg-hover);
+  @include keyboard-ring;
 }
 
 .disabled {

@@ -147,6 +147,7 @@ export const BaseTile = ({
       onClick={onRoomClick}
       onContextMenu={onContextMenu}
       data-testid={dataTestId ?? "tile"}
+      aria-busy={inProgress || undefined}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
     >
@@ -166,6 +167,7 @@ export const BaseTile = ({
             </div>
           ) : (
             <Loader
+              isDecorative
               className={styles.loader}
               color=""
               size="20px"

@@ -48,7 +48,7 @@ describe("ModalDialog", () => {
       </ModalDialog>,
     );
 
-    const closeButton = screen.getByLabelText("close");
+    const closeButton = screen.getByLabelText("Close");
     await userEvent.click(closeButton);
 
     expect(mockOnClose).toHaveBeenCalledTimes(1);
@@ -62,7 +62,7 @@ describe("ModalDialog", () => {
       </ModalDialog>,
     );
 
-    const closeButton = screen.queryByLabelText("close");
+    const closeButton = screen.queryByLabelText("Close");
     expect(closeButton).not.toBeInTheDocument();
   });
 
@@ -451,6 +451,118 @@ describe("ModalDialog", () => {
       expect(dialog).toHaveAttribute("aria-modal", "true");
     });
 
+    // Closed, the dialog stays mounted; it used to stay a `role="dialog"`
+    // with `aria-modal="true"` as well, telling a screen reader that the
+    // whole page behind an invisible dialog was out of bounds.
+    it("takes a closed dialog out of the accessibility tree and the Tab order", () => {
+      const { rerender } = render(
+        <ModalDialog {...defaultProps} visible={false} aria-label="Delete room">
+          <ModalDialog.Body>
+            <button type="button">Inside</button>
+          </ModalDialog.Body>
+        </ModalDialog>,
+      );
+
+      expect(screen.queryByRole("dialog")).toBeNull();
+      const outer = screen.getByTestId("modal");
+      expect(outer).toHaveAttribute("aria-hidden", "true");
+      expect(outer).toHaveAttribute("inert");
+      expect(screen.getByTestId("modal-dialog")).not.toHaveAttribute(
+        "aria-modal",
+      );
+
+      rerender(
+        <ModalDialog {...defaultProps} visible aria-label="Delete room">
+          <ModalDialog.Body>
+            <button type="button">Inside</button>
+          </ModalDialog.Body>
+        </ModalDialog>,
+      );
+
+      expect(screen.getByRole("dialog")).toHaveAttribute("aria-modal", "true");
+      expect(outer).not.toHaveAttribute("aria-hidden");
+      expect(outer).not.toHaveAttribute("inert");
+    });
+
+    // Opened from the keyboard, the dialog used to leave the focus on the
+    // trigger behind it, so Tab walked the page before reaching the dialog.
+    it("takes the focus when it opens and hands it back when it closes", () => {
+      const Harness = ({ visible }: { visible: boolean }) => (
+        <>
+          <button type="button">Trigger</button>
+          <ModalDialog {...defaultProps} visible={visible} aria-label="Room">
+            <ModalDialog.Body>
+              <button type="button">Inside</button>
+            </ModalDialog.Body>
+          </ModalDialog>
+        </>
+      );
+      const { rerender } = render(<Harness visible={false} />);
+      const trigger = screen.getByRole("button", { name: "Trigger" });
+      trigger.focus();
+
+      rerender(<Harness visible />);
+      expect(screen.getByRole("dialog")).toHaveFocus();
+
+      rerender(<Harness visible={false} />);
+      expect(trigger).toHaveFocus();
+    });
+
+    // `hideContent` swaps the content node while the dialog is open (a nested
+    // picker in CreateRoomDialog); closing afterwards must still find the
+    // focus inside the dialog and hand it back.
+    it("hands the focus back after hideContent recreated the content", () => {
+      const Harness = ({
+        visible,
+        hideContent = false,
+      }: {
+        visible: boolean;
+        hideContent?: boolean;
+      }) => (
+        <>
+          <button type="button">Trigger</button>
+          <ModalDialog
+            {...defaultProps}
+            visible={visible}
+            hideContent={hideContent}
+            aria-label="Room"
+          >
+            <ModalDialog.Body>
+              <input aria-label="Name" />
+            </ModalDialog.Body>
+          </ModalDialog>
+        </>
+      );
+      const { rerender } = render(<Harness visible={false} />);
+      const trigger = screen.getByRole("button", { name: "Trigger" });
+      trigger.focus();
+
+      rerender(<Harness visible />);
+      rerender(<Harness visible hideContent />);
+      rerender(<Harness visible />);
+      screen.getByLabelText("Name").focus();
+
+      rerender(<Harness visible={false} />);
+      expect(trigger).toHaveFocus();
+    });
+
+    it("leaves the focus on a field the dialog's content focused itself", () => {
+      const AutoFocused = () => {
+        const ref = React.useRef<HTMLInputElement>(null);
+        React.useEffect(() => ref.current?.focus(), []);
+        return <input ref={ref} aria-label="Name" />;
+      };
+      render(
+        <ModalDialog {...defaultProps}>
+          <ModalDialog.Body>
+            <AutoFocused />
+          </ModalDialog.Body>
+        </ModalDialog>,
+      );
+
+      expect(screen.getByLabelText("Name")).toHaveFocus();
+    });
+
     it("hides content when hideContent is true", () => {
       render(
         <ModalDialog {...defaultProps} hideContent>
@@ -471,7 +583,7 @@ describe("ModalDialog", () => {
         </ModalDialog>,
       );
 
-      const closeButton = screen.queryByLabelText("close");
+      const closeButton = screen.queryByLabelText("Close");
       expect(closeButton).not.toBeInTheDocument();
     });
 

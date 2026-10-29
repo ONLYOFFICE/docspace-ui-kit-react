@@ -149,4 +149,77 @@ describe("Dropzone", () => {
     expect(textArea).toHaveAttribute("aria-relevant", "additions removals");
     expect(fileTypes).toHaveAttribute("aria-label", "Supported file types");
   });
+
+  it("opens the folder picker from the keyboard in folder mode", () => {
+    render(<Dropzone {...defaultProps} isFolderUpload />);
+
+    const area = screen.getByTestId("dropzone-input-area");
+    const input = screen.getByTestId("dropzone-input");
+    const pick = vi.spyOn(input, "click").mockImplementation(() => {});
+
+    expect(area).toHaveAttribute("tabindex", "0");
+    fireEvent.keyDown(area, { key: "Enter" });
+    fireEvent.keyDown(area, { key: " " });
+    expect(pick).toHaveBeenCalledTimes(2);
+  });
+
+  it("makes the format line a button that toggles the full list", () => {
+    render(
+      <Dropzone {...defaultProps} fullExstsText="PDF, DOC, DOCX, ODT, RTF" />,
+    );
+
+    const line = screen.getByTestId("dropzone-file-types");
+    expect(line).toHaveAttribute("role", "button");
+    expect(line).toHaveAttribute("tabindex", "0");
+    expect(line).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.keyDown(line, { key: "Enter" });
+    expect(line).toHaveAttribute("aria-expanded", "true");
+    fireEvent.keyDown(line, { key: "Escape" });
+    expect(line).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("keeps the format button out of the drop area's button", () => {
+    render(
+      <Dropzone {...defaultProps} fullExstsText="PDF, DOC, DOCX, ODT, RTF" />,
+    );
+
+    const area = screen.getByTestId("dropzone-input-area");
+    const line = screen.getByTestId("dropzone-file-types");
+    expect(area).toHaveAttribute("role", "button");
+    expect(area.contains(line)).toBe(false);
+    expect(area.parentElement).toBe(line.parentElement);
+    expect(screen.getAllByRole("button")).toEqual([area, line]);
+  });
+
+  it("does not open the file dialog when the format line is used", () => {
+    render(
+      <Dropzone {...defaultProps} fullExstsText="PDF, DOC, DOCX, ODT, RTF" />,
+    );
+
+    const input = screen.getByTestId("dropzone-input");
+    const pick = vi.spyOn(input, "click").mockImplementation(() => {});
+    const line = screen.getByTestId("dropzone-file-types");
+
+    fireEvent.click(line);
+    fireEvent.keyDown(line, { key: " " });
+    expect(pick).not.toHaveBeenCalled();
+
+    // The area itself still opens it.
+    fireEvent.click(screen.getByTestId("dropzone-input-area"));
+    expect(pick).toHaveBeenCalledTimes(1);
+  });
+
+  it("closes the full format list on a click outside", () => {
+    render(
+      <Dropzone {...defaultProps} fullExstsText="PDF, DOC, DOCX, ODT, RTF" />,
+    );
+
+    const line = screen.getByTestId("dropzone-file-types");
+    fireEvent.click(line);
+    expect(line).toHaveAttribute("aria-expanded", "true");
+
+    fireEvent.click(document.body);
+    expect(line).toHaveAttribute("aria-expanded", "false");
+  });
 });

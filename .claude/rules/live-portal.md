@@ -36,7 +36,10 @@ const me = (await profilesApi.getSelfProfile()).data.response; // EmployeeFullDt
 `VITE_PROVIDER_API_URL` / `VITE_PROVIDER_API_KEY` from `.env` (gitignored; `.env.example` shows
 the shape, and the `VITE_` prefix is what exposes them to the browser), and the `apiConfig`
 toolbar global switches between portals saved in `localStorage` by
-`.storybook/utils/apiProviders.ts`. Two deliberate settings there:
+`.storybook/utils/apiProviders.ts`. The last pick is saved there too and becomes the initial
+`apiConfig`, so a bare `localhost:6006` opens on it; a `globals=` in the URL still wins, and a
+fresh browser profile — the story tests, the console scan, the screenshots — starts in demo
+mode. Two deliberate settings there:
 
 - `initSocket={false}` — the socket would otherwise connect to the portal from every story.
 - `useBearerForRawClient` — the raw client sends `Bearer <key>`, which is what an API key needs
@@ -205,8 +208,9 @@ createFileJsonElement: { title } })` makes an office document through the docume
   carries demo data behind the same shape and an explicit "not connected" state; a screen that
   throws or hangs on a missing portal is a broken page, not a strict one.
   A module with no demo data of its own — the selectors, `uploader`, billing, the AI chat and
-  settings — gets it from the **demo portal**, `https://demo-portal.invalid`, which a Mock Service
-  Worker (`msw`, started by a global loader in `.storybook/preview.tsx`) answers from
+  settings — gets it from the **demo portal**, `https://demo-portal.invalid`, which `msw` (started
+  by a global loader in `.storybook/preview.tsx`, patching `fetch` and `XMLHttpRequest` in the
+  preview frame) answers from
   `.storybook/mocks/` — one handler file and one fixture file per area, all data made up. The
   story takes `withPortalGate(title)` (or `<PortalGate>`) from `.storybook/decorators/PortalGate.tsx`;
   with no portal selected it renders the story inside `DemoPortal`, a nested `ApiProvider`
@@ -217,9 +221,10 @@ createFileJsonElement: { title } })` makes an office document through the docume
   `withDemoBanner` for the banner alone. `DemoBanner` is a loud "Demo data" note with an arrow up
   at the toolbar, a **Connect a portal**
   button that opens the API Config form through a channel event
-  (`.storybook/addons/events.ts`), and the registration link. The worker file is
-  `.storybook/public/mockServiceWorker.js`, served from the root by `staticDirs`, so the static
-  build has the demo too. A demo-portal route no handler answers gets a 404 and a
+  (`.storybook/addons/events.ts`), and the registration link. There is no service worker: the
+  interception is part of the preview bundle (`.storybook/mocks/network.ts`), so the static build
+  has the demo too. `.storybook/public/mockServiceWorker.js` is only a stub that unregisters the
+  worker earlier builds installed in visitors' browsers. A demo-portal route no handler answers gets a 404 and a
   `[demo portal] no fixture for …` warning in the console, never a silent `{}`: add the fixture
   rather than a catch-all. `document-editor` is the one exception — no fixture can stand in for
   a Document Server — so it passes `{ demo: false }` and keeps the "no portal" card, which has

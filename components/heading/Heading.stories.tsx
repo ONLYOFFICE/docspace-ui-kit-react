@@ -1,6 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 
 import { Heading, HeadingLevel, HeadingSize } from ".";
 
@@ -118,6 +119,8 @@ type Story = StoryObj<ComponentProps<typeof Heading>>;
 
 export default meta;
 
+const styleOf = (el: HTMLElement) => getComputedStyle(el);
+
 const Wrapper = (props: { children: React.ReactNode }) => {
   return (
     <div
@@ -138,6 +141,11 @@ export const Default: Story = {
     level: HeadingLevel.h1,
     size: HeadingSize.large,
     children: "Default Heading",
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("heading", { level: 1, name: "Default Heading" }),
+    ).toBeVisible();
   },
   parameters: {
     docs: {
@@ -235,6 +243,14 @@ const CustomStyledTemplate = () => {
 
 export const Levels: Story = {
   render: () => <LevelsTemplate />,
+  play: async ({ canvas }) => {
+    // Each level is its own element, all at the same size.
+    const sizes = [1, 2, 3, 4, 5, 6].map((level) => {
+      const heading = canvas.getByRole("heading", { level });
+      return styleOf(heading).fontSize;
+    });
+    await expect(new Set(sizes).size).toBe(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -255,6 +271,15 @@ export const Levels: Story = {
 
 export const Sizes: Story = {
   render: () => <SizesTemplate />,
+  play: async ({ canvas }) => {
+    // 15px to 27px, growing with each step.
+    const sizes = canvas
+      .getAllByRole("heading")
+      .map((heading) => Number.parseFloat(styleOf(heading).fontSize));
+    await expect(sizes[0]).toBe(15);
+    await expect(sizes[4]).toBe(27);
+    await expect([...sizes].sort((a, b) => a - b)).toEqual(sizes);
+  },
   parameters: {
     docs: {
       description: {
@@ -274,6 +299,15 @@ export const Sizes: Story = {
 
 export const Types: Story = {
   render: () => <TypesTemplate />,
+  play: async ({ canvas }) => {
+    const [, header, menu, content] = canvas.getAllByRole("heading");
+    await expect(styleOf(header).fontSize).toBe("28px");
+    await expect(styleOf(menu).fontSize).toBe("23px");
+    await expect(styleOf(content).fontSize).toBe("18px");
+    for (const heading of [header, menu, content]) {
+      await expect(styleOf(heading).lineHeight).toBe("50px");
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -292,6 +326,11 @@ export const Types: Story = {
 
 export const TruncatedHeading: Story = {
   render: () => <TruncatedTemplate />,
+  play: async ({ canvas }) => {
+    const heading = canvas.getByRole("heading", { level: 2 });
+    await expect(styleOf(heading).textOverflow).toBe("ellipsis");
+    await expect(heading.scrollWidth).toBeGreaterThan(heading.clientWidth);
+  },
   parameters: {
     docs: {
       description: {
@@ -311,6 +350,14 @@ export const TruncatedHeading: Story = {
 
 export const CustomStyled: Story = {
   render: () => <CustomStyledTemplate />,
+  play: async ({ canvas }) => {
+    await expect(styleOf(canvas.getByText("Blue Heading")).color).toBe(
+      "rgb(0, 0, 255)",
+    );
+    await expect(styleOf(canvas.getByText("Italic Heading")).fontStyle).toBe(
+      "italic",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -352,6 +399,21 @@ export const CssCustomization: Story = {
       </Heading>
     </div>
   ),
+  play: async ({ canvas }) => {
+    const custom = styleOf(canvas.getByText("Custom Heading"));
+    await expect(custom.color).toBe("rgb(123, 79, 191)");
+    await expect(custom.fontSize).toBe("22px");
+    await expect(custom.lineHeight).toBe("40px");
+    await expect(styleOf(canvas.getByText("Plain Heading")).fontWeight).toBe(
+      "800",
+    );
+    await expect(styleOf(canvas.getByText("Menu Heading")).fontSize).toBe(
+      "26px",
+    );
+    await expect(styleOf(canvas.getByText("Header Heading")).fontSize).toBe(
+      "32px",
+    );
+  },
   parameters: {
     docs: {
       description: {

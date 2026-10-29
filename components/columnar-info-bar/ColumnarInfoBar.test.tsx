@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { renderToStaticMarkup } from "react-dom/server";
 
 import { ColumnarInfoBar } from "./ColumnarInfoBar";
 
@@ -19,6 +20,77 @@ describe("ColumnarInfoBar", () => {
     expect(screen.getByText("john@example.com")).toBeInTheDocument();
     expect(screen.getByText("Status")).toBeInTheDocument();
     expect(screen.getByText("Active")).toBeInTheDocument();
+  });
+
+  it.each(["default", "neutral", "page"] as const)(
+    "renders the pairs as a description list (%s variant)",
+    (variant) => {
+      const { container } = render(
+        <ColumnarInfoBar columns={columns} variant={variant} />,
+      );
+
+      expect(container.querySelector("dl")).not.toBeNull();
+      const terms = screen.getAllByRole("term");
+      expect(terms.map((t) => t.textContent)).toEqual([
+        "Name",
+        "Email",
+        "Status",
+      ]);
+      expect(terms[0].nextElementSibling?.tagName).toBe("DD");
+      expect(terms[0].nextElementSibling).toHaveTextContent("John Smith");
+    },
+  );
+
+  it.each(["default", "neutral"] as const)(
+    "announces its content through a status region (%s variant)",
+    async (variant) => {
+      render(<ColumnarInfoBar columns={columns} variant={variant} />);
+      await waitFor(() =>
+        expect(screen.getByRole("status")).toHaveTextContent(
+          "Name John Smith Email john@example.com Status Active",
+        ),
+      );
+    },
+  );
+
+  // The server renders the first render only, and the client's first render
+  // matches it: the region is in it, empty, and the text arrives a moment
+  // later as a change to a region already on the page. The content itself is
+  // drawn at once.
+  it("mounts the live region empty and fills it a moment later", async () => {
+    const host = document.createElement("div");
+    host.innerHTML = renderToStaticMarkup(
+      <ColumnarInfoBar headerText="Details" columns={columns} />,
+    );
+    const region = host.querySelector('[role="status"]');
+    expect(region).not.toBeNull();
+    expect(region).toBeEmptyDOMElement();
+
+    render(<ColumnarInfoBar headerText="Details" columns={columns} />);
+    expect(screen.getByRole("heading", { name: "Details" })).toBeVisible();
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent("Details"),
+    );
+  });
+
+  it("announces a change of its content", async () => {
+    const { rerender } = render(
+      <ColumnarInfoBar headerText="Details" columns={columns} />,
+    );
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent("Details"),
+    );
+
+    rerender(<ColumnarInfoBar headerText="Updated" columns={columns} />);
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent("Updated"),
+    );
+  });
+
+  it("is not a live region in the page variant", () => {
+    render(<ColumnarInfoBar columns={columns} variant="page" />);
+    expect(screen.queryByRole("status")).toBeNull();
   });
 
   it.each(["default", "neutral", "page"] as const)(
@@ -101,5 +173,37 @@ describe("ColumnarInfoBar", () => {
     ];
     render(<ColumnarInfoBar columns={columnsWithNode} />);
     expect(screen.getByTestId("status-badge")).toBeInTheDocument();
+  });
+
+  it.each(["default", "neutral"] as const)(
+    "keeps the close button out of the status live region (%s variant)",
+    (variant) => {
+      render(
+        <ColumnarInfoBar
+          columns={columns}
+          onAction={vi.fn()}
+          variant={variant}
+        />,
+      );
+      const button = screen.getByRole("button", { name: /close/i });
+
+      expect(screen.getByRole("status")).not.toContainElement(button);
+    },
+  );
+
+  it("defaults the close button label to the translated Common:CloseButton", () => {
+    const win = window as unknown as { i18n?: unknown };
+    const saved = win.i18n;
+    win.i18n = {
+      loaded: { "en/Common.json": { data: { CloseButton: "Schliessen" } } },
+    };
+    try {
+      render(<ColumnarInfoBar columns={columns} onAction={vi.fn()} />);
+      expect(
+        screen.getByRole("button", { name: "Schliessen" }),
+      ).toBeInTheDocument();
+    } finally {
+      win.i18n = saved;
+    }
   });
 });

@@ -127,11 +127,14 @@
   width: 60%;
 }
 
-.dropzone {
+// Lays out the drop area and the format line, which is its sibling rather
+// than its child (a button may not sit inside the area's role="button").
+.dropzoneBody {
+  position: relative;
+  isolation: isolate;
   flex: 1;
   height: 100%;
   width: 100%;
-  visibility: visible;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -139,6 +142,34 @@
   gap: var(--dropzone-gap-v);
 
   user-select: none;
+}
+
+.dropzone {
+  max-width: 100%;
+  visibility: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dropzone-gap-v);
+
+  // Stretches the area's hit box (clicks, drags, the focus ring) over the
+  // whole body, beneath the format line, which stays on top and takes its
+  // own clicks.
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  &:focus-visible {
+    outline: none;
+
+    &::before {
+      outline: auto;
+    }
+  }
 
   &.isLoading {
     visibility: hidden;
@@ -198,6 +229,16 @@
   gap: var(--dropzone-gap-v);
 
   color: var(--dropzone-exsts-color-v);
+
+  // The line sits over the drop area's ::before, outside the area itself.
+  // Plain text, it lets clicks and drops through to the area, as it did when
+  // it was inside it; a button keeps its clicks but lets every drag through,
+  // so a drop on it is taken and the area's drag highlight does not flicker.
+  &:not(.clickable),
+  .isDraggingOnPage &,
+  .isDragOver & {
+    pointer-events: none;
+  }
 }
 
 .dropzoneExstsTextContainer {

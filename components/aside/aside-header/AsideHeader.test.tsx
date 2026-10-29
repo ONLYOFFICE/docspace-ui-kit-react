@@ -37,6 +37,47 @@ describe("AsideHeader", () => {
     expect(onCloseClick).toHaveBeenCalledTimes(1);
   });
 
+  // The cross was named "close" in every language, the back arrow not at all.
+  it("names the close cross and the back arrow from the translation", () => {
+    const saved = Reflect.get(window, "i18n");
+    Reflect.set(window, "i18n", {
+      loaded: {
+        "en/Common.json": {
+          data: { CloseButton: "Schliessen", Back: "Zurueck" },
+        },
+      },
+    });
+    try {
+      render(<AsideHeader isBackButton onBackClick={vi.fn()} />);
+      expect(
+        screen.getByTestId("aside_header_close_icon_button"),
+      ).toHaveAttribute("aria-label", "Schliessen");
+      expect(
+        screen.getByTestId("aside_header_back_icon_button"),
+      ).toHaveAttribute("aria-label", "Zurueck");
+    } finally {
+      Reflect.set(window, "i18n", saved);
+    }
+  });
+
+  it("takes the names of the cross and the arrow from props", () => {
+    render(
+      <AsideHeader
+        isBackButton
+        onBackClick={vi.fn()}
+        closeLabel="Close panel"
+        backLabel="Previous step"
+      />,
+    );
+    expect(
+      screen.getByTestId("aside_header_close_icon_button"),
+    ).toHaveAttribute("aria-label", "Close panel");
+    expect(screen.getByTestId("aside_header_back_icon_button")).toHaveAttribute(
+      "aria-label",
+      "Previous step",
+    );
+  });
+
   it("renders custom header icons", () => {
     const headerIcons = [
       {

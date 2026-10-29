@@ -15,6 +15,9 @@ const PERIODS: TServiceLimitPeriod[] = ["Day", "Week", "Month", "Lifetime"];
 
 const SCOPES: TServiceLimitScope[] = ["Total", "Global", "Custom"];
 
+// The API sends these enums as strings. A numeric code is the backend's own
+// numbering, which starts at 1 (ServiceLimitScope.Total, ServiceLimitPeriod.Day
+// in ASC.Core.Common/Billing/AccountingClient.cs), so it indexes from 1 here.
 const normalizeEnum = <T extends string>(
   values: T[],
   value: unknown,
