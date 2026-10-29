@@ -1601,7 +1601,12 @@ class PaymentStore {
           }
         }
 
-        requests.push(this.fetchAutoPayments(), this.fetchTransactionHistory());
+        requests.push(
+          this.fetchAutoPayments(),
+          this.fetchTransactionHistory(),
+          this.fetchServiceFeePercent(AI_TOOLS),
+          this.fetchServiceFeePercent(AI_SEARCH),
+        );
       } else {
         requests.push(this.fetchCardLinked(integrationUrl));
         runInAction(() => {
