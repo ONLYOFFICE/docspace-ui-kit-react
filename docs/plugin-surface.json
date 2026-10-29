@@ -1,8 +1,8 @@
 {
   "entry": "index.ts",
   "package": "@onlyoffice/apps-ui-kit",
-  "total": 713,
-  "values": 464,
+  "total": 716,
+  "values": 465,
   "exports": {
     "ADMIN": {
       "kind": "variable",
@@ -978,6 +978,10 @@
       "kind": "variable",
       "origin": "context/InterfaceDirectionContext"
     },
+    "InvoiceHistory": {
+      "kind": "other",
+      "origin": "billing/invoice-history"
+    },
     "ItemProps": {
       "kind": "interface",
       "origin": "components/selector"
@@ -1108,6 +1112,10 @@
     },
     "NavMenu": {
       "kind": "variable",
+      "origin": "components/nav-menu"
+    },
+    "NavMenuClickMeta": {
+      "kind": "type",
       "origin": "components/nav-menu"
     },
     "NavMenuGroup": {
@@ -1757,6 +1765,10 @@
     "TOption": {
       "kind": "type",
       "origin": "components/combobox"
+    },
+    "TOptionTagKind": {
+      "kind": "type",
+      "origin": "components/tags"
     },
     "TPathParts": {
       "kind": "type",

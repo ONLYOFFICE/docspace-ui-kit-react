@@ -53,6 +53,7 @@ const RadioButtonGroup = ({
   return (
     <div
       ref={radioButtonGroupRef}
+      role="radiogroup"
       id={id}
       className={classNames(
         styles.radioButtonGroup,

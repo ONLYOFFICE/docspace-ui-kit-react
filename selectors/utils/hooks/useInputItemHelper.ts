@@ -84,10 +84,10 @@ const useInputItemHelper = ({
         return;
       }
 
-      // The socket "folder created" event replaces the input row, but it only
-      // arrives for the folder the selector is subscribed to. At a root
-      // (e.g. the rooms root) there is no subscription, so reconcile locally.
-      // Keyed by id, so the socket handler winning the race is a no-op.
+      // The input row is replaced here, not by the socket "folder created"
+      // event: that event may be for another folder, and it does not arrive
+      // at a root (e.g. the rooms root), where nothing is subscribed. Keyed by
+      // id, so when the socket listed the folder first the row is just dropped.
       setItems?.((value) => {
         const idx = value.findIndex((item) => item.isInputItem);
 

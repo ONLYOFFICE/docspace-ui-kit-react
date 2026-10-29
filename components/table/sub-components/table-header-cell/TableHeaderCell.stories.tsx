@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fireEvent, fn, within } from "storybook/test";
 
 import { TableHeaderCell } from "./TableHeaderCell";
 import { SortByFieldName } from "../../../../enums";
@@ -84,6 +85,13 @@ type Story = StoryObj<ComponentProps<typeof TableHeaderCell>>;
 
 export default meta;
 
+const onSortClick = fn();
+const onResizeStart = fn();
+const onSelectAll = fn();
+
+const cellOf = (canvas: { getByTestId: (id: string) => HTMLElement }) =>
+  canvas.getByTestId("table-header-cell");
+
 export const Default: Story = {
   render: (args) => <TableHeaderCell {...args} />,
   args: {
@@ -94,14 +102,32 @@ export const Default: Story = {
       sortBy: SortByFieldName.Name,
       minWidth: 200,
       resizable: false,
-      onClick: () => {},
+      onClick: onSortClick,
     },
     index: 0,
-    onMouseDown: () => {},
+    onMouseDown: onResizeStart,
     resizable: false,
     sortBy: SortByFieldName.Author,
     sorted: true,
     sortingVisible: true,
+  },
+  beforeEach: () => {
+    onSortClick.mockClear();
+    onResizeStart.mockClear();
+    onSelectAll.mockClear();
+  },
+  play: async ({ canvas, userEvent }) => {
+    const cell = cellOf(canvas);
+    // Sorted by another column, so this one is not highlighted.
+    await expect(cell.className).not.toMatch(/isActive/);
+    await userEvent.click(within(cell).getByText("Name"));
+    await expect(onSortClick).toHaveBeenCalledWith(
+      SortByFieldName.Name,
+      expect.anything(),
+    );
+    await userEvent.click(within(cell).getByTestId("sort-icon"));
+    await expect(onSortClick).toHaveBeenCalledTimes(2);
+    await expect(within(cell).queryByTestId("resize-handle")).toBeNull();
   },
   parameters: {
     docs: {
@@ -142,6 +168,15 @@ export const Resizable: Story = {
     },
     resizable: true,
   },
+  beforeEach: () => {
+    onResizeStart.mockClear();
+  },
+  play: async ({ canvas }) => {
+    const handle = within(cellOf(canvas)).getByTestId("resize-handle");
+    await expect(handle).toHaveAttribute("data-column", "0");
+    fireEvent.mouseDown(handle);
+    await expect(onResizeStart).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -174,6 +209,9 @@ export const Resizable: Story = {
 export const SortedByThisColumn: Story = {
   render: (args) => <TableHeaderCell {...args} />,
   args: { ...Default.args, sortBy: SortByFieldName.Name },
+  play: async ({ canvas }) => {
+    await expect(cellOf(canvas).className).toMatch(/isActive/);
+  },
   parameters: {
     docs: {
       description: {
@@ -212,6 +250,15 @@ export const WithoutSorting: Story = {
     ...Default.args,
     sortingVisible: false,
   },
+  beforeEach: () => {
+    onSortClick.mockClear();
+  },
+  play: async ({ canvas, userEvent }) => {
+    const cell = cellOf(canvas);
+    await expect(within(cell).queryByTestId("sort-icon")).toBeNull();
+    await userEvent.click(within(cell).getByText("Name"));
+    await expect(onSortClick).not.toHaveBeenCalled();
+  },
   parameters: {
     docs: {
       description: {
@@ -249,9 +296,14 @@ export const WithUncheckedCheckbox: Story = {
       checkbox: {
         value: false,
         isIndeterminate: false,
-        onChange: () => {},
+        onChange: onSelectAll,
       },
     },
+  },
+  play: async ({ canvas }) => {
+    // An unticked checkbox is not drawn at all.
+    await expect(within(cellOf(canvas)).queryByRole("checkbox")).toBeNull();
+    await expect(within(cellOf(canvas)).getByText("Select")).toBeVisible();
   },
   parameters: {
     docs: {
@@ -292,9 +344,18 @@ export const WithCheckedCheckbox: Story = {
       checkbox: {
         value: true,
         isIndeterminate: false,
-        onChange: () => {},
+        onChange: onSelectAll,
       },
     },
+  },
+  beforeEach: () => {
+    onSelectAll.mockClear();
+  },
+  play: async ({ canvas, userEvent }) => {
+    const checkbox = within(cellOf(canvas)).getByRole("checkbox");
+    await expect(checkbox).toBeChecked();
+    await userEvent.click(checkbox);
+    await expect(onSelectAll).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -335,9 +396,14 @@ export const WithIndeterminateCheckbox: Story = {
       checkbox: {
         value: true,
         isIndeterminate: true,
-        onChange: () => {},
+        onChange: onSelectAll,
       },
     },
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      within(cellOf(canvas)).getByRole("checkbox"),
+    ).toBePartiallyChecked();
   },
   parameters: {
     docs: {
@@ -385,6 +451,12 @@ export const ShortColumn: Story = {
       resizable: false,
       isShort: true,
     },
+  },
+  play: async ({ canvas }) => {
+    const cell = cellOf(canvas);
+    await expect(cell).toHaveAttribute("data-short-colum", "true");
+    await expect(within(cell).getByTestId("resize-handle")).toBeInTheDocument();
+    await expect(within(cell).queryByTestId("sort-icon")).toBeNull();
   },
   parameters: {
     docs: {

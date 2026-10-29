@@ -1,6 +1,7 @@
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 
 import { LoadingButton } from ".";
 
@@ -14,17 +15,15 @@ const meta = {
   argTypes: {
     id: {
       control: false,
-      description:
-        "Ignored: nothing reads this prop, and the element carries no `id`",
+      description: "DOM `id` of the outer 16px square",
     },
     className: {
       control: false,
-      description:
-        "Ignored: nothing reads this prop; style the ring through the CSS custom properties",
+      description: "Added to the outer 16px square",
     },
     style: {
       control: false,
-      description: "Ignored: nothing reads this prop",
+      description: "Inline style of the outer 16px square",
     },
     percent: {
       control: { type: "number", min: 0, max: 100 },
@@ -62,7 +61,16 @@ const meta = {
     onClick: {
       action: "onClick",
       description:
-        "Called with no arguments when anything inside the 16px square is clicked, including the cross",
+        "Called with no arguments when anything inside the 16px square is clicked, including the cross, and when the cancel control is pressed with Enter or Space",
+    },
+    cancelLabel: {
+      control: "text",
+      description:
+        'Accessible name of the cancel control; the translated "Cancel" by default',
+    },
+    progressLabel: {
+      control: "text",
+      description: "Accessible name of the ring's progress bar",
     },
   },
 } satisfies Meta<typeof LoadingButton>;
@@ -70,6 +78,23 @@ const meta = {
 type Story = StoryObj<ComponentProps<typeof LoadingButton>>;
 
 export default meta;
+
+const ringsOf = (canvasElement: HTMLElement) =>
+  Array.from(
+    canvasElement.querySelectorAll<HTMLElement>(
+      "[data-testid='loading-button-container']",
+    ),
+  );
+
+// The progress is handed to the stylesheet as a custom property.
+const percentOf = (container: HTMLElement) =>
+  (container.firstElementChild as HTMLElement).style.getPropertyValue(
+    "--loading-button-percent",
+  );
+
+// The cross is the only SVG inside a ring.
+const hasCross = (container: HTMLElement) =>
+  container.querySelector("svg") !== null;
 
 const Wrapper = (props: { children: React.ReactNode }) => {
   return (
@@ -92,6 +117,28 @@ export const Default: Story = {
     percent: 0,
     inConversion: false,
     isDefaultMode: false,
+    onClick: fn(),
+  },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const [ring] = ringsOf(canvasElement);
+    await expect(percentOf(ring)).toBe("0");
+    await expect(hasCross(ring)).toBe(true);
+    // A click anywhere in the square, the cross included, cancels.
+    await userEvent.click(canvas.getByTestId("loading-button-container"));
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+
+    // The cancel control is reached with Tab and pressed with Enter or Space.
+    const cancel = canvas.getByRole("button", { name: "Cancel" });
+    await userEvent.tab();
+    await expect(cancel).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+    await userEvent.keyboard(" ");
+    await expect(args.onClick).toHaveBeenCalledTimes(3);
+
+    // At 0 the progress is unknown: the progress bar reports no value.
+    const progress = canvas.getByRole("progressbar", { name: "Progress" });
+    await expect(progress).not.toHaveAttribute("aria-valuenow");
   },
   parameters: {
     docs: {
@@ -130,6 +177,21 @@ const ProgressStagesTemplate = () => {
 
 export const ProgressStages: Story = {
   render: () => <ProgressStagesTemplate />,
+  play: async ({ canvas, canvasElement }) => {
+    await expect(ringsOf(canvasElement).map(percentOf)).toEqual([
+      "0",
+      "25",
+      "50",
+      "75",
+      "100",
+    ]);
+    // Each known percentage is reported to assistive technology.
+    await expect(
+      canvas
+        .getAllByRole("progressbar")
+        .map((bar) => bar.getAttribute("aria-valuenow")),
+    ).toEqual([null, "25", "50", "75", "100"]);
+  },
   parameters: {
     docs: {
       description: {
@@ -159,6 +221,12 @@ const InConversionTemplate = () => {
 
 export const InConversion: Story = {
   render: () => <InConversionTemplate />,
+  play: async ({ canvasElement }) => {
+    // inConversion drops the cross from every ring.
+    const rings = ringsOf(canvasElement);
+    await expect(rings).toHaveLength(3);
+    await expect(rings.some(hasCross)).toBe(false);
+  },
   parameters: {
     docs: {
       description: {
@@ -184,6 +252,11 @@ const DefaultModeTemplate = () => {
 
 export const DefaultMode: Story = {
   render: () => <DefaultModeTemplate />,
+  play: async ({ canvasElement }) => {
+    const [ring] = ringsOf(canvasElement);
+    await expect(ring.className).toMatch(/defaultMode/);
+    await expect(percentOf(ring)).toBe("45");
+  },
   parameters: {
     docs: {
       description: {
@@ -214,6 +287,20 @@ const CustomColorsTemplate = () => {
 
 export const CustomColors: Story = {
   render: () => <CustomColorsTemplate />,
+  play: async ({ canvasElement }) => {
+    // loaderColor is handed to the ring as --circle-fill-color.
+    const colors = ringsOf(canvasElement).map((ring) =>
+      ring.style.getPropertyValue("--circle-fill-color"),
+    );
+    await expect(colors).toEqual(["#2DA7DB", "#4CAF50", "#FF5722", "#FF5722"]);
+    // backgroundColor tints the disc behind the cross.
+    const disc = ringsOf(canvasElement)[3].querySelector(
+      ".loading-button",
+    ) as HTMLElement;
+    await expect(getComputedStyle(disc).backgroundColor).toBe(
+      "rgb(255, 224, 214)",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -249,6 +336,14 @@ export const CssCustomization: Story = {
       <LoadingButton percent={30} isDefaultMode />
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const disc = ringsOf(canvasElement)[0].querySelector(
+      ".loading-button",
+    ) as HTMLElement;
+    await expect(getComputedStyle(disc).backgroundColor).toBe(
+      "rgb(237, 233, 254)",
+    );
+  },
   parameters: {
     docs: {
       description: {

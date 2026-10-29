@@ -3,6 +3,9 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, waitFor } from "storybook/test";
+
+import { WhenVisible } from "../../.storybook/utils/WhenVisible";
 
 import { TextInput } from ".";
 import { InputSize, InputType } from "./TextInput.enums";
@@ -256,7 +259,7 @@ const Wrapper = (props: { children: React.ReactNode }) => {
 const ControlledInput = (
   props: Partial<ComponentProps<typeof TextInput>> & { initialValue?: string },
 ) => {
-  const { initialValue, type = InputType.text, ...rest } = props;
+  const { initialValue, type = InputType.text, onChange, ...rest } = props;
   const [val, setValue] = useState(initialValue || rest.value || "");
 
   return (
@@ -264,9 +267,10 @@ const ControlledInput = (
       {...rest}
       type={type}
       value={val}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-        setValue(e.target.value)
-      }
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+        setValue(e.target.value);
+        onChange?.(e);
+      }}
     />
   );
 };
@@ -285,6 +289,13 @@ export const Default: Story = {
     scale: false,
     withBorder: true,
     value: "",
+    onChange: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const input = canvas.getByPlaceholderText("Enter text here");
+    await userEvent.type(input, "Hello");
+    await expect(input).toHaveValue("Hello");
+    await expect(args.onChange).toHaveBeenCalledTimes(5);
   },
   parameters: {
     docs: {
@@ -303,6 +314,8 @@ export const Default: Story = {
     },
   },
 };
+
+const rect = (element: Element) => element.getBoundingClientRect();
 
 const SizesTemplate = () => {
   return (
@@ -328,6 +341,19 @@ const SizesTemplate = () => {
 
 export const Sizes: Story = {
   render: () => <SizesTemplate />,
+  play: async ({ canvas }) => {
+    // Each size has its own fixed width; large also has the bigger text.
+    const [base, middle, large] = [
+      "Base size",
+      "Middle size",
+      "Large size",
+    ].map((value) => canvas.getByDisplayValue(value));
+    await expect(
+      [base, middle, large].map((input) => Math.round(rect(input).width)),
+    ).toEqual([173, 300, 550]);
+    await expect(base).toHaveStyle({ fontSize: "13px" });
+    await expect(large).toHaveStyle({ fontSize: "16px" });
+  },
   parameters: {
     docs: {
       description: {
@@ -358,6 +384,17 @@ const TypesTemplate = () => {
 
 export const Types: Story = {
   render: () => <TypesTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByPlaceholderText("Password")).toHaveAttribute(
+      "type",
+      "password",
+    );
+
+    // The browser keeps letters out of a number field.
+    const number = canvas.getByPlaceholderText("Number");
+    await userEvent.type(number, "a1b2");
+    await expect(number).toHaveValue(12);
+  },
   parameters: {
     docs: {
       description: {
@@ -411,6 +448,13 @@ const StatesTemplate = () => {
 
 export const States: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByPlaceholderText("Disabled")).toBeDisabled();
+
+    const readOnly = canvas.getByPlaceholderText("Read only");
+    await userEvent.type(readOnly, "!");
+    await expect(readOnly).toHaveValue("Read only");
+  },
   parameters: {
     docs: {
       description: {
@@ -494,6 +538,26 @@ const WithMaskTemplate = () => {
 
 export const WithMask: Story = {
   render: () => <WithMaskTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // The mask inserts the separators itself.
+    const date = canvas.getByPlaceholderText("DD/MM/YYYY");
+    await userEvent.type(date, "25122024");
+    await expect(date).toHaveValue("25/12/2024");
+
+    const phone = canvas.getByPlaceholderText("+1 (___) ___-____");
+    await userEvent.type(phone, "15551234567");
+    await expect(phone).toHaveValue("+1 (555) 123-4567");
+
+    // A mask function picks the pattern from the value as it is typed.
+    const flexible = canvas.getByPlaceholderText(
+      "Extension, or + for a full number",
+    );
+    await userEvent.type(flexible, "12345");
+    await expect(flexible).toHaveValue("1234");
+    await userEvent.clear(flexible);
+    await userEvent.type(flexible, "+15551234567");
+    await expect(flexible).toHaveValue("+1 (555) 123-4567");
+  },
   parameters: {
     docs: {
       description: {
@@ -548,6 +612,15 @@ const ScaledTemplate = () => {
 
 export const ScaledInputs: Story = {
   render: () => <ScaledTemplate />,
+  play: async ({ canvas }) => {
+    for (const value of ["Scaled base", "Scaled middle", "Scaled large"]) {
+      const input = canvas.getByDisplayValue(value);
+      const column = input.closest("div[style]") as HTMLElement;
+      await expect(Math.round(rect(input).width)).toBe(
+        Math.round(rect(column).width),
+      );
+    }
+  },
   parameters: {
     docs: {
       description: {
@@ -575,6 +648,14 @@ const BoldTemplate = () => {
 
 export const BoldText: Story = {
   render: () => <BoldTemplate />,
+  play: async ({ canvas }) => {
+    const weight = (value: string) =>
+      Number(getComputedStyle(canvas.getByDisplayValue(value)).fontWeight);
+    await expect(weight("Bold weight")).toBeGreaterThan(
+      weight("Normal weight"),
+    );
+    await expect(weight("Weight 700")).toBe(700);
+  },
   parameters: {
     docs: {
       description: {
@@ -592,11 +673,20 @@ export const BoldText: Story = {
 
 export const AutoFocused: Story = {
   render: () => (
-    <ControlledInput
-      isAutoFocussed
-      placeholder="Focused as soon as it mounts"
-    />
+    <WhenVisible>
+      <ControlledInput
+        isAutoFocussed
+        placeholder="Focused as soon as it mounts"
+      />
+    </WhenVisible>
   ),
+  play: async ({ canvas }) => {
+    await waitFor(() =>
+      expect(
+        canvas.getByPlaceholderText("Focused as soon as it mounts"),
+      ).toHaveFocus(),
+    );
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -632,6 +722,15 @@ const RightToLeftTemplate = () => {
 export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The text field follows its content; the phone field stays
+    // left-to-right so a number reads the same.
+    const [text, tel] = canvas.getAllByRole("textbox");
+    await expect(text).toHaveAttribute("dir", "auto");
+    await expect(getComputedStyle(text).direction).toBe("rtl");
+    await expect(tel).toHaveAttribute("type", "tel");
+    await expect(getComputedStyle(tel, "::placeholder").direction).toBe("ltr");
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -651,6 +750,25 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    await expect(canvas.getByDisplayValue("Custom styled input")).toHaveStyle({
+      backgroundColor: "rgb(245, 243, 255)",
+      borderTopColor: "rgb(196, 181, 253)",
+      borderRadius: "8px",
+      fontSize: "14px",
+      color: "rgb(76, 29, 149)",
+    });
+    await expect(
+      getComputedStyle(
+        canvas.getByPlaceholderText("Placeholder text"),
+        "::placeholder",
+      ).color,
+    ).toBe("rgb(139, 92, 246)");
+    // The disabled fill is an inset shadow, not the background.
+    await expect(
+      getComputedStyle(canvas.getByDisplayValue("Disabled")).boxShadow,
+    ).toContain("rgb(221, 214, 254)");
+  },
   render: () => (
     <div
       style={

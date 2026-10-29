@@ -42,8 +42,11 @@ const SecondaryTabs = (props: TabsProps) => {
     ? 0
     : items.findIndex((item) => item.id === selectedItemId);
 
-  const [focusedTabIndex, setFocusedTabIndex] = useState(selectedItemIndex);
-  const [hotkeysIsActive, setHotkeysIsActive] = useState(false);
+  // The roving tab stop: the one tab Tab lands on, and the one the arrow
+  // keys move from. It follows the selection until the keyboard moves it.
+  const [focusedTabIndex, setFocusedTabIndex] = useState(
+    Math.max(selectedItemIndex, 0),
+  );
   const [tabsCountInContainer, setTabsCountInContainer] = useState(0);
 
   const { interfaceDirection } = useInterfaceDirection();
@@ -55,8 +58,6 @@ const SecondaryTabs = (props: TabsProps) => {
   const scrollRef = useRef<ScrollbarType>(null);
   const tabItemsRef = useRef<(HTMLDivElement | null)[]>([]);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
-
-  const [activeElement, setActiveElement] = useState<HTMLElement | null>(null);
 
   const isViewFirstTab = useViewTab(scrollRef, tabsRef, 0);
   const isViewLastTab = useViewTab(scrollRef, tabsRef, items.length - 1);
@@ -90,30 +91,45 @@ const SecondaryTabs = (props: TabsProps) => {
     [tabsCountInContainer, scrollOnly],
   );
 
-  useTabsHotkeys({
-    enabledHotkeys: hotkeysIsActive,
-    setHotkeysIsActive,
-    items,
-    focusedTabIndex,
-    setFocusedTabIndex,
-    scrollToTab,
-    onSelect,
-    hotkeysId,
-  });
+  useEffect(() => {
+    setFocusedTabIndex(Math.max(selectedItemIndex, 0));
+  }, [selectedItemIndex]);
 
-  const onMouseUp = (e: MouseEvent) => {
-    (e.target as HTMLElement)?.focus();
-    setActiveElement(e.target as HTMLElement);
-
-    setHotkeysIsActive(false);
-
-    return e;
-  };
+  // A shorter list must not leave the tab stop past its end, where no tab
+  // would carry tabIndex 0 and Tab would skip the whole bar.
+  const lastTabIndex = Math.max(items.length - 1, 0);
+  const rovingTabIndex = Math.min(focusedTabIndex, lastTabIndex);
 
   useEffect(() => {
-    document.addEventListener("mouseup", onMouseUp);
-    return () => document.removeEventListener("mouseup", onMouseUp);
-  }, [selectedItemIndex, items, scrollToTab]);
+    setFocusedTabIndex((index) => Math.min(index, lastTabIndex));
+  }, [lastTabIndex]);
+
+  const setSelectedItem = (selectedTabItem: TTabItem, index: number): void => {
+    onSelect?.(selectedTabItem);
+    setFocusedTabIndex(index);
+
+    scrollToTab(index);
+  };
+
+  const selectTab = (index: number) => {
+    const item = items[index];
+    if (!item || item.isDisabled || index === selectedItemIndex) return;
+    item.onClick?.();
+    setSelectedItem(item, index);
+  };
+
+  const focusTab = (index: number) => {
+    setFocusedTabIndex(index);
+    tabItemsRef.current[index]?.focus();
+    scrollToTab(index);
+  };
+
+  const { onKeyDown } = useTabsHotkeys({
+    items,
+    focusedTabIndex: rovingTabIndex,
+    focusTab,
+    selectTab,
+  });
 
   useEffect(() => {
     if (isLoading) return;
@@ -181,37 +197,32 @@ const SecondaryTabs = (props: TabsProps) => {
     scrollToTab(selectedItemIndex);
   }, [selectedItemIndex, items, scrollToTab]);
 
-  useEffect(() => {
-    const tabsIsActive = !!document.activeElement?.classList.contains(
-      `secondary-tabs-scroll-${hotkeysId}`,
-    );
-
-    setHotkeysIsActive(tabsIsActive);
-  }, [activeElement]);
-
-  const setSelectedItem = (selectedTabItem: TTabItem, index: number): void => {
-    onSelect?.(selectedTabItem);
-    setFocusedTabIndex(index);
-
-    scrollToTab(index);
-  };
-
   const classes = classNames({
     [styles.secondary]: true,
   });
 
-  const onSelectPrev = () => {
-    if (selectedItemIndex === 0) return;
+  // The nearest tab in a direction that can be selected, skipping disabled
+  // ones; -1 when there is none.
+  const findEnabled = (from: number, step: 1 | -1) => {
+    for (let i = from + step; i >= 0 && i < items.length; i += step) {
+      if (!items[i].isDisabled) return i;
+    }
+    return -1;
+  };
 
-    const prevItem = items[selectedItemIndex - 1];
-    onSelect?.(prevItem);
+  const prevIndex = findEnabled(selectedItemIndex, -1);
+  const nextIndex = findEnabled(selectedItemIndex, 1);
+
+  // The arrows select as a click on the tab does: its own onClick first,
+  // then onSelect, and the tab is scrolled into view.
+  const onSelectPrev = () => {
+    if (prevIndex < 0) return;
+    selectTab(prevIndex);
   };
 
   const onSelectNext = () => {
-    if (selectedItemIndex === items.length - 1) return;
-
-    const nextItem = items[selectedItemIndex + 1];
-    onSelect?.(nextItem);
+    if (nextIndex < 0) return;
+    selectTab(nextIndex);
   };
 
   const containerW =
@@ -241,10 +252,11 @@ const SecondaryTabs = (props: TabsProps) => {
         classes,
       )}
       ref={tabsRef}
+      role="tablist"
+      onKeyDown={onKeyDown}
     >
       {items.map((item, index) => {
         const isSelected = index === selectedItemIndex;
-        const isFocused = hotkeysIsActive ? index === focusedTabIndex : false;
 
         return (
           <div
@@ -256,17 +268,19 @@ const SecondaryTabs = (props: TabsProps) => {
               styles.tab,
               {
                 [styles.selected]: isSelected,
-                [styles.focused]: isFocused,
                 [styles.disabled]: item.isDisabled,
               },
               classes,
               "tab",
             )}
-            onClick={() => {
-              if (index === selectedItemIndex) return;
-              item.onClick?.();
-              setSelectedItem(item, index);
-            }}
+            role="tab"
+            aria-selected={isSelected}
+            aria-disabled={item.isDisabled || undefined}
+            tabIndex={index === rovingTabIndex ? 0 : -1}
+            // Whatever put focus here -- a click on the tab already selected,
+            // a script -- the arrows have to start from this tab.
+            onFocus={() => setFocusedTabIndex(index)}
+            onClick={() => selectTab(index)}
             style={
               scaled
                 ? {}
@@ -317,7 +331,7 @@ const SecondaryTabs = (props: TabsProps) => {
         {withArrows ? (
           <IconButton
             className={classNames(styles.arrowIcon, styles.arrowLeft, {
-              [styles.disabled]: selectedItemIndex === 0,
+              [styles.disabled]: prevIndex < 0,
             })}
             isFill
             onClick={onSelectPrev}
@@ -338,7 +352,9 @@ const SecondaryTabs = (props: TabsProps) => {
           autoHide={false}
           noScrollY
           paddingInlineEnd="0"
-          scrollBodyClassName={`secondary-tabs-scroll-${hotkeysId}`}
+          scrollBodyClassName={
+            hotkeysId ? `secondary-tabs-scroll-${hotkeysId}` : undefined
+          }
           className={classNames(styles.scroll, classes)}
         >
           {renderContent}
@@ -355,7 +371,7 @@ const SecondaryTabs = (props: TabsProps) => {
         {withArrows ? (
           <IconButton
             className={classNames(styles.arrowIcon, styles.arrowRight, {
-              [styles.disabled]: selectedItemIndex === items.length - 1,
+              [styles.disabled]: nextIndex < 0,
             })}
             isFill
             onClick={onSelectNext}

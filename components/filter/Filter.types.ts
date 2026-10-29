@@ -23,6 +23,24 @@ export type SelectorRenderProps = {
 
 export type TRenderSelector = (props: SelectorRenderProps) => React.ReactNode;
 
+export type TCustomItemValue = {
+  key: string;
+  label?: string;
+};
+
+export type CustomItemRenderProps = {
+  group: FilterGroups;
+  value?: TCustomItemValue;
+  onChange: (value: TCustomItemValue | null) => void;
+  openPanel: (render: TRenderCustomItem) => void;
+  closePanel: () => void;
+  closeFilter: () => void;
+};
+
+export type TRenderCustomItem = (
+  props: CustomItemRenderProps,
+) => React.ReactNode;
+
 export type TSortDataItem = {
   id: string;
   className?: string;
@@ -106,12 +124,21 @@ export type TTagItem = {
   isMultiSelect?: boolean;
 };
 
+export type TCustomItem = {
+  group: FilterGroups;
+  key: string;
+  isCustom: true;
+  label?: string;
+  isSelected?: boolean;
+};
+
 export type TGroupItem =
   | TTagItem
   | TCheckboxItem
   | TWithOptionItem
   | TSelectorItem
-  | TToggleButtonItem;
+  | TToggleButtonItem
+  | TCustomItem;
 
 export interface FilterBlockItemProps {
   group: FilterGroups;
@@ -124,6 +151,7 @@ export interface FilterBlockItemProps {
   showSelector: TShowSelector;
   isFirst: boolean;
   withMultiItems: boolean;
+  renderCustom?: (item: TCustomItem) => React.ReactNode;
 }
 
 export type TItem = {
@@ -145,6 +173,8 @@ export type TItem = {
   isMultiSelect?: boolean;
   selectedLabel?: string;
   isCheckbox?: boolean;
+  isCustom?: boolean;
+  chips?: { key: string; label: string }[];
 };
 
 export type TGetFilterData = () => Promise<TItem[]>;
@@ -186,6 +216,8 @@ export type FilterBlockProps = {
 
   /** Renders the selector the panel opens for a person or a room group. Without it that step is empty — this package ships no portal selector. */
   renderSelector?: TRenderSelector;
+  /** Renders a group item marked `isCustom`. Without it such an item is empty. */
+  renderCustomItem?: TRenderCustomItem;
 };
 
 export type FilterButtonProps = Omit<FilterBlockProps, "hideFilterBlock"> & {
@@ -220,7 +252,7 @@ export type SortButtonProps = {
 };
 
 export type SearchInputProps = {
-  /** Called with the search string on every keystroke — the string itself, not an event. The component keeps no value of its own beyond the caret. */
+  /** Called with the search string — the string itself, not an event — once typing pauses for a second, and with `""` when the cross clears the box. */
   onSearch: (value: string) => void;
   /** Called when the search box is cleared through `clearSearch`. */
   onClearFilter: () => void;
@@ -230,7 +262,7 @@ export type SearchInputProps = {
   /** Called with `false` once a requested clear has been carried out. */
   setClearSearch: (value: boolean) => void;
 
-  /** Returns the text the search box should show. **Give it a stable identity**: the effect that reads it also focuses the field, so a new function on every render keeps stealing focus. */
+  /** Returns the text the search box should show; it is read whenever its identity changes. A value equal to the last one read, or a query the user has already replaced, leaves the field alone; any other value is put in the field, which is focused when the value is not empty. */
   getSelectedInputValue: () => string;
 
   /** Placeholder of the search box. Nothing translates it for you. */
@@ -248,6 +280,12 @@ export type SearchInputProps = {
   mainButtonProps?: MainButtonProps;
   /** Icon node rendered inside the MainButton (12x12) */
   mainButtonIcon?: React.ReactNode;
+  /** Leaves the search field out of the bar; the main button stays. Nothing
+   * calls `onSearch`, and `initSearchValue` and `getSelectedInputValue` are
+   * shown nowhere. Meant for use with `showMainButton` and `mainButtonProps`:
+   * without a main button the search block stays as empty space that keeps
+   * the filter and sort controls at the end of the row. */
+  hideSearch?: boolean;
 };
 
 export type TRoomGroupIcon = {

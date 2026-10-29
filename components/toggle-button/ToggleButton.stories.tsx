@@ -2,6 +2,7 @@ import type { CSSProperties, ComponentProps } from "react";
 import { useEffect, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn } from "storybook/test";
 
 import { ToggleButton } from ".";
 
@@ -119,6 +120,20 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   );
 };
 
+// The switch is an SVG beside its label: the track (rect) and the knob
+// (circle).
+const switchOf = (
+  canvas: { getAllByText: (text: string) => HTMLElement[] },
+  label: string,
+  index = 0,
+) =>
+  canvas
+    .getAllByText(label)
+    [index].closest("label")
+    ?.querySelector("svg") as SVGSVGElement;
+
+const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+
 const Template = ({ isChecked, onChange, ...args }: ToggleButtonProps) => {
   const [checked, setChecked] = useState(isChecked);
 
@@ -139,6 +154,22 @@ export const Default: Story = {
   args: {
     label: "Toggle me",
     isChecked: false,
+    onChange: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const toggle = canvas.getByRole("checkbox", { name: "Toggle me" });
+
+    // The visually hidden input is the tab stop; Space toggles it natively.
+    await userEvent.tab();
+    await expect(toggle).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await expect(toggle).toBeChecked();
+
+    await userEvent.click(canvas.getByText("Toggle me"));
+    await expect(toggle).not.toBeChecked();
+    await userEvent.click(canvas.getByText("Toggle me"));
+    await expect(toggle).toBeChecked();
+    await expect(args.onChange).toHaveBeenCalledTimes(3);
   },
   parameters: {
     docs: {
@@ -165,6 +196,14 @@ const StatesTemplate = () => {
 
 export const CheckedStates: Story = {
   render: () => <StatesTemplate />,
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("checkbox", { name: "Checked" }),
+    ).toBeChecked();
+    await expect(
+      canvas.getByRole("checkbox", { name: "Unchecked" }),
+    ).not.toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -194,6 +233,19 @@ const DisabledTemplate = () => {
 
 export const DisabledStates: Story = {
   render: () => <DisabledTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const off = canvas.getByRole("checkbox", { name: "Disabled off" });
+    const on = canvas.getByRole("checkbox", { name: "Disabled on" });
+    await expect(off).toBeDisabled();
+    await expect(on).toBeDisabled();
+
+    await expect(off).not.toBeChecked();
+    await expect(on).toBeChecked();
+
+    // A disabled input is no tab stop, so Tab passes both switches.
+    await userEvent.tab();
+    await expect(document.activeElement).toBe(document.body);
+  },
   parameters: {
     docs: {
       description: {
@@ -221,6 +273,13 @@ const LoadingTemplate = () => {
 
 export const LoadingState: Story = {
   render: () => <LoadingTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // Loading only pulses the knob: the switch still takes a click.
+    const toggle = canvas.getByRole("checkbox", { name: "Loading unchecked" });
+    await expect(toggle).toBeEnabled();
+    await userEvent.click(canvas.getByText("Loading unchecked"));
+    await expect(toggle).toBeChecked();
+  },
   parameters: {
     docs: {
       description: {
@@ -248,6 +307,22 @@ const NoAnimationTemplate = () => {
 
 export const WithoutAnimation: Story = {
   render: () => <NoAnimationTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // The knob lands in place at once: a frame after the click it is where
+    // the checked switch keeps it.
+    const knob = (label: string) =>
+      switchOf(canvas, label).querySelector("circle") as SVGCircleElement;
+    const onPosition =
+      knob("No animation on").getBoundingClientRect().left -
+      switchOf(canvas, "No animation on").getBoundingClientRect().left;
+    await userEvent.click(canvas.getByText("No animation off"));
+    await frame();
+    await frame();
+    await expect(
+      knob("No animation off").getBoundingClientRect().left -
+        switchOf(canvas, "No animation off").getBoundingClientRect().left,
+    ).toBeCloseTo(onPosition, 0);
+  },
   parameters: {
     docs: {
       description: {
@@ -272,6 +347,14 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The switch moves to the right of its label.
+    const [label] = canvas.getAllByText(/./, { selector: "label *" });
+    const toggle = switchOf(canvas, label.textContent as string);
+    await expect(toggle.getBoundingClientRect().left).toBeGreaterThan(
+      label.getBoundingClientRect().left,
+    );
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -291,6 +374,21 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  play: async ({ canvas }) => {
+    const track = (label: string) =>
+      getComputedStyle(switchOf(canvas, label).querySelector("rect") as Element)
+        .fill;
+    await expect(track("On")).toBe("rgb(0, 103, 158)");
+    await expect(track("Off")).toBe("rgb(125, 125, 125)");
+    // --toggle-button-spacing: the room between the switch and the label.
+    const toggle = switchOf(canvas, "Off");
+    await expect(
+      Math.round(
+        canvas.getByText("Off").getBoundingClientRect().left -
+          toggle.getBoundingClientRect().right,
+      ),
+    ).toBe(16);
+  },
   render: () => (
     <div
       style={

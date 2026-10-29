@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import { globalColors } from "../../providers/theme";
 
@@ -33,23 +34,40 @@ const meta = {
     },
     applyButtonLabel: {
       control: "text",
-      description: "Label for the apply button",
+      description:
+        "Label for the apply button; left out, the kit's translation of Apply",
       table: {
-        defaultValue: { summary: "Apply" },
+        defaultValue: { summary: 't("Common:ApplyButton")' },
       },
     },
     cancelButtonLabel: {
       control: "text",
-      description: "Label for the cancel button",
+      description:
+        "Label for the cancel button; left out, the kit's translation of Cancel",
       table: {
-        defaultValue: { summary: "Cancel" },
+        defaultValue: { summary: 't("Common:CancelButton")' },
       },
     },
     hexCodeLabel: {
       control: "text",
-      description: "Label for the hex code input field",
+      description: "Caption of the hex field, which also names the field",
       table: {
         defaultValue: { summary: "Hex code" },
+      },
+    },
+    ariaLabel: {
+      control: "text",
+      description: "Accessible name of the picker's group",
+      table: {
+        defaultValue: { summary: "Color picker" },
+      },
+    },
+    closeButtonLabel: {
+      control: "text",
+      description:
+        "Accessible name of the closing cross drawn in picker-only mode",
+      table: {
+        defaultValue: { summary: "Close color picker" },
       },
     },
     onApply: {
@@ -79,6 +97,18 @@ type Story = StoryObj<ComponentProps<typeof ColorPicker>>;
 
 export default meta;
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// Replaces the hex field's code; the field reports only a complete one.
+const typeHex = async ({ canvas, userEvent }: PlayContext, hex: string) => {
+  const input = canvas.getByLabelText("Hex code:");
+  await userEvent.clear(input);
+  await userEvent.type(input, hex);
+  return input;
+};
+
+const onPickerOnlyClose = fn().mockName("onClose");
+
 export const Default: Story = {
   render: (args) => <ColorPicker {...args} />,
   args: {
@@ -87,9 +117,34 @@ export const Default: Story = {
     applyButtonLabel: "Apply",
     cancelButtonLabel: "Cancel",
     hexCodeLabel: "Hex code",
-    onClose: () => console.log("Close clicked"),
-    onApply: (color) => console.log("Apply clicked with color:", color),
-    handleChange: (color) => console.log("Color changed to:", color),
+    onClose: fn(),
+    onApply: fn(),
+    handleChange: fn(),
+  },
+  play: async (context) => {
+    const { args, canvas, userEvent } = context;
+    // A named group: it claims no dialog role it would not live up to.
+    await expect(
+      canvas.getByRole("group", { name: "Color picker" }),
+    ).toBeVisible();
+    await expect(canvas.queryByRole("dialog")).toBeNull();
+
+    // A complete hex code moves the picker and is reported.
+    await typeHex(context, "00ff00");
+    await waitFor(() =>
+      expect(args.handleChange).toHaveBeenLastCalledWith("#00ff00"),
+    );
+
+    // Apply hands over the chosen color; Cancel only reports the close.
+    await userEvent.click(canvas.getByRole("button", { name: "Apply" }));
+    await expect(args.onApply).toHaveBeenCalledWith("#00ff00");
+    await userEvent.click(canvas.getByRole("button", { name: "Cancel" }));
+    await expect(args.onClose).toHaveBeenCalledTimes(1);
+
+    // Escape is the keyboard's cancel.
+    canvas.getByLabelText("Hex code:").focus();
+    await userEvent.keyboard("{Escape}");
+    await expect(args.onClose).toHaveBeenCalledTimes(2);
   },
   parameters: {
     docs: {
@@ -114,13 +169,23 @@ const PickerOnlyTemplate = () => {
     <ColorPicker
       isPickerOnly
       appliedColor={globalColors.lightBlueMain}
-      handleChange={(color) => console.log("Color changed:", color)}
+      handleChange={fn()}
+      onClose={onPickerOnlyClose}
     />
   );
 };
 
 export const PickerOnly: Story = {
   render: () => <PickerOnlyTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // A title and a cross; no hex field and no buttons.
+    await expect(canvas.getByTestId("color-picker-title")).toBeVisible();
+    await expect(canvas.queryByTestId("color-picker-hex-input")).toBeNull();
+    await expect(canvas.queryByTestId("color-picker-buttons")).toBeNull();
+
+    await userEvent.click(canvas.getByTestId("color-picker-close"));
+    await expect(onPickerOnlyClose).toHaveBeenCalledTimes(1);
+  },
   parameters: {
     docs: {
       description: {
@@ -142,19 +207,32 @@ const CustomLabelsTemplate = () => {
       applyButtonLabel="Save Color"
       cancelButtonLabel="Discard"
       hexCodeLabel="Color Code"
-      onApply={(color) => console.log("Saved:", color)}
-      onClose={() => console.log("Discarded")}
+      onApply={fn()}
+      onClose={fn()}
     />
   );
 };
 
 export const CustomLabels: Story = {
   render: () => <CustomLabelsTemplate />,
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole("button", { name: "Save Color" }),
+    ).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Discard" })).toBeVisible();
+    await expect(
+      canvas.getByTestId("color-picker-hex-label"),
+    ).toHaveTextContent("Color Code:");
+    // The caption is the field's name.
+    await expect(canvas.getByLabelText("Color Code:")).toBe(
+      canvas.getByTestId("color-picker-hex-input"),
+    );
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "The component translates none of its texts, so a caller passes its own for the buttons and the hex caption (`applyButtonLabel`, `cancelButtonLabel`, `hexCodeLabel`).",
+          "A caller replaces the button texts and the hex caption with its own (`applyButtonLabel`, `cancelButtonLabel`, `hexCodeLabel`). Left out, the buttons take the kit's translations of Apply and Cancel, while the caption, the group name and the cross's name are English defaults to override; the caption also names the hex field.",
       },
       source: {
         code: `<ColorPicker
@@ -182,7 +260,7 @@ const LiveColorReadoutTemplate = () => {
           setColor(newColor);
           console.log("Applied color:", newColor);
         }}
-        onClose={() => console.log("Closed")}
+        onClose={fn()}
       />
       <p style={{ margin: 0, fontSize: "12px" }}>
         Current color: <strong>{color}</strong>
@@ -193,6 +271,13 @@ const LiveColorReadoutTemplate = () => {
 
 export const LiveColorReadout: Story = {
   render: () => <LiveColorReadoutTemplate />,
+  play: async (context) => {
+    // The caller's copy follows every change before anything is applied.
+    await typeHex(context, "123abc");
+    await waitFor(() =>
+      expect(context.canvas.getByText("#123abc")).toBeVisible(),
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -219,14 +304,19 @@ const PresetColorTemplate = () => {
     <ColorPicker
       isPickerOnly={false}
       appliedColor="#FF0000"
-      onApply={(color) => console.log("Applied:", color)}
-      onClose={() => console.log("Closed")}
+      onApply={fn()}
+      onClose={fn()}
     />
   );
 };
 
 export const PresetColor: Story = {
   render: () => <PresetColorTemplate />,
+  play: async ({ canvas }) => {
+    // The hex field opens on the saved color.
+    const input = canvas.getByLabelText("Hex code:") as HTMLInputElement;
+    await expect(input.value.toLowerCase()).toBe("#ff0000");
+  },
   parameters: {
     docs: {
       description: {
@@ -254,8 +344,8 @@ const RightToLeftTemplate = () => {
         applyButtonLabel={"\u062a\u0637\u0628\u064a\u0642"}
         cancelButtonLabel={"\u0625\u0644\u063a\u0627\u0621"}
         hexCodeLabel={"\u0631\u0645\u0632 \u0627\u0644\u0644\u0648\u0646"}
-        onApply={(color) => console.log("Applied:", color)}
-        onClose={() => console.log("Closed")}
+        onApply={fn()}
+        onClose={fn()}
       />
     </div>
   );
@@ -264,6 +354,14 @@ const RightToLeftTemplate = () => {
 export const RightToLeft: Story = {
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
+  play: async () => {
+    // Under RTL the apply button sits to the right of cancel.
+    const apply = screen.getByTestId("color-picker-apply");
+    const cancel = screen.getByTestId("color-picker-cancel");
+    await expect(apply.getBoundingClientRect().left).toBeGreaterThan(
+      cancel.getBoundingClientRect().left,
+    );
+  },
   parameters: {
     noPadding: true,
     docs: {
@@ -324,9 +422,9 @@ const CssCustomizationTemplate = () => {
         applyButtonLabel="Apply"
         cancelButtonLabel="Cancel"
         hexCodeLabel="Hex code"
-        onApply={() => {}}
-        onClose={() => {}}
-        handleChange={() => {}}
+        onApply={fn()}
+        onClose={fn()}
+        handleChange={fn()}
       />
     </div>
   );
@@ -334,6 +432,12 @@ const CssCustomizationTemplate = () => {
 
 export const CssCustomization: Story = {
   render: () => <CssCustomizationTemplate />,
+  play: async ({ canvas }) => {
+    const input = getComputedStyle(canvas.getByLabelText("Hex code:"));
+    await expect(input.borderTopColor).toBe("rgb(0, 130, 201)");
+    await expect(input.backgroundColor).toBe("rgb(240, 248, 255)");
+    await expect(input.height).toBe("36px");
+  },
   parameters: {
     docs: {
       description: {

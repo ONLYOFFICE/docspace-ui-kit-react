@@ -3,14 +3,21 @@ import React, { useState, useEffect } from "react";
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn, screen, waitFor, within } from "storybook/test";
 
 import ViewRowsReactSvg from "../../assets/view-rows.react.svg";
 import ViewTilesReactSvg from "../../assets/view-tiles.react.svg";
 
 import { DeviceType, FilterGroups, FilterKeys } from "../../enums";
+import { Button, ButtonSize } from "../button";
+import { Text } from "../text";
 import Filter from ".";
-import type { FilterProps, TItem, TSortDataItem } from "./Filter.types";
+import type {
+  CustomItemRenderProps,
+  FilterProps,
+  TItem,
+  TSortDataItem,
+} from "./Filter.types";
 import {
   ViewSelector,
   type ViewSelectorProps,
@@ -182,6 +189,95 @@ const optionKindItems = [
   },
 ] as TItem[];
 
+// A host's own group: the enum lists only the groups the portal ships.
+const ratingGroup = "filter-rating" as FilterGroups;
+
+const ratingOptions = [
+  { key: "3", label: "3 stars and up" },
+  { key: "4", label: "4 stars and up" },
+  { key: "5", label: "5 stars" },
+];
+
+const customGroupItems = [
+  {
+    key: ratingGroup,
+    group: ratingGroup,
+    label: "Rating",
+    isHeader: true,
+    isLast: true,
+  },
+  { key: "rating", group: ratingGroup, label: "", isCustom: true },
+] as TItem[];
+
+const RatingStep = ({
+  onChange,
+  closePanel,
+}: Pick<CustomItemRenderProps, "onChange" | "closePanel">) => (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "8px",
+      padding: "16px",
+    }}
+  >
+    <Text fontSize="16px" fontWeight={700}>
+      Rating
+    </Text>
+    {ratingOptions.map((option) => (
+      <Button
+        key={option.key}
+        label={option.label}
+        size={ButtonSize.small}
+        scale
+        onClick={() => {
+          onChange(option);
+          closePanel();
+        }}
+      />
+    ))}
+    <Button label="Back" size={ButtonSize.small} scale onClick={closePanel} />
+  </div>
+);
+
+const renderRatingItem = ({
+  value,
+  onChange,
+  openPanel,
+  closePanel,
+}: CustomItemRenderProps) => (
+  <div style={{ display: "flex", gap: "8px" }}>
+    <Button
+      label={value?.label ?? "Choose rating"}
+      size={ButtonSize.small}
+      onClick={() =>
+        openPanel(() => (
+          <RatingStep onChange={onChange} closePanel={closePanel} />
+        ))
+      }
+    />
+    {value ? (
+      <Button
+        label="Clear"
+        size={ButtonSize.small}
+        onClick={() => onChange(null)}
+      />
+    ) : null}
+  </div>
+);
+
+const multiChipSelection: TItem[] = [
+  {
+    key: '{"rating":"4","reviews":"10"}',
+    group: ratingGroup,
+    label: "Rating",
+    chips: [
+      { key: "rating", label: "Rating: 4 stars and up" },
+      { key: "reviews", label: "Reviews: 10 and more" },
+    ],
+  },
+];
+
 const groupIcon = {
   id: "folder",
   data: {
@@ -272,7 +368,7 @@ const meta = {
     onSearch: {
       action: "onSearch",
       description:
-        "Called with the search string itself on every keystroke, and with an empty string when the cross in the box is clicked",
+        "Called with the search string itself once typing pauses for a second, and with an empty string when the cross in the box is clicked",
     },
     onClearFilter: {
       action: "onClearFilter",
@@ -291,7 +387,7 @@ const meta = {
     getSelectedInputValue: {
       control: false,
       description:
-        "Returns the text the search box shows; give it a stable identity, because the component focuses the field each time the function changes",
+        "Returns the text the search box shows, read each time the function changes; a value it returned before, or a query the user has already replaced, leaves the field alone",
     },
     initSearchValue: {
       control: "text",
@@ -311,6 +407,11 @@ const meta = {
       control: false,
       description:
         "Icon shown at 12 by 12 pixels inside the main button; a plus when omitted",
+    },
+    hideSearch: {
+      control: "boolean",
+      description:
+        "Leaves the search field out of the bar; the main button, the filter and the sort controls stay",
     },
     isIndexEditingMode: {
       control: "boolean",
@@ -369,6 +470,11 @@ const meta = {
       control: false,
       description:
         "Renders the step the panel opens when a group picks a person or a room; without it that step stays empty",
+    },
+    renderCustomItem: {
+      control: false,
+      description:
+        "Renders a group item marked `isCustom`, with the group's pending value, `onChange` to set it and `openPanel` / `closePanel` for a nested step; without it such an item stays empty",
     },
     userId: {
       control: "text",
@@ -525,6 +631,31 @@ type Story = StoryObj<ComponentProps<typeof Filter>>;
 
 export default meta;
 
+type PlayContext = Parameters<NonNullable<Story["play"]>>[0];
+
+// The filter panel is an aside dialog in a portal.
+const filterPanel = async () => {
+  const panel = await waitFor(() => {
+    const element = screen.getByTestId("modal-dialog");
+    expect(element).toBeVisible();
+    return element;
+  });
+  return within(panel);
+};
+
+// Closed, the panel unmounts.
+const panelClosed = () =>
+  waitFor(() => expect(screen.queryByTestId("modal-dialog")).toBeNull());
+
+const tag = (key: string) => screen.getByTestId(`filter_tag_${key}`);
+
+const applyButton = () => screen.getByTestId("filter_apply_button");
+
+const openPanel = async ({ canvas, userEvent }: PlayContext) => {
+  await userEvent.click(canvas.getByTestId("filter_icon_button"));
+  return filterPanel();
+};
+
 const Wrapper = (props: { children: React.ReactNode }) => {
   return <div style={{ height: "140px" }}>{props.children}</div>;
 };
@@ -565,6 +696,34 @@ const panelDocsStory = { inline: false, height: "480px" };
 
 export const Default: Story = {
   render: (args) => <FilterTemplate {...args} />,
+  play: async (context) => {
+    const { args, canvas, userEvent } = context;
+    // Typing searches.
+    await userEvent.type(canvas.getByPlaceholderText("Search..."), "report");
+    // The search is debounced.
+    await waitFor(() => expect(args.onSearch).toHaveBeenCalledWith("report"), {
+      timeout: 3000,
+    });
+
+    // The filter button opens the panel; Cancel closes it.
+    const panel = await openPanel(context);
+    await expect(panel.getByTestId("filter_block_header")).toHaveTextContent(
+      "Filter",
+    );
+    await userEvent.click(panel.getByTestId("filter_cancel_button"));
+    await panelClosed();
+
+    // The sort menu reports the field picked.
+    await userEvent.click(canvas.getByTestId("filter_sort_button"));
+    await userEvent.click(
+      await waitFor(() => screen.getByTestId("filter_sort_option_Size")),
+    );
+    await expect(args.onSort).toHaveBeenCalledWith("Size", "asc");
+
+    // On a desktop the single view button switches to the other view.
+    await userEvent.click(canvas.getByTestId("view-selector-icon"));
+    await expect(args.onChangeViewAs).toHaveBeenCalledWith("tile");
+  },
   parameters: {
     docs: {
       description: {
@@ -598,6 +757,21 @@ export const DocumentTypes: Story = {
   args: {
     getFilterData: () => Promise.resolve(documentTypeItems),
   },
+  play: async ({ args, userEvent }) => {
+    await filterPanel();
+    // Apply waits for a change.
+    await expect(applyButton()).toBeDisabled();
+    await userEvent.click(await waitFor(() => tag("spreadsheets")));
+    await expect(tag("spreadsheets")).toHaveAttribute("data-selected", "true");
+    await userEvent.click(applyButton());
+    await expect(args.onFilter).toHaveBeenCalledWith([
+      expect.objectContaining({
+        key: "spreadsheets",
+        group: FilterGroups.filterType,
+      }),
+    ]);
+    await panelClosed();
+  },
   parameters: {
     docs: {
       story: panelDocsStory,
@@ -626,6 +800,16 @@ export const WithSelectedFilters: Story = {
   args: {
     getFilterData: () => Promise.resolve(documentTypeItems),
     initSelectedFilterData: selectedDocuments,
+  },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByTestId("filter_selected_item_documents"),
+    ).toHaveTextContent("Documents");
+    await filterPanel();
+    await waitFor(() =>
+      expect(tag("documents")).toHaveAttribute("data-selected", "true"),
+    );
+    await expect(applyButton()).toBeDisabled();
   },
   parameters: {
     docs: {
@@ -708,6 +892,28 @@ export const MultipleFilterGroups: Story = {
         },
       ]),
   },
+  play: async ({ args, userEvent }) => {
+    const panel = await filterPanel();
+    for (const group of [
+      FilterGroups.filterType,
+      FilterGroups.filterStatus,
+      FilterGroups.filterAuthor,
+    ]) {
+      await waitFor(() =>
+        expect(panel.getByTestId(`filter_block_item_${group}`)).toBeVisible(),
+      );
+    }
+    // One pick per group, applied together.
+    await userEvent.click(tag("active"));
+    await userEvent.click(tag("me"));
+    await userEvent.click(applyButton());
+    await expect(args.onFilter).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ key: "active" }),
+        expect.objectContaining({ key: "me" }),
+      ]),
+    );
+  },
   parameters: {
     docs: {
       story: panelDocsStory,
@@ -772,6 +978,15 @@ export const RoomsFilter: Story = {
         },
       ]),
   },
+  play: async () => {
+    const panel = await filterPanel();
+    // A skeleton first, then the rooms.
+    await expect(panel.getByTestId("filter-block-loader")).toBeVisible();
+    await waitFor(() => expect(tag("room-1")).toBeVisible(), {
+      timeout: 2000,
+    });
+    await expect(panel.queryByTestId("filter-block-loader")).toBeNull();
+  },
   parameters: {
     docs: {
       story: panelDocsStory,
@@ -801,6 +1016,12 @@ export const DisabledFilter: Story = {
     isIndexEditingMode: true,
     isIndexing: true,
     getFilterData: () => Promise.resolve([]),
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByPlaceholderText("Search...")).toBeDisabled();
+    await expect(canvas.queryByTestId("filter_icon_button")).toBeNull();
+    await expect(canvas.queryByTestId("filter_sort_button")).toBeNull();
+    await expect(canvas.queryByTestId("view-selector-icon")).toBeNull();
   },
   parameters: {
     docs: {
@@ -851,6 +1072,13 @@ const ViewSelectorDefaultTemplate = () => {
 
 export const ViewSelectorDefault: Story = {
   render: () => <ViewSelectorDefaultTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const [row, tile] = canvas.getAllByTestId("view-selector-icon");
+    await expect(row.className).toMatch(/checked/);
+    await userEvent.click(tile);
+    await expect(tile.className).toMatch(/checked/);
+    await expect(row.className).not.toMatch(/checked/);
+  },
   parameters: {
     docs: {
       description: {
@@ -885,6 +1113,12 @@ const ViewSelectorDisabledTemplate = () => {
 
 export const ViewSelectorDisabled: Story = {
   render: () => <ViewSelectorDisabledTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const [row, tile] = canvas.getAllByTestId("view-selector-icon");
+    await userEvent.click(tile);
+    await expect(row.className).toMatch(/checked/);
+    await expect(tile.className).not.toMatch(/checked/);
+  },
   parameters: {
     docs: {
       description: {
@@ -912,6 +1146,16 @@ const ViewSelectorFilterModeTemplate = () => {
 
 export const ViewSelectorFilterMode: Story = {
   render: () => <ViewSelectorFilterModeTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // One button, carrying the view it switches to.
+    const button = canvas.getByTestId("view-selector-icon");
+    await expect(button).toHaveAttribute("data-view", "tile");
+    await userEvent.click(button);
+    await expect(canvas.getByTestId("view-selector-icon")).toHaveAttribute(
+      "data-view",
+      "row",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -930,6 +1174,17 @@ export const WithFilterChips: Story = {
   args: {
     initSelectedFilterData: selectedChips,
     getSelectedFilterData: () => selectedChips,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByTestId("filter_selected_item_me")).toBeVisible();
+    await userEvent.click(
+      within(canvas.getByTestId("filter_selected_item_me")).getByText("Me"),
+    );
+    await expect(args.removeSelectedItem).toHaveBeenCalledWith(
+      expect.objectContaining({ key: "me", group: FilterGroups.filterAuthor }),
+    );
+    await userEvent.click(canvas.getByTestId("filter_clear_all_link"));
+    await expect(args.clearAll).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -950,10 +1205,66 @@ export const WithFilterChips: Story = {
   },
 };
 
+export const OneFilterManyChips: Story = {
+  render: (args) => <FilterTemplate {...args} />,
+  args: {
+    initSelectedFilterData: multiChipSelection,
+    getSelectedFilterData: () => multiChipSelection,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "One filter value drawn as several chips, for a filter made of conditions the reader should see and drop one by one. Each entry of `chips` becomes a chip; clicking one calls `removeSelectedItem` with that chip's key and the item's group, and the host rebuilds the value without it.",
+      },
+      source: {
+        code: `const selected = [
+  {
+    key: serializedValue,
+    group: "filter-rating",
+    label: "Rating",
+    chips: [
+      { key: "rating", label: "Rating: 4 stars and up" },
+      { key: "reviews", label: "Reviews: 10 and more" },
+    ],
+  },
+];
+
+<Filter
+  initSelectedFilterData={selected}
+  getSelectedFilterData={() => selected}
+  removeSelectedItem={({ key, group }) => dropCondition(group, key)}
+  {...props}
+/>`,
+      },
+    },
+  },
+};
+
 export const PanelOptionKinds: Story = {
   render: (args) => <OpenPanelTemplate {...args} />,
   args: {
     getFilterData: () => Promise.resolve(optionKindItems),
+  },
+  play: async ({ args, userEvent }) => {
+    const panel = await filterPanel();
+    // A drop-down of values and a checkbox, besides the tags.
+    await waitFor(() =>
+      expect(panel.getAllByText("Anywhere")[0]).toBeVisible(),
+    );
+    const checkbox = within(
+      panel.getByTestId(
+        `filter_checkbox_container_${FilterKeys.excludeSubfolders}`,
+      ),
+    ).getByRole("checkbox");
+    await userEvent.click(checkbox);
+    await expect(checkbox).toBeChecked();
+    await userEvent.click(applyButton());
+    await expect(args.onFilter).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ key: FilterKeys.excludeSubfolders }),
+      ]),
+    );
   },
   parameters: {
     docs: {
@@ -985,6 +1296,40 @@ export const PanelOptionKinds: Story = {
   },
 };
 
+export const CustomGroupItem: Story = {
+  render: (args) => <OpenPanelTemplate {...args} />,
+  args: {
+    getFilterData: () => Promise.resolve(customGroupItems),
+    renderCustomItem: renderRatingItem,
+  },
+  parameters: {
+    docs: {
+      story: panelDocsStory,
+      description: {
+        story:
+          "A group the host draws itself, for a filter none of the built-in kinds can express. The item is marked `isCustom` and rendered by `renderCustomItem`: **Choose rating** opens a nested step with `openPanel`, a choice there sets the pending value with `onChange` and returns with `closePanel`. The value is applied and compared like any other, so Apply and `onFilter` need nothing extra.",
+      },
+      source: {
+        code: `<Filter
+  getFilterData={() => Promise.resolve([
+    { key: "filter-rating", group: "filter-rating", label: "Rating", isHeader: true, isLast: true },
+    { key: "rating", group: "filter-rating", label: "", isCustom: true },
+  ])}
+  renderCustomItem={({ value, onChange, openPanel, closePanel }) => (
+    <Button
+      label={value?.label ?? "Choose rating"}
+      onClick={() => openPanel(() => (
+        <RatingStep onChange={onChange} closePanel={closePanel} />
+      ))}
+    />
+  )}
+  {...props}
+/>`,
+      },
+    },
+  },
+};
+
 export const SortMenuOnTablet: Story = {
   render: (args) => (
     <div style={{ height: "300px" }}>
@@ -995,6 +1340,16 @@ export const SortMenuOnTablet: Story = {
   ),
   args: {
     currentDeviceType: DeviceType.tablet,
+  },
+  play: async ({ args, userEvent }) => {
+    // The view switch heads the open menu, above the sort fields.
+    await waitFor(() =>
+      expect(
+        screen.getByTestId("filter_sort_view_selector_item"),
+      ).toBeVisible(),
+    );
+    await userEvent.click(screen.getByTestId("filter_sort_option_DateAndTime"));
+    await expect(args.onSort).toHaveBeenCalledWith("DateAndTime", "asc");
   },
   parameters: {
     docs: {
@@ -1022,6 +1377,17 @@ export const WithGroupingRow: Story = {
     roomGroups: mockRoomGroups,
     getAllRoomGroups,
     currentGroupId: "2",
+    onFilterByGroup: fn(),
+    setEditRoomGroupsDialogVisible: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // The chosen group is highlighted; another chip chooses its group.
+    const current = await waitFor(() => canvas.getByTestId("room_group_tag_2"));
+    await expect(current).toHaveTextContent("Clients");
+    await userEvent.click(canvas.getByTestId("room_group_tag_1"));
+    await expect(args.onFilterByGroup).toHaveBeenCalled();
+    await userEvent.click(canvas.getByTestId("create_group_icon_button"));
+    await expect(args.setEditRoomGroupsDialogVisible).toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -1051,6 +1417,11 @@ export const WithMainButton: Story = {
     showMainButton: true,
     mainButtonProps: { text: "New", model: [] },
   },
+  play: async ({ canvas }) => {
+    await expect(
+      within(canvas.getByTestId("filter_container")).getByText("New"),
+    ).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -1068,6 +1439,37 @@ export const WithMainButton: Story = {
   },
 };
 
+export const WithoutSearch: Story = {
+  render: (args) => <FilterTemplate {...args} />,
+  args: {
+    hideSearch: true,
+    showMainButton: true,
+    mainButtonProps: { text: "New", model: [] },
+  },
+  play: async ({ canvas }) => {
+    const bar = within(canvas.getByTestId("filter_container"));
+    await expect(bar.getByText("New")).toBeVisible();
+    await expect(bar.queryByRole("searchbox")).not.toBeInTheDocument();
+    await expect(bar.queryByRole("textbox")).not.toBeInTheDocument();
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A listing whose content the server cannot search: the field is left out and the main button keeps its place, with the filter and sort controls at the end of the row (`hideSearch`).",
+      },
+      source: {
+        code: `<Filter
+  hideSearch
+  showMainButton
+  mainButtonProps={{ text: "New", model: menuItems }}
+  {...props}
+/>`,
+      },
+    },
+  },
+};
+
 export const RightToLeft: Story = {
   render: (args) => (
     <div dir="rtl">
@@ -1075,6 +1477,14 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    // The search box at the right, the buttons at the left.
+    const search = canvas.getByPlaceholderText("بحث").getBoundingClientRect();
+    const filterButton = canvas
+      .getByTestId("filter_icon_button")
+      .getBoundingClientRect();
+    await expect(search.left).toBeGreaterThan(filterButton.right);
+  },
   args: {
     placeholder: "بحث",
     initSelectedFilterData: selectedChips,
@@ -1105,17 +1515,17 @@ export const CssCustomization: Story = {
         {
           height: "140px",
           "--filter-btn-border": "1px solid #0082c9",
-          "--filter-btn-hover-border": "1px solid #004f7a",
+          "--filter-btn-hover-border": "1px solid light-dark(#004f7a, #7cc3ea)",
           "--filter-btn-open-fill": "#0082c9",
           "--filter-btn-radius": "6px",
-          "--filter-sort-bg": "#e6f3fb",
-          "--filter-sort-selected-bg": "#cce5f6",
+          "--filter-sort-bg": "light-dark(#e6f3fb, #16303e)",
+          "--filter-sort-selected-bg": "light-dark(#cce5f6, #1f4a61)",
           "--filter-sort-fill": "#0082c9",
-          "--filter-view-fill": "#e6f3fb",
+          "--filter-view-fill": "light-dark(#e6f3fb, #16303e)",
           "--filter-view-checked": "#0082c9",
           "--filter-view-border": "#0082c9",
-          "--filter-view-hover-border": "#004f7a",
-          "--filter-view-hover-icon": "#004f7a",
+          "--filter-view-hover-border": "light-dark(#004f7a, #7cc3ea)",
+          "--filter-view-hover-icon": "light-dark(#004f7a, #7cc3ea)",
         } as React.CSSProperties
       }
     >
@@ -1125,6 +1535,11 @@ export const CssCustomization: Story = {
   args: {
     getFilterData: () => Promise.resolve([]),
   },
+  play: async ({ canvas }) => {
+    const button = getComputedStyle(canvas.getByTestId("filter_icon_button"));
+    await expect(button.borderTopColor).toBe("rgb(0, 130, 201)");
+    await expect(button.borderTopLeftRadius).toBe("6px");
+  },
   parameters: {
     docs: {
       description: {
@@ -1133,17 +1548,17 @@ export const CssCustomization: Story = {
       source: {
         code: `<div style={{
   "--filter-btn-border": "1px solid #0082c9",
-  "--filter-btn-hover-border": "1px solid #004f7a",
+  "--filter-btn-hover-border": "1px solid light-dark(#004f7a, #7cc3ea)",
   "--filter-btn-open-fill": "#0082c9",
   "--filter-btn-radius": "6px",
-  "--filter-sort-bg": "#e6f3fb",
-  "--filter-sort-selected-bg": "#cce5f6",
+  "--filter-sort-bg": "light-dark(#e6f3fb, #16303e)",
+  "--filter-sort-selected-bg": "light-dark(#cce5f6, #1f4a61)",
   "--filter-sort-fill": "#0082c9",
-  "--filter-view-fill": "#e6f3fb",
+  "--filter-view-fill": "light-dark(#e6f3fb, #16303e)",
   "--filter-view-checked": "#0082c9",
   "--filter-view-border": "#0082c9",
-  "--filter-view-hover-border": "#004f7a",
-  "--filter-view-hover-icon": "#004f7a",
+  "--filter-view-hover-border": "light-dark(#004f7a, #7cc3ea)",
+  "--filter-view-hover-icon": "light-dark(#004f7a, #7cc3ea)",
 }}>
   <Filter {...props} />
 </div>`,

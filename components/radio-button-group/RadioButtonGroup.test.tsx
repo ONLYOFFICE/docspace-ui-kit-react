@@ -25,6 +25,16 @@ describe("<RadioButtonGroup />", () => {
     expect(screen.getByTestId("radio-button-group")).toBeInTheDocument();
   });
 
+  it("is a radiogroup around its options", () => {
+    render(<RadioButtonGroup {...baseProps} />);
+
+    const group = screen.getByRole("radiogroup");
+    expect(group).toBe(screen.getByTestId("radio-button-group"));
+    screen.getAllByRole("radio").forEach((radio) => {
+      expect(group).toContainElement(radio);
+    });
+  });
+
   it("renders all options", () => {
     render(<RadioButtonGroup {...baseProps} />);
 

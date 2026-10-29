@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, within } from "storybook/test";
 
 import { AsideHeader } from ".";
 import SettingsReactSvg from "../../../assets/settings.react.svg";
@@ -97,10 +98,26 @@ const meta: Meta<typeof AsideHeader> = {
       },
     },
   },
+  args: {
+    onBackClick: fn(),
+    onCloseClick: fn(),
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof AsideHeader>;
+
+const onSettingsClick = fn();
+const onInfoClick = fn();
+
+const backButton = (root: HTMLElement) =>
+  within(root).queryByTestId("aside_header_back_icon_button");
+
+const closeButton = (root: HTMLElement) =>
+  within(root).queryByTestId("aside_header_close_icon_button");
+
+// The line under the header is drawn by ::after.
+const borderOf = (header: HTMLElement) => getComputedStyle(header, "::after");
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
   <div style={{ width: "450px", border: "1px solid #eee" }}>{children}</div>
@@ -115,6 +132,16 @@ export const Default: Story = {
   args: {
     header: "Default Header",
     isCloseable: true,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const header = canvas.getByTestId("aside-header");
+    await expect(within(header).getByText("Default Header")).toBeVisible();
+    await expect(backButton(header)).toBeNull();
+    await expect(getComputedStyle(header).height).toBe("53px");
+    await expect(borderOf(header).borderBottomWidth).toBe("1px");
+
+    await userEvent.click(closeButton(header) as HTMLElement);
+    await expect(args.onCloseClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -139,6 +166,19 @@ export const WithBackButton: Story = {
     header: "Header with Back Button",
     isBackButton: true,
     isCloseable: true,
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const header = canvas.getByTestId("aside-header");
+    const back = backButton(header) as HTMLElement;
+    // The arrow comes before the title.
+    await expect(back.getBoundingClientRect().right).toBeLessThanOrEqual(
+      within(header)
+        .getByText("Header with Back Button")
+        .getBoundingClientRect().left,
+    );
+    await userEvent.click(back);
+    await expect(args.onBackClick).toHaveBeenCalledTimes(1);
+    await expect(args.onCloseClick).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {
@@ -170,15 +210,34 @@ export const WithIcons: Story = {
       {
         key: "settings",
         iconNode: <SettingsReactSvg />,
-        onClick: () => console.log("Settings clicked"),
+        onClick: onSettingsClick,
       },
       {
         key: "info",
         iconNode: <InfoOutlineReactSvg />,
-        onClick: () => console.log("Info clicked"),
+        onClick: onInfoClick,
       },
     ],
     isCloseable: true,
+  },
+  beforeEach: () => {
+    onSettingsClick.mockClear();
+    onInfoClick.mockClear();
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const icons = canvas.getByTestId("icons-container");
+    const [settings, info] = within(icons).getAllByTestId("icon-button");
+    await userEvent.click(settings);
+    await expect(onSettingsClick).toHaveBeenCalledTimes(1);
+    await expect(onInfoClick).not.toHaveBeenCalled();
+    await userEvent.click(info);
+    await expect(onInfoClick).toHaveBeenCalledTimes(1);
+    await expect(args.onCloseClick).not.toHaveBeenCalled();
+    // Between the title and the close cross.
+    const header = canvas.getByTestId("aside-header");
+    await expect(icons.getBoundingClientRect().right).toBeLessThanOrEqual(
+      (closeButton(header) as HTMLElement).getBoundingClientRect().left,
+    );
   },
   parameters: {
     docs: {
@@ -210,6 +269,14 @@ export const Loading: Story = {
     isLoading: true,
     isCloseable: true,
   },
+  play: async ({ canvas }) => {
+    const header = canvas.getByTestId("aside-header");
+    // The skeleton replaces everything, the close cross too.
+    await expect(
+      within(header).getByTestId("rectangle-skeleton"),
+    ).toBeVisible();
+    await expect(closeButton(header)).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -233,6 +300,10 @@ export const WithoutBorder: Story = {
     header: "Header without Border",
     withoutBorder: true,
     isCloseable: true,
+  },
+  play: async ({ canvas }) => {
+    const header = canvas.getByTestId("aside-header");
+    await expect(borderOf(header).content).toBe("none");
   },
   parameters: {
     docs: {
@@ -258,6 +329,11 @@ export const CustomHeight: Story = {
     headerHeight: "70px",
     isCloseable: true,
   },
+  play: async ({ canvas }) => {
+    await expect(
+      getComputedStyle(canvas.getByTestId("aside-header")).height,
+    ).toBe("70px");
+  },
   parameters: {
     docs: {
       description: {
@@ -281,6 +357,17 @@ export const BackAndClose: Story = {
     header: "A navigation header with a title too long for the panel",
     isBackButton: true,
     isCloseable: true,
+  },
+  play: async ({ canvas }) => {
+    const header = canvas.getByTestId("aside-header");
+    const title = within(header).getByText(
+      "A navigation header with a title too long for the panel",
+    );
+    // The title is cut off; the close cross stays inside the header.
+    await expect(title.scrollWidth).toBeGreaterThan(title.clientWidth);
+    await expect(
+      (closeButton(header) as HTMLElement).getBoundingClientRect().right,
+    ).toBeLessThanOrEqual(header.getBoundingClientRect().right);
   },
   parameters: {
     docs: {
@@ -313,6 +400,18 @@ export const WithCustomControl: Story = {
     ),
     isCloseable: true,
   },
+  play: async ({ canvas }) => {
+    const header = canvas.getByTestId("aside-header");
+    const invite = within(header).getByRole("button", { name: "Invite" });
+    const title = within(header).getByText("Members").getBoundingClientRect();
+    const close = (closeButton(header) as HTMLElement).getBoundingClientRect();
+    await expect(invite.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+      title.right,
+    );
+    await expect(invite.getBoundingClientRect().right).toBeLessThanOrEqual(
+      close.left,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -340,6 +439,19 @@ export const RightToLeft: Story = {
     </div>
   ),
   globals: { direction: "rtl" },
+  play: async ({ canvas }) => {
+    const header = canvas.getByTestId("aside-header");
+    // The back arrow is on the right edge, the close cross on the left.
+    const back = (backButton(header) as HTMLElement).getBoundingClientRect();
+    const close = (closeButton(header) as HTMLElement).getBoundingClientRect();
+    await expect(back.left).toBeGreaterThan(close.right);
+    // The arrow is mirrored to point right.
+    await expect(
+      getComputedStyle(
+        (backButton(header) as HTMLElement).querySelector("svg") as SVGElement,
+      ).transform,
+    ).toBe("matrix(-1, 0, 0, 1, 0, 0)");
+  },
   args: {
     header: "Details",
     isBackButton: true,
@@ -398,6 +510,26 @@ export const CssCustomization: Story = {
       </div>
     </div>
   ),
+  play: async ({ canvas }) => {
+    const [custom, centered] = canvas.getAllByTestId("aside-header");
+    await expect(getComputedStyle(custom).height).toBe("60px");
+    await expect(getComputedStyle(custom).columnGap).toBe("16px");
+    await expect(borderOf(custom).borderBottomColor).toBe("rgb(0, 130, 201)");
+    const heading = within(custom).getByText("Customized Header")
+      .parentElement as HTMLElement;
+    await expect(getComputedStyle(heading).color).toBe("rgb(0, 79, 130)");
+    await expect(getComputedStyle(heading).fontSize).toBe("18px");
+
+    // The second title is centred and has no line under it.
+    await expect(borderOf(centered).content).toBe("none");
+    const title = within(centered)
+      .getByText("Centered Title")
+      .getBoundingClientRect();
+    const box = centered.getBoundingClientRect();
+    await expect(
+      Math.abs(title.left + title.width / 2 - (box.left + box.width / 2)),
+    ).toBeLessThanOrEqual(2);
+  },
   parameters: {
     docs: {
       description: {

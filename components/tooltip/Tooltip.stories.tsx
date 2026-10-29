@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { TooltipRefProps } from "react-tooltip";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import { globalColors } from "../../providers/theme";
 import { Button, ButtonSize } from "../button";
@@ -194,6 +195,23 @@ export default meta;
 
 const bodyStyle = { marginTop: 100, marginInlineStart: 200 };
 
+// The tooltip renders in a portal and fades in.
+const shownTooltip = async (options?: { timeout: number }) => {
+  const tooltip = await screen.findByRole("tooltip", undefined, options);
+  await waitFor(() => expect(tooltip).toBeVisible(), options);
+  return tooltip;
+};
+
+const tooltipGone = () =>
+  waitFor(() => expect(screen.queryByRole("tooltip")).toBeNull());
+
+// Nothing opens within this time.
+const staysClosed = async (ms = 300) => {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+  const tooltip = screen.queryByRole("tooltip");
+  if (tooltip) await expect(tooltip).not.toBeVisible();
+};
+
 export const Default: Story = {
   render: (args) => {
     return (
@@ -213,6 +231,23 @@ export const Default: Story = {
   args: {
     float: true,
     place: "top",
+    afterShow: fn(),
+    afterHide: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const anchor = canvas.getByText("Hover me");
+    await userEvent.hover(anchor);
+    const tooltip = await shownTooltip();
+    await expect(tooltip).toHaveTextContent("Simple tooltip");
+    await waitFor(() => expect(args.afterShow).toHaveBeenCalled());
+    // The arrow is rendered but hidden by default.
+    await expect(
+      tooltip.querySelector(".react-tooltip-arrow"),
+    ).not.toBeVisible();
+
+    await userEvent.unhover(anchor);
+    await tooltipGone();
+    await waitFor(() => expect(args.afterHide).toHaveBeenCalled());
   },
   parameters: {
     docs: {
@@ -253,6 +288,13 @@ const CustomStylingTemplate = () => {
 
 export const CustomStyling: Story = {
   render: () => <CustomStylingTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.hover(canvas.getByText("Hover for styled tooltip"));
+    const tooltip = await shownTooltip();
+    await expect(getComputedStyle(tooltip).maxWidth).toBe("200px");
+    await waitFor(() => expect(getComputedStyle(tooltip).opacity).toBe("0.9"));
+    await expect(tooltip.querySelector(".react-tooltip-arrow")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -292,6 +334,27 @@ const ClickToShowTemplate = () => {
 
 export const ClickToShow: Story = {
   render: () => <ClickToShowTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const anchor = canvas.getByText("Click me");
+    await userEvent.hover(anchor);
+    await staysClosed();
+
+    await userEvent.click(anchor);
+    const tooltip = await shownTooltip();
+    await expect(tooltip).toHaveTextContent("Click-triggered tooltip");
+    // Placed on the right of the link.
+    await expect(tooltip.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+      anchor.getBoundingClientRect().right,
+    );
+    await userEvent.click(anchor);
+    await tooltipGone();
+
+    // Escape closes it too.
+    await userEvent.click(anchor);
+    await shownTooltip();
+    await userEvent.keyboard("{Escape}");
+    await tooltipGone();
+  },
   parameters: {
     docs: {
       description: {
@@ -339,6 +402,14 @@ const RichContentTemplate = () => {
 
 export const RichContent: Story = {
   render: () => <RichContentTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.hover(canvas.getByText("Hover for rich content"));
+    const tooltip = await shownTooltip();
+    // The title comes from the anchor's data-tooltip-content.
+    await expect(tooltip).toHaveTextContent("Team member");
+    await expect(tooltip).toHaveTextContent("name@example.com");
+    await expect(tooltip).toHaveTextContent("Developer");
+  },
   parameters: {
     docs: {
       description: {
@@ -410,6 +481,18 @@ const DynamicGroupTemplate = () => {
 
 export const SharedByManyAnchors: Story = {
   render: () => <DynamicGroupTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    // One tooltip, a different member for each anchor.
+    await userEvent.hover(canvas.getByText("Member B"));
+    await expect(await shownTooltip()).toHaveTextContent("b@example.com");
+    await userEvent.hover(canvas.getByText("Member C"));
+    await waitFor(() =>
+      expect(screen.getByRole("tooltip")).toHaveTextContent("Manager"),
+    );
+    await expect(screen.getByRole("tooltip")).not.toHaveTextContent(
+      "b@example.com",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -451,6 +534,12 @@ const FixedContentTemplate = () => {
 
 export const FixedContent: Story = {
   render: () => <FixedContentTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.hover(canvas.getByText("Hover me"));
+    await expect(await shownTooltip()).toHaveTextContent(
+      "Shown for every anchor without text of its own",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -483,6 +572,16 @@ const AnchoredBySelectorTemplate = () => {
 
 export const AnchoredBySelector: Story = {
   render: () => <AnchoredBySelectorTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const second = canvas.getByText("Second");
+    await userEvent.hover(second);
+    const tooltip = await shownTooltip();
+    await expect(tooltip).toHaveTextContent("Second file");
+    // Placed below the link.
+    await expect(tooltip.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+      second.getBoundingClientRect().bottom,
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -519,6 +618,15 @@ const ClickableContentTemplate = () => {
 
 export const ClickableContent: Story = {
   render: () => <ClickableContentTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.hover(canvas.getByText("Hover me"));
+    const tooltip = await shownTooltip();
+    // Moving into the tooltip keeps it open, so its link can be reached.
+    await userEvent.hover(tooltip);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await expect(screen.getByRole("tooltip")).toBeVisible();
+    await expect(screen.getByText("follow the link")).toBeVisible();
+  },
   parameters: {
     docs: {
       description: {
@@ -555,6 +663,14 @@ const DelayedAppearanceTemplate = () => {
 
 export const DelayedAppearance: Story = {
   render: () => <DelayedAppearanceTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.hover(canvas.getByText("Rest the pointer here"));
+    // Nothing during the first half second, the tooltip after the delay.
+    await staysClosed(500);
+    await expect(await shownTooltip({ timeout: 2000 })).toHaveTextContent(
+      "Appears after one second",
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -595,6 +711,19 @@ const ControlledOpenTemplate = () => {
 
 export const ControlledOpen: Story = {
   render: () => <ControlledOpenTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const button = canvas.getByRole("button", { name: "Show tooltip" });
+    await userEvent.hover(button);
+    await staysClosed();
+
+    await userEvent.click(button);
+    await expect(await shownTooltip()).toHaveTextContent(
+      "Opened by the button, not by hover",
+    );
+    await expect(button).toHaveTextContent("Hide tooltip");
+    await userEvent.click(button);
+    await tooltipGone();
+  },
   parameters: {
     docs: {
       description: {
@@ -661,6 +790,20 @@ const OpenedFromCodeTemplate = () => {
 
 export const OpenedFromCode: Story = {
   render: () => <OpenedFromCodeTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const open = canvas.getByRole("button", { name: "Open" });
+    await userEvent.hover(open);
+    await staysClosed();
+
+    await userEvent.click(open);
+    const tooltip = await shownTooltip();
+    await expect(tooltip).toHaveTextContent("Opened from code");
+    await expect(tooltip.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+      open.getBoundingClientRect().bottom,
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Close" }));
+    await tooltipGone();
+  },
   parameters: {
     docs: {
       description: {
@@ -716,6 +859,16 @@ export const CssCustomization: Story = {
       />
     </div>
   ),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.hover(canvas.getByText("Hover to see custom tooltip"));
+    const tooltip = getComputedStyle(await shownTooltip());
+    await expect(tooltip.backgroundColor).toBe("rgb(30, 27, 75)");
+    await expect(tooltip.color).toBe("rgb(224, 231, 255)");
+    await expect(tooltip.borderTopLeftRadius).toBe("16px");
+    await expect(tooltip.maxWidth).toBe("180px");
+    await expect(tooltip.fontSize).toBe("14px");
+    await expect(tooltip.paddingLeft).toBe("20px");
+  },
   parameters: {
     docs: {
       description: {

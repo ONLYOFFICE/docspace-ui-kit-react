@@ -24,6 +24,7 @@ const SelectionArea = ({
   containerClass,
   itemClass,
   onMouseDown,
+  startAreaSelector = "#sectionScroll",
 }: SelectionAreaProps) => {
   const areaLocation = React.useRef({ x1: 0, x2: 0, y1: 0, y2: 0 });
   const areaRect = React.useRef(new DOMRect());
@@ -32,6 +33,9 @@ const SelectionArea = ({
   const elemRect = React.useRef({ top: 0, left: 0, width: 0, height: 0 });
   const scrollDelta = React.useRef({ x: 0, y: 0 });
   const scrollElement = React.useRef<null | Element>(null);
+  // Where the `scroll` events of `scrollElement` arrive: the element itself,
+  // or the document when the element is the page's own scroller.
+  const scrollEventTarget = React.useRef<null | Element | Document>(null);
   const scrollSpeed = React.useRef({ x: 0, y: 0 });
   const selectableNodes = React.useRef(new Set<Element>());
 
@@ -282,26 +286,25 @@ const SelectionArea = ({
     [frame],
   );
 
-  const onScroll = React.useCallback<EventListener>(
-    (e: Event) => {
-      const { scrollTop, scrollLeft } = e.target as HTMLElement;
+  const onScroll = React.useCallback<EventListener>(() => {
+    if (!scrollElement.current) return;
 
-      areaLocation.current.x1 += scrollDelta.current.x - scrollLeft;
-      areaLocation.current.y1 += scrollDelta.current.y - scrollTop;
-      scrollDelta.current.x = scrollLeft;
-      scrollDelta.current.y = scrollTop;
+    const { scrollTop, scrollLeft } = scrollElement.current;
 
-      const selectables = document.getElementsByClassName(selectableClass);
+    areaLocation.current.x1 += scrollDelta.current.x - scrollLeft;
+    areaLocation.current.y1 += scrollDelta.current.y - scrollTop;
+    scrollDelta.current.x = scrollLeft;
+    scrollDelta.current.y = scrollTop;
 
-      for (let i = 0; i < selectables.length; i += 1) {
-        const node = selectables[i];
-        selectableNodes.current.add(node);
-      }
+    const selectables = document.getElementsByClassName(selectableClass);
 
-      frame().next();
-    },
-    [frame, selectableClass],
-  );
+    for (let i = 0; i < selectables.length; i += 1) {
+      const node = selectables[i];
+      selectableNodes.current.add(node);
+    }
+
+    frame().next();
+  }, [frame, selectableClass]);
 
   const onMoveAction = React.useCallback(
     (e: MouseEvent) => {
@@ -316,6 +319,9 @@ const SelectionArea = ({
       ) {
         document.removeEventListener("mousemove", onMoveAction);
 
+        // The drag has begun: whatever an earlier drag selected is dropped.
+        onMove?.({ added: [], removed: [], clear: true });
+
         document.addEventListener("mousemove", onTapMove, {
           passive: false,
         });
@@ -325,15 +331,14 @@ const SelectionArea = ({
         onTapMove(e);
       }
     },
-    [onTapMove],
+    [onMove, onTapMove],
   );
 
   const removeListeners = React.useCallback(() => {
     document.removeEventListener("mousemove", onMoveAction);
     document.removeEventListener("mousemove", onTapMove);
 
-    if (scrollElement.current)
-      scrollElement.current.removeEventListener("scroll", onScroll);
+    scrollEventTarget.current?.removeEventListener("scroll", onScroll);
   }, [onMoveAction, onScroll, onTapMove]);
 
   const onTapStop = React.useCallback(() => {
@@ -368,8 +373,7 @@ const SelectionArea = ({
 
     window.addEventListener("blur", onTapStop);
 
-    if (scrollElement.current)
-      scrollElement.current.addEventListener("scroll", onScroll);
+    scrollEventTarget.current?.addEventListener("scroll", onScroll);
   }, [onMoveAction, onScroll, onTapStop]);
 
   const onTapStart = React.useCallback(
@@ -385,7 +389,7 @@ const SelectionArea = ({
         target.closest(".tile-selected") ||
         target.closest(".table-row-selected") ||
         target.closest(".row-selected") ||
-        !target.closest("#sectionScroll") ||
+        !target.closest(startAreaSelector) ||
         target.closest(".table-container_row-checkbox") ||
         target.closest(".item-file-name")
       )
@@ -397,30 +401,22 @@ const SelectionArea = ({
 
       areaLocation.current = { x1: e.clientX, y1: e.clientY, x2: 0, y2: 0 };
 
+      // The element matching `scrollClass`, or the page's own scroller when
+      // nothing matches it. The page's scroller reports its `scroll` events
+      // on the document rather than on itself.
+      const pageScroller =
+        document.scrollingElement ?? document.documentElement;
       const scroll =
-        scrollClass && document.getElementsByClassName(scrollClass)
+        (scrollClass
           ? document.getElementsByClassName(scrollClass)[0]
-          : document;
+          : undefined) ?? pageScroller;
 
-      if (scroll instanceof Element) {
-        scrollElement.current = scroll;
-      }
-
-      if (scroll instanceof Element)
-        scrollDelta.current = {
-          x: scroll.scrollLeft,
-          y: scroll.scrollTop,
-        };
-
-      const threshold = 10;
-      const { x1, y1 } = areaLocation.current;
-
-      if (
-        Math.abs(e.clientX - x1) >= threshold ||
-        Math.abs(e.clientY - y1) >= threshold
-      ) {
-        onMove?.({ added: [], removed: [], clear: true });
-      }
+      scrollElement.current = scroll;
+      scrollEventTarget.current = scroll === pageScroller ? document : scroll;
+      scrollDelta.current = {
+        x: scroll.scrollLeft,
+        y: scroll.scrollTop,
+      };
 
       addListeners();
 
@@ -432,15 +428,13 @@ const SelectionArea = ({
       try {
         const itemsContainerRect = itemsContainer[0].getBoundingClientRect();
 
-        if (scroll instanceof Element) {
-          if (!isRooms && viewAs === "tile") {
-            elemRect.current.top =
-              scroll.scrollTop + itemsContainerRect.top + folderHeaderHeight!;
-            elemRect.current.left = scroll.scrollLeft + itemsContainerRect.left;
-          } else {
-            elemRect.current.top = scroll.scrollTop + itemsContainerRect.top;
-            elemRect.current.left = scroll.scrollLeft + itemsContainerRect.left;
-          }
+        if (!isRooms && viewAs === "tile") {
+          elemRect.current.top =
+            scroll.scrollTop + itemsContainerRect.top + folderHeaderHeight!;
+          elemRect.current.left = scroll.scrollLeft + itemsContainerRect.left;
+        } else {
+          elemRect.current.top = scroll.scrollTop + itemsContainerRect.top;
+          elemRect.current.left = scroll.scrollLeft + itemsContainerRect.left;
         }
       } catch (err) {
         console.error("Error getting container bounds:", err);
@@ -459,9 +453,10 @@ const SelectionArea = ({
       folderHeaderHeight,
       isRooms,
       itemsContainerClass,
-      onMove,
+      onMouseDown,
       scrollClass,
       selectableClass,
+      startAreaSelector,
       viewAs,
     ],
   );

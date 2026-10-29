@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor } from "storybook/test";
 import type { TGroupMenuItem } from "../../Table.types";
 
 import { GroupMenuItem } from "./GroupMenuItem";
@@ -37,11 +38,26 @@ The Table README describes it in full.`,
       },
     },
   },
+  beforeEach: () => {
+    onItemClick.mockClear();
+    onFirstOption.mockClear();
+    onSecondOption.mockClear();
+  },
 } satisfies Meta<typeof GroupMenuItem>;
 
 type Story = StoryObj<ComponentProps<typeof GroupMenuItem>>;
 
 export default meta;
+
+const onItemClick = fn();
+const onFirstOption = fn();
+const onSecondOption = fn();
+
+// The menu of options is portalled and stays mounted while closed.
+const shownOption = (name: string) =>
+  screen
+    .queryAllByRole("option", { name })
+    .find((option) => option.checkVisibility());
 
 const createMenuItem = (
   overrides: Partial<TGroupMenuItem> = {},
@@ -49,7 +65,7 @@ const createMenuItem = (
   return {
     label: "Menu Item",
     disabled: false,
-    onClick: () => {},
+    onClick: onItemClick,
     iconUrl: "",
     title: "Menu Item Title",
     withDropDown: false,
@@ -64,6 +80,12 @@ export const Default: Story = {
   args: {
     item: createMenuItem(),
     isBlocked: false,
+  },
+  play: async ({ canvas, userEvent }) => {
+    const button = canvas.getByTestId("group-menu-item-button");
+    await expect(button).toHaveTextContent("Menu Item");
+    await userEvent.click(button);
+    await expect(onItemClick).toHaveBeenCalledTimes(1);
   },
   parameters: {
     docs: {
@@ -97,16 +119,27 @@ export const WithDropdown: Story = {
         {
           key: "option-1",
           label: "Option 1",
-          onClick: () => {},
+          onClick: onFirstOption,
         },
         {
           key: "option-2",
           label: "Option 2",
-          onClick: () => {},
+          onClick: onSecondOption,
         },
       ],
     }),
     isBlocked: false,
+  },
+  play: async ({ canvas, userEvent }) => {
+    await expect(shownOption("Option 1")).toBeUndefined();
+    // The button opens its options; picking one closes them.
+    await userEvent.click(canvas.getByTestId("group-menu-item-button"));
+    await expect(onItemClick).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(shownOption("Option 2")).toBeDefined());
+    await userEvent.click(shownOption("Option 2") as HTMLElement);
+    await expect(onSecondOption).toHaveBeenCalledTimes(1);
+    await expect(onFirstOption).not.toHaveBeenCalled();
+    await waitFor(() => expect(shownOption("Option 2")).toBeUndefined());
   },
   parameters: {
     docs: {
@@ -141,6 +174,10 @@ export const Blocked: Story = {
   args: {
     item: createMenuItem(),
     isBlocked: true,
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByTestId("group-menu-item-button")).toBeDisabled();
+    await expect(onItemClick).not.toHaveBeenCalled();
   },
   parameters: {
     docs: {

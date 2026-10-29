@@ -1,8 +1,9 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, fn, screen, waitFor } from "storybook/test";
 
 import { ContextMenuModel } from "../../context-menu";
-import { TableCell } from "../sub-components/table-cell";
+import FileCells, { storyFiles } from "../../../.storybook/utils/FileCells";
 import { TableRow } from "./TableRow";
 
 const meta = {
@@ -144,6 +145,12 @@ The Table README describes it in full.`,
       display: "grid",
       gridTemplateColumns: "repeat(3, 1fr) 24px",
     },
+    fileContextClick: fn(),
+    onHideContextMenu: fn(),
+    onClick: fn(),
+    onDoubleClick: fn(),
+    onMouseEnter: fn(),
+    onMouseLeave: fn(),
   },
 } satisfies Meta<typeof TableRow>;
 
@@ -151,32 +158,30 @@ type Story = StoryObj<ComponentProps<typeof TableRow>>;
 
 export default meta;
 
+const onEditOption = fn();
+const onDeleteOption = fn();
+
 const contextOptions: ContextMenuModel[] = [
   {
     key: "edit",
     label: "Edit",
-    onClick: () => console.log("Edit clicked"),
+    onClick: onEditOption,
   },
   {
     key: "delete",
     label: "Delete",
-    onClick: () => console.log("Delete clicked"),
+    onClick: onDeleteOption,
   },
 ];
 
-const RowContent = (
-  <>
-    <TableCell>
-      <span>Cell 1</span>
-    </TableCell>
-    <TableCell>
-      <span>Cell 2</span>
-    </TableCell>
-    <TableCell>
-      <span>Cell 3</span>
-    </TableCell>
-  </>
-);
+// The menu is portalled and fades in.
+const menuItem = async (name: string) => {
+  const item = await screen.findByRole("menuitem", { name });
+  await waitFor(() => expect(item).toBeVisible());
+  return item;
+};
+
+const RowContent = <FileCells file={storyFiles[0]} />;
 
 export const Default: Story = {
   render: (args) => <TableRow {...args} />,
@@ -186,6 +191,25 @@ export const Default: Story = {
     selectionProp: { className: "selection-class" },
     title: "Context menu",
     contextOptions,
+  },
+  beforeEach: () => {
+    onDeleteOption.mockClear();
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const row = canvas.getByTestId("table-row");
+    await expect(row).toHaveClass("custom-row-class", "table-container_row");
+
+    await userEvent.click(canvas.getByText("Annual Report 2025"));
+    await expect(args.onClick).toHaveBeenCalled();
+    await userEvent.dblClick(canvas.getByText("Document"));
+    await expect(args.onDoubleClick).toHaveBeenCalled();
+
+    // The menu button opens the row's menu beside it.
+    await userEvent.click(canvas.getByTestId("context-menu-button"));
+    await expect(args.fileContextClick).toHaveBeenCalledWith(false);
+    await userEvent.click(await menuItem("Delete"));
+    await expect(onDeleteOption).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(args.onHideContextMenu).toHaveBeenCalled());
   },
   parameters: {
     docs: {
@@ -198,9 +222,9 @@ export const Default: Story = {
   contextOptions={contextOptions}
   style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr) 24px" }}
 >
-  <TableCell><span>Cell 1</span></TableCell>
-  <TableCell><span>Cell 2</span></TableCell>
-  <TableCell><span>Cell 3</span></TableCell>
+  <TableCell>{nameCell}</TableCell>
+  <TableCell><Text fontSize="12px" fontWeight={600} color="#A3A9AE">Document</Text></TableCell>
+  <TableCell><Text fontSize="12px" fontWeight={600} color="#A3A9AE">Finance</Text></TableCell>
 </TableRow>`,
       },
     },
@@ -215,6 +239,13 @@ export const IndexEditingMode: Story = {
     selectionProp: { className: "selection-class" },
     isIndexEditingMode: true,
   },
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvas.getByText("Finance")).toBeVisible();
+    // No last cell with a menu while the index is edited.
+    await expect(
+      canvasElement.querySelector(".context-menu-container"),
+    ).toBeNull();
+  },
   parameters: {
     docs: {
       description: {
@@ -226,9 +257,9 @@ export const IndexEditingMode: Story = {
   isIndexEditingMode
   style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr) 24px" }}
 >
-  <TableCell><span>Cell 1</span></TableCell>
-  <TableCell><span>Cell 2</span></TableCell>
-  <TableCell><span>Cell 3</span></TableCell>
+  <TableCell>{nameCell}</TableCell>
+  <TableCell><Text fontSize="12px" fontWeight={600} color="#A3A9AE">Document</Text></TableCell>
+  <TableCell><Text fontSize="12px" fontWeight={600} color="#A3A9AE">Finance</Text></TableCell>
 </TableRow>`,
       },
     },

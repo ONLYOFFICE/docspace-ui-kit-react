@@ -1,0 +1,37 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  max-width: 660px;
+}
+
+.description {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.sectionBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-inline-start: 40px;
+  margin-bottom: 32px;
+
+  @media (max-width: 600px) {
+    padding-inline-start: 0;
+  }
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

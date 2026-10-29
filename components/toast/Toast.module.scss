@@ -3,17 +3,48 @@
 @use "../../styles/variables/colors" as *;
 
 .iconButton {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin: 0;
+  padding: 2px 0 0;
+  border: none;
+  background: none;
+  line-height: 0;
+  cursor: pointer;
   opacity: 0.5;
-  padding-top: 2px;
-  &:hover {
+
+  &:hover,
+  &:focus-visible {
     opacity: 1;
   }
 
   svg {
+    width: 12px;
+    height: 12px;
+
     path {
       fill: var(--toastr-close-button-color);
     }
   }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover svg path {
+      fill: var(--toastr-close-button-hover-color);
+    }
+  }
+}
+
+// A toast opened without `withCross` closes on click; its close button is
+// there for the keyboard and stays out of sight until it is focused.
+:global(.Toastify__toast--close-on-click) .iconButton:not(:focus-visible) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 :global(.rtl) {
@@ -50,7 +81,8 @@
       --toast-warning-hover-bg: #{$black};
 
       --toastr-text-color: #{$dark-gray-dark};
-      --toastr-close-button-color: #{$dark-gray-dark};
+      --toastr-close-button-color: #{$gray-dark};
+      --toastr-close-button-hover-color: #{$white};
 
       --toastr-title-success-color: #{$dark-toast-done};
       --toastr-svg-success-color: #{$dark-toast-done};
@@ -93,7 +125,10 @@
   --toast-warning-hover-bg: #{$light-toast-alert};
 
   --toastr-text-color: #{$black};
-  --toastr-close-button-color: #{$black};
+  // The grey the cross had as an IconButton, whose own fill rule outranked
+  // this one until the close button became a native <button>.
+  --toastr-close-button-color: #{$gray};
+  --toastr-close-button-hover-color: #{$light-gray-dark};
 
   --toastr-title-success-color: #{$dark-black};
   --toastr-svg-success-color: #{$black};

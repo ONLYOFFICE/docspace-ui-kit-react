@@ -164,10 +164,10 @@ const SimpleTopUpDialogContent = observer(
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({ event: AnalyticsEvents.WalletTopUp });
 
-        const requests: Promise<unknown>[] = [fetchBalance(true)];
-        if (fetchTransactionHistory)
-          requests.push(fetchTransactionHistory(serviceName));
-        await Promise.allSettled(requests);
+        fetchTransactionHistory?.(serviceName);
+        // The top-up went through; a balance that fails to refresh must not
+        // turn its success into an error.
+        await fetchBalance(true).catch(() => undefined);
 
         if (isDelayedPaymentMethod) {
           toastr.success(t("TopUpDelayedPaymentMethodWarning"));

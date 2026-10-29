@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect } from "react";
 
 import { useInterfaceDirection } from "../../../context/InterfaceDirectionContext";
+import { useTheme } from "../../../context/ThemeContext";
 import { useIsMobile } from "../../../hooks/use-is-mobile";
 import { INFO_PANEL_WIDTH } from "../../../utils/device";
 import {
@@ -9,6 +10,7 @@ import {
   FLOATING_CORNER_INSET_MOBILE,
   FLOATING_CORNER_SIZE,
 } from "../../../constants";
+import { globalColors } from "../../../providers/theme";
 import { Zendesk } from "../zendesk";
 import { zendeskAPI } from "../zendesk/Zendesk.utils";
 import { ArticleLiveChatProps } from "../Article.types";
@@ -31,8 +33,9 @@ const Z_INDEX = 201;
  * The account serves the messaging Web Widget, so every command goes through
  * the `messenger` namespace. The Web Widget (Classic) `webWidget` commands are
  * not ignored there, they throw ("Method webWidget.hide does not exist"), and
- * the messaging widget has no API for the launcher label, the colour or a
- * visitor prefill: those are Admin Center settings.
+ * the messaging widget has no API for the launcher label or a visitor
+ * prefill: those are Admin Center settings. Its colours can be set, and follow
+ * the portal's accent and the light or dark theme.
  */
 const ArticleLiveChat = ({
   languageBaseName,
@@ -42,7 +45,11 @@ const ArticleLiveChat = ({
   isInfoPanelVisible = false,
 }: ArticleLiveChatProps) => {
   const { isRTL } = useInterfaceDirection();
+  const { isBase, currentColorScheme } = useTheme();
   const isMobileWidth = useIsMobile();
+
+  const accent = currentColorScheme?.main?.accent ?? globalColors.lightBlueMain;
+  const onAccent = currentColorScheme?.text?.accent ?? globalColors.white;
 
   useEffect(() => {
     zendeskAPI.addChanges("messenger:set", "locale", languageBaseName);
@@ -71,13 +78,38 @@ const ArticleLiveChat = ({
     // The widget keeps a second offset for what it takes to be a phone. It
     // gets the same one, so the breakpoint stays ours - useIsMobile, which is
     // what the create button's stylesheet keys off too.
+    // Position and theme go in one call, so neither can be dropped by a
+    // later customization that carries only the other.
     zendeskAPI.addChanges("messenger:set", "customization", {
       position: {
         side: isRTL ? "left" : "right",
         offset: { web: offset, mobile: offset },
       },
+      theme: {
+        primary: accent,
+        onPrimary: onAccent,
+        action: accent,
+        onAction: onAccent,
+        onSecondaryAction: accent,
+        message: accent,
+        onMessage: onAccent,
+        background: isBase ? globalColors.white : globalColors.black,
+        onBackground: isBase ? globalColors.black : globalColors.white,
+        businessMessage: isBase
+          ? globalColors.paleGray
+          : globalColors.grayDarkStrong,
+        onBusinessMessage: isBase ? globalColors.black : globalColors.white,
+      },
     });
-  }, [withFloatingButton, isInfoPanelVisible, isMobileWidth, isRTL]);
+  }, [
+    withFloatingButton,
+    isInfoPanelVisible,
+    isMobileWidth,
+    isRTL,
+    isBase,
+    accent,
+    onAccent,
+  ]);
 
   const onZendeskLoaded = useCallback(() => {
     zendeskAPI.addChanges("messenger:set", "zIndex", Z_INDEX);

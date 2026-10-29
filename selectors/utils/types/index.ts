@@ -62,6 +62,7 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
 
 export type UseAgentsHelperProps = TUseInputItemHelper & {
   searchValue?: string;
+  onCreateAIAgent?: () => void;
   // isRoomsOnly: boolean;
   excludeItems?: (number | string | undefined)[];
   isInit: boolean;
@@ -98,7 +99,6 @@ export type UseSocketHelperProps = {
   disabledItems: (string | number)[];
   disabledFolderType?: FolderType;
   filterParam?: string | number;
-  withCreate?: boolean;
   disableBySecurity?: string;
   isRoomDisabled?: (room: FolderDtoInteger) => boolean;
 };

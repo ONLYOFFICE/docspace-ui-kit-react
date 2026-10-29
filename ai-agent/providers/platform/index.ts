@@ -1,4 +1,5 @@
 import type { ExportFormat, PlatformAdapter } from "@onlyoffice/ai-chat";
+import copy from "copy-to-clipboard";
 import { useEffect, useMemo, useRef, useState, useEffectEvent } from "react";
 
 import { toastr } from "../../../components/toast";
@@ -35,6 +36,39 @@ const showHostToast: NonNullable<PlatformAdapter["showToast"]> = (
   meta,
 ) => {
   toastr.success(text, meta?.heading);
+};
+
+// Every copy action of the chat - a message, a code block, a tool card - goes
+// through this writer once the adapter declares it. Without one the library
+// calls `navigator.clipboard.writeText`, and the Clipboard API exists only in
+// a secure context: on a portal served over plain HTTP `navigator.clipboard`
+// is undefined and every copy button threw (Bug 84481). There the copy falls
+// back to `copy-to-clipboard`, whose `execCommand("copy")` needs no secure
+// context and, with nothing awaited first, still runs inside the click that
+// triggered it. The fallback after a rejected `writeText` does not: it runs
+// after an `await`, which Safari no longer counts as part of the gesture. An
+// unfocused document is the one rejection known up front, so it skips
+// `writeText` and copies synchronously instead. A failed copy rejects, so the
+// button does not report "Copied".
+export const copyToHostClipboard: NonNullable<
+  PlatformAdapter["copyToClipboard"]
+> = async (text) => {
+  if (
+    isBrowser &&
+    window.isSecureContext &&
+    navigator.clipboard &&
+    document.hasFocus()
+  ) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch {
+      // A denied permission or an unfocused document - try the legacy path.
+    }
+  }
+  if (!copy(text, { format: "text/plain" })) {
+    throw new Error("Copying to the clipboard failed");
+  }
 };
 
 export type SaveAsFileHandler = (
@@ -133,6 +167,7 @@ export const usePlatformAdapter = ({
       hostTools: null,
       clouds: null,
       showToast: showHostToast,
+      copyToClipboard: copyToHostClipboard,
       env: {
         theme: theme ?? themeIdForSystem(getSystemTheme()),
         systemTheme,

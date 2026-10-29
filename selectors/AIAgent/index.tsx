@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo } from "react";
 
 import InfoIconSvgUrl from "../../assets/info.outline.react.svg";
-import EmptyScreenAIAgentsSelectorLight from "../../assets/ai.agents.selector.light.react.svg";
-import EmptyScreenAIAgentsSelectorDark from "../../assets/ai.agents.selector.dark.react.svg";
+import EmptyScreenAIAgentsSelectorLight from "../../assets/emptyview/empty.agents.info.light.svg";
+import EmptyScreenAIAgentsSelectorDark from "../../assets/emptyview/empty.agents.info.dark.svg";
 
 import { useTheme } from "../../context/ThemeContext";
 import { useCommonTranslation } from "../../utils/i18n";
@@ -26,6 +26,13 @@ import {
 
 import type { AIAgentSelectorProps } from "./AIAgent.types";
 import { convertToItems } from "./AIAgent.utils";
+
+type TExcludeItems = AIAgentSelectorProps["excludeItems"];
+
+const sameIds = (a: TExcludeItems, b: TExcludeItems) =>
+  a === b ||
+  ((a?.length ?? 0) === (b?.length ?? 0) &&
+    (a ?? []).every((id, index) => id === b?.[index]));
 
 const AIAgentSelectorComponent = ({
   id,
@@ -138,7 +145,6 @@ const AIAgentSelectorComponent = ({
   );
 
   const { subscribe } = useSocketHelper({
-    withCreate: true,
     setTotal,
     setItems,
     disabledItems: [],
@@ -157,7 +163,7 @@ const AIAgentSelectorComponent = ({
     [startContentLoading],
   );
 
-  const { getAgentList: onLoadNextPage } = useAgentsHelper({
+  const { getAgentList } = useAgentsHelper({
     withCreate: true,
     isInit: isInitRef.current,
     setIsInit,
@@ -173,6 +179,43 @@ const AIAgentSelectorComponent = ({
     subscribe,
     disableBySecurity,
   });
+
+  // `Selector` asks for page 0 on mount, and again whenever this callback
+  // changes -- which it does for reasons of its own, not only when the list
+  // should change. With `withInit` page 0 is `initItems`, already on screen,
+  // so it is not fetched while it still describes the list: asking the portal
+  // would replace the items the caller passed. Once `excludeItems` or
+  // `disableBySecurity` differ from what `initItems` were shown with, page 0
+  // is fetched as usual from then on. The translation is not compared: it
+  // changes with the language, which is what hydration does on a page served
+  // in English to a user of another, and the caller's items stay right. A
+  // search, or clearing one, fetches too, and so do later pages when
+  // `initHasNextPage` says there are more.
+  const initInputs = React.useRef({ excludeItems, disableBySecurity });
+  const initItemsCurrent = React.useRef(true);
+
+  const onLoadNextPage = React.useCallback(
+    async (startIndex: number) => {
+      if (
+        withInit &&
+        startIndex === 0 &&
+        !afterSearch.current &&
+        initItemsCurrent.current
+      ) {
+        const init = initInputs.current;
+        const unchanged =
+          init.disableBySecurity === disableBySecurity &&
+          sameIds(init.excludeItems, excludeItems);
+
+        if (unchanged) return;
+
+        initItemsCurrent.current = false;
+      }
+
+      await getAgentList(startIndex);
+    },
+    [withInit, getAgentList, disableBySecurity, excludeItems],
+  );
 
   React.useEffect(() => {
     const withInfo =

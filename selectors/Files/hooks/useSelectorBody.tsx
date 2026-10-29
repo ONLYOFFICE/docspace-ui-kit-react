@@ -1,9 +1,4 @@
-import { use, useMemo } from "react";
-
-import EmptyScreenFilterFilesLight from "../../../assets/emptyFilter/empty.filter.files.light.svg";
-import EmptyScreenFilterFilesDark from "../../../assets/emptyFilter/empty.filter.files.dark.svg";
-import EmptyScreenRoomsLight from "../../../assets/emptyview/empty.rooms.root.user.light.svg";
-import EmptyScreenRoomsDark from "../../../assets/emptyview/empty.rooms.root.user.dark.svg";
+import { use } from "react";
 
 import { useCommonTranslation } from "../../../utils/i18n";
 import {
@@ -20,13 +15,10 @@ import {
   type TSelectorSearch,
   type TSelectorSubmitButton,
 } from "../../../components/selector";
-import {
-  FolderType,
-  type FolderDtoInteger,
-} from "@onlyoffice/docspace-api-sdk";
-import { useTheme } from "../../../context/ThemeContext";
+import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
 
 import type { FilesSelectorProps } from "../FilesSelector.types";
+import useEmptyScreenProps from "./useEmptyScreenProps";
 import { LoadersContext } from "../../utils/contexts/Loaders";
 import { SettingsContext } from "../../utils/contexts/Settings";
 
@@ -112,6 +104,7 @@ const useSelectorBody = ({
 
   selectedItemType,
   selectedTreeNode,
+  agentsEmptyDescription,
 }: Omit<FilesSelectorProps, "withSearch" | "onSubmit"> &
   PickedSearchProps &
   PickedSubmitButtonProps &
@@ -119,7 +112,6 @@ const useSelectorBody = ({
   PickedSelectorBodyProps &
   SelectedTreeNodeProps) => {
   const t = useCommonTranslation();
-  const { isBase } = useTheme();
 
   const {
     showBreadCrumbsLoader,
@@ -136,7 +128,8 @@ const useSelectorBody = ({
         headerProps: {
           ...headerProps,
           headerLabel: headerProps?.headerLabel || t("SelectAction"),
-          onCloseClick: onCancel,
+          // The caller's own close handler wins; onCancel is the fallback.
+          onCloseClick: headerProps?.onCloseClick ?? onCancel,
         },
       }
     : {};
@@ -196,31 +189,19 @@ const useSelectorBody = ({
       }
     : {};
 
-  const isKnowledgeFolder = selectedTreeNode?.type === FolderType.Knowledge;
-  const isEmptyFilesRootScreen = selectedItemType === "files";
-  const isEmptyAgentsRootScreen = selectedItemType === "agents";
-
-  const emptyScreenHeader = useMemo(() => {
-    if (isKnowledgeFolder) {
-      return t("SelectorEmptyScreenHeaderKnowledge");
-    }
-
-    if (isEmptyFilesRootScreen) return t("SelectorEmptyScreenHeader");
-
-    if (isEmptyAgentsRootScreen) return t("EmptyRoomsHeaderAgent");
-
-    return t("EmptyRoomsHeader");
-  }, [isKnowledgeFolder, isEmptyFilesRootScreen, isEmptyAgentsRootScreen, t]);
-
-  const emptyScreenDescription = isEmptyFilesRootScreen
-    ? ""
-    : isEmptyAgentsRootScreen
-      ? t("EmptyRoomsDescriptionTextAgent", {
-          sectionName: t("AIAgents"),
-        })
-      : t("EmptyRoomsDescriptionText", {
-          sectionName: t("Rooms"),
-        });
+  const {
+    emptyScreenImage,
+    emptyScreenHeader,
+    emptyScreenDescription,
+    searchEmptyScreenImage,
+    searchEmptyScreenHeader,
+    searchEmptyScreenDescription,
+  } = useEmptyScreenProps({
+    selectedItemType,
+    selectedTreeNode,
+    canCreateAgent: items.some((item) => item.isCreateNewItem),
+    agentsEmptyDescription,
+  });
 
   const SelectorBody = (
     <Selector
@@ -235,20 +216,12 @@ const useSelectorBody = ({
       maxSelectedItems={maxSelectedItems}
       items={items}
       onSelect={onSelect}
-      emptyScreenImage={
-        isBase ? <EmptyScreenRoomsLight /> : <EmptyScreenRoomsDark />
-      }
+      emptyScreenImage={emptyScreenImage}
       emptyScreenHeader={emptyScreenHeader}
       emptyScreenDescription={emptyScreenDescription}
-      searchEmptyScreenImage={
-        isBase ? (
-          <EmptyScreenFilterFilesLight />
-        ) : (
-          <EmptyScreenFilterFilesDark />
-        )
-      }
-      searchEmptyScreenHeader={t("NotFoundTitle")}
-      searchEmptyScreenDescription={t("EmptyFilterDescriptionText")}
+      searchEmptyScreenImage={searchEmptyScreenImage}
+      searchEmptyScreenHeader={searchEmptyScreenHeader}
+      searchEmptyScreenDescription={searchEmptyScreenDescription}
       isLoading={showBodyLoader}
       isContentLoading={isContentLoading}
       rowLoader={

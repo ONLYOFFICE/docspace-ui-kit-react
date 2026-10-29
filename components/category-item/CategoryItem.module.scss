@@ -5,7 +5,8 @@
   :global(.light) & {
     --settings-description-color: #{colors.$gray-text};
     --settings-arrow-fill: #{colors.$black};
-    --text-disable-color: #{colors.$gray-text};
+    // Lighter than the description's grey, so a disabled item stands out.
+    --text-disable-color: #{colors.$gray};
   }
 
   :global(.dark) & {
@@ -66,6 +67,7 @@
 
   &.disabled {
     color: var(--category-item-disabled-color-value);
+    cursor: default;
   }
 }
 
@@ -78,6 +80,10 @@
 
   path {
     fill: var(--category-item-arrow-color-value);
+  }
+
+  &.disabled path {
+    fill: var(--category-item-disabled-color-value);
   }
 
   :global(.rtl) & {

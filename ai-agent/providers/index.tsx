@@ -188,10 +188,14 @@ type AiAgentProvidersProps = {
    * Explicitly controls the composer model picker. The chat lib hides the
    * picker whenever `entityId` is set, but DocSpace scopes the chat by the
    * current folder/room, so `entityId` alone no longer means "agent chat".
-   * Pass `true` to hide the picker entirely (highest priority — it also
-   * suppresses the read-only label). To keep the fixed model visible instead
-   * of hidden — e.g. inside AI agent rooms — leave this `false` and use
-   * {@link profilePickerReadOnly} / {@link isAgentRoom}.
+   * Pass `true` to lock the picker (highest priority — it also wins over
+   * the read-only label). Despite the name the picker is not removed:
+   * `@onlyoffice/ai-chat` 0.6.0 and later keep a locked picker on screen,
+   * because its menu also carries the reasoning Effort row; the menu then
+   * holds the current profile as an inert row, Effort, and nothing else.
+   * To show the fixed model as plain text instead — e.g. inside AI agent
+   * rooms — leave this `false` and use {@link profilePickerReadOnly} /
+   * {@link isAgentRoom}.
    */
   hideProfilePicker?: boolean;
   /**
@@ -200,8 +204,8 @@ type AiAgentProvidersProps = {
    * dropdown) instead of an interactive combo. Forwarded to
    * `WidgetConfig.profilePickerReadOnly`; it overrides the `entityId`
    * default-hide heuristic (the label is shown even in entity chats) but
-   * NOT an explicit `hideProfilePicker` `true`, which still hides
-   * everything. Use where the host fixes the profile but still wants to
+   * NOT an explicit `hideProfilePicker` `true`, which shows the locked
+   * picker instead of the label. Use where the host fixes the profile but still wants to
    * surface which model answers — e.g. an AI agent room viewer who lacks
    * the right to change the assignment.
    */

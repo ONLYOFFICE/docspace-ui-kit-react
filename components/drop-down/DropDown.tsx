@@ -53,6 +53,8 @@ const DropDown = ({
   withDynamicScrollbar,
   backDrop,
   dataTestId,
+  id,
+  role = "listbox",
 }: DropDownProps) => {
   const { isRTL } = useInterfaceDirection();
 
@@ -351,14 +353,15 @@ const DropDown = ({
 
     return (
       <>
-        {isDefaultMode ? backDrop : null}
+        {backDrop}
 
         <div
           ref={setDropDownRef}
           style={dropDownStyles}
           className={dropDownClasses}
           data-testid={dataTestId ?? "dropdown"}
-          role="listbox"
+          id={id}
+          role={role}
         >
           {/* withDynamicScrollbar: use project Scrollbar instead of VirtualList */}
           {useDynamicScrollbar ? (
@@ -461,10 +464,34 @@ const DropDown = ({
     open,
   ]);
 
-  React.useEffect(() => {
-    if (!dropDownRef.current) return;
+  // The event that opened the menu, captured on the closed->open transition
+  // only. The effect below also reruns while the menu stays open (a new
+  // clickOutsideAction every render is common), and the event being
+  // dispatched then is not the opening one: ignoring it would swallow a
+  // genuine outside mousedown that happened to cause the re-render.
+  const wasOpenRef = React.useRef(false);
+  const openingEventRef = React.useRef<Event | null>(null);
 
+  React.useEffect(() => {
+    // No early return on a missing ref: in portal mode the menu element only
+    // appears after the portal mounts, so a menu rendered open would
+    // otherwise never get its listeners.
+    // On the transition, the event being dispatched now is the one that
+    // opened the menu: in a browser React commits the open state, and this
+    // effect attaches the window listeners, while that click or tap is still
+    // bubbling, so it would reach window and close the menu at once.
+    if (open && !wasOpenRef.current) {
+      openingEventRef.current =
+        typeof window !== "undefined" ? (window.event ?? null) : null;
+    } else if (!open) {
+      openingEventRef.current = null;
+    }
+    wasOpenRef.current = !!open;
+
+    const openingEvent = openingEventRef.current;
     const listener = (evt: Event) => {
+      if (openingEvent && evt === openingEvent) return;
+
       const target = evt.target as HTMLElement;
 
       if (dropDownRef.current?.contains(target)) return;

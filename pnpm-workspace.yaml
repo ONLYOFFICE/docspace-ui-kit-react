@@ -21,3 +21,32 @@ minimumReleaseAgeExclude:
   - "@rolldown/binding-linux-arm64-musl@1.2.2"
   - "@rolldown/binding-linux-s390x-gnu@1.2.2"
   - "@rolldown/binding-linux-x64-musl@1.2.2"
+  - "@onlyoffice/doceditor-types@10.0.0"
+  - "@onlyoffice/document-editor-react@2.3.0"
+# Security overrides. These rewrite only this repository's lockfile - they are
+# not published, so a package that ships to consumers through `dependencies`
+# or `peerDependencies` still needs its fix there (see the audit-deps skill).
+overrides:
+  # RUNTIME: @onlyoffice/docspace-api-sdk 3.7.0 (latest) pins axios 1.13.5
+  # exactly, so consumers without an axios override of their own still get
+  # it. Drop once docspace-api-sdk ships a release with a patched axios.
+  "axios@^1": "^1.20.0"
+  "follow-redirects@^1": "^1.16.1"
+  # serve 14.2.6 (latest) pins compression 1.8.1 and, via serve-handler,
+  # minimatch 3.1.2; drop both once serve lifts them
+  "compression@^1": "^1.8.2"
+  "minimatch@^3": "^3.1.4"
+  # sass, postcss and css-tree accept ^1.0.x and the lockfile kept 1.2.1
+  "source-map-js@^1": "^1.2.2"
+  # Reaches consumers through @onlyoffice/ai-chat's peers; DocSpace pins
+  # zod itself in its catalog, here @assistant-ui/react resolved 4.6.5
+  "zod@^4": "^4.6.6"
+# Advisories deliberately left open. Each needs its reason here.
+auditConfig:
+  ignoreGhsas:
+    # katex <0.18.2 (low, RUNTIME through the katex peer and ai-chat): trust
+    # restrictions can be bypassed only after a prototype pollution has already
+    # happened. The fix is katex 0.18, a new 0.x major that changes what
+    # consumers render, and remark-math / rehype-katex still require ^0.16.
+    # Not forced in a hotfix; revisit when the peer moves to ^0.18.
+    - GHSA-238p-pmpm-9mq7

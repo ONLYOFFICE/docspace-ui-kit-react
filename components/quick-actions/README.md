@@ -244,7 +244,9 @@ export function StartHereMixed({ canCreateRoom }: { canCreateRoom: boolean }) {
 - **Paging keeps 64px of the current view on screen** and asks for a smooth scroll; direction
   is read from the track's computed `direction`, so RTL pages the other way round.
 - **A tooltipped tile is wrapped in an extra element** that becomes the flex item, and the
-  tooltip is anchored by an id built from React's `useId` with its colons stripped.
+  tooltip is anchored by an id built from React's `useId` (anything a CSS selector cannot hold
+  replaced by `-`), never from the item's `id` — two banners can offer tiles with the same
+  `id`, and each still gets its own tooltip.
 - **`onClose` only hides the banner if you do.** The component renders the cross and calls the
   handler; it keeps no state of its own.
 - The banner spans its container while the row is capped by
@@ -284,8 +286,10 @@ but the edge fades stay at the banner's edge, so the strip is cut off hard where
   track in the DOM. The controls stay reachable by keyboard on a hover device: they are
   revealed by `:focus-within` as well as by hover. The cross's tooltip is its `closeLabel`,
   the same text as its accessible name.
-- The strip itself has no role and no keyboard scrolling of its own; a tile scrolled out of
-  view is still reached by tabbing to it, which scrolls it in.
+- **The strip is a `role="toolbar"`** with `aria-orientation="horizontal"`. The arrow keys move
+  focus to the next or previous tile in reading order (mirrored in RTL), Home and End to the
+  first and last, and the focused tile is scrolled into view. Every enabled tile also stays in
+  the tab order, so Tab still walks them one by one.
 
 ## Test ids
 

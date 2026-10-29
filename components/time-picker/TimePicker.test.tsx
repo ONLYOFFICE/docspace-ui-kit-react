@@ -77,6 +77,63 @@ describe("<TimePicker />", () => {
     expect(minutesInput).toHaveAttribute("data-test-id", "minutes-input");
   });
 
+  it("renders plain text fields, not search fields", () => {
+    render(<TimePicker {...baseProps} />);
+    expect(screen.getByLabelText("Hours")).toHaveAttribute("type", "text");
+    expect(screen.getByLabelText("Minutes")).toHaveAttribute("type", "text");
+    expect(screen.queryAllByRole("searchbox")).toHaveLength(0);
+  });
+
+  it("takes translated names for the group and both fields", () => {
+    render(
+      <TimePicker
+        {...baseProps}
+        ariaLabel="Uhrzeit"
+        hoursLabel="Stunden"
+        minutesLabel="Minuten"
+      />,
+    );
+    expect(screen.getByRole("group", { name: "Uhrzeit" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("textbox", { name: "Stunden" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("textbox", { name: "Minuten" }),
+    ).toBeInTheDocument();
+  });
+
+  it("marks both fields invalid under hasError", () => {
+    const { rerender } = render(<TimePicker {...baseProps} />);
+    expect(screen.getByLabelText("Hours")).not.toHaveAttribute("aria-invalid");
+
+    rerender(<TimePicker {...baseProps} hasError />);
+    expect(screen.getByLabelText("Hours")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    expect(screen.getByLabelText("Minutes")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+  });
+
+  it("keeps the focus where it is with autoAdvance off", () => {
+    render(<TimePicker {...baseProps} autoAdvance={false} />);
+    const hoursInput = screen.getByLabelText("Hours") as HTMLInputElement;
+    const minutesInput = screen.getByLabelText("Minutes") as HTMLInputElement;
+
+    hoursInput.focus();
+    fireEvent.change(hoursInput, { target: { value: "09" } });
+    expect(hoursInput).toHaveFocus();
+    expect(mockOnChange).toHaveBeenCalled();
+
+    minutesInput.focus();
+    fireEvent.change(minutesInput, { target: { value: "45" } });
+    expect(minutesInput).toHaveFocus();
+    expect(minutesInput.value).toBe("45");
+    expect(mockOnBlur).not.toHaveBeenCalled();
+  });
+
   it("automatically formats and blurs when entering a single digit > 5 in minutes", () => {
     render(<TimePicker {...baseProps} />);
     const minutesInput = screen.getByLabelText("Minutes") as HTMLInputElement;

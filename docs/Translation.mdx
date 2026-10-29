@@ -140,7 +140,7 @@ const message = getCommonTranslation("DeleteMessage", { name: "Report.docx" });
 
 1. Tries `window.i18n.t()` first (set by `TranslationProvider`).
 2. Falls back to manual lookup from `window.i18n.loaded` using the language from the `asc_language` cookie.
-3. Logs an error if the key is not found and returns an empty string.
+3. Returns an empty string if the key is not found, and logs an error about it when `window.i18n` exists. With no `window.i18n` at all -- no `TranslationProvider`, or a render before it mounts -- it returns an empty string silently, and the components fall back to their English defaults.
 
 Many internal components use `getCommonTranslation` to provide default labels (buttons, empty screens, error pages) so that they work without an explicit `t` prop. If `TranslationProvider` is mounted, translations resolve automatically.
 

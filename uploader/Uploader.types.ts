@@ -25,7 +25,12 @@ export type UploaderProps = {
   /** Height of the uploader container */
   height?: string;
   filesSettings?: UploaderFilesSettings;
-  accept: string;
+  /**
+   * Accepted types as a comma-separated list (".pdf,.docx", "image/*").
+   * `"*"`, `"*\/*"`, `""` or leaving it out accept any file. Ignored in
+   * folder mode.
+   */
+  accept?: string;
   shortText: string;
   fullText?: string;
   badgeValue?: number;

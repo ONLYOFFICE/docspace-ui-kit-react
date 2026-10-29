@@ -43,4 +43,137 @@ describe("<MainButtonMobile />", () => {
     fireEvent.click(button);
     expect(mockOnClick).toHaveBeenCalled();
   });
+
+  it("reports opening through onOpen and closing through onClose only", () => {
+    const onOpen = vi.fn();
+    const onClose = vi.fn();
+    render(
+      <MainButtonMobile
+        buttonOptions={buttonOptions}
+        onOpen={onOpen}
+        onClose={onClose}
+      />,
+    );
+    const button = screen.getByTestId("floating-button");
+    expect(button).toHaveAttribute("aria-haspopup", "menu");
+    expect(button).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.click(button);
+    expect(onOpen).toHaveBeenCalledTimes(1);
+    expect(onClose).not.toHaveBeenCalled();
+    expect(button).toHaveAttribute("aria-expanded", "true");
+
+    fireEvent.click(button);
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(button).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("closes on Escape, reporting it", () => {
+    const onClose = vi.fn();
+    render(
+      <MainButtonMobile
+        buttonOptions={buttonOptions}
+        opened
+        onClose={onClose}
+      />,
+    );
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("floating-button")).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+  });
+
+  // Escape closes the sheet only: not a dialog around it (Escape keyup on
+  // window) and not the portal's selection (Escape keydown on the document).
+  it("keeps its Escape from document and window listeners", () => {
+    const onDocumentKeyDown = vi.fn();
+    const onWindowKeyUp = vi.fn();
+    document.addEventListener("keydown", onDocumentKeyDown);
+    window.addEventListener("keyup", onWindowKeyUp);
+    const onClose = vi.fn();
+    render(
+      <MainButtonMobile
+        buttonOptions={buttonOptions}
+        opened
+        onClose={onClose}
+      />,
+    );
+
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    fireEvent.keyUp(document.body, { key: "Escape" });
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(onDocumentKeyDown).not.toHaveBeenCalled();
+    expect(onWindowKeyUp).not.toHaveBeenCalled();
+    document.removeEventListener("keydown", onDocumentKeyDown);
+    window.removeEventListener("keyup", onWindowKeyUp);
+  });
+
+  it("marks the sheet as a menu of menu items", () => {
+    render(<MainButtonMobile buttonOptions={buttonOptions} opened />);
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+    expect(screen.getAllByRole("menuitem")).toHaveLength(2);
+  });
+
+  it("chooses the focused item with Enter", () => {
+    render(<MainButtonMobile buttonOptions={buttonOptions} opened />);
+    const [first] = screen.getAllByRole("menuitem");
+    first.focus();
+    fireEvent.keyDown(first, { key: "Enter" });
+    expect(buttonOptions[0].onClick).toHaveBeenCalledTimes(1);
+  });
+
+  // The sheet sits over the page; Tab must not walk into the page behind it.
+  it("closes on Tab from an item and hands focus back to the button", () => {
+    const onClose = vi.fn();
+    render(
+      <MainButtonMobile
+        buttonOptions={buttonOptions}
+        opened
+        onClose={onClose}
+      />,
+    );
+    const [first] = screen.getAllByRole("menuitem");
+    first.focus();
+
+    const tab = fireEvent.keyDown(first, { key: "Tab" });
+
+    // The browser's own Tab still moves on, now from the button.
+    expect(tab).toBe(true);
+    const button = screen.getByTestId("floating-button");
+    expect(button).toHaveFocus();
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("makes the alert badge a named button only with withAlertClick", () => {
+    const onAlertClick = vi.fn();
+    const { rerender } = render(
+      <MainButtonMobile alert withAlertClick onAlertClick={onAlertClick} />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Alert" }));
+    expect(onAlertClick).toHaveBeenCalledTimes(1);
+
+    rerender(<MainButtonMobile alert onAlertClick={onAlertClick} />);
+    expect(screen.queryByRole("button", { name: "Alert" })).toBeNull();
+    expect(screen.getByRole("img", { name: "Alert" })).toBeInTheDocument();
+  });
+
+  // The name comes from the portal's Common:Alert, through the kit's own
+  // lookup rather than an I18nextProvider.
+  it("names the alert badge from the loaded Common translations", () => {
+    const w = window as unknown as {
+      i18n?: { loaded: Record<string, { data: Record<string, string> }> };
+    };
+    w.i18n = { loaded: { "en/Common.json": { data: { Alert: "Warnung" } } } };
+    document.cookie = "asc_language=en";
+    try {
+      render(<MainButtonMobile alert />);
+      expect(screen.getByRole("img", { name: "Warnung" })).toBeInTheDocument();
+    } finally {
+      w.i18n = undefined;
+    }
+  });
 });

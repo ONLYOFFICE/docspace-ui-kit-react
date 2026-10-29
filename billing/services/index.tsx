@@ -55,6 +55,7 @@ type TServicesProps = {
   cardDisabled?: boolean;
   onOpenSupportedModels?: () => void;
   onOpenWebSearch?: () => void;
+  onOpenLimits?: () => void;
   onDocsConnectClick?: () => void;
   onDocsConnectToggle?: () => void;
   docsConnectState?: TDocsConnectCardState;
@@ -68,6 +69,7 @@ const Services = observer(
     cardDisabled,
     onOpenSupportedModels,
     onOpenWebSearch,
+    onOpenLimits,
     onDocsConnectClick,
     onDocsConnectToggle,
     docsConnectState,
@@ -367,6 +369,7 @@ const Services = observer(
           cardDisabled={cardDisabled}
           onOpenSupportedModels={onOpenSupportedModels}
           onOpenWebSearch={onOpenWebSearch}
+          onOpenLimits={onOpenLimits}
           docsConnectState={docsConnectState}
           onDocsConnectToggle={onDocsConnectToggle}
         />

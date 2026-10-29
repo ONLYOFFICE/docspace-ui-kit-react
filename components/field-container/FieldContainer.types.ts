@@ -8,9 +8,9 @@ export type FieldContainerProps = {
   removeMargin?: boolean;
   /** CSS class name for custom styling */
   className?: string;
-  /** Indicates that the field is required */
+  /** Indicates that the field is required: an asterisk after the caption, and `aria-required` on the control in the field body */
   isRequired?: boolean;
-  /** Indicates that the field has an error state */
+  /** Indicates that the field has an error state: `aria-invalid` on the control in the field body, and the error message when `errorMessage` is set */
   hasError?: boolean;
   /** Controls visibility of the field label section */
   labelVisible?: boolean;

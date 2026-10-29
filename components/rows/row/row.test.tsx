@@ -21,6 +21,23 @@ describe("<Row />", () => {
     expect(screen.getByTestId("row")).toBeInTheDocument();
   });
 
+  it("marks the row busy only while inProgress", () => {
+    const { rerender } = render(
+      <Row
+        {...baseProps}
+        inProgress
+        isIndexEditingMode={false}
+        onRowClick={() => {}}
+      />,
+    );
+    expect(screen.getByTestId("row")).toHaveAttribute("aria-busy", "true");
+
+    rerender(
+      <Row {...baseProps} isIndexEditingMode={false} onRowClick={() => {}} />,
+    );
+    expect(screen.getByTestId("row")).not.toHaveAttribute("aria-busy");
+  });
+
   it("renders checkbox with correct styling", () => {
     render(
       <Row

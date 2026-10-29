@@ -63,10 +63,9 @@ node .claude/scripts/ui-kit-reference/check-drift.mjs
 ```
 
 `agent-skills/skills/plugin-sdk` documents this kit for plugin authors: the package specifier,
-a vendored tarball, prop defaults and layout traps. Nothing keeps it fresh. It is clean against
-its own `feature/ui-kit-separation` branch and stale against `main` by design — the rename lands
-in all three repositories at once ([plugin-api.md](../../rules/plugin-api.md)), so check which
-branch is out before reading the result. A **new** finding blocks: it means this change
+the range it installs, prop defaults and layout traps. Nothing keeps it fresh. The checker reads
+the agent-skills checkout beside this repository, so have it on the branch that targets this
+release before reading the result. A **new** finding blocks: it means this change
 invalidated documentation somebody is reading right now.
 
 ## 5 -- what the change adds stylistically
@@ -77,6 +76,17 @@ node .claude/scripts/audit-tokens/audit.mjs --changed --base <merge-base>
 
 `--changed`, never the full run: the full run reports a standing backlog that this change did
 not cause.
+
+## 5a -- vulnerable dependencies
+
+```bash
+node .claude/scripts/audit-deps/audit-deps.mjs --level moderate
+```
+
+Neither CI job runs an audit. A finding marked `reach: RUNTIME` ships to every consumer of the
+published package, and an override in `pnpm-workspace.yaml` does not travel with it - see the
+`audit-deps` skill. A new runtime finding at high or above blocks a publish; dev-only findings
+are reported, not blocking.
 
 ## 6 -- read the file list
 

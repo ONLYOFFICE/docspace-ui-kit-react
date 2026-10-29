@@ -70,7 +70,7 @@ export const usePortalConnection = (enabled = true): PortalConnectionState => {
 
 /**
  * The story under the demo banner, with its own `ApiProvider` pointed at the
- * demo portal the mock service worker plays (`.storybook/mocks`). Nested
+ * demo portal msw plays in the preview frame (`.storybook/mocks`). Nested
  * rather than set in `withApiProvider`, so only a gated story reaches the
  * fixtures: a screen with demo data of its own keeps seeing an empty
  * `baseUrl` and uses that.

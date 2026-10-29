@@ -14,9 +14,10 @@ import { useCommonTranslation } from "../../utils/i18n";
 
 import { ToggleButton } from "../toggle-button";
 import { Badge } from "../badge";
-import { Link, LinkType } from "../link";
+import { Link, LinkTarget, LinkType } from "../link";
 
 import type { DropDownItemProps } from "./DropDownItem.types";
+import { isInlinedSvgUrl, isSvgDataUrl } from "./iconSource";
 import styles from "./DropDownItem.module.scss";
 import { TooltipContainer } from "../tooltip";
 import { getConstName } from "../../constants/consts";
@@ -30,13 +31,7 @@ const IconComponent = ({
   icon: string | React.ReactElement | React.ElementType;
   fillIcon?: boolean;
 }) => {
-  const isImageSrc = (src: string) =>
-    (!src.includes("images/") && !src.includes(".svg")) ||
-    src.includes("webplugins");
-
-  const isDataUrlSvg = (src: string) => src.startsWith("data:image/svg+xml");
-
-  if (typeof icon === "string" && isDataUrlSvg(icon)) {
+  if (typeof icon === "string" && isSvgDataUrl(icon)) {
     return (
       <ReactSVG
         className={
@@ -49,7 +44,7 @@ const IconComponent = ({
     );
   }
 
-  if (typeof icon === "string" && isImageSrc(icon)) {
+  if (typeof icon === "string" && !isInlinedSvgUrl(icon)) {
     return (
       <img className="drop-down-icon_image" src={icon} alt="plugin-logo" />
     );
@@ -110,6 +105,7 @@ const DropDownItem = ({
   withExternalLink,
   externalLinkPath,
   onExternalLinkClick,
+  externalLinkLabel,
   testId,
   tooltip,
   description,
@@ -117,6 +113,10 @@ const DropDownItem = ({
   stopMouseDownPropagation,
   betaLabel,
   paidLabel,
+  role = "option",
+  // DropDown reads this off the element to size its virtualised rows; it is
+  // no attribute, so it must not reach the div.
+  heightTablet: _heightTablet,
   ...rest
 }: DropDownItemProps) => {
   const t = useCommonTranslation();
@@ -125,6 +125,10 @@ const DropDownItem = ({
 
   const resolvedBetaLabel = betaLabel || getConstName("BetaLabel") || "";
   const resolvedPaidLabel = paidLabel || t("Paid") || "";
+
+  const resolvedExternalLinkLabel =
+    externalLinkLabel ||
+    (typeof label === "string" && label ? `${t("Open")} ${label}` : t("Open"));
 
   const withDisabledTooltip = disabled && tooltip;
   const hasDescription = Boolean(description);
@@ -202,8 +206,8 @@ const DropDownItem = ({
         withDisabledTooltip && isTouchDevice ? tooltip : undefined
       }
       data-tooltip-place="bottom-end"
-      role={isSeparator ? "separator" : "option"}
-      aria-selected={isSelected}
+      role={isSeparator ? "separator" : role}
+      aria-selected={role === "option" ? isSelected : undefined}
       aria-disabled={disabled}
       style={
         { "--drop-down-min-width": minWidth, ...style } as React.CSSProperties
@@ -292,12 +296,31 @@ const DropDownItem = ({
         <Link
           type={LinkType.action}
           className={styles.externalLink}
-          onClick={(e) => {
+          // Only a callback makes the path navigable: the SDK passes a path
+          // its parent frame resolves and no callback, and a link of its own
+          // would open a dead tab. The href is there for a middle or
+          // modified click, which the browser opens in a new tab.
+          {...(onExternalLinkClick
+            ? {
+                href: externalLinkPath,
+                target: LinkTarget.blank,
+                rel: "noopener noreferrer",
+              }
+            : {})}
+          ariaLabel={resolvedExternalLinkLabel}
+          onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
-            onExternalLinkClick?.();
+            if (!onExternalLinkClick) return;
+            // A modified click is the browser's: it opens the href in a new
+            // tab or window, and the callback, which navigates the current
+            // page, would move this one as well. A plain click is the
+            // callback's, as it was before the anchor had an href.
+            if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+            e.preventDefault();
+            onExternalLinkClick();
           }}
         >
-          <ExternalLinkReactSvgUrl />
+          <ExternalLinkReactSvgUrl aria-hidden="true" focusable="false" />
         </Link>
       ) : null}
 
