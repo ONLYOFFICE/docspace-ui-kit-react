@@ -17,7 +17,11 @@ import DeviceUploader, { type DeviceUploaderHandle } from "./device-uploader";
 import type { OnFilesAttached } from "./attach-files";
 import AttachDialog from "./attach-dialog";
 import ContextFolderDialog from "./context-folder-dialog";
+import ContextRoomsDialog, {
+  type ContextRoomsKind,
+} from "./context-rooms-dialog";
 import SaveDialog from "./save-dialog";
+import { CONTEXT_ROOM_CLOUD } from "../context-room/ContextRoomSync";
 import { EXPORT_FORMAT_IDS, EXTENSION_BY_FORMAT } from "./export-format";
 import styles from "./styles.module.scss";
 
@@ -27,6 +31,16 @@ export type FilesIntegration = {
   // Opens the folder picker behind the composer's Context slot; unset where
   // the host does not offer folder context.
   onPickFolderContext?: () => void;
+  // Opens the Instructions room picker behind the composer's skills slot.
+  onPickContextRooms: () => void;
+  // Opens the Knowledge room picker behind the composer's knowledge slot.
+  onPickKnowledgeRooms: () => void;
+  // Opens a connected Instructions or Knowledge room from the composer's
+  // rooms menus.
+  onOpenContextRoom: (
+    cloud: string,
+    room: { id: string; name: string },
+  ) => void;
   // Message "Save as file" handler, wired into platform.file.saveAsFile.
   onSaveAsFile: SaveAsFileHandler;
   // Thread export formats, wired into platform.file.getExportFormats.
@@ -81,6 +95,32 @@ export const useFilesIntegration = ({
   const [contextPickerVisible, setContextPickerVisible] = React.useState(false);
   const closeContextPicker = React.useCallback(
     () => setContextPickerVisible(false),
+    [],
+  );
+
+  // The room picker open for the skills or the knowledge slot; `null` while closed.
+  const [roomsPicker, setRoomsPicker] = React.useState<ContextRoomsKind | null>(
+    null,
+  );
+  const closeRoomsPicker = React.useCallback(() => setRoomsPicker(null), []);
+  const onPickContextRooms = React.useCallback(
+    () => setRoomsPicker("skills"),
+    [],
+  );
+  const onPickKnowledgeRooms = React.useCallback(
+    () => setRoomsPicker("knowledge"),
+    [],
+  );
+  // A room of this portal opens in Files; the chat panel stays as it is.
+  const onOpenContextRoom = React.useCallback(
+    (cloud: string, room: { id: string; name: string }) => {
+      if (cloud !== CONTEXT_ROOM_CLOUD) return;
+      // The address Files opens a room by: the bare `/rooms/shared/{id}`
+      // carries no `folder` and lands on `/rooms/shared/undefined`.
+      window.DocSpace?.navigate(
+        `/rooms/shared/${room.id}/filter?folder=${room.id}`,
+      );
+    },
     [],
   );
 
@@ -176,6 +216,9 @@ export const useFilesIntegration = ({
       {contextPickerVisible ? (
         <ContextFolderDialog onClose={closeContextPicker} />
       ) : null}
+      {roomsPicker ? (
+        <ContextRoomsDialog kind={roomsPicker} onClose={closeRoomsPicker} />
+      ) : null}
       {saveRequest ? (
         <SaveDialog
           content={saveRequest.content}
@@ -195,6 +238,9 @@ export const useFilesIntegration = ({
   return {
     composerActions,
     onPickFolderContext,
+    onPickContextRooms,
+    onPickKnowledgeRooms,
+    onOpenContextRoom,
     onSaveAsFile,
     exportFormats,
     overlay,

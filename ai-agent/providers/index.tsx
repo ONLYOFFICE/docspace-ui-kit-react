@@ -676,6 +676,9 @@ const AiAgentProviders = ({
   const {
     composerActions: attachActions,
     onPickFolderContext,
+    onPickContextRooms,
+    onPickKnowledgeRooms,
+    onOpenContextRoom,
     onSaveAsFile,
     exportFormats,
     overlay,
@@ -1118,6 +1121,13 @@ const AiAgentProviders = ({
       // composer drops its own chips and pickers there.
       hideComposerContext: composerContextHidden,
       onPickFolderContext,
+      // Instructions rooms and knowledge bases are picked in the room
+      // selector, several at once, and a connected one opens in Files from
+      // its pill's menu.
+      onPickContextRooms,
+      onOpenContextRoom,
+      onPickKnowledgeRooms,
+      onOpenKnowledgeRoom: onOpenContextRoom,
     }),
     [
       composerActions,
@@ -1138,6 +1148,9 @@ const AiAgentProviders = ({
       chatIntro,
       composerContextHidden,
       onPickFolderContext,
+      onPickContextRooms,
+      onPickKnowledgeRooms,
+      onOpenContextRoom,
       t,
     ],
   );

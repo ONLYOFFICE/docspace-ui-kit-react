@@ -6,13 +6,7 @@ export const PORTAL_BASE_THEME_ID = "theme-portal-base";
 export const PORTAL_DARK_THEME_ID = "theme-portal-dark";
 
 type BasePalette = {
-  // composer source pills (skills room / knowledge base), the same paint
-  // as the AI project cards
-  sourceText: string;
-  sourceSkillsBackground: string;
-  sourceSkillsIcon: string;
-  sourceKnowledgeBackground: string;
-  sourceKnowledgeIcon: string;
+  // hover of the composer source pills
   sourceHoverBrightness: string;
   backgroundNormal: string;
   backgroundNormalElement: string;
@@ -334,14 +328,17 @@ const buildTokens = (
   "--chat-composer-room-border-color": "var(--chat-input-file-border-color)",
   "--chat-composer-room-hover-background-color":
     "var(--chat-input-tools-button-hover-background)",
-  // The composer's source slots: a tinted pill per role, the same paint as
-  // the chips on the AI project cards; a dashed placeholder while empty.
-  "--chat-source-skills-background-color": p.sourceSkillsBackground,
-  "--chat-source-skills-color": p.sourceText,
-  "--chat-source-skills-icon-color": p.sourceSkillsIcon,
-  "--chat-source-knowledge-background-color": p.sourceKnowledgeBackground,
-  "--chat-source-knowledge-color": p.sourceText,
-  "--chat-source-knowledge-icon-color": p.sourceKnowledgeIcon,
+  // The composer's source slots: every role is a plain pill in the paint of
+  // the blocks inside the chat input (the Context one included), told apart
+  // by its glyph only; a dashed placeholder while empty.
+  "--chat-source-skills-background-color":
+    "var(--chat-input-file-background-color)",
+  "--chat-source-skills-color": "var(--text-normal)",
+  "--chat-source-skills-icon-color": "var(--icon-normal)",
+  "--chat-source-knowledge-background-color":
+    "var(--chat-input-file-background-color)",
+  "--chat-source-knowledge-color": "var(--text-normal)",
+  "--chat-source-knowledge-icon-color": "var(--icon-normal)",
   "--chat-source-context-background-color":
     "var(--chat-input-file-background-color)",
   "--chat-source-context-color": "var(--text-normal)",
@@ -459,11 +456,6 @@ const buildTokens = (
 // component tokens used in the DocSpace base theme (see providers/theme/
 // themes/base.ts — input/modalDialog/scrollbar/checkbox/toggleButton).
 const portalBasePalette: BasePalette = {
-  sourceText: globalColors.black,
-  sourceSkillsBackground: globalColors.portalPurple,
-  sourceSkillsIcon: globalColors.purple,
-  sourceKnowledgeBackground: globalColors.portalGreen,
-  sourceKnowledgeIcon: globalColors.editorGreenColor,
   sourceHoverBrightness: "0.97",
   // surfaces — matches base.ts modalDialog/input/aside backgrounds
   backgroundNormal: globalColors.white,
@@ -556,11 +548,6 @@ const portalBasePalette: BasePalette = {
 // recessed surface for inputs. `lightDarkGrayHover` (#3D3D3D) is the hover
 // state for buttons/file items.
 const portalDarkPalette: BasePalette = {
-  sourceText: globalColors.white,
-  sourceSkillsBackground: globalColors.secondPurpleDark,
-  sourceSkillsIcon: globalColors.white,
-  sourceKnowledgeBackground: globalColors.secondGreenDark,
-  sourceKnowledgeIcon: globalColors.white,
   sourceHoverBrightness: "1.15",
   backgroundNormal: globalColors.black,
   backgroundNormalElement: globalColors.darkGrayLight,
