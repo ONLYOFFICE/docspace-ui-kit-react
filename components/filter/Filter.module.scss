@@ -729,6 +729,14 @@
   border-color: var(--filter-view-border-v);
   background-color: var(--filter-view-fill-v);
 
+  // Above a checked neighbour, which is lifted to z-index 1 itself.
+  &:focus-visible {
+    z-index: 2;
+    outline: 2px solid
+      var(--accent-main, var(--color-scheme-main-accent, #{$light-blue-main}));
+    outline-offset: 1px;
+  }
+
   &.checked {
     z-index: 1;
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { act, render, screen, cleanup } from "@testing-library/react";
+import { act, render, screen, cleanup, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { DeviceType, FilterGroups } from "../../enums";
@@ -217,6 +217,39 @@ describe("Filter Component", () => {
       await user.keyboard("{Enter}");
 
       expect(button).toHaveAttribute("aria-expanded", "true");
+    });
+
+    it("opens the sort list from the keyboard and sorts with Enter", async () => {
+      const user = userEvent.setup();
+      const onSort = vi.fn();
+      const sortData = [
+        { id: "sort-title", key: "title", label: "Name", default: true },
+        { id: "sort-date", key: "date", label: "Modified" },
+      ];
+      await act(async () => {
+        renderComponent({
+          onSort,
+          getSortData: () => sortData,
+          getSelectedSortData: () => ({
+            sortId: "title",
+            sortDirection: "asc",
+          }),
+        });
+      });
+      const sortButton = within(
+        screen.getByTestId("filter_sort_combobox"),
+      ).getByRole("button");
+
+      sortButton.focus();
+      await user.keyboard("{Enter}");
+
+      expect(
+        await screen.findByTestId("filter_sort_option_date"),
+      ).toBeVisible();
+
+      await user.keyboard("{ArrowDown}{Enter}");
+
+      expect(onSort).toHaveBeenCalled();
     });
   });
 
@@ -525,6 +558,35 @@ describe("<ViewSelector />", () => {
     const viewSelector = screen.getByTestId("view-selector");
     expect(viewSelector).toHaveClass("custom-class");
     expect(viewSelector.style.backgroundColor).toBe("red");
+  });
+
+  it.each(["{Enter}", " "])(
+    "switches the view from the keyboard on %s",
+    async (key) => {
+      const user = userEvent.setup();
+      const onChangeView = vi.fn();
+      render(
+        <ViewSelector
+          {...viewSelectorDefaultProps}
+          viewAs="row"
+          isFilter
+          onChangeView={onChangeView}
+        />,
+      );
+
+      await user.tab();
+      expect(screen.getByTestId("view-selector-icon")).toHaveFocus();
+
+      await user.keyboard(key);
+      expect(onChangeView).toHaveBeenCalledWith("tile");
+    },
+  );
+
+  it("leaves a disabled selector out of the Tab order", () => {
+    render(<ViewSelector {...viewSelectorDefaultProps} isDisabled />);
+
+    for (const icon of screen.getAllByTestId("view-selector-icon"))
+      expect(icon).not.toHaveAttribute("tabindex");
   });
 
   it("renders only one icon when isFilter is true", () => {
