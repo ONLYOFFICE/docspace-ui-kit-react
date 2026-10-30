@@ -194,6 +194,11 @@ export const useEdgeResizer = ({
       const onPointerMove = (event: PointerEvent) => {
         if (event.pointerId !== pointerId) return;
 
+        if (event.pointerType === "mouse" && event.buttons === 0) {
+          finishDrag();
+          return;
+        }
+
         const desiredWidth =
           anchorWidth + direction * (event.clientX - anchorX);
 
@@ -256,14 +261,11 @@ export const useEdgeResizer = ({
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("pointerup", onPointerUp);
         window.removeEventListener("pointercancel", onPointerUp);
+        window.removeEventListener("blur", finishDrag);
         document.body.classList.remove(styles.resizingCursor);
       };
 
-      // A cancelled pointer (the system took the touch over) ends the drag
-      // where it stands, exactly like a release.
-      function onPointerUp(event: PointerEvent) {
-        if (event.pointerId !== pointerId) return;
-
+      function finishDrag() {
         stopDrag();
         // A drag that never left fullscreen has no width to commit, and one
         // that left it on its last frame already committed the same value.
@@ -272,11 +274,20 @@ export const useEdgeResizer = ({
         settleLayout();
       }
 
+      // A cancelled pointer (the system took the touch over) ends the drag
+      // where it stands, exactly like a release.
+      function onPointerUp(event: PointerEvent) {
+        if (event.pointerId !== pointerId) return;
+
+        finishDrag();
+      }
+
       stopDragRef.current = stopDrag;
       document.body.classList.add(styles.resizingCursor);
       window.addEventListener("pointermove", onPointerMove);
       window.addEventListener("pointerup", onPointerUp);
       window.addEventListener("pointercancel", onPointerUp);
+      window.addEventListener("blur", finishDrag);
     },
     [
       isFullscreen,
