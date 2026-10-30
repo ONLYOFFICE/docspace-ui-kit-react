@@ -139,6 +139,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `aria-hidden` and no tab stop. A test that focused the `svg` or waited for it to be focused
   must use the input (`getByRole("checkbox")`) instead. The focused box still draws its border
   in the focus colour.
+- **The AI chat panel keeps its width.** A dragged docked width used to last until the panel
+  closed; `AiChatStore` now saves it in `localStorage` under `chatPanelWidth` and starts every
+  open and every visit from it. The new `utils/panel-width` holds that storage
+  (`createPanelWidthStorage`), so a host keeps the info panel's width the same way, and
+  `CHAT_PANEL_MIN_WIDTH`, the 360px the chat cannot be dragged below.
 
 ### Added
 
@@ -151,6 +156,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   props had none to give it, so an icon button could be made keyboard-operable with `tabIndex`
   and `onKeyDown` but not announced as a button without a cast. Both props are rendered on the
   element, as `Link`'s are; nothing changes for a button that passes neither.
+- Section: the info panel can be resized from its inline-start edge on a desktop. `isInfoPanelResizable` turns it on, with the host's width in `infoPanelWidth` and a setter in `setInfoPanelWidth`. The edge drags from 400px to 800px (`INFO_PANEL_WIDTH`, and the new `INFO_PANEL_MAX_WIDTH` in `utils/device`) while the section keeps 416px, narrows to fit a narrower window without saving it, and a double click restores 400px. It shares its resizer with the chat panel, whose edge now also takes a finger or a pen and narrows the panel to a narrower window, a chat opened after mount included, without calling `setChatPanelWidth` for it. `onShownInfoPanelWidthChange` reports the width the open info panel, or the chat open in its place, takes on screen (`0` when neither does), for floating buttons a host draws itself; it follows a resize drag once per frame, and below a desktop the info panel counts as 400px and the chat as `0`
+- Article: `infoPanelWidth`, and the same prop on `ArticleLiveChat`, sets how far the live chat launcher moves clear of the open info panel, or of the AI chat open in its place, for a host whose panels are resizable; `0` when neither is. Unset, `isInfoPanelVisible` still assumes `INFO_PANEL_WIDTH`. The `isInfoPanelVisible` docs no longer call it unread: the launcher has moved clear of the info panel again since the switch to the Zendesk messaging API
+- `OperationsProgressButton` takes `infoPanelWidth`. Inside `Section` the button gets the width through `--operations-progress-info-panel-width` on the section container instead: the width the open info panel, or the chat open in its place, takes on a desktop, updated on every frame of a resize drag, so the button stays 24px clear of the panel instead of sitting 424px in, under it
 
 ### Fixed
 
@@ -476,7 +484,12 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **The `Section` chat panel resizer no longer grows the panel by 1px per grab.** It measured the
   panel with its border and wrote that to `--chat-panel-width`, which sets the content box: a click
   on the edge committed 401 for a 400px panel. `setChatPanelWidth` now receives the content width,
-  and a grab released without moving commits the width unchanged.
+  and a grab released without moving commits nothing.
+- **A `Section` panel resize no longer outlives its mouse button.** A drag whose button was
+  released where the page could not see it, in another window after Alt+Tab or over the Start
+  menu, went on moving the panel with the pointer and kept the resize cursor until the next click.
+  The drag now ends, committing the width it reached, as soon as the window loses focus or the
+  pointer moves without the button.
 - **A late search result no longer overwrites a newer edit in `Filter`'s search box.** A query the
   host applied after the user had already changed or cleared the box came back into it and was
   searched again. Such a stale value, or a new `getSelectedInputValue` returning the value already
@@ -552,6 +565,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   elsewhere — a sign-in redirect, a link followed in the tab — would have received them. Both
   windows open the portal's `/doceditor`, so the calls are now addressed to
   `window.location.origin` and the browser drops one whose window holds any other page.
+- Table: a column reset no longer squeezes the name column below its own minimum. With many columns on and a narrow list, for instance beside the AI chat, the reset took every other column's minimum out of the name column's share, down to a negative width that broke the grid: the header lost its title and the rows came out empty. The name column now keeps its minimum, and when the other columns cannot fit next to it the table shows the name column alone, as a resize already does
 
 ## 4.1.0
 
