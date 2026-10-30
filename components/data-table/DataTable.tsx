@@ -1,8 +1,12 @@
 "use client";
 
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import classNames from "classnames";
 
+import {
+  DataTableContext,
+  type DataTableContextValue,
+} from "./DataTable.context";
 import type { DataTableProps } from "./DataTable.types";
 import { useColumnLayout } from "./hooks/useColumnLayout";
 import { useColumnResize } from "./hooks/useColumnResize";
@@ -30,6 +34,8 @@ export const DataTable = <T,>({
   getRowKey,
   sort,
   onSortChange,
+  onColumnVisibilityChange,
+  onCompactChange,
   widthStorage,
   ariaLabel,
   id,
@@ -93,43 +99,78 @@ export const DataTable = <T,>({
     [containerRef, ref],
   );
 
+  // Reported on a change only; a table that mounts compact reports `true`.
+  const reportedCompactRef = useRef(false);
+  useEffect(() => {
+    if (reportedCompactRef.current === compact) return;
+    reportedCompactRef.current = compact;
+    onCompactChange?.(compact);
+  }, [compact, onCompactChange]);
+
+  // Sorting by a column the user hid turns it back on, as the old table did,
+  // so the sorted values are on screen. Only when the sort moves there.
+  const sortKey = sort?.key;
+  const lastSortKeyRef = useRef(sortKey);
+  useEffect(() => {
+    if (lastSortKeyRef.current === sortKey) return;
+    lastSortKeyRef.current = sortKey;
+
+    const sorted = columns.find(
+      (column) => sortKey !== undefined && column.sortKey === sortKey,
+    );
+    if (sorted && sorted.visible === false && sorted.hideable) {
+      onColumnVisibilityChange?.(sorted.id, true);
+    }
+  }, [sortKey, columns, onColumnVisibilityChange]);
+
+  const context = useMemo<DataTableContextValue>(
+    () => ({
+      columns: columns as DataTableContextValue["columns"],
+      compact,
+      onColumnVisibilityChange,
+    }),
+    [columns, compact, onColumnVisibilityChange],
+  );
+
   return (
-    <div
-      ref={setRef}
-      id={id}
-      role="table"
-      aria-label={ariaLabel}
-      className={classNames(styles.dataTable, "table-container", className, {
-        [styles.isResizing]: resizingId !== null,
-      })}
-      style={{ "--data-table-grid": gridTemplate } as React.CSSProperties}
-      data-testid={testId}
-    >
-      <DataTableHeader
-        columns={renderedColumns}
-        sort={sort}
-        onSortChange={onSortChange}
-        compact={compact}
-        resize={resize}
-        id={headerId}
-        className={headerClassName}
-      />
+    <DataTableContext value={context}>
       <div
-        role="rowgroup"
-        className={classNames(styles.body, "table-container_body")}
-        data-testid="data-table-body"
+        ref={setRef}
+        id={id}
+        role="table"
+        aria-label={ariaLabel}
+        className={classNames(styles.dataTable, "table-container", className, {
+          [styles.isResizing]: resizingId !== null,
+        })}
+        style={{ "--data-table-grid": gridTemplate } as React.CSSProperties}
+        data-testid={testId}
       >
-        {rows.map((row, index) => (
-          <DataTableRow
-            key={getRowKey(row, index)}
-            row={row}
-            index={index}
-            columns={renderedColumns}
-            lastColumnId={lastColumnId}
-            compact={compact}
-          />
-        ))}
+        <DataTableHeader
+          columns={renderedColumns}
+          sort={sort}
+          onSortChange={onSortChange}
+          compact={compact}
+          resize={resize}
+          id={headerId}
+          className={headerClassName}
+        />
+        <div
+          role="rowgroup"
+          className={classNames(styles.body, "table-container_body")}
+          data-testid="data-table-body"
+        >
+          {rows.map((row, index) => (
+            <DataTableRow
+              key={getRowKey(row, index)}
+              row={row}
+              index={index}
+              columns={renderedColumns}
+              lastColumnId={lastColumnId}
+              compact={compact}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </DataTableContext>
   );
 };

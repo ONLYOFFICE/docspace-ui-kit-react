@@ -35,6 +35,7 @@ export const HeaderCell = <T,>({
 
   const ariaSort = ariaSortOf(sort, sortKey);
   const sortable = Boolean(sortKey && onSortChange);
+  const resizable = Boolean(resize?.canResize(id));
 
   const renderContent = () => {
     if (header) return header(context);
@@ -72,13 +73,15 @@ export const HeaderCell = <T,>({
         {
           [styles.isSorted]: Boolean(ariaSort),
           [styles.isAscending]: ariaSort === "ascending",
+          [styles.hasResizeHandle]: resizable,
+          [styles.isFixed]: column.width.type === "fixed",
         },
       )}
       data-column-id={id}
       data-testid={`data-table-header-${id}`}
     >
       {renderContent()}
-      {resize?.canResize(id) ? (
+      {resize && resizable ? (
         <ResizeHandle
           columnId={id}
           label={typeof title === "string" ? title : id}

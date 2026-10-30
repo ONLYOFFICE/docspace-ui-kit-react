@@ -1,13 +1,14 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, waitFor, within } from "storybook/test";
+import { expect, screen, userEvent, waitFor, within } from "storybook/test";
 
 import {
   DataTable,
   type DataTableColumn,
   type DataTableSort,
   createMemoryWidths,
+  settingsColumn,
 } from ".";
 
 type FileRow = {
@@ -44,6 +45,7 @@ const COLUMNS: DataTableColumn<FileRow>[] = [
     title: "Author",
     width: { type: "flex" },
     sortKey: "author",
+    hideable: true,
     cell: (row) => row.author,
   },
   {
@@ -51,6 +53,7 @@ const COLUMNS: DataTableColumn<FileRow>[] = [
     title: "Modified",
     width: { type: "flex" },
     sortKey: "modified",
+    hideable: true,
     cell: (row) => row.modified,
   },
   {
@@ -58,15 +61,40 @@ const COLUMNS: DataTableColumn<FileRow>[] = [
     title: "Size",
     width: { type: "flex" },
     sortKey: "size",
+    hideable: true,
     cell: (row) => row.size,
   },
   {
     id: "Type",
     title: "Type",
     width: { type: "flex" },
+    hideable: true,
     cell: (row) => row.type,
   },
+  settingsColumn<FileRow>({ title: "Choose columns" }),
 ];
+
+/** Holds which columns are hidden, as a consumer's store would. */
+const useColumnVisibility = (columns: DataTableColumn<FileRow>[]) => {
+  const [hidden, setHidden] = useState<string[]>(() =>
+    columns.filter((c) => c.visible === false).map((c) => c.id),
+  );
+
+  const visibleColumns = useMemo(
+    () => columns.map((c) => ({ ...c, visible: !hidden.includes(c.id) })),
+    [columns, hidden],
+  );
+
+  const onColumnVisibilityChange = useCallback(
+    (id: string, visible: boolean) =>
+      setHidden((prev) =>
+        visible ? prev.filter((x) => x !== id) : [...prev, id],
+      ),
+    [],
+  );
+
+  return { columns: visibleColumns, onColumnVisibilityChange };
+};
 
 // An instantiation of the generic component, so that the story's args are
 // typed for these rows.
@@ -137,9 +165,12 @@ const SortingTemplate = (args: React.ComponentProps<typeof FilesTable>) => {
     return sort.desc ? sorted.reverse() : sorted;
   }, [args.rows, sort]);
 
+  const visibility = useColumnVisibility(args.columns);
+
   return (
     <FilesTable
       {...args}
+      {...visibility}
       rows={rows}
       sort={sort}
       onSortChange={(key) =>
@@ -158,10 +189,19 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Name fills 40 % and the other columns share 60 %. A click on a sortable header sorts by it, a second click reverses the order; the table only reports the click, the story sorts the rows.",
+          "Name fills 40 % and the other columns share 60 %. A click on a sortable header sorts by it, a second click reverses the order; the table only reports the click, the story sorts the rows. The button at the end of the header shows and hides columns: a hidden column gives its width to its left neighbour, a shown one takes its share from the widest.",
       },
       source: {
         code: `const [sort, setSort] = useState<DataTableSort>({ key: "title", desc: false });
+const [hidden, setHidden] = useState<string[]>([]);
+
+const columns = useMemo(
+  () => [
+    ...allColumns.map((c) => ({ ...c, visible: !hidden.includes(c.id) })),
+    settingsColumn({ title: "Choose columns" }),
+  ],
+  [hidden],
+);
 
 <DataTable
   columns={columns}
@@ -171,6 +211,9 @@ export const Default: Story = {
   onSortChange={(key) =>
     setSort((prev) => ({ key, desc: prev.key === key ? !prev.desc : false }))
   }
+  onColumnVisibilityChange={(id, visible) =>
+    setHidden((prev) => (visible ? prev.filter((x) => x !== id) : [...prev, id]))
+  }
 />`,
       },
     },
@@ -178,7 +221,7 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const header = (id: string) =>
-      canvas.getByTestId(`data-table-header-${id}`);
+      canvas.queryByTestId(`data-table-header-${id}`);
 
     await expect(header("Name")).toHaveAttribute("aria-sort", "ascending");
 
@@ -192,6 +235,132 @@ export const Default: Story = {
       expect(header("Author")).toHaveAttribute("aria-sort", "ascending"),
     );
     await expect(header("Name")).not.toHaveAttribute("aria-sort");
+
+    // Hide Type through the settings menu, then show it again.
+    const typeItem = () =>
+      within(screen.getByTestId("data-table-settings-Type")).getByRole(
+        "checkbox",
+      );
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Choose columns" }),
+    );
+    await userEvent.click(typeItem());
+    await waitFor(() => expect(header("Type")).toBeNull());
+    await userEvent.click(typeItem());
+    await waitFor(() => expect(header("Type")).not.toBeNull());
+    await userEvent.keyboard("{Escape}");
+  },
+};
+
+const NarrowTemplate = (args: React.ComponentProps<typeof FilesTable>) => {
+  const visibility = useColumnVisibility(args.columns);
+
+  return (
+    <div style={{ width: 560 }}>
+      <FilesTable {...args} {...visibility} />
+    </div>
+  );
+};
+
+export const Compact: Story = {
+  render: (args) => <NarrowTemplate {...args} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "560 px cannot hold Name at 210 px and four columns at 110 px, so only Name and the fixed columns render, and the settings button is disabled: the design's rule for a small screen or an open side panel. The columns come back, in their old proportions, as soon as they fit.",
+      },
+      source: {
+        code: `<div style={{ width: 560 }}>
+  <DataTable
+    columns={columns}
+    rows={rows}
+    getRowKey={(row) => row.id}
+    onCompactChange={setCompact}
+  />
+</div>`,
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await waitFor(() =>
+      expect(
+        canvas
+          .getAllByRole("columnheader")
+          .map((cell) => cell.getAttribute("data-column-id")),
+      ).toEqual(["Name", "Settings"]),
+    );
+    await expect(
+      canvas.getByRole("button", { name: "Choose columns" }),
+    ).toBeDisabled();
+  },
+};
+
+const InfoPanelTemplate = (args: React.ComponentProps<typeof FilesTable>) => {
+  const visibility = useColumnVisibility(args.columns);
+  const widthStorage = useMemo(() => createMemoryWidths(), []);
+  const [panel, setPanel] = useState(false);
+
+  return (
+    <>
+      <button type="button" onClick={() => setPanel((open) => !open)}>
+        {panel ? "Close the info panel" : "Open the info panel"}
+      </button>
+      <div style={{ display: "flex", gap: 16, marginTop: 16 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <FilesTable {...args} {...visibility} widthStorage={widthStorage} />
+        </div>
+        {panel ? (
+          <aside
+            style={{ width: 400, flex: "none", border: "1px dashed gray" }}
+            data-testid="info-panel"
+          >
+            Info panel
+          </aside>
+        ) : null}
+      </div>
+    </>
+  );
+};
+
+export const WithInfoPanel: Story = {
+  render: (args) => <InfoPanelTemplate {...args} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Opening a side panel only narrows the table. The proportions are shares of the table, so they stay as they were and nothing is stored; the old table kept a second record for this case. If the narrower table cannot fit every column at its minimum, it turns compact until the panel closes.",
+      },
+      source: {
+        code: `<div style={{ display: "flex" }}>
+  <div style={{ flex: 1, minWidth: 0 }}>
+    <DataTable columns={columns} rows={rows} getRowKey={(row) => row.id} />
+  </div>
+  {infoPanelVisible ? <InfoPanel /> : null}
+</div>`,
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const table = canvas.getByTestId("data-table");
+    const grid = () => table.style.getPropertyValue("--data-table-grid");
+    const before = grid();
+    const wide = table.getBoundingClientRect().width;
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Open the info panel" }),
+    );
+    await waitFor(() =>
+      expect(table.getBoundingClientRect().width).toBeLessThan(wide),
+    );
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Close the info panel" }),
+    );
+    await waitFor(() => expect(grid()).toBe(before));
   },
 };
 

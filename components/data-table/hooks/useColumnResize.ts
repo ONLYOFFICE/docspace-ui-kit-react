@@ -21,7 +21,9 @@ type Drag = {
   width: number;
   startFractions: ColumnFractions;
   latest: ColumnFractions;
-  frame: number | null;
+  /** Whether a frame is pending; the id alone cannot say, see onPointerMove. */
+  scheduled: boolean;
+  frame: number;
 };
 
 type UseColumnResizeOptions = {
@@ -83,7 +85,7 @@ export const useColumnResize = ({
     const drag = dragRef.current;
     if (!drag || event.pointerId !== drag.pointerId) return;
 
-    if (drag.frame !== null) cancelAnimationFrame(drag.frame);
+    if (drag.scheduled) cancelAnimationFrame(drag.frame);
     dragRef.current = null;
     setResizingId(null);
 
@@ -122,7 +124,8 @@ export const useColumnResize = ({
         width: measure(),
         startFractions: fractions,
         latest: fractions,
-        frame: null,
+        scheduled: false,
+        frame: 0,
       };
       setResizingId(columnId);
     },
@@ -139,9 +142,13 @@ export const useColumnResize = ({
         toLogicalDelta(event.clientX - drag.startX, isRTL),
       );
 
-      if (drag.frame === null) {
+      // One write per frame. The flag says whether one is pending: the id is
+      // assigned after `requestAnimationFrame` returns, which can be after the
+      // callback already ran.
+      if (!drag.scheduled) {
+        drag.scheduled = true;
         drag.frame = requestAnimationFrame(() => {
-          drag.frame = null;
+          drag.scheduled = false;
           writeGrid(drag.latest);
         });
       }

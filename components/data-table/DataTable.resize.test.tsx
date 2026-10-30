@@ -146,6 +146,20 @@ describe("DataTable resizing", () => {
     expect(screen.getByTestId("data-table")).not.toHaveClass("isResizing");
   });
 
+  it("follows every move of a drag, not just the first", () => {
+    renderTable();
+    const target = handle("Name");
+
+    fireEvent.pointerDown(target, { pointerId: 1, button: 0, clientX: 500 });
+    fireEvent.pointerMove(target, { pointerId: 1, clientX: 520 });
+    expect(grid()).toContain("minmax(210px, 42fr)");
+    fireEvent.pointerMove(target, { pointerId: 1, clientX: 540 });
+    expect(grid()).toContain("minmax(210px, 44fr)");
+    fireEvent.pointerMove(target, { pointerId: 1, clientX: 560 });
+    expect(grid()).toContain("minmax(210px, 46fr)");
+    fireEvent.pointerUp(target, { pointerId: 1, clientX: 560 });
+  });
+
   it("puts the grid back and stores nothing when the pointer is cancelled", () => {
     const { save } = renderTable();
     const target = handle("Name");

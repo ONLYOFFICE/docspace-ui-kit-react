@@ -59,8 +59,18 @@
   align-items: center;
   min-width: 0;
   overflow: hidden;
+  padding-inline-end: 8px;
+
   // Room for the resize handle, whose line sits 8px before the column's end.
-  padding-inline-end: 16px;
+  &.hasResizeHandle {
+    padding-inline-end: 16px;
+  }
+
+  // A fixed column is exactly as wide as its content needs (the settings
+  // button, a checkbox); padding would clip it.
+  &.isFixed {
+    padding-inline-end: 0;
+  }
 }
 
 // ===== Resize handle =====
@@ -159,6 +169,60 @@
   .isAscending & {
     transform: scaleY(-1);
   }
+}
+
+// ===== Column settings =====
+
+.settings {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.settingsButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+
+  border: 0;
+  background: none;
+  cursor: pointer;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  svg path {
+    fill: var(--data-table-header-text-color);
+  }
+
+  &:hover:not(:disabled) svg path {
+    fill: var(--data-table-header-text-hover-color);
+  }
+
+  &:focus-visible {
+    outline: 1px solid var(--data-table-header-text-hover-color);
+  }
+
+  &:disabled {
+    cursor: default;
+
+    svg path {
+      fill: var(--data-table-resize-color);
+    }
+  }
+}
+
+.settingsCheckbox {
+  padding: 8px 16px;
+  white-space: nowrap;
 }
 
 // ===== Body =====

@@ -47,6 +47,10 @@ export type DataTableColumn<T> = {
   /** Whether the column is shown. A hidden column renders nothing, in the header or the rows.
    * @default true */
   visible?: boolean;
+  /** Whether the column settings menu offers to show and hide this column. */
+  hideable?: boolean;
+  /** The column's name in the settings menu, when `title` is not plain text. */
+  settingsLabel?: string;
   /** Whether a drag may change the column's width. Ignored for `fixed` columns.
    * @default true */
   resizable?: boolean;
@@ -75,6 +79,14 @@ export interface DataTableProps<T> {
   sort?: DataTableSort;
   /** Called with a column's `sortKey` when its header is clicked. Without it, headers are not buttons. */
   onSortChange?: (sortKey: string) => void;
+  /**
+   * Called when the user ticks or unticks a column in the settings menu, and
+   * with `true` when `sort` moves to a hidden `hideable` column. The table does
+   * not hide anything itself: update the column's `visible`.
+   */
+  onColumnVisibilityChange?: (columnId: string, visible: boolean) => void;
+  /** Called when the table enters or leaves compact mode, where only `fill` and `fixed` columns render. */
+  onCompactChange?: (compact: boolean) => void;
   /**
    * Where the column widths are remembered. Without it the table still lays
    * out and resizes, and forgets the layout on unmount.
