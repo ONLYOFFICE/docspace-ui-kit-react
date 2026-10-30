@@ -218,7 +218,7 @@ around the panel, they reach its header too.
 - Renders a real `<aside>` element, so it is exposed as a complementary landmark, not a dialog:
   no `role="dialog"` and no `aria-modal`. The focus is not moved into it on open, but while
   `visible` Tab and Shift+Tab stay inside it
-  ([`useFocusTrap`](../../hooks/useFocusTrap/README.md)): the first Tab from the page behind
+  (`useFocusTrap`): the first Tab from the page behind
   lands on its first control, and the last one wraps to the first.
 - Because the markup stays in the document while `visible` is false, everything inside it is
   reachable by keyboard from the page behind. Conditional rendering is what prevents that.
