@@ -82,6 +82,8 @@ export type ArticleLiveChatProps = ArticleZendeskProps & {
   withFloatingButton?: boolean;
   /** The info panel is docked at the inline end, so the launcher moves clear of it. */
   isInfoPanelVisible?: boolean;
+  /** Width in px of the open info panel, or of the AI chat open in its place, which the launcher moves clear of; `0` when neither is. Set, it wins over `isInfoPanelVisible`, which assumes `INFO_PANEL_WIDTH`. */
+  infoPanelWidth?: number;
 };
 
 export type ArticleProfileProps = {
@@ -114,11 +116,10 @@ export type ArticleProps = ArticleProfileProps &
      * @deprecated Not read: the live chat launcher no longer moves for a progress indicator. Kept so existing callers compile; it goes in the next major.
      */
     showProgress?: boolean;
-    /**
-     * Whether the info panel is open.
-     * @deprecated Not read: the live chat launcher no longer moves clear of the info panel. Kept so existing callers compile; it goes in the next major.
-     */
+    /** Whether the info panel is open. Above mobile the live chat launcher moves clear of it. */
     isInfoPanelVisible?: boolean;
+    /** Width in px of the open info panel, or of the AI chat open in its place, for the live chat launcher to move clear of; `0` when neither is. Set, it wins over `isInfoPanelVisible`, which assumes `INFO_PANEL_WIDTH`. Pass it when the panels are resizable. */
+    infoPanelWidth?: number;
     /** Called on mount and on every device change. Wire it to the state behind `isMobileArticle`. */
     setIsMobileArticle: (value: boolean) => void;
     /** The three slots, as an array. Each is `Article.Header`, `Article.MainButton` or `Article.Body`; anything else is dropped, and the slots are matched by display name, so a wrapper around one hides it. */

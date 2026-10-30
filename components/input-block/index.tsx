@@ -14,7 +14,7 @@ const InputBlock = React.memo(
     type,
     value = "",
     placeholder,
-    tabIndex = -1,
+    tabIndex,
     maxLength = 255,
     autoComplete = "off",
     mask,

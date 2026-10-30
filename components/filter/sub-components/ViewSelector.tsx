@@ -4,6 +4,7 @@ import classNames from "classnames";
 
 import { useCommonTranslation } from "../../../utils/i18n";
 import { TooltipContainer } from "../../tooltip";
+import { activateOnButtonKey } from "../../../utils/keyboard-activation";
 import styles from "../Filter.module.scss";
 
 export type TViewSelectorOption = {
@@ -63,6 +64,27 @@ const ViewSelector = ({
 
   const lastIndx = viewSettings && viewSettings.length - 1;
 
+  const getTitle = (value: string) =>
+    value === "row"
+      ? (t("SwitchViewToCompact") ?? "")
+      : (t("SwitchToThumbnails") ?? "");
+
+  // Each icon is a button to the keyboard: Enter / Space click it, and the
+  // click reaches the selector's own handler as a pointer's does.
+  const getKeyboardProps = (value: string, isPressed?: boolean) =>
+    isDisabled
+      ? {}
+      : {
+          role: "button",
+          tabIndex: 0,
+          "aria-label": getTitle(value),
+          "aria-pressed": isPressed,
+          onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) =>
+            activateOnButtonKey(e, ({ currentTarget }) =>
+              currentTarget.click(),
+            ),
+        };
+
   const renderFewIconView = () => {
     return viewSettings.map((el: TViewSelectorOption, indx: number) => {
       const { value, icon, id } = el;
@@ -80,11 +102,8 @@ const ViewSelector = ({
           id={id}
           key={value}
           data-view={value}
-          title={
-            value === "row"
-              ? (t("SwitchViewToCompact") ?? "")
-              : (t("SwitchToThumbnails") ?? "")
-          }
+          title={getTitle(value)}
+          {...getKeyboardProps(value, viewAs === value)}
           data-testid="view-selector-icon"
         >
           {typeof icon === "string" ? <ReactSVG src={icon} /> : icon}
@@ -110,11 +129,8 @@ const ViewSelector = ({
           })}
           key={value}
           data-view={value}
-          title={
-            value === "row"
-              ? (t("SwitchViewToCompact") ?? "")
-              : (t("SwitchToThumbnails") ?? "")
-          }
+          title={getTitle(value)}
+          {...getKeyboardProps(value)}
           data-testid="view-selector-icon"
         >
           {typeof icon === "string" ? <ReactSVG src={icon} /> : icon}
