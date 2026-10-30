@@ -8,6 +8,7 @@ import VerticalDotsReactSvg from "../../assets/icons/16/vertical-dots.react.svg"
 
 import { isTablet, isMobile } from "../../utils";
 import { consumeKey } from "../../utils/consume-key";
+import { keyboardClickAt } from "../../utils/keyboard-activation";
 import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 import { useCommonTranslation } from "../../utils/i18n";
 
@@ -26,44 +27,6 @@ const OUTSIDE_CLICK_EVENTS = ["click", "mousedown"];
 const MENU_ITEM_SELECTOR = '[role="menuitem"]:not([aria-disabled="true"])';
 
 type TFocusTarget = "first" | "last" | null;
-
-// A click event positioned at the element's lower start corner -- the left
-// one, or the right one in RTL, where ContextMenu puts the menu's right edge
-// at pageX -- for an action the keyboard started. It is never dispatched, so it is given the
-// target, currentTarget and nativeEvent a handler typed for a React mouse
-// event reads, and the methods React adds to its events, so a handler that
-// calls isDefaultPrevented() or persist() does not throw.
-const keyboardClickAt = (
-  element: HTMLElement | null,
-  isRTL: boolean,
-): React.MouseEvent => {
-  const rect = element?.getBoundingClientRect();
-  const left = (isRTL ? rect?.right : rect?.left) ?? 0;
-  const bottom = rect?.bottom ?? 0;
-  const event = new MouseEvent("click", {
-    bubbles: true,
-    cancelable: true,
-    clientX: left,
-    clientY: bottom,
-  });
-  Object.defineProperty(event, "pageX", { value: left + window.scrollX });
-  Object.defineProperty(event, "pageY", { value: bottom + window.scrollY });
-  Object.defineProperty(event, "target", { value: element });
-  Object.defineProperty(event, "currentTarget", { value: element });
-  Object.defineProperty(event, "nativeEvent", { value: event });
-  let propagationStopped = false;
-  const stopPropagation = event.stopPropagation.bind(event);
-  Object.assign(event, {
-    stopPropagation: () => {
-      propagationStopped = true;
-      stopPropagation();
-    },
-    isDefaultPrevented: () => event.defaultPrevented,
-    isPropagationStopped: () => propagationStopped,
-    persist: () => {},
-  });
-  return event as unknown as React.MouseEvent;
-};
 
 const ContextMenuButtonPure = ({
   opened = false,

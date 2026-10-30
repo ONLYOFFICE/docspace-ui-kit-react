@@ -37,7 +37,13 @@ const DragAndDrop = (props: DragAndDropProps) => {
     onDragLeave?.(e);
   };
 
+  // No file input is rendered here, so the keyboard has nothing to open: by
+  // default the dropzone would still make the wrapper a focusable
+  // role="button" around a whole section or row. It stays focusable from
+  // script (tabIndex -1): the portal moves the focus to the section body after
+  // a navigation so that the list's hotkeys apply.
   const { getRootProps, isDragActive } = useDropzone({
+    noKeyboard: true,
     noDragEventsBubbling: !isDropZone,
     onDrop: onDropAction,
     onDragOver: onDragOverAction,
@@ -54,7 +60,11 @@ const DragAndDrop = (props: DragAndDropProps) => {
   });
 
   return (
-    <div {...rest} className={rootClassName} {...getRootProps()}>
+    <div
+      {...rest}
+      className={rootClassName}
+      {...getRootProps({ role: "presentation", tabIndex: -1 })}
+    >
       {children}
     </div>
   );

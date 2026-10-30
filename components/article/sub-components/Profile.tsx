@@ -122,6 +122,8 @@ const ArticleProfile = (props: ArticleProfileProps) => {
                 iconNode={<VerticalDotsReactSvg />}
                 size={32}
                 isFill
+                ariaLabel={t("MoreOptions")}
+                aria-haspopup="menu"
                 dataTestId="profile_user_icon_button"
               />
               <ContextMenu

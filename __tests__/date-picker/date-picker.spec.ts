@@ -6,6 +6,9 @@ const STORY_BASE = "ui-form-controls-datepicker";
 
 async function gotoStory(page: Page, storyId: string) {
   const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
+  // The stories open on today and highlight it, so a screenshot taken on
+  // another day differs. Pin "today" to the day the baselines were taken.
+  await page.clock.setFixedTime(new Date("2026-10-28T12:00:00"));
   await page.goto(url);
   // Storybook answers 200 for an unknown id and shows its error display
   // instead of the story: fail on that now, not on a timeout further down.

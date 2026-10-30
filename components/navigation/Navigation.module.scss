@@ -533,6 +533,12 @@
       .icon {
         flex-shrink: 0;
       }
+
+      // Inset: the slot clips its overflow for the collapse, and that cut
+      // Button's outside ring away entirely.
+      &:focus-visible {
+        outline-offset: -2px;
+      }
     }
   }
 
