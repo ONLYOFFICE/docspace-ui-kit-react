@@ -3,6 +3,7 @@ import { ReactSVG } from "react-svg";
 import CrossReactSvgUrl from "../../assets/icons/12/cross.react.svg";
 import { IconButton } from "../icon-button";
 import { TooltipContainer } from "../tooltip";
+import { activateOnButtonKey } from "../../utils/keyboard-activation";
 
 import type { SelectedItemProps } from "./SelectedItem.types";
 import styles from "./SelectedItem.module.scss";
@@ -27,6 +28,7 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
     dataTestId,
     icon,
     isActive,
+    clickable,
   } = props;
   if (!label) return null;
 
@@ -40,6 +42,21 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
     if (!isDisabled && !target.closest(".selected-tag-removed"))
       onClick?.(propKey, label, group, e);
   };
+
+  // A clickable chip is a button to the keyboard: Enter / Space click it, so
+  // the key takes the same path as the pointer.
+  const keyboardProps =
+    clickable && !isDisabled
+      ? {
+          role: "button",
+          tabIndex: 0,
+          "aria-pressed": isActive,
+          onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) =>
+            activateOnButtonKey(e, ({ currentTarget }) =>
+              currentTarget.click(),
+            ),
+        }
+      : {};
 
   const selectedItemClassNames = [
     styles.selectedItem,
@@ -68,6 +85,7 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
       ref={forwardedRef}
       data-testid={dataTestId ?? "selected-item"}
       title={title}
+      {...keyboardProps}
     >
       {icon ? (
         typeof icon === "string" ? (

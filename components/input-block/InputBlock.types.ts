@@ -24,11 +24,8 @@ type CommonProps = {
   /** Ref to the `<input>` element itself. */
   forwardedRef?: React.Ref<HTMLInputElement>;
   /**
-   * Used as HTML `tabindex` property of the `<input>`. Unlike `TextInput`'s, this one defaults to
-   * `-1`, so the field is out of the tab order until you pass `0` — and so is every component
-   * built on it that passes its own `tabIndex` through, `SearchInput` and `PasswordInput` among
-   * them.
-   * @default -1
+   * Used as HTML `tabindex` property of the `<input>`. Unset, the field keeps its natural place in
+   * the tab order; pass `-1` only for a field the keyboard must skip.
    */
   tabIndex?: number;
 };

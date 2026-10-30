@@ -39,4 +39,10 @@
   :global(.table-container_row-loader) {
     display: inline-flex;
   }
+
+  // The cell holds the row's "..." button and nothing to ellipsize. Clipping
+  // it cut off the keyboard ring of a button that sits flush with its end.
+  :global(.table-container_row-context-menu-wrapper) {
+    overflow: visible;
+  }
 }

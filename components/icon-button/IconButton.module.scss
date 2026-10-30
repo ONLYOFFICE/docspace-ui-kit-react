@@ -41,6 +41,20 @@
     cursor: default;
   }
 
+  // Same keyboard ring as Button: the pointer gets none. Outside the icon, so
+  // a 12-16px glyph still gets a ring big enough to find; a container that
+  // clips its overflow flush with a larger button moves it inside with
+  // --icon-button-focus-offset.
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--icon-button-focus-color, var(--accent-main));
+    outline-offset: var(--icon-button-focus-offset, 2px);
+    border-radius: 2px;
+  }
+
   &.stroke {
     svg {
       &:not(:root) {

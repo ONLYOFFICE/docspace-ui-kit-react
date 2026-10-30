@@ -341,10 +341,14 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     // The same exclusion comboBoxClick makes: the optional children block
     // (`children`) keeps its own keys while disableIconClick is on.
     if (disableIconClick && isInOptionalBlock(target, e.currentTarget)) return;
+    // disableItemClick hands the opening to the caller, which then drives
+    // `opened` through onToggle (the sort button and the overflow "..." do).
+    // The keys still open the list through that same onToggle; with no
+    // onToggle nobody would open it, so they stay off too.
     if (
       isDisabled ||
       isLoading ||
-      props.disableItemClick ||
+      (props.disableItemClick && !onToggle) ||
       displayType === ComboBoxDisplayType.toggle
     )
       return;
