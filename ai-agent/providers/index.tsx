@@ -239,6 +239,11 @@ type AiAgentProvidersProps = {
    */
   onProfilePickerSelect?: (profile: Profile, actionId?: string) => void;
   /**
+   * Awaited when the model picker is asked to open, before it shows: the
+   * host refreshes what `profilePickerActions` lists (the AI projects).
+   */
+  onProfilePickerOpen?: () => void | Promise<void>;
+  /**
    * Host override for the chat error box content (title / description /
    * action) by normalized error code — see {@link WidgetConfig.formatChatError}.
    * Return `null` to keep the library default (localized text + Retry).
@@ -366,16 +371,32 @@ const ProfilePickerAliasBridge = ({
   const { useProfilesStore } = useStores();
   const initialized = useProfilesStore((s) => s.initialized);
   const getProfileById = useProfilesStore((s) => s.getProfileById);
+  const ensureProfiles = useProfilesStore((s) => s.ensureProfiles);
   const setSessionChatProfile = useProfilesStore(
     (s) => s.setSessionChatProfile,
   );
 
   useEffect(() => {
     if (!alias || !initialized) return;
-    const profile = getProfileById(alias.profileId);
-    if (!profile) return;
-    setSessionChatProfile({ ...profile, name: alias.label });
-  }, [alias, initialized, getProfileById, setSessionChatProfile]);
+    // The chat starts knowing only its assigned profiles; the aliased one
+    // (a project's model) may be another, so the catalogue is read first.
+    let cancelled = false;
+    void ensureProfiles().then(() => {
+      if (cancelled) return;
+      const profile = getProfileById(alias.profileId);
+      if (!profile) return;
+      setSessionChatProfile({ ...profile, name: alias.label });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    alias,
+    initialized,
+    ensureProfiles,
+    getProfileById,
+    setSessionChatProfile,
+  ]);
 
   return null;
 };
@@ -586,6 +607,7 @@ const AiAgentProviders = ({
   profilePickerActions,
   profilePickerAlias,
   onProfilePickerSelect,
+  onProfilePickerOpen,
   formatChatError,
   onThreadContextChange,
   composerHeader,
@@ -1092,6 +1114,7 @@ const AiAgentProviders = ({
       profilePickerReadOnly,
       profilePickerActions,
       onProfilePickerSelect,
+      onProfilePickerOpen,
       dropdownNavigation: isMobile ? "drilldown" : "flyout",
       formatChatError,
       // Hide "Always allow" only for generate tools (matched by full name).

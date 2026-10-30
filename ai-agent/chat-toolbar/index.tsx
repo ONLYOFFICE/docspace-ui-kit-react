@@ -33,12 +33,11 @@ export const ChatToolbar: React.FC<ChatToolbarProps> = ({
   const stores = useStores();
   const currentPage = stores.useRouter((s) => s.currentPage);
   const setCurrentPage = stores.useRouter((s) => s.setCurrentPage);
+  const openHistory = stores.useRouter((s) => s.openHistory);
   const startNewChat = stores.useThreadsStore((s) => s.onSwitchToNewThread);
   // Empty string while no thread is selected — i.e. an unsaved new chat.
   const threadId = stores.useThreadsStore((s) => s.threadId);
-  const profiles = stores.useProfilesStore((s) => s.profiles);
-
-  const hasProfile = profiles.length > 0;
+  const hasProfile = stores.useProfilesStore((s) => s.hasProfiles);
 
   const isHistoryActive = currentPage === "history";
   const isNewChat = !threadId;
@@ -48,7 +47,8 @@ export const ChatToolbar: React.FC<ChatToolbarProps> = ({
       return setCurrentPage("chat");
     }
 
-    setCurrentPage("history");
+    // The page turns once the thread list is read: nothing shows half-empty.
+    void openHistory();
   };
 
   const handleStartNewChat = () => {

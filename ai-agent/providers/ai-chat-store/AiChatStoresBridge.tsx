@@ -21,7 +21,7 @@ const AiChatStoresBridge = () => {
   const store = useAiChatStore();
   const stores = useStores();
   const currentPage = stores.useRouter((s) => s.currentPage);
-  const profiles = stores.useProfilesStore((s) => s.profiles);
+  const hasProfiles = stores.useProfilesStore((s) => s.hasProfiles);
   const initialized = stores.useProfilesStore((s) => s.initialized);
 
   useEffect(() => {
@@ -34,8 +34,8 @@ const AiChatStoresBridge = () => {
     // hasProfiles to false and blink every gated UI across the app, so the
     // last known value is kept until hydration completes.
     if (!initialized) return;
-    store.setHasProfiles(profiles.length > 0);
-  }, [store, profiles, initialized]);
+    store.setHasProfiles(hasProfiles);
+  }, [store, hasProfiles, initialized]);
 
   const hasAnalyzeChip = useAnalyzeLock(stores.useAttachmentsStore);
 

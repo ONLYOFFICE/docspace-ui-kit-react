@@ -18,16 +18,6 @@ import type { ChatProps } from "./chat.types";
 // The in-chat AI settings section now lives in DocSpace portal settings.
 const AI_SETTINGS_URL = "/portal-settings/ai-settings";
 
-// The Chat bit of a profile's capability mask (ASC.AI.Integration).
-const CHAT_CAPABILITY = 0x01;
-
-// Whether a profile can drive a chat round, the way the widget's model
-// pickers decide it: no mask predates capability reporting and is allowed, an
-// explicit one must carry the Chat bit. Image-only gateway models (Nano
-// Banana) stay in the profiles list, but the picker never offers them.
-const isChatCapable = ({ capabilities }: { capabilities?: number }) =>
-  !capabilities || (capabilities & CHAT_CAPABILITY) !== 0;
-
 const NewChat: React.FC<ChatProps> = observer(
   ({ aiReady = true, noAccessProps, isAgents }) => {
     const isDesktop = useIsDesktop();
@@ -35,9 +25,10 @@ const NewChat: React.FC<ChatProps> = observer(
     const stores = useStores();
     const currentPage = stores.useRouter((s) => s.currentPage);
     const setCurrentPage = stores.useRouter((s) => s.setCurrentPage);
-    const profiles = stores.useProfilesStore((s) => s.profiles);
-    const hasProfiles = profiles.length > 0;
-    const hasChatProfiles = profiles.some(isChatCapable);
+    // The portal-wide flags: the chat starts knowing only its assigned
+    // profiles, so the list's length says nothing about the catalogue.
+    const hasProfiles = stores.useProfilesStore((s) => s.hasProfiles);
+    const hasChatProfiles = stores.useProfilesStore((s) => s.hasChatProfiles);
     const profilesInitialized = stores.useProfilesStore((s) => s.initialized);
     // Empty string when no thread is selected (see ThreadsStoreState.threadId).
     const threadId = stores.useThreadsStore((s) => s.threadId);
