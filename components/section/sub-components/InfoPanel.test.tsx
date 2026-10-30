@@ -94,6 +94,36 @@ describe("InfoPanel resizer", () => {
     expect(onResize).toHaveBeenCalledWith(550);
   });
 
+  it("ends a drag whose mouse button was released out of its sight", () => {
+    const onResize = vi.fn();
+    render(panel({ onResize }));
+    const mouse = { pointerType: "mouse", pointerId: 1 };
+
+    fireEvent.pointerDown(resizer(), { ...mouse, clientX: 800, button: 0 });
+    fireEvent.pointerMove(window, { ...mouse, clientX: 700, buttons: 1 });
+    fireEvent.pointerMove(window, { ...mouse, clientX: 600, buttons: 0 });
+
+    expect(onResize).toHaveBeenCalledWith(500);
+    expect(document.body.className).toBe("");
+
+    fireEvent.pointerMove(window, { ...mouse, clientX: 500, buttons: 0 });
+    expect(panelWidth()).toBe("500px");
+  });
+
+  it("ends a drag once the window loses focus", () => {
+    const onResize = vi.fn();
+    render(panel({ onResize }));
+
+    fireEvent.pointerDown(resizer(), { clientX: 800, button: 0 });
+    fireEvent.pointerMove(window, { clientX: 700 });
+    fireEvent.blur(window);
+
+    expect(onResize).toHaveBeenCalledWith(500);
+
+    fireEvent.pointerMove(window, { clientX: 600 });
+    expect(panelWidth()).toBe("500px");
+  });
+
   it("stays between the default width and its own cap", () => {
     const onResize = vi.fn();
     render(panel({ onResize }));

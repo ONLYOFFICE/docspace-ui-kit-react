@@ -480,6 +480,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   panel with its border and wrote that to `--chat-panel-width`, which sets the content box: a click
   on the edge committed 401 for a 400px panel. `setChatPanelWidth` now receives the content width,
   and a grab released without moving commits nothing.
+- **A `Section` panel resize no longer outlives its mouse button.** A drag whose button was
+  released where the page could not see it, in another window after Alt+Tab or over the Start
+  menu, went on moving the panel with the pointer and kept the resize cursor until the next click.
+  The drag now ends, committing the width it reached, as soon as the window loses focus or the
+  pointer moves without the button.
 - **A late search result no longer overwrites a newer edit in `Filter`'s search box.** A query the
   host applied after the user had already changed or cleared the box came back into it and was
   searched again. Such a stale value, or a new `getSelectedInputValue` returning the value already
