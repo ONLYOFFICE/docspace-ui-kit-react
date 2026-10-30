@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, act } from "@testing-library/react";
 
 import { SortByFieldName } from "../../../enums";
@@ -265,5 +265,58 @@ describe("<TableHeader />", () => {
     });
 
     expect(onChangeMock).toHaveBeenCalledWith("Type");
+  });
+
+  describe("a reset in a narrow container", () => {
+    const narrow = (width: number) => {
+      window.HTMLElement.prototype.getBoundingClientRect = vi.fn(
+        () => ({ width, height: 40, top: 0, left: 0 }) as DOMRect,
+      );
+      vi.spyOn(Element.prototype, "clientWidth", "get").mockReturnValue(width);
+    };
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    const resetWith = (
+      before: typeof mockColumns,
+      after: typeof mockColumns,
+    ) => {
+      const { rerender } = render(
+        <TableHeaderWithContainerRef {...defaultProps} columns={before} />,
+      );
+      localStorage.removeItem(COLUMN_STORAGE_NAME);
+
+      act(() => {
+        rerender(
+          <TableHeaderWithContainerRef {...defaultProps} columns={after} />,
+        );
+      });
+
+      return localStorage.getItem(COLUMN_STORAGE_NAME)?.split(" ");
+    };
+
+    const [name, type, tags] = mockColumns;
+    const extra = { ...tags, key: "Extra", title: "Extra" };
+
+    it("keeps the name column at its own minimum", () => {
+      narrow(400);
+
+      const sizes = resetWith(
+        [name, type],
+        [name, type, { ...tags, enable: false }],
+      );
+
+      expect(sizes?.[0]).toBe("210px");
+    });
+
+    it("shows only the name column once the others cannot fit", () => {
+      narrow(400);
+
+      const sizes = resetWith(mockColumns, [...mockColumns, extra]);
+
+      expect(sizes).toEqual(["376px", "0px", "0px", "0px", "0px", "24px"]);
+    });
   });
 });
