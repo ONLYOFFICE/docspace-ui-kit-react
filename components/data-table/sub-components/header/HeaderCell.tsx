@@ -8,12 +8,15 @@ import type {
   DataTableSort,
 } from "../../DataTable.types";
 import styles from "../../DataTable.module.scss";
+import type { HeaderResize } from "./DataTableHeader";
+import { ResizeHandle } from "./ResizeHandle";
 
 type HeaderCellProps<T> = {
   column: DataTableColumn<T>;
   sort?: DataTableSort;
   onSortChange?: (sortKey: string) => void;
   context: DataTableHeaderContext;
+  resize?: HeaderResize;
 };
 
 const ariaSortOf = (sort: DataTableSort | undefined, sortKey?: string) => {
@@ -26,6 +29,7 @@ export const HeaderCell = <T,>({
   sort,
   onSortChange,
   context,
+  resize,
 }: HeaderCellProps<T>) => {
   const { id, title, header, sortKey, headerRef, headerClassName } = column;
 
@@ -74,6 +78,15 @@ export const HeaderCell = <T,>({
       data-testid={`data-table-header-${id}`}
     >
       {renderContent()}
+      {resize?.canResize(id) ? (
+        <ResizeHandle
+          columnId={id}
+          label={typeof title === "string" ? title : id}
+          valueNow={resize.valueOf(id)}
+          active={resize.resizingId === id}
+          {...resize.bind(id)}
+        />
+      ) : null}
     </div>
   );
 };

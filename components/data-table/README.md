@@ -5,21 +5,21 @@
   "kind": "component",
   "category": "Data display",
   "status": "public",
-  "summary": "Columnar list whose header and rows share one grid, with sortable columns and widths remembered as shares of the table.",
+  "summary": "Columnar list whose header and rows share one grid, with sortable, resizable columns whose widths are remembered as shares of the table.",
   "import": { "subpath": "components/data-table", "barrel": false, "default": false },
   "exports": ["DataTable", "DataTableProps", "DataTableColumn", "DataTableSort", "DataTableCellContext", "DataTableHeaderContext", "ColumnWidth", "WidthStorage", "createLocalStorageWidths", "createMemoryWidths", "DATA_TABLE_MIN_FILL_WIDTH", "DATA_TABLE_MIN_COLUMN_WIDTH"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
   "related": ["table", "rows"],
   "subComponents": [],
-  "testIds": ["data-table", "data-table-header", "data-table-header-<columnId>", "data-table-sort-<columnId>", "data-table-body", "data-table-row"]
+  "testIds": ["data-table", "data-table-header", "data-table-header-<columnId>", "data-table-sort-<columnId>", "data-table-resize-<columnId>", "data-table-body", "data-table-row"]
 } -->
 
 # DataTable
 
-Columnar list whose header and rows share one grid, with sortable columns and widths remembered
-as shares of the table. It is the successor of [`Table`](../table/README.md), being built next to
-it; this version has no column resizing, settings menu or virtualisation yet.
+Columnar list whose header and rows share one grid, with sortable, resizable columns whose widths
+are remembered as shares of the table. It is the successor of [`Table`](../table/README.md), being
+built next to it; this version has no settings menu or virtualisation yet.
 
 ## Use this when / not when
 
@@ -28,8 +28,7 @@ it; this version has no column resizing, settings menu or virtualisation yet.
   Until then, [`Table`](../table/README.md) is the one that virtualises.
 - Not for a list of items with one line each — [`Rows`](../rows/README.md) is the portal's own
   list.
-- There is no column resizing by drag and no settings menu yet. Widths come from the defaults or
-  from the stored record, and visibility from each column's `visible`.
+- There is no settings menu yet: which columns show comes from each column's `visible`.
 
 ## Import
 
@@ -224,8 +223,19 @@ export function Docs({ docs, userId }: { docs: Doc[]; userId: string }) {
   record of another table, of the old `Table` (a pixel string) or one that cannot be parsed reads
   as nothing stored. Storage that is blocked, full or absent is ignored.
 - The table restores the stored record before its first paint, and again only when
-  `widthStorage.id` changes. It never writes the record by rendering, so a second window with the
-  same key does not overwrite the first one's layout.
+  `widthStorage.id` changes. It writes the record only when the user resizes or resets, never by
+  rendering, so a second window with the same key does not overwrite the first one's layout.
+- A column's trailing edge in the header is a resize handle when the column is resizable and a
+  resizable column follows it, so the last flexible column and `fixed` columns have none. Dragging
+  it grows the column and shrinks the resizable columns on the side the pointer moves to, nearest
+  first, each down to its minimum; the column on the other side of the edge takes the difference.
+  The total never changes, so the table never scrolls sideways. `fixed` columns are skipped.
+- During a drag only the `--data-table-grid` property changes, once per animation frame; React
+  does not re-render. The widths are committed and stored once, when the pointer is released. A
+  cancelled pointer (`pointercancel`) puts the grid back and stores nothing.
+- A double click on any edge resets every column to 40/60 and clears the stored record.
+- In right-to-left the edges sit on the left of each header and both the pointer and the arrow
+  keys are mirrored: the edge follows the pointer and the key's visual direction.
 - `isLast` in the cell context is true for the last rendered column that is not `fixed`, so
   trailing content lands before a fixed context-menu column, not in it.
 - The header is `position: sticky` at the top of the nearest scrolling ancestor. Each body cell is
@@ -239,7 +249,13 @@ The table element has `role="table"`, with `aria-label` from `ariaLabel`. The he
 are each a `role="rowgroup"`, every row `role="row"`, header cells `role="columnheader"` and body
 cells `role="cell"`. A header with a `sortKey`, when `onSortChange` is given, holds a native
 `<button>`, so it is reachable with Tab and sorts on Enter or Space; the sorted column carries
-`aria-sort="ascending"` or `"descending"`. The sort arrow is decorative (`aria-hidden`). A `fixed`
+`aria-sort="ascending"` or `"descending"`. The sort arrow is decorative (`aria-hidden`).
+
+Each resize handle is a focusable `role="separator"` with `aria-orientation="vertical"`, named
+after its column (`title` when it is a string, otherwise the column id) and reporting the column's
+share of the flexible space as `aria-valuenow` from 0 to 100, with `aria-valuetext` such as
+`"40%"`. ArrowLeft and ArrowRight move the edge 10 px, 50 px with Shift; the handle sits outside
+the sort button, so it never sorts. A `fixed`
 column with an empty `title`, such as a context-menu column, has an empty column header; give it a
 `header` renderer with visually hidden text if it needs a name.
 
@@ -251,6 +267,7 @@ column with an empty `title`, such as a context-menu column, has an empty column
 | Header row group             | `data-table-header`                    |
 | Header cell of a column      | `data-table-header-<columnId>`         |
 | Sort button in a header cell | `data-table-sort-<columnId>`           |
+| Resize handle of a column    | `data-table-resize-<columnId>`         |
 | Body row group               | `data-table-body`                      |
 | Each body row                | `data-table-row`                       |
 
@@ -258,6 +275,6 @@ Header and body cells also carry `data-column-id="<columnId>"`.
 
 ## Related
 
-- [`Table`](../table/README.md) — the table this one replaces; it resizes, virtualises and has a
-  settings menu today.
+- [`Table`](../table/README.md) — the table this one replaces; it virtualises and has a settings
+  menu today.
 - [`Rows`](../rows/README.md) — a one-line-per-item list instead of columns.

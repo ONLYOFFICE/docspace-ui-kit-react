@@ -10,6 +10,8 @@
     --data-table-border-color: #{colors.$gray-light-mid};
     --data-table-header-text-color: #{colors.$gray};
     --data-table-header-text-hover-color: #{colors.$light-gray-dark};
+    --data-table-resize-color: #{colors.$gray-strong};
+    --data-table-resize-active-color: #{colors.$light-gray-dark};
   }
 
   :global(.dark) & {
@@ -17,11 +19,21 @@
     --data-table-border-color: #{colors.$gray-dark-strong};
     --data-table-header-text-color: #{colors.$gray-dark};
     --data-table-header-text-hover-color: #{colors.$white};
+    --data-table-resize-color: #{colors.$gray-dark-strong};
+    --data-table-resize-active-color: #{colors.$gray-dark};
   }
 
   position: relative;
   width: 100%;
   min-width: 0;
+
+  // While an edge is dragged, the pointer keeps its resize cursor over the
+  // whole table and nothing gets text-selected on the way.
+  &.isResizing,
+  &.isResizing * {
+    cursor: ew-resize !important;
+    user-select: none !important;
+  }
 }
 
 // ===== Header =====
@@ -42,11 +54,48 @@
 }
 
 .headerCell {
+  position: relative;
   display: flex;
   align-items: center;
   min-width: 0;
   overflow: hidden;
-  padding-inline-end: 8px;
+  // Room for the resize handle, whose line sits 8px before the column's end.
+  padding-inline-end: 16px;
+}
+
+// ===== Resize handle =====
+
+// A 16px hit area at the end of the header cell, drawing a 2 x 10px line 8px
+// before the end, where the old table drew it.
+.resizeHandle {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  z-index: 1;
+  width: 16px;
+
+  cursor: ew-resize;
+  touch-action: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 14px;
+    inset-inline-end: 8px;
+    height: 10px;
+    border-inline-end: 2px solid var(--data-table-resize-color);
+  }
+
+  &:hover::after,
+  &.isActive::after,
+  &:focus-visible::after {
+    border-color: var(--data-table-resize-active-color);
+  }
+
+  &:focus-visible {
+    outline: 1px solid var(--data-table-header-text-hover-color);
+    outline-offset: -1px;
+  }
 }
 
 .headerText {

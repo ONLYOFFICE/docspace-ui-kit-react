@@ -5,9 +5,17 @@ import classNames from "classnames";
 
 import type { DataTableProps } from "./DataTable.types";
 import { useColumnLayout } from "./hooks/useColumnLayout";
-import { type LayoutColumn, isFlexible } from "./layout/engine";
+import { useColumnResize } from "./hooks/useColumnResize";
+import {
+  type LayoutColumn,
+  hasResizeHandle,
+  isFlexible,
+} from "./layout/engine";
 import { getRenderedColumns } from "./layout/grid";
-import { DataTableHeader } from "./sub-components/header/DataTableHeader";
+import {
+  DataTableHeader,
+  type HeaderResize,
+} from "./sub-components/header/DataTableHeader";
 import { DataTableRow } from "./sub-components/row/DataTableRow";
 import styles from "./DataTable.module.scss";
 
@@ -46,9 +54,23 @@ export const DataTable = <T,>({
     [visibleColumns],
   );
 
-  const { containerRef, gridTemplate, compact } = useColumnLayout(
-    layoutColumns,
-    widthStorage,
+  const layout = useColumnLayout(layoutColumns, widthStorage);
+  const { containerRef, gridTemplate, compact } = layout;
+
+  const { bind, resizingId } = useColumnResize(layout);
+
+  const resize = useMemo<HeaderResize | undefined>(
+    () =>
+      compact
+        ? undefined
+        : {
+            canResize: (columnId) => hasResizeHandle(layout.columns, columnId),
+            valueOf: (columnId) =>
+              Math.round((layout.fractions[columnId] ?? 0) * 100),
+            bind,
+            resizingId,
+          },
+    [compact, layout.columns, layout.fractions, bind, resizingId],
   );
 
   // Header and rows map over this one array, so they always render the same
@@ -77,7 +99,9 @@ export const DataTable = <T,>({
       id={id}
       role="table"
       aria-label={ariaLabel}
-      className={classNames(styles.dataTable, "table-container", className)}
+      className={classNames(styles.dataTable, "table-container", className, {
+        [styles.isResizing]: resizingId !== null,
+      })}
       style={{ "--data-table-grid": gridTemplate } as React.CSSProperties}
       data-testid={testId}
     >
@@ -86,6 +110,7 @@ export const DataTable = <T,>({
         sort={sort}
         onSortChange={onSortChange}
         compact={compact}
+        resize={resize}
         id={headerId}
         className={headerClassName}
       />

@@ -1,8 +1,9 @@
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import {
   type ColumnFractions,
   type LayoutColumn,
+  getDefaultFractions,
   reconcileColumns,
   restoreFractions,
 } from "../layout/engine";
@@ -40,8 +41,9 @@ const signatureOf = (columns: LayoutColumn[]) =>
  * - A different `storage.id` restores again; the same id with a new adapter
  *   object does nothing.
  *
- * Nothing is written to the storage here: a table that only renders must never
- * overwrite a record another window saved.
+ * The storage is written only by `commit` and `reset`, which run on what the
+ * user did: a table that only renders must never overwrite a record another
+ * window saved.
  */
 export const useColumnLayout = (
   columns: LayoutColumn[],
@@ -121,10 +123,32 @@ export const useColumnLayout = (
     [current.columns, current.fractions],
   );
 
+  const storageRef = useRef(storage);
+  storageRef.current = storage;
+
+  /** Applies shares the user chose and remembers them. */
+  const commit = useCallback((fractions: ColumnFractions) => {
+    setState((prev) => ({ ...prev, fractions }));
+    storageRef.current?.save(fractions);
+  }, []);
+
+  /** Back to 40/60, and forgets the stored record. */
+  const reset = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      fractions: getDefaultFractions(prev.columns, widthRef.current),
+    }));
+    storageRef.current?.clear();
+  }, []);
+
   return {
     containerRef,
+    /** The visible columns the shares belong to. */
+    columns: current.columns,
     fractions: current.fractions,
     gridTemplate,
     compact: false,
+    commit,
+    reset,
   };
 };

@@ -225,6 +225,51 @@ export const SavedWidths: Story = {
   },
 };
 
+const ResizingTemplate = (args: React.ComponentProps<typeof FilesTable>) => {
+  const widthStorage = useMemo(() => createMemoryWidths(), []);
+
+  return <FilesTable {...args} widthStorage={widthStorage} />;
+};
+
+export const Resizing: Story = {
+  render: (args) => <ResizingTemplate {...args} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Drag the edge of a header: the column grows and the columns on the side the pointer moves to shrink, nearest first, down to 110 px (210 px for Name), so the table never gets wider. A focused edge moves with the arrow keys, 10 px a press or 50 px with Shift; a double click resets to 40/60. The widths are stored when the pointer is released.",
+      },
+      source: {
+        code: `<DataTable
+  columns={columns}
+  rows={rows}
+  getRowKey={(row) => row.id}
+  widthStorage={widthStorage}
+/>`,
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const edge = canvas.getByTestId("data-table-resize-Name");
+    const before = Number(edge.getAttribute("aria-valuenow"));
+
+    edge.focus();
+    await userEvent.keyboard("{Shift>}{ArrowRight}{/Shift}");
+
+    // ArrowRight grows the column in left-to-right and shrinks it in
+    // right-to-left; either way the share moves.
+    await waitFor(() =>
+      expect(Number(edge.getAttribute("aria-valuenow"))).not.toBe(before),
+    );
+
+    await userEvent.dblClick(edge);
+    await waitFor(() =>
+      expect(Number(edge.getAttribute("aria-valuenow"))).toBe(before),
+    );
+  },
+};
+
 export const HiddenColumns: Story = {
   args: {
     columns: COLUMNS.map((column) =>
