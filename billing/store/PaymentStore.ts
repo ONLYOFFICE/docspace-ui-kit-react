@@ -1322,10 +1322,15 @@ class PaymentStore {
   };
 
   initWalletPayerAndBalance = async (isRefresh: boolean) => {
-    await Promise.all([
+    const requests: Promise<unknown>[] = [
       this.tariff.fetchCustomerInfo(isRefresh),
       this.fetchBalance(isRefresh),
-    ]);
+    ];
+
+    if (!this.quotas.isLoaded)
+      requests.push(this.quotas.fetchPortalQuota(isRefresh));
+
+    await Promise.all(requests);
   };
 
   setServiceQuota = async (serviceName = BACKUP_SERVICE) => {
