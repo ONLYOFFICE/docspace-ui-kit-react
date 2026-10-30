@@ -6,6 +6,8 @@ import { expect, screen, userEvent, waitFor, within } from "storybook/test";
 import {
   DataTable,
   type DataTableColumn,
+  DataTableRow,
+  type DataTableRowState,
   type DataTableSort,
   createMemoryWidths,
   settingsColumn,
@@ -435,6 +437,260 @@ export const Resizing: Story = {
     await userEvent.dblClick(edge);
     await waitFor(() =>
       expect(Number(edge.getAttribute("aria-valuenow"))).toBe(before),
+    );
+  },
+};
+
+const MENU_OPTIONS = [
+  { key: "open", label: "Open" },
+  { key: "rename", label: "Rename" },
+  { key: "delete", label: "Delete" },
+];
+
+const ROW_COLUMNS: DataTableColumn<FileRow>[] = [
+  ...COLUMNS.slice(0, -1),
+  settingsColumn<FileRow>({ title: "Choose columns", withContextMenu: true }),
+];
+
+const RowsTemplate = (args: React.ComponentProps<typeof FilesTable>) => {
+  const [selected, setSelected] = useState<number[]>([]);
+  const [menuRow, setMenuRow] = useState<number | null>(null);
+  const visibility = useColumnVisibility(args.columns);
+
+  const getRowProps = useCallback(
+    (row: FileRow): DataTableRowState => ({
+      checked: selected.includes(row.id),
+      active: menuRow === row.id,
+      onClick: () =>
+        setSelected((prev) =>
+          prev.includes(row.id)
+            ? prev.filter((id) => id !== row.id)
+            : [...prev, row.id],
+        ),
+      contextMenu: {
+        options: MENU_OPTIONS,
+        title: "Actions",
+        onOpen: () => setMenuRow(row.id),
+        onClose: () => setMenuRow(null),
+      },
+    }),
+    [selected, menuRow],
+  );
+
+  return <FilesTable {...args} {...visibility} getRowProps={getRowProps} />;
+};
+
+export const RowsAndMenus: Story = {
+  args: { columns: ROW_COLUMNS, rows: ROWS.slice(0, 8) },
+  render: (args) => <RowsTemplate {...args} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`getRowProps` gives each row its state: a click selects it, and every row has a menu, opened by the button at its end or a right-click anywhere in it. The button shares the settings column, as in the old table; `contextMenuColumn()` gives it a column of its own in a table without settings.",
+      },
+      source: {
+        code: `const getRowProps = useCallback(
+  (row: FileRow): DataTableRowState => ({
+    checked: selected.includes(row.id),
+    active: menuRow === row.id,
+    onClick: () => toggle(row.id),
+    contextMenu: {
+      options,
+      title: "Actions",
+      onOpen: () => setMenuRow(row.id),
+      onClose: () => setMenuRow(null),
+    },
+  }),
+  [selected, menuRow],
+);
+
+<DataTable
+  columns={[...columns, settingsColumn({ title: "Choose columns", withContextMenu: true })]}
+  rows={rows}
+  getRowKey={(row) => row.id}
+  getRowProps={getRowProps}
+/>`,
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const row = () => canvas.getAllByTestId("data-table-row")[1];
+
+    await userEvent.click(within(row()).getByText(ROWS[1].name));
+    await waitFor(() => expect(row()).toHaveClass("checked"));
+
+    await userEvent.pointer({
+      keys: "[MouseRight]",
+      target: within(row()).getByText(ROWS[1].author),
+    });
+    await waitFor(() => expect(screen.getByText("Rename")).toBeInTheDocument());
+    await userEvent.keyboard("{Escape}");
+  },
+};
+
+type IndexedRow = FileRow & { index: number };
+
+const INDEXED_ROWS: IndexedRow[] = ROWS.slice(0, 8).map((row, i) => ({
+  ...row,
+  index: i + 1,
+}));
+
+const indexColumn = (
+  move?: (id: number, by: number) => void,
+): DataTableColumn<IndexedRow> => ({
+  id: "Index",
+  title: "#",
+  width: { type: "fixed", size: move ? 88 : 48 },
+  cell: (row) =>
+    move ? (
+      <span style={{ display: "flex", gap: 4 }}>
+        <button
+          type="button"
+          aria-label={`Move ${row.name} up`}
+          onClick={() => move(row.id, -1)}
+        >
+          ↑
+        </button>
+        <button
+          type="button"
+          aria-label={`Move ${row.name} down`}
+          onClick={() => move(row.id, 1)}
+        >
+          ↓
+        </button>
+      </span>
+    ) : (
+      row.index
+    ),
+});
+
+const IndexedTable = DataTable<IndexedRow>;
+
+const IndexEditingTemplate = () => {
+  const [rows, setRows] = useState(INDEXED_ROWS);
+  const [editing, setEditing] = useState(false);
+
+  const move = useCallback((id: number, by: number) => {
+    setRows((prev) => {
+      const from = prev.findIndex((row) => row.id === id);
+      const to = from + by;
+      if (to < 0 || to >= prev.length) return prev;
+      const next = [...prev];
+      [next[from], next[to]] = [next[to], next[from]];
+      return next.map((row, i) => ({ ...row, index: i + 1 }));
+    });
+  }, []);
+
+  // Reordering is another set of columns, not a mode the table knows: the
+  // index column grows its buttons, and the settings lose the row menu.
+  const columns = useMemo<DataTableColumn<IndexedRow>[]>(
+    () => [
+      indexColumn(editing ? move : undefined),
+      ...(COLUMNS.slice(0, -1) as DataTableColumn<IndexedRow>[]),
+      settingsColumn<IndexedRow>({
+        title: "Choose columns",
+        withContextMenu: !editing,
+        disabled: editing,
+      }),
+    ],
+    [editing, move],
+  );
+
+  const getRowProps = useCallback(
+    (): DataTableRowState => ({
+      contextMenu: { options: MENU_OPTIONS, title: "Actions" },
+    }),
+    [],
+  );
+
+  return (
+    <>
+      <button type="button" onClick={() => setEditing((value) => !value)}>
+        {editing ? "Done" : "Reorder"}
+      </button>
+      <div style={{ marginTop: 16 }}>
+        <IndexedTable
+          columns={columns}
+          rows={rows}
+          getRowKey={(row) => row.id}
+          getRowProps={getRowProps}
+          renderRow={({ row, index, rowProps }) => (
+            <DataTableRow
+              row={row}
+              index={index}
+              {...rowProps}
+              style={editing ? { cursor: "grab" } : undefined}
+            />
+          )}
+          ariaLabel="Files"
+        />
+      </div>
+    </>
+  );
+};
+
+export const IndexEditing: Story = {
+  render: () => <IndexEditingTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A virtual data room numbers its files. Reordering them is a different set of columns rather than a mode of the table: a wider index column with buttons, the settings disabled and no row menu. `renderRow` changes the cursor of every row while it lasts.",
+      },
+      source: {
+        code: `const columns = useMemo(
+  () => [
+    indexColumn(editing ? move : undefined),
+    ...fileColumns,
+    settingsColumn({ title: "Choose columns", withContextMenu: !editing, disabled: editing }),
+  ],
+  [editing],
+);
+
+<DataTable
+  columns={columns}
+  rows={rows}
+  getRowKey={(row) => row.id}
+  renderRow={({ row, index, rowProps }) => (
+    <DataTableRow
+      row={row}
+      index={index}
+      {...rowProps}
+      style={editing ? { cursor: "grab" } : undefined}
+    />
+  )}
+/>`,
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const menuButtons = () =>
+      canvas.queryAllByTestId("data-table-context-menu-button");
+
+    await expect(menuButtons()).toHaveLength(INDEXED_ROWS.length);
+
+    await userEvent.click(canvas.getByRole("button", { name: "Reorder" }));
+    await waitFor(() => expect(menuButtons()).toHaveLength(0));
+    await expect(
+      canvas.getByRole("button", { name: "Choose columns" }),
+    ).toBeDisabled();
+
+    const second = INDEXED_ROWS[1].name;
+    await userEvent.click(
+      canvas.getByRole("button", { name: `Move ${second} up` }),
+    );
+    await waitFor(() =>
+      expect(
+        within(canvas.getAllByTestId("data-table-row")[0]).getByText(second),
+      ).toBeInTheDocument(),
+    );
+
+    await userEvent.click(canvas.getByRole("button", { name: "Done" }));
+    await waitFor(() =>
+      expect(menuButtons()).toHaveLength(INDEXED_ROWS.length),
     );
   },
 };

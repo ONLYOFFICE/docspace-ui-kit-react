@@ -12,6 +12,8 @@
     --data-table-header-text-hover-color: #{colors.$light-gray-dark};
     --data-table-resize-color: #{colors.$gray-strong};
     --data-table-resize-active-color: #{colors.$light-gray-dark};
+    --data-table-row-selected-background: #{colors.$light-gray-hover};
+    --data-table-row-drag-background: #{colors.$dnd-hover-color};
   }
 
   :global(.dark) & {
@@ -21,6 +23,8 @@
     --data-table-header-text-hover-color: #{colors.$white};
     --data-table-resize-color: #{colors.$gray-dark-strong};
     --data-table-resize-active-color: #{colors.$gray-dark};
+    --data-table-row-selected-background: #{colors.$light-dark-gray-hover};
+    --data-table-row-drag-background: #{colors.$dnd-dark-hover};
   }
 
   position: relative;
@@ -230,6 +234,17 @@
 .row {
   display: grid;
   grid-template-columns: var(--data-table-grid);
+
+  // A selected row and the one being acted on are tinted cell by cell, as in
+  // the old table, so a consumer's per-cell styles (drag and drop) still win.
+  &.isChecked .cell,
+  &.isActive .cell {
+    background: var(--data-table-row-selected-background);
+  }
+
+  &.isDragging .cell {
+    background: var(--data-table-row-drag-background);
+  }
 }
 
 .cell {
@@ -241,4 +256,19 @@
   overflow: hidden;
 
   border-bottom: 1px solid var(--data-table-border-color);
+}
+
+// ===== Row menu =====
+
+.contextMenu {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+}
+
+.contextMenuSpacer {
+  width: 16px;
+  height: 16px;
 }

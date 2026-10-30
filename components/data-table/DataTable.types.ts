@@ -1,5 +1,7 @@
 import type React from "react";
 
+import type { ContextMenuModel } from "../context-menu";
+
 import type { ColumnWidth } from "./layout/engine";
 import type { WidthStorage } from "./layout/storage";
 
@@ -64,6 +66,94 @@ export type DataTableColumn<T> = {
   headerClassName?: string;
 };
 
+/**
+ * Attributes put on every cell of a row. Drag and drop finds all the cells of
+ * the row under the pointer by a class and marks them, so a row-wide value has
+ * to be on each cell rather than on the row.
+ */
+export type DataTableCellProps = {
+  /** Added to the class of every cell. */
+  className?: string;
+  /** Applied to every cell. */
+  style?: React.CSSProperties;
+  /** Written to every cell as a `value` attribute, which drag and drop reads. */
+  value?: string;
+  /** Written to every cell as `data-document-title`. */
+  documentTitle?: string;
+};
+
+/**
+ * The menu of a row. It opens on a right-click anywhere in the row and from the
+ * button of `contextMenuColumn`; without that column in the table there is no
+ * menu at all.
+ */
+export type DataTableRowContextMenu = {
+  /** Items of the menu. The button is drawn only while there are some. */
+  options?: ContextMenuModel[];
+  /** Builds the items each time the menu opens, instead of `options`. */
+  getModel?: () => ContextMenuModel[];
+  /** Called as the menu opens, with `true` when a right-click opened it. */
+  onOpen?: (isRightClick: boolean) => void;
+  /** Called when the menu closes. */
+  onClose?: () => void;
+  /** Accessible name and tooltip of the button. */
+  title?: string;
+  /** URL of the badge image in the menu's header. */
+  badgeUrl?: string;
+  /** Value of `data-testid` on the menu. */
+  testId?: string;
+};
+
+/** The state and handlers of one row, from `getRowProps` or given to `DataTableRow` directly. */
+export type DataTableRowState = {
+  /** Marks the row as selected: the `checked` class and `aria-selected`. */
+  checked?: boolean;
+  /** Marks the row as the one being acted on, such as the one whose menu is open. */
+  active?: boolean;
+  /** Marks the row as being dragged. */
+  dragging?: boolean;
+  /** Applied to the row. */
+  className?: string;
+  /** Applied to the row. Widths do not belong here: they come from the table. */
+  style?: React.CSSProperties;
+  /** Put on every cell of the row. */
+  cellProps?: DataTableCellProps;
+  /** The row's menu, for `contextMenuColumn`. */
+  contextMenu?: DataTableRowContextMenu;
+  /** Called on a click anywhere in the row. */
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  /** Called on a double click anywhere in the row. */
+  onDoubleClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  /** Called on a right-click before the row's menu opens; `preventDefault()` keeps it closed. */
+  onContextMenu?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  /** Called when the pointer enters the row. */
+  onMouseEnter?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  /** Called when the pointer leaves the row. */
+  onMouseLeave?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  /** Value of `data-testid` on the row. */
+  testId?: string;
+};
+
+/** Props of `DataTableRow`. */
+export type DataTableRowProps<T> = DataTableRowState & {
+  /** The row, handed to every cell renderer. */
+  row: T;
+  /** Position of the row in `rows`. */
+  index: number;
+  /** Ref of the row element. */
+  ref?: React.Ref<HTMLDivElement>;
+};
+
+/** What `renderRow` is given for one row. */
+export type DataTableRenderRowProps<T> = {
+  /** The row. */
+  row: T;
+  /** Position of the row in `rows`. */
+  index: number;
+  /** What `getRowProps` returned for the row; empty without it. */
+  rowProps: DataTableRowState;
+};
+
 export interface DataTableProps<T> {
   /**
    * Every column, in order, system columns (checkbox, settings, context menu)
@@ -75,6 +165,18 @@ export interface DataTableProps<T> {
   rows: T[];
   /** Stable key of a row. */
   getRowKey: (row: T, index: number) => React.Key;
+  /**
+   * The state and handlers of a row: selection, its menu, attributes for every
+   * cell. Keep the function stable between renders, or every row re-renders.
+   */
+  getRowProps?: (row: T, index: number) => DataTableRowState;
+  /**
+   * Renders a row instead of the default `DataTableRow`, to wrap it or to give
+   * it state the consumer computes in a component of its own. Return a
+   * `DataTableRow` for the row, with `rowProps` spread on it. Keep the function
+   * stable between renders.
+   */
+  renderRow?: (props: DataTableRenderRowProps<T>) => React.ReactNode;
   /** Current sort, highlighted in the header. */
   sort?: DataTableSort;
   /** Called with a column's `sortKey` when its header is clicked. Without it, headers are not buttons. */

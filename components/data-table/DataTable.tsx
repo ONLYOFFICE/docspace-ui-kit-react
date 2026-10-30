@@ -20,7 +20,7 @@ import {
   DataTableHeader,
   type HeaderResize,
 } from "./sub-components/header/DataTableHeader";
-import { DataTableRow } from "./sub-components/row/DataTableRow";
+import { RowSlot } from "./sub-components/row/RowSlot";
 import styles from "./DataTable.module.scss";
 
 const assignRef = <V,>(ref: React.Ref<V> | undefined, value: V | null) => {
@@ -32,6 +32,8 @@ export const DataTable = <T,>({
   columns,
   rows,
   getRowKey,
+  getRowProps,
+  renderRow,
   sort,
   onSortChange,
   onColumnVisibilityChange,
@@ -126,10 +128,13 @@ export const DataTable = <T,>({
   const context = useMemo<DataTableContextValue>(
     () => ({
       columns: columns as DataTableContextValue["columns"],
+      renderedColumns:
+        renderedColumns as DataTableContextValue["renderedColumns"],
+      lastColumnId,
       compact,
       onColumnVisibilityChange,
     }),
-    [columns, compact, onColumnVisibilityChange],
+    [columns, renderedColumns, lastColumnId, compact, onColumnVisibilityChange],
   );
 
   return (
@@ -160,13 +165,12 @@ export const DataTable = <T,>({
           data-testid="data-table-body"
         >
           {rows.map((row, index) => (
-            <DataTableRow
+            <RowSlot
               key={getRowKey(row, index)}
               row={row}
               index={index}
-              columns={renderedColumns}
-              lastColumnId={lastColumnId}
-              compact={compact}
+              getRowProps={getRowProps}
+              renderRow={renderRow}
             />
           ))}
         </div>

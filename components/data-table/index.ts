@@ -1,10 +1,16 @@
 export { DataTable } from "./DataTable";
+export { DataTableRow } from "./sub-components/row/DataTableRow";
 
 export type {
   DataTableCellContext,
+  DataTableCellProps,
   DataTableColumn,
   DataTableHeaderContext,
   DataTableProps,
+  DataTableRenderRowProps,
+  DataTableRowContextMenu,
+  DataTableRowProps,
+  DataTableRowState,
   DataTableSort,
 } from "./DataTable.types";
 
@@ -15,6 +21,7 @@ export {
 } from "./DataTable.constants";
 
 export { settingsColumn } from "./columns/settingsColumn";
+export { contextMenuColumn } from "./columns/contextMenuColumn";
 export { ColumnSettings } from "./sub-components/settings/ColumnSettings";
 
 export type { ColumnWidth } from "./layout/engine";

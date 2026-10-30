@@ -16,6 +16,8 @@ import styles from "../../DataTable.module.scss";
 type ColumnSettingsProps = {
   /** Accessible name and tooltip of the button. */
   title?: string;
+  /** Disables the button whatever the table's state. */
+  disabled?: boolean;
 };
 
 const labelOf = (column: DataTableColumn<unknown>) =>
@@ -28,10 +30,13 @@ const labelOf = (column: DataTableColumn<unknown>) =>
  * only works inside one, normally through `settingsColumn`.
  *
  * It is disabled in compact mode, where choosing columns would change nothing
- * visible, without `onColumnVisibilityChange`, and when no column is
- * hideable. The last visible flexible column cannot be unticked.
+ * visible, without `onColumnVisibilityChange`, when no column is hideable, and
+ * with `disabled`. The last visible flexible column cannot be unticked.
  */
-export const ColumnSettings = ({ title }: ColumnSettingsProps) => {
+export const ColumnSettings = ({
+  title,
+  disabled: disabledProp = false,
+}: ColumnSettingsProps) => {
   const table = useDataTableContext();
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -40,6 +45,7 @@ export const ColumnSettings = ({ title }: ColumnSettingsProps) => {
   const columns = table?.columns ?? [];
   const items = columns.filter((column) => column.hideable);
   const disabled =
+    disabledProp ||
     !table ||
     table.compact ||
     !table.onColumnVisibilityChange ||
