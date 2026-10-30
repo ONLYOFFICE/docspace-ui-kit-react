@@ -11,6 +11,7 @@ import {
 import { useApi } from "../../../providers/api";
 import type { TRoomTypeValue } from "../../../types";
 import { RoomsTypeValues } from "../../../utils/common";
+import { RoomsType } from "../../../enums";
 import RoomType from "../../../components/room-type";
 import { Tooltip } from "../../../components/tooltip";
 import type { TSelectorItem, TBreadCrumb } from "../../../components/selector";
@@ -45,6 +46,7 @@ const useRoomsHelper = ({
   searchArea,
   roomType,
   formsSection,
+  roomsSectionTypes,
   isRoomsOnly,
 
   isInit,
@@ -178,13 +180,23 @@ const useRoomsHelper = ({
         }
 
         if (!typeFilter && formsSection !== undefined) {
+          // The Rooms section lists the ordinary rooms unless the host names
+          // the types itself (it adds Instructions or Knowledge rooms when its
+          // selection can land there). Form filling rooms live in the Forms
+          // section, an Instructions room takes Markdown only, a Knowledge
+          // room takes the vectorized formats only and an AI project holds no
+          // files. The list comes from our own enum: the SDK's lacks the AI
+          // types.
           typeFilter = formsSection
             ? [ApiRoomType.FillingFormsRoom]
-            : Object.values(ApiRoomType).filter(
-                (value) =>
-                  value !== ApiRoomType.FillingFormsRoom &&
-                  value !== ApiRoomType.AiRoom,
-              );
+            : ((roomsSectionTypes ??
+                RoomsTypeValues.filter(
+                  (value) =>
+                    value !== RoomsType.FormRoom &&
+                    value !== RoomsType.InstructionsRoom &&
+                    value !== RoomsType.KnowledgeRoom &&
+                    value !== RoomsType.AiProjectRoom,
+                )) as RoomTypeEnum[]);
         }
 
         // Form filling rooms live only in the Forms section, so a listing scoped

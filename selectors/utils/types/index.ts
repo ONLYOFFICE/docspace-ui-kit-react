@@ -29,6 +29,12 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
   isRoomsOnly: boolean;
   roomType?: RoomType | RoomType[];
   formsSection?: boolean;
+  /**
+   * The room types the Rooms section lists when no `roomType` is given.
+   * Defaults to the ordinary rooms; a host adds Instructions or Knowledge
+   * rooms when what it carries can land there.
+   */
+  roomsSectionTypes?: RoomType[];
   excludeItems?: (number | string | undefined)[];
   isInit: boolean;
   createDefineRoomLabel?: string;

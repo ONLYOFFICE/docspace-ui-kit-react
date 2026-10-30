@@ -182,4 +182,58 @@ describe("useRoomsHelper", () => {
     expect(roomTypeKeys).not.toContain(String(RoomsType.FormRoom));
     expect(roomTypeKeys).toContain(String(RoomsType.CustomRoom));
   });
+
+  const emptyRooms = () =>
+    mocks.getRoomsFolder.mockResolvedValue({
+      data: {
+        response: {
+          folders: [],
+          total: 0,
+          count: 0,
+          current: { id: 1, title: "Rooms", security: {} },
+        },
+      },
+    });
+
+  const requestedTypes = () =>
+    (mocks.getRoomsFolder.mock.calls[0][0] as { type: number[] }).type;
+
+  it("lists the ordinary rooms in the Rooms section by default", async () => {
+    emptyRooms();
+
+    const { result } = setup({ formsSection: false });
+
+    await act(async () => {
+      await result.current.rooms.getRoomList(0);
+    });
+
+    const type = requestedTypes();
+    expect(type).toContain(RoomsType.CustomRoom);
+    expect(type).toContain(RoomsType.EditingRoom);
+    expect(type).not.toContain(RoomsType.FormRoom);
+    expect(type).not.toContain(RoomsType.AIRoom);
+    expect(type).not.toContain(RoomsType.InstructionsRoom);
+    expect(type).not.toContain(RoomsType.KnowledgeRoom);
+    expect(type).not.toContain(RoomsType.AiProjectRoom);
+  });
+
+  it("lists the room types the host names for the Rooms section", async () => {
+    emptyRooms();
+
+    // The SDK's room enum does not know the AI types, so the host's list must
+    // reach the request as given.
+    const { result } = setup({
+      formsSection: false,
+      roomsSectionTypes: [RoomsType.CustomRoom, RoomsType.KnowledgeRoom],
+    });
+
+    await act(async () => {
+      await result.current.rooms.getRoomList(0);
+    });
+
+    expect(requestedTypes()).toEqual([
+      RoomsType.CustomRoom,
+      RoomsType.KnowledgeRoom,
+    ]);
+  });
 });

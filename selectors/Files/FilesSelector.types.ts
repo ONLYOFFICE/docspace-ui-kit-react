@@ -32,6 +32,7 @@ import type {
 } from "@onlyoffice/docspace-api-sdk";
 import type { DeviceType } from "../../enums";
 import type { TGetIcon } from "../utils/types";
+import type { TRoomTypeValue } from "../../types";
 
 /** A file of the list, as `resolveItemTitle` and `onFilesLoaded` see it. */
 export type TFilesSelectorFile = {
@@ -252,6 +253,12 @@ export type FilesSelectorProps = TInfoBar &
     withAIAgentsTreeFolder?: boolean;
     withRoomsTreeFolder?: boolean;
     withFormsTreeFolder?: boolean;
+    /**
+     * The room types the Rooms section lists when no `roomType` is given.
+     * Defaults to the ordinary rooms; pass Instructions or Knowledge rooms
+     * too when the selection can land there.
+     */
+    roomsSectionTypes?: TRoomTypeValue[];
 
     onSetBaseFolderPath?: (
       value: number | string | undefined | TBreadCrumb[],
