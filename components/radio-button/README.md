@@ -175,20 +175,21 @@ export function ControlledChoice() {
   [`RadioButtonGroup`](../radio-button-group/README.md) defaults to `horizontal`.
 - **`id` lands on the label, not on the input**, so it cannot be the target of an external
   `<label for>` — the input is already nested inside this one.
-- **The input is hidden but focusable** (`opacity: 0.0001`, `z-index: -1`), and nothing draws a
-  focus ring. A keyboard user moving through the set gets no visible cue.
+- **The input is hidden but focusable** (`opacity: 0.0001`, `z-index: -1`); its keyboard focus is
+  drawn as a ring around the circle.
 - `label` falls back to `value`, so a button with neither shows nothing beside the circle.
 
 ## CSS variables
 
-| Variable                            | Default    | Effect                                |
-| ----------------------------------- | ---------- | ------------------------------------- |
-| `--radio-button-gap`                | `8px`      | Space between the circle and the text |
-| `--radio-button-background`         | theme bg   | Fill behind the circle                |
-| `--radio-button-label-color`        | theme text | Colour of the text                    |
-| `--radio-button-dot-color`          | theme text | The filled dot when checked           |
-| `--radio-button-circle-color`       | theme grey | The circle's outline                  |
-| `--radio-button-circle-hover-color` | theme grey | That outline on hover                 |
+| Variable                            | Default    | Effect                                    |
+| ----------------------------------- | ---------- | ----------------------------------------- |
+| `--radio-button-gap`                | `8px`      | Space between the circle and the text     |
+| `--radio-button-background`         | theme bg   | Fill behind the circle                    |
+| `--radio-button-label-color`        | theme text | Colour of the text                        |
+| `--radio-button-dot-color`          | theme text | The filled dot when checked               |
+| `--radio-button-circle-color`       | theme grey | The circle's outline                      |
+| `--radio-button-circle-hover-color` | theme grey | That outline on hover                     |
+| `--radio-button-focus-ring-color`   | accent     | The ring around a keyboard-focused circle |
 
 A disabled button ignores all of them except `--radio-button-gap`: it draws its own grey fill,
 outline, dot and text, and its outline does not change on hover.
