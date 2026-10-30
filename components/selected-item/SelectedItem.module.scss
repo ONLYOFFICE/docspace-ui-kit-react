@@ -112,6 +112,16 @@
   &.isActive:not(.disabled):hover {
     background: var(--selected-item-active-background);
   }
+
+  // Inset: a row of group chips clips anything drawn outside them.
+  &:focus-visible {
+    outline: 2px solid
+      var(
+        --accent-main,
+        var(--color-scheme-main-accent, #{colors.$light-blue-main})
+      );
+    outline-offset: -2px;
+  }
 }
 
 .icon {

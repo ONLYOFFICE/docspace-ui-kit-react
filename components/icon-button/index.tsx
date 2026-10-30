@@ -12,6 +12,11 @@ import classNames from "classnames";
 
 import { isIconSizeType } from "../../utils/common-icons-style";
 import { isDesktop } from "../../utils/device";
+import {
+  activateOnButtonKey,
+  keyboardClickAt,
+} from "../../utils/keyboard-activation";
+import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 
 import { Tooltip, TooltipContainer } from "../tooltip";
 
@@ -83,9 +88,16 @@ const IconButton = memo(
     role,
     ariaLabel,
     tooltipId,
+    tabIndex,
+    onKeyDown,
 
     ...rest
   }: IconButtonProps) => {
+    const { isRTL } = useInterfaceDirection();
+    // A button with an action is a button to the keyboard too, unless the
+    // caller wires the keyboard itself (ContextMenuButton does).
+    const isKeyboardButton =
+      !!onClick && !isDisabled && tabIndex === undefined && !onKeyDown;
     const buttonRef = React.useRef<HTMLDivElement>(null);
     // State for dynamic icon and color changes
     const [currentIcon, setCurrentIcon] = useState({
@@ -203,6 +215,16 @@ const IconButton = memo(
       [isDisabled, onClick],
     );
 
+    const handleKeyDown = useCallback(
+      (e: React.KeyboardEvent<HTMLDivElement>) =>
+        // Handlers open menus at the click's pageX/pageY, which a key press
+        // lacks; it gets the button's own corner instead.
+        activateOnButtonKey(e, ({ currentTarget }) =>
+          onClick?.(keyboardClickAt(currentTarget, isRTL)),
+        ),
+      [onClick, isRTL],
+    );
+
     const buttonClasses = classNames(
       styles.iconButton,
       {
@@ -248,8 +270,11 @@ const IconButton = memo(
         data-tooltip-id={tooltipId}
         data-tooltip-content={tooltipContent}
         aria-disabled={isDisabled}
-        role={role}
-        aria-label={ariaLabel}
+        role={role ?? (isKeyboardButton ? "button" : undefined)}
+        tabIndex={isKeyboardButton ? 0 : tabIndex}
+        onKeyDown={isKeyboardButton ? handleKeyDown : onKeyDown}
+        // `title` is taken by the tooltip, so it names the button instead.
+        aria-label={ariaLabel ?? (isKeyboardButton ? title : undefined)}
         {...rest}
       >
         {iconNode ? (

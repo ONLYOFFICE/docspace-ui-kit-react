@@ -182,6 +182,21 @@ describe("<NavMenu />", () => {
       expect(roomsButton).toHaveAttribute("aria-expanded", "true");
     });
 
+    it("makes a collapsed section's sub-items inert", async () => {
+      // jsdom ignores `inert` when tabbing, so the attribute is what is
+      // checked here; the Tab order itself is covered in the browser.
+      render(<NavMenu groups={groups} />);
+      const filesButton = screen.getByRole("button", { name: "AI Files" });
+      const subItem = () =>
+        screen.getByText("Shared with me").closest("ul")?.parentElement;
+
+      expect(subItem()).toHaveAttribute("inert");
+
+      await userEvent.click(filesButton);
+
+      expect(subItem()).not.toHaveAttribute("inert");
+    });
+
     it("does not add aria-expanded to items without children", () => {
       render(<NavMenu groups={groups} />);
       const button = screen.getByRole("button", { name: "AI Agents" });

@@ -78,17 +78,17 @@ export type IconButtonProps = {
   /** Text of that tooltip. Without `tooltipId` it does nothing. */
   tooltipContent?: string;
 
-  /** Applied to the element, which is a `<div>`: without this the button is
-   * not reachable by keyboard at all. */
+  /** Applied to the element. Unset on a button with an `onClick` that is not
+   * disabled, it is `0`, and the button also gets `role="button"` and Enter /
+   * Space activation; passing it (or `onKeyDown`) leaves the keyboard to you. */
   tabIndex?: number;
-  /** Called on a key press. The element is a `<div>` with no button role, so
-   * Enter and Space do nothing unless this handler implements them. */
+  /** Called on a key press. Passing it replaces the built-in Enter / Space
+   * activation, so it must implement them itself. */
   onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
-  /** ARIA role. A `<div>` has no implicit role at all, so an icon button is
-   * invisible to assistive technology until it is named one - "button", since
-   * it acts, together with `tabIndex` and `onKeyDown`. */
+  /** ARIA role. Unset, it is "button" whenever the built-in keyboard support
+   * applies (see `tabIndex`), and none otherwise. */
   role?: React.AriaRole;
-  /** Value of `aria-label`, the button's accessible name. `title` feeds the
-   * kit's tooltip and names nothing, so an icon button with a role needs this. */
+  /** Value of `aria-label`, the button's accessible name. Unset, a button with
+   * the built-in keyboard support is named by `title`. */
   ariaLabel?: string;
 };
