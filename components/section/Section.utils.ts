@@ -1,4 +1,7 @@
 import React from "react";
+
+import { INFO_PANEL_WIDTH } from "../../utils/device";
+
 import {
   SECTION_HEADER_NAME,
   SECTION_FILTER_NAME,
@@ -86,4 +89,32 @@ export const parseChildren = (children: React.ReactNode) => {
   ];
 
   return arr;
+};
+
+const CHAT_PANEL_WIDTH = 400;
+
+type TShownInfoPanelWidthArgs = {
+  isDesktop: boolean;
+  isInfoPanelVisible?: boolean;
+  infoPanelWidth?: number;
+  isChatPanelVisible?: boolean;
+  isChatPanelFullscreen?: boolean;
+  chatPanelWidth?: number;
+};
+
+/** Width in px the open info panel, or the AI chat open in its place, takes on screen; `0` when neither does. A panel without a width of its own takes its default. */
+export const getShownInfoPanelWidth = ({
+  isDesktop,
+  isInfoPanelVisible,
+  infoPanelWidth,
+  isChatPanelVisible,
+  isChatPanelFullscreen,
+  chatPanelWidth,
+}: TShownInfoPanelWidthArgs) => {
+  if (isInfoPanelVisible)
+    return (isDesktop && infoPanelWidth) || INFO_PANEL_WIDTH;
+  if (isDesktop && isChatPanelVisible && !isChatPanelFullscreen)
+    return chatPanelWidth || CHAT_PANEL_WIDTH;
+
+  return 0;
 };

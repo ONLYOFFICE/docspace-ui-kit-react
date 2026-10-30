@@ -322,17 +322,39 @@ export const TableHeader = (props: TableHeaderProps) => {
       otherColumns = DEFAULT_MIN_COLUMN_SIZE;
     }
 
+    const wideColumnMinWidth =
+      columns.find((col) => col.default)?.minWidth ?? MIN_SIZE_NAME_COLUMN;
+    const onlyWideColumn =
+      !withoutWideColumn &&
+      containerWidth - wideColumnMinWidth <
+        DEFAULT_MIN_COLUMN_SIZE * enableColumns.length;
+
+    if (onlyWideColumn) {
+      wideColumnSize = containerWidth;
+    } else if (!withoutWideColumn && wideColumnSize < wideColumnMinWidth) {
+      wideColumnSize = wideColumnMinWidth;
+      otherColumns =
+        (containerWidth - wideColumnMinWidth) / enableColumns.length;
+    }
+
+    if (hideColumns !== onlyWideColumn) {
+      setHideColumns(onlyWideColumn);
+      setHideColumnsProp?.(onlyWideColumn);
+    }
+
     columns.forEach((col) => {
       if (col.default) {
         str += `${wideColumnSize}px `;
       } else if (col.isShort) {
         str += `${col.minWidth}px `;
       } else {
-        str += col.enable
-          ? col.defaultSize
+        str += !col.enable
+          ? "0px "
+          : col.defaultSize
             ? `${col.defaultSize}px `
-            : `${otherColumns}px `
-          : "0px ";
+            : onlyWideColumn
+              ? "0px "
+              : `${otherColumns}px `;
       }
     });
 

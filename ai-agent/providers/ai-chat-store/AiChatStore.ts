@@ -1,5 +1,10 @@
 import { makeAutoObservable, reaction } from "mobx";
 
+import {
+  CHAT_PANEL_MIN_WIDTH,
+  createPanelWidthStorage,
+} from "../../../utils/panel-width";
+
 export type AiChatRouterPage =
   "chat" | "settings" | "history" | "initial-setup";
 
@@ -35,8 +40,13 @@ export type AnalyzeMode = {
 
 // Docked (non-fullscreen) panel width on desktop. Matches the CSS default of
 // `--chat-panel-width` in Section.module.scss: the panel renders at this width
-// until the user drags the resizer, and every open starts from it again.
+// until the user drags the resizer.
 export const DEFAULT_CHAT_PANEL_WIDTH = 400;
+
+const panelWidthStorage = createPanelWidthStorage("chatPanelWidth", {
+  defaultWidth: DEFAULT_CHAT_PANEL_WIDTH,
+  minWidth: CHAT_PANEL_MIN_WIDTH,
+});
 
 // Single source of truth for the AI Chat panel UI: visibility + fullscreen
 // + selected agent + mirrors of the upstream router page and profiles
@@ -53,12 +63,11 @@ class AiChatStore {
 
   currentPage: AiChatRouterPage = "chat";
 
-  // Width of the docked panel in px, driven by the edge resizer. Session-only
-  // by design: it is deliberately not persisted and every open resets it to
-  // `DEFAULT_CHAT_PANEL_WIDTH`, so a fresh panel always has the familiar size.
-  // Ignored in fullscreen and on tablet/mobile, where the panel is not
-  // resizable and its width comes from the layout instead.
-  panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
+  // Width of the docked panel in px, driven by the edge resizer and kept in
+  // localStorage, as hosts keep the info panel's. Ignored in fullscreen and on
+  // tablet/mobile, where the panel is not resizable and its width comes from
+  // the layout instead.
+  panelWidth = panelWidthStorage.read();
 
   agentId: number | null = null;
 
@@ -163,7 +172,6 @@ class AiChatStore {
       this.endAnalyzeMode();
     }
     if (agentId !== undefined) this.agentId = agentId;
-    if (!this.isVisible) this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
     this.isVisible = true;
   };
 
@@ -174,7 +182,6 @@ class AiChatStore {
   openNewChat = () => {
     if (!this.isVisible) {
       this.pendingNewChat = true;
-      this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
       // A fresh conversation is not the one that was analyzing a form.
       //
       // Only here, inside the branch that actually starts one. An already
@@ -198,7 +205,6 @@ class AiChatStore {
     this.agentId = null;
     this.isVisible = false;
     this.userFullscreen = false;
-    this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
     // Closing the panel is one of the explicit ways out of the analyze mode.
     this.endAnalyzeMode();
   };
@@ -209,8 +215,6 @@ class AiChatStore {
       this.userFullscreen = false;
       this.endAnalyzeMode();
     }
-    // Both directions reset: closing clears the drag, opening starts fresh.
-    this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
   };
 
   setAgentId = (agentId: number | null) => {
@@ -230,7 +234,7 @@ class AiChatStore {
   };
 
   setPanelWidth = (value: number) => {
-    this.panelWidth = value;
+    this.panelWidth = panelWidthStorage.save(value);
   };
 
   setHasProfiles = (value: boolean) => {

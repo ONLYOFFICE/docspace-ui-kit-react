@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
 import AiChatStore from "./AiChatStore";
 
@@ -207,5 +207,38 @@ describe("AiChatStore analyze mode", () => {
     store.markAnalyzeSent();
 
     expect(store.isAnalyzeMode).toBe(false);
+  });
+});
+
+describe("AiChatStore panel width", () => {
+  afterEach(() => {
+    localStorage.clear();
+  });
+
+  it("keeps the dragged width across closing and opening the panel", () => {
+    const store = new AiChatStore();
+    store.open();
+    store.setPanelWidth(640);
+
+    store.close();
+    store.open();
+    expect(store.panelWidth).toBe(640);
+
+    store.toggle();
+    store.toggle();
+    store.close();
+    store.openNewChat();
+    expect(store.panelWidth).toBe(640);
+  });
+
+  it("starts the next visit from the width saved in the last one", () => {
+    new AiChatStore().setPanelWidth(640);
+
+    expect(localStorage.getItem("chatPanelWidth")).toBe("640");
+    expect(new AiChatStore().panelWidth).toBe(640);
+  });
+
+  it("starts from the default width while nothing is saved", () => {
+    expect(new AiChatStore().panelWidth).toBe(400);
   });
 });

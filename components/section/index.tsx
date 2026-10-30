@@ -34,7 +34,7 @@ import {
   SECTION_SUBMENU_NAME,
   SECTION_BANNER_NAME,
 } from "./Section.constants";
-import { parseChildren } from "./Section.utils";
+import { getShownInfoPanelWidth, parseChildren } from "./Section.utils";
 
 export type { SectionProps };
 
@@ -80,6 +80,10 @@ const Section = (props: SectionProps) => {
     settingsStudio = false,
     isInfoPanelScrollLocked,
     infoPanelWithoutScroll,
+    isInfoPanelResizable,
+    infoPanelWidth,
+    setInfoPanelWidth,
+    onShownInfoPanelWidthChange,
     currentDeviceType,
 
     isInfoPanelVisible,
@@ -145,6 +149,38 @@ const Section = (props: SectionProps) => {
 
   const containerRef = React.useRef<null | HTMLDivElement>(null);
   const timerRef = React.useRef<null | ReturnType<typeof setTimeout>>(null);
+
+  const [infoPanelShownWidth, setInfoPanelShownWidth] =
+    React.useState<number>();
+  const [chatPanelShownWidth, setChatPanelShownWidth] =
+    React.useState<number>();
+
+  const setProgressButtonOffset = React.useCallback((value?: number) => {
+    const style = containerRef.current?.style;
+    if (!style) return;
+
+    if (value)
+      style.setProperty("--operations-progress-info-panel-width", `${value}px`);
+    else style.removeProperty("--operations-progress-info-panel-width");
+  }, []);
+
+  const liveReportFrameRef = React.useRef(0);
+
+  React.useEffect(
+    () => () => cancelAnimationFrame(liveReportFrameRef.current),
+    [],
+  );
+
+  const onPanelLiveResize = React.useCallback(
+    (value: number) => {
+      setProgressButtonOffset(value);
+      cancelAnimationFrame(liveReportFrameRef.current);
+      liveReportFrameRef.current = requestAnimationFrame(() =>
+        onShownInfoPanelWidthChange?.(value),
+      );
+    },
+    [setProgressButtonOffset, onShownInfoPanelWidthChange],
+  );
 
   const [
     sectionHeaderContent,
@@ -292,6 +328,36 @@ const Section = (props: SectionProps) => {
   const isInfoVisible =
     canDisplay && (isInfoPanelVisible || isChatPanelVisible);
 
+  const shownInfoPanelWidth = getShownInfoPanelWidth({
+    isDesktop: currentDeviceType === DeviceType.desktop,
+    isInfoPanelVisible:
+      isInfoPanelAvailable && !!canDisplay && !!isInfoPanelVisible,
+    infoPanelWidth:
+      infoPanelShownWidth ??
+      (isInfoPanelResizable ? infoPanelWidth : undefined),
+    isChatPanelVisible: isChatPanelAvailable && !!isChatPanelVisible,
+    isChatPanelFullscreen,
+    chatPanelWidth:
+      chatPanelShownWidth ??
+      (isChatPanelResizable ? chatPanelWidth : undefined),
+  });
+
+  React.useEffect(() => {
+    setProgressButtonOffset(shownInfoPanelWidth);
+  }, [shownInfoPanelWidth, setProgressButtonOffset]);
+
+  const hasPanels = isInfoPanelAvailable || isChatPanelAvailable;
+
+  React.useEffect(() => {
+    cancelAnimationFrame(liveReportFrameRef.current);
+    if (hasPanels) onShownInfoPanelWidthChange?.(shownInfoPanelWidth);
+  }, [hasPanels, shownInfoPanelWidth, onShownInfoPanelWidthChange]);
+
+  React.useEffect(
+    () => () => onShownInfoPanelWidthChange?.(0),
+    [onShownInfoPanelWidthChange],
+  );
+
   if (!isSectionAvailable) return null;
 
   return (
@@ -428,6 +494,11 @@ const Section = (props: SectionProps) => {
           currentDeviceType={currentDeviceType}
           asideInfoPanel={asideInfoPanel}
           withoutBodyScroll={infoPanelWithoutScroll}
+          isResizable={isInfoPanelResizable}
+          width={infoPanelWidth}
+          onResize={setInfoPanelWidth}
+          onLiveResize={onPanelLiveResize}
+          onShownWidthChange={setInfoPanelShownWidth}
         >
           <SubInfoPanelHeader>{infoPanelHeaderContent}</SubInfoPanelHeader>
           <SubInfoPanelBody
@@ -448,6 +519,8 @@ const Section = (props: SectionProps) => {
           isResizable={isChatPanelResizable}
           width={chatPanelWidth}
           onResize={setChatPanelWidth}
+          onLiveResize={onPanelLiveResize}
+          onShownWidthChange={setChatPanelShownWidth}
           isFullscreen={isChatPanelFullscreen}
           onRequestFullscreen={setChatPanelFullscreen}
           onExitFullscreen={unsetChatPanelFullscreen}
