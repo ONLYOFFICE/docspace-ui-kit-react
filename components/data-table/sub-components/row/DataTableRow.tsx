@@ -57,7 +57,7 @@ const DataTableRowPure = <T,>({
 
   if (!table) return null;
 
-  const { renderedColumns, lastColumnId, compact } = table;
+  const { renderedColumns, lastColumnId, compact, virtualized } = table;
 
   // The click `openMenu` sends still reaches listeners above the row, but it
   // is not the user clicking the row: it must not select it.
@@ -78,6 +78,8 @@ const DataTableRowPure = <T,>({
         ref={ref}
         role="row"
         aria-selected={checked}
+        // The header is row 1.
+        aria-rowindex={virtualized ? index + 2 : undefined}
         className={classNames(styles.row, "table-container_row", className, {
           checked,
           [styles.isChecked]: checked,

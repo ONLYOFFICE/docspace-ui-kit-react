@@ -18,6 +18,8 @@ export type DataTableContextValue = {
   lastColumnId: string | undefined;
   /** Whether the table is in compact mode. */
   compact: boolean;
+  /** Whether only the rows near the view are rendered. */
+  virtualized: boolean;
   /** The table's `onColumnVisibilityChange`. */
   onColumnVisibilityChange?: (columnId: string, visible: boolean) => void;
 };

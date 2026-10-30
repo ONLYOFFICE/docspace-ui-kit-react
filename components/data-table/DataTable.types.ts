@@ -154,6 +154,29 @@ export type DataTableRenderRowProps<T> = {
   rowProps: DataTableRowState;
 };
 
+/** How a virtualised table finds its scroller and how many rows it renders. */
+export type DataTableVirtualize = {
+  /**
+   * The element that scrolls the table. Without it, the nearest scrolling
+   * ancestor, or the window when there is none.
+   */
+  scrollElement?: HTMLElement | null;
+  /** Rows rendered beyond each edge of the visible ones.
+   * @default 5 */
+  overscan?: number;
+  /** Applied to the element that holds the rows, the full height of the list. */
+  innerClassName?: string;
+};
+
+/** What a table's `apiRef` exposes. */
+export type DataTableApi = {
+  /** Scrolls until the row at `index` is in view; `align` says where. */
+  scrollToIndex: (
+    index: number,
+    options?: { align?: "start" | "center" | "end" | "auto" },
+  ) => void;
+};
+
 export interface DataTableProps<T> {
   /**
    * Every column, in order, system columns (checkbox, settings, context menu)
@@ -194,6 +217,15 @@ export interface DataTableProps<T> {
    * out and resizes, and forgets the layout on unmount.
    */
   widthStorage?: WidthStorage;
+  /**
+   * Renders only the rows in and near the view, for long lists. `true` uses the
+   * nearest scrolling ancestor; an object names the scroller and tunes it.
+   */
+  virtualize?: boolean | DataTableVirtualize;
+  /** Height of every row in pixels, the same for all of them. */
+  rowHeight?: number;
+  /** Ref to the table's methods, such as `scrollToIndex`. */
+  apiRef?: React.Ref<DataTableApi>;
   /** Accessible name of the table. */
   ariaLabel?: string;
   /** Id of the table element. */

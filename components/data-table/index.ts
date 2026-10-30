@@ -12,11 +12,14 @@ export type {
   DataTableRowProps,
   DataTableRowState,
   DataTableSort,
+  DataTableApi,
+  DataTableVirtualize,
 } from "./DataTable.types";
 
 export {
   DATA_TABLE_MIN_COLUMN_WIDTH,
   DATA_TABLE_MIN_FILL_WIDTH,
+  DATA_TABLE_ROW_HEIGHT,
   DATA_TABLE_SETTINGS_WIDTH,
 } from "./DataTable.constants";
 

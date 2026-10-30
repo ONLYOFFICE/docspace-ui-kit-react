@@ -7,7 +7,7 @@ import {
   DataTableContext,
   type DataTableContextValue,
 } from "./DataTable.context";
-import type { DataTableProps } from "./DataTable.types";
+import type { DataTableProps, DataTableVirtualize } from "./DataTable.types";
 import { useColumnLayout } from "./hooks/useColumnLayout";
 import { useColumnResize } from "./hooks/useColumnResize";
 import {
@@ -20,8 +20,11 @@ import {
   DataTableHeader,
   type HeaderResize,
 } from "./sub-components/header/DataTableHeader";
-import { RowSlot } from "./sub-components/row/RowSlot";
+import { DataTableBody } from "./sub-components/body/DataTableBody";
+import { DATA_TABLE_ROW_HEIGHT } from "./DataTable.constants";
 import styles from "./DataTable.module.scss";
+
+const NO_OPTIONS: DataTableVirtualize = {};
 
 const assignRef = <V,>(ref: React.Ref<V> | undefined, value: V | null) => {
   if (typeof ref === "function") ref(value);
@@ -39,6 +42,9 @@ export const DataTable = <T,>({
   onColumnVisibilityChange,
   onCompactChange,
   widthStorage,
+  virtualize = false,
+  rowHeight = DATA_TABLE_ROW_HEIGHT,
+  apiRef,
   ariaLabel,
   id,
   className,
@@ -125,6 +131,10 @@ export const DataTable = <T,>({
     }
   }, [sortKey, columns, onColumnVisibilityChange]);
 
+  const virtualOptions =
+    virtualize === false ? null : virtualize === true ? NO_OPTIONS : virtualize;
+  const virtualized = virtualOptions !== null;
+
   const context = useMemo<DataTableContextValue>(
     () => ({
       columns: columns as DataTableContextValue["columns"],
@@ -132,9 +142,17 @@ export const DataTable = <T,>({
         renderedColumns as DataTableContextValue["renderedColumns"],
       lastColumnId,
       compact,
+      virtualized,
       onColumnVisibilityChange,
     }),
-    [columns, renderedColumns, lastColumnId, compact, onColumnVisibilityChange],
+    [
+      columns,
+      renderedColumns,
+      lastColumnId,
+      compact,
+      virtualized,
+      onColumnVisibilityChange,
+    ],
   );
 
   return (
@@ -144,10 +162,18 @@ export const DataTable = <T,>({
         id={id}
         role="table"
         aria-label={ariaLabel}
+        // With only some rows in the DOM, the count says how many there are;
+        // the header row is one of them.
+        aria-rowcount={virtualized ? rows.length + 1 : undefined}
         className={classNames(styles.dataTable, "table-container", className, {
           [styles.isResizing]: resizingId !== null,
         })}
-        style={{ "--data-table-grid": gridTemplate } as React.CSSProperties}
+        style={
+          {
+            "--data-table-grid": gridTemplate,
+            "--data-table-row-height": `${rowHeight}px`,
+          } as React.CSSProperties
+        }
         data-testid={testId}
       >
         <DataTableHeader
@@ -159,21 +185,15 @@ export const DataTable = <T,>({
           id={headerId}
           className={headerClassName}
         />
-        <div
-          role="rowgroup"
-          className={classNames(styles.body, "table-container_body")}
-          data-testid="data-table-body"
-        >
-          {rows.map((row, index) => (
-            <RowSlot
-              key={getRowKey(row, index)}
-              row={row}
-              index={index}
-              getRowProps={getRowProps}
-              renderRow={renderRow}
-            />
-          ))}
-        </div>
+        <DataTableBody
+          rows={rows}
+          getRowKey={getRowKey}
+          getRowProps={getRowProps}
+          renderRow={renderRow}
+          virtualize={virtualOptions}
+          rowHeight={rowHeight}
+          apiRef={apiRef}
+        />
       </div>
     </DataTableContext>
   );

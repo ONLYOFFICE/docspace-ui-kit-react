@@ -151,6 +151,7 @@
   "dependencies": {
     "@floating-ui/dom": "1.6.13",
     "@onlyoffice/docspace-api-sdk": "^3.7.0",
+    "@tanstack/react-virtual": "3.14.16",
     "classnames": "2.5.1",
     "cnbuilder": "3.1.0",
     "copy-to-clipboard": "3.3.3",

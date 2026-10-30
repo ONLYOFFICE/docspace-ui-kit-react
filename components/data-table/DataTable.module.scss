@@ -234,6 +234,8 @@
 .row {
   display: grid;
   grid-template-columns: var(--data-table-grid);
+  // Scrolled into view, a row stops below the sticky header, not under it.
+  scroll-margin-block-start: 40px;
 
   // A selected row and the one being acted on are tinted cell by cell, as in
   // the old table, so a consumer's per-cell styles (drag and drop) still win.
@@ -252,10 +254,25 @@
   align-items: center;
   box-sizing: border-box;
   min-width: 0;
-  height: 48px;
+  height: var(--data-table-row-height, 48px);
   overflow: hidden;
 
   border-bottom: 1px solid var(--data-table-border-color);
+}
+
+// ===== Virtual list =====
+
+// As tall as every row together, so the scroller's height is right; the rows
+// in it sit at their own `top`, not shifted by a transform, because the
+// client reads `offsetTop` and the computed `top` of `.window-item`.
+.virtualList {
+  position: relative;
+  width: 100%;
+}
+
+.virtualRow {
+  position: absolute;
+  inset-inline: 0;
 }
 
 // ===== Row menu =====

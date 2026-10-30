@@ -1,10 +1,11 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, screen, userEvent, waitFor, within } from "storybook/test";
 
 import {
   DataTable,
+  type DataTableApi,
   type DataTableColumn,
   DataTableRow,
   type DataTableRowState,
@@ -691,6 +692,97 @@ export const IndexEditing: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Done" }));
     await waitFor(() =>
       expect(menuButtons()).toHaveLength(INDEXED_ROWS.length),
+    );
+  },
+};
+
+const MANY_ROWS: FileRow[] = Array.from({ length: 10_000 }, (_, i) => ({
+  id: i + 1,
+  name: `Scan ${String(i + 1).padStart(5, "0")}.pdf`,
+  author: AUTHORS[i % AUTHORS.length],
+  modified: `2026-10-${String((i % 28) + 1).padStart(2, "0")}`,
+  size: `${(i * 37) % 900} KB`,
+  type: TYPES[i % TYPES.length],
+}));
+
+const VirtualizedTemplate = (args: React.ComponentProps<typeof FilesTable>) => {
+  const visibility = useColumnVisibility(args.columns);
+  const [scroller, setScroller] = useState<HTMLDivElement | null>(null);
+  const apiRef = useRef<DataTableApi>(null);
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => apiRef.current?.scrollToIndex(4999, { align: "start" })}
+      >
+        Go to row 5000
+      </button>
+      <div
+        ref={setScroller}
+        data-testid="scroller"
+        style={{ height: 520, overflowY: "auto", marginTop: 16 }}
+      >
+        <div style={{ height: 120, padding: 16, boxSizing: "border-box" }}>
+          A filter bar above the table, inside the same scroller
+        </div>
+        <FilesTable
+          {...args}
+          {...visibility}
+          virtualize={{ scrollElement: scroller }}
+          apiRef={apiRef}
+        />
+      </div>
+    </>
+  );
+};
+
+export const Virtualized: Story = {
+  args: { rows: MANY_ROWS },
+  render: (args) => <VirtualizedTemplate {...args} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "10 000 rows, of which only those in and near the view are in the DOM. The scroller is named by `virtualize.scrollElement`; the content above the table scrolls with it, and the header sticks to its top. `apiRef.scrollToIndex` brings a row into view.",
+      },
+      source: {
+        code: `const apiRef = useRef<DataTableApi>(null);
+
+<div ref={setScroller} style={{ height: 520, overflowY: "auto" }}>
+  <Filter />
+  <DataTable
+    columns={columns}
+    rows={rows}
+    getRowKey={(row) => row.id}
+    virtualize={{ scrollElement: scroller }}
+    apiRef={apiRef}
+  />
+</div>
+
+apiRef.current?.scrollToIndex(4999, { align: "start" });`,
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const rendered = () => canvas.getAllByTestId("data-table-row");
+
+    await waitFor(() => expect(rendered().length).toBeGreaterThan(5));
+    await expect(rendered().length).toBeLessThan(40);
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Go to row 5000" }),
+    );
+    await waitFor(() =>
+      expect(canvas.getByText("Scan 05000.pdf")).toBeInTheDocument(),
+    );
+    await expect(rendered().length).toBeLessThan(40);
+
+    const scroller = canvas.getByTestId("scroller");
+    scroller.scrollTop = scroller.scrollHeight;
+    await waitFor(() =>
+      expect(canvas.getByText("Scan 10000.pdf")).toBeInTheDocument(),
     );
   },
 };

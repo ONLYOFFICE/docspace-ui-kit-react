@@ -14,5 +14,11 @@ export const DATA_TABLE_SETTINGS_WIDTH = 24;
 export const DATA_TABLE_CONTEXT_MENU_CELL_CLASS =
   "table-container_row-context-menu-wrapper";
 
+/** Height of a body row, its bottom border included, in pixels. */
+export const DATA_TABLE_ROW_HEIGHT = 48;
+
+/** Rows a virtualised table renders beyond each edge of the visible ones. */
+export const DATA_TABLE_OVERSCAN = 5;
+
 /** Share of the flexible area the `fill` columns get on a reset; `flex` ones split the rest. */
 export const DATA_TABLE_FILL_SHARE = 0.4;
