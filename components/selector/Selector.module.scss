@@ -1,4 +1,5 @@
 @use "../../styles/mixins";
+@use "../../styles/variables/colors";
 
 .selector {
   width: 100%;
@@ -198,6 +199,15 @@
         padding: 6px 10px;
         border-radius: 6px;
         background-color: var(--empty-view-link-bg-color);
+
+        &:focus-visible {
+          outline: 2px solid
+            var(
+              --accent-main,
+              var(--color-scheme-main-accent, #{colors.$light-blue-main})
+            );
+          outline-offset: -2px;
+        }
 
         .empty-folder_link {
           color: var(--accent-main, var(--empty-view-link-color));
@@ -662,4 +672,16 @@
   to {
     opacity: 0.5;
   }
+}
+
+// The row the keyboard is on. The list's scroll container holds the focus, and
+// a click focuses it too, so the ring is drawn only while that focus came
+// from the keyboard. Inset: the list clips its rows.
+:global(.scroll-body):focus-visible .keyboardActive {
+  outline: 2px solid
+    var(
+      --accent-main,
+      var(--color-scheme-main-accent, #{colors.$light-blue-main})
+    );
+  outline-offset: -2px;
 }

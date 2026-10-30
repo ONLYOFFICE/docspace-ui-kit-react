@@ -40,7 +40,10 @@ const compareFunction = (prevProps: ItemProps, nextProps: ItemProps) => {
     prevItem?.isSelected === nextItem?.isSelected &&
     nextData?.inputItemVisible === prevData?.inputItemVisible &&
     nextData?.listHeight === prevData?.listHeight &&
-    nextData?.isLimitReached === prevData?.isLimitReached
+    nextData?.isLimitReached === prevData?.isLimitReached &&
+    nextData?.listboxId === prevData?.listboxId &&
+    (nextData?.activeIndex === nextIndex) ===
+      (prevData?.activeIndex === prevIndex)
   );
 };
 
@@ -60,7 +63,12 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
     isLimitReached,
     displayFileExtension,
     forceIsMultiSelect,
+    listboxId,
+    activeIndex,
   }: Data = data;
+
+  const optionId = listboxId ? `${listboxId}-option-${index}` : undefined;
+  const isActive = activeIndex === index;
 
   const { isBase } = useTheme();
 
@@ -165,6 +173,8 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
           style={style}
           hotkey={hotkey}
           inputItemVisible={inputItemVisible}
+          optionId={optionId}
+          isActive={isActive}
         />
       );
     }
@@ -233,7 +243,12 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
         key={`${label}-${avatar}-${role}`}
         style={style}
         onClick={onClick}
+        id={optionId}
+        role={optionId ? "option" : undefined}
+        aria-selected={optionId ? !!isSelected : undefined}
+        aria-disabled={optionId && isItemDisabled ? true : undefined}
         className={classNames(styles.selectorItem, {
+          [styles.keyboardActive]: isActive,
           [styles.disabled]: isItemDisabled,
           [styles.selectedSingle]: isSelected && !isMultiSelect,
           [styles.hoverable]: !isItemDisabled,

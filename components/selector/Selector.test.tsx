@@ -258,3 +258,51 @@ describe("<Selector /> Enter", () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 });
+
+describe("<Selector /> keyboard", () => {
+  const breadCrumbs = [
+    { id: "apps", label: "Apps", isRoom: false },
+    { id: "rooms", label: "Rooms", isRoom: false },
+  ];
+  const withCrumbs = (override: object = {}) => ({
+    withBreadCrumbs: true,
+    isBreadCrumbsLoading: false,
+    breadCrumbs,
+    breadCrumbsLoader: <div />,
+    ...override,
+  });
+
+  it("makes a crumb before the last a link that Enter follows", () => {
+    const onSelectBreadCrumb = vi.fn();
+    renderSelector(withCrumbs({ onSelectBreadCrumb }));
+
+    const apps = screen.getByRole("link", { name: "Apps" });
+    expect(apps).toHaveAttribute("tabindex", "0");
+    expect(screen.getByText("Rooms")).toHaveAttribute("aria-current", "page");
+    expect(screen.queryByRole("link", { name: "Rooms" })).toBeNull();
+
+    fireEvent.keyDown(apps, { key: "Enter" });
+
+    expect(onSelectBreadCrumb).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "apps" }),
+    );
+  });
+
+  it("makes the empty screen's Back a button that Enter and Space press", () => {
+    const onSelectBreadCrumb = vi.fn();
+    renderSelector(
+      withCrumbs({ items: [], totalItems: 0, onSelectBreadCrumb }),
+    );
+
+    const back = screen.getByRole("button", { name: "Back" });
+    expect(back).toHaveAttribute("tabindex", "0");
+
+    fireEvent.keyDown(back, { key: "Enter" });
+    fireEvent.keyDown(back, { key: " " });
+
+    expect(onSelectBreadCrumb).toHaveBeenCalledTimes(2);
+    expect(onSelectBreadCrumb).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "apps" }),
+    );
+  });
+});

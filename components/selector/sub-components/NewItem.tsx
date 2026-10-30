@@ -18,6 +18,8 @@ const NewItem = ({
   hotkey,
   inputItemVisible,
   listHeight,
+  optionId,
+  isActive,
 }: NewItemProps) => {
   const { isOpenDropDown, onCloseDropDown, setIsOpenDropDown } =
     useCreateDropDown();
@@ -62,7 +64,12 @@ const NewItem = ({
     <div
       key="create-new-item"
       style={style}
-      className={classNames(styles.selectorItem, styles.hoverable)}
+      className={classNames(styles.selectorItem, styles.hoverable, {
+        [styles.keyboardActive]: isActive,
+      })}
+      id={optionId}
+      role={optionId ? "option" : undefined}
+      aria-selected={optionId ? false : undefined}
       onClick={onCreateClickAction}
     >
       <AddButton

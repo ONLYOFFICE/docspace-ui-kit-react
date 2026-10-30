@@ -703,11 +703,14 @@ the stylesheet reads neither, so setting them changes nothing.
 
 ## Accessibility
 
-- **The list is not reachable from the keyboard.** Rows are `<div>`s with an `onClick`, carry
-  no role and are never focusable; only the rows near the viewport exist in the DOM at all, so
-  assistive technology is given no list, no count and no position. In multi-select the row's
-  checkbox is focusable with Tab and toggled with Space, and that is the only way through the
-  list; outside multi-select a row can be picked only with the pointer.
+- **The list is one Tab stop, a listbox.** Its scroll container takes the focus and names the
+  row the keyboard is on (`aria-activedescendant`); the rows are options with `aria-selected`.
+  The arrows, Home and End move between the rows that can be picked - separators, the new-name
+  field and disabled rows are skipped - and scroll to them, and Enter or Space click the row, so
+  a key does what the pointer does there: open a folder, pick an item, start "New folder". The
+  row is ringed only while the focus came from the keyboard. The Enter that opened a row does
+  not also submit the selector. In multi-select the row's checkbox is still a Tab stop of its
+  own. With `isSSR`, which renders the rows without the virtual list, none of this applies.
 - **Focus moves into the selector when it mounts**: to the list's scroll container, unless the
   search box already has it, and to the new-name field when that field appears, with its text
   selected. Neither scrolls the page (`preventScroll`), so a selector further down a page takes
@@ -719,7 +722,10 @@ the stylesheet reads neither, so setting them changes nothing.
   everything else on the page in tab order.
 - Escape and Enter are listened for on the window, so they act even when focus is outside the
   panel — and Enter submits without the button being focused.
-- The empty screen's create and back controls are `<div>`s with click handlers, not buttons.
+- The empty screen's create, back and clear-filter controls are buttons to the keyboard
+  (`role="button"`, Enter and Space), named by their labels.
+- A breadcrumb before the last is a link to the keyboard (Enter); the last one, where the list
+  is, carries `aria-current="page"`.
 - The footer's submit and cancel buttons are native buttons, reached with Tab and pressed with
   Enter or Space.
 - Give the panel a name yourself: `headerProps.headerLabel` renders as text, not as a label for

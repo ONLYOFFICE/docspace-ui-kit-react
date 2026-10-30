@@ -8,6 +8,7 @@ import type { Nullable } from "../../../types";
 import styles from "../Selector.module.scss";
 import { Scrollbar } from "../../scrollbar";
 import { Text } from "../../text";
+import { consumeKey } from "../../../utils/consume-key";
 
 import { SearchContext, SearchValueContext } from "../contexts/Search";
 import { BreadCrumbsContext } from "../contexts/BreadCrumbs";
@@ -33,6 +34,7 @@ import { BreadCrumbs } from "./BreadCrumbs";
 import { Item } from "./Item";
 import { Info } from "./Info";
 import { VirtualScroll } from "./VirtualScroll";
+import { ListboxContext } from "../contexts/Listbox";
 import { Tabs } from "../../tabs";
 import InputItem from "./InputItem";
 
@@ -366,6 +368,113 @@ const Body = ({
     return 48;
   };
 
+  // The keyboard's place in the list. The list's scroll container holds the
+  // focus (one Tab stop for the whole list, as only the rows near the viewport
+  // exist), the arrows move this index, and Enter or Space click the row, so a
+  // key does what the pointer does there.
+  const listboxId = React.useId();
+  const [activeIndex, setActiveIndex] = React.useState(-1);
+  const listItems = isEmptyInput ? [displayItems[1]] : displayItems;
+
+  const isPickable = (index: number) => {
+    const item = listItems[index];
+    return (
+      !!item &&
+      !!item.id &&
+      !item.isSeparator &&
+      !item.isInputItem &&
+      !item.isDisabled
+    );
+  };
+
+  const stepFrom = (from: number, step: 1 | -1) => {
+    for (
+      let index = from + step;
+      index >= 0 && index < listItems.length;
+      index += step
+    )
+      if (isPickable(index)) return index;
+    return from;
+  };
+
+  // Rows on screen, from react-window: focus lands on one of them rather than
+  // scrolling the list to a row further down.
+  const visibleRangeRef = React.useRef({ start: 0, stop: 0 });
+
+  const moveTo = (index: number) => {
+    if (index < 0) return;
+    setActiveIndex(index);
+    listRef.current?.scrollToItem(index);
+  };
+
+  // A row opened from the keyboard swaps the list for the folder's: the
+  // keyboard starts again on its first row while the list keeps the focus.
+  React.useEffect(() => {
+    setActiveIndex((index) => {
+      if (index < 0) return index;
+      const list = document.activeElement;
+      const keepsFocus =
+        list?.getAttribute("role") === "listbox" &&
+        !!bodyRef.current?.contains(list);
+      return keepsFocus ? 0 : -1;
+    });
+  }, [items]);
+
+  const listbox = {
+    activeOptionId:
+      activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined,
+    // Focused, the list shows where the keyboard is: on the selected row if
+    // it is on screen, or else the first row on screen. The list does not
+    // move for it.
+    onFocus: () => {
+      if (activeIndex >= 0) return;
+      const { start, stop } = visibleRangeRef.current;
+      const selected = listItems.findIndex(
+        (item, index) =>
+          item?.isSelected &&
+          isPickable(index) &&
+          index >= start &&
+          index <= stop,
+      );
+      const index = selected >= 0 ? selected : stepFrom(start - 1, 1);
+      if (index >= start && index <= stop) setActiveIndex(index);
+    },
+    onBlur: () => setActiveIndex(-1),
+    onKeyDown: (e: KeyboardEvent) => {
+      if (e.target !== e.currentTarget) return;
+      const last = stepFrom(listItems.length, -1);
+
+      switch (e.key) {
+        case "ArrowDown":
+          moveTo(activeIndex < 0 ? stepFrom(-1, 1) : stepFrom(activeIndex, 1));
+          break;
+        case "ArrowUp":
+          moveTo(activeIndex < 0 ? last : stepFrom(activeIndex, -1));
+          break;
+        case "Home":
+          moveTo(stepFrom(-1, 1));
+          break;
+        case "End":
+          moveTo(last);
+          break;
+        case "Enter":
+        case " ": {
+          if (!isPickable(activeIndex)) return;
+          // The row is on screen: moving to it scrolled it there.
+          document
+            .getElementById(`${listboxId}-option-${activeIndex}`)
+            ?.click();
+          break;
+        }
+        default:
+          return;
+      }
+
+      e.preventDefault();
+      consumeKey(e);
+    },
+  };
+
   return (
     <div
       ref={bodyRef}
@@ -514,48 +623,58 @@ const Body = ({
               placeholder={displayItems[1].placeholder}
             />
           ) : (
-            <InfiniteLoader
-              ref={listOptionsRef}
-              isItemLoaded={isItemLoaded}
-              itemCount={displayTotal}
-              loadMoreItems={onLoadMoreItems}
-            >
-              {({ onItemsRendered, ref }) => (
-                <List
-                  className="items-list"
-                  height={listHeight}
-                  width="100%"
-                  itemCount={itemsCount}
-                  itemData={{
-                    items: isEmptyInput ? [displayItems[1]] : displayItems,
-                    onSelect,
-                    isMultiSelect: isMultiSelect || false,
-                    rowLoader,
-                    isItemLoaded,
-                    renderCustomItem,
-                    setInputItemVisible,
-                    inputItemVisible,
-                    savedInputValue,
-                    setSavedInputValue,
-                    listHeight,
-                    isLimitReached,
-                    displayFileExtension,
-                    forceIsMultiSelect,
-                  }}
-                  itemSize={getItemSize}
-                  onItemsRendered={onItemsRendered}
-                  ref={(node: List | null) => {
-                    if (typeof ref === "function") {
-                      (ref as (r: List | null) => void)(node);
-                    }
-                    listRef.current = node;
-                  }}
-                  outerElementType={VirtualScroll}
-                >
-                  {Item}
-                </List>
-              )}
-            </InfiniteLoader>
+            <ListboxContext value={listbox}>
+              <InfiniteLoader
+                ref={listOptionsRef}
+                isItemLoaded={isItemLoaded}
+                itemCount={displayTotal}
+                loadMoreItems={onLoadMoreItems}
+              >
+                {({ onItemsRendered, ref }) => (
+                  <List
+                    className="items-list"
+                    height={listHeight}
+                    width="100%"
+                    itemCount={itemsCount}
+                    itemData={{
+                      items: isEmptyInput ? [displayItems[1]] : displayItems,
+                      onSelect,
+                      isMultiSelect: isMultiSelect || false,
+                      rowLoader,
+                      isItemLoaded,
+                      renderCustomItem,
+                      setInputItemVisible,
+                      inputItemVisible,
+                      savedInputValue,
+                      setSavedInputValue,
+                      listHeight,
+                      isLimitReached,
+                      displayFileExtension,
+                      forceIsMultiSelect,
+                      listboxId,
+                      activeIndex,
+                    }}
+                    itemSize={getItemSize}
+                    onItemsRendered={(props) => {
+                      visibleRangeRef.current = {
+                        start: props.visibleStartIndex,
+                        stop: props.visibleStopIndex,
+                      };
+                      onItemsRendered(props);
+                    }}
+                    ref={(node: List | null) => {
+                      if (typeof ref === "function") {
+                        (ref as (r: List | null) => void)(node);
+                      }
+                      listRef.current = node;
+                    }}
+                    outerElementType={VirtualScroll}
+                  >
+                    {Item}
+                  </List>
+                )}
+              </InfiniteLoader>
+            </ListboxContext>
           )}
         </div>
       )}

@@ -1,16 +1,53 @@
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 
 import { Scrollbar, type ScrollbarProps } from "../../scrollbar";
 import { ASIDE_PADDING_AFTER_LAST_ITEM } from "../../../constants";
+import { ListboxContext } from "../contexts/Listbox";
 
 export const VirtualScroll = (props: ScrollbarProps) => {
   const scrollContentRef = useRef<HTMLDivElement | null>(null);
+  const { activeOptionId, onKeyDown, onFocus, onBlur } =
+    useContext(ListboxContext);
+
+  // The scroll container is the list's one Tab stop, a listbox whose options
+  // the arrows move through (aria-activedescendant); the rows themselves
+  // never take the focus, as only those near the viewport exist.
+  useEffect(() => {
+    const list = scrollContentRef.current;
+    if (!list) return;
+
+    list.setAttribute("role", "listbox");
+    if (activeOptionId)
+      list.setAttribute("aria-activedescendant", activeOptionId);
+    else list.removeAttribute("aria-activedescendant");
+  }, [activeOptionId]);
+
+  useEffect(() => {
+    const list = scrollContentRef.current;
+    if (!list) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => onKeyDown?.(e);
+    const handleFocus = () => onFocus?.();
+    const handleBlur = (e: FocusEvent) => onBlur?.(e);
+
+    list.addEventListener("keydown", handleKeyDown);
+    list.addEventListener("focus", handleFocus);
+    list.addEventListener("blur", handleBlur);
+
+    return () => {
+      list.removeEventListener("keydown", handleKeyDown);
+      list.removeEventListener("focus", handleFocus);
+      list.removeEventListener("blur", handleBlur);
+    };
+  }, [onKeyDown, onFocus, onBlur]);
 
   useEffect(() => {
     const isSearchInputFocused = document.activeElement?.closest(
       ".search-input-block",
     );
 
+    // After the listeners above, so the list's own focus handler sees this
+    // focus and puts the keyboard on a row at once.
     // `preventScroll`: the list takes focus for the keyboard, not the page's
     // scroll position. Without it every selector that mounts scrolls the
     // page to itself -- on a Docs page with a dozen of them, to the bottom.
@@ -25,6 +62,7 @@ export const VirtualScroll = (props: ScrollbarProps) => {
       scrollClass="selector-body-scroll"
       paddingAfterLastItem={ASIDE_PADDING_AFTER_LAST_ITEM}
       contentRef={scrollContentRef}
+      tabIndex={0}
     />
   );
 };
