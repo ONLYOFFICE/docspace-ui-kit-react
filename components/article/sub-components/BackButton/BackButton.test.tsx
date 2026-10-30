@@ -131,4 +131,37 @@ describe("BackButton", () => {
     expect(toggleArticleOpen).toHaveBeenCalledTimes(1);
     expect(navigate).toHaveBeenCalledWith("/");
   });
+
+  it("is a button that Enter and Space press", () => {
+    const onBack = vi.fn();
+    render(
+      <BackButton
+        showText
+        currentDeviceType={DeviceType.desktop}
+        onBack={onBack}
+      />,
+    );
+
+    const back = screen.getByRole("button", { name: "Back" });
+    expect(back).toHaveAttribute("tabindex", "0");
+
+    fireEvent.keyDown(back, { key: "Enter" });
+    fireEvent.keyDown(back, { key: " " });
+
+    expect(onBack).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps its name while collapsed to the arrow", () => {
+    render(
+      <BackButton
+        showText={false}
+        currentDeviceType={DeviceType.desktop}
+        label="Settings"
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Settings" }),
+    ).toBeInTheDocument();
+  });
 });
