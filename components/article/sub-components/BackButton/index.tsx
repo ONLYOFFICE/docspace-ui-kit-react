@@ -47,6 +47,10 @@ const BackButton = ({
     }
   };
 
+  // The row is a div: a button to the keyboard.
+  const onKeyDownBack = (e: React.KeyboardEvent<HTMLDivElement>) =>
+    activateOnButtonKey(e, onClickBack);
+
   // When the article is collapsed (showText === false) the column shrinks to
   // the narrow variant, so use the tablet arrow/layout even on desktop —
   // otherwise the desktop styling (margin-inline-start) pushes the arrow
@@ -72,7 +76,7 @@ const BackButton = ({
       onClick={onClickBack}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => activateOnButtonKey(e, onClickBack)}
+      onKeyDown={onKeyDownBack}
       // Collapsed, only the arrow shows: the name comes from here instead.
       aria-label={showText ? undefined : text}
     >
