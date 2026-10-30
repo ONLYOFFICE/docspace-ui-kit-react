@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useEffectEvent, useRef } from "react";
 
 import { Scrollbar, type ScrollbarProps } from "../../scrollbar";
 import { ASIDE_PADDING_AFTER_LAST_ITEM } from "../../../constants";
@@ -22,13 +22,15 @@ export const VirtualScroll = (props: ScrollbarProps) => {
     else list.removeAttribute("aria-activedescendant");
   }, [activeOptionId]);
 
+  // Body makes new handlers on every render, every arrow press among them:
+  // the listeners call the current ones instead of being re-attached.
+  const handleKeyDown = useEffectEvent((e: KeyboardEvent) => onKeyDown?.(e));
+  const handleFocus = useEffectEvent(() => onFocus?.());
+  const handleBlur = useEffectEvent((e: FocusEvent) => onBlur?.(e));
+
   useEffect(() => {
     const list = scrollContentRef.current;
     if (!list) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => onKeyDown?.(e);
-    const handleFocus = () => onFocus?.();
-    const handleBlur = (e: FocusEvent) => onBlur?.(e);
 
     list.addEventListener("keydown", handleKeyDown);
     list.addEventListener("focus", handleFocus);
@@ -39,7 +41,7 @@ export const VirtualScroll = (props: ScrollbarProps) => {
       list.removeEventListener("focus", handleFocus);
       list.removeEventListener("blur", handleBlur);
     };
-  }, [onKeyDown, onFocus, onBlur]);
+  }, []);
 
   useEffect(() => {
     const isSearchInputFocused = document.activeElement?.closest(
