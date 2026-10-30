@@ -38,6 +38,7 @@ const InputBlock = React.memo(
 
     onChange,
     onIconClick,
+    iconAriaLabel,
     onBlur,
     onFocus,
     onKeyDown,
@@ -64,6 +65,17 @@ const InputBlock = React.memo(
       (e: React.MouseEvent) => onIconClick?.(e),
       [onIconClick],
     );
+
+    // The icon's own click makes it a keyboard button; the box around it,
+    // which takes the pointer's click, must not run it a second time.
+    const handleIconButtonClick = useCallback(
+      (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onIconClick?.(e);
+      },
+      [onIconClick],
+    );
+    const isIconKeyboardButton = !!onIconClick && !!iconAriaLabel;
 
     const handleFocus = useCallback(
       (e: React.FocusEvent<HTMLInputElement>) => {
@@ -153,6 +165,10 @@ const InputBlock = React.memo(
                 color={iconColor}
                 isDisabled={typeof onIconClick !== "function"}
                 hoverColor={hoverColor}
+                ariaLabel={iconAriaLabel}
+                onClick={
+                  isIconKeyboardButton ? handleIconButtonClick : undefined
+                }
               />
             </div>
           </div>

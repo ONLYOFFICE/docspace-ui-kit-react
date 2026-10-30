@@ -89,6 +89,24 @@ describe("<PasswordInput />", () => {
     expect(input).toHaveAttribute("type", "password");
   });
 
+  it("makes the visibility toggle a named button the keyboard presses", async () => {
+    const user = userEvent.setup();
+    render(<PasswordInput {...baseProps} />);
+
+    const input = screen.getByTestId("password-input").querySelector("input");
+    const show = screen.getByRole("button", { name: "Show" });
+    expect(show).toHaveAttribute("tabindex", "0");
+
+    show.focus();
+    await user.keyboard("{Enter}");
+    expect(input).toHaveAttribute("type", "text");
+
+    const hide = screen.getByRole("button", { name: "Hide" });
+    hide.focus();
+    await user.keyboard(" ");
+    expect(input).toHaveAttribute("type", "password");
+  });
+
   it("shows tooltip with password requirements", async () => {
     const user = userEvent.setup();
     render(

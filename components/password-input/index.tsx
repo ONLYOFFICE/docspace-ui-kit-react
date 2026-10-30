@@ -20,6 +20,7 @@ import { InputSize, InputType } from "../text-input";
 
 import { PasswordInputProps, TPasswordSettings } from "./PasswordInput.types";
 import { globalColors } from "../../providers/theme";
+import { useCommonTranslation } from "../../utils";
 
 import {
   usePasswordGenerator,
@@ -137,6 +138,7 @@ const PasswordInput = ({
   );
 
   const { isRTL } = useInterfaceDirection();
+  const t = useCommonTranslation();
 
   const changeInputType = React.useCallback(() => {
     const newType =
@@ -397,6 +399,7 @@ const PasswordInput = ({
             isSimulateType && type === "password" ? bullets : (value ?? "")
           }
           onIconClick={changeInputType}
+          iconAriaLabel={type === "password" ? t("Show") : t("Hide")}
           onChange={onChangeAction}
           scale={scale}
           size={effectiveSize}

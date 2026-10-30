@@ -54,6 +54,12 @@ type IconProps = {
    * disabled style and does not respond — it is what makes the icon a button.
    */
   onIconClick?: (e: React.MouseEvent) => void;
+  /**
+   * Name of the icon as a button. With `onIconClick` it also puts the icon in
+   * the Tab order, where Enter and Space press it; without a name it stays
+   * out, so the keyboard never meets a button it cannot announce.
+   */
+  iconAriaLabel?: string;
   /** Applied to the box around the icon. */
   iconButtonClassName?: string;
   /**
