@@ -9,6 +9,8 @@ import { IconButton } from "../../icon-button";
 import { RoomIcon } from "../../room-icon";
 import { RoomLogo } from "../../room-logo";
 import { Loader, LoaderTypes } from "../../loader";
+import { useCommonTranslation } from "../../../utils/i18n";
+import { activateOnButtonKey } from "../../../utils/keyboard-activation";
 
 import styles from "../Selector.module.scss";
 import type { InputItemProps } from "../Selector.types";
@@ -82,6 +84,25 @@ const InputItem = ({
     };
   }, [onAcceptInputAction, onCancelInputAction]);
 
+  const t = useCommonTranslation();
+
+  // Accept and cancel are divs the pointer clicks; to the keyboard each is a
+  // named button whose Enter / Space click it. Its own key stays off the
+  // window listener above, which would otherwise accept on an Enter pressed
+  // on cancel.
+  const getButtonProps = (label: string) =>
+    isLoading
+      ? {}
+      : {
+          role: "button",
+          tabIndex: 0,
+          "aria-label": label,
+          onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) =>
+            activateOnButtonKey(e, ({ currentTarget }) =>
+              currentTarget.click(),
+            ),
+        };
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVal = e.target.value;
 
@@ -149,6 +170,7 @@ const InputItem = ({
           [styles.loading]: isLoading,
         })}
         onClick={onAcceptInputAction}
+        {...getButtonProps(t("Done"))}
       >
         {isLoading ? (
           <Loader isDecorative type={LoaderTypes.track} size="16px" />
@@ -165,6 +187,7 @@ const InputItem = ({
           [styles.loading]: isLoading,
         })}
         onClick={onCancelInputAction}
+        {...getButtonProps(t("CancelButton"))}
       >
         <IconButton
           iconNode={<CancelIconReactSvg />}

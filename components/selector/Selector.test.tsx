@@ -305,4 +305,52 @@ describe("<Selector /> keyboard", () => {
       expect.objectContaining({ id: "apps" }),
     );
   });
+
+  describe("the new-name row", () => {
+    const withInput = (onAcceptInput = vi.fn(), onCancelInput = vi.fn()) =>
+      renderSelector({
+        items: [
+          { id: "new", label: "New folder", isCreateNewItem: true },
+          {
+            id: "input",
+            label: "",
+            isInputItem: true,
+            defaultInputValue: "New folder",
+            onAcceptInput,
+            onCancelInput,
+          },
+          ...items,
+        ],
+        totalItems: items.length + 2,
+      });
+
+    it("makes accept and cancel buttons that the keyboard presses", () => {
+      const onAcceptInput = vi.fn();
+      const onCancelInput = vi.fn();
+      withInput(onAcceptInput, onCancelInput);
+
+      const accept = screen.getByRole("button", { name: "Done" });
+      const cancel = screen.getByRole("button", { name: "Cancel" });
+      expect(accept).toHaveAttribute("tabindex", "0");
+      expect(cancel).toHaveAttribute("tabindex", "0");
+
+      fireEvent.keyDown(accept, { key: " " });
+      expect(onAcceptInput).toHaveBeenCalledOnce();
+    });
+
+    // The field accepts on any Enter on the page; one pressed on cancel is
+    // cancel's own.
+    it("cancels, not accepts, on Enter pressed on cancel", () => {
+      const onAcceptInput = vi.fn();
+      const onCancelInput = vi.fn();
+      withInput(onAcceptInput, onCancelInput);
+
+      fireEvent.keyDown(screen.getByRole("button", { name: "Cancel" }), {
+        key: "Enter",
+      });
+
+      expect(onCancelInput).toHaveBeenCalledOnce();
+      expect(onAcceptInput).not.toHaveBeenCalled();
+    });
+  });
 });
