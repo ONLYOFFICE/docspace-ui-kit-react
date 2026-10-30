@@ -162,6 +162,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`ComboBox` no longer throws when `options` is missing.** A caller that renders it before
+  its options are loaded passed `undefined`, and reading its length threw "Cannot read
+  properties of undefined (reading 'length')". A missing list is now treated as an empty one.
 - **`FileTile`'s `--tile-height` sizes the whole tile.** The thumbnail area kept its 156px and
   the name row its 64px, so a taller tile ended in an empty band under the name row, outside the
   hover and checked background. The thumbnail area now takes whatever the name row leaves; at

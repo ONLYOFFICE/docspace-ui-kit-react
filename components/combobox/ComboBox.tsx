@@ -15,6 +15,10 @@ import { ComboBoxSize, ComboBoxDisplayType } from "./ComboBox.enums";
 import type { TComboboxProps, TOption } from "./ComboBox.types";
 import styles from "./ComboBox.module.scss";
 
+// A caller that loads its options asynchronously can render before they
+// arrive. One shared empty list keeps the memoised lists below stable.
+const NO_OPTIONS: TOption[] = [];
+
 const compare = (prevProps: TComboboxProps, nextProps: TComboboxProps) => {
   return equal(prevProps, nextProps);
 };
@@ -215,7 +219,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     directionY,
     size = ComboBoxSize.base,
     type,
-    options,
+    options: optionsProp,
     advancedOptions,
     isDisabled,
     children,
@@ -267,6 +271,8 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     withoutArrow = false,
     id,
   } = props;
+
+  const options = optionsProp ?? NO_OPTIONS;
 
   React.useEffect(() => {
     setIsOpen(opened || false);
