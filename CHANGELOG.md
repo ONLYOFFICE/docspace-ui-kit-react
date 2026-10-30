@@ -213,6 +213,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   carrying its name — so hovering one of three buttons opened three tooltips, and the page held
   three elements with one `id`. A button without an `id` now gets a generated one; a button
   with an `id` is unchanged
+- **A click under a `Tabs` label selects the tab.** When the underlined row overflows, its
+  horizontal scroll track — 16px tall, at the bottom of the 32px bar — lay over the lower half
+  of every tab, so a click on the bottom of a label or just under it reached the track, which
+  scrolled the row instead of selecting the tab. The track now lets the pointer through; the
+  wheel and the trackpad still scroll the row
 - **A disabled `Tabs` item cannot be selected.** The click handlers of both bars, the segmented
   keyboard and the overflow arrows now refuse it; before, only CSS `pointer-events: none` kept
   the pointer off it, and the arrows selected it
