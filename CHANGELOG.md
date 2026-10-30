@@ -151,7 +151,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   props had none to give it, so an icon button could be made keyboard-operable with `tabIndex`
   and `onKeyDown` but not announced as a button without a cast. Both props are rendered on the
   element, as `Link`'s are; nothing changes for a button that passes neither.
-- Section: the info panel can be resized from its inline-start edge on a desktop. `isInfoPanelResizable` turns it on, with the host's width in `infoPanelWidth` and a setter in `setInfoPanelWidth`. The edge drags from 400px to 800px (`INFO_PANEL_WIDTH`, and the new `INFO_PANEL_MAX_WIDTH` in `utils/device`) while the section keeps 416px, narrows to fit a narrower window without saving it, and a double click restores 400px. It shares its resizer with the chat panel. `onShownInfoPanelWidthChange` reports the width the open info panel, or the chat open in its place, takes on screen (`0` when neither does), for floating buttons a host draws itself; it follows a resize drag once per frame, and below a desktop the info panel counts as 400px and the chat as `0`
+- Section: the info panel can be resized from its inline-start edge on a desktop. `isInfoPanelResizable` turns it on, with the host's width in `infoPanelWidth` and a setter in `setInfoPanelWidth`. The edge drags from 400px to 800px (`INFO_PANEL_WIDTH`, and the new `INFO_PANEL_MAX_WIDTH` in `utils/device`) while the section keeps 416px, narrows to fit a narrower window without saving it, and a double click restores 400px. It shares its resizer with the chat panel, whose edge now also takes a finger or a pen and narrows the panel to a narrower window, a chat opened after mount included, without calling `setChatPanelWidth` for it. `onShownInfoPanelWidthChange` reports the width the open info panel, or the chat open in its place, takes on screen (`0` when neither does), for floating buttons a host draws itself; it follows a resize drag once per frame, and below a desktop the info panel counts as 400px and the chat as `0`
 - Article: `infoPanelWidth`, and the same prop on `ArticleLiveChat`, sets how far the live chat launcher moves clear of the open info panel, or of the AI chat open in its place, for a host whose panels are resizable; `0` when neither is. Unset, `isInfoPanelVisible` still assumes `INFO_PANEL_WIDTH`. The `isInfoPanelVisible` docs no longer call it unread: the launcher has moved clear of the info panel again since the switch to the Zendesk messaging API
 - `OperationsProgressButton` takes `infoPanelWidth`. Inside `Section` the button gets the width through `--operations-progress-info-panel-width` on the section container instead: the width the open info panel, or the chat open in its place, takes on a desktop, updated on every frame of a resize drag, so the button stays 24px clear of the panel instead of sitting 424px in, under it
 
@@ -479,7 +479,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **The `Section` chat panel resizer no longer grows the panel by 1px per grab.** It measured the
   panel with its border and wrote that to `--chat-panel-width`, which sets the content box: a click
   on the edge committed 401 for a 400px panel. `setChatPanelWidth` now receives the content width,
-  and a grab released without moving commits the width unchanged.
+  and a grab released without moving commits nothing.
 - **A late search result no longer overwrites a newer edit in `Filter`'s search box.** A query the
   host applied after the user had already changed or cleared the box came back into it and was
   searched again. Such a stale value, or a new `getSelectedInputValue` returning the value already
@@ -556,10 +556,6 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   windows open the portal's `/doceditor`, so the calls are now addressed to
   `window.location.origin` and the browser drops one whose window holds any other page.
 - Table: a column reset no longer squeezes the name column below its own minimum. With many columns on and a narrow list, for instance beside the AI chat, the reset took every other column's minimum out of the name column's share, down to a negative width that broke the grid: the header lost its title and the rows came out empty. The name column now keeps its minimum, and when the other columns cannot fit next to it the table shows the name column alone, as a resize already does
-- Section: the chat panel's resize edge takes a finger or a pen, not only a mouse. It listened to mouse events alone, so a touch drag on it panned the page instead of resizing the panel
-- Section: a resizable chat panel opened after the section mounted narrows when the row shrinks. The watch on the row was set up only for a panel already open on mount, so a chat opened later kept its dragged width and squeezed the section
-- Section: the chat panel narrows to fit a narrower window without saving the narrowed width, so it widens back when the window does. Before, `setChatPanelWidth` was called with the narrowed width and it replaced the one the user chose
-- Section: a click on the chat panel's resize edge no longer widens it by 1px. The drag measured the panel together with its border and committed that width even when the pointer had not moved
 
 ## 4.1.0
 
