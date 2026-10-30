@@ -376,14 +376,16 @@ const Body = ({
   const [activeIndex, setActiveIndex] = React.useState(-1);
   const listItems = isEmptyInput ? [displayItems[1]] : displayItems;
 
+  // The rows Item greys out: disabled, or unticked once the limit is reached.
   const isPickable = (index: number) => {
     const item = listItems[index];
-    return (
-      !!item &&
-      !!item.id &&
-      !item.isSeparator &&
-      !item.isInputItem &&
-      !item.isDisabled
+    if (!item || !item.id || item.isSeparator || item.isInputItem) return false;
+    if (item.isDisabled) return false;
+    return !(
+      isMultiSelect &&
+      isLimitReached &&
+      !item.isSelected &&
+      !item.isFolder
     );
   };
 
