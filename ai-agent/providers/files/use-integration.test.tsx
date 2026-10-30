@@ -25,11 +25,6 @@ vi.mock("./save-dialog", () => ({
 vi.mock("./device-uploader", () => ({
   default: React.forwardRef(() => <div data-testid="device-uploader" />),
 }));
-vi.mock("./context-folder-dialog", () => ({
-  default: ({ onClose }: { onClose: () => void }) => (
-    <button type="button" data-testid="folder-dialog" onClick={onClose} />
-  ),
-}));
 vi.mock("./context-rooms-dialog", () => ({
   default: ({ kind, onClose }: { kind: string; onClose: () => void }) => (
     <button
@@ -41,15 +36,13 @@ vi.mock("./context-rooms-dialog", () => ({
   ),
 }));
 
-import AiChatStore from "../ai-chat-store/AiChatStore";
 import { CONTEXT_ROOM_CLOUD } from "../context-room/ContextRoomSync";
 import { useFilesIntegration, type FilesIntegration } from "./use-integration";
 
 let latest: FilesIntegration | null = null;
 
-const Host = ({ aiChatStore }: { aiChatStore?: AiChatStore }) => {
+const Host = () => {
   const integration = useFilesIntegration({
-    aiChatStore,
     onFilesAttached: vi.fn(),
   });
   latest = integration;
@@ -104,27 +97,5 @@ describe("useFilesIntegration: the composer's source pickers", () => {
     render(<Host />);
     integration().onOpenContextRoom("google", { id: "abc", name: "Drive" });
     expect(navigate).not.toHaveBeenCalled();
-  });
-
-  it("offers the folder picker only where the host turns the Context slot on", () => {
-    const store = new AiChatStore();
-    render(<Host aiChatStore={store} />);
-    expect(integration().onPickFolderContext).toBeUndefined();
-
-    act(() => store.setFolderContextPickerEnabled(true));
-    expect(integration().onPickFolderContext).toBeDefined();
-
-    act(() => integration().onPickFolderContext?.());
-    expect(screen.getByTestId("folder-dialog")).toBeInTheDocument();
-    act(() => screen.getByTestId("folder-dialog").click());
-    expect(screen.queryByTestId("folder-dialog")).toBeNull();
-
-    act(() => store.setFolderContextPickerEnabled(false));
-    expect(integration().onPickFolderContext).toBeUndefined();
-  });
-
-  it("has no folder picker without a panel store", () => {
-    render(<Host />);
-    expect(integration().onPickFolderContext).toBeUndefined();
   });
 });

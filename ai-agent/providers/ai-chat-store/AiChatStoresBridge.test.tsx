@@ -158,15 +158,4 @@ describe("AiChatStoresBridge", () => {
     });
     expect(clouds.selectContextFolders).not.toHaveBeenCalled();
   });
-
-  it("drops the context folder when the host switches the slot off", () => {
-    const store = new AiChatStore();
-    store.setFolderContextPickerEnabled(true);
-    renderBridge(store);
-    expect(clouds.clearFolderContext).not.toHaveBeenCalled();
-    act(() => {
-      store.setFolderContextPickerEnabled(false);
-    });
-    expect(clouds.clearFolderContext).toHaveBeenCalledTimes(1);
-  });
 });

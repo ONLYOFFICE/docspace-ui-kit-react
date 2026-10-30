@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { reaction } from "mobx";
 import { useTranslation } from "react-i18next";
 import type { ComposerAction, ExportFormat } from "@onlyoffice/ai-chat";
 
@@ -11,12 +10,10 @@ import CatalogDocuments from "../../../assets/icons/16/catalog.documents.react.s
 import UploadIcon from "../../../assets/icons/16/upload.react.svg";
 
 import type { SaveAsFileHandler } from "../platform";
-import type { AiChatStore } from "../ai-chat-store";
 
 import DeviceUploader, { type DeviceUploaderHandle } from "./device-uploader";
 import type { OnFilesAttached } from "./attach-files";
 import AttachDialog from "./attach-dialog";
-import ContextFolderDialog from "./context-folder-dialog";
 import ContextRoomsDialog, {
   type ContextRoomsKind,
 } from "./context-rooms-dialog";
@@ -28,9 +25,6 @@ import styles from "./styles.module.scss";
 export type FilesIntegration = {
   // Composer "attach" actions (add files from the host / upload from device).
   composerActions: ComposerAction[];
-  // Opens the folder picker behind the composer's Context slot; unset where
-  // the host does not offer folder context.
-  onPickFolderContext?: () => void;
   // Opens the Instructions room picker behind the composer's skills slot.
   onPickContextRooms: () => void;
   // Opens the Knowledge room picker behind the composer's knowledge slot.
@@ -60,13 +54,8 @@ export type FilesIntegration = {
 export const useFilesIntegration = ({
   entityId,
   onFilesAttached,
-  aiChatStore,
 }: {
   entityId?: string;
-  // The panel store, whose `folderContextPickerEnabled` flag turns on the
-  // composer's Context slot. Passed in: <AiAgentProviders> creates the store
-  // itself and renders its provider below this hook's call.
-  aiChatStore?: AiChatStore | null;
   // Reports every file attached through the dialog or a device upload, so the
   // caller can keep the record flags the attachments store drops
   // (`canAnalyze`).
@@ -76,27 +65,6 @@ export const useFilesIntegration = ({
 
   const [pickerVisible, setPickerVisible] = React.useState(false);
   const closePicker = React.useCallback(() => setPickerVisible(false), []);
-
-  // The Context slot: any folder as the round's context, where the host asks
-  // for it (see AiChatStore.folderContextPickerEnabled). Read off the panel
-  // store so the entry follows the host's switch without a config rebuild.
-  // <AiAgentProviders> is no observer, so the flag is mirrored into state.
-  const [folderContextEnabled, setFolderContextEnabled] = React.useState(
-    () => aiChatStore?.folderContextPickerEnabled ?? false,
-  );
-  React.useEffect(() => {
-    if (!aiChatStore) return undefined;
-    return reaction(
-      () => aiChatStore.folderContextPickerEnabled,
-      setFolderContextEnabled,
-      { fireImmediately: true },
-    );
-  }, [aiChatStore]);
-  const [contextPickerVisible, setContextPickerVisible] = React.useState(false);
-  const closeContextPicker = React.useCallback(
-    () => setContextPickerVisible(false),
-    [],
-  );
 
   // The room picker open for the skills or the knowledge slot; `null` while closed.
   const [roomsPicker, setRoomsPicker] = React.useState<ContextRoomsKind | null>(
@@ -202,19 +170,10 @@ export const useFilesIntegration = ({
     [t, i18n.language],
   );
 
-  const onPickFolderContext = React.useMemo(
-    () =>
-      folderContextEnabled ? () => setContextPickerVisible(true) : undefined,
-    [folderContextEnabled],
-  );
-
   const overlay = (
     <>
       {pickerVisible ? (
         <AttachDialog onClose={closePicker} onFilesAttached={onFilesAttached} />
-      ) : null}
-      {contextPickerVisible ? (
-        <ContextFolderDialog onClose={closeContextPicker} />
       ) : null}
       {roomsPicker ? (
         <ContextRoomsDialog kind={roomsPicker} onClose={closeRoomsPicker} />
@@ -237,7 +196,6 @@ export const useFilesIntegration = ({
 
   return {
     composerActions,
-    onPickFolderContext,
     onPickContextRooms,
     onPickKnowledgeRooms,
     onOpenContextRoom,

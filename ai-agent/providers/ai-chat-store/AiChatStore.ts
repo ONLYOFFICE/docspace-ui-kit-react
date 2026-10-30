@@ -136,13 +136,6 @@ class AiChatStore {
   pendingPresetFresh = true;
 
   /**
-   * Whether the composer shows its Context slot: a host that lets the user
-   * connect any folder as the round's context (the projects page) switches
-   * it on; off (the default) the slot is not shown.
-   */
-  folderContextPickerEnabled = false;
-
-  /**
    * Name of the AI project the open chat was started from, shown as the
    * panel title in place of "AI Chat"; `null` for an ordinary chat. Set and
    * cleared by the host, which knows its projects.
@@ -321,10 +314,6 @@ class AiChatStore {
   consumePendingPreset = () => {
     this.pendingPreset = null;
     this.pendingPresetFresh = true;
-  };
-
-  setFolderContextPickerEnabled = (value: boolean) => {
-    this.folderContextPickerEnabled = value;
   };
 
   setProjectTitle = (title: string | null) => {

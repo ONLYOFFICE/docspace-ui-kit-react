@@ -210,17 +210,6 @@ describe("AiChatStore analyze mode", () => {
   });
 });
 
-describe("AiChatStore folder context picker", () => {
-  it("is off by default and switches with the host's flag", () => {
-    const store = new AiChatStore();
-    expect(store.folderContextPickerEnabled).toBe(false);
-    store.setFolderContextPickerEnabled(true);
-    expect(store.folderContextPickerEnabled).toBe(true);
-    store.setFolderContextPickerEnabled(false);
-    expect(store.folderContextPickerEnabled).toBe(false);
-  });
-});
-
 describe("AiChatStore project view", () => {
   it("carries the project title and the composer flag the host sets", () => {
     const store = new AiChatStore();

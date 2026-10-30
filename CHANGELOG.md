@@ -14,6 +14,14 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `ContextRoomSync` connects each offered room that holds skills and `ContextRoomWatcher`
   follows every connected room on its own (one losing its skills is disconnected alone)
 - `@onlyoffice/ai-chat` peer requirement raised to `^1.0.2`
+- **`AiAgentProviders`' `entityId` is the AI project the chat is open in, `contextEntityId` the
+  location.** With the AI agents gone, threads are global per user and nothing but a project
+  scopes the chat; the folder or room the user is in goes in `contextEntityId`, which the AI
+  service uses for the prompt's location line and for generated files, and device uploads and
+  drops follow it too (`contextEntityId ?? entityId`, else My documents). A connected
+  Instructions room no longer becomes the round's scope (`contextRoomScopesRounds` off): it
+  contributes its skills only. `AiChatStore.folderContextPickerEnabled` and the composer's
+  empty Context slot are removed; the context folder is picked in the AI project itself
 
 - **`Uploader`'s progress bar moves while a chunk is being sent.** The percentage used to grow
   only when a whole chunk (5 MB by default) had been answered, so a file under one chunk went

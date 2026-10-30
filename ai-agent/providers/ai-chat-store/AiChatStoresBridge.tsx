@@ -151,20 +151,6 @@ const AiChatStoresBridge = () => {
     [store, stores],
   );
 
-  // A folder connected through the Context slot belongs to the page that
-  // offers the slot: once the host switches the slot off, the folder would
-  // keep scoping every round with nothing on screen to show or remove it.
-  useEffect(
-    () =>
-      reaction(
-        () => store.folderContextPickerEnabled,
-        (enabled) => {
-          if (!enabled) stores.useCloudsStore.getState().clearFolderContext();
-        },
-      ),
-    [store, stores],
-  );
-
   return null;
 };
 

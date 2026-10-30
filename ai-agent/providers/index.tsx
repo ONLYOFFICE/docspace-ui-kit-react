@@ -176,18 +176,25 @@ type AiAgentProvidersProps = {
   getAgentRoomId?: () => number | null;
   openResultFile?: (fileId: number | string) => void;
   closeEditorPanel?: () => void;
+  /**
+   * The chat's own scope: the AI project the chat is open in (its id), or
+   * nothing. Threads and history are global per user whatever it is; the
+   * AI service reads the project's model and linked rooms off it.
+   */
   entityId?: string;
   /**
-   * Secondary scope for the request context (agent tools, workspace
-   * steering, profile fallback) when talking to an AI agent from outside
-   * its room: threads/history and uploads keep following `entityId`,
-   * only sends carry this value — see `WidgetConfig.contextEntityId`.
+   * The location the rounds work in: the folder or room the user is in.
+   * Sends carry it (the AI service puts it in the prompt's location line
+   * and saves generated files there), and device uploads land there; with
+   * none, in My documents. Inside an AI project the host leaves it out: the
+   * project's own context folder (picked in the project, or My documents)
+   * takes its place on the AI service. See `WidgetConfig.contextEntityId`.
    */
   contextEntityId?: string;
   /**
    * Explicitly controls the composer model picker. The chat lib hides the
-   * picker whenever `entityId` is set, but DocSpace scopes the chat by the
-   * current folder/room, so `entityId` alone no longer means "agent chat".
+   * picker whenever `entityId` is set, but here `entityId` is the AI project
+   * the chat is open in, whose picker is a read-only label of its own.
    * Pass `true` to lock the picker (highest priority — it also wins over
    * the read-only label). Despite the name the picker is not removed:
    * `@onlyoffice/ai-chat` 0.6.0 and later keep a locked picker on screen,
@@ -698,12 +705,15 @@ const AiAgentProviders = ({
     CHAT_ATTACHMENT_LIMIT,
   );
 
+  // Where files the user brings into the chat are stored as portal files:
+  // the location the rounds work in, else the chat's own scope (an AI
+  // project), else My documents (see `uploadFilesToChat`).
+  const uploadFolderId = contextEntityId ?? entityId;
+
   // File-attachment integration: the composer "attach" actions, the message
   // "Save as file" handler, and the supporting dialogs/device-upload input.
-  // Device uploads are stored as portal files in the chat's entity scope.
   const {
     composerActions: attachActions,
-    onPickFolderContext,
     onPickContextRooms,
     onPickKnowledgeRooms,
     onOpenContextRoom,
@@ -711,10 +721,8 @@ const AiAgentProviders = ({
     exportFormats,
     overlay,
   } = useFilesIntegration({
-    entityId,
+    entityId: uploadFolderId,
     onFilesAttached,
-    // Created above, so the hook cannot read it from context here.
-    aiChatStore,
   });
 
   // Platform adapter passed downstream. Its `file` adapter is wired to the
@@ -956,8 +964,8 @@ const AiAgentProviders = ({
   // agent-ness of the scope the chat currently shows.
   const wasAgentRoomRef = useRef(isAgentRoom);
 
-  // Live re-scope on entityId changes (room navigation, agent pick): the
-  // bundle — and everything not scope-bound (profiles list, servers UI,
+  // Live re-scope on entityId changes (entering or leaving an AI project):
+  // the bundle — and everything not scope-bound (profiles list, servers UI,
   // router page) — stays intact; only what the scope owns is reloaded.
   // Threads re-init themselves through `WidgetConfig.entityId` (the
   // useThread hydration effect), so they are not touched here.
@@ -1041,7 +1049,7 @@ const AiAgentProviders = ({
   const onDropFiles = useCallback(
     (files: File[]) =>
       uploadFilesToChat(files, {
-        entityId,
+        entityId: uploadFolderId,
         foldersApi,
         operationsApi,
         filesSettingsApi,
@@ -1051,7 +1059,7 @@ const AiAgentProviders = ({
         t,
       }),
     [
-      entityId,
+      uploadFolderId,
       foldersApi,
       operationsApi,
       filesSettingsApi,
@@ -1106,8 +1114,8 @@ const AiAgentProviders = ({
       entityId,
       contextEntityId,
       // Host-driven model-picker visibility: the lib falls back to hiding
-      // whenever entityId is set, but here entityId means "current
-      // folder/room scope", not "agent chat" — only agents fix the model.
+      // whenever entityId is set, but here entityId is the AI project the
+      // chat is open in, whose picker is a read-only label of its own.
       hideProfilePicker,
       // Read-only label instead of an interactive picker (overrides the
       // entityId hide-heuristic, deferring to an explicit hideProfilePicker).
@@ -1142,17 +1150,19 @@ const AiAgentProviders = ({
       // rooms. DocSpace is one cloud to the library, so the picker
       // skips the cloud level and lists the rooms straight away.
       hideContextClouds: true,
-      // DocSpace knows every room and folder id, so a connected skills room
-      // or context folder becomes the round's scope (tools, allow-always
-      // preferences, assignment fallback) — see the library's option doc.
-      contextRoomScopesRounds: true,
+      // A connected Instructions room contributes its skills and nothing
+      // else: the round's context stays the location (`contextEntityId`),
+      // so the AI service's location line and generated files follow the
+      // folder the user is in, not the room. The scope-bound behaviour the
+      // option used to buy (per-room tools and preferences) went with the
+      // AI agents.
+      contextRoomScopesRounds: false,
       // The AI project view lists the sources beside the chat, so the
       // composer drops its own chips and pickers there.
       hideComposerContext: composerContextHidden,
       // With vectorization off on the portal no Knowledge room can be picked
       // for a chat: the composer loses its knowledge base picker.
       hideKnowledgePicker: knowledgePickerHidden,
-      onPickFolderContext,
       // Instructions rooms and knowledge bases are picked in the room
       // selector, several at once, and a connected one opens in Files from
       // its pill's menu.
@@ -1180,7 +1190,6 @@ const AiAgentProviders = ({
       chatIntro,
       composerContextHidden,
       knowledgePickerHidden,
-      onPickFolderContext,
       onPickContextRooms,
       onPickKnowledgeRooms,
       onOpenContextRoom,
