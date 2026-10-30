@@ -16,6 +16,7 @@ import {
 } from "./Tabs.constants";
 import styles from "./Tabs.module.scss";
 import useTabsHotkeys from "./hooks/use-tabs-hotkeys/useTabsHotkeys";
+import useTabPanel from "./hooks/use-tab-panel/useTabPanel";
 import { useViewTab } from "./hooks/use-view-tab/useViewTab";
 import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 
@@ -231,6 +232,12 @@ const SecondaryTabs = (props: TabsProps) => {
 
   const withArrows = tabsIsOverflowing && !isMobile;
 
+  const selectedContent = items[selectedItemIndex]?.content;
+  const { getTabProps, panelProps } = useTabPanel(
+    selectedItemIndex,
+    !!selectedContent,
+  );
+
   const renderContent = (
     <div
       id={layoutId}
@@ -270,6 +277,7 @@ const SecondaryTabs = (props: TabsProps) => {
               "tab",
             )}
             role="tab"
+            {...getTabProps(index)}
             aria-selected={isSelected}
             aria-disabled={item.isDisabled || undefined}
             tabIndex={index === rovingTabIndex ? 0 : -1}
@@ -331,6 +339,10 @@ const SecondaryTabs = (props: TabsProps) => {
             })}
             isFill
             onClick={onSelectPrev}
+            // The arrow keys already move along the bar: out of the Tab
+            // order, so Tab goes from the bar straight into the panel.
+            tabIndex={-1}
+            aria-hidden
             iconNode={<ArrowReactUrl />}
           />
         ) : null}
@@ -371,6 +383,8 @@ const SecondaryTabs = (props: TabsProps) => {
             })}
             isFill
             onClick={onSelectNext}
+            tabIndex={-1}
+            aria-hidden
             iconNode={<ArrowReactUrl />}
           />
         ) : null}
@@ -379,12 +393,9 @@ const SecondaryTabs = (props: TabsProps) => {
       {withoutStickyIntend ? null : (
         <div className={classNames(styles.stickyIndent, "sticky-indent")} />
       )}
-      {items[selectedItemIndex]?.content ? (
-        <div
-          // style={{ overflow: "hidden" }}
-          className={`${styles.tabsBody} tabs-body`}
-        >
-          {items[selectedItemIndex].content}
+      {selectedContent ? (
+        <div className={`${styles.tabsBody} tabs-body`} {...panelProps}>
+          {selectedContent}
         </div>
       ) : null}
     </div>

@@ -870,4 +870,72 @@ describe("Tabs", () => {
       expect(onClickMock).not.toHaveBeenCalled();
     });
   });
+
+  describe.each([
+    ["primary", TabsTypes.Primary],
+    ["secondary", TabsTypes.Secondary],
+  ])("the %s bar's panel", (_, type) => {
+    const items: TTabItem[] = [
+      { id: "first", name: "First", content: <p>First text</p> },
+      { id: "second", name: "Second", content: <p>Second text</p> },
+    ];
+
+    it("is a tabpanel labelled by the selected tab, which controls it", () => {
+      render(<Tabs type={type} items={items} selectedItemId="second" />);
+
+      const panel = screen.getByRole("tabpanel", { name: "Second" });
+      expect(panel).toHaveTextContent("Second text");
+
+      const [first, second] = screen.getAllByRole("tab");
+      expect(second).toHaveAttribute("aria-controls", panel.id);
+      // The other tab's panel is not rendered, so nothing to point at.
+      expect(first).not.toHaveAttribute("aria-controls");
+    });
+
+    it("is a Tab stop itself when it has nothing to tab to", () => {
+      render(<Tabs type={type} items={items} selectedItemId="first" />);
+
+      expect(screen.getByRole("tabpanel")).toHaveAttribute("tabindex", "0");
+    });
+  });
+
+  it("keeps the secondary bar's scroll arrows out of the Tab order", () => {
+    mockIsMobile.value = false;
+    const original = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      "offsetWidth",
+    );
+    // A narrow bar for three wide tabs: the arrows show.
+    Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+      configurable: true,
+      get: function () {
+        if (this.classList.contains(styles.tabs)) return 100;
+        if (this.classList.contains(styles.tab)) return 50;
+        return 0;
+      },
+    });
+
+    try {
+      const { container } = render(
+        <Tabs
+          type={TabsTypes.Secondary}
+          items={[
+            { id: "1", name: "Tab 1", content: null },
+            { id: "2", name: "Tab 2", content: null },
+            { id: "3", name: "Tab 3", content: null },
+          ]}
+          selectedItemId="1"
+        />,
+      );
+
+      const arrows = container.querySelectorAll(`.${styles.arrowIcon}`);
+      expect(arrows).toHaveLength(2);
+      for (const arrow of arrows) {
+        expect(arrow).toHaveAttribute("tabindex", "-1");
+      }
+    } finally {
+      if (original)
+        Object.defineProperty(HTMLElement.prototype, "offsetWidth", original);
+    }
+  });
 });

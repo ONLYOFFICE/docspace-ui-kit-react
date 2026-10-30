@@ -480,6 +480,13 @@
   width: 100%;
   display: flex;
   align-items: center;
+
+  // A panel with nothing in it to tab to is a Tab stop of its own; inside,
+  // where the page's scroller cannot clip it.
+  &:focus-visible {
+    outline: 2px solid var(--accent-main, #{$light-blue-main});
+    outline-offset: -2px;
+  }
 }
 
 .motionBackground {

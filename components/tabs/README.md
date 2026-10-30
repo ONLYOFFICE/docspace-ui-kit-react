@@ -276,22 +276,24 @@ arrows.
 
 ## Accessibility
 
-- **The underlined bar has no tab semantics and no keyboard path.** Its tabs are `<div>`s with
-  click handlers: no `role="tablist"`, no `role="tab"`, no `aria-selected`, and the body is not a
-  `tabpanel`. A screen reader reads a run of text followed by the content, with nothing tying
-  them together.
-- **The segmented bar is a `role="tablist"` of `role="tab"` elements** with `aria-selected` on the
-  selected one and `aria-disabled` on a disabled one. The body is still not a `tabpanel`, and
-  nothing links a tab to it with `aria-controls`.
-- The segmented bar is one stop in the Tab order (a roving `tabindex`): Tab lands on the selected
-  tab, the Left and Right arrows move the focus and wrap around at either end (swapped in a
-  right-to-left layout), Home and End jump to the first and last tab, Enter or Space selects the
-  focused one, and the next Tab leaves the bar. Selection is manual: moving the focus does not
-  select. The focused tab takes the hover colours under `:focus-visible`.
-- A disabled item is greyed, inert in CSS, refused by the click handler and announced as
-  unavailable on the segmented bar; on the underlined bar nothing announces it.
-- The horizontal scroller is a [`Scrollbar`](../scrollbar/README.md) — overflowing tabs are
-  reachable by dragging or with the arrows, not by tabbing.
+- Both bars follow the WAI-ARIA tabs pattern. The bar is a `role="tablist"` of `role="tab"`
+  elements, with `aria-selected` on the selected one and `aria-disabled` on a disabled one. The
+  body is a `role="tabpanel"` labelled by the selected tab (`aria-labelledby`), and that tab
+  points at it with `aria-controls`. Only the selected tab's panel is rendered, so the other tabs
+  carry no `aria-controls`.
+- Each bar is one stop in the Tab order (a roving `tabindex`): Tab lands on the selected tab, the
+  Left and Right arrows move the focus and wrap around at either end (swapped in a right-to-left
+  layout), Home and End jump to the first and last tab, Enter or Space selects the focused one.
+  Selection is manual: moving the focus does not select.
+- The next Tab goes into the panel, to its first control. A panel with nothing in it to tab to is
+  a Tab stop itself (`tabindex="0"`) and draws an inset ring. The segmented bar's scroll arrows
+  are left out of the Tab order: the arrow keys already move along the bar.
+- The underlined bar draws its own ring inside the tab under `:focus-visible`; the segmented bar
+  takes the hover colours there.
+- A disabled item is greyed, inert in CSS, refused by the click handler and by the keyboard, and
+  announced as unavailable.
+- The horizontal scroller is a [`Scrollbar`](../scrollbar/README.md); the arrow keys scroll the
+  focused tab into view.
 
 ## Test ids
 
