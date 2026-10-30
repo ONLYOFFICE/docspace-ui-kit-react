@@ -1,5 +1,5 @@
 import { describe, expect, it, afterEach, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 import { Aside } from ".";
 import styles from "./Aside.module.scss";
@@ -59,6 +59,25 @@ describe("Aside Component", () => {
     );
 
     expect(screen.getByTestId("scrollbar")).toBeInTheDocument();
+  });
+
+  // The focus trap keeps Tab in the panel. With nothing in it to tab to, the
+  // panel itself must take the focus, or Tab does nothing at all.
+  it("takes the focus itself on Tab when it has nothing to tab to", () => {
+    render(
+      <>
+        <button type="button">Behind</button>
+        <Aside visible onClose={mockOnClose} withoutHeader withoutBodyScroll>
+          plain text
+        </Aside>
+      </>,
+    );
+
+    const behind = screen.getByRole("button", { name: "Behind" });
+    behind.focus();
+    fireEvent.keyDown(behind, { key: "Tab" });
+
+    expect(screen.getByTestId("aside")).toHaveFocus();
   });
 
   it("renders with withoutBodyScroll prop", () => {

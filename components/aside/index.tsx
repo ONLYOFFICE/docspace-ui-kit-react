@@ -55,6 +55,9 @@ const AsidePure = (props: AsideProps) => {
   return (
     <aside
       ref={asideRef}
+      // The trap's fallback: with nothing in the panel to tab to, the panel
+      // itself takes the focus, so Tab does not go dead.
+      tabIndex={-1}
       className={asideClasses}
       style={{ zIndex }}
       data-testid="aside"
