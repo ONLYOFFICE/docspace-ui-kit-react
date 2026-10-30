@@ -146,6 +146,17 @@
       }
     }
   }
+
+  // Inset: a row of tags clips anything drawn outside them, which cut the
+  // browser's own ring down to its sides.
+  &:focus-visible {
+    outline: 2px solid
+      var(
+        --accent-main,
+        var(--color-scheme-main-accent, #{colors.$light-blue-main})
+      );
+    outline-offset: -2px;
+  }
 }
 
 .tagText {

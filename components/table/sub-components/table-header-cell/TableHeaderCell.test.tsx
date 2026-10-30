@@ -104,4 +104,35 @@ describe("<TableHeaderCell />", () => {
       `column_${index}`,
     );
   });
+
+  // The sort icon is hidden except on hover and on the active column, so the
+  // header text is the keyboard's one stop for sorting.
+  describe("keyboard", () => {
+    it.each(["{Enter}", " "])(
+      "sorts on %s from a single tab stop",
+      async (key) => {
+        const user = userEvent.setup();
+        render(<TableHeaderCell {...defaultProps} />);
+
+        await user.tab();
+        expect(screen.getByRole("button", { name: "Name" })).toHaveFocus();
+
+        await user.keyboard(key);
+        expect(mockColumn.onClick).toHaveBeenCalledWith(
+          SortByFieldName.Name,
+          expect.anything(),
+        );
+
+        // The icon is not a second stop.
+        await user.tab();
+        expect(screen.getByTestId("sort-icon")).not.toHaveFocus();
+      },
+    );
+
+    it("is not a tab stop when sorting is off", () => {
+      render(<TableHeaderCell {...defaultProps} sortingVisible={false} />);
+
+      expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    });
+  });
 });

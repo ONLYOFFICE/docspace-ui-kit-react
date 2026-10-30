@@ -104,8 +104,9 @@
 
   // The input holds the focus and the icon right after it draws it. `:where()`
   // keeps this under hover, pressed and the state colours, which drew over the
-  // `svg:focus` rule it replaces and still do.
-  :where(.hiddenInput:focus) + svg rect {
+  // `svg:focus` rule it replaces and still do. Keyboard focus only, as for
+  // Button: a box ticked with the pointer keeps the focus but draws no ring.
+  :where(.hiddenInput:focus-visible) + svg rect {
     stroke: var(--checkbox-focus-color);
   }
 

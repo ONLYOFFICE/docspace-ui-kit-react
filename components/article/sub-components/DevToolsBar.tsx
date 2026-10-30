@@ -9,6 +9,10 @@ import { openingNewTab } from "../../../utils/openingNewTab";
 import { Text } from "../../text";
 import { TooltipContainer } from "../../tooltip";
 import { useCommonTranslation } from "../../../utils/i18n";
+import {
+  activateOnButtonKey,
+  keyboardClickAt,
+} from "../../../utils/keyboard-activation";
 
 import styles from "../Article.module.scss";
 import { ArticleDevToolsBarProps } from "../Article.types";
@@ -54,6 +58,16 @@ const ArticleDevToolsBar = ({
       data-with-custom-slot={withCustomSlot ? "true" : "false"}
       data-hide-profile-block={articleOpen ? "true" : "false"}
       title={showText ? undefined : t("DeveloperTools")}
+      // It navigates, so it is a link to the keyboard: Enter only.
+      role="link"
+      tabIndex={0}
+      aria-label={t("DeveloperTools")}
+      onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key !== "Enter") return;
+        activateOnButtonKey(e, ({ currentTarget }) =>
+          onClick(keyboardClickAt(currentTarget, false)),
+        );
+      }}
     >
       <DeveloperReactSvg className="icon" />
       {showText ? (

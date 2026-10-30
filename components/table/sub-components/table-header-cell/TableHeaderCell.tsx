@@ -7,6 +7,11 @@ import { Checkbox } from "../../../checkbox";
 import { Text } from "../../../text";
 import { IconButton } from "../../../icon-button";
 import { globalColors } from "../../../../providers/theme";
+import { useInterfaceDirection } from "../../../../context/InterfaceDirectionContext";
+import {
+  activateOnButtonKey,
+  keyboardClickAt,
+} from "../../../../utils/keyboard-activation";
 
 import { TableHeaderCellProps } from "../../Table.types";
 import styles from "./TableHeaderCell.module.scss";
@@ -34,7 +39,12 @@ const TableHeaderCell = ({
     isShort,
   } = column;
 
+  const { isRTL } = useInterfaceDirection();
+
   const isActive = (sortBy && column.sortBy === sortBy) || active;
+  // The sort icon shows only on hover and on the active column, so the
+  // keyboard sorts through the header text instead.
+  const isSortable = !!column.onClick && !!sortingVisible && !!enable;
 
   const onClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -74,7 +84,18 @@ const TableHeaderCell = ({
       data-testid={testId}
     >
       <div className={styles.tableHeaderItem}>
-        <div className={styles.textWrapper} onClick={onClick}>
+        <div
+          className={styles.textWrapper}
+          onClick={onClick}
+          {...(isSortable && {
+            role: "button",
+            tabIndex: 0,
+            onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) =>
+              activateOnButtonKey(e, ({ currentTarget }) =>
+                onClick(keyboardClickAt(currentTarget, isRTL)),
+              ),
+          })}
+        >
           {checkbox && (checkbox.isIndeterminate || checkbox.value) ? (
             <Checkbox
               onChange={checkbox.onChange}
@@ -93,6 +114,8 @@ const TableHeaderCell = ({
           {sortingVisible ? (
             <IconButton
               onClick={column.onIconClick ? onIconClick : onClick}
+              // The header text is the keyboard's way to sort.
+              tabIndex={-1}
               iconNode={<SortDescReactSvgUrl />}
               className={styles.sortIcon}
               size={12}
