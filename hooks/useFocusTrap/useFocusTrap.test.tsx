@@ -167,6 +167,26 @@ describe("useFocusTrap", () => {
     expect(screen.getByRole("dialog")).toHaveFocus();
   });
 
+  // As the browser does: a focusable element that contains the focus comes
+  // before it, so Shift+Tab goes out to it (a listbox around its options).
+  it("goes back from a stop to the stop that contains it", () => {
+    render(
+      <Trap label="Dialog">
+        <button type="button">Before</button>
+        <div tabIndex={0} aria-label="List">
+          <button type="button">Inside</button>
+        </div>
+      </Trap>,
+    );
+
+    screen.getByText("Inside").focus();
+    tab(true);
+    expect(screen.getByLabelText("List")).toHaveFocus();
+
+    tab();
+    expect(screen.getByText("Inside")).toHaveFocus();
+  });
+
   it("follows stops added while it is open", () => {
     const { rerender } = render(
       <Trap label="Dialog">

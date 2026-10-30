@@ -108,7 +108,7 @@ const onDocumentKeyDown = (e: KeyboardEvent) => {
           !!(
             from.compareDocumentPosition(stop) &
             Node.DOCUMENT_POSITION_PRECEDING
-          ) && !stop.contains(from),
+          ),
       )
     : stops.find(
         (stop) =>
