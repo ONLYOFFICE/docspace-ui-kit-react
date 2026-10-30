@@ -318,6 +318,7 @@ described above and calls `onClick`; everything else — opening, choosing, clos
 | `--combobox-border-color`       | theme grey                              | Border colour of the button                                        |
 | `--combobox-hover-border-color` | theme grey                              | Border colour of the button under the pointer                      |
 | `--combobox-focus-border-color` | the accent colour (white in dark theme) | Border colour of the button while its list is open, hovered or not |
+| `--combobox-focus-ring-color`   | the accent colour                       | Colour of the keyboard focus ring, drawn inside the button         |
 | `--combobox-radius`             | `3px`                                   | Corner radius of the button when it has a border                   |
 | `--combobox-inner-padding`      | `4px 0`                                 | Space above and below the button, inside the wrapper               |
 | `--combobox-base-width`         | `173px`                                 | Width of the wrapper at `ComboBoxSize.base`                        |

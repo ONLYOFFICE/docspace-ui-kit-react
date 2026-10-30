@@ -29,6 +29,13 @@
   height: 100%;
   min-width: fit-content;
 
+  // Inset: the button fills the bar's height and sits between neighbours
+  // with backgrounds of their own, which hid all of Button's outside ring
+  // but a sliver of one side.
+  &:focus-visible {
+    outline-offset: -2px;
+  }
+
   background-color: var(--button-background-base);
 
   :global(.combo-button_selected-icon) > div {

@@ -259,6 +259,20 @@
     line-height: 16px;
   }
 
+  // The keyboard ring, in the accent like the rest of the kit's controls;
+  // without it the browser drew its own, white on the dark theme.
+  &:focus-visible {
+    outline: 2px solid
+      var(
+        --combobox-focus-ring-color,
+        var(
+          --accent-main,
+          var(--color-scheme-main-accent, #{colors.$light-blue-main})
+        )
+      );
+    outline-offset: -2px;
+  }
+
   :focus {
     outline: none;
     border-color: var(--combobox-button-hover-border-color);
