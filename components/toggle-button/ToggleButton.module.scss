@@ -172,4 +172,15 @@
   position: absolute;
   inset-inline-end: 0;
   z-index: -1;
+
+  // The input is hidden: the switch right after it shows its keyboard focus.
+  &:focus-visible + svg {
+    outline: 2px solid
+      var(
+        --toggle-button-focus-ring-color,
+        var(--accent-main, var(--color-scheme-main-accent, #{$light-blue-main}))
+      );
+    outline-offset: 1px;
+    border-radius: 10px;
+  }
 }
