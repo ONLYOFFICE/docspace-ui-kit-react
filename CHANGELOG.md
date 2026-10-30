@@ -139,6 +139,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `aria-hidden` and no tab stop. A test that focused the `svg` or waited for it to be focused
   must use the input (`getByRole("checkbox")`) instead. The focused box still draws its border
   in the focus colour.
+- **The AI chat panel keeps its width.** A dragged docked width used to last until the panel
+  closed; `AiChatStore` now saves it in `localStorage` under `chatPanelWidth` and starts every
+  open and every visit from it. The new `utils/panel-width` holds that storage
+  (`createPanelWidthStorage`), so a host keeps the info panel's width the same way, and
+  `CHAT_PANEL_MIN_WIDTH`, the 360px the chat cannot be dragged below.
 
 ### Added
 
