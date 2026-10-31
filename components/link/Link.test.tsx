@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { screen, render } from "@testing-library/react";
+import { screen, render, fireEvent } from "@testing-library/react";
 
 import { Link, LinkType } from "./index";
 
@@ -173,5 +173,63 @@ describe("<Link />", () => {
     );
     const link = screen.getByTestId("link");
     expect(link).toHaveAttribute("tabindex", "-1");
+  });
+
+  describe("an action link with no href", () => {
+    it("is a button the keyboard reaches and presses", () => {
+      const onClick = vi.fn();
+      render(
+        <Link type={LinkType.action} onClick={onClick}>
+          Manage storage quota
+        </Link>,
+      );
+
+      const link = screen.getByRole("button", { name: "Manage storage quota" });
+      expect(link).toHaveAttribute("tabindex", "0");
+
+      fireEvent.keyDown(link, { key: "Enter" });
+      fireEvent.keyDown(link, { key: " " });
+      expect(onClick).toHaveBeenCalledTimes(2);
+    });
+
+    it("stays a link when it has an href", () => {
+      render(
+        <Link href="https://github.com" onClick={vi.fn()}>
+          GitHub
+        </Link>,
+      );
+
+      const link = screen.getByTestId("link");
+      expect(link).not.toHaveAttribute("role");
+      expect(link).not.toHaveAttribute("tabindex");
+    });
+
+    it("leaves the keyboard to a caller that wires it itself", () => {
+      const onClick = vi.fn();
+      const onKeyDown = vi.fn();
+      render(
+        <Link
+          type={LinkType.action}
+          onClick={onClick}
+          role="button"
+          tabIndex={0}
+          onKeyDown={onKeyDown}
+        >
+          Clean
+        </Link>,
+      );
+
+      fireEvent.keyDown(screen.getByRole("button", { name: "Clean" }), {
+        key: "Enter",
+      });
+      expect(onKeyDown).toHaveBeenCalledTimes(1);
+      expect(onClick).not.toHaveBeenCalled();
+    });
+
+    it("is no button without an onClick", () => {
+      render(<Link type={LinkType.action}>Plain</Link>);
+
+      expect(screen.queryByRole("button")).toBeNull();
+    });
   });
 });

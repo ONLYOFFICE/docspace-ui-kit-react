@@ -43,6 +43,8 @@ export type TextProps = {
   children?: React.ReactNode;
   /** Called with the event when the element is clicked. */
   onClick?: (e: React.MouseEvent<Element>) => void;
+  /** Called with the event on a key press while the element has focus; passed to the element unchanged. */
+  onKeyDown?: (e: React.KeyboardEvent<HTMLElement>) => void;
   /** Passed to the element unchanged, for `as="label"`. */
   htmlFor?: string;
   /** Only `"tile"` is recognised, and only together with `dir="auto"`: it clamps the text to two lines. */
