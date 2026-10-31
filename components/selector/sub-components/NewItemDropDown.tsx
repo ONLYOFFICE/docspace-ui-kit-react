@@ -35,6 +35,70 @@ const NewItemDropDown = ({
     };
   }, [onCloseDropDown]);
 
+  // The keyboard opens the menu from the list too: it takes the focus to its
+  // first entry, walks the entries with the arrows, picks one with Enter or
+  // Space, and closes on Escape or Tab, giving the focus back to the list.
+  // Caught on the window ahead of the Selector, whose own Escape would close
+  // the whole selector.
+  const menuRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    const menu = menuRef.current;
+    if (!menu) return;
+
+    const previous = document.activeElement;
+    const entries = () =>
+      Array.from(
+        menu.querySelectorAll<HTMLElement>(
+          '[role="option"], [role="menuitem"]',
+        ),
+      ).filter((entry) => entry.getAttribute("aria-disabled") !== "true");
+
+    entries()[0]?.focus({ preventScroll: true });
+
+    const giveFocusBack = () => {
+      if (previous instanceof HTMLElement && previous.isConnected)
+        previous.focus({ preventScroll: true });
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      const list = entries();
+      const index = list.findIndex((entry) => entry === document.activeElement);
+
+      switch (e.key) {
+        case "ArrowDown":
+          list[(index + 1) % list.length]?.focus();
+          break;
+        case "ArrowUp":
+          list[(index - 1 + list.length) % list.length]?.focus();
+          break;
+        case "Home":
+          list[0]?.focus();
+          break;
+        case "End":
+          list[list.length - 1]?.focus();
+          break;
+        case "Enter":
+        case " ":
+          list[index]?.click();
+          onCloseDropDown();
+          break;
+        case "Escape":
+        case "Tab":
+          onCloseDropDown();
+          giveFocusBack();
+          break;
+        default:
+          return;
+      }
+
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
+  }, [onCloseDropDown]);
+
   React.useEffect(() => {
     const onResize = () => {
       if (isMobileUtils(window.innerWidth)) return setIsMobile(true);
@@ -54,6 +118,7 @@ const NewItemDropDown = ({
   const dropDown =
     dropDownItems.length > 0 ? (
       <div
+        ref={menuRef}
         className={classNames(
           styles.createDropDown,
           { [styles.isEmpty]: isEmpty },
@@ -84,6 +149,7 @@ const NewItemDropDown = ({
               zIndex={450}
             />
             <div
+              ref={menuRef}
               className={classNames(
                 styles.createDropDown,
                 { [styles.isEmpty]: isEmpty },
