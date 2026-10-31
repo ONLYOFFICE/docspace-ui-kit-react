@@ -115,6 +115,15 @@ const InputItem = ({
       inputRef.current.focus({ preventScroll: true });
       inputRef.current.select();
     }
+
+    // Once the name is entered or the row cancelled, the field goes and the
+    // focus with it: it goes back to the list it came from, not the page.
+    const list = inputRef.current?.closest<HTMLElement>('[role="listbox"]');
+    return () => {
+      const { activeElement } = document;
+      if (activeElement && activeElement !== document.body) return;
+      if (list?.isConnected) list.focus({ preventScroll: true });
+    };
   }, []);
 
   return (
