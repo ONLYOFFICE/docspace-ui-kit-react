@@ -74,6 +74,9 @@ const NewItem = ({
     >
       <AddButton
         isAction
+        // The row is the option the list's keys act on: its button is no
+        // Tab stop of its own inside the listbox.
+        tabIndex={-1}
         label={label}
         titleText={label}
         fontSize="14px"

@@ -14,6 +14,8 @@ import type { NewItemDropDownProps } from "../Selector.types";
 
 export const DROPDOWN_CLASS_NAME = "selector-create-new-dropdown";
 
+const ENTRY_SELECTOR = '[role="option"], [role="menuitem"], [role="button"]';
+
 const DROPDOWN_CONTAINER_WITH_PADDING = 560;
 const PADDING = 80;
 
@@ -50,15 +52,18 @@ const NewItemDropDown = ({
     openerRef.current = document.activeElement;
   }, []);
 
-  const entries = React.useCallback(
-    () =>
-      Array.from(
-        menuRef.current?.querySelectorAll<HTMLElement>(
-          '[role="option"], [role="menuitem"]',
-        ) ?? [],
-      ).filter((entry) => entry.getAttribute("aria-disabled") !== "true"),
-    [],
-  );
+  // The entries are DropDownItems (options) or a caller's own buttons, such
+  // as the room types; a button inside an entry is no entry of its own.
+  const entries = React.useCallback(() => {
+    const menu = menuRef.current;
+    if (!menu) return [];
+    const all = Array.from(menu.querySelectorAll<HTMLElement>(ENTRY_SELECTOR));
+    return all.filter(
+      (entry) =>
+        entry.getAttribute("aria-disabled") !== "true" &&
+        !all.some((other) => other !== entry && other.contains(entry)),
+    );
+  }, []);
 
   React.useEffect(() => {
     if (menuRef.current?.contains(document.activeElement)) return;
