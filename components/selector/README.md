@@ -703,14 +703,21 @@ the stylesheet reads neither, so setting them changes nothing.
 
 ## Accessibility
 
-- **The list is one Tab stop, a listbox.** Its scroll container takes the focus and names the
-  row the keyboard is on (`aria-activedescendant`); the rows are options with `aria-selected`.
-  The arrows, Home and End move between the rows that can be picked - separators, the new-name
-  field and disabled rows are skipped - and scroll to them, and Enter or Space click the row, so
-  a key does what the pointer does there: open a folder, pick an item, start "New folder". The
-  row is ringed only while the focus came from the keyboard. The Enter that opened a row does
-  not also submit the selector. In multi-select the row's checkbox is still a Tab stop of its
-  own. With `isSSR`, which renders the rows without the virtual list, none of this applies.
+- **The list is one Tab stop, a listbox.** Its scroll container takes the focus, is named by the
+  header's title, and names the row the keyboard is on (`aria-activedescendant`); the rows are
+  options with `aria-selected`, and separators and loading rows are `role="presentation"`. The
+  focus alone puts the keyboard on no row, so Enter still submits. The first arrow lands on the
+  selected row on screen, or else the first one; the arrows, Home and End then move between the
+  rows that can be picked - separators, the new-name field, disabled rows and rows the selection
+  limit disables are skipped - and scroll to them, and Enter or Space click the row, so a key
+  does what the pointer does there: open a folder, pick an item, start "New folder". Picking a
+  row keeps the keyboard on it; only a new list (a folder opened, a search run) starts again from
+  its first row. The row is ringed only while the focus came from the keyboard. The Enter that
+  opened a row does not also submit the selector. In multi-select the row's checkbox is no Tab
+  stop of its own: Space on the row ticks it. A "New" row with a menu opens it with Enter: the
+  focus moves to its first entry, the arrows walk it, Enter or Space picks one, Escape or Tab
+  closes it and gives the focus back to the list. With `isSSR`, which renders the rows without
+  the virtual list, none of this applies.
 - **Focus moves into the selector when it mounts**: to the list's scroll container, unless the
   search box already has it, and to the new-name field when that field appears, with its text
   selected. Neither scrolls the page (`preventScroll`), so a selector further down a page takes
@@ -718,8 +725,6 @@ the stylesheet reads neither, so setting them changes nothing.
   side panel it cycles through the header, the search box, the list and the footer
   ([`Aside`](../aside/README.md)'s focus trap). It used to be sent back to the search box from
   anywhere in the list, so the header and the footer were out of the keyboard's reach.
-- The search box is given `tabIndex={1}`, a positive tab index, which pulls it ahead of
-  everything else on the page in tab order.
 - Escape and Enter are listened for on the window, so they act even when focus is outside the
   panel — and Enter submits without the button being focused.
 - The empty screen's create, back and clear-filter controls are buttons to the keyboard

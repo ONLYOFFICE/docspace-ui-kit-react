@@ -739,6 +739,7 @@ const Selector = ({
           withErrorFooter={withErrorFooter}
           isLimitReached={isLimitReached}
           displayFileExtension={displayFileExtension}
+          listLabel={withHeader ? headerProps?.headerLabel : undefined}
           forceIsMultiSelect={forceIsMultiSelect}
           // info
           {...infoProps}

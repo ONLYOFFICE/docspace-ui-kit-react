@@ -1127,17 +1127,33 @@ export const SelectionLimit: Story = {
     other.click();
     await expect(args.onSelect).not.toHaveBeenCalled();
 
-    // The arrows step over it too, from one ticked row to the other and back.
     const list = within(root).getByRole("listbox");
     const active = () =>
       document.getElementById(list.getAttribute("aria-activedescendant") ?? "")
         ?.textContent ?? "";
+
+    // The focus alone puts the keyboard on no row, so Enter submits.
     list.focus();
+    await expect(active()).toBe("");
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(args.onSubmit).toHaveBeenCalled());
+    await expect(args.onSelect).not.toHaveBeenCalled();
+
+    // The first arrow lands on the ticked row on screen; the arrows then
+    // step over the rows the limit disables.
+    await userEvent.keyboard("{ArrowDown}");
     await waitFor(() => expect(active()).toContain(limitItems[0].label));
     await userEvent.keyboard("{ArrowDown}");
     await waitFor(() => expect(active()).toContain(limitItems[2].label));
+
+    // Space unticks it, and the keyboard stays on that row.
+    await userEvent.keyboard(" ");
+    await waitFor(() => expect(args.onSelect).toHaveBeenCalled());
+    await expect(active()).toContain(limitItems[2].label);
+
+    // Below the limit again, the row between is back within reach.
     await userEvent.keyboard("{ArrowUp}");
-    await waitFor(() => expect(active()).toContain(limitItems[0].label));
+    await waitFor(() => expect(active()).toContain(limitItems[1].label));
   },
   parameters: {
     docs: {

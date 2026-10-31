@@ -116,6 +116,7 @@ const Body = ({
 
   displayFileExtension,
   forceIsMultiSelect,
+  listLabel,
 }: BodyProps) => {
   const infoBarRef = useRef<HTMLDivElement>(null);
   const injectedElementRef = useRef<HTMLElement>(null);
@@ -374,6 +375,8 @@ const Body = ({
   // key does what the pointer does there.
   const listboxId = React.useId();
   const [activeIndex, setActiveIndex] = React.useState(-1);
+  const activeIndexRef = React.useRef(activeIndex);
+  activeIndexRef.current = activeIndex;
   const listItems = isEmptyInput ? [displayItems[1]] : displayItems;
 
   // The rows Item greys out: disabled, or unticked once the limit is reached.
@@ -382,7 +385,12 @@ const Body = ({
     if (!item || !item.id || item.isSeparator || item.isInputItem) return false;
     if (item.isDisabled) return false;
     // The "create new" row is an action, not a pick: the limit leaves it be.
-    if (item.isCreateNewItem) return true;
+    // Item draws it only beside other rows; alone it renders nothing.
+    if (item.isCreateNewItem)
+      return (
+        listItems.length > 2 ||
+        (listItems.length === 2 && !listItems[1]?.isInputItem)
+      );
     return !(
       isMultiSelect &&
       isLimitReached &&
@@ -413,36 +421,49 @@ const Body = ({
 
   // A row opened from the keyboard swaps the list for the folder's: the
   // keyboard starts again on its first row while the list keeps the focus.
+  // Only a new list does that - not a pick re-rendering the same rows (the
+  // items array is rebuilt on every Selector render), nor the next page
+  // appended below them.
+  const itemIdsRef = React.useRef<unknown[]>([]);
   React.useEffect(() => {
-    setActiveIndex((index) => {
-      if (index < 0) return index;
-      const list = document.activeElement;
-      const keepsFocus =
-        list?.getAttribute("role") === "listbox" &&
-        !!bodyRef.current?.contains(list);
-      return keepsFocus ? 0 : -1;
-    });
+    const ids = items.map((item) => item?.id);
+    const previous = itemIdsRef.current;
+    itemIdsRef.current = ids;
+    const sameList = previous.every((id, index) => ids[index] === id);
+    if (sameList || activeIndexRef.current < 0) return;
+
+    const list = document.activeElement;
+    const keepsFocus =
+      list?.getAttribute("role") === "listbox" &&
+      !!bodyRef.current?.contains(list);
+    if (keepsFocus) moveTo(stepFrom(-1, 1));
+    else setActiveIndex(-1);
   }, [items]);
 
+  // Where the first arrow press lands: on the selected row if it is on
+  // screen, or else on the first row on screen, or the first row at all.
+  const getStartIndex = () => {
+    const { start, stop } = visibleRangeRef.current;
+    const selected = listItems.findIndex(
+      (item, index) =>
+        item?.isSelected &&
+        isPickable(index) &&
+        index >= start &&
+        index <= stop,
+    );
+    if (selected >= 0) return selected;
+    const firstOnScreen = stepFrom(start - 1, 1);
+    return firstOnScreen >= start && firstOnScreen <= stop
+      ? firstOnScreen
+      : stepFrom(-1, 1);
+  };
+
+  // The focus alone puts the keyboard on no row: Enter then still submits,
+  // as it did before the list took keys. The arrows pick the row to act on.
   const listbox = {
+    label: listLabel,
     activeOptionId:
       activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined,
-    // Focused, the list shows where the keyboard is: on the selected row if
-    // it is on screen, or else the first row on screen. The list does not
-    // move for it.
-    onFocus: () => {
-      if (activeIndex >= 0) return;
-      const { start, stop } = visibleRangeRef.current;
-      const selected = listItems.findIndex(
-        (item, index) =>
-          item?.isSelected &&
-          isPickable(index) &&
-          index >= start &&
-          index <= stop,
-      );
-      const index = selected >= 0 ? selected : stepFrom(start - 1, 1);
-      if (index >= start && index <= stop) setActiveIndex(index);
-    },
     onBlur: () => setActiveIndex(-1),
     onKeyDown: (e: KeyboardEvent) => {
       if (e.target !== e.currentTarget) return;
@@ -450,10 +471,10 @@ const Body = ({
 
       switch (e.key) {
         case "ArrowDown":
-          moveTo(activeIndex < 0 ? stepFrom(-1, 1) : stepFrom(activeIndex, 1));
+          moveTo(activeIndex < 0 ? getStartIndex() : stepFrom(activeIndex, 1));
           break;
         case "ArrowUp":
-          moveTo(activeIndex < 0 ? last : stepFrom(activeIndex, -1));
+          moveTo(activeIndex < 0 ? getStartIndex() : stepFrom(activeIndex, -1));
           break;
         case "Home":
           moveTo(stepFrom(-1, 1));
@@ -463,7 +484,8 @@ const Body = ({
           break;
         case "Enter":
         case " ": {
-          if (!isPickable(activeIndex)) return;
+          // No row chosen with the arrows: Enter is the Selector's submit.
+          if (activeIndex < 0 || !isPickable(activeIndex)) return;
           // The row is on screen: moving to it scrolled it there.
           document
             .getElementById(`${listboxId}-option-${activeIndex}`)

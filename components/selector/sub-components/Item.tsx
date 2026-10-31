@@ -79,7 +79,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
 
     if (!item || (item && !item.id))
       return (
-        <div key="row-loader" style={style}>
+        <div key="row-loader" style={style} role="presentation">
           {rowLoader}
         </div>
       );
@@ -123,7 +123,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
 
     if (isSeparator) {
       return (
-        <div style={style}>
+        <div style={style} role="presentation">
           <div
             style={{
               backgroundColor: isBase
@@ -375,13 +375,22 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
             isChecked={isSelected}
             isDisabled={isItemDisabled}
             onChange={onChangeAction}
+            // The row is the option the list's arrows and Space act on; its box
+            // is no Tab stop of its own inside the listbox.
+            tabIndex={-1}
           />
         ) : null}
       </div>
     );
   };
 
-  return isLoaded ? renderItem() : <div style={style}>{rowLoader}</div>;
+  return isLoaded ? (
+    renderItem()
+  ) : (
+    <div style={style} role="presentation">
+      {rowLoader}
+    </div>
+  );
 }, compareFunction);
 
 Item.displayName = "Item";

@@ -680,6 +680,8 @@ export type BodyProps = TSelectorInfo &
     isLimitReached?: boolean;
 
     displayFileExtension?: boolean;
+    /** Accessible name of the list: the header's title, when there is one. */
+    listLabel?: string;
   };
 
 export type FooterProps = TSelectorFooterSubmitButton &
