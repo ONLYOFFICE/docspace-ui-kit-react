@@ -49,22 +49,27 @@ const LinkUi: React.FC<LinkProps> = React.memo(
   }: LinkProps) => {
     const { isRTL } = useInterfaceDirection();
 
-    // An action link has no href, so the keyboard never reaches it: one that
-    // runs code is a button to the keyboard too, unless the caller wires the
-    // keyboard itself (a role, a tabIndex or a key handler of its own).
-    const isKeyboardButton =
+    // A link with an onClick and no href is out of the keyboard's reach: it
+    // takes a Tab stop and its keys, unless the caller wires the keyboard
+    // itself (a role, a tabIndex or a key handler of its own). An action link
+    // runs code, so it is a button; a page link navigates, so it stays a link.
+    const isKeyboardOperable =
       !href &&
       !!onClick &&
       role === undefined &&
       tabIndex === undefined &&
       !onKeyDown;
+    const isAction = type === LinkType.action;
 
-    // Enter and Space press it as a click would; handlers that open a menu at
-    // the click's position get the link's own corner instead.
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) =>
+    // Enter presses it as a click would, and Space too for a button - a link
+    // takes Enter only. Handlers that open a menu at the click's position get
+    // the link's own corner instead.
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+      if (!isAction && e.key === " ") return;
       activateOnButtonKey(e, ({ currentTarget }) =>
         onClick?.(keyboardClickAt(currentTarget, isRTL)),
       );
+    };
 
     const linkClasses = classNames(
       styles.link,
@@ -99,10 +104,10 @@ const LinkUi: React.FC<LinkProps> = React.memo(
         as="a"
         href={href}
         rel={rel}
-        role={isKeyboardButton ? "button" : role}
-        tabIndex={isKeyboardButton ? 0 : tabIndex}
+        role={isKeyboardOperable ? (isAction ? "button" : "link") : role}
+        tabIndex={isKeyboardOperable ? 0 : tabIndex}
         onClick={onClick}
-        onKeyDown={isKeyboardButton ? handleKeyDown : onKeyDown}
+        onKeyDown={isKeyboardOperable ? handleKeyDown : onKeyDown}
         isBold={isBold}
         style={commonStyle}
         aria-label={

@@ -8,6 +8,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **A `Link` with an `onClick` and no `href` is a Tab stop.** It used to be out of the keyboard's
+  reach; it now takes `tabIndex={0}` and a key handler. An `action` link is `role="button"`,
+  pressed by Enter and Space, and a `page` link `role="link"`, followed by Enter. Every such link
+  a consumer renders gains a Tab stop: pass `tabIndex={-1}` where something around the link is
+  the control already, or `role`, `tabIndex` or `onKeyDown` to wire the keyboard yourself
 - **`Uploader`'s progress bar moves while a chunk is being sent.** The percentage used to grow
   only when a whole chunk (5 MB by default) had been answered, so a file under one chunk went
   from 0 to done in a single step; it now also counts the bytes of chunks still on their way,

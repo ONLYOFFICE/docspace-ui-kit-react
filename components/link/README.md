@@ -184,11 +184,12 @@ export function FileLink({ href, name }: { href: string; name: string }) {
 - The hover underline differs by type: a `page` link grows a solid underline, an `action` link
   a dashed one. `isHovered` holds that underline on without the pointer, and `noHover` removes
   it in both cases.
-- **An action link with an `onClick` is a button to the keyboard by itself.** With no `href`
-  the anchor would have no implicit role, no tab stop and no Enter activation, so the component
-  adds `role="button"` and `tabIndex={0}`, and Enter and Space call `onClick`. Pass any of
-  `role`, `tabIndex` or `onKeyDown` and the keyboard is left to you, as in the recipe above;
-  `tabIndex={-1}` keeps a link out of the Tab order when something around it is the button.
+- **A link with an `onClick` and no `href` is keyboard-operable by itself.** Such an anchor
+  would have no implicit role, no tab stop and no Enter activation, so the component adds
+  `tabIndex={0}` and a key handler. An `action` link becomes `role="button"`, pressed by Enter
+  and Space; a `page` link becomes `role="link"`, followed by Enter only. Pass any of `role`,
+  `tabIndex` or `onKeyDown` and the keyboard is left to you, as in the recipe above;
+  `tabIndex={-1}` keeps a link out of the Tab order when something around it is the control.
 - `aria-label` falls back to `children` when `ariaLabel` is absent and the child is a string,
   so the visible text is the accessible name. A node child sets no `aria-label`, and the anchor
   is named by its content as any anchor is.
@@ -216,9 +217,10 @@ set on an ancestor is overridden. Set them through the link's own `style` prop, 
 ## Accessibility
 
 - With `href` it is an ordinary anchor: focusable, activated by Enter, announced as a link.
-- With no `href` and an `onClick` it is announced as a button, sits in the Tab order and is
-  pressed by Enter and Space; the key press is kept from the page's own hotkeys. Without an
-  `onClick` it is plain text to assistive technology.
+- With no `href` and an `onClick` it sits in the Tab order: an `action` link is announced as a
+  button and pressed by Enter and Space, a `page` link as a link and followed by Enter. The key
+  press is kept from the page's own hotkeys. Without an `onClick` it is plain text to assistive
+  technology.
 - `aria-label` is set from `ariaLabel`, or from `children` when that is a string.
 - The hover state is an underline; keyboard focus gets a 2px accent ring from
   [`Text`](../text/README.md) (`--text-focus-color`), and pointer focus none.

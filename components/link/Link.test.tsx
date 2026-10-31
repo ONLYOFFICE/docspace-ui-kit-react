@@ -192,6 +192,21 @@ describe("<Link />", () => {
       expect(onClick).toHaveBeenCalledTimes(2);
     });
 
+    // A page link navigates: it is a link to assistive technology, and
+    // Enter alone follows it, as for any link.
+    it("is a link the keyboard reaches and Enter follows when it navigates", () => {
+      const onClick = vi.fn();
+      render(<Link onClick={onClick}>Open folder</Link>);
+
+      const link = screen.getByRole("link", { name: "Open folder" });
+      expect(link).toHaveAttribute("tabindex", "0");
+
+      fireEvent.keyDown(link, { key: " " });
+      expect(onClick).not.toHaveBeenCalled();
+      fireEvent.keyDown(link, { key: "Enter" });
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
     it("stays a link when it has an href", () => {
       render(
         <Link href="https://github.com" onClick={vi.fn()}>
