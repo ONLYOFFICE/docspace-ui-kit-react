@@ -30,9 +30,9 @@ const useTabPanel = (selectedIndex: number, hasPanel: boolean) => {
     const update = () => setPanelHasStops(getTabStops(panel).length > 0);
     update();
 
-    // The content loads and changes after the panel is shown. Reading the stops
-    // lays the page out, so a burst of changes is read once, on the next frame,
-    // and only changes that can add or remove a stop are watched.
+    // The content loads and changes after the panel is shown, and a control
+    // can be shown or hidden by its class or style alone. Reading the stops
+    // lays the page out, so a burst of changes is read once, on the next frame.
     let frame = 0;
     const scheduleUpdate = () => {
       if (frame) return;
@@ -46,7 +46,14 @@ const useTabPanel = (selectedIndex: number, hasPanel: boolean) => {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["tabindex", "disabled", "hidden", "inert"],
+      attributeFilter: [
+        "tabindex",
+        "disabled",
+        "hidden",
+        "inert",
+        "style",
+        "class",
+      ],
     });
     return () => {
       observer.disconnect();
