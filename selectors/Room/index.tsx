@@ -83,6 +83,8 @@ const RoomSelectorComponent = ({
   selectedItems,
   disableFirstFetch,
   forceIsMultiSelect,
+  maxSelectedItems,
+  onSelectLimitReached,
 }: RoomSelectorProps) => {
   const t = useCommonTranslation();
   const { isBase } = useTheme();
@@ -353,6 +355,8 @@ const RoomSelectorComponent = ({
       }
       isSSR={withInit}
       forceIsMultiSelect={forceIsMultiSelect}
+      maxSelectedItems={maxSelectedItems}
+      onSelectLimitReached={onSelectLimitReached}
       dataTestId="room_selector"
       disableFirstFetch={disableFirstFetch}
     />

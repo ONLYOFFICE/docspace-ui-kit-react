@@ -35,6 +35,10 @@ export type RoomSelectorProps = TSelectorHeader &
     roomType?: RoomType | RoomType[];
     searchArea?: SearchArea | string;
     excludeItems?: (number | string | undefined)[];
+    /** Largest number of rooms that may be ticked at once (multi-select). */
+    maxSelectedItems?: number;
+    /** Called when a room is ticked past `maxSelectedItems`; see Selector. */
+    onSelectLimitReached?: () => void;
     /** Lists a room but greys it out, with `getRoomDisabledText` as the hint on it. */
     isRoomDisabled?: (room: FolderDtoInteger) => boolean;
     getRoomDisabledText?: (room: FolderDtoInteger) => string | undefined;

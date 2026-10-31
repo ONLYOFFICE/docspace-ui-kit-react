@@ -596,6 +596,12 @@ export type SelectorProps = TSelectorHeader &
      * unticked rows go grey and stop responding, with no message of their own.
      */
     maxSelectedItems?: number;
+    /**
+     * Called when a row is ticked past `maxSelectedItems`. With it set, the
+     * unticked rows stay as they are and the tick is refused here instead, so
+     * the host can say why (a toast) only when the limit is hit.
+     */
+    onSelectLimitReached?: () => void;
 
     /** Whether to skip the `loadNextPage(0)` call Selector makes on mount. */
     disableFirstFetch?: boolean;

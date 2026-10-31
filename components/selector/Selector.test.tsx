@@ -173,3 +173,42 @@ describe("<Selector /> Escape", () => {
     expect(onCancel).toHaveBeenCalledOnce();
   });
 });
+
+describe("<Selector /> selection limit", () => {
+  const multi = {
+    isMultiSelect: true,
+    maxSelectedItems: 1,
+    selectedItems: [{ id: "1", label: "First item" }],
+  };
+
+  it("refuses a tick past the limit and reports it", () => {
+    const onSelect = vi.fn();
+    const onSelectLimitReached = vi.fn();
+    renderSelector({ ...multi, onSelect, onSelectLimitReached });
+
+    fireEvent.click(screen.getByText("Second item"));
+
+    expect(onSelectLimitReached).toHaveBeenCalledTimes(1);
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("still unticks a row at the limit", () => {
+    const onSelect = vi.fn();
+    const onSelectLimitReached = vi.fn();
+    renderSelector({ ...multi, onSelect, onSelectLimitReached });
+
+    fireEvent.click(screen.getByText("First item"));
+
+    expect(onSelectLimitReached).not.toHaveBeenCalled();
+    expect(onSelect).toHaveBeenCalledTimes(1);
+  });
+
+  it("greys the rows out without the callback", () => {
+    const onSelect = vi.fn();
+    renderSelector({ ...multi, onSelect });
+
+    fireEvent.click(screen.getByText("Second item"));
+
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+});
