@@ -220,6 +220,9 @@ around the panel, they reach its header too.
   `visible` Tab and Shift+Tab stay inside it
   (`useFocusTrap`): the first Tab from the page behind
   lands on its first control, and the last one wraps to the first.
+- A panel with nothing in it to tab to (`withoutHeader` and plain content) takes the focus
+  itself on Tab: the `<aside>` carries `tabIndex={-1}` for that, and draws no ring, since
+  the controls it holds show their own.
 - Because the markup stays in the document while `visible` is false, everything inside it is
   reachable by keyboard from the page behind. Conditional rendering is what prevents that.
 - The header's close cross is named "Close" (translated; `closeLabel` replaces it) and is a
