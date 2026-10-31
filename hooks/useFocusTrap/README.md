@@ -51,6 +51,10 @@ in document order.
   its DOM. When it closes, the one below takes over again.
 - A Tab that a control inside has already handled (`preventDefault`) is left
   alone, and so is Tab with Ctrl, Alt or Meta.
+- An `iframe` inside the container is a stop, but a Tab pressed inside the
+  frame never reaches the document the trap listens on: from there the focus
+  can leave the container. Keep frames out of trapped content, or trap within
+  the frame as well.
 
 It does not move the focus into the container on open, nor back to the opener
 on close; `ModalDialog` does both itself.
