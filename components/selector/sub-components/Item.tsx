@@ -21,6 +21,7 @@ import InputItem from "./InputItem";
 import styles from "../Selector.module.scss";
 import { useTheme } from "../../../context/ThemeContext";
 import { globalColors } from "../../../providers/theme";
+import { isCreateNewItemShown } from "../Selector.utils";
 
 const compareFunction = (prevProps: ItemProps, nextProps: ItemProps) => {
   const prevData = prevProps.data;
@@ -160,10 +161,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
       );
     }
 
-    if (
-      isCreateNewItem &&
-      (items.length > 2 || (items.length === 2 && !items[1].isInputItem))
-    ) {
+    if (isCreateNewItem && isCreateNewItemShown(items)) {
       return (
         <NewItem
           label={label}

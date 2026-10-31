@@ -37,6 +37,7 @@ import { VirtualScroll } from "./VirtualScroll";
 import { ListboxContext } from "../contexts/Listbox";
 import { Tabs } from "../../tabs";
 import InputItem from "./InputItem";
+import { isCreateNewItemShown } from "../Selector.utils";
 
 const DimmedEmptyScreen = ({
   emptyScreenCtx,
@@ -385,12 +386,8 @@ const Body = ({
     if (!item || !item.id || item.isSeparator || item.isInputItem) return false;
     if (item.isDisabled) return false;
     // The "create new" row is an action, not a pick: the limit leaves it be.
-    // Item draws it only beside other rows; alone it renders nothing.
-    if (item.isCreateNewItem)
-      return (
-        listItems.length > 2 ||
-        (listItems.length === 2 && !listItems[1]?.isInputItem)
-      );
+    // It is reachable only where Item draws it.
+    if (item.isCreateNewItem) return isCreateNewItemShown(listItems);
     return !(
       isMultiSelect &&
       isLimitReached &&

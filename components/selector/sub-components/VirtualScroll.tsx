@@ -6,7 +6,7 @@ import { ListboxContext } from "../contexts/Listbox";
 
 export const VirtualScroll = (props: ScrollbarProps) => {
   const scrollContentRef = useRef<HTMLDivElement | null>(null);
-  const { label, activeOptionId, onKeyDown, onFocus, onBlur } =
+  const { label, activeOptionId, onKeyDown, onBlur } =
     useContext(ListboxContext);
 
   // The scroll container is the list's one Tab stop, a listbox whose options
@@ -27,7 +27,7 @@ export const VirtualScroll = (props: ScrollbarProps) => {
   // Body makes new handlers on every render, every arrow press among them:
   // the listeners call the current ones instead of being re-attached.
   const handleKeyDown = useEffectEvent((e: KeyboardEvent) => onKeyDown?.(e));
-  const handleFocus = useEffectEvent(() => onFocus?.());
+
   const handleBlur = useEffectEvent((e: FocusEvent) => onBlur?.(e));
 
   useEffect(() => {
@@ -35,12 +35,10 @@ export const VirtualScroll = (props: ScrollbarProps) => {
     if (!list) return;
 
     list.addEventListener("keydown", handleKeyDown);
-    list.addEventListener("focus", handleFocus);
     list.addEventListener("blur", handleBlur);
 
     return () => {
       list.removeEventListener("keydown", handleKeyDown);
-      list.removeEventListener("focus", handleFocus);
       list.removeEventListener("blur", handleBlur);
     };
   }, []);
@@ -50,8 +48,8 @@ export const VirtualScroll = (props: ScrollbarProps) => {
       ".search-input-block",
     );
 
-    // After the listeners above, so the list's own focus handler sees this
-    // focus and puts the keyboard on a row at once.
+    // The list takes the focus on mount, putting the keyboard on no row yet:
+    // Enter still submits, and the first arrow picks a row.
     // `preventScroll`: the list takes focus for the keyboard, not the page's
     // scroll position. Without it every selector that mounts scrolls the
     // page to itself -- on a Docs page with a dozen of them, to the bottom.
