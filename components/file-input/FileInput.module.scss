@@ -70,6 +70,18 @@
   position: relative;
   outline: none;
 
+  // The group is the Tab stop (its input is out of the order): it shows the
+  // keyboard focus in the accent, as the other controls do.
+  &:focus-visible {
+    outline: 2px solid
+      var(
+        --file-input-focus-ring-color,
+        var(--accent-main, var(--color-scheme-main-accent, #{$light-blue-main}))
+      );
+    outline-offset: 2px;
+    border-radius: var(--file-input-radius-v);
+  }
+
   &.base {
     width: 173px;
     max-height: 32px;
