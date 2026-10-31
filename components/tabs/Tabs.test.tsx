@@ -892,10 +892,42 @@ describe("Tabs", () => {
       expect(first).not.toHaveAttribute("aria-controls");
     });
 
+    // jsdom lays nothing out, so every element would read as unrendered and
+    // every panel as empty: the rendered check needs a box to look at.
+    const withLayout = () =>
+      vi.spyOn(Element.prototype, "getClientRects").mockImplementation(() => {
+        const rects = [new DOMRect(0, 0, 10, 10)];
+        return Object.assign(rects, {
+          item: (i: number) => rects[i] ?? null,
+        });
+      });
+
     it("is a Tab stop itself when it has nothing to tab to", () => {
+      const layout = withLayout();
       render(<Tabs type={type} items={items} selectedItemId="first" />);
 
       expect(screen.getByRole("tabpanel")).toHaveAttribute("tabindex", "0");
+      layout.mockRestore();
+    });
+
+    it("is no Tab stop of its own when it holds a control", () => {
+      const layout = withLayout();
+      render(
+        <Tabs
+          type={type}
+          items={[
+            {
+              id: "form",
+              name: "Form",
+              content: <button type="button">Save</button>,
+            },
+          ]}
+          selectedItemId="form"
+        />,
+      );
+
+      expect(screen.getByRole("tabpanel")).not.toHaveAttribute("tabindex");
+      layout.mockRestore();
     });
   });
 

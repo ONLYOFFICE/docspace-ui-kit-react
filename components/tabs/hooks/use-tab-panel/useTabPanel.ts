@@ -30,15 +30,28 @@ const useTabPanel = (selectedIndex: number, hasPanel: boolean) => {
     const update = () => setPanelHasStops(getTabStops(panel).length > 0);
     update();
 
-    // The content loads and changes after the panel is shown.
-    const observer = new MutationObserver(update);
+    // The content loads and changes after the panel is shown. Reading the stops
+    // lays the page out, so a burst of changes is read once, on the next frame,
+    // and only changes that can add or remove a stop are watched.
+    let frame = 0;
+    const scheduleUpdate = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        update();
+      });
+    };
+    const observer = new MutationObserver(scheduleUpdate);
     observer.observe(panel, {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["tabindex", "disabled", "hidden", "style", "class"],
+      attributeFilter: ["tabindex", "disabled", "hidden", "inert"],
     });
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
   }, [hasPanel, selectedIndex]);
 
   const getTabProps = (index: number) => ({
