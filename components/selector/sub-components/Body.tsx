@@ -381,6 +381,8 @@ const Body = ({
     const item = listItems[index];
     if (!item || !item.id || item.isSeparator || item.isInputItem) return false;
     if (item.isDisabled) return false;
+    // The "create new" row is an action, not a pick: the limit leaves it be.
+    if (item.isCreateNewItem) return true;
     return !(
       isMultiSelect &&
       isLimitReached &&
