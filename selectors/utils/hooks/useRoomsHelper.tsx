@@ -22,6 +22,7 @@ import { LoadersContext } from "../contexts/Loaders";
 import {
   PAGE_COUNT,
   FORMS_SEARCH_AREA,
+  AI_HUB_SEARCH_AREA,
   ROOMS_SECTION_FOLDER_TYPES,
 } from "../constants";
 import type { UseRoomsHelperProps } from "../types";
@@ -207,11 +208,24 @@ const useRoomsHelper = ({
           typeFilter.length > 0 &&
           typeFilter.every((value) => value === ApiRoomType.FillingFormsRoom);
 
+        // Instructions and Knowledge rooms live under their own root ("AI
+        // rooms"), so a listing scoped to them asks for that search area too.
+        const isAiHubOnlyFilter =
+          !!typeFilter &&
+          typeFilter.length > 0 &&
+          typeFilter.every(
+            (value) =>
+              (value as number) === RoomsType.InstructionsRoom ||
+              (value as number) === RoomsType.KnowledgeRoom,
+          );
+
         const effectiveSearchArea = searchArea
           ? (searchArea as SearchArea)
           : formsSection || isFormRoomOnlyFilter
             ? (FORMS_SEARCH_AREA as unknown as SearchArea)
-            : undefined;
+            : isAiHubOnlyFilter
+              ? (AI_HUB_SEARCH_AREA as unknown as SearchArea)
+              : undefined;
 
         const res = await roomsApi.getRoomsFolder({
           type: typeFilter,

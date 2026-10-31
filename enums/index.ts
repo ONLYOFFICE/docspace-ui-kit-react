@@ -177,6 +177,8 @@ export enum FolderType {
   AiProjectRoom = 40,
   /** The root the AI projects are listed under. */
   AiProjects = 41,
+  /** The root the Instructions and Knowledge rooms are kept under ("AI rooms"). */
+  AiHub = 42,
 }
 
 export enum GuidanceRefKey {

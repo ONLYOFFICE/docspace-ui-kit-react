@@ -236,4 +236,34 @@ describe("useRoomsHelper", () => {
       RoomsType.KnowledgeRoom,
     ]);
   });
+
+  const requestedSearchArea = () =>
+    (mocks.getRoomsFolder.mock.calls[0][0] as { searchArea?: string })
+      .searchArea;
+
+  it("looks for Instructions and Knowledge rooms under the AI rooms root", async () => {
+    emptyRooms();
+
+    const { result } = setup({ roomType: RoomsType.KnowledgeRoom });
+
+    await act(async () => {
+      await result.current.rooms.getRoomList(0);
+    });
+
+    expect(requestedSearchArea()).toBe("AiHub");
+  });
+
+  it("keeps the default search area for a mix of AI and ordinary rooms", async () => {
+    emptyRooms();
+
+    const { result } = setup({
+      roomType: [RoomsType.CustomRoom, RoomsType.InstructionsRoom],
+    });
+
+    await act(async () => {
+      await result.current.rooms.getRoomList(0);
+    });
+
+    expect(requestedSearchArea()).toBeUndefined();
+  });
 });
