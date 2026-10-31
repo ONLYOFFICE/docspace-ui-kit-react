@@ -306,7 +306,9 @@ const DropDownItem = ({
                 target: LinkTarget.blank,
                 rel: "noopener noreferrer",
               }
-            : {})}
+            : // Without a callback the icon does nothing: no Tab stop, or
+              // the keyboard would land on a button that does not act.
+              { tabIndex: -1 })}
           ariaLabel={resolvedExternalLinkLabel}
           onClick={(e: React.MouseEvent) => {
             e.stopPropagation();
