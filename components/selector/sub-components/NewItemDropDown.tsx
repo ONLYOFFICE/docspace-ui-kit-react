@@ -40,27 +40,40 @@ const NewItemDropDown = ({
   // Space, and closes on Escape or Tab, giving the focus back to the list.
   // Caught on the window ahead of the Selector, whose own Escape would close
   // the whole selector.
+  // The menu is drawn in place or, at a phone's width, in a portal, and a
+  // resize can swap one for the other while it is open: the keys always read
+  // the menu that is on screen now, and the focus follows it to the new one.
+  // The focus goes back to the element it came from on opening.
   const menuRef = React.useRef<HTMLDivElement>(null);
+  const openerRef = React.useRef<Element | null>(null);
   React.useEffect(() => {
-    const menu = menuRef.current;
-    if (!menu) return;
+    openerRef.current = document.activeElement;
+  }, []);
 
-    const previous = document.activeElement;
-    const entries = () =>
+  const entries = React.useCallback(
+    () =>
       Array.from(
-        menu.querySelectorAll<HTMLElement>(
+        menuRef.current?.querySelectorAll<HTMLElement>(
           '[role="option"], [role="menuitem"]',
-        ),
-      ).filter((entry) => entry.getAttribute("aria-disabled") !== "true");
+        ) ?? [],
+      ).filter((entry) => entry.getAttribute("aria-disabled") !== "true"),
+    [],
+  );
 
+  React.useEffect(() => {
+    if (menuRef.current?.contains(document.activeElement)) return;
     entries()[0]?.focus({ preventScroll: true });
+  }, [entries, isMobile]);
 
+  React.useEffect(() => {
     const giveFocusBack = () => {
-      if (previous instanceof HTMLElement && previous.isConnected)
-        previous.focus({ preventScroll: true });
+      const opener = openerRef.current;
+      if (opener instanceof HTMLElement && opener.isConnected)
+        opener.focus({ preventScroll: true });
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
+      if (!menuRef.current) return;
       const list = entries();
       const index = list.findIndex((entry) => entry === document.activeElement);
 
@@ -97,7 +110,7 @@ const NewItemDropDown = ({
 
     window.addEventListener("keydown", onKeyDown, true);
     return () => window.removeEventListener("keydown", onKeyDown, true);
-  }, [onCloseDropDown]);
+  }, [entries, onCloseDropDown]);
 
   React.useEffect(() => {
     const onResize = () => {
