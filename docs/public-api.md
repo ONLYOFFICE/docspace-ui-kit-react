@@ -240,7 +240,7 @@ after the switch, not to delete it with the blocker.
 
 ### `peerDependencies`, required
 
-`react`, `react-dom` (relaxed to `^19.0.0`), plus **`i18next` and `react-i18next`** — imported
+`react`, `react-dom` (`^19.2.0`: the kit calls `useEffectEvent`, which earlier 19.x lacks), plus **`i18next` and `react-i18next`** — imported
 by `providers/translation`, and stateful, so a second copy in the consumer's tree breaks
 translation silently. Peer, never bundled.
 
