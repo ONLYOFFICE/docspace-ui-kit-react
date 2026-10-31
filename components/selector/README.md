@@ -705,19 +705,20 @@ the stylesheet reads neither, so setting them changes nothing.
 
 - **The list is one Tab stop, a listbox.** Its scroll container takes the focus, is named by the
   header's title, and names the row the keyboard is on (`aria-activedescendant`); the rows are
-  options with `aria-selected`, and separators and loading rows are `role="presentation"`. The
-  focus alone puts the keyboard on no row, so Enter still submits. The first arrow lands on the
-  selected row on screen, or else the first one; the arrows, Home and End then move between the
-  rows that can be picked - separators, the new-name field, disabled rows and rows the selection
-  limit disables are skipped - and scroll to them, and Enter or Space click the row, so a key
-  does what the pointer does there: open a folder, pick an item, start "New folder". Picking a
-  row keeps the keyboard on it; only a new list (a folder opened, a search run) starts again from
-  its first row. The row is ringed only while the focus came from the keyboard. The Enter that
-  opened a row does not also submit the selector. In multi-select the row's checkbox is no Tab
-  stop of its own: Space on the row ticks it. A "New" row with a menu opens it with Enter: the
-  focus moves to its first entry, the arrows walk it, Enter or Space picks one, Escape or Tab
-  closes it and gives the focus back to the list. With `isSSR`, which renders the rows without
-  the virtual list, none of this applies.
+  options with `aria-selected`, and separators and loading rows are `role="presentation"`.
+  Focused, the list puts the keyboard on the selected row on screen, or else the first row. The
+  arrows, Home and End move between the rows that can be picked - separators, the new-name
+  field, disabled rows and rows the selection limit disables are skipped - and scroll to them,
+  and Enter or Space click the row, so a key does what the pointer does there: open a folder,
+  pick an item, start "New folder". Enter on the row already picked in single select submits the
+  choice instead of unpicking it. Picking a row keeps the keyboard on it; only a new list (a
+  folder opened, a search run) starts again from its first row. The row is ringed only while the
+  focus came from the keyboard. The Enter that opened a row does not also submit the selector.
+  The row's own controls - the multi-select checkbox, the "New" row's button - are no Tab stops
+  of their own. A "New" row with a menu opens it with Enter: the focus moves to its first entry
+  (an option or a button, such as a room type), the arrows walk it, Enter or Space picks one,
+  Escape or Tab closes it and gives the focus back to the list. With `isSSR`, which renders the
+  rows without the virtual list, none of this applies.
 - **Focus moves into the selector when it mounts**: to the list's scroll container, unless the
   search box already has it, and to the new-name field when that field appears, with its text
   selected. Neither scrolls the page (`preventScroll`), so a selector further down a page takes

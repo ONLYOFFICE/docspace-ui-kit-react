@@ -455,12 +455,19 @@ const Body = ({
       : stepFrom(-1, 1);
   };
 
-  // The focus alone puts the keyboard on no row: Enter then still submits,
-  // as it did before the list took keys. The arrows pick the row to act on.
+  // Focused, the list shows where the keyboard is: on the selected row on
+  // screen, or else the first one. Enter there picks that row - except on
+  // the row already picked in single select, where it submits the choice
+  // instead of unpicking it.
   const listbox = {
     label: listLabel,
     activeOptionId:
       activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined,
+    onFocus: () => {
+      if (activeIndexRef.current >= 0) return;
+      const index = getStartIndex();
+      if (index >= 0) setActiveIndex(index);
+    },
     onBlur: () => setActiveIndex(-1),
     onKeyDown: (e: KeyboardEvent) => {
       if (e.target !== e.currentTarget) return;
@@ -481,8 +488,15 @@ const Body = ({
           break;
         case "Enter":
         case " ": {
-          // No row chosen with the arrows: Enter is the Selector's submit.
           if (activeIndex < 0 || !isPickable(activeIndex)) return;
+          // Enter on the row already picked in single select is the Selector's
+          // submit: the choice stands.
+          if (
+            e.key === "Enter" &&
+            !isMultiSelect &&
+            listItems[activeIndex]?.isSelected
+          )
+            return;
           // The row is on screen: moving to it scrolled it there.
           document
             .getElementById(`${listboxId}-option-${activeIndex}`)

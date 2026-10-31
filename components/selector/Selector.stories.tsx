@@ -1132,16 +1132,9 @@ export const SelectionLimit: Story = {
       document.getElementById(list.getAttribute("aria-activedescendant") ?? "")
         ?.textContent ?? "";
 
-    // The focus alone puts the keyboard on no row, so Enter submits.
+    // Focused, the list puts the keyboard on the ticked row on screen; the
+    // arrows then step over the rows the limit disables.
     list.focus();
-    await expect(active()).toBe("");
-    await userEvent.keyboard("{Enter}");
-    await waitFor(() => expect(args.onSubmit).toHaveBeenCalled());
-    await expect(args.onSelect).not.toHaveBeenCalled();
-
-    // The first arrow lands on the ticked row on screen; the arrows then
-    // step over the rows the limit disables.
-    await userEvent.keyboard("{ArrowDown}");
     await waitFor(() => expect(active()).toContain(limitItems[0].label));
     await userEvent.keyboard("{ArrowDown}");
     await waitFor(() => expect(active()).toContain(limitItems[2].label));
