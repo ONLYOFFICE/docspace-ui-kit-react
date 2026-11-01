@@ -65,10 +65,23 @@ const NewItemDropDown = ({
     );
   }, []);
 
+  // The entry the keyboard is on, so a swapped container focuses the same.
+  const focusedIndexRef = React.useRef(0);
+  const focusEntry = React.useCallback(
+    (index: number) => {
+      const list = entries();
+      if (!list.length) return;
+      const clamped = Math.min(Math.max(index, 0), list.length - 1);
+      focusedIndexRef.current = clamped;
+      list[clamped].focus({ preventScroll: true });
+    },
+    [entries],
+  );
+
   React.useEffect(() => {
     if (menuRef.current?.contains(document.activeElement)) return;
-    entries()[0]?.focus({ preventScroll: true });
-  }, [entries, isMobile]);
+    focusEntry(focusedIndexRef.current);
+  }, [focusEntry, isMobile]);
 
   React.useEffect(() => {
     const giveFocusBack = () => {
@@ -84,16 +97,16 @@ const NewItemDropDown = ({
 
       switch (e.key) {
         case "ArrowDown":
-          list[(index + 1) % list.length]?.focus();
+          focusEntry((index + 1) % list.length);
           break;
         case "ArrowUp":
-          list[(index - 1 + list.length) % list.length]?.focus();
+          focusEntry((index - 1 + list.length) % list.length);
           break;
         case "Home":
-          list[0]?.focus();
+          focusEntry(0);
           break;
         case "End":
-          list[list.length - 1]?.focus();
+          focusEntry(list.length - 1);
           break;
         case "Enter":
         case " ":
@@ -115,7 +128,7 @@ const NewItemDropDown = ({
 
     window.addEventListener("keydown", onKeyDown, true);
     return () => window.removeEventListener("keydown", onKeyDown, true);
-  }, [entries, onCloseDropDown]);
+  }, [entries, focusEntry, onCloseDropDown]);
 
   React.useEffect(() => {
     const onResize = () => {

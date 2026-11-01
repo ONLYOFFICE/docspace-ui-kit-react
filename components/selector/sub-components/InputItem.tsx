@@ -117,12 +117,23 @@ const InputItem = ({
     }
 
     // Once the name is entered or the row cancelled, the field goes and the
-    // focus with it: it goes back to the list it came from, not the page.
-    const list = inputRef.current?.closest<HTMLElement>('[role="listbox"]');
+    // focus with it: it goes back to the list, not the page. In an empty
+    // folder the field stood alone, with no list around it yet: the list
+    // drawn after it, on the next frame, takes the focus then.
+    const body = inputRef.current?.closest<HTMLElement>(".selector_body");
+    const focusLost = () =>
+      !document.activeElement || document.activeElement === document.body;
+    const focusList = () => {
+      const list = body?.querySelector<HTMLElement>('[role="listbox"]');
+      list?.focus({ preventScroll: true });
+      return !!list;
+    };
     return () => {
-      const { activeElement } = document;
-      if (activeElement && activeElement !== document.body) return;
-      if (list?.isConnected) list.focus({ preventScroll: true });
+      if (!focusLost() || !body?.isConnected) return;
+      if (!focusList())
+        requestAnimationFrame(() => {
+          if (focusLost()) focusList();
+        });
     };
   }, []);
 

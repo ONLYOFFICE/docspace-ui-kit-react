@@ -38,6 +38,7 @@ import { ListboxContext } from "../contexts/Listbox";
 import { Tabs } from "../../tabs";
 import InputItem from "./InputItem";
 import { isCreateNewItemShown } from "../Selector.utils";
+import { DROPDOWN_CLASS_NAME } from "./NewItemDropDown";
 
 const DimmedEmptyScreen = ({
   emptyScreenCtx,
@@ -468,7 +469,14 @@ const Body = ({
       const index = getStartIndex();
       if (index >= 0) setActiveIndex(index);
     },
-    onBlur: () => setActiveIndex(-1),
+    // The New row's menu takes the focus to its entries and gives it back:
+    // the keyboard stays on that row meanwhile, so it is ringed again after.
+    onBlur: (e: FocusEvent) => {
+      const next = e.relatedTarget;
+      if (next instanceof Element && next.closest(`.${DROPDOWN_CLASS_NAME}`))
+        return;
+      setActiveIndex(-1);
+    },
     onKeyDown: (e: KeyboardEvent) => {
       if (e.target !== e.currentTarget) return;
       const last = stepFrom(listItems.length, -1);
