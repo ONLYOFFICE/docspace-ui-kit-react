@@ -8,6 +8,36 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **React and React DOM 19.2 are required.** The peer range moves from `^19.0.0` to `^19.2.0`:
+  the kit calls `useEffectEvent` (Selector's list, `useUnmount`, `useCloseOnAnchorCovered`, the
+  AI agent's platform provider), which React 19.0 and 19.1 do not export. A consumer on those
+  versions gets a peer warning on install and a crash where the hook is reached
+- **`ModalDialog` and `Aside` keep the keyboard focus inside while open.** The new
+  `useFocusTrap` hook (`hooks/useFocusTrap`) takes Tab and Shift+Tab on the document while the
+  container is open: the last stop wraps to the first and back, and the page behind is out of
+  reach; of nested traps only the top one acts. `Aside`'s `<aside>` carries `tabIndex={-1}`, so
+  a panel with nothing to tab to holds the focus itself. A consumer that relied on tabbing out of
+  an open dialog or panel no longer can
+- **`Selector`'s list is a listbox and takes the keyboard.** The scroll container is one Tab stop
+  (`role="listbox"`, named by the header's title, `aria-activedescendant` on the row the keyboard
+  is on). Focused, it marks the selected row on screen or the first row; the arrows, Home and
+  End move between the rows that can be picked, and Enter or Space click the row - open a
+  folder, pick an item, start "New". Enter on the row already picked in single select still
+  submits. The row's checkbox and the "New" row's button are no Tab stops of their own, the
+  "New" row's menu takes the arrows and Escape, and the new-name field gives the focus back to
+  the list when it goes. The search box lost its `tabIndex={1}`. A consumer test that pressed
+  Enter in the focused list to submit now picks the marked row unless it is the picked one
+- **`Tabs` ties each tab to its panel.** The body is `role="tabpanel"`, labelled by the selected
+  tab, which points at it with `aria-controls`; a panel with nothing to tab to is a Tab stop
+  (`tabIndex={0}`). The segmented bar's scroll arrows left the Tab order, so Tab goes from the
+  bar straight into the panel
+- **Focus rings on the keyboard's controls.** `Checkbox`, `RadioButton`, `ToggleButton`,
+  `FileInput`, `ComboBox`, `GroupMenuItem` and `Article`'s back button draw a 2px accent ring
+  under `:focus-visible` (themable through `--checkbox-focus-ring-color`,
+  `--radio-button-focus-ring-color`, `--toggle-button-focus-ring-color`,
+  `--file-input-focus-ring-color`, `--combobox-focus-ring-color`); `Article`'s back button and
+  `PasswordInput`'s eye (named "Show" or "Hide", through `InputBlock`'s new `iconAriaLabel`) are
+  keyboard buttons now
 - **A `Link` with an `onClick` and no `href` is a Tab stop.** It used to be out of the keyboard's
   reach; it now takes `tabIndex={0}` and a key handler. An `action` link is `role="button"`,
   pressed by Enter and Space, and a `page` link `role="link"`, followed by Enter. Every such link
