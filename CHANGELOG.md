@@ -155,6 +155,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`RoomType`'s `isDisabled`** greys out any room type, marks it `aria-disabled` and stops its
+  `onClick`, as `disabledFormRoom` and `disabledPublicRoom` do for their own types
 - `AiAgentProviders` takes `chatIntro`: what an empty chat shows above the suggestion chips in place of the default illustration and tagline (an AI project puts its logo, name and sources there).
 - `RoomsType.AiProjectRoom` (12), `FolderType.AiProjectRoom` (40) and `FolderType.AiProjects`
   (41) for the AI projects of the DocSpace client; `RoomLogo` and the room type title /
