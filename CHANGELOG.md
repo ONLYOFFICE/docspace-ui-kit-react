@@ -18,6 +18,21 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   reach; of nested traps only the top one acts. `Aside`'s `<aside>` carries `tabIndex={-1}`, so
   a panel with nothing to tab to holds the focus itself. A consumer that relied on tabbing out of
   an open dialog or panel no longer can
+- **`Filter`'s tags are keyboard buttons.** A value tag is `role="button"` with `aria-pressed`,
+  "Other" is one with `aria-haspopup="dialog"`; both take `tabIndex={0}`, Enter and Space, and a
+  focus ring. The panel used to offer the keyboard only its close cross and Cancel. Escape on the
+  selector step that "Other" opens goes back to the filter, as its arrow does, instead of closing
+  the whole panel
+- **Escape closes one layer at a time.** `Selector` (with an `onCancel`) and the "New" row's menu
+  consume the Escape they close on, keyup included: a selector opened from a `ModalDialog` used
+  to close that dialog along with itself, as the dialog closes on an Escape keyup on the window.
+  The "New" menu's Enter is consumed the same way, so picking an entry never also submits the
+  selector
+- **`Aside` takes the focus when it opens and gives it back when it closes**, as `ModalDialog`
+  already did. Both use the new `useFocusReturn` hook (`hooks/useFocusReturn`): the container
+  takes the focus unless its content focused a control of its own, and on close the focus goes
+  back to the element that had it before, if it is still in the page. A panel used to leave the
+  focus behind its backdrop on open and drop it on the page's body on close
 - **`Selector`'s list is a listbox and takes the keyboard.** The scroll container is one Tab stop
   (`role="listbox"`, named by the header's title, `aria-activedescendant` on the row the keyboard
   is on). Focused, it marks the selected row on screen or the first row; the arrows, Home and
