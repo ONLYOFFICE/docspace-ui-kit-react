@@ -8,6 +8,7 @@ import { isMobile as isMobileUtils } from "../../../utils";
 import { Backdrop } from "../../backdrop";
 
 import { Scrollbar } from "../../scrollbar";
+import { consumeKey } from "../../../utils/consume-key";
 
 import styles from "../Selector.module.scss";
 import type { NewItemDropDownProps } from "../Selector.types";
@@ -124,8 +125,10 @@ const NewItemDropDown = ({
           return;
       }
 
+      // The keyup too: ModalDialog closes on an Escape keyup and the
+      // Selector submits on an Enter keyup, both on the window.
       e.preventDefault();
-      e.stopPropagation();
+      consumeKey(e);
     };
 
     window.addEventListener("keydown", onKeyDown, true);
