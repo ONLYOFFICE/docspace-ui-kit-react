@@ -80,6 +80,8 @@ const FOOTER_WITH_NEW_NAME_HEIGHT = 145;
 const FOOTER_WITH_CHECKBOX_HEIGHT = 110;
 const FOOTER_WITH_NEW_NAME_AND_CHECKBOX_HEIGHT = 181;
 const ERROR_FOOTER_HEIGHT = 20;
+// How many frames a row scrolled back on screen is waited for to be drawn.
+const ROW_FRAMES = 10;
 
 const Body = ({
   footerVisible,
@@ -417,6 +419,26 @@ const Body = ({
     listRef.current?.scrollToItem(index);
   };
 
+  // Clicks the row the keyboard is on. The keys scrolled it on screen, but the
+  // wheel may have taken it away since, and react-window drew it out: it is
+  // scrolled back and clicked once drawn, a few frames later at most.
+  const clickRow = (index: number) => {
+    const optionId = `${listboxId}-option-${index}`;
+    const click = () => {
+      const row = document.getElementById(optionId);
+      row?.click();
+      return !!row;
+    };
+    if (click()) return;
+
+    listRef.current?.scrollToItem(index);
+    const retry = (framesLeft: number) => {
+      if (!framesLeft || click()) return;
+      requestAnimationFrame(() => retry(framesLeft - 1));
+    };
+    requestAnimationFrame(() => retry(ROW_FRAMES));
+  };
+
   // A row opened from the keyboard swaps the list for the folder's: the
   // keyboard starts again on its first row while the list keeps the focus.
   // Only a new list does that - not a pick re-rendering the same rows (the
@@ -427,7 +449,10 @@ const Body = ({
     const ids = items.map((item) => item?.id);
     const previous = itemIdsRef.current;
     itemIdsRef.current = ids;
-    const sameList = previous.every((id, index) => ids[index] === id);
+    // An empty list before is no "same list": a folder that loads through an
+    // empty one would keep the keyboard on a row index of the list before it.
+    const sameList =
+      previous.length > 0 && previous.every((id, index) => ids[index] === id);
     if (sameList || activeIndexRef.current < 0) return;
 
     const list = document.activeElement;
@@ -505,10 +530,7 @@ const Body = ({
             listItems[activeIndex]?.isSelected
           )
             return;
-          // The row is on screen: moving to it scrolled it there.
-          document
-            .getElementById(`${listboxId}-option-${activeIndex}`)
-            ?.click();
+          clickRow(activeIndex);
           break;
         }
         default:
