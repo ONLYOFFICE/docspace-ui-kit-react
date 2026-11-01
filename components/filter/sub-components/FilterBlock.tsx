@@ -10,6 +10,7 @@ import { Button, ButtonSize } from "../../button";
 import { ModalDialog, ModalDialogType } from "../../modal-dialog";
 import { IconButton } from "../../icon-button";
 import { useCommonTranslation } from "../../../utils/i18n";
+import { consumeKey } from "../../../utils/consume-key";
 import styles from "../Filter.module.scss";
 import {
   CustomItemRenderProps,
@@ -371,6 +372,20 @@ const FilterBlock = ({
   const onArrowClick = React.useCallback(() => {
     setShowSelector((val) => ({ ...val, show: false }));
   }, []);
+
+  // Escape on the selector step goes back to the filter, as its arrow does.
+  // The dialog closes on an Escape keyup and would take the whole filter with
+  // it, so the key is consumed.
+  React.useEffect(() => {
+    if (!showSelector.show) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      consumeKey(e);
+      onArrowClick();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [showSelector.show, onArrowClick]);
 
   const changeCustomValue = React.useCallback(
     (group: FilterGroups, value: TCustomItemValue | null) => {

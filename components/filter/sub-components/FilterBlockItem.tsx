@@ -11,6 +11,7 @@ import { ComboBox } from "../../combobox";
 import { Checkbox } from "../../checkbox";
 import { Text } from "../../text";
 import { ToggleButton } from "../../toggle-button";
+import { activateOnButtonKey } from "../../../utils/keyboard-activation";
 
 import styles from "../Filter.module.scss";
 import {
@@ -265,22 +266,39 @@ const FilterBlockItem = ({
         return;
     }
 
+    const opensSelector =
+      item.key === FilterKeys.other || item.key === "filter_group-other";
+    const toggleTag = () =>
+      changeFilterValueAction(
+        item.key as string,
+        item.isSelected,
+        item.isMultiSelect,
+      );
+
+    // A tag is a div the pointer clicks; to the keyboard it is a button that
+    // Enter and Space press: a toggle for a value, or the one that opens the
+    // selector for "Other".
+    const onTagKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) =>
+      activateOnButtonKey(e, () =>
+        opensSelector ? showSelector?.(selectorType, item.group) : toggleTag(),
+      );
+
     return (
       <div
         key={Array.isArray(item.key) ? item.key[0] : item.key}
         className={styles.filterBlockItemTag}
         data-selected={item.isSelected ? "true" : "false"}
         id={item.id}
+        role="button"
+        tabIndex={0}
+        aria-pressed={opensSelector ? undefined : !!item.isSelected}
+        aria-haspopup={opensSelector ? "dialog" : undefined}
+        onKeyDown={onTagKeyDown}
         onClick={
-          item.key === FilterKeys.other || item.key === "filter_group-other"
+          opensSelector
             ? (event: React.MouseEvent) =>
                 showSelectorAction(event, selectorType, item.group, [])
-            : () =>
-                changeFilterValueAction(
-                  item.key as string,
-                  item.isSelected,
-                  item.isMultiSelect,
-                )
+            : toggleTag
         }
         data-testid={`filter_tag_${Array.isArray(item.key) ? item.key[0] : item.key}`}
       >

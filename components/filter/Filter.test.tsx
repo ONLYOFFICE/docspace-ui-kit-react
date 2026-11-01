@@ -253,6 +253,87 @@ describe("Filter Component", () => {
     });
   });
 
+  // The panel's tags were divs only the pointer could press: the keyboard
+  // never reached a value, nor "Other" and the selector it opens.
+  describe("Tags from the keyboard", () => {
+    const getFilterData = () =>
+      Promise.resolve([
+        {
+          key: FilterGroups.filterGroup,
+          group: FilterGroups.filterGroup,
+          label: "Group",
+          isHeader: true,
+        },
+        {
+          key: "filter_group-without-group",
+          group: FilterGroups.filterGroup,
+          label: "Without group",
+        },
+        {
+          key: "filter_group-other",
+          group: FilterGroups.filterGroup,
+          label: "Other",
+        },
+      ]);
+
+    // The host draws the selector "Other" opens.
+    const renderSelector = ({ selectorType }: { selectorType: string }) => (
+      <div data-testid={selectorType} />
+    );
+
+    const openFilter = async () => {
+      await act(async () => {
+        renderComponent({ getFilterData, renderSelector });
+      });
+      await userEvent.click(screen.getByTestId("filter_icon_button"));
+    };
+
+    it("makes a value a toggle button that Enter presses", async () => {
+      const user = userEvent.setup();
+      await openFilter();
+      const tag = await screen.findByRole("button", { name: "Without group" });
+
+      expect(tag).toHaveAttribute("tabindex", "0");
+      expect(tag).toHaveAttribute("aria-pressed", "false");
+
+      tag.focus();
+      await user.keyboard("{Enter}");
+
+      expect(tag).toHaveAttribute("aria-pressed", "true");
+    });
+
+    it("makes Other a button that opens the selector", async () => {
+      const user = userEvent.setup();
+      await openFilter();
+      const other = await screen.findByRole("button", { name: "Other" });
+
+      expect(other).toHaveAttribute("aria-haspopup", "dialog");
+      expect(other).not.toHaveAttribute("aria-pressed");
+
+      other.focus();
+      await user.keyboard("{Enter}");
+
+      expect(await screen.findByTestId("groups-selector")).toBeInTheDocument();
+    });
+
+    // The dialog closes on an Escape keyup: one press on the selector step
+    // used to close the whole filter.
+    it("goes back from the selector to the filter on Escape", async () => {
+      const user = userEvent.setup();
+      await openFilter();
+      const other = await screen.findByRole("button", { name: "Other" });
+      other.focus();
+      await user.keyboard("{Enter}");
+      expect(await screen.findByTestId("groups-selector")).toBeInTheDocument();
+
+      await user.keyboard("{Escape}");
+
+      expect(screen.queryByTestId("groups-selector")).not.toBeInTheDocument();
+      // Still in the filter, on its tags.
+      expect(screen.getByRole("button", { name: "Other" })).toBeVisible();
+    });
+  });
+
   describe("Custom items", () => {
     const getFilterData = () =>
       Promise.resolve([
