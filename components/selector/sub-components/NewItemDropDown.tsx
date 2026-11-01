@@ -66,21 +66,23 @@ const NewItemDropDown = ({
   }, []);
 
   // The entry the keyboard is on, so a swapped container focuses the same.
+  // The keys scroll the entry they move to into view in a long menu; only
+  // the focus on mount keeps still, as the menu is still being placed.
   const focusedIndexRef = React.useRef(0);
   const focusEntry = React.useCallback(
-    (index: number) => {
+    (index: number, preventScroll = false) => {
       const list = entries();
       if (!list.length) return;
       const clamped = Math.min(Math.max(index, 0), list.length - 1);
       focusedIndexRef.current = clamped;
-      list[clamped].focus({ preventScroll: true });
+      list[clamped].focus({ preventScroll });
     },
     [entries],
   );
 
   React.useEffect(() => {
     if (menuRef.current?.contains(document.activeElement)) return;
-    focusEntry(focusedIndexRef.current);
+    focusEntry(focusedIndexRef.current, true);
   }, [focusEntry, isMobile]);
 
   React.useEffect(() => {

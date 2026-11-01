@@ -15,6 +15,9 @@ import { activateOnButtonKey } from "../../../utils/keyboard-activation";
 import styles from "../Selector.module.scss";
 import type { InputItemProps } from "../Selector.types";
 
+// How many frames a list drawn after the name row is waited for.
+const LIST_FRAMES = 10;
+
 const InputItem = ({
   defaultInputValue,
   onAcceptInput,
@@ -119,7 +122,8 @@ const InputItem = ({
     // Once the name is entered or the row cancelled, the field goes and the
     // focus with it: it goes back to the list, not the page. In an empty
     // folder the field stood alone, with no list around it yet: the list
-    // drawn after it, on the next frame, takes the focus then.
+    // drawn after it takes the focus then, watched for a few frames as its
+    // rows may wait on an update of their own.
     const body = inputRef.current?.closest<HTMLElement>(".selector_body");
     const focusLost = () =>
       !document.activeElement || document.activeElement === document.body;
@@ -128,12 +132,13 @@ const InputItem = ({
       list?.focus({ preventScroll: true });
       return !!list;
     };
+    const retry = (framesLeft: number) => {
+      if (!framesLeft || !body?.isConnected || !focusLost()) return;
+      if (!focusList()) requestAnimationFrame(() => retry(framesLeft - 1));
+    };
     return () => {
       if (!focusLost() || !body?.isConnected) return;
-      if (!focusList())
-        requestAnimationFrame(() => {
-          if (focusLost()) focusList();
-        });
+      if (!focusList()) requestAnimationFrame(() => retry(LIST_FRAMES));
     };
   }, []);
 
