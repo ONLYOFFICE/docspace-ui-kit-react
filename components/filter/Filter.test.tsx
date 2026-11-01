@@ -1,9 +1,16 @@
 import React from "react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { act, render, screen, cleanup, within } from "@testing-library/react";
+import {
+  act,
+  render,
+  screen,
+  cleanup,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { DeviceType, FilterGroups } from "../../enums";
+import { DeviceType, FilterGroups, FilterKeys } from "../../enums";
 import Filter from ".";
 import {
   CustomItemRenderProps,
@@ -265,21 +272,50 @@ describe("Filter Component", () => {
           isHeader: true,
         },
         {
-          key: "filter_group-without-group",
+          key: FilterKeys.withoutGroup,
           group: FilterGroups.filterGroup,
           label: "Without group",
         },
         {
-          key: "filter_group-other",
+          key: FilterKeys.other,
           group: FilterGroups.filterGroup,
           label: "Other",
         },
+        {
+          key: FilterKeys.selectedGroup,
+          group: FilterGroups.filterGroup,
+          displaySelectorType: "link",
+        },
       ]);
 
-    // The host draws the selector "Other" opens.
-    const renderSelector = ({ selectorType }: { selectorType: string }) => (
-      <div data-testid={selectorType} />
+    // The host draws the selector "Other" opens; its button picks a group.
+    const renderSelector = ({
+      selectorType,
+      onSubmit,
+    }: {
+      selectorType: string;
+      onSubmit: (items: { id: string; label: string }[]) => void;
+    }) => (
+      <div data-testid={selectorType}>
+        <button
+          type="button"
+          onClick={() => onSubmit([{ id: "group-1", label: "Group 1" }])}
+        >
+          Pick
+        </button>
+      </div>
     );
+
+    // Opens the selector from "Other" with the keyboard and picks Group 1.
+    const pickFromKeyboard = async (
+      user: ReturnType<typeof userEvent.setup>,
+    ) => {
+      const other = await screen.findByRole("button", { name: "Other" });
+      other.focus();
+      await user.keyboard("{Enter}");
+      screen.getByRole("button", { name: "Pick" }).focus();
+      await user.keyboard("{Enter}");
+    };
 
     const openFilter = async () => {
       await act(async () => {
@@ -329,8 +365,56 @@ describe("Filter Component", () => {
       await user.keyboard("{Escape}");
 
       expect(screen.queryByTestId("groups-selector")).not.toBeInTheDocument();
-      // Still in the filter, on its tags.
-      expect(screen.getByRole("button", { name: "Other" })).toBeVisible();
+      // Still in the filter, back on the tag that opened the selector.
+      await waitFor(() =>
+        expect(screen.getByRole("button", { name: "Other" })).toHaveFocus(),
+      );
+    });
+
+    // A pick swaps "Other" for the picked value: the focus, which was in the
+    // selector's list, used to fall on the page's body.
+    it("gives the focus to the picked value after a pick", async () => {
+      const user = userEvent.setup();
+      await openFilter();
+
+      await pickFromKeyboard(user);
+
+      const picked = await screen.findByRole("button", { name: "Group 1" });
+      expect(picked).toHaveAttribute("aria-haspopup", "dialog");
+      await waitFor(() => expect(picked).toHaveFocus());
+    });
+
+    // The picked value's tag is the pointer's one target; to the keyboard its
+    // label opens the selector again and its cross clears the value.
+    it("clears the picked value with its cross and gives the focus to Other", async () => {
+      const user = userEvent.setup();
+      await openFilter();
+      await pickFromKeyboard(user);
+      await screen.findByRole("button", { name: "Group 1" });
+
+      const remove = screen.getByRole("button", { name: "Remove" });
+      expect(remove).toHaveAttribute("tabindex", "0");
+      remove.focus();
+      await user.keyboard("{Enter}");
+
+      expect(
+        screen.queryByRole("button", { name: "Group 1" }),
+      ).not.toBeInTheDocument();
+      await waitFor(() =>
+        expect(screen.getByRole("button", { name: "Other" })).toHaveFocus(),
+      );
+    });
+
+    it("opens the selector again from the picked value's label", async () => {
+      const user = userEvent.setup();
+      await openFilter();
+      await pickFromKeyboard(user);
+      const picked = await screen.findByRole("button", { name: "Group 1" });
+
+      picked.focus();
+      await user.keyboard("{Enter}");
+
+      expect(await screen.findByTestId("groups-selector")).toBeInTheDocument();
     });
   });
 

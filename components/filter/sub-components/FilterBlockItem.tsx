@@ -12,6 +12,8 @@ import { Checkbox } from "../../checkbox";
 import { Text } from "../../text";
 import { ToggleButton } from "../../toggle-button";
 import { activateOnButtonKey } from "../../../utils/keyboard-activation";
+import { useCommonTranslation } from "../../../utils/i18n";
+import { focusSelectorOpener } from "../Filter.utils";
 
 import styles from "../Filter.module.scss";
 import {
@@ -37,6 +39,7 @@ const FilterBlockItem = ({
   withMultiItems,
   renderCustom,
 }: FilterBlockItemProps) => {
+  const t = useCommonTranslation();
   const changeFilterValueAction = (
     key: string,
     isSelected?: boolean,
@@ -132,6 +135,9 @@ const FilterBlockItem = ({
         }
         data-testid={`filter_selector_selected_${item.key}`}
       >
+        {/* The pointer presses the tag as a whole; to the keyboard its label
+            and its cross are two buttons: one opens the selector again, the
+            other clears the value. */}
         <Text
           className={classNames(
             styles.filterBlockItemTagText,
@@ -144,6 +150,15 @@ const FilterBlockItem = ({
           fontSize="13px"
           fontWeight={400}
           lineHeight="20px"
+          role="button"
+          tabIndex={0}
+          aria-haspopup="dialog"
+          data-selector-opener={item.group}
+          onKeyDown={(e: React.KeyboardEvent<HTMLElement>) =>
+            activateOnButtonKey(e, () =>
+              showSelector?.(selectorType, item.group),
+            )
+          }
         >
           {item?.selectedLabel}
         </Text>
@@ -152,6 +167,15 @@ const FilterBlockItem = ({
             className={styles.filterBlockItemTagIcon}
             ref={clearSelectorRef}
             data-testid={`filter_selector_clear_${item.key}`}
+            role="button"
+            tabIndex={0}
+            aria-label={t("Remove")}
+            onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) =>
+              activateOnButtonKey(e, () => {
+                changeFilterValue?.(item.group, "", true);
+                focusSelectorOpener(item.group);
+              })
+            }
           >
             <XIcon style={{ marginTop: "2px" }} />
           </div>
@@ -293,6 +317,7 @@ const FilterBlockItem = ({
         tabIndex={0}
         aria-pressed={opensSelector ? undefined : !!item.isSelected}
         aria-haspopup={opensSelector ? "dialog" : undefined}
+        data-selector-opener={opensSelector ? item.group : undefined}
         onKeyDown={onTagKeyDown}
         onClick={
           opensSelector

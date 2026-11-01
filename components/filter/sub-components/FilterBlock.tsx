@@ -22,6 +22,7 @@ import {
   TRenderCustomItem,
 } from "../Filter.types";
 import {
+  focusSelectorOpener,
   removeGroupManagerFilterValueIfNeeded,
   syncGroupManagerCheckBox,
 } from "../Filter.utils";
@@ -372,6 +373,16 @@ const FilterBlock = ({
   const onArrowClick = React.useCallback(() => {
     setShowSelector((val) => ({ ...val, show: false }));
   }, []);
+
+  // The selector step closed - on a pick, its arrow or Escape - and the list
+  // that held the focus went with it: back to the tag that opens it.
+  const selectorWasShownRef = React.useRef(false);
+  React.useEffect(() => {
+    const wasShown = selectorWasShownRef.current;
+    selectorWasShownRef.current = showSelector.show;
+    if (wasShown && !showSelector.show && showSelector.group)
+      focusSelectorOpener(showSelector.group);
+  }, [showSelector.show, showSelector.group]);
 
   // Escape on the selector step goes back to the filter, as its arrow does.
   // The dialog closes on an Escape keyup and would take the whole filter with
