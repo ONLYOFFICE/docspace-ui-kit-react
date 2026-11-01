@@ -22,7 +22,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   "Other" is one with `aria-haspopup="dialog"`; both take `tabIndex={0}`, Enter and Space, and a
   focus ring. The panel used to offer the keyboard only its close cross and Cancel. Escape on the
   selector step that "Other" opens goes back to the filter, as its arrow does, instead of closing
-  the whole panel
+  the whole panel. When that step closes - a pick, the arrow or Escape - the focus goes to the
+  tag that opens the group's selector rather than the page's body; a picked value's label opens
+  the selector again and its cross (named "Remove") clears the value, each a Tab stop of its own
 - **Escape closes one layer at a time.** `Selector` (with an `onCancel`) and the "New" row's menu
   consume the Escape they close on, keyup included: a selector opened from a `ModalDialog` used
   to close that dialog along with itself, as the dialog closes on an Escape keyup on the window.
