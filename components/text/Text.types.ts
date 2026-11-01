@@ -63,6 +63,8 @@ export type TextProps = {
   "aria-live"?: React.AriaAttributes["aria-live"];
   /** Hides the element from assistive technology, passed unchanged, for decoration that repeats what is already read. */
   "aria-hidden"?: React.AriaAttributes["aria-hidden"];
+  /** What a `role="button"` text opens, passed unchanged: `dialog` for one that opens a panel or a selector. */
+  "aria-haspopup"?: React.AriaAttributes["aria-haspopup"];
   /** Not read here — it reaches the DOM as an unknown attribute. It is read off this element by `RowContent` and `TileContent`, which use it as the width of the slot they put the child in. */
   containerWidth?: string;
   /** Not read here — it reaches the DOM as an unknown attribute. It is read off this element by `RowContent`, which uses it as the minimum width of a side slot. */
