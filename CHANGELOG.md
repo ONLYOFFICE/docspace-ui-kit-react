@@ -8,6 +8,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`FolderType.AiHub` is 41 and `FolderType.AiProjects` is gone**, after the server moved the AI
+  projects under the AI rooms root: one root now keeps the Instructions rooms, the Knowledge rooms
+  and the AI projects
 - **Several context and knowledge rooms per chat**, on `@onlyoffice/ai-chat` 1.0.2:
   `AiChatPresetSettings` carries `contextRooms` and `knowledgeRooms` (arrays) in place of
   `contextRoom` / `knowledgeRoom`; `AiChatPanelSave` hands the host every connected room;
