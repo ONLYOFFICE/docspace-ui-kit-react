@@ -130,6 +130,34 @@ describe("<Selector /> Escape", () => {
     expect(onCancel).toHaveBeenCalledOnce();
   });
 
+  // ModalDialog closes on an Escape keyup on the window: a selector opened
+  // from a dialog closed that dialog along with itself.
+  it("keeps the Escape keyup it closed on from the window", () => {
+    const onCancel = vi.fn();
+    renderSelector({ onCancel });
+    const keyup = vi.fn();
+    window.addEventListener("keyup", keyup);
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    fireEvent.keyUp(window, { key: "Escape" });
+    window.removeEventListener("keyup", keyup);
+
+    expect(onCancel).toHaveBeenCalledOnce();
+    expect(keyup).not.toHaveBeenCalled();
+  });
+
+  it("leaves the Escape keyup alone when it has no onCancel", () => {
+    renderSelector({ onCancel: undefined });
+    const keyup = vi.fn();
+    window.addEventListener("keyup", keyup);
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    fireEvent.keyUp(window, { key: "Escape" });
+    window.removeEventListener("keyup", keyup);
+
+    expect(keyup).toHaveBeenCalledOnce();
+  });
+
   it("leaves the selector open under a dialog opened from it", () => {
     const onCancel = vi.fn();
     renderSelector({ onCancel });
