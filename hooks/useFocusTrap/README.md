@@ -57,4 +57,5 @@ in document order.
   the frame as well.
 
 It does not move the focus into the container on open, nor back to the opener
-on close; `ModalDialog` does both itself.
+on close: `useFocusReturn` does both, and `ModalDialog` and `Aside` use the two
+together.

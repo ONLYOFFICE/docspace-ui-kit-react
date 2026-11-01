@@ -216,10 +216,10 @@ around the panel, they reach its header too.
 ## Accessibility
 
 - Renders a real `<aside>` element, so it is exposed as a complementary landmark, not a dialog:
-  no `role="dialog"` and no `aria-modal`. The focus is not moved into it on open, but while
-  `visible` Tab and Shift+Tab stay inside it
-  (`useFocusTrap`): the first Tab from the page behind
-  lands on its first control, and the last one wraps to the first.
+  no `role="dialog"` and no `aria-modal`. Opened, the panel takes the focus unless its content
+  already focused something of its own; closed, it gives the focus back to the element that had
+  it before (`useFocusReturn`). While `visible`, Tab and Shift+Tab stay inside it
+  (`useFocusTrap`), and the last stop wraps to the first.
 - A panel with nothing in it to tab to (`withoutHeader` and plain content) takes the focus
   itself on Tab: the `<aside>` carries `tabIndex={-1}` for that, and draws no ring, since
   the controls it holds show their own.
