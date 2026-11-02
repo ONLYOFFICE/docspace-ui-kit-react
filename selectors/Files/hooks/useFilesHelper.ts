@@ -1,7 +1,6 @@
 import React, { use } from "react";
 import {
   FolderType,
-  RoomType,
   type FolderDtoInteger,
   type FileDtoInteger,
   type FolderContentDtoInteger,
