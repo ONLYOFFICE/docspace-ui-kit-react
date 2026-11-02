@@ -43,6 +43,7 @@ export const DataTable = <T,>({
   onCompactChange,
   widthStorage,
   virtualize = false,
+  loadMore,
   rowHeight = DATA_TABLE_ROW_HEIGHT,
   apiRef,
   ariaLabel,
@@ -191,6 +192,7 @@ export const DataTable = <T,>({
           getRowProps={getRowProps}
           renderRow={renderRow}
           virtualize={virtualOptions}
+          loadMore={loadMore}
           rowHeight={rowHeight}
           apiRef={apiRef}
         />

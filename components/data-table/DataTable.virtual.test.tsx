@@ -82,6 +82,10 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+// These tests jump far in one scroll event, which would otherwise draw
+// skeleton rows for a moment; DataTable.load.test.tsx covers that.
+const STILL = { skeletonOnFastScroll: false };
+
 const renderInScroller = (props: Partial<DataTableProps<Item>> = {}) =>
   render(
     <div data-testid="scroller" style={{ overflowY: "auto" }}>
@@ -89,7 +93,7 @@ const renderInScroller = (props: Partial<DataTableProps<Item>> = {}) =>
         columns={COLUMNS}
         rows={ITEMS}
         getRowKey={(r) => r.id}
-        virtualize
+        virtualize={STILL}
         {...props}
       />
     </div>,
@@ -117,7 +121,9 @@ describe("DataTable virtualisation", () => {
   });
 
   it("keeps the markup the client reads", () => {
-    renderInScroller({ virtualize: { innerClassName: "files-list" } });
+    renderInScroller({
+      virtualize: { ...STILL, innerClassName: "files-list" },
+    });
 
     const [first, second] = wrappers();
     expect(first).toHaveClass("table-list-item", "window-item");
@@ -196,7 +202,7 @@ describe("DataTable virtualisation", () => {
         columns={COLUMNS}
         rows={ITEMS}
         getRowKey={(r) => r.id}
-        virtualize
+        virtualize={STILL}
       />,
     );
 

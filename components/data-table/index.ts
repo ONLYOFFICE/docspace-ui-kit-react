@@ -13,6 +13,7 @@ export type {
   DataTableRowState,
   DataTableSort,
   DataTableApi,
+  DataTableLoadMore,
   DataTableVirtualize,
 } from "./DataTable.types";
 

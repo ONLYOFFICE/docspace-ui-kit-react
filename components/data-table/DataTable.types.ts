@@ -64,6 +64,11 @@ export type DataTableColumn<T> = {
   cellClassName?: string;
   /** Applied to the column's header cell. */
   headerClassName?: string;
+  /**
+   * Renders the column's cell in a row that is still loading, instead of the
+   * default bar; `null` leaves it empty.
+   */
+  skeleton?: () => React.ReactNode;
 };
 
 /**
@@ -166,6 +171,29 @@ export type DataTableVirtualize = {
   overscan?: number;
   /** Applied to the element that holds the rows, the full height of the list. */
   innerClassName?: string;
+  /**
+   * Draws skeleton rows instead of the real ones while the list is flung
+   * faster than 800 px between two scroll events, so heavy rows are not
+   * rendered only to scroll away.
+   * @default true */
+  skeletonOnFastScroll?: boolean;
+};
+
+/** How a table asks for more rows as the user scrolls towards the end. */
+export type DataTableLoadMore = {
+  /** Whether there are rows beyond `rows` still to load. */
+  hasMore: boolean;
+  /**
+   * Called when the view comes within `threshold` rows of the last loaded
+   * one. A returned promise holds off the next call until it settles.
+   */
+  onLoadMore: () => Promise<unknown> | void;
+  /** How many rows before the last loaded one the next page is asked for.
+   * @default 15 */
+  threshold?: number;
+  /** Skeleton rows drawn after the loaded ones while `hasMore`.
+   * @default 2 */
+  skeletonRows?: number;
 };
 
 /** What a table's `apiRef` exposes. */
@@ -222,6 +250,8 @@ export interface DataTableProps<T> {
    * nearest scrolling ancestor; an object names the scroller and tunes it.
    */
   virtualize?: boolean | DataTableVirtualize;
+  /** Loads more rows as the user scrolls towards the end; draws skeleton rows meanwhile. */
+  loadMore?: DataTableLoadMore;
   /** Height of every row in pixels, the same for all of them. */
   rowHeight?: number;
   /** Ref to the table's methods, such as `scrollToIndex`. */

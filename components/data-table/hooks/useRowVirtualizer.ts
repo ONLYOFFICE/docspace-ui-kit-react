@@ -158,5 +158,7 @@ export const useRowVirtualizer = ({
     rows,
     totalSize: enabled ? virtualizer.getTotalSize() : 0,
     scrollToIndex,
+    /** The scroller in use, once found. */
+    target,
   };
 };

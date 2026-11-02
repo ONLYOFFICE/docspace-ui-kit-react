@@ -787,6 +787,88 @@ apiRef.current?.scrollToIndex(4999, { align: "start" });`,
   },
 };
 
+const PAGE_SIZE = 100;
+const TOTAL = 1000;
+
+const InfiniteScrollTemplate = (
+  args: React.ComponentProps<typeof FilesTable>,
+) => {
+  const visibility = useColumnVisibility(args.columns);
+  const [scroller, setScroller] = useState<HTMLDivElement | null>(null);
+  const [rows, setRows] = useState(() => MANY_ROWS.slice(0, PAGE_SIZE));
+  const [requests, setRequests] = useState(0);
+
+  // A server that answers in 600 ms.
+  const onLoadMore = useCallback(async () => {
+    setRequests((count) => count + 1);
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    setRows((prev) => MANY_ROWS.slice(0, prev.length + PAGE_SIZE));
+  }, []);
+
+  return (
+    <>
+      <p data-testid="load-status">
+        {rows.length} of {TOTAL} loaded, {requests} requests
+      </p>
+      <div
+        ref={setScroller}
+        data-testid="scroller"
+        style={{ height: 520, overflowY: "auto" }}
+      >
+        <FilesTable
+          {...args}
+          {...visibility}
+          rows={rows}
+          virtualize={{ scrollElement: scroller }}
+          loadMore={{ hasMore: rows.length < TOTAL, onLoadMore }}
+        />
+      </div>
+    </>
+  );
+};
+
+export const InfiniteScroll: Story = {
+  render: (args) => <InfiniteScrollTemplate {...args} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Pages of 100 rows from a server that takes 600 ms, 1 000 in all. Scrolling within 15 rows of the end asks for the next page, once; two skeleton rows stand at the end while it loads. Fling the list and the rows give way to skeletons until it slows down.",
+      },
+      source: {
+        code: `<DataTable
+  columns={columns}
+  rows={files}
+  getRowKey={(file) => file.id}
+  virtualize={{ scrollElement: scroller }}
+  loadMore={{ hasMore: files.length < total, onLoadMore: fetchMoreFiles }}
+/>`,
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const scroller = canvas.getByTestId("scroller");
+    const status = canvas.getByTestId("load-status");
+
+    await waitFor(() =>
+      expect(canvas.getAllByTestId("data-table-row").length).toBeGreaterThan(5),
+    );
+    await expect(status).toHaveTextContent("100 of 1000 loaded, 0 requests");
+
+    scroller.scrollTop = scroller.scrollHeight;
+    await waitFor(() =>
+      expect(
+        canvas.getAllByTestId("data-table-skeleton-row").length,
+      ).toBeGreaterThan(0),
+    );
+    await waitFor(
+      () => expect(status).toHaveTextContent("200 of 1000 loaded, 1 requests"),
+      { timeout: 3000 },
+    );
+  },
+};
+
 export const HiddenColumns: Story = {
   args: {
     columns: COLUMNS.map((column) =>
