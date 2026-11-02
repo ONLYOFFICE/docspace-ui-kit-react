@@ -35,6 +35,11 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
    * rooms when what it carries can land there.
    */
   roomsSectionTypes?: RoomType[];
+  /**
+   * Set while the "AI rooms" section is open: the room types it lists. The
+   * listing then asks for the AiHub search area and offers no room creation.
+   */
+  aiRoomsSectionTypes?: RoomType[];
   excludeItems?: (number | string | undefined)[];
   isInit: boolean;
   createDefineRoomLabel?: string;

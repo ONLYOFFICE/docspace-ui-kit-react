@@ -266,4 +266,39 @@ describe("useRoomsHelper", () => {
 
     expect(requestedSearchArea()).toBeUndefined();
   });
+
+  it("lists the AI rooms section under its root, without projects or a create row", async () => {
+    mocks.getRoomsFolder.mockResolvedValue({
+      data: {
+        response: {
+          folders: [],
+          total: 0,
+          count: 0,
+          current: { id: 4, title: "AI rooms", security: { Create: true } },
+        },
+      },
+    });
+
+    const setItems = vi.fn();
+    const { result } = setup({
+      formsSection: false,
+      aiRoomsSectionTypes: [
+        RoomsType.InstructionsRoom,
+        RoomsType.KnowledgeRoom,
+      ],
+      withCreate: true,
+      setItems,
+    });
+
+    await act(async () => {
+      await result.current.rooms.getRoomList(0);
+    });
+
+    expect(requestedTypes()).toEqual([
+      RoomsType.InstructionsRoom,
+      RoomsType.KnowledgeRoom,
+    ]);
+    expect(requestedSearchArea()).toBe("AiHub");
+    expect(setItems).toHaveBeenCalledWith([]);
+  });
 });

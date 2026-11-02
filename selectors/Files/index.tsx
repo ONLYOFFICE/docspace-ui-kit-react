@@ -42,7 +42,12 @@ import {
 } from "../utils/contexts/Loaders";
 import { getDefaultBreadCrumb } from "../utils";
 import { applyResolvedTitles } from "./FilesSelector.utils";
-import { FORMS_ROOT_FOLDER_TYPE, FORMS_SECTION_ID } from "../utils/constants";
+import {
+  AI_HUB_ROOT_FOLDER_TYPE,
+  AI_ROOMS_SECTION_TYPES,
+  FORMS_ROOT_FOLDER_TYPE,
+  FORMS_SECTION_ID,
+} from "../utils/constants";
 
 const FilesSelectorComponent = (props: FilesSelectorProps) => {
   const {
@@ -56,7 +61,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     treeFolders,
     withRecentTreeFolder,
     withFavoritesTreeFolder,
-    withAIAgentsTreeFolder,
+    withAIRoomsTreeFolder = true,
     withRoomsTreeFolder = true,
     withFormsTreeFolder = true,
 
@@ -206,6 +211,34 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       createDefineRoomType === RoomType.FillingFormsRoom,
   );
 
+  // The "AI rooms" section lists the Instructions and Knowledge rooms, or only
+  // those of them the host names in `roomsSectionTypes` (the copy and move
+  // targets), and is left out when it names neither. With the section shown,
+  // those rooms leave the Rooms section.
+  const aiRoomsSectionTypes = React.useMemo(
+    () =>
+      roomsSectionTypes
+        ? AI_ROOMS_SECTION_TYPES.filter((type) =>
+            roomsSectionTypes.includes(type),
+          )
+        : AI_ROOMS_SECTION_TYPES,
+    [roomsSectionTypes],
+  );
+  const withAIRooms = withAIRoomsTreeFolder && aiRoomsSectionTypes.length > 0;
+  const ordinaryRoomsSectionTypes = React.useMemo(
+    () =>
+      withAIRooms && roomsSectionTypes
+        ? roomsSectionTypes.filter(
+            (type) => !AI_ROOMS_SECTION_TYPES.some((ai) => ai === type),
+          )
+        : roomsSectionTypes,
+    [withAIRooms, roomsSectionTypes],
+  );
+
+  const [isAiRoomsSection, setIsAiRoomsSection] = React.useState(
+    () => Number(rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE,
+  );
+
   const [recentFolder, setRecentFolder] = React.useState<
     FolderDtoInteger | undefined
   >(undefined);
@@ -235,7 +268,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     setItems,
     setHasNextPage,
     setIsInit,
-    withAIAgentsTreeFolder,
+    withAIRoomsTreeFolder: withAIRooms,
     withRoomsTreeFolder,
     withFormsTreeFolder,
     setRecentFolder,
@@ -296,7 +329,9 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
     searchValue,
     roomType,
-    roomsSectionTypes,
+    roomsSectionTypes: ordinaryRoomsSectionTypes,
+    aiRoomsSectionTypes:
+      withAIRooms && isAiRoomsSection ? aiRoomsSectionTypes : undefined,
     formsSection: withFormsTreeFolder ? isFormsSection : undefined,
     isRoomsOnly,
     isInit,
@@ -424,12 +459,16 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           setActiveSpecialScope(specialScope ?? null);
           if (specialScope) {
             setIsFormsSection(false);
+            setIsAiRoomsSection(false);
             setSelectedItemType("files");
           } else if (item.isAgent) {
             setSelectedItemType("agents");
           } else if (item.isRoom) {
             setIsFormsSection(
               Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE,
+            );
+            setIsAiRoomsSection(
+              Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE,
             );
             setSelectedItemType("rooms");
           } else {
@@ -490,6 +529,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           setSelectedFileInfo(null);
           setSelectedItemType("files");
           setIsFormsSection(false);
+          setIsAiRoomsSection(false);
           return;
         }
 
@@ -515,7 +555,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
               !isAgent &&
               item.parentId === 0 &&
               (item.rootFolderType === FolderType.VirtualRooms ||
-                Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE),
+                Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE ||
+                Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE),
             isAgent: isAgent,
             roomType: item.roomType,
             shared: item.shared,
@@ -531,10 +572,14 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           item.parentId === 0 &&
           (item.rootFolderType === FolderType.VirtualRooms ||
             Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE ||
+            Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE ||
             item.rootFolderType === FolderType.AiAgents)
         ) {
           setIsFormsSection(
             Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE,
+          );
+          setIsAiRoomsSection(
+            Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE,
           );
           setSelectedItemType(
             item.rootFolderType === FolderType.AiAgents ? "agents" : "rooms",

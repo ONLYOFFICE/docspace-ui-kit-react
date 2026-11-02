@@ -63,7 +63,7 @@ describe("ContextFolderDialog", () => {
     render(<ContextFolderDialog onClose={vi.fn()} />);
     const props = selector();
     expect(props.isRoomsOnly).toBe(false);
-    expect(props.withAIAgentsTreeFolder).toBe(true);
+    expect(props.withAIRoomsTreeFolder).not.toBe(false);
     expect(props.withCreate).toBe(false);
     expect(props.openRoot).toBe(true);
     expect(props.getIsDisabled(true, false, "5", undefined, false)).toBe(true);

@@ -1,5 +1,7 @@
 import { FolderType } from "@onlyoffice/docspace-api-sdk";
 
+import { RoomsType } from "../../../enums";
+
 export const SHOW_LOADER_TIMER = 200;
 
 export const MIN_LOADER_TIMER = 500;
@@ -30,6 +32,18 @@ export const FORMS_SEARCH_AREA = "Forms";
  * the Rooms section.
  */
 export const AI_HUB_SEARCH_AREA = "AiHub";
+
+/** Root folder type of the "AI rooms" section (FolderType.AiHub); the SDK enum lacks it. */
+export const AI_HUB_ROOT_FOLDER_TYPE = 41;
+
+/**
+ * The room types the "AI rooms" section of a selector lists: the Instructions
+ * and Knowledge rooms. AI projects are left out - they hold no files.
+ */
+export const AI_ROOMS_SECTION_TYPES = [
+  RoomsType.InstructionsRoom,
+  RoomsType.KnowledgeRoom,
+];
 
 /**
  * Folder types of the rooms that make up the "Rooms" section, for the

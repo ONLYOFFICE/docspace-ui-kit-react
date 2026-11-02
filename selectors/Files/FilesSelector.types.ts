@@ -78,7 +78,7 @@ export interface UseRootHelperProps {
   treeFolders?: FolderDtoInteger[];
   withRecentTreeFolder?: boolean;
   withFavoritesTreeFolder?: boolean;
-  withAIAgentsTreeFolder?: boolean;
+  withAIRoomsTreeFolder?: boolean;
   withRoomsTreeFolder?: boolean;
   withFormsTreeFolder?: boolean;
   isUserOnly?: boolean;
@@ -250,7 +250,13 @@ export type FilesSelectorProps = TInfoBar &
     treeFolders?: FolderDtoInteger[];
     withRecentTreeFolder?: boolean;
     withFavoritesTreeFolder?: boolean;
-    withAIAgentsTreeFolder?: boolean;
+    /**
+     * Lists the "AI rooms" section (Instructions and Knowledge rooms, never AI
+     * projects) at the root, when the portal serves it. On by default; with
+     * `roomsSectionTypes` it keeps only the AI types named there and moves
+     * them out of the Rooms section.
+     */
+    withAIRoomsTreeFolder?: boolean;
     withRoomsTreeFolder?: boolean;
     withFormsTreeFolder?: boolean;
     /**

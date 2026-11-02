@@ -8,6 +8,13 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`FilesSelector` lists AI rooms instead of AI agents at its root.** `withAIAgentsTreeFolder`
+  is gone; `withAIRoomsTreeFolder` (on by default) lists the AI rooms root (`FolderType.AiHub`)
+  after Forms, whenever the portal serves it. The section holds the Instructions and Knowledge
+  rooms, never the AI projects, which hold no files, and offers no room creation or Recent /
+  Favorites rows. With `roomsSectionTypes` it keeps only the AI types named there, moves them
+  out of the Rooms section, and is left out when it names neither. A host that passed
+  `withAIAgentsTreeFolder` drops it.
 - **`FolderType.AiHub` is 41 and `FolderType.AiProjects` is gone**, after the server moved the AI
   projects under the AI rooms root: one root now keeps the Instructions rooms, the Knowledge rooms
   and the AI projects

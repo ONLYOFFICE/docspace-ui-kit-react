@@ -48,6 +48,7 @@ const useRoomsHelper = ({
   roomType,
   formsSection,
   roomsSectionTypes,
+  aiRoomsSectionTypes,
   isRoomsOnly,
 
   isInit,
@@ -180,6 +181,12 @@ const useRoomsHelper = ({
           typeFilter = types.length > 0 ? (types as RoomTypeEnum[]) : undefined;
         }
 
+        // The "AI rooms" section: its types make the listing ask for the AiHub
+        // search area below.
+        if (!typeFilter && aiRoomsSectionTypes) {
+          typeFilter = aiRoomsSectionTypes as RoomTypeEnum[];
+        }
+
         if (!typeFilter && formsSection !== undefined) {
           // The Rooms section lists the ordinary rooms unless the host names
           // the types itself (it adds Instructions or Knowledge rooms when its
@@ -279,7 +286,7 @@ const useRoomsHelper = ({
         if (firstLoadRef.current || startIndex === 0) {
           const { security } = current!;
 
-          if (withCreate && security?.Create) {
+          if (withCreate && security?.Create && !aiRoomsSectionTypes) {
             setTotal(total + 1);
             const createRoomType =
               createDefineRoomType ??
@@ -323,6 +330,7 @@ const useRoomsHelper = ({
           if (
             startIndex === 0 &&
             !searchValue &&
+            !aiRoomsSectionTypes &&
             (withRecentTreeFolder || withFavoritesTreeFolder)
           ) {
             const specialItems = buildSpecialFolderItems({
@@ -345,7 +353,10 @@ const useRoomsHelper = ({
             if (specialItems.length) {
               itemList.unshift(...specialItems);
               specialItemsCountRef.current = specialItems.length;
-              const base = withCreate && security?.Create ? total + 1 : total;
+              const base =
+                withCreate && security?.Create && !aiRoomsSectionTypes
+                  ? total + 1
+                  : total;
               setTotal(base + specialItems.length);
             }
           }
@@ -383,6 +394,8 @@ const useRoomsHelper = ({
       setIsNextPageLoading,
       roomType,
       formsSection,
+      roomsSectionTypes,
+      aiRoomsSectionTypes,
       isRoomsOnly,
       subscribe,
       onSetBaseFolderPath,

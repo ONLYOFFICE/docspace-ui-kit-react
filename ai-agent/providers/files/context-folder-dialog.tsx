@@ -71,7 +71,6 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
       openRoot
       withRecentTreeFolder={false}
       withFavoritesTreeFolder={false}
-      withAIAgentsTreeFolder
       isRoomsOnly={false}
       isThirdParty={false}
       withCreate={false}
