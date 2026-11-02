@@ -176,18 +176,25 @@ type AiAgentProvidersProps = {
   getAgentRoomId?: () => number | null;
   openResultFile?: (fileId: number | string) => void;
   closeEditorPanel?: () => void;
+  /**
+   * The chat's own scope: the AI project the chat is open in (its id), or
+   * nothing. Threads and history are global per user whatever it is; the
+   * AI service reads the project's model and linked rooms off it.
+   */
   entityId?: string;
   /**
-   * Secondary scope for the request context (agent tools, workspace
-   * steering, profile fallback) when talking to an AI agent from outside
-   * its room: threads/history and uploads keep following `entityId`,
-   * only sends carry this value — see `WidgetConfig.contextEntityId`.
+   * The location the rounds work in: the folder or room the user is in.
+   * Sends carry it (the AI service puts it in the prompt's location line
+   * and saves generated files there), and device uploads land there; with
+   * none, in My documents. Inside an AI project the host leaves it out: the
+   * project's own context folder (picked in the project, or My documents)
+   * takes its place on the AI service. See `WidgetConfig.contextEntityId`.
    */
   contextEntityId?: string;
   /**
    * Explicitly controls the composer model picker. The chat lib hides the
-   * picker whenever `entityId` is set, but DocSpace scopes the chat by the
-   * current folder/room, so `entityId` alone no longer means "agent chat".
+   * picker whenever `entityId` is set, but here `entityId` is the AI project
+   * the chat is open in, whose picker is a read-only label of its own.
    * Pass `true` to lock the picker (highest priority — it also wins over
    * the read-only label). Despite the name the picker is not removed:
    * `@onlyoffice/ai-chat` 0.6.0 and later keep a locked picker on screen,
@@ -239,6 +246,11 @@ type AiAgentProvidersProps = {
    */
   onProfilePickerSelect?: (profile: Profile, actionId?: string) => void;
   /**
+   * Awaited when the model picker is asked to open, before it shows: the
+   * host refreshes what `profilePickerActions` lists (the AI projects).
+   */
+  onProfilePickerOpen?: () => void | Promise<void>;
+  /**
    * Host override for the chat error box content (title / description /
    * action) by normalized error code — see {@link WidgetConfig.formatChatError}.
    * Return `null` to keep the library default (localized text + Retry).
@@ -265,13 +277,20 @@ type AiAgentProvidersProps = {
    */
   suggestions?: Suggestion[] | SuggestionSet;
   /**
-   * The room the user is standing in, offered to the chat as context. When
-   * the chat opens, `ContextRoomSync` connects it if it holds a `.ai` folder
-   * and the composer shows it with the folder's skills; `null` (outside a
-   * room, or a room kind that cannot hold the folder) drops any connection.
-   * There is no room picker: the current room is the only candidate.
+   * What an empty chat shows above the suggestion chips in place of the
+   * default illustration and tagline: an AI project puts its logo, name and
+   * a line on its model and sources there. Rendered by the library inside
+   * its thread layout, only while the chat is empty.
    */
-  contextRoom?: ContextRoom | null;
+  chatIntro?: React.ReactNode;
+  /**
+   * The room the user is standing in, offered to the chat as context, or
+   * the rooms of an AI project. When the chat opens, `ContextRoomSync`
+   * connects each one that is an Instructions room holding a skill file,
+   * and the composer shows them with their skills; `null` or an empty list
+   * (outside a room, or a room of another kind) drops any connection.
+   */
+  contextRoom?: ContextRoom | ContextRoom[] | null;
   /**
    * How many attachments the composer accepts in the section the host is
    * showing. Defaults to the widget's own `CHAT_ATTACHMENT_LIMIT`; the Forms
@@ -359,16 +378,32 @@ const ProfilePickerAliasBridge = ({
   const { useProfilesStore } = useStores();
   const initialized = useProfilesStore((s) => s.initialized);
   const getProfileById = useProfilesStore((s) => s.getProfileById);
+  const ensureProfiles = useProfilesStore((s) => s.ensureProfiles);
   const setSessionChatProfile = useProfilesStore(
     (s) => s.setSessionChatProfile,
   );
 
   useEffect(() => {
     if (!alias || !initialized) return;
-    const profile = getProfileById(alias.profileId);
-    if (!profile) return;
-    setSessionChatProfile({ ...profile, name: alias.label });
-  }, [alias, initialized, getProfileById, setSessionChatProfile]);
+    // The chat starts knowing only its assigned profiles; the aliased one
+    // (a project's model) may be another, so the catalogue is read first.
+    let cancelled = false;
+    void ensureProfiles().then(() => {
+      if (cancelled) return;
+      const profile = getProfileById(alias.profileId);
+      if (!profile) return;
+      setSessionChatProfile({ ...profile, name: alias.label });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    alias,
+    initialized,
+    ensureProfiles,
+    getProfileById,
+    setSessionChatProfile,
+  ]);
 
   return null;
 };
@@ -449,6 +484,32 @@ const getPendingToolName = (
 // submit runs `reserveGeneratedFileWindow`; `openGeneratedFileWithToolCall`
 // then navigates that tab. When the pending call goes away without the tab
 // being used (deny, failed stream, no file id) the blank tab is closed.
+// The widget keeps the confirmation dialog open with a loader from "Allow"
+// until the tool result streams back, so `onToolCallApproveResult` can open
+// the generated file inside the user's gesture window. That wait only serves
+// the generate tools above; any other server-side tool (the document agent,
+// minutes of work) would hold the dialog for its whole run. For those the
+// dialog is released the moment the approval is sent: the library's own
+// release later finds nothing pending and is a no-op.
+const LongToolApprovalBridge = () => {
+  const { useServersStore } = useStores();
+  const isApprovingTool = useServersStore((s) => s.isApprovingTool);
+  const pendingToolName = useServersStore((s) =>
+    getPendingToolName(s.manageToolData),
+  );
+  const setIsApprovingTool = useServersStore((s) => s.setIsApprovingTool);
+  const setManageToolData = useServersStore((s) => s.setManageToolData);
+
+  useEffect(() => {
+    if (!isApprovingTool || pendingToolName === undefined) return;
+    if (GENERATE_TOOL_NAMES.includes(pendingToolName)) return;
+    setIsApprovingTool(false);
+    setManageToolData(undefined);
+  }, [isApprovingTool, pendingToolName, setIsApprovingTool, setManageToolData]);
+
+  return null;
+};
+
 const GenerateToolApprovalBridge = () => {
   const { useServersStore } = useStores();
   const pendingToolName = useServersStore((s) =>
@@ -509,7 +570,7 @@ const logRescopeFailure = (step: string, reload: Promise<unknown>): void => {
 // Illustration + tagline above the suggestion chips of an empty chat. Static
 // (it reads its own string through window.i18n), so one element is created
 // once and reused instead of being rebuilt per render.
-const chatIntro = <ChatIntro />;
+const defaultChatIntro = <ChatIntro />;
 // Static, so it never invalidates the widget config memo.
 const analyzeIntro = <AnalyzeIntro />;
 
@@ -553,11 +614,13 @@ const AiAgentProviders = ({
   profilePickerActions,
   profilePickerAlias,
   onProfilePickerSelect,
+  onProfilePickerOpen,
   formatChatError,
   onThreadContextChange,
   composerHeader,
   composerDisabled,
   suggestions,
+  chatIntro,
   contextRoom,
   attachmentLimit,
   serverApi,
@@ -588,11 +651,15 @@ const AiAgentProviders = ({
     analyzePending,
     analyzeAttachmentId,
     analyzeFileName,
+    composerContextHidden,
+    knowledgePickerHidden,
   } = useObservedFields(() => ({
     analyzeActive: aiChatStore.isAnalyzeMode,
     analyzePending: aiChatStore.isAnalyzePending,
     analyzeAttachmentId: aiChatStore.analyzeAttachmentId,
     analyzeFileName: aiChatStore.analyzeFormTitle,
+    composerContextHidden: aiChatStore.composerContextHidden,
+    knowledgePickerHidden: aiChatStore.knowledgePickerHidden,
   }));
 
   // Ids of attached files the backend flagged as analyzable. The attachments
@@ -638,16 +705,23 @@ const AiAgentProviders = ({
     CHAT_ATTACHMENT_LIMIT,
   );
 
+  // Where files the user brings into the chat are stored as portal files:
+  // the location the rounds work in, else the chat's own scope (an AI
+  // project), else My documents (see `uploadFilesToChat`).
+  const uploadFolderId = contextEntityId ?? entityId;
+
   // File-attachment integration: the composer "attach" actions, the message
   // "Save as file" handler, and the supporting dialogs/device-upload input.
-  // Device uploads are stored as portal files in the chat's entity scope.
   const {
     composerActions: attachActions,
+    onPickContextRooms,
+    onPickKnowledgeRooms,
+    onOpenContextRoom,
     onSaveAsFile,
     exportFormats,
     overlay,
   } = useFilesIntegration({
-    entityId,
+    entityId: uploadFolderId,
     onFilesAttached,
   });
 
@@ -890,8 +964,8 @@ const AiAgentProviders = ({
   // agent-ness of the scope the chat currently shows.
   const wasAgentRoomRef = useRef(isAgentRoom);
 
-  // Live re-scope on entityId changes (room navigation, agent pick): the
-  // bundle — and everything not scope-bound (profiles list, servers UI,
+  // Live re-scope on entityId changes (entering or leaving an AI project):
+  // the bundle — and everything not scope-bound (profiles list, servers UI,
   // router page) — stays intact; only what the scope owns is reloaded.
   // Threads re-init themselves through `WidgetConfig.entityId` (the
   // useThread hydration effect), so they are not touched here.
@@ -975,7 +1049,7 @@ const AiAgentProviders = ({
   const onDropFiles = useCallback(
     (files: File[]) =>
       uploadFilesToChat(files, {
-        entityId,
+        entityId: uploadFolderId,
         foldersApi,
         operationsApi,
         filesSettingsApi,
@@ -985,7 +1059,7 @@ const AiAgentProviders = ({
         t,
       }),
     [
-      entityId,
+      uploadFolderId,
       foldersApi,
       operationsApi,
       filesSettingsApi,
@@ -1040,14 +1114,15 @@ const AiAgentProviders = ({
       entityId,
       contextEntityId,
       // Host-driven model-picker visibility: the lib falls back to hiding
-      // whenever entityId is set, but here entityId means "current
-      // folder/room scope", not "agent chat" — only agents fix the model.
+      // whenever entityId is set, but here entityId is the AI project the
+      // chat is open in, whose picker is a read-only label of its own.
       hideProfilePicker,
       // Read-only label instead of an interactive picker (overrides the
       // entityId hide-heuristic, deferring to an explicit hideProfilePicker).
       profilePickerReadOnly,
       profilePickerActions,
       onProfilePickerSelect,
+      onProfilePickerOpen,
       dropdownNavigation: isMobile ? "drilldown" : "flyout",
       formatChatError,
       // Hide "Always allow" only for generate tools (matched by full name).
@@ -1062,17 +1137,39 @@ const AiAgentProviders = ({
       suggestions: resolvedSuggestions,
       // Rendered by the library above the chips, under the same "empty chat"
       // gate — no chips, no intro.
-      suggestionsHeader: analyzeActive ? analyzeIntro : chatIntro,
+      suggestionsHeader: analyzeActive
+        ? analyzeIntro
+        : (chatIntro ?? defaultChatIntro),
 
       // Route drag-and-drop through the portal-upload + attach flow (same as
       // the "Upload from device" button) instead of the library's in-memory
       // default, so dropped DOCX/PDF/XLSX are supported too.
       onDropFiles,
       // The context room is the room the user is in, connected by
-      // ContextRoomSync; the composer's picker lists the other rooms with a
-      // .ai folder. DocSpace is one cloud to the library, so the picker
+      // ContextRoomSync; the composer's picker lists the other Instructions
+      // rooms. DocSpace is one cloud to the library, so the picker
       // skips the cloud level and lists the rooms straight away.
       hideContextClouds: true,
+      // A connected Instructions room contributes its skills and nothing
+      // else: the round's context stays the location (`contextEntityId`),
+      // so the AI service's location line and generated files follow the
+      // folder the user is in, not the room. The scope-bound behaviour the
+      // option used to buy (per-room tools and preferences) went with the
+      // AI agents.
+      contextRoomScopesRounds: false,
+      // The AI project view lists the sources beside the chat, so the
+      // composer drops its own chips and pickers there.
+      hideComposerContext: composerContextHidden,
+      // With vectorization off on the portal no Knowledge room can be picked
+      // for a chat: the composer loses its knowledge base picker.
+      hideKnowledgePicker: knowledgePickerHidden,
+      // Instructions rooms and knowledge bases are picked in the room
+      // selector, several at once, and a connected one opens in Files from
+      // its pill's menu.
+      onPickContextRooms,
+      onOpenContextRoom,
+      onPickKnowledgeRooms,
+      onOpenKnowledgeRoom: onOpenContextRoom,
     }),
     [
       composerActions,
@@ -1090,6 +1187,12 @@ const AiAgentProviders = ({
       onToolCallApproveResult,
       onDropFiles,
       resolvedSuggestions,
+      chatIntro,
+      composerContextHidden,
+      knowledgePickerHidden,
+      onPickContextRooms,
+      onPickKnowledgeRooms,
+      onOpenContextRoom,
       t,
     ],
   );
@@ -1142,8 +1245,17 @@ const AiAgentProviders = ({
                             onThreadContextChange={onThreadContextChange}
                           />
                           <GenerateToolApprovalBridge />
+                          <LongToolApprovalBridge />
                           <AiChatStoreProvider store={aiChatStore}>
-                            <ContextRoomProvider room={contextRoom}>
+                            <ContextRoomProvider
+                              rooms={
+                                Array.isArray(contextRoom)
+                                  ? contextRoom
+                                  : contextRoom
+                                    ? [contextRoom]
+                                    : []
+                              }
+                            >
                               <ContextRoomWatcher />
                               <AiChatStoresBridge />
                               {getAgentRoomId ? null : <AgentRoomIdSync />}
@@ -1185,7 +1297,11 @@ const AiAgentProviders = ({
 export default AiAgentProviders;
 
 export { useIsAiChatAvailable } from "./availability";
-export { useContextRoom, type ContextRoom } from "./context-room";
+export {
+  useContextRoom,
+  useContextRooms,
+  type ContextRoom,
+} from "./context-room";
 export { useApi, useI18n, useStores } from "@onlyoffice/ai-chat";
 export { DEFAULT_SERVER_API_ROUTES } from "@onlyoffice/ai-chat";
 export type {

@@ -30,6 +30,12 @@ vi.mock("@onlyoffice/ai-chat", () => ({
       selector({
         profiles: widgetState.profiles,
         initialized: widgetState.initialized,
+        // The portal-wide flags the page reads, as the store derives them
+        // from the catalogue: a profile without a mask may chat.
+        hasProfiles: widgetState.profiles.length > 0,
+        hasChatProfiles: (
+          widgetState.profiles as { capabilities?: number }[]
+        ).some((p) => !p.capabilities || (p.capabilities & 0x01) !== 0),
       }),
     useThreadsStore: <T,>(selector: (s: unknown) => T) =>
       selector({ threadId: widgetState.threadId }),

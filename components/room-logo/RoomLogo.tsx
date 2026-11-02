@@ -11,6 +11,9 @@ import FormRoomSvg from "../../assets/icons/32/room/form.svg";
 import VirtualDataRoomSvg from "../../assets/icons/32/room/virtual-data.svg";
 import TemplateRoomsSvg from "../../assets/icons/32/room/template.react.svg";
 import AIRoomSvg from "../../assets/icons/32/room/ai.svg";
+import InstructionsRoomSvg from "../../assets/icons/32/room/instructions.svg";
+import KnowledgeRoomSvg from "../../assets/icons/32/room/knowledge.svg";
+import AiProjectSvg from "../../assets/icons/32/room/ai-project.svg";
 import CollaborationTemplateSvg from "../../assets/icons/32/template/collaboration.svg";
 import CustomTemplateSvg from "../../assets/icons/32/template/custom.svg";
 import FormTemplateSvg from "../../assets/icons/32/template/form.svg";
@@ -61,6 +64,12 @@ const RoomLogoPure = ({
           return FormTemplateSvg;
         case RoomsType.AIRoom:
           return AIRoomSvg;
+        case RoomsType.InstructionsRoom:
+          return InstructionsRoomSvg;
+        case RoomsType.KnowledgeRoom:
+          return KnowledgeRoomSvg;
+        case RoomsType.AiProjectRoom:
+          return AiProjectSvg;
         default:
           return null;
       }
@@ -79,6 +88,12 @@ const RoomLogoPure = ({
         return FormRoomSvg;
       case RoomsType.AIRoom:
         return AIRoomSvg;
+      case RoomsType.InstructionsRoom:
+        return InstructionsRoomSvg;
+      case RoomsType.KnowledgeRoom:
+        return KnowledgeRoomSvg;
+      case RoomsType.AiProjectRoom:
+        return AiProjectSvg;
       default:
         return null;
     }
