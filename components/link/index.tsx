@@ -51,13 +51,15 @@ const LinkUi: React.FC<LinkProps> = React.memo(
 
     // A link with an onClick and no href is out of the keyboard's reach: it
     // takes a Tab stop and its keys, unless the caller wires the keyboard
-    // itself (a role, a tabIndex or a key handler of its own). An action link
-    // runs code, so it is a button; a page link navigates, so it stays a link.
+    // itself (a role or a key handler of its own) or keeps the link out of
+    // it (a negative tabIndex, where something around it is the control). A
+    // tabIndex of 0 or more only places the stop. An action link runs code,
+    // so it is a button; a page link navigates, so it stays a link.
     const isKeyboardOperable =
       !href &&
       !!onClick &&
       role === undefined &&
-      tabIndex === undefined &&
+      (tabIndex === undefined || tabIndex >= 0) &&
       !onKeyDown;
     const isAction = type === LinkType.action;
 
@@ -105,7 +107,7 @@ const LinkUi: React.FC<LinkProps> = React.memo(
         href={href}
         rel={rel}
         role={isKeyboardOperable ? (isAction ? "button" : "link") : role}
-        tabIndex={isKeyboardOperable ? 0 : tabIndex}
+        tabIndex={isKeyboardOperable ? (tabIndex ?? 0) : tabIndex}
         onClick={onClick}
         onKeyDown={isKeyboardOperable ? handleKeyDown : onKeyDown}
         isBold={isBold}

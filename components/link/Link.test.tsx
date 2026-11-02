@@ -241,6 +241,41 @@ describe("<Link />", () => {
       expect(onClick).not.toHaveBeenCalled();
     });
 
+    // A tab stop of its own place in the order is no key handler: such a
+    // link took the Tab and did nothing on Enter.
+    it("is pressed by the keyboard in the Tab order it was given", () => {
+      const onClick = vi.fn();
+      render(
+        <Link type={LinkType.action} onClick={onClick} tabIndex={1}>
+          Generate
+        </Link>,
+      );
+
+      const link = screen.getByRole("button", { name: "Generate" });
+      expect(link).toHaveAttribute("tabindex", "1");
+
+      fireEvent.keyDown(link, { key: "Enter" });
+      fireEvent.keyDown(link, { key: " " });
+      expect(onClick).toHaveBeenCalledTimes(2);
+    });
+
+    // Something around it is the control: the link is the pointer's only.
+    it("stays out of the keyboard's reach with a negative tabIndex", () => {
+      const onClick = vi.fn();
+      render(
+        <Link type={LinkType.action} onClick={onClick} tabIndex={-1}>
+          browse
+        </Link>,
+      );
+
+      const link = screen.getByTestId("link");
+      expect(link).not.toHaveAttribute("role");
+      expect(link).toHaveAttribute("tabindex", "-1");
+
+      fireEvent.keyDown(link, { key: "Enter" });
+      expect(onClick).not.toHaveBeenCalled();
+    });
+
     it("is no button without an onClick", () => {
       render(<Link type={LinkType.action}>Plain</Link>);
 
