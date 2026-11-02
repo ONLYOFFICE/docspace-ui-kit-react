@@ -120,39 +120,13 @@ describe("<MigrateToWalletDialog /> confirm", () => {
       () => mocks.post.mockResolvedValue({ data: { response: false } }),
     ],
     ["the request fails", () => mocks.post.mockRejectedValue(new Error("500"))],
-  ])("keeps the dialog open with an error when %s", async (_, arrange) => {
+  ])("refreshes and closes with an error when %s", async (_, arrange) => {
     arrange();
 
-    const { onClose, onMigrated, confirm } = await confirmMigration();
-
-    await waitFor(() =>
-      expect(store.tariff.fetchPortalTariff).toHaveBeenCalledWith(true),
-    );
-    expect(store.fetchBalance).toHaveBeenCalledWith(true);
-    expect(store.quotas.fetchPortalQuota).toHaveBeenCalledWith(true);
-    expect(mocks.toastError).toHaveBeenCalledTimes(1);
-    expect(onClose).not.toHaveBeenCalled();
-    expect(onMigrated).not.toHaveBeenCalled();
-    await waitFor(() => expect(confirm).toBeEnabled());
-  });
-
-  it("lets the user retry after a failure with the same number of admins", async () => {
-    mocks.post
-      .mockResolvedValueOnce({ data: { response: false } })
-      .mockResolvedValueOnce({ data: { response: true } });
-
-    const { onClose, onMigrated, confirm } = await confirmMigration();
-
-    await waitFor(() => expect(confirm).toBeEnabled());
-    fireEvent.click(confirm);
+    const { onClose, onMigrated } = await confirmMigration();
 
     await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
     expect(onMigrated).toHaveBeenCalledTimes(1);
-    expect(mocks.post).toHaveBeenCalledTimes(2);
-    expect(mocks.post).toHaveBeenNthCalledWith(
-      2,
-      "api/2.0/portal/payment/subscription/movetowallet",
-      { quantity: { adminwallet: 5 } },
-    );
+    expect(mocks.toastError).toHaveBeenCalledTimes(1);
   });
 });

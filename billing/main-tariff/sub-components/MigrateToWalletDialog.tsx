@@ -106,8 +106,6 @@ const MigrateToWalletDialog = observer(
     const onConfirm = async () => {
       setIsSubmitting(true);
 
-      let isMigrated = false;
-
       try {
         const { data } = await rawApiClient.instance.post(
           "api/2.0/portal/payment/subscription/movetowallet",
@@ -116,25 +114,17 @@ const MigrateToWalletDialog = observer(
           },
         );
 
-        isMigrated = data?.response === true;
-        if (!isMigrated) toastr.error(t("ErrorNotification"));
+        if (data?.response !== true) toastr.error(t("ErrorNotification"));
       } catch (e) {
         console.error("[migrate-to-wallet] migration failed", e);
         toastr.error(t("ErrorNotification"));
-      }
-
-      try {
-        if (isMigrated) {
-          await onMigrated();
-          onClose();
-        } else {
-          await Promise.all([
-            store.tariff.fetchPortalTariff(true),
-            store.fetchBalance(true),
-            store.quotas.fetchPortalQuota(true),
-          ]);
-        }
       } finally {
+        try {
+          await onMigrated();
+        } catch (e) {
+          console.error("[migrate-to-wallet] refresh failed", e);
+        }
+        onClose();
         setIsSubmitting(false);
       }
     };
